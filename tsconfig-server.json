@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+      "target": "es2018",
+      "module": "commonjs",
+      "sourceMap": true,
+      "declaration": true,
+      "outDir": "build/server",
+      "strict": true,
+      "removeComments": true
+    },
+    "include": [
+      "ts/common/**/*.ts",
+      "ts/server/**/*.ts"
+    ]
+  }

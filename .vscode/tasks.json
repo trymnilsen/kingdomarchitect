@@ -1,0 +1,38 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "presentation": {
+                "echo": true,
+                "reveal": "never",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false
+            },
+            "label": "frontend",
+            "type": "npm",
+            "script": "build-client",
+            "problemMatcher": ["$ts-webpack"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "dependsOn": ["server"]
+        },
+        {
+            "presentation": {
+                "echo": true,
+                "reveal": "never",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false
+            },
+            "label": "server",
+            "type": "npm",
+            "script": "build-server",
+            "problemMatcher": ["$tsc"]
+        }
+    ]
+}

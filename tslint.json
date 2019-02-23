@@ -1,0 +1,79 @@
+{
+    "rules": {
+        "array-type": [true, "generic"],
+        "arrow-parens": [true],
+        "class-name": true,
+        "cyclomatic-complexity": [true, 3],
+        "comment-format": [true, "check-space"],
+        "eofline": true,
+        "indent": [true, "spaces"],
+        "jsdoc-format": true,
+        "max-classes-per-file": [true, 1],
+        "max-file-line-count": [true, 100],
+        "no-default-export": true,
+        "no-duplicate-variable": true,
+        "no-parameter-properties": true,
+        "no-eval": true,
+        "no-internal-module": true,
+        "no-trailing-whitespace": true,
+        "no-unsafe-finally": true,
+        "no-var-keyword": true,
+        "object-literal-key-quotes": [true, "always"],
+        "object-literal-shorthand": true,
+        "object-literal-sort-keys": true,
+        "one-line": [
+            true,
+            "check-open-brace",
+            "check-whitespace"
+        ],
+        "ordered-imports": [
+            true,
+            {
+                "import-sources-order": "lowercase-last",
+                "named-imports-order": "lowercase-first"
+            }
+        ],
+        "one-variable-per-declaration": [true, "ignore-for-loop"],
+        "quotemark": [true, "double"],
+        "semicolon": [
+            true,
+            "always"
+        ],
+        "trailing-comma": [
+            false,
+            {
+                "multiline": "never",
+                "singleline": "never"
+            }
+        ],
+        "triple-equals": true,
+        "typedef-whitespace": [
+            true,
+            {
+                "call-signature": "nospace",
+                "index-signature": "nospace",
+                "parameter": "nospace",
+                "property-declaration": "nospace",
+                "variable-declaration": "nospace"
+            }
+        ],
+        "variable-name": [
+            true,
+            "check-format",
+            "allow-leading-underscore",
+            "allow-trailing-underscore",
+            "allow-pascal-case",
+            "ban-keywords"
+        ],
+        "whitespace": [
+            true,
+            "check-branch",
+            "check-decl",
+            "check-operator",
+            "check-module",
+            "check-separator",
+            "check-type",
+            "check-typecast"
+        ]
+    }
+}

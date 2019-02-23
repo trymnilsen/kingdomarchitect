@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "target": "ES5",
+        "module": "es6",
+        "moduleResolution": "node",
+        "outDir": "build/client",
+        "rootDir": "./ts",
+        "noEmitOnError": true,
+        "lib": ["dom", "scripthost", "es2015.promise", "es2015", "es5"],
+        "types": [],
+        "sourceMap": true,
+        "experimentalDecorators": true
+    },
+    "exclude": [
+        "node_modules",
+        ".npm"
+    ],
+    "include": [
+        "ts/**/*.ts"
+    ]
+  }

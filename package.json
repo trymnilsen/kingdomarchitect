@@ -1,0 +1,44 @@
+{
+  "name": "kingdomarchitect",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "build-server": "tsc -p tsconfig-server.json",
+    "build-client": "webpack",
+    "build": "npm run build-server && npm run build-client",
+    "lint": "tslint -c tslint.json 'ts/**/*.ts'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/trymnilsen/kingdomarchitect.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/trymnilsen/kingdomarchitect/issues"
+  },
+  "homepage": "https://github.com/trymnilsen/kingdomarchitect#readme",
+  "dependencies": {
+    "@google-cloud/firestore": "^1.0.1",
+    "@types/express": "^4.16.1",
+    "@types/jest": "^24.0.6",
+    "@types/ws": "^6.0.1",
+    "express": "^4.16.4",
+    "express-handlebars": "^3.0.1",
+    "jest": "^24.1.0",
+    "konva": "^2.6.0",
+    "source-map-support": "^0.5.10",
+    "ts-jest": "^24.0.0",
+    "ts-loader": "^5.3.3",
+    "ts-mockito": "^2.3.1",
+    "tslint": "^5.13.0",
+    "typescript": "^3.3.3333",
+    "webpack": "^4.29.5",
+    "webpack-cli": "^3.2.3",
+    "ws": "^6.1.4"
+  }
+}
