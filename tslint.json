@@ -1,15 +1,15 @@
 {
     "rules": {
-        "array-type": [true, "generic"],
+        "array-type": [false, "generic"],
         "arrow-parens": [true],
         "class-name": true,
-        "cyclomatic-complexity": [true, 3],
+        "cyclomatic-complexity": [true, 5],
         "comment-format": [true, "check-space"],
         "eofline": true,
         "indent": [true, "spaces"],
         "jsdoc-format": true,
-        "max-classes-per-file": [true, 1],
-        "max-file-line-count": [true, 100],
+        "max-classes-per-file": [true, 5],
+        "max-file-line-count": [true, 500],
         "no-default-export": true,
         "no-duplicate-variable": true,
         "no-parameter-properties": true,
@@ -18,21 +18,15 @@
         "no-trailing-whitespace": true,
         "no-unsafe-finally": true,
         "no-var-keyword": true,
-        "object-literal-key-quotes": [true, "always"],
+        "object-literal-key-quotes": [true, "consistent-as-needed"],
         "object-literal-shorthand": true,
-        "object-literal-sort-keys": true,
+        "object-literal-sort-keys": false,
         "one-line": [
             true,
             "check-open-brace",
             "check-whitespace"
         ],
-        "ordered-imports": [
-            true,
-            {
-                "import-sources-order": "lowercase-last",
-                "named-imports-order": "lowercase-first"
-            }
-        ],
+        "ordered-imports": false,
         "one-variable-per-declaration": [true, "ignore-for-loop"],
         "quotemark": [true, "double"],
         "semicolon": [

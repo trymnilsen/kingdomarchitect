@@ -1,0 +1,19 @@
+html,
+body {
+    height: 100%;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+#renderContainer {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+#stage-parent {
+    width: 100%;
+    overflow: hidden;
+    background:rgba(240, 240, 240, 255);
+}

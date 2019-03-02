@@ -7,9 +7,10 @@
         "rootDir": "./ts",
         "noEmitOnError": true,
         "lib": ["dom", "scripthost", "es2015.promise", "es2015", "es5"],
-        "types": [],
+        "types": ["jest"],
         "sourceMap": true,
-        "experimentalDecorators": true
+        "experimentalDecorators": true,
+        "esModuleInterop": true
     },
     "exclude": [
         "node_modules",

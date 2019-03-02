@@ -4,12 +4,16 @@
       "module": "commonjs",
       "sourceMap": true,
       "declaration": true,
-      "outDir": "build/server",
-      "strict": true,
-      "removeComments": true
+      "outDir": "build",
+      "strict": false,
+      "rootDir": "./ts",
+      "removeComments": false,
+      "experimentalDecorators": true,
+      "types": ["jest"],
+      "esModuleInterop": true
     },
     "include": [
       "ts/common/**/*.ts",
       "ts/server/**/*.ts"
-    ]
+    ],
   }
