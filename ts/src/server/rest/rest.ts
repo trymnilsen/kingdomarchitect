@@ -1,6 +1,7 @@
 import { inspect } from "util";
 import { Application } from "express";
 import { UserController } from "./controller/user-controller";
+import { getLog } from "../monitoring/logger";
 
 enum Method {
     GET = "GET",
@@ -25,6 +26,7 @@ interface ControllerInstance {
     instance: Object;
 }
 
+const logger = getLog("REST");
 const controllerMetadata: ControllerMetadata[] = [];
 const controllerInstance: ControllerInstance[] = [];
 
@@ -115,13 +117,13 @@ export function attachController(
 function attachSingleController(controller: Object, express: Application) {
     const metadata = controllerMetadata.find((x) => x.controllerFunction === controller.constructor);
     if (!metadata) {
-        console.log("No controller metadata found for ", controller.constructor);
+        logger.error("No controller metadata found for " + controller.constructor);
     }
     if (!!metadata.routes) {
         metadata.routes.forEach((r) => {
             const handler = r.handler.bind(controller);
             const path = metadata.controllerPath + r.path;
-            console.log(`Creating route ${r.method} ${path}`);
+            logger.info(`Creating route ${r.method} ${path}`);
             switch (r.method) {
                 case Method.GET:
                     express.get(path, handler);
@@ -130,7 +132,7 @@ function attachSingleController(controller: Object, express: Application) {
                     express.post(path, handler);
                     break;
                 default:
-                    console.log(r.method + " not yet supported");
+                    logger.error(r.method + " not yet supported");
                     break;
             }
         });

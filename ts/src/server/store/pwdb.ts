@@ -1,11 +1,11 @@
-import * as datastore from "pwdb";
+import datastore from "pwdb";
+
+let store: datastore = new datastore({
+});
 
 export class Pwdb {
     public datastore: datastore;
     public constructor() {
-        this.datastore = new datastore({
-            filename: "database.pwdb",
-            autoload: true
-        });
+        this.datastore = store;
     }
 }

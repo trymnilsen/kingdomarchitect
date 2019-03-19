@@ -1,0 +1,5 @@
+GET http://localhost:5000/user
+
+
+### Create anon user
+POST http://localhost:5000/user/anonymous

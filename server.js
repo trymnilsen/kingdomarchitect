@@ -4,5 +4,9 @@
 //     allowExpressions: true,
 //     projectId: "kingdomarchitect"
 // });
-const app = require("./build/server/application");
-app.bootstrap();
+const app = require("./build/src/server/application");
+const expressApp = app.bootstrap();
+
+expressApp.listen(5000, () => {
+    console.log("Listening on port 5000");
+});

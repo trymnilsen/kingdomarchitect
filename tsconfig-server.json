@@ -13,7 +13,7 @@
       "esModuleInterop": true
     },
     "include": [
-      "ts/common/**/*.ts",
-      "ts/server/**/*.ts"
+      "ts/src/common/**/*.ts",
+      "ts/src/server/**/*.ts"
     ],
   }

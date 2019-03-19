@@ -4,7 +4,15 @@ export interface Logger {
 }
 export function getLog(name: string): Logger {
     return {
-      info: (message: string) => { console.info(`${Date.name} - ${name} - ${message}`); },
-      error: (message: string) => { console.error(`${Date.name} - ${name} - ${message}`); }
+      info: (message: string) => {
+        if (process.env["NODE_ENV"] === "test") { return; }
+        console.info(`${timestamp()} - ${name} - ${message}`);
+      },
+      error: (message: string) => { console.error(`${timestamp()} - ${name} - ${message}`); }
     };
+}
+
+
+function timestamp(): string {
+  return new Date().toString();
 }

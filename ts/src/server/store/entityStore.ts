@@ -1,8 +1,8 @@
 import { Entity } from "./entity";
-import * as Pwdb from "pwdb";
+import { Pwdb } from "./pwdb";
 
 export abstract class EntityStore<T extends Entity> {
-    protected pwdb: Pwdb;
+    protected pwdb: Pwdb ;
     private type: string;
     public constructor(entityName: string) {
         this.pwdb = new Pwdb();
@@ -10,7 +10,7 @@ export abstract class EntityStore<T extends Entity> {
     }
     public insert(data: T): Promise<T> {
         return new Promise<T>((resolve, reject) => {
-            this.pwdb.insert(data, (err, document) => {
+            this.pwdb.datastore.insert(data, (err, document) => {
                 if (!!err) {
                     reject(err);
                 } else {
@@ -21,7 +21,7 @@ export abstract class EntityStore<T extends Entity> {
     }
     public delete(id: string): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            this.pwdb.remove({
+            this.pwdb.datastore.remove({
                 _id: id,
                 _type: this.type
             }, {}, (err) => {
@@ -35,7 +35,7 @@ export abstract class EntityStore<T extends Entity> {
     }
     public findById(id: string): Promise<T> {
         return new Promise<T>((resolve, reject) => {
-            this.pwdb.findOne({
+            this.pwdb.datastore.findOne({
                 _id: id,
                 _type: this.type
             }, (err, document) => {
