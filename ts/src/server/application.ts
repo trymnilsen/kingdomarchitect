@@ -42,6 +42,10 @@ export function bootstrap() {
         gameServer.clientConnected(socket);
     });
 
+    expressApp.get("*", (req, res) => {
+        res.sendFile(process.cwd() + "/public/index.html");
+    });
+
     httpServer.listen(5000, "localhost");
     return expressApp;
 }

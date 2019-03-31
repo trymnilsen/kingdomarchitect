@@ -1,4 +1,4 @@
-import { getUser, User, setUser } from "./data/user";
+import { getUser, setUser } from "./data/user";
 
 export async function authenticate() {
     // Check local storage for user

@@ -1,7 +1,7 @@
+import { User } from "../../common/data/user";
+
 const userKey = "USERDATA";
-export interface User {
-    id: string;
-}
+
 export function getUser(): User {
     const userData = window.localStorage.getItem(userKey);
     if (!!userData) {

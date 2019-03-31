@@ -33,11 +33,10 @@ export class GameServer {
         const socket = this.unauthenticatedConnections[connectionId];
         if (parsedData.id === AuthenticateMessageId) {
             // Todo check authenticity
-            if (!!parsedData.data.id) {
+            if (!!parsedData.data) {
                 const responseMessage: NetworkEvent = {
                     id: AuthenticateMessageId,
-                    status: "OK",
-                    data: {}
+                    status: "OK"
                 };
                 socket.send(JSON.stringify(responseMessage));
                 this.authenticatedConnections[connectionId] = socket;
@@ -45,8 +44,7 @@ export class GameServer {
             } else {
                 const responseMessage: NetworkEvent = {
                     id: AuthenticateMessageId,
-                    status: "REFUSE",
-                    data: {}
+                    status: "REFUSE"
                 };
                 socket.send(JSON.stringify(responseMessage));
                 socket.close();

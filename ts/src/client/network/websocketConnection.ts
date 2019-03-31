@@ -6,7 +6,9 @@ import {
 
 export class WebsocketConnection {
     private connection: WebSocket;
+
     public constructor() {}
+
     public async connect() {
         this.connection = new WebSocket("ws://localhost:5000/ws");
         return new Promise<void>((resolve, reject) => {
