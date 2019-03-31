@@ -10,6 +10,7 @@ export class Game {
             //Messages
             //Toast
     }
+
     public dispose(): any {
     //    throw new Error("Method not implemented.");
     }

@@ -1,5 +1,9 @@
 {
+    "rulesDirectory": [
+        "node_modules/tslint-lines-between-class-members"
+    ],
     "rules": {
+        "lines-between-class-members": [true, 1],
         "array-type": [false, "generic"],
         "arrow-parens": [true],
         "class-name": true,

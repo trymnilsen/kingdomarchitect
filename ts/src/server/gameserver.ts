@@ -1,13 +1,16 @@
 import { getLog, Logger } from "./monitoring/logger";
-import { NetworkEvent, AuthenticateMessageId } from "../common/data/event/networkEvent";
+import {
+    NetworkEvent,
+    AuthenticateMessageId
+} from "../common/data/event/networkEvent";
 
 export type WebSocket = import("ws");
 
 export class GameServer {
     private connectionId = 0;
     private logger: Logger;
-    private unauthenticatedConnections: {[id: string]: WebSocket} = {};
-    private authenticatedConnections: {[id: string]: WebSocket} = {};
+    private unauthenticatedConnections: { [id: string]: WebSocket } = {};
+    private authenticatedConnections: { [id: string]: WebSocket } = {};
 
     public constructor() {
         this.logger = getLog("GameServer");
@@ -18,7 +21,9 @@ export class GameServer {
         this.connectionId = newClientId;
         this.unauthenticatedConnections[newClientId] = ws;
         ws.on("message", (data) => {
-            this.logger.info(`OnMessage connection: ${newClientId} data: ${data.toString()}`);
+            this.logger.info(
+                `OnMessage connection: ${newClientId} data: ${data.toString()}`
+            );
             this.onMessage(data.toString(), newClientId);
         });
     }
@@ -48,5 +53,5 @@ export class GameServer {
                 delete this.unauthenticatedConnections[connectionId];
             }
         }
-    }
+    };
 }

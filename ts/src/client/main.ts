@@ -18,6 +18,10 @@ export async function bootstrap() {
     router.init();
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    bootstrap();
-}, false);
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+        bootstrap();
+    },
+    false
+);

@@ -5,9 +5,12 @@ export async function authenticate() {
     const currentUser = getUser();
     if (!currentUser) {
         try {
-            const response = await fetch("http://localhost:5000/user/anonymous", {
-                method: "POST"
-            });
+            const response = await fetch(
+                "http://localhost:5000/user/anonymous",
+                {
+                    method: "POST"
+                }
+            );
             const responseData = await response.json();
             setUser({
                 id: responseData._id

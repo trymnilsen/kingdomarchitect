@@ -1,11 +1,12 @@
 import { getUser } from "../data/user";
-import { NetworkEvent, AuthenticateMessageId } from "../../common/data/event/networkEvent";
+import {
+    NetworkEvent,
+    AuthenticateMessageId
+} from "../../common/data/event/networkEvent";
 
 export class WebsocketConnection {
     private connection: WebSocket;
-    public constructor() {
-
-    }
+    public constructor() {}
     public async connect() {
         this.connection = new WebSocket("ws://localhost:5000/ws");
         return new Promise<void>((resolve, reject) => {
@@ -20,4 +21,3 @@ export class WebsocketConnection {
         });
     }
 }
-

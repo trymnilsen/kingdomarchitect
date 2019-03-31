@@ -115,9 +115,13 @@ export function attachController(
 }
 
 function attachSingleController(controller: Object, express: Application) {
-    const metadata = controllerMetadata.find((x) => x.controllerFunction === controller.constructor);
+    const metadata = controllerMetadata.find(
+        (x) => x.controllerFunction === controller.constructor
+    );
     if (!metadata) {
-        logger.error("No controller metadata found for " + controller.constructor);
+        logger.error(
+            "No controller metadata found for " + controller.constructor
+        );
     }
     if (!!metadata.routes) {
         metadata.routes.forEach((r) => {

@@ -8,11 +8,12 @@ export class MenuView extends View {
         const worldsButton = document.createElement("a");
         worldsButton.className = "button";
         worldsButton.href = "/select-world";
-        
+
         buttonContainer.append(worldsButton);
         worldsButton.innerText = "My Worlds";
         return buttonContainer;
-    }    
+    }
+
     public dispose(): void {
 
     }

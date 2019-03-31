@@ -12,6 +12,7 @@ export class NotFoundView extends View {
         container.innerText = "Not found";
         return container;
     }
+
     public dispose(): void {
         console.log("Disposing not found view");
     }
@@ -31,6 +32,7 @@ export class Router {
         this.notFoundView = new NotFoundView();
         this.routes = this.createRoutes(routes);
     }
+
     public init() {
         this.routeView();
     }
@@ -44,12 +46,12 @@ export class Router {
 
             this.routeView(targetElement.pathname);
         }
-    };
+    }
 
     private stackPopped = (event: PopStateEvent) => {
         console.log("Stack popped", event);
         this.routeView();
-    };
+    }
 
     private routeView(url?: string) {
         if (!!url) {
@@ -68,7 +70,9 @@ export class Router {
 
     private getView(): View {
         console.log("Finding view for ", window.location.pathname);
-        const route = this.routes.find(x=> x.regex.exec(window.location.pathname) !== null);
+        const route = this.routes.find(
+            (x) => x.regex.exec(window.location.pathname) !== null
+        );
         if (!!route) {
             console.log("Found");
             return route.view;
@@ -85,13 +89,16 @@ export class Router {
                 const view = routes[path];
                 try {
                     const regex = new RegExp(path);
-                    finalRoutes.push({regex, view});
+                    finalRoutes.push({ regex, view });
                 } catch {
-                    console.error("Could not create route for invalid regex", path);
+                    console.error(
+                        "Could not create route for invalid regex",
+                        path
+                    );
                 }
             }
         }
-        if(finalRoutes.length === 0) {
+        if (finalRoutes.length === 0) {
             console.warn("No routes defined");
         }
         return finalRoutes;

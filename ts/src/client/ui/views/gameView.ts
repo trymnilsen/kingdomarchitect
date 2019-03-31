@@ -13,6 +13,7 @@ export class GameView extends View {
         this.game = new Game(canvasWrapperId);
         return canvasWrapper;
     }
+
     public dispose(): void {
         console.log("Disposing gameview");
         this.game.dispose();

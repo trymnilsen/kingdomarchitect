@@ -2,7 +2,7 @@ import { Entity } from "./entity";
 import { Pwdb } from "./pwdb";
 
 export abstract class EntityStore<T extends Entity> {
-    protected pwdb: Pwdb ;
+    protected pwdb: Pwdb;
     private type: string;
     public constructor(entityName: string) {
         this.pwdb = new Pwdb();
@@ -21,30 +21,37 @@ export abstract class EntityStore<T extends Entity> {
     }
     public delete(id: string): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            this.pwdb.datastore.remove({
-                _id: id,
-                _type: this.type
-            }, {}, (err) => {
-                if (!!err) {
-                    reject(err);
-                } else {
-                    resolve();
+            this.pwdb.datastore.remove(
+                {
+                    _id: id,
+                    _type: this.type
+                },
+                {},
+                (err) => {
+                    if (!!err) {
+                        reject(err);
+                    } else {
+                        resolve();
+                    }
                 }
-            });
+            );
         });
     }
     public findById(id: string): Promise<T> {
         return new Promise<T>((resolve, reject) => {
-            this.pwdb.datastore.findOne({
-                _id: id,
-                _type: this.type
-            }, (err, document) => {
-                if (!!err) {
-                    reject(err);
-                } else {
-                    resolve(document as T);
+            this.pwdb.datastore.findOne(
+                {
+                    _id: id,
+                    _type: this.type
+                },
+                (err, document) => {
+                    if (!!err) {
+                        reject(err);
+                    } else {
+                        resolve(document as T);
+                    }
                 }
-            });
+            );
         });
     }
 }

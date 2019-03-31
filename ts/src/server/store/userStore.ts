@@ -3,9 +3,7 @@ import { Entity } from "./entity";
 import * as uuid from "uuid";
 
 export const USER_ENTITY_NAME = "user";
-export interface User extends Entity {
-
-}
+export interface User extends Entity {}
 export class UserStore extends EntityStore<User> {
     public constructor() {
         super("user");

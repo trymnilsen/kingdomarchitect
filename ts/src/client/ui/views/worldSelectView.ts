@@ -15,10 +15,12 @@ export class WorldSelectView extends View {
 
         listContainer.append(createWorldButton);
         return listContainer;
-    }    
+    }
+
     public dispose(): void {
 
     }
+
     private createWorldListItems(): HTMLElement[] {
         const items: HTMLElement[] = [];
         items.push(this.createSingleWorldListItem("TestWorld1"));
@@ -26,6 +28,7 @@ export class WorldSelectView extends View {
         items.push(this.createSingleWorldListItem("The world i forgot"));
         return items;
     }
+
     private createSingleWorldListItem(name: string): HTMLElement {
         const listItem = document.createElement("li");
         const worldLink = document.createElement("a");

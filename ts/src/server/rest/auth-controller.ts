@@ -4,12 +4,7 @@ import { UserStore } from "../store/userStore";
 
 @controller("/authenticate")
 export class AuthenticateController {
-
-    public constructor() {
-
-    }
+    public constructor() {}
     @post("/websocket")
-    public async createAnonymousUser(req: Request, res: Response) {
-
-    }
+    public async createAnonymousUser(req: Request, res: Response) {}
 }
