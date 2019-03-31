@@ -2,16 +2,16 @@ import { View } from "../view";
 import "./gameView.css";
 import { Game } from "../../game/game";
 
-const canvasWrapperId = "gameCanvasWrapper";
+const canvasElementId = "gameCanvas";
 
 export class GameView extends View {
     private game: Game;
 
     public render(): HTMLElement {
-        const canvasWrapper = document.createElement("div");
-        canvasWrapper.id = canvasWrapperId;
-        this.game = new Game(canvasWrapperId);
-        return canvasWrapper;
+        const canvasElement = document.createElement("canvas");
+        canvasElement.id = canvasElementId;
+        this.game = new Game(canvasElementId);
+        return canvasElement;
     }
 
     public dispose(): void {

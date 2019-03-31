@@ -1,9 +1,12 @@
 import { View } from "../view";
+import "./worldSelectView.css";
 
 export class WorldSelectView extends View {
     public render(): HTMLElement {
         const listContainer = document.createElement("div");
+        listContainer.classList.toggle("padded-view-container");
         const list = document.createElement("ul");
+        list.id = "worldSelectList";
         this.createWorldListItems().forEach((item) => {
             list.appendChild(item);
         });
