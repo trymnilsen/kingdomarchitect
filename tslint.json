@@ -4,7 +4,7 @@
         "arrow-parens": [true],
         "class-name": true,
         "cyclomatic-complexity": [true, 5],
-        "comment-format": [true, "check-space"],
+        "comment-format": false,
         "eofline": true,
         "indent": [true, "spaces"],
         "jsdoc-format": true,

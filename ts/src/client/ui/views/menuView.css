@@ -1,0 +1,20 @@
+div#container #button-container {
+    position: fixed;
+    bottom: 0px;
+    width: 100%;
+    padding: 20px;
+}
+
+div#container #button-container .button {
+    background-color: blue;
+    width: calc(100% - 40px);
+    height: 50px;
+    display: inline-block;
+    line-height: 50px;
+    font-size: 32px;
+    font-family: sans-serif;
+    color: white;
+    border-radius: 10px;
+    text-align: center;
+    text-decoration: none;
+}

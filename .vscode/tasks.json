@@ -14,7 +14,7 @@
             "label": "frontend",
             "type": "npm",
             "script": "build-client",
-            "problemMatcher": ["$ts-webpack"],
+            "problemMatcher": ["$awesometsc"],
             "group": {
                 "kind": "build",
                 "isDefault": true

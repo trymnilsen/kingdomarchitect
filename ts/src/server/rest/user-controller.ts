@@ -1,6 +1,6 @@
-import { controller, get, post } from "../rest";
+import { controller, get, post } from "./rest";
 import { Request, Response } from "express";
-import { UserStore } from "../../store/userStore";
+import { UserStore } from "../store/userStore";
 
 @controller("/user")
 export class UserController {

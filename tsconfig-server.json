@@ -1,19 +1,12 @@
 {
+    "extends": "./tsconfig.json",
     "compilerOptions": {
-      "target": "es2018",
-      "module": "commonjs",
-      "sourceMap": true,
-      "declaration": true,
-      "outDir": "build",
-      "strict": false,
-      "rootDir": "./ts",
-      "removeComments": false,
-      "experimentalDecorators": true,
-      "types": ["jest"],
-      "esModuleInterop": true
+      "outDir": "./build/",
+      "lib": ["es2018"],
+      "skipLibCheck": true
     },
     "include": [
+      "ts/src/server/**/*.ts",
       "ts/src/common/**/*.ts",
-      "ts/src/server/**/*.ts"
-    ],
+    ]
   }

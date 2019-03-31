@@ -1,22 +1,20 @@
 {
     "compilerOptions": {
-        "target": "ES5",
-        "module": "es6",
-        "moduleResolution": "node",
-        "outDir": "build/client",
-        "rootDir": "./ts",
-        "noEmitOnError": true,
-        "lib": ["dom", "scripthost", "es2015.promise", "es2015", "es5"],
-        "types": ["jest"],
-        "sourceMap": true,
-        "experimentalDecorators": true,
-        "esModuleInterop": true
+      "target": "es2018",
+      "module": "commonjs",
+      "sourceMap": true,
+      "declaration": false,
+      "rootDir": "./ts",
+      "strictFunctionTypes": true,
+      "noImplicitReturns": true,
+      "noImplicitAny": true,
+      "noImplicitThis": true,
+      "removeComments": false,
+      "experimentalDecorators": true,
+      "esModuleInterop": true,
+      "noEmitOnError": true
     },
-    "exclude": [
-        "node_modules",
-        ".npm"
-    ],
     "include": [
-        "ts/**/*.ts"
+      "**/*.ts",
     ]
   }

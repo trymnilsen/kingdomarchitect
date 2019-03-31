@@ -1,6 +1,6 @@
 import { inspect } from "util";
 import { Application } from "express";
-import { UserController } from "./controller/user-controller";
+import { UserController } from "./user-controller";
 import { getLog } from "../monitoring/logger";
 
 enum Method {
@@ -106,7 +106,7 @@ export function post(path?: string) {
 }
 
 export function attachController(
-    controllers: Object[],
+    controllers: Array<Object>,
     express: Application
 ) {
     controllers.forEach((controller) => {

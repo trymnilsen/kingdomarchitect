@@ -1,14 +1,4 @@
-export class View {
-    public render() {
-
-    }
-    public dispose() {
-
-    }
-    public attach(view: View) {
-
-    }
-    public detach(view: View) {
-
-    }
+export abstract class View {
+    public abstract render(): HTMLElement;
+    public abstract dispose(): void;
 }

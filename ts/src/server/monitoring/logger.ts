@@ -14,5 +14,5 @@ export function getLog(name: string): Logger {
 
 
 function timestamp(): string {
-  return new Date().toString();
+  return new Date().toISOString();
 }
