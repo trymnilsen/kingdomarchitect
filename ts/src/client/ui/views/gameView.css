@@ -2,3 +2,8 @@ canvas#gameCanvas {
     width: 100%;
     height: 100%;
 }
+div#canvaswrapper {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}

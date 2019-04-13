@@ -1,7 +1,4 @@
 {
-    "rulesDirectory": [
-        "node_modules/tslint-lines-between-class-members"
-    ],
     "rules": {
         "array-type": [false, "generic"],
         "arrow-parens": [true],
@@ -34,7 +31,8 @@
         "quotemark": [true, "double"],
         "semicolon": [
             true,
-            "always"
+            "always",
+            "ignore-bound-class-methods"
         ],
         "trailing-comma": [
             false,

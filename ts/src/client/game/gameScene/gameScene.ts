@@ -1,7 +1,8 @@
+import { RenderContext } from "../rendering/renderContext";
+
 export interface GameScene {
     transitionTo(): void;
-    transitionFrom(): void;
-    render(): void;
+    render(context: RenderContext): void;
     dispose(): void;
 }
 
@@ -24,7 +25,7 @@ export class GameSceneHandler implements GameSceneChanger {
             throw new Error("Invalid scene name, cannot transition");
         }
         if (!!this.currentScene) {
-            this.currentScene.transitionFrom();
+            this.currentScene.dispose();
         }
         newScene.transitionTo();
         this.currentScene = newScene;

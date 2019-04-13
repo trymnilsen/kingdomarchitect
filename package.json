@@ -4,13 +4,14 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --no-colors",
     "start": "node server.js",
     "live-start": "nodemon --delay 500ms -w build server.js",
     "build-server": "tsc -b tsconfig-server.json",
     "build-client": "webpack",
     "build": "npm run build-server && npm run build-client",
-    "lint": "tslint -c tslint.json 'ts/**/*.ts'"
+    "lint": "tslint -c tslint.json 'ts/**/*.ts'",
+    "ci": "npm run build && npm run lint && npm run test"
   },
   "repository": {
     "type": "git",
@@ -50,7 +51,7 @@
     "ts-loader": "^5.3.3",
     "ts-mockito": "^2.3.1",
     "tslint": "^5.14.0",
-    "typescript": "^3.4.1",
+    "typescript": "^3.4.3",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.3.0"
   }

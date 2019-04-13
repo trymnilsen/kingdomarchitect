@@ -4,9 +4,9 @@ describe("UserController tests", () => {
     describe("GET /user", () => {
         it("returns 200", (done) => {
             request(bootstrap())
-            .get("/user")
-            .set("Accept", "application/json")
-            .expect(200, done);
+                .get("/user")
+                .set("Accept", "application/json")
+                .expect(200, done);
         });
     });
 });

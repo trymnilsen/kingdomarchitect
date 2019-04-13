@@ -46,12 +46,12 @@ export class Router {
 
             this.routeView(targetElement.pathname);
         }
-    }
+    };
 
     private stackPopped = (event: PopStateEvent) => {
         console.log("Stack popped", event);
         this.routeView();
-    }
+    };
 
     private routeView(url?: string) {
         if (!!url) {
@@ -63,9 +63,12 @@ export class Router {
         }
         const view: View = this.getView();
         this.currentView = view;
+        console.log(`Rendering to ${view}`);
         const element = view.render();
         this.currentElement = element;
         this.container.append(element);
+        console.log("Mounting view");
+        view.onMounted();
     }
 
     private getView(): View {

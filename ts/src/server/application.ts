@@ -11,7 +11,7 @@ import http from "http";
 import { GameServer } from "./gameserver";
 import { AuthenticateController } from "./rest/auth-controller";
 
-export function bootstrap() {
+export function bootstrap(listen?: boolean) {
     const expressApp = express();
     const httpServer = http.createServer(expressApp);
 
@@ -46,6 +46,8 @@ export function bootstrap() {
         res.sendFile(process.cwd() + "/public/index.html");
     });
 
-    httpServer.listen(5000, "localhost");
+    if (listen) {
+        httpServer.listen(5000, "localhost");
+    }
     return expressApp;
 }
