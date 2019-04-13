@@ -9,8 +9,12 @@ export class Event<T = {}> {
         };
     }
     public publish(data: T): void {
-        Object.values(this.listeners).forEach((listener) => {
-            listener(data);
+        Object.values(this.listeners).forEach((listener, idx) => {
+            try {
+                listener(data);
+            } catch (err) {
+                console.error(`Failed to run event listener #${idx} ${listener.name}`, err);
+            }
         });
     }
     public dispose(): void {

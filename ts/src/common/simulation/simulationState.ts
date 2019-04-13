@@ -5,13 +5,9 @@ export enum Operation {
     Update,
     Delete
 }
-export class SimulationState {
-    public listen(path: string, operation: Operation): EventHandle {}
-    public get(path: string) {}
-}
 
 class StateNode {
-    public set() {}
-    public push() {}
-    public clear() {}
+    public set() { }
+    public push() { }
+    public clear() { }
 }
