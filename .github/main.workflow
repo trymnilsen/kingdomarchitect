@@ -1,6 +1,5 @@
 workflow "Build on commit" {
     on = "push"
-    resolves = [ "GitHub Action for npm" ]
 }
 
 action "Install" {
