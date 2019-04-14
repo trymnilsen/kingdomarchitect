@@ -3,7 +3,7 @@
         "array-type": [false, "generic"],
         "arrow-parens": [true],
         "class-name": true,
-        "cyclomatic-complexity": [true, 6],
+        "cyclomatic-complexity": [true, 10],
         "comment-format": false,
         "eofline": true,
         "indent": [true, "spaces"],

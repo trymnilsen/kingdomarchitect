@@ -1,12 +1,13 @@
-export interface Json {
-    [x: string]: JsonValueTypes;
+export interface JsonObject {
+    [x: string]: Json;
 }
-export interface JsonArray extends Array<JsonValueTypes> { }
+export interface JsonArray extends Array<Json> {}
 
-export type JsonValueTypes =
+export type Json = string | number | boolean | Date | JsonObject | JsonArray;
+
+export type JsonValueSubTypes =
     | string
     | number
     | boolean
-    | Date
-    | Json
+    | JsonObject
     | JsonArray;

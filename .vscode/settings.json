@@ -13,5 +13,9 @@
         "**/node_modules/*/**": true,
         "build/**": true
     },
-    "editor.formatOnSave": true
+    "typescript.format.enable": true,
+    "editor.formatOnSave": true,
+    "jest.enableSnapshotUpdateMessages": false,
+    "jest.enableSnapshotPreviews": false,
+    "jest.enableInlineErrorMessages": false
 }
