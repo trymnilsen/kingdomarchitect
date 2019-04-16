@@ -13,7 +13,10 @@ export class Event<T = {}> {
             try {
                 listener(data);
             } catch (err) {
-                console.error(`Failed to run event listener #${idx} ${listener.name}`, err);
+                console.error(
+                    `Failed to run event listener #${idx} ${listener.name}`,
+                    err
+                );
             }
         });
     }
@@ -21,9 +24,11 @@ export class Event<T = {}> {
         this.listeners = {};
     }
 }
+
 export interface EventListener<T> {
     listen(subscriber: EventSubscriptionHandler<T>): EventHandle;
 }
+
 export interface EventPublisher<T> {
     publish(data: T): void;
 }

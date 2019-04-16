@@ -1,4 +1,6 @@
 import { View } from "./view";
+import { ServiceContainer } from "../../common/ioc/service";
+import { ViewContext } from "./viewContext";
 
 interface Route {
     regex: RegExp;
@@ -24,13 +26,19 @@ export class Router {
     private container: HTMLElement;
     private routes: Route[];
     private notFoundView: NotFoundView;
+    private viewContext: ViewContext;
 
-    public constructor(mountingPoint: string, routes: { [id: string]: View }) {
+    public constructor(
+        mountingPoint: string,
+        routes: { [id: string]: View },
+        services: ServiceContainer
+    ) {
         this.container = document.querySelector(mountingPoint);
         document.addEventListener("click", this.documentClick);
         window.addEventListener("popstate", this.stackPopped);
         this.notFoundView = new NotFoundView();
         this.routes = this.createRoutes(routes);
+        this.viewContext = { ioc: services };
     }
 
     public init() {
@@ -68,7 +76,7 @@ export class Router {
         this.currentElement = element;
         this.container.append(element);
         console.log("Mounting view");
-        view.onMounted();
+        view.onMounted(this.viewContext);
     }
 
     private getView(): View {

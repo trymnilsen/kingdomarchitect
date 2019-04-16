@@ -1,11 +1,11 @@
-import { InputAction } from "./inputAction";
+import { InputActionData } from "./inputAction";
 import { Event, EventListener } from "../../common/event/event";
 
-export type KeyboardMap = { [key: string]: InputAction };
+export type KeyboardMap = { [key: string]: InputActionData };
 
 export class Keyboard {
     private keyboardMap: KeyboardMap;
-    private _keyEvent: Event<InputAction>;
+    private _keyEvent: Event<InputActionData>;
     public constructor() {
         this.keyboardMap = getKeyboardMap();
         this._keyEvent = new Event();
@@ -15,7 +15,7 @@ export class Keyboard {
         this._keyEvent.dispose();
     }
 
-    public get keyEvent(): EventListener<InputAction> {
+    public get keyEvent(): EventListener<InputActionData> {
         return this._keyEvent;
     }
 

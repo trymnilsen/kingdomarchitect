@@ -1,9 +1,9 @@
 import { Event, EventListener } from "../../common/event/event";
-import { InputAction } from "./inputAction";
+import { InputActionData } from "./inputAction";
 import { Keyboard } from "./keyboard";
 
 export interface InputEvent {
-    action: InputAction;
+    action: InputActionData;
     inputType: InputType;
 }
 export enum InputType {

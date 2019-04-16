@@ -26,13 +26,14 @@ export interface JsonNodeChangeEvent {
     node: JsonNode;
     operation: ChangeOperation;
     cancelBubbling?: boolean;
+    trigger?: string;
 }
 
 export type JsonObject = {
     [id: string]: object | number | string | Array<object | number | string>;
 };
 
-export abstract class JsonNode {
+export abstract class JsonNode implements EventListener<JsonNodeChangeEvent> {
     private _id: string;
     private _type: JsonNodeType;
     private parent: JsonNode;
