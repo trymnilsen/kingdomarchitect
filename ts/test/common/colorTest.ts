@@ -1,4 +1,4 @@
-import { rgbToHex } from "../../src/common/color";
+import { rgbToHex } from "../../src/util/color";
 
 describe("color", () => {
     it("encodes color", () => {

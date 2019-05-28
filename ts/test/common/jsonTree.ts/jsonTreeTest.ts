@@ -6,7 +6,7 @@ import {
     getNodeValue,
     getId,
     JsonTree
-} from "../../../src/common/jsontree/jsonNode";
+} from "../../../src/util/jsontree/jsonNode";
 import { json } from "body-parser";
 
 describe("JsonTree", () => {
