@@ -5,7 +5,9 @@ import { Input, InputEventToAction } from "../input/input";
 import { JsonNode, JsonTree } from "../state/jsonNode";
 import { Dispatcher } from "../action/dispatcher";
 import { rootReducer } from "../action/reducer";
-import { DataTree } from "../state/dataNode";
+import { DataTree, pathsEqual } from "../state/dataNode";
+import { Player } from "../data/player";
+import { Point } from "../data/point";
 
 export class Game {
     private sceneHandler: GameSceneHandler;
@@ -38,7 +40,10 @@ export class Game {
         //TODO: Setup input
         this.renderer.render();
 
-        this.state.get("player").listen(() => {
+        this.state.get("player").listen((event) => {
+            if (pathsEqual(event.path, ["player", "position"])) {
+                this.renderer.camera.follow(event.data as Point);
+            }
             this.renderer.render();
         });
     }

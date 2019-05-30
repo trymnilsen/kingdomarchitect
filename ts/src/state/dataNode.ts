@@ -218,6 +218,18 @@ export class DataTree {
     }
 }
 
+export function pathsEqual(pathA: string[], pathB: string[]) {
+    if (pathA.length !== pathB.length) {
+        return false;
+    }
+    for (let i = 0; i < pathA.length; i++) {
+        if (pathA[i] !== pathB[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
 export function concatPath(path: string[]): string {
     return path.join("/");
 }
