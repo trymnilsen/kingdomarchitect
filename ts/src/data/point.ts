@@ -9,3 +9,16 @@ export function addPoint(p1: Point, p2: Point) {
         y: p1.y + p2.y
     };
 }
+
+export function changeX(point: Point, amount: number) {
+    return {
+        x: point.x + amount,
+        y: point.y
+    };
+}
+export function changeY(point: Point, amount: number) {
+    return {
+        x: point.x,
+        y: point.y + amount
+    };
+}

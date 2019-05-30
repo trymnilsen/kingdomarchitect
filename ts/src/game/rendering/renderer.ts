@@ -1,13 +1,16 @@
 import { RenderContext } from "./renderContext";
 import { RenderNode } from "./items/renderNode";
 import { rgbToHex } from "../../util/color";
+import { Camera } from "./camera";
 
 export class Renderer {
     private canvasContext: CanvasRenderingContext2D;
     private renderingContext: RenderContext;
+    private camera: Camera;
     private _rootNode: RenderNode;
 
     public constructor(canvasElementId: string) {
+        this.camera = new Camera();
         const canvasElement: HTMLCanvasElement = document.querySelector(
             `#${canvasElementId}`
         );
@@ -25,7 +28,8 @@ export class Renderer {
 
     public render() {
         const startTime = performance.now();
-        this._rootNode.updateTransform(null);
+        const cameraScreenSpace = this.camera.screenPosition;
+        this._rootNode.updateTransform(null, cameraScreenSpace);
         //Traverse nodes add to list, breadth first
         const renderList = this.prepareRenderList();
         //Clear screen

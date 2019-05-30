@@ -17,5 +17,6 @@
     "editor.formatOnSave": true,
     "jest.enableSnapshotUpdateMessages": false,
     "jest.enableSnapshotPreviews": false,
-    "jest.enableInlineErrorMessages": false
+    "jest.enableInlineErrorMessages": false,
+    "typescript.tsdk": "node_modules/typescript/lib"
 }

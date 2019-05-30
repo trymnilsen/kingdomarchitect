@@ -60,8 +60,8 @@ export abstract class JsonNode implements EventListener<JsonNodeChangeEvent> {
             if (id.length > 1) {
                 const firstChild = this._children[id[0]];
                 if (!!firstChild) {
-                    id.splice(0, 1);
-                    return firstChild.get(id);
+                    const newId = id.slice(1, id.length);
+                    return firstChild.get(newId);
                 } else {
                     return null;
                 }
@@ -76,15 +76,8 @@ export abstract class JsonNode implements EventListener<JsonNodeChangeEvent> {
             return child;
         }
     }
-    public getValue<T extends NodeValueType>(id: string | string[]): T {
-        const node = this.get(id);
-        if (!!node) {
-            return getNodeValue<T>(node);
-        } else {
-            return null;
-        }
-    }
-    public put(data: Json, id: string) {
+
+    public put(id: string, data: Json) {
         if (isBlank(id)) {
             throw new Error("Cannot put to empty id");
         }
@@ -101,10 +94,10 @@ export abstract class JsonNode implements EventListener<JsonNodeChangeEvent> {
         });
         return dataAsJsonNode;
     }
-    public replace(data: JsonObject) {
+    public set(data: Json) {
         //Create json node from data
         const dataAsJsonNode = dataToJsonNode(this.parent, data);
-        //Remove each node so we can dispose them and send events
+        //Remove each node so we can dispose them
         this.getChildrenAsArray().forEach((x) => x.remove());
         //set the children of the create data node to this
         this.children = dataAsJsonNode.children;
@@ -127,6 +120,7 @@ export abstract class JsonNode implements EventListener<JsonNodeChangeEvent> {
     ): EventHandle {
         return this.changeEvent.listen(listener);
     }
+
     public removeChild(id: string): boolean {
         const deletedElement = this._children[id];
         if (!!deletedElement) {
@@ -165,7 +159,9 @@ export abstract class JsonNode implements EventListener<JsonNodeChangeEvent> {
         return Object.values(this._children);
     }
     public abstract toData(): Json;
-
+    public value<T extends Json>(): T {
+        return this.toData() as T;
+    }
     public get id(): string {
         return this._id;
     }
@@ -218,9 +214,6 @@ export class JsonNodeField<T extends NodeValueType> extends JsonNode {
         super(parent, type);
         this._value = value;
     }
-    public get value(): Readonly<T> {
-        return this._value;
-    }
     public toData(): Json {
         return this._value;
     }
@@ -247,7 +240,7 @@ export function getNodeValue<T extends NodeValueType>(node: JsonNode): T {
         return null;
     }
     const nodeAsField = node as JsonNodeField<T>;
-    return nodeAsField.value;
+    return nodeAsField.value<T>();
 }
 
 function getIdToString(id: string | string[]): string {
@@ -302,7 +295,7 @@ function dataObjectToJsonNode(
         for (const key in data) {
             if (data.hasOwnProperty(key)) {
                 const element = data[key];
-                container.put(element, key);
+                container.put(key, element);
             }
         }
     }

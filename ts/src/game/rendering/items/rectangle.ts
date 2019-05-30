@@ -16,8 +16,8 @@ export class Rectangle extends RenderNode {
         this.config = config;
     }
     public render(context: CanvasRenderingContext2D): void {
-        let rx = this.absolutePosition.x;
-        let ry = this.absolutePosition.y;
+        let rx = this.absolutePosition.x + this._screenSpacePosition.x;
+        let ry = this.absolutePosition.y + this._screenSpacePosition.y;
         let rw = this.config.width;
         let rh = this.config.height;
         if (this.config.strokeWidth > 0) {
@@ -28,8 +28,8 @@ export class Rectangle extends RenderNode {
             const color = this.config.strokeColor || "black";
             context.fillStyle = color;
             context.fillRect(
-                this.absolutePosition.x,
-                this.absolutePosition.y,
+                this.absolutePosition.x + this._screenSpacePosition.x,
+                this.absolutePosition.y + this._screenSpacePosition.y,
                 this.config.width,
                 this.config.height
             );

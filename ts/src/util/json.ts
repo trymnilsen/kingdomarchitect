@@ -3,7 +3,14 @@ export interface JsonObject {
 }
 export interface JsonArray extends Array<Json> {}
 
-export type Json = string | number | boolean | Date | JsonObject | JsonArray;
+export type Json =
+    | string
+    | number
+    | boolean
+    | Date
+    | JsonObject
+    | JsonArray
+    | {};
 
 export type JsonValueSubTypes =
     | string

@@ -9,7 +9,7 @@ export class Keyboard {
     public constructor() {
         this.keyboardMap = getKeyboardMap();
         this._keyEvent = new Event();
-        window.addEventListener("keypress", this.onKeyPress);
+        window.addEventListener("keydown", this.onKeyPress);
     }
     public dispose() {
         this._keyEvent.dispose();
@@ -45,4 +45,13 @@ export function getKeyboardMap(): KeyboardMap {
 }
 
 export const UserKeyboardMapStorageKey = "KEYBOARD_USER_MAP";
-export const DefaultKeyboardMap: KeyboardMap = {};
+export const DefaultKeyboardMap: KeyboardMap = {
+    d: InputActionData.RIGHT_PRESS,
+    a: InputActionData.LEFT_PRESS,
+    w: InputActionData.UP_PRESS,
+    s: InputActionData.DOWN_PRESS,
+    q: InputActionData.BACK_PRESS,
+    e: InputActionData.ACTION_PRESS,
+    j: InputActionData.SELECT_PRESS,
+    k: InputActionData.START_PRESS
+};
