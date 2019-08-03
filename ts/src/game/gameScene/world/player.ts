@@ -7,12 +7,13 @@ import { DataNodeReference } from "../../../state/dataNode";
 export class Player {
     private playerVisual: Rectangle;
     public constructor(renderNode: RenderNode, state: DataNodeReference) {
+        const position = state.get("position").value<Point>();
         this.playerVisual = new Rectangle({
             width: TileSize - 8,
             height: TileSize - 8,
             color: "red",
-            x: 4,
-            y: 4,
+            x: position.x * TileSize + 4,
+            y: position.y * TileSize + 4,
             depth: 1000
         });
         renderNode.addChild(this.playerVisual);

@@ -9,6 +9,13 @@ export class Camera {
     public constructor() {
         this.cameraPosition = { x: 0, y: 0 };
     }
+    public center(worldSpace: Point) {
+        const screenSpace = {
+            x: worldSpace.x * -TileSize,
+            y: worldSpace.y * -TileSize
+        };
+        this.cameraPosition = screenSpace;
+    }
     public follow(worldSpace: Point) {
         const translation: Point = { x: 0, y: 0 };
         const screenSpace = {
@@ -24,7 +31,7 @@ export class Camera {
         //Check if outside of the client area which is considered to be the size
         //of four tiles. This means that if the point moves outside
         //this area/rectangle (in screenspace) we will move the camera
-        //enough to keep the point inside the client rectangle
+        //enough to keep the point inside the client rectangle¨
         if (screenSpace.x < BufferSize) {
             const amountOutside = BufferSize - screenSpace.x;
             translation.x = amountOutside;

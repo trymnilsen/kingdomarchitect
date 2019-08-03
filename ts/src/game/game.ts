@@ -19,7 +19,7 @@ export class Game {
         this.input = new Input();
         this.state = new DataTree();
         this.state.get("focus").set("player");
-        this.state.get(["player", "position"]).set({ x: 0, y: 0 });
+        this.state.get(["player", "position"]).set({ x: 8, y: 8 });
         this.dispatcher = new Dispatcher(rootReducer, this.state);
         //Input
         this.input.onInput.listen((inputEvent) => {
@@ -36,7 +36,7 @@ export class Game {
         );
 
         this.sceneHandler.transition(WorldSceneName);
-
+        this.renderer.camera.center({ x: 8, y: 8 });
         //TODO: Setup input
         this.renderer.render();
 
