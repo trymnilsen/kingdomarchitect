@@ -1,0 +1,1 @@
+{"version":3,"file":"renderContext.js","sourceRoot":"","sources":["../../../../ts/src/game/rendering/renderContext.ts"],"names":[],"mappings":";;AAEA,MAAa,aAAa;IAEtB,IAAW,MAAM;QACb,OAAO,IAAI,CAAC,YAAY,CAAC;IAC7B,CAAC;IAED,IAAW,MAAM,CAAC,MAAc;QAC5B,IAAI,CAAC,YAAY,GAAG,MAAM,CAAC;IAC/B,CAAC;CACJ;AATD,sCASC"}

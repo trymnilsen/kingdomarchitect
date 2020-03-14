@@ -8,11 +8,37 @@ export interface NodeConfiguration {
     depth?: number;
 }
 
-export class RenderNode {
+export enum RenderNodeType {
+    container = "CONTAINER",
+    rectangle = "RECTANGLE",
+    text = "TEXT"
+}
+
+export interface RenderNode {
+    type: RenderNodeType;
+    config: NodeConfiguration;
+    children: RenderNode[];
+}
+
+export function container(point?: Point): RenderNode {
+    if (!point) {
+        point = { x: 0, y: 0 };
+    }
+    return {
+        type: RenderNodeType.container,
+        config: {
+            x: point.x,
+            y: point.y
+        },
+        children: []
+    };
+}
+
+/* export class RenderNode {
     public position: Point;
     public depth: number = 0;
-    private _absolutePosition: Point;
-    private _children: RenderNode[] = [];
+    protected _absolutePosition: Point;
+    protected _children: RenderNode[] = [];
     protected _screenSpacePosition: Point;
     public constructor(nodeConfig?: NodeConfiguration) {
         this.position = { x: 0, y: 0 };
@@ -48,3 +74,18 @@ export class RenderNode {
         );
     }
 }
+
+export class UiRenderNode extends RenderNode {
+    public updateTransform(parentPoint: Point, cameraScreenSpace: Point) {
+        //Ui nodes are never moved based on camera
+        if (!parentPoint) {
+            //No parent, use zero
+            parentPoint = { x: 0, y: 0 };
+        }
+        this._absolutePosition = addPoint(parentPoint, this.position);
+        this.children.forEach((p) =>
+            p.updateTransform(this._absolutePosition, { x: 0, y: 0 })
+        );
+    }
+}
+ */

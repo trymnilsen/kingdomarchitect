@@ -28,3 +28,5 @@ export function nameStartsWith(start: string | string[], array: string[]) {
     }
     return potentialMatch;
 }
+
+export const emptyAction = {};

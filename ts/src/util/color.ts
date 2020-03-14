@@ -1,5 +1,5 @@
 function numToHex(num: number) {
-    let hex = Number(num).toString(16);
+    let hex = Number(Math.min(Math.max(0, num), 255)).toString(16);
     if (hex.length < 2) {
         hex = "0" + hex;
     }

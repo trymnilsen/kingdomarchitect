@@ -13,7 +13,7 @@ export class Dispatcher {
     }
     public doAction(action: Action) {
         const operations = this.rootReducer(action, this.state);
-        console.log(`Action: ${action.name.join(",")} ops: `, operations);
+        //console.log(`Action: ${action.name.join(",")} ops: `, operations);
         applyOperations(operations, this.state);
     }
 }

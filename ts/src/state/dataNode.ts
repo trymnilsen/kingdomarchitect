@@ -58,10 +58,14 @@ export type DataNode = {} | string | boolean | number;
 
 export class DataTree {
     private readonly rootNode: {};
+    private anyStateListener: () => void;
     private listeners: EventListenersCollection;
     public constructor() {
         this.listeners = {};
         this.rootNode = {};
+    }
+    listenForAnyStateChange(listener: () => void) {
+        this.anyStateListener = listener;
     }
     get(id: DataNodePath): DataNodeReference {
         if (!id) {
@@ -79,6 +83,9 @@ export class DataTree {
         data: DataNode,
         operation: ChangeOperation
     ) {
+        if (!!this.anyStateListener) {
+            this.anyStateListener();
+        }
         const changeEvent: NodeChangeEvent = {
             data,
             operation,

@@ -1,9 +1,9 @@
 # Kingdom Architect
-> Medieval multiplayer simulation/city builder game for the browser.
+> Medieval simulation/city builder game for the browser.
 
-Kingdom architects is intended to be a combined simulation and city building game around building your own kingdom on an island with out players, both human and simulated.
+Kingdom architects is intended to be a combined simulation and city building game around building your own kingdom
 
-The goal of the client is to write it without any included libraries, only the api's provided by the browser and the typescript written in this repo is used. 
+The goal of the client is to write it without any included libraries, only the api's provided by the browser. (Why? mostly just as a challenge)
 
 ## Installation
 

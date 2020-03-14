@@ -1,4 +1,10 @@
-import { RenderNode } from "../../rendering/items/renderNode";
+import { DataTree } from "../../../state/dataNode";
+import { RenderNode, container } from "../../rendering/items/renderNode";
+import { rectangle } from "../../rendering/items/rectangle";
+import { rgbToHex } from "../../../util/color";
+import { Point } from "../../../data/point";
+
+/* import { RenderNode } from "../../rendering/items/renderNode";
 import { RenderContext } from "../../rendering/renderContext";
 import { Rectangle } from "../../rendering/items/rectangle";
 import { Point } from "../../../data/point";
@@ -14,9 +20,11 @@ export class ChunkHandler {
     }
     public render(context: RenderContext) {}
 
+    public addChunk() {}
+
     private buildChunks() {
-        const horizontalChunks = Math.ceil(window.innerWidth / ChunkSize);
-        const verticalChunks = Math.ceil(window.innerHeight / ChunkSize);
+        const horizontalChunks = 1;
+        const verticalChunks = 1;
         console.log("[buildChunks]", horizontalChunks, verticalChunks);
         for (let x = 0; x < horizontalChunks; x++) {
             for (let y = 0; y < verticalChunks; y++) {
@@ -31,7 +39,7 @@ export class ChunkHandler {
 }
 
 export const bufferChunks = 2;
-export const TilesPerChunck = 8;
+export const TilesPerChunck = 3;
 export const TileSize = 64;
 export const ChunkSize = TilesPerChunck * TileSize;
 
@@ -86,9 +94,58 @@ export function getChunkId(x: number, y: number): string {
 
 //Looks weird but will be fixed when we have an actuall wolrd generated,
 //not is just for differentiating the different tiles when rendered with a slightly pleasing pattern
+
+ */
 export function getColor(x: number, y: number): string {
     const r = Math.floor(0 + Math.sin(x) * 5 * 3);
     const g = Math.floor(130 + Math.sin(x - y) * 10 * 3);
     const b = Math.floor(25 + ((x * y) % 10) * 3);
     return rgbToHex(r, g, b);
+}
+export interface Tile {
+    color: String;
+    x: number;
+    y: number;
+}
+export type TileCollection = { [position: string]: Tile };
+
+export function renderChunks(state: DataTree): RenderNode {
+    const renderNodeContainer = container();
+    const tiles = state.get(["world", "tiles"]).value<TileCollection>();
+    for (const key in tiles) {
+        if (tiles.hasOwnProperty(key)) {
+            const tile = tiles[key];
+            renderNodeContainer.children.push(
+                rectangle({
+                    x: tile.x * 64,
+                    y: tile.y * 64,
+                    color: getColor(tile.x, tile.y),
+                    width: 64,
+                    height: 64
+                })
+            );
+        }
+    }
+    return renderNodeContainer;
+}
+
+export function getChunk() {
+    const chunks = [];
+    for (let x = -1; x < 2; x++) {
+        for (let y = -1; y < 2; y++) {
+            chunks.push({
+                x,
+                y
+            });
+        }
+    }
+    return chunks;
+}
+
+export function getTile(point: Point): Tile {
+    return {
+        x: point.x,
+        y: point.y,
+        color: getColor(point.x, point.y)
+    };
 }

@@ -8,7 +8,11 @@ import { addPoint, changeY, changeX } from "../../data/point";
 
 export const playerInputReducer: Reducer<InputActionData> = (action, state) => {
     const ops: NodeOperation[] = [];
-    const player = state.get("player").value<Player>();
+    const player = state.get(["world", "player"]).value<Player>();
+    let position = {
+        x: player.position.x,
+        y: player.position.y
+    };
     switch (action.data) {
         case InputActionData.ACTION_PRESS:
             console.log("Action press");
@@ -17,24 +21,29 @@ export const playerInputReducer: Reducer<InputActionData> = (action, state) => {
             console.log("Back press");
             break;
         case InputActionData.DOWN_PRESS:
-            player.position = changeY(player.position, 1);
+            position = changeY(position, 1);
             break;
         case InputActionData.UP_PRESS:
-            player.position = changeY(player.position, -1);
+            position = changeY(position, -1);
             break;
         case InputActionData.LEFT_PRESS:
-            player.position = changeX(player.position, -1);
+            position = changeX(position, -1);
             break;
         case InputActionData.RIGHT_PRESS:
-            player.position = changeX(player.position, 1);
+            position = changeX(position, 1);
             break;
         default:
             console.log("No implementation for " + action.data);
     }
-    ops.push({
-        operation: "set",
-        path: ["player", "position"],
-        data: player.position
-    });
+    //Check if the place to move to is valid
+    if (
+        !!state.get(["world", "tiles", `x${position.x}y${position.y}`]).value()
+    ) {
+        ops.push({
+            operation: "set",
+            path: ["world", "player", "position"],
+            data: position
+        });
+    }
     return ops;
 };

@@ -1,8 +1,13 @@
+import { DataTree } from "../../../state/dataNode";
+import { Point } from "../../../data/point";
 import { RenderNode } from "../../rendering/items/renderNode";
+import { rectangle } from "../../rendering/items/rectangle";
+
+/* import { RenderNode } from "../../rendering/items/renderNode";
 import { Rectangle } from "../../rendering/items/rectangle";
 import { TileSize } from "./chunk";
 import { Point } from "../../../data/point";
-import { DataNodeReference } from "../../../state/dataNode";
+import { DataNodeReference, DataTree } from "../../../state/dataNode";
 
 export class Player {
     private playerVisual: Rectangle;
@@ -26,4 +31,27 @@ export class Player {
             };
         });
     }
+}
+ */
+export function getPlayerPosition(state: DataTree): Point {
+    const position = state.get(["world", "player", "position"]).value<Point>();
+    if (!!position) {
+        return position;
+    } else {
+        console.error("Unable to get player position");
+        return { x: 0, y: 0 };
+    }
+}
+
+export function renderPlayer(state: DataTree): RenderNode {
+    const playerPosition = getPlayerPosition(state);
+    const playerVisual = rectangle({
+        width: 64,
+        height: 64,
+        x: playerPosition.x * 64,
+        y: playerPosition.y * 64,
+        color: "red",
+        depth: 10
+    });
+    return playerVisual;
 }

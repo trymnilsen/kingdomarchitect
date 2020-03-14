@@ -1,8 +1,10 @@
 import { RenderContext } from "../rendering/renderContext";
+import { DataTree } from "../../state/dataNode";
+import { RenderNode } from "../rendering/items/renderNode";
 
 export interface GameScene {
     transitionTo(): void;
-    render(context: RenderContext): void;
+    render(state: DataTree): RenderNode;
     dispose(): void;
 }
 
@@ -11,7 +13,7 @@ export interface GameSceneChanger {
 }
 export class GameSceneHandler implements GameSceneChanger {
     private scenes: { [name: string]: GameScene } = {};
-    private currentScene: GameScene;
+    private _currentScene: GameScene;
 
     public constructor() {}
 
@@ -24,11 +26,12 @@ export class GameSceneHandler implements GameSceneChanger {
         if (!newScene) {
             throw new Error("Invalid scene name, cannot transition");
         }
-        if (!!this.currentScene) {
-            this.currentScene.dispose();
+        if (!!this._currentScene) {
+            this._currentScene.dispose();
         }
         newScene.transitionTo();
-        this.currentScene = newScene;
+        this._currentScene = newScene;
+        console.log("Changed Scene: ", toName);
     }
 
     public disposeAllScenes(): void {
@@ -36,6 +39,6 @@ export class GameSceneHandler implements GameSceneChanger {
     }
 
     public get currentGameScene(): GameScene {
-        return this.currentGameScene;
+        return this._currentScene;
     }
 }

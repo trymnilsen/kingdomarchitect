@@ -8,6 +8,9 @@ import { rootReducer } from "../action/reducer";
 import { DataTree, pathsEqual } from "../state/dataNode";
 import { Player } from "../data/player";
 import { Point } from "../data/point";
+import { getPlayerPosition } from "./gameScene/world/player";
+import { initChunkAction } from "../action/chunk/createChunkReducer";
+import { onTickAction } from "../action/tick/tickReducer";
 
 export class Game {
     private sceneHandler: GameSceneHandler;
@@ -19,7 +22,7 @@ export class Game {
         this.input = new Input();
         this.state = new DataTree();
         this.state.get("focus").set("player");
-        this.state.get(["player", "position"]).set({ x: 8, y: 8 });
+        this.state.get(["world", "player", "position"]).set({ x: 0, y: 0 });
         this.dispatcher = new Dispatcher(rootReducer, this.state);
         //Input
         this.input.onInput.listen((inputEvent) => {
@@ -30,22 +33,28 @@ export class Game {
         this.renderer = new Renderer(domElementWrapperSelector);
         this.sceneHandler = new GameSceneHandler();
 
-        this.sceneHandler.registerScene(
-            WorldSceneName,
-            new WorldScene(this.renderer.rootNode, this.state)
-        );
+        this.sceneHandler.registerScene(WorldSceneName, new WorldScene());
 
         this.sceneHandler.transition(WorldSceneName);
-        this.renderer.camera.center({ x: 8, y: 8 });
-        //TODO: Setup input
-        this.renderer.render();
+        this.renderer.camera.center({ x: 0, y: 0 });
 
-        this.state.get("player").listen((event) => {
-            if (pathsEqual(event.path, ["player", "position"])) {
-                this.renderer.camera.follow(event.data as Point);
-            }
-            this.renderer.render();
+        this.state.listenForAnyStateChange(() => {
+            //console.log("Update!");
+            this.renderer.camera.follow(getPlayerPosition(this.state));
+            this.render();
         });
+        this.dispatcher.doAction(initChunkAction());
+
+        for (let i = 0; i < 32; i++) {
+            this.dispatcher.doAction(onTickAction());
+        }
+        this.render();
+    }
+
+    private render() {
+        const rootNode = this.sceneHandler.currentGameScene.render(this.state);
+        //TODO: Setup input
+        this.renderer.render(rootNode);
     }
 
     public dispose(): any {

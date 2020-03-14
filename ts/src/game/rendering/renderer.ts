@@ -1,7 +1,23 @@
 import { RenderContext } from "./renderContext";
-import { RenderNode } from "./items/renderNode";
+import { RenderNode, RenderNodeType } from "./items/renderNode";
 import { rgbToHex } from "../../util/color";
 import { Camera } from "./camera";
+import { Point, addPoint } from "../../data/point";
+import { rectangleRenderer } from "./items/rectangle";
+
+export interface RenderItem {
+    node: RenderNode;
+    transform: Point;
+}
+
+export type TypeRenderFunction = (
+    renderItem: RenderItem,
+    context: CanvasRenderingContext2D
+) => void;
+
+const typerRenders: { [type: string]: TypeRenderFunction } = {
+    [RenderNodeType.rectangle]: rectangleRenderer
+};
 
 export class Renderer {
     private canvasContext: CanvasRenderingContext2D;
@@ -18,33 +34,51 @@ export class Renderer {
             throw new Error(`Canvas element ${canvasElementId} not found`);
         }
         window.addEventListener("resize", () => {
-            this.onResize();
+            //this.onResize();
         });
         this.canvasContext = canvasElement.getContext("2d");
         this.canvasContext.canvas.width = window.innerWidth;
         this.canvasContext.canvas.height = window.innerHeight;
-        this._rootNode = new RenderNode();
     }
 
-    public render() {
+    public render(rootNode: RenderNode) {
         const startTime = performance.now();
         const cameraScreenSpace = this._camera.screenPosition;
-        this._rootNode.updateTransform(null, cameraScreenSpace);
         //Traverse nodes add to list, breadth first
-        const renderList = this.prepareRenderList();
+        const renderList = this.prepareRenderList(rootNode);
         //Clear screen
         this.clearScreen();
         //run render method on each entry
-        this.renderItems(renderList);
+        this.renderItems(renderList, this._camera.screenPosition);
         const endTime = performance.now();
-        console.log("Render time: " + (endTime - startTime));
+        //console.log("Render time: " + (endTime - startTime));
     }
 
-    private renderItems(renderList: RenderNode[]) {
+    private renderItems(renderList: RenderItem[], camera: Point) {
         for (let index = 0; index < renderList.length; index++) {
             const element = renderList[index];
-            element.render(this.canvasContext);
+            element.transform = addPoint(element.transform, camera);
+            if (element.node.type == RenderNodeType.container) {
+                continue;
+            }
+            if (!this.onScreen(element.transform)) {
+                continue;
+            }
+            const typeRender = typerRenders[element.node.type];
+            if (!!typeRender) {
+                typeRender(element, this.canvasContext);
+            } else {
+                console.warn("no render found for type", element.node.type);
+            }
         }
+    }
+    private onScreen(point: Point) {
+        return (
+            point.x >= 0 &&
+            point.y >= 0 &&
+            point.x <= window.innerWidth &&
+            point.y <= window.innerHeight
+        );
     }
 
     private clearScreen() {
@@ -71,25 +105,43 @@ export class Renderer {
     public get rootNode(): RenderNode {
         return this._rootNode;
     }
-    private onResize() {
+    /*     private onResize() {
         this.canvasContext.canvas.width = window.innerWidth;
         this.canvasContext.canvas.height = window.innerHeight;
         this.render();
-    }
-    private prepareRenderList() {
-        const renderList = [];
-
-        const queue = [this._rootNode];
+    } */
+    private prepareRenderList(rootNode: RenderNode) {
+        const renderList: RenderItem[] = [];
+        const queue: RenderItem[] = [
+            {
+                node: rootNode,
+                transform: { x: rootNode.config.x, y: rootNode.config.y }
+            }
+        ];
 
         while (queue.length > 0) {
             const node = queue.shift();
+            node.node.config.depth = node.node.config.depth || 0;
             renderList.push(node);
-            if (!node.children || node.children.length < 1) {
+            if (!node.node.children || node.node.children.length < 1) {
                 continue;
             }
 
-            for (let i = 0; i < node.children.length; i++) {
-                queue.push(node.children[i]);
+            for (let i = 0; i < node.node.children.length; i++) {
+                const absolutePosition = addPoint(
+                    {
+                        x: node.node.config.x,
+                        y: node.node.config.y
+                    },
+                    {
+                        x: node.node.children[i].config.x,
+                        y: node.node.children[i].config.y
+                    }
+                );
+                queue.push({
+                    node: node.node.children[i],
+                    transform: absolutePosition
+                });
             }
         }
         //Sort list based on depth, keep items with same depth in same order
@@ -98,8 +150,8 @@ export class Renderer {
         });
 
         sortArray.sort(function(a, b) {
-            if (a.item.depth < b.item.depth) return -1;
-            if (a.item.depth > b.item.depth) return 1;
+            if (a.item.node.config.depth < b.item.node.config.depth) return -1;
+            if (a.item.node.config.depth > b.item.node.config.depth) return 1;
             return a.idx - b.idx;
         });
         return sortArray.map((element) => element.item);
