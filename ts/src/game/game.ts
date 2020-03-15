@@ -239,7 +239,7 @@ function updateVolumes(chunk: Chunk) {
             visitedTiles.push(connectedTile);
             //add the volume id of this tile
             const volumeId = chunk.volumes[connectedTile];
-            if (!volumeIds.includes(volumeId)) {
+            if (!volumeIds.includes(volumeId) && volumeId >= 0) {
                 volumeIds.push(volumeId);
             }
             //Also remove the tile from available blocks unless the current block
@@ -362,7 +362,10 @@ function updateVolumes(chunk: Chunk) {
                 idReservations[volumeId] = v;
             }
         } else {
-            console.error("Volume had no volume ids", volume);
+            //if a volume has no ids its likely because it was created from a
+            //impasseable tile that is no longer impassable. Create a new id for it
+            const newVolumeId = incrementAndGetVolumeId();
+            idReservations[newVolumeId] = v;
         }
     }
     console.log("VolumeReservations: ", idReservations);
