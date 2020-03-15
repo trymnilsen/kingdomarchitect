@@ -6,7 +6,7 @@
     "scripts": {
         "test": "jest --no-colors",
         "start": "live-server ./public",
-        "build": "npm run build-server && npm run build-client",
+        "build": "webpack",
         "lint": "tslint -c tslint.json 'ts/**/*.ts'",
         "ci": "npm run build && npm run lint && npm run test"
     },

@@ -13,26 +13,12 @@
             },
             "label": "frontend",
             "type": "npm",
-            "script": "build-client",
+            "script": "build",
             "problemMatcher": ["$ts-webpack"],
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
-            "dependsOn": ["server"]
-        },
-        {
-            "presentation": {
-                "echo": true,
-                "reveal": "never",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": false
-            },
-            "label": "server",
-            "type": "npm",
-            "script": "build-server",
-            "problemMatcher": ["$tsc"]
         }
     ]
 }

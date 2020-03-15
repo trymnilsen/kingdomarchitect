@@ -1,11 +1,36 @@
-import { RenderNode, NodeConfiguration } from "./renderNode";
+import { RenderNode, NodeConfiguration, RenderNodeType } from "./renderNode";
 import { RenderContext } from "../renderContext";
+import { RenderItem } from "../renderer";
 
-/* export interface TextConfiguration extends NodeConfiguration {
+export interface TextConfiguration extends NodeConfiguration {
     text: string;
     color: string;
     align?: "left" | "center" | "right";
 }
+
+export function text(textConfig: TextConfiguration): RenderNode {
+    return {
+        type: RenderNodeType.text,
+        config: textConfig,
+        children: []
+    };
+}
+
+export function textRenderer(
+    renderItem: RenderItem,
+    context: CanvasRenderingContext2D
+) {
+    const config = renderItem.node.config as TextConfiguration;
+    context.fillStyle = config.color;
+    context.font = "14px Arial";
+    context.fillText(
+        config.text,
+        renderItem.transform.x,
+        renderItem.transform.y
+    );
+}
+
+/* 
 
 export class TextVisual extends RenderNode {
     private config: TextConfiguration;

@@ -1,7 +1,6 @@
 import { InputActionData } from "./inputAction";
 import { Keyboard } from "./keyboard";
 import { Event, EventListener } from "../event/event";
-import { Action } from "../action/action";
 
 export interface InputEvent {
     action: InputActionData;
@@ -33,13 +32,4 @@ export class Input {
     public get currentInputType(): InputType {
         return this._currentInputType;
     }
-}
-
-export function InputEventToAction(
-    inputEvent: InputEvent
-): Action<InputActionData> {
-    return {
-        name: ["input"],
-        data: inputEvent.action
-    };
 }

@@ -4,6 +4,7 @@ import { rgbToHex } from "../../util/color";
 import { Camera } from "./camera";
 import { Point, addPoint } from "../../data/point";
 import { rectangleRenderer } from "./items/rectangle";
+import { textRenderer } from "./items/text";
 
 export interface RenderItem {
     node: RenderNode;
@@ -16,7 +17,8 @@ export type TypeRenderFunction = (
 ) => void;
 
 const typerRenders: { [type: string]: TypeRenderFunction } = {
-    [RenderNodeType.rectangle]: rectangleRenderer
+    [RenderNodeType.rectangle]: rectangleRenderer,
+    [RenderNodeType.text]: textRenderer
 };
 
 export class Renderer {
@@ -25,13 +27,10 @@ export class Renderer {
     private _camera: Camera;
     private _rootNode: RenderNode;
 
-    public constructor(canvasElementId: string) {
+    public constructor(canvasElement: HTMLCanvasElement) {
         this._camera = new Camera();
-        const canvasElement: HTMLCanvasElement = document.querySelector(
-            `#${canvasElementId}`
-        );
         if (!canvasElement) {
-            throw new Error(`Canvas element ${canvasElementId} not found`);
+            throw new Error(`Canvas element ${canvasElement} not found`);
         }
         window.addEventListener("resize", () => {
             //this.onResize();
@@ -61,7 +60,7 @@ export class Renderer {
             if (element.node.type == RenderNodeType.container) {
                 continue;
             }
-            if (!this.onScreen(element.transform)) {
+            if (!this.onScreen(element.transform) && false) {
                 continue;
             }
             const typeRender = typerRenders[element.node.type];
