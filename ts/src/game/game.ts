@@ -57,6 +57,7 @@ export class Game {
                     y: clickEvent.clientY
                 }
             );
+            this.cameraPosition = worldSpaceClickPoint;
             this.toggleWall(worldSpaceClickPoint);
         });
 
