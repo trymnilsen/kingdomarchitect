@@ -1,4 +1,4 @@
-export const NUMBEROFCHUNKS = 4;
+export const NUMBEROFCHUNKS = 8;
 export const NUMBEROFTILES = 8;
 export const TILESIZE = 64;
 

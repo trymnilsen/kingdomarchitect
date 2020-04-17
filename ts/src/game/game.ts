@@ -41,6 +41,9 @@ export class Game {
             console.log("Input", inputEvent);
             console.log("Pre camera pos: ", this.cameraPosition);
             this.cameraPosition = updateCamera(this.cameraPosition, inputEvent);
+            if (inputEvent.action == InputActionData.ACTION_PRESS) {
+                console.log(JSON.stringify(this.world));
+            }
             console.log("post camera pos: ", this.cameraPosition);
             this.update();
         });
@@ -57,7 +60,7 @@ export class Game {
                     y: clickEvent.clientY
                 }
             );
-            this.cameraPosition = worldSpaceClickPoint;
+            //this.cameraPosition = worldSpaceClickPoint;
             this.toggleWall(worldSpaceClickPoint);
         });
 
