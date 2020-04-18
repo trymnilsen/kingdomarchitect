@@ -1,5 +1,5 @@
 import { Point, addPoint } from "../../data/point";
-import { TILESIZE } from "../../state/state";
+import { TILE_SIZE } from "../constants";
 //import { TileSize } from "../gameScene/world/chunk";
 const TileSize = 64;
 const TilesPadding = 4;
@@ -13,7 +13,7 @@ export class Camera {
     public center(worldSpace: Point) {
         const screenSpace = {
             x: worldSpace.x * -TileSize,
-            y: worldSpace.y * -TileSize
+            y: worldSpace.y * -TileSize,
         };
         this.cameraPosition = screenSpace;
     }
@@ -25,8 +25,8 @@ export class Camera {
             screenSpacePoint.y - this.cameraPosition.y - window.innerHeight / 2;
 
         const worldSpace = {
-            x: Math.floor(clickX / TILESIZE),
-            y: Math.floor(clickY / TILESIZE)
+            x: Math.floor(clickX / TILE_SIZE),
+            y: Math.floor(clickY / TILE_SIZE),
         };
         console.log("Clicked at: ", worldSpace);
         return worldSpace;
@@ -41,7 +41,7 @@ export class Camera {
             y:
                 worldSpace.y * TileSize +
                 window.innerHeight / 2 +
-                this.cameraPosition.y
+                this.cameraPosition.y,
         };
         //Check if outside of the client area which is considered to be the size
         //of four tiles. This means that if the point moves outside
@@ -70,7 +70,7 @@ export class Camera {
     public get screenPosition(): Point {
         return {
             x: this.cameraPosition.x + window.innerWidth / 2,
-            y: this.cameraPosition.y + window.innerHeight / 2
+            y: this.cameraPosition.y + window.innerHeight / 2,
         };
     }
 }

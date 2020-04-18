@@ -18,7 +18,7 @@ export type TypeRenderFunction = (
 
 const typerRenders: { [type: string]: TypeRenderFunction } = {
     [RenderNodeType.rectangle]: rectangleRenderer,
-    [RenderNodeType.text]: textRenderer
+    [RenderNodeType.text]: textRenderer,
 };
 
 export class Renderer {
@@ -114,8 +114,8 @@ export class Renderer {
         const queue: RenderItem[] = [
             {
                 node: rootNode,
-                transform: { x: rootNode.config.x, y: rootNode.config.y }
-            }
+                transform: { x: rootNode.config.x, y: rootNode.config.y },
+            },
         ];
 
         while (queue.length > 0) {
@@ -130,25 +130,25 @@ export class Renderer {
                 const absolutePosition = addPoint(
                     {
                         x: node.node.config.x,
-                        y: node.node.config.y
+                        y: node.node.config.y,
                     },
                     {
                         x: node.node.children[i].config.x,
-                        y: node.node.children[i].config.y
+                        y: node.node.children[i].config.y,
                     }
                 );
                 queue.push({
                     node: node.node.children[i],
-                    transform: absolutePosition
+                    transform: absolutePosition,
                 });
             }
         }
         //Sort list based on depth, keep items with same depth in same order
-        const sortArray = renderList.map(function(item, idx) {
+        const sortArray = renderList.map(function (item, idx) {
             return { idx, item };
         });
 
-        sortArray.sort(function(a, b) {
+        sortArray.sort(function (a, b) {
             if (a.item.node.config.depth < b.item.node.config.depth) return -1;
             if (a.item.node.config.depth > b.item.node.config.depth) return 1;
             return a.idx - b.idx;

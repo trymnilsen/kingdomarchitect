@@ -1,4 +1,4 @@
-import { DataTree } from "../../src/state/dataNode";
+/* import { DataTree } from "../../src/state/dataNode";
 
 describe("Get data", () => {
     test("can get node reference", () => {
@@ -19,3 +19,4 @@ describe("push data", () => {
         console.log(tree.data);
     });
 });
+ */
