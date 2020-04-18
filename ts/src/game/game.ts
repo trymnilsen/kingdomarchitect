@@ -8,13 +8,15 @@ import { rgbToHex } from "../util/color";
 import { text } from "./rendering/items/text";
 import { GameScene } from "./scene/gameScene";
 import { MainScene } from "./scene/mainScene";
-import { GameState } from "./gameState";
+import { GameState } from "./state/gameState";
+import { Dispatcher } from "./state/dispatcher";
 
 export class Game {
     private renderer: Renderer;
     private input: Input;
     private scene: GameScene;
     private state: GameState;
+    private dispatcher: Dispatcher;
     private cameraPosition: Point = {
         x: 0,
         y: 0,
@@ -22,16 +24,15 @@ export class Game {
     public constructor(domElementWrapperSelector: string) {
         // Input
         this.input = new Input();
-        this.scene = new MainScene(this.state);
         this.state = new GameState();
+        this.dispatcher = new Dispatcher(this.state, () => {
+            this.render();
+        });
+        this.scene = new MainScene(this.dispatcher);
 
         this.input.onInput.listen((inputEvent) => {
             console.log("Input", inputEvent);
             this.scene.onInput(inputEvent);
-        });
-
-        this.state.stateUpdated.listen(() => {
-            this.render();
         });
 
         const canvasElement: HTMLCanvasElement = document.querySelector(
@@ -46,7 +47,7 @@ export class Game {
 
     private render() {
         const getRenderNodesStart = performance.now();
-        const nodes = this.scene.onRender(this.renderer.camera);
+        const nodes = this.scene.onRender(this.state, this.renderer.camera);
         const getRenderNodesEnd = performance.now();
         console.log(
             "Get RenderNodes: ",

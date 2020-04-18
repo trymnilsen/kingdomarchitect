@@ -1,9 +1,10 @@
-import { GameView } from "./ui/gameView";
+import { Game } from "./game/game";
 
-export async function bootstrap() {
+const canvasElementId = "gameCanvas";
+
+export function bootstrap() {
     console.log("Bootstrapping");
-    const view = new GameView();
-    view.init();
+    new Game(canvasElementId);
 }
 
 document.addEventListener(
