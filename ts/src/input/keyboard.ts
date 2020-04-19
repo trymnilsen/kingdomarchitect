@@ -52,6 +52,5 @@ export const DefaultKeyboardMap: KeyboardMap = {
     s: InputActionData.DOWN_PRESS,
     q: InputActionData.BACK_PRESS,
     e: InputActionData.ACTION_PRESS,
-    j: InputActionData.SELECT_PRESS,
-    k: InputActionData.START_PRESS
+    r: InputActionData.MENU_PRESS,
 };

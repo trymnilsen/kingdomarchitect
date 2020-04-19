@@ -15,7 +15,10 @@ export class Dispatcher {
         if (!action.name) {
             throw new Error("Action needs to have a name");
         }
+        const reduceStart = performance.now();
         rootReducer(this._gameState, action);
+        const reduceEnd = performance.now();
+        console.log("⏱reduce time: ", reduceEnd - reduceStart);
         this._onAction();
     }
 }

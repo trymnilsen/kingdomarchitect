@@ -1,72 +1,83 @@
-import { GameScene } from "./gameScene";
-import { Renderer } from "../rendering/renderer";
-import { InputEvent } from "../../input/input";
-import { Camera } from "../rendering/camera";
-import { RenderNode, container } from "../rendering/items/renderNode";
-import { GameState } from "../state/gameState";
-import { PlayerEntity } from "../entity/playerEntity";
-import { InputActionName, InputActionData } from "../../input/inputAction";
-import { playerVisual } from "../visual/player";
-import { rectangle } from "../rendering/items/rectangle";
-import { Dispatcher } from "../state/dispatcher";
-import { movePlayerAction } from "../state/action/player/movePlayerAction";
 import { Direction } from "../../data/direction";
 import { Point } from "../../data/point";
+import { Camera } from "../rendering/camera";
+import { rectangle } from "../rendering/items/rectangle";
+import { container, RenderNode } from "../rendering/items/renderNode";
+import {
+    CAMPFIRE_TILE_ITEM_TYPE,
+    GameState,
+    STONE_TILE_ITEM_TYPE,
+    TileMap,
+    TREE_TILE_ITEM_TYPE,
+} from "../state/gameState";
+import { campfireVisual } from "../visual/campfire";
+import { playerVisual } from "../visual/player";
+import { stoneVisual } from "../visual/stone";
+import { treeVisual } from "../visual/tree";
+import { GameScene } from "./gameScene";
+import { getUi } from "../ui/uiPresenter";
 
 export class MainScene implements GameScene {
-    private dispatcher: Dispatcher;
-
-    constructor(dispatcher: Dispatcher) {
-        this.dispatcher = dispatcher;
-    }
-
-    onInput(inputEvent: InputEvent): void {
-        //throw new Error("Method not implemented.");
-        switch (inputEvent.action) {
-            case InputActionData.LEFT_PRESS:
-                this.dispatcher.dispatch(movePlayerAction(Direction.Left));
-                break;
-            case InputActionData.RIGHT_PRESS:
-                this.dispatcher.dispatch(movePlayerAction(Direction.Right));
-                break;
-            case InputActionData.UP_PRESS:
-                this.dispatcher.dispatch(movePlayerAction(Direction.Up));
-                break;
-            case InputActionData.DOWN_PRESS:
-                this.dispatcher.dispatch(movePlayerAction(Direction.Down));
-                break;
-        }
-    }
-
     onRender(gameState: GameState, camera: Camera): RenderNode {
         const world = container();
-        world.children.push(this.renderTiles());
-        world.children.push(this.renderPlayer(gameState.playerState.position));
+        world.children.push(this.renderTiles(gameState.tiles));
+        world.children.push(
+            this.renderPlayer(
+                gameState.playerState.position,
+                gameState.playerState.direction
+            )
+        );
         return world;
     }
 
-    private renderPlayer(playerPosition: Point): RenderNode {
-        const visual = playerVisual();
+    private renderPlayer(
+        playerPosition: Point,
+        direction: Direction
+    ): RenderNode {
+        const visual = playerVisual(direction);
         visual.config.x = playerPosition.x * 32;
         visual.config.y = playerPosition.y * 32;
         return visual;
     }
 
-    private renderTiles(): RenderNode {
-        const tileContainer = container();
-        for (let x = 0; x < 8; x++) {
-            for (let y = 0; y < 8; y++) {
-                tileContainer.children.push(
-                    rectangle({
-                        x: x * 32 + 2,
-                        y: y * 32 + 2,
-                        width: 28,
-                        height: 28,
-                        fill: "#1ac92f",
-                    })
-                );
+    private renderTiles(tiles: TileMap): RenderNode {
+        const allTiles = container();
+        for (const tileKey in tiles) {
+            if (tiles.hasOwnProperty(tileKey)) {
+                const tile = tiles[tileKey];
+                const tileContainer = container({
+                    x: tile.x * 32,
+                    y: tile.y * 32,
+                });
+                const tileVisual = rectangle({
+                    x: 2,
+                    y: 2,
+                    width: 28,
+                    height: 28,
+                    fill: "#32a852",
+                });
+                tileContainer.children.push(tileVisual);
+                tile.items.forEach((item) => {
+                    const visual = getTileItemVisual(item.type);
+                    if (!!visual) {
+                        tileContainer.children.push(visual);
+                    }
+                });
+                allTiles.children.push(tileContainer);
             }
         }
-        return tileContainer;
+        return allTiles;
     }
+}
+
+function getTileItemVisual(type: String) {
+    switch (type) {
+        case TREE_TILE_ITEM_TYPE:
+            return treeVisual();
+        case STONE_TILE_ITEM_TYPE:
+            return stoneVisual();
+        case CAMPFIRE_TILE_ITEM_TYPE:
+            return campfireVisual();
+    }
+    return null;
 }

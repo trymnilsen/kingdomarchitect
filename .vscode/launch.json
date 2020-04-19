@@ -17,16 +17,11 @@
             "program": "${workspaceFolder}/node_modules/jest/bin/jest"
         },
         {
-            "type": "node",
+            "name": "Chrome",
+            "type": "chrome",
             "request": "launch",
-            "name": "Node - Api",
-            "sourceMaps": true,
-            "internalConsoleOptions": "neverOpen",
-            "program": "${workspaceFolder}\\server.js",
-            "preLaunchTask": "server",
-            "outFiles": [
-                "${workspaceFolder}/build/**/*.js"
-            ]
+            "url": "http://localhost:8080",
+            "webRoot": "${workspaceRoot}/src"
         }
     ]
 }

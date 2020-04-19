@@ -5,8 +5,7 @@ export enum InputActionData {
     DOWN_PRESS = "DOWN_PRESS",
     ACTION_PRESS = "ACTION_PRESS",
     BACK_PRESS = "BACK_PRESS",
-    START_PRESS = "START_PRESS",
-    SELECT_PRESS = "SELECT_PRESS"
+    MENU_PRESS = "MENU_PRESS",
 }
 
 export const InputActionName = "inputAction";

@@ -2,7 +2,7 @@ import { RenderContext } from "./renderContext";
 import { RenderNode, RenderNodeType } from "./items/renderNode";
 import { rgbToHex } from "../../util/color";
 import { Camera } from "./camera";
-import { Point, addPoint } from "../../data/point";
+import { Point, addPoint, zeroPoint } from "../../data/point";
 import { rectangleRenderer } from "./items/rectangle";
 import { textRenderer } from "./items/text";
 
@@ -40,17 +40,26 @@ export class Renderer {
         this.canvasContext.canvas.height = window.innerHeight;
     }
 
-    public render(rootNode: RenderNode) {
-        const startTime = performance.now();
-        const cameraScreenSpace = this._camera.screenPosition;
-        //Traverse nodes add to list, breadth first
-        const renderList = this.prepareRenderList(rootNode);
+    public render(gameWorldNode: RenderNode, uiNode: RenderNode) {
         //Clear screen
         this.clearScreen();
+        this.renderGameWorld(gameWorldNode);
+        this.renderUi(uiNode);
+    }
+
+    private renderGameWorld(rootGameNode: RenderNode) {
+        const cameraScreenSpace = this._camera.screenPosition;
+        //Traverse nodes add to list, breadth first
+        const renderList = this.prepareRenderList(rootGameNode);
         //run render method on each entry
         this.renderItems(renderList, this._camera.screenPosition);
-        const endTime = performance.now();
-        //console.log("Render time: " + (endTime - startTime));
+    }
+
+    private renderUi(rootUiNode: RenderNode) {
+        //Traverse nodes add to list, breadth first
+        const renderList = this.prepareRenderList(rootUiNode);
+        //run render method on each entry
+        this.renderItems(renderList, zeroPoint);
     }
 
     private renderItems(renderList: RenderItem[], camera: Point) {
@@ -109,7 +118,7 @@ export class Renderer {
         this.canvasContext.canvas.height = window.innerHeight;
         this.render();
     } */
-    private prepareRenderList(rootNode: RenderNode) {
+    private prepareRenderList(rootNode: RenderNode): RenderItem[] {
         const renderList: RenderItem[] = [];
         const queue: RenderItem[] = [
             {
@@ -121,22 +130,18 @@ export class Renderer {
         while (queue.length > 0) {
             const node = queue.shift();
             node.node.config.depth = node.node.config.depth || 0;
-            renderList.push(node);
+            if (node.node.type != RenderNodeType.container) {
+                renderList.push(node);
+            }
             if (!node.node.children || node.node.children.length < 1) {
                 continue;
             }
 
             for (let i = 0; i < node.node.children.length; i++) {
-                const absolutePosition = addPoint(
-                    {
-                        x: node.node.config.x,
-                        y: node.node.config.y,
-                    },
-                    {
-                        x: node.node.children[i].config.x,
-                        y: node.node.children[i].config.y,
-                    }
-                );
+                const absolutePosition = addPoint(node.transform, {
+                    x: node.node.children[i].config.x,
+                    y: node.node.children[i].config.y,
+                });
                 queue.push({
                     node: node.node.children[i],
                     transform: absolutePosition,

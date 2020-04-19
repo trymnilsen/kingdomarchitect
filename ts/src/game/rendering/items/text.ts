@@ -6,13 +6,14 @@ export interface TextConfiguration extends NodeConfiguration {
     text: string;
     color: string;
     align?: "left" | "center" | "right";
+    weight?: "normal" | "bold";
 }
 
 export function text(textConfig: TextConfiguration): RenderNode {
     return {
         type: RenderNodeType.text,
         config: textConfig,
-        children: []
+        children: [],
     };
 }
 
@@ -21,8 +22,13 @@ export function textRenderer(
     context: CanvasRenderingContext2D
 ) {
     const config = renderItem.node.config as TextConfiguration;
+    let fontString = "14px Arial";
+    if (!!config.weight) {
+        fontString = config.weight + " " + fontString;
+    }
     context.fillStyle = config.color;
-    context.font = "14px Arial";
+    context.font = fontString;
+    context.textBaseline = "top";
     context.fillText(
         config.text,
         renderItem.transform.x,

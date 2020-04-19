@@ -1,7 +1,7 @@
 import { Point, addPoint } from "../../data/point";
 import { TILE_SIZE } from "../constants";
 //import { TileSize } from "../gameScene/world/chunk";
-const TileSize = 64;
+const TileSize = 32;
 const TilesPadding = 4;
 const BufferSize = TileSize * TilesPadding;
 export class Camera {

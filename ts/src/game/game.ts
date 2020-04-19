@@ -10,6 +10,9 @@ import { GameScene } from "./scene/gameScene";
 import { MainScene } from "./scene/mainScene";
 import { GameState } from "./state/gameState";
 import { Dispatcher } from "./state/dispatcher";
+import { inputAction } from "./state/action/inputAction";
+import { Action } from "./state/action/action";
+import { getUi } from "./ui/uiPresenter";
 
 export class Game {
     private renderer: Renderer;
@@ -18,8 +21,8 @@ export class Game {
     private state: GameState;
     private dispatcher: Dispatcher;
     private cameraPosition: Point = {
-        x: 0,
-        y: 0,
+        x: 4,
+        y: 4,
     };
     public constructor(domElementWrapperSelector: string) {
         // Input
@@ -28,11 +31,10 @@ export class Game {
         this.dispatcher = new Dispatcher(this.state, () => {
             this.render();
         });
-        this.scene = new MainScene(this.dispatcher);
+        this.scene = new MainScene();
 
         this.input.onInput.listen((inputEvent) => {
-            console.log("Input", inputEvent);
-            this.scene.onInput(inputEvent);
+            this.dispatch(inputAction(inputEvent));
         });
 
         const canvasElement: HTMLCanvasElement = document.querySelector(
@@ -47,17 +49,25 @@ export class Game {
 
     private render() {
         const getRenderNodesStart = performance.now();
-        const nodes = this.scene.onRender(this.state, this.renderer.camera);
+        const gameNode = this.scene.onRender(this.state, this.renderer.camera);
+        const uiNode = getUi(this.state);
         const getRenderNodesEnd = performance.now();
         console.log(
-            "Get RenderNodes: ",
+            "⏱get RenderNodes: ",
             getRenderNodesEnd - getRenderNodesStart
         );
         const renderStart = performance.now();
-        this.renderer.render(nodes);
+        this.renderer.render(gameNode, uiNode);
         const renderEnd = performance.now();
-        console.log("render time: ", renderEnd - renderStart);
+        console.log("⏱render time: ", renderEnd - renderStart);
     }
 
     public dispose(): any {}
+
+    private dispatch(action: Action<any>) {
+        const dispatchStart = performance.now();
+        this.dispatcher.dispatch(action);
+        const dispatchEnd = performance.now();
+        console.log("⏱[Total] update time: ", dispatchEnd - dispatchStart);
+    }
 }
