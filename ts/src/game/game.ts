@@ -41,6 +41,17 @@ export class Game {
             `#${domElementWrapperSelector}`
         );
 
+        canvasElement.addEventListener("click", (mouseEvent) => {
+            const hitTestTimeStart = performance.now();
+            const hit = this.renderer.queryRenderItem({
+                x: mouseEvent.clientX,
+                y: mouseEvent.clientY,
+            });
+            const hitTestTimeEnd = performance.now();
+            console.log("Hit: ", hit);
+            console.log("⏱hit test time: ", hitTestTimeEnd - hitTestTimeStart);
+        });
+
         this.renderer = new Renderer(canvasElement);
         this.renderer.camera.center(this.cameraPosition);
         //this.renderer.camera.follow(getPlayerPosition(this.state));

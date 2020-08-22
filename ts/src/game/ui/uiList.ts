@@ -14,6 +14,7 @@ export function uiList(
         width: 300,
         height: options.length * 30,
         fill: "#2e2e2e",
+        includeInHitList: true,
     });
     listContainer.children.push(background);
 

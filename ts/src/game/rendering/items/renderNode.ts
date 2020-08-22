@@ -1,17 +1,19 @@
 import { RenderContext } from "../renderContext";
 import { Point, addPoint } from "../../../data/point";
 import { Camera } from "../camera";
+import { RenderItem } from "../renderer";
 
 export interface NodeConfiguration {
     x: number;
     y: number;
     depth?: number;
+    includeInHitList?: boolean;
 }
 
 export enum RenderNodeType {
     container = "CONTAINER",
     rectangle = "RECTANGLE",
-    text = "TEXT"
+    text = "TEXT",
 }
 
 export interface RenderNode {
@@ -28,9 +30,9 @@ export function container(point?: Point): RenderNode {
         type: RenderNodeType.container,
         config: {
             x: point.x,
-            y: point.y
+            y: point.y,
         },
-        children: []
+        children: [],
     };
 }
 

@@ -1,6 +1,7 @@
 import { RenderNode, NodeConfiguration, RenderNodeType } from "./renderNode";
 import { RenderContext } from "../renderContext";
 import { RenderItem } from "../renderer";
+import { Point } from "../../../data/point";
 
 export interface RectangleConfiguration extends NodeConfiguration {
     width: number;
@@ -17,7 +18,7 @@ export function rectangle(config: RectangleConfiguration): RenderNode {
     return {
         type: RenderNodeType.rectangle,
         config: config,
-        children: []
+        children: [],
     };
 }
 
@@ -48,6 +49,24 @@ export function rectangleRenderer(
         );
     }
 }
+
+export function testRectangleHit(
+    testPoint: Point,
+    rectanglePoint: Point,
+    rectangleConfig: RectangleConfiguration
+): boolean {
+    const x1 = rectanglePoint.x;
+    const y1 = rectanglePoint.y;
+    const x2 = rectanglePoint.x + rectangleConfig.width;
+    const y2 = rectanglePoint.y + rectangleConfig.height;
+    return (
+        x1 <= testPoint.x &&
+        x2 >= testPoint.x &&
+        y1 <= testPoint.y &&
+        y2 >= testPoint.y
+    );
+}
+
 /* 
 export class Rectangle extends RenderNode {
     private config: RectangleConfiguration;

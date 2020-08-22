@@ -3,7 +3,11 @@ import { RenderNode, RenderNodeType } from "./items/renderNode";
 import { rgbToHex } from "../../util/color";
 import { Camera } from "./camera";
 import { Point, addPoint, zeroPoint } from "../../data/point";
-import { rectangleRenderer } from "./items/rectangle";
+import {
+    rectangleRenderer,
+    RectangleConfiguration,
+    testRectangleHit,
+} from "./items/rectangle";
 import { textRenderer } from "./items/text";
 
 export interface RenderItem {
@@ -24,6 +28,7 @@ const typerRenders: { [type: string]: TypeRenderFunction } = {
 export class Renderer {
     private canvasContext: CanvasRenderingContext2D;
     private renderingContext: RenderContext;
+    private hitList: RenderItem[];
     private _camera: Camera;
     private _rootNode: RenderNode;
 
@@ -38,6 +43,22 @@ export class Renderer {
         this.canvasContext = canvasElement.getContext("2d");
         this.canvasContext.canvas.width = window.innerWidth;
         this.canvasContext.canvas.height = window.innerHeight;
+    }
+
+    public queryRenderItem(point: Point): RenderNode {
+        const hits: RenderNode[] = [];
+        for (let i = 0; i < this.hitList.length; i++) {
+            const renderItem = this.hitList[i];
+            if (this.testRenderItemForHit(renderItem, point)) {
+                hits.push(renderItem.node);
+            }
+        }
+
+        if (hits.length > 0) {
+            return hits[hits.length - 1];
+        } else {
+            return null;
+        }
     }
 
     public render(gameWorldNode: RenderNode, uiNode: RenderNode) {
@@ -58,6 +79,9 @@ export class Renderer {
     private renderUi(rootUiNode: RenderNode) {
         //Traverse nodes add to list, breadth first
         const renderList = this.prepareRenderList(rootUiNode);
+        this.hitList = renderList.filter(
+            (item) => item.node.config.includeInHitList == true
+        );
         //run render method on each entry
         this.renderItems(renderList, zeroPoint);
     }
@@ -159,5 +183,17 @@ export class Renderer {
             return a.idx - b.idx;
         });
         return sortArray.map((element) => element.item);
+    }
+
+    private testRenderItemForHit(item: RenderItem, testPoint: Point): boolean {
+        if (item.node.type == RenderNodeType.rectangle) {
+            return testRectangleHit(
+                testPoint,
+                item.transform,
+                item.node.config as RectangleConfiguration
+            );
+        } else {
+            return false;
+        }
     }
 }
