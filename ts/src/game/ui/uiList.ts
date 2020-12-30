@@ -1,6 +1,5 @@
 import { RenderNode, container } from "../rendering/items/renderNode";
 import { rectangle } from "../rendering/items/rectangle";
-import { UiWindowType } from "../state/gameState";
 import { text } from "../rendering/items/text";
 
 export function uiList(
@@ -14,7 +13,7 @@ export function uiList(
         width: 300,
         height: options.length * 30,
         fill: "#2e2e2e",
-        includeInHitList: true,
+        hitTag: "list",
     });
     listContainer.children.push(background);
 

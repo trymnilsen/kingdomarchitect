@@ -64,6 +64,7 @@ export class Renderer {
     public render(gameWorldNode: RenderNode, uiNode: RenderNode) {
         //Clear screen
         this.clearScreen();
+        this.hitList = [];
         this.renderGameWorld(gameWorldNode);
         this.renderUi(uiNode);
     }
@@ -72,6 +73,11 @@ export class Renderer {
         const cameraScreenSpace = this._camera.screenPosition;
         //Traverse nodes add to list, breadth first
         const renderList = this.prepareRenderList(rootGameNode);
+        renderList.forEach((item) => {
+            if (!!item.node.config.hitTag) {
+                this.hitList.push(item);
+            }
+        });
         //run render method on each entry
         this.renderItems(renderList, this._camera.screenPosition);
     }
@@ -79,9 +85,11 @@ export class Renderer {
     private renderUi(rootUiNode: RenderNode) {
         //Traverse nodes add to list, breadth first
         const renderList = this.prepareRenderList(rootUiNode);
-        this.hitList = renderList.filter(
-            (item) => item.node.config.includeInHitList == true
-        );
+        renderList.forEach((item) => {
+            if (!!item.node.config.hitTag) {
+                this.hitList.push(item);
+            }
+        });
         //run render method on each entry
         this.renderItems(renderList, zeroPoint);
     }

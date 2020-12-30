@@ -7,7 +7,7 @@ export interface NodeConfiguration {
     x: number;
     y: number;
     depth?: number;
-    includeInHitList?: boolean;
+    hitTag?: string;
 }
 
 export enum RenderNodeType {

@@ -1,9 +1,8 @@
 import { Point, addPoint } from "../../data/point";
 import { TILE_SIZE } from "../constants";
 //import { TileSize } from "../gameScene/world/chunk";
-const TileSize = 32;
 const TilesPadding = 4;
-const BufferSize = TileSize * TilesPadding;
+const BufferSize = TILE_SIZE * TilesPadding;
 export class Camera {
     private cameraPosition: Point;
 
@@ -12,8 +11,8 @@ export class Camera {
     }
     public center(worldSpace: Point) {
         const screenSpace = {
-            x: worldSpace.x * -TileSize,
-            y: worldSpace.y * -TileSize,
+            x: worldSpace.x * -TILE_SIZE,
+            y: worldSpace.y * -TILE_SIZE,
         };
         this.cameraPosition = screenSpace;
     }
@@ -28,18 +27,18 @@ export class Camera {
             x: Math.floor(clickX / TILE_SIZE),
             y: Math.floor(clickY / TILE_SIZE),
         };
-        console.log("Clicked at: ", worldSpace);
+
         return worldSpace;
     }
     public follow(worldSpace: Point) {
         const translation: Point = { x: 0, y: 0 };
         const screenSpace = {
             x:
-                worldSpace.x * TileSize +
+                worldSpace.x * TILE_SIZE +
                 window.innerWidth / 2 +
                 this.cameraPosition.x,
             y:
-                worldSpace.y * TileSize +
+                worldSpace.y * TILE_SIZE +
                 window.innerHeight / 2 +
                 this.cameraPosition.y,
         };
