@@ -49,7 +49,7 @@ export class Game {
             });
             const hitTestTimeEnd = performance.now();
             console.log("Hit: ", hit);
-            console.log("⏱hit test time: ", hitTestTimeEnd - hitTestTimeStart);
+            //console.log("⏱hit test time: ", hitTestTimeEnd - hitTestTimeStart);
         });
 
         this.renderer = new Renderer(canvasElement);
