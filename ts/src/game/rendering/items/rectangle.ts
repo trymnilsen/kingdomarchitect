@@ -27,6 +27,7 @@ export function rectangleRenderer(
     context: CanvasRenderingContext2D
 ) {
     const config = renderItem.node.config as RectangleConfiguration;
+
     if (!!config.fill) {
         context.fillStyle = config.fill;
         context.fillRect(

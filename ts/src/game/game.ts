@@ -135,7 +135,7 @@ function getInitalGameState(): GameState {
             for (let tileX = 0; tileX < TILES_PER_CHUNK; tileX++) {
                 for (let tileY = 0; tileY < TILES_PER_CHUNK; tileY++) {
                     tileMap.push(0);
-                    roomMap.push(1);
+                    roomMap.push(-1);
                 }
             }
 
