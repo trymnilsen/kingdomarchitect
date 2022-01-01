@@ -13,9 +13,9 @@
       "experimentalDecorators": true,
       "esModuleInterop": true,
       "noEmitOnError": true,
-      "outDir": "./tmp"
+      "outDir": "./build"
     },
     "include": [
-      "**/*.ts",
+      "ts/src/**/*.ts",
     ]
   }
