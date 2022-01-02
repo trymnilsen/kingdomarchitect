@@ -4,3 +4,8 @@ export enum Direction {
     Left,
     Right,
 }
+
+export enum Axis {
+    XAxis,
+    YAxis,
+}

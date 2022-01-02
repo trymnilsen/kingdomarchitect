@@ -1,25 +1,26 @@
-import { InputActionData } from "./inputAction";
+import { InputAction } from "./inputAction";
 import { Keyboard } from "./keyboard";
-import { Event, EventListener } from "../event/event";
+import { Event, EventListener } from "../common/event";
 
 export interface InputEvent {
-    action: InputActionData;
+    action: InputAction;
     inputType: InputType;
 }
 export enum InputType {
-    Keyboard
+    Keyboard,
 }
 export class Input {
     private _currentInputType: InputType;
     private events: Event<InputEvent>;
     private keyboard: Keyboard;
     public constructor() {
+        this._currentInputType = InputType.Keyboard;
         this.events = new Event();
         this.keyboard = new Keyboard();
         this.keyboard.keyEvent.listen((action) => {
             this.events.publish({
                 inputType: InputType.Keyboard,
-                action
+                action,
             });
         });
     }

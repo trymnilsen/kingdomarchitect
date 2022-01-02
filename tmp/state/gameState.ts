@@ -1,6 +1,6 @@
-import { Direction } from "../../data/direction";
-import { Point } from "../../data/point";
-import { NumberRange } from "../../data/range";
+import { Direction } from "../../common/data/direction";
+import { Point } from "../../common/data/point";
+import { NumberRange } from "../../common/data/range";
 import { TILES_PER_CHUNK } from "../constants";
 
 export type ChunkMap = { [id: string]: Chunk };

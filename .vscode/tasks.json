@@ -4,13 +4,6 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "presentation": {
-                "echo": true,
-                "reveal": "never",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": false
-            },
             "label": "frontend",
             "type": "npm",
             "script": "build",

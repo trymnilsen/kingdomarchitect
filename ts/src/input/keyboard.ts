@@ -1,11 +1,11 @@
-import { InputActionData } from "./inputAction";
-import { Event, EventListener } from "../event/event";
+import { InputAction } from "./inputAction";
+import { Event, EventListener } from "../common/event";
 
-export type KeyboardMap = { [key: string]: InputActionData };
+export type KeyboardMap = { [key: string]: InputAction };
 
 export class Keyboard {
     private keyboardMap: KeyboardMap;
-    private _keyEvent: Event<InputActionData>;
+    private _keyEvent: Event<InputAction>;
     public constructor() {
         this.keyboardMap = getKeyboardMap();
         this._keyEvent = new Event();
@@ -15,7 +15,7 @@ export class Keyboard {
         this._keyEvent.dispose();
     }
 
-    public get keyEvent(): EventListener<InputActionData> {
+    public get keyEvent(): EventListener<InputAction> {
         return this._keyEvent;
     }
 
@@ -46,11 +46,11 @@ export function getKeyboardMap(): KeyboardMap {
 
 export const UserKeyboardMapStorageKey = "KEYBOARD_USER_MAP";
 export const DefaultKeyboardMap: KeyboardMap = {
-    d: InputActionData.RIGHT_PRESS,
-    a: InputActionData.LEFT_PRESS,
-    w: InputActionData.UP_PRESS,
-    s: InputActionData.DOWN_PRESS,
-    q: InputActionData.BACK_PRESS,
-    e: InputActionData.ACTION_PRESS,
-    r: InputActionData.MENU_PRESS,
+    d: InputAction.RIGHT_PRESS,
+    a: InputAction.LEFT_PRESS,
+    w: InputAction.UP_PRESS,
+    s: InputAction.DOWN_PRESS,
+    q: InputAction.BACK_PRESS,
+    e: InputAction.ACTION_PRESS,
+    r: InputAction.MENU_PRESS,
 };

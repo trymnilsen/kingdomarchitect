@@ -1,6 +1,6 @@
 import { RenderNode, container } from "../rendering/items/renderNode";
 import { rectangle } from "../rendering/items/rectangle";
-import { Direction } from "../../data/direction";
+import { Direction } from "../../common/data/direction";
 
 export function playerVisual(direction: Direction): RenderNode {
     const parent = container({ x: 0, y: 0 });

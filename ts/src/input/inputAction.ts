@@ -1,4 +1,4 @@
-export enum InputActionData {
+export enum InputAction {
     LEFT_PRESS = "LEFT_PRESS",
     RIGHT_PRESS = "RIGHT_PRESS",
     UP_PRESS = "UP_PRESS",

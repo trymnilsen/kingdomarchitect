@@ -1,12 +1,4 @@
 {
-    "mongoRunner": {
-        "connections": [
-            {
-                "name": "connection1",
-                "url": "mongodb://localhost:27017/test"
-            }
-        ]
-    },
     "files.watcherExclude": {
         "**/.git/objects/**": true,
         "**/.git/subtree-cache/**": true,
@@ -20,9 +12,5 @@
         "tmp/**": true
     },
     "typescript.format.enable": true,
-    "editor.formatOnSave": true,
-    "jest.enableSnapshotUpdateMessages": false,
-    "jest.enableSnapshotPreviews": false,
-    "jest.enableInlineErrorMessages": false,
-    "typescript.tsdk": "node_modules/typescript/lib"
+    "editor.formatOnSave": true
 }

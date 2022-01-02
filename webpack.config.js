@@ -9,7 +9,10 @@ module.exports = {
         all: false,
         errors: true,
         assets: true,
-        timings: true
+        timings: true,
+    },
+    devServer: {
+        allowedHosts: "all",
     },
     module: {
         rules: [
@@ -18,18 +21,18 @@ module.exports = {
                 use: {
                     loader: "ts-loader",
                     options: {
-                        configFile: "tsconfig-client.json"
-                    }
+                        configFile: "tsconfig.json",
+                    },
                 },
-                exclude: /node_modules/
-            }
-        ]
+                exclude: /node_modules/,
+            },
+        ],
     },
     resolve: {
-        extensions: [".ts", ".ts", ".js"]
+        extensions: [".ts", ".ts", ".js"],
     },
     output: {
         filename: "bundle.js",
-        path: path.resolve(__dirname, "public/dist")
-    }
+        path: path.resolve(__dirname, "public/dist"),
+    },
 };

@@ -1,3 +1,4 @@
+/* 
 import { RenderNode, NodeConfiguration, RenderNodeType } from "./renderNode";
 import { RenderContext } from "../renderContext";
 import { RenderItem } from "../renderer";
@@ -36,7 +37,7 @@ export function textRenderer(
     );
 }
 
-/* 
+
 
 export class TextVisual extends RenderNode {
     private config: TextConfiguration;
