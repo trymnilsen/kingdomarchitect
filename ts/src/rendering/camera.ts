@@ -2,7 +2,7 @@ import { addPoint, Point, zeroPoint } from "../common/point";
 
 export class Camera {
     private _position: Point;
-
+    private _;
     constructor() {
         this._position = { x: 0, y: 0 };
     }
@@ -25,5 +25,12 @@ export class Camera {
 
     worldToScreenY(y: number): number {
         return y - this._position.y + window.innerHeight / 2;
+    }
+
+    screenToWorld(point: Point): Point {
+        return {
+            x: point.x - window.innerWidth / 2 + this._position.x,
+            y: point.y - window.innerHeight / 2 + this._position.y,
+        };
     }
 }

@@ -6,25 +6,31 @@ export interface OnPanEvent {
     position: Point;
 }
 
-export class DragInput {
+export class touchInput {
     private canvasElement: HTMLCanvasElement;
     private isDragging: boolean = false;
     private onTapPosition: Point | null = null;
     private previousMovePosition: Point | null = null;
     private _onPan: Event<OnPanEvent>;
+    private _onTap: Event<Point>;
 
     public get onPan(): EventListener<OnPanEvent> {
         return this._onPan;
     }
 
+    public get onTap(): EventListener<Point> {
+        return this._onTap;
+    }
+
     constructor(canvasElement: HTMLCanvasElement) {
         this.canvasElement = canvasElement;
         this._onPan = new Event();
+        this._onTap = new Event();
         canvasElement.addEventListener(
             "touchstart",
             (event) => {
                 event.preventDefault();
-                this.onTap({
+                this.onTapStart({
                     x: event.touches[0].clientX,
                     y: event.touches[0].clientY,
                 });
@@ -36,7 +42,7 @@ export class DragInput {
             "mousedown",
             (event) => {
                 event.preventDefault();
-                this.onTap({
+                this.onTapStart({
                     x: event.clientX,
                     y: event.clientY,
                 });
@@ -106,7 +112,7 @@ export class DragInput {
             { passive: false }
         );
     }
-    private onTap(position: Point) {
+    private onTapStart(position: Point) {
         console.log("onTap: ", position);
         this.onTapPosition = position;
     }
@@ -127,11 +133,14 @@ export class DragInput {
     }
 
     private onTapEnded() {
-        if (this.isDragging || this.onTapPosition) {
-            this.isDragging = false;
-            this.onTapPosition = null;
-            this.previousMovePosition = null;
+        if (this.isDragging) {
+            console.log("drag ended");
+        } else if (this.onTapPosition) {
+            this._onTap.publish(this.onTapPosition);
             console.log("tap ended");
         }
+        this.isDragging = false;
+        this.onTapPosition = null;
+        this.previousMovePosition = null;
     }
 }

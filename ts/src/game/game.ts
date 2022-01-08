@@ -1,5 +1,5 @@
 import { changeX, changeY, inverte as invert, Point } from "../common/point";
-import { DragInput } from "../input/dragInput";
+import { touchInput } from "../input/touchInput";
 import { Input, InputEvent } from "../input/input";
 import { InputAction } from "../input/inputAction";
 import { Renderer } from "../rendering/renderer";
@@ -10,8 +10,8 @@ export class Game {
     private renderer: Renderer;
     private input: Input;
     private currentScene: Scene;
-    private dragInput: DragInput;
-
+    private dragInput: touchInput;
+    private currentTick: number = 0;
     public constructor(domElementWrapperSelector: string) {
         // Input
         this.input = new Input();
@@ -19,6 +19,7 @@ export class Game {
         this.input.onInput.listen((inputEvent) => {
             this.onInput(inputEvent);
         });
+        setInterval(this.onTick, 1000);
 
         const canvasElement: HTMLCanvasElement | null = document.querySelector(
             `#${domElementWrapperSelector}`
@@ -27,15 +28,28 @@ export class Game {
         if (canvasElement == null) {
             throw new Error("Canvas element not found");
         }
-        this.dragInput = new DragInput(canvasElement);
+        this.dragInput = new touchInput(canvasElement);
         this.dragInput.onPan.listen((onPanEvent) => {
             this.renderer.camera.translate(invert(onPanEvent.movement));
+            this.render();
+        });
+        this.dragInput.onTap.listen((onTapEvent) => {
+            const worldPosition =
+                this.renderer.camera.screenToWorld(onTapEvent);
+            console.log("Clicked at: ", worldPosition);
+            this.currentScene.tap(worldPosition);
             this.render();
         });
         this.renderer = new Renderer(canvasElement);
         //this.renderer.camera.center(this.cameraPosition);
         this.render();
     }
+
+    private onTick = () => {
+        this.currentTick += 1;
+        this.currentScene.tick(this.currentTick);
+        this.render();
+    };
 
     private updateCamera(newPosition: Point) {
         this.renderer.camera.position = newPosition;

@@ -23,6 +23,11 @@ export class Ground {
             }
         }
     }
+    getTile(worldPosition: Point): GroundTile | null {
+        const tx = Math.floor(worldPosition.x / 32);
+        const ty = Math.floor(worldPosition.y / 32);
+        return this.tiles[getTileId(tx, ty)] || null;
+    }
     generate() {
         //console.log("Generate based on current tiles", this.tiles);
         const renderStart = performance.now();
@@ -49,7 +54,6 @@ export class Ground {
                 height: 30,
                 fill: "green",
             });
-      
         }
     }
 }
