@@ -1,4 +1,4 @@
-import { Point, zeroPoint } from "../common/point";
+import { addPoint, Point, zeroPoint } from "../common/point";
 
 export class Camera {
     private _position: Point;
@@ -13,6 +13,10 @@ export class Camera {
 
     public set position(point: Point) {
         this._position = point;
+    }
+
+    translate(translation: Point) {
+        this._position = addPoint(this._position, translation);
     }
 
     worldToScreenX(x: number): number {

@@ -1,4 +1,5 @@
-import { changeX, changeY, Point } from "../common/point";
+import { changeX, changeY, inverte as invert, Point } from "../common/point";
+import { DragInput } from "../input/dragInput";
 import { Input, InputEvent } from "../input/input";
 import { InputAction } from "../input/inputAction";
 import { Renderer } from "../rendering/renderer";
@@ -9,6 +10,7 @@ export class Game {
     private renderer: Renderer;
     private input: Input;
     private currentScene: Scene;
+    private dragInput: DragInput;
 
     public constructor(domElementWrapperSelector: string) {
         // Input
@@ -25,11 +27,11 @@ export class Game {
         if (canvasElement == null) {
             throw new Error("Canvas element not found");
         }
-
-        canvasElement.addEventListener("click", (mouseEvent) => {
-            //On click
+        this.dragInput = new DragInput(canvasElement);
+        this.dragInput.onPan.listen((onPanEvent) => {
+            this.renderer.camera.translate(invert(onPanEvent.movement));
+            this.render();
         });
-
         this.renderer = new Renderer(canvasElement);
         //this.renderer.camera.center(this.cameraPosition);
         this.render();

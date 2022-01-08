@@ -49,6 +49,7 @@ export class Ground {
                 height: 30,
                 fill: "green",
             });
+      
         }
     }
 }

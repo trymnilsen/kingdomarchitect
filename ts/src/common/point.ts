@@ -30,11 +30,25 @@ export function changeX(point: Point, amount: number) {
         y: point.y,
     };
 }
+
 export function changeY(point: Point, amount: number) {
     return {
         x: point.x,
         y: point.y + amount,
     };
+}
+
+export function inverte(point: Point): Point {
+    return {
+        x: point.x * -1,
+        y: point.y * -1,
+    };
+}
+
+export function distance(from: Point, to: Point): number {
+    const xDiff = to.x - from.x;
+    const yDiff = to.y - from.y;
+    return Math.sqrt(xDiff * xDiff + yDiff + yDiff);
 }
 
 export function adjacentPoint(point: Point, direction: Direction) {
