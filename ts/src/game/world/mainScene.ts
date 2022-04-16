@@ -1,52 +1,31 @@
 import { Point } from "../../common/point";
 import { InputAction } from "../../input/inputAction";
+import { Camera } from "../../rendering/camera";
 import { RenderContext } from "../../rendering/renderContext";
 import { Scene } from "../../scene/scene";
-import { SceneNode } from "../../scene/sceneNode";
-import { Ground } from "./entity/ground";
+import { InteractionHandler } from "./interaction/InteractionHandler";
+import { World } from "./world";
 
 export class MainScene implements Scene {
-    private ground: Ground;
-    private cursorPosition: Point | null = null;
-    constructor() {
-        this.ground = new Ground();
+    private world: World;
+    private interactionHandler: InteractionHandler;
+    constructor(camera: Camera) {
+        this.world = new World();
+        this.interactionHandler = new InteractionHandler(this.world, camera);
     }
+
     tick(tick: number): void {
-        if (tick % 10 == 0) {
-            console.log("Generate tick");
-            this.ground.generate();
-        }
+        this.world.tick(tick);
     }
+
     tap(worldPoint: Point): void {
-        const tile = this.ground.getTile(worldPoint);
-        if (tile) {
-            this.cursorPosition = {
-                x: Math.floor(worldPoint.x / 32) * 32,
-                y: Math.floor(worldPoint.y / 32) * 32,
-            };
-            console.log("Tile clicked: ", tile);
-        } else {
-            console.log("No tile found");
-            this.cursorPosition = null;
-        }
+        this.interactionHandler.tap(worldPoint);
     }
 
     input(action: InputAction): void {}
 
     drawScene(context: RenderContext): void {
-        this.ground.onDraw(context);
-        if (this.cursorPosition) {
-            context.drawRectangle({
-                x: this.cursorPosition.x + 1,
-                y: this.cursorPosition.y + 1,
-                width: 28,
-                height: 28,
-                strokeColor: "red",
-                strokeWidth: 2,
-            });
-        }
+        this.world.onDraw(context);
+        this.interactionHandler.onDraw(context);
     }
 }
-
-//Move drawing logic into ground
-//Generate groud on each input

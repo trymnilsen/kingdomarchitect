@@ -6,7 +6,7 @@ export interface OnPanEvent {
     position: Point;
 }
 
-export class touchInput {
+export class TouchInput {
     private canvasElement: HTMLCanvasElement;
     private isDragging: boolean = false;
     private onTapPosition: Point | null = null;

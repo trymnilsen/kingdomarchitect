@@ -7,6 +7,14 @@
             "label": "frontend",
             "type": "npm",
             "script": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "never",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
             "problemMatcher": ["$ts-webpack"],
             "group": {
                 "kind": "build",

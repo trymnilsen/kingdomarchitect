@@ -2,9 +2,10 @@ import { Game } from "./game/game";
 
 const canvasElementId = "gameCanvas";
 
-export function bootstrap() {
+export async function bootstrap() {
     console.log("Bootstrapping");
-    new Game(canvasElementId);
+    const game = new Game(canvasElementId);
+    await game.bootstrap();
 }
 
 document.addEventListener(

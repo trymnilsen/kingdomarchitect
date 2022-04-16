@@ -38,11 +38,22 @@ export function changeY(point: Point, amount: number) {
     };
 }
 
-export function inverte(point: Point): Point {
+export function invert(point: Point): Point {
     return {
         x: point.x * -1,
         y: point.y * -1,
     };
+}
+
+export function multiplyPoint(point: Point, factor: number): Point {
+    return {
+        x: point.x * factor,
+        y: point.y * factor,
+    };
+}
+
+export function pointEquals(point: Point, otherPoint: Point): boolean {
+    return point.x == otherPoint.x && point.y == otherPoint.y;
 }
 
 export function distance(from: Point, to: Point): number {

@@ -1,8 +1,7 @@
-import { addPoint, Point, zeroPoint } from "../common/point";
+import { addPoint, multiplyPoint, Point, zeroPoint } from "../common/point";
 
 export class Camera {
     private _position: Point;
-    private _;
     constructor() {
         this._position = { x: 0, y: 0 };
     }
@@ -13,6 +12,17 @@ export class Camera {
 
     public set position(point: Point) {
         this._position = point;
+    }
+
+    worldSpaceToTileSpace(worldSpace: Point): Point {
+        return {
+            x: Math.floor(worldSpace.x / 32),
+            y: Math.floor(worldSpace.y / 32),
+        };
+    }
+
+    tileSpaceToWorldSpace(tileSpace: Point): Point {
+        return multiplyPoint(tileSpace, 32);
     }
 
     translate(translation: Point) {

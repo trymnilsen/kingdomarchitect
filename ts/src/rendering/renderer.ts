@@ -1,3 +1,4 @@
+import { AssetLoader } from "../asset/assetLoader";
 import { rgbToHex } from "../common/color";
 import { Camera } from "./camera";
 import { RenderContext } from "./renderContext";
@@ -15,7 +16,7 @@ export class Renderer {
         return this.renderContext;
     }
 
-    constructor(canvasElement: HTMLCanvasElement) {
+    constructor(canvasElement: HTMLCanvasElement, assetLoader: AssetLoader) {
         const context = canvasElement.getContext("2d");
         if (!context) {
             throw Error("Unable to get 2d context from canvas");
@@ -24,7 +25,11 @@ export class Renderer {
         this.canvasContext = context;
         this.canvasContext.canvas.width = window.innerWidth;
         this.canvasContext.canvas.height = window.innerHeight;
-        this.renderContext = new RenderContext(context, this.camera);
+        this.renderContext = new RenderContext(
+            context,
+            this.camera,
+            assetLoader
+        );
     }
 
     clearScreen() {

@@ -1,26 +1,23 @@
-import { changeX, changeY, inverte as invert, Point } from "../common/point";
-import { touchInput } from "../input/touchInput";
+import { changeX, changeY, invert as invert, Point } from "../common/point";
+import { TouchInput } from "../input/touchInput";
 import { Input, InputEvent } from "../input/input";
 import { InputAction } from "../input/inputAction";
 import { Renderer } from "../rendering/renderer";
 import { Scene } from "../scene/scene";
 import { MainScene } from "./world/mainScene";
+import { assets } from "../asset/assets";
+import { AssetLoader } from "../asset/assetLoader";
 
 export class Game {
     private renderer: Renderer;
     private input: Input;
     private currentScene: Scene;
-    private dragInput: touchInput;
+    private dragInput: TouchInput;
+    private assetLoader: AssetLoader;
     private currentTick: number = 0;
     public constructor(domElementWrapperSelector: string) {
         // Input
         this.input = new Input();
-        this.currentScene = new MainScene();
-        this.input.onInput.listen((inputEvent) => {
-            this.onInput(inputEvent);
-        });
-        setInterval(this.onTick, 1000);
-
         const canvasElement: HTMLCanvasElement | null = document.querySelector(
             `#${domElementWrapperSelector}`
         );
@@ -28,7 +25,14 @@ export class Game {
         if (canvasElement == null) {
             throw new Error("Canvas element not found");
         }
-        this.dragInput = new touchInput(canvasElement);
+        this.dragInput = new TouchInput(canvasElement);
+        this.assetLoader = new AssetLoader();
+        this.renderer = new Renderer(canvasElement, this.assetLoader);
+        this.currentScene = new MainScene(this.renderer.camera);
+    }
+
+    async bootstrap(): Promise<void> {
+        await this.assetLoader.load();
         this.dragInput.onPan.listen((onPanEvent) => {
             this.renderer.camera.translate(invert(onPanEvent.movement));
             this.render();
@@ -40,8 +44,10 @@ export class Game {
             this.currentScene.tap(worldPosition);
             this.render();
         });
-        this.renderer = new Renderer(canvasElement);
-        //this.renderer.camera.center(this.cameraPosition);
+        this.input.onInput.listen((inputEvent) => {
+            this.onInput(inputEvent);
+        });
+        setInterval(this.onTick, 1000);
         this.render();
     }
 
@@ -83,7 +89,7 @@ export class Game {
         this.renderer.clearScreen();
         this.currentScene.drawScene(this.renderer.context);
         const renderEnd = performance.now();
-        console.log("⏱render time: ", renderEnd - renderStart);
+        //console.log("⏱render time: ", renderEnd - renderStart);
     }
 
     public dispose(): any {}
