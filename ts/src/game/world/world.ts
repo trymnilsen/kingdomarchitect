@@ -4,18 +4,12 @@ import { Heroes } from "./entity/heroes";
 
 export class World {
     private _ground: Ground;
-    private _heroes: Heroes;
 
     public get ground(): Ground {
         return this._ground;
     }
 
-    public get heroes(): Heroes {
-        return this._heroes;
-    }
-
     constructor() {
-        this._heroes = new Heroes();
         this._ground = new Ground();
         for (let i = 0; i < 10; i++) {
             this.ground.generate();
@@ -31,6 +25,5 @@ export class World {
 
     onDraw(context: RenderContext): void {
         this.ground.onDraw(context);
-        this.heroes.onDraw(context);
     }
 }
