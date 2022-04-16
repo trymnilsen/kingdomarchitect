@@ -39,7 +39,7 @@ export class Renderer {
             window.innerWidth,
             window.innerHeight
         );
-        this.canvasContext.fillStyle = rgbToHex(0, 50, 20);
+        this.canvasContext.fillStyle = rgbToHex(40, 40, 40);
         this.canvasContext.fillRect(
             0,
             0,
