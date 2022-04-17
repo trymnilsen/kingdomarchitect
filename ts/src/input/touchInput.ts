@@ -113,7 +113,6 @@ export class TouchInput {
         );
     }
     private onTapStart(position: Point) {
-        console.log("onTap: ", position);
         this.onTapPosition = position;
     }
 
@@ -137,7 +136,6 @@ export class TouchInput {
             console.log("drag ended");
         } else if (this.onTapPosition) {
             this._onTap.publish(this.onTapPosition);
-            console.log("tap ended");
         }
         this.isDragging = false;
         this.onTapPosition = null;

@@ -25,10 +25,13 @@ export class Renderer {
         this.canvasContext = context;
         this.canvasContext.canvas.width = window.innerWidth;
         this.canvasContext.canvas.height = window.innerHeight;
+        this.canvasContext.imageSmoothingEnabled = false;
         this.renderContext = new RenderContext(
             context,
             this.camera,
-            assetLoader
+            assetLoader,
+            window.innerWidth,
+            window.innerHeight
         );
     }
 

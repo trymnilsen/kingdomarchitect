@@ -6,7 +6,7 @@ import { InteractionState } from "../interactionState";
 import { InteractionStateChanger } from "../interactionStateChanger";
 import { TileSelectedState } from "./tileSelectedState";
 
-export class RootState implements InteractionState {
+export class RootState extends InteractionState {
     onTap(
         screenPosition: Point,
         stateChanger: InteractionStateChanger
@@ -21,7 +21,5 @@ export class RootState implements InteractionState {
         return true;
     }
 
-    onActive(): void {}
-    onInactive(): void {}
     onDraw(context: RenderContext): void {}
 }

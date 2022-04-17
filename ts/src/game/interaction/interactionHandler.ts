@@ -27,20 +27,34 @@ export class InteractionHandler {
             return;
         }
 
-        const worldPosition = this.camera.screenToWorld(screenPoint);
-        const tilePosition = this.camera.worldSpaceToTileSpace(worldPosition);
-
-        const tile = this.world.ground.getTile(tilePosition);
-        if (tile) {
-            this.history.state.onTileTap(tile, this.history);
+        if (this.history.state.isModal) {
+            this.history.pop();
         } else {
-            // No tap result was handled and no tile was present at tap.
-            // as of now this means that nothing in the map was pressed
-            this.clearInteractionState();
+            const worldPosition = this.camera.screenToWorld(screenPoint);
+            const tilePosition =
+                this.camera.worldSpaceToTileSpace(worldPosition);
+
+            const tile = this.world.ground.getTile(tilePosition);
+            if (tile) {
+                this.history.state.onTileTap(tile, this.history);
+            } else {
+                // No tap result was handled and no tile was present at tap.
+                // as of now this means that nothing in the map was pressed
+                this.clearInteractionState();
+            }
         }
     }
 
     onDraw(renderContext: RenderContext) {
+        if (this.history.state.isModal) {
+            renderContext.drawScreenSpaceRectangle({
+                x: 0,
+                y: 0,
+                width: renderContext.width,
+                height: renderContext.height,
+                fill: "rgba(40, 40, 40, 0.8)",
+            });
+        }
         this.history.state.onDraw(renderContext);
     }
 
