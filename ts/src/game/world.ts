@@ -1,4 +1,4 @@
-import { RenderContext } from "../../rendering/renderContext";
+import { RenderContext } from "../rendering/renderContext";
 import { Ground } from "./entity/ground";
 import { Heroes } from "./entity/heroes";
 

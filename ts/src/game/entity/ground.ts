@@ -1,8 +1,8 @@
-import { Bounds, getBoundsAxis } from "../../../common/bounds";
-import { Axis, Direction } from "../../../common/direction";
-import { adjacentPoint, Point } from "../../../common/point";
-import { NumberRange, rangeDistance, rangeRandom } from "../../../common/range";
-import { RenderContext } from "../../../rendering/renderContext";
+import { Bounds, getBoundsAxis } from "../../common/bounds";
+import { Axis, Direction } from "../../common/direction";
+import { adjacentPoint, Point } from "../../common/point";
+import { NumberRange, rangeDistance, rangeRandom } from "../../common/range";
+import { RenderContext } from "../../rendering/renderContext";
 
 export interface GroundTile {
     tileX: number;
@@ -102,7 +102,7 @@ export function generateGround(tiles: { [id: string]: GroundTile }): Point {
     const boundsStart = performance.now();
     const bounds = getTileBounds(entries);
     const boundsEnd = performance.now();
-    console.log("⏱get bounds time: ", boundsEnd - boundsStart);
+    //console.log("⏱get bounds time: ", boundsEnd - boundsStart);
     const side = Math.floor(Math.random() * 4);
 
     //console.log("bounds", bounds);
@@ -161,7 +161,7 @@ export function generateGround(tiles: { [id: string]: GroundTile }): Point {
         }
     }
     const searchEnd = performance.now();
-    console.log("⏱search tile time: ", searchEnd - searchStart);
+    //console.log("⏱search tile time: ", searchEnd - searchStart);
 
     return tilePoint;
 }

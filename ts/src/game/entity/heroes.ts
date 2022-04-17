@@ -4,9 +4,9 @@ import {
     Point,
     pointEquals,
     zeroPoint,
-} from "../../../common/point";
-import { RenderContext } from "../../../rendering/renderContext";
-import { heroVisual } from "../../../visual/hero/heroVisual";
+} from "../../common/point";
+import { RenderContext } from "../../rendering/renderContext";
+import { heroVisual } from "../../visual/hero/heroVisual";
 
 export class Heroes {
     private heroes: Hero[] = [];

@@ -9,7 +9,8 @@
         "**/node_modules": true,
         "**/bower_components": true,
         "**/*.code-search": true,
-        "tmp/**": true
+        "tmp/**": true,
+        "build/**": true,
     },
     "typescript.format.enable": true,
     "editor.formatOnSave": true

@@ -25,6 +25,14 @@ export class Camera {
         return multiplyPoint(tileSpace, 32);
     }
 
+    tileSpaceToScreenSpace(tileSpace: Point): Point {
+        const tileWorldPoint = this.tileSpaceToWorldSpace(tileSpace);
+        return {
+            x: this.worldToScreenX(tileWorldPoint.x),
+            y: this.worldToScreenY(tileWorldPoint.y),
+        };
+    }
+
     translate(translation: Point) {
         this._position = addPoint(this._position, translation);
     }

@@ -5,7 +5,8 @@
     "main": "ts/src/main.ts",
     "scripts": {
         "start": "webpack serve",
-        "build": "webpack"
+        "build": "webpack",
+        "test": "ava"
     },
     "repository": {
         "type": "git",
@@ -13,7 +14,8 @@
     },
     "keywords": [],
     "author": "",
-    "license": "UNLICENSED",
+    "private": true,
+    "license": "MIT",
     "bugs": {
         "url": "https://github.com/trymnilsen/kingdomarchitect/issues"
     },

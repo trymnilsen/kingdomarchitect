@@ -4,8 +4,7 @@ import { Input, InputEvent } from "../input/input";
 import { InputAction } from "../input/inputAction";
 import { Renderer } from "../rendering/renderer";
 import { Scene } from "../scene/scene";
-import { MainScene } from "./world/mainScene";
-import { assets } from "../asset/assets";
+import { MainScene } from "./mainScene";
 import { AssetLoader } from "../asset/assetLoader";
 
 export class Game {
@@ -16,8 +15,7 @@ export class Game {
     private assetLoader: AssetLoader;
     private currentTick: number = 0;
     public constructor(domElementWrapperSelector: string) {
-        // Input
-        this.input = new Input();
+        // Get the canvas
         const canvasElement: HTMLCanvasElement | null = document.querySelector(
             `#${domElementWrapperSelector}`
         );
@@ -25,7 +23,12 @@ export class Game {
         if (canvasElement == null) {
             throw new Error("Canvas element not found");
         }
+
+        // Input
+        this.input = new Input();
         this.touchInput = new TouchInput(canvasElement);
+
+        // Rendering and scenes
         this.assetLoader = new AssetLoader();
         this.renderer = new Renderer(canvasElement, this.assetLoader);
         this.currentScene = new MainScene(this.renderer.camera);
@@ -38,10 +41,7 @@ export class Game {
             this.render();
         });
         this.touchInput.onTap.listen((onTapEvent) => {
-            const worldPosition =
-                this.renderer.camera.screenToWorld(onTapEvent);
-            console.log("Clicked at: ", worldPosition);
-            this.currentScene.tap(worldPosition);
+            this.currentScene.tap(onTapEvent);
             this.render();
         });
         this.input.onInput.listen((inputEvent) => {
