@@ -21,6 +21,7 @@ export interface NinePatchImageConfiguration extends RenderItemConfiguration {
     sides: Sides;
     width: number;
     height: number;
+    scale: number;
 }
 
 export function spriteRenderer(
@@ -40,30 +41,131 @@ export function ninePatchImageRenderer(
     bottom: number,
     left: number,
     right: number,
+    scale: number,
     image: HTMLImageElement,
     context: CanvasRenderingContext2D
 ) {
-    /* - Draw topLeft rectangle
-	- Draw topRight rectangle
-	- Draw bottomLeft rectangle
-	- Draw bottomRight rectangle
-	- draw top border
-	- draw left border
-	- draw right border
-	- draw bottom
-	- draw middle */
-    // Draw topLeft part of the patch
-    context.drawImage(image, 0, 0, left, top, x, y, left, top);
-    // Draw topRight part of the patch
+    const patchWidth = image.width;
+    const patchHeight = image.height;
+    const middlePatchWidth = patchWidth - left - right;
+    const middlePatchHeight = patchHeight - top - bottom;
+
+    const leftScaled = left * scale;
+    const rightScaled = right * scale;
+    const topScaled = top * scale;
+    const bottomScaled = bottom * scale;
+
+    const middleScaledWidth = Math.max(width - leftScaled - rightScaled, 0);
+    const middleScaledHeight = Math.max(height - topScaled - bottomScaled, 0);
+
+    // Draw top left part of the patch
+    context.drawImage(image, 0, 0, left, top, x, y, leftScaled, topScaled);
+
+    // Draw top right part of the patch
     context.drawImage(
         image,
-        image.width - right,
+        patchWidth - right,
         0,
         right,
         top,
-        x + width - right,
+        x + width - rightScaled,
         y,
+        rightScaled,
+        topScaled
+    );
+
+    // Draw bottom left part of the patch
+    context.drawImage(
+        image,
+        0,
+        patchHeight - bottom,
+        left,
+        bottom,
+        x,
+        y + height - bottomScaled,
+        leftScaled,
+        bottomScaled
+    );
+
+    // Draw bottom right part of the patch
+    context.drawImage(
+        image,
+        patchWidth - right,
+        patchHeight - bottom,
         right,
-        top
+        bottom,
+        x + width - rightScaled,
+        y + height - bottomScaled,
+        rightScaled,
+        bottomScaled
+    );
+
+    if (middleScaledHeight > 0) {
+        // Draw the left middle part
+        context.drawImage(
+            image,
+            0,
+            top,
+            left,
+            middlePatchHeight,
+            x,
+            y + topScaled,
+            leftScaled,
+            middleScaledHeight
+        );
+
+        // Draw the right middle part
+        context.drawImage(
+            image,
+            patchWidth - right,
+            top,
+            right,
+            middlePatchHeight,
+            x + width - rightScaled,
+            y + topScaled,
+            rightScaled,
+            middleScaledHeight
+        );
+    }
+
+    if (middleScaledWidth > 0) {
+        // Draw the top middle part
+        context.drawImage(
+            image,
+            left,
+            0,
+            middlePatchWidth,
+            top,
+            x + leftScaled,
+            y,
+            middleScaledWidth,
+            topScaled
+        );
+
+        // Draw the bottom middle part
+        context.drawImage(
+            image,
+            left,
+            patchHeight - bottom,
+            middlePatchWidth,
+            bottom,
+            x + leftScaled,
+            y + height - bottomScaled,
+            middleScaledWidth,
+            bottomScaled
+        );
+    }
+
+    // Draw the middle part
+    context.drawImage(
+        image,
+        left,
+        top,
+        middlePatchWidth,
+        middlePatchHeight,
+        x + leftScaled,
+        y + topScaled,
+        middleScaledWidth,
+        middleScaledHeight
     );
 }

@@ -27,13 +27,46 @@ export class BuildMenuState extends InteractionState {
     onDraw(context: RenderContext): void {
         const width = context.height / 3;
         const height = context.height / 2;
+        const x = context.width / 2 - width / 2;
+        const y = context.height / 2 - height / 2;
         context.drawNinePatchImage({
             asset: "stoneSlateBackground",
             height: height,
             width: width,
-            x: context.width / 2 - width / 2,
-            y: context.height / 2 - height / 2,
+            x: x,
+            y: y,
             sides: allSides(16),
+            scale: 4,
+        });
+
+        context.drawNinePatchImage({
+            asset: "fancyWoodBackground",
+            height: 80,
+            width: width - 64,
+            x: x + 32,
+            y: y + 64,
+            sides: allSides(9),
+            scale: 4,
+        });
+
+        context.drawNinePatchImage({
+            asset: "fancyWoodBackground",
+            height: 80,
+            width: width - 64,
+            x: x + 32,
+            y: y + 64 + 96,
+            sides: allSides(9),
+            scale: 4,
+        });
+
+        context.drawNinePatchImage({
+            asset: "fancyWoodBackground",
+            height: 80,
+            width: width - 64,
+            x: x + 32,
+            y: y + 64 + 192,
+            sides: allSides(9),
+            scale: 4,
         });
     }
 }

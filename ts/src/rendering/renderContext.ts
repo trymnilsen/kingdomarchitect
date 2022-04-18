@@ -72,6 +72,12 @@ export class RenderContext {
         );
     }
 
+    /**
+     * Draws a scalable version of an image know as a nine patch or nice slice.
+     * This is a bit expensive as it needs to draw 9 images to represent a
+     * perceived single image so use it sparringly.
+     * @param image the configuration of the image to draw
+     */
     drawNinePatchImage(image: NinePatchImageConfiguration) {
         ninePatchImageRenderer(
             image.x,
@@ -82,6 +88,7 @@ export class RenderContext {
             image.sides.bottom,
             image.sides.left,
             image.sides.right,
+            image.scale,
             this.assetLoader.getAsset(image.asset),
             this.canvasContext
         );
