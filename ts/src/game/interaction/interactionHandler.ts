@@ -52,7 +52,7 @@ export class InteractionHandler {
                 y: 0,
                 width: renderContext.width,
                 height: renderContext.height,
-                fill: "rgba(40, 40, 40, 0.8)",
+                fill: "rgba(20, 20, 20, 0.8)",
             });
         }
         this.history.state.onDraw(renderContext);

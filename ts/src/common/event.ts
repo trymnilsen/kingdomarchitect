@@ -1,6 +1,7 @@
 export class Event<T = {}> {
     private nextListenersId = 0;
     private listeners: { [id: string]: EventSubscriptionHandler<T> } = {};
+
     public listen(subscriber: EventSubscriptionHandler<T>): EventHandle {
         const listnerId = this.nextListenersId + 1;
         this.listeners[listnerId] = subscriber;
@@ -8,6 +9,16 @@ export class Event<T = {}> {
             delete this.listeners[listnerId];
         };
     }
+
+    public listenOnce(subscriber: EventSubscriptionHandler<T>): EventHandle {
+        const handle = this.listen((data) => {
+            // Remove the listener after the first value
+            handle();
+            subscriber(data);
+        });
+        return handle;
+    }
+
     public publish(data: T): void {
         Object.values(this.listeners).forEach((listener, idx) => {
             try {
@@ -20,6 +31,7 @@ export class Event<T = {}> {
             }
         });
     }
+
     public dispose(): void {
         this.listeners = {};
     }

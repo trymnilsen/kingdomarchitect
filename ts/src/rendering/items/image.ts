@@ -10,10 +10,21 @@ export interface ImageConfiguration extends RenderItemConfiguration {
 export function imageRenderer(
     x: number,
     y: number,
+    scale: number,
     image: HTMLImageElement,
     context: CanvasRenderingContext2D
 ) {
-    context.drawImage(image, x, y);
+    if (scale == 1) {
+        context.drawImage(image, x, y);
+    } else {
+        context.drawImage(
+            image,
+            x,
+            y,
+            image.width * scale,
+            image.height * scale
+        );
+    }
 }
 
 export interface NinePatchImageConfiguration extends RenderItemConfiguration {
@@ -50,10 +61,10 @@ export function ninePatchImageRenderer(
     const middlePatchWidth = patchWidth - left - right;
     const middlePatchHeight = patchHeight - top - bottom;
 
-    const leftScaled = left * scale;
-    const rightScaled = right * scale;
-    const topScaled = top * scale;
-    const bottomScaled = bottom * scale;
+    const leftScaled = Math.floor(left * scale);
+    const rightScaled = Math.floor(right * scale);
+    const topScaled = Math.floor(top * scale);
+    const bottomScaled = Math.floor(bottom * scale);
 
     const middleScaledWidth = Math.max(width - leftScaled - rightScaled, 0);
     const middleScaledHeight = Math.max(height - topScaled - bottomScaled, 0);

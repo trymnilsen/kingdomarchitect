@@ -90,11 +90,14 @@ export class TileSelectedState extends InteractionState {
                 i
             );
 
-            context.drawScreenSpaceImage({
-                x: buttonPosition.x,
-                y: buttonPosition.y,
-                image: "stoneSlateBackground",
-            });
+            context.drawScreenSpaceImage(
+                {
+                    x: buttonPosition.x,
+                    y: buttonPosition.y,
+                    image: "stoneSlateBackground",
+                },
+                1
+            );
         }
     }
 

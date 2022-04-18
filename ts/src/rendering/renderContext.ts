@@ -58,15 +58,17 @@ export class RenderContext {
         imageRenderer(
             transformedX,
             transformedY,
+            1,
             this.assetLoader.getAsset(image.image),
             this.canvasContext
         );
     }
 
-    drawScreenSpaceImage(image: ImageConfiguration) {
+    drawScreenSpaceImage(image: ImageConfiguration, scale: number) {
         imageRenderer(
             image.x,
             image.y,
+            scale,
             this.assetLoader.getAsset(image.image),
             this.canvasContext
         );

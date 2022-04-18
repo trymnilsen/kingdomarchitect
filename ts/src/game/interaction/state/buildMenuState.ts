@@ -29,6 +29,7 @@ export class BuildMenuState extends InteractionState {
         const height = context.height / 2;
         const x = context.width / 2 - width / 2;
         const y = context.height / 2 - height / 2;
+        const windowScale = 4;
         context.drawNinePatchImage({
             asset: "stoneSlateBackground",
             height: height,
@@ -36,7 +37,7 @@ export class BuildMenuState extends InteractionState {
             x: x,
             y: y,
             sides: allSides(16),
-            scale: 4,
+            scale: windowScale,
         });
 
         context.drawNinePatchImage({
@@ -46,7 +47,7 @@ export class BuildMenuState extends InteractionState {
             x: x + 32,
             y: y + 64,
             sides: allSides(9),
-            scale: 4,
+            scale: windowScale,
         });
 
         context.drawNinePatchImage({
@@ -56,7 +57,7 @@ export class BuildMenuState extends InteractionState {
             x: x + 32,
             y: y + 64 + 96,
             sides: allSides(9),
-            scale: 4,
+            scale: windowScale,
         });
 
         context.drawNinePatchImage({
@@ -66,7 +67,7 @@ export class BuildMenuState extends InteractionState {
             x: x + 32,
             y: y + 64 + 192,
             sides: allSides(9),
-            scale: 4,
+            scale: windowScale,
         });
     }
 }
