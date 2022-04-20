@@ -40,7 +40,7 @@ export class Ground {
         }
 
         const renderEnd = performance.now();
-        console.log("⏱generate ground time: ", renderEnd - renderStart);
+        //console.log("⏱generate ground time: ", renderEnd - renderStart);
     }
     onDraw(context: RenderContext) {
         for (const tileId in this.tiles) {

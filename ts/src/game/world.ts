@@ -18,7 +18,7 @@ export class World {
 
     tick(tick: number): void {
         if (tick % 10 == 0) {
-            console.log("Generate tick");
+            //console.log("Generate tick");
             this.ground.generate();
         }
     }

@@ -1,7 +1,6 @@
 import { withinRectangle } from "../../../common/bounds";
 import { Point } from "../../../common/point";
 import { InputEvent } from "../../../input/input";
-import { InputAction } from "../../../input/inputAction";
 import { RenderContext } from "../../../rendering/renderContext";
 import { GroundTile } from "../../entity/ground";
 import { InteractionState } from "../interactionState";
@@ -54,21 +53,30 @@ export class TileSelectedState extends InteractionState {
                 )
             ) {
                 console.log("TileSelectedState - onTap: ", i);
-                stateChanger.push(new BuildMenuState());
+                stateChanger.push(new BuildMenuState(), (value) => {
+                    console.log("Pop callback from build");
+                    if (value === true) {
+                        this.onBuildSelected();
+                    }
+                });
+
                 return true;
             }
         }
 
         return false;
     }
+
     onTileTap(tile: GroundTile, stateChanger: InteractionStateChanger): void {
         // If a new tile was tapped while in this state we move the cursor to it
         console.log("TileSelectedState - onTileTap: ", tile);
         this.selectedTile = tile;
     }
+
     onInput(input: InputEvent, stateChanger: InteractionStateChanger): boolean {
         return false;
     }
+
     onActive(): void {}
     onInactive(): void {}
     onDraw(context: RenderContext): void {
@@ -99,6 +107,10 @@ export class TileSelectedState extends InteractionState {
                 1
             );
         }
+    }
+
+    private onBuildSelected() {
+        console.log("Build was selected");
     }
 
     private actionBarButtonPosition(

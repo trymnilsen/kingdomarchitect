@@ -21,6 +21,7 @@ export class BuildMenuState extends InteractionState {
         const x = window.innerWidth / 2 - width / 2;
         const y = window.innerHeight / 2 - height / 2;
         if (withinRectangle(screenPosition, x, y, x + width, y + width)) {
+            console.log("Clicked inside, popping with value");
             stateChanger.pop(true);
             return true;
         } else {

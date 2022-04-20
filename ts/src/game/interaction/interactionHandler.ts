@@ -35,12 +35,6 @@ export class InteractionHandler {
                 return;
             }
 
-            // If we do not handle the tap but return state changes, we log it
-            // for our own sanity in the future
-            if (stateChanger.hasOperations) {
-                console.warn("Tap was not handled but returned state change");
-            }
-
             // Get the transformed position of the click
             const worldPosition = this.camera.screenToWorld(screenPoint);
             const tilePosition =
@@ -53,7 +47,6 @@ export class InteractionHandler {
             }
         }
 
-        // Apply the state changes from tapping to the state
         stateChanger.apply(this.history);
     }
 

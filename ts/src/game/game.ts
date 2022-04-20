@@ -89,7 +89,7 @@ export class Game {
         this.renderer.clearScreen();
         this.currentScene.drawScene(this.renderer.context);
         const renderEnd = performance.now();
-        console.log("⏱render time: ", renderEnd - renderStart);
+        //console.log("⏱render time: ", renderEnd - renderStart);
     }
 
     public dispose(): any {}

@@ -3,7 +3,7 @@ import { InteractionState } from "./interactionState";
 import { InteractionStateHistory } from "./interactionStateHistory";
 
 export interface InteractionStateChanger {
-    push(state: InteractionState): Promise<unknown>;
+    push(state: InteractionState, onPop?: (result: unknown) => void): void;
     replace(state: InteractionState): void;
     pop(result: unknown): void;
     clear(): void;
@@ -18,28 +18,28 @@ export class CommitableInteractionStateChanger
         return this.operations.length > 0;
     }
 
-    push(state: InteractionState): Promise<unknown> {
-        const completer = new Completer();
+    push(state: InteractionState, onPop?: (value: unknown) => void) {
         this.operations.push({
             type: "push",
             newState: state,
-            completer: completer,
+            onPushCallback: onPop,
         });
-
-        return completer.promise;
     }
+
     replace(state: InteractionState): void {
         this.operations.push({
             type: "replace",
             newState: state,
         });
     }
+
     pop(result: unknown): void {
         this.operations.push({
             type: "pop",
             result: result,
         });
     }
+
     clear(): void {
         this.operations.push({
             type: "clear",
@@ -48,9 +48,10 @@ export class CommitableInteractionStateChanger
 
     apply(history: InteractionStateHistory) {
         for (const operation of this.operations) {
+            console.log("Handling interactionStateOperation:", operation);
             switch (operation.type) {
                 case "push":
-                    history.push(operation.newState, operation.completer);
+                    history.push(operation.newState, operation.onPushCallback);
                     break;
                 case "pop":
                     history.pop(operation.result);
@@ -85,7 +86,7 @@ interface ReplaceOperation {
 interface PushOperation {
     type: "push";
     newState: InteractionState;
-    completer: Completer<unknown>;
+    onPushCallback?: (value: unknown) => void;
 }
 
 interface ClearOperation {

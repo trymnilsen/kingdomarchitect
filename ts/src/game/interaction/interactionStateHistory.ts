@@ -5,7 +5,7 @@ import { RootState } from "./state/rootState";
 
 interface InteractionStateHistoryEntry {
     state: InteractionState;
-    popCompleter?: Completer<unknown>;
+    onPop?: (value: unknown) => void;
 }
 
 /**
@@ -13,7 +13,7 @@ interface InteractionStateHistoryEntry {
  * is active or have been active. This enables us to have a back functionality
  * if we show a menu or a specific UI state.
  */
-export class InteractionStateHistory implements InteractionStateChanger {
+export class InteractionStateHistory {
     private history: InteractionStateHistoryEntry[] = [];
 
     /**
@@ -33,17 +33,14 @@ export class InteractionStateHistory implements InteractionStateChanger {
      * active state before the push is perfomed to be set as inactive.
      * @param state The new state to push and set as active
      */
-    public push(
-        state: InteractionState,
-        popCompleter: Completer<unknown>
-    ): void {
+    public push(state: InteractionState, onPop?: (value: unknown) => void) {
         console.log("Pushing state: ", state.constructor.name);
         this.history[this.history.length - 1].state.onInactive();
         // Create a pop completer that can we awaited to wait for a result
         // This enables awaiting this function and resume with a value
         this.history.push({
             state,
-            popCompleter,
+            onPop,
         });
         state.onActive();
     }
@@ -63,12 +60,6 @@ export class InteractionStateHistory implements InteractionStateChanger {
         const replacedState = this.history.pop();
         // Set it to inactive
         replacedState?.state.onInactive();
-        // If it has a promise for when it is poped, reject it to avoid it
-        // waiting forever for a state that will now never be popped with
-        // a result
-        if (replacedState?.popCompleter) {
-            replacedState.popCompleter.rejectWith("State was replaced");
-        }
         // Push the new state and set it to active
         this.history.push({ state });
         state.onActive();
@@ -86,7 +77,10 @@ export class InteractionStateHistory implements InteractionStateChanger {
         const poppedState = this.history.pop();
         poppedState?.state.onInactive();
         this.history[this.history.length - 1].state.onActive();
-        this.history[this.history.length - 1].popCompleter?.resolveWith(value);
+        const popCallback = poppedState?.onPop;
+        if (popCallback) {
+            popCallback(value);
+        }
     }
 
     /**
@@ -97,7 +91,6 @@ export class InteractionStateHistory implements InteractionStateChanger {
         for (let i = items; i > 1; i--) {
             const item = this.history.pop();
             item?.state.onInactive();
-            item?.popCompleter?.rejectWith("History was explicity cleared");
         }
         this.history[0].state.onActive();
     }
