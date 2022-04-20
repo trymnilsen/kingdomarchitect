@@ -1,3 +1,4 @@
+import { withinRectangle } from "../../../common/bounds";
 import { Point } from "../../../common/point";
 import { allSides } from "../../../common/sides";
 import { InputEvent } from "../../../input/input";
@@ -15,7 +16,16 @@ export class BuildMenuState extends InteractionState {
         screenPosition: Point,
         stateChanger: InteractionStateChanger
     ): boolean {
-        return false;
+        const width = window.innerHeight / 3;
+        const height = window.innerHeight / 2;
+        const x = window.innerWidth / 2 - width / 2;
+        const y = window.innerHeight / 2 - height / 2;
+        if (withinRectangle(screenPosition, x, y, x + width, y + width)) {
+            stateChanger.pop(true);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     onTileTap(tile: GroundTile, stateChanger: InteractionStateChanger): void {}

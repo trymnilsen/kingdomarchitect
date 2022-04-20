@@ -2,6 +2,7 @@ import { Point } from "../../common/point";
 import { Camera } from "../../rendering/camera";
 import { RenderContext } from "../../rendering/renderContext";
 import { World } from "../world";
+import { CommitableInteractionStateChanger } from "./interactionStateChanger";
 import { InteractionStateHistory } from "./interactionStateHistory";
 
 /**
@@ -20,29 +21,40 @@ export class InteractionHandler {
     }
 
     tap(screenPoint: Point): void {
-        const onTapResult = this.history.state.onTap(screenPoint, this.history);
-        if (onTapResult) {
-            // The tap in screenspace was consumed by the state, no need for
-            // further processing
-            return;
-        }
+        const stateChanger = new CommitableInteractionStateChanger();
+        const onTapResult = this.history.state.onTap(screenPoint, stateChanger);
 
-        if (this.history.state.isModal) {
-            this.history.pop();
-        } else {
+        //If the tap was not handled check if it will be handled in tilespace
+        if (!onTapResult) {
+            if (this.history.state.isModal) {
+                // if the tap was not handled and the current route is a modal
+                // route we pop the state
+                console.log("Tap was not handled by modal route, popping");
+                this.history.pop();
+                // Return to stop handling the tap more
+                return;
+            }
+
+            // If we do not handle the tap but return state changes, we log it
+            // for our own sanity in the future
+            if (stateChanger.hasOperations) {
+                console.warn("Tap was not handled but returned state change");
+            }
+
+            // Get the transformed position of the click
             const worldPosition = this.camera.screenToWorld(screenPoint);
             const tilePosition =
                 this.camera.worldSpaceToTileSpace(worldPosition);
 
+            // Check if a tile was clicked at this position
             const tile = this.world.ground.getTile(tilePosition);
             if (tile) {
-                this.history.state.onTileTap(tile, this.history);
-            } else {
-                // No tap result was handled and no tile was present at tap.
-                // as of now this means that nothing in the map was pressed
-                this.clearInteractionState();
+                this.history.state.onTileTap(tile, stateChanger);
             }
         }
+
+        // Apply the state changes from tapping to the state
+        stateChanger.apply(this.history);
     }
 
     onDraw(renderContext: RenderContext) {

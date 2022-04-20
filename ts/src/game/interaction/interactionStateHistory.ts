@@ -13,7 +13,7 @@ interface InteractionStateHistoryEntry {
  * is active or have been active. This enables us to have a back functionality
  * if we show a menu or a specific UI state.
  */
-export class InteractionStateHistory {
+export class InteractionStateHistory implements InteractionStateChanger {
     private history: InteractionStateHistoryEntry[] = [];
 
     /**
@@ -33,18 +33,19 @@ export class InteractionStateHistory {
      * active state before the push is perfomed to be set as inactive.
      * @param state The new state to push and set as active
      */
-    public push(state: InteractionState): Promise<unknown> {
+    public push(
+        state: InteractionState,
+        popCompleter: Completer<unknown>
+    ): void {
         console.log("Pushing state: ", state.constructor.name);
         this.history[this.history.length - 1].state.onInactive();
         // Create a pop completer that can we awaited to wait for a result
         // This enables awaiting this function and resume with a value
-        const popCompleter = new Completer<unknown>();
         this.history.push({
             state,
             popCompleter,
         });
         state.onActive();
-        return popCompleter.promise;
     }
 
     /**
