@@ -1,10 +1,15 @@
 import { assets } from "../../asset/assets";
+import { Sprite } from "../../asset/sprite";
 import { Bounds } from "../../common/bounds";
 import { Sides } from "../../common/sides";
 import { RenderItemConfiguration } from "./renderItemConfiguration";
 
 export interface ImageConfiguration extends RenderItemConfiguration {
     image: keyof typeof assets;
+}
+
+export interface SpriteConfiguration extends RenderItemConfiguration {
+    sprite: Sprite;
 }
 
 export function imageRenderer(
@@ -41,7 +46,21 @@ export function spriteRenderer(
     bounds: Bounds,
     image: HTMLImageElement,
     context: CanvasRenderingContext2D
-) {}
+) {
+    const width = bounds.x2 - bounds.x1;
+    const height = bounds.y2 - bounds.y1;
+    context.drawImage(
+        image,
+        bounds.x1,
+        bounds.y1,
+        width,
+        height,
+        x,
+        y,
+        width,
+        height
+    );
+}
 
 export function ninePatchImageRenderer(
     x: number,

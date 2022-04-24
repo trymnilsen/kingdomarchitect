@@ -1,7 +1,7 @@
-import { Completer } from "../../common/promise";
+import { RootState } from "../state/rootState";
 import { InteractionState } from "./interactionState";
 import { InteractionStateChanger } from "./interactionStateChanger";
-import { RootState } from "./state/rootState";
+import { StateContext } from "./stateContext";
 
 interface InteractionStateHistoryEntry {
     state: InteractionState;
@@ -23,8 +23,10 @@ export class InteractionStateHistory {
         return this.history[this.history.length - 1].state;
     }
 
-    constructor() {
+    constructor(private context: StateContext) {
         const rootState = new RootState();
+        rootState.context = context;
+        rootState.onActive();
         this.history.push({ state: rootState });
     }
 
@@ -42,6 +44,7 @@ export class InteractionStateHistory {
             state,
             onPop,
         });
+        state.context = this.context;
         state.onActive();
     }
 
@@ -62,6 +65,7 @@ export class InteractionStateHistory {
         replacedState?.state.onInactive();
         // Push the new state and set it to active
         this.history.push({ state });
+        state.context = this.context;
         state.onActive();
     }
 

@@ -18,8 +18,3 @@ Install the required development packages (typescript and webpack). You should t
 ### Running
 
 `npm run start` can be used to start a webpack development server.
-
-
-### Running tests
-
-The `npm run test` runs the tests via jest. Have a look at the `package.json` to view the other options.

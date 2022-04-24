@@ -1,7 +1,7 @@
-import { Point } from "../../common/point";
-import { Camera } from "../../rendering/camera";
-import { RenderContext } from "../../rendering/renderContext";
-import { World } from "../world";
+import { Point } from "../../../common/point";
+import { Camera } from "../../../rendering/camera";
+import { RenderContext } from "../../../rendering/renderContext";
+import { World } from "../../world";
 import { CommitableInteractionStateChanger } from "./interactionStateChanger";
 import { InteractionStateHistory } from "./interactionStateHistory";
 
@@ -17,7 +17,9 @@ export class InteractionHandler {
     constructor(world: World, camera: Camera) {
         this.world = world;
         this.camera = camera;
-        this.history = new InteractionStateHistory();
+        this.history = new InteractionStateHistory({
+            world: world,
+        });
     }
 
     tap(screenPoint: Point): void {
@@ -44,6 +46,9 @@ export class InteractionHandler {
             const tile = this.world.ground.getTile(tilePosition);
             if (tile) {
                 this.history.state.onTileTap(tile, stateChanger);
+            } else {
+                // Tap was not handled and we did not tap a tile
+                stateChanger.clear();
             }
         }
 
@@ -61,9 +66,5 @@ export class InteractionHandler {
             });
         }
         this.history.state.onDraw(renderContext);
-    }
-
-    private clearInteractionState() {
-        this.history.clear();
     }
 }

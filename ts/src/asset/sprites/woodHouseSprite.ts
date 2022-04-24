@@ -1,11 +1,11 @@
 import { Sprite } from "../sprite";
 
 export const woodenHouseSprite: Sprite = {
-    asset: "woodHouses",
+    asset: "woodHouse",
     bounds: {
         x1: 0,
-        x2: 16,
-        y1: 16,
-        y2: 32,
+        x2: 32,
+        y1: 32,
+        y2: 64,
     },
 };

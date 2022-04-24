@@ -5,7 +5,8 @@ import { InputAction } from "../input/inputAction";
 import { Renderer } from "../rendering/renderer";
 import { Scene } from "../scene/scene";
 import { MainScene } from "./mainScene";
-import { AssetLoader } from "../asset/assetLoader";
+import { AssetLoader } from "../asset/loader/assetLoader";
+import { TileSize } from "./entity/tile";
 
 export class Game {
     private renderer: Renderer;
@@ -69,16 +70,24 @@ export class Game {
                 this.currentScene.input(inputEvent.action);
                 break;
             case InputAction.UP_PRESS:
-                this.updateCamera(changeY(this.renderer.camera.position, -32));
+                this.updateCamera(
+                    changeY(this.renderer.camera.position, -TileSize)
+                );
                 break;
             case InputAction.DOWN_PRESS:
-                this.updateCamera(changeY(this.renderer.camera.position, 32));
+                this.updateCamera(
+                    changeY(this.renderer.camera.position, TileSize)
+                );
                 break;
             case InputAction.LEFT_PRESS:
-                this.updateCamera(changeX(this.renderer.camera.position, -32));
+                this.updateCamera(
+                    changeX(this.renderer.camera.position, -TileSize)
+                );
                 break;
             case InputAction.RIGHT_PRESS:
-                this.updateCamera(changeX(this.renderer.camera.position, 32));
+                this.updateCamera(
+                    changeX(this.renderer.camera.position, TileSize)
+                );
                 break;
         }
         this.render();

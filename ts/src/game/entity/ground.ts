@@ -1,16 +1,15 @@
+import { sprites } from "../../asset/sprite";
 import { Bounds, getBoundsAxis } from "../../common/bounds";
 import { Axis, Direction } from "../../common/direction";
 import { adjacentPoint, Point } from "../../common/point";
 import { NumberRange, rangeDistance, rangeRandom } from "../../common/range";
 import { RenderContext } from "../../rendering/renderContext";
+import { getTileId, TileSize } from "./tile";
 
 export interface GroundTile {
     tileX: number;
     tileY: number;
-}
-
-export function getTileId(x: number, y: number) {
-    return `x${x}y${y}`;
+    hasTree?: boolean;
 }
 
 export class Ground {
@@ -22,6 +21,10 @@ export class Ground {
                 this.tiles[id] = { tileX: x, tileY: y };
             }
         }
+    }
+    getBounds(): Bounds {
+        const entries = Object.entries(this.tiles);
+        return getTileBounds(entries);
     }
     getTile(tilePosition: Point): GroundTile | null {
         return this.tiles[getTileId(tilePosition.x, tilePosition.y)] || null;
@@ -36,6 +39,7 @@ export class Ground {
             this.tiles[getTileId(newTilePosition.x, newTilePosition.y)] = {
                 tileX: newTilePosition.x,
                 tileY: newTilePosition.y,
+                hasTree: Math.random() > 0.7,
             };
         }
 
@@ -46,12 +50,20 @@ export class Ground {
         for (const tileId in this.tiles) {
             const tile = this.tiles[tileId];
             context.drawRectangle({
-                x: tile.tileX * 32,
-                y: tile.tileY * 32,
-                width: 30,
-                height: 30,
+                x: tile.tileX * TileSize,
+                y: tile.tileY * TileSize,
+                width: TileSize - 2,
+                height: TileSize - 2,
                 fill: "green",
             });
+
+            if (tile.hasTree) {
+                context.drawSprite({
+                    sprite: sprites.tree,
+                    x: tile.tileX * TileSize + 4,
+                    y: tile.tileY * TileSize,
+                });
+            }
         }
     }
 }

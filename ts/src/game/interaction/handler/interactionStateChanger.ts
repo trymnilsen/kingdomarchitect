@@ -1,4 +1,4 @@
-import { Completer } from "../../common/promise";
+import { Completer } from "../../../common/promise";
 import { InteractionState } from "./interactionState";
 import { InteractionStateHistory } from "./interactionStateHistory";
 

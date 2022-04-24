@@ -4,8 +4,8 @@ import { allSides } from "../../../common/sides";
 import { InputEvent } from "../../../input/input";
 import { RenderContext } from "../../../rendering/renderContext";
 import { GroundTile } from "../../entity/ground";
-import { InteractionState } from "../interactionState";
-import { InteractionStateChanger } from "../interactionStateChanger";
+import { InteractionState } from "../handler/interactionState";
+import { InteractionStateChanger } from "../handler/interactionStateChanger";
 
 export class BuildMenuState extends InteractionState {
     get isModal(): boolean {

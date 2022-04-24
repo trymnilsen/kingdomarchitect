@@ -1,8 +1,9 @@
-import { Point } from "../../common/point";
-import { InputEvent } from "../../input/input";
-import { RenderContext } from "../../rendering/renderContext";
-import { GroundTile } from "../entity/ground";
+import { Point } from "../../../common/point";
+import { InputEvent } from "../../../input/input";
+import { RenderContext } from "../../../rendering/renderContext";
+import { GroundTile } from "../../entity/ground";
 import { InteractionStateChanger } from "./interactionStateChanger";
+import { StateContext } from "./stateContext";
 
 /**
  * Interaction is built up as a simple state machine. Each state can via the
@@ -10,6 +11,25 @@ import { InteractionStateChanger } from "./interactionStateChanger";
  * active state is resposible for handling taps, input and drawing.
  */
 export abstract class InteractionState {
+    private _context: StateContext | undefined;
+    /**
+     * The state context for this state, contains access to the world and other
+     * components useful to a state.
+     * Set after the constructor has run, but before the first onActive call.
+     */
+    public get context(): StateContext {
+        if (!this._context) {
+            throw Error("State context is not set");
+        }
+        return this._context;
+    }
+    /**
+     * Sets the context for this state
+     */
+    public set context(v: StateContext) {
+        this._context = v;
+    }
+
     /**
      * Returns if this state is considered a modal state, if true it will be given
      * a scrim and taps that are not handled will pop the state
@@ -63,7 +83,8 @@ export abstract class InteractionState {
 
     /**
      * Called when this state becomes the active state, either by being popped
-     * back to, or the first time it becomes active.
+     * back to, or the first time it becomes active. Will be called multiple
+     * times during its life if its shown or hidden
      */
     onActive(): void {}
     /**

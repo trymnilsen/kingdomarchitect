@@ -1,10 +1,12 @@
-import { AssetLoader } from "../asset/assetLoader";
+import { AssetLoader } from "../asset/loader/assetLoader";
 import { Camera } from "./camera";
 import {
     ImageConfiguration,
     imageRenderer,
     NinePatchImageConfiguration,
     ninePatchImageRenderer,
+    SpriteConfiguration,
+    spriteRenderer,
 } from "./items/image";
 import { RectangleConfiguration, rectangleRenderer } from "./items/rectangle";
 
@@ -60,6 +62,19 @@ export class RenderContext {
             transformedY,
             1,
             this.assetLoader.getAsset(image.image),
+            this.canvasContext
+        );
+    }
+
+    drawSprite(sprite: SpriteConfiguration) {
+        const transformedX = this.camera.worldToScreenX(sprite.x);
+        const transformedY = this.camera.worldToScreenY(sprite.y);
+
+        spriteRenderer(
+            transformedX,
+            transformedY,
+            sprite.sprite.bounds,
+            this.assetLoader.getAsset(sprite.sprite.asset),
             this.canvasContext
         );
     }

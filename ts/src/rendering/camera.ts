@@ -1,4 +1,5 @@
 import { addPoint, multiplyPoint, Point, zeroPoint } from "../common/point";
+import { TileSize } from "../game/entity/tile";
 
 export class Camera {
     private _position: Point;
@@ -16,13 +17,13 @@ export class Camera {
 
     worldSpaceToTileSpace(worldSpace: Point): Point {
         return {
-            x: Math.floor(worldSpace.x / 32),
-            y: Math.floor(worldSpace.y / 32),
+            x: Math.floor(worldSpace.x / TileSize),
+            y: Math.floor(worldSpace.y / TileSize),
         };
     }
 
     tileSpaceToWorldSpace(tileSpace: Point): Point {
-        return multiplyPoint(tileSpace, 32);
+        return multiplyPoint(tileSpace, TileSize);
     }
 
     tileSpaceToScreenSpace(tileSpace: Point): Point {

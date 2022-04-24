@@ -1,20 +1,23 @@
+import { sprites } from "../../../asset/sprite";
 import { withinRectangle } from "../../../common/bounds";
 import { Point } from "../../../common/point";
 import { InputEvent } from "../../../input/input";
 import { RenderContext } from "../../../rendering/renderContext";
+import { woodHouseEntity } from "../../entity/building/woodenHouseEntity";
 import { GroundTile } from "../../entity/ground";
-import { InteractionState } from "../interactionState";
-import { InteractionStateChanger } from "../interactionStateChanger";
+import { InteractionState } from "../handler/interactionState";
+import { InteractionStateChanger } from "../handler/interactionStateChanger";
 import { BuildMenuState } from "./buildMenuState";
+import { MoveState } from "./moveState";
 
 export interface ActionButton {
     name: string;
+    id: string;
 }
 
 export class TileSelectedState extends InteractionState {
     private selectedTile: GroundTile;
     private actions: ActionButton[] = [];
-
     constructor(tile: GroundTile) {
         super();
 
@@ -22,15 +25,19 @@ export class TileSelectedState extends InteractionState {
         this.actions = [
             {
                 name: "Build",
+                id: "build",
             },
             {
                 name: "Info",
+                id: "info",
             },
             {
                 name: "Cancel",
+                id: "cancel",
             },
         ];
     }
+
     onTap(
         screenPosition: Point,
         stateChanger: InteractionStateChanger
@@ -53,12 +60,21 @@ export class TileSelectedState extends InteractionState {
                 )
             ) {
                 console.log("TileSelectedState - onTap: ", i);
-                stateChanger.push(new BuildMenuState(), (value) => {
-                    console.log("Pop callback from build");
-                    if (value === true) {
-                        this.onBuildSelected();
-                    }
-                });
+                if (i == 0) {
+                    stateChanger.push(new BuildMenuState(), (value) => {
+                        console.log("Pop callback from build");
+                        if (value === true) {
+                            this.onBuildSelected();
+                        }
+                    });
+                } else if (i == 1) {
+                    stateChanger.push(
+                        new MoveState({
+                            x: this.selectedTile.tileX,
+                            y: this.selectedTile.tileY,
+                        })
+                    );
+                }
 
                 return true;
             }
@@ -77,17 +93,16 @@ export class TileSelectedState extends InteractionState {
         return false;
     }
 
-    onActive(): void {}
-    onInactive(): void {}
     onDraw(context: RenderContext): void {
         const cursorWorldPosition = context.camera.tileSpaceToWorldSpace({
             x: this.selectedTile.tileX,
             y: this.selectedTile.tileY,
         });
-        context.drawImage({
-            image: "cursor",
-            x: cursorWorldPosition.x,
-            y: cursorWorldPosition.y,
+
+        context.drawSprite({
+            sprite: sprites.cursor,
+            x: cursorWorldPosition.x + 2,
+            y: cursorWorldPosition.y + 2,
         });
 
         for (let i = 0; i < this.actions.length; i++) {
@@ -102,7 +117,7 @@ export class TileSelectedState extends InteractionState {
                 {
                     x: buttonPosition.x,
                     y: buttonPosition.y,
-                    image: "stoneSlateBackground",
+                    image: "stoneSlateButton",
                 },
                 1
             );
@@ -111,6 +126,13 @@ export class TileSelectedState extends InteractionState {
 
     private onBuildSelected() {
         console.log("Build was selected");
+        this.context.world.buildings.add(
+            woodHouseEntity({
+                x: this.selectedTile.tileX,
+                y: this.selectedTile.tileY,
+            })
+        );
+        this.context.world.invalidateWorld();
     }
 
     private actionBarButtonPosition(

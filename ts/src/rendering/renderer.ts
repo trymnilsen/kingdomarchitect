@@ -1,4 +1,4 @@
-import { AssetLoader } from "../asset/assetLoader";
+import { AssetLoader } from "../asset/loader/assetLoader";
 import { rgbToHex } from "../common/color";
 import { Camera } from "./camera";
 import { RenderContext } from "./renderContext";
@@ -42,7 +42,7 @@ export class Renderer {
             window.innerWidth,
             window.innerHeight
         );
-        this.canvasContext.fillStyle = rgbToHex(40, 40, 40);
+        this.canvasContext.fillStyle = rgbToHex(0, 50, 20);
         this.canvasContext.fillRect(
             0,
             0,

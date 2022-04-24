@@ -3,7 +3,7 @@ import { InputAction } from "../input/inputAction";
 import { Camera } from "../rendering/camera";
 import { RenderContext } from "../rendering/renderContext";
 import { Scene } from "../scene/scene";
-import { InteractionHandler } from "./interaction/interactionHandler";
+import { InteractionHandler } from "./interaction/handler/interactionHandler";
 import { World } from "./world";
 
 export class MainScene implements Scene {
@@ -12,6 +12,7 @@ export class MainScene implements Scene {
 
     constructor(camera: Camera) {
         this.world = new World();
+        this.world.invalidateWorld();
         this.interactionHandler = new InteractionHandler(this.world, camera);
     }
 

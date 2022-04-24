@@ -1,4 +1,4 @@
-import { assets } from "./assets";
+import { assets } from "../assets";
 
 export class AssetLoader {
     private _assets: { [name: string]: HTMLImageElement } = {};
