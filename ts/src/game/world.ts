@@ -107,20 +107,20 @@ function createWeightGraphFromWorld(world: World): Graph {
                 tilePositionXWithoutOffset,
                 tilePositionYWithoutOffset
             );
-            const building = world.buildings.getTile(tileId);
-            if (building) {
-                weight = 1000; //If there is a building at this position we make it very difficult to pass
-            }
             const ground = world.ground.getTile({
                 x: tilePositionXWithoutOffset,
                 y: tilePositionYWithoutOffset,
             });
             if (ground) {
                 if (ground.hasTree) {
-                    weight = 4;
+                    weight = 10;
                 } else {
                     weight = 1;
                 }
+            }
+            const building = world.buildings.getTile(tileId);
+            if (building) {
+                weight = 1000; //If there is a building at this position we make it very difficult to pass
             }
 
             weightGraph[x][y] = weight;

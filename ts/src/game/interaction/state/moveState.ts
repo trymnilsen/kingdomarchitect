@@ -1,8 +1,9 @@
 import { sprites } from "../../../asset/sprite";
-import { Point } from "../../../common/point";
+import { Point, pointEquals } from "../../../common/point";
 import { InputEvent } from "../../../input/input";
 import { RenderContext } from "../../../rendering/renderContext";
 import { GroundTile } from "../../entity/ground";
+import { TileSize } from "../../entity/tile";
 import { InteractionState } from "../handler/interactionState";
 import { InteractionStateChanger } from "../handler/interactionStateChanger";
 
@@ -27,11 +28,17 @@ export class MoveState extends InteractionState {
             y: tile.tileY,
         });
         console.log("New path: ", newPath);
+        if (newPath.length > 0) {
+            this.path = [
+                { x: this.tileSpaceSelection.x, y: this.tileSpaceSelection.y },
+                ...newPath,
+            ];
+        }
+
         this.tileSpaceSelection = {
             x: tile.tileX,
             y: tile.tileY,
         };
-        this.path = newPath;
     }
     onInput(input: InputEvent, stateChanger: InteractionStateChanger): boolean {
         return false;
@@ -54,13 +61,15 @@ export class MoveState extends InteractionState {
                 y: pathItem.y,
             });
 
-            context.drawRectangle({
-                x: pathWorldPosition.x + 8,
-                y: pathWorldPosition.y + 8,
-                width: 8,
-                height: 8,
-                fill: "purple",
-            });
+            if (!pointEquals(pathItem, this.tileSpaceSelection)) {
+                context.drawRectangle({
+                    x: pathWorldPosition.x + TileSize / 2 - 5,
+                    y: pathWorldPosition.y + TileSize / 2 - 5,
+                    width: 8,
+                    height: 8,
+                    fill: "purple",
+                });
+            }
         }
     }
 }
