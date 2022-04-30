@@ -6,13 +6,14 @@ import { PathSearch } from "../path/search";
 import { RenderContext } from "../rendering/renderContext";
 import { Buildings } from "./entity/buildings";
 import { Ground } from "./entity/ground";
-import { Heroes } from "./entity/heroes";
+import { Hero, Heroes } from "./entity/heroes";
 import { getTileId } from "./entity/tile";
 
 export class World {
     private _ground: Ground;
     private _buildings: Buildings;
     private _pathSearch: PathSearch;
+    private _heroes: Heroes;
 
     public get ground(): Ground {
         return this._ground;
@@ -22,9 +23,14 @@ export class World {
         return this._buildings;
     }
 
+    public get heroes(): Heroes {
+        return this._heroes;
+    }
+
     constructor() {
         this._ground = new Ground();
-        this, (this._buildings = new Buildings());
+        this._buildings = new Buildings();
+        this._heroes = new Heroes();
         for (let i = 0; i < 300; i++) {
             this.ground.generate();
         }
@@ -47,6 +53,7 @@ export class World {
     onDraw(context: RenderContext): void {
         this.ground.onDraw(context);
         this._buildings.onDraw(context);
+        this._heroes.onDraw(context);
     }
 
     findPath(from: Point, to: Point): Point[] {

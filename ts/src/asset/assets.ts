@@ -5,4 +5,5 @@ export const assets = {
     stoneSlateButton: "stone_slate_button_2x.png",
     woodHouse: "house_sheet.png",
     tree: "tree_sheet.png",
+    swordsman: "swordsman_sheet.png",
 };

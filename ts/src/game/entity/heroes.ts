@@ -1,3 +1,4 @@
+import { sprites } from "../../asset/sprite";
 import {
     addPoint,
     multiplyPoint,
@@ -6,7 +7,6 @@ import {
     zeroPoint,
 } from "../../common/point";
 import { RenderContext } from "../../rendering/renderContext";
-import { heroVisual } from "../../visual/hero/heroVisual";
 
 export class Heroes {
     private heroes: Hero[] = [];
@@ -28,8 +28,12 @@ export class Heroes {
             const worldspace = context.camera.tileSpaceToWorldSpace(
                 hero.tilePosition
             );
-            const offsetPosition = addPoint(worldspace, { x: 6, y: 6 });
-            heroVisual(context, offsetPosition);
+            const offsetPosition = addPoint(worldspace, { x: 4, y: 4 });
+            context.drawSprite({
+                sprite: sprites.swordsman,
+                x: offsetPosition.x,
+                y: offsetPosition.y,
+            });
         }
     }
 }

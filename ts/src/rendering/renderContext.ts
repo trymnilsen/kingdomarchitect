@@ -1,4 +1,5 @@
 import { AssetLoader } from "../asset/loader/assetLoader";
+import { Point } from "../common/point";
 import { Camera } from "./camera";
 import {
     ImageConfiguration,
@@ -9,11 +10,12 @@ import {
     spriteRenderer,
 } from "./items/image";
 import { RectangleConfiguration, rectangleRenderer } from "./items/rectangle";
+import { TextConfiguration, textRenderer } from "./items/text";
 
 export class RenderContext {
     private canvasContext: CanvasRenderingContext2D;
     private _camera: Camera;
-    private assetLoader: AssetLoader;
+    private _assetLoader: AssetLoader;
     private _width: number;
     private _height: number;
 
@@ -29,6 +31,10 @@ export class RenderContext {
         return this._height;
     }
 
+    public get assetLoader(): AssetLoader {
+        return this._assetLoader;
+    }
+
     constructor(
         canvasContext: CanvasRenderingContext2D,
         camera: Camera,
@@ -38,7 +44,7 @@ export class RenderContext {
     ) {
         this.canvasContext = canvasContext;
         this._camera = camera;
-        this.assetLoader = assetLoader;
+        this._assetLoader = assetLoader;
         this._width = width;
         this._height = height;
     }
@@ -61,7 +67,7 @@ export class RenderContext {
             transformedX,
             transformedY,
             1,
-            this.assetLoader.getAsset(image.image),
+            this._assetLoader.getAsset(image.image),
             this.canvasContext
         );
     }
@@ -74,7 +80,7 @@ export class RenderContext {
             transformedX,
             transformedY,
             sprite.sprite.bounds,
-            this.assetLoader.getAsset(sprite.sprite.asset),
+            this._assetLoader.getAsset(sprite.sprite.asset),
             this.canvasContext
         );
     }
@@ -84,7 +90,7 @@ export class RenderContext {
             image.x,
             image.y,
             scale,
-            this.assetLoader.getAsset(image.image),
+            this._assetLoader.getAsset(image.image),
             this.canvasContext
         );
     }
@@ -106,8 +112,12 @@ export class RenderContext {
             image.sides.left,
             image.sides.right,
             image.scale,
-            this.assetLoader.getAsset(image.asset),
+            this._assetLoader.getAsset(image.asset),
             this.canvasContext
         );
+    }
+
+    drawText(text: TextConfiguration) {
+        textRenderer(text, this.canvasContext);
     }
 }

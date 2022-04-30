@@ -7,6 +7,7 @@ export interface InteractionStateChanger {
     replace(state: InteractionState): void;
     pop(result: unknown): void;
     clear(): void;
+    hasOperations: boolean;
 }
 
 export class CommitableInteractionStateChanger

@@ -3,41 +3,6 @@ import { RenderNode, NodeConfiguration, RenderNodeType } from "./renderNode";
 import { RenderContext } from "../renderContext";
 import { RenderItem } from "../renderer";
 
-export interface TextConfiguration extends NodeConfiguration {
-    text: string;
-    color: string;
-    align?: "left" | "center" | "right";
-    weight?: "normal" | "bold";
-}
-
-export function text(textConfig: TextConfiguration): RenderNode {
-    return {
-        type: RenderNodeType.text,
-        config: textConfig,
-        children: [],
-    };
-}
-
-export function textRenderer(
-    renderItem: RenderItem,
-    context: CanvasRenderingContext2D
-) {
-    const config = renderItem.node.config as TextConfiguration;
-    let fontString = "14px Arial";
-    if (!!config.weight) {
-        fontString = config.weight + " " + fontString;
-    }
-    context.fillStyle = config.color;
-    context.font = fontString;
-    context.textBaseline = "top";
-    context.fillText(
-        config.text,
-        renderItem.transform.x,
-        renderItem.transform.y
-    );
-}
-
-
 
 export class TextVisual extends RenderNode {
     private config: TextConfiguration;
@@ -57,3 +22,26 @@ export class TextVisual extends RenderNode {
     }
 }
  */
+
+import { RenderItemConfiguration } from "./renderItemConfiguration";
+
+export interface TextConfiguration extends RenderItemConfiguration {
+    text: string;
+    color: string;
+    align?: "left" | "center" | "right";
+    weight?: "normal" | "bold";
+}
+
+export function textRenderer(
+    renderItem: TextConfiguration,
+    context: CanvasRenderingContext2D
+) {
+    let fontString = "14px Arial";
+    if (!!renderItem.weight) {
+        fontString = renderItem.weight + " " + fontString;
+    }
+    context.fillStyle = renderItem.color;
+    context.font = fontString;
+    context.textBaseline = "top";
+    context.fillText(renderItem.text, renderItem.x, renderItem.y);
+}

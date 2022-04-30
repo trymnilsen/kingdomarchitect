@@ -3,6 +3,9 @@ import { withinRectangle } from "../../../common/bounds";
 import { Point } from "../../../common/point";
 import { InputEvent } from "../../../input/input";
 import { RenderContext } from "../../../rendering/renderContext";
+import { drawLayout, onTapLayout } from "../../../ui/layout/layout";
+import { LayoutNode } from "../../../ui/layout/layoutNode";
+import { actionbarView, ActionButton } from "../../../ui/view/actionbar";
 import { woodHouseEntity } from "../../entity/building/woodenHouseEntity";
 import { GroundTile } from "../../entity/ground";
 import { InteractionState } from "../handler/interactionState";
@@ -10,83 +13,60 @@ import { InteractionStateChanger } from "../handler/interactionStateChanger";
 import { BuildMenuState } from "./buildMenuState";
 import { MoveState } from "./moveState";
 
-export interface ActionButton {
-    name: string;
-    id: string;
-}
-
 export class TileSelectedState extends InteractionState {
     private selectedTile: GroundTile;
     private actions: ActionButton[] = [];
+    private actionbar: LayoutNode | null = null;
+
     constructor(tile: GroundTile) {
         super();
-
         this.selectedTile = tile;
-        this.actions = [
-            {
-                name: "Build",
-                id: "build",
-            },
-            {
-                name: "Info",
-                id: "info",
-            },
-            {
-                name: "Cancel",
-                id: "cancel",
-            },
-        ];
+    }
+
+    onActive(): void {
+        this.updateTileActions();
     }
 
     onTap(
         screenPosition: Point,
         stateChanger: InteractionStateChanger
     ): boolean {
-        for (let i = 0; i < this.actions.length; i++) {
-            const action = this.actions[i];
-            const position = this.actionBarButtonPosition(
-                window.innerWidth,
-                window.innerHeight,
-                i
-            );
+        if (this.actionbar) {
+            const hitResult = onTapLayout(this.actionbar, screenPosition);
+            if (!hitResult.handled) {
+                return false;
+            }
 
-            if (
-                withinRectangle(
-                    screenPosition,
-                    position.x,
-                    position.y,
-                    position.x + 48,
-                    position.y + 48
-                )
-            ) {
-                console.log("TileSelectedState - onTap: ", i);
-                if (i == 0) {
-                    stateChanger.push(new BuildMenuState(), (value) => {
-                        console.log("Pop callback from build");
-                        if (value === true) {
-                            this.onBuildSelected();
-                        }
-                    });
-                } else if (i == 1) {
-                    stateChanger.push(
-                        new MoveState({
-                            x: this.selectedTile.tileX,
-                            y: this.selectedTile.tileY,
-                        })
-                    );
-                }
-
-                return true;
+            if (hitResult.data === "build") {
+                stateChanger.push(new BuildMenuState(), (value) => {
+                    console.log("Pop callback from build");
+                    if (value === true) {
+                        this.onBuildSelected();
+                    }
+                });
+            } else if (hitResult.data === "move") {
+                stateChanger.push(
+                    new MoveState({
+                        x: this.selectedTile.tileX,
+                        y: this.selectedTile.tileY,
+                    })
+                );
+            } else if (hitResult.data === "cancel") {
+                stateChanger.pop(null);
             }
         }
-
-        return false;
+        if (stateChanger.hasOperations) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     onTileTap(tile: GroundTile, stateChanger: InteractionStateChanger): void {
         // If a new tile was tapped while in this state we move the cursor to it
         console.log("TileSelectedState - onTileTap: ", tile);
         this.selectedTile = tile;
+        this.updateTileActions();
     }
 
     onInput(input: InputEvent, stateChanger: InteractionStateChanger): boolean {
@@ -105,23 +85,47 @@ export class TileSelectedState extends InteractionState {
             y: cursorWorldPosition.y + 2,
         });
 
-        for (let i = 0; i < this.actions.length; i++) {
-            const action = this.actions[i];
-            const buttonPosition = this.actionBarButtonPosition(
-                window.innerWidth,
-                window.innerHeight,
-                i
-            );
+        this.actionbar = actionbarView(context, this.actions);
+        drawLayout(context, this.actionbar);
+    }
 
-            context.drawScreenSpaceImage(
+    private updateTileActions() {
+        this.actions = this.getTileActions({
+            x: this.selectedTile.tileX,
+            y: this.selectedTile.tileY,
+        });
+    }
+
+    private getTileActions(tilePosition: Point): ActionButton[] {
+        const hero = this.context.world.heroes.getHero(tilePosition);
+        if (hero) {
+            return [
                 {
-                    x: buttonPosition.x,
-                    y: buttonPosition.y,
-                    image: "stoneSlateButton",
+                    id: "move",
+                    name: "Move",
                 },
-                1
-            );
+                {
+                    id: "cancel",
+                    name: "Cancel",
+                },
+            ];
         }
+
+        const tile = this.context.world.ground.getTile(tilePosition);
+        if (tile) {
+            return [
+                {
+                    id: "build",
+                    name: "Build",
+                },
+                {
+                    id: "cancel",
+                    name: "Cancel",
+                },
+            ];
+        }
+
+        return [];
     }
 
     private onBuildSelected() {
@@ -133,16 +137,5 @@ export class TileSelectedState extends InteractionState {
             })
         );
         this.context.world.invalidateWorld();
-    }
-
-    private actionBarButtonPosition(
-        clientWidth: number,
-        clientHeight: number,
-        buttonIndex: number
-    ): Point {
-        return {
-            x: 64 + buttonIndex * (48 + 8),
-            y: clientHeight - 64 - 48,
-        };
     }
 }
