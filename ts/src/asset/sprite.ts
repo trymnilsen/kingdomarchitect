@@ -1,6 +1,7 @@
 import { Bounds } from "../common/bounds";
 import { assets } from "./assets";
 import { cursorSprite } from "./sprites/cursor";
+import { farmerSprite } from "./sprites/farmerSprite";
 import { swordsManSprite } from "./sprites/swordsmanSprite";
 import { treeSprite } from "./sprites/treeSprite";
 import { woodenHouseSprite } from "./sprites/woodHouseSprite";
@@ -15,4 +16,5 @@ export const sprites = {
     cursor: cursorSprite,
     tree: treeSprite,
     swordsman: swordsManSprite,
+    farmer: farmerSprite,
 };

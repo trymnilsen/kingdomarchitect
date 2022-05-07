@@ -45,7 +45,15 @@ export class InteractionHandler {
             // Check if a tile was clicked at this position
             const tile = this.world.ground.getTile(tilePosition);
             if (tile) {
-                this.history.state.onTileTap(tile, stateChanger);
+                const tileTapHandled = this.history.state.onTileTap(
+                    tile,
+                    stateChanger
+                );
+
+                // If the tap is not handled we treat it as a clear
+                if (!tileTapHandled) {
+                    stateChanger.clear();
+                }
             } else {
                 // Tap was not handled and we did not tap a tile
                 stateChanger.clear();

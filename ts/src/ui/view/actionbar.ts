@@ -82,6 +82,7 @@ function actionbarViewButton(
         height: 20,
         children: [],
         configuration: {
+            width: width,
             align: "center",
             color: "white",
             weight: "bold",

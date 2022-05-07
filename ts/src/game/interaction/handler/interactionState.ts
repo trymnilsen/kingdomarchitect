@@ -50,18 +50,7 @@ export abstract class InteractionState {
         screenPosition: Point,
         stateChanger: InteractionStateChanger
     ): boolean;
-    /**
-     * A tap has occured on a tile in the world. Will not be called if onTap has
-     * returned true indicating that is has handled it. (To avoid clicks on UI)
-     * elements also causing a selection of a tile behind.
-     * @param tile the tile that was tapped
-     * @param stateChanger The InteractionStateChanger that can be used to change
-     * to a different state
-     */
-    abstract onTileTap(
-        tile: GroundTile,
-        stateChanger: InteractionStateChanger
-    ): void;
+
     /**
      * An input event has occured, like the directional keys or action key was
      * pressed
@@ -81,6 +70,20 @@ export abstract class InteractionState {
      */
     abstract onDraw(context: RenderContext): void;
 
+    /**
+     * A tap has occured on a tile in the world. Will not be called if onTap has
+     * returned true indicating that is has handled it. (To avoid clicks on UI)
+     * elements also causing a selection of a tile behind.
+     * @param tile the tile that was tapped
+     * @param stateChanger The InteractionStateChanger that can be used to change
+     * to a different state
+     */
+    onTileTap(
+        tile: GroundTile,
+        stateChanger: InteractionStateChanger
+    ): boolean {
+        return false;
+    }
     /**
      * Called when this state becomes the active state, either by being popped
      * back to, or the first time it becomes active. Will be called multiple

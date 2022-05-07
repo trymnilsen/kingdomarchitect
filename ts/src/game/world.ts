@@ -4,16 +4,17 @@ import { addPoint, Point } from "../common/point";
 import { Graph } from "../path/graph";
 import { PathSearch } from "../path/search";
 import { RenderContext } from "../rendering/renderContext";
+import { JobQueue } from "./actor/job/jobQueue";
+import { Actors } from "./entity/actors";
 import { Buildings } from "./entity/buildings";
 import { Ground } from "./entity/ground";
-import { Hero, Heroes } from "./entity/heroes";
 import { getTileId } from "./entity/tile";
 
 export class World {
     private _ground: Ground;
     private _buildings: Buildings;
     private _pathSearch: PathSearch;
-    private _heroes: Heroes;
+    private _actors: Actors;
 
     public get ground(): Ground {
         return this._ground;
@@ -23,15 +24,19 @@ export class World {
         return this._buildings;
     }
 
-    public get heroes(): Heroes {
-        return this._heroes;
+    public get actors(): Actors {
+        return this._actors;
+    }
+
+    public get jobQueue(): JobQueue {
+        return this.actors.jobQueue;
     }
 
     constructor() {
         this._ground = new Ground();
         this._buildings = new Buildings();
-        this._heroes = new Heroes();
-        for (let i = 0; i < 300; i++) {
+        this._actors = new Actors(this);
+        for (let i = 0; i < 100; i++) {
             this.ground.generate();
         }
 
@@ -39,11 +44,12 @@ export class World {
     }
 
     tick(tick: number): void {
-        if (tick % 50 == 0) {
+        if (tick % 5 == 0) {
             //console.log("Generate tick");
             this.ground.generate();
             this.invalidateWorld();
         }
+        this._actors.onUpdate(tick);
     }
 
     invalidateWorld() {
@@ -53,7 +59,7 @@ export class World {
     onDraw(context: RenderContext): void {
         this.ground.onDraw(context);
         this._buildings.onDraw(context);
-        this._heroes.onDraw(context);
+        this._actors.onDraw(context);
     }
 
     findPath(from: Point, to: Point): Point[] {

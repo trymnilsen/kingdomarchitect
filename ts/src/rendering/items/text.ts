@@ -29,6 +29,7 @@ export interface TextConfiguration extends RenderItemConfiguration {
     text: string;
     color: string;
     align?: "left" | "center" | "right";
+    width?: number;
     weight?: "normal" | "bold";
 }
 
@@ -37,11 +38,22 @@ export function textRenderer(
     context: CanvasRenderingContext2D
 ) {
     let fontString = "14px Arial";
+    let alignOffset = 0;
     if (!!renderItem.weight) {
         fontString = renderItem.weight + " " + fontString;
     }
+
     context.fillStyle = renderItem.color;
     context.font = fontString;
     context.textBaseline = "top";
-    context.fillText(renderItem.text, renderItem.x, renderItem.y);
+    if (renderItem.align == "center" || renderItem.align == "right") {
+        if (renderItem.width) {
+            const textMetrics = context.measureText(renderItem.text);
+            alignOffset = Math.max(0, renderItem.width - textMetrics.width) / 2;
+        } else {
+            console.warn("A width needs to be set for text to be aligned");
+        }
+    }
+
+    context.fillText(renderItem.text, renderItem.x + alignOffset, renderItem.y);
 }

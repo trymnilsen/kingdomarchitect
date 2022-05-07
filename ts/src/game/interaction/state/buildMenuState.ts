@@ -29,8 +29,6 @@ export class BuildMenuState extends InteractionState {
         }
     }
 
-    onTileTap(tile: GroundTile, stateChanger: InteractionStateChanger): void {}
-
     onInput(input: InputEvent, stateChanger: InteractionStateChanger): boolean {
         return false;
     }

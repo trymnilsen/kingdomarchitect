@@ -6,10 +6,13 @@ import { RenderContext } from "../../../rendering/renderContext";
 import { drawLayout, onTapLayout } from "../../../ui/layout/layout";
 import { LayoutNode } from "../../../ui/layout/layoutNode";
 import { actionbarView, ActionButton } from "../../../ui/view/actionbar";
+import { ChopTreeJob } from "../../actor/jobs/chopTreeJob";
+import { SwordsmanActor } from "../../actor/swordsmanActor";
 import { woodHouseEntity } from "../../entity/building/woodenHouseEntity";
 import { GroundTile } from "../../entity/ground";
 import { InteractionState } from "../handler/interactionState";
 import { InteractionStateChanger } from "../handler/interactionStateChanger";
+import { ActorActionsState } from "./actorActionsState";
 import { BuildMenuState } from "./buildMenuState";
 import { MoveState } from "./moveState";
 
@@ -34,27 +37,36 @@ export class TileSelectedState extends InteractionState {
         if (this.actionbar) {
             const hitResult = onTapLayout(this.actionbar, screenPosition);
             if (!hitResult.handled) {
+                //If the tap was not in our layout return false early
                 return false;
             }
 
-            if (hitResult.data === "build") {
+            if (hitResult.data == "build") {
                 stateChanger.push(new BuildMenuState(), (value) => {
                     console.log("Pop callback from build");
-                    if (value === true) {
+                    if (value == true) {
                         this.onBuildSelected();
                     }
                 });
-            } else if (hitResult.data === "move") {
+            } else if (hitResult.data == "move") {
                 stateChanger.push(
                     new MoveState({
                         x: this.selectedTile.tileX,
                         y: this.selectedTile.tileY,
                     })
                 );
-            } else if (hitResult.data === "cancel") {
+            } else if (hitResult.data == "chop") {
+                this.context.world.jobQueue.schedule(
+                    new ChopTreeJob(this.selectedTile)
+                );
+                stateChanger.pop(null);
+            } else if (hitResult.data == "actions") {
+                stateChanger.push(new ActorActionsState());
+            } else if (hitResult.data == "cancel") {
                 stateChanger.pop(null);
             }
         }
+
         if (stateChanger.hasOperations) {
             return true;
         } else {
@@ -62,11 +74,15 @@ export class TileSelectedState extends InteractionState {
         }
     }
 
-    onTileTap(tile: GroundTile, stateChanger: InteractionStateChanger): void {
+    onTileTap(
+        tile: GroundTile,
+        stateChanger: InteractionStateChanger
+    ): boolean {
         // If a new tile was tapped while in this state we move the cursor to it
         console.log("TileSelectedState - onTileTap: ", tile);
         this.selectedTile = tile;
         this.updateTileActions();
+        return true;
     }
 
     onInput(input: InputEvent, stateChanger: InteractionStateChanger): boolean {
@@ -97,32 +113,62 @@ export class TileSelectedState extends InteractionState {
     }
 
     private getTileActions(tilePosition: Point): ActionButton[] {
-        const hero = this.context.world.heroes.getHero(tilePosition);
-        if (hero) {
-            return [
-                {
-                    id: "move",
-                    name: "Move",
-                },
-                {
-                    id: "cancel",
-                    name: "Cancel",
-                },
-            ];
+        const actor = this.context.world.actors.getActor(tilePosition);
+        if (actor) {
+            if (actor instanceof SwordsmanActor) {
+                return [
+                    {
+                        id: "actions",
+                        name: "Actions",
+                    },
+                    {
+                        id: "move",
+                        name: "Move",
+                    },
+                    {
+                        id: "cancel",
+                        name: "Cancel",
+                    },
+                ];
+            } else {
+                return [
+                    {
+                        id: "info",
+                        name: "Info",
+                    },
+                    {
+                        id: "cancel",
+                        name: "Cancel",
+                    },
+                ];
+            }
         }
 
         const tile = this.context.world.ground.getTile(tilePosition);
         if (tile) {
-            return [
-                {
-                    id: "build",
-                    name: "Build",
-                },
-                {
-                    id: "cancel",
-                    name: "Cancel",
-                },
-            ];
+            if (tile.hasTree) {
+                return [
+                    {
+                        id: "chop",
+                        name: "Chop",
+                    },
+                    {
+                        id: "cancel",
+                        name: "Cancel",
+                    },
+                ];
+            } else {
+                return [
+                    {
+                        id: "build",
+                        name: "Build",
+                    },
+                    {
+                        id: "cancel",
+                        name: "Cancel",
+                    },
+                ];
+            }
         }
 
         return [];

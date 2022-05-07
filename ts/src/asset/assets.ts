@@ -6,4 +6,5 @@ export const assets = {
     woodHouse: "house_sheet.png",
     tree: "tree_sheet.png",
     swordsman: "swordsman_sheet.png",
+    farmer: "farmer_sheet.png",
 };

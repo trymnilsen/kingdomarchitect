@@ -13,10 +13,16 @@ export class RootState extends InteractionState {
     ): boolean {
         return false;
     }
-    onTileTap(tile: GroundTile, stateChanger: InteractionStateChanger): void {
+
+    onTileTap(
+        tile: GroundTile,
+        stateChanger: InteractionStateChanger
+    ): boolean {
         console.log("RootState tap: ", tile);
         stateChanger.push(new TileSelectedState(tile));
+        return true;
     }
+
     onInput(input: InputEvent, stateChanger: InteractionStateChanger): boolean {
         return true;
     }

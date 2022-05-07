@@ -22,13 +22,16 @@ export class Ground {
             }
         }
     }
+
     getBounds(): Bounds {
         const entries = Object.entries(this.tiles);
         return getTileBounds(entries);
     }
+
     getTile(tilePosition: Point): GroundTile | null {
         return this.tiles[getTileId(tilePosition.x, tilePosition.y)] || null;
     }
+
     generate() {
         //console.log("Generate based on current tiles", this.tiles);
         const renderStart = performance.now();
@@ -46,6 +49,7 @@ export class Ground {
         const renderEnd = performance.now();
         //console.log("⏱generate ground time: ", renderEnd - renderStart);
     }
+
     onDraw(context: RenderContext) {
         for (const tileId in this.tiles) {
             const tile = this.tiles[tileId];

@@ -10,6 +10,7 @@ import { InteractionState } from "../handler/interactionState";
 import { InteractionStateChanger } from "../handler/interactionStateChanger";
 import { actionbarView, ActionButton } from "../../../ui/view/actionbar";
 import { LayoutNode } from "../../../ui/layout/layoutNode";
+import { MoveToJob } from "../../actor/jobs/moveToJob";
 
 export class MoveState extends InteractionState {
     private tileSpaceSelection: Point | null;
@@ -41,12 +42,28 @@ export class MoveState extends InteractionState {
             const hitResult = onTapLayout(this.actionbar, screenPosition);
             if (hitResult.handled) {
                 console.log("tapped actionbar");
+                if (hitResult.data == "cancel") {
+                    stateChanger.pop(null);
+                } else if (hitResult.data == "confirm") {
+                    stateChanger.clear();
+                    const actor = this.context.world.actors.getActor(
+                        this.initialSelection
+                    );
+                    if (actor && this.path) {
+                        actor?.assignJob(new MoveToJob(this.path));
+                    }
+                }
+
                 return true;
             }
         }
         return false;
     }
-    onTileTap(tile: GroundTile, stateChanger: InteractionStateChanger): void {
+
+    onTileTap(
+        tile: GroundTile,
+        stateChanger: InteractionStateChanger
+    ): boolean {
         console.log("Tapped tile: ", tile);
         const newPath = this.context.world.findPath(this.initialSelection, {
             x: tile.tileX,
@@ -61,10 +78,14 @@ export class MoveState extends InteractionState {
             x: tile.tileX,
             y: tile.tileY,
         };
+
+        return true;
     }
+
     onInput(input: InputEvent, stateChanger: InteractionStateChanger): boolean {
         return false;
     }
+
     onDraw(context: RenderContext): void {
         let cursorWorldPosition = this.getCursorPosition(context.camera);
 
