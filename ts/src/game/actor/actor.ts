@@ -84,12 +84,19 @@ export abstract class Actor {
         const worldspace = context.camera.tileSpaceToWorldSpace(
             this.tilePosition
         );
-        const offsetPosition = addPoint(worldspace, { x: 4, y: 4 });
+        const offsetPosition = addPoint(worldspace, { x: 3, y: 3 });
+        // Draw the sprite of this actor
         context.drawSprite({
             sprite: this.sprite,
             x: offsetPosition.x,
             y: offsetPosition.y,
         });
+
+        // Draw any job effects that the actor is currently doing
+        const currentJob = this._job;
+        if (currentJob) {
+            currentJob.onDraw(context);
+        }
     }
 
     /**

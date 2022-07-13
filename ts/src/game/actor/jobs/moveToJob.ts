@@ -1,6 +1,10 @@
 import { Point } from "../../../common/point";
 import { Job } from "../job/job";
 
+/**
+ * Represents a job that will move through a specific path and complete once
+ * the actor of this job is at the end of the path
+ */
 export class MoveToJob extends Job {
     private path: Point[];
     constructor(path: Point[]) {

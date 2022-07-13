@@ -97,8 +97,8 @@ export class TileSelectedState extends InteractionState {
 
         context.drawSprite({
             sprite: sprites.cursor,
-            x: cursorWorldPosition.x + 2,
-            y: cursorWorldPosition.y + 2,
+            x: cursorWorldPosition.x + 3,
+            y: cursorWorldPosition.y + 3,
         });
 
         this.actionbar = actionbarView(context, this.actions);

@@ -95,24 +95,27 @@ export class Actors {
         }
     }
 
+    /**
+     * Check for available actors when a job has been scheduled
+     */
     private onJobScheduled() {
         const idleActors = this.actors.filter((actor) => {
             return actor instanceof FarmerActor && !actor.hasJob;
         });
 
+        // If there is an idle actor pick a pending job and assign it
         if (idleActors.length > 0) {
             const job = this.jobQueue.pendingJobs.pop();
             if (job) {
                 const actor = idleActors[0];
-                actor.assignJob(job);
-
                 console.log("Actor was idle, assinging job to it", actor, job);
+                actor.assignJob(job);
             }
         }
     }
 
     private requestNewJob(actor: Actor) {
-        // Generated a sort list from jobs based on proximity
+        //TODO: Generated a sort list from jobs based on proximity
         const job = this._jobQueue.pendingJobs.pop();
         if (job) {
             actor.assignJob(job);

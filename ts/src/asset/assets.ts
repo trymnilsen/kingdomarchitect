@@ -7,4 +7,6 @@ export const assets = {
     tree: "tree_sheet.png",
     swordsman: "swordsman_sheet.png",
     farmer: "farmer_sheet.png",
+    swipe_effect: "swipe_effect.png",
+    coins: "coins.png",
 };

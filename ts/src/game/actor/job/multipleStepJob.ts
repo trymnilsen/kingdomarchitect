@@ -1,6 +1,13 @@
 import { InvalidStateError } from "../../../common/error/invalidStateError";
+import { RenderContext } from "../../../rendering/renderContext";
 import { Job, JobState } from "./job";
 
+/**
+ * Represents a job that is able to hold a sequence of smaller child jobs.
+ * Only the currently active job in the list of child jobs will be updated
+ * until the child job considers itself finished.
+ * Will finish once the last job in the sequence is finished
+ */
 export abstract class MultipleStepJob extends Job {
     private jobs: Job[] = [];
 
@@ -11,6 +18,18 @@ export abstract class MultipleStepJob extends Job {
         }
     }
 
+    onDraw(renderContext: RenderContext) {
+        const job = this.jobs[0];
+        if (job) {
+            job.onDraw(renderContext);
+        }
+    }
+
+    /**
+     * Set list of job that needs to complete for this job to be completed.
+     * Needs to be called before the job has started. Calling it in onStarted is OK.
+     * @param subJobs list of jobs that makes up this job
+     */
     setJobs(subJobs: Job[]): void {
         if (subJobs.length == 0) {
             throw new Error("Empty list of jobs provided");

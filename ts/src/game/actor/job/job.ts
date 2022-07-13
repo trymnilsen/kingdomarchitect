@@ -2,6 +2,7 @@ import { Event, EventListener } from "../../../common/event";
 import { NotInitializedError } from "../../../common/error/notInitializedError";
 import { Actor } from "../actor";
 import { InvalidStateError } from "../../../common/error/invalidStateError";
+import { RenderContext } from "../../../rendering/renderContext";
 
 export enum JobState {
     NotStarted,
@@ -14,10 +15,21 @@ export abstract class Job {
     private _actor: Actor | null = null;
     private _jobState: JobState = JobState.NotStarted;
 
+    /**
+     * Get the current state of the job
+     */
     public get jobState(): JobState {
         return this._jobState;
     }
 
+    /**
+     * Set the state of the job, this will also check that the transition of
+     * the state is valid.
+     *
+     * If the job is not started, it cannot be updated to not started
+     * If the job is complete, the state cannot be updated
+     * If the job is running the only valid transition is completed
+     */
     public set jobState(v: JobState) {
         if (v == JobState.NotStarted) {
             throw new InvalidStateError(
@@ -76,6 +88,12 @@ export abstract class Job {
      * invoked when the job is started
      */
     onStart() {}
+
+    /**
+     * Render anything this job wants to
+     * @param renderContext the context to render to
+     */
+    onDraw(renderContext: RenderContext) {}
 
     /**
      * Signal that this job is completed and any actors performing it can
