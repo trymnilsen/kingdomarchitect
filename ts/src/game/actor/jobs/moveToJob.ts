@@ -1,5 +1,6 @@
 import { Point } from "../../../common/point";
 import { Job } from "../job/job";
+import { JobConstraint } from "../job/jobConstraint";
 
 /**
  * Represents a job that will move through a specific path and complete once
@@ -7,8 +8,8 @@ import { Job } from "../job/job";
  */
 export class MoveToJob extends Job {
     private path: Point[];
-    constructor(path: Point[]) {
-        super();
+    constructor(path: Point[], constraint?: JobConstraint) {
+        super(constraint);
         this.path = path.reverse();
     }
     update(tick: number): void {

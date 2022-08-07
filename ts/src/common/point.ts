@@ -108,7 +108,7 @@ export function pointEquals(point: Point, otherPoint: Point): boolean {
 export function distance(from: Point, to: Point): number {
     const xDiff = to.x - from.x;
     const yDiff = to.y - from.y;
-    return Math.sqrt(xDiff * xDiff + yDiff + yDiff);
+    return Math.sqrt(xDiff * xDiff + yDiff * yDiff);
 }
 
 /**

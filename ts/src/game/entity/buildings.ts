@@ -1,5 +1,7 @@
 import { sprites } from "../../asset/sprite";
+import { Point } from "../../common/point";
 import { RenderContext } from "../../rendering/renderContext";
+import { RenderVisual } from "../../rendering/renderVisual";
 import { getTileId, TileSize } from "./tile";
 
 export class Buildings {
@@ -13,11 +15,17 @@ export class Buildings {
     }
     onDraw(renderContext: RenderContext) {
         for (const tile of Object.values(this.tiles)) {
-            renderContext.drawSprite({
-                x: tile.x * TileSize + 2,
-                y: tile.y * TileSize + 2,
-                sprite: sprites[tile.sprite],
-            });
+            const offset = tile.offset || { x: 0, y: 0 };
+            if (tile.sprite) {
+                renderContext.drawSprite({
+                    x: tile.x * TileSize + 2 + offset.x,
+                    y: tile.y * TileSize + 2 + offset.y,
+                    sprite: sprites[tile.sprite],
+                });
+            }
+            if (tile.visual) {
+                tile.visual.onDraw(renderContext);
+            }
         }
     }
 }
@@ -25,5 +33,8 @@ export class Buildings {
 export interface BuildingTile {
     x: number;
     y: number;
-    sprite: keyof typeof sprites;
+    weight?: number;
+    offset?: Point;
+    visual?: RenderVisual;
+    sprite?: keyof typeof sprites;
 }

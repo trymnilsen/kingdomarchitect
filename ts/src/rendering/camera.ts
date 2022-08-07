@@ -12,7 +12,10 @@ export class Camera {
     }
 
     public set position(point: Point) {
-        this._position = point;
+        this._position = {
+            x: Math.floor(point.x),
+            y: Math.floor(point.y),
+        };
     }
 
     worldSpaceToTileSpace(worldSpace: Point): Point {

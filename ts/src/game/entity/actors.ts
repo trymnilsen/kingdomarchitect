@@ -1,8 +1,10 @@
 import { sprites } from "../../asset/sprite";
+import { randomEntry } from "../../common/array";
 import { Point, pointEquals, zeroPoint } from "../../common/point";
 import { RenderContext } from "../../rendering/renderContext";
 import { Actor } from "../actor/actor";
 import { FarmerActor } from "../actor/farmerActor";
+import { Job } from "../actor/job/job";
 import { JobQueue } from "../actor/job/jobQueue";
 import { SwordsmanActor } from "../actor/swordsmanActor";
 import { World } from "../world";
@@ -20,8 +22,8 @@ export class Actors {
         this.world = world;
         // Set up the job queue
         this._jobQueue = new JobQueue();
-        this._jobQueue.jobScheduledEvent.listen(() => {
-            this.onJobScheduled();
+        this._jobQueue.jobScheduledEvent.listen((job) => {
+            this.onJobScheduled(job);
         });
         // Set up the default actors
         this.addActor(new SwordsmanActor(zeroPoint));
@@ -76,6 +78,15 @@ export class Actors {
     }
 
     /**
+     * Returns actors based on the given predicate
+     * @param predicate a callback for retrieving actor
+     * @returns a list of actors
+     */
+    getActors(predicate: (actor: Actor) => boolean): Actor[] {
+        return this.actors.filter(predicate);
+    }
+
+    /**
      * Update all actors currently active
      * @param tick the game tick for this update
      */
@@ -98,26 +109,51 @@ export class Actors {
     /**
      * Check for available actors when a job has been scheduled
      */
-    private onJobScheduled() {
+    private onJobScheduled(job: Job) {
         const idleActors = this.actors.filter((actor) => {
-            return actor instanceof FarmerActor && !actor.hasJob;
+            // If the actor already has a job, return early
+            if (actor.hasJob) {
+                return false;
+            }
+
+            // Check if the job is applicable for the actor. If no constraint
+            // is set on the job it is considered applicable
+            const isJobApplicableForActor =
+                job.constraint?.isActorApplicableForJob(job, actor) || true;
+
+            return isJobApplicableForActor;
         });
 
         // If there is an idle actor pick a pending job and assign it
         if (idleActors.length > 0) {
             const job = this.jobQueue.pendingJobs.pop();
             if (job) {
-                const actor = idleActors[0];
+                const actor = randomEntry(idleActors);
                 console.log("Actor was idle, assinging job to it", actor, job);
                 actor.assignJob(job);
             }
         }
     }
 
+    /**
+     * Invoked when a actor has finished their job and needs a new one.
+     * @param actor the actor that finished a job
+     */
     private requestNewJob(actor: Actor) {
-        //TODO: Generated a sort list from jobs based on proximity
-        const job = this._jobQueue.pendingJobs.pop();
+        // Filter out jobs that are not applicable for this actor
+        const availableJobs = this._jobQueue.pendingJobs.filter((job) => {
+            return job.constraint?.isActorApplicableForJob(job, actor) || true;
+        });
+        // pick the first applicable job
+        let job: Job | null | undefined = availableJobs[0];
+        // if no job is available for the actor, ask for any idle jobs
+        if (!job) {
+            job = actor.onIdle();
+        }
+
         if (job) {
+            // remove it from the list of pending jobs
+            this._jobQueue.removeJob(job);
             actor.assignJob(job);
         }
     }

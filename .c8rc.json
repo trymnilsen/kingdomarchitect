@@ -1,0 +1,10 @@
+{
+    "all": true,
+    "include": [
+        "ts/**/*"
+    ],
+    "reporter": [
+      "lcov",
+      "text-summary"
+    ]
+  }

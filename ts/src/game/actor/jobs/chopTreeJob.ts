@@ -3,7 +3,9 @@ import { RenderContext } from "../../../rendering/renderContext";
 import { BlinkingImageAnimation } from "../../../rendering/visual/blinkingImageAnimation";
 import { GroundTile } from "../../entity/ground";
 import { CoinActor } from "../coinActor";
+import { isFarmerJobConstraint } from "../job/constraint/isFarmerActorConstraint";
 import { Job } from "../job/job";
+import { JobConstraint } from "../job/jobConstraint";
 import { JobConstraintsError } from "../job/jobConstraintsError";
 import { MultipleStepJob } from "../job/multipleStepJob";
 import { MoveToJob } from "./moveToJob";
@@ -16,8 +18,12 @@ import { MoveToJob } from "./moveToJob";
 export class ChopTreeJob extends MultipleStepJob {
     private tile: GroundTile;
 
+    public get constraint(): JobConstraint {
+        return isFarmerJobConstraint;
+    }
+
     constructor(tree: GroundTile) {
-        super();
+        super(isFarmerJobConstraint);
         this.tile = tree;
     }
 

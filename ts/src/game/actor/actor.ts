@@ -53,6 +53,14 @@ export abstract class Actor {
     }
 
     /**
+     * Invoked when the actor does not have any available jobs.
+     * @returns an idle job or null if no idle job should be scheduled
+     */
+    onIdle(): Job | null {
+        return null;
+    }
+
+    /**
      * Update the actor and any attached jobs
      * @param tick the current world tick number
      */

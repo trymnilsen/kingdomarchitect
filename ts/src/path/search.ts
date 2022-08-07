@@ -1,21 +1,7 @@
 import { Point } from "../common/point";
 import { BinaryHeap } from "./binaryHeap";
 import { Graph, GraphNode } from "./graph";
-
-export const heuristics = {
-    manhattan: (pos0: GraphNode, pos1: GraphNode) => {
-        var d1 = Math.abs(pos1.x - pos0.x);
-        var d2 = Math.abs(pos1.y - pos0.y);
-        return d1 + d2;
-    },
-    diagonal: (pos0: GraphNode, pos1: GraphNode) => {
-        var D = 1;
-        var D2 = Math.sqrt(2);
-        var d1 = Math.abs(pos1.x - pos0.x);
-        var d2 = Math.abs(pos1.y - pos0.y);
-        return D * (d1 + d2) + (D2 - 2 * D) * Math.min(d1, d2);
-    },
-};
+import { manhattanDistance } from "./pathHeuristics";
 
 export class PathSearch {
     private graph: Graph;
@@ -45,12 +31,11 @@ export class PathSearch {
         }
 
         this.graph.cleanDirtyNodes();
-        var heuristic = heuristics.manhattan;
 
         var openHeap = this.createHeap();
         var closestNode = start; // set the start node to be the closest if required
 
-        start.h = heuristic(start, end);
+        start.h = manhattanDistance(start, end);
         this.graph.markDirtyNode(start);
 
         openHeap.push(start);
@@ -87,7 +72,7 @@ export class PathSearch {
                     // Found an optimal (so far) path to this node.  Take score for node to see how good it is.
                     neighbor.visited = true;
                     neighbor.parent = currentNode;
-                    neighbor.h = neighbor.h || heuristic(neighbor, end);
+                    neighbor.h = neighbor.h || manhattanDistance(neighbor, end);
                     neighbor.g = gScore;
                     neighbor.f = neighbor.g + neighbor.h;
                     this.graph.markDirtyNode(neighbor);

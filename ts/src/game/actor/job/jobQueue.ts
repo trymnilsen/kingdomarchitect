@@ -9,13 +9,13 @@ import { Job } from "./job";
  */
 export class JobQueue {
     private _pendingJobs: Job[] = [];
-    private _jobScheduled = new Event<void>();
+    private _jobScheduled = new Event<Job>();
 
     public get pendingJobs(): Job[] {
         return this._pendingJobs;
     }
 
-    public get jobScheduledEvent(): EventListener<void> {
+    public get jobScheduledEvent(): EventListener<Job> {
         return this._jobScheduled;
     }
 
@@ -25,6 +25,21 @@ export class JobQueue {
      */
     schedule(job: Job) {
         this._pendingJobs.push(job);
-        this._jobScheduled.publish();
+        this._jobScheduled.publish(job);
+    }
+
+    /**
+     * Remove a job from the list of pending jobs because it has been consumed
+     * @param job the job to remove
+     */
+    removeJob(job: Job) {
+        const indexOfJob = this._pendingJobs.indexOf(job);
+        if (indexOfJob >= 0) {
+            this._pendingJobs.splice(indexOfJob, 1);
+        } else {
+            console.error(
+                "Unable to remove job, it was not in list of pending"
+            );
+        }
     }
 }

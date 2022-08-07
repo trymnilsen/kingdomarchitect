@@ -20,13 +20,15 @@ module.exports = {
     ignorePatterns: [
         "/lib/**/*", // Ignore built files.
     ],
-    plugins: ["@typescript-eslint", "import"],
+    plugins: ["@typescript-eslint", "import", "jsdoc"],
     rules: {
         indent: ["error", 4, { SwitchCase: 1 }],
         "no-invalid-this": 0,
         "object-curly-spacing": 0,
         "import/no-unresolved": 0,
         "require-jsdoc": 0,
+        "jsdoc/require-description": 1,
+        "jsdoc/require-param-name": 1,
         "new-cap": 0,
         "spaced-comment": 0,
         "max-len": [

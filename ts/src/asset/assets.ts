@@ -9,4 +9,6 @@ export const assets = {
     farmer: "farmer_sheet.png",
     swipe_effect: "swipe_effect.png",
     coins: "coins.png",
+    pixelanimals: "animals_sheet.png",
+    keep_sheet: "keep_sheet.png",
 };

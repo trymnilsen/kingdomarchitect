@@ -1,4 +1,4 @@
-import { Bounds } from "../common/bounds";
+import { Bounds, absBounds } from "../common/bounds";
 import { clone } from "../common/clone";
 import { addPoint, Point } from "../common/point";
 import { Graph } from "../path/graph";
@@ -9,6 +9,7 @@ import { Actors } from "./entity/actors";
 import { Buildings } from "./entity/buildings";
 import { Ground } from "./entity/ground";
 import { getTileId } from "./entity/tile";
+import { getStartBuildings } from "./worldHelper";
 
 export class World {
     private _ground: Ground;
@@ -40,7 +41,25 @@ export class World {
             this.ground.generate();
         }
 
+        const startBuildings = getStartBuildings(this._ground);
+        for (let x = 0; x < 3; x++) {
+            for (let y = 0; y < 3; y++) {
+                this.ground.setTile({
+                    tileX: x + 3,
+                    tileY: y + 3,
+                });
+            }
+        }
+        for (const buidling of startBuildings) {
+            this.ground.setTile({
+                tileX: buidling.x,
+                tileY: buidling.y,
+            });
+            this.buildings.add(buidling);
+        }
+
         this._pathSearch = new PathSearch(new Graph([], 0, 0));
+        this.invalidateWorld();
     }
 
     tick(tick: number): void {
@@ -85,27 +104,11 @@ export class World {
     }
 }
 
-function absBounds(bounds: Bounds): {
-    bounds: Bounds;
-    offsets: Point;
-} {
-    const boundsDiffX = 0 - bounds.x1;
-    const boundsDiffY = 0 - bounds.y1;
-
-    return {
-        bounds: {
-            x1: 0,
-            y1: 0,
-            x2: bounds.x2 + boundsDiffX,
-            y2: bounds.y2 + boundsDiffY,
-        },
-        offsets: {
-            x: boundsDiffX,
-            y: boundsDiffY,
-        },
-    };
-}
-
+/**
+ * Creates a graph based on the given world
+ * @param world
+ * @returns a [Graph] based on the tiles in the world for pathfinding
+ */
 function createWeightGraphFromWorld(world: World): Graph {
     const bounds = world.ground.getBounds();
     const offsetBounds = absBounds(bounds);
@@ -126,14 +129,14 @@ function createWeightGraphFromWorld(world: World): Graph {
             });
             if (ground) {
                 if (ground.hasTree) {
-                    weight = 10;
+                    weight = 20;
                 } else {
-                    weight = 1;
+                    weight = 5;
                 }
             }
             const building = world.buildings.getTile(tileId);
             if (building) {
-                weight = 1000; //If there is a building at this position we make it very difficult to pass
+                weight = building.weight || 1000; //If there is a building at this position we make it very difficult to pass
             }
 
             weightGraph[x][y] = weight;

@@ -3,6 +3,7 @@ import { NotInitializedError } from "../../../common/error/notInitializedError";
 import { Actor } from "../actor";
 import { InvalidStateError } from "../../../common/error/invalidStateError";
 import { RenderContext } from "../../../rendering/renderContext";
+import { JobConstraint } from "./jobConstraint";
 
 export enum JobState {
     NotStarted,
@@ -14,6 +15,11 @@ export abstract class Job {
     private _completedEvent = new Event<void>();
     private _actor: Actor | null = null;
     private _jobState: JobState = JobState.NotStarted;
+    private _constraint: JobConstraint | null = null;
+
+    public get constraint(): JobConstraint | null {
+        return null;
+    }
 
     /**
      * Get the current state of the job
@@ -76,6 +82,12 @@ export abstract class Job {
      */
     public set actor(actor: Actor) {
         this._actor = actor;
+    }
+
+    constructor(constraint?: JobConstraint) {
+        if (constraint) {
+            this._constraint = constraint;
+        }
     }
 
     /**

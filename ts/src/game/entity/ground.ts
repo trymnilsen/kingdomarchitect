@@ -15,10 +15,14 @@ export interface GroundTile {
 export class Ground {
     private tiles: { [id: string]: GroundTile } = {};
     constructor() {
-        for (let x = 0; x < 3; x++) {
-            for (let y = 0; y < 3; y++) {
+        for (let x = 0; x < 10; x++) {
+            for (let y = 0; y < 10; y++) {
                 const id = getTileId(x, y);
-                this.tiles[id] = { tileX: x, tileY: y };
+                this.tiles[id] = {
+                    tileX: x,
+                    tileY: y,
+                    hasTree: Math.random() > 0.9,
+                };
             }
         }
     }
@@ -30,6 +34,14 @@ export class Ground {
 
     getTile(tilePosition: Point): GroundTile | null {
         return this.tiles[getTileId(tilePosition.x, tilePosition.y)] || null;
+    }
+
+    getTiles(predicate: (tile: GroundTile) => boolean): GroundTile[] {
+        return Object.values(this.tiles).filter(predicate);
+    }
+
+    setTile(tile: GroundTile) {
+        this.tiles[getTileId(tile.tileX, tile.tileY)] = tile;
     }
 
     generate() {
