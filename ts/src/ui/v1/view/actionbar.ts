@@ -1,4 +1,4 @@
-import { Point } from "../../common/point";
+import { Point } from "../../../common/point";
 import { addChild } from "../layout/layout";
 import { LayoutContext } from "../layout/layoutContext";
 import { LayoutNode } from "../layout/layoutNode";

@@ -2,7 +2,6 @@ import { Point } from "../common/point";
 import { InputAction } from "../input/inputAction";
 import { Camera } from "../rendering/camera";
 import { RenderContext } from "../rendering/renderContext";
-import { Scene } from "../scene/scene";
 import { InteractionHandler } from "./interaction/handler/interactionHandler";
 import { spawnRoutines } from "./routine/spawnRoutines";
 import { World } from "./world";
@@ -34,4 +33,11 @@ export class MainScene implements Scene {
         this.world.onDraw(context);
         this.interactionHandler.onDraw(context);
     }
+}
+
+export interface Scene {
+    drawScene(context: RenderContext): void;
+    input(action: InputAction): void;
+    tap(screenPoint: Point): void;
+    tick(tick: number): void;
 }

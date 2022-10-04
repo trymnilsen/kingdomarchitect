@@ -1,15 +1,15 @@
 import { sprites } from "../../../asset/sprite";
 import { Point, pointEquals } from "../../../common/point";
 import { InputEvent } from "../../../input/input";
-import { drawLayout, onTapLayout } from "../../../ui/layout/layout";
+import { drawLayout, onTapLayout } from "../../../ui/v1/layout/layout";
 import { Camera } from "../../../rendering/camera";
 import { RenderContext } from "../../../rendering/renderContext";
 import { GroundTile } from "../../entity/ground";
 import { TileSize } from "../../entity/tile";
 import { InteractionState } from "../handler/interactionState";
 import { InteractionStateChanger } from "../handler/interactionStateChanger";
-import { actionbarView, ActionButton } from "../../../ui/view/actionbar";
-import { LayoutNode } from "../../../ui/layout/layoutNode";
+import { actionbarView, ActionButton } from "../../../ui/v1/view/actionbar";
+import { LayoutNode } from "../../../ui/v1/layout/layoutNode";
 import { MoveToJob } from "../../actor/jobs/moveToJob";
 
 export class MoveState extends InteractionState {

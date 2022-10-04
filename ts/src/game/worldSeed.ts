@@ -1,5 +1,4 @@
 import { withinRectangle } from "../common/bounds";
-import { distance, Point } from "../common/point";
 import { Graph } from "../path/graph";
 import { PathSearch } from "../path/search";
 import { RoadVisual } from "../rendering/visual/roadVisual";

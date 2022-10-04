@@ -3,8 +3,7 @@ import { TouchInput } from "../input/touchInput";
 import { Input, InputEvent } from "../input/input";
 import { InputAction } from "../input/inputAction";
 import { Renderer } from "../rendering/renderer";
-import { Scene } from "../scene/scene";
-import { MainScene } from "./mainScene";
+import { MainScene, Scene } from "./mainScene";
 import { AssetLoader } from "../asset/loader/assetLoader";
 import { TileSize } from "./entity/tile";
 

@@ -47,6 +47,9 @@ export function spriteRenderer(
     image: HTMLImageElement,
     context: CanvasRenderingContext2D
 ) {
+    x = Math.floor(x);
+    y = Math.floor(y);
+
     const width = bounds.x2 - bounds.x1;
     const height = bounds.y2 - bounds.y1;
     context.drawImage(
@@ -75,6 +78,11 @@ export function ninePatchImageRenderer(
     image: HTMLImageElement,
     context: CanvasRenderingContext2D
 ) {
+    x = Math.floor(x);
+    y = Math.floor(y);
+    width = Math.floor(width);
+    height = Math.floor(height);
+
     const patchWidth = image.width;
     const patchHeight = image.height;
     const middlePatchWidth = patchWidth - left - right;

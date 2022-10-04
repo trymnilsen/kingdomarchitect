@@ -1,4 +1,4 @@
-import { AssetLoader } from "../../asset/loader/assetLoader";
+import { AssetLoader } from "../../../asset/loader/assetLoader";
 
 export interface LayoutContext {
     height: number;

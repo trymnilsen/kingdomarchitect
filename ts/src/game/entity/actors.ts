@@ -146,14 +146,20 @@ export class Actors {
         });
         // pick the first applicable job
         let job: Job | null | undefined = availableJobs[0];
+        let isIdleJob = false;
         // if no job is available for the actor, ask for any idle jobs
         if (!job) {
             job = actor.onIdle();
+            if (job) {
+                isIdleJob = true;
+            }
         }
 
         if (job) {
             // remove it from the list of pending jobs
-            this._jobQueue.removeJob(job);
+            if (!isIdleJob) {
+                this._jobQueue.removeJob(job);
+            }
             actor.assignJob(job);
         }
     }

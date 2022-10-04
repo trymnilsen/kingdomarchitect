@@ -11,8 +11,9 @@ import {
 } from "./items/image";
 import { RectangleConfiguration, rectangleRenderer } from "./items/rectangle";
 import { TextConfiguration, textRenderer } from "./items/text";
+import { UIRenderContext } from "./uiRenderContext";
 
-export class RenderContext {
+export class RenderContext implements UIRenderContext {
     private canvasContext: CanvasRenderingContext2D;
     private _camera: Camera;
     private _assetLoader: AssetLoader;

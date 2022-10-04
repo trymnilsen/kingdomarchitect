@@ -9,7 +9,7 @@ import { Actors } from "./entity/actors";
 import { Buildings } from "./entity/buildings";
 import { Ground } from "./entity/ground";
 import { getTileId } from "./entity/tile";
-import { getStartBuildings } from "./worldHelper";
+import { getStartBuildings } from "./worldSeed";
 
 export class World {
     private _ground: Ground;

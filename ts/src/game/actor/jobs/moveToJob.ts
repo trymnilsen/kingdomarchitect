@@ -18,7 +18,6 @@ export class MoveToJob extends Job {
             this.actor.tilePosition.x = newPosition.x;
             this.actor.tilePosition.y = newPosition.y;
         } else {
-            console.log("Move to job finished");
             this.complete();
         }
     }
