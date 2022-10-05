@@ -52,7 +52,7 @@ export class BuildMenuState extends InteractionState {
                 height: context.height,
             });
         }
-
+        this.view.updateTransform();
         this.view.draw(context);
         const end = performance.now();
         console.log(`build state draw: ${end - start}`);

@@ -1,28 +1,12 @@
 import { clamp } from "../../common/number";
 import { addPoint, Point } from "../../common/point";
 import { UIRenderContext } from "../../rendering/uiRenderContext";
-import {
-    fillUiSize,
-    UIBackground,
-    UISize,
-    UIView,
-    wrapUiSize,
-} from "../uiView";
-
-export const alignments = {
-    topLeft: { x: -1, y: -1 },
-    topCenter: { x: 0, y: -1 },
-    topRight: { x: 1, y: -1 },
-    centerLeft: { x: -1, y: 0 },
-    center: { x: 0, y: 0 },
-    centerRight: { x: 1, y: 0 },
-    bottomLeft: { x: -1, y: 1 },
-    bottomCenter: { x: 0, y: 1 },
-    bottomRight: { x: 1, y: 1 },
-};
+import { uiAlignment } from "../uiAlignment";
+import { UIBackground } from "../uiBackground";
+import { fillUiSize, UISize, UIView, wrapUiSize } from "../uiView";
 
 export class UIBox extends UIView {
-    private _alignment: Point = alignments.center;
+    private _alignment: Point = uiAlignment.center;
     private _background: UIBackground | null = null;
 
     get alignment(): Point {
@@ -111,8 +95,8 @@ export class UIBox extends UIView {
                 throw new Error("Child had no measured size");
             }
 
-            const halfWidthConstraint = constraints.width / 2;
-            const halfHeightConstraint = constraints.height / 2;
+            const halfWidthConstraint = measuredWidth / 2;
+            const halfHeightConstraint = measuredHeight / 2;
 
             const widthAlignment =
                 halfWidthConstraint * this._alignment.x + halfWidthConstraint;
@@ -123,18 +107,18 @@ export class UIBox extends UIView {
             const clampedOffsetX = clamp(
                 offsetX,
                 0,
-                constraints.width - child.measuredSize.width
+                measuredWidth - child.measuredSize.width
             );
             const clampedOffsetY = clamp(
                 offsetY,
                 0,
-                constraints.height - child.measuredSize.height
+                measuredHeight - child.measuredSize.height
             );
 
-            child.screenPosition = addPoint(this.screenPosition, {
+            child.offset = {
                 x: clampedOffsetX,
                 y: clampedOffsetY,
-            });
+            };
         }
         this._isDirty = false;
         return measuredSize;
