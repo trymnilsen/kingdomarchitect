@@ -1,7 +1,9 @@
 import { assets } from "../asset/assets";
-import { Sides } from "../common/sides";
+import { Sides, zeroSides } from "../common/sides";
 import { addPoint, Point, zeroPoint } from "../common/point";
 import { UIRenderContext } from "../rendering/uiRenderContext";
+import { UILayoutContext } from "./uiLayoutContext";
+import { Bounds, zeroBounds } from "../common/bounds";
 
 export interface UISize {
     height: number;
@@ -13,13 +15,21 @@ export const fillUiSize = -2;
 
 export abstract class UIView {
     private _parent: UIView | null = null;
-    private _screenPosition: Point = zeroPoint;
-    private _offset: Point = zeroPoint;
+    private _screenPosition: Point = zeroPoint();
+    private _offset: Point = zeroPoint();
+    private _padding: Sides = zeroSides();
     private _size: UISize;
     private _id: string | null = null;
     private _children: UIView[] = [];
     protected _measuredSize: UISize | null = null;
     protected _isDirty: boolean = true;
+
+    get padding(): Sides {
+        return this._padding;
+    }
+    set padding(value: Sides) {
+        this._padding = value;
+    }
 
     get offset(): Point {
         return this._offset;
@@ -68,6 +78,13 @@ export abstract class UIView {
     }
 
     constructor(size: UISize) {
+        if (size.width < fillUiSize) {
+            throw new Error(`Invalid ui width provided: ${size.width}`);
+        }
+        if (size.height < fillUiSize) {
+            throw new Error(`Invalid ui height provided: ${size.height}`);
+        }
+
         this._size = size;
     }
 
@@ -103,6 +120,10 @@ export abstract class UIView {
      * @param constraints the size constraints for the parent
      * @return the size of the view
      */
-    abstract layout(constraints: UISize): UISize;
+    abstract layout(
+        layoutContext: UILayoutContext,
+        constraints: UISize
+    ): UISize;
+
     abstract draw(context: UIRenderContext): void;
 }

@@ -1,5 +1,5 @@
 import { Bounds } from "../common/bounds";
-import { assets } from "./assets";
+import { assets, ImageAsset } from "./assets";
 import { coinsFlat, coinSprite } from "./sprites/coinSprite";
 import { cursorSprite } from "./sprites/cursor";
 import { farmerSprite } from "./sprites/farmerSprite";
@@ -11,7 +11,7 @@ import { woodenHouseSprite } from "./sprites/woodHouseSprite";
 
 export type Sprite = {
     bounds: Bounds;
-    asset: keyof typeof assets;
+    asset: ImageAsset;
 };
 
 export const sprites = {

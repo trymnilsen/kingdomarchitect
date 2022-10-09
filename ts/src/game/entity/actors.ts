@@ -26,7 +26,7 @@ export class Actors {
             this.onJobScheduled(job);
         });
         // Set up the default actors
-        this.addActor(new SwordsmanActor(zeroPoint));
+        this.addActor(new SwordsmanActor(zeroPoint()));
         this.addActor(
             new FarmerActor({
                 x: 0,

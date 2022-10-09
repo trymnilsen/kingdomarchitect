@@ -1,4 +1,4 @@
-import { assets } from "../assets";
+import { assets, ImageAsset } from "../assets";
 
 export class AssetLoader {
     private _assets: { [name: string]: HTMLImageElement } = {};
@@ -10,10 +10,20 @@ export class AssetLoader {
             const imageElement = await this.loadAsset(asset[1]);
             this._assets[asset[0]] = imageElement;
         }
+        await this.loadFonts();
     }
 
-    getAsset(asset: keyof typeof assets): HTMLImageElement {
+    getAsset(asset: ImageAsset): HTMLImageElement {
         return this._assets[asset];
+    }
+
+    private async loadFonts(): Promise<void> {
+        const myFont = new FontFace(
+            "Silkscreen",
+            "url(asset/Silkscreen-regular.ttf)"
+        );
+        const loadedFont = await myFont.load();
+        document.fonts.add(loadedFont);
     }
 
     private loadAsset(name: string): Promise<HTMLImageElement> {

@@ -1,3 +1,6 @@
+import { clamp } from "../common/number";
+import { Point } from "../common/point";
+
 export const uiAlignment = {
     topLeft: { x: -1, y: -1 },
     topCenter: { x: 0, y: -1 },
@@ -9,3 +12,28 @@ export const uiAlignment = {
     bottomCenter: { x: 0, y: 1 },
     bottomRight: { x: 1, y: 1 },
 };
+
+export function calculateAlignment(
+    width: number,
+    height: number,
+    alignment: Point,
+    itemWidth: number,
+    itemHeight: number
+): Point {
+    const halfWidthConstraint = width / 2;
+    const halfHeightConstraint = height / 2;
+
+    const widthAlignment =
+        halfWidthConstraint * alignment.x + halfWidthConstraint;
+    const heightAlignment =
+        halfHeightConstraint * alignment.y + halfHeightConstraint;
+    const offsetX = widthAlignment - itemWidth / 2;
+    const offsetY = heightAlignment - itemHeight / 2;
+    const clampedOffsetX = clamp(offsetX, 0, width - itemWidth);
+    const clampedOffsetY = clamp(offsetY, 0, height - itemHeight);
+
+    return {
+        x: clampedOffsetX,
+        y: clampedOffsetY,
+    };
+}

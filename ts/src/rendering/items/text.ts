@@ -28,16 +28,18 @@ import { RenderItemConfiguration } from "./renderItemConfiguration";
 export interface TextConfiguration extends RenderItemConfiguration {
     text: string;
     color: string;
+    font: string;
+    size: number;
     align?: "left" | "center" | "right";
     width?: number;
     weight?: "normal" | "bold";
 }
 
-export function textRenderer(
+export function configureText(
     renderItem: TextConfiguration,
     context: CanvasRenderingContext2D
 ) {
-    let fontString = "14px Arial";
+    let fontString = `${renderItem.size}px ${renderItem.font}`;
     let alignOffset = 0;
     if (!!renderItem.weight) {
         fontString = renderItem.weight + " " + fontString;
@@ -54,6 +56,12 @@ export function textRenderer(
             console.warn("A width needs to be set for text to be aligned");
         }
     }
+}
 
-    context.fillText(renderItem.text, renderItem.x + alignOffset, renderItem.y);
+export function textRenderer(
+    renderItem: TextConfiguration,
+    context: CanvasRenderingContext2D
+) {
+    configureText(renderItem, context);
+    context.fillText(renderItem.text, renderItem.x, renderItem.y);
 }

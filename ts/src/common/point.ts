@@ -13,10 +13,12 @@ export interface Point {
 /**
  * A point with both components set to zero
  */
-export const zeroPoint: { readonly x: 0; readonly y: 0 } = {
-    x: 0,
-    y: 0,
-};
+export function zeroPoint(): Point {
+    return {
+        x: 0,
+        y: 0,
+    };
+}
 
 /**
  * Adds the component of one point with the components of another

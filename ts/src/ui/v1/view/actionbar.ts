@@ -86,6 +86,8 @@ function actionbarViewButton(
             align: "center",
             color: "white",
             weight: "bold",
+            font: "arial",
+            size: 14,
             text: action.name,
         },
     };

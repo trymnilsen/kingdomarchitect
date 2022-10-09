@@ -47,7 +47,7 @@ export class BuildMenuState extends InteractionState {
     onDraw(context: RenderContext): void {
         const start = performance.now();
         if (this.view.isDirty) {
-            this.view.layout({
+            this.view.layout(context, {
                 width: context.width,
                 height: context.height,
             });

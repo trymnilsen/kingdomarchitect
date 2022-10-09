@@ -1,8 +1,10 @@
 import { clamp } from "../../common/number";
 import { addPoint, Point } from "../../common/point";
+import { addHorizontal, addVertical } from "../../common/sides";
 import { UIRenderContext } from "../../rendering/uiRenderContext";
-import { uiAlignment } from "../uiAlignment";
+import { calculateAlignment, uiAlignment } from "../uiAlignment";
 import { UIBackground } from "../uiBackground";
+import { UILayoutContext } from "../uiLayoutContext";
 import { fillUiSize, UISize, UIView, wrapUiSize } from "../uiView";
 
 export class UIBox extends UIView {
@@ -23,7 +25,7 @@ export class UIBox extends UIView {
         this._background = background;
     }
 
-    layout(constraints: UISize): UISize {
+    layout(layoutContext: UILayoutContext, constraints: UISize): UISize {
         let widthConstraint = 0;
         let widthSize = 0;
         let heightConstraint = 0;
@@ -32,16 +34,20 @@ export class UIBox extends UIView {
         let measuredWidth = 0;
         let measuredHeight = 0;
         // Set the constraints for children based on the size of this box
+        // subtract any padding
+        let horizontalPadding = addHorizontal(this.padding);
+        let verticalPadding = addVertical(this.padding);
+
         if (this.size.width > 0) {
-            widthConstraint = this.size.width;
+            widthConstraint = this.size.width - horizontalPadding;
         } else {
-            widthConstraint = constraints.width;
+            widthConstraint = constraints.width - horizontalPadding;
         }
 
         if (this.size.height > 0) {
-            heightConstraint = this.size.height;
+            heightConstraint = this.size.height - verticalPadding;
         } else {
-            heightConstraint = constraints.height;
+            heightConstraint = constraints.height - verticalPadding;
         }
 
         // Update the measured size if fill or fixed
@@ -59,26 +65,29 @@ export class UIBox extends UIView {
 
         // layout the children
         for (const child of this.children) {
-            const childSize = child.layout({
+            const childSize = child.layout(layoutContext, {
                 width: widthConstraint,
                 height: heightConstraint,
             });
             // Update the size of this view if its set to wrap
+            // Include the padding in the newly wrapped size
+            const childWidthWithPadding = childSize.width + horizontalPadding;
+            const childHeightWithPadding = childSize.height + verticalPadding;
             if (this.size.width == wrapUiSize) {
                 if (
-                    childSize.width > measuredWidth &&
-                    childSize.width < constraints.width
+                    childWidthWithPadding > measuredWidth &&
+                    childWidthWithPadding < constraints.width
                 ) {
-                    measuredWidth = childSize.width;
+                    measuredWidth = childWidthWithPadding;
                 }
             }
 
             if (this.size.height == wrapUiSize) {
                 if (
-                    childSize.height > measuredHeight &&
-                    childSize.height < constraints.height
+                    childHeightWithPadding > measuredHeight &&
+                    childHeightWithPadding < constraints.height
                 ) {
-                    measuredHeight = childSize.height;
+                    measuredHeight = childHeightWithPadding;
                 }
             }
         }
@@ -95,30 +104,20 @@ export class UIBox extends UIView {
                 throw new Error("Child had no measured size");
             }
 
-            const halfWidthConstraint = measuredWidth / 2;
-            const halfHeightConstraint = measuredHeight / 2;
-
-            const widthAlignment =
-                halfWidthConstraint * this._alignment.x + halfWidthConstraint;
-            const heightAlignment =
-                halfHeightConstraint * this._alignment.y + halfHeightConstraint;
-            const offsetX = widthAlignment - child.measuredSize.width / 2;
-            const offsetY = heightAlignment - child.measuredSize.height / 2;
-            const clampedOffsetX = clamp(
-                offsetX,
-                0,
-                measuredWidth - child.measuredSize.width
-            );
-            const clampedOffsetY = clamp(
-                offsetY,
-                0,
-                measuredHeight - child.measuredSize.height
+            const alignedPosition = calculateAlignment(
+                measuredWidth - horizontalPadding,
+                measuredHeight - verticalPadding,
+                this._alignment,
+                child.measuredSize.width,
+                child.measuredSize.height
             );
 
-            child.offset = {
-                x: clampedOffsetX,
-                y: clampedOffsetY,
-            };
+            // set the offset of the child based on the alignment, offset
+            // by the x1 and y1 padding
+            child.offset = addPoint(alignedPosition, {
+                x: this.padding.left,
+                y: this.padding.top,
+            });
         }
         this._isDirty = false;
         return measuredSize;

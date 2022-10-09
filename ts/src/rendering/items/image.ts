@@ -1,11 +1,11 @@
-import { assets } from "../../asset/assets";
+import { assets, ImageAsset } from "../../asset/assets";
 import { Sprite } from "../../asset/sprite";
 import { Bounds } from "../../common/bounds";
 import { Sides } from "../../common/sides";
 import { RenderItemConfiguration } from "./renderItemConfiguration";
 
 export interface ImageConfiguration extends RenderItemConfiguration {
-    image: keyof typeof assets;
+    image: ImageAsset;
 }
 
 export interface SpriteConfiguration extends RenderItemConfiguration {
@@ -33,7 +33,7 @@ export function imageRenderer(
 }
 
 export interface NinePatchImageConfiguration extends RenderItemConfiguration {
-    asset: keyof typeof assets;
+    asset: ImageAsset;
     sides: Sides;
     width: number;
     height: number;

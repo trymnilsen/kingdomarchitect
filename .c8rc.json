@@ -1,7 +1,7 @@
 {
     "all": true,
     "include": [
-        "ts/**/*"
+        "ts/src/**/*"
     ],
     "reporter": [
       "lcov",

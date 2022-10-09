@@ -12,3 +12,5 @@ export const assets = {
     pixelanimals: "animals_sheet.png",
     keep_sheet: "keep_sheet.png",
 };
+
+export type ImageAsset = keyof typeof assets;

@@ -1,12 +1,11 @@
-import { allSides } from "../../../../common/sides";
+import { allSides, symmetricSides } from "../../../../common/sides";
+import { titleTextStyle } from "../../../../rendering/text/textStyle";
 import { uiAlignment } from "../../../../ui/uiAlignment";
-import {
-    ColorBackground,
-    NinePatchBackground,
-} from "../../../../ui/uiBackground";
+import { NinePatchBackground } from "../../../../ui/uiBackground";
 import { fillUiSize, UIView, wrapUiSize } from "../../../../ui/uiView";
 import { UIBox } from "../../../../ui/view/uiBox";
 import { UIColumn } from "../../../../ui/view/uiColumn";
+import { UIText } from "../../../../ui/view/uiText";
 
 export function buildMenuStateView(): UIView {
     const rootView = new UIBox({
@@ -26,48 +25,58 @@ export function buildMenuStateView(): UIView {
         allSides(16),
         4
     );
+    container.alignment = uiAlignment.topCenter;
+
+    container.padding = symmetricSides(32, 16);
 
     const menuColumn = new UIColumn({
-        width: 300,
-        height: 400,
-    });
-
-    const redBox = new UIBox({
-        width: 300,
-        height: 50,
-    });
-
-    redBox.background = new ColorBackground("red");
-
-    const blueBox = new UIBox({
-        width: 300,
+        width: fillUiSize,
         height: fillUiSize,
     });
 
-    blueBox.background = new ColorBackground("blue");
-    blueBox.id = "abfd";
-
-    const greenBox = new UIBox({
-        width: 300,
-        height: fillUiSize,
+    const titleText = new UIText({
+        width: fillUiSize,
+        height: wrapUiSize,
     });
 
-    greenBox.background = new ColorBackground("green");
-    greenBox.id = "kjsa";
+    titleText.textStyle = titleTextStyle;
+    titleText.text = "Buildings";
 
-    const yellowBox = new UIBox({
-        width: 300,
-        height: 50,
-    });
+    menuColumn.addView(titleText);
+    menuColumn.addView(
+        new UIBox({
+            width: fillUiSize,
+            height: 32,
+        })
+    );
 
-    yellowBox.background = new ColorBackground("yellow");
-
-    menuColumn.addView(redBox);
-    menuColumn.addView(blueBox, 1);
-    menuColumn.addView(greenBox, 1);
-    menuColumn.addView(yellowBox);
+    menuColumn.addView(buildItemView());
+    menuColumn.addView(new UIBox({ width: fillUiSize, height: 8 }));
+    menuColumn.addView(buildItemView());
 
     container.addView(menuColumn);
     rootView.addView(container);
     return rootView;
+}
+
+function buildItemView(): UIView {
+    const container = new UIBox({
+        width: fillUiSize,
+        height: wrapUiSize,
+    });
+
+    container.background = new NinePatchBackground(
+        "fancyWoodBackground",
+        allSides(8),
+        4
+    );
+    container.padding = allSides(16);
+    container.addView(
+        new UIBox({
+            width: fillUiSize,
+            height: 50,
+        })
+    );
+
+    return container;
 }

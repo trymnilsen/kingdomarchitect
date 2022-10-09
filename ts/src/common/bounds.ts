@@ -45,6 +45,15 @@ export interface Bounds {
     y2: number;
 }
 
+export function zeroBounds(): Bounds {
+    return {
+        x1: 0,
+        y1: 0,
+        x2: 0,
+        y2: 0,
+    };
+}
+
 /**
  * Creates a [NumberRange] based on the given [Bounds] along [Axis]
  * @param bounds the bounds to calculate range of

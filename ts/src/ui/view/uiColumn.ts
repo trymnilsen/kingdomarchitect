@@ -1,7 +1,8 @@
 import { addPoint, Point } from "../../common/point";
 import { NumberRange } from "../../common/range";
 import { UIRenderContext } from "../../rendering/uiRenderContext";
-import { fillUiSize, UISize, UIView } from "../uiView";
+import { UILayoutContext } from "../uiLayoutContext";
+import { fillUiSize, UISize, UIView, wrapUiSize } from "../uiView";
 
 export enum HorizontalAlignment {
     Left,
@@ -34,6 +35,10 @@ export class UIColumn extends UIView {
             );
         }
 
+        if (view.size.height == wrapUiSize && !!weight) {
+            throw new Error("Cannot use weight when height is wrapSize");
+        }
+
         if (weight) {
             if (weight <= 0) {
                 throw new Error("Weight needs to be larger than 0");
@@ -51,7 +56,7 @@ export class UIColumn extends UIView {
         super.addView(view);
     }
 
-    layout(constraints: UISize): UISize {
+    layout(context: UILayoutContext, constraints: UISize): UISize {
         const offsets: VerticalPlacement[] = [];
         let measuredWidth = 0;
         let measuredHeight = 0;
@@ -68,7 +73,7 @@ export class UIColumn extends UIView {
             }
 
             // Layout the child
-            const layoutSize = child.layout(constraints);
+            const layoutSize = child.layout(context, constraints);
             const newTotalHeight = measuredHeight + layoutSize.height;
             if (newTotalHeight > constraints.height) {
                 throw new Error("Non weighted column children height overflow");
@@ -106,7 +111,7 @@ export class UIColumn extends UIView {
                 measuredHeight += weightedHeight;
 
                 // Run layout on the child
-                const layoutSize = child.layout({
+                const layoutSize = child.layout(context, {
                     width: constraints.width,
                     height: weightedHeight,
                 });
@@ -151,13 +156,6 @@ export class UIColumn extends UIView {
     }
 
     draw(context: UIRenderContext): void {
-        context.drawScreenSpaceRectangle({
-            x: this.screenPosition.x,
-            y: this.screenPosition.y,
-            width: this.measuredSize!.width,
-            height: this.measuredSize!.height,
-            fill: "orange",
-        });
         for (const child of this.children) {
             child.draw(context);
         }

@@ -4,7 +4,7 @@ import { RenderContext } from "../renderContext";
 
 export class SpriteAnimation {
     private currentFrame: number = 0;
-    private position: Point = zeroPoint;
+    private position: Point = zeroPoint();
     constructor(private spriteFrames: Sprite[]) {}
 
     updatePosition(point: Point) {
