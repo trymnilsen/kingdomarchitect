@@ -1,18 +1,12 @@
-import { addPoint, Point } from "../../common/point";
-import { NumberRange } from "../../common/range";
 import { UIRenderContext } from "../../rendering/uiRenderContext";
 import { UILayoutContext } from "../uiLayoutContext";
 import { fillUiSize, UISize, UIView, wrapUiSize } from "../uiView";
+import { AxisPlacement, insertAndShift } from "./axisPlacement";
 
 export enum HorizontalAlignment {
     Left,
     Center,
     Right,
-}
-
-export interface VerticalPlacement {
-    top: number;
-    bottom: number;
 }
 
 export class UIColumn extends UIView {
@@ -57,13 +51,13 @@ export class UIColumn extends UIView {
     }
 
     layout(context: UILayoutContext, constraints: UISize): UISize {
-        const offsets: VerticalPlacement[] = [];
+        const offsets: AxisPlacement[] = [];
         let measuredWidth = 0;
         let measuredHeight = 0;
         // First measure the items without a weight
         for (let i = 0; i < this.children.length; i++) {
             // Initialise offset array
-            offsets[i] = { top: 0, bottom: 0 };
+            offsets[i] = { start: 0, end: 0 };
 
             // Check if child has a weight
             const child = this.children[i];
@@ -83,8 +77,8 @@ export class UIColumn extends UIView {
             // children. This makes the current child start at the bottom of the
             // previous child
             offsets[i] = {
-                top: measuredHeight,
-                bottom: newTotalHeight,
+                start: measuredHeight,
+                end: newTotalHeight,
             };
 
             measuredHeight += layoutSize.height;
@@ -117,18 +111,18 @@ export class UIColumn extends UIView {
                 });
                 // Get the offset of the previous child to find
                 // where we should start
-                let previousOffsets = { top: 0, bottom: 0 };
+                let previousOffsets = { start: 0, end: 0 };
                 if (i > 0) {
                     previousOffsets = offsets[i - 1];
                 }
 
-                const top = previousOffsets.bottom;
+                const top = previousOffsets.end;
                 const weightedOffset = {
-                    top: top,
-                    bottom: top + weightedHeight,
+                    start: top,
+                    end: top + weightedHeight,
                 };
 
-                if (weightedOffset.bottom < weightedOffset.top) {
+                if (weightedOffset.end < weightedOffset.start) {
                     throw new Error("Offset bottom cannot be less than top");
                 }
                 // Insert the weighted items size and shift any following items
@@ -148,7 +142,7 @@ export class UIColumn extends UIView {
             const offset = offsets[i];
             child.offset = {
                 x: 0,
-                y: offset.top,
+                y: offset.start,
             };
         }
 
@@ -159,29 +153,5 @@ export class UIColumn extends UIView {
         for (const child of this.children) {
             child.draw(context);
         }
-    }
-}
-
-/**
- * Given an array of offsets for views, shift the placement of following views
- * by the amount of the inserted item. Operates on the array in place
- * @param array the array of placements
- * @param index the index to insert the new placement at
- * @param value the placement to insert
- */
-export function insertAndShift(
-    array: VerticalPlacement[],
-    index: number,
-    value: VerticalPlacement
-) {
-    array[index] = value;
-    const height = value.bottom - value.top;
-    for (let i = index + 1; i < array.length; i++) {
-        const offset = array[i];
-        const newOffset = {
-            top: offset.top + height,
-            bottom: offset.bottom + height,
-        };
-        array[i] = newOffset;
     }
 }
