@@ -74,7 +74,7 @@ export class UIRow extends UIView {
             // children. This makes the current child start at the bottom of the
             // previous child
             offsets[i] = {
-                start: measuredHeight,
+                start: measuredWidth,
                 end: newTotalWidth,
             };
 
@@ -113,10 +113,10 @@ export class UIRow extends UIView {
                     previousOffsets = offsets[i - 1];
                 }
 
-                const top = previousOffsets.end;
+                const left = previousOffsets.end;
                 const weightedOffset = {
-                    start: top,
-                    end: top + weightedWidth,
+                    start: left,
+                    end: left + weightedWidth,
                 };
 
                 if (weightedOffset.end < weightedOffset.start) {

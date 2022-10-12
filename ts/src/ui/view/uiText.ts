@@ -71,6 +71,7 @@ export class UIText extends UIView {
             text: this._text,
             color: this._textStyle.color,
             x: this.screenPosition.x + this._textAlignmentOffset.x,
+            //TODO: The y position for offsets seems off?
             y: this.screenPosition.y + this._textAlignmentOffset.y,
             font: this._textStyle.font,
             size: this._textStyle.size,

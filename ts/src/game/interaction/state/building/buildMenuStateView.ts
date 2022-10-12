@@ -1,3 +1,4 @@
+import { sprites } from "../../../../asset/sprite";
 import { allSides, symmetricSides } from "../../../../common/sides";
 import { titleTextStyle } from "../../../../rendering/text/textStyle";
 import { uiAlignment } from "../../../../ui/uiAlignment";
@@ -5,6 +6,8 @@ import { NinePatchBackground } from "../../../../ui/uiBackground";
 import { fillUiSize, UIView, wrapUiSize } from "../../../../ui/uiView";
 import { UIBox } from "../../../../ui/view/uiBox";
 import { UIColumn } from "../../../../ui/view/uiColumn";
+import { UIImage, UISpriteImageSource } from "../../../../ui/view/uiImage";
+import { UIRow } from "../../../../ui/view/uiRow";
 import { UIText } from "../../../../ui/view/uiText";
 
 export function buildMenuStateView(): UIView {
@@ -77,6 +80,28 @@ function buildItemView(): UIView {
             height: 50,
         })
     );
+
+    const row = new UIRow({
+        width: fillUiSize,
+        height: fillUiSize,
+    });
+
+    const image = new UIImage({
+        width: 24,
+        height: 24,
+    });
+
+    image.image = new UISpriteImageSource(sprites.woodHouse);
+    const text = new UIText({
+        width: fillUiSize,
+        height: wrapUiSize,
+    });
+
+    text.text = "Wooden House";
+    text.id = "labelhouse";
+    row.addView(image);
+    row.addView(text, 1);
+    container.addView(row);
 
     return container;
 }
