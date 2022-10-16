@@ -9,7 +9,15 @@ import { getTileId, TileSize } from "./tile";
 export interface GroundTile {
     tileX: number;
     tileY: number;
-    hasTree?: boolean;
+    hasTree?: number;
+}
+
+function hasTree(threshold: number): number {
+    if (Math.random() > threshold) {
+        return Math.floor(Math.random() * 3.0) + 1;
+    } else {
+        return 0;
+    }
 }
 
 export class Ground {
@@ -21,7 +29,7 @@ export class Ground {
                 this.tiles[id] = {
                     tileX: x,
                     tileY: y,
-                    hasTree: Math.random() > 0.9,
+                    hasTree: hasTree(0.9),
                 };
             }
         }
@@ -54,7 +62,7 @@ export class Ground {
             this.tiles[getTileId(newTilePosition.x, newTilePosition.y)] = {
                 tileX: newTilePosition.x,
                 tileY: newTilePosition.y,
-                hasTree: Math.random() > 0.7,
+                hasTree: hasTree(0.7),
             };
         }
 
@@ -73,9 +81,16 @@ export class Ground {
                 fill: "green",
             });
 
-            if (tile.hasTree) {
+            if (tile.hasTree && tile.hasTree > 0) {
+                let sprite = sprites.tree;
+                if (tile.hasTree >= 2.0) {
+                    sprite = sprites.tree2;
+                }
+                if (tile.hasTree >= 3.0) {
+                    sprite = sprites.tree3;
+                }
                 context.drawSprite({
-                    sprite: sprites.tree,
+                    sprite: sprite,
                     x: tile.tileX * TileSize + 4,
                     y: tile.tileY * TileSize,
                 });

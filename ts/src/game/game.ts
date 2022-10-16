@@ -36,17 +36,32 @@ export class Game {
 
     async bootstrap(): Promise<void> {
         await this.assetLoader.load();
-        this.touchInput.onPan.listen((onPanEvent) => {
-            this.renderer.camera.translate(invert(onPanEvent.movement));
+
+        this.touchInput.onTapDown = (position: Point) => {
+            const tapResult = this.currentScene.onTapDown(position);
             this.render();
-        });
-        this.touchInput.onTap.listen((onTapEvent) => {
-            this.currentScene.tap(onTapEvent);
+            return tapResult;
+        };
+
+        this.touchInput.onTapUp = (position: Point) => {
+            this.currentScene.onTapUp(position);
             this.render();
-        });
+        };
+
+        this.touchInput.onPan = (movement: Point, position: Point) => {
+            this.renderer.camera.translate(invert(movement));
+            this.render();
+        };
+
+        this.touchInput.onTap = (onTapEvent) => {
+            this.currentScene.onTap(onTapEvent);
+            this.render();
+        };
+
         this.input.onInput.listen((inputEvent) => {
             this.onInput(inputEvent);
         });
+
         setInterval(this.onTick, 1000);
         this.render();
     }

@@ -77,7 +77,7 @@ class _ChopTreeJob extends Job {
 
         const elapsedTicks = tick - this.startTick;
         if (elapsedTicks > 2) {
-            this.tile.hasTree = false;
+            this.tile.hasTree = 0.0;
             console.log("_ChopTreeJob finished");
             this.actor.world.actors.addActor(
                 new CoinActor({ x: this.tile.tileX, y: this.tile.tileY })

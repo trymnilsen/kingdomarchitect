@@ -3,7 +3,8 @@ import { Sides, zeroSides } from "../common/sides";
 import { addPoint, Point, zeroPoint } from "../common/point";
 import { UIRenderContext } from "../rendering/uiRenderContext";
 import { UILayoutContext } from "./uiLayoutContext";
-import { Bounds, zeroBounds } from "../common/bounds";
+import { Bounds, withinRectangle, zeroBounds } from "../common/bounds";
+import { UIEvent } from "./event/uiEvent";
 
 export interface UISize {
     height: number;
@@ -62,7 +63,6 @@ export abstract class UIView {
     get screenPosition(): Point {
         return this._screenPosition;
     }
-
     set screenPosition(position: Point) {
         this._screenPosition = position;
     }
@@ -100,7 +100,10 @@ export abstract class UIView {
         this._children.push(view);
     }
 
-    removeView(view: UIView) {}
+    removeView(view: UIView) {
+        //
+    }
+
     updateTransform() {
         if (this.parent) {
             this._screenPosition = addPoint(
@@ -115,6 +118,74 @@ export abstract class UIView {
             child.updateTransform();
         }
     }
+
+    withinViewBounds(point: Point): boolean {
+        return withinRectangle(
+            point,
+            this.screenPosition.x,
+            this.screenPosition.y,
+            this.screenPosition.x + (this.measuredSize?.width || 0),
+            this.screenPosition.y + (this.measuredSize?.height || 0)
+        );
+    }
+
+    onTapDown(screenPoint: Point): boolean {
+        return false;
+    }
+    onTap(screenPoint: Point): boolean {
+        return false;
+    }
+    onTapUp(screenPoint: Point) {}
+
+    /**
+     *
+     * @param event
+     */
+    dispatchUIEvent(event: UIEvent): boolean {
+        let handled = false;
+        // check if this view is within bounds, if it its we dispatch the event
+        // to children. Then run the tap events if it hit tests
+        const withinBounds = this.withinViewBounds(event.position);
+
+        // If the event is not within our bounds we do not pass it on
+        if (!withinBounds) {
+            return false;
+        }
+
+        // Pass it on to children, allowing the deepest child to handle the
+        // event first
+        for (const child of this.children) {
+            const childHandledEvent = child.dispatchUIEvent(event);
+            if (childHandledEvent) {
+                return true;
+            }
+        }
+
+        // if we get here the children did not handle the event so we check if
+        // this view wants to handle it
+        if (this.hitTest(event.position)) {
+            switch (event.type) {
+                case "tap":
+                    handled = this.onTap(event.position);
+                    break;
+                case "tapStart":
+                    handled = this.onTapDown(event.position);
+                    break;
+                case "tapEnd":
+                    this.onTapUp(event.position);
+                    break;
+            }
+        }
+
+        return handled;
+    }
+
+    /**
+     * Test if the screen point is within the bounds of this view
+     * @param screenPoint
+     * @returns
+     */
+    abstract hitTest(screenPoint: Point): boolean;
     /**
      * Requests the view to layout itself and any children
      * @param constraints the size constraints for the parent

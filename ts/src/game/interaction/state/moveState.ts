@@ -34,18 +34,15 @@ export class MoveState extends InteractionState {
         ];
     }
 
-    onTap(
-        screenPosition: Point,
-        stateChanger: InteractionStateChanger
-    ): boolean {
+    onTap(screenPosition: Point): boolean {
         if (this.actionbar) {
             const hitResult = onTapLayout(this.actionbar, screenPosition);
             if (hitResult.handled) {
                 console.log("tapped actionbar");
                 if (hitResult.data == "cancel") {
-                    stateChanger.pop(null);
+                    this.context.stateChanger.pop(null);
                 } else if (hitResult.data == "confirm") {
-                    stateChanger.clear();
+                    this.context.stateChanger.clear();
                     const actor = this.context.world.actors.getActor(
                         this.initialSelection
                     );
@@ -60,10 +57,7 @@ export class MoveState extends InteractionState {
         return false;
     }
 
-    onTileTap(
-        tile: GroundTile,
-        stateChanger: InteractionStateChanger
-    ): boolean {
+    onTileTap(tile: GroundTile): boolean {
         console.log("Tapped tile: ", tile);
         const newPath = this.context.world.findPath(this.initialSelection, {
             x: tile.tileX,

@@ -1,6 +1,18 @@
 import { clamp } from "../common/number";
 import { Point } from "../common/point";
 
+export enum HorizontalAlignment {
+    Left,
+    Center,
+    Right,
+}
+
+export enum VerticalAlignment {
+    Top,
+    Center,
+    Bottom,
+}
+
 export const uiAlignment = {
     topLeft: { x: -1, y: -1 },
     topCenter: { x: 0, y: -1 },

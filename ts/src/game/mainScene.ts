@@ -23,8 +23,16 @@ export class MainScene implements Scene {
         this.world.tick(tick);
     }
 
-    tap(worldPoint: Point): void {
-        this.interactionHandler.tap(worldPoint);
+    onTap(worldPoint: Point): void {
+        this.interactionHandler.onTap(worldPoint);
+    }
+
+    onTapDown(screenPoint: any): boolean {
+        return this.interactionHandler.onTapDown(screenPoint);
+    }
+
+    onTapUp(screenPoint: any): void {
+        this.interactionHandler.onTapUp(screenPoint);
     }
 
     input(action: InputAction): void {}
@@ -38,6 +46,8 @@ export class MainScene implements Scene {
 export interface Scene {
     drawScene(context: RenderContext): void;
     input(action: InputAction): void;
-    tap(screenPoint: Point): void;
+    onTapDown(screenPoint: Point): boolean;
+    onTapUp(screenPoint: Point): void;
+    onTap(screenPoint: Point): void;
     tick(tick: number): void;
 }

@@ -9,21 +9,17 @@ import { ActorSelectedItem, TileSelectedItem } from "./selection/selectedItem";
 import { SelectionState } from "./selection/selectionState";
 
 export class RootState extends InteractionState {
-    onTap(
-        screenPosition: Point,
-        stateChanger: InteractionStateChanger
+    /*     onTap(
+        screenPosition: Point
     ): boolean {
         if (withinRectangle(screenPosition, 16, 16, 48, 48)) {
             return true;
         } else {
             return false;
         }
-    }
+    } */
 
-    onTileTap(
-        tile: GroundTile,
-        stateChanger: InteractionStateChanger
-    ): boolean {
+    onTileTap(tile: GroundTile): boolean {
         console.log("RootState tap: ", tile);
         const actor = this.context.world.actors.getActor({
             x: tile.tileX,
@@ -32,10 +28,10 @@ export class RootState extends InteractionState {
 
         if (!!actor) {
             const actorSelection = new ActorSelectedItem(actor);
-            stateChanger.push(new SelectionState(actorSelection));
+            this.context.stateChanger.push(new SelectionState(actorSelection));
         } else {
             const tileSelection = new TileSelectedItem(tile);
-            stateChanger.push(new SelectionState(tileSelection));
+            this.context.stateChanger.push(new SelectionState(tileSelection));
         }
 
         return true;

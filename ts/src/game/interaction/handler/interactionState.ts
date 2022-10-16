@@ -1,6 +1,8 @@
 import { Point } from "../../../common/point";
 import { InputEvent } from "../../../input/input";
 import { RenderContext } from "../../../rendering/renderContext";
+import { UIEvent } from "../../../ui/event/uiEvent";
+import { UIView } from "../../../ui/uiView";
 import { GroundTile } from "../../entity/ground";
 import { InteractionStateChanger } from "./interactionStateChanger";
 import { StateContext } from "./stateContext";
@@ -12,6 +14,15 @@ import { StateContext } from "./stateContext";
  */
 export abstract class InteractionState {
     private _context: StateContext | undefined;
+    private _view: UIView | null = null;
+
+    public get view(): UIView | null {
+        return this._view;
+    }
+
+    protected set view(value: UIView | null) {
+        this._view = value;
+    }
     /**
      * The state context for this state, contains access to the world and other
      * components useful to a state.
@@ -39,17 +50,60 @@ export abstract class InteractionState {
     }
 
     /**
-     * A tap has occured at the given screen position. The coordinates are
-     * relative to the browser client viewport, not the entire computer screen.
-     * @param screenPosition The coordinate for the tap
-     * @param stateChanger The InteractionStateChanger that can be used to change
-     * to a different state
-     * @returns if the tap has been handled or not
+     *
+     * @param event
+     * @returns
      */
-    abstract onTap(
-        screenPosition: Point,
-        stateChanger: InteractionStateChanger
-    ): boolean;
+    dispatchUIEvent(event: UIEvent): boolean {
+        if (this._view) {
+            const handled = this._view.dispatchUIEvent(event);
+            return handled;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * A tap has occured on a tile in the world. Will not be called if onTap has
+     * returned true indicating that is has handled it. (To avoid clicks on UI)
+     * elements also causing a selection of a tile behind.
+     * @param tile the tile that was tapped
+     */
+    onTileTap(tile: GroundTile): boolean {
+        return false;
+    }
+
+    /**
+     * Called when this state becomes the active state, either by being popped
+     * back to, or the first time it becomes active. Will be called multiple
+     * times during its life if its shown or hidden
+     */
+    onActive(): void {}
+    /**
+     * Called when this state becomes inactive. Either from another state
+     * becomming active on to or from being removed.
+     */
+    onInactive(): void {}
+
+    /**
+     * Called when its time to render/draw anything this state wants to
+     * @param context The render context with access to camera and drawing methods
+     */
+    onDraw(context: RenderContext): void {
+        if (this._view) {
+            const start = performance.now();
+            if (this._view.isDirty) {
+                this._view.layout(context, {
+                    width: context.width,
+                    height: context.height,
+                });
+            }
+            this._view.updateTransform();
+            this._view.draw(context);
+            const end = performance.now();
+            console.log(`build state draw: ${end - start}`);
+        }
+    }
 
     /**
      * An input event has occured, like the directional keys or action key was
@@ -63,36 +117,4 @@ export abstract class InteractionState {
         input: InputEvent,
         stateChanger: InteractionStateChanger
     ): boolean;
-
-    /**
-     * Called when its time to render/draw anything this state wants to
-     * @param context The render context with access to camera and drawing methods
-     */
-    abstract onDraw(context: RenderContext): void;
-
-    /**
-     * A tap has occured on a tile in the world. Will not be called if onTap has
-     * returned true indicating that is has handled it. (To avoid clicks on UI)
-     * elements also causing a selection of a tile behind.
-     * @param tile the tile that was tapped
-     * @param stateChanger The InteractionStateChanger that can be used to change
-     * to a different state
-     */
-    onTileTap(
-        tile: GroundTile,
-        stateChanger: InteractionStateChanger
-    ): boolean {
-        return false;
-    }
-    /**
-     * Called when this state becomes the active state, either by being popped
-     * back to, or the first time it becomes active. Will be called multiple
-     * times during its life if its shown or hidden
-     */
-    onActive(): void {}
-    /**
-     * Called when this state becomes inactive. Either from another state
-     * becomming active on to or from being removed.
-     */
-    onInactive(): void {}
 }

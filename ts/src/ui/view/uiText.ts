@@ -32,6 +32,10 @@ export class UIText extends UIView {
         this._alignment = value;
     }
 
+    hitTest(screenPoint: Point): boolean {
+        return this.withinViewBounds(screenPoint);
+    }
+
     layout(layoutContext: UILayoutContext, constraints: UISize): UISize {
         const textSize = layoutContext.measureText(this._text, this._textStyle);
         let measuredSize = { width: 0, height: 0 };
@@ -76,5 +80,9 @@ export class UIText extends UIView {
             font: this._textStyle.font,
             size: this._textStyle.size,
         });
+    }
+
+    isInteractable(): boolean {
+        return false;
     }
 }

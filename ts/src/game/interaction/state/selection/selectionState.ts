@@ -1,8 +1,18 @@
 import { sprites } from "../../../../asset/sprite";
 import { withinRectangle } from "../../../../common/bounds";
 import { Point } from "../../../../common/point";
+import { allSides } from "../../../../common/sides";
 import { InputEvent } from "../../../../input/input";
 import { RenderContext } from "../../../../rendering/renderContext";
+import { subTitleTextStyle } from "../../../../rendering/text/textStyle";
+import { ninePatchBackground } from "../../../../ui/dsl/uiBackgroundDsl";
+import { uiBox } from "../../../../ui/dsl/uiBoxDsl";
+import { uiButton } from "../../../../ui/dsl/uiButtonDsl";
+import { uiColumn } from "../../../../ui/dsl/uiColumnDsl";
+import { RowChild, uiRow } from "../../../../ui/dsl/uiRowDsl";
+import { uiText } from "../../../../ui/dsl/uiTextDsl";
+import { uiAlignment } from "../../../../ui/uiAlignment";
+import { fillUiSize, UIView, wrapUiSize } from "../../../../ui/uiView";
 import { drawLayout, onTapLayout } from "../../../../ui/v1/layout/layout";
 import { LayoutNode } from "../../../../ui/v1/layout/layoutNode";
 import { actionbarView, ActionButton } from "../../../../ui/v1/view/actionbar";
@@ -23,8 +33,6 @@ import {
 
 export class SelectionState extends InteractionState {
     private selectedItem: SelectedItem;
-    private actions: ActionButton[] = [];
-    private actionbar: LayoutNode | null = null;
 
     constructor(tile: SelectedItem) {
         super();
@@ -35,41 +43,13 @@ export class SelectionState extends InteractionState {
         this.updateTileActions();
     }
 
-    onTap(
-        screenPosition: Point,
-        stateChanger: InteractionStateChanger
-    ): boolean {
+    /* 
+    onTap(screenPosition: Point): boolean {
         if (this.actionbar) {
             const hitResult = onTapLayout(this.actionbar, screenPosition);
             if (!hitResult.handled) {
                 //If the tap was not in our layout return false early
                 return false;
-            }
-
-            if (hitResult.data == "build") {
-                stateChanger.push(new BuildMenuState(), (value) => {
-                    console.log("Pop callback from build");
-                    if (value == true) {
-                        this.onBuildSelected();
-                    }
-                });
-            } else if (hitResult.data == "move") {
-                stateChanger.push(
-                    new MoveState(this.selectedItem.tilePosition)
-                );
-            } else if (hitResult.data == "chop") {
-                const selectedTile = this.selectedItem;
-                if (selectedTile instanceof TileSelectedItem) {
-                    this.context.world.jobQueue.schedule(
-                        new ChopTreeJob(selectedTile.tile)
-                    );
-                }
-
-                stateChanger.pop(null);
-            } else if (hitResult.data == "actions") {
-                stateChanger.push(new ActorActionsState());
-            } else if (hitResult.data == "cancel") {
-                stateChanger.pop(null);
             }
         }
 
@@ -78,12 +58,9 @@ export class SelectionState extends InteractionState {
         } else {
             return false;
         }
-    }
+    } */
 
-    onTileTap(
-        tile: GroundTile,
-        stateChanger: InteractionStateChanger
-    ): boolean {
+    onTileTap(tile: GroundTile): boolean {
         // If a new tile was tapped while in this state we move the cursor to it
         console.log("TileSelectedState - onTileTap: ", tile);
 
@@ -119,12 +96,13 @@ export class SelectionState extends InteractionState {
             y: cursorWorldPosition.y + 3,
         });
 
-        this.actionbar = actionbarView(context, this.actions);
-        drawLayout(context, this.actionbar);
+        super.onDraw(context);
     }
 
     private updateTileActions() {
-        this.actions = this.getTileActions(this.selectedItem.tilePosition);
+        const actions = this.getTileActions(this.selectedItem.tilePosition);
+        const actionbarView = this.getActionbarView(actions);
+        this.view = actionbarView;
     }
 
     private getTileActions(tilePosition: Point): ActionButton[] {
@@ -187,6 +165,87 @@ export class SelectionState extends InteractionState {
         }
 
         return [];
+    }
+
+    private getActionbarView(actions: ActionButton[]): UIView {
+        const actionbarButton = (action: ActionButton): RowChild => {
+            return {
+                child: uiColumn({
+                    width: wrapUiSize,
+                    height: wrapUiSize,
+                    children: [
+                        {
+                            child: uiButton({
+                                width: 48,
+                                height: 48,
+                                onTapCallback: () => {
+                                    console.log("Action tapped: ", action);
+                                    this.actionButtonPressed(action.id);
+                                },
+                                defaultBackground: ninePatchBackground({
+                                    asset: "stoneSlateBackground",
+                                }),
+                            }),
+                        },
+                        {
+                            child: uiText({
+                                width: wrapUiSize,
+                                height: wrapUiSize,
+                                text: action.name,
+                                style: subTitleTextStyle,
+                            }),
+                        },
+                    ],
+                }),
+            };
+        };
+
+        const buttons: RowChild[] = [];
+        for (const action of actions) {
+            buttons.push(actionbarButton(action));
+            buttons.push({ child: uiBox({ width: 8, height: 1 }) });
+        }
+        return uiBox({
+            width: fillUiSize,
+            height: fillUiSize,
+            padding: allSides(16),
+            alignment: uiAlignment.bottomLeft,
+            children: [
+                uiRow({
+                    width: wrapUiSize,
+                    height: wrapUiSize,
+                    children: buttons,
+                }),
+            ],
+        });
+    }
+
+    private actionButtonPressed(actionId: string) {
+        if (actionId == "build") {
+            this.context.stateChanger.push(new BuildMenuState(), (value) => {
+                console.log("Pop callback from build");
+                if (value == true) {
+                    this.onBuildSelected();
+                }
+            });
+        } else if (actionId == "move") {
+            this.context.stateChanger.push(
+                new MoveState(this.selectedItem.tilePosition)
+            );
+        } else if (actionId == "chop") {
+            const selectedTile = this.selectedItem;
+            if (selectedTile instanceof TileSelectedItem) {
+                this.context.world.jobQueue.schedule(
+                    new ChopTreeJob(selectedTile.tile)
+                );
+            }
+
+            this.context.stateChanger.pop(null);
+        } else if (actionId == "actions") {
+            this.context.stateChanger.push(new ActorActionsState());
+        } else if (actionId == "cancel") {
+            this.context.stateChanger.pop(null);
+        }
     }
 
     private onBuildSelected() {

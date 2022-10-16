@@ -25,6 +25,10 @@ export class UIBox extends UIView {
         this._background = background;
     }
 
+    hitTest(screenPoint: Point): boolean {
+        return !!this._background && this.withinViewBounds(screenPoint);
+    }
+
     layout(layoutContext: UILayoutContext, constraints: UISize): UISize {
         let widthConstraint = 0;
         let widthSize = 0;
@@ -137,5 +141,9 @@ export class UIBox extends UIView {
         for (const child of this.children) {
             child.draw(context);
         }
+    }
+
+    isInteractable(): boolean {
+        return this._background != null;
     }
 }

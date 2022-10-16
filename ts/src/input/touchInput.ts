@@ -1,4 +1,3 @@
-import { Event, EventListener } from "../common/event";
 import { distance, Point, subtractPoint } from "../common/point";
 
 export interface OnPanEvent {
@@ -6,26 +5,23 @@ export interface OnPanEvent {
     position: Point;
 }
 
+export type OnTapDownCallback = (position: Point) => boolean;
+export type OnPanCallback = (movement: Point, position: Point) => void;
+export type OnTapUpCallback = (movement: Point) => void;
+export type OnTapCallback = (position: Point) => void;
+
 export class TouchInput {
-    private canvasElement: HTMLCanvasElement;
     private isDragging: boolean = false;
     private onTapPosition: Point | null = null;
     private previousMovePosition: Point | null = null;
-    private _onPan: Event<OnPanEvent>;
-    private _onTap: Event<Point>;
+    private tapHandled: boolean = false;
 
-    public get onPan(): EventListener<OnPanEvent> {
-        return this._onPan;
-    }
-
-    public get onTap(): EventListener<Point> {
-        return this._onTap;
-    }
+    onPan: OnPanCallback | null = null;
+    onTap: OnTapCallback | null = null;
+    onTapDown: OnTapDownCallback | null = null;
+    onTapUp: OnTapUpCallback | null = null;
 
     constructor(canvasElement: HTMLCanvasElement) {
-        this.canvasElement = canvasElement;
-        this._onPan = new Event();
-        this._onTap = new Event();
         canvasElement.addEventListener(
             "touchstart",
             (event) => {
@@ -113,16 +109,22 @@ export class TouchInput {
         );
     }
     private onTapStart(position: Point) {
+        if (this.onTapDown) {
+            this.tapHandled = this.onTapDown(position);
+        }
         this.onTapPosition = position;
     }
 
     private onDrag(position: Point) {
+        if (this.tapHandled) {
+            return;
+        }
+
         if (this.isDragging && this.previousMovePosition) {
             const movement = subtractPoint(position, this.previousMovePosition);
-            this._onPan.publish({
-                movement: movement,
-                position: position,
-            });
+            if (this.onPan) {
+                this.onPan(movement, position);
+            }
         } else if (this.onTapPosition != null) {
             if (distance(this.onTapPosition, position) > 5) {
                 this.isDragging = true;
@@ -132,13 +134,22 @@ export class TouchInput {
     }
 
     private onTapEnded() {
-        if (this.isDragging) {
-            console.log("drag ended");
-        } else if (this.onTapPosition) {
-            this._onTap.publish(this.onTapPosition);
+        try {
+            if (this.isDragging) {
+                console.log("drag ended");
+            } else if (this.onTapPosition && this.onTap) {
+                if (this.onTapUp) {
+                    this.onTapUp(this.onTapPosition);
+                }
+                this.onTap(this.onTapPosition);
+            }
+        } catch (err) {
+            console.error("Failed ending tap", err);
+        } finally {
+            this.tapHandled = false;
+            this.isDragging = false;
+            this.onTapPosition = null;
+            this.previousMovePosition = null;
         }
-        this.isDragging = false;
-        this.onTapPosition = null;
-        this.previousMovePosition = null;
     }
 }

@@ -1,45 +1,8 @@
-import { ImageAsset } from "../../asset/assets";
-import { Sprite } from "../../asset/sprite";
 import { Point } from "../../common/point";
 import { UIRenderContext } from "../../rendering/uiRenderContext";
 import { UILayoutContext } from "../uiLayoutContext";
 import { fillUiSize, UISize, UIView, wrapUiSize } from "../uiView";
-
-export interface UIImageSource {
-    measure(layoutContext: UILayoutContext): UISize;
-    draw(context: UIRenderContext, screenposition: Point, size: UISize): void;
-}
-
-export class UISpriteImageSource implements UIImageSource {
-    constructor(private sprite: Sprite) {}
-    measure(layoutContext: UILayoutContext): UISize {
-        return layoutContext.measureSprite(this.sprite);
-    }
-    draw(context: UIRenderContext, screenposition: Point, size: UISize): void {
-        context.drawScreenSpaceSprite({
-            sprite: this.sprite,
-            x: screenposition.x,
-            y: screenposition.y,
-        });
-    }
-}
-
-export class UIAssetImageSource implements UIImageSource {
-    constructor(private asset: ImageAsset) {}
-    measure(layoutContext: UILayoutContext): UISize {
-        return layoutContext.measureImage(this.asset);
-    }
-    draw(context: UIRenderContext, screenposition: Point, size: UISize): void {
-        context.drawScreenSpaceImage(
-            {
-                image: this.asset,
-                x: screenposition.x,
-                y: screenposition.y,
-            },
-            1
-        );
-    }
-}
+import { UIImageSource } from "./uiImageSource";
 
 export class UIImage extends UIView {
     private _image: UIImageSource | null = null;
@@ -60,6 +23,10 @@ export class UIImage extends UIView {
 
     set scale(value: number) {
         this._scale = value;
+    }
+
+    hitTest(screenPoint: Point): boolean {
+        return this.withinViewBounds(screenPoint);
     }
 
     layout(layoutContext: UILayoutContext, constraints: UISize): UISize {
@@ -109,5 +76,8 @@ export class UIImage extends UIView {
     }
     draw(context: UIRenderContext): void {
         this._image?.draw(context, this.screenPosition, this._imageDrawSize);
+    }
+    isInteractable(): boolean {
+        return false;
     }
 }

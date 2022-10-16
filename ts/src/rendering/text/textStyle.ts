@@ -15,3 +15,9 @@ export const titleTextStyle: TextStyle = {
     font: "Silkscreen",
     size: 24,
 };
+
+export const subTitleTextStyle: TextStyle = {
+    color: "white",
+    font: "Silkscreen",
+    size: 16,
+};

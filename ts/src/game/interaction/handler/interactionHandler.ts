@@ -4,6 +4,7 @@ import { RenderContext } from "../../../rendering/renderContext";
 import { World } from "../../world";
 import { CommitableInteractionStateChanger } from "./interactionStateChanger";
 import { InteractionStateHistory } from "./interactionStateHistory";
+import { StateContext } from "./stateContext";
 
 /**
  * The interactionHandler recieves input taps and forward them to the currently
@@ -12,19 +13,48 @@ import { InteractionStateHistory } from "./interactionStateHistory";
 export class InteractionHandler {
     private camera: Camera;
     private world: World;
+    private interactionStateChanger: CommitableInteractionStateChanger;
     private history: InteractionStateHistory;
 
     constructor(world: World, camera: Camera) {
+        this.interactionStateChanger = new CommitableInteractionStateChanger();
         this.world = world;
         this.camera = camera;
-        this.history = new InteractionStateHistory({
-            world: world,
+        const stateContext: StateContext = {
+            world: this.world,
+            stateChanger: this.interactionStateChanger,
+        };
+        this.history = new InteractionStateHistory(stateContext);
+    }
+
+    onTapUp(screenPoint: Point) {
+        this.history.state.dispatchUIEvent({
+            type: "tapEnd",
+            position: screenPoint,
         });
     }
 
-    tap(screenPoint: Point): void {
-        const stateChanger = new CommitableInteractionStateChanger();
-        const onTapResult = this.history.state.onTap(screenPoint, stateChanger);
+    onTapDown(screenPoint: Point): boolean {
+        const state = this.history.state;
+        const stateHandledTap = state.dispatchUIEvent({
+            type: "tapStart",
+            position: screenPoint,
+        });
+        //If the tap was not handled but the state is a modal it is still
+        //considered handled by the handler. so that tapping the faded overlay
+        //pops the state
+        if (!stateHandledTap && state.isModal) {
+            return true;
+        } else {
+            return stateHandledTap;
+        }
+    }
+
+    onTap(screenPoint: Point): void {
+        const onTapResult = this.history.state.dispatchUIEvent({
+            type: "tap",
+            position: screenPoint,
+        });
 
         //If the tap was not handled check if it will be handled in tilespace
         if (!onTapResult) {
@@ -45,22 +75,19 @@ export class InteractionHandler {
             // Check if a tile was clicked at this position
             const tile = this.world.ground.getTile(tilePosition);
             if (tile) {
-                const tileTapHandled = this.history.state.onTileTap(
-                    tile,
-                    stateChanger
-                );
+                const tileTapHandled = this.history.state.onTileTap(tile);
 
                 // If the tap is not handled we treat it as a clear
                 if (!tileTapHandled) {
-                    stateChanger.clear();
+                    this.interactionStateChanger.clear();
                 }
             } else {
                 // Tap was not handled and we did not tap a tile
-                stateChanger.clear();
+                this.interactionStateChanger.clear();
             }
         }
 
-        stateChanger.apply(this.history);
+        this.interactionStateChanger.apply(this.history);
     }
 
     onDraw(renderContext: RenderContext) {

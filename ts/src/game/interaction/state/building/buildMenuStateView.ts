@@ -1,12 +1,17 @@
 import { sprites } from "../../../../asset/sprite";
 import { allSides, symmetricSides } from "../../../../common/sides";
-import { titleTextStyle } from "../../../../rendering/text/textStyle";
+import {
+    subTitleTextStyle,
+    titleTextStyle,
+} from "../../../../rendering/text/textStyle";
 import { uiAlignment } from "../../../../ui/uiAlignment";
 import { NinePatchBackground } from "../../../../ui/uiBackground";
 import { fillUiSize, UIView, wrapUiSize } from "../../../../ui/uiView";
 import { UIBox } from "../../../../ui/view/uiBox";
+import { UIButton } from "../../../../ui/view/uiButton";
 import { UIColumn } from "../../../../ui/view/uiColumn";
-import { UIImage, UISpriteImageSource } from "../../../../ui/view/uiImage";
+import { UIImage } from "../../../../ui/view/uiImage";
+import { UISpriteImageSource } from "../../../../ui/view/uiImageSource";
 import { UIRow } from "../../../../ui/view/uiRow";
 import { UIText } from "../../../../ui/view/uiText";
 
@@ -53,24 +58,32 @@ export function buildMenuStateView(): UIView {
         })
     );
 
-    menuColumn.addView(buildItemView());
+    menuColumn.addView(buildItemView(1));
     menuColumn.addView(new UIBox({ width: fillUiSize, height: 8 }));
-    menuColumn.addView(buildItemView());
+    menuColumn.addView(buildItemView(2));
 
     container.addView(menuColumn);
     rootView.addView(container);
     return rootView;
 }
 
-function buildItemView(): UIView {
-    const container = new UIBox({
+function buildItemView(number: number): UIView {
+    const container = new UIButton({
         width: fillUiSize,
         height: wrapUiSize,
     });
+    container.onTapCallback = () => {
+        console.log(`Tapped on button: ${number}`);
+    };
 
-    container.background = new NinePatchBackground(
-        "fancyWoodBackground",
-        allSides(8),
+    container.defaultBackground = new NinePatchBackground(
+        "stoneSlateBorder",
+        allSides(6),
+        4
+    );
+    container.onTappedBackground = new NinePatchBackground(
+        "stoneSlateBorderSelected",
+        allSides(6),
         4
     );
     container.padding = allSides(16);
@@ -96,7 +109,7 @@ function buildItemView(): UIView {
         width: fillUiSize,
         height: wrapUiSize,
     });
-
+    text.textStyle = subTitleTextStyle;
     text.text = "Wooden House";
     text.id = "labelhouse";
     row.addView(image);

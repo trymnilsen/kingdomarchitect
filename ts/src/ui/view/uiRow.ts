@@ -1,13 +1,9 @@
+import { Point } from "../../common/point";
 import { UIRenderContext } from "../../rendering/uiRenderContext";
+import { VerticalAlignment } from "../uiAlignment";
 import { UILayoutContext } from "../uiLayoutContext";
 import { fillUiSize, UISize, UIView, wrapUiSize } from "../uiView";
 import { AxisPlacement, insertAndShift } from "./axisPlacement";
-
-export enum VerticalAlignment {
-    Top,
-    Center,
-    Bottom,
-}
 
 export class UIRow extends UIView {
     private weights: { [view: string]: number } = {};
@@ -45,6 +41,10 @@ export class UIRow extends UIView {
         }
 
         super.addView(view);
+    }
+
+    hitTest(screenPoint: Point): boolean {
+        return false;
     }
 
     layout(context: UILayoutContext, constraints: UISize): UISize {
@@ -150,5 +150,9 @@ export class UIRow extends UIView {
         for (const child of this.children) {
             child.draw(context);
         }
+    }
+
+    isInteractable(): boolean {
+        return false;
     }
 }

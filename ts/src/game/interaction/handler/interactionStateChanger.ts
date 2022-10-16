@@ -65,6 +65,9 @@ export class CommitableInteractionStateChanger
                     break;
             }
         }
+        // Clear the list of pending operations so that we don't re-apply
+        // an operation later
+        this.operations = [];
     }
 }
 
