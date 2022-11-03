@@ -56,7 +56,7 @@ class UITextWithIcon extends UIView {
     }
 
     layout(layoutContext: UILayoutContext, constraints: UISize): UISize {
-        throw new Error("Method not implemented.");
+        throw new Error("Method not implemented");
     }
     draw(context: UIRenderContext): void {
         throw new Error("Method not implemented.");

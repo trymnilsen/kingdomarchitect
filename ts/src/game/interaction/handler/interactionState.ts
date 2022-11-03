@@ -82,8 +82,12 @@ export abstract class InteractionState {
     /**
      * Called when this state becomes inactive. Either from another state
      * becomming active on to or from being removed.
+     * Overriding implementions should call super.onInactive to ensure that
+     * the view is properly disposed
      */
-    onInactive(): void {}
+    onInactive(): void {
+        this._view?.dispose();
+    }
 
     /**
      * Called when its time to render/draw anything this state wants to

@@ -14,6 +14,7 @@ import { UIImage } from "../../../../ui/view/uiImage";
 import { UISpriteImageSource } from "../../../../ui/view/uiImageSource";
 import { UIRow } from "../../../../ui/view/uiRow";
 import { UIText } from "../../../../ui/view/uiText";
+import { SelectedBuildingUiActionType } from "./selectedBuildingUiAction";
 
 export function buildMenuStateView(): UIView {
     const rootView = new UIBox({
@@ -74,6 +75,10 @@ function buildItemView(number: number): UIView {
     });
     container.onTapCallback = () => {
         console.log(`Tapped on button: ${number}`);
+        container.bubbleAction({
+            type: SelectedBuildingUiActionType,
+            data: {},
+        });
     };
 
     container.defaultBackground = new NinePatchBackground(

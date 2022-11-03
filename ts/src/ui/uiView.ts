@@ -5,10 +5,16 @@ import { UIRenderContext } from "../rendering/uiRenderContext";
 import { UILayoutContext } from "./uiLayoutContext";
 import { Bounds, withinRectangle, zeroBounds } from "../common/bounds";
 import { UIEvent } from "./event/uiEvent";
+import { Event, EventListener } from "../common/event";
 
 export interface UISize {
     height: number;
     width: number;
+}
+
+export interface UIAction {
+    type: string;
+    data: unknown;
 }
 
 export const wrapUiSize = -1;
@@ -22,6 +28,7 @@ export abstract class UIView {
     private _size: UISize;
     private _id: string | null = null;
     private _children: UIView[] = [];
+    private _uiAction: Event<UIAction> = new Event();
     protected _measuredSize: UISize | null = null;
     protected _isDirty: boolean = true;
 
@@ -76,6 +83,9 @@ export abstract class UIView {
     get isDirty(): boolean {
         return this._isDirty;
     }
+    get uiAction(): EventListener<UIAction> {
+        return this._uiAction;
+    }
 
     constructor(size: UISize) {
         if (size.width < fillUiSize) {
@@ -88,6 +98,21 @@ export abstract class UIView {
         this._size = size;
     }
 
+    /**
+     * Dispose the resources this view is holding. Will be called when the view
+     * is removed from the interaction state or if this view is a child of
+     * another view and it is being removed from that view.
+     * Any inherited classes should call super.dispose to ensure that all
+     * resources are properly handled.
+     */
+    dispose() {
+        this._uiAction.dispose();
+    }
+
+    /**
+     * Adds a child view to the view. Views added should not have a parent.
+     * @param view the view to add
+     */
     addView(view: UIView) {
         if (view.parent != null) {
             throw new Error("Attempted to add view already added to a parent");
@@ -100,10 +125,19 @@ export abstract class UIView {
         this._children.push(view);
     }
 
+    /**
+     * Removes a child view from this view. Will call dispose on the
+     * view that is removed from this view
+     * @param view the view to remove
+     */
     removeView(view: UIView) {
         //
     }
 
+    /**
+     * Update the screen position of the children for this view based on their
+     * offset position
+     */
     updateTransform() {
         if (this.parent) {
             this._screenPosition = addPoint(
@@ -119,6 +153,13 @@ export abstract class UIView {
         }
     }
 
+    /**
+     * Checks if the point is within the bounds of this view. Mostly used for
+     * checking if a tap is considered inside this view. Does not handle the
+     * hit testing, this is handled by `hitTest`.
+     * @param point the point in screen space to test if is within this view
+     * @returns true if within, false if not
+     */
     withinViewBounds(point: Point): boolean {
         return withinRectangle(
             point,
@@ -129,17 +170,46 @@ export abstract class UIView {
         );
     }
 
+    /**
+     * Called when a tap is registered down. Will only trigged if the
+     * screenpoint is considered within this view
+     * @param screenPoint the position the tap started at
+     * @returns true if this tap was consumed by this view. Defaults to false
+     */
     onTapDown(screenPoint: Point): boolean {
         return false;
     }
+    /**
+     * Called when a tap is registered as no-longer down.
+     * @param screenPoint the position of this tap event
+     */
+    onTapUp(screenPoint: Point) {}
+    /**
+     * Called when a tap is registered as both up and down within this view.
+     * @param screenPoint the position this event occured at.
+     * @returns true if this tap was handled by the view. Defaults to false
+     */
     onTap(screenPoint: Point): boolean {
         return false;
     }
-    onTapUp(screenPoint: Point) {}
 
     /**
-     *
-     * @param event
+     * Bubble a `UIAction` upwards to parents.
+     * Will first trigger the views `uiAction` event listeners and then pass
+     * on the action to any parents.
+     * @param action the action to bubble upwards
+     */
+    bubbleAction(action: UIAction): void {
+        this._uiAction.publish(action);
+        if (this._parent) {
+            this._parent.bubbleAction(action);
+        }
+    }
+    /**
+     * Dispatch a UIEvent. Will check if the event is within the bounds of this
+     * view and dispatch it to children if it is.
+     * @param event the event to dispatch
+     * @returns if the event was consumed by any children
      */
     dispatchUIEvent(event: UIEvent): boolean {
         let handled = false;
@@ -196,5 +266,8 @@ export abstract class UIView {
         constraints: UISize
     ): UISize;
 
+    /**
+     * Request to draw this view
+     */
     abstract draw(context: UIRenderContext): void;
 }

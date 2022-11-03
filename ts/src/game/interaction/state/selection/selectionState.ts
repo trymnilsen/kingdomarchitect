@@ -184,6 +184,7 @@ export class SelectionState extends InteractionState {
                                 },
                                 defaultBackground: ninePatchBackground({
                                     asset: "stoneSlateBackground",
+                                    scale: 2,
                                 }),
                             }),
                         },

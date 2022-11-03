@@ -97,8 +97,8 @@ export class MoveState extends InteractionState {
 
             if (!pointEquals(pathWorldPosition, cursorWorldPosition)) {
                 context.drawRectangle({
-                    x: pathWorldPosition.x + TileSize / 2 - 5,
-                    y: pathWorldPosition.y + TileSize / 2 - 5,
+                    x: pathWorldPosition.x + TileSize / 2 - 6,
+                    y: pathWorldPosition.y + TileSize / 2 - 6,
                     width: 8,
                     height: 8,
                     fill: "purple",
