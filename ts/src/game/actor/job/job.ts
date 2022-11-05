@@ -16,9 +16,22 @@ export abstract class Job {
     private _actor: Actor | null = null;
     private _jobState: JobState = JobState.NotStarted;
     private _constraint: JobConstraint | null = null;
+    private _startTick: number = 0;
+
+    public get startTick(): number {
+        return this._startTick;
+    }
+    public set startTick(value: number) {
+        if (this._startTick != 0) {
+            throw new InvalidStateError(
+                "Cannot set start tick after it is set"
+            );
+        }
+        this._startTick = value;
+    }
 
     public get constraint(): JobConstraint | null {
-        return null;
+        return this._constraint;
     }
 
     /**
@@ -81,6 +94,10 @@ export abstract class Job {
      * Set the actor this job is assigned to
      */
     public set actor(actor: Actor) {
+        if (!actor) {
+            throw new Error("attempted to set actor to null");
+        }
+
         this._actor = actor;
     }
 
@@ -91,7 +108,8 @@ export abstract class Job {
     }
 
     /**
-     * Update this job
+     * Request to update this job. Called when attached to an actor and running
+     * as their active job. Any inherited methods should call `super.update`.
      * @param tick the game tick
      */
     abstract update(tick: number): void;

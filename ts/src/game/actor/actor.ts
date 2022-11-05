@@ -5,6 +5,7 @@ import { addPoint, Point } from "../../common/point";
 import { RenderContext } from "../../rendering/renderContext";
 import { World } from "../world";
 import { Job, JobState } from "./job/job";
+import { InvalidStateError } from "../../common/error/invalidStateError";
 
 /**
  * Actors is the base for all interactive objects in the game world.
@@ -65,8 +66,12 @@ export abstract class Actor {
      * @param tick the current world tick number
      */
     onUpdate(tick: number) {
-        if (this._job) {
-            this._job.update(tick);
+        const job = this._job;
+        if (job) {
+            if (job.startTick == 0) {
+                job.startTick = tick;
+            }
+            job.update(tick);
         }
     }
 
@@ -75,6 +80,11 @@ export abstract class Actor {
      * @param job the job to assign to this actor
      */
     assignJob(job: Job) {
+        if (this._job == job) {
+            throw new InvalidStateError(
+                `Job ${job} already assigned to actor ${this}`
+            );
+        }
         job.actor = this;
         job.onStart();
         job.jobState = JobState.Running;

@@ -71,7 +71,10 @@ export class TouchInput {
             "mouseleave",
             (event) => {
                 event.preventDefault();
-                this.onTapEnded();
+                this.onTapEnded({
+                    x: event.clientX,
+                    y: event.clientY,
+                });
             },
             { passive: false }
         );
@@ -79,7 +82,10 @@ export class TouchInput {
             "mouseout",
             (event) => {
                 event.preventDefault();
-                this.onTapEnded();
+                this.onTapEnded({
+                    x: event.clientX,
+                    y: event.clientY,
+                });
             },
             { passive: false }
         );
@@ -87,7 +93,10 @@ export class TouchInput {
             "mouseup",
             (event) => {
                 event.preventDefault();
-                this.onTapEnded();
+                this.onTapEnded({
+                    x: event.clientX,
+                    y: event.clientY,
+                });
             },
             { passive: false }
         );
@@ -95,7 +104,10 @@ export class TouchInput {
             "touchend",
             (event) => {
                 event.preventDefault();
-                this.onTapEnded();
+                this.onTapEnded({
+                    x: event.touches[0].clientX,
+                    y: event.touches[0].clientY,
+                });
             },
             { passive: false }
         );
@@ -103,7 +115,10 @@ export class TouchInput {
             "touchcancel",
             (event) => {
                 event.preventDefault();
-                this.onTapEnded();
+                this.onTapEnded({
+                    x: event.touches[0].clientX,
+                    y: event.touches[0].clientY,
+                });
             },
             { passive: false }
         );
@@ -133,15 +148,15 @@ export class TouchInput {
         this.previousMovePosition = position;
     }
 
-    private onTapEnded() {
+    private onTapEnded(position: Point) {
         try {
             if (this.isDragging) {
                 console.log("drag ended");
             } else if (this.onTapPosition && this.onTap) {
                 if (this.onTapUp) {
-                    this.onTapUp(this.onTapPosition);
+                    this.onTapUp(position);
                 }
-                this.onTap(this.onTapPosition);
+                this.onTap(position);
             }
         } catch (err) {
             console.error("Failed ending tap", err);

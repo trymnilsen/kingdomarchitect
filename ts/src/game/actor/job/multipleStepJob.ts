@@ -45,11 +45,13 @@ export abstract class MultipleStepJob extends Job {
     }
 
     private runJob(subJob: Job) {
+        console.log(`Starting multiple step job for actor`, subJob, this.actor);
         subJob.jobState = JobState.Running;
         subJob.actor = this.actor;
         subJob.onStart();
         // Listen to completion on the subJob
         subJob.completedEvent.listenOnce(() => {
+            console.log(`Multiple step job finished`, subJob, this.actor);
             this.subJobCompleted();
         });
     }

@@ -10,7 +10,7 @@ import { InteractionState } from "../handler/interactionState";
 import { InteractionStateChanger } from "../handler/interactionStateChanger";
 import { actionbarView, ActionButton } from "../../../ui/v1/view/actionbar";
 import { LayoutNode } from "../../../ui/v1/layout/layoutNode";
-import { MoveToJob } from "../../actor/jobs/moveToJob";
+import { MoveJob } from "../../actor/jobs/moveJob";
 
 export class MoveState extends InteractionState {
     private tileSpaceSelection: Point | null;
@@ -47,7 +47,7 @@ export class MoveState extends InteractionState {
                         this.initialSelection
                     );
                     if (actor && this.path) {
-                        actor?.assignJob(new MoveToJob(this.path));
+                        actor?.assignJob(new MoveJob(this.path));
                     }
                 }
 

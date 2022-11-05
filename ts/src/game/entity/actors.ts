@@ -119,7 +119,7 @@ export class Actors {
             // Check if the job is applicable for the actor. If no constraint
             // is set on the job it is considered applicable
             const isJobApplicableForActor =
-                job.constraint?.isActorApplicableForJob(job, actor) || true;
+                job.constraint?.isActorApplicableForJob(job, actor);
 
             return isJobApplicableForActor;
         });
@@ -132,6 +132,8 @@ export class Actors {
                 console.log("Actor was idle, assinging job to it", actor, job);
                 actor.assignJob(job);
             }
+        } else {
+            console.log(`No actors idle for job ${job.constructor.name} yet`);
         }
     }
 
@@ -142,7 +144,7 @@ export class Actors {
     private requestNewJob(actor: Actor) {
         // Filter out jobs that are not applicable for this actor
         const availableJobs = this._jobQueue.pendingJobs.filter((job) => {
-            return job.constraint?.isActorApplicableForJob(job, actor) || true;
+            return job.constraint?.isActorApplicableForJob(job, actor);
         });
         // pick the first applicable job
         let job: Job | null | undefined = availableJobs[0];

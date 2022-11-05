@@ -105,7 +105,7 @@ export abstract class InteractionState {
             this._view.updateTransform();
             this._view.draw(context);
             const end = performance.now();
-            console.log(`build state draw: ${end - start}`);
+            //console.log(`build state draw: ${end - start}`);
         }
     }
 

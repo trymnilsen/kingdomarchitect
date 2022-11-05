@@ -5,7 +5,7 @@ import { manhattanDistance } from "../../path/pathHeuristics";
 import { Actor } from "./actor";
 import { ActorInstanceJobConstraint } from "./job/constraint/actorInstanceConstraint";
 import { Job } from "./job/job";
-import { MoveToJob } from "./jobs/moveToJob";
+import { MoveJob } from "./jobs/moveJob";
 
 export class FoxActor extends Actor {
     constructor(initialPoint: Point) {
@@ -33,6 +33,6 @@ export class FoxActor extends Actor {
             y: randomSpot.tileY,
         });
 
-        return new MoveToJob(path, new ActorInstanceJobConstraint(this));
+        return new MoveJob(path, new ActorInstanceJobConstraint(this));
     }
 }

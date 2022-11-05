@@ -16,9 +16,13 @@ import { fillUiSize, UIView, wrapUiSize } from "../../../../ui/uiView";
 import { drawLayout, onTapLayout } from "../../../../ui/v1/layout/layout";
 import { LayoutNode } from "../../../../ui/v1/layout/layoutNode";
 import { actionbarView, ActionButton } from "../../../../ui/v1/view/actionbar";
+import { BuildJob } from "../../../actor/jobs/buildJob";
 import { ChopTreeJob } from "../../../actor/jobs/chopTreeJob";
 import { SwordsmanActor } from "../../../actor/swordsmanActor";
-import { woodHouseEntity } from "../../../entity/building/woodenHouseEntity";
+import {
+    woodHouseEntity,
+    woodHouseScaffold,
+} from "../../../entity/building/woodenHouseEntity";
 import { GroundTile } from "../../../entity/ground";
 import { InteractionState } from "../../handler/interactionState";
 import { InteractionStateChanger } from "../../handler/interactionStateChanger";
@@ -252,8 +256,13 @@ export class SelectionState extends InteractionState {
     private onBuildSelected() {
         console.log("Build was selected");
         this.context.world.buildings.add(
-            woodHouseEntity(this.selectedItem.tilePosition)
+            woodHouseScaffold(this.selectedItem.tilePosition)
         );
         this.context.world.invalidateWorld();
+        if (this.selectedItem instanceof TileSelectedItem) {
+            this.context.world.jobQueue.schedule(
+                new BuildJob(this.selectedItem.tile)
+            );
+        }
     }
 }

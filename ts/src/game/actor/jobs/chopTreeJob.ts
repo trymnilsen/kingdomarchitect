@@ -8,7 +8,7 @@ import { Job } from "../job/job";
 import { JobConstraint } from "../job/jobConstraint";
 import { JobConstraintsError } from "../job/jobConstraintsError";
 import { MultipleStepJob } from "../job/multipleStepJob";
-import { MoveToJob } from "./moveToJob";
+import { MoveJob } from "./moveJob";
 
 /**
  * Represents a multistep job that will move towards a tree and then chop
@@ -47,7 +47,7 @@ export class ChopTreeJob extends MultipleStepJob {
                 throw new JobConstraintsError("Unable to find path to job");
             }
 
-            subJobs.push(new MoveToJob(path));
+            subJobs.push(new MoveJob(path));
         }
 
         subJobs.push(new _ChopTreeJob(this.tile));
@@ -57,7 +57,6 @@ export class ChopTreeJob extends MultipleStepJob {
 
 class _ChopTreeJob extends Job {
     private tile: GroundTile;
-    private startTick = 0;
     private blinkingAnimation: BlinkingImageAnimation;
 
     constructor(tile: GroundTile) {
@@ -71,10 +70,6 @@ class _ChopTreeJob extends Job {
     }
 
     update(tick: number): void {
-        if (this.startTick == 0) {
-            this.startTick = tick;
-        }
-
         const elapsedTicks = tick - this.startTick;
         if (elapsedTicks > 2) {
             this.tile.hasTree = 0.0;

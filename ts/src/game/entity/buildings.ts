@@ -6,13 +6,16 @@ import { getTileId, TileSize } from "./tile";
 
 export class Buildings {
     private tiles: { [id: string]: BuildingTile } = {};
+
     getTile(tileId: string): BuildingTile {
         return this.tiles[tileId];
     }
+
     add(building: BuildingTile) {
         const tileId = getTileId(building.x, building.y);
         this.tiles[tileId] = building;
     }
+
     onDraw(renderContext: RenderContext) {
         for (const tile of Object.values(this.tiles)) {
             const offset = tile.offset || { x: 0, y: 0 };

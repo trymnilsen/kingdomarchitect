@@ -7,7 +7,10 @@ import { foxSprite } from "./sprites/foxSprite";
 import { keepSprite } from "./sprites/keepSprite";
 import { swordsManSprite } from "./sprites/swordsmanSprite";
 import { treeSprite, treeSprite2, treeSprite3 } from "./sprites/treeSprite";
-import { woodenHouseSprite } from "./sprites/woodHouseSprite";
+import {
+    woodenHouseScaffold,
+    woodenHouseSprite,
+} from "./sprites/woodHouseSprite";
 
 export type Sprite = {
     bounds: Bounds;
@@ -16,6 +19,7 @@ export type Sprite = {
 
 export const sprites = {
     woodHouse: woodenHouseSprite,
+    woodHouseScaffold: woodenHouseScaffold,
     cursor: cursorSprite,
     tree: treeSprite,
     tree2: treeSprite2,

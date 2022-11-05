@@ -8,3 +8,11 @@ export function woodHouseEntity(point: Point): BuildingTile {
         sprite: "woodHouse",
     };
 }
+
+export function woodHouseScaffold(point: Point): BuildingTile {
+    return {
+        x: point.x,
+        y: point.y,
+        sprite: "woodHouseScaffold",
+    };
+}
