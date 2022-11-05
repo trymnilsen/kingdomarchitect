@@ -18,7 +18,7 @@ export abstract class MultipleStepJob extends Job {
         }
     }
 
-    onDraw(renderContext: RenderContext) {
+    override onDraw(renderContext: RenderContext) {
         const job = this.jobs[0];
         if (job) {
             job.onDraw(renderContext);

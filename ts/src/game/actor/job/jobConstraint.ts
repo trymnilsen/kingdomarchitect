@@ -1,5 +1,4 @@
 import { Actor } from "../actor";
-import { FarmerActor } from "../farmerActor";
 import { Job } from "./job";
 
 export interface JobConstraint {

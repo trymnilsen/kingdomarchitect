@@ -1,5 +1,4 @@
 import { sprites } from "../../../../asset/sprite";
-import { withinRectangle } from "../../../../common/bounds";
 import { Point } from "../../../../common/point";
 import { allSides } from "../../../../common/sides";
 import { InputEvent } from "../../../../input/input";
@@ -13,16 +12,11 @@ import { RowChild, uiRow } from "../../../../ui/dsl/uiRowDsl";
 import { uiText } from "../../../../ui/dsl/uiTextDsl";
 import { uiAlignment } from "../../../../ui/uiAlignment";
 import { fillUiSize, UIView, wrapUiSize } from "../../../../ui/uiView";
-import { drawLayout, onTapLayout } from "../../../../ui/v1/layout/layout";
-import { LayoutNode } from "../../../../ui/v1/layout/layoutNode";
-import { actionbarView, ActionButton } from "../../../../ui/v1/view/actionbar";
+import { ActionButton } from "../../../../ui/v1/view/actionbar";
 import { BuildJob } from "../../../actor/jobs/buildJob";
 import { ChopTreeJob } from "../../../actor/jobs/chopTreeJob";
 import { SwordsmanActor } from "../../../actor/swordsmanActor";
-import {
-    woodHouseEntity,
-    woodHouseScaffold,
-} from "../../../entity/building/woodenHouseEntity";
+import { woodHouseScaffold } from "../../../entity/building/woodenHouseEntity";
 import { GroundTile } from "../../../entity/ground";
 import { InteractionState } from "../../handler/interactionState";
 import { InteractionStateChanger } from "../../handler/interactionStateChanger";
@@ -43,7 +37,7 @@ export class SelectionState extends InteractionState {
         this.selectedItem = tile;
     }
 
-    onActive(): void {
+    override onActive(): void {
         this.updateTileActions();
     }
 
@@ -64,7 +58,7 @@ export class SelectionState extends InteractionState {
         }
     } */
 
-    onTileTap(tile: GroundTile): boolean {
+    override onTileTap(tile: GroundTile): boolean {
         // If a new tile was tapped while in this state we move the cursor to it
         console.log("TileSelectedState - onTileTap: ", tile);
 
@@ -89,7 +83,7 @@ export class SelectionState extends InteractionState {
         return false;
     }
 
-    onDraw(context: RenderContext): void {
+    override onDraw(context: RenderContext): void {
         const cursorWorldPosition = context.camera.tileSpaceToWorldSpace(
             this.selectedItem.tilePosition
         );

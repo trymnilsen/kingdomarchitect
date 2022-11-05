@@ -1,4 +1,4 @@
-import { addPoint, multiplyPoint, Point, zeroPoint } from "../common/point";
+import { addPoint, multiplyPoint, Point } from "../common/point";
 import { TileSize } from "../game/entity/tile";
 
 export class Camera {

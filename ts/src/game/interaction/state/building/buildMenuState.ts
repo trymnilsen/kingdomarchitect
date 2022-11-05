@@ -1,17 +1,12 @@
-import { withinRectangle } from "../../../../common/bounds";
-import { Point } from "../../../../common/point";
-import { allSides } from "../../../../common/sides";
 import { InputEvent } from "../../../../input/input";
-import { RenderContext } from "../../../../rendering/renderContext";
-import { UIAction, UIView } from "../../../../ui/uiView";
-import { GroundTile } from "../../../entity/ground";
+import { UIAction } from "../../../../ui/uiView";
 import { InteractionState } from "../../handler/interactionState";
 import { InteractionStateChanger } from "../../handler/interactionStateChanger";
 import { buildMenuStateView } from "./buildMenuStateView";
 import { SelectedBuildingUiActionType } from "./selectedBuildingUiAction";
 
 export class BuildMenuState extends InteractionState {
-    get isModal(): boolean {
+    override get isModal(): boolean {
         return true;
     }
 

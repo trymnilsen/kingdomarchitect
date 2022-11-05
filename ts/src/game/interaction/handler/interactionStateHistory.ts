@@ -1,6 +1,5 @@
 import { RootState } from "../state/rootState";
 import { InteractionState } from "./interactionState";
-import { InteractionStateChanger } from "./interactionStateChanger";
 import { StateContext } from "./stateContext";
 
 interface InteractionStateHistoryEntry {

@@ -1,12 +1,10 @@
 import { ImageAsset } from "../../asset/assets";
-import { Sprite } from "../../asset/sprite";
 import { allSides, Sides } from "../../common/sides";
 import {
     ColorBackground,
     NinePatchBackground,
     UIBackground,
 } from "../uiBackground";
-import { UISpriteImageSource } from "../view/uiImageSource";
 
 export function colorBackground(color: string): UIBackground {
     return new ColorBackground(color);

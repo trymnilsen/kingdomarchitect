@@ -1,7 +1,4 @@
 import { Event, EventListener } from "../../../common/event";
-import { Actors } from "../../entity/actors";
-import { World } from "../../world";
-import { Actor } from "../actor";
 import { Job } from "./job";
 
 /**

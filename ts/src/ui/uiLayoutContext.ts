@@ -1,4 +1,4 @@
-import { assets, ImageAsset } from "../asset/assets";
+import { ImageAsset } from "../asset/assets";
 import { Sprite } from "../asset/sprite";
 import { TextStyle } from "../rendering/text/textStyle";
 import { UISize } from "./uiView";

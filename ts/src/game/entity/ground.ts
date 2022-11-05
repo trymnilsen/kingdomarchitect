@@ -2,7 +2,7 @@ import { sprites } from "../../asset/sprite";
 import { Bounds, getBoundsAxis } from "../../common/bounds";
 import { Axis, Direction } from "../../common/direction";
 import { adjacentPoint, Point } from "../../common/point";
-import { NumberRange, rangeDistance, rangeRandom } from "../../common/range";
+import { rangeDistance, rangeRandom } from "../../common/range";
 import { RenderContext } from "../../rendering/renderContext";
 import { getTileId, TileSize } from "./tile";
 
@@ -54,7 +54,7 @@ export class Ground {
 
     generate() {
         //console.log("Generate based on current tiles", this.tiles);
-        const renderStart = performance.now();
+        //const renderStart = performance.now();
         const newTilePosition = generateGround(this.tiles);
         if (newTilePosition.x == 0 && newTilePosition.y == 0) {
             console.warn("Unable to generate tile position");
@@ -66,7 +66,7 @@ export class Ground {
             };
         }
 
-        const renderEnd = performance.now();
+        //const renderEnd = performance.now();
         //console.log("⏱generate ground time: ", renderEnd - renderStart);
     }
 
@@ -142,9 +142,9 @@ export function getTileBounds(entries: [string, GroundTile][]): Bounds {
 
 export function generateGround(tiles: { [id: string]: GroundTile }): Point {
     const entries = Object.entries(tiles);
-    const boundsStart = performance.now();
+    //const boundsStart = performance.now();
     const bounds = getTileBounds(entries);
-    const boundsEnd = performance.now();
+    //const boundsEnd = performance.now();
     //console.log("⏱get bounds time: ", boundsEnd - boundsStart);
     const side = Math.floor(Math.random() * 4);
 
@@ -187,7 +187,7 @@ export function generateGround(tiles: { [id: string]: GroundTile }): Point {
     let tilePoint: Point = { x: 0, y: 0 };
     let lastSearchPoint = { x, y };
     //console.log("range distance", rangeDistance(axisRange));
-    const searchStart = performance.now();
+    //const searchStart = performance.now();
     for (let i = 0; i < rangeDistance(axisRange); i++) {
         const adjacent = adjacentPoint(lastSearchPoint, searchDirection);
         const tileId = getTileId(adjacent.x, adjacent.y);
@@ -203,7 +203,7 @@ export function generateGround(tiles: { [id: string]: GroundTile }): Point {
             lastSearchPoint = adjacent;
         }
     }
-    const searchEnd = performance.now();
+    //const searchEnd = performance.now();
     //console.log("⏱search tile time: ", searchEnd - searchStart);
 
     return tilePoint;

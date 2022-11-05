@@ -1,4 +1,3 @@
-import { clamp } from "../../common/number";
 import { addPoint, Point } from "../../common/point";
 import { addHorizontal, addVertical } from "../../common/sides";
 import { UIRenderContext } from "../../rendering/uiRenderContext";
@@ -31,9 +30,7 @@ export class UIBox extends UIView {
 
     layout(layoutContext: UILayoutContext, constraints: UISize): UISize {
         let widthConstraint = 0;
-        let widthSize = 0;
         let heightConstraint = 0;
-        let heightSize = 0;
 
         let measuredWidth = 0;
         let measuredHeight = 0;

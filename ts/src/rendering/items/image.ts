@@ -1,4 +1,4 @@
-import { assets, ImageAsset } from "../../asset/assets";
+import { ImageAsset } from "../../asset/assets";
 import { Sprite } from "../../asset/sprite";
 import { Bounds } from "../../common/bounds";
 import { Sides } from "../../common/sides";

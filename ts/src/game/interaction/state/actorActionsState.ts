@@ -4,7 +4,6 @@ import { RenderContext } from "../../../rendering/renderContext";
 import { drawLayout, onTapLayout } from "../../../ui/v1/layout/layout";
 import { LayoutNode } from "../../../ui/v1/layout/layoutNode";
 import { actionbarView } from "../../../ui/v1/view/actionbar";
-import { GroundTile } from "../../entity/ground";
 import { InteractionState } from "../handler/interactionState";
 import { InteractionStateChanger } from "../handler/interactionStateChanger";
 
@@ -27,7 +26,8 @@ export class ActorActionsState extends InteractionState {
     onInput(input: InputEvent, stateChanger: InteractionStateChanger): boolean {
         return false;
     }
-    onDraw(context: RenderContext): void {
+
+    override onDraw(context: RenderContext): void {
         this.actionbar = actionbarView(context, [
             {
                 id: "chop",

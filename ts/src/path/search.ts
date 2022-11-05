@@ -33,7 +33,7 @@ export class PathSearch {
         this.graph.cleanDirtyNodes();
 
         var openHeap = this.createHeap();
-        var closestNode = start; // set the start node to be the closest if required
+        //var closestNode = start; // set the start node to be the closest if required
 
         start.h = manhattanDistance(start, end);
         this.graph.markDirtyNode(start);

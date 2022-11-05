@@ -25,7 +25,7 @@ export class UIButton extends UIBox {
         this._defaultBackground = background;
     }
 
-    onTapDown(screenPoint: Point): boolean {
+    override onTapDown(screenPoint: Point): boolean {
         if (this._onTappedBackground) {
             this.background = this._onTappedBackground;
         }
@@ -33,7 +33,7 @@ export class UIButton extends UIBox {
         return true;
     }
 
-    onTap(screenPoint: Point): boolean {
+    override onTap(screenPoint: Point): boolean {
         if (this.onTapCallback) {
             try {
                 this.onTapCallback();
@@ -44,11 +44,11 @@ export class UIButton extends UIBox {
         return true;
     }
 
-    onTapUp(screenPoint: Point) {
+    override onTapUp(screenPoint: Point) {
         this.background = this._defaultBackground;
     }
 
-    hitTest(screenPoint: Point): boolean {
+    override hitTest(screenPoint: Point): boolean {
         return withinRectangle(
             screenPoint,
             this.screenPosition.x,

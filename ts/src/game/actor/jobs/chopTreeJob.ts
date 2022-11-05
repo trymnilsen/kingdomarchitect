@@ -18,7 +18,7 @@ import { MoveJob } from "./moveJob";
 export class ChopTreeJob extends MultipleStepJob {
     private tile: GroundTile;
 
-    public get constraint(): JobConstraint {
+    public override get constraint(): JobConstraint {
         return isFarmerJobConstraint;
     }
 
@@ -27,7 +27,7 @@ export class ChopTreeJob extends MultipleStepJob {
         this.tile = tree;
     }
 
-    onStart(): void {
+    override onStart(): void {
         // If the tree is next to us we just push the chop job
         // if the tree is not next to us we also push a move to job
         const tilePosition = { x: this.tile.tileX, y: this.tile.tileY };
@@ -81,7 +81,7 @@ class _ChopTreeJob extends Job {
         }
     }
 
-    onDraw(renderContext: RenderContext) {
+    override onDraw(renderContext: RenderContext) {
         const worldSpacePosition = renderContext.camera.tileSpaceToWorldSpace({
             x: this.tile.tileX,
             y: this.tile.tileY,
@@ -93,9 +93,5 @@ class _ChopTreeJob extends Job {
         });
 
         this.blinkingAnimation.onDraw(renderContext);
-    }
-
-    private spawnCoin() {
-        this.actor.world.actors.addActor;
     }
 }

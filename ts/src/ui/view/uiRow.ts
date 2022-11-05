@@ -17,7 +17,7 @@ export class UIRow extends UIView {
         this._verticalAlignment = horizontalAlignment;
     }
 
-    addView(view: UIView, weight: number | null = null) {
+    override addView(view: UIView, weight: number | null = null) {
         if (view.size.width == fillUiSize && !weight) {
             throw new Error("Column children cannot fill width without weight");
         }
@@ -102,7 +102,11 @@ export class UIRow extends UIView {
                 measuredWidth += weightedWidth;
 
                 // Run layout on the child
-                const layoutSize = child.layout(context, {
+                /* const layoutSize = child.layout(context, {
+                    width: weightedWidth,
+                    height: constraints.height,
+                }); */
+                child.layout(context, {
                     width: weightedWidth,
                     height: constraints.height,
                 });

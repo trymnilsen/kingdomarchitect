@@ -108,10 +108,10 @@ export class Game {
     }
 
     private render() {
-        const renderStart = performance.now();
+        //const renderStart = performance.now();
         this.renderer.clearScreen();
         this.currentScene.drawScene(this.renderer.context);
-        const renderEnd = performance.now();
+        //const renderEnd = performance.now();
         //console.log("⏱render time: ", renderEnd - renderStart);
     }
 

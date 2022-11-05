@@ -1,5 +1,3 @@
-import { ImageConfiguration } from "../../../rendering/items/image";
-import { RectangleConfiguration } from "../../../rendering/items/rectangle";
 import { RenderItemConfiguration } from "../../../rendering/items/renderItemConfiguration";
 import { assets } from "../../../asset/assets";
 import { TextConfiguration } from "../../../rendering/items/text";
@@ -7,13 +5,13 @@ export type LayoutNode = LayoutNodeConfiguration & LayoutNodeBase;
 
 type LayoutNodeConfiguration =
     | LayoutRectangleNode
-    | LayoutImageNode
+    | LayoutImageNode /*  */
     | LayoutTextNode
     | LayoutGroupNode;
 
 type LayoutNodeBase = {
     x: number;
-    y: number;
+    y: number /*  */;
     width: number;
     height: number;
     children: LayoutNode[];

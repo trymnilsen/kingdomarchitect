@@ -1,5 +1,4 @@
-import { Bounds, absBounds } from "../common/bounds";
-import { clone } from "../common/clone";
+import { absBounds } from "../common/bounds";
 import { addPoint, Point } from "../common/point";
 import { Graph } from "../path/graph";
 import { PathSearch } from "../path/search";

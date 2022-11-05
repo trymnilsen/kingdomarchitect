@@ -24,7 +24,7 @@ export class MoveToBeforeJob extends MultipleStepJob {
         this.job = job;
     }
 
-    onStart(): void {
+    override onStart(): void {
         // If the target is not adjacent to the actor we search for a path and
         // add a move job before the wrapped job
         const subJobs: Job[] = [];

@@ -1,4 +1,3 @@
-import { sprites } from "../../asset/sprite";
 import { randomEntry } from "../../common/array";
 import { Point, pointEquals, zeroPoint } from "../../common/point";
 import { RenderContext } from "../../rendering/renderContext";

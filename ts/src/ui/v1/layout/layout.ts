@@ -1,4 +1,4 @@
-import { Bounds, withinRectangle } from "../../../common/bounds";
+import { withinRectangle } from "../../../common/bounds";
 import { Point } from "../../../common/point";
 import { RenderContext } from "../../../rendering/renderContext";
 import { LayoutNode } from "./layoutNode";
@@ -10,11 +10,11 @@ export function drawLayout(
     drawNode(renderContext, layoutNode);
     for (const child of layoutNode.children) {
         drawLayout(renderContext, child);
-    }
+    } /*  */
 }
 
 function drawNode(context: RenderContext, node: LayoutNode) {
-    switch (node.type) {
+    switch (node.type /*  */) {
         case "IMAGE":
             context.drawScreenSpaceImage(
                 {
@@ -39,6 +39,7 @@ function drawNode(context: RenderContext, node: LayoutNode) {
                 y: node.y,
                 ...node.configuration,
             });
+            break;
         default:
             break;
     }

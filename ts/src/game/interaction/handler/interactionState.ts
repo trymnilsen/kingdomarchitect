@@ -1,4 +1,3 @@
-import { Point } from "../../../common/point";
 import { InputEvent } from "../../../input/input";
 import { RenderContext } from "../../../rendering/renderContext";
 import { UIEvent } from "../../../ui/event/uiEvent";
@@ -95,7 +94,7 @@ export abstract class InteractionState {
      */
     onDraw(context: RenderContext): void {
         if (this._view) {
-            const start = performance.now();
+            //const start = performance.now();
             if (this._view.isDirty) {
                 this._view.layout(context, {
                     width: context.width,
@@ -104,7 +103,7 @@ export abstract class InteractionState {
             }
             this._view.updateTransform();
             this._view.draw(context);
-            const end = performance.now();
+            //const end = performance.now();
             //console.log(`build state draw: ${end - start}`);
         }
     }

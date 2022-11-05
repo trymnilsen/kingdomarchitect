@@ -18,7 +18,7 @@ export class UIColumn extends UIView {
         this._horizontalAlignment = horizontalAlignment;
     }
 
-    addView(view: UIView, weight: number | null = null) {
+    override addView(view: UIView, weight: number | null = null) {
         if (view.size.height == fillUiSize && !weight) {
             throw new Error(
                 "Column children cannot fill height without weight"
@@ -105,7 +105,11 @@ export class UIColumn extends UIView {
                 measuredHeight += weightedHeight;
 
                 // Run layout on the child
-                const layoutSize = child.layout(context, {
+                /*                 const layoutSize = child.layout(context, {
+                    width: constraints.width,
+                    height: weightedHeight,
+                }); */
+                child.layout(context, {
                     width: constraints.width,
                     height: weightedHeight,
                 });

@@ -1,11 +1,10 @@
-import { assets } from "../asset/assets";
-import { Sides, zeroSides } from "../common/sides";
-import { addPoint, Point, zeroPoint } from "../common/point";
-import { UIRenderContext } from "../rendering/uiRenderContext";
-import { UILayoutContext } from "./uiLayoutContext";
-import { Bounds, withinRectangle, zeroBounds } from "../common/bounds";
-import { UIEvent } from "./event/uiEvent";
+import { withinRectangle } from "../common/bounds";
 import { Event, EventListener } from "../common/event";
+import { addPoint, Point, zeroPoint } from "../common/point";
+import { Sides, zeroSides } from "../common/sides";
+import { UIRenderContext } from "../rendering/uiRenderContext";
+import { UIEvent } from "./event/uiEvent";
+import { UILayoutContext } from "./uiLayoutContext";
 
 export interface UISize {
     height: number;

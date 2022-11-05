@@ -1,7 +1,6 @@
 import { assets } from "../asset/assets";
 import { AssetLoader } from "../asset/loader/assetLoader";
 import { Sprite } from "../asset/sprite";
-import { Point } from "../common/point";
 import { UILayoutContext } from "../ui/uiLayoutContext";
 import { UISize } from "../ui/uiView";
 import { Camera } from "./camera";
@@ -14,7 +13,7 @@ import {
     spriteRenderer,
 } from "./items/image";
 import { RectangleConfiguration, rectangleRenderer } from "./items/rectangle";
-import { configureText, TextConfiguration, textRenderer } from "./items/text";
+import { TextConfiguration, textRenderer } from "./items/text";
 import { TextStyle } from "./text/textStyle";
 import { UIRenderContext } from "./uiRenderContext";
 

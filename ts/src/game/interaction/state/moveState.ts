@@ -57,7 +57,7 @@ export class MoveState extends InteractionState {
         return false;
     }
 
-    onTileTap(tile: GroundTile): boolean {
+    override onTileTap(tile: GroundTile): boolean {
         console.log("Tapped tile: ", tile);
         const newPath = this.context.world.findPath(this.initialSelection, {
             x: tile.tileX,
@@ -76,11 +76,14 @@ export class MoveState extends InteractionState {
         return true;
     }
 
-    onInput(input: InputEvent, stateChanger: InteractionStateChanger): boolean {
+    override onInput(
+        input: InputEvent,
+        stateChanger: InteractionStateChanger
+    ): boolean {
         return false;
     }
 
-    onDraw(context: RenderContext): void {
+    override onDraw(context: RenderContext): void {
         let cursorWorldPosition = this.getCursorPosition(context.camera);
 
         context.drawSprite({

@@ -1,4 +1,4 @@
-import { Point, zeroPoint } from "../../common/point";
+import { Point } from "../../common/point";
 import { defaultTextStyle, TextStyle } from "../../rendering/text/textStyle";
 import { UIRenderContext } from "../../rendering/uiRenderContext";
 import { HorizontalAlignment } from "../uiAlignment";
@@ -6,11 +6,11 @@ import { UILayoutContext } from "../uiLayoutContext";
 import { UISize, UIView } from "../uiView";
 import { UIImageSource } from "./uiImageSource";
 
-class UITextWithIcon extends UIView {
+export class UITextWithIcon extends UIView {
     private _textStyle: TextStyle = defaultTextStyle;
     private _text: string = "";
-    private _textAlignmentOffset: Point = zeroPoint();
-    private _endIconDrawOffset: Point = zeroPoint();
+    /*     private _textAlignmentOffset: Point = zeroPoint();
+    private _endIconDrawOffset: Point = zeroPoint(); */
     private _startImage: UIImageSource | null = null;
     private _endImage: UIImageSource | null = null;
     private _horizontalAlignment: HorizontalAlignment =

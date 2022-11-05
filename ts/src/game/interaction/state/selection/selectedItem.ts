@@ -1,4 +1,4 @@
-import { Point, pointEquals } from "../../../../common/point";
+import { Point } from "../../../../common/point";
 import { Actor } from "../../../actor/actor";
 import { GroundTile } from "../../../entity/ground";
 

@@ -12,7 +12,7 @@ export class FoxActor extends Actor {
         super(initialPoint, foxSprite);
     }
 
-    onIdle(): Job {
+    override onIdle(): Job {
         // When the fox becomes idle move to a new random spot
         const possibleSpots = this.world.ground.getTiles((tile) => {
             // Only pick tiles that have a manhattan distance of more than 3

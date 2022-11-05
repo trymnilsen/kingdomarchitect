@@ -15,7 +15,7 @@ export class CoinActor extends Actor {
         this.coinAnimation.updatePosition(initialPoint);
     }
 
-    onDraw(context: RenderContext) {
+    override onDraw(context: RenderContext) {
         this.coinAnimation.onDraw(context);
     }
 }
