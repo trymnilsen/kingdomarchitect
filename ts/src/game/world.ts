@@ -6,6 +6,7 @@ import { RenderContext } from "../rendering/renderContext";
 import { JobQueue } from "./actor/job/jobQueue";
 import { Actors } from "./entity/actors";
 import { Buildings } from "./entity/buildings";
+import { Entities } from "./entity/entities";
 import { Ground } from "./entity/ground";
 import { getTileId } from "./entity/tile";
 import { getStartBuildings } from "./worldSeed";
@@ -15,9 +16,14 @@ export class World {
     private _buildings: Buildings;
     private _pathSearch: PathSearch;
     private _actors: Actors;
+    private _entities: Entities;
 
     public get ground(): Ground {
         return this._ground;
+    }
+
+    public get entities(): Entities {
+        return this._entities;
     }
 
     public get buildings(): Buildings {
@@ -33,6 +39,7 @@ export class World {
     }
 
     constructor() {
+        this._entities = new Entities();
         this._ground = new Ground();
         this._buildings = new Buildings();
         this._actors = new Actors(this);
@@ -63,7 +70,6 @@ export class World {
 
     tick(tick: number): void {
         if (tick % 5 == 0) {
-            //console.log("Generate tick");
             this.ground.generate();
             this.invalidateWorld();
         }
@@ -77,6 +83,7 @@ export class World {
     onDraw(context: RenderContext): void {
         this.ground.onDraw(context);
         this._buildings.onDraw(context);
+        this._entities.onDraw(context);
         this._actors.onDraw(context);
     }
 

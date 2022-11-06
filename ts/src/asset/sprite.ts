@@ -5,6 +5,7 @@ import { cursorSprite } from "./sprites/cursor";
 import { farmerSprite } from "./sprites/farmerSprite";
 import { foxSprite } from "./sprites/foxSprite";
 import { keepSprite } from "./sprites/keepSprite";
+import { stoneWoodWalls } from "./sprites/stoneWoodWalls";
 import { swordsManSprite } from "./sprites/swordsmanSprite";
 import { treeSprite, treeSprite2, treeSprite3 } from "./sprites/treeSprite";
 import {
@@ -30,4 +31,5 @@ export const sprites = {
     coinsFlat: coinsFlat,
     fox: foxSprite,
     keep: keepSprite,
+    stoneWoodWalls: stoneWoodWalls,
 };

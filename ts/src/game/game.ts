@@ -63,6 +63,10 @@ export class Game {
         });
 
         setInterval(this.onTick, 1000);
+        this.updateCamera({
+            x: TileSize * 5,
+            y: TileSize * 5,
+        });
         this.render();
     }
 

@@ -13,6 +13,7 @@ export const assets = {
     coins: "coins.png",
     pixelanimals: "animals_sheet.png",
     keep_sheet: "keep_sheet.png",
+    stoneWoodWallsSheet: "stone_wood_walls.png",
 };
 
 export type ImageAsset = keyof typeof assets;

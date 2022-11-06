@@ -1,4 +1,4 @@
-import { sprites } from "../../../../asset/sprite";
+import { Sprite, sprites } from "../../../../asset/sprite";
 import { allSides, symmetricSides } from "../../../../common/sides";
 import {
     subTitleTextStyle,
@@ -14,7 +14,7 @@ import { UIImage } from "../../../../ui/view/uiImage";
 import { UISpriteImageSource } from "../../../../ui/view/uiImageSource";
 import { UIRow } from "../../../../ui/view/uiRow";
 import { UIText } from "../../../../ui/view/uiText";
-import { SelectedBuildingUiActionType } from "./selectedBuildingUiAction";
+import { selectedBuildingUiAction } from "./selectedBuildingUiAction";
 
 export function buildMenuStateView(): UIView {
     const rootView = new UIBox({
@@ -59,26 +59,43 @@ export function buildMenuStateView(): UIView {
         })
     );
 
-    menuColumn.addView(buildItemView(1));
+    menuColumn.addView(
+        buildItemView(1, sprites.woodHouse, "woodhouse", "Wooden house")
+    );
     menuColumn.addView(new UIBox({ width: fillUiSize, height: 8 }));
-    menuColumn.addView(buildItemView(2));
+    menuColumn.addView(
+        buildItemView(2, sprites.stoneWoodWalls, "stonewoodwalls", "Walls")
+    );
 
     container.addView(menuColumn);
     rootView.addView(container);
     return rootView;
 }
 
-function buildItemView(number: number): UIView {
+function indexToBuildType(index: number) {
+    if (index == 1) {
+        return "woodenHouse";
+    } else {
+        return "walls";
+    }
+}
+
+function buildItemView(
+    index: number,
+    sprite: Sprite,
+    id: string,
+    name: string
+): UIView {
     const container = new UIButton({
         width: fillUiSize,
         height: wrapUiSize,
     });
     container.onTapCallback = () => {
-        console.log(`Tapped on button: ${number}`);
-        container.bubbleAction({
-            type: SelectedBuildingUiActionType,
-            data: {},
-        });
+        console.log(`Tapped on button: ${index}`);
+
+        container.bubbleAction(
+            selectedBuildingUiAction(indexToBuildType(index))
+        );
     };
 
     container.defaultBackground = new NinePatchBackground(
@@ -109,14 +126,14 @@ function buildItemView(number: number): UIView {
         height: 24,
     });
 
-    image.image = new UISpriteImageSource(sprites.woodHouse);
+    image.image = new UISpriteImageSource(sprite);
     const text = new UIText({
         width: fillUiSize,
         height: wrapUiSize,
     });
     text.textStyle = subTitleTextStyle;
-    text.text = "Wooden House";
-    text.id = "labelhouse";
+    text.text = name;
+    text.id = id;
     row.addView(image);
     row.addView(text, 1);
     container.addView(row);

@@ -12,8 +12,9 @@ export class BuildMenuState extends InteractionState {
 
     constructor() {
         super();
-        this.view = buildMenuStateView();
-        this.view.uiAction.listen(this.buildSelected);
+        const view = buildMenuStateView();
+        view.uiAction.listen(this.buildSelected);
+        this.view = view;
     }
 
     onInput(input: InputEvent, stateChanger: InteractionStateChanger): boolean {
@@ -22,7 +23,7 @@ export class BuildMenuState extends InteractionState {
 
     private buildSelected = (uiAction: UIAction) => {
         if (uiAction.type == SelectedBuildingUiActionType) {
-            this.context.stateChanger.pop(true);
+            this.context.stateChanger.pop(uiAction);
         }
     };
 }

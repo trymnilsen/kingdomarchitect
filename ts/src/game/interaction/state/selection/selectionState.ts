@@ -1,27 +1,23 @@
 import { sprites } from "../../../../asset/sprite";
 import { Point } from "../../../../common/point";
-import { allSides } from "../../../../common/sides";
 import { InputEvent } from "../../../../input/input";
 import { RenderContext } from "../../../../rendering/renderContext";
-import { subTitleTextStyle } from "../../../../rendering/text/textStyle";
-import { ninePatchBackground } from "../../../../ui/dsl/uiBackgroundDsl";
-import { uiBox } from "../../../../ui/dsl/uiBoxDsl";
-import { uiButton } from "../../../../ui/dsl/uiButtonDsl";
-import { uiColumn } from "../../../../ui/dsl/uiColumnDsl";
-import { RowChild, uiRow } from "../../../../ui/dsl/uiRowDsl";
-import { uiText } from "../../../../ui/dsl/uiTextDsl";
-import { uiAlignment } from "../../../../ui/uiAlignment";
-import { fillUiSize, UIView, wrapUiSize } from "../../../../ui/uiView";
-import { ActionButton } from "../../../../ui/v1/view/actionbar";
 import { BuildJob } from "../../../actor/jobs/buildJob";
 import { ChopTreeJob } from "../../../actor/jobs/chopTreeJob";
 import { SwordsmanActor } from "../../../actor/swordsmanActor";
-import { woodHouseScaffold } from "../../../entity/building/woodenHouseEntity";
+import { WoodHouseEntity } from "../../../entity/building/woodenHouseEntity";
 import { GroundTile } from "../../../entity/ground";
 import { InteractionState } from "../../handler/interactionState";
 import { InteractionStateChanger } from "../../handler/interactionStateChanger";
+import { ActionButton, getActionbarView } from "../../view/actionbar";
 import { ActorActionsState } from "../actorActionsState";
 import { BuildMenuState } from "../building/buildMenuState";
+import { PathOrSingleBuild } from "../building/pathOrSingleBuild";
+import {
+    PossibleSelectedBuilding,
+    SelectedBuildingUiAction,
+    SelectedBuildingUiActionType,
+} from "../building/selectedBuildingUiAction";
 import { MoveState } from "../moveState";
 import {
     ActorSelectedItem,
@@ -99,7 +95,10 @@ export class SelectionState extends InteractionState {
 
     private updateTileActions() {
         const actions = this.getTileActions(this.selectedItem.tilePosition);
-        const actionbarView = this.getActionbarView(actions);
+        const actionbarView = getActionbarView(actions, (action) => {
+            this.actionButtonPressed(action.id);
+        });
+
         this.view = actionbarView;
     }
 
@@ -165,66 +164,18 @@ export class SelectionState extends InteractionState {
         return [];
     }
 
-    private getActionbarView(actions: ActionButton[]): UIView {
-        const actionbarButton = (action: ActionButton): RowChild => {
-            return {
-                child: uiColumn({
-                    width: wrapUiSize,
-                    height: wrapUiSize,
-                    children: [
-                        {
-                            child: uiButton({
-                                width: 48,
-                                height: 48,
-                                onTapCallback: () => {
-                                    console.log("Action tapped: ", action);
-                                    this.actionButtonPressed(action.id);
-                                },
-                                defaultBackground: ninePatchBackground({
-                                    asset: "stoneSlateBackground",
-                                    scale: 2,
-                                }),
-                            }),
-                        },
-                        {
-                            child: uiText({
-                                width: wrapUiSize,
-                                height: wrapUiSize,
-                                text: action.name,
-                                style: subTitleTextStyle,
-                            }),
-                        },
-                    ],
-                }),
-            };
-        };
-
-        const buttons: RowChild[] = [];
-        for (const action of actions) {
-            buttons.push(actionbarButton(action));
-            buttons.push({ child: uiBox({ width: 8, height: 1 }) });
-        }
-        return uiBox({
-            width: fillUiSize,
-            height: fillUiSize,
-            padding: allSides(16),
-            alignment: uiAlignment.bottomLeft,
-            children: [
-                uiRow({
-                    width: wrapUiSize,
-                    height: wrapUiSize,
-                    children: buttons,
-                }),
-            ],
-        });
-    }
-
     private actionButtonPressed(actionId: string) {
         if (actionId == "build") {
             this.context.stateChanger.push(new BuildMenuState(), (value) => {
                 console.log("Pop callback from build");
-                if (value == true) {
-                    this.onBuildSelected();
+                if (
+                    value &&
+                    typeof value == "object" &&
+                    value["type"] == SelectedBuildingUiActionType
+                ) {
+                    this.onBuildSelected(
+                        (value as SelectedBuildingUiAction).data.build
+                    );
                 }
             });
         } else if (actionId == "move") {
@@ -247,16 +198,20 @@ export class SelectionState extends InteractionState {
         }
     }
 
-    private onBuildSelected() {
+    private onBuildSelected(buildType: PossibleSelectedBuilding) {
         console.log("Build was selected");
-        this.context.world.buildings.add(
-            woodHouseScaffold(this.selectedItem.tilePosition)
-        );
-        this.context.world.invalidateWorld();
-        if (this.selectedItem instanceof TileSelectedItem) {
-            this.context.world.jobQueue.schedule(
-                new BuildJob(this.selectedItem.tile)
+        if (buildType == "woodenHouse") {
+            this.context.world.entities.add(
+                new WoodHouseEntity(this.selectedItem.tilePosition)
             );
+            this.context.world.invalidateWorld();
+            if (this.selectedItem instanceof TileSelectedItem) {
+                this.context.world.jobQueue.schedule(
+                    new BuildJob(this.selectedItem.tile)
+                );
+            }
+        } else if (buildType == "walls") {
+            this.context.stateChanger.push(new PathOrSingleBuild());
         }
     }
 }
