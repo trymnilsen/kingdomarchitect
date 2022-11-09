@@ -5,7 +5,11 @@ const canvasElementId = "gameCanvas";
 export async function bootstrap() {
     console.log("Bootstrapping");
     const game = new Game(canvasElementId);
-    await game.bootstrap();
+    try {
+        await game.bootstrap();
+    } catch (e) {
+        console.error("Failed to bootstrap game: ", e);
+    }
 }
 
 document.addEventListener(
