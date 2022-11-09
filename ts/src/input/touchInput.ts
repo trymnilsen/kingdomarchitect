@@ -92,6 +92,7 @@ export class TouchInput {
         canvasElement.addEventListener(
             "mouseup",
             (event) => {
+                console.log("mouseUp", event);
                 event.preventDefault();
                 this.onTapEnded({
                     x: event.clientX,
@@ -103,22 +104,18 @@ export class TouchInput {
         canvasElement.addEventListener(
             "touchend",
             (event) => {
+                console.log("touchEnd", event);
                 event.preventDefault();
-                this.onTapEnded({
-                    x: event.touches[0].clientX,
-                    y: event.touches[0].clientY,
-                });
+                this.onTapEnded();
             },
             { passive: false }
         );
         canvasElement.addEventListener(
             "touchcancel",
             (event) => {
+                console.log("touchCancel", event);
                 event.preventDefault();
-                this.onTapEnded({
-                    x: event.touches[0].clientX,
-                    y: event.touches[0].clientY,
-                });
+                this.onTapEnded();
             },
             { passive: false }
         );
@@ -148,11 +145,15 @@ export class TouchInput {
         this.previousMovePosition = position;
     }
 
-    private onTapEnded(position: Point) {
+    private onTapEnded(position: Point | undefined = undefined) {
         try {
             if (this.isDragging) {
                 console.log("drag ended");
             } else if (this.onTapPosition && this.onTap) {
+                if (!position) {
+                    position = this.previousMovePosition || this.onTapPosition;
+                }
+
                 if (this.onTapUp) {
                     this.onTapUp(position);
                 }
