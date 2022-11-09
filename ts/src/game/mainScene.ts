@@ -21,6 +21,7 @@ export class MainScene implements Scene {
             routine(tick, this.world);
         }
         this.world.tick(tick);
+        this.interactionHandler.onUpdate(tick);
     }
 
     onTap(worldPoint: Point): void {

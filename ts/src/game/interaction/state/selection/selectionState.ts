@@ -12,7 +12,7 @@ import { InteractionStateChanger } from "../../handler/interactionStateChanger";
 import { ActionButton, getActionbarView } from "../../view/actionbar";
 import { ActorActionsState } from "../actorActionsState";
 import { BuildMenuState } from "../building/buildMenuState";
-import { PathOrSingleBuild } from "../building/pathOrSingleBuild";
+import { PathOrSingleBuildState } from "../building/pathOrSingleBuildState";
 import {
     PossibleSelectedBuilding,
     SelectedBuildingUiAction,
@@ -212,8 +212,8 @@ export class SelectionState extends InteractionState {
             }
         } else if (buildType == "walls") {
             this.context.stateChanger.push(
-                new PathOrSingleBuild(this.selectedItem.tilePosition, {
-                    sprite: sprites.woodHouse,
+                new PathOrSingleBuildState(this.selectedItem.tilePosition, {
+                    sprite: sprites.stoneWoodWalls,
                 })
             );
         }

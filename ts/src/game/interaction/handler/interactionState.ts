@@ -89,6 +89,12 @@ export abstract class InteractionState {
     }
 
     /**
+     * Update method called consistently on each update
+     * @param tick
+     */
+    onUpdate(tick: number): void {}
+
+    /**
      * Called when its time to render/draw anything this state wants to
      * @param context The render context with access to camera and drawing methods
      */

@@ -90,6 +90,10 @@ export class InteractionHandler {
         this.interactionStateChanger.apply(this.history);
     }
 
+    onUpdate(tick: number) {
+        this.history.state.onUpdate(tick);
+    }
+
     onDraw(renderContext: RenderContext) {
         if (this.history.state.isModal) {
             renderContext.drawScreenSpaceRectangle({
