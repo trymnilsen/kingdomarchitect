@@ -20,7 +20,7 @@ export class AssetLoader {
     private async loadFonts(): Promise<void> {
         const myFont = new FontFace(
             "Silkscreen",
-            "url(asset/Silkscreen-regular.ttf)"
+            "url(asset/silkscreen_regular.ttf)"
         );
         const loadedFont = await myFont.load();
         document.fonts.add(loadedFont);

@@ -211,7 +211,11 @@ export class SelectionState extends InteractionState {
                 );
             }
         } else if (buildType == "walls") {
-            this.context.stateChanger.push(new PathOrSingleBuild());
+            this.context.stateChanger.push(
+                new PathOrSingleBuild(this.selectedItem.tilePosition, {
+                    sprite: sprites.woodHouse,
+                })
+            );
         }
     }
 }
