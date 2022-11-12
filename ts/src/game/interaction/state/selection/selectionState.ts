@@ -1,18 +1,23 @@
 import { sprites } from "../../../../asset/sprite";
+import { stoneWoodWalls } from "../../../../asset/sprites/stoneWoodWalls";
+import {
+    woodenHouseScaffold,
+    woodenHouseSprite,
+} from "../../../../asset/sprites/woodHouseSprite";
 import { Point } from "../../../../common/point";
 import { InputEvent } from "../../../../input/input";
 import { RenderContext } from "../../../../rendering/renderContext";
 import { BuildJob } from "../../../actor/jobs/buildJob";
 import { ChopTreeJob } from "../../../actor/jobs/chopTreeJob";
 import { SwordsmanActor } from "../../../actor/swordsmanActor";
-import { WoodHouseEntity } from "../../../entity/building/woodenHouseEntity";
+import { BuildableEntity } from "../../../entity/buildableEntity";
+import { WallEntity } from "../../../entity/building/wallEntity";
 import { GroundTile } from "../../../entity/ground";
 import { InteractionState } from "../../handler/interactionState";
 import { InteractionStateChanger } from "../../handler/interactionStateChanger";
 import { ActionButton, getActionbarView } from "../../view/actionbar";
 import { ActorActionsState } from "../actorActionsState";
 import { BuildMenuState } from "../building/buildMenuState";
-import { PathOrSingleBuildState } from "../building/pathOrSingleBuildState";
 import {
     PossibleSelectedBuilding,
     SelectedBuildingUiAction,
@@ -202,7 +207,13 @@ export class SelectionState extends InteractionState {
         console.log("Build was selected");
         if (buildType == "woodenHouse") {
             this.context.world.entities.add(
-                new WoodHouseEntity(this.selectedItem.tilePosition)
+                new BuildableEntity(
+                    this.selectedItem.tilePosition,
+                    woodenHouseScaffold,
+                    { x: 2, y: 2 },
+                    woodenHouseSprite,
+                    { x: 2, y: 2 }
+                )
             );
             this.context.world.invalidateWorld();
             if (this.selectedItem instanceof TileSelectedItem) {
@@ -211,11 +222,21 @@ export class SelectionState extends InteractionState {
                 );
             }
         } else if (buildType == "walls") {
-            this.context.stateChanger.push(
-                new PathOrSingleBuildState(this.selectedItem.tilePosition, {
-                    sprite: sprites.stoneWoodWalls,
-                })
+            this.context.world.entities.add(
+                new WallEntity(
+                    this.selectedItem.tilePosition,
+                    stoneWoodWalls,
+                    { x: 2, y: 2 },
+                    stoneWoodWalls,
+                    { x: 2, y: 2 }
+                )
             );
+            this.context.world.invalidateWorld();
+            if (this.selectedItem instanceof TileSelectedItem) {
+                this.context.world.jobQueue.schedule(
+                    new BuildJob(this.selectedItem.tile)
+                );
+            }
         }
     }
 }

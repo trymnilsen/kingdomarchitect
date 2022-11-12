@@ -33,3 +33,19 @@ export const sprites = {
     keep: keepSprite,
     stoneWoodWalls: stoneWoodWalls,
 };
+
+export function spriteWithSize(
+    asset: ImageAsset,
+    width: number,
+    height: number
+): Sprite {
+    return {
+        asset: asset,
+        bounds: {
+            x1: 0,
+            y1: 0,
+            x2: width,
+            y2: height,
+        },
+    };
+}

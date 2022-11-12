@@ -1,3 +1,4 @@
+import { AssetLoader } from "../asset/loader/assetLoader";
 import { Point } from "../common/point";
 import { InputAction } from "../input/inputAction";
 import { Camera } from "../rendering/camera";
@@ -10,10 +11,14 @@ export class MainScene implements Scene {
     private world: World;
     private interactionHandler: InteractionHandler;
 
-    constructor(camera: Camera) {
+    constructor(camera: Camera, assetsLoader: AssetLoader) {
         this.world = new World();
         this.world.invalidateWorld();
-        this.interactionHandler = new InteractionHandler(this.world, camera);
+        this.interactionHandler = new InteractionHandler(
+            this.world,
+            camera,
+            assetsLoader
+        );
     }
 
     tick(tick: number): void {

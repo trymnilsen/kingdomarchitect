@@ -1,3 +1,4 @@
+import { AssetLoader } from "../../../asset/loader/assetLoader";
 import { Point } from "../../../common/point";
 import { Camera } from "../../../rendering/camera";
 import { RenderContext } from "../../../rendering/renderContext";
@@ -16,12 +17,13 @@ export class InteractionHandler {
     private interactionStateChanger: CommitableInteractionStateChanger;
     private history: InteractionStateHistory;
 
-    constructor(world: World, camera: Camera) {
+    constructor(world: World, camera: Camera, assets: AssetLoader) {
         this.interactionStateChanger = new CommitableInteractionStateChanger();
         this.world = world;
         this.camera = camera;
         const stateContext: StateContext = {
             world: this.world,
+            assets: assets,
             stateChanger: this.interactionStateChanger,
         };
         this.history = new InteractionStateHistory(stateContext);

@@ -1,4 +1,5 @@
 import { assets, ImageAsset } from "../assets";
+import { Sprite } from "../sprite";
 
 export class AssetLoader {
     private _assets: { [name: string]: HTMLImageElement } = {};
@@ -15,6 +16,24 @@ export class AssetLoader {
 
     getAsset(asset: ImageAsset): HTMLImageElement {
         return this._assets[asset];
+    }
+
+    /**
+     * Returns a sprite that is backed by the given asset with its bounds
+     * defined by the full width and height of the asset
+     * @param asset
+     */
+    getAssetAsSprite(asset: ImageAsset): Sprite {
+        const image = this.getAsset(asset);
+        return {
+            asset: asset,
+            bounds: {
+                x1: 0,
+                y1: 0,
+                x2: image.width,
+                y2: image.height,
+            },
+        };
     }
 
     private async loadFonts(): Promise<void> {

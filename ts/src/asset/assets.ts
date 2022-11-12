@@ -14,6 +14,22 @@ export const assets = {
     pixelanimals: "animals_sheet.png",
     keep_sheet: "keep_sheet.png",
     stoneWoodWallsSheet: "stone_wood_walls.png",
+    stoneWoodWallsHorizontal: "stone_wood_walls_horizontal.png",
+    stoneWoodWallsVeritcal: "stone_wood_walls_vertical.png",
+    stoneWoodWallsLeft: "stone_wood_walls_left.png",
+    stoneWoodWallsRight: "stone_wood_walls_right.png",
+    stoneWoodWallsUp: "stone_wood_walls_up.png",
+    stoneWoodWallsDown: "stone_wood_walls_bottom.png",
+    stoneWoodWallsBottomRight: "stone_wood_walls_br.png",
+    stoneWoodWallsLeftBottom: "stone_wood_walls_lb.png",
+    stoneWoodwallsLeftBottomRight: "stone_wood_walls_lbr.png",
+    stoneWoodWallsLeftUp: "stone_wood_walls_lu.png",
+    stoneWoodWallsLeftUpBottom: "stone_wood_walls_lub.png",
+    stoneWoodWallsLeftUpRight: "stone_wood_walls_lur.png",
+    stoneWoodWallsLeftUpRightBottom: "stone_wood_walls_lurb.png",
+    stoneWoodWallsScaffold: "stone_wood_walls_scaffold.png",
+    stoneWoodWallsUpBottomRight: "stone_wood_walls_ubr.png",
+    stoneWoodWallsUpRight: "stone_wood_walls_ur.png",
 };
 
 export type ImageAsset = keyof typeof assets;

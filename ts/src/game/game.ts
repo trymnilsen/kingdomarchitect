@@ -31,7 +31,10 @@ export class Game {
         // Rendering and scenes
         this.assetLoader = new AssetLoader();
         this.renderer = new Renderer(canvasElement, this.assetLoader);
-        this.currentScene = new MainScene(this.renderer.camera);
+        this.currentScene = new MainScene(
+            this.renderer.camera,
+            this.assetLoader
+        );
     }
 
     async bootstrap(): Promise<void> {

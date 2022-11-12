@@ -1,4 +1,4 @@
-import { WoodHouseEntity } from "../../entity/building/woodenHouseEntity";
+import { BuildableEntity } from "../../entity/buildableEntity";
 import { GroundTile } from "../../entity/ground";
 import { isFarmerJobConstraint } from "../job/constraint/isFarmerActorConstraint";
 import { Job } from "../job/job";
@@ -28,11 +28,11 @@ class _BuildJob extends Job {
 
     update(tick: number): void {
         //const elapsedTicks = tick - this.startTick;
-        const entity = this.actor.world.entities.getTile(
-            this.tile.tileX,
-            this.tile.tileY
-        );
-        if (entity instanceof WoodHouseEntity) {
+        const entity = this.actor.world.entities.getTile({
+            x: this.tile.tileX,
+            y: this.tile.tileY,
+        });
+        if (entity instanceof BuildableEntity) {
             const buildResult = entity.build(10);
             if (buildResult < 10 || entity.healthPercentage === 1.0) {
                 console.log("_BuildJob finished");

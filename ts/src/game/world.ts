@@ -39,7 +39,7 @@ export class World {
     }
 
     constructor() {
-        this._entities = new Entities();
+        this._entities = new Entities(this);
         this._ground = new Ground();
         this._buildings = new Buildings();
         this._actors = new Actors(this);

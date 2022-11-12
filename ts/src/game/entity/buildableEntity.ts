@@ -1,27 +1,32 @@
-import { Point } from "../../../common/point";
-import { BuildingTile } from "../buildings";
+import { Sprite } from "../../asset/sprite";
+import { InvalidArgumentError } from "../../common/error/invalidArgumentError";
+import { Point } from "../../common/point";
+import { RenderContext } from "../../rendering/renderContext";
+import { Entity } from "./entity";
+import { TileSize } from "./tile";
 
-export function woodHouseEntity(point: Point): BuildingTile {
-    return {
-        x: point.x,
-        y: point.y,
-        sprite: "woodHouse",
-    };
-}
-
-export function woodHouseScaffold(point: Point): BuildingTile {
-    return {
-        x: point.x,
-        y: point.y,
-        sprite: "woodHouseScaffold",
-    };
-}
-/*
-class WoodHouseEntity extends Entity {
+export class BuildableEntity extends Entity {
     private _health: number = 0;
     private _maxHp: number = 100;
     private _isScaffolded: boolean = true;
 
+    private scaffoldSprite: Sprite;
+    private scaffoldOffset: Point;
+    private _buildingSprite: Sprite;
+    private _buildingOffset: Point;
+
+    public get buildingSprite(): Sprite {
+        return this._buildingSprite;
+    }
+    public set buildingSprite(value: Sprite) {
+        this._buildingSprite = value;
+    }
+    public get buildingOffset(): Point {
+        return this._buildingOffset;
+    }
+    public set buildingOffset(value: Point) {
+        this._buildingOffset = value;
+    }
     public get health(): number {
         return this._health;
     }
@@ -39,9 +44,19 @@ class WoodHouseEntity extends Entity {
         this._health = value;
     }
 
-    constructor(position: Point) {
+    constructor(
+        position: Point,
+        scaffoldSprite: Sprite,
+        scaffoldOffset: Point,
+        buildingSprite: Sprite,
+        buildingOffset: Point
+    ) {
         super();
         this.tilePosition = position;
+        this.scaffoldSprite = scaffoldSprite;
+        this.scaffoldOffset = scaffoldOffset;
+        this._buildingSprite = buildingSprite;
+        this._buildingOffset = buildingOffset;
     }
 
     build(energy: number): number {
@@ -51,26 +66,39 @@ class WoodHouseEntity extends Entity {
         // If the build amount would cause us to go above the maxHp,
         // only consume some of it
         if (this._health >= this._maxHp) {
-            this._isScaffolded = false;
             const overflowedHp = this._health - this._maxHp;
             this._health = this._maxHp;
             consumedEnergy = energy - overflowedHp;
+
+            // If we reach the max hp and are currently scaffolded we run the
+            // onBuildEnded method
+            if (this._isScaffolded) {
+                this.onBuildEnded();
+            }
+
+            this._isScaffolded = false;
         }
 
         return consumedEnergy;
     }
+
+    protected onBuildEnded() {}
 
     override onDraw(context: RenderContext): void {
         const worldSpace = context.camera.tileSpaceToWorldSpace(
             this.tilePosition
         );
 
+        const offset = this._isScaffolded
+            ? this.scaffoldOffset
+            : this._buildingOffset;
+
         context.drawSprite({
-            x: worldSpace.x + 2,
-            y: worldSpace.y + 2,
+            x: worldSpace.x + offset.x,
+            y: worldSpace.y + offset.y,
             sprite: this._isScaffolded
-                ? sprites.woodHouseScaffold
-                : sprites.woodHouse,
+                ? this.scaffoldSprite
+                : this._buildingSprite,
         });
 
         if (this._health > 0 && this._health < this._maxHp) {
@@ -96,4 +124,3 @@ class WoodHouseEntity extends Entity {
         }
     }
 }
-*/
