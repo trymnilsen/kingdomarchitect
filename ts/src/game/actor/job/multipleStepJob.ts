@@ -11,9 +11,17 @@ import { Job, JobState } from "./job";
 export abstract class MultipleStepJob extends Job {
     private jobs: Job[] = [];
 
+    /**
+     * Request to update the multiple set job. Will pass on the update to the
+     * currently active job
+     * @param tick
+     */
     update(tick: number): void {
         const job = this.jobs[0];
         if (job) {
+            if (job.startTick == 0) {
+                job.startTick = tick;
+            }
             job.update(tick);
         }
     }

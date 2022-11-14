@@ -71,6 +71,7 @@ class _ChopTreeJob extends Job {
 
     update(tick: number): void {
         const elapsedTicks = tick - this.startTick;
+        console.log("Chop tree job update, tick:", tick, this.startTick);
         if (elapsedTicks > 2) {
             this.tile.hasTree = 0.0;
             console.log("_ChopTreeJob finished");

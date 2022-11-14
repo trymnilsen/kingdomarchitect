@@ -7,8 +7,10 @@ import {
 import { Point } from "../../../../common/point";
 import { InputEvent } from "../../../../input/input";
 import { RenderContext } from "../../../../rendering/renderContext";
+import { CoinActor } from "../../../actor/coinActor";
 import { BuildJob } from "../../../actor/jobs/buildJob";
 import { ChopTreeJob } from "../../../actor/jobs/chopTreeJob";
+import { CollectCoinJob } from "../../../actor/jobs/collectCoinJob";
 import { SwordsmanActor } from "../../../actor/swordsmanActor";
 import { BuildableEntity } from "../../../entity/buildableEntity";
 import { WallEntity } from "../../../entity/building/wallEntity";
@@ -125,6 +127,17 @@ export class SelectionState extends InteractionState {
                         name: "Cancel",
                     },
                 ];
+            } else if (actor instanceof CoinActor) {
+                return [
+                    {
+                        id: "collect_coin",
+                        name: "Collect",
+                    },
+                    {
+                        id: "cancel",
+                        name: "Cancel",
+                    },
+                ];
             } else {
                 return [
                     {
@@ -199,6 +212,18 @@ export class SelectionState extends InteractionState {
         } else if (actionId == "actions") {
             this.context.stateChanger.push(new ActorActionsState());
         } else if (actionId == "cancel") {
+            this.context.stateChanger.pop(null);
+        } else if (actionId == "collect_coin") {
+            const selectedTile = this.selectedItem;
+            const coin = this.context.world.actors.getActor(
+                selectedTile.tilePosition
+            );
+            if (coin instanceof CoinActor) {
+                this.context.world.jobQueue.schedule(
+                    new CollectCoinJob(selectedTile.tilePosition)
+                );
+            }
+
             this.context.stateChanger.pop(null);
         }
     }

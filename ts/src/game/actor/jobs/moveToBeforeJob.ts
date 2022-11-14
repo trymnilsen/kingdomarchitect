@@ -49,7 +49,9 @@ export class MoveToBeforeJob extends MultipleStepJob {
             subJobs.push(new MoveJob(path));
         } else {
             console.log(
-                `Job ${this} was adjacent to ${this.tileSpaceTarget} for actor ${this.actor}`
+                `Job ${this.constructor.name} was adjacent to for actor`,
+                this.tileSpaceTarget,
+                this.actor
             );
         }
 
