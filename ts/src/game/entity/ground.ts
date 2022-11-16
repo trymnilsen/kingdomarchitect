@@ -1,6 +1,6 @@
 import { sprites } from "../../asset/sprite";
 import { Bounds, getBoundsAxis } from "../../common/bounds";
-import { Axis, Direction } from "../../common/direction";
+import { Axis, Direction, invertDirection } from "../../common/direction";
 import { adjacentPoint, Point } from "../../common/point";
 import { rangeDistance, rangeRandom } from "../../common/range";
 import { RenderContext } from "../../rendering/renderContext";
@@ -33,6 +33,10 @@ export class Ground {
                 };
             }
         }
+    }
+
+    getRandomBoundsPosition(): Point {
+        return getRandomBoundsPosition(this.tiles, 0);
     }
 
     getBounds(): Bounds {
@@ -141,54 +145,14 @@ export function getTileBounds(entries: [string, GroundTile][]): Bounds {
 }
 
 export function generateGround(tiles: { [id: string]: GroundTile }): Point {
-    const entries = Object.entries(tiles);
-    //const boundsStart = performance.now();
-    const bounds = getTileBounds(entries);
-    //const boundsEnd = performance.now();
-    //console.log("⏱get bounds time: ", boundsEnd - boundsStart);
-    const side = Math.floor(Math.random() * 4);
-
-    //console.log("bounds", bounds);
-    let x = 0;
-    let y = 0;
-    let searchDirection = Direction.Down;
-    let axis = side % 2 == 0 ? Axis.YAxis : Axis.XAxis;
-    let axisRange = getBoundsAxis(bounds, axis);
-    //console.log("side", side);
-    //console.log("axis", axis);
-    //console.log("axisRange", axisRange);
-
-    switch (side) {
-        case LEFT_SIDE:
-            x = bounds.x1 - 1;
-            y = rangeRandom(axisRange);
-            searchDirection = Direction.Right;
-            break;
-        case TOP_SIDE:
-            x = rangeRandom(axisRange);
-            y = bounds.y1 - 1;
-            searchDirection = Direction.Down;
-            break;
-        case RIGHT_SIDE:
-            x = bounds.x2 + 1;
-            y = rangeRandom(axisRange);
-            searchDirection = Direction.Left;
-            break;
-        case BOTTOM_SIDE:
-            x = rangeRandom(axisRange);
-            y = bounds.y2 + 1;
-            searchDirection = Direction.Up;
-            break;
-    }
-    //console.log("searchdirection: ", searchDirection);
-    //console.log("x:", x);
-    //console.log("y:", y);
+    const edgeTile = getRandomBoundsPosition(tiles, 1);
+    const searchDirection = invertDirection(edgeTile.direction);
 
     let tilePoint: Point = { x: 0, y: 0 };
-    let lastSearchPoint = { x, y };
+    let lastSearchPoint = { x: edgeTile.x, y: edgeTile.y };
     //console.log("range distance", rangeDistance(axisRange));
     //const searchStart = performance.now();
-    for (let i = 0; i < rangeDistance(axisRange); i++) {
+    for (let i = 0; i < rangeDistance(edgeTile.axisRange); i++) {
         const adjacent = adjacentPoint(lastSearchPoint, searchDirection);
         const tileId = getTileId(adjacent.x, adjacent.y);
         /* console.log(
@@ -207,4 +171,50 @@ export function generateGround(tiles: { [id: string]: GroundTile }): Point {
     //console.log("⏱search tile time: ", searchEnd - searchStart);
 
     return tilePoint;
+}
+
+export function getRandomBoundsPosition(
+    tiles: { [id: string]: GroundTile },
+    edgeOffset: number
+) {
+    const entries = Object.entries(tiles);
+    const bounds = getTileBounds(entries);
+    const side = Math.floor(Math.random() * 4);
+
+    let x = 0;
+    let y = 0;
+    let direction = Direction.Down;
+    let axis = side % 2 == 0 ? Axis.YAxis : Axis.XAxis;
+    let axisRange = getBoundsAxis(bounds, axis);
+
+    switch (side) {
+        case LEFT_SIDE:
+            x = bounds.x1 - edgeOffset;
+            y = rangeRandom(axisRange);
+            direction = Direction.Left;
+            break;
+        case TOP_SIDE:
+            x = rangeRandom(axisRange);
+            y = bounds.y1 - edgeOffset;
+            direction = Direction.Up;
+            break;
+        case RIGHT_SIDE:
+            x = bounds.x2 + edgeOffset;
+            y = rangeRandom(axisRange);
+            direction = Direction.Right;
+            break;
+        case BOTTOM_SIDE:
+            x = rangeRandom(axisRange);
+            y = bounds.y2 + edgeOffset;
+            direction = Direction.Down;
+            break;
+    }
+
+    return {
+        x,
+        y,
+        direction,
+        axis,
+        axisRange,
+    };
 }

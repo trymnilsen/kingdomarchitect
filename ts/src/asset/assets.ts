@@ -12,6 +12,7 @@ export const assets = {
     swipe_effect: "swipe_effect.png",
     coins: "coins.png",
     pixelanimals: "animals_sheet.png",
+    goblinClub: "goblin_club_sheet.png",
     keep_sheet: "keep_sheet.png",
     stoneWoodWallsSheet: "stone_wood_walls.png",
     stoneWoodWallsHorizontal: "stone_wood_walls_horizontal.png",
