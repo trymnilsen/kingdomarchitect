@@ -1,11 +1,11 @@
-import { foxSprite } from "../../asset/sprites/foxSprite";
-import { randomEntry } from "../../common/array";
-import { Point } from "../../common/point";
-import { manhattanDistance } from "../../path/pathHeuristics";
-import { Actor } from "./actor";
-import { ActorInstanceJobConstraint } from "./job/constraint/actorInstanceConstraint";
-import { Job } from "./job/job";
-import { MoveJob } from "./jobs/moveJob";
+import { foxSprite } from "../../../asset/sprites/foxSprite";
+import { randomEntry } from "../../../common/array";
+import { Point } from "../../../common/point";
+import { manhattanDistance } from "../../../path/pathHeuristics";
+import { Actor } from "./../actor";
+import { ActorInstanceJobConstraint } from "./../job/constraint/actorInstanceConstraint";
+import { Job } from "./../job/job";
+import { MoveJob } from "./../jobs/moveJob";
 
 export class FoxActor extends Actor {
     constructor(initialPoint: Point) {

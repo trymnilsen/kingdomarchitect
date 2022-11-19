@@ -1,5 +1,5 @@
 import { randomEntry } from "../../common/array";
-import { FoxActor } from "../actor/foxActor";
+import { FoxActor } from "../actor/actors/foxActor";
 import { World } from "../world";
 
 export function spawnAnimalsRoutine(tick: number, world: World) {

@@ -1,4 +1,4 @@
-import { MobActor } from "../actor/mobActor";
+import { MobActor } from "../actor/actors/mobActor";
 import { World } from "../world";
 
 export function spawnMobRoutine(tick: number, world: World) {

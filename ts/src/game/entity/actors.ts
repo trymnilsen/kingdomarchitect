@@ -2,10 +2,10 @@ import { randomEntry } from "../../common/array";
 import { Point, pointEquals, zeroPoint } from "../../common/point";
 import { RenderContext } from "../../rendering/renderContext";
 import { Actor } from "../actor/actor";
-import { FarmerActor } from "../actor/farmerActor";
+import { FarmerActor } from "../actor/actors/farmerActor";
 import { Job } from "../actor/job/job";
 import { JobQueue } from "../actor/job/jobQueue";
-import { SwordsmanActor } from "../actor/swordsmanActor";
+import { SwordsmanActor } from "../actor/actors/swordsmanActor";
 import { World } from "../world";
 
 export class Actors {

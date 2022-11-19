@@ -1,23 +1,21 @@
 import { sprites } from "../../../asset/sprite";
 import { Point, pointEquals } from "../../../common/point";
 import { InputEvent } from "../../../input/input";
-import { drawLayout, onTapLayout } from "../../../ui/v1/layout/layout";
 import { Camera } from "../../../rendering/camera";
 import { RenderContext } from "../../../rendering/renderContext";
+import { ActionButton } from "../../../ui/v1/view/actionbar";
+import { MoveJob } from "../../actor/jobs/moveJob";
 import { GroundTile } from "../../entity/ground";
 import { TileSize } from "../../entity/tile";
 import { InteractionState } from "../handler/interactionState";
 import { InteractionStateChanger } from "../handler/interactionStateChanger";
-import { actionbarView, ActionButton } from "../../../ui/v1/view/actionbar";
-import { LayoutNode } from "../../../ui/v1/layout/layoutNode";
-import { MoveJob } from "../../actor/jobs/moveJob";
+import { getActionbarView } from "../view/actionbar";
 
 export class MoveState extends InteractionState {
     private tileSpaceSelection: Point | null;
     private initialSelection: Point;
     private path: Point[] = [];
     private actions: ActionButton[] = [];
-    private actionbar: LayoutNode | null = null;
     constructor(tileSpaceSelection: Point) {
         super();
         this.tileSpaceSelection = null;
@@ -32,29 +30,12 @@ export class MoveState extends InteractionState {
                 id: "cancel",
             },
         ];
-    }
 
-    onTap(screenPosition: Point): boolean {
-        if (this.actionbar) {
-            const hitResult = onTapLayout(this.actionbar, screenPosition);
-            if (hitResult.handled) {
-                console.log("tapped actionbar");
-                if (hitResult.data == "cancel") {
-                    this.context.stateChanger.pop(null);
-                } else if (hitResult.data == "confirm") {
-                    this.context.stateChanger.clear();
-                    const actor = this.context.world.actors.getActor(
-                        this.initialSelection
-                    );
-                    if (actor && this.path) {
-                        actor?.assignJob(new MoveJob(this.path));
-                    }
-                }
+        const actionbarView = getActionbarView(this.actions, (action) => {
+            this.actionButtonPressed(action.id);
+        });
 
-                return true;
-            }
-        }
-        return false;
+        this.view = actionbarView;
     }
 
     override onTileTap(tile: GroundTile): boolean {
@@ -109,8 +90,21 @@ export class MoveState extends InteractionState {
             }
         }
 
-        this.actionbar = actionbarView(context, this.actions);
-        drawLayout(context, this.actionbar);
+        super.onDraw(context);
+    }
+
+    private actionButtonPressed(id: string) {
+        if (id == "cancel") {
+            this.context.stateChanger.pop(null);
+        } else if (id == "confirm") {
+            this.context.stateChanger.clear();
+            const actor = this.context.world.actors.getActor(
+                this.initialSelection
+            );
+            if (actor && this.path) {
+                actor?.assignJob(new MoveJob(this.path));
+            }
+        }
     }
 
     private getCursorPosition(camera: Camera): Point {

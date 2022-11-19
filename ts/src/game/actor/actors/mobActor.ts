@@ -1,9 +1,9 @@
-import { goblinSprite } from "../../asset/sprites/goblinSprite";
-import { Point, pointEquals } from "../../common/point";
-import { Actor } from "./actor";
-import { ActorInstanceJobConstraint } from "./job/constraint/actorInstanceConstraint";
-import { Job } from "./job/job";
-import { MoveJob } from "./jobs/moveJob";
+import { goblinSprite } from "../../../asset/sprites/goblinSprite";
+import { Point, pointEquals } from "../../../common/point";
+import { Actor } from "./../actor";
+import { ActorInstanceJobConstraint } from "./../job/constraint/actorInstanceConstraint";
+import { Job } from "./../job/job";
+import { MoveJob } from "./../jobs/moveJob";
 
 export class MobActor extends Actor {
     constructor(position: Point) {

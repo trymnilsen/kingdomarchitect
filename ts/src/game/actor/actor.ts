@@ -62,10 +62,11 @@ export abstract class Actor {
     }
 
     /**
-     * Update the actor and any attached jobs
+     * Update the actor and any attached jobs.
      * @param tick the current world tick number
      */
     onUpdate(tick: number) {
+        this;
         const job = this._job;
         if (job) {
             if (job.startTick == 0) {

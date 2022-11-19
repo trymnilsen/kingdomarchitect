@@ -2,7 +2,7 @@ import { isPointAdjacentTo } from "../../../common/point";
 import { RenderContext } from "../../../rendering/renderContext";
 import { BlinkingImageAnimation } from "../../../rendering/visual/blinkingImageAnimation";
 import { GroundTile } from "../../entity/ground";
-import { CoinActor } from "../coinActor";
+import { CoinActor } from "../actors/coinActor";
 import { isFarmerJobConstraint } from "../job/constraint/isFarmerActorConstraint";
 import { Job } from "../job/job";
 import { JobConstraint } from "../job/jobConstraint";

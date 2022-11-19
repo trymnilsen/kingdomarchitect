@@ -1,5 +1,5 @@
 import { Actor } from "../../actor";
-import { FarmerActor } from "../../farmerActor";
+import { FarmerActor } from "../../actors/farmerActor";
 import { Job } from "../job";
 import { JobConstraint } from "../jobConstraint";
 
