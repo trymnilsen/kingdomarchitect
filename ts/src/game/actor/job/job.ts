@@ -110,6 +110,7 @@ export abstract class Job {
     /**
      * Request to update this job. Called when attached to an actor and running
      * as their active job. Any inherited methods should call `super.update`.
+     * TODO: Actor and World should be arguments?
      * @param tick the game tick
      */
     abstract update(tick: number): void;

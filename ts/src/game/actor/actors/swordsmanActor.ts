@@ -3,8 +3,8 @@ import {
     SpriteAnimation,
     spriteFromAnimation,
 } from "../../../asset/spriteAnimation";
-import { Direction, getDirection } from "../../../common/direction";
-import { addPoint, Point } from "../../../common/point";
+import { Direction } from "../../../common/direction";
+import { addPoint, Point, getDirection } from "../../../common/point";
 import { RenderContext } from "../../../rendering/renderContext";
 import { Actor } from "./../actor";
 
@@ -75,9 +75,11 @@ export class SwordsmanActor extends Actor {
             this.tilePosition
         );
 
-        if (direction) {
+        if (direction !== null) {
             this._direction = direction;
             this._animationFrame += 1;
+        } else {
+            this._direction = Direction.Down;
         }
     }
 

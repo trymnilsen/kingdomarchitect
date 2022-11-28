@@ -1,4 +1,6 @@
 import { MobActor } from "../actor/actors/mobActor";
+import { ActorInstanceJobConstraint } from "../actor/job/constraint/actorInstanceConstraint";
+import { MoveJob } from "../actor/jobs/moveJob";
 import { World } from "../world";
 
 export function spawnMobRoutine(tick: number, world: World) {
@@ -18,5 +20,13 @@ export function spawnMobRoutine(tick: number, world: World) {
         y: spawnPosition.y,
     });
 
+    const path = world.findPath(spawnPosition, {
+        x: 4,
+        y: 4,
+    });
+
     world.actors.addActor(mobActor);
+    world.actors.jobQueue.schedule(
+        new MoveJob(path, new ActorInstanceJobConstraint(mobActor))
+    );
 }

@@ -122,7 +122,7 @@ function createWeightGraphFromWorld(world: World): Graph {
     for (let x = 0; x <= offsetBounds.bounds.x2; x++) {
         weightGraph[x] = [];
         for (let y = 0; y <= offsetBounds.bounds.y2; y++) {
-            let weight = 0;
+            let weight = 1000;
             const tilePositionXWithoutOffset = x - offsetBounds.offsets.x;
             const tilePositionYWithoutOffset = y - offsetBounds.offsets.y;
             const tileId = getTileId(

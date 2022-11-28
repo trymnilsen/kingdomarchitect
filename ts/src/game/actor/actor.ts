@@ -6,6 +6,7 @@ import { RenderContext } from "../../rendering/renderContext";
 import { World } from "../world";
 import { Job, JobState } from "./job/job";
 import { InvalidStateError } from "../../common/error/invalidStateError";
+import { Behavior } from "./behavior/behavior";
 
 /**
  * Actors is the base for all interactive objects in the game world.
@@ -15,6 +16,8 @@ export abstract class Actor {
     private _jobCompleted: Event<void>;
     private _world: World | null = null;
     private _job: Job | null = null;
+    private _behavior: Behavior | null = null;
+    private _tags: string[] = [];
     private sprite: Sprite;
 
     public get hasJob(): boolean {
@@ -26,6 +29,14 @@ export abstract class Actor {
      */
     public get jobCompletedEvent(): EventListener<void> {
         return this._jobCompleted;
+    }
+
+    public get behavior(): Behavior | null {
+        return this._behavior;
+    }
+
+    public set behavior(value: Behavior | null) {
+        this._behavior = value;
     }
 
     /**
@@ -45,6 +56,10 @@ export abstract class Actor {
 
     public set world(v: World) {
         this._world = v;
+    }
+
+    public get tags(): string[] {
+        return this._tags;
     }
 
     constructor(initialPosition: Point, sprite: Sprite) {

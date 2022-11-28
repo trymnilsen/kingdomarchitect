@@ -2,37 +2,33 @@
     "name": "kingdomarchitect",
     "version": "1.0.0",
     "description": "Kingdom architects is intended to be a building/management game",
-    "main": "ts/src/main.ts",
+    "type": "module",
     "scripts": {
-        "start": "webpack serve",
-        "build": "webpack",
-        "build-tsc": "tsc",
-        "test": "c8 jest",
-        "coverage": "c8 report"
+        "build": "tsc && rollup --config rollup.config.js",
+        "start": "cd public && static-server",
+        "test": "tsc && node --test",
+        "coverage": "c8 node --test && c8 report && open coverage/lcov-report/index.html"
     },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/trymnilsen/kingdomarchitect.git"
     },
-    "keywords": [],
-    "author": "",
+    "author": "Trym Nilsen",
     "private": true,
     "license": "MIT",
     "bugs": {
         "url": "https://github.com/trymnilsen/kingdomarchitect/issues"
     },
+    "overrides": {
+        "rollup": "^3.5.0"
+    },
     "homepage": "https://github.com/trymnilsen/kingdomarchitect#readme",
     "dependencies": {
+        "@types/node": "^18.11.9",
         "c8": "^7.12.0",
-        "eslint-plugin-jsdoc": "^39.3.6",
-        "jest": "^29.1.2",
-        "jest-progress-bar-reporter": "^1.0.25",
-        "ts-jest": "^29.0.3",
-        "ts-loader": "^9.4.1",
-        "ts-node": "^10.9.1",
-        "typescript": "^4.8.4",
-        "webpack": "^5.74.0",
-        "webpack-cli": "^4.10.0",
-        "webpack-dev-server": "^4.11.1"
+        "rollup": "^3.5.0",
+        "rollup-plugin-sourcemaps": "^0.6.3",
+        "static-server": "^2.2.1",
+        "typescript": "^4.9.3"
     }
 }

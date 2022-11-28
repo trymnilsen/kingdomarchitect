@@ -1,7 +1,7 @@
-import { describe, expect, test } from "@jest/globals";
+import { test } from "node:test";
+import assert from "node:assert";
 
-describe("dummy test", () => {
-    test("3 to equal 3", () => {
-        expect(3).toBe(3);
-    });
+test("synchronous passing test", (t) => {
+    assert.strictEqual(1, 2);
+    // This test passes because it does not throw an exception.
 });

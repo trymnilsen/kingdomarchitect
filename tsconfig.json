@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
-      "target": "ES2018",
-      "module": "commonjs",
+      "target": "ES2022",
+      "module": "ES2022",
       "sourceMap": true,
       "declaration": false,
       "rootDir": "./ts",
@@ -15,7 +15,7 @@
       "noUnusedLocals": true,
       "noFallthroughCasesInSwitch": true,
       "noPropertyAccessFromIndexSignature": true,
-      "removeComments": false,
+      "removeComments": true,
       "experimentalDecorators": true,
       "esModuleInterop": true,
       "noEmitOnError": true,
