@@ -6,7 +6,7 @@
     "scripts": {
         "build": "tsc && rollup --config rollup.config.js",
         "start": "cd public && static-server",
-        "test": "tsc && node --test",
+        "test": "tsc && node --test build/test/",
         "coverage": "c8 node --test && c8 report && open coverage/lcov-report/index.html"
     },
     "repository": {

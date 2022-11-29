@@ -1,12 +1,11 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
 
-describe("dummy tests", () => {
-    it("dummy is smart", () => {
+describe("UIText", () => {
+    it("Measures text", () => {
         assert.strictEqual(1, 1);
     });
-
-    it("dummy is two", () => {
-        assert.strictEqual(2, 2);
+    it("Aligns correctly", () => {
+        assert.strictEqual(1, 1);
     });
 });
