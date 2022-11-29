@@ -1,8 +1,5 @@
-import { describe, it } from "node:test";
-import assert from "node:assert";
+import test from "ava";
 
-describe("smart tests", () => {
-    it("smarty is dumb", () => {
-        assert.strictEqual(1, 1);
-    });
+test("foo", (t) => {
+    t.pass();
 });
