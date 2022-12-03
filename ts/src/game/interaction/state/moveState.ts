@@ -1,4 +1,3 @@
-import { sprites } from "../../../asset/sprite";
 import { Point, pointEquals } from "../../../common/point";
 import { InputEvent } from "../../../input/input";
 import { Camera } from "../../../rendering/camera";
@@ -67,8 +66,8 @@ export class MoveState extends InteractionState {
     override onDraw(context: RenderContext): void {
         let cursorWorldPosition = this.getCursorPosition(context.camera);
 
-        context.drawSprite({
-            sprite: sprites.cursor,
+        context.drawImage({
+            image: "cursor",
             x: cursorWorldPosition.x + 2,
             y: cursorWorldPosition.y + 2,
         });

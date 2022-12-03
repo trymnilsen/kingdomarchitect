@@ -145,6 +145,13 @@ function createWeightGraphFromWorld(world: World): Graph {
                 weight = building.weight || 1000; //If there is a building at this position we make it very difficult to pass
             }
 
+            const entity = world.entities.getTile({
+                x: tilePositionXWithoutOffset,
+                y: tilePositionYWithoutOffset,
+            });
+            if (!!entity) {
+                weight = 500;
+            }
             weightGraph[x][y] = weight;
         }
     }

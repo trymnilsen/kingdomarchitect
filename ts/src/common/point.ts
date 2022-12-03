@@ -188,3 +188,30 @@ export function getDirection(a: Point, b: Point): Direction | null {
     }
     return direction;
 }
+
+export function getSizeOfPoints(points: Point[]): Point {
+    let lowestX = Number.MAX_SAFE_INTEGER;
+    let lowestY = Number.MAX_SAFE_INTEGER;
+    let highestX = Number.MIN_SAFE_INTEGER;
+    let highestY = Number.MIN_SAFE_INTEGER;
+
+    for (const point of points) {
+        if (point.x < lowestX) {
+            lowestX = point.x;
+        }
+        if (point.y < lowestY) {
+            lowestY = point.y;
+        }
+        if (point.x > highestX) {
+            highestX = point.x;
+        }
+        if (point.y > highestY) {
+            highestY = point.y;
+        }
+    }
+
+    return {
+        x: highestX - lowestX + 1,
+        y: highestY - lowestY + 1,
+    };
+}

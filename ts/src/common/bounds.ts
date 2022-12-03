@@ -101,3 +101,12 @@ export function absBounds(bounds: Bounds): {
         },
     };
 }
+
+export function normaliseBounds(bounds: Bounds): Bounds {
+    return {
+        x1: bounds.x1 - bounds.x1,
+        y1: bounds.y1 - bounds.y1,
+        x2: bounds.x2 - bounds.x1,
+        y2: bounds.y2 - bounds.y1,
+    };
+}

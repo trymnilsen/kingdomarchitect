@@ -1,4 +1,3 @@
-import { sprites } from "../../../../asset/sprite";
 import { Point } from "../../../../common/point";
 import { InputEvent } from "../../../../input/input";
 import { RenderContext } from "../../../../rendering/renderContext";
@@ -53,8 +52,8 @@ export class PathOrSingleBuildState extends InteractionState {
             });
         }
 
-        context.drawSprite({
-            sprite: sprites.cursor,
+        context.drawImage({
+            image: "cursor",
             x: cursorWorldPosition.x + 3,
             y: cursorWorldPosition.y + 3,
         });

@@ -1,4 +1,3 @@
-import { sprites } from "../../../../asset/sprite";
 import { stoneWoodWalls } from "../../../../asset/sprites/stoneWoodWalls";
 import {
     woodenHouseScaffold,
@@ -28,9 +27,13 @@ import {
 import { MoveState } from "../moveState";
 import {
     ActorSelectedItem,
+    BuildingSelectedItem,
     SelectedItem,
     TileSelectedItem,
 } from "./selectedItem";
+import { getTileId, TileSize } from "../../../entity/tile";
+import { allSides } from "../../../../common/sides";
+import { MultiTile } from "../../../entity/buildings";
 
 export class SelectionState extends InteractionState {
     private selectedItem: SelectedItem;
@@ -74,8 +77,31 @@ export class SelectionState extends InteractionState {
             const actorSelection = new ActorSelectedItem(actor);
             this.selectedItem = actorSelection;
         } else {
-            const tileSelection = new TileSelectedItem(tile);
-            this.selectedItem = tileSelection;
+            let building = this.context.world.buildings.getTile(
+                getTileId(tile.tileX, tile.tileY)
+            );
+
+            if (!!building && "multiTile" in building) {
+                const sourceTile = (building as MultiTile).multiTile;
+                const sourceBuilding =
+                    this.context.world.buildings.getTile(sourceTile);
+                if (!!sourceBuilding) {
+                    building = sourceBuilding;
+                } else {
+                    console.error(
+                        "Tapped building had reference to multitile not found"
+                    );
+                }
+            }
+            console.log(`Building at ${tile.tileX} ${tile.tileY}`, building);
+            if (!!building) {
+                const size = this.context.world.buildings.getSize(building);
+                console.log(`building size`, size);
+                this.selectedItem = new BuildingSelectedItem(building, size);
+            } else {
+                const tileSelection = new TileSelectedItem(tile);
+                this.selectedItem = tileSelection;
+            }
         }
 
         this.updateTileActions();
@@ -87,14 +113,21 @@ export class SelectionState extends InteractionState {
     }
 
     override onDraw(context: RenderContext): void {
-        const cursorWorldPosition = context.camera.tileSpaceToWorldSpace(
+        const cursorWorldPosition = context.camera.tileSpaceToScreenSpace(
             this.selectedItem.tilePosition
         );
+        const bounds = this.selectedItem.selectionSize;
+        const cursorWidth = bounds.x * TileSize;
+        const cursorHeight = bounds.y * TileSize;
 
-        context.drawSprite({
-            sprite: sprites.cursor,
-            x: cursorWorldPosition.x + 3,
-            y: cursorWorldPosition.y + 3,
+        context.drawNinePatchImage({
+            asset: "cursor",
+            height: cursorHeight,
+            width: cursorWidth,
+            scale: 1.0,
+            sides: allSides(12.0),
+            x: cursorWorldPosition.x,
+            y: cursorWorldPosition.y,
         });
 
         super.onDraw(context);

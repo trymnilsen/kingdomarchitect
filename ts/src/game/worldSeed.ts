@@ -2,13 +2,14 @@ import { withinRectangle } from "../common/bounds";
 import { Graph } from "../path/graph";
 import { PathSearch } from "../path/search";
 import { RoadVisual } from "../rendering/visual/roadVisual";
-import { BuildingTile } from "./entity/buildings";
+import { BuildingTile, MultiTile, MultiTileSource } from "./entity/buildings";
 import { Ground } from "./entity/ground";
+import { getTileId } from "./entity/tile";
 
 export function getStartBuildings(world: Ground): BuildingTile[] {
     const buildings: BuildingTile[] = [];
     //Place castle
-    const castle: BuildingTile = {
+    const castle: MultiTileSource = {
         sprite: "keep",
         x: 3,
         y: 3,
@@ -16,7 +17,25 @@ export function getStartBuildings(world: Ground): BuildingTile[] {
             x: 8,
             y: 8,
         },
+        connectedTile: [],
     };
+    for (let y = 0; y < 3; y++) {
+        for (let x = 0; x < 3; x++) {
+            if (x == 0 && y == 0) {
+                continue;
+            }
+            const castleMultiTile: MultiTile = {
+                x: 3 + x,
+                y: 3 + y,
+                multiTile: getTileId(3, 3),
+            };
+            castle.connectedTile.push(
+                getTileId(castleMultiTile.x, castleMultiTile.y)
+            );
+
+            buildings.push(castleMultiTile);
+        }
+    }
     buildings.push(castle);
     //Get tiles for possible houses
     const tiles = world.getTiles((tile) => {

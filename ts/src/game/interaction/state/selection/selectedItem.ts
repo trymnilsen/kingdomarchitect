@@ -1,5 +1,6 @@
 import { Point } from "../../../../common/point";
 import { Actor } from "../../../actor/actor";
+import { BuildingTile } from "../../../entity/buildings";
 import { GroundTile } from "../../../entity/ground";
 
 /**
@@ -12,6 +13,7 @@ export interface SelectedItem {
      * Will be updated if the selected item moves.
      */
     get tilePosition(): Point;
+    get selectionSize(): Point;
     /**
      * Checks if the two items, the item wrapped by this class and the
      * new item are refering to the same item. This check will be different
@@ -24,6 +26,12 @@ export interface SelectedItem {
 
 export class TileSelectedItem implements SelectedItem {
     constructor(private item: GroundTile) {}
+    get selectionSize(): Point {
+        return {
+            x: 1,
+            y: 1,
+        };
+    }
 
     get tile(): GroundTile {
         return this.item;
@@ -43,10 +51,32 @@ export class TileSelectedItem implements SelectedItem {
 
 export class ActorSelectedItem implements SelectedItem {
     constructor(private item: Actor) {}
+    get selectionSize(): Point {
+        return {
+            x: 1,
+            y: 1,
+        };
+    }
     get tilePosition(): Point {
         return this.item.tilePosition;
     }
     isSelectedItem(item: any): boolean {
         return this.item == item;
+    }
+}
+
+export class BuildingSelectedItem implements SelectedItem {
+    constructor(private item: BuildingTile, private boundsSize: Point) {}
+    get tilePosition(): Point {
+        return {
+            x: this.item.x,
+            y: this.item.y,
+        };
+    }
+    get selectionSize(): Point {
+        return this.boundsSize;
+    }
+    isSelectedItem(item: any): boolean {
+        throw new Error("Method not implemented.");
     }
 }

@@ -36,6 +36,7 @@ class _BuildJob extends Job {
             const buildResult = entity.build(10);
             if (buildResult < 10 || entity.healthPercentage === 1.0) {
                 console.log("_BuildJob finished");
+                this.actor.world.invalidateWorld();
                 this.complete();
             }
         }
