@@ -1,7 +1,15 @@
 import { sprites } from "../../asset/sprite";
+import { randomEntry } from "../../common/array";
 import { Bounds, getBoundsAxis } from "../../common/bounds";
-import { Axis, Direction, invertDirection } from "../../common/direction";
-import { adjacentPoint, Point } from "../../common/point";
+import {
+    Axis,
+    Direction,
+    getRandomAxis,
+    getRandomDirection,
+    invertAxis,
+    invertDirection,
+} from "../../common/direction";
+import { adjacentPoint, Point, pointEquals } from "../../common/point";
 import { rangeDistance, rangeRandom } from "../../common/range";
 import { RenderContext } from "../../rendering/renderContext";
 import { getTileId, TileSize } from "./tile";
@@ -22,9 +30,16 @@ function hasTree(threshold: number): number {
 
 export class Ground {
     private tiles: { [id: string]: GroundTile } = {};
+    private chunks: Point[] = [];
+
     constructor() {
-        for (let x = 0; x < 10; x++) {
-            for (let y = 0; y < 10; y++) {
+        for (let cx = 0; cx < 3; cx++) {
+            for (let cy = 0; cy < 3; cy++) {
+                this.chunks.push({ x: cx, y: cy });
+            }
+        }
+        for (let x = 0; x < 9; x++) {
+            for (let y = 0; y < 9; y++) {
                 const id = getTileId(x, y);
                 this.tiles[id] = {
                     tileX: x,
@@ -57,21 +72,26 @@ export class Ground {
     }
 
     generate() {
-        //console.log("Generate based on current tiles", this.tiles);
-        //const renderStart = performance.now();
-        const newTilePosition = generateGround(this.tiles);
-        if (newTilePosition.x == 0 && newTilePosition.y == 0) {
-            console.warn("Unable to generate tile position");
+        const chunk = generateChunk(this.chunks);
+        if (!!chunk) {
+            this.chunks.push(chunk);
+            for (let cx = 0; cx < 3; cx++) {
+                for (let cy = 0; cy < 3; cy++) {
+                    const tilePoint: Point = {
+                        x: chunk.x * 3 + cx,
+                        y: chunk.y * 3 + cy,
+                    };
+                    this.tiles[getTileId(tilePoint.x, tilePoint.y)] = {
+                        tileX: tilePoint.x,
+                        tileY: tilePoint.y,
+                        hasTree: hasTree(0.7),
+                    };
+                }
+            }
+            console.log("Chunk generated: ", chunk);
         } else {
-            this.tiles[getTileId(newTilePosition.x, newTilePosition.y)] = {
-                tileX: newTilePosition.x,
-                tileY: newTilePosition.y,
-                hasTree: hasTree(0.7),
-            };
+            console.warn("Failed to generate tile");
         }
-
-        //const renderEnd = performance.now();
-        //console.log("⏱generate ground time: ", renderEnd - renderStart);
     }
 
     onDraw(context: RenderContext) {
@@ -142,6 +162,34 @@ export function getTileBounds(entries: [string, GroundTile][]): Bounds {
     }
 
     return bounds;
+}
+
+export function generateChunk(chunks: Point[]): Point | null {
+    const randomAxis = getRandomAxis();
+    const randomDirection = getRandomDirection(invertAxis(randomAxis));
+    let axisItems: Point[] = [];
+    if (randomAxis === Axis.XAxis) {
+        axisItems = chunks.filter((chunk) => chunk.y == 1);
+    } else {
+        axisItems = chunks.filter((chunk) => chunk.x == 1);
+    }
+
+    //We now have a random tile to start search outwards from for a free point
+    let searchPoint = randomEntry(axisItems);
+    let foundPoint: Point | null = null;
+    let searches = 0;
+    while (searches < 32) {
+        const nextPoint = adjacentPoint(searchPoint, randomDirection);
+        if (chunks.some((chunk) => pointEquals(nextPoint, chunk))) {
+            searchPoint = nextPoint;
+        } else {
+            foundPoint = nextPoint;
+            break;
+        }
+        searches += 1;
+    }
+
+    return foundPoint;
 }
 
 export function generateGround(tiles: { [id: string]: GroundTile }): Point {

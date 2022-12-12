@@ -43,9 +43,9 @@ export class World {
         this._ground = new Ground();
         this._buildings = new Buildings();
         this._actors = new Actors(this);
-        for (let i = 0; i < 100; i++) {
+        /*         for (let i = 0; i < 100; i++) {
             this.ground.generate();
-        }
+        } */
 
         const startBuildings = getStartBuildings(this._ground);
         for (let x = 0; x < 3; x++) {
