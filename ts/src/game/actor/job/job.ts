@@ -11,8 +11,13 @@ export enum JobState {
     Completed,
 }
 
+export enum JobCompletedResult {
+    Aborted,
+    Success,
+}
+
 export abstract class Job {
-    private _completedEvent = new Event<void>();
+    private _completedEvent = new Event<JobCompletedResult>();
     private _actor: Actor | null = null;
     private _jobState: JobState = JobState.NotStarted;
     private _constraint: JobConstraint | null = null;
@@ -64,7 +69,7 @@ export abstract class Job {
 
         if (this._jobState == JobState.Running && v != JobState.Completed) {
             throw new InvalidStateError(
-                `Can only transition to completed from running, attempted to set: ${v}`
+                `Can only transition to end-state from running, attempted to set: ${v}`
             );
         }
 
@@ -74,7 +79,7 @@ export abstract class Job {
     /**
      * Event that is triggered when this job is completed
      */
-    public get completedEvent(): EventListener<void> {
+    public get completedEvent(): EventListener<JobCompletedResult> {
         return this._completedEvent;
     }
 
@@ -126,12 +131,17 @@ export abstract class Job {
      */
     onDraw(renderContext: RenderContext) {}
 
+    public abort() {
+        this._jobState = JobState.Completed;
+        this._completedEvent.publish(JobCompletedResult.Aborted);
+    }
+
     /**
      * Signal that this job is completed and any actors performing it can
      * take on new jobs
      */
     protected complete() {
         this._jobState = JobState.Completed;
-        this._completedEvent.publish();
+        this._completedEvent.publish(JobCompletedResult.Success);
     }
 }

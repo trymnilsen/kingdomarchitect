@@ -122,8 +122,7 @@ export abstract class InteractionState {
      * to a different state
      * @returns if the tap has been handled or not
      */
-    abstract onInput(
-        input: InputEvent,
-        stateChanger: InteractionStateChanger
-    ): boolean;
+    onInput(input: InputEvent, stateChanger: InteractionStateChanger): boolean {
+        return false;
+    }
 }

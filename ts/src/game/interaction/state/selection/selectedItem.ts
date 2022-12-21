@@ -1,6 +1,6 @@
 import { Point } from "../../../../common/point";
 import { Actor } from "../../../actor/actor";
-import { BuildingTile } from "../../../entity/buildings";
+import { Entity } from "../../../entity/entity";
 import { GroundTile } from "../../../entity/ground";
 
 /**
@@ -65,8 +65,8 @@ export class ActorSelectedItem implements SelectedItem {
     }
 }
 
-export class BuildingSelectedItem implements SelectedItem {
-    constructor(private item: BuildingTile, private boundsSize: Point) {}
+export class EntitySelectedItem implements SelectedItem {
+    constructor(private item: Entity, private boundsSize: Point) {}
     get tilePosition(): Point {
         return {
             x: this.item.x,
@@ -77,6 +77,6 @@ export class BuildingSelectedItem implements SelectedItem {
         return this.boundsSize;
     }
     isSelectedItem(item: any): boolean {
-        throw new Error("Method not implemented.");
+        return this.item === item;
     }
 }

@@ -1,13 +1,9 @@
 import { Sprite } from "../../asset/sprite";
-import { InvalidArgumentError } from "../../common/error/invalidArgumentError";
 import { Point } from "../../common/point";
 import { RenderContext } from "../../rendering/renderContext";
 import { Entity } from "./entity";
-import { TileSize } from "./tile";
 
 export class BuildableEntity extends Entity {
-    private _health: number = 0;
-    private _maxHp: number = 100;
     private _isScaffolded: boolean = true;
 
     private scaffoldSprite: Sprite;
@@ -26,22 +22,6 @@ export class BuildableEntity extends Entity {
     }
     public set buildingOffset(value: Point) {
         this._buildingOffset = value;
-    }
-    public get health(): number {
-        return this._health;
-    }
-    public get healthPercentage(): number {
-        return this._health / this._maxHp;
-    }
-    public set health(value: number) {
-        if (value < 0) {
-            throw new InvalidArgumentError("Health cannot be less than 0");
-        }
-        if (value > this._maxHp) {
-            throw new InvalidArgumentError("Health cannot be more than max hp");
-        }
-
-        this._health = value;
     }
 
     constructor(
@@ -101,26 +81,6 @@ export class BuildableEntity extends Entity {
                 : this._buildingSprite,
         });
 
-        if (this._health > 0 && this._health < this._maxHp) {
-            const healthbarY = worldSpace.y + TileSize - 16;
-            const healthbarWidth = TileSize - 10;
-            const healthbarX = worldSpace.x + 4;
-
-            context.drawRectangle({
-                x: healthbarX,
-                y: healthbarY,
-                width: healthbarWidth,
-                height: 8,
-                fill: "black",
-            });
-
-            context.drawRectangle({
-                x: healthbarX + 2,
-                y: healthbarY + 2,
-                width: Math.max(healthbarWidth * this.healthPercentage - 4, 4),
-                height: 4,
-                fill: "green",
-            });
-        }
+        super.onDraw(context);
     }
 }

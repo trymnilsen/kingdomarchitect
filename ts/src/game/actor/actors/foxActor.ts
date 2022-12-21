@@ -2,6 +2,8 @@ import { foxSprite } from "../../../asset/sprites/foxSprite";
 import { randomEntry } from "../../../common/array";
 import { Point } from "../../../common/point";
 import { manhattanDistance } from "../../../path/pathHeuristics";
+import { getTileId } from "../../entity/tile";
+import { PathResultStatus } from "../../world";
 import { Actor } from "./../actor";
 import { ActorInstanceJobConstraint } from "./../job/constraint/actorInstanceConstraint";
 import { Job } from "./../job/job";
@@ -12,19 +14,19 @@ export class FoxActor extends Actor {
         super(initialPoint, foxSprite);
     }
 
-    override onIdle(): Job {
+    override onIdle(): Job | null {
         // When the fox becomes idle move to a new random spot
         const possibleSpots = this.world.ground.getTiles((tile) => {
             // Only pick tiles that have a manhattan distance of more than 3
-            return (
-                manhattanDistance(
-                    {
-                        x: tile.tileX,
-                        y: tile.tileY,
-                    },
-                    this.tilePosition
-                ) > 3
+            const tilePoint = {
+                x: tile.tileX,
+                y: tile.tileY,
+            };
+            const distance = manhattanDistance(tilePoint, this.tilePosition);
+            const hasBuilding = this.world.buildings.getTile(
+                getTileId(tile.tileX, tile.tileY)
             );
+            return distance > 3 && !hasBuilding;
         });
         const randomSpot = randomEntry(possibleSpots);
 
@@ -33,6 +35,10 @@ export class FoxActor extends Actor {
             y: randomSpot.tileY,
         });
 
-        return new MoveJob(path, new ActorInstanceJobConstraint(this));
+        if (path.status == PathResultStatus.Complete) {
+            return new MoveJob(path.path, new ActorInstanceJobConstraint(this));
+        } else {
+            return null;
+        }
     }
 }

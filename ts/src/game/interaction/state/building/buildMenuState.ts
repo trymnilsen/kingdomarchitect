@@ -1,7 +1,5 @@
-import { InputEvent } from "../../../../input/input";
 import { UIAction } from "../../../../ui/uiView";
 import { InteractionState } from "../../handler/interactionState";
-import { InteractionStateChanger } from "../../handler/interactionStateChanger";
 import { buildMenuStateView } from "./buildMenuStateView";
 import { SelectedBuildingUiActionType } from "./selectedBuildingUiAction";
 
@@ -15,10 +13,6 @@ export class BuildMenuState extends InteractionState {
         const view = buildMenuStateView();
         view.uiAction.listen(this.buildSelected);
         this.view = view;
-    }
-
-    onInput(input: InputEvent, stateChanger: InteractionStateChanger): boolean {
-        return false;
     }
 
     private buildSelected = (uiAction: UIAction) => {

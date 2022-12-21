@@ -1,12 +1,16 @@
-import { Point } from "../common/point";
+import { Point, pointEquals } from "../common/point";
 import { BinaryHeap } from "./binaryHeap";
-import { Graph, GraphNode } from "./graph";
+import { Graph, GraphNode, WeightNode } from "./graph";
 import { manhattanDistance } from "./pathHeuristics";
 
 export class PathSearch {
     private graph: Graph;
     constructor(graph: Graph) {
         this.graph = graph;
+    }
+
+    getWeights(): WeightNode[][] {
+        return this.graph.weights;
     }
 
     getGraph(): Graph {
@@ -17,9 +21,15 @@ export class PathSearch {
         this.graph = graph;
     }
 
-    search(from: Point, to: Point): Point[] {
-        let start = this.graph.nodeAt(from.x, from.y);
-        let end = this.graph.nodeAt(to.x, to.y);
+    search(
+        from: Point,
+        to: Point,
+        allowPartialPaths: boolean,
+        weightModifier: (graphNode: GraphNode) => number
+    ): Point[] {
+        const start = this.graph.nodeAt(from.x, from.y);
+        const end = this.graph.nodeAt(to.x, to.y);
+        let closestNode = start;
         if (!start) {
             console.warn("From point not in graph", from);
             return [];
@@ -32,7 +42,7 @@ export class PathSearch {
 
         this.graph.cleanDirtyNodes();
 
-        var openHeap = this.createHeap();
+        const openHeap = this.createHeap();
         //var closestNode = start; // set the start node to be the closest if required
 
         start.h = manhattanDistance(start, end);
@@ -42,7 +52,7 @@ export class PathSearch {
 
         while (openHeap.size > 0) {
             // Grab the lowest f(x) to process next.  Heap keeps this sorted for us.
-            var currentNode = openHeap.pop();
+            const currentNode = openHeap.pop();
 
             // End case -- result has been found, return the traced path.
             if (currentNode === end) {
@@ -53,20 +63,22 @@ export class PathSearch {
             currentNode.closed = true;
 
             // Find all neighbors for the current node.
-            var neighbors = this.graph.neighbors(currentNode);
+            const neighbors = this.graph.neighbors(currentNode);
 
             for (var i = 0, il = neighbors.length; i < il; ++i) {
-                var neighbor = neighbors[i];
-
-                if (neighbor.closed || neighbor.isWall) {
+                const neighbor = neighbors[i];
+                const neighborWeight = weightModifier(neighbor);
+                if (neighbor.closed || neighborWeight === 0) {
                     // Not a valid node to process, skip to next neighbor.
+                    // if the weight modifier returns 0 it is absolutely
+                    // impassable and should not be ranked
                     continue;
                 }
 
                 // The g score is the shortest distance from start to current node.
                 // We need to check if the path we have arrived at this neighbor is the shortest one we have seen yet.
-                var gScore = currentNode.g + neighbor.weight;
-                var beenVisited = neighbor.visited;
+                const gScore = currentNode.g + neighborWeight;
+                const beenVisited = neighbor.visited;
 
                 if (!beenVisited || gScore < neighbor.g) {
                     // Found an optimal (so far) path to this node.  Take score for node to see how good it is.
@@ -76,17 +88,18 @@ export class PathSearch {
                     neighbor.g = gScore;
                     neighbor.f = neighbor.g + neighbor.h;
                     this.graph.markDirtyNode(neighbor);
-                    /*                     if (closest) {
-                        // If the neighbour is closer than the current closestNode or if it's equally close but has
-                        // a cheaper path than the current closest node then it becomes the closest node
-                        if (
-                            neighbor.h < closestNode.h ||
-                            (neighbor.h === closestNode.h &&
-                                neighbor.g < closestNode.g)
-                        ) {
-                            closestNode = neighbor;
-                        }
-                    } */
+
+                    // If the neighbour is closer than the current closestNode or if it's equally close but has
+                    // a cheaper path than the current closest node then it becomes the closest node
+                    const neighborCloserThanClosest =
+                        neighbor.h < closestNode.h;
+                    const neighborIsCheaper =
+                        neighbor.h === closestNode.h &&
+                        neighbor.g < closestNode.g;
+
+                    if (neighborCloserThanClosest || neighborIsCheaper) {
+                        closestNode = neighbor;
+                    }
 
                     if (!beenVisited) {
                         // Pushing to heap will put it in proper place based on the 'f' value.
@@ -99,6 +112,11 @@ export class PathSearch {
             }
         }
 
+        // If the closest node is not the start node, we have a partial path
+        if (!pointEquals(start, closestNode)) {
+            return this.pathTo(closestNode);
+        }
+
         // No result was found - empty array signifies failure to find path.
         return [];
     }
@@ -108,8 +126,8 @@ export class PathSearch {
     }
 
     private pathTo(node: GraphNode) {
-        var curr = node;
-        var path: GraphNode[] = [];
+        let curr = node;
+        const path: GraphNode[] = [];
         while (curr.parent) {
             path.unshift(curr);
             curr = curr.parent;

@@ -1,32 +1,25 @@
 import { MobActor } from "../actor/actors/mobActor";
-import { ActorInstanceJobConstraint } from "../actor/job/constraint/actorInstanceConstraint";
-import { MoveJob } from "../actor/jobs/moveJob";
+import { AttackBuildingJob } from "../actor/jobs/attack/attackBuildingJob";
 import { World } from "../world";
 
 export function spawnMobRoutine(tick: number, world: World) {
     if (tick % 20 != 0) {
         return;
     }
-    const existingAnimals = world.actors.getActors(
+    const existingMob = world.actors.getActors(
         (actor) => actor instanceof MobActor
     );
-    if (existingAnimals.length > 0) {
+    if (existingMob.length > 0) {
         return;
     }
-    const spawnPosition = world.ground.getRandomBoundsPosition();
-
-    const mobActor = new MobActor({
-        x: spawnPosition.x,
-        y: spawnPosition.y,
-    });
-
-    const path = world.findPath(spawnPosition, {
+    const spawnPosition = {
         x: 4,
-        y: 4,
-    });
-
+        y: 0,
+    };
+    const mobActor = new MobActor(spawnPosition);
+    const building = world.entities.getTile({ x: 3, y: 3 });
+    //const pathResult = world.findPath(spawnPosition, toPosition, true);
+    const job = new AttackBuildingJob(building, mobActor);
     world.actors.addActor(mobActor);
-    world.actors.jobQueue.schedule(
-        new MoveJob(path, new ActorInstanceJobConstraint(mobActor))
-    );
+    world.actors.jobQueue.schedule(job);
 }

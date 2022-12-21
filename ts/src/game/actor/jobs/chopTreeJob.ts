@@ -1,11 +1,11 @@
-import { isPointAdjacentTo } from "../../../common/point";
+import { isPointAdjacentTo, pointEquals } from "../../../common/point";
 import { RenderContext } from "../../../rendering/renderContext";
 import { BlinkingImageAnimation } from "../../../rendering/visual/blinkingImageAnimation";
 import { GroundTile } from "../../entity/ground";
+import { TileSize } from "../../entity/tile";
 import { CoinActor } from "../actors/coinActor";
 import { isFarmerJobConstraint } from "../job/constraint/isFarmerActorConstraint";
 import { Job } from "../job/job";
-import { JobConstraint } from "../job/jobConstraint";
 import { JobConstraintsError } from "../job/jobConstraintsError";
 import { MultipleStepJob } from "../job/multipleStepJob";
 import { MoveJob } from "./moveJob";
@@ -16,32 +16,35 @@ import { MoveJob } from "./moveJob";
  * be skipped.
  */
 export class ChopTreeJob extends MultipleStepJob {
-    private tile: GroundTile;
+    private _tile: GroundTile;
 
-    public override get constraint(): JobConstraint {
-        return isFarmerJobConstraint;
+    public get groundTile(): GroundTile {
+        return this._tile;
     }
 
     constructor(tree: GroundTile) {
         super(isFarmerJobConstraint);
-        this.tile = tree;
+        this._tile = tree;
     }
 
     override onStart(): void {
         // If the tree is next to us we just push the chop job
         // if the tree is not next to us we also push a move to job
-        const tilePosition = { x: this.tile.tileX, y: this.tile.tileY };
+        const tilePosition = { x: this._tile.tileX, y: this._tile.tileY };
         const subJobs: Job[] = [];
         if (!isPointAdjacentTo(tilePosition, this.actor.tilePosition)) {
             //The tile was not adjacent to us so we need to move to it first
-            const path = this.actor.world.findPath(
+            const pathResult = this.actor.world.findPath(
                 this.actor.tilePosition,
                 tilePosition
             );
+            const path = pathResult.path;
             // The pathfinding will return the selected tile as a position to
             // walk to as well. To avoid ending on top of the tree to chop, we
             // pop the path removing the last position (position of the tree)
-            path.pop();
+            if (pointEquals(tilePosition, path[path.length - 1])) {
+                path.pop();
+            }
 
             if (path.length == 0) {
                 throw new JobConstraintsError("Unable to find path to job");
@@ -50,8 +53,26 @@ export class ChopTreeJob extends MultipleStepJob {
             subJobs.push(new MoveJob(path));
         }
 
-        subJobs.push(new _ChopTreeJob(this.tile));
+        subJobs.push(new _ChopTreeJob(this._tile));
         this.setJobs(subJobs);
+    }
+
+    override onDraw(renderContext: RenderContext): void {
+        let visualPosition = renderContext.camera.tileSpaceToWorldSpace({
+            x: this._tile.tileX,
+            y: this._tile.tileY,
+        });
+
+        renderContext.drawRectangle({
+            x: visualPosition.x + 4,
+            y: visualPosition.y + 4,
+            height: TileSize - 10,
+            width: TileSize - 10,
+            strokeColor: "yellow",
+            strokeWidth: 2,
+        });
+
+        super.onDraw(renderContext);
     }
 }
 

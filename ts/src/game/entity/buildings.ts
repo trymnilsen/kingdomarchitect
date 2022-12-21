@@ -1,5 +1,5 @@
 import { sprites } from "../../asset/sprite";
-import { getSizeOfPoints, Point } from "../../common/point";
+import { Point } from "../../common/point";
 import { RenderContext } from "../../rendering/renderContext";
 import { RenderVisual } from "../../rendering/renderVisual";
 import { getTileId, TileSize } from "./tile";
@@ -9,39 +9,6 @@ export class Buildings {
 
     getTile(tileId: string): BuildingTile {
         return this.tiles[tileId];
-    }
-
-    getSize(buildingTile: BuildingTile): Point {
-        const tiles: BuildingTile[] = [];
-
-        if ("multiTile" in buildingTile) {
-            const hostTileId = (buildingTile as MultiTile).multiTile;
-            const hostTile = this.getTile(hostTileId) as MultiTileSource;
-            if (!!hostTile) {
-                hostTile.connectedTile.forEach((connectedTile) => {
-                    const tile = this.getTile(connectedTile);
-                    if (!!tile) {
-                        tiles.push(tile);
-                    }
-                });
-            }
-        } else if ("connectedTile" in buildingTile) {
-            tiles.push(buildingTile);
-            //Add all connected tiles as well
-            (buildingTile as MultiTileSource).connectedTile.forEach(
-                (connectedTile) => {
-                    const tile = this.getTile(connectedTile);
-                    if (!!tile) {
-                        tiles.push(tile);
-                    }
-                }
-            );
-        } else {
-            tiles.push(buildingTile);
-        }
-
-        //Get the bounds of all tiles
-        return getSizeOfPoints(tiles);
     }
 
     add(building: BuildingTile) {

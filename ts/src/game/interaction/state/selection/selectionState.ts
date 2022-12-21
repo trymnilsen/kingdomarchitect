@@ -4,18 +4,18 @@ import {
     woodenHouseSprite,
 } from "../../../../asset/sprites/woodHouseSprite";
 import { Point } from "../../../../common/point";
-import { InputEvent } from "../../../../input/input";
+import { allSides } from "../../../../common/sides";
 import { RenderContext } from "../../../../rendering/renderContext";
 import { CoinActor } from "../../../actor/actors/coinActor";
-import { BuildJob } from "../../../actor/jobs/buildJob";
-import { ChopTreeJob } from "../../../actor/jobs/chopTreeJob";
-import { CollectCoinJob } from "../../../actor/jobs/collectCoinJob";
 import { SwordsmanActor } from "../../../actor/actors/swordsmanActor";
+import { BuildJob } from "../../../actor/jobs/buildJob";
+import { CollectCoinJob } from "../../../actor/jobs/collectCoinJob";
 import { BuildableEntity } from "../../../entity/buildableEntity";
 import { WallEntity } from "../../../entity/building/wallEntity";
 import { GroundTile } from "../../../entity/ground";
+import { MultiTileEntity } from "../../../entity/multiTileEntity";
+import { TileSize } from "../../../entity/tile";
 import { InteractionState } from "../../handler/interactionState";
-import { InteractionStateChanger } from "../../handler/interactionStateChanger";
 import { ActionButton, getActionbarView } from "../../view/actionbar";
 import { ActorActionsState } from "../actorActionsState";
 import { BuildMenuState } from "../building/buildMenuState";
@@ -25,15 +25,13 @@ import {
     SelectedBuildingUiActionType,
 } from "../building/selectedBuildingUiAction";
 import { MoveState } from "../moveState";
+import { ChopJobState } from "../resource/chopJopState";
 import {
     ActorSelectedItem,
-    BuildingSelectedItem,
+    EntitySelectedItem,
     SelectedItem,
     TileSelectedItem,
 } from "./selectedItem";
-import { getTileId, TileSize } from "../../../entity/tile";
-import { allSides } from "../../../../common/sides";
-import { MultiTile } from "../../../entity/buildings";
 
 export class SelectionState extends InteractionState {
     private selectedItem: SelectedItem;
@@ -77,27 +75,28 @@ export class SelectionState extends InteractionState {
             const actorSelection = new ActorSelectedItem(actor);
             this.selectedItem = actorSelection;
         } else {
-            let building = this.context.world.buildings.getTile(
-                getTileId(tile.tileX, tile.tileY)
-            );
+            let entity = this.context.world.entities.getTile({
+                x: tile.tileX,
+                y: tile.tileY,
+            });
 
-            if (!!building && "multiTile" in building) {
-                const sourceTile = (building as MultiTile).multiTile;
-                const sourceBuilding =
-                    this.context.world.buildings.getTile(sourceTile);
-                if (!!sourceBuilding) {
-                    building = sourceBuilding;
+            if (entity instanceof MultiTileEntity && !!entity.multiTileSource) {
+                const sourceEntity = this.context.world.entities.getTileById(
+                    entity.multiTileSource
+                );
+                if (!!sourceEntity) {
+                    entity = sourceEntity;
                 } else {
                     console.error(
-                        "Tapped building had reference to multitile not found"
+                        "Tapped entity had reference to multitile not found"
                     );
                 }
             }
-            console.log(`Building at ${tile.tileX} ${tile.tileY}`, building);
-            if (!!building) {
-                const size = this.context.world.buildings.getSize(building);
+
+            if (!!entity) {
+                const size = this.context.world.entities.getSize(entity);
                 console.log(`building size`, size);
-                this.selectedItem = new BuildingSelectedItem(building, size);
+                this.selectedItem = new EntitySelectedItem(entity, size);
             } else {
                 const tileSelection = new TileSelectedItem(tile);
                 this.selectedItem = tileSelection;
@@ -106,10 +105,6 @@ export class SelectionState extends InteractionState {
 
         this.updateTileActions();
         return true;
-    }
-
-    onInput(input: InputEvent, stateChanger: InteractionStateChanger): boolean {
-        return false;
     }
 
     override onDraw(context: RenderContext): void {
@@ -236,12 +231,8 @@ export class SelectionState extends InteractionState {
         } else if (actionId == "chop") {
             const selectedTile = this.selectedItem;
             if (selectedTile instanceof TileSelectedItem) {
-                this.context.world.jobQueue.schedule(
-                    new ChopTreeJob(selectedTile.tile)
-                );
+                this.context.stateChanger.push(new ChopJobState(selectedTile));
             }
-
-            this.context.stateChanger.pop(null);
         } else if (actionId == "actions") {
             this.context.stateChanger.push(new ActorActionsState());
         } else if (actionId == "cancel") {

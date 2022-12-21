@@ -24,6 +24,10 @@ export abstract class Actor {
         return !!this._job;
     }
 
+    public get job(): Job | null {
+        return this._job;
+    }
+
     /**
      * Event updated whenever the assigned job of this actor finishes
      */
@@ -106,6 +110,7 @@ export abstract class Actor {
         job.jobState = JobState.Running;
         this._job = job;
         this._job.completedEvent.listenOnce(() => {
+            console.log("Actor finished job");
             this.onJobCompleted();
         });
     }

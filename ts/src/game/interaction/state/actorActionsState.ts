@@ -1,5 +1,4 @@
 import { Point } from "../../../common/point";
-import { InputEvent } from "../../../input/input";
 import { RenderContext } from "../../../rendering/renderContext";
 import { drawLayout, onTapLayout } from "../../../ui/v1/layout/layout";
 import { LayoutNode } from "../../../ui/v1/layout/layoutNode";
@@ -20,10 +19,6 @@ export class ActorActionsState extends InteractionState {
                 return true;
             }
         }
-        return false;
-    }
-
-    onInput(input: InputEvent, stateChanger: InteractionStateChanger): boolean {
         return false;
     }
 

@@ -1,8 +1,6 @@
 import { Point } from "../../../../common/point";
-import { InputEvent } from "../../../../input/input";
 import { RenderContext } from "../../../../rendering/renderContext";
 import { InteractionState } from "../../handler/interactionState";
-import { InteractionStateChanger } from "../../handler/interactionStateChanger";
 import { getActionbarView } from "../../view/actionbar";
 import { PathBuildState } from "./pathBuildState";
 import { SelectedBuild } from "./selectedBuild";
@@ -30,10 +28,6 @@ export class PathOrSingleBuildState extends InteractionState {
                 this.onActionButton(action.id);
             }
         );
-    }
-
-    onInput(input: InputEvent, stateChanger: InteractionStateChanger): boolean {
-        return false;
     }
 
     override onUpdate(tick: number) {

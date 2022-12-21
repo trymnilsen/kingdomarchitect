@@ -13,6 +13,10 @@ export class Graph {
         return this._offsetY;
     }
 
+    public get weights(): WeightNode[][] {
+        return this.grid;
+    }
+
     constructor(weights: number[][], offsetX: number, offsetY: number) {
         this.grid = [];
         this.nodes = [];
@@ -48,9 +52,9 @@ export class Graph {
     }
 
     neighbors(node: GraphNode): GraphNode[] {
-        var neighborNodes: GraphNode[] = [];
-        var x = node.x;
-        var y = node.y;
+        const neighborNodes: GraphNode[] = [];
+        const x = node.x;
+        const y = node.y;
 
         // West
         if (this.grid[x - 1] && this.grid[x - 1][y]) {
@@ -76,7 +80,7 @@ export class Graph {
     }
 }
 
-export class GraphNode {
+export class GraphNode implements WeightNode {
     private _x: number;
     private _y: number;
     /**
@@ -139,4 +143,10 @@ export class GraphNode {
         this.closed = false;
         this.parent = null;
     }
+}
+
+export interface WeightNode {
+    readonly x: number;
+    readonly y: number;
+    readonly weight: number;
 }

@@ -7,6 +7,7 @@ import { Job } from "../actor/job/job";
 import { JobQueue } from "../actor/job/jobQueue";
 import { SwordsmanActor } from "../actor/actors/swordsmanActor";
 import { World } from "../world";
+import { JobQuery } from "../actor/job/jobQuery";
 
 export class Actors {
     private _jobQueue: JobQueue;
@@ -49,6 +50,7 @@ export class Actors {
         actor.world = this.world;
         //Set up a job for this actor if any and listen for completion of jobs
         actor.jobCompletedEvent.listen(() => {
+            console.log("Job completed for actor, requesting new", actor);
             this.requestNewJob(actor);
         });
         this.requestNewJob(actor);
@@ -86,6 +88,37 @@ export class Actors {
     }
 
     /**
+     * Checks if there exists any jobs that matches the provided query
+     * If multiple jobs matches the first is returned
+     * @param query the query for a job
+     * @returns the job or null if there are no jobs that matches
+     */
+    queryJob(query: JobQuery): Job | null {
+        //Check the job queue first
+        const queuedJobs = this._jobQueue.pendingJobs;
+        const matchingQueuedJob = queuedJobs.find((job) => query.matches(job));
+        // if the job was truthy return it
+        if (!!matchingQueuedJob) {
+            return matchingQueuedJob;
+        }
+        // Check actors for any jobs
+        const actorMatchedJob = this.actors.find((actor) => {
+            if (!!actor.job) {
+                return query.matches(actor.job);
+            } else {
+                return false;
+            }
+        });
+
+        if (!!actorMatchedJob?.job) {
+            return actorMatchedJob.job;
+        }
+
+        // No job was found
+        return null;
+    }
+
+    /**
      * Update all actors currently active
      * @param tick the game tick for this update
      */
@@ -100,6 +133,9 @@ export class Actors {
      * @param context the context used to draw actors
      */
     onDraw(context: RenderContext) {
+        for (const job of this._jobQueue.pendingJobs) {
+            job.onDraw(context);
+        }
         for (const actor of this.actors) {
             actor.onDraw(context);
         }
@@ -125,7 +161,7 @@ export class Actors {
 
         // If there is an idle actor pick a pending job and assign it
         if (idleActors.length > 0) {
-            const job = this.jobQueue.pendingJobs.pop();
+            const job = this.jobQueue.pop();
             if (job) {
                 const actor = randomEntry(idleActors);
                 console.log("Actor was idle, assinging job to it", actor, job);

@@ -1,4 +1,4 @@
-import { isPointAdjacentTo, Point } from "../../../common/point";
+import { isPointAdjacentTo, Point, pointEquals } from "../../../common/point";
 import { Job } from "../job/job";
 import { JobConstraint } from "../job/jobConstraint";
 import { JobConstraintsError } from "../job/jobConstraintsError";
@@ -33,14 +33,17 @@ export class MoveToBeforeJob extends MultipleStepJob {
                 `Job ${this.constructor.name} was not next to actor, adding path`
             );
             //The tile was not adjacent to us so we need to move to it first
-            const path = this.actor.world.findPath(
+            const pathResult = this.actor.world.findPath(
                 this.actor.tilePosition,
                 this.tileSpaceTarget
             );
+            const path = pathResult.path;
             // The pathfinding will return the selected tile as a position to
             // walk to as well. To avoid ending on top of the tree to chop, we
             // pop the path removing the last position (position of the tree)
-            path.pop();
+            if (pointEquals(this.tileSpaceTarget, path[path.length - 1])) {
+                path.pop();
+            }
 
             if (path.length == 0) {
                 throw new JobConstraintsError("Unable to find path to job");

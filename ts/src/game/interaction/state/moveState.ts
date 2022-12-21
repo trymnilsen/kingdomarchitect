@@ -1,5 +1,4 @@
 import { Point, pointEquals } from "../../../common/point";
-import { InputEvent } from "../../../input/input";
 import { Camera } from "../../../rendering/camera";
 import { RenderContext } from "../../../rendering/renderContext";
 import { ActionButton } from "../../../ui/v1/view/actionbar";
@@ -7,7 +6,6 @@ import { MoveJob } from "../../actor/jobs/moveJob";
 import { GroundTile } from "../../entity/ground";
 import { TileSize } from "../../entity/tile";
 import { InteractionState } from "../handler/interactionState";
-import { InteractionStateChanger } from "../handler/interactionStateChanger";
 import { getActionbarView } from "../view/actionbar";
 
 export class MoveState extends InteractionState {
@@ -39,13 +37,18 @@ export class MoveState extends InteractionState {
 
     override onTileTap(tile: GroundTile): boolean {
         console.log("Tapped tile: ", tile);
-        const newPath = this.context.world.findPath(this.initialSelection, {
+        const targetPoint = {
             x: tile.tileX,
             y: tile.tileY,
-        });
+        };
+        const newPath = this.context.world.findPath(
+            this.initialSelection,
+            targetPoint,
+            true
+        );
         console.log("New path: ", newPath);
-        if (newPath.length > 0) {
-            this.path = newPath;
+        if (newPath.path.length > 0) {
+            this.path = newPath.path;
         }
 
         this.tileSpaceSelection = {
@@ -54,13 +57,6 @@ export class MoveState extends InteractionState {
         };
 
         return true;
-    }
-
-    override onInput(
-        input: InputEvent,
-        stateChanger: InteractionStateChanger
-    ): boolean {
-        return false;
     }
 
     override onDraw(context: RenderContext): void {
