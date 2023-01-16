@@ -2,9 +2,11 @@ import { Point, pointEquals } from "../../../common/point";
 import { Camera } from "../../../rendering/camera";
 import { RenderContext } from "../../../rendering/renderContext";
 import { ActionButton } from "../../../ui/v1/view/actionbar";
-import { MoveJob } from "../../actor/jobs/moveJob";
-import { GroundTile } from "../../entity/ground";
-import { TileSize } from "../../entity/tile";
+import { Actor } from "../../world/actor/actor";
+import { MoveJob } from "../../world/actor/jobs/moveJob";
+import { PathFindingComponent } from "../../world/component/root/path/pathFindingComponent";
+import { GroundTile } from "../../world/tile/ground";
+import { TileSize } from "../../world/tile/tile";
 import { InteractionState } from "../handler/interactionState";
 import { getActionbarView } from "../view/actionbar";
 
@@ -41,13 +43,12 @@ export class MoveState extends InteractionState {
             x: tile.tileX,
             y: tile.tileY,
         };
-        const newPath = this.context.world.findPath(
-            this.initialSelection,
-            targetPoint,
-            true
-        );
+        const newPath = this.context.world.rootEntity
+            .getComponent(PathFindingComponent)
+            ?.findPath(this.initialSelection, targetPoint, true);
+
         console.log("New path: ", newPath);
-        if (newPath.path.length > 0) {
+        if (!!newPath && newPath.path.length > 0) {
             this.path = newPath.path;
         }
 
@@ -93,12 +94,14 @@ export class MoveState extends InteractionState {
             this.context.stateChanger.pop(null);
         } else if (id == "confirm") {
             this.context.stateChanger.clear();
-            const actor = this.context.world.actors.getActor(
+            //TODO: Add this back in
+            /*const actor = this.context.world.actors.getActor(
                 this.initialSelection
             );
+            
             if (actor && this.path) {
                 actor?.assignJob(new MoveJob(this.path));
-            }
+            }*/
         }
     }
 

@@ -132,6 +132,30 @@ export function adjacentPoint(point: Point, direction: Direction): Point {
     }
 }
 
+export function adjacentPoints(
+    point: Point,
+    includeDiagonal: boolean = false
+): Point[] {
+    const points: Point[] = [];
+    points.push(adjacentPoint(point, Direction.Left));
+    points.push(adjacentPoint(point, Direction.Right));
+    points.push(adjacentPoint(point, Direction.Up));
+    points.push(adjacentPoint(point, Direction.Down));
+
+    if (includeDiagonal) {
+        //Upper left
+        points.push(addPoint(point, { x: -1, y: -1 }));
+        //Upper right
+        points.push(addPoint(point, { x: 1, y: -1 }));
+        //bottom left
+        points.push(addPoint(point, { x: -1, y: 1 }));
+        //bottom right
+        points.push(addPoint(point, { x: 11, y: 1 }));
+    }
+
+    return points;
+}
+
 /**
  * Checks if pointB is adjacent to PointA either on the top, left, right or bottom
  * @param pointA The main point

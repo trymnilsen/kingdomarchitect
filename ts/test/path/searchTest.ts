@@ -1,17 +1,51 @@
-import test from "ava";
+import { assert } from "chai";
 
-test("Can find path", (t) => {
-    t.pass();
-});
+describe("Search test", () => {
+    it("Can find path", () => {
+        assert.equal(2, 2);
+    });
 
-test("Selects cheapest path", (t) => {
-    t.pass();
-});
+    it("Selects cheapest path", () => {
+        assert.equal(2, 2);
+    });
 
-test("Returns error of start point is not in graph", (t) => {
-    t.pass();
-});
+    it("Returns error of start point is not in graph", () => {
+        assert.equal(2, 2);
+    });
 
-test("Returns partial path, if end point is not reachable", (t) => {
-    t.pass();
+    it("Returns partial path, if end point is not reachable", () => {
+        assert.equal(2, 2);
+    });
+
+    it("PathTestCase1", () => {
+        assert.equal(2, 2);
+    });
+
+    it("PathTestCase2", () => {
+        assert.equal(2, 2);
+    });
+
+    it("PathTestCase3", () => {
+        assert.equal(2, 2);
+    });
+
+    it("PathTestCase4", () => {
+        assert.equal(2, 2);
+    });
+
+    it("PathTestCase5", () => {
+        assert.equal(2, 2);
+    });
+
+    it("PathTestCase6", () => {
+        assert.equal(2, 2);
+    });
+
+    it("PathTestCase7", () => {
+        assert.equal(2, 2);
+    });
+
+    it("PathTestCase8", () => {
+        assert.equal(2, 2);
+    });
 });

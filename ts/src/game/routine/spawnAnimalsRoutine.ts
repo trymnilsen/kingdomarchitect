@@ -1,8 +1,10 @@
 import { randomEntry } from "../../common/array";
-import { FoxActor } from "../actor/actors/foxActor";
-import { World } from "../world";
+import { FoxActor } from "../world/actor/actors/foxActor";
+import { World } from "../world/world";
 
 export function spawnAnimalsRoutine(tick: number, world: World) {
+    //TODO: add back spawn animals
+    /*
     if (tick % 10 != 0) {
         return;
     }
@@ -20,5 +22,5 @@ export function spawnAnimalsRoutine(tick: number, world: World) {
         y: spawnPosition.tileY,
     });
 
-    world.actors.addActor(foxActor);
+    world.actors.addActor(foxActor);*/
 }

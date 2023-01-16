@@ -1,6 +1,7 @@
 import { RenderContext } from "../../../../rendering/renderContext";
-import { JobByGroundTileQuery } from "../../../actor/job/jobQuery";
-import { ChopTreeJob } from "../../../actor/jobs/chopTreeJob";
+import { JobByGroundTileQuery } from "../../../world/actor/job/jobQuery";
+import { ChopTreeJob } from "../../../world/actor/jobs/chopTreeJob";
+import { SelectedTileItem } from "../../../world/selection/selectedTileItem";
 import { InteractionState } from "../../handler/interactionState";
 import { ActionButton, getActionbarView } from "../../view/actionbar";
 import { TileSelectedItem } from "../selection/selectedItem";
@@ -35,9 +36,11 @@ export class ChopJobState extends InteractionState {
 
     private getActions(): ActionButton[] {
         //Check if there is a job active on the tile
-        const job = this.context.world.actors.queryJob(
+        // TODO: add query back in
+        const job = null;
+        /*this.context.world.actors.queryJob(
             new JobByGroundTileQuery(this.selection.tile)
-        );
+        );*/
         if (!!job) {
             return [
                 {
@@ -74,16 +77,17 @@ export class ChopJobState extends InteractionState {
             this.context.stateChanger.pop(null);
         } else if (id == "confirm") {
             this.context.world.jobQueue.schedule(
-                new ChopTreeJob(this.selection.tile)
+                new ChopTreeJob(new SelectedTileItem(this.selection.tile))
             );
             this.context.stateChanger.clear();
         } else if (id == "abort") {
-            const job = this.context.world.actors.queryJob(
+            //TODO: Add this back in
+            /*const job = this.context.world.actors.queryJob(
                 new JobByGroundTileQuery(this.selection.tile)
             );
             if (!!job) {
                 job.abort();
-            }
+            }*/
             this.context.stateChanger.clear();
         }
     }

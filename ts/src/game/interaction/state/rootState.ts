@@ -1,6 +1,6 @@
 import { InputEvent } from "../../../input/input";
 import { RenderContext } from "../../../rendering/renderContext";
-import { GroundTile } from "../../entity/ground";
+import { GroundTile } from "../../world/tile/ground";
 import { InteractionState } from "../handler/interactionState";
 import { InteractionStateChanger } from "../handler/interactionStateChanger";
 import { ActorSelectedItem, TileSelectedItem } from "./selection/selectedItem";
@@ -19,10 +19,12 @@ export class RootState extends InteractionState {
 
     override onTileTap(tile: GroundTile): boolean {
         console.log("RootState tap: ", tile);
-        const actor = this.context.world.actors.getActor({
+        const actor = null;
+        //TODO: add back actor selector
+        /*this.context.world.actors.getActor({
             x: tile.tileX,
             y: tile.tileY,
-        });
+        });*/
 
         if (!!actor) {
             const actorSelection = new ActorSelectedItem(actor);

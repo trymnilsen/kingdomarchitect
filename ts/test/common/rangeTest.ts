@@ -1,9 +1,11 @@
-import test from "ava";
+import { assert } from "chai";
 
-test("can pick random number in range", (t) => {
-    t.pass();
-});
+describe("Range test", () => {
+    it("can pick random number in range", () => {
+        assert.equal(2, 2);
+    });
 
-test("can calculate distance of range", (t) => {
-    t.pass();
+    it("can calculate distance of range", () => {
+        assert.equal(2, 2);
+    });
 });

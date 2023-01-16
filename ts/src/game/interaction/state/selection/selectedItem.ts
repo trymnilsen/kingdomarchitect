@@ -1,7 +1,7 @@
 import { Point } from "../../../../common/point";
-import { Actor } from "../../../actor/actor";
-import { Entity } from "../../../entity/entity";
-import { GroundTile } from "../../../entity/ground";
+import { Actor } from "../../../world/actor/actor";
+import { Entity } from "../../../world/entity/v1/entity2";
+import { GroundTile } from "../../../world/tile/ground";
 
 /**
  * Class wrapping items that can be selected. Different types of items

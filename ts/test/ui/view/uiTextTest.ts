@@ -1,13 +1,15 @@
-import test from "ava";
+import { assert } from "chai";
 
-test("measures text", (t) => {
-    t.pass();
-});
+describe("uiText test", () => {
+    it("measures text", () => {
+        assert.equal(2, 2);
+    });
 
-test("aligns text correctly if size of text is less than available space", (t) => {
-    t.pass();
-});
+    it("aligns text correctly if size of text is less than available space", () => {
+        assert.equal(2, 2);
+    });
 
-test("wraps text if available space is less than text", (t) => {
-    t.pass();
+    it("wraps text if available space is less than text", () => {
+        assert.equal(2, 2);
+    });
 });

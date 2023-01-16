@@ -1,13 +1,15 @@
-import test from "ava";
+import { assert } from "chai";
 
-test("create a background with properties", (t) => {
-    t.pass();
-});
+describe("uiViewDsl test", () => {
+    it("create a background with properties", () => {
+        assert.equal(2, 2);
+    });
 
-test("set the sides to a default value", (t) => {
-    t.pass();
-});
+    it("set the sides to a default value", () => {
+        assert.equal(2, 2);
+    });
 
-test("set a default scale value", (t) => {
-    t.pass();
+    it("set a default scale value", () => {
+        assert.equal(2, 2);
+    });
 });

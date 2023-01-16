@@ -1,17 +1,19 @@
-import test from "ava";
+import { assert } from "chai";
 
-test("add actor", (t) => {
-    t.pass();
-});
+describe("Actors test", () => {
+    it("add actor", () => {
+        assert.equal(2, 2);
+    });
 
-test("get actor", (t) => {
-    t.pass();
-});
+    it("get actor", () => {
+        assert.equal(2, 2);
+    });
 
-test("onUpdate updates all actors", (t) => {
-    t.pass();
-});
+    it("onUpdate updates all actors", () => {
+        assert.equal(2, 2);
+    });
 
-test("onDraw updates all actors", (t) => {
-    t.pass();
+    it("onDraw updates all actors", () => {
+        assert.equal(2, 2);
+    });
 });

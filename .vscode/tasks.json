@@ -4,21 +4,12 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "type": "typescript",
-            "tsconfig": "tsconfig.json",
-            "problemMatcher": [
-                "$tsc"
-            ],
-            "group": "build",
-            "label": "tsc: build - tsconfig.json"
-        },
-        {
+            "label": "frontend",
             "type": "npm",
             "script": "build",
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
+            "problemMatcher": [
+                "$ts-webpack"
+            ],
             "presentation": {
                 "echo": true,
                 "reveal": "never",
@@ -27,11 +18,11 @@
                 "showReuseMessage": true,
                 "clear": false
             },
-            "problemMatcher": [
-                "$tsc",
-            ],
-            "label": "npm: build",
-            "detail": "tsc && rollup --config rollup.config.js"
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "webpack"
         }
     ]
 }

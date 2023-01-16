@@ -1,49 +1,51 @@
-import test from "ava";
+import { assert } from "chai";
 
-test("on tap up dispatches event", (t) => {
-    t.pass();
-});
+describe("InteractionHandler test", () => {
+    it("on tap up dispatches event", () => {
+        assert.equal(2, 2);
+    });
 
-test("on tap down dispatches event", (t) => {
-    t.pass();
-});
+    it("on tap down dispatches event", () => {
+        assert.equal(2, 2);
+    });
 
-test("on tap down returns for state handled", (t) => {
-    t.pass();
-});
+    it("on tap down returns for state handled", () => {
+        assert.equal(2, 2);
+    });
 
-test("on tap down is always handled if modal", (t) => {
-    t.pass();
-});
+    it("on tap down is always handled if modal", () => {
+        assert.equal(2, 2);
+    });
 
-test("on tap dispatches event", (t) => {
-    t.pass();
-});
+    it("on tap dispatches event", () => {
+        assert.equal(2, 2);
+    });
 
-test("on tap pops the state if dispatched event is handled", (t) => {
-    t.pass();
-});
+    it("on tap pops the state if dispatched event is handled", () => {
+        assert.equal(2, 2);
+    });
 
-test("on tap calls on tileTap with tilespace if event is not handled", (t) => {
-    t.pass();
-});
+    it("on tap calls on tileTap with tilespace if event is not handled", () => {
+        assert.equal(2, 2);
+    });
 
-test("on tap tile that is not handled clears the state", (t) => {
-    t.pass();
-});
+    it("on tap tile that is not handled clears the state", () => {
+        assert.equal(2, 2);
+    });
 
-test("applies state changes at the end of onTap", (t) => {
-    t.pass();
-});
+    it("applies state changes at the end of onTap", () => {
+        assert.equal(2, 2);
+    });
 
-test("on update updates the current state", (t) => {
-    t.pass();
-});
+    it("on update updates the current state", () => {
+        assert.equal(2, 2);
+    });
 
-test("on draw draws a scrim if modal", (t) => {
-    t.pass();
-});
+    it("on draw draws a scrim if modal", () => {
+        assert.equal(2, 2);
+    });
 
-test("on draw draws the current state", (t) => {
-    t.pass();
+    it("on draw draws the current state", () => {
+        assert.equal(2, 2);
+    });
 });

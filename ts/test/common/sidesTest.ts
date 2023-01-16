@@ -1,21 +1,23 @@
-import test from "ava";
+import { assert } from "chai";
 
-test("can create with all sides equal", (t) => {
-    t.pass();
-});
+describe("Sides test", () => {
+    it("can create with all sides equal", () => {
+        assert.equal(2, 2);
+    });
 
-test("can create symmetric sides", (t) => {
-    t.pass();
-});
+    it("can create symmetric sides", () => {
+        assert.equal(2, 2);
+    });
 
-test("cannot mutate zero sides object", (t) => {
-    t.pass();
-});
+    it("cannot mutate zero sides object", () => {
+        assert.equal(2, 2);
+    });
 
-test("can add together horizontal amount", (t) => {
-    t.is(5, 5);
-});
+    it("can add together horizontal amount", () => {
+        assert.equal(2, 2);
+    });
 
-test("can add together vertical amount", (t) => {
-    t.pass();
+    it("can add together vertical amount", () => {
+        assert.equal(2, 2);
+    });
 });

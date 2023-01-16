@@ -6,15 +6,15 @@ import {
 import { Point } from "../../../../common/point";
 import { allSides } from "../../../../common/sides";
 import { RenderContext } from "../../../../rendering/renderContext";
-import { CoinActor } from "../../../actor/actors/coinActor";
-import { SwordsmanActor } from "../../../actor/actors/swordsmanActor";
-import { BuildJob } from "../../../actor/jobs/buildJob";
-import { CollectCoinJob } from "../../../actor/jobs/collectCoinJob";
-import { BuildableEntity } from "../../../entity/buildableEntity";
-import { WallEntity } from "../../../entity/building/wallEntity";
-import { GroundTile } from "../../../entity/ground";
-import { MultiTileEntity } from "../../../entity/multiTileEntity";
-import { TileSize } from "../../../entity/tile";
+import { CoinActor } from "../../../world/actor/actors/coinActor";
+import { SwordsmanActor } from "../../../world/actor/actors/swordsmanActor";
+import { BuildJob } from "../../../world/actor/jobs/buildJob";
+import { CollectCoinJob } from "../../../world/actor/jobs/collectCoinJob";
+import { BuildableEntity } from "../../../world/entity/v1/buildableEntity";
+import { WallEntity } from "../../../world/entity/v1/building/wallEntity";
+import { GroundTile } from "../../../world/tile/ground";
+import { MultiTileEntity } from "../../../world/entity/v1/multiTileEntity";
+import { TileSize } from "../../../world/tile/tile";
 import { InteractionState } from "../../handler/interactionState";
 import { ActionButton, getActionbarView } from "../../view/actionbar";
 import { ActorActionsState } from "../actorActionsState";
@@ -65,11 +65,14 @@ export class SelectionState extends InteractionState {
     override onTileTap(tile: GroundTile): boolean {
         // If a new tile was tapped while in this state we move the cursor to it
         console.log("TileSelectedState - onTileTap: ", tile);
-
-        const actor = this.context.world.actors.getActor({
+        const tileSelection = new TileSelectedItem(tile);
+        this.selectedItem = tileSelection;
+        //TODO: add this back
+        /*const actor = this.context.world.actors.getActor({
             x: tile.tileX,
             y: tile.tileY,
         });
+
 
         if (!!actor) {
             const actorSelection = new ActorSelectedItem(actor);
@@ -98,10 +101,11 @@ export class SelectionState extends InteractionState {
                 console.log(`building size`, size);
                 this.selectedItem = new EntitySelectedItem(entity, size);
             } else {
-                const tileSelection = new TileSelectedItem(tile);
-                this.selectedItem = tileSelection;
+                
             }
         }
+
+        */
 
         this.updateTileActions();
         return true;
@@ -138,6 +142,7 @@ export class SelectionState extends InteractionState {
     }
 
     private getTileActions(tilePosition: Point): ActionButton[] {
+        /*
         const actor = this.context.world.actors.getActor(tilePosition);
         if (actor) {
             if (actor instanceof SwordsmanActor) {
@@ -179,6 +184,7 @@ export class SelectionState extends InteractionState {
                 ];
             }
         }
+        */
 
         const tile = this.context.world.ground.getTile(tilePosition);
         if (tile) {
@@ -237,7 +243,7 @@ export class SelectionState extends InteractionState {
             this.context.stateChanger.push(new ActorActionsState());
         } else if (actionId == "cancel") {
             this.context.stateChanger.pop(null);
-        } else if (actionId == "collect_coin") {
+        } /*else if (actionId == "collect_coin") {
             const selectedTile = this.selectedItem;
             const coin = this.context.world.actors.getActor(
                 selectedTile.tilePosition
@@ -249,13 +255,15 @@ export class SelectionState extends InteractionState {
             }
 
             this.context.stateChanger.pop(null);
-        }
+        }*/
     }
 
     private onBuildSelected(buildType: PossibleSelectedBuilding) {
         console.log("Build was selected");
         if (buildType == "woodenHouse") {
-            this.context.world.entities.add(
+            //TODO: Add back building
+            console.log("Build house");
+            /* this.context.world.entities.add(
                 new BuildableEntity(
                     this.selectedItem.tilePosition,
                     woodenHouseScaffold,
@@ -269,8 +277,11 @@ export class SelectionState extends InteractionState {
                 this.context.world.jobQueue.schedule(
                     new BuildJob(this.selectedItem.tile)
                 );
-            }
+            } */
         } else if (buildType == "walls") {
+            //TODO: Add back walls
+            console.log("Build walls");
+            /*
             this.context.world.entities.add(
                 new WallEntity(
                     this.selectedItem.tilePosition,
@@ -286,6 +297,7 @@ export class SelectionState extends InteractionState {
                     new BuildJob(this.selectedItem.tile)
                 );
             }
+            */
         }
     }
 }

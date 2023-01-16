@@ -1,37 +1,39 @@
-import test from "ava";
+import { assert } from "chai";
 
-test("throws error if width is not valid", (t) => {
-    t.pass();
-});
+describe("uiView test", () => {
+    it("throws error if width is not valid", () => {
+        assert.equal(2, 2);
+    });
 
-test("throw error if height is not valid", (t) => {
-    t.pass();
-});
+    it("throw error if height is not valid", () => {
+        assert.equal(2, 2);
+    });
 
-test("throws error if view is already added to another parent", (t) => {
-    t.pass();
-});
+    it("throws error if view is already added to another parent", () => {
+        assert.equal(2, 2);
+    });
 
-test("throws error if view is added to itself", (t) => {
-    t.pass();
-});
+    it("throws error if view is added to itself", () => {
+        assert.equal(2, 2);
+    });
 
-test("add children", (t) => {
-    t.pass();
-});
+    it("add children", () => {
+        assert.equal(2, 2);
+    });
 
-test("remove children", (t) => {
-    t.pass();
-});
+    it("remove children", () => {
+        assert.equal(2, 2);
+    });
 
-test("updates transform with parent value", (t) => {
-    t.pass();
-});
+    it("updates transform with parent value", () => {
+        assert.equal(2, 2);
+    });
 
-test("sets screenposition to offset if there is not parent", (t) => {
-    t.pass();
-});
+    it("sets screenposition to offset if there is not parent", () => {
+        assert.equal(2, 2);
+    });
 
-test("updates transform of children after self", (t) => {
-    t.pass();
+    it("updates transform of children after self", () => {
+        assert.equal(2, 2);
+    });
 });

@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
       "target": "ES2022",
-      "module": "ES2022",
+      "module": "CommonJS",
       "sourceMap": true,
       "declaration": false,
       "moduleResolution": "node",
@@ -13,7 +13,7 @@
       "strictPropertyInitialization": true,
       "noImplicitThis": true,
       "noImplicitOverride": true,
-      "noUnusedLocals": true,
+      "noUnusedLocals": false,
       "noFallthroughCasesInSwitch": true,
       "noPropertyAccessFromIndexSignature": true,
       "removeComments": true,

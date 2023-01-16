@@ -8,12 +8,24 @@ export function randomEntry<T>(array: T[]): T {
     return array[randomIndex];
 }
 
-export function removeItem<T>(array: T[], item: T): Boolean {
+export function removeItem<T>(array: T[], item: T): boolean {
     const indexOfItem = array.indexOf(item);
     if (indexOfItem >= 0) {
         array.splice(indexOfItem, 1);
         return true;
     } else {
         return false;
+    }
+}
+
+export function pushMapEntry<T>(
+    collection: { [id: string]: T[] },
+    key: string,
+    item: T
+) {
+    if (!!collection[key]) {
+        collection[key].push(item);
+    } else {
+        collection[key] = [item];
     }
 }

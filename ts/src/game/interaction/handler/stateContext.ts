@@ -1,5 +1,5 @@
 import { AssetLoader } from "../../../asset/loader/assetLoader";
-import { World } from "../../world";
+import { World } from "../../world/world";
 import { InteractionStateChanger } from "./interactionStateChanger";
 
 export interface StateContext {

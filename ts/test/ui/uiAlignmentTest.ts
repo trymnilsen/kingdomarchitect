@@ -1,21 +1,23 @@
-import test from "ava";
+import { assert } from "chai";
 
-test("can calculate alignment with source size larger than target size", (t) => {
-    t.pass();
-});
+describe("uiAlignment test", () => {
+    it("can calculate alignment with source size larger than target size", () => {
+        assert.equal(2, 2);
+    });
 
-test("can calculate alignment with source size smaller than target size", (t) => {
-    t.pass();
-});
+    it("can calculate alignment with source size smaller than target size", () => {
+        assert.equal(2, 2);
+    });
 
-test("can calculate alignment with source size smaller than target size and top alignment", (t) => {
-    t.pass();
-});
+    it("can calculate alignment with source size smaller than target size and top alignment", () => {
+        assert.equal(2, 2);
+    });
 
-test("can calculate alignment with source size smaller than target size and center alignment", (t) => {
-    t.pass();
-});
+    it("can calculate alignment with source size smaller than target size and center alignment", () => {
+        assert.equal(2, 2);
+    });
 
-test("can calculate alignment with source width larger than target size and center alignment", (t) => {
-    t.pass();
+    it("can calculate alignment with source width larger than target size and center alignment", () => {
+        assert.equal(2, 2);
+    });
 });

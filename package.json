@@ -2,12 +2,12 @@
     "name": "kingdomarchitect",
     "version": "1.0.0",
     "description": "Kingdom architects is intended to be a building/management game",
-    "type": "module",
     "scripts": {
-        "build": "tsc && rollup --config rollup.config.js",
-        "start": "cd public && static-server",
-        "test": "tsc && ava",
-        "coverage": "ava c8 report && open coverage/lcov-report/index.html"
+        "tsc": "tsc",
+        "build": "webpack",
+        "start": "webpack serve",
+        "test": "mocha",
+        "coverage": "c8 mocha && open coverage/lcov-report/index.html"
     },
     "repository": {
         "type": "git",
@@ -19,22 +19,18 @@
     "bugs": {
         "url": "https://github.com/trymnilsen/kingdomarchitect/issues"
     },
-    "overrides": {
-        "rollup": "^3.5.0"
-    },
     "homepage": "https://github.com/trymnilsen/kingdomarchitect#readme",
     "dependencies": {
-        "ava": "^5.1.0",
+        "@types/chai": "^4.3.4",
+        "@types/mocha": "^10.0.1",
         "c8": "^7.12.0",
-        "rollup": "^3.5.0",
-        "rollup-plugin-sourcemaps": "^0.6.3",
-        "static-server": "^2.2.1",
-        "typescript": "^4.9.4"
-    },
-    "ava": {
-		"files": [
-			"build/test/**/*"
-		],
-		"failWithoutAssertions": true
-	}
+        "chai": "^4.3.7",
+        "mocha": "^10.2.0",
+        "ts-loader": "^9.4.2",
+        "ts-node": "^10.9.1",
+        "typescript": "^4.9.4",
+        "webpack": "^5.75.0",
+        "webpack-cli": "^5.0.1",
+        "webpack-dev-server": "^4.11.1"
+    }
 }

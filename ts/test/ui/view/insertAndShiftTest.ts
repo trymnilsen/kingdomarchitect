@@ -1,13 +1,15 @@
-import test from "ava";
+import { assert } from "chai";
 
-test("shifts nothing when inserted at the end", (t) => {
-    t.pass();
-});
+describe("insertAndShift test", () => {
+    it("shifts nothing when inserted at the end", () => {
+        assert.equal(2, 2);
+    });
 
-test("shifts all when inserted at the beginning", (t) => {
-    t.pass();
-});
+    it("shifts all when inserted at the beginning", () => {
+        assert.equal(2, 2);
+    });
 
-test("shifts from correct index when inserted at the middle", (t) => {
-    t.pass();
+    it("shifts from correct index when inserted at the middle", () => {
+        assert.equal(2, 2);
+    });
 });

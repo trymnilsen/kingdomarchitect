@@ -1,9 +1,11 @@
-import test from "ava";
+import { assert } from "chai";
 
-test("Nudge actor out of completed build", (t) => {
-    t.pass();
-});
+describe("BuildJob test", () => {
+    it("Nudge actor out of completed build", () => {
+        assert.equal(2, 2);
+    });
 
-test("increase health then complete build", (t) => {
-    t.pass();
+    it("increase health then complete build", () => {
+        assert.equal(2, 2);
+    });
 });

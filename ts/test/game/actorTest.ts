@@ -1,5 +1,7 @@
-import test from "ava";
+import { assert } from "chai";
 
-test("assign job starts it", (t) => {
-    t.pass();
+describe("Actor test", () => {
+    it("assign job starts it", () => {
+        assert.equal(2, 2);
+    });
 });

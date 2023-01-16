@@ -1,5 +1,7 @@
-import test from "ava";
+import { assert } from "chai";
 
-test("can check if string is empty", (t) => {
-    t.pass();
+describe("String test", () => {
+    it("can check if string is empty", () => {
+        assert.equal(2, 2);
+    });
 });

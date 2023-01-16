@@ -1,25 +1,27 @@
-import test from "ava";
+import { assert } from "chai";
 
-test("convert from world space to tile space", (t) => {
-    t.pass();
-});
+describe("Camera test", () => {
+    it("convert from world space to tile space", () => {
+        assert.equal(2, 2);
+    });
 
-test("convert from tile space to world space", (t) => {
-    t.pass();
-});
+    it("convert from tile space to world space", () => {
+        assert.equal(2, 2);
+    });
 
-test("convert from tilespace to screen space", (t) => {
-    t.pass();
-});
+    it("convert from tilespace to screen space", () => {
+        assert.equal(2, 2);
+    });
 
-test("convert from world space to screen space", (t) => {
-    t.pass();
-});
+    it("convert from world space to screen space", () => {
+        assert.equal(2, 2);
+    });
 
-test("convert from screen space to world space", (t) => {
-    t.pass();
-});
+    it("convert from screen space to world space", () => {
+        assert.equal(2, 2);
+    });
 
-test("translate moves camera", (t) => {
-    t.pass();
+    it("translate moves camera", () => {
+        assert.equal(2, 2);
+    });
 });

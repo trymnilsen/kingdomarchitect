@@ -2,7 +2,7 @@ import { InputEvent } from "../../../input/input";
 import { RenderContext } from "../../../rendering/renderContext";
 import { UIEvent } from "../../../ui/event/uiEvent";
 import { UIView } from "../../../ui/uiView";
-import { GroundTile } from "../../entity/ground";
+import { GroundTile } from "../../world/tile/ground";
 import { InteractionStateChanger } from "./interactionStateChanger";
 import { StateContext } from "./stateContext";
 

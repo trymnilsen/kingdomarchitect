@@ -1,4 +1,4 @@
-import { World } from "../world";
+import { World } from "../world/world";
 import { spawnAnimalsRoutine } from "./spawnAnimalsRoutine";
 import { spawnMobRoutine } from "./spawnMobRoutine";
 

@@ -1,13 +1,15 @@
-import test from "ava";
+import { assert } from "chai";
 
-test("scheduled job is added to queue", (t) => {
-    t.pass();
-});
+describe("JobQueue test", () => {
+    it("scheduled job is added to queue", () => {
+        assert.equal(2, 2);
+    });
 
-test("event is triggered when job is scheduled", (t) => {
-    t.pass();
-});
+    it("event is triggered when job is scheduled", () => {
+        assert.equal(2, 2);
+    });
 
-test("remove job", (t) => {
-    t.pass();
+    it("remove job", () => {
+        assert.equal(2, 2);
+    });
 });

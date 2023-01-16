@@ -1,33 +1,35 @@
-import test from "ava";
+import { assert } from "chai";
 
-test("does not allow to add children with fill space and now weight", (t) => {
-    t.pass();
-});
+describe("uiColumn test", () => {
+    it("does not allow to add children with fill space and now weight", () => {
+        assert.equal(2, 2);
+    });
 
-test("does not allow children with weight if wrap size is set", (t) => {
-    t.pass();
-});
+    it("does not allow children with weight if wrap size is set", () => {
+        assert.equal(2, 2);
+    });
 
-test("does not allow zero weight", (t) => {
-    t.pass();
-});
+    it("does not allow zero weight", () => {
+        assert.equal(2, 2);
+    });
 
-test("requires weighted children to have an id", (t) => {
-    t.pass();
-});
+    it("requires weighted children to have an id", () => {
+        assert.equal(2, 2);
+    });
 
-test("increments total weight when child is added", (t) => {
-    t.pass();
-});
+    it("increments total weight when child is added", () => {
+        assert.equal(2, 2);
+    });
 
-test("correctly sizes children with weight", (t) => {
-    t.pass();
-});
+    it("correctly sizes children with weight", () => {
+        assert.equal(2, 2);
+    });
 
-test("measures children with no weight", (t) => {
-    t.pass();
-});
+    it("measures children with no weight", () => {
+        assert.equal(2, 2);
+    });
 
-test("throws error if total height of children exceeds constraints", (t) => {
-    t.pass();
+    it("throws error if total height of children exceeds constraints", () => {
+        assert.equal(2, 2);
+    });
 });

@@ -1,13 +1,15 @@
-import test from "ava";
+import { assert } from "chai";
 
-test("does not clamp value if inbetween range", (t) => {
-    t.pass();
-});
+describe("Number test", () => {
+    it("does not clamp value if inbetween range", () => {
+        assert.equal(2, 2);
+    });
 
-test("clamps value to lower value", (t) => {
-    t.pass();
-});
+    it("clamps value to lower value", () => {
+        assert.equal(2, 2);
+    });
 
-test("clamps value to higher value", (t) => {
-    t.pass();
+    it("clamps value to higher value", () => {
+        assert.equal(2, 2);
+    });
 });

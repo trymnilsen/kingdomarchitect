@@ -1,37 +1,39 @@
-import test from "ava";
+import { assert } from "chai";
 
-test("sizes to largest child on wrap", (t) => {
-    t.pass();
-});
+describe("uiBox test", () => {
+    it("sizes to largest child on wrap", () => {
+        assert.equal(2, 2);
+    });
 
-test("sizes to parent on fill", (t) => {
-    t.pass();
-});
+    it("sizes to parent on fill", () => {
+        assert.equal(2, 2);
+    });
 
-test("keep size if fixed", (t) => {
-    t.pass();
-});
+    it("keep size if fixed", () => {
+        assert.equal(2, 2);
+    });
 
-test("does not scale larger than parent on wrap", (t) => {
-    t.pass();
-});
+    it("does not scale larger than parent on wrap", () => {
+        assert.equal(2, 2);
+    });
 
-test("aligns child correctly", (t) => {
-    t.pass();
-});
+    it("aligns child correctly", () => {
+        assert.equal(2, 2);
+    });
 
-test("applies padding to children constraints", (t) => {
-    t.pass();
-});
+    it("applies padding to children constraints", () => {
+        assert.equal(2, 2);
+    });
 
-test("offsets children with padding", (t) => {
-    t.pass();
-});
+    it("offsets children with padding", () => {
+        assert.equal(2, 2);
+    });
 
-test("does not apply padding to background", (t) => {
-    t.pass();
-});
+    it("does not apply padding to background", () => {
+        assert.equal(2, 2);
+    });
 
-test("sets measured size on layout", (t) => {
-    t.pass();
+    it("sets measured size on layout", () => {
+        assert.equal(2, 2);
+    });
 });

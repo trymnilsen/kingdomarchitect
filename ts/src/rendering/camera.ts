@@ -1,5 +1,5 @@
 import { addPoint, multiplyPoint, Point } from "../common/point";
-import { TileSize } from "../game/entity/tile";
+import { TileSize } from "../game/world/tile/tile";
 
 export class Camera {
     private _position: Point;

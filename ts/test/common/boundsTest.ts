@@ -1,33 +1,35 @@
-import test from "ava";
+import { assert } from "chai";
 
-test("Is within rectangle", (t) => {
-    t.pass();
-});
+describe("Bounds tests", () => {
+    it("Is within rectangle", () => {
+        assert.equal(2, 2);
+    });
 
-test("top is outside rectangle", (t) => {
-    t.pass();
-});
+    it("top is outside rectangle", () => {
+        assert.equal(2, 2);
+    });
 
-test("left is outside rectangle", (t) => {
-    t.pass();
-});
+    it("left is outside rectangle", () => {
+        assert.equal(2, 2);
+    });
 
-test("right is outside rectangle", (t) => {
-    t.is(5, 5);
-});
+    it("right is outside rectangle", () => {
+        assert.equal(2, 2);
+    });
 
-test("bottom is outside rectangle", (t) => {
-    t.pass();
-});
+    it("bottom is outside rectangle", () => {
+        assert.equal(2, 2);
+    });
 
-test("zerobounds it not mutable", (t) => {
-    t.pass();
-});
+    it("zerobounds it not mutable", () => {
+        assert.equal(2, 2);
+    });
 
-test("gets range from axis", (t) => {
-    t.pass();
-});
+    it("gets range from axis", () => {
+        assert.equal(2, 2);
+    });
 
-test("offsets bounds to absolute coordinates", (t) => {
-    t.pass();
+    it("offsets bounds to absolute coordinates", () => {
+        assert.equal(2, 2);
+    });
 });

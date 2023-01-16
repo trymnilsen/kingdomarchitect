@@ -1,45 +1,47 @@
-import test from "ava";
+import { assert } from "chai";
 
-test("update only updates current job", (t) => {
-    t.pass();
-});
+describe("MultipleStepJob test", () => {
+    it("update only updates current job", () => {
+        assert.equal(2, 2);
+    });
 
-test("draw only draws current job", (t) => {
-    t.pass();
-});
+    it("draw only draws current job", () => {
+        assert.equal(2, 2);
+    });
 
-test("cannot set empty list of jobs", (t) => {
-    t.pass();
-});
+    it("cannot set empty list of jobs", () => {
+        assert.equal(2, 2);
+    });
 
-test("can only set list of jobs before its started", (t) => {
-    t.pass();
-});
+    it("can only set list of jobs before its started", () => {
+        assert.equal(2, 2);
+    });
 
-test("run sub job sets state and actor", (t) => {
-    t.pass();
-});
+    it("run sub job sets state and actor", () => {
+        assert.equal(2, 2);
+    });
 
-test("run sub job starts onStart", (t) => {
-    t.pass();
-});
+    it("run sub job starts onStart", () => {
+        assert.equal(2, 2);
+    });
 
-test("subJobListener is added on runJob", (t) => {
-    t.pass();
-});
+    it("subJobListener is added on runJob", () => {
+        assert.equal(2, 2);
+    });
 
-test("next job is ran when previous step completes", (t) => {
-    t.pass();
-});
+    it("next job is ran when previous step completes", () => {
+        assert.equal(2, 2);
+    });
 
-test("job step is removed when it completes", (t) => {
-    t.pass();
-});
+    it("job step is removed when it completes", () => {
+        assert.equal(2, 2);
+    });
 
-test("parent job completes when the last step job completes", (t) => {
-    t.pass();
-});
+    it("parent job completes when the last step job completes", () => {
+        assert.equal(2, 2);
+    });
 
-test("can only set completed state if its currently running", (t) => {
-    t.pass();
+    it("can only set completed state if its currently running", () => {
+        assert.equal(2, 2);
+    });
 });

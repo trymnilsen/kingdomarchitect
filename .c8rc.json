@@ -3,6 +3,7 @@
     "include": [
         "ts/src/**/*"
     ],
+
     "reporter": [
       "lcov",
       "text-summary"

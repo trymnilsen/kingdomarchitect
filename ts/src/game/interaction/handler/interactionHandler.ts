@@ -2,7 +2,7 @@ import { AssetLoader } from "../../../asset/loader/assetLoader";
 import { Point } from "../../../common/point";
 import { Camera } from "../../../rendering/camera";
 import { RenderContext } from "../../../rendering/renderContext";
-import { World } from "../../world";
+import { World } from "../../world/world";
 import { CommitableInteractionStateChanger } from "./interactionStateChanger";
 import { InteractionStateHistory } from "./interactionStateHistory";
 import { StateContext } from "./stateContext";

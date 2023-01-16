@@ -1,17 +1,19 @@
-import test from "ava";
+import { assert } from "chai";
 
-test("push state", (t) => {
-    t.pass();
-});
+describe("InteractionStateHistory test", () => {
+    it("push state", () => {
+        assert.equal(2, 2);
+    });
 
-test("replace state", (t) => {
-    t.pass();
-});
+    it("replace state", () => {
+        assert.equal(2, 2);
+    });
 
-test("pop state", (t) => {
-    t.pass();
-});
+    it("pop state", () => {
+        assert.equal(2, 2);
+    });
 
-test("clear states", (t) => {
-    t.pass();
+    it("clear states", () => {
+        assert.equal(2, 2);
+    });
 });

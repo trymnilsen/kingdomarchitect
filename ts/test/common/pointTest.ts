@@ -1,45 +1,47 @@
-import test from "ava";
+import { assert } from "chai";
 
-test("zero point is not mutable", (t) => {
-    t.pass();
-});
+describe("Point test", () => {
+    it("zero point is not mutable", () => {
+        assert.equal(2, 2);
+    });
 
-test("add two points", (t) => {
-    t.pass();
-});
+    it("add two points", () => {
+        assert.equal(2, 2);
+    });
 
-test("subtract two points", (t) => {
-    t.pass();
-});
+    it("subtract two points", () => {
+        assert.equal(2, 2);
+    });
 
-test("change only x value", (t) => {
-    t.is(5, 5);
-});
+    it("change only x value", () => {
+        assert.equal(2, 2);
+    });
 
-test("change only y value", (t) => {
-    t.pass();
-});
+    it("change only y value", () => {
+        assert.equal(2, 2);
+    });
 
-test("invert point", (t) => {
-    t.pass();
-});
+    it("invert point", () => {
+        assert.equal(2, 2);
+    });
 
-test("multiply point", (t) => {
-    t.pass();
-});
+    it("multiply point", () => {
+        assert.equal(2, 2);
+    });
 
-test("distance between points", (t) => {
-    t.pass();
-});
+    it("distance between points", () => {
+        assert.equal(2, 2);
+    });
 
-test("get adjacent points", (t) => {
-    t.pass();
-});
+    it("get adjacent points", () => {
+        assert.equal(2, 2);
+    });
 
-test("check if one point is adjacent to another", (t) => {
-    t.pass();
-});
+    it("check if one point is adjacent to another", () => {
+        assert.equal(2, 2);
+    });
 
-test("two distant points on the same axis are not adjacent", (t) => {
-    t.pass();
+    it("two distant points on the same axis are not adjacent", () => {
+        assert.equal(2, 2);
+    });
 });

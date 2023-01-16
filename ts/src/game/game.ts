@@ -5,7 +5,7 @@ import { InputAction } from "../input/inputAction";
 import { Renderer } from "../rendering/renderer";
 import { MainScene, Scene } from "./mainScene";
 import { AssetLoader } from "../asset/loader/assetLoader";
-import { TileSize } from "./entity/tile";
+import { TileSize } from "./world/tile/tile";
 
 export class Game {
     private renderer: Renderer;
