@@ -10,6 +10,7 @@ import { RenderContext } from "../../../../rendering/renderContext";
 import { BlinkingImageAnimation } from "../../../../rendering/visual/blinkingImageAnimation";
 import { TileSelectedItem } from "../../../interaction/state/selection/selectedItem";
 import { EntityComponent } from "../../component/entityComponent";
+import { HealthComponent } from "../../component/health/healthComponent";
 import { TreeComponent } from "../../component/resource/treeComponent";
 import { PathFindingComponent } from "../../component/root/path/pathFindingComponent";
 import { TilesComponent } from "../../component/tile/tilesComponent";
@@ -59,6 +60,7 @@ export class ChopTreeJob extends MoveToBeforeJob {
 class _ChopTreeJob extends Job {
     private target: SelectedWorldItem;
     private treeComponent?: TreeComponent;
+    private treeHealthComponent?: HealthComponent | null;
     private blinkingAnimation: BlinkingImageAnimation;
 
     get tileX(): number {
@@ -128,22 +130,17 @@ class _ChopTreeJob extends Job {
         if (!component) {
             throw new JobConstraintsError("No tree component on selection");
         }
-
+        this.treeHealthComponent =
+            component.entity?.getComponent(HealthComponent);
         this.treeComponent = component;
     }
 
     update(tick: number): void {
-        const elapsedTicks = tick - this.startTick;
-        /*if (elapsedTicks > 2) {
-            this.tile.hasTree = 0.0;
-            console.log("_ChopTreeJob finished");
-            //TODO: add back coin actor as an entity
-            
-            this.actor.world.actors.addActor(
-                new CoinActor({ x: this.tile.tileX, y: this.tile.tileY })
-            );
-            this.complete();
-        }*/
+        if (this.treeHealthComponent) {
+            if (this.treeHealthComponent.health > 10) {
+                this.treeHealthComponent.damage(1);
+            }
+        }
     }
 
     override onDraw(renderContext: RenderContext) {

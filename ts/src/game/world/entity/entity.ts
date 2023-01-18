@@ -18,7 +18,8 @@ export class Entity {
     private _children: Entity[] = [];
     private _localPosition: Point = zeroPoint();
     private _worldPosition: Point = zeroPoint();
-    private _componentEvents: TypedEvent<ComponentEvent> = new TypedEvent();
+    private _componentEvents: TypedEvent<ComponentEvent<EntityComponent>> =
+        new TypedEvent();
     private _componentsMap: { [id: string]: EntityComponent } = {};
     private _components: EntityComponent[] = [];
     constructor(readonly id: string) {}
@@ -85,7 +86,7 @@ export class Entity {
         return this._children;
     }
 
-    public get componentEvents(): TypedEvent<ComponentEvent> {
+    public get componentEvents(): TypedEvent<ComponentEvent<EntityComponent>> {
         return this._componentEvents;
     }
 
@@ -143,6 +144,15 @@ export class Entity {
         });
 
         return removeItem(this._children, entity);
+    }
+
+    /**
+     * Remove the entity from the child list of the parent if any
+     */
+    public remove(): void {
+        if (!!this.parent) {
+            this.parent.removeChild(this);
+        }
     }
 
     /**
