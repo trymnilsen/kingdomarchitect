@@ -92,7 +92,6 @@ export class TouchInput {
         canvasElement.addEventListener(
             "mouseup",
             (event) => {
-                console.log("mouseUp", event);
                 event.preventDefault();
                 this.onTapEnded({
                     x: event.clientX,
@@ -104,7 +103,6 @@ export class TouchInput {
         canvasElement.addEventListener(
             "touchend",
             (event) => {
-                console.log("touchEnd", event);
                 event.preventDefault();
                 this.onTapEnded();
             },
@@ -113,7 +111,6 @@ export class TouchInput {
         canvasElement.addEventListener(
             "touchcancel",
             (event) => {
-                console.log("touchCancel", event);
                 event.preventDefault();
                 this.onTapEnded();
             },
@@ -148,7 +145,7 @@ export class TouchInput {
     private onTapEnded(position: Point | undefined = undefined) {
         try {
             if (this.isDragging) {
-                console.log("drag ended");
+                //console.log("drag ended");
             } else if (this.onTapPosition && this.onTap) {
                 if (!position) {
                     position = this.previousMovePosition || this.onTapPosition;

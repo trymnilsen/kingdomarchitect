@@ -27,3 +27,7 @@ export class Completer<T> {
         this.rejectedEvent.publish("completer was disposed");
     }
 }
+
+export function timeout(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}

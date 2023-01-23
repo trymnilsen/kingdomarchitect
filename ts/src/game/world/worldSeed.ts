@@ -53,8 +53,8 @@ export function getStartBuildings(world: Ground): BuildingTile[] {
         }
     });
     const graph = generateGraph(buildings);
-    const pathFinder = new PathSearch(graph);
-
+    //const pathFinder = new PathSearch(graph);
+    /*
     for (let i = 0; i < 2; i++) {
         const randomItemIndex = Math.floor(Math.random() * tiles.length);
         const position = tiles[randomItemIndex];
@@ -89,7 +89,7 @@ export function getStartBuildings(world: Ground): BuildingTile[] {
         }
         pathFinder.updateGraph(generateGraph(buildings));
     }
-
+*/
     return buildings;
 }
 

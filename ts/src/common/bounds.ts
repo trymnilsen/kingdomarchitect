@@ -110,3 +110,10 @@ export function normaliseBounds(bounds: Bounds): Bounds {
         y2: bounds.y2 - bounds.y1,
     };
 }
+
+export function sizeOfBounds(bounds: Bounds): Point {
+    return {
+        x: bounds.x2 - bounds.x1,
+        y: bounds.y2 - bounds.y1,
+    };
+}

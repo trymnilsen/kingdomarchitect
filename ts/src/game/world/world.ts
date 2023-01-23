@@ -19,10 +19,11 @@ import { Entity } from "./entity/entity";
 import { RootEntity } from "./entity/rootEntity";
 import { workerPrefab } from "./prefab/workerPrefab";
 import { getTileId } from "./tile/tile";
+import { WorldGraphGenerator } from "./worldGraphGenerator";
 
 export class World {
     private _pathSearch: PathSearch;
-    private _rootEntity: Entity = new RootEntity("root");
+    private _rootEntity: Entity;
 
     private _groundComponent: TilesComponent;
     private _jobQueueComponent: JobQueueComponent;
@@ -41,7 +42,10 @@ export class World {
     }
 
     constructor() {
-        this._pathSearch = new PathSearch(new Graph([], 0, 0));
+        this._rootEntity = new RootEntity("root");
+        this._pathSearch = new PathSearch(
+            new WorldGraphGenerator(this._rootEntity)
+        );
         this._jobQueueComponent = new JobQueueComponent();
         this._groundComponent = new TilesComponent();
         this._pathFindingComponent = new PathFindingComponent(this._pathSearch);
@@ -52,7 +56,7 @@ export class World {
 
         const firstWorker = workerPrefab(generateId("worker"));
         this._rootEntity.addChild(firstWorker);
-        this.invalidateWorld();
+        //this.invalidateWorld();
     }
 
     tick(tick: number): void {
@@ -62,9 +66,9 @@ export class World {
         this._rootEntity.onUpdate(tick);
     }
 
-    invalidateWorld() {
+    /*     invalidateWorld() {
         this._pathSearch.updateGraph(createGraphFromNodes(this._rootEntity));
-    }
+    } */
 
     onDraw(context: RenderContext): void {
         this._rootEntity.onDraw(context);

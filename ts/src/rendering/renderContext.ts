@@ -101,8 +101,8 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
     drawRectangle(rectangle: RectangleConfiguration) {
         const transformedX = this.camera.worldToScreenX(rectangle.x);
         const transformedY = this.camera.worldToScreenY(rectangle.y);
-        rectangle.x = transformedX;
-        rectangle.y = transformedY;
+        rectangle.x = Math.floor(transformedX);
+        rectangle.y = Math.floor(transformedY);
         rectangleRenderer(rectangle, this.canvasContext);
     }
 

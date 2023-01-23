@@ -1,31 +1,17 @@
-import { InvalidStateError } from "../../../../common/error/invalidStateError";
-import { from } from "../../../../common/from";
 import { generateId } from "../../../../common/idGenerator";
-import {
-    isPointAdjacentTo,
-    Point,
-    pointEquals,
-} from "../../../../common/point";
 import { RenderContext } from "../../../../rendering/renderContext";
 import { BlinkingImageAnimation } from "../../../../rendering/visual/blinkingImageAnimation";
-import { TileSelectedItem } from "../../../interaction/state/selection/selectedItem";
-import { EntityComponent } from "../../component/entityComponent";
 import { HealthComponent } from "../../component/health/healthComponent";
-import { TreeComponent } from "../../component/resource/treeComponent";
-import { PathFindingComponent } from "../../component/root/path/pathFindingComponent";
 import { TilesComponent } from "../../component/tile/tilesComponent";
 import { Entity } from "../../entity/entity";
 import { treePrefab } from "../../prefab/treePrefab";
 import { SelectedEntityItem } from "../../selection/selectedEntityItem";
 import { SelectedTileItem } from "../../selection/selectedTileItem";
 import { SelectedWorldItem } from "../../selection/selectedWorldItem";
-import { GroundTile } from "../../tile/ground";
 import { TileSize } from "../../tile/tile";
 import { WorkerConstraint } from "../job/constraint/workerConstraint";
 import { Job } from "../job/job";
 import { JobConstraintsError } from "../job/jobConstraintsError";
-import { MultipleStepJob } from "../job/multipleStepJob";
-import { MoveJob } from "./moveJob";
 import { MoveToBeforeJob } from "./moveToBeforeJob";
 
 /**
@@ -59,7 +45,6 @@ export class ChopTreeJob extends MoveToBeforeJob {
 
 class _ChopTreeJob extends Job {
     private target: SelectedWorldItem;
-    private treeComponent?: TreeComponent;
     private treeHealthComponent?: HealthComponent | null;
     private blinkingAnimation: BlinkingImageAnimation;
 
@@ -94,52 +79,43 @@ class _ChopTreeJob extends Job {
         super.onStart();
         //Check if we need to convert the tile with a tree into a tile without
         //a tree to a tree entity (to keep track of chopping progress etc
-        let component: TreeComponent | undefined;
+        let entity: Entity | undefined;
         if (this.target instanceof SelectedEntityItem) {
-            const entity = this.target.entity;
-            const entityComponent = this.entity.getComponent(TreeComponent);
-            if (entityComponent) {
-                component = entityComponent;
-            }
+            entity = this.target.entity;
         }
 
         if (this.target instanceof SelectedTileItem) {
             const tileComponent =
                 this.entity.getAncestorComponent(TilesComponent);
 
-            if (tileComponent) {
-                const tile = tileComponent.getTile(this.target.tilePosition);
-
-                if (!!tile?.hasTree) {
-                    const treeEntity = treePrefab(
-                        generateId("tree"),
-                        tile.hasTree
-                    );
-                    tile.hasTree = 0;
-                    treeEntity.worldPosition = this.target.tilePosition;
-                    tileComponent.entity?.addChild(treeEntity, 0);
-                    component = treeEntity.getComponent(TreeComponent)!;
-                } else {
-                    throw new JobConstraintsError("No tree at selection");
-                }
-            } else {
+            if (!tileComponent) {
                 throw new JobConstraintsError("No tile component found");
+            }
+
+            const tile = tileComponent.getTile(this.target.tilePosition);
+
+            if (!!tile?.hasTree) {
+                const treeEntity = treePrefab(generateId("tree"), tile.hasTree);
+                tile.hasTree = 0;
+                treeEntity.worldPosition = this.target.tilePosition;
+                tileComponent.entity?.addChild(treeEntity, 0);
+                entity = treeEntity;
+            } else {
+                throw new JobConstraintsError("No tree at selection");
             }
         }
 
-        if (!component) {
-            throw new JobConstraintsError("No tree component on selection");
+        if (!entity) {
+            throw new JobConstraintsError("No entity for selection");
         }
-        this.treeHealthComponent =
-            component.entity?.getComponent(HealthComponent);
-        this.treeComponent = component;
+
+        this.treeHealthComponent = entity.getComponent(HealthComponent);
     }
 
     update(tick: number): void {
-        if (this.treeHealthComponent) {
-            if (this.treeHealthComponent.health > 10) {
-                this.treeHealthComponent.damage(1);
-            }
+        const component = this.treeHealthComponent!;
+        if (component.health > 10) {
+            component.damage(1);
         }
     }
 

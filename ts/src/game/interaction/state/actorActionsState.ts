@@ -9,7 +9,7 @@ import { InteractionStateChanger } from "../handler/interactionStateChanger";
 export class ActorActionsState extends InteractionState {
     private actionbar: LayoutNode | null = null;
 
-    onTap(
+    /*     onTap(
         screenPosition: Point,
         stateChanger: InteractionStateChanger
     ): boolean {
@@ -20,7 +20,7 @@ export class ActorActionsState extends InteractionState {
             }
         }
         return false;
-    }
+    } */
 
     override onDraw(context: RenderContext): void {
         this.actionbar = actionbarView(context, [

@@ -1,24 +1,38 @@
 import { Point, pointEquals } from "../common/point";
 import { BinaryHeap } from "./binaryHeap";
 import { Graph, GraphNode, WeightNode } from "./graph";
+import { GraphGenerator } from "./graphGenerator";
 import { manhattanDistance } from "./pathHeuristics";
 
 export class PathSearch {
-    private graph: Graph;
-    constructor(graph: Graph) {
-        this.graph = graph;
+    private generator: GraphGenerator;
+    private _graph: Graph | undefined;
+
+    private get graph(): Graph {
+        if (!this._graph) {
+            this._graph = this.generator.createGraph();
+        }
+
+        return this._graph;
+    }
+
+    get offset(): Point {
+        return {
+            x: this.graph.offsetX,
+            y: this.graph.offsetY,
+        };
+    }
+
+    constructor(generator: GraphGenerator) {
+        this.generator = generator;
     }
 
     getWeights(): WeightNode[][] {
         return this.graph.weights;
     }
 
-    getGraph(): Graph {
-        return this.graph;
-    }
-
-    updateGraph(graph: Graph) {
-        this.graph = graph;
+    invalidateGraph(): void {
+        this._graph = undefined;
     }
 
     search(

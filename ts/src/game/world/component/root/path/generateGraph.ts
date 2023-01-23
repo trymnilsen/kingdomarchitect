@@ -1,4 +1,5 @@
 import { absBounds, Bounds } from "../../../../../common/bounds";
+import { InvalidArgumentError } from "../../../../../common/error/invalidArgumentError";
 import { Graph } from "../../../../../path/graph";
 import { Entity } from "../../../entity/entity";
 import { getTileId } from "../../../tile/tile";
@@ -11,13 +12,19 @@ import { TilesComponent } from "../../tile/tilesComponent";
  */
 export function createGraphFromNodes(rootEntity: Entity): Graph {
     const groundComponent = rootEntity.getComponent(TilesComponent);
+    if (!groundComponent) {
+        throw new InvalidArgumentError("Root entity needs a tiles component");
+    }
 
-    const bounds: Bounds = {
+    let bounds = groundComponent.getBounds();
+
+    /* const bounds: Bounds = {
         x1: 0,
         x2: 2,
         y1: 0,
         y2: 2,
-    };
+    }; */
+
     const offsetBounds = absBounds(bounds);
     const weightGraph: number[][] = [];
     for (let x = 0; x <= offsetBounds.bounds.x2; x++) {
@@ -30,17 +37,16 @@ export function createGraphFromNodes(rootEntity: Entity): Graph {
                 tilePositionXWithoutOffset,
                 tilePositionYWithoutOffset
             );
-            if (groundComponent) {
-                const ground = groundComponent.getTile({
-                    x: tilePositionXWithoutOffset,
-                    y: tilePositionYWithoutOffset,
-                });
-                if (ground) {
-                    if (ground.hasTree) {
-                        weight = 20;
-                    } else {
-                        weight = 5;
-                    }
+
+            const ground = groundComponent.getTile({
+                x: tilePositionXWithoutOffset,
+                y: tilePositionYWithoutOffset,
+            });
+            if (ground) {
+                if (ground.hasTree) {
+                    weight = 20;
+                } else {
+                    weight = 5;
                 }
             }
 

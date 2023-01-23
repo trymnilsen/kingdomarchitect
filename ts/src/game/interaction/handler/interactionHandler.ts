@@ -53,14 +53,21 @@ export class InteractionHandler {
     }
 
     onTap(screenPoint: Point): void {
-        const onTapResult = this.history.state.dispatchUIEvent({
+        const currentState = this.history.state;
+        let onTapResult = currentState.dispatchUIEvent({
             type: "tap",
             position: screenPoint,
         });
 
-        //If the tap was not handled check if it will be handled in tilespace
+        const worldPosition = this.camera.screenToWorld(screenPoint);
+        // Check if the tap is handled by the state
         if (!onTapResult) {
-            if (this.history.state.isModal) {
+            onTapResult = currentState.onTap(screenPoint, worldPosition);
+        }
+        // If the tap was not handled in the ui check if it will be handled
+        // by the state itself
+        if (!onTapResult) {
+            if (currentState.isModal) {
                 // if the tap was not handled and the current route is a modal
                 // route we pop the state
                 console.log("Tap was not handled by modal route, popping");
@@ -69,15 +76,13 @@ export class InteractionHandler {
                 return;
             }
 
-            // Get the transformed position of the click
-            const worldPosition = this.camera.screenToWorld(screenPoint);
             const tilePosition =
                 this.camera.worldSpaceToTileSpace(worldPosition);
 
             // Check if a tile was clicked at this position
             const tile = this.world.ground.getTile(tilePosition);
             if (tile) {
-                const tileTapHandled = this.history.state.onTileTap(tile);
+                const tileTapHandled = currentState.onTileTap(tile);
 
                 // If the tap is not handled we treat it as a clear
                 if (!tileTapHandled) {

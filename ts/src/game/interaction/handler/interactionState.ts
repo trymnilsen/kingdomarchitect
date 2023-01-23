@@ -1,3 +1,4 @@
+import { Point } from "../../../common/point";
 import { InputEvent } from "../../../input/input";
 import { RenderContext } from "../../../rendering/renderContext";
 import { UIEvent } from "../../../ui/event/uiEvent";
@@ -15,13 +16,20 @@ export abstract class InteractionState {
     private _context: StateContext | undefined;
     private _view: UIView | null = null;
 
+    /**
+     * Retrieve the currently set root view of the this state
+     */
     public get view(): UIView | null {
         return this._view;
     }
-
+    /**
+     * Sets the view of this state, will be used for checking UIEvent's and
+     * drawn automatically
+     */
     protected set view(value: UIView | null) {
         this._view = value;
     }
+
     /**
      * The state context for this state, contains access to the world and other
      * components useful to a state.
@@ -33,6 +41,7 @@ export abstract class InteractionState {
         }
         return this._context;
     }
+
     /**
      * Sets the context for this state
      */
@@ -49,9 +58,9 @@ export abstract class InteractionState {
     }
 
     /**
-     *
-     * @param event
-     * @returns
+     * Dispatch a UI event to the currently set view
+     * @param event the event to dispatch to the view
+     * @returns if the event was handled or not
      */
     dispatchUIEvent(event: UIEvent): boolean {
         if (this._view) {
@@ -73,11 +82,21 @@ export abstract class InteractionState {
     }
 
     /**
+     * A tap has occured on screen and it was not handled by the view
+     * @param screenPosition the position of the tap
+     * @returns if the tap was handled or not
+     */
+    onTap(screenPosition: Point, worldPosition: Point): boolean {
+        return false;
+    }
+
+    /**
      * Called when this state becomes the active state, either by being popped
      * back to, or the first time it becomes active. Will be called multiple
      * times during its life if its shown or hidden
      */
     onActive(): void {}
+
     /**
      * Called when this state becomes inactive. Either from another state
      * becomming active on to or from being removed.
@@ -95,7 +114,12 @@ export abstract class InteractionState {
     onUpdate(tick: number): void {}
 
     /**
-     * Called when its time to render/draw anything this state wants to
+     * Called when its time to render/draw anything this state wants to.
+     * Make sure to call `super.OnDraw(...)` if this is override to show any
+     * views set.
+     *
+     * Note: this method has a varying frequency of updates. Any logic that
+     * needs a consistent update cycle should be called in onUpdate
      * @param context The render context with access to camera and drawing methods
      */
     onDraw(context: RenderContext): void {

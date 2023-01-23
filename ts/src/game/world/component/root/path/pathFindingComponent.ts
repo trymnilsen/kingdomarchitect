@@ -1,18 +1,37 @@
+import { TypedEventHandle } from "../../../../../common/event/typedEvent";
 import { addPoint, Point, pointEquals } from "../../../../../common/point";
 import { GraphNode } from "../../../../../path/graph";
 import { PathSearch } from "../../../../../path/search";
 import { EntityComponent } from "../../entityComponent";
+import { TileMapUpdateEvent } from "../../tile/tileMapUpdatedEvent";
 import { PathResult, PathResultStatus } from "./pathResult";
 
 export class PathFindingComponent extends EntityComponent {
+    private tileEventListener: TypedEventHandle | undefined;
+
     constructor(private pathSearch: PathSearch) {
         super();
     }
-    findPath(from: Point, to: Point, blockBuildings?: Boolean): PathResult {
-        const offsetPoint = {
-            x: this.pathSearch.getGraph().offsetX,
-            y: this.pathSearch.getGraph().offsetY,
-        };
+
+    override onStart(tick: number): void {
+        this.tileEventListener = this.entity!.componentEvents.listen(
+            TileMapUpdateEvent,
+            (event) => {
+                this.invalidateCurrentGraph();
+            }
+        );
+    }
+
+    override onStop(tick: number): void {
+        this.tileEventListener?.dispose();
+    }
+
+    public findPath(
+        from: Point,
+        to: Point,
+        blockBuildings?: Boolean
+    ): PathResult {
+        const offsetPoint = this.pathSearch.offset;
         const offsetFrom = addPoint(from, {
             x: offsetPoint.x,
             y: offsetPoint.y,
@@ -72,6 +91,10 @@ export class PathFindingComponent extends EntityComponent {
                 path: path,
             };
         }
+    }
+
+    private invalidateCurrentGraph() {
+        this.pathSearch.invalidateGraph();
     }
 }
 

@@ -113,6 +113,10 @@ export function distance(from: Point, to: Point): number {
     return Math.sqrt(xDiff * xDiff + yDiff * yDiff);
 }
 
+export function manhattanDistance(from: Point, to: Point): number {
+    return Math.abs(to.x - from.x) + Math.abs(to.y - from.y);
+}
+
 /**
  * Gets the coordinate of the point that is adjacent in the provided direction
  * @param point the point to create an adjacent coordinate from

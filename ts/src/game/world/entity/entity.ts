@@ -187,9 +187,7 @@ export class Entity {
         entityComponent.entity = this;
         // If there is a parent we are in the entity tree
         // call any lifecycle methods on the component
-        if (!!this._parent) {
-            entityComponent.onStart(0);
-        }
+        entityComponent.onStart(0);
 
         this._componentsMap[componentName] = entityComponent;
         this._components = Object.values(this._componentsMap);
@@ -258,7 +256,9 @@ export class Entity {
     }
 
     /**
-     * Request the entity runs its onDraw for components and children
+     * Request the entity runs its onDraw for components and children.
+     * Note: this method has a varying frequency of updates. Any logic that
+     * needs a consistent update cycle should be called in onUpdate
      * @param renderContext the context used to render anything to the canvas
      */
     public onDraw(renderContext: RenderContext) {

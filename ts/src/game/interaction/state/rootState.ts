@@ -3,6 +3,8 @@ import { RenderContext } from "../../../rendering/renderContext";
 import { GroundTile } from "../../world/tile/ground";
 import { InteractionState } from "../handler/interactionState";
 import { InteractionStateChanger } from "../handler/interactionStateChanger";
+import { ActionButton, getActionbarView } from "../view/actionbar";
+import { LandUnlockState } from "./land/landUnlockState";
 import { ActorSelectedItem, TileSelectedItem } from "./selection/selectedItem";
 import { SelectionState } from "./selection/selectionState";
 
@@ -16,6 +18,27 @@ export class RootState extends InteractionState {
             return false;
         }
     } */
+
+    override onActive(): void {
+        super.onActive();
+
+        const actions: ActionButton[] = [
+            {
+                id: "build",
+                name: "Build",
+            },
+            {
+                id: "land",
+                name: "Land",
+            },
+        ];
+
+        const actionbarView = getActionbarView(actions, (action) => {
+            this.actionSelected(action);
+        });
+
+        this.view = actionbarView;
+    }
 
     override onTileTap(tile: GroundTile): boolean {
         console.log("RootState tap: ", tile);
@@ -44,13 +67,9 @@ export class RootState extends InteractionState {
         return true;
     }
 
-    override onDraw(context: RenderContext): void {
-        context.drawScreenSpaceRectangle({
-            x: 16,
-            y: 16,
-            width: 32,
-            height: 32,
-            fill: "blue",
-        });
+    private actionSelected(action: ActionButton) {
+        if (action.id == "land") {
+            this.context.stateChanger.push(new LandUnlockState());
+        }
     }
 }

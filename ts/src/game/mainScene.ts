@@ -13,7 +13,7 @@ export class MainScene implements Scene {
 
     constructor(camera: Camera, assetsLoader: AssetLoader) {
         this.world = new World();
-        this.world.invalidateWorld();
+        //this.world.invalidateWorld();
         this.interactionHandler = new InteractionHandler(
             this.world,
             camera,
