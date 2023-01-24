@@ -44,11 +44,30 @@ export class TilesComponent extends EntityComponent implements Ground {
     getBounds(): Bounds {
         //Loop over chunk map and get min and max
         //multiply this to get tile bounds
+        const chunks = Object.values(this.chunkMap);
+        let minX = Number.MAX_SAFE_INTEGER;
+        let minY = Number.MAX_SAFE_INTEGER;
+        let maxX = Number.MIN_SAFE_INTEGER;
+        let maxY = Number.MIN_SAFE_INTEGER;
+        for (const chunk of chunks) {
+            if (chunk.chunkX > maxX) {
+                maxX = chunk.chunkX;
+            }
+            if (chunk.chunkX < minX) {
+                minX = chunk.chunkX;
+            }
+            if (chunk.chunkY > maxY) {
+                maxY = chunk.chunkY;
+            }
+            if (chunk.chunkY < minY) {
+                minY = chunk.chunkY;
+            }
+        }
         return {
-            x1: 0,
-            y1: 0,
-            x2: 2,
-            y2: 2,
+            x1: minX * 3,
+            y1: minY * 3,
+            x2: maxX * 3 + 2,
+            y2: maxY * 3 + 2,
         };
     }
 

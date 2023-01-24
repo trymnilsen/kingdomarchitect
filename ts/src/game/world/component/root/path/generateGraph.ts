@@ -48,6 +48,8 @@ export function createGraphFromNodes(rootEntity: Entity): Graph {
                 } else {
                     weight = 5;
                 }
+            } else {
+                weight = 0;
             }
 
             /*
