@@ -18,13 +18,6 @@ export function createGraphFromNodes(rootEntity: Entity): Graph {
 
     let bounds = groundComponent.getBounds();
 
-    /* const bounds: Bounds = {
-        x1: 0,
-        x2: 2,
-        y1: 0,
-        y2: 2,
-    }; */
-
     const offsetBounds = absBounds(bounds);
     const weightGraph: number[][] = [];
     for (let x = 0; x <= offsetBounds.bounds.x2; x++) {
@@ -52,19 +45,6 @@ export function createGraphFromNodes(rootEntity: Entity): Graph {
                 weight = 0;
             }
 
-            /*
-            const building = world.buildings.getTile(tileId);
-            if (building) {
-                weight = building.weight || 1000; //If there is a building at this position we make it very difficult to pass
-            }
-
-            const entity = world.entities.getTile({
-                x: tilePositionXWithoutOffset,
-                y: tilePositionYWithoutOffset,
-            });
-            if (!!entity) {
-                weight = 500;
-            }*/
             weightGraph[x][y] = weight;
         }
     }

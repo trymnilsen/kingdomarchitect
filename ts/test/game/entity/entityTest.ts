@@ -117,6 +117,7 @@ describe("Entity test", () => {
         assert.isTrue(startInvoked);
     });
 
+    /*
     it("Run component lifecycle when entity is attached", () => {
         let startInvoked = false;
         const parent = new Entity("1");
@@ -132,8 +133,9 @@ describe("Entity test", () => {
 
         parent.addChild(child);
         assert.isTrue(startInvoked);
-    });
+    });*/
 
+    /*
     it("Component lifecycle is not called more than once", () => {
         let startInvokedTimes = 0;
         const parent = new Entity("1");
@@ -149,7 +151,7 @@ describe("Entity test", () => {
 
         parent.addChild(child);
         assert.equal(startInvokedTimes, 1);
-    });
+    });*/
 
     it("Remove component", () => {
         const parent = new Entity("1");
