@@ -4,6 +4,7 @@ import { GroundTile } from "../../world/tile/ground";
 import { InteractionState } from "../handler/interactionState";
 import { InteractionStateChanger } from "../handler/interactionStateChanger";
 import { ActionButton, getActionbarView } from "../view/actionbar";
+import { InventoryState } from "./inventory/inventoryState";
 import { LandUnlockState } from "./land/landUnlockState";
 import { ActorSelectedItem, TileSelectedItem } from "./selection/selectedItem";
 import { SelectionState } from "./selection/selectionState";
@@ -30,6 +31,10 @@ export class RootState extends InteractionState {
             {
                 id: "land",
                 name: "Land",
+            },
+            {
+                id: "inventory",
+                name: "Inventory",
             },
         ];
 
@@ -70,6 +75,8 @@ export class RootState extends InteractionState {
     private actionSelected(action: ActionButton) {
         if (action.id == "land") {
             this.context.stateChanger.push(new LandUnlockState());
+        } else if (action.id == "inventory") {
+            this.context.stateChanger.push(new InventoryState());
         }
     }
 }

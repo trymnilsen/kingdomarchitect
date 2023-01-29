@@ -14,6 +14,7 @@ import { EntityComponent } from "../component/entityComponent";
 import { EntityEvent } from "./entityEvent";
 
 export class Entity {
+    protected _isRoot: boolean = false;
     private _parent?: Entity;
     private _children: Entity[] = [];
     private _localPosition: Point = zeroPoint();
@@ -209,6 +210,17 @@ export class Entity {
             return true;
         } else {
             return false;
+        }
+    }
+
+    /**
+     * Check if this entity is attached to a live entity tree
+     */
+    public isAttached(): boolean {
+        if (!!this._parent) {
+            return this._parent.isAttached();
+        } else {
+            return this._isRoot;
         }
     }
 

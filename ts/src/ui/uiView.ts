@@ -11,6 +11,13 @@ export interface UISize {
     width: number;
 }
 
+export function UISizeEquals(firstSize: UISize, secondSize: UISize): Boolean {
+    return (
+        firstSize.width == secondSize.width &&
+        firstSize.height == secondSize.height
+    );
+}
+
 export interface UIAction {
     type: string;
     data: unknown;
@@ -251,6 +258,9 @@ export abstract class UIView {
 
     /**
      * Test if the screen point is within the bounds of this view
+     * Return false from this method will still do hit testing on
+     * children. This might return true if something wants to be considered
+     * opaque. Eg a background or some padding.
      * @param screenPoint
      * @returns
      */

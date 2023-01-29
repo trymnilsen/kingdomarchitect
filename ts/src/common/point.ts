@@ -73,7 +73,7 @@ export function changeY(point: Point, amount: number) {
 }
 
 /**
- * Inverts both the components of the point
+ * Inverts both the components of the point to negative or positive
  * @param point the point to invert
  * @returns a new instance of a point with the components flipped/inverted
  */
@@ -154,7 +154,7 @@ export function adjacentPoints(
         //bottom left
         points.push(addPoint(point, { x: -1, y: 1 }));
         //bottom right
-        points.push(addPoint(point, { x: 11, y: 1 }));
+        points.push(addPoint(point, { x: 1, y: 1 }));
     }
 
     return points;

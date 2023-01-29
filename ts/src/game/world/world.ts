@@ -1,24 +1,16 @@
-import { absBounds, Bounds } from "../../common/bounds";
 import { generateId } from "../../common/idGenerator";
-import {
-    addPoint,
-    isPointAdjacentTo,
-    Point,
-    pointEquals,
-} from "../../common/point";
-import { Graph, GraphNode } from "../../path/graph";
 import { PathSearch } from "../../path/search";
 import { RenderContext } from "../../rendering/renderContext";
 import { JobQueue } from "./component/job/jobQueue";
 import { JobQueueComponent } from "./component/job/jobQueueComponent";
-import { createGraphFromNodes } from "./component/root/path/generateGraph";
 import { PathFindingComponent } from "./component/root/path/pathFindingComponent";
 import { Ground } from "./component/tile/ground";
 import { TilesComponent } from "./component/tile/tilesComponent";
 import { Entity } from "./entity/entity";
 import { RootEntity } from "./entity/rootEntity";
+import { farmPrefab } from "./prefab/farmPrefab";
+import { housePrefab } from "./prefab/housePrefab";
 import { workerPrefab } from "./prefab/workerPrefab";
-import { getTileId } from "./tile/tile";
 import { WorldGraphGenerator } from "./worldGraphGenerator";
 
 export class World {
@@ -54,8 +46,15 @@ export class World {
         this._rootEntity.addComponent(this._groundComponent);
         this._rootEntity.addComponent(this._pathFindingComponent);
 
+        //Set up initial entities
         const firstWorker = workerPrefab(generateId("worker"));
+        const firstFarm = farmPrefab(generateId("farm"));
+        const firstHouse = housePrefab(generateId("house"));
+        firstFarm.position = { x: 2, y: 0 };
+        firstHouse.position = { x: 1, y: 0 };
+        this._rootEntity.addChild(firstHouse);
         this._rootEntity.addChild(firstWorker);
+        this._rootEntity.addChild(firstFarm);
         //this.invalidateWorld();
     }
 

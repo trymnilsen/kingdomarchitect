@@ -1,11 +1,27 @@
 import { assert } from "chai";
+import {
+    NumberRange,
+    rangeDistance,
+    rangeRandom,
+} from "../../src/common/range";
 
 describe("Range test", () => {
     it("can pick random number in range", () => {
-        assert.equal(2, 2);
+        const range: NumberRange = {
+            min: 5,
+            max: 20,
+        };
+        const randomValue = rangeRandom(range);
+        assert.isAtLeast(randomValue, range.min);
+        assert.isAtMost(randomValue, range.max);
     });
 
     it("can calculate distance of range", () => {
-        assert.equal(2, 2);
+        const range: NumberRange = {
+            min: 5,
+            max: 20,
+        };
+        const distance = rangeDistance(range);
+        assert.equal(distance, 15);
     });
 });

@@ -1,4 +1,7 @@
 export const assets = {
+    book_right: "book_right.png",
+    book_left: "book_left.png",
+    farmSheet: "farm_field.png",
     cursor: "cursor.png",
     fancyWoodBackground: "fancy_wood_background.png",
     stoneSlateBackground: "stone_slate_background.png",

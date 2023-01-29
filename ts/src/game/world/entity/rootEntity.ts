@@ -1,7 +1,6 @@
 import { InvalidStateError } from "../../../common/error/invalidStateError";
 import { adjacentPoints, Point, pointEquals } from "../../../common/point";
 import { getChunkId, getChunkPosition } from "../chunk";
-import { EntityComponent } from "../component/entityComponent";
 import { Entity } from "./entity";
 import { EntityEvent } from "./entityEvent";
 
@@ -23,6 +22,11 @@ export class RootEntity extends Entity {
      * chunkId
      */
     private entityChunks: { [entityId: string]: string } = {};
+
+    constructor(id: string) {
+        super(id);
+        this._isRoot = true;
+    }
 
     public getEntityAt(worldPosition: Point): Entity[] {
         const position = getChunkPosition(worldPosition);
