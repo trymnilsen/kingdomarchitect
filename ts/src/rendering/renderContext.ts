@@ -2,7 +2,7 @@ import { assets } from "../asset/assets";
 import { AssetLoader } from "../asset/loader/assetLoader";
 import { Sprite } from "../asset/sprite";
 import { UILayoutContext } from "../ui/uiLayoutContext";
-import { UISize } from "../ui/uiView";
+import { UISize } from "../ui/uiSize";
 import { Camera } from "./camera";
 import {
     ImageConfiguration,

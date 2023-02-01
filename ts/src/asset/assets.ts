@@ -1,4 +1,5 @@
 export const assets = {
+    book_grid_item: "book_grid_item.png",
     book_right: "book_right.png",
     book_left: "book_left.png",
     farmSheet: "farm_field.png",

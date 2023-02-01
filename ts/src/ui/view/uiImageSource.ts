@@ -3,7 +3,7 @@ import { Sprite } from "../../asset/sprite";
 import { Point } from "../../common/point";
 import { UIRenderContext } from "../../rendering/uiRenderContext";
 import { UILayoutContext } from "../uiLayoutContext";
-import { UISize } from "../uiView";
+import { UISize } from "../uiSize";
 
 export interface UIImageSource {
     measure(layoutContext: UILayoutContext): UISize;

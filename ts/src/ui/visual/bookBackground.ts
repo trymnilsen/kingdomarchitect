@@ -2,7 +2,7 @@ import { Point, pointEquals, zeroPoint } from "../../common/point";
 import { allSides } from "../../common/sides";
 import { UIRenderContext } from "../../rendering/uiRenderContext";
 import { UIBackground } from "../uiBackground";
-import { UISize, UISizeEquals as uiSizeEquals } from "../uiView";
+import { UISize } from "../uiSize";
 
 export class OpenBookUIBackground implements UIBackground {
     draw(context: UIRenderContext, screenPosition: Point, size: UISize): void {

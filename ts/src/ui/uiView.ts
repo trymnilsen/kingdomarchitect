@@ -5,18 +5,7 @@ import { Sides, zeroSides } from "../common/sides";
 import { UIRenderContext } from "../rendering/uiRenderContext";
 import { UIEvent } from "./event/uiEvent";
 import { UILayoutContext } from "./uiLayoutContext";
-
-export interface UISize {
-    height: number;
-    width: number;
-}
-
-export function UISizeEquals(firstSize: UISize, secondSize: UISize): Boolean {
-    return (
-        firstSize.width == secondSize.width &&
-        firstSize.height == secondSize.height
-    );
-}
+import { UISize } from "./uiSize";
 
 export interface UIAction {
     type: string;

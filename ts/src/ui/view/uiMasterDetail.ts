@@ -2,7 +2,8 @@ import { Point } from "../../common/point";
 import { UIRenderContext } from "../../rendering/uiRenderContext";
 import { UIBackground } from "../uiBackground";
 import { UILayoutContext } from "../uiLayoutContext";
-import { UISize, UIView } from "../uiView";
+import { UISize } from "../uiSize";
+import { UIView } from "../uiView";
 
 export class UIMasterDetails extends UIView {
     private _singleBackground: UIBackground | null = null;
@@ -40,6 +41,8 @@ export class UIMasterDetails extends UIView {
         size: UISize
     ) {
         super(size);
+        this.addView(masterView);
+        this.addView(detailsView);
     }
 
     /**
@@ -61,6 +64,7 @@ export class UIMasterDetails extends UIView {
             width: 600,
             height: 400,
         };
+        this.masterView.layout(layoutContext, { width: 300, height: 400 });
 
         this._measuredSize = measuredSize;
         return measuredSize;
@@ -73,6 +77,7 @@ export class UIMasterDetails extends UIView {
                 this.measuredSize
             );
         }
+        this.masterView.draw(context);
     }
 }
 

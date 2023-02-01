@@ -2,7 +2,7 @@ import { assets } from "../asset/assets";
 import { Point } from "../common/point";
 import { Sides } from "../common/sides";
 import { UIRenderContext } from "../rendering/uiRenderContext";
-import { UISize } from "./uiView";
+import { UISize } from "./uiSize";
 
 export interface UIBackground {
     draw(context: UIRenderContext, screenPosition: Point, size: UISize): void;

@@ -4,7 +4,8 @@ import { UIRenderContext } from "../../rendering/uiRenderContext";
 import { calculateAlignment, uiAlignment } from "../uiAlignment";
 import { UIBackground } from "../uiBackground";
 import { UILayoutContext } from "../uiLayoutContext";
-import { fillUiSize, UISize, UIView, wrapUiSize } from "../uiView";
+import { UISize } from "../uiSize";
+import { fillUiSize, UIView, wrapUiSize } from "../uiView";
 
 export class UIBox extends UIView {
     private _alignment: Point = uiAlignment.center;

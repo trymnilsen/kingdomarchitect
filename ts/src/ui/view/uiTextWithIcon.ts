@@ -3,7 +3,8 @@ import { defaultTextStyle, TextStyle } from "../../rendering/text/textStyle";
 import { UIRenderContext } from "../../rendering/uiRenderContext";
 import { HorizontalAlignment } from "../uiAlignment";
 import { UILayoutContext } from "../uiLayoutContext";
-import { UISize, UIView } from "../uiView";
+import { UISize } from "../uiSize";
+import { UIView } from "../uiView";
 import { UIImageSource } from "./uiImageSource";
 
 export class UITextWithIcon extends UIView {

@@ -3,7 +3,8 @@ import { defaultTextStyle, TextStyle } from "../../rendering/text/textStyle";
 import { UIRenderContext } from "../../rendering/uiRenderContext";
 import { calculateAlignment, uiAlignment } from "../uiAlignment";
 import { UILayoutContext } from "../uiLayoutContext";
-import { fillUiSize, UISize, UIView, wrapUiSize } from "../uiView";
+import { UISize } from "../uiSize";
+import { fillUiSize, UIView, wrapUiSize } from "../uiView";
 
 export class UIText extends UIView {
     private _textStyle: TextStyle = defaultTextStyle;
