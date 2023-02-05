@@ -53,22 +53,31 @@ export class UIMasterDetails extends UIView {
      * @param view
      */
     showDetails(view: UIView) {
+        this.removeView(this.detailsView);
         this.detailsView = view;
+        this.addView(view);
     }
 
     hitTest(screenPoint: Point): boolean {
         return !!this.background;
     }
+
+    override onTap(screenPoint: Point): boolean {
+        return !!this.background;
+    }
+
     layout(layoutContext: UILayoutContext, constraints: UISize): UISize {
         const measuredSize: UISize = {
             width: 600,
             height: 400,
         };
         this.masterView.layout(layoutContext, { width: 300, height: 400 });
-
+        this.detailsView.layout(layoutContext, { width: 300, height: 400 });
+        this.detailsView.offset = { x: 300, y: 0 };
         this._measuredSize = measuredSize;
         return measuredSize;
     }
+
     draw(context: UIRenderContext): void {
         if (this.measuredSize) {
             this._dualBackground?.draw(
@@ -78,6 +87,7 @@ export class UIMasterDetails extends UIView {
             );
         }
         this.masterView.draw(context);
+        this.detailsView.draw(context);
     }
 }
 

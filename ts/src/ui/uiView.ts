@@ -101,6 +101,10 @@ export abstract class UIView {
      * resources are properly handled.
      */
     dispose() {
+        for (const child of this._children) {
+            child.dispose();
+        }
+        this._parent = null;
         this._uiAction.dispose();
     }
 
@@ -126,7 +130,8 @@ export abstract class UIView {
      * @param view the view to remove
      */
     removeView(view: UIView) {
-        //
+        view.dispose();
+        this._children = this._children.filter((child) => child != view);
     }
 
     /**

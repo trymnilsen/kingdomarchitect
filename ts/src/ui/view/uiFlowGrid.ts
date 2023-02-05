@@ -62,11 +62,19 @@ export class UIFlowGrid extends UIView {
         //Calculate how many we fit in the width axis
         const numberOfColumns = Math.floor(measuredWidth / this.gridItemSize);
         const numberOfRows = Math.ceil(this.children.length / numberOfColumns);
-        const rowHeight = numberOfRows * this.gridItemSize;
+        const totalRowHeight = numberOfRows * this.gridItemSize;
         const gridItemSizeWithPadding =
             this.gridItemSize - this._gridPadding * 2;
+        const totalColumnWidth = numberOfColumns * this.gridItemSize;
+        const columnAlignmentOffset =
+            (constraints.width - totalColumnWidth) / 2;
+        // if the wanted size is wrap we set the height to the height of our rows
+        if (this.size.height == wrapUiSize) {
+            measuredHeight = totalRowHeight;
+        }
         //Luckily we can layout and position the children in one iteration as
         //their size is know
+
         for (let index = 0; index < this.children.length; index++) {
             const child = this.children[index];
             child.layout(layoutContext, {
@@ -76,7 +84,8 @@ export class UIFlowGrid extends UIView {
 
             const x =
                 (index % numberOfColumns) * this.gridItemSize +
-                this._gridPadding;
+                this._gridPadding +
+                columnAlignmentOffset;
             const y =
                 Math.floor(index / numberOfColumns) * this.gridItemSize +
                 this._gridPadding;
@@ -89,7 +98,7 @@ export class UIFlowGrid extends UIView {
 
         const measuredSize: UISize = {
             width: measuredWidth,
-            height: rowHeight,
+            height: measuredHeight,
         };
 
         this._measuredSize = measuredSize;

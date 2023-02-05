@@ -1,6 +1,6 @@
 import { Point } from "../../common/point";
 import { UIRenderContext } from "../../rendering/uiRenderContext";
-import { HorizontalAlignment } from "../uiAlignment";
+import { calculateAlignment, HorizontalAlignment } from "../uiAlignment";
 import { UILayoutContext } from "../uiLayoutContext";
 import { UISize } from "../uiSize";
 import { fillUiSize, UIView, wrapUiSize } from "../uiView";
@@ -88,7 +88,7 @@ export class UIColumn extends UIView {
             }
         }
 
-        //Then measure an place any weighted children
+        //Then measure and place any weighted children
         if (this.totalWeight > 0) {
             const remainingHeight = constraints.height - measuredHeight;
             for (let i = 0; i < this.children.length; i++) {
@@ -136,6 +136,23 @@ export class UIColumn extends UIView {
             }
         }
 
+        // !Fill size special handling!
+        // If there are no children with a weight we will only increment
+        // measuredHeight with the measured size of the children. E.g if the
+        // constraints are 300 and we have two items each with a height of 50,
+        // we will end up with a measured height of 100. If the view is the of
+        // a box it will be aligned in the middle even if the wanted size of
+        // _this_ view is fillheight. To remedy this, if the wanted size is
+        // fill and the measured size is less than the constrainted height,
+        // we will set the measured size to the constrainted size.
+        // This should cause this view (the column) to still have correctly
+        // sized children, but still consume all the size of its
+        // parent/constraints and not be aligned in the middle if there are
+        // only a few items
+        if (this.size.height == fillUiSize) {
+            measuredHeight = constraints.height;
+        }
+
         this._measuredSize = {
             width: measuredWidth,
             height: measuredHeight,
@@ -145,8 +162,22 @@ export class UIColumn extends UIView {
         for (let i = 0; i < this.children.length; i++) {
             const child = this.children[i];
             const offset = offsets[i];
+            // Position the child on the horizontal axis if its size is
+            // less than ours
+            const childWidth = child.measuredSize?.width;
+            let horizontalOffset = 0;
+            if (childWidth && childWidth < measuredWidth) {
+                let childParentWidthDifferent = measuredWidth - childWidth;
+                if (this._horizontalAlignment == HorizontalAlignment.Center) {
+                    horizontalOffset = childParentWidthDifferent / 2;
+                } else if (
+                    this._horizontalAlignment == HorizontalAlignment.Right
+                ) {
+                    horizontalOffset = childParentWidthDifferent;
+                }
+            }
             child.offset = {
-                x: 0,
+                x: horizontalOffset,
                 y: offset.start,
             };
         }

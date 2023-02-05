@@ -30,13 +30,14 @@ export class UIAssetImageSource implements UIImageSource {
         return layoutContext.measureImage(this.asset);
     }
     draw(context: UIRenderContext, screenposition: Point, size: UISize): void {
-        context.drawScreenSpaceImage(
+        context.drawScreenSpaceImageInto(
             {
                 image: this.asset,
                 x: screenposition.x,
                 y: screenposition.y,
             },
-            1
+            size.width,
+            size.height
         );
     }
 }

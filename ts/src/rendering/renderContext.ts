@@ -7,6 +7,7 @@ import { Camera } from "./camera";
 import {
     ImageConfiguration,
     imageRenderer,
+    imageSizeRenderer,
     NinePatchImageConfiguration,
     ninePatchImageRenderer,
     SpriteConfiguration,
@@ -159,6 +160,21 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
             image.x,
             image.y,
             scale,
+            this._assetLoader.getAsset(image.image),
+            this.canvasContext
+        );
+    }
+
+    drawScreenSpaceImageInto(
+        image: ImageConfiguration,
+        targetWidth: number,
+        targetHeight: number
+    ) {
+        imageSizeRenderer(
+            image.x,
+            image.y,
+            targetWidth,
+            targetHeight,
             this._assetLoader.getAsset(image.image),
             this.canvasContext
         );

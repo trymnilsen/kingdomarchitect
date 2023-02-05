@@ -12,4 +12,9 @@ export interface UIRenderContext {
     drawNinePatchImage(image: NinePatchImageConfiguration): void;
     drawScreenSpaceRectangle(rectangle: RectangleConfiguration): void;
     drawScreenspaceText(text: TextConfiguration): void;
+    drawScreenSpaceImageInto(
+        image: ImageConfiguration,
+        targetWidth: number,
+        targetHeight: number
+    ): void;
 }

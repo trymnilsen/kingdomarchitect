@@ -32,10 +32,10 @@ export function zeroSides(): Sides {
     };
 }
 
-export function addHorizontal(sides: Sides): number {
+export function totalHorizontal(sides: Sides): number {
     return sides.left + sides.right;
 }
 
-export function addVertical(sides: Sides): number {
+export function totalVertical(sides: Sides): number {
     return sides.top + sides.bottom;
 }

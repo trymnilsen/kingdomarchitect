@@ -12,6 +12,17 @@ export interface SpriteConfiguration extends RenderItemConfiguration {
     sprite: Sprite;
 }
 
+export function imageSizeRenderer(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    image: HTMLImageElement,
+    context: CanvasRenderingContext2D
+) {
+    context.drawImage(image, x, y, width, height);
+}
+
 export function imageRenderer(
     x: number,
     y: number,

@@ -11,6 +11,7 @@ export interface ColumnChild {
 export interface UIColumnProperties extends UIViewProperties {
     horizontalAlignment?: HorizontalAlignment;
     children: ColumnChild[];
+    weights?: { [viewId: string]: number };
 }
 
 export function uiColumn(columnProperties: UIColumnProperties): UIColumn {

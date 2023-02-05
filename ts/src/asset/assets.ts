@@ -1,9 +1,11 @@
 export const assets = {
+    book_tab: "book_tab.png",
     bagOfGlitter: "bag_of_glitter.png",
     gemResource: "gem_resource.png",
     stoneResource: "stone_resource.png",
     woodResource: "wood_resource.png",
     book_grid_item: "book_grid_item.png",
+    book_grid_item_focused: "book_grid_item_focused.png",
     book_right: "book_right.png",
     book_left: "book_left.png",
     farmSheet: "farm_field.png",

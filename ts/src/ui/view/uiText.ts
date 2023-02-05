@@ -1,4 +1,5 @@
 import { Point, zeroPoint } from "../../common/point";
+import { totalHorizontal, totalVertical } from "../../common/sides";
 import { defaultTextStyle, TextStyle } from "../../rendering/text/textStyle";
 import { UIRenderContext } from "../../rendering/uiRenderContext";
 import { calculateAlignment, uiAlignment } from "../uiAlignment";
@@ -40,10 +41,11 @@ export class UIText extends UIView {
     layout(layoutContext: UILayoutContext, constraints: UISize): UISize {
         const textSize = layoutContext.measureText(this._text, this._textStyle);
         let measuredSize = { width: 0, height: 0 };
-
+        let horizontalPadding = totalHorizontal(this.padding);
+        let verticalPadding = totalVertical(this.padding);
         // Set the measured size based on the wanted ui size
         if (this.size.width == wrapUiSize) {
-            measuredSize.width = textSize.width;
+            measuredSize.width = textSize.width + horizontalPadding;
         } else if (this.size.width == fillUiSize) {
             measuredSize.width = constraints.width;
         } else {
@@ -51,7 +53,7 @@ export class UIText extends UIView {
         }
 
         if (this.size.height == wrapUiSize) {
-            measuredSize.height = textSize.height;
+            measuredSize.height = textSize.height + verticalPadding;
         } else if (this.size.height == fillUiSize) {
             measuredSize.height = constraints.height;
         } else {
@@ -62,8 +64,8 @@ export class UIText extends UIView {
             measuredSize.width,
             measuredSize.height,
             this._alignment,
-            textSize.width,
-            textSize.height
+            textSize.width + horizontalPadding,
+            textSize.height + verticalPadding
         );
 
         this._textAlignmentOffset = calculatedAlignment;
@@ -75,9 +77,15 @@ export class UIText extends UIView {
         context.drawScreenspaceText({
             text: this._text,
             color: this._textStyle.color,
-            x: this.screenPosition.x + this._textAlignmentOffset.x,
+            x:
+                this.screenPosition.x +
+                this._textAlignmentOffset.x +
+                this.padding.left,
             //TODO: The y position for offsets seems off?
-            y: this.screenPosition.y + this._textAlignmentOffset.y,
+            y:
+                this.screenPosition.y +
+                this._textAlignmentOffset.y +
+                this.padding.top,
             font: this._textStyle.font,
             size: this._textStyle.size,
         });

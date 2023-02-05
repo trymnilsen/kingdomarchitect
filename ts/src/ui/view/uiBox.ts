@@ -1,5 +1,5 @@
 import { addPoint, Point } from "../../common/point";
-import { addHorizontal, addVertical } from "../../common/sides";
+import { totalHorizontal, totalVertical } from "../../common/sides";
 import { UIRenderContext } from "../../rendering/uiRenderContext";
 import { calculateAlignment, uiAlignment } from "../uiAlignment";
 import { UIBackground } from "../uiBackground";
@@ -37,8 +37,8 @@ export class UIBox extends UIView {
         let measuredHeight = 0;
         // Set the constraints for children based on the size of this box
         // subtract any padding
-        let horizontalPadding = addHorizontal(this.padding);
-        let verticalPadding = addVertical(this.padding);
+        let horizontalPadding = totalHorizontal(this.padding);
+        let verticalPadding = totalVertical(this.padding);
 
         if (this.size.width > 0) {
             widthConstraint = this.size.width - horizontalPadding;
@@ -121,7 +121,7 @@ export class UIBox extends UIView {
                 y: this.padding.top,
             });
         }
-        this._isDirty = false;
+        //this._isDirty = false;
         return measuredSize;
     }
 

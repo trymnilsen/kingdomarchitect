@@ -25,6 +25,14 @@ describe("uiColumn test", () => {
         assert.equal(2, 2);
     });
 
+    it("column fills height", () => {
+        assert.equal(2, 2);
+    });
+
+    it("aligns items from top by default", () => {
+        assert.equal(2, 2);
+    });
+
     it("measures children with no weight", () => {
         assert.equal(2, 2);
     });

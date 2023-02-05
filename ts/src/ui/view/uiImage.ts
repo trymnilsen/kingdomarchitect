@@ -37,7 +37,7 @@ export class UIImage extends UIView {
 
         let imageSize: UISize = this._image.measure(layoutContext);
         imageSize.width = imageSize.width * this._scale;
-        imageSize.height = imageSize.height * this.scale;
+        imageSize.height = imageSize.height * this._scale;
 
         let measuredSize = { width: 0, height: 0 };
 
