@@ -1,11 +1,11 @@
-import { ImageAsset } from "../../../../asset/assets";
-import { allSides } from "../../../../common/sides";
-import { UIRenderContext } from "../../../../rendering/uiRenderContext";
-import { ninePatchBackground } from "../../../../ui/dsl/uiBackgroundDsl";
-import { UILayoutContext } from "../../../../ui/uiLayoutContext";
-import { UISize } from "../../../../ui/uiSize";
-import { fillUiSize } from "../../../../ui/uiView";
-import { UIButton } from "../../../../ui/view/uiButton";
+import { ImageAsset } from "../../../../../asset/assets";
+import { allSides } from "../../../../../common/sides";
+import { UIRenderContext } from "../../../../../rendering/uiRenderContext";
+import { ninePatchBackground } from "../../../../../ui/dsl/uiBackgroundDsl";
+import { UILayoutContext } from "../../../../../ui/uiLayoutContext";
+import { UISize } from "../../../../../ui/uiSize";
+import { fillUiSize } from "../../../../../ui/uiView";
+import { UIButton } from "../../../../../ui/view/uiButton";
 
 export class UIInventoryGridItem extends UIButton {
     constructor(private asset: ImageAsset, public isSelected: boolean) {

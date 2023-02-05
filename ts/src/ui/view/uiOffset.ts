@@ -32,4 +32,8 @@ export class UIOffset extends UIBox {
 
         return size;
     }
+
+    override withinViewBounds(point: Point): boolean {
+        return true;
+    }
 }

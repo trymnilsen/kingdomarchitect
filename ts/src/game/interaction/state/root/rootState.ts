@@ -1,13 +1,14 @@
-import { InputEvent } from "../../../input/input";
-import { RenderContext } from "../../../rendering/renderContext";
-import { GroundTile } from "../../world/tile/ground";
-import { InteractionState } from "../handler/interactionState";
-import { InteractionStateChanger } from "../handler/interactionStateChanger";
-import { ActionButton, getActionbarView } from "../view/actionbar";
+import { InputEvent } from "../../../../input/input";
+import { RenderContext } from "../../../../rendering/renderContext";
+import { GroundTile } from "../../../world/tile/ground";
+import { InteractionState } from "../../handler/interactionState";
+import { InteractionStateChanger } from "../../handler/interactionStateChanger";
+import { ActionButton, getActionbarView } from "../../view/actionbar";
 import { InventoryState } from "./inventory/inventoryState";
-import { LandUnlockState } from "./land/landUnlockState";
-import { ActorSelectedItem, TileSelectedItem } from "./selection/selectedItem";
-import { SelectionState } from "./selection/selectionState";
+import { LandUnlockState } from "../land/landUnlockState";
+import { ActorSelectedItem, TileSelectedItem } from "../selection/selectedItem";
+import { SelectionState } from "../selection/selectionState";
+import { BuildingState } from "./building/buildingState";
 
 export class RootState extends InteractionState {
     /*     onTap(
@@ -77,6 +78,8 @@ export class RootState extends InteractionState {
             this.context.stateChanger.push(new LandUnlockState());
         } else if (action.id == "inventory") {
             this.context.stateChanger.push(new InventoryState());
+        } else if (action.id == "build") {
+            this.context.stateChanger.push(new BuildingState());
         }
     }
 }

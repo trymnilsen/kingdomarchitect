@@ -1,4 +1,4 @@
-import { RootState } from "../state/rootState";
+import { RootState } from "../state/root/rootState";
 import { InteractionState } from "./interactionState";
 import { StateContext } from "./stateContext";
 

@@ -1,19 +1,24 @@
-import { ImageAsset } from "../../../../asset/assets";
-import { allSides, symmetricSides } from "../../../../common/sides";
-import { bookInkColor } from "../../../../ui/color";
-import { ninePatchBackground } from "../../../../ui/dsl/uiBackgroundDsl";
-import { uiBox } from "../../../../ui/dsl/uiBoxDsl";
-import { uiColumn } from "../../../../ui/dsl/uiColumnDsl";
-import { assetImageSource, uiImage } from "../../../../ui/dsl/uiImageDsl";
-import { uiOffset } from "../../../../ui/dsl/uiOffsetDsl";
-import { uiSpace } from "../../../../ui/dsl/uiSpaceDsl";
-import { uiText } from "../../../../ui/dsl/uiTextDsl";
-import { HorizontalAlignment, uiAlignment } from "../../../../ui/uiAlignment";
-import { fillUiSize, UIView, wrapUiSize } from "../../../../ui/uiView";
-import { UIFlowGrid } from "../../../../ui/view/uiFlowGrid";
-import { UIMasterDetails } from "../../../../ui/view/uiMasterDetail";
-import { OpenBookUIBackground } from "../../../../ui/visual/bookBackground";
-import { InteractionState } from "../../handler/interactionState";
+import { ImageAsset } from "../../../../../asset/assets";
+import { allSides, symmetricSides } from "../../../../../common/sides";
+import { bookInkColor } from "../../../../../ui/color";
+import { ninePatchBackground } from "../../../../../ui/dsl/uiBackgroundDsl";
+import { uiBox } from "../../../../../ui/dsl/uiBoxDsl";
+import { uiColumn } from "../../../../../ui/dsl/uiColumnDsl";
+import { assetImageSource, uiImage } from "../../../../../ui/dsl/uiImageDsl";
+import { uiOffset } from "../../../../../ui/dsl/uiOffsetDsl";
+import { uiSpace } from "../../../../../ui/dsl/uiSpaceDsl";
+import { uiText } from "../../../../../ui/dsl/uiTextDsl";
+import {
+    HorizontalAlignment,
+    uiAlignment,
+} from "../../../../../ui/uiAlignment";
+import { fillUiSize, UIView, wrapUiSize } from "../../../../../ui/uiView";
+import { UIFlowGrid } from "../../../../../ui/view/uiFlowGrid";
+import { UIMasterDetails } from "../../../../../ui/view/uiMasterDetail";
+import { OpenBookUIBackground } from "../../../../../ui/visual/bookBackground";
+import { InteractionState } from "../../../handler/interactionState";
+import { BuildingState } from "../building/buildingState";
+import { bookTabs } from "../ui/bookTabs";
 import { UIInventoryGridItem } from "./uiInventoryGridItem";
 
 export interface InventoryItems {
@@ -148,57 +153,10 @@ export class InventoryState extends InteractionState {
                         y: 0,
                     },
                     children: [
-                        uiColumn({
-                            horizontalAlignment: HorizontalAlignment.Right,
-                            width: 100,
-                            height: wrapUiSize,
-                            children: [
-                                {
-                                    child: uiBox({
-                                        width: 38,
-                                        height: 48,
-                                        background: ninePatchBackground({
-                                            asset: "book_tab",
-                                            scale: 1,
-                                            sides: allSides(8),
-                                        }),
-                                    }),
-                                },
-                                {
-                                    child: uiSpace({
-                                        width: 1,
-                                        height: 8,
-                                    }),
-                                },
-                                {
-                                    child: uiBox({
-                                        width: 38,
-                                        height: 48,
-                                        background: ninePatchBackground({
-                                            asset: "book_tab",
-                                            scale: 1,
-                                            sides: allSides(8),
-                                        }),
-                                    }),
-                                },
-                                {
-                                    child: uiSpace({
-                                        width: 1,
-                                        height: 8,
-                                    }),
-                                },
-                                {
-                                    child: uiBox({
-                                        width: 48,
-                                        height: 48,
-                                        background: ninePatchBackground({
-                                            asset: "book_tab",
-                                            scale: 1,
-                                            sides: allSides(8),
-                                        }),
-                                    }),
-                                },
-                            ],
+                        bookTabs((tab) => {
+                            this.context.stateChanger.replace(
+                                new BuildingState()
+                            );
                         }),
                     ],
                 }),
