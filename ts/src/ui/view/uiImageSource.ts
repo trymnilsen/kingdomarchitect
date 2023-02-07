@@ -16,11 +16,14 @@ export class UISpriteImageSource implements UIImageSource {
         return layoutContext.measureSprite(this.sprite);
     }
     draw(context: UIRenderContext, screenposition: Point, size: UISize): void {
-        context.drawScreenSpaceSprite({
-            sprite: this.sprite,
-            x: screenposition.x,
-            y: screenposition.y,
-        });
+        context.drawScreenSpaceSprite(
+            {
+                sprite: this.sprite,
+                x: screenposition.x,
+                y: screenposition.y,
+            },
+            size
+        );
     }
 }
 

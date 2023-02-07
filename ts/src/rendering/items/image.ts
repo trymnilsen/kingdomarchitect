@@ -56,13 +56,24 @@ export function spriteRenderer(
     y: number,
     bounds: Bounds,
     image: HTMLImageElement,
-    context: CanvasRenderingContext2D
+    context: CanvasRenderingContext2D,
+    targetWidth?: number,
+    targetHeight?: number
 ) {
     x = Math.floor(x);
     y = Math.floor(y);
 
     const width = bounds.x2 - bounds.x1;
     const height = bounds.y2 - bounds.y1;
+    let destinationWidth = width;
+    let destinationHeight = height;
+    if (targetWidth) {
+        destinationWidth = targetWidth;
+    }
+    if (targetHeight) {
+        destinationHeight = targetHeight;
+    }
+
     context.drawImage(
         image,
         bounds.x1,
@@ -71,8 +82,8 @@ export function spriteRenderer(
         height,
         x,
         y,
-        width,
-        height
+        destinationWidth,
+        destinationHeight
     );
 }
 

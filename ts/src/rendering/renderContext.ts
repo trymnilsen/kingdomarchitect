@@ -185,13 +185,15 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
      * given scale
      * @param sprite the sprite to draw
      */
-    drawScreenSpaceSprite(sprite: SpriteConfiguration) {
+    drawScreenSpaceSprite(sprite: SpriteConfiguration, uiSize?: UISize) {
         spriteRenderer(
             sprite.x,
             sprite.y,
             sprite.sprite.bounds,
             this._assetLoader.getAsset(sprite.sprite.asset),
-            this.canvasContext
+            this.canvasContext,
+            uiSize?.width,
+            uiSize?.height
         );
     }
 

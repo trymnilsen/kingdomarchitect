@@ -1,3 +1,4 @@
+import { UISize } from "../ui/uiSize";
 import {
     ImageConfiguration,
     NinePatchImageConfiguration,
@@ -8,7 +9,7 @@ import { TextConfiguration } from "./items/text";
 
 export interface UIRenderContext {
     drawScreenSpaceImage(image: ImageConfiguration, scale: number): void;
-    drawScreenSpaceSprite(sprite: SpriteConfiguration): void;
+    drawScreenSpaceSprite(sprite: SpriteConfiguration, size?: UISize): void;
     drawNinePatchImage(image: NinePatchImageConfiguration): void;
     drawScreenSpaceRectangle(rectangle: RectangleConfiguration): void;
     drawScreenspaceText(text: TextConfiguration): void;

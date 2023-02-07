@@ -14,6 +14,10 @@ export function uiButton(properties: UIButtonProperties): UIButton {
         height: properties.height,
     });
 
+    if (properties.padding) {
+        button.padding = properties.padding;
+    }
+
     if (properties.id) {
         button.id = properties.id;
     }
