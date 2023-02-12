@@ -142,6 +142,7 @@ export abstract class Job {
      * take on new jobs
      */
     protected complete() {
+        console.log("Job completed", this);
         this._jobState = JobState.Completed;
         this._completedEvent.publish(JobCompletedResult.Success);
     }

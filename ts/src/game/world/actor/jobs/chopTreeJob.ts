@@ -128,9 +128,11 @@ class _ChopTreeJob extends Job {
             entity.getAncestorComponent(InventoryComponent)!;
 
         if (healthComponent.health >= 20) {
+            console.log("Health mte 20");
             healthComponent.damage(10);
         }
         if (healthComponent.health <= 10) {
+            console.log("Health lte 10");
             treeComponent.setChopped();
             inventoryComponent.addInventoryItem(woodResourceItem, 4);
             this.complete();

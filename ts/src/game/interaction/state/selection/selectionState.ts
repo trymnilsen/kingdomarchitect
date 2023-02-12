@@ -1,6 +1,10 @@
 import { Point } from "../../../../common/point";
 import { allSides } from "../../../../common/sides";
 import { RenderContext } from "../../../../rendering/renderContext";
+import { TreeComponent } from "../../../world/component/resource/treeComponent";
+import { SelectedEntityItem } from "../../../world/selection/selectedEntityItem";
+import { SelectedTileItem } from "../../../world/selection/selectedTileItem";
+import { SelectedWorldItem } from "../../../world/selection/selectedWorldItem";
 import { GroundTile } from "../../../world/tile/ground";
 import { TileSize } from "../../../world/tile/tile";
 import { InteractionState } from "../../handler/interactionState";
@@ -14,14 +18,13 @@ import {
 } from "../building/selectedBuildingUiAction";
 import { MoveState } from "../moveState";
 import { ChopJobState } from "../resource/chopJopState";
-import { SelectedItem, TileSelectedItem } from "./selectedItem";
 
 export class SelectionState extends InteractionState {
-    private selectedItem: SelectedItem;
+    private selectedItem: SelectedWorldItem;
 
-    constructor(tile: SelectedItem) {
+    constructor(selection: SelectedWorldItem) {
         super();
-        this.selectedItem = tile;
+        this.selectedItem = selection;
     }
 
     override onActive(): void {
@@ -48,47 +51,16 @@ export class SelectionState extends InteractionState {
     override onTileTap(tile: GroundTile): boolean {
         // If a new tile was tapped while in this state we move the cursor to it
         console.log("TileSelectedState - onTileTap: ", tile);
-        const tileSelection = new TileSelectedItem(tile);
-        this.selectedItem = tileSelection;
-        //TODO: add this back
-        /*const actor = this.context.world.actors.getActor({
+        const entitiesAt = this.context.world.rootEntity.getEntityAt({
             x: tile.tileX,
             y: tile.tileY,
         });
-
-
-        if (!!actor) {
-            const actorSelection = new ActorSelectedItem(actor);
-            this.selectedItem = actorSelection;
+        if (entitiesAt.length > 0) {
+            this.selectedItem = new SelectedEntityItem(entitiesAt[0]);
         } else {
-            let entity = this.context.world.entities.getTile({
-                x: tile.tileX,
-                y: tile.tileY,
-            });
-
-            if (entity instanceof MultiTileEntity && !!entity.multiTileSource) {
-                const sourceEntity = this.context.world.entities.getTileById(
-                    entity.multiTileSource
-                );
-                if (!!sourceEntity) {
-                    entity = sourceEntity;
-                } else {
-                    console.error(
-                        "Tapped entity had reference to multitile not found"
-                    );
-                }
-            }
-
-            if (!!entity) {
-                const size = this.context.world.entities.getSize(entity);
-                console.log(`building size`, size);
-                this.selectedItem = new EntitySelectedItem(entity, size);
-            } else {
-                
-            }
+            this.selectedItem = new SelectedTileItem(tile);
         }
-
-        */
+        console.log("Selection updated: ", this.selectedItem);
 
         this.updateTileActions();
         return true;
@@ -125,50 +97,6 @@ export class SelectionState extends InteractionState {
     }
 
     private getTileActions(tilePosition: Point): ActionButton[] {
-        /*
-        const actor = this.context.world.actors.getActor(tilePosition);
-        if (actor) {
-            if (actor instanceof SwordsmanActor) {
-                return [
-                    {
-                        id: "actions",
-                        name: "Actions",
-                    },
-                    {
-                        id: "move",
-                        name: "Move",
-                    },
-                    {
-                        id: "cancel",
-                        name: "Cancel",
-                    },
-                ];
-            } else if (actor instanceof CoinActor) {
-                return [
-                    {
-                        id: "collect_coin",
-                        name: "Collect",
-                    },
-                    {
-                        id: "cancel",
-                        name: "Cancel",
-                    },
-                ];
-            } else {
-                return [
-                    {
-                        id: "info",
-                        name: "Info",
-                    },
-                    {
-                        id: "cancel",
-                        name: "Cancel",
-                    },
-                ];
-            }
-        }
-        */
-
         const tile = this.context.world.ground.getTile(tilePosition);
         let actions: ActionButton[] = [];
         if (tile && tile.hasTree) {
@@ -184,12 +112,35 @@ export class SelectionState extends InteractionState {
             ];
         }
 
-        const rootEntity = this.context.world.rootEntity;
-        const entities = rootEntity.getEntityAt(tilePosition);
-        console.log(
-            `Entities at: ${tilePosition.x} ${tilePosition.y}`,
-            entities
-        );
+        if (actions.length == 0) {
+            const rootEntity = this.context.world.rootEntity;
+            const entities = rootEntity.getEntityAt(tilePosition);
+            console.log(
+                `Entities at: ${tilePosition.x} ${tilePosition.y}`,
+                entities
+            );
+
+            if (entities.length > 0) {
+                const treeEntity = entities.filter((entity) => {
+                    const isTree = entity.getComponent(TreeComponent);
+                    return !!isTree;
+                });
+
+                if (treeEntity.length > 0) {
+                    actions = [
+                        {
+                            id: "chop",
+                            name: "Chop",
+                        },
+                        {
+                            id: "cancel",
+                            name: "Cancel",
+                        },
+                    ];
+                }
+            }
+        }
+
         return actions;
     }
 
@@ -213,9 +164,7 @@ export class SelectionState extends InteractionState {
             );
         } else if (actionId == "chop") {
             const selectedTile = this.selectedItem;
-            if (selectedTile instanceof TileSelectedItem) {
-                this.context.stateChanger.push(new ChopJobState(selectedTile));
-            }
+            this.context.stateChanger.push(new ChopJobState(selectedTile));
         } else if (actionId == "actions") {
             this.context.stateChanger.push(new ActorActionsState());
         } else if (actionId == "cancel") {

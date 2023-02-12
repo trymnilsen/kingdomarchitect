@@ -6,9 +6,11 @@ import { InteractionStateChanger } from "../../handler/interactionStateChanger";
 import { ActionButton, getActionbarView } from "../../view/actionbar";
 import { InventoryState } from "./inventory/inventoryState";
 import { LandUnlockState } from "../land/landUnlockState";
-import { ActorSelectedItem, TileSelectedItem } from "../selection/selectedItem";
 import { SelectionState } from "../selection/selectionState";
 import { BuildingState } from "./building/buildingState";
+import { SelectedTileItem } from "../../../world/selection/selectedTileItem";
+import { SelectedEntityItem } from "../../../world/selection/selectedEntityItem";
+import { SelectedWorldItem } from "../../../world/selection/selectedWorldItem";
 
 export class RootState extends InteractionState {
     /*     onTap(
@@ -48,20 +50,16 @@ export class RootState extends InteractionState {
 
     override onTileTap(tile: GroundTile): boolean {
         console.log("RootState tap: ", tile);
-        const actor = null;
-        //TODO: add back actor selector
-        /*this.context.world.actors.getActor({
+        let selection: SelectedWorldItem = new SelectedTileItem(tile);
+        const entitiesAt = this.context.world.rootEntity.getEntityAt({
             x: tile.tileX,
             y: tile.tileY,
-        });*/
-
-        if (!!actor) {
-            const actorSelection = new ActorSelectedItem(actor);
-            this.context.stateChanger.push(new SelectionState(actorSelection));
-        } else {
-            const tileSelection = new TileSelectedItem(tile);
-            this.context.stateChanger.push(new SelectionState(tileSelection));
+        });
+        if (entitiesAt.length > 0) {
+            selection = new SelectedEntityItem(entitiesAt[0]);
         }
+
+        this.context.stateChanger.push(new SelectionState(selection));
 
         return true;
     }
