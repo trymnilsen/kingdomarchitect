@@ -5,6 +5,7 @@
     "scripts": {
         "tsc": "tsc",
         "build": "webpack",
+        "spritepack": "ts-node ts/tool/spritePack.ts",
         "start": "webpack serve",
         "test": "mocha",
         "coverage": "c8 mocha && open coverage/lcov-report/index.html"
@@ -27,6 +28,8 @@
         "c8": "^7.12.0",
         "chai": "^4.3.7",
         "get-pixels": "^3.3.3",
+        "jimp": "^0.22.4",
+        "maxrects-packer": "^2.7.3",
         "mocha": "^10.2.0",
         "ts-loader": "^9.4.2",
         "ts-node": "^10.9.1",

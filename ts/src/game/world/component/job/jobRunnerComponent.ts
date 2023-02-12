@@ -92,6 +92,13 @@ export class JobRunnerComponent extends EntityComponent {
             // to some other entity as well
             queue.removeJob(mostApplicableJob);
             this.assignJob(mostApplicableJob);
+        } else {
+            console.log(
+                "No applicable job found",
+                entity,
+                applicableJobs,
+                queue.pendingJobs
+            );
         }
     }
 }

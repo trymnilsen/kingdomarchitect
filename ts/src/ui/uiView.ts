@@ -218,7 +218,7 @@ export abstract class UIView {
         const withinBounds = this.withinViewBounds(event.position);
 
         // If the event is not within our bounds we do not pass it on
-        if (!withinBounds && false) {
+        if (!withinBounds) {
             return false;
         }
 

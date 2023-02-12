@@ -16,6 +16,7 @@ import { fillUiSize, UIView, wrapUiSize } from "../../../../../ui/uiView";
 import { UIFlowGrid } from "../../../../../ui/view/uiFlowGrid";
 import { UIMasterDetails } from "../../../../../ui/view/uiMasterDetail";
 import { OpenBookUIBackground } from "../../../../../ui/visual/bookBackground";
+import { InventoryComponent } from "../../../../world/component/root/inventory/inventoryComponent";
 import { InteractionState } from "../../../handler/interactionState";
 import { BuildingState } from "../building/buildingState";
 import { bookTabs } from "../ui/bookTabs";
@@ -31,32 +32,8 @@ export interface InventoryItems {
 export class InventoryState extends InteractionState {
     private _masterDetailsView: UIMasterDetails;
     private _selectedGridItemView: UIInventoryGridItem | undefined;
-    private items: InventoryItems[] = [
-        {
-            name: "Block of wood",
-            asset: "woodResource",
-            amount: 7,
-            value: 27,
-        },
-        {
-            name: "Bag o' glitter",
-            asset: "bagOfGlitter",
-            amount: 1,
-            value: 300,
-        },
-        {
-            name: "Ruby Gem",
-            asset: "gemResource",
-            amount: 1,
-            value: 500,
-        },
-        {
-            name: "Stone",
-            asset: "stoneResource",
-            amount: 53,
-            value: 154,
-        },
-    ];
+    private _items: InventoryItems[] = [];
+
     override get isModal(): boolean {
         return true;
     }
@@ -64,6 +41,34 @@ export class InventoryState extends InteractionState {
     constructor() {
         super();
 
+        const gridView = this.getMasterGridView();
+        const detailsView = this.getDetailsView(0);
+
+        const masterView = uiBox({
+            width: 300,
+            height: 400,
+            padding: allSides(32),
+            children: [gridView],
+        });
+
+        this._masterDetailsView = new UIMasterDetails(masterView, detailsView, {
+            width: fillUiSize,
+            height: fillUiSize,
+        });
+
+        this._masterDetailsView.dualBackground = new OpenBookUIBackground();
+
+        this.view = uiBox({
+            width: fillUiSize,
+            height: fillUiSize,
+            padding: allSides(64),
+            alignment: uiAlignment.center,
+            children: [this._masterDetailsView],
+        });
+    }
+
+    override onActive(): void {
+        this.getInventoryItemList();
         const gridView = this.getMasterGridView();
         const detailsView = this.getDetailsView(0);
 
@@ -100,6 +105,21 @@ export class InventoryState extends InteractionState {
         view.isSelected = true;
     }
 
+    private getInventoryItemList() {
+        const inventoryComponent =
+            this.context.world.rootEntity.getComponent(InventoryComponent)!;
+
+        const items = inventoryComponent.items;
+        this._items = items.map((item) => {
+            return {
+                name: item.item.name,
+                asset: item.item.asset,
+                amount: item.amount,
+                value: 5,
+            };
+        });
+    }
+
     private getMasterGridView(): UIView {
         const gridView = new UIFlowGrid({
             width: fillUiSize,
@@ -108,7 +128,7 @@ export class InventoryState extends InteractionState {
         gridView.gridItemSize = 50;
 
         for (let i = 0; i < 8; i++) {
-            const inventoryItem = this.items[i];
+            const inventoryItem = this._items[i];
             if (!!inventoryItem) {
                 const isSelected = i == 0;
                 const gridItem = new UIInventoryGridItem(
@@ -165,85 +185,111 @@ export class InventoryState extends InteractionState {
     }
 
     private getDetailsView(index: number): UIView {
-        const inventoryItem = this.items[index];
+        const inventoryItem = this._items[index];
 
-        return uiBox({
-            width: 300,
-            height: 400,
-            padding: {
-                bottom: 32,
-                left: 24,
-                top: 32,
-                right: 40,
-            },
-            children: [
-                uiColumn({
-                    width: fillUiSize,
-                    height: fillUiSize,
-                    children: [
-                        {
-                            child: uiBox({
-                                height: 180,
-                                width: fillUiSize,
-                                background: ninePatchBackground({
-                                    asset: "book_grid_item",
-                                    sides: allSides(8),
-                                    scale: 1,
-                                }),
-                                children: [
-                                    uiImage({
-                                        height: 64,
-                                        width: 64,
-                                        image: assetImageSource(
-                                            inventoryItem.asset
-                                        ),
+        if (!!inventoryItem) {
+            return uiBox({
+                width: 300,
+                height: 400,
+                padding: {
+                    bottom: 32,
+                    left: 24,
+                    top: 32,
+                    right: 40,
+                },
+                children: [
+                    uiColumn({
+                        width: fillUiSize,
+                        height: fillUiSize,
+                        children: [
+                            {
+                                child: uiBox({
+                                    height: 180,
+                                    width: fillUiSize,
+                                    background: ninePatchBackground({
+                                        asset: "book_grid_item",
+                                        sides: allSides(8),
+                                        scale: 1,
                                     }),
-                                ],
-                            }),
+                                    children: [
+                                        uiImage({
+                                            height: 64,
+                                            width: 64,
+                                            image: assetImageSource(
+                                                inventoryItem.asset
+                                            ),
+                                        }),
+                                    ],
+                                }),
+                            },
+                            {
+                                child: uiText({
+                                    padding: symmetricSides(0, 8),
+                                    text: inventoryItem.name,
+                                    style: {
+                                        color: bookInkColor,
+                                        font: "Silkscreen",
+                                        size: 20,
+                                    },
+                                    width: fillUiSize,
+                                    height: wrapUiSize,
+                                }),
+                            },
+                            {
+                                child: uiText({
+                                    alignment: uiAlignment.centerLeft,
+                                    text: `amount: ${inventoryItem.amount}`,
+                                    style: {
+                                        color: bookInkColor,
+                                        font: "Silkscreen",
+                                        size: 16,
+                                    },
+                                    width: fillUiSize,
+                                    height: wrapUiSize,
+                                }),
+                            },
+                            {
+                                child: uiText({
+                                    alignment: uiAlignment.centerLeft,
+                                    text: `value: ${inventoryItem.value}`,
+                                    style: {
+                                        color: bookInkColor,
+                                        font: "Silkscreen",
+                                        size: 16,
+                                    },
+                                    width: fillUiSize,
+                                    height: wrapUiSize,
+                                }),
+                            },
+                        ],
+                    }),
+                ],
+            });
+        } else {
+            return uiBox({
+                width: 300,
+                height: 400,
+                padding: {
+                    bottom: 32,
+                    left: 24,
+                    top: 32,
+                    right: 40,
+                },
+                children: [
+                    uiText({
+                        padding: symmetricSides(0, 8),
+                        text: "Inventory empty",
+                        style: {
+                            color: bookInkColor,
+                            font: "Silkscreen",
+                            size: 20,
                         },
-                        {
-                            child: uiText({
-                                padding: symmetricSides(0, 8),
-                                text: inventoryItem.name,
-                                style: {
-                                    color: bookInkColor,
-                                    font: "Silkscreen",
-                                    size: 20,
-                                },
-                                width: fillUiSize,
-                                height: wrapUiSize,
-                            }),
-                        },
-                        {
-                            child: uiText({
-                                alignment: uiAlignment.centerLeft,
-                                text: `amount: ${inventoryItem.amount}`,
-                                style: {
-                                    color: bookInkColor,
-                                    font: "Silkscreen",
-                                    size: 16,
-                                },
-                                width: fillUiSize,
-                                height: wrapUiSize,
-                            }),
-                        },
-                        {
-                            child: uiText({
-                                alignment: uiAlignment.centerLeft,
-                                text: `value: ${inventoryItem.value}`,
-                                style: {
-                                    color: bookInkColor,
-                                    font: "Silkscreen",
-                                    size: 16,
-                                },
-                                width: fillUiSize,
-                                height: wrapUiSize,
-                            }),
-                        },
-                    ],
-                }),
-            ],
-        });
+                        width: fillUiSize,
+                        height: wrapUiSize,
+                    }),
+                ],
+            });
+        }
     }
 }
 

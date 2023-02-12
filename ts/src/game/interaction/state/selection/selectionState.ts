@@ -1,19 +1,7 @@
-import { stoneWoodWalls } from "../../../../asset/sprites/stoneWoodWalls";
-import {
-    woodenHouseScaffold,
-    woodenHouseSprite,
-} from "../../../../asset/sprites/woodHouseSprite";
 import { Point } from "../../../../common/point";
 import { allSides } from "../../../../common/sides";
 import { RenderContext } from "../../../../rendering/renderContext";
-import { CoinActor } from "../../../world/actor/actors/coinActor";
-import { SwordsmanActor } from "../../../world/actor/actors/swordsmanActor";
-import { BuildJob } from "../../../world/actor/jobs/buildJob";
-import { CollectCoinJob } from "../../../world/actor/jobs/collectCoinJob";
-import { BuildableEntity } from "../../../world/entity/v1/buildableEntity";
-import { WallEntity } from "../../../world/entity/v1/building/wallEntity";
 import { GroundTile } from "../../../world/tile/ground";
-import { MultiTileEntity } from "../../../world/entity/v1/multiTileEntity";
 import { TileSize } from "../../../world/tile/tile";
 import { InteractionState } from "../../handler/interactionState";
 import { ActionButton, getActionbarView } from "../../view/actionbar";
@@ -26,12 +14,7 @@ import {
 } from "../building/selectedBuildingUiAction";
 import { MoveState } from "../moveState";
 import { ChopJobState } from "../resource/chopJopState";
-import {
-    ActorSelectedItem,
-    EntitySelectedItem,
-    SelectedItem,
-    TileSelectedItem,
-} from "./selectedItem";
+import { SelectedItem, TileSelectedItem } from "./selectedItem";
 
 export class SelectionState extends InteractionState {
     private selectedItem: SelectedItem;
@@ -187,33 +170,27 @@ export class SelectionState extends InteractionState {
         */
 
         const tile = this.context.world.ground.getTile(tilePosition);
-        if (tile) {
-            if (tile.hasTree) {
-                return [
-                    {
-                        id: "chop",
-                        name: "Chop",
-                    },
-                    {
-                        id: "cancel",
-                        name: "Cancel",
-                    },
-                ];
-            } else {
-                return [
-                    {
-                        id: "build",
-                        name: "Build",
-                    },
-                    {
-                        id: "cancel",
-                        name: "Cancel",
-                    },
-                ];
-            }
+        let actions: ActionButton[] = [];
+        if (tile && tile.hasTree) {
+            actions = [
+                {
+                    id: "chop",
+                    name: "Chop",
+                },
+                {
+                    id: "cancel",
+                    name: "Cancel",
+                },
+            ];
         }
 
-        return [];
+        const rootEntity = this.context.world.rootEntity;
+        const entities = rootEntity.getEntityAt(tilePosition);
+        console.log(
+            `Entities at: ${tilePosition.x} ${tilePosition.y}`,
+            entities
+        );
+        return actions;
     }
 
     private actionButtonPressed(actionId: string) {

@@ -3,6 +3,7 @@ import { PathSearch } from "../../path/search";
 import { RenderContext } from "../../rendering/renderContext";
 import { JobQueue } from "./component/job/jobQueue";
 import { JobQueueComponent } from "./component/job/jobQueueComponent";
+import { InventoryComponent } from "./component/root/inventory/inventoryComponent";
 import { PathFindingComponent } from "./component/root/path/pathFindingComponent";
 import { Ground } from "./component/tile/ground";
 import { TilesComponent } from "./component/tile/tilesComponent";
@@ -15,11 +16,12 @@ import { WorldGraphGenerator } from "./worldGraphGenerator";
 
 export class World {
     private _pathSearch: PathSearch;
-    private _rootEntity: Entity;
+    private _rootEntity: RootEntity;
 
     private _groundComponent: TilesComponent;
     private _jobQueueComponent: JobQueueComponent;
     private _pathFindingComponent: PathFindingComponent;
+    private _inventoryComponent: InventoryComponent;
 
     public get ground(): Ground {
         return this._groundComponent;
@@ -29,7 +31,7 @@ export class World {
         return this._jobQueueComponent;
     }
 
-    public get rootEntity(): Entity {
+    public get rootEntity(): RootEntity {
         return this._rootEntity;
     }
 
@@ -41,7 +43,9 @@ export class World {
         this._jobQueueComponent = new JobQueueComponent();
         this._groundComponent = new TilesComponent();
         this._pathFindingComponent = new PathFindingComponent(this._pathSearch);
+        this._inventoryComponent = new InventoryComponent();
 
+        this._rootEntity.addComponent(this._inventoryComponent);
         this._rootEntity.addComponent(this._jobQueueComponent);
         this._rootEntity.addComponent(this._groundComponent);
         this._rootEntity.addComponent(this._pathFindingComponent);

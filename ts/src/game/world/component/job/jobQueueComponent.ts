@@ -1,3 +1,4 @@
+import { removeItem } from "../../../../common/array";
 import { InvalidStateError } from "../../../../common/error/invalidStateError";
 import { Event, EventListener } from "../../../../common/event";
 import { Job } from "../../actor/job/job";
@@ -25,7 +26,10 @@ export class JobQueueComponent extends EntityComponent implements JobQueue {
     }
 
     removeJob(job: Job): void {
-        throw new Error("Method not implemented.");
+        const removeResult = removeItem(this._pendingJobs, job);
+        if (!removeResult) {
+            console.warn("Job not removed, was not in list", job);
+        }
     }
 
     private assignJobToAvailableEntity(job: Job): boolean {
@@ -38,15 +42,17 @@ export class JobQueueComponent extends EntityComponent implements JobQueue {
 
         const searchEntities = [...this.entity.children];
 
+        console.log("assignJobToAvailableEntity", job);
         while (searchEntities.length > 0) {
             // Pick the first entity in the search list
             const entity = searchEntities.shift();
-
+            console.log("assignJobToAvailableEntity - search entity", entity);
             if (!entity) {
                 throw new InvalidStateError(
                     "Shifted item in list with >0 length was undefined"
                 );
             }
+
             // Check if this node is applicable
             const jobRunner = entity.getComponent(JobRunnerComponent);
             // If the child has a runner component and that runner does not
@@ -68,7 +74,7 @@ export class JobQueueComponent extends EntityComponent implements JobQueue {
             }
 
             // Add the children of this entity to nodes to search
-            for (const child of this.entity.children) {
+            for (const child of entity.children) {
                 searchEntities.push(child);
             }
         }

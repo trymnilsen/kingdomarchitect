@@ -29,9 +29,9 @@ export class UISpace extends UIView {
             measuredWidth = this.size.width;
         }
 
-        if (this.size.width == wrapUiSize) {
+        if (this.size.height == wrapUiSize) {
             measuredHeight = constraints.height;
-        } else if (this.size.width > 0) {
+        } else if (this.size.height > 0) {
             measuredHeight = this.size.height;
         }
 

@@ -30,15 +30,18 @@ export class JobQueue2 {
      * @param job the job to be performed
      */
     schedule(job: Job) {
+        console.log("Schedule job", job);
         this._pendingJobs.push(job);
         //Listen for the job to be aborted while in the queue
         const handle = job.completedEvent.listen((completedResult) => {
             this._removeJob(job, false);
         });
+        console.log("Schedule job - Push abort listner", job);
         this._abortListeners.push({
             handle: handle,
             job: job,
         });
+        console.log("Schedule job - publish event", job);
         this._jobScheduled.publish(job);
     }
 

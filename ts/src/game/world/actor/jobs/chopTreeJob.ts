@@ -1,7 +1,10 @@
 import { generateId } from "../../../../common/idGenerator";
+import { woodResourceItem } from "../../../../data/inventory/resources";
 import { RenderContext } from "../../../../rendering/renderContext";
 import { BlinkingImageAnimation } from "../../../../rendering/visual/blinkingImageAnimation";
 import { HealthComponent } from "../../component/health/healthComponent";
+import { TreeComponent } from "../../component/resource/treeComponent";
+import { InventoryComponent } from "../../component/root/inventory/inventoryComponent";
 import { TilesComponent } from "../../component/tile/tilesComponent";
 import { Entity } from "../../entity/entity";
 import { treePrefab } from "../../prefab/treePrefab";
@@ -45,7 +48,7 @@ export class ChopTreeJob extends MoveToBeforeJob {
 
 class _ChopTreeJob extends Job {
     private target: SelectedWorldItem;
-    private treeHealthComponent?: HealthComponent | null;
+    private treeEntity?: Entity;
     private blinkingAnimation: BlinkingImageAnimation;
 
     get tileX(): number {
@@ -109,13 +112,28 @@ class _ChopTreeJob extends Job {
             throw new JobConstraintsError("No entity for selection");
         }
 
-        this.treeHealthComponent = entity.getComponent(HealthComponent);
+        this.treeEntity = entity;
     }
 
     update(tick: number): void {
-        const component = this.treeHealthComponent!;
-        if (component.health > 10) {
-            component.damage(1);
+        const entity = this.treeEntity;
+        if (!entity) {
+            return;
+        }
+
+        const healthComponent = entity.getComponent(HealthComponent)!;
+        const treeComponent = entity.getComponent(TreeComponent)!;
+
+        const inventoryComponent =
+            entity.getAncestorComponent(InventoryComponent)!;
+
+        if (healthComponent.health >= 20) {
+            healthComponent.damage(10);
+        }
+        if (healthComponent.health <= 10) {
+            treeComponent.setChopped();
+            inventoryComponent.addInventoryItem(woodResourceItem, 4);
+            this.complete();
         }
     }
 

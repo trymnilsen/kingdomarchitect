@@ -1,4 +1,8 @@
-import { sizeOfBounds, withinRectangle } from "../../../../common/bounds";
+import {
+    getBoundsAxis,
+    sizeOfBounds,
+    withinRectangle,
+} from "../../../../common/bounds";
 import { InvalidStateError } from "../../../../common/error/invalidStateError";
 import {
     distance,
@@ -7,12 +11,27 @@ import {
     zeroPoint,
 } from "../../../../common/point";
 import { allSides } from "../../../../common/sides";
+import { woodResourceItem } from "../../../../data/inventory/resources";
 import { RenderContext } from "../../../../rendering/renderContext";
+import {
+    subTitleTextStyle,
+    titleTextStyle,
+} from "../../../../rendering/text/textStyle";
+import { colorBackground } from "../../../../ui/dsl/uiBackgroundDsl";
+import { uiBox } from "../../../../ui/dsl/uiBoxDsl";
+import { uiImage } from "../../../../ui/dsl/uiImageDsl";
+import { uiRow } from "../../../../ui/dsl/uiRowDsl";
+import { uiSpace } from "../../../../ui/dsl/uiSpaceDsl";
+import { uiText } from "../../../../ui/dsl/uiTextDsl";
+import { wrapUiSize } from "../../../../ui/uiView";
+import { UIAssetImageSource } from "../../../../ui/view/uiImageSource";
+import { InventoryComponent } from "../../../world/component/root/inventory/inventoryComponent";
 import { TilesComponent } from "../../../world/component/tile/tilesComponent";
 import { UnlockableArea } from "../../../world/component/tile/unlockableArea";
 import { TileSize } from "../../../world/tile/tile";
 import { InteractionState } from "../../handler/interactionState";
 import { ActionButton, getActionbarView } from "../../view/actionbar";
+import { AlertMessageState } from "../common/alertMessageState";
 
 export class LandUnlockState extends InteractionState {
     private unlockableArea: UnlockableArea[] = [];
@@ -66,6 +85,12 @@ export class LandUnlockState extends InteractionState {
 
     override onDraw(context: RenderContext): void {
         for (const unlockableArea of this.unlockableArea) {
+            const areaScreenSpaceBounds = context.camera.tileSpaceToScreenSpace(
+                {
+                    x: unlockableArea.bounds.x1,
+                    y: unlockableArea.bounds.y1,
+                }
+            );
             for (const tiles of unlockableArea.tiles) {
                 context.drawRectangle({
                     width: 38,
@@ -75,6 +100,58 @@ export class LandUnlockState extends InteractionState {
                     fill: "purple",
                 });
             }
+            const bounds = sizeOfBounds(unlockableArea.bounds);
+            const boundsWidth = bounds.x * TileSize;
+            const boundsHeight = bounds.x * TileSize;
+            const view = uiBox({
+                width: boundsWidth,
+                height: boundsHeight,
+                children: [
+                    uiBox({
+                        padding: allSides(8),
+                        width: wrapUiSize,
+                        height: wrapUiSize,
+                        background: colorBackground("#39034a"),
+                        children: [
+                            uiRow({
+                                width: wrapUiSize,
+                                height: wrapUiSize,
+                                children: [
+                                    {
+                                        child: uiImage({
+                                            width: wrapUiSize,
+                                            height: wrapUiSize,
+                                            image: new UIAssetImageSource(
+                                                "woodResource"
+                                            ),
+                                        }),
+                                    },
+                                    {
+                                        child: uiSpace({ height: 4, width: 4 }),
+                                    },
+                                    {
+                                        child: uiText({
+                                            width: wrapUiSize,
+                                            height: wrapUiSize,
+                                            text: Math.max(
+                                                1,
+                                                Math.abs(
+                                                    unlockableArea.bounds.x1
+                                                )
+                                            ).toString(),
+                                            style: titleTextStyle,
+                                        }),
+                                    },
+                                ],
+                            }),
+                        ],
+                    }),
+                ],
+            });
+            view.layout(context, { width: boundsWidth, height: boundsHeight });
+            view.offset = areaScreenSpaceBounds;
+            view.updateTransform();
+            view.draw(context);
         }
 
         if (this.selectedArea) {
@@ -101,16 +178,31 @@ export class LandUnlockState extends InteractionState {
         if (action.id == "cancel") {
             this.context.stateChanger.clear();
         } else if (action.id == "unlock") {
-            const tilesComponent =
-                this.context.world.rootEntity.getComponent(TilesComponent);
-            const selectedArea = this.selectedArea;
-            if (!!tilesComponent && selectedArea) {
-                tilesComponent.unlockArea(selectedArea);
-                this.selectedArea = undefined;
-                this.selectedAreaSize = zeroPoint();
-                this.getUnlockableAreas();
+            // Check if there is enough resources
+            const rootEntity = this.context.world.rootEntity;
+            const inventoryComponent =
+                rootEntity.getComponent(InventoryComponent)!;
+
+            const removeResult = inventoryComponent.removeInventoryItem(
+                woodResourceItem.id,
+                4
+            );
+
+            if (removeResult) {
+                const tilesComponent = rootEntity.getComponent(TilesComponent);
+                const selectedArea = this.selectedArea;
+                if (!!tilesComponent && selectedArea) {
+                    tilesComponent.unlockArea(selectedArea);
+                    this.selectedArea = undefined;
+                    this.selectedAreaSize = zeroPoint();
+                    //this.getUnlockableAreas();
+                    this.context.stateChanger.clear();
+                }
+            } else {
+                this.context.stateChanger.push(
+                    new AlertMessageState("Oh no", "Not enough")
+                );
             }
-            //this.context.stateChanger.clear();
         }
     }
 

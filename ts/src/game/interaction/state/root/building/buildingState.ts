@@ -21,6 +21,7 @@ import { fillUiSize, UIView, wrapUiSize } from "../../../../../ui/uiView";
 import { UIMasterDetails } from "../../../../../ui/view/uiMasterDetail";
 import { OpenBookUIBackground } from "../../../../../ui/visual/bookBackground";
 import { InteractionState } from "../../../handler/interactionState";
+import { BuildConfirmState } from "../../building2/buildConfirmState";
 import { InventoryState } from "../inventory/inventoryState";
 import { bookTabs } from "../ui/bookTabs";
 
@@ -263,6 +264,11 @@ export class BuildingState extends InteractionState {
                                         ],
                                     }),
                                 ],
+                                onTapCallback: () => {
+                                    this.context.stateChanger.replace(
+                                        new BuildConfirmState()
+                                    );
+                                },
                                 defaultBackground: ninePatchBackground({
                                     asset: "stoneSlateBackground",
                                     scale: 2,
@@ -272,7 +278,7 @@ export class BuildingState extends InteractionState {
                         {
                             child: uiSpace({
                                 height: 16,
-                                width: fillUiSize,
+                                width: 16,
                             }),
                         },
                     ],

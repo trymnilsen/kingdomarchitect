@@ -1,13 +1,11 @@
 import { RenderContext } from "../../../../rendering/renderContext";
-import { JobByGroundTileQuery } from "../../../world/actor/job/jobQuery";
 import { ChopTreeJob } from "../../../world/actor/jobs/chopTreeJob";
-import { SelectedTileItem } from "../../../world/selection/selectedTileItem";
+import { SelectedWorldItem } from "../../../world/selection/selectedWorldItem";
 import { InteractionState } from "../../handler/interactionState";
 import { ActionButton, getActionbarView } from "../../view/actionbar";
-import { TileSelectedItem } from "../selection/selectedItem";
 
 export class ChopJobState extends InteractionState {
-    constructor(private selection: TileSelectedItem) {
+    constructor(private selection: SelectedWorldItem) {
         super();
     }
 
@@ -76,9 +74,12 @@ export class ChopJobState extends InteractionState {
         if (id == "cancel") {
             this.context.stateChanger.pop(null);
         } else if (id == "confirm") {
+            console.log("Schedule chop tree job");
             this.context.world.jobQueue.schedule(
-                new ChopTreeJob(new SelectedTileItem(this.selection.tile))
+                new ChopTreeJob(this.selection)
             );
+
+            console.log("Clear state changer job");
             this.context.stateChanger.clear();
         } else if (id == "abort") {
             //TODO: Add this back in
