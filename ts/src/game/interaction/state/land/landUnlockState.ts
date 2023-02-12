@@ -133,12 +133,7 @@ export class LandUnlockState extends InteractionState {
                                         child: uiText({
                                             width: wrapUiSize,
                                             height: wrapUiSize,
-                                            text: Math.max(
-                                                1,
-                                                Math.abs(
-                                                    unlockableArea.bounds.x1
-                                                )
-                                            ).toString(),
+                                            text: unlockableArea.cost.toString(),
                                             style: titleTextStyle,
                                         }),
                                     },
@@ -183,15 +178,20 @@ export class LandUnlockState extends InteractionState {
             const inventoryComponent =
                 rootEntity.getComponent(InventoryComponent)!;
 
+            const selectedArea = this.selectedArea;
+            if (!selectedArea) {
+                console.error("No selected area, cannot unlock");
+                return;
+            }
+
             const removeResult = inventoryComponent.removeInventoryItem(
                 woodResourceItem.id,
-                4
+                selectedArea.cost
             );
 
             if (removeResult) {
                 const tilesComponent = rootEntity.getComponent(TilesComponent);
-                const selectedArea = this.selectedArea;
-                if (!!tilesComponent && selectedArea) {
+                if (!!tilesComponent) {
                     tilesComponent.unlockArea(selectedArea);
                     this.selectedArea = undefined;
                     this.selectedAreaSize = zeroPoint();

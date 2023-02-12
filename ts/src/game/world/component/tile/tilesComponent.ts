@@ -1,6 +1,10 @@
 import { sprites } from "../../../../asset/sprite";
 import { Bounds } from "../../../../common/bounds";
-import { adjacentPoints, Point } from "../../../../common/point";
+import {
+    adjacentPoints,
+    manhattanDistance,
+    Point,
+} from "../../../../common/point";
 import { RenderContext } from "../../../../rendering/renderContext";
 import { getTileId, TileSize } from "../../tile/tile";
 import { EntityComponent } from "../entityComponent";
@@ -134,6 +138,16 @@ export class TilesComponent extends EntityComponent implements Ground {
                 }
             }
 
+            const distance = manhattanDistance(
+                { x: 0, y: 0 },
+                {
+                    x: unlockableChunk.chunkX,
+                    y: unlockableChunk.chunkY,
+                }
+            );
+
+            const cost = Math.min(999, Math.pow(2, distance + 1));
+
             return {
                 chunks: [unlockableChunk],
                 bounds: {
@@ -144,6 +158,7 @@ export class TilesComponent extends EntityComponent implements Ground {
                 },
                 name: "",
                 tiles: tiles,
+                cost: cost,
             };
         });
     }

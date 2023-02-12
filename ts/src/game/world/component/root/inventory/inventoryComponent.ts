@@ -1,4 +1,5 @@
 import { InventoryItem } from "../../../../../data/inventory/inventoryItem";
+import { woodResourceItem } from "../../../../../data/inventory/resources";
 import { EntityComponent } from "../../entityComponent";
 
 type InventoryEntry = { amount: number; item: InventoryItem };

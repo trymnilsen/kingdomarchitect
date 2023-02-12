@@ -6,4 +6,5 @@ export interface UnlockableArea {
     chunks: GroundChunk[];
     bounds: Bounds;
     name: string;
+    cost: number;
 }

@@ -1,6 +1,8 @@
 import { removeItem } from "../../../../common/array";
 import { InvalidStateError } from "../../../../common/error/invalidStateError";
 import { Event, EventListener } from "../../../../common/event";
+import { Point } from "../../../../common/point";
+import { RenderContext } from "../../../../rendering/renderContext";
 import { Job } from "../../actor/job/job";
 import { EntityComponent } from "../entityComponent";
 import { JobQueue } from "./jobQueue";
@@ -80,5 +82,11 @@ export class JobQueueComponent extends EntityComponent implements JobQueue {
         }
 
         return false;
+    }
+
+    override onDraw(context: RenderContext, screenPosition: Point): void {
+        for (const pendingJob of this._pendingJobs) {
+            pendingJob.onDraw(context);
+        }
     }
 }
