@@ -1,12 +1,19 @@
 import { woodenHouseScaffold } from "../../../../asset/sprites/woodHouseSprite";
+import { generateId } from "../../../../common/idGenerator";
 import { Point } from "../../../../common/point";
 import { allSides } from "../../../../common/sides";
+import { woodResourceItem } from "../../../../data/inventory/resources";
 import { RenderContext } from "../../../../rendering/renderContext";
 import { BlinkingImageAnimation } from "../../../../rendering/visual/blinkingImageAnimation";
+import { BuildJob } from "../../../world/actor/jobs/buildJob";
+import { BuildingComponent } from "../../../world/component/building/buildingComponent";
+import { InventoryComponent } from "../../../world/component/root/inventory/inventoryComponent";
+import { housePrefab } from "../../../world/prefab/housePrefab";
 import { GroundTile } from "../../../world/tile/ground";
 import { TileSize } from "../../../world/tile/tile";
 import { InteractionState } from "../../handler/interactionState";
 import { ActionButton, getActionbarView } from "../../view/actionbar";
+import { AlertMessageState } from "../common/alertMessageState";
 
 export class BuildConfirmState extends InteractionState {
     private buildingAnimation: BlinkingImageAnimation;
@@ -44,6 +51,38 @@ export class BuildConfirmState extends InteractionState {
 
     private actionSelected(action: ActionButton) {
         if (action.id == "build") {
+            const rootEntity = this.context.world.rootEntity;
+            const entitiesAt = rootEntity.getEntityAt(this.selectionPosition);
+            if (entitiesAt.length > 0) {
+                this.context.stateChanger.push(
+                    new AlertMessageState("Oh no", "Spot taken")
+                );
+                return;
+            }
+            const inventoryComponent =
+                rootEntity.getComponent(InventoryComponent)!;
+
+            const removeResult = inventoryComponent.removeInventoryItem(
+                woodResourceItem.id,
+                10
+            );
+
+            if (removeResult) {
+                const house = housePrefab(generateId("house"), true);
+                house.position = this.selectionPosition;
+                this.context.world.rootEntity.addChild(house);
+                this.context.world.jobQueue.schedule(new BuildJob(house));
+                this.context.stateChanger.clear();
+            } else {
+                this.context.stateChanger.push(
+                    new AlertMessageState("Oh no", "Not enough")
+                );
+            }
+        } else if (action.id == "mode") {
+            this.context.stateChanger.push(
+                new AlertMessageState("Oh no", "Not implemented")
+            );
+        } else {
             this.context.stateChanger.clear();
         }
     }

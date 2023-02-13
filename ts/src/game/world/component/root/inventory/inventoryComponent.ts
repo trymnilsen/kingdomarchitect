@@ -5,7 +5,12 @@ import { EntityComponent } from "../../entityComponent";
 type InventoryEntry = { amount: number; item: InventoryItem };
 
 export class InventoryComponent extends EntityComponent {
-    private _items: { [id: string]: InventoryEntry } = {};
+    private _items: { [id: string]: InventoryEntry } = {
+        [woodResourceItem.id]: {
+            amount: 2000,
+            item: woodResourceItem,
+        },
+    };
 
     get items(): ReadonlyArray<Readonly<InventoryEntry>> {
         return Object.values(this._items);

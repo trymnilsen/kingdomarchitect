@@ -1,49 +1,52 @@
-import { BuildableEntity } from "../../entity/v1/buildableEntity";
-import { GroundTile } from "../../tile/ground";
-import { NeverAssignConstraint } from "../job/constraint/neverAssignConstraint";
+import { BuildingComponent } from "../../component/building/buildingComponent";
+import { HealthComponent } from "../../component/health/healthComponent";
+import { Entity } from "../../entity/entity";
+import { WorkerConstraint } from "../job/constraint/workerConstraint";
 import { Job } from "../job/job";
 import { MoveToBeforeJob } from "./moveToBeforeJob";
 
 export class BuildJob extends MoveToBeforeJob {
-    constructor(tileToBuildOn: GroundTile) {
+    constructor(buildingToBuild: Entity) {
         super(
-            new _BuildJob(tileToBuildOn),
-            new NeverAssignConstraint()
+            new _BuildJob(buildingToBuild),
+            new WorkerConstraint()
         ); /*, isFarmerJobConstraint);*/
     }
 }
 
 class _BuildJob extends Job {
-    private tile: GroundTile;
-
+    private buildingComponent: BuildingComponent;
+    private buildingEntity: Entity;
     get tileX(): number {
-        return this.tile.tileX;
+        return this.buildingEntity.worldPosition.x;
     }
 
     get tileY(): number {
-        return this.tile.tileY;
+        return this.buildingEntity.worldPosition.y;
     }
 
-    constructor(tile: GroundTile) {
+    constructor(building: Entity) {
         super();
-        this.tile = tile;
+        this.buildingEntity = building;
+        this.buildingComponent = building.getComponent(BuildingComponent)!;
     }
 
     update(tick: number): void {
-        //TODO: add back build
-        /*
-        //const elapsedTicks = tick - this.startTick;
-        const entity = this.actor.world.entities.getTile({
-            x: this.tile.tileX,
-            y: this.tile.tileY,
-        });
-        if (entity instanceof BuildableEntity) {
-            const buildResult = entity.build(10);
-            if (buildResult < 10 || entity.healthPercentage === 1.0) {
-                console.log("_BuildJob finished");
-                this.actor.world.invalidateWorld();
-                this.complete();
-            }
-        }*/
+        const entity = this.entity;
+        if (!entity) {
+            console.error("No entity");
+            return;
+        }
+
+        const healthComponent =
+            this.buildingEntity.getComponent(HealthComponent)!;
+
+        if (healthComponent.healthPercentage < 1) {
+            healthComponent.heal(10);
+        }
+        if (healthComponent.healthPercentage >= 1) {
+            this.buildingComponent.finishBuild();
+            this.complete();
+        }
     }
 }

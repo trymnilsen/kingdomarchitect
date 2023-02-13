@@ -39,8 +39,13 @@ export class HealthComponent extends EntityComponent {
     heal(amount: number): number {
         const oldHealth = this._health;
         const newHealth = oldHealth + amount;
-        this._health = newHealth;
-        this.publishEvent(new HealthEvent(oldHealth, newHealth, this));
+        if (newHealth > this._maxHealth) {
+            this._health = this._maxHealth;
+        } else {
+            this._health = newHealth;
+        }
+
+        this.publishEvent(new HealthEvent(oldHealth, this._health, this));
         return 0;
     }
 
