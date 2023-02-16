@@ -1,0 +1,16 @@
+{
+    "wooden_house_scaffold": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32,
+        "frames": 1
+    },
+    "wooden_house": {
+        "x": 0,
+        "y": 32,
+        "w": 32,
+        "h": 32,
+        "frames": 1
+    }
+}
