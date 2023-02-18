@@ -1,4 +1,4 @@
-import { assets } from "../asset/assets";
+import { Sprite2 } from "../asset/sprite";
 import { Point } from "../common/point";
 import { Sides } from "../common/sides";
 import { UIRenderContext } from "../rendering/uiRenderContext";
@@ -23,17 +23,17 @@ export class ColorBackground implements UIBackground {
 
 export class NinePatchBackground implements UIBackground {
     constructor(
-        private asset: keyof typeof assets,
+        private sprite: Sprite2,
         private sides: Sides,
         private scale: number
     ) {}
     draw(context: UIRenderContext, screenPosition: Point, size: UISize): void {
-        context.drawNinePatchImage({
+        context.drawNinePatchSprite({
             x: screenPosition.x,
             y: screenPosition.y,
             width: size.width,
             height: size.height,
-            asset: this.asset,
+            sprite: this.sprite,
             scale: this.scale,
             sides: this.sides,
         });

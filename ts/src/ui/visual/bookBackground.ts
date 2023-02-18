@@ -1,4 +1,5 @@
-import { Point, pointEquals, zeroPoint } from "../../common/point";
+import { sprites2 } from "../../asset/sprite";
+import { Point } from "../../common/point";
 import { allSides } from "../../common/sides";
 import { UIRenderContext } from "../../rendering/uiRenderContext";
 import { UIBackground } from "../uiBackground";
@@ -6,8 +7,8 @@ import { UISize } from "../uiSize";
 
 export class OpenBookUIBackground implements UIBackground {
     draw(context: UIRenderContext, screenPosition: Point, size: UISize): void {
-        context.drawNinePatchImage({
-            asset: "book_left",
+        context.drawNinePatchSprite({
+            sprite: sprites2.book_left,
             sides: allSides(32),
             height: size.height,
             width: size.width / 2,
@@ -15,8 +16,8 @@ export class OpenBookUIBackground implements UIBackground {
             x: screenPosition.x,
             y: screenPosition.y,
         });
-        context.drawNinePatchImage({
-            asset: "book_right",
+        context.drawNinePatchSprite({
+            sprite: sprites2.book_right,
             sides: allSides(32),
             height: size.height,
             width: size.width / 2,

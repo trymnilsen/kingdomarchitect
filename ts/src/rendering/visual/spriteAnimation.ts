@@ -1,11 +1,11 @@
-import { Sprite } from "../../asset/sprite";
+import { Sprite2 } from "../../asset/sprite";
 import { addPoint, Point, zeroPoint } from "../../common/point";
 import { RenderContext } from "../renderContext";
 
 export class SpriteAnimation {
     private currentFrame: number = 0;
     private position: Point = zeroPoint();
-    constructor(private spriteFrames: Sprite[]) {}
+    constructor(private spriteFrames: Sprite2[]) {}
 
     updatePosition(point: Point) {
         this.position = point;

@@ -1,4 +1,3 @@
-import { MobActor } from "../world/actor/actors/mobActor";
 import { AttackBuildingJob } from "../world/actor/jobs/attack/attackBuildingJob";
 import { World } from "../world/world";
 

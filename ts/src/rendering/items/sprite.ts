@@ -1,50 +1,15 @@
-import { ImageAsset } from "../../asset/assets";
-import { Sprite } from "../../asset/sprite";
-import { Bounds } from "../../common/bounds";
+import { Sprite2 } from "../../asset/sprite";
 import { Sides } from "../../common/sides";
 import { RenderItemConfiguration } from "./renderItemConfiguration";
 
-export interface ImageConfiguration extends RenderItemConfiguration {
-    image: ImageAsset;
-}
-
 export interface SpriteConfiguration extends RenderItemConfiguration {
-    sprite: Sprite;
+    sprite: Sprite2;
+    targetWidth?: number;
+    targetHeight?: number;
 }
 
-export function imageSizeRenderer(
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    image: HTMLImageElement,
-    context: CanvasRenderingContext2D
-) {
-    context.drawImage(image, x, y, width, height);
-}
-
-export function imageRenderer(
-    x: number,
-    y: number,
-    scale: number,
-    image: HTMLImageElement,
-    context: CanvasRenderingContext2D
-) {
-    if (scale == 1) {
-        context.drawImage(image, x, y);
-    } else {
-        context.drawImage(
-            image,
-            x,
-            y,
-            image.width * scale,
-            image.height * scale
-        );
-    }
-}
-
-export interface NinePatchImageConfiguration extends RenderItemConfiguration {
-    asset: ImageAsset;
+export interface NinePatchSpriteConfiguration extends RenderItemConfiguration {
+    sprite: Sprite2;
     sides: Sides;
     width: number;
     height: number;
@@ -54,42 +19,56 @@ export interface NinePatchImageConfiguration extends RenderItemConfiguration {
 export function spriteRenderer(
     x: number,
     y: number,
-    bounds: Bounds,
-    image: HTMLImageElement,
-    context: CanvasRenderingContext2D,
-    targetWidth?: number,
-    targetHeight?: number
+    sourceX: number,
+    sourceY: number,
+    sourceWidth: number,
+    sourceHeight: number,
+    targetWidth: number,
+    targetHeight: number,
+    binAsset: HTMLImageElement,
+    context: CanvasRenderingContext2D
 ) {
     x = Math.floor(x);
     y = Math.floor(y);
 
-    const width = bounds.x2 - bounds.x1;
-    const height = bounds.y2 - bounds.y1;
-    let destinationWidth = width;
-    let destinationHeight = height;
-    if (targetWidth) {
-        destinationWidth = targetWidth;
-    }
-    if (targetHeight) {
-        destinationHeight = targetHeight;
-    }
-
     context.drawImage(
-        image,
-        bounds.x1,
-        bounds.y1,
-        width,
-        height,
+        binAsset,
+        sourceX,
+        sourceY,
+        sourceWidth,
+        sourceHeight,
         x,
         y,
-        destinationWidth,
-        destinationHeight
+        targetWidth,
+        targetHeight
     );
 }
 
+/**
+ * Draws a sprite as a ninePatch/NineSlice
+ * @param x
+ * @param y
+ * @param sourceX
+ * @param sourceY
+ * @param sourceWidth
+ * @param sourceHeight
+ * @param width
+ * @param height
+ * @param top
+ * @param bottom
+ * @param left
+ * @param right
+ * @param scale
+ * @param binAsset
+ * @param context
+ */
 export function ninePatchImageRenderer(
     x: number,
     y: number,
+    sourceX: number,
+    sourceY: number,
+    sourceWidth: number,
+    sourceHeight: number,
     width: number,
     height: number,
     top: number,
@@ -97,7 +76,7 @@ export function ninePatchImageRenderer(
     left: number,
     right: number,
     scale: number,
-    image: HTMLImageElement,
+    binAsset: HTMLImageElement,
     context: CanvasRenderingContext2D
 ) {
     x = Math.floor(x);
@@ -105,8 +84,8 @@ export function ninePatchImageRenderer(
     width = Math.floor(width);
     height = Math.floor(height);
 
-    const patchWidth = image.width;
-    const patchHeight = image.height;
+    const patchWidth = sourceWidth;
+    const patchHeight = sourceHeight;
     const middlePatchWidth = patchWidth - left - right;
     const middlePatchHeight = patchHeight - top - bottom;
 
@@ -119,13 +98,23 @@ export function ninePatchImageRenderer(
     const middleScaledHeight = Math.max(height - topScaled - bottomScaled, 0);
 
     // Draw top left part of the patch
-    context.drawImage(image, 0, 0, left, top, x, y, leftScaled, topScaled);
+    context.drawImage(
+        binAsset,
+        sourceX,
+        sourceY,
+        left,
+        top,
+        x,
+        y,
+        leftScaled,
+        topScaled
+    );
 
     // Draw top right part of the patch
     context.drawImage(
-        image,
-        patchWidth - right,
-        0,
+        binAsset,
+        sourceX + patchWidth - right,
+        sourceY,
         right,
         top,
         x + width - rightScaled,
@@ -136,9 +125,9 @@ export function ninePatchImageRenderer(
 
     // Draw bottom left part of the patch
     context.drawImage(
-        image,
-        0,
-        patchHeight - bottom,
+        binAsset,
+        sourceX,
+        sourceY + patchHeight - bottom,
         left,
         bottom,
         x,
@@ -149,9 +138,9 @@ export function ninePatchImageRenderer(
 
     // Draw bottom right part of the patch
     context.drawImage(
-        image,
-        patchWidth - right,
-        patchHeight - bottom,
+        binAsset,
+        sourceX + patchWidth - right,
+        sourceY + patchHeight - bottom,
         right,
         bottom,
         x + width - rightScaled,
@@ -163,9 +152,9 @@ export function ninePatchImageRenderer(
     if (middleScaledHeight > 0) {
         // Draw the left middle part
         context.drawImage(
-            image,
-            0,
-            top,
+            binAsset,
+            sourceX,
+            sourceY + top,
             left,
             middlePatchHeight,
             x,
@@ -176,9 +165,9 @@ export function ninePatchImageRenderer(
 
         // Draw the right middle part
         context.drawImage(
-            image,
-            patchWidth - right,
-            top,
+            binAsset,
+            sourceX + patchWidth - right,
+            sourceY + top,
             right,
             middlePatchHeight,
             x + width - rightScaled,
@@ -191,9 +180,9 @@ export function ninePatchImageRenderer(
     if (middleScaledWidth > 0) {
         // Draw the top middle part
         context.drawImage(
-            image,
-            left,
-            0,
+            binAsset,
+            sourceX + left,
+            sourceY,
             middlePatchWidth,
             top,
             x + leftScaled,
@@ -204,9 +193,9 @@ export function ninePatchImageRenderer(
 
         // Draw the bottom middle part
         context.drawImage(
-            image,
-            left,
-            patchHeight - bottom,
+            binAsset,
+            sourceX + left,
+            sourceY + patchHeight - bottom,
             middlePatchWidth,
             bottom,
             x + leftScaled,
@@ -218,9 +207,9 @@ export function ninePatchImageRenderer(
 
     // Draw the middle part
     context.drawImage(
-        image,
-        left,
-        top,
+        binAsset,
+        sourceX + left,
+        sourceY + top,
         middlePatchWidth,
         middlePatchHeight,
         x + leftScaled,

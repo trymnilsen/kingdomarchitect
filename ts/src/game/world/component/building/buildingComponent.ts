@@ -1,13 +1,13 @@
-import { Sprite } from "../../../../asset/sprite";
+import { Sprite2 } from "../../../../asset/sprite";
 import { Point } from "../../../../common/point";
 import { RenderContext } from "../../../../rendering/renderContext";
 import { EntityComponent } from "../entityComponent";
 
 export class BuildingComponent extends EntityComponent {
-    private buildingSprite: Sprite;
-    private scaffoldSprite: Sprite;
+    private buildingSprite: Sprite2;
+    private scaffoldSprite: Sprite2;
     private isScaffolded: boolean = true;
-    constructor(buildingSprite: Sprite, scaffoldSprite: Sprite) {
+    constructor(buildingSprite: Sprite2, scaffoldSprite: Sprite2) {
         super();
         this.buildingSprite = buildingSprite;
         this.scaffoldSprite = scaffoldSprite;

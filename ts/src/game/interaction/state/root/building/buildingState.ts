@@ -1,17 +1,11 @@
-import { Sprite } from "../../../../../asset/sprite";
-import { stoneWoodWalls } from "../../../../../asset/sprites/stoneWoodWalls";
-import { woodenHouseSprite } from "../../../../../asset/sprites/woodHouseSprite";
+import { Sprite2, sprites2 } from "../../../../../asset/sprite";
 import { allSides, symmetricSides } from "../../../../../common/sides";
 import { bookInkColor } from "../../../../../ui/color";
 import { ninePatchBackground } from "../../../../../ui/dsl/uiBackgroundDsl";
 import { uiBox } from "../../../../../ui/dsl/uiBoxDsl";
 import { uiButton } from "../../../../../ui/dsl/uiButtonDsl";
 import { uiColumn } from "../../../../../ui/dsl/uiColumnDsl";
-import {
-    assetImageSource,
-    spriteImageSource,
-    uiImage,
-} from "../../../../../ui/dsl/uiImageDsl";
+import { spriteImageSource, uiImage } from "../../../../../ui/dsl/uiImageDsl";
 import { uiOffset } from "../../../../../ui/dsl/uiOffsetDsl";
 import { uiRow } from "../../../../../ui/dsl/uiRowDsl";
 import { uiSpace } from "../../../../../ui/dsl/uiSpaceDsl";
@@ -28,9 +22,12 @@ import { bookTabs } from "../ui/bookTabs";
 const buildings: BuildingListEntry[] = [
     {
         name: "Wooden House",
-        sprite: woodenHouseSprite,
+        sprite: sprites2.wooden_house,
     },
-    { name: "Wall", sprite: stoneWoodWalls },
+    {
+        name: "Wall",
+        sprite: sprites2.stone_wood_walls,
+    },
 ];
 
 export class BuildingState extends InteractionState {
@@ -121,12 +118,12 @@ export class BuildingState extends InteractionState {
             width: fillUiSize,
             height: wrapUiSize,
             defaultBackground: ninePatchBackground({
-                asset: "book_grid_item",
+                sprite: sprites2.book_grid_item,
                 sides: allSides(8),
                 scale: 1,
             }),
             onTappedBackground: ninePatchBackground({
-                asset: "book_grid_item_focused",
+                sprite: sprites2.book_grid_item_focused,
                 sides: allSides(8),
                 scale: 1,
             }),
@@ -192,7 +189,7 @@ export class BuildingState extends InteractionState {
                                 height: 180,
                                 width: fillUiSize,
                                 background: ninePatchBackground({
-                                    asset: "book_grid_item",
+                                    sprite: sprites2.book_grid_item,
                                     sides: allSides(8),
                                     scale: 1,
                                 }),
@@ -202,7 +199,7 @@ export class BuildingState extends InteractionState {
                                         width: wrapUiSize,
                                         scale: 2,
                                         image: spriteImageSource(
-                                            woodenHouseSprite
+                                            sprites2.wooden_house
                                         ),
                                     }),
                                 ],
@@ -270,7 +267,7 @@ export class BuildingState extends InteractionState {
                                     );
                                 },
                                 defaultBackground: ninePatchBackground({
-                                    asset: "stoneSlateBackground",
+                                    sprite: sprites2.stone_slate_background,
                                     scale: 2,
                                 }),
                             }),
@@ -289,6 +286,6 @@ export class BuildingState extends InteractionState {
 }
 
 interface BuildingListEntry {
-    sprite: Sprite;
+    sprite: Sprite2;
     name: string;
 }

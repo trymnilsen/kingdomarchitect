@@ -1,39 +1,27 @@
-import { assets, ImageAsset } from "../assets";
-import { Sprite } from "../sprite";
-
+import * as binsJson from "../../../generated/bins.json";
 export class AssetLoader {
     private _assets: { [name: string]: HTMLImageElement } = {};
 
     async load(): Promise<void> {
-        const loadables = Object.entries(assets);
-        for (let i = 0; i < loadables.length; i++) {
-            const asset = loadables[i];
-            const imageElement = await this.loadAsset(asset[1]);
-            this._assets[asset[0]] = imageElement;
+        const loadPromises: Promise<any>[] = [];
+
+        loadPromises.push(this.loadFonts());
+        for (const bin of Object.entries(binsJson)) {
+            if (bin[0] != "default") {
+                loadPromises.push(this.loadAsset(bin[0], bin[1]));
+            }
         }
-        await this.loadFonts();
+
+        await Promise.all(loadPromises);
     }
 
-    getAsset(asset: ImageAsset): HTMLImageElement {
-        return this._assets[asset];
-    }
+    getBinAsset(binName: string): HTMLImageElement {
+        const binAsset = this._assets[binName];
+        if (!binAsset) {
+            throw new Error(`Cannot find bin asset: ${binName}`);
+        }
 
-    /**
-     * Returns a sprite that is backed by the given asset with its bounds
-     * defined by the full width and height of the asset
-     * @param asset
-     */
-    getAssetAsSprite(asset: ImageAsset): Sprite {
-        const image = this.getAsset(asset);
-        return {
-            asset: asset,
-            bounds: {
-                x1: 0,
-                y1: 0,
-                x2: image.width,
-                y2: image.height,
-            },
-        };
+        return binAsset;
     }
 
     private async loadFonts(): Promise<void> {
@@ -45,7 +33,12 @@ export class AssetLoader {
         document.fonts.add(loadedFont);
     }
 
-    private loadAsset(name: string): Promise<HTMLImageElement> {
+    private async loadAsset(name: string, filename: string) {
+        const imageElement = await this.fetchAsset(filename);
+        this._assets[name] = imageElement;
+    }
+
+    private fetchAsset(name: string): Promise<HTMLImageElement> {
         return new Promise((resolve, reject) => {
             const element = new Image();
             element.addEventListener("load", () => {

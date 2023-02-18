@@ -1,4 +1,4 @@
-import { woodenHouseScaffold } from "../../../../asset/sprites/woodHouseSprite";
+import { sprites2 } from "../../../../asset/sprite";
 import { generateId } from "../../../../common/idGenerator";
 import { Point } from "../../../../common/point";
 import { allSides } from "../../../../common/sides";
@@ -6,7 +6,6 @@ import { woodResourceItem } from "../../../../data/inventory/resources";
 import { RenderContext } from "../../../../rendering/renderContext";
 import { BlinkingImageAnimation } from "../../../../rendering/visual/blinkingImageAnimation";
 import { BuildJob } from "../../../world/actor/jobs/buildJob";
-import { BuildingComponent } from "../../../world/component/building/buildingComponent";
 import { InventoryComponent } from "../../../world/component/root/inventory/inventoryComponent";
 import { housePrefab } from "../../../world/prefab/housePrefab";
 import { GroundTile } from "../../../world/tile/ground";
@@ -24,7 +23,7 @@ export class BuildConfirmState extends InteractionState {
         this.buildingAnimation = new BlinkingImageAnimation({
             x: 0,
             y: 0,
-            image: "woodHouse",
+            sprite: sprites2.wooden_house,
         });
 
         const actions: ActionButton[] = [
@@ -110,15 +109,15 @@ export class BuildConfirmState extends InteractionState {
             context.drawScreenSpaceSprite({
                 x: cursorWorldPosition.x + 4,
                 y: cursorWorldPosition.y + 4,
-                sprite: woodenHouseScaffold,
+                sprite: sprites2.wooden_house_scaffold,
             });
         }
 
         const cursorWidth = TileSize;
         const cursorHeight = TileSize;
 
-        context.drawNinePatchImage({
-            asset: "cursor",
+        context.drawNinePatchSprite({
+            sprite: sprites2.cursor,
             height: cursorHeight,
             width: cursorWidth,
             scale: 1.0,

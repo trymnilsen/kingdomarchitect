@@ -1,10 +1,10 @@
-import { Sprite } from "../../../../asset/sprite";
+import { Sprite2 } from "../../../../asset/sprite";
 import { Point, zeroPoint } from "../../../../common/point";
 import { RenderContext } from "../../../../rendering/renderContext";
 import { EntityComponent } from "../entityComponent";
 
 export class SpriteComponent extends EntityComponent {
-    constructor(private sprite: Sprite, private offset: Point = zeroPoint()) {
+    constructor(private sprite: Sprite2, private offset: Point = zeroPoint()) {
         super();
     }
 

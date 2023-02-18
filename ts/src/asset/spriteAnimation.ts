@@ -1,22 +1,23 @@
-import { Sprite } from "./sprite";
+import { Sprite2 } from "./sprite";
 
-export interface SpriteAnimation extends Sprite {
+export interface SpriteAnimation extends Sprite2 {
     frames: number;
 }
 
 export function spriteFromAnimation(
     sprite: SpriteAnimation,
     frame: number
-): Sprite {
+): Sprite2 {
     const clampedFrame = frame % sprite.frames;
-    const frameWidth = sprite.bounds.x2 - sprite.bounds.x1;
+    const frameWidth = sprite.defintion.w;
     return {
-        asset: sprite.asset,
-        bounds: {
-            x1: sprite.bounds.x1 + clampedFrame * frameWidth,
-            x2: sprite.bounds.x1 + (clampedFrame + 1) * frameWidth,
-            y1: sprite.bounds.y1,
-            y2: sprite.bounds.y2,
+        bin: sprite.bin,
+        defintion: {
+            frames: 1,
+            x: sprite.defintion.x + frameWidth * clampedFrame,
+            y: sprite.defintion.y,
+            w: sprite.defintion.w,
+            h: sprite.defintion.h,
         },
     };
 }

@@ -1,4 +1,4 @@
-import { ImageAsset } from "../../asset/assets";
+import { Sprite2 } from "../../asset/sprite";
 import { allSides, Sides } from "../../common/sides";
 import {
     ColorBackground,
@@ -11,7 +11,7 @@ export function colorBackground(color: string): UIBackground {
 }
 
 export interface NinePatchBackgroundProperties {
-    asset: ImageAsset;
+    sprite: Sprite2;
     sides?: Sides;
     scale?: number;
 }
@@ -20,7 +20,7 @@ export function ninePatchBackground(
     properties: NinePatchBackgroundProperties
 ): UIBackground {
     return new NinePatchBackground(
-        properties.asset,
+        properties.sprite,
         properties.sides || allSides(8),
         properties.scale || 1
     );

@@ -99,7 +99,7 @@ async function packSprites(sprites: PackableSprite[]) {
         console.log("Pack sprite: ", sprite.spriteName);
         packer.add(sprite.definition.w, sprite.definition.h, i);
     }
-
+    const binNames: { [name: string]: string } = {};
     const packedSprites: { [name: string]: PackedSprite } = {};
 
     //Loop over all bins and rects and output sheets
@@ -120,7 +120,7 @@ async function packSprites(sprites: PackableSprite[]) {
             }
 
             packedSprites[packedSprite.spriteName] = {
-                bin: binIndex,
+                bin: binIndex.toString(),
                 defintion: {
                     frames: packedSprite.definition.frames,
                     w: packedSprite.definition.w,
@@ -182,8 +182,10 @@ async function packSprites(sprites: PackableSprite[]) {
             }
         }
 
+        const binName = `bin-${binIndex}.png`;
+        binNames[binIndex.toString()] = binName;
         await bitmap.write(
-            path.join(process.cwd(), "public", "asset", `bin-${binIndex}.png`)
+            path.join(process.cwd(), "public", "asset", binName)
         );
     }
 
@@ -391,7 +393,7 @@ type PackableSprite = {
 
 type PackedSprite = {
     defintion: SpriteDefinition;
-    bin: number;
+    bin: string;
 };
 
 type SpriteDefinitionMap = { [name: string]: SpriteDefinition };

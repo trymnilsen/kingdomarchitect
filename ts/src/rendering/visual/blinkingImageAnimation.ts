@@ -1,5 +1,5 @@
 import { Point } from "../../common/point";
-import { ImageConfiguration } from "../items/image";
+import { SpriteConfiguration } from "../items/sprite";
 import { RenderContext } from "../renderContext";
 
 /**
@@ -16,7 +16,7 @@ export class BlinkingImageAnimation {
      * Create a new BlinkingImageAnimation
      * @param image The configratuion to render for this animation
      */
-    constructor(private image: ImageConfiguration) {}
+    constructor(private sprite: SpriteConfiguration) {}
 
     /**
      * Update the position in the configuration with the newly provided point.
@@ -24,8 +24,8 @@ export class BlinkingImageAnimation {
      * @param position the position to use for future draw calls
      */
     updatePosition(position: Point) {
-        this.image.x = position.x;
-        this.image.y = position.y;
+        this.sprite.x = position.x;
+        this.sprite.y = position.y;
     }
 
     /**
@@ -37,7 +37,7 @@ export class BlinkingImageAnimation {
      */
     onDraw(context: RenderContext) {
         if (this.frame % 2) {
-            context.drawImage(this.image);
+            context.drawSprite(this.sprite);
         }
         this.frame = this.frame + 1;
     }

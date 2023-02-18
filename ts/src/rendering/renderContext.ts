@@ -1,18 +1,14 @@
-import { assets } from "../asset/assets";
 import { AssetLoader } from "../asset/loader/assetLoader";
-import { Sprite } from "../asset/sprite";
+import { Sprite2 } from "../asset/sprite";
 import { UILayoutContext } from "../ui/uiLayoutContext";
 import { UISize } from "../ui/uiSize";
 import { Camera } from "./camera";
 import {
-    ImageConfiguration,
-    imageRenderer,
-    imageSizeRenderer,
-    NinePatchImageConfiguration,
-    ninePatchImageRenderer,
+    NinePatchSpriteConfiguration,
+    ninePatchImageRenderer as ninePatchSpriteRenderer,
     SpriteConfiguration,
     spriteRenderer,
-} from "./items/image";
+} from "./items/sprite";
 import { RectangleConfiguration, rectangleRenderer } from "./items/rectangle";
 import { TextConfiguration, textRenderer } from "./items/text";
 import { TextStyle } from "./text/textStyle";
@@ -29,18 +25,30 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
     private _width: number;
     private _height: number;
 
+    /**
+     * The currently active camera for the render context
+     */
     public get camera(): Camera {
         return this._camera;
     }
 
+    /**
+     * The width of the canvas the context is drawing to
+     */
     public get width(): number {
         return this._width;
     }
 
+    /**
+     * The height of the canvas the context is drawing to
+     */
     public get height(): number {
         return this._height;
     }
 
+    /**
+     * The loader for assets like sprites and fonts
+     */
     public get assetLoader(): AssetLoader {
         return this._assetLoader;
     }
@@ -59,19 +67,14 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
         this._height = height;
     }
 
-    measureImage(asset: keyof typeof assets): UISize {
-        const image = this._assetLoader.getAsset(asset);
-        const width = image.width;
-        const height = image.height;
-        return {
-            width,
-            height,
-        };
-    }
-
-    measureSprite(sprite: Sprite): UISize {
-        const width = sprite.bounds.x2 - sprite.bounds.x1;
-        const height = sprite.bounds.y2 - sprite.bounds.y1;
+    /**
+     * Measures the size of the sprite
+     * @param sprite the sprite to measure
+     * @returns the width and height as a UISize
+     */
+    measureSprite(sprite: Sprite2): UISize {
+        const width = sprite.defintion.w;
+        const height = sprite.defintion.h;
 
         return {
             width,
@@ -96,7 +99,7 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
     }
 
     /**
-     * Draw a rectangle on the canvas using coordinates in tilespace
+     * Draw a rectangle on the canvas using coordinates in worldspace
      * @param rectangle the configuration for the rectangle
      */
     drawRectangle(rectangle: RectangleConfiguration) {
@@ -116,68 +119,16 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
     }
 
     /**
-     * Draw an image on the canvas using coordinates in tilespace
-     * @param image the image to draw
-     */
-    drawImage(image: ImageConfiguration) {
-        const transformedX = this.camera.worldToScreenX(image.x);
-        const transformedY = this.camera.worldToScreenY(image.y);
-        imageRenderer(
-            transformedX,
-            transformedY,
-            1,
-            this._assetLoader.getAsset(image.image),
-            this.canvasContext
-        );
-    }
-
-    /**
-     * Draw a sprite on the canvas using coordinates in tilespace
+     * Draw a sprite on the canvas using coordinates in worldspace
      * @param sprite the sprite to draw
      */
     drawSprite(sprite: SpriteConfiguration) {
         const transformedX = this.camera.worldToScreenX(sprite.x);
         const transformedY = this.camera.worldToScreenY(sprite.y);
-
-        spriteRenderer(
-            transformedX,
-            transformedY,
-            sprite.sprite.bounds,
-            this._assetLoader.getAsset(sprite.sprite.asset),
-            this.canvasContext
-        );
-    }
-
-    /**
-     * Draw an image on the canvas using coordinates in screenspace with a
-     * given scale
-     * @param image the image to draw
-     * @param scale the scale to draw the image at. 1.0 is considered the normal
-     * size
-     */
-    drawScreenSpaceImage(image: ImageConfiguration, scale: number) {
-        imageRenderer(
-            image.x,
-            image.y,
-            scale,
-            this._assetLoader.getAsset(image.image),
-            this.canvasContext
-        );
-    }
-
-    drawScreenSpaceImageInto(
-        image: ImageConfiguration,
-        targetWidth: number,
-        targetHeight: number
-    ) {
-        imageSizeRenderer(
-            image.x,
-            image.y,
-            targetWidth,
-            targetHeight,
-            this._assetLoader.getAsset(image.image),
-            this.canvasContext
-        );
+        const transformedConfiguration = Object.assign({}, sprite);
+        transformedConfiguration.x = transformedX;
+        transformedConfiguration.y = transformedY;
+        this.drawScreenSpaceSprite(transformedConfiguration);
     }
 
     /**
@@ -185,15 +136,27 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
      * given scale
      * @param sprite the sprite to draw
      */
-    drawScreenSpaceSprite(sprite: SpriteConfiguration, uiSize?: UISize) {
+    drawScreenSpaceSprite(sprite: SpriteConfiguration) {
+        const spriteBounds = sprite.sprite.defintion;
+        let targetWidth = spriteBounds.w;
+        let targetHeight = spriteBounds.h;
+        if (!!sprite.targetWidth) {
+            targetWidth = sprite.targetWidth;
+        }
+        if (!!sprite.targetHeight) {
+            targetHeight = sprite.targetHeight;
+        }
         spriteRenderer(
             sprite.x,
             sprite.y,
-            sprite.sprite.bounds,
-            this._assetLoader.getAsset(sprite.sprite.asset),
-            this.canvasContext,
-            uiSize?.width,
-            uiSize?.height
+            spriteBounds.x,
+            spriteBounds.y,
+            spriteBounds.w,
+            spriteBounds.h,
+            targetWidth,
+            targetHeight,
+            this._assetLoader.getBinAsset(sprite.sprite.bin),
+            this.canvasContext
         );
     }
 
@@ -202,32 +165,40 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
      * This is a bit expensive as it needs to draw 9 images to represent a
      * perceived single image so use it sparringly. Coordinates are provided in
      * screenspace.
-     * @param image the configuration of the image to draw
+     * @param ninePatch the configuration of the image to draw
      */
-    drawNinePatchImage(image: NinePatchImageConfiguration) {
-        ninePatchImageRenderer(
-            image.x,
-            image.y,
-            image.width,
-            image.height,
-            image.sides.top,
-            image.sides.bottom,
-            image.sides.left,
-            image.sides.right,
-            image.scale,
-            this._assetLoader.getAsset(image.asset),
+    drawNinePatchSprite(ninePatch: NinePatchSpriteConfiguration) {
+        const spriteDefintion = ninePatch.sprite.defintion;
+        ninePatchSpriteRenderer(
+            ninePatch.x,
+            ninePatch.y,
+            spriteDefintion.x,
+            spriteDefintion.y,
+            spriteDefintion.w,
+            spriteDefintion.h,
+            ninePatch.width,
+            ninePatch.height,
+            ninePatch.sides.top,
+            ninePatch.sides.bottom,
+            ninePatch.sides.left,
+            ninePatch.sides.right,
+            ninePatch.scale,
+            this._assetLoader.getBinAsset(ninePatch.sprite.bin),
             this.canvasContext
         );
     }
 
     /**
-     *
-     * @param text
+     * Draw text to the canvas using coordinates in worldspace
      */
     drawText(text: TextConfiguration) {
         textRenderer(text, this.canvasContext);
     }
 
+    /**
+     * Draw text to the canvas using coordinates in screenspace
+     * TODO: This seems to be the same as `drawText`
+     */
     drawScreenspaceText(text: TextConfiguration): void {
         textRenderer(text, this.canvasContext);
     }

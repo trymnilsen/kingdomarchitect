@@ -1,18 +1,13 @@
-import { sprites } from "../../../asset/sprite";
-import {
-    woodenHouseScaffold,
-    woodenHouseSprite,
-} from "../../../asset/sprites/woodHouseSprite";
+import { sprites2 } from "../../../asset/sprite";
 import { BuildingComponent } from "../component/building/buildingComponent";
-import { SpriteComponent } from "../component/draw/spriteComponent";
 import { HealthComponent } from "../component/health/healthComponent";
 import { Entity } from "../entity/entity";
 
 export function housePrefab(id: string, scaffold: boolean): Entity {
     const house = new Entity(id);
     const buildingComponent = new BuildingComponent(
-        woodenHouseSprite,
-        woodenHouseScaffold
+        sprites2.wooden_house,
+        sprites2.wooden_house_scaffold
     );
     let currentHealth = 100;
     if (scaffold) {

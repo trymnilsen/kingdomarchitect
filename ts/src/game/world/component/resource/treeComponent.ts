@@ -1,5 +1,4 @@
-import { sprites } from "../../../../asset/sprite";
-import { treeStubSprite } from "../../../../asset/sprites/treeSprite";
+import { sprites2 } from "../../../../asset/sprite";
 import { Point } from "../../../../common/point";
 import { RenderContext } from "../../../../rendering/renderContext";
 import { EntityComponent } from "../entityComponent";
@@ -35,16 +34,16 @@ export class TreeComponent extends EntityComponent {
             console.warn("No health component");
         }
 
-        let sprite = sprites.tree;
+        let sprite = sprites2.tree_1;
         if (this.tree >= 2.0) {
-            sprite = sprites.tree2;
+            sprite = sprites2.tree_2;
         }
         if (this.tree >= 3.0) {
-            sprite = sprites.tree3;
+            sprite = sprites2.tree_3;
         }
 
         if (!!this.chopTime) {
-            sprite = treeStubSprite;
+            sprite = sprites2.tree_stub;
         }
 
         context.drawScreenSpaceSprite({

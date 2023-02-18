@@ -1,4 +1,4 @@
-import { sprites } from "../../../asset/sprite";
+import { sprites2 } from "../../../asset/sprite";
 import { randomEntry } from "../../../common/array";
 import { Bounds, getBoundsAxis } from "../../../common/bounds";
 import {
@@ -102,6 +102,8 @@ export class Ground {
             });
 
             if (tile.hasTree && tile.hasTree > 0) {
+                /*
+                TODO: Might not need this file anymore since the is
                 let sprite = sprites.tree;
                 if (tile.hasTree >= 2.0) {
                     sprite = sprites.tree2;
@@ -109,8 +111,9 @@ export class Ground {
                 if (tile.hasTree >= 3.0) {
                     sprite = sprites.tree3;
                 }
+                */
                 context.drawSprite({
-                    sprite: sprite,
+                    sprite: sprites2.tree_1,
                     x: tile.tileX * TileSize + 4,
                     y: tile.tileY * TileSize,
                 });

@@ -1,4 +1,3 @@
-import { Sprite } from "../../../asset/sprite";
 import { Event, EventListener } from "../../../common/event";
 import { NotInitializedError } from "../../../common/error/notInitializedError";
 import { addPoint, Point } from "../../../common/point";
@@ -7,6 +6,7 @@ import { World } from "../world";
 import { Job, JobState } from "./job/job";
 import { InvalidStateError } from "../../../common/error/invalidStateError";
 import { Behavior } from "./behavior/behavior";
+import { Sprite2 } from "../../../asset/sprite";
 
 /**
  * Actors is the base for all interactive objects in the game world.
@@ -18,7 +18,7 @@ export abstract class Actor {
     private _job: Job | null = null;
     private _behavior: Behavior | null = null;
     private _tags: string[] = [];
-    private sprite: Sprite;
+    private sprite: Sprite2;
 
     public get hasJob(): boolean {
         return !!this._job;
@@ -66,7 +66,7 @@ export abstract class Actor {
         return this._tags;
     }
 
-    constructor(initialPosition: Point, sprite: Sprite) {
+    constructor(initialPosition: Point, sprite: Sprite2) {
         this._tilePosition = initialPosition;
         this._jobCompleted = new Event();
         this.sprite = sprite;

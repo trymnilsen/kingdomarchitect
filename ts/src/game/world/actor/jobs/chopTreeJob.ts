@@ -1,3 +1,4 @@
+import { sprites2 } from "../../../../asset/sprite";
 import { generateId } from "../../../../common/idGenerator";
 import { woodResourceItem } from "../../../../data/inventory/resources";
 import { RenderContext } from "../../../../rendering/renderContext";
@@ -74,7 +75,7 @@ class _ChopTreeJob extends Job {
         this.blinkingAnimation = new BlinkingImageAnimation({
             x: 0,
             y: 0,
-            image: "swipe_effect",
+            sprite: sprites2.swipe_effect,
         });
     }
 

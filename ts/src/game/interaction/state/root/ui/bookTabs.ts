@@ -1,3 +1,4 @@
+import { sprites2 } from "../../../../../asset/sprite";
 import { allSides } from "../../../../../common/sides";
 import { ninePatchBackground } from "../../../../../ui/dsl/uiBackgroundDsl";
 import { uiBox } from "../../../../../ui/dsl/uiBoxDsl";
@@ -21,7 +22,7 @@ export function bookTabs(onTap: (tab: number) => void): UIView {
                         onTap(0);
                     },
                     defaultBackground: ninePatchBackground({
-                        asset: "book_tab",
+                        sprite: sprites2.book_tab,
                         scale: 1,
                         sides: allSides(8),
                     }),
@@ -41,7 +42,7 @@ export function bookTabs(onTap: (tab: number) => void): UIView {
                         onTap(1);
                     },
                     defaultBackground: ninePatchBackground({
-                        asset: "book_tab",
+                        sprite: sprites2.book_tab,
                         scale: 1,
                         sides: allSides(8),
                     }),
@@ -61,7 +62,7 @@ export function bookTabs(onTap: (tab: number) => void): UIView {
                         onTap(2);
                     },
                     defaultBackground: ninePatchBackground({
-                        asset: "book_tab",
+                        sprite: sprites2.book_tab,
                         scale: 1,
                         sides: allSides(8),
                     }),

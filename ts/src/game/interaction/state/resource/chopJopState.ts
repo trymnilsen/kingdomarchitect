@@ -1,3 +1,4 @@
+import { sprites2 } from "../../../../asset/sprite";
 import { RenderContext } from "../../../../rendering/renderContext";
 import { ChopTreeJob } from "../../../world/actor/jobs/chopTreeJob";
 import { SelectedWorldItem } from "../../../world/selection/selectedWorldItem";
@@ -23,8 +24,8 @@ export class ChopJobState extends InteractionState {
             y: this.selection.tilePosition.y,
         });
 
-        context.drawImage({
-            image: "cursor",
+        context.drawSprite({
+            sprite: sprites2.cursor,
             x: cursorWorldPosition.x + 2,
             y: cursorWorldPosition.y + 2,
         });

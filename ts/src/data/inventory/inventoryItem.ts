@@ -1,7 +1,7 @@
-import { ImageAsset } from "../../asset/assets";
+import { Sprite2 } from "../../asset/sprite";
 
 export interface InventoryItem {
     id: string;
     name: string;
-    asset: ImageAsset;
+    asset: Sprite2;
 }

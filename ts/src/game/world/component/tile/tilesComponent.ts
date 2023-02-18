@@ -1,4 +1,4 @@
-import { sprites } from "../../../../asset/sprite";
+import { sprites2 } from "../../../../asset/sprite";
 import { Bounds } from "../../../../common/bounds";
 import {
     adjacentPoints,
@@ -175,13 +175,15 @@ export class TilesComponent extends EntityComponent implements Ground {
             });
 
             if (tile.hasTree && tile.hasTree > 0) {
-                let sprite = sprites.tree;
+                let sprite = sprites2.tree_1;
+
                 if (tile.hasTree >= 2.0) {
-                    sprite = sprites.tree2;
+                    sprite = sprites2.tree_2;
                 }
                 if (tile.hasTree >= 3.0) {
-                    sprite = sprites.tree3;
+                    sprite = sprites2.tree_3;
                 }
+
                 context.drawSprite({
                     sprite: sprite,
                     x: tile.tileX * TileSize + 4,

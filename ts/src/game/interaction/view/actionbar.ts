@@ -1,3 +1,4 @@
+import { sprites2 } from "../../../asset/sprite";
 import { allSides } from "../../../common/sides";
 import { subTitleTextStyle } from "../../../rendering/text/textStyle";
 import { ninePatchBackground } from "../../../ui/dsl/uiBackgroundDsl";
@@ -33,7 +34,7 @@ export function getActionbarView(
                                 onClick(action);
                             },
                             defaultBackground: ninePatchBackground({
-                                asset: "stoneSlateBackground",
+                                sprite: sprites2.stone_slate_background,
                                 scale: 2,
                             }),
                         }),

@@ -1,3 +1,4 @@
+import { sprites2 } from "../../../../asset/sprite";
 import {
     getBoundsAxis,
     sizeOfBounds,
@@ -24,7 +25,7 @@ import { uiRow } from "../../../../ui/dsl/uiRowDsl";
 import { uiSpace } from "../../../../ui/dsl/uiSpaceDsl";
 import { uiText } from "../../../../ui/dsl/uiTextDsl";
 import { wrapUiSize } from "../../../../ui/uiView";
-import { UIAssetImageSource } from "../../../../ui/view/uiImageSource";
+import { UISpriteImageSource } from "../../../../ui/view/uiImageSource";
 import { InventoryComponent } from "../../../world/component/root/inventory/inventoryComponent";
 import { TilesComponent } from "../../../world/component/tile/tilesComponent";
 import { UnlockableArea } from "../../../world/component/tile/unlockableArea";
@@ -121,8 +122,8 @@ export class LandUnlockState extends InteractionState {
                                         child: uiImage({
                                             width: wrapUiSize,
                                             height: wrapUiSize,
-                                            image: new UIAssetImageSource(
-                                                "woodResource"
+                                            image: new UISpriteImageSource(
+                                                sprites2.wood_resource
                                             ),
                                         }),
                                     },
@@ -155,8 +156,8 @@ export class LandUnlockState extends InteractionState {
                 y: this.selectedArea.bounds.y1,
             });
 
-            context.drawNinePatchImage({
-                asset: "cursor",
+            context.drawNinePatchSprite({
+                sprite: sprites2.cursor,
                 height: this.selectedAreaSize.x * TileSize,
                 width: this.selectedAreaSize.y * TileSize,
                 scale: 1.0,

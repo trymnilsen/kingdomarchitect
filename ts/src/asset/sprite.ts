@@ -1,49 +1,32 @@
-import { Bounds } from "../common/bounds";
-import { ImageAsset } from "./assets";
-import { coinsFlat, coinSprite } from "./sprites/coinSprite";
-import { farmerSprite } from "./sprites/farmerSprite";
-import { foxSprite } from "./sprites/foxSprite";
-import { keepSprite } from "./sprites/keepSprite";
-import { stoneWoodWalls } from "./sprites/stoneWoodWalls";
-import { swordsManSprite } from "./sprites/swordsmanSprite";
-import { treeSprite, treeSprite2, treeSprite3 } from "./sprites/treeSprite";
-import {
-    woodenHouseScaffold,
-    woodenHouseSprite,
-} from "./sprites/woodHouseSprite";
+import * as jsonSprites from "../../generated/sprites.json";
 
-export type Sprite = {
-    bounds: Bounds;
-    asset: ImageAsset;
-};
-
-export const sprites = {
-    woodHouse: woodenHouseSprite,
-    woodHouseScaffold: woodenHouseScaffold,
-    tree: treeSprite,
-    tree2: treeSprite2,
-    tree3: treeSprite3,
-    swordsman: swordsManSprite,
-    farmer: farmerSprite,
-    coins: coinSprite,
-    coinsFlat: coinsFlat,
-    fox: foxSprite,
-    keep: keepSprite,
-    stoneWoodWalls: stoneWoodWalls,
-};
-
-export function spriteWithSize(
-    asset: ImageAsset,
-    width: number,
-    height: number
-): Sprite {
-    return {
-        asset: asset,
-        bounds: {
-            x1: 0,
-            y1: 0,
-            x2: width,
-            y2: height,
-        },
+export type Sprite2 = {
+    /**
+     * The reference to which spritesheet this sprite is found in
+     */
+    bin: string;
+    /**
+     * The definition defines where in the spritesheet the sprite can be found
+     */
+    defintion: {
+        frames: number;
+        /**
+         * The width of the sprite in the spritesheet
+         */
+        w: number;
+        /**
+         * The height of the sprite in the spritesheet
+         */
+        h: number;
+        /**
+         * The X position the sprite in the spritesheet
+         */
+        x: number;
+        /**
+         * The Y position the sprite in the spritesheet
+         */
+        y: number;
     };
-}
+};
+
+export const sprites2 = jsonSprites;

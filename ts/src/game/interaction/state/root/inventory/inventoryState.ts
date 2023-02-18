@@ -1,10 +1,10 @@
-import { ImageAsset } from "../../../../../asset/assets";
+import { Sprite2, sprites2 } from "../../../../../asset/sprite";
 import { allSides, symmetricSides } from "../../../../../common/sides";
 import { bookInkColor } from "../../../../../ui/color";
 import { ninePatchBackground } from "../../../../../ui/dsl/uiBackgroundDsl";
 import { uiBox } from "../../../../../ui/dsl/uiBoxDsl";
 import { uiColumn } from "../../../../../ui/dsl/uiColumnDsl";
-import { assetImageSource, uiImage } from "../../../../../ui/dsl/uiImageDsl";
+import { spriteImageSource, uiImage } from "../../../../../ui/dsl/uiImageDsl";
 import { uiOffset } from "../../../../../ui/dsl/uiOffsetDsl";
 import { uiSpace } from "../../../../../ui/dsl/uiSpaceDsl";
 import { uiText } from "../../../../../ui/dsl/uiTextDsl";
@@ -24,7 +24,7 @@ import { UIInventoryGridItem } from "./uiInventoryGridItem";
 
 export interface InventoryItems {
     name: string;
-    asset: ImageAsset;
+    asset: Sprite2;
     amount: number;
     value: number;
 }
@@ -150,7 +150,7 @@ export class InventoryState extends InteractionState {
                         width: fillUiSize,
                         height: fillUiSize,
                         background: ninePatchBackground({
-                            asset: "book_grid_item",
+                            sprite: sprites2.book_grid_item,
                             sides: allSides(8),
                             scale: 1,
                         }),
@@ -207,7 +207,7 @@ export class InventoryState extends InteractionState {
                                     height: 180,
                                     width: fillUiSize,
                                     background: ninePatchBackground({
-                                        asset: "book_grid_item",
+                                        sprite: sprites2.book_grid_item,
                                         sides: allSides(8),
                                         scale: 1,
                                     }),
@@ -215,7 +215,7 @@ export class InventoryState extends InteractionState {
                                         uiImage({
                                             height: 64,
                                             width: 64,
-                                            image: assetImageSource(
+                                            image: spriteImageSource(
                                                 inventoryItem.asset
                                             ),
                                         }),
@@ -293,16 +293,16 @@ export class InventoryState extends InteractionState {
     }
 }
 
-export function getAssetImage(index: number): ImageAsset | null {
+export function getAssetImage(index: number): Sprite2 | null {
     switch (index) {
         case 0:
-            return "woodResource";
+            return sprites2.wood_resource;
         case 1:
-            return "bagOfGlitter";
+            return sprites2.bag_of_glitter;
         case 2:
-            return "gemResource";
+            return sprites2.gem_resource;
         case 3:
-            return "stoneResource";
+            return sprites2.stone_resource;
         default:
             return null;
     }

@@ -1,3 +1,4 @@
+import { sprites2 } from "../../../../asset/sprite";
 import { allSides, symmetricSides } from "../../../../common/sides";
 import { bookInkColor } from "../../../../ui/color";
 import { ninePatchBackground } from "../../../../ui/dsl/uiBackgroundDsl";
@@ -21,7 +22,7 @@ export class AlertMessageState extends InteractionState {
                     width: 300,
                     height: wrapUiSize,
                     background: ninePatchBackground({
-                        asset: "stoneSlateBackground",
+                        sprite: sprites2.stone_slate_background,
                         sides: allSides(16),
                         scale: 4,
                     }),
@@ -71,13 +72,13 @@ export class AlertMessageState extends InteractionState {
                                         },
                                         padding: allSides(16),
                                         defaultBackground: ninePatchBackground({
-                                            asset: "stoneSlateBorder",
+                                            sprite: sprites2.stone_slate_border,
                                             sides: allSides(6),
                                             scale: 4,
                                         }),
                                         onTappedBackground: ninePatchBackground(
                                             {
-                                                asset: "stoneSlateBorderSelected",
+                                                sprite: sprites2.stone_slate_border_selected,
                                                 sides: allSides(6),
                                                 scale: 4,
                                             }

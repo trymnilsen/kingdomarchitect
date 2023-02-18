@@ -1,24 +1,15 @@
 import { UIViewProperties } from "./uiViewDsl";
 import { UIImage } from "../view/uiImage";
-import {
-    UIImageSource,
-    UISpriteImageSource,
-    UIAssetImageSource,
-} from "../view/uiImageSource";
-import { Sprite } from "../../asset/sprite";
-import { ImageAsset } from "../../asset/assets";
+import { UIImageSource, UISpriteImageSource } from "../view/uiImageSource";
+import { Sprite2 } from "../../asset/sprite";
 
 export interface UIImageProperties extends UIViewProperties {
     image: UIImageSource;
     scale?: number;
 }
 
-export function spriteImageSource(sprite: Sprite): UIImageSource {
+export function spriteImageSource(sprite: Sprite2): UIImageSource {
     return new UISpriteImageSource(sprite);
-}
-
-export function assetImageSource(asset: ImageAsset): UIImageSource {
-    return new UIAssetImageSource(asset);
 }
 
 export function uiImage(uiImageProperties: UIImageProperties): UIImage {

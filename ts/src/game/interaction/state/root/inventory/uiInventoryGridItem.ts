@@ -1,4 +1,4 @@
-import { ImageAsset } from "../../../../../asset/assets";
+import { Sprite2, sprites2 } from "../../../../../asset/sprite";
 import { allSides } from "../../../../../common/sides";
 import { UIRenderContext } from "../../../../../rendering/uiRenderContext";
 import { ninePatchBackground } from "../../../../../ui/dsl/uiBackgroundDsl";
@@ -8,20 +8,20 @@ import { fillUiSize } from "../../../../../ui/uiView";
 import { UIButton } from "../../../../../ui/view/uiButton";
 
 export class UIInventoryGridItem extends UIButton {
-    constructor(private asset: ImageAsset, public isSelected: boolean) {
+    constructor(private sprite: Sprite2, public isSelected: boolean) {
         super({
             width: fillUiSize,
             height: fillUiSize,
         });
 
         this.defaultBackground = ninePatchBackground({
-            asset: "book_grid_item",
+            sprite: sprites2.book_grid_item,
             sides: allSides(8),
             scale: 1,
         });
 
         this.onTappedBackground = ninePatchBackground({
-            asset: "book_grid_item_focused",
+            sprite: sprites2.book_grid_item_focused,
             sides: allSides(8),
             scale: 1,
         });
@@ -46,23 +46,20 @@ export class UIInventoryGridItem extends UIButton {
             throw new Error("Measured size not set");
         }
 
-        context.drawScreenSpaceImage(
-            {
-                x: this.screenPosition.x + 4,
-                y: this.screenPosition.y + 4,
-                image: this.asset,
-            },
-            1
-        );
+        context.drawScreenSpaceSprite({
+            x: this.screenPosition.x + 4,
+            y: this.screenPosition.y + 4,
+            sprite: this.sprite,
+        });
 
         if (this.isSelected) {
-            context.drawNinePatchImage({
+            context.drawNinePatchSprite({
                 x: this.screenPosition.x - 4,
                 y: this.screenPosition.y - 4,
                 width: size.width + 8,
                 height: size.height + 8,
                 scale: 1,
-                asset: "cursor",
+                sprite: sprites2.cursor,
                 sides: allSides(12),
             });
         }

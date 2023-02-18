@@ -1,5 +1,4 @@
-import { ImageAsset } from "../../asset/assets";
-import { Sprite } from "../../asset/sprite";
+import { Sprite2 } from "../../asset/sprite";
 import { Point } from "../../common/point";
 import { UIRenderContext } from "../../rendering/uiRenderContext";
 import { UILayoutContext } from "../uiLayoutContext";
@@ -11,36 +10,17 @@ export interface UIImageSource {
 }
 
 export class UISpriteImageSource implements UIImageSource {
-    constructor(private sprite: Sprite) {}
+    constructor(private sprite: Sprite2) {}
     measure(layoutContext: UILayoutContext): UISize {
         return layoutContext.measureSprite(this.sprite);
     }
     draw(context: UIRenderContext, screenposition: Point, size: UISize): void {
-        context.drawScreenSpaceSprite(
-            {
-                sprite: this.sprite,
-                x: screenposition.x,
-                y: screenposition.y,
-            },
-            size
-        );
-    }
-}
-
-export class UIAssetImageSource implements UIImageSource {
-    constructor(private asset: ImageAsset) {}
-    measure(layoutContext: UILayoutContext): UISize {
-        return layoutContext.measureImage(this.asset);
-    }
-    draw(context: UIRenderContext, screenposition: Point, size: UISize): void {
-        context.drawScreenSpaceImageInto(
-            {
-                image: this.asset,
-                x: screenposition.x,
-                y: screenposition.y,
-            },
-            size.width,
-            size.height
-        );
+        context.drawScreenSpaceSprite({
+            sprite: this.sprite,
+            x: screenposition.x,
+            y: screenposition.y,
+            targetWidth: size.width,
+            targetHeight: size.height,
+        });
     }
 }
