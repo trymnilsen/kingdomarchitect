@@ -100,6 +100,8 @@ async function packSprites(sprites: PackableSprite[]) {
         packer.add(sprite.definition.w, sprite.definition.h, i);
     }
 
+    const packedSprites: { [name: string]: PackedSprite } = {};
+
     //Loop over all bins and rects and output sheets
     for (let binIndex = 0; binIndex < packer.bins.length; binIndex++) {
         const bin = packer.bins[binIndex];
@@ -116,6 +118,17 @@ async function packSprites(sprites: PackableSprite[]) {
                     `Unable to get pixels from ${packedSprite.filename}`
                 );
             }
+
+            packedSprites[packedSprite.spriteName] = {
+                bin: binIndex,
+                defintion: {
+                    frames: packedSprite.definition.frames,
+                    w: packedSprite.definition.w,
+                    h: packedSprite.definition.h,
+                    x: rect.x,
+                    y: rect.y,
+                },
+            };
 
             for (let x = 0; x < rect.width; x++) {
                 for (let y = 0; y < rect.height; y++) {
@@ -173,6 +186,12 @@ async function packSprites(sprites: PackableSprite[]) {
             path.join(process.cwd(), "public", "asset", `bin-${binIndex}.png`)
         );
     }
+
+    // Write all sprites to json
+    await fs.writeFile(
+        path.join(process.cwd(), "ts", "generated", "sprites.json"),
+        JSON.stringify(packedSprites, null, 2)
+    );
 }
 
 /**
@@ -368,6 +387,11 @@ type PackableSprite = {
     filename: string;
     spriteName: string;
     definition: SpriteDefinition;
+};
+
+type PackedSprite = {
+    defintion: SpriteDefinition;
+    bin: number;
 };
 
 type SpriteDefinitionMap = { [name: string]: SpriteDefinition };

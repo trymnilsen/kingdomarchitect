@@ -15,6 +15,7 @@
       "noImplicitOverride": true,
       "noUnusedLocals": false,
       "noFallthroughCasesInSwitch": true,
+      "resolveJsonModule": true,
       "noPropertyAccessFromIndexSignature": true,
       "removeComments": true,
       "experimentalDecorators": true,
@@ -25,6 +26,7 @@
     "include": [
       "ts/src/**/*.ts",
       "ts/tool/**/*.ts",
-      "ts/test/**/*.ts"
+      "ts/test/**/*.ts",
+      "ts/generated/sprites.json"
     ]
   }
