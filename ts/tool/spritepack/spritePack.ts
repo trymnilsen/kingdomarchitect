@@ -36,7 +36,6 @@ async function run() {
             sourceFilePath
         );
         if (createdSprites) {
-            console.log("Loaded: ", sourceFilePath);
             if (createdSprites.length == 0) {
                 console.error(
                     `No sprites created for: ${sourceFilePath}`,
@@ -44,7 +43,6 @@ async function run() {
                 );
             }
             for (const sprite of createdSprites) {
-                console.log("Created sprite: ", sprite.spriteName);
                 secondPassSpriteDefinitions.push(sprite);
             }
 
@@ -65,7 +63,6 @@ async function run() {
         const width = pixelData.shape[0];
         const height = pixelData.shape[1];
 
-        console.log("Loaded: ", assetPath);
         secondPassSpriteDefinitions.push({
             filename: assetPath,
             spriteName: spriteName,
@@ -96,7 +93,6 @@ async function packSprites(sprites: PackableSprite[]) {
     for (let i = 0; i < sprites.length; i++) {
         const sprite = sprites[i];
         //Index is used as data
-        console.log("Pack sprite: ", sprite.spriteName);
         packer.add(sprite.definition.w, sprite.definition.h, i);
     }
     const binNames: { [name: string]: string } = {};
@@ -191,8 +187,8 @@ async function packSprites(sprites: PackableSprite[]) {
 
     // Write all sprites to json
     await fs.writeFile(
-        path.join(process.cwd(), "ts", "generated", "sprites.json"),
-        JSON.stringify(packedSprites, null, 2)
+        path.join(process.cwd(), "ts", "generated", "sprites.ts"),
+        "export const sprites = " + JSON.stringify(packedSprites, null, 2)
     );
 }
 
@@ -255,17 +251,12 @@ async function createSpriteSheet(
         }
 
         try {
-            const definition = await extractSprite(
+            const packableSprite = await extractSprite(
                 spriteName,
                 spriteDefinition,
                 pixelData
             );
-
-            packedSprites.push({
-                spriteName: spriteName,
-                filename: spritePath,
-                definition: definition,
-            });
+            packedSprites.push(packableSprite);
         } catch (err) {
             console.error(`Failed to extract ${spriteName}`, err);
         }
@@ -278,9 +269,7 @@ async function extractSprite(
     spriteName: string,
     spriteDefinition: SpriteDefinition,
     spritePixels: NdArray<Uint8Array>
-): Promise<SpriteDefinition> {
-    const sourceWidth = spritePixels.shape[0];
-    const sourceHeight = spritePixels.shape[1];
+): Promise<PackableSprite> {
     const options = {
         smart: false,
         pot: false,
@@ -342,16 +331,24 @@ async function extractSprite(
         }
     }
 
-    await bitmap.write(
-        path.join(process.cwd(), "build", "sprites", `${spriteName}.png`)
+    const filename = path.join(
+        process.cwd(),
+        "build",
+        "sprites",
+        `${spriteName}.png`
     );
+    await bitmap.write(filename);
 
     return {
-        w: bin.width,
-        h: bin.height,
-        x: 0,
-        y: 0,
-        frames: frames.length,
+        spriteName: spriteName,
+        filename: filename,
+        definition: {
+            w: bin.width,
+            h: bin.height,
+            x: 0,
+            y: 0,
+            frames: frames.length,
+        },
     };
 }
 

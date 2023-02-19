@@ -5,7 +5,7 @@
     "scripts": {
         "tsc": "tsc",
         "build": "webpack",
-        "spritepack": "ts-node ts/tool/spritepack/spritePack.ts",
+        "spritepack": "ts-node ts/tool/spritepack/spritePack.ts && webpack",
         "start": "webpack serve",
         "test": "mocha",
         "coverage": "c8 mocha && open coverage/lcov-report/index.html"

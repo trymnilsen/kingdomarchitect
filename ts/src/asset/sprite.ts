@@ -1,4 +1,4 @@
-import * as jsonSprites from "../../generated/sprites.json";
+import { sprites } from "../../generated/sprites";
 
 export type Sprite2 = {
     /**
@@ -29,4 +29,4 @@ export type Sprite2 = {
     };
 };
 
-export const sprites2 = jsonSprites;
+export const sprites2 = sprites;

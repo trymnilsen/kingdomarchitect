@@ -1,4 +1,4 @@
-{
+export const sprites = {
   "fox": {
     "bin": "0",
     "defintion": {
@@ -119,7 +119,7 @@
       "y": 96
     }
   },
-  "knight": {
+  "stone_wood_walls": {
     "bin": "0",
     "defintion": {
       "frames": 1,
@@ -129,7 +129,7 @@
       "y": 96
     }
   },
-  "tree_stub": {
+  "knight": {
     "bin": "0",
     "defintion": {
       "frames": 1,
@@ -139,7 +139,7 @@
       "y": 96
     }
   },
-  "tree_1": {
+  "tree_stub": {
     "bin": "0",
     "defintion": {
       "frames": 1,
@@ -149,7 +149,7 @@
       "y": 0
     }
   },
-  "tree_2": {
+  "tree_1": {
     "bin": "0",
     "defintion": {
       "frames": 1,
@@ -159,7 +159,7 @@
       "y": 32
     }
   },
-  "tree_3": {
+  "tree_2": {
     "bin": "0",
     "defintion": {
       "frames": 1,
@@ -169,7 +169,7 @@
       "y": 64
     }
   },
-  "bag_of_glitter": {
+  "tree_3": {
     "bin": "0",
     "defintion": {
       "frames": 1,
@@ -179,7 +179,7 @@
       "y": 96
     }
   },
-  "book_grid_item": {
+  "bag_of_glitter": {
     "bin": "0",
     "defintion": {
       "frames": 1,
@@ -189,13 +189,23 @@
       "y": 128
     }
   },
-  "book_grid_item_focused": {
+  "book_grid_item": {
     "bin": "0",
     "defintion": {
       "frames": 1,
       "w": 32,
       "h": 32,
       "x": 32,
+      "y": 128
+    }
+  },
+  "book_grid_item_focused": {
+    "bin": "0",
+    "defintion": {
+      "frames": 1,
+      "w": 32,
+      "h": 32,
+      "x": 64,
       "y": 128
     }
   },
@@ -235,7 +245,7 @@
       "frames": 1,
       "w": 64,
       "h": 16,
-      "x": 64,
+      "x": 168,
       "y": 128
     }
   },
@@ -245,8 +255,8 @@
       "frames": 1,
       "w": 32,
       "h": 32,
-      "x": 128,
-      "y": 168
+      "x": 96,
+      "y": 128
     }
   },
   "fancy_wood_background": {
@@ -255,8 +265,8 @@
       "frames": 1,
       "w": 48,
       "h": 48,
-      "x": 128,
-      "y": 200
+      "x": 232,
+      "y": 128
     }
   },
   "gem_resource": {
@@ -265,8 +275,8 @@
       "frames": 1,
       "w": 32,
       "h": 32,
-      "x": 160,
-      "y": 168
+      "x": 168,
+      "y": 144
     }
   },
   "stone_resource": {
@@ -275,8 +285,8 @@
       "frames": 1,
       "w": 32,
       "h": 32,
-      "x": 128,
-      "y": 248
+      "x": 200,
+      "y": 144
     }
   },
   "stone_slate_background": {
@@ -285,8 +295,8 @@
       "frames": 1,
       "w": 48,
       "h": 48,
-      "x": 176,
-      "y": 200
+      "x": 128,
+      "y": 176
     }
   },
   "stone_slate_background_2x": {
@@ -295,8 +305,8 @@
       "frames": 1,
       "w": 48,
       "h": 48,
-      "x": 224,
-      "y": 128
+      "x": 128,
+      "y": 224
     }
   },
   "stone_slate_border": {
@@ -305,8 +315,8 @@
       "frames": 1,
       "w": 16,
       "h": 16,
-      "x": 64,
-      "y": 144
+      "x": 128,
+      "y": 272
     }
   },
   "stone_slate_border_selected": {
@@ -315,8 +325,8 @@
       "frames": 1,
       "w": 16,
       "h": 16,
-      "x": 272,
-      "y": 128
+      "x": 144,
+      "y": 272
     }
   },
   "stone_slate_button_2x": {
@@ -325,18 +335,8 @@
       "frames": 1,
       "w": 48,
       "h": 48,
-      "x": 224,
+      "x": 176,
       "y": 176
-    }
-  },
-  "stone_wood_walls": {
-    "bin": "0",
-    "defintion": {
-      "frames": 1,
-      "w": 96,
-      "h": 192,
-      "x": 288,
-      "y": 0
     }
   },
   "stone_wood_walls_bottom": {
@@ -345,8 +345,8 @@
       "frames": 1,
       "w": 40,
       "h": 40,
-      "x": 160,
-      "y": 248
+      "x": 176,
+      "y": 224
     }
   },
   "stone_wood_walls_br": {
@@ -355,8 +355,8 @@
       "frames": 1,
       "w": 40,
       "h": 40,
-      "x": 168,
-      "y": 128
+      "x": 224,
+      "y": 176
     }
   },
   "stone_wood_walls_horizontal": {
@@ -365,8 +365,8 @@
       "frames": 1,
       "w": 40,
       "h": 40,
-      "x": 200,
-      "y": 248
+      "x": 216,
+      "y": 224
     }
   },
   "stone_wood_walls_lb": {
@@ -375,8 +375,8 @@
       "frames": 1,
       "w": 40,
       "h": 40,
-      "x": 240,
-      "y": 224
+      "x": 288,
+      "y": 0
     }
   },
   "stone_wood_walls_lbr": {
@@ -385,8 +385,8 @@
       "frames": 1,
       "w": 40,
       "h": 40,
-      "x": 280,
-      "y": 192
+      "x": 288,
+      "y": 40
     }
   },
   "stone_wood_walls_left": {
@@ -395,8 +395,8 @@
       "frames": 1,
       "w": 40,
       "h": 40,
-      "x": 280,
-      "y": 232
+      "x": 288,
+      "y": 80
     }
   },
   "stone_wood_walls_lu": {
@@ -405,8 +405,8 @@
       "frames": 1,
       "w": 40,
       "h": 40,
-      "x": 320,
-      "y": 192
+      "x": 288,
+      "y": 120
     }
   },
   "stone_wood_walls_lub": {
@@ -415,8 +415,8 @@
       "frames": 1,
       "w": 40,
       "h": 40,
-      "x": 320,
-      "y": 232
+      "x": 280,
+      "y": 160
     }
   },
   "stone_wood_walls_lur": {
@@ -425,11 +425,21 @@
       "frames": 1,
       "w": 40,
       "h": 40,
-      "x": 240,
-      "y": 264
+      "x": 264,
+      "y": 200
     }
   },
   "stone_wood_walls_lurb": {
+    "bin": "0",
+    "defintion": {
+      "frames": 1,
+      "w": 40,
+      "h": 40,
+      "x": 256,
+      "y": 240
+    }
+  },
+  "stone_wood_walls_right": {
     "bin": "0",
     "defintion": {
       "frames": 1,
@@ -439,7 +449,7 @@
       "y": 288
     }
   },
-  "stone_wood_walls_right": {
+  "stone_wood_walls_scaffold": {
     "bin": "0",
     "defintion": {
       "frames": 1,
@@ -449,7 +459,7 @@
       "y": 288
     }
   },
-  "stone_wood_walls_scaffold": {
+  "stone_wood_walls_single": {
     "bin": "0",
     "defintion": {
       "frames": 1,
@@ -459,7 +469,7 @@
       "y": 288
     }
   },
-  "stone_wood_walls_single": {
+  "stone_wood_walls_ubr": {
     "bin": "0",
     "defintion": {
       "frames": 1,
@@ -469,24 +479,14 @@
       "y": 288
     }
   },
-  "stone_wood_walls_ubr": {
-    "bin": "0",
-    "defintion": {
-      "frames": 1,
-      "w": 40,
-      "h": 40,
-      "x": 160,
-      "y": 288
-    }
-  },
   "stone_wood_walls_up": {
     "bin": "0",
     "defintion": {
       "frames": 1,
       "w": 40,
       "h": 40,
-      "x": 200,
-      "y": 288
+      "x": 160,
+      "y": 280
     }
   },
   "stone_wood_walls_ur": {
@@ -495,8 +495,8 @@
       "frames": 1,
       "w": 40,
       "h": 40,
-      "x": 280,
-      "y": 272
+      "x": 200,
+      "y": 280
     }
   },
   "stone_wood_walls_vertical": {
@@ -505,8 +505,8 @@
       "frames": 1,
       "w": 40,
       "h": 40,
-      "x": 320,
-      "y": 272
+      "x": 240,
+      "y": 280
     }
   },
   "swipe_effect": {
@@ -515,8 +515,8 @@
       "frames": 1,
       "w": 40,
       "h": 40,
-      "x": 240,
-      "y": 304
+      "x": 280,
+      "y": 280
     }
   },
   "wood_resource": {
@@ -525,8 +525,8 @@
       "frames": 1,
       "w": 32,
       "h": 32,
-      "x": 192,
-      "y": 168
+      "x": 296,
+      "y": 240
     }
   }
 }
