@@ -112,7 +112,7 @@ class _ChopTreeJob extends Job {
         if (!entity) {
             throw new JobConstraintsError("No entity for selection");
         }
-
+        entity.getComponent(TreeComponent)!.startChop();
         this.treeEntity = entity;
     }
 
@@ -134,7 +134,7 @@ class _ChopTreeJob extends Job {
         }
         if (healthComponent.health <= 10) {
             console.log("Health lte 10");
-            treeComponent.setChopped();
+            treeComponent.finishChop();
             inventoryComponent.addInventoryItem(woodResourceItem, 4);
             this.complete();
         }

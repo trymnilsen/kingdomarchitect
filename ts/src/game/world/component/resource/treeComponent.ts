@@ -4,23 +4,44 @@ import { RenderContext } from "../../../../rendering/renderContext";
 import { EntityComponent } from "../entityComponent";
 import { HealthComponent } from "../health/healthComponent";
 
+export enum TreeComponentChopState {
+    Chopping,
+    Stub,
+    Clearing,
+    Full,
+}
+
 export class TreeComponent extends EntityComponent {
     private chopTime?: number;
     private previousTick: number = 0;
+    private chopState: TreeComponentChopState = TreeComponentChopState.Full;
     constructor(private tree: number) {
         super();
     }
+    startChop() {
+        if (this.chopState == TreeComponentChopState.Stub) {
+            this.chopState = TreeComponentChopState.Clearing;
+        } else {
+            this.chopState = TreeComponentChopState.Chopping;
+        }
+    }
 
-    setChopped() {
-        this.chopTime = this.previousTick;
+    finishChop() {
+        if (this.chopState == TreeComponentChopState.Chopping) {
+            this.chopTime = this.previousTick;
+            this.chopState = TreeComponentChopState.Stub;
+        } else if (this.chopState == TreeComponentChopState.Clearing) {
+            this.entity?.remove();
+        }
     }
 
     override onUpdate(tick: number): void {
         this.previousTick = tick;
-        if (!!this.chopTime) {
+        if (!!this.chopTime && this.chopState == TreeComponentChopState.Stub) {
             const timeDifference = tick - this.chopTime;
             if (timeDifference > 30) {
                 this.chopTime = undefined;
+                this.chopState = TreeComponentChopState.Full;
                 const health = this.entity?.getComponent(HealthComponent)!;
                 health.healToMax();
             }

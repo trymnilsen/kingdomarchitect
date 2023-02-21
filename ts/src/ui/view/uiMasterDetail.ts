@@ -1,4 +1,4 @@
-import { Point } from "../../common/point";
+import { addPoint, Point } from "../../common/point";
 import { UIRenderContext } from "../../rendering/uiRenderContext";
 import { UIBackground } from "../uiBackground";
 import { UILayoutContext } from "../uiLayoutContext";
@@ -11,7 +11,7 @@ export class UIMasterDetails extends UIView {
     private _mode: UIMasterDetailsMode = UIMasterDetailsMode.Dual;
     private _focusedMode: UIMasterDetailFocusedMode =
         UIMasterDetailFocusedMode.Master;
-
+    private inventoryOffset;
     get singleBackground(): UIBackground | null {
         return this._singleBackground;
     }
@@ -55,6 +55,7 @@ export class UIMasterDetails extends UIView {
     showDetails(view: UIView) {
         this.removeView(this.detailsView);
         this.detailsView = view;
+        this._focusedMode = UIMasterDetailFocusedMode.Details;
         this.addView(view);
     }
 
@@ -67,23 +68,58 @@ export class UIMasterDetails extends UIView {
     }
 
     layout(layoutContext: UILayoutContext, constraints: UISize): UISize {
-        const measuredSize: UISize = {
-            width: 600,
-            height: 400,
-        };
-        this.masterView.layout(layoutContext, { width: 300, height: 400 });
-        this.detailsView.layout(layoutContext, { width: 300, height: 400 });
-        this.detailsView.offset = { x: 300, y: 0 };
-        this._measuredSize = measuredSize;
-        return measuredSize;
+        if (constraints.width < 600) {
+            this._mode = UIMasterDetailsMode.Single;
+            let measuredSize: UISize = {
+                width: 300,
+                height: 400,
+            };
+
+            this.masterView.layout(layoutContext, { width: 300, height: 400 });
+            this.detailsView.layout(layoutContext, { width: 300, height: 400 });
+            if (this._focusedMode == UIMasterDetailFocusedMode.Master) {
+                this.detailsView.offset = { x: 300, y: 0 };
+                this.masterView.offset = { x: 0, y: 0 };
+            } else {
+                this.detailsView.offset = { x: 0, y: 0 };
+                this.masterView.offset = { x: -300, y: 0 };
+            }
+
+            this._measuredSize = measuredSize;
+            return measuredSize;
+        } else {
+            let measuredSize: UISize = {
+                width: 600,
+                height: 400,
+            };
+            this._mode = UIMasterDetailsMode.Dual;
+            this.masterView.layout(layoutContext, { width: 300, height: 400 });
+            this.detailsView.layout(layoutContext, { width: 300, height: 400 });
+            this.detailsView.offset = { x: 300, y: 0 };
+            this._measuredSize = measuredSize;
+            return measuredSize;
+        }
     }
 
     draw(context: UIRenderContext): void {
         if (this.measuredSize) {
+            let backgroundOffset = { x: 0, y: 0 };
+            if (
+                this._mode == UIMasterDetailsMode.Single &&
+                this._focusedMode == UIMasterDetailFocusedMode.Details
+            ) {
+                backgroundOffset = {
+                    x: -300,
+                    y: 0,
+                };
+            }
             this._dualBackground?.draw(
                 context,
-                this.screenPosition,
-                this.measuredSize
+                addPoint(this.screenPosition, backgroundOffset),
+                {
+                    width: 600,
+                    height: 400,
+                }
             );
         }
         this.masterView.draw(context);
