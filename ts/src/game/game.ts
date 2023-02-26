@@ -1,7 +1,7 @@
 import { changeX, changeY, invert as invert, Point } from "../common/point";
 import { TouchInput } from "../input/touchInput";
 import { Input, InputEvent } from "../input/input";
-import { InputAction } from "../input/inputAction";
+import { InputAction, InputActionType } from "../input/inputAction";
 import { Renderer } from "../rendering/renderer";
 import { MainScene, Scene } from "./mainScene";
 import { AssetLoader } from "../asset/loader/assetLoader";
@@ -86,31 +86,36 @@ export class Game {
 
     private onInput(inputEvent: InputEvent) {
         console.log("Input: ", inputEvent);
-        switch (inputEvent.action) {
-            case InputAction.ACTION_PRESS:
-                this.currentScene.input(inputEvent.action);
-                break;
-            case InputAction.UP_PRESS:
-                this.updateCamera(
-                    changeY(this.renderer.camera.position, -TileSize)
-                );
-                break;
-            case InputAction.DOWN_PRESS:
-                this.updateCamera(
-                    changeY(this.renderer.camera.position, TileSize)
-                );
-                break;
-            case InputAction.LEFT_PRESS:
-                this.updateCamera(
-                    changeX(this.renderer.camera.position, -TileSize)
-                );
-                break;
-            case InputAction.RIGHT_PRESS:
-                this.updateCamera(
-                    changeX(this.renderer.camera.position, TileSize)
-                );
-                break;
+        if (inputEvent.action.isShifted) {
+            switch (inputEvent.action.action) {
+                case InputActionType.ACTION_PRESS:
+                    this.currentScene.input(inputEvent.action);
+                    break;
+                case InputActionType.UP_PRESS:
+                    this.updateCamera(
+                        changeY(this.renderer.camera.position, -TileSize)
+                    );
+                    break;
+                case InputActionType.DOWN_PRESS:
+                    this.updateCamera(
+                        changeY(this.renderer.camera.position, TileSize)
+                    );
+                    break;
+                case InputActionType.LEFT_PRESS:
+                    this.updateCamera(
+                        changeX(this.renderer.camera.position, -TileSize)
+                    );
+                    break;
+                case InputActionType.RIGHT_PRESS:
+                    this.updateCamera(
+                        changeX(this.renderer.camera.position, TileSize)
+                    );
+                    break;
+            }
+        } else {
+            this.currentScene.input(inputEvent.action);
         }
+
         this.render();
     }
 

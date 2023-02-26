@@ -1,5 +1,6 @@
 import { Point } from "../../../common/point";
 import { InputEvent } from "../../../input/input";
+import { InputAction } from "../../../input/inputAction";
 import { RenderContext } from "../../../rendering/renderContext";
 import { UIEvent } from "../../../ui/event/uiEvent";
 import { UIView } from "../../../ui/uiView";
@@ -133,6 +134,7 @@ export abstract class InteractionState {
             }
             this._view.updateTransform();
             this._view.draw(context);
+            this._view.focusState.onDraw(context);
             //const end = performance.now();
             //console.log(`build state draw: ${end - start}`);
         }
@@ -146,7 +148,10 @@ export abstract class InteractionState {
      * to a different state
      * @returns if the tap has been handled or not
      */
-    onInput(input: InputEvent, stateChanger: InteractionStateChanger): boolean {
+    onInput(
+        input: InputAction,
+        stateChanger: InteractionStateChanger
+    ): boolean {
         return false;
     }
 }

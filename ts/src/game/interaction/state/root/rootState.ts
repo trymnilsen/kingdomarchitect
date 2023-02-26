@@ -11,6 +11,22 @@ import { BuildingState } from "./building/buildingState";
 import { SelectedTileItem } from "../../../world/selection/selectedTileItem";
 import { SelectedEntityItem } from "../../../world/selection/selectedEntityItem";
 import { SelectedWorldItem } from "../../../world/selection/selectedWorldItem";
+import { InputAction, InputActionType } from "../../../../input/inputAction";
+
+const actions: ActionButton[] = [
+    {
+        id: "build",
+        name: "Build",
+    },
+    {
+        id: "land",
+        name: "Land",
+    },
+    {
+        id: "inventory",
+        name: "Inventory",
+    },
+];
 
 export class RootState extends InteractionState {
     /*     onTap(
@@ -25,21 +41,6 @@ export class RootState extends InteractionState {
 
     override onActive(): void {
         super.onActive();
-
-        const actions: ActionButton[] = [
-            {
-                id: "build",
-                name: "Build",
-            },
-            {
-                id: "land",
-                name: "Land",
-            },
-            {
-                id: "inventory",
-                name: "Inventory",
-            },
-        ];
 
         const actionbarView = getActionbarView(actions, (action) => {
             this.actionSelected(action);
@@ -65,10 +66,21 @@ export class RootState extends InteractionState {
     }
 
     override onInput(
-        input: InputEvent,
+        input: InputAction,
         stateChanger: InteractionStateChanger
     ): boolean {
-        return true;
+        if (input.action == InputActionType.NUMBER_PRESS) {
+            const number = parseInt(input.value) - 1;
+            if (number >= 0 && number < actions.length) {
+                const action = actions[number];
+                this.actionSelected(action);
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 
     private actionSelected(action: ActionButton) {

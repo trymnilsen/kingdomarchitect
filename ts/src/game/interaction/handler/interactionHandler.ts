@@ -1,5 +1,6 @@
 import { AssetLoader } from "../../../asset/loader/assetLoader";
 import { Point } from "../../../common/point";
+import { InputAction, InputActionType } from "../../../input/inputAction";
 import { Camera } from "../../../rendering/camera";
 import { RenderContext } from "../../../rendering/renderContext";
 import { World } from "../../world/world";
@@ -94,6 +95,22 @@ export class InteractionHandler {
             }
         }
 
+        this.interactionStateChanger.apply(this.history);
+    }
+
+    onInput(inputAction: InputAction) {
+        const inputHandled = this.history.state.onInput(
+            inputAction,
+            this.interactionStateChanger
+        );
+
+        if (
+            !inputHandled &&
+            inputAction.action == InputActionType.BACK_PRESS &&
+            !this.interactionStateChanger.hasOperations
+        ) {
+            this.interactionStateChanger.pop(undefined);
+        }
         this.interactionStateChanger.apply(this.history);
     }
 

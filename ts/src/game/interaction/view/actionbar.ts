@@ -8,7 +8,8 @@ import { uiColumn } from "../../../ui/dsl/uiColumnDsl";
 import { RowChild, uiRow } from "../../../ui/dsl/uiRowDsl";
 import { uiText } from "../../../ui/dsl/uiTextDsl";
 import { uiAlignment } from "../../../ui/uiAlignment";
-import { fillUiSize, UIView, wrapUiSize } from "../../../ui/uiView";
+import { fillUiSize, wrapUiSize } from "../../../ui/uiSize";
+import { UIView } from "../../../ui/uiView";
 
 export interface ActionButton {
     name: string;

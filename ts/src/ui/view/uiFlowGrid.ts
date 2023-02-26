@@ -1,8 +1,8 @@
 import { Point } from "../../common/point";
 import { UIRenderContext } from "../../rendering/uiRenderContext";
 import { UILayoutContext } from "../uiLayoutContext";
-import { UISize, zeroSize } from "../uiSize";
-import { fillUiSize, UIView, wrapUiSize } from "../uiView";
+import { fillUiSize, UISize, wrapUiSize } from "../uiSize";
+import { UIView } from "../uiView";
 
 export class UIFlowGrid extends UIView {
     private _gridItemMinimumSize: number = 32;

@@ -1,9 +1,9 @@
 import { Point } from "../../common/point";
 import { UIRenderContext } from "../../rendering/uiRenderContext";
-import { calculateAlignment, HorizontalAlignment } from "../uiAlignment";
+import { HorizontalAlignment } from "../uiAlignment";
 import { UILayoutContext } from "../uiLayoutContext";
-import { UISize } from "../uiSize";
-import { fillUiSize, UIView, wrapUiSize } from "../uiView";
+import { fillUiSize, UISize, wrapUiSize } from "../uiSize";
+import { UIView } from "../uiView";
 import { AxisPlacement, insertAndShift } from "./axisPlacement";
 
 export class UIColumn extends UIView {

@@ -1,8 +1,8 @@
 import { Point } from "../../common/point";
 import { UIRenderContext } from "../../rendering/uiRenderContext";
 import { UILayoutContext } from "../uiLayoutContext";
-import { UISize } from "../uiSize";
-import { fillUiSize, UIView, wrapUiSize } from "../uiView";
+import { UISize, fillUiSize, wrapUiSize } from "../uiSize";
+import { UIView } from "../uiView";
 import { UIImageSource } from "./uiImageSource";
 
 export class UIImage extends UIView {

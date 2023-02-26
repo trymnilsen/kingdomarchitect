@@ -2,8 +2,8 @@ import { Point } from "../../common/point";
 import { UIRenderContext } from "../../rendering/uiRenderContext";
 import { VerticalAlignment } from "../uiAlignment";
 import { UILayoutContext } from "../uiLayoutContext";
-import { UISize } from "../uiSize";
-import { fillUiSize, UIView, wrapUiSize } from "../uiView";
+import { UISize, fillUiSize, wrapUiSize } from "../uiSize";
+import { UIView } from "../uiView";
 import { AxisPlacement, insertAndShift } from "./axisPlacement";
 
 export class UIRow extends UIView {

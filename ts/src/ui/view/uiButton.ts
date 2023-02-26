@@ -25,6 +25,10 @@ export class UIButton extends UIBox {
         this._defaultBackground = background;
     }
 
+    override get isFocusable(): boolean {
+        return true;
+    }
+
     override onTapDown(screenPoint: Point): boolean {
         if (this._onTappedBackground) {
             this.background = this._onTappedBackground;

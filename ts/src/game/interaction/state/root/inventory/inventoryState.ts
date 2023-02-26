@@ -1,26 +1,47 @@
 import { Sprite2, sprites2 } from "../../../../../asset/sprite";
+import { Direction } from "../../../../../common/direction";
+import { generateId } from "../../../../../common/idGenerator";
 import { allSides, symmetricSides } from "../../../../../common/sides";
+import { InputAction } from "../../../../../input/inputAction";
 import { bookInkColor } from "../../../../../ui/color";
 import { ninePatchBackground } from "../../../../../ui/dsl/uiBackgroundDsl";
 import { uiBox } from "../../../../../ui/dsl/uiBoxDsl";
 import { uiColumn } from "../../../../../ui/dsl/uiColumnDsl";
 import { spriteImageSource, uiImage } from "../../../../../ui/dsl/uiImageDsl";
 import { uiOffset } from "../../../../../ui/dsl/uiOffsetDsl";
-import { uiSpace } from "../../../../../ui/dsl/uiSpaceDsl";
 import { uiText } from "../../../../../ui/dsl/uiTextDsl";
-import {
-    HorizontalAlignment,
-    uiAlignment,
-} from "../../../../../ui/uiAlignment";
-import { fillUiSize, UIView, wrapUiSize } from "../../../../../ui/uiView";
+import { uiAlignment } from "../../../../../ui/uiAlignment";
+import { fillUiSize, wrapUiSize } from "../../../../../ui/uiSize";
+import { UIView } from "../../../../../ui/uiView";
 import { UIFlowGrid } from "../../../../../ui/view/uiFlowGrid";
 import { UIMasterDetails } from "../../../../../ui/view/uiMasterDetail";
 import { OpenBookUIBackground } from "../../../../../ui/visual/bookBackground";
-import { InventoryComponent } from "../../../../world/component/root/inventory/inventoryComponent";
+import { InventoryComponent } from "../../../../world/component/inventory/inventoryComponent";
 import { InteractionState } from "../../../handler/interactionState";
+import { InteractionStateChanger } from "../../../handler/interactionStateChanger";
+import { ActionButton, getActionbarView } from "../../../view/actionbar";
 import { BuildingState } from "../building/buildingState";
 import { bookTabs } from "../ui/bookTabs";
 import { UIInventoryGridItem } from "./uiInventoryGridItem";
+
+const actions: ActionButton[] = [
+    {
+        id: "drop",
+        name: "Drop",
+    },
+    {
+        id: "equip",
+        name: "Equip",
+    },
+    {
+        id: "location",
+        name: "Locate",
+    },
+    {
+        id: "cancel",
+        name: "Close",
+    },
+];
 
 export interface InventoryItems {
     name: string;
@@ -30,7 +51,8 @@ export interface InventoryItems {
 }
 
 export class InventoryState extends InteractionState {
-    private _masterDetailsView: UIMasterDetails;
+    private _actionbar!: UIView;
+    private _masterDetailsView!: UIMasterDetails;
     private _selectedGridItemView: UIInventoryGridItem | undefined;
     private _items: InventoryItems[] = [];
 
@@ -40,31 +62,6 @@ export class InventoryState extends InteractionState {
 
     constructor() {
         super();
-
-        const gridView = this.getMasterGridView();
-        const detailsView = this.getDetailsView(0);
-
-        const masterView = uiBox({
-            width: 300,
-            height: 400,
-            padding: allSides(32),
-            children: [gridView],
-        });
-
-        this._masterDetailsView = new UIMasterDetails(masterView, detailsView, {
-            width: fillUiSize,
-            height: fillUiSize,
-        });
-
-        this._masterDetailsView.dualBackground = new OpenBookUIBackground();
-
-        this.view = uiBox({
-            width: fillUiSize,
-            height: fillUiSize,
-            padding: allSides(64),
-            alignment: uiAlignment.center,
-            children: [this._masterDetailsView],
-        });
     }
 
     override onActive(): void {
@@ -84,15 +81,78 @@ export class InventoryState extends InteractionState {
             height: fillUiSize,
         });
 
+        this._actionbar = getActionbarView(actions, (action) => {
+            this.actionSelected(action);
+        });
+        this._actionbar.size = {
+            width: fillUiSize,
+            height: wrapUiSize,
+        };
+
         this._masterDetailsView.dualBackground = new OpenBookUIBackground();
 
         this.view = uiBox({
             width: fillUiSize,
             height: fillUiSize,
-            padding: allSides(64),
-            alignment: uiAlignment.center,
-            children: [this._masterDetailsView],
+            children: [
+                uiColumn({
+                    width: fillUiSize,
+                    height: fillUiSize,
+                    children: [
+                        {
+                            weight: 1,
+                            child: uiBox({
+                                id: "inventoryMasterDetails",
+                                width: fillUiSize,
+                                height: fillUiSize,
+                                padding: allSides(64),
+                                children: [this._masterDetailsView],
+                            }),
+                        },
+                        {
+                            child: this._actionbar,
+                        },
+                    ],
+                }),
+            ],
         });
+    }
+
+    override onInput(
+        input: InputAction,
+        stateChanger: InteractionStateChanger
+    ): boolean {
+        const view = this.view;
+        if (!!view) {
+            let direction: Direction | undefined;
+            switch (input.value) {
+                case "a":
+                    direction = Direction.Left;
+                    break;
+                case "d":
+                    direction = Direction.Right;
+                    break;
+                case "w":
+                    direction = Direction.Up;
+                    break;
+                case "s":
+                    direction = Direction.Down;
+                    break;
+                default:
+                    break;
+            }
+            if (!!direction) {
+                view.dispatchUIEvent({
+                    type: "direction",
+                    direction: direction,
+                });
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 
     private itemSelected(index: number, view: UIInventoryGridItem) {
@@ -103,6 +163,13 @@ export class InventoryState extends InteractionState {
 
         this._selectedGridItemView = view;
         view.isSelected = true;
+    }
+
+    private actionSelected(action: ActionButton) {
+        console.log("Action pressed: ", action);
+        if (action.id == "cancel") {
+            this.context.stateChanger.pop(undefined);
+        }
     }
 
     private getInventoryItemList() {
@@ -127,7 +194,7 @@ export class InventoryState extends InteractionState {
         });
         gridView.gridItemSize = 50;
 
-        for (let i = 0; i < 8; i++) {
+        for (let i = 0; i < 12; i++) {
             const inventoryItem = this._items[i];
             if (!!inventoryItem) {
                 const isSelected = i == 0;

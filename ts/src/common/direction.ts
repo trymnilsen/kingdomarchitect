@@ -1,10 +1,10 @@
 import { randomEntry } from "./array";
 
 export enum Direction {
-    Up,
-    Down,
-    Left,
-    Right,
+    Up = "up",
+    Down = "down",
+    Left = "left",
+    Right = "right",
 }
 
 export function invertDirection(direction: Direction) {

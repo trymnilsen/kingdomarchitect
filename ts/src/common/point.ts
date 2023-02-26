@@ -108,9 +108,19 @@ export function pointEquals(point: Point, otherPoint: Point): boolean {
  * @returns the distance between the points
  */
 export function distance(from: Point, to: Point): number {
+    return Math.sqrt(distanceSquared(from, to));
+}
+
+/**
+ * Measure the distance between two points squared
+ * @param from the coordinate to measure from
+ * @param to the coordinate to measure to
+ * @returns the distance squared
+ */
+export function distanceSquared(from: Point, to: Point): number {
     const xDiff = to.x - from.x;
     const yDiff = to.y - from.y;
-    return Math.sqrt(xDiff * xDiff + yDiff * yDiff);
+    return xDiff * xDiff + yDiff * yDiff;
 }
 
 export function manhattanDistance(from: Point, to: Point): number {
@@ -242,4 +252,44 @@ export function getSizeOfPoints(points: Point[]): Point {
         x: highestX - lowestX + 1,
         y: highestY - lowestY + 1,
     };
+}
+
+/**
+ * Calculates the dot product of the to points as vectors
+ * @param a the first component of the dot product
+ * @param b the second component of the dot product
+ * @returns the dot product scalar
+ */
+export function dotProduct(a: Point, b: Point): number {
+    return a.x * b.x + a.y * b.y;
+}
+
+/**
+ * Find the point on a line presented by A and B points that is closest to
+ * a given point P
+ * @param a the start of the line segment
+ * @param b the end of the line segment
+ * @param p the point we want to find the closest point on the line to
+ */
+export function closestPointOnLine(a: Point, b: Point, p: Point): Point {
+    const abVector = subtractPoint(b, a);
+    const apVector = subtractPoint(p, a);
+    const projection = dotProduct(apVector, abVector);
+    const abDistanceSquared = distanceSquared({ x: 0, y: 0 }, abVector);
+    if (abDistanceSquared == 0) {
+        return a;
+    }
+    const t = projection / abDistanceSquared;
+    //If t is outside the range of 0-1 the closest point should be the end
+    //of our line
+    if (t <= 0) {
+        return a;
+    } else if (t >= 1) {
+        return b;
+    } else {
+        //The closest point was somewhere on our line so we start at a
+        //and add the amout of ab (as it is the whole line between a and b)
+        //and multiply it with t
+        return addPoint(a, multiplyPoint(abVector, t));
+    }
 }

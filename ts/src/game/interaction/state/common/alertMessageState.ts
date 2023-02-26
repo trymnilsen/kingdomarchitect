@@ -7,7 +7,7 @@ import { uiButton } from "../../../../ui/dsl/uiButtonDsl";
 import { uiColumn } from "../../../../ui/dsl/uiColumnDsl";
 import { uiSpace } from "../../../../ui/dsl/uiSpaceDsl";
 import { uiText } from "../../../../ui/dsl/uiTextDsl";
-import { fillUiSize, wrapUiSize } from "../../../../ui/uiView";
+import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize";
 import { InteractionState } from "../../handler/interactionState";
 
 export class AlertMessageState extends InteractionState {

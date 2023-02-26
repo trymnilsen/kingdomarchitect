@@ -1,12 +1,12 @@
 import { sprites2 } from "../../../../../asset/sprite";
 import { allSides } from "../../../../../common/sides";
 import { ninePatchBackground } from "../../../../../ui/dsl/uiBackgroundDsl";
-import { uiBox } from "../../../../../ui/dsl/uiBoxDsl";
 import { uiButton } from "../../../../../ui/dsl/uiButtonDsl";
 import { uiColumn } from "../../../../../ui/dsl/uiColumnDsl";
 import { uiSpace } from "../../../../../ui/dsl/uiSpaceDsl";
 import { HorizontalAlignment } from "../../../../../ui/uiAlignment";
-import { UIView, wrapUiSize } from "../../../../../ui/uiView";
+import { wrapUiSize } from "../../../../../ui/uiSize";
+import { UIView } from "../../../../../ui/uiView";
 
 export function bookTabs(onTap: (tab: number) => void): UIView {
     return uiColumn({

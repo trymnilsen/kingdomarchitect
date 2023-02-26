@@ -189,7 +189,7 @@ export const sprites = {
       "y": 128
     }
   },
-  "book_grid_item": {
+  "blue_book": {
     "bin": "0",
     "defintion": {
       "frames": 1,
@@ -199,13 +199,23 @@ export const sprites = {
       "y": 128
     }
   },
-  "book_grid_item_focused": {
+  "book_grid_item": {
     "bin": "0",
     "defintion": {
       "frames": 1,
       "w": 32,
       "h": 32,
       "x": 64,
+      "y": 128
+    }
+  },
+  "book_grid_item_focused": {
+    "bin": "0",
+    "defintion": {
+      "frames": 1,
+      "w": 32,
+      "h": 32,
+      "x": 96,
       "y": 128
     }
   },
@@ -255,7 +265,7 @@ export const sprites = {
       "frames": 1,
       "w": 32,
       "h": 32,
-      "x": 96,
+      "x": 232,
       "y": 128
     }
   },
@@ -265,8 +275,8 @@ export const sprites = {
       "frames": 1,
       "w": 48,
       "h": 48,
-      "x": 232,
-      "y": 128
+      "x": 168,
+      "y": 144
     }
   },
   "gem_resource": {
@@ -275,8 +285,48 @@ export const sprites = {
       "frames": 1,
       "w": 32,
       "h": 32,
-      "x": 168,
-      "y": 144
+      "x": 128,
+      "y": 168
+    }
+  },
+  "gold_coins": {
+    "bin": "0",
+    "defintion": {
+      "frames": 1,
+      "w": 32,
+      "h": 32,
+      "x": 216,
+      "y": 160
+    }
+  },
+  "health_potion": {
+    "bin": "0",
+    "defintion": {
+      "frames": 1,
+      "w": 32,
+      "h": 32,
+      "x": 248,
+      "y": 160
+    }
+  },
+  "mana_potion": {
+    "bin": "0",
+    "defintion": {
+      "frames": 1,
+      "w": 32,
+      "h": 32,
+      "x": 128,
+      "y": 200
+    }
+  },
+  "scroll": {
+    "bin": "0",
+    "defintion": {
+      "frames": 1,
+      "w": 32,
+      "h": 32,
+      "x": 128,
+      "y": 232
     }
   },
   "stone_resource": {
@@ -285,8 +335,8 @@ export const sprites = {
       "frames": 1,
       "w": 32,
       "h": 32,
-      "x": 200,
-      "y": 144
+      "x": 160,
+      "y": 192
     }
   },
   "stone_slate_background": {
@@ -295,8 +345,8 @@ export const sprites = {
       "frames": 1,
       "w": 48,
       "h": 48,
-      "x": 128,
-      "y": 176
+      "x": 160,
+      "y": 224
     }
   },
   "stone_slate_background_2x": {
@@ -305,8 +355,8 @@ export const sprites = {
       "frames": 1,
       "w": 48,
       "h": 48,
-      "x": 128,
-      "y": 224
+      "x": 208,
+      "y": 192
     }
   },
   "stone_slate_border": {
@@ -315,8 +365,8 @@ export const sprites = {
       "frames": 1,
       "w": 16,
       "h": 16,
-      "x": 128,
-      "y": 272
+      "x": 216,
+      "y": 144
     }
   },
   "stone_slate_border_selected": {
@@ -325,7 +375,7 @@ export const sprites = {
       "frames": 1,
       "w": 16,
       "h": 16,
-      "x": 144,
+      "x": 128,
       "y": 272
     }
   },
@@ -335,41 +385,11 @@ export const sprites = {
       "frames": 1,
       "w": 48,
       "h": 48,
-      "x": 176,
-      "y": 176
+      "x": 208,
+      "y": 240
     }
   },
   "stone_wood_walls_bottom": {
-    "bin": "0",
-    "defintion": {
-      "frames": 1,
-      "w": 40,
-      "h": 40,
-      "x": 176,
-      "y": 224
-    }
-  },
-  "stone_wood_walls_br": {
-    "bin": "0",
-    "defintion": {
-      "frames": 1,
-      "w": 40,
-      "h": 40,
-      "x": 224,
-      "y": 176
-    }
-  },
-  "stone_wood_walls_horizontal": {
-    "bin": "0",
-    "defintion": {
-      "frames": 1,
-      "w": 40,
-      "h": 40,
-      "x": 216,
-      "y": 224
-    }
-  },
-  "stone_wood_walls_lb": {
     "bin": "0",
     "defintion": {
       "frames": 1,
@@ -379,7 +399,7 @@ export const sprites = {
       "y": 0
     }
   },
-  "stone_wood_walls_lbr": {
+  "stone_wood_walls_br": {
     "bin": "0",
     "defintion": {
       "frames": 1,
@@ -389,7 +409,7 @@ export const sprites = {
       "y": 40
     }
   },
-  "stone_wood_walls_left": {
+  "stone_wood_walls_horizontal": {
     "bin": "0",
     "defintion": {
       "frames": 1,
@@ -399,7 +419,7 @@ export const sprites = {
       "y": 80
     }
   },
-  "stone_wood_walls_lu": {
+  "stone_wood_walls_lb": {
     "bin": "0",
     "defintion": {
       "frames": 1,
@@ -409,7 +429,7 @@ export const sprites = {
       "y": 120
     }
   },
-  "stone_wood_walls_lub": {
+  "stone_wood_walls_lbr": {
     "bin": "0",
     "defintion": {
       "frames": 1,
@@ -419,17 +439,17 @@ export const sprites = {
       "y": 160
     }
   },
-  "stone_wood_walls_lur": {
+  "stone_wood_walls_left": {
     "bin": "0",
     "defintion": {
       "frames": 1,
       "w": 40,
       "h": 40,
-      "x": 264,
+      "x": 256,
       "y": 200
     }
   },
-  "stone_wood_walls_lurb": {
+  "stone_wood_walls_lu": {
     "bin": "0",
     "defintion": {
       "frames": 1,
@@ -439,7 +459,7 @@ export const sprites = {
       "y": 240
     }
   },
-  "stone_wood_walls_right": {
+  "stone_wood_walls_lub": {
     "bin": "0",
     "defintion": {
       "frames": 1,
@@ -449,7 +469,7 @@ export const sprites = {
       "y": 288
     }
   },
-  "stone_wood_walls_scaffold": {
+  "stone_wood_walls_lur": {
     "bin": "0",
     "defintion": {
       "frames": 1,
@@ -459,7 +479,7 @@ export const sprites = {
       "y": 288
     }
   },
-  "stone_wood_walls_single": {
+  "stone_wood_walls_lurb": {
     "bin": "0",
     "defintion": {
       "frames": 1,
@@ -469,7 +489,7 @@ export const sprites = {
       "y": 288
     }
   },
-  "stone_wood_walls_ubr": {
+  "stone_wood_walls_right": {
     "bin": "0",
     "defintion": {
       "frames": 1,
@@ -479,37 +499,37 @@ export const sprites = {
       "y": 288
     }
   },
-  "stone_wood_walls_up": {
+  "stone_wood_walls_scaffold": {
     "bin": "0",
     "defintion": {
       "frames": 1,
       "w": 40,
       "h": 40,
       "x": 160,
-      "y": 280
+      "y": 288
     }
   },
-  "stone_wood_walls_ur": {
+  "stone_wood_walls_single": {
     "bin": "0",
     "defintion": {
       "frames": 1,
       "w": 40,
       "h": 40,
       "x": 200,
-      "y": 280
+      "y": 288
     }
   },
-  "stone_wood_walls_vertical": {
+  "stone_wood_walls_ubr": {
     "bin": "0",
     "defintion": {
       "frames": 1,
       "w": 40,
       "h": 40,
       "x": 240,
-      "y": 280
+      "y": 288
     }
   },
-  "swipe_effect": {
+  "stone_wood_walls_up": {
     "bin": "0",
     "defintion": {
       "frames": 1,
@@ -519,14 +539,44 @@ export const sprites = {
       "y": 280
     }
   },
+  "stone_wood_walls_ur": {
+    "bin": "0",
+    "defintion": {
+      "frames": 1,
+      "w": 40,
+      "h": 40,
+      "x": 328,
+      "y": 0
+    }
+  },
+  "stone_wood_walls_vertical": {
+    "bin": "0",
+    "defintion": {
+      "frames": 1,
+      "w": 40,
+      "h": 40,
+      "x": 328,
+      "y": 40
+    }
+  },
+  "swipe_effect": {
+    "bin": "0",
+    "defintion": {
+      "frames": 1,
+      "w": 40,
+      "h": 40,
+      "x": 328,
+      "y": 80
+    }
+  },
   "wood_resource": {
     "bin": "0",
     "defintion": {
       "frames": 1,
       "w": 32,
       "h": 32,
-      "x": 296,
-      "y": 240
+      "x": 328,
+      "y": 120
     }
   }
 }

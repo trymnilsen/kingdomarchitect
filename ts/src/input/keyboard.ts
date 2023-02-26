@@ -1,11 +1,12 @@
-import { InputAction } from "./inputAction";
+import { InputAction, InputActionType } from "./inputAction";
 import { Event, EventListener } from "../common/event";
 
-export type KeyboardMap = { [key: string]: InputAction };
+export type KeyboardMap = { [key: string]: InputActionType };
 
 export class Keyboard {
     private keyboardMap: KeyboardMap;
     private _keyEvent: Event<InputAction>;
+
     public constructor() {
         this.keyboardMap = getKeyboardMap();
         this._keyEvent = new Event();
@@ -22,7 +23,11 @@ export class Keyboard {
     private onKeyPress = (event: KeyboardEvent) => {
         const action = this.keyboardMap[event.key.toLowerCase()];
         if (!!action) {
-            this._keyEvent.publish(action);
+            this._keyEvent.publish({
+                action: action,
+                isShifted: event.shiftKey,
+                value: event.key,
+            });
         }
     };
 }
@@ -46,11 +51,21 @@ export function getKeyboardMap(): KeyboardMap {
 
 export const UserKeyboardMapStorageKey = "KEYBOARD_USER_MAP";
 export const DefaultKeyboardMap: KeyboardMap = {
-    d: InputAction.RIGHT_PRESS,
-    a: InputAction.LEFT_PRESS,
-    w: InputAction.UP_PRESS,
-    s: InputAction.DOWN_PRESS,
-    q: InputAction.BACK_PRESS,
-    e: InputAction.ACTION_PRESS,
-    r: InputAction.MENU_PRESS,
+    d: InputActionType.RIGHT_PRESS,
+    a: InputActionType.LEFT_PRESS,
+    w: InputActionType.UP_PRESS,
+    s: InputActionType.DOWN_PRESS,
+    q: InputActionType.BACK_PRESS,
+    e: InputActionType.ACTION_PRESS,
+    r: InputActionType.MENU_PRESS,
+    1: InputActionType.NUMBER_PRESS,
+    2: InputActionType.NUMBER_PRESS,
+    3: InputActionType.NUMBER_PRESS,
+    4: InputActionType.NUMBER_PRESS,
+    5: InputActionType.NUMBER_PRESS,
+    6: InputActionType.NUMBER_PRESS,
+    7: InputActionType.NUMBER_PRESS,
+    8: InputActionType.NUMBER_PRESS,
+    9: InputActionType.NUMBER_PRESS,
+    0: InputActionType.NUMBER_PRESS,
 };

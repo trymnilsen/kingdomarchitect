@@ -4,7 +4,9 @@ import {
     adjacentPoints,
     changeX,
     changeY,
+    closestPointOnLine,
     distance,
+    dotProduct,
     invert,
     isPointAdjacentTo,
     multiplyPoint,
@@ -116,5 +118,52 @@ describe("Point test", () => {
         const pointTwo = { x: 4, y: 2 };
         const isAdjacent = isPointAdjacentTo(pointOne, pointTwo);
         assert.isFalse(isAdjacent);
+    });
+
+    it("dot product", () => {
+        const pointOne = { x: -6, y: 8 };
+        const pointTwo = { x: 5, y: 12 };
+        const dot = dotProduct(pointOne, pointTwo);
+        assert.equal(dot, 66);
+    });
+
+    it("closest point on vertical line", () => {
+        const aPoint = { x: 2, y: 10 };
+        const bPoint = { x: 2, y: 50 };
+        const pPoint = { x: 6, y: 30 };
+        const point = closestPointOnLine(aPoint, bPoint, pPoint);
+        assert.deepEqual(point, { x: 2, y: 30 });
+    });
+
+    it("closest point on horizontal line", () => {
+        const aPoint = { x: 0, y: 0 };
+        const bPoint = { x: 20, y: 0 };
+        const pPoint = { x: 10, y: 10 };
+        const point = closestPointOnLine(aPoint, bPoint, pPoint);
+        assert.deepEqual(point, { x: 10, y: 0 });
+    });
+
+    it("closest point on diagonal line", () => {
+        const aPoint = { x: 0, y: 0 };
+        const bPoint = { x: 10, y: 10 };
+        const pPoint = { x: 10, y: 0 };
+        const point = closestPointOnLine(aPoint, bPoint, pPoint);
+        assert.deepEqual(point, { x: 5, y: 5 });
+    });
+
+    it("closest point on line where the point is the end", () => {
+        const aPoint = { x: 0, y: 0 };
+        const bPoint = { x: 10, y: 10 };
+        const pPoint = { x: 500, y: 500 };
+        const point = closestPointOnLine(aPoint, bPoint, pPoint);
+        assert.deepEqual(point, { x: 10, y: 10 });
+    });
+
+    it("closest point on line where the point is the start", () => {
+        const aPoint = { x: 2, y: 2 };
+        const bPoint = { x: 10, y: 10 };
+        const pPoint = { x: -200, y: -200 };
+        const point = closestPointOnLine(aPoint, bPoint, pPoint);
+        assert.deepEqual(point, { x: 2, y: 2 });
     });
 });

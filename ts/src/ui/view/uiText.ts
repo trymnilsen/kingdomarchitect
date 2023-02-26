@@ -4,8 +4,8 @@ import { defaultTextStyle, TextStyle } from "../../rendering/text/textStyle";
 import { UIRenderContext } from "../../rendering/uiRenderContext";
 import { calculateAlignment, uiAlignment } from "../uiAlignment";
 import { UILayoutContext } from "../uiLayoutContext";
-import { UISize } from "../uiSize";
-import { fillUiSize, UIView, wrapUiSize } from "../uiView";
+import { fillUiSize, UISize, wrapUiSize } from "../uiSize";
+import { UIView } from "../uiView";
 
 export class UIText extends UIView {
     private _textStyle: TextStyle = defaultTextStyle;

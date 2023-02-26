@@ -6,7 +6,7 @@ import { woodResourceItem } from "../../../../data/inventory/resources";
 import { RenderContext } from "../../../../rendering/renderContext";
 import { BlinkingImageAnimation } from "../../../../rendering/visual/blinkingImageAnimation";
 import { BuildJob } from "../../../world/actor/jobs/buildJob";
-import { InventoryComponent } from "../../../world/component/root/inventory/inventoryComponent";
+import { InventoryComponent } from "../../../world/component/inventory/inventoryComponent";
 import { housePrefab } from "../../../world/prefab/housePrefab";
 import { GroundTile } from "../../../world/tile/ground";
 import { TileSize } from "../../../world/tile/tile";

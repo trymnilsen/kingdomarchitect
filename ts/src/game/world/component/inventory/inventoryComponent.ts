@@ -1,6 +1,16 @@
-import { InventoryItem } from "../../../../../data/inventory/inventoryItem";
-import { woodResourceItem } from "../../../../../data/inventory/resources";
-import { EntityComponent } from "../../entityComponent";
+import { InventoryItem } from "../../../../data/inventory/inventoryItem";
+import {
+    bagOfGlitter,
+    blueBook,
+    gemResource,
+    goldCoins,
+    healthPotion,
+    manaPotion,
+    scroll,
+    stoneResource,
+    woodResourceItem,
+} from "../../../../data/inventory/resources";
+import { EntityComponent } from "../entityComponent";
 
 type InventoryEntry = { amount: number; item: InventoryItem };
 
@@ -9,6 +19,38 @@ export class InventoryComponent extends EntityComponent {
         [woodResourceItem.id]: {
             amount: 2000,
             item: woodResourceItem,
+        },
+        [stoneResource.id]: {
+            amount: 47,
+            item: stoneResource,
+        },
+        [bagOfGlitter.id]: {
+            amount: 1,
+            item: bagOfGlitter,
+        },
+        [gemResource.id]: {
+            amount: 3,
+            item: gemResource,
+        },
+        [goldCoins.id]: {
+            amount: 219,
+            item: goldCoins,
+        },
+        [healthPotion.id]: {
+            amount: 2,
+            item: healthPotion,
+        },
+        [manaPotion.id]: {
+            amount: 1,
+            item: manaPotion,
+        },
+        [scroll.id]: {
+            amount: 1,
+            item: scroll,
+        },
+        [blueBook.id]: {
+            amount: 1,
+            item: blueBook,
         },
     };
 

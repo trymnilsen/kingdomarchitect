@@ -3,17 +3,20 @@ import { Event, EventListener } from "../common/event";
 import { addPoint, Point, zeroPoint } from "../common/point";
 import { Sides, zeroSides } from "../common/sides";
 import { UIRenderContext } from "../rendering/uiRenderContext";
-import { UIEvent } from "./event/uiEvent";
+import { isTapEvent, UIEvent, UIInputEvent, UITapEvent } from "./event/uiEvent";
+import {
+    closestViewByEdge,
+    getFocusableViews,
+    isViewInDirection,
+} from "./focus/focusHelpers";
+import { FocusState } from "./focus/focusState";
 import { UILayoutContext } from "./uiLayoutContext";
-import { UISize } from "./uiSize";
+import { fillUiSize, UISize } from "./uiSize";
 
 export interface UIAction {
     type: string;
     data: unknown;
 }
-
-export const wrapUiSize = -1;
-export const fillUiSize = -2;
 
 export abstract class UIView {
     private _parent: UIView | null = null;
@@ -24,6 +27,7 @@ export abstract class UIView {
     private _id: string | null = null;
     private _children: UIView[] = [];
     private _uiAction: Event<UIAction> = new Event();
+    private _focusState: FocusState | undefined;
     protected _measuredSize: UISize | null = null;
     protected _isDirty: boolean = true;
 
@@ -34,6 +38,9 @@ export abstract class UIView {
         this._padding = value;
     }
 
+    /**
+     * The offset of this view from its parent
+     */
     get offset(): Point {
         return this._offset;
     }
@@ -41,45 +48,164 @@ export abstract class UIView {
         this._offset = value;
     }
 
+    /**
+     * The wanted size of this view. For the final size see `_measuredSize`.
+     */
     get size(): UISize {
         return this._size;
     }
+
     set size(size: UISize) {
         this._size = size;
     }
 
+    /**
+     * The id of this view
+     */
     get id(): string | null {
         return this._id;
     }
+
     set id(id: string | null) {
         this._id = id;
     }
 
+    /**
+     * The parent of this view
+     */
     get parent(): UIView | null {
         return this._parent;
     }
+
     set parent(parent: UIView | null) {
         this._parent = parent;
     }
 
+    /**
+     * The position of this view in screenspace
+     */
     get screenPosition(): Point {
         return this._screenPosition;
     }
+
     set screenPosition(position: Point) {
         this._screenPosition = position;
     }
 
+    /**
+     * Return the measured size of this view. Can be null if this view
+     * has never been layed out.
+     */
     get measuredSize(): UISize | null {
         return this._measuredSize;
     }
+
+    /**
+     * Has this view previously been layed out and have a measured size?
+     */
+    get isLayedOut(): Boolean {
+        return !!this._measuredSize;
+    }
+
+    /**
+     * Returns a collection of the direct children of this view. For all nested
+     * views use the `getViews` method.
+     */
     get children(): UIView[] {
         return this._children;
     }
+
+    /**
+     * Does this view have changes since last time it was layed out
+     */
     get isDirty(): boolean {
         return this._isDirty;
     }
+
+    /**
+     * The source of UI events triggered on this view
+     */
     get uiAction(): EventListener<UIAction> {
         return this._uiAction;
+    }
+
+    /**
+     * Is this view considered focusable? If a view is focusable it will
+     * able considered for keyboard and directional navigation
+     */
+    get isFocusable(): boolean {
+        return false;
+    }
+
+    /**
+     * The corners in a clockwise order. Will return an array of four points.
+     * Note: If the view has not been layed out they will all be the value of
+     * the default screenPosition.
+     */
+    get corners(): Point[] {
+        if (!!this._measuredSize) {
+            return [
+                //Top left
+                this._screenPosition,
+                //Top right
+                addPoint(this._screenPosition, {
+                    x: this._measuredSize.width,
+                    y: 0,
+                }),
+                //Bottom right
+                addPoint(this._screenPosition, {
+                    x: this._measuredSize.width,
+                    y: this._measuredSize.height,
+                }),
+                //Bottom left
+                addPoint(this._screenPosition, {
+                    x: 0,
+                    y: this._measuredSize.height,
+                }),
+            ];
+        } else {
+            return [
+                this._screenPosition,
+                this._screenPosition,
+                this._screenPosition,
+                this._screenPosition,
+            ];
+        }
+    }
+
+    /**
+     * The center position of this view.
+     * Note: if the view has not been layed out the position will be the same
+     * as the screen position
+     */
+    get center(): Point {
+        if (!!this._measuredSize) {
+            const halfWidth = this._measuredSize.width / 2;
+            const halfHeight = this._measuredSize.height / 2;
+            return addPoint(this._screenPosition, {
+                x: halfWidth,
+                y: halfHeight,
+            });
+        } else {
+            return this._screenPosition;
+        }
+    }
+
+    /**
+     * The current focus state attached to this view. Will attempt to traverse
+     * up the tree if this view is attatched to a parent to find the root focus
+     * state. If there is no parent a new focus state will be made if the is
+     * one.
+     */
+    get focusState(): FocusState {
+        if (!!this._parent) {
+            return this._parent.focusState;
+        } else {
+            if (!this._focusState) {
+                this._focusState = new FocusState();
+            }
+            return this._focusState;
+        }
     }
 
     constructor(size: UISize) {
@@ -132,6 +258,30 @@ export abstract class UIView {
     removeView(view: UIView) {
         view.dispose();
         this._children = this._children.filter((child) => child != view);
+    }
+
+    /**
+     * Visit and return all views (including self and nested).
+     * @param filter optional filter to apply to children returned
+     */
+    getViews(filter?: (view: UIView) => boolean): UIView[] {
+        const views: UIView[] = [];
+        let viewsToFilter: UIView[] = [this];
+
+        while (viewsToFilter.length > 0) {
+            const view = viewsToFilter.pop()!;
+
+            // If there is a filter and it matches or there is no filter
+            // add the view to the returned list of views
+            if ((filter && filter(view)) || !filter) {
+                views.push(view);
+            }
+            for (const child of view._children) {
+                viewsToFilter.push(child);
+            }
+        }
+
+        return views;
     }
 
     /**
@@ -193,6 +343,9 @@ export abstract class UIView {
         return false;
     }
 
+    onFocus() {}
+    onFocusLost() {}
+
     /**
      * Bubble a `UIAction` upwards to parents.
      * Will first trigger the views `uiAction` event listeners and then pass
@@ -212,6 +365,47 @@ export abstract class UIView {
      * @returns if the event was consumed by any children
      */
     dispatchUIEvent(event: UIEvent): boolean {
+        if (isTapEvent(event)) {
+            return this.dispatchTapEvent(event);
+        } else if ((event.type = "direction")) {
+            return this.handleDirectionEvent(event);
+        } else {
+            console.warn("Unrecognised event type: ", event);
+            //Input type was not recognised so it will not be handled
+            return false;
+        }
+    }
+
+    /**
+     * Test if the screen point is within the bounds of this view
+     * Return false from this method will still do hit testing on
+     * children. This might return true if something wants to be considered
+     * opaque. Eg a background or some padding.
+     * @param screenPoint
+     * @returns
+     */
+    abstract hitTest(screenPoint: Point): boolean;
+    /**
+     * Requests the view to layout itself and any children
+     * @param constraints the size constraints for the parent
+     * @return the size of the view
+     */
+    abstract layout(
+        layoutContext: UILayoutContext,
+        constraints: UISize
+    ): UISize;
+
+    /**
+     * Request to draw this view
+     */
+    abstract draw(context: UIRenderContext): void;
+
+    /**
+     * Dispatch a tap event to this view and its children to check if its handled
+     * @param event the tap event that occured
+     * @returns if the event was handled
+     */
+    private dispatchTapEvent(event: UITapEvent): boolean {
         let handled = false;
         // check if this view is within bounds, if it its we dispatch the event
         // to children. Then run the tap events if it hit tests
@@ -251,26 +445,45 @@ export abstract class UIView {
     }
 
     /**
-     * Test if the screen point is within the bounds of this view
-     * Return false from this method will still do hit testing on
-     * children. This might return true if something wants to be considered
-     * opaque. Eg a background or some padding.
-     * @param screenPoint
-     * @returns
+     * Handle the input event by attempting to focus the closest
+     * focusable view in the whole view hierachy of this view and its children,
+     * in the direction of the event. Will change the focus of this
+     * view hierachy if there is a view considered adjacent.
+     * @param event the input event to handle
+     * @returns true if there was a view to focus, false if not
+     *
      */
-    abstract hitTest(screenPoint: Point): boolean;
-    /**
-     * Requests the view to layout itself and any children
-     * @param constraints the size constraints for the parent
-     * @return the size of the view
-     */
-    abstract layout(
-        layoutContext: UILayoutContext,
-        constraints: UISize
-    ): UISize;
-
-    /**
-     * Request to draw this view
-     */
-    abstract draw(context: UIRenderContext): void;
+    private handleDirectionEvent(event: UIInputEvent): boolean {
+        //Get all the focusable views
+        const focusableViews = getFocusableViews(this);
+        //Get the currently focused view
+        const currentlyFocusedView = this.focusState.currentFocus;
+        if (!!currentlyFocusedView) {
+            //Find the view from the directional sector that has an edge closest to
+            //currently selected view
+            const viewsInDirectionalSector = focusableViews.filter((view) => {
+                const isInDirection = isViewInDirection(
+                    view,
+                    currentlyFocusedView,
+                    event.direction
+                );
+                return isInDirection && view != currentlyFocusedView;
+            });
+            if (viewsInDirectionalSector.length > 0) {
+                const closestView = closestViewByEdge(
+                    currentlyFocusedView,
+                    viewsInDirectionalSector
+                );
+                this.focusState.setFocus(closestView);
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            //No current focus exist so we pick the view closest to the top left
+            const firstFocusResult =
+                this.focusState.setFirstFocus(focusableViews);
+            return firstFocusResult;
+        }
+    }
 }

@@ -3,7 +3,7 @@ import { PathSearch } from "../../path/search";
 import { RenderContext } from "../../rendering/renderContext";
 import { JobQueue } from "./component/job/jobQueue";
 import { JobQueueComponent } from "./component/job/jobQueueComponent";
-import { InventoryComponent } from "./component/root/inventory/inventoryComponent";
+import { InventoryComponent } from "./component/inventory/inventoryComponent";
 import { PathFindingComponent } from "./component/root/path/pathFindingComponent";
 import { Ground } from "./component/tile/ground";
 import { TilesComponent } from "./component/tile/tilesComponent";

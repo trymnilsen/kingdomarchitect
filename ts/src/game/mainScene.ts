@@ -41,7 +41,9 @@ export class MainScene implements Scene {
         this.interactionHandler.onTapUp(screenPoint);
     }
 
-    input(action: InputAction): void {}
+    input(action: InputAction): void {
+        this.interactionHandler.onInput(action);
+    }
 
     drawScene(context: RenderContext): void {
         this.world.onDraw(context);

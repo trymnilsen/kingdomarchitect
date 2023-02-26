@@ -5,7 +5,7 @@ import { RenderContext } from "../../../../rendering/renderContext";
 import { BlinkingImageAnimation } from "../../../../rendering/visual/blinkingImageAnimation";
 import { HealthComponent } from "../../component/health/healthComponent";
 import { TreeComponent } from "../../component/resource/treeComponent";
-import { InventoryComponent } from "../../component/root/inventory/inventoryComponent";
+import { InventoryComponent } from "../../component/inventory/inventoryComponent";
 import { TilesComponent } from "../../component/tile/tilesComponent";
 import { Entity } from "../../entity/entity";
 import { treePrefab } from "../../prefab/treePrefab";

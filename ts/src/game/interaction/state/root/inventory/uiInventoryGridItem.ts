@@ -3,8 +3,7 @@ import { allSides } from "../../../../../common/sides";
 import { UIRenderContext } from "../../../../../rendering/uiRenderContext";
 import { ninePatchBackground } from "../../../../../ui/dsl/uiBackgroundDsl";
 import { UILayoutContext } from "../../../../../ui/uiLayoutContext";
-import { UISize } from "../../../../../ui/uiSize";
-import { fillUiSize } from "../../../../../ui/uiView";
+import { fillUiSize, UISize } from "../../../../../ui/uiSize";
 import { UIButton } from "../../../../../ui/view/uiButton";
 
 export class UIInventoryGridItem extends UIButton {
@@ -52,6 +51,7 @@ export class UIInventoryGridItem extends UIButton {
             sprite: this.sprite,
         });
 
+        /*
         if (this.isSelected) {
             context.drawNinePatchSprite({
                 x: this.screenPosition.x - 4,
@@ -62,6 +62,6 @@ export class UIInventoryGridItem extends UIButton {
                 sprite: sprites2.cursor,
                 sides: allSides(12),
             });
-        }
+        }*/
     }
 }
