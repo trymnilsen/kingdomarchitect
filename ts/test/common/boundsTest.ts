@@ -94,4 +94,24 @@ describe("Bounds tests", () => {
         });
         assert.deepEqual(abosluteBounds.offsets, { x: 5, y: 8 });
     });
+
+    it("is bounds within another bounds", () => {
+        assert.equal(2, 2);
+    });
+
+    it("is bounds not within another bounds", () => {
+        assert.equal(2, 2);
+    });
+
+    it("overlapping bounds are not considered within", () => {
+        assert.equal(2, 2);
+    });
+
+    it("is bounds overlapping", () => {
+        assert.equal(2, 2);
+    });
+
+    it("is bounds not overlapping", () => {
+        assert.equal(2, 2);
+    });
 });

@@ -30,6 +30,7 @@ export function getActionbarView(
                         child: uiButton({
                             width: 48,
                             height: 48,
+                            id: `actionButton${action.name}`,
                             onTapCallback: () => {
                                 console.log("Action tapped: ", action);
                                 onClick(action);

@@ -128,6 +128,25 @@ export function manhattanDistance(from: Point, to: Point): number {
 }
 
 /**
+ * Measures the distance between to points using the manhattan algorithm.
+ * (Adding the x and y components) and multiplies a weight to each component
+ * @param from the point to measure from
+ * @param to the point to measure to
+ * @param xWeight the factor to multiply the x component with
+ * @param yWeight the factor to multiply the y component with
+ */
+export function weightedManhattanDistance(
+    from: Point,
+    to: Point,
+    xWeight: number,
+    yWeight: number
+): number {
+    const xDistance = Math.abs(to.x - from.x);
+    const yDistance = Math.abs(to.y - from.y);
+    return xDistance * xWeight + yDistance * yWeight;
+}
+
+/**
  * Gets the coordinate of the point that is adjacent in the provided direction
  * @param point the point to create an adjacent coordinate from
  * @param direction the direction the of the adjacent coordinate

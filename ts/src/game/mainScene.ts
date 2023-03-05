@@ -1,5 +1,6 @@
 import { AssetLoader } from "../asset/loader/assetLoader";
 import { Point } from "../common/point";
+import { GameTime } from "../common/time";
 import { InputAction } from "../input/inputAction";
 import { Camera } from "../rendering/camera";
 import { RenderContext } from "../rendering/renderContext";
@@ -11,13 +12,14 @@ export class MainScene implements Scene {
     private world: World;
     private interactionHandler: InteractionHandler;
 
-    constructor(camera: Camera, assetsLoader: AssetLoader) {
+    constructor(camera: Camera, assetsLoader: AssetLoader, gameTime: GameTime) {
         this.world = new World();
         //this.world.invalidateWorld();
         this.interactionHandler = new InteractionHandler(
             this.world,
             camera,
-            assetsLoader
+            assetsLoader,
+            gameTime
         );
     }
 

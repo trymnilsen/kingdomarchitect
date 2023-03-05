@@ -1,8 +1,10 @@
+import { sprites2 } from "../../../asset/sprite";
 import { Point } from "../../../common/point";
-import { InputEvent } from "../../../input/input";
+import { allSides } from "../../../common/sides";
 import { InputAction } from "../../../input/inputAction";
 import { RenderContext } from "../../../rendering/renderContext";
 import { UIEvent } from "../../../ui/event/uiEvent";
+import { FocusState } from "../../../ui/focus/focusState";
 import { UIView } from "../../../ui/uiView";
 import { GroundTile } from "../../world/tile/ground";
 import { InteractionStateChanger } from "./interactionStateChanger";
@@ -116,7 +118,7 @@ export abstract class InteractionState {
 
     /**
      * Called when its time to render/draw anything this state wants to.
-     * Make sure to call `super.OnDraw(...)` if this is override to show any
+     * Make sure to call `super.OnDraw(...)` if this is overriden to show any
      * views set.
      *
      * Note: this method has a varying frequency of updates. Any logic that
@@ -134,7 +136,7 @@ export abstract class InteractionState {
             }
             this._view.updateTransform();
             this._view.draw(context);
-            this._view.focusState.onDraw(context);
+            this.drawFocus(context, this._view.focusState);
             //const end = performance.now();
             //console.log(`build state draw: ${end - start}`);
         }
@@ -153,5 +155,25 @@ export abstract class InteractionState {
         stateChanger: InteractionStateChanger
     ): boolean {
         return false;
+    }
+
+    private drawFocus(context: RenderContext, focusState: FocusState) {
+        const currentFocus = focusState.currentFocus;
+        if (!!currentFocus && this._context) {
+            const postition = currentFocus.screenPosition;
+            const size = currentFocus.measuredSize;
+            if (!!size) {
+                const sizeVariation = 2 - (this._context.gameTime.tick % 2) * 4;
+                context.drawNinePatchSprite({
+                    sprite: sprites2.cursor,
+                    height: size.height + sizeVariation,
+                    width: size.width + sizeVariation,
+                    scale: 1.0,
+                    sides: allSides(12.0),
+                    x: postition.x + (this._context.gameTime.tick % 2) * 2,
+                    y: postition.y + (this._context.gameTime.tick % 2) * 2,
+                });
+            }
+        }
     }
 }

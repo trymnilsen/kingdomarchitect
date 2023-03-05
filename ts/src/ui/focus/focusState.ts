@@ -1,4 +1,5 @@
 import { sprites2 } from "../../asset/sprite";
+import { manhattanDistance } from "../../common/point";
 import { allSides } from "../../common/sides";
 import { RenderContext } from "../../rendering/renderContext";
 import { UIView } from "../uiView";
@@ -26,34 +27,20 @@ export class FocusState {
         if (views.length == 0) {
             return false;
         } else {
-            this.setFocus(views[0]);
-            return true;
-        }
-    }
-
-    onDraw(context: RenderContext): void {
-        if (!!this._currentFocus) {
-            const postition = this._currentFocus.screenPosition;
-            const size = this._currentFocus.measuredSize;
-            if (!!size) {
-                context.drawScreenSpaceRectangle({
-                    fill: "blue",
-                    width: size.width,
-                    height: size.height,
-                    x: postition.x,
-                    y: postition.y,
-                });
-                /*
-                context.drawNinePatchSprite({
-                    sprite: sprites2.cursor,
-                    height: size.height,
-                    width: size.width,
-                    scale: 1.0,
-                    sides: allSides(12.0),
-                    x: postition.x,
-                    y: postition.y,
-                });*/
+            let closestDistance = Number.MAX_SAFE_INTEGER;
+            let closestView = views[0];
+            for (const view of views) {
+                const viewDistance = manhattanDistance(
+                    { x: 0, y: 0 },
+                    view.screenPosition
+                );
+                if (viewDistance < closestDistance) {
+                    closestDistance = viewDistance;
+                    closestView = view;
+                }
             }
+            this.setFocus(closestView);
+            return true;
         }
     }
 }

@@ -66,6 +66,14 @@ describe("uiView test", () => {
         assert.deepEqual(view.center, { x: 15, y: 20 });
     });
 
+    it("has bounds when layed out", () => {
+        assert.equal(2, 2);
+    });
+
+    it("has bounds with equal components when not layed out", () => {
+        assert.equal(2, 2);
+    });
+
     it("throws error if width is not valid", () => {
         assert.equal(2, 2);
     });

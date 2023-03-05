@@ -6,6 +6,7 @@ import { Renderer } from "../rendering/renderer";
 import { MainScene, Scene } from "./mainScene";
 import { AssetLoader } from "../asset/loader/assetLoader";
 import { TileSize } from "./world/tile/tile";
+import { GameTime, MutableGameTime } from "../common/time";
 
 export class Game {
     private renderer: Renderer;
@@ -13,6 +14,7 @@ export class Game {
     private currentScene: Scene;
     private touchInput: TouchInput;
     private assetLoader: AssetLoader;
+    private gameTime: MutableGameTime;
     private currentTick: number = 0;
     public constructor(domElementWrapperSelector: string) {
         // Get the canvas
@@ -23,6 +25,7 @@ export class Game {
         if (canvasElement == null) {
             throw new Error("Canvas element not found");
         }
+        this.gameTime = new MutableGameTime();
 
         // Input
         this.input = new Input();
@@ -33,7 +36,8 @@ export class Game {
         this.renderer = new Renderer(canvasElement, this.assetLoader);
         this.currentScene = new MainScene(
             this.renderer.camera,
-            this.assetLoader
+            this.assetLoader,
+            this.gameTime
         );
     }
 
@@ -75,6 +79,7 @@ export class Game {
 
     private onTick = () => {
         this.currentTick += 1;
+        this.gameTime.updateTick(this.currentTick);
         this.currentScene.tick(this.currentTick);
         this.render();
     };

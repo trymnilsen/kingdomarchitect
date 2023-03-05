@@ -102,6 +102,12 @@ export function absBounds(bounds: Bounds): {
     };
 }
 
+/**
+ * Normalises the bounds to start at {0,0} by shifting the components
+ * of the bounds
+ * @param bounds the bounds to normalise
+ * @returns a bounds starting at {0,0}
+ */
 export function normaliseBounds(bounds: Bounds): Bounds {
     return {
         x1: bounds.x1 - bounds.x1,
@@ -111,9 +117,44 @@ export function normaliseBounds(bounds: Bounds): Bounds {
     };
 }
 
+/**
+ * Get the size of the bounds
+ * @param bounds the bounds to measure
+ * @returns the width and height of the bounds
+ */
 export function sizeOfBounds(bounds: Bounds): Point {
     return {
         x: bounds.x2 - bounds.x1,
         y: bounds.y2 - bounds.y1,
     };
+}
+
+/**
+ * Checks if all the edges of the inner bounds are inside the outer bounds
+ * @param outer the bounds wrapping the inner bounds
+ * @param inner the bounds that should fit inside the outer bounds
+ * @returns true if the innerbounds are not outside the outer bounds
+ */
+export function boundsContains(outer: Bounds, inner: Bounds): boolean {
+    return (
+        outer.x1 <= inner.x1 &&
+        outer.x2 >= inner.x2 &&
+        outer.y1 <= inner.y1 &&
+        outer.y2 >= inner.y2
+    );
+}
+
+/**
+ * Checks if the first bounds overlap the second bounds
+ * @param first the first rectangle
+ * @param second the second rectangle to check if overlaps the first
+ * @returns if the two bounds overlap
+ */
+export function boundsOverlap(first: Bounds, second: Bounds): boolean {
+    return (
+        first.x1 < second.x2 &&
+        first.x2 > second.x1 &&
+        first.y1 < second.y2 &&
+        first.y2 > second.y1
+    );
 }

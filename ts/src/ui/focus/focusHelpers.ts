@@ -1,8 +1,8 @@
-import { Direction } from "../../common/direction";
+import { boundsContains, boundsOverlap } from "../../common/bounds";
+import { Direction, invertDirection } from "../../common/direction";
 import { InvalidArgumentError } from "../../common/error/invalidArgumentError";
 import {
     closestPointOnLine,
-    distance,
     manhattanDistance,
     Point,
 } from "../../common/point";
@@ -10,6 +10,294 @@ import { UIView } from "../uiView";
 
 export function getFocusableViews(rootView: UIView): UIView[] {
     return rootView.getViews((view) => view.isFocusable);
+}
+
+export function getClosestFocusableView(
+    focusableViews: UIView[],
+    currentlyFocusedView: UIView,
+    direction: Direction
+): UIView | null {
+    const adjacentViews = getPrioritisedViews(
+        focusableViews.filter((view) => view != currentlyFocusedView),
+        currentlyFocusedView,
+        direction
+    );
+
+    if (adjacentViews.length > 0) {
+        const closestView = closestViewByEdge(
+            currentlyFocusedView,
+            adjacentViews
+        );
+        return closestView;
+    } else {
+        return null;
+    }
+}
+
+/**
+ * Get the most priorites subsection of views from the given list
+ * The views will be extracted based on three priorities.
+ * 1. If the view contains/wraps (considered the same thing, potato potato).
+ * 2. if the view is partially overlapping
+ * 3. If the view is completely past the edgeline of the view
+ * The edgeline is the line that aligns width the edge of the view that is most
+ * in the direction of the direction.
+ * E.g for a left direction, this is the leftmost/western edge. For the down
+ * direction this is the bottom/southern edge.
+ *
+ * The term "most in the direction" will be used to describe the item that is
+ * furthest from this edge in the choosen direction.
+ * E.g {x: 1, y: 2} is more in direction than {x: 3, y: 1} if the
+ * direction is left
+ *
+ * Below is the three conditions described as a diagram
+ *
+ *
+ * For all examples
+ * Wanted Direction is right
+ * +---------------->
+ *                                                           '
+ * 
+ * 1: Potential views that contain/wrap the currently focused
+ * view (cfv)
+ * 
+ * ````
+ *                     EdgeLine
+ *      Potential     +
+ *      View          |
+ *         +---+    +---------------------------+
+ *             |    | |                         |
+ *             v    | |                         |
+ * Currently x-+----------x <---+               | <--+
+ * Focused   |      | |   |   Any corner(x)     |  Screen
+ * View      |   +----+   |   beyond edge line  |  Bounds
+ *      +------->+  | |   |                     |
+ *           |   +----+   |   all corners are   |
+ *           |      | |   |   outside of cfv    |
+ *           |      | |   |                     |
+ *           x------------x                     |
+ *                  | |                         |
+ *                  +---------------------------+
+ *                    |
+ *                    +
+ * `````
+ *
+ * 2: Get potential views that overlap cfv but all
+ * corners (x) of the potential are further in the
+ * direction than the least directionmost corners (y)
+ * of the cfv
+ * 
+ * ````
+ *                    + Edgeline
+ *                    |
+ *                  +---------------------------+
+ *                  | |                         |
+ *     Currently  x-------x Any corner beyond   |
+ *     Focused    | | |   | edgeline            |
+ *     View     y-----+   |                     |
+ *        +---->| | | |   | Potential view      |
+ *              y-----+   | overlaps cfv        |
+ *                | | |   |                     |
+ *         +----> x-------x All corners are more|
+ *         |        | |     in direction        |
+ *         +        | |                         |
+ *     Potential    +---------------------------+
+ *     View           |
+ *                    +
+ * ````
+ * 
+ * 3: Get view that have corners(x) that are all more
+ *    in the direction than the edgeline of the cfv
+ * 
+ * ````
+ * 
+ *                     + Edgeline
+ *                     |
+ *                   +---------------------------+
+ *                   | |                         |
+ *                   | |                         |
+ *                   | |  x------x               |
+ *       Currently   | |  |      |               |
+ *       Focused  +----+  |      |               |
+ *       View+--->+  | |  x-+----x               |
+ *                +----+    ^                    |
+ *                   | |    |                    |
+ *                   | |    |                    |
+ *                   | |    |                    |
+ *                   | |    |                    |
+ *                   +---------------------------+
+ *                     |    |
+ *                     |    + Potential view
+ *                     +
+ * ````
+ * 
+ * Not Valid Example: None of the three cases above
+ * 
+ * ````
+ *                     + Edgeline
+ *                   +---------------------------+
+ *    Potential   +-------+                      |
+ *    View        |  | |  |  Not wrapping        |
+ *    +---------->+  | |  |  or containing       |
+ *                +-------+                      |
+ *    Currently      | |     Not overlapping     |
+ *    Focused      +---+                         |
+ *    View         | | |     Not completely past |
+ *     +---------> +---+     the edgeline in     |
+ *                   | |     the direction       |
+ *                   | |                         |
+ *                   | |                         |
+ *                   | |                         |
+ *                   +---------------------------+
+ *                     |
+ *                     +
+ * ````
+ * 
+ * **Note**: This example is applicable for the up
+ * direction as in that case it would have
+ * all its four corners (x) past the edgeline
+ * that would be aligned on the top of the cfv
+
+ *
+ * @param focusableViews the views to check if are applicable
+ * @param currentlyFocusedView the currently focused view moving away from
+ * @param direction the direction we are moving in
+ * @returns a list view views that are considered the best candidates to move to
+ */
+function getPrioritisedViews(
+    focusableViews: UIView[],
+    currentlyFocusedView: UIView,
+    direction: Direction
+): UIView[] {
+    const viewsInDirection = focusableViews.filter((view) => {
+        return isViewInDirection(view, currentlyFocusedView, direction);
+    });
+
+    const wrappingViews = viewsInDirection.filter((view) => {
+        return boundsContains(view.bounds, currentlyFocusedView.bounds);
+    });
+    if (wrappingViews.length > 0) {
+        return wrappingViews;
+    }
+
+    const overlappingViews = viewsInDirection
+        .filter((view) => {
+            return boundsOverlap(currentlyFocusedView.bounds, view.bounds);
+        })
+        .filter((view) => {
+            const oppositeDirection = invertDirection(direction);
+            const oppositeEdge = getDirectionalEdge(view, oppositeDirection);
+            const oppositeEdgeOfFocusedView = getDirectionalEdge(
+                currentlyFocusedView,
+                oppositeDirection
+            );
+
+            const corners = [oppositeEdge.start, oppositeEdge.end];
+            return corners.every((corner) =>
+                isPointPastEdge(
+                    direction,
+                    corner,
+                    oppositeEdgeOfFocusedView.start
+                )
+            );
+        });
+    if (overlappingViews.length > 0) {
+        return overlappingViews;
+    }
+
+    const completelyPastEdgeViews = viewsInDirection.filter((view) => {
+        //Check that all corners are past the view edge
+        const edge = getDirectionalEdge(currentlyFocusedView, direction);
+        return view.corners.every((corner) =>
+            isPointPastEdge(direction, corner, edge.start)
+        );
+    });
+    if (completelyPastEdgeViews.length > 0) {
+        return completelyPastEdgeViews;
+    }
+
+    // No applicable views
+    return [];
+}
+
+function getDirectionalEdge(view: UIView, direction: Direction): ViewEdge {
+    const viewBounds = view.bounds;
+    switch (direction) {
+        case Direction.Down:
+            return {
+                start: {
+                    x: viewBounds.x2,
+                    y: viewBounds.y2,
+                },
+                end: {
+                    x: viewBounds.x1,
+                    y: viewBounds.y2,
+                },
+                view: view,
+            };
+        case Direction.Up:
+            return {
+                start: {
+                    x: viewBounds.x1,
+                    y: viewBounds.y1,
+                },
+                end: {
+                    x: viewBounds.x2,
+                    y: viewBounds.y1,
+                },
+                view: view,
+            };
+        case Direction.Right:
+            return {
+                start: {
+                    x: viewBounds.x2,
+                    y: viewBounds.y1,
+                },
+                end: {
+                    x: viewBounds.x2,
+                    y: viewBounds.y2,
+                },
+                view: view,
+            };
+        case Direction.Left:
+            return {
+                start: {
+                    x: viewBounds.x1,
+                    y: viewBounds.y2,
+                },
+                end: {
+                    x: viewBounds.x1,
+                    y: viewBounds.y1,
+                },
+                view: view,
+            };
+    }
+}
+
+/**
+ * Check if the current point is past the edge defined as a point.
+ * Based on the direction _either_ the x or y component of the point will
+ * be used
+ * @param direction
+ * @param point
+ * @param edge
+ * @returns
+ */
+function isPointPastEdge(
+    direction: Direction,
+    point: Point,
+    edge: Point
+): boolean {
+    switch (direction) {
+        case Direction.Left:
+            return point.x < edge.x;
+        case Direction.Right:
+            return point.x > edge.x;
+        case Direction.Up:
+            return point.y < edge.y;
+        case Direction.Down:
+            return point.y > edge.y;
+    }
 }
 
 /**
@@ -24,30 +312,15 @@ export function getFocusableViews(rootView: UIView): UIView[] {
  * @param originView the view to treat as the origin we check against
  * @param direction the direction we a want to test against
  */
-export function isViewInDirection(
+function isViewInDirection(
     view: UIView,
     originView: UIView,
     direction: Direction
 ): boolean {
-    let testFunction: (point: Point) => boolean;
-    switch (direction) {
-        case Direction.Left:
-            testFunction = (point) => point.x < originView.center.x;
-            break;
-        case Direction.Right:
-            testFunction = (point) => point.x > originView.center.x;
-            break;
-        case Direction.Up:
-            testFunction = (point) => point.y < originView.center.y;
-            break;
-        case Direction.Down:
-            testFunction = (point) => point.y > originView.center.y;
-            break;
-    }
-
-    const hasCornerInDirection = view.corners.some(testFunction);
-    const hasCenterInDirection = testFunction(view.center);
-    return hasCornerInDirection && hasCenterInDirection;
+    const hasCornerInDirection = view.corners.some((corner) => {
+        return isPointPastEdge(direction, corner, originView.center);
+    });
+    return hasCornerInDirection;
 }
 
 /**
@@ -57,68 +330,11 @@ export function isViewInDirection(
  * @param fromView
  * @param views
  */
-export function closestViewByEdge(fromView: UIView, views: UIView[]): UIView {
+function closestViewByEdge(fromView: UIView, views: UIView[]): UIView {
     if (views.length == 0) {
         throw new InvalidArgumentError("views cannot be empty");
     }
-    const viewEdges = views.flatMap((view) => {
-        const position = view.screenPosition;
-        const size = view.measuredSize;
-        if (!size) {
-            throw new Error("Cannot find closest edge on unmeasured view");
-        }
-        //TODO: should we filter out edges that are not in the direction wanted?
-        //this would require direction as an argument but can also let us filter out
-        //edges that are not aligned with the direction?
-        const edges: ViewEdge[] = [
-            {
-                start: {
-                    x: position.x,
-                    y: position.y,
-                },
-                end: {
-                    x: position.x + size.width,
-                    y: position.y,
-                },
-                view: view,
-            },
-            {
-                start: {
-                    x: position.x + size.width,
-                    y: position.y,
-                },
-                end: {
-                    x: position.x + size.width,
-                    y: position.y + size.height,
-                },
-                view: view,
-            },
-            {
-                start: {
-                    x: position.x + size.width,
-                    y: position.y + size.height,
-                },
-                end: {
-                    x: position.x,
-                    y: position.y + size.height,
-                },
-                view: view,
-            },
-            {
-                start: {
-                    x: position.x,
-                    y: position.y + size.height,
-                },
-                end: {
-                    x: position.x,
-                    y: position.y,
-                },
-                view: view,
-            },
-        ];
-
-        return edges;
-    });
+    const viewEdges = views.flatMap(getViewEdges);
     const fromViewPoint = fromView.center;
     let closestView: UIView = views[0];
     let closestViewDistance = Number.MAX_SAFE_INTEGER;
@@ -130,24 +346,71 @@ export function closestViewByEdge(fromView: UIView, views: UIView[]): UIView {
             fromViewPoint
         );
 
-        //TODO: Can we use distance squared?
         const edgeDistance = manhattanDistance(fromViewPoint, edgePoint);
         if (edgeDistance < closestViewDistance) {
-            console.log(
-                `Edge was closer with a distance: ${edgeDistance}`,
-                edge.view
-            );
             closestView = edge.view;
             closestViewDistance = edgeDistance;
-        } else {
-            console.log(
-                `Edge NOT was closer with a distance: ${edgeDistance}`,
-                edge.view
-            );
         }
     }
 
     return closestView;
+}
+
+function getViewEdges(view: UIView): ViewEdge[] {
+    const position = view.screenPosition;
+    const size = view.measuredSize;
+    if (!size) {
+        throw new Error("Cannot find closest edge on unmeasured view");
+    }
+
+    const edges: ViewEdge[] = [
+        {
+            start: {
+                x: position.x,
+                y: position.y,
+            },
+            end: {
+                x: position.x + size.width,
+                y: position.y,
+            },
+            view: view,
+        },
+        {
+            start: {
+                x: position.x + size.width,
+                y: position.y,
+            },
+            end: {
+                x: position.x + size.width,
+                y: position.y + size.height,
+            },
+            view: view,
+        },
+        {
+            start: {
+                x: position.x + size.width,
+                y: position.y + size.height,
+            },
+            end: {
+                x: position.x,
+                y: position.y + size.height,
+            },
+            view: view,
+        },
+        {
+            start: {
+                x: position.x,
+                y: position.y + size.height,
+            },
+            end: {
+                x: position.x,
+                y: position.y,
+            },
+            view: view,
+        },
+    ];
+
+    return edges;
 }
 
 type ViewEdge = {

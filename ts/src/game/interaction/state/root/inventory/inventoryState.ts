@@ -6,7 +6,7 @@ import { InputAction } from "../../../../../input/inputAction";
 import { bookInkColor } from "../../../../../ui/color";
 import { ninePatchBackground } from "../../../../../ui/dsl/uiBackgroundDsl";
 import { uiBox } from "../../../../../ui/dsl/uiBoxDsl";
-import { uiColumn } from "../../../../../ui/dsl/uiColumnDsl";
+import { ColumnChild, uiColumn } from "../../../../../ui/dsl/uiColumnDsl";
 import { spriteImageSource, uiImage } from "../../../../../ui/dsl/uiImageDsl";
 import { uiOffset } from "../../../../../ui/dsl/uiOffsetDsl";
 import { uiText } from "../../../../../ui/dsl/uiTextDsl";
@@ -48,6 +48,7 @@ export interface InventoryItems {
     asset: Sprite2;
     amount: number;
     value: number;
+    hint?: string;
 }
 
 export class InventoryState extends InteractionState {
@@ -183,6 +184,7 @@ export class InventoryState extends InteractionState {
                 asset: item.item.asset,
                 amount: item.amount,
                 value: 5,
+                hint: item.item.hint,
             };
         });
     }
@@ -194,7 +196,7 @@ export class InventoryState extends InteractionState {
         });
         gridView.gridItemSize = 50;
 
-        for (let i = 0; i < 12; i++) {
+        for (let i = 0; i < 24; i++) {
             const inventoryItem = this._items[i];
             if (!!inventoryItem) {
                 const isSelected = i == 0;
@@ -202,6 +204,7 @@ export class InventoryState extends InteractionState {
                     inventoryItem.asset,
                     isSelected
                 );
+                gridItem.id = inventoryItem.name;
 
                 if (isSelected) {
                     this._selectedGridItemView = gridItem;
@@ -253,7 +256,40 @@ export class InventoryState extends InteractionState {
 
     private getDetailsView(index: number): UIView {
         const inventoryItem = this._items[index];
-
+        const description: (item: InventoryItems) => ColumnChild[] = (item) => {
+            if (item.hint) {
+                return [
+                    {
+                        child: uiText({
+                            alignment: uiAlignment.centerLeft,
+                            text: `description:`,
+                            style: {
+                                color: bookInkColor,
+                                font: "Silkscreen",
+                                size: 16,
+                            },
+                            width: fillUiSize,
+                            height: wrapUiSize,
+                        }),
+                    },
+                    {
+                        child: uiText({
+                            alignment: uiAlignment.centerLeft,
+                            text: inventoryItem.hint || "",
+                            style: {
+                                color: bookInkColor,
+                                font: "Silkscreen",
+                                size: 16,
+                            },
+                            width: fillUiSize,
+                            height: wrapUiSize,
+                        }),
+                    },
+                ];
+            } else {
+                return [];
+            }
+        };
         if (!!inventoryItem) {
             return uiBox({
                 width: 300,
@@ -328,6 +364,7 @@ export class InventoryState extends InteractionState {
                                     height: wrapUiSize,
                                 }),
                             },
+                            ...description(inventoryItem),
                         ],
                     }),
                 ],

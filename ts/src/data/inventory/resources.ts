@@ -47,6 +47,7 @@ export const blueBook: InventoryItem = {
     asset: sprites2.blue_book,
     id: "tomeofsecrets",
     name: "Tome of Secrets",
+    hint: "Just pictures of ducks",
 };
 
 export const scroll: InventoryItem = {

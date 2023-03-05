@@ -1,5 +1,6 @@
 import { AssetLoader } from "../../../asset/loader/assetLoader";
 import { Point } from "../../../common/point";
+import { GameTime } from "../../../common/time";
 import { InputAction, InputActionType } from "../../../input/inputAction";
 import { Camera } from "../../../rendering/camera";
 import { RenderContext } from "../../../rendering/renderContext";
@@ -18,7 +19,12 @@ export class InteractionHandler {
     private interactionStateChanger: CommitableInteractionStateChanger;
     private history: InteractionStateHistory;
 
-    constructor(world: World, camera: Camera, assets: AssetLoader) {
+    constructor(
+        world: World,
+        camera: Camera,
+        assets: AssetLoader,
+        time: GameTime
+    ) {
         this.interactionStateChanger = new CommitableInteractionStateChanger();
         this.world = world;
         this.camera = camera;
@@ -26,6 +32,7 @@ export class InteractionHandler {
             world: this.world,
             assets: assets,
             stateChanger: this.interactionStateChanger,
+            gameTime: time,
         };
         this.history = new InteractionStateHistory(stateContext);
     }

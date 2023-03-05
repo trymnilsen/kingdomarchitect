@@ -1,13 +1,18 @@
-import { withinRectangle } from "../common/bounds";
+import { Bounds, withinRectangle } from "../common/bounds";
+import { getAxis } from "../common/direction";
 import { Event, EventListener } from "../common/event";
-import { addPoint, Point, zeroPoint } from "../common/point";
+import {
+    addPoint,
+    Point,
+    weightedManhattanDistance,
+    zeroPoint,
+} from "../common/point";
 import { Sides, zeroSides } from "../common/sides";
 import { UIRenderContext } from "../rendering/uiRenderContext";
 import { isTapEvent, UIEvent, UIInputEvent, UITapEvent } from "./event/uiEvent";
 import {
-    closestViewByEdge,
+    getClosestFocusableView,
     getFocusableViews,
-    isViewInDirection,
 } from "./focus/focusHelpers";
 import { FocusState } from "./focus/focusState";
 import { UILayoutContext } from "./uiLayoutContext";
@@ -188,6 +193,29 @@ export abstract class UIView {
             });
         } else {
             return this._screenPosition;
+        }
+    }
+
+    /**
+     * Returns the bounds of this view
+     * Note: if the view has not been layed out the x2 and y2 components will
+     * be the same as the x1 and y1
+     */
+    get bounds(): Bounds {
+        if (!!this._measuredSize) {
+            return {
+                x1: this.screenPosition.x,
+                x2: this._screenPosition.x + this._measuredSize.width,
+                y1: this._screenPosition.y,
+                y2: this._screenPosition.y + this._measuredSize.height,
+            };
+        } else {
+            return {
+                x1: this.screenPosition.x,
+                x2: this._screenPosition.x,
+                y1: this._screenPosition.y,
+                y2: this._screenPosition.y,
+            };
         }
     }
 
@@ -461,19 +489,12 @@ export abstract class UIView {
         if (!!currentlyFocusedView) {
             //Find the view from the directional sector that has an edge closest to
             //currently selected view
-            const viewsInDirectionalSector = focusableViews.filter((view) => {
-                const isInDirection = isViewInDirection(
-                    view,
-                    currentlyFocusedView,
-                    event.direction
-                );
-                return isInDirection && view != currentlyFocusedView;
-            });
-            if (viewsInDirectionalSector.length > 0) {
-                const closestView = closestViewByEdge(
-                    currentlyFocusedView,
-                    viewsInDirectionalSector
-                );
+            const closestView = getClosestFocusableView(
+                focusableViews,
+                currentlyFocusedView,
+                event.direction
+            );
+            if (!!closestView) {
                 this.focusState.setFocus(closestView);
                 return true;
             } else {
