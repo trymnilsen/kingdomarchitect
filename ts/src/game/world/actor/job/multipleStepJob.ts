@@ -35,7 +35,8 @@ export abstract class MultipleStepJob extends Job {
 
     /**
      * Set list of job that needs to complete for this job to be completed.
-     * Needs to be called before the job has started. Calling it in onStarted is OK.
+     * Needs to be called before the job has started.
+     * Calling it in onStarted is OK.
      * @param subJobs list of jobs that makes up this job
      */
     setJobs(subJobs: Job[]): void {

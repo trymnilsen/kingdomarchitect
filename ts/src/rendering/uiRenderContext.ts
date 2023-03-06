@@ -1,9 +1,8 @@
-import { UISize } from "../ui/uiSize";
+import { RectangleConfiguration } from "./items/rectangle";
 import {
     NinePatchSpriteConfiguration,
     SpriteConfiguration,
 } from "./items/sprite";
-import { RectangleConfiguration } from "./items/rectangle";
 import { TextConfiguration } from "./items/text";
 
 export interface UIRenderContext {

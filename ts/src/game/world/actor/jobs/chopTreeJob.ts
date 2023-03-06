@@ -30,7 +30,7 @@ export class ChopTreeJob extends MoveToBeforeJob {
     }
 
     override onDraw(renderContext: RenderContext): void {
-        let visualPosition = renderContext.camera.tileSpaceToWorldSpace(
+        const visualPosition = renderContext.camera.tileSpaceToWorldSpace(
             this.target.tilePosition
         );
 
@@ -112,7 +112,12 @@ class _ChopTreeJob extends Job {
         if (!entity) {
             throw new JobConstraintsError("No entity for selection");
         }
-        entity.getComponent(TreeComponent)!.startChop();
+        const treeComponent = entity.getComponent(TreeComponent);
+        if (!treeComponent) {
+            throw new Error("No tree component on entity for chop tree job");
+        }
+
+        treeComponent.startChop();
         this.treeEntity = entity;
     }
 
@@ -122,11 +127,23 @@ class _ChopTreeJob extends Job {
             return;
         }
 
-        const healthComponent = entity.getComponent(HealthComponent)!;
-        const treeComponent = entity.getComponent(TreeComponent)!;
+        const healthComponent = entity.getComponent(HealthComponent);
+        if (!healthComponent) {
+            throw new Error("No health component on entity for ChopTreeJob");
+        }
+
+        const treeComponent = entity.getComponent(TreeComponent);
+        if (!treeComponent) {
+            throw new Error("No tree component of entity for ChopTreeJob");
+        }
 
         const inventoryComponent =
-            entity.getAncestorComponent(InventoryComponent)!;
+            entity.getAncestorComponent(InventoryComponent);
+        if (!inventoryComponent) {
+            throw new Error(
+                "No inventory component on ancestor of entity for ChopTreeJob"
+            );
+        }
 
         if (healthComponent.health >= 20) {
             console.log("Health mte 20");

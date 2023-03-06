@@ -202,11 +202,6 @@ export function generateGround(tiles: { [id: string]: GroundTile }): Point {
     for (let i = 0; i < rangeDistance(edgeTile.axisRange); i++) {
         const adjacent = adjacentPoint(lastSearchPoint, searchDirection);
         const tileId = getTileId(adjacent.x, adjacent.y);
-        /* console.log(
-            `adjacent to ${lastSearchPoint.x}/${lastSearchPoint.y} in direction ${searchDirection}`,
-            adjacent,
-            tileId
-        ); */
         if (!!tiles[tileId]) {
             tilePoint = lastSearchPoint;
             break;
@@ -231,8 +226,8 @@ export function getRandomBoundsPosition(
     let x = 0;
     let y = 0;
     let direction = Direction.Down;
-    let axis = side % 2 == 0 ? Axis.YAxis : Axis.XAxis;
-    let axisRange = getBoundsAxis(bounds, axis);
+    const axis = side % 2 == 0 ? Axis.YAxis : Axis.XAxis;
+    const axisRange = getBoundsAxis(bounds, axis);
 
     switch (side) {
         case LEFT_SIDE:

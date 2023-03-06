@@ -1,8 +1,6 @@
 import { assert } from "chai";
-import { zeroPoint } from "../../../src/common/point";
 import { Entity } from "../../../src/game/world/entity/entity";
 import { RootEntity } from "../../../src/game/world/entity/rootEntity";
-import { StubComponent } from "../component/stubComponent";
 
 describe("RootEntity Test", () => {
     it("Can get entity at position", () => {

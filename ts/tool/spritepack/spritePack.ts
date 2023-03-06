@@ -12,7 +12,7 @@ const assetPath = path.join(process.cwd(), "asset");
 run();
 
 async function run() {
-    let files = await fs.readdir(assetPath);
+    const files = await fs.readdir(assetPath);
     const assetFiles = files.filter((filename) => filename.endsWith(".png"));
     const definitionFiles = files.filter((filename) =>
         filename.endsWith(".json")
@@ -196,7 +196,7 @@ async function packSprites(sprites: PackableSprite[]) {
  * Read a given json file with possibly many sprite definitions and read the
  * pixels of the related png file. Then generate separate sprite sheets for
  * each definition in the sprite sheet.
- * @param definitionFileName the name of the json file containing sprite definitions
+ * @param definitionFileName name of the json file containing sprite definitions
  * @returns
  */
 async function createSpriteSheet(
@@ -377,11 +377,6 @@ type Rectangle = {
     h: number;
 };
 
-type CreateSpriteSheetResult = {
-    sourceFile: string;
-    sprites: PackableSprite[];
-};
-
 type PackableSprite = {
     filename: string;
     spriteName: string;
@@ -393,9 +388,6 @@ type PackedSprite = {
     bin: string;
 };
 
-type SpriteDefinitionMap = { [name: string]: SpriteDefinition };
 interface SpriteDefinition extends Rectangle {
     frames: number;
 }
-
-interface SpriteFrame {}

@@ -1,12 +1,6 @@
 import { Bounds, withinRectangle } from "../common/bounds";
-import { getAxis } from "../common/direction";
 import { Event, EventListener } from "../common/event";
-import {
-    addPoint,
-    Point,
-    weightedManhattanDistance,
-    zeroPoint,
-} from "../common/point";
+import { addPoint, Point, zeroPoint } from "../common/point";
 import { Sides, zeroSides } from "../common/sides";
 import { UIRenderContext } from "../rendering/uiRenderContext";
 import { isTapEvent, UIEvent, UIInputEvent, UITapEvent } from "./event/uiEvent";
@@ -108,7 +102,7 @@ export abstract class UIView {
     /**
      * Has this view previously been layed out and have a measured size?
      */
-    get isLayedOut(): Boolean {
+    get isLayedOut(): boolean {
         return !!this._measuredSize;
     }
 
@@ -294,9 +288,10 @@ export abstract class UIView {
      */
     getViews(filter?: (view: UIView) => boolean): UIView[] {
         const views: UIView[] = [];
-        let viewsToFilter: UIView[] = [this];
+        const viewsToFilter: UIView[] = [this];
 
         while (viewsToFilter.length > 0) {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const view = viewsToFilter.pop()!;
 
             // If there is a filter and it matches or there is no filter
@@ -395,7 +390,7 @@ export abstract class UIView {
     dispatchUIEvent(event: UIEvent): boolean {
         if (isTapEvent(event)) {
             return this.dispatchTapEvent(event);
-        } else if ((event.type = "direction")) {
+        } else if (event.type == "direction") {
             return this.handleDirectionEvent(event);
         } else {
             console.warn("Unrecognised event type: ", event);
@@ -429,7 +424,8 @@ export abstract class UIView {
     abstract draw(context: UIRenderContext): void;
 
     /**
-     * Dispatch a tap event to this view and its children to check if its handled
+     * Dispatch a tap event to this view and its children to
+     * check if its handled
      * @param event the tap event that occured
      * @returns if the event was handled
      */
@@ -482,13 +478,19 @@ export abstract class UIView {
      *
      */
     private handleDirectionEvent(event: UIInputEvent): boolean {
+        const currentlyFocusedView = this.focusState.currentFocus;
+        //Allow the currently focused view to handle the event if wanted
+        if (!!currentlyFocusedView) {
+            const handledEvent = currentlyFocusedView.dispatchUIEvent(event);
+            if (handledEvent) {
+                return true;
+            }
+        }
         //Get all the focusable views
         const focusableViews = getFocusableViews(this);
-        //Get the currently focused view
-        const currentlyFocusedView = this.focusState.currentFocus;
         if (!!currentlyFocusedView) {
-            //Find the view from the directional sector that has an edge closest to
-            //currently selected view
+            //Find the view from the directional sector that has an edge
+            // closest to currently selected view
             const closestView = getClosestFocusableView(
                 focusableViews,
                 currentlyFocusedView,

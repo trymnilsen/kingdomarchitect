@@ -6,6 +6,7 @@ import { UIBox } from "./uiBox";
 export class UIButton extends UIBox {
     private _onTappedBackground: UIBackground | null = null;
     private _defaultBackground: UIBackground | null = null;
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     onTapCallback: () => void = () => {};
 
     get onTappedBackground(): UIBackground | null {

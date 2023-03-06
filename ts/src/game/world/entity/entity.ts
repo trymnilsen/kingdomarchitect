@@ -169,6 +169,7 @@ export class Entity {
 
         //If parent is not truthy the while will not run an root will be this
         //so it should be safe to return root as non nullable
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         return root!;
     }
 

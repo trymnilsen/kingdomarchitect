@@ -25,7 +25,7 @@ export class UIOffset extends UIBox {
     ): UISize {
         const size = super.layout(layoutContext, constraints);
         // Loop over all the children and add any layout offset to the offset
-        // of the child
+        // of the child
         for (const child of this.children) {
             child.offset = addPoint(child.offset, this._layoutOffset);
         }

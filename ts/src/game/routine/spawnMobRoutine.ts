@@ -1,4 +1,3 @@
-import { AttackBuildingJob } from "../world/actor/jobs/attack/attackBuildingJob";
 import { World } from "../world/world";
 
 export function spawnMobRoutine(tick: number, world: World) {

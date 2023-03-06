@@ -1,8 +1,8 @@
 /**
- * An event allows modeling updates to data. You can listen to updates or publish
- * them.
+ * An event allows modeling updates to data.
+ * You can listen to updates or publish them.
  */
-export class Event<T = {}> implements EventListener<T> {
+export class Event<T = object> implements EventListener<T> {
     private nextListenersId = 0;
     private listeners: { [id: string]: EventSubscriptionHandler<T> } = {};
 

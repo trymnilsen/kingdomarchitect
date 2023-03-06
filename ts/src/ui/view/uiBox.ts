@@ -37,8 +37,8 @@ export class UIBox extends UIView {
         let measuredHeight = 0;
         // Set the constraints for children based on the size of this box
         // subtract any padding
-        let horizontalPadding = totalHorizontal(this.padding);
-        let verticalPadding = totalVertical(this.padding);
+        const horizontalPadding = totalHorizontal(this.padding);
+        const verticalPadding = totalVertical(this.padding);
 
         if (this.size.width > 0) {
             widthConstraint = this.size.width - horizontalPadding;

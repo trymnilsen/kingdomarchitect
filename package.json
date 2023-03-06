@@ -4,7 +4,7 @@
     "description": "Kingdom architects is intended to be a building/management game",
     "scripts": {
         "tsc": "tsc",
-        "build": "webpack",
+        "build": "webpack && eslint . --ext .ts",
         "spritepack": "ts-node ts/tool/spritepack/spritePack.ts && webpack",
         "start": "webpack serve",
         "test": "mocha",
@@ -27,6 +27,8 @@
         "@types/mocha": "^10.0.1",
         "c8": "^7.12.0",
         "chai": "^4.3.7",
+        "eslint-plugin-import": "^2.27.5",
+        "eslint-plugin-tsdoc": "^0.2.17",
         "get-pixels": "^3.3.3",
         "jimp": "^0.22.4",
         "maxrects-packer": "^2.7.3",
@@ -37,5 +39,10 @@
         "webpack": "^5.75.0",
         "webpack-cli": "^5.0.1",
         "webpack-dev-server": "^4.11.1"
+    },
+    "devDependencies": {
+        "@typescript-eslint/eslint-plugin": "^5.54.1",
+        "@typescript-eslint/parser": "^5.54.1",
+        "eslint": "^8.35.0"
     }
 }

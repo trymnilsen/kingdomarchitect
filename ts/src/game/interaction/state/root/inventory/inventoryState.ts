@@ -1,6 +1,5 @@
 import { Sprite2, sprites2 } from "../../../../../asset/sprite";
 import { Direction } from "../../../../../common/direction";
-import { generateId } from "../../../../../common/idGenerator";
 import { allSides, symmetricSides } from "../../../../../common/sides";
 import { InputAction } from "../../../../../input/inputAction";
 import { bookInkColor } from "../../../../../ui/color";
@@ -175,7 +174,11 @@ export class InventoryState extends InteractionState {
 
     private getInventoryItemList() {
         const inventoryComponent =
-            this.context.world.rootEntity.getComponent(InventoryComponent)!;
+            this.context.world.rootEntity.getComponent(InventoryComponent);
+
+        if (!inventoryComponent) {
+            throw new Error("No inventory component on root entity");
+        }
 
         const items = inventoryComponent.items;
         this._items = items.map((item) => {

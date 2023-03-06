@@ -53,8 +53,9 @@ export abstract class InteractionState {
     }
 
     /**
-     * Returns if this state is considered a modal state, if true it will be given
-     * a scrim and taps that are not handled will pop the state
+     * Returns if this state is considered a modal state.
+     * if true it will be given a scrim and taps that are not
+     * handled will pop the state
      */
     get isModal(): boolean {
         return false;
@@ -123,7 +124,7 @@ export abstract class InteractionState {
      *
      * Note: this method has a varying frequency of updates. Any logic that
      * needs a consistent update cycle should be called in onUpdate
-     * @param context The render context with access to camera and drawing methods
+     * @param context Render context with access to camera and drawing methods
      */
     onDraw(context: RenderContext): void {
         if (this._view) {
@@ -146,7 +147,7 @@ export abstract class InteractionState {
      * An input event has occured, like the directional keys or action key was
      * pressed
      * @param input the event that occured
-     * @param stateChanger The InteractionStateChanger that can be used to change
+     * @param stateChanger InteractionStateChanger that can be used to change
      * to a different state
      * @returns if the tap has been handled or not
      */

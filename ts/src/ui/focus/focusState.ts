@@ -1,7 +1,4 @@
-import { sprites2 } from "../../asset/sprite";
 import { manhattanDistance } from "../../common/point";
-import { allSides } from "../../common/sides";
-import { RenderContext } from "../../rendering/renderContext";
 import { UIView } from "../uiView";
 
 export class FocusState {

@@ -1,4 +1,3 @@
-import { randomEntry } from "../../common/array";
 import { World } from "../world/world";
 
 export function spawnAnimalsRoutine(tick: number, world: World) {

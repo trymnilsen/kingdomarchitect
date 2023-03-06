@@ -16,6 +16,7 @@
       "noUnusedLocals": false,
       "noFallthroughCasesInSwitch": true,
       "resolveJsonModule": true,
+      "noUnusedParameters": false,
       "noPropertyAccessFromIndexSignature": true,
       "removeComments": true,
       "experimentalDecorators": true,

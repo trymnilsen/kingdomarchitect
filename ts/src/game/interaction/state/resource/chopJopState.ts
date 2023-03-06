@@ -19,7 +19,7 @@ export class ChopJobState extends InteractionState {
     }
 
     override onDraw(context: RenderContext): void {
-        let cursorWorldPosition = context.camera.tileSpaceToWorldSpace({
+        const cursorWorldPosition = context.camera.tileSpaceToWorldSpace({
             x: this.selection.tilePosition.x,
             y: this.selection.tilePosition.y,
         });

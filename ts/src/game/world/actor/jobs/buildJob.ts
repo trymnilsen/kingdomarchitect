@@ -28,7 +28,12 @@ class _BuildJob extends Job {
     constructor(building: Entity) {
         super();
         this.buildingEntity = building;
-        this.buildingComponent = building.getComponent(BuildingComponent)!;
+        const buildingComponent = building.getComponent(BuildingComponent);
+        if (!buildingComponent) {
+            throw new Error("No building component on building entity");
+        }
+
+        this.buildingComponent = buildingComponent;
     }
 
     update(tick: number): void {
@@ -39,7 +44,11 @@ class _BuildJob extends Job {
         }
 
         const healthComponent =
-            this.buildingEntity.getComponent(HealthComponent)!;
+            this.buildingEntity.getComponent(HealthComponent);
+
+        if (!healthComponent) {
+            throw new Error("No health component on building entity");
+        }
 
         if (healthComponent.healthPercentage < 1) {
             healthComponent.heal(10);

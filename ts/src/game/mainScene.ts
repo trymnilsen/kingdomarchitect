@@ -5,7 +5,6 @@ import { InputAction } from "../input/inputAction";
 import { Camera } from "../rendering/camera";
 import { RenderContext } from "../rendering/renderContext";
 import { InteractionHandler } from "./interaction/handler/interactionHandler";
-import { spawnRoutines } from "./routine/spawnRoutines";
 import { World } from "./world/world";
 
 export class MainScene implements Scene {
@@ -24,9 +23,9 @@ export class MainScene implements Scene {
     }
 
     tick(tick: number): void {
-        for (const routine of spawnRoutines) {
+        /*for (const routine of spawnRoutines) {
             //routine(tick, this.world);
-        }
+        }*/
         this.world.tick(tick);
         this.interactionHandler.onUpdate(tick);
     }

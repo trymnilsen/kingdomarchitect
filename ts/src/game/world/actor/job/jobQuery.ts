@@ -1,4 +1,3 @@
-import { pointEquals } from "../../../../common/point";
 import { GroundTile } from "../../tile/ground";
 import { ChopTreeJob } from "../jobs/chopTreeJob";
 import { Job } from "./job";

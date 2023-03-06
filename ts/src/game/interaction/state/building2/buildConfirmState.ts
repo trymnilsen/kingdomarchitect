@@ -59,7 +59,11 @@ export class BuildConfirmState extends InteractionState {
                 return;
             }
             const inventoryComponent =
-                rootEntity.getComponent(InventoryComponent)!;
+                rootEntity.getComponent(InventoryComponent);
+
+            if (!inventoryComponent) {
+                throw new Error("No inventory component of root entity");
+            }
 
             const removeResult = inventoryComponent.removeInventoryItem(
                 woodResourceItem.id,

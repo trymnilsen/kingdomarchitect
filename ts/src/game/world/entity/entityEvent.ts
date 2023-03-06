@@ -1,4 +1,3 @@
-import { Point } from "../../../common/point";
 import { Entity } from "./entity";
 
 export type EntityEvent = EntityTransformEvent | EntityChildrenUpdatedEvent;

@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Event } from "./event";
 
 export class Completer<T> {
     private resolvedEvent: Event<T>;
-    private rejectedEvent: Event<any>;
+    private rejectedEvent: Event<unknown>;
     private _promise: Promise<T>;
 
     public get promise(): Promise<T> {
@@ -11,7 +13,7 @@ export class Completer<T> {
 
     constructor() {
         this.resolvedEvent = new Event<T>();
-        this.rejectedEvent = new Event<void>();
+        this.rejectedEvent = new Event<unknown>();
         this._promise = new Promise<T>((resolve, reject) => {
             this.resolvedEvent.listenOnce(resolve);
             this.rejectedEvent.listenOnce(reject);
@@ -20,7 +22,7 @@ export class Completer<T> {
 
     resolveWith(value: T) {}
 
-    rejectWith(value: any) {}
+    rejectWith(value: unknown) {}
 
     dispose() {
         this.resolvedEvent.dispose();

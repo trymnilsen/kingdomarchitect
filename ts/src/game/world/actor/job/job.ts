@@ -1,10 +1,9 @@
-import { Event, EventListener } from "../../../../common/event";
-import { NotInitializedError } from "../../../../common/error/notInitializedError";
-import { Actor } from "../actor";
 import { InvalidStateError } from "../../../../common/error/invalidStateError";
+import { NotInitializedError } from "../../../../common/error/notInitializedError";
+import { Event, EventListener } from "../../../../common/event";
 import { RenderContext } from "../../../../rendering/renderContext";
-import { JobConstraint } from "./jobConstraint";
 import { Entity } from "../../entity/entity";
+import { JobConstraint } from "./jobConstraint";
 
 export enum JobState {
     NotStarted,

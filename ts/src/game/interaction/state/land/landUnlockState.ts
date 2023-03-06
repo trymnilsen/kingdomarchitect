@@ -1,23 +1,11 @@
 import { sprites2 } from "../../../../asset/sprite";
-import {
-    getBoundsAxis,
-    sizeOfBounds,
-    withinRectangle,
-} from "../../../../common/bounds";
+import { sizeOfBounds, withinRectangle } from "../../../../common/bounds";
 import { InvalidStateError } from "../../../../common/error/invalidStateError";
-import {
-    distance,
-    manhattanDistance,
-    Point,
-    zeroPoint,
-} from "../../../../common/point";
+import { manhattanDistance, Point, zeroPoint } from "../../../../common/point";
 import { allSides } from "../../../../common/sides";
 import { woodResourceItem } from "../../../../data/inventory/resources";
 import { RenderContext } from "../../../../rendering/renderContext";
-import {
-    subTitleTextStyle,
-    titleTextStyle,
-} from "../../../../rendering/text/textStyle";
+import { titleTextStyle } from "../../../../rendering/text/textStyle";
 import { colorBackground } from "../../../../ui/dsl/uiBackgroundDsl";
 import { uiBox } from "../../../../ui/dsl/uiBoxDsl";
 import { uiImage } from "../../../../ui/dsl/uiImageDsl";
@@ -25,6 +13,7 @@ import { uiRow } from "../../../../ui/dsl/uiRowDsl";
 import { uiSpace } from "../../../../ui/dsl/uiSpaceDsl";
 import { uiText } from "../../../../ui/dsl/uiTextDsl";
 import { wrapUiSize } from "../../../../ui/uiSize";
+import { UIView } from "../../../../ui/uiView";
 import { UISpriteImageSource } from "../../../../ui/view/uiImageSource";
 import { InventoryComponent } from "../../../world/component/inventory/inventoryComponent";
 import { TilesComponent } from "../../../world/component/tile/tilesComponent";
@@ -104,47 +93,15 @@ export class LandUnlockState extends InteractionState {
             const bounds = sizeOfBounds(unlockableArea.bounds);
             const boundsWidth = bounds.x * TileSize;
             const boundsHeight = bounds.x * TileSize;
-            const view = uiBox({
+            const view = this.getUnlockableLabelView(
+                boundsWidth,
+                boundsHeight,
+                unlockableArea
+            );
+            view.layout(context, {
                 width: boundsWidth,
                 height: boundsHeight,
-                children: [
-                    uiBox({
-                        padding: allSides(8),
-                        width: wrapUiSize,
-                        height: wrapUiSize,
-                        background: colorBackground("#39034a"),
-                        children: [
-                            uiRow({
-                                width: wrapUiSize,
-                                height: wrapUiSize,
-                                children: [
-                                    {
-                                        child: uiImage({
-                                            width: wrapUiSize,
-                                            height: wrapUiSize,
-                                            image: new UISpriteImageSource(
-                                                sprites2.wood_resource
-                                            ),
-                                        }),
-                                    },
-                                    {
-                                        child: uiSpace({ height: 4, width: 4 }),
-                                    },
-                                    {
-                                        child: uiText({
-                                            width: wrapUiSize,
-                                            height: wrapUiSize,
-                                            text: unlockableArea.cost.toString(),
-                                            style: titleTextStyle,
-                                        }),
-                                    },
-                                ],
-                            }),
-                        ],
-                    }),
-                ],
             });
-            view.layout(context, { width: boundsWidth, height: boundsHeight });
             view.offset = areaScreenSpaceBounds;
             view.updateTransform();
             view.draw(context);
@@ -177,7 +134,11 @@ export class LandUnlockState extends InteractionState {
             // Check if there is enough resources
             const rootEntity = this.context.world.rootEntity;
             const inventoryComponent =
-                rootEntity.getComponent(InventoryComponent)!;
+                rootEntity.getComponent(InventoryComponent);
+
+            if (!inventoryComponent) {
+                throw new Error("No inventory component on root entity");
+            }
 
             const selectedArea = this.selectedArea;
             if (!selectedArea) {
@@ -241,5 +202,52 @@ export class LandUnlockState extends InteractionState {
 
             this.selectedAreaSize = sizeOfBounds(this.selectedArea.bounds);
         }
+    }
+
+    private getUnlockableLabelView(
+        boundsWidth: number,
+        boundsHeight: number,
+        area: UnlockableArea
+    ): UIView {
+        return uiBox({
+            width: boundsWidth,
+            height: boundsHeight,
+            children: [
+                uiBox({
+                    padding: allSides(8),
+                    width: wrapUiSize,
+                    height: wrapUiSize,
+                    background: colorBackground("#39034a"),
+                    children: [
+                        uiRow({
+                            width: wrapUiSize,
+                            height: wrapUiSize,
+                            children: [
+                                {
+                                    child: uiImage({
+                                        width: wrapUiSize,
+                                        height: wrapUiSize,
+                                        image: new UISpriteImageSource(
+                                            sprites2.wood_resource
+                                        ),
+                                    }),
+                                },
+                                {
+                                    child: uiSpace({ height: 4, width: 4 }),
+                                },
+                                {
+                                    child: uiText({
+                                        width: wrapUiSize,
+                                        height: wrapUiSize,
+                                        text: area.cost.toString(),
+                                        style: titleTextStyle,
+                                    }),
+                                },
+                            ],
+                        }),
+                    ],
+                }),
+            ],
+        });
     }
 }

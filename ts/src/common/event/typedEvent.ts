@@ -10,7 +10,7 @@ import { EventSubscriptionHandler } from "../event";
  * a list to handle subscriptions so its not optimised for a lot of
  * listeners but this should not be a common occurence.
  */
-export class TypedEvent<TBaseEvent extends Object> {
+export class TypedEvent<TBaseEvent extends object> {
     private nextListenersId = 0;
     private subscriptions: TypedEventSubscription<TBaseEvent>[] = [];
 
@@ -82,8 +82,8 @@ export class TypedEvent<TBaseEvent extends Object> {
 }
 
 /**
- * Represents a single subscription for an event. Allows
- * checking if the subscription is active and disposing the subscription
+ * Represents a single subscription for an event.
+ * Allows checking if the subscription is active and disposing the subscription
  */
 export class TypedEventHandle {
     private _isDisposed: boolean = false;

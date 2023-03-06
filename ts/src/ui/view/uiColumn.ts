@@ -167,7 +167,7 @@ export class UIColumn extends UIView {
             const childWidth = child.measuredSize?.width;
             let horizontalOffset = 0;
             if (childWidth && childWidth < measuredWidth) {
-                let childParentWidthDifferent = measuredWidth - childWidth;
+                const childParentWidthDifferent = measuredWidth - childWidth;
                 if (this._horizontalAlignment == HorizontalAlignment.Center) {
                     horizontalOffset = childParentWidthDifferent / 2;
                 } else if (

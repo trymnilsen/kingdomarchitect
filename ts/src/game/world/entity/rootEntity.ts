@@ -101,7 +101,7 @@ export class RootEntity extends Entity {
         const oldChunkId = this.entityChunks[entity.id];
         const newChunkId = getChunkId(getChunkPosition(entity.worldPosition));
         if (oldChunkId != newChunkId) {
-            // No need to remove the entity from the chunk map if its not present
+            // No need to remove entity from the chunk map if its not present
             if (!!oldChunkId) {
                 this.removeEntityFromChunkMap(entity);
             }

@@ -13,6 +13,39 @@ import { InteractionState } from "../../handler/interactionState";
 export class AlertMessageState extends InteractionState {
     constructor(private title: string, private text: string) {
         super();
+
+        const okButton = uiButton({
+            onTapCallback: () => {
+                this.context.stateChanger.pop(undefined);
+            },
+            padding: allSides(16),
+            defaultBackground: ninePatchBackground({
+                sprite: sprites2.stone_slate_border,
+                sides: allSides(6),
+                scale: 4,
+            }),
+            onTappedBackground: ninePatchBackground({
+                sprite: sprites2.stone_slate_border_selected,
+                sides: allSides(6),
+                scale: 4,
+            }),
+            children: [
+                uiText({
+                    padding: symmetricSides(0, 8),
+                    text: "Ok",
+                    style: {
+                        color: bookInkColor,
+                        font: "Silkscreen",
+                        size: 20,
+                    },
+                    width: fillUiSize,
+                    height: wrapUiSize,
+                }),
+            ],
+            width: fillUiSize,
+            height: wrapUiSize,
+        });
+
         this.view = uiBox({
             width: fillUiSize,
             height: fillUiSize,
@@ -64,41 +97,7 @@ export class AlertMessageState extends InteractionState {
                                     }),
                                 },
                                 {
-                                    child: uiButton({
-                                        onTapCallback: () => {
-                                            this.context.stateChanger.pop(
-                                                undefined
-                                            );
-                                        },
-                                        padding: allSides(16),
-                                        defaultBackground: ninePatchBackground({
-                                            sprite: sprites2.stone_slate_border,
-                                            sides: allSides(6),
-                                            scale: 4,
-                                        }),
-                                        onTappedBackground: ninePatchBackground(
-                                            {
-                                                sprite: sprites2.stone_slate_border_selected,
-                                                sides: allSides(6),
-                                                scale: 4,
-                                            }
-                                        ),
-                                        children: [
-                                            uiText({
-                                                padding: symmetricSides(0, 8),
-                                                text: "Ok",
-                                                style: {
-                                                    color: bookInkColor,
-                                                    font: "Silkscreen",
-                                                    size: 20,
-                                                },
-                                                width: fillUiSize,
-                                                height: wrapUiSize,
-                                            }),
-                                        ],
-                                        width: fillUiSize,
-                                        height: wrapUiSize,
-                                    }),
+                                    child: okButton,
                                 },
                             ],
                         }),
@@ -107,6 +106,7 @@ export class AlertMessageState extends InteractionState {
             ],
         });
     }
+
     override get isModal(): boolean {
         return true;
     }

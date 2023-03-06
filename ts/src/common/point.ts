@@ -190,7 +190,7 @@ export function adjacentPoints(
 }
 
 /**
- * Checks if pointB is adjacent to PointA either on the top, left, right or bottom
+ * Checks if pointB is adjacent to PointA on the top, left, right or bottom
  * @param pointA The main point
  * @param pointB The point to check if is adjacent to pointA
  * @returns true if the point is adjacent

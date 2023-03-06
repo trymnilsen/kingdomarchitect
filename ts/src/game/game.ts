@@ -1,12 +1,12 @@
-import { changeX, changeY, invert as invert, Point } from "../common/point";
-import { TouchInput } from "../input/touchInput";
+import { AssetLoader } from "../asset/loader/assetLoader";
+import { changeX, changeY, invert, Point } from "../common/point";
+import { MutableGameTime } from "../common/time";
 import { Input, InputEvent } from "../input/input";
-import { InputAction, InputActionType } from "../input/inputAction";
+import { InputActionType } from "../input/inputAction";
+import { TouchInput } from "../input/touchInput";
 import { Renderer } from "../rendering/renderer";
 import { MainScene, Scene } from "./mainScene";
-import { AssetLoader } from "../asset/loader/assetLoader";
 import { TileSize } from "./world/tile/tile";
-import { GameTime, MutableGameTime } from "../common/time";
 
 export class Game {
     private renderer: Renderer;
@@ -55,7 +55,7 @@ export class Game {
             this.render();
         };
 
-        this.touchInput.onPan = (movement: Point, position: Point) => {
+        this.touchInput.onPan = (movement: Point) => {
             this.renderer.camera.translate(invert(movement));
             this.render();
         };
@@ -131,6 +131,4 @@ export class Game {
         //const renderEnd = performance.now();
         //console.log("⏱render time: ", renderEnd - renderStart);
     }
-
-    public dispose(): any {}
 }

@@ -1,8 +1,7 @@
-import { absBounds, Bounds } from "../../../../../common/bounds";
+import { absBounds } from "../../../../../common/bounds";
 import { InvalidArgumentError } from "../../../../../common/error/invalidArgumentError";
 import { Graph } from "../../../../../path/graph";
 import { Entity } from "../../../entity/entity";
-import { getTileId } from "../../../tile/tile";
 import { TilesComponent } from "../../tile/tilesComponent";
 
 /**
@@ -16,7 +15,7 @@ export function createGraphFromNodes(rootEntity: Entity): Graph {
         throw new InvalidArgumentError("Root entity needs a tiles component");
     }
 
-    let bounds = groundComponent.getBounds();
+    const bounds = groundComponent.getBounds();
 
     const offsetBounds = absBounds(bounds);
     const weightGraph: number[][] = [];
@@ -26,10 +25,6 @@ export function createGraphFromNodes(rootEntity: Entity): Graph {
             let weight = 1000;
             const tilePositionXWithoutOffset = x - offsetBounds.offsets.x;
             const tilePositionYWithoutOffset = y - offsetBounds.offsets.y;
-            const tileId = getTileId(
-                tilePositionXWithoutOffset,
-                tilePositionYWithoutOffset
-            );
 
             const ground = groundComponent.getTile({
                 x: tilePositionXWithoutOffset,

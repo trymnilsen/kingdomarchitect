@@ -1,5 +1,3 @@
-import { BaseEvent } from "../../../common/event/baseEvent";
-import { TypedEventHandle } from "../../../common/event/typedEvent";
 import { Point } from "../../../common/point";
 import { RenderContext } from "../../../rendering/renderContext";
 import { Entity } from "../entity/entity";
@@ -8,11 +6,15 @@ import { ComponentEvent } from "./componentEvent";
 export abstract class EntityComponent {
     private _entity?: Entity;
 
-    public get entity(): Entity | undefined {
+    public get entity(): Entity {
+        if (!this._entity) {
+            throw new Error("No entity available for component");
+        }
+
         return this._entity;
     }
 
-    public set entity(value: Entity | undefined) {
+    public set entity(value: Entity) {
         this._entity = value;
     }
 

@@ -70,7 +70,7 @@ export class UIMasterDetails extends UIView {
     layout(layoutContext: UILayoutContext, constraints: UISize): UISize {
         if (constraints.width < 600) {
             this._mode = UIMasterDetailsMode.Single;
-            let measuredSize: UISize = {
+            const measuredSize: UISize = {
                 width: 300,
                 height: 400,
             };
@@ -88,7 +88,7 @@ export class UIMasterDetails extends UIView {
             this._measuredSize = measuredSize;
             return measuredSize;
         } else {
-            let measuredSize: UISize = {
+            const measuredSize: UISize = {
                 width: 600,
                 height: 400,
             };

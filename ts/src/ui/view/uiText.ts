@@ -40,9 +40,9 @@ export class UIText extends UIView {
 
     layout(layoutContext: UILayoutContext, constraints: UISize): UISize {
         const textSize = layoutContext.measureText(this._text, this._textStyle);
-        let measuredSize = { width: 0, height: 0 };
-        let horizontalPadding = totalHorizontal(this.padding);
-        let verticalPadding = totalVertical(this.padding);
+        const measuredSize = { width: 0, height: 0 };
+        const horizontalPadding = totalHorizontal(this.padding);
+        const verticalPadding = totalVertical(this.padding);
         // Set the measured size based on the wanted ui size
         if (this.size.width == wrapUiSize) {
             measuredSize.width = textSize.width + horizontalPadding;

@@ -25,7 +25,7 @@ export interface UISize {
  * @param secondSize second size
  * @returns if the size is equal
  */
-export function UISizeEquals(firstSize: UISize, secondSize: UISize): Boolean {
+export function UISizeEquals(firstSize: UISize, secondSize: UISize): boolean {
     return (
         firstSize.width == secondSize.width &&
         firstSize.height == secondSize.height

@@ -41,9 +41,6 @@ export class UIFlowGrid extends UIView {
             throw new Error("Grid size larger than parent");
         }
 
-        let widthConstraint = 0;
-        let heightConstraint = 0;
-
         let measuredWidth = 0;
         let measuredHeight = 0;
 
@@ -68,7 +65,7 @@ export class UIFlowGrid extends UIView {
         const totalColumnWidth = numberOfColumns * this.gridItemSize;
         const columnAlignmentOffset =
             (constraints.width - totalColumnWidth) / 2;
-        // if the wanted size is wrap we set the height to the height of our rows
+        // if the wanted size is wrap set the height to the height of our rows
         if (this.size.height == wrapUiSize) {
             measuredHeight = totalRowHeight;
         }

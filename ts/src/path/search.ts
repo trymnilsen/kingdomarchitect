@@ -57,7 +57,7 @@ export class PathSearch {
         this.graph.cleanDirtyNodes();
 
         const openHeap = this.createHeap();
-        //var closestNode = start; // set the start node to be the closest if required
+        //var closestNode = start; // set start node to be closest if required
 
         start.h = manhattanDistance(start, end);
         this.graph.markDirtyNode(start);
@@ -65,7 +65,8 @@ export class PathSearch {
         openHeap.push(start);
 
         while (openHeap.size > 0) {
-            // Grab the lowest f(x) to process next.  Heap keeps this sorted for us.
+            // Grab the lowest f(x) to process next.
+            // Heap keeps this sorted for us.
             const currentNode = openHeap.pop();
 
             // End case -- result has been found, return the traced path.
@@ -73,13 +74,14 @@ export class PathSearch {
                 return this.pathTo(currentNode);
             }
 
-            // Normal case -- move currentNode from open to closed, process each of its neighbors.
+            // Normal case -- move currentNode from open to closed,
+            // process each of its neighbors.
             currentNode.closed = true;
 
             // Find all neighbors for the current node.
             const neighbors = this.graph.neighbors(currentNode);
 
-            for (var i = 0, il = neighbors.length; i < il; ++i) {
+            for (let i = 0, il = neighbors.length; i < il; ++i) {
                 const neighbor = neighbors[i];
                 const neighborWeight = weightModifier(neighbor);
                 if (neighbor.closed || neighborWeight === 0) {
@@ -89,13 +91,16 @@ export class PathSearch {
                     continue;
                 }
 
-                // The g score is the shortest distance from start to current node.
-                // We need to check if the path we have arrived at this neighbor is the shortest one we have seen yet.
+                // The g score is the shortest distance from start
+                // to current node. We need to check if the path we
+                // have arrived at this neighbor is the shortest one
+                // we have seen yet.
                 const gScore = currentNode.g + neighborWeight;
                 const beenVisited = neighbor.visited;
 
                 if (!beenVisited || gScore < neighbor.g) {
-                    // Found an optimal (so far) path to this node.  Take score for node to see how good it is.
+                    // Found an optimal (so far) path to this node.
+                    // Take score for node to see how good it is.
                     neighbor.visited = true;
                     neighbor.parent = currentNode;
                     neighbor.h = neighbor.h || manhattanDistance(neighbor, end);
@@ -103,8 +108,9 @@ export class PathSearch {
                     neighbor.f = neighbor.g + neighbor.h;
                     this.graph.markDirtyNode(neighbor);
 
-                    // If the neighbour is closer than the current closestNode or if it's equally close but has
-                    // a cheaper path than the current closest node then it becomes the closest node
+                    // If the neighbour is closer than the current closestNode
+                    // or if it's equally close but has a cheaper path than
+                    // the current closest node then it becomes the closest node
                     const neighborCloserThanClosest =
                         neighbor.h < closestNode.h;
                     const neighborIsCheaper =
@@ -116,10 +122,12 @@ export class PathSearch {
                     }
 
                     if (!beenVisited) {
-                        // Pushing to heap will put it in proper place based on the 'f' value.
+                        // Pushing to heap will put it in proper place
+                        // based on the 'f' value.
                         openHeap.push(neighbor);
                     } else {
-                        // Already seen the node, but since it has been rescored we need to reorder it in the heap
+                        // Already seen the node, but since it has been
+                        // rescored we need to reorder it in the heap
                         openHeap.rescoreItem(neighbor);
                     }
                 }

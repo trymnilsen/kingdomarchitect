@@ -35,11 +35,11 @@ export class UIImage extends UIView {
             return constraints;
         }
 
-        let imageSize: UISize = this._image.measure(layoutContext);
+        const imageSize: UISize = this._image.measure(layoutContext);
         imageSize.width = imageSize.width * this._scale;
         imageSize.height = imageSize.height * this._scale;
 
-        let measuredSize = { width: 0, height: 0 };
+        const measuredSize = { width: 0, height: 0 };
 
         // Set the measured size based on the wanted ui size
         if (this.size.width == wrapUiSize) {

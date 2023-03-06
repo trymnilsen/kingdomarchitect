@@ -14,7 +14,7 @@ export class PathFindingComponent extends EntityComponent {
     }
 
     override onStart(tick: number): void {
-        this.tileEventListener = this.entity!.componentEvents.listen(
+        this.tileEventListener = this.entity.componentEvents.listen(
             TileMapUpdateEvent,
             (event) => {
                 this.invalidateCurrentGraph();
@@ -29,7 +29,7 @@ export class PathFindingComponent extends EntityComponent {
     public findPath(
         from: Point,
         to: Point,
-        blockBuildings?: Boolean
+        blockBuildings?: boolean
     ): PathResult {
         const offsetPoint = this.pathSearch.offset;
         const offsetFrom = addPoint(from, {
@@ -46,10 +46,11 @@ export class PathFindingComponent extends EntityComponent {
         // building itself we will override the partial search but rememeber it.
         // Once the search is complete we check if the final position in
         // the path that has been searched is adjacent to the to point or tile
-        // this adjency handles multi-tiles. I.e the points might not be adjacent
-        // on a grid, but they might be considered adjacent if the to point is
-        // inside a building that stretches across multiple tiles and one of the
-        // tiles belonging to the building is adjacent to the last path point
+        // this adjency handles multi-tiles. I.e the points might not be
+        // adjacent on a grid, but they might be considered adjacent if the
+        // to point is inside a building that stretches across multiple
+        // tiles and one of the tiles belonging to the building is adjacent
+        // to the last path point
         const weightModifier = !!blockBuildings
             ? blockBuildingsModifier
             : defaultWeightModifier;

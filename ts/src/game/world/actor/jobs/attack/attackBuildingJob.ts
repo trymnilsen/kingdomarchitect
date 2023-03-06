@@ -29,17 +29,6 @@ class _AttackBuilding extends Job {
     }
 
     update(tick: number): void {
-        /*         const halfHealth = this.entity.maxHealth / 2;
-        if (this.entity.health > halfHealth) {
-            this.entity.health = halfHealth;
-            console.log(
-                `Attacked building, health is now ${this.entity.health}`
-            );
-        } else {
-            console.log(
-                `Health less than halfHealth (${halfHealth}): ${this.entity.health} `
-            );
-        } */
         this.complete();
     }
 }

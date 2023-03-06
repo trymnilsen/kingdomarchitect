@@ -42,8 +42,15 @@ export class TreeComponent extends EntityComponent {
             if (timeDifference > 30) {
                 this.chopTime = undefined;
                 this.chopState = TreeComponentChopState.Full;
-                const health = this.entity?.getComponent(HealthComponent)!;
-                health.healToMax();
+                const health = this.entity?.getComponent(HealthComponent);
+                if (!!health) {
+                    health.healToMax();
+                } else {
+                    console.error(
+                        "No health component found on entity, cannot heal",
+                        this
+                    );
+                }
             }
         }
     }

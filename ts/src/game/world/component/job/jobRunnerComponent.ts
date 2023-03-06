@@ -17,7 +17,7 @@ export class JobRunnerComponent extends EntityComponent {
         return this._activeJob;
     }
 
-    public get hasActiveJob(): Boolean {
+    public get hasActiveJob(): boolean {
         return !!this._activeJob;
     }
 
