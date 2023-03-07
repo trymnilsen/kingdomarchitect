@@ -12,6 +12,12 @@ export class UISkillTree extends UIView {
     };
     private halfWidth: number = 0;
     private halfHeight: number = 0;
+
+    panView(movement: Point) {
+        this.scrollTranslation.x += movement.x;
+        this.scrollTranslation.y += movement.y;
+    }
+
     hitTest(screenPoint: Point): boolean {
         return true;
     }
@@ -24,6 +30,7 @@ export class UISkillTree extends UIView {
         this.halfHeight = constraints.height / 2;
         return this._measuredSize;
     }
+
     draw(context: UIRenderContext): void {
         const itemOffset = addPoint(
             addPoint(this.scrollTranslation, this.screenPosition),
@@ -111,5 +118,9 @@ export class UISkillTree extends UIView {
             x: archerOffset.x,
             y: archerOffset.y,
         });
+    }
+
+    override onTapDown(screenPoint: Point): boolean {
+        return true;
     }
 }

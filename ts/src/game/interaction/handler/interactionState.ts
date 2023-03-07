@@ -94,6 +94,8 @@ export abstract class InteractionState {
         return false;
     }
 
+    onTapPan(movement: Point, position: Point, startPosition: Point): void {}
+
     /**
      * Called when this state becomes the active state, either by being popped
      * back to, or the first time it becomes active. Will be called multiple

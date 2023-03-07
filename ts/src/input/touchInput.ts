@@ -6,7 +6,12 @@ export interface OnPanEvent {
 }
 
 export type OnTapDownCallback = (position: Point) => boolean;
-export type OnPanCallback = (movement: Point, position: Point) => void;
+export type OnPanCallback = (
+    movement: Point,
+    position: Point,
+    startPosition: Point,
+    downTapHandled: boolean
+) => void;
 export type OnTapUpCallback = (movement: Point) => void;
 export type OnTapCallback = (position: Point) => void;
 
@@ -125,14 +130,19 @@ export class TouchInput {
     }
 
     private onDrag(position: Point) {
-        if (this.tapHandled) {
-            return;
-        }
-
-        if (this.isDragging && this.previousMovePosition) {
+        if (
+            this.isDragging &&
+            this.previousMovePosition &&
+            this.onTapPosition
+        ) {
             const movement = subtractPoint(position, this.previousMovePosition);
             if (this.onPan) {
-                this.onPan(movement, position);
+                this.onPan(
+                    movement,
+                    position,
+                    this.onTapPosition,
+                    this.tapHandled
+                );
             }
         } else if (this.onTapPosition != null) {
             if (distance(this.onTapPosition, position) > 5) {

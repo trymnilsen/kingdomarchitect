@@ -42,6 +42,10 @@ export class MainScene implements Scene {
         this.interactionHandler.onTapUp(screenPoint);
     }
 
+    onTapPan(movement: Point, position: Point, startPoint: Point): void {
+        this.interactionHandler.onTapPan(movement, position, startPoint);
+    }
+
     input(action: InputAction): void {
         this.interactionHandler.onInput(action);
     }
@@ -58,5 +62,6 @@ export interface Scene {
     onTapDown(screenPoint: Point): boolean;
     onTapUp(screenPoint: Point): void;
     onTap(screenPoint: Point): void;
+    onTapPan(movement: Point, position: Point, startPoint: Point): void;
     tick(tick: number): void;
 }

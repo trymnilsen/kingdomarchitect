@@ -55,8 +55,18 @@ export class Game {
             this.render();
         };
 
-        this.touchInput.onPan = (movement: Point) => {
-            this.renderer.camera.translate(invert(movement));
+        this.touchInput.onPan = (
+            movement: Point,
+            position: Point,
+            startPosition: Point,
+            downTapHandled: boolean
+        ) => {
+            if (downTapHandled) {
+                this.currentScene.onTapPan(movement, position, startPosition);
+            } else {
+                this.renderer.camera.translate(invert(movement));
+            }
+
             this.render();
         };
 

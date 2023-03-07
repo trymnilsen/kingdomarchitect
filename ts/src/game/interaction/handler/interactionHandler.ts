@@ -105,6 +105,10 @@ export class InteractionHandler {
         this.interactionStateChanger.apply(this.history);
     }
 
+    onTapPan(movement: Point, position: Point, startPosition: Point): void {
+        this.history.state.onTapPan(movement, position, startPosition);
+    }
+
     onInput(inputAction: InputAction) {
         const inputHandled = this.history.state.onInput(
             inputAction,

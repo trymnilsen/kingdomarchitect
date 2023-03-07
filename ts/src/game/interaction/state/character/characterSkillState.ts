@@ -1,4 +1,6 @@
 import { sprites2 } from "../../../../asset/sprite";
+import { withinRectangle } from "../../../../common/bounds";
+import { Point } from "../../../../common/point";
 import { allSides, symmetricSides } from "../../../../common/sides";
 import {
     bookFill,
@@ -92,6 +94,25 @@ export class CharacterSkillState extends InteractionState {
                 }),
             ],
         });
+    }
+
+    override onTapPan(
+        movement: Point,
+        position: Point,
+        startPosition: Point
+    ): void {
+        const panViewBounds = this._skillTree.bounds;
+        if (
+            withinRectangle(
+                startPosition,
+                panViewBounds.x1,
+                panViewBounds.y1,
+                panViewBounds.x2,
+                panViewBounds.y2
+            )
+        ) {
+            this._skillTree.panView(movement);
+        }
     }
 
     private actionSelected(action: ActionButton) {}
