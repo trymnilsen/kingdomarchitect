@@ -39,3 +39,23 @@ export class NinePatchBackground implements UIBackground {
         });
     }
 }
+
+export class BoxBackground implements UIBackground {
+    constructor(
+        private fill: string,
+        private stroke: string,
+        private strokeWidth: number
+    ) {}
+
+    draw(context: UIRenderContext, screenPosition: Point, size: UISize): void {
+        context.drawScreenSpaceRectangle({
+            x: screenPosition.x,
+            y: screenPosition.y,
+            width: size.width,
+            height: size.height,
+            fill: this.fill,
+            strokeColor: this.stroke,
+            strokeWidth: this.strokeWidth,
+        });
+    }
+}

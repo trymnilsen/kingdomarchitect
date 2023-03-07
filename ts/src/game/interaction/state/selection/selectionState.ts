@@ -1,7 +1,7 @@
 import { sprites2 } from "../../../../asset/sprite";
-import { Point } from "../../../../common/point";
 import { allSides } from "../../../../common/sides";
 import { RenderContext } from "../../../../rendering/renderContext";
+import { WorkerBehaviorComponent } from "../../../world/component/behavior/workerBehaviorComponent";
 import { TreeComponent } from "../../../world/component/resource/treeComponent";
 import { SelectedEntityItem } from "../../../world/selection/selectedEntityItem";
 import { SelectedTileItem } from "../../../world/selection/selectedTileItem";
@@ -10,6 +10,7 @@ import { GroundTile } from "../../../world/tile/ground";
 import { TileSize } from "../../../world/tile/tile";
 import { InteractionState } from "../../handler/interactionState";
 import { ActionButton, getActionbarView } from "../../view/actionbar";
+import { CharacterSkillState } from "../character/characterSkillState";
 import { ChopJobState } from "../resource/chopJopState";
 
 export class SelectionState extends InteractionState {
@@ -81,7 +82,7 @@ export class SelectionState extends InteractionState {
     }
 
     private updateTileActions() {
-        const actions = this.getTileActions(this.selectedItem.tilePosition);
+        const actions = this.getTileActions(this.selectedItem);
         const actionbarView = getActionbarView(actions, (action) => {
             this.actionButtonPressed(action.id);
         });
@@ -89,52 +90,68 @@ export class SelectionState extends InteractionState {
         this.view = actionbarView;
     }
 
-    private getTileActions(tilePosition: Point): ActionButton[] {
-        const tile = this.context.world.ground.getTile(tilePosition);
-        let actions: ActionButton[] = [];
-        if (tile && tile.hasTree) {
-            actions = [
-                {
-                    id: "chop",
-                    name: "Chop",
-                },
+    private getTileActions(selection: SelectedWorldItem): ActionButton[] {
+        if (selection instanceof SelectedEntityItem) {
+            let actions: ActionButton[] = [];
+            const tree = selection.entity.getComponent(TreeComponent);
+            if (!!tree) {
+                actions = [
+                    {
+                        id: "chop",
+                        name: "Chop",
+                    },
+                    {
+                        id: "cancel",
+                        name: "Cancel",
+                    },
+                ];
+            }
+
+            const worker = selection.entity.getComponent(
+                WorkerBehaviorComponent
+            );
+
+            if (!!worker) {
+                actions = [
+                    {
+                        id: "skills",
+                        name: "skills",
+                    },
+                    {
+                        id: "cancel",
+                        name: "Cancel",
+                    },
+                ];
+            }
+
+            return actions;
+        } else if (selection instanceof SelectedTileItem) {
+            const tile = this.context.world.ground.getTile(
+                selection.tilePosition
+            );
+            let actions: ActionButton[] = [];
+            if (tile && tile.hasTree) {
+                actions = [
+                    {
+                        id: "chop",
+                        name: "Chop",
+                    },
+                    {
+                        id: "cancel",
+                        name: "Cancel",
+                    },
+                ];
+            }
+
+            return actions;
+        } else {
+            return [
                 {
                     id: "cancel",
                     name: "Cancel",
                 },
             ];
         }
-
-        if (actions.length == 0) {
-            const rootEntity = this.context.world.rootEntity;
-            const entities = rootEntity.getEntityAt(tilePosition);
-            console.log(
-                `Entities at: ${tilePosition.x} ${tilePosition.y}`,
-                entities
-            );
-
-            if (entities.length > 0) {
-                const treeEntity = entities.filter((entity) => {
-                    const isTree = entity.getComponent(TreeComponent);
-                    return !!isTree;
-                });
-
-                if (treeEntity.length > 0) {
-                    actions = [
-                        {
-                            id: "chop",
-                            name: "Chop",
-                        },
-                        {
-                            id: "cancel",
-                            name: "Cancel",
-                        },
-                    ];
-                }
-            }
-        }
-
-        return actions;
     }
 
     private actionButtonPressed(actionId: string) {
@@ -143,6 +160,8 @@ export class SelectionState extends InteractionState {
             this.context.stateChanger.push(new ChopJobState(selectedTile));
         } else if (actionId == "cancel") {
             this.context.stateChanger.pop(null);
+        } else if (actionId == "skills") {
+            this.context.stateChanger.push(new CharacterSkillState());
         } /*else if (actionId == "collect_coin") {
             const selectedTile = this.selectedItem;
             const coin = this.context.world.actors.getActor(

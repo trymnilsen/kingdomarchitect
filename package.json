@@ -4,10 +4,11 @@
     "description": "Kingdom architects is intended to be a building/management game",
     "scripts": {
         "tsc": "tsc",
-        "build": "webpack && eslint . --ext .ts",
+        "build": "webpack",
         "spritepack": "ts-node ts/tool/spritepack/spritePack.ts && webpack",
         "start": "webpack serve",
         "test": "mocha",
+        "lint": "eslint . --ext .ts",
         "coverage": "c8 mocha && open coverage/lcov-report/index.html"
     },
     "repository": {

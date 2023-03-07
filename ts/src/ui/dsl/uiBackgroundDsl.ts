@@ -1,6 +1,7 @@
 import { Sprite2 } from "../../asset/sprite";
 import { allSides, Sides } from "../../common/sides";
 import {
+    BoxBackground,
     ColorBackground,
     NinePatchBackground,
     UIBackground,
@@ -24,4 +25,20 @@ export function ninePatchBackground(
         properties.sides || allSides(8),
         properties.scale || 1
     );
+}
+
+export interface BoxBackgroundProperties {
+    fill: string;
+    stroke: string;
+    strokeWidth?: number;
+}
+export function boxBackground(
+    properties: BoxBackgroundProperties
+): UIBackground {
+    let strokeWidth = 1;
+    if (properties.strokeWidth != undefined) {
+        strokeWidth = properties.strokeWidth;
+    }
+
+    return new BoxBackground(properties.fill, properties.stroke, strokeWidth);
 }
