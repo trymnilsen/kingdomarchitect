@@ -13,6 +13,7 @@ import { RectangleConfiguration, rectangleRenderer } from "./items/rectangle";
 import { TextConfiguration, textRenderer } from "./items/text";
 import { TextStyle } from "./text/textStyle";
 import { UIRenderContext } from "./uiRenderContext";
+import { Bounds } from "../common/bounds";
 
 /**
  * The rendercontext combines the access to the camera, assets and canvas
@@ -96,6 +97,26 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
             width: Math.ceil(textMetrics.width),
             height: Math.ceil(textMetrics.actualBoundingBoxDescent),
         };
+    }
+
+    drawWithClip(
+        bounds: Bounds,
+        drawFunction: (context: UIRenderContext) => void
+    ): void {
+        try {
+            this.canvasContext.save();
+            this.canvasContext.beginPath();
+            this.canvasContext.rect(
+                bounds.x1,
+                bounds.y1,
+                bounds.x2 - bounds.x1,
+                bounds.y2 - bounds.y1
+            );
+            this.canvasContext.clip();
+            drawFunction(this);
+        } finally {
+            this.canvasContext.restore();
+        }
     }
 
     /**
