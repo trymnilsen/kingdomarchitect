@@ -1,4 +1,3 @@
-import { sprites2 } from "../../../../asset/sprite";
 import { withinRectangle } from "../../../../common/bounds";
 import { Point } from "../../../../common/point";
 import { allSides, symmetricSides } from "../../../../common/sides";
@@ -7,10 +6,7 @@ import {
     bookInkColor,
     hiddenBookInkColor,
 } from "../../../../ui/color";
-import {
-    boxBackground,
-    ninePatchBackground,
-} from "../../../../ui/dsl/uiBackgroundDsl";
+import { boxBackground } from "../../../../ui/dsl/uiBackgroundDsl";
 import { uiBox } from "../../../../ui/dsl/uiBoxDsl";
 import { uiColumn } from "../../../../ui/dsl/uiColumnDsl";
 import { uiText } from "../../../../ui/dsl/uiTextDsl";

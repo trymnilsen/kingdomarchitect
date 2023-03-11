@@ -19,6 +19,7 @@ import { InteractionState } from "../../../handler/interactionState";
 import { BuildConfirmState } from "../../building2/buildConfirmState";
 import { InventoryState } from "../inventory/inventoryState";
 import { bookTabs } from "../ui/bookTabs";
+import { ActionButton, getActionbarView } from "../../../view/actionbar";
 
 const buildings: BuildingListEntry[] = [
     {
@@ -31,8 +32,20 @@ const buildings: BuildingListEntry[] = [
     },
 ];
 
+const actions: ActionButton[] = [
+    {
+        id: "build",
+        name: "Build",
+    },
+    {
+        id: "close",
+        name: "close",
+    },
+];
+
 export class BuildingState extends InteractionState {
     private _masterDetailsView: UIMasterDetails;
+    private _actionbar: UIView;
 
     override get isModal(): boolean {
         return true;
@@ -49,16 +62,46 @@ export class BuildingState extends InteractionState {
             height: fillUiSize,
         });
 
+        this._actionbar = getActionbarView(actions, (action) => {
+            this.actionSelected(action);
+        });
+
+        this._actionbar.size = {
+            width: fillUiSize,
+            height: wrapUiSize,
+        };
+
         this._masterDetailsView.dualBackground = new OpenBookUIBackground();
 
         this.view = uiBox({
             width: fillUiSize,
             height: fillUiSize,
-            padding: allSides(64),
-            alignment: uiAlignment.center,
-            children: [this._masterDetailsView],
+            children: [
+                uiColumn({
+                    width: fillUiSize,
+                    height: fillUiSize,
+                    children: [
+                        {
+                            weight: 1,
+                            child: uiBox({
+                                id: "buildStateLayout",
+                                width: fillUiSize,
+                                height: fillUiSize,
+                                padding: allSides(64),
+                                alignment: uiAlignment.center,
+                                children: [this._masterDetailsView],
+                            }),
+                        },
+                        {
+                            child: this._actionbar,
+                        },
+                    ],
+                }),
+            ],
         });
     }
+
+    private actionSelected(action: ActionButton) {}
 
     private setActiveBuilding(index: number) {}
 
