@@ -101,7 +101,13 @@ export class BuildingState extends InteractionState {
         });
     }
 
-    private actionSelected(action: ActionButton) {}
+    private actionSelected(action: ActionButton) {
+        if (action.id == "build") {
+            this.context.stateChanger.replace(new BuildConfirmState());
+        } else if (action.id == "close") {
+            this.context.stateChanger.pop(undefined);
+        }
+    }
 
     private setActiveBuilding(index: number) {}
 

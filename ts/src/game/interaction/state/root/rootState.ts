@@ -1,4 +1,11 @@
+import { sprites2 } from "../../../../asset/sprite";
 import { InputAction, InputActionType } from "../../../../input/inputAction";
+import { uiBox } from "../../../../ui/dsl/uiBoxDsl";
+import { spriteImageSource, uiImage } from "../../../../ui/dsl/uiImageDsl";
+import { uiRow } from "../../../../ui/dsl/uiRowDsl";
+import { uiSpace } from "../../../../ui/dsl/uiSpaceDsl";
+import { uiAlignment } from "../../../../ui/uiAlignment";
+import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize";
 import { SelectedEntityItem } from "../../../world/selection/selectedEntityItem";
 import { SelectedTileItem } from "../../../world/selection/selectedTileItem";
 import { SelectedWorldItem } from "../../../world/selection/selectedWorldItem";
@@ -44,7 +51,79 @@ export class RootState extends InteractionState {
             this.actionSelected(action);
         });
 
-        this.view = actionbarView;
+        const timelineControls = uiBox({
+            width: fillUiSize,
+            height: fillUiSize,
+            alignment: uiAlignment.topCenter,
+            children: [
+                uiRow({
+                    width: wrapUiSize,
+                    height: wrapUiSize,
+                    children: [
+                        {
+                            child: uiImage({
+                                width: 48,
+                                height: 48,
+                                image: spriteImageSource(
+                                    sprites2.stone_slate_background_2x
+                                ),
+                            }),
+                        },
+                        {
+                            child: uiSpace({
+                                width: 64,
+                                height: 48,
+                            }),
+                        },
+                        {
+                            child: uiImage({
+                                width: 48,
+                                height: 48,
+                                image: spriteImageSource(
+                                    sprites2.stone_slate_background_2x
+                                ),
+                            }),
+                        },
+                        {
+                            child: uiSpace({
+                                width: 64,
+                                height: 48,
+                            }),
+                        },
+                        {
+                            child: uiImage({
+                                width: 48,
+                                height: 48,
+                                image: spriteImageSource(
+                                    sprites2.stone_slate_background_2x
+                                ),
+                            }),
+                        },
+                        {
+                            child: uiSpace({
+                                width: 64,
+                                height: 48,
+                            }),
+                        },
+                        {
+                            child: uiImage({
+                                width: 48,
+                                height: 48,
+                                image: spriteImageSource(
+                                    sprites2.stone_slate_background_2x
+                                ),
+                            }),
+                        },
+                    ],
+                }),
+            ],
+        });
+
+        this.view = uiBox({
+            width: fillUiSize,
+            height: fillUiSize,
+            children: [actionbarView, timelineControls],
+        });
     }
 
     override onTileTap(tile: GroundTile): boolean {

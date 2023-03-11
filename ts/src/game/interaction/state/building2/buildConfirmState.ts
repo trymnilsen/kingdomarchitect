@@ -7,6 +7,7 @@ import { RenderContext } from "../../../../rendering/renderContext";
 import { BlinkingImageAnimation } from "../../../../rendering/visual/blinkingImageAnimation";
 import { BuildJob } from "../../../world/actor/jobs/buildJob";
 import { InventoryComponent } from "../../../world/component/inventory/inventoryComponent";
+import { TilesComponent } from "../../../world/component/tile/tilesComponent";
 import { housePrefab } from "../../../world/prefab/housePrefab";
 import { GroundTile } from "../../../world/tile/ground";
 import { TileSize } from "../../../world/tile/tile";
@@ -52,7 +53,11 @@ export class BuildConfirmState extends InteractionState {
         if (action.id == "build") {
             const rootEntity = this.context.world.rootEntity;
             const entitiesAt = rootEntity.getEntityAt(this.selectionPosition);
-            if (entitiesAt.length > 0) {
+            const treeAt = rootEntity
+                .getComponent(TilesComponent)
+                ?.getTile(this.selectionPosition)?.hasTree;
+
+            if (entitiesAt.length > 0 || !!treeAt) {
                 this.context.stateChanger.push(
                     new AlertMessageState("Oh no", "Spot taken")
                 );

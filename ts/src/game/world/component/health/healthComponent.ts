@@ -9,6 +9,9 @@ export class HealthComponent extends EntityComponent {
     private _maxHealth: number;
     private _showHealthBarThreshold: NumberRange;
 
+    /*
+     * Returns the health as a percentage between 0.0 and 1.0
+     */
     public get healthPercentage(): number {
         return this._health / this._maxHealth;
     }

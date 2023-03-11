@@ -51,8 +51,8 @@ export class World {
 
         //Set up initial entities
         const firstWorker = workerPrefab(generateId("worker"));
+        const firstHouse = housePrefab(generateId("house"), false, firstWorker);
         const firstFarm = farmPrefab(generateId("farm"));
-        const firstHouse = housePrefab(generateId("house"), false);
         firstFarm.position = { x: 2, y: 0 };
         firstHouse.position = { x: 1, y: 0 };
         this._rootEntity.addChild(firstHouse);
