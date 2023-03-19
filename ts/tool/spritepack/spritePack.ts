@@ -115,12 +115,21 @@ async function packSprites(sprites: PackableSprite[]) {
                 );
             }
 
+            const definition = packedSprite.definition;
+            let frames = definition.frames;
+            if (!frames) {
+                console.log(
+                    `Frames was not defined ${packedSprite.filename}:${packedSprite.spriteName}. Setting it to 1`
+                );
+                frames = 1;
+            }
+
             packedSprites[packedSprite.spriteName] = {
                 bin: binIndex.toString(),
                 defintion: {
-                    frames: packedSprite.definition.frames,
-                    w: packedSprite.definition.w,
-                    h: packedSprite.definition.h,
+                    frames: frames,
+                    w: definition.w / frames,
+                    h: definition.h,
                     x: rect.x,
                     y: rect.y,
                 },
@@ -128,8 +137,8 @@ async function packSprites(sprites: PackableSprite[]) {
 
             for (let x = 0; x < rect.width; x++) {
                 for (let y = 0; y < rect.height; y++) {
-                    const xInSourceImage = packedSprite.definition.x + x;
-                    const yInSourceImage = packedSprite.definition.y + y;
+                    const xInSourceImage = definition.x + x;
+                    const yInSourceImage = definition.y + y;
 
                     const pixel: PixelColor = {
                         red: spritePixels.get(

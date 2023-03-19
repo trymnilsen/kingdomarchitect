@@ -1,6 +1,7 @@
 import { sprites2 } from "../../../../../asset/sprite";
 import { rgbToHex } from "../../../../../common/color";
 import { Point } from "../../../../../common/point";
+import { GameTime, TimeOfDay } from "../../../../../common/time";
 import { UIRenderContext } from "../../../../../rendering/uiRenderContext";
 import { UILayoutContext } from "../../../../../ui/uiLayoutContext";
 import { UISize } from "../../../../../ui/uiSize";
@@ -8,10 +9,16 @@ import { UIView } from "../../../../../ui/uiView";
 
 export class UITimeline extends UIView {
     private spaceBetweenWidth: number = wantedSpaceBetween;
+    private gameTime: GameTime;
+    constructor(gameTime: GameTime, size: UISize) {
+        super(size);
+        this.gameTime = gameTime;
+    }
 
     hitTest(screenPoint: Point): boolean {
         return false;
     }
+
     layout(layoutContext: UILayoutContext, constraints: UISize): UISize {
         const rectangleSizes = 48 * 4;
         const wantedWidth = rectangleSizes + this.spaceBetweenWidth * 3;
@@ -34,6 +41,8 @@ export class UITimeline extends UIView {
         if (!this._measuredSize) {
             throw new Error("Size not measured");
         }
+
+        const nextTimeOfDay = this.gameTime.nextTimeOfDay;
 
         for (let i = 0; i < 4; i++) {
             const screenX =
@@ -61,11 +70,25 @@ export class UITimeline extends UIView {
                 strokeWidth: 2,
             });
 
+            if (i == 0) {
+                const frame = Math.floor(
+                    ((this.gameTime.fractionalTimeOfDay * 4) % 1) * 8
+                );
+                context.drawScreenSpaceSprite({
+                    x: this.screenPosition.x,
+                    y: this.screenPosition.y,
+                    sprite: sprites2.clock_reveal,
+                    frame: frame,
+                    targetHeight: 48,
+                    targetWidth: 48,
+                });
+            }
+
             const iconX = screenX + 8;
             const iconY = this.screenPosition.y + 8;
-
-            switch (i) {
-                case 0:
+            const timeOfDay = nextTimeOfDay[i];
+            switch (timeOfDay) {
+                case TimeOfDay.Dawn:
                     context.drawScreenSpaceSprite({
                         sprite: sprites2.sunrise_icon,
                         x: iconX,
@@ -74,7 +97,7 @@ export class UITimeline extends UIView {
                         targetHeight: 32,
                     });
                     break;
-                case 1:
+                case TimeOfDay.Day:
                     context.drawScreenSpaceSprite({
                         sprite: sprites2.sun_icon,
                         x: iconX,
@@ -83,7 +106,7 @@ export class UITimeline extends UIView {
                         targetHeight: 32,
                     });
                     break;
-                case 2:
+                case TimeOfDay.Dusk:
                     context.drawScreenSpaceSprite({
                         sprite: sprites2.sunrise_icon,
                         x: iconX,
@@ -92,7 +115,7 @@ export class UITimeline extends UIView {
                         targetHeight: 32,
                     });
                     break;
-                case 3:
+                case TimeOfDay.Night:
                     context.drawScreenSpaceSprite({
                         sprite: sprites2.moon_icon,
                         x: iconX,

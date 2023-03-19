@@ -4,6 +4,7 @@ import { RenderItemConfiguration } from "./renderItemConfiguration";
 
 export interface SpriteConfiguration extends RenderItemConfiguration {
     sprite: Sprite2;
+    frame?: number;
     targetWidth?: number;
     targetHeight?: number;
 }
@@ -25,15 +26,21 @@ export function spriteRenderer(
     sourceHeight: number,
     targetWidth: number,
     targetHeight: number,
+    frame: number,
     binAsset: HTMLImageElement,
     context: CanvasRenderingContext2D
 ) {
     x = Math.floor(x);
     y = Math.floor(y);
+    let sourceXWithOffset = sourceX;
+
+    if (frame > 0) {
+        sourceXWithOffset = sourceX + frame * sourceWidth;
+    }
 
     context.drawImage(
         binAsset,
-        sourceX,
+        sourceXWithOffset,
         sourceY,
         sourceWidth,
         sourceHeight,

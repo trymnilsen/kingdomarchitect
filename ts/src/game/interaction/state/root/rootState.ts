@@ -43,7 +43,10 @@ export class RootState extends InteractionState {
             this.actionSelected(action);
         });
 
-        const timeline = new UITimeline({ width: fillUiSize, height: 48 });
+        const timeline = new UITimeline(this.context.gameTime, {
+            width: fillUiSize,
+            height: 48,
+        });
 
         const timelineControls = uiBox({
             width: fillUiSize,

@@ -33,7 +33,11 @@ export class Game {
 
         // Rendering and scenes
         this.assetLoader = new AssetLoader();
-        this.renderer = new Renderer(canvasElement, this.assetLoader);
+        this.renderer = new Renderer(
+            canvasElement,
+            this.assetLoader,
+            this.gameTime
+        );
         this.currentScene = new MainScene(
             this.renderer.camera,
             this.assetLoader,

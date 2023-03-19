@@ -161,11 +161,15 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
         const spriteBounds = sprite.sprite.defintion;
         let targetWidth = spriteBounds.w;
         let targetHeight = spriteBounds.h;
+        let frame = 0;
         if (!!sprite.targetWidth) {
             targetWidth = sprite.targetWidth;
         }
         if (!!sprite.targetHeight) {
             targetHeight = sprite.targetHeight;
+        }
+        if (!!sprite.frame) {
+            frame = sprite.frame;
         }
         spriteRenderer(
             sprite.x,
@@ -176,6 +180,7 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
             spriteBounds.h,
             targetWidth,
             targetHeight,
+            frame,
             this._assetLoader.getBinAsset(sprite.sprite.bin),
             this.canvasContext
         );
