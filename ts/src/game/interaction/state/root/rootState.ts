@@ -1,4 +1,5 @@
 import { sprites2 } from "../../../../asset/sprite";
+import { allSides } from "../../../../common/sides";
 import { InputAction, InputActionType } from "../../../../input/inputAction";
 import { uiBox } from "../../../../ui/dsl/uiBoxDsl";
 import { spriteImageSource, uiImage } from "../../../../ui/dsl/uiImageDsl";
@@ -17,6 +18,7 @@ import { LandUnlockState } from "../land/landUnlockState";
 import { SelectionState } from "../selection/selectionState";
 import { BuildingState } from "./building/buildingState";
 import { InventoryState } from "./inventory/inventoryState";
+import { UITimeline } from "./ui/uiTimeline";
 
 const actions: ActionButton[] = [
     {
@@ -34,16 +36,6 @@ const actions: ActionButton[] = [
 ];
 
 export class RootState extends InteractionState {
-    /*     onTap(
-        screenPosition: Point
-    ): boolean {
-        if (withinRectangle(screenPosition, 16, 16, 48, 48)) {
-            return true;
-        } else {
-            return false;
-        }
-    } */
-
     override onActive(): void {
         super.onActive();
 
@@ -51,72 +43,14 @@ export class RootState extends InteractionState {
             this.actionSelected(action);
         });
 
+        const timeline = new UITimeline({ width: fillUiSize, height: 48 });
+
         const timelineControls = uiBox({
             width: fillUiSize,
             height: fillUiSize,
+            padding: allSides(16),
             alignment: uiAlignment.topCenter,
-            children: [
-                uiRow({
-                    width: wrapUiSize,
-                    height: wrapUiSize,
-                    children: [
-                        {
-                            child: uiImage({
-                                width: 48,
-                                height: 48,
-                                image: spriteImageSource(
-                                    sprites2.stone_slate_background_2x
-                                ),
-                            }),
-                        },
-                        {
-                            child: uiSpace({
-                                width: 64,
-                                height: 48,
-                            }),
-                        },
-                        {
-                            child: uiImage({
-                                width: 48,
-                                height: 48,
-                                image: spriteImageSource(
-                                    sprites2.stone_slate_background_2x
-                                ),
-                            }),
-                        },
-                        {
-                            child: uiSpace({
-                                width: 64,
-                                height: 48,
-                            }),
-                        },
-                        {
-                            child: uiImage({
-                                width: 48,
-                                height: 48,
-                                image: spriteImageSource(
-                                    sprites2.stone_slate_background_2x
-                                ),
-                            }),
-                        },
-                        {
-                            child: uiSpace({
-                                width: 64,
-                                height: 48,
-                            }),
-                        },
-                        {
-                            child: uiImage({
-                                width: 48,
-                                height: 48,
-                                image: spriteImageSource(
-                                    sprites2.stone_slate_background_2x
-                                ),
-                            }),
-                        },
-                    ],
-                }),
-            ],
+            children: [timeline],
         });
 
         this.view = uiBox({
