@@ -1,10 +1,6 @@
-import { Bounds } from "../../../../common/bounds";
-import { GroundChunk, GroundTile } from "./tilesComponent";
+import { Tileset } from "../../../../data/tileset/tileset";
 
 export interface UnlockableArea {
-    tiles: GroundTile[];
-    chunks: GroundChunk[];
-    bounds: Bounds;
-    name: string;
+    tileset: Tileset;
     cost: number;
 }

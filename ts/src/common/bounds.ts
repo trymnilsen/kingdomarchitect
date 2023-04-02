@@ -24,7 +24,7 @@ export function withinRectangle(
 }
 
 /**
- * Represents a rectangle larged enough to encompass something.
+ * Represents a rectangle large enough to encompass something.
  */
 export interface Bounds {
     /**
@@ -157,4 +157,37 @@ export function boundsOverlap(first: Bounds, second: Bounds): boolean {
         first.y1 < second.y2 &&
         first.y2 > second.y1
     );
+}
+
+export function getBounds(points: Point[]): Bounds {
+    if (points.length == 0) {
+        return zeroBounds();
+    }
+
+    let maxX = Number.MIN_SAFE_INTEGER;
+    let minX = Number.MAX_SAFE_INTEGER;
+    let maxY = Number.MIN_SAFE_INTEGER;
+    let minY = Number.MAX_SAFE_INTEGER;
+
+    for (const point of points) {
+        if (point.x < minX) {
+            minX = point.x;
+        }
+        if (point.x > maxX) {
+            maxX = point.x;
+        }
+        if (point.y < minY) {
+            minY = point.y;
+        }
+        if (point.y > maxY) {
+            maxY = point.y;
+        }
+    }
+
+    return {
+        x1: minX,
+        y1: minY,
+        x2: maxX,
+        y2: maxY,
+    };
 }

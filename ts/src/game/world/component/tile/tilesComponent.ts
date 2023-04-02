@@ -5,7 +5,11 @@ import {
     manhattanDistance,
     Point,
 } from "../../../../common/point";
+import { createFirstTileSet } from "../../../../data/tileset/firstTile";
+import { createRandomTileSet } from "../../../../data/tileset/randomTileSet";
+import { Tileset } from "../../../../data/tileset/tileset";
 import { RenderContext } from "../../../../rendering/renderContext";
+import { getChunkPosition } from "../../chunk";
 import { getTileId, TileSize } from "../../tile/tile";
 import { EntityComponent } from "../entityComponent";
 import { Ground } from "./ground";
@@ -88,13 +92,25 @@ export class TilesComponent extends EntityComponent implements Ground {
     }
 
     unlockArea(area: UnlockableArea) {
-        for (const chunk of area.chunks) {
+        const chunks = getChunks(area.tileset.tiles);
+
+        for (const chunk of chunks) {
             this.chunkMap[getTileId(chunk.chunkX, chunk.chunkY)] = chunk;
         }
 
-        for (const tile of area.tiles) {
+        const factory = area.tileset.factory;
+        const groundTiles = factory.createTiles();
+        const entities = factory.createEntities();
+
+        for (const tile of groundTiles) {
             this.setTile(tile);
         }
+
+        const rootEntity = this.entity.getRootEntity();
+        for (const entity of entities) {
+            rootEntity.addChild(entity);
+        }
+
         this.publishEvent(new TileMapUpdateEvent(this));
     }
 
@@ -103,6 +119,7 @@ export class TilesComponent extends EntityComponent implements Ground {
         //Check for chunks that has an edge/adjacent chunk not in the chunkMap
         //Add chunks not in chunkmap to the array of unlockable areas
         //Should unlockable chunks be cached?
+
         const unlockableChunks: { [chunkId: string]: GroundChunk } = {};
         for (const key in this.chunkMap) {
             if (!Object.prototype.hasOwnProperty.call(this.chunkMap, key)) {
@@ -127,17 +144,8 @@ export class TilesComponent extends EntityComponent implements Ground {
         }
 
         return Object.values(unlockableChunks).map((unlockableChunk) => {
-            const tiles: GroundTile[] = [];
-            for (let x = 0; x < 3; x++) {
-                for (let y = 0; y < 3; y++) {
-                    tiles.push({
-                        tileX: unlockableChunk.chunkX * 3 + x,
-                        tileY: unlockableChunk.chunkY * 3 + y,
-                        hasTree: hasTree(0.5),
-                    });
-                }
-            }
-
+            //The distance from the center of the map to the chunk is used
+            //as the factor to calculate the cost
             const distance = manhattanDistance(
                 { x: 0, y: 0 },
                 {
@@ -145,20 +153,13 @@ export class TilesComponent extends EntityComponent implements Ground {
                     y: unlockableChunk.chunkY,
                 }
             );
-
             const cost = Math.min(999, Math.pow(2, distance + 1));
 
+            const tileset = this.getTileSet(unlockableChunk);
+
             return {
-                chunks: [unlockableChunk],
-                bounds: {
-                    x1: unlockableChunk.chunkX * 3,
-                    y1: unlockableChunk.chunkY * 3,
-                    x2: (unlockableChunk.chunkX + 1) * 3,
-                    y2: (unlockableChunk.chunkY + 1) * 3,
-                },
-                name: "",
-                tiles: tiles,
-                cost: cost,
+                tileset,
+                cost,
             };
         });
     }
@@ -192,12 +193,29 @@ export class TilesComponent extends EntityComponent implements Ground {
             }
         }
     }
+
+    private getTileSet(chunk: GroundChunk): Tileset {
+        const chunks = Object.keys(this.chunkMap);
+        if (chunks.length == 1) {
+            return createFirstTileSet(chunk);
+        } else {
+            return createRandomTileSet(chunk);
+        }
+    }
 }
 
-function hasTree(threshold: number): number {
-    if (Math.random() > threshold) {
-        return Math.floor(Math.random() * 3.0) + 1;
-    } else {
-        return 0;
+function getChunks(tiles: Point[]): GroundChunk[] {
+    const chunks: { [id: string]: GroundChunk } = {};
+    for (const tile of tiles) {
+        const chunkPosition = getChunkPosition(tile);
+        const chunkId = getTileId(chunkPosition.x, chunkPosition.y);
+        if (!chunks[chunkId]) {
+            chunks[chunkId] = {
+                chunkX: chunkPosition.x,
+                chunkY: chunkPosition.y,
+            };
+        }
     }
+
+    return Object.values(chunks);
 }

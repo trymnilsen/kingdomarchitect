@@ -32,7 +32,7 @@ module.exports = {
         "spaced-comment": 0,
         "no-extra-boolean-cast": 0,
         "max-len": [
-            "warn",
+            "error",
             {
                 code: 80,
                 ignoreTemplateLiterals: true,

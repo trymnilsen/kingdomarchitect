@@ -4,7 +4,11 @@ import { RenderContext } from "../../../../rendering/renderContext";
 import { EntityComponent } from "../entityComponent";
 
 export class SpriteComponent extends EntityComponent {
-    constructor(private sprite: Sprite2, private offset: Point = zeroPoint()) {
+    constructor(
+        private sprite: Sprite2,
+        private offset: Point = zeroPoint(),
+        private size?: Point
+    ) {
         super();
     }
 
@@ -13,6 +17,8 @@ export class SpriteComponent extends EntityComponent {
             sprite: this.sprite,
             x: screenPosition.x + this.offset.x,
             y: screenPosition.y + this.offset.y,
+            targetHeight: this.size?.y,
+            targetWidth: this.size?.x,
         });
     }
 }

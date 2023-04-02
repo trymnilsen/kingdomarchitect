@@ -52,19 +52,20 @@ export class LandUnlockState extends InteractionState {
 
     override onTap(screenPosition: Point, worldPosition: Point): boolean {
         for (const unlockedArea of this.unlockableArea) {
+            const tileSet = unlockedArea.tileset;
             const withinArea = withinRectangle(
                 worldPosition,
-                unlockedArea.bounds.x1 * TileSize,
-                unlockedArea.bounds.y1 * TileSize,
-                unlockedArea.bounds.x2 * TileSize,
-                unlockedArea.bounds.y2 * TileSize
+                tileSet.bounds.x1 * TileSize,
+                tileSet.bounds.y1 * TileSize,
+                tileSet.bounds.x2 * TileSize,
+                tileSet.bounds.y2 * TileSize
             );
 
             if (withinArea) {
                 this.selectedArea = unlockedArea;
                 this.previousSelectedAreaPosition = {
-                    x: unlockedArea.bounds.x1 + 1,
-                    y: unlockedArea.bounds.y1 + 1,
+                    x: tileSet.bounds.x1 + 1,
+                    y: tileSet.bounds.y1 + 1,
                 };
                 return true;
             }
@@ -75,22 +76,23 @@ export class LandUnlockState extends InteractionState {
 
     override onDraw(context: RenderContext): void {
         for (const unlockableArea of this.unlockableArea) {
+            const tileSet = unlockableArea.tileset;
             const areaScreenSpaceBounds = context.camera.tileSpaceToScreenSpace(
                 {
-                    x: unlockableArea.bounds.x1,
-                    y: unlockableArea.bounds.y1,
+                    x: tileSet.bounds.x1,
+                    y: tileSet.bounds.y1,
                 }
             );
-            for (const tiles of unlockableArea.tiles) {
+            for (const tiles of tileSet.tiles) {
                 context.drawRectangle({
                     width: 38,
                     height: 38,
-                    x: tiles.tileX * TileSize,
-                    y: tiles.tileY * TileSize,
+                    x: tiles.x * TileSize,
+                    y: tiles.y * TileSize,
                     fill: "purple",
                 });
             }
-            const bounds = sizeOfBounds(unlockableArea.bounds);
+            const bounds = sizeOfBounds(tileSet.bounds);
             const boundsWidth = bounds.x * TileSize;
             const boundsHeight = bounds.x * TileSize;
             const view = this.getUnlockableLabelView(
@@ -109,8 +111,8 @@ export class LandUnlockState extends InteractionState {
 
         if (this.selectedArea) {
             const screenSpace = context.camera.tileSpaceToScreenSpace({
-                x: this.selectedArea.bounds.x1,
-                y: this.selectedArea.bounds.y1,
+                x: this.selectedArea.tileset.bounds.x1,
+                y: this.selectedArea.tileset.bounds.y1,
             });
 
             context.drawNinePatchSprite({
@@ -184,8 +186,8 @@ export class LandUnlockState extends InteractionState {
                     Number.MAX_SAFE_INTEGER;
                 for (const area of this.unlockableArea) {
                     const areaPosition = {
-                        x: area.bounds.x1 + 1,
-                        y: area.bounds.y1 + 1,
+                        x: area.tileset.bounds.x1 + 1,
+                        y: area.tileset.bounds.y1 + 1,
                     };
 
                     const distanceTo = manhattanDistance(
@@ -200,7 +202,9 @@ export class LandUnlockState extends InteractionState {
                 }
             }
 
-            this.selectedAreaSize = sizeOfBounds(this.selectedArea.bounds);
+            this.selectedAreaSize = sizeOfBounds(
+                this.selectedArea.tileset.bounds
+            );
         }
     }
 

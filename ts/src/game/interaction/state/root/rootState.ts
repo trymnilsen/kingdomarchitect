@@ -33,6 +33,10 @@ const actions: ActionButton[] = [
         id: "inventory",
         name: "Inventory",
     },
+    {
+        id: "quest",
+        name: "Quest",
+    },
 ];
 
 export class RootState extends InteractionState {
