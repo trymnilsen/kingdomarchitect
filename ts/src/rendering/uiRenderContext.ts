@@ -15,4 +15,12 @@ export interface UIRenderContext {
         bounds: Bounds,
         drawFunction: (context: UIRenderContext) => void
     ): void;
+    drawLine(
+        x1: number,
+        y1: number,
+        x2: number,
+        y2: number,
+        color: string,
+        width: number
+    ): void;
 }

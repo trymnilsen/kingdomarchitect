@@ -110,10 +110,17 @@ export class UIColumn extends UIView {
                     width: constraints.width,
                     height: weightedHeight,
                 }); */
-                child.layout(context, {
+                const layoutSize = child.layout(context, {
                     width: constraints.width,
                     height: weightedHeight,
                 });
+
+                // check if the measured width is larger than the current
+                // measured width
+                if (layoutSize.width > measuredWidth) {
+                    measuredWidth = layoutSize.width;
+                }
+
                 // Get the offset of the previous child to find
                 // where we should start
                 let previousOffsets = { start: 0, end: 0 };

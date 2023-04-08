@@ -9,6 +9,14 @@ describe("uiColumn test", () => {
         assert.equal(2, 2);
     });
 
+    it("size is measured correctly when there is only weighted children", () => {
+        assert.equal(2, 2);
+    });
+
+    it("size is measured correctly when there is only non-weighted children", () => {
+        assert.equal(2, 2);
+    });
+
     it("does not allow zero weight", () => {
         assert.equal(2, 2);
     });

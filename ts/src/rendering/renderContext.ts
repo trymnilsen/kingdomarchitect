@@ -68,6 +68,22 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
         this._height = height;
     }
 
+    drawLine(
+        x1: number,
+        y1: number,
+        x2: number,
+        y2: number,
+        color: string,
+        width: number
+    ): void {
+        this.canvasContext.beginPath();
+        this.canvasContext.moveTo(x1, y1);
+        this.canvasContext.lineTo(x2, y2);
+        this.canvasContext.lineWidth = width;
+        this.canvasContext.strokeStyle = color;
+        this.canvasContext.stroke();
+    }
+
     /**
      * Measures the size of the sprite
      * @param sprite the sprite to measure

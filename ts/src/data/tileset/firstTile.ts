@@ -1,10 +1,9 @@
-import { sprites2 } from "../../asset/sprite";
 import { getBounds } from "../../common/bounds";
 import { generateId } from "../../common/idGenerator";
 import { Point } from "../../common/point";
-import { SpriteComponent } from "../../game/world/component/draw/spriteComponent";
 import { GroundChunk } from "../../game/world/component/tile/tilesComponent";
 import { Entity } from "../../game/world/entity/entity";
+import { chestPrefab } from "../../game/world/prefab/chestPrefab";
 import { GroundTile } from "../../game/world/tile/ground";
 import { Tileset, TileSetFactory } from "./tileset";
 
@@ -46,22 +45,12 @@ export class FirstTileFactory implements TileSetFactory {
     createEntities(): Entity[] {
         const entities: Entity[] = [];
 
-        const chestEntity = new Entity(generateId("chest"));
+        const chestEntity = chestPrefab(generateId("chest"), []);
         chestEntity.worldPosition = {
             x: this.chunk.chunkX * 3 + 1,
             y: this.chunk.chunkY * 3 + 1,
         };
 
-        chestEntity.addComponent(
-            new SpriteComponent(
-                sprites2.chest_gold,
-                { x: 2, y: 0 },
-                {
-                    x: 32,
-                    y: 32,
-                }
-            )
-        );
         entities.push(chestEntity);
         return entities;
     }

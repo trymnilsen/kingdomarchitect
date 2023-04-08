@@ -2,6 +2,7 @@ import { sprites2 } from "../../../../asset/sprite";
 import { allSides } from "../../../../common/sides";
 import { RenderContext } from "../../../../rendering/renderContext";
 import { WorkerBehaviorComponent } from "../../../world/component/behavior/workerBehaviorComponent";
+import { ChestComponent } from "../../../world/component/resource/chestComponent";
 import { TreeComponent } from "../../../world/component/resource/treeComponent";
 import { SelectedEntityItem } from "../../../world/selection/selectedEntityItem";
 import { SelectedTileItem } from "../../../world/selection/selectedTileItem";
@@ -12,6 +13,7 @@ import { InteractionState } from "../../handler/interactionState";
 import { ActionButton, getActionbarView } from "../../view/actionbar";
 import { CharacterSkillState } from "../character/characterSkillState";
 import { ChopJobState } from "../resource/chopJopState";
+import { CollectChestState } from "../resource/collectChestState";
 
 export class SelectionState extends InteractionState {
     private selectedItem: SelectedWorldItem;
@@ -124,6 +126,21 @@ export class SelectionState extends InteractionState {
                 ];
             }
 
+            const chest = selection.entity.getComponent(ChestComponent);
+
+            if (!!chest) {
+                actions = [
+                    {
+                        id: "collect",
+                        name: "Open",
+                    },
+                    {
+                        id: "cancel",
+                        name: "Cancel",
+                    },
+                ];
+            }
+
             return actions;
         } else if (selection instanceof SelectedTileItem) {
             const tile = this.context.world.ground.getTile(
@@ -162,7 +179,19 @@ export class SelectionState extends InteractionState {
             this.context.stateChanger.pop(null);
         } else if (actionId == "skills") {
             this.context.stateChanger.push(new CharacterSkillState());
-        } /*else if (actionId == "collect_coin") {
+        } else if (actionId == "collect") {
+            if (this.selectedItem instanceof SelectedEntityItem) {
+                const chest =
+                    this.selectedItem.entity.getComponent(ChestComponent);
+
+                if (!chest) {
+                    throw new Error("No chest component found");
+                }
+
+                this.context.stateChanger.push(new CollectChestState(chest));
+            }
+        }
+        /*else if (actionId == "collect_coin") {
             const selectedTile = this.selectedItem;
             const coin = this.context.world.actors.getActor(
                 selectedTile.tilePosition
