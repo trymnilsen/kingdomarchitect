@@ -63,5 +63,9 @@ export function textRenderer(
     context: CanvasRenderingContext2D
 ) {
     configureText(renderItem, context);
-    context.fillText(renderItem.text, renderItem.x, renderItem.y);
+    context.fillText(
+        renderItem.text,
+        Math.floor(renderItem.x),
+        Math.floor(renderItem.y)
+    );
 }

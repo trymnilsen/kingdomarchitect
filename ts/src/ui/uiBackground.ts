@@ -59,3 +59,14 @@ export class BoxBackground implements UIBackground {
         });
     }
 }
+
+export class SpriteBackground implements UIBackground {
+    constructor(private sprite: Sprite2) {}
+    draw(context: UIRenderContext, screenPosition: Point, size: UISize): void {
+        context.drawScreenSpaceSprite({
+            sprite: this.sprite,
+            x: screenPosition.x,
+            y: screenPosition.y,
+        });
+    }
+}

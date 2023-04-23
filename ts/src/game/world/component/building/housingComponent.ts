@@ -7,7 +7,6 @@ import { HealthComponent } from "../health/healthComponent";
 /**
  * The housing component manages npcs living in a building and
  * spawing the npcs/workers if there are no-one living here
- *
  */
 export class HousingComponent extends EntityComponent {
     private startTime = 0;

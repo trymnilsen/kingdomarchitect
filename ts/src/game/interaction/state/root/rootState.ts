@@ -7,6 +7,7 @@ import { uiRow } from "../../../../ui/dsl/uiRowDsl";
 import { uiSpace } from "../../../../ui/dsl/uiSpaceDsl";
 import { uiAlignment } from "../../../../ui/uiAlignment";
 import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize";
+import { WorkerBehaviorComponent } from "../../../world/component/behavior/workerBehaviorComponent";
 import { SelectedEntityItem } from "../../../world/selection/selectedEntityItem";
 import { SelectedTileItem } from "../../../world/selection/selectedTileItem";
 import { SelectedWorldItem } from "../../../world/selection/selectedWorldItem";
@@ -15,6 +16,7 @@ import { InteractionState } from "../../handler/interactionState";
 import { InteractionStateChanger } from "../../handler/interactionStateChanger";
 import { ActionButton, getActionbarView } from "../../view/actionbar";
 import { LandUnlockState } from "../land/landUnlockState";
+import { ActorSelectionState } from "../selection/actorSelectionState";
 import { SelectionState } from "../selection/selectionState";
 import { BuildingState } from "./building/buildingState";
 import { InventoryState } from "./inventory/inventoryState";
@@ -31,7 +33,7 @@ const actions: ActionButton[] = [
     },
     {
         id: "inventory",
-        name: "Inventory",
+        name: "Stash",
     },
     {
         id: "quest",
@@ -75,10 +77,15 @@ export class RootState extends InteractionState {
             y: tile.tileY,
         });
         if (entitiesAt.length > 0) {
-            selection = new SelectedEntityItem(entitiesAt[0]);
+            const actor = entitiesAt[0];
+            const behavior = actor.getComponent(WorkerBehaviorComponent);
+            if (behavior) {
+                this.context.stateChanger.push(new ActorSelectionState());
+            } else {
+                selection = new SelectedEntityItem(entitiesAt[0]);
+                this.context.stateChanger.push(new SelectionState(selection));
+            }
         }
-
-        this.context.stateChanger.push(new SelectionState(selection));
 
         return true;
     }

@@ -1,0 +1,16 @@
+{
+    "building_mill": {
+        "x": 0,
+        "y": 16,
+        "w": 16,
+        "h": 16,
+        "frames": 1
+    },
+    "building_quarry": {
+        "x": 16,
+        "y": 48,
+        "w": 16,
+        "h": 16,
+        "frames": 1
+    }
+}

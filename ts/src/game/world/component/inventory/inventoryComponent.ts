@@ -1,3 +1,4 @@
+import { hammerItem, swordItem } from "../../../../data/inventory/equipment";
 import { InventoryItem } from "../../../../data/inventory/inventoryItem";
 import {
     bagOfGlitter,
@@ -51,6 +52,14 @@ export class InventoryComponent extends EntityComponent {
         [blueBook.id]: {
             amount: 1,
             item: blueBook,
+        },
+        [swordItem.id]: {
+            amount: 1,
+            item: swordItem,
+        },
+        [hammerItem.id]: {
+            amount: 1,
+            item: hammerItem,
         },
     };
 

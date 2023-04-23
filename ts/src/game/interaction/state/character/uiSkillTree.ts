@@ -31,16 +31,23 @@ export class UISkillTree extends UIView {
         this.halfWidth = constraints.width / 2;
         this.halfHeight = constraints.height / 2;
         this.drawBounds = {
-            x1: this.screenPosition.x + 2,
-            y1: this.screenPosition.y + 2,
-            x2: this.screenPosition.x + this._measuredSize.width - 2,
-            y2: this.screenPosition.y + this._measuredSize.height - 2,
+            x1: 2,
+            y1: 2,
+            x2: this._measuredSize.width - 2,
+            y2: this._measuredSize.height - 2,
         };
         return this._measuredSize;
     }
 
     draw(context: UIRenderContext): void {
-        context.drawWithClip(this.drawBounds, (clippedContext) => {
+        const bounds = {
+            x1: this.screenPosition.x + this.drawBounds.x1,
+            y1: this.screenPosition.y + this.drawBounds.y1,
+            x2: this.screenPosition.x + this.drawBounds.x2,
+            y2: this.screenPosition.y + this.drawBounds.y2,
+        };
+
+        context.drawWithClip(bounds, (clippedContext) => {
             const itemOffset = addPoint(
                 addPoint(this.scrollTranslation, this.screenPosition),
                 {

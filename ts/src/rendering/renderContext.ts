@@ -68,6 +68,11 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
         this._height = height;
     }
 
+    updateSize(width: number, height: number): void {
+        this._width = width;
+        this._height = height;
+    }
+
     drawLine(
         x1: number,
         y1: number,

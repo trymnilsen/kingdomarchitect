@@ -33,6 +33,12 @@ export interface Tileset {
  * while previewing it for purchase
  */
 export interface TileSetFactory {
+    /**
+     * Any tiles that should be added once the tilset has been unlocked
+     */
     createTiles(): GroundTile[];
+    /**
+     * Any entities that should be added once the tilset has been unlocked
+     */
     createEntities(): Entity[];
 }

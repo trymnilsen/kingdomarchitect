@@ -1,0 +1,16 @@
+{
+    "building_chapel": {
+        "x": 16,
+        "y": 16,
+        "w": 16,
+        "h": 16,
+        "frames": 1
+    },
+    "building_library": {
+        "x": 32,
+        "y": 16,
+        "w": 16,
+        "h": 16,
+        "frames": 1
+    }
+}

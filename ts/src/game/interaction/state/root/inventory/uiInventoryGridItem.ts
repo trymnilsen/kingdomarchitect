@@ -1,26 +1,31 @@
 import { Sprite2, sprites2 } from "../../../../../asset/sprite";
 import { allSides } from "../../../../../common/sides";
 import { UIRenderContext } from "../../../../../rendering/uiRenderContext";
+import { UIThemeType } from "../../../../../ui/color";
 import { ninePatchBackground } from "../../../../../ui/dsl/uiBackgroundDsl";
 import { UILayoutContext } from "../../../../../ui/uiLayoutContext";
 import { fillUiSize, UISize } from "../../../../../ui/uiSize";
 import { UIButton } from "../../../../../ui/view/uiButton";
 
 export class UIInventoryGridItem extends UIButton {
-    constructor(private sprite: Sprite2, public isSelected: boolean) {
+    constructor(
+        private sprite: Sprite2,
+        public isSelected: boolean,
+        private theme: UIThemeType
+    ) {
         super({
             width: fillUiSize,
             height: fillUiSize,
         });
 
         this.defaultBackground = ninePatchBackground({
-            sprite: sprites2.book_grid_item,
+            sprite: UIInventoryGridItem.getBackgroundSprite(theme),
             sides: allSides(8),
             scale: 1,
         });
 
         this.onTappedBackground = ninePatchBackground({
-            sprite: sprites2.book_grid_item_focused,
+            sprite: UIInventoryGridItem.getFocusedBackgroundSprite(theme),
             sides: allSides(8),
             scale: 1,
         });
@@ -63,5 +68,26 @@ export class UIInventoryGridItem extends UIButton {
                 sides: allSides(12),
             });
         }*/
+    }
+
+    /**
+     * return either book item grid or book item grid gray
+     * depending on the theme
+     * @param theme
+     * @returns
+     */
+    static getBackgroundSprite(theme: UIThemeType): Sprite2 {
+        return theme === UIThemeType.Book
+            ? sprites2.book_grid_item
+            : sprites2.book_grid_item_gray;
+    }
+
+    /**
+     * Same as getBackgroundSprite but for the focused state
+     */
+    static getFocusedBackgroundSprite(theme: UIThemeType): Sprite2 {
+        return theme === UIThemeType.Book
+            ? sprites2.book_grid_item_focused
+            : sprites2.book_grid_item_gray_focused;
     }
 }

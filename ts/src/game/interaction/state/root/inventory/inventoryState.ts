@@ -2,7 +2,7 @@ import { Sprite2, sprites2 } from "../../../../../asset/sprite";
 import { Direction } from "../../../../../common/direction";
 import { allSides, symmetricSides } from "../../../../../common/sides";
 import { InputAction } from "../../../../../input/inputAction";
-import { bookInkColor } from "../../../../../ui/color";
+import { UIThemeType, bookInkColor } from "../../../../../ui/color";
 import { ninePatchBackground } from "../../../../../ui/dsl/uiBackgroundDsl";
 import { uiBox } from "../../../../../ui/dsl/uiBoxDsl";
 import { ColumnChild, uiColumn } from "../../../../../ui/dsl/uiColumnDsl";
@@ -21,6 +21,7 @@ import { InteractionStateChanger } from "../../../handler/interactionStateChange
 import { ActionButton, getActionbarView } from "../../../view/actionbar";
 import { BuildingState } from "../building/buildingState";
 import { bookTabs } from "../ui/bookTabs";
+import { EquipItemState } from "./equipItemState";
 import { UIInventoryGridItem } from "./uiInventoryGridItem";
 
 const actions: ActionButton[] = [
@@ -169,6 +170,8 @@ export class InventoryState extends InteractionState {
         console.log("Action pressed: ", action);
         if (action.id == "cancel") {
             this.context.stateChanger.pop(undefined);
+        } else if (action.id == "equip") {
+            this.context.stateChanger.push(new EquipItemState());
         }
     }
 
@@ -205,7 +208,8 @@ export class InventoryState extends InteractionState {
                 const isSelected = i == 0;
                 const gridItem = new UIInventoryGridItem(
                     inventoryItem.asset,
-                    isSelected
+                    isSelected,
+                    UIThemeType.Book
                 );
                 gridItem.id = inventoryItem.name;
 

@@ -40,6 +40,16 @@ export class Renderer {
             window.innerWidth,
             window.innerHeight
         );
+
+        /*
+        window.addEventListener("resize", () => {
+            this.canvasContext.canvas.width = window.innerWidth;
+            this.canvasContext.canvas.height = window.innerHeight;
+            this.renderContext.updateSize(
+                window.innerWidth,
+                window.innerHeight
+            );
+        });*/
     }
 
     clearScreen() {

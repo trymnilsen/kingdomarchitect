@@ -1,16 +1,14 @@
 import { sprites2 } from "../../../../asset/sprite";
-import { allSides, symmetricSides } from "../../../../common/sides";
-import {
-    colorBackground,
-    ninePatchBackground,
-} from "../../../../ui/dsl/uiBackgroundDsl";
+import { allSides } from "../../../../common/sides";
+import { UIThemeType } from "../../../../ui/color";
+import { ninePatchBackground } from "../../../../ui/dsl/uiBackgroundDsl";
 import { uiBox } from "../../../../ui/dsl/uiBoxDsl";
 import { uiColumn } from "../../../../ui/dsl/uiColumnDsl";
-import { HorizontalAlignment } from "../../../../ui/uiAlignment";
 import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize";
 import { UIView } from "../../../../ui/uiView";
 import { UIBorderTitle } from "../../../../ui/view/uiBorderTitle";
 import { UIFlowGrid } from "../../../../ui/view/uiFlowGrid";
+import { CollectChestJob } from "../../../world/actor/jobs/chest/collectChestJob";
 import { ChestComponent } from "../../../world/component/resource/chestComponent";
 import { InteractionState } from "../../handler/interactionState";
 import { ActionButton, getActionbarView } from "../../view/actionbar";
@@ -53,24 +51,22 @@ export class CollectChestState extends InteractionState {
         });
 
         borderWrapper.title = "Chest";
+        borderWrapper.background = ninePatchBackground({
+            sprite: sprites2.stone_slate_background_2x,
+            sides: allSides(32),
+            scale: 2,
+        });
 
         const chestUI = uiBox({
             width: fillUiSize,
             height: wrapUiSize,
-            padding: symmetricSides(16, 32),
-            background: ninePatchBackground({
-                sprite: sprites2.stone_slate_background_2x,
-                sides: allSides(32),
-                scale: 2,
-            }),
-            children: [
-                uiBox({
-                    id: "chestGridBox",
-                    width: fillUiSize,
-                    height: wrapUiSize,
-                    children: [this.getGridView()],
-                }),
-            ],
+            padding: {
+                top: 0,
+                left: 16,
+                right: 16,
+                bottom: 16,
+            },
+            children: [this.getGridView()],
         });
 
         borderWrapper.addView(chestUI);
@@ -106,6 +102,10 @@ export class CollectChestState extends InteractionState {
         console.log("Action pressed: ", action);
         if (action.id == "cancel") {
             this.context.stateChanger.pop(undefined);
+        } else if (action.id == "collect") {
+            const collectJob = new CollectChestJob(this.chest);
+            this.context.world.jobQueue.schedule(collectJob);
+            this.context.stateChanger.clear();
         }
     }
 
@@ -120,23 +120,20 @@ export class CollectChestState extends InteractionState {
         gridView.gridItemSize = 50;
 
         for (let i = 0; i < 8; i++) {
-            const inventoryItem = null;
+            const inventoryItem = this.chest.items[i];
             if (!!inventoryItem) {
-                /* const isSelected = i == 0;
+                const isSelected = i == 0;
                 const gridItem = new UIInventoryGridItem(
                     inventoryItem.asset,
-                    isSelected
+                    isSelected,
+                    UIThemeType.Stone
                 );
                 gridItem.id = inventoryItem.name;
-
-                if (isSelected) {
-                    this._selectedGridItemView = gridItem;
-                }
 
                 gridItem.onTapCallback = () => {
                     this.itemSelected(i, gridItem);
                 };
-                gridView.addView(gridItem); */
+                gridView.addView(gridItem);
             } else {
                 gridView.addView(
                     uiBox({

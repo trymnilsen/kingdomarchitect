@@ -10,6 +10,10 @@ export class UIBorderTitle extends UIBox {
     private _title: string = "";
     private _titleWidth: number = 0;
 
+    private topLinePoint: number = 0;
+    private topLineLeft: number = 0;
+    private topLineRight: number = 0;
+
     private topLeft: Point = zeroPoint();
     private topRight: Point = zeroPoint();
     private bottomLeft: Point = zeroPoint();
@@ -38,12 +42,18 @@ export class UIBorderTitle extends UIBox {
 
         //Subtract the size for the border and the title
         //from the constraints as a new constant provided to the super class
-        const newConstraints: UISize = {
-            width: constraints.width - 32, // 32 = 2 sides * 16
-            height: constraints.height - (64 + titleSize.height),
+        const topPadding = 32 + titleSize.height;
+        const horizontalPadding = 16;
+        const bottomPadding = 32;
+
+        this.padding = {
+            top: topPadding,
+            left: horizontalPadding,
+            right: horizontalPadding,
+            bottom: bottomPadding,
         };
 
-        const boxSize = super.layout(layoutContext, newConstraints);
+        const boxSize = super.layout(layoutContext, constraints);
 
         this.topLeft = {
             x: 16,
@@ -57,14 +67,21 @@ export class UIBorderTitle extends UIBox {
 
         this.bottomLeft = {
             x: 16,
-            y: boxSize.height - 16,
+            y: boxSize.height - 32,
         };
 
         this.bottomRight = {
             x: boxSize.width - 16,
-            y: boxSize.height - 16,
+            y: boxSize.height - 32,
         };
 
+        this.topLinePoint = this.topLeft.y + titleSize.height / 2;
+        const topWidth = boxSize.width - horizontalPadding * 2;
+        const halfTitleWidth = this._titleWidth / 2;
+        const halfTopWidth = topWidth / 2;
+        this.topLineLeft = this.topLeft.x + halfTopWidth - halfTitleWidth - 16;
+        this.topLineRight =
+            this.topRight.x - halfTopWidth + halfTitleWidth + 16;
         return boxSize;
     }
 
@@ -73,7 +90,9 @@ export class UIBorderTitle extends UIBox {
         if (!this._measuredSize) {
             throw new Error("UIBorderTitle must be measured before drawing");
         }
-
+        const screenTopPointLeft = this.screenPosition.x + this.topLineLeft;
+        const screenTopPointRight = this.screenPosition.x + this.topLineRight;
+        const screenTopPoint = this.screenPosition.y + this.topLinePoint;
         const screenTopLeft = addPoint(this.screenPosition, this.topLeft);
         const screenTopRight = addPoint(this.screenPosition, this.topRight);
         const screenBottomLeft = addPoint(this.screenPosition, this.bottomLeft);
@@ -85,7 +104,7 @@ export class UIBorderTitle extends UIBox {
         //draw the top lef to bottom left line
         context.drawLine(
             screenTopLeft.x,
-            screenTopLeft.y,
+            screenTopPoint,
             screenBottomLeft.x,
             screenBottomLeft.y,
             bookInkColor,
@@ -95,7 +114,7 @@ export class UIBorderTitle extends UIBox {
         //Draw the top right to bottom right line
         context.drawLine(
             screenTopRight.x,
-            screenTopRight.y,
+            screenTopPoint,
             screenBottomRight.x,
             screenBottomRight.y,
             bookInkColor,
@@ -108,6 +127,25 @@ export class UIBorderTitle extends UIBox {
             screenBottomLeft.y,
             screenBottomRight.x,
             screenBottomRight.y,
+            bookInkColor,
+            2
+        );
+
+        //Draw the line from screen top left to screen top point left
+        context.drawLine(
+            screenTopLeft.x,
+            screenTopPoint,
+            screenTopPointLeft,
+            screenTopPoint,
+            bookInkColor,
+            2
+        );
+        //Draw the line from screen top right to screen top point right
+        context.drawLine(
+            screenTopRight.x,
+            screenTopPoint,
+            screenTopPointRight,
+            screenTopPoint,
             bookInkColor,
             2
         );
