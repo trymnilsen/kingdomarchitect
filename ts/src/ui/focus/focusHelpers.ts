@@ -359,7 +359,7 @@ function closestViewByEdge(fromView: UIView, views: UIView[]): UIView {
 function getViewEdges(view: UIView): ViewEdge[] {
     const position = view.screenPosition;
     const size = view.measuredSize;
-    if (!size) {
+    if (!view.isLayedOut) {
         throw new Error("Cannot find closest edge on unmeasured view");
     }
 

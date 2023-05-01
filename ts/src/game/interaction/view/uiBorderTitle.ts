@@ -1,10 +1,10 @@
-import { Point, addPoint, zeroPoint } from "../../common/point";
-import { titleTextStyle } from "../../rendering/text/textStyle";
-import { UIRenderContext } from "../../rendering/uiRenderContext";
-import { bookInkColor } from "../color";
-import { UILayoutContext } from "../uiLayoutContext";
-import { UISize } from "../uiSize";
-import { UIBox } from "./uiBox";
+import { Point, addPoint, zeroPoint } from "../../../common/point";
+import { titleTextStyle } from "../../../rendering/text/textStyle";
+import { UIRenderContext } from "../../../rendering/uiRenderContext";
+import { bookInkColor } from "../../../ui/color";
+import { UILayoutContext } from "../../../ui/uiLayoutContext";
+import { UISize } from "../../../ui/uiSize";
+import { UIBox } from "./../../../ui/view/uiBox";
 
 export class UIBorderTitle extends UIBox {
     private _title: string = "";

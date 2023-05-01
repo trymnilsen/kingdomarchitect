@@ -4,9 +4,10 @@ import { VerticalAlignment } from "../uiAlignment";
 import { UILayoutContext } from "../uiLayoutContext";
 import { UISize, fillUiSize, wrapUiSize } from "../uiSize";
 import { UIView } from "../uiView";
+import { UIViewGroup } from "../uiViewGroup";
 import { AxisPlacement, insertAndShift } from "./axisPlacement";
 
-export class UIRow extends UIView {
+export class UIRow extends UIViewGroup {
     private weights: { [view: string]: number } = {};
     private totalWeight: number = 0;
     private _verticalAlignment: VerticalAlignment = VerticalAlignment.Center;

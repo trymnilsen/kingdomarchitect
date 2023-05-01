@@ -102,7 +102,7 @@ export class UIMasterDetails extends UIView {
     }
 
     draw(context: UIRenderContext): void {
-        if (this.measuredSize) {
+        if (this.isLayedOut) {
             let backgroundOffset = { x: 0, y: 0 };
             if (
                 this._mode == UIMasterDetailsMode.Single &&

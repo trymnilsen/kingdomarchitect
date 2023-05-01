@@ -1,9 +1,9 @@
-import { Point } from "../../../common/point";
-import { Sides, allSides } from "../../../common/sides";
-import { UIRenderContext } from "../../../rendering/uiRenderContext";
-import { UILayoutContext } from "../../uiLayoutContext";
-import { UISize } from "../../uiSize";
-import { UIView } from "../../uiView";
+import { Point } from "../../../../common/point";
+import { Sides, allSides } from "../../../../common/sides";
+import { UIRenderContext } from "../../../../rendering/uiRenderContext";
+import { UILayoutContext } from "../../../../ui/uiLayoutContext";
+import { UISize } from "../../../../ui/uiSize";
+import { UIView } from "../../../../ui/uiView";
 import { UIActionbar, actionbarHeight as actionbarHeight } from "./uiActionbar";
 
 export class UIActionbarScaffold extends UIView {
@@ -102,7 +102,7 @@ export class UIActionbarScaffold extends UIView {
         }
 
         if (this.rightActionbar) {
-            const size = this.rightActionbar.measuredSize?.width || 0;
+            const size = this.rightActionbar.measuredSize.width;
             this.rightActionbar.offset = {
                 x: constraints.width - size - this._sides.right,
                 y: constraints.height - actionbarHeight - this._sides.bottom,

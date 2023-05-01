@@ -4,9 +4,10 @@ import { HorizontalAlignment } from "../uiAlignment";
 import { UILayoutContext } from "../uiLayoutContext";
 import { fillUiSize, UISize, wrapUiSize } from "../uiSize";
 import { UIView } from "../uiView";
+import { UIViewGroup } from "../uiViewGroup";
 import { AxisPlacement, insertAndShift } from "./axisPlacement";
 
-export class UIColumn extends UIView {
+export class UIColumn extends UIViewGroup {
     private weights: { [view: string]: number } = {};
     private totalWeight: number = 0;
     private _horizontalAlignment: HorizontalAlignment =
@@ -171,7 +172,7 @@ export class UIColumn extends UIView {
             const offset = offsets[i];
             // Position the child on the horizontal axis if its size is
             // less than ours
-            const childWidth = child.measuredSize?.width;
+            const childWidth = child.measuredSize.width;
             let horizontalOffset = 0;
             if (childWidth && childWidth < measuredWidth) {
                 const childParentWidthDifferent = measuredWidth - childWidth;

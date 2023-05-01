@@ -125,4 +125,8 @@ describe("uiView test", () => {
     it("focus is changed on direction input", () => {
         assert.equal(2, 2);
     });
+
+    it("Focus is lost if view is removed", () => {
+        assert.equal(2, 2);
+    });
 });

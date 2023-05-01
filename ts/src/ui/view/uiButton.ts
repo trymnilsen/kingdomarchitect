@@ -58,8 +58,8 @@ export class UIButton extends UIBox {
             screenPoint,
             this.screenPosition.x,
             this.screenPosition.y,
-            this.screenPosition.x + (this.measuredSize?.width || 0),
-            this.screenPosition.y + (this.measuredSize?.height || 0)
+            this.screenPosition.x + this.measuredSize.width,
+            this.screenPosition.y + this.measuredSize.height
         );
     }
 }

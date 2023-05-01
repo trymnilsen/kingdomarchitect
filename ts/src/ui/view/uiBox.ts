@@ -1,15 +1,28 @@
 import { addPoint, Point } from "../../common/point";
-import { totalHorizontal, totalVertical } from "../../common/sides";
+import {
+    Sides,
+    totalHorizontal,
+    totalVertical,
+    zeroSides,
+} from "../../common/sides";
 import { UIRenderContext } from "../../rendering/uiRenderContext";
 import { calculateAlignment, uiAlignment } from "../uiAlignment";
 import { UIBackground } from "../uiBackground";
 import { UILayoutContext } from "../uiLayoutContext";
 import { fillUiSize, UISize, wrapUiSize } from "../uiSize";
-import { UIView } from "../uiView";
+import { UIViewGroup } from "../uiViewGroup";
 
-export class UIBox extends UIView {
+export class UIBox extends UIViewGroup {
     private _alignment: Point = uiAlignment.center;
     private _background: UIBackground | null = null;
+    private _padding: Sides = zeroSides();
+
+    get padding(): Sides {
+        return this._padding;
+    }
+    set padding(value: Sides) {
+        this._padding = value;
+    }
 
     get alignment(): Point {
         return this._alignment;
@@ -102,8 +115,10 @@ export class UIBox extends UIView {
 
         // Update the position of the children
         for (const child of this.children) {
-            if (!child.measuredSize) {
-                throw new Error("Child had no measured size");
+            if (!child.isLayedOut) {
+                throw new Error(
+                    "Child had no measured size, make its layed out"
+                );
             }
 
             const alignedPosition = calculateAlignment(
@@ -126,10 +141,7 @@ export class UIBox extends UIView {
     }
 
     draw(context: UIRenderContext): void {
-        if (this._background) {
-            if (!this.measuredSize) {
-                throw new Error("Size not measured, unable to draw");
-            }
+        if (this._background && this.isLayedOut) {
             this._background.draw(
                 context,
                 this.screenPosition,

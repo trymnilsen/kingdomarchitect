@@ -1,5 +1,10 @@
 import { Point, zeroPoint } from "../../common/point";
-import { totalHorizontal, totalVertical } from "../../common/sides";
+import {
+    Sides,
+    totalHorizontal,
+    totalVertical,
+    zeroSides,
+} from "../../common/sides";
 import { defaultTextStyle, TextStyle } from "../../rendering/text/textStyle";
 import { UIRenderContext } from "../../rendering/uiRenderContext";
 import { calculateAlignment, uiAlignment } from "../uiAlignment";
@@ -12,6 +17,14 @@ export class UIText extends UIView {
     private _text: string = "";
     private _alignment: Point = uiAlignment.center;
     private _textAlignmentOffset: Point = zeroPoint();
+    private _padding: Sides = zeroSides();
+
+    get padding(): Sides {
+        return this._padding;
+    }
+    set padding(value: Sides) {
+        this._padding = value;
+    }
 
     get text(): string {
         return this._text;

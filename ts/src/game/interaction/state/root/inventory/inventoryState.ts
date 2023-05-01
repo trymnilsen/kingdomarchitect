@@ -7,7 +7,6 @@ import { ninePatchBackground } from "../../../../../ui/dsl/uiBackgroundDsl";
 import { uiBox } from "../../../../../ui/dsl/uiBoxDsl";
 import { ColumnChild, uiColumn } from "../../../../../ui/dsl/uiColumnDsl";
 import { spriteImageSource, uiImage } from "../../../../../ui/dsl/uiImageDsl";
-import { uiOffset } from "../../../../../ui/dsl/uiOffsetDsl";
 import { uiText } from "../../../../../ui/dsl/uiTextDsl";
 import { uiAlignment } from "../../../../../ui/uiAlignment";
 import { fillUiSize, wrapUiSize } from "../../../../../ui/uiSize";
@@ -19,8 +18,6 @@ import { InventoryComponent } from "../../../../world/component/inventory/invent
 import { InteractionState } from "../../../handler/interactionState";
 import { InteractionStateChanger } from "../../../handler/interactionStateChanger";
 import { ActionButton, getActionbarView } from "../../../view/actionbar";
-import { BuildingState } from "../building/buildingState";
-import { bookTabs } from "../ui/bookTabs";
 import { EquipItemState } from "./equipItemState";
 import { UIInventoryGridItem } from "./uiInventoryGridItem";
 
@@ -240,24 +237,7 @@ export class InventoryState extends InteractionState {
             width: fillUiSize,
             height: fillUiSize,
             alignment: uiAlignment.topLeft,
-            children: [
-                gridView,
-                uiOffset({
-                    width: wrapUiSize,
-                    height: wrapUiSize,
-                    layoutOffset: {
-                        x: -60,
-                        y: 0,
-                    },
-                    children: [
-                        bookTabs((tab) => {
-                            this.context.stateChanger.replace(
-                                new BuildingState()
-                            );
-                        }),
-                    ],
-                }),
-            ],
+            children: [gridView],
         });
     }
 

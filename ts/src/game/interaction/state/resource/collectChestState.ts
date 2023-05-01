@@ -6,12 +6,12 @@ import { uiBox } from "../../../../ui/dsl/uiBoxDsl";
 import { uiColumn } from "../../../../ui/dsl/uiColumnDsl";
 import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize";
 import { UIView } from "../../../../ui/uiView";
-import { UIBorderTitle } from "../../../../ui/view/uiBorderTitle";
 import { UIFlowGrid } from "../../../../ui/view/uiFlowGrid";
 import { CollectChestJob } from "../../../world/actor/jobs/chest/collectChestJob";
 import { ChestComponent } from "../../../world/component/resource/chestComponent";
 import { InteractionState } from "../../handler/interactionState";
 import { ActionButton, getActionbarView } from "../../view/actionbar";
+import { UIBorderTitle } from "../../view/uiBorderTitle";
 import { UIInventoryGridItem } from "../root/inventory/uiInventoryGridItem";
 
 const actions: ActionButton[] = [

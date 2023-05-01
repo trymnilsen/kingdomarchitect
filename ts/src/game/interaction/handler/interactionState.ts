@@ -165,7 +165,7 @@ export abstract class InteractionState {
         if (!!currentFocus && this._context) {
             const postition = currentFocus.screenPosition;
             const size = currentFocus.measuredSize;
-            if (!!size) {
+            if (currentFocus.isLayedOut) {
                 const sizeVariation = 2 - (this._context.gameTime.tick % 2) * 4;
                 context.drawNinePatchSprite({
                     sprite: sprites2.cursor,

@@ -1,7 +1,6 @@
 import { Bounds, withinRectangle } from "../common/bounds";
 import { Event, EventListener } from "../common/event";
 import { addPoint, Point, zeroPoint } from "../common/point";
-import { Sides, zeroSides } from "../common/sides";
 import { UIRenderContext } from "../rendering/uiRenderContext";
 import { isTapEvent, UIEvent, UIInputEvent, UITapEvent } from "./event/uiEvent";
 import {
@@ -10,18 +9,28 @@ import {
 } from "./focus/focusHelpers";
 import { FocusState } from "./focus/focusState";
 import { UILayoutContext } from "./uiLayoutContext";
-import { fillUiSize, UISize } from "./uiSize";
+import { fillUiSize, UISize, zeroSize } from "./uiSize";
 
 export interface UIAction {
     type: string;
     data: unknown;
 }
 
+/**
+ * UIView is the base class for all UI elements, it supports basic functions
+ * for getting and setting size and position, as well as handling input events.
+ * It also supports a simple focus system. It is not intended to be used
+ * directly but rather extended by other classes. Internally is has a list of
+ * child views this is not exposed publicly as there will be extended views
+ * that does not allow children (For example text views, or image views).
+ * If you are making a view that can have children for dynamic layouting, like
+ * a row or a column you should extend the uiViewGroup class which exposes the
+ * addView and removeView methods publicly.
+ */
 export abstract class UIView {
     private _parent: UIView | null = null;
     private _screenPosition: Point = zeroPoint();
     private _offset: Point = zeroPoint();
-    private _padding: Sides = zeroSides();
     private _size: UISize;
     private _id: string | null = null;
     private _children: UIView[] = [];
@@ -29,13 +38,6 @@ export abstract class UIView {
     private _focusState: FocusState | undefined;
     protected _measuredSize: UISize | null = null;
     protected _isDirty: boolean = true;
-
-    get padding(): Sides {
-        return this._padding;
-    }
-    set padding(value: Sides) {
-        this._padding = value;
-    }
 
     /**
      * The offset of this view from its parent
@@ -92,11 +94,11 @@ export abstract class UIView {
     }
 
     /**
-     * Return the measured size of this view. Can be null if this view
-     * has never been layed out.
+     * Return the measured size of this view.
+     * Will be zero if `isLayedOut` is false
      */
-    get measuredSize(): UISize | null {
-        return this._measuredSize;
+    get measuredSize(): UISize {
+        return this._measuredSize || zeroSize();
     }
 
     /**
@@ -257,32 +259,6 @@ export abstract class UIView {
     }
 
     /**
-     * Adds a child view to the view. Views added should not have a parent.
-     * @param view the view to add
-     */
-    addView(view: UIView) {
-        if (view.parent != null) {
-            throw new Error("Attempted to add view already added to a parent");
-        }
-        if (view === this) {
-            throw new Error("Cannot add view to itself");
-        }
-
-        view.parent = this;
-        this._children.push(view);
-    }
-
-    /**
-     * Removes a child view from this view. Will call dispose on the
-     * view that is removed from this view
-     * @param view the view to remove
-     */
-    removeView(view: UIView) {
-        view.dispose();
-        this._children = this._children.filter((child) => child != view);
-    }
-
-    /**
      * Visit and return all views (including self and nested).
      * @param filter optional filter to apply to children returned
      */
@@ -338,8 +314,8 @@ export abstract class UIView {
             point,
             this.screenPosition.x,
             this.screenPosition.y,
-            this.screenPosition.x + (this.measuredSize?.width || 0),
-            this.screenPosition.y + (this.measuredSize?.height || 0)
+            this.screenPosition.x + this.measuredSize.width,
+            this.screenPosition.y + this.measuredSize.height
         );
     }
 
@@ -397,6 +373,32 @@ export abstract class UIView {
             //Input type was not recognised so it will not be handled
             return false;
         }
+    }
+
+    /**
+     * Adds a child view to the view. Views added should not have a parent.
+     * @param view the view to add
+     */
+    protected addView(view: UIView) {
+        if (view.parent != null) {
+            throw new Error("Attempted to add view already added to a parent");
+        }
+        if (view === this) {
+            throw new Error("Cannot add view to itself");
+        }
+
+        view.parent = this;
+        this._children.push(view);
+    }
+
+    /**
+     * Removes a child view from this view. Will call dispose on the
+     * view that is removed from this view
+     * @param view the view to remove
+     */
+    protected removeView(view: UIView) {
+        view.dispose();
+        this._children = this._children.filter((child) => child != view);
     }
 
     /**

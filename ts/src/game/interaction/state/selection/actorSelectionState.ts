@@ -7,8 +7,8 @@ import {
     UIActionbar,
     UIActionbarAlignment,
     UIActionbarItem,
-} from "../../../../ui/view/actionbar/uiActionbar";
-import { UIActionbarScaffold } from "../../../../ui/view/actionbar/uiActionbarScaffold";
+} from "../../view/actionbar/uiActionbar";
+import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold";
 import { InteractionState } from "../../handler/interactionState";
 
 export class ActorSelectionState extends InteractionState {
