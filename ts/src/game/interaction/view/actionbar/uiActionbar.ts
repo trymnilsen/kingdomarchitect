@@ -13,7 +13,7 @@ import { UISize, wrapUiSize } from "../../../../ui/uiSize";
 import { UIView } from "../../../../ui/uiView";
 
 export const actionbarHeight = 72;
-export const actionbarWidth = 64;
+export const actionbarWidth = 72;
 export interface UIActionbarItem {
     text: string;
     onClick?: () => void;

@@ -26,6 +26,8 @@ export class BuildingComponent extends EntityComponent {
             sprite: sprite,
             x: screenPosition.x + 3,
             y: screenPosition.y + 2,
+            targetWidth: 32,
+            targetHeight: 32,
         });
     }
 }

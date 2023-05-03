@@ -14,41 +14,25 @@ import { UIView } from "../../../../../ui/uiView";
 import { fillUiSize, wrapUiSize } from "../../../../../ui/uiSize";
 import { InteractionState } from "../../../handler/interactionState";
 import { BuildConfirmState } from "../../building2/buildConfirmState";
-import { ActionButton, getActionbarView } from "../../../view/actionbar";
 import { UIBookLayout, UIBookLayoutTab } from "../../../view/uiBookLayout";
 import { Building } from "../../../../../data/building/building";
 import { woodenBuildings } from "../../../../../data/building/wood";
 import { stoneBuildings } from "../../../../../data/building/stone";
 import { goldBuildings } from "../../../../../data/building/gold";
 import { foodBuildings } from "../../../../../data/building/food";
-
-const buildings: BuildingListEntry[] = [
-    {
-        name: "Wooden House",
-        sprite: sprites2.wooden_house,
-    },
-    {
-        name: "Wall",
-        sprite: sprites2.stone_wood_walls,
-    },
-];
-
-const actions: ActionButton[] = [
-    {
-        id: "build",
-        name: "Build",
-    },
-    {
-        id: "close",
-        name: "close",
-    },
-];
+import { SpriteBackground } from "../../../../../ui/uiBackground";
+import {
+    UIActionbar,
+    UIActionbarAlignment,
+    UIActionbarItem,
+} from "../../../view/actionbar/uiActionbar";
+import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold";
 
 export class BuildingState extends InteractionState {
     private _masterDetailsView: UIBookLayout;
-    private _actionbar: UIView;
 
     private _activeBuildings: Building[] = [];
+    private _selectedBuilding: Building;
 
     override get isModal(): boolean {
         return true;
@@ -57,49 +41,61 @@ export class BuildingState extends InteractionState {
     constructor() {
         super();
 
+        const rightItems: UIActionbarItem[] = [
+            {
+                text: "Build",
+                icon: sprites2.empty_sprite,
+                onClick: () => {
+                    console.log("Build selected: ", this._selectedBuilding);
+                    this.context.stateChanger.replace(
+                        new BuildConfirmState(this._selectedBuilding)
+                    );
+                },
+            },
+            {
+                text: "Cancel",
+                icon: sprites2.empty_sprite,
+                onClick: () => {
+                    this.context.stateChanger.pop(undefined);
+                },
+            },
+        ];
+
         this._activeBuildings = woodenBuildings;
+        this._selectedBuilding = woodenBuildings[0];
         const masterView = this.getMasterView();
-        const detailsView = this.getDetailsView(woodenBuildings[0]);
+        const detailsView = this.getDetailsView(this._selectedBuilding);
 
         this._masterDetailsView = new UIBookLayout();
         this._masterDetailsView.leftPage = masterView;
         this._masterDetailsView.rightPage = detailsView;
         this._masterDetailsView.setTabs(this.getTabs(0));
 
-        this._actionbar = getActionbarView(actions, (action) => {
-            this.actionSelected(action);
-        });
-
-        this._actionbar.size = {
-            width: fillUiSize,
-            height: wrapUiSize,
-        };
-
-        this.view = uiBox({
+        const leftActionbar = new UIActionbar(
+            rightItems,
+            new SpriteBackground(sprites2.stone_slate_background_2x),
+            UIActionbarAlignment.Left,
+            {
+                width: fillUiSize,
+                height: fillUiSize,
+            }
+        );
+        const contentView = uiBox({
+            id: "buildStateLayout",
             width: fillUiSize,
             height: fillUiSize,
-            children: [
-                uiColumn({
-                    width: fillUiSize,
-                    height: fillUiSize,
-                    children: [
-                        {
-                            weight: 1,
-                            child: uiBox({
-                                id: "buildStateLayout",
-                                width: fillUiSize,
-                                height: fillUiSize,
-                                alignment: uiAlignment.center,
-                                children: [this._masterDetailsView],
-                            }),
-                        },
-                        {
-                            child: this._actionbar,
-                        },
-                    ],
-                }),
-            ],
+            alignment: uiAlignment.center,
+            children: [this._masterDetailsView],
         });
+
+        const scaffoldState = new UIActionbarScaffold(
+            contentView,
+            leftActionbar,
+            null,
+            { width: fillUiSize, height: fillUiSize }
+        );
+
+        this.view = scaffoldState;
     }
 
     private tabSelected(index: number) {
@@ -122,18 +118,11 @@ export class BuildingState extends InteractionState {
         this._masterDetailsView.leftPage = masterView;
     }
 
-    private actionSelected(action: ActionButton) {
-        if (action.id == "build") {
-            this.context.stateChanger.replace(new BuildConfirmState());
-        } else if (action.id == "close") {
-            this.context.stateChanger.pop(undefined);
-        }
-    }
-
     private setActiveBuilding(index: number) {
         const activeBuilding = this._activeBuildings[index];
         const detailsView = this.getDetailsView(activeBuilding);
         this._masterDetailsView.rightPage = detailsView;
+        this._selectedBuilding = activeBuilding;
     }
 
     private getMasterView(): UIView {
@@ -235,6 +224,7 @@ export class BuildingState extends InteractionState {
     }
 
     private getDetailsView(building: Building): UIView {
+        const scale = building.scale * 2;
         return uiBox({
             width: 300,
             height: 400,
@@ -262,7 +252,7 @@ export class BuildingState extends InteractionState {
                                     uiImage({
                                         height: wrapUiSize,
                                         width: wrapUiSize,
-                                        scale: 2,
+                                        scale: scale,
                                         image: spriteImageSource(building.icon),
                                     }),
                                 ],

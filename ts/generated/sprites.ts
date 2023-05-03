@@ -189,7 +189,7 @@ export const sprites = {
       "y": 112
     }
   },
-  "building_mill": {
+  "empty_sprite": {
     "bin": "0",
     "defintion": {
       "frames": 1,
@@ -199,7 +199,7 @@ export const sprites = {
       "y": 128
     }
   },
-  "building_quarry": {
+  "building_mill": {
     "bin": "0",
     "defintion": {
       "frames": 1,
@@ -207,6 +207,16 @@ export const sprites = {
       "h": 16,
       "x": 96,
       "y": 112
+    }
+  },
+  "building_quarry": {
+    "bin": "0",
+    "defintion": {
+      "frames": 1,
+      "w": 16,
+      "h": 16,
+      "x": 96,
+      "y": 128
     }
   },
   "stone": {
@@ -235,8 +245,8 @@ export const sprites = {
       "frames": 1,
       "w": 16,
       "h": 16,
-      "x": 96,
-      "y": 128
+      "x": 144,
+      "y": 32
     }
   },
   "sunrise_icon": {
@@ -245,7 +255,7 @@ export const sprites = {
       "frames": 1,
       "w": 16,
       "h": 16,
-      "x": 144,
+      "x": 128,
       "y": 32
     }
   },
@@ -255,8 +265,8 @@ export const sprites = {
       "frames": 1,
       "w": 16,
       "h": 16,
-      "x": 128,
-      "y": 32
+      "x": 144,
+      "y": 48
     }
   },
   "knight": {
@@ -266,7 +276,7 @@ export const sprites = {
       "w": 32,
       "h": 32,
       "x": 128,
-      "y": 48
+      "y": 64
     }
   },
   "building_tavern": {
@@ -275,8 +285,8 @@ export const sprites = {
       "frames": 1,
       "w": 16,
       "h": 16,
-      "x": 144,
-      "y": 80
+      "x": 128,
+      "y": 96
     }
   },
   "building_tombstone": {
@@ -286,7 +296,7 @@ export const sprites = {
       "w": 16,
       "h": 16,
       "x": 128,
-      "y": 96
+      "y": 48
     }
   },
   "tree_stub": {
@@ -445,8 +455,8 @@ export const sprites = {
       "frames": 1,
       "w": 16,
       "h": 16,
-      "x": 128,
-      "y": 80
+      "x": 160,
+      "y": 96
     }
   },
   "building_statue": {
@@ -455,7 +465,7 @@ export const sprites = {
       "frames": 1,
       "w": 16,
       "h": 16,
-      "x": 160,
+      "x": 176,
       "y": 96
     }
   },
@@ -466,7 +476,7 @@ export const sprites = {
       "w": 16,
       "h": 16,
       "x": 176,
-      "y": 96
+      "y": 112
     }
   },
   "coins": {
@@ -606,7 +616,7 @@ export const sprites = {
       "w": 16,
       "h": 16,
       "x": 176,
-      "y": 112
+      "y": 128
     }
   },
   "stone_slate_border_selected": {

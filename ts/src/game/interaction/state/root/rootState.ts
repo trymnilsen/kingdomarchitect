@@ -1,12 +1,10 @@
 import { sprites2 } from "../../../../asset/sprite";
 import { allSides } from "../../../../common/sides";
-import { InputAction, InputActionType } from "../../../../input/inputAction";
+import { InputAction } from "../../../../input/inputAction";
 import { uiBox } from "../../../../ui/dsl/uiBoxDsl";
-import { spriteImageSource, uiImage } from "../../../../ui/dsl/uiImageDsl";
-import { uiRow } from "../../../../ui/dsl/uiRowDsl";
-import { uiSpace } from "../../../../ui/dsl/uiSpaceDsl";
 import { uiAlignment } from "../../../../ui/uiAlignment";
-import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize";
+import { SpriteBackground } from "../../../../ui/uiBackground";
+import { fillUiSize } from "../../../../ui/uiSize";
 import { WorkerBehaviorComponent } from "../../../world/component/behavior/workerBehaviorComponent";
 import { SelectedEntityItem } from "../../../world/selection/selectedEntityItem";
 import { SelectedTileItem } from "../../../world/selection/selectedTileItem";
@@ -14,7 +12,14 @@ import { SelectedWorldItem } from "../../../world/selection/selectedWorldItem";
 import { GroundTile } from "../../../world/tile/ground";
 import { InteractionState } from "../../handler/interactionState";
 import { InteractionStateChanger } from "../../handler/interactionStateChanger";
-import { ActionButton, getActionbarView } from "../../view/actionbar";
+import { ActionButton } from "../../view/actionbar";
+import {
+    UIActionbar,
+    UIActionbarAlignment,
+    UIActionbarItem,
+} from "../../view/actionbar/uiActionbar";
+import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold";
+import { AlertMessageState } from "../common/alertMessageState";
 import { LandUnlockState } from "../land/landUnlockState";
 import { ActorSelectionState } from "../selection/actorSelectionState";
 import { SelectionState } from "../selection/selectionState";
@@ -22,39 +27,59 @@ import { BuildingState } from "./building/buildingState";
 import { InventoryState } from "./inventory/inventoryState";
 import { UITimeline } from "./ui/uiTimeline";
 
-const actions: ActionButton[] = [
-    {
-        id: "build",
-        name: "Build",
-    },
-    {
-        id: "land",
-        name: "Land",
-    },
-    {
-        id: "inventory",
-        name: "Stash",
-    },
-    {
-        id: "quest",
-        name: "Quest",
-    },
-];
-
 export class RootState extends InteractionState {
     override onActive(): void {
         super.onActive();
 
-        const actionbarView = getActionbarView(actions, (action) => {
-            this.actionSelected(action);
-        });
+        const actionItems: UIActionbarItem[] = [
+            {
+                text: "Build",
+                icon: sprites2.empty_sprite,
+                onClick: () => {
+                    this.context.stateChanger.push(new BuildingState());
+                },
+            },
+            {
+                text: "Land",
+                icon: sprites2.empty_sprite,
+                onClick: () => {
+                    this.context.stateChanger.push(new LandUnlockState());
+                },
+            },
+            {
+                text: "Stash",
+                icon: sprites2.empty_sprite,
+                onClick: () => {
+                    this.context.stateChanger.push(new InventoryState());
+                },
+            },
+            {
+                text: "Quest",
+                icon: sprites2.empty_sprite,
+                onClick: () => {
+                    this.context.stateChanger.push(
+                        new AlertMessageState("Oh no", "Not implemented")
+                    );
+                },
+            },
+        ];
 
         const timeline = new UITimeline(this.context.gameTime, {
             width: fillUiSize,
             height: 48,
         });
 
-        const timelineControls = uiBox({
+        const leftActionbar = new UIActionbar(
+            actionItems,
+            new SpriteBackground(sprites2.stone_slate_background_2x),
+            UIActionbarAlignment.Left,
+            {
+                width: fillUiSize,
+                height: fillUiSize,
+            }
+        );
+
+        const contentView = uiBox({
             width: fillUiSize,
             height: fillUiSize,
             padding: allSides(16),
@@ -62,11 +87,14 @@ export class RootState extends InteractionState {
             children: [timeline],
         });
 
-        this.view = uiBox({
-            width: fillUiSize,
-            height: fillUiSize,
-            children: [actionbarView, timelineControls],
-        });
+        const scaffoldState = new UIActionbarScaffold(
+            contentView,
+            leftActionbar,
+            null,
+            { width: fillUiSize, height: fillUiSize }
+        );
+
+        this.view = scaffoldState;
     }
 
     override onTileTap(tile: GroundTile): boolean {
@@ -94,27 +122,6 @@ export class RootState extends InteractionState {
         input: InputAction,
         stateChanger: InteractionStateChanger
     ): boolean {
-        if (input.action == InputActionType.NUMBER_PRESS) {
-            const number = parseInt(input.value) - 1;
-            if (number >= 0 && number < actions.length) {
-                const action = actions[number];
-                this.actionSelected(action);
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
-    }
-
-    private actionSelected(action: ActionButton) {
-        if (action.id == "land") {
-            this.context.stateChanger.push(new LandUnlockState());
-        } else if (action.id == "inventory") {
-            this.context.stateChanger.push(new InventoryState());
-        } else if (action.id == "build") {
-            this.context.stateChanger.push(new BuildingState());
-        }
+        return false;
     }
 }
