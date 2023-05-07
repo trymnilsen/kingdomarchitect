@@ -18,7 +18,7 @@ type InventoryEntry = { amount: number; item: InventoryItem };
 export class InventoryComponent extends EntityComponent {
     private _items: { [id: string]: InventoryEntry } = {
         [woodResourceItem.id]: {
-            amount: 2000,
+            amount: 200000,
             item: woodResourceItem,
         },
         [stoneResource.id]: {

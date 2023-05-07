@@ -1,6 +1,9 @@
 import { sprites2 } from "../../../../asset/sprite";
 import { allSides } from "../../../../common/sides";
 import { RenderContext } from "../../../../rendering/renderContext";
+import { uiBox } from "../../../../ui/dsl/uiBoxDsl";
+import { SpriteBackground } from "../../../../ui/uiBackground";
+import { fillUiSize } from "../../../../ui/uiSize";
 import { WorkerBehaviorComponent } from "../../../world/component/behavior/workerBehaviorComponent";
 import { ChestComponent } from "../../../world/component/resource/chestComponent";
 import { TreeComponent } from "../../../world/component/resource/treeComponent";
@@ -10,7 +13,12 @@ import { SelectedWorldItem } from "../../../world/selection/selectedWorldItem";
 import { GroundTile } from "../../../world/tile/ground";
 import { TileSize } from "../../../world/tile/tile";
 import { InteractionState } from "../../handler/interactionState";
-import { ActionButton, getActionbarView } from "../../view/actionbar";
+import {
+    UIActionbar,
+    UIActionbarAlignment,
+    UIActionbarItem,
+} from "../../view/actionbar/uiActionbar";
+import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold";
 import { CharacterSkillState } from "../character/characterSkillState";
 import { ChopJobState } from "../resource/chopJopState";
 import { CollectChestState } from "../resource/collectChestState";
@@ -85,26 +93,50 @@ export class SelectionState extends InteractionState {
 
     private updateTileActions() {
         const actions = this.getTileActions(this.selectedItem);
-        const actionbarView = getActionbarView(actions, (action) => {
-            this.actionButtonPressed(action.id);
+        const leftActionbar = new UIActionbar(
+            actions,
+            new SpriteBackground(sprites2.stone_slate_background_2x),
+            UIActionbarAlignment.Left,
+            {
+                width: fillUiSize,
+                height: fillUiSize,
+            }
+        );
+
+        const contentView = uiBox({
+            width: fillUiSize,
+            height: fillUiSize,
         });
 
-        this.view = actionbarView;
+        const scaffoldView = new UIActionbarScaffold(
+            contentView,
+            leftActionbar,
+            null,
+            { width: fillUiSize, height: fillUiSize }
+        );
+
+        this.view = scaffoldView;
     }
 
-    private getTileActions(selection: SelectedWorldItem): ActionButton[] {
+    private getTileActions(selection: SelectedWorldItem): UIActionbarItem[] {
         if (selection instanceof SelectedEntityItem) {
-            let actions: ActionButton[] = [];
+            let actions: UIActionbarItem[] = [];
             const tree = selection.entity.getComponent(TreeComponent);
             if (!!tree) {
                 actions = [
                     {
-                        id: "chop",
-                        name: "Chop",
+                        icon: sprites2.empty_sprite,
+                        text: "Chop",
+                        onClick: () => {
+                            this.onChopSelected();
+                        },
                     },
                     {
-                        id: "cancel",
-                        name: "Cancel",
+                        icon: sprites2.empty_sprite,
+                        text: "Cancel",
+                        onClick: () => {
+                            this.onCancel();
+                        },
                     },
                 ];
             }
@@ -116,12 +148,18 @@ export class SelectionState extends InteractionState {
             if (!!worker) {
                 actions = [
                     {
-                        id: "skills",
-                        name: "skills",
+                        icon: sprites2.empty_sprite,
+                        text: "Skills",
+                        onClick: () => {
+                            this.onSkills();
+                        },
                     },
                     {
-                        id: "cancel",
-                        name: "Cancel",
+                        icon: sprites2.empty_sprite,
+                        text: "Cancel",
+                        onClick: () => {
+                            this.onCancel();
+                        },
                     },
                 ];
             }
@@ -131,12 +169,18 @@ export class SelectionState extends InteractionState {
             if (!!chest) {
                 actions = [
                     {
-                        id: "collect",
-                        name: "Open",
+                        text: "Collect",
+                        icon: sprites2.empty_sprite,
+                        onClick: () => {
+                            this.onCollect();
+                        },
                     },
                     {
-                        id: "cancel",
-                        name: "Cancel",
+                        icon: sprites2.empty_sprite,
+                        text: "Cancel",
+                        onClick: () => {
+                            this.onCancel();
+                        },
                     },
                 ];
             }
@@ -146,16 +190,22 @@ export class SelectionState extends InteractionState {
             const tile = this.context.world.ground.getTile(
                 selection.tilePosition
             );
-            let actions: ActionButton[] = [];
+            let actions: UIActionbarItem[] = [];
             if (tile && tile.hasTree) {
                 actions = [
                     {
-                        id: "chop",
-                        name: "Chop",
+                        icon: sprites2.empty_sprite,
+                        text: "Chop",
+                        onClick: () => {
+                            this.onChopSelected();
+                        },
                     },
                     {
-                        id: "cancel",
-                        name: "Cancel",
+                        icon: sprites2.empty_sprite,
+                        text: "Cancel",
+                        onClick: () => {
+                            this.onCancel();
+                        },
                     },
                 ];
             }
@@ -164,45 +214,38 @@ export class SelectionState extends InteractionState {
         } else {
             return [
                 {
-                    id: "cancel",
-                    name: "Cancel",
+                    icon: sprites2.empty_sprite,
+                    text: "Cancel",
+                    onClick: () => {
+                        this.onCancel();
+                    },
                 },
             ];
         }
     }
 
-    private actionButtonPressed(actionId: string) {
-        if (actionId == "chop") {
-            const selectedTile = this.selectedItem;
-            this.context.stateChanger.push(new ChopJobState(selectedTile));
-        } else if (actionId == "cancel") {
-            this.context.stateChanger.pop(null);
-        } else if (actionId == "skills") {
-            this.context.stateChanger.push(new CharacterSkillState());
-        } else if (actionId == "collect") {
-            if (this.selectedItem instanceof SelectedEntityItem) {
-                const chest =
-                    this.selectedItem.entity.getComponent(ChestComponent);
+    private onChopSelected() {
+        const selectedTile = this.selectedItem;
+        this.context.stateChanger.push(new ChopJobState(selectedTile));
+    }
 
-                if (!chest) {
-                    throw new Error("No chest component found");
-                }
+    private onCancel() {
+        this.context.stateChanger.pop(null);
+    }
 
-                this.context.stateChanger.push(new CollectChestState(chest));
+    private onSkills() {
+        this.context.stateChanger.push(new CharacterSkillState());
+    }
+
+    private onCollect() {
+        if (this.selectedItem instanceof SelectedEntityItem) {
+            const chest = this.selectedItem.entity.getComponent(ChestComponent);
+
+            if (!chest) {
+                throw new Error("No chest component found");
             }
+
+            this.context.stateChanger.push(new CollectChestState(chest));
         }
-        /*else if (actionId == "collect_coin") {
-            const selectedTile = this.selectedItem;
-            const coin = this.context.world.actors.getActor(
-                selectedTile.tilePosition
-            );
-            if (coin instanceof CoinActor) {
-                this.context.world.jobQueue.schedule(
-                    new CollectCoinJob(selectedTile.tilePosition)
-                );
-            }
-
-            this.context.stateChanger.pop(null);
-        }*/
     }
 }

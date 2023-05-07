@@ -3,27 +3,20 @@ import { allSides } from "../../../../common/sides";
 import { UIThemeType } from "../../../../ui/color";
 import { ninePatchBackground } from "../../../../ui/dsl/uiBackgroundDsl";
 import { uiBox } from "../../../../ui/dsl/uiBoxDsl";
-import { uiColumn } from "../../../../ui/dsl/uiColumnDsl";
+import { SpriteBackground } from "../../../../ui/uiBackground";
 import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize";
 import { UIView } from "../../../../ui/uiView";
 import { UIFlowGrid } from "../../../../ui/view/uiFlowGrid";
 import { CollectChestJob } from "../../../world/actor/jobs/chest/collectChestJob";
 import { ChestComponent } from "../../../world/component/resource/chestComponent";
 import { InteractionState } from "../../handler/interactionState";
-import { ActionButton, getActionbarView } from "../../view/actionbar";
+import {
+    UIActionbar,
+    UIActionbarAlignment,
+} from "../../view/actionbar/uiActionbar";
+import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold";
 import { UIBorderTitle } from "../../view/uiBorderTitle";
 import { UIInventoryGridItem } from "../root/inventory/uiInventoryGridItem";
-
-const actions: ActionButton[] = [
-    {
-        id: "collect",
-        name: "Collect",
-    },
-    {
-        id: "cancel",
-        name: "Close",
-    },
-];
 
 export class CollectChestState extends InteractionState {
     private _actionbar!: UIView;
@@ -37,13 +30,30 @@ export class CollectChestState extends InteractionState {
     }
 
     override onActive(): void {
-        this._actionbar = getActionbarView(actions, (action) => {
-            this.actionSelected(action);
-        });
-        this._actionbar.size = {
-            width: fillUiSize,
-            height: wrapUiSize,
-        };
+        const leftActionbar = new UIActionbar(
+            [
+                {
+                    text: "Collect",
+                    icon: sprites2.empty_sprite,
+                    onClick: () => {
+                        this.scheduleCollectJob();
+                    },
+                },
+                {
+                    text: "Cancel",
+                    icon: sprites2.empty_sprite,
+                    onClick: () => {
+                        this.context.stateChanger.pop(null);
+                    },
+                },
+            ],
+            new SpriteBackground(sprites2.stone_slate_background_2x),
+            UIActionbarAlignment.Left,
+            {
+                width: fillUiSize,
+                height: fillUiSize,
+            }
+        );
 
         const borderWrapper = new UIBorderTitle({
             height: wrapUiSize,
@@ -70,43 +80,26 @@ export class CollectChestState extends InteractionState {
         });
 
         borderWrapper.addView(chestUI);
-
-        this.view = uiBox({
+        const contentView = uiBox({
             width: fillUiSize,
             height: fillUiSize,
-            children: [
-                uiColumn({
-                    width: fillUiSize,
-                    height: fillUiSize,
-                    children: [
-                        {
-                            weight: 1,
-                            child: uiBox({
-                                id: "chestState",
-                                width: fillUiSize,
-                                height: fillUiSize,
-                                padding: allSides(64),
-                                children: [borderWrapper],
-                            }),
-                        },
-                        {
-                            child: this._actionbar,
-                        },
-                    ],
-                }),
-            ],
+            padding: allSides(64),
+            children: [borderWrapper],
         });
+
+        const scaffoldView = new UIActionbarScaffold(
+            contentView,
+            leftActionbar,
+            null,
+            { width: fillUiSize, height: fillUiSize }
+        );
+        this.view = scaffoldView;
     }
 
-    private actionSelected(action: ActionButton) {
-        console.log("Action pressed: ", action);
-        if (action.id == "cancel") {
-            this.context.stateChanger.pop(undefined);
-        } else if (action.id == "collect") {
-            const collectJob = new CollectChestJob(this.chest);
-            this.context.world.jobQueue.schedule(collectJob);
-            this.context.stateChanger.clear();
-        }
+    private scheduleCollectJob() {
+        const collectJob = new CollectChestJob(this.chest);
+        this.context.world.jobQueue.schedule(collectJob);
+        this.context.stateChanger.clear();
     }
 
     private itemSelected(index: number, gridItem: UIInventoryGridItem) {}

@@ -9,6 +9,7 @@ import { ColumnChild, uiColumn } from "../../../../../ui/dsl/uiColumnDsl";
 import { spriteImageSource, uiImage } from "../../../../../ui/dsl/uiImageDsl";
 import { uiText } from "../../../../../ui/dsl/uiTextDsl";
 import { uiAlignment } from "../../../../../ui/uiAlignment";
+import { SpriteBackground } from "../../../../../ui/uiBackground";
 import { fillUiSize, wrapUiSize } from "../../../../../ui/uiSize";
 import { UIView } from "../../../../../ui/uiView";
 import { UIFlowGrid } from "../../../../../ui/view/uiFlowGrid";
@@ -17,28 +18,15 @@ import { OpenBookUIBackground } from "../../../../../ui/visual/bookBackground";
 import { InventoryComponent } from "../../../../world/component/inventory/inventoryComponent";
 import { InteractionState } from "../../../handler/interactionState";
 import { InteractionStateChanger } from "../../../handler/interactionStateChanger";
-import { ActionButton, getActionbarView } from "../../../view/actionbar";
+import {
+    UIActionbar,
+    UIActionbarAlignment,
+    UIActionbarItem,
+} from "../../../view/actionbar/uiActionbar";
+import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold";
+import { AlertMessageState } from "../../common/alertMessageState";
 import { EquipItemState } from "./equipItemState";
 import { UIInventoryGridItem } from "./uiInventoryGridItem";
-
-const actions: ActionButton[] = [
-    {
-        id: "drop",
-        name: "Drop",
-    },
-    {
-        id: "equip",
-        name: "Equip",
-    },
-    {
-        id: "location",
-        name: "Locate",
-    },
-    {
-        id: "cancel",
-        name: "Close",
-    },
-];
 
 export interface InventoryItems {
     name: string;
@@ -49,7 +37,6 @@ export interface InventoryItems {
 }
 
 export class InventoryState extends InteractionState {
-    private _actionbar!: UIView;
     private _masterDetailsView!: UIMasterDetails;
     private _selectedGridItemView: UIInventoryGridItem | undefined;
     private _items: InventoryItems[] = [];
@@ -63,6 +50,40 @@ export class InventoryState extends InteractionState {
     }
 
     override onActive(): void {
+        const actions: UIActionbarItem[] = [
+            {
+                text: "Drop",
+                icon: sprites2.empty_sprite,
+                onClick: () => {
+                    this.context.stateChanger.push(
+                        new AlertMessageState("Ops", "not implemented")
+                    );
+                },
+            },
+            {
+                text: "Equip",
+                icon: sprites2.empty_sprite,
+                onClick: () => {
+                    this.context.stateChanger.push(new EquipItemState());
+                },
+            },
+            {
+                text: "Cancel",
+                icon: sprites2.empty_sprite,
+                onClick: () => {
+                    this.context.stateChanger.pop(null);
+                },
+            },
+        ];
+        const leftActionbar = new UIActionbar(
+            actions,
+            new SpriteBackground(sprites2.stone_slate_background_2x),
+            UIActionbarAlignment.Left,
+            {
+                width: fillUiSize,
+                height: fillUiSize,
+            }
+        );
         this.getInventoryItemList();
         const gridView = this.getMasterGridView();
         const detailsView = this.getDetailsView(0);
@@ -79,41 +100,22 @@ export class InventoryState extends InteractionState {
             height: fillUiSize,
         });
 
-        this._actionbar = getActionbarView(actions, (action) => {
-            this.actionSelected(action);
-        });
-        this._actionbar.size = {
-            width: fillUiSize,
-            height: wrapUiSize,
-        };
-
         this._masterDetailsView.dualBackground = new OpenBookUIBackground();
-
-        this.view = uiBox({
+        const contentView = uiBox({
             width: fillUiSize,
             height: fillUiSize,
-            children: [
-                uiColumn({
-                    width: fillUiSize,
-                    height: fillUiSize,
-                    children: [
-                        {
-                            weight: 1,
-                            child: uiBox({
-                                id: "inventoryMasterDetails",
-                                width: fillUiSize,
-                                height: fillUiSize,
-                                padding: allSides(64),
-                                children: [this._masterDetailsView],
-                            }),
-                        },
-                        {
-                            child: this._actionbar,
-                        },
-                    ],
-                }),
-            ],
+            padding: allSides(64),
+            children: [this._masterDetailsView],
         });
+
+        const scaffoldView = new UIActionbarScaffold(
+            contentView,
+            leftActionbar,
+            null,
+            { width: fillUiSize, height: fillUiSize }
+        );
+
+        this.view = scaffoldView;
     }
 
     override onInput(
@@ -161,15 +163,6 @@ export class InventoryState extends InteractionState {
 
         this._selectedGridItemView = view;
         view.isSelected = true;
-    }
-
-    private actionSelected(action: ActionButton) {
-        console.log("Action pressed: ", action);
-        if (action.id == "cancel") {
-            this.context.stateChanger.pop(undefined);
-        } else if (action.id == "equip") {
-            this.context.stateChanger.push(new EquipItemState());
-        }
     }
 
     private getInventoryItemList() {

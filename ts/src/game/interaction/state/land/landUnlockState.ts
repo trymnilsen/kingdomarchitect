@@ -12,7 +12,8 @@ import { uiImage } from "../../../../ui/dsl/uiImageDsl";
 import { uiRow } from "../../../../ui/dsl/uiRowDsl";
 import { uiSpace } from "../../../../ui/dsl/uiSpaceDsl";
 import { uiText } from "../../../../ui/dsl/uiTextDsl";
-import { wrapUiSize } from "../../../../ui/uiSize";
+import { SpriteBackground } from "../../../../ui/uiBackground";
+import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize";
 import { UIView } from "../../../../ui/uiView";
 import { UISpriteImageSource } from "../../../../ui/view/uiImageSource";
 import { InventoryComponent } from "../../../world/component/inventory/inventoryComponent";
@@ -20,7 +21,11 @@ import { TilesComponent } from "../../../world/component/tile/tilesComponent";
 import { UnlockableArea } from "../../../world/component/tile/unlockableArea";
 import { TileSize } from "../../../world/tile/tile";
 import { InteractionState } from "../../handler/interactionState";
-import { ActionButton, getActionbarView } from "../../view/actionbar";
+import {
+    UIActionbar,
+    UIActionbarAlignment,
+} from "../../view/actionbar/uiActionbar";
+import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold";
 import { AlertMessageState } from "../common/alertMessageState";
 
 export class LandUnlockState extends InteractionState {
@@ -32,22 +37,44 @@ export class LandUnlockState extends InteractionState {
     override onActive(): void {
         this.getUnlockableAreas();
 
-        const actions: ActionButton[] = [
+        const leftActionbar = new UIActionbar(
+            [
+                {
+                    text: "Unlock",
+                    icon: sprites2.empty_sprite,
+                    onClick: () => {
+                        this.unlockSelection();
+                    },
+                },
+                {
+                    text: "Cancel",
+                    icon: sprites2.empty_sprite,
+                    onClick: () => {
+                        this.context.stateChanger.pop(null);
+                    },
+                },
+            ],
+            new SpriteBackground(sprites2.stone_slate_background_2x),
+            UIActionbarAlignment.Left,
             {
-                id: "unlock",
-                name: "Unlock",
-            },
-            {
-                id: "cancel",
-                name: "Cancel",
-            },
-        ];
+                width: fillUiSize,
+                height: fillUiSize,
+            }
+        );
 
-        const actionbarView = getActionbarView(actions, (action) => {
-            this.actionSelected(action);
+        const contentView = uiBox({
+            width: fillUiSize,
+            height: fillUiSize,
         });
 
-        this.view = actionbarView;
+        const scaffoldView = new UIActionbarScaffold(
+            contentView,
+            leftActionbar,
+            null,
+            { width: fillUiSize, height: fillUiSize }
+        );
+
+        this.view = scaffoldView;
     }
 
     override onTap(screenPosition: Point, worldPosition: Point): boolean {
@@ -129,44 +156,39 @@ export class LandUnlockState extends InteractionState {
         super.onDraw(context);
     }
 
-    private actionSelected(action: ActionButton) {
-        if (action.id == "cancel") {
-            this.context.stateChanger.clear();
-        } else if (action.id == "unlock") {
-            // Check if there is enough resources
-            const rootEntity = this.context.world.rootEntity;
-            const inventoryComponent =
-                rootEntity.getComponent(InventoryComponent);
+    private unlockSelection() {
+        // Check if there is enough resources
+        const rootEntity = this.context.world.rootEntity;
+        const inventoryComponent = rootEntity.getComponent(InventoryComponent);
 
-            if (!inventoryComponent) {
-                throw new Error("No inventory component on root entity");
+        if (!inventoryComponent) {
+            throw new Error("No inventory component on root entity");
+        }
+
+        const selectedArea = this.selectedArea;
+        if (!selectedArea) {
+            console.error("No selected area, cannot unlock");
+            return;
+        }
+
+        const removeResult = inventoryComponent.removeInventoryItem(
+            woodResourceItem.id,
+            selectedArea.cost
+        );
+
+        if (removeResult) {
+            const tilesComponent = rootEntity.getComponent(TilesComponent);
+            if (!!tilesComponent) {
+                tilesComponent.unlockArea(selectedArea);
+                this.selectedArea = undefined;
+                this.selectedAreaSize = zeroPoint();
+                this.getUnlockableAreas();
+                //this.context.stateChanger.clear();
             }
-
-            const selectedArea = this.selectedArea;
-            if (!selectedArea) {
-                console.error("No selected area, cannot unlock");
-                return;
-            }
-
-            const removeResult = inventoryComponent.removeInventoryItem(
-                woodResourceItem.id,
-                selectedArea.cost
+        } else {
+            this.context.stateChanger.push(
+                new AlertMessageState("Oh no", "Not enough")
             );
-
-            if (removeResult) {
-                const tilesComponent = rootEntity.getComponent(TilesComponent);
-                if (!!tilesComponent) {
-                    tilesComponent.unlockArea(selectedArea);
-                    this.selectedArea = undefined;
-                    this.selectedAreaSize = zeroPoint();
-                    //this.getUnlockableAreas();
-                    this.context.stateChanger.clear();
-                }
-            } else {
-                this.context.stateChanger.push(
-                    new AlertMessageState("Oh no", "Not enough")
-                );
-            }
         }
     }
 

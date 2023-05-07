@@ -12,7 +12,6 @@ import { SelectedWorldItem } from "../../../world/selection/selectedWorldItem";
 import { GroundTile } from "../../../world/tile/ground";
 import { InteractionState } from "../../handler/interactionState";
 import { InteractionStateChanger } from "../../handler/interactionStateChanger";
-import { ActionButton } from "../../view/actionbar";
 import {
     UIActionbar,
     UIActionbarAlignment,

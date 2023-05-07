@@ -1,3 +1,4 @@
+import { sprites2 } from "../../../../asset/sprite";
 import { withinRectangle } from "../../../../common/bounds";
 import { Point } from "../../../../common/point";
 import { allSides, symmetricSides } from "../../../../common/sides";
@@ -8,31 +9,24 @@ import {
 } from "../../../../ui/color";
 import { boxBackground } from "../../../../ui/dsl/uiBackgroundDsl";
 import { uiBox } from "../../../../ui/dsl/uiBoxDsl";
-import { uiColumn } from "../../../../ui/dsl/uiColumnDsl";
 import { uiText } from "../../../../ui/dsl/uiTextDsl";
 import { uiAlignment } from "../../../../ui/uiAlignment";
+import { SpriteBackground } from "../../../../ui/uiBackground";
 import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize";
 import { UIView } from "../../../../ui/uiView";
 import { UIMasterDetails } from "../../../../ui/view/uiMasterDetail";
 import { OpenBookUIBackground } from "../../../../ui/visual/bookBackground";
 import { InteractionState } from "../../handler/interactionState";
-import { ActionButton, getActionbarView } from "../../view/actionbar";
+import {
+    UIActionbar,
+    UIActionbarAlignment,
+    UIActionbarItem,
+} from "../../view/actionbar/uiActionbar";
+import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold";
 import { UISkillTree } from "./uiSkillTree";
-
-const actions: ActionButton[] = [
-    {
-        id: "unlock",
-        name: "Unlock",
-    },
-    {
-        id: "cancel",
-        name: "cancel",
-    },
-];
 
 export class CharacterSkillState extends InteractionState {
     private _masterDetailsView: UIMasterDetails;
-    private _actionbar: UIView;
     private _skillTree: UISkillTree;
     override get isModal(): boolean {
         return true;
@@ -40,22 +34,40 @@ export class CharacterSkillState extends InteractionState {
 
     constructor() {
         super();
+
+        const items: UIActionbarItem[] = [
+            {
+                icon: sprites2.empty_sprite,
+                text: "Unlock",
+                onClick: () => {
+                    console.log("Unlock");
+                },
+            },
+            {
+                icon: sprites2.empty_sprite,
+                text: "Unlock",
+                onClick: () => {
+                    console.log("Unlock");
+                },
+            },
+        ];
+
         this._skillTree = new UISkillTree({
             width: fillUiSize,
             height: fillUiSize,
         });
 
+        const actionbar = new UIActionbar(
+            items,
+            new SpriteBackground(sprites2.stone_slate_background_2x),
+            UIActionbarAlignment.Left,
+            {
+                width: fillUiSize,
+                height: fillUiSize,
+            }
+        );
         const masterView = this.getMasterView();
         const detailsView = this.getDetailsView(0);
-
-        this._actionbar = getActionbarView(actions, (action) => {
-            this.actionSelected(action);
-        });
-
-        this._actionbar.size = {
-            width: fillUiSize,
-            height: wrapUiSize,
-        };
 
         this._masterDetailsView = new UIMasterDetails(masterView, detailsView, {
             width: fillUiSize,
@@ -63,32 +75,18 @@ export class CharacterSkillState extends InteractionState {
         });
 
         this._masterDetailsView.dualBackground = new OpenBookUIBackground();
-
-        this.view = uiBox({
+        const contentView = uiBox({
+            id: "characterSkillsLayout",
             width: fillUiSize,
             height: fillUiSize,
-            children: [
-                uiColumn({
-                    width: fillUiSize,
-                    height: fillUiSize,
-                    children: [
-                        {
-                            weight: 1,
-                            child: uiBox({
-                                id: "characterSkillsLayout",
-                                width: fillUiSize,
-                                height: fillUiSize,
-                                padding: allSides(64),
-                                alignment: uiAlignment.center,
-                                children: [this._masterDetailsView],
-                            }),
-                        },
-                        {
-                            child: this._actionbar,
-                        },
-                    ],
-                }),
-            ],
+            padding: allSides(64),
+            alignment: uiAlignment.center,
+            children: [this._masterDetailsView],
+        });
+
+        this.view = new UIActionbarScaffold(contentView, actionbar, null, {
+            width: fillUiSize,
+            height: fillUiSize,
         });
     }
 
@@ -110,8 +108,6 @@ export class CharacterSkillState extends InteractionState {
             this._skillTree.panView(movement);
         }
     }
-
-    private actionSelected(action: ActionButton) {}
 
     private getMasterView(): UIView {
         return uiBox({

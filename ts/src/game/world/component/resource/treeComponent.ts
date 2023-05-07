@@ -6,8 +6,6 @@ import { HealthComponent } from "../health/healthComponent";
 
 export enum TreeComponentChopState {
     Chopping,
-    Stub,
-    Clearing,
     Full,
 }
 
@@ -19,40 +17,16 @@ export class TreeComponent extends EntityComponent {
         super();
     }
     startChop() {
-        if (this.chopState == TreeComponentChopState.Stub) {
-            this.chopState = TreeComponentChopState.Clearing;
-        } else {
-            this.chopState = TreeComponentChopState.Chopping;
-        }
+        this.chopState = TreeComponentChopState.Chopping;
     }
 
     finishChop() {
-        if (this.chopState == TreeComponentChopState.Chopping) {
-            this.chopTime = this.previousTick;
-            this.chopState = TreeComponentChopState.Stub;
-        } else if (this.chopState == TreeComponentChopState.Clearing) {
-            this.entity?.remove();
-        }
+        this.chopTime = this.previousTick;
+        this.entity?.remove();
     }
 
     override onUpdate(tick: number): void {
         this.previousTick = tick;
-        if (!!this.chopTime && this.chopState == TreeComponentChopState.Stub) {
-            const timeDifference = tick - this.chopTime;
-            if (timeDifference > 30) {
-                this.chopTime = undefined;
-                this.chopState = TreeComponentChopState.Full;
-                const health = this.entity?.getComponent(HealthComponent);
-                if (!!health) {
-                    health.healToMax();
-                } else {
-                    console.error(
-                        "No health component found on entity, cannot heal",
-                        this
-                    );
-                }
-            }
-        }
     }
 
     override onDraw(context: RenderContext, screenPosition: Point): void {

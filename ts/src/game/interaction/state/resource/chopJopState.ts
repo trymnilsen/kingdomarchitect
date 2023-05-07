@@ -1,9 +1,16 @@
 import { sprites2 } from "../../../../asset/sprite";
 import { RenderContext } from "../../../../rendering/renderContext";
+import { uiBox } from "../../../../ui/dsl/uiBoxDsl";
+import { SpriteBackground } from "../../../../ui/uiBackground";
+import { fillUiSize } from "../../../../ui/uiSize";
 import { ChopTreeJob } from "../../../world/actor/jobs/chopTreeJob";
 import { SelectedWorldItem } from "../../../world/selection/selectedWorldItem";
 import { InteractionState } from "../../handler/interactionState";
-import { ActionButton, getActionbarView } from "../../view/actionbar";
+import {
+    UIActionbar,
+    UIActionbarAlignment,
+} from "../../view/actionbar/uiActionbar";
+import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold";
 
 export class ChopJobState extends InteractionState {
     constructor(private selection: SelectedWorldItem) {
@@ -11,11 +18,44 @@ export class ChopJobState extends InteractionState {
     }
 
     override onActive(): void {
-        const actions = this.getActions();
+        const leftActionbar = new UIActionbar(
+            [
+                {
+                    text: "Confirm",
+                    icon: sprites2.empty_sprite,
+                    onClick: () => {
+                        this.scheduleChop();
+                    },
+                },
+                {
+                    text: "Cancel",
+                    icon: sprites2.empty_sprite,
+                    onClick: () => {
+                        this.context.stateChanger.pop(null);
+                    },
+                },
+            ],
+            new SpriteBackground(sprites2.stone_slate_background_2x),
+            UIActionbarAlignment.Left,
+            {
+                width: fillUiSize,
+                height: fillUiSize,
+            }
+        );
 
-        this.view = getActionbarView(actions, (action) => {
-            this.actionButtonPressed(action.id);
+        const contentView = uiBox({
+            width: fillUiSize,
+            height: fillUiSize,
         });
+
+        const scaffoldView = new UIActionbarScaffold(
+            contentView,
+            leftActionbar,
+            null,
+            { width: fillUiSize, height: fillUiSize }
+        );
+
+        this.view = scaffoldView;
     }
 
     override onDraw(context: RenderContext): void {
@@ -33,64 +73,11 @@ export class ChopJobState extends InteractionState {
         super.onDraw(context);
     }
 
-    private getActions(): ActionButton[] {
-        //Check if there is a job active on the tile
-        // TODO: add query back in
-        const job = null;
-        /*this.context.world.actors.queryJob(
-            new JobByGroundTileQuery(this.selection.tile)
-        );*/
-        if (!!job) {
-            return [
-                {
-                    name: "Abort",
-                    id: "abort",
-                },
-                {
-                    name: "Prioritise",
-                    id: "prioritise",
-                },
-                {
-                    name: "Cancel",
-                    id: "cancel",
-                },
-            ];
-        } else {
-            //There was not job so return actions for confirming
-            //the job
-            return [
-                {
-                    name: "Confirm",
-                    id: "confirm",
-                },
-                {
-                    name: "Cancel",
-                    id: "cancel",
-                },
-            ];
-        }
-    }
+    private scheduleChop() {
+        console.log("Schedule chop tree job");
+        this.context.world.jobQueue.schedule(new ChopTreeJob(this.selection));
 
-    private actionButtonPressed(id: string) {
-        if (id == "cancel") {
-            this.context.stateChanger.pop(null);
-        } else if (id == "confirm") {
-            console.log("Schedule chop tree job");
-            this.context.world.jobQueue.schedule(
-                new ChopTreeJob(this.selection)
-            );
-
-            console.log("Clear state changer job");
-            this.context.stateChanger.clear();
-        } else if (id == "abort") {
-            //TODO: Add this back in
-            /*const job = this.context.world.actors.queryJob(
-                new JobByGroundTileQuery(this.selection.tile)
-            );
-            if (!!job) {
-                job.abort();
-            }*/
-            this.context.stateChanger.clear();
-        }
+        console.log("Clear state changer job");
+        this.context.stateChanger.clear();
     }
 }

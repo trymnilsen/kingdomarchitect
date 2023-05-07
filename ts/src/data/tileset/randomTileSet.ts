@@ -35,10 +35,11 @@ export class RandomTileSetFactory implements TileSetFactory {
     constructor(private chunk: GroundChunk, private tiles: Point[]) {}
     createTiles(): GroundTile[] {
         return this.tiles.map((point) => {
+            const plantTree = Math.random() > 0.7;
             return {
                 tileX: point.x,
                 tileY: point.y,
-                hasTree: Math.floor(Math.random() * 4),
+                hasTree: plantTree ? Math.floor(Math.random() * 4) : 0,
             };
         });
     }
