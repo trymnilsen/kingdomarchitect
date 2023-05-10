@@ -4,7 +4,9 @@ import { Event, EventListener } from "../../../../common/event";
 import { Point } from "../../../../common/point";
 import { RenderContext } from "../../../../rendering/renderContext";
 import { Job } from "../../actor/job/job";
+import { Entity } from "../../entity/entity";
 import { EntityComponent } from "../entityComponent";
+import { JobQuery } from "./jobQuery";
 import { JobQueue } from "./jobQueue";
 import { JobRunnerComponent } from "./jobRunnerComponent";
 
@@ -32,6 +34,49 @@ export class JobQueueComponent extends EntityComponent implements JobQueue {
         if (!removeResult) {
             console.warn("Job not removed, was not in list", job);
         }
+    }
+
+    query(query: JobQuery, includeRunning: boolean = true): Job | null {
+        for (const job of this._pendingJobs) {
+            if (query.matches(job)) {
+                return job;
+            }
+        }
+
+        if (includeRunning) {
+            const entityQueryResult = this.queryEntityForRunningJob(
+                this.entity,
+                query
+            );
+
+            if (entityQueryResult) {
+                return entityQueryResult;
+            }
+        }
+
+        return null;
+    }
+
+    private queryEntityForRunningJob(
+        entity: Entity,
+        query: JobQuery
+    ): Job | null {
+        const runnerComponent = entity.getComponent(JobRunnerComponent);
+        if (runnerComponent && runnerComponent.activeJob) {
+            const queryResult = query.matches(runnerComponent.activeJob);
+            if (queryResult) {
+                return runnerComponent.activeJob;
+            }
+        }
+
+        for (const child of entity.children) {
+            const childResult = this.queryEntityForRunningJob(child, query);
+            if (childResult) {
+                return childResult;
+            }
+        }
+
+        return null;
     }
 
     private assignJobToAvailableEntity(job: Job): boolean {
