@@ -30,6 +30,7 @@ export class ChopTreeJob extends MoveToBeforeJob {
     }
 
     override onDraw(renderContext: RenderContext): void {
+        super.onDraw(renderContext);
         const visualPosition = renderContext.camera.tileSpaceToWorldSpace(
             this.target.tilePosition
         );
@@ -42,8 +43,6 @@ export class ChopTreeJob extends MoveToBeforeJob {
             strokeColor: "yellow",
             strokeWidth: 2,
         });
-
-        super.onDraw(renderContext);
     }
 }
 

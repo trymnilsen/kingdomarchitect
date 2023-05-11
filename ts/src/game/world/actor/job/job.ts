@@ -35,6 +35,9 @@ export abstract class Job {
         this._startTick = value;
     }
 
+    /**
+     * The constraint used when assigning this job to a runner
+     */
     public get constraint(): JobConstraint | null {
         return this._constraint;
     }
@@ -126,11 +129,16 @@ export abstract class Job {
     onStart() {}
 
     /**
-     * Render anything this job wants to
+     * Render anything this job wants to show. Note that this method will
+     * be called both while pending and while active and any overriden
+     * logic should consider that entity can be null and the job not started
      * @param renderContext the context to render to
      */
     onDraw(renderContext: RenderContext) {}
 
+    /**
+     * Abort this job, setting its state to completed and publishing completion
+     */
     public abort() {
         this._jobState = JobState.Completed;
         this._completedEvent.publish(JobCompletedResult.Aborted);

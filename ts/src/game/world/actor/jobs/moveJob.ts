@@ -1,4 +1,6 @@
 import { Point } from "../../../../common/point";
+import { RenderContext } from "../../../../rendering/renderContext";
+import { TileSize } from "../../tile/tile";
 import { Job } from "../job/job";
 import { JobConstraint } from "../job/jobConstraint";
 
@@ -20,6 +22,18 @@ export class MoveJob extends Job {
             this.entity.worldPosition = newPosition;
         } else {
             this.complete();
+        }
+    }
+
+    override onDraw(renderContext: RenderContext): void {
+        for (const pathPoint of this.path) {
+            renderContext.drawRectangle({
+                x: pathPoint.x * TileSize + 14,
+                y: pathPoint.y * TileSize + 14,
+                width: 8,
+                height: 8,
+                fill: "purple",
+            });
         }
     }
 }
