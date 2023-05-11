@@ -13,7 +13,6 @@ import { BuildJob } from "../../../world/actor/jobs/buildJob";
 import { InventoryComponent } from "../../../world/component/inventory/inventoryComponent";
 import { TilesComponent } from "../../../world/component/tile/tilesComponent";
 import { buildingPrefab } from "../../../world/prefab/buildingPrefab";
-import { housePrefab } from "../../../world/prefab/housePrefab";
 import { GroundTile } from "../../../world/tile/ground";
 import { TileSize } from "../../../world/tile/tile";
 import { InteractionState } from "../../handler/interactionState";
@@ -36,7 +35,9 @@ export class BuildConfirmState extends InteractionState {
             y: 0,
             sprite: building.icon,
         });
+    }
 
+    override onActive(): void {
         const actions: UIActionbarItem[] = [
             {
                 text: "Confirm",
