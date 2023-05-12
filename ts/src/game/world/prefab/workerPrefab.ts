@@ -3,6 +3,7 @@ import { SpriteComponent } from "../component/draw/spriteComponent";
 import { WorkerBehaviorComponent } from "../component/behavior/workerBehaviorComponent";
 import { Entity } from "../entity/entity";
 import { sprites2 } from "../../../asset/sprite";
+import { EquipmentComponent } from "../component/inventory/equipmentComponent";
 
 export function workerPrefab(id: string): Entity {
     const worker = new Entity(id);
@@ -12,10 +13,12 @@ export function workerPrefab(id: string): Entity {
     });
     const jobRunner = new JobRunnerComponent();
     const workerBehaviorComponent = new WorkerBehaviorComponent();
+    const equipmentComponet = new EquipmentComponent();
 
     worker.addComponent(spriteDrawer);
     worker.addComponent(jobRunner);
     worker.addComponent(workerBehaviorComponent);
+    worker.addComponent(equipmentComponet);
 
     return worker;
 }

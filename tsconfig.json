@@ -29,5 +29,9 @@
       "ts/tool/**/*.ts",
       "ts/test/**/*.ts",
       "ts/generated/sprites.json"
+    ],
+
+    "exclude": [
+      "node_modules"
     ]
   }

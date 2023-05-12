@@ -401,6 +401,13 @@ export abstract class UIView {
         this._children = this._children.filter((child) => child != view);
     }
 
+    protected clearViews() {
+        for (const child of this._children) {
+            child.dispose();
+        }
+        this._children = [];
+    }
+
     /**
      * Test if the screen point is within the bounds of this view
      * Return false from this method will still do hit testing on

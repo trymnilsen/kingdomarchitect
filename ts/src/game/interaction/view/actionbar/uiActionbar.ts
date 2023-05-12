@@ -34,6 +34,12 @@ export class UIActionbar extends UIView {
         size: UISize
     ) {
         super(size);
+        this.updateItems(items);
+    }
+
+    public updateItems(items: UIActionbarItem[]) {
+        this.clearViews();
+        this.items = items;
         const views = this.items.map((item) => {
             let icon: UIView[] = [];
             if (item.icon) {

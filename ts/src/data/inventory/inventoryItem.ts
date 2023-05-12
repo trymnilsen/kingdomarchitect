@@ -5,4 +5,9 @@ export interface InventoryItem {
     name: string;
     asset: Sprite2;
     hint?: string;
+    tag?: ItemTag[];
+}
+
+export enum ItemTag {
+    SkillGear,
 }

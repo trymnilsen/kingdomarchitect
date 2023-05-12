@@ -10,9 +10,12 @@ import {
 } from "../../view/actionbar/uiActionbar";
 import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold";
 import { InteractionState } from "../../handler/interactionState";
+import { CharacterSkillState } from "../character/characterSkillState";
+import { Entity } from "../../../world/entity/entity";
+import { EquipmentComponent } from "../../../world/component/inventory/equipmentComponent";
 
 export class ActorSelectionState extends InteractionState {
-    constructor() {
+    constructor(private entity: Entity) {
         super();
     }
 
@@ -20,6 +23,9 @@ export class ActorSelectionState extends InteractionState {
         const items: UIActionbarItem[] = [
             {
                 text: "Skills",
+                onClick: () => {
+                    this.context.stateChanger.push(new CharacterSkillState());
+                },
             },
             {
                 text: "Stats",
@@ -28,16 +34,7 @@ export class ActorSelectionState extends InteractionState {
                 text: "Close",
             },
         ];
-        const rightItems: UIActionbarItem[] = [
-            {
-                text: "Main",
-                icon: sprites2.sword_skill,
-            },
-            {
-                text: "Other",
-                icon: sprites2.health_potion,
-            },
-        ];
+        const rightItems = this.getRightItems();
         const leftActionBar = new UIActionbar(
             items,
             ninePatchBackground({
@@ -71,5 +68,28 @@ export class ActorSelectionState extends InteractionState {
         );
 
         this.view = scaffoldState;
+    }
+
+    private getRightItems(): UIActionbarItem[] {
+        const items: UIActionbarItem[] = [];
+        const equipment = this.entity.getComponent(EquipmentComponent);
+        if (equipment && equipment.mainItem) {
+            items.push({
+                text: "Main",
+                icon: equipment.mainItem.asset,
+            });
+        } else {
+            items.push({
+                text: "Main",
+                icon: sprites2.sword_skill,
+            });
+        }
+
+        items.push({
+            text: "Other",
+            icon: sprites2.health_potion,
+        });
+
+        return items;
     }
 }

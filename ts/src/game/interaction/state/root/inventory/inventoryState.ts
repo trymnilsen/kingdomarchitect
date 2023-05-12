@@ -1,6 +1,11 @@
 import { Sprite2, sprites2 } from "../../../../../asset/sprite";
 import { Direction } from "../../../../../common/direction";
 import { allSides, symmetricSides } from "../../../../../common/sides";
+import {
+    InventoryItem,
+    ItemTag,
+} from "../../../../../data/inventory/inventoryItem";
+import { InventoryItemList } from "../../../../../data/inventory/inventoryItemQuantity";
 import { InputAction } from "../../../../../input/inputAction";
 import { UIThemeType, bookInkColor } from "../../../../../ui/color";
 import { ninePatchBackground } from "../../../../../ui/dsl/uiBackgroundDsl";
@@ -28,18 +33,12 @@ import { AlertMessageState } from "../../common/alertMessageState";
 import { EquipItemState } from "./equipItemState";
 import { UIInventoryGridItem } from "./uiInventoryGridItem";
 
-export interface InventoryItems {
-    name: string;
-    asset: Sprite2;
-    amount: number;
-    value: number;
-    hint?: string;
-}
-
 export class InventoryState extends InteractionState {
     private _masterDetailsView!: UIMasterDetails;
+    private _actionbar: UIActionbar | null = null;
     private _selectedGridItemView: UIInventoryGridItem | undefined;
-    private _items: InventoryItems[] = [];
+    private _items: InventoryItemList = [];
+    private _activeItem: number = 0;
 
     override get isModal(): boolean {
         return true;
@@ -50,32 +49,9 @@ export class InventoryState extends InteractionState {
     }
 
     override onActive(): void {
-        const actions: UIActionbarItem[] = [
-            {
-                text: "Drop",
-                icon: sprites2.empty_sprite,
-                onClick: () => {
-                    this.context.stateChanger.push(
-                        new AlertMessageState("Ops", "not implemented")
-                    );
-                },
-            },
-            {
-                text: "Equip",
-                icon: sprites2.empty_sprite,
-                onClick: () => {
-                    this.context.stateChanger.push(new EquipItemState());
-                },
-            },
-            {
-                text: "Cancel",
-                icon: sprites2.empty_sprite,
-                onClick: () => {
-                    this.context.stateChanger.pop(null);
-                },
-            },
-        ];
-        const leftActionbar = new UIActionbar(
+        this.getInventoryItemList();
+        const actions = this.getActionbarItems();
+        this._actionbar = new UIActionbar(
             actions,
             new SpriteBackground(sprites2.stone_slate_background_2x),
             UIActionbarAlignment.Left,
@@ -84,7 +60,7 @@ export class InventoryState extends InteractionState {
                 height: fillUiSize,
             }
         );
-        this.getInventoryItemList();
+
         const gridView = this.getMasterGridView();
         const detailsView = this.getDetailsView(0);
 
@@ -110,7 +86,7 @@ export class InventoryState extends InteractionState {
 
         const scaffoldView = new UIActionbarScaffold(
             contentView,
-            leftActionbar,
+            this._actionbar,
             null,
             { width: fillUiSize, height: fillUiSize }
         );
@@ -160,9 +136,13 @@ export class InventoryState extends InteractionState {
         if (this._selectedGridItemView) {
             this._selectedGridItemView.isSelected = false;
         }
-
+        this._activeItem = index;
         this._selectedGridItemView = view;
         view.isSelected = true;
+        if (this._actionbar) {
+            const items = this.getActionbarItems();
+            this._actionbar.updateItems(items);
+        }
     }
 
     private getInventoryItemList() {
@@ -173,16 +153,7 @@ export class InventoryState extends InteractionState {
             throw new Error("No inventory component on root entity");
         }
 
-        const items = inventoryComponent.items;
-        this._items = items.map((item) => {
-            return {
-                name: item.item.name,
-                asset: item.item.asset,
-                amount: item.amount,
-                value: 5,
-                hint: item.item.hint,
-            };
-        });
+        this._items = inventoryComponent.items;
     }
 
     private getMasterGridView(): UIView {
@@ -197,11 +168,11 @@ export class InventoryState extends InteractionState {
             if (!!inventoryItem) {
                 const isSelected = i == 0;
                 const gridItem = new UIInventoryGridItem(
-                    inventoryItem.asset,
+                    inventoryItem.item.asset,
                     isSelected,
                     UIThemeType.Book
                 );
-                gridItem.id = inventoryItem.name;
+                gridItem.id = inventoryItem.item.name;
 
                 if (isSelected) {
                     this._selectedGridItemView = gridItem;
@@ -236,7 +207,9 @@ export class InventoryState extends InteractionState {
 
     private getDetailsView(index: number): UIView {
         const inventoryItem = this._items[index];
-        const description: (item: InventoryItems) => ColumnChild[] = (item) => {
+        const description: (item: Readonly<InventoryItem>) => ColumnChild[] = (
+            item
+        ) => {
             if (item.hint) {
                 return [
                     {
@@ -255,7 +228,7 @@ export class InventoryState extends InteractionState {
                     {
                         child: uiText({
                             alignment: uiAlignment.centerLeft,
-                            text: inventoryItem.hint || "",
+                            text: inventoryItem.item.hint || "",
                             style: {
                                 color: bookInkColor,
                                 font: "Silkscreen",
@@ -299,7 +272,7 @@ export class InventoryState extends InteractionState {
                                             height: 64,
                                             width: 64,
                                             image: spriteImageSource(
-                                                inventoryItem.asset
+                                                inventoryItem.item.asset
                                             ),
                                         }),
                                     ],
@@ -308,7 +281,7 @@ export class InventoryState extends InteractionState {
                             {
                                 child: uiText({
                                     padding: symmetricSides(0, 8),
-                                    text: inventoryItem.name,
+                                    text: inventoryItem.item.name,
                                     style: {
                                         color: bookInkColor,
                                         font: "Silkscreen",
@@ -334,7 +307,7 @@ export class InventoryState extends InteractionState {
                             {
                                 child: uiText({
                                     alignment: uiAlignment.centerLeft,
-                                    text: `value: ${inventoryItem.value}`,
+                                    text: `value: 50`,
                                     style: {
                                         color: bookInkColor,
                                         font: "Silkscreen",
@@ -344,7 +317,7 @@ export class InventoryState extends InteractionState {
                                     height: wrapUiSize,
                                 }),
                             },
-                            ...description(inventoryItem),
+                            ...description(inventoryItem.item),
                         ],
                     }),
                 ],
@@ -373,6 +346,58 @@ export class InventoryState extends InteractionState {
                     }),
                 ],
             });
+        }
+    }
+
+    private getActionbarItems(): UIActionbarItem[] {
+        if (this._items.length == 0) {
+            return [
+                {
+                    text: "Cancel",
+                    icon: sprites2.empty_sprite,
+                    onClick: () => {
+                        this.context.stateChanger.pop(null);
+                    },
+                },
+            ];
+        } else {
+            const actions: UIActionbarItem[] = [];
+
+            actions.push({
+                text: "Drop",
+                icon: sprites2.empty_sprite,
+                onClick: () => {
+                    this.context.stateChanger.push(
+                        new AlertMessageState("Ops", "not implemented")
+                    );
+                },
+            });
+
+            const activeItem = this._items[this._activeItem];
+            if (
+                activeItem &&
+                activeItem.item.tag?.some((tag) => tag === ItemTag.SkillGear)
+            ) {
+                actions.push({
+                    text: "Equip",
+                    icon: sprites2.empty_sprite,
+                    onClick: () => {
+                        this.context.stateChanger.push(
+                            new EquipItemState(activeItem.item)
+                        );
+                    },
+                });
+            }
+
+            actions.push({
+                text: "Cancel",
+                icon: sprites2.empty_sprite,
+                onClick: () => {
+                    this.context.stateChanger.pop(null);
+                },
+            });
+
+            return actions;
         }
     }
 }

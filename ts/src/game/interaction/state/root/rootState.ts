@@ -107,7 +107,7 @@ export class RootState extends InteractionState {
             const actor = entitiesAt[0];
             const behavior = actor.getComponent(WorkerBehaviorComponent);
             if (behavior) {
-                this.context.stateChanger.push(new ActorSelectionState());
+                this.context.stateChanger.push(new ActorSelectionState(actor));
             } else {
                 selection = new SelectedEntityItem(entitiesAt[0]);
                 this.context.stateChanger.push(new SelectionState(selection));

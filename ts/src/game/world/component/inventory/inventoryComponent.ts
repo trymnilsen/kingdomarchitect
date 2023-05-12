@@ -1,6 +1,10 @@
 import { hammerItem, swordItem } from "../../../../data/inventory/equipment";
 import { InventoryItem } from "../../../../data/inventory/inventoryItem";
 import {
+    InventoryItemList,
+    InventoryItemQuantity,
+} from "../../../../data/inventory/inventoryItemQuantity";
+import {
     bagOfGlitter,
     blueBook,
     gemResource,
@@ -13,10 +17,8 @@ import {
 } from "../../../../data/inventory/resources";
 import { EntityComponent } from "../entityComponent";
 
-type InventoryEntry = { amount: number; item: InventoryItem };
-
 export class InventoryComponent extends EntityComponent {
-    private _items: { [id: string]: InventoryEntry } = {
+    private _items: { [id: string]: InventoryItemQuantity } = {
         [woodResourceItem.id]: {
             amount: 200000,
             item: woodResourceItem,
@@ -63,7 +65,7 @@ export class InventoryComponent extends EntityComponent {
         },
     };
 
-    get items(): ReadonlyArray<Readonly<InventoryEntry>> {
+    get items(): InventoryItemList {
         return Object.values(this._items);
     }
 
