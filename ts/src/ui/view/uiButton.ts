@@ -50,6 +50,7 @@ export class UIButton extends UIBox {
     }
 
     override onTapUp(screenPoint: Point) {
+        console.log("Button: reset background due to tapUp");
         this.background = this._defaultBackground;
     }
 
