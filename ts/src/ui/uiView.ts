@@ -2,7 +2,15 @@ import { Bounds, withinRectangle } from "../common/bounds";
 import { Event, EventListener } from "../common/event";
 import { addPoint, Point, zeroPoint } from "../common/point";
 import { UIRenderContext } from "../rendering/uiRenderContext";
-import { isTapEvent, UIEvent, UIInputEvent, UITapEvent } from "./event/uiEvent";
+import {
+    isTapEvent,
+    tapStartType,
+    tapType,
+    tapUpType,
+    UIEvent,
+    UIInputEvent,
+    UITapEvent,
+} from "./event/uiEvent";
 import {
     getClosestFocusableView,
     getFocusableViews,
@@ -332,7 +340,7 @@ export abstract class UIView {
      * Called when a tap is registered as no-longer down.
      * @param screenPoint the position of this tap event
      */
-    onTapUp(screenPoint: Point) {}
+    onTapUp(screenPoint: Point, isCancelled: boolean) {}
     /**
      * Called when a tap is registered as both up and down within this view.
      * @param screenPoint the position this event occured at.
@@ -367,7 +375,8 @@ export abstract class UIView {
         if (isTapEvent(event)) {
             return this.dispatchTapEvent(event);
         } else if (event.type == "direction") {
-            return this.handleDirectionEvent(event);
+            const directionalResult = this.handleDirectionEvent(event);
+            return directionalResult;
         } else {
             console.warn("Unrecognised event type: ", event);
             //Input type was not recognised so it will not be handled
@@ -410,9 +419,10 @@ export abstract class UIView {
 
     /**
      * Test if the screen point is within the bounds of this view
-     * Return false from this method will still do hit testing on
-     * children. This might return true if something wants to be considered
-     * opaque. Eg a background or some padding.
+     * This might return true if something wants to be considered
+     * opaque, e.g a background or some padding. The inverse would be true
+     * for a pure layout view, we might not want a column to be tappable even
+     * though a tap or point is within the bounds of the view
      * @param screenPoint
      * @returns
      */
@@ -439,10 +449,12 @@ export abstract class UIView {
      * @returns if the event was handled
      */
     private dispatchTapEvent(event: UITapEvent): boolean {
-        let handled = false;
-        // check if this view is within bounds, if it its we dispatch the event
-        // to children. Then run the tap events if it hit tests
-        const withinBounds = this.withinViewBounds(event.position);
+        // check if this view is within bounds, this depends on different
+        // logic based on the event type. See the documentation for
+        // `isUITapEventWithinBounds` for more information.
+        // We do a bounds check here before propegating the event to children
+        // to avoid passing it down unnecessarily
+        const withinBounds = this.isUITapEventWithinBounds(event);
 
         // If the event is not within our bounds we do not pass it on
         if (!withinBounds) {
@@ -452,29 +464,48 @@ export abstract class UIView {
         // Pass it on to children, allowing the deepest child to handle the
         // event first
         for (const child of this.children) {
-            const childHandledEvent = child.dispatchUIEvent(event);
-            if (childHandledEvent) {
-                return true;
+            const childResult = child.dispatchUIEvent(event);
+            if (childResult) {
+                return childResult;
             }
         }
 
         // if we get here the children did not handle the event so we check if
         // this view wants to handle it
-        if (this.hitTest(event.position)) {
-            switch (event.type) {
-                case "tap":
-                    handled = this.onTap(event.position);
-                    break;
-                case "tapStart":
-                    handled = this.onTapDown(event.position);
-                    break;
-                case "tapEnd":
-                    this.onTapUp(event.position);
-                    break;
+        if (event.type == tapType) {
+            // Check if both the start and end event is within bounds
+            const startHitTest = this.hitTest(event.startPosition);
+            const endHitTest = this.hitTest(event.position);
+
+            if (startHitTest && endHitTest) {
+                // If both start and end is hit
+                console.log("View: Tap up withing view", this);
+                this.onTapUp(event.position, false);
+                const tapResult = this.onTap(event.position);
+                return tapResult;
             }
+        } else if (event.type == tapUpType) {
+            const startHitTest = this.hitTest(event.startPosition);
+            const endHitTest = this.hitTest(event.position);
+
+            if (startHitTest && !endHitTest) {
+                this.onTapUp(event.position, true);
+                return false;
+            }
+        } else if (event.type == tapStartType) {
+            // The tap was started, we need no more logic as we already know
+            // from `this.isUITapEventWithinBounds` that the tap is intended
+            // for this view
+            if (this.hitTest(event.position)) {
+                console.log("View: Tap down on view", this);
+                const tapResult = this.onTapDown(event.position);
+                return tapResult;
+            }
+        } else {
+            console.warn("Encountered unknown UITapEvent type", event);
         }
 
-        return handled;
+        return false;
     }
 
     /**
@@ -516,6 +547,24 @@ export abstract class UIView {
             const firstFocusResult =
                 this.focusState.setFirstFocus(focusableViews);
             return firstFocusResult;
+        }
+    }
+
+    /**
+     * Check if the tap event is within the bounds of this view.
+     * Based on the type we use a different property
+     * @param uiEvent The tap event to check if is within bounds
+     */
+    private isUITapEventWithinBounds(uiEvent: UITapEvent): boolean {
+        if (uiEvent.type == "tapStart") {
+            return this.withinViewBounds(uiEvent.position);
+        } else if (uiEvent.type == "tap") {
+            return (
+                this.withinViewBounds(uiEvent.startPosition) &&
+                this.withinViewBounds(uiEvent.position)
+            );
+        } else {
+            return this.withinViewBounds(uiEvent.startPosition);
         }
     }
 }

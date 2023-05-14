@@ -2,6 +2,7 @@ import { AssetLoader } from "../asset/loader/assetLoader";
 import { Point } from "../common/point";
 import { GameTime } from "../common/time";
 import { InputAction } from "../input/inputAction";
+import { OnTapEndEvent } from "../input/touchInput";
 import { Camera } from "../rendering/camera";
 import { RenderContext } from "../rendering/renderContext";
 import { InteractionHandler } from "./interaction/handler/interactionHandler";
@@ -30,16 +31,12 @@ export class MainScene implements Scene {
         this.interactionHandler.onUpdate(tick);
     }
 
-    onTap(worldPoint: Point): void {
-        this.interactionHandler.onTap(worldPoint);
+    onTapUp(tapEndEvent: OnTapEndEvent): void {
+        this.interactionHandler.onTapUp(tapEndEvent);
     }
 
     onTapDown(screenPoint: any): boolean {
         return this.interactionHandler.onTapDown(screenPoint);
-    }
-
-    onTapUp(screenPoint: any): void {
-        this.interactionHandler.onTapUp(screenPoint);
     }
 
     onTapPan(movement: Point, position: Point, startPoint: Point): void {
@@ -60,8 +57,7 @@ export interface Scene {
     drawScene(context: RenderContext): void;
     input(action: InputAction): void;
     onTapDown(screenPoint: Point): boolean;
-    onTapUp(screenPoint: Point): void;
-    onTap(screenPoint: Point): void;
+    onTapUp(tapEndEvent: OnTapEndEvent): void;
     onTapPan(movement: Point, position: Point, startPoint: Point): void;
     tick(tick: number): void;
 }

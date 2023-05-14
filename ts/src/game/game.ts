@@ -54,10 +54,11 @@ export class Game {
             return tapResult;
         };
 
+        /*
         this.touchInput.onTapUp = (position: Point) => {
             this.currentScene.onTapUp(position);
             this.render();
-        };
+        };*/
 
         this.touchInput.onPan = (
             movement: Point,
@@ -74,8 +75,8 @@ export class Game {
             this.render();
         };
 
-        this.touchInput.onTap = (onTapEvent) => {
-            this.currentScene.onTap(onTapEvent);
+        this.touchInput.onTapEnd = (tapEndEvent) => {
+            this.currentScene.onTapUp(tapEndEvent);
             this.render();
         };
 

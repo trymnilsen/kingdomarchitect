@@ -63,10 +63,38 @@ export abstract class InteractionState {
 
     /**
      * Dispatch a UI event to the currently set view
+     *
+     * The dispatching is done using a depth first search, queueing views
+     * in a queue and looping over them with a while loop. This ensures that
+     * we have the referene to the view that handles the event and can compare
+     * them on later events when the event is dependent on previous events.
+     *
+     * For example on tap up should only trigger if tap down happened on the
+     * same view.
+     *
      * @param event the event to dispatch to the view
      * @returns if the event was handled or not
      */
     dispatchUIEvent(event: UIEvent): boolean {
+        /*
+        const viewsToVisit = [this._view];
+
+        while (viewsToVisit.length > 0) {
+            // Pick the first view
+            const view = viewsToVisit.shift();
+            if (!view) {
+                throw new Error("Undefined view in queue with > 0 length");
+            }
+            // Add the children of this entity to nodes to search
+            for (const child of view.children) {
+                viewsToVisit.push(child);
+            }
+        }
+
+        return false;
+        */
+
+        console.log("UI Event: ", event);
         if (this._view) {
             const handled = this._view.dispatchUIEvent(event);
             return handled;

@@ -5,15 +5,24 @@ export interface OnPanEvent {
     position: Point;
 }
 
+export interface OnTapEndEvent {
+    position: Point;
+    startPosition: Point;
+    wasDragging: boolean;
+}
+
 export type OnTapDownCallback = (position: Point) => boolean;
+export type OnTapCallback = (tapEndEvent: OnTapEndEvent) => void;
 export type OnPanCallback = (
     movement: Point,
     position: Point,
     startPosition: Point,
     downTapHandled: boolean
 ) => void;
-export type OnTapUpCallback = (movement: Point) => void;
-export type OnTapCallback = (position: Point) => void;
+export type OnStartDragCallback = (
+    tapStart: Point,
+    dragStart: Point
+) => boolean;
 
 export class TouchInput {
     private isDragging: boolean = false;
@@ -22,9 +31,9 @@ export class TouchInput {
     private tapHandled: boolean = false;
 
     onPan: OnPanCallback | null = null;
-    onTap: OnTapCallback | null = null;
+    onStartDrag: OnStartDragCallback | null = null;
+    onTapEnd: OnTapCallback | null = null;
     onTapDown: OnTapDownCallback | null = null;
-    onTapUp: OnTapUpCallback | null = null;
 
     constructor(canvasElement: HTMLCanvasElement) {
         canvasElement.addEventListener(
@@ -146,25 +155,27 @@ export class TouchInput {
             }
         } else if (this.onTapPosition != null) {
             if (distance(this.onTapPosition, position) > 5) {
+                console.log("Drag started");
                 this.isDragging = true;
             }
         }
         this.previousMovePosition = position;
     }
 
-    private onTapEnded(position: Point | undefined = undefined) {
+    private onTapEnded(position: Point | null | undefined = undefined) {
         try {
-            if (this.isDragging) {
-                //console.log("drag ended");
-            } else if (this.onTapPosition && this.onTap) {
-                if (!position) {
-                    position = this.previousMovePosition || this.onTapPosition;
-                }
+            position = position || this.previousMovePosition;
 
-                if (this.onTapUp) {
-                    this.onTapUp(position);
-                }
-                this.onTap(position);
+            if (this.onTapEnd && this.onTapPosition) {
+                console.log(`TouchInput: Tap ended`, position, this.isDragging);
+                this.onTapEnd({
+                    // Substitute the onTapPosition as the end position if
+                    // there is no position in the event or a previous
+                    // pointer position registered
+                    position: position || this.onTapPosition,
+                    wasDragging: this.isDragging,
+                    startPosition: this.onTapPosition,
+                });
             }
         } catch (err) {
             console.error("Failed ending tap", err);

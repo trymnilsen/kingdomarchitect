@@ -3,18 +3,20 @@ import { Point } from "../../common/point";
 
 export type UIEvent = UITapEvent | UIInputEvent;
 
-export const tapType = "tap";
 export const tapStartType = "tapStart";
-export const tapEndType = "tapEnd";
+export const tapType = "tap";
+export const tapUpType = "tapUp";
 export const directionInputType = "direction";
 
-export type UITapEventType =
-    | typeof tapType
-    | typeof tapStartType
-    | typeof tapEndType;
+export type UITapEvent = UITapStartEvent | UITapEndEvent;
+export type UITapStartEvent = {
+    type: typeof tapStartType;
+    position: Point;
+};
 
-export type UITapEvent = {
-    type: UITapEventType;
+export type UITapEndEvent = {
+    type: typeof tapType | typeof tapUpType;
+    startPosition: Point;
     position: Point;
 };
 
@@ -25,8 +27,8 @@ export type UIInputEvent = {
 
 export function isTapEvent(uiEvent: UIEvent): uiEvent is UITapEvent {
     return (
-        uiEvent.type == tapType ||
         uiEvent.type == tapStartType ||
-        uiEvent.type == tapEndType
+        uiEvent.type == tapType ||
+        uiEvent.type == tapUpType
     );
 }

@@ -2,6 +2,7 @@ import { AssetLoader } from "../../../asset/loader/assetLoader";
 import { Point } from "../../../common/point";
 import { GameTime } from "../../../common/time";
 import { InputAction, InputActionType } from "../../../input/inputAction";
+import { OnTapEndEvent } from "../../../input/touchInput";
 import { Camera } from "../../../rendering/camera";
 import { RenderContext } from "../../../rendering/renderContext";
 import { World } from "../../world/world";
@@ -37,13 +38,6 @@ export class InteractionHandler {
         this.history = new InteractionStateHistory(stateContext);
     }
 
-    onTapUp(screenPoint: Point) {
-        this.history.state.dispatchUIEvent({
-            type: "tapEnd",
-            position: screenPoint,
-        });
-    }
-
     onTapDown(screenPoint: Point): boolean {
         const state = this.history.state;
         const stateHandledTap = state.dispatchUIEvent({
@@ -60,21 +54,39 @@ export class InteractionHandler {
         }
     }
 
-    onTap(screenPoint: Point): void {
+    onTapUp(tapUpEvent: OnTapEndEvent): void {
         const currentState = this.history.state;
+        const screenPoint = tapUpEvent.position;
+
+        //We dispatch two events as they are handled differently when it comes
+        //to applicability. `tap` requires both position and startposition to
+        //be withing the bounds. `tapUp` requires only startposition. A view
+        //should also be able to handle one without affecting the other
+        currentState.dispatchUIEvent({
+            type: "tapUp",
+            position: screenPoint,
+            startPosition: tapUpEvent.startPosition,
+        });
+
         let onTapResult = currentState.dispatchUIEvent({
             type: "tap",
             position: screenPoint,
+            startPosition: tapUpEvent.startPosition,
         });
 
         const worldPosition = this.camera.screenToWorld(screenPoint);
-        // Check if the tap is handled by the state
+        // Check if the tap is handled by the state if its ignored by the view
         if (!onTapResult) {
             onTapResult = currentState.onTap(screenPoint, worldPosition);
         }
-        // If the tap was not handled in the ui check if it will be handled
-        // by the state itself
-        if (!onTapResult) {
+        // If the tap was not handled in the ui or by the state itself
+        // We will now check for either of the following:
+
+        // - The state is modal in which case this is considered a tap on the
+        // scrim and we should take the tap as a dismis
+        // - The state should check if there is a tile at the world position
+        // of the tap
+        if (!onTapResult && !tapUpEvent.wasDragging) {
             if (currentState.isModal) {
                 // if the tap was not handled and the current route is a modal
                 // route we pop the state
