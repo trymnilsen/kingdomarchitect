@@ -1,4 +1,4 @@
-import { Entity } from "../../../entity/entity";
+import { Entity } from "../../entity/entity";
 import { Job } from "../job";
 import { JobConstraint } from "../jobConstraint";
 

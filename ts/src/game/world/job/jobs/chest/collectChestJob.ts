@@ -1,7 +1,7 @@
 import { InventoryComponent } from "../../../component/inventory/inventoryComponent";
 import { ChestComponent } from "../../../component/resource/chestComponent";
-import { WorkerConstraint } from "../../job/constraint/workerConstraint";
-import { Job } from "../../job/job";
+import { WorkerConstraint } from "../../constraint/workerConstraint";
+import { Job } from "../../job";
 import { MoveToBeforeJob } from "../moveToBeforeJob";
 
 export class CollectChestJob extends MoveToBeforeJob {

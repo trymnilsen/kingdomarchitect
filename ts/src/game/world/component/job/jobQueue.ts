@@ -1,6 +1,6 @@
 import { removeItem } from "../../../../common/array";
 import { Event, EventHandle, EventListener } from "../../../../common/event";
-import { Job } from "../../actor/job/job";
+import { Job } from "../../job/job";
 
 export interface JobQueue {
     readonly pendingJobs: Job[];

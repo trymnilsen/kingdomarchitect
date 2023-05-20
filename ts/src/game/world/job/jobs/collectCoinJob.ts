@@ -1,6 +1,6 @@
 import { Point } from "../../../../common/point";
-import { NeverAssignConstraint } from "../job/constraint/neverAssignConstraint";
-import { Job } from "../job/job";
+import { NeverAssignConstraint } from "../constraint/neverAssignConstraint";
+import { Job } from "../job";
 import { MoveToBeforeJob } from "./moveToBeforeJob";
 
 export class CollectCoinJob extends MoveToBeforeJob {

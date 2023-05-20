@@ -13,9 +13,9 @@ import { SelectedEntityItem } from "../../selection/selectedEntityItem";
 import { SelectedTileItem } from "../../selection/selectedTileItem";
 import { SelectedWorldItem } from "../../selection/selectedWorldItem";
 import { TileSize } from "../../tile/tile";
-import { WorkerConstraint } from "../job/constraint/workerConstraint";
-import { Job } from "../job/job";
-import { JobConstraintsError } from "../job/jobConstraintsError";
+import { WorkerConstraint } from "../constraint/workerConstraint";
+import { Job } from "../job";
+import { JobConstraintsError } from "../jobConstraintsError";
 import { MoveToBeforeJob } from "./moveToBeforeJob";
 
 /**

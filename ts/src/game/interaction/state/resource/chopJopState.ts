@@ -3,7 +3,7 @@ import { RenderContext } from "../../../../rendering/renderContext";
 import { uiBox } from "../../../../ui/dsl/uiBoxDsl";
 import { SpriteBackground } from "../../../../ui/uiBackground";
 import { fillUiSize } from "../../../../ui/uiSize";
-import { ChopTreeJob } from "../../../world/actor/jobs/chopTreeJob";
+import { ChopTreeJob } from "../../../world/job/jobs/chopTreeJob";
 import { SelectedWorldItem } from "../../../world/selection/selectedWorldItem";
 import { InteractionState } from "../../handler/interactionState";
 import {

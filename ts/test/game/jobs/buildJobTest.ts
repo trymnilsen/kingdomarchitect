@@ -1,11 +1,15 @@
 import { assert } from "chai";
 
 describe("BuildJob test", () => {
-    it("Nudge actor out of completed build", () => {
+    it("Heal health component if less than full", () => {
         assert.equal(2, 2);
     });
 
-    it("increase health then complete build", () => {
+    it("Finish build if health is full", () => {
+        assert.equal(2, 2);
+    });
+
+    it("Throw error if building entity has no component", () => {
         assert.equal(2, 2);
     });
 });

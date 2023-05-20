@@ -7,7 +7,7 @@ import { SpriteBackground } from "../../../../ui/uiBackground";
 import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize";
 import { UIView } from "../../../../ui/uiView";
 import { UIFlowGrid } from "../../../../ui/view/uiFlowGrid";
-import { CollectChestJob } from "../../../world/actor/jobs/chest/collectChestJob";
+import { CollectChestJob } from "../../../world/job/jobs/chest/collectChestJob";
 import { ChestComponent } from "../../../world/component/resource/chestComponent";
 import { InteractionState } from "../../handler/interactionState";
 import {
