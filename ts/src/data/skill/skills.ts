@@ -5,10 +5,10 @@ import { productivitySkills } from "./productivity";
 import { rangedSkills } from "./ranged";
 
 type SkillsObject = {
-    melee: SkillTree;
     magic: SkillTree;
-    ranged: SkillTree;
+    melee: SkillTree;
     productivity: SkillTree;
+    ranged: SkillTree;
 };
 
 export const skills: SkillsObject = {

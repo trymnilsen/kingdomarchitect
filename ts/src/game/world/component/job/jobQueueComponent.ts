@@ -3,7 +3,7 @@ import { InvalidStateError } from "../../../../common/error/invalidStateError";
 import { Event, EventListener } from "../../../../common/event";
 import { Point } from "../../../../common/point";
 import { RenderContext } from "../../../../rendering/renderContext";
-import { Job } from "../../actor/job/job";
+import { Job } from "../../job/job";
 import { Entity } from "../../entity/entity";
 import { EntityComponent } from "../entityComponent";
 import { JobQuery } from "./jobQuery";

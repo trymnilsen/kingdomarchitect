@@ -1,5 +1,5 @@
-import { GroundTile } from "../../tile/ground";
-import { ChopTreeJob } from "../jobs/chopTreeJob";
+import { GroundTile } from "../tile/ground";
+import { ChopTreeJob } from "./jobs/chopTreeJob";
 import { Job } from "./job";
 
 export interface JobQuery {

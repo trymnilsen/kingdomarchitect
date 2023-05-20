@@ -10,7 +10,6 @@ export enum SkillCategory {
 export interface Skill {
     asset: Sprite2;
     name: string;
-    category: SkillCategory;
 }
 
 export type SkillTree = Skill[][];

@@ -7,10 +7,10 @@ import {
 import { RenderContext } from "../../../../rendering/renderContext";
 import { PathFindingComponent } from "../../component/root/path/pathFindingComponent";
 import { PathResultStatus } from "../../component/root/path/pathResult";
-import { Job } from "../job/job";
-import { JobConstraint } from "../job/jobConstraint";
-import { JobConstraintsError } from "../job/jobConstraintsError";
-import { MultipleStepJob } from "../job/multipleStepJob";
+import { Job } from "../job";
+import { JobConstraint } from "../jobConstraint";
+import { JobConstraintsError } from "../jobConstraintsError";
+import { MultipleStepJob } from "../multipleStepJob";
 import { MoveJob } from "./moveJob";
 
 export interface TargetedJob {

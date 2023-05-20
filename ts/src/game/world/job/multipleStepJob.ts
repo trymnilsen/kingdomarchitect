@@ -1,5 +1,5 @@
-import { InvalidStateError } from "../../../../common/error/invalidStateError";
-import { RenderContext } from "../../../../rendering/renderContext";
+import { InvalidStateError } from "../../../common/error/invalidStateError";
+import { RenderContext } from "../../../rendering/renderContext";
 import { Job, JobState } from "./job";
 
 /**

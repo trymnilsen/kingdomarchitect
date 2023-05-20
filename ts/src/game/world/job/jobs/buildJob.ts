@@ -1,8 +1,8 @@
 import { BuildingComponent } from "../../component/building/buildingComponent";
 import { HealthComponent } from "../../component/health/healthComponent";
 import { Entity } from "../../entity/entity";
-import { WorkerConstraint } from "../job/constraint/workerConstraint";
-import { Job } from "../job/job";
+import { WorkerConstraint } from "../constraint/workerConstraint";
+import { Job } from "../job";
 import { MoveToBeforeJob } from "./moveToBeforeJob";
 
 export class BuildJob extends MoveToBeforeJob {
@@ -39,8 +39,7 @@ class _BuildJob extends Job {
     update(tick: number): void {
         const entity = this.entity;
         if (!entity) {
-            console.error("No entity");
-            return;
+            throw new Error("No entity set for job");
         }
 
         const healthComponent =

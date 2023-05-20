@@ -1,5 +1,5 @@
-import { WorkerBehaviorComponent } from "../../../component/behavior/workerBehaviorComponent";
-import { Entity } from "../../../entity/entity";
+import { WorkerBehaviorComponent } from "../../component/behavior/workerBehaviorComponent";
+import { Entity } from "../../entity/entity";
 import { Job } from "../job";
 import { JobConstraint } from "../jobConstraint";
 

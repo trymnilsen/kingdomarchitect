@@ -9,7 +9,7 @@ import { BlinkingImageAnimation } from "../../../../rendering/visual/blinkingIma
 import { uiBox } from "../../../../ui/dsl/uiBoxDsl";
 import { SpriteBackground } from "../../../../ui/uiBackground";
 import { fillUiSize } from "../../../../ui/uiSize";
-import { BuildJob } from "../../../world/actor/jobs/buildJob";
+import { BuildJob } from "../../../world/job/jobs/buildJob";
 import { InventoryComponent } from "../../../world/component/inventory/inventoryComponent";
 import { TilesComponent } from "../../../world/component/tile/tilesComponent";
 import { buildingPrefab } from "../../../world/prefab/buildingPrefab";

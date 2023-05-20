@@ -1,6 +1,6 @@
 import { Entity } from "../../../entity/entity";
-import { EntityInstanceJobConstraint } from "../../job/constraint/entityInstanceConstraint";
-import { Job } from "../../job/job";
+import { EntityInstanceJobConstraint } from "../../constraint/entityInstanceConstraint";
+import { Job } from "../../job";
 import { MoveToBeforeJob } from "../moveToBeforeJob";
 
 export class AttackBuildingJob extends MoveToBeforeJob {
