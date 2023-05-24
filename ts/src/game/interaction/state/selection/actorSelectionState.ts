@@ -13,6 +13,9 @@ import { InteractionState } from "../../handler/interactionState";
 import { CharacterSkillState } from "../character/characterSkillState";
 import { Entity } from "../../../world/entity/entity";
 import { EquipmentComponent } from "../../../world/component/inventory/equipmentComponent";
+import { RenderContext } from "../../../../rendering/renderContext";
+import { TileSize } from "../../../world/tile/tile";
+import { allSides } from "../../../../common/sides";
 
 export class ActorSelectionState extends InteractionState {
     constructor(private entity: Entity) {
@@ -81,15 +84,40 @@ export class ActorSelectionState extends InteractionState {
         } else {
             items.push({
                 text: "Main",
-                icon: sprites2.sword_skill,
+                icon: sprites2.empty_sprite,
             });
         }
 
-        items.push({
-            text: "Other",
-            icon: sprites2.health_potion,
-        });
+        if (equipment && equipment.otherItem) {
+            items.push({
+                text: "Other",
+                icon: equipment.otherItem.asset,
+            });
+        } else {
+            items.push({
+                text: "Other",
+                icon: sprites2.empty_sprite,
+            });
+        }
 
         return items;
+    }
+
+    override onDraw(context: RenderContext): void {
+        super.onDraw(context);
+
+        const cursorWorldPosition = context.camera.tileSpaceToScreenSpace(
+            this.entity.worldPosition
+        );
+
+        context.drawNinePatchSprite({
+            sprite: sprites2.cursor,
+            height: TileSize,
+            width: TileSize,
+            scale: 1.0,
+            sides: allSides(12.0),
+            x: cursorWorldPosition.x,
+            y: cursorWorldPosition.y,
+        });
     }
 }

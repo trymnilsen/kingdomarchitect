@@ -1,21 +1,14 @@
 import { sprites2 } from "../../../../asset/sprite";
-import { withinRectangle } from "../../../../common/bounds";
-import { Point } from "../../../../common/point";
 import { allSides, symmetricSides } from "../../../../common/sides";
-import {
-    bookFill,
-    bookInkColor,
-    hiddenBookInkColor,
-} from "../../../../ui/color";
-import { boxBackground } from "../../../../ui/dsl/uiBackgroundDsl";
+import { meleeSkills } from "../../../../data/skill/melee";
+import { SkillTree } from "../../../../data/skill/skill";
+import { bookInkColor } from "../../../../ui/color";
 import { uiBox } from "../../../../ui/dsl/uiBoxDsl";
 import { uiText } from "../../../../ui/dsl/uiTextDsl";
 import { uiAlignment } from "../../../../ui/uiAlignment";
 import { SpriteBackground } from "../../../../ui/uiBackground";
 import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize";
 import { UIView } from "../../../../ui/uiView";
-import { UIMasterDetails } from "../../../../ui/view/uiMasterDetail";
-import { OpenBookUIBackground } from "../../../../ui/visual/bookBackground";
 import { InteractionState } from "../../handler/interactionState";
 import {
     UIActionbar,
@@ -23,11 +16,12 @@ import {
     UIActionbarItem,
 } from "../../view/actionbar/uiActionbar";
 import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold";
-import { UISkillTree } from "./uiSkillTree";
+import { UIBookLayout, UIBookLayoutTab } from "../../view/uiBookLayout";
+import { UISkillCategoryTree } from "./uiSkillCategoryTree";
 
 export class CharacterSkillState extends InteractionState {
-    private _masterDetailsView: UIMasterDetails;
-    private _skillTree: UISkillTree;
+    private _masterDetailsView: UIBookLayout;
+
     override get isModal(): boolean {
         return true;
     }
@@ -45,17 +39,12 @@ export class CharacterSkillState extends InteractionState {
             },
             {
                 icon: sprites2.empty_sprite,
-                text: "Unlock",
+                text: "Cancel",
                 onClick: () => {
                     console.log("Unlock");
                 },
             },
         ];
-
-        this._skillTree = new UISkillTree({
-            width: fillUiSize,
-            height: fillUiSize,
-        });
 
         const actionbar = new UIActionbar(
             items,
@@ -66,15 +55,14 @@ export class CharacterSkillState extends InteractionState {
                 height: fillUiSize,
             }
         );
-        const masterView = this.getMasterView();
+        const masterView = this.getMasterView(meleeSkills);
         const detailsView = this.getDetailsView(0);
 
-        this._masterDetailsView = new UIMasterDetails(masterView, detailsView, {
-            width: fillUiSize,
-            height: fillUiSize,
-        });
+        this._masterDetailsView = new UIBookLayout();
+        this._masterDetailsView.leftPage = masterView;
+        this._masterDetailsView.rightPage = detailsView;
+        this._masterDetailsView.setTabs(this.getTabs(0));
 
-        this._masterDetailsView.dualBackground = new OpenBookUIBackground();
         const contentView = uiBox({
             id: "characterSkillsLayout",
             width: fillUiSize,
@@ -90,26 +78,47 @@ export class CharacterSkillState extends InteractionState {
         });
     }
 
-    override onTapPan(
-        movement: Point,
-        position: Point,
-        startPosition: Point
-    ): void {
-        const panViewBounds = this._skillTree.bounds;
-        if (
-            withinRectangle(
-                startPosition,
-                panViewBounds.x1,
-                panViewBounds.y1,
-                panViewBounds.x2,
-                panViewBounds.y2
-            )
-        ) {
-            this._skillTree.panView(movement);
-        }
+    private tabSelected(index: number) {
+        this._masterDetailsView.setTabs(this.getTabs(index));
+
+        const masterView = this.getMasterView(meleeSkills);
+        this._masterDetailsView.leftPage = masterView;
     }
 
-    private getMasterView(): UIView {
+    private getTabs(selectedTab: number): UIBookLayoutTab[] {
+        return [
+            {
+                icon: sprites2.sword_skill,
+                isSelected: selectedTab == 0,
+                onTap: (index) => {
+                    this.tabSelected(index);
+                },
+            },
+            {
+                icon: sprites2.worker_skill,
+                isSelected: selectedTab == 1,
+                onTap: (index) => {
+                    this.tabSelected(index);
+                },
+            },
+            {
+                icon: sprites2.archer_skill,
+                isSelected: selectedTab == 2,
+                onTap: (index) => {
+                    this.tabSelected(index);
+                },
+            },
+            {
+                icon: sprites2.wizard_hat_skill,
+                isSelected: selectedTab == 3,
+                onTap: (index) => {
+                    this.tabSelected(index);
+                },
+            },
+        ];
+    }
+
+    private getMasterView(skillCategory: SkillTree): UIView {
         return uiBox({
             width: fillUiSize,
             height: fillUiSize,
@@ -120,34 +129,7 @@ export class CharacterSkillState extends InteractionState {
                 top: 32,
                 bottom: 48,
             },
-            children: [
-                /*
-                uiOffset({
-                    width: wrapUiSize,
-                    height: wrapUiSize,
-                    layoutOffset: {
-                        x: -68,
-                        y: 0,
-                    },
-                    children: [
-                        bookTabs((tab) => {
-                            this.context.stateChanger.replace(
-                                new InventoryState()
-                            );
-                        }),
-                    ],
-                }),*/
-                uiBox({
-                    width: fillUiSize,
-                    height: fillUiSize,
-                    background: boxBackground({
-                        fill: bookFill,
-                        stroke: hiddenBookInkColor,
-                        strokeWidth: 2,
-                    }),
-                    children: [this._skillTree],
-                }),
-            ],
+            children: [new UISkillCategoryTree(skillCategory)],
         });
     }
 

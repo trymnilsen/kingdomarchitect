@@ -4,7 +4,29 @@ import { SkillTree } from "./skill";
 export const productivitySkills: SkillTree = [
     [
         {
-            name: "Magic",
+            name: "Firebolt",
+            asset: sprites2.worker_skill,
+        },
+        {
+            name: "Magic Missile",
+            asset: sprites2.worker_skill,
+        },
+        {
+            name: "Shield",
+            asset: sprites2.worker_skill,
+        },
+    ],
+    [
+        {
+            name: "Firebolt",
+            asset: sprites2.worker_skill,
+        },
+        {
+            name: "Magic Missile",
+            asset: sprites2.worker_skill,
+        },
+        {
+            name: "Shield",
             asset: sprites2.worker_skill,
         },
     ],
@@ -35,8 +57,14 @@ export const productivitySkills: SkillTree = [
             name: "Shield",
             asset: sprites2.worker_skill,
         },
+    ],
+    [
         {
-            name: "Shield",
+            name: "Firebolt",
+            asset: sprites2.worker_skill,
+        },
+        {
+            name: "Magic Missile",
             asset: sprites2.worker_skill,
         },
         {
