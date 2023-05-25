@@ -15,4 +15,8 @@ export abstract class UIViewGroup extends UIView {
     public override removeView(view: UIView) {
         super.removeView(view);
     }
+
+    public override clearViews(): void {
+        super.clearViews();
+    }
 }
