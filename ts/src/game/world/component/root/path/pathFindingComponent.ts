@@ -1,6 +1,6 @@
 import { TypedEventHandle } from "../../../../../common/event/typedEvent";
 import { addPoint, Point, pointEquals } from "../../../../../common/point";
-import { GraphNode } from "../../../../../path/graph";
+import { GraphNode } from "../../../../../path/graph/graph";
 import { PathSearch } from "../../../../../path/search";
 import { EntityComponent } from "../../entityComponent";
 import { TileMapUpdateEvent } from "../../tile/tileMapUpdatedEvent";
@@ -17,7 +17,9 @@ export class PathFindingComponent extends EntityComponent {
         this.tileEventListener = this.entity.componentEvents.listen(
             TileMapUpdateEvent,
             (event) => {
-                this.invalidateCurrentGraph();
+                // TODO: I dont think we need to handle this as it would just
+                // remove this position that was not there yet from the graph
+                this.invalidateGraphPoint({ x: 0, y: 0 });
             }
         );
     }
@@ -94,8 +96,8 @@ export class PathFindingComponent extends EntityComponent {
         }
     }
 
-    private invalidateCurrentGraph() {
-        this.pathSearch.invalidateGraph();
+    public invalidateGraphPoint(point: Point) {
+        this.pathSearch.invalidateGraphPoint(point);
     }
 }
 

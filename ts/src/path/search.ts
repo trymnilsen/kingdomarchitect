@@ -1,20 +1,10 @@
 import { Point, pointEquals } from "../common/point";
 import { BinaryHeap } from "./binaryHeap";
-import { Graph, GraphNode, WeightNode } from "./graph";
-import { GraphGenerator } from "./graphGenerator";
+import { Graph, GraphNode } from "./graph/graph";
 import { manhattanDistance } from "./pathHeuristics";
 
 export class PathSearch {
-    private generator: GraphGenerator;
-    private _graph: Graph | undefined;
-
-    private get graph(): Graph {
-        if (!this._graph) {
-            this._graph = this.generator.createGraph();
-        }
-
-        return this._graph;
-    }
+    private graph: Graph;
 
     get offset(): Point {
         return {
@@ -23,16 +13,12 @@ export class PathSearch {
         };
     }
 
-    constructor(generator: GraphGenerator) {
-        this.generator = generator;
+    constructor(graph: Graph) {
+        this.graph = graph;
     }
 
-    getWeights(): WeightNode[][] {
-        return this.graph.weights;
-    }
-
-    invalidateGraph(): void {
-        this._graph = undefined;
+    invalidateGraphPoint(point: Point): void {
+        this.graph.invalidatePoint(point);
     }
 
     search(
@@ -43,7 +29,6 @@ export class PathSearch {
     ): Point[] {
         const start = this.graph.nodeAt(from.x, from.y);
         const end = this.graph.nodeAt(to.x, to.y);
-        let closestNode = start;
         if (!start) {
             console.warn("From point not in graph", from);
             return [];
@@ -54,6 +39,7 @@ export class PathSearch {
             return [];
         }
 
+        let closestNode = start;
         this.graph.cleanDirtyNodes();
 
         const openHeap = this.createHeap();

@@ -3,15 +3,6 @@ import getPixels from "get-pixels";
 import { NdArray } from "ndarray";
 import * as path from "path";
 import { Point, pointEquals, zeroPoint } from "../../src/common/point";
-import { Graph } from "../../src/path/graph";
-import { GraphGenerator } from "../../src/path/graphGenerator";
-
-export class TestGraphGenerator implements GraphGenerator {
-    constructor(private testGraph: TestGraph) {}
-    createGraph(): Graph {
-        return this.testGraph.graph;
-    }
-}
 
 export async function createGraphFromTestFile(
     mazeName: string
@@ -51,7 +42,7 @@ export async function createGraphFromTestFile(
     }
 
     return {
-        graph: new Graph(weightGraph, 0, 0),
+        graph: weightGraph,
         expectedPath,
         start,
         stop,
@@ -99,7 +90,7 @@ async function getPixelsAsync(path: string): Promise<NdArray<Uint8Array>> {
 type ExpectedPath = { [pointKey: string]: Point };
 
 interface TestGraph {
-    graph: Graph;
+    graph: number[][];
     start: Point;
     stop: Point;
     expectedPath: ExpectedPath;

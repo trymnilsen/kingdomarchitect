@@ -4,6 +4,7 @@ import { RenderContext } from "../../rendering/renderContext";
 import { InventoryComponent } from "./component/inventory/inventoryComponent";
 import { JobQueue } from "./component/job/jobQueue";
 import { JobQueueComponent } from "./component/job/jobQueueComponent";
+import { createGraphFromNodes } from "./component/root/path/generateGraph";
 import { PathFindingComponent } from "./component/root/path/pathFindingComponent";
 import { Ground } from "./component/tile/ground";
 import { TilesComponent } from "./component/tile/tilesComponent";
@@ -11,7 +12,6 @@ import { RootEntity } from "./entity/rootEntity";
 import { farmPrefab } from "./prefab/farmPrefab";
 import { housePrefab } from "./prefab/housePrefab";
 import { workerPrefab } from "./prefab/workerPrefab";
-import { WorldGraphGenerator } from "./worldGraphGenerator";
 
 export class World {
     private _pathSearch: PathSearch;
@@ -36,17 +36,21 @@ export class World {
 
     constructor() {
         this._rootEntity = new RootEntity("root");
-        this._pathSearch = new PathSearch(
-            new WorldGraphGenerator(this._rootEntity)
-        );
+
         this._jobQueueComponent = new JobQueueComponent();
         this._groundComponent = new TilesComponent();
-        this._pathFindingComponent = new PathFindingComponent(this._pathSearch);
+
         this._inventoryComponent = new InventoryComponent();
 
         this._rootEntity.addComponent(this._inventoryComponent);
         this._rootEntity.addComponent(this._jobQueueComponent);
         this._rootEntity.addComponent(this._groundComponent);
+
+        this._pathSearch = new PathSearch(
+            createGraphFromNodes(this._rootEntity)
+        );
+
+        this._pathFindingComponent = new PathFindingComponent(this._pathSearch);
         this._rootEntity.addComponent(this._pathFindingComponent);
 
         //Set up initial entities

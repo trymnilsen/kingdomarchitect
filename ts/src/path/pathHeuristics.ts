@@ -1,5 +1,5 @@
 import { Point } from "../common/point";
-import { GraphNode } from "./graph";
+import { GraphNode } from "./graph/graph";
 
 export function manhattanDistance(
     from: GraphNode | Point,
