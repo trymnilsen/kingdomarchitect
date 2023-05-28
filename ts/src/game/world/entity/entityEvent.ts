@@ -10,4 +10,5 @@ export interface EntityTransformEvent {
 export interface EntityChildrenUpdatedEvent {
     id: "child_added" | "child_removed";
     source: Entity;
+    target: Entity;
 }

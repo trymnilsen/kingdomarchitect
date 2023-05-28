@@ -6,8 +6,16 @@ export interface InventoryItem {
     asset: Sprite2;
     hint?: string;
     tag?: ItemTag[];
+    category?: ItemCategory;
 }
 
 export enum ItemTag {
     SkillGear,
+}
+
+export enum ItemCategory {
+    Melee,
+    Magic,
+    Productivity,
+    Ranged,
 }

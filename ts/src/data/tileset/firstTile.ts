@@ -1,4 +1,3 @@
-import { sprites2 } from "../../asset/sprite";
 import { getBounds } from "../../common/bounds";
 import { generateId } from "../../common/idGenerator";
 import { Point } from "../../common/point";
@@ -6,7 +5,14 @@ import { GroundChunk } from "../../game/world/component/tile/tilesComponent";
 import { Entity } from "../../game/world/entity/entity";
 import { chestPrefab } from "../../game/world/prefab/chestPrefab";
 import { GroundTile } from "../../game/world/tile/ground";
+import {
+    bowItem,
+    hammerItem,
+    swordItem,
+    wizardHat,
+} from "../inventory/equipment";
 import { InventoryItem } from "../inventory/inventoryItem";
+import { goldCoins } from "../inventory/resources";
 import { Tileset, TileSetFactory } from "./tileset";
 
 export function createFirstTileSet(chunk: GroundChunk): Tileset {
@@ -49,21 +55,11 @@ export class FirstTileFactory implements TileSetFactory {
     createEntities(): Entity[] {
         const entities: Entity[] = [];
         const chestItems: InventoryItem[] = [
-            {
-                id: "gold",
-                asset: sprites2.gold_coins,
-                name: "Gold",
-            },
-            {
-                id: "sword",
-                asset: sprites2.sword_skill,
-                name: "Sword",
-            },
-            {
-                id: "axe",
-                asset: sprites2.worker_skill,
-                name: "Axe",
-            },
+            goldCoins,
+            swordItem,
+            hammerItem,
+            wizardHat,
+            bowItem,
         ];
         const chestEntity = chestPrefab(generateId("chest"), chestItems);
         chestEntity.worldPosition = {

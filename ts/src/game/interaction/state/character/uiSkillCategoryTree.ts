@@ -1,7 +1,6 @@
-import { sprites2 } from "../../../../asset/sprite";
+import { Sprite2, sprites2 } from "../../../../asset/sprite";
 import { allSides } from "../../../../common/sides";
-import { SkillTree } from "../../../../data/skill/skill";
-import { colorBackground } from "../../../../ui/dsl/uiBackgroundDsl";
+import { SkillCategory, SkillTree } from "../../../../data/skill/skill";
 import { uiBox } from "../../../../ui/dsl/uiBoxDsl";
 import { uiButton } from "../../../../ui/dsl/uiButtonDsl";
 import { ColumnChild, uiColumn } from "../../../../ui/dsl/uiColumnDsl";
@@ -14,7 +13,10 @@ import { UIBox } from "../../../../ui/view/uiBox";
 import { UISpriteImageSource } from "../../../../ui/view/uiImageSource";
 
 export class UISkillCategoryTree extends UIBox {
-    constructor(private skills: SkillTree) {
+    constructor(
+        private skills: SkillTree,
+        private skillCategory: SkillCategory
+    ) {
         super({
             width: fillUiSize,
             height: fillUiSize,
@@ -82,7 +84,9 @@ export class UISkillCategoryTree extends UIBox {
                             uiImage({
                                 width: 32,
                                 height: 32,
-                                image: new UISpriteImageSource(sprites2.knight),
+                                image: new UISpriteImageSource(
+                                    this.getSkillWorkerStyle(this.skillCategory)
+                                ),
                             }),
                         ],
                     }),
@@ -98,5 +102,18 @@ export class UISkillCategoryTree extends UIBox {
         });
 
         this.addView(skillView);
+    }
+
+    private getSkillWorkerStyle(category: SkillCategory): Sprite2 {
+        switch (category) {
+            case SkillCategory.Magic:
+                return sprites2.mage;
+            case SkillCategory.Melee:
+                return sprites2.knight;
+            case SkillCategory.Productivity:
+                return sprites2.worker;
+            case SkillCategory.Ranged:
+                return sprites2.bowman;
+        }
     }
 }

@@ -1,7 +1,10 @@
 import { sprites2 } from "../../../../asset/sprite";
 import { allSides, symmetricSides } from "../../../../common/sides";
+import { magicSkills } from "../../../../data/skill/magic";
 import { meleeSkills } from "../../../../data/skill/melee";
-import { SkillTree } from "../../../../data/skill/skill";
+import { productivitySkills } from "../../../../data/skill/productivity";
+import { rangedSkills } from "../../../../data/skill/ranged";
+import { Skill, SkillCategory, SkillTree } from "../../../../data/skill/skill";
 import { bookInkColor } from "../../../../ui/color";
 import { uiBox } from "../../../../ui/dsl/uiBoxDsl";
 import { uiText } from "../../../../ui/dsl/uiTextDsl";
@@ -21,6 +24,7 @@ import { UISkillCategoryTree } from "./uiSkillCategoryTree";
 
 export class CharacterSkillState extends InteractionState {
     private _masterDetailsView: UIBookLayout;
+    private _activeSkillTree: SkillTree;
 
     override get isModal(): boolean {
         return true;
@@ -28,7 +32,7 @@ export class CharacterSkillState extends InteractionState {
 
     constructor() {
         super();
-
+        this._activeSkillTree = meleeSkills;
         const items: UIActionbarItem[] = [
             {
                 icon: sprites2.empty_sprite,
@@ -55,7 +59,7 @@ export class CharacterSkillState extends InteractionState {
                 height: fillUiSize,
             }
         );
-        const masterView = this.getMasterView(meleeSkills);
+        const masterView = this.getMasterView(meleeSkills, SkillCategory.Melee);
         const detailsView = this.getDetailsView(0);
 
         this._masterDetailsView = new UIBookLayout();
@@ -80,8 +84,9 @@ export class CharacterSkillState extends InteractionState {
 
     private tabSelected(index: number) {
         this._masterDetailsView.setTabs(this.getTabs(index));
-
-        const masterView = this.getMasterView(meleeSkills);
+        const skillTree = this.getSkillTree(index);
+        const category = this.getSkillCategory(index);
+        const masterView = this.getMasterView(skillTree, category);
         this._masterDetailsView.leftPage = masterView;
     }
 
@@ -118,7 +123,36 @@ export class CharacterSkillState extends InteractionState {
         ];
     }
 
-    private getMasterView(skillCategory: SkillTree): UIView {
+    private getSkillTree(tabIndex: number): SkillTree {
+        switch (tabIndex) {
+            case 1:
+                return productivitySkills;
+            case 2:
+                return rangedSkills;
+            case 3:
+                return magicSkills;
+            default:
+                return meleeSkills;
+        }
+    }
+
+    private getSkillCategory(tabIndex: number): SkillCategory {
+        switch (tabIndex) {
+            case 1:
+                return SkillCategory.Productivity;
+            case 2:
+                return SkillCategory.Ranged;
+            case 3:
+                return SkillCategory.Magic;
+            default:
+                return SkillCategory.Melee;
+        }
+    }
+
+    private getMasterView(
+        skillTree: SkillTree,
+        category: SkillCategory
+    ): UIView {
         return uiBox({
             width: fillUiSize,
             height: fillUiSize,
@@ -129,7 +163,7 @@ export class CharacterSkillState extends InteractionState {
                 top: 32,
                 bottom: 48,
             },
-            children: [new UISkillCategoryTree(skillCategory)],
+            children: [new UISkillCategoryTree(skillTree, category)],
         });
     }
 

@@ -1,10 +1,14 @@
 import { sprites2 } from "../../../../../asset/sprite";
-import { InventoryItem } from "../../../../../data/inventory/inventoryItem";
+import {
+    InventoryItem,
+    ItemCategory,
+} from "../../../../../data/inventory/inventoryItem";
 import { RenderContext } from "../../../../../rendering/renderContext";
 import { uiBox } from "../../../../../ui/dsl/uiBoxDsl";
 import { SpriteBackground } from "../../../../../ui/uiBackground";
 import { fillUiSize } from "../../../../../ui/uiSize";
 import { WorkerBehaviorComponent } from "../../../../world/component/behavior/workerBehaviorComponent";
+import { SpriteComponent } from "../../../../world/component/draw/spriteComponent";
 import { EquipmentComponent } from "../../../../world/component/inventory/equipmentComponent";
 import { InventoryComponent } from "../../../../world/component/inventory/inventoryComponent";
 import { firstChildWhere } from "../../../../world/entity/child/first";
@@ -140,6 +144,13 @@ export class EquipItemState extends InteractionState {
             throw new Error("No equipment component on selection");
         }
 
+        const spriteComponent =
+            this.cursorSelection.getComponent(SpriteComponent);
+
+        if (!spriteComponent) {
+            throw new Error("No sprite component");
+        }
+
         const removeResult = inventoryComponent.removeInventoryItem(
             this.inventoryItem.id,
             1
@@ -147,6 +158,21 @@ export class EquipItemState extends InteractionState {
 
         if (removeResult) {
             equipmentComponent.mainItem = this.inventoryItem;
+            switch (this.inventoryItem.category) {
+                case ItemCategory.Melee:
+                    spriteComponent.updateSprite(sprites2.knight);
+                    break;
+                case ItemCategory.Ranged:
+                    spriteComponent.updateSprite(sprites2.bowman);
+                    break;
+                case ItemCategory.Magic:
+                    spriteComponent.updateSprite(sprites2.mage);
+                    break;
+                case ItemCategory.Productivity:
+                    spriteComponent.updateSprite(sprites2.worker);
+                    break;
+            }
+
             this.context.stateChanger.clear();
         } else {
             this.context.stateChanger.replace(

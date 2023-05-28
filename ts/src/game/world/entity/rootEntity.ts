@@ -56,10 +56,10 @@ export class RootEntity extends Entity {
     public override bubbleEvent(event: EntityEvent): void {
         switch (event.id) {
             case "child_added":
-                this.addEntityToChunkMap(event.source);
+                this.addEntityToChunkMap(event.target);
                 break;
             case "child_removed":
-                this.removeEntityFromChunkMap(event.source);
+                this.removeEntityFromChunkMap(event.target);
                 break;
             case "transform":
                 this.updateChunkMapForEntity(event.source);

@@ -119,6 +119,12 @@ export class Entity {
         // Update the transform of the entity (also bubbles a transform
         // change adding the entity ot the chunk map if its not present)
         entity.updateTransform();
+        // Bubble change
+        this.bubbleEvent({
+            id: "child_added",
+            source: this,
+            target: entity,
+        });
         //Get components if any that needs to be started
         for (const component of entity.components) {
             component.onStart(0);
@@ -142,6 +148,7 @@ export class Entity {
         this.bubbleEvent({
             id: "child_removed",
             source: this,
+            target: entity,
         });
 
         return removeItem(this._children, entity);
