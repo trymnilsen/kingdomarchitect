@@ -72,8 +72,25 @@ export class LazyGraph implements Graph {
         if (!!northNode) {
             neighborNodes.push(northNode);
         }
-
+        /*
+        console.log(
+            `Neighbor nodes of ${x},${y}`,
+            neighborNodes.map((item) => {
+                return `${item.x},${item.y}`;
+            })
+        );*/
         return neighborNodes;
+    }
+
+    getNodes(): GraphNode[] {
+        const nodesList: GraphNode[] = [];
+        for (const i of Object.values(this._nodes)) {
+            for (const j of Object.values(i)) {
+                nodesList.push(j);
+            }
+        }
+
+        return nodesList;
     }
 
     private setNode(graphNode: GraphNode) {

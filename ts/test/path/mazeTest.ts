@@ -21,6 +21,6 @@ describe("Maze tests", () => {
             (node) => node.weight
         );
 
-        verifyPath(pathResult, graph);
+        verifyPath(pathResult.path, graph);
     });
 });

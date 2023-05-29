@@ -124,6 +124,10 @@ export class RootEntity extends Entity {
         // TODO: this should be handled in the component as an event?
         const pathFindingComponent = this.getComponent(PathFindingComponent);
         if (!!pathFindingComponent) {
+            const adjacent = adjacentPoints(entity.worldPosition);
+            for (const point of adjacent) {
+                pathFindingComponent.invalidateGraphPoint(point);
+            }
             pathFindingComponent.invalidateGraphPoint(entity.worldPosition);
         }
     }

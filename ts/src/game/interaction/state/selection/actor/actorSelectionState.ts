@@ -8,6 +8,7 @@ import { TileSize } from "../../../../world/tile/tile";
 import { InteractionState } from "../../../handler/interactionState";
 import { UIActionbarItem } from "../../../view/actionbar/uiActionbar";
 import { CharacterSkillState } from "../../character/characterSkillState";
+import { ActorMovementState } from "./actorMovementState";
 import { ActorSelectionPresenter } from "./actorSelectionPresenter";
 
 export class ActorSelectionState extends InteractionState {
@@ -30,6 +31,14 @@ export class ActorSelectionState extends InteractionState {
 
     override onActive(): void {
         const items: UIActionbarItem[] = [
+            {
+                text: "Move",
+                onClick: () => {
+                    this.context.stateChanger.push(
+                        new ActorMovementState(this.entity)
+                    );
+                },
+            },
             {
                 text: "Skills",
                 onClick: () => {

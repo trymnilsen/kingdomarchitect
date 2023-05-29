@@ -4,7 +4,10 @@ import { RenderContext } from "../../rendering/renderContext";
 import { InventoryComponent } from "./component/inventory/inventoryComponent";
 import { JobQueue } from "./component/job/jobQueue";
 import { JobQueueComponent } from "./component/job/jobQueueComponent";
-import { createGraphFromNodes } from "./component/root/path/generateGraph";
+import {
+    createGraphFromNodes,
+    createLazyGraphFromRootNode,
+} from "./component/root/path/generateGraph";
 import { PathFindingComponent } from "./component/root/path/pathFindingComponent";
 import { Ground } from "./component/tile/ground";
 import { TilesComponent } from "./component/tile/tilesComponent";
@@ -30,6 +33,10 @@ export class World {
         return this._jobQueueComponent;
     }
 
+    public get pathFinding(): PathFindingComponent {
+        return this._pathFindingComponent;
+    }
+
     public get rootEntity(): RootEntity {
         return this._rootEntity;
     }
@@ -47,7 +54,7 @@ export class World {
         this._rootEntity.addComponent(this._groundComponent);
 
         this._pathSearch = new PathSearch(
-            createGraphFromNodes(this._rootEntity)
+            createLazyGraphFromRootNode(this._rootEntity)
         );
 
         this._pathFindingComponent = new PathFindingComponent(this._pathSearch);
@@ -65,7 +72,6 @@ export class World {
         this._rootEntity.addChild(firstWorker);
         this._rootEntity.addChild(firstFarm);
         this._rootEntity.addChild(secondWorker);
-        //this.invalidateWorld();
     }
 
     tick(tick: number): void {

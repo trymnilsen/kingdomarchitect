@@ -6,6 +6,7 @@ export interface Graph {
     markDirtyNode(point: GraphNode): void;
     neighbors(point: GraphNode): GraphNode[];
     invalidatePoint(point: Point): void;
+    getNodes(): GraphNode[];
     readonly offsetX: number;
     readonly offsetY: number;
 }

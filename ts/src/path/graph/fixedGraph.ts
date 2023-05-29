@@ -73,6 +73,10 @@ export class FixedGraph implements Graph {
         return neighborNodes;
     }
 
+    getNodes(): GraphNode[] {
+        return this.nodes;
+    }
+
     private generateGrid() {
         const generateResult = this.weightFunction();
         const weights = generateResult.weights;
