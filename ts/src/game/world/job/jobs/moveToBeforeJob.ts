@@ -4,7 +4,6 @@ import {
     Point,
     pointEquals,
 } from "../../../../common/point";
-import { RenderContext } from "../../../../rendering/renderContext";
 import { PathFindingComponent } from "../../component/root/path/pathFindingComponent";
 import { PathResultStatus } from "../../component/root/path/pathResult";
 import { Job } from "../job";

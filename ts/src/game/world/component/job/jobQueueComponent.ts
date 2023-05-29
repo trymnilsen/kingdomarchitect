@@ -6,17 +6,22 @@ import { RenderContext } from "../../../../rendering/renderContext";
 import { Job } from "../../job/job";
 import { Entity } from "../../entity/entity";
 import { EntityComponent } from "../entityComponent";
-import { JobQuery } from "./jobQuery";
+import { JobQuery } from "./query/jobQuery";
 import { JobQueue } from "./jobQueue";
 import { JobRunnerComponent } from "./jobRunnerComponent";
+import { JobOwner } from "./jobOwner";
 
-export class JobQueueComponent extends EntityComponent implements JobQueue {
+export class JobQueueComponent
+    extends EntityComponent
+    implements JobQueue, JobOwner
+{
     private _pendingJobs: Job[] = [];
     _jobScheduledEvent: Event<Job> = new Event<Job>();
 
     get pendingJobs(): Job[] {
         return this._pendingJobs;
     }
+
     get jobScheduledEvent(): EventListener<Job> {
         return this._jobScheduledEvent;
     }
@@ -25,6 +30,7 @@ export class JobQueueComponent extends EntityComponent implements JobQueue {
         //Check if this job can be immediately assigned to an available entity
         const assigned = this.assignJobToAvailableEntity(job);
         if (!assigned) {
+            job.owner = this;
             this._pendingJobs.push(job);
         }
     }
@@ -55,6 +61,14 @@ export class JobQueueComponent extends EntityComponent implements JobQueue {
         }
 
         return null;
+    }
+
+    onAbort(job: Job): void {
+        this.removeJob(job);
+    }
+
+    onComplete(job: Job): void {
+        this.removeJob(job);
     }
 
     private queryEntityForRunningJob(

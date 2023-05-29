@@ -1,7 +1,7 @@
 import { InvalidStateError } from "../../../common/error/invalidStateError";
 import { NotInitializedError } from "../../../common/error/notInitializedError";
-import { Event, EventListener } from "../../../common/event";
 import { RenderContext } from "../../../rendering/renderContext";
+import { JobOwner } from "../component/job/jobOwner";
 import { Entity } from "../entity/entity";
 import { JobConstraint } from "./jobConstraint";
 
@@ -17,15 +17,36 @@ export enum JobCompletedResult {
 }
 
 export abstract class Job {
-    private _completedEvent = new Event<JobCompletedResult>();
     private _entity: Entity | null = null;
     private _jobState: JobState = JobState.NotStarted;
     private _constraint: JobConstraint | null = null;
     private _startTick: number = 0;
+    private _owner: JobOwner | null = null;
 
+    /**
+     * Return the owner for this job. The owner of a job is responsible for
+     * executing it is functions and handling completion and aborting.
+     */
+    public get owner(): JobOwner | null {
+        return this._owner;
+    }
+    /**
+     * Set the owner for this job. This job will be used for handling aborting
+     * and completing.
+     */
+    public set owner(value: JobOwner | null) {
+        this._owner = value;
+    }
+
+    /**
+     * The gametime tick that this job was started on
+     */
     public get startTick(): number {
         return this._startTick;
     }
+    /**
+     * Set the game time tick this job was started on
+     */
     public set startTick(value: number) {
         if (this._startTick != 0) {
             throw new InvalidStateError(
@@ -77,13 +98,6 @@ export abstract class Job {
         }
 
         this._jobState = v;
-    }
-
-    /**
-     * Event that is triggered when this job is completed
-     */
-    public get completedEvent(): EventListener<JobCompletedResult> {
-        return this._completedEvent;
     }
 
     /**
@@ -140,8 +154,13 @@ export abstract class Job {
      * Abort this job, setting its state to completed and publishing completion
      */
     public abort() {
+        console.log("Aborting job");
         this._jobState = JobState.Completed;
-        this._completedEvent.publish(JobCompletedResult.Aborted);
+        if (this._owner) {
+            this._owner.onAbort(this);
+        } else {
+            console.warn("Job was aborted without any owner", this);
+        }
     }
 
     /**
@@ -151,6 +170,10 @@ export abstract class Job {
     protected complete() {
         console.log("Job completed", this);
         this._jobState = JobState.Completed;
-        this._completedEvent.publish(JobCompletedResult.Success);
+        if (this._owner) {
+            this._owner.onComplete(this);
+        } else {
+            console.warn("Job was completed without any owner", this);
+        }
     }
 }
