@@ -1,20 +1,10 @@
 import { Point, pointEquals } from "../common/point";
 import { BinaryHeap } from "./binaryHeap";
-import { Graph, GraphNode, WeightNode } from "./graph";
-import { GraphGenerator } from "./graphGenerator";
+import { Graph, GraphNode } from "./graph/graph";
 import { manhattanDistance } from "./pathHeuristics";
 
 export class PathSearch {
-    private generator: GraphGenerator;
-    private _graph: Graph | undefined;
-
-    private get graph(): Graph {
-        if (!this._graph) {
-            this._graph = this.generator.createGraph();
-        }
-
-        return this._graph;
-    }
+    private graph: Graph;
 
     get offset(): Point {
         return {
@@ -23,16 +13,12 @@ export class PathSearch {
         };
     }
 
-    constructor(generator: GraphGenerator) {
-        this.generator = generator;
+    constructor(graph: Graph) {
+        this.graph = graph;
     }
 
-    getWeights(): WeightNode[][] {
-        return this.graph.weights;
-    }
-
-    invalidateGraph(): void {
-        this._graph = undefined;
+    invalidateGraphPoint(point: Point): void {
+        this.graph.invalidatePoint(point);
     }
 
     search(
@@ -40,20 +26,26 @@ export class PathSearch {
         to: Point,
         allowPartialPaths: boolean,
         weightModifier: (graphNode: GraphNode) => number
-    ): Point[] {
+    ): SearchResult {
         const start = this.graph.nodeAt(from.x, from.y);
         const end = this.graph.nodeAt(to.x, to.y);
-        let closestNode = start;
         if (!start) {
             console.warn("From point not in graph", from);
-            return [];
+            return {
+                graph: [],
+                path: [],
+            };
         }
 
         if (!end) {
             console.warn("To point not in graph", to);
-            return [];
+            return {
+                graph: [],
+                path: [],
+            };
         }
 
+        let closestNode = start;
         this.graph.cleanDirtyNodes();
 
         const openHeap = this.createHeap();
@@ -71,7 +63,11 @@ export class PathSearch {
 
             // End case -- result has been found, return the traced path.
             if (currentNode === end) {
-                return this.pathTo(currentNode);
+                const path = this.pathTo(currentNode);
+                return {
+                    path: path,
+                    graph: this.mapGraph(),
+                };
             }
 
             // Normal case -- move currentNode from open to closed,
@@ -103,7 +99,7 @@ export class PathSearch {
                     // Take score for node to see how good it is.
                     neighbor.visited = true;
                     neighbor.parent = currentNode;
-                    neighbor.h = neighbor.h || manhattanDistance(neighbor, end);
+                    neighbor.h = manhattanDistance(neighbor, end);
                     neighbor.g = gScore;
                     neighbor.f = neighbor.g + neighbor.h;
                     this.graph.markDirtyNode(neighbor);
@@ -136,11 +132,18 @@ export class PathSearch {
 
         // If the closest node is not the start node, we have a partial path
         if (!pointEquals(start, closestNode)) {
-            return this.pathTo(closestNode);
+            const path = this.pathTo(closestNode);
+            return {
+                path: path,
+                graph: this.mapGraph(),
+            };
         }
 
         // No result was found - empty array signifies failure to find path.
-        return [];
+        return {
+            path: [],
+            graph: [],
+        };
     }
 
     private createHeap(): BinaryHeap<GraphNode> {
@@ -156,4 +159,29 @@ export class PathSearch {
         }
         return path;
     }
+
+    private mapGraph(): SearchedNode[] {
+        return this.graph.getNodes().map((node) => {
+            return {
+                x: node.x,
+                y: node.y,
+                weight: node.weight,
+                visited: node.visited,
+                totalCost: node.f,
+            };
+        });
+    }
+}
+
+export interface SearchedNode {
+    x: number;
+    y: number;
+    weight: number;
+    visited: boolean;
+    totalCost: number;
+}
+
+export interface SearchResult {
+    path: Point[];
+    graph: SearchedNode[];
 }

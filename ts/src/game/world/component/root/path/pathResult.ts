@@ -1,4 +1,5 @@
 import { Point } from "../../../../../common/point";
+import { SearchedNode } from "../../../../../path/search";
 
 /**
  * Status of a path search result
@@ -36,4 +37,5 @@ export enum PathResultStatus {
 export interface PathResult {
     path: Point[];
     status: PathResultStatus;
+    graph: SearchedNode[];
 }

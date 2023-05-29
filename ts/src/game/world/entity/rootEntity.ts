@@ -1,6 +1,7 @@
 import { InvalidStateError } from "../../../common/error/invalidStateError";
 import { adjacentPoints, Point, pointEquals } from "../../../common/point";
 import { getChunkId, getChunkPosition } from "../chunk";
+import { PathFindingComponent } from "../component/root/path/pathFindingComponent";
 import { Entity } from "./entity";
 import { EntityEvent } from "./entityEvent";
 
@@ -84,6 +85,12 @@ export class RootEntity extends Entity {
             delete chunk[entity.id];
             delete this.entityChunks[entity.id];
         }
+
+        // TODO: this should be handled in the component as an event?
+        const pathFindingComponent = this.getComponent(PathFindingComponent);
+        if (!!pathFindingComponent) {
+            pathFindingComponent.invalidateGraphPoint(entity.worldPosition);
+        }
     }
 
     private addEntityToChunkMap(entity: Entity) {
@@ -95,6 +102,12 @@ export class RootEntity extends Entity {
         }
         this.chunkMap[chunkId][entity.id] = entity;
         this.entityChunks[entity.id] = chunkId;
+
+        // TODO: this should be handled in the component as an event?
+        const pathFindingComponent = this.getComponent(PathFindingComponent);
+        if (!!pathFindingComponent) {
+            pathFindingComponent.invalidateGraphPoint(entity.worldPosition);
+        }
     }
 
     private updateChunkMapForEntity(entity: Entity) {
@@ -106,6 +119,16 @@ export class RootEntity extends Entity {
                 this.removeEntityFromChunkMap(entity);
             }
             this.addEntityToChunkMap(entity);
+        }
+
+        // TODO: this should be handled in the component as an event?
+        const pathFindingComponent = this.getComponent(PathFindingComponent);
+        if (!!pathFindingComponent) {
+            const adjacent = adjacentPoints(entity.worldPosition);
+            for (const point of adjacent) {
+                pathFindingComponent.invalidateGraphPoint(point);
+            }
+            pathFindingComponent.invalidateGraphPoint(entity.worldPosition);
         }
     }
 }

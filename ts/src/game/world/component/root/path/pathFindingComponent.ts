@@ -1,6 +1,6 @@
 import { TypedEventHandle } from "../../../../../common/event/typedEvent";
 import { addPoint, Point, pointEquals } from "../../../../../common/point";
-import { GraphNode } from "../../../../../path/graph";
+import { GraphNode } from "../../../../../path/graph/graph";
 import { PathSearch } from "../../../../../path/search";
 import { EntityComponent } from "../../entityComponent";
 import { TileMapUpdateEvent } from "../../tile/tileMapUpdatedEvent";
@@ -17,7 +17,9 @@ export class PathFindingComponent extends EntityComponent {
         this.tileEventListener = this.entity.componentEvents.listen(
             TileMapUpdateEvent,
             (event) => {
-                this.invalidateCurrentGraph();
+                // TODO: I dont think we need to handle this as it would just
+                // remove this position that was not there yet from the graph
+                this.invalidateGraphPoint({ x: 0, y: 0 });
             }
         );
     }
@@ -65,7 +67,7 @@ export class PathFindingComponent extends EntityComponent {
 
         // The path results are returned in a absolute space, so we convert them
         // back before doing any further work on it
-        const path = result.map((item) => {
+        const path = result.path.map((item) => {
             return {
                 x: item.x - offsetPoint.x,
                 y: item.y - offsetPoint.y,
@@ -75,6 +77,7 @@ export class PathFindingComponent extends EntityComponent {
             return {
                 status: PathResultStatus.None,
                 path: [],
+                graph: result.graph,
             };
         }
 
@@ -85,17 +88,19 @@ export class PathFindingComponent extends EntityComponent {
             return {
                 status: PathResultStatus.Complete,
                 path: path,
+                graph: result.graph,
             };
         } else {
             return {
                 status: PathResultStatus.Partial,
                 path: path,
+                graph: result.graph,
             };
         }
     }
 
-    private invalidateCurrentGraph() {
-        this.pathSearch.invalidateGraph();
+    public invalidateGraphPoint(point: Point) {
+        this.pathSearch.invalidateGraphPoint(point);
     }
 }
 
