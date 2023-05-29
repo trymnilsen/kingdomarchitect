@@ -5,8 +5,11 @@ import { uiBox } from "../../../../ui/dsl/uiBoxDsl";
 import { SpriteBackground } from "../../../../ui/uiBackground";
 import { fillUiSize } from "../../../../ui/uiSize";
 import { WorkerBehaviorComponent } from "../../../world/component/behavior/workerBehaviorComponent";
+import { JobQueueComponent } from "../../../world/component/job/jobQueueComponent";
+import { SelectedItemIsTargetQuery } from "../../../world/component/job/query/selectedItemIsTargetQuery";
 import { ChestComponent } from "../../../world/component/resource/chestComponent";
 import { TreeComponent } from "../../../world/component/resource/treeComponent";
+import { Job } from "../../../world/job/job";
 import { SelectedEntityItem } from "../../../world/selection/selectedEntityItem";
 import { SelectedTileItem } from "../../../world/selection/selectedTileItem";
 import { SelectedWorldItem } from "../../../world/selection/selectedWorldItem";
@@ -123,22 +126,44 @@ export class SelectionState extends InteractionState {
             let actions: UIActionbarItem[] = [];
             const tree = selection.entity.getComponent(TreeComponent);
             if (!!tree) {
-                actions = [
-                    {
+                const jobQueue =
+                    selection.entity.getAncestorComponent(JobQueueComponent);
+
+                if (!jobQueue) {
+                    throw new Error(
+                        "No job queue component on root for selection"
+                    );
+                }
+
+                const currentJob = jobQueue.query(
+                    new SelectedItemIsTargetQuery(selection)
+                );
+
+                if (currentJob) {
+                    actions.push({
+                        icon: sprites2.empty_sprite,
+                        text: "Abort",
+                        onClick: () => {
+                            this.abortJob(currentJob);
+                        },
+                    });
+                } else {
+                    actions.push({
                         icon: sprites2.empty_sprite,
                         text: "Chop",
                         onClick: () => {
                             this.onChopSelected();
                         },
+                    });
+                }
+
+                actions.push({
+                    icon: sprites2.empty_sprite,
+                    text: "Cancel",
+                    onClick: () => {
+                        this.onCancel();
                     },
-                    {
-                        icon: sprites2.empty_sprite,
-                        text: "Cancel",
-                        onClick: () => {
-                            this.onCancel();
-                        },
-                    },
-                ];
+                });
             }
 
             const worker = selection.entity.getComponent(
@@ -190,24 +215,48 @@ export class SelectionState extends InteractionState {
             const tile = this.context.world.ground.getTile(
                 selection.tilePosition
             );
-            let actions: UIActionbarItem[] = [];
+            const actions: UIActionbarItem[] = [];
             if (tile && tile.hasTree) {
-                actions = [
-                    {
+                const jobQueue =
+                    this.context.world.rootEntity.getComponent(
+                        JobQueueComponent
+                    );
+
+                if (!jobQueue) {
+                    throw new Error(
+                        "No job queue component on root for selection"
+                    );
+                }
+
+                const currentJob = jobQueue.query(
+                    new SelectedItemIsTargetQuery(selection)
+                );
+
+                if (currentJob) {
+                    actions.push({
+                        icon: sprites2.empty_sprite,
+                        text: "Abort",
+                        onClick: () => {
+                            this.abortJob(currentJob);
+                        },
+                    });
+                } else {
+                    actions.push({
                         icon: sprites2.empty_sprite,
                         text: "Chop",
                         onClick: () => {
                             this.onChopSelected();
                         },
+                    });
+                }
+
+                actions.push({
+                    icon: sprites2.empty_sprite,
+                    text: "Cancel",
+                    onClick: () => {
+                        this.onCancel();
                     },
-                    {
-                        icon: sprites2.empty_sprite,
-                        text: "Cancel",
-                        onClick: () => {
-                            this.onCancel();
-                        },
-                    },
-                ];
+                });
             }
 
             return actions;
@@ -222,6 +271,11 @@ export class SelectionState extends InteractionState {
                 },
             ];
         }
+    }
+
+    private abortJob(job: Job) {
+        job.abort();
+        this.context.stateChanger.pop(null);
     }
 
     private onChopSelected() {

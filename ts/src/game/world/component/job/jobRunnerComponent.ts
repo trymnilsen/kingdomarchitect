@@ -3,9 +3,10 @@ import { Point } from "../../../../common/point";
 import { RenderContext } from "../../../../rendering/renderContext";
 import { Job } from "../../job/job";
 import { EntityComponent } from "../entityComponent";
+import { JobOwner } from "./jobOwner";
 import { JobQueueComponent } from "./jobQueueComponent";
 
-export class JobRunnerComponent extends EntityComponent {
+export class JobRunnerComponent extends EntityComponent implements JobOwner {
     /**
      * Jobs can be interupted and paused while running
      * To enable resuming jobs we keep them in a stack
@@ -21,13 +22,7 @@ export class JobRunnerComponent extends EntityComponent {
         return !!this._activeJob;
     }
 
-    override onStart(tick: number): void {
-        super.onStart(tick);
-        // Request a job
-        this.requestNewJob();
-    }
-
-    public assignJob(job: Job): void {
+    assignJob(job: Job): void {
         if (!this.entity) {
             throw new InvalidStateError(
                 "Cannot assign job to runner without entity"
@@ -37,16 +32,27 @@ export class JobRunnerComponent extends EntityComponent {
 
         this._activeJob = job;
         job.entity = this.entity;
+        job.owner = this;
+
         try {
             job.onStart();
         } catch (e) {
             console.error("Failed to start job", e, job);
             this.endJob();
         }
+    }
 
-        job.completedEvent.listenOnce((completeResult) => {
-            this.endJob();
-        });
+    onAbort(job: Job): void {
+        this.endJob();
+    }
+    onComplete(job: Job): void {
+        this.endJob();
+    }
+
+    override onStart(tick: number): void {
+        super.onStart(tick);
+        // Request a job
+        this.requestNewJob();
     }
 
     override onUpdate(tick: number): void {

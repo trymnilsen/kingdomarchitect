@@ -1,5 +1,6 @@
 import { InvalidStateError } from "../../../common/error/invalidStateError";
 import { RenderContext } from "../../../rendering/renderContext";
+import { JobOwner } from "../component/job/jobOwner";
 import { Job, JobState } from "./job";
 
 /**
@@ -8,9 +9,8 @@ import { Job, JobState } from "./job";
  * until the child job considers itself finished.
  * Will finish once the last job in the sequence is finished
  */
-export abstract class MultipleStepJob extends Job {
+export abstract class MultipleStepJob extends Job implements JobOwner {
     private jobs: Job[] = [];
-
     /**
      * Request to update the multiple set job. Will pass on the update to the
      * currently active job
@@ -53,6 +53,15 @@ export abstract class MultipleStepJob extends Job {
         this.runJob(firstJob);
     }
 
+    onAbort(job: Job): void {
+        console.error("Subjob aborted, aborting this job", job, this);
+        this.complete();
+    }
+    onComplete(job: Job): void {
+        console.log(`Multiple step job finished`, job, this.entity);
+        this.subJobCompleted();
+    }
+
     private runJob(subJob: Job) {
         console.log(
             `Starting multiple step job for entity`,
@@ -61,17 +70,13 @@ export abstract class MultipleStepJob extends Job {
         );
         subJob.jobState = JobState.Running;
         subJob.entity = this.entity;
+        subJob.owner = this;
         try {
             subJob.onStart();
         } catch (e) {
             console.error("Subjob failed to start, completing", e);
             this.complete();
         }
-        // Listen to completion on the subJob
-        subJob.completedEvent.listenOnce(() => {
-            console.log(`Multiple step job finished`, subJob, this.entity);
-            this.subJobCompleted();
-        });
     }
 
     private subJobCompleted() {

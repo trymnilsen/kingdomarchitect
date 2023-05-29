@@ -50,8 +50,8 @@ export class World {
         this._inventoryComponent = new InventoryComponent();
 
         this._rootEntity.addComponent(this._inventoryComponent);
-        this._rootEntity.addComponent(this._jobQueueComponent);
         this._rootEntity.addComponent(this._groundComponent);
+        this._rootEntity.addComponent(this._jobQueueComponent);
 
         this._pathSearch = new PathSearch(
             createLazyGraphFromRootNode(this._rootEntity)

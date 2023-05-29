@@ -13,10 +13,10 @@ import { SelectedEntityItem } from "../../selection/selectedEntityItem";
 import { SelectedTileItem } from "../../selection/selectedTileItem";
 import { SelectedWorldItem } from "../../selection/selectedWorldItem";
 import { TileSize } from "../../tile/tile";
-import { WorkerConstraint } from "../constraint/workerConstraint";
 import { Job } from "../job";
 import { JobConstraintsError } from "../jobConstraintsError";
 import { MoveToBeforeJob } from "./moveToBeforeJob";
+import { WorkerConstraint } from "../constraint/workerConstraint";
 
 /**
  * Represents a multistep job that will move towards a tree and then chop
@@ -31,17 +31,16 @@ export class ChopTreeJob extends MoveToBeforeJob {
 
     override onDraw(renderContext: RenderContext): void {
         super.onDraw(renderContext);
-        const visualPosition = renderContext.camera.tileSpaceToWorldSpace(
+        const tilePosition = renderContext.camera.tileSpaceToWorldSpace(
             this.target.tilePosition
         );
-
         renderContext.drawRectangle({
-            x: visualPosition.x + 4,
-            y: visualPosition.y + 4,
-            height: TileSize - 10,
-            width: TileSize - 10,
+            x: tilePosition.x + 2,
+            y: tilePosition.y + 2,
+            height: TileSize - 6,
+            width: TileSize - 6,
             strokeColor: "yellow",
-            strokeWidth: 2,
+            strokeWidth: 3,
         });
     }
 }
