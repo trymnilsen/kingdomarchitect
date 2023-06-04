@@ -1,15 +1,10 @@
 import { sprites2 } from "../../../../asset/sprite";
 import { RenderContext } from "../../../../rendering/renderContext";
 import { uiBox } from "../../../../ui/dsl/uiBoxDsl";
-import { SpriteBackground } from "../../../../ui/uiBackground";
 import { fillUiSize } from "../../../../ui/uiSize";
 import { ChopTreeJob } from "../../../world/job/jobs/chopTreeJob";
 import { SelectedWorldItem } from "../../../world/selection/selectedWorldItem";
 import { InteractionState } from "../../handler/interactionState";
-import {
-    UIActionbar,
-    UIActionbarAlignment,
-} from "../../view/actionbar/uiActionbar";
 import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold";
 
 export class ChopJobState extends InteractionState {
@@ -18,7 +13,13 @@ export class ChopJobState extends InteractionState {
     }
 
     override onActive(): void {
-        const leftActionbar = new UIActionbar(
+        const contentView = uiBox({
+            width: fillUiSize,
+            height: fillUiSize,
+        });
+
+        const scaffoldView = new UIActionbarScaffold(
+            contentView,
             [
                 {
                     text: "Confirm",
@@ -35,23 +36,7 @@ export class ChopJobState extends InteractionState {
                     },
                 },
             ],
-            new SpriteBackground(sprites2.stone_slate_background_2x),
-            UIActionbarAlignment.Left,
-            {
-                width: fillUiSize,
-                height: fillUiSize,
-            }
-        );
-
-        const contentView = uiBox({
-            width: fillUiSize,
-            height: fillUiSize,
-        });
-
-        const scaffoldView = new UIActionbarScaffold(
-            contentView,
-            leftActionbar,
-            null,
+            [],
             { width: fillUiSize, height: fillUiSize }
         );
 

@@ -3,7 +3,6 @@ import { allSides } from "../../../../common/sides";
 import { InputAction } from "../../../../input/inputAction";
 import { uiBox } from "../../../../ui/dsl/uiBoxDsl";
 import { uiAlignment } from "../../../../ui/uiAlignment";
-import { SpriteBackground } from "../../../../ui/uiBackground";
 import { fillUiSize } from "../../../../ui/uiSize";
 import { WorkerBehaviorComponent } from "../../../world/component/behavior/workerBehaviorComponent";
 import { SelectedEntityItem } from "../../../world/selection/selectedEntityItem";
@@ -12,11 +11,7 @@ import { SelectedWorldItem } from "../../../world/selection/selectedWorldItem";
 import { GroundTile } from "../../../world/tile/ground";
 import { InteractionState } from "../../handler/interactionState";
 import { InteractionStateChanger } from "../../handler/interactionStateChanger";
-import {
-    UIActionbar,
-    UIActionbarAlignment,
-    UIActionbarItem,
-} from "../../view/actionbar/uiActionbar";
+import { UIActionbarItem } from "../../view/actionbar/uiActionbar";
 import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold";
 import { AlertMessageState } from "../common/alertMessageState";
 import { LandUnlockState } from "../land/landUnlockState";
@@ -68,16 +63,6 @@ export class RootState extends InteractionState {
             height: 48,
         });
 
-        const leftActionbar = new UIActionbar(
-            actionItems,
-            new SpriteBackground(sprites2.stone_slate_background_2x),
-            UIActionbarAlignment.Left,
-            {
-                width: fillUiSize,
-                height: fillUiSize,
-            }
-        );
-
         const contentView = uiBox({
             width: fillUiSize,
             height: fillUiSize,
@@ -88,8 +73,8 @@ export class RootState extends InteractionState {
 
         const scaffoldState = new UIActionbarScaffold(
             contentView,
-            leftActionbar,
-            null,
+            actionItems,
+            [],
             { width: fillUiSize, height: fillUiSize }
         );
 

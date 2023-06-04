@@ -1,6 +1,5 @@
 import { sprites2 } from "../../../../../asset/sprite";
 import { subTitleTextStyle } from "../../../../../rendering/text/textStyle";
-import { ninePatchBackground } from "../../../../../ui/dsl/uiBackgroundDsl";
 import { uiBox } from "../../../../../ui/dsl/uiBoxDsl";
 import { uiButton } from "../../../../../ui/dsl/uiButtonDsl";
 import { uiColumn } from "../../../../../ui/dsl/uiColumnDsl";
@@ -12,18 +11,12 @@ import { fillUiSize, wrapUiSize } from "../../../../../ui/uiSize";
 import { UIView } from "../../../../../ui/uiView";
 import { UIBox } from "../../../../../ui/view/uiBox";
 import { UIColumn } from "../../../../../ui/view/uiColumn";
-import {
-    UIActionbar,
-    UIActionbarAlignment,
-    UIActionbarItem,
-    actionbarWidth,
-} from "../../../view/actionbar/uiActionbar";
+import { UIActionbarItem } from "../../../view/actionbar/uiActionbar";
+import { actionbarWidth } from "../../../view/actionbar/uiActionbarConstants";
 import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold";
 import { StatePresenter } from "../../../view/statePresenter";
 
 export class ActorSelectionPresenter implements StatePresenter {
-    private leftActionBar: UIActionbar;
-    private rightActionBar: UIActionbar;
     private scaffold: UIActionbarScaffold;
 
     private expandedMenu: UIColumn;
@@ -37,9 +30,6 @@ export class ActorSelectionPresenter implements StatePresenter {
         private leftActionbarItems: UIActionbarItem[],
         private rightActionbarItems: UIActionbarItem[]
     ) {
-        this.leftActionBar = this.createLeftActionBar(leftActionbarItems);
-        this.rightActionBar = this.createRightActionBar(rightActionbarItems);
-
         this.expandedMenu = new UIColumn({
             width: wrapUiSize,
             height: wrapUiSize,
@@ -60,8 +50,8 @@ export class ActorSelectionPresenter implements StatePresenter {
 
         this.scaffold = new UIActionbarScaffold(
             content,
-            this.leftActionBar,
-            this.rightActionBar,
+            leftActionbarItems,
+            rightActionbarItems,
             { width: fillUiSize, height: fillUiSize }
         );
     }
@@ -130,36 +120,5 @@ export class ActorSelectionPresenter implements StatePresenter {
         for (const view of menuViews) {
             this.expandedMenu.addView(view);
         }
-    }
-
-    private createLeftActionBar(
-        leftActionbarItems: UIActionbarItem[]
-    ): UIActionbar {
-        return new UIActionbar(
-            leftActionbarItems,
-            ninePatchBackground({
-                sprite: sprites2.stone_slate_background,
-                scale: 2,
-            }),
-            UIActionbarAlignment.Left,
-            {
-                width: fillUiSize,
-                height: fillUiSize,
-            }
-        );
-    }
-
-    private createRightActionBar(
-        rightActionbarItems: UIActionbarItem[]
-    ): UIActionbar {
-        return new UIActionbar(
-            rightActionbarItems,
-            new SpriteBackground(sprites2.stone_slate_button_2x),
-            UIActionbarAlignment.Right,
-            {
-                width: fillUiSize,
-                height: fillUiSize,
-            }
-        );
     }
 }

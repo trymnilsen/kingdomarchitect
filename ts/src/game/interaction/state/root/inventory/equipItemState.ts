@@ -5,7 +5,6 @@ import {
 } from "../../../../../data/inventory/inventoryItem";
 import { RenderContext } from "../../../../../rendering/renderContext";
 import { uiBox } from "../../../../../ui/dsl/uiBoxDsl";
-import { SpriteBackground } from "../../../../../ui/uiBackground";
 import { fillUiSize } from "../../../../../ui/uiSize";
 import { WorkerBehaviorComponent } from "../../../../world/component/behavior/workerBehaviorComponent";
 import { SpriteComponent } from "../../../../world/component/draw/spriteComponent";
@@ -16,11 +15,7 @@ import { Entity } from "../../../../world/entity/entity";
 import { GroundTile } from "../../../../world/tile/ground";
 import { TileSize } from "../../../../world/tile/tile";
 import { InteractionState } from "../../../handler/interactionState";
-import {
-    UIActionbar,
-    UIActionbarAlignment,
-    UIActionbarItem,
-} from "../../../view/actionbar/uiActionbar";
+import { UIActionbarItem } from "../../../view/actionbar/uiActionbar";
 import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold";
 import { AlertMessageState } from "../../common/alertMessageState";
 
@@ -58,15 +53,6 @@ export class EquipItemState extends InteractionState {
             },
         ];
 
-        const leftActionbar = new UIActionbar(
-            actions,
-            new SpriteBackground(sprites2.stone_slate_background_2x),
-            UIActionbarAlignment.Left,
-            {
-                width: fillUiSize,
-                height: fillUiSize,
-            }
-        );
         const contentView = uiBox({
             width: fillUiSize,
             height: fillUiSize,
@@ -74,8 +60,8 @@ export class EquipItemState extends InteractionState {
 
         const scaffoldState = new UIActionbarScaffold(
             contentView,
-            leftActionbar,
-            null,
+            actions,
+            [],
             { width: fillUiSize, height: fillUiSize }
         );
 

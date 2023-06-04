@@ -519,13 +519,23 @@ export const sprites = {
       "y": 160
     }
   },
+  "cursor_red": {
+    "bin": "0",
+    "defintion": {
+      "frames": 1,
+      "w": 32,
+      "h": 32,
+      "x": 232,
+      "y": 128
+    }
+  },
   "fancy_wood_background": {
     "bin": "0",
     "defintion": {
       "frames": 1,
       "w": 48,
       "h": 48,
-      "x": 232,
+      "x": 264,
       "y": 128
     }
   },
@@ -535,8 +545,8 @@ export const sprites = {
       "frames": 1,
       "w": 32,
       "h": 32,
-      "x": 192,
-      "y": 168
+      "x": 232,
+      "y": 160
     }
   },
   "generic_skill": {
@@ -545,8 +555,8 @@ export const sprites = {
       "frames": 1,
       "w": 32,
       "h": 32,
-      "x": 280,
-      "y": 128
+      "x": 192,
+      "y": 168
     }
   },
   "gold_coins": {
@@ -555,8 +565,8 @@ export const sprites = {
       "frames": 1,
       "w": 32,
       "h": 32,
-      "x": 280,
-      "y": 160
+      "x": 128,
+      "y": 176
     }
   },
   "health_potion": {
@@ -565,7 +575,7 @@ export const sprites = {
       "frames": 1,
       "w": 32,
       "h": 32,
-      "x": 224,
+      "x": 160,
       "y": 176
     }
   },
@@ -575,7 +585,7 @@ export const sprites = {
       "frames": 1,
       "w": 32,
       "h": 32,
-      "x": 128,
+      "x": 264,
       "y": 176
     }
   },
@@ -585,7 +595,7 @@ export const sprites = {
       "frames": 1,
       "w": 32,
       "h": 32,
-      "x": 160,
+      "x": 296,
       "y": 176
     }
   },
@@ -595,8 +605,8 @@ export const sprites = {
       "frames": 1,
       "w": 32,
       "h": 32,
-      "x": 192,
-      "y": 200
+      "x": 224,
+      "y": 192
     }
   },
   "scroll": {
@@ -605,8 +615,8 @@ export const sprites = {
       "frames": 1,
       "w": 32,
       "h": 32,
-      "x": 128,
-      "y": 208
+      "x": 192,
+      "y": 200
     }
   },
   "stone_resource": {
@@ -615,7 +625,7 @@ export const sprites = {
       "frames": 1,
       "w": 32,
       "h": 32,
-      "x": 160,
+      "x": 128,
       "y": 208
     }
   },
@@ -626,7 +636,7 @@ export const sprites = {
       "w": 48,
       "h": 48,
       "x": 256,
-      "y": 192
+      "y": 208
     }
   },
   "stone_slate_background_2x": {
@@ -635,8 +645,8 @@ export const sprites = {
       "frames": 1,
       "w": 48,
       "h": 48,
-      "x": 192,
-      "y": 232
+      "x": 128,
+      "y": 256
     }
   },
   "stone_slate_border": {
@@ -665,8 +675,8 @@ export const sprites = {
       "frames": 1,
       "w": 48,
       "h": 48,
-      "x": 128,
-      "y": 240
+      "x": 176,
+      "y": 256
     }
   },
   "stone_slate_dark_background_2x": {
@@ -675,8 +685,8 @@ export const sprites = {
       "frames": 1,
       "w": 48,
       "h": 48,
-      "x": 240,
-      "y": 240
+      "x": 224,
+      "y": 256
     }
   },
   "stone_wood_walls_bottom": {
@@ -685,31 +695,11 @@ export const sprites = {
       "frames": 1,
       "w": 40,
       "h": 40,
-      "x": 176,
-      "y": 280
+      "x": 272,
+      "y": 256
     }
   },
   "stone_wood_walls_br": {
-    "bin": "0",
-    "defintion": {
-      "frames": 1,
-      "w": 40,
-      "h": 40,
-      "x": 288,
-      "y": 240
-    }
-  },
-  "stone_wood_walls_horizontal": {
-    "bin": "0",
-    "defintion": {
-      "frames": 1,
-      "w": 40,
-      "h": 40,
-      "x": 288,
-      "y": 280
-    }
-  },
-  "stone_wood_walls_lb": {
     "bin": "0",
     "defintion": {
       "frames": 1,
@@ -719,7 +709,7 @@ export const sprites = {
       "y": 320
     }
   },
-  "stone_wood_walls_lbr": {
+  "stone_wood_walls_horizontal": {
     "bin": "0",
     "defintion": {
       "frames": 1,
@@ -729,7 +719,7 @@ export const sprites = {
       "y": 320
     }
   },
-  "stone_wood_walls_left": {
+  "stone_wood_walls_lb": {
     "bin": "0",
     "defintion": {
       "frames": 1,
@@ -739,7 +729,7 @@ export const sprites = {
       "y": 320
     }
   },
-  "stone_wood_walls_lu": {
+  "stone_wood_walls_lbr": {
     "bin": "0",
     "defintion": {
       "frames": 1,
@@ -749,14 +739,34 @@ export const sprites = {
       "y": 320
     }
   },
-  "stone_wood_walls_lub": {
+  "stone_wood_walls_left": {
     "bin": "0",
     "defintion": {
       "frames": 1,
       "w": 40,
       "h": 40,
       "x": 160,
-      "y": 320
+      "y": 304
+    }
+  },
+  "stone_wood_walls_lu": {
+    "bin": "0",
+    "defintion": {
+      "frames": 1,
+      "w": 40,
+      "h": 40,
+      "x": 200,
+      "y": 304
+    }
+  },
+  "stone_wood_walls_lub": {
+    "bin": "0",
+    "defintion": {
+      "frames": 1,
+      "w": 40,
+      "h": 40,
+      "x": 240,
+      "y": 304
     }
   },
   "stone_wood_walls_lur": {
@@ -765,41 +775,11 @@ export const sprites = {
       "frames": 1,
       "w": 40,
       "h": 40,
-      "x": 200,
-      "y": 320
+      "x": 280,
+      "y": 296
     }
   },
   "stone_wood_walls_lurb": {
-    "bin": "0",
-    "defintion": {
-      "frames": 1,
-      "w": 40,
-      "h": 40,
-      "x": 240,
-      "y": 320
-    }
-  },
-  "stone_wood_walls_right": {
-    "bin": "0",
-    "defintion": {
-      "frames": 1,
-      "w": 40,
-      "h": 40,
-      "x": 280,
-      "y": 320
-    }
-  },
-  "stone_wood_walls_scaffold": {
-    "bin": "0",
-    "defintion": {
-      "frames": 1,
-      "w": 40,
-      "h": 40,
-      "x": 320,
-      "y": 320
-    }
-  },
-  "stone_wood_walls_single": {
     "bin": "0",
     "defintion": {
       "frames": 1,
@@ -809,7 +789,7 @@ export const sprites = {
       "y": 0
     }
   },
-  "stone_wood_walls_ubr": {
+  "stone_wood_walls_right": {
     "bin": "0",
     "defintion": {
       "frames": 1,
@@ -819,7 +799,7 @@ export const sprites = {
       "y": 40
     }
   },
-  "stone_wood_walls_up": {
+  "stone_wood_walls_scaffold": {
     "bin": "0",
     "defintion": {
       "frames": 1,
@@ -829,7 +809,7 @@ export const sprites = {
       "y": 80
     }
   },
-  "stone_wood_walls_ur": {
+  "stone_wood_walls_single": {
     "bin": "0",
     "defintion": {
       "frames": 1,
@@ -839,14 +819,44 @@ export const sprites = {
       "y": 120
     }
   },
-  "stone_wood_walls_vertical": {
+  "stone_wood_walls_ubr": {
     "bin": "0",
     "defintion": {
       "frames": 1,
       "w": 40,
       "h": 40,
       "x": 304,
-      "y": 192
+      "y": 208
+    }
+  },
+  "stone_wood_walls_up": {
+    "bin": "0",
+    "defintion": {
+      "frames": 1,
+      "w": 40,
+      "h": 40,
+      "x": 312,
+      "y": 248
+    }
+  },
+  "stone_wood_walls_ur": {
+    "bin": "0",
+    "defintion": {
+      "frames": 1,
+      "w": 40,
+      "h": 40,
+      "x": 328,
+      "y": 160
+    }
+  },
+  "stone_wood_walls_vertical": {
+    "bin": "0",
+    "defintion": {
+      "frames": 1,
+      "w": 40,
+      "h": 40,
+      "x": 320,
+      "y": 288
     }
   },
   "swipe_effect": {
@@ -855,8 +865,8 @@ export const sprites = {
       "frames": 1,
       "w": 40,
       "h": 40,
-      "x": 328,
-      "y": 232
+      "x": 0,
+      "y": 360
     }
   },
   "sword_skill": {
@@ -865,8 +875,8 @@ export const sprites = {
       "frames": 1,
       "w": 32,
       "h": 32,
-      "x": 128,
-      "y": 288
+      "x": 160,
+      "y": 208
     }
   },
   "sword_skill_shadow": {
@@ -875,8 +885,8 @@ export const sprites = {
       "frames": 1,
       "w": 32,
       "h": 32,
-      "x": 216,
-      "y": 288
+      "x": 224,
+      "y": 224
     }
   },
   "wizard_hat_skill": {
@@ -885,8 +895,8 @@ export const sprites = {
       "frames": 1,
       "w": 32,
       "h": 32,
-      "x": 312,
-      "y": 160
+      "x": 344,
+      "y": 200
     }
   },
   "wood_resource": {
@@ -895,8 +905,8 @@ export const sprites = {
       "frames": 1,
       "w": 32,
       "h": 32,
-      "x": 344,
-      "y": 160
+      "x": 40,
+      "y": 360
     }
   },
   "worker_skill": {
@@ -905,8 +915,8 @@ export const sprites = {
       "frames": 1,
       "w": 32,
       "h": 32,
-      "x": 248,
-      "y": 288
+      "x": 72,
+      "y": 360
     }
   }
 }
