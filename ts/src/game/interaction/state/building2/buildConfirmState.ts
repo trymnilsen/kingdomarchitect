@@ -32,6 +32,15 @@ export class BuildConfirmState extends InteractionState {
     }
 
     override onActive(): void {
+        const cursorPosition = this.buildMode.cursorSelection();
+        this.selection = [
+            {
+                isAvailable: this.isTileAvailable(cursorPosition),
+                x: cursorPosition.x,
+                y: cursorPosition.y,
+            },
+        ];
+
         const actions: UIActionbarItem[] = this.getActionItems();
         const contentView = uiBox({
             width: fillUiSize,
@@ -77,26 +86,29 @@ export class BuildConfirmState extends InteractionState {
     }
 
     private onBuildModeSelected() {
-        this.scaffold?.setLeftExpandedMenu([
-            {
-                text: "Single",
-                icon: sprites2.empty_sprite,
-                onClick: () => {
-                    this.changeBuildMode(
-                        new SingleBuildMode(this.buildMode.cursorSelection())
-                    );
+        this.scaffold?.setLeftExpandedMenu(
+            [
+                {
+                    text: "Single",
+                    icon: sprites2.empty_sprite,
+                    onClick: () => {
+                        this.changeBuildMode(
+                            new SingleBuildMode(
+                                this.buildMode.cursorSelection()
+                            )
+                        );
+                    },
                 },
-            },
-            {
-                text: "Line",
-                icon: sprites2.empty_sprite,
-                onClick: () => {
-                    this.changeBuildMode(
-                        new LineBuildMode(this.buildMode.cursorSelection())
-                    );
+                {
+                    text: "Line",
+                    icon: sprites2.empty_sprite,
+                    onClick: () => {
+                        this.changeBuildMode(
+                            new LineBuildMode(this.buildMode.cursorSelection())
+                        );
+                    },
                 },
-            },
-            /*
+                /*
             {
                 text: "Box",
                 icon: sprites2.empty_sprite,
@@ -111,7 +123,9 @@ export class BuildConfirmState extends InteractionState {
                     this.changeBuildMode(new ToggleBuildMode());
                 },
             },*/
-        ]);
+            ],
+            1
+        );
     }
 
     private confirmBuildSelection() {
@@ -124,7 +138,7 @@ export class BuildConfirmState extends InteractionState {
 
         const selections = this.buildMode.getSelection();
         const isAllTilesAvailable = selections.every((item) => {
-            this.isTileAvailable(item);
+            return this.isTileAvailable(item);
         });
 
         if (!isAllTilesAvailable) {

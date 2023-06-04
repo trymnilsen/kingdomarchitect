@@ -56,7 +56,12 @@ export class LineBuildMode implements BuildMode {
 
         positions.push(point);
 
-        this.selection = positions;
+        //Filter out duplicates
+        this.selection = positions.filter(
+            (value, index, self) =>
+                index ===
+                self.findIndex((t) => t.x === value.x && t.y === value.y)
+        );
         this.from = point;
     }
     getSelection(): Point[] {

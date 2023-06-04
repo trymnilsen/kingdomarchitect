@@ -13,7 +13,7 @@ import {
     UIActionbarItem,
 } from "./uiActionbar";
 import { UIActionbarButton } from "./uiActionbarButton";
-import { actionbarHeight } from "./uiActionbarConstants";
+import { actionbarHeight, actionbarWidth } from "./uiActionbarConstants";
 
 const background = new SpriteBackground(sprites2.stone_slate_background_2x);
 
@@ -90,13 +90,15 @@ export class UIActionbarScaffold extends UIView {
         this._rightActionbar.updateItems(items);
     }
 
-    setLeftExpandedMenu(items: UIActionbarItem[]) {
+    setLeftExpandedMenu(items: UIActionbarItem[], anchorIndex: number) {
         this._leftExpandedMenu = items;
+        this._leftExpandedMenuIndex = anchorIndex;
         this.setExpandedMenu(this._leftExpandedMenuColumn, items);
     }
 
-    setRightExpandedMenu(items: UIActionbarItem[]) {
+    setRightExpandedMenu(items: UIActionbarItem[], anchorIndex: number) {
         this._rightExpandedMenu = items;
+        this._rightExpandedMenuIndex = anchorIndex;
         this.setExpandedMenu(this._rightExpandedMenuColumn, items);
     }
 
@@ -155,7 +157,10 @@ export class UIActionbarScaffold extends UIView {
             height: actionbarHeight,
         };
 
-        this._rightActionbar.layout(layoutContext, rightConstraints);
+        const rightActionbar = this._rightActionbar.layout(
+            layoutContext,
+            rightConstraints
+        );
 
         //Now we can measure the content view
         const contentConstraints = {
@@ -176,7 +181,9 @@ export class UIActionbarScaffold extends UIView {
             );
 
             this._leftExpandedMenuColumn.offset = {
-                x: this._sides.left,
+                x:
+                    this._sides.left +
+                    this._leftExpandedMenuIndex * actionbarWidth,
                 y:
                     this._sides.top +
                     contentSize.height -
@@ -194,7 +201,9 @@ export class UIActionbarScaffold extends UIView {
                 x:
                     this._sides.right +
                     contentSize.height -
-                    rightExpandedMenuSize.width,
+                    rightExpandedMenuSize.width -
+                    rightActionbar.width +
+                    this._rightExpandedMenuIndex * actionbarWidth,
                 y:
                     this._sides.top +
                     contentSize.height -
