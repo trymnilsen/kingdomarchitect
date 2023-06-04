@@ -94,7 +94,7 @@ export abstract class InteractionState {
         return false;
         */
 
-        console.log("UI Event: ", event);
+        //console.log("UI Event: ", event);
         if (this._view) {
             const handled = this._view.dispatchUIEvent(event);
             return handled;

@@ -4,7 +4,6 @@ import { allSides } from "../../../../../common/sides";
 import { SearchedNode } from "../../../../../path/search";
 import { RenderContext } from "../../../../../rendering/renderContext";
 import { uiBox } from "../../../../../ui/dsl/uiBoxDsl";
-import { SpriteBackground } from "../../../../../ui/uiBackground";
 import { fillUiSize } from "../../../../../ui/uiSize";
 import { Entity } from "../../../../world/entity/entity";
 import { EntityInstanceJobConstraint } from "../../../../world/job/constraint/entityInstanceConstraint";
@@ -12,10 +11,6 @@ import { MoveJob } from "../../../../world/job/jobs/moveJob";
 import { GroundTile } from "../../../../world/tile/ground";
 import { TileSize } from "../../../../world/tile/tile";
 import { InteractionState } from "../../../handler/interactionState";
-import {
-    UIActionbar,
-    UIActionbarAlignment,
-} from "../../../view/actionbar/uiActionbar";
 import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold";
 
 export class ActorMovementState extends InteractionState {
@@ -27,7 +22,13 @@ export class ActorMovementState extends InteractionState {
         super();
     }
     override onActive(): void {
-        const leftActionbar = new UIActionbar(
+        const contentView = uiBox({
+            width: fillUiSize,
+            height: fillUiSize,
+        });
+
+        const scaffoldView = new UIActionbarScaffold(
+            contentView,
             [
                 {
                     text: "Move",
@@ -45,23 +46,7 @@ export class ActorMovementState extends InteractionState {
                     },
                 },
             ],
-            new SpriteBackground(sprites2.stone_slate_background_2x),
-            UIActionbarAlignment.Left,
-            {
-                width: fillUiSize,
-                height: fillUiSize,
-            }
-        );
-
-        const contentView = uiBox({
-            width: fillUiSize,
-            height: fillUiSize,
-        });
-
-        const scaffoldView = new UIActionbarScaffold(
-            contentView,
-            leftActionbar,
-            null,
+            [],
             { width: fillUiSize, height: fillUiSize }
         );
 

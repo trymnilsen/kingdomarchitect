@@ -3,17 +3,12 @@ import { allSides } from "../../../../common/sides";
 import { UIThemeType } from "../../../../ui/color";
 import { ninePatchBackground } from "../../../../ui/dsl/uiBackgroundDsl";
 import { uiBox } from "../../../../ui/dsl/uiBoxDsl";
-import { SpriteBackground } from "../../../../ui/uiBackground";
 import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize";
 import { UIView } from "../../../../ui/uiView";
 import { UIFlowGrid } from "../../../../ui/view/uiFlowGrid";
-import { CollectChestJob } from "../../../world/job/jobs/chest/collectChestJob";
 import { ChestComponent } from "../../../world/component/resource/chestComponent";
+import { CollectChestJob } from "../../../world/job/jobs/chest/collectChestJob";
 import { InteractionState } from "../../handler/interactionState";
-import {
-    UIActionbar,
-    UIActionbarAlignment,
-} from "../../view/actionbar/uiActionbar";
 import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold";
 import { UIBorderTitle } from "../../view/uiBorderTitle";
 import { UIInventoryGridItem } from "../root/inventory/uiInventoryGridItem";
@@ -30,31 +25,6 @@ export class CollectChestState extends InteractionState {
     }
 
     override onActive(): void {
-        const leftActionbar = new UIActionbar(
-            [
-                {
-                    text: "Collect",
-                    icon: sprites2.empty_sprite,
-                    onClick: () => {
-                        this.scheduleCollectJob();
-                    },
-                },
-                {
-                    text: "Cancel",
-                    icon: sprites2.empty_sprite,
-                    onClick: () => {
-                        this.context.stateChanger.pop(null);
-                    },
-                },
-            ],
-            new SpriteBackground(sprites2.stone_slate_background_2x),
-            UIActionbarAlignment.Left,
-            {
-                width: fillUiSize,
-                height: fillUiSize,
-            }
-        );
-
         const borderWrapper = new UIBorderTitle({
             height: wrapUiSize,
             width: 300,
@@ -89,8 +59,23 @@ export class CollectChestState extends InteractionState {
 
         const scaffoldView = new UIActionbarScaffold(
             contentView,
-            leftActionbar,
-            null,
+            [
+                {
+                    text: "Collect",
+                    icon: sprites2.empty_sprite,
+                    onClick: () => {
+                        this.scheduleCollectJob();
+                    },
+                },
+                {
+                    text: "Cancel",
+                    icon: sprites2.empty_sprite,
+                    onClick: () => {
+                        this.context.stateChanger.pop(null);
+                    },
+                },
+            ],
+            [],
             { width: fillUiSize, height: fillUiSize }
         );
         this.view = scaffoldView;

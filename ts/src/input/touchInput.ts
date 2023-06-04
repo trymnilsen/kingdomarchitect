@@ -167,7 +167,7 @@ export class TouchInput {
             position = position || this.previousMovePosition;
 
             if (this.onTapEnd && this.onTapPosition) {
-                console.log(`TouchInput: Tap ended`, position, this.isDragging);
+                //console.log(`TouchInput: Tap ended`, position, this.isDragging);
                 this.onTapEnd({
                     // Substitute the onTapPosition as the end position if
                     // there is no position in the event or a previous

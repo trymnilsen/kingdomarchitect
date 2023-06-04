@@ -71,15 +71,6 @@ export class BuildingState extends InteractionState {
         this._masterDetailsView.rightPage = detailsView;
         this._masterDetailsView.setTabs(this.getTabs(0));
 
-        const leftActionbar = new UIActionbar(
-            rightItems,
-            new SpriteBackground(sprites2.stone_slate_background_2x),
-            UIActionbarAlignment.Left,
-            {
-                width: fillUiSize,
-                height: fillUiSize,
-            }
-        );
         const contentView = uiBox({
             id: "buildStateLayout",
             width: fillUiSize,
@@ -90,8 +81,8 @@ export class BuildingState extends InteractionState {
 
         const scaffoldState = new UIActionbarScaffold(
             contentView,
-            leftActionbar,
-            null,
+            rightItems,
+            [],
             { width: fillUiSize, height: fillUiSize }
         );
 

@@ -1,7 +1,7 @@
 import { sprites2 } from "../../../../asset/sprite";
 import { sizeOfBounds, withinRectangle } from "../../../../common/bounds";
 import { InvalidStateError } from "../../../../common/error/invalidStateError";
-import { manhattanDistance, Point, zeroPoint } from "../../../../common/point";
+import { Point, manhattanDistance, zeroPoint } from "../../../../common/point";
 import { allSides } from "../../../../common/sides";
 import { woodResourceItem } from "../../../../data/inventory/resources";
 import { RenderContext } from "../../../../rendering/renderContext";
@@ -12,7 +12,6 @@ import { uiImage } from "../../../../ui/dsl/uiImageDsl";
 import { uiRow } from "../../../../ui/dsl/uiRowDsl";
 import { uiSpace } from "../../../../ui/dsl/uiSpaceDsl";
 import { uiText } from "../../../../ui/dsl/uiTextDsl";
-import { SpriteBackground } from "../../../../ui/uiBackground";
 import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize";
 import { UIView } from "../../../../ui/uiView";
 import { UISpriteImageSource } from "../../../../ui/view/uiImageSource";
@@ -21,10 +20,6 @@ import { TilesComponent } from "../../../world/component/tile/tilesComponent";
 import { UnlockableArea } from "../../../world/component/tile/unlockableArea";
 import { TileSize } from "../../../world/tile/tile";
 import { InteractionState } from "../../handler/interactionState";
-import {
-    UIActionbar,
-    UIActionbarAlignment,
-} from "../../view/actionbar/uiActionbar";
 import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold";
 import { AlertMessageState } from "../common/alertMessageState";
 
@@ -37,7 +32,13 @@ export class LandUnlockState extends InteractionState {
     override onActive(): void {
         this.getUnlockableAreas();
 
-        const leftActionbar = new UIActionbar(
+        const contentView = uiBox({
+            width: fillUiSize,
+            height: fillUiSize,
+        });
+
+        const scaffoldView = new UIActionbarScaffold(
+            contentView,
             [
                 {
                     text: "Unlock",
@@ -54,23 +55,7 @@ export class LandUnlockState extends InteractionState {
                     },
                 },
             ],
-            new SpriteBackground(sprites2.stone_slate_background_2x),
-            UIActionbarAlignment.Left,
-            {
-                width: fillUiSize,
-                height: fillUiSize,
-            }
-        );
-
-        const contentView = uiBox({
-            width: fillUiSize,
-            height: fillUiSize,
-        });
-
-        const scaffoldView = new UIActionbarScaffold(
-            contentView,
-            leftActionbar,
-            null,
+            [],
             { width: fillUiSize, height: fillUiSize }
         );
 

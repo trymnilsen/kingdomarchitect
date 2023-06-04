@@ -1,23 +1,16 @@
 import { Sprite2 } from "../../../../asset/sprite";
 import { Point } from "../../../../common/point";
-import { subTitleTextStyle } from "../../../../rendering/text/textStyle";
 import { UIRenderContext } from "../../../../rendering/uiRenderContext";
-import { uiBox } from "../../../../ui/dsl/uiBoxDsl";
-import { uiButton } from "../../../../ui/dsl/uiButtonDsl";
-import { uiColumn } from "../../../../ui/dsl/uiColumnDsl";
-import { spriteImageSource, uiImage } from "../../../../ui/dsl/uiImageDsl";
-import { uiText } from "../../../../ui/dsl/uiTextDsl";
 import { UIBackground } from "../../../../ui/uiBackground";
 import { UILayoutContext } from "../../../../ui/uiLayoutContext";
-import { UISize, wrapUiSize } from "../../../../ui/uiSize";
+import { UISize } from "../../../../ui/uiSize";
 import { UIView } from "../../../../ui/uiView";
+import { UIActionbarButton } from "./uiActionbarButton";
 
-export const actionbarHeight = 72;
-export const actionbarWidth = 72;
 export interface UIActionbarItem {
     text: string;
     onClick?: () => void;
-    children?: UIActionbarItem[];
+    children?: Omit<UIActionbarItem, "children">[];
     icon?: Sprite2;
 }
 
@@ -41,54 +34,7 @@ export class UIActionbar extends UIView {
         this.clearViews();
         this.items = items;
         const views = this.items.map((item) => {
-            let icon: UIView[] = [];
-            if (item.icon) {
-                icon = [
-                    uiImage({
-                        width: 32,
-                        height: 32,
-                        image: spriteImageSource(item.icon),
-                    }),
-                ];
-            }
-            return uiBox({
-                width: actionbarWidth,
-                height: 72,
-                children: [
-                    uiColumn({
-                        width: wrapUiSize,
-                        height: wrapUiSize,
-                        children: [
-                            {
-                                child: uiButton({
-                                    width: 48,
-                                    height: 48,
-                                    id: `actionButton${item.text}`,
-                                    onTapCallback: () => {
-                                        if (item.onClick) {
-                                            item.onClick();
-                                        } else {
-                                            console.log(
-                                                `No callback for ${item.text}`
-                                            );
-                                        }
-                                    },
-                                    children: icon,
-                                    defaultBackground: this.background,
-                                }),
-                            },
-                            {
-                                child: uiText({
-                                    width: wrapUiSize,
-                                    height: wrapUiSize,
-                                    text: item.text,
-                                    style: subTitleTextStyle,
-                                }),
-                            },
-                        ],
-                    }),
-                ],
-            });
+            return new UIActionbarButton(item, this.background);
         });
 
         //Add the views as children

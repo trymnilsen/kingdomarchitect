@@ -4,20 +4,15 @@ import { magicSkills } from "../../../../data/skill/magic";
 import { meleeSkills } from "../../../../data/skill/melee";
 import { productivitySkills } from "../../../../data/skill/productivity";
 import { rangedSkills } from "../../../../data/skill/ranged";
-import { Skill, SkillCategory, SkillTree } from "../../../../data/skill/skill";
+import { SkillCategory, SkillTree } from "../../../../data/skill/skill";
 import { bookInkColor } from "../../../../ui/color";
 import { uiBox } from "../../../../ui/dsl/uiBoxDsl";
 import { uiText } from "../../../../ui/dsl/uiTextDsl";
 import { uiAlignment } from "../../../../ui/uiAlignment";
-import { SpriteBackground } from "../../../../ui/uiBackground";
 import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize";
 import { UIView } from "../../../../ui/uiView";
 import { InteractionState } from "../../handler/interactionState";
-import {
-    UIActionbar,
-    UIActionbarAlignment,
-    UIActionbarItem,
-} from "../../view/actionbar/uiActionbar";
+import { UIActionbarItem } from "../../view/actionbar/uiActionbar";
 import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold";
 import { UIBookLayout, UIBookLayoutTab } from "../../view/uiBookLayout";
 import { UISkillCategoryTree } from "./uiSkillCategoryTree";
@@ -50,15 +45,6 @@ export class CharacterSkillState extends InteractionState {
             },
         ];
 
-        const actionbar = new UIActionbar(
-            items,
-            new SpriteBackground(sprites2.stone_slate_background_2x),
-            UIActionbarAlignment.Left,
-            {
-                width: fillUiSize,
-                height: fillUiSize,
-            }
-        );
         const masterView = this.getMasterView(meleeSkills, SkillCategory.Melee);
         const detailsView = this.getDetailsView(0);
 
@@ -76,7 +62,7 @@ export class CharacterSkillState extends InteractionState {
             children: [this._masterDetailsView],
         });
 
-        this.view = new UIActionbarScaffold(contentView, actionbar, null, {
+        this.view = new UIActionbarScaffold(contentView, items, [], {
             width: fillUiSize,
             height: fillUiSize,
         });

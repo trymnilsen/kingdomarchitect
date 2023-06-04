@@ -14,7 +14,6 @@ import { ColumnChild, uiColumn } from "../../../../../ui/dsl/uiColumnDsl";
 import { spriteImageSource, uiImage } from "../../../../../ui/dsl/uiImageDsl";
 import { uiText } from "../../../../../ui/dsl/uiTextDsl";
 import { uiAlignment } from "../../../../../ui/uiAlignment";
-import { SpriteBackground } from "../../../../../ui/uiBackground";
 import { fillUiSize, wrapUiSize } from "../../../../../ui/uiSize";
 import { UIView } from "../../../../../ui/uiView";
 import { UIFlowGrid } from "../../../../../ui/view/uiFlowGrid";
@@ -23,11 +22,7 @@ import { OpenBookUIBackground } from "../../../../../ui/visual/bookBackground";
 import { InventoryComponent } from "../../../../world/component/inventory/inventoryComponent";
 import { InteractionState } from "../../../handler/interactionState";
 import { InteractionStateChanger } from "../../../handler/interactionStateChanger";
-import {
-    UIActionbar,
-    UIActionbarAlignment,
-    UIActionbarItem,
-} from "../../../view/actionbar/uiActionbar";
+import { UIActionbarItem } from "../../../view/actionbar/uiActionbar";
 import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold";
 import { AlertMessageState } from "../../common/alertMessageState";
 import { EquipItemState } from "./equipItemState";
@@ -35,8 +30,8 @@ import { UIInventoryGridItem } from "./uiInventoryGridItem";
 
 export class InventoryState extends InteractionState {
     private _masterDetailsView!: UIMasterDetails;
-    private _actionbar: UIActionbar | null = null;
     private _selectedGridItemView: UIInventoryGridItem | undefined;
+    private _scaffold: UIActionbarScaffold | null = null;
     private _items: InventoryItemList = [];
     private _activeItem: number = 0;
 
@@ -51,15 +46,6 @@ export class InventoryState extends InteractionState {
     override onActive(): void {
         this.getInventoryItemList();
         const actions = this.getActionbarItems();
-        this._actionbar = new UIActionbar(
-            actions,
-            new SpriteBackground(sprites2.stone_slate_background_2x),
-            UIActionbarAlignment.Left,
-            {
-                width: fillUiSize,
-                height: fillUiSize,
-            }
-        );
 
         const gridView = this.getMasterGridView();
         const detailsView = this.getDetailsView(0);
@@ -84,13 +70,12 @@ export class InventoryState extends InteractionState {
             children: [this._masterDetailsView],
         });
 
-        const scaffoldView = new UIActionbarScaffold(
-            contentView,
-            this._actionbar,
-            null,
-            { width: fillUiSize, height: fillUiSize }
-        );
+        const scaffoldView = new UIActionbarScaffold(contentView, actions, [], {
+            width: fillUiSize,
+            height: fillUiSize,
+        });
 
+        this._scaffold = scaffoldView;
         this.view = scaffoldView;
     }
 
@@ -139,10 +124,8 @@ export class InventoryState extends InteractionState {
         this._activeItem = index;
         this._selectedGridItemView = view;
         view.isSelected = true;
-        if (this._actionbar) {
-            const items = this.getActionbarItems();
-            this._actionbar.updateItems(items);
-        }
+        const items = this.getActionbarItems();
+        this._scaffold?.setLeftMenu(items);
     }
 
     private getInventoryItemList() {

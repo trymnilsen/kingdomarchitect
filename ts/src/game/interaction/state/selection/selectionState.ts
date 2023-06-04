@@ -2,7 +2,6 @@ import { sprites2 } from "../../../../asset/sprite";
 import { allSides } from "../../../../common/sides";
 import { RenderContext } from "../../../../rendering/renderContext";
 import { uiBox } from "../../../../ui/dsl/uiBoxDsl";
-import { SpriteBackground } from "../../../../ui/uiBackground";
 import { fillUiSize } from "../../../../ui/uiSize";
 import { WorkerBehaviorComponent } from "../../../world/component/behavior/workerBehaviorComponent";
 import { JobQueueComponent } from "../../../world/component/job/jobQueueComponent";
@@ -16,11 +15,7 @@ import { SelectedWorldItem } from "../../../world/selection/selectedWorldItem";
 import { GroundTile } from "../../../world/tile/ground";
 import { TileSize } from "../../../world/tile/tile";
 import { InteractionState } from "../../handler/interactionState";
-import {
-    UIActionbar,
-    UIActionbarAlignment,
-    UIActionbarItem,
-} from "../../view/actionbar/uiActionbar";
+import { UIActionbarItem } from "../../view/actionbar/uiActionbar";
 import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold";
 import { CharacterSkillState } from "../character/characterSkillState";
 import { ChopJobState } from "../resource/chopJopState";
@@ -96,27 +91,16 @@ export class SelectionState extends InteractionState {
 
     private updateTileActions() {
         const actions = this.getTileActions(this.selectedItem);
-        const leftActionbar = new UIActionbar(
-            actions,
-            new SpriteBackground(sprites2.stone_slate_background_2x),
-            UIActionbarAlignment.Left,
-            {
-                width: fillUiSize,
-                height: fillUiSize,
-            }
-        );
 
         const contentView = uiBox({
             width: fillUiSize,
             height: fillUiSize,
         });
 
-        const scaffoldView = new UIActionbarScaffold(
-            contentView,
-            leftActionbar,
-            null,
-            { width: fillUiSize, height: fillUiSize }
-        );
+        const scaffoldView = new UIActionbarScaffold(contentView, actions, [], {
+            width: fillUiSize,
+            height: fillUiSize,
+        });
 
         this.view = scaffoldView;
     }
