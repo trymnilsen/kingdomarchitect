@@ -9,7 +9,7 @@ import { createFirstTileSet } from "../../../../data/tileset/firstTile";
 import { createRandomTileSet } from "../../../../data/tileset/randomTileSet";
 import { Tileset } from "../../../../data/tileset/tileset";
 import { RenderContext } from "../../../../rendering/renderContext";
-import { getChunkPosition } from "../../chunk";
+import { ChunkSize, getChunkPosition } from "../../chunk";
 import { getTileId, TileSize } from "../../tile/tile";
 import { EntityComponent } from "../entityComponent";
 import { Ground } from "./ground";
@@ -32,8 +32,8 @@ export class TilesComponent extends EntityComponent implements Ground {
     private chunkMap: { [id: string]: GroundChunk } = {};
     constructor() {
         super();
-        for (let x = 0; x < 3; x++) {
-            for (let y = 0; y < 3; y++) {
+        for (let x = 0; x < ChunkSize; x++) {
+            for (let y = 0; y < ChunkSize; y++) {
                 const id = getTileId(x, y);
                 this.tileMap[id] = {
                     tileX: x,
@@ -72,10 +72,10 @@ export class TilesComponent extends EntityComponent implements Ground {
             }
         }
         return {
-            x1: minX * 3,
-            y1: minY * 3,
-            x2: maxX * 3 + 2,
-            y2: maxY * 3 + 2,
+            x1: minX * ChunkSize,
+            y1: minY * ChunkSize,
+            x2: maxX * ChunkSize + ChunkSize - 1,
+            y2: maxY * ChunkSize + ChunkSize - 1,
         };
     }
 
