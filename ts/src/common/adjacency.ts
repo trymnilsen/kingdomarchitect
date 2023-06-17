@@ -1,0 +1,16 @@
+export enum Adjacency {
+    Left = "left",
+    Right = "right",
+    Upper = "upper",
+    Bottom = "bottom",
+    LeftRight = "leftright",
+    LeftRightUpper = "leftrightupper",
+    LeftUpper = "leftupper",
+    LeftBottom = "leftbottom",
+    LeftRightBottom = "leftrightbottom",
+    LeftRightUpperBottom = "leftrightupperbottom",
+    RightUpper = "rightupper",
+    RightUpperBottom = "rightupperbottom",
+    RightBottom = "rightbottom",
+    UpperBottom = "upperbottom",
+}

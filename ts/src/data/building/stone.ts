@@ -1,4 +1,5 @@
 import { sprites2 } from "../../asset/sprite";
+import { wallAdjacency } from "./adjacency/wallAdjacency";
 import { Building } from "./building";
 
 export const stoneBuildings: Building[] = [
@@ -6,6 +7,7 @@ export const stoneBuildings: Building[] = [
         icon: sprites2.stone_wood_walls,
         name: "Stone wall",
         scale: 1,
+        adjacencySprite: wallAdjacency,
     },
     {
         icon: sprites2.building_tower,

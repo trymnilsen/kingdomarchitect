@@ -8,7 +8,8 @@ export function buildingPrefab(id: string, building: Building): Entity {
     const entity = new Entity(id);
     const buildingComponent = new BuildingComponent(
         building.icon,
-        sprites2.wooden_house_scaffold
+        sprites2.wooden_house_scaffold,
+        building
     );
     const currentHealth = 10;
 

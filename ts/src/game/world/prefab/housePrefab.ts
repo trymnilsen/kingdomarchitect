@@ -1,4 +1,5 @@
 import { sprites2 } from "../../../asset/sprite";
+import { woodenBuildings } from "../../../data/building/wood";
 import { BuildingComponent } from "../component/building/buildingComponent";
 import { HousingComponent } from "../component/building/housingComponent";
 import { HealthComponent } from "../component/health/healthComponent";
@@ -12,7 +13,8 @@ export function housePrefab(
     const house = new Entity(id);
     const buildingComponent = new BuildingComponent(
         sprites2.wooden_house,
-        sprites2.wooden_house_scaffold
+        sprites2.wooden_house_scaffold,
+        woodenBuildings[0]
     );
 
     let currentHealth = 100;
