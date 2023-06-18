@@ -3,15 +3,15 @@
 
 > Medieval simulation/city builder game for the browser.
 
-[About the project](#about-the-project)
+[About the project](#📜-about-the-project)
 
-[Play](#play)
+[Play](#🕹️-play)
 
-[Development](#development)
+[Development](#👩‍💻-development)
 
-[Contributing](#contributing)
+[Contributing](#🙋-contributing)
 
-[FAQ](#faq)
+[FAQ](#❓-faq)
 
 ## 📜 About the project
 
@@ -66,6 +66,7 @@ Items that are not directly connected to the game world, like menus and screens 
 |-------------|---------------------------------------------------------------|
 | asset       | code related to load and lookup of assets can be found here.  |
 | common      | generic code that can be used across the whole application    |
+| data        | defintions and lists for the items/buildings in game          |
 | game        | the game logic, both hud and world code                       |
 | input       | code related to recieveing input from the browser             |
 | path        | pathfinding and graphing code                                 |
@@ -74,10 +75,17 @@ Items that are not directly connected to the game world, like menus and screens 
 
 ### Tooling
 
-Currently we only rely on typescript and webpack, but there will come custom tool scripts for things like bin-packing the assets into shared sheets.
+#### Transpiling and bundling
+
+Typescript and webpack is used for transpiling and bundling the code.
+This is performed with the `build` npm task.
+
+#### Spritepacking
+
+To optimize, remove unused parts of images and bundling them together into a spritebin the `spritepack` npm task can be used. If you update any of the images in `asset` you need to run this task to get the updated version to show up in game. The source for this can be found in `ts/tool/spritepack`.
 
 ### Testing
-Some tests already exists for the game, these are made in mocha with chai as the assertion library. Some files are currently just scaffold and some contain actuall test code. These tests can be run with `npm run test`. We also have coverage, but this is not for the sake of the total coverage number but as a tool to check if you exercise what you expect to excersise in your test.
+Some tests already exists for the game, these are made in mocha with chai as the assertion library. Some files are currently just scaffold and some contain actuall test code. These tests can be run with `npm  test`. We also have coverage, but this is not for the sake of the total coverage number but as a tool to check if you exercise what you expect to excercise in your test.
 
 ## ❓ FAQ
 
