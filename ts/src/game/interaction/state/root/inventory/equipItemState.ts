@@ -100,7 +100,7 @@ export class EquipItemState extends InteractionState {
                 y: tile.tileY,
             })
             .filter((entity) => {
-                isWorker(entity);
+                return isWorker(entity);
             });
 
         if (workers.length > 0) {
