@@ -10,6 +10,7 @@ import { fillUiSize } from "../../../../ui/uiSize";
 import { InventoryComponent } from "../../../world/component/inventory/inventoryComponent";
 import { TilesComponent } from "../../../world/component/tile/tilesComponent";
 import { BuildJob } from "../../../world/job/jobs/buildJob";
+import { buildingFactory } from "../../../world/prefab/buildingFactory";
 import { buildingPrefab } from "../../../world/prefab/buildingPrefab";
 import { GroundTile } from "../../../world/tile/ground";
 import { TileSize } from "../../../world/tile/tile";
@@ -155,10 +156,7 @@ export class BuildConfirmState extends InteractionState {
 
         if (removeResult) {
             for (const selection of selections) {
-                const house = buildingPrefab(
-                    generateId("building"),
-                    this.building
-                );
+                const house = buildingFactory(this.building);
                 house.position = selection;
                 this.context.world.rootEntity.addChild(house);
                 this.context.world.jobQueue.schedule(new BuildJob(house));

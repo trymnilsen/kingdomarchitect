@@ -1,10 +1,15 @@
 import { sprites2 } from "../../../asset/sprite";
 import { Building } from "../../../data/building/building";
 import { BuildingComponent } from "../component/building/buildingComponent";
+import { EntityComponent } from "../component/entityComponent";
 import { HealthComponent } from "../component/health/healthComponent";
 import { Entity } from "../entity/entity";
 
-export function buildingPrefab(id: string, building: Building): Entity {
+export function buildingPrefab(
+    id: string,
+    building: Building,
+    extraComponents: EntityComponent[]
+): Entity {
     const entity = new Entity(id);
     const buildingComponent = new BuildingComponent(
         building.icon,
@@ -20,5 +25,9 @@ export function buildingPrefab(id: string, building: Building): Entity {
 
     entity.addComponent(buildingComponent);
     entity.addComponent(healthComponent);
+
+    for (const extraComponent of extraComponents) {
+        entity.addComponent(extraComponent);
+    }
     return entity;
 }
