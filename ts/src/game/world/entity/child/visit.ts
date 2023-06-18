@@ -1,7 +1,8 @@
 import { Entity } from "../entity";
 
 /**
- * Visit each of the children and nested children for the given entity
+ * Visit the entity and each of the children and nested
+ * children for the given entity
  * @param entity the entity to visit
  * @param visitor the function to run on each visit of an entity.
  *  return true to stop visiting

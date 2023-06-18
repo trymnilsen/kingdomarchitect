@@ -194,9 +194,10 @@ export class Entity {
             );
         }
         entityComponent.entity = this;
-        // If there is a parent we are in the entity tree
-        // call any lifecycle methods on the component
-        entityComponent.onStart(0);
+        // call any lifecycle methods on the component if we are attached
+        if (this.isAttached()) {
+            entityComponent.onStart(0);
+        }
 
         this._componentsMap[componentName] = entityComponent;
         this._components = Object.values(this._componentsMap);

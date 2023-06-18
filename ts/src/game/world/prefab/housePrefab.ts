@@ -1,7 +1,7 @@
 import { sprites2 } from "../../../asset/sprite";
 import { woodenBuildings } from "../../../data/building/wood";
 import { BuildingComponent } from "../component/building/buildingComponent";
-import { HousingComponent } from "../component/building/housingComponent";
+import { HousingComponent } from "../component/housing/housingComponent";
 import { HealthComponent } from "../component/health/healthComponent";
 import { Entity } from "../entity/entity";
 
@@ -29,7 +29,7 @@ export function housePrefab(
         max: 100,
     });
 
-    const housingComponent = new HousingComponent(initalResident);
+    const housingComponent = new HousingComponent();
     house.addComponent(buildingComponent);
     house.addComponent(healthComponent);
     house.addComponent(housingComponent);

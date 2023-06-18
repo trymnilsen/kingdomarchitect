@@ -1,6 +1,7 @@
 import { assert } from "chai";
 import { Entity } from "../../../src/game/world/entity/entity";
 import { StubComponent } from "../component/stubComponent";
+import { RootEntity } from "../../../src/game/world/entity/rootEntity";
 
 describe("Entity test", () => {
     it("Add child entity", () => {
@@ -108,9 +109,25 @@ describe("Entity test", () => {
         assert.strictEqual(ancestorComponent, component);
     });
 
-    it("Run component lifecycle methods on add if entity is attached", () => {
+    it("Do not run lifecycle methods if entity is not attached", () => {
         let startInvoked = false;
         const parent = new Entity("1");
+        const child = new Entity("2");
+        const component = new StubComponent({
+            onStart: () => {
+                startInvoked = true;
+            },
+        });
+
+        parent.addChild(child);
+        child.addComponent(component);
+
+        assert.isFalse(startInvoked);
+    });
+
+    it("Run lifecycle methods if entity is attached", () => {
+        let startInvoked = false;
+        const parent = new RootEntity("1");
         const child = new Entity("2");
         const component = new StubComponent({
             onStart: () => {
