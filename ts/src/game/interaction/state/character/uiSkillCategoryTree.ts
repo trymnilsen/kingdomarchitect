@@ -1,16 +1,16 @@
-import { Sprite2, sprites2 } from "../../../../asset/sprite";
-import { allSides } from "../../../../common/sides";
-import { SkillCategory, SkillTree } from "../../../../data/skill/skill";
-import { uiBox } from "../../../../ui/dsl/uiBoxDsl";
-import { uiButton } from "../../../../ui/dsl/uiButtonDsl";
-import { ColumnChild, uiColumn } from "../../../../ui/dsl/uiColumnDsl";
-import { uiImage } from "../../../../ui/dsl/uiImageDsl";
-import { RowChild, uiRow } from "../../../../ui/dsl/uiRowDsl";
-import { HorizontalAlignment } from "../../../../ui/uiAlignment";
-import { SpriteBackground } from "../../../../ui/uiBackground";
-import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize";
-import { UIBox } from "../../../../ui/view/uiBox";
-import { UISpriteImageSource } from "../../../../ui/view/uiImageSource";
+import { Sprite2, sprites2 } from "../../../../asset/sprite.js";
+import { allSides } from "../../../../common/sides.js";
+import { SkillCategory, SkillTree } from "../../../../data/skill/skill.js";
+import { uiBox } from "../../../../ui/dsl/uiBoxDsl.js";
+import { uiButton } from "../../../../ui/dsl/uiButtonDsl.js";
+import { ColumnChild, uiColumn } from "../../../../ui/dsl/uiColumnDsl.js";
+import { uiImage } from "../../../../ui/dsl/uiImageDsl.js";
+import { RowChild, uiRow } from "../../../../ui/dsl/uiRowDsl.js";
+import { HorizontalAlignment } from "../../../../ui/uiAlignment.js";
+import { SpriteBackground } from "../../../../ui/uiBackground.js";
+import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize.js";
+import { UIBox } from "../../../../ui/view/uiBox.js";
+import { UISpriteImageSource } from "../../../../ui/view/uiImageSource.js";
 
 export class UISkillCategoryTree extends UIBox {
     constructor(

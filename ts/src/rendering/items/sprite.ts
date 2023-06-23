@@ -1,6 +1,6 @@
-import { Sprite2 } from "../../asset/sprite";
-import { Sides } from "../../common/sides";
-import { RenderItemConfiguration } from "./renderItemConfiguration";
+import { Sprite2 } from "../../asset/sprite.js";
+import { Sides } from "../../common/sides.js";
+import { RenderItemConfiguration } from "./renderItemConfiguration.js";
 
 export interface SpriteConfiguration extends RenderItemConfiguration {
     sprite: Sprite2;

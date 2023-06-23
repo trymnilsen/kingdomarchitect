@@ -1,6 +1,6 @@
-import { ConstructorFunction } from "../constructor";
-import { InvalidArgumentError } from "../error/invalidArgumentError";
-import { EventSubscriptionHandler } from "../event";
+import { ConstructorFunction } from "../constructor.js";
+import { InvalidArgumentError } from "../error/invalidArgumentError.js";
+import { EventSubscriptionHandler } from "../event.js";
 
 /**
  * An event that allows listening for a specific event type.

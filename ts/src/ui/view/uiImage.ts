@@ -1,9 +1,9 @@
-import { Point } from "../../common/point";
-import { UIRenderContext } from "../../rendering/uiRenderContext";
-import { UILayoutContext } from "../uiLayoutContext";
-import { UISize, fillUiSize, wrapUiSize } from "../uiSize";
-import { UIView } from "../uiView";
-import { UIImageSource } from "./uiImageSource";
+import { Point } from "../../common/point.js";
+import { UIRenderContext } from "../../rendering/uiRenderContext.js";
+import { UILayoutContext } from "../uiLayoutContext.js";
+import { UISize, fillUiSize, wrapUiSize } from "../uiSize.js";
+import { UIView } from "../uiView.js";
+import { UIImageSource } from "./uiImageSource.js";
 
 export class UIImage extends UIView {
     private _image: UIImageSource | null = null;

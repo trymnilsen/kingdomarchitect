@@ -1,4 +1,4 @@
-import * as binsJson from "../../../generated/bins.json";
+import * as binsJson from "../../../generated/bins.json.js";
 export class AssetLoader {
     private _assets: { [name: string]: HTMLImageElement } = {};
 

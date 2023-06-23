@@ -1,8 +1,8 @@
-import { AssetLoader } from "../asset/loader/assetLoader";
-import { rgbToHex } from "../common/color";
-import { GameTime } from "../common/time";
-import { Camera } from "./camera";
-import { RenderContext } from "./renderContext";
+import { AssetLoader } from "../asset/loader/assetLoader.js";
+import { rgbToHex } from "../common/color.js";
+import { GameTime } from "../common/time.js";
+import { Camera } from "./camera.js";
+import { RenderContext } from "./renderContext.js";
 
 export class Renderer {
     private canvasContext: CanvasRenderingContext2D;

@@ -1,16 +1,16 @@
-import { Point, zeroPoint } from "../../common/point";
+import { Point, zeroPoint } from "../../common/point.js";
 import {
     Sides,
     totalHorizontal,
     totalVertical,
     zeroSides,
-} from "../../common/sides";
-import { defaultTextStyle, TextStyle } from "../../rendering/text/textStyle";
-import { UIRenderContext } from "../../rendering/uiRenderContext";
-import { calculateAlignment, uiAlignment } from "../uiAlignment";
-import { UILayoutContext } from "../uiLayoutContext";
-import { fillUiSize, UISize, wrapUiSize } from "../uiSize";
-import { UIView } from "../uiView";
+} from "../../common/sides.js";
+import { defaultTextStyle, TextStyle } from "../../rendering/text/textStyle.js";
+import { UIRenderContext } from "../../rendering/uiRenderContext.js";
+import { calculateAlignment, uiAlignment } from "../uiAlignment.js";
+import { UILayoutContext } from "../uiLayoutContext.js";
+import { fillUiSize, UISize, wrapUiSize } from "../uiSize.js";
+import { UIView } from "../uiView.js";
 
 export class UIText extends UIView {
     private _textStyle: TextStyle = defaultTextStyle;

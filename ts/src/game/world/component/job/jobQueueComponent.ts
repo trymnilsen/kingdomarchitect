@@ -1,15 +1,15 @@
-import { removeItem } from "../../../../common/array";
-import { InvalidStateError } from "../../../../common/error/invalidStateError";
-import { Event, EventListener } from "../../../../common/event";
-import { Point } from "../../../../common/point";
-import { RenderContext } from "../../../../rendering/renderContext";
-import { Job } from "../../job/job";
-import { Entity } from "../../entity/entity";
-import { EntityComponent } from "../entityComponent";
-import { JobQuery } from "./query/jobQuery";
-import { JobQueue } from "./jobQueue";
-import { JobRunnerComponent } from "./jobRunnerComponent";
-import { JobOwner } from "./jobOwner";
+import { removeItem } from "../../../../common/array.js";
+import { InvalidStateError } from "../../../../common/error/invalidStateError.js";
+import { Event, EventListener } from "../../../../common/event.js";
+import { Point } from "../../../../common/point.js";
+import { RenderContext } from "../../../../rendering/renderContext.js";
+import { Job } from "../../job/job.js";
+import { Entity } from "../../entity/entity.js";
+import { EntityComponent } from "../entityComponent.js";
+import { JobQuery } from "./query/jobQuery.js";
+import { JobQueue } from "./jobQueue.js";
+import { JobRunnerComponent } from "./jobRunnerComponent.js";
+import { JobOwner } from "./jobOwner.js";
 
 export class JobQueueComponent
     extends EntityComponent

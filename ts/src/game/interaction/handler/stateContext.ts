@@ -1,7 +1,7 @@
-import { AssetLoader } from "../../../asset/loader/assetLoader";
-import { GameTime } from "../../../common/time";
-import { World } from "../../world/world";
-import { InteractionStateChanger } from "./interactionStateChanger";
+import { AssetLoader } from "../../../asset/loader/assetLoader.js";
+import { GameTime } from "../../../common/time.js";
+import { World } from "../../world/world.js";
+import { InteractionStateChanger } from "./interactionStateChanger.js";
 
 export interface StateContext {
     world: World;

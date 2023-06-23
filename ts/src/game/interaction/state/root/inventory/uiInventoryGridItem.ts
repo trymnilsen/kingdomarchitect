@@ -1,11 +1,11 @@
-import { Sprite2, sprites2 } from "../../../../../asset/sprite";
-import { allSides } from "../../../../../common/sides";
-import { UIRenderContext } from "../../../../../rendering/uiRenderContext";
-import { UIThemeType } from "../../../../../ui/color";
-import { ninePatchBackground } from "../../../../../ui/dsl/uiBackgroundDsl";
-import { UILayoutContext } from "../../../../../ui/uiLayoutContext";
-import { fillUiSize, UISize } from "../../../../../ui/uiSize";
-import { UIButton } from "../../../../../ui/view/uiButton";
+import { Sprite2, sprites2 } from "../../../../../asset/sprite.js";
+import { allSides } from "../../../../../common/sides.js";
+import { UIRenderContext } from "../../../../../rendering/uiRenderContext.js";
+import { UIThemeType } from "../../../../../ui/color.js";
+import { ninePatchBackground } from "../../../../../ui/dsl/uiBackgroundDsl.js";
+import { UILayoutContext } from "../../../../../ui/uiLayoutContext.js";
+import { fillUiSize, UISize } from "../../../../../ui/uiSize.js";
+import { UIButton } from "../../../../../ui/view/uiButton.js";
 
 export class UIInventoryGridItem extends UIButton {
     constructor(

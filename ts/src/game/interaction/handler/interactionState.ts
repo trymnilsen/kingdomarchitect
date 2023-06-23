@@ -1,14 +1,14 @@
-import { sprites2 } from "../../../asset/sprite";
-import { Point } from "../../../common/point";
-import { allSides } from "../../../common/sides";
-import { InputAction } from "../../../input/inputAction";
-import { RenderContext } from "../../../rendering/renderContext";
-import { UIEvent } from "../../../ui/event/uiEvent";
-import { FocusState } from "../../../ui/focus/focusState";
-import { UIView } from "../../../ui/uiView";
-import { GroundTile } from "../../world/tile/ground";
-import { InteractionStateChanger } from "./interactionStateChanger";
-import { StateContext } from "./stateContext";
+import { sprites2 } from "../../../asset/sprite.js";
+import { Point } from "../../../common/point.js";
+import { allSides } from "../../../common/sides.js";
+import { InputAction } from "../../../input/inputAction.js";
+import { RenderContext } from "../../../rendering/renderContext.js";
+import { UIEvent } from "../../../ui/event/uiEvent.js";
+import { FocusState } from "../../../ui/focus/focusState.js";
+import { UIView } from "../../../ui/uiView.js";
+import { GroundTile } from "../../world/tile/ground.js";
+import { InteractionStateChanger } from "./interactionStateChanger.js";
+import { StateContext } from "./stateContext.js";
 
 /**
  * Interaction is built up as a simple state machine. Each state can via the

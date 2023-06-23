@@ -1,6 +1,6 @@
 import { assert } from "chai";
-import { uiBox } from "../../src/ui/dsl/uiBoxDsl";
-import { doTestLayout } from "./layoutContextStub";
+import { uiBox } from "../../src/ui/dsl/uiBoxDsl.js";
+import { doTestLayout } from "./layoutContextStub.js";
 
 describe("uiView test", () => {
     it("has 4 corners", () => {

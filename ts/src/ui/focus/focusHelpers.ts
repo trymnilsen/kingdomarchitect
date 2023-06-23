@@ -1,12 +1,12 @@
-import { boundsContains, boundsOverlap } from "../../common/bounds";
-import { Direction, invertDirection } from "../../common/direction";
-import { InvalidArgumentError } from "../../common/error/invalidArgumentError";
+import { boundsContains, boundsOverlap } from "../../common/bounds.js";
+import { Direction, invertDirection } from "../../common/direction.js";
+import { InvalidArgumentError } from "../../common/error/invalidArgumentError.js";
 import {
     closestPointOnLine,
     manhattanDistance,
     Point,
-} from "../../common/point";
-import { UIView } from "../uiView";
+} from "../../common/point.js";
+import { UIView } from "../uiView.js";
 
 export function getFocusableViews(rootView: UIView): UIView[] {
     return rootView.getViews((view) => view.isFocusable);

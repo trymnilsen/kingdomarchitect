@@ -3,7 +3,7 @@ import {
     NumberRange,
     rangeDistance,
     rangeRandom,
-} from "../../src/common/range";
+} from "../../src/common/range.js";
 
 describe("Range test", () => {
     it("can pick random number in range", () => {

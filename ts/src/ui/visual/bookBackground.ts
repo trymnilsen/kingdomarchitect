@@ -1,9 +1,9 @@
-import { sprites2 } from "../../asset/sprite";
-import { Point } from "../../common/point";
-import { allSides } from "../../common/sides";
-import { UIRenderContext } from "../../rendering/uiRenderContext";
-import { UIBackground } from "../uiBackground";
-import { UISize } from "../uiSize";
+import { sprites2 } from "../../asset/sprite.js";
+import { Point } from "../../common/point.js";
+import { allSides } from "../../common/sides.js";
+import { UIRenderContext } from "../../rendering/uiRenderContext.js";
+import { UIBackground } from "../uiBackground.js";
+import { UISize } from "../uiSize.js";
 
 export class OpenBookUIBackground implements UIBackground {
     draw(context: UIRenderContext, screenPosition: Point, size: UISize): void {

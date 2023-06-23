@@ -1,12 +1,16 @@
-import { sprites2 } from "../../../../asset/sprite";
-import { Bounds, zeroBounds } from "../../../../common/bounds";
-import { Point, addPoint, zeroPoint } from "../../../../common/point";
-import { Skill, SkillCategory, SkillTree } from "../../../../data/skill/skill";
-import { skills } from "../../../../data/skill/skills";
-import { UIRenderContext } from "../../../../rendering/uiRenderContext";
-import { UILayoutContext } from "../../../../ui/uiLayoutContext";
-import { UISize } from "../../../../ui/uiSize";
-import { UIView } from "../../../../ui/uiView";
+import { sprites2 } from "../../../../asset/sprite.js";
+import { Bounds, zeroBounds } from "../../../../common/bounds.js";
+import { Point, addPoint, zeroPoint } from "../../../../common/point.js";
+import {
+    Skill,
+    SkillCategory,
+    SkillTree,
+} from "../../../../data/skill/skill.js";
+import { skills } from "../../../../data/skill/skills.js";
+import { UIRenderContext } from "../../../../rendering/uiRenderContext.js";
+import { UILayoutContext } from "../../../../ui/uiLayoutContext.js";
+import { UISize } from "../../../../ui/uiSize.js";
+import { UIView } from "../../../../ui/uiView.js";
 
 export class UISkillTree extends UIView {
     private scrollTranslation: Point = {

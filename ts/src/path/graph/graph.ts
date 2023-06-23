@@ -1,4 +1,4 @@
-import { Point } from "../../common/point";
+import { Point } from "../../common/point.js";
 
 export interface Graph {
     nodeAt(x: number, y: number): GraphNode | null;

@@ -1,11 +1,11 @@
-import { generateId } from "../../../../common/idGenerator";
-import { firstChildWhere } from "../../entity/child/first";
-import { Entity } from "../../entity/entity";
-import { workerPrefab } from "../../prefab/workerPrefab";
-import { WorkerBehaviorComponent } from "../behavior/workerBehaviorComponent";
-import { EntityComponent } from "../entityComponent";
-import { HealthComponent } from "../health/healthComponent";
-import { TenantComponent } from "./tenantComponent";
+import { generateId } from "../../../../common/idGenerator.js";
+import { firstChildWhere } from "../../entity/child/first.js";
+import { Entity } from "../../entity/entity.js";
+import { workerPrefab } from "../../prefab/workerPrefab.js";
+import { WorkerBehaviorComponent } from "../behavior/workerBehaviorComponent.js";
+import { EntityComponent } from "../entityComponent.js";
+import { HealthComponent } from "../health/healthComponent.js";
+import { TenantComponent } from "./tenantComponent.js";
 
 /**
  * The housing component manages npcs living in a building and

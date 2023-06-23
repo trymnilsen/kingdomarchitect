@@ -1,6 +1,6 @@
-import { Entity } from "../../entity/entity";
-import { Job } from "../job";
-import { JobConstraint } from "../jobConstraint";
+import { Entity } from "../../entity/entity.js";
+import { Job } from "../job.js";
+import { JobConstraint } from "../jobConstraint.js";
 
 /**
  * A debug constraint if the job should stay in the queue forever

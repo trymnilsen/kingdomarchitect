@@ -1,11 +1,11 @@
-import { Point } from "../../common/point";
-import { defaultTextStyle, TextStyle } from "../../rendering/text/textStyle";
-import { UIRenderContext } from "../../rendering/uiRenderContext";
-import { HorizontalAlignment } from "../uiAlignment";
-import { UILayoutContext } from "../uiLayoutContext";
-import { UISize } from "../uiSize";
-import { UIView } from "../uiView";
-import { UIImageSource } from "./uiImageSource";
+import { Point } from "../../common/point.js";
+import { defaultTextStyle, TextStyle } from "../../rendering/text/textStyle.js";
+import { UIRenderContext } from "../../rendering/uiRenderContext.js";
+import { HorizontalAlignment } from "../uiAlignment.js";
+import { UILayoutContext } from "../uiLayoutContext.js";
+import { UISize } from "../uiSize.js";
+import { UIView } from "../uiView.js";
+import { UIImageSource } from "./uiImageSource.js";
 
 export class UITextWithIcon extends UIView {
     private _textStyle: TextStyle = defaultTextStyle;

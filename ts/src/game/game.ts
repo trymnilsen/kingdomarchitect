@@ -1,12 +1,12 @@
-import { AssetLoader } from "../asset/loader/assetLoader";
-import { changeX, changeY, invert, Point } from "../common/point";
-import { MutableGameTime } from "../common/time";
-import { Input, InputEvent } from "../input/input";
-import { InputActionType } from "../input/inputAction";
-import { TouchInput } from "../input/touchInput";
-import { Renderer } from "../rendering/renderer";
-import { MainScene, Scene } from "./mainScene";
-import { TileSize } from "./world/tile/tile";
+import { AssetLoader } from "../asset/loader/assetLoader.js";
+import { changeX, changeY, invert, Point } from "../common/point.js";
+import { MutableGameTime } from "../common/time.js";
+import { Input, InputEvent } from "../input/input.js";
+import { InputActionType } from "../input/inputAction.js";
+import { TouchInput } from "../input/touchInput.js";
+import { Renderer } from "../rendering/renderer.js";
+import { MainScene, Scene } from "./mainScene.js";
+import { TileSize } from "./world/tile/tile.js";
 
 export class Game {
     private renderer: Renderer;

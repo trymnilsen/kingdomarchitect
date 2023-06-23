@@ -1,7 +1,7 @@
 import { assert } from "chai";
-import { Entity } from "../../../src/game/world/entity/entity";
-import { StubComponent } from "../component/stubComponent";
-import { RootEntity } from "../../../src/game/world/entity/rootEntity";
+import { Entity } from "../../../src/game/world/entity/entity.js";
+import { StubComponent } from "../component/stubComponent.js";
+import { RootEntity } from "../../../src/game/world/entity/rootEntity.js";
 
 describe("Entity test", () => {
     it("Add child entity", () => {

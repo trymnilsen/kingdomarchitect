@@ -1,11 +1,11 @@
-import { getBounds } from "../../common/bounds";
-import { Point } from "../../common/point";
+import { getBounds } from "../../common/bounds.js";
+import { Point } from "../../common/point.js";
 import {
     GroundChunk,
     GroundTile,
-} from "../../game/world/component/tile/tilesComponent";
-import { Entity } from "../../game/world/entity/entity";
-import { Tileset, TileSetFactory } from "./tileset";
+} from "../../game/world/component/tile/tilesComponent.js";
+import { Entity } from "../../game/world/entity/entity.js";
+import { Tileset, TileSetFactory } from "./tileset.js";
 
 export function createRandomTileSet(chunk: GroundChunk): Tileset {
     const tiles: Point[] = [];

@@ -1,12 +1,12 @@
-import { sprites2 } from "../../../../../asset/sprite";
-import { allSides } from "../../../../../common/sides";
-import { ninePatchBackground } from "../../../../../ui/dsl/uiBackgroundDsl";
-import { uiButton } from "../../../../../ui/dsl/uiButtonDsl";
-import { uiColumn } from "../../../../../ui/dsl/uiColumnDsl";
-import { uiSpace } from "../../../../../ui/dsl/uiSpaceDsl";
-import { HorizontalAlignment } from "../../../../../ui/uiAlignment";
-import { wrapUiSize } from "../../../../../ui/uiSize";
-import { UIView } from "../../../../../ui/uiView";
+import { sprites2 } from "../../../../../asset/sprite.js";
+import { allSides } from "../../../../../common/sides.js";
+import { ninePatchBackground } from "../../../../../ui/dsl/uiBackgroundDsl.js";
+import { uiButton } from "../../../../../ui/dsl/uiButtonDsl.js";
+import { uiColumn } from "../../../../../ui/dsl/uiColumnDsl.js";
+import { uiSpace } from "../../../../../ui/dsl/uiSpaceDsl.js";
+import { HorizontalAlignment } from "../../../../../ui/uiAlignment.js";
+import { wrapUiSize } from "../../../../../ui/uiSize.js";
+import { UIView } from "../../../../../ui/uiView.js";
 
 export function bookTabs(onTap: (tab: number) => void): UIView {
     return uiColumn({

@@ -1,19 +1,19 @@
-import { Sprite2, sprites2 } from "../../../asset/sprite";
-import { Point, addPoint } from "../../../common/point";
-import { allSides } from "../../../common/sides";
-import { UIRenderContext } from "../../../rendering/uiRenderContext";
-import { ninePatchBackground } from "../../../ui/dsl/uiBackgroundDsl";
-import { uiButton } from "../../../ui/dsl/uiButtonDsl";
-import { ColumnChild, uiColumn } from "../../../ui/dsl/uiColumnDsl";
-import { spriteImageSource, uiImage } from "../../../ui/dsl/uiImageDsl";
-import { uiSpace } from "../../../ui/dsl/uiSpaceDsl";
-import { HorizontalAlignment, uiAlignment } from "../../../ui/uiAlignment";
-import { UILayoutContext } from "../../../ui/uiLayoutContext";
-import { UISize, wrapUiSize, zeroSize } from "../../../ui/uiSize";
-import { UIView } from "../../../ui/uiView";
-import { NullView } from "../../../ui/view/nullView";
-import { UIColumn } from "../../../ui/view/uiColumn";
-import { OpenBookUIBackground } from "../../../ui/visual/bookBackground";
+import { Sprite2, sprites2 } from "../../../asset/sprite.js";
+import { Point, addPoint } from "../../../common/point.js";
+import { allSides } from "../../../common/sides.js";
+import { UIRenderContext } from "../../../rendering/uiRenderContext.js";
+import { ninePatchBackground } from "../../../ui/dsl/uiBackgroundDsl.js";
+import { uiButton } from "../../../ui/dsl/uiButtonDsl.js";
+import { ColumnChild, uiColumn } from "../../../ui/dsl/uiColumnDsl.js";
+import { spriteImageSource, uiImage } from "../../../ui/dsl/uiImageDsl.js";
+import { uiSpace } from "../../../ui/dsl/uiSpaceDsl.js";
+import { HorizontalAlignment, uiAlignment } from "../../../ui/uiAlignment.js";
+import { UILayoutContext } from "../../../ui/uiLayoutContext.js";
+import { UISize, wrapUiSize, zeroSize } from "../../../ui/uiSize.js";
+import { UIView } from "../../../ui/uiView.js";
+import { NullView } from "../../../ui/view/nullView.js";
+import { UIColumn } from "../../../ui/view/uiColumn.js";
+import { OpenBookUIBackground } from "../../../ui/visual/bookBackground.js";
 
 export class UIBookLayout extends UIView {
     private _leftPage: UIView = new NullView();

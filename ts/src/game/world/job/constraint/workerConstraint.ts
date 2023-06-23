@@ -1,7 +1,7 @@
-import { WorkerBehaviorComponent } from "../../component/behavior/workerBehaviorComponent";
-import { Entity } from "../../entity/entity";
-import { Job } from "../job";
-import { JobConstraint } from "../jobConstraint";
+import { WorkerBehaviorComponent } from "../../component/behavior/workerBehaviorComponent.js";
+import { Entity } from "../../entity/entity.js";
+import { Job } from "../job.js";
+import { JobConstraint } from "../jobConstraint.js";
 
 /**
  * A constrain that will filter for if the entity is worker constraint

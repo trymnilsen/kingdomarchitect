@@ -1,32 +1,35 @@
-import { Sprite2, sprites2 } from "../../../../../asset/sprite";
-import { allSides, symmetricSides } from "../../../../../common/sides";
-import { bookInkColor } from "../../../../../ui/color";
-import { ninePatchBackground } from "../../../../../ui/dsl/uiBackgroundDsl";
-import { uiBox } from "../../../../../ui/dsl/uiBoxDsl";
-import { uiButton } from "../../../../../ui/dsl/uiButtonDsl";
-import { uiColumn } from "../../../../../ui/dsl/uiColumnDsl";
-import { spriteImageSource, uiImage } from "../../../../../ui/dsl/uiImageDsl";
-import { uiRow } from "../../../../../ui/dsl/uiRowDsl";
-import { uiSpace } from "../../../../../ui/dsl/uiSpaceDsl";
-import { uiText } from "../../../../../ui/dsl/uiTextDsl";
-import { uiAlignment } from "../../../../../ui/uiAlignment";
-import { UIView } from "../../../../../ui/uiView";
-import { fillUiSize, wrapUiSize } from "../../../../../ui/uiSize";
-import { InteractionState } from "../../../handler/interactionState";
-import { BuildConfirmState } from "../../building2/buildConfirmState";
-import { UIBookLayout, UIBookLayoutTab } from "../../../view/uiBookLayout";
-import { Building } from "../../../../../data/building/building";
-import { woodenBuildings } from "../../../../../data/building/wood";
-import { stoneBuildings } from "../../../../../data/building/stone";
-import { goldBuildings } from "../../../../../data/building/gold";
-import { foodBuildings } from "../../../../../data/building/food";
-import { SpriteBackground } from "../../../../../ui/uiBackground";
+import { Sprite2, sprites2 } from "../../../../../asset/sprite.js";
+import { allSides, symmetricSides } from "../../../../../common/sides.js";
+import { bookInkColor } from "../../../../../ui/color.js";
+import { ninePatchBackground } from "../../../../../ui/dsl/uiBackgroundDsl.js";
+import { uiBox } from "../../../../../ui/dsl/uiBoxDsl.js";
+import { uiButton } from "../../../../../ui/dsl/uiButtonDsl.js";
+import { uiColumn } from "../../../../../ui/dsl/uiColumnDsl.js";
+import {
+    spriteImageSource,
+    uiImage,
+} from "../../../../../ui/dsl/uiImageDsl.js";
+import { uiRow } from "../../../../../ui/dsl/uiRowDsl.js";
+import { uiSpace } from "../../../../../ui/dsl/uiSpaceDsl.js";
+import { uiText } from "../../../../../ui/dsl/uiTextDsl.js";
+import { uiAlignment } from "../../../../../ui/uiAlignment.js";
+import { UIView } from "../../../../../ui/uiView.js";
+import { fillUiSize, wrapUiSize } from "../../../../../ui/uiSize.js";
+import { InteractionState } from "../../../handler/interactionState.js";
+import { BuildConfirmState } from "../../building2/buildConfirmState.js";
+import { UIBookLayout, UIBookLayoutTab } from "../../../view/uiBookLayout.js";
+import { Building } from "../../../../../data/building/building.js";
+import { woodenBuildings } from "../../../../../data/building/wood.js";
+import { stoneBuildings } from "../../../../../data/building/stone.js";
+import { goldBuildings } from "../../../../../data/building/gold.js";
+import { foodBuildings } from "../../../../../data/building/food.js";
+import { SpriteBackground } from "../../../../../ui/uiBackground.js";
 import {
     UIActionbar,
     UIActionbarAlignment,
     UIActionbarItem,
-} from "../../../view/actionbar/uiActionbar";
-import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold";
+} from "../../../view/actionbar/uiActionbar.js";
+import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold.js";
 
 export class BuildingState extends InteractionState {
     private _masterDetailsView: UIBookLayout;

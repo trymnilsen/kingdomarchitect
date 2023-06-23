@@ -1,11 +1,11 @@
-import { sprites2 } from "../../../../../asset/sprite";
-import { rgbToHex } from "../../../../../common/color";
-import { Point } from "../../../../../common/point";
-import { GameTime, TimeOfDay } from "../../../../../common/time";
-import { UIRenderContext } from "../../../../../rendering/uiRenderContext";
-import { UILayoutContext } from "../../../../../ui/uiLayoutContext";
-import { UISize } from "../../../../../ui/uiSize";
-import { UIView } from "../../../../../ui/uiView";
+import { sprites2 } from "../../../../../asset/sprite.js";
+import { rgbToHex } from "../../../../../common/color.js";
+import { Point } from "../../../../../common/point.js";
+import { GameTime, TimeOfDay } from "../../../../../common/time.js";
+import { UIRenderContext } from "../../../../../rendering/uiRenderContext.js";
+import { UILayoutContext } from "../../../../../ui/uiLayoutContext.js";
+import { UISize } from "../../../../../ui/uiSize.js";
+import { UIView } from "../../../../../ui/uiView.js";
 
 export class UITimeline extends UIView {
     private spaceBetweenWidth: number = wantedSpaceBetween;

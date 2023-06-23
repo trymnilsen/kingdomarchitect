@@ -1,5 +1,5 @@
-import { manhattanDistance } from "../../common/point";
-import { UIView } from "../uiView";
+import { manhattanDistance } from "../../common/point.js";
+import { UIView } from "../uiView.js";
 
 export class FocusState {
     private _currentFocus: UIView | null = null;

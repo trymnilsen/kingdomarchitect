@@ -1,6 +1,6 @@
-import { GroundTile } from "../tile/ground";
-import { ChopTreeJob } from "./jobs/chopTreeJob";
-import { Job } from "./job";
+import { GroundTile } from "../tile/ground.js";
+import { ChopTreeJob } from "./jobs/chopTreeJob.js";
+import { Job } from "./job.js";
 
 export interface JobQuery {
     matches(job: Job): boolean;

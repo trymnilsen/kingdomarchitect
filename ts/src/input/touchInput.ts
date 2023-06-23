@@ -1,4 +1,4 @@
-import { distance, Point, subtractPoint } from "../common/point";
+import { distance, Point, subtractPoint } from "../common/point.js";
 
 export interface OnPanEvent {
     movement: Point;

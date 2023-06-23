@@ -1,10 +1,10 @@
-import { Bounds } from "../common/bounds";
-import { RectangleConfiguration } from "./items/rectangle";
+import { Bounds } from "../common/bounds.js";
+import { RectangleConfiguration } from "./items/rectangle.js";
 import {
     NinePatchSpriteConfiguration,
     SpriteConfiguration,
-} from "./items/sprite";
-import { TextConfiguration } from "./items/text";
+} from "./items/sprite.js";
+import { TextConfiguration } from "./items/text.js";
 
 export interface UIRenderContext {
     drawScreenSpaceSprite(sprite: SpriteConfiguration): void;

@@ -1,6 +1,6 @@
-import { FixedGraph } from "../../src/path/graph/fixedGraph";
-import { PathSearch } from "../../src/path/search";
-import { createGraphFromTestFile, verifyPath } from "./testGraph";
+import { FixedGraph } from "../../src/path/graph/fixedGraph.js";
+import { PathSearch } from "../../src/path/search.js";
+import { createGraphFromTestFile, verifyPath } from "./testGraph.js";
 
 describe("Maze tests", () => {
     it(`Maze test - maze1.png`, async () => {

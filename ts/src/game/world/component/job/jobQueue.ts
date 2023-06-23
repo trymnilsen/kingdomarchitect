@@ -1,5 +1,5 @@
-import { EventListener } from "../../../../common/event";
-import { Job } from "../../job/job";
+import { EventListener } from "../../../../common/event.js";
+import { Job } from "../../job/job.js";
 
 export interface JobQueue {
     readonly pendingJobs: Job[];

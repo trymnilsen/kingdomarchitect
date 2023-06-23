@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import { LazyGraph } from "../../src/path/graph/lazyGraph";
+import { LazyGraph } from "../../src/path/graph/lazyGraph.js";
 
 describe("Lazy graph test", () => {
     it("Can get node at", () => {

@@ -1,6 +1,6 @@
-import { sprites2 } from "../../asset/sprite";
-import { wallAdjacency } from "./adjacency/wallAdjacency";
-import { Building } from "./building";
+import { sprites2 } from "../../asset/sprite.js";
+import { wallAdjacency } from "./adjacency/wallAdjacency.js";
+import { Building } from "./building.js";
 
 export const stoneBuildings: Building[] = [
     {

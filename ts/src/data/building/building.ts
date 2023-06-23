@@ -1,5 +1,5 @@
-import { Sprite2 } from "../../asset/sprite";
-import { Adjacency } from "../../common/adjacency";
+import { Sprite2 } from "../../asset/sprite.js";
+import { Adjacency } from "../../common/adjacency.js";
 
 export interface Building {
     icon: Sprite2;

@@ -1,15 +1,15 @@
-import { sprites2 } from "../../../../../asset/sprite";
-import { Point } from "../../../../../common/point";
-import { allSides } from "../../../../../common/sides";
-import { RenderContext } from "../../../../../rendering/renderContext";
-import { EquipmentComponent } from "../../../../world/component/inventory/equipmentComponent";
-import { Entity } from "../../../../world/entity/entity";
-import { TileSize } from "../../../../world/tile/tile";
-import { InteractionState } from "../../../handler/interactionState";
-import { UIActionbarItem } from "../../../view/actionbar/uiActionbar";
-import { CharacterSkillState } from "../../character/characterSkillState";
-import { ActorMovementState } from "./actorMovementState";
-import { ActorSelectionPresenter } from "./actorSelectionPresenter";
+import { sprites2 } from "../../../../../asset/sprite.js";
+import { Point } from "../../../../../common/point.js";
+import { allSides } from "../../../../../common/sides.js";
+import { RenderContext } from "../../../../../rendering/renderContext.js";
+import { EquipmentComponent } from "../../../../world/component/inventory/equipmentComponent.js";
+import { Entity } from "../../../../world/entity/entity.js";
+import { TileSize } from "../../../../world/tile/tile.js";
+import { InteractionState } from "../../../handler/interactionState.js";
+import { UIActionbarItem } from "../../../view/actionbar/uiActionbar.js";
+import { CharacterSkillState } from "../../character/characterSkillState.js";
+import { ActorMovementState } from "./actorMovementState.js";
+import { ActorSelectionPresenter } from "./actorSelectionPresenter.js";
 
 export class ActorSelectionState extends InteractionState {
     private presenter: ActorSelectionPresenter | null = null;

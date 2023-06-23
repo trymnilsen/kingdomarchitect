@@ -1,4 +1,4 @@
-import { Direction } from "./direction";
+import { Direction } from "./direction.js";
 
 /**
  * A point represents a pair of numbers used to represent a point in space

@@ -3,9 +3,9 @@ import * as fs from "fs/promises";
 import { MaxRectsPacker } from "maxrects-packer";
 import { NdArray } from "ndarray";
 import * as path from "path";
-import { removeItem } from "../../src/common/array";
-import { BitmapImage } from "./bitmapImage";
-import { getPixelsAsync, PixelColor } from "./pixels";
+import { removeItem } from "../../src/common/array.js";
+import { BitmapImage } from "./bitmapImage.js";
+import { getPixelsAsync, PixelColor } from "./pixels.js";
 
 const assetPath = path.join(process.cwd(), "asset");
 

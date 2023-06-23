@@ -1,5 +1,5 @@
-import { InputAction, InputActionType } from "./inputAction";
-import { Event, EventListener } from "../common/event";
+import { InputAction, InputActionType } from "./inputAction.js";
+import { Event, EventListener } from "../common/event.js";
 
 export type KeyboardMap = { [key: string]: InputActionType };
 

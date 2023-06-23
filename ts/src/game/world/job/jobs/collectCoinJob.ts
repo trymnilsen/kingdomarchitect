@@ -1,7 +1,7 @@
-import { Point } from "../../../../common/point";
-import { NeverAssignConstraint } from "../constraint/neverAssignConstraint";
-import { Job } from "../job";
-import { MoveToBeforeJob } from "./moveToBeforeJob";
+import { Point } from "../../../../common/point.js";
+import { NeverAssignConstraint } from "../constraint/neverAssignConstraint.js";
+import { Job } from "../job.js";
+import { MoveToBeforeJob } from "./moveToBeforeJob.js";
 
 export class CollectCoinJob extends MoveToBeforeJob {
     constructor(tileToCollectCoinOn: Point) {

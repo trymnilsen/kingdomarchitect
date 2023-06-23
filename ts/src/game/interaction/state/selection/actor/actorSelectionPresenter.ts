@@ -1,20 +1,23 @@
-import { sprites2 } from "../../../../../asset/sprite";
-import { subTitleTextStyle } from "../../../../../rendering/text/textStyle";
-import { uiBox } from "../../../../../ui/dsl/uiBoxDsl";
-import { uiButton } from "../../../../../ui/dsl/uiButtonDsl";
-import { uiColumn } from "../../../../../ui/dsl/uiColumnDsl";
-import { spriteImageSource, uiImage } from "../../../../../ui/dsl/uiImageDsl";
-import { uiText } from "../../../../../ui/dsl/uiTextDsl";
-import { uiAlignment } from "../../../../../ui/uiAlignment";
-import { SpriteBackground } from "../../../../../ui/uiBackground";
-import { fillUiSize, wrapUiSize } from "../../../../../ui/uiSize";
-import { UIView } from "../../../../../ui/uiView";
-import { UIBox } from "../../../../../ui/view/uiBox";
-import { UIColumn } from "../../../../../ui/view/uiColumn";
-import { UIActionbarItem } from "../../../view/actionbar/uiActionbar";
-import { actionbarWidth } from "../../../view/actionbar/uiActionbarConstants";
-import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold";
-import { StatePresenter } from "../../../view/statePresenter";
+import { sprites2 } from "../../../../../asset/sprite.js";
+import { subTitleTextStyle } from "../../../../../rendering/text/textStyle.js";
+import { uiBox } from "../../../../../ui/dsl/uiBoxDsl.js";
+import { uiButton } from "../../../../../ui/dsl/uiButtonDsl.js";
+import { uiColumn } from "../../../../../ui/dsl/uiColumnDsl.js";
+import {
+    spriteImageSource,
+    uiImage,
+} from "../../../../../ui/dsl/uiImageDsl.js";
+import { uiText } from "../../../../../ui/dsl/uiTextDsl.js";
+import { uiAlignment } from "../../../../../ui/uiAlignment.js";
+import { SpriteBackground } from "../../../../../ui/uiBackground.js";
+import { fillUiSize, wrapUiSize } from "../../../../../ui/uiSize.js";
+import { UIView } from "../../../../../ui/uiView.js";
+import { UIBox } from "../../../../../ui/view/uiBox.js";
+import { UIColumn } from "../../../../../ui/view/uiColumn.js";
+import { UIActionbarItem } from "../../../view/actionbar/uiActionbar.js";
+import { actionbarWidth } from "../../../view/actionbar/uiActionbarConstants.js";
+import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold.js";
+import { StatePresenter } from "../../../view/statePresenter.js";
 
 export class ActorSelectionPresenter implements StatePresenter {
     private scaffold: UIActionbarScaffold;

@@ -1,8 +1,8 @@
-import { InventoryComponent } from "../../../component/inventory/inventoryComponent";
-import { ChestComponent } from "../../../component/resource/chestComponent";
-import { WorkerConstraint } from "../../constraint/workerConstraint";
-import { Job } from "../../job";
-import { MoveToBeforeJob } from "../moveToBeforeJob";
+import { InventoryComponent } from "../../../component/inventory/inventoryComponent.js";
+import { ChestComponent } from "../../../component/resource/chestComponent.js";
+import { WorkerConstraint } from "../../constraint/workerConstraint.js";
+import { Job } from "../../job.js";
+import { MoveToBeforeJob } from "../moveToBeforeJob.js";
 
 export class CollectChestJob extends MoveToBeforeJob {
     constructor(chest: ChestComponent) {

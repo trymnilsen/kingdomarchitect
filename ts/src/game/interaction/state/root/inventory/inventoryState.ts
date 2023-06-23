@@ -1,32 +1,35 @@
-import { Sprite2, sprites2 } from "../../../../../asset/sprite";
-import { Direction } from "../../../../../common/direction";
-import { allSides, symmetricSides } from "../../../../../common/sides";
+import { Sprite2, sprites2 } from "../../../../../asset/sprite.js";
+import { Direction } from "../../../../../common/direction.js";
+import { allSides, symmetricSides } from "../../../../../common/sides.js";
 import {
     InventoryItem,
     ItemTag,
-} from "../../../../../data/inventory/inventoryItem";
-import { InventoryItemList } from "../../../../../data/inventory/inventoryItemQuantity";
-import { InputAction } from "../../../../../input/inputAction";
-import { UIThemeType, bookInkColor } from "../../../../../ui/color";
-import { ninePatchBackground } from "../../../../../ui/dsl/uiBackgroundDsl";
-import { uiBox } from "../../../../../ui/dsl/uiBoxDsl";
-import { ColumnChild, uiColumn } from "../../../../../ui/dsl/uiColumnDsl";
-import { spriteImageSource, uiImage } from "../../../../../ui/dsl/uiImageDsl";
-import { uiText } from "../../../../../ui/dsl/uiTextDsl";
-import { uiAlignment } from "../../../../../ui/uiAlignment";
-import { fillUiSize, wrapUiSize } from "../../../../../ui/uiSize";
-import { UIView } from "../../../../../ui/uiView";
-import { UIFlowGrid } from "../../../../../ui/view/uiFlowGrid";
-import { UIMasterDetails } from "../../../../../ui/view/uiMasterDetail";
-import { OpenBookUIBackground } from "../../../../../ui/visual/bookBackground";
-import { InventoryComponent } from "../../../../world/component/inventory/inventoryComponent";
-import { InteractionState } from "../../../handler/interactionState";
-import { InteractionStateChanger } from "../../../handler/interactionStateChanger";
-import { UIActionbarItem } from "../../../view/actionbar/uiActionbar";
-import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold";
-import { AlertMessageState } from "../../common/alertMessageState";
-import { EquipItemState } from "./equipItemState";
-import { UIInventoryGridItem } from "./uiInventoryGridItem";
+} from "../../../../../data/inventory/inventoryItem.js";
+import { InventoryItemList } from "../../../../../data/inventory/inventoryItemQuantity.js";
+import { InputAction } from "../../../../../input/inputAction.js";
+import { UIThemeType, bookInkColor } from "../../../../../ui/color.js";
+import { ninePatchBackground } from "../../../../../ui/dsl/uiBackgroundDsl.js";
+import { uiBox } from "../../../../../ui/dsl/uiBoxDsl.js";
+import { ColumnChild, uiColumn } from "../../../../../ui/dsl/uiColumnDsl.js";
+import {
+    spriteImageSource,
+    uiImage,
+} from "../../../../../ui/dsl/uiImageDsl.js";
+import { uiText } from "../../../../../ui/dsl/uiTextDsl.js";
+import { uiAlignment } from "../../../../../ui/uiAlignment.js";
+import { fillUiSize, wrapUiSize } from "../../../../../ui/uiSize.js";
+import { UIView } from "../../../../../ui/uiView.js";
+import { UIFlowGrid } from "../../../../../ui/view/uiFlowGrid.js";
+import { UIMasterDetails } from "../../../../../ui/view/uiMasterDetail.js";
+import { OpenBookUIBackground } from "../../../../../ui/visual/bookBackground.js";
+import { InventoryComponent } from "../../../../world/component/inventory/inventoryComponent.js";
+import { InteractionState } from "../../../handler/interactionState.js";
+import { InteractionStateChanger } from "../../../handler/interactionStateChanger.js";
+import { UIActionbarItem } from "../../../view/actionbar/uiActionbar.js";
+import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold.js";
+import { AlertMessageState } from "../../common/alertMessageState.js";
+import { EquipItemState } from "./equipItemState.js";
+import { UIInventoryGridItem } from "./uiInventoryGridItem.js";
 
 export class InventoryState extends InteractionState {
     private _masterDetailsView!: UIMasterDetails;

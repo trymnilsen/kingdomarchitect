@@ -1,7 +1,7 @@
-import { VerticalAlignment } from "../uiAlignment";
-import { UIView } from "../uiView";
-import { UIRow } from "../view/uiRow";
-import { UIViewProperties } from "./uiViewDsl";
+import { VerticalAlignment } from "../uiAlignment.js";
+import { UIView } from "../uiView.js";
+import { UIRow } from "../view/uiRow.js";
+import { UIViewProperties } from "./uiViewDsl.js";
 
 export interface RowChild {
     child: UIView;

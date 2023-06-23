@@ -1,9 +1,9 @@
-import { Point } from "../../common/point";
-import { Sides } from "../../common/sides";
-import { UIBackground } from "../uiBackground";
-import { UIView } from "../uiView";
-import { UIBox } from "../view/uiBox";
-import { UIViewProperties } from "./uiViewDsl";
+import { Point } from "../../common/point.js";
+import { Sides } from "../../common/sides.js";
+import { UIBackground } from "../uiBackground.js";
+import { UIView } from "../uiView.js";
+import { UIBox } from "../view/uiBox.js";
+import { UIViewProperties } from "./uiViewDsl.js";
 
 export interface UIBoxProperties extends UIViewProperties {
     alignment?: Point;

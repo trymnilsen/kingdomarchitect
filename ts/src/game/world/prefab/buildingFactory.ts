@@ -1,10 +1,10 @@
-import { generateId } from "../../../common/idGenerator";
-import { Building } from "../../../data/building/building";
-import { woodenBuildings } from "../../../data/building/wood";
-import { EntityComponent } from "../component/entityComponent";
-import { HousingComponent } from "../component/housing/housingComponent";
-import { Entity } from "../entity/entity";
-import { buildingPrefab } from "./buildingPrefab";
+import { generateId } from "../../../common/idGenerator.js";
+import { Building } from "../../../data/building/building.js";
+import { woodenBuildings } from "../../../data/building/wood.js";
+import { EntityComponent } from "../component/entityComponent.js";
+import { HousingComponent } from "../component/housing/housingComponent.js";
+import { Entity } from "../entity/entity.js";
+import { buildingPrefab } from "./buildingPrefab.js";
 
 export function buildingFactory(building: Building): Entity {
     const extraComponents: EntityComponent[] = [];

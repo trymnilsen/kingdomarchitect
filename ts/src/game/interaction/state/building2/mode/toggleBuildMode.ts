@@ -1,5 +1,5 @@
-import { Point } from "../../../../../common/point";
-import { BuildMode, BuildModeDescription } from "./buildMode";
+import { Point } from "../../../../../common/point.js";
+import { BuildMode, BuildModeDescription } from "./buildMode.js";
 
 export class ToggleBuildMode implements BuildMode {
     get description(): BuildModeDescription {

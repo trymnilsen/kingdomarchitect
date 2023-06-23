@@ -1,8 +1,8 @@
-import { Point } from "../../../../common/point";
-import { NumberRange } from "../../../../common/range";
-import { RenderContext } from "../../../../rendering/renderContext";
-import { EntityComponent } from "../entityComponent";
-import { HealthEvent } from "./healthEvent";
+import { Point } from "../../../../common/point.js";
+import { NumberRange } from "../../../../common/range.js";
+import { RenderContext } from "../../../../rendering/renderContext.js";
+import { EntityComponent } from "../entityComponent.js";
+import { HealthEvent } from "./healthEvent.js";
 
 export class HealthComponent extends EntityComponent {
     private _health: number;

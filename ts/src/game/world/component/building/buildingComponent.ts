@@ -1,10 +1,10 @@
-import { Sprite2 } from "../../../../asset/sprite";
-import { Adjacency } from "../../../../common/adjacency";
-import { Point } from "../../../../common/point";
-import { Building } from "../../../../data/building/building";
-import { RenderContext } from "../../../../rendering/renderContext";
-import { RootEntity } from "../../entity/rootEntity";
-import { EntityComponent } from "../entityComponent";
+import { Sprite2 } from "../../../../asset/sprite.js";
+import { Adjacency } from "../../../../common/adjacency.js";
+import { Point } from "../../../../common/point.js";
+import { Building } from "../../../../data/building/building.js";
+import { RenderContext } from "../../../../rendering/renderContext.js";
+import { RootEntity } from "../../entity/rootEntity.js";
+import { EntityComponent } from "../entityComponent.js";
 
 export class BuildingComponent extends EntityComponent {
     private buildingSprite: Sprite2;

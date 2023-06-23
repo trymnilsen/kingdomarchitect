@@ -1,5 +1,5 @@
-import { Point } from "../common/point";
-import { GraphNode } from "./graph/graph";
+import { Point } from "../common/point.js";
+import { GraphNode } from "./graph/graph.js";
 
 export function manhattanDistance(
     from: GraphNode | Point,

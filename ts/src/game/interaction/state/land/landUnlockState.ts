@@ -1,27 +1,31 @@
-import { sprites2 } from "../../../../asset/sprite";
-import { sizeOfBounds, withinRectangle } from "../../../../common/bounds";
-import { InvalidStateError } from "../../../../common/error/invalidStateError";
-import { Point, manhattanDistance, zeroPoint } from "../../../../common/point";
-import { allSides } from "../../../../common/sides";
-import { woodResourceItem } from "../../../../data/inventory/resources";
-import { RenderContext } from "../../../../rendering/renderContext";
-import { titleTextStyle } from "../../../../rendering/text/textStyle";
-import { colorBackground } from "../../../../ui/dsl/uiBackgroundDsl";
-import { uiBox } from "../../../../ui/dsl/uiBoxDsl";
-import { uiImage } from "../../../../ui/dsl/uiImageDsl";
-import { uiRow } from "../../../../ui/dsl/uiRowDsl";
-import { uiSpace } from "../../../../ui/dsl/uiSpaceDsl";
-import { uiText } from "../../../../ui/dsl/uiTextDsl";
-import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize";
-import { UIView } from "../../../../ui/uiView";
-import { UISpriteImageSource } from "../../../../ui/view/uiImageSource";
-import { InventoryComponent } from "../../../world/component/inventory/inventoryComponent";
-import { TilesComponent } from "../../../world/component/tile/tilesComponent";
-import { UnlockableArea } from "../../../world/component/tile/unlockableArea";
-import { TileSize } from "../../../world/tile/tile";
-import { InteractionState } from "../../handler/interactionState";
-import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold";
-import { AlertMessageState } from "../common/alertMessageState";
+import { sprites2 } from "../../../../asset/sprite.js";
+import { sizeOfBounds, withinRectangle } from "../../../../common/bounds.js";
+import { InvalidStateError } from "../../../../common/error/invalidStateError.js";
+import {
+    Point,
+    manhattanDistance,
+    zeroPoint,
+} from "../../../../common/point.js";
+import { allSides } from "../../../../common/sides.js";
+import { woodResourceItem } from "../../../../data/inventory/resources.js";
+import { RenderContext } from "../../../../rendering/renderContext.js";
+import { titleTextStyle } from "../../../../rendering/text/textStyle.js";
+import { colorBackground } from "../../../../ui/dsl/uiBackgroundDsl.js";
+import { uiBox } from "../../../../ui/dsl/uiBoxDsl.js";
+import { uiImage } from "../../../../ui/dsl/uiImageDsl.js";
+import { uiRow } from "../../../../ui/dsl/uiRowDsl.js";
+import { uiSpace } from "../../../../ui/dsl/uiSpaceDsl.js";
+import { uiText } from "../../../../ui/dsl/uiTextDsl.js";
+import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize.js";
+import { UIView } from "../../../../ui/uiView.js";
+import { UISpriteImageSource } from "../../../../ui/view/uiImageSource.js";
+import { InventoryComponent } from "../../../world/component/inventory/inventoryComponent.js";
+import { TilesComponent } from "../../../world/component/tile/tilesComponent.js";
+import { UnlockableArea } from "../../../world/component/tile/unlockableArea.js";
+import { TileSize } from "../../../world/tile/tile.js";
+import { InteractionState } from "../../handler/interactionState.js";
+import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold.js";
+import { AlertMessageState } from "../common/alertMessageState.js";
 
 export class LandUnlockState extends InteractionState {
     private unlockableArea: UnlockableArea[] = [];

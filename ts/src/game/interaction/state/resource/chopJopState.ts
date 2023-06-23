@@ -1,11 +1,11 @@
-import { sprites2 } from "../../../../asset/sprite";
-import { RenderContext } from "../../../../rendering/renderContext";
-import { uiBox } from "../../../../ui/dsl/uiBoxDsl";
-import { fillUiSize } from "../../../../ui/uiSize";
-import { ChopTreeJob } from "../../../world/job/jobs/chopTreeJob";
-import { SelectedWorldItem } from "../../../world/selection/selectedWorldItem";
-import { InteractionState } from "../../handler/interactionState";
-import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold";
+import { sprites2 } from "../../../../asset/sprite.js";
+import { RenderContext } from "../../../../rendering/renderContext.js";
+import { uiBox } from "../../../../ui/dsl/uiBoxDsl.js";
+import { fillUiSize } from "../../../../ui/uiSize.js";
+import { ChopTreeJob } from "../../../world/job/jobs/chopTreeJob.js";
+import { SelectedWorldItem } from "../../../world/selection/selectedWorldItem.js";
+import { InteractionState } from "../../handler/interactionState.js";
+import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold.js";
 
 export class ChopJobState extends InteractionState {
     constructor(private selection: SelectedWorldItem) {

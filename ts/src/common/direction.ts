@@ -1,4 +1,4 @@
-import { randomEntry } from "./array";
+import { randomEntry } from "./array.js";
 
 export enum Direction {
     Up = "up",

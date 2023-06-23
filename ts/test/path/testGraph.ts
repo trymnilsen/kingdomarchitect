@@ -2,7 +2,7 @@ import { assert } from "chai";
 import getPixels from "get-pixels";
 import { NdArray } from "ndarray";
 import * as path from "path";
-import { Point, pointEquals, zeroPoint } from "../../src/common/point";
+import { Point, pointEquals, zeroPoint } from "../../src/common/point.js";
 
 export async function createGraphFromTestFile(
     mazeName: string

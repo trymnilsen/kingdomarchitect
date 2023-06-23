@@ -1,5 +1,5 @@
-import { Direction } from "../../common/direction";
-import { Point } from "../../common/point";
+import { Direction } from "../../common/direction.js";
+import { Point } from "../../common/point.js";
 
 export type UIEvent = UITapEvent | UIInputEvent;
 

@@ -1,6 +1,6 @@
-import { InputAction } from "./inputAction";
-import { Keyboard } from "./keyboard";
-import { Event, EventListener } from "../common/event";
+import { InputAction } from "./inputAction.js";
+import { Keyboard } from "./keyboard.js";
+import { Event, EventListener } from "../common/event.js";
 
 export interface InputEvent {
     action: InputAction;

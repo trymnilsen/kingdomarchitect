@@ -1,4 +1,4 @@
-import { RenderItemConfiguration } from "./renderItemConfiguration";
+import { RenderItemConfiguration } from "./renderItemConfiguration.js";
 
 export interface RectangleConfiguration extends RenderItemConfiguration {
     width: number;

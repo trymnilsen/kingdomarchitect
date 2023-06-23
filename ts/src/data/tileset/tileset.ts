@@ -1,7 +1,7 @@
-import { Bounds } from "../../common/bounds";
-import { Point } from "../../common/point";
-import { GroundTile } from "../../game/world/component/tile/tilesComponent";
-import { Entity } from "../../game/world/entity/entity";
+import { Bounds } from "../../common/bounds.js";
+import { Point } from "../../common/point.js";
+import { GroundTile } from "../../game/world/component/tile/tilesComponent.js";
+import { Entity } from "../../game/world/entity/entity.js";
 
 /**
  * Represent as set of tiles that can be unlocked

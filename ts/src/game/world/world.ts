@@ -1,20 +1,20 @@
-import { generateId } from "../../common/idGenerator";
-import { PathSearch } from "../../path/search";
-import { RenderContext } from "../../rendering/renderContext";
-import { InventoryComponent } from "./component/inventory/inventoryComponent";
-import { JobQueue } from "./component/job/jobQueue";
-import { JobQueueComponent } from "./component/job/jobQueueComponent";
+import { generateId } from "../../common/idGenerator.js";
+import { PathSearch } from "../../path/search.js";
+import { RenderContext } from "../../rendering/renderContext.js";
+import { InventoryComponent } from "./component/inventory/inventoryComponent.js";
+import { JobQueue } from "./component/job/jobQueue.js";
+import { JobQueueComponent } from "./component/job/jobQueueComponent.js";
 import {
     createGraphFromNodes,
     createLazyGraphFromRootNode,
-} from "./component/root/path/generateGraph";
-import { PathFindingComponent } from "./component/root/path/pathFindingComponent";
-import { Ground } from "./component/tile/ground";
-import { TilesComponent } from "./component/tile/tilesComponent";
-import { RootEntity } from "./entity/rootEntity";
-import { farmPrefab } from "./prefab/farmPrefab";
-import { housePrefab } from "./prefab/housePrefab";
-import { workerPrefab } from "./prefab/workerPrefab";
+} from "./component/root/path/generateGraph.js";
+import { PathFindingComponent } from "./component/root/path/pathFindingComponent.js";
+import { Ground } from "./component/tile/ground.js";
+import { TilesComponent } from "./component/tile/tilesComponent.js";
+import { RootEntity } from "./entity/rootEntity.js";
+import { farmPrefab } from "./prefab/farmPrefab.js";
+import { housePrefab } from "./prefab/housePrefab.js";
+import { workerPrefab } from "./prefab/workerPrefab.js";
 
 export class World {
     private _pathSearch: PathSearch;

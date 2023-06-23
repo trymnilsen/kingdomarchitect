@@ -1,4 +1,4 @@
-import { Point } from "../../common/point";
+import { Point } from "../../common/point.js";
 
 export const ChunkSize = 3;
 

@@ -1,9 +1,9 @@
-import { InvalidStateError } from "../../../common/error/invalidStateError";
-import { NotInitializedError } from "../../../common/error/notInitializedError";
-import { RenderContext } from "../../../rendering/renderContext";
-import { JobOwner } from "../component/job/jobOwner";
-import { Entity } from "../entity/entity";
-import { JobConstraint } from "./jobConstraint";
+import { InvalidStateError } from "../../../common/error/invalidStateError.js";
+import { NotInitializedError } from "../../../common/error/notInitializedError.js";
+import { RenderContext } from "../../../rendering/renderContext.js";
+import { JobOwner } from "../component/job/jobOwner.js";
+import { Entity } from "../entity/entity.js";
+import { JobConstraint } from "./jobConstraint.js";
 
 export enum JobState {
     NotStarted,

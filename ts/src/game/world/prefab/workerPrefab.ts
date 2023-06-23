@@ -1,9 +1,9 @@
-import { JobRunnerComponent } from "../component/job/jobRunnerComponent";
-import { SpriteComponent } from "../component/draw/spriteComponent";
-import { WorkerBehaviorComponent } from "../component/behavior/workerBehaviorComponent";
-import { Entity } from "../entity/entity";
-import { sprites2 } from "../../../asset/sprite";
-import { EquipmentComponent } from "../component/inventory/equipmentComponent";
+import { JobRunnerComponent } from "../component/job/jobRunnerComponent.js";
+import { SpriteComponent } from "../component/draw/spriteComponent.js";
+import { WorkerBehaviorComponent } from "../component/behavior/workerBehaviorComponent.js";
+import { Entity } from "../entity/entity.js";
+import { sprites2 } from "../../../asset/sprite.js";
+import { EquipmentComponent } from "../component/inventory/equipmentComponent.js";
 
 export function workerPrefab(id: string): Entity {
     const worker = new Entity(id);

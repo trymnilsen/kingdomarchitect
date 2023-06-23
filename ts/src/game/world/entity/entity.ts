@@ -1,17 +1,17 @@
-import { removeItem } from "../../../common/array";
-import { ConstructorFunction } from "../../../common/constructor";
-import { InvalidArgumentError } from "../../../common/error/invalidArgumentError";
-import { TypedEvent } from "../../../common/event/typedEvent";
+import { removeItem } from "../../../common/array.js";
+import { ConstructorFunction } from "../../../common/constructor.js";
+import { InvalidArgumentError } from "../../../common/error/invalidArgumentError.js";
+import { TypedEvent } from "../../../common/event/typedEvent.js";
 import {
     addPoint,
     Point,
     subtractPoint,
     zeroPoint,
-} from "../../../common/point";
-import { RenderContext } from "../../../rendering/renderContext";
-import { ComponentEvent } from "../component/componentEvent";
-import { EntityComponent } from "../component/entityComponent";
-import { EntityEvent } from "./entityEvent";
+} from "../../../common/point.js";
+import { RenderContext } from "../../../rendering/renderContext.js";
+import { ComponentEvent } from "../component/componentEvent.js";
+import { EntityComponent } from "../component/entityComponent.js";
+import { EntityEvent } from "./entityEvent.js";
 
 export class Entity {
     protected _isRoot: boolean = false;

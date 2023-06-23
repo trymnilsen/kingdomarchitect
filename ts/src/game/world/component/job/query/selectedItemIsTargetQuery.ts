@@ -1,9 +1,9 @@
-import { Job } from "../../../job/job";
-import { ChopTreeJob } from "../../../job/jobs/chopTreeJob";
-import { SelectedEntityItem } from "../../../selection/selectedEntityItem";
-import { SelectedTileItem } from "../../../selection/selectedTileItem";
-import { SelectedWorldItem } from "../../../selection/selectedWorldItem";
-import { JobQuery } from "./jobQuery";
+import { Job } from "../../../job/job.js";
+import { ChopTreeJob } from "../../../job/jobs/chopTreeJob.js";
+import { SelectedEntityItem } from "../../../selection/selectedEntityItem.js";
+import { SelectedTileItem } from "../../../selection/selectedTileItem.js";
+import { SelectedWorldItem } from "../../../selection/selectedWorldItem.js";
+import { JobQuery } from "./jobQuery.js";
 
 /**
  * Queries for jobs that is targeting the given entity. This is different

@@ -1,8 +1,8 @@
-import { Point } from "../../common/point";
-import { Sides } from "../../common/sides";
-import { TextStyle } from "../../rendering/text/textStyle";
-import { UIText } from "../view/uiText";
-import { UIViewProperties } from "./uiViewDsl";
+import { Point } from "../../common/point.js";
+import { Sides } from "../../common/sides.js";
+import { TextStyle } from "../../rendering/text/textStyle.js";
+import { UIText } from "../view/uiText.js";
+import { UIViewProperties } from "./uiViewDsl.js";
 
 export interface UITextProperties extends UIViewProperties {
     text: string;

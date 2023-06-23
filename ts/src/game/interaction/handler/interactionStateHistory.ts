@@ -1,6 +1,6 @@
-import { RootState } from "../state/root/rootState";
-import { InteractionState } from "./interactionState";
-import { StateContext } from "./stateContext";
+import { RootState } from "../state/root/rootState.js";
+import { InteractionState } from "./interactionState.js";
+import { StateContext } from "./stateContext.js";
 
 interface InteractionStateHistoryEntry {
     state: InteractionState;

@@ -1,5 +1,5 @@
-import { InventoryItem } from "../../../../data/inventory/inventoryItem";
-import { EntityComponent } from "../entityComponent";
+import { InventoryItem } from "../../../../data/inventory/inventoryItem.js";
+import { EntityComponent } from "../entityComponent.js";
 
 export class EquipmentComponent extends EntityComponent {
     private _mainItem: InventoryItem | null = null;

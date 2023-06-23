@@ -1,4 +1,4 @@
-import { Game } from "./game/game";
+import { Game } from "./game/game.js";
 
 const canvasElementId = "gameCanvas";
 

@@ -5,8 +5,8 @@ import {
     getBoundsAxis,
     withinRectangle,
     zeroBounds,
-} from "../../src/common/bounds";
-import { Axis } from "../../src/common/direction";
+} from "../../src/common/bounds.js";
+import { Axis } from "../../src/common/direction.js";
 
 describe("Bounds tests", () => {
     it("Is within rectangle", () => {

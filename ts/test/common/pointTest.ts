@@ -13,7 +13,7 @@ import {
     Point,
     subtractPoint,
     zeroPoint,
-} from "../../src/common/point";
+} from "../../src/common/point.js";
 
 describe("Point test", () => {
     it("zero point is not mutable", () => {

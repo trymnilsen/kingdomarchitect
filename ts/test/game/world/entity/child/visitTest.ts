@@ -1,6 +1,6 @@
 import { assert } from "chai";
-import { Entity } from "../../../../../src/game/world/entity/entity";
-import { visitChildren } from "../../../../../src/game/world/entity/child/visit";
+import { Entity } from "../../../../../src/game/world/entity/entity.js";
+import { visitChildren } from "../../../../../src/game/world/entity/child/visit.js";
 
 describe("Visit tests", () => {
     it("Visit entities breadth first", () => {

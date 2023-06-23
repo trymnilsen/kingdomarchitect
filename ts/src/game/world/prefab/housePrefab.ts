@@ -1,9 +1,9 @@
-import { sprites2 } from "../../../asset/sprite";
-import { woodenBuildings } from "../../../data/building/wood";
-import { BuildingComponent } from "../component/building/buildingComponent";
-import { HousingComponent } from "../component/housing/housingComponent";
-import { HealthComponent } from "../component/health/healthComponent";
-import { Entity } from "../entity/entity";
+import { sprites2 } from "../../../asset/sprite.js";
+import { woodenBuildings } from "../../../data/building/wood.js";
+import { BuildingComponent } from "../component/building/buildingComponent.js";
+import { HousingComponent } from "../component/housing/housingComponent.js";
+import { HealthComponent } from "../component/health/healthComponent.js";
+import { Entity } from "../entity/entity.js";
 
 export function housePrefab(
     id: string,
