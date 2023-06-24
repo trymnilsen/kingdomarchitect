@@ -1,4 +1,5 @@
-import { assert } from "chai";
+import { describe, it } from "node:test";
+import * as assert from "node:assert";
 
 describe("JobQueue test", () => {
     it("scheduled job is added to queue", () => {

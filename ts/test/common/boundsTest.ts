@@ -1,4 +1,5 @@
-import { assert } from "chai";
+import { describe, it } from "node:test";
+import * as assert from "node:assert";
 import {
     absBounds,
     Bounds,
@@ -15,7 +16,7 @@ describe("Bounds tests", () => {
             y: 2,
         };
         const within = withinRectangle(point, 1, 1, 5, 5);
-        assert.isTrue(within);
+        assert.equal(within, true);
     });
 
     it("top is outside rectangle", () => {
@@ -24,7 +25,7 @@ describe("Bounds tests", () => {
             y: 0,
         };
         const within = withinRectangle(point, 1, 1, 5, 5);
-        assert.isFalse(within);
+        assert.equal(within, false);
     });
 
     it("left is outside rectangle", () => {
@@ -33,7 +34,7 @@ describe("Bounds tests", () => {
             y: 2,
         };
         const within = withinRectangle(point, 1, 1, 5, 5);
-        assert.isFalse(within);
+        assert.equal(within, false);
     });
 
     it("right is outside rectangle", () => {
@@ -42,7 +43,7 @@ describe("Bounds tests", () => {
             y: 2,
         };
         const within = withinRectangle(point, 1, 1, 5, 5);
-        assert.isFalse(within);
+        assert.equal(within, false);
     });
 
     it("bottom is outside rectangle", () => {
@@ -51,7 +52,7 @@ describe("Bounds tests", () => {
             y: 6,
         };
         const within = withinRectangle(point, 1, 1, 5, 5);
-        assert.isFalse(within);
+        assert.equal(within, false);
     });
 
     it("zerobounds it not mutable", () => {

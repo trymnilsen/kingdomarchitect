@@ -1,4 +1,5 @@
-import { assert } from "chai";
+import { describe, it } from "node:test";
+import * as assert from "node:assert";
 import { Entity } from "../../../src/game/world/entity/entity.js";
 import { RootEntity } from "../../../src/game/world/entity/rootEntity.js";
 

@@ -1,4 +1,5 @@
-import { assert } from "chai";
+import { describe, it } from "node:test";
+import * as assert from "node:assert";
 import { Entity } from "../../../src/game/world/entity/entity.js";
 import { StubComponent } from "../component/stubComponent.js";
 import { RootEntity } from "../../../src/game/world/entity/rootEntity.js";
@@ -20,7 +21,6 @@ describe("Entity test", () => {
         const firstChild = new Entity("2");
 
         parent.addChild(firstChild);
-
         assert.strictEqual(firstChild.parent, parent);
     });
 
@@ -81,7 +81,10 @@ describe("Entity test", () => {
         const addedComponent = parent.getComponent(StubComponent);
 
         assert.strictEqual(addedComponent, component);
-        assert.isTrue(parent.components.some((item) => item === component));
+        assert.equal(
+            parent.components.some((item) => item === component),
+            true
+        );
     });
 
     it("Cannot add component of same type twice", () => {
@@ -122,7 +125,7 @@ describe("Entity test", () => {
         parent.addChild(child);
         child.addComponent(component);
 
-        assert.isFalse(startInvoked);
+        assert.equal(startInvoked, false);
     });
 
     it("Run lifecycle methods if entity is attached", () => {
@@ -138,7 +141,7 @@ describe("Entity test", () => {
         parent.addChild(child);
         child.addComponent(component);
 
-        assert.isTrue(startInvoked);
+        assert.equal(startInvoked, true);
     });
 
     it("Run component lifecycle when entity is attached", () => {
@@ -192,8 +195,11 @@ describe("Entity test", () => {
 
         parent.removeComponent(component);
         const removedComponent = parent.getComponent(StubComponent);
-        assert.isNull(removedComponent);
-        assert.isFalse(parent.components.some((item) => item === component));
+        assert.equal(removedComponent, null);
+        assert.equal(
+            parent.components.some((item) => item === component),
+            false
+        );
     });
 
     it("Remove component returns false on non existence", () => {
@@ -218,7 +224,7 @@ describe("Entity test", () => {
 
         child.addComponent(component);
         child.removeComponent(component);
-        assert.isTrue(stopInvoked);
+        assert.equal(stopInvoked, true);
     });
 
     it("Component lifecycle is called on remove entity", () => {

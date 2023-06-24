@@ -3,6 +3,7 @@ import * as fs from "fs/promises";
 import { MaxRectsPacker } from "maxrects-packer";
 import { NdArray } from "ndarray";
 import * as path from "path";
+import { EOL } from "os";
 import { removeItem } from "../../src/common/array.js";
 import { BitmapImage } from "./bitmapImage.js";
 import { getPixelsAsync, PixelColor } from "./pixels.js";
@@ -95,7 +96,7 @@ async function packSprites(sprites: PackableSprite[]) {
         //Index is used as data
         packer.add(sprite.definition.w, sprite.definition.h, i);
     }
-    const binNames: { [name: string]: string } = {};
+    const binNames: { name: string; filename: string }[] = [];
     const packedSprites: { [name: string]: PackedSprite } = {};
 
     //Loop over all bins and rects and output sheets
@@ -188,16 +189,26 @@ async function packSprites(sprites: PackableSprite[]) {
         }
 
         const binName = `bin-${binIndex}.png`;
-        binNames[binIndex.toString()] = binName;
+        binNames.push({
+            name: binIndex.toString(),
+            filename: binName,
+        });
         await bitmap.write(
             path.join(process.cwd(), "public", "asset", binName)
         );
     }
 
+    const binNamesJson = JSON.stringify(binNames, null, 2);
+    const spritesJson = JSON.stringify(packedSprites, null, 2);
+    const generatedTypescript = [
+        "export const bins = " + binNamesJson + ";",
+        "export const sprites = " + spritesJson + ";",
+    ].join(EOL);
+
     // Write all sprites to json
     await fs.writeFile(
         path.join(process.cwd(), "ts", "generated", "sprites.ts"),
-        "export const sprites = " + JSON.stringify(packedSprites, null, 2)
+        generatedTypescript
     );
 }
 

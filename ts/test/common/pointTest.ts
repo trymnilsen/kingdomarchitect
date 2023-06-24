@@ -1,4 +1,5 @@
-import { assert } from "chai";
+import { describe, it } from "node:test";
+import * as assert from "node:assert";
 import {
     addPoint,
     adjacentPoints,
@@ -11,6 +12,7 @@ import {
     isPointAdjacentTo,
     multiplyPoint,
     Point,
+    pointEquals,
     subtractPoint,
     zeroPoint,
 } from "../../src/common/point.js";
@@ -87,11 +89,20 @@ describe("Point test", () => {
         const point = { x: 3, y: 2 };
         const points = adjacentPoints(point);
 
+        function includesPoint(
+            listOfPoints: Point[],
+            pointToTest: Point
+        ): boolean {
+            return listOfPoints.some((item) => {
+                return pointEquals(item, pointToTest);
+            });
+        }
+
         function verifyAdjacent(pointsToVerify: Point[]) {
-            assert.deepInclude(pointsToVerify, { x: 2, y: 2 });
-            assert.deepInclude(pointsToVerify, { x: 4, y: 2 });
-            assert.deepInclude(pointsToVerify, { x: 3, y: 1 });
-            assert.deepInclude(pointsToVerify, { x: 3, y: 3 });
+            assert.equal(includesPoint(pointsToVerify, { x: 2, y: 2 }), true);
+            assert.equal(includesPoint(pointsToVerify, { x: 4, y: 2 }), true);
+            assert.equal(includesPoint(pointsToVerify, { x: 3, y: 1 }), true);
+            assert.equal(includesPoint(pointsToVerify, { x: 3, y: 3 }), true);
         }
 
         assert.equal(points.length, 4);
@@ -100,24 +111,24 @@ describe("Point test", () => {
         const pointsWithDiagonal = adjacentPoints(point, true);
         assert.equal(pointsWithDiagonal.length, 8);
         verifyAdjacent(pointsWithDiagonal);
-        assert.deepInclude(pointsWithDiagonal, { x: 2, y: 1 });
-        assert.deepInclude(pointsWithDiagonal, { x: 2, y: 3 });
-        assert.deepInclude(pointsWithDiagonal, { x: 4, y: 1 });
-        assert.deepInclude(pointsWithDiagonal, { x: 4, y: 3 });
+        assert.equal(includesPoint(pointsWithDiagonal, { x: 2, y: 1 }), true);
+        assert.equal(includesPoint(pointsWithDiagonal, { x: 2, y: 3 }), true);
+        assert.equal(includesPoint(pointsWithDiagonal, { x: 4, y: 1 }), true);
+        assert.equal(includesPoint(pointsWithDiagonal, { x: 4, y: 3 }), true);
     });
 
     it("check if one point is adjacent to another", () => {
         const pointOne = { x: 3, y: 2 };
         const pointTwo = { x: 4, y: 2 };
         const isAdjacent = isPointAdjacentTo(pointOne, pointTwo);
-        assert.isTrue(isAdjacent);
+        assert.equal(isAdjacent, true);
     });
 
     it("two distant points on the same axis are not adjacent", () => {
         const pointOne = { x: 6, y: 2 };
         const pointTwo = { x: 4, y: 2 };
         const isAdjacent = isPointAdjacentTo(pointOne, pointTwo);
-        assert.isFalse(isAdjacent);
+        assert.equal(isAdjacent, false);
     });
 
     it("dot product", () => {

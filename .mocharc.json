@@ -1,6 +1,0 @@
-{
-    "spec": [
-        "dist/test/**/*Test.js"
-    ],
-    "reporter": "dot"
-}

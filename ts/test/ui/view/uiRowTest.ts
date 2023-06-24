@@ -1,4 +1,5 @@
-import { assert } from "chai";
+import { describe, it } from "node:test";
+import * as assert from "node:assert";
 
 describe("uiRow test", () => {
     it("does not allow to add children with fill space and now weight", () => {

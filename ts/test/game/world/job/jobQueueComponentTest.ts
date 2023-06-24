@@ -1,4 +1,5 @@
-import { assert } from "chai";
+import { describe, it } from "node:test";
+import * as assert from "node:assert";
 
 describe("JobQueueComponent", () => {
     it("can get pending jobs", () => {

@@ -1,3 +1,9 @@
+export const bins = [
+  {
+    "name": "0",
+    "filename": "bin-0.png"
+  }
+];
 export const sprites = {
   "fox": {
     "bin": "0",
@@ -919,4 +925,4 @@ export const sprites = {
       "y": 360
     }
   }
-}
+};

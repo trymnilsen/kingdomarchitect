@@ -1,4 +1,5 @@
-import { assert } from "chai";
+import { describe, it } from "node:test";
+import * as assert from "node:assert";
 import getPixels from "get-pixels";
 import { NdArray } from "ndarray";
 import * as path from "path";
@@ -7,7 +8,28 @@ import { Point, pointEquals, zeroPoint } from "../../src/common/point.js";
 export async function createGraphFromTestFile(
     mazeName: string
 ): Promise<TestGraph> {
-    const directory = path.join(process.cwd(), "ts", "test", "path", "mazes");
+    let currentDirectory = process.cwd();
+    //If the current directory contains the build folder, we should jump out to
+    //the root of the repo first
+    if (currentDirectory.includes("build")) {
+        const currentDirectorySegments = currentDirectory.split(path.sep);
+        while (currentDirectorySegments.length > 0) {
+            const directory = currentDirectorySegments.pop();
+            if (directory == "build") {
+                break;
+            }
+        }
+
+        currentDirectory = path.join(path.sep, ...currentDirectorySegments);
+    }
+
+    const directory = path.join(
+        currentDirectory,
+        "ts",
+        "test",
+        "path",
+        "mazes"
+    );
 
     const pixels = await getPixelsAsync(path.join(directory, mazeName));
     const width = pixels.shape[0];

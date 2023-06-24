@@ -4,13 +4,12 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "frontend",
-            "type": "npm",
-            "script": "build",
+            "type": "typescript",
+            "tsconfig": "tsconfig.json",
             "problemMatcher": [
-                "$ts-webpack",
-                "$eslint-stylish"
+                "$tsc"
             ],
+            "label": "tsc: build - tsconfig.json",
             "presentation": {
                 "echo": true,
                 "reveal": "never",
@@ -23,22 +22,6 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "detail": "webpack"
-        },
-        {
-            "type": "eslint",
-            "problemMatcher": [
-                "$eslint-stylish"
-            ],
-            "presentation": {
-                "echo": true,
-                "reveal": "never",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": true,
-                "clear": false
-            },
-            "label": "eslint: lint whole folder"
         }
     ]
 }

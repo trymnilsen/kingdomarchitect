@@ -20,7 +20,8 @@
         "**/*.code-search": true,
         "tmp/**": true,
         "build/**": true,
-        "doc/**": true
+        "doc/**": true,
+        "dist/**": true,
     },
     "typescript.format.enable": true,
     "editor.formatOnSave": true
