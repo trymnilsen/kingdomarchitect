@@ -10,6 +10,7 @@
     "scripts": {
         "build": "tsc && rollup -c",
         "spritepack": "tsc && node build/tool/spritepack/spritePack.js",
+        "start": "http-server -c-1",
         "test": "tsc && node --test --test-reporter dot"
     },
     "repository": {
@@ -21,6 +22,7 @@
     },
     "dependencies": {
         "@types/node": "^20.3.1",
+        "http-server": "^14.1.1",
         "jimp": "^0.22.8",
         "maxrects-packer": "^2.7.3",
         "rollup": "^3.25.2",

@@ -23,7 +23,10 @@
       "esModuleInterop": true,
       "noEmitOnError": true,
       "outDir": "./build",
-      "incremental": true
+      "incremental": true,
+      "types": [
+        "node"
+      ]
     },
     "include": [
       "ts/src/**/*.ts",
