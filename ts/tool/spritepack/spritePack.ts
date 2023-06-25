@@ -1,12 +1,12 @@
 import { existsSync } from "fs";
 import * as fs from "fs/promises";
 import { MaxRectsPacker } from "maxrects-packer";
-import { NdArray } from "ndarray";
 import * as path from "path";
 import { EOL } from "os";
 import { removeItem } from "../../src/common/array.js";
 import { BitmapImage } from "./bitmapImage.js";
-import { getPixelsAsync, PixelColor } from "./pixels.js";
+import { PixelColor } from "./pixels.js";
+import Jimp, { read, intToRGBA } from "jimp";
 
 const assetPath = path.join(process.cwd(), "asset");
 
@@ -59,10 +59,10 @@ async function run() {
     // these are considered to be a single frame
     for (const assetFile of assetFiles) {
         const assetPath = path.join(process.cwd(), "asset", assetFile);
-        const pixelData = await getPixelsAsync(assetPath);
+        const pixelData = await read(assetPath);
         const spriteName = assetFile.replace(".png", "");
-        const width = pixelData.shape[0];
-        const height = pixelData.shape[1];
+        const width = pixelData.bitmap.width;
+        const height = pixelData.bitmap.height;
 
         secondPassSpriteDefinitions.push({
             filename: assetPath,
@@ -109,7 +109,7 @@ async function packSprites(sprites: PackableSprite[]) {
         // it to the new sheet with the position of the packed rectangle
         for (const rect of bin.rects) {
             const packedSprite = sprites[rect.data];
-            const spritePixels = await getPixelsAsync(packedSprite.filename);
+            const spritePixels = await read(packedSprite.filename);
             if (!spritePixels) {
                 throw new Error(
                     `Unable to get pixels from ${packedSprite.filename}`
@@ -140,39 +140,24 @@ async function packSprites(sprites: PackableSprite[]) {
                 for (let y = 0; y < rect.height; y++) {
                     const xInSourceImage = definition.x + x;
                     const yInSourceImage = definition.y + y;
+                    const color = intToRGBA(
+                        spritePixels.getPixelColor(
+                            xInSourceImage,
+                            yInSourceImage
+                        )
+                    );
 
                     const pixel: PixelColor = {
-                        red: spritePixels.get(
-                            xInSourceImage,
-                            yInSourceImage,
-                            0
-                        ),
-                        green: spritePixels.get(
-                            xInSourceImage,
-                            yInSourceImage,
-                            1
-                        ),
-                        blue: spritePixels.get(
-                            xInSourceImage,
-                            yInSourceImage,
-                            2
-                        ),
-                        alpha: spritePixels.get(
-                            xInSourceImage,
-                            yInSourceImage,
-                            3
-                        ),
+                        red: color.r,
+                        green: color.g,
+                        blue: color.b,
+                        alpha: color.a,
                     };
                     try {
                         bitmap.setPixel(rect.x + x, rect.y + y, pixel);
                     } catch (err) {
                         console.log("Packed rectangle", rect);
                         console.log("Related sprite", packedSprite);
-                        console.log(
-                            "Pixel data",
-                            spritePixels.shape[0],
-                            spritePixels.shape[1]
-                        );
                         console.log(
                             "Error setting pixel",
                             x,
@@ -243,12 +228,12 @@ async function createSpriteSheet(
     const packedSprites: PackableSprite[] = [];
 
     for (const spriteDefinitionEntry of Object.entries(spriteDefinitions)) {
-        const pixelData = await getPixelsAsync(spritePath);
+        const pixelData = await read(spritePath);
         const spriteDefinition = spriteDefinitionEntry[1];
         const spriteName = spriteDefinitionEntry[0];
 
-        const width = pixelData.shape[0];
-        const height = pixelData.shape[1];
+        const width = pixelData.bitmap.width;
+        const height = pixelData.bitmap.height;
         const definitionMaxX = spriteDefinition.x + spriteDefinition.w;
         const definitionMaxY = spriteDefinition.y + spriteDefinition.h;
 
@@ -288,7 +273,7 @@ async function createSpriteSheet(
 async function extractSprite(
     spriteName: string,
     spriteDefinition: SpriteDefinition,
-    spritePixels: NdArray<Uint8Array>
+    spritePixels: Jimp
 ): Promise<PackableSprite> {
     const options = {
         smart: false,
@@ -335,11 +320,14 @@ async function extractSprite(
                 const xInSourceImage = packedFrame.x + x;
                 const yInSourceImage = packedFrame.y + y;
 
+                const color = intToRGBA(
+                    spritePixels.getPixelColor(xInSourceImage, yInSourceImage)
+                );
                 const pixel: PixelColor = {
-                    red: spritePixels.get(xInSourceImage, yInSourceImage, 0),
-                    green: spritePixels.get(xInSourceImage, yInSourceImage, 1),
-                    blue: spritePixels.get(xInSourceImage, yInSourceImage, 2),
-                    alpha: spritePixels.get(xInSourceImage, yInSourceImage, 3),
+                    red: color.r,
+                    green: color.g,
+                    blue: color.b,
+                    alpha: color.a,
                 };
 
                 bitmap.setPixel(
