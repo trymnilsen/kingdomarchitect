@@ -8,13 +8,9 @@
     "license": "MIT",
     "homepage": "https://github.com/trymnilsen/kingdomarchitect#readme",
     "scripts": {
-        "tsc": "tsc",
-        "build": "webpack",
-        "spritepack": "ts-node ts/tool/spritepack/spritePack.ts && webpack",
-        "start": "webpack serve",
-        "test": "mocha",
-        "lint": "eslint . --ext .ts",
-        "coverage": "c8 mocha && open coverage/lcov-report/index.html"
+        "build": "tsc && rollup -c",
+        "spritepack": "tsc && node build/tool/spritepack/spritePack.js",
+        "test": "tsc && node --test --test-reporter dot"
     },
     "repository": {
         "type": "git",
@@ -24,10 +20,11 @@
         "url": "https://github.com/trymnilsen/kingdomarchitect/issues"
     },
     "dependencies": {
-        "@swc/cli": "^0.1.60",
-        "@swc/core": "^1.3.66",
+        "@types/node": "^20.3.1",
         "jimp": "^0.22.8",
         "maxrects-packer": "^2.7.3",
+        "rollup": "^3.25.2",
+        "rollup-plugin-sourcemaps": "^0.6.3",
         "typescript": "^5.1.3"
     },
     "overrides": {
