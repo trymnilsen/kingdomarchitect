@@ -1,5 +1,6 @@
 import * as assert from "node:assert";
-import { intToRGBA, read } from "jimp";
+import pkg from "jimp";
+const { intToRGBA, read } = pkg;
 import * as path from "path";
 import { Point, pointEquals, zeroPoint } from "../../src/common/point.js";
 

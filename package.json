@@ -11,7 +11,8 @@
         "build": "tsc && rollup -c",
         "spritepack": "tsc && node build/tool/spritepack/spritePack.js",
         "start": "http-server -c-1",
-        "test": "tsc && node --test --test-reporter dot"
+        "test": "tsc && node --test --test-reporter dot",
+        "bundle": "rollup -c"
     },
     "repository": {
         "type": "git",

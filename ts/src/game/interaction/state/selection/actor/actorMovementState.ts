@@ -154,7 +154,7 @@ export class ActorMovementState extends InteractionState {
     }
 
     private scheduleMovement() {
-        this.context.world.jobQueue.schedule(
+        this.context.world.jobQueue.addJob(
             new MoveJob(this.path, new EntityInstanceJobConstraint(this.entity))
         );
     }

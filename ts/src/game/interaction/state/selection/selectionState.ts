@@ -5,6 +5,7 @@ import { uiBox } from "../../../../ui/dsl/uiBoxDsl.js";
 import { fillUiSize } from "../../../../ui/uiSize.js";
 import { WorkerBehaviorComponent } from "../../../world/component/behavior/workerBehaviorComponent.js";
 import { JobQueueComponent } from "../../../world/component/job/jobQueueComponent.js";
+import { query } from "../../../world/component/job/query/jobQuery.js";
 import { SelectedItemIsTargetQuery } from "../../../world/component/job/query/selectedItemIsTargetQuery.js";
 import { ChestComponent } from "../../../world/component/resource/chestComponent.js";
 import { TreeComponent } from "../../../world/component/resource/treeComponent.js";
@@ -119,7 +120,8 @@ export class SelectionState extends InteractionState {
                     );
                 }
 
-                const currentJob = jobQueue.query(
+                const currentJob = query(
+                    selection.entity.getRootEntity(),
                     new SelectedItemIsTargetQuery(selection)
                 );
 
@@ -212,7 +214,8 @@ export class SelectionState extends InteractionState {
                     );
                 }
 
-                const currentJob = jobQueue.query(
+                const currentJob = query(
+                    this.context.world.rootEntity,
                     new SelectedItemIsTargetQuery(selection)
                 );
 

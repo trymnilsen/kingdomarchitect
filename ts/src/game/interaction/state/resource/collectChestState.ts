@@ -83,7 +83,7 @@ export class CollectChestState extends InteractionState {
 
     private scheduleCollectJob() {
         const collectJob = new CollectChestJob(this.chest);
-        this.context.world.jobQueue.schedule(collectJob);
+        this.context.world.jobQueue.addJob(collectJob);
         this.context.stateChanger.clear();
     }
 

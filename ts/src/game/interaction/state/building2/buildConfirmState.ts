@@ -159,7 +159,7 @@ export class BuildConfirmState extends InteractionState {
                 const house = buildingFactory(this.building);
                 house.position = selection;
                 this.context.world.rootEntity.addChild(house);
-                this.context.world.jobQueue.schedule(new BuildJob(house));
+                this.context.world.jobQueue.addJob(new BuildJob(house));
             }
 
             this.context.stateChanger.clear();

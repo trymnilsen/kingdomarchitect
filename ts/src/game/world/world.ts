@@ -4,6 +4,7 @@ import { RenderContext } from "../../rendering/renderContext.js";
 import { InventoryComponent } from "./component/inventory/inventoryComponent.js";
 import { JobQueue } from "./component/job/jobQueue.js";
 import { JobQueueComponent } from "./component/job/jobQueueComponent.js";
+import { JobSchedulerComponent } from "./component/job/jobSchedulerComponent.js";
 import {
     createGraphFromNodes,
     createLazyGraphFromRootNode,
@@ -52,6 +53,7 @@ export class World {
         this._rootEntity.addComponent(this._inventoryComponent);
         this._rootEntity.addComponent(this._groundComponent);
         this._rootEntity.addComponent(this._jobQueueComponent);
+        this._rootEntity.addComponent(new JobSchedulerComponent());
 
         this._pathSearch = new PathSearch(
             createLazyGraphFromRootNode(this._rootEntity)

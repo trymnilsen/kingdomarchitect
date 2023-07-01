@@ -6,7 +6,9 @@ import { EOL } from "os";
 import { removeItem } from "../../src/common/array.js";
 import { BitmapImage } from "./bitmapImage.js";
 import { PixelColor } from "./pixels.js";
-import Jimp, { read, intToRGBA } from "jimp";
+import Jimp from "jimp";
+import pkg from "jimp";
+const { read, intToRGBA } = pkg;
 
 const assetPath = path.join(process.cwd(), "asset");
 
