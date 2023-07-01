@@ -1,5 +1,5 @@
-import { sprites2 } from "../../asset/sprite";
-import { Building } from "./building";
+import { sprites2 } from "../../asset/sprite.js";
+import { Building } from "./building.js";
 
 export const foodBuildings: Building[] = [
     {

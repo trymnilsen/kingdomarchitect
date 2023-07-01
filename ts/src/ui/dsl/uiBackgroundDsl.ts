@@ -1,11 +1,11 @@
-import { Sprite2 } from "../../asset/sprite";
-import { allSides, Sides } from "../../common/sides";
+import { Sprite2 } from "../../asset/sprite.js";
+import { allSides, Sides } from "../../common/sides.js";
 import {
     BoxBackground,
     ColorBackground,
     NinePatchBackground,
     UIBackground,
-} from "../uiBackground";
+} from "../uiBackground.js";
 
 export function colorBackground(color: string): UIBackground {
     return new ColorBackground(color);

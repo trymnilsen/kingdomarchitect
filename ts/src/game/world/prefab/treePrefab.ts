@@ -1,6 +1,6 @@
-import { HealthComponent } from "../component/health/healthComponent";
-import { TreeComponent } from "../component/resource/treeComponent";
-import { Entity } from "../entity/entity";
+import { HealthComponent } from "../component/health/healthComponent.js";
+import { TreeComponent } from "../component/resource/treeComponent.js";
+import { Entity } from "../entity/entity.js";
 
 export function treePrefab(id: string, variation: number): Entity {
     const tree = new Entity(id);

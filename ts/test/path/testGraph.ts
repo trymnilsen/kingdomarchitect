@@ -1,17 +1,39 @@
-import { assert } from "chai";
-import getPixels from "get-pixels";
-import { NdArray } from "ndarray";
+import * as assert from "node:assert";
+import pkg from "jimp";
+const { intToRGBA, read } = pkg;
 import * as path from "path";
-import { Point, pointEquals, zeroPoint } from "../../src/common/point";
+import { Point, pointEquals, zeroPoint } from "../../src/common/point.js";
 
 export async function createGraphFromTestFile(
     mazeName: string
 ): Promise<TestGraph> {
-    const directory = path.join(process.cwd(), "ts", "test", "path", "mazes");
+    let currentDirectory = process.cwd();
+    //If the current directory contains the build folder, we should jump out to
+    //the root of the repo first
+    if (currentDirectory.includes("build")) {
+        const currentDirectorySegments = currentDirectory.split(path.sep);
+        while (currentDirectorySegments.length > 0) {
+            const directory = currentDirectorySegments.pop();
+            if (directory == "build") {
+                break;
+            }
+        }
 
-    const pixels = await getPixelsAsync(path.join(directory, mazeName));
-    const width = pixels.shape[0];
-    const height = pixels.shape[1];
+        currentDirectory = path.join(path.sep, ...currentDirectorySegments);
+    }
+
+    const directory = path.join(
+        currentDirectory,
+        "ts",
+        "test",
+        "path",
+        "mazes"
+    );
+
+    const image = await read(path.join(directory, mazeName));
+
+    const width = image.bitmap.width;
+    const height = image.bitmap.height;
     const expectedPath: ExpectedPath = {};
     let start: Point = zeroPoint();
     let stop: Point = zeroPoint();
@@ -20,11 +42,7 @@ export async function createGraphFromTestFile(
     for (let x = 0; x < width; x++) {
         weightGraph[x] = [];
         for (let y = 0; y < height; y++) {
-            const pixel = {
-                r: pixels.get(x, y, 0),
-                g: pixels.get(x, y, 1),
-                b: pixels.get(x, y, 2),
-            };
+            const pixel = intToRGBA(image.getPixelColor(x, y));
 
             if (pixel.b == 255 && pixel.r == 0 && pixel.g == 0) {
                 expectedPath[pointId(x, y)] = { x, y };
@@ -73,18 +91,6 @@ export function verifyPath(resultingPath: Point[], graph: TestGraph) {
         0,
         "All expected points not visited by resulting path"
     );
-}
-
-async function getPixelsAsync(path: string): Promise<NdArray<Uint8Array>> {
-    return new Promise((resolve, reject) => {
-        getPixels(path, (error, pixels) => {
-            if (!!error) {
-                reject(error);
-            } else {
-                resolve(pixels);
-            }
-        });
-    });
 }
 
 type ExpectedPath = { [pointKey: string]: Point };

@@ -1,10 +1,10 @@
 {
     "compilerOptions": {
       "target": "ES2022",
-      "module": "CommonJS",
+      "module": "ES2022",
       "sourceMap": true,
       "declaration": false,
-      "moduleResolution": "node",
+      "moduleResolution": "Node16",
       "rootDir": "./ts",
       "strictFunctionTypes": true,
       "strictNullChecks": true,
@@ -22,7 +22,11 @@
       "experimentalDecorators": true,
       "esModuleInterop": true,
       "noEmitOnError": true,
-      "outDir": "./build"
+      "outDir": "./build",
+      "incremental": true,
+      "types": [
+        "node"
+      ]
     },
     "include": [
       "ts/src/**/*.ts",

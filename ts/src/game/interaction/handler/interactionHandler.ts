@@ -1,14 +1,14 @@
-import { AssetLoader } from "../../../asset/loader/assetLoader";
-import { Point } from "../../../common/point";
-import { GameTime } from "../../../common/time";
-import { InputAction, InputActionType } from "../../../input/inputAction";
-import { OnTapEndEvent } from "../../../input/touchInput";
-import { Camera } from "../../../rendering/camera";
-import { RenderContext } from "../../../rendering/renderContext";
-import { World } from "../../world/world";
-import { CommitableInteractionStateChanger } from "./interactionStateChanger";
-import { InteractionStateHistory } from "./interactionStateHistory";
-import { StateContext } from "./stateContext";
+import { AssetLoader } from "../../../asset/loader/assetLoader.js";
+import { Point } from "../../../common/point.js";
+import { GameTime } from "../../../common/time.js";
+import { InputAction, InputActionType } from "../../../input/inputAction.js";
+import { OnTapEndEvent } from "../../../input/touchInput.js";
+import { Camera } from "../../../rendering/camera.js";
+import { RenderContext } from "../../../rendering/renderContext.js";
+import { World } from "../../world/world.js";
+import { CommitableInteractionStateChanger } from "./interactionStateChanger.js";
+import { InteractionStateHistory } from "./interactionStateHistory.js";
+import { StateContext } from "./stateContext.js";
 
 /**
  * The interactionHandler recieves input taps and forward them to the currently

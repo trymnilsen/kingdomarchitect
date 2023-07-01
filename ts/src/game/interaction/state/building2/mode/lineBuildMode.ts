@@ -1,5 +1,5 @@
-import { Point, pointEquals } from "../../../../../common/point";
-import { BuildMode, BuildModeDescription } from "./buildMode";
+import { Point, pointEquals } from "../../../../../common/point.js";
+import { BuildMode, BuildModeDescription } from "./buildMode.js";
 
 export class LineBuildMode implements BuildMode {
     private from: Point;

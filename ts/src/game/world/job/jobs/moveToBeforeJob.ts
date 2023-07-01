@@ -1,16 +1,16 @@
-import { InvalidStateError } from "../../../../common/error/invalidStateError";
+import { InvalidStateError } from "../../../../common/error/invalidStateError.js";
 import {
     isPointAdjacentTo,
     Point,
     pointEquals,
-} from "../../../../common/point";
-import { PathFindingComponent } from "../../component/root/path/pathFindingComponent";
-import { PathResultStatus } from "../../component/root/path/pathResult";
-import { Job } from "../job";
-import { JobConstraint } from "../jobConstraint";
-import { JobConstraintsError } from "../jobConstraintsError";
-import { MultipleStepJob } from "../multipleStepJob";
-import { MoveJob } from "./moveJob";
+} from "../../../../common/point.js";
+import { PathFindingComponent } from "../../component/root/path/pathFindingComponent.js";
+import { PathResultStatus } from "../../component/root/path/pathResult.js";
+import { Job } from "../job.js";
+import { JobConstraint } from "../jobConstraint.js";
+import { JobConstraintsError } from "../jobConstraintsError.js";
+import { MultipleStepJob } from "../multipleStepJob.js";
+import { MoveJob } from "./moveJob.js";
 
 export interface TargetedJob {
     tileX: number;

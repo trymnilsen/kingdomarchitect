@@ -1,10 +1,10 @@
-import { TypedEventHandle } from "../../../../../common/event/typedEvent";
-import { addPoint, Point, pointEquals } from "../../../../../common/point";
-import { GraphNode } from "../../../../../path/graph/graph";
-import { PathSearch } from "../../../../../path/search";
-import { EntityComponent } from "../../entityComponent";
-import { TileMapUpdateEvent } from "../../tile/tileMapUpdatedEvent";
-import { PathResult, PathResultStatus } from "./pathResult";
+import { TypedEventHandle } from "../../../../../common/event/typedEvent.js";
+import { addPoint, Point, pointEquals } from "../../../../../common/point.js";
+import { GraphNode } from "../../../../../path/graph/graph.js";
+import { PathSearch } from "../../../../../path/search.js";
+import { EntityComponent } from "../../entityComponent.js";
+import { TileMapUpdateEvent } from "../../tile/tileMapUpdatedEvent.js";
+import { PathResult, PathResultStatus } from "./pathResult.js";
 
 export class PathFindingComponent extends EntityComponent {
     private tileEventListener: TypedEventHandle | undefined;

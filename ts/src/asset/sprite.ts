@@ -1,4 +1,4 @@
-import { sprites } from "../../generated/sprites";
+import { sprites } from "../../generated/sprites.js";
 
 export type Sprite2 = {
     /**

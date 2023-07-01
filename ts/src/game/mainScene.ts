@@ -1,12 +1,12 @@
-import { AssetLoader } from "../asset/loader/assetLoader";
-import { Point } from "../common/point";
-import { GameTime } from "../common/time";
-import { InputAction } from "../input/inputAction";
-import { OnTapEndEvent } from "../input/touchInput";
-import { Camera } from "../rendering/camera";
-import { RenderContext } from "../rendering/renderContext";
-import { InteractionHandler } from "./interaction/handler/interactionHandler";
-import { World } from "./world/world";
+import { AssetLoader } from "../asset/loader/assetLoader.js";
+import { Point } from "../common/point.js";
+import { GameTime } from "../common/time.js";
+import { InputAction } from "../input/inputAction.js";
+import { OnTapEndEvent } from "../input/touchInput.js";
+import { Camera } from "../rendering/camera.js";
+import { RenderContext } from "../rendering/renderContext.js";
+import { InteractionHandler } from "./interaction/handler/interactionHandler.js";
+import { World } from "./world/world.js";
 
 export class MainScene implements Scene {
     private world: World;

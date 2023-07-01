@@ -1,9 +1,10 @@
-import { assert } from "chai";
+import { describe, it } from "node:test";
+import * as assert from "node:assert";
 import {
     NumberRange,
     rangeDistance,
     rangeRandom,
-} from "../../src/common/range";
+} from "../../src/common/range.js";
 
 describe("Range test", () => {
     it("can pick random number in range", () => {
@@ -12,8 +13,8 @@ describe("Range test", () => {
             max: 20,
         };
         const randomValue = rangeRandom(range);
-        assert.isAtLeast(randomValue, range.min);
-        assert.isAtMost(randomValue, range.max);
+        assert.equal(randomValue >= range.min, true);
+        assert.equal(randomValue <= range.max, true);
     });
 
     it("can calculate distance of range", () => {

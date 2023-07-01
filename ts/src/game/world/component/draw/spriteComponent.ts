@@ -1,7 +1,7 @@
-import { Sprite2, sprites2 } from "../../../../asset/sprite";
-import { Point, zeroPoint } from "../../../../common/point";
-import { RenderContext } from "../../../../rendering/renderContext";
-import { EntityComponent } from "../entityComponent";
+import { Sprite2, sprites2 } from "../../../../asset/sprite.js";
+import { Point, zeroPoint } from "../../../../common/point.js";
+import { RenderContext } from "../../../../rendering/renderContext.js";
+import { EntityComponent } from "../entityComponent.js";
 
 export class SpriteComponent extends EntityComponent {
     constructor(

@@ -1,22 +1,22 @@
-import { sprites2 } from "../../../../asset/sprite";
-import { generateId } from "../../../../common/idGenerator";
-import { woodResourceItem } from "../../../../data/inventory/resources";
-import { RenderContext } from "../../../../rendering/renderContext";
-import { BlinkingImageAnimation } from "../../../../rendering/visual/blinkingImageAnimation";
-import { HealthComponent } from "../../component/health/healthComponent";
-import { TreeComponent } from "../../component/resource/treeComponent";
-import { InventoryComponent } from "../../component/inventory/inventoryComponent";
-import { TilesComponent } from "../../component/tile/tilesComponent";
-import { Entity } from "../../entity/entity";
-import { treePrefab } from "../../prefab/treePrefab";
-import { SelectedEntityItem } from "../../selection/selectedEntityItem";
-import { SelectedTileItem } from "../../selection/selectedTileItem";
-import { SelectedWorldItem } from "../../selection/selectedWorldItem";
-import { TileSize } from "../../tile/tile";
-import { Job } from "../job";
-import { JobConstraintsError } from "../jobConstraintsError";
-import { MoveToBeforeJob } from "./moveToBeforeJob";
-import { WorkerConstraint } from "../constraint/workerConstraint";
+import { sprites2 } from "../../../../asset/sprite.js";
+import { generateId } from "../../../../common/idGenerator.js";
+import { woodResourceItem } from "../../../../data/inventory/resources.js";
+import { RenderContext } from "../../../../rendering/renderContext.js";
+import { BlinkingImageAnimation } from "../../../../rendering/visual/blinkingImageAnimation.js";
+import { HealthComponent } from "../../component/health/healthComponent.js";
+import { TreeComponent } from "../../component/resource/treeComponent.js";
+import { InventoryComponent } from "../../component/inventory/inventoryComponent.js";
+import { TilesComponent } from "../../component/tile/tilesComponent.js";
+import { Entity } from "../../entity/entity.js";
+import { treePrefab } from "../../prefab/treePrefab.js";
+import { SelectedEntityItem } from "../../selection/selectedEntityItem.js";
+import { SelectedTileItem } from "../../selection/selectedTileItem.js";
+import { SelectedWorldItem } from "../../selection/selectedWorldItem.js";
+import { TileSize } from "../../tile/tile.js";
+import { Job } from "../job.js";
+import { JobConstraintsError } from "../jobConstraintsError.js";
+import { MoveToBeforeJob } from "./moveToBeforeJob.js";
+import { WorkerConstraint } from "../constraint/workerConstraint.js";
 
 /**
  * Represents a multistep job that will move towards a tree and then chop

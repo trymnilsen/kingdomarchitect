@@ -1,11 +1,11 @@
-import { Sprite2 } from "../../../../asset/sprite";
-import { Point } from "../../../../common/point";
-import { UIRenderContext } from "../../../../rendering/uiRenderContext";
-import { UIBackground } from "../../../../ui/uiBackground";
-import { UILayoutContext } from "../../../../ui/uiLayoutContext";
-import { UISize } from "../../../../ui/uiSize";
-import { UIView } from "../../../../ui/uiView";
-import { UIActionbarButton } from "./uiActionbarButton";
+import { Sprite2 } from "../../../../asset/sprite.js";
+import { Point } from "../../../../common/point.js";
+import { UIRenderContext } from "../../../../rendering/uiRenderContext.js";
+import { UIBackground } from "../../../../ui/uiBackground.js";
+import { UILayoutContext } from "../../../../ui/uiLayoutContext.js";
+import { UISize } from "../../../../ui/uiSize.js";
+import { UIView } from "../../../../ui/uiView.js";
+import { UIActionbarButton } from "./uiActionbarButton.js";
 
 export interface UIActionbarItem {
     text: string;

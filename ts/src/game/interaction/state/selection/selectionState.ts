@@ -1,25 +1,26 @@
-import { sprites2 } from "../../../../asset/sprite";
-import { allSides } from "../../../../common/sides";
-import { RenderContext } from "../../../../rendering/renderContext";
-import { uiBox } from "../../../../ui/dsl/uiBoxDsl";
-import { fillUiSize } from "../../../../ui/uiSize";
-import { WorkerBehaviorComponent } from "../../../world/component/behavior/workerBehaviorComponent";
-import { JobQueueComponent } from "../../../world/component/job/jobQueueComponent";
-import { SelectedItemIsTargetQuery } from "../../../world/component/job/query/selectedItemIsTargetQuery";
-import { ChestComponent } from "../../../world/component/resource/chestComponent";
-import { TreeComponent } from "../../../world/component/resource/treeComponent";
-import { Job } from "../../../world/job/job";
-import { SelectedEntityItem } from "../../../world/selection/selectedEntityItem";
-import { SelectedTileItem } from "../../../world/selection/selectedTileItem";
-import { SelectedWorldItem } from "../../../world/selection/selectedWorldItem";
-import { GroundTile } from "../../../world/tile/ground";
-import { TileSize } from "../../../world/tile/tile";
-import { InteractionState } from "../../handler/interactionState";
-import { UIActionbarItem } from "../../view/actionbar/uiActionbar";
-import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold";
-import { CharacterSkillState } from "../character/characterSkillState";
-import { ChopJobState } from "../resource/chopJopState";
-import { CollectChestState } from "../resource/collectChestState";
+import { sprites2 } from "../../../../asset/sprite.js";
+import { allSides } from "../../../../common/sides.js";
+import { RenderContext } from "../../../../rendering/renderContext.js";
+import { uiBox } from "../../../../ui/dsl/uiBoxDsl.js";
+import { fillUiSize } from "../../../../ui/uiSize.js";
+import { WorkerBehaviorComponent } from "../../../world/component/behavior/workerBehaviorComponent.js";
+import { JobQueueComponent } from "../../../world/component/job/jobQueueComponent.js";
+import { query } from "../../../world/component/job/query/jobQuery.js";
+import { SelectedItemIsTargetQuery } from "../../../world/component/job/query/selectedItemIsTargetQuery.js";
+import { ChestComponent } from "../../../world/component/resource/chestComponent.js";
+import { TreeComponent } from "../../../world/component/resource/treeComponent.js";
+import { Job } from "../../../world/job/job.js";
+import { SelectedEntityItem } from "../../../world/selection/selectedEntityItem.js";
+import { SelectedTileItem } from "../../../world/selection/selectedTileItem.js";
+import { SelectedWorldItem } from "../../../world/selection/selectedWorldItem.js";
+import { GroundTile } from "../../../world/tile/ground.js";
+import { TileSize } from "../../../world/tile/tile.js";
+import { InteractionState } from "../../handler/interactionState.js";
+import { UIActionbarItem } from "../../view/actionbar/uiActionbar.js";
+import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold.js";
+import { CharacterSkillState } from "../character/characterSkillState.js";
+import { ChopJobState } from "../resource/chopJopState.js";
+import { CollectChestState } from "../resource/collectChestState.js";
 
 export class SelectionState extends InteractionState {
     private selectedItem: SelectedWorldItem;
@@ -119,7 +120,8 @@ export class SelectionState extends InteractionState {
                     );
                 }
 
-                const currentJob = jobQueue.query(
+                const currentJob = query(
+                    selection.entity.getRootEntity(),
                     new SelectedItemIsTargetQuery(selection)
                 );
 
@@ -212,7 +214,8 @@ export class SelectionState extends InteractionState {
                     );
                 }
 
-                const currentJob = jobQueue.query(
+                const currentJob = query(
+                    this.context.world.rootEntity,
                     new SelectedItemIsTargetQuery(selection)
                 );
 

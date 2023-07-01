@@ -1,16 +1,16 @@
-import { addPoint, Point } from "../../common/point";
+import { addPoint, Point } from "../../common/point.js";
 import {
     Sides,
     totalHorizontal,
     totalVertical,
     zeroSides,
-} from "../../common/sides";
-import { UIRenderContext } from "../../rendering/uiRenderContext";
-import { calculateAlignment, uiAlignment } from "../uiAlignment";
-import { UIBackground } from "../uiBackground";
-import { UILayoutContext } from "../uiLayoutContext";
-import { fillUiSize, UISize, wrapUiSize } from "../uiSize";
-import { UIViewGroup } from "../uiViewGroup";
+} from "../../common/sides.js";
+import { UIRenderContext } from "../../rendering/uiRenderContext.js";
+import { calculateAlignment, uiAlignment } from "../uiAlignment.js";
+import { UIBackground } from "../uiBackground.js";
+import { UILayoutContext } from "../uiLayoutContext.js";
+import { fillUiSize, UISize, wrapUiSize } from "../uiSize.js";
+import { UIViewGroup } from "../uiViewGroup.js";
 
 export class UIBox extends UIViewGroup {
     private _alignment: Point = uiAlignment.center;

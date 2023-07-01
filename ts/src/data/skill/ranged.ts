@@ -1,5 +1,5 @@
-import { sprites2 } from "../../asset/sprite";
-import { SkillTree } from "./skill";
+import { sprites2 } from "../../asset/sprite.js";
+import { SkillTree } from "./skill.js";
 
 export const rangedSkills: SkillTree = [
     [

@@ -1,7 +1,7 @@
 /* 
-import { RenderNode, NodeConfiguration, RenderNodeType } from "./renderNode";
-import { RenderContext } from "../renderContext";
-import { RenderItem } from "../renderer";
+import { RenderNode, NodeConfiguration, RenderNodeType } from "./renderNode.js";
+import { RenderContext } from "../renderContext.js";
+import { RenderItem } from "../renderer.js";
 
 
 export class TextVisual extends RenderNode {
@@ -23,7 +23,7 @@ export class TextVisual extends RenderNode {
 }
  */
 
-import { RenderItemConfiguration } from "./renderItemConfiguration";
+import { RenderItemConfiguration } from "./renderItemConfiguration.js";
 
 export interface TextConfiguration extends RenderItemConfiguration {
     text: string;

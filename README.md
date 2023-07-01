@@ -39,7 +39,7 @@ Wow, thanks! First see if there are any open issues or open a thread under discu
 
 ## 👩‍💻 Development
 
-Install the required development packages (typescript and webpack). You should then be able to run it with the `npm run start` command and get a link from webpack in your terminal to test out the locally built version. Your favourite IDE can be used to edit any game code. If you want to contribute on the development on the game, here follows some notes on the architecture for the game/application and some tools used during development
+Install the required development packages (typescript and rollup) with `npm i`. Build and bundle the typescript source with `npm run build`, you should then be able to run it with the `npm run start` command and get a link in your terminal to test out the locally built version in your browser of choice. Your favourite IDE can be used to edit any game code. If you want to contribute on the development on the game, here follows some notes on the architecture for the game/application and some tools used during development.
 
 ### Concepts
 The architecture of the game is loosely based around three concepts:
@@ -77,7 +77,7 @@ Items that are not directly connected to the game world, like menus and screens 
 
 #### Transpiling and bundling
 
-Typescript and webpack is used for transpiling and bundling the code.
+Typescript and rollup is used for transpiling, typechecking and bundling the code.
 This is performed with the `build` npm task.
 
 #### Spritepacking
@@ -85,7 +85,10 @@ This is performed with the `build` npm task.
 To optimize, remove unused parts of images and bundling them together into a spritebin the `spritepack` npm task can be used. If you update any of the images in `asset` you need to run this task to get the updated version to show up in game. The source for this can be found in `ts/tool/spritepack`.
 
 ### Testing
-Some tests already exists for the game, these are made in mocha with chai as the assertion library. Some files are currently just scaffold and some contain actuall test code. These tests can be run with `npm  test`. We also have coverage, but this is not for the sake of the total coverage number but as a tool to check if you exercise what you expect to excercise in your test.
+
+Note: The test suite uses the node test runner and requires node >=20.
+
+Some tests already exists for the game, these are made with the built in node test runner. Note that files are not automatically built when tests are run. These needs to be built independently (however the `npm test` script includes the tsc step before the tests are run). Some files are currently just scaffold and some contain actuall test code. Tests can be run with `npm  test`.
 
 ## ❓ FAQ
 

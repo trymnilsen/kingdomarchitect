@@ -1,5 +1,5 @@
-import { assert } from "chai";
-import { describe } from "mocha";
+import { describe, it } from "node:test";
+import * as assert from "node:assert";
 
 describe("getFocusableViews test", () => {
     it("can get focusable views", () => {

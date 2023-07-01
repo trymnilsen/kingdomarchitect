@@ -1,4 +1,4 @@
-import { Sprite2 } from "../../asset/sprite";
+import { Sprite2 } from "../../asset/sprite.js";
 
 export interface InventoryItem {
     id: string;

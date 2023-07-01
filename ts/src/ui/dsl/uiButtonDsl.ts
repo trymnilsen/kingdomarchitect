@@ -1,6 +1,6 @@
-import { UIBackground } from "../uiBackground";
-import { UIButton } from "../view/uiButton";
-import { UIBoxProperties } from "./uiBoxDsl";
+import { UIBackground } from "../uiBackground.js";
+import { UIButton } from "../view/uiButton.js";
+import { UIBoxProperties } from "./uiBoxDsl.js";
 
 export type UIButtonProperties = {
     onTappedBackground?: UIBackground;

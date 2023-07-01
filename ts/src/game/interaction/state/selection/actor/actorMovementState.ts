@@ -1,17 +1,17 @@
-import { sprites2 } from "../../../../../asset/sprite";
-import { Point } from "../../../../../common/point";
-import { allSides } from "../../../../../common/sides";
-import { SearchedNode } from "../../../../../path/search";
-import { RenderContext } from "../../../../../rendering/renderContext";
-import { uiBox } from "../../../../../ui/dsl/uiBoxDsl";
-import { fillUiSize } from "../../../../../ui/uiSize";
-import { Entity } from "../../../../world/entity/entity";
-import { EntityInstanceJobConstraint } from "../../../../world/job/constraint/entityInstanceConstraint";
-import { MoveJob } from "../../../../world/job/jobs/moveJob";
-import { GroundTile } from "../../../../world/tile/ground";
-import { TileSize } from "../../../../world/tile/tile";
-import { InteractionState } from "../../../handler/interactionState";
-import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold";
+import { sprites2 } from "../../../../../asset/sprite.js";
+import { Point } from "../../../../../common/point.js";
+import { allSides } from "../../../../../common/sides.js";
+import { SearchedNode } from "../../../../../path/search.js";
+import { RenderContext } from "../../../../../rendering/renderContext.js";
+import { uiBox } from "../../../../../ui/dsl/uiBoxDsl.js";
+import { fillUiSize } from "../../../../../ui/uiSize.js";
+import { Entity } from "../../../../world/entity/entity.js";
+import { EntityInstanceJobConstraint } from "../../../../world/job/constraint/entityInstanceConstraint.js";
+import { MoveJob } from "../../../../world/job/jobs/moveJob.js";
+import { GroundTile } from "../../../../world/tile/ground.js";
+import { TileSize } from "../../../../world/tile/tile.js";
+import { InteractionState } from "../../../handler/interactionState.js";
+import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold.js";
 
 export class ActorMovementState extends InteractionState {
     private selectedPoint: Point | null = null;
@@ -154,7 +154,7 @@ export class ActorMovementState extends InteractionState {
     }
 
     private scheduleMovement() {
-        this.context.world.jobQueue.schedule(
+        this.context.world.jobQueue.addJob(
             new MoveJob(this.path, new EntityInstanceJobConstraint(this.entity))
         );
     }

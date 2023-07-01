@@ -1,9 +1,9 @@
-import { addPoint, Point } from "../../common/point";
-import { UIRenderContext } from "../../rendering/uiRenderContext";
-import { UIBackground } from "../uiBackground";
-import { UILayoutContext } from "../uiLayoutContext";
-import { UISize } from "../uiSize";
-import { UIView } from "../uiView";
+import { addPoint, Point } from "../../common/point.js";
+import { UIRenderContext } from "../../rendering/uiRenderContext.js";
+import { UIBackground } from "../uiBackground.js";
+import { UILayoutContext } from "../uiLayoutContext.js";
+import { UISize } from "../uiSize.js";
+import { UIView } from "../uiView.js";
 
 export class UIMasterDetails extends UIView {
     private _singleBackground: UIBackground | null = null;

@@ -1,5 +1,5 @@
-import { ComponentEvent } from "../componentEvent";
-import { HealthComponent } from "./healthComponent";
+import { ComponentEvent } from "../componentEvent.js";
+import { HealthComponent } from "./healthComponent.js";
 
 export class HealthEvent extends ComponentEvent<HealthComponent> {
     constructor(

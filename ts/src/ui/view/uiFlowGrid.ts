@@ -1,8 +1,8 @@
-import { Point } from "../../common/point";
-import { UIRenderContext } from "../../rendering/uiRenderContext";
-import { UILayoutContext } from "../uiLayoutContext";
-import { fillUiSize, UISize, wrapUiSize } from "../uiSize";
-import { UIViewGroup } from "../uiViewGroup";
+import { Point } from "../../common/point.js";
+import { UIRenderContext } from "../../rendering/uiRenderContext.js";
+import { UILayoutContext } from "../uiLayoutContext.js";
+import { fillUiSize, UISize, wrapUiSize } from "../uiSize.js";
+import { UIViewGroup } from "../uiViewGroup.js";
 
 export class UIFlowGrid extends UIViewGroup {
     private _gridItemMinimumSize: number = 32;

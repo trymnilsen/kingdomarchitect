@@ -1,19 +1,19 @@
-import { getBounds } from "../../common/bounds";
-import { generateId } from "../../common/idGenerator";
-import { Point } from "../../common/point";
-import { GroundChunk } from "../../game/world/component/tile/tilesComponent";
-import { Entity } from "../../game/world/entity/entity";
-import { chestPrefab } from "../../game/world/prefab/chestPrefab";
-import { GroundTile } from "../../game/world/tile/ground";
+import { getBounds } from "../../common/bounds.js";
+import { generateId } from "../../common/idGenerator.js";
+import { Point } from "../../common/point.js";
+import { GroundChunk } from "../../game/world/component/tile/tilesComponent.js";
+import { Entity } from "../../game/world/entity/entity.js";
+import { chestPrefab } from "../../game/world/prefab/chestPrefab.js";
+import { GroundTile } from "../../game/world/tile/ground.js";
 import {
     bowItem,
     hammerItem,
     swordItem,
     wizardHat,
-} from "../inventory/equipment";
-import { InventoryItem } from "../inventory/inventoryItem";
-import { goldCoins } from "../inventory/resources";
-import { Tileset, TileSetFactory } from "./tileset";
+} from "../inventory/equipment.js";
+import { InventoryItem } from "../inventory/inventoryItem.js";
+import { goldCoins } from "../inventory/resources.js";
+import { Tileset, TileSetFactory } from "./tileset.js";
 
 export function createFirstTileSet(chunk: GroundChunk): Tileset {
     const tiles: Point[] = [];

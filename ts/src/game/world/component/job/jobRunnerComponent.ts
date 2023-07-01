@@ -1,10 +1,10 @@
-import { InvalidStateError } from "../../../../common/error/invalidStateError";
-import { Point } from "../../../../common/point";
-import { RenderContext } from "../../../../rendering/renderContext";
-import { Job } from "../../job/job";
-import { EntityComponent } from "../entityComponent";
-import { JobOwner } from "./jobOwner";
-import { JobQueueComponent } from "./jobQueueComponent";
+import { InvalidStateError } from "../../../../common/error/invalidStateError.js";
+import { Point } from "../../../../common/point.js";
+import { RenderContext } from "../../../../rendering/renderContext.js";
+import { Job } from "../../job/job.js";
+import { EntityComponent } from "../entityComponent.js";
+import { JobOwner } from "./jobOwner.js";
+import { JobQueueComponent } from "./jobQueueComponent.js";
 
 export class JobRunnerComponent extends EntityComponent implements JobOwner {
     /**

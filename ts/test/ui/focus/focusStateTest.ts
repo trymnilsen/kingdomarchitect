@@ -1,4 +1,5 @@
-import { assert } from "chai";
+import { describe, it } from "node:test";
+import * as assert from "node:assert";
 
 describe("FocusState test", () => {
     it("set first focus sets focus to upperleft most view", () => {

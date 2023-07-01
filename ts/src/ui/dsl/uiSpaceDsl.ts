@@ -1,5 +1,5 @@
-import { UISpace } from "../view/uiSpace";
-import { UIViewProperties } from "./uiViewDsl";
+import { UISpace } from "../view/uiSpace.js";
+import { UIViewProperties } from "./uiViewDsl.js";
 
 export function uiSpace(properties: UIViewProperties): UISpace {
     const spacer = new UISpace({

@@ -1,4 +1,5 @@
-import * as binsJson from "../../../generated/bins.json";
+import { bins } from "../../../generated/sprites.js";
+
 export class AssetLoader {
     private _assets: { [name: string]: HTMLImageElement } = {};
 
@@ -6,10 +7,9 @@ export class AssetLoader {
         const loadPromises: Promise<any>[] = [];
 
         loadPromises.push(this.loadFonts());
-        for (const bin of Object.entries(binsJson)) {
-            if (bin[0] != "default") {
-                loadPromises.push(this.loadAsset(bin[0], bin[1]));
-            }
+
+        for (const bin of bins) {
+            loadPromises.push(this.loadAsset(bin.name, bin.filename));
         }
 
         await Promise.all(loadPromises);

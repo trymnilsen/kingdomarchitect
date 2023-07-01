@@ -1,8 +1,8 @@
-import { sprites2 } from "../../../../asset/sprite";
-import { Point } from "../../../../common/point";
-import { RenderContext } from "../../../../rendering/renderContext";
-import { EntityComponent } from "../entityComponent";
-import { HealthComponent } from "../health/healthComponent";
+import { sprites2 } from "../../../../asset/sprite.js";
+import { Point } from "../../../../common/point.js";
+import { RenderContext } from "../../../../rendering/renderContext.js";
+import { EntityComponent } from "../entityComponent.js";
+import { HealthComponent } from "../health/healthComponent.js";
 
 export enum TreeComponentChopState {
     Chopping,

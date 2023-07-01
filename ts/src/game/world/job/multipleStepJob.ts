@@ -1,7 +1,7 @@
-import { InvalidStateError } from "../../../common/error/invalidStateError";
-import { RenderContext } from "../../../rendering/renderContext";
-import { JobOwner } from "../component/job/jobOwner";
-import { Job, JobState } from "./job";
+import { InvalidStateError } from "../../../common/error/invalidStateError.js";
+import { RenderContext } from "../../../rendering/renderContext.js";
+import { JobOwner } from "../component/job/jobOwner.js";
+import { Job, JobState } from "./job.js";
 
 /**
  * Represents a job that is able to hold a sequence of smaller child jobs.

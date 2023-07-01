@@ -1,5 +1,5 @@
-import { Point } from "../../common/point";
-import { Graph, GraphNode } from "./graph";
+import { Point } from "../../common/point.js";
+import { Graph, GraphNode } from "./graph.js";
 
 export type WeightFunction = () => {
     offsetX: number;

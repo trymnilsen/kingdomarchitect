@@ -1,17 +1,17 @@
-import { sprites2 } from "../../../../asset/sprite";
-import { allSides } from "../../../../common/sides";
-import { UIThemeType } from "../../../../ui/color";
-import { ninePatchBackground } from "../../../../ui/dsl/uiBackgroundDsl";
-import { uiBox } from "../../../../ui/dsl/uiBoxDsl";
-import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize";
-import { UIView } from "../../../../ui/uiView";
-import { UIFlowGrid } from "../../../../ui/view/uiFlowGrid";
-import { ChestComponent } from "../../../world/component/resource/chestComponent";
-import { CollectChestJob } from "../../../world/job/jobs/chest/collectChestJob";
-import { InteractionState } from "../../handler/interactionState";
-import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold";
-import { UIBorderTitle } from "../../view/uiBorderTitle";
-import { UIInventoryGridItem } from "../root/inventory/uiInventoryGridItem";
+import { sprites2 } from "../../../../asset/sprite.js";
+import { allSides } from "../../../../common/sides.js";
+import { UIThemeType } from "../../../../ui/color.js";
+import { ninePatchBackground } from "../../../../ui/dsl/uiBackgroundDsl.js";
+import { uiBox } from "../../../../ui/dsl/uiBoxDsl.js";
+import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize.js";
+import { UIView } from "../../../../ui/uiView.js";
+import { UIFlowGrid } from "../../../../ui/view/uiFlowGrid.js";
+import { ChestComponent } from "../../../world/component/resource/chestComponent.js";
+import { CollectChestJob } from "../../../world/job/jobs/chest/collectChestJob.js";
+import { InteractionState } from "../../handler/interactionState.js";
+import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold.js";
+import { UIBorderTitle } from "../../view/uiBorderTitle.js";
+import { UIInventoryGridItem } from "../root/inventory/uiInventoryGridItem.js";
 
 export class CollectChestState extends InteractionState {
     private _actionbar!: UIView;
@@ -83,7 +83,7 @@ export class CollectChestState extends InteractionState {
 
     private scheduleCollectJob() {
         const collectJob = new CollectChestJob(this.chest);
-        this.context.world.jobQueue.schedule(collectJob);
+        this.context.world.jobQueue.addJob(collectJob);
         this.context.stateChanger.clear();
     }
 

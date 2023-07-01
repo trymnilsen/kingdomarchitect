@@ -1,4 +1,4 @@
-import { Job } from "../../job/job";
+import { Job } from "../../job/job.js";
 
 export interface JobOwner {
     /**

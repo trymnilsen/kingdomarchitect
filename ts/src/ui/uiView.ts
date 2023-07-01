@@ -1,7 +1,7 @@
-import { Bounds, withinRectangle } from "../common/bounds";
-import { Event, EventListener } from "../common/event";
-import { addPoint, Point, zeroPoint } from "../common/point";
-import { UIRenderContext } from "../rendering/uiRenderContext";
+import { Bounds, withinRectangle } from "../common/bounds.js";
+import { Event, EventListener } from "../common/event.js";
+import { addPoint, Point, zeroPoint } from "../common/point.js";
+import { UIRenderContext } from "../rendering/uiRenderContext.js";
 import {
     isTapEvent,
     tapStartType,
@@ -10,14 +10,14 @@ import {
     UIEvent,
     UIInputEvent,
     UITapEvent,
-} from "./event/uiEvent";
+} from "./event/uiEvent.js";
 import {
     getClosestFocusableView,
     getFocusableViews,
-} from "./focus/focusHelpers";
-import { FocusState } from "./focus/focusState";
-import { UILayoutContext } from "./uiLayoutContext";
-import { fillUiSize, UISize, zeroSize } from "./uiSize";
+} from "./focus/focusHelpers.js";
+import { FocusState } from "./focus/focusState.js";
+import { UILayoutContext } from "./uiLayoutContext.js";
+import { fillUiSize, UISize, zeroSize } from "./uiSize.js";
 
 export interface UIAction {
     type: string;

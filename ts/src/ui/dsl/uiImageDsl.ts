@@ -1,7 +1,7 @@
-import { UIViewProperties } from "./uiViewDsl";
-import { UIImage } from "../view/uiImage";
-import { UIImageSource, UISpriteImageSource } from "../view/uiImageSource";
-import { Sprite2 } from "../../asset/sprite";
+import { UIViewProperties } from "./uiViewDsl.js";
+import { UIImage } from "../view/uiImage.js";
+import { UIImageSource, UISpriteImageSource } from "../view/uiImageSource.js";
+import { Sprite2 } from "../../asset/sprite.js";
 
 export interface UIImageProperties extends UIViewProperties {
     image: UIImageSource;

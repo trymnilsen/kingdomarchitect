@@ -1,3 +1,9 @@
+export const bins = [
+  {
+    "name": "0",
+    "filename": "bin-0.png"
+  }
+];
 export const sprites = {
   "fox": {
     "bin": "0",
@@ -239,6 +245,16 @@ export const sprites = {
       "y": 32
     }
   },
+  "rocks": {
+    "bin": "0",
+    "defintion": {
+      "frames": 1,
+      "w": 16,
+      "h": 16,
+      "x": 80,
+      "y": 64
+    }
+  },
   "stone": {
     "bin": "0",
     "defintion": {
@@ -265,8 +281,8 @@ export const sprites = {
       "frames": 1,
       "w": 16,
       "h": 16,
-      "x": 80,
-      "y": 64
+      "x": 144,
+      "y": 32
     }
   },
   "sunrise_icon": {
@@ -275,8 +291,8 @@ export const sprites = {
       "frames": 1,
       "w": 16,
       "h": 16,
-      "x": 144,
-      "y": 32
+      "x": 192,
+      "y": 48
     }
   },
   "moon_icon": {
@@ -285,8 +301,8 @@ export const sprites = {
       "frames": 1,
       "w": 16,
       "h": 16,
-      "x": 192,
-      "y": 48
+      "x": 96,
+      "y": 64
     }
   },
   "knight": {
@@ -305,8 +321,8 @@ export const sprites = {
       "frames": 1,
       "w": 16,
       "h": 16,
-      "x": 96,
-      "y": 64
+      "x": 144,
+      "y": 48
     }
   },
   "building_tombstone": {
@@ -315,8 +331,8 @@ export const sprites = {
       "frames": 1,
       "w": 16,
       "h": 16,
-      "x": 144,
-      "y": 48
+      "x": 192,
+      "y": 64
     }
   },
   "tree_stub": {
@@ -365,7 +381,7 @@ export const sprites = {
       "frames": 1,
       "w": 16,
       "h": 16,
-      "x": 192,
+      "x": 112,
       "y": 64
     }
   },
@@ -475,7 +491,7 @@ export const sprites = {
       "frames": 1,
       "w": 16,
       "h": 16,
-      "x": 112,
+      "x": 128,
       "y": 64
     }
   },
@@ -495,7 +511,7 @@ export const sprites = {
       "frames": 1,
       "w": 16,
       "h": 16,
-      "x": 128,
+      "x": 144,
       "y": 64
     }
   },
@@ -665,8 +681,8 @@ export const sprites = {
       "frames": 1,
       "w": 16,
       "h": 16,
-      "x": 144,
-      "y": 64
+      "x": 176,
+      "y": 208
     }
   },
   "stone_slate_button_2x": {
@@ -876,7 +892,7 @@ export const sprites = {
       "w": 32,
       "h": 32,
       "x": 160,
-      "y": 208
+      "y": 224
     }
   },
   "sword_skill_shadow": {
@@ -919,4 +935,4 @@ export const sprites = {
       "y": 360
     }
   }
-}
+};

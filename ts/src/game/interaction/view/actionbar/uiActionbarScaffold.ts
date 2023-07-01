@@ -1,19 +1,19 @@
-import { sprites2 } from "../../../../asset/sprite";
-import { Point } from "../../../../common/point";
-import { Sides, allSides } from "../../../../common/sides";
-import { UIRenderContext } from "../../../../rendering/uiRenderContext";
-import { SpriteBackground } from "../../../../ui/uiBackground";
-import { UILayoutContext } from "../../../../ui/uiLayoutContext";
-import { UISize, wrapUiSize } from "../../../../ui/uiSize";
-import { UIView } from "../../../../ui/uiView";
-import { UIColumn } from "../../../../ui/view/uiColumn";
+import { sprites2 } from "../../../../asset/sprite.js";
+import { Point } from "../../../../common/point.js";
+import { Sides, allSides } from "../../../../common/sides.js";
+import { UIRenderContext } from "../../../../rendering/uiRenderContext.js";
+import { SpriteBackground } from "../../../../ui/uiBackground.js";
+import { UILayoutContext } from "../../../../ui/uiLayoutContext.js";
+import { UISize, wrapUiSize } from "../../../../ui/uiSize.js";
+import { UIView } from "../../../../ui/uiView.js";
+import { UIColumn } from "../../../../ui/view/uiColumn.js";
 import {
     UIActionbar,
     UIActionbarAlignment,
     UIActionbarItem,
-} from "./uiActionbar";
-import { UIActionbarButton } from "./uiActionbarButton";
-import { actionbarHeight, actionbarWidth } from "./uiActionbarConstants";
+} from "./uiActionbar.js";
+import { UIActionbarButton } from "./uiActionbarButton.js";
+import { actionbarHeight, actionbarWidth } from "./uiActionbarConstants.js";
 
 const background = new SpriteBackground(sprites2.stone_slate_background_2x);
 

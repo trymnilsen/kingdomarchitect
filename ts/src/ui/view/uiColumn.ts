@@ -1,11 +1,11 @@
-import { Point } from "../../common/point";
-import { UIRenderContext } from "../../rendering/uiRenderContext";
-import { HorizontalAlignment } from "../uiAlignment";
-import { UILayoutContext } from "../uiLayoutContext";
-import { fillUiSize, UISize, wrapUiSize } from "../uiSize";
-import { UIView } from "../uiView";
-import { UIViewGroup } from "../uiViewGroup";
-import { AxisPlacement, insertAndShift } from "./axisPlacement";
+import { Point } from "../../common/point.js";
+import { UIRenderContext } from "../../rendering/uiRenderContext.js";
+import { HorizontalAlignment } from "../uiAlignment.js";
+import { UILayoutContext } from "../uiLayoutContext.js";
+import { fillUiSize, UISize, wrapUiSize } from "../uiSize.js";
+import { UIView } from "../uiView.js";
+import { UIViewGroup } from "../uiViewGroup.js";
+import { AxisPlacement, insertAndShift } from "./axisPlacement.js";
 
 export class UIColumn extends UIViewGroup {
     private weights: { [view: string]: number } = {};

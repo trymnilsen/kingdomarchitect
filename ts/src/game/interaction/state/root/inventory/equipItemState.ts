@@ -1,23 +1,23 @@
-import { sprites2 } from "../../../../../asset/sprite";
+import { sprites2 } from "../../../../../asset/sprite.js";
 import {
     InventoryItem,
     ItemCategory,
-} from "../../../../../data/inventory/inventoryItem";
-import { RenderContext } from "../../../../../rendering/renderContext";
-import { uiBox } from "../../../../../ui/dsl/uiBoxDsl";
-import { fillUiSize } from "../../../../../ui/uiSize";
-import { WorkerBehaviorComponent } from "../../../../world/component/behavior/workerBehaviorComponent";
-import { SpriteComponent } from "../../../../world/component/draw/spriteComponent";
-import { EquipmentComponent } from "../../../../world/component/inventory/equipmentComponent";
-import { InventoryComponent } from "../../../../world/component/inventory/inventoryComponent";
-import { firstChildWhere } from "../../../../world/entity/child/first";
-import { Entity } from "../../../../world/entity/entity";
-import { GroundTile } from "../../../../world/tile/ground";
-import { TileSize } from "../../../../world/tile/tile";
-import { InteractionState } from "../../../handler/interactionState";
-import { UIActionbarItem } from "../../../view/actionbar/uiActionbar";
-import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold";
-import { AlertMessageState } from "../../common/alertMessageState";
+} from "../../../../../data/inventory/inventoryItem.js";
+import { RenderContext } from "../../../../../rendering/renderContext.js";
+import { uiBox } from "../../../../../ui/dsl/uiBoxDsl.js";
+import { fillUiSize } from "../../../../../ui/uiSize.js";
+import { WorkerBehaviorComponent } from "../../../../world/component/behavior/workerBehaviorComponent.js";
+import { SpriteComponent } from "../../../../world/component/draw/spriteComponent.js";
+import { EquipmentComponent } from "../../../../world/component/inventory/equipmentComponent.js";
+import { InventoryComponent } from "../../../../world/component/inventory/inventoryComponent.js";
+import { firstChildWhere } from "../../../../world/entity/child/first.js";
+import { Entity } from "../../../../world/entity/entity.js";
+import { GroundTile } from "../../../../world/tile/ground.js";
+import { TileSize } from "../../../../world/tile/tile.js";
+import { InteractionState } from "../../../handler/interactionState.js";
+import { UIActionbarItem } from "../../../view/actionbar/uiActionbar.js";
+import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold.js";
+import { AlertMessageState } from "../../common/alertMessageState.js";
 
 export class EquipItemState extends InteractionState {
     private cursorSelection: Entity | null = null;

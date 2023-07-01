@@ -1,7 +1,7 @@
-import { Point } from "../../../common/point";
-import { RenderContext } from "../../../rendering/renderContext";
-import { Entity } from "../entity/entity";
-import { ComponentEvent } from "./componentEvent";
+import { Point } from "../../../common/point.js";
+import { RenderContext } from "../../../rendering/renderContext.js";
+import { Entity } from "../entity/entity.js";
+import { ComponentEvent } from "./componentEvent.js";
 
 export abstract class EntityComponent {
     private _entity?: Entity;

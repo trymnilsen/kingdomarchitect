@@ -1,19 +1,22 @@
-import { AssetLoader } from "../asset/loader/assetLoader";
-import { Sprite2 } from "../asset/sprite";
-import { UILayoutContext } from "../ui/uiLayoutContext";
-import { UISize } from "../ui/uiSize";
-import { Camera } from "./camera";
+import { AssetLoader } from "../asset/loader/assetLoader.js";
+import { Sprite2 } from "../asset/sprite.js";
+import { UILayoutContext } from "../ui/uiLayoutContext.js";
+import { UISize } from "../ui/uiSize.js";
+import { Camera } from "./camera.js";
 import {
     NinePatchSpriteConfiguration,
     ninePatchImageRenderer as ninePatchSpriteRenderer,
     SpriteConfiguration,
     spriteRenderer,
-} from "./items/sprite";
-import { RectangleConfiguration, rectangleRenderer } from "./items/rectangle";
-import { TextConfiguration, textRenderer } from "./items/text";
-import { TextStyle } from "./text/textStyle";
-import { UIRenderContext } from "./uiRenderContext";
-import { Bounds } from "../common/bounds";
+} from "./items/sprite.js";
+import {
+    RectangleConfiguration,
+    rectangleRenderer,
+} from "./items/rectangle.js";
+import { TextConfiguration, textRenderer } from "./items/text.js";
+import { TextStyle } from "./text/textStyle.js";
+import { UIRenderContext } from "./uiRenderContext.js";
+import { Bounds } from "../common/bounds.js";
 
 /**
  * The rendercontext combines the access to the camera, assets and canvas

@@ -1,7 +1,7 @@
-import { withinRectangle } from "../../common/bounds";
-import { Point } from "../../common/point";
-import { UIBackground } from "../uiBackground";
-import { UIBox } from "./uiBox";
+import { withinRectangle } from "../../common/bounds.js";
+import { Point } from "../../common/point.js";
+import { UIBackground } from "../uiBackground.js";
+import { UIBox } from "./uiBox.js";
 
 export class UIButton extends UIBox {
     private _onTappedBackground: UIBackground | null = null;

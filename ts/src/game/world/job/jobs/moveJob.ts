@@ -1,8 +1,8 @@
-import { Point } from "../../../../common/point";
-import { RenderContext } from "../../../../rendering/renderContext";
-import { TileSize } from "../../tile/tile";
-import { Job } from "../job";
-import { JobConstraint } from "../jobConstraint";
+import { Point } from "../../../../common/point.js";
+import { RenderContext } from "../../../../rendering/renderContext.js";
+import { TileSize } from "../../tile/tile.js";
+import { Job } from "../job.js";
+import { JobConstraint } from "../jobConstraint.js";
 
 /**
  * Represents a job that will move through a specific path and complete once

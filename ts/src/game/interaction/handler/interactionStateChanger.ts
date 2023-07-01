@@ -1,5 +1,5 @@
-import { InteractionState } from "./interactionState";
-import { InteractionStateHistory } from "./interactionStateHistory";
+import { InteractionState } from "./interactionState.js";
+import { InteractionStateHistory } from "./interactionStateHistory.js";
 
 export interface InteractionStateChanger {
     push(state: InteractionState, onPop?: (result: unknown) => void): void;

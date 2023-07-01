@@ -1,4 +1,4 @@
-import { Point } from "../../../../../common/point";
+import { Point } from "../../../../../common/point.js";
 
 export interface BuildMode {
     readonly description: BuildModeDescription;

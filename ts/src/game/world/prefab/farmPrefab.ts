@@ -1,6 +1,6 @@
-import { sprites2 } from "../../../asset/sprite";
-import { SpriteComponent } from "../component/draw/spriteComponent";
-import { Entity } from "../entity/entity";
+import { sprites2 } from "../../../asset/sprite.js";
+import { SpriteComponent } from "../component/draw/spriteComponent.js";
+import { Entity } from "../entity/entity.js";
 
 export function farmPrefab(id: string): Entity {
     const farm = new Entity(id);

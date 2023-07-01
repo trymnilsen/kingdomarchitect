@@ -1,11 +1,11 @@
-import { Point } from "../../common/point";
-import { UIRenderContext } from "../../rendering/uiRenderContext";
-import { VerticalAlignment } from "../uiAlignment";
-import { UILayoutContext } from "../uiLayoutContext";
-import { UISize, fillUiSize, wrapUiSize } from "../uiSize";
-import { UIView } from "../uiView";
-import { UIViewGroup } from "../uiViewGroup";
-import { AxisPlacement, insertAndShift } from "./axisPlacement";
+import { Point } from "../../common/point.js";
+import { UIRenderContext } from "../../rendering/uiRenderContext.js";
+import { VerticalAlignment } from "../uiAlignment.js";
+import { UILayoutContext } from "../uiLayoutContext.js";
+import { UISize, fillUiSize, wrapUiSize } from "../uiSize.js";
+import { UIView } from "../uiView.js";
+import { UIViewGroup } from "../uiViewGroup.js";
+import { AxisPlacement, insertAndShift } from "./axisPlacement.js";
 
 export class UIRow extends UIViewGroup {
     private weights: { [view: string]: number } = {};

@@ -1,9 +1,9 @@
-import { hammerItem, swordItem } from "../../../../data/inventory/equipment";
-import { InventoryItem } from "../../../../data/inventory/inventoryItem";
+import { hammerItem, swordItem } from "../../../../data/inventory/equipment.js";
+import { InventoryItem } from "../../../../data/inventory/inventoryItem.js";
 import {
     InventoryItemList,
     InventoryItemQuantity,
-} from "../../../../data/inventory/inventoryItemQuantity";
+} from "../../../../data/inventory/inventoryItemQuantity.js";
 import {
     bagOfGlitter,
     blueBook,
@@ -14,8 +14,8 @@ import {
     scroll,
     stoneResource,
     woodResourceItem,
-} from "../../../../data/inventory/resources";
-import { EntityComponent } from "../entityComponent";
+} from "../../../../data/inventory/resources.js";
+import { EntityComponent } from "../entityComponent.js";
 
 export class InventoryComponent extends EntityComponent {
     private _items: { [id: string]: InventoryItemQuantity } = {

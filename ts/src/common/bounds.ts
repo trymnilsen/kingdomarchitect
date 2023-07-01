@@ -1,6 +1,6 @@
-import { Axis } from "./direction";
-import { Point } from "./point";
-import { NumberRange } from "./range";
+import { Axis } from "./direction.js";
+import { Point } from "./point.js";
+import { NumberRange } from "./range.js";
 
 /**
  * Check if the given point is within the given rectangle represented by the

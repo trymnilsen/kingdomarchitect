@@ -1,7 +1,7 @@
-import { Point, pointEquals } from "../common/point";
-import { BinaryHeap } from "./binaryHeap";
-import { Graph, GraphNode } from "./graph/graph";
-import { manhattanDistance } from "./pathHeuristics";
+import { Point, pointEquals } from "../common/point.js";
+import { BinaryHeap } from "./binaryHeap.js";
+import { Graph, GraphNode } from "./graph/graph.js";
+import { manhattanDistance } from "./pathHeuristics.js";
 
 export class PathSearch {
     private graph: Graph;

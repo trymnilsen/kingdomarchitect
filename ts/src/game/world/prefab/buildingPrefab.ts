@@ -1,9 +1,9 @@
-import { sprites2 } from "../../../asset/sprite";
-import { Building } from "../../../data/building/building";
-import { BuildingComponent } from "../component/building/buildingComponent";
-import { EntityComponent } from "../component/entityComponent";
-import { HealthComponent } from "../component/health/healthComponent";
-import { Entity } from "../entity/entity";
+import { sprites2 } from "../../../asset/sprite.js";
+import { Building } from "../../../data/building/building.js";
+import { BuildingComponent } from "../component/building/buildingComponent.js";
+import { EntityComponent } from "../component/entityComponent.js";
+import { HealthComponent } from "../component/health/healthComponent.js";
+import { Entity } from "../entity/entity.js";
 
 export function buildingPrefab(
     id: string,

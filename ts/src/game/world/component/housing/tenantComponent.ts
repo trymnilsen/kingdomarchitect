@@ -1,5 +1,5 @@
-import { Entity } from "../../entity/entity";
-import { EntityComponent } from "../entityComponent";
+import { Entity } from "../../entity/entity.js";
+import { EntityComponent } from "../entityComponent.js";
 
 export class TenantComponent extends EntityComponent {
     private _house: Entity | null = null;

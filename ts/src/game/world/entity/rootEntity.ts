@@ -1,9 +1,9 @@
-import { InvalidStateError } from "../../../common/error/invalidStateError";
-import { adjacentPoints, Point, pointEquals } from "../../../common/point";
-import { getChunkId, getChunkPosition } from "../chunk";
-import { PathFindingComponent } from "../component/root/path/pathFindingComponent";
-import { Entity } from "./entity";
-import { EntityEvent } from "./entityEvent";
+import { InvalidStateError } from "../../../common/error/invalidStateError.js";
+import { adjacentPoints, Point, pointEquals } from "../../../common/point.js";
+import { getChunkId, getChunkPosition } from "../chunk.js";
+import { PathFindingComponent } from "../component/root/path/pathFindingComponent.js";
+import { Entity } from "./entity.js";
+import { EntityEvent } from "./entityEvent.js";
 
 type ChunkMap = { [chunkPosition: string]: { [entityId: string]: Entity } };
 

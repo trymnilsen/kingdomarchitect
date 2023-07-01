@@ -1,6 +1,6 @@
-import { Sprite2 } from "../../asset/sprite";
-import { addPoint, Point, zeroPoint } from "../../common/point";
-import { RenderContext } from "../renderContext";
+import { Sprite2 } from "../../asset/sprite.js";
+import { addPoint, Point, zeroPoint } from "../../common/point.js";
+import { RenderContext } from "../renderContext.js";
 
 export class SpriteAnimation {
     private currentFrame: number = 0;

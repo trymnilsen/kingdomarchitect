@@ -1,4 +1,4 @@
-import { World } from "../world/world";
+import { World } from "../world/world.js";
 
 export function spawnAnimalsRoutine(tick: number, world: World) {
     //TODO: add back spawn animals

@@ -1,8 +1,8 @@
-import { Sprite2 } from "../../src/asset/sprite";
-import { TextStyle } from "../../src/rendering/text/textStyle";
-import { UILayoutContext } from "../../src/ui/uiLayoutContext";
-import { UISize } from "../../src/ui/uiSize";
-import { UIView } from "../../src/ui/uiView";
+import { Sprite2 } from "../../src/asset/sprite.js";
+import { TextStyle } from "../../src/rendering/text/textStyle.js";
+import { UILayoutContext } from "../../src/ui/uiLayoutContext.js";
+import { UISize } from "../../src/ui/uiSize.js";
+import { UIView } from "../../src/ui/uiView.js";
 
 /**
  * A test layout context. Implementation should not be depended upon.

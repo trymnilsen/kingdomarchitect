@@ -1,14 +1,14 @@
-import { subTitleTextStyle } from "../../../../rendering/text/textStyle";
-import { uiButton } from "../../../../ui/dsl/uiButtonDsl";
-import { uiColumn } from "../../../../ui/dsl/uiColumnDsl";
-import { spriteImageSource, uiImage } from "../../../../ui/dsl/uiImageDsl";
-import { uiText } from "../../../../ui/dsl/uiTextDsl";
-import { UIBackground } from "../../../../ui/uiBackground";
-import { wrapUiSize } from "../../../../ui/uiSize";
-import { UIView } from "../../../../ui/uiView";
-import { UIBox } from "../../../../ui/view/uiBox";
-import { UIActionbarItem } from "./uiActionbar";
-import { actionbarHeight, actionbarWidth } from "./uiActionbarConstants";
+import { subTitleTextStyle } from "../../../../rendering/text/textStyle.js";
+import { uiButton } from "../../../../ui/dsl/uiButtonDsl.js";
+import { uiColumn } from "../../../../ui/dsl/uiColumnDsl.js";
+import { spriteImageSource, uiImage } from "../../../../ui/dsl/uiImageDsl.js";
+import { uiText } from "../../../../ui/dsl/uiTextDsl.js";
+import { UIBackground } from "../../../../ui/uiBackground.js";
+import { wrapUiSize } from "../../../../ui/uiSize.js";
+import { UIView } from "../../../../ui/uiView.js";
+import { UIBox } from "../../../../ui/view/uiBox.js";
+import { UIActionbarItem } from "./uiActionbar.js";
+import { actionbarHeight, actionbarWidth } from "./uiActionbarConstants.js";
 
 export class UIActionbarButton extends UIBox {
     constructor(

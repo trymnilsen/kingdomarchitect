@@ -1,6 +1,6 @@
-import { Sprite2 } from "../asset/sprite";
-import { TextStyle } from "../rendering/text/textStyle";
-import { UISize } from "./uiSize";
+import { Sprite2 } from "../asset/sprite.js";
+import { TextStyle } from "../rendering/text/textStyle.js";
+import { UISize } from "./uiSize.js";
 
 export interface UILayoutContext {
     measureText(text: string, textStyle: TextStyle): UISize;

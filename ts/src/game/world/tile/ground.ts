@@ -1,6 +1,6 @@
-import { sprites2 } from "../../../asset/sprite";
-import { randomEntry } from "../../../common/array";
-import { Bounds, getBoundsAxis } from "../../../common/bounds";
+import { sprites2 } from "../../../asset/sprite.js";
+import { randomEntry } from "../../../common/array.js";
+import { Bounds, getBoundsAxis } from "../../../common/bounds.js";
 import {
     Axis,
     Direction,
@@ -8,11 +8,11 @@ import {
     getRandomDirection,
     invertAxis,
     invertDirection,
-} from "../../../common/direction";
-import { adjacentPoint, Point, pointEquals } from "../../../common/point";
-import { rangeDistance, rangeRandom } from "../../../common/range";
-import { RenderContext } from "../../../rendering/renderContext";
-import { getTileId, TileSize } from "./tile";
+} from "../../../common/direction.js";
+import { adjacentPoint, Point, pointEquals } from "../../../common/point.js";
+import { rangeDistance, rangeRandom } from "../../../common/range.js";
+import { RenderContext } from "../../../rendering/renderContext.js";
+import { getTileId, TileSize } from "./tile.js";
 
 export interface GroundTile {
     tileX: number;

@@ -2,49 +2,36 @@
     "name": "kingdomarchitect",
     "version": "1.0.0",
     "description": "Kingdom architects is intended to be a building/management game",
+    "type": "module",
+    "author": "Trym Nilsen",
+    "private": true,
+    "license": "MIT",
+    "homepage": "https://github.com/trymnilsen/kingdomarchitect#readme",
     "scripts": {
-        "tsc": "tsc",
-        "build": "webpack",
-        "spritepack": "ts-node ts/tool/spritepack/spritePack.ts && webpack",
-        "start": "webpack serve",
-        "test": "mocha",
-        "lint": "eslint . --ext .ts",
-        "coverage": "c8 mocha && open coverage/lcov-report/index.html"
+        "build": "tsc && rollup -c",
+        "spritepack": "tsc && node build/tool/spritepack/spritePack.js",
+        "start": "http-server -c-1",
+        "test": "tsc && node --test --test-reporter dot",
+        "bundle": "rollup -c"
     },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/trymnilsen/kingdomarchitect.git"
     },
-    "author": "Trym Nilsen",
-    "private": true,
-    "license": "MIT",
     "bugs": {
         "url": "https://github.com/trymnilsen/kingdomarchitect/issues"
     },
-    "homepage": "https://github.com/trymnilsen/kingdomarchitect#readme",
     "dependencies": {
-        "@types/chai": "^4.3.5",
-        "@types/get-pixels": "^3.3.2",
-        "@types/mocha": "^10.0.1",
-        "@typescript-eslint/eslint-plugin": "^5.59.6",
-        "@typescript-eslint/parser": "^5.59.6",
-        "c8": "^7.13.0",
-        "chai": "^4.3.7",
-        "eslint-plugin-import": "^2.27.5",
-        "eslint-plugin-tsdoc": "^0.2.17",
-        "eslint": "^8.41.0",
-        "get-pixels": "^3.3.3",
+        "@types/node": "^20.3.1",
+        "http-server": "^14.1.1",
         "jimp": "^0.22.8",
         "maxrects-packer": "^2.7.3",
-        "mocha": "^10.2.0",
-        "ts-loader": "^9.4.2",
-        "ts-node": "^10.9.1",
-        "typescript": "^5.1.3",
-        "webpack-cli": "^5.1.1",
-        "webpack-dev-server": "^4.15.0",
-        "webpack": "^5.83.1"
+        "rollup": "^3.25.2",
+        "rollup-plugin-sourcemaps": "^0.6.3",
+        "typescript": "^5.1.3"
     },
     "overrides": {
-        "xml2js": "^0.5.0"
+        "xml2js": "^0.5.0",
+        "semver": "^7.5.3"
     }
 }

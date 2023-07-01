@@ -1,8 +1,8 @@
-import { Game } from "./game/game";
+import { Game } from "./game/game.js";
 
 const canvasElementId = "gameCanvas";
 
-export async function bootstrap() {
+async function bootstrap() {
     console.log("Bootstrapping");
     const game = new Game(canvasElementId);
     try {

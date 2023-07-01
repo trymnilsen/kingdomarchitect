@@ -1,7 +1,7 @@
-import { HorizontalAlignment } from "../uiAlignment";
-import { UIView } from "../uiView";
-import { UIColumn } from "../view/uiColumn";
-import { UIViewProperties } from "./uiViewDsl";
+import { HorizontalAlignment } from "../uiAlignment.js";
+import { UIView } from "../uiView.js";
+import { UIColumn } from "../view/uiColumn.js";
+import { UIViewProperties } from "./uiViewDsl.js";
 
 export interface ColumnChild {
     child: UIView;

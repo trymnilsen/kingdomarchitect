@@ -1,6 +1,6 @@
-import { Point } from "../../../common/point";
-import { GroundTile } from "../component/tile/tilesComponent";
-import { SelectedWorldItem } from "./selectedWorldItem";
+import { Point } from "../../../common/point.js";
+import { GroundTile } from "../component/tile/tilesComponent.js";
+import { SelectedWorldItem } from "./selectedWorldItem.js";
 
 export class SelectedTileItem implements SelectedWorldItem {
     constructor(public groundTile: GroundTile) {}

@@ -1,17 +1,17 @@
-import { absBounds } from "../../../../../common/bounds";
-import { InvalidArgumentError } from "../../../../../common/error/invalidArgumentError";
-import { Point } from "../../../../../common/point";
+import { absBounds } from "../../../../../common/bounds.js";
+import { InvalidArgumentError } from "../../../../../common/error/invalidArgumentError.js";
+import { Point } from "../../../../../common/point.js";
 import {
     FixedGraph,
     WeightFunction,
-} from "../../../../../path/graph/fixedGraph";
-import { Graph } from "../../../../../path/graph/graph";
-import { LazyGraph } from "../../../../../path/graph/lazyGraph";
+} from "../../../../../path/graph/fixedGraph.js";
+import { Graph } from "../../../../../path/graph/graph.js";
+import { LazyGraph } from "../../../../../path/graph/lazyGraph.js";
 
-import { RootEntity } from "../../../entity/rootEntity";
-import { WorkerBehaviorComponent } from "../../behavior/workerBehaviorComponent";
-import { BuildingComponent } from "../../building/buildingComponent";
-import { TilesComponent } from "../../tile/tilesComponent";
+import { RootEntity } from "../../../entity/rootEntity.js";
+import { WorkerBehaviorComponent } from "../../behavior/workerBehaviorComponent.js";
+import { BuildingComponent } from "../../building/buildingComponent.js";
+import { TilesComponent } from "../../tile/tilesComponent.js";
 
 /**
  * Creates a graph based on the given world

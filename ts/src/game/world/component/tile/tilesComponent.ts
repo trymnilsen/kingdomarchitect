@@ -1,20 +1,21 @@
-import { sprites2 } from "../../../../asset/sprite";
-import { Bounds } from "../../../../common/bounds";
+import { sprites2 } from "../../../../asset/sprite.js";
+import { Bounds } from "../../../../common/bounds.js";
 import {
     adjacentPoints,
     manhattanDistance,
     Point,
-} from "../../../../common/point";
-import { createFirstTileSet } from "../../../../data/tileset/firstTile";
-import { createRandomTileSet } from "../../../../data/tileset/randomTileSet";
-import { Tileset } from "../../../../data/tileset/tileset";
-import { RenderContext } from "../../../../rendering/renderContext";
-import { ChunkSize, getChunkPosition } from "../../chunk";
-import { getTileId, TileSize } from "../../tile/tile";
-import { EntityComponent } from "../entityComponent";
-import { Ground } from "./ground";
-import { TileMapUpdateEvent } from "./tileMapUpdatedEvent";
-import { UnlockableArea } from "./unlockableArea";
+} from "../../../../common/point.js";
+import { createFirstTileSet } from "../../../../data/tileset/firstTile.js";
+import { createRandomTileSet } from "../../../../data/tileset/randomTileSet.js";
+import { createSecondTileSet } from "../../../../data/tileset/secondTile.js";
+import { Tileset } from "../../../../data/tileset/tileset.js";
+import { RenderContext } from "../../../../rendering/renderContext.js";
+import { ChunkSize, getChunkPosition } from "../../chunk.js";
+import { getTileId, TileSize } from "../../tile/tile.js";
+import { EntityComponent } from "../entityComponent.js";
+import { Ground } from "./ground.js";
+import { TileMapUpdateEvent } from "./tileMapUpdatedEvent.js";
+import { UnlockableArea } from "./unlockableArea.js";
 
 export interface GroundTile {
     tileX: number;
@@ -198,6 +199,8 @@ export class TilesComponent extends EntityComponent implements Ground {
         const chunks = Object.keys(this.chunkMap);
         if (chunks.length == 1) {
             return createFirstTileSet(chunk);
+        } else if (chunks.length == 2) {
+            return createSecondTileSet(chunk);
         } else {
             return createRandomTileSet(chunk);
         }

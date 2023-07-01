@@ -1,4 +1,5 @@
-import { assert } from "chai";
+import { describe, it } from "node:test";
+import * as assert from "node:assert";
 
 describe("uiBookLayout", () => {
     it("will layout both left and right page", () => {
@@ -50,10 +51,6 @@ describe("uiBookLayout", () => {
     });
 
     it("Dragging book will clamp to edges", () => {
-        assert.equal(2, 2);
-    });
-
-    it("Dragging book will snap to page", () => {
         assert.equal(2, 2);
     });
 

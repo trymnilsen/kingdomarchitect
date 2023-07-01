@@ -1,4 +1,4 @@
-import { Tileset } from "../../../../data/tileset/tileset";
+import { Tileset } from "../../../../data/tileset/tileset.js";
 
 export interface UnlockableArea {
     tileset: Tileset;

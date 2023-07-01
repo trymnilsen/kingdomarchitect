@@ -1,9 +1,9 @@
-import { BuildingComponent } from "../../component/building/buildingComponent";
-import { HealthComponent } from "../../component/health/healthComponent";
-import { Entity } from "../../entity/entity";
-import { WorkerConstraint } from "../constraint/workerConstraint";
-import { Job } from "../job";
-import { MoveToBeforeJob } from "./moveToBeforeJob";
+import { BuildingComponent } from "../../component/building/buildingComponent.js";
+import { HealthComponent } from "../../component/health/healthComponent.js";
+import { Entity } from "../../entity/entity.js";
+import { WorkerConstraint } from "../constraint/workerConstraint.js";
+import { Job } from "../job.js";
+import { MoveToBeforeJob } from "./moveToBeforeJob.js";
 
 export class BuildJob extends MoveToBeforeJob {
     constructor(buildingToBuild: Entity) {

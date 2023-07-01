@@ -1,8 +1,8 @@
-import { Sprite2 } from "../../asset/sprite";
-import { Point } from "../../common/point";
-import { UIRenderContext } from "../../rendering/uiRenderContext";
-import { UILayoutContext } from "../uiLayoutContext";
-import { UISize } from "../uiSize";
+import { Sprite2 } from "../../asset/sprite.js";
+import { Point } from "../../common/point.js";
+import { UIRenderContext } from "../../rendering/uiRenderContext.js";
+import { UILayoutContext } from "../uiLayoutContext.js";
+import { UISize } from "../uiSize.js";
 
 export interface UIImageSource {
     measure(layoutContext: UILayoutContext): UISize;
