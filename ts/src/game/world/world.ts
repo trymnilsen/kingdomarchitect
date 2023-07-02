@@ -64,7 +64,7 @@ export class World {
 
         //Set up initial entities
         const firstWorker = workerPrefab(generateId("worker"));
-        const firstHouse = housePrefab(generateId("house"), false, firstWorker);
+        const firstHouse = housePrefab(generateId("house"), false);
         const firstFarm = farmPrefab(generateId("farm"));
         firstFarm.position = { x: 2, y: 0 };
         firstHouse.position = { x: 1, y: 0 };
@@ -74,15 +74,8 @@ export class World {
     }
 
     tick(tick: number): void {
-        /*         if (tick % 5 == 0) {
-            this.invalidateWorld();
-        } */
         this._rootEntity.onUpdate(tick);
     }
-
-    /*     invalidateWorld() {
-        this._pathSearch.updateGraph(createGraphFromNodes(this._rootEntity));
-    } */
 
     onDraw(context: RenderContext): void {
         this._rootEntity.onDraw(context);

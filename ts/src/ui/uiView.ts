@@ -275,7 +275,6 @@ export abstract class UIView {
         const viewsToFilter: UIView[] = [this];
 
         while (viewsToFilter.length > 0) {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const view = viewsToFilter.pop()!;
 
             // If there is a filter and it matches or there is no filter

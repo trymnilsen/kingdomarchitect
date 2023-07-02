@@ -5,11 +5,7 @@ import { HousingComponent } from "../component/housing/housingComponent.js";
 import { HealthComponent } from "../component/health/healthComponent.js";
 import { Entity } from "../entity/entity.js";
 
-export function housePrefab(
-    id: string,
-    scaffold: boolean,
-    initalResident?: Entity
-): Entity {
+export function housePrefab(id: string, scaffold: boolean): Entity {
     const house = new Entity(id);
     const buildingComponent = new BuildingComponent(
         sprites2.wooden_house,

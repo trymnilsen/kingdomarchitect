@@ -8,6 +8,7 @@ import {
 import { createFirstTileSet } from "../../../../data/tileset/firstTile.js";
 import { createRandomTileSet } from "../../../../data/tileset/randomTileSet.js";
 import { createSecondTileSet } from "../../../../data/tileset/secondTile.js";
+import { createThirdTileSet } from "../../../../data/tileset/thirdTile.js";
 import { Tileset } from "../../../../data/tileset/tileset.js";
 import { RenderContext } from "../../../../rendering/renderContext.js";
 import { ChunkSize, getChunkPosition } from "../../chunk.js";
@@ -197,12 +198,15 @@ export class TilesComponent extends EntityComponent implements Ground {
 
     private getTileSet(chunk: GroundChunk): Tileset {
         const chunks = Object.keys(this.chunkMap);
-        if (chunks.length == 1) {
-            return createFirstTileSet(chunk);
-        } else if (chunks.length == 2) {
-            return createSecondTileSet(chunk);
-        } else {
-            return createRandomTileSet(chunk);
+        switch (chunks.length) {
+            case 1:
+                return createFirstTileSet(chunk);
+            case 2:
+                return createSecondTileSet(chunk);
+            case 3:
+                return createThirdTileSet(chunk);
+            default:
+                return createRandomTileSet(chunk);
         }
     }
 }

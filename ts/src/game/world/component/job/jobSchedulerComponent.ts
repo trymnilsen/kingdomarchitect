@@ -5,6 +5,12 @@ import { EntityComponent } from "../entityComponent.js";
 import { JobQueueComponent } from "./jobQueueComponent.js";
 import { JobRunnerComponent } from "./jobRunnerComponent.js";
 
+/**
+ * The JobSchedulerComponent listens for events on jobs added to the job queue.
+ * Once a job is added it looks for available runners and assigns the job to
+ * that runner. This code is split out from the queue to avoid circular
+ * dependencies between the JobRunner and JobQueue.
+ */
 export class JobSchedulerComponent extends EntityComponent {
     private jobQueueAddedListener: EventHandle | undefined;
     private queue: JobQueueComponent | undefined;

@@ -13,12 +13,16 @@ import { TenantComponent } from "./tenantComponent.js";
  */
 export class HousingComponent extends EntityComponent {
     private startTime = 0;
-    private resident: Entity | null = null;
+    private _resident: Entity | null = null;
+
+    public get resident(): Entity | null {
+        return this._resident;
+    }
 
     override onStart(tick: number): void {
         super.onStart(tick);
         //Look for any homeless workers
-        if (!this.resident) {
+        if (!this._resident) {
             const homelessWorker = firstChildWhere(
                 this.entity.getRootEntity(),
                 (entity) => {
@@ -42,7 +46,11 @@ export class HousingComponent extends EntityComponent {
             this.startTime = tick;
         }
 
-        if (!this.resident && tick - this.startTime > 60) {
+        if (!this._resident && tick - this.startTime > 60) {
+            //Check if there are any homeless workers
+            //If there was no homless workers, spawn a new one
+            //for this house.
+            //TODO: Should spawning be moved to some other component?
             const buildingHpComponent =
                 this.entity.getComponent(HealthComponent);
 
@@ -51,7 +59,7 @@ export class HousingComponent extends EntityComponent {
             }
             if (buildingHpComponent.healthPercentage >= 1.0) {
                 const worker = workerPrefab(generateId("worker"));
-                this.resident = worker;
+                this._resident = worker;
                 this.setHouseOnTenant(worker);
                 this.entity.getRootEntity().addChild(worker);
             }
@@ -66,6 +74,7 @@ export class HousingComponent extends EntityComponent {
             const tenant = new TenantComponent();
             tenant.house = this.entity;
             entity.addComponent(tenant);
+            this._resident = entity;
         }
     }
 }
