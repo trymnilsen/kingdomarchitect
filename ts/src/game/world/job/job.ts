@@ -123,6 +123,10 @@ export abstract class Job {
         this._entity = entity;
     }
 
+    public get isSuspendable(): Boolean {
+        return false;
+    }
+
     constructor(constraint?: JobConstraint) {
         if (constraint) {
             this._constraint = constraint;
@@ -141,6 +145,9 @@ export abstract class Job {
      * invoked when the job is started
      */
     onStart() {}
+
+    onSuspend() {}
+    onResume() {}
 
     /**
      * Render anything this job wants to show. Note that this method will

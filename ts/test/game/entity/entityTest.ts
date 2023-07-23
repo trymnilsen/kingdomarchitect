@@ -3,6 +3,7 @@ import * as assert from "node:assert";
 import { Entity } from "../../../src/game/world/entity/entity.js";
 import { StubComponent } from "../component/stubComponent.js";
 import { RootEntity } from "../../../src/game/world/entity/rootEntity.js";
+import { RequireError } from "../../../src/common/error/requireError.js";
 
 describe("Entity test", () => {
     it("Add child entity", () => {
@@ -96,6 +97,35 @@ describe("Entity test", () => {
             parent.addComponent(firstComponent);
             parent.addComponent(secondComponent);
         });
+    });
+
+    it("Get component", () => {
+        const entity = new Entity("1");
+        const component = new StubComponent();
+        entity.addComponent(component);
+        const getResult = entity.getComponent(StubComponent);
+        assert.strictEqual(getResult, component);
+    });
+
+    it("Get component returns null if not present", () => {
+        const entity = new Entity("1");
+        const getResult = entity.getComponent(StubComponent);
+        assert.equal(null, getResult);
+    });
+
+    it("Require component returns component", () => {
+        const entity = new Entity("1");
+        const component = new StubComponent();
+        entity.addComponent(component);
+        const getResult = entity.requireComponent(StubComponent);
+        assert.strictEqual(getResult, component);
+    });
+
+    it("Require component throws if not present", () => {
+        const entity = new Entity("1");
+        assert.throws(() => {
+            entity.requireComponent(StubComponent);
+        }, RequireError);
     });
 
     it("Get ancestor component of entity", () => {

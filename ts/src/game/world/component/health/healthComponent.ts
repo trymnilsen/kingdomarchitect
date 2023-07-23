@@ -1,6 +1,7 @@
 import { Point } from "../../../../common/point.js";
 import { NumberRange } from "../../../../common/range.js";
 import { RenderContext } from "../../../../rendering/renderContext.js";
+import { Entity } from "../../entity/entity.js";
 import { EntityComponent } from "../entityComponent.js";
 import { HealthEvent } from "./healthEvent.js";
 
@@ -8,6 +9,8 @@ export class HealthComponent extends EntityComponent {
     private _health: number;
     private _maxHealth: number;
     private _showHealthBarThreshold: NumberRange;
+    private healthBubble: number = 0;
+    private tickTime: number = 0;
 
     /*
      * Returns the health as a percentage between 0.0 and 1.0
@@ -31,24 +34,33 @@ export class HealthComponent extends EntityComponent {
         this._showHealthBarThreshold = showHealthBarThreshold;
     }
 
-    damage(amount: number): number {
+    /**
+     * Add damage from a source to this component
+     * @param amount the amount of damage inflicted
+     * @param source the entity that caused this damage
+     * @returns
+     */
+    damage(amount: number, source: Entity): number {
         const oldHealth = this._health;
-        const newHealth = oldHealth - amount;
+        const newHealth = Math.max(0, oldHealth - amount);
         this._health = newHealth;
-        this.publishEvent(new HealthEvent(oldHealth, newHealth, this));
+        this.healthBubble = amount;
+        this.publishEvent(new HealthEvent(oldHealth, newHealth, source, this));
         return 0;
     }
 
+    /**
+     * Remove damage from this component, effectively healing them
+     * @param amount the amount of damage to heal
+     * @param source the entity that gave/caused the healing to happen
+     * @returns
+     */
     heal(amount: number): number {
         const oldHealth = this._health;
-        const newHealth = oldHealth + amount;
-        if (newHealth > this._maxHealth) {
-            this._health = this._maxHealth;
-        } else {
-            this._health = newHealth;
-        }
+        const newHealth = Math.min(oldHealth + amount, this._maxHealth);
+        this._health = newHealth;
 
-        this.publishEvent(new HealthEvent(oldHealth, this._health, this));
+        this.publishEvent(new HealthEvent(oldHealth, this._health, null, this));
         return 0;
     }
 
@@ -56,8 +68,21 @@ export class HealthComponent extends EntityComponent {
         const oldHealth = this._health;
         const newHealth = this._maxHealth;
         this._health = newHealth;
-        this.publishEvent(new HealthEvent(oldHealth, newHealth, this));
+        this.publishEvent(new HealthEvent(oldHealth, newHealth, null, this));
         return 0;
+    }
+
+    override onUpdate(tick: number): void {
+        if (this.healthBubble !== 0) {
+            if (this.tickTime === 0) {
+                this.tickTime = tick;
+            }
+
+            if (tick - this.tickTime >= 2) {
+                this.healthBubble = 0;
+                this.tickTime = 0;
+            }
+        }
     }
 
     override onDraw(context: RenderContext, screenPosition: Point): void {
@@ -84,6 +109,17 @@ export class HealthComponent extends EntityComponent {
                 width: Math.max(healthbarWidth * this.healthPercentage - 4, 4),
                 height: 4,
                 fill: "green",
+            });
+        }
+
+        if (this.healthBubble !== 0) {
+            context.drawText({
+                x: screenPosition.x,
+                y: screenPosition.y - 16,
+                text: this.healthBubble.toString(),
+                size: 12,
+                font: "arial",
+                color: this.healthBubble < 0 ? "lime" : "red",
             });
         }
     }

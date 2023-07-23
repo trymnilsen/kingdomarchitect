@@ -43,11 +43,11 @@ export function getAxis(direction: Direction) {
 export function getRandomDirection(axis?: Axis): Direction {
     let directions: Direction[] = [];
     if (axis === Axis.XAxis) {
-        directions = horizontalDirections;
+        directions = [...horizontalDirections];
     } else if (axis === Axis.YAxis) {
-        directions = verticalDirections;
+        directions = [...verticalDirections];
     } else {
-        directions = [...verticalDirections, ...horizontalDirections];
+        directions = [...allDirections];
     }
     return randomEntry(directions);
 }
@@ -66,5 +66,15 @@ export enum Axis {
     YAxis,
 }
 
-const verticalDirections = [Direction.Up, Direction.Down];
-const horizontalDirections = [Direction.Left, Direction.Right];
+export const verticalDirections: Readonly<Direction[]> = [
+    Direction.Up,
+    Direction.Down,
+];
+export const horizontalDirections: Readonly<Direction[]> = [
+    Direction.Left,
+    Direction.Right,
+];
+export const allDirections: Readonly<Direction[]> = [
+    ...horizontalDirections,
+    ...verticalDirections,
+];

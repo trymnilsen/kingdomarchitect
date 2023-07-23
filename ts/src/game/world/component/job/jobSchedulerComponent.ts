@@ -59,7 +59,12 @@ export class JobSchedulerComponent extends EntityComponent {
             const jobRunner = entity.getComponent(JobRunnerComponent);
             // If the child has a runner component and that runner does not
             // have an active job check if it is applicable
-            if (!!jobRunner && !jobRunner.hasActiveJob) {
+            const canRunJobs =
+                !!jobRunner &&
+                !jobRunner.hasActiveJob &&
+                jobRunner.isOpenForExternalJobs;
+
+            if (canRunJobs) {
                 const constraint = job.constraint?.isEntityApplicableForJob(
                     job,
                     entity

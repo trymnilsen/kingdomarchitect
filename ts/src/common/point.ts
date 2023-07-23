@@ -72,6 +72,19 @@ export function changeY(point: Point, amount: number) {
     };
 }
 
+export function shiftPoint(point: Point, direction: Direction, amount: number) {
+    switch (direction) {
+        case Direction.Down:
+            return changeY(point, amount);
+        case Direction.Up:
+            return changeY(point, amount * -1);
+        case Direction.Left:
+            return changeX(point, amount * -1);
+        case Direction.Right:
+            return changeX(point, amount);
+    }
+}
+
 /**
  * Inverts both the components of the point to negative or positive
  * @param point the point to invert
