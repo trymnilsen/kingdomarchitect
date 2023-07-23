@@ -7,7 +7,6 @@ import {
 } from "../../game/world/component/tile/tilesComponent.js";
 import { Entity } from "../../game/world/entity/entity.js";
 import { mobPrefab } from "../../game/world/prefab/mobPrefab.js";
-import { quarryPrefab } from "../../game/world/prefab/quarryPrefab.js";
 import { TileSetFactory, Tileset } from "./tileset.js";
 
 export function createThirdTileSet(chunk: GroundChunk): Tileset {

@@ -1,6 +1,7 @@
 import { removeItem } from "../../../common/array.js";
 import { ConstructorFunction } from "../../../common/constructor.js";
 import { InvalidArgumentError } from "../../../common/error/invalidArgumentError.js";
+import { RequireError } from "../../../common/error/requireError.js";
 import { TypedEvent } from "../../../common/event/typedEvent.js";
 import {
     addPoint,
@@ -141,6 +142,7 @@ export class Entity {
             throw new InvalidArgumentError("Child does not have a parent");
         }
 
+        // Stop any components on the entity being removed
         for (const component of entity.components) {
             component.onStop(0);
         }
@@ -177,6 +179,17 @@ export class Entity {
         //If parent is not truthy the while will not run an root will be this
         //so it should be safe to return root as non nullable
         return root!;
+    }
+
+    /**
+     * Check if this entity is attached to a live entity tree
+     */
+    public isAttached(): boolean {
+        if (!!this._parent) {
+            return this._parent.isAttached();
+        } else {
+            return this._isRoot;
+        }
     }
 
     /**
@@ -222,17 +235,6 @@ export class Entity {
     }
 
     /**
-     * Check if this entity is attached to a live entity tree
-     */
-    public isAttached(): boolean {
-        if (!!this._parent) {
-            return this._parent.isAttached();
-        } else {
-            return this._isRoot;
-        }
-    }
-
-    /**
      * Retrieves a component from this entity based on its type
      *
      * Example:
@@ -250,6 +252,32 @@ export class Entity {
         const componentId = filterType.name;
         const component = this._componentsMap[componentId] as TFilter;
         return component || null;
+    }
+
+    /**
+     * Retrieves a component from this entity based on its type
+     *
+     * Example:
+     * ````
+     * // note how the constructor is used as the argument
+     * const component = entity.getComponent(SpriteComponent);
+     * ````
+     *
+     * @throws RequireError if the component is not present
+     * @param filterType the type of the component to get
+     * @returns the component on the entity of this type
+     */
+    public requireComponent<TFilter extends EntityComponent>(
+        filterType: ConstructorFunction<TFilter>
+    ): TFilter {
+        const component = this.getComponent(filterType);
+        if (!!component) {
+            return component;
+        } else {
+            throw new RequireError(
+                `Required component ${filterType.name} was not present`
+            );
+        }
     }
 
     /**

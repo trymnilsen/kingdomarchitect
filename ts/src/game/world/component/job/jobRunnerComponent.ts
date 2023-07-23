@@ -1,4 +1,3 @@
-import { InvalidStateError } from "../../../../common/error/invalidStateError.js";
 import { Point } from "../../../../common/point.js";
 import { RenderContext } from "../../../../rendering/renderContext.js";
 import { Job } from "../../job/job.js";
@@ -12,25 +11,50 @@ export class JobRunnerComponent extends EntityComponent implements JobOwner {
      * To enable resuming jobs we keep them in a stack
      */
     private jobStack: Job[] = [];
-    private _activeJob?: Job;
+    private _isOpenForExternalJobs = true;
 
     public get activeJob(): Job | undefined {
-        return this._activeJob;
+        return this.jobStack[this.jobStack.length - 1];
     }
 
     public get hasActiveJob(): boolean {
-        return !!this._activeJob;
+        return !!this.activeJob;
     }
 
+    public get isOpenForExternalJobs(): boolean {
+        return this._isOpenForExternalJobs;
+    }
+
+    public set isOpenForExternalJobs(value: boolean) {
+        this._isOpenForExternalJobs = value;
+    }
+
+    /**
+     * Assign a job to this runner. Any job currently running will be suspended
+     * or aborted if it does not support suspending. If you want to
+     * queue a job for a specific runner you should add it to the JobQueue
+     * instead with a entityInstanceConstraint.
+     * @param job
+     */
     assignJob(job: Job): void {
-        if (!this.entity) {
-            throw new InvalidStateError(
-                "Cannot assign job to runner without entity"
-            );
-        }
         console.log("Assign job to runner:", job, this);
 
-        this._activeJob = job;
+        const currentJob = this.activeJob;
+        if (currentJob) {
+            if (currentJob.isSuspendable) {
+                try {
+                    currentJob.onSuspend();
+                } catch (e) {
+                    //TODO: should we abort the job if it fails to suspend?
+                    console.error("Failed to suspend job", e, currentJob);
+                }
+            } else {
+                // The job was not resumable so we will remove it
+                this.jobStack.pop();
+            }
+        }
+
+        this.jobStack.push(job);
         job.entity = this.entity;
         job.owner = this;
 
@@ -56,20 +80,26 @@ export class JobRunnerComponent extends EntityComponent implements JobOwner {
     }
 
     override onUpdate(tick: number): void {
-        if (!!this._activeJob) {
-            this._activeJob.update(tick);
+        if (!!this.activeJob) {
+            this.activeJob.update(tick);
         }
     }
 
     override onDraw(context: RenderContext, screenPosition: Point): void {
-        if (!!this._activeJob) {
-            this._activeJob.onDraw(context);
+        if (!!this.activeJob) {
+            this.activeJob.onDraw(context);
         }
     }
 
     private endJob() {
-        this._activeJob = undefined;
-        this.requestNewJob();
+        this.jobStack.pop();
+        if (this.jobStack.length == 0) {
+            this.requestNewJob();
+        } else {
+            // Resume the job that was last suspended and below the job
+            // that was popped in the job
+            this.activeJob?.onResume();
+        }
     }
 
     private requestNewJob(): void {

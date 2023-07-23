@@ -145,7 +145,7 @@ class _ChopTreeJob extends Job {
 
         if (healthComponent.health >= 20) {
             console.log("Health mte 20");
-            healthComponent.damage(10);
+            healthComponent.damage(10, this.entity);
         }
         if (healthComponent.health <= 10) {
             console.log("Health lte 10");
