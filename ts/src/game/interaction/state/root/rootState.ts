@@ -105,11 +105,4 @@ export class RootState extends InteractionState {
 
         return true;
     }
-
-    override onInput(
-        input: InputAction,
-        stateChanger: InteractionStateChanger
-    ): boolean {
-        return false;
-    }
 }

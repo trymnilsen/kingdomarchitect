@@ -1,12 +1,17 @@
 import { sprites2 } from "../../../asset/sprite.js";
+import { Direction } from "../../../common/direction.js";
 import { Point } from "../../../common/point.js";
 import { allSides } from "../../../common/sides.js";
-import { InputAction } from "../../../input/inputAction.js";
+import {
+    InputAction,
+    getDirectionFromInputType,
+} from "../../../input/inputAction.js";
 import { RenderContext } from "../../../rendering/renderContext.js";
 import { UIEvent } from "../../../ui/event/uiEvent.js";
 import { FocusState } from "../../../ui/focus/focusState.js";
 import { UIView } from "../../../ui/uiView.js";
 import { GroundTile } from "../../world/tile/ground.js";
+import { FocusGroup } from "./focusGroup.js";
 import { InteractionStateChanger } from "./interactionStateChanger.js";
 import { StateContext } from "./stateContext.js";
 
@@ -59,6 +64,19 @@ export abstract class InteractionState {
      */
     get isModal(): boolean {
         return false;
+    }
+
+    /**
+     * Retrieve the focus groups for this interaction state,
+     * defaults to return the root view if any. Implemented as a
+     * method and not a property to allow easy overriding.
+     */
+    getFocusGroups(): FocusGroup[] {
+        if (!!this._view) {
+            return [this._view];
+        } else {
+            return [];
+        }
     }
 
     /**
@@ -185,7 +203,26 @@ export abstract class InteractionState {
         input: InputAction,
         stateChanger: InteractionStateChanger
     ): boolean {
-        return false;
+        // TODO: Move all focus handling to interaction state not view? (Maybe a thirdpart?)
+        const view = this.view;
+        if (!!view) {
+            const direction = getDirectionFromInputType(input.action);
+            if (!!direction) {
+                //Loop over the focus groups of this interaction state.
+                //if the event is not handled, check if the next groups will
+                //handle the focus event
+                const handled = view.dispatchUIEvent({
+                    type: "direction",
+                    direction: direction,
+                });
+                console.log("onInput: ", handled, input);
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 
     private drawFocus(context: RenderContext, focusState: FocusState) {

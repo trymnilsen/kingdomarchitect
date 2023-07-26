@@ -519,12 +519,13 @@ export abstract class UIView {
     private handleDirectionEvent(event: UIInputEvent): boolean {
         const currentlyFocusedView = this.focusState.currentFocus;
         //Allow the currently focused view to handle the event if wanted
+        /*
         if (!!currentlyFocusedView) {
             const handledEvent = currentlyFocusedView.dispatchUIEvent(event);
             if (handledEvent) {
                 return true;
             }
-        }
+        }*/
         //Get all the focusable views
         const focusableViews = getFocusableViews(this);
         if (!!currentlyFocusedView) {
