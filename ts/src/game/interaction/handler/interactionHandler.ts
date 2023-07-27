@@ -34,6 +34,7 @@ export class InteractionHandler {
             assets: assets,
             stateChanger: this.interactionStateChanger,
             gameTime: time,
+            camera: camera,
         };
         this.history = new InteractionStateHistory(stateContext);
     }

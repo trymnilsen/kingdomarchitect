@@ -1,5 +1,4 @@
 import { sprites2 } from "../../../asset/sprite.js";
-import { Direction } from "../../../common/direction.js";
 import { Point } from "../../../common/point.js";
 import { allSides } from "../../../common/sides.js";
 import {
@@ -8,10 +7,10 @@ import {
 } from "../../../input/inputAction.js";
 import { RenderContext } from "../../../rendering/renderContext.js";
 import { UIEvent } from "../../../ui/event/uiEvent.js";
+import { FocusGroup } from "../../../ui/focus/focusGroup.js";
 import { FocusState } from "../../../ui/focus/focusState.js";
 import { UIView } from "../../../ui/uiView.js";
 import { GroundTile } from "../../world/tile/ground.js";
-import { FocusGroup } from "./focusGroup.js";
 import { InteractionStateChanger } from "./interactionStateChanger.js";
 import { StateContext } from "./stateContext.js";
 
@@ -23,7 +22,8 @@ import { StateContext } from "./stateContext.js";
 export abstract class InteractionState {
     private _context: StateContext | undefined;
     private _view: UIView | null = null;
-
+    private _cachedFocusGroups: FocusGroup[] = [];
+    private _currentFocusGroupIndex: number = 0;
     /**
      * Retrieve the currently set root view of the this state
      */
@@ -36,6 +36,8 @@ export abstract class InteractionState {
      */
     protected set view(value: UIView | null) {
         this._view = value;
+        this._currentFocusGroupIndex = 0;
+        this._cachedFocusGroups = this.getFocusGroups();
     }
 
     /**
@@ -185,7 +187,7 @@ export abstract class InteractionState {
             }
             this._view.updateTransform();
             this._view.draw(context);
-            this.drawFocus(context, this._view.focusState);
+            this.drawFocus(context);
             //const end = performance.now();
             //console.log(`build state draw: ${end - start}`);
         }
@@ -203,45 +205,58 @@ export abstract class InteractionState {
         input: InputAction,
         stateChanger: InteractionStateChanger
     ): boolean {
-        // TODO: Move all focus handling to interaction state not view? (Maybe a thirdpart?)
         const view = this.view;
-        if (!!view) {
-            const direction = getDirectionFromInputType(input.action);
-            if (!!direction) {
-                //Loop over the focus groups of this interaction state.
-                //if the event is not handled, check if the next groups will
-                //handle the focus event
-                const handled = view.dispatchUIEvent({
-                    type: "direction",
-                    direction: direction,
-                });
-                console.log("onInput: ", handled, input);
-                return true;
-            } else {
-                return false;
-            }
-        } else {
+        const direction = getDirectionFromInputType(input.action);
+        if (!view || !direction) {
             return false;
         }
+
+        let consumedInput = false;
+        const focusGroups = this._cachedFocusGroups;
+        const currentFocusIndex = this._currentFocusGroupIndex;
+        const currentFocusGroup = focusGroups[currentFocusIndex];
+        const currentFocusBounds = currentFocusGroup.getFocusBounds();
+
+        for (let i = currentFocusIndex; i < focusGroups.length; i++) {
+            const focusGroup = focusGroups[i];
+            const focusTaken = focusGroup.moveFocus(
+                direction,
+                currentFocusBounds
+            );
+
+            if (focusTaken) {
+                this._currentFocusGroupIndex = i;
+                consumedInput = true;
+                break;
+            }
+        }
+
+        return consumedInput;
     }
 
-    private drawFocus(context: RenderContext, focusState: FocusState) {
-        const currentFocus = focusState.currentFocus;
+    private drawFocus(context: RenderContext) {
+        const index = this._currentFocusGroupIndex;
+        const focusGroups = this._cachedFocusGroups.length;
+
+        if (focusGroups === 0 || focusGroups <= index || index < 0) {
+            return;
+        }
+
+        const currentFocus = this._cachedFocusGroups[index].getFocusBounds();
         if (!!currentFocus && this._context) {
-            const postition = currentFocus.screenPosition;
-            const size = currentFocus.measuredSize;
-            if (currentFocus.isLayedOut) {
-                const sizeVariation = 2 - (this._context.gameTime.tick % 2) * 4;
-                context.drawNinePatchSprite({
-                    sprite: sprites2.cursor,
-                    height: size.height + sizeVariation,
-                    width: size.width + sizeVariation,
-                    scale: 1.0,
-                    sides: allSides(12.0),
-                    x: postition.x + (this._context.gameTime.tick % 2) * 2,
-                    y: postition.y + (this._context.gameTime.tick % 2) * 2,
-                });
-            }
+            const width = currentFocus.x2 - currentFocus.x1;
+            const height = currentFocus.y2 - currentFocus.y1;
+
+            const sizeVariation = 2 - (this._context.gameTime.tick % 2) * 4;
+            context.drawNinePatchSprite({
+                sprite: sprites2.cursor,
+                height: width + sizeVariation,
+                width: height + sizeVariation,
+                scale: 1.0,
+                sides: allSides(12.0),
+                x: currentFocus.x1 + (this._context.gameTime.tick % 2) * 2,
+                y: currentFocus.y1 + (this._context.gameTime.tick % 2) * 2,
+            });
         }
     }
 }
