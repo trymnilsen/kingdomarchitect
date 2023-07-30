@@ -1,4 +1,9 @@
-import { boundsContains, boundsOverlap } from "../../common/bounds.js";
+import {
+    Bounds,
+    boundsCenter,
+    boundsContains,
+    boundsOverlap,
+} from "../../common/bounds.js";
 import { Direction, invertDirection } from "../../common/direction.js";
 import { InvalidArgumentError } from "../../common/error/invalidArgumentError.js";
 import {
@@ -14,18 +19,18 @@ export function getFocusableViews(rootView: UIView): UIView[] {
 
 export function getClosestFocusableView(
     focusableViews: UIView[],
-    currentlyFocusedView: UIView,
+    currentFocusBounds: Bounds,
     direction: Direction
 ): UIView | null {
     const adjacentViews = getPrioritisedViews(
-        focusableViews.filter((view) => view != currentlyFocusedView),
-        currentlyFocusedView,
+        focusableViews,
+        currentFocusBounds,
         direction
     );
 
     if (adjacentViews.length > 0) {
         const closestView = closestViewByEdge(
-            currentlyFocusedView,
+            currentFocusBounds,
             adjacentViews
         );
         return closestView;
@@ -160,21 +165,25 @@ export function getClosestFocusableView(
 
  *
  * @param focusableViews the views to check if are applicable
- * @param currentlyFocusedView the currently focused view moving away from
+ * @param currentFocusBounds the currently focused bounds we are moving away from
  * @param direction the direction we are moving in
  * @returns a list view views that are considered the best candidates to move to
  */
 function getPrioritisedViews(
     focusableViews: UIView[],
-    currentlyFocusedView: UIView,
+    currentFocusBounds: Bounds,
     direction: Direction
 ): UIView[] {
     const viewsInDirection = focusableViews.filter((view) => {
-        return isViewInDirection(view, currentlyFocusedView, direction);
+        return isViewInDirection(
+            view,
+            boundsCenter(currentFocusBounds),
+            direction
+        );
     });
 
     const wrappingViews = viewsInDirection.filter((view) => {
-        return boundsContains(view.bounds, currentlyFocusedView.bounds);
+        return boundsContains(view.bounds, currentFocusBounds);
     });
     if (wrappingViews.length > 0) {
         return wrappingViews;
@@ -182,13 +191,16 @@ function getPrioritisedViews(
 
     const overlappingViews = viewsInDirection
         .filter((view) => {
-            return boundsOverlap(currentlyFocusedView.bounds, view.bounds);
+            return boundsOverlap(currentFocusBounds, view.bounds);
         })
         .filter((view) => {
             const oppositeDirection = invertDirection(direction);
-            const oppositeEdge = getDirectionalEdge(view, oppositeDirection);
+            const oppositeEdge = getDirectionalEdge(
+                view.bounds,
+                oppositeDirection
+            );
             const oppositeEdgeOfFocusedView = getDirectionalEdge(
-                currentlyFocusedView,
+                currentFocusBounds,
                 oppositeDirection
             );
 
@@ -207,7 +219,7 @@ function getPrioritisedViews(
 
     const completelyPastEdgeViews = viewsInDirection.filter((view) => {
         //Check that all corners are past the view edge
-        const edge = getDirectionalEdge(currentlyFocusedView, direction);
+        const edge = getDirectionalEdge(currentFocusBounds, direction);
         return view.corners.every((corner) =>
             isPointPastEdge(direction, corner, edge.start)
         );
@@ -220,8 +232,10 @@ function getPrioritisedViews(
     return [];
 }
 
-function getDirectionalEdge(view: UIView, direction: Direction): ViewEdge {
-    const viewBounds = view.bounds;
+function getDirectionalEdge(
+    viewBounds: Bounds,
+    direction: Direction
+): ViewEdge {
     switch (direction) {
         case Direction.Down:
             return {
@@ -233,7 +247,6 @@ function getDirectionalEdge(view: UIView, direction: Direction): ViewEdge {
                     x: viewBounds.x1,
                     y: viewBounds.y2,
                 },
-                view: view,
             };
         case Direction.Up:
             return {
@@ -245,7 +258,6 @@ function getDirectionalEdge(view: UIView, direction: Direction): ViewEdge {
                     x: viewBounds.x2,
                     y: viewBounds.y1,
                 },
-                view: view,
             };
         case Direction.Right:
             return {
@@ -257,7 +269,6 @@ function getDirectionalEdge(view: UIView, direction: Direction): ViewEdge {
                     x: viewBounds.x2,
                     y: viewBounds.y2,
                 },
-                view: view,
             };
         case Direction.Left:
             return {
@@ -269,7 +280,6 @@ function getDirectionalEdge(view: UIView, direction: Direction): ViewEdge {
                     x: viewBounds.x1,
                     y: viewBounds.y1,
                 },
-                view: view,
             };
     }
 }
@@ -302,119 +312,106 @@ function isPointPastEdge(
 
 /**
  * Checks if the given first view argument is within a given
- * direction (third arg) of the origin of another view (the second argument).
- * The origin position is defined as the center of the origin view, we only
- * consider the center of the origin view, not any of its corners.
+ * direction (third arg) of a provided point (the second argument).
  * A view (the first argument) is considered to be in the direction if any or
  * its corners are in the direction.
  *
  * @param view the view to check if is in direction
- * @param originView the view to treat as the origin we check against
+ * @param point the point to treat as the origin we check against
  * @param direction the direction we a want to test against
  */
 function isViewInDirection(
     view: UIView,
-    originView: UIView,
+    origin: Point,
     direction: Direction
 ): boolean {
     const hasCornerInDirection = view.corners.some((corner) => {
-        return isPointPastEdge(direction, corner, originView.center);
+        return isPointPastEdge(direction, corner, origin);
     });
     return hasCornerInDirection;
 }
 
 /**
  * Attempt to find the view in a list of views that has an _edge_ that is
- * considered closest to the fromView. The center of fromView will be used
+ * considered closest to the from bounds. The center of fromBounds will be used
  * as the position to measure from.
- * @param fromView
+ * @param fromBounds
  * @param views
  */
-function closestViewByEdge(fromView: UIView, views: UIView[]): UIView {
+function closestViewByEdge(fromBounds: Bounds, views: UIView[]): UIView {
     if (views.length == 0) {
         throw new InvalidArgumentError("views cannot be empty");
     }
-    const viewEdges = views.flatMap(getViewEdges);
-    const fromViewPoint = fromView.center;
+    const fromViewPoint = boundsCenter(fromBounds);
     let closestView: UIView = views[0];
     let closestViewDistance = Number.MAX_SAFE_INTEGER;
 
-    for (const edge of viewEdges) {
-        const edgePoint = closestPointOnLine(
-            edge.start,
-            edge.end,
-            fromViewPoint
-        );
+    for (const view of views) {
+        const edges = getViewEdges(view.bounds);
+        for (const edge of edges) {
+            const edgePoint = closestPointOnLine(
+                edge.start,
+                edge.end,
+                fromViewPoint
+            );
 
-        const edgeDistance = manhattanDistance(fromViewPoint, edgePoint);
-        if (edgeDistance < closestViewDistance) {
-            closestView = edge.view;
-            closestViewDistance = edgeDistance;
+            const edgeDistance = manhattanDistance(fromViewPoint, edgePoint);
+            if (edgeDistance < closestViewDistance) {
+                closestView = view;
+                closestViewDistance = edgeDistance;
+            }
         }
     }
 
     return closestView;
 }
 
-function getViewEdges(view: UIView): ViewEdge[] {
-    const position = view.screenPosition;
-    const size = view.measuredSize;
-    if (!view.isLayedOut) {
-        throw new Error("Cannot find closest edge on unmeasured view");
-    }
-
-    const edges: ViewEdge[] = [
+function getViewEdges(view: Bounds): ViewEdge[] {
+    return [
         {
             start: {
-                x: position.x,
-                y: position.y,
+                x: view.x1,
+                y: view.y1,
             },
             end: {
-                x: position.x + size.width,
-                y: position.y,
+                x: view.x2,
+                y: view.y1,
             },
-            view: view,
         },
         {
             start: {
-                x: position.x + size.width,
-                y: position.y,
+                x: view.x2,
+                y: view.y1,
             },
             end: {
-                x: position.x + size.width,
-                y: position.y + size.height,
+                x: view.x2,
+                y: view.y2,
             },
-            view: view,
         },
         {
             start: {
-                x: position.x + size.width,
-                y: position.y + size.height,
+                x: view.x2,
+                y: view.y2,
             },
             end: {
-                x: position.x,
-                y: position.y + size.height,
+                x: view.x1,
+                y: view.y2,
             },
-            view: view,
         },
         {
             start: {
-                x: position.x,
-                y: position.y + size.height,
+                x: view.x1,
+                y: view.y2,
             },
             end: {
-                x: position.x,
-                y: position.y,
+                x: view.x1,
+                y: view.y1,
             },
-            view: view,
         },
     ];
-
-    return edges;
 }
 
 type ViewEdge = {
     start: Point;
     end: Point;
-    view: UIView;
 };

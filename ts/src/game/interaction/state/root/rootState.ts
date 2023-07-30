@@ -1,16 +1,22 @@
 import { sprites2 } from "../../../../asset/sprite.js";
+import { Bounds, boundsCenter } from "../../../../common/bounds.js";
+import { Direction } from "../../../../common/direction.js";
+import { manhattanDistance, shiftPoint } from "../../../../common/point.js";
 import { allSides } from "../../../../common/sides.js";
-import { InputAction } from "../../../../input/inputAction.js";
+import { Camera } from "../../../../rendering/camera.js";
 import { uiBox } from "../../../../ui/dsl/uiBoxDsl.js";
+import { FocusGroup } from "../../../../ui/focus/focusGroup.js";
 import { uiAlignment } from "../../../../ui/uiAlignment.js";
 import { fillUiSize } from "../../../../ui/uiSize.js";
 import { WorkerBehaviorComponent } from "../../../world/component/behavior/workerBehaviorComponent.js";
+import { TilesComponent } from "../../../world/component/tile/tilesComponent.js";
 import { SelectedEntityItem } from "../../../world/selection/selectedEntityItem.js";
 import { SelectedTileItem } from "../../../world/selection/selectedTileItem.js";
 import { SelectedWorldItem } from "../../../world/selection/selectedWorldItem.js";
 import { GroundTile } from "../../../world/tile/ground.js";
+import { HalfTileSize, TileSize } from "../../../world/tile/tile.js";
+import { World } from "../../../world/world.js";
 import { InteractionState } from "../../handler/interactionState.js";
-import { InteractionStateChanger } from "../../handler/interactionStateChanger.js";
 import { UIActionbarItem } from "../../view/actionbar/uiActionbar.js";
 import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold.js";
 import { AlertMessageState } from "../common/alertMessageState.js";
@@ -22,6 +28,17 @@ import { InventoryState } from "./inventory/inventoryState.js";
 import { UITimeline } from "./ui/uiTimeline.js";
 
 export class RootState extends InteractionState {
+    override getFocusGroups(): FocusGroup[] {
+        const groups: FocusGroup[] = [];
+        if (!!this.view) {
+            groups.push(this.view);
+        }
+        groups.push(
+            new WorldFocusGroup(this.context.world, this.context.camera)
+        );
+
+        return groups;
+    }
     override onActive(): void {
         super.onActive();
 
@@ -58,17 +75,18 @@ export class RootState extends InteractionState {
             },
         ];
 
+        /*
         const timeline = new UITimeline(this.context.gameTime, {
             width: fillUiSize,
             height: 48,
-        });
+        });*/
 
         const contentView = uiBox({
             width: fillUiSize,
             height: fillUiSize,
             padding: allSides(16),
             alignment: uiAlignment.topCenter,
-            children: [timeline],
+            children: [],
         });
 
         const scaffoldState = new UIActionbarScaffold(
@@ -105,11 +123,70 @@ export class RootState extends InteractionState {
 
         return true;
     }
+}
 
-    override onInput(
-        input: InputAction,
-        stateChanger: InteractionStateChanger
-    ): boolean {
+class WorldFocusGroup implements FocusGroup {
+    private currentFocus: GroundTile | null = null;
+    constructor(private world: World, private camera: Camera) {}
+    onFocusActionInput(): boolean {
         return false;
+    }
+    getFocusBounds(): Bounds | null {
+        if (!this.currentFocus) {
+            return null;
+        }
+
+        const screenPosition = this.camera.tileSpaceToScreenSpace({
+            x: this.currentFocus.tileX,
+            y: this.currentFocus.tileY,
+        });
+
+        const bounds = {
+            x1: screenPosition.x,
+            y1: screenPosition.y,
+            x2: screenPosition.x + TileSize,
+            y2: screenPosition.y + TileSize,
+        };
+        return bounds;
+    }
+    moveFocus(
+        direction: Direction,
+        currentFocusBounds: Bounds | null
+    ): boolean {
+        if (!currentFocusBounds) {
+            return false;
+        }
+
+        const centerPosition = shiftPoint(
+            boundsCenter(currentFocusBounds),
+            direction,
+            TileSize
+        );
+
+        //TODO: Optimize finding the closest tile, no need to loop over all
+        const worldPosition = this.camera.screenToWorld(centerPosition);
+        const tilesComponent =
+            this.world.rootEntity.requireComponent(TilesComponent);
+
+        const tiles = tilesComponent.getTiles((tile) => true);
+        let closestTile = tiles[0];
+        let closestDistance = Number.MAX_SAFE_INTEGER;
+        for (const tile of tiles) {
+            const distance = manhattanDistance(
+                {
+                    x: tile.tileX * TileSize + HalfTileSize,
+                    y: tile.tileY * TileSize + HalfTileSize,
+                },
+                worldPosition
+            );
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestTile = tile;
+            }
+        }
+
+        this.currentFocus = closestTile;
+
+        return true;
     }
 }

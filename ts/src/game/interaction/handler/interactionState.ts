@@ -1,9 +1,14 @@
 import { sprites2 } from "../../../asset/sprite.js";
 import { Point } from "../../../common/point.js";
 import { allSides } from "../../../common/sides.js";
-import { InputAction } from "../../../input/inputAction.js";
+import {
+    InputAction,
+    InputActionType,
+    getDirectionFromInputType,
+} from "../../../input/inputAction.js";
 import { RenderContext } from "../../../rendering/renderContext.js";
 import { UIEvent } from "../../../ui/event/uiEvent.js";
+import { FocusGroup } from "../../../ui/focus/focusGroup.js";
 import { FocusState } from "../../../ui/focus/focusState.js";
 import { UIView } from "../../../ui/uiView.js";
 import { GroundTile } from "../../world/tile/ground.js";
@@ -18,7 +23,8 @@ import { StateContext } from "./stateContext.js";
 export abstract class InteractionState {
     private _context: StateContext | undefined;
     private _view: UIView | null = null;
-
+    private _cachedFocusGroups: FocusGroup[] = [];
+    private _currentFocusGroupIndex: number = 0;
     /**
      * Retrieve the currently set root view of the this state
      */
@@ -31,6 +37,8 @@ export abstract class InteractionState {
      */
     protected set view(value: UIView | null) {
         this._view = value;
+        this._currentFocusGroupIndex = 0;
+        this._cachedFocusGroups = this.getFocusGroups();
     }
 
     /**
@@ -59,6 +67,19 @@ export abstract class InteractionState {
      */
     get isModal(): boolean {
         return false;
+    }
+
+    /**
+     * Retrieve the focus groups for this interaction state,
+     * defaults to return the root view if any. Implemented as a
+     * method and not a property to allow easy overriding.
+     */
+    getFocusGroups(): FocusGroup[] {
+        if (!!this._view) {
+            return [this._view];
+        } else {
+            return [];
+        }
     }
 
     /**
@@ -131,6 +152,8 @@ export abstract class InteractionState {
      */
     onActive(): void {}
 
+    onFocusChanged(focusGroup: FocusGroup) {}
+
     /**
      * Called when this state becomes inactive. Either from another state
      * becomming active on to or from being removed.
@@ -167,7 +190,7 @@ export abstract class InteractionState {
             }
             this._view.updateTransform();
             this._view.draw(context);
-            this.drawFocus(context, this._view.focusState);
+            this.drawFocus(context);
             //const end = performance.now();
             //console.log(`build state draw: ${end - start}`);
         }
@@ -185,26 +208,76 @@ export abstract class InteractionState {
         input: InputAction,
         stateChanger: InteractionStateChanger
     ): boolean {
-        return false;
-    }
+        const view = this.view;
+        const direction = getDirectionFromInputType(input.action);
+        if (!view) {
+            return false;
+        }
 
-    private drawFocus(context: RenderContext, focusState: FocusState) {
-        const currentFocus = focusState.currentFocus;
-        if (!!currentFocus && this._context) {
-            const postition = currentFocus.screenPosition;
-            const size = currentFocus.measuredSize;
-            if (currentFocus.isLayedOut) {
-                const sizeVariation = 2 - (this._context.gameTime.tick % 2) * 4;
-                context.drawNinePatchSprite({
-                    sprite: sprites2.cursor,
-                    height: size.height + sizeVariation,
-                    width: size.width + sizeVariation,
-                    scale: 1.0,
-                    sides: allSides(12.0),
-                    x: postition.x + (this._context.gameTime.tick % 2) * 2,
-                    y: postition.y + (this._context.gameTime.tick % 2) * 2,
-                });
+        let consumedInput = false;
+        if (!!direction) {
+            const focusGroups = this._cachedFocusGroups;
+            const currentFocusIndex = this._currentFocusGroupIndex;
+            const currentFocusGroup = focusGroups[currentFocusIndex];
+            const currentFocusBounds = currentFocusGroup.getFocusBounds();
+
+            for (let i = currentFocusIndex; i < focusGroups.length; i++) {
+                const focusGroup = focusGroups[i];
+                const focusTaken = focusGroup.moveFocus(
+                    direction,
+                    currentFocusBounds
+                );
+
+                if (focusTaken) {
+                    this._currentFocusGroupIndex = i;
+                    consumedInput = true;
+                    break;
+                }
             }
         }
+
+        if (input.action == InputActionType.ACTION_PRESS) {
+            const currentFocusGroup = this.getCurrentFocusGroup();
+            if (!!currentFocusGroup) {
+                currentFocusGroup.onFocusActionInput();
+            }
+        }
+
+        return consumedInput;
+    }
+
+    private drawFocus(context: RenderContext) {
+        const currentFocusGroup = this.getCurrentFocusGroup();
+        if (!currentFocusGroup) {
+            return;
+        }
+
+        const currentFocus = currentFocusGroup.getFocusBounds();
+        if (!!currentFocus && this._context) {
+            const width = currentFocus.x2 - currentFocus.x1;
+            const height = currentFocus.y2 - currentFocus.y1;
+
+            const sizeVariation = 2 - (this._context.gameTime.tick % 2) * 4;
+            context.drawNinePatchSprite({
+                sprite: sprites2.cursor,
+                height: height + sizeVariation,
+                width: width + sizeVariation,
+                scale: 1.0,
+                sides: allSides(12.0),
+                x: currentFocus.x1 + (this._context.gameTime.tick % 2) * 2,
+                y: currentFocus.y1 + (this._context.gameTime.tick % 2) * 2,
+            });
+        }
+    }
+
+    private getCurrentFocusGroup(): FocusGroup | null {
+        const index = this._currentFocusGroupIndex;
+        const focusGroups = this._cachedFocusGroups.length;
+
+        if (focusGroups === 0 || focusGroups <= index || index < 0) {
+            return null;
+        }
+
+        return this._cachedFocusGroups[index];
     }
 }

@@ -1,16 +1,21 @@
-import { Bounds, withinRectangle } from "../common/bounds.js";
+import {
+    Bounds,
+    boundsCenter,
+    boundsOverlap,
+    withinRectangle,
+} from "../common/bounds.js";
+import { Direction } from "../common/direction.js";
 import { Event, EventListener } from "../common/event.js";
 import { addPoint, Point, zeroPoint } from "../common/point.js";
 import { UIRenderContext } from "../rendering/uiRenderContext.js";
 import {
-    isTapEvent,
     tapStartType,
     tapType,
     tapUpType,
     UIEvent,
-    UIInputEvent,
     UITapEvent,
 } from "./event/uiEvent.js";
+import { FocusGroup } from "./focus/focusGroup.js";
 import {
     getClosestFocusableView,
     getFocusableViews,
@@ -35,7 +40,7 @@ export interface UIAction {
  * a row or a column you should extend the uiViewGroup class which exposes the
  * addView and removeView methods publicly.
  */
-export abstract class UIView {
+export abstract class UIView implements FocusGroup {
     private _parent: UIView | null = null;
     private _screenPosition: Point = zeroPoint();
     private _offset: Point = zeroPoint();
@@ -251,6 +256,26 @@ export abstract class UIView {
         this._size = size;
     }
 
+    getFocusBounds(): Bounds | null {
+        return this.focusState.currentFocus?.bounds || null;
+    }
+
+    moveFocus(
+        direction: Direction,
+        currentFocusBounds: Bounds | null
+    ): boolean {
+        return this.moveDirectionalFocus(direction, currentFocusBounds);
+    }
+
+    onFocusActionInput(): boolean {
+        const currentFocus = this.focusState.currentFocus;
+        if (!currentFocus) {
+            return false;
+        }
+
+        return currentFocus.onTap(boundsCenter(currentFocus.bounds));
+    }
+
     /**
      * Dispose the resources this view is holding. Will be called when the view
      * is removed from the interaction state or if this view is a child of
@@ -371,16 +396,63 @@ export abstract class UIView {
      * @returns if the event was consumed by any children
      */
     dispatchUIEvent(event: UIEvent): boolean {
-        if (isTapEvent(event)) {
-            return this.dispatchTapEvent(event);
-        } else if (event.type == "direction") {
-            const directionalResult = this.handleDirectionEvent(event);
-            return directionalResult;
-        } else {
-            console.warn("Unrecognised event type: ", event);
-            //Input type was not recognised so it will not be handled
+        // check if this view is within bounds, this depends on different
+        // logic based on the event type. See the documentation for
+        // `isUITapEventWithinBounds` for more information.
+        // We do a bounds check here before propegating the event to children
+        // to avoid passing it down unnecessarily
+        const withinBounds = this.isUITapEventWithinBounds(event);
+
+        // If the event is not within our bounds we do not pass it on
+        if (!withinBounds) {
             return false;
         }
+
+        // Pass it on to children, allowing the deepest child to handle the
+        // event first
+        for (const child of this.children) {
+            const childResult = child.dispatchUIEvent(event);
+            if (childResult) {
+                return childResult;
+            }
+        }
+
+        // if we get here the children did not handle the event so we check if
+        // this view wants to handle it
+        if (event.type == tapType) {
+            // Check if both the start and end event is within bounds
+            const startHitTest = this.hitTest(event.startPosition);
+            const endHitTest = this.hitTest(event.position);
+
+            if (startHitTest && endHitTest) {
+                // If both start and end is hit
+                console.log("View: Tap up withing view", this);
+                this.onTapUp(event.position, false);
+                const tapResult = this.onTap(event.position);
+                return tapResult;
+            }
+        } else if (event.type == tapUpType) {
+            const startHitTest = this.hitTest(event.startPosition);
+            const endHitTest = this.hitTest(event.position);
+
+            if (startHitTest && !endHitTest) {
+                this.onTapUp(event.position, true);
+                return false;
+            }
+        } else if (event.type == tapStartType) {
+            // The tap was started, we need no more logic as we already know
+            // from `this.isUITapEventWithinBounds` that the tap is intended
+            // for this view
+            if (this.hitTest(event.position)) {
+                console.log("View: Tap down on view", this);
+                const tapResult = this.onTapDown(event.position);
+                return tapResult;
+            }
+        } else {
+            console.warn("Encountered unknown UITapEvent type", event);
+        }
+
+        return false;
     }
 
     /**
@@ -442,72 +514,6 @@ export abstract class UIView {
     abstract draw(context: UIRenderContext): void;
 
     /**
-     * Dispatch a tap event to this view and its children to
-     * check if its handled
-     * @param event the tap event that occured
-     * @returns if the event was handled
-     */
-    private dispatchTapEvent(event: UITapEvent): boolean {
-        // check if this view is within bounds, this depends on different
-        // logic based on the event type. See the documentation for
-        // `isUITapEventWithinBounds` for more information.
-        // We do a bounds check here before propegating the event to children
-        // to avoid passing it down unnecessarily
-        const withinBounds = this.isUITapEventWithinBounds(event);
-
-        // If the event is not within our bounds we do not pass it on
-        if (!withinBounds) {
-            return false;
-        }
-
-        // Pass it on to children, allowing the deepest child to handle the
-        // event first
-        for (const child of this.children) {
-            const childResult = child.dispatchUIEvent(event);
-            if (childResult) {
-                return childResult;
-            }
-        }
-
-        // if we get here the children did not handle the event so we check if
-        // this view wants to handle it
-        if (event.type == tapType) {
-            // Check if both the start and end event is within bounds
-            const startHitTest = this.hitTest(event.startPosition);
-            const endHitTest = this.hitTest(event.position);
-
-            if (startHitTest && endHitTest) {
-                // If both start and end is hit
-                console.log("View: Tap up withing view", this);
-                this.onTapUp(event.position, false);
-                const tapResult = this.onTap(event.position);
-                return tapResult;
-            }
-        } else if (event.type == tapUpType) {
-            const startHitTest = this.hitTest(event.startPosition);
-            const endHitTest = this.hitTest(event.position);
-
-            if (startHitTest && !endHitTest) {
-                this.onTapUp(event.position, true);
-                return false;
-            }
-        } else if (event.type == tapStartType) {
-            // The tap was started, we need no more logic as we already know
-            // from `this.isUITapEventWithinBounds` that the tap is intended
-            // for this view
-            if (this.hitTest(event.position)) {
-                console.log("View: Tap down on view", this);
-                const tapResult = this.onTapDown(event.position);
-                return tapResult;
-            }
-        } else {
-            console.warn("Encountered unknown UITapEvent type", event);
-        }
-
-        return false;
-    }
-
-    /**
      * Handle the input event by attempting to focus the closest
      * focusable view in the whole view hierachy of this view and its children,
      * in the direction of the event. Will change the focus of this
@@ -516,24 +522,31 @@ export abstract class UIView {
      * @returns true if there was a view to focus, false if not
      *
      */
-    private handleDirectionEvent(event: UIInputEvent): boolean {
+    private moveDirectionalFocus(
+        direction: Direction,
+        currentFocusBounds: Bounds | null
+    ): boolean {
+        const viewPortBounds: Bounds = {
+            x1: 0,
+            y1: 0,
+            x2: window.innerWidth,
+            y2: window.innerHeight,
+        };
         const currentlyFocusedView = this.focusState.currentFocus;
-        //Allow the currently focused view to handle the event if wanted
-        if (!!currentlyFocusedView) {
-            const handledEvent = currentlyFocusedView.dispatchUIEvent(event);
-            if (handledEvent) {
-                return true;
-            }
-        }
-        //Get all the focusable views
-        const focusableViews = getFocusableViews(this);
-        if (!!currentlyFocusedView) {
+        const focusableViews = getFocusableViews(this).filter((view) => {
+            return (
+                view != currentlyFocusedView &&
+                boundsOverlap(view.bounds, viewPortBounds)
+            );
+        });
+
+        if (!!currentFocusBounds && !!currentlyFocusedView) {
             //Find the view from the directional sector that has an edge
             // closest to currently selected view
             const closestView = getClosestFocusableView(
                 focusableViews,
-                currentlyFocusedView,
-                event.direction
+                currentFocusBounds,
+                direction
             );
             if (!!closestView) {
                 this.focusState.setFocus(closestView);

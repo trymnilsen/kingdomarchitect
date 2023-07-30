@@ -1,5 +1,5 @@
 import { Axis } from "./direction.js";
-import { Point } from "./point.js";
+import { Point, addPoint } from "./point.js";
 import { NumberRange } from "./range.js";
 
 /**
@@ -43,6 +43,16 @@ export interface Bounds {
      * The south east y component
      */
     y2: number;
+}
+
+export function boundsCenter(bounds: Bounds): Point {
+    const width = bounds.x2 - bounds.x1;
+    const height = bounds.y2 - bounds.y1;
+
+    return addPoint(
+        { x: bounds.x1, y: bounds.y1 },
+        { x: width / 2, y: height / 2 }
+    );
 }
 
 export function zeroBounds(): Bounds {

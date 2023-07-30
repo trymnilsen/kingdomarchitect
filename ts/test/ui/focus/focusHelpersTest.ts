@@ -29,4 +29,7 @@ describe("getClosestFocusableView test", () => {
     it("will not return item not overlapping, not wrapping and not completely past edgeline", () => {
         assert.equal(2, 2);
     });
+    it("dont return view if adjacent directory is a better match", () => {
+        assert.equal(2, 2);
+    });
 });

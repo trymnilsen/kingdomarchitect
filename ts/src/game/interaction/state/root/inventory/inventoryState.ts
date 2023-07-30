@@ -1,12 +1,10 @@
 import { Sprite2, sprites2 } from "../../../../../asset/sprite.js";
-import { Direction } from "../../../../../common/direction.js";
 import { allSides, symmetricSides } from "../../../../../common/sides.js";
 import {
     InventoryItem,
     ItemTag,
 } from "../../../../../data/inventory/inventoryItem.js";
 import { InventoryItemList } from "../../../../../data/inventory/inventoryItemQuantity.js";
-import { InputAction } from "../../../../../input/inputAction.js";
 import { UIThemeType, bookInkColor } from "../../../../../ui/color.js";
 import { ninePatchBackground } from "../../../../../ui/dsl/uiBackgroundDsl.js";
 import { uiBox } from "../../../../../ui/dsl/uiBoxDsl.js";
@@ -24,7 +22,6 @@ import { UIMasterDetails } from "../../../../../ui/view/uiMasterDetail.js";
 import { OpenBookUIBackground } from "../../../../../ui/visual/bookBackground.js";
 import { InventoryComponent } from "../../../../world/component/inventory/inventoryComponent.js";
 import { InteractionState } from "../../../handler/interactionState.js";
-import { InteractionStateChanger } from "../../../handler/interactionStateChanger.js";
 import { UIActionbarItem } from "../../../view/actionbar/uiActionbar.js";
 import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold.js";
 import { AlertMessageState } from "../../common/alertMessageState.js";
@@ -80,43 +77,6 @@ export class InventoryState extends InteractionState {
 
         this._scaffold = scaffoldView;
         this.view = scaffoldView;
-    }
-
-    override onInput(
-        input: InputAction,
-        stateChanger: InteractionStateChanger
-    ): boolean {
-        const view = this.view;
-        if (!!view) {
-            let direction: Direction | undefined;
-            switch (input.value) {
-                case "a":
-                    direction = Direction.Left;
-                    break;
-                case "d":
-                    direction = Direction.Right;
-                    break;
-                case "w":
-                    direction = Direction.Up;
-                    break;
-                case "s":
-                    direction = Direction.Down;
-                    break;
-                default:
-                    break;
-            }
-            if (!!direction) {
-                view.dispatchUIEvent({
-                    type: "direction",
-                    direction: direction,
-                });
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
     }
 
     private itemSelected(index: number, view: UIInventoryGridItem) {
