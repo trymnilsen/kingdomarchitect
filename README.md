@@ -37,6 +37,10 @@ Tap the item you would like to select or activate
 
 `K`: Activate the second secondary actionbar item
 
+#### Gamepad input
+
+Not yet available
+
 ## 📜 About the project
 
 Kingdom architects is intended to be a combined simulation and city building game around building your own kingdom and protecting it from hordes of evil monsters. It is intended to be single-player and playable both on mobile screens and desktop size clients. Your kingdom might last for decades or only seconds, who knows what the legends of your reign will be.

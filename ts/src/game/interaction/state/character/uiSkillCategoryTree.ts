@@ -1,6 +1,10 @@
 import { Sprite2, sprites2 } from "../../../../asset/sprite.js";
 import { allSides } from "../../../../common/sides.js";
-import { SkillCategory, SkillTree } from "../../../../data/skill/skill.js";
+import {
+    Skill,
+    SkillCategory,
+    SkillTree,
+} from "../../../../data/skill/skill.js";
 import { uiBox } from "../../../../ui/dsl/uiBoxDsl.js";
 import { uiButton } from "../../../../ui/dsl/uiButtonDsl.js";
 import { ColumnChild, uiColumn } from "../../../../ui/dsl/uiColumnDsl.js";
@@ -15,7 +19,8 @@ import { UISpriteImageSource } from "../../../../ui/view/uiImageSource.js";
 export class UISkillCategoryTree extends UIBox {
     constructor(
         private skills: SkillTree,
-        private skillCategory: SkillCategory
+        private skillCategory: SkillCategory,
+        private skillSelected: (skill: Skill) => void
     ) {
         super({
             width: fillUiSize,
@@ -41,6 +46,9 @@ export class UISkillCategoryTree extends UIBox {
                             defaultBackground: new SpriteBackground(
                                 sprites2.fancy_wood_background
                             ),
+                            onTapCallback: () => {
+                                this.skillSelected(skill);
+                            },
                             children: [
                                 uiImage({
                                     width: 32,

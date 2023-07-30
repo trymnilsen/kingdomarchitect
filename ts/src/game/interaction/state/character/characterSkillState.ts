@@ -1,21 +1,39 @@
+import { wrap } from "module";
 import { sprites2 } from "../../../../asset/sprite.js";
 import { allSides, symmetricSides } from "../../../../common/sides.js";
 import { magicSkills } from "../../../../data/skill/magic.js";
 import { meleeSkills } from "../../../../data/skill/melee.js";
 import { productivitySkills } from "../../../../data/skill/productivity.js";
 import { rangedSkills } from "../../../../data/skill/ranged.js";
-import { SkillCategory, SkillTree } from "../../../../data/skill/skill.js";
+import {
+    Skill,
+    SkillCategory,
+    SkillTree,
+} from "../../../../data/skill/skill.js";
 import { bookInkColor } from "../../../../ui/color.js";
 import { uiBox } from "../../../../ui/dsl/uiBoxDsl.js";
+import { uiColumn } from "../../../../ui/dsl/uiColumnDsl.js";
+import { uiRow } from "../../../../ui/dsl/uiRowDsl.js";
 import { uiText } from "../../../../ui/dsl/uiTextDsl.js";
-import { uiAlignment } from "../../../../ui/uiAlignment.js";
+import {
+    HorizontalAlignment,
+    VerticalAlignment,
+    uiAlignment,
+} from "../../../../ui/uiAlignment.js";
 import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize.js";
 import { UIView } from "../../../../ui/uiView.js";
 import { InteractionState } from "../../handler/interactionState.js";
 import { UIActionbarItem } from "../../view/actionbar/uiActionbar.js";
 import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold.js";
-import { UIBookLayout, UIBookLayoutTab } from "../../view/uiBookLayout.js";
+import {
+    UIBookLayout,
+    UIBookLayoutPage,
+    UIBookLayoutTab,
+} from "../../view/uiBookLayout.js";
 import { UISkillCategoryTree } from "./uiSkillCategoryTree.js";
+import { SpriteBackground } from "../../../../ui/uiBackground.js";
+import { uiImage } from "../../../../ui/dsl/uiImageDsl.js";
+import { UISpriteImageSource } from "../../../../ui/view/uiImageSource.js";
 
 export class CharacterSkillState extends InteractionState {
     private _masterDetailsView: UIBookLayout;
@@ -46,7 +64,7 @@ export class CharacterSkillState extends InteractionState {
         ];
 
         const masterView = this.getMasterView(meleeSkills, SkillCategory.Melee);
-        const detailsView = this.getDetailsView(0);
+        const detailsView = this.getDetailsView(meleeSkills[0][0]);
 
         this._masterDetailsView = new UIBookLayout();
         this._masterDetailsView.leftPage = masterView;
@@ -57,7 +75,7 @@ export class CharacterSkillState extends InteractionState {
             id: "characterSkillsLayout",
             width: fillUiSize,
             height: fillUiSize,
-            padding: allSides(64),
+            //padding: allSides(64),
             alignment: uiAlignment.center,
             children: [this._masterDetailsView],
         });
@@ -149,11 +167,16 @@ export class CharacterSkillState extends InteractionState {
                 top: 32,
                 bottom: 48,
             },
-            children: [new UISkillCategoryTree(skillTree, category)],
+            children: [
+                new UISkillCategoryTree(skillTree, category, (skill) => {
+                    this.skillSelected(skill);
+                }),
+            ],
         });
     }
 
-    private getDetailsView(index: number): UIView {
+    private getDetailsView(skill: Skill): UIView {
+        const header = this.getSkillDetailsHeader(skill);
         return uiBox({
             width: 300,
             height: 400,
@@ -164,18 +187,86 @@ export class CharacterSkillState extends InteractionState {
                 right: 40,
             },
             children: [
-                uiText({
-                    padding: symmetricSides(0, 8),
-                    text: "Skill details",
-                    style: {
-                        color: bookInkColor,
-                        font: "Silkscreen",
-                        size: 20,
-                    },
+                uiColumn({
+                    horizontalAlignment: HorizontalAlignment.Left,
+                    height: fillUiSize,
                     width: fillUiSize,
-                    height: wrapUiSize,
+                    children: [
+                        {
+                            child: header,
+                        },
+                        {
+                            child: uiText({
+                                id: "skill-name",
+                                width: wrapUiSize,
+                                height: wrapUiSize,
+                                padding: symmetricSides(0, 8),
+                                text: "Description",
+                                style: {
+                                    color: bookInkColor,
+                                    font: "Silkscreen",
+                                    size: 20,
+                                },
+                            }),
+                        },
+                    ],
                 }),
             ],
         });
+    }
+
+    private getSkillDetailsHeader(skill: Skill): UIView {
+        return uiRow({
+            width: fillUiSize,
+            height: wrapUiSize,
+            verticalAlignment: VerticalAlignment.Center,
+            children: [
+                {
+                    child: uiBox({
+                        width: wrapUiSize,
+                        height: wrapUiSize,
+                        padding: allSides(8),
+                        children: [
+                            uiBox({
+                                width: 48,
+                                height: 48,
+                                background: new SpriteBackground(
+                                    sprites2.fancy_wood_background
+                                ),
+                                children: [
+                                    uiImage({
+                                        width: 32,
+                                        height: 32,
+                                        image: new UISpriteImageSource(
+                                            skill.asset
+                                        ),
+                                    }),
+                                ],
+                            }),
+                        ],
+                    }),
+                },
+                {
+                    weight: 1,
+                    child: uiText({
+                        id: "skill-name",
+                        width: fillUiSize,
+                        height: wrapUiSize,
+                        padding: symmetricSides(0, 8),
+                        text: skill.name,
+                        style: {
+                            color: bookInkColor,
+                            font: "Silkscreen",
+                            size: 20,
+                        },
+                    }),
+                },
+            ],
+        });
+    }
+
+    private skillSelected(skill: Skill) {
+        this._masterDetailsView.rightPage = this.getDetailsView(skill);
+        this._masterDetailsView.currentPage = UIBookLayoutPage.Right;
     }
 }

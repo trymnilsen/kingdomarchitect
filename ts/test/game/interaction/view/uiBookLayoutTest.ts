@@ -50,11 +50,11 @@ describe("uiBookLayout", () => {
         assert.equal(2, 2);
     });
 
-    it("Dragging book will clamp to edges", () => {
+    it("Focus changes switches page if needed", () => {
         assert.equal(2, 2);
     });
 
-    it("Dragging book will snap to page", () => {
+    it("Focus is kept when tab is selected or unselected", () => {
         assert.equal(2, 2);
     });
 });
