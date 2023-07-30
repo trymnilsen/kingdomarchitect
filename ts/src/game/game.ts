@@ -105,7 +105,6 @@ export class Game {
     }
 
     private onInput(inputEvent: InputEvent) {
-        console.log("Input: ", inputEvent);
         if (inputEvent.action.isShifted) {
             switch (inputEvent.action.action) {
                 case InputActionType.ACTION_PRESS:

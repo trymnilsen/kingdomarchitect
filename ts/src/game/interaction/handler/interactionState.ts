@@ -3,6 +3,7 @@ import { Point } from "../../../common/point.js";
 import { allSides } from "../../../common/sides.js";
 import {
     InputAction,
+    InputActionType,
     getDirectionFromInputType,
 } from "../../../input/inputAction.js";
 import { RenderContext } from "../../../rendering/renderContext.js";
@@ -151,6 +152,8 @@ export abstract class InteractionState {
      */
     onActive(): void {}
 
+    onFocusChanged(focusGroup: FocusGroup) {}
+
     /**
      * Called when this state becomes inactive. Either from another state
      * becomming active on to or from being removed.
@@ -207,27 +210,36 @@ export abstract class InteractionState {
     ): boolean {
         const view = this.view;
         const direction = getDirectionFromInputType(input.action);
-        if (!view || !direction) {
+        if (!view) {
             return false;
         }
 
         let consumedInput = false;
-        const focusGroups = this._cachedFocusGroups;
-        const currentFocusIndex = this._currentFocusGroupIndex;
-        const currentFocusGroup = focusGroups[currentFocusIndex];
-        const currentFocusBounds = currentFocusGroup.getFocusBounds();
+        if (!!direction) {
+            const focusGroups = this._cachedFocusGroups;
+            const currentFocusIndex = this._currentFocusGroupIndex;
+            const currentFocusGroup = focusGroups[currentFocusIndex];
+            const currentFocusBounds = currentFocusGroup.getFocusBounds();
 
-        for (let i = currentFocusIndex; i < focusGroups.length; i++) {
-            const focusGroup = focusGroups[i];
-            const focusTaken = focusGroup.moveFocus(
-                direction,
-                currentFocusBounds
-            );
+            for (let i = currentFocusIndex; i < focusGroups.length; i++) {
+                const focusGroup = focusGroups[i];
+                const focusTaken = focusGroup.moveFocus(
+                    direction,
+                    currentFocusBounds
+                );
 
-            if (focusTaken) {
-                this._currentFocusGroupIndex = i;
-                consumedInput = true;
-                break;
+                if (focusTaken) {
+                    this._currentFocusGroupIndex = i;
+                    consumedInput = true;
+                    break;
+                }
+            }
+        }
+
+        if (input.action == InputActionType.ACTION_PRESS) {
+            const currentFocusGroup = this.getCurrentFocusGroup();
+            if (!!currentFocusGroup) {
+                currentFocusGroup.onFocusActionInput();
             }
         }
 
@@ -235,14 +247,12 @@ export abstract class InteractionState {
     }
 
     private drawFocus(context: RenderContext) {
-        const index = this._currentFocusGroupIndex;
-        const focusGroups = this._cachedFocusGroups.length;
-
-        if (focusGroups === 0 || focusGroups <= index || index < 0) {
+        const currentFocusGroup = this.getCurrentFocusGroup();
+        if (!currentFocusGroup) {
             return;
         }
 
-        const currentFocus = this._cachedFocusGroups[index].getFocusBounds();
+        const currentFocus = currentFocusGroup.getFocusBounds();
         if (!!currentFocus && this._context) {
             const width = currentFocus.x2 - currentFocus.x1;
             const height = currentFocus.y2 - currentFocus.y1;
@@ -250,13 +260,24 @@ export abstract class InteractionState {
             const sizeVariation = 2 - (this._context.gameTime.tick % 2) * 4;
             context.drawNinePatchSprite({
                 sprite: sprites2.cursor,
-                height: width + sizeVariation,
-                width: height + sizeVariation,
+                height: height + sizeVariation,
+                width: width + sizeVariation,
                 scale: 1.0,
                 sides: allSides(12.0),
                 x: currentFocus.x1 + (this._context.gameTime.tick % 2) * 2,
                 y: currentFocus.y1 + (this._context.gameTime.tick % 2) * 2,
             });
         }
+    }
+
+    private getCurrentFocusGroup(): FocusGroup | null {
+        const index = this._currentFocusGroupIndex;
+        const focusGroups = this._cachedFocusGroups.length;
+
+        if (focusGroups === 0 || focusGroups <= index || index < 0) {
+            return null;
+        }
+
+        return this._cachedFocusGroups[index];
     }
 }

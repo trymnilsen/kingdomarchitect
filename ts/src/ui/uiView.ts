@@ -1,4 +1,9 @@
-import { Bounds, withinRectangle } from "../common/bounds.js";
+import {
+    Bounds,
+    boundsCenter,
+    boundsOverlap,
+    withinRectangle,
+} from "../common/bounds.js";
 import { Direction } from "../common/direction.js";
 import { Event, EventListener } from "../common/event.js";
 import { addPoint, Point, zeroPoint } from "../common/point.js";
@@ -262,6 +267,15 @@ export abstract class UIView implements FocusGroup {
         return this.moveDirectionalFocus(direction, currentFocusBounds);
     }
 
+    onFocusActionInput(): boolean {
+        const currentFocus = this.focusState.currentFocus;
+        if (!currentFocus) {
+            return false;
+        }
+
+        return currentFocus.onTap(boundsCenter(currentFocus.bounds));
+    }
+
     /**
      * Dispose the resources this view is holding. Will be called when the view
      * is removed from the interaction state or if this view is a child of
@@ -512,14 +526,25 @@ export abstract class UIView implements FocusGroup {
         direction: Direction,
         currentFocusBounds: Bounds | null
     ): boolean {
-        //Get all the focusable views
-        const focusableViews = getFocusableViews(this);
+        const viewPortBounds: Bounds = {
+            x1: 0,
+            y1: 0,
+            x2: window.innerWidth,
+            y2: window.innerHeight,
+        };
         const currentlyFocusedView = this.focusState.currentFocus;
+        const focusableViews = getFocusableViews(this).filter((view) => {
+            return (
+                view != currentlyFocusedView &&
+                boundsOverlap(view.bounds, viewPortBounds)
+            );
+        });
+
         if (!!currentFocusBounds && !!currentlyFocusedView) {
             //Find the view from the directional sector that has an edge
             // closest to currently selected view
             const closestView = getClosestFocusableView(
-                focusableViews.filter((view) => view != currentlyFocusedView),
+                focusableViews,
                 currentFocusBounds,
                 direction
             );

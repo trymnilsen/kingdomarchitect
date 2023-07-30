@@ -3,3 +3,4 @@ export function getTileId(x: number, y: number) {
 }
 
 export const TileSize = 40;
+export const HalfTileSize = TileSize / 2;

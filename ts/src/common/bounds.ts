@@ -50,7 +50,7 @@ export function boundsCenter(bounds: Bounds): Point {
     const height = bounds.y2 - bounds.y1;
 
     return addPoint(
-        { x: bounds.x1, y: bounds.y2 },
+        { x: bounds.x1, y: bounds.y1 },
         { x: width / 2, y: height / 2 }
     );
 }

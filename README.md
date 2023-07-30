@@ -1,30 +1,49 @@
 # 🏰 Kingdom Architect
+> Medieval simulation and city builder game for the browser.
+
 ![Screenshot of the game](screenshot/screenshot.png)
-
-> Medieval simulation/city builder game for the browser.
-
-[About the project](#📜-about-the-project)
-
-[Play](#🕹️-play)
-
-[Development](#👩‍💻-development)
-
-[Contributing](#🙋-contributing)
-
-[FAQ](#❓-faq)
-
-## 📜 About the project
-
-Kingdom architects is intended to be a combined simulation and city building game around building your own kingdom and protecting it from hordes of evil monsters. It is intended to be single-player and playable both on mobile screens and desktop size clients. Your kingdom might last for decades or only seconds, once the browser is closed it's gone and only history might tell its tales.
-
-### Goals for the project
-- Play both using the keyboard and mouse/touch.
-- Only depend on browser-apis, no extra libraries.
-- Kingdoms are ephemeral, you should come back and create multiple kingdoms rather than having a single one for a long time
 
 ## 🕹️ Play
 
 You can either clone this repository and run it based on the instructions on how to run the game below, or try the last version out at [https://kingdomarchitect.netlify.app](https://kingdomarchitect.netlify.app)
+
+### How to play
+
+- Gather resources
+- Unlock land
+- Build houses to spawn workers
+- Level up the skills of workers as wizards, knights or archers
+- Defend against enemy mobs
+
+### Controls
+
+#### Pointer/Touch input
+
+Tap the item you would like to select or activate
+
+#### Keyboard input
+
+`WASD`: Use the W,A,S,D keys to move the cursor or selected items directionally
+
+`Escape`: Go back, cancel or unselect
+
+`E`: Activate the current selection or action
+
+`1-9`: Activate the n'th actionbar button
+
+`M`: Cycle between focus groups
+
+`J`: Activate the first secondary actionbar item
+
+`K`: Activate the second secondary actionbar item
+
+## 📜 About the project
+
+Kingdom architects is intended to be a combined simulation and city building game around building your own kingdom and protecting it from hordes of evil monsters. It is intended to be single-player and playable both on mobile screens and desktop size clients. Your kingdom might last for decades or only seconds, who knows what the legends of your reign will be.
+
+### Goals for the project
+- Play both using the keyboard and mouse/touch.
+- Only depend on browser-apis, no extra libraries.
 
 ## 🙋 Contributing
 

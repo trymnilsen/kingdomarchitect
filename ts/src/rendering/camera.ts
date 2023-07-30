@@ -42,17 +42,21 @@ export class Camera {
     }
 
     worldToScreenX(x: number): number {
-        return Math.floor(x - this._position.x + window.innerWidth / 2);
+        return Math.floor(
+            x - this._position.x + Math.floor(window.innerWidth / 2)
+        );
     }
 
     worldToScreenY(y: number): number {
-        return Math.floor(y - this._position.y + window.innerHeight / 2);
+        return Math.floor(
+            y - this._position.y + Math.floor(window.innerHeight / 2)
+        );
     }
 
     screenToWorld(point: Point): Point {
         return {
-            x: point.x - window.innerWidth / 2 + this._position.x,
-            y: point.y - window.innerHeight / 2 + this._position.y,
+            x: point.x - Math.floor(window.innerWidth / 2) + this._position.x,
+            y: point.y - Math.floor(window.innerHeight / 2) + this._position.y,
         };
     }
 }
