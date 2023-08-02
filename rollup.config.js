@@ -1,5 +1,5 @@
 import { defineConfig } from "rollup";
-import sourcemaps from "rollup-plugin-sourcemaps";
+import sourcemaps from "@edugis/rollup-plugin-sourcemaps";
 
 export default defineConfig({
     input: "build/src/main.js",
