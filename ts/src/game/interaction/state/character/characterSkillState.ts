@@ -34,6 +34,7 @@ import { UISkillCategoryTree } from "./uiSkillCategoryTree.js";
 import { SpriteBackground } from "../../../../ui/uiBackground.js";
 import { uiImage } from "../../../../ui/dsl/uiImageDsl.js";
 import { UISpriteImageSource } from "../../../../ui/view/uiImageSource.js";
+import { colorBackground } from "../../../../ui/dsl/uiBackgroundDsl.js";
 
 export class CharacterSkillState extends InteractionState {
     private _masterDetailsView: UIBookLayout;
@@ -201,7 +202,7 @@ export class CharacterSkillState extends InteractionState {
                                 width: wrapUiSize,
                                 height: wrapUiSize,
                                 padding: symmetricSides(0, 8),
-                                text: "Description",
+                                text: "Description with a long name. Maybe this will be on a new line or maybe thisverylongname will be on its own little line. Lets see what ends up in the UI.",
                                 style: {
                                     color: bookInkColor,
                                     font: "Silkscreen",

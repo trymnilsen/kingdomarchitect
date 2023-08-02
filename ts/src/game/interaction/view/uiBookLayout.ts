@@ -1,6 +1,7 @@
 import { Sprite2, sprites2 } from "../../../asset/sprite.js";
 import { Point, addPoint } from "../../../common/point.js";
 import { allSides } from "../../../common/sides.js";
+import { uiDebug } from "../../../constants.js";
 import { UIRenderContext } from "../../../rendering/uiRenderContext.js";
 import { ninePatchBackground } from "../../../ui/dsl/uiBackgroundDsl.js";
 import { uiButton } from "../../../ui/dsl/uiButtonDsl.js";
@@ -227,30 +228,32 @@ export class UIBookLayout extends UIView {
         );
 
         bookBackground.draw(context, backgroundPosition, bookSize);
-        /*
-        context.drawScreenSpaceRectangle({
-            x: this.screenPosition.x,
-            y: this.screenPosition.y,
-            width: this._measuredSize.width,
-            height: this._measuredSize.height,
-            fill: "rgba(0,0,255,0.5)",
-        });
 
-        context.drawScreenSpaceRectangle({
-            x: this._leftPage.screenPosition.x,
-            y: this._leftPage.screenPosition.y,
-            width: this._leftPage.measuredSize.width,
-            height: this._leftPage.measuredSize.height,
-            fill: "rgba(255,255,0,0.5)",
-        });
+        if (uiDebug()) {
+            context.drawScreenSpaceRectangle({
+                x: this.screenPosition.x,
+                y: this.screenPosition.y,
+                width: this._measuredSize.width,
+                height: this._measuredSize.height,
+                fill: "rgba(0,0,255,0.5)",
+            });
 
-        context.drawScreenSpaceRectangle({
-            x: this._rightPage.screenPosition.x,
-            y: this._rightPage.screenPosition.y,
-            width: this._rightPage.measuredSize.width,
-            height: this._rightPage.measuredSize.height,
-            fill: "rgba(255,0,255,0.5)",
-        });*/
+            context.drawScreenSpaceRectangle({
+                x: this._leftPage.screenPosition.x,
+                y: this._leftPage.screenPosition.y,
+                width: this._leftPage.measuredSize.width,
+                height: this._leftPage.measuredSize.height,
+                fill: "rgba(255,255,0,0.5)",
+            });
+
+            context.drawScreenSpaceRectangle({
+                x: this._rightPage.screenPosition.x,
+                y: this._rightPage.screenPosition.y,
+                width: this._rightPage.measuredSize.width,
+                height: this._rightPage.measuredSize.height,
+                fill: "rgba(255,0,255,0.5)",
+            });
+        }
 
         this._leftPage.draw(context);
         this._rightPage.draw(context);
