@@ -1,5 +1,5 @@
 import Jimp from "jimp";
-import { PixelColor } from "./pixels.js";
+import { PixelColor } from "./spritepack/pixels.js";
 
 export class BitmapImage {
     private image: Jimp | undefined;

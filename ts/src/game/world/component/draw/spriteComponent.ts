@@ -18,7 +18,11 @@ export class SpriteComponent extends EntityComponent {
 
     override onDraw(context: RenderContext, screenPosition: Point): void {
         let scale = 1;
-        if (this.sprite == sprites2.mage || this.sprite == sprites2.bowman) {
+        if (
+            this.sprite == sprites2.mage ||
+            this.sprite == sprites2.bowman ||
+            this.sprite == sprites2.dweller
+        ) {
             scale = 2;
         }
 

@@ -34,23 +34,6 @@ export class SelectionState extends InteractionState {
         this.updateTileActions();
     }
 
-    /* 
-    onTap(screenPosition: Point): boolean {
-        if (this.actionbar) {
-            const hitResult = onTapLayout(this.actionbar, screenPosition);
-            if (!hitResult.handled) {
-                //If the tap was not in our layout return false early
-                return false;
-            }
-        }
-
-        if (stateChanger.hasOperations) {
-            return true;
-        } else {
-            return false;
-        }
-    } */
-
     override onTileTap(tile: GroundTile): boolean {
         // If a new tile was tapped while in this state we move the cursor to it
         console.log("TileSelectedState - onTileTap: ", tile);

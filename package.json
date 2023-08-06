@@ -27,6 +27,7 @@
         "http-server": "^14.1.1",
         "jimp": "^0.22.10",
         "maxrects-packer": "^2.7.3",
+        "perlin-simplex": "^0.0.3",
         "rollup": "^3.27.0",
         "typescript": "^5.1.6"
     },

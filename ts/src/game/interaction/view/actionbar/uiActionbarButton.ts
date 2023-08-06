@@ -54,6 +54,7 @@ export class UIActionbarButton extends UIBox {
                     },
                     {
                         child: uiText({
+                            wrap: false,
                             width: wrapUiSize,
                             height: wrapUiSize,
                             text: item.text,

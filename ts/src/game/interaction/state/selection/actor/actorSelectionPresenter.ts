@@ -1,5 +1,7 @@
 import { sprites2 } from "../../../../../asset/sprite.js";
+import { allSides } from "../../../../../common/sides.js";
 import { subTitleTextStyle } from "../../../../../rendering/text/textStyle.js";
+import { ninePatchBackground } from "../../../../../ui/dsl/uiBackgroundDsl.js";
 import { uiBox } from "../../../../../ui/dsl/uiBoxDsl.js";
 import { uiButton } from "../../../../../ui/dsl/uiButtonDsl.js";
 import { uiColumn } from "../../../../../ui/dsl/uiColumnDsl.js";
@@ -47,8 +49,18 @@ export class ActorSelectionPresenter implements StatePresenter {
         const content = uiBox({
             width: fillUiSize,
             height: fillUiSize,
-            alignment: uiAlignment.bottomRight,
-            children: [this.expandedMenuPadding],
+            padding: allSides(12),
+            alignment: uiAlignment.bottomLeft,
+            children: [
+                uiBox({
+                    width: 200,
+                    height: 100,
+                    background: ninePatchBackground({
+                        sprite: sprites2.stone_slate_background_2x,
+                        sides: allSides(10),
+                    }),
+                }),
+            ],
         });
 
         this.scaffold = new UIActionbarScaffold(

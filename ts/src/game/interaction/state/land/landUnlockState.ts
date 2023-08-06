@@ -20,6 +20,7 @@ import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize.js";
 import { UIView } from "../../../../ui/uiView.js";
 import { UISpriteImageSource } from "../../../../ui/view/uiImageSource.js";
 import { InventoryComponent } from "../../../world/component/inventory/inventoryComponent.js";
+import { TileGeneratorComponent } from "../../../world/component/tile/tileGeneratorComponent.js";
 import { TilesComponent } from "../../../world/component/tile/tilesComponent.js";
 import { UnlockableArea } from "../../../world/component/tile/unlockableArea.js";
 import { TileSize } from "../../../world/tile/tile.js";
@@ -166,14 +167,14 @@ export class LandUnlockState extends InteractionState {
         );
 
         if (removeResult) {
-            const tilesComponent = rootEntity.getComponent(TilesComponent);
-            if (!!tilesComponent) {
-                tilesComponent.unlockArea(selectedArea);
-                this.selectedArea = undefined;
-                this.selectedAreaSize = zeroPoint();
-                this.getUnlockableAreas();
-                //this.context.stateChanger.clear();
-            }
+            const tileGeneratorComponent = rootEntity.requireComponent(
+                TileGeneratorComponent
+            );
+            tileGeneratorComponent.unlockArea(selectedArea);
+            this.selectedArea = undefined;
+            this.selectedAreaSize = zeroPoint();
+            this.getUnlockableAreas();
+            //this.context.stateChanger.clear();
         } else {
             this.context.stateChanger.push(
                 new AlertMessageState("Oh no", "Not enough")
@@ -182,14 +183,12 @@ export class LandUnlockState extends InteractionState {
     }
 
     private getUnlockableAreas() {
-        const tilesComponent =
-            this.context.world.rootEntity.getComponent(TilesComponent);
+        const tileGeneratorComponent =
+            this.context.world.rootEntity.requireComponent(
+                TileGeneratorComponent
+            );
 
-        if (!tilesComponent) {
-            throw new InvalidStateError("No tile component found");
-        }
-
-        this.unlockableArea = tilesComponent.getUnlockableArea();
+        this.unlockableArea = tileGeneratorComponent.getUnlockableArea();
         if (this.unlockableArea.length > 0) {
             this.selectedArea = this.unlockableArea[0];
             if (!!this.previousSelectedAreaPosition) {

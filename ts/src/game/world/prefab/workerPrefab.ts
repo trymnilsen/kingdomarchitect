@@ -12,7 +12,7 @@ import {
 
 export function workerPrefab(id: string): Entity {
     const worker = new Entity(id);
-    const spriteDrawer = new SpriteComponent(sprites2.worker, {
+    const spriteDrawer = new SpriteComponent(sprites2.dweller, {
         x: 3,
         y: 2,
     });

@@ -9,6 +9,7 @@ export interface UITextProperties extends UIViewProperties {
     style?: TextStyle;
     alignment?: Point;
     padding?: Sides;
+    wrap?: boolean;
 }
 
 export function uiText(textProperties: UITextProperties): UIText {
@@ -18,6 +19,10 @@ export function uiText(textProperties: UITextProperties): UIText {
     });
 
     text.text = textProperties.text;
+
+    if (textProperties.wrap) {
+        text.wrapText = textProperties.wrap;
+    }
 
     if (textProperties.style) {
         text.textStyle = textProperties.style;

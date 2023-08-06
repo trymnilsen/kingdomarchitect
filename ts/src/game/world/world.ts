@@ -11,6 +11,7 @@ import {
 } from "./component/root/path/generateGraph.js";
 import { PathFindingComponent } from "./component/root/path/pathFindingComponent.js";
 import { Ground } from "./component/tile/ground.js";
+import { TileGeneratorComponent } from "./component/tile/tileGeneratorComponent.js";
 import { TilesComponent } from "./component/tile/tilesComponent.js";
 import { RootEntity } from "./entity/rootEntity.js";
 import { farmPrefab } from "./prefab/farmPrefab.js";
@@ -54,7 +55,7 @@ export class World {
         this._rootEntity.addComponent(this._groundComponent);
         this._rootEntity.addComponent(this._jobQueueComponent);
         this._rootEntity.addComponent(new JobSchedulerComponent());
-
+        this.rootEntity.addComponent(new TileGeneratorComponent());
         this._pathSearch = new PathSearch(
             createLazyGraphFromRootNode(this._rootEntity)
         );

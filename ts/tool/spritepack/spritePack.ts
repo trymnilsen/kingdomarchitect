@@ -4,7 +4,7 @@ import { MaxRectsPacker } from "maxrects-packer";
 import * as path from "path";
 import { EOL } from "os";
 import { removeItem } from "../../src/common/array.js";
-import { BitmapImage } from "./bitmapImage.js";
+import { BitmapImage } from "../bitmapImage.js";
 import { PixelColor } from "./pixels.js";
 import Jimp from "jimp";
 import pkg from "jimp";
@@ -155,6 +155,7 @@ async function packSprites(sprites: PackableSprite[]) {
                         blue: color.b,
                         alpha: color.a,
                     };
+
                     try {
                         bitmap.setPixel(rect.x + x, rect.y + y, pixel);
                     } catch (err) {
