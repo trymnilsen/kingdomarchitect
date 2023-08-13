@@ -2,7 +2,7 @@ import { JobRunnerComponent } from "../component/job/jobRunnerComponent.js";
 import { SpriteComponent } from "../component/draw/spriteComponent.js";
 import { WorkerBehaviorComponent } from "../component/behavior/workerBehaviorComponent.js";
 import { Entity } from "../entity/entity.js";
-import { sprites2 } from "../../../asset/sprite.js";
+import { sprites2 } from "../../asset/sprite.js";
 import { EquipmentComponent } from "../component/inventory/equipmentComponent.js";
 import { HealthComponent } from "../component/health/healthComponent.js";
 import {

@@ -4,7 +4,7 @@ import {
     GroundChunk,
     GroundTile,
 } from "../../game/component/tile/tilesComponent.js";
-import { Entity } from "../../game/world/entity/entity.js";
+import { Entity } from "../../game/entity/entity.js";
 import { Tileset, TileSetFactory } from "./tileset.js";
 
 export function createRandomTileSet(chunk: GroundChunk): Tileset {

@@ -2,9 +2,10 @@ import { shuffleItems } from "../../../../common/array.js";
 import { TypedEventHandle } from "../../../../common/event/typedEvent.js";
 import { adjacentPoints } from "../../../../common/point.js";
 import { WorkerBehaviorComponent } from "../../behavior/workerBehaviorComponent.js";
-import { ComponentFactory, EntityComponent } from "../../entityComponent.js";
+import { EntityComponent } from "../../entityComponent.js";
 import { HealthEvent } from "../../health/healthEvent.js";
 import { JobRunnerComponent } from "../../job/jobRunnerComponent.js";
+import { ChunkMapComponent } from "../../root/chunk/chunkMapComponent.js";
 import { AttackJob } from "./attackJob.js";
 
 export enum AggroMode {
@@ -74,10 +75,12 @@ export class AggroComponent extends EntityComponent<AggroComponentBundle> {
         const adjacentPoint = shuffleItems(
             adjacentPoints(this.entity.worldPosition)
         );
-        const rootEntity = this.entity.getRootEntity() as RootEntity;
+        const chunkMap = this.entity
+            .getRootEntity()
+            .requireComponent(ChunkMapComponent);
 
         for (const point of adjacentPoint) {
-            const entities = rootEntity.getEntityAt(point);
+            const entities = chunkMap.getEntityAt(point);
             const actor = entities.find((item) => {
                 return !!item.getComponent(WorkerBehaviorComponent);
             });
@@ -94,14 +97,4 @@ export class AggroComponent extends EntityComponent<AggroComponentBundle> {
             }
         }
     }
-
-    override factory(): ComponentFactory<{}> {
-        throw new Error("Method not implemented.");
-    }
-    override onPersist(): AggroComponentBundle {}
 }
-
-export const aggroComponentFactory = (data: AggroComponentBundle) => {
-    const component = new AggroComponent();
-    component.aggroMode = data.aggroMode;
-};

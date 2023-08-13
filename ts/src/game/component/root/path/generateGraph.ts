@@ -7,18 +7,18 @@ import {
 } from "../../../../path/graph/fixedGraph.js";
 import { Graph } from "../../../../path/graph/graph.js";
 import { LazyGraph } from "../../../../path/graph/lazyGraph.js";
-
-import { RootEntity } from "../../../entity/rootEntity.js";
+import { Entity } from "../../../entity/entity.js";
 import { WorkerBehaviorComponent } from "../../behavior/workerBehaviorComponent.js";
 import { BuildingComponent } from "../../building/buildingComponent.js";
 import { TilesComponent } from "../../tile/tilesComponent.js";
+import { ChunkMapComponent } from "../chunk/chunkMapComponent.js";
 
 /**
  * Creates a graph based on the given world
  * @param rootEntity
  * @returns a [Graph] based on the entities in the world for pathfinding
  */
-export function createGraphFromNodes(rootEntity: RootEntity): FixedGraph {
+export function createGraphFromNodes(rootEntity: Entity): FixedGraph {
     const weightFunction: WeightFunction = () => {
         const groundComponent = rootEntity.getComponent(TilesComponent);
         if (!groundComponent) {
@@ -59,7 +59,7 @@ export function createGraphFromNodes(rootEntity: RootEntity): FixedGraph {
     return graph;
 }
 
-export function createLazyGraphFromRootNode(node: RootEntity): Graph {
+export function createLazyGraphFromRootNode(node: Entity): Graph {
     const groundComponent = node.getComponent(TilesComponent);
     if (!groundComponent) {
         throw new Error("No ground component on root node");
@@ -72,7 +72,7 @@ export function createLazyGraphFromRootNode(node: RootEntity): Graph {
 
 function getWeightAtPoint(
     point: Point,
-    rootEntity: RootEntity,
+    rootEntity: Entity,
     groundComponent: TilesComponent
 ): number {
     let weight = 1000;
@@ -91,10 +91,12 @@ function getWeightAtPoint(
         weight = 0;
     }
 
-    const entities = rootEntity.getEntityAt({
-        x: point.x,
-        y: point.y,
-    });
+    const entities = rootEntity
+        .requireComponent(ChunkMapComponent)
+        .getEntityAt({
+            x: point.x,
+            y: point.y,
+        });
 
     if (entities.length > 0) {
         let entityWeight = 0;

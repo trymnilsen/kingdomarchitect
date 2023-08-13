@@ -1,4 +1,4 @@
-import { Point } from "../../../common/point.js";
+import { Point } from "../../common/point.js";
 import { Entity } from "../entity/entity.js";
 import { SelectedWorldItem } from "./selectedWorldItem.js";
 

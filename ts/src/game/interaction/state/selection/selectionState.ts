@@ -9,12 +9,14 @@ import { query } from "../../../component/job/query/jobQuery.js";
 import { SelectedItemIsTargetQuery } from "../../../component/job/query/selectedItemIsTargetQuery.js";
 import { ChestComponent } from "../../../component/resource/chestComponent.js";
 import { TreeComponent } from "../../../component/resource/treeComponent.js";
-import { Job } from "../../../world/job/job.js";
-import { SelectedEntityItem } from "../../../world/selection/selectedEntityItem.js";
-import { SelectedTileItem } from "../../../world/selection/selectedTileItem.js";
-import { SelectedWorldItem } from "../../../world/selection/selectedWorldItem.js";
-import { GroundTile } from "../../../world/tile/ground.js";
-import { TileSize } from "../../../world/tile/tile.js";
+import { ChunkMapComponent } from "../../../component/root/chunk/chunkMapComponent.js";
+import { TilesComponent } from "../../../component/tile/tilesComponent.js";
+import { Job } from "../../../job/job.js";
+import { SelectedEntityItem } from "../../../selection/selectedEntityItem.js";
+import { SelectedTileItem } from "../../../selection/selectedTileItem.js";
+import { SelectedWorldItem } from "../../../selection/selectedWorldItem.js";
+import { GroundTile } from "../../../tile/ground.js";
+import { TileSize } from "../../../tile/tile.js";
 import { InteractionState } from "../../handler/interactionState.js";
 import { UIActionbarItem } from "../../view/actionbar/uiActionbar.js";
 import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold.js";
@@ -37,10 +39,13 @@ export class SelectionState extends InteractionState {
     override onTileTap(tile: GroundTile): boolean {
         // If a new tile was tapped while in this state we move the cursor to it
         console.log("TileSelectedState - onTileTap: ", tile);
-        const entitiesAt = this.context.world.rootEntity.getEntityAt({
-            x: tile.tileX,
-            y: tile.tileY,
-        });
+        const entitiesAt = this.context.root
+            .requireComponent(ChunkMapComponent)
+            .getEntityAt({
+                x: tile.tileX,
+                y: tile.tileY,
+            });
+
         if (entitiesAt.length > 0) {
             this.selectedItem = new SelectedEntityItem(entitiesAt[0]);
         } else {
@@ -181,15 +186,14 @@ export class SelectionState extends InteractionState {
 
             return actions;
         } else if (selection instanceof SelectedTileItem) {
-            const tile = this.context.world.ground.getTile(
-                selection.tilePosition
-            );
+            const tile = this.context.root
+                .requireComponent(TilesComponent)
+                .getTile(selection.tilePosition);
+
             const actions: UIActionbarItem[] = [];
             if (tile && tile.hasTree) {
                 const jobQueue =
-                    this.context.world.rootEntity.getComponent(
-                        JobQueueComponent
-                    );
+                    this.context.root.getComponent(JobQueueComponent);
 
                 if (!jobQueue) {
                     throw new Error(
@@ -198,7 +202,7 @@ export class SelectionState extends InteractionState {
                 }
 
                 const currentJob = query(
-                    this.context.world.rootEntity,
+                    this.context.root,
                     new SelectedItemIsTargetQuery(selection)
                 );
 

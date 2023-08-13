@@ -1,4 +1,4 @@
-import { Point } from "../../../common/point.js";
+import { Point } from "../../common/point.js";
 import { GroundTile } from "../component/tile/tilesComponent.js";
 import { SelectedWorldItem } from "./selectedWorldItem.js";
 

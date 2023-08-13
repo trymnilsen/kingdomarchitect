@@ -23,7 +23,7 @@ import { InventoryComponent } from "../../../component/inventory/inventoryCompon
 import { TileGeneratorComponent } from "../../../component/tile/tileGeneratorComponent.js";
 import { TilesComponent } from "../../../component/tile/tilesComponent.js";
 import { UnlockableArea } from "../../../component/tile/unlockableArea.js";
-import { TileSize } from "../../../world/tile/tile.js";
+import { TileSize } from "../../../tile/tile.js";
 import { InteractionState } from "../../handler/interactionState.js";
 import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold.js";
 import { AlertMessageState } from "../common/alertMessageState.js";
@@ -148,7 +148,7 @@ export class LandUnlockState extends InteractionState {
 
     private unlockSelection() {
         // Check if there is enough resources
-        const rootEntity = this.context.world.rootEntity;
+        const rootEntity = this.context.root;
         const inventoryComponent = rootEntity.getComponent(InventoryComponent);
 
         if (!inventoryComponent) {
@@ -183,10 +183,9 @@ export class LandUnlockState extends InteractionState {
     }
 
     private getUnlockableAreas() {
-        const tileGeneratorComponent =
-            this.context.world.rootEntity.requireComponent(
-                TileGeneratorComponent
-            );
+        const tileGeneratorComponent = this.context.root.requireComponent(
+            TileGeneratorComponent
+        );
 
         this.unlockableArea = tileGeneratorComponent.getUnlockableArea();
         if (this.unlockableArea.length > 0) {

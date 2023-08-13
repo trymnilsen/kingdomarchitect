@@ -55,10 +55,4 @@ export class SpriteComponent extends EntityComponent<SpriteComponentBundle> {
             targetWidth: targetWidth,
         });
     }
-
-    override factory(): ComponentFactory<SpriteComponentBundle> {
-        throw new Error("Method not implemented.");
-    }
-
-    override onPersist(): SpriteComponentBundle {}
 }

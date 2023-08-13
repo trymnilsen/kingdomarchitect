@@ -1,6 +1,6 @@
-import { InvalidStateError } from "../../../common/error/invalidStateError.js";
-import { NotInitializedError } from "../../../common/error/notInitializedError.js";
-import { RenderContext } from "../../../rendering/renderContext.js";
+import { InvalidStateError } from "../../common/error/invalidStateError.js";
+import { NotInitializedError } from "../../common/error/notInitializedError.js";
+import { RenderContext } from "../../rendering/renderContext.js";
 import { JobOwner } from "../component/job/jobOwner.js";
 import { Entity } from "../entity/entity.js";
 import { JobConstraint } from "./jobConstraint.js";

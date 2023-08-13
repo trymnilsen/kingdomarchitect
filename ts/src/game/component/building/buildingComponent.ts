@@ -4,6 +4,7 @@ import { Point } from "../../../common/point.js";
 import { Building } from "../../../data/building/building.js";
 import { RenderContext } from "../../../rendering/renderContext.js";
 import { ComponentFactory, EntityComponent } from "../entityComponent.js";
+import { ChunkMapComponent } from "../root/chunk/chunkMapComponent.js";
 
 type BuildingComponentBundle = {
     buildingSprite: Sprite2;
@@ -83,10 +84,6 @@ export class BuildingComponent extends EntityComponent<BuildingComponentBundle> 
         }
     }
 
-    override factory(): ComponentFactory<BuildingComponentBundle> {
-        return buildingComponentFactory;
-    }
-
     private getAdjacency(): AdjacentBuildings {
         let adjacency = "";
         const leftBuilding = this.getBuildingAtPoint({
@@ -135,8 +132,11 @@ export class BuildingComponent extends EntityComponent<BuildingComponentBundle> 
     }
 
     private getBuildingAtPoint(point: Point): BuildingComponent | null {
-        const rootEntity = this.entity.getRootEntity() as RootEntity;
-        const entities = rootEntity.getEntityAt(point);
+        const rootEntity = this.entity.getRootEntity();
+        const entities = rootEntity
+            .requireComponent(ChunkMapComponent)
+            .getEntityAt(point);
+
         let buildingComponent: BuildingComponent | null = null;
         for (const entity of entities) {
             const component = entity.getComponent(BuildingComponent);
@@ -178,9 +178,3 @@ interface AdjacentBuildings {
     upper: BuildingComponent | null;
     bottom: BuildingComponent | null;
 }
-
-const buildingComponentFactory: ComponentFactory<BuildingComponentBundle> = (
-    data: BuildingComponentBundle
-) => {
-    return new BuildingComponent();
-};

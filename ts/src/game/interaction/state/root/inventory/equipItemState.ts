@@ -10,10 +10,11 @@ import { WorkerBehaviorComponent } from "../../../../component/behavior/workerBe
 import { SpriteComponent } from "../../../../component/draw/spriteComponent.js";
 import { EquipmentComponent } from "../../../../component/inventory/equipmentComponent.js";
 import { InventoryComponent } from "../../../../component/inventory/inventoryComponent.js";
-import { firstChildWhere } from "../../../../world/entity/child/first.js";
-import { Entity } from "../../../../world/entity/entity.js";
-import { GroundTile } from "../../../../world/tile/ground.js";
-import { TileSize } from "../../../../world/tile/tile.js";
+import { ChunkMapComponent } from "../../../../component/root/chunk/chunkMapComponent.js";
+import { firstChildWhere } from "../../../../entity/child/first.js";
+import { Entity } from "../../../../entity/entity.js";
+import { GroundTile } from "../../../../tile/ground.js";
+import { TileSize } from "../../../../tile/tile.js";
 import { InteractionState } from "../../../handler/interactionState.js";
 import { UIActionbarItem } from "../../../view/actionbar/uiActionbar.js";
 import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold.js";
@@ -29,12 +30,9 @@ export class EquipItemState extends InteractionState {
     }
 
     override onActive(): void {
-        this.cursorSelection = firstChildWhere(
-            this.context.world.rootEntity,
-            (child) => {
-                return isWorker(child);
-            }
-        );
+        this.cursorSelection = firstChildWhere(this.context.root, (child) => {
+            return isWorker(child);
+        });
 
         const actions: UIActionbarItem[] = [
             {
@@ -81,7 +79,7 @@ export class EquipItemState extends InteractionState {
         super.onDraw(context);
 
         // Draw all workers on top of the scrim
-        this.drawWorker(context, this.context.world.rootEntity);
+        this.drawWorker(context, this.context.root);
 
         // Draw the currently selected worker cursor
         if (this.cursorSelection) {
@@ -94,7 +92,8 @@ export class EquipItemState extends InteractionState {
     }
 
     override onTileTap(tile: GroundTile): boolean {
-        const workers = this.context.world.rootEntity
+        const workers = this.context.root
+            .requireComponent(ChunkMapComponent)
             .getEntityAt({
                 x: tile.tileX,
                 y: tile.tileY,
@@ -113,7 +112,7 @@ export class EquipItemState extends InteractionState {
 
     private confirmEquip() {
         const inventoryComponent =
-            this.context.world.rootEntity.getComponent(InventoryComponent);
+            this.context.root.getComponent(InventoryComponent);
 
         if (!inventoryComponent) {
             throw new Error("No inventory component present on root entity");

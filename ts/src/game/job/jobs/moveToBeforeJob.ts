@@ -1,9 +1,9 @@
-import { InvalidStateError } from "../../../../common/error/invalidStateError.js";
+import { InvalidStateError } from "../../../common/error/invalidStateError.js";
 import {
     isPointAdjacentTo,
     Point,
     pointEquals,
-} from "../../../../common/point.js";
+} from "../../../common/point.js";
 import { PathFindingComponent } from "../../component/root/path/pathFindingComponent.js";
 import { PathResultStatus } from "../../component/root/path/pathResult.js";
 import { Job } from "../job.js";

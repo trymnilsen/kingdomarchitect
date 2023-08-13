@@ -1,6 +1,6 @@
-import { generateId } from "../../../common/idGenerator.js";
-import { Building } from "../../../data/building/building.js";
-import { woodenBuildings } from "../../../data/building/wood.js";
+import { generateId } from "../../common/idGenerator.js";
+import { Building } from "../../data/building/building.js";
+import { woodenBuildings } from "../../data/building/wood.js";
 import { EntityComponent } from "../component/entityComponent.js";
 import { HousingComponent } from "../component/housing/housingComponent.js";
 import { Entity } from "../entity/entity.js";

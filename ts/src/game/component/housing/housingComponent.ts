@@ -69,10 +69,10 @@ export class HousingComponent extends EntityComponent {
     private setHouseOnTenant(entity: Entity) {
         const existingTenantComponent = entity.getComponent(TenantComponent);
         if (!!existingTenantComponent) {
-            existingTenantComponent.house = this.entity;
+            existingTenantComponent.houseEntityId = this.entity.id;
         } else {
             const tenant = new TenantComponent();
-            tenant.house = this.entity;
+            tenant.houseEntityId = this.entity.id;
             entity.addComponent(tenant);
             this._resident = entity;
         }

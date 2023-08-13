@@ -1,5 +1,5 @@
-import { InvalidStateError } from "../../../common/error/invalidStateError.js";
-import { RenderContext } from "../../../rendering/renderContext.js";
+import { InvalidStateError } from "../../common/error/invalidStateError.js";
+import { RenderContext } from "../../rendering/renderContext.js";
 import { JobOwner } from "../component/job/jobOwner.js";
 import { Job, JobState } from "./job.js";
 

@@ -6,9 +6,9 @@ import { InputActionType } from "../input/inputAction.js";
 import { TouchInput } from "../input/touchInput.js";
 import { Renderer } from "../rendering/renderer.js";
 import { InteractionHandler } from "./interaction/handler/interactionHandler.js";
-import { Entity } from "./world/entity/entity.js";
-import { createRootEntity } from "./world/entity/rootEntity.js";
-import { TileSize } from "./world/tile/tile.js";
+import { Entity } from "./entity/entity.js";
+import { createRootEntity } from "./entity/rootEntity.js";
+import { TileSize } from "./tile/tile.js";
 
 export class Game {
     private renderer: Renderer;

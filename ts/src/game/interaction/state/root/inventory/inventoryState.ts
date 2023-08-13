@@ -93,7 +93,7 @@ export class InventoryState extends InteractionState {
 
     private getInventoryItemList() {
         const inventoryComponent =
-            this.context.world.rootEntity.getComponent(InventoryComponent);
+            this.context.root.getComponent(InventoryComponent);
 
         if (!inventoryComponent) {
             throw new Error("No inventory component on root entity");

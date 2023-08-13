@@ -1,5 +1,5 @@
-import { sprites2 } from "../../../asset/sprite.js";
-import { Building } from "../../../data/building/building.js";
+import { sprites2 } from "../../asset/sprite.js";
+import { Building } from "../../data/building/building.js";
 import { BuildingComponent } from "../component/building/buildingComponent.js";
 import { EntityComponent } from "../component/entityComponent.js";
 import { HealthComponent } from "../component/health/healthComponent.js";

@@ -1,5 +1,5 @@
-import { sprites2 } from "../../../asset/sprite.js";
-import { InventoryItem } from "../../../data/inventory/inventoryItem.js";
+import { sprites2 } from "../../asset/sprite.js";
+import { InventoryItem } from "../../data/inventory/inventoryItem.js";
 import { SpriteComponent } from "../component/draw/spriteComponent.js";
 import { ChestComponent } from "../component/resource/chestComponent.js";
 import { Entity } from "../entity/entity.js";

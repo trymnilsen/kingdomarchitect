@@ -1,8 +1,8 @@
-import { sprites2 } from "../../../../asset/sprite.js";
-import { generateId } from "../../../../common/idGenerator.js";
-import { woodResourceItem } from "../../../../data/inventory/resources.js";
-import { RenderContext } from "../../../../rendering/renderContext.js";
-import { BlinkingImageAnimation } from "../../../../rendering/visual/blinkingImageAnimation.js";
+import { sprites2 } from "../../../asset/sprite.js";
+import { generateId } from "../../../common/idGenerator.js";
+import { woodResourceItem } from "../../../data/inventory/resources.js";
+import { RenderContext } from "../../../rendering/renderContext.js";
+import { BlinkingImageAnimation } from "../../../rendering/visual/blinkingImageAnimation.js";
 import { HealthComponent } from "../../component/health/healthComponent.js";
 import { TreeComponent } from "../../component/resource/treeComponent.js";
 import { InventoryComponent } from "../../component/inventory/inventoryComponent.js";

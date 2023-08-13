@@ -1,8 +1,6 @@
-import { ConstructorFunction } from "../../../common/constructor.js";
-import { InvalidArgumentError } from "../../../common/error/invalidArgumentError.js";
-import { EntityComponent } from "../component/entityComponent.js";
-import { World } from "../world.js";
-import { Entity } from "./entity.js";
+import { ConstructorFunction } from "../common/constructor.js";
+import { InvalidArgumentError } from "../common/error/invalidArgumentError.js";
+import { EntityComponent } from "../game/component/entityComponent.js";
 
 type ComponentPersisterMap = { [id: string]: ComponentPersister };
 type ComponentLoaderMap = { [id: string]: ComponentLoader<any> };
@@ -33,6 +31,7 @@ export class EntityPersister {
         this._componentLoaderMap[componentName] = componentLoader;
     }
 
+    /*
     persist(world: World): BundleSet[] {
         // loop over the children and persist them
         const children = [world.rootEntity as Entity];
@@ -88,7 +87,7 @@ export class EntityPersister {
 
     load(bundleSet: BundleSet[]): World {
         return new World();
-    }
+    }*/
 
     private getPersister(
         component: EntityComponent

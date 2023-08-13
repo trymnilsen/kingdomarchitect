@@ -1,9 +1,9 @@
 import { describe, it } from "node:test";
 import * as assert from "node:assert";
-import { Entity } from "../../../src/game/world/entity/entity.js";
 import { StubComponent } from "../component/stubComponent.js";
-import { RootEntity } from "../../../src/game/world/entity/rootEntity.js";
 import { RequireError } from "../../../src/common/error/requireError.js";
+import { Entity } from "../../../src/game/entity/entity.js";
+import { createRootEntity } from "../../../src/game/entity/rootEntity.js";
 
 describe("Entity test", () => {
     it("Add child entity", () => {
@@ -160,7 +160,7 @@ describe("Entity test", () => {
 
     it("Run lifecycle methods if entity is attached", () => {
         let startInvoked = false;
-        const parent = new RootEntity("1");
+        const parent = createRootEntity();
         const child = new Entity("2");
         const component = new StubComponent({
             onStart: () => {

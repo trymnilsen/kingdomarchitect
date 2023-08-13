@@ -1,5 +1,5 @@
 import { addPoint, multiplyPoint, Point } from "../common/point.js";
-import { TileSize } from "../game/world/tile/tile.js";
+import { TileSize } from "../game/tile/tile.js";
 
 export class Camera {
     private _position: Point;

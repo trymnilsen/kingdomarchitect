@@ -62,13 +62,6 @@ export class ChunkMapComponent extends EntityComponent {
         }
     }
 
-    override onPersist(): {} {
-        throw new Error("Method not implemented.");
-    }
-    override factory(): ComponentFactory {
-        throw new Error("Method not implemented.");
-    }
-
     private onEntityEvent(event: EntityEvent): void {
         switch (event.id) {
             case "child_added":

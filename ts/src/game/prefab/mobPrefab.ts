@@ -1,4 +1,4 @@
-import { sprites2 } from "../../../asset/sprite.js";
+import { sprites2 } from "../../asset/sprite.js";
 import { IdleMobComponent } from "../component/actor/mob/IdleMobComponent.js";
 import {
     AggroComponent,

@@ -1,4 +1,4 @@
-import { Point } from "../../../../common/point.js";
+import { Point } from "../../../common/point.js";
 import { NeverAssignConstraint } from "../constraint/neverAssignConstraint.js";
 import { Job } from "../job.js";
 import { MoveToBeforeJob } from "./moveToBeforeJob.js";

@@ -5,7 +5,8 @@ import { InputAction, InputActionType } from "../../../input/inputAction.js";
 import { OnTapEndEvent } from "../../../input/touchInput.js";
 import { Camera } from "../../../rendering/camera.js";
 import { RenderContext } from "../../../rendering/renderContext.js";
-import { Entity } from "../../world/entity/entity.js";
+import { TilesComponent } from "../../component/tile/tilesComponent.js";
+import { Entity } from "../../entity/entity.js";
 import { CommitableInteractionStateChanger } from "./interactionStateChanger.js";
 import { InteractionStateHistory } from "./interactionStateHistory.js";
 import { StateContext } from "./stateContext.js";
@@ -30,7 +31,7 @@ export class InteractionHandler {
         this.world = world;
         this.camera = camera;
         const stateContext: StateContext = {
-            world: this.world,
+            root: this.world,
             assets: assets,
             stateChanger: this.interactionStateChanger,
             gameTime: time,
@@ -101,7 +102,10 @@ export class InteractionHandler {
                 this.camera.worldSpaceToTileSpace(worldPosition);
 
             // Check if a tile was clicked at this position
-            const tile = this.world.ground.getTile(tilePosition);
+            const tile = this.world
+                .requireComponent(TilesComponent)
+                .getTile(tilePosition);
+
             if (tile) {
                 const tileTapHandled = currentState.onTileTap(tile);
 

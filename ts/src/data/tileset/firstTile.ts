@@ -2,9 +2,9 @@ import { getBounds } from "../../common/bounds.js";
 import { generateId } from "../../common/idGenerator.js";
 import { Point } from "../../common/point.js";
 import { GroundChunk } from "../../game/component/tile/tilesComponent.js";
-import { Entity } from "../../game/world/entity/entity.js";
-import { chestPrefab } from "../../game/world/prefab/chestPrefab.js";
-import { GroundTile } from "../../game/world/tile/ground.js";
+import { Entity } from "../../game/entity/entity.js";
+import { chestPrefab } from "../../game/prefab/chestPrefab.js";
+import { GroundTile } from "../../game/tile/ground.js";
 import {
     bowItem,
     hammerItem,

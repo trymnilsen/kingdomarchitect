@@ -5,8 +5,8 @@ import {
     GroundChunk,
     GroundTile,
 } from "../../game/component/tile/tilesComponent.js";
-import { Entity } from "../../game/world/entity/entity.js";
-import { quarryPrefab } from "../../game/world/prefab/quarryPrefab.js";
+import { Entity } from "../../game/entity/entity.js";
+import { quarryPrefab } from "../../game/prefab/quarryPrefab.js";
 import { TileSetFactory, Tileset } from "./tileset.js";
 
 export function createSecondTileSet(chunk: GroundChunk): Tileset {

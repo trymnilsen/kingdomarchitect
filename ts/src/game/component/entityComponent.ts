@@ -1,4 +1,4 @@
-import { Lifecycle } from "../../common/event/lifecycle.js";
+import { JSONValue } from "../../common/object.js";
 import { Point } from "../../common/point.js";
 import { RenderContext } from "../../rendering/renderContext.js";
 import { Entity } from "../entity/entity.js";

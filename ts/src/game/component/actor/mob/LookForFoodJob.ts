@@ -2,6 +2,7 @@ import { randomEntry } from "../../../../common/array.js";
 import { Direction, allDirections } from "../../../../common/direction.js";
 import { Point, shiftPoint } from "../../../../common/point.js";
 import { Job } from "../../../job/job.js";
+import { ChunkMapComponent } from "../../root/chunk/chunkMapComponent.js";
 import { TilesComponent } from "../../tile/tilesComponent.js";
 
 export class LookForFoodJob extends Job {
@@ -41,13 +42,15 @@ export class LookForFoodJob extends Job {
     }
 
     private isPositionAvailable(point: Point): Boolean {
-        const rootEntity = this.entity.getRootEntity() as RootEntity;
+        const rootEntity = this.entity.getRootEntity();
         const tileComponent = rootEntity.requireComponent(TilesComponent);
 
         const tile = tileComponent?.getTile(point);
         const hasTile = !!tile && tile.hasTree === 0;
 
-        const entities = rootEntity.getEntityAt(point);
+        const entities = rootEntity
+            .requireComponent(ChunkMapComponent)
+            .getEntityAt(point);
         const hasNoEntities = entities.length == 0;
 
         return hasTile && hasNoEntities;
