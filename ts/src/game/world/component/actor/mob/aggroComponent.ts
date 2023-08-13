@@ -1,9 +1,8 @@
 import { shuffleItems } from "../../../../../common/array.js";
 import { TypedEventHandle } from "../../../../../common/event/typedEvent.js";
 import { adjacentPoints } from "../../../../../common/point.js";
-import { RootEntity } from "../../../entity/rootEntity.js";
 import { WorkerBehaviorComponent } from "../../behavior/workerBehaviorComponent.js";
-import { EntityComponent } from "../../entityComponent.js";
+import { ComponentFactory, EntityComponent } from "../../entityComponent.js";
 import { HealthEvent } from "../../health/healthEvent.js";
 import { JobRunnerComponent } from "../../job/jobRunnerComponent.js";
 import { AttackJob } from "./attackJob.js";
@@ -13,7 +12,16 @@ export enum AggroMode {
     Agressive,
 }
 
-export class AggroComponent extends EntityComponent {
+type AggroComponentBundle = {
+    aggroMode: AggroMode;
+};
+
+/**
+ * The aggro component will check for adjacent actors and assign
+ * a job to attack it if the mode is set to agressive. Upon receiving damage it
+ * will assign the attack job regardless of [AggroMode]
+ */
+export class AggroComponent extends EntityComponent<AggroComponentBundle> {
     private _aggroMode: AggroMode = AggroMode.Agressive;
     private healthEventHandle: TypedEventHandle | undefined;
 
@@ -86,4 +94,9 @@ export class AggroComponent extends EntityComponent {
             }
         }
     }
+
+    override factory(): ComponentFactory<{}> {
+        throw new Error("Method not implemented.");
+    }
+    override onPersist(): AggroComponentBundle {}
 }

@@ -5,17 +5,20 @@ import { Input, InputEvent } from "../input/input.js";
 import { InputActionType } from "../input/inputAction.js";
 import { TouchInput } from "../input/touchInput.js";
 import { Renderer } from "../rendering/renderer.js";
-import { MainScene, Scene } from "./mainScene.js";
+import { InteractionHandler } from "./interaction/handler/interactionHandler.js";
+import { Entity } from "./world/entity/entity.js";
+import { createRootEntity } from "./world/entity/rootEntity.js";
 import { TileSize } from "./world/tile/tile.js";
 
 export class Game {
     private renderer: Renderer;
     private input: Input;
-    private currentScene: Scene;
     private touchInput: TouchInput;
     private assetLoader: AssetLoader;
     private gameTime: MutableGameTime;
+    private interactionHandler: InteractionHandler;
     private currentTick: number = 0;
+    private world: Entity;
     public constructor(domElementWrapperSelector: string) {
         // Get the canvas
         const canvasElement: HTMLCanvasElement | null = document.querySelector(
@@ -38,7 +41,11 @@ export class Game {
             this.assetLoader,
             this.gameTime
         );
-        this.currentScene = new MainScene(
+
+        this.world = createRootEntity();
+
+        this.interactionHandler = new InteractionHandler(
+            this.world,
             this.renderer.camera,
             this.assetLoader,
             this.gameTime
@@ -49,7 +56,7 @@ export class Game {
         await this.assetLoader.load();
 
         this.touchInput.onTapDown = (position: Point) => {
-            const tapResult = this.currentScene.onTapDown(position);
+            const tapResult = this.interactionHandler.onTapDown(position);
             this.render();
             return tapResult;
         };
@@ -67,7 +74,11 @@ export class Game {
             downTapHandled: boolean
         ) => {
             if (downTapHandled) {
-                this.currentScene.onTapPan(movement, position, startPosition);
+                this.interactionHandler.onTapPan(
+                    movement,
+                    position,
+                    startPosition
+                );
             } else {
                 this.renderer.camera.translate(invert(movement));
             }
@@ -76,7 +87,7 @@ export class Game {
         };
 
         this.touchInput.onTapEnd = (tapEndEvent) => {
-            this.currentScene.onTapUp(tapEndEvent);
+            this.interactionHandler.onTapUp(tapEndEvent);
             this.render();
         };
 
@@ -95,7 +106,8 @@ export class Game {
     private onTick = () => {
         this.currentTick += 1;
         this.gameTime.updateTick(this.currentTick);
-        this.currentScene.tick(this.currentTick);
+        this.world.onUpdate(this.currentTick);
+        this.interactionHandler.onUpdate(this.currentTick);
         this.render();
     };
 
@@ -108,7 +120,7 @@ export class Game {
         if (inputEvent.action.isShifted) {
             switch (inputEvent.action.action) {
                 case InputActionType.ACTION_PRESS:
-                    this.currentScene.input(inputEvent.action);
+                    this.interactionHandler.onInput(inputEvent.action);
                     break;
                 case InputActionType.UP_PRESS:
                     this.updateCamera(
@@ -132,7 +144,7 @@ export class Game {
                     break;
             }
         } else {
-            this.currentScene.input(inputEvent.action);
+            this.interactionHandler.onInput(inputEvent.action);
         }
 
         this.render();
@@ -141,7 +153,8 @@ export class Game {
     private render() {
         //const renderStart = performance.now();
         this.renderer.clearScreen();
-        this.currentScene.drawScene(this.renderer.context);
+        this.world.onDraw(this.renderer.context);
+        this.interactionHandler.onDraw(this.renderer.context);
         //const renderEnd = performance.now();
         //console.log("⏱render time: ", renderEnd - renderStart);
     }

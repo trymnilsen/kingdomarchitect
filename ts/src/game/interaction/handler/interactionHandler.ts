@@ -5,7 +5,7 @@ import { InputAction, InputActionType } from "../../../input/inputAction.js";
 import { OnTapEndEvent } from "../../../input/touchInput.js";
 import { Camera } from "../../../rendering/camera.js";
 import { RenderContext } from "../../../rendering/renderContext.js";
-import { World } from "../../world/world.js";
+import { Entity } from "../../world/entity/entity.js";
 import { CommitableInteractionStateChanger } from "./interactionStateChanger.js";
 import { InteractionStateHistory } from "./interactionStateHistory.js";
 import { StateContext } from "./stateContext.js";
@@ -16,12 +16,12 @@ import { StateContext } from "./stateContext.js";
  */
 export class InteractionHandler {
     private camera: Camera;
-    private world: World;
+    private world: Entity;
     private interactionStateChanger: CommitableInteractionStateChanger;
     private history: InteractionStateHistory;
 
     constructor(
-        world: World,
+        world: Entity,
         camera: Camera,
         assets: AssetLoader,
         time: GameTime

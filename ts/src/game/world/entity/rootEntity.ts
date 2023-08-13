@@ -12,7 +12,7 @@ type ChunkMap = { [chunkPosition: string]: { [entityId: string]: Entity } };
  * It cannot be moved or get components added to it. This class is not exported
  * as it is only needed once in the world
  */
-export class RootEntity extends Entity {
+class RootEntity extends Entity {
     /**
      * Holds a map of entities within a given chunk
      */
@@ -26,7 +26,6 @@ export class RootEntity extends Entity {
 
     constructor(id: string) {
         super(id);
-        this._isRoot = true;
     }
 
     public getEntityAt(worldPosition: Point): Entity[] {
@@ -131,4 +130,32 @@ export class RootEntity extends Entity {
             pathFindingComponent.invalidateGraphPoint(entity.worldPosition);
         }
     }
+}
+
+export function createRootEntity(): Entity {
+    this._rootEntity = new RootEntity("root");
+    this._jobQueueComponent = new JobQueueComponent();
+    this._groundComponent = new TilesComponent();
+    this._inventoryComponent = new InventoryComponent();
+    this._rootEntity.addComponent(this._inventoryComponent);
+    this._rootEntity.addComponent(this._groundComponent);
+    this._rootEntity.addComponent(this._jobQueueComponent);
+    this._rootEntity.addComponent(new JobSchedulerComponent());
+    this.rootEntity.addComponent(new TileGeneratorComponent());
+    this._pathSearch = new PathSearch(
+        createLazyGraphFromRootNode(this._rootEntity)
+    );
+
+    this._pathFindingComponent = new PathFindingComponent(this._pathSearch);
+    this._rootEntity.addComponent(this._pathFindingComponent);
+
+    //Set up initial entities
+    const firstWorker = workerPrefab(generateId("worker"));
+    const firstHouse = housePrefab(generateId("house"), false);
+    const firstFarm = farmPrefab(generateId("farm"));
+    firstFarm.position = { x: 2, y: 0 };
+    firstHouse.position = { x: 1, y: 0 };
+    this._rootEntity.addChild(firstFarm);
+    this._rootEntity.addChild(firstWorker);
+    this._rootEntity.addChild(firstHouse);
 }

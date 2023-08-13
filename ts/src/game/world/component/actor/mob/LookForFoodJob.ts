@@ -1,7 +1,6 @@
 import { randomEntry } from "../../../../../common/array.js";
 import { Direction, allDirections } from "../../../../../common/direction.js";
 import { Point, shiftPoint } from "../../../../../common/point.js";
-import { RootEntity } from "../../../entity/rootEntity.js";
 import { Job } from "../../../job/job.js";
 import { TilesComponent } from "../../tile/tilesComponent.js";
 

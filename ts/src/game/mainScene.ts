@@ -8,19 +8,13 @@ import { RenderContext } from "../rendering/renderContext.js";
 import { InteractionHandler } from "./interaction/handler/interactionHandler.js";
 import { World } from "./world/world.js";
 
-export class MainScene implements Scene {
+class MainScene implements Scene {
     private world: World;
     private interactionHandler: InteractionHandler;
 
     constructor(camera: Camera, assetsLoader: AssetLoader, gameTime: GameTime) {
         this.world = new World();
         //this.world.invalidateWorld();
-        this.interactionHandler = new InteractionHandler(
-            this.world,
-            camera,
-            assetsLoader,
-            gameTime
-        );
     }
 
     tick(tick: number): void {

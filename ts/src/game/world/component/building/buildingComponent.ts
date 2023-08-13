@@ -3,10 +3,16 @@ import { Adjacency } from "../../../../common/adjacency.js";
 import { Point } from "../../../../common/point.js";
 import { Building } from "../../../../data/building/building.js";
 import { RenderContext } from "../../../../rendering/renderContext.js";
-import { RootEntity } from "../../entity/rootEntity.js";
-import { EntityComponent } from "../entityComponent.js";
+import { ComponentFactory, EntityComponent } from "../entityComponent.js";
 
-export class BuildingComponent extends EntityComponent {
+type BuildingComponentBundle = {
+    buildingSprite: Sprite2;
+    scaffoldSprite: Sprite2;
+    buildingId: string;
+    isScaffolded: boolean;
+};
+
+export class BuildingComponent extends EntityComponent<BuildingComponentBundle> {
     private buildingSprite: Sprite2;
     private scaffoldSprite: Sprite2;
     private _building: Building;
@@ -51,6 +57,34 @@ export class BuildingComponent extends EntityComponent {
             const newSprite = this._building.adjacencySprite(adjacency);
             this.buildingSprite = newSprite;
         }
+    }
+
+    override onDraw(context: RenderContext, screenPosition: Point): void {
+        let sprite = this.buildingSprite;
+        if (this.isScaffolded) {
+            sprite = this.scaffoldSprite;
+        }
+        if (!!this.building.adjacencySprite && !this.isScaffolded) {
+            context.drawScreenSpaceSprite({
+                sprite: sprite,
+                x: screenPosition.x,
+                y: screenPosition.y,
+                targetWidth: 40,
+                targetHeight: 40,
+            });
+        } else {
+            context.drawScreenSpaceSprite({
+                sprite: sprite,
+                x: screenPosition.x + 3,
+                y: screenPosition.y + 2,
+                targetWidth: 32,
+                targetHeight: 32,
+            });
+        }
+    }
+
+    override factory(): ComponentFactory<BuildingComponentBundle> {
+        return buildingComponentFactory;
     }
 
     private getAdjacency(): AdjacentBuildings {
@@ -135,30 +169,6 @@ export class BuildingComponent extends EntityComponent {
 
         this.updateOwnAdjacency(adjacentBuildings.adjacency);
     }
-
-    override onDraw(context: RenderContext, screenPosition: Point): void {
-        let sprite = this.buildingSprite;
-        if (this.isScaffolded) {
-            sprite = this.scaffoldSprite;
-        }
-        if (!!this.building.adjacencySprite && !this.isScaffolded) {
-            context.drawScreenSpaceSprite({
-                sprite: sprite,
-                x: screenPosition.x,
-                y: screenPosition.y,
-                targetWidth: 40,
-                targetHeight: 40,
-            });
-        } else {
-            context.drawScreenSpaceSprite({
-                sprite: sprite,
-                x: screenPosition.x + 3,
-                y: screenPosition.y + 2,
-                targetWidth: 32,
-                targetHeight: 32,
-            });
-        }
-    }
 }
 
 interface AdjacentBuildings {
@@ -168,3 +178,9 @@ interface AdjacentBuildings {
     upper: BuildingComponent | null;
     bottom: BuildingComponent | null;
 }
+
+const buildingComponentFactory: ComponentFactory<BuildingComponentBundle> = (
+    data: BuildingComponentBundle
+) => {
+    return new BuildingComponent();
+};

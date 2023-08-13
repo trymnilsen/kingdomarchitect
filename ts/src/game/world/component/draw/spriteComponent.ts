@@ -1,9 +1,15 @@
 import { Sprite2, sprites2 } from "../../../../asset/sprite.js";
 import { Point, zeroPoint } from "../../../../common/point.js";
 import { RenderContext } from "../../../../rendering/renderContext.js";
-import { EntityComponent } from "../entityComponent.js";
+import { ComponentFactory, EntityComponent } from "../entityComponent.js";
 
-export class SpriteComponent extends EntityComponent {
+type SpriteComponentBundle = {
+    sprite: Sprite2;
+    offset: Point;
+    size: Point;
+};
+
+export class SpriteComponent extends EntityComponent<SpriteComponentBundle> {
     constructor(
         private sprite: Sprite2,
         private offset: Point = zeroPoint(),
@@ -49,4 +55,10 @@ export class SpriteComponent extends EntityComponent {
             targetWidth: targetWidth,
         });
     }
+
+    override factory(): ComponentFactory<SpriteComponentBundle> {
+        throw new Error("Method not implemented.");
+    }
+
+    override onPersist(): SpriteComponentBundle {}
 }

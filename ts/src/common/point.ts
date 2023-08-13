@@ -5,10 +5,10 @@ import { Direction } from "./direction.js";
  * The point does not take into account the type of space. It can be both
  * in screenspace, worldspace or "tile space".
  */
-export interface Point {
+export type Point = {
     x: number;
     y: number;
-}
+};
 
 /**
  * A point with both components set to zero

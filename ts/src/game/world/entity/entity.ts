@@ -2,6 +2,7 @@ import { removeItem } from "../../../common/array.js";
 import { ConstructorFunction } from "../../../common/constructor.js";
 import { InvalidArgumentError } from "../../../common/error/invalidArgumentError.js";
 import { RequireError } from "../../../common/error/requireError.js";
+import { Event, EventListener } from "../../../common/event.js";
 import { TypedEvent } from "../../../common/event/typedEvent.js";
 import {
     addPoint,
@@ -14,14 +15,22 @@ import { ComponentEvent } from "../component/componentEvent.js";
 import { EntityComponent } from "../component/entityComponent.js";
 import { EntityEvent } from "./entityEvent.js";
 
+/**
+ * Represents a node in the entity tree used to create a scenegraph for the
+ * game. Entities has positions and components attached to them.
+ *
+ * For more info see the entities.md doc
+ */
 export class Entity {
-    protected _isRoot: boolean = false;
+    private _isGameRoot: boolean = false;
     private _parent?: Entity;
     private _children: Entity[] = [];
     private _localPosition: Point = zeroPoint();
     private _worldPosition: Point = zeroPoint();
     private _componentEvents: TypedEvent<ComponentEvent<EntityComponent>> =
         new TypedEvent();
+    private _entityEvents: Event<EntityEvent> = new Event();
+
     private _componentsMap: { [id: string]: EntityComponent } = {};
     private _components: EntityComponent[] = [];
     constructor(readonly id: string) {}
@@ -38,6 +47,30 @@ export class Entity {
      */
     public set parent(entity: Entity | undefined) {
         this._parent = entity;
+    }
+
+    /**
+     * Return if this entity is the game root of the entity tree. This is
+     * handled explicitly with a variable rather than checking if the
+     * entity has any parents as it is used to check if any children or
+     * itself is attached to the game tree or if it is a detached or
+     * independent tree that has not been added yet.
+     */
+    public get isGameRoot(): boolean {
+        return this._isGameRoot;
+    }
+
+    /**
+     * Set if this entity is the root of the entity tree
+     */
+    public set isGameRoot(value: boolean) {
+        if (!!this._parent && value) {
+            throw new InvalidArgumentError(
+                "Cannot set entity to game root if it has a parent"
+            );
+        }
+
+        this._isGameRoot = value;
     }
 
     /**
@@ -86,6 +119,10 @@ export class Entity {
      */
     public get children(): readonly Entity[] {
         return this._children;
+    }
+
+    public get entityEvents(): EventListener<EntityEvent> {
+        return this._entityEvents;
     }
 
     public get componentEvents(): TypedEvent<ComponentEvent<EntityComponent>> {

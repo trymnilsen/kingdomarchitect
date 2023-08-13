@@ -1,14 +1,12 @@
 import { generateId } from "../../common/idGenerator.js";
 import { PathSearch } from "../../path/search.js";
 import { RenderContext } from "../../rendering/renderContext.js";
+import { EntityComponent } from "./component/entityComponent.js";
 import { InventoryComponent } from "./component/inventory/inventoryComponent.js";
 import { JobQueue } from "./component/job/jobQueue.js";
 import { JobQueueComponent } from "./component/job/jobQueueComponent.js";
 import { JobSchedulerComponent } from "./component/job/jobSchedulerComponent.js";
-import {
-    createGraphFromNodes,
-    createLazyGraphFromRootNode,
-} from "./component/root/path/generateGraph.js";
+import { createLazyGraphFromRootNode } from "./component/root/path/generateGraph.js";
 import { PathFindingComponent } from "./component/root/path/pathFindingComponent.js";
 import { Ground } from "./component/tile/ground.js";
 import { TileGeneratorComponent } from "./component/tile/tileGeneratorComponent.js";
@@ -18,7 +16,9 @@ import { farmPrefab } from "./prefab/farmPrefab.js";
 import { housePrefab } from "./prefab/housePrefab.js";
 import { workerPrefab } from "./prefab/workerPrefab.js";
 
-export class World {
+
+
+class World {
     private _pathSearch: PathSearch;
     private _rootEntity: RootEntity;
 
