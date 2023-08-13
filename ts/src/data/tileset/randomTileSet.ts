@@ -3,7 +3,7 @@ import { Point } from "../../common/point.js";
 import {
     GroundChunk,
     GroundTile,
-} from "../../game/world/component/tile/tilesComponent.js";
+} from "../../game/component/tile/tilesComponent.js";
 import { Entity } from "../../game/world/entity/entity.js";
 import { Tileset, TileSetFactory } from "./tileset.js";
 

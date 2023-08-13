@@ -20,7 +20,7 @@ import { UIView } from "../../../../../ui/uiView.js";
 import { UIFlowGrid } from "../../../../../ui/view/uiFlowGrid.js";
 import { UIMasterDetails } from "../../../../../ui/view/uiMasterDetail.js";
 import { OpenBookUIBackground } from "../../../../../ui/visual/bookBackground.js";
-import { InventoryComponent } from "../../../../world/component/inventory/inventoryComponent.js";
+import { InventoryComponent } from "../../../../component/inventory/inventoryComponent.js";
 import { InteractionState } from "../../../handler/interactionState.js";
 import { UIActionbarItem } from "../../../view/actionbar/uiActionbar.js";
 import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold.js";

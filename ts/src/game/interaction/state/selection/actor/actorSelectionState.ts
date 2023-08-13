@@ -2,7 +2,7 @@ import { sprites2 } from "../../../../../asset/sprite.js";
 import { Point } from "../../../../../common/point.js";
 import { allSides } from "../../../../../common/sides.js";
 import { RenderContext } from "../../../../../rendering/renderContext.js";
-import { EquipmentComponent } from "../../../../world/component/inventory/equipmentComponent.js";
+import { EquipmentComponent } from "../../../../component/inventory/equipmentComponent.js";
 import { Entity } from "../../../../world/entity/entity.js";
 import { TileSize } from "../../../../world/tile/tile.js";
 import { InteractionState } from "../../../handler/interactionState.js";

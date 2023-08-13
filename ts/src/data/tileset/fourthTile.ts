@@ -4,7 +4,7 @@ import { Point } from "../../common/point.js";
 import {
     GroundChunk,
     GroundTile,
-} from "../../game/world/component/tile/tilesComponent.js";
+} from "../../game/component/tile/tilesComponent.js";
 import { Entity } from "../../game/world/entity/entity.js";
 import { ruinsPrefab } from "../../game/world/prefab/ruinsPrefab.js";
 import { TileSetFactory, Tileset } from "./tileset.js";

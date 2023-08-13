@@ -6,7 +6,7 @@ import { uiBox } from "../../../../ui/dsl/uiBoxDsl.js";
 import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize.js";
 import { UIView } from "../../../../ui/uiView.js";
 import { UIFlowGrid } from "../../../../ui/view/uiFlowGrid.js";
-import { ChestComponent } from "../../../world/component/resource/chestComponent.js";
+import { ChestComponent } from "../../../component/resource/chestComponent.js";
 import { CollectChestJob } from "../../../world/job/jobs/chest/collectChestJob.js";
 import { InteractionState } from "../../handler/interactionState.js";
 import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold.js";

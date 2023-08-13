@@ -3,8 +3,8 @@ import * as assert from "node:assert";
 import { RootEntity } from "../../../../src/game/world/entity/rootEntity.js";
 import { workerPrefab } from "../../../../src/game/world/prefab/workerPrefab.js";
 import { housePrefab } from "../../../../src/game/world/prefab/housePrefab.js";
-import { HousingComponent } from "../../../../src/game/world/component/housing/housingComponent.js";
-import { TenantComponent } from "../../../../src/game/world/component/housing/tenantComponent.js";
+import { HousingComponent } from "../../../../src/game/component/housing/housingComponent.js";
+import { TenantComponent } from "../../../../src/game/component/housing/tenantComponent.js";
 
 describe("Housing component test", () => {
     it("Will assign any workers on start", () => {
