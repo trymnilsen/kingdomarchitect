@@ -1,5 +1,5 @@
 import { Entity } from "../../../entity/entity.js";
-import { Job } from "../../../job/job.js";
+import { Job } from "../job.js";
 import { JobRunnerComponent } from "../jobRunnerComponent.js";
 
 export interface JobQuery {

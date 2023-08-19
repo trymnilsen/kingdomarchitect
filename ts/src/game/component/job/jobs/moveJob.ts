@@ -1,6 +1,6 @@
-import { Point } from "../../../common/point.js";
-import { RenderContext } from "../../../rendering/renderContext.js";
-import { TileSize } from "../../tile/tile.js";
+import { Point } from "../../../../common/point.js";
+import { RenderContext } from "../../../../rendering/renderContext.js";
+import { TileSize } from "../../../tile/tile.js";
 import { Job } from "../job.js";
 import { JobConstraint } from "../jobConstraint.js";
 

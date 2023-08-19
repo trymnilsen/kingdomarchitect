@@ -1,7 +1,7 @@
 import { InvalidStateError } from "../../../common/error/invalidStateError.js";
 import { EventHandle } from "../../../common/event.js";
-import { Job } from "../../job/job.js";
 import { StatelessComponent } from "../entityComponent.js";
+import { Job } from "./job.js";
 import { JobQueueComponent } from "./jobQueueComponent.js";
 import { JobRunnerComponent } from "./jobRunnerComponent.js";
 

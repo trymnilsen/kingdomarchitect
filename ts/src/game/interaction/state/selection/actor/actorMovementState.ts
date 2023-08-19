@@ -8,12 +8,12 @@ import { fillUiSize } from "../../../../../ui/uiSize.js";
 import { JobQueueComponent } from "../../../../component/job/jobQueueComponent.js";
 import { PathFindingComponent } from "../../../../component/root/path/pathFindingComponent.js";
 import { Entity } from "../../../../entity/entity.js";
-import { EntityInstanceJobConstraint } from "../../../../job/constraint/entityInstanceConstraint.js";
-import { MoveJob } from "../../../../job/jobs/moveJob.js";
+import { EntityInstanceJobConstraint } from "../../../../component/job/constraint/entityInstanceConstraint.js";
 import { GroundTile } from "../../../../tile/ground.js";
 import { TileSize } from "../../../../tile/tile.js";
 import { InteractionState } from "../../../handler/interactionState.js";
 import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold.js";
+import { MoveJob } from "../../../../component/job/jobs/moveJob.js";
 
 export class ActorMovementState extends InteractionState {
     private selectedPoint: Point | null = null;

@@ -1,6 +1,6 @@
-import { BuildingComponent } from "../../component/building/buildingComponent.js";
-import { HealthComponent } from "../../component/health/healthComponent.js";
-import { Entity } from "../../entity/entity.js";
+import { BuildingComponent } from "../../building/buildingComponent.js";
+import { HealthComponent } from "../../health/healthComponent.js";
+import { Entity } from "../../../entity/entity.js";
 import { WorkerConstraint } from "../constraint/workerConstraint.js";
 import { Job } from "../job.js";
 import { MoveToBeforeJob } from "./moveToBeforeJob.js";

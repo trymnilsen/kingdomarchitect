@@ -1,7 +1,7 @@
 import { isPointAdjacentTo } from "../../../../common/point.js";
 import { Entity } from "../../../entity/entity.js";
-import { Job } from "../../../job/job.js";
 import { HealthComponent } from "../../health/healthComponent.js";
+import { Job } from "../../job/job.js";
 
 export class AttackJob extends Job {
     constructor(private target: Entity, private amount: number) {

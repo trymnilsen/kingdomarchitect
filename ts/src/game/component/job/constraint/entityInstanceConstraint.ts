@@ -1,4 +1,4 @@
-import { Entity } from "../../entity/entity.js";
+import { Entity } from "../../../entity/entity.js";
 import { Job } from "../job.js";
 import { JobConstraint } from "../jobConstraint.js";
 

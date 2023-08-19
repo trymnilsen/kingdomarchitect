@@ -1,5 +1,5 @@
 import { EventListener } from "../../../common/event.js";
-import { Job } from "../../job/job.js";
+import { Job } from "./job.js";
 
 export interface JobQueue {
     /**

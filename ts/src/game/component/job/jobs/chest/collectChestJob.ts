@@ -1,5 +1,5 @@
-import { InventoryComponent } from "../../../component/inventory/inventoryComponent.js";
-import { ChestComponent } from "../../../component/resource/chestComponent.js";
+import { InventoryComponent } from "../../../inventory/inventoryComponent.js";
+import { ChestComponent } from "../../../resource/chestComponent.js";
 import { WorkerConstraint } from "../../constraint/workerConstraint.js";
 import { Job } from "../../job.js";
 import { MoveToBeforeJob } from "../moveToBeforeJob.js";

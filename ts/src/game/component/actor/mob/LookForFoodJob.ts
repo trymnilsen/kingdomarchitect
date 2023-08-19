@@ -1,7 +1,7 @@
 import { randomEntry } from "../../../../common/array.js";
 import { Direction, allDirections } from "../../../../common/direction.js";
 import { Point, shiftPoint } from "../../../../common/point.js";
-import { Job } from "../../../job/job.js";
+import { Job } from "../../job/job.js";
 import { ChunkMapComponent } from "../../root/chunk/chunkMapComponent.js";
 import { TilesComponent } from "../../tile/tilesComponent.js";
 

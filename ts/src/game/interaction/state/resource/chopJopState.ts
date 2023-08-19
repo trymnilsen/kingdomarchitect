@@ -3,7 +3,7 @@ import { RenderContext } from "../../../../rendering/renderContext.js";
 import { uiBox } from "../../../../ui/dsl/uiBoxDsl.js";
 import { fillUiSize } from "../../../../ui/uiSize.js";
 import { JobQueueComponent } from "../../../component/job/jobQueueComponent.js";
-import { ChopTreeJob } from "../../../job/jobs/chopTreeJob.js";
+import { ChopTreeJob } from "../../../component/job/jobs/chopTreeJob.js";
 import { SelectedWorldItem } from "../../../selection/selectedWorldItem.js";
 import { InteractionState } from "../../handler/interactionState.js";
 import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold.js";

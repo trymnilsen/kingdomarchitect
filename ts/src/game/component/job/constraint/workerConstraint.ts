@@ -1,5 +1,5 @@
-import { WorkerBehaviorComponent } from "../../component/behavior/workerBehaviorComponent.js";
-import { Entity } from "../../entity/entity.js";
+import { WorkerBehaviorComponent } from "../../behavior/workerBehaviorComponent.js";
+import { Entity } from "../../../entity/entity.js";
 import { Job } from "../job.js";
 import { JobConstraint } from "../jobConstraint.js";
 

@@ -2,8 +2,8 @@ import { removeItem } from "../../../common/array.js";
 import { Event, EventListener } from "../../../common/event.js";
 import { Point } from "../../../common/point.js";
 import { RenderContext } from "../../../rendering/renderContext.js";
-import { Job } from "../../job/job.js";
 import { EntityComponent } from "../entityComponent.js";
+import { Job } from "./job.js";
 import { JobOwner } from "./jobOwner.js";
 import { JobQueue } from "./jobQueue.js";
 
