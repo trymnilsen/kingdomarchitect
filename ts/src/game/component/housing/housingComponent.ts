@@ -7,22 +7,27 @@ import { EntityComponent } from "../entityComponent.js";
 import { HealthComponent } from "../health/healthComponent.js";
 import { TenantComponent } from "./tenantComponent.js";
 
+type HousingBundle = {
+    startTime: number;
+    residentEntityId: string | null;
+};
+
 /**
  * The housing component manages npcs living in a building and
  * spawing the npcs/workers if there are no-one living here
  */
-export class HousingComponent extends EntityComponent {
+export class HousingComponent extends EntityComponent<HousingBundle> {
     private startTime = 0;
-    private _resident: Entity | null = null;
+    private _residentEntityId: string | null = null;
 
-    public get resident(): Entity | null {
-        return this._resident;
+    public get residentEntityId(): string | null {
+        return this._residentEntityId;
     }
 
     override onStart(tick: number): void {
         super.onStart(tick);
         //Look for any homeless workers
-        if (!this._resident) {
+        if (!this._residentEntityId) {
             const homelessWorker = firstChildWhere(
                 this.entity.getRootEntity(),
                 (entity) => {
@@ -46,7 +51,7 @@ export class HousingComponent extends EntityComponent {
             this.startTime = tick;
         }
 
-        if (!this._resident && tick - this.startTime > 60) {
+        if (!this._residentEntityId && tick - this.startTime > 60) {
             //Check if there are any homeless workers
             //If there was no homless workers, spawn a new one
             //for this house.
@@ -59,11 +64,23 @@ export class HousingComponent extends EntityComponent {
             }
             if (buildingHpComponent.healthPercentage >= 1.0) {
                 const worker = workerPrefab(generateId("worker"));
-                this._resident = worker;
+                this._residentEntityId = worker.id;
                 this.setHouseOnTenant(worker);
                 this.entity.getRootEntity().addChild(worker);
             }
         }
+    }
+
+    override fromBundle(bundle: HousingBundle): void {
+        this._residentEntityId = bundle.residentEntityId;
+        this.startTime = bundle.startTime;
+    }
+
+    override toBundle(): HousingBundle {
+        return {
+            startTime: this.startTime,
+            residentEntityId: this._residentEntityId,
+        };
     }
 
     private setHouseOnTenant(entity: Entity) {
@@ -74,7 +91,7 @@ export class HousingComponent extends EntityComponent {
             const tenant = new TenantComponent();
             tenant.houseEntityId = this.entity.id;
             entity.addComponent(tenant);
-            this._resident = entity;
+            this._residentEntityId = entity.id;
         }
     }
 }

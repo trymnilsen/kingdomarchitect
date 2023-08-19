@@ -7,12 +7,12 @@ import {
 import { getChunkId, getChunkPosition } from "../../../chunk.js";
 import { Entity } from "../../../entity/entity.js";
 import { EntityEvent } from "../../../entity/entityEvent.js";
-import { ComponentFactory, EntityComponent } from "../../entityComponent.js";
-import { PathFindingComponent } from "../path/pathFindingComponent.js";
+import { StatelessComponent } from "../../entityComponent.js";
+import { ChunkMapUpdateEvent } from "./chunkMapUpdateEvent.js";
 
 type ChunkMap = { [chunkPosition: string]: { [entityId: string]: Entity } };
 
-export class ChunkMapComponent extends EntityComponent {
+export class ChunkMapComponent extends StatelessComponent {
     /**
      * Holds a map of entities within a given chunk
      */
@@ -84,10 +84,7 @@ export class ChunkMapComponent extends EntityComponent {
             delete this.entityChunks[entity.id];
         }
 
-        const pathFindingComponent =
-            this.entity.requireComponent(PathFindingComponent);
-
-        pathFindingComponent.invalidateGraphPoint(entity.worldPosition);
+        this.invalidatePoint(entity.worldPosition);
     }
 
     private addEntityToChunkMap(entity: Entity) {
@@ -100,9 +97,7 @@ export class ChunkMapComponent extends EntityComponent {
         this.chunkMap[chunkId][entity.id] = entity;
         this.entityChunks[entity.id] = chunkId;
 
-        const pathFindingComponent =
-            this.entity.requireComponent(PathFindingComponent);
-        pathFindingComponent.invalidateGraphPoint(entity.worldPosition);
+        this.invalidatePoint(entity.worldPosition);
     }
 
     private updateChunkMapForEntity(entity: Entity) {
@@ -116,13 +111,15 @@ export class ChunkMapComponent extends EntityComponent {
             this.addEntityToChunkMap(entity);
         }
 
-        const pathFindingComponent =
-            this.entity.requireComponent(PathFindingComponent);
-
         const adjacent = adjacentPoints(entity.worldPosition);
         for (const point of adjacent) {
-            pathFindingComponent.invalidateGraphPoint(point);
+            this.invalidatePoint(point);
         }
-        pathFindingComponent.invalidateGraphPoint(entity.worldPosition);
+
+        this.invalidatePoint(entity.worldPosition);
+    }
+
+    private invalidatePoint(point: Point) {
+        this.publishEvent(new ChunkMapUpdateEvent(point, this));
     }
 }

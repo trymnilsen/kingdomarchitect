@@ -1,8 +1,8 @@
-import { ComponentFactory, EntityComponent } from "../../entityComponent.js";
+import { StatelessComponent } from "../../entityComponent.js";
 import { JobRunnerComponent } from "../../job/jobRunnerComponent.js";
 import { LookForFoodJob } from "./LookForFoodJob.js";
 
-export class IdleMobComponent extends EntityComponent {
+export class IdleMobComponent extends StatelessComponent {
     override onUpdate(tick: number): void {
         const jobRunner = this.entity.requireComponent(JobRunnerComponent);
         if (!jobRunner.activeJob) {

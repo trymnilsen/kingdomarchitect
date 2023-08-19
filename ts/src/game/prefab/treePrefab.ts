@@ -4,8 +4,8 @@ import { Entity } from "../entity/entity.js";
 
 export function treePrefab(id: string, variation: number): Entity {
     const tree = new Entity(id);
-    const treeComponent = new TreeComponent(variation);
-    const healthComponent = new HealthComponent(100, 100, {
+    const treeComponent = TreeComponent.createInstance(variation);
+    const healthComponent = HealthComponent.createInstance(100, 100, {
         min: 10,
         max: 100,
     });

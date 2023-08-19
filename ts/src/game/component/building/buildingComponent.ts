@@ -1,9 +1,14 @@
-import { Sprite2 } from "../../../asset/sprite.js";
+import { Sprite2, emptySprite } from "../../../asset/sprite.js";
 import { Adjacency } from "../../../common/adjacency.js";
 import { Point } from "../../../common/point.js";
-import { Building } from "../../../data/building/building.js";
+import {
+    Building,
+    nullBuilding,
+    nullBuildingId,
+} from "../../../data/building/building.js";
+import { getBuildingById } from "../../../data/building/buildings.js";
 import { RenderContext } from "../../../rendering/renderContext.js";
-import { ComponentFactory, EntityComponent } from "../entityComponent.js";
+import { EntityComponent } from "../entityComponent.js";
 import { ChunkMapComponent } from "../root/chunk/chunkMapComponent.js";
 
 type BuildingComponentBundle = {
@@ -14,24 +19,33 @@ type BuildingComponentBundle = {
 };
 
 export class BuildingComponent extends EntityComponent<BuildingComponentBundle> {
-    private buildingSprite: Sprite2;
-    private scaffoldSprite: Sprite2;
-    private _building: Building;
+    private buildingSprite: Sprite2 = emptySprite;
+    private scaffoldSprite: Sprite2 = emptySprite;
+    private _building: Building = nullBuilding;
     private isScaffolded: boolean = true;
 
     public get building(): Readonly<Building> {
         return this._building;
     }
 
-    constructor(
+    constructor() {
+        super();
+    }
+
+    static createInstance(
         buildingSprite: Sprite2,
         scaffoldSprite: Sprite2,
-        building: Building
-    ) {
-        super();
-        this._building = building;
-        this.buildingSprite = buildingSprite;
-        this.scaffoldSprite = scaffoldSprite;
+        buildingId: string
+    ): BuildingComponent {
+        const instance = new BuildingComponent();
+        instance.fromBundle({
+            buildingId: buildingId,
+            buildingSprite: buildingSprite,
+            scaffoldSprite: scaffoldSprite,
+            isScaffolded: true,
+        });
+
+        return instance;
     }
 
     finishBuild() {
@@ -82,6 +96,29 @@ export class BuildingComponent extends EntityComponent<BuildingComponentBundle> 
                 targetHeight: 32,
             });
         }
+    }
+
+    override fromBundle(bundle: BuildingComponentBundle): void {
+        this.buildingSprite = bundle.buildingSprite;
+        this.scaffoldSprite = bundle.scaffoldSprite;
+        this.isScaffolded = bundle.isScaffolded;
+        const building = getBuildingById(bundle.buildingId);
+        if (!!building) {
+            this._building = building;
+        } else if (bundle.buildingId === nullBuildingId) {
+            this._building = nullBuilding;
+        } else {
+            console.error("No building found with id: ", bundle.buildingId);
+        }
+    }
+
+    override toBundle(): BuildingComponentBundle {
+        return {
+            buildingId: this.building.id,
+            buildingSprite: this.buildingSprite,
+            scaffoldSprite: this.scaffoldSprite,
+            isScaffolded: this.isScaffolded,
+        };
     }
 
     private getAdjacency(): AdjacentBuildings {

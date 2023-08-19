@@ -1,12 +1,13 @@
 import { JSONValue } from "../../common/object.js";
 import { Point } from "../../common/point.js";
+import { Persistable } from "../../persistence/Persistable.js";
 import { RenderContext } from "../../rendering/renderContext.js";
 import { Entity } from "../entity/entity.js";
 import { ComponentEvent } from "./componentEvent.js";
 
-export abstract class EntityComponent<
-    PersistedDataType extends JSONValue = {}
-> {
+export abstract class EntityComponent<PersistedDataType extends JSONValue = {}>
+    implements Persistable<PersistedDataType>
+{
     private _entity?: Entity;
 
     public get entity(): Entity {
@@ -40,14 +41,16 @@ export abstract class EntityComponent<
     onDraw(context: RenderContext, screenPosition: Point) {}
 
     /**
-     * Invoked when the the game is saved and this component should create
-     * an object/map that can be serialized and stored in save data.
-     * Defaults to returning an empty object, override to provide an object of
-     * the `PersistedDataType` type
+     * Invoked when component is restored from a save. The component should
+     * reset its state to match the given bundle
+     * @param bundle
      */
-    onPersist(): PersistedDataType {
-        return <PersistedDataType>{};
-    }
+    abstract fromBundle(bundle: PersistedDataType): void;
+    /**
+     * Invoked when the component is meant to save its state. The returned
+     * bundle will later be used to restore this component fra the savestate
+     */
+    abstract toBundle(): PersistedDataType;
 
     protected publishEvent(event: ComponentEvent<EntityComponent>) {
         if (!!this._entity) {
@@ -59,9 +62,16 @@ export abstract class EntityComponent<
 }
 
 /**
- * Represents a function used to create components, will provided the id of the
- * component that it was saved with)
+ * A component that does not persist any state. This class can be used when
+ * the component solely does updating logic and the scaffolding of a to and from
+ * bundle implementation is not needed or for cases where component are used as
+ * indicators based or their presence or not. Non persisted components still
+ * needs to be added to the `ComponentLoader`, they're just not saved with any
+ * state.
  */
-export type ComponentFactory<T extends JSONValue = {}> = (
-    data: T
-) => EntityComponent;
+export class StatelessComponent extends EntityComponent {
+    override fromBundle(bundle: {}): void {}
+    override toBundle() {
+        return {};
+    }
+}

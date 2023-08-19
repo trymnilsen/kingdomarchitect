@@ -4,7 +4,7 @@ import { Entity } from "../entity/entity.js";
 
 export function quarryPrefab(id: string): Entity {
     const stone = new Entity(id);
-    const spriteDrawer = new SpriteComponent(
+    const spriteDrawer = SpriteComponent.createInstance(
         sprites2.rocks,
         {
             x: 3,

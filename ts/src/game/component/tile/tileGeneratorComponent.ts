@@ -11,12 +11,12 @@ import { createThirdTileSet } from "../../../data/tileset/thirdTile.js";
 import { Tileset } from "../../../data/tileset/tileset.js";
 import { getChunkPosition } from "../../chunk.js";
 import { getTileId } from "../../tile/tile.js";
-import { EntityComponent } from "../entityComponent.js";
+import { StatelessComponent } from "../entityComponent.js";
 import { TileMapUpdateEvent } from "./tileMapUpdatedEvent.js";
 import { GroundChunk, TilesComponent } from "./tilesComponent.js";
 import { UnlockableArea } from "./unlockableArea.js";
 
-export class TileGeneratorComponent extends EntityComponent {
+export class TileGeneratorComponent extends StatelessComponent {
     unlockArea(area: UnlockableArea) {
         const tileComponent = this.entity.requireComponent(TilesComponent);
         const chunks = getChunks(area.tileset.tiles);

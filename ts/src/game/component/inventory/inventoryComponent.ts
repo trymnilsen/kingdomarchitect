@@ -17,8 +17,14 @@ import {
 } from "../../../data/inventory/resources.js";
 import { EntityComponent } from "../entityComponent.js";
 
-export class InventoryComponent extends EntityComponent {
-    private _items: { [id: string]: InventoryItemQuantity } = {
+export type InventoryMap = { [id: string]: InventoryItemQuantity };
+
+type InventoryBundle = {
+    items: InventoryMap;
+};
+
+export class InventoryComponent extends EntityComponent<InventoryBundle> {
+    private _items: InventoryMap = {
         [woodResourceItem.id]: {
             amount: 200000,
             item: woodResourceItem,
@@ -103,5 +109,14 @@ export class InventoryComponent extends EntityComponent {
         } else {
             return false;
         }
+    }
+
+    override fromBundle(bundle: InventoryBundle): void {
+        this._items = bundle.items;
+    }
+    override toBundle(): InventoryBundle {
+        return {
+            items: this._items,
+        };
     }
 }

@@ -15,6 +15,7 @@ export enum AggroMode {
 
 type AggroComponentBundle = {
     aggroMode: AggroMode;
+    damage: number;
 };
 
 /**
@@ -25,12 +26,9 @@ type AggroComponentBundle = {
 export class AggroComponent extends EntityComponent<AggroComponentBundle> {
     private _aggroMode: AggroMode = AggroMode.Agressive;
     private healthEventHandle: TypedEventHandle | undefined;
-
-    constructor(private damage: number) {
-        //TODO: Move damage from field here to a value from the equipment on
-        //the entity
-        super();
-    }
+    //TODO: Move damage from field here to a value from the equipment on
+    //the entity
+    private damage: number = 0;
 
     public get aggroMode(): AggroMode {
         return this._aggroMode;
@@ -96,5 +94,26 @@ export class AggroComponent extends EntityComponent<AggroComponentBundle> {
                 }
             }
         }
+    }
+
+    override fromBundle(bundle: AggroComponentBundle): void {
+        this._aggroMode = bundle.aggroMode;
+        this.damage = bundle.damage;
+    }
+
+    override toBundle(): AggroComponentBundle {
+        return {
+            aggroMode: this.aggroMode,
+            damage: this.damage,
+        };
+    }
+
+    static createInstance(damage: number): AggroComponent {
+        const instance = new AggroComponent();
+        instance.fromBundle({
+            damage: damage,
+            aggroMode: AggroMode.Agressive,
+        });
+        return instance;
     }
 }

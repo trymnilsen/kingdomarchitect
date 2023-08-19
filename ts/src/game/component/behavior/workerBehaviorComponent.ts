@@ -1,3 +1,3 @@
-import { ComponentFactory, EntityComponent } from "../entityComponent.js";
+import { StatelessComponent } from "../entityComponent.js";
 
-export class WorkerBehaviorComponent extends EntityComponent {}
+export class WorkerBehaviorComponent extends StatelessComponent {}

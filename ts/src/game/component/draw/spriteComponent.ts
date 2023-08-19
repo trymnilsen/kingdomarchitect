@@ -1,21 +1,31 @@
-import { Sprite2, sprites2 } from "../../../asset/sprite.js";
+import { Sprite2, emptySprite, sprites2 } from "../../../asset/sprite.js";
 import { Point, zeroPoint } from "../../../common/point.js";
 import { RenderContext } from "../../../rendering/renderContext.js";
-import { ComponentFactory, EntityComponent } from "../entityComponent.js";
+import { EntityComponent } from "../entityComponent.js";
 
 type SpriteComponentBundle = {
     sprite: Sprite2;
     offset: Point;
-    size: Point;
+    size?: Point;
 };
 
 export class SpriteComponent extends EntityComponent<SpriteComponentBundle> {
-    constructor(
-        private sprite: Sprite2,
-        private offset: Point = zeroPoint(),
-        private size?: Point
-    ) {
-        super();
+    private sprite: Sprite2 = emptySprite;
+    private offset: Point = zeroPoint();
+    private size?: Point;
+
+    static createInstance(
+        sprite: Sprite2,
+        offset: Point,
+        size?: Point
+    ): SpriteComponent {
+        const instance = new SpriteComponent();
+        instance.fromBundle({
+            offset: offset,
+            sprite: sprite,
+            size: size,
+        });
+        return instance;
     }
 
     updateSprite(sprite: Sprite2) {
@@ -54,5 +64,19 @@ export class SpriteComponent extends EntityComponent<SpriteComponentBundle> {
             targetHeight: targetHeight,
             targetWidth: targetWidth,
         });
+    }
+
+    override fromBundle(bundle: SpriteComponentBundle): void {
+        this.sprite = bundle.sprite;
+        this.offset = bundle.offset;
+        this.size = bundle.size;
+    }
+
+    override toBundle(): SpriteComponentBundle {
+        return {
+            sprite: this.sprite,
+            offset: this.offset,
+            size: this.size,
+        };
     }
 }

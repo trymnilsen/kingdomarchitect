@@ -1,14 +1,23 @@
 import { Point } from "../../../common/point.js";
-import { NumberRange } from "../../../common/range.js";
+import {
+    NumberRange,
+    zeroRange as zeroNumberRange,
+} from "../../../common/range.js";
 import { RenderContext } from "../../../rendering/renderContext.js";
 import { Entity } from "../../entity/entity.js";
 import { EntityComponent } from "../entityComponent.js";
 import { HealthEvent } from "./healthEvent.js";
 
-export class HealthComponent extends EntityComponent {
-    private _health: number;
-    private _maxHealth: number;
-    private _showHealthBarThreshold: NumberRange;
+type HealthBundle = {
+    health: number;
+    maxHealth: number;
+    showHealthbarThreshold: NumberRange;
+};
+
+export class HealthComponent extends EntityComponent<HealthBundle> {
+    private _health: number = 0;
+    private _maxHealth: number = 0;
+    private _showHealthBarThreshold: NumberRange = zeroNumberRange();
     private healthBubble: number = 0;
     private tickTime: number = 0;
 
@@ -23,15 +32,18 @@ export class HealthComponent extends EntityComponent {
         return this._health;
     }
 
-    constructor(
+    static createInstance(
         currentHealth: number,
         maxHealth: number,
         showHealthBarThreshold: NumberRange = { min: 0, max: maxHealth }
-    ) {
-        super();
-        this._health = currentHealth;
-        this._maxHealth = maxHealth;
-        this._showHealthBarThreshold = showHealthBarThreshold;
+    ): HealthComponent {
+        const instance = new HealthComponent();
+        instance.fromBundle({
+            health: currentHealth,
+            maxHealth: maxHealth,
+            showHealthbarThreshold: showHealthBarThreshold,
+        });
+        return instance;
     }
 
     /**
@@ -64,6 +76,10 @@ export class HealthComponent extends EntityComponent {
         return 0;
     }
 
+    /**
+     * Heal the component to its max health
+     * @returns always 0
+     */
     healToMax(): number {
         const oldHealth = this._health;
         const newHealth = this._maxHealth;
@@ -122,5 +138,19 @@ export class HealthComponent extends EntityComponent {
                 color: this.healthBubble < 0 ? "lime" : "red",
             });
         }
+    }
+
+    override fromBundle(bundle: HealthBundle): void {
+        this._health = bundle.health;
+        this._maxHealth = bundle.maxHealth;
+        this._showHealthBarThreshold = bundle.showHealthbarThreshold;
+    }
+
+    override toBundle(): HealthBundle {
+        return {
+            health: this._health,
+            maxHealth: this._maxHealth,
+            showHealthbarThreshold: this._showHealthBarThreshold,
+        };
     }
 }

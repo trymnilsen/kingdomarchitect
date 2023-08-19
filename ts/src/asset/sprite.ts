@@ -30,3 +30,4 @@ export type Sprite2 = {
 };
 
 export const sprites2 = sprites;
+export const emptySprite = sprites.empty_sprite;

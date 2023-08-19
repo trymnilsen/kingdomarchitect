@@ -1,7 +1,12 @@
 import { InventoryItem } from "../../../data/inventory/inventoryItem.js";
 import { EntityComponent } from "../entityComponent.js";
 
-export class EquipmentComponent extends EntityComponent {
+type EquipmentBundle = {
+    mainItem: InventoryItem | null;
+    otherItem: InventoryItem | null;
+};
+
+export class EquipmentComponent extends EntityComponent<EquipmentBundle> {
     private _mainItem: InventoryItem | null = null;
     private _otherItem: InventoryItem | null = null;
 
@@ -20,5 +25,16 @@ export class EquipmentComponent extends EntityComponent {
 
     public set otherItem(v: InventoryItem | null) {
         this._otherItem = v;
+    }
+
+    override fromBundle(bundle: EquipmentBundle): void {
+        this._mainItem = bundle.mainItem;
+        this._otherItem = bundle.otherItem;
+    }
+    override toBundle(): EquipmentBundle {
+        return {
+            mainItem: this._mainItem,
+            otherItem: this._otherItem,
+        };
     }
 }

@@ -11,17 +11,14 @@ export function buildingPrefab(
     extraComponents: EntityComponent[]
 ): Entity {
     const entity = new Entity(id);
-    const buildingComponent = new BuildingComponent(
+    const buildingComponent = BuildingComponent.createInstance(
         building.icon,
         sprites2.wooden_house_scaffold,
-        building
+        building.id
     );
-    const currentHealth = 10;
 
-    const healthComponent = new HealthComponent(currentHealth, 100, {
-        min: 0,
-        max: 100,
-    });
+    const currentHealth = 10;
+    const healthComponent = HealthComponent.createInstance(currentHealth, 100);
 
     entity.addComponent(buildingComponent);
     entity.addComponent(healthComponent);

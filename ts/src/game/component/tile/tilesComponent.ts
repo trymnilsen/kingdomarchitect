@@ -7,42 +7,34 @@ import { getTileId, TileSize } from "../../tile/tile.js";
 import { EntityComponent } from "../entityComponent.js";
 import { Ground } from "./ground.js";
 
-export interface GroundTile {
+export type GroundTile = {
     tileX: number;
     tileY: number;
     hasTree?: number;
-}
+};
 
-export interface GroundChunk {
+export type GroundChunk = {
     chunkX: number;
     chunkY: number;
-}
+};
 
-export class TilesComponent extends EntityComponent implements Ground {
-    private tileMap: { [id: string]: GroundTile } = {};
-    private _chunkMap: { [id: string]: GroundChunk } = {};
+type TilesBundle = {
+    tileMap: { [id: string]: GroundTile };
+    chunkMap: { [id: string]: GroundChunk };
+};
+
+type TileMap = { [id: string]: GroundTile };
+type GroundChunkMap = { [id: string]: GroundChunk };
+
+export class TilesComponent
+    extends EntityComponent<TilesBundle>
+    implements Ground
+{
+    private tileMap: TileMap = {};
+    private _chunkMap: GroundChunkMap = {};
 
     public get chunkMap(): Readonly<{ [id: string]: Readonly<GroundChunk> }> {
         return this._chunkMap;
-    }
-
-    constructor() {
-        super();
-        for (let x = 0; x < ChunkSize; x++) {
-            for (let y = 0; y < ChunkSize; y++) {
-                const id = getTileId(x, y);
-                this.tileMap[id] = {
-                    tileX: x,
-                    tileY: y,
-                    hasTree: x == 2 && y == 2 ? 2 : 0,
-                };
-            }
-        }
-
-        this._chunkMap[getTileId(0, 0)] = {
-            chunkX: 0,
-            chunkY: 0,
-        };
     }
 
     getBounds(): Bounds {
@@ -119,5 +111,46 @@ export class TilesComponent extends EntityComponent implements Ground {
                 });
             }
         }
+    }
+
+    override fromBundle(bundle: TilesBundle): void {
+        this.tileMap = bundle.tileMap;
+        this._chunkMap = bundle.chunkMap;
+    }
+    override toBundle(): TilesBundle {
+        return {
+            tileMap: this.tileMap,
+            chunkMap: this._chunkMap,
+        };
+    }
+
+    static createInstance(): TilesComponent {
+        const tileMap: TileMap = {};
+        const chunkMap: GroundChunkMap = {};
+        for (let x = 0; x < ChunkSize; x++) {
+            for (let y = 0; y < ChunkSize; y++) {
+                const id = getTileId(x, y);
+                tileMap[id] = {
+                    tileX: x,
+                    tileY: y,
+                    hasTree: x == 2 && y == 2 ? 2 : 0,
+                };
+            }
+        }
+
+        chunkMap[getTileId(0, 0)] = {
+            chunkX: 0,
+            chunkY: 0,
+        };
+
+        const tilesBundle: TilesBundle = {
+            chunkMap,
+            tileMap,
+        };
+
+        const instance = new TilesComponent();
+        instance.fromBundle(tilesBundle);
+
+        return instance;
     }
 }

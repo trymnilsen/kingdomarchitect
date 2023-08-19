@@ -24,7 +24,7 @@ describe("Housing component test", () => {
         }
 
         assert.equal(tenantComponent.houseEntityId, house.id);
-        assert.equal(housingComponent.resident?.id, worker.id);
+        assert.equal(housingComponent.residentEntityId, worker.id);
     });
 
     it("Will not spawn worker if tenant is set", () => {

@@ -12,7 +12,7 @@ import { Entity } from "../entity/entity.js";
 
 export function mobPrefab(id: string): Entity {
     const goblin = new Entity(id);
-    const spriteDrawer = new SpriteComponent(
+    const spriteDrawer = SpriteComponent.createInstance(
         sprites2.goblin,
         {
             x: 3,
@@ -20,11 +20,11 @@ export function mobPrefab(id: string): Entity {
         },
         { x: 32, y: 32 }
     );
-    const aggroComponent = new AggroComponent(1);
+    const aggroComponent = AggroComponent.createInstance(1);
     aggroComponent.aggroMode = AggroMode.Agressive;
     const jobRunnerComponent = new JobRunnerComponent();
     const idleMobComponent = new IdleMobComponent();
-    const healthComponent = new HealthComponent(100, 100);
+    const healthComponent = HealthComponent.createInstance(100, 100);
     jobRunnerComponent.isOpenForExternalJobs = false;
 
     goblin.addComponent(idleMobComponent);

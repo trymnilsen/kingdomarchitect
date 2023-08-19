@@ -9,13 +9,30 @@ export enum TreeComponentChopState {
     Full,
 }
 
-export class TreeComponent extends EntityComponent {
+type TreeBundle = {
+    chopTime?: number;
+    tree: number;
+    previousTick: number;
+    chopState: TreeComponentChopState;
+};
+
+export class TreeComponent extends EntityComponent<TreeBundle> {
     private chopTime?: number;
+    private tree: number = 1;
     private previousTick: number = 0;
     private chopState: TreeComponentChopState = TreeComponentChopState.Full;
-    constructor(private tree: number) {
-        super();
+
+    static createInstance(tree: number): TreeComponent {
+        const instance = new TreeComponent();
+        instance.fromBundle({
+            tree: tree,
+            previousTick: 0,
+            chopState: TreeComponentChopState.Full,
+        });
+
+        return instance;
     }
+
     startChop() {
         this.chopState = TreeComponentChopState.Chopping;
     }
@@ -53,5 +70,21 @@ export class TreeComponent extends EntityComponent {
             x: screenPosition.x + 4,
             y: screenPosition.y,
         });
+    }
+
+    override fromBundle(bundle: TreeBundle): void {
+        this.chopState = bundle.chopState;
+        this.chopTime = bundle.chopTime;
+        this.previousTick = bundle.previousTick;
+        this.tree = bundle.tree;
+    }
+
+    override toBundle(): TreeBundle {
+        return {
+            chopState: this.chopState,
+            chopTime: this.chopTime,
+            previousTick: this.previousTick,
+            tree: this.tree,
+        };
     }
 }

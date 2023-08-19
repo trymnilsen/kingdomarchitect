@@ -7,10 +7,10 @@ import { Entity } from "../entity/entity.js";
 
 export function housePrefab(id: string, scaffold: boolean): Entity {
     const house = new Entity(id);
-    const buildingComponent = new BuildingComponent(
+    const buildingComponent = BuildingComponent.createInstance(
         sprites2.wooden_house,
         sprites2.wooden_house_scaffold,
-        woodenBuildings[0]
+        woodenBuildings[0].id
     );
 
     let currentHealth = 100;
@@ -20,7 +20,7 @@ export function housePrefab(id: string, scaffold: boolean): Entity {
         buildingComponent.finishBuild();
     }
 
-    const healthComponent = new HealthComponent(currentHealth, 100, {
+    const healthComponent = HealthComponent.createInstance(currentHealth, 100, {
         min: 0,
         max: 100,
     });

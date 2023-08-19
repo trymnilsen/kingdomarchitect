@@ -19,6 +19,12 @@ export class JobQueueComponent
     extends EntityComponent
     implements JobQueue, JobOwner
 {
+    override fromBundle(bundle: {}): void {
+        throw new Error("Method not implemented.");
+    }
+    override toBundle(): {} {
+        throw new Error("Method not implemented.");
+    }
     private _pendingJobs: Job[] = [];
     private _jobScheduledEvent: Event<Job> = new Event<Job>();
 

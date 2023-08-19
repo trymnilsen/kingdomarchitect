@@ -1,11 +1,10 @@
 import { sprites2 } from "../../asset/sprite.js";
-import { InventoryItem } from "../../data/inventory/inventoryItem.js";
 import { SpriteComponent } from "../component/draw/spriteComponent.js";
 import { Entity } from "../entity/entity.js";
 
 export function ruinsPrefab(id: string): Entity {
     const ruinsPrefab = new Entity(id);
-    const spriteDrawer = new SpriteComponent(
+    const spriteDrawer = SpriteComponent.createInstance(
         sprites2.ruins,
         {
             x: 3,

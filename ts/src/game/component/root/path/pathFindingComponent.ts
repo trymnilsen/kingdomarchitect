@@ -2,18 +2,25 @@ import { TypedEventHandle } from "../../../../common/event/typedEvent.js";
 import { addPoint, Point, pointEquals } from "../../../../common/point.js";
 import { GraphNode } from "../../../../path/graph/graph.js";
 import { PathSearch } from "../../../../path/search.js";
-import { EntityComponent } from "../../entityComponent.js";
+import { StatelessComponent } from "../../entityComponent.js";
 import { TileMapUpdateEvent } from "../../tile/tileMapUpdatedEvent.js";
+import { ChunkMapUpdateEvent } from "../chunk/chunkMapUpdateEvent.js";
+import { createLazyGraphFromRootNode } from "./generateGraph.js";
 import { PathResult, PathResultStatus } from "./pathResult.js";
 
-export class PathFindingComponent extends EntityComponent {
+export class PathFindingComponent extends StatelessComponent {
     private tileEventListener: TypedEventHandle | undefined;
+    private chunkMapEventListener: TypedEventHandle | undefined;
+    private pathSearch: PathSearch | null = null;
 
-    constructor(private pathSearch: PathSearch) {
+    constructor() {
         super();
     }
 
     override onStart(tick: number): void {
+        this.pathSearch = new PathSearch(
+            createLazyGraphFromRootNode(this.entity.getRootEntity())
+        );
         this.tileEventListener = this.entity.componentEvents.listen(
             TileMapUpdateEvent,
             (event) => {
@@ -22,10 +29,17 @@ export class PathFindingComponent extends EntityComponent {
                 this.invalidateGraphPoint({ x: 0, y: 0 });
             }
         );
+        this.chunkMapEventListener = this.entity.componentEvents.listen(
+            ChunkMapUpdateEvent,
+            (event) => {
+                this.invalidateGraphPoint(event.pointUpdated);
+            }
+        );
     }
 
     override onStop(tick: number): void {
         this.tileEventListener?.dispose();
+        this.chunkMapEventListener?.dispose();
     }
 
     public findPath(
@@ -33,6 +47,10 @@ export class PathFindingComponent extends EntityComponent {
         to: Point,
         blockBuildings?: boolean
     ): PathResult {
+        if (!this.pathSearch) {
+            throw new Error("Cannot find path, no pathsearch set");
+        }
+
         const offsetPoint = this.pathSearch.offset;
         const offsetFrom = addPoint(from, {
             x: offsetPoint.x,
@@ -100,6 +118,9 @@ export class PathFindingComponent extends EntityComponent {
     }
 
     public invalidateGraphPoint(point: Point) {
+        if (!this.pathSearch) {
+            throw new Error("Cannot invalidate point, pathsearch is null");
+        }
         this.pathSearch.invalidateGraphPoint(point);
     }
 }

@@ -3,6 +3,7 @@ import { PathSearch } from "../../path/search.js";
 import { InventoryComponent } from "../component/inventory/inventoryComponent.js";
 import { JobQueueComponent } from "../component/job/jobQueueComponent.js";
 import { JobSchedulerComponent } from "../component/job/jobSchedulerComponent.js";
+import { ChunkMapComponent } from "../component/root/chunk/chunkMapComponent.js";
 import { createLazyGraphFromRootNode } from "../component/root/path/generateGraph.js";
 import { PathFindingComponent } from "../component/root/path/pathFindingComponent.js";
 import { TileGeneratorComponent } from "../component/tile/tileGeneratorComponent.js";
@@ -15,16 +16,16 @@ import { Entity } from "./entity.js";
 export function createRootEntity(): Entity {
     const rootEntity = new Entity("root");
     const jobQueueComponent = new JobQueueComponent();
-    const groundComponent = new TilesComponent();
     const inventoryComponent = new InventoryComponent();
-
+    const groundComponent = TilesComponent.createInstance();
+    const chunkmapComponent = new ChunkMapComponent();
     rootEntity.addComponent(inventoryComponent);
     rootEntity.addComponent(groundComponent);
     rootEntity.addComponent(jobQueueComponent);
+    rootEntity.addComponent(chunkmapComponent);
     rootEntity.addComponent(new JobSchedulerComponent());
     rootEntity.addComponent(new TileGeneratorComponent());
-    const pathSearch = new PathSearch(createLazyGraphFromRootNode(rootEntity));
-    const pathFindingComponent = new PathFindingComponent(pathSearch);
+    const pathFindingComponent = new PathFindingComponent();
     rootEntity.addComponent(pathFindingComponent);
 
     //Set up initial entities
