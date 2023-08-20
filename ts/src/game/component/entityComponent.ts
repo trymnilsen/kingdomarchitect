@@ -74,3 +74,11 @@ export class StatelessComponent extends EntityComponent {
         return {};
     }
 }
+
+export function assertEntityComponent<T extends EntityComponent>(
+    component: T | null
+): asserts component is T {
+    if (!component) {
+        throw new Error("Entity has not been resolved from id");
+    }
+}

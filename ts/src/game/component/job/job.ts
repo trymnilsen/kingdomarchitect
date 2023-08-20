@@ -235,7 +235,10 @@ export abstract class Job<T extends JSONValue = {}> {
 
     /**
      * invoked when the job is started, dependencies like entity is guaranteed
-     * to be set at this point
+     * to be set at this point. Avoid resolving entities or data in this
+     * method and prefer to do it in `onFromPersistedState` as onStart will not
+     * be called when a job that has been started is created from the save state
+     * and the job could end up without the needed object references.
      */
     onStart() {}
 

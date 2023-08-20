@@ -1,49 +1,62 @@
 import { Entity } from "../../../entity/entity.js";
 import { BuildingComponent } from "../../building/buildingComponent.js";
+import { assertEntityComponent } from "../../entityComponent.js";
 import { HealthComponent } from "../../health/healthComponent.js";
 import { Job } from "../job.js";
 
-export class BuildJob extends Job {
-    private buildingComponent: BuildingComponent;
-    private buildingEntity: Entity;
-    get tileX(): number {
-        return this.buildingEntity.worldPosition.x;
-    }
+type BuildBundle = {
+    entityId: string;
+};
 
-    get tileY(): number {
-        return this.buildingEntity.worldPosition.y;
-    }
+export class BuildJob extends Job<BuildBundle> {
+    private buildingComponent: BuildingComponent | null = null;
+    private healthComponent: HealthComponent | null = null;
 
-    constructor(building: Entity) {
-        super();
-        this.buildingEntity = building;
-        const buildingComponent = building.getComponent(BuildingComponent);
-        if (!buildingComponent) {
-            throw new Error("No building component on building entity");
-        }
+    static createInstance(building: Entity): BuildJob {
+        const instance = new BuildJob();
+        instance.bundle = {
+            entityId: building.id,
+        };
 
-        this.buildingComponent = buildingComponent;
+        return instance;
     }
 
     update(tick: number): void {
-        const entity = this.entity;
-        if (!entity) {
-            throw new Error("No entity set for job");
+        if (!this.healthComponent) {
+            throw new Error("Health component not set");
+        }
+        if (!this.buildingComponent) {
+            throw new Error("Building component not set");
         }
 
-        const healthComponent =
-            this.buildingEntity.getComponent(HealthComponent);
-
-        if (!healthComponent) {
-            throw new Error("No health component on building entity");
+        if (this.healthComponent.healthPercentage < 1) {
+            this.healthComponent.heal(10);
         }
-
-        if (healthComponent.healthPercentage < 1) {
-            healthComponent.heal(10);
-        }
-        if (healthComponent.healthPercentage >= 1) {
+        if (this.healthComponent.healthPercentage >= 1) {
             this.buildingComponent.finishBuild();
             this.complete();
         }
+    }
+
+    protected override onFromPersistedState(bundle: BuildBundle): void {
+        const entityWithId = this.entity
+            .getRootEntity()
+            .findEntity(bundle.entityId);
+
+        if (!entityWithId) {
+            throw new Error(`Entity not found with id ${bundle.entityId}`);
+        }
+
+        this.healthComponent = entityWithId.requireComponent(HealthComponent);
+        this.buildingComponent =
+            entityWithId.requireComponent(BuildingComponent);
+    }
+
+    protected override onPersistJobState(): BuildBundle {
+        assertEntityComponent(this.buildingComponent);
+
+        return {
+            entityId: this.buildingComponent.entity.id,
+        };
     }
 }
