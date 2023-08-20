@@ -1,22 +1,9 @@
-import { InvalidStateError } from "../../../../common/error/invalidStateError.js";
-import {
-    isPointAdjacentTo,
-    Point,
-    pointEquals,
-} from "../../../../common/point.js";
-import { PathFindingComponent } from "../../../component/root/path/pathFindingComponent.js";
-import { PathResultStatus } from "../../../component/root/path/pathResult.js";
-import { Job } from "../job.js";
-import { JobConstraint } from "../jobConstraint.js";
-import { JobConstraintsError } from "../jobConstraintsError.js";
-import { MultipleStepJob } from "../multipleStepJob.js";
-import { MoveJob } from "./moveJob.js";
-
 export interface TargetedJob {
     tileX: number;
     tileY: number;
 }
 
+/*
 export class MoveToBeforeJob extends MultipleStepJob {
     private job: Job;
     private tileSpaceTarget: Point;
@@ -78,3 +65,4 @@ export class MoveToBeforeJob extends MultipleStepJob {
         this.setJobs(subJobs);
     }
 }
+*/

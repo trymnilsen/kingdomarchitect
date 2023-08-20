@@ -1,16 +1,8 @@
 import { InventoryComponent } from "../../../inventory/inventoryComponent.js";
 import { ChestComponent } from "../../../resource/chestComponent.js";
-import { WorkerConstraint } from "../../constraint/workerConstraint.js";
 import { Job } from "../../job.js";
-import { MoveToBeforeJob } from "../moveToBeforeJob.js";
 
-export class CollectChestJob extends MoveToBeforeJob {
-    constructor(chest: ChestComponent) {
-        super(new _CollectChestJob(chest), new WorkerConstraint());
-    }
-}
-
-class _CollectChestJob extends Job {
+export class CollectChestJob extends Job {
     constructor(private readonly chest: ChestComponent) {
         super();
     }

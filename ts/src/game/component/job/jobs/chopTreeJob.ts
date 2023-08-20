@@ -4,19 +4,16 @@ import { woodResourceItem } from "../../../../data/inventory/resources.js";
 import { RenderContext } from "../../../../rendering/renderContext.js";
 import { BlinkingImageAnimation } from "../../../../rendering/visual/blinkingImageAnimation.js";
 import { HealthComponent } from "../../../component/health/healthComponent.js";
-import { TreeComponent } from "../../../component/resource/treeComponent.js";
 import { InventoryComponent } from "../../../component/inventory/inventoryComponent.js";
+import { TreeComponent } from "../../../component/resource/treeComponent.js";
 import { TilesComponent } from "../../../component/tile/tilesComponent.js";
 import { Entity } from "../../../entity/entity.js";
 import { treePrefab } from "../../../prefab/treePrefab.js";
 import { SelectedEntityItem } from "../../../selection/selectedEntityItem.js";
 import { SelectedTileItem } from "../../../selection/selectedTileItem.js";
 import { SelectedWorldItem } from "../../../selection/selectedWorldItem.js";
-import { TileSize } from "../../../tile/tile.js";
 import { Job } from "../job.js";
 import { JobConstraintsError } from "../jobConstraintsError.js";
-import { MoveToBeforeJob } from "./moveToBeforeJob.js";
-import { WorkerConstraint } from "../constraint/workerConstraint.js";
 
 /**
  * Represents a multistep job that will move towards a tree and then chop
@@ -24,28 +21,7 @@ import { WorkerConstraint } from "../constraint/workerConstraint.js";
  * be skipped.
  */
 
-export class ChopTreeJob extends MoveToBeforeJob {
-    constructor(public target: SelectedWorldItem) {
-        super(new _ChopTreeJob(target), new WorkerConstraint());
-    }
-
-    override onDraw(renderContext: RenderContext): void {
-        super.onDraw(renderContext);
-        const tilePosition = renderContext.camera.tileSpaceToWorldSpace(
-            this.target.tilePosition
-        );
-        renderContext.drawRectangle({
-            x: tilePosition.x + 2,
-            y: tilePosition.y + 2,
-            height: TileSize - 6,
-            width: TileSize - 6,
-            strokeColor: "yellow",
-            strokeWidth: 3,
-        });
-    }
-}
-
-class _ChopTreeJob extends Job {
+export class ChopTreeJob extends Job {
     private target: SelectedWorldItem;
     private treeEntity?: Entity;
     private blinkingAnimation: BlinkingImageAnimation;

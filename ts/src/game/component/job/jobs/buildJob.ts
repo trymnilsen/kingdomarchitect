@@ -1,20 +1,9 @@
+import { Entity } from "../../../entity/entity.js";
 import { BuildingComponent } from "../../building/buildingComponent.js";
 import { HealthComponent } from "../../health/healthComponent.js";
-import { Entity } from "../../../entity/entity.js";
-import { WorkerConstraint } from "../constraint/workerConstraint.js";
 import { Job } from "../job.js";
-import { MoveToBeforeJob } from "./moveToBeforeJob.js";
 
-export class BuildJob extends MoveToBeforeJob {
-    constructor(buildingToBuild: Entity) {
-        super(
-            new _BuildJob(buildingToBuild),
-            new WorkerConstraint()
-        ); /*, isFarmerJobConstraint);*/
-    }
-}
-
-class _BuildJob extends Job {
+export class BuildJob extends Job {
     private buildingComponent: BuildingComponent;
     private buildingEntity: Entity;
     get tileX(): number {
