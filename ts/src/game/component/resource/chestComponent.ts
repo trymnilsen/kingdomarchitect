@@ -10,16 +10,16 @@ export class ChestComponent extends EntityComponent<ChestBundle> {
 
     static createInstance(items: InventoryItem[]): ChestComponent {
         const instance = new ChestComponent();
-        instance.fromBundle({
+        instance.fromComponentBundle({
             items: items,
         });
         return instance;
     }
 
-    override fromBundle(bundle: ChestBundle): void {
+    override fromComponentBundle(bundle: ChestBundle): void {
         this.items = bundle.items;
     }
-    override toBundle(): ChestBundle {
+    override toComponentBundle(): ChestBundle {
         return {
             items: this.items,
         };

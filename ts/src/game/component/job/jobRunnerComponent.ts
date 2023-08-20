@@ -6,12 +6,6 @@ import { JobOwner } from "./jobOwner.js";
 import { JobQueueComponent } from "./jobQueueComponent.js";
 
 export class JobRunnerComponent extends EntityComponent implements JobOwner {
-    override fromBundle(bundle: {}): void {
-        throw new Error("Method not implemented.");
-    }
-    override toBundle(): {} {
-        throw new Error("Method not implemented.");
-    }
     /**
      * Jobs can be interupted and paused while running
      * To enable resuming jobs we keep them in a stack
@@ -95,6 +89,14 @@ export class JobRunnerComponent extends EntityComponent implements JobOwner {
         if (!!this.activeJob) {
             this.activeJob.onDraw(context);
         }
+    }
+
+    override fromComponentBundle(bundle: {}): void {
+        throw new Error("Method not implemented.");
+    }
+
+    override toComponentBundle(): {} {
+        throw new Error("Method not implemented.");
     }
 
     private endJob() {

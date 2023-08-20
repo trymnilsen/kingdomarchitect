@@ -1,9 +1,12 @@
 import { InvalidStateError } from "../../../common/error/invalidStateError.js";
 import { NotInitializedError } from "../../../common/error/notInitializedError.js";
+import { JSONValue } from "../../../common/object.js";
+import { Point, isPointAdjacentTo } from "../../../common/point.js";
 import { RenderContext } from "../../../rendering/renderContext.js";
 import { Entity } from "../../entity/entity.js";
-import { JobOwner } from "./jobOwner.js";
+import { MovementBundle, MovementHelper } from "./helper/movementHelper.js";
 import { JobConstraint } from "./jobConstraint.js";
+import { JobOwner } from "./jobOwner.js";
 
 export enum JobState {
     NotStarted,
@@ -16,13 +19,39 @@ export enum JobCompletedResult {
     Success,
 }
 
-export abstract class Job {
+type JobBundle<T extends JSONValue = {}> = {
+    data: T;
+    jobState: JobState;
+    movement?: MovementBundle;
+};
+
+/**
+ * Job is the base class for logic that can be queued and assigned to actors.
+ * A job will update either until it is interupted or completed. Actions like
+ * chopping a tree or collecting a chest is implemented as jobs. Actions that
+ * interupts such as attacks are also implemented as jobs.
+ */
+export abstract class Job<T extends JSONValue = {}> {
     private _entity: Entity | null = null;
     private _jobState: JobState = JobState.NotStarted;
     private _constraint: JobConstraint | null = null;
     private _startTick: number = 0;
     private _owner: JobOwner | null = null;
+    private _movementHelper: MovementHelper | null = null;
+    private _bundle: T | null = null;
+    /**
+     * Return the bundle this job was saved with
+     */
+    public get bundle(): Readonly<T> | null {
+        return this._bundle;
+    }
 
+    /**
+     * Set the persisted bundle used for this job
+     */
+    public set bundle(value: T) {
+        this._bundle = value;
+    }
     /**
      * Return the owner for this job. The owner of a job is responsible for
      * executing it is functions and handling completion and aborting.
@@ -127,6 +156,21 @@ export abstract class Job {
         return false;
     }
 
+    public get movement(): MovementHelper {
+        if (!this._entity) {
+            throw new Error(
+                "Cannot access movement helper before entity is set"
+            );
+        }
+        //Lazily create the helper if needed
+        if (!this._movementHelper) {
+            this._movementHelper = new MovementHelper();
+            this._movementHelper.entity = this.entity;
+        }
+
+        return this._movementHelper;
+    }
+
     constructor(constraint?: JobConstraint) {
         if (constraint) {
             this._constraint = constraint;
@@ -134,19 +178,77 @@ export abstract class Job {
     }
 
     /**
-     * Request to update this job. Called when attached to an actor and running
-     * as their active job. Any inherited methods should call `super.update`.
-     * TODO: Actor and World should be arguments?
-     * @param tick the game tick
+     * Restore the job from a persisted job bundle
+     * @param bundle the persisted data to restore
      */
-    abstract update(tick: number): void;
+    fromJobBundle(bundle: JobBundle<T>): void {
+        this._jobState = bundle.jobState;
+        this._bundle = bundle.data;
+        if (!!bundle.movement) {
+            this.movement.fromBundle(bundle.movement);
+        }
+        this.onFromPersistedState(bundle.data);
+    }
 
     /**
-     * invoked when the job is started
+     * Save the state of this job to a job bundle. Will include generic and
+     * helper state as well as custom data persisted by any implementations of
+     * this job
+     */
+    toJobBundle(): JobBundle<T> {
+        const jobState = this.onPersistJobState();
+        const bundle: JobBundle<T> = {
+            jobState: this._jobState,
+            movement: this._movementHelper?.toBundle(),
+            data: jobState,
+        };
+
+        return bundle;
+    }
+
+    /**
+     * Abort this job, setting its state to completed and publishing completion
+     */
+    abort() {
+        console.log("Aborting job");
+        this._jobState = JobState.Completed;
+        if (this._owner) {
+            this._owner.onAbort(this as Job);
+        } else {
+            console.warn("Job was aborted without any owner", this);
+        }
+    }
+
+    /**
+     * Signal that this job is completed and any actors performing it can
+     * take on new jobs
+     */
+    complete() {
+        console.log("Job completed", this);
+        this._jobState = JobState.Completed;
+        if (this._owner) {
+            this._owner.onComplete(this as Job);
+        } else {
+            console.warn("Job was completed without any owner", this);
+        }
+    }
+
+    /**
+     * invoked when the job is started, dependencies like entity is guaranteed
+     * to be set at this point
      */
     onStart() {}
 
+    /**
+     * Called if this job is interuped and the job is stopped to run another
+     * job. Will only be called if the job is suspendedable
+     */
     onSuspend() {}
+
+    /**
+     * Called when a job is resumed after having been interupted. Will only be
+     * called if the job is suspendable.
+     */
     onResume() {}
 
     /**
@@ -158,29 +260,34 @@ export abstract class Job {
     onDraw(renderContext: RenderContext) {}
 
     /**
-     * Abort this job, setting its state to completed and publishing completion
+     * Request to update this job. Called when attached to an actor and running
+     * as their active job. Any inherited methods should call `super.update`.
+     * TODO: Actor and World should be arguments?
+     * @param tick the game tick
      */
-    public abort() {
-        console.log("Aborting job");
-        this._jobState = JobState.Completed;
-        if (this._owner) {
-            this._owner.onAbort(this);
-        } else {
-            console.warn("Job was aborted without any owner", this);
-        }
+    abstract update(tick: number): void;
+
+    /**
+     * Request that the job create an object that is used to presist its state
+     */
+    protected onPersistJobState(): T {
+        return {} as T;
     }
 
     /**
-     * Signal that this job is completed and any actors performing it can
-     * take on new jobs
+     * Invoked on restore to reset the state of this job after recreating the
+     * game from saved state. Will be called after the entity is set if any
+     * so logic requiring the entity tree can be used here.
+     * @param bundle provides the locally saved bundle as a non-nullable value
      */
-    protected complete() {
-        console.log("Job completed", this);
-        this._jobState = JobState.Completed;
-        if (this._owner) {
-            this._owner.onComplete(this);
-        } else {
-            console.warn("Job was completed without any owner", this);
-        }
+    protected onFromPersistedState(bundle: T) {}
+
+    /**
+     * Check if a point is adjacent to the entity of this job
+     * @param point the adjacent point
+     * @returns if the point is adjacent to this job
+     */
+    protected adjacentTo(point: Point): boolean {
+        return isPointAdjacentTo(this.entity.worldPosition, point);
     }
 }

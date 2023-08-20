@@ -71,12 +71,12 @@ export class HousingComponent extends EntityComponent<HousingBundle> {
         }
     }
 
-    override fromBundle(bundle: HousingBundle): void {
+    override fromComponentBundle(bundle: HousingBundle): void {
         this._residentEntityId = bundle.residentEntityId;
         this.startTime = bundle.startTime;
     }
 
-    override toBundle(): HousingBundle {
+    override toComponentBundle(): HousingBundle {
         return {
             startTime: this.startTime,
             residentEntityId: this._residentEntityId,

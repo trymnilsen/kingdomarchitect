@@ -24,7 +24,7 @@ export class TreeComponent extends EntityComponent<TreeBundle> {
 
     static createInstance(tree: number): TreeComponent {
         const instance = new TreeComponent();
-        instance.fromBundle({
+        instance.fromComponentBundle({
             tree: tree,
             previousTick: 0,
             chopState: TreeComponentChopState.Full,
@@ -72,14 +72,14 @@ export class TreeComponent extends EntityComponent<TreeBundle> {
         });
     }
 
-    override fromBundle(bundle: TreeBundle): void {
+    override fromComponentBundle(bundle: TreeBundle): void {
         this.chopState = bundle.chopState;
         this.chopTime = bundle.chopTime;
         this.previousTick = bundle.previousTick;
         this.tree = bundle.tree;
     }
 
-    override toBundle(): TreeBundle {
+    override toComponentBundle(): TreeBundle {
         return {
             chopState: this.chopState,
             chopTime: this.chopTime,

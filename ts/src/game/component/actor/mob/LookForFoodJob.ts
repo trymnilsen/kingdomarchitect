@@ -5,7 +5,11 @@ import { Job } from "../../job/job.js";
 import { ChunkMapComponent } from "../../root/chunk/chunkMapComponent.js";
 import { TilesComponent } from "../../tile/tilesComponent.js";
 
-export class LookForFoodJob extends Job {
+type LookForFoodBundle = {
+    direction: Direction;
+};
+
+export class LookForFoodJob extends Job<LookForFoodBundle> {
     private direction: Direction = Direction.Down;
     override onStart(): void {
         //Get directions that can be walked towards
@@ -54,5 +58,15 @@ export class LookForFoodJob extends Job {
         const hasNoEntities = entities.length == 0;
 
         return hasTile && hasNoEntities;
+    }
+
+    protected override onPersistJobState(): LookForFoodBundle {
+        return {
+            direction: this.direction,
+        };
+    }
+
+    protected override onFromPersistedState(bundle: LookForFoodBundle): void {
+        this.direction = bundle.direction;
     }
 }

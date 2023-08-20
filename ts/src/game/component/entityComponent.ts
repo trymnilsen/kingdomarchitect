@@ -1,13 +1,12 @@
 import { JSONValue } from "../../common/object.js";
 import { Point } from "../../common/point.js";
-import { Persistable } from "../../persistence/Persistable.js";
 import { RenderContext } from "../../rendering/renderContext.js";
 import { Entity } from "../entity/entity.js";
 import { ComponentEvent } from "./componentEvent.js";
 
-export abstract class EntityComponent<PersistedDataType extends JSONValue = {}>
-    implements Persistable<PersistedDataType>
-{
+export abstract class EntityComponent<
+    PersistedDataType extends JSONValue = {}
+> {
     private _entity?: Entity;
 
     public get entity(): Entity {
@@ -45,12 +44,12 @@ export abstract class EntityComponent<PersistedDataType extends JSONValue = {}>
      * reset its state to match the given bundle
      * @param bundle
      */
-    abstract fromBundle(bundle: PersistedDataType): void;
+    abstract fromComponentBundle(bundle: PersistedDataType): void;
     /**
      * Invoked when the component is meant to save its state. The returned
      * bundle will later be used to restore this component fra the savestate
      */
-    abstract toBundle(): PersistedDataType;
+    abstract toComponentBundle(): PersistedDataType;
 
     protected publishEvent(event: ComponentEvent<EntityComponent>) {
         if (!!this._entity) {
@@ -70,8 +69,8 @@ export abstract class EntityComponent<PersistedDataType extends JSONValue = {}>
  * state.
  */
 export class StatelessComponent extends EntityComponent {
-    override fromBundle(bundle: {}): void {}
-    override toBundle() {
+    override fromComponentBundle(bundle: {}): void {}
+    override toComponentBundle() {
         return {};
     }
 }

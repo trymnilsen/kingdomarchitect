@@ -113,11 +113,11 @@ export class TilesComponent
         }
     }
 
-    override fromBundle(bundle: TilesBundle): void {
+    override fromComponentBundle(bundle: TilesBundle): void {
         this.tileMap = bundle.tileMap;
         this._chunkMap = bundle.chunkMap;
     }
-    override toBundle(): TilesBundle {
+    override toComponentBundle(): TilesBundle {
         return {
             tileMap: this.tileMap,
             chunkMap: this._chunkMap,
@@ -149,7 +149,7 @@ export class TilesComponent
         };
 
         const instance = new TilesComponent();
-        instance.fromBundle(tilesBundle);
+        instance.fromComponentBundle(tilesBundle);
 
         return instance;
     }

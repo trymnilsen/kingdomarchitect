@@ -27,11 +27,11 @@ export class EquipmentComponent extends EntityComponent<EquipmentBundle> {
         this._otherItem = v;
     }
 
-    override fromBundle(bundle: EquipmentBundle): void {
+    override fromComponentBundle(bundle: EquipmentBundle): void {
         this._mainItem = bundle.mainItem;
         this._otherItem = bundle.otherItem;
     }
-    override toBundle(): EquipmentBundle {
+    override toComponentBundle(): EquipmentBundle {
         return {
             mainItem: this._mainItem,
             otherItem: this._otherItem,

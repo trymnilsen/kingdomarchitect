@@ -13,6 +13,7 @@ import {
 import { RenderContext } from "../../rendering/renderContext.js";
 import { ComponentEvent } from "../component/componentEvent.js";
 import { EntityComponent } from "../component/entityComponent.js";
+import { entityWithId } from "./child/withId.js";
 import { EntityEvent } from "./entityEvent.js";
 
 /**
@@ -218,6 +219,10 @@ export class Entity {
         return root!;
     }
 
+    public findEntity(id: string): Entity | null {
+        return entityWithId(this, id);
+    }
+
     /**
      * Check if this entity is attached to a live entity tree
      */
@@ -414,3 +419,25 @@ export class Entity {
         return Object.getPrototypeOf(component).constructor.name;
     }
 }
+
+export function assertEntity(
+    entity: Entity | string | null
+): asserts entity is Entity {
+    if (!entity) {
+        throw new Error("Entity is not defined");
+    }
+    if (typeof entity == "string") {
+        throw new Error("Entity has not been resolved from id");
+    }
+}
+/*
+type Data = { foo: string };
+
+function assertData(d: Data | null): asserts d is Data {
+    if (d == null) throw new Error("Invalid data");
+}
+// Use
+declare var bar: Data | null;
+bar.foo; // error as expected
+assertData(bar);
+bar.foo; // inferred to be Data*/

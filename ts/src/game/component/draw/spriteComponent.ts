@@ -20,7 +20,7 @@ export class SpriteComponent extends EntityComponent<SpriteComponentBundle> {
         size?: Point
     ): SpriteComponent {
         const instance = new SpriteComponent();
-        instance.fromBundle({
+        instance.fromComponentBundle({
             offset: offset,
             sprite: sprite,
             size: size,
@@ -66,13 +66,13 @@ export class SpriteComponent extends EntityComponent<SpriteComponentBundle> {
         });
     }
 
-    override fromBundle(bundle: SpriteComponentBundle): void {
+    override fromComponentBundle(bundle: SpriteComponentBundle): void {
         this.sprite = bundle.sprite;
         this.offset = bundle.offset;
         this.size = bundle.size;
     }
 
-    override toBundle(): SpriteComponentBundle {
+    override toComponentBundle(): SpriteComponentBundle {
         return {
             sprite: this.sprite,
             offset: this.offset,

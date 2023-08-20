@@ -19,12 +19,6 @@ export class JobQueueComponent
     extends EntityComponent
     implements JobQueue, JobOwner
 {
-    override fromBundle(bundle: {}): void {
-        throw new Error("Method not implemented.");
-    }
-    override toBundle(): {} {
-        throw new Error("Method not implemented.");
-    }
     private _pendingJobs: Job[] = [];
     private _jobScheduledEvent: Event<Job> = new Event<Job>();
 
@@ -61,5 +55,13 @@ export class JobQueueComponent
         for (const pendingJob of this._pendingJobs) {
             pendingJob.onDraw(context);
         }
+    }
+
+    override fromComponentBundle(bundle: {}): void {
+        throw new Error("Method not implemented.");
+    }
+
+    override toComponentBundle(): {} {
+        throw new Error("Method not implemented.");
     }
 }

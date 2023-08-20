@@ -38,7 +38,7 @@ export class HealthComponent extends EntityComponent<HealthBundle> {
         showHealthBarThreshold: NumberRange = { min: 0, max: maxHealth }
     ): HealthComponent {
         const instance = new HealthComponent();
-        instance.fromBundle({
+        instance.fromComponentBundle({
             health: currentHealth,
             maxHealth: maxHealth,
             showHealthbarThreshold: showHealthBarThreshold,
@@ -140,13 +140,13 @@ export class HealthComponent extends EntityComponent<HealthBundle> {
         }
     }
 
-    override fromBundle(bundle: HealthBundle): void {
+    override fromComponentBundle(bundle: HealthBundle): void {
         this._health = bundle.health;
         this._maxHealth = bundle.maxHealth;
         this._showHealthBarThreshold = bundle.showHealthbarThreshold;
     }
 
-    override toBundle(): HealthBundle {
+    override toComponentBundle(): HealthBundle {
         return {
             health: this._health,
             maxHealth: this._maxHealth,

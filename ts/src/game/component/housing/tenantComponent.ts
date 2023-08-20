@@ -16,10 +16,10 @@ export class TenantComponent extends EntityComponent<TenantBundle> {
         this._houseEntityId = v;
     }
 
-    override fromBundle(bundle: TenantBundle): void {
+    override fromComponentBundle(bundle: TenantBundle): void {
         this._houseEntityId = bundle.houseEntityId;
     }
-    override toBundle(): TenantBundle {
+    override toComponentBundle(): TenantBundle {
         return {
             houseEntityId: this._houseEntityId,
         };

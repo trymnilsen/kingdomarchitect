@@ -38,7 +38,7 @@ export class BuildingComponent extends EntityComponent<BuildingComponentBundle> 
         buildingId: string
     ): BuildingComponent {
         const instance = new BuildingComponent();
-        instance.fromBundle({
+        instance.fromComponentBundle({
             buildingId: buildingId,
             buildingSprite: buildingSprite,
             scaffoldSprite: scaffoldSprite,
@@ -98,7 +98,7 @@ export class BuildingComponent extends EntityComponent<BuildingComponentBundle> 
         }
     }
 
-    override fromBundle(bundle: BuildingComponentBundle): void {
+    override fromComponentBundle(bundle: BuildingComponentBundle): void {
         this.buildingSprite = bundle.buildingSprite;
         this.scaffoldSprite = bundle.scaffoldSprite;
         this.isScaffolded = bundle.isScaffolded;
@@ -112,7 +112,7 @@ export class BuildingComponent extends EntityComponent<BuildingComponentBundle> 
         }
     }
 
-    override toBundle(): BuildingComponentBundle {
+    override toComponentBundle(): BuildingComponentBundle {
         return {
             buildingId: this.building.id,
             buildingSprite: this.buildingSprite,

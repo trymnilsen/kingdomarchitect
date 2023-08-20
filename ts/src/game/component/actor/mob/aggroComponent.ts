@@ -53,7 +53,10 @@ export class AggroComponent extends EntityComponent<AggroComponentBundle> {
                     // damage if the aggro is larger
                     if (!hasAttackJob) {
                         jobRunner.assignJob(
-                            new AttackJob(event.causeEntity, this.damage)
+                            AttackJob.createInstance(
+                                event.causeEntity.id,
+                                this.damage
+                            )
                         );
                     }
                 }
@@ -90,18 +93,20 @@ export class AggroComponent extends EntityComponent<AggroComponentBundle> {
                 const hasAttackJob = jobRunner.activeJob instanceof AttackJob;
 
                 if (!hasAttackJob) {
-                    jobRunner.assignJob(new AttackJob(actor, this.damage));
+                    jobRunner.assignJob(
+                        AttackJob.createInstance(actor.id, this.damage)
+                    );
                 }
             }
         }
     }
 
-    override fromBundle(bundle: AggroComponentBundle): void {
+    override fromComponentBundle(bundle: AggroComponentBundle): void {
         this._aggroMode = bundle.aggroMode;
         this.damage = bundle.damage;
     }
 
-    override toBundle(): AggroComponentBundle {
+    override toComponentBundle(): AggroComponentBundle {
         return {
             aggroMode: this.aggroMode,
             damage: this.damage,
@@ -110,7 +115,7 @@ export class AggroComponent extends EntityComponent<AggroComponentBundle> {
 
     static createInstance(damage: number): AggroComponent {
         const instance = new AggroComponent();
-        instance.fromBundle({
+        instance.fromComponentBundle({
             damage: damage,
             aggroMode: AggroMode.Agressive,
         });

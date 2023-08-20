@@ -111,10 +111,10 @@ export class InventoryComponent extends EntityComponent<InventoryBundle> {
         }
     }
 
-    override fromBundle(bundle: InventoryBundle): void {
+    override fromComponentBundle(bundle: InventoryBundle): void {
         this._items = bundle.items;
     }
-    override toBundle(): InventoryBundle {
+    override toComponentBundle(): InventoryBundle {
         return {
             items: this._items,
         };
