@@ -1,139 +1,82 @@
 import { sprites2 } from "../../../../asset/sprite.js";
-import { generateId } from "../../../../common/idGenerator.js";
 import { woodResourceItem } from "../../../../data/inventory/resources.js";
 import { RenderContext } from "../../../../rendering/renderContext.js";
 import { BlinkingImageAnimation } from "../../../../rendering/visual/blinkingImageAnimation.js";
 import { HealthComponent } from "../../../component/health/healthComponent.js";
 import { InventoryComponent } from "../../../component/inventory/inventoryComponent.js";
 import { TreeComponent } from "../../../component/resource/treeComponent.js";
-import { TilesComponent } from "../../../component/tile/tilesComponent.js";
-import { Entity } from "../../../entity/entity.js";
-import { treePrefab } from "../../../prefab/treePrefab.js";
-import { SelectedEntityItem } from "../../../selection/selectedEntityItem.js";
-import { SelectedTileItem } from "../../../selection/selectedTileItem.js";
-import { SelectedWorldItem } from "../../../selection/selectedWorldItem.js";
+import { Entity, assertEntity } from "../../../entity/entity.js";
+import { assertEntityComponent } from "../../entityComponent.js";
 import { Job } from "../job.js";
-import { JobConstraintsError } from "../jobConstraintsError.js";
+
+type ChopTreeBundle = {
+    entityId: string;
+};
 
 /**
  * Represents a multistep job that will move towards a tree and then chop
  * it down. If the tree is adjacent to the actor doing it, the moving part will
  * be skipped.
  */
-
-export class ChopTreeJob extends Job {
-    private target: SelectedWorldItem;
-    private treeEntity?: Entity;
-    private blinkingAnimation: BlinkingImageAnimation;
-
-    get tileX(): number {
-        return this.target.tilePosition.x;
-    }
-
-    get tileY(): number {
-        return this.target.tilePosition.y;
-    }
-
-    constructor(target: SelectedWorldItem) {
-        super();
-        const validSelection =
-            target instanceof SelectedTileItem ||
-            target instanceof SelectedEntityItem;
-
-        if (!validSelection) {
-            throw new JobConstraintsError(
-                "Invalid selected provided for chopTreeJob"
-            );
-        }
-        this.target = target;
-        this.blinkingAnimation = new BlinkingImageAnimation({
+export class ChopTreeJob extends Job<ChopTreeBundle> {
+    private _target: Entity | null = null;
+    private healthComponent: HealthComponent | null = null;
+    private blinkingAnimation: BlinkingImageAnimation =
+        new BlinkingImageAnimation({
             x: 0,
             y: 0,
             sprite: sprites2.swipe_effect,
         });
+
+    public get target(): Readonly<Entity | null> {
+        return this._target;
+    }
+
+    static createInstance(tree: TreeComponent) {
+        const instance = new ChopTreeJob();
+        instance.bundle = {
+            entityId: tree.entity.id,
+        };
+        return instance;
     }
 
     override onStart(): void {
         super.onStart();
-        //Check if we need to convert the tile with a tree into a tile without
-        //a tree to a tree entity (to keep track of chopping progress etc
-        let entity: Entity | undefined;
-        if (this.target instanceof SelectedEntityItem) {
-            entity = this.target.entity;
-        }
-
-        if (this.target instanceof SelectedTileItem) {
-            const tileComponent =
-                this.entity.getAncestorComponent(TilesComponent);
-
-            if (!tileComponent) {
-                throw new JobConstraintsError("No tile component found");
-            }
-
-            const tile = tileComponent.getTile(this.target.tilePosition);
-
-            if (!!tile?.hasTree) {
-                const treeEntity = treePrefab(generateId("tree"), tile.hasTree);
-                tile.hasTree = 0;
-                treeEntity.worldPosition = this.target.tilePosition;
-                tileComponent.entity?.addChild(treeEntity, 0);
-                entity = treeEntity;
-            } else {
-                throw new JobConstraintsError("No tree at selection");
-            }
-        }
-
-        if (!entity) {
-            throw new JobConstraintsError("No entity for selection");
-        }
-        const treeComponent = entity.getComponent(TreeComponent);
-        if (!treeComponent) {
-            throw new Error("No tree component on entity for chop tree job");
-        }
-
-        treeComponent.startChop();
-        this.treeEntity = entity;
+        assertEntity(this._target);
+        this._target.requireComponent(TreeComponent).startChop();
     }
 
     update(tick: number): void {
-        const entity = this.treeEntity;
-        if (!entity) {
-            return;
-        }
+        assertEntity(this._target);
+        assertEntityComponent(this.healthComponent);
 
-        const healthComponent = entity.getComponent(HealthComponent);
-        if (!healthComponent) {
-            throw new Error("No health component on entity for ChopTreeJob");
-        }
-
-        const treeComponent = entity.getComponent(TreeComponent);
-        if (!treeComponent) {
-            throw new Error("No tree component of entity for ChopTreeJob");
-        }
-
-        const inventoryComponent =
-            entity.getAncestorComponent(InventoryComponent);
-        if (!inventoryComponent) {
-            throw new Error(
-                "No inventory component on ancestor of entity for ChopTreeJob"
-            );
-        }
-
-        if (healthComponent.health >= 20) {
+        if (this.healthComponent.health >= 20) {
             console.log("Health mte 20");
-            healthComponent.damage(10, this.entity);
+            this.healthComponent.damage(10, this.entity);
         }
-        if (healthComponent.health <= 10) {
+
+        if (this.healthComponent.health <= 10) {
             console.log("Health lte 10");
+            const treeComponent = this._target.requireComponent(TreeComponent);
+            const inventoryComponent =
+                this._target.getAncestorComponent(InventoryComponent);
+            if (!inventoryComponent) {
+                throw new Error(
+                    "No inventory component on ancestor of entity for ChopTreeJob"
+                );
+            }
+
             treeComponent.finishChop();
+
             inventoryComponent.addInventoryItem(woodResourceItem, 4);
             this.complete();
         }
     }
 
     override onDraw(renderContext: RenderContext) {
+        assertEntity(this._target);
         const worldSpacePosition = renderContext.camera.tileSpaceToWorldSpace(
-            this.target.tilePosition
+            this._target.worldPosition
         );
 
         this.blinkingAnimation.updatePosition({
@@ -142,5 +85,22 @@ export class ChopTreeJob extends Job {
         });
 
         this.blinkingAnimation.onDraw(renderContext);
+    }
+
+    protected override onPersistJobState(): ChopTreeBundle {
+        assertEntity(this._target);
+        return {
+            entityId: this._target?.id,
+        };
+    }
+    protected override onFromPersistedState(bundle: ChopTreeBundle): void {
+        const entityWithId = this.entity
+            .getRootEntity()
+            .findEntity(bundle.entityId);
+
+        assertEntity(entityWithId);
+
+        this._target = entityWithId;
+        this.healthComponent = entityWithId.requireComponent(HealthComponent);
     }
 }

@@ -22,6 +22,7 @@ export class BuildJob extends Job<BuildBundle> {
     }
 
     update(tick: number): void {
+        //TODO: Add adjacent and move towards
         if (!this.healthComponent) {
             throw new Error("Health component not set");
         }

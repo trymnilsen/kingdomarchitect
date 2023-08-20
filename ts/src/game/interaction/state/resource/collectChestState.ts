@@ -83,7 +83,7 @@ export class CollectChestState extends InteractionState {
     }
 
     private scheduleCollectJob() {
-        const collectJob = new CollectChestJob(this.chest);
+        const collectJob = CollectChestJob.createInstance(this.chest);
         this.context.root
             .requireComponent(JobQueueComponent)
             .addJob(collectJob);

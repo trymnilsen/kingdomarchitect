@@ -161,7 +161,7 @@ export class BuildConfirmState extends InteractionState {
                 const root = this.context.root;
                 root.addChild(house);
                 root.requireComponent(JobQueueComponent).addJob(
-                    new BuildJob(house)
+                    BuildJob.createInstance(house)
                 );
             }
 
