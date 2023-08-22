@@ -254,7 +254,11 @@ export class SelectionState extends InteractionState {
 
     private onChopSelected() {
         const selectedTile = this.selectedItem;
-        this.context.stateChanger.push(new ChopJobState(selectedTile));
+        if (selectedTile instanceof SelectedEntityItem) {
+            this.context.stateChanger.push(
+                new ChopJobState(selectedTile.entity)
+            );
+        }
     }
 
     private onCancel() {

@@ -41,7 +41,6 @@ export class ThirdTileFactory implements TileSetFactory {
             return {
                 tileX: point.x,
                 tileY: point.y,
-                hasTree: 0,
             };
         });
     }

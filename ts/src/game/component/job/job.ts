@@ -19,8 +19,9 @@ export enum JobCompletedResult {
     Success,
 }
 
-type JobBundle<T extends JSONValue = {}> = {
+export type JobBundle<T extends JSONValue = {}> = {
     data: T;
+    type: string;
     jobState: JobState;
     movement?: MovementBundle;
 };
@@ -201,6 +202,7 @@ export abstract class Job<T extends JSONValue = {}> {
             jobState: this._jobState,
             movement: this._movementHelper?.toBundle(),
             data: jobState,
+            type: this.constructor.name,
         };
 
         return bundle;

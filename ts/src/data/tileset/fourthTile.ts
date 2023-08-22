@@ -41,7 +41,6 @@ export class FourthTileFactory implements TileSetFactory {
             return {
                 tileX: point.x,
                 tileY: point.y,
-                hasTree: this.hasTree(point),
             };
         });
     }

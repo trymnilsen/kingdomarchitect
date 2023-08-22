@@ -17,7 +17,6 @@ import { getTileId, TileSize } from "./tile.js";
 export interface GroundTile {
     tileX: number;
     tileY: number;
-    hasTree?: number;
 }
 
 function hasTree(threshold: number): number {
@@ -40,7 +39,6 @@ export class Ground {
                 this.tiles[id] = {
                     tileX: x,
                     tileY: y,
-                    hasTree: x == 2 && y == 2 ? 2 : 0,
                 };
             }
         }
@@ -80,7 +78,6 @@ export class Ground {
                     this.tiles[getTileId(tilePoint.x, tilePoint.y)] = {
                         tileX: tilePoint.x,
                         tileY: tilePoint.y,
-                        hasTree: hasTree(0.7),
                     };
                 }
             }
@@ -100,24 +97,6 @@ export class Ground {
                 height: TileSize - 2,
                 fill: "green",
             });
-
-            if (tile.hasTree && tile.hasTree > 0) {
-                /*
-                TODO: Might not need this file anymore since the is
-                let sprite = sprites.tree;
-                if (tile.hasTree >= 2.0) {
-                    sprite = sprites.tree2;
-                }
-                if (tile.hasTree >= 3.0) {
-                    sprite = sprites.tree3;
-                }
-                */
-                context.drawSprite({
-                    sprite: sprites2.tree_1,
-                    x: tile.tileX * TileSize + 4,
-                    y: tile.tileY * TileSize,
-                });
-            }
         }
     }
 }

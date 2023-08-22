@@ -62,19 +62,6 @@ export class Entity {
     }
 
     /**
-     * Set if this entity is the root of the entity tree
-     */
-    public set isGameRoot(value: boolean) {
-        if (!!this._parent && value) {
-            throw new InvalidArgumentError(
-                "Cannot set entity to game root if it has a parent"
-            );
-        }
-
-        this._isGameRoot = value;
-    }
-
-    /**
      * Returns the position of this entity locally in its own space
      */
     public get position(): Point {
@@ -135,6 +122,23 @@ export class Entity {
     }
 
     /**
+     * Set if this entity is the root of the entity tree
+     */
+    public toggleIsGameRoot(value: boolean) {
+        if (value == this._isGameRoot) {
+            return;
+        }
+
+        if (!!this._parent && value) {
+            throw new InvalidArgumentError(
+                "Cannot set entity to game root if it has a parent"
+            );
+        }
+
+        this._isGameRoot = value;
+    }
+
+    /**
      * Add a entity to this entity
      * @param entity the entity to add
      */
@@ -164,9 +168,11 @@ export class Entity {
             source: this,
             target: entity,
         });
-        //Get components if any that needs to be started
-        for (const component of entity.components) {
-            component.onStart(0);
+        //Get components if any that needs to be started if the entity is attached
+        if (this.isAttached()) {
+            for (const component of entity.components) {
+                component.onStart(0);
+            }
         }
     }
 

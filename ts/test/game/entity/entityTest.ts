@@ -215,6 +215,8 @@ describe("Entity test", () => {
         assert.equal(2, 2);
     });
 
+    it("Component lifecycle is started if gameroot is set to true", () => {});
+
     it("Remove component", () => {
         const parent = new Entity("1");
         const component = new StubComponent();

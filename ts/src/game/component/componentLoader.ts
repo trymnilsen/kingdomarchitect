@@ -21,7 +21,7 @@ import { PathFindingComponent } from "./root/path/pathFindingComponent.js";
 import { TileGeneratorComponent } from "./tile/tileGeneratorComponent.js";
 import { TilesComponent } from "./tile/tilesComponent.js";
 
-export const loaders: ConstructorFunction<EntityComponent>[] = [
+export const componentLoaders: ConstructorFunction<EntityComponent>[] = [
     AggroComponent,
     IdleMobComponent,
     WorkerBehaviorComponent,

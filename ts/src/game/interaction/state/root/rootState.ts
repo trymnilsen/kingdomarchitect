@@ -119,10 +119,6 @@ export class RootState extends InteractionState {
                 selection = new SelectedEntityItem(entitiesAt[0]);
                 this.context.stateChanger.push(new SelectionState(selection));
             }
-        } else {
-            if (tile.hasTree) {
-                this.context.stateChanger.push(new SelectionState(selection));
-            }
         }
 
         return true;

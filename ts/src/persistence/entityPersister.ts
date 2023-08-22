@@ -1,40 +1,10 @@
-import { ConstructorFunction } from "../common/constructor.js";
-import { InvalidArgumentError } from "../common/error/invalidArgumentError.js";
-import { EntityComponent } from "../game/component/entityComponent.js";
-
-type ComponentPersisterMap = { [id: string]: ComponentPersister };
-type ComponentLoaderMap = { [id: string]: ComponentLoader<any> };
+import { componentLoaders } from "../game/component/componentLoader.js";
+import { Entity } from "../game/entity/entity.js";
 
 export class EntityPersister {
-    private _componentPersisterMap: ComponentPersisterMap = {};
-    private _componentLoaderMap: ComponentLoaderMap = {};
-
-    registerComponentPersister<T extends EntityComponent>(
-        componentType: ConstructorFunction<T>,
-        componentPersister: ComponentPersister,
-        componentLoader: ComponentLoader<T>
-    ) {
-        const componentName = componentType.name;
-        if (!!this._componentPersisterMap[componentName]) {
-            throw new InvalidArgumentError(
-                `Persister already added for ${componentName}`
-            );
-        }
-
-        if (!!this._componentLoaderMap[componentName]) {
-            throw new InvalidArgumentError(
-                `Loader already added for ${componentName}`
-            );
-        }
-
-        this._componentPersisterMap[componentName] = componentPersister;
-        this._componentLoaderMap[componentName] = componentLoader;
-    }
-
-    /*
-    persist(world: World): BundleSet[] {
+    persist(world: Entity): BundleSet[] {
         // loop over the children and persist them
-        const children = [world.rootEntity as Entity];
+        const children = [world];
         const bundleSet: BundleSet[] = [];
         while (children.length > 0) {
             const entity = children.pop()!;
@@ -42,16 +12,10 @@ export class EntityPersister {
             const componentBundles: ComponentPersistenceBundle[] = [];
             // Persist any components of this entity
             for (const component of entity.components) {
-                const persister = this.getPersister(component);
-                if (!persister) {
-                    // No persister registered for component
-                    throw new Error(`No component persister for ${persister}`);
-                }
-
                 const type = Object.getPrototypeOf(component).constructor.name;
                 const id = entity.id + "-" + type;
                 componentIds.push(id);
-                const data = persister();
+                const data = component.toComponentBundle();
                 const bundle: ComponentPersistenceBundle = {
                     type: type,
                     entityId: entity.id,
@@ -85,16 +49,77 @@ export class EntityPersister {
         return bundleSet;
     }
 
-    load(bundleSet: BundleSet[]): World {
-        return new World();
-    }*/
+    load(bundleSets: BundleSet[]): Entity {
+        const componentPersistenceBundles: ComponentPersistenceBundle[] = [];
+        const entitiesForChildMap: { [id: string]: Entity } = {};
+        const entitiesById: { [id: string]: Entity } = {};
+        const entityChildren: { [id: string]: string[] } = {};
 
-    private getPersister(
-        component: EntityComponent
-    ): ComponentPersister | null {
-        const persisterName = Object.getPrototypeOf(component).constructor.name;
-        const persister = this._componentPersisterMap[persisterName];
-        return persister;
+        //Loop over and sort out components and create the entities
+        for (const bundleSet of bundleSets) {
+            componentPersistenceBundles.push(...bundleSet.components);
+            const entity = new Entity(bundleSet.entity.id);
+            entity.worldPosition = {
+                x: bundleSet.entity.x,
+                y: bundleSet.entity.y,
+            };
+            entitiesForChildMap[entity.id] = entity;
+            entitiesById[entity.id] = entity;
+            entityChildren[entity.id] = bundleSet.entity.children;
+        }
+        //Loop over and assign children
+        for (const entity of Object.values(entitiesById)) {
+            const children = entityChildren[entity.id];
+            for (const child of children) {
+                const childEntity = entitiesForChildMap[child];
+                if (!childEntity) {
+                    throw new Error(`Child with id ${child} not found`);
+                }
+                entity.addChild(childEntity);
+                delete entitiesForChildMap[child];
+            }
+        }
+        //Find the root node, the one without a parent
+        const rootNodes = Object.values(entitiesById).filter(
+            (entity) => !entity.parent
+        );
+
+        if (rootNodes.length == 0) {
+            throw new Error("No root node found");
+        }
+
+        if (rootNodes.length > 1) {
+            throw new Error("More than one entity without a parent found");
+        }
+
+        const rootNode = rootNodes[0];
+
+        //Loop over and create components
+        for (const persistedComponent of componentPersistenceBundles) {
+            const type = persistedComponent.type;
+            const constructorFn = componentLoaders.find(
+                (fn) => fn.name == type
+            );
+            if (!constructorFn) {
+                throw new Error(
+                    `No constructor function found for component, ${constructorFn}`
+                );
+            }
+
+            const owningEntity = entitiesById[persistedComponent.entityId];
+            if (!owningEntity) {
+                throw new Error(
+                    `No entity with id ${persistedComponent.entityId} for component ${persistedComponent.componentId}`
+                );
+            }
+
+            const component = new constructorFn();
+            owningEntity.addComponent(component);
+            component.fromComponentBundle(persistedComponent.data);
+        }
+
+        rootNode.toggleIsGameRoot(true);
+        return rootNode;
     }
 }
 
@@ -117,6 +142,3 @@ export interface BundleSet {
     components: ComponentPersistenceBundle[];
     entity: EntityPersistenceBundle;
 }
-
-export type ComponentPersister = () => {};
-export type ComponentLoader<T extends EntityComponent> = (data: {}) => T;

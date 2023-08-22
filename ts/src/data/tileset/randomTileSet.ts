@@ -1,10 +1,12 @@
 import { getBounds } from "../../common/bounds.js";
+import { generateId } from "../../common/idGenerator.js";
 import { Point } from "../../common/point.js";
 import {
     GroundChunk,
     GroundTile,
 } from "../../game/component/tile/tilesComponent.js";
 import { Entity } from "../../game/entity/entity.js";
+import { treePrefab } from "../../game/prefab/treePrefab.js";
 import { Tileset, TileSetFactory } from "./tileset.js";
 
 export function createRandomTileSet(chunk: GroundChunk): Tileset {
@@ -44,6 +46,15 @@ export class RandomTileSetFactory implements TileSetFactory {
         });
     }
     createEntities(): Entity[] {
-        return [];
+        const entities: Entity[] = [];
+
+        const treeEntity = treePrefab(generateId("tree"), 2);
+        treeEntity.worldPosition = {
+            x: this.chunk.chunkX * 3 + 1,
+            y: this.chunk.chunkY * 3 + 1,
+        };
+
+        entities.push(treeEntity);
+        return entities;
     }
 }

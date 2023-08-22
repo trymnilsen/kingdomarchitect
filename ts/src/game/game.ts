@@ -9,6 +9,7 @@ import { InteractionHandler } from "./interaction/handler/interactionHandler.js"
 import { Entity } from "./entity/entity.js";
 import { createRootEntity } from "./entity/rootEntity.js";
 import { TileSize } from "./tile/tile.js";
+import { GamePersister } from "../persistence/gamePersister.js";
 
 export class Game {
     private renderer: Renderer;
@@ -19,6 +20,7 @@ export class Game {
     private interactionHandler: InteractionHandler;
     private currentTick: number = 0;
     private world: Entity;
+    private gamePersister: GamePersister;
     public constructor(domElementWrapperSelector: string) {
         // Get the canvas
         const canvasElement: HTMLCanvasElement | null = document.querySelector(
@@ -29,7 +31,7 @@ export class Game {
             throw new Error("Canvas element not found");
         }
         this.gameTime = new MutableGameTime();
-
+        this.gamePersister = new GamePersister();
         // Input
         this.input = new Input();
         this.touchInput = new TouchInput(canvasElement);
@@ -42,7 +44,15 @@ export class Game {
             this.gameTime
         );
 
-        this.world = createRootEntity();
+        if (this.gamePersister.hasSaveData) {
+            this.world = this.gamePersister.loadWorld();
+        } else {
+            this.world = createRootEntity();
+        }
+
+        window["save"] = () => {
+            this.gamePersister.save(this.world);
+        };
 
         this.interactionHandler = new InteractionHandler(
             this.world,

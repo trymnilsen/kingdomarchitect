@@ -3,9 +3,14 @@ import { Event, EventListener } from "../../../common/event.js";
 import { Point } from "../../../common/point.js";
 import { RenderContext } from "../../../rendering/renderContext.js";
 import { EntityComponent } from "../entityComponent.js";
-import { Job } from "./job.js";
+import { Job, JobBundle } from "./job.js";
+import { createJobFromBundle } from "./jobLoader.js";
 import { JobOwner } from "./jobOwner.js";
 import { JobQueue } from "./jobQueue.js";
+
+type JobQueueBundle = {
+    pendingJobs: JobBundle[];
+};
 
 /**
  * The job queue components holds a list of pending jobs that are not run
@@ -16,7 +21,7 @@ import { JobQueue } from "./jobQueue.js";
  * JobSchedulerComponent will look for available runners.
  */
 export class JobQueueComponent
-    extends EntityComponent
+    extends EntityComponent<JobQueueBundle>
     implements JobQueue, JobOwner
 {
     private _pendingJobs: Job[] = [];
@@ -57,11 +62,15 @@ export class JobQueueComponent
         }
     }
 
-    override fromComponentBundle(bundle: {}): void {
-        throw new Error("Method not implemented.");
+    override fromComponentBundle(bundle: JobQueueBundle): void {
+        this._pendingJobs = bundle.pendingJobs.map((jobBundle) => {
+            return createJobFromBundle(jobBundle);
+        });
     }
 
-    override toComponentBundle(): {} {
-        throw new Error("Method not implemented.");
+    override toComponentBundle(): JobQueueBundle {
+        return {
+            pendingJobs: this._pendingJobs.map((job) => job.toJobBundle()),
+        };
     }
 }

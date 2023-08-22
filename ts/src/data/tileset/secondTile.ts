@@ -41,7 +41,6 @@ export class SecondTileFactory implements TileSetFactory {
             return {
                 tileX: point.x,
                 tileY: point.y,
-                hasTree: this.hasTree(point),
             };
         });
     }

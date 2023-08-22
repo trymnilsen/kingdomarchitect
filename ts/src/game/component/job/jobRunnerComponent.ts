@@ -1,11 +1,19 @@
 import { Point } from "../../../common/point.js";
 import { RenderContext } from "../../../rendering/renderContext.js";
 import { EntityComponent } from "../entityComponent.js";
-import { Job } from "./job.js";
+import { Job, JobBundle } from "./job.js";
+import { createJobFromBundle } from "./jobLoader.js";
 import { JobOwner } from "./jobOwner.js";
 import { JobQueueComponent } from "./jobQueueComponent.js";
 
-export class JobRunnerComponent extends EntityComponent implements JobOwner {
+type JobRunnerBundle = {
+    jobStack: JobBundle[];
+};
+
+export class JobRunnerComponent
+    extends EntityComponent<JobRunnerBundle>
+    implements JobOwner
+{
     /**
      * Jobs can be interupted and paused while running
      * To enable resuming jobs we keep them in a stack
@@ -91,12 +99,16 @@ export class JobRunnerComponent extends EntityComponent implements JobOwner {
         }
     }
 
-    override fromComponentBundle(bundle: {}): void {
-        throw new Error("Method not implemented.");
+    override fromComponentBundle(bundle: JobRunnerBundle): void {
+        this.jobStack = bundle.jobStack.map((jobBundle) => {
+            return createJobFromBundle(jobBundle);
+        });
     }
 
-    override toComponentBundle(): {} {
-        throw new Error("Method not implemented.");
+    override toComponentBundle(): JobRunnerBundle {
+        return {
+            jobStack: this.jobStack.map((job) => job.toJobBundle()),
+        };
     }
 
     private endJob() {
