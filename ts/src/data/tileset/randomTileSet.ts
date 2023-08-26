@@ -37,21 +37,21 @@ export class RandomTileSetFactory implements TileSetFactory {
     constructor(private chunk: GroundChunk, private tiles: Point[]) {}
     createTiles(): GroundTile[] {
         return this.tiles.map((point) => {
-            const plantTree = Math.random() > 0.7;
             return {
                 tileX: point.x,
                 tileY: point.y,
-                hasTree: plantTree ? Math.floor(Math.random() * 4) : 0,
             };
         });
     }
     createEntities(): Entity[] {
         const entities: Entity[] = [];
 
+        const treeX = Math.floor(Math.random() * 3);
+        const treeY = Math.floor(Math.random() * 3);
         const treeEntity = treePrefab(generateId("tree"), 2);
         treeEntity.worldPosition = {
-            x: this.chunk.chunkX * 3 + 1,
-            y: this.chunk.chunkY * 3 + 1,
+            x: this.chunk.chunkX * 3 + treeX,
+            y: this.chunk.chunkY * 3 + treeY,
         };
 
         entities.push(treeEntity);

@@ -13,6 +13,7 @@ import {
 import { RenderContext } from "../../rendering/renderContext.js";
 import { ComponentEvent } from "../component/componentEvent.js";
 import { EntityComponent } from "../component/entityComponent.js";
+import { visitChildren } from "./child/visit.js";
 import { entityWithId } from "./child/withId.js";
 import { EntityEvent } from "./entityEvent.js";
 
@@ -136,6 +137,14 @@ export class Entity {
         }
 
         this._isGameRoot = value;
+        if (value) {
+            visitChildren(this, (entity) => {
+                for (const component of entity.components) {
+                    component.onStart(0);
+                }
+                return false;
+            });
+        }
     }
 
     /**

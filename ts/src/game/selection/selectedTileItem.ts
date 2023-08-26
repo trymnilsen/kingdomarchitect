@@ -19,7 +19,6 @@ export class SelectedTileItem implements SelectedWorldItem {
     isSelectedItem(item: any): boolean {
         const xIsSame = this.groundTile.tileX === item.tileX;
         const yIsSame = this.groundTile.tileY === item.tileY;
-        const treeIsSame = this.groundTile.hasTree === item.hasTree;
-        return xIsSame && yIsSame && treeIsSame;
+        return xIsSame && yIsSame;
     }
 }

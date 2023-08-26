@@ -45,13 +45,19 @@ export class Game {
         );
 
         if (this.gamePersister.hasSaveData) {
-            this.world = this.gamePersister.loadWorld();
+            const loadedItems = this.gamePersister.loadWorld();
+            this.renderer.camera.position = loadedItems.cameraPosition;
+            this.world = loadedItems.rootEntity;
         } else {
             this.world = createRootEntity();
         }
 
-        window["save"] = () => {
-            this.gamePersister.save(this.world);
+        window["saveGame"] = () => {
+            this.gamePersister.save(this.world, this.renderer.camera);
+        };
+
+        window["clearGame"] = () => {
+            window.localStorage.clear();
         };
 
         this.interactionHandler = new InteractionHandler(

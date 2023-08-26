@@ -50,7 +50,7 @@ export class LookForFoodJob extends Job<LookForFoodBundle> {
         const tileComponent = rootEntity.requireComponent(TilesComponent);
 
         const tile = tileComponent?.getTile(point);
-        const hasTile = !!tile && tile.hasTree === 0;
+        const hasTile = !!tile;
 
         const entities = rootEntity
             .requireComponent(ChunkMapComponent)

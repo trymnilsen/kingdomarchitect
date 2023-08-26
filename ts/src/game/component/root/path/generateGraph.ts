@@ -10,6 +10,7 @@ import { LazyGraph } from "../../../../path/graph/lazyGraph.js";
 import { Entity } from "../../../entity/entity.js";
 import { WorkerBehaviorComponent } from "../../behavior/workerBehaviorComponent.js";
 import { BuildingComponent } from "../../building/buildingComponent.js";
+import { TreeComponent } from "../../resource/treeComponent.js";
 import { TilesComponent } from "../../tile/tilesComponent.js";
 import { ChunkMapComponent } from "../chunk/chunkMapComponent.js";
 
@@ -80,13 +81,7 @@ function getWeightAtPoint(
         x: point.x,
         y: point.y,
     });
-    if (ground) {
-        if (ground.hasTree) {
-            weight = 200;
-        } else {
-            weight = 5;
-        }
-    } else {
+    if (!ground) {
         console.log(`No ground at ${point.x}, ${point.y} setting to 0`);
         weight = 0;
     }
@@ -113,6 +108,11 @@ function getWeightAtPoint(
 
             if (!!workerComponent) {
                 entityWeight = 500;
+            }
+
+            const treeComponent = entity.getComponent(TreeComponent);
+            if (!!treeComponent) {
+                entityWeight = 200;
             }
         }
 

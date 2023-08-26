@@ -1,7 +1,8 @@
 import { Point } from "../../../common/point.js";
 import { RenderContext } from "../../../rendering/renderContext.js";
 import { EntityComponent } from "../entityComponent.js";
-import { Job, JobBundle } from "./job.js";
+import { Job, JobBundle, JobState } from "./job.js";
+import { isJobApplicableForEntity } from "./jobConstraint.js";
 import { createJobFromBundle } from "./jobLoader.js";
 import { JobOwner } from "./jobOwner.js";
 import { JobQueueComponent } from "./jobQueueComponent.js";
@@ -65,7 +66,13 @@ export class JobRunnerComponent
         this.jobStack.push(job);
         job.entity = this.entity;
         job.owner = this;
-
+        if (!!job.bundle) {
+            job.fromJobBundle({
+                data: job.bundle,
+                jobState: JobState.NotStarted,
+                type: job.constructor.name,
+            });
+        }
         try {
             job.onStart();
         } catch (e) {
@@ -101,7 +108,10 @@ export class JobRunnerComponent
 
     override fromComponentBundle(bundle: JobRunnerBundle): void {
         this.jobStack = bundle.jobStack.map((jobBundle) => {
-            return createJobFromBundle(jobBundle);
+            const job = createJobFromBundle(jobBundle);
+            job.entity = this.entity;
+            job.owner = this;
+            return job;
         });
     }
 
@@ -138,10 +148,7 @@ export class JobRunnerComponent
             return;
         }
 
-        const applicableJobs = queue.pendingJobs.filter((job) => {
-            return job.constraint?.isEntityApplicableForJob(job, entity);
-        });
-
+        const applicableJobs = queue.getApplicableJobs(this.entity);
         if (applicableJobs.length > 0) {
             const mostApplicableJob = applicableJobs[0];
             // Remove the job from the queue to avoid it being assigned

@@ -10,7 +10,6 @@ import { Ground } from "./ground.js";
 export type GroundTile = {
     tileX: number;
     tileY: number;
-    hasTree?: number;
 };
 
 export type GroundChunk = {
@@ -93,23 +92,6 @@ export class TilesComponent
                 height: TileSize - 2,
                 fill: "green",
             });
-
-            if (tile.hasTree && tile.hasTree > 0) {
-                let sprite = sprites2.tree_1;
-
-                if (tile.hasTree >= 2.0) {
-                    sprite = sprites2.tree_2;
-                }
-                if (tile.hasTree >= 3.0) {
-                    sprite = sprites2.tree_3;
-                }
-
-                context.drawSprite({
-                    sprite: sprite,
-                    x: tile.tileX * TileSize + 4,
-                    y: tile.tileY * TileSize,
-                });
-            }
         }
     }
 
@@ -133,7 +115,6 @@ export class TilesComponent
                 tileMap[id] = {
                     tileX: x,
                     tileY: y,
-                    hasTree: x == 2 && y == 2 ? 2 : 0,
                 };
             }
         }

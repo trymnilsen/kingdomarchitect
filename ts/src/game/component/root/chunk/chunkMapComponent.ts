@@ -5,6 +5,7 @@ import {
     pointEquals,
 } from "../../../../common/point.js";
 import { getChunkId, getChunkPosition } from "../../../chunk.js";
+import { visitChildren } from "../../../entity/child/visit.js";
 import { Entity } from "../../../entity/entity.js";
 import { EntityEvent } from "../../../entity/entityEvent.js";
 import { StatelessComponent } from "../../entityComponent.js";
@@ -51,6 +52,7 @@ export class ChunkMapComponent extends StatelessComponent {
     }
 
     override onStart(tick: number): void {
+        this.rebuildChunkMap();
         this.entityEventHandle = this.entity.entityEvents.listen((event) => {
             this.onEntityEvent(event);
         });
@@ -121,5 +123,14 @@ export class ChunkMapComponent extends StatelessComponent {
 
     private invalidatePoint(point: Point) {
         this.publishEvent(new ChunkMapUpdateEvent(point, this));
+    }
+
+    private rebuildChunkMap() {
+        this.chunkMap = {};
+        this.entityChunks = {};
+        visitChildren(this.entity, (entity) => {
+            this.addEntityToChunkMap(entity);
+            return false;
+        });
     }
 }

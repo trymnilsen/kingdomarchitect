@@ -268,9 +268,8 @@ export class BuildConfirmState extends InteractionState {
         const tile = rootEntity
             .requireComponent(TilesComponent)
             .getTile(tilePosition);
-        const hasTree = tile?.hasTree;
 
-        return entitiesAt.length == 0 && !!tile && !hasTree;
+        return entitiesAt.length == 0 && !!tile;
     }
 }
 

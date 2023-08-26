@@ -191,7 +191,7 @@ export class SelectionState extends InteractionState {
                 .getTile(selection.tilePosition);
 
             const actions: UIActionbarItem[] = [];
-            if (tile && tile.hasTree) {
+            if (tile) {
                 const jobQueue =
                     this.context.root.getComponent(JobQueueComponent);
 
@@ -219,7 +219,8 @@ export class SelectionState extends InteractionState {
                         icon: sprites2.empty_sprite,
                         text: "Chop",
                         onClick: () => {
-                            this.onChopSelected();
+                            //TODO: look for tree entity
+                            //this.onChopSelected();
                         },
                     });
                 }

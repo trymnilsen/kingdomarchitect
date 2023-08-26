@@ -4,7 +4,7 @@ import { JSONValue } from "../../../common/object.js";
 import { Point, isPointAdjacentTo } from "../../../common/point.js";
 import { RenderContext } from "../../../rendering/renderContext.js";
 import { Entity } from "../../entity/entity.js";
-import { MovementBundle, MovementHelper } from "./helper/movementHelper.js";
+import { MovementHelper, PathMovement } from "./helper/movementHelper.js";
 import { JobConstraint } from "./jobConstraint.js";
 import { JobOwner } from "./jobOwner.js";
 
@@ -23,7 +23,7 @@ export type JobBundle<T extends JSONValue = {}> = {
     data: T;
     type: string;
     jobState: JobState;
-    movement?: MovementBundle;
+    movement?: PathMovement | null;
 };
 
 /**
@@ -35,7 +35,6 @@ export type JobBundle<T extends JSONValue = {}> = {
 export abstract class Job<T extends JSONValue = {}> {
     private _entity: Entity | null = null;
     private _jobState: JobState = JobState.NotStarted;
-    private _constraint: JobConstraint | null = null;
     private _startTick: number = 0;
     private _owner: JobOwner | null = null;
     private _movementHelper: MovementHelper | null = null;
@@ -43,7 +42,7 @@ export abstract class Job<T extends JSONValue = {}> {
     /**
      * Return the bundle this job was saved with
      */
-    public get bundle(): Readonly<T> | null {
+    public get bundle(): T | null {
         return this._bundle;
     }
 
@@ -84,13 +83,6 @@ export abstract class Job<T extends JSONValue = {}> {
             );
         }
         this._startTick = value;
-    }
-
-    /**
-     * The constraint used when assigning this job to a runner
-     */
-    public get constraint(): JobConstraint | null {
-        return this._constraint;
     }
 
     /**
@@ -172,12 +164,6 @@ export abstract class Job<T extends JSONValue = {}> {
         return this._movementHelper;
     }
 
-    constructor(constraint?: JobConstraint) {
-        if (constraint) {
-            this._constraint = constraint;
-        }
-    }
-
     /**
      * Restore the job from a persisted job bundle
      * @param bundle the persisted data to restore
@@ -186,7 +172,7 @@ export abstract class Job<T extends JSONValue = {}> {
         this._jobState = bundle.jobState;
         this._bundle = bundle.data;
         if (!!bundle.movement) {
-            this.movement.fromBundle(bundle.movement);
+            this.movement.currentMovement = bundle.movement;
         }
         this.onFromPersistedState(bundle.data);
     }
@@ -200,7 +186,7 @@ export abstract class Job<T extends JSONValue = {}> {
         const jobState = this.onPersistJobState();
         const bundle: JobBundle<T> = {
             jobState: this._jobState,
-            movement: this._movementHelper?.toBundle(),
+            movement: this._movementHelper?.currentMovement,
             data: jobState,
             type: this.constructor.name,
         };

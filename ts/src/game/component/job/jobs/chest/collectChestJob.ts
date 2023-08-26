@@ -23,8 +23,9 @@ export class CollectChestJob extends Job<CollectChestBundle> {
         }
 
         if (this.adjacentTo(this.chest.entity.worldPosition)) {
-            const inventory =
-                this.chest.entity.requireComponent(InventoryComponent);
+            const inventory = this.chest.entity
+                .getRootEntity()
+                .requireComponent(InventoryComponent);
 
             for (const item of this.chest.items) {
                 inventory.addInventoryItem(item, 1);
@@ -32,6 +33,9 @@ export class CollectChestJob extends Job<CollectChestBundle> {
 
             this.chest.entity.remove();
             this.complete();
+        } else {
+            //Path towards the chest until we are adjacent to it
+            this.movement.pathTowards(this.chest.entity.worldPosition);
         }
     }
 

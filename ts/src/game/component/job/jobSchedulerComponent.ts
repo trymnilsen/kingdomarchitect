@@ -1,9 +1,10 @@
 import { InvalidStateError } from "../../../common/error/invalidStateError.js";
 import { EventHandle } from "../../../common/event.js";
 import { StatelessComponent } from "../entityComponent.js";
-import { Job } from "./job.js";
+import { isJobApplicableForEntity } from "./jobConstraint.js";
 import { JobQueueComponent } from "./jobQueueComponent.js";
 import { JobRunnerComponent } from "./jobRunnerComponent.js";
+import { ScheduledJob } from "./scheduledJob.js";
 
 /**
  * The JobSchedulerComponent listens for events on jobs added to the job queue.
@@ -25,6 +26,7 @@ export class JobSchedulerComponent extends StatelessComponent {
                 "No job queue component on same entity as scheduler"
             );
         }
+        this.queue = queue;
         this.jobQueueAddedListener = queue.jobScheduledEvent.listen((job) => {
             this.assignJobToAvailableEntity(job);
         });
@@ -36,7 +38,7 @@ export class JobSchedulerComponent extends StatelessComponent {
         }
     }
 
-    private assignJobToAvailableEntity(job: Job) {
+    private assignJobToAvailableEntity(scheduledJob: ScheduledJob) {
         // Visit all child entities using a breadth first search
         // and check if they are applicable for this job
         if (!this.entity) {
@@ -65,18 +67,18 @@ export class JobSchedulerComponent extends StatelessComponent {
                 jobRunner.isOpenForExternalJobs;
 
             if (canRunJobs) {
-                const constraint = job.constraint?.isEntityApplicableForJob(
-                    job,
-                    entity
-                );
+                let isApplicable = true;
+                if (!!scheduledJob.constraint) {
+                    isApplicable = isJobApplicableForEntity(
+                        scheduledJob.job,
+                        scheduledJob.constraint,
+                        entity
+                    );
+                }
 
-                // if the constraint is false we cannot assign the job
-                // all other cases (undefined, null and true) will treat
-                // the entity as applicable for running the job
-                const isApplicable = !(constraint === false);
                 if (isApplicable) {
-                    this.queue?.removeJob(job);
-                    jobRunner.assignJob(job);
+                    this.queue?.removeJob(scheduledJob.job);
+                    jobRunner.assignJob(scheduledJob.job);
                     return;
                 }
             }
