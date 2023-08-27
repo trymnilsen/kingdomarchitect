@@ -2,13 +2,15 @@ import { sprites2 } from "../../../../asset/sprite.js";
 import { RenderContext } from "../../../../rendering/renderContext.js";
 import { uiBox } from "../../../../ui/dsl/uiBoxDsl.js";
 import { fillUiSize } from "../../../../ui/uiSize.js";
-import { ChopTreeJob } from "../../../world/job/jobs/chopTreeJob.js";
-import { SelectedWorldItem } from "../../../world/selection/selectedWorldItem.js";
+import { JobQueueComponent } from "../../../component/job/jobQueueComponent.js";
+import { ChopTreeJob } from "../../../component/job/jobs/chopTreeJob.js";
+import { TreeComponent } from "../../../component/resource/treeComponent.js";
+import { Entity } from "../../../entity/entity.js";
 import { InteractionState } from "../../handler/interactionState.js";
 import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold.js";
 
 export class ChopJobState extends InteractionState {
-    constructor(private selection: SelectedWorldItem) {
+    constructor(private selection: Entity) {
         super();
     }
 
@@ -45,8 +47,8 @@ export class ChopJobState extends InteractionState {
 
     override onDraw(context: RenderContext): void {
         const cursorWorldPosition = context.camera.tileSpaceToWorldSpace({
-            x: this.selection.tilePosition.x,
-            y: this.selection.tilePosition.y,
+            x: this.selection.worldPosition.x,
+            y: this.selection.worldPosition.y,
         });
 
         context.drawSprite({
@@ -60,7 +62,10 @@ export class ChopJobState extends InteractionState {
 
     private scheduleChop() {
         console.log("Schedule chop tree job");
-        this.context.world.jobQueue.addJob(new ChopTreeJob(this.selection));
+        const selection = this.selection.requireComponent(TreeComponent);
+        this.context.root
+            .requireComponent(JobQueueComponent)
+            .addJob(ChopTreeJob.createInstance(selection));
 
         console.log("Clear state changer job");
         this.context.stateChanger.clear();

@@ -26,7 +26,7 @@ export class UIText extends UIView {
     private _padding: Sides = zeroSides();
     private _previousConstraints: UISize = zeroSize();
     private _textRuns: string[] = [];
-    private _wrapText: boolean = true;
+    private _wrapText: boolean = false;
     private _lineHeight = 0;
 
     get padding(): Sides {

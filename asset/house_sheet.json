@@ -2,15 +2,15 @@
     "wooden_house_scaffold": {
         "x": 0,
         "y": 0,
-        "w": 32,
-        "h": 32,
+        "w": 16,
+        "h": 16,
         "frames": 1
     },
     "wooden_house": {
         "x": 0,
-        "y": 32,
-        "w": 32,
-        "h": 32,
+        "y": 16,
+        "w": 16,
+        "h": 16,
         "frames": 1
     }
 }

@@ -129,6 +129,7 @@ async function packSprites(sprites: PackableSprite[]) {
 
             packedSprites[packedSprite.spriteName] = {
                 bin: binIndex.toString(),
+                id: packedSprite.spriteName,
                 defintion: {
                     frames: frames,
                     w: definition.w / frames,
@@ -397,6 +398,7 @@ type PackableSprite = {
 type PackedSprite = {
     defintion: SpriteDefinition;
     bin: string;
+    id: string;
 };
 
 interface SpriteDefinition extends Rectangle {

@@ -12,7 +12,7 @@ export class OpenBookUIBackground implements UIBackground {
             sides: allSides(32),
             height: size.height,
             width: size.width / 2,
-            scale: 1,
+            scale: 2,
             x: screenPosition.x,
             y: screenPosition.y,
         });
@@ -21,7 +21,7 @@ export class OpenBookUIBackground implements UIBackground {
             sides: allSides(32),
             height: size.height,
             width: size.width / 2,
-            scale: 1,
+            scale: 2,
             x: screenPosition.x + size.width / 2,
             y: screenPosition.y,
         });

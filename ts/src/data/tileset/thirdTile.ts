@@ -4,9 +4,9 @@ import { Point } from "../../common/point.js";
 import {
     GroundChunk,
     GroundTile,
-} from "../../game/world/component/tile/tilesComponent.js";
-import { Entity } from "../../game/world/entity/entity.js";
-import { mobPrefab } from "../../game/world/prefab/mobPrefab.js";
+} from "../../game/component/tile/tilesComponent.js";
+import { Entity } from "../../game/entity/entity.js";
+import { mobPrefab } from "../../game/prefab/mobPrefab.js";
 import { TileSetFactory, Tileset } from "./tileset.js";
 
 export function createThirdTileSet(chunk: GroundChunk): Tileset {
@@ -41,7 +41,6 @@ export class ThirdTileFactory implements TileSetFactory {
             return {
                 tileX: point.x,
                 tileY: point.y,
-                hasTree: 0,
             };
         });
     }

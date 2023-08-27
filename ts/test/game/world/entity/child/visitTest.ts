@@ -1,7 +1,7 @@
 import { describe, it } from "node:test";
 import * as assert from "node:assert";
-import { Entity } from "../../../../../src/game/world/entity/entity.js";
-import { visitChildren } from "../../../../../src/game/world/entity/child/visit.js";
+import { Entity } from "../../../../../src/game/entity/entity.js";
+import { visitChildren } from "../../../../../src/game/entity/child/visit.js";
 
 describe("Visit tests", () => {
     it("Visit entities breadth first", () => {

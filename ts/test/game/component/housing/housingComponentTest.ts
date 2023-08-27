@@ -1,14 +1,14 @@
 import { describe, it } from "node:test";
 import * as assert from "node:assert";
-import { RootEntity } from "../../../../src/game/world/entity/rootEntity.js";
-import { workerPrefab } from "../../../../src/game/world/prefab/workerPrefab.js";
-import { housePrefab } from "../../../../src/game/world/prefab/housePrefab.js";
-import { HousingComponent } from "../../../../src/game/world/component/housing/housingComponent.js";
-import { TenantComponent } from "../../../../src/game/world/component/housing/tenantComponent.js";
+import { HousingComponent } from "../../../../src/game/component/housing/housingComponent.js";
+import { TenantComponent } from "../../../../src/game/component/housing/tenantComponent.js";
+import { housePrefab } from "../../../../src/game/prefab/housePrefab.js";
+import { workerPrefab } from "../../../../src/game/prefab/workerPrefab.js";
+import { createRootEntity } from "../../../../src/game/entity/rootEntity.js";
 
 describe("Housing component test", () => {
     it("Will assign any workers on start", () => {
-        const rootEntity = new RootEntity("root");
+        const rootEntity = createRootEntity();
         const worker = workerPrefab("worker1");
         const house = housePrefab("house1", false);
         rootEntity.addChild(worker);
@@ -23,8 +23,8 @@ describe("Housing component test", () => {
             assert.fail("Worker entity had no tenant component");
         }
 
-        assert.equal(tenantComponent.house?.id, house.id);
-        assert.equal(housingComponent.resident?.id, worker.id);
+        assert.equal(tenantComponent.houseEntityId, house.id);
+        assert.equal(housingComponent.residentEntityId, worker.id);
     });
 
     it("Will not spawn worker if tenant is set", () => {

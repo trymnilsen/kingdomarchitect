@@ -1,5 +1,4 @@
 import { sprites2 } from "../../../../asset/sprite.js";
-import { generateId } from "../../../../common/idGenerator.js";
 import { Point } from "../../../../common/point.js";
 import { allSides } from "../../../../common/sides.js";
 import { Building } from "../../../../data/building/building.js";
@@ -7,13 +6,15 @@ import { woodResourceItem } from "../../../../data/inventory/resources.js";
 import { RenderContext } from "../../../../rendering/renderContext.js";
 import { uiBox } from "../../../../ui/dsl/uiBoxDsl.js";
 import { fillUiSize } from "../../../../ui/uiSize.js";
-import { InventoryComponent } from "../../../world/component/inventory/inventoryComponent.js";
-import { TilesComponent } from "../../../world/component/tile/tilesComponent.js";
-import { BuildJob } from "../../../world/job/jobs/buildJob.js";
-import { buildingFactory } from "../../../world/prefab/buildingFactory.js";
-import { buildingPrefab } from "../../../world/prefab/buildingPrefab.js";
-import { GroundTile } from "../../../world/tile/ground.js";
-import { TileSize } from "../../../world/tile/tile.js";
+import { InventoryComponent } from "../../../component/inventory/inventoryComponent.js";
+import { workerConstraint } from "../../../component/job/jobConstraint.js";
+import { JobQueueComponent } from "../../../component/job/jobQueueComponent.js";
+import { BuildJob } from "../../../component/job/jobs/buildJob.js";
+import { ChunkMapComponent } from "../../../component/root/chunk/chunkMapComponent.js";
+import { TilesComponent } from "../../../component/tile/tilesComponent.js";
+import { buildingFactory } from "../../../prefab/buildingFactory.js";
+import { GroundTile } from "../../../tile/ground.js";
+import { TileSize } from "../../../tile/tile.js";
 import { InteractionState } from "../../handler/interactionState.js";
 import { UIActionbarItem } from "../../view/actionbar/uiActionbar.js";
 import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold.js";
@@ -130,7 +131,7 @@ export class BuildConfirmState extends InteractionState {
     }
 
     private confirmBuildSelection() {
-        const rootEntity = this.context.world.rootEntity;
+        const rootEntity = this.context.root;
         const inventoryComponent = rootEntity.getComponent(InventoryComponent);
 
         if (!inventoryComponent) {
@@ -158,8 +159,12 @@ export class BuildConfirmState extends InteractionState {
             for (const selection of selections) {
                 const house = buildingFactory(this.building);
                 house.position = selection;
-                this.context.world.rootEntity.addChild(house);
-                this.context.world.jobQueue.addJob(new BuildJob(house));
+                const root = this.context.root;
+                root.addChild(house);
+                root.requireComponent(JobQueueComponent).addJob(
+                    BuildJob.createInstance(house),
+                    workerConstraint()
+                );
             }
 
             this.context.stateChanger.clear();
@@ -181,8 +186,9 @@ export class BuildConfirmState extends InteractionState {
     }
 
     override onTap(screenPosition: Point, worldPosition: Point): boolean {
-        const isTileAtPosition =
-            this.context.world.ground.getTile(worldPosition);
+        const isTileAtPosition = this.context.root
+            .requireComponent(TilesComponent)
+            .getTile(worldPosition);
 
         if (this.scaffold?.isExpanded && isTileAtPosition) {
             this.scaffold.resetExpandedMenu();
@@ -256,14 +262,16 @@ export class BuildConfirmState extends InteractionState {
     }
 
     private isTileAvailable(tilePosition: Point): boolean {
-        const rootEntity = this.context.world.rootEntity;
-        const entitiesAt = rootEntity.getEntityAt(tilePosition);
-        const tile = rootEntity
-            .getComponent(TilesComponent)
-            ?.getTile(tilePosition);
-        const hasTree = tile?.hasTree;
+        const rootEntity = this.context.root;
+        const entitiesAt = rootEntity
+            .requireComponent(ChunkMapComponent)
+            .getEntityAt(tilePosition);
 
-        return entitiesAt.length == 0 && !!tile && !hasTree;
+        const tile = rootEntity
+            .requireComponent(TilesComponent)
+            .getTile(tilePosition);
+
+        return entitiesAt.length == 0 && !!tile;
     }
 }
 

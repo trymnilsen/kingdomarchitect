@@ -8,14 +8,15 @@ import { uiBox } from "../../../../ui/dsl/uiBoxDsl.js";
 import { FocusGroup } from "../../../../ui/focus/focusGroup.js";
 import { uiAlignment } from "../../../../ui/uiAlignment.js";
 import { fillUiSize } from "../../../../ui/uiSize.js";
-import { WorkerBehaviorComponent } from "../../../world/component/behavior/workerBehaviorComponent.js";
-import { TilesComponent } from "../../../world/component/tile/tilesComponent.js";
-import { SelectedEntityItem } from "../../../world/selection/selectedEntityItem.js";
-import { SelectedTileItem } from "../../../world/selection/selectedTileItem.js";
-import { SelectedWorldItem } from "../../../world/selection/selectedWorldItem.js";
-import { GroundTile } from "../../../world/tile/ground.js";
-import { HalfTileSize, TileSize } from "../../../world/tile/tile.js";
-import { World } from "../../../world/world.js";
+import { WorkerBehaviorComponent } from "../../../component/behavior/workerBehaviorComponent.js";
+import { ChunkMapComponent } from "../../../component/root/chunk/chunkMapComponent.js";
+import { TilesComponent } from "../../../component/tile/tilesComponent.js";
+import { Entity } from "../../../entity/entity.js";
+import { SelectedEntityItem } from "../../../selection/selectedEntityItem.js";
+import { SelectedTileItem } from "../../../selection/selectedTileItem.js";
+import { SelectedWorldItem } from "../../../selection/selectedWorldItem.js";
+import { GroundTile } from "../../../tile/ground.js";
+import { HalfTileSize, TileSize } from "../../../tile/tile.js";
 import { InteractionState } from "../../handler/interactionState.js";
 import { UIActionbarItem } from "../../view/actionbar/uiActionbar.js";
 import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold.js";
@@ -34,7 +35,7 @@ export class RootState extends InteractionState {
             groups.push(this.view);
         }
         groups.push(
-            new WorldFocusGroup(this.context.world, this.context.camera)
+            new WorldFocusGroup(this.context.root, this.context.camera)
         );
 
         return groups;
@@ -102,10 +103,13 @@ export class RootState extends InteractionState {
     override onTileTap(tile: GroundTile): boolean {
         console.log("RootState tap: ", tile);
         let selection: SelectedWorldItem = new SelectedTileItem(tile);
-        const entitiesAt = this.context.world.rootEntity.getEntityAt({
-            x: tile.tileX,
-            y: tile.tileY,
-        });
+        const entitiesAt = this.context.root
+            .requireComponent(ChunkMapComponent)
+            .getEntityAt({
+                x: tile.tileX,
+                y: tile.tileY,
+            });
+
         if (entitiesAt.length > 0) {
             const actor = entitiesAt[0];
             const behavior = actor.getComponent(WorkerBehaviorComponent);
@@ -113,10 +117,6 @@ export class RootState extends InteractionState {
                 this.context.stateChanger.push(new ActorSelectionState(actor));
             } else {
                 selection = new SelectedEntityItem(entitiesAt[0]);
-                this.context.stateChanger.push(new SelectionState(selection));
-            }
-        } else {
-            if (tile.hasTree) {
                 this.context.stateChanger.push(new SelectionState(selection));
             }
         }
@@ -127,7 +127,7 @@ export class RootState extends InteractionState {
 
 class WorldFocusGroup implements FocusGroup {
     private currentFocus: GroundTile | null = null;
-    constructor(private world: World, private camera: Camera) {}
+    constructor(private rootNode: Entity, private camera: Camera) {}
     onFocusActionInput(): boolean {
         return false;
     }
@@ -165,8 +165,7 @@ class WorldFocusGroup implements FocusGroup {
 
         //TODO: Optimize finding the closest tile, no need to loop over all
         const worldPosition = this.camera.screenToWorld(centerPosition);
-        const tilesComponent =
-            this.world.rootEntity.requireComponent(TilesComponent);
+        const tilesComponent = this.rootNode.requireComponent(TilesComponent);
 
         const tiles = tilesComponent.getTiles((tile) => true);
         let closestTile = tiles[0];

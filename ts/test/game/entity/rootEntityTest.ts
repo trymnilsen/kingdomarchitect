@@ -1,11 +1,12 @@
 import { describe, it } from "node:test";
 import * as assert from "node:assert";
-import { Entity } from "../../../src/game/world/entity/entity.js";
-import { RootEntity } from "../../../src/game/world/entity/rootEntity.js";
+import { Entity } from "../../../src/game/entity/entity.js";
+import { createRootEntity } from "../../../src/game/entity/rootEntity.js";
+import { ChunkMapComponent } from "../../../src/game/component/root/chunk/chunkMapComponent.js";
 
 describe("RootEntity Test", () => {
     it("Can get entity at position", () => {
-        const rootEntity = new RootEntity("1");
+        const rootEntity = createRootEntity();
         const firstItem = new Entity("2");
         firstItem.position = { x: -2, y: -1 };
 
@@ -15,20 +16,26 @@ describe("RootEntity Test", () => {
         rootEntity.addChild(firstItem);
         rootEntity.addChild(secondItem);
 
-        const entitiesAtFirstPoint = rootEntity.getEntityAt({
-            x: -2,
-            y: -1,
-        });
+        const entitiesAtFirstPoint = rootEntity
+            .requireComponent(ChunkMapComponent)
+            .getEntityAt({
+                x: -2,
+                y: -1,
+            });
 
-        const entitiesAtSecondPoint = rootEntity.getEntityAt({
-            x: 4,
-            y: 5,
-        });
+        const entitiesAtSecondPoint = rootEntity
+            .requireComponent(ChunkMapComponent)
+            .getEntityAt({
+                x: 4,
+                y: 5,
+            });
 
-        const entitiesAtThirdPoint = rootEntity.getEntityAt({
-            x: 5,
-            y: 3,
-        });
+        const entitiesAtThirdPoint = rootEntity
+            .requireComponent(ChunkMapComponent)
+            .getEntityAt({
+                x: 5,
+                y: 3,
+            });
 
         assert.equal(entitiesAtFirstPoint.length, 1);
         assert.equal(entitiesAtSecondPoint.length, 1);
@@ -44,11 +51,5 @@ describe("RootEntity Test", () => {
     });
     it("Updates chunk map when child is added or removed", () => {
         assert.equal(2, 2);
-    });
-    it("Cannot set parent", () => {
-        const rootEntity = new RootEntity("1");
-        assert.throws(() => {
-            rootEntity.parent = new Entity("2");
-        });
     });
 });

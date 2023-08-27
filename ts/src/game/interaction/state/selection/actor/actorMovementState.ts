@@ -5,13 +5,15 @@ import { SearchedNode } from "../../../../../path/search.js";
 import { RenderContext } from "../../../../../rendering/renderContext.js";
 import { uiBox } from "../../../../../ui/dsl/uiBoxDsl.js";
 import { fillUiSize } from "../../../../../ui/uiSize.js";
-import { Entity } from "../../../../world/entity/entity.js";
-import { EntityInstanceJobConstraint } from "../../../../world/job/constraint/entityInstanceConstraint.js";
-import { MoveJob } from "../../../../world/job/jobs/moveJob.js";
-import { GroundTile } from "../../../../world/tile/ground.js";
-import { TileSize } from "../../../../world/tile/tile.js";
+import { JobQueueComponent } from "../../../../component/job/jobQueueComponent.js";
+import { PathFindingComponent } from "../../../../component/root/path/pathFindingComponent.js";
+import { Entity } from "../../../../entity/entity.js";
+import { GroundTile } from "../../../../tile/ground.js";
+import { TileSize } from "../../../../tile/tile.js";
 import { InteractionState } from "../../../handler/interactionState.js";
 import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold.js";
+import { MoveJob } from "../../../../component/job/jobs/moveJob.js";
+import { entityInstanceConstraint } from "../../../../component/job/jobConstraint.js";
 
 export class ActorMovementState extends InteractionState {
     private selectedPoint: Point | null = null;
@@ -60,10 +62,9 @@ export class ActorMovementState extends InteractionState {
         };
         this.selectedPoint = toPoint;
 
-        const path = this.context.world.pathFinding.findPath(
-            this.entity.worldPosition,
-            toPoint
-        );
+        const path = this.context.root
+            .requireComponent(PathFindingComponent)
+            .findPath(this.entity.worldPosition, toPoint);
 
         this.graph = path.graph;
         this.path = path.path;
@@ -154,8 +155,11 @@ export class ActorMovementState extends InteractionState {
     }
 
     private scheduleMovement() {
-        this.context.world.jobQueue.addJob(
-            new MoveJob(this.path, new EntityInstanceJobConstraint(this.entity))
-        );
+        this.context.root
+            .requireComponent(JobQueueComponent)
+            .addJob(
+                MoveJob.createInstance(this.path),
+                entityInstanceConstraint(this.entity.id)
+            );
     }
 }

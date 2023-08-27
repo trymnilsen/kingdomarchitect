@@ -6,8 +6,9 @@ import { uiBox } from "../../../../ui/dsl/uiBoxDsl.js";
 import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize.js";
 import { UIView } from "../../../../ui/uiView.js";
 import { UIFlowGrid } from "../../../../ui/view/uiFlowGrid.js";
-import { ChestComponent } from "../../../world/component/resource/chestComponent.js";
-import { CollectChestJob } from "../../../world/job/jobs/chest/collectChestJob.js";
+import { JobQueueComponent } from "../../../component/job/jobQueueComponent.js";
+import { CollectChestJob } from "../../../component/job/jobs/chest/collectChestJob.js";
+import { ChestComponent } from "../../../component/resource/chestComponent.js";
 import { InteractionState } from "../../handler/interactionState.js";
 import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold.js";
 import { UIBorderTitle } from "../../view/uiBorderTitle.js";
@@ -82,8 +83,11 @@ export class CollectChestState extends InteractionState {
     }
 
     private scheduleCollectJob() {
-        const collectJob = new CollectChestJob(this.chest);
-        this.context.world.jobQueue.addJob(collectJob);
+        const collectJob = CollectChestJob.createInstance(this.chest);
+        this.context.root
+            .requireComponent(JobQueueComponent)
+            .addJob(collectJob);
+
         this.context.stateChanger.clear();
     }
 

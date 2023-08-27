@@ -5,10 +5,10 @@ import { Direction } from "./direction.js";
  * The point does not take into account the type of space. It can be both
  * in screenspace, worldspace or "tile space".
  */
-export interface Point {
+export type Point = {
     x: number;
     y: number;
-}
+};
 
 /**
  * A point with both components set to zero
@@ -18,6 +18,17 @@ export function zeroPoint(): Point {
         x: 0,
         y: 0,
     };
+}
+
+export function pointGrid(width: number, height: number): Point[] {
+    const points: Point[] = [];
+    for (let x = 0; x < width; x++) {
+        for (let y = 0; y < height; y++) {
+            points.push({ x, y });
+        }
+    }
+
+    return points;
 }
 
 /**

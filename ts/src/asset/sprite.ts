@@ -5,6 +5,10 @@ export type Sprite2 = {
      * The reference to which spritesheet this sprite is found in
      */
     bin: string;
+    /*
+     * The id of the sprite
+     */
+    id: string;
     /**
      * The definition defines where in the spritesheet the sprite can be found
      */
@@ -30,3 +34,4 @@ export type Sprite2 = {
 };
 
 export const sprites2 = sprites;
+export const emptySprite = sprites.empty_sprite;

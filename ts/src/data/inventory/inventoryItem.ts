@@ -1,13 +1,13 @@
 import { Sprite2 } from "../../asset/sprite.js";
 
-export interface InventoryItem {
+export type InventoryItem = {
     id: string;
     name: string;
     asset: Sprite2;
     hint?: string;
     tag?: ItemTag[];
     category?: ItemCategory;
-}
+};
 
 export enum ItemTag {
     SkillGear,
