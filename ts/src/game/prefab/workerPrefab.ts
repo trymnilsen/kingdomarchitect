@@ -12,10 +12,17 @@ import {
 
 export function workerPrefab(id: string): Entity {
     const worker = new Entity(id);
-    const spriteDrawer = SpriteComponent.createInstance(sprites2.dweller, {
-        x: 3,
-        y: 2,
-    });
+    const spriteDrawer = SpriteComponent.createInstance(
+        sprites2.dweller,
+        {
+            x: 3,
+            y: 2,
+        },
+        {
+            x: 32,
+            y: 32,
+        }
+    );
     const jobRunner = new JobRunnerComponent();
     const workerBehaviorComponent = new WorkerBehaviorComponent();
     const equipmentComponent = new EquipmentComponent();
