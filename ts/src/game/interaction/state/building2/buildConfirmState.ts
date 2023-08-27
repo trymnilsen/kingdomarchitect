@@ -7,6 +7,7 @@ import { RenderContext } from "../../../../rendering/renderContext.js";
 import { uiBox } from "../../../../ui/dsl/uiBoxDsl.js";
 import { fillUiSize } from "../../../../ui/uiSize.js";
 import { InventoryComponent } from "../../../component/inventory/inventoryComponent.js";
+import { workerConstraint } from "../../../component/job/jobConstraint.js";
 import { JobQueueComponent } from "../../../component/job/jobQueueComponent.js";
 import { BuildJob } from "../../../component/job/jobs/buildJob.js";
 import { ChunkMapComponent } from "../../../component/root/chunk/chunkMapComponent.js";
@@ -161,7 +162,8 @@ export class BuildConfirmState extends InteractionState {
                 const root = this.context.root;
                 root.addChild(house);
                 root.requireComponent(JobQueueComponent).addJob(
-                    BuildJob.createInstance(house)
+                    BuildJob.createInstance(house),
+                    workerConstraint()
                 );
             }
 

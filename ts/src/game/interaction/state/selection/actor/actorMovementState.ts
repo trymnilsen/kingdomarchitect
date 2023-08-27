@@ -13,6 +13,7 @@ import { TileSize } from "../../../../tile/tile.js";
 import { InteractionState } from "../../../handler/interactionState.js";
 import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold.js";
 import { MoveJob } from "../../../../component/job/jobs/moveJob.js";
+import { entityInstanceConstraint } from "../../../../component/job/jobConstraint.js";
 
 export class ActorMovementState extends InteractionState {
     private selectedPoint: Point | null = null;
@@ -156,6 +157,9 @@ export class ActorMovementState extends InteractionState {
     private scheduleMovement() {
         this.context.root
             .requireComponent(JobQueueComponent)
-            .addJob(MoveJob.createInstance(this.path));
+            .addJob(
+                MoveJob.createInstance(this.path),
+                entityInstanceConstraint(this.entity.id)
+            );
     }
 }

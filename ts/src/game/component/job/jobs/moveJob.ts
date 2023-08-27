@@ -18,7 +18,7 @@ export class MoveJob extends Job<MoveBundle> {
     static createInstance(path: Point[]) {
         const instance = new MoveJob();
         instance.bundle = {
-            path: path,
+            path: path.reverse(),
         };
         return instance;
     }

@@ -22,20 +22,20 @@ export class BuildJob extends Job<BuildBundle> {
     }
 
     update(tick: number): void {
-        //TODO: Add adjacent and move towards
-        if (!this.healthComponent) {
-            throw new Error("Health component not set");
-        }
-        if (!this.buildingComponent) {
-            throw new Error("Building component not set");
-        }
+        assertEntityComponent(this.healthComponent);
+        assertEntityComponent(this.buildingComponent);
 
-        if (this.healthComponent.healthPercentage < 1) {
-            this.healthComponent.heal(10);
-        }
-        if (this.healthComponent.healthPercentage >= 1) {
-            this.buildingComponent.finishBuild();
-            this.complete();
+        const target = this.buildingComponent.entity.worldPosition;
+        if (this.adjacentTo(target)) {
+            if (this.healthComponent.healthPercentage < 1) {
+                this.healthComponent.heal(10);
+            }
+            if (this.healthComponent.healthPercentage >= 1) {
+                this.buildingComponent.finishBuild();
+                this.complete();
+            }
+        } else {
+            this.movement.pathTowards(target);
         }
     }
 

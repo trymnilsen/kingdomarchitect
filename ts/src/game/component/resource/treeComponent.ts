@@ -69,6 +69,8 @@ export class TreeComponent extends EntityComponent<TreeBundle> {
             sprite: sprite,
             x: screenPosition.x + 4,
             y: screenPosition.y,
+            targetWidth: 32,
+            targetHeight: 32,
         });
     }
 

@@ -12,6 +12,7 @@ export function spriteFromAnimation(
     const frameWidth = sprite.defintion.w;
     return {
         bin: sprite.bin,
+        id: sprite.id,
         defintion: {
             frames: 1,
             x: sprite.defintion.x + frameWidth * clampedFrame,

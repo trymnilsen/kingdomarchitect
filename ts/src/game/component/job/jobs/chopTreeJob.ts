@@ -50,26 +50,31 @@ export class ChopTreeJob extends Job<ChopTreeBundle> {
         assertEntity(this._target);
         assertEntityComponent(this.healthComponent);
 
-        if (this.healthComponent.health >= 20) {
-            console.log("Health mte 20");
-            this.healthComponent.damage(10, this.entity);
-        }
-
-        if (this.healthComponent.health <= 10) {
-            console.log("Health lte 10");
-            const treeComponent = this._target.requireComponent(TreeComponent);
-            const inventoryComponent =
-                this._target.getAncestorComponent(InventoryComponent);
-            if (!inventoryComponent) {
-                throw new Error(
-                    "No inventory component on ancestor of entity for ChopTreeJob"
-                );
+        if (this.adjacentTo(this._target.worldPosition)) {
+            if (this.healthComponent.health >= 20) {
+                console.log("Health mte 20");
+                this.healthComponent.damage(10, this.entity);
             }
 
-            treeComponent.finishChop();
+            if (this.healthComponent.health <= 10) {
+                console.log("Health lte 10");
+                const treeComponent =
+                    this._target.requireComponent(TreeComponent);
+                const inventoryComponent =
+                    this._target.getAncestorComponent(InventoryComponent);
+                if (!inventoryComponent) {
+                    throw new Error(
+                        "No inventory component on ancestor of entity for ChopTreeJob"
+                    );
+                }
 
-            inventoryComponent.addInventoryItem(woodResourceItem, 4);
-            this.complete();
+                treeComponent.finishChop();
+
+                inventoryComponent.addInventoryItem(woodResourceItem, 4);
+                this.complete();
+            }
+        } else {
+            this.movement.pathTowards(this._target.worldPosition);
         }
     }
 

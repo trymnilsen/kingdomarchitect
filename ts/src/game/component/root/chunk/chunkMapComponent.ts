@@ -129,7 +129,10 @@ export class ChunkMapComponent extends StatelessComponent {
         this.chunkMap = {};
         this.entityChunks = {};
         visitChildren(this.entity, (entity) => {
-            this.addEntityToChunkMap(entity);
+            if (!entity.isGameRoot) {
+                this.addEntityToChunkMap(entity);
+            }
+
             return false;
         });
     }

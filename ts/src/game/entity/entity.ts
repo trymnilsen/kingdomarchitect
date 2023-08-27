@@ -427,6 +427,7 @@ export class Entity {
     public publishComponentEvent() {}
 
     public bubbleEvent(event: EntityEvent) {
+        this._entityEvents.publish(event);
         this._parent?.bubbleEvent(event);
     }
 

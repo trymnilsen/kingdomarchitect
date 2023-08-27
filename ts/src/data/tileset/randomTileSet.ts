@@ -1,6 +1,6 @@
 import { getBounds } from "../../common/bounds.js";
 import { generateId } from "../../common/idGenerator.js";
-import { Point } from "../../common/point.js";
+import { Point, pointGrid } from "../../common/point.js";
 import {
     GroundChunk,
     GroundTile,
@@ -45,16 +45,27 @@ export class RandomTileSetFactory implements TileSetFactory {
     }
     createEntities(): Entity[] {
         const entities: Entity[] = [];
+        const points = pointGrid(3, 3);
+        const numberOfTrees = Math.floor(Math.random() * 9);
+        for (let i = 0; i < numberOfTrees; i++) {
+            const index = Math.floor(Math.random() * points.length);
+            const treePosition = points[index];
+            points.splice(index, 1);
 
-        const treeX = Math.floor(Math.random() * 3);
-        const treeY = Math.floor(Math.random() * 3);
-        const treeEntity = treePrefab(generateId("tree"), 2);
-        treeEntity.worldPosition = {
-            x: this.chunk.chunkX * 3 + treeX,
-            y: this.chunk.chunkY * 3 + treeY,
-        };
+            const treeX = treePosition.x;
+            const treeY = treePosition.y;
+            const treeEntity = treePrefab(
+                generateId("tree"),
+                Math.floor(Math.random() * 3)
+            );
+            treeEntity.worldPosition = {
+                x: this.chunk.chunkX * 3 + treeX,
+                y: this.chunk.chunkY * 3 + treeY,
+            };
 
-        entities.push(treeEntity);
+            entities.push(treeEntity);
+        }
+
         return entities;
     }
 }

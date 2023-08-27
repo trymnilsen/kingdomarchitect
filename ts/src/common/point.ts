@@ -20,6 +20,17 @@ export function zeroPoint(): Point {
     };
 }
 
+export function pointGrid(width: number, height: number): Point[] {
+    const points: Point[] = [];
+    for (let x = 0; x < width; x++) {
+        for (let y = 0; y < height; y++) {
+            points.push({ x, y });
+        }
+    }
+
+    return points;
+}
+
 /**
  * Adds the component of one point with the components of another
  * @param p1 the first addend

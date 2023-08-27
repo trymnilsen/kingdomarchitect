@@ -21,7 +21,6 @@
       "removeComments": true,
       "experimentalDecorators": true,
       "esModuleInterop": true,
-      "noEmitOnError": true,
       "outDir": "./build",
       "incremental": true,
       "types": [

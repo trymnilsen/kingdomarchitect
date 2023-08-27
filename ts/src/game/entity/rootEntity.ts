@@ -10,6 +10,7 @@ import { TileGeneratorComponent } from "../component/tile/tileGeneratorComponent
 import { TilesComponent } from "../component/tile/tilesComponent.js";
 import { farmPrefab } from "../prefab/farmPrefab.js";
 import { housePrefab } from "../prefab/housePrefab.js";
+import { treePrefab } from "../prefab/treePrefab.js";
 import { workerPrefab } from "../prefab/workerPrefab.js";
 import { Entity } from "./entity.js";
 
@@ -27,16 +28,19 @@ export function createRootEntity(): Entity {
     rootEntity.addComponent(new TileGeneratorComponent());
     const pathFindingComponent = new PathFindingComponent();
     rootEntity.addComponent(pathFindingComponent);
-
+    rootEntity.toggleIsGameRoot(true);
     //Set up initial entities
     const firstWorker = workerPrefab(generateId("worker"));
     const firstHouse = housePrefab(generateId("house"), false);
     const firstFarm = farmPrefab(generateId("farm"));
+    const firstTree = treePrefab(generateId("tree"), 1);
     firstFarm.position = { x: 2, y: 0 };
     firstHouse.position = { x: 1, y: 0 };
+    firstTree.position = { x: 2, y: 2 };
     rootEntity.addChild(firstFarm);
     rootEntity.addChild(firstWorker);
     rootEntity.addChild(firstHouse);
+    rootEntity.addChild(firstTree);
 
     return rootEntity;
 }

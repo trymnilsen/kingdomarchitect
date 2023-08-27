@@ -4,7 +4,7 @@ import { RenderContext } from "../../../rendering/renderContext.js";
 import { EntityComponent } from "../entityComponent.js";
 
 type SpriteComponentBundle = {
-    sprite: Sprite2;
+    sprite: string;
     offset: Point;
     size?: Point;
 };
@@ -22,7 +22,7 @@ export class SpriteComponent extends EntityComponent<SpriteComponentBundle> {
         const instance = new SpriteComponent();
         instance.fromComponentBundle({
             offset: offset,
-            sprite: sprite,
+            sprite: sprite.id,
             size: size,
         });
         return instance;
@@ -67,14 +67,19 @@ export class SpriteComponent extends EntityComponent<SpriteComponentBundle> {
     }
 
     override fromComponentBundle(bundle: SpriteComponentBundle): void {
-        this.sprite = bundle.sprite;
+        const sprite = sprites2[bundle.sprite];
+        if (!sprite) {
+            throw new Error(`No sprite with id ${bundle.sprite}`);
+        }
+
+        this.sprite = sprite;
         this.offset = bundle.offset;
         this.size = bundle.size;
     }
 
     override toComponentBundle(): SpriteComponentBundle {
         return {
-            sprite: this.sprite,
+            sprite: this.sprite.id,
             offset: this.offset,
             size: this.size,
         };
