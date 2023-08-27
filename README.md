@@ -1,7 +1,7 @@
 # 🏰 Kingdom Architect
 > Medieval simulation and city builder game for the browser.
 
-![Screenshot of the game](screenshot/screenshot.png)
+![Screenshot of the game](screenshot/gameplay.png)
 
 ## 🕹️ Play
 
