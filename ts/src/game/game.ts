@@ -53,10 +53,11 @@ export class Game {
         }
 
         window["saveGame"] = () => {
-            this.gamePersister.save(this.world, this.renderer.camera);
+            this.saveGame();
         };
 
         window["clearGame"] = () => {
+            console.log("Clear game");
             window.localStorage.clear();
         };
 
@@ -125,6 +126,11 @@ export class Game {
         this.world.onUpdate(this.currentTick);
         this.interactionHandler.onUpdate(this.currentTick);
         this.render();
+        try {
+            this.saveGame();
+        } catch (err) {
+            console.error(err);
+        }
     };
 
     private updateCamera(newPosition: Point) {
@@ -173,5 +179,9 @@ export class Game {
         this.interactionHandler.onDraw(this.renderer.context);
         //const renderEnd = performance.now();
         //console.log("⏱render time: ", renderEnd - renderStart);
+    }
+
+    private saveGame() {
+        this.gamePersister.save(this.world, this.renderer.camera);
     }
 }

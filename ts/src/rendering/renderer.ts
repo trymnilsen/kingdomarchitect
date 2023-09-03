@@ -27,7 +27,10 @@ export class Renderer {
         if (!context) {
             throw Error("Unable to get 2d context from canvas");
         }
-        this.currentCamera = new Camera();
+        this.currentCamera = new Camera({
+            x: window.innerWidth,
+            y: window.innerHeight,
+        });
         this.canvasContext = context;
         this.gameTime = gameTime;
         this.canvasContext.canvas.width = window.innerWidth;

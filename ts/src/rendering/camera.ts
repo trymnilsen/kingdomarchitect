@@ -3,8 +3,13 @@ import { TileSize } from "../game/tile/tile.js";
 
 export class Camera {
     private _position: Point;
-    constructor() {
+    private _halfWindowSize: Point;
+    constructor(private windowSize: Point) {
         this._position = { x: 0, y: 0 };
+        this._halfWindowSize = {
+            x: Math.floor(windowSize.x / 2),
+            y: Math.floor(windowSize.y / 2),
+        };
     }
 
     public get position(): Point {
@@ -42,21 +47,17 @@ export class Camera {
     }
 
     worldToScreenX(x: number): number {
-        return Math.floor(
-            x - this._position.x + Math.floor(window.innerWidth / 2)
-        );
+        return Math.floor(x - this._position.x + this._halfWindowSize.x);
     }
 
     worldToScreenY(y: number): number {
-        return Math.floor(
-            y - this._position.y + Math.floor(window.innerHeight / 2)
-        );
+        return Math.floor(y - this._position.y + this._halfWindowSize.y);
     }
 
     screenToWorld(point: Point): Point {
         return {
-            x: point.x - Math.floor(window.innerWidth / 2) + this._position.x,
-            y: point.y - Math.floor(window.innerHeight / 2) + this._position.y,
+            x: point.x - this._halfWindowSize.x + this._position.x,
+            y: point.y - this._halfWindowSize.y + this._position.y,
         };
     }
 }

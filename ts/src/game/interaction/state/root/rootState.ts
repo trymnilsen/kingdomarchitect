@@ -22,6 +22,7 @@ import { UIActionbarItem } from "../../view/actionbar/uiActionbar.js";
 import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold.js";
 import { AlertMessageState } from "../common/alertMessageState.js";
 import { LandUnlockState } from "../land/landUnlockState.js";
+import { MenuState } from "../menu/menuState.js";
 import { ActorSelectionState } from "../selection/actor/actorSelectionState.js";
 import { SelectionState } from "../selection/selectionState.js";
 import { BuildingState } from "./building/buildingState.js";
@@ -76,6 +77,16 @@ export class RootState extends InteractionState {
             },
         ];
 
+        const rightActionItems: UIActionbarItem[] = [
+            {
+                text: "Menu",
+                icon: sprites2.empty_sprite,
+                onClick: () => {
+                    this.context.stateChanger.push(new MenuState());
+                },
+            },
+        ];
+
         /*
         const timeline = new UITimeline(this.context.gameTime, {
             width: fillUiSize,
@@ -93,7 +104,7 @@ export class RootState extends InteractionState {
         const scaffoldState = new UIActionbarScaffold(
             contentView,
             actionItems,
-            [],
+            rightActionItems,
             { width: fillUiSize, height: fillUiSize }
         );
 

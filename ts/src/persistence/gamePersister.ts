@@ -17,12 +17,18 @@ export class GamePersister {
     }
 
     save(world: Entity, camera: Camera) {
+        const saveTimeStart = performance.now();
         const ids = getGeneratorIds();
         const bundleSets = this.entityPersister.persist(world);
         const bundleSetsAsJson = JSON.stringify(bundleSets);
         window.localStorage.setItem("bundles", bundleSetsAsJson);
         window.localStorage.setItem("ids", JSON.stringify(ids));
         window.localStorage.setItem("camera", JSON.stringify(camera.position));
+        const saveTimeEnd = performance.now();
+        const saveTime = saveTimeEnd - saveTimeStart;
+        if (window["debugLog"]) {
+            console.log("save time: ", saveTime);
+        }
     }
 
     loadWorld(): LoadedItems {

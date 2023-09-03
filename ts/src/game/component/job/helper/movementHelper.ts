@@ -11,7 +11,7 @@ export class MovementHelper {
     private _currentMovement: PathMovement | null = null;
 
     public get currentMovement(): PathMovement | null {
-        return this.currentMovement;
+        return this._currentMovement;
     }
 
     public set currentMovement(v: PathMovement | null) {
