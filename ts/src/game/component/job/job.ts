@@ -212,7 +212,7 @@ export abstract class Job<T extends JSONValue = {}> {
      * take on new jobs
      */
     complete() {
-        console.log("Job completed", this);
+        console.debug("Job completed", this);
         this._jobState = JobState.Completed;
         if (this._owner) {
             this._owner.onComplete(this as Job);

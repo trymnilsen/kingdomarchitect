@@ -83,7 +83,7 @@ export class ActorSelectionState extends InteractionState {
             items.push({
                 text: "Main",
                 onClick: () => {
-                    this.onMainItemTap();
+                    //this.onMainItemTap();
                 },
                 icon: equipment.mainItem.asset,
             });
@@ -91,7 +91,7 @@ export class ActorSelectionState extends InteractionState {
             items.push({
                 text: "Main",
                 onClick: () => {
-                    this.onMainItemTap();
+                    //this.onMainItemTap();
                 },
                 icon: sprites2.empty_sprite,
             });

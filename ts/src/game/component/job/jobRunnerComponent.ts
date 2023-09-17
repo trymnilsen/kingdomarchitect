@@ -1,4 +1,5 @@
 import { Point } from "../../../common/point.js";
+import { jobDebug } from "../../../constants.js";
 import { RenderContext } from "../../../rendering/renderContext.js";
 import { EntityComponent } from "../entityComponent.js";
 import { Job, JobBundle, JobState } from "./job.js";
@@ -46,7 +47,7 @@ export class JobRunnerComponent
      * @param job
      */
     assignJob(job: Job): void {
-        console.log("Assign job to runner:", job, this);
+        console.debug("Assign job to runner:", job, this);
 
         const currentJob = this.activeJob;
         if (currentJob) {
@@ -133,7 +134,7 @@ export class JobRunnerComponent
     }
 
     private requestNewJob(): void {
-        console.log("requestNewJob", this);
+        console.debug("requestNewJob", this);
         const entity = this.entity;
         if (!entity) {
             console.error(
@@ -156,7 +157,7 @@ export class JobRunnerComponent
             queue.removeJob(mostApplicableJob);
             this.assignJob(mostApplicableJob);
         } else {
-            console.log(
+            console.debug(
                 "No applicable job found",
                 entity,
                 applicableJobs,

@@ -12,6 +12,7 @@ export interface UIActionbarItem {
     onClick?: () => void;
     children?: Omit<UIActionbarItem, "children">[];
     icon?: Sprite2;
+    
 }
 
 export enum UIActionbarAlignment {

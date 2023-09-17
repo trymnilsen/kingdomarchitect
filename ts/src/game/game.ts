@@ -177,6 +177,7 @@ export class Game {
         this.renderer.clearScreen();
         this.world.onDraw(this.renderer.context);
         this.interactionHandler.onDraw(this.renderer.context);
+        this.renderer.renderDeferred();
         //const renderEnd = performance.now();
         //console.log("⏱render time: ", renderEnd - renderStart);
     }

@@ -18,6 +18,8 @@ import { TextStyle } from "./text/textStyle.js";
 import { UIRenderContext } from "./uiRenderContext.js";
 import { Bounds } from "../common/bounds.js";
 
+export type DrawFunction = (context: RenderContext) => void;
+
 /**
  * The rendercontext combines the access to the camera, assets and canvas
  * allowing drawing to the screen and convertion of tilespace to screenspace
@@ -26,6 +28,7 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
     private canvasContext: CanvasRenderingContext2D;
     private _camera: Camera;
     private _assetLoader: AssetLoader;
+    private _deferredRenderCalls: DrawFunction[] = [];
     private _width: number;
     private _height: number;
 
@@ -123,10 +126,7 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
         };
     }
 
-    drawWithClip(
-        bounds: Bounds,
-        drawFunction: (context: UIRenderContext) => void
-    ): void {
+    drawWithClip(bounds: Bounds, drawFunction: DrawFunction): void {
         try {
             this.canvasContext.save();
             this.canvasContext.beginPath();
@@ -141,6 +141,18 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
         } finally {
             this.canvasContext.restore();
         }
+    }
+
+    drawDeferred(drawFunction: DrawFunction): void {
+        this._deferredRenderCalls.push(drawFunction);
+    }
+
+    getDeferredDrawFunctions(): ReadonlyArray<DrawFunction> {
+        return this._deferredRenderCalls;
+    }
+
+    clearDeferredDrawFunctions(): void {
+        this._deferredRenderCalls = [];
     }
 
     /**

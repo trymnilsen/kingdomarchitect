@@ -69,13 +69,30 @@ export class BuildConfirmState extends InteractionState {
             {
                 text: this.buildMode.description.name,
                 icon: sprites2.empty_sprite,
-                onClick: () => {
-                    if (this.scaffold?.isExpanded) {
-                        this.scaffold.resetExpandedMenu();
-                    } else {
-                        this.onBuildModeSelected();
-                    }
-                },
+                children: [
+                    {
+                        text: "Single",
+                        icon: sprites2.empty_sprite,
+                        onClick: () => {
+                            this.changeBuildMode(
+                                new SingleBuildMode(
+                                    this.buildMode.cursorSelection()
+                                )
+                            );
+                        },
+                    },
+                    {
+                        text: "Line",
+                        icon: sprites2.empty_sprite,
+                        onClick: () => {
+                            this.changeBuildMode(
+                                new LineBuildMode(
+                                    this.buildMode.cursorSelection()
+                                )
+                            );
+                        },
+                    },
+                ],
             },
             {
                 text: "Cancel",
@@ -88,6 +105,7 @@ export class BuildConfirmState extends InteractionState {
     }
 
     private onBuildModeSelected() {
+        /*
         this.scaffold?.setLeftExpandedMenu(
             [
                 {
@@ -124,10 +142,10 @@ export class BuildConfirmState extends InteractionState {
                 onClick: () => {
                     this.changeBuildMode(new ToggleBuildMode());
                 },
-            },*/
+            },
             ],
             1
-        );
+        );*/
     }
 
     private confirmBuildSelection() {
@@ -177,7 +195,6 @@ export class BuildConfirmState extends InteractionState {
 
     private changeBuildMode(mode: BuildMode) {
         this.buildMode = mode;
-        this.scaffold?.resetExpandedMenu();
         this.scaffold?.setLeftMenu(this.getActionItems());
     }
 
@@ -190,19 +207,10 @@ export class BuildConfirmState extends InteractionState {
             .requireComponent(TilesComponent)
             .getTile(worldPosition);
 
-        if (this.scaffold?.isExpanded && isTileAtPosition) {
-            this.scaffold.resetExpandedMenu();
-            return true;
-        } else {
-            return false;
-        }
+        return false;
     }
 
     override onTileTap(tile: GroundTile): boolean {
-        if (this.scaffold?.isExpanded) {
-            this.scaffold.resetExpandedMenu();
-        }
-
         const position = {
             x: tile.tileX,
             y: tile.tileY,

@@ -55,6 +55,14 @@ export class Renderer {
         });*/
     }
 
+    renderDeferred() {
+        const functions = this.context.getDeferredDrawFunctions();
+        for (const drawFunction of functions) {
+            drawFunction(this.renderContext);
+        }
+        this.renderContext.clearDeferredDrawFunctions();
+    }
+
     clearScreen() {
         let clearColor = dayClearColor;
         if (this.gameTime.fractionalTimeOfDay >= 0.75) {

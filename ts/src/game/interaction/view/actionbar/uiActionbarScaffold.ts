@@ -1,44 +1,39 @@
 import { sprites2 } from "../../../../asset/sprite.js";
-import { Point } from "../../../../common/point.js";
-import { Sides, allSides } from "../../../../common/sides.js";
-import { UIRenderContext } from "../../../../rendering/uiRenderContext.js";
-import { SpriteBackground } from "../../../../ui/uiBackground.js";
-import { UILayoutContext } from "../../../../ui/uiLayoutContext.js";
-import { UISize, wrapUiSize } from "../../../../ui/uiSize.js";
-import { UIView } from "../../../../ui/uiView.js";
-import { UIColumn } from "../../../../ui/view/uiColumn.js";
 import {
-    UIActionbar,
-    UIActionbarAlignment,
-    UIActionbarItem,
-} from "./uiActionbar.js";
-import { UIActionbarButton } from "./uiActionbarButton.js";
-import { actionbarHeight, actionbarWidth } from "./uiActionbarConstants.js";
-
-const background = new SpriteBackground(sprites2.stone_slate_background_2x);
+    Bounds,
+    sizeOfBounds,
+    withinRectangle,
+} from "../../../../common/bounds.js";
+import { Axis, invertAxis } from "../../../../common/direction.js";
+import { Point, addPoint, zeroPoint } from "../../../../common/point.js";
+import {
+    Sides,
+    allSides,
+    totalHorizontal,
+    totalVertical,
+} from "../../../../common/sides.js";
+import { subTitleTextStyle } from "../../../../rendering/text/textStyle.js";
+import { UIRenderContext } from "../../../../rendering/uiRenderContext.js";
+import { UILayoutContext } from "../../../../ui/uiLayoutContext.js";
+import { UISize } from "../../../../ui/uiSize.js";
+import { UIView } from "../../../../ui/uiView.js";
+import { UIActionbarItem } from "./uiActionbar.js";
 
 export class UIActionbarScaffold extends UIView {
     private _sides: Sides = allSides(16);
-    private _leftActionbar: UIActionbar;
-    private _rightActionbar: UIActionbar;
-    private _leftExpandedMenuIndex: number = 0;
-    private _rightExpandedMenuIndex: number = 0;
-    private _leftExpandedMenuColumn: UIColumn;
-    private _rightExpandedMenuColumn: UIColumn;
-    private _leftExpandedMenu: UIActionbarItem[] = [];
-    private _rightExpandedMenu: UIActionbarItem[] = [];
+    private buttons: ActionbarButton[] = [];
+    private selectedPath: string = "";
 
-    public get isExpanded(): boolean {
-        return (
-            this._leftExpandedMenu.length > 0 ||
-            this._rightExpandedMenu.length > 0
-        );
-    }
-
+    /**
+     * Get the padding for the content and action bar
+     */
     public get sides(): Sides {
         return this._sides;
     }
 
+    /**
+     * Set the padding for the content and action bar
+     */
     public set sides(value: Sides) {
         this._sides = value;
     }
@@ -51,73 +46,28 @@ export class UIActionbarScaffold extends UIView {
     ) {
         super(size);
         this.addView(contentView);
-        const leftActionbar = this.createActionbar(
-            leftItems,
-            UIActionbarAlignment.Left
-        );
-        this._leftActionbar = leftActionbar;
-        this.addView(leftActionbar);
-
-        const rightActionbar = this.createActionbar(
-            rightItems,
-            UIActionbarAlignment.Right
-        );
-        this._rightActionbar = rightActionbar;
-        this.addView(rightActionbar);
-
-        const leftColumn = new UIColumn({
-            width: wrapUiSize,
-            height: wrapUiSize,
-        });
-
-        const rightColumn = new UIColumn({
-            width: wrapUiSize,
-            height: wrapUiSize,
-        });
-
-        this._leftExpandedMenuColumn = leftColumn;
-        this._rightExpandedMenuColumn = rightColumn;
-
-        this.addView(leftColumn);
-        this.addView(rightColumn);
     }
 
+    /**
+     * Update the actionbar buttons show in the left actionbar
+     * @param items The updated set of items
+     */
     setLeftMenu(items: UIActionbarItem[]) {
-        this._leftActionbar.updateItems(items);
+        this.leftItems = items;
+        this._isDirty = true;
     }
 
+    /**
+     * Update the actionbar buttons show in the right actionbar
+     * @param items The updated set of items
+     */
     setRightMenu(items: UIActionbarItem[]) {
-        this._rightActionbar.updateItems(items);
-    }
-
-    setLeftExpandedMenu(items: UIActionbarItem[], anchorIndex: number) {
-        this._leftExpandedMenu = items;
-        this._leftExpandedMenuIndex = anchorIndex;
-        this.setExpandedMenu(this._leftExpandedMenuColumn, items);
-    }
-
-    setRightExpandedMenu(items: UIActionbarItem[], anchorIndex: number) {
-        this._rightExpandedMenu = items;
-        this._rightExpandedMenuIndex = anchorIndex;
-        this.setExpandedMenu(this._rightExpandedMenuColumn, items);
-    }
-
-    resetExpandedMenu() {
-        if (this._leftExpandedMenu.length > 0) {
-            this._leftExpandedMenuColumn.clearViews();
-            this._leftExpandedMenu = [];
-            this._leftExpandedMenuIndex = 0;
-        }
-
-        if (this._rightExpandedMenu.length > 0) {
-            this._rightExpandedMenuColumn.clearViews();
-            this._rightExpandedMenu = [];
-            this._rightExpandedMenuIndex = 0;
-        }
+        this.rightItems = items;
+        this._isDirty = true;
     }
 
     override hitTest(screenPoint: Point): boolean {
-        return false;
+        return true;
     }
 
     override layout(
@@ -127,89 +77,22 @@ export class UIActionbarScaffold extends UIView {
         //Measure the actionbars first
         //We start with the left actionbar as it should be collapsed last
         //if there is not enough space
-        const horizontalPadding = this._sides.left + this._sides.right;
-        const verticalPadding = this._sides.top + this._sides.bottom;
         const paddedConstraints = {
-            width: constraints.width - horizontalPadding,
-            height: constraints.height - verticalPadding,
+            width: constraints.width - totalHorizontal(this.sides),
+            height: constraints.height - totalVertical(this.sides),
         };
 
-        const actionbarConstraints = {
-            //Reserve some width for the right actionbar.
-            //We substract a value here to avoid the need to do a
-            //layout pass again if there is not enough space
-            width: paddedConstraints.width - 100,
-            height: actionbarHeight,
-        };
-
-        let leftLayout: UISize = { width: 0, height: 0 };
-
-        //Layout the left actionbar if it is defined
-        leftLayout = this._leftActionbar.layout(
+        const actionbarSize = this.layoutActionbar(
             layoutContext,
-            actionbarConstraints
+            paddedConstraints
         );
 
-        //Layout the right actionbar if it is defined
-
-        const rightConstraints = {
-            width: paddedConstraints.width - leftLayout.width,
-            height: actionbarHeight,
-        };
-
-        const rightActionbar = this._rightActionbar.layout(
-            layoutContext,
-            rightConstraints
-        );
-
-        //Now we can measure the content view
         const contentConstraints = {
             width: paddedConstraints.width,
-            height: paddedConstraints.height - actionbarHeight,
+            height: paddedConstraints.height - actionbarSize.height,
         };
 
-        const contentSize = this.contentView.layout(
-            layoutContext,
-            contentConstraints
-        );
-
-        //Layout the expanded views
-        if (this._leftExpandedMenuColumn) {
-            const leftExpandedMenuSize = this._leftExpandedMenuColumn.layout(
-                layoutContext,
-                contentConstraints
-            );
-
-            this._leftExpandedMenuColumn.offset = {
-                x:
-                    this._sides.left +
-                    this._leftExpandedMenuIndex * actionbarWidth,
-                y:
-                    this._sides.top +
-                    contentSize.height -
-                    leftExpandedMenuSize.height,
-            };
-        }
-
-        if (this._rightExpandedMenuColumn) {
-            const rightExpandedMenuSize = this._rightExpandedMenuColumn.layout(
-                layoutContext,
-                contentConstraints
-            );
-
-            this._rightExpandedMenuColumn.offset = {
-                x:
-                    this._sides.right +
-                    contentSize.height -
-                    rightExpandedMenuSize.width -
-                    rightActionbar.width +
-                    this._rightExpandedMenuIndex * actionbarWidth,
-                y:
-                    this._sides.top +
-                    contentSize.height -
-                    rightExpandedMenuSize.height,
-            };
-        }
+        this.layoutContentView(layoutContext, contentConstraints);
 
         //The measured size includes the padding, so we are just setting
         //the constraints we received here
@@ -218,68 +101,469 @@ export class UIActionbarScaffold extends UIView {
             height: constraints.height,
         };
 
-        //Position the actionbars
-        //The left actionbar is positioned at the bottom left
-        //The right actionbar is positioned at the bottom right
-        this._leftActionbar.offset = {
-            x: this._sides.left,
-            y: constraints.height - actionbarHeight - this._sides.bottom,
+        return this._measuredSize;
+    }
+
+    override draw(context: UIRenderContext): void {
+        this.contentView.draw(context);
+        if (this.buttons.length > 0) {
+            this.drawActionbar(context, this.buttons);
+        }
+    }
+
+    override onTap(screenPoint: Point): boolean {
+        return this.checkForTapOnButton(screenPoint, this.buttons);
+    }
+
+    /**
+     * Draw a list of actionbar buttons, will recursively iterate through
+     * children to draw them as well
+     * @param context
+     * @param actionbar
+     */
+    private drawActionbar(
+        context: UIRenderContext,
+        actionbar: ActionbarButton[]
+    ) {
+        for (const item of actionbar) {
+            if (!item.visible) {
+                continue;
+            }
+
+            context.drawNinePatchSprite({
+                x: item.position.x + item.width / 2 - 24,
+                y: item.position.y + 2,
+                width: 48,
+                height: 48,
+                sprite: sprites2.stone_slate_background_2x,
+                scale: 1,
+                sides: allSides(16),
+            });
+
+            context.drawScreenspaceText({
+                text: item.text,
+                color: "white",
+                width: item.width,
+                align: "center",
+                x: item.position.x + item.textOffset,
+                y: item.position.y + 48 + 2,
+                font: subTitleTextStyle.font,
+                size: subTitleTextStyle.size,
+            });
+
+            if (item.children.length > 0) {
+                this.drawActionbar(context, item.children);
+            }
+        }
+    }
+
+    /**
+     * Request to layout the action bar and create the actionbar tree structure
+     * @param layoutContext the UI context for layouting
+     * @param paddedConstraints the constraints (with padding applied)
+     * @returns the sized used for the actionbar
+     */
+    private layoutActionbar(
+        layoutContext: UILayoutContext,
+        paddedConstraints: UISize
+    ): UISize {
+        //Get the size of the first level of the left tree
+        const leftSize = this.layoutSingleActionbar(
+            layoutContext,
+            this.leftItems,
+            Axis.XAxis
+        );
+        const rightSize = this.layoutSingleActionbar(
+            layoutContext,
+            this.rightItems,
+            Axis.XAxis
+        );
+        //Get the size of the first level of the right tree
+        let leftActionTree = this.leftItems;
+        let rightActionTree = this.rightItems;
+        if (
+            paddedConstraints.width - rightSize.totalWidth <
+            leftSize.totalWidth
+        ) {
+            //The size of the left actionbar was larger than what was available
+            //so we add a level that is just "actions" for the "top-level" left
+            //actionbar items
+            leftActionTree = [
+                {
+                    text: "actions",
+                    children: this.leftItems,
+                },
+            ];
+        }
+
+        const paddingOffset = {
+            x: this.sides.left,
+            y: this.sides.top,
         };
 
-        const size = this._rightActionbar.measuredSize.width;
-        this._rightActionbar.offset = {
-            x: constraints.width - size - this._sides.right,
-            y: constraints.height - actionbarHeight - this._sides.bottom,
+        const leftItems = this.layoutActionItems(
+            leftActionTree,
+            layoutContext,
+            paddedConstraints.width,
+            paddedConstraints.height,
+            {
+                x: 0,
+                y: paddedConstraints.height,
+            },
+            paddingOffset,
+            ActionbarAlignment.Left,
+            Axis.XAxis,
+            "left",
+            0
+        );
+
+        const rightItems = this.layoutActionItems(
+            rightActionTree,
+            layoutContext,
+            paddedConstraints.width,
+            paddedConstraints.height,
+            {
+                x: paddedConstraints.width,
+                y: paddedConstraints.height,
+            },
+            paddingOffset,
+            ActionbarAlignment.Right,
+            Axis.XAxis,
+            "right",
+            0
+        );
+
+        this.buttons = [...leftItems, ...rightItems];
+
+        return {
+            width: paddedConstraints.width,
+            height: Math.max(leftSize.totalHeight, rightSize.totalHeight),
         };
+    }
+
+    /**
+     * Layout a list of `UIActionbarItem` and layout them and their children
+     * @param actionbarItems the list of items to turn into buttons
+     * @param layoutContext context to use for measuring
+     * @param width the total width available (taken from constraints)
+     * @param height the total width available (taken from constraints)
+     * @param anchor where the actionbar should be anchored
+     * @param paddingOffset the padding offset to apply
+     * @param alignment the alignment of the actionbars (right or left side)
+     * @param axis if the actionbar flows vertically or horizontally
+     * @param path an identifyable path for this actionbar (e.g `left/1/2`)
+     * @param level the level of actionsbar above this actionbar
+     * @returns a list of laid out actionbar buttons
+     */
+    private layoutActionItems(
+        actionbarItems: UIActionbarItem[],
+        layoutContext: UILayoutContext,
+        width: number,
+        height: number,
+        anchor: Point,
+        paddingOffset: Point,
+        alignment: ActionbarAlignment,
+        axis: Axis,
+        path: string,
+        level: number
+    ): ActionbarButton[] {
+        const actionbar = this.layoutSingleActionbar(
+            layoutContext,
+            actionbarItems,
+            axis
+        );
+
+        const actionbarAlignment = getActionbarAlignment(alignment, axis);
+        const actionbarOffset = this.calculateAnchorOffset(
+            anchor,
+            actionbarAlignment,
+            width,
+            height,
+            actionbar.totalWidth,
+            actionbar.totalHeight
+        );
+
+        // Sanity check for actionbar items size
+        if (actionbar.boundaries.length != actionbarItems.length) {
+            throw new Error("Amount of actionbar items inconsistency");
+        }
+
+        const buttons: ActionbarButton[] = [];
+        for (let i = 0; i < actionbar.boundaries.length; i++) {
+            const boundary = actionbar.boundaries[i];
+            const actionbarItem = actionbarItems[i];
+            const size = sizeOfBounds(boundary);
+            const position = addPoint(
+                { x: boundary.x1, y: boundary.y1 },
+                {
+                    x: actionbarOffset.x + paddingOffset.x,
+                    y: actionbarOffset.y + paddingOffset.y,
+                }
+            );
+            const itemPath = `${path}/${i}`;
+
+            let children: ActionbarButton[] = [];
+            if (!!actionbarItem.children && actionbarItem.children.length > 0) {
+                const childrenAnchor = this.calculateChildAnchor(
+                    size.x,
+                    size.y,
+                    axis,
+                    alignment
+                );
+
+                children = this.layoutActionItems(
+                    actionbarItem.children,
+                    layoutContext,
+                    width,
+                    height,
+                    {
+                        x: childrenAnchor.x + position.x,
+                        y: childrenAnchor.y + position.y,
+                    },
+                    zeroPoint(),
+                    alignment,
+                    invertAxis(axis),
+                    itemPath,
+                    level + 1
+                );
+            }
+
+            const textSize = layoutContext.measureText(
+                actionbarItem.text,
+                subTitleTextStyle
+            );
+            const textOffset = (size.x - Math.min(textSize.width, size.x)) / 2;
+            const isPathOfSelected =
+                this.selectedPath != "" &&
+                itemPath.startsWith(this.selectedPath);
+
+            const button: ActionbarButton = {
+                width: size.x,
+                heigth: size.y,
+                text: actionbarItem.text,
+                textOffset: textOffset,
+                onClick: actionbarItem.onClick,
+                visible: level == 0 || isPathOfSelected,
+                path: itemPath,
+                position,
+                children,
+            };
+
+            buttons.push(button);
+        }
+
+        return buttons;
+    }
+
+    /**
+     * Measure a single level of actionbar items, will be used to detect overflow
+     * @param layoutContext
+     * @param items
+     * @param orientation
+     * @returns
+     */
+    private layoutSingleActionbar(
+        layoutContext: UILayoutContext,
+        items: UIActionbarItem[],
+        orientation: Axis
+    ): SingleActionbarLayout {
+        let totalWidth = 0;
+        let totalHeight = 0;
+        let boundaries: Bounds[] = [];
+        if (orientation == Axis.XAxis) {
+            totalHeight = 72;
+            for (const item of items) {
+                const x1 = totalWidth;
+                totalWidth += actionbarWidth;
+                const x2 = totalWidth;
+                boundaries.push({
+                    x1,
+                    x2,
+                    y1: 0,
+                    y2: totalHeight,
+                });
+            }
+        } else {
+            totalWidth = actionbarWidth;
+            for (const item of items) {
+                const y1 = totalHeight;
+                totalHeight += 72;
+                const y2 = totalHeight;
+                boundaries.push({
+                    x1: 0,
+                    x2: totalWidth,
+                    y1,
+                    y2,
+                });
+            }
+        }
+
+        return {
+            totalWidth,
+            totalHeight,
+            boundaries,
+        };
+    }
+
+    private calculateChildAnchor(
+        width: number,
+        height: number,
+        axis: Axis,
+        alignment: ActionbarAlignment
+    ): Point {
+        if (axis == Axis.XAxis) {
+            return {
+                x: width / 2,
+                y: 0,
+            };
+        } else {
+            if (alignment == ActionbarAlignment.Left) {
+                return {
+                    x: width,
+                    y: height / 2,
+                };
+            } else {
+                return {
+                    x: 0,
+                    y: height / 2,
+                };
+            }
+        }
+    }
+
+    private calculateAnchorOffset(
+        anchor: Point,
+        anchorAlignment: ActionbarAnchorAlignment,
+        constraintsWidth: number,
+        constraintsHeight: number,
+        actionBarWidth: number,
+        actionBarHeight: number
+    ): Point {
+        if (anchorAlignment == ActionbarAnchorAlignment.Left) {
+            return {
+                x: anchor.x,
+                y: anchor.y - actionBarHeight,
+            };
+        } else if (anchorAlignment == ActionbarAnchorAlignment.Right) {
+            return {
+                x: anchor.x - actionBarWidth,
+                y: anchor.y - actionBarHeight,
+            };
+        } else if (anchorAlignment == ActionbarAnchorAlignment.Bottom) {
+            return {
+                x: anchor.x - actionBarWidth / 2,
+                y: anchor.y - actionBarHeight,
+            };
+        }
+
+        return zeroPoint();
+    }
+
+    private checkForTapOnButton(
+        point: Point,
+        buttons: ActionbarButton[]
+    ): boolean {
+        for (const button of buttons) {
+            if (
+                withinRectangle(
+                    point,
+                    button.position.x,
+                    button.position.y,
+                    button.position.x + button.width,
+                    button.position.y + button.heigth
+                )
+            ) {
+                let handled = false;
+                if (!!button.onClick) {
+                    button.onClick();
+                    handled = true;
+                    this.selectedPath = "";
+                }
+
+                if (button.children.length > 0) {
+                    if (this.selectedPath == button.path) {
+                        this.selectedPath = "";
+                    } else {
+                        this.selectedPath = button.path;
+                    }
+                    handled = true;
+                }
+
+                return handled;
+            }
+
+            if (button.children.length > 0) {
+                const childTapResult = this.checkForTapOnButton(
+                    point,
+                    button.children
+                );
+                if (childTapResult) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Request to layout the content view
+     * @param layoutContext the UI context for layouting
+     * @param paddedConstraints constraints minus padding and actionbar height
+     */
+    private layoutContentView(
+        layoutContext: UILayoutContext,
+        constraints: UISize
+    ) {
+        this.contentView.layout(layoutContext, constraints);
 
         this.contentView.offset = {
             x: this._sides.left,
             y: this._sides.top,
         };
-
-        return this._measuredSize;
     }
-    override draw(context: UIRenderContext): void {
-        this.contentView.draw(context);
-        if (this._leftActionbar.children.length > 0) {
-            this._leftActionbar.draw(context);
-        }
-        if (this._rightActionbar.children.length > 0) {
-            this._rightActionbar.draw(context);
-        }
+}
 
-        if (this._leftExpandedMenu.length > 0) {
-            this._leftExpandedMenuColumn.draw(context);
-        }
+const actionbarWidth = 80;
 
-        if (this._rightExpandedMenu.length > 0) {
-            this._rightExpandedMenuColumn.draw(context);
-        }
+function getActionbarAlignment(
+    alignment: ActionbarAlignment,
+    axis: Axis
+): ActionbarAnchorAlignment {
+    if (axis == Axis.YAxis) {
+        return ActionbarAnchorAlignment.Bottom;
+    } else if (alignment == ActionbarAlignment.Left) {
+        return ActionbarAnchorAlignment.Left;
+    } else {
+        return ActionbarAnchorAlignment.Right;
     }
+}
 
-    private createActionbar(
-        items: UIActionbarItem[],
-        alignment: UIActionbarAlignment
-    ): UIActionbar {
-        return new UIActionbar(
-            items,
-            new SpriteBackground(sprites2.stone_slate_background_2x),
-            alignment,
-            {
-                width: wrapUiSize,
-                height: wrapUiSize,
-            }
-        );
-    }
+enum ActionbarAlignment {
+    Left,
+    Right,
+}
 
-    private setExpandedMenu(menu: UIColumn, items: UIActionbarItem[]) {
-        const buttons = items.map((item) => {
-            return new UIActionbarButton(item, background);
-        });
+enum ActionbarAnchorAlignment {
+    Left,
+    Right,
+    Bottom,
+}
 
-        menu.clearViews();
-        for (const button of buttons) {
-            menu.addView(button);
-        }
-    }
+interface ActionbarButton {
+    width: number;
+    heigth: number;
+    text: string;
+    position: Point;
+    textOffset: number;
+    children: ActionbarButton[];
+    onClick?: () => void;
+    visible: boolean;
+    path: string;
+}
+
+interface SingleActionbarLayout {
+    totalWidth: number;
+    totalHeight: number;
+    boundaries: Bounds[];
 }
