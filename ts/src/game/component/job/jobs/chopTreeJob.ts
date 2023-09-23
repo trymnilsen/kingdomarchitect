@@ -10,7 +10,7 @@ import { assertEntityComponent } from "../../entityComponent.js";
 import { Job } from "../job.js";
 
 type ChopTreeBundle = {
-    entityId: string;
+    targetEntityId: string;
 };
 
 /**
@@ -35,7 +35,7 @@ export class ChopTreeJob extends Job<ChopTreeBundle> {
     static createInstance(tree: TreeComponent) {
         const instance = new ChopTreeJob();
         instance.bundle = {
-            entityId: tree.entity.id,
+            targetEntityId: tree.entity.id,
         };
         return instance;
     }
@@ -79,6 +79,9 @@ export class ChopTreeJob extends Job<ChopTreeBundle> {
     }
 
     override onDraw(renderContext: RenderContext) {
+        if (!this._target) {
+            return;
+        }
         assertEntity(this._target);
         const worldSpacePosition = renderContext.camera.tileSpaceToWorldSpace(
             this._target.worldPosition
@@ -93,15 +96,14 @@ export class ChopTreeJob extends Job<ChopTreeBundle> {
     }
 
     protected override onPersistJobState(): ChopTreeBundle {
-        assertEntity(this._target);
         return {
-            entityId: this._target?.id,
+            targetEntityId: this.bundle!.targetEntityId,
         };
     }
     protected override onFromPersistedState(bundle: ChopTreeBundle): void {
         const entityWithId = this.entity
             .getRootEntity()
-            .findEntity(bundle.entityId);
+            .findEntity(bundle.targetEntityId);
 
         assertEntity(entityWithId);
 

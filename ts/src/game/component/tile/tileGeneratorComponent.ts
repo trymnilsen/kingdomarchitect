@@ -87,7 +87,7 @@ export class TileGeneratorComponent extends StatelessComponent {
                     y: unlockableChunk.chunkY,
                 }
             );
-            const cost = Math.min(999, Math.pow(2, distance + 1));
+            const cost = Math.min(64, Math.pow(2, distance + 1));
 
             const tileset = this.getTileSet(tileComponent, unlockableChunk);
 

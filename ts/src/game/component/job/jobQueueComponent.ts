@@ -52,11 +52,16 @@ export class JobQueueComponent
 
     removeJob(job: Job): void {
         const filteredList = this._pendingJobs.filter((scheduledJob) => {
-            scheduledJob.job !== job;
+            return scheduledJob.job !== job;
         });
 
-        if (filteredList.length == this._pendingJobs.length) {
+        const itemsRemoved = this._pendingJobs.length - filteredList.length;
+        if (itemsRemoved == 0) {
             console.warn("Job not removed, was not in list", job);
+        }
+
+        if (itemsRemoved > 1) {
+            console.warn("More than one item removed, this is probably a bug");
         }
 
         this._pendingJobs = filteredList;
