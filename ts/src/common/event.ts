@@ -6,7 +6,7 @@ export class Event<T = object> implements EventListener<T> {
     private nextListenersId = 0;
     private listeners: { [id: string]: EventSubscriptionHandler<T> } = {};
 
-    public listen(subscriber: EventSubscriptionHandler<T>): EventHandle {
+    listen(subscriber: EventSubscriptionHandler<T>): EventHandle {
         const listnerId = this.nextListenersId + 1;
         this.listeners[listnerId] = subscriber;
         return () => {
@@ -14,7 +14,7 @@ export class Event<T = object> implements EventListener<T> {
         };
     }
 
-    public listenOnce(subscriber: EventSubscriptionHandler<T>): EventHandle {
+    listenOnce(subscriber: EventSubscriptionHandler<T>): EventHandle {
         const handle = this.listen((data) => {
             // Remove the listener after the first value
             handle();
@@ -23,7 +23,7 @@ export class Event<T = object> implements EventListener<T> {
         return handle;
     }
 
-    public publish(data: T): void {
+    publish(data: T): void {
         Object.values(this.listeners).forEach((listener, idx) => {
             try {
                 listener(data);
@@ -39,7 +39,7 @@ export class Event<T = object> implements EventListener<T> {
     /**
      * Dispose the event, removing all listeners
      */
-    public dispose(): void {
+    dispose(): void {
         this.listeners = {};
     }
 }
@@ -96,11 +96,11 @@ export class ForwardEvent<T> implements EventListener<T> {
         this._listenable = new Event<T>();
     }
 
-    public listen(subscriber: EventSubscriptionHandler<T>): EventHandle {
+    listen(subscriber: EventSubscriptionHandler<T>): EventHandle {
         return this._listenable.listen(subscriber);
     }
 
-    public listenOnce(subscriber: EventSubscriptionHandler<T>): EventHandle {
+    listenOnce(subscriber: EventSubscriptionHandler<T>): EventHandle {
         return this._listenable.listenOnce(subscriber);
     }
 
@@ -108,7 +108,7 @@ export class ForwardEvent<T> implements EventListener<T> {
      * Update the source event we are listening to and forwarding
      * @param event the event instance we are fowarding
      */
-    public setSource(event: Event<T>) {
+    setSource(event: Event<T>) {
         //Clear the current source before setting a new one
         this.clearSource();
         this._sourceHandle = event.listen((data) => {
@@ -120,7 +120,7 @@ export class ForwardEvent<T> implements EventListener<T> {
      * Clear the set source event we are listening on.
      * Removing listeners for it.
      */
-    public clearSource() {
+    clearSource() {
         if (this._sourceHandle != null) {
             this._sourceHandle();
         }
@@ -129,7 +129,7 @@ export class ForwardEvent<T> implements EventListener<T> {
     /**
      * Dispose the forward event, this will remove all listeners.
      */
-    public dispose(): void {
+    dispose(): void {
         this.clearSource();
         this._listenable.dispose();
     }

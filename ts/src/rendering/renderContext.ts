@@ -36,28 +36,28 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
     /**
      * The currently active camera for the render context
      */
-    public get camera(): Camera {
+    get camera(): Camera {
         return this._camera;
     }
 
     /**
      * The width of the canvas the context is drawing to
      */
-    public get width(): number {
+    get width(): number {
         return this._width;
     }
 
     /**
      * The height of the canvas the context is drawing to
      */
-    public get height(): number {
+    get height(): number {
         return this._height;
     }
 
     /**
      * The loader for assets like sprites and fonts
      */
-    public get assetLoader(): AssetLoader {
+    get assetLoader(): AssetLoader {
         return this._assetLoader;
     }
 

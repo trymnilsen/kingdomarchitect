@@ -11,9 +11,9 @@ export class HealthEvent extends ComponentEvent<HealthComponent> {
      * @param sourceComponent the healthComponent the event happend on
      */
     constructor(
-        public readonly oldHealth: number,
-        public readonly newHealth: number,
-        public readonly causeEntity: Entity | null,
+        readonly oldHealth: number,
+        readonly newHealth: number,
+        readonly causeEntity: Entity | null,
         sourceComponent: HealthComponent
     ) {
         super(sourceComponent);

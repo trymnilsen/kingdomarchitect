@@ -14,11 +14,11 @@ export class FixedGraph implements Graph {
     private _offsetX: number = 0;
     private _offsetY: number = 0;
 
-    public get offsetX(): number {
+    get offsetX(): number {
         return this._offsetX;
     }
 
-    public get offsetY(): number {
+    get offsetY(): number {
         return this._offsetY;
     }
 

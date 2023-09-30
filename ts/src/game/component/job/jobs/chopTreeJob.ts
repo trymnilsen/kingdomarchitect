@@ -28,7 +28,7 @@ export class ChopTreeJob extends Job<ChopTreeBundle> {
             sprite: sprites2.swipe_effect,
         });
 
-    public get target(): Readonly<Entity | null> {
+    get target(): Readonly<Entity | null> {
         return this._target;
     }
 

@@ -28,7 +28,7 @@ export abstract class InteractionState {
     /**
      * Retrieve the currently set root view of the this state
      */
-    public get view(): UIView | null {
+    get view(): UIView | null {
         return this._view;
     }
     /**
@@ -46,7 +46,7 @@ export abstract class InteractionState {
      * components useful to a state.
      * Set after the constructor has run, but before the first onActive call.
      */
-    public get context(): StateContext {
+    get context(): StateContext {
         if (!this._context) {
             throw Error("State context is not set");
         }
@@ -56,7 +56,7 @@ export abstract class InteractionState {
     /**
      * Sets the context for this state
      */
-    public set context(v: StateContext) {
+    set context(v: StateContext) {
         this._context = v;
     }
 

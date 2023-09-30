@@ -2,7 +2,7 @@ import { Point } from "../../../../../common/point.js";
 import { BuildMode, BuildModeDescription } from "./buildMode.js";
 
 export class BoxBuildMode implements BuildMode {
-    public get description(): BuildModeDescription {
+    get description(): BuildModeDescription {
         return boxBuildModeDescription;
     }
 

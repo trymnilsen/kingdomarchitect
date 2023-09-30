@@ -30,11 +30,11 @@ export class AggroComponent extends EntityComponent<AggroComponentBundle> {
     //the entity
     private damage: number = 0;
 
-    public get aggroMode(): AggroMode {
+    get aggroMode(): AggroMode {
         return this._aggroMode;
     }
 
-    public set aggroMode(v: AggroMode) {
+    set aggroMode(v: AggroMode) {
         this._aggroMode = v;
     }
 

@@ -24,7 +24,7 @@ export class BuildingComponent extends EntityComponent<BuildingComponentBundle> 
     private _building: Building = nullBuilding;
     private isScaffolded: boolean = true;
 
-    public get building(): Readonly<Building> {
+    get building(): Readonly<Building> {
         return this._building;
     }
 

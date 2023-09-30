@@ -32,9 +32,15 @@ jobs:
     steps:
       - name: Compile the source
         run: echo compile placeholder
+  minify:
+    runs-on: ubuntu-latest
+    needs: bundle
+    steps:
+      - name: Compile the source
+        run: echo compile placeholder
   deploy-preview:
     runs-on: ubuntu-latest
-    needs: [compile, bundle, lint, test, check-format]
+    needs: [minify, lint, test, check-format]
     steps:
       - name: Compile the source
         run: echo compile placeholder

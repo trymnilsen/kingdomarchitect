@@ -42,7 +42,7 @@ export class PathFindingComponent extends StatelessComponent {
         this.chunkMapEventListener?.dispose();
     }
 
-    public findPath(
+    findPath(
         from: Point,
         to: Point,
         blockBuildings?: boolean,
@@ -117,7 +117,7 @@ export class PathFindingComponent extends StatelessComponent {
         }
     }
 
-    public invalidateGraphPoint(point: Point) {
+    invalidateGraphPoint(point: Point) {
         if (!this.pathSearch) {
             throw new Error("Cannot invalidate point, pathsearch is null");
         }

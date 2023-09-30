@@ -14,7 +14,7 @@ export class CommitableInteractionStateChanger
 {
     private operations: StateOperation[] = [];
 
-    public get hasOperations(): boolean {
+    get hasOperations(): boolean {
         return this.operations.length > 0;
     }
 

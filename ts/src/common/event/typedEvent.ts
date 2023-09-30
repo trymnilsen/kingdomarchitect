@@ -27,7 +27,7 @@ export class TypedEvent<TBaseEvent> {
      * @param subscriber the callback to invoke when an event is published
      * @returns a handle that can be used to dispose the subscription
      */
-    public listen<TEventFilter extends TBaseEvent>(
+    listen<TEventFilter extends TBaseEvent>(
         filterType: ConstructorFunction<TEventFilter>,
         subscriber: EventSubscriptionHandler<TEventFilter>,
     ): TypedEventHandle {
@@ -50,7 +50,7 @@ export class TypedEvent<TBaseEvent> {
      * will be used to select the applicable subscribers
      * @param data The data to publish to subscriber
      */
-    public publish(data: TBaseEvent) {
+    publish(data: TBaseEvent) {
         const typeName = Object.getPrototypeOf(data)?.constructor?.name;
         if (!typeName) {
             throw new InvalidArgumentError("Data had no constructor name");
@@ -71,7 +71,7 @@ export class TypedEvent<TBaseEvent> {
      * Remove a subscriber for the list of listeners
      * @param handleId the id of the subscription to remove
      */
-    public removeListener(handleId: string) {
+    removeListener(handleId: string) {
         this.subscriptions = this.subscriptions.filter((item) => {
             item.handleId != handleId;
         });
@@ -90,7 +90,7 @@ export class TypedEvent<TBaseEvent> {
 export class TypedEventHandle {
     constructor(private disposeHandle: () => void) {}
 
-    public dispose() {
+    dispose() {
         this.disposeHandle();
     }
 }

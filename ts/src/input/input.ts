@@ -13,7 +13,7 @@ export class Input {
     private _currentInputType: InputType;
     private events: Event<InputEvent>;
     private keyboard: Keyboard;
-    public constructor() {
+    constructor() {
         this._currentInputType = InputType.Keyboard;
         this.events = new Event();
         this.keyboard = new Keyboard();
@@ -24,13 +24,13 @@ export class Input {
             });
         });
     }
-    public dispose() {
+    dispose() {
         this.keyboard.dispose();
     }
-    public get onInput(): EventListener<InputEvent> {
+    get onInput(): EventListener<InputEvent> {
         return this.events;
     }
-    public get currentInputType(): InputType {
+    get currentInputType(): InputType {
         return this._currentInputType;
     }
 }

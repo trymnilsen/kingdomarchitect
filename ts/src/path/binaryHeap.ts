@@ -2,7 +2,7 @@ export class BinaryHeap<T> {
     private content: T[];
     private scoreFunction: (item: T) => number;
 
-    public get size(): number {
+    get size(): number {
         return this.content.length;
     }
 

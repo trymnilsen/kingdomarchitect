@@ -12,11 +12,11 @@ export class Camera {
         };
     }
 
-    public get position(): Point {
+    get position(): Point {
         return this._position;
     }
 
-    public set position(point: Point) {
+    set position(point: Point) {
         this._position = {
             x: Math.floor(point.x),
             y: Math.floor(point.y),

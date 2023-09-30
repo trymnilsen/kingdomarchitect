@@ -32,7 +32,7 @@ export class TilesComponent
     private tileMap: TileMap = {};
     private _chunkMap: GroundChunkMap = {};
 
-    public get chunkMap(): Readonly<{ [id: string]: Readonly<GroundChunk> }> {
+    get chunkMap(): Readonly<{ [id: string]: Readonly<GroundChunk> }> {
         return this._chunkMap;
     }
 

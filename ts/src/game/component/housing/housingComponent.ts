@@ -20,7 +20,7 @@ export class HousingComponent extends EntityComponent<HousingBundle> {
     private startTime = 0;
     private _residentEntityId: string | null = null;
 
-    public get residentEntityId(): string | null {
+    get residentEntityId(): string | null {
         return this._residentEntityId;
     }
 

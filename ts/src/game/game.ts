@@ -21,7 +21,7 @@ export class Game {
     private currentTick: number = 0;
     private world: Entity;
     private gamePersister: GamePersister;
-    public constructor(domElementWrapperSelector: string) {
+    constructor(domElementWrapperSelector: string) {
         // Get the canvas
         const canvasElement: HTMLCanvasElement | null = document.querySelector(
             `#${domElementWrapperSelector}`

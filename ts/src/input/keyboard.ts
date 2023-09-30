@@ -7,16 +7,16 @@ export class Keyboard {
     private keyboardMap: KeyboardMap;
     private _keyEvent: Event<InputAction>;
 
-    public constructor() {
+    constructor() {
         this.keyboardMap = getKeyboardMap();
         this._keyEvent = new Event();
         window.addEventListener("keydown", this.onKeyPress);
     }
-    public dispose() {
+    dispose() {
         this._keyEvent.dispose();
     }
 
-    public get keyEvent(): EventListener<InputAction> {
+    get keyEvent(): EventListener<InputAction> {
         return this._keyEvent;
     }
 

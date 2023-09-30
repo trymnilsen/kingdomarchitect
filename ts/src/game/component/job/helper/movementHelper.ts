@@ -10,15 +10,15 @@ export class MovementHelper {
     private _entity: Entity | null = null;
     private _currentMovement: PathMovement | null = null;
 
-    public get currentMovement(): PathMovement | null {
+    get currentMovement(): PathMovement | null {
         return this._currentMovement;
     }
 
-    public set currentMovement(v: PathMovement | null) {
+    set currentMovement(v: PathMovement | null) {
         this._currentMovement = v;
     }
 
-    public get entity(): Entity {
+    get entity(): Entity {
         if (!this._entity) {
             throw new Error("Entity is not set for movement helper");
         }
@@ -26,7 +26,7 @@ export class MovementHelper {
         return this._entity;
     }
 
-    public set entity(v: Entity) {
+    set entity(v: Entity) {
         this._entity = v;
     }
 
@@ -39,7 +39,7 @@ export class MovementHelper {
      * @returns true if a movement was made, false if there was nowhere to go (
      * for example if the entity is stuck, adjacent or on top of the target)
      */
-    public pathTowards(
+    pathTowards(
         target: Point,
         _stopAtAdjacent: boolean = true,
     ): boolean {

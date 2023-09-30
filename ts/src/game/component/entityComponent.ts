@@ -9,7 +9,7 @@ export abstract class EntityComponent<
 > {
     private _entity?: Entity;
 
-    public get entity(): Entity {
+    get entity(): Entity {
         if (!this._entity) {
             throw new Error("No entity available for component");
         }
@@ -17,7 +17,7 @@ export abstract class EntityComponent<
         return this._entity;
     }
 
-    public set entity(value: Entity) {
+    set entity(value: Entity) {
         this._entity = value;
     }
 

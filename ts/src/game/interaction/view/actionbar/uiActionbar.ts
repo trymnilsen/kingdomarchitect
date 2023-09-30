@@ -30,7 +30,7 @@ export class UIActionbar extends UIView {
         this.updateItems(items);
     }
 
-    public updateItems(items: UIActionbarItem[]) {
+    updateItems(items: UIActionbarItem[]) {
         this.clearViews();
         this.items = items;
         const views = this.items.map((item) => {

@@ -12,7 +12,7 @@ export type LoadedItems = {
 export class GamePersister {
     private entityPersister: EntityPersister = new EntityPersister();
 
-    public get hasSaveData(): boolean {
+    get hasSaveData(): boolean {
         return window.localStorage.length > 0;
     }
 

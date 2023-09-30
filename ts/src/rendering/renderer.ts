@@ -10,11 +10,11 @@ export class Renderer {
     private renderContext: RenderContext;
     private gameTime: GameTime;
 
-    public get camera(): Camera {
+    get camera(): Camera {
         return this.currentCamera;
     }
 
-    public get context(): RenderContext {
+    get context(): RenderContext {
         return this.renderContext;
     }
 

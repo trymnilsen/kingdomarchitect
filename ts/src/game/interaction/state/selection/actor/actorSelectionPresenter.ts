@@ -27,7 +27,7 @@ export class ActorSelectionPresenter implements StatePresenter {
     private expandedMenu: UIColumn;
     private expandedMenuPadding: UIBox;
 
-    public get root(): UIView {
+    get root(): UIView {
         return this.scaffold;
     }
 

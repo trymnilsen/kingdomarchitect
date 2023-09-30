@@ -8,15 +8,15 @@ import { UIView } from "./uiView.js";
  * addView and removeView methods itself.
  */
 export abstract class UIViewGroup extends UIView {
-    public override addView(view: UIView) {
+    override addView(view: UIView) {
         super.addView(view);
     }
 
-    public override removeView(view: UIView) {
+    override removeView(view: UIView) {
         super.removeView(view);
     }
 
-    public override clearViews(): void {
+    override clearViews(): void {
         super.clearViews();
     }
 }

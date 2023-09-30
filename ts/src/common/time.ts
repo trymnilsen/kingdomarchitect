@@ -32,19 +32,19 @@ export class MutableGameTime implements GameTime {
         TimeOfDay.Night,
     ];
 
-    public get fractionalTimeOfDay(): number {
+    get fractionalTimeOfDay(): number {
         return this._fractionalTimeOfDay;
     }
 
-    public get nextTimeOfDay(): TimeOfDay[] {
+    get nextTimeOfDay(): TimeOfDay[] {
         return this._nextTimeOfDay;
     }
 
-    public get tick(): number {
+    get tick(): number {
         return this._currentTick;
     }
 
-    public updateTick(tick: number) {
+    updateTick(tick: number) {
         this._currentTick = tick;
         this._fractionalTimeOfDay = (tick % 64) / 64;
         this._nextTimeOfDay = this.generateNextTimeOfDay();

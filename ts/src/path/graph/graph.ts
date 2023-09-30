@@ -30,19 +30,19 @@ export class GraphNode {
     parent: GraphNode | null;
     isDirty: boolean;
 
-    public get x(): number {
+    get x(): number {
         return this._x;
     }
 
-    public get y(): number {
+    get y(): number {
         return this._y;
     }
 
-    public get weight(): number {
+    get weight(): number {
         return this._weight;
     }
 
-    public get isWall(): boolean {
+    get isWall(): boolean {
         return this.weight == 0;
     }
 

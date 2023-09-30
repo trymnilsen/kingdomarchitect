@@ -41,13 +41,13 @@ export class Entity {
      * Returns the parent entity of this entity, can be null if this is the root
      * entity or if the entity is not attached to the entity tree
      */
-    public get parent(): Entity | undefined {
+    get parent(): Entity | undefined {
         return this._parent;
     }
     /**
      * Set the parent for this entity
      */
-    public set parent(entity: Entity | undefined) {
+    set parent(entity: Entity | undefined) {
         this._parent = entity;
     }
 
@@ -58,21 +58,21 @@ export class Entity {
      * itself is attached to the game tree or if it is a detached or
      * independent tree that has not been added yet.
      */
-    public get isGameRoot(): boolean {
+    get isGameRoot(): boolean {
         return this._isGameRoot;
     }
 
     /**
      * Returns the position of this entity locally in its own space
      */
-    public get position(): Point {
+    get position(): Point {
         return this._localPosition;
     }
 
     /**
      * Set the position of this entity locally in its own space
      */
-    public set position(position: Point) {
+    set position(position: Point) {
         this._localPosition = position;
         this.updateTransform();
     }
@@ -80,7 +80,7 @@ export class Entity {
     /**
      * Return the postion of this entity express as its world position
      */
-    public get worldPosition(): Point {
+    get worldPosition(): Point {
         return this._worldPosition;
     }
 
@@ -89,7 +89,7 @@ export class Entity {
      * Will update its local position to be offset the parent to achieve
      * the wanted world position
      */
-    public set worldPosition(position: Point) {
+    set worldPosition(position: Point) {
         this._worldPosition = position;
         if (this.parent) {
             this._localPosition = subtractPoint(
@@ -106,26 +106,26 @@ export class Entity {
      * Returns a readonly list of the child entities of this entity.
      * To add or remove children use the `addChild` or `removeChild` methods
      */
-    public get children(): readonly Entity[] {
+    get children(): readonly Entity[] {
         return this._children;
     }
 
-    public get entityEvents(): EventListener<EntityEvent> {
+    get entityEvents(): EventListener<EntityEvent> {
         return this._entityEvents;
     }
 
-    public get componentEvents(): TypedEvent<ComponentEvent<EntityComponent>> {
+    get componentEvents(): TypedEvent<ComponentEvent<EntityComponent>> {
         return this._componentEvents;
     }
 
-    public get components(): EntityComponent[] {
+    get components(): EntityComponent[] {
         return this._components;
     }
 
     /**
      * Set if this entity is the root of the entity tree
      */
-    public toggleIsGameRoot(value: boolean) {
+    toggleIsGameRoot(value: boolean) {
         if (value == this._isGameRoot) {
             return;
         }
@@ -151,7 +151,7 @@ export class Entity {
      * Add a entity to this entity
      * @param entity the entity to add
      */
-    public addChild(entity: Entity, index: number | null = null) {
+    addChild(entity: Entity, index: number | null = null) {
         if (entity === this) {
             throw new InvalidArgumentError("Cannot add self as a child");
         }
@@ -190,7 +190,7 @@ export class Entity {
      * @param entity the entity to remove
      * @returns if the entity was removed successfully
      */
-    public removeChild(entity: Entity): boolean {
+    removeChild(entity: Entity): boolean {
         if (!entity.parent) {
             throw new InvalidArgumentError("Child does not have a parent");
         }
@@ -212,7 +212,7 @@ export class Entity {
     /**
      * Remove the entity from the child list of the parent if any
      */
-    public remove(): void {
+    remove(): void {
         if (this.parent) {
             this.parent.removeChild(this);
         }
@@ -223,7 +223,7 @@ export class Entity {
      * if no parent is defined for this entity, this entity is returned
      * @returns the entity at the end of the parent chain
      */
-    public getRootEntity(): Entity {
+    getRootEntity(): Entity {
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         let root: Entity | undefined = this;
         while (root?._parent) {
@@ -235,14 +235,14 @@ export class Entity {
         return root!;
     }
 
-    public findEntity(id: string): Entity | null {
+    findEntity(id: string): Entity | null {
         return entityWithId(this, id);
     }
 
     /**
      * Check if this entity is attached to a live entity tree
      */
-    public isAttached(): boolean {
+    isAttached(): boolean {
         if (this._parent) {
             return this._parent.isAttached();
         } else {
@@ -254,7 +254,7 @@ export class Entity {
      * Add a component to the entity
      * @param entityComponent
      */
-    public addComponent(entityComponent: EntityComponent) {
+    addComponent(entityComponent: EntityComponent) {
         const componentName =
             Object.getPrototypeOf(entityComponent).constructor.name;
 
@@ -278,7 +278,7 @@ export class Entity {
      * @param entityComponent the component to remove
      * @returns true if the removal was successful
      */
-    public removeComponent(entityComponent: EntityComponent): boolean {
+    removeComponent(entityComponent: EntityComponent): boolean {
         const componentName = this.getComponentName(entityComponent);
         if (this._componentsMap[componentName]) {
             delete this._componentsMap[componentName];
@@ -304,7 +304,7 @@ export class Entity {
      * @param filterType the type of the component to get
      * @returns the component if it exists or null
      */
-    public getComponent<TFilter extends EntityComponent>(
+    getComponent<TFilter extends EntityComponent>(
         filterType: ConstructorFunction<TFilter>,
     ): TFilter | null {
         const componentId = filterType.name;
@@ -325,7 +325,7 @@ export class Entity {
      * @param filterType the type of the component to get
      * @returns the component on the entity of this type
      */
-    public requireComponent<TFilter extends EntityComponent>(
+    requireComponent<TFilter extends EntityComponent>(
         filterType: ConstructorFunction<TFilter>,
     ): TFilter {
         const component = this.getComponent(filterType);
@@ -344,7 +344,7 @@ export class Entity {
      * @see getComponent
      * @param filterType the type of the component to get
      */
-    public getAncestorComponent<TFilter extends EntityComponent>(
+    getAncestorComponent<TFilter extends EntityComponent>(
         filterType: ConstructorFunction<TFilter>,
     ): TFilter | null {
         // eslint-disable-next-line @typescript-eslint/no-this-alias
@@ -368,7 +368,7 @@ export class Entity {
      * needs a consistent update cycle should be called in onUpdate
      * @param renderContext the context used to render anything to the canvas
      */
-    public onDraw(renderContext: RenderContext) {
+    onDraw(renderContext: RenderContext) {
         if (this._components.length > 0) {
             //Calculating the screen position once for components
             const screenPosition = renderContext.camera.tileSpaceToScreenSpace(
@@ -388,7 +388,7 @@ export class Entity {
      * Request that the entity runs its onUpdate for components and children
      * @param tick the current game time tick
      */
-    public onUpdate(tick: number) {
+    onUpdate(tick: number) {
         for (const component of this._components) {
             component.onUpdate(tick);
         }
@@ -403,7 +403,7 @@ export class Entity {
      * The world position is calculated based on the parent position and this
      * entity's local position
      */
-    public updateTransform() {
+    updateTransform() {
         if (this.parent) {
             // If there is a parent, add its world position to the
             // local position, to get this entitys new world position
@@ -426,9 +426,9 @@ export class Entity {
         }
     }
 
-    public publishComponentEvent() {}
+    publishComponentEvent() {}
 
-    public bubbleEvent(event: EntityEvent) {
+    bubbleEvent(event: EntityEvent) {
         this._entityEvents.publish(event);
         this._parent?.bubbleEvent(event);
     }

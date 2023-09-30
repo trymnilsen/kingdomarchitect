@@ -23,19 +23,19 @@ export class JobRunnerComponent
     private jobStack: Job[] = [];
     private _isOpenForExternalJobs = true;
 
-    public get activeJob(): Job | undefined {
+    get activeJob(): Job | undefined {
         return this.jobStack[this.jobStack.length - 1];
     }
 
-    public get hasActiveJob(): boolean {
+    get hasActiveJob(): boolean {
         return !!this.activeJob;
     }
 
-    public get isOpenForExternalJobs(): boolean {
+    get isOpenForExternalJobs(): boolean {
         return this._isOpenForExternalJobs;
     }
 
-    public set isOpenForExternalJobs(value: boolean) {
+    set isOpenForExternalJobs(value: boolean) {
         this._isOpenForExternalJobs = value;
     }
 

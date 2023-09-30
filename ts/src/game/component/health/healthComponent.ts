@@ -24,11 +24,11 @@ export class HealthComponent extends EntityComponent<HealthBundle> {
     /*
      * Returns the health as a percentage between 0.0 and 1.0
      */
-    public get healthPercentage(): number {
+    get healthPercentage(): number {
         return this._health / this._maxHealth;
     }
 
-    public get health(): number {
+    get health(): number {
         return this._health;
     }
 

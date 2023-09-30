@@ -5,7 +5,7 @@ export class Completer<T> {
     private rejectedEvent: Event<unknown>;
     private _promise: Promise<T>;
 
-    public get promise(): Promise<T> {
+    get promise(): Promise<T> {
         return this._promise;
     }
 

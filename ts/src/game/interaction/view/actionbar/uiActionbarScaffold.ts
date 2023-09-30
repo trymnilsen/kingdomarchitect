@@ -27,14 +27,14 @@ export class UIActionbarScaffold extends UIView {
     /**
      * Get the padding for the content and action bar
      */
-    public get sides(): Sides {
+    get sides(): Sides {
         return this._sides;
     }
 
     /**
      * Set the padding for the content and action bar
      */
-    public set sides(value: Sides) {
+    set sides(value: Sides) {
         this._sides = value;
     }
 

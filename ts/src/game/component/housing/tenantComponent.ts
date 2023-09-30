@@ -8,11 +8,11 @@ type TenantBundle = {
 export class TenantComponent extends EntityComponent<TenantBundle> {
     private _houseEntityId: string | null = null;
 
-    public get houseEntityId(): string | null {
+    get houseEntityId(): string | null {
         return this._houseEntityId;
     }
 
-    public set houseEntityId(v: string | null) {
+    set houseEntityId(v: string | null) {
         this._houseEntityId = v;
     }
 

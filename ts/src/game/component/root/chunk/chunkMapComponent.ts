@@ -26,7 +26,7 @@ export class ChunkMapComponent extends StatelessComponent {
     private entityChunks: { [entityId: string]: string } = {};
     private entityEventHandle: EventHandle | null = null;
 
-    public getEntityAt(worldPosition: Point): Entity[] {
+    getEntityAt(worldPosition: Point): Entity[] {
         const position = getChunkPosition(worldPosition);
         // We include any adjacent chunks to get any entitys that has bounds
         // stretching into the chunk of the position but has a world position
