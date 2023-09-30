@@ -145,7 +145,7 @@ export abstract class Job<T extends JSONValue = {}> {
         this._entity = entity;
     }
 
-    public get isSuspendable(): Boolean {
+    public get isSuspendable(): boolean {
         return false;
     }
 
@@ -171,7 +171,7 @@ export abstract class Job<T extends JSONValue = {}> {
     fromJobBundle(bundle: JobBundle<T>): void {
         this._jobState = bundle.jobState;
         this._bundle = bundle.data;
-        if (!!bundle.movement) {
+        if (bundle.movement) {
             this.movement.currentMovement = bundle.movement;
         }
         this.onFromPersistedState(bundle.data);

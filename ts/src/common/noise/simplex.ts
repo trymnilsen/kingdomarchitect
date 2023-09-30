@@ -60,10 +60,10 @@ const noise2D = (tables: PermTables, x: number, y: number): number => {
         n1 = 0.0,
         n2 = 0.0;
     // Skew the input space to determine which simplex cell we're in
-    var s = (x + y) * F2; // Hairy factor for 2D
-    var i = Math.floor(x + s);
-    var j = Math.floor(y + s);
-    var t = (i + j) * G2;
+    const s = (x + y) * F2; // Hairy factor for 2D
+    const i = Math.floor(x + s);
+    const j = Math.floor(y + s);
+    const t = (i + j) * G2;
     // Unskew the cell origin back to (x, y) space
     const x00 = i - t;
     const y00 = j - t;
@@ -252,7 +252,7 @@ const noise3D = (
     }
     let t3 = 0.6 - x3 * x3 - y3 * y3 - z3 * z3;
     if (t3 >= 0) {
-        var gi3 = permMod12[ii + 1 + perm[jj + 1 + perm[kk + 1]]] * 3;
+        const gi3 = permMod12[ii + 1 + perm[jj + 1 + perm[kk + 1]]] * 3;
         t3 *= t3;
         n3 =
             t3 *

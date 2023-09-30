@@ -69,7 +69,7 @@ export class MovementHelper {
 
         // Take the backward most path and move to it
         const nextStep = this._currentMovement?.path?.pop();
-        if (!!nextStep) {
+        if (nextStep) {
             this.entity.worldPosition = nextStep;
             return true;
         } else {

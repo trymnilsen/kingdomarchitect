@@ -41,7 +41,7 @@ export function configureText(
 ) {
     let fontString = `${renderItem.size}px ${renderItem.font}`;
     //let alignOffset = 0;
-    if (!!renderItem.weight) {
+    if (renderItem.weight) {
         fontString = renderItem.weight + " " + fontString;
     }
 

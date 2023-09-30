@@ -203,13 +203,13 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
         let targetWidth = spriteBounds.w;
         let targetHeight = spriteBounds.h;
         let frame = 0;
-        if (!!sprite.targetWidth) {
+        if (sprite.targetWidth) {
             targetWidth = sprite.targetWidth;
         }
-        if (!!sprite.targetHeight) {
+        if (sprite.targetHeight) {
             targetHeight = sprite.targetHeight;
         }
-        if (!!sprite.frame) {
+        if (sprite.frame) {
             frame = sprite.frame;
         }
         spriteRenderer(

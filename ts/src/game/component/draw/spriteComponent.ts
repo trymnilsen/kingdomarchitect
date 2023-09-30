@@ -33,18 +33,18 @@ export class SpriteComponent extends EntityComponent<SpriteComponentBundle> {
     }
 
     override onDraw(context: RenderContext, screenPosition: Point): void {
-        let scale = 1;
+        const scale = 1;
 
         let targetWidth = this.size?.x;
         let targetHeight = this.size?.y;
 
-        if (!!targetWidth) {
+        if (targetWidth) {
             targetWidth = targetWidth * scale;
         } else {
             targetWidth = context.measureSprite(this.sprite).width * scale;
         }
 
-        if (!!targetHeight) {
+        if (targetHeight) {
             targetHeight = targetHeight * scale;
         } else {
             targetHeight = context.measureSprite(this.sprite).height * scale;

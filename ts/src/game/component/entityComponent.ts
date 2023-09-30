@@ -52,7 +52,7 @@ export abstract class EntityComponent<
     abstract toComponentBundle(): PersistedDataType;
 
     protected publishEvent(event: ComponentEvent<EntityComponent>) {
-        if (!!this._entity) {
+        if (this._entity) {
             this._entity.componentEvents.publish(event);
         } else {
             console.warn("No entity set, event is not published", this, event);

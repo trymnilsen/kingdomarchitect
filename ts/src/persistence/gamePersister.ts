@@ -38,7 +38,7 @@ export class GamePersister {
         setGeneratorIds(ids);
         const cameraJson = window.localStorage.getItem("camera");
         let cameraPosition = zeroPoint();
-        if (!!cameraJson) {
+        if (cameraJson) {
             cameraPosition = JSON.parse(cameraJson);
         }
         const bundleSets = JSON.parse(bundleSetsAsJson);

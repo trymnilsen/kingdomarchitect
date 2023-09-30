@@ -23,7 +23,7 @@ export function pushMapEntry<T>(
     key: string,
     item: T
 ) {
-    if (!!collection[key]) {
+    if (collection[key]) {
         collection[key].push(item);
     } else {
         collection[key] = [item];

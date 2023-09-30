@@ -61,7 +61,7 @@ export class TreeComponent extends EntityComponent<TreeBundle> {
             sprite = sprites2.tree_3;
         }
 
-        if (!!this.chopTime) {
+        if (this.chopTime) {
             sprite = sprites2.tree_stub;
         }
 

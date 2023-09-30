@@ -12,7 +12,7 @@ export function rectangleRenderer(
     config: RectangleConfiguration,
     context: CanvasRenderingContext2D
 ) {
-    if (!!config.fill) {
+    if (config.fill) {
         context.fillStyle = config.fill;
         context.fillRect(config.x, config.y, config.width, config.height);
     }

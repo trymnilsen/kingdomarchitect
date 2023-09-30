@@ -32,7 +32,7 @@ import { UITimeline } from "./ui/uiTimeline.js";
 export class RootState extends InteractionState {
     override getFocusGroups(): FocusGroup[] {
         const groups: FocusGroup[] = [];
-        if (!!this.view) {
+        if (this.view) {
             groups.push(this.view);
         }
         groups.push(

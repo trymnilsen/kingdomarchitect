@@ -14,7 +14,7 @@ export class LazyGraph implements Graph {
      * @param point
      */
     invalidatePoint(point: Point) {
-        if (!!this._nodes[point.x]) {
+        if (this._nodes[point.x]) {
             delete this._nodes[point.x][point.y];
         }
     }
@@ -51,25 +51,25 @@ export class LazyGraph implements Graph {
 
         // West
         const westNode = this.nodeAt(x - 1, y);
-        if (!!westNode) {
+        if (westNode) {
             neighborNodes.push(westNode);
         }
 
         // East
         const eastNode = this.nodeAt(x + 1, y);
-        if (!!eastNode) {
+        if (eastNode) {
             neighborNodes.push(eastNode);
         }
 
         // South
         const southNode = this.nodeAt(x, y - 1);
-        if (!!southNode) {
+        if (southNode) {
             neighborNodes.push(southNode);
         }
 
         // North
         const northNode = this.nodeAt(x, y + 1);
-        if (!!northNode) {
+        if (northNode) {
             neighborNodes.push(northNode);
         }
         /*

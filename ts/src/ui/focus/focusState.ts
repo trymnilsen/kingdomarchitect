@@ -9,7 +9,7 @@ export class FocusState {
     }
 
     setFocus(view: UIView) {
-        if (!!this._currentFocus) {
+        if (this._currentFocus) {
             this._currentFocus.onFocusLost();
         }
         this._currentFocus = view;

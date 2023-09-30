@@ -191,7 +191,7 @@ export class UIActionbarScaffold extends UIView {
         );
         //Get the size of the first level of the right tree
         let leftActionTree = this.leftItems;
-        let rightActionTree = this.rightItems;
+        const rightActionTree = this.rightItems;
         if (
             paddedConstraints.width - rightSize.totalWidth <
             leftSize.totalWidth
@@ -381,7 +381,7 @@ export class UIActionbarScaffold extends UIView {
     ): SingleActionbarLayout {
         let totalWidth = 0;
         let totalHeight = 0;
-        let boundaries: Bounds[] = [];
+        const boundaries: Bounds[] = [];
         if (orientation == Axis.XAxis) {
             totalHeight = 72;
             for (const item of items) {
@@ -486,7 +486,7 @@ export class UIActionbarScaffold extends UIView {
                 )
             ) {
                 let handled = false;
-                if (!!button.onClick) {
+                if (button.onClick) {
                     button.onClick();
                     handled = true;
                     this.selectedPath = "";

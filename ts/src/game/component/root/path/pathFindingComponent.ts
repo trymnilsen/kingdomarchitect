@@ -71,7 +71,7 @@ export class PathFindingComponent extends StatelessComponent {
         // to point is inside a building that stretches across multiple
         // tiles and one of the tiles belonging to the building is adjacent
         // to the last path point
-        const weightModifier = !!blockBuildings
+        const weightModifier = blockBuildings
             ? blockBuildingsModifier
             : defaultWeightModifier;
 

@@ -190,7 +190,7 @@ export class LandUnlockState extends InteractionState {
         this.unlockableArea = tileGeneratorComponent.getUnlockableArea();
         if (this.unlockableArea.length > 0) {
             this.selectedArea = this.unlockableArea[0];
-            if (!!this.previousSelectedAreaPosition) {
+            if (this.previousSelectedAreaPosition) {
                 let closestAreaDistanceToPreviousSelection =
                     Number.MAX_SAFE_INTEGER;
                 for (const area of this.unlockableArea) {

@@ -157,7 +157,7 @@ export abstract class UIView implements FocusGroup {
      * the default screenPosition.
      */
     get corners(): Point[] {
-        if (!!this._measuredSize) {
+        if (this._measuredSize) {
             return [
                 //Top left
                 this._screenPosition,
@@ -193,7 +193,7 @@ export abstract class UIView implements FocusGroup {
      * as the screen position
      */
     get center(): Point {
-        if (!!this._measuredSize) {
+        if (this._measuredSize) {
             const halfWidth = this._measuredSize.width / 2;
             const halfHeight = this._measuredSize.height / 2;
             return addPoint(this._screenPosition, {
@@ -211,7 +211,7 @@ export abstract class UIView implements FocusGroup {
      * be the same as the x1 and y1
      */
     get bounds(): Bounds {
-        if (!!this._measuredSize) {
+        if (this._measuredSize) {
             return {
                 x1: this.screenPosition.x,
                 x2: this._screenPosition.x + this._measuredSize.width,
@@ -235,7 +235,7 @@ export abstract class UIView implements FocusGroup {
      * one.
      */
     get focusState(): FocusState {
-        if (!!this._parent) {
+        if (this._parent) {
             return this._parent.focusState;
         } else {
             if (!this._focusState) {
@@ -548,7 +548,7 @@ export abstract class UIView implements FocusGroup {
                 currentFocusBounds,
                 direction
             );
-            if (!!closestView) {
+            if (closestView) {
                 this.focusState.setFocus(closestView);
                 return true;
             } else {

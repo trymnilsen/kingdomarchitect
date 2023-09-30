@@ -87,7 +87,7 @@ export class InventoryComponent extends EntityComponent<InventoryBundle> {
     }
 
     hasAmount(itemId: string, amount: number): boolean {
-        if (!!this._items[itemId]) {
+        if (this._items[itemId]) {
             return this._items[itemId].amount >= amount;
         } else {
             return false;
@@ -96,7 +96,7 @@ export class InventoryComponent extends EntityComponent<InventoryBundle> {
 
     removeInventoryItem(itemId: string, amount: number): boolean {
         const item = this._items[itemId];
-        if (!!item) {
+        if (item) {
             if (item.amount > amount) {
                 item.amount -= amount;
                 return true;

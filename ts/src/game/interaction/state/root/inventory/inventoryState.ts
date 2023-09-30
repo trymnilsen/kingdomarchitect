@@ -111,7 +111,7 @@ export class InventoryState extends InteractionState {
 
         for (let i = 0; i < 24; i++) {
             const inventoryItem = this._items[i];
-            if (!!inventoryItem) {
+            if (inventoryItem) {
                 const isSelected = i == 0;
                 const gridItem = new UIInventoryGridItem(
                     inventoryItem.item.asset,
@@ -189,7 +189,7 @@ export class InventoryState extends InteractionState {
                 return [];
             }
         };
-        if (!!inventoryItem) {
+        if (inventoryItem) {
             return uiBox({
                 width: 300,
                 height: 400,

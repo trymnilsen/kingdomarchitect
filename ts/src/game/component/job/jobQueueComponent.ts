@@ -70,7 +70,7 @@ export class JobQueueComponent
     getApplicableJobs(entity: Entity): Job[] {
         return this._pendingJobs
             .filter((scheduledJob) => {
-                if (!!scheduledJob.constraint) {
+                if (scheduledJob.constraint) {
                     return isJobApplicableForEntity(
                         scheduledJob.job,
                         scheduledJob.constraint,

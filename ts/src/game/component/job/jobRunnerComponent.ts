@@ -67,7 +67,7 @@ export class JobRunnerComponent
         this.jobStack.push(job);
         job.entity = this.entity;
         job.owner = this;
-        if (!!job.bundle) {
+        if (job.bundle) {
             job.fromJobBundle({
                 data: job.bundle,
                 jobState: JobState.NotStarted,
@@ -96,13 +96,13 @@ export class JobRunnerComponent
     }
 
     override onUpdate(tick: number): void {
-        if (!!this.activeJob) {
+        if (this.activeJob) {
             this.activeJob.update(tick);
         }
     }
 
     override onDraw(context: RenderContext, screenPosition: Point): void {
-        if (!!this.activeJob) {
+        if (this.activeJob) {
             this.activeJob.onDraw(context);
         }
     }

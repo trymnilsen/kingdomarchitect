@@ -40,7 +40,7 @@ export class HousingComponent extends EntityComponent<HousingBundle> {
                 }
             );
 
-            if (!!homelessWorker) {
+            if (homelessWorker) {
                 this.setHouseOnTenant(homelessWorker);
             }
         }
@@ -85,7 +85,7 @@ export class HousingComponent extends EntityComponent<HousingBundle> {
 
     private setHouseOnTenant(entity: Entity) {
         const existingTenantComponent = entity.getComponent(TenantComponent);
-        if (!!existingTenantComponent) {
+        if (existingTenantComponent) {
             existingTenantComponent.houseEntityId = this.entity.id;
         } else {
             const tenant = new TenantComponent();

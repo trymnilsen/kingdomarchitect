@@ -75,7 +75,7 @@ export abstract class InteractionState {
      * method and not a property to allow easy overriding.
      */
     getFocusGroups(): FocusGroup[] {
-        if (!!this._view) {
+        if (this._view) {
             return [this._view];
         } else {
             return [];
@@ -215,7 +215,7 @@ export abstract class InteractionState {
         }
 
         let consumedInput = false;
-        if (!!direction) {
+        if (direction) {
             const focusGroups = this._cachedFocusGroups;
             const currentFocusIndex = this._currentFocusGroupIndex;
             const currentFocusGroup = focusGroups[currentFocusIndex];
@@ -238,7 +238,7 @@ export abstract class InteractionState {
 
         if (input.action == InputActionType.ACTION_PRESS) {
             const currentFocusGroup = this.getCurrentFocusGroup();
-            if (!!currentFocusGroup) {
+            if (currentFocusGroup) {
                 currentFocusGroup.onFocusActionInput();
             }
         }

@@ -98,7 +98,7 @@ export class SelectionState extends InteractionState {
         if (selection instanceof SelectedEntityItem) {
             let actions: UIActionbarItem[] = [];
             const tree = selection.entity.getComponent(TreeComponent);
-            if (!!tree) {
+            if (tree) {
                 const jobQueue =
                     selection.entity.getAncestorComponent(JobQueueComponent);
 
@@ -144,7 +144,7 @@ export class SelectionState extends InteractionState {
                 WorkerBehaviorComponent
             );
 
-            if (!!worker) {
+            if (worker) {
                 actions = [
                     {
                         icon: sprites2.empty_sprite,
@@ -165,7 +165,7 @@ export class SelectionState extends InteractionState {
 
             const chest = selection.entity.getComponent(ChestComponent);
 
-            if (!!chest) {
+            if (chest) {
                 actions = [
                     {
                         text: "Collect",

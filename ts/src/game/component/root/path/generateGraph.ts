@@ -100,7 +100,7 @@ function getWeightAtPoint(
         for (const entity of entities) {
             const buildingComponent = entity.getComponent(BuildingComponent);
 
-            if (!!buildingComponent) {
+            if (buildingComponent) {
                 entityWeight = 500;
             }
 
@@ -108,12 +108,12 @@ function getWeightAtPoint(
                 WorkerBehaviorComponent
             );
 
-            if (!!workerComponent) {
+            if (workerComponent) {
                 entityWeight = 500;
             }
 
             const treeComponent = entity.getComponent(TreeComponent);
-            if (!!treeComponent) {
+            if (treeComponent) {
                 entityWeight = 200;
             }
         }

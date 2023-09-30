@@ -86,7 +86,7 @@ export class AggroComponent extends EntityComponent<AggroComponentBundle> {
                 return !!item.getComponent(WorkerBehaviorComponent);
             });
 
-            if (!!actor) {
+            if (actor) {
                 const jobRunner =
                     this.entity.requireComponent(JobRunnerComponent);
 

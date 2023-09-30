@@ -91,7 +91,7 @@ export class Entity {
      */
     public set worldPosition(position: Point) {
         this._worldPosition = position;
-        if (!!this.parent) {
+        if (this.parent) {
             this._localPosition = subtractPoint(
                 position,
                 this.parent.worldPosition
@@ -156,7 +156,7 @@ export class Entity {
             throw new InvalidArgumentError("Cannot add self as a child");
         }
 
-        if (!!entity.parent) {
+        if (entity.parent) {
             throw new InvalidArgumentError(
                 "Entity is already added to another entity"
             );
@@ -213,7 +213,7 @@ export class Entity {
      * Remove the entity from the child list of the parent if any
      */
     public remove(): void {
-        if (!!this.parent) {
+        if (this.parent) {
             this.parent.removeChild(this);
         }
     }
@@ -225,7 +225,7 @@ export class Entity {
      */
     public getRootEntity(): Entity {
         let root: Entity | undefined = this;
-        while (!!root?._parent) {
+        while (root?._parent) {
             root = root.parent;
         }
 
@@ -242,7 +242,7 @@ export class Entity {
      * Check if this entity is attached to a live entity tree
      */
     public isAttached(): boolean {
-        if (!!this._parent) {
+        if (this._parent) {
             return this._parent.isAttached();
         } else {
             return this._isGameRoot;
@@ -257,7 +257,7 @@ export class Entity {
         const componentName =
             Object.getPrototypeOf(entityComponent).constructor.name;
 
-        if (!!this._componentsMap[componentName]) {
+        if (this._componentsMap[componentName]) {
             throw new InvalidArgumentError(
                 `Component already added ${entityComponent}`
             );
@@ -279,10 +279,10 @@ export class Entity {
      */
     public removeComponent(entityComponent: EntityComponent): boolean {
         const componentName = this.getComponentName(entityComponent);
-        if (!!this._componentsMap[componentName]) {
+        if (this._componentsMap[componentName]) {
             delete this._componentsMap[componentName];
             this._components = Object.values(this._componentsMap);
-            if (!!this._parent) {
+            if (this._parent) {
                 entityComponent.onStop(0);
             }
             return true;
@@ -328,7 +328,7 @@ export class Entity {
         filterType: ConstructorFunction<TFilter>
     ): TFilter {
         const component = this.getComponent(filterType);
-        if (!!component) {
+        if (component) {
             return component;
         } else {
             throw new RequireError(
@@ -348,9 +348,9 @@ export class Entity {
     ): TFilter | null {
         let entityToLookOn: Entity | undefined = this;
 
-        while (!!entityToLookOn) {
+        while (entityToLookOn) {
             const component = entityToLookOn.getComponent(filterType);
-            if (!!component) {
+            if (component) {
                 return component;
             }
             // Set the entity to look on to the parent and try again
@@ -402,7 +402,7 @@ export class Entity {
      * entity's local position
      */
     public updateTransform() {
-        if (!!this.parent) {
+        if (this.parent) {
             // If there is a parent, add its world position to the
             // local position, to get this entitys new world position
             this._worldPosition = addPoint(

@@ -24,7 +24,7 @@ export class LookForFoodJob extends Job<LookForFoodBundle> {
         });
         if (applicableDirections.length > 0) {
             const randomDirection = randomEntry(applicableDirections);
-            if (!!randomDirection) {
+            if (randomDirection) {
                 this.direction = randomDirection;
             }
         }
@@ -38,14 +38,14 @@ export class LookForFoodJob extends Job<LookForFoodBundle> {
         );
 
         const isPointAvailable = this.isPositionAvailable(nextPosition);
-        if (!!isPointAvailable) {
+        if (isPointAvailable) {
             this.entity.worldPosition = nextPosition;
         } else {
             this.complete();
         }
     }
 
-    private isPositionAvailable(point: Point): Boolean {
+    private isPositionAvailable(point: Point): boolean {
         const rootEntity = this.entity.getRootEntity();
         const tileComponent = rootEntity.requireComponent(TilesComponent);
 

@@ -103,7 +103,7 @@ export class CollectChestState extends InteractionState {
 
         for (let i = 0; i < 8; i++) {
             const inventoryItem = this.chest.items[i];
-            if (!!inventoryItem) {
+            if (inventoryItem) {
                 const isSelected = i == 0;
                 const gridItem = new UIInventoryGridItem(
                     inventoryItem.asset,

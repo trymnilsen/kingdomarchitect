@@ -12,7 +12,7 @@ export class BitmapImage {
     async create() {
         const createPromise = new Promise<Jimp>((resolve, reject) => {
             new Jimp(this.width, this.height, (err, image) => {
-                if (!!err) {
+                if (err) {
                     reject(err);
                 } else {
                     resolve(image);

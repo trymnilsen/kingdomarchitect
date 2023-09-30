@@ -37,7 +37,7 @@ export class ChunkMapComponent extends StatelessComponent {
         for (const chunkPosition of chunkPositions) {
             const chunkId = getChunkId(chunkPosition);
             const chunkEntities = this.chunkMap[chunkId];
-            if (!!chunkEntities) {
+            if (chunkEntities) {
                 for (const entity of Object.values(chunkEntities)) {
                     // Check if the entity has a bounds component
                     // If not then just check its position
@@ -59,7 +59,7 @@ export class ChunkMapComponent extends StatelessComponent {
     }
 
     override onStop(tick: number): void {
-        if (!!this.entityEventHandle) {
+        if (this.entityEventHandle) {
             this.entityEventHandle();
         }
     }
@@ -81,7 +81,7 @@ export class ChunkMapComponent extends StatelessComponent {
     private removeEntityFromChunkMap(entity: Entity) {
         const entityChunkId = this.entityChunks[entity.id];
         const chunk = this.chunkMap[entityChunkId];
-        if (!!chunk) {
+        if (chunk) {
             delete chunk[entity.id];
             delete this.entityChunks[entity.id];
         }
@@ -107,7 +107,7 @@ export class ChunkMapComponent extends StatelessComponent {
         const newChunkId = getChunkId(getChunkPosition(entity.worldPosition));
         if (oldChunkId != newChunkId) {
             // No need to remove entity from the chunk map if its not present
-            if (!!oldChunkId) {
+            if (oldChunkId) {
                 this.removeEntityFromChunkMap(entity);
             }
             this.addEntityToChunkMap(entity);

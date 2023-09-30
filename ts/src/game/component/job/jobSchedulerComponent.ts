@@ -68,7 +68,7 @@ export class JobSchedulerComponent extends StatelessComponent {
 
             if (canRunJobs) {
                 let isApplicable = true;
-                if (!!scheduledJob.constraint) {
+                if (scheduledJob.constraint) {
                     isApplicable = isJobApplicableForEntity(
                         scheduledJob.job,
                         scheduledJob.constraint,

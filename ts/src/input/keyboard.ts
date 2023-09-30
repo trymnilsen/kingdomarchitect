@@ -22,7 +22,7 @@ export class Keyboard {
 
     private onKeyPress = (event: KeyboardEvent) => {
         const action = this.keyboardMap[event.key.toLowerCase()];
-        if (!!action) {
+        if (action) {
             this._keyEvent.publish({
                 action: action,
                 isShifted: event.shiftKey,
@@ -34,7 +34,7 @@ export class Keyboard {
 
 export function getKeyboardMap(): KeyboardMap {
     const userMap = window.localStorage.getItem(UserKeyboardMapStorageKey);
-    if (!!userMap) {
+    if (userMap) {
         try {
             return JSON.parse(userMap) as KeyboardMap;
         } catch (err) {

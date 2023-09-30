@@ -67,7 +67,7 @@ export class Ground {
 
     generate() {
         const chunk = generateChunk(this.chunks);
-        if (!!chunk) {
+        if (chunk) {
             this.chunks.push(chunk);
             for (let cx = 0; cx < 3; cx++) {
                 for (let cy = 0; cy < 3; cy++) {
@@ -181,7 +181,7 @@ export function generateGround(tiles: { [id: string]: GroundTile }): Point {
     for (let i = 0; i < rangeDistance(edgeTile.axisRange); i++) {
         const adjacent = adjacentPoint(lastSearchPoint, searchDirection);
         const tileId = getTileId(adjacent.x, adjacent.y);
-        if (!!tiles[tileId]) {
+        if (tiles[tileId]) {
             tilePoint = lastSearchPoint;
             break;
         } else {
