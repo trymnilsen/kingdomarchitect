@@ -1,3 +1,4 @@
+name: Build preview
 on:
   push:
     branches:
