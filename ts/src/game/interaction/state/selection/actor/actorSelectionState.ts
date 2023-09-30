@@ -1,7 +1,10 @@
 import { sprites2 } from "../../../../../asset/sprite.js";
 import { Point } from "../../../../../common/point.js";
 import { allSides } from "../../../../../common/sides.js";
-import { InventoryItem } from "../../../../../data/inventory/inventoryItem.js";
+import {
+    InventoryItem,
+    ItemCategory,
+} from "../../../../../data/inventory/inventoryItem.js";
 import { RenderContext } from "../../../../../rendering/renderContext.js";
 import { EquipmentComponent } from "../../../../component/inventory/equipmentComponent.js";
 import { Entity } from "../../../../entity/entity.js";
@@ -36,7 +39,7 @@ export class ActorSelectionState extends InteractionState {
                 text: "Move",
                 onClick: () => {
                     this.context.stateChanger.push(
-                        new ActorMovementState(this.entity)
+                        new ActorMovementState(this.entity),
                     );
                 },
             },
@@ -63,7 +66,7 @@ export class ActorSelectionState extends InteractionState {
         super.onDraw(context);
 
         const cursorWorldPosition = context.camera.tileSpaceToScreenSpace(
-            this.entity.worldPosition
+            this.entity.worldPosition,
         );
 
         context.drawNinePatchSprite({
@@ -83,18 +86,14 @@ export class ActorSelectionState extends InteractionState {
         if (equipment && equipment.mainItem) {
             items.push({
                 text: "Main",
-                onClick: () => {
-                    //this.onMainItemTap();
-                },
+                children: this.getEquipmentAction(equipment.mainItem),
                 icon: equipment.mainItem.asset,
             });
         } else {
             items.push({
                 text: "Main",
-                onClick: () => {
-                    //this.onMainItemTap();
-                },
                 icon: sprites2.empty_sprite,
+                children: this.getEmptyMainEquipmentAction(),
             });
         }
 
@@ -107,14 +106,63 @@ export class ActorSelectionState extends InteractionState {
             items.push({
                 text: "Other",
                 icon: sprites2.empty_sprite,
+                children: this.getEmptyOtherEquipmentAction(),
             });
         }
 
         return items;
     }
 
-    private getEquipmentAction(inventoryItem: InventoryItem) {
+    private getEmptyMainEquipmentAction(): UIActionbarItem[] {
+        return [
+            {
+                text: "Equip",
+                onClick: () => {
+                    //this.onMainItemTap();
+                },
+                icon: sprites2.empty_sprite,
+            },
+        ];
+    }
 
+    private getEmptyOtherEquipmentAction(): UIActionbarItem[] {
+        return [
+            {
+                text: "Equip",
+                onClick: () => {
+                    //this.onMainItemTap();
+                },
+                icon: sprites2.empty_sprite,
+            },
+        ];
+    }
+
+    private getEquipmentAction(
+        inventoryItem: InventoryItem,
+    ): UIActionbarItem[] | undefined {
+        return [
+            {
+                text: "Unequip",
+                onClick: () => {
+                    //this.onMainItemTap();
+                },
+                icon: sprites2.empty_sprite,
+            },
+            {
+                text: "Attack",
+                onClick: () => {
+                    //this.onMainItemTap();
+                },
+                icon: sprites2.empty_sprite,
+            },
+            {
+                text: "Defend",
+                onClick: () => {
+                    //this.onMainItemTap();
+                },
+                icon: sprites2.empty_sprite,
+            },
+        ];
     }
 
     private onMainItemTap() {

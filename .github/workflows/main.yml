@@ -7,19 +7,16 @@ on:
 jobs:
   compile:
     runs-on: ubuntu-latest
-
     steps:
       - name: Compile the source
         run: echo compile placeholder
   lint:
     runs-on: ubuntu-latest
-
     steps:
       - name: Compile the source
         run: echo compile placeholder
   check-format:
     runs-on: ubuntu-latest
-
     steps:
       - name: Compile the source
         run: echo compile placeholder
@@ -29,9 +26,15 @@ jobs:
     steps:
       - name: Compile the source
         run: echo compile placeholder
+  bundle:
+    runs-on: ubuntu-latest
+    needs: compile
+    steps:
+      - name: Compile the source
+        run: echo compile placeholder
   deploy-preview:
     runs-on: ubuntu-latest
-    needs: [compile, lint, test, check-format]
+    needs: [compile, lint, bundle, test, check-format]
     steps:
       - name: Compile the source
         run: echo compile placeholder
