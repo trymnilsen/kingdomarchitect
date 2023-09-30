@@ -26,6 +26,7 @@
         "@types/node": "^20.6.2",
         "jimp": "^0.22.10",
         "maxrects-packer": "^2.7.3",
+        "prettier": "^3.0.3",
         "rollup": "^3.29.2",
         "typescript": "^5.2.2"
     },

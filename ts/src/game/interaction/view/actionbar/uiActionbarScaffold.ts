@@ -130,8 +130,10 @@ export class UIActionbarScaffold extends UIView {
                 continue;
             }
 
+            const middleX = item.position.x + item.width / 2;
+
             context.drawNinePatchSprite({
-                x: item.position.x + item.width / 2 - 24,
+                x: middleX - 24,
                 y: item.position.y + 2,
                 width: 48,
                 height: 48,
@@ -139,6 +141,15 @@ export class UIActionbarScaffold extends UIView {
                 scale: 1,
                 sides: allSides(16),
             });
+
+            if (item.icon) {
+                const sprite = context.getSprite(item.icon)
+                context.drawScreenSpaceSprite({
+                    sprite: sprite,
+                    x: middleX - 16,
+                    y: item.position.y + 8
+                });
+            }
 
             context.drawScreenspaceText({
                 text: item.text,
@@ -345,6 +356,7 @@ export class UIActionbarScaffold extends UIView {
                 onClick: actionbarItem.onClick,
                 visible: level == 0 || isPathOfSelected,
                 path: itemPath,
+                icon: actionbarItem.icon?.id,
                 position,
                 children,
             };
@@ -557,9 +569,10 @@ interface ActionbarButton {
     position: Point;
     textOffset: number;
     children: ActionbarButton[];
-    onClick?: () => void;
     visible: boolean;
     path: string;
+    onClick?: () => void;
+    icon?: string;
 }
 
 interface SingleActionbarLayout {

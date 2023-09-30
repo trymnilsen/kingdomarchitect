@@ -1,3 +1,4 @@
+import { Sprite2 } from "../asset/sprite.js";
 import { Bounds } from "../common/bounds.js";
 import { RectangleConfiguration } from "./items/rectangle.js";
 import {
@@ -23,4 +24,5 @@ export interface UIRenderContext {
         color: string,
         width: number
     ): void;
+    getSprite(id: string): Sprite2;
 }

@@ -17,6 +17,7 @@ import { TextConfiguration, textRenderer } from "./items/text.js";
 import { TextStyle } from "./text/textStyle.js";
 import { UIRenderContext } from "./uiRenderContext.js";
 import { Bounds } from "../common/bounds.js";
+import { sprites } from "../../generated/sprites.js";
 
 export type DrawFunction = (context: RenderContext) => void;
 
@@ -93,6 +94,10 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
         this.canvasContext.lineWidth = width;
         this.canvasContext.strokeStyle = color;
         this.canvasContext.stroke();
+    }
+
+    getSprite(id: string): Sprite2 {
+        return sprites[id];
     }
 
     /**
