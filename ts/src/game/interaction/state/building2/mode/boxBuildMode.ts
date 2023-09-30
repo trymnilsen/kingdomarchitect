@@ -9,7 +9,7 @@ export class BoxBuildMode implements BuildMode {
     cursorSelection(): Point {
         throw new Error("Method not implemented.");
     }
-    setSelection(point: Point): void {
+    setSelection(): void {
         throw new Error("Method not implemented.");
     }
     getSelection(): Point[] {

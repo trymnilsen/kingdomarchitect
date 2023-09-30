@@ -24,8 +24,8 @@ export class PathSearch {
     search(
         from: Point,
         to: Point,
-        allowPartialPaths: boolean,
-        weightModifier: (graphNode: GraphNode) => number
+        _allowPartialPaths: boolean,
+        weightModifier: (graphNode: GraphNode) => number,
     ): SearchResult {
         const start = this.graph.nodeAt(from.x, from.y);
         const end = this.graph.nodeAt(to.x, to.y);

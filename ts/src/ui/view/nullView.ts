@@ -1,6 +1,3 @@
-import { Point } from "../../common/point.js";
-import { UIRenderContext } from "../../rendering/uiRenderContext.js";
-import { UILayoutContext } from "../uiLayoutContext.js";
 import { UISize } from "../uiSize.js";
 import { UIView } from "../uiView.js";
 
@@ -16,13 +13,10 @@ export class NullView extends UIView {
             height: 0,
         });
     }
-    override hitTest(screenPoint: Point): boolean {
+    override hitTest(): boolean {
         return false;
     }
-    override layout(
-        layoutContext: UILayoutContext,
-        constraints: UISize
-    ): UISize {
+    override layout(): UISize {
         const size: UISize = {
             width: 0,
             height: 0,
@@ -31,7 +25,7 @@ export class NullView extends UIView {
         this._measuredSize = size;
         return size;
     }
-    override draw(context: UIRenderContext): void {
+    override draw(): void {
         // No-op, we dont draw anything
     }
 }

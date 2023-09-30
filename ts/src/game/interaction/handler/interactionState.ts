@@ -130,7 +130,7 @@ export abstract class InteractionState {
      * elements also causing a selection of a tile behind.
      * @param tile the tile that was tapped
      */
-    onTileTap(tile: GroundTile): boolean {
+    onTileTap(_tile: GroundTile): boolean {
         return false;
     }
 
@@ -139,11 +139,11 @@ export abstract class InteractionState {
      * @param screenPosition the position of the tap
      * @returns if the tap was handled or not
      */
-    onTap(screenPosition: Point, worldPosition: Point): boolean {
+    onTap(_screenPosition: Point, _worldPosition: Point): boolean {
         return false;
     }
 
-    onTapPan(movement: Point, position: Point, startPosition: Point): void {}
+    onTapPan(_movement: Point, _position: Point, _startPosition: Point): void {}
 
     /**
      * Called when this state becomes the active state, either by being popped
@@ -152,7 +152,7 @@ export abstract class InteractionState {
      */
     onActive(): void {}
 
-    onFocusChanged(focusGroup: FocusGroup) {}
+    onFocusChanged(_focusGroup: FocusGroup) {}
 
     /**
      * Called when this state becomes inactive. Either from another state
@@ -168,7 +168,7 @@ export abstract class InteractionState {
      * Update method called consistently on each update
      * @param tick
      */
-    onUpdate(tick: number): void {}
+    onUpdate(_tick: number): void {}
 
     /**
      * Called when its time to render/draw anything this state wants to.
@@ -206,7 +206,7 @@ export abstract class InteractionState {
      */
     onInput(
         input: InputAction,
-        stateChanger: InteractionStateChanger
+        _stateChanger: InteractionStateChanger,
     ): boolean {
         const view = this.view;
         const direction = getDirectionFromInputType(input.action);
@@ -225,7 +225,7 @@ export abstract class InteractionState {
                 const focusGroup = focusGroups[i];
                 const focusTaken = focusGroup.moveFocus(
                     direction,
-                    currentFocusBounds
+                    currentFocusBounds,
                 );
 
                 if (focusTaken) {

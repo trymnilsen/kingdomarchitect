@@ -1,4 +1,3 @@
-import { Point } from "../../common/point.js";
 import { UIRenderContext } from "../../rendering/uiRenderContext.js";
 import { VerticalAlignment } from "../uiAlignment.js";
 import { UILayoutContext } from "../uiLayoutContext.js";
@@ -45,7 +44,7 @@ export class UIRow extends UIViewGroup {
         super.addView(view);
     }
 
-    hitTest(screenPoint: Point): boolean {
+    hitTest(): boolean {
         return false;
     }
 

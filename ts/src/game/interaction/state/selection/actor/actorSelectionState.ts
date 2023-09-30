@@ -23,16 +23,6 @@ export class ActorSelectionState extends InteractionState {
         super();
     }
 
-    override onTap(screenPosition: Point, worldPosition: Point): boolean {
-        if (this.expandedMenuState) {
-            this.expandedMenuState = false;
-            this.presenter?.setExpandedMenu([]);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     override onActive(): void {
         const items: UIActionbarItem[] = [
             {
@@ -138,7 +128,7 @@ export class ActorSelectionState extends InteractionState {
     }
 
     private getEquipmentAction(
-        inventoryItem: InventoryItem,
+        _inventoryItem: InventoryItem,
     ): UIActionbarItem[] | undefined {
         return [
             {

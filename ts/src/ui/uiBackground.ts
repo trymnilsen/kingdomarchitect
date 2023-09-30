@@ -25,7 +25,7 @@ export class NinePatchBackground implements UIBackground {
     constructor(
         private sprite: Sprite2,
         private sides: Sides,
-        private scale: number
+        private scale: number,
     ) {}
     draw(context: UIRenderContext, screenPosition: Point, size: UISize): void {
         context.drawNinePatchSprite({
@@ -44,7 +44,7 @@ export class BoxBackground implements UIBackground {
     constructor(
         private fill: string,
         private stroke: string,
-        private strokeWidth: number
+        private strokeWidth: number,
     ) {}
 
     draw(context: UIRenderContext, screenPosition: Point, size: UISize): void {
@@ -62,7 +62,7 @@ export class BoxBackground implements UIBackground {
 
 export class SpriteBackground implements UIBackground {
     constructor(private sprite: Sprite2) {}
-    draw(context: UIRenderContext, screenPosition: Point, size: UISize): void {
+    draw(context: UIRenderContext, screenPosition: Point): void {
         context.drawScreenSpaceSprite({
             sprite: this.sprite,
             x: screenPosition.x,

@@ -13,8 +13,7 @@
         "start": "tsc && node build/tool/http/server.js",
         "test": "tsc && node --test",
         "bundle": "rollup -c",
-        "check-format": "prettier ts/ --check",
-        "lint": "eslint ."
+        "check-format": "prettier ts/ --check"
     },
     "repository": {
         "type": "git",
@@ -26,9 +25,6 @@
     "dependencies": {
         "@edugis/rollup-plugin-sourcemaps": "0.6.4",
         "@types/node": "^20.6.2",
-        "@typescript-eslint/eslint-plugin": "^6.7.3",
-        "@typescript-eslint/parser": "^6.7.3",
-        "eslint": "^8.50.0",
         "jimp": "^0.22.10",
         "maxrects-packer": "^2.7.3",
         "prettier": "^3.0.3",

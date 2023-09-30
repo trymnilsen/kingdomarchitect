@@ -26,10 +26,10 @@ export class UISkillTree extends UIView {
         this.scrollTranslation.y += movement.y;
     }
 
-    hitTest(screenPoint: Point): boolean {
+    hitTest(): boolean {
         return true;
     }
-    layout(layoutContext: UILayoutContext, constraints: UISize): UISize {
+    layout(_layoutContext: UILayoutContext, constraints: UISize): UISize {
         this._measuredSize = {
             width: constraints.width,
             height: constraints.height,
@@ -56,32 +56,32 @@ export class UISkillTree extends UIView {
         context.drawWithClip(bounds, (clippedContext) => {
             const screenPositionWithScrollTranslation = addPoint(
                 this.scrollTranslation,
-                this.screenPosition
+                this.screenPosition,
             );
 
             this.drawSkillCategory(
                 clippedContext,
                 screenPositionWithScrollTranslation,
                 skills.magic,
-                SkillCategory.Magic
+                SkillCategory.Magic,
             );
             this.drawSkillCategory(
                 clippedContext,
                 screenPositionWithScrollTranslation,
                 skills.melee,
-                SkillCategory.Melee
+                SkillCategory.Melee,
             );
             this.drawSkillCategory(
                 clippedContext,
                 screenPositionWithScrollTranslation,
                 skills.productivity,
-                SkillCategory.Productivity
+                SkillCategory.Productivity,
             );
             this.drawSkillCategory(
                 clippedContext,
                 screenPositionWithScrollTranslation,
                 skills.ranged,
-                SkillCategory.Ranged
+                SkillCategory.Ranged,
             );
 
             clippedContext.drawScreenSpaceRectangle({
@@ -94,7 +94,7 @@ export class UISkillTree extends UIView {
         });
     }
 
-    override onTapDown(screenPoint: Point): boolean {
+    override onTapDown(): boolean {
         return true;
     }
 
@@ -102,7 +102,7 @@ export class UISkillTree extends UIView {
         context: UIRenderContext,
         screenPositionWithScrollTranslation: Point,
         skills: SkillTree,
-        category: SkillCategory
+        category: SkillCategory,
     ) {
         for (let tierIndex = 0; tierIndex < skills.length; tierIndex++) {
             const skillTier = skills[tierIndex];
@@ -116,12 +116,12 @@ export class UISkillTree extends UIView {
                     category,
                     tierIndex,
                     skillIndex,
-                    skillTier.length
+                    skillTier.length,
                 );
 
                 const offsetPosition = addPoint(
                     screenPositionWithScrollTranslation,
-                    skillPosition
+                    skillPosition,
                 );
 
                 context.drawScreenSpaceSprite({
@@ -143,7 +143,7 @@ export class UISkillTree extends UIView {
         category: SkillCategory,
         depth: number,
         index: number,
-        numberOfIndexes: number
+        numberOfIndexes: number,
     ): Point {
         const halfOfNumberOfIndexSize =
             (numberOfIndexes / 2) * itemPositionIndexSize;

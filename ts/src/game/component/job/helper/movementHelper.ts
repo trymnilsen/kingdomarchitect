@@ -39,7 +39,10 @@ export class MovementHelper {
      * @returns true if a movement was made, false if there was nowhere to go (
      * for example if the entity is stuck, adjacent or on top of the target)
      */
-    public pathTowards(target: Point, stopAtAdjacent: boolean = true): boolean {
+    public pathTowards(
+        target: Point,
+        _stopAtAdjacent: boolean = true,
+    ): boolean {
         if (
             !!this._currentMovement &&
             pointEquals(target, this._currentMovement.target)
@@ -52,19 +55,11 @@ export class MovementHelper {
             if (!isPointAdjacentTo(trailingEdge, this.entity.worldPosition)) {
                 // The world position has moved and is not adjacent to our
                 // trailing edge we should regenerate the path to the target
-                this.generatePath(
-                    this.entity.worldPosition,
-                    target,
-                    stopAtAdjacent
-                );
+                this.generatePath(this.entity.worldPosition, target);
             }
         } else {
             // There is no path, generate movement
-            this.generatePath(
-                this.entity.worldPosition,
-                target,
-                stopAtAdjacent
-            );
+            this.generatePath(this.entity.worldPosition, target);
         }
 
         // Take the backward most path and move to it
@@ -80,11 +75,7 @@ export class MovementHelper {
         }
     }
 
-    private generatePath(
-        start: Point,
-        target: Point,
-        removeTargetPoint: boolean
-    ): Point[] {
+    private generatePath(start: Point, target: Point): Point[] {
         const pathComponent = this.entity
             .getRootEntity()
             .requireComponent(PathFindingComponent);

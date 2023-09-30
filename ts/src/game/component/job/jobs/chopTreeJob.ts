@@ -46,7 +46,7 @@ export class ChopTreeJob extends Job<ChopTreeBundle> {
         this._target.requireComponent(TreeComponent).startChop();
     }
 
-    update(tick: number): void {
+    update(): void {
         assertEntity(this._target);
         assertEntityComponent(this.healthComponent);
 
@@ -64,7 +64,7 @@ export class ChopTreeJob extends Job<ChopTreeBundle> {
                     this._target.getAncestorComponent(InventoryComponent);
                 if (!inventoryComponent) {
                     throw new Error(
-                        "No inventory component on ancestor of entity for ChopTreeJob"
+                        "No inventory component on ancestor of entity for ChopTreeJob",
                     );
                 }
 
@@ -84,7 +84,7 @@ export class ChopTreeJob extends Job<ChopTreeBundle> {
         }
         assertEntity(this._target);
         const worldSpacePosition = renderContext.camera.tileSpaceToWorldSpace(
-            this._target.worldPosition
+            this._target.worldPosition,
         );
 
         this.blinkingAnimation.updatePosition({

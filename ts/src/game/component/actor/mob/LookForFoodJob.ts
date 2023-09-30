@@ -17,7 +17,7 @@ export class LookForFoodJob extends Job<LookForFoodBundle> {
             const positionInDirection = shiftPoint(
                 this.entity.worldPosition,
                 direction,
-                1
+                1,
             );
 
             return this.isPositionAvailable(positionInDirection);
@@ -30,11 +30,11 @@ export class LookForFoodJob extends Job<LookForFoodBundle> {
         }
     }
 
-    override update(tick: number): void {
+    override update(): void {
         const nextPosition = shiftPoint(
             this.entity.worldPosition,
             this.direction,
-            1
+            1,
         );
 
         const isPointAvailable = this.isPositionAvailable(nextPosition);

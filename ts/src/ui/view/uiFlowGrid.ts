@@ -1,4 +1,3 @@
-import { Point } from "../../common/point.js";
 import { UIRenderContext } from "../../rendering/uiRenderContext.js";
 import { UILayoutContext } from "../uiLayoutContext.js";
 import { fillUiSize, UISize, wrapUiSize } from "../uiSize.js";
@@ -29,7 +28,7 @@ export class UIFlowGrid extends UIViewGroup {
         this._gridPadding = value;
     }
 
-    hitTest(screenPoint: Point): boolean {
+    hitTest(): boolean {
         //This layout itself is not interactable, only its children
         return false;
     }

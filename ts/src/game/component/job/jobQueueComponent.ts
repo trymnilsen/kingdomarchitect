@@ -74,7 +74,7 @@ export class JobQueueComponent
                     return isJobApplicableForEntity(
                         scheduledJob.job,
                         scheduledJob.constraint,
-                        entity
+                        entity,
                     );
                 } else {
                     return true;
@@ -91,7 +91,7 @@ export class JobQueueComponent
         this.removeJob(job);
     }
 
-    override onDraw(context: RenderContext, screenPosition: Point): void {
+    override onDraw(context: RenderContext): void {
         for (const pendingJob of this._pendingJobs) {
             pendingJob.job.onDraw(context);
         }

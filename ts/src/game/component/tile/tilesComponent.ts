@@ -82,7 +82,7 @@ export class TilesComponent
         this._chunkMap[getTileId(chunk.chunkX, chunk.chunkY)] = chunk;
     }
 
-    override onDraw(context: RenderContext, screenPosition: Point): void {
+    override onDraw(context: RenderContext): void {
         for (const tileId in this.tileMap) {
             const tile = this.tileMap[tileId];
             context.drawRectangle({

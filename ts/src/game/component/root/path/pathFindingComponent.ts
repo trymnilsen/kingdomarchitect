@@ -17,27 +17,27 @@ export class PathFindingComponent extends StatelessComponent {
         super();
     }
 
-    override onStart(tick: number): void {
+    override onStart(): void {
         this.pathSearch = new PathSearch(
-            createLazyGraphFromRootNode(this.entity.getRootEntity())
+            createLazyGraphFromRootNode(this.entity.getRootEntity()),
         );
         this.tileEventListener = this.entity.componentEvents.listen(
             TileMapUpdateEvent,
-            (event) => {
+            () => {
                 // TODO: I dont think we need to handle this as it would just
                 // remove this position that was not there yet from the graph
                 this.invalidateGraphPoint({ x: 0, y: 0 });
-            }
+            },
         );
         this.chunkMapEventListener = this.entity.componentEvents.listen(
             ChunkMapUpdateEvent,
             (event) => {
                 this.invalidateGraphPoint(event.pointUpdated);
-            }
+            },
         );
     }
 
-    override onStop(tick: number): void {
+    override onStop(): void {
         this.tileEventListener?.dispose();
         this.chunkMapEventListener?.dispose();
     }
@@ -45,7 +45,7 @@ export class PathFindingComponent extends StatelessComponent {
     public findPath(
         from: Point,
         to: Point,
-        blockBuildings?: boolean
+        blockBuildings?: boolean,
     ): PathResult {
         if (!this.pathSearch) {
             throw new Error("Cannot find path, no pathsearch set");
@@ -80,7 +80,7 @@ export class PathFindingComponent extends StatelessComponent {
             offsetFrom,
             offsetTo,
             true,
-            weightModifier
+            weightModifier,
         );
 
         // The path results are returned in a absolute space, so we convert them

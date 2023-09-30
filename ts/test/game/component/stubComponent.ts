@@ -8,18 +8,18 @@ export class StubComponent extends StatelessComponent {
         private callbacks?: {
             onStart?: () => void;
             onStop?: () => void;
-        }
+        },
     ) {
         super();
     }
 
-    override onStart(tick: number): void {
+    override onStart(): void {
         if (this.callbacks?.onStart) {
             this.callbacks.onStart();
         }
     }
 
-    override onStop(tick: number): void {
+    override onStop(): void {
         if (this.callbacks?.onStop) {
             this.callbacks.onStop();
         }

@@ -17,7 +17,7 @@ export class CollectChestJob extends Job<CollectChestBundle> {
         return instance;
     }
 
-    override update(tick: number): void {
+    override update(): void {
         if (!this.chest) {
             throw new Error("No chest component provided");
         }

@@ -82,10 +82,10 @@ export class JobRunnerComponent
         }
     }
 
-    onAbort(job: Job): void {
+    onAbort(): void {
         this.endJob();
     }
-    onComplete(job: Job): void {
+    onComplete(): void {
         this.endJob();
     }
 
@@ -101,7 +101,7 @@ export class JobRunnerComponent
         }
     }
 
-    override onDraw(context: RenderContext, screenPosition: Point): void {
+    override onDraw(context: RenderContext): void {
         if (this.activeJob) {
             this.activeJob.onDraw(context);
         }
@@ -138,7 +138,7 @@ export class JobRunnerComponent
         const entity = this.entity;
         if (!entity) {
             console.error(
-                "Unable to request job, JobRunnerComponent has no entity"
+                "Unable to request job, JobRunnerComponent has no entity",
             );
             return;
         }
@@ -161,7 +161,7 @@ export class JobRunnerComponent
                 "No applicable job found",
                 entity,
                 applicableJobs,
-                queue.pendingJobs
+                queue.pendingJobs,
             );
         }
     }

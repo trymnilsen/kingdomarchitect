@@ -51,14 +51,14 @@ export class ChunkMapComponent extends StatelessComponent {
         return entities;
     }
 
-    override onStart(tick: number): void {
+    override onStart(): void {
         this.rebuildChunkMap();
         this.entityEventHandle = this.entity.entityEvents.listen((event) => {
             this.onEntityEvent(event);
         });
     }
 
-    override onStop(tick: number): void {
+    override onStop(): void {
         if (this.entityEventHandle) {
             this.entityEventHandle();
         }

@@ -5,7 +5,7 @@ import { Entity } from "../entity/entity.js";
 import { ComponentEvent } from "./componentEvent.js";
 
 export abstract class EntityComponent<
-    PersistedDataType extends JSONValue = {}
+    PersistedDataType extends JSONValue = {},
 > {
     private _entity?: Entity;
 
@@ -29,15 +29,15 @@ export abstract class EntityComponent<
      * at this point
      * @param tick
      */
-    onStart(tick: number) {}
+    onStart(_tick: number) {}
     /**
      * Called when the component is either removed from an entity or when
      * an entity this component is added to is removed from the entity-tree.
      *
      */
-    onStop(tick: number) {}
-    onUpdate(tick: number) {}
-    onDraw(context: RenderContext, screenPosition: Point) {}
+    onStop(_tick: number) {}
+    onUpdate(_tick: number) {}
+    onDraw(_context: RenderContext, _screenPosition: Point) {}
 
     /**
      * Invoked when component is restored from a save. The component should
@@ -69,14 +69,14 @@ export abstract class EntityComponent<
  * state.
  */
 export class StatelessComponent extends EntityComponent {
-    override fromComponentBundle(bundle: {}): void {}
+    override fromComponentBundle(): void {}
     override toComponentBundle() {
         return {};
     }
 }
 
 export function assertEntityComponent<T extends EntityComponent>(
-    component: T | null
+    component: T | null,
 ): asserts component is T {
     if (!component) {
         throw new Error("Entity has not been resolved from id");

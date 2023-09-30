@@ -20,12 +20,12 @@ export class AttackJob extends Job<AttackJobBundle> {
         return instance;
     }
 
-    override update(tick: number): void {
+    override update(): void {
         if (!this.target) {
             console.warn(
                 "No entity set for job, completing",
                 this.target,
-                this
+                this,
             );
             this.complete();
             return;

@@ -1,5 +1,3 @@
-import { Point } from "../../common/point.js";
-import { UIRenderContext } from "../../rendering/uiRenderContext.js";
 import { UILayoutContext } from "../uiLayoutContext.js";
 import { UISize, fillUiSize, wrapUiSize } from "../uiSize.js";
 import { UIView } from "../uiView.js";
@@ -16,10 +14,10 @@ export class UISpace extends UIView {
         }
     }
 
-    hitTest(screenPoint: Point): boolean {
+    hitTest(): boolean {
         return false;
     }
-    layout(layoutContext: UILayoutContext, constraints: UISize): UISize {
+    layout(_layoutContext: UILayoutContext, constraints: UISize): UISize {
         let measuredWidth = 0;
         let measuredHeight = 0;
 
@@ -43,7 +41,7 @@ export class UISpace extends UIView {
         return this._measuredSize;
     }
 
-    draw(context: UIRenderContext): void {
+    draw(): void {
         // Nothing to draw here
     }
 }

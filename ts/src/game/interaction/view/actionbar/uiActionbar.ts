@@ -12,7 +12,6 @@ export interface UIActionbarItem {
     onClick?: () => void;
     children?: Omit<UIActionbarItem, "children">[];
     icon?: Sprite2;
-    
 }
 
 export enum UIActionbarAlignment {
@@ -25,7 +24,7 @@ export class UIActionbar extends UIView {
         private items: UIActionbarItem[],
         private background: UIBackground,
         private aligment: UIActionbarAlignment,
-        size: UISize
+        size: UISize,
     ) {
         super(size);
         this.updateItems(items);
@@ -44,12 +43,12 @@ export class UIActionbar extends UIView {
         }
     }
 
-    override hitTest(screenPoint: Point): boolean {
+    override hitTest(): boolean {
         return false;
     }
     override layout(
         layoutContext: UILayoutContext,
-        constraints: UISize
+        constraints: UISize,
     ): UISize {
         let usedWidth = 0;
         for (const child of this.children) {

@@ -1,8 +1,6 @@
 import { Point } from "../../common/point.js";
 import { defaultTextStyle, TextStyle } from "../../rendering/text/textStyle.js";
-import { UIRenderContext } from "../../rendering/uiRenderContext.js";
 import { HorizontalAlignment } from "../uiAlignment.js";
-import { UILayoutContext } from "../uiLayoutContext.js";
 import { UISize } from "../uiSize.js";
 import { UIView } from "../uiView.js";
 import { UIImageSource } from "./uiImageSource.js";
@@ -56,10 +54,10 @@ export class UITextWithIcon extends UIView {
         return this.withinViewBounds(screenPoint);
     }
 
-    layout(layoutContext: UILayoutContext, constraints: UISize): UISize {
+    layout(): UISize {
         throw new Error("Method not implemented");
     }
-    draw(context: UIRenderContext): void {
+    draw(): void {
         throw new Error("Method not implemented.");
     }
 

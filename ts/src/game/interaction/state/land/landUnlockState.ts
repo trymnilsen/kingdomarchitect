@@ -61,13 +61,13 @@ export class LandUnlockState extends InteractionState {
                 },
             ],
             [],
-            { width: fillUiSize, height: fillUiSize }
+            { width: fillUiSize, height: fillUiSize },
         );
 
         this.view = scaffoldView;
     }
 
-    override onTap(screenPosition: Point, worldPosition: Point): boolean {
+    override onTap(_screenPosition: Point, worldPosition: Point): boolean {
         for (const unlockedArea of this.unlockableArea) {
             const tileSet = unlockedArea.tileset;
             const withinArea = withinRectangle(
@@ -75,7 +75,7 @@ export class LandUnlockState extends InteractionState {
                 tileSet.bounds.x1 * TileSize,
                 tileSet.bounds.y1 * TileSize,
                 tileSet.bounds.x2 * TileSize,
-                tileSet.bounds.y2 * TileSize
+                tileSet.bounds.y2 * TileSize,
             );
 
             if (withinArea) {
@@ -98,7 +98,7 @@ export class LandUnlockState extends InteractionState {
                 {
                     x: tileSet.bounds.x1,
                     y: tileSet.bounds.y1,
-                }
+                },
             );
             for (const tiles of tileSet.tiles) {
                 context.drawRectangle({
@@ -115,7 +115,7 @@ export class LandUnlockState extends InteractionState {
             const view = this.getUnlockableLabelView(
                 boundsWidth,
                 boundsHeight,
-                unlockableArea
+                unlockableArea,
             );
             view.layout(context, {
                 width: boundsWidth,
@@ -163,12 +163,12 @@ export class LandUnlockState extends InteractionState {
 
         const removeResult = inventoryComponent.removeInventoryItem(
             woodResourceItem.id,
-            selectedArea.cost
+            selectedArea.cost,
         );
 
         if (removeResult) {
             const tileGeneratorComponent = rootEntity.requireComponent(
-                TileGeneratorComponent
+                TileGeneratorComponent,
             );
             tileGeneratorComponent.unlockArea(selectedArea);
             this.selectedArea = undefined;
@@ -177,14 +177,14 @@ export class LandUnlockState extends InteractionState {
             //this.context.stateChanger.clear();
         } else {
             this.context.stateChanger.push(
-                new AlertMessageState("Oh no", "Not enough")
+                new AlertMessageState("Oh no", "Not enough"),
             );
         }
     }
 
     private getUnlockableAreas() {
         const tileGeneratorComponent = this.context.root.requireComponent(
-            TileGeneratorComponent
+            TileGeneratorComponent,
         );
 
         this.unlockableArea = tileGeneratorComponent.getUnlockableArea();
@@ -201,7 +201,7 @@ export class LandUnlockState extends InteractionState {
 
                     const distanceTo = manhattanDistance(
                         this.previousSelectedAreaPosition,
-                        areaPosition
+                        areaPosition,
                     );
 
                     if (distanceTo < closestAreaDistanceToPreviousSelection) {
@@ -212,7 +212,7 @@ export class LandUnlockState extends InteractionState {
             }
 
             this.selectedAreaSize = sizeOfBounds(
-                this.selectedArea.tileset.bounds
+                this.selectedArea.tileset.bounds,
             );
         }
     }
@@ -220,7 +220,7 @@ export class LandUnlockState extends InteractionState {
     private getUnlockableLabelView(
         boundsWidth: number,
         boundsHeight: number,
-        area: UnlockableArea
+        area: UnlockableArea,
     ): UIView {
         return uiBox({
             width: boundsWidth,
@@ -241,7 +241,7 @@ export class LandUnlockState extends InteractionState {
                                         width: wrapUiSize,
                                         height: wrapUiSize,
                                         image: new UISpriteImageSource(
-                                            sprites2.wood_resource
+                                            sprites2.wood_resource,
                                         ),
                                     }),
                                 },

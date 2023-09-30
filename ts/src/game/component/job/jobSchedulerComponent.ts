@@ -15,7 +15,7 @@ import { ScheduledJob } from "./scheduledJob.js";
 export class JobSchedulerComponent extends StatelessComponent {
     private jobQueueAddedListener: EventHandle | undefined;
     private queue: JobQueueComponent | undefined;
-    override onStart(tick: number): void {
+    override onStart(): void {
         if (!this.entity) {
             throw new Error("JobScheduler not attached to entity");
         }
@@ -23,7 +23,7 @@ export class JobSchedulerComponent extends StatelessComponent {
         const queue = this.entity.getComponent(JobQueueComponent);
         if (!queue) {
             throw new Error(
-                "No job queue component on same entity as scheduler"
+                "No job queue component on same entity as scheduler",
             );
         }
         this.queue = queue;
@@ -32,7 +32,7 @@ export class JobSchedulerComponent extends StatelessComponent {
         });
     }
 
-    override onStop(tick: number): void {
+    override onStop(): void {
         if (this.jobQueueAddedListener) {
             this.jobQueueAddedListener();
         }
@@ -53,7 +53,7 @@ export class JobSchedulerComponent extends StatelessComponent {
             console.log("assignJobToAvailableEntity - search entity", entity);
             if (!entity) {
                 throw new InvalidStateError(
-                    "Shifted item in list with >0 length was undefined"
+                    "Shifted item in list with >0 length was undefined",
                 );
             }
 
@@ -72,7 +72,7 @@ export class JobSchedulerComponent extends StatelessComponent {
                     isApplicable = isJobApplicableForEntity(
                         scheduledJob.job,
                         scheduledJob.constraint,
-                        entity
+                        entity,
                     );
                 }
 

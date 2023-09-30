@@ -38,7 +38,7 @@ export class AggroComponent extends EntityComponent<AggroComponentBundle> {
         this._aggroMode = v;
     }
 
-    override onStart(tick: number): void {
+    override onStart(): void {
         this.healthEventHandle = this.entity.componentEvents.listen(
             HealthEvent,
             (event) => {
@@ -55,26 +55,26 @@ export class AggroComponent extends EntityComponent<AggroComponentBundle> {
                         jobRunner.assignJob(
                             AttackJob.createInstance(
                                 event.causeEntity.id,
-                                this.damage
-                            )
+                                this.damage,
+                            ),
                         );
                     }
                 }
-            }
+            },
         );
     }
 
-    override onStop(tick: number): void {
+    override onStop(): void {
         this.healthEventHandle?.dispose();
     }
 
-    override onUpdate(tick: number): void {
+    override onUpdate(): void {
         if (this._aggroMode == AggroMode.Defensive) {
             return;
         }
 
         const adjacentPoint = shuffleItems(
-            adjacentPoints(this.entity.worldPosition)
+            adjacentPoints(this.entity.worldPosition),
         );
         const chunkMap = this.entity
             .getRootEntity()
@@ -94,7 +94,7 @@ export class AggroComponent extends EntityComponent<AggroComponentBundle> {
 
                 if (!hasAttackJob) {
                     jobRunner.assignJob(
-                        AttackJob.createInstance(actor.id, this.damage)
+                        AttackJob.createInstance(actor.id, this.damage),
                     );
                 }
             }

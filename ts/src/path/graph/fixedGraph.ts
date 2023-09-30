@@ -26,7 +26,7 @@ export class FixedGraph implements Graph {
         this.generateGrid();
     }
 
-    invalidatePoint(point: Point) {
+    invalidatePoint() {
         this.generateGrid();
     }
 

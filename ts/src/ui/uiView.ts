@@ -262,7 +262,7 @@ export abstract class UIView implements FocusGroup {
 
     moveFocus(
         direction: Direction,
-        currentFocusBounds: Bounds | null
+        currentFocusBounds: Bounds | null,
     ): boolean {
         return this.moveDirectionalFocus(direction, currentFocusBounds);
     }
@@ -323,7 +323,7 @@ export abstract class UIView implements FocusGroup {
         if (this.parent) {
             this._screenPosition = addPoint(
                 this.parent.screenPosition,
-                this._offset
+                this._offset,
             );
         } else {
             this.screenPosition = this._offset;
@@ -347,7 +347,7 @@ export abstract class UIView implements FocusGroup {
             this.screenPosition.x,
             this.screenPosition.y,
             this.screenPosition.x + this.measuredSize.width,
-            this.screenPosition.y + this.measuredSize.height
+            this.screenPosition.y + this.measuredSize.height,
         );
     }
 
@@ -357,20 +357,21 @@ export abstract class UIView implements FocusGroup {
      * @param screenPoint the position the tap started at
      * @returns true if this tap was consumed by this view. Defaults to false
      */
-    onTapDown(screenPoint: Point): boolean {
+    onTapDown(_screenPoint: Point): boolean {
         return false;
     }
     /**
      * Called when a tap is registered as no-longer down.
      * @param screenPoint the position of this tap event
      */
-    onTapUp(screenPoint: Point, isCancelled: boolean) {}
+    onTapUp(_screenPoint: Point, _isCancelled: boolean) {}
+
     /**
      * Called when a tap is registered as both up and down within this view.
      * @param screenPoint the position this event occured at.
      * @returns true if this tap was handled by the view. Defaults to false
      */
-    onTap(screenPoint: Point): boolean {
+    onTap(_screenPoint: Point): boolean {
         return false;
     }
 
@@ -505,7 +506,7 @@ export abstract class UIView implements FocusGroup {
      */
     abstract layout(
         layoutContext: UILayoutContext,
-        constraints: UISize
+        constraints: UISize,
     ): UISize;
 
     /**
@@ -524,7 +525,7 @@ export abstract class UIView implements FocusGroup {
      */
     private moveDirectionalFocus(
         direction: Direction,
-        currentFocusBounds: Bounds | null
+        currentFocusBounds: Bounds | null,
     ): boolean {
         const viewPortBounds: Bounds = {
             x1: 0,
@@ -546,7 +547,7 @@ export abstract class UIView implements FocusGroup {
             const closestView = getClosestFocusableView(
                 focusableViews,
                 currentFocusBounds,
-                direction
+                direction,
             );
             if (closestView) {
                 this.focusState.setFocus(closestView);

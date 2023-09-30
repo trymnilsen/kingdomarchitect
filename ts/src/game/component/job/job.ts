@@ -79,7 +79,7 @@ export abstract class Job<T extends JSONValue = {}> {
     public set startTick(value: number) {
         if (this._startTick != 0) {
             throw new InvalidStateError(
-                "Cannot set start tick after it is set"
+                "Cannot set start tick after it is set",
             );
         }
         this._startTick = value;
@@ -103,19 +103,19 @@ export abstract class Job<T extends JSONValue = {}> {
     public set jobState(v: JobState) {
         if (v == JobState.NotStarted) {
             throw new InvalidStateError(
-                "Cannot set job state to not started, this the default state"
+                "Cannot set job state to not started, this the default state",
             );
         }
 
         if (this._jobState == JobState.Completed) {
             throw new InvalidStateError(
-                `Job already completed, unable to change state to: ${v}`
+                `Job already completed, unable to change state to: ${v}`,
             );
         }
 
         if (this._jobState == JobState.Running && v != JobState.Completed) {
             throw new InvalidStateError(
-                `Can only transition to end-state from running, attempted to set: ${v}`
+                `Can only transition to end-state from running, attempted to set: ${v}`,
             );
         }
 
@@ -152,7 +152,7 @@ export abstract class Job<T extends JSONValue = {}> {
     public get movement(): MovementHelper {
         if (!this._entity) {
             throw new Error(
-                "Cannot access movement helper before entity is set"
+                "Cannot access movement helper before entity is set",
             );
         }
         //Lazily create the helper if needed
@@ -248,7 +248,7 @@ export abstract class Job<T extends JSONValue = {}> {
      * logic should consider that entity can be null and the job not started
      * @param renderContext the context to render to
      */
-    onDraw(renderContext: RenderContext) {}
+    onDraw(_renderContext: RenderContext) {}
 
     /**
      * Request to update this job. Called when attached to an actor and running
@@ -271,7 +271,7 @@ export abstract class Job<T extends JSONValue = {}> {
      * so logic requiring the entity tree can be used here.
      * @param bundle provides the locally saved bundle as a non-nullable value
      */
-    protected onFromPersistedState(bundle: T) {}
+    protected onFromPersistedState(_bundle: T) {}
 
     /**
      * Check if a point is adjacent to the entity of this job

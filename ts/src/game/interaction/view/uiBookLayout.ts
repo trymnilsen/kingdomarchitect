@@ -141,13 +141,13 @@ export class UIBookLayout extends UIView {
         this.addView(tabContainer);
     }
 
-    override hitTest(screenPoint: Point): boolean {
+    override hitTest(): boolean {
         return false;
     }
 
     override layout(
         layoutContext: UILayoutContext,
-        constraints: UISize
+        constraints: UISize,
     ): UISize {
         const availableSize = {
             width: constraints.width - horizontalPadding * 2,
@@ -224,7 +224,7 @@ export class UIBookLayout extends UIView {
                 x: horizontalPadding + this._bookOffset,
                 y: verticalPadding,
             },
-            this.screenPosition
+            this.screenPosition,
         );
 
         bookBackground.draw(context, backgroundPosition, bookSize);

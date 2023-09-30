@@ -36,7 +36,7 @@ export class RootState extends InteractionState {
             groups.push(this.view);
         }
         groups.push(
-            new WorldFocusGroup(this.context.root, this.context.camera)
+            new WorldFocusGroup(this.context.root, this.context.camera),
         );
 
         return groups;
@@ -71,7 +71,7 @@ export class RootState extends InteractionState {
                 icon: sprites2.empty_sprite,
                 onClick: () => {
                     this.context.stateChanger.push(
-                        new AlertMessageState("Oh no", "Not implemented")
+                        new AlertMessageState("Oh no", "Not implemented"),
                     );
                 },
             },
@@ -105,7 +105,7 @@ export class RootState extends InteractionState {
             contentView,
             actionItems,
             rightActionItems,
-            { width: fillUiSize, height: fillUiSize }
+            { width: fillUiSize, height: fillUiSize },
         );
 
         this.view = scaffoldState;
@@ -138,7 +138,10 @@ export class RootState extends InteractionState {
 
 class WorldFocusGroup implements FocusGroup {
     private currentFocus: GroundTile | null = null;
-    constructor(private rootNode: Entity, private camera: Camera) {}
+    constructor(
+        private rootNode: Entity,
+        private camera: Camera,
+    ) {}
     onFocusActionInput(): boolean {
         return false;
     }
@@ -162,7 +165,7 @@ class WorldFocusGroup implements FocusGroup {
     }
     moveFocus(
         direction: Direction,
-        currentFocusBounds: Bounds | null
+        currentFocusBounds: Bounds | null,
     ): boolean {
         if (!currentFocusBounds) {
             return false;
@@ -171,14 +174,14 @@ class WorldFocusGroup implements FocusGroup {
         const centerPosition = shiftPoint(
             boundsCenter(currentFocusBounds),
             direction,
-            TileSize
+            TileSize,
         );
 
         //TODO: Optimize finding the closest tile, no need to loop over all
         const worldPosition = this.camera.screenToWorld(centerPosition);
         const tilesComponent = this.rootNode.requireComponent(TilesComponent);
 
-        const tiles = tilesComponent.getTiles((tile) => true);
+        const tiles = tilesComponent.getTiles(() => true);
         let closestTile = tiles[0];
         let closestDistance = Number.MAX_SAFE_INTEGER;
         for (const tile of tiles) {
@@ -187,7 +190,7 @@ class WorldFocusGroup implements FocusGroup {
                     x: tile.tileX * TileSize + HalfTileSize,
                     y: tile.tileY * TileSize + HalfTileSize,
                 },
-                worldPosition
+                worldPosition,
             );
             if (distance < closestDistance) {
                 closestDistance = distance;

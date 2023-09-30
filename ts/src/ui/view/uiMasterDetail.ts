@@ -1,4 +1,4 @@
-import { addPoint, Point } from "../../common/point.js";
+import { addPoint } from "../../common/point.js";
 import { UIRenderContext } from "../../rendering/uiRenderContext.js";
 import { UIBackground } from "../uiBackground.js";
 import { UILayoutContext } from "../uiLayoutContext.js";
@@ -38,7 +38,7 @@ export class UIMasterDetails extends UIView {
     constructor(
         private masterView: UIView,
         private detailsView: UIView,
-        size: UISize
+        size: UISize,
     ) {
         super(size);
         this.addView(masterView);
@@ -59,11 +59,11 @@ export class UIMasterDetails extends UIView {
         this.addView(view);
     }
 
-    hitTest(screenPoint: Point): boolean {
+    hitTest(): boolean {
         return !!this.background;
     }
 
-    override onTap(screenPoint: Point): boolean {
+    override onTap(): boolean {
         return !!this.background;
     }
 
@@ -119,7 +119,7 @@ export class UIMasterDetails extends UIView {
                 {
                     width: 600,
                     height: 400,
-                }
+                },
             );
         }
         this.masterView.draw(context);
