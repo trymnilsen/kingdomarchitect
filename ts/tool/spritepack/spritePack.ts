@@ -18,7 +18,7 @@ async function run() {
     const files = await fs.readdir(assetPath);
     const assetFiles = files.filter((filename) => filename.endsWith(".png"));
     const definitionFiles = files.filter((filename) =>
-        filename.endsWith(".json")
+        filename.endsWith(".json"),
     );
 
     if (definitionFiles.length > 0) {
@@ -36,13 +36,13 @@ async function run() {
         //any parts of the original spritesheet that is not used
         const createdSprites = await createSpriteSheet(
             defintionPath,
-            sourceFilePath
+            sourceFilePath,
         );
         if (createdSprites) {
             if (createdSprites.length == 0) {
                 console.error(
                     `No sprites created for: ${sourceFilePath}`,
-                    createdSprites
+                    createdSprites,
                 );
             }
             for (const sprite of createdSprites) {
@@ -114,7 +114,7 @@ async function packSprites(sprites: PackableSprite[]) {
             const spritePixels = await read(packedSprite.filename);
             if (!spritePixels) {
                 throw new Error(
-                    `Unable to get pixels from ${packedSprite.filename}`
+                    `Unable to get pixels from ${packedSprite.filename}`,
                 );
             }
 
@@ -122,7 +122,7 @@ async function packSprites(sprites: PackableSprite[]) {
             let frames = definition.frames;
             if (!frames) {
                 console.log(
-                    `Frames was not defined ${packedSprite.filename}:${packedSprite.spriteName}. Setting it to 1`
+                    `Frames was not defined ${packedSprite.filename}:${packedSprite.spriteName}. Setting it to 1`,
                 );
                 frames = 1;
             }
@@ -146,8 +146,8 @@ async function packSprites(sprites: PackableSprite[]) {
                     const color = intToRGBA(
                         spritePixels.getPixelColor(
                             xInSourceImage,
-                            yInSourceImage
-                        )
+                            yInSourceImage,
+                        ),
                     );
 
                     const pixel: PixelColor = {
@@ -168,7 +168,7 @@ async function packSprites(sprites: PackableSprite[]) {
                             y,
                             xInSourceImage,
                             yInSourceImage,
-                            pixel
+                            pixel,
                         );
                         console.error("Error: ", err);
                         throw err;
@@ -183,7 +183,7 @@ async function packSprites(sprites: PackableSprite[]) {
             filename: binName,
         });
         await bitmap.write(
-            path.join(process.cwd(), "public", "asset", binName)
+            path.join(process.cwd(), "public", "asset", binName),
         );
     }
 
@@ -197,7 +197,7 @@ async function packSprites(sprites: PackableSprite[]) {
     // Write all sprites to json
     await fs.writeFile(
         path.join(process.cwd(), "ts", "generated", "sprites.ts"),
-        generatedTypescript
+        generatedTypescript,
     );
 }
 
@@ -210,7 +210,7 @@ async function packSprites(sprites: PackableSprite[]) {
  */
 async function createSpriteSheet(
     definitionPath: string,
-    spritePath: string
+    spritePath: string,
 ): Promise<PackableSprite[] | null> {
     const definitionFileContent = await fs.readFile(definitionPath, {
         encoding: "utf8",
@@ -245,7 +245,7 @@ async function createSpriteSheet(
             console.error(
                 `Sprite definition (${spriteName}) width overflow`,
                 definitionMaxX,
-                width
+                width,
             );
             return null;
         }
@@ -254,7 +254,7 @@ async function createSpriteSheet(
             console.error(
                 `Sprite definition (${spriteName}) height overflow`,
                 definitionMaxY,
-                height
+                height,
             );
             return null;
         }
@@ -263,7 +263,7 @@ async function createSpriteSheet(
             const packableSprite = await extractSprite(
                 spriteName,
                 spriteDefinition,
-                pixelData
+                pixelData,
             );
             packedSprites.push(packableSprite);
         } catch (err) {
@@ -277,7 +277,7 @@ async function createSpriteSheet(
 async function extractSprite(
     spriteName: string,
     spriteDefinition: SpriteDefinition,
-    spritePixels: Jimp
+    spritePixels: Jimp,
 ): Promise<PackableSprite> {
     const options = {
         smart: false,
@@ -294,7 +294,7 @@ async function extractSprite(
         spriteDefinition.w * frames.length,
         spriteDefinition.h,
         0,
-        options
+        options,
     );
 
     for (let i = 0; i < frames.length; i++) {
@@ -307,7 +307,7 @@ async function extractSprite(
 
     if (packer.bins.length > 1) {
         throw new Error(
-            `Failed to pack ${spriteName}, got ${packer.bins.length} bins`
+            `Failed to pack ${spriteName}, got ${packer.bins.length} bins`,
         );
     }
 
@@ -325,7 +325,7 @@ async function extractSprite(
                 const yInSourceImage = packedFrame.y + y;
 
                 const color = intToRGBA(
-                    spritePixels.getPixelColor(xInSourceImage, yInSourceImage)
+                    spritePixels.getPixelColor(xInSourceImage, yInSourceImage),
                 );
                 const pixel: PixelColor = {
                     red: color.r,
@@ -337,7 +337,7 @@ async function extractSprite(
                 bitmap.setPixel(
                     packedRectangle.x + x,
                     packedRectangle.y + y,
-                    pixel
+                    pixel,
                 );
             }
         }
@@ -347,7 +347,7 @@ async function extractSprite(
         process.cwd(),
         "build",
         "sprites",
-        `${spriteName}.png`
+        `${spriteName}.png`,
     );
     await bitmap.write(filename);
 

@@ -18,7 +18,7 @@ export function mobPrefab(id: string): Entity {
             x: 3,
             y: 2,
         },
-        { x: 32, y: 32 }
+        { x: 32, y: 32 },
     );
     const aggroComponent = AggroComponent.createInstance(1);
     aggroComponent.aggroMode = AggroMode.Agressive;

@@ -14,7 +14,7 @@ export interface UIRenderContext {
     drawScreenspaceText(text: TextConfiguration): void;
     drawWithClip(
         bounds: Bounds,
-        drawFunction: (context: UIRenderContext) => void
+        drawFunction: (context: UIRenderContext) => void,
     ): void;
     drawLine(
         x1: number,
@@ -22,7 +22,7 @@ export interface UIRenderContext {
         x2: number,
         y2: number,
         color: string,
-        width: number
+        width: number,
     ): void;
     getSprite(id: string): Sprite2;
 }

@@ -37,7 +37,7 @@ export interface TextConfiguration extends RenderItemConfiguration {
 
 export function configureText(
     renderItem: TextConfiguration,
-    context: CanvasRenderingContext2D
+    context: CanvasRenderingContext2D,
 ) {
     let fontString = `${renderItem.size}px ${renderItem.font}`;
     //let alignOffset = 0;
@@ -60,12 +60,12 @@ export function configureText(
 
 export function textRenderer(
     renderItem: TextConfiguration,
-    context: CanvasRenderingContext2D
+    context: CanvasRenderingContext2D,
 ) {
     configureText(renderItem, context);
     context.fillText(
         renderItem.text,
         Math.floor(renderItem.x),
-        Math.floor(renderItem.y)
+        Math.floor(renderItem.y),
     );
 }

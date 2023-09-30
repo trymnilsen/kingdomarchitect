@@ -5,7 +5,7 @@ import { ChunkMapComponent } from "./chunkMapComponent.js";
 export class ChunkMapUpdateEvent extends ComponentEvent<ChunkMapComponent> {
     constructor(
         readonly pointUpdated: Point,
-        sourceComponent: ChunkMapComponent
+        sourceComponent: ChunkMapComponent,
     ) {
         super(sourceComponent);
     }

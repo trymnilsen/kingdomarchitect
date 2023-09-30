@@ -44,7 +44,7 @@ export function getKeyboardMap(): KeyboardMap {
     }
     console.debug(
         "No keyboardmap defined, returning default",
-        DefaultKeyboardMap
+        DefaultKeyboardMap,
     );
     return DefaultKeyboardMap;
 }

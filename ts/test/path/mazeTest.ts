@@ -13,13 +13,13 @@ describe("Maze tests", () => {
                     offsetY: 0,
                     weights: graph.graph,
                 };
-            })
+            }),
         );
         const pathResult = pathSearch.search(
             graph.start,
             graph.stop,
             true,
-            (node) => node.weight
+            (node) => node.weight,
         );
 
         verifyPath(pathResult.path, graph);

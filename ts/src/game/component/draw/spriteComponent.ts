@@ -17,7 +17,7 @@ export class SpriteComponent extends EntityComponent<SpriteComponentBundle> {
     static createInstance(
         sprite: Sprite2,
         offset: Point,
-        size?: Point
+        size?: Point,
     ): SpriteComponent {
         const instance = new SpriteComponent();
         instance.fromComponentBundle({

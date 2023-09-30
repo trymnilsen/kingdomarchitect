@@ -30,7 +30,7 @@ export class Event<T = object> implements EventListener<T> {
             } catch (err) {
                 console.error(
                     `Failed to run event listener #${idx} ${listener.name}`,
-                    err
+                    err,
                 );
             }
         });

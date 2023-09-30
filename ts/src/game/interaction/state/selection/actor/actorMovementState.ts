@@ -49,7 +49,7 @@ export class ActorMovementState extends InteractionState {
                 },
             ],
             [],
-            { width: fillUiSize, height: fillUiSize }
+            { width: fillUiSize, height: fillUiSize },
         );
 
         this.view = scaffoldView;
@@ -85,7 +85,7 @@ export class ActorMovementState extends InteractionState {
 
         if (this.selectedPoint) {
             const cursorWorldPosition = context.camera.tileSpaceToScreenSpace(
-                this.selectedPoint
+                this.selectedPoint,
             );
 
             context.drawNinePatchSprite({
@@ -159,7 +159,7 @@ export class ActorMovementState extends InteractionState {
             .requireComponent(JobQueueComponent)
             .addJob(
                 MoveJob.createInstance(this.path),
-                entityInstanceConstraint(this.entity.id)
+                entityInstanceConstraint(this.entity.id),
             );
     }
 }

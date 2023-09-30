@@ -32,12 +32,12 @@ export class HousingComponent extends EntityComponent<HousingBundle> {
                 this.entity.getRootEntity(),
                 (entity) => {
                     const workerComponent = entity.getComponent(
-                        WorkerBehaviorComponent
+                        WorkerBehaviorComponent,
                     );
                     const tenantComponent =
                         entity.getComponent(TenantComponent);
                     return !!workerComponent && !tenantComponent;
-                }
+                },
             );
 
             if (homelessWorker) {

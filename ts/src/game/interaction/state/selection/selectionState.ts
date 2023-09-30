@@ -59,7 +59,7 @@ export class SelectionState extends InteractionState {
 
     override onDraw(context: RenderContext): void {
         const cursorWorldPosition = context.camera.tileSpaceToScreenSpace(
-            this.selectedItem.tilePosition
+            this.selectedItem.tilePosition,
         );
         const bounds = this.selectedItem.selectionSize;
         const cursorWidth = bounds.x * TileSize;
@@ -104,13 +104,13 @@ export class SelectionState extends InteractionState {
 
                 if (!jobQueue) {
                     throw new Error(
-                        "No job queue component on root for selection"
+                        "No job queue component on root for selection",
                     );
                 }
 
                 const currentJob = query(
                     selection.entity.getRootEntity(),
-                    new SelectedItemIsTargetQuery(selection)
+                    new SelectedItemIsTargetQuery(selection),
                 );
 
                 if (currentJob) {
@@ -141,7 +141,7 @@ export class SelectionState extends InteractionState {
             }
 
             const worker = selection.entity.getComponent(
-                WorkerBehaviorComponent
+                WorkerBehaviorComponent,
             );
 
             if (worker) {
@@ -197,13 +197,13 @@ export class SelectionState extends InteractionState {
 
                 if (!jobQueue) {
                     throw new Error(
-                        "No job queue component on root for selection"
+                        "No job queue component on root for selection",
                     );
                 }
 
                 const currentJob = query(
                     this.context.root,
-                    new SelectedItemIsTargetQuery(selection)
+                    new SelectedItemIsTargetQuery(selection),
                 );
 
                 if (currentJob) {
@@ -257,7 +257,7 @@ export class SelectionState extends InteractionState {
         const selectedTile = this.selectedItem;
         if (selectedTile instanceof SelectedEntityItem) {
             this.context.stateChanger.push(
-                new ChopJobState(selectedTile.entity)
+                new ChopJobState(selectedTile.entity),
             );
         }
     }

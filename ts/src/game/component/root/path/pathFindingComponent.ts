@@ -42,11 +42,7 @@ export class PathFindingComponent extends StatelessComponent {
         this.chunkMapEventListener?.dispose();
     }
 
-    findPath(
-        from: Point,
-        to: Point,
-        blockBuildings?: boolean,
-    ): PathResult {
+    findPath(from: Point, to: Point, blockBuildings?: boolean): PathResult {
         if (!this.pathSearch) {
             throw new Error("Cannot find path, no pathsearch set");
         }

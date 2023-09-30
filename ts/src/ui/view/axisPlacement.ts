@@ -13,7 +13,7 @@ export interface AxisPlacement {
 export function insertAndShift(
     array: AxisPlacement[],
     index: number,
-    value: AxisPlacement
+    value: AxisPlacement,
 ) {
     array[index] = value;
     const range = value.end - value.start;

@@ -64,7 +64,7 @@ export class LineSelectionMode implements SelectionMode {
         this.selection = positions.filter(
             (value, index, self) =>
                 index ===
-                self.findIndex((t) => t.x === value.x && t.y === value.y)
+                self.findIndex((t) => t.x === value.x && t.y === value.y),
         );
         this.from = point;
     }

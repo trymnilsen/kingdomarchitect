@@ -6,7 +6,7 @@ export interface SpriteAnimation extends Sprite2 {
 
 export function spriteFromAnimation(
     sprite: SpriteAnimation,
-    frame: number
+    frame: number,
 ): Sprite2 {
     const clampedFrame = frame % sprite.frames;
     const frameWidth = sprite.defintion.w;

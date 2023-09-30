@@ -13,6 +13,7 @@
         "start": "tsc && node build/tool/http/server.js",
         "test": "tsc && node --test",
         "bundle": "rollup -c",
+        "format": "prettier ts/ --write",
         "check-format": "prettier ts/ --check",
         "lint": "eslint ts/src",
         "verify": "npm run test && npm run check-format && npm run lint" 

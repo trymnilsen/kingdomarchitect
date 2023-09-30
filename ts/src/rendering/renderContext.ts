@@ -66,7 +66,7 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
         camera: Camera,
         assetLoader: AssetLoader,
         width: number,
-        height: number
+        height: number,
     ) {
         this.canvasContext = canvasContext;
         this._camera = camera;
@@ -86,7 +86,7 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
         x2: number,
         y2: number,
         color: string,
-        width: number
+        width: number,
     ): void {
         this.canvasContext.beginPath();
         this.canvasContext.moveTo(x1, y1);
@@ -139,7 +139,7 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
                 bounds.x1,
                 bounds.y1,
                 bounds.x2 - bounds.x1,
-                bounds.y2 - bounds.y1
+                bounds.y2 - bounds.y1,
             );
             this.canvasContext.clip();
             drawFunction(this);
@@ -223,7 +223,7 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
             targetHeight,
             frame,
             this._assetLoader.getBinAsset(sprite.sprite.bin),
-            this.canvasContext
+            this.canvasContext,
         );
     }
 
@@ -251,7 +251,7 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
             ninePatch.sides.right,
             ninePatch.scale,
             this._assetLoader.getBinAsset(ninePatch.sprite.bin),
-            this.canvasContext
+            this.canvasContext,
         );
     }
 

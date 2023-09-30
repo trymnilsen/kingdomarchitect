@@ -18,7 +18,7 @@ export const jobLoaderJobs: ConstructorFunction<Job>[] = [
 
 export function createJobFromBundle(jobBundle: JobBundle): Job {
     const jobConstructorFn = jobLoaderJobs.find(
-        (fn) => fn.name == jobBundle.type
+        (fn) => fn.name == jobBundle.type,
     );
     if (!jobConstructorFn) {
         throw new Error(`Job constructor not found for ${jobBundle.type}`);

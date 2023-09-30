@@ -17,5 +17,5 @@ document.addEventListener(
     () => {
         bootstrap();
     },
-    false
+    false,
 );

@@ -84,7 +84,7 @@ describe("Entity test", () => {
         assert.strictEqual(addedComponent, component);
         assert.equal(
             parent.components.some((item) => item === component),
-            true
+            true,
         );
     });
 
@@ -230,14 +230,14 @@ describe("Entity test", () => {
         assert.equal(removedComponent, null);
         assert.equal(
             parent.components.some((item) => item === component),
-            false
+            false,
         );
     });
 
     it("Remove component returns false on non existence", () => {
         const parent = new Entity("1");
         const nonExistingRemoveResult = parent.removeComponent(
-            new StubComponent()
+            new StubComponent(),
         );
         assert.strictEqual(nonExistingRemoveResult, false);
     });

@@ -30,7 +30,7 @@ export function calculateAlignment(
     height: number,
     alignment: Point,
     itemWidth: number,
-    itemHeight: number
+    itemHeight: number,
 ): Point {
     const halfWidthConstraint = width / 2;
     const halfHeightConstraint = height / 2;

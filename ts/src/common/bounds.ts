@@ -18,7 +18,7 @@ export function withinRectangle(
     x1: number,
     y1: number,
     x2: number,
-    y2: number
+    y2: number,
 ) {
     return point.x >= x1 && point.x <= x2 && point.y >= y1 && point.y <= y2;
 }
@@ -51,7 +51,7 @@ export function boundsCenter(bounds: Bounds): Point {
 
     return addPoint(
         { x: bounds.x1, y: bounds.y1 },
-        { x: width / 2, y: height / 2 }
+        { x: width / 2, y: height / 2 },
     );
 }
 

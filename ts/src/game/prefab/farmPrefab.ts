@@ -10,7 +10,7 @@ export function farmPrefab(id: string): Entity {
             x: 3,
             y: 2,
         },
-        { x: 32, y: 32 }
+        { x: 32, y: 32 },
     );
 
     farm.addComponent(spriteDrawer);

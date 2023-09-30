@@ -21,7 +21,7 @@ export class Renderer {
     constructor(
         canvasElement: HTMLCanvasElement,
         assetLoader: AssetLoader,
-        gameTime: GameTime
+        gameTime: GameTime,
     ) {
         const context = canvasElement.getContext("2d");
         if (!context) {
@@ -41,7 +41,7 @@ export class Renderer {
             this.camera,
             assetLoader,
             window.innerWidth,
-            window.innerHeight
+            window.innerHeight,
         );
 
         /*
@@ -72,14 +72,14 @@ export class Renderer {
             0,
             0,
             window.innerWidth,
-            window.innerHeight
+            window.innerHeight,
         );
         this.canvasContext.fillStyle = clearColor;
         this.canvasContext.fillRect(
             0,
             0,
             window.innerWidth,
-            window.innerHeight
+            window.innerHeight,
         );
     }
 }

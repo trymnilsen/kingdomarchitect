@@ -18,7 +18,7 @@ export interface InputAction {
 }
 
 export function getDirectionFromInputType(
-    action: InputActionType
+    action: InputActionType,
 ): Direction | null {
     let direction: Direction | null = null;
     switch (action) {

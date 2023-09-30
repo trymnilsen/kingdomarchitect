@@ -24,7 +24,7 @@ export class Game {
     constructor(domElementWrapperSelector: string) {
         // Get the canvas
         const canvasElement: HTMLCanvasElement | null = document.querySelector(
-            `#${domElementWrapperSelector}`
+            `#${domElementWrapperSelector}`,
         );
 
         if (canvasElement == null) {
@@ -41,7 +41,7 @@ export class Game {
         this.renderer = new Renderer(
             canvasElement,
             this.assetLoader,
-            this.gameTime
+            this.gameTime,
         );
 
         if (this.gamePersister.hasSaveData) {
@@ -65,7 +65,7 @@ export class Game {
             this.world,
             this.renderer.camera,
             this.assetLoader,
-            this.gameTime
+            this.gameTime,
         );
     }
 
@@ -88,13 +88,13 @@ export class Game {
             movement: Point,
             position: Point,
             startPosition: Point,
-            downTapHandled: boolean
+            downTapHandled: boolean,
         ) => {
             if (downTapHandled) {
                 this.interactionHandler.onTapPan(
                     movement,
                     position,
-                    startPosition
+                    startPosition,
                 );
             } else {
                 this.renderer.camera.translate(invert(movement));
@@ -146,22 +146,22 @@ export class Game {
                     break;
                 case InputActionType.UP_PRESS:
                     this.updateCamera(
-                        changeY(this.renderer.camera.position, -TileSize)
+                        changeY(this.renderer.camera.position, -TileSize),
                     );
                     break;
                 case InputActionType.DOWN_PRESS:
                     this.updateCamera(
-                        changeY(this.renderer.camera.position, TileSize)
+                        changeY(this.renderer.camera.position, TileSize),
                     );
                     break;
                 case InputActionType.LEFT_PRESS:
                     this.updateCamera(
-                        changeX(this.renderer.camera.position, -TileSize)
+                        changeX(this.renderer.camera.position, -TileSize),
                     );
                     break;
                 case InputActionType.RIGHT_PRESS:
                     this.updateCamera(
-                        changeX(this.renderer.camera.position, TileSize)
+                        changeX(this.renderer.camera.position, TileSize),
                     );
                     break;
             }

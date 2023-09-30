@@ -13,7 +13,7 @@ import { actionbarHeight, actionbarWidth } from "./uiActionbarConstants.js";
 export class UIActionbarButton extends UIBox {
     constructor(
         private item: UIActionbarItem,
-        private buttonBackground: UIBackground
+        private buttonBackground: UIBackground,
     ) {
         super({
             width: actionbarWidth,
@@ -62,7 +62,7 @@ export class UIActionbarButton extends UIBox {
                         }),
                     },
                 ],
-            })
+            }),
         );
     }
 }

@@ -10,7 +10,7 @@ export interface RectangleConfiguration extends RenderItemConfiguration {
 
 export function rectangleRenderer(
     config: RectangleConfiguration,
-    context: CanvasRenderingContext2D
+    context: CanvasRenderingContext2D,
 ) {
     if (config.fill) {
         context.fillStyle = config.fill;

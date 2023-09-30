@@ -17,11 +17,11 @@ export type OnPanCallback = (
     movement: Point,
     position: Point,
     startPosition: Point,
-    downTapHandled: boolean
+    downTapHandled: boolean,
 ) => void;
 export type OnStartDragCallback = (
     tapStart: Point,
-    dragStart: Point
+    dragStart: Point,
 ) => boolean;
 
 export class TouchInput {
@@ -45,7 +45,7 @@ export class TouchInput {
                     y: event.touches[0].clientY,
                 });
             },
-            { passive: false }
+            { passive: false },
         );
 
         canvasElement.addEventListener(
@@ -57,7 +57,7 @@ export class TouchInput {
                     y: event.clientY,
                 });
             },
-            { passive: false }
+            { passive: false },
         );
 
         canvasElement.addEventListener(
@@ -68,7 +68,7 @@ export class TouchInput {
             },
             {
                 passive: false,
-            }
+            },
         );
 
         canvasElement.addEventListener(
@@ -78,7 +78,7 @@ export class TouchInput {
                 const touch = event.touches[0];
                 this.onDrag({ x: touch.clientX, y: touch.clientY });
             },
-            { passive: false }
+            { passive: false },
         );
 
         canvasElement.addEventListener(
@@ -90,7 +90,7 @@ export class TouchInput {
                     y: event.clientY,
                 });
             },
-            { passive: false }
+            { passive: false },
         );
         canvasElement.addEventListener(
             "mouseout",
@@ -101,7 +101,7 @@ export class TouchInput {
                     y: event.clientY,
                 });
             },
-            { passive: false }
+            { passive: false },
         );
         canvasElement.addEventListener(
             "mouseup",
@@ -112,7 +112,7 @@ export class TouchInput {
                     y: event.clientY,
                 });
             },
-            { passive: false }
+            { passive: false },
         );
         canvasElement.addEventListener(
             "touchend",
@@ -120,7 +120,7 @@ export class TouchInput {
                 event.preventDefault();
                 this.onTapEnded();
             },
-            { passive: false }
+            { passive: false },
         );
         canvasElement.addEventListener(
             "touchcancel",
@@ -128,7 +128,7 @@ export class TouchInput {
                 event.preventDefault();
                 this.onTapEnded();
             },
-            { passive: false }
+            { passive: false },
         );
     }
     private onTapStart(position: Point) {
@@ -150,7 +150,7 @@ export class TouchInput {
                     movement,
                     position,
                     this.onTapPosition,
-                    this.tapHandled
+                    this.tapHandled,
                 );
             }
         } else if (this.onTapPosition != null) {

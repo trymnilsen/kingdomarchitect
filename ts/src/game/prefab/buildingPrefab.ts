@@ -8,13 +8,13 @@ import { Entity } from "../entity/entity.js";
 export function buildingPrefab(
     id: string,
     building: Building,
-    extraComponents: EntityComponent[]
+    extraComponents: EntityComponent[],
 ): Entity {
     const entity = new Entity(id);
     const buildingComponent = BuildingComponent.createInstance(
         building.icon,
         sprites2.wooden_house_scaffold,
-        building.id
+        building.id,
     );
 
     const currentHealth = 10;

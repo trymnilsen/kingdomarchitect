@@ -5,7 +5,7 @@ import * as path from "path";
 import { Point, pointEquals, zeroPoint } from "../../src/common/point.js";
 
 export async function createGraphFromTestFile(
-    mazeName: string
+    mazeName: string,
 ): Promise<TestGraph> {
     let currentDirectory = process.cwd();
     //If the current directory contains the build folder, we should jump out to
@@ -27,7 +27,7 @@ export async function createGraphFromTestFile(
         "ts",
         "test",
         "path",
-        "mazes"
+        "mazes",
     );
 
     const image = await read(path.join(directory, mazeName));
@@ -89,7 +89,7 @@ export function verifyPath(resultingPath: Point[], graph: TestGraph) {
     assert.equal(
         expectedPointsLeft,
         0,
-        "All expected points not visited by resulting path"
+        "All expected points not visited by resulting path",
     );
 }
 

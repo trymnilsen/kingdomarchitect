@@ -17,7 +17,7 @@ export class SpriteAnimation {
             {
                 x: 10,
                 y: 10,
-            }
+            },
         );
         const frameIndex = this.currentFrame % this.spriteFrames.length;
         const spriteFrame = this.spriteFrames[frameIndex];

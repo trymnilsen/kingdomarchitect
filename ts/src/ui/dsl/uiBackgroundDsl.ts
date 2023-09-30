@@ -18,12 +18,12 @@ export interface NinePatchBackgroundProperties {
 }
 
 export function ninePatchBackground(
-    properties: NinePatchBackgroundProperties
+    properties: NinePatchBackgroundProperties,
 ): UIBackground {
     return new NinePatchBackground(
         properties.sprite,
         properties.sides || allSides(8),
-        properties.scale || 1
+        properties.scale || 1,
     );
 }
 
@@ -33,7 +33,7 @@ export interface BoxBackgroundProperties {
     strokeWidth?: number;
 }
 export function boxBackground(
-    properties: BoxBackgroundProperties
+    properties: BoxBackgroundProperties,
 ): UIBackground {
     let strokeWidth = 1;
     if (properties.strokeWidth != undefined) {

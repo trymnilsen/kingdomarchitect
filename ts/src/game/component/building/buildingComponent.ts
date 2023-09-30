@@ -35,7 +35,7 @@ export class BuildingComponent extends EntityComponent<BuildingComponentBundle> 
     static createInstance(
         buildingSprite: Sprite2,
         scaffoldSprite: Sprite2,
-        buildingId: string
+        buildingId: string,
     ): BuildingComponent {
         const instance = new BuildingComponent();
         instance.fromComponentBundle({

@@ -35,7 +35,7 @@ export class HealthComponent extends EntityComponent<HealthBundle> {
     static createInstance(
         currentHealth: number,
         maxHealth: number,
-        showHealthBarThreshold: NumberRange = { min: 0, max: maxHealth }
+        showHealthBarThreshold: NumberRange = { min: 0, max: maxHealth },
     ): HealthComponent {
         const instance = new HealthComponent();
         instance.fromComponentBundle({

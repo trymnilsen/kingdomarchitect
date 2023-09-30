@@ -60,7 +60,7 @@ export class EquipItemState extends InteractionState {
             contentView,
             actions,
             [],
-            { width: fillUiSize, height: fillUiSize }
+            { width: fillUiSize, height: fillUiSize },
         );
 
         this.view = scaffoldState;
@@ -138,7 +138,7 @@ export class EquipItemState extends InteractionState {
 
         const removeResult = inventoryComponent.removeInventoryItem(
             this.inventoryItem.id,
-            1
+            1,
         );
 
         if (removeResult) {
@@ -161,7 +161,7 @@ export class EquipItemState extends InteractionState {
             this.context.stateChanger.clear();
         } else {
             this.context.stateChanger.replace(
-                new AlertMessageState("Uh oh", "Item no longer available")
+                new AlertMessageState("Uh oh", "Item no longer available"),
             );
         }
     }

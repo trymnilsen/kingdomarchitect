@@ -9,7 +9,7 @@ export interface JobQuery {
 export function query(
     entity: Entity,
     query: JobQuery,
-    includeRunning: boolean = true
+    includeRunning: boolean = true,
 ): Job | null {
     /*
     for (const job of this._pendingJobs) {

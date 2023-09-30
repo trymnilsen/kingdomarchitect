@@ -29,7 +29,7 @@ export class FocusState {
             for (const view of views) {
                 const viewDistance = manhattanDistance(
                     { x: 0, y: 0 },
-                    view.screenPosition
+                    view.screenPosition,
                 );
                 if (viewDistance < closestDistance) {
                     closestDistance = viewDistance;

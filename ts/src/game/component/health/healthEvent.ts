@@ -14,7 +14,7 @@ export class HealthEvent extends ComponentEvent<HealthComponent> {
         readonly oldHealth: number,
         readonly newHealth: number,
         readonly causeEntity: Entity | null,
-        sourceComponent: HealthComponent
+        sourceComponent: HealthComponent,
     ) {
         super(sourceComponent);
     }

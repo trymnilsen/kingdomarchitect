@@ -21,7 +21,7 @@ export function workerPrefab(id: string): Entity {
         {
             x: 32,
             y: 32,
-        }
+        },
     );
     const jobRunner = new JobRunnerComponent();
     const workerBehaviorComponent = new WorkerBehaviorComponent();
