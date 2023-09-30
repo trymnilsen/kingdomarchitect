@@ -1,5 +1,5 @@
 import { RenderContext } from "./renderContext.js";
 
-export interface RenderVisual {
+export type RenderVisual = {
     onDraw(context: RenderContext): void;
 }

@@ -4,4 +4,4 @@ export type JSONValue =
     | boolean
     | null
     | { [x: string]: JSONValue }
-    | Array<JSONValue>;
+    | JSONValue[];

@@ -4,7 +4,7 @@ import { Sides } from "../common/sides.js";
 import { UIRenderContext } from "../rendering/uiRenderContext.js";
 import { UISize } from "./uiSize.js";
 
-export interface UIBackground {
+export type UIBackground = {
     draw(context: UIRenderContext, screenPosition: Point, size: UISize): void;
 }
 

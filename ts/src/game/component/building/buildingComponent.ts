@@ -22,7 +22,7 @@ export class BuildingComponent extends EntityComponent<BuildingComponentBundle> 
     private buildingSprite: Sprite2 = emptySprite;
     private scaffoldSprite: Sprite2 = emptySprite;
     private _building: Building = nullBuilding;
-    private isScaffolded: boolean = true;
+    private isScaffolded = true;
 
     get building(): Readonly<Building> {
         return this._building;
@@ -208,7 +208,7 @@ export class BuildingComponent extends EntityComponent<BuildingComponentBundle> 
     }
 }
 
-interface AdjacentBuildings {
+type AdjacentBuildings = {
     adjacency: Adjacency;
     left: BuildingComponent | null;
     right: BuildingComponent | null;

@@ -4,30 +4,12 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "type": "typescript",
-            "tsconfig": "tsconfig.json",
+            "type": "npm",
+            "script": "build",
             "problemMatcher": [
                 "$tsc"
             ],
-            "label": "tsc: build - tsconfig.json",
-            "presentation": {
-                "echo": true,
-                "reveal": "never",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": true,
-                "clear": false
-            }
-        },
-        {
-            "dependsOn": [
-                "tsc: build - tsconfig.json"
-            ],
-            "type": "npm",
-            "script": "bundle",
-            "problemMatcher": [],
             "label": "npm: bundle",
-            "detail": "rollup -c",
             "group": {
                 "kind": "build",
                 "isDefault": true

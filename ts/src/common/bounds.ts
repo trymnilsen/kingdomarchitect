@@ -26,7 +26,7 @@ export function withinRectangle(
 /**
  * Represents a rectangle large enough to encompass something.
  */
-export interface Bounds {
+export type Bounds = {
     /**
      * The north west x component
      */

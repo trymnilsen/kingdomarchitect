@@ -2,7 +2,7 @@ import { InputAction } from "./inputAction.js";
 import { Keyboard } from "./keyboard.js";
 import { Event, EventListener } from "../common/event.js";
 
-export interface InputEvent {
+export type InputEvent = {
     action: InputAction;
     inputType: InputType;
 }

@@ -17,7 +17,7 @@ import { ActorSelectionPresenter } from "./actorSelectionPresenter.js";
 
 export class ActorSelectionState extends InteractionState {
     private presenter: ActorSelectionPresenter | null = null;
-    private expandedMenuState: boolean = false;
+    private expandedMenuState = false;
 
     constructor(private entity: Entity) {
         super();
@@ -73,7 +73,7 @@ export class ActorSelectionState extends InteractionState {
     private getRightItems(): UIActionbarItem[] {
         const items: UIActionbarItem[] = [];
         const equipment = this.entity.getComponent(EquipmentComponent);
-        if (equipment && equipment.mainItem) {
+        if (equipment?.mainItem) {
             items.push({
                 text: "Main",
                 children: this.getEquipmentAction(equipment.mainItem),
@@ -87,7 +87,7 @@ export class ActorSelectionState extends InteractionState {
             });
         }
 
-        if (equipment && equipment.otherItem) {
+        if (equipment?.otherItem) {
             items.push({
                 text: "Other",
                 icon: equipment.otherItem.asset,

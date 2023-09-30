@@ -173,7 +173,7 @@ export class PathSearch {
     }
 }
 
-export interface SearchedNode {
+export type SearchedNode = {
     x: number;
     y: number;
     weight: number;
@@ -181,7 +181,7 @@ export interface SearchedNode {
     totalCost: number;
 }
 
-export interface SearchResult {
+export type SearchResult = {
     path: Point[];
     graph: SearchedNode[];
 }

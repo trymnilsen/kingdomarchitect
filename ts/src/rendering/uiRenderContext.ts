@@ -7,7 +7,7 @@ import {
 } from "./items/sprite.js";
 import { TextConfiguration } from "./items/text.js";
 
-export interface UIRenderContext {
+export type UIRenderContext = {
     drawScreenSpaceSprite(sprite: SpriteConfiguration): void;
     drawNinePatchSprite(image: NinePatchSpriteConfiguration): void;
     drawScreenSpaceRectangle(rectangle: RectangleConfiguration): void;

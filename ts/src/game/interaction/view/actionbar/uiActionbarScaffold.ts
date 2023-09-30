@@ -22,7 +22,7 @@ import { UIActionbarItem } from "./uiActionbar.js";
 export class UIActionbarScaffold extends UIView {
     private _sides: Sides = allSides(16);
     private buttons: ActionbarButton[] = [];
-    private selectedPath: string = "";
+    private selectedPath = "";
 
     /**
      * Get the padding for the content and action bar
@@ -562,7 +562,7 @@ enum ActionbarAnchorAlignment {
     Bottom,
 }
 
-interface ActionbarButton {
+type ActionbarButton = {
     width: number;
     heigth: number;
     text: string;
@@ -575,7 +575,7 @@ interface ActionbarButton {
     icon?: string;
 }
 
-interface SingleActionbarLayout {
+type SingleActionbarLayout = {
     totalWidth: number;
     totalHeight: number;
     boundaries: Bounds[];

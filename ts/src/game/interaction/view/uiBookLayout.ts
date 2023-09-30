@@ -28,7 +28,7 @@ export class UIBookLayout extends UIView {
     private _rightPage: UIView = new NullView();
     private _mode: UIBookLayoutMode = UIBookLayoutMode.Dual;
     private _currentPage: UIBookLayoutPage = UIBookLayoutPage.Left;
-    private _bookOffset: number = 0;
+    private _bookOffset = 0;
     /**
      * The view that keeps the tabs, is null if no tabs are set
      */
@@ -274,7 +274,7 @@ export enum UIBookLayoutPage {
     Right,
 }
 
-export interface UIBookLayoutTab {
+export type UIBookLayoutTab = {
     icon: Sprite2;
     onTap: (index: number) => void;
     isSelected: boolean;

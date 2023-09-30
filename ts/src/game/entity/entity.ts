@@ -24,16 +24,16 @@ import { EntityEvent } from "./entityEvent.js";
  * For more info see the entities.md doc
  */
 export class Entity {
-    private _isGameRoot: boolean = false;
+    private _isGameRoot = false;
     private _parent?: Entity;
     private _children: Entity[] = [];
     private _localPosition: Point = zeroPoint();
     private _worldPosition: Point = zeroPoint();
-    private _componentEvents: TypedEvent<ComponentEvent<EntityComponent>> =
-        new TypedEvent();
-    private _entityEvents: Event<EntityEvent> = new Event();
+    private _componentEvents =
+        new TypedEvent<ComponentEvent<EntityComponent>>();
+    private _entityEvents = new Event<EntityEvent>();
 
-    private _componentsMap: { [id: string]: EntityComponent } = {};
+    private _componentsMap: Record<string, EntityComponent> = {};
     private _components: EntityComponent[] = [];
     constructor(readonly id: string) {}
 

@@ -2,20 +2,20 @@ import { Sprite2 } from "../../asset/sprite.js";
 import { Sides } from "../../common/sides.js";
 import { RenderItemConfiguration } from "./renderItemConfiguration.js";
 
-export interface SpriteConfiguration extends RenderItemConfiguration {
+export type SpriteConfiguration = {
     sprite: Sprite2;
     frame?: number;
     targetWidth?: number;
     targetHeight?: number;
-}
+} & RenderItemConfiguration
 
-export interface NinePatchSpriteConfiguration extends RenderItemConfiguration {
+export type NinePatchSpriteConfiguration = {
     sprite: Sprite2;
     sides: Sides;
     width: number;
     height: number;
     scale: number;
-}
+} & RenderItemConfiguration
 
 export function spriteRenderer(
     x: number,

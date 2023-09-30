@@ -152,7 +152,7 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
         this._deferredRenderCalls.push(drawFunction);
     }
 
-    getDeferredDrawFunctions(): ReadonlyArray<DrawFunction> {
+    getDeferredDrawFunctions(): readonly DrawFunction[] {
         return this._deferredRenderCalls;
     }
 

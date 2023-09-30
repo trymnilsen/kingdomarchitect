@@ -47,7 +47,7 @@ export class TileGeneratorComponent extends StatelessComponent {
         //Add chunks not in chunkmap to the array of unlockable areas
         //Should unlockable chunks be cached?
         const tileComponent = this.entity.requireComponent(TilesComponent);
-        const unlockableChunks: { [chunkId: string]: GroundChunk } = {};
+        const unlockableChunks: Record<string, GroundChunk> = {};
         for (const key in tileComponent.chunkMap) {
             if (
                 !Object.prototype.hasOwnProperty.call(
@@ -119,7 +119,7 @@ export class TileGeneratorComponent extends StatelessComponent {
 }
 
 function getChunks(tiles: Point[]): GroundChunk[] {
-    const chunks: { [id: string]: GroundChunk } = {};
+    const chunks: Record<string, GroundChunk> = {};
     for (const tile of tiles) {
         const chunkPosition = getChunkPosition(tile);
         const chunkId = getTileId(chunkPosition.x, chunkPosition.y);

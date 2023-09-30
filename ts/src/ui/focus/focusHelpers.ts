@@ -414,4 +414,4 @@ function getViewEdges(view: Bounds): ViewEdge[] {
 type ViewEdge = {
     start: Point;
     end: Point;
-};
+}

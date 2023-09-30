@@ -9,7 +9,7 @@ type AttackJobBundle = {
 
 export class AttackJob extends Job<AttackJobBundle> {
     private target: Entity | null = null;
-    private damage: number = 0;
+    private damage = 0;
 
     static createInstance(entityId: string, damage: number): AttackJob {
         const instance = new AttackJob();

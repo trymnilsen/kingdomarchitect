@@ -1,12 +1,12 @@
 import { Point } from "../../../../../common/point.js";
 
-export interface BuildMode {
+export type BuildMode = {
     readonly description: BuildModeDescription;
     setSelection(point: Point): void;
     getSelection(): Point[];
     cursorSelection(): Point;
 }
 
-export interface BuildModeDescription {
+export type BuildModeDescription = {
     readonly name: string;
 }

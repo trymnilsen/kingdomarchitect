@@ -1,4 +1,4 @@
-export interface UIViewProperties {
+export type UIViewProperties = {
     width: number;
     height: number;
     id?: string;

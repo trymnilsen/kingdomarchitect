@@ -35,7 +35,7 @@ export type JobBundle<T extends JSONValue = JSONValue> = {
 export abstract class Job<T extends JSONValue = JSONValue> {
     private _entity: Entity | null = null;
     private _jobState: JobState = JobState.NotStarted;
-    private _startTick: number = 0;
+    private _startTick = 0;
     private _owner: JobOwner | null = null;
     private _movementHelper: MovementHelper | null = null;
     private _bundle: T | null = null;

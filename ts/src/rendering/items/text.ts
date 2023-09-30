@@ -25,7 +25,7 @@ export class TextVisual extends RenderNode {
 
 import { RenderItemConfiguration } from "./renderItemConfiguration.js";
 
-export interface TextConfiguration extends RenderItemConfiguration {
+export type TextConfiguration = {
     text: string;
     color: string;
     font: string;
@@ -33,7 +33,7 @@ export interface TextConfiguration extends RenderItemConfiguration {
     align?: "left" | "center" | "right";
     width?: number;
     weight?: "normal" | "bold";
-}
+} & RenderItemConfiguration
 
 export function configureText(
     renderItem: TextConfiguration,

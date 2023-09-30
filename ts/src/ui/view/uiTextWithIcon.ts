@@ -7,7 +7,7 @@ import { UIImageSource } from "./uiImageSource.js";
 
 export class UITextWithIcon extends UIView {
     private _textStyle: TextStyle = defaultTextStyle;
-    private _text: string = "";
+    private _text = "";
     /*     private _textAlignmentOffset: Point = zeroPoint();
     private _endIconDrawOffset: Point = zeroPoint(); */
     private _startImage: UIImageSource | null = null;

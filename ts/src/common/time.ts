@@ -1,4 +1,4 @@
-export interface GameTime {
+export type GameTime = {
     /**
      * The current gametick
      */
@@ -23,8 +23,8 @@ export enum TimeOfDay {
 }
 
 export class MutableGameTime implements GameTime {
-    private _currentTick: number = 0;
-    private _fractionalTimeOfDay: number = 0;
+    private _currentTick = 0;
+    private _fractionalTimeOfDay = 0;
     private _nextTimeOfDay: TimeOfDay[] = [
         TimeOfDay.Dawn,
         TimeOfDay.Day,

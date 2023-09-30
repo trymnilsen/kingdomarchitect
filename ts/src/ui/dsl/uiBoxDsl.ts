@@ -5,12 +5,12 @@ import { UIView } from "../uiView.js";
 import { UIBox } from "../view/uiBox.js";
 import { UIViewProperties } from "./uiViewDsl.js";
 
-export interface UIBoxProperties extends UIViewProperties {
+export type UIBoxProperties = {
     alignment?: Point;
     background?: UIBackground;
     padding?: Sides;
     children?: UIView[];
-}
+} & UIViewProperties
 
 export function uiBox(uiBoxProperties: UIBoxProperties): UIBox {
     const box = new UIBox({

@@ -11,8 +11,8 @@ export class FixedGraph implements Graph {
     private nodes: GraphNode[] = [];
     private grid: GraphNode[][] = [];
     private dirtyNodes: GraphNode[] = [];
-    private _offsetX: number = 0;
-    private _offsetY: number = 0;
+    private _offsetX = 0;
+    private _offsetY = 0;
 
     get offsetX(): number {
         return this._offsetX;

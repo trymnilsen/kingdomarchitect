@@ -15,11 +15,11 @@ type HealthBundle = {
 };
 
 export class HealthComponent extends EntityComponent<HealthBundle> {
-    private _health: number = 0;
-    private _maxHealth: number = 0;
+    private _health = 0;
+    private _maxHealth = 0;
     private _showHealthBarThreshold: NumberRange = zeroNumberRange();
-    private healthBubble: number = 0;
-    private tickTime: number = 0;
+    private healthBubble = 0;
+    private tickTime = 0;
 
     /*
      * Returns the health as a percentage between 0.0 and 1.0

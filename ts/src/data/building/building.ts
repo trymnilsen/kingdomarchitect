@@ -1,7 +1,7 @@
 import { Sprite2, emptySprite } from "../../asset/sprite.js";
 import { Adjacency } from "../../common/adjacency.js";
 
-export interface Building {
+export type Building = {
     icon: Sprite2;
     name: string;
     id: string;

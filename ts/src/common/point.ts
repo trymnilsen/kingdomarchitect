@@ -189,10 +189,7 @@ export function adjacentPoint(point: Point, direction: Direction): Point {
     }
 }
 
-export function adjacentPoints(
-    point: Point,
-    includeDiagonal: boolean = false,
-): Point[] {
+export function adjacentPoints(point: Point, includeDiagonal = false): Point[] {
     const points: Point[] = [];
     points.push(adjacentPoint(point, Direction.Left));
     points.push(adjacentPoint(point, Direction.Right));

@@ -1,7 +1,7 @@
 import { InteractionState } from "./interactionState.js";
 import { InteractionStateHistory } from "./interactionStateHistory.js";
 
-export interface InteractionStateChanger {
+export type InteractionStateChanger = {
     push(state: InteractionState, onPop?: (result: unknown) => void): void;
     replace(state: InteractionState): void;
     pop(result: unknown): void;
@@ -76,22 +76,22 @@ type StateOperation =
     | PushOperation
     | ClearOperation;
 
-interface PopOperation {
+type PopOperation = {
     type: "pop";
     result: unknown;
 }
 
-interface ReplaceOperation {
+type ReplaceOperation = {
     type: "replace";
     newState: InteractionState;
 }
 
-interface PushOperation {
+type PushOperation = {
     type: "push";
     newState: InteractionState;
     onPushCallback?: (value: unknown) => void;
 }
 
-interface ClearOperation {
+type ClearOperation = {
     type: "clear";
 }

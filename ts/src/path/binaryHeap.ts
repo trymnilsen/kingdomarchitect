@@ -92,7 +92,7 @@ export class BinaryHeap<T> {
             const child1N = child2N - 1;
             // This is used to store the new position of the element, if any.
             let swap: number | null = null;
-            let child1Score: number = 0;
+            let child1Score = 0;
             // If the first child exists (is inside the array)...
             if (child1N < length) {
                 // Look it up and compute its score.

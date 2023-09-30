@@ -10,10 +10,10 @@ export type UITapEvent = UITapStartEvent | UITapEndEvent;
 export type UITapStartEvent = {
     type: typeof tapStartType;
     position: Point;
-};
+}
 
 export type UITapEndEvent = {
     type: typeof tapType | typeof tapUpType;
     startPosition: Point;
     position: Point;
-};
+}

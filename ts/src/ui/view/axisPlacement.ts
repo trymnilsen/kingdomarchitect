@@ -1,4 +1,4 @@
-export interface AxisPlacement {
+export type AxisPlacement = {
     start: number;
     end: number;
 }

@@ -7,7 +7,7 @@ import { EntityPersister } from "./entityPersister.js";
 export type LoadedItems = {
     rootEntity: Entity;
     cameraPosition: Point;
-};
+}
 
 export class GamePersister {
     private entityPersister: EntityPersister = new EntityPersister();
@@ -26,9 +26,6 @@ export class GamePersister {
         window.localStorage.setItem("camera", JSON.stringify(camera.position));
         const saveTimeEnd = performance.now();
         const saveTime = saveTimeEnd - saveTimeStart;
-        if (window["debugLog"]) {
-            console.log("save time: ", saveTime);
-        }
     }
 
     loadWorld(): LoadedItems {

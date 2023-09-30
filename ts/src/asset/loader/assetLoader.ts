@@ -1,7 +1,7 @@
 import { bins } from "../../../generated/sprites.js";
 
 export class AssetLoader {
-    private _assets: { [name: string]: HTMLImageElement } = {};
+    private _assets: Record<string, HTMLImageElement> = {};
 
     async load(): Promise<void> {
         const loadPromises: Promise<unknown>[] = [];

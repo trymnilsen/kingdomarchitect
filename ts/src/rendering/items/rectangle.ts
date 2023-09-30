@@ -1,12 +1,12 @@
 import { RenderItemConfiguration } from "./renderItemConfiguration.js";
 
-export interface RectangleConfiguration extends RenderItemConfiguration {
+export type RectangleConfiguration = {
     width: number;
     height: number;
     fill?: string;
     strokeWidth?: number;
     strokeColor?: string;
-}
+} & RenderItemConfiguration
 
 export function rectangleRenderer(
     config: RectangleConfiguration,

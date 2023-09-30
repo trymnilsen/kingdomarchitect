@@ -3,16 +3,16 @@ import { UIView } from "../uiView.js";
 import { UIColumn } from "../view/uiColumn.js";
 import { UIViewProperties } from "./uiViewDsl.js";
 
-export interface ColumnChild {
+export type ColumnChild = {
     child: UIView;
     weight?: number;
 }
 
-export interface UIColumnProperties extends UIViewProperties {
+export type UIColumnProperties = {
     horizontalAlignment?: HorizontalAlignment;
     children: ColumnChild[];
-    weights?: { [viewId: string]: number };
-}
+    weights?: Record<string, number>;
+} & UIViewProperties
 
 export function uiColumn(columnProperties: UIColumnProperties): UIColumn {
     const column = new UIColumn({

@@ -11,7 +11,7 @@ import { EntityEvent } from "../../../entity/entityEvent.js";
 import { StatelessComponent } from "../../entityComponent.js";
 import { ChunkMapUpdateEvent } from "./chunkMapUpdateEvent.js";
 
-type ChunkMap = { [chunkPosition: string]: { [entityId: string]: Entity } };
+type ChunkMap = Record<string, Record<string, Entity>>;
 
 export class ChunkMapComponent extends StatelessComponent {
     /**
@@ -23,7 +23,7 @@ export class ChunkMapComponent extends StatelessComponent {
      * The entities are keyed by their id and the chunks are defined by their
      * chunkId
      */
-    private entityChunks: { [entityId: string]: string } = {};
+    private entityChunks: Record<string, string> = {};
     private entityEventHandle: EventHandle | null = null;
 
     getEntityAt(worldPosition: Point): Entity[] {

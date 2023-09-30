@@ -34,7 +34,7 @@ export enum PathResultStatus {
  * status of the search. Note: A result with entries in the path array might
  * not be a complete path, remember to check the status
  */
-export interface PathResult {
+export type PathResult = {
     path: Point[];
     status: PathResultStatus;
     graph: SearchedNode[];

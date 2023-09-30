@@ -4,7 +4,7 @@
  */
 export class Event<T = object> implements EventListener<T> {
     private nextListenersId = 0;
-    private listeners: { [id: string]: EventSubscriptionHandler<T> } = {};
+    private listeners: Record<string, EventSubscriptionHandler<T>> = {};
 
     listen(subscriber: EventSubscriptionHandler<T>): EventHandle {
         const listnerId = this.nextListenersId + 1;
@@ -47,7 +47,7 @@ export class Event<T = object> implements EventListener<T> {
 /**
  * Represent an event that can be listened to by other sources
  */
-export interface EventListener<T> {
+export type EventListener<T> = {
     /**
      * Listen to updates to this event. Each time an event is emitted the
      * provided subscriber is updated
@@ -69,7 +69,7 @@ export interface EventListener<T> {
 /**
  * A publisher of events without any ability to listen
  */
-export interface EventPublisher<T> {
+export type EventPublisher<T> = {
     publish(data: T): void;
 }
 

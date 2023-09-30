@@ -17,7 +17,7 @@ import {
 } from "../../../data/inventory/resources.js";
 import { EntityComponent } from "../entityComponent.js";
 
-export type InventoryMap = { [id: string]: InventoryItemQuantity };
+export type InventoryMap = Record<string, InventoryItemQuantity>;
 
 type InventoryBundle = {
     items: InventoryMap;

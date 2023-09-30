@@ -14,7 +14,7 @@ import { rangeDistance, rangeRandom } from "../../common/range.js";
 import { RenderContext } from "../../rendering/renderContext.js";
 import { getTileId, TileSize } from "./tile.js";
 
-export interface GroundTile {
+export type GroundTile = {
     tileX: number;
     tileY: number;
 }
@@ -43,7 +43,7 @@ function hasTree(threshold: number): number {
 }
 
 export class Ground {
-    private tiles: { [id: string]: GroundTile } = {};
+    private tiles: Record<string, GroundTile> = {};
     private chunks: Point[] = [];
 
     constructor() {
@@ -185,7 +185,7 @@ export function generateChunk(chunks: Point[]): Point | null {
     return foundPoint;
 }
 
-export function generateGround(tiles: { [id: string]: GroundTile }): Point {
+export function generateGround(tiles: Record<string, GroundTile>): Point {
     const edgeTile = getRandomBoundsPosition(tiles, 1);
     const searchDirection = invertDirection(edgeTile.direction);
 
@@ -210,7 +210,7 @@ export function generateGround(tiles: { [id: string]: GroundTile }): Point {
 }
 
 export function getRandomBoundsPosition(
-    tiles: { [id: string]: GroundTile },
+    tiles: Record<string, GroundTile>,
     edgeOffset: number,
 ) {
     const entries = Object.entries(tiles);

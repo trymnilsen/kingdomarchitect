@@ -7,7 +7,7 @@ export enum SkillCategory {
     Productivity,
 }
 
-export interface Skill {
+export type Skill = {
     asset: Sprite2;
     name: string;
 }

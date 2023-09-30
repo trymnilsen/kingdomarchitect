@@ -7,8 +7,8 @@ import { UIViewGroup } from "../uiViewGroup.js";
 import { AxisPlacement, insertAndShift } from "./axisPlacement.js";
 
 export class UIColumn extends UIViewGroup {
-    private weights: { [view: string]: number } = {};
-    private totalWeight: number = 0;
+    private weights: Record<string, number> = {};
+    private totalWeight = 0;
     private _horizontalAlignment: HorizontalAlignment =
         HorizontalAlignment.Center;
 

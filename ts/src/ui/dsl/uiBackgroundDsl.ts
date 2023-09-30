@@ -11,7 +11,7 @@ export function colorBackground(color: string): UIBackground {
     return new ColorBackground(color);
 }
 
-export interface NinePatchBackgroundProperties {
+export type NinePatchBackgroundProperties = {
     sprite: Sprite2;
     sides?: Sides;
     scale?: number;
@@ -27,7 +27,7 @@ export function ninePatchBackground(
     );
 }
 
-export interface BoxBackgroundProperties {
+export type BoxBackgroundProperties = {
     fill: string;
     stroke: string;
     strokeWidth?: number;

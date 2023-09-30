@@ -1,4 +1,4 @@
-export interface Visitable {
+export type Visitable = {
     children: Visitable[];
 }
 

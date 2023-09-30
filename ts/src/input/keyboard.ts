@@ -1,7 +1,7 @@
 import { InputAction, InputActionType } from "./inputAction.js";
 import { Event, EventListener } from "../common/event.js";
 
-export type KeyboardMap = { [key: string]: InputActionType };
+export type KeyboardMap = Record<string, InputActionType>;
 
 export class Keyboard {
     private keyboardMap: KeyboardMap;

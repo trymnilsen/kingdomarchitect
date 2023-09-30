@@ -18,7 +18,7 @@ export class Game {
     private assetLoader: AssetLoader;
     private gameTime: MutableGameTime;
     private interactionHandler: InteractionHandler;
-    private currentTick: number = 0;
+    private currentTick = 0;
     private world: Entity;
     private gamePersister: GamePersister;
     constructor(domElementWrapperSelector: string) {
@@ -52,14 +52,15 @@ export class Game {
             this.world = createRootEntity();
         }
 
-        window["saveGame"] = () => {
+        /*
+        window.saveGame = () => {
             this.saveGame();
         };
 
-        window["clearGame"] = () => {
+        window.clearGame = () => {
             console.log("Clear game");
             window.localStorage.clear();
-        };
+        };*/
 
         this.interactionHandler = new InteractionHandler(
             this.world,

@@ -52,9 +52,9 @@ export class EntityPersister {
 
     load(bundleSets: BundleSet[]): Entity {
         const componentPersistenceBundles: ComponentPersistenceBundle[] = [];
-        const entitiesForChildMap: { [id: string]: Entity } = {};
-        const entitiesById: { [id: string]: Entity } = {};
-        const entityChildren: { [id: string]: string[] } = {};
+        const entitiesForChildMap: Record<string, Entity> = {};
+        const entitiesById: Record<string, Entity> = {};
+        const entityChildren: Record<string, string[]> = {};
 
         //Loop over and sort out components and create the entities
         for (const bundleSet of bundleSets) {
@@ -129,7 +129,7 @@ export type ComponentPersistenceBundle = {
     componentId: string;
     type: string;
     data: JSONValue;
-};
+}
 
 export type EntityPersistenceBundle = {
     id: string;
@@ -137,9 +137,9 @@ export type EntityPersistenceBundle = {
     y: number;
     children: string[];
     components: string[];
-};
+}
 
-export interface BundleSet {
+export type BundleSet = {
     components: ComponentPersistenceBundle[];
     entity: EntityPersistenceBundle;
 }

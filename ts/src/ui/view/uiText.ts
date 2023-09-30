@@ -20,13 +20,13 @@ import { UIView } from "../uiView.js";
 
 export class UIText extends UIView {
     private _textStyle: TextStyle = defaultTextStyle;
-    private _text: string = "";
+    private _text = "";
     private _alignment: Point = uiAlignment.center;
     private _textAlignmentOffset: Point = zeroPoint();
     private _padding: Sides = zeroSides();
     private _previousConstraints: UISize = zeroSize();
     private _textRuns: string[] = [];
-    private _wrapText: boolean = false;
+    private _wrapText = false;
     private _lineHeight = 0;
 
     get padding(): Sides {

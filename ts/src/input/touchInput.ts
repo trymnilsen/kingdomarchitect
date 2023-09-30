@@ -1,11 +1,11 @@
 import { distance, Point, subtractPoint } from "../common/point.js";
 
-export interface OnPanEvent {
+export type OnPanEvent = {
     movement: Point;
     position: Point;
 }
 
-export interface OnTapEndEvent {
+export type OnTapEndEvent = {
     position: Point;
     startPosition: Point;
     wasDragging: boolean;
@@ -25,10 +25,10 @@ export type OnStartDragCallback = (
 ) => boolean;
 
 export class TouchInput {
-    private isDragging: boolean = false;
+    private isDragging = false;
     private onTapPosition: Point | null = null;
     private previousMovePosition: Point | null = null;
-    private tapHandled: boolean = false;
+    private tapHandled = false;
 
     onPan: OnPanCallback | null = null;
     onStartDrag: OnStartDragCallback | null = null;

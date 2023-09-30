@@ -4,8 +4,8 @@ import { fillUiSize, UISize, wrapUiSize } from "../uiSize.js";
 import { UIViewGroup } from "../uiViewGroup.js";
 
 export class UIFlowGrid extends UIViewGroup {
-    private _gridItemMinimumSize: number = 32;
-    private _gridPadding: number = 4;
+    private _gridItemMinimumSize = 32;
+    private _gridPadding = 4;
 
     constructor(size: UISize) {
         super(size);

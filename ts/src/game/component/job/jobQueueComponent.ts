@@ -15,7 +15,7 @@ type JobQueueBundle = {
         constraint?: JobConstraint;
         job: JobBundle;
     }[];
-};
+}
 
 /**
  * The job queue components holds a list of pending jobs that are not run

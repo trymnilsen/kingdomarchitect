@@ -24,7 +24,7 @@ import { FocusState } from "./focus/focusState.js";
 import { UILayoutContext } from "./uiLayoutContext.js";
 import { fillUiSize, UISize, zeroSize } from "./uiSize.js";
 
-export interface UIAction {
+export type UIAction = {
     type: string;
     data: unknown;
 }
@@ -47,10 +47,10 @@ export abstract class UIView implements FocusGroup {
     private _size: UISize;
     private _id: string | null = null;
     private _children: UIView[] = [];
-    private _uiAction: Event<UIAction> = new Event();
+    private _uiAction = new Event<UIAction>();
     private _focusState: FocusState | undefined;
     protected _measuredSize: UISize | null = null;
-    protected _isDirty: boolean = true;
+    protected _isDirty = true;
 
     /**
      * The offset of this view from its parent

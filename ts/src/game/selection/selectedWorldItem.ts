@@ -4,7 +4,7 @@ import { Point } from "../../common/point.js";
  * Class wrapping items that can be selected. Different types of items
  * like a position for tile or an instance of an entity
  */
-export interface SelectedWorldItem {
+export type SelectedWorldItem = {
     /**
      * The current position of the item that is selected.
      * Will be updated if the selected item moves.

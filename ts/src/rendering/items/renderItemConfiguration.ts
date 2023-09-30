@@ -1,4 +1,4 @@
-export interface RenderItemConfiguration {
+export type RenderItemConfiguration = {
     x: number;
     y: number;
 }

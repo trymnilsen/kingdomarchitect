@@ -4,10 +4,10 @@ import { Graph, GraphNode } from "./graph.js";
 export type LazyGraphNodeFunction = (point: Point) => number | null;
 
 export class LazyGraph implements Graph {
-    private _nodes: { [x: number]: { [y: number]: GraphNode } } = {};
+    private _nodes: Record<number, Record<number, GraphNode>> = {};
     constructor(private nodeFunction: LazyGraphNodeFunction) {}
-    offsetX: number = 0;
-    offsetY: number = 0;
+    offsetX = 0;
+    offsetY = 0;
     /**
      * Invalidate a point lazily. This means it is deleted by not
      * re-generated until its needed

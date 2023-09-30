@@ -25,7 +25,7 @@ import { SingleBuildMode } from "./mode/singleBuildMode.js";
 
 export class BuildConfirmState extends InteractionState {
     private scaffold: UIActionbarScaffold | null = null;
-    private blinkScaffold: boolean = true;
+    private blinkScaffold = true;
     private buildMode: BuildMode = new SingleBuildMode({ x: 1, y: 1 });
     private selection: SelectedTile[] = [];
 
@@ -283,7 +283,7 @@ export class BuildConfirmState extends InteractionState {
     }
 }
 
-interface SelectedTile {
+type SelectedTile = {
     isAvailable: boolean;
     x: number;
     y: number;

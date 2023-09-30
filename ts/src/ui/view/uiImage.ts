@@ -8,7 +8,7 @@ import { UIImageSource } from "./uiImageSource.js";
 export class UIImage extends UIView {
     private _image: UIImageSource | null = null;
     private _imageDrawSize: UISize = { width: 0, height: 0 };
-    private _scale: number = 1;
+    private _scale = 1;
 
     get image(): UIImageSource | null {
         return this._image;

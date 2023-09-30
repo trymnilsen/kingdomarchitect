@@ -39,7 +39,7 @@ export class MovementHelper {
      * @returns true if a movement was made, false if there was nowhere to go (
      * for example if the entity is stuck, adjacent or on top of the target)
      */
-    pathTowards(target: Point, _stopAtAdjacent: boolean = true): boolean {
+    pathTowards(target: Point, _stopAtAdjacent = true): boolean {
         if (
             !!this._currentMovement &&
             pointEquals(target, this._currentMovement.target)

@@ -7,7 +7,7 @@ import { UISize } from "../../../../ui/uiSize.js";
 import { UIView } from "../../../../ui/uiView.js";
 import { UIActionbarButton } from "./uiActionbarButton.js";
 
-export interface UIActionbarItem {
+export type UIActionbarItem = {
     text: string;
     onClick?: () => void;
     children?: Omit<UIActionbarItem, "children">[];

@@ -1,6 +1,6 @@
 import { Point } from "../../common/point.js";
 
-export interface Graph {
+export type Graph = {
     nodeAt(x: number, y: number): GraphNode | null;
     cleanDirtyNodes(): void;
     markDirtyNode(point: GraphNode): void;

@@ -3,7 +3,7 @@ import { addPoint, Point, zeroPoint } from "../../common/point.js";
 import { RenderContext } from "../renderContext.js";
 
 export class SpriteAnimation {
-    private currentFrame: number = 0;
+    private currentFrame = 0;
     private position: Point = zeroPoint();
     constructor(private spriteFrames: Sprite2[]) {}
 

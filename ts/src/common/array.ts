@@ -19,7 +19,7 @@ export function removeItem<T>(array: T[], item: T): boolean {
 }
 
 export function pushMapEntry<T>(
-    collection: { [id: string]: T[] },
+    collection: Record<string, T[]>,
     key: string,
     item: T,
 ) {

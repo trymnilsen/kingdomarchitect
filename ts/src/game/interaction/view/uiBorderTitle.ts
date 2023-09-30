@@ -7,12 +7,12 @@ import { UISize } from "../../../ui/uiSize.js";
 import { UIBox } from "./../../../ui/view/uiBox.js";
 
 export class UIBorderTitle extends UIBox {
-    private _title: string = "";
-    private _titleWidth: number = 0;
+    private _title = "";
+    private _titleWidth = 0;
 
-    private topLinePoint: number = 0;
-    private topLineLeft: number = 0;
-    private topLineRight: number = 0;
+    private topLinePoint = 0;
+    private topLineLeft = 0;
+    private topLineRight = 0;
 
     private topLeft: Point = zeroPoint();
     private topRight: Point = zeroPoint();

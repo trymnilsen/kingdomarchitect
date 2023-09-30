@@ -11,7 +11,7 @@ export enum InputActionType {
     NUMBER_PRESS = "NUMBER_PRESS",
 }
 
-export interface InputAction {
+export type InputAction = {
     isShifted: boolean;
     action: InputActionType;
     value: string;

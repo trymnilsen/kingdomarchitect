@@ -95,7 +95,7 @@ export class TypedEventHandle {
     }
 }
 
-interface TypedEventSubscription<T> {
+type TypedEventSubscription<T> = {
     handleId: string;
     typeName: string;
     handler: EventSubscriptionHandler<T>;

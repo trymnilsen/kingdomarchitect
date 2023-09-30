@@ -28,7 +28,7 @@ export class AggroComponent extends EntityComponent<AggroComponentBundle> {
     private healthEventHandle: TypedEventHandle | undefined;
     //TODO: Move damage from field here to a value from the equipment on
     //the entity
-    private damage: number = 0;
+    private damage = 0;
 
     get aggroMode(): AggroMode {
         return this._aggroMode;

@@ -17,8 +17,8 @@ export class UISkillTree extends UIView {
         x: -16,
         y: -16,
     };
-    private halfWidth: number = 0;
-    private halfHeight: number = 0;
+    private halfWidth = 0;
+    private halfHeight = 0;
     private drawBounds: Bounds = zeroBounds();
 
     panView(movement: Point) {

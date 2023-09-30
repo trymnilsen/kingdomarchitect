@@ -33,7 +33,7 @@ export class InventoryState extends InteractionState {
     private _selectedGridItemView: UIInventoryGridItem | undefined;
     private _scaffold: UIActionbarScaffold | null = null;
     private _items: InventoryItemList = [];
-    private _activeItem: number = 0;
+    private _activeItem = 0;
 
     override get isModal(): boolean {
         return true;

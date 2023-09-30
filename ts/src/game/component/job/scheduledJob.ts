@@ -4,4 +4,4 @@ import { JobConstraint } from "./jobConstraint.js";
 export type ScheduledJob = {
     job: Job;
     constraint?: JobConstraint;
-};
+}

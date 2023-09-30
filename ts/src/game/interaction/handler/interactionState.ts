@@ -24,7 +24,7 @@ export abstract class InteractionState {
     private _context: StateContext | undefined;
     private _view: UIView | null = null;
     private _cachedFocusGroups: FocusGroup[] = [];
-    private _currentFocusGroupIndex: number = 0;
+    private _currentFocusGroupIndex = 0;
     /**
      * Retrieve the currently set root view of the this state
      */

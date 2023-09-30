@@ -1,8 +1,8 @@
 import { Sprite2 } from "./sprite.js";
 
-export interface SpriteAnimation extends Sprite2 {
+export type SpriteAnimation = {
     frames: number;
-}
+} & Sprite2
 
 export function spriteFromAnimation(
     sprite: SpriteAnimation,

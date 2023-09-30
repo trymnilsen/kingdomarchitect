@@ -326,7 +326,7 @@ export class BuildingState extends InteractionState {
     }
 }
 
-interface BuildingListEntry {
+type BuildingListEntry = {
     sprite: Sprite2;
     name: string;
 }

@@ -1,4 +1,4 @@
-export type IdCounterMap = { [tag: string]: number };
+export type IdCounterMap = Record<string, number>;
 let ids: IdCounterMap = {};
 
 export function setGeneratorIds(map: IdCounterMap) {
