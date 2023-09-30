@@ -5,7 +5,7 @@ import { Entity } from "../entity/entity.js";
 import { ComponentEvent } from "./componentEvent.js";
 
 export abstract class EntityComponent<
-    PersistedDataType extends JSONValue = {},
+    PersistedDataType extends JSONValue = JSONValue,
 > {
     private _entity?: Entity;
 

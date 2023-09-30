@@ -19,7 +19,7 @@ export enum JobCompletedResult {
     Success,
 }
 
-export type JobBundle<T extends JSONValue = {}> = {
+export type JobBundle<T extends JSONValue = JSONValue> = {
     data: T;
     type: string;
     jobState: JobState;
@@ -32,7 +32,7 @@ export type JobBundle<T extends JSONValue = {}> = {
  * chopping a tree or collecting a chest is implemented as jobs. Actions that
  * interupts such as attacks are also implemented as jobs.
  */
-export abstract class Job<T extends JSONValue = {}> {
+export abstract class Job<T extends JSONValue = JSONValue> {
     private _entity: Entity | null = null;
     private _jobState: JobState = JobState.NotStarted;
     private _startTick: number = 0;

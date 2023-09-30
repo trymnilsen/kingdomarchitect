@@ -29,11 +29,16 @@
         "maxrects-packer": "^2.7.3",
         "prettier": "^3.0.3",
         "rollup": "^3.29.2",
-        "sanitize-filename": "^1.6.3",
-        "typescript": "^5.2.2"
+        "sanitize-filename": "^1.6.3"
     },
     "overrides": {
         "xml2js": "^0.5.0",
         "semver": "^7.5.3"
+    },
+    "devDependencies": {
+        "@typescript-eslint/eslint-plugin": "^6.7.3",
+        "@typescript-eslint/parser": "^6.7.3",
+        "eslint": "^8.50.0",
+        "typescript": "^5.2.2"
     }
 }

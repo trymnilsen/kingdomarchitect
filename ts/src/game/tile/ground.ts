@@ -19,6 +19,21 @@ export interface GroundTile {
     tileY: number;
 }
 
+export function isTile(value: unknown): value is GroundTile {
+    if (!value) {
+        return false;
+    }
+
+    if (typeof value != "object") {
+        return false;
+    }
+
+    return (
+        nameof<GroundTile>("tileX") in value &&
+        nameof<GroundTile>("tileY") in value
+    );
+}
+
 function hasTree(threshold: number): number {
     if (Math.random() > threshold) {
         return Math.floor(Math.random() * 3.0) + 1;
@@ -196,7 +211,7 @@ export function generateGround(tiles: { [id: string]: GroundTile }): Point {
 
 export function getRandomBoundsPosition(
     tiles: { [id: string]: GroundTile },
-    edgeOffset: number
+    edgeOffset: number,
 ) {
     const entries = Object.entries(tiles);
     const bounds = getTileBounds(entries);

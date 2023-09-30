@@ -4,7 +4,7 @@ export class AssetLoader {
     private _assets: { [name: string]: HTMLImageElement } = {};
 
     async load(): Promise<void> {
-        const loadPromises: Promise<any>[] = [];
+        const loadPromises: Promise<unknown>[] = [];
 
         loadPromises.push(this.loadFonts());
 
@@ -27,7 +27,7 @@ export class AssetLoader {
     private async loadFonts(): Promise<void> {
         const myFont = new FontFace(
             "Silkscreen",
-            "url(asset/silkscreen_regular.ttf)"
+            "url(asset/silkscreen_regular.ttf)",
         );
         const loadedFont = await myFont.load();
         document.fonts.add(loadedFont);

@@ -163,7 +163,7 @@ export function weightedManhattanDistance(
     from: Point,
     to: Point,
     xWeight: number,
-    yWeight: number
+    yWeight: number,
 ): number {
     const xDistance = Math.abs(to.x - from.x);
     const yDistance = Math.abs(to.y - from.y);
@@ -191,7 +191,7 @@ export function adjacentPoint(point: Point, direction: Direction): Point {
 
 export function adjacentPoints(
     point: Point,
-    includeDiagonal: boolean = false
+    includeDiagonal: boolean = false,
 ): Point[] {
     const points: Point[] = [];
     points.push(adjacentPoint(point, Direction.Left));
@@ -335,4 +335,16 @@ export function closestPointOnLine(a: Point, b: Point, p: Point): Point {
         //and multiply it with t
         return addPoint(a, multiplyPoint(abVector, t));
     }
+}
+
+export function isPoint(value: unknown): value is Point {
+    if (!value) {
+        return false;
+    }
+
+    if (typeof value != "object") {
+        return false;
+    }
+
+    return "x" in value && "y" in value;
 }

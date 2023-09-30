@@ -10,7 +10,7 @@ import { EventSubscriptionHandler } from "../event.js";
  * a list to handle subscriptions so its not optimised for a lot of
  * listeners but this should not be a common occurence.
  */
-export class TypedEvent<TBaseEvent extends object> {
+export class TypedEvent<TBaseEvent> {
     private nextListenersId = 0;
     private subscriptions: TypedEventSubscription<TBaseEvent>[] = [];
 
@@ -29,7 +29,7 @@ export class TypedEvent<TBaseEvent extends object> {
      */
     public listen<TEventFilter extends TBaseEvent>(
         filterType: ConstructorFunction<TEventFilter>,
-        subscriber: EventSubscriptionHandler<TEventFilter>
+        subscriber: EventSubscriptionHandler<TEventFilter>,
     ): TypedEventHandle {
         const typename = filterType.name;
         const listenerId = this.getNextListenerId();
@@ -39,7 +39,9 @@ export class TypedEvent<TBaseEvent extends object> {
             handler: subscriber as EventSubscriptionHandler<TBaseEvent>,
         };
         this.subscriptions.push(subscription);
-        const handle = new TypedEventHandle(this, listenerId);
+        const handle = new TypedEventHandle(() => {
+            this.removeListener(listenerId);
+        });
         return handle;
     }
 
@@ -86,16 +88,10 @@ export class TypedEvent<TBaseEvent extends object> {
  * Allows checking if the subscription is active and disposing the subscription
  */
 export class TypedEventHandle {
-    private _isDisposed: boolean = false;
-
-    constructor(private event: TypedEvent<any>, private handleId: string) {}
-
-    public get isDisposed(): boolean {
-        return this._isDisposed;
-    }
+    constructor(private disposeHandle: () => void) {}
 
     public dispose() {
-        this.event.removeListener(this.handleId);
+        this.disposeHandle();
     }
 }
 

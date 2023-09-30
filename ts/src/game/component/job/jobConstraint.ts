@@ -15,7 +15,7 @@ export function isJobApplicableForEntity(
         );
     }
 
-    const isApplicable = validator(job, entity, constraint.value as any);
+    const isApplicable = validator(job, entity, constraint.value as string);
     return isApplicable;
 }
 

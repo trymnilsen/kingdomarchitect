@@ -94,7 +94,7 @@ export class Entity {
         if (this.parent) {
             this._localPosition = subtractPoint(
                 position,
-                this.parent.worldPosition
+                this.parent.worldPosition,
             );
         } else {
             this._localPosition = position;
@@ -132,7 +132,7 @@ export class Entity {
 
         if (!!this._parent && value) {
             throw new InvalidArgumentError(
-                "Cannot set entity to game root if it has a parent"
+                "Cannot set entity to game root if it has a parent",
             );
         }
 
@@ -158,7 +158,7 @@ export class Entity {
 
         if (entity.parent) {
             throw new InvalidArgumentError(
-                "Entity is already added to another entity"
+                "Entity is already added to another entity",
             );
         }
         if (index != null) {
@@ -224,6 +224,7 @@ export class Entity {
      * @returns the entity at the end of the parent chain
      */
     public getRootEntity(): Entity {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         let root: Entity | undefined = this;
         while (root?._parent) {
             root = root.parent;
@@ -259,7 +260,7 @@ export class Entity {
 
         if (this._componentsMap[componentName]) {
             throw new InvalidArgumentError(
-                `Component already added ${entityComponent}`
+                `Component already added ${entityComponent}`,
             );
         }
         entityComponent.entity = this;
@@ -304,7 +305,7 @@ export class Entity {
      * @returns the component if it exists or null
      */
     public getComponent<TFilter extends EntityComponent>(
-        filterType: ConstructorFunction<TFilter>
+        filterType: ConstructorFunction<TFilter>,
     ): TFilter | null {
         const componentId = filterType.name;
         const component = this._componentsMap[componentId] as TFilter;
@@ -325,14 +326,14 @@ export class Entity {
      * @returns the component on the entity of this type
      */
     public requireComponent<TFilter extends EntityComponent>(
-        filterType: ConstructorFunction<TFilter>
+        filterType: ConstructorFunction<TFilter>,
     ): TFilter {
         const component = this.getComponent(filterType);
         if (component) {
             return component;
         } else {
             throw new RequireError(
-                `Required component ${filterType.name} was not present`
+                `Required component ${filterType.name} was not present`,
             );
         }
     }
@@ -344,8 +345,9 @@ export class Entity {
      * @param filterType the type of the component to get
      */
     public getAncestorComponent<TFilter extends EntityComponent>(
-        filterType: ConstructorFunction<TFilter>
+        filterType: ConstructorFunction<TFilter>,
     ): TFilter | null {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         let entityToLookOn: Entity | undefined = this;
 
         while (entityToLookOn) {
@@ -370,7 +372,7 @@ export class Entity {
         if (this._components.length > 0) {
             //Calculating the screen position once for components
             const screenPosition = renderContext.camera.tileSpaceToScreenSpace(
-                this._worldPosition
+                this._worldPosition,
             );
             for (const component of this._components) {
                 component.onDraw(renderContext, screenPosition);
@@ -407,7 +409,7 @@ export class Entity {
             // local position, to get this entitys new world position
             this._worldPosition = addPoint(
                 this.parent.worldPosition,
-                this._localPosition
+                this._localPosition,
             );
         } else {
             // If there is no parent update the world position to this
@@ -437,7 +439,7 @@ export class Entity {
 }
 
 export function assertEntity(
-    entity: Entity | string | null
+    entity: Entity | string | null,
 ): asserts entity is Entity {
     if (!entity) {
         throw new Error("Entity is not defined");

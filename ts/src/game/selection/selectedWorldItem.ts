@@ -18,5 +18,5 @@ export interface SelectedWorldItem {
      * multiple tiles
      * @param item the other item to check if is the selected item
      */
-    isSelectedItem(item: any): boolean;
+    isSelectedItem(item: unknown): boolean;
 }

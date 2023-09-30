@@ -13,7 +13,7 @@ export class SelectedEntityItem implements SelectedWorldItem {
             y: 1,
         };
     }
-    isSelectedItem(item: any): boolean {
+    isSelectedItem(item: unknown): boolean {
         return item === this;
     }
 }
