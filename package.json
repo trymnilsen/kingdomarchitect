@@ -12,7 +12,8 @@
         "spritepack": "tsc && node build/tool/spritepack/spritePack.js",
         "start": "tsc && node build/tool/http/server.js",
         "test": "tsc && node --test",
-        "bundle": "rollup -c"
+        "bundle": "rollup -c",
+        "check-format": "prettier ts/ --check"
     },
     "repository": {
         "type": "git",

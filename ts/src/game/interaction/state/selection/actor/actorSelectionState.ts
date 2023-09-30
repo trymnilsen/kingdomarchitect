@@ -1,6 +1,7 @@
 import { sprites2 } from "../../../../../asset/sprite.js";
 import { Point } from "../../../../../common/point.js";
 import { allSides } from "../../../../../common/sides.js";
+import { InventoryItem } from "../../../../../data/inventory/inventoryItem.js";
 import { RenderContext } from "../../../../../rendering/renderContext.js";
 import { EquipmentComponent } from "../../../../component/inventory/equipmentComponent.js";
 import { Entity } from "../../../../entity/entity.js";
@@ -110,6 +111,10 @@ export class ActorSelectionState extends InteractionState {
         }
 
         return items;
+    }
+
+    private getEquipmentAction(inventoryItem: InventoryItem) {
+
     }
 
     private onMainItemTap() {
