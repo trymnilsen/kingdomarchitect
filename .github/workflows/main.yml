@@ -33,7 +33,7 @@ jobs:
   bundle:
     name: Bundle compiled sources with Rollup
     runs-on: ubuntu-latest
-    needs: compile
+    needs: test
     steps:
       - name: Compile the source
         run: echo compile placeholder
