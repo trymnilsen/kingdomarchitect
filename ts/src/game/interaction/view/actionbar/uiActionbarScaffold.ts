@@ -144,11 +144,13 @@ export class UIActionbarScaffold extends UIView {
 
             if (item.icon) {
                 const sprite = context.getSprite(item.icon);
-                context.drawScreenSpaceSprite({
-                    sprite: sprite,
-                    x: middleX - 16,
-                    y: item.position.y + 8,
-                });
+                if (sprite) {
+                    context.drawScreenSpaceSprite({
+                        sprite: sprite,
+                        x: middleX - 16,
+                        y: item.position.y + 8,
+                    });
+                }
             }
 
             context.drawScreenspaceText({
@@ -573,10 +575,10 @@ type ActionbarButton = {
     path: string;
     onClick?: () => void;
     icon?: string;
-}
+};
 
 type SingleActionbarLayout = {
     totalWidth: number;
     totalHeight: number;
     boundaries: Bounds[];
-}
+};
