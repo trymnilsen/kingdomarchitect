@@ -61,7 +61,7 @@ jobs:
   generate-docs:
     name: Generate typedoc page
     runs-on: ubuntu-latest
-    needs: [minify, lint, test, check-format]
+    needs: [lint, test, check-format]
     steps:
       - name: Compile the source
         run: echo compile placeholder
