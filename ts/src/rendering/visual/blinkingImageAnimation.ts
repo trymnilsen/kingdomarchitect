@@ -10,7 +10,7 @@ export class BlinkingImageAnimation {
     /**
      * The current frame number for this animation
      */
-    private frame: number = 0;
+    private frame = 0;
 
     /**
      * Create a new BlinkingImageAnimation

@@ -34,7 +34,10 @@ export function createSecondTileSet(chunk: GroundChunk): Tileset {
 }
 
 export class SecondTileFactory implements TileSetFactory {
-    constructor(private chunk: GroundChunk, private tiles: Point[]) {}
+    constructor(
+        private chunk: GroundChunk,
+        private tiles: Point[],
+    ) {}
 
     createTiles(): GroundTile[] {
         return this.tiles.map((point) => {

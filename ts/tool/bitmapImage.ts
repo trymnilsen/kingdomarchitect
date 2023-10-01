@@ -4,12 +4,15 @@ import { PixelColor } from "./spritepack/pixels.js";
 export class BitmapImage {
     private image: Jimp | undefined;
 
-    constructor(private width: number, private height: number) {}
+    constructor(
+        private width: number,
+        private height: number,
+    ) {}
 
     async create() {
         const createPromise = new Promise<Jimp>((resolve, reject) => {
             new Jimp(this.width, this.height, (err, image) => {
-                if (!!err) {
+                if (err) {
                     reject(err);
                 } else {
                     resolve(image);
@@ -25,7 +28,7 @@ export class BitmapImage {
             pixel.red,
             pixel.green,
             pixel.blue,
-            pixel.alpha
+            pixel.alpha,
         );
 
         if (this.image) {

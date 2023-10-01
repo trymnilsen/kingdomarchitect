@@ -1,4 +1,4 @@
-import { ConstructorFunction } from "../constructor.js";
+import { ConstructorFunction, getConstructorName } from "../constructor.js";
 import { InvalidArgumentError } from "../error/invalidArgumentError.js";
 import { EventSubscriptionHandler } from "../event.js";
 
@@ -27,9 +27,9 @@ export class TypedEvent<TBaseEvent extends object> {
      * @param subscriber the callback to invoke when an event is published
      * @returns a handle that can be used to dispose the subscription
      */
-    public listen<TEventFilter extends TBaseEvent>(
+    listen<TEventFilter extends TBaseEvent>(
         filterType: ConstructorFunction<TEventFilter>,
-        subscriber: EventSubscriptionHandler<TEventFilter>
+        subscriber: EventSubscriptionHandler<TEventFilter>,
     ): TypedEventHandle {
         const typename = filterType.name;
         const listenerId = this.getNextListenerId();
@@ -39,7 +39,9 @@ export class TypedEvent<TBaseEvent extends object> {
             handler: subscriber as EventSubscriptionHandler<TBaseEvent>,
         };
         this.subscriptions.push(subscription);
-        const handle = new TypedEventHandle(this, listenerId);
+        const handle = new TypedEventHandle(() => {
+            this.removeListener(listenerId);
+        });
         return handle;
     }
 
@@ -48,16 +50,12 @@ export class TypedEvent<TBaseEvent extends object> {
      * will be used to select the applicable subscribers
      * @param data The data to publish to subscriber
      */
-    public publish(data: TBaseEvent) {
-        const typeName = Object.getPrototypeOf(data)?.constructor?.name;
-        if (!typeName) {
-            throw new InvalidArgumentError("Data had no constructor name");
-        }
-        for (let i = 0; i < this.subscriptions.length; i++) {
-            const item = this.subscriptions[i];
-            if (typeName == item.typeName) {
+    publish(data: TBaseEvent) {
+        const typeName = getConstructorName(data);
+        for (const subscription of this.subscriptions) {
+            if (typeName == subscription.typeName) {
                 try {
-                    item.handler(data);
+                    subscription.handler(data);
                 } catch (err) {
                     console.error("Failed running event subscriber", err);
                 }
@@ -69,7 +67,7 @@ export class TypedEvent<TBaseEvent extends object> {
      * Remove a subscriber for the list of listeners
      * @param handleId the id of the subscription to remove
      */
-    public removeListener(handleId: string) {
+    removeListener(handleId: string) {
         this.subscriptions = this.subscriptions.filter((item) => {
             item.handleId != handleId;
         });
@@ -86,21 +84,15 @@ export class TypedEvent<TBaseEvent extends object> {
  * Allows checking if the subscription is active and disposing the subscription
  */
 export class TypedEventHandle {
-    private _isDisposed: boolean = false;
+    constructor(private disposeHandle: () => void) {}
 
-    constructor(private event: TypedEvent<any>, private handleId: string) {}
-
-    public get isDisposed(): boolean {
-        return this._isDisposed;
-    }
-
-    public dispose() {
-        this.event.removeListener(this.handleId);
+    dispose() {
+        this.disposeHandle();
     }
 }
 
-interface TypedEventSubscription<T> {
+type TypedEventSubscription<T> = {
     handleId: string;
     typeName: string;
     handler: EventSubscriptionHandler<T>;
-}
+};

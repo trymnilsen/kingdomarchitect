@@ -33,7 +33,7 @@ export class InventoryState extends InteractionState {
     private _selectedGridItemView: UIInventoryGridItem | undefined;
     private _scaffold: UIActionbarScaffold | null = null;
     private _items: InventoryItemList = [];
-    private _activeItem: number = 0;
+    private _activeItem = 0;
 
     override get isModal(): boolean {
         return true;
@@ -111,12 +111,12 @@ export class InventoryState extends InteractionState {
 
         for (let i = 0; i < 24; i++) {
             const inventoryItem = this._items[i];
-            if (!!inventoryItem) {
+            if (inventoryItem) {
                 const isSelected = i == 0;
                 const gridItem = new UIInventoryGridItem(
                     inventoryItem.item.asset,
                     isSelected,
-                    UIThemeType.Book
+                    UIThemeType.Book,
                 );
                 gridItem.id = inventoryItem.item.name;
 
@@ -138,7 +138,7 @@ export class InventoryState extends InteractionState {
                             sides: allSides(8),
                             scale: 1,
                         }),
-                    })
+                    }),
                 );
             }
         }
@@ -154,7 +154,7 @@ export class InventoryState extends InteractionState {
     private getDetailsView(index: number): UIView {
         const inventoryItem = this._items[index];
         const description: (item: Readonly<InventoryItem>) => ColumnChild[] = (
-            item
+            item,
         ) => {
             if (item.hint) {
                 return [
@@ -174,7 +174,7 @@ export class InventoryState extends InteractionState {
                     {
                         child: uiText({
                             alignment: uiAlignment.centerLeft,
-                            text: inventoryItem.item.hint || "",
+                            text: inventoryItem.item.hint ?? "",
                             style: {
                                 color: bookInkColor,
                                 font: "Silkscreen",
@@ -189,7 +189,7 @@ export class InventoryState extends InteractionState {
                 return [];
             }
         };
-        if (!!inventoryItem) {
+        if (inventoryItem) {
             return uiBox({
                 width: 300,
                 height: 400,
@@ -218,7 +218,7 @@ export class InventoryState extends InteractionState {
                                             height: 64,
                                             width: 64,
                                             image: spriteImageSource(
-                                                inventoryItem.item.asset
+                                                inventoryItem.item.asset,
                                             ),
                                         }),
                                     ],
@@ -314,7 +314,7 @@ export class InventoryState extends InteractionState {
                 icon: sprites2.empty_sprite,
                 onClick: () => {
                     this.context.stateChanger.push(
-                        new AlertMessageState("Ops", "not implemented")
+                        new AlertMessageState("Ops", "not implemented"),
                     );
                 },
             });
@@ -329,7 +329,7 @@ export class InventoryState extends InteractionState {
                     icon: sprites2.empty_sprite,
                     onClick: () => {
                         this.context.stateChanger.push(
-                            new EquipItemState(activeItem.item)
+                            new EquipItemState(activeItem.item),
                         );
                     },
                 });

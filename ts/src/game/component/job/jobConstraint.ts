@@ -6,23 +6,23 @@ import { Job } from "./job.js";
 export function isJobApplicableForEntity(
     job: Job,
     constraint: JobConstraint,
-    entity: Entity
+    entity: Entity,
 ): boolean {
     const validator = constraints[constraint.key];
     if (!validator) {
         throw new Error(
-            `Unable to find constraint with key: ${constraint.key}`
+            `Unable to find constraint with key: ${constraint.key}`,
         );
     }
 
-    const isApplicable = validator(job, entity, constraint.value as any);
+    const isApplicable = validator(job, entity, constraint.value as string);
     return isApplicable;
 }
 
 export type JobConstraint = {
     key: JobConstraintNames;
     value: JSONValue;
-};
+}
 
 export function entityInstanceConstraint(entityId: string) {
     return jobConstraint("entityInstance", entityId);
@@ -33,14 +33,14 @@ export function workerConstraint() {
 }
 
 const entityInstanceConstraintValidator = (
-    job: Job,
+    _job: Job,
     entity: Entity,
-    data: string
+    data: string,
 ) => {
     return entity.id === data;
 };
 
-const workerConstraintValidator = (job: Job, entity: Entity) => {
+const workerConstraintValidator = (_job: Job, entity: Entity) => {
     return !!entity.getComponent(WorkerBehaviorComponent);
 };
 
@@ -59,7 +59,7 @@ type JobConstraintsMap = {
 
 function jobConstraint(
     constraintName: JobConstraintNames,
-    data: JobConstraintsMap[typeof constraintName]["value"]
+    data: JobConstraintsMap[typeof constraintName]["value"],
 ): JobConstraint {
     return {
         value: data as JSONValue,

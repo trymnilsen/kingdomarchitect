@@ -11,14 +11,14 @@ export class FixedGraph implements Graph {
     private nodes: GraphNode[] = [];
     private grid: GraphNode[][] = [];
     private dirtyNodes: GraphNode[] = [];
-    private _offsetX: number = 0;
-    private _offsetY: number = 0;
+    private _offsetX = 0;
+    private _offsetY = 0;
 
-    public get offsetX(): number {
+    get offsetX(): number {
         return this._offsetX;
     }
 
-    public get offsetY(): number {
+    get offsetY(): number {
         return this._offsetY;
     }
 
@@ -26,7 +26,7 @@ export class FixedGraph implements Graph {
         this.generateGrid();
     }
 
-    invalidatePoint(point: Point) {
+    invalidatePoint() {
         this.generateGrid();
     }
 
@@ -51,22 +51,22 @@ export class FixedGraph implements Graph {
         const y = node.y;
 
         // West
-        if (this.grid[x - 1] && this.grid[x - 1][y]) {
+        if (this.grid[x - 1]?.[y]) {
             neighborNodes.push(this.grid[x - 1][y]);
         }
 
         // East
-        if (this.grid[x + 1] && this.grid[x + 1][y]) {
+        if (this.grid[x + 1]?.[y]) {
             neighborNodes.push(this.grid[x + 1][y]);
         }
 
         // South
-        if (this.grid[x] && this.grid[x][y - 1]) {
+        if (this.grid[x]?.[y - 1]) {
             neighborNodes.push(this.grid[x][y - 1]);
         }
 
         // North
-        if (this.grid[x] && this.grid[x][y + 1]) {
+        if (this.grid[x]?.[y + 1]) {
             neighborNodes.push(this.grid[x][y + 1]);
         }
 

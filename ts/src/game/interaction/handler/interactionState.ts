@@ -24,11 +24,11 @@ export abstract class InteractionState {
     private _context: StateContext | undefined;
     private _view: UIView | null = null;
     private _cachedFocusGroups: FocusGroup[] = [];
-    private _currentFocusGroupIndex: number = 0;
+    private _currentFocusGroupIndex = 0;
     /**
      * Retrieve the currently set root view of the this state
      */
-    public get view(): UIView | null {
+    get view(): UIView | null {
         return this._view;
     }
     /**
@@ -46,7 +46,7 @@ export abstract class InteractionState {
      * components useful to a state.
      * Set after the constructor has run, but before the first onActive call.
      */
-    public get context(): StateContext {
+    get context(): StateContext {
         if (!this._context) {
             throw Error("State context is not set");
         }
@@ -56,7 +56,7 @@ export abstract class InteractionState {
     /**
      * Sets the context for this state
      */
-    public set context(v: StateContext) {
+    set context(v: StateContext) {
         this._context = v;
     }
 
@@ -75,7 +75,7 @@ export abstract class InteractionState {
      * method and not a property to allow easy overriding.
      */
     getFocusGroups(): FocusGroup[] {
-        if (!!this._view) {
+        if (this._view) {
             return [this._view];
         } else {
             return [];
@@ -130,7 +130,7 @@ export abstract class InteractionState {
      * elements also causing a selection of a tile behind.
      * @param tile the tile that was tapped
      */
-    onTileTap(tile: GroundTile): boolean {
+    onTileTap(_tile: GroundTile): boolean {
         return false;
     }
 
@@ -139,11 +139,11 @@ export abstract class InteractionState {
      * @param screenPosition the position of the tap
      * @returns if the tap was handled or not
      */
-    onTap(screenPosition: Point, worldPosition: Point): boolean {
+    onTap(_screenPosition: Point, _worldPosition: Point): boolean {
         return false;
     }
 
-    onTapPan(movement: Point, position: Point, startPosition: Point): void {}
+    onTapPan(_movement: Point, _position: Point, _startPosition: Point): void {}
 
     /**
      * Called when this state becomes the active state, either by being popped
@@ -152,7 +152,7 @@ export abstract class InteractionState {
      */
     onActive(): void {}
 
-    onFocusChanged(focusGroup: FocusGroup) {}
+    onFocusChanged(_focusGroup: FocusGroup) {}
 
     /**
      * Called when this state becomes inactive. Either from another state
@@ -168,7 +168,7 @@ export abstract class InteractionState {
      * Update method called consistently on each update
      * @param tick
      */
-    onUpdate(tick: number): void {}
+    onUpdate(_tick: number): void {}
 
     /**
      * Called when its time to render/draw anything this state wants to.
@@ -206,7 +206,7 @@ export abstract class InteractionState {
      */
     onInput(
         input: InputAction,
-        stateChanger: InteractionStateChanger
+        _stateChanger: InteractionStateChanger,
     ): boolean {
         const view = this.view;
         const direction = getDirectionFromInputType(input.action);
@@ -215,7 +215,7 @@ export abstract class InteractionState {
         }
 
         let consumedInput = false;
-        if (!!direction) {
+        if (direction) {
             const focusGroups = this._cachedFocusGroups;
             const currentFocusIndex = this._currentFocusGroupIndex;
             const currentFocusGroup = focusGroups[currentFocusIndex];
@@ -225,7 +225,7 @@ export abstract class InteractionState {
                 const focusGroup = focusGroups[i];
                 const focusTaken = focusGroup.moveFocus(
                     direction,
-                    currentFocusBounds
+                    currentFocusBounds,
                 );
 
                 if (focusTaken) {
@@ -238,7 +238,7 @@ export abstract class InteractionState {
 
         if (input.action == InputActionType.ACTION_PRESS) {
             const currentFocusGroup = this.getCurrentFocusGroup();
-            if (!!currentFocusGroup) {
+            if (currentFocusGroup) {
                 currentFocusGroup.onFocusActionInput();
             }
         }

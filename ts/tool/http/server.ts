@@ -1,17 +1,18 @@
 import * as http from "http";
 import * as fs from "fs";
 import * as path from "path";
+import sanitize from "sanitize-filename";
 
 const serverName = "kingdom";
 
 http.createServer(function (request, response) {
     console.log(request.method + " " + request.url);
 
-    var filePath = "." + request.url;
+    let filePath = "." + request.url;
     if (filePath == "./") filePath = "./index.html";
     filePath = path.join(process.cwd(), "public", filePath);
-    var extname = path.extname(filePath);
-    var contentType = "text/html";
+    const extname = path.extname(filePath);
+    let contentType = "text/html";
     switch (extname) {
         case ".js":
             contentType = "text/javascript";
@@ -33,7 +34,7 @@ http.createServer(function (request, response) {
             break;
     }
 
-    fs.readFile(filePath, function (error, content) {
+    fs.readFile(sanitize(filePath), function (error, content) {
         if (error) {
             if (error.code == "ENOENT") {
                 response.writeHead(404, {

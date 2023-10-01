@@ -51,7 +51,7 @@ export class BuildingState extends InteractionState {
                 onClick: () => {
                     console.log("Build selected: ", this._selectedBuilding);
                     this.context.stateChanger.replace(
-                        new BuildConfirmState(this._selectedBuilding)
+                        new BuildConfirmState(this._selectedBuilding),
                     );
                 },
             },
@@ -86,7 +86,7 @@ export class BuildingState extends InteractionState {
             contentView,
             rightItems,
             [],
-            { width: fillUiSize, height: fillUiSize }
+            { width: fillUiSize, height: fillUiSize },
         );
 
         this.view = scaffoldState;
@@ -141,14 +141,14 @@ export class BuildingState extends InteractionState {
                                             sprite: building.icon,
                                             name: building.name,
                                         },
-                                        index
+                                        index,
                                     ),
                                 },
                                 {
                                     child: uiSpace({ width: 1, height: 8 }),
                                 },
                             ];
-                        }
+                        },
                     ),
                     width: fillUiSize,
                     height: fillUiSize,
@@ -159,7 +159,7 @@ export class BuildingState extends InteractionState {
 
     private getBuildingListItem(
         building: BuildingListEntry,
-        index: number
+        index: number,
     ): UIView {
         return uiButton({
             padding: allSides(16),
@@ -326,7 +326,7 @@ export class BuildingState extends InteractionState {
     }
 }
 
-interface BuildingListEntry {
+type BuildingListEntry = {
     sprite: Sprite2;
     name: string;
 }

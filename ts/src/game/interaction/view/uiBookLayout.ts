@@ -28,7 +28,7 @@ export class UIBookLayout extends UIView {
     private _rightPage: UIView = new NullView();
     private _mode: UIBookLayoutMode = UIBookLayoutMode.Dual;
     private _currentPage: UIBookLayoutPage = UIBookLayoutPage.Left;
-    private _bookOffset: number = 0;
+    private _bookOffset = 0;
     /**
      * The view that keeps the tabs, is null if no tabs are set
      */
@@ -141,13 +141,13 @@ export class UIBookLayout extends UIView {
         this.addView(tabContainer);
     }
 
-    override hitTest(screenPoint: Point): boolean {
+    override hitTest(): boolean {
         return false;
     }
 
     override layout(
         layoutContext: UILayoutContext,
-        constraints: UISize
+        constraints: UISize,
     ): UISize {
         const availableSize = {
             width: constraints.width - horizontalPadding * 2,
@@ -224,7 +224,7 @@ export class UIBookLayout extends UIView {
                 x: horizontalPadding + this._bookOffset,
                 y: verticalPadding,
             },
-            this.screenPosition
+            this.screenPosition,
         );
 
         bookBackground.draw(context, backgroundPosition, bookSize);
@@ -274,7 +274,7 @@ export enum UIBookLayoutPage {
     Right,
 }
 
-export interface UIBookLayoutTab {
+export type UIBookLayoutTab = {
     icon: Sprite2;
     onTap: (index: number) => void;
     isSelected: boolean;

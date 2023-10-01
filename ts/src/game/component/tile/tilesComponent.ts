@@ -18,12 +18,12 @@ export type GroundChunk = {
 };
 
 type TilesBundle = {
-    tileMap: { [id: string]: GroundTile };
-    chunkMap: { [id: string]: GroundChunk };
+    tileMap: Record<string, GroundTile>;
+    chunkMap: Record<string, GroundChunk>;
 };
 
-type TileMap = { [id: string]: GroundTile };
-type GroundChunkMap = { [id: string]: GroundChunk };
+type TileMap = Record<string, GroundTile>;
+type GroundChunkMap = Record<string, GroundChunk>;
 
 export class TilesComponent
     extends EntityComponent<TilesBundle>
@@ -32,7 +32,7 @@ export class TilesComponent
     private tileMap: TileMap = {};
     private _chunkMap: GroundChunkMap = {};
 
-    public get chunkMap(): Readonly<{ [id: string]: Readonly<GroundChunk> }> {
+    get chunkMap(): Readonly<Record<string, Readonly<GroundChunk>>> {
         return this._chunkMap;
     }
 
@@ -82,7 +82,7 @@ export class TilesComponent
         this._chunkMap[getTileId(chunk.chunkX, chunk.chunkY)] = chunk;
     }
 
-    override onDraw(context: RenderContext, screenPosition: Point): void {
+    override onDraw(context: RenderContext): void {
         for (const tileId in this.tileMap) {
             const tile = this.tileMap[tileId];
             context.drawRectangle({

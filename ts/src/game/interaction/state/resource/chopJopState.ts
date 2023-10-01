@@ -48,7 +48,7 @@ export class ChopJobState extends InteractionState {
                             icon: sprites2.empty_sprite,
                             onClick: () => {
                                 this.chopMode = new SingleSelectionMode(
-                                    this.chopMode.cursorSelection()
+                                    this.chopMode.cursorSelection(),
                                 );
                             },
                         },
@@ -57,7 +57,7 @@ export class ChopJobState extends InteractionState {
                             icon: sprites2.empty_sprite,
                             onClick: () => {
                                 this.chopMode = new LineSelectionMode(
-                                    this.chopMode.cursorSelection()
+                                    this.chopMode.cursorSelection(),
                                 );
                             },
                         },
@@ -66,7 +66,7 @@ export class ChopJobState extends InteractionState {
                             icon: sprites2.empty_sprite,
                             onClick: () => {
                                 this.chopMode = new BoxSelectionMode(
-                                    this.chopMode.cursorSelection()
+                                    this.chopMode.cursorSelection(),
                                 );
                             },
                         },
@@ -81,7 +81,7 @@ export class ChopJobState extends InteractionState {
                 },
             ],
             [],
-            { width: fillUiSize, height: fillUiSize }
+            { width: fillUiSize, height: fillUiSize },
         );
 
         this.view = scaffoldView;

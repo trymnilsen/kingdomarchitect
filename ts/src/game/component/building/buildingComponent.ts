@@ -22,9 +22,9 @@ export class BuildingComponent extends EntityComponent<BuildingComponentBundle> 
     private buildingSprite: Sprite2 = emptySprite;
     private scaffoldSprite: Sprite2 = emptySprite;
     private _building: Building = nullBuilding;
-    private isScaffolded: boolean = true;
+    private isScaffolded = true;
 
-    public get building(): Readonly<Building> {
+    get building(): Readonly<Building> {
         return this._building;
     }
 
@@ -35,7 +35,7 @@ export class BuildingComponent extends EntityComponent<BuildingComponentBundle> 
     static createInstance(
         buildingSprite: Sprite2,
         scaffoldSprite: Sprite2,
-        buildingId: string
+        buildingId: string,
     ): BuildingComponent {
         const instance = new BuildingComponent();
         instance.fromComponentBundle({
@@ -103,7 +103,7 @@ export class BuildingComponent extends EntityComponent<BuildingComponentBundle> 
         this.scaffoldSprite = bundle.scaffoldSprite;
         this.isScaffolded = bundle.isScaffolded;
         const building = getBuildingById(bundle.buildingId);
-        if (!!building) {
+        if (building) {
             this._building = building;
         } else if (bundle.buildingId === nullBuildingId) {
             this._building = nullBuilding;
@@ -128,7 +128,7 @@ export class BuildingComponent extends EntityComponent<BuildingComponentBundle> 
             y: this.entity.worldPosition.y,
         });
 
-        if (!!leftBuilding) {
+        if (leftBuilding) {
             adjacency += Adjacency.Left;
         }
 
@@ -137,7 +137,7 @@ export class BuildingComponent extends EntityComponent<BuildingComponentBundle> 
             y: this.entity.worldPosition.y,
         });
 
-        if (!!rightBuilding) {
+        if (rightBuilding) {
             adjacency += Adjacency.Right;
         }
 
@@ -146,7 +146,7 @@ export class BuildingComponent extends EntityComponent<BuildingComponentBundle> 
             y: this.entity.worldPosition.y - 1,
         });
 
-        if (!!upperBuilding) {
+        if (upperBuilding) {
             adjacency += Adjacency.Upper;
         }
 
@@ -155,7 +155,7 @@ export class BuildingComponent extends EntityComponent<BuildingComponentBundle> 
             y: this.entity.worldPosition.y + 1,
         });
 
-        if (!!bottomBuilding) {
+        if (bottomBuilding) {
             adjacency += Adjacency.Bottom;
         }
 
@@ -191,16 +191,16 @@ export class BuildingComponent extends EntityComponent<BuildingComponentBundle> 
         //Check if it has a building component
         //if it does call update own adjacency on it
         const adjacentBuildings = this.getAdjacency();
-        if (!!adjacentBuildings.left) {
+        if (adjacentBuildings.left) {
             adjacentBuildings.left.updateOwnAdjacency();
         }
-        if (!!adjacentBuildings.right) {
+        if (adjacentBuildings.right) {
             adjacentBuildings.right.updateOwnAdjacency();
         }
-        if (!!adjacentBuildings.upper) {
+        if (adjacentBuildings.upper) {
             adjacentBuildings.upper.updateOwnAdjacency();
         }
-        if (!!adjacentBuildings.bottom) {
+        if (adjacentBuildings.bottom) {
             adjacentBuildings.bottom.updateOwnAdjacency();
         }
 
@@ -208,7 +208,7 @@ export class BuildingComponent extends EntityComponent<BuildingComponentBundle> 
     }
 }
 
-interface AdjacentBuildings {
+type AdjacentBuildings = {
     adjacency: Adjacency;
     left: BuildingComponent | null;
     right: BuildingComponent | null;

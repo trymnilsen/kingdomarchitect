@@ -1,4 +1,4 @@
-export interface TextStyle {
+export type TextStyle = {
     color: string;
     font: string;
     size: number;

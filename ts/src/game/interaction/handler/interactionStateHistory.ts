@@ -2,7 +2,7 @@ import { RootState } from "../state/root/rootState.js";
 import { InteractionState } from "./interactionState.js";
 import { StateContext } from "./stateContext.js";
 
-interface InteractionStateHistoryEntry {
+type InteractionStateHistoryEntry = {
     state: InteractionState;
     onPop?: (value: unknown) => void;
 }
@@ -18,7 +18,7 @@ export class InteractionStateHistory {
     /**
      * Retrieve the currently active interaction state
      */
-    public get state(): InteractionState {
+    get state(): InteractionState {
         return this.history[this.history.length - 1].state;
     }
 
@@ -34,7 +34,7 @@ export class InteractionStateHistory {
      * active state before the push is perfomed to be set as inactive.
      * @param state The new state to push and set as active
      */
-    public push(state: InteractionState, onPop?: (value: unknown) => void) {
+    push(state: InteractionState, onPop?: (value: unknown) => void) {
         console.log("Pushing state: ", state.constructor.name);
         this.history[this.history.length - 1].state.onInactive();
         // Create a pop completer that can we awaited to wait for a result
@@ -53,7 +53,7 @@ export class InteractionStateHistory {
      * the stack
      * @param state the state to replace the current state with
      */
-    public replace(state: InteractionState) {
+    replace(state: InteractionState) {
         if (this.history.length == 1) {
             throw Error("Cannot replace root state");
         }
@@ -72,7 +72,7 @@ export class InteractionStateHistory {
      * Pops the stack of the currenly active state causing the previous state
      * to become active
      */
-    public pop(value?: unknown) {
+    pop(value?: unknown) {
         if (this.history.length == 1) {
             throw Error("Cannot pop root state");
         }
@@ -89,7 +89,7 @@ export class InteractionStateHistory {
     /**
      * Clears all currently pushed states and resets to the RootState
      */
-    public clear() {
+    clear() {
         const items = this.history.length;
         for (let i = items; i > 1; i--) {
             const item = this.history.pop();

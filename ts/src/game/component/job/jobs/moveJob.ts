@@ -6,7 +6,7 @@ import { JobConstraint } from "../jobConstraint.js";
 
 type MoveBundle = {
     path: Point[];
-};
+}
 
 /**
  * Represents a job that will move through a specific path and complete once
@@ -23,7 +23,7 @@ export class MoveJob extends Job<MoveBundle> {
         return instance;
     }
 
-    update(tick: number): void {
+    update(): void {
         const newPosition = this.path.pop();
         if (newPosition) {
             this.entity.worldPosition = newPosition;

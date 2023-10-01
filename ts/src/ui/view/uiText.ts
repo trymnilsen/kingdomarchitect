@@ -20,13 +20,13 @@ import { UIView } from "../uiView.js";
 
 export class UIText extends UIView {
     private _textStyle: TextStyle = defaultTextStyle;
-    private _text: string = "";
+    private _text = "";
     private _alignment: Point = uiAlignment.center;
     private _textAlignmentOffset: Point = zeroPoint();
     private _padding: Sides = zeroSides();
     private _previousConstraints: UISize = zeroSize();
     private _textRuns: string[] = [];
-    private _wrapText: boolean = false;
+    private _wrapText = false;
     private _lineHeight = 0;
 
     get padding(): Sides {
@@ -142,7 +142,7 @@ export class UIText extends UIView {
             measuredSize.height,
             this._alignment,
             textSize.width + horizontalPadding,
-            textSize.height + verticalPadding
+            textSize.height + verticalPadding,
         );
 
         this._textAlignmentOffset = calculatedAlignment;
@@ -153,7 +153,7 @@ export class UIText extends UIView {
 
     private layoutMultiRunText(
         constraints: UISize,
-        layoutContext: UILayoutContext
+        layoutContext: UILayoutContext,
     ): UISize {
         const horizontalPadding = totalHorizontal(this.padding);
         const verticalPadding = totalVertical(this.padding);
@@ -166,7 +166,7 @@ export class UIText extends UIView {
         const textRuns: string[] = [];
         const spaceWidth = layoutContext.measureText(
             " ",
-            this._textStyle
+            this._textStyle,
         ).width;
 
         let currentRun = "";

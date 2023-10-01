@@ -3,10 +3,10 @@ import { UIImage } from "../view/uiImage.js";
 import { UIImageSource, UISpriteImageSource } from "../view/uiImageSource.js";
 import { Sprite2 } from "../../asset/sprite.js";
 
-export interface UIImageProperties extends UIViewProperties {
+export type UIImageProperties = {
     image: UIImageSource;
     scale?: number;
-}
+} & UIViewProperties
 
 export function spriteImageSource(sprite: Sprite2): UIImageSource {
     return new UISpriteImageSource(sprite);

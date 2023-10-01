@@ -2,7 +2,7 @@ export class BinaryHeap<T> {
     private content: T[];
     private scoreFunction: (item: T) => number;
 
-    public get size(): number {
+    get size(): number {
         return this.content.length;
     }
 
@@ -85,13 +85,14 @@ export class BinaryHeap<T> {
         const element = this.content[n];
         const elemScore = this.scoreFunction(element);
 
+        // eslint-disable-next-line no-constant-condition
         while (true) {
             // Compute the indices of the child elements.
             const child2N = (n + 1) << 1;
             const child1N = child2N - 1;
             // This is used to store the new position of the element, if any.
             let swap: number | null = null;
-            let child1Score: number = 0;
+            let child1Score = 0;
             // If the first child exists (is inside the array)...
             if (child1N < length) {
                 // Look it up and compute its score.
@@ -119,6 +120,7 @@ export class BinaryHeap<T> {
                 this.content[swap] = element;
                 n = swap;
             }
+
             // Otherwise, we are done.
             else {
                 break;

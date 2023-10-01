@@ -1,5 +1,5 @@
 import { UIView } from "../../../ui/uiView.js";
 
-export interface StatePresenter {
+export type StatePresenter = {
     readonly root: UIView;
 }

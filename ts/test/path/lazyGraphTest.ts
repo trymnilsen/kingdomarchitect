@@ -5,7 +5,7 @@ import { LazyGraph } from "../../src/path/graph/lazyGraph.js";
 describe("Lazy graph test", () => {
     it("Can get node at", () => {
         let times = 0;
-        const lazyGraph = new LazyGraph((point) => {
+        const lazyGraph = new LazyGraph(() => {
             times++;
             return 0;
         });
@@ -27,7 +27,7 @@ describe("Lazy graph test", () => {
 
     it("Can invalidate point in graph", () => {
         let times = 0;
-        const lazyGraph = new LazyGraph((point) => {
+        const lazyGraph = new LazyGraph(() => {
             times++;
             return 0;
         });

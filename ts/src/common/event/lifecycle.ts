@@ -9,12 +9,10 @@ export enum LifecycleStatus {
     Stopped,
 }
 export class Lifecycle implements EventListener<LifecycleStatus> {
-    listen(subscriber: EventSubscriptionHandler<LifecycleStatus>): EventHandle {
+    listen(): EventHandle {
         throw new Error("Method not implemented.");
     }
-    listenOnce(
-        subscriber: EventSubscriptionHandler<LifecycleStatus>
-    ): EventHandle {
+    listenOnce(): EventHandle {
         throw new Error("Method not implemented.");
     }
 }

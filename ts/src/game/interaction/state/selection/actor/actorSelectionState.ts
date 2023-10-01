@@ -1,6 +1,10 @@
 import { sprites2 } from "../../../../../asset/sprite.js";
 import { Point } from "../../../../../common/point.js";
 import { allSides } from "../../../../../common/sides.js";
+import {
+    InventoryItem,
+    ItemCategory,
+} from "../../../../../data/inventory/inventoryItem.js";
 import { RenderContext } from "../../../../../rendering/renderContext.js";
 import { EquipmentComponent } from "../../../../component/inventory/equipmentComponent.js";
 import { Entity } from "../../../../entity/entity.js";
@@ -13,20 +17,10 @@ import { ActorSelectionPresenter } from "./actorSelectionPresenter.js";
 
 export class ActorSelectionState extends InteractionState {
     private presenter: ActorSelectionPresenter | null = null;
-    private expandedMenuState: boolean = false;
+    private expandedMenuState = false;
 
     constructor(private entity: Entity) {
         super();
-    }
-
-    override onTap(screenPosition: Point, worldPosition: Point): boolean {
-        if (this.expandedMenuState) {
-            this.expandedMenuState = false;
-            this.presenter?.setExpandedMenu([]);
-            return true;
-        } else {
-            return false;
-        }
     }
 
     override onActive(): void {
@@ -35,7 +29,7 @@ export class ActorSelectionState extends InteractionState {
                 text: "Move",
                 onClick: () => {
                     this.context.stateChanger.push(
-                        new ActorMovementState(this.entity)
+                        new ActorMovementState(this.entity),
                     );
                 },
             },
@@ -62,7 +56,7 @@ export class ActorSelectionState extends InteractionState {
         super.onDraw(context);
 
         const cursorWorldPosition = context.camera.tileSpaceToScreenSpace(
-            this.entity.worldPosition
+            this.entity.worldPosition,
         );
 
         context.drawNinePatchSprite({
@@ -79,25 +73,21 @@ export class ActorSelectionState extends InteractionState {
     private getRightItems(): UIActionbarItem[] {
         const items: UIActionbarItem[] = [];
         const equipment = this.entity.getComponent(EquipmentComponent);
-        if (equipment && equipment.mainItem) {
+        if (equipment?.mainItem) {
             items.push({
                 text: "Main",
-                onClick: () => {
-                    //this.onMainItemTap();
-                },
+                children: this.getEquipmentAction(equipment.mainItem),
                 icon: equipment.mainItem.asset,
             });
         } else {
             items.push({
                 text: "Main",
-                onClick: () => {
-                    //this.onMainItemTap();
-                },
                 icon: sprites2.empty_sprite,
+                children: this.getEmptyMainEquipmentAction(),
             });
         }
 
-        if (equipment && equipment.otherItem) {
+        if (equipment?.otherItem) {
             items.push({
                 text: "Other",
                 icon: equipment.otherItem.asset,
@@ -106,10 +96,63 @@ export class ActorSelectionState extends InteractionState {
             items.push({
                 text: "Other",
                 icon: sprites2.empty_sprite,
+                children: this.getEmptyOtherEquipmentAction(),
             });
         }
 
         return items;
+    }
+
+    private getEmptyMainEquipmentAction(): UIActionbarItem[] {
+        return [
+            {
+                text: "Equip",
+                onClick: () => {
+                    //this.onMainItemTap();
+                },
+                icon: sprites2.empty_sprite,
+            },
+        ];
+    }
+
+    private getEmptyOtherEquipmentAction(): UIActionbarItem[] {
+        return [
+            {
+                text: "Equip",
+                onClick: () => {
+                    //this.onMainItemTap();
+                },
+                icon: sprites2.empty_sprite,
+            },
+        ];
+    }
+
+    private getEquipmentAction(
+        _inventoryItem: InventoryItem,
+    ): UIActionbarItem[] | undefined {
+        return [
+            {
+                text: "Unequip",
+                onClick: () => {
+                    //this.onMainItemTap();
+                },
+                icon: sprites2.empty_sprite,
+            },
+            {
+                text: "Attack",
+                onClick: () => {
+                    //this.onMainItemTap();
+                },
+                icon: sprites2.empty_sprite,
+            },
+            {
+                text: "Defend",
+                onClick: () => {
+                    //this.onMainItemTap();
+                },
+                icon: sprites2.empty_sprite,
+            },
+        ];
     }
 
     private onMainItemTap() {

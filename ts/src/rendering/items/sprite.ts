@@ -2,20 +2,20 @@ import { Sprite2 } from "../../asset/sprite.js";
 import { Sides } from "../../common/sides.js";
 import { RenderItemConfiguration } from "./renderItemConfiguration.js";
 
-export interface SpriteConfiguration extends RenderItemConfiguration {
+export type SpriteConfiguration = {
     sprite: Sprite2;
     frame?: number;
     targetWidth?: number;
     targetHeight?: number;
-}
+} & RenderItemConfiguration
 
-export interface NinePatchSpriteConfiguration extends RenderItemConfiguration {
+export type NinePatchSpriteConfiguration = {
     sprite: Sprite2;
     sides: Sides;
     width: number;
     height: number;
     scale: number;
-}
+} & RenderItemConfiguration
 
 export function spriteRenderer(
     x: number,
@@ -28,7 +28,7 @@ export function spriteRenderer(
     targetHeight: number,
     frame: number,
     binAsset: HTMLImageElement,
-    context: CanvasRenderingContext2D
+    context: CanvasRenderingContext2D,
 ) {
     x = Math.floor(x);
     y = Math.floor(y);
@@ -47,7 +47,7 @@ export function spriteRenderer(
         x,
         y,
         targetWidth,
-        targetHeight
+        targetHeight,
     );
 }
 
@@ -84,7 +84,7 @@ export function ninePatchImageRenderer(
     right: number,
     scale: number,
     binAsset: HTMLImageElement,
-    context: CanvasRenderingContext2D
+    context: CanvasRenderingContext2D,
 ) {
     x = Math.floor(x);
     y = Math.floor(y);
@@ -114,7 +114,7 @@ export function ninePatchImageRenderer(
         x,
         y,
         leftScaled,
-        topScaled
+        topScaled,
     );
 
     // Draw top right part of the patch
@@ -127,7 +127,7 @@ export function ninePatchImageRenderer(
         x + width - rightScaled,
         y,
         rightScaled,
-        topScaled
+        topScaled,
     );
 
     // Draw bottom left part of the patch
@@ -140,7 +140,7 @@ export function ninePatchImageRenderer(
         x,
         y + height - bottomScaled,
         leftScaled,
-        bottomScaled
+        bottomScaled,
     );
 
     // Draw bottom right part of the patch
@@ -153,7 +153,7 @@ export function ninePatchImageRenderer(
         x + width - rightScaled,
         y + height - bottomScaled,
         rightScaled,
-        bottomScaled
+        bottomScaled,
     );
 
     if (middleScaledHeight > 0) {
@@ -167,7 +167,7 @@ export function ninePatchImageRenderer(
             x,
             y + topScaled,
             leftScaled,
-            middleScaledHeight
+            middleScaledHeight,
         );
 
         // Draw the right middle part
@@ -180,7 +180,7 @@ export function ninePatchImageRenderer(
             x + width - rightScaled,
             y + topScaled,
             rightScaled,
-            middleScaledHeight
+            middleScaledHeight,
         );
     }
 
@@ -195,7 +195,7 @@ export function ninePatchImageRenderer(
             x + leftScaled,
             y,
             middleScaledWidth,
-            topScaled
+            topScaled,
         );
 
         // Draw the bottom middle part
@@ -208,7 +208,7 @@ export function ninePatchImageRenderer(
             x + leftScaled,
             y + height - bottomScaled,
             middleScaledWidth,
-            bottomScaled
+            bottomScaled,
         );
     }
 
@@ -222,6 +222,6 @@ export function ninePatchImageRenderer(
         x + leftScaled,
         y + topScaled,
         middleScaledWidth,
-        middleScaledHeight
+        middleScaledHeight,
     );
 }

@@ -7,14 +7,14 @@ import {
 } from "./items/sprite.js";
 import { TextConfiguration } from "./items/text.js";
 
-export interface UIRenderContext {
+export type UIRenderContext = {
     drawScreenSpaceSprite(sprite: SpriteConfiguration): void;
     drawNinePatchSprite(image: NinePatchSpriteConfiguration): void;
     drawScreenSpaceRectangle(rectangle: RectangleConfiguration): void;
     drawScreenspaceText(text: TextConfiguration): void;
     drawWithClip(
         bounds: Bounds,
-        drawFunction: (context: UIRenderContext) => void
+        drawFunction: (context: UIRenderContext) => void,
     ): void;
     drawLine(
         x1: number,
@@ -22,7 +22,7 @@ export interface UIRenderContext {
         x2: number,
         y2: number,
         color: string,
-        width: number
+        width: number,
     ): void;
-    getSprite(id: string): Sprite2;
-}
+    getSprite(id: string): Sprite2 | undefined;
+};

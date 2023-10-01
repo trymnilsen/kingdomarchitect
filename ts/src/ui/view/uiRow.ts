@@ -1,4 +1,3 @@
-import { Point } from "../../common/point.js";
 import { UIRenderContext } from "../../rendering/uiRenderContext.js";
 import { VerticalAlignment } from "../uiAlignment.js";
 import { UILayoutContext } from "../uiLayoutContext.js";
@@ -8,8 +7,8 @@ import { UIViewGroup } from "../uiViewGroup.js";
 import { AxisPlacement, insertAndShift } from "./axisPlacement.js";
 
 export class UIRow extends UIViewGroup {
-    private weights: { [view: string]: number } = {};
-    private totalWeight: number = 0;
+    private weights: Record<string, number> = {};
+    private totalWeight = 0;
     private _verticalAlignment: VerticalAlignment = VerticalAlignment.Center;
 
     get verticalAlignment(): VerticalAlignment {
@@ -45,7 +44,7 @@ export class UIRow extends UIViewGroup {
         super.addView(view);
     }
 
-    hitTest(screenPoint: Point): boolean {
+    hitTest(): boolean {
         return false;
     }
 

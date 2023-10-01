@@ -14,12 +14,12 @@ type TreeBundle = {
     tree: number;
     previousTick: number;
     chopState: TreeComponentChopState;
-};
+}
 
 export class TreeComponent extends EntityComponent<TreeBundle> {
     private chopTime?: number;
-    private tree: number = 1;
-    private previousTick: number = 0;
+    private tree = 1;
+    private previousTick = 0;
     private chopState: TreeComponentChopState = TreeComponentChopState.Full;
 
     static createInstance(tree: number): TreeComponent {
@@ -61,7 +61,7 @@ export class TreeComponent extends EntityComponent<TreeBundle> {
             sprite = sprites2.tree_3;
         }
 
-        if (!!this.chopTime) {
+        if (this.chopTime) {
             sprite = sprites2.tree_stub;
         }
 

@@ -1,4 +1,3 @@
-import { Point } from "../../common/point.js";
 import { UIRenderContext } from "../../rendering/uiRenderContext.js";
 import { HorizontalAlignment } from "../uiAlignment.js";
 import { UILayoutContext } from "../uiLayoutContext.js";
@@ -8,8 +7,8 @@ import { UIViewGroup } from "../uiViewGroup.js";
 import { AxisPlacement, insertAndShift } from "./axisPlacement.js";
 
 export class UIColumn extends UIViewGroup {
-    private weights: { [view: string]: number } = {};
-    private totalWeight: number = 0;
+    private weights: Record<string, number> = {};
+    private totalWeight = 0;
     private _horizontalAlignment: HorizontalAlignment =
         HorizontalAlignment.Center;
 
@@ -23,7 +22,7 @@ export class UIColumn extends UIViewGroup {
     override addView(view: UIView, weight: number | null = null) {
         if (view.size.height == fillUiSize && !weight) {
             throw new Error(
-                "Column children cannot fill height without weight"
+                "Column children cannot fill height without weight",
             );
         }
 
@@ -48,7 +47,7 @@ export class UIColumn extends UIViewGroup {
         super.addView(view);
     }
 
-    hitTest(screenPoint: Point): boolean {
+    hitTest(): boolean {
         return false;
     }
 

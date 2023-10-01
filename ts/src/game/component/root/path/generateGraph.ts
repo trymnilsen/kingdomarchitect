@@ -24,7 +24,7 @@ export function createGraphFromNodes(rootEntity: Entity): FixedGraph {
         const groundComponent = rootEntity.getComponent(TilesComponent);
         if (!groundComponent) {
             throw new InvalidArgumentError(
-                "Root entity needs a tiles component"
+                "Root entity needs a tiles component",
             );
         }
 
@@ -44,7 +44,7 @@ export function createGraphFromNodes(rootEntity: Entity): FixedGraph {
                         y: tilePositionYWithoutOffset,
                     },
                     rootEntity,
-                    groundComponent
+                    groundComponent,
                 );
             }
         }
@@ -74,7 +74,7 @@ export function createLazyGraphFromRootNode(node: Entity): Graph {
 function getWeightAtPoint(
     point: Point,
     rootEntity: Entity,
-    groundComponent: TilesComponent
+    groundComponent: TilesComponent,
 ): number {
     let weight = 1000;
     const ground = groundComponent.getTile({
@@ -100,20 +100,20 @@ function getWeightAtPoint(
         for (const entity of entities) {
             const buildingComponent = entity.getComponent(BuildingComponent);
 
-            if (!!buildingComponent) {
+            if (buildingComponent) {
                 entityWeight = 500;
             }
 
             const workerComponent = entity.getComponent(
-                WorkerBehaviorComponent
+                WorkerBehaviorComponent,
             );
 
-            if (!!workerComponent) {
+            if (workerComponent) {
                 entityWeight = 500;
             }
 
             const treeComponent = entity.getComponent(TreeComponent);
-            if (!!treeComponent) {
+            if (treeComponent) {
                 entityWeight = 200;
             }
         }

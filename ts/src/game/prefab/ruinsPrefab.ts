@@ -13,7 +13,7 @@ export function ruinsPrefab(id: string): Entity {
         {
             x: 32,
             y: 32,
-        }
+        },
     );
 
     ruinsPrefab.addComponent(spriteDrawer);

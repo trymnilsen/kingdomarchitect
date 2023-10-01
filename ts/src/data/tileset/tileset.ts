@@ -6,7 +6,7 @@ import { Entity } from "../../game/entity/entity.js";
 /**
  * Represent as set of tiles that can be unlocked
  */
-export interface Tileset {
+export type Tileset = {
     /**
      * The position of the tiles in this set
      */
@@ -32,7 +32,7 @@ export interface Tileset {
  * fixed areas and avoiding the need to create the entities of an area
  * while previewing it for purchase
  */
-export interface TileSetFactory {
+export type TileSetFactory = {
     /**
      * Any tiles that should be added once the tilset has been unlocked
      */

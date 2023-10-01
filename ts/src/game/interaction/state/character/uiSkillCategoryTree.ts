@@ -20,7 +20,7 @@ export class UISkillCategoryTree extends UIBox {
     constructor(
         private skills: SkillTree,
         private skillCategory: SkillCategory,
-        private skillSelected: (skill: Skill) => void
+        private skillSelected: (skill: Skill) => void,
     ) {
         super({
             width: fillUiSize,
@@ -44,7 +44,7 @@ export class UISkillCategoryTree extends UIBox {
                             width: 48,
                             height: 48,
                             defaultBackground: new SpriteBackground(
-                                sprites2.fancy_wood_background
+                                sprites2.fancy_wood_background,
                             ),
                             onTapCallback: () => {
                                 this.skillSelected(skill);
@@ -86,14 +86,16 @@ export class UISkillCategoryTree extends UIBox {
                         width: 48,
                         height: 48,
                         defaultBackground: new SpriteBackground(
-                            sprites2.fancy_wood_background
+                            sprites2.fancy_wood_background,
                         ),
                         children: [
                             uiImage({
                                 width: 32,
                                 height: 32,
                                 image: new UISpriteImageSource(
-                                    this.getSkillWorkerStyle(this.skillCategory)
+                                    this.getSkillWorkerStyle(
+                                        this.skillCategory,
+                                    ),
                                 ),
                             }),
                         ],

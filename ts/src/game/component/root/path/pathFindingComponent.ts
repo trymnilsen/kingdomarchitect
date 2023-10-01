@@ -17,36 +17,32 @@ export class PathFindingComponent extends StatelessComponent {
         super();
     }
 
-    override onStart(tick: number): void {
+    override onStart(): void {
         this.pathSearch = new PathSearch(
-            createLazyGraphFromRootNode(this.entity.getRootEntity())
+            createLazyGraphFromRootNode(this.entity.getRootEntity()),
         );
         this.tileEventListener = this.entity.componentEvents.listen(
             TileMapUpdateEvent,
-            (event) => {
+            () => {
                 // TODO: I dont think we need to handle this as it would just
                 // remove this position that was not there yet from the graph
                 this.invalidateGraphPoint({ x: 0, y: 0 });
-            }
+            },
         );
         this.chunkMapEventListener = this.entity.componentEvents.listen(
             ChunkMapUpdateEvent,
             (event) => {
                 this.invalidateGraphPoint(event.pointUpdated);
-            }
+            },
         );
     }
 
-    override onStop(tick: number): void {
+    override onStop(): void {
         this.tileEventListener?.dispose();
         this.chunkMapEventListener?.dispose();
     }
 
-    public findPath(
-        from: Point,
-        to: Point,
-        blockBuildings?: boolean
-    ): PathResult {
+    findPath(from: Point, to: Point, blockBuildings?: boolean): PathResult {
         if (!this.pathSearch) {
             throw new Error("Cannot find path, no pathsearch set");
         }
@@ -71,7 +67,7 @@ export class PathFindingComponent extends StatelessComponent {
         // to point is inside a building that stretches across multiple
         // tiles and one of the tiles belonging to the building is adjacent
         // to the last path point
-        const weightModifier = !!blockBuildings
+        const weightModifier = blockBuildings
             ? blockBuildingsModifier
             : defaultWeightModifier;
 
@@ -80,7 +76,7 @@ export class PathFindingComponent extends StatelessComponent {
             offsetFrom,
             offsetTo,
             true,
-            weightModifier
+            weightModifier,
         );
 
         // The path results are returned in a absolute space, so we convert them
@@ -117,7 +113,7 @@ export class PathFindingComponent extends StatelessComponent {
         }
     }
 
-    public invalidateGraphPoint(point: Point) {
+    invalidateGraphPoint(point: Point) {
         if (!this.pathSearch) {
             throw new Error("Cannot invalidate point, pathsearch is null");
         }

@@ -7,12 +7,12 @@ import { UISize } from "../../../ui/uiSize.js";
 import { UIBox } from "./../../../ui/view/uiBox.js";
 
 export class UIBorderTitle extends UIBox {
-    private _title: string = "";
-    private _titleWidth: number = 0;
+    private _title = "";
+    private _titleWidth = 0;
 
-    private topLinePoint: number = 0;
-    private topLineLeft: number = 0;
-    private topLineRight: number = 0;
+    private topLinePoint = 0;
+    private topLineLeft = 0;
+    private topLineRight = 0;
 
     private topLeft: Point = zeroPoint();
     private topRight: Point = zeroPoint();
@@ -26,17 +26,17 @@ export class UIBorderTitle extends UIBox {
         this._title = value;
     }
 
-    override hitTest(screenPoint: Point): boolean {
+    override hitTest(): boolean {
         throw new Error("Method not implemented.");
     }
 
     override layout(
         layoutContext: UILayoutContext,
-        constraints: UISize
+        constraints: UISize,
     ): UISize {
         const titleSize = layoutContext.measureText(
             this._title,
-            titleTextStyle
+            titleTextStyle,
         );
         this._titleWidth = titleSize.width;
 
@@ -98,7 +98,7 @@ export class UIBorderTitle extends UIBox {
         const screenBottomLeft = addPoint(this.screenPosition, this.bottomLeft);
         const screenBottomRight = addPoint(
             this.screenPosition,
-            this.bottomRight
+            this.bottomRight,
         );
 
         //draw the top lef to bottom left line
@@ -108,7 +108,7 @@ export class UIBorderTitle extends UIBox {
             screenBottomLeft.x,
             screenBottomLeft.y,
             bookInkColor,
-            2
+            2,
         );
 
         //Draw the top right to bottom right line
@@ -118,7 +118,7 @@ export class UIBorderTitle extends UIBox {
             screenBottomRight.x,
             screenBottomRight.y,
             bookInkColor,
-            2
+            2,
         );
 
         //Draw the bottom left to bottom right line
@@ -128,7 +128,7 @@ export class UIBorderTitle extends UIBox {
             screenBottomRight.x,
             screenBottomRight.y,
             bookInkColor,
-            2
+            2,
         );
 
         //Draw the line from screen top left to screen top point left
@@ -138,7 +138,7 @@ export class UIBorderTitle extends UIBox {
             screenTopPointLeft,
             screenTopPoint,
             bookInkColor,
-            2
+            2,
         );
         //Draw the line from screen top right to screen top point right
         context.drawLine(
@@ -147,7 +147,7 @@ export class UIBorderTitle extends UIBox {
             screenTopPointRight,
             screenTopPoint,
             bookInkColor,
-            2
+            2,
         );
 
         if (this._title != "") {

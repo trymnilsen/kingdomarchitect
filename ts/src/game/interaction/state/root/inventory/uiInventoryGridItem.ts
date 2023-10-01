@@ -11,7 +11,7 @@ export class UIInventoryGridItem extends UIButton {
     constructor(
         private sprite: Sprite2,
         public isSelected: boolean,
-        private theme: UIThemeType
+        private theme: UIThemeType,
     ) {
         super({
             width: fillUiSize,
@@ -32,8 +32,8 @@ export class UIInventoryGridItem extends UIButton {
     }
 
     override layout(
-        layoutContext: UILayoutContext,
-        constraints: UISize
+        _layoutContext: UILayoutContext,
+        constraints: UISize,
     ): UISize {
         this._measuredSize = {
             width: constraints.width,

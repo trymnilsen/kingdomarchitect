@@ -29,7 +29,7 @@ export class UIButton extends UIBox {
         return true;
     }
 
-    override onTapDown(screenPoint: Point): boolean {
+    override onTapDown(): boolean {
         if (this._onTappedBackground) {
             this.background = this._onTappedBackground;
         }
@@ -37,7 +37,7 @@ export class UIButton extends UIBox {
         return true;
     }
 
-    override onTap(screenPoint: Point): boolean {
+    override onTap(): boolean {
         if (this.onTapCallback) {
             try {
                 this.onTapCallback();
@@ -48,7 +48,7 @@ export class UIButton extends UIBox {
         return true;
     }
 
-    override onTapUp(screenPoint: Point) {
+    override onTapUp() {
         console.log("Button: reset background due to tapUp");
         this.background = this._defaultBackground;
     }
@@ -59,7 +59,7 @@ export class UIButton extends UIBox {
             this.screenPosition.x,
             this.screenPosition.y,
             this.screenPosition.x + this.measuredSize.width,
-            this.screenPosition.y + this.measuredSize.height
+            this.screenPosition.y + this.measuredSize.height,
         );
     }
 }

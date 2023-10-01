@@ -15,7 +15,7 @@ export function chestPrefab(id: string, initialItems: InventoryItem[]): Entity {
         {
             x: 32,
             y: 32,
-        }
+        },
     );
 
     const chestComponent = ChestComponent.createInstance(initialItems);

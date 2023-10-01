@@ -7,12 +7,11 @@ import { UISize } from "../../../../ui/uiSize.js";
 import { UIView } from "../../../../ui/uiView.js";
 import { UIActionbarButton } from "./uiActionbarButton.js";
 
-export interface UIActionbarItem {
+export type UIActionbarItem = {
     text: string;
     onClick?: () => void;
     children?: Omit<UIActionbarItem, "children">[];
     icon?: Sprite2;
-    
 }
 
 export enum UIActionbarAlignment {
@@ -25,13 +24,13 @@ export class UIActionbar extends UIView {
         private items: UIActionbarItem[],
         private background: UIBackground,
         private aligment: UIActionbarAlignment,
-        size: UISize
+        size: UISize,
     ) {
         super(size);
         this.updateItems(items);
     }
 
-    public updateItems(items: UIActionbarItem[]) {
+    updateItems(items: UIActionbarItem[]) {
         this.clearViews();
         this.items = items;
         const views = this.items.map((item) => {
@@ -44,12 +43,12 @@ export class UIActionbar extends UIView {
         }
     }
 
-    override hitTest(screenPoint: Point): boolean {
+    override hitTest(): boolean {
         return false;
     }
     override layout(
         layoutContext: UILayoutContext,
-        constraints: UISize
+        constraints: UISize,
     ): UISize {
         let usedWidth = 0;
         for (const child of this.children) {

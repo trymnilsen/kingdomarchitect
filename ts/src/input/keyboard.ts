@@ -1,28 +1,28 @@
 import { InputAction, InputActionType } from "./inputAction.js";
 import { Event, EventListener } from "../common/event.js";
 
-export type KeyboardMap = { [key: string]: InputActionType };
+export type KeyboardMap = Record<string, InputActionType>;
 
 export class Keyboard {
     private keyboardMap: KeyboardMap;
     private _keyEvent: Event<InputAction>;
 
-    public constructor() {
+    constructor() {
         this.keyboardMap = getKeyboardMap();
         this._keyEvent = new Event();
         window.addEventListener("keydown", this.onKeyPress);
     }
-    public dispose() {
+    dispose() {
         this._keyEvent.dispose();
     }
 
-    public get keyEvent(): EventListener<InputAction> {
+    get keyEvent(): EventListener<InputAction> {
         return this._keyEvent;
     }
 
     private onKeyPress = (event: KeyboardEvent) => {
         const action = this.keyboardMap[event.key.toLowerCase()];
-        if (!!action) {
+        if (action) {
             this._keyEvent.publish({
                 action: action,
                 isShifted: event.shiftKey,
@@ -34,7 +34,7 @@ export class Keyboard {
 
 export function getKeyboardMap(): KeyboardMap {
     const userMap = window.localStorage.getItem(UserKeyboardMapStorageKey);
-    if (!!userMap) {
+    if (userMap) {
         try {
             return JSON.parse(userMap) as KeyboardMap;
         } catch (err) {
@@ -44,7 +44,7 @@ export function getKeyboardMap(): KeyboardMap {
     }
     console.debug(
         "No keyboardmap defined, returning default",
-        DefaultKeyboardMap
+        DefaultKeyboardMap,
     );
     return DefaultKeyboardMap;
 }

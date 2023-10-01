@@ -11,7 +11,7 @@ import { EntityEvent } from "../../../entity/entityEvent.js";
 import { StatelessComponent } from "../../entityComponent.js";
 import { ChunkMapUpdateEvent } from "./chunkMapUpdateEvent.js";
 
-type ChunkMap = { [chunkPosition: string]: { [entityId: string]: Entity } };
+type ChunkMap = Record<string, Record<string, Entity>>;
 
 export class ChunkMapComponent extends StatelessComponent {
     /**
@@ -23,10 +23,10 @@ export class ChunkMapComponent extends StatelessComponent {
      * The entities are keyed by their id and the chunks are defined by their
      * chunkId
      */
-    private entityChunks: { [entityId: string]: string } = {};
+    private entityChunks: Record<string, string> = {};
     private entityEventHandle: EventHandle | null = null;
 
-    public getEntityAt(worldPosition: Point): Entity[] {
+    getEntityAt(worldPosition: Point): Entity[] {
         const position = getChunkPosition(worldPosition);
         // We include any adjacent chunks to get any entitys that has bounds
         // stretching into the chunk of the position but has a world position
@@ -37,7 +37,7 @@ export class ChunkMapComponent extends StatelessComponent {
         for (const chunkPosition of chunkPositions) {
             const chunkId = getChunkId(chunkPosition);
             const chunkEntities = this.chunkMap[chunkId];
-            if (!!chunkEntities) {
+            if (chunkEntities) {
                 for (const entity of Object.values(chunkEntities)) {
                     // Check if the entity has a bounds component
                     // If not then just check its position
@@ -51,15 +51,15 @@ export class ChunkMapComponent extends StatelessComponent {
         return entities;
     }
 
-    override onStart(tick: number): void {
+    override onStart(): void {
         this.rebuildChunkMap();
         this.entityEventHandle = this.entity.entityEvents.listen((event) => {
             this.onEntityEvent(event);
         });
     }
 
-    override onStop(tick: number): void {
-        if (!!this.entityEventHandle) {
+    override onStop(): void {
+        if (this.entityEventHandle) {
             this.entityEventHandle();
         }
     }
@@ -81,7 +81,7 @@ export class ChunkMapComponent extends StatelessComponent {
     private removeEntityFromChunkMap(entity: Entity) {
         const entityChunkId = this.entityChunks[entity.id];
         const chunk = this.chunkMap[entityChunkId];
-        if (!!chunk) {
+        if (chunk) {
             delete chunk[entity.id];
             delete this.entityChunks[entity.id];
         }
@@ -107,7 +107,7 @@ export class ChunkMapComponent extends StatelessComponent {
         const newChunkId = getChunkId(getChunkPosition(entity.worldPosition));
         if (oldChunkId != newChunkId) {
             // No need to remove entity from the chunk map if its not present
-            if (!!oldChunkId) {
+            if (oldChunkId) {
                 this.removeEntityFromChunkMap(entity);
             }
             this.addEntityToChunkMap(entity);

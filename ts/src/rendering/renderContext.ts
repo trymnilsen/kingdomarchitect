@@ -36,28 +36,28 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
     /**
      * The currently active camera for the render context
      */
-    public get camera(): Camera {
+    get camera(): Camera {
         return this._camera;
     }
 
     /**
      * The width of the canvas the context is drawing to
      */
-    public get width(): number {
+    get width(): number {
         return this._width;
     }
 
     /**
      * The height of the canvas the context is drawing to
      */
-    public get height(): number {
+    get height(): number {
         return this._height;
     }
 
     /**
      * The loader for assets like sprites and fonts
      */
-    public get assetLoader(): AssetLoader {
+    get assetLoader(): AssetLoader {
         return this._assetLoader;
     }
 
@@ -66,7 +66,7 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
         camera: Camera,
         assetLoader: AssetLoader,
         width: number,
-        height: number
+        height: number,
     ) {
         this.canvasContext = canvasContext;
         this._camera = camera;
@@ -86,7 +86,7 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
         x2: number,
         y2: number,
         color: string,
-        width: number
+        width: number,
     ): void {
         this.canvasContext.beginPath();
         this.canvasContext.moveTo(x1, y1);
@@ -96,8 +96,8 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
         this.canvasContext.stroke();
     }
 
-    getSprite(id: string): Sprite2 {
-        return sprites[id];
+    getSprite(id: string): Sprite2 | undefined {
+        return sprites[id] as Sprite2;
     }
 
     /**
@@ -139,7 +139,7 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
                 bounds.x1,
                 bounds.y1,
                 bounds.x2 - bounds.x1,
-                bounds.y2 - bounds.y1
+                bounds.y2 - bounds.y1,
             );
             this.canvasContext.clip();
             drawFunction(this);
@@ -152,7 +152,7 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
         this._deferredRenderCalls.push(drawFunction);
     }
 
-    getDeferredDrawFunctions(): ReadonlyArray<DrawFunction> {
+    getDeferredDrawFunctions(): readonly DrawFunction[] {
         return this._deferredRenderCalls;
     }
 
@@ -203,13 +203,13 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
         let targetWidth = spriteBounds.w;
         let targetHeight = spriteBounds.h;
         let frame = 0;
-        if (!!sprite.targetWidth) {
+        if (sprite.targetWidth) {
             targetWidth = sprite.targetWidth;
         }
-        if (!!sprite.targetHeight) {
+        if (sprite.targetHeight) {
             targetHeight = sprite.targetHeight;
         }
-        if (!!sprite.frame) {
+        if (sprite.frame) {
             frame = sprite.frame;
         }
         spriteRenderer(
@@ -223,7 +223,7 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
             targetHeight,
             frame,
             this._assetLoader.getBinAsset(sprite.sprite.bin),
-            this.canvasContext
+            this.canvasContext,
         );
     }
 
@@ -251,7 +251,7 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
             ninePatch.sides.right,
             ninePatch.scale,
             this._assetLoader.getBinAsset(ninePatch.sprite.bin),
-            this.canvasContext
+            this.canvasContext,
         );
     }
 

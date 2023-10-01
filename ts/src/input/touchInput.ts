@@ -1,15 +1,15 @@
 import { distance, Point, subtractPoint } from "../common/point.js";
 
-export interface OnPanEvent {
+export type OnPanEvent = {
     movement: Point;
     position: Point;
-}
+};
 
-export interface OnTapEndEvent {
+export type OnTapEndEvent = {
     position: Point;
     startPosition: Point;
     wasDragging: boolean;
-}
+};
 
 export type OnTapDownCallback = (position: Point) => boolean;
 export type OnTapCallback = (tapEndEvent: OnTapEndEvent) => void;
@@ -17,18 +17,18 @@ export type OnPanCallback = (
     movement: Point,
     position: Point,
     startPosition: Point,
-    downTapHandled: boolean
+    downTapHandled: boolean,
 ) => void;
 export type OnStartDragCallback = (
     tapStart: Point,
-    dragStart: Point
+    dragStart: Point,
 ) => boolean;
 
 export class TouchInput {
-    private isDragging: boolean = false;
+    private isDragging = false;
     private onTapPosition: Point | null = null;
     private previousMovePosition: Point | null = null;
-    private tapHandled: boolean = false;
+    private tapHandled = false;
 
     onPan: OnPanCallback | null = null;
     onStartDrag: OnStartDragCallback | null = null;
@@ -45,7 +45,7 @@ export class TouchInput {
                     y: event.touches[0].clientY,
                 });
             },
-            { passive: false }
+            { passive: false },
         );
 
         canvasElement.addEventListener(
@@ -57,7 +57,7 @@ export class TouchInput {
                     y: event.clientY,
                 });
             },
-            { passive: false }
+            { passive: false },
         );
 
         canvasElement.addEventListener(
@@ -68,7 +68,7 @@ export class TouchInput {
             },
             {
                 passive: false,
-            }
+            },
         );
 
         canvasElement.addEventListener(
@@ -78,7 +78,7 @@ export class TouchInput {
                 const touch = event.touches[0];
                 this.onDrag({ x: touch.clientX, y: touch.clientY });
             },
-            { passive: false }
+            { passive: false },
         );
 
         canvasElement.addEventListener(
@@ -90,7 +90,7 @@ export class TouchInput {
                     y: event.clientY,
                 });
             },
-            { passive: false }
+            { passive: false },
         );
         canvasElement.addEventListener(
             "mouseout",
@@ -101,7 +101,7 @@ export class TouchInput {
                     y: event.clientY,
                 });
             },
-            { passive: false }
+            { passive: false },
         );
         canvasElement.addEventListener(
             "mouseup",
@@ -112,7 +112,7 @@ export class TouchInput {
                     y: event.clientY,
                 });
             },
-            { passive: false }
+            { passive: false },
         );
         canvasElement.addEventListener(
             "touchend",
@@ -120,7 +120,7 @@ export class TouchInput {
                 event.preventDefault();
                 this.onTapEnded();
             },
-            { passive: false }
+            { passive: false },
         );
         canvasElement.addEventListener(
             "touchcancel",
@@ -128,7 +128,7 @@ export class TouchInput {
                 event.preventDefault();
                 this.onTapEnded();
             },
-            { passive: false }
+            { passive: false },
         );
     }
     private onTapStart(position: Point) {
@@ -150,7 +150,7 @@ export class TouchInput {
                     movement,
                     position,
                     this.onTapPosition,
-                    this.tapHandled
+                    this.tapHandled,
                 );
             }
         } else if (this.onTapPosition != null) {
@@ -164,7 +164,7 @@ export class TouchInput {
 
     private onTapEnded(position: Point | null | undefined = undefined) {
         try {
-            position = position || this.previousMovePosition;
+            position = position ?? this.previousMovePosition;
 
             if (this.onTapEnd && this.onTapPosition) {
                 //console.log(`TouchInput: Tap ended`, position, this.isDragging);
@@ -172,7 +172,7 @@ export class TouchInput {
                     // Substitute the onTapPosition as the end position if
                     // there is no position in the event or a previous
                     // pointer position registered
-                    position: position || this.onTapPosition,
+                    position: position ?? this.onTapPosition,
                     wasDragging: this.isDragging,
                     startPosition: this.onTapPosition,
                 });

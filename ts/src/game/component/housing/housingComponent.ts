@@ -20,7 +20,7 @@ export class HousingComponent extends EntityComponent<HousingBundle> {
     private startTime = 0;
     private _residentEntityId: string | null = null;
 
-    public get residentEntityId(): string | null {
+    get residentEntityId(): string | null {
         return this._residentEntityId;
     }
 
@@ -32,15 +32,15 @@ export class HousingComponent extends EntityComponent<HousingBundle> {
                 this.entity.getRootEntity(),
                 (entity) => {
                     const workerComponent = entity.getComponent(
-                        WorkerBehaviorComponent
+                        WorkerBehaviorComponent,
                     );
                     const tenantComponent =
                         entity.getComponent(TenantComponent);
                     return !!workerComponent && !tenantComponent;
-                }
+                },
             );
 
-            if (!!homelessWorker) {
+            if (homelessWorker) {
                 this.setHouseOnTenant(homelessWorker);
             }
         }
@@ -85,7 +85,7 @@ export class HousingComponent extends EntityComponent<HousingBundle> {
 
     private setHouseOnTenant(entity: Entity) {
         const existingTenantComponent = entity.getComponent(TenantComponent);
-        if (!!existingTenantComponent) {
+        if (existingTenantComponent) {
             existingTenantComponent.houseEntityId = this.entity.id;
         } else {
             const tenant = new TenantComponent();

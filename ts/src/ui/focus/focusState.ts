@@ -9,7 +9,7 @@ export class FocusState {
     }
 
     setFocus(view: UIView) {
-        if (!!this._currentFocus) {
+        if (this._currentFocus) {
             this._currentFocus.onFocusLost();
         }
         this._currentFocus = view;
@@ -29,7 +29,7 @@ export class FocusState {
             for (const view of views) {
                 const viewDistance = manhattanDistance(
                     { x: 0, y: 0 },
-                    view.screenPosition
+                    view.screenPosition,
                 );
                 if (viewDistance < closestDistance) {
                     closestDistance = viewDistance;

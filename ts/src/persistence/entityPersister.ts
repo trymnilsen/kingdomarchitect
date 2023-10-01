@@ -1,3 +1,5 @@
+import { getConstructorName } from "../common/constructor.js";
+import { JSONValue } from "../common/object.js";
 import { componentLoaders } from "../game/component/componentLoader.js";
 import { Entity } from "../game/entity/entity.js";
 
@@ -12,7 +14,7 @@ export class EntityPersister {
             const componentBundles: ComponentPersistenceBundle[] = [];
             // Persist any components of this entity
             for (const component of entity.components) {
-                const type = Object.getPrototypeOf(component).constructor.name;
+                const type = getConstructorName(component);
                 const id = entity.id + "-" + type;
                 componentIds.push(id);
                 const data = component.toComponentBundle();
@@ -51,9 +53,9 @@ export class EntityPersister {
 
     load(bundleSets: BundleSet[]): Entity {
         const componentPersistenceBundles: ComponentPersistenceBundle[] = [];
-        const entitiesForChildMap: { [id: string]: Entity } = {};
-        const entitiesById: { [id: string]: Entity } = {};
-        const entityChildren: { [id: string]: string[] } = {};
+        const entitiesForChildMap: Record<string, Entity> = {};
+        const entitiesById: Record<string, Entity> = {};
+        const entityChildren: Record<string, string[]> = {};
 
         //Loop over and sort out components and create the entities
         for (const bundleSet of bundleSets) {
@@ -81,7 +83,7 @@ export class EntityPersister {
         }
         //Find the root node, the one without a parent
         const rootNodes = Object.values(entitiesById).filter(
-            (entity) => !entity.parent
+            (entity) => !entity.parent,
         );
 
         if (rootNodes.length == 0) {
@@ -98,18 +100,18 @@ export class EntityPersister {
         for (const persistedComponent of componentPersistenceBundles) {
             const type = persistedComponent.type;
             const constructorFn = componentLoaders.find(
-                (fn) => fn.name == type
+                (fn) => fn.name == type,
             );
             if (!constructorFn) {
                 throw new Error(
-                    `No constructor function found for component, ${constructorFn}`
+                    `No constructor function found for component, ${constructorFn}`,
                 );
             }
 
             const owningEntity = entitiesById[persistedComponent.entityId];
             if (!owningEntity) {
                 throw new Error(
-                    `No entity with id ${persistedComponent.entityId} for component ${persistedComponent.componentId}`
+                    `No entity with id ${persistedComponent.entityId} for component ${persistedComponent.componentId}`,
                 );
             }
 
@@ -123,22 +125,22 @@ export class EntityPersister {
     }
 }
 
-export interface ComponentPersistenceBundle {
+export type ComponentPersistenceBundle = {
     entityId: string;
     componentId: string;
     type: string;
-    data: {};
-}
+    data: JSONValue;
+};
 
-export interface EntityPersistenceBundle {
+export type EntityPersistenceBundle = {
     id: string;
     x: number;
     y: number;
     children: string[];
     components: string[];
-}
+};
 
-export interface BundleSet {
+export type BundleSet = {
     components: ComponentPersistenceBundle[];
     entity: EntityPersistenceBundle;
-}
+};

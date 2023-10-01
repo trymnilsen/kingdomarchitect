@@ -15,7 +15,7 @@ type JobQueueBundle = {
         constraint?: JobConstraint;
         job: JobBundle;
     }[];
-};
+}
 
 /**
  * The job queue components holds a list of pending jobs that are not run
@@ -70,11 +70,11 @@ export class JobQueueComponent
     getApplicableJobs(entity: Entity): Job[] {
         return this._pendingJobs
             .filter((scheduledJob) => {
-                if (!!scheduledJob.constraint) {
+                if (scheduledJob.constraint) {
                     return isJobApplicableForEntity(
                         scheduledJob.job,
                         scheduledJob.constraint,
-                        entity
+                        entity,
                     );
                 } else {
                     return true;
@@ -91,7 +91,7 @@ export class JobQueueComponent
         this.removeJob(job);
     }
 
-    override onDraw(context: RenderContext, screenPosition: Point): void {
+    override onDraw(context: RenderContext): void {
         for (const pendingJob of this._pendingJobs) {
             pendingJob.job.onDraw(context);
         }

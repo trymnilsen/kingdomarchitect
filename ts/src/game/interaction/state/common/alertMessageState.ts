@@ -11,7 +11,10 @@ import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize.js";
 import { InteractionState } from "../../handler/interactionState.js";
 
 export class AlertMessageState extends InteractionState {
-    constructor(private title: string, private text: string) {
+    constructor(
+        private title: string,
+        private text: string,
+    ) {
         super();
 
         const okButton = uiButton({

@@ -10,7 +10,7 @@ import { visitChildren } from "./visit.js";
  */
 export function firstChildWhere(
     entity: Entity,
-    predicate: (child: Entity) => boolean
+    predicate: (child: Entity) => boolean,
 ): Entity | null {
     let firstChild: Entity | null = null;
     visitChildren(entity, (child) => {

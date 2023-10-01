@@ -77,7 +77,7 @@ export class CollectChestState extends InteractionState {
                 },
             ],
             [],
-            { width: fillUiSize, height: fillUiSize }
+            { width: fillUiSize, height: fillUiSize },
         );
         this.view = scaffoldView;
     }
@@ -91,7 +91,7 @@ export class CollectChestState extends InteractionState {
         this.context.stateChanger.clear();
     }
 
-    private itemSelected(index: number, gridItem: UIInventoryGridItem) {}
+    private itemSelected(_index: number, _gridItem: UIInventoryGridItem) {}
 
     private getGridView(): UIView {
         const gridView = new UIFlowGrid({
@@ -103,12 +103,12 @@ export class CollectChestState extends InteractionState {
 
         for (let i = 0; i < 8; i++) {
             const inventoryItem = this.chest.items[i];
-            if (!!inventoryItem) {
+            if (inventoryItem) {
                 const isSelected = i == 0;
                 const gridItem = new UIInventoryGridItem(
                     inventoryItem.asset,
                     isSelected,
-                    UIThemeType.Stone
+                    UIThemeType.Stone,
                 );
                 gridItem.id = inventoryItem.name;
 
@@ -126,7 +126,7 @@ export class CollectChestState extends InteractionState {
                             sides: allSides(8),
                             scale: 1,
                         }),
-                    })
+                    }),
                 );
             }
         }

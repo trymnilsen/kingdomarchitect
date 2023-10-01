@@ -12,7 +12,11 @@
         "spritepack": "tsc && node build/tool/spritepack/spritePack.js",
         "start": "tsc && node build/tool/http/server.js",
         "test": "tsc && node --test",
-        "bundle": "rollup -c"
+        "bundle": "rollup -c",
+        "format": "prettier ts/ --write",
+        "check-format": "prettier ts/ --check",
+        "lint": "eslint ts/src",
+        "verify": "npm run test && npm run check-format && npm run lint" 
     },
     "repository": {
         "type": "git",
@@ -28,10 +32,16 @@
         "maxrects-packer": "^2.7.3",
         "prettier": "^3.0.3",
         "rollup": "^3.29.2",
-        "typescript": "^5.2.2"
+        "sanitize-filename": "^1.6.3"
     },
     "overrides": {
         "xml2js": "^0.5.0",
         "semver": "^7.5.3"
+    },
+    "devDependencies": {
+        "@typescript-eslint/eslint-plugin": "^6.7.3",
+        "@typescript-eslint/parser": "^6.7.3",
+        "eslint": "^8.50.0",
+        "typescript": "^5.2.2"
     }
 }

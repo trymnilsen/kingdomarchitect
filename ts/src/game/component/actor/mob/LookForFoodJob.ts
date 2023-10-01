@@ -17,35 +17,35 @@ export class LookForFoodJob extends Job<LookForFoodBundle> {
             const positionInDirection = shiftPoint(
                 this.entity.worldPosition,
                 direction,
-                1
+                1,
             );
 
             return this.isPositionAvailable(positionInDirection);
         });
         if (applicableDirections.length > 0) {
             const randomDirection = randomEntry(applicableDirections);
-            if (!!randomDirection) {
+            if (randomDirection) {
                 this.direction = randomDirection;
             }
         }
     }
 
-    override update(tick: number): void {
+    override update(): void {
         const nextPosition = shiftPoint(
             this.entity.worldPosition,
             this.direction,
-            1
+            1,
         );
 
         const isPointAvailable = this.isPositionAvailable(nextPosition);
-        if (!!isPointAvailable) {
+        if (isPointAvailable) {
             this.entity.worldPosition = nextPosition;
         } else {
             this.complete();
         }
     }
 
-    private isPositionAvailable(point: Point): Boolean {
+    private isPositionAvailable(point: Point): boolean {
         const rootEntity = this.entity.getRootEntity();
         const tileComponent = rootEntity.requireComponent(TilesComponent);
 

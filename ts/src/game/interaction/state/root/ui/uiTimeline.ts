@@ -15,11 +15,11 @@ export class UITimeline extends UIView {
         this.gameTime = gameTime;
     }
 
-    hitTest(screenPoint: Point): boolean {
+    hitTest(): boolean {
         return false;
     }
 
-    layout(layoutContext: UILayoutContext, constraints: UISize): UISize {
+    layout(_layoutContext: UILayoutContext, constraints: UISize): UISize {
         const rectangleSizes = 48 * 4;
         const wantedWidth = rectangleSizes + this.spaceBetweenWidth * 3;
         if (constraints.width < wantedWidth) {
@@ -72,7 +72,7 @@ export class UITimeline extends UIView {
 
             if (i == 0) {
                 const frame = Math.floor(
-                    ((this.gameTime.fractionalTimeOfDay * 4) % 1) * 8
+                    ((this.gameTime.fractionalTimeOfDay * 4) % 1) * 8,
                 );
                 context.drawScreenSpaceSprite({
                     x: this.screenPosition.x,

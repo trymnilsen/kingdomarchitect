@@ -16,7 +16,7 @@
       "noUnusedLocals": false,
       "noFallthroughCasesInSwitch": true,
       "resolveJsonModule": true,
-      "noUnusedParameters": false,
+      "noUnusedParameters": true,
       "noPropertyAccessFromIndexSignature": true,
       "removeComments": true,
       "experimentalDecorators": true,
@@ -33,7 +33,6 @@
       "ts/test/**/*.ts",
       "ts/generated/sprites.json"
     ],
-
     "exclude": [
       "node_modules"
     ]

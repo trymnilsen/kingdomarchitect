@@ -2,14 +2,14 @@ import { Entity } from "../../../entity/entity.js";
 import { Job } from "../job.js";
 import { JobRunnerComponent } from "../jobRunnerComponent.js";
 
-export interface JobQuery {
+export type JobQuery = {
     matches(job: Job): boolean;
 }
 
 export function query(
     entity: Entity,
     query: JobQuery,
-    includeRunning: boolean = true
+    includeRunning = true,
 ): Job | null {
     /*
     for (const job of this._pendingJobs) {
@@ -32,7 +32,7 @@ export function query(
 
 function queryEntityForRunningJob(entity: Entity, query: JobQuery): Job | null {
     const runnerComponent = entity.getComponent(JobRunnerComponent);
-    if (runnerComponent && runnerComponent.activeJob) {
+    if (runnerComponent?.activeJob) {
         const queryResult = query.matches(runnerComponent.activeJob);
         if (queryResult) {
             return runnerComponent.activeJob;

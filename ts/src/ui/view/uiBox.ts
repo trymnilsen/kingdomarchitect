@@ -117,7 +117,7 @@ export class UIBox extends UIViewGroup {
         for (const child of this.children) {
             if (!child.isLayedOut) {
                 throw new Error(
-                    "Child had no measured size, make its layed out"
+                    "Child had no measured size, make its layed out",
                 );
             }
 
@@ -126,7 +126,7 @@ export class UIBox extends UIViewGroup {
                 measuredHeight - verticalPadding,
                 this._alignment,
                 child.measuredSize.width,
-                child.measuredSize.height
+                child.measuredSize.height,
             );
 
             // set the offset of the child based on the alignment, offset
@@ -145,7 +145,7 @@ export class UIBox extends UIViewGroup {
             this._background.draw(
                 context,
                 this.screenPosition,
-                this.measuredSize
+                this.measuredSize,
             );
         }
         for (const child of this.children) {

@@ -1,6 +1,6 @@
 import { Job } from "./job.js";
 
-export interface JobOwner {
+export type JobOwner = {
     /**
      * Signal to the owner that the job has been aborted.
      * Do not use this to start aborting a job, use the method on the job

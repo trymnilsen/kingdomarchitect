@@ -12,7 +12,7 @@ export type LoadedItems = {
 export class GamePersister {
     private entityPersister: EntityPersister = new EntityPersister();
 
-    public get hasSaveData(): boolean {
+    get hasSaveData(): boolean {
         return window.localStorage.length > 0;
     }
 
@@ -26,11 +26,9 @@ export class GamePersister {
         window.localStorage.setItem("camera", JSON.stringify(camera.position));
         const saveTimeEnd = performance.now();
         const saveTime = saveTimeEnd - saveTimeStart;
-        if (window["debugLog"]) {
-            console.log("save time: ", saveTime);
-        }
     }
 
+    /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument */
     loadWorld(): LoadedItems {
         const loadTimeStart = performance.now();
         const bundleSetsAsJson = window.localStorage.getItem("bundles")!;
@@ -38,7 +36,7 @@ export class GamePersister {
         setGeneratorIds(ids);
         const cameraJson = window.localStorage.getItem("camera");
         let cameraPosition = zeroPoint();
-        if (!!cameraJson) {
+        if (cameraJson) {
             cameraPosition = JSON.parse(cameraJson);
         }
         const bundleSets = JSON.parse(bundleSetsAsJson);
@@ -51,4 +49,5 @@ export class GamePersister {
             cameraPosition,
         };
     }
+    /* eslint-enable */
 }

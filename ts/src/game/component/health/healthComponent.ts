@@ -15,27 +15,27 @@ type HealthBundle = {
 };
 
 export class HealthComponent extends EntityComponent<HealthBundle> {
-    private _health: number = 0;
-    private _maxHealth: number = 0;
+    private _health = 0;
+    private _maxHealth = 0;
     private _showHealthBarThreshold: NumberRange = zeroNumberRange();
-    private healthBubble: number = 0;
-    private tickTime: number = 0;
+    private healthBubble = 0;
+    private tickTime = 0;
 
     /*
      * Returns the health as a percentage between 0.0 and 1.0
      */
-    public get healthPercentage(): number {
+    get healthPercentage(): number {
         return this._health / this._maxHealth;
     }
 
-    public get health(): number {
+    get health(): number {
         return this._health;
     }
 
     static createInstance(
         currentHealth: number,
         maxHealth: number,
-        showHealthBarThreshold: NumberRange = { min: 0, max: maxHealth }
+        showHealthBarThreshold: NumberRange = { min: 0, max: maxHealth },
     ): HealthComponent {
         const instance = new HealthComponent();
         instance.fromComponentBundle({

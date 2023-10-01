@@ -25,7 +25,7 @@ import { SingleBuildMode } from "./mode/singleBuildMode.js";
 
 export class BuildConfirmState extends InteractionState {
     private scaffold: UIActionbarScaffold | null = null;
-    private blinkScaffold: boolean = true;
+    private blinkScaffold = true;
     private buildMode: BuildMode = new SingleBuildMode({ x: 1, y: 1 });
     private selection: SelectedTile[] = [];
 
@@ -76,8 +76,8 @@ export class BuildConfirmState extends InteractionState {
                         onClick: () => {
                             this.changeBuildMode(
                                 new SingleBuildMode(
-                                    this.buildMode.cursorSelection()
-                                )
+                                    this.buildMode.cursorSelection(),
+                                ),
                             );
                         },
                     },
@@ -87,8 +87,8 @@ export class BuildConfirmState extends InteractionState {
                         onClick: () => {
                             this.changeBuildMode(
                                 new LineBuildMode(
-                                    this.buildMode.cursorSelection()
-                                )
+                                    this.buildMode.cursorSelection(),
+                                ),
                             );
                         },
                     },
@@ -163,14 +163,14 @@ export class BuildConfirmState extends InteractionState {
 
         if (!isAllTilesAvailable) {
             this.context.stateChanger.push(
-                new AlertMessageState("Oh no", "Spot taken")
+                new AlertMessageState("Oh no", "Spot taken"),
             );
             return;
         }
 
         const removeResult = inventoryComponent.removeInventoryItem(
             woodResourceItem.id,
-            10 * selections.length
+            10 * selections.length,
         );
 
         if (removeResult) {
@@ -181,14 +181,14 @@ export class BuildConfirmState extends InteractionState {
                 root.addChild(house);
                 root.requireComponent(JobQueueComponent).addJob(
                     BuildJob.createInstance(house),
-                    workerConstraint()
+                    workerConstraint(),
                 );
             }
 
             this.context.stateChanger.clear();
         } else {
             this.context.stateChanger.push(
-                new AlertMessageState("Oh no", "Not enough resources")
+                new AlertMessageState("Oh no", "Not enough resources"),
             );
         }
     }
@@ -202,7 +202,7 @@ export class BuildConfirmState extends InteractionState {
         this.context.stateChanger.clear();
     }
 
-    override onTap(screenPosition: Point, worldPosition: Point): boolean {
+    override onTap(_screenPosition: Point, worldPosition: Point): boolean {
         const isTileAtPosition = this.context.root
             .requireComponent(TilesComponent)
             .getTile(worldPosition);
@@ -231,7 +231,7 @@ export class BuildConfirmState extends InteractionState {
         return true;
     }
 
-    override onUpdate(tick: number): void {
+    override onUpdate(): void {
         this.blinkScaffold = !this.blinkScaffold;
     }
 
@@ -283,7 +283,7 @@ export class BuildConfirmState extends InteractionState {
     }
 }
 
-interface SelectedTile {
+type SelectedTile = {
     isAvailable: boolean;
     x: number;
     y: number;

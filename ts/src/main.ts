@@ -15,7 +15,9 @@ async function bootstrap() {
 document.addEventListener(
     "DOMContentLoaded",
     () => {
-        bootstrap();
+        bootstrap().catch((err) => {
+            console.error("Failed to run bootstrap", err);
+        });
     },
-    false
+    false,
 );

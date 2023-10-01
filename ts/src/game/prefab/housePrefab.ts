@@ -10,7 +10,7 @@ export function housePrefab(id: string, scaffold: boolean): Entity {
     const buildingComponent = BuildingComponent.createInstance(
         sprites2.wooden_house,
         sprites2.wooden_house_scaffold,
-        woodenBuildings[0].id
+        woodenBuildings[0].id,
     );
 
     let currentHealth = 100;

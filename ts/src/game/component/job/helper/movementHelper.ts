@@ -10,15 +10,15 @@ export class MovementHelper {
     private _entity: Entity | null = null;
     private _currentMovement: PathMovement | null = null;
 
-    public get currentMovement(): PathMovement | null {
+    get currentMovement(): PathMovement | null {
         return this._currentMovement;
     }
 
-    public set currentMovement(v: PathMovement | null) {
+    set currentMovement(v: PathMovement | null) {
         this._currentMovement = v;
     }
 
-    public get entity(): Entity {
+    get entity(): Entity {
         if (!this._entity) {
             throw new Error("Entity is not set for movement helper");
         }
@@ -26,7 +26,7 @@ export class MovementHelper {
         return this._entity;
     }
 
-    public set entity(v: Entity) {
+    set entity(v: Entity) {
         this._entity = v;
     }
 
@@ -39,7 +39,7 @@ export class MovementHelper {
      * @returns true if a movement was made, false if there was nowhere to go (
      * for example if the entity is stuck, adjacent or on top of the target)
      */
-    public pathTowards(target: Point, stopAtAdjacent: boolean = true): boolean {
+    pathTowards(target: Point, _stopAtAdjacent = true): boolean {
         if (
             !!this._currentMovement &&
             pointEquals(target, this._currentMovement.target)
@@ -52,24 +52,16 @@ export class MovementHelper {
             if (!isPointAdjacentTo(trailingEdge, this.entity.worldPosition)) {
                 // The world position has moved and is not adjacent to our
                 // trailing edge we should regenerate the path to the target
-                this.generatePath(
-                    this.entity.worldPosition,
-                    target,
-                    stopAtAdjacent
-                );
+                this.generatePath(this.entity.worldPosition, target);
             }
         } else {
             // There is no path, generate movement
-            this.generatePath(
-                this.entity.worldPosition,
-                target,
-                stopAtAdjacent
-            );
+            this.generatePath(this.entity.worldPosition, target);
         }
 
         // Take the backward most path and move to it
         const nextStep = this._currentMovement?.path?.pop();
-        if (!!nextStep) {
+        if (nextStep) {
             this.entity.worldPosition = nextStep;
             return true;
         } else {
@@ -80,11 +72,7 @@ export class MovementHelper {
         }
     }
 
-    private generatePath(
-        start: Point,
-        target: Point,
-        removeTargetPoint: boolean
-    ): Point[] {
+    private generatePath(start: Point, target: Point): Point[] {
         const pathComponent = this.entity
             .getRootEntity()
             .requireComponent(PathFindingComponent);

@@ -22,19 +22,19 @@ import { UIActionbarItem } from "./uiActionbar.js";
 export class UIActionbarScaffold extends UIView {
     private _sides: Sides = allSides(16);
     private buttons: ActionbarButton[] = [];
-    private selectedPath: string = "";
+    private selectedPath = "";
 
     /**
      * Get the padding for the content and action bar
      */
-    public get sides(): Sides {
+    get sides(): Sides {
         return this._sides;
     }
 
     /**
      * Set the padding for the content and action bar
      */
-    public set sides(value: Sides) {
+    set sides(value: Sides) {
         this._sides = value;
     }
 
@@ -42,7 +42,7 @@ export class UIActionbarScaffold extends UIView {
         private contentView: UIView,
         private leftItems: UIActionbarItem[],
         private rightItems: UIActionbarItem[],
-        size: UISize
+        size: UISize,
     ) {
         super(size);
         this.addView(contentView);
@@ -66,13 +66,13 @@ export class UIActionbarScaffold extends UIView {
         this._isDirty = true;
     }
 
-    override hitTest(screenPoint: Point): boolean {
+    override hitTest(): boolean {
         return true;
     }
 
     override layout(
         layoutContext: UILayoutContext,
-        constraints: UISize
+        constraints: UISize,
     ): UISize {
         //Measure the actionbars first
         //We start with the left actionbar as it should be collapsed last
@@ -84,7 +84,7 @@ export class UIActionbarScaffold extends UIView {
 
         const actionbarSize = this.layoutActionbar(
             layoutContext,
-            paddedConstraints
+            paddedConstraints,
         );
 
         const contentConstraints = {
@@ -123,7 +123,7 @@ export class UIActionbarScaffold extends UIView {
      */
     private drawActionbar(
         context: UIRenderContext,
-        actionbar: ActionbarButton[]
+        actionbar: ActionbarButton[],
     ) {
         for (const item of actionbar) {
             if (!item.visible) {
@@ -143,12 +143,14 @@ export class UIActionbarScaffold extends UIView {
             });
 
             if (item.icon) {
-                const sprite = context.getSprite(item.icon)
-                context.drawScreenSpaceSprite({
-                    sprite: sprite,
-                    x: middleX - 16,
-                    y: item.position.y + 8
-                });
+                const sprite = context.getSprite(item.icon);
+                if (sprite) {
+                    context.drawScreenSpaceSprite({
+                        sprite: sprite,
+                        x: middleX - 16,
+                        y: item.position.y + 8,
+                    });
+                }
             }
 
             context.drawScreenspaceText({
@@ -176,22 +178,22 @@ export class UIActionbarScaffold extends UIView {
      */
     private layoutActionbar(
         layoutContext: UILayoutContext,
-        paddedConstraints: UISize
+        paddedConstraints: UISize,
     ): UISize {
         //Get the size of the first level of the left tree
         const leftSize = this.layoutSingleActionbar(
             layoutContext,
             this.leftItems,
-            Axis.XAxis
+            Axis.XAxis,
         );
         const rightSize = this.layoutSingleActionbar(
             layoutContext,
             this.rightItems,
-            Axis.XAxis
+            Axis.XAxis,
         );
         //Get the size of the first level of the right tree
         let leftActionTree = this.leftItems;
-        let rightActionTree = this.rightItems;
+        const rightActionTree = this.rightItems;
         if (
             paddedConstraints.width - rightSize.totalWidth <
             leftSize.totalWidth
@@ -225,7 +227,7 @@ export class UIActionbarScaffold extends UIView {
             ActionbarAlignment.Left,
             Axis.XAxis,
             "left",
-            0
+            0,
         );
 
         const rightItems = this.layoutActionItems(
@@ -241,7 +243,7 @@ export class UIActionbarScaffold extends UIView {
             ActionbarAlignment.Right,
             Axis.XAxis,
             "right",
-            0
+            0,
         );
 
         this.buttons = [...leftItems, ...rightItems];
@@ -276,12 +278,12 @@ export class UIActionbarScaffold extends UIView {
         alignment: ActionbarAlignment,
         axis: Axis,
         path: string,
-        level: number
+        level: number,
     ): ActionbarButton[] {
         const actionbar = this.layoutSingleActionbar(
             layoutContext,
             actionbarItems,
-            axis
+            axis,
         );
 
         const actionbarAlignment = getActionbarAlignment(alignment, axis);
@@ -291,7 +293,7 @@ export class UIActionbarScaffold extends UIView {
             width,
             height,
             actionbar.totalWidth,
-            actionbar.totalHeight
+            actionbar.totalHeight,
         );
 
         // Sanity check for actionbar items size
@@ -309,7 +311,7 @@ export class UIActionbarScaffold extends UIView {
                 {
                     x: actionbarOffset.x + paddingOffset.x,
                     y: actionbarOffset.y + paddingOffset.y,
-                }
+                },
             );
             const itemPath = `${path}/${i}`;
 
@@ -319,7 +321,7 @@ export class UIActionbarScaffold extends UIView {
                     size.x,
                     size.y,
                     axis,
-                    alignment
+                    alignment,
                 );
 
                 children = this.layoutActionItems(
@@ -335,13 +337,13 @@ export class UIActionbarScaffold extends UIView {
                     alignment,
                     invertAxis(axis),
                     itemPath,
-                    level + 1
+                    level + 1,
                 );
             }
 
             const textSize = layoutContext.measureText(
                 actionbarItem.text,
-                subTitleTextStyle
+                subTitleTextStyle,
             );
             const textOffset = (size.x - Math.min(textSize.width, size.x)) / 2;
             const isPathOfSelected =
@@ -375,13 +377,13 @@ export class UIActionbarScaffold extends UIView {
      * @returns
      */
     private layoutSingleActionbar(
-        layoutContext: UILayoutContext,
+        _layoutContext: UILayoutContext,
         items: UIActionbarItem[],
-        orientation: Axis
+        orientation: Axis,
     ): SingleActionbarLayout {
         let totalWidth = 0;
         let totalHeight = 0;
-        let boundaries: Bounds[] = [];
+        const boundaries: Bounds[] = [];
         if (orientation == Axis.XAxis) {
             totalHeight = 72;
             for (const item of items) {
@@ -421,7 +423,7 @@ export class UIActionbarScaffold extends UIView {
         width: number,
         height: number,
         axis: Axis,
-        alignment: ActionbarAlignment
+        alignment: ActionbarAlignment,
     ): Point {
         if (axis == Axis.XAxis) {
             return {
@@ -446,10 +448,10 @@ export class UIActionbarScaffold extends UIView {
     private calculateAnchorOffset(
         anchor: Point,
         anchorAlignment: ActionbarAnchorAlignment,
-        constraintsWidth: number,
-        constraintsHeight: number,
+        _constraintsWidth: number,
+        _constraintsHeight: number,
         actionBarWidth: number,
-        actionBarHeight: number
+        actionBarHeight: number,
     ): Point {
         if (anchorAlignment == ActionbarAnchorAlignment.Left) {
             return {
@@ -473,7 +475,7 @@ export class UIActionbarScaffold extends UIView {
 
     private checkForTapOnButton(
         point: Point,
-        buttons: ActionbarButton[]
+        buttons: ActionbarButton[],
     ): boolean {
         for (const button of buttons) {
             if (
@@ -482,11 +484,11 @@ export class UIActionbarScaffold extends UIView {
                     button.position.x,
                     button.position.y,
                     button.position.x + button.width,
-                    button.position.y + button.heigth
+                    button.position.y + button.heigth,
                 )
             ) {
                 let handled = false;
-                if (!!button.onClick) {
+                if (button.onClick) {
                     button.onClick();
                     handled = true;
                     this.selectedPath = "";
@@ -507,7 +509,7 @@ export class UIActionbarScaffold extends UIView {
             if (button.children.length > 0) {
                 const childTapResult = this.checkForTapOnButton(
                     point,
-                    button.children
+                    button.children,
                 );
                 if (childTapResult) {
                     return true;
@@ -525,7 +527,7 @@ export class UIActionbarScaffold extends UIView {
      */
     private layoutContentView(
         layoutContext: UILayoutContext,
-        constraints: UISize
+        constraints: UISize,
     ) {
         this.contentView.layout(layoutContext, constraints);
 
@@ -540,7 +542,7 @@ const actionbarWidth = 80;
 
 function getActionbarAlignment(
     alignment: ActionbarAlignment,
-    axis: Axis
+    axis: Axis,
 ): ActionbarAnchorAlignment {
     if (axis == Axis.YAxis) {
         return ActionbarAnchorAlignment.Bottom;
@@ -562,7 +564,7 @@ enum ActionbarAnchorAlignment {
     Bottom,
 }
 
-interface ActionbarButton {
+type ActionbarButton = {
     width: number;
     heigth: number;
     text: string;
@@ -573,10 +575,10 @@ interface ActionbarButton {
     path: string;
     onClick?: () => void;
     icon?: string;
-}
+};
 
-interface SingleActionbarLayout {
+type SingleActionbarLayout = {
     totalWidth: number;
     totalHeight: number;
     boundaries: Bounds[];
-}
+};

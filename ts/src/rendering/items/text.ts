@@ -25,7 +25,7 @@ export class TextVisual extends RenderNode {
 
 import { RenderItemConfiguration } from "./renderItemConfiguration.js";
 
-export interface TextConfiguration extends RenderItemConfiguration {
+export type TextConfiguration = {
     text: string;
     color: string;
     font: string;
@@ -33,15 +33,15 @@ export interface TextConfiguration extends RenderItemConfiguration {
     align?: "left" | "center" | "right";
     width?: number;
     weight?: "normal" | "bold";
-}
+} & RenderItemConfiguration
 
 export function configureText(
     renderItem: TextConfiguration,
-    context: CanvasRenderingContext2D
+    context: CanvasRenderingContext2D,
 ) {
     let fontString = `${renderItem.size}px ${renderItem.font}`;
     //let alignOffset = 0;
-    if (!!renderItem.weight) {
+    if (renderItem.weight) {
         fontString = renderItem.weight + " " + fontString;
     }
 
@@ -60,12 +60,12 @@ export function configureText(
 
 export function textRenderer(
     renderItem: TextConfiguration,
-    context: CanvasRenderingContext2D
+    context: CanvasRenderingContext2D,
 ) {
     configureText(renderItem, context);
     context.fillText(
         renderItem.text,
         Math.floor(renderItem.x),
-        Math.floor(renderItem.y)
+        Math.floor(renderItem.y),
     );
 }

@@ -20,18 +20,18 @@ export function getFocusableViews(rootView: UIView): UIView[] {
 export function getClosestFocusableView(
     focusableViews: UIView[],
     currentFocusBounds: Bounds,
-    direction: Direction
+    direction: Direction,
 ): UIView | null {
     const adjacentViews = getPrioritisedViews(
         focusableViews,
         currentFocusBounds,
-        direction
+        direction,
     );
 
     if (adjacentViews.length > 0) {
         const closestView = closestViewByEdge(
             currentFocusBounds,
-            adjacentViews
+            adjacentViews,
         );
         return closestView;
     } else {
@@ -172,13 +172,13 @@ export function getClosestFocusableView(
 function getPrioritisedViews(
     focusableViews: UIView[],
     currentFocusBounds: Bounds,
-    direction: Direction
+    direction: Direction,
 ): UIView[] {
     const viewsInDirection = focusableViews.filter((view) => {
         return isViewInDirection(
             view,
             boundsCenter(currentFocusBounds),
-            direction
+            direction,
         );
     });
 
@@ -197,11 +197,11 @@ function getPrioritisedViews(
             const oppositeDirection = invertDirection(direction);
             const oppositeEdge = getDirectionalEdge(
                 view.bounds,
-                oppositeDirection
+                oppositeDirection,
             );
             const oppositeEdgeOfFocusedView = getDirectionalEdge(
                 currentFocusBounds,
-                oppositeDirection
+                oppositeDirection,
             );
 
             const corners = [oppositeEdge.start, oppositeEdge.end];
@@ -209,8 +209,8 @@ function getPrioritisedViews(
                 isPointPastEdge(
                     direction,
                     corner,
-                    oppositeEdgeOfFocusedView.start
-                )
+                    oppositeEdgeOfFocusedView.start,
+                ),
             );
         });
     if (overlappingViews.length > 0) {
@@ -221,7 +221,7 @@ function getPrioritisedViews(
         //Check that all corners are past the view edge
         const edge = getDirectionalEdge(currentFocusBounds, direction);
         return view.corners.every((corner) =>
-            isPointPastEdge(direction, corner, edge.start)
+            isPointPastEdge(direction, corner, edge.start),
         );
     });
     if (completelyPastEdgeViews.length > 0) {
@@ -234,7 +234,7 @@ function getPrioritisedViews(
 
 function getDirectionalEdge(
     viewBounds: Bounds,
-    direction: Direction
+    direction: Direction,
 ): ViewEdge {
     switch (direction) {
         case Direction.Down:
@@ -296,7 +296,7 @@ function getDirectionalEdge(
 function isPointPastEdge(
     direction: Direction,
     point: Point,
-    edge: Point
+    edge: Point,
 ): boolean {
     switch (direction) {
         case Direction.Left:
@@ -323,7 +323,7 @@ function isPointPastEdge(
 function isViewInDirection(
     view: UIView,
     origin: Point,
-    direction: Direction
+    direction: Direction,
 ): boolean {
     const hasCornerInDirection = view.corners.some((corner) => {
         return isPointPastEdge(direction, corner, origin);
@@ -352,7 +352,7 @@ function closestViewByEdge(fromBounds: Bounds, views: UIView[]): UIView {
             const edgePoint = closestPointOnLine(
                 edge.start,
                 edge.end,
-                fromViewPoint
+                fromViewPoint,
             );
 
             const edgeDistance = manhattanDistance(fromViewPoint, edgePoint);
@@ -414,4 +414,4 @@ function getViewEdges(view: Bounds): ViewEdge[] {
 type ViewEdge = {
     start: Point;
     end: Point;
-};
+}

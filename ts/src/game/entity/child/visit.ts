@@ -9,7 +9,7 @@ import { Entity } from "../entity.js";
  */
 export function visitChildren(
     entity: Entity,
-    visitor: (entity: Entity) => boolean
+    visitor: (entity: Entity) => boolean,
 ): void {
     const searchEntities = [entity];
 

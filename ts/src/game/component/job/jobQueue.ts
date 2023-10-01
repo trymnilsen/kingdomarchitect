@@ -3,7 +3,7 @@ import { Job } from "./job.js";
 import { JobConstraint } from "./jobConstraint.js";
 import { ScheduledJob } from "./scheduledJob.js";
 
-export interface JobQueue {
+export type JobQueue = {
     /**
      * Retrieve a list of pending jobs
      */

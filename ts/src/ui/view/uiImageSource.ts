@@ -4,7 +4,7 @@ import { UIRenderContext } from "../../rendering/uiRenderContext.js";
 import { UILayoutContext } from "../uiLayoutContext.js";
 import { UISize } from "../uiSize.js";
 
-export interface UIImageSource {
+export type UIImageSource = {
     measure(layoutContext: UILayoutContext): UISize;
     draw(context: UIRenderContext, screenposition: Point, size: UISize): void;
 }

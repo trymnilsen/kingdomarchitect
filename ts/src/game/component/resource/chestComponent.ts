@@ -3,10 +3,10 @@ import { EntityComponent } from "../entityComponent.js";
 
 type ChestBundle = {
     items: InventoryItem[];
-};
+}
 
 export class ChestComponent extends EntityComponent<ChestBundle> {
-    public items: InventoryItem[] = [];
+    items: InventoryItem[] = [];
 
     static createInstance(items: InventoryItem[]): ChestComponent {
         const instance = new ChestComponent();

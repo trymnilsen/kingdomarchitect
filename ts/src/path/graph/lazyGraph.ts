@@ -4,17 +4,17 @@ import { Graph, GraphNode } from "./graph.js";
 export type LazyGraphNodeFunction = (point: Point) => number | null;
 
 export class LazyGraph implements Graph {
-    private _nodes: { [x: number]: { [y: number]: GraphNode } } = {};
+    private _nodes: Record<number, Record<number, GraphNode>> = {};
     constructor(private nodeFunction: LazyGraphNodeFunction) {}
-    offsetX: number = 0;
-    offsetY: number = 0;
+    offsetX = 0;
+    offsetY = 0;
     /**
      * Invalidate a point lazily. This means it is deleted by not
      * re-generated until its needed
      * @param point
      */
     invalidatePoint(point: Point) {
-        if (!!this._nodes[point.x]) {
+        if (this._nodes[point.x]) {
             delete this._nodes[point.x][point.y];
         }
     }
@@ -51,25 +51,25 @@ export class LazyGraph implements Graph {
 
         // West
         const westNode = this.nodeAt(x - 1, y);
-        if (!!westNode) {
+        if (westNode) {
             neighborNodes.push(westNode);
         }
 
         // East
         const eastNode = this.nodeAt(x + 1, y);
-        if (!!eastNode) {
+        if (eastNode) {
             neighborNodes.push(eastNode);
         }
 
         // South
         const southNode = this.nodeAt(x, y - 1);
-        if (!!southNode) {
+        if (southNode) {
             neighborNodes.push(southNode);
         }
 
         // North
         const northNode = this.nodeAt(x, y + 1);
-        if (!!northNode) {
+        if (northNode) {
             neighborNodes.push(northNode);
         }
         /*

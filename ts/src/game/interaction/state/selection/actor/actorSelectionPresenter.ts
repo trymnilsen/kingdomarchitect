@@ -27,13 +27,13 @@ export class ActorSelectionPresenter implements StatePresenter {
     private expandedMenu: UIColumn;
     private expandedMenuPadding: UIBox;
 
-    public get root(): UIView {
+    get root(): UIView {
         return this.scaffold;
     }
 
     constructor(
         private leftActionbarItems: UIActionbarItem[],
-        private rightActionbarItems: UIActionbarItem[]
+        private rightActionbarItems: UIActionbarItem[],
     ) {
         this.expandedMenu = new UIColumn({
             width: wrapUiSize,
@@ -67,7 +67,7 @@ export class ActorSelectionPresenter implements StatePresenter {
             content,
             leftActionbarItems,
             rightActionbarItems,
-            { width: fillUiSize, height: fillUiSize }
+            { width: fillUiSize, height: fillUiSize },
         );
     }
 
@@ -102,13 +102,13 @@ export class ActorSelectionPresenter implements StatePresenter {
                                             item.onClick();
                                         } else {
                                             console.log(
-                                                `No callback for ${item.text}`
+                                                `No callback for ${item.text}`,
                                             );
                                         }
                                     },
                                     children: icon,
                                     defaultBackground: new SpriteBackground(
-                                        sprites2.stone_slate_button_2x
+                                        sprites2.stone_slate_button_2x,
                                     ),
                                 }),
                             },

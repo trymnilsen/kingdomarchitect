@@ -6,7 +6,7 @@ import { Job } from "../job.js";
 
 type BuildBundle = {
     entityId: string;
-};
+}
 
 export class BuildJob extends Job<BuildBundle> {
     private buildingComponent: BuildingComponent | null = null;
@@ -21,7 +21,7 @@ export class BuildJob extends Job<BuildBundle> {
         return instance;
     }
 
-    update(tick: number): void {
+    update(): void {
         assertEntityComponent(this.healthComponent);
         assertEntityComponent(this.buildingComponent);
 

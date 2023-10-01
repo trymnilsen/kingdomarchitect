@@ -24,10 +24,10 @@ import { FocusState } from "./focus/focusState.js";
 import { UILayoutContext } from "./uiLayoutContext.js";
 import { fillUiSize, UISize, zeroSize } from "./uiSize.js";
 
-export interface UIAction {
+export type UIAction = {
     type: string;
     data: unknown;
-}
+};
 
 /**
  * UIView is the base class for all UI elements, it supports basic functions
@@ -47,10 +47,10 @@ export abstract class UIView implements FocusGroup {
     private _size: UISize;
     private _id: string | null = null;
     private _children: UIView[] = [];
-    private _uiAction: Event<UIAction> = new Event();
+    private _uiAction = new Event<UIAction>();
     private _focusState: FocusState | undefined;
     protected _measuredSize: UISize | null = null;
-    protected _isDirty: boolean = true;
+    protected _isDirty = true;
 
     /**
      * The offset of this view from its parent
@@ -111,7 +111,7 @@ export abstract class UIView implements FocusGroup {
      * Will be zero if `isLayedOut` is false
      */
     get measuredSize(): UISize {
-        return this._measuredSize || zeroSize();
+        return this._measuredSize ?? zeroSize();
     }
 
     /**
@@ -157,7 +157,7 @@ export abstract class UIView implements FocusGroup {
      * the default screenPosition.
      */
     get corners(): Point[] {
-        if (!!this._measuredSize) {
+        if (this._measuredSize) {
             return [
                 //Top left
                 this._screenPosition,
@@ -193,7 +193,7 @@ export abstract class UIView implements FocusGroup {
      * as the screen position
      */
     get center(): Point {
-        if (!!this._measuredSize) {
+        if (this._measuredSize) {
             const halfWidth = this._measuredSize.width / 2;
             const halfHeight = this._measuredSize.height / 2;
             return addPoint(this._screenPosition, {
@@ -211,7 +211,7 @@ export abstract class UIView implements FocusGroup {
      * be the same as the x1 and y1
      */
     get bounds(): Bounds {
-        if (!!this._measuredSize) {
+        if (this._measuredSize) {
             return {
                 x1: this.screenPosition.x,
                 x2: this._screenPosition.x + this._measuredSize.width,
@@ -235,7 +235,7 @@ export abstract class UIView implements FocusGroup {
      * one.
      */
     get focusState(): FocusState {
-        if (!!this._parent) {
+        if (this._parent) {
             return this._parent.focusState;
         } else {
             if (!this._focusState) {
@@ -257,12 +257,12 @@ export abstract class UIView implements FocusGroup {
     }
 
     getFocusBounds(): Bounds | null {
-        return this.focusState.currentFocus?.bounds || null;
+        return this.focusState.currentFocus?.bounds ?? null;
     }
 
     moveFocus(
         direction: Direction,
-        currentFocusBounds: Bounds | null
+        currentFocusBounds: Bounds | null,
     ): boolean {
         return this.moveDirectionalFocus(direction, currentFocusBounds);
     }
@@ -304,7 +304,7 @@ export abstract class UIView implements FocusGroup {
 
             // If there is a filter and it matches or there is no filter
             // add the view to the returned list of views
-            if ((filter && filter(view)) || !filter) {
+            if ((filter && filter(view)) ?? !filter) {
                 views.push(view);
             }
             for (const child of view._children) {
@@ -323,7 +323,7 @@ export abstract class UIView implements FocusGroup {
         if (this.parent) {
             this._screenPosition = addPoint(
                 this.parent.screenPosition,
-                this._offset
+                this._offset,
             );
         } else {
             this.screenPosition = this._offset;
@@ -347,7 +347,7 @@ export abstract class UIView implements FocusGroup {
             this.screenPosition.x,
             this.screenPosition.y,
             this.screenPosition.x + this.measuredSize.width,
-            this.screenPosition.y + this.measuredSize.height
+            this.screenPosition.y + this.measuredSize.height,
         );
     }
 
@@ -357,20 +357,21 @@ export abstract class UIView implements FocusGroup {
      * @param screenPoint the position the tap started at
      * @returns true if this tap was consumed by this view. Defaults to false
      */
-    onTapDown(screenPoint: Point): boolean {
+    onTapDown(_screenPoint: Point): boolean {
         return false;
     }
     /**
      * Called when a tap is registered as no-longer down.
      * @param screenPoint the position of this tap event
      */
-    onTapUp(screenPoint: Point, isCancelled: boolean) {}
+    onTapUp(_screenPoint: Point, _isCancelled: boolean) {}
+
     /**
      * Called when a tap is registered as both up and down within this view.
      * @param screenPoint the position this event occured at.
      * @returns true if this tap was handled by the view. Defaults to false
      */
-    onTap(screenPoint: Point): boolean {
+    onTap(_screenPoint: Point): boolean {
         return false;
     }
 
@@ -505,7 +506,7 @@ export abstract class UIView implements FocusGroup {
      */
     abstract layout(
         layoutContext: UILayoutContext,
-        constraints: UISize
+        constraints: UISize,
     ): UISize;
 
     /**
@@ -524,7 +525,7 @@ export abstract class UIView implements FocusGroup {
      */
     private moveDirectionalFocus(
         direction: Direction,
-        currentFocusBounds: Bounds | null
+        currentFocusBounds: Bounds | null,
     ): boolean {
         const viewPortBounds: Bounds = {
             x1: 0,
@@ -546,9 +547,9 @@ export abstract class UIView implements FocusGroup {
             const closestView = getClosestFocusableView(
                 focusableViews,
                 currentFocusBounds,
-                direction
+                direction,
             );
-            if (!!closestView) {
+            if (closestView) {
                 this.focusState.setFocus(closestView);
                 return true;
             } else {

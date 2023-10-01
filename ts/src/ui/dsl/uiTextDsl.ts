@@ -4,13 +4,13 @@ import { TextStyle } from "../../rendering/text/textStyle.js";
 import { UIText } from "../view/uiText.js";
 import { UIViewProperties } from "./uiViewDsl.js";
 
-export interface UITextProperties extends UIViewProperties {
+export type UITextProperties = {
     text: string;
     style?: TextStyle;
     alignment?: Point;
     padding?: Sides;
     wrap?: boolean;
-}
+} & UIViewProperties
 
 export function uiText(textProperties: UITextProperties): UIText {
     const text = new UIText({

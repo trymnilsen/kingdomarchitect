@@ -17,7 +17,7 @@ export class SpriteComponent extends EntityComponent<SpriteComponentBundle> {
     static createInstance(
         sprite: Sprite2,
         offset: Point,
-        size?: Point
+        size?: Point,
     ): SpriteComponent {
         const instance = new SpriteComponent();
         instance.fromComponentBundle({
@@ -33,18 +33,18 @@ export class SpriteComponent extends EntityComponent<SpriteComponentBundle> {
     }
 
     override onDraw(context: RenderContext, screenPosition: Point): void {
-        let scale = 1;
+        const scale = 1;
 
         let targetWidth = this.size?.x;
         let targetHeight = this.size?.y;
 
-        if (!!targetWidth) {
+        if (targetWidth) {
             targetWidth = targetWidth * scale;
         } else {
             targetWidth = context.measureSprite(this.sprite).width * scale;
         }
 
-        if (!!targetHeight) {
+        if (targetHeight) {
             targetHeight = targetHeight * scale;
         } else {
             targetHeight = context.measureSprite(this.sprite).height * scale;
@@ -60,7 +60,7 @@ export class SpriteComponent extends EntityComponent<SpriteComponentBundle> {
     }
 
     override fromComponentBundle(bundle: SpriteComponentBundle): void {
-        const sprite = sprites2[bundle.sprite];
+        const sprite = sprites2[bundle.sprite] as Sprite2;
         if (!sprite) {
             throw new Error(`No sprite with id ${bundle.sprite}`);
         }

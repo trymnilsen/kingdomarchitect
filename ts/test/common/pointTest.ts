@@ -80,7 +80,7 @@ describe("Point test", () => {
         const secondDiagonalPoint = { x: 6, y: 6 };
         const diagonalDistance = distance(
             firstDiagonalPoint,
-            secondDiagonalPoint
+            secondDiagonalPoint,
         );
         assert.equal(diagonalDistance.toPrecision(2), "4.2");
     });
@@ -91,7 +91,7 @@ describe("Point test", () => {
 
         function includesPoint(
             listOfPoints: Point[],
-            pointToTest: Point
+            pointToTest: Point,
         ): boolean {
             return listOfPoints.some((item) => {
                 return pointEquals(item, pointToTest);

@@ -11,29 +11,29 @@ export function colorBackground(color: string): UIBackground {
     return new ColorBackground(color);
 }
 
-export interface NinePatchBackgroundProperties {
+export type NinePatchBackgroundProperties = {
     sprite: Sprite2;
     sides?: Sides;
     scale?: number;
-}
+};
 
 export function ninePatchBackground(
-    properties: NinePatchBackgroundProperties
+    properties: NinePatchBackgroundProperties,
 ): UIBackground {
     return new NinePatchBackground(
         properties.sprite,
-        properties.sides || allSides(8),
-        properties.scale || 1
+        properties.sides ?? allSides(8),
+        properties.scale ?? 1,
     );
 }
 
-export interface BoxBackgroundProperties {
+export type BoxBackgroundProperties = {
     fill: string;
     stroke: string;
     strokeWidth?: number;
-}
+};
 export function boxBackground(
-    properties: BoxBackgroundProperties
+    properties: BoxBackgroundProperties,
 ): UIBackground {
     let strokeWidth = 1;
     if (properties.strokeWidth != undefined) {

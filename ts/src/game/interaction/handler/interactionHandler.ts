@@ -25,7 +25,7 @@ export class InteractionHandler {
         world: Entity,
         camera: Camera,
         assets: AssetLoader,
-        time: GameTime
+        time: GameTime,
     ) {
         this.interactionStateChanger = new CommitableInteractionStateChanger();
         this.world = world;
@@ -129,7 +129,7 @@ export class InteractionHandler {
     onInput(inputAction: InputAction) {
         const inputHandled = this.history.state.onInput(
             inputAction,
-            this.interactionStateChanger
+            this.interactionStateChanger,
         );
 
         if (

@@ -156,7 +156,7 @@ export class CharacterSkillState extends InteractionState {
 
     private getMasterView(
         skillTree: SkillTree,
-        category: SkillCategory
+        category: SkillCategory,
     ): UIView {
         return uiBox({
             width: fillUiSize,
@@ -232,14 +232,14 @@ export class CharacterSkillState extends InteractionState {
                                 width: 48,
                                 height: 48,
                                 background: new SpriteBackground(
-                                    sprites2.fancy_wood_background
+                                    sprites2.fancy_wood_background,
                                 ),
                                 children: [
                                     uiImage({
                                         width: 32,
                                         height: 32,
                                         image: new UISpriteImageSource(
-                                            skill.asset
+                                            skill.asset,
                                         ),
                                     }),
                                 ],

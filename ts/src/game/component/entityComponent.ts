@@ -5,11 +5,11 @@ import { Entity } from "../entity/entity.js";
 import { ComponentEvent } from "./componentEvent.js";
 
 export abstract class EntityComponent<
-    PersistedDataType extends JSONValue = {}
+    PersistedDataType extends JSONValue = JSONValue,
 > {
     private _entity?: Entity;
 
-    public get entity(): Entity {
+    get entity(): Entity {
         if (!this._entity) {
             throw new Error("No entity available for component");
         }
@@ -17,7 +17,7 @@ export abstract class EntityComponent<
         return this._entity;
     }
 
-    public set entity(value: Entity) {
+    set entity(value: Entity) {
         this._entity = value;
     }
 
@@ -29,15 +29,15 @@ export abstract class EntityComponent<
      * at this point
      * @param tick
      */
-    onStart(tick: number) {}
+    onStart(_tick: number) {}
     /**
      * Called when the component is either removed from an entity or when
      * an entity this component is added to is removed from the entity-tree.
      *
      */
-    onStop(tick: number) {}
-    onUpdate(tick: number) {}
-    onDraw(context: RenderContext, screenPosition: Point) {}
+    onStop(_tick: number) {}
+    onUpdate(_tick: number) {}
+    onDraw(_context: RenderContext, _screenPosition: Point) {}
 
     /**
      * Invoked when component is restored from a save. The component should
@@ -52,7 +52,7 @@ export abstract class EntityComponent<
     abstract toComponentBundle(): PersistedDataType;
 
     protected publishEvent(event: ComponentEvent<EntityComponent>) {
-        if (!!this._entity) {
+        if (this._entity) {
             this._entity.componentEvents.publish(event);
         } else {
             console.warn("No entity set, event is not published", this, event);
@@ -69,14 +69,14 @@ export abstract class EntityComponent<
  * state.
  */
 export class StatelessComponent extends EntityComponent {
-    override fromComponentBundle(bundle: {}): void {}
+    override fromComponentBundle(): void {}
     override toComponentBundle() {
         return {};
     }
 }
 
 export function assertEntityComponent<T extends EntityComponent>(
-    component: T | null
+    component: T | null,
 ): asserts component is T {
     if (!component) {
         throw new Error("Entity has not been resolved from id");

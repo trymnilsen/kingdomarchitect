@@ -11,14 +11,14 @@ export enum InputActionType {
     NUMBER_PRESS = "NUMBER_PRESS",
 }
 
-export interface InputAction {
+export type InputAction = {
     isShifted: boolean;
     action: InputActionType;
     value: string;
 }
 
 export function getDirectionFromInputType(
-    action: InputActionType
+    action: InputActionType,
 ): Direction | null {
     let direction: Direction | null = null;
     switch (action) {

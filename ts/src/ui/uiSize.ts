@@ -13,7 +13,7 @@ export const fillUiSize = -2;
  * a UI where width and height can be less than zero. See `fillUiSize` and
  * `wrapUiSize` for further details on these to magic numbers.
  */
-export interface UISize {
+export type UISize = {
     height: number;
     width: number;
 }

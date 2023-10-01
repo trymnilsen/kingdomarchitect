@@ -19,7 +19,7 @@ export enum JobCompletedResult {
     Success,
 }
 
-export type JobBundle<T extends JSONValue = {}> = {
+export type JobBundle<T extends JSONValue = JSONValue> = {
     data: T;
     type: string;
     jobState: JobState;
@@ -32,54 +32,54 @@ export type JobBundle<T extends JSONValue = {}> = {
  * chopping a tree or collecting a chest is implemented as jobs. Actions that
  * interupts such as attacks are also implemented as jobs.
  */
-export abstract class Job<T extends JSONValue = {}> {
+export abstract class Job<T extends JSONValue = JSONValue> {
     private _entity: Entity | null = null;
     private _jobState: JobState = JobState.NotStarted;
-    private _startTick: number = 0;
+    private _startTick = 0;
     private _owner: JobOwner | null = null;
     private _movementHelper: MovementHelper | null = null;
     private _bundle: T | null = null;
     /**
      * Return the bundle this job was saved with
      */
-    public get bundle(): T | null {
+    get bundle(): T | null {
         return this._bundle;
     }
 
     /**
      * Set the persisted bundle used for this job
      */
-    public set bundle(value: T) {
+    set bundle(value: T) {
         this._bundle = value;
     }
     /**
      * Return the owner for this job. The owner of a job is responsible for
      * executing it is functions and handling completion and aborting.
      */
-    public get owner(): JobOwner | null {
+    get owner(): JobOwner | null {
         return this._owner;
     }
     /**
      * Set the owner for this job. This job will be used for handling aborting
      * and completing.
      */
-    public set owner(value: JobOwner | null) {
+    set owner(value: JobOwner | null) {
         this._owner = value;
     }
 
     /**
      * The gametime tick that this job was started on
      */
-    public get startTick(): number {
+    get startTick(): number {
         return this._startTick;
     }
     /**
      * Set the game time tick this job was started on
      */
-    public set startTick(value: number) {
+    set startTick(value: number) {
         if (this._startTick != 0) {
             throw new InvalidStateError(
-                "Cannot set start tick after it is set"
+                "Cannot set start tick after it is set",
             );
         }
         this._startTick = value;
@@ -88,7 +88,7 @@ export abstract class Job<T extends JSONValue = {}> {
     /**
      * Get the current state of the job
      */
-    public get jobState(): JobState {
+    get jobState(): JobState {
         return this._jobState;
     }
 
@@ -100,22 +100,22 @@ export abstract class Job<T extends JSONValue = {}> {
      * If the job is complete, the state cannot be updated
      * If the job is running the only valid transition is completed
      */
-    public set jobState(v: JobState) {
+    set jobState(v: JobState) {
         if (v == JobState.NotStarted) {
             throw new InvalidStateError(
-                "Cannot set job state to not started, this the default state"
+                "Cannot set job state to not started, this the default state",
             );
         }
 
         if (this._jobState == JobState.Completed) {
             throw new InvalidStateError(
-                `Job already completed, unable to change state to: ${v}`
+                `Job already completed, unable to change state to: ${v}`,
             );
         }
 
         if (this._jobState == JobState.Running && v != JobState.Completed) {
             throw new InvalidStateError(
-                `Can only transition to end-state from running, attempted to set: ${v}`
+                `Can only transition to end-state from running, attempted to set: ${v}`,
             );
         }
 
@@ -126,7 +126,7 @@ export abstract class Job<T extends JSONValue = {}> {
      * The entity this job is assigned to
      * Will throw if it is not set
      */
-    public get entity(): Entity {
+    get entity(): Entity {
         if (this._entity) {
             return this._entity;
         } else {
@@ -137,7 +137,7 @@ export abstract class Job<T extends JSONValue = {}> {
     /**
      * Set the actor this job is assigned to
      */
-    public set entity(entity: Entity) {
+    set entity(entity: Entity) {
         if (!entity) {
             throw new Error("attempted to set entity to null");
         }
@@ -145,14 +145,14 @@ export abstract class Job<T extends JSONValue = {}> {
         this._entity = entity;
     }
 
-    public get isSuspendable(): Boolean {
+    get isSuspendable(): boolean {
         return false;
     }
 
-    public get movement(): MovementHelper {
+    get movement(): MovementHelper {
         if (!this._entity) {
             throw new Error(
-                "Cannot access movement helper before entity is set"
+                "Cannot access movement helper before entity is set",
             );
         }
         //Lazily create the helper if needed
@@ -171,7 +171,7 @@ export abstract class Job<T extends JSONValue = {}> {
     fromJobBundle(bundle: JobBundle<T>): void {
         this._jobState = bundle.jobState;
         this._bundle = bundle.data;
-        if (!!bundle.movement) {
+        if (bundle.movement) {
             this.movement.currentMovement = bundle.movement;
         }
         this.onFromPersistedState(bundle.data);
@@ -248,7 +248,7 @@ export abstract class Job<T extends JSONValue = {}> {
      * logic should consider that entity can be null and the job not started
      * @param renderContext the context to render to
      */
-    onDraw(renderContext: RenderContext) {}
+    onDraw(_renderContext: RenderContext) {}
 
     /**
      * Request to update this job. Called when attached to an actor and running
@@ -271,7 +271,7 @@ export abstract class Job<T extends JSONValue = {}> {
      * so logic requiring the entity tree can be used here.
      * @param bundle provides the locally saved bundle as a non-nullable value
      */
-    protected onFromPersistedState(bundle: T) {}
+    protected onFromPersistedState(_bundle: T) {}
 
     /**
      * Check if a point is adjacent to the entity of this job

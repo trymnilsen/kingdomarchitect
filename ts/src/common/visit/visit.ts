@@ -1,4 +1,4 @@
-export interface Visitable {
+export type Visitable = {
     children: Visitable[];
 }
 
@@ -11,7 +11,7 @@ export interface Visitable {
  */
 export function visitChildren(
     visitable: Visitable,
-    visitor: (visitable: Visitable) => boolean
+    visitor: (visitable: Visitable) => boolean,
 ): void {
     const searchEntities = [visitable];
 

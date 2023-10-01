@@ -23,19 +23,19 @@ export class JobRunnerComponent
     private jobStack: Job[] = [];
     private _isOpenForExternalJobs = true;
 
-    public get activeJob(): Job | undefined {
+    get activeJob(): Job | undefined {
         return this.jobStack[this.jobStack.length - 1];
     }
 
-    public get hasActiveJob(): boolean {
+    get hasActiveJob(): boolean {
         return !!this.activeJob;
     }
 
-    public get isOpenForExternalJobs(): boolean {
+    get isOpenForExternalJobs(): boolean {
         return this._isOpenForExternalJobs;
     }
 
-    public set isOpenForExternalJobs(value: boolean) {
+    set isOpenForExternalJobs(value: boolean) {
         this._isOpenForExternalJobs = value;
     }
 
@@ -67,7 +67,7 @@ export class JobRunnerComponent
         this.jobStack.push(job);
         job.entity = this.entity;
         job.owner = this;
-        if (!!job.bundle) {
+        if (job.bundle) {
             job.fromJobBundle({
                 data: job.bundle,
                 jobState: JobState.NotStarted,
@@ -82,10 +82,10 @@ export class JobRunnerComponent
         }
     }
 
-    onAbort(job: Job): void {
+    onAbort(): void {
         this.endJob();
     }
-    onComplete(job: Job): void {
+    onComplete(): void {
         this.endJob();
     }
 
@@ -96,13 +96,13 @@ export class JobRunnerComponent
     }
 
     override onUpdate(tick: number): void {
-        if (!!this.activeJob) {
+        if (this.activeJob) {
             this.activeJob.update(tick);
         }
     }
 
-    override onDraw(context: RenderContext, screenPosition: Point): void {
-        if (!!this.activeJob) {
+    override onDraw(context: RenderContext): void {
+        if (this.activeJob) {
             this.activeJob.onDraw(context);
         }
     }
@@ -138,7 +138,7 @@ export class JobRunnerComponent
         const entity = this.entity;
         if (!entity) {
             console.error(
-                "Unable to request job, JobRunnerComponent has no entity"
+                "Unable to request job, JobRunnerComponent has no entity",
             );
             return;
         }
@@ -161,7 +161,7 @@ export class JobRunnerComponent
                 "No applicable job found",
                 entity,
                 applicableJobs,
-                queue.pendingJobs
+                queue.pendingJobs,
             );
         }
     }

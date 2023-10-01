@@ -1,6 +1,6 @@
 import { Tileset } from "../../../data/tileset/tileset.js";
 
-export interface UnlockableArea {
+export type UnlockableArea = {
     tileset: Tileset;
     cost: number;
 }

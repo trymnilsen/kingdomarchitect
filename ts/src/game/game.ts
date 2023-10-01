@@ -18,13 +18,13 @@ export class Game {
     private assetLoader: AssetLoader;
     private gameTime: MutableGameTime;
     private interactionHandler: InteractionHandler;
-    private currentTick: number = 0;
+    private currentTick = 0;
     private world: Entity;
     private gamePersister: GamePersister;
-    public constructor(domElementWrapperSelector: string) {
+    constructor(domElementWrapperSelector: string) {
         // Get the canvas
         const canvasElement: HTMLCanvasElement | null = document.querySelector(
-            `#${domElementWrapperSelector}`
+            `#${domElementWrapperSelector}`,
         );
 
         if (canvasElement == null) {
@@ -41,7 +41,7 @@ export class Game {
         this.renderer = new Renderer(
             canvasElement,
             this.assetLoader,
-            this.gameTime
+            this.gameTime,
         );
 
         if (this.gamePersister.hasSaveData) {
@@ -52,20 +52,21 @@ export class Game {
             this.world = createRootEntity();
         }
 
-        window["saveGame"] = () => {
+        /*
+        window.saveGame = () => {
             this.saveGame();
         };
 
-        window["clearGame"] = () => {
+        window.clearGame = () => {
             console.log("Clear game");
             window.localStorage.clear();
-        };
+        };*/
 
         this.interactionHandler = new InteractionHandler(
             this.world,
             this.renderer.camera,
             this.assetLoader,
-            this.gameTime
+            this.gameTime,
         );
     }
 
@@ -88,13 +89,13 @@ export class Game {
             movement: Point,
             position: Point,
             startPosition: Point,
-            downTapHandled: boolean
+            downTapHandled: boolean,
         ) => {
             if (downTapHandled) {
                 this.interactionHandler.onTapPan(
                     movement,
                     position,
-                    startPosition
+                    startPosition,
                 );
             } else {
                 this.renderer.camera.translate(invert(movement));
@@ -146,22 +147,22 @@ export class Game {
                     break;
                 case InputActionType.UP_PRESS:
                     this.updateCamera(
-                        changeY(this.renderer.camera.position, -TileSize)
+                        changeY(this.renderer.camera.position, -TileSize),
                     );
                     break;
                 case InputActionType.DOWN_PRESS:
                     this.updateCamera(
-                        changeY(this.renderer.camera.position, TileSize)
+                        changeY(this.renderer.camera.position, TileSize),
                     );
                     break;
                 case InputActionType.LEFT_PRESS:
                     this.updateCamera(
-                        changeX(this.renderer.camera.position, -TileSize)
+                        changeX(this.renderer.camera.position, -TileSize),
                     );
                     break;
                 case InputActionType.RIGHT_PRESS:
                     this.updateCamera(
-                        changeX(this.renderer.camera.position, TileSize)
+                        changeX(this.renderer.camera.position, TileSize),
                     );
                     break;
             }

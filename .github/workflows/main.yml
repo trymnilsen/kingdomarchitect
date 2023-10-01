@@ -6,32 +6,69 @@ on:
       
 jobs:
   compile:
+    name: Compile with tsc
     runs-on: ubuntu-latest
-
-    steps:
-      - name: Compile the source
-        run: echo compile placeholder
-  lint:
-    runs-on: ubuntu-latest
-
     steps:
       - name: Compile the source
         run: echo compile placeholder
   check-format:
+    name: Check format with prettier
     runs-on: ubuntu-latest
-
+    steps:
+      - name: Compile the source
+        run: echo compile placeholder
+  lint:
+    name: Run eslint over sources
+    runs-on: ubuntu-latest
     steps:
       - name: Compile the source
         run: echo compile placeholder
   test:
+    name: Run tests
     runs-on: ubuntu-latest
     needs: compile
     steps:
       - name: Compile the source
         run: echo compile placeholder
-  deploy-preview:
+  bundle:
+    name: Bundle compiled sources with Rollup
     runs-on: ubuntu-latest
-    needs: [compile, lint, test, check-format]
+    needs: compile
+    steps:
+      - name: Compile the source
+        run: echo compile placeholder
+  minify:
+    name: Compress and mangle with Terser
+    runs-on: ubuntu-latest
+    needs: bundle
+    steps:
+      - name: Compile the source
+        run: echo compile placeholder
+  inject-html:
+    name: Inject html for error and telemetry
+    runs-on: ubuntu-latest
+    needs: [minify, lint, test, check-format]
+    steps:
+      - name: Compile the source
+        run: echo compile placeholder
+  deploy-preview:
+    name: Deploy to preview environment
+    runs-on: ubuntu-latest
+    needs: [inject-html]
+    steps:
+      - name: Compile the source
+        run: echo compile placeholder
+  generate-docs:
+    name: Generate typedoc page
+    runs-on: ubuntu-latest
+    needs: [minify, lint, test, check-format]
+    steps:
+      - name: Compile the source
+        run: echo compile placeholder
+  deploy-docs:
+    name: Deploy typedoc pages
+    runs-on: ubuntu-latest
+    needs: generate-docs
     steps:
       - name: Compile the source
         run: echo compile placeholder

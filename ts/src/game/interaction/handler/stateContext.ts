@@ -4,7 +4,7 @@ import { Camera } from "../../../rendering/camera.js";
 import { Entity } from "../../entity/entity.js";
 import { InteractionStateChanger } from "./interactionStateChanger.js";
 
-export interface StateContext {
+export type StateContext = {
     root: Entity;
     stateChanger: InteractionStateChanger;
     assets: AssetLoader;
