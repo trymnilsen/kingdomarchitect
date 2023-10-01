@@ -24,5 +24,5 @@ export type UIRenderContext = {
         color: string,
         width: number,
     ): void;
-    getSprite(id: string): Sprite2;
-}
+    getSprite(id: string): Sprite2 | undefined;
+};

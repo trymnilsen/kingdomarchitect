@@ -51,22 +51,22 @@ export class FixedGraph implements Graph {
         const y = node.y;
 
         // West
-        if (this.grid[x - 1] && this.grid[x - 1][y]) {
+        if (this.grid[x - 1]?.[y]) {
             neighborNodes.push(this.grid[x - 1][y]);
         }
 
         // East
-        if (this.grid[x + 1] && this.grid[x + 1][y]) {
+        if (this.grid[x + 1]?.[y]) {
             neighborNodes.push(this.grid[x + 1][y]);
         }
 
         // South
-        if (this.grid[x] && this.grid[x][y - 1]) {
+        if (this.grid[x]?.[y - 1]) {
             neighborNodes.push(this.grid[x][y - 1]);
         }
 
         // North
-        if (this.grid[x] && this.grid[x][y + 1]) {
+        if (this.grid[x]?.[y + 1]) {
             neighborNodes.push(this.grid[x][y + 1]);
         }
 

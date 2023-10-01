@@ -1,5 +1,8 @@
 import { removeItem } from "../../common/array.js";
-import { ConstructorFunction } from "../../common/constructor.js";
+import {
+    ConstructorFunction,
+    getConstructorName,
+} from "../../common/constructor.js";
 import { InvalidArgumentError } from "../../common/error/invalidArgumentError.js";
 import { RequireError } from "../../common/error/requireError.js";
 import { Event, EventListener } from "../../common/event.js";
@@ -29,8 +32,9 @@ export class Entity {
     private _children: Entity[] = [];
     private _localPosition: Point = zeroPoint();
     private _worldPosition: Point = zeroPoint();
-    private _componentEvents =
-        new TypedEvent<ComponentEvent<EntityComponent>>();
+    private _componentEvents = new TypedEvent<
+        ComponentEvent<EntityComponent>
+    >();
     private _entityEvents = new Event<EntityEvent>();
 
     private _componentsMap: Record<string, EntityComponent> = {};
@@ -255,12 +259,11 @@ export class Entity {
      * @param entityComponent
      */
     addComponent(entityComponent: EntityComponent) {
-        const componentName =
-            Object.getPrototypeOf(entityComponent).constructor.name;
+        const componentName = getConstructorName(entityComponent);
 
         if (this._componentsMap[componentName]) {
             throw new InvalidArgumentError(
-                `Component already added ${entityComponent}`,
+                `Component already added ${componentName}`,
             );
         }
         entityComponent.entity = this;
@@ -279,7 +282,7 @@ export class Entity {
      * @returns true if the removal was successful
      */
     removeComponent(entityComponent: EntityComponent): boolean {
-        const componentName = this.getComponentName(entityComponent);
+        const componentName = getConstructorName(entityComponent);
         if (this._componentsMap[componentName]) {
             delete this._componentsMap[componentName];
             this._components = Object.values(this._componentsMap);
@@ -431,10 +434,6 @@ export class Entity {
     bubbleEvent(event: EntityEvent) {
         this._entityEvents.publish(event);
         this._parent?.bubbleEvent(event);
-    }
-
-    private getComponentName(component: EntityComponent): string {
-        return Object.getPrototypeOf(component).constructor.name;
     }
 }
 

@@ -1,4 +1,4 @@
-import { ConstructorFunction } from "../constructor.js";
+import { ConstructorFunction, getConstructorName } from "../constructor.js";
 import { InvalidArgumentError } from "../error/invalidArgumentError.js";
 import { EventSubscriptionHandler } from "../event.js";
 
@@ -10,7 +10,7 @@ import { EventSubscriptionHandler } from "../event.js";
  * a list to handle subscriptions so its not optimised for a lot of
  * listeners but this should not be a common occurence.
  */
-export class TypedEvent<TBaseEvent> {
+export class TypedEvent<TBaseEvent extends object> {
     private nextListenersId = 0;
     private subscriptions: TypedEventSubscription<TBaseEvent>[] = [];
 
@@ -51,15 +51,11 @@ export class TypedEvent<TBaseEvent> {
      * @param data The data to publish to subscriber
      */
     publish(data: TBaseEvent) {
-        const typeName = Object.getPrototypeOf(data)?.constructor?.name;
-        if (!typeName) {
-            throw new InvalidArgumentError("Data had no constructor name");
-        }
-        for (let i = 0; i < this.subscriptions.length; i++) {
-            const item = this.subscriptions[i];
-            if (typeName == item.typeName) {
+        const typeName = getConstructorName(data);
+        for (const subscription of this.subscriptions) {
+            if (typeName == subscription.typeName) {
                 try {
-                    item.handler(data);
+                    subscription.handler(data);
                 } catch (err) {
                     console.error("Failed running event subscriber", err);
                 }
@@ -99,4 +95,4 @@ type TypedEventSubscription<T> = {
     handleId: string;
     typeName: string;
     handler: EventSubscriptionHandler<T>;
-}
+};

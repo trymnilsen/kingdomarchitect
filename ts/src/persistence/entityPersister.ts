@@ -1,3 +1,4 @@
+import { getConstructorName } from "../common/constructor.js";
 import { JSONValue } from "../common/object.js";
 import { componentLoaders } from "../game/component/componentLoader.js";
 import { Entity } from "../game/entity/entity.js";
@@ -13,7 +14,7 @@ export class EntityPersister {
             const componentBundles: ComponentPersistenceBundle[] = [];
             // Persist any components of this entity
             for (const component of entity.components) {
-                const type = Object.getPrototypeOf(component).constructor.name;
+                const type = getConstructorName(component);
                 const id = entity.id + "-" + type;
                 componentIds.push(id);
                 const data = component.toComponentBundle();
@@ -129,7 +130,7 @@ export type ComponentPersistenceBundle = {
     componentId: string;
     type: string;
     data: JSONValue;
-}
+};
 
 export type EntityPersistenceBundle = {
     id: string;
@@ -137,9 +138,9 @@ export type EntityPersistenceBundle = {
     y: number;
     children: string[];
     components: string[];
-}
+};
 
 export type BundleSet = {
     components: ComponentPersistenceBundle[];
     entity: EntityPersistenceBundle;
-}
+};

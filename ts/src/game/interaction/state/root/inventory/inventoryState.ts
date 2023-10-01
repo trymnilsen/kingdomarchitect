@@ -174,7 +174,7 @@ export class InventoryState extends InteractionState {
                     {
                         child: uiText({
                             alignment: uiAlignment.centerLeft,
-                            text: inventoryItem.item.hint || "",
+                            text: inventoryItem.item.hint ?? "",
                             style: {
                                 color: bookInkColor,
                                 font: "Silkscreen",

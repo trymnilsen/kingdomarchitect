@@ -15,15 +15,15 @@ export type NinePatchBackgroundProperties = {
     sprite: Sprite2;
     sides?: Sides;
     scale?: number;
-}
+};
 
 export function ninePatchBackground(
     properties: NinePatchBackgroundProperties,
 ): UIBackground {
     return new NinePatchBackground(
         properties.sprite,
-        properties.sides || allSides(8),
-        properties.scale || 1,
+        properties.sides ?? allSides(8),
+        properties.scale ?? 1,
     );
 }
 
@@ -31,7 +31,7 @@ export type BoxBackgroundProperties = {
     fill: string;
     stroke: string;
     strokeWidth?: number;
-}
+};
 export function boxBackground(
     properties: BoxBackgroundProperties,
 ): UIBackground {

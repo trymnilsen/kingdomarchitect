@@ -174,7 +174,7 @@ export class UISkillTree extends UIView {
                     y: mainAxis,
                 };
             default:
-                throw new Error(`Unknown category ${category}`);
+                throw new Error(`Unknown category`);
         }
     }
 }

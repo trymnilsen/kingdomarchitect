@@ -6,7 +6,7 @@ export type RectangleConfiguration = {
     fill?: string;
     strokeWidth?: number;
     strokeColor?: string;
-} & RenderItemConfiguration
+} & RenderItemConfiguration;
 
 export function rectangleRenderer(
     config: RectangleConfiguration,
@@ -18,7 +18,7 @@ export function rectangleRenderer(
     }
 
     if (!!config.strokeWidth && config.strokeWidth > 0) {
-        const color = config.strokeColor || "black";
+        const color = config.strokeColor ?? "black";
         context.lineWidth = config.strokeWidth;
         context.strokeStyle = color;
         context.strokeRect(config.x, config.y, config.width, config.height);

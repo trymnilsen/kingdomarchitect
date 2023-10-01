@@ -7,7 +7,7 @@ import { EntityPersister } from "./entityPersister.js";
 export type LoadedItems = {
     rootEntity: Entity;
     cameraPosition: Point;
-}
+};
 
 export class GamePersister {
     private entityPersister: EntityPersister = new EntityPersister();
@@ -28,6 +28,7 @@ export class GamePersister {
         const saveTime = saveTimeEnd - saveTimeStart;
     }
 
+    /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument */
     loadWorld(): LoadedItems {
         const loadTimeStart = performance.now();
         const bundleSetsAsJson = window.localStorage.getItem("bundles")!;
@@ -48,4 +49,5 @@ export class GamePersister {
             cameraPosition,
         };
     }
+    /* eslint-enable */
 }

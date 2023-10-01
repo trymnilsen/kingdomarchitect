@@ -27,7 +27,7 @@ import { fillUiSize, UISize, zeroSize } from "./uiSize.js";
 export type UIAction = {
     type: string;
     data: unknown;
-}
+};
 
 /**
  * UIView is the base class for all UI elements, it supports basic functions
@@ -111,7 +111,7 @@ export abstract class UIView implements FocusGroup {
      * Will be zero if `isLayedOut` is false
      */
     get measuredSize(): UISize {
-        return this._measuredSize || zeroSize();
+        return this._measuredSize ?? zeroSize();
     }
 
     /**
@@ -257,7 +257,7 @@ export abstract class UIView implements FocusGroup {
     }
 
     getFocusBounds(): Bounds | null {
-        return this.focusState.currentFocus?.bounds || null;
+        return this.focusState.currentFocus?.bounds ?? null;
     }
 
     moveFocus(
@@ -304,7 +304,7 @@ export abstract class UIView implements FocusGroup {
 
             // If there is a filter and it matches or there is no filter
             // add the view to the returned list of views
-            if ((filter && filter(view)) || !filter) {
+            if ((filter && filter(view)) ?? !filter) {
                 views.push(view);
             }
             for (const child of view._children) {

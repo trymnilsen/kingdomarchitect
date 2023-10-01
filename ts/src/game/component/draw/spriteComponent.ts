@@ -60,7 +60,7 @@ export class SpriteComponent extends EntityComponent<SpriteComponentBundle> {
     }
 
     override fromComponentBundle(bundle: SpriteComponentBundle): void {
-        const sprite = sprites2[bundle.sprite];
+        const sprite = sprites2[bundle.sprite] as Sprite2;
         if (!sprite) {
             throw new Error(`No sprite with id ${bundle.sprite}`);
         }

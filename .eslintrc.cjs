@@ -32,5 +32,7 @@ module.exports = {
         "@typescript-eslint/prefer-optional-chain": "error",
         "@typescript-eslint/prefer-includes": "error",
         "@typescript-eslint/consistent-type-definitions": ["error", "type"],
+        "@typescript-eslint/class-literal-property-style": "off",
+        "@typescript-eslint/no-empty-function": "off",
     },
 };

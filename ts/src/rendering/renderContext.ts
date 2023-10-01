@@ -96,8 +96,8 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
         this.canvasContext.stroke();
     }
 
-    getSprite(id: string): Sprite2 {
-        return sprites[id];
+    getSprite(id: string): Sprite2 | undefined {
+        return sprites[id] as Sprite2;
     }
 
     /**

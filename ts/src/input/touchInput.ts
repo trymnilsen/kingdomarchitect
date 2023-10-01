@@ -3,13 +3,13 @@ import { distance, Point, subtractPoint } from "../common/point.js";
 export type OnPanEvent = {
     movement: Point;
     position: Point;
-}
+};
 
 export type OnTapEndEvent = {
     position: Point;
     startPosition: Point;
     wasDragging: boolean;
-}
+};
 
 export type OnTapDownCallback = (position: Point) => boolean;
 export type OnTapCallback = (tapEndEvent: OnTapEndEvent) => void;
@@ -164,7 +164,7 @@ export class TouchInput {
 
     private onTapEnded(position: Point | null | undefined = undefined) {
         try {
-            position = position || this.previousMovePosition;
+            position = position ?? this.previousMovePosition;
 
             if (this.onTapEnd && this.onTapPosition) {
                 //console.log(`TouchInput: Tap ended`, position, this.isDragging);
@@ -172,7 +172,7 @@ export class TouchInput {
                     // Substitute the onTapPosition as the end position if
                     // there is no position in the event or a previous
                     // pointer position registered
-                    position: position || this.onTapPosition,
+                    position: position ?? this.onTapPosition,
                     wasDragging: this.isDragging,
                     startPosition: this.onTapPosition,
                 });
