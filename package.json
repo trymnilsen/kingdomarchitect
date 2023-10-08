@@ -10,13 +10,13 @@
     "scripts": {
         "build": "tsc && rollup -c",
         "spritepack": "tsc && node build/tool/spritepack/spritePack.js",
-        "start": "tsc && node build/tool/http/server.js",
+        "start": "http-server public -c-1",
         "test": "tsc && node --test",
         "bundle": "rollup -c",
         "format": "prettier ts/ --write",
         "check-format": "prettier ts/ --check",
         "lint": "eslint ts/src",
-        "verify": "npm run test && npm run check-format && npm run lint" 
+        "verify": "npm run test && npm run check-format && npm run lint"
     },
     "repository": {
         "type": "git",
@@ -28,6 +28,7 @@
     "dependencies": {
         "@edugis/rollup-plugin-sourcemaps": "0.6.4",
         "@types/node": "^20.8.0",
+        "http-server": "^14.1.1",
         "jimp": "^0.22.10",
         "maxrects-packer": "^2.7.3",
         "prettier": "^3.0.3",

@@ -3,6 +3,7 @@ import { PathSearch } from "../../path/search.js";
 import { InventoryComponent } from "../component/inventory/inventoryComponent.js";
 import { JobQueueComponent } from "../component/job/jobQueueComponent.js";
 import { JobSchedulerComponent } from "../component/job/jobSchedulerComponent.js";
+import { ForrestComponent } from "../component/resource/forrestComponent.js";
 import { ChunkMapComponent } from "../component/root/chunk/chunkMapComponent.js";
 import { createLazyGraphFromRootNode } from "../component/root/path/generateGraph.js";
 import { PathFindingComponent } from "../component/root/path/pathFindingComponent.js";
@@ -26,6 +27,7 @@ export function createRootEntity(): Entity {
     rootEntity.addComponent(chunkmapComponent);
     rootEntity.addComponent(new JobSchedulerComponent());
     rootEntity.addComponent(new TileGeneratorComponent());
+    rootEntity.addComponent(new ForrestComponent());
     const pathFindingComponent = new PathFindingComponent();
     rootEntity.addComponent(pathFindingComponent);
     rootEntity.toggleIsGameRoot(true);

@@ -1,4 +1,5 @@
 import { ConstructorFunction } from "../../common/constructor.js";
+import { FoxComponent } from "./actor/animal/foxComponent.js";
 import { IdleMobComponent } from "./actor/mob/IdleMobComponent.js";
 import { AggroComponent } from "./actor/mob/aggroComponent.js";
 import { WorkerBehaviorComponent } from "./behavior/workerBehaviorComponent.js";
@@ -15,6 +16,7 @@ import { JobQueueComponent } from "./job/jobQueueComponent.js";
 import { JobRunnerComponent } from "./job/jobRunnerComponent.js";
 import { JobSchedulerComponent } from "./job/jobSchedulerComponent.js";
 import { ChestComponent } from "./resource/chestComponent.js";
+import { ForrestComponent } from "./resource/forrestComponent.js";
 import { TreeComponent } from "./resource/treeComponent.js";
 import { ChunkMapComponent } from "./root/chunk/chunkMapComponent.js";
 import { PathFindingComponent } from "./root/path/pathFindingComponent.js";
@@ -42,4 +44,6 @@ export const componentLoaders: ConstructorFunction<EntityComponent>[] = [
     PathFindingComponent,
     TileGeneratorComponent,
     TilesComponent,
+    FoxComponent,
+    ForrestComponent,
 ];

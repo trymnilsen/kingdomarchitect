@@ -39,7 +39,7 @@ export class MenuState extends InteractionState {
                             children: [
                                 {
                                     child: getButtonView("New game", () => {
-                                        //window.clearGame();
+                                        window.localStorage.clear();
                                         location.reload();
                                     }),
                                 },
