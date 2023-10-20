@@ -47,8 +47,6 @@ export class JobRunnerComponent
      * @param job
      */
     assignJob(job: Job): void {
-        console.debug("Assign job to runner:", job, this);
-
         const currentJob = this.activeJob;
         if (currentJob) {
             if (currentJob.isSuspendable) {
@@ -134,7 +132,6 @@ export class JobRunnerComponent
     }
 
     private requestNewJob(): void {
-        console.debug("requestNewJob", this);
         const entity = this.entity;
         if (!entity) {
             console.error(
@@ -156,13 +153,6 @@ export class JobRunnerComponent
             // to some other entity as well
             queue.removeJob(mostApplicableJob);
             this.assignJob(mostApplicableJob);
-        } else {
-            console.debug(
-                "No applicable job found",
-                entity,
-                applicableJobs,
-                queue.pendingJobs,
-            );
         }
     }
 }

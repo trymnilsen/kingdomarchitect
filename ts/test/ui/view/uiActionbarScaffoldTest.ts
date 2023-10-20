@@ -17,4 +17,16 @@ describe("uiActionbarScaffold test", () => {
     it("Prioritises collapsing the second actionbar first", () => {
         assert.equal(2, 2);
     });
+
+    it("Collapses actionbar items if no space", () => {
+        assert.equal(2, 2);
+    });
+
+    it("Will expand sub-menu on selection", () => {
+        assert.equal(2, 2);
+    });
+
+    it("Will export focus regions of buttons", () => {
+        assert.equal(2, 2);
+    });
 });

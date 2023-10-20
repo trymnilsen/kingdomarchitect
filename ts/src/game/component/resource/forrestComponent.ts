@@ -1,8 +1,8 @@
-import { generateId } from "../../../common/idGenerator";
-import { firstChildWhere } from "../../entity/child/first";
-import { foxPrefab } from "../../prefab/foxPrefab";
-import { FoxComponent } from "../actor/animal/foxComponent";
-import { StatelessComponent } from "../entityComponent";
+import { generateId } from "../../../common/idGenerator.js";
+import { firstChildWhere } from "../../entity/child/first.js";
+import { foxPrefab } from "../../prefab/foxPrefab.js";
+import { FoxComponent } from "../actor/animal/foxComponent.js";
+import { StatelessComponent } from "../entityComponent.js";
 
 export class ForrestComponent extends StatelessComponent {
     override onUpdate(tick: number): void {

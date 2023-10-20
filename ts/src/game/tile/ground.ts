@@ -17,7 +17,7 @@ import { getTileId, TileSize } from "./tile.js";
 export type GroundTile = {
     tileX: number;
     tileY: number;
-}
+};
 
 export function isTile(value: unknown): value is GroundTile {
     if (!value) {

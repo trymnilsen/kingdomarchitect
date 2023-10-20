@@ -93,6 +93,7 @@ Items that are not directly connected to the game world, like menus and screens 
 | game        | the game logic, both hud and world code                       |
 | input       | code related to recieveing input from the browser             |
 | path        | pathfinding and graphing code                                 |
+| persistence | logic for saving and loading state                            |
 | rendering   | code related to drawing pixels on the game canvas             |
 | ui          | a custom ui system for setting up GUI elements and screens    |
 
@@ -103,15 +104,28 @@ Items that are not directly connected to the game world, like menus and screens 
 Typescript and rollup is used for transpiling, typechecking and bundling the code.
 This is performed with the `build` npm task.
 
-#### Spritepacking
-
-To optimize, remove unused parts of images and bundling them together into a spritebin the `spritepack` npm task can be used. If you update any of the images in `asset` you need to run this task to get the updated version to show up in game. The source for this can be found in `ts/tool/spritepack`.
-
 ### Testing
 
 Note: The test suite uses the node test runner and requires node >=20.
 
 Some tests already exists for the game, these are made with the built in node test runner. Note that files are not automatically built when tests are run. These needs to be built independently (however the `npm test` script includes the tsc step before the tests are run). Some files are currently just scaffold and some contain actuall test code. Tests can be run with `npm  test`.
+
+### Custom tooling
+
+#### Spritepacking
+
+- Task: `spritepack`
+- (typescript sources needs to be built before the task can run)
+
+To optimize, remove unused parts of images and bundling them together into a spritebin the `spritepack` npm task can be used. If you update any of the images in `asset` you need to run this task to get the updated version to show up in game. The source for this can be found in `ts/tool/spritepack`.
+
+#### Typelistgen
+
+- Task: `typelistgen`
+- (typescript sources needs to be built before the task can run)
+
+To support persisting and loading the state of components and jobs, we need a list of the constructors for all components and jobs. To update the generated list of these, or the path for their imports run the `typelistgen`
+npm task.
 
 ## ❓ FAQ
 

@@ -24,5 +24,10 @@
         "dist/**": true,
     },
     "typescript.format.enable": true,
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "prettier.documentSelectors": [
+        "ts/**/*.ts"
+    ],
+    "javascript.preferences.importModuleSpecifierEnding": "js",
+    "typescript.preferences.importModuleSpecifierEnding": "js"
 }

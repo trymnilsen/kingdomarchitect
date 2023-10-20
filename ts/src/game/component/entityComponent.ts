@@ -68,7 +68,7 @@ export abstract class EntityComponent<
  * needs to be added to the `ComponentLoader`, they're just not saved with any
  * state.
  */
-export class StatelessComponent extends EntityComponent {
+export abstract class StatelessComponent extends EntityComponent {
     override fromComponentBundle(): void {}
     override toComponentBundle() {
         return {};
