@@ -28,7 +28,7 @@
     "dependencies": {
         "@edugis/rollup-plugin-sourcemaps": "0.6.4",
         "@types/node": "^20.8.0",
-        "@typescript-eslint/eslint-plugin": "^6.7.3",
+        "@typescript-eslint/eslint-plugin": "^6.8.0",
         "@typescript-eslint/parser": "^6.7.3",
         "eslint": "^8.50.0",
         "http-server": "^14.1.1",
