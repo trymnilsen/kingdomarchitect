@@ -5,26 +5,15 @@ import { Point, isPointAdjacentTo } from "../../../common/point.js";
 import { RenderContext } from "../../../rendering/renderContext.js";
 import { Entity } from "../../entity/entity.js";
 import { MovementHelper, PathMovement } from "./helper/movementHelper.js";
+import { JobBundle } from "./jobBundle.js";
 import { JobConstraint } from "./jobConstraint.js";
 import { JobOwner } from "./jobOwner.js";
-
-export enum JobState {
-    NotStarted,
-    Running,
-    Completed,
-}
+import { JobState } from "./jobState.js";
 
 export enum JobCompletedResult {
     Aborted,
     Success,
 }
-
-export type JobBundle<T extends JSONValue = JSONValue> = {
-    data: T;
-    type: string;
-    jobState: JobState;
-    movement?: PathMovement | null;
-};
 
 /**
  * Job is the base class for logic that can be queued and assigned to actors.

@@ -3,9 +3,10 @@ import { Point } from "../../../common/point.js";
 import { RenderContext } from "../../../rendering/renderContext.js";
 import { Entity } from "../../entity/entity.js";
 import { EntityComponent } from "../entityComponent.js";
-import { Job, JobBundle } from "./job.js";
+import { Job } from "./job.js";
+import { JobBundle } from "./jobBundle.js";
+import { createJobFromBundle } from "./jobBundleHelper.js";
 import { JobConstraint, isJobApplicableForEntity } from "./jobConstraint.js";
-import { createJobFromBundle } from "./jobLoader.js";
 import { JobOwner } from "./jobOwner.js";
 import { JobQueue } from "./jobQueue.js";
 import { ScheduledJob } from "./scheduledJob.js";
@@ -15,7 +16,7 @@ type JobQueueBundle = {
         constraint?: JobConstraint;
         job: JobBundle;
     }[];
-}
+};
 
 /**
  * The job queue components holds a list of pending jobs that are not run

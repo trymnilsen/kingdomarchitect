@@ -1,7 +1,7 @@
 import { getConstructorName } from "../common/constructor.js";
 import { JSONValue } from "../common/object.js";
-import { componentLoaders } from "../game/component/componentLoader.js";
 import { Entity } from "../game/entity/entity.js";
+import { componentLoaders } from "../../generated/componentLoader.js";
 
 export class EntityPersister {
     persist(world: Entity): BundleSet[] {

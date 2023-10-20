@@ -2,11 +2,13 @@ import { Point } from "../../../common/point.js";
 import { jobDebug } from "../../../constants.js";
 import { RenderContext } from "../../../rendering/renderContext.js";
 import { EntityComponent } from "../entityComponent.js";
-import { Job, JobBundle, JobState } from "./job.js";
+import { Job } from "./job.js";
+import { JobBundle } from "./jobBundle.js";
+import { createJobFromBundle } from "./jobBundleHelper.js";
 import { isJobApplicableForEntity } from "./jobConstraint.js";
-import { createJobFromBundle } from "./jobLoader.js";
 import { JobOwner } from "./jobOwner.js";
 import { JobQueueComponent } from "./jobQueueComponent.js";
+import { JobState } from "./jobState.js";
 
 type JobRunnerBundle = {
     jobStack: JobBundle[];
