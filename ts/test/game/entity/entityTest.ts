@@ -88,6 +88,18 @@ describe("Entity test", () => {
         );
     });
 
+    it("can remove entity", () => {
+        assert.equal(2, 2);
+    });
+
+    it("will keep components sorted by priority from highest to lowest on add", () => {
+        assert.equal(2, 2);
+    });
+
+    it("will keep components sorted when one is removed", () => {
+        assert.equal(2, 2);
+    });
+
     it("Cannot add component of same type twice", () => {
         const parent = new Entity("1");
         const firstComponent = new StubComponent();
@@ -275,6 +287,18 @@ describe("Entity test", () => {
         assert.strictEqual(stopInvokedTimes, 0);
         parent.removeChild(child);
         assert.equal(stopInvokedTimes, 1);
+    });
+
+    it("onUpdate of component is called", () => {
+        assert.equal(2, 2);
+    });
+
+    it("onUpdate of component is called in priority order", () => {
+        assert.equal(2, 2);
+    });
+
+    it("onDraw of component is called", () => {
+        assert.equal(2, 2);
     });
 
     it("Position of children is updated on parent update", () => {

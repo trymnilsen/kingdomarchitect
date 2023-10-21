@@ -1,44 +1,27 @@
-import Jimp from "jimp";
+import { PNG } from "pngjs";
+import { createWriteStream } from "fs";
 import { PixelColor } from "./spritepack/pixels.js";
+import { createPng } from "./spritepack/pngHelper.js";
 
 export class BitmapImage {
-    private image: Jimp | undefined;
+    private image: PNG;
 
     constructor(
         private width: number,
         private height: number,
-    ) {}
-
-    async create() {
-        const createPromise = new Promise<Jimp>((resolve, reject) => {
-            new Jimp(this.width, this.height, (err, image) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(image);
-                }
-            });
-        });
-
-        this.image = await createPromise;
+    ) {
+        this.image = createPng(width, height);
     }
 
     setPixel(x: number, y: number, pixel: PixelColor) {
-        const color = Jimp.rgbaToInt(
-            pixel.red,
-            pixel.green,
-            pixel.blue,
-            pixel.alpha,
-        );
-
-        if (this.image) {
-            this.image.setPixelColor(color, x, y);
-        }
+        const idx = (this.image.width * y + x) << 2;
+        this.image.data[idx] = pixel.red; // red
+        this.image.data[idx + 1] = pixel.green; // green
+        this.image.data[idx + 2] = pixel.blue; // blue
+        this.image.data[idx + 3] = pixel.alpha; // alpha (0 is transparent)
     }
 
-    async write(filename: string) {
-        if (this.image) {
-            await this.image.writeAsync(filename);
-        }
+    write(filename: string) {
+        this.image.pack().pipe(createWriteStream(filename));
     }
 }

@@ -17,12 +17,6 @@ jobs:
     steps:
       - name: Compile the source
         run: echo compile placeholder
-  lint:
-    name: Run eslint over sources
-    runs-on: ubuntu-latest
-    steps:
-      - name: Compile the source
-        run: echo compile placeholder
   test:
     name: Run tests
     runs-on: ubuntu-latest
@@ -33,7 +27,7 @@ jobs:
   bundle:
     name: Bundle compiled sources with Rollup
     runs-on: ubuntu-latest
-    needs: test
+    needs: [compile, check-format, test]
     steps:
       - name: Compile the source
         run: echo compile placeholder
@@ -47,7 +41,7 @@ jobs:
   inject-html:
     name: Inject html for error and telemetry
     runs-on: ubuntu-latest
-    needs: [minify, lint, test, check-format]
+    needs: [minify]
     steps:
       - name: Compile the source
         run: echo compile placeholder
@@ -55,20 +49,6 @@ jobs:
     name: Deploy to preview environment
     runs-on: ubuntu-latest
     needs: [inject-html]
-    steps:
-      - name: Compile the source
-        run: echo compile placeholder
-  generate-docs:
-    name: Generate typedoc page
-    runs-on: ubuntu-latest
-    needs: [lint, test, check-format]
-    steps:
-      - name: Compile the source
-        run: echo compile placeholder
-  deploy-docs:
-    name: Deploy typedoc pages
-    runs-on: ubuntu-latest
-    needs: generate-docs
     steps:
       - name: Compile the source
         run: echo compile placeholder

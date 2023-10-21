@@ -1,8 +1,7 @@
 import * as assert from "node:assert";
-import pkg from "jimp";
-const { intToRGBA, read } = pkg;
 import * as path from "path";
 import { Point, pointEquals, zeroPoint } from "../../src/common/point.js";
+import { getPixelColor, readPng } from "../../tool/spritepack/pngHelper.js";
 
 export async function createGraphFromTestFile(
     mazeName: string,
@@ -30,10 +29,10 @@ export async function createGraphFromTestFile(
         "mazes",
     );
 
-    const image = await read(path.join(directory, mazeName));
+    const png = readPng(path.join(directory, mazeName));
 
-    const width = image.bitmap.width;
-    const height = image.bitmap.height;
+    const width = png.width;
+    const height = png.height;
     const expectedPath: ExpectedPath = {};
     let start: Point = zeroPoint();
     let stop: Point = zeroPoint();
@@ -42,20 +41,24 @@ export async function createGraphFromTestFile(
     for (let x = 0; x < width; x++) {
         weightGraph[x] = [];
         for (let y = 0; y < height; y++) {
-            const pixel = intToRGBA(image.getPixelColor(x, y));
+            const pixel = getPixelColor(png, x, y);
 
-            if (pixel.b == 255 && pixel.r == 0 && pixel.g == 0) {
+            if (pixel.blue == 255 && pixel.red == 0 && pixel.green == 0) {
                 expectedPath[pointId(x, y)] = { x, y };
             }
 
-            if (pixel.b == 0 && pixel.r == 255 && pixel.g == 0) {
+            if (pixel.blue == 0 && pixel.red == 255 && pixel.green == 0) {
                 start = { x, y };
             }
 
-            if (pixel.b == 0 && pixel.r == 0 && pixel.g == 255) {
+            if (pixel.blue == 0 && pixel.red == 0 && pixel.green == 255) {
                 stop = { x, y };
             }
-            weightGraph[x][y] = averageColor(pixel.r, pixel.g, pixel.b);
+            weightGraph[x][y] = averageColor(
+                pixel.red,
+                pixel.green,
+                pixel.blue,
+            );
         }
     }
 

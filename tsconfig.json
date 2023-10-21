@@ -31,7 +31,7 @@
       "ts/src/**/*.ts",
       "ts/tool/**/*.ts",
       "ts/test/**/*.ts",
-      "ts/generated/sprites.json"
+      "ts/generated/**/*.ts"
     ],
     "exclude": [
       "node_modules"

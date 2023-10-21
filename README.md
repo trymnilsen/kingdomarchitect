@@ -78,7 +78,7 @@ actions are perfomed. Panning the gameworld is a good example of when the draw m
 is executed on each drag event from the browser.
 
 #### Entity component system
-A entity component system is in the works where all items in the world are tied to an entity with some amount of componets on it handle updates and draw actions. Some exceptions exists like tiles where all tiles belong to the same entity with a component that is responsible for drawing and handling all the tiles. All new game world items and data will be stored in components on entities.
+A entity component system is in the works where all items in the world are tied to an entity with some amount of componets on it handle updates and draw actions. Some exceptions exists like tiles where all tiles belong to the same entity with a component that is responsible for drawing and handling all the tiles. All new game world items and data will be stored in components on entities. If you create new components or jobs, remember to run the [Typelistgen tooling](#typelistgen)
 
 #### A state system for the HUD/GUI
 Items that are not directly connected to the game world, like menus and screens are considered `InteractionStates` these are screens that can be navigated to and from in a stack. States can draw custom actions and handle events as well as setting up complex views using the custom UI system
@@ -121,10 +121,10 @@ To optimize, remove unused parts of images and bundling them together into a spr
 
 #### Typelistgen
 
-- **Task:** `typelistgen`
+- **Task:** `generate-loaders`
 - **Note:** typescript sources needs to be built before the task can run
 
-To support persisting and loading the state of components and jobs, we need a list of the constructors for all components and jobs. To update the generated list of these, or the path for their imports run the `typelistgen`
+To support persisting and loading the state of components and jobs, we need a list of the constructors for all components and jobs. To update the generated list of these, or the path for their imports run the `generate-loaders`
 npm task.
 
 ## ❓ FAQ
