@@ -79,10 +79,6 @@ describe("Shuffling", () => {
         assert.equal(2, 2);
     });
 
-    it("Shuffling uses energy", () => {
-        assert.equal(2, 2);
-    });
-
     it("A shuffled actor will regenerate path if not possible to return to their intended path", () => {
         assert.equal(2, 2);
     });
@@ -110,6 +106,10 @@ describe("Movement scenarios", () => {
     });
 
     it("given a corridor with a width of 2, four actors will reach the endpoint", () => {
+        assert.equal(2, 2);
+    });
+
+    it("given a corridor with a width of 8, four actors will reach the endpoint", () => {
         assert.equal(2, 2);
     });
 });

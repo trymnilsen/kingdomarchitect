@@ -32,5 +32,5 @@
     "typescript.preferences.importModuleSpecifierEnding": "js",
     "mochaExplorer.files": "build/test/**/*Test.js",
     "mochaExplorer.require": "source-map-support/register",
-    "mochaExplorer.watch": "src/**/*.ts"
+    "mochaExplorer.watch": "build/**/*.js",
 }

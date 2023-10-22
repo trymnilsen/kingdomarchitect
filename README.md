@@ -55,11 +55,10 @@ Wow, thanks! First see if there are any open issues or open a thread under discu
 ## 👩‍💻 Development
 ### Requirements
 - Node v20 or higher
-- A http server to serve the built files
 - An editor to edit typescript with
 
 ### Get set up
-Install the required development packages (typescript and rollup) with `npm i`. Build and bundle the typescript source with `npm run build`. You and then use your development server of choice and your favourite IDE to edit any game code. If you want to contribute on the development on the game, here follows some notes on the architecture for the game/application and some tools used during development.
+Install the required development packages (typescript and rollup) with `npm i`. Build and bundle the typescript source with `npm run build`. `npm run start` will start a development server and give you a link to test out the game locally. Use your favourite IDE to edit any typescript game code. If you want to contribute on the development on the game, here follows some notes on the architecture for the game/application and some tools used during development.
 
 ### Concepts
 The architecture of the game is loosely based around three concepts:
