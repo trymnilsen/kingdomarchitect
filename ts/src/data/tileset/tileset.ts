@@ -24,7 +24,7 @@ export type Tileset = {
      * if this set is unlocked
      */
     factory: TileSetFactory;
-}
+};
 
 /**
  * A factory to create the tiles and entities for a given unlockable
@@ -41,4 +41,4 @@ export type TileSetFactory = {
      * Any entities that should be added once the tilset has been unlocked
      */
     createEntities(): Entity[];
-}
+};

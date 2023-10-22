@@ -3,7 +3,7 @@ import { EntityComponent } from "../entityComponent.js";
 
 type TenantBundle = {
     houseEntityId: string | null;
-}
+};
 
 export class TenantComponent extends EntityComponent<TenantBundle> {
     private _houseEntityId: string | null = null;

@@ -5,8 +5,8 @@ export type SelectionMode = {
     setSelection(point: Point): void;
     getSelection(): Point[];
     cursorSelection(): Point;
-}
+};
 
 export type SelectionModeDescription = {
     readonly name: string;
-}
+};

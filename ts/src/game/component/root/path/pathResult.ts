@@ -38,4 +38,4 @@ export type PathResult = {
     path: Point[];
     status: PathResultStatus;
     graph: SearchedNode[];
-}
+};

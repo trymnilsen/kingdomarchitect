@@ -7,7 +7,7 @@ export type InventoryItem = {
     hint?: string;
     tag?: ItemTag[];
     category?: ItemCategory;
-}
+};
 
 export enum ItemTag {
     SkillGear,

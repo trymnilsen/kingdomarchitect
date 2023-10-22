@@ -214,4 +214,4 @@ type AdjacentBuildings = {
     right: BuildingComponent | null;
     upper: BuildingComponent | null;
     bottom: BuildingComponent | null;
-}
+};

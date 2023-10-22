@@ -10,4 +10,4 @@ export type StateContext = {
     assets: AssetLoader;
     gameTime: GameTime;
     camera: Camera;
-}
+};

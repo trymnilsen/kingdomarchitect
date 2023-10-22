@@ -11,7 +11,7 @@ import { Job } from "../job.js";
 
 type ChopTreeBundle = {
     targetEntityId: string;
-}
+};
 
 /**
  * Represents a multistep job that will move towards a tree and then chop

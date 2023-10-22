@@ -19,4 +19,4 @@ export type SelectedWorldItem = {
      * @param item the other item to check if is the selected item
      */
     isSelectedItem(item: unknown): boolean;
-}
+};

@@ -6,7 +6,7 @@ import { Job } from "../job.js";
 
 type BuildBundle = {
     entityId: string;
-}
+};
 
 export class BuildJob extends Job<BuildBundle> {
     private buildingComponent: BuildingComponent | null = null;

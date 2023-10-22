@@ -13,7 +13,7 @@ export type GameTime = {
     readonly fractionalTimeOfDay: number;
 
     readonly nextTimeOfDay: TimeOfDay[];
-}
+};
 
 export enum TimeOfDay {
     Dawn,

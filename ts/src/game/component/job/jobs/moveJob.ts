@@ -6,7 +6,7 @@ import { JobConstraint } from "../jobConstraint.js";
 
 type MoveBundle = {
     path: Point[];
-}
+};
 
 /**
  * Represents a job that will move through a specific path and complete once

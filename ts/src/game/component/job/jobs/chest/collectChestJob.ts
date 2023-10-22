@@ -4,7 +4,7 @@ import { Job } from "../../job.js";
 
 type CollectChestBundle = {
     entityId: string;
-}
+};
 
 export class CollectChestJob extends Job<CollectChestBundle> {
     private chest: ChestComponent | null = null;

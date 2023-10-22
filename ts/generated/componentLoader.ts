@@ -1,5 +1,5 @@
-import { ConstructorFunction } from "../src/common/constructor.js"
-import { EntityComponent } from "../src/game/component/entityComponent.js"
+import { ConstructorFunction } from "../src/common/constructor.js";
+import { EntityComponent } from "../src/game/component/entityComponent.js";
 import { TilesComponent } from "../src/game/component/tile/tilesComponent.js";
 import { WorkerBehaviorComponent } from "../src/game/component/behavior/workerBehaviorComponent.js";
 import { ChunkMapComponent } from "../src/game/component/root/chunk/chunkMapComponent.js";

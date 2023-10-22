@@ -4,7 +4,7 @@ import { EntityComponent } from "../entityComponent.js";
 type EquipmentBundle = {
     mainItem: InventoryItem | null;
     otherItem: InventoryItem | null;
-}
+};
 
 export class EquipmentComponent extends EntityComponent<EquipmentBundle> {
     private _mainItem: InventoryItem | null = null;

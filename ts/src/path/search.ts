@@ -179,9 +179,9 @@ export type SearchedNode = {
     weight: number;
     visited: boolean;
     totalCost: number;
-}
+};
 
 export type SearchResult = {
     path: Point[];
     graph: SearchedNode[];
-}
+};

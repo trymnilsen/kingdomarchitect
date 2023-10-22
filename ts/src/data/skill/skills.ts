@@ -9,7 +9,7 @@ type SkillsObject = {
     melee: SkillTree;
     productivity: SkillTree;
     ranged: SkillTree;
-}
+};
 
 export const skills: SkillsObject = {
     magic: magicSkills,

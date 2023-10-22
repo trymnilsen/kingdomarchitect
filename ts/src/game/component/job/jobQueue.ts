@@ -19,4 +19,4 @@ export type JobQueue = {
      * @param job the job to remove
      */
     removeJob(job: Job): void;
-}
+};

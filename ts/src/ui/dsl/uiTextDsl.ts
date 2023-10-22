@@ -10,7 +10,7 @@ export type UITextProperties = {
     alignment?: Point;
     padding?: Sides;
     wrap?: boolean;
-} & UIViewProperties
+} & UIViewProperties;
 
 export function uiText(textProperties: UITextProperties): UIText {
     const text = new UIText({

@@ -6,12 +6,12 @@ import { UIViewProperties } from "./uiViewDsl.js";
 export type RowChild = {
     child: UIView;
     weight?: number;
-}
+};
 
 export type UIColumnProperties = {
     verticalAlignment?: VerticalAlignment;
     children: RowChild[];
-} & UIViewProperties
+} & UIViewProperties;
 
 export function uiRow(rowProperties: UIColumnProperties): UIRow {
     const row = new UIRow({

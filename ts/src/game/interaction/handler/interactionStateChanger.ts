@@ -7,7 +7,7 @@ export type InteractionStateChanger = {
     pop(result: unknown): void;
     clear(): void;
     hasOperations: boolean;
-}
+};
 
 export class CommitableInteractionStateChanger
     implements InteractionStateChanger
@@ -79,19 +79,19 @@ type StateOperation =
 type PopOperation = {
     type: "pop";
     result: unknown;
-}
+};
 
 type ReplaceOperation = {
     type: "replace";
     newState: InteractionState;
-}
+};
 
 type PushOperation = {
     type: "push";
     newState: InteractionState;
     onPushCallback?: (value: unknown) => void;
-}
+};
 
 type ClearOperation = {
     type: "clear";
-}
+};

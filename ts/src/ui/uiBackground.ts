@@ -6,7 +6,7 @@ import { UISize } from "./uiSize.js";
 
 export type UIBackground = {
     draw(context: UIRenderContext, screenPosition: Point, size: UISize): void;
-}
+};
 
 export class ColorBackground implements UIBackground {
     constructor(private color: string) {}

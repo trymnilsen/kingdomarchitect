@@ -2,7 +2,7 @@ export type TextStyle = {
     color: string;
     font: string;
     size: number;
-}
+};
 
 export const defaultTextStyle: TextStyle = {
     color: "black",

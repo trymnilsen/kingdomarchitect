@@ -6,7 +6,7 @@ import { Sprite2 } from "../../asset/sprite.js";
 export type UIImageProperties = {
     image: UIImageSource;
     scale?: number;
-} & UIViewProperties
+} & UIViewProperties;
 
 export function spriteImageSource(sprite: Sprite2): UIImageSource {
     return new UISpriteImageSource(sprite);

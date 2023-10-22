@@ -4,7 +4,7 @@ import { JobRunnerComponent } from "../jobRunnerComponent.js";
 
 export type JobQuery = {
     matches(job: Job): boolean;
-}
+};
 
 export function query(
     entity: Entity,

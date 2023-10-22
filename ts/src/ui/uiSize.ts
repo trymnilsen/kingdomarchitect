@@ -16,7 +16,7 @@ export const fillUiSize = -2;
 export type UISize = {
     height: number;
     width: number;
-}
+};
 
 /**
  * Check if a given UISize's width and height matches another UISize's

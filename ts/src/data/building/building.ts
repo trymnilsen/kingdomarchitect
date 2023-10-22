@@ -7,7 +7,7 @@ export type Building = {
     id: string;
     scale: 1 | 2;
     adjacencySprite?: (adjacentBuildings: Adjacency) => Sprite2;
-}
+};
 
 export const nullBuildingId = "nullBuilding";
 export const nullBuilding: Building = {

@@ -10,7 +10,7 @@ export type UIBoxProperties = {
     background?: UIBackground;
     padding?: Sides;
     children?: UIView[];
-} & UIViewProperties
+} & UIViewProperties;
 
 export function uiBox(uiBoxProperties: UIBoxProperties): UIBox {
     const box = new UIBox({

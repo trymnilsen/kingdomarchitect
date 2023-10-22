@@ -2,7 +2,7 @@ import { Sprite2 } from "./sprite.js";
 
 export type SpriteAnimation = {
     frames: number;
-} & Sprite2
+} & Sprite2;
 
 export function spriteFromAnimation(
     sprite: SpriteAnimation,

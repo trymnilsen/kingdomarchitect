@@ -15,7 +15,7 @@ export type InputAction = {
     isShifted: boolean;
     action: InputActionType;
     value: string;
-}
+};
 
 export function getDirectionFromInputType(
     action: InputActionType,

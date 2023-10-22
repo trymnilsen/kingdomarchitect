@@ -33,7 +33,7 @@ export type TextConfiguration = {
     align?: "left" | "center" | "right";
     width?: number;
     weight?: "normal" | "bold";
-} & RenderItemConfiguration
+} & RenderItemConfiguration;
 
 export function configureText(
     renderItem: TextConfiguration,

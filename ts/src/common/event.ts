@@ -64,14 +64,14 @@ export type EventListener<T> = {
      * is invoked after the first emit it has no effect.
      */
     listenOnce(subscriber: EventSubscriptionHandler<T>): EventHandle;
-}
+};
 
 /**
  * A publisher of events without any ability to listen
  */
 export type EventPublisher<T> = {
     publish(data: T): void;
-}
+};
 
 /**
  * A function to be called each time the data of an event is updated

@@ -1,7 +1,7 @@
 export type AxisPlacement = {
     start: number;
     end: number;
-}
+};
 
 /**
  * Given an array of offsets for views, shift the placement of following views

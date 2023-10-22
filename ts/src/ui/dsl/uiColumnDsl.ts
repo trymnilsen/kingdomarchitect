@@ -6,13 +6,13 @@ import { UIViewProperties } from "./uiViewDsl.js";
 export type ColumnChild = {
     child: UIView;
     weight?: number;
-}
+};
 
 export type UIColumnProperties = {
     horizontalAlignment?: HorizontalAlignment;
     children: ColumnChild[];
     weights?: Record<string, number>;
-} & UIViewProperties
+} & UIViewProperties;
 
 export function uiColumn(columnProperties: UIColumnProperties): UIColumn {
     const column = new UIColumn({

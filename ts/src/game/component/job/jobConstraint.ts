@@ -22,7 +22,7 @@ export function isJobApplicableForEntity(
 export type JobConstraint = {
     key: JobConstraintNames;
     value: JSONValue;
-}
+};
 
 export function entityInstanceConstraint(entityId: string) {
     return jobConstraint("entityInstance", entityId);

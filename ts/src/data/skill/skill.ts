@@ -10,6 +10,6 @@ export enum SkillCategory {
 export type Skill = {
     asset: Sprite2;
     name: string;
-}
+};
 
 export type SkillTree = Skill[][];

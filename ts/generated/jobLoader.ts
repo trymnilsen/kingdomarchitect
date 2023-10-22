@@ -1,5 +1,5 @@
-import { ConstructorFunction } from "../src/common/constructor.js"
-import { Job } from "../src/game/component/job/job.js"
+import { ConstructorFunction } from "../src/common/constructor.js";
+import { Job } from "../src/game/component/job/job.js";
 import { LookForFoodJob } from "../src/game/component/actor/mob/LookForFoodJob.js";
 import { AttackJob } from "../src/game/component/actor/mob/attackJob.js";
 import { BuildJob } from "../src/game/component/job/jobs/buildJob.js";

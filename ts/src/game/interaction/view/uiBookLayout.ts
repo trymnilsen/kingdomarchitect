@@ -278,7 +278,7 @@ export type UIBookLayoutTab = {
     icon: Sprite2;
     onTap: (index: number) => void;
     isSelected: boolean;
-}
+};
 
 const pageWidth = 300;
 const pageHeight = 500;

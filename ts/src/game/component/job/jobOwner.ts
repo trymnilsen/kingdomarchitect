@@ -15,4 +15,4 @@ export type JobOwner = {
      * @param job
      */
     onComplete(job: Job): void;
-}
+};

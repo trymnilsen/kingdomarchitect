@@ -3,7 +3,7 @@ export type Sides = {
     left: number;
     right: number;
     bottom: number;
-}
+};
 
 export function allSides(size: number): Sides {
     return {

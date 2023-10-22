@@ -7,7 +7,7 @@ export type SpriteConfiguration = {
     frame?: number;
     targetWidth?: number;
     targetHeight?: number;
-} & RenderItemConfiguration
+} & RenderItemConfiguration;
 
 export type NinePatchSpriteConfiguration = {
     sprite: Sprite2;
@@ -15,7 +15,7 @@ export type NinePatchSpriteConfiguration = {
     width: number;
     height: number;
     scale: number;
-} & RenderItemConfiguration
+} & RenderItemConfiguration;
 
 export function spriteRenderer(
     x: number,

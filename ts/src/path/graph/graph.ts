@@ -9,7 +9,7 @@ export type Graph = {
     getNodes(): GraphNode[];
     readonly offsetX: number;
     readonly offsetY: number;
-}
+};
 
 export class GraphNode {
     private _x: number;

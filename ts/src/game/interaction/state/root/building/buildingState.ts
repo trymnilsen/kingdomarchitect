@@ -329,4 +329,4 @@ export class BuildingState extends InteractionState {
 type BuildingListEntry = {
     sprite: Sprite2;
     name: string;
-}
+};

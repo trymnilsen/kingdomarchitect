@@ -5,7 +5,7 @@ import { Event, EventListener } from "../common/event.js";
 export type InputEvent = {
     action: InputAction;
     inputType: InputType;
-}
+};
 export enum InputType {
     Keyboard,
 }

@@ -43,7 +43,7 @@ export type Bounds = {
      * The south east y component
      */
     y2: number;
-}
+};
 
 export function boundsCenter(bounds: Bounds): Point {
     const width = bounds.x2 - bounds.x1;

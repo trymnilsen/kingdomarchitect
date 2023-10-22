@@ -5,7 +5,7 @@ import { StateContext } from "./stateContext.js";
 type InteractionStateHistoryEntry = {
     state: InteractionState;
     onPop?: (value: unknown) => void;
-}
+};
 
 /**
  * The InteractionStateHistory contains a stack of InteractionStates that

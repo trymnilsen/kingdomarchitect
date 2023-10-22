@@ -1,6 +1,6 @@
 export type Visitable = {
     children: Visitable[];
-}
+};
 
 /**
  * Visit the entity and each of the children and nested

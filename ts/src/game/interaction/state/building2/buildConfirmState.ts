@@ -287,4 +287,4 @@ type SelectedTile = {
     isAvailable: boolean;
     x: number;
     y: number;
-}
+};

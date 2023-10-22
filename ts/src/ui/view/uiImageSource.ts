@@ -7,7 +7,7 @@ import { UISize } from "../uiSize.js";
 export type UIImageSource = {
     measure(layoutContext: UILayoutContext): UISize;
     draw(context: UIRenderContext, screenposition: Point, size: UISize): void;
-}
+};
 
 export class UISpriteImageSource implements UIImageSource {
     constructor(private sprite: Sprite2) {}

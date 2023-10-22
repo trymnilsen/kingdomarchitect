@@ -5,4 +5,4 @@ import { UISize } from "./uiSize.js";
 export type UILayoutContext = {
     measureText(text: string, textStyle: TextStyle): UISize;
     measureSprite(sprite: Sprite2): UISize;
-}
+};

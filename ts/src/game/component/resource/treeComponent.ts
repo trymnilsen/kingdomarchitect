@@ -14,7 +14,7 @@ type TreeBundle = {
     tree: number;
     previousTick: number;
     chopState: TreeComponentChopState;
-}
+};
 
 export class TreeComponent extends EntityComponent<TreeBundle> {
     private chopTime?: number;
