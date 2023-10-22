@@ -1,4 +1,3 @@
-import { describe, it } from "node:test";
 import * as assert from "node:assert";
 import { Entity } from "../../../src/game/entity/entity.js";
 import { createRootEntity } from "../../../src/game/entity/rootEntity.js";

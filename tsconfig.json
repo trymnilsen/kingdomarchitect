@@ -24,7 +24,8 @@
       "outDir": "./build",
       "incremental": true,
       "types": [
-        "node"
+        "node",
+        "mocha"
       ]
     },
     "include": [

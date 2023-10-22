@@ -228,7 +228,6 @@ export class Entity {
      * @returns the entity at the end of the parent chain
      */
     getRootEntity(): Entity {
-        // eslint-disable-next-line @typescript-eslint/no-this-alias
         let root: Entity | undefined = this;
         while (root?._parent) {
             root = root.parent;
@@ -350,7 +349,6 @@ export class Entity {
     getAncestorComponent<TFilter extends EntityComponent>(
         filterType: ConstructorFunction<TFilter>,
     ): TFilter | null {
-        // eslint-disable-next-line @typescript-eslint/no-this-alias
         let entityToLookOn: Entity | undefined = this;
 
         while (entityToLookOn) {

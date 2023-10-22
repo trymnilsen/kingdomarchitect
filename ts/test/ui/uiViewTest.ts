@@ -1,4 +1,3 @@
-import { describe, it } from "node:test";
 import * as assert from "node:assert";
 import { uiBox } from "../../src/ui/dsl/uiBoxDsl.js";
 import { doTestLayout } from "./layoutContextStub.js";

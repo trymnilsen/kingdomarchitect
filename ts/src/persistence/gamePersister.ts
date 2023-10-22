@@ -28,7 +28,6 @@ export class GamePersister {
         const saveTime = saveTimeEnd - saveTimeStart;
     }
 
-    /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument */
     loadWorld(): LoadedItems {
         const loadTimeStart = performance.now();
         const bundleSetsAsJson = window.localStorage.getItem("bundles")!;
@@ -49,5 +48,4 @@ export class GamePersister {
             cameraPosition,
         };
     }
-    /* eslint-enable */
 }

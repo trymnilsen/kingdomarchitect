@@ -1,4 +1,3 @@
-import { describe, it } from "node:test";
 import * as assert from "node:assert";
 import { HousingComponent } from "../../../../src/game/component/housing/housingComponent.js";
 import { TenantComponent } from "../../../../src/game/component/housing/tenantComponent.js";

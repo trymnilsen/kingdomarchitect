@@ -4,11 +4,9 @@
 ![Screenshot of the game](screenshot/gameplay.png)
 
 ## 🕹️ Play
-
 You can either clone this repository and run it based on the instructions on how to run the game below, or try the last version out at [https://kingdomarchitect.netlify.app](https://kingdomarchitect.netlify.app)
 
 ### How to play
-
 - Gather resources
 - Unlock land
 - Build houses to spawn workers
@@ -16,13 +14,10 @@ You can either clone this repository and run it based on the instructions on how
 - Defend against enemy mobs
 
 ### Controls
-
 #### Pointer/Touch input
-
 Tap the item you would like to select or activate
 
 #### Keyboard input
-
 `WASD`: Use the W,A,S,D keys to move the cursor or selected items directionally
 
 `Escape`: Go back, cancel or unselect
@@ -38,11 +33,9 @@ Tap the item you would like to select or activate
 `K`: Activate the second secondary actionbar item
 
 #### Gamepad input
-
 Not yet available
 
 ## 📜 About the project
-
 Kingdom architects is intended to be a combined simulation and city building game around building your own kingdom and protecting it from hordes of evil monsters. It is intended to be single-player and playable both on mobile screens and desktop size clients. Your kingdom might last for decades or only seconds, who knows what the legends of your reign will be.
 
 ### Goals for the project
@@ -50,7 +43,6 @@ Kingdom architects is intended to be a combined simulation and city building gam
 - Only depend on browser-apis, no extra libraries.
 
 ## 🙋 Contributing
-
 ### I have a suggestion for a feature
 Great, if you feel like it aligns with the goal for the project open a thread under discussion with some details on your idea
 
@@ -61,8 +53,13 @@ Fantastic, getting bug reports is important. File an issue with steps to reprodu
 Wow, thanks! First see if there are any open issues or open a thread under discussion on the improvement or contribution you would like to make.
 
 ## 👩‍💻 Development
+### Requirements
+- Node v20 or higher
+- A http server to serve the built files
+- An editor to edit typescript with
 
-Install the required development packages (typescript and rollup) with `npm i`. Build and bundle the typescript source with `npm run build`, you should then be able to run it with the `npm run start` command and get a link in your terminal to test out the locally built version in your browser of choice. Your favourite IDE can be used to edit any game code. If you want to contribute on the development on the game, here follows some notes on the architecture for the game/application and some tools used during development.
+### Get set up
+Install the required development packages (typescript and rollup) with `npm i`. Build and bundle the typescript source with `npm run build`. You and then use your development server of choice and your favourite IDE to edit any game code. If you want to contribute on the development on the game, here follows some notes on the architecture for the game/application and some tools used during development.
 
 ### Concepts
 The architecture of the game is loosely based around three concepts:
@@ -84,7 +81,6 @@ A entity component system is in the works where all items in the world are tied 
 Items that are not directly connected to the game world, like menus and screens are considered `InteractionStates` these are screens that can be navigated to and from in a stack. States can draw custom actions and handle events as well as setting up complex views using the custom UI system
 
 ### Folder Structure
-
 | Folder name | Function                                                      |
 |-------------|---------------------------------------------------------------|
 | asset       | code related to load and lookup of assets can be found here.  |
@@ -98,29 +94,23 @@ Items that are not directly connected to the game world, like menus and screens 
 | ui          | a custom ui system for setting up GUI elements and screens    |
 
 ### Tooling
-
 #### Transpiling and bundling
-
 Typescript and rollup is used for transpiling, typechecking and bundling the code.
 This is performed with the `build` npm task.
 
 ### Testing
-
 Note: The test suite uses the node test runner and requires node >=20.
 
 Some tests already exists for the game, these are made with the built in node test runner. Note that files are not automatically built when tests are run. These needs to be built independently (however the `npm test` script includes the tsc step before the tests are run). Some files are currently just scaffold and some contain actuall test code. Tests can be run with `npm  test`.
 
 ### Custom tooling
-
 #### Spritepacking
-
 - **Task:** `spritepack`
 - **Note:** typescript sources needs to be built before the task can run
 
 To optimize, remove unused parts of images and bundling them together into a spritebin the `spritepack` npm task can be used. If you update any of the images in `asset` you need to run this task to get the updated version to show up in game. The source for this can be found in `ts/tool/spritepack`.
 
 #### Typelistgen
-
 - **Task:** `generate-loaders`
 - **Note:** typescript sources needs to be built before the task can run
 
@@ -128,5 +118,4 @@ To support persisting and loading the state of components and jobs, we need a li
 npm task.
 
 ## ❓ FAQ
-
 No questions so far

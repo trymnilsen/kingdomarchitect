@@ -1,4 +1,3 @@
-import { describe, it } from "node:test";
 import * as assert from "node:assert";
 import { StubComponent } from "../component/stubComponent.js";
 import { RequireError } from "../../../src/common/error/requireError.js";
