@@ -30,7 +30,7 @@
         "@types/node": "^20.8.0",
         "@typescript-eslint/eslint-plugin": "^6.7.3",
         "@typescript-eslint/parser": "^6.7.3",
-        "eslint": "^8.50.0",
+        "eslint": "^8.52.0",
         "http-server": "^14.1.1",
         "jimp": "^0.22.10",
         "maxrects-packer": "^2.7.3",
