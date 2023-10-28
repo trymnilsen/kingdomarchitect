@@ -12,7 +12,7 @@
         "build": "tsc && rollup -c",
         "spritepack": "tsc && node build/tool/spritepack/spritePack.js",
         "generate-loaders": "tsc && node build/tool/typelistgen/typelistgen.js",
-        "test": "tsc && node --test --test-reporter=dot",
+        "test": "tsc && mocha",
         "bundle": "rollup -c",
         "format": "prettier ts/ --write",
         "check-format": "prettier ts/ --check"

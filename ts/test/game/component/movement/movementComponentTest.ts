@@ -1,6 +1,10 @@
 import * as assert from "node:assert";
 
 describe("Movement component", () => {
+    it("Will persist the current movement for the movement component", () => {
+        assert.equal(2, 2);
+    });
+
     it("Path towards will move towards", () => {
         assert.equal(2, 2);
     });
@@ -22,6 +26,14 @@ describe("Movement component", () => {
     });
 
     it("Path to will return false if movement in not possible", () => {
+        assert.equal(2, 2);
+    });
+
+    it("Path will require energy", () => {
+        assert.equal(2, 2);
+    });
+
+    it("Path to will not move if no energy is available", () => {
         assert.equal(2, 2);
     });
 
@@ -63,15 +75,23 @@ describe("Shuffling", () => {
         assert.equal(2, 2);
     });
 
+    it("Shuffling will move perpendicular to incoming movement", () => {
+        assert.equal(2, 2);
+    });
+
     it("Shuffling will propagate shuffling if actor is in the way", () => {
         assert.equal(2, 2);
     });
 
-    it("Shuffling will return true if possible", () => {
+    it("A shuffled actor will return to their path if possible", () => {
         assert.equal(2, 2);
     });
 
-    it("A shuffled actor will return to their path if possible", () => {
+    it("Shuffling will consume energy", () => {
+        assert.equal(2, 2);
+    });
+
+    it("Shuffling will return 0 if no energy is available", () => {
         assert.equal(2, 2);
     });
 
