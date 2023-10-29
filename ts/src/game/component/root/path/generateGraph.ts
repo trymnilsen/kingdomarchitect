@@ -82,7 +82,6 @@ function getWeightAtPoint(
         y: point.y,
     });
     if (!ground) {
-        console.log(`No ground at ${point.x}, ${point.y} setting to 0`);
         weight = 0;
     } else {
         weight = 10;
