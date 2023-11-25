@@ -7,6 +7,7 @@ import { InventoryComponent } from "../../../component/inventory/inventoryCompon
 import { TreeComponent } from "../../../component/resource/treeComponent.js";
 import { Entity, assertEntity } from "../../../entity/entity.js";
 import { assertEntityComponent } from "../../entityComponent.js";
+import { MovementComponent } from "../../movement/movementComponent.js";
 import { Job } from "../job.js";
 
 type ChopTreeBundle = {
@@ -74,7 +75,10 @@ export class ChopTreeJob extends Job<ChopTreeBundle> {
                 this.complete();
             }
         } else {
-            this.movement.pathTowards(this._target.worldPosition);
+            const movementComponent =
+                this.entity.requireComponent(MovementComponent);
+
+            movementComponent.pathTo(this._target.worldPosition);
         }
     }
 

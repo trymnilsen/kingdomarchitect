@@ -2,6 +2,7 @@ import { Entity } from "../../../entity/entity.js";
 import { BuildingComponent } from "../../building/buildingComponent.js";
 import { assertEntityComponent } from "../../entityComponent.js";
 import { HealthComponent } from "../../health/healthComponent.js";
+import { MovementComponent } from "../../movement/movementComponent.js";
 import { Job } from "../job.js";
 
 type BuildBundle = {
@@ -35,7 +36,10 @@ export class BuildJob extends Job<BuildBundle> {
                 this.complete();
             }
         } else {
-            this.movement.pathTowards(target);
+            const movementComponent =
+                this.entity.requireComponent(MovementComponent);
+
+            movementComponent.pathTo(target);
         }
     }
 

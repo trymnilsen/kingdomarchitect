@@ -7,6 +7,12 @@ export const woodResourceItem: InventoryItem = {
     name: "Block of wood",
 };
 
+export const wheatResourceItem: InventoryItem = {
+    asset: sprites2.farm_4,
+    id: "wheat",
+    name: "Wheat",
+};
+
 export const stoneResource: InventoryItem = {
     asset: sprites2.stone_resource,
     id: "stone",

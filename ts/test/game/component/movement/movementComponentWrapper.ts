@@ -1,17 +1,20 @@
 import { Event } from "../../../../src/common/event.js";
 import { Point } from "../../../../src/common/point.js";
+import { EnergyComponent } from "../../../../src/game/component/energy/energyComponent.js";
 import {
     CurrentMovement,
     CurrentMovementUpdatedEvent,
 } from "../../../../src/game/component/movement/currentMovement.js";
 import { MovementComponent } from "../../../../src/game/component/movement/movementComponent.js";
+import { Entity } from "../../../../src/game/entity/entity.js";
 import { EntityEvent } from "../../../../src/game/entity/entityEvent.js";
 import { BoundMethod } from "../../../../util/boundDecorator.js";
 
 export class MovementComponentWrapper {
     private _onMovementUpdated: Event<CurrentMovement> = new Event();
     private _movementUpdates: number = 0;
-    private _component: MovementComponent;
+    private _movementComponent: MovementComponent;
+    private _energyComponent: EnergyComponent;
     private _entityMovement: Point[] = [];
 
     public get movementUpdates(): number {
@@ -22,21 +25,34 @@ export class MovementComponentWrapper {
         return this._onMovementUpdated;
     }
 
-    public get component(): MovementComponent {
-        return this._component;
+    public get movementComponent(): MovementComponent {
+        return this._movementComponent;
+    }
+
+    public get energyComponent(): EnergyComponent {
+        return this._energyComponent;
     }
 
     public get entityMovement(): ReadonlyArray<Point> {
         return this._entityMovement;
     }
 
-    constructor(component: MovementComponent) {
-        this._component = component;
-        component.entity.componentEvents.listen(
+    public get entity(): Entity {
+        return this._movementComponent.entity;
+    }
+
+    constructor(
+        movementComponent: MovementComponent,
+        energyComponent: EnergyComponent,
+    ) {
+        this._movementComponent = movementComponent;
+        this._energyComponent = energyComponent;
+
+        movementComponent.entity.componentEvents.listen(
             CurrentMovementUpdatedEvent,
             this.onMovementUpdateEvent,
         );
-        component.entity.entityEvents.listen(this.onEntityEvent);
+        movementComponent.entity.entityEvents.listen(this.onEntityEvent);
     }
 
     resetMovementUpdatesCount() {

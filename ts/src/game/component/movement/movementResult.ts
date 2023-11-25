@@ -3,4 +3,5 @@ export enum MovementResult {
     NoPath,
     NotEnoughEnergy,
     AtPoint,
+    Obstructed,
 }

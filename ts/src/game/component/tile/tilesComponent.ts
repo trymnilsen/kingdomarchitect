@@ -78,6 +78,10 @@ export class TilesComponent
         this.tileMap[getTileId(tile.tileX, tile.tileY)] = tile;
     }
 
+    removeTile(x: number, y: number) {
+        delete this.tileMap[getTileId(x, y)];
+    }
+
     setChunk(chunk: GroundChunk) {
         this._chunkMap[getTileId(chunk.chunkX, chunk.chunkY)] = chunk;
     }

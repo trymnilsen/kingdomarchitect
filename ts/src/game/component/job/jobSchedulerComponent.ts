@@ -50,7 +50,6 @@ export class JobSchedulerComponent extends StatelessComponent {
         while (searchEntities.length > 0) {
             // Pick the first entity in the search list
             const entity = searchEntities.shift();
-            console.log("assignJobToAvailableEntity - search entity", entity);
             if (!entity) {
                 throw new InvalidStateError(
                     "Shifted item in list with >0 length was undefined",
@@ -78,6 +77,7 @@ export class JobSchedulerComponent extends StatelessComponent {
 
                 if (isApplicable) {
                     this.queue?.removeJob(scheduledJob.job);
+                    console.log("Assign job", scheduledJob.job, entity);
                     jobRunner.assignJob(scheduledJob.job);
                     return;
                 }

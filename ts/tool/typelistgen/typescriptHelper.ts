@@ -68,7 +68,16 @@ export function getClasses(
         }
     }
 
-    return output;
+    return output.sort((a, b) => {
+        if (a.name < b.name) {
+            return -1;
+        }
+        if (a.name > b.name) {
+            return 1;
+        }
+
+        return 0;
+    });
 }
 
 function nodeHasModifier(node: ts.Node, modifier: ts.ModifierFlags): boolean {

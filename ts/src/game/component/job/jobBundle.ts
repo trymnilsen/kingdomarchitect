@@ -6,5 +6,4 @@ export type JobBundle<T extends JSONValue = JSONValue> = {
     data: T;
     type: string;
     jobState: JobState;
-    movement?: PathMovement | null;
 };
