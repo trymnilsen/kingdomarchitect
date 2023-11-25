@@ -13,6 +13,7 @@ import {
     manaPotion,
     scroll,
     stoneResource,
+    wheatResourceItem,
     woodResourceItem,
 } from "../../../data/inventory/resources.js";
 import { EntityComponent } from "../entityComponent.js";
@@ -28,6 +29,10 @@ export class InventoryComponent extends EntityComponent<InventoryBundle> {
         [woodResourceItem.id]: {
             amount: 200000,
             item: woodResourceItem,
+        },
+        [wheatResourceItem.id]: {
+            amount: 200000,
+            item: wheatResourceItem,
         },
         [stoneResource.id]: {
             amount: 47,

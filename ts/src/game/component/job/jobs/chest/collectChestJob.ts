@@ -1,4 +1,5 @@
 import { InventoryComponent } from "../../../inventory/inventoryComponent.js";
+import { MovementComponent } from "../../../movement/movementComponent.js";
 import { ChestComponent } from "../../../resource/chestComponent.js";
 import { Job } from "../../job.js";
 
@@ -35,7 +36,10 @@ export class CollectChestJob extends Job<CollectChestBundle> {
             this.complete();
         } else {
             //Path towards the chest until we are adjacent to it
-            this.movement.pathTowards(this.chest.entity.worldPosition);
+            const movementComponent =
+                this.entity.requireComponent(MovementComponent);
+
+            movementComponent.pathTo(this.chest.entity.worldPosition);
         }
     }
 

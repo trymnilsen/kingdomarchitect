@@ -33,5 +33,6 @@
     "mochaExplorer.files": "build/test/**/*Test.js",
     "mochaExplorer.require": "source-map-support/register",
     "mochaExplorer.watch": "build/**/*.js",
-    "mochaExplorer.timeout": 0
+    "mochaExplorer.timeout": 0,
+    "typescript.tsdk": "node_modules/typescript/lib"
 }

@@ -4,7 +4,6 @@ import { JSONValue } from "../../../common/object.js";
 import { Point, isPointAdjacentTo } from "../../../common/point.js";
 import { RenderContext } from "../../../rendering/renderContext.js";
 import { Entity } from "../../entity/entity.js";
-import { MovementHelper, PathMovement } from "./helper/movementHelper.js";
 import { JobBundle } from "./jobBundle.js";
 import { JobConstraint } from "./jobConstraint.js";
 import { JobOwner } from "./jobOwner.js";
@@ -26,7 +25,6 @@ export abstract class Job<T extends JSONValue = JSONValue> {
     private _jobState: JobState = JobState.NotStarted;
     private _startTick = 0;
     private _owner: JobOwner | null = null;
-    private _movementHelper: MovementHelper | null = null;
     private _bundle: T | null = null;
     /**
      * Return the bundle this job was saved with
@@ -138,21 +136,6 @@ export abstract class Job<T extends JSONValue = JSONValue> {
         return false;
     }
 
-    get movement(): MovementHelper {
-        if (!this._entity) {
-            throw new Error(
-                "Cannot access movement helper before entity is set",
-            );
-        }
-        //Lazily create the helper if needed
-        if (!this._movementHelper) {
-            this._movementHelper = new MovementHelper();
-            this._movementHelper.entity = this.entity;
-        }
-
-        return this._movementHelper;
-    }
-
     /**
      * Restore the job from a persisted job bundle
      * @param bundle the persisted data to restore
@@ -160,9 +143,6 @@ export abstract class Job<T extends JSONValue = JSONValue> {
     fromJobBundle(bundle: JobBundle<T>): void {
         this._jobState = bundle.jobState;
         this._bundle = bundle.data;
-        if (bundle.movement) {
-            this.movement.currentMovement = bundle.movement;
-        }
         this.onFromPersistedState(bundle.data);
     }
 
@@ -175,7 +155,6 @@ export abstract class Job<T extends JSONValue = JSONValue> {
         const jobState = this.onPersistJobState();
         const bundle: JobBundle<T> = {
             jobState: this._jobState,
-            movement: this._movementHelper?.currentMovement,
             data: jobState,
             type: this.constructor.name,
         };

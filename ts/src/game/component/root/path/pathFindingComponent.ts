@@ -11,7 +11,7 @@ import { PathResult, PathResultStatus } from "./pathResult.js";
 export class PathFindingComponent extends StatelessComponent {
     private tileEventListener: TypedEventHandle | undefined;
     private chunkMapEventListener: TypedEventHandle | undefined;
-    private pathSearch: PathSearch | null = null;
+    protected pathSearch: PathSearch | null = null;
 
     constructor() {
         super();

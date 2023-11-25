@@ -2,7 +2,43 @@ import * as assert from "node:assert";
 import * as path from "path";
 import { Point, pointEquals, zeroPoint } from "../../src/common/point.js";
 import { getPixelColor, readPng } from "../../tool/spritepack/pngHelper.js";
+import { FixedGraph } from "../../src/path/graph/fixedGraph.js";
 
+/**
+ * Create an empty graph with the given size for testing. The graph will be
+ * a grid with the given width and height
+ * @param width the width of the graph
+ * @param height the height of the graph
+ * @returns the graph to use for pathfinding in the test
+ */
+export function createEmptyGraph(width: number, height: number): FixedGraph {
+    const weightGraph: number[][] = [];
+    for (let x = 0; x < width; x++) {
+        weightGraph[x] = [];
+        for (let y = 0; y < height; y++) {
+            weightGraph[x][y] = 1;
+        }
+    }
+    return new FixedGraph(() => {
+        return {
+            weights: weightGraph,
+            offsetX: 0,
+            offsetY: 0,
+        };
+    });
+}
+
+/**
+ * Create a graph from a given png file used for testing pathfinding.
+ * The result will include the graph as well as the start and end point.
+ *
+ * A red pixel represents the start point
+ * A green pixel represents the end point
+ * A blue pixel represents the expected path to assert against
+ * The weight is based on the average of the red green and blue components
+ * @param mazeName the filename of the maze as png
+ * @returns the test graph including graph, start and expected path
+ */
 export async function createGraphFromTestFile(
     mazeName: string,
 ): Promise<TestGraph> {

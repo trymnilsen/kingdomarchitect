@@ -36,9 +36,8 @@ export class Entity {
         ComponentEvent<EntityComponent>
     >();
     private _entityEvents = new Event<EntityEvent>();
+    private _componentsMap = new Map<string, EntityComponent>();
 
-    private _componentsMap: Record<string, EntityComponent> = {};
-    private _components: EntityComponent[] = [];
     constructor(readonly id: string) {}
 
     /**
@@ -123,7 +122,7 @@ export class Entity {
     }
 
     get components(): EntityComponent[] {
-        return this._components;
+        return Array.from(this._componentsMap.values());
     }
 
     /**
@@ -260,7 +259,7 @@ export class Entity {
     addComponent(entityComponent: EntityComponent) {
         const componentName = getConstructorName(entityComponent);
 
-        if (this._componentsMap[componentName]) {
+        if (this._componentsMap.get(componentName)) {
             throw new InvalidArgumentError(
                 `Component already added ${componentName}`,
             );
@@ -271,8 +270,7 @@ export class Entity {
             entityComponent.onStart(0);
         }
 
-        this._componentsMap[componentName] = entityComponent;
-        this._components = Object.values(this._componentsMap);
+        this._componentsMap.set(componentName, entityComponent);
     }
 
     /**
@@ -282,9 +280,8 @@ export class Entity {
      */
     removeComponent(entityComponent: EntityComponent): boolean {
         const componentName = getConstructorName(entityComponent);
-        if (this._componentsMap[componentName]) {
-            delete this._componentsMap[componentName];
-            this._components = Object.values(this._componentsMap);
+        if (this._componentsMap.get(componentName)) {
+            this._componentsMap.delete(componentName);
             if (this._parent) {
                 entityComponent.onStop(0);
             }
@@ -310,7 +307,7 @@ export class Entity {
         filterType: ConstructorFunction<TFilter>,
     ): TFilter | null {
         const componentId = filterType.name;
-        const component = this._componentsMap[componentId] as TFilter;
+        const component = this._componentsMap.get(componentId) as TFilter;
         return component || null;
     }
 
@@ -370,13 +367,13 @@ export class Entity {
      * @param renderContext the context used to render anything to the canvas
      */
     onDraw(renderContext: RenderContext) {
-        if (this._components.length > 0) {
+        if (this._componentsMap.size > 0) {
             //Calculating the screen position once for components
             const screenPosition = renderContext.camera.tileSpaceToScreenSpace(
                 this._worldPosition,
             );
-            for (const component of this._components) {
-                component.onDraw(renderContext, screenPosition);
+            for (const component of this._componentsMap) {
+                component[1].onDraw(renderContext, screenPosition);
             }
         }
 
@@ -390,8 +387,8 @@ export class Entity {
      * @param tick the current game time tick
      */
     onUpdate(tick: number) {
-        for (const component of this._components) {
-            component.onUpdate(tick);
+        for (const component of this._componentsMap) {
+            component[1].onUpdate(tick);
         }
 
         for (const child of this._children) {
