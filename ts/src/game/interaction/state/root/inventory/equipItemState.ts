@@ -129,13 +129,6 @@ export class EquipItemState extends InteractionState {
             throw new Error("No equipment component on selection");
         }
 
-        const spriteComponent =
-            this.cursorSelection.getComponent(SpriteComponent);
-
-        if (!spriteComponent) {
-            throw new Error("No sprite component");
-        }
-
         const removeResult = inventoryComponent.removeInventoryItem(
             this.inventoryItem.id,
             1,
@@ -143,21 +136,6 @@ export class EquipItemState extends InteractionState {
 
         if (removeResult) {
             equipmentComponent.mainItem = this.inventoryItem;
-            switch (this.inventoryItem.category) {
-                case ItemCategory.Melee:
-                    spriteComponent.updateSprite(sprites2.knight);
-                    break;
-                case ItemCategory.Ranged:
-                    spriteComponent.updateSprite(sprites2.bowman);
-                    break;
-                case ItemCategory.Magic:
-                    spriteComponent.updateSprite(sprites2.mage);
-                    break;
-                case ItemCategory.Productivity:
-                    spriteComponent.updateSprite(sprites2.worker);
-                    break;
-            }
-
             this.context.stateChanger.clear();
         } else {
             this.context.stateChanger.replace(

@@ -40,8 +40,8 @@ export class UIActionbarScaffold extends UIView {
 
     constructor(
         private contentView: UIView,
-        private leftItems: UIActionbarItem[],
-        private rightItems: UIActionbarItem[],
+        private leftItems: ReadonlyArray<UIActionbarItem>,
+        private rightItems: ReadonlyArray<UIActionbarItem>,
         size: UISize,
     ) {
         super(size);
@@ -52,7 +52,7 @@ export class UIActionbarScaffold extends UIView {
      * Update the actionbar buttons show in the left actionbar
      * @param items The updated set of items
      */
-    setLeftMenu(items: UIActionbarItem[]) {
+    setLeftMenu(items: ReadonlyArray<UIActionbarItem>) {
         this.leftItems = items;
         this._isDirty = true;
     }
@@ -61,7 +61,7 @@ export class UIActionbarScaffold extends UIView {
      * Update the actionbar buttons show in the right actionbar
      * @param items The updated set of items
      */
-    setRightMenu(items: UIActionbarItem[]) {
+    setRightMenu(items: ReadonlyArray<UIActionbarItem>) {
         this.rightItems = items;
         this._isDirty = true;
     }
@@ -269,7 +269,7 @@ export class UIActionbarScaffold extends UIView {
      * @returns a list of laid out actionbar buttons
      */
     private layoutActionItems(
-        actionbarItems: UIActionbarItem[],
+        actionbarItems: ReadonlyArray<UIActionbarItem>,
         layoutContext: UILayoutContext,
         width: number,
         height: number,
@@ -378,7 +378,7 @@ export class UIActionbarScaffold extends UIView {
      */
     private layoutSingleActionbar(
         _layoutContext: UILayoutContext,
-        items: UIActionbarItem[],
+        items: ReadonlyArray<UIActionbarItem>,
         orientation: Axis,
     ): SingleActionbarLayout {
         let totalWidth = 0;

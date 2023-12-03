@@ -10,7 +10,7 @@ import { UIActionbarButton } from "./uiActionbarButton.js";
 export type UIActionbarItem = {
     text: string;
     onClick?: () => void;
-    children?: Omit<UIActionbarItem, "children">[];
+    children?: ReadonlyArray<Omit<UIActionbarItem, "children">>;
     icon?: Sprite2;
 };
 

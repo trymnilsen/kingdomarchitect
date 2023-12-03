@@ -1,5 +1,5 @@
-import { ConstructorFunction } from "../src/common/constructor.js";
-import { EntityComponent } from "../src/game/component/entityComponent.js";
+import { ConstructorFunction } from "../src/common/constructor.js"
+import { EntityComponent } from "../src/game/component/entityComponent.js"
 import { AggroComponent } from "../src/game/component/actor/mob/aggroComponent.js";
 import { BuildingComponent } from "../src/game/component/building/buildingComponent.js";
 import { ChestComponent } from "../src/game/component/resource/chestComponent.js";
@@ -24,6 +24,7 @@ import { TileGeneratorComponent } from "../src/game/component/tile/tileGenerator
 import { TilesComponent } from "../src/game/component/tile/tilesComponent.js";
 import { TreeComponent } from "../src/game/component/resource/treeComponent.js";
 import { WorkerBehaviorComponent } from "../src/game/component/behavior/workerBehaviorComponent.js";
+import { WorkerSpriteComponent } from "../src/game/component/actor/mob/workerSpriteComponent.js";
 
 export const componentLoaders: ConstructorFunction<EntityComponent>[] = [
     AggroComponent,
@@ -50,4 +51,5 @@ export const componentLoaders: ConstructorFunction<EntityComponent>[] = [
     TilesComponent,
     TreeComponent,
     WorkerBehaviorComponent,
+    WorkerSpriteComponent,
 ];

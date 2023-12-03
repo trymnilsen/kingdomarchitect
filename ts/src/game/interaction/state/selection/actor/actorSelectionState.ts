@@ -6,7 +6,9 @@ import {
     ItemCategory,
 } from "../../../../../data/inventory/inventoryItem.js";
 import { RenderContext } from "../../../../../rendering/renderContext.js";
+import { SpriteComponent } from "../../../../component/draw/spriteComponent.js";
 import { EquipmentComponent } from "../../../../component/inventory/equipmentComponent.js";
+import { InventoryComponent } from "../../../../component/inventory/inventoryComponent.js";
 import { Entity } from "../../../../entity/entity.js";
 import { TileSize } from "../../../../tile/tile.js";
 import { InteractionState } from "../../../handler/interactionState.js";
@@ -14,42 +16,30 @@ import { UIActionbarItem } from "../../../view/actionbar/uiActionbar.js";
 import { CharacterSkillState } from "../../character/characterSkillState.js";
 import { ActorMovementState } from "./actorMovementState.js";
 import { ActorSelectionPresenter } from "./actorSelectionPresenter.js";
+import {
+    ActorSelectionProvider,
+    ButtonSelection,
+} from "./provider/actorSelectionProvider.js";
+import { WorkerSelectionProvider } from "./provider/workerSelectionProvider.js";
 
 export class ActorSelectionState extends InteractionState {
     private presenter: ActorSelectionPresenter | null = null;
-    private expandedMenuState = false;
+    private providers: ActorSelectionProvider[] = [
+        new WorkerSelectionProvider(),
+    ];
 
     constructor(private entity: Entity) {
         super();
     }
 
     override onActive(): void {
-        const items: UIActionbarItem[] = [
-            {
-                text: "Move",
-                onClick: () => {
-                    this.context.stateChanger.push(
-                        new ActorMovementState(this.entity),
-                    );
-                },
-            },
-            {
-                text: "Skills",
-                onClick: () => {
-                    this.context.stateChanger.push(new CharacterSkillState());
-                },
-            },
-            {
-                text: "Stats",
-            },
-            {
-                text: "Close",
-            },
-        ];
-
-        const rightItems = this.getRightItems();
-        this.presenter = new ActorSelectionPresenter(items, rightItems);
+        const items = this.getActionItems();
+        this.presenter = new ActorSelectionPresenter(items.left, items.right);
         this.view = this.presenter.root;
+    }
+
+    override onUpdate(_tick: number): void {
+        this.updateActionbarItems();
     }
 
     override onDraw(context: RenderContext): void {
@@ -70,103 +60,25 @@ export class ActorSelectionState extends InteractionState {
         });
     }
 
-    private getRightItems(): UIActionbarItem[] {
-        const items: UIActionbarItem[] = [];
-        const equipment = this.entity.getComponent(EquipmentComponent);
-        if (equipment?.mainItem) {
-            items.push({
-                text: "Main",
-                children: this.getEquipmentAction(equipment.mainItem),
-                icon: equipment.mainItem.asset,
-            });
-        } else {
-            items.push({
-                text: "Main",
-                icon: sprites2.empty_sprite,
-                children: this.getEmptyMainEquipmentAction(),
-            });
+    private getActionItems(): ButtonSelection {
+        const leftItems: UIActionbarItem[] = [];
+        const rightItems: UIActionbarItem[] = [];
+
+        for (const provider of this.providers) {
+            const item = provider.provideButtons(this.context, this.entity);
+            leftItems.push(...item.left);
+            rightItems.push(...item.right);
         }
 
-        if (equipment?.otherItem) {
-            items.push({
-                text: "Other",
-                icon: equipment.otherItem.asset,
-            });
-        } else {
-            items.push({
-                text: "Other",
-                icon: sprites2.empty_sprite,
-                children: this.getEmptyOtherEquipmentAction(),
-            });
-        }
-
-        return items;
+        return {
+            left: leftItems,
+            right: rightItems,
+        };
     }
 
-    private getEmptyMainEquipmentAction(): UIActionbarItem[] {
-        return [
-            {
-                text: "Equip",
-                onClick: () => {
-                    //this.onMainItemTap();
-                },
-                icon: sprites2.empty_sprite,
-            },
-        ];
-    }
-
-    private getEmptyOtherEquipmentAction(): UIActionbarItem[] {
-        return [
-            {
-                text: "Equip",
-                onClick: () => {
-                    //this.onMainItemTap();
-                },
-                icon: sprites2.empty_sprite,
-            },
-        ];
-    }
-
-    private getEquipmentAction(
-        _inventoryItem: InventoryItem,
-    ): UIActionbarItem[] | undefined {
-        return [
-            {
-                text: "Unequip",
-                onClick: () => {
-                    //this.onMainItemTap();
-                },
-                icon: sprites2.empty_sprite,
-            },
-            {
-                text: "Attack",
-                onClick: () => {
-                    //this.onMainItemTap();
-                },
-                icon: sprites2.empty_sprite,
-            },
-            {
-                text: "Defend",
-                onClick: () => {
-                    //this.onMainItemTap();
-                },
-                icon: sprites2.empty_sprite,
-            },
-        ];
-    }
-
-    private onMainItemTap() {
-        if (!this.presenter) {
-            throw new Error("Presenter not set");
-        }
-        this.expandedMenuState = true;
-        this.presenter.setExpandedMenu([
-            {
-                text: "Unequip",
-            },
-            {
-                text: "Attack",
-            },
-        ]);
+    private updateActionbarItems() {
+        const items = this.getActionItems();
+        this.presenter?.setLeftMenu(items.left);
+        this.presenter?.setRightMenu(items.right);
     }
 }
