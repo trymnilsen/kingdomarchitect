@@ -22,14 +22,16 @@ import { UIMasterDetails } from "../../../../../ui/view/uiMasterDetail.js";
 import { OpenBookUIBackground } from "../../../../../ui/visual/bookBackground.js";
 import { InventoryComponent } from "../../../../component/inventory/inventoryComponent.js";
 import { InteractionState } from "../../../handler/interactionState.js";
+import { StateContext } from "../../../handler/stateContext.js";
 import { UIActionbarItem } from "../../../view/actionbar/uiActionbar.js";
 import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold.js";
 import { AlertMessageState } from "../../common/alertMessageState.js";
-import { EquipItemState } from "./equipItemState.js";
+import { EquipItemConfirmState } from "./equipItemConfirmState.js";
 import { UIInventoryGridItem } from "./uiInventoryGridItem.js";
 
 export class InventoryState extends InteractionState {
     private _masterDetailsView!: UIMasterDetails;
+    private _equipAction: InventoryEquipAction;
     private _selectedGridItemView: UIInventoryGridItem | undefined;
     private _scaffold: UIActionbarScaffold | null = null;
     private _items: InventoryItemList = [];
@@ -39,8 +41,9 @@ export class InventoryState extends InteractionState {
         return true;
     }
 
-    constructor() {
+    constructor(equipmentAction: InventoryEquipAction) {
         super();
+        this._equipAction = equipmentAction;
     }
 
     override onActive(): void {
@@ -107,6 +110,7 @@ export class InventoryState extends InteractionState {
             width: fillUiSize,
             height: fillUiSize,
         });
+
         gridView.gridItemSize = 50;
 
         for (let i = 0; i < 24; i++) {
@@ -320,16 +324,15 @@ export class InventoryState extends InteractionState {
             });
 
             const activeItem = this._items[this._activeItem];
-            if (
-                activeItem &&
-                activeItem.item.tag?.some((tag) => tag === ItemTag.SkillGear)
-            ) {
+
+            if (activeItem && this._equipAction.isApplicable(activeItem.item)) {
                 actions.push({
                     text: "Equip",
                     icon: sprites2.empty_sprite,
                     onClick: () => {
-                        this.context.stateChanger.push(
-                            new EquipItemState(activeItem.item),
+                        this._equipAction.onEquip(
+                            activeItem.item,
+                            this.context,
                         );
                     },
                 });
@@ -361,4 +364,9 @@ export function getAssetImage(index: number): Sprite2 | null {
         default:
             return null;
     }
+}
+
+export interface InventoryEquipAction {
+    onEquip(item: InventoryItem, stateContext: StateContext);
+    isApplicable(item: InventoryItem): boolean;
 }

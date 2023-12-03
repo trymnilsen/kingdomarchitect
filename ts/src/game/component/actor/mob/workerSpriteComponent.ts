@@ -20,7 +20,7 @@ export class WorkerSpriteComponent extends StatelessComponent {
 
     private getSprite(): Sprite2 {
         const equipment = this.entity.requireComponent(EquipmentComponent);
-        const mainItem = equipment.mainItem;
+        const mainItem = equipment.mainItem.getItem();
         if (mainItem) {
             switch (mainItem.category) {
                 case ItemCategory.Melee:

@@ -1,5 +1,8 @@
 import { sprites2 } from "../../../../../../asset/sprite.js";
-import { InventoryItem } from "../../../../../../data/inventory/inventoryItem.js";
+import {
+    InventoryItem,
+    ItemTag,
+} from "../../../../../../data/inventory/inventoryItem.js";
 import { WorkerBehaviorComponent } from "../../../../../component/behavior/workerBehaviorComponent.js";
 import { SpriteComponent } from "../../../../../component/draw/spriteComponent.js";
 import { EquipmentComponent } from "../../../../../component/inventory/equipmentComponent.js";
@@ -8,6 +11,8 @@ import { Entity } from "../../../../../entity/entity.js";
 import { StateContext } from "../../../../handler/stateContext.js";
 import { UIActionbarItem } from "../../../../view/actionbar/uiActionbar.js";
 import { CharacterSkillState } from "../../../character/characterSkillState.js";
+import { EquipOnActorAction } from "../../../root/inventory/equipActions.js";
+import { InventoryState } from "../../../root/inventory/inventoryState.js";
 import { ActorMovementState } from "../actorMovementState.js";
 import {
     ActorSelectionProvider,
@@ -46,7 +51,7 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
         equipmentComponent: EquipmentComponent,
     ): UIActionbarItem[] {
         const items: UIActionbarItem[] = [];
-        const mainItem = equipmentComponent.mainItem;
+        const mainItem = equipmentComponent.mainItem.getItem();
 
         if (mainItem) {
             items.push({
@@ -62,11 +67,15 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
             items.push({
                 text: "Main",
                 icon: sprites2.empty_sprite,
-                children: this.getEmptyMainEquipmentAction(),
+                children: this.getEmptyMainEquipmentAction(
+                    stateContext,
+                    selectedEntity,
+                    equipmentComponent,
+                ),
             });
         }
 
-        const otherItem = equipmentComponent.otherItem;
+        const otherItem = equipmentComponent.otherItem.getItem();
 
         if (otherItem) {
             items.push({
@@ -77,7 +86,11 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
             items.push({
                 text: "Other",
                 icon: sprites2.empty_sprite,
-                children: this.getEmptyOtherEquipmentAction(),
+                children: this.getEmptyOtherEquipmentAction(
+                    stateContext,
+                    selectedEntity,
+                    equipmentComponent,
+                ),
             });
         }
 
@@ -114,24 +127,46 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
         return items;
     }
 
-    private getEmptyMainEquipmentAction(): UIActionbarItem[] {
+    private getEmptyMainEquipmentAction(
+        stateContext: StateContext,
+        selectedEntity: Entity,
+        equipmentComponent: EquipmentComponent,
+    ): UIActionbarItem[] {
         return [
             {
                 text: "Equip",
                 onClick: () => {
-                    //this.onMainItemTap();
+                    stateContext.stateChanger.push(
+                        new InventoryState(
+                            new EquipOnActorAction(
+                                selectedEntity,
+                                equipmentComponent.mainItem,
+                            ),
+                        ),
+                    );
                 },
                 icon: sprites2.empty_sprite,
             },
         ];
     }
 
-    private getEmptyOtherEquipmentAction(): UIActionbarItem[] {
+    private getEmptyOtherEquipmentAction(
+        stateContext: StateContext,
+        selectedEntity: Entity,
+        equipmentComponent: EquipmentComponent,
+    ): UIActionbarItem[] {
         return [
             {
                 text: "Equip",
                 onClick: () => {
-                    //this.onMainItemTap();
+                    stateContext.stateChanger.push(
+                        new InventoryState(
+                            new EquipOnActorAction(
+                                selectedEntity,
+                                equipmentComponent.otherItem,
+                            ),
+                        ),
+                    );
                 },
                 icon: sprites2.empty_sprite,
             },
@@ -139,7 +174,7 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
     }
 
     private getEquipmentAction(
-        inventoryItem: InventoryItem,
+        _inventoryItem: InventoryItem,
         stateContext: StateContext,
         selectedEntity: Entity,
     ): UIActionbarItem[] | undefined {
@@ -152,8 +187,7 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
                     const equipmentComponent =
                         selectedEntity.requireComponent(EquipmentComponent);
 
-                    inventoryComponent.addInventoryItem(inventoryItem, 1);
-                    equipmentComponent.mainItem = null;
+                    equipmentComponent.mainItem.setItem(null);
                 },
                 icon: sprites2.empty_sprite,
             },

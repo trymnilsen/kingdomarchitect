@@ -11,6 +11,7 @@ export type InventoryItem = {
 
 export enum ItemTag {
     SkillGear,
+    Consumable,
 }
 
 export enum ItemCategory {

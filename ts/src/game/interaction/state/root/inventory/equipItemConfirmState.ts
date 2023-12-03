@@ -16,11 +16,13 @@ import { Entity } from "../../../../entity/entity.js";
 import { GroundTile } from "../../../../tile/ground.js";
 import { TileSize } from "../../../../tile/tile.js";
 import { InteractionState } from "../../../handler/interactionState.js";
+import { StateContext } from "../../../handler/stateContext.js";
 import { UIActionbarItem } from "../../../view/actionbar/uiActionbar.js";
 import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold.js";
 import { AlertMessageState } from "../../common/alertMessageState.js";
+import { InventoryEquipAction } from "./inventoryState.js";
 
-export class EquipItemState extends InteractionState {
+export class EquipItemConfirmState extends InteractionState {
     private cursorSelection: Entity | null = null;
     private inventoryItem: InventoryItem;
 
@@ -135,7 +137,7 @@ export class EquipItemState extends InteractionState {
         );
 
         if (removeResult) {
-            equipmentComponent.mainItem = this.inventoryItem;
+            equipmentComponent.mainItem.setItem(this.inventoryItem);
             this.context.stateChanger.clear();
         } else {
             this.context.stateChanger.replace(
