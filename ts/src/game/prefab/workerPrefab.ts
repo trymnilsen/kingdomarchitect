@@ -12,6 +12,7 @@ import {
 import { MovementComponent } from "../component/movement/movementComponent.js";
 import { EnergyComponent } from "../component/energy/energyComponent.js";
 import { WorkerSpriteComponent } from "../component/actor/mob/workerSpriteComponent.js";
+import { EffectComponent } from "../component/effect/effectComponent.js";
 
 export function workerPrefab(id: string): Entity {
     const worker = new Entity(id);
@@ -21,18 +22,20 @@ export function workerPrefab(id: string): Entity {
     const equipmentComponent = new EquipmentComponent();
     const movementComponent = new MovementComponent();
     const energyComponent = new EnergyComponent();
+    const effectComponent = new EffectComponent();
     energyComponent.setEnergy(10000);
     const healthComponent = HealthComponent.createInstance(100, 100);
-    const aggroComponent = AggroComponent.createInstance(10);
+    const aggroComponent = AggroComponent.createInstance(5);
     aggroComponent.aggroMode = AggroMode.Defensive;
     worker.addComponent(jobRunner);
     worker.addComponent(workerBehaviorComponent);
     worker.addComponent(equipmentComponent);
-    worker.addComponent(healthComponent);
     worker.addComponent(aggroComponent);
     worker.addComponent(movementComponent);
     worker.addComponent(energyComponent);
     worker.addComponent(new WorkerSpriteComponent());
+    worker.addComponent(healthComponent);
+    worker.addComponent(effectComponent);
 
     return worker;
 }

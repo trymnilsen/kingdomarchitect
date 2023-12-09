@@ -1,10 +1,11 @@
-import { ConstructorFunction } from "../src/common/constructor.js";
-import { EntityComponent } from "../src/game/component/entityComponent.js";
+import { ConstructorFunction } from "../src/common/constructor.js"
+import { EntityComponent } from "../src/game/component/entityComponent.js"
 import { AggroComponent } from "../src/game/component/actor/mob/aggroComponent.js";
 import { BuildingComponent } from "../src/game/component/building/buildingComponent.js";
 import { ChestComponent } from "../src/game/component/resource/chestComponent.js";
 import { ChunkMapComponent } from "../src/game/component/root/chunk/chunkMapComponent.js";
 import { DestroyOnZeroHealthComponent } from "../src/game/component/health/destroyOnZeroHealthComponent.js";
+import { EffectComponent } from "../src/game/component/effect/effectComponent.js";
 import { EnergyComponent } from "../src/game/component/energy/energyComponent.js";
 import { EquipmentComponent } from "../src/game/component/inventory/equipmentComponent.js";
 import { ForrestComponent } from "../src/game/component/resource/forrestComponent.js";
@@ -32,6 +33,7 @@ export const componentLoaders: ConstructorFunction<EntityComponent>[] = [
     ChestComponent,
     ChunkMapComponent,
     DestroyOnZeroHealthComponent,
+    EffectComponent,
     EnergyComponent,
     EquipmentComponent,
     ForrestComponent,

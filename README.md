@@ -1,6 +1,10 @@
 # 🏰 Kingdom Architect
 > Medieval simulation and city builder game for the browser.
 
+![GitHub License](https://img.shields.io/github/license/trymnilsen/kingdomarchitect)
+![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/trymnilsen/kingdomarchitect/main.yml)
+
+
 ![Screenshot of the game](screenshot/gameplay.png)
 
 ## 🕹️ Play

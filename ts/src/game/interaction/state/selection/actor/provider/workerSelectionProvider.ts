@@ -1,11 +1,17 @@
 import { sprites2 } from "../../../../../../asset/sprite.js";
+import { Effect } from "../../../../../../data/effect/effect.js";
 import {
     InventoryItem,
     ItemTag,
 } from "../../../../../../data/inventory/inventoryItem.js";
+import { itemEffectFactoryList } from "../../../../../../data/inventory/itemEffectFactoryList.js";
 import { WorkerBehaviorComponent } from "../../../../../component/behavior/workerBehaviorComponent.js";
 import { SpriteComponent } from "../../../../../component/draw/spriteComponent.js";
-import { EquipmentComponent } from "../../../../../component/inventory/equipmentComponent.js";
+import { EffectComponent } from "../../../../../component/effect/effectComponent.js";
+import {
+    EquipmentComponent,
+    EquipmentSlot,
+} from "../../../../../component/inventory/equipmentComponent.js";
 import { InventoryComponent } from "../../../../../component/inventory/inventoryComponent.js";
 import { Entity } from "../../../../../entity/entity.js";
 import { StateContext } from "../../../../handler/stateContext.js";
@@ -81,6 +87,11 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
             items.push({
                 text: "Other",
                 icon: otherItem.asset,
+                children: this.getOtherActions(
+                    stateContext,
+                    selectedEntity,
+                    equipmentComponent.otherItem,
+                ),
             });
         } else {
             items.push({
@@ -95,6 +106,47 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
         }
 
         return items;
+    }
+
+    private getOtherActions(
+        stateContext: StateContext,
+        selectedEntity: Entity,
+        otherItem: EquipmentSlot,
+    ): UIActionbarItem[] {
+        return [
+            {
+                text: "Unequip",
+                onClick: () => {
+                    otherItem.setItem(null);
+                },
+                icon: sprites2.empty_sprite,
+            },
+            {
+                text: "Consume",
+                onClick: () => {
+                    const effectComponent =
+                        selectedEntity.getComponent(EffectComponent);
+                    const inventoryComponent =
+                        stateContext.root.requireComponent(InventoryComponent);
+
+                    const item = otherItem.getItem();
+                    let effect: Effect | null = null;
+                    if (item) {
+                        const factory = itemEffectFactoryList[item.id];
+                        if (!!factory) {
+                            effect = factory(item);
+                        }
+                    }
+
+                    if (effectComponent && item && !!effect) {
+                        otherItem.setItem(null);
+                        inventoryComponent.removeInventoryItem(item.id, 1);
+                        effectComponent.addEffect(effect);
+                    }
+                },
+                icon: sprites2.empty_sprite,
+            },
+        ];
     }
 
     private getPrimaryActions(

@@ -20,7 +20,7 @@ export function mobPrefab(id: string): Entity {
         },
         { x: 32, y: 32 },
     );
-    const aggroComponent = AggroComponent.createInstance(1);
+    const aggroComponent = AggroComponent.createInstance(2);
     aggroComponent.aggroMode = AggroMode.Agressive;
     const jobRunnerComponent = new JobRunnerComponent();
     const idleMobComponent = new IdleMobComponent();

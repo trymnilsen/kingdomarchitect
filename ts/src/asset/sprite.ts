@@ -1,5 +1,6 @@
 import { sprites } from "../../generated/sprites.js";
 
+export type Sprite2Id = keyof typeof sprites2;
 export type Sprite2 = {
     /**
      * The reference to which spritesheet this sprite is found in
