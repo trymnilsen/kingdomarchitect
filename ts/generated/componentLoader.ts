@@ -1,5 +1,5 @@
-import { ConstructorFunction } from "../src/common/constructor.js"
-import { EntityComponent } from "../src/game/component/entityComponent.js"
+import { ConstructorFunction } from "../src/common/constructor.js";
+import { EntityComponent } from "../src/game/component/entityComponent.js";
 import { AggroComponent } from "../src/game/component/actor/mob/aggroComponent.js";
 import { BuildingComponent } from "../src/game/component/building/buildingComponent.js";
 import { ChestComponent } from "../src/game/component/resource/chestComponent.js";
