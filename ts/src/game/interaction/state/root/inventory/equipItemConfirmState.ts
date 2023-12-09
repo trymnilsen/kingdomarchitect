@@ -16,11 +16,13 @@ import { Entity } from "../../../../entity/entity.js";
 import { GroundTile } from "../../../../tile/ground.js";
 import { TileSize } from "../../../../tile/tile.js";
 import { InteractionState } from "../../../handler/interactionState.js";
+import { StateContext } from "../../../handler/stateContext.js";
 import { UIActionbarItem } from "../../../view/actionbar/uiActionbar.js";
 import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold.js";
 import { AlertMessageState } from "../../common/alertMessageState.js";
+import { InventoryEquipAction } from "./inventoryState.js";
 
-export class EquipItemState extends InteractionState {
+export class EquipItemConfirmState extends InteractionState {
     private cursorSelection: Entity | null = null;
     private inventoryItem: InventoryItem;
 
@@ -129,35 +131,13 @@ export class EquipItemState extends InteractionState {
             throw new Error("No equipment component on selection");
         }
 
-        const spriteComponent =
-            this.cursorSelection.getComponent(SpriteComponent);
-
-        if (!spriteComponent) {
-            throw new Error("No sprite component");
-        }
-
         const removeResult = inventoryComponent.removeInventoryItem(
             this.inventoryItem.id,
             1,
         );
 
         if (removeResult) {
-            equipmentComponent.mainItem = this.inventoryItem;
-            switch (this.inventoryItem.category) {
-                case ItemCategory.Melee:
-                    spriteComponent.updateSprite(sprites2.knight);
-                    break;
-                case ItemCategory.Ranged:
-                    spriteComponent.updateSprite(sprites2.bowman);
-                    break;
-                case ItemCategory.Magic:
-                    spriteComponent.updateSprite(sprites2.mage);
-                    break;
-                case ItemCategory.Productivity:
-                    spriteComponent.updateSprite(sprites2.worker);
-                    break;
-            }
-
+            equipmentComponent.mainItem.setItem(this.inventoryItem);
             this.context.stateChanger.clear();
         } else {
             this.context.stateChanger.replace(

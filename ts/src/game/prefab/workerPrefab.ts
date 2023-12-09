@@ -11,20 +11,11 @@ import {
 } from "../component/actor/mob/aggroComponent.js";
 import { MovementComponent } from "../component/movement/movementComponent.js";
 import { EnergyComponent } from "../component/energy/energyComponent.js";
+import { WorkerSpriteComponent } from "../component/actor/mob/workerSpriteComponent.js";
 
 export function workerPrefab(id: string): Entity {
     const worker = new Entity(id);
-    const spriteDrawer = SpriteComponent.createInstance(
-        sprites2.dweller,
-        {
-            x: 3,
-            y: 2,
-        },
-        {
-            x: 32,
-            y: 32,
-        },
-    );
+
     const jobRunner = new JobRunnerComponent();
     const workerBehaviorComponent = new WorkerBehaviorComponent();
     const equipmentComponent = new EquipmentComponent();
@@ -34,7 +25,6 @@ export function workerPrefab(id: string): Entity {
     const healthComponent = HealthComponent.createInstance(100, 100);
     const aggroComponent = AggroComponent.createInstance(10);
     aggroComponent.aggroMode = AggroMode.Defensive;
-    worker.addComponent(spriteDrawer);
     worker.addComponent(jobRunner);
     worker.addComponent(workerBehaviorComponent);
     worker.addComponent(equipmentComponent);
@@ -42,6 +32,7 @@ export function workerPrefab(id: string): Entity {
     worker.addComponent(aggroComponent);
     worker.addComponent(movementComponent);
     worker.addComponent(energyComponent);
+    worker.addComponent(new WorkerSpriteComponent());
 
     return worker;
 }

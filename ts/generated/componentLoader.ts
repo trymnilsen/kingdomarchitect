@@ -24,6 +24,7 @@ import { TileGeneratorComponent } from "../src/game/component/tile/tileGenerator
 import { TilesComponent } from "../src/game/component/tile/tilesComponent.js";
 import { TreeComponent } from "../src/game/component/resource/treeComponent.js";
 import { WorkerBehaviorComponent } from "../src/game/component/behavior/workerBehaviorComponent.js";
+import { WorkerSpriteComponent } from "../src/game/component/actor/mob/workerSpriteComponent.js";
 
 export const componentLoaders: ConstructorFunction<EntityComponent>[] = [
     AggroComponent,
@@ -50,4 +51,5 @@ export const componentLoaders: ConstructorFunction<EntityComponent>[] = [
     TilesComponent,
     TreeComponent,
     WorkerBehaviorComponent,
+    WorkerSpriteComponent,
 ];

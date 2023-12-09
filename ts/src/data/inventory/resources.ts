@@ -1,5 +1,5 @@
 import { sprites2 } from "../../asset/sprite.js";
-import { InventoryItem } from "./inventoryItem.js";
+import { InventoryItem, ItemCategory, ItemTag } from "./inventoryItem.js";
 
 export const woodResourceItem: InventoryItem = {
     asset: sprites2.wood_resource,
@@ -41,6 +41,7 @@ export const healthPotion: InventoryItem = {
     asset: sprites2.health_potion,
     id: "healthpotion",
     name: "Health Potion",
+    tag: [ItemTag.Consumable],
 };
 
 export const manaPotion: InventoryItem = {

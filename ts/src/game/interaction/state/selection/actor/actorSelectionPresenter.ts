@@ -32,8 +32,8 @@ export class ActorSelectionPresenter implements StatePresenter {
     }
 
     constructor(
-        private leftActionbarItems: UIActionbarItem[],
-        private rightActionbarItems: UIActionbarItem[],
+        private leftActionbarItems: ReadonlyArray<UIActionbarItem>,
+        private rightActionbarItems: ReadonlyArray<UIActionbarItem>,
     ) {
         this.expandedMenu = new UIColumn({
             width: wrapUiSize,
@@ -69,6 +69,14 @@ export class ActorSelectionPresenter implements StatePresenter {
             rightActionbarItems,
             { width: fillUiSize, height: fillUiSize },
         );
+    }
+
+    setLeftMenu(items: ReadonlyArray<UIActionbarItem>) {
+        this.scaffold.setLeftMenu(items);
+    }
+
+    setRightMenu(items: ReadonlyArray<UIActionbarItem>) {
+        this.scaffold.setRightMenu(items);
     }
 
     setExpandedMenu(items: UIActionbarItem[]) {

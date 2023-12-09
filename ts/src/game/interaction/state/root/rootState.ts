@@ -26,6 +26,7 @@ import { MenuState } from "../menu/menuState.js";
 import { ActorSelectionState } from "../selection/actor/actorSelectionState.js";
 import { SelectionState } from "../selection/selectionState.js";
 import { BuildingState } from "./building/buildingState.js";
+import { ConfirmEquipAction } from "./inventory/equipActions.js";
 import { InventoryState } from "./inventory/inventoryState.js";
 import { UITimeline } from "./ui/uiTimeline.js";
 
@@ -63,7 +64,9 @@ export class RootState extends InteractionState {
                 text: "Stash",
                 icon: sprites2.empty_sprite,
                 onClick: () => {
-                    this.context.stateChanger.push(new InventoryState());
+                    this.context.stateChanger.push(
+                        new InventoryState(new ConfirmEquipAction()),
+                    );
                 },
             },
             {
