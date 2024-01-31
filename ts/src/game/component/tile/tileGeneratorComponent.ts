@@ -9,7 +9,8 @@ import { createRandomTileSet } from "../../../data/tileset/randomTileSet.js";
 import { createSecondTileSet } from "../../../data/tileset/secondTile.js";
 import { createThirdTileSet } from "../../../data/tileset/thirdTile.js";
 import { Tileset } from "../../../data/tileset/tileset.js";
-import { getChunkPosition } from "../../chunk.js";
+import { createTownTileset } from "../../../data/tileset/town/townTileset.js";
+import { getChunkId, getChunkPosition } from "../../chunk.js";
 import { getTileId } from "../../tile/tile.js";
 import { StatelessComponent } from "../entityComponent.js";
 import { TileMapUpdateEvent } from "./tileMapUpdatedEvent.js";
@@ -47,7 +48,7 @@ export class TileGeneratorComponent extends StatelessComponent {
         //Add chunks not in chunkmap to the array of unlockable areas
         //Should unlockable chunks be cached?
         const tileComponent = this.entity.requireComponent(TilesComponent);
-        const unlockableChunks: Record<string, GroundChunk> = {};
+        const unlockableChunks = new Map<string, GroundChunk>();
         for (const key in tileComponent.chunkMap) {
             if (
                 !Object.prototype.hasOwnProperty.call(
@@ -68,16 +69,19 @@ export class TileGeneratorComponent extends StatelessComponent {
                 const adjacentChunkId = getTileId(adjacent.x, adjacent.y);
                 const adjacentChunk = tileComponent.chunkMap[adjacentChunkId];
                 //Check if this chunk has already been added
-                if (!adjacentChunk && !unlockableChunks[adjacentChunkId]) {
-                    unlockableChunks[adjacentChunkId] = {
+                if (!adjacentChunk && !unlockableChunks.has(adjacentChunkId)) {
+                    unlockableChunks.set(adjacentChunkId, {
                         chunkX: adjacent.x,
                         chunkY: adjacent.y,
-                    };
+                    });
                 }
             }
         }
 
-        return Object.values(unlockableChunks).map((unlockableChunk) => {
+        const returnedAreas: UnlockableArea[] = [];
+        while (unlockableChunks.size > 0) {
+            const nextChunkId = unlockableChunks.keys().next().value;
+            const unlockableChunk = unlockableChunks.get(nextChunkId)!;
             //The distance from the center of the map to the chunk is used
             //as the factor to calculate the cost
             const distance = manhattanDistance(
@@ -89,18 +93,42 @@ export class TileGeneratorComponent extends StatelessComponent {
             );
             const cost = Math.min(64, Math.pow(2, distance + 1));
 
-            const tileset = this.getTileSet(tileComponent, unlockableChunk);
+            const tileset = this.getTileSet(
+                tileComponent,
+                unlockableChunk,
+                returnedAreas,
+            );
 
-            return {
+            //Find all chunks thats contains the tiles returned and remove them
+            if (tileset.tiles.length == 0) {
+                console.warn(
+                    "Tileset returned zero tiles, this might be a bug",
+                );
+                unlockableChunks.delete(nextChunkId);
+                continue;
+            }
+
+            returnedAreas.push({
                 tileset,
                 cost,
-            };
-        });
+            });
+
+            for (const tilePosition of tileset.tiles) {
+                const chunkPosition = getChunkPosition(tilePosition);
+                const chunkId = getChunkId(chunkPosition);
+                if (unlockableChunks.has(chunkId)) {
+                    unlockableChunks.delete(chunkId);
+                }
+            }
+        }
+
+        return returnedAreas;
     }
 
     private getTileSet(
         tileComponent: TilesComponent,
         chunk: GroundChunk,
+        claimedAreas: ReadonlyArray<UnlockableArea>,
     ): Tileset {
         const chunks = Object.keys(tileComponent.chunkMap);
         switch (chunks.length) {
@@ -112,6 +140,17 @@ export class TileGeneratorComponent extends StatelessComponent {
                 return createThirdTileSet(chunk);
             case 4:
                 return createFourthTileSet(chunk);
+            case 5:
+                const town = createTownTileset(
+                    chunk,
+                    tileComponent,
+                    claimedAreas,
+                );
+                if (!!town) {
+                    return town;
+                } else {
+                    return createRandomTileSet(chunk);
+                }
             default:
                 return createRandomTileSet(chunk);
         }

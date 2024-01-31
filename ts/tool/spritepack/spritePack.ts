@@ -172,7 +172,9 @@ async function packSprites(sprites: PackableSprite[]) {
             name: binIndex.toString(),
             filename: binName,
         });
-        bitmap.write(path.join(process.cwd(), "public", "asset", binName));
+        await bitmap.write(
+            path.join(process.cwd(), "public", "asset", binName),
+        );
     }
 
     const binNamesJson = JSON.stringify(binNames, null, 2);
@@ -333,7 +335,11 @@ async function extractSprite(
         `${spriteName}.png`,
     );
 
-    bitmap.write(filename);
+    console.log(
+        `Writing ${spriteName}.png with ${frames.length} and dims: ${bin.width} ${bin.height} and ${bin.rects.length} rects`,
+    );
+
+    await bitmap.write(filename);
 
     return {
         spriteName: spriteName,

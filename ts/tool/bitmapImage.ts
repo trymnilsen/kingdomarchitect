@@ -21,7 +21,15 @@ export class BitmapImage {
         this.image.data[idx + 3] = pixel.alpha; // alpha (0 is transparent)
     }
 
-    write(filename: string) {
-        this.image.pack().pipe(createWriteStream(filename));
+    write(filename: string): Promise<void> {
+        const writeStream = this.image.pack().pipe(createWriteStream(filename));
+        return new Promise((resolve, reject) => {
+            writeStream.on("close", () => {
+                resolve();
+            });
+            writeStream.on("error", (e: unknown) => {
+                reject(e);
+            });
+        });
     }
 }

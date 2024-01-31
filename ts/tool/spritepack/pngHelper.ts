@@ -22,9 +22,14 @@ export function getPixelColor(
 }
 
 export function readPng(path: string): PNGWithMetadata {
-    const data = readFileSync(path);
-    const png = PNG.sync.read(data);
-    return png;
+    try {
+        const data = readFileSync(path);
+        const png = PNG.sync.read(data);
+        return png;
+    } catch (e: unknown) {
+        console.error(`Failed to read png at ${path}`);
+        throw e;
+    }
 }
 
 export function createPng(width: number, height: number): PNG {

@@ -34,5 +34,7 @@
     "mochaExplorer.require": "source-map-support/register",
     "mochaExplorer.watch": "build/**/*.js",
     "mochaExplorer.timeout": 0,
-    "typescript.tsdk": "node_modules/typescript/lib"
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "intellicodeApiExamples.python.enabled": false,
+    "intellicodeApiExamples.typescript.enabled": false
 }
