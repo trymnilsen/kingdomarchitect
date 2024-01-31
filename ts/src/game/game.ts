@@ -122,6 +122,7 @@ export class Game {
     }
 
     private onTick = () => {
+        performance.mark("tick-start");
         this.currentTick += 1;
         this.gameTime.updateTick(this.currentTick);
         this.world.onUpdate(this.currentTick);
@@ -132,6 +133,7 @@ export class Game {
         } catch (err) {
             console.error(err);
         }
+        performance.measure("onTick duration", "tick-start");
     };
 
     private updateCamera(newPosition: Point) {

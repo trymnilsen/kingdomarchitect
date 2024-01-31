@@ -13,6 +13,7 @@ import { MovementComponent } from "../component/movement/movementComponent.js";
 import { EnergyComponent } from "../component/energy/energyComponent.js";
 import { WorkerSpriteComponent } from "../component/actor/mob/workerSpriteComponent.js";
 import { EffectComponent } from "../component/effect/effectComponent.js";
+import { TileDiscoveryComponent } from "../component/tile/tileDiscoveryComponent.js";
 
 export function workerPrefab(id: string): Entity {
     const worker = new Entity(id);
@@ -23,6 +24,7 @@ export function workerPrefab(id: string): Entity {
     const movementComponent = new MovementComponent();
     const energyComponent = new EnergyComponent();
     const effectComponent = new EffectComponent();
+    const tileDiscoveryComponent = new TileDiscoveryComponent();
     energyComponent.setEnergy(10000);
     const healthComponent = HealthComponent.createInstance(100, 100);
     const aggroComponent = AggroComponent.createInstance(5);
@@ -36,6 +38,7 @@ export function workerPrefab(id: string): Entity {
     worker.addComponent(new WorkerSpriteComponent());
     worker.addComponent(healthComponent);
     worker.addComponent(effectComponent);
+    worker.addComponent(tileDiscoveryComponent);
 
     return worker;
 }

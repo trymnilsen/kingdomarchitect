@@ -37,7 +37,6 @@ export function createRootEntity(): Entity {
     const firstHouse = housePrefab(generateId("house"), false);
     const firstFarm = farmPrefab(generateId("farm"));
     const firstTree = treePrefab(generateId("tree"), 1);
-    firstWorker.addComponent(new TileDiscoveryComponent());
     firstFarm.position = { x: 2, y: 0 };
     firstHouse.position = { x: 1, y: 0 };
     firstTree.position = { x: 2, y: 2 };
