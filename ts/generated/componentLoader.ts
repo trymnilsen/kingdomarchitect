@@ -25,6 +25,7 @@ import { TileDiscoveryComponent } from "../src/game/component/tile/tileDiscovery
 import { TileGeneratorComponent } from "../src/game/component/tile/tileGeneratorComponent.js";
 import { TilesComponent } from "../src/game/component/tile/tilesComponent.js";
 import { TreeComponent } from "../src/game/component/resource/treeComponent.js";
+import { VisibilityComponent } from "../src/game/component/visibility/visibilityComponent.js";
 import { WorkerBehaviorComponent } from "../src/game/component/behavior/workerBehaviorComponent.js";
 import { WorkerSpriteComponent } from "../src/game/component/actor/mob/workerSpriteComponent.js";
 
@@ -54,6 +55,7 @@ export const componentLoaders: ConstructorFunction<EntityComponent>[] = [
     TileGeneratorComponent,
     TilesComponent,
     TreeComponent,
+    VisibilityComponent,
     WorkerBehaviorComponent,
     WorkerSpriteComponent,
 ];

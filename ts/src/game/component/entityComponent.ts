@@ -1,6 +1,7 @@
 import { JSONValue } from "../../common/object.js";
 import { Point } from "../../common/point.js";
 import { RenderContext } from "../../rendering/renderContext.js";
+import { RenderVisibilityMap } from "../../rendering/renderVisibilityMap.js";
 import { Entity } from "../entity/entity.js";
 import { ComponentEvent } from "./componentEvent.js";
 
@@ -37,7 +38,11 @@ export abstract class EntityComponent<
      */
     onStop(_tick: number) {}
     onUpdate(_tick: number) {}
-    onDraw(_context: RenderContext, _screenPosition: Point) {}
+    onDraw(
+        _context: RenderContext,
+        _screenPosition: Point,
+        _visibilityMap: RenderVisibilityMap,
+    ) {}
 
     /**
      * Invoked when component is restored from a save. The component should

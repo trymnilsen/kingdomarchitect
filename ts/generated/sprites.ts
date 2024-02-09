@@ -654,6 +654,17 @@ export const sprites = {
       "y": 16
     }
   },
+  "fence": {
+    "bin": "0",
+    "id": "fence",
+    "defintion": {
+      "frames": 1,
+      "w": 16,
+      "h": 16,
+      "x": 148,
+      "y": 96
+    }
+  },
   "gem_resource": {
     "bin": "0",
     "id": "gem_resource",
@@ -661,7 +672,7 @@ export const sprites = {
       "frames": 1,
       "w": 32,
       "h": 32,
-      "x": 164,
+      "x": 160,
       "y": 64
     }
   },
@@ -673,7 +684,7 @@ export const sprites = {
       "w": 32,
       "h": 32,
       "x": 160,
-      "y": 96
+      "y": 112
     }
   },
   "gold_coins": {
@@ -684,7 +695,7 @@ export const sprites = {
       "w": 32,
       "h": 32,
       "x": 192,
-      "y": 96
+      "y": 64
     }
   },
   "health_potion": {
@@ -694,8 +705,8 @@ export const sprites = {
       "frames": 1,
       "w": 32,
       "h": 32,
-      "x": 164,
-      "y": 128
+      "x": 192,
+      "y": 96
     }
   },
   "health_potion_shadow": {
@@ -705,8 +716,8 @@ export const sprites = {
       "frames": 1,
       "w": 32,
       "h": 32,
-      "x": 164,
-      "y": 160
+      "x": 192,
+      "y": 128
     }
   },
   "mana_potion": {
@@ -716,8 +727,8 @@ export const sprites = {
       "frames": 1,
       "w": 32,
       "h": 32,
-      "x": 132,
-      "y": 176
+      "x": 164,
+      "y": 160
     }
   },
   "resource_corn": {
@@ -727,8 +738,8 @@ export const sprites = {
       "frames": 1,
       "w": 32,
       "h": 32,
-      "x": 0,
-      "y": 194
+      "x": 132,
+      "y": 176
     }
   },
   "scroll": {
@@ -738,7 +749,7 @@ export const sprites = {
       "frames": 1,
       "w": 32,
       "h": 32,
-      "x": 32,
+      "x": 0,
       "y": 194
     }
   },
@@ -749,7 +760,7 @@ export const sprites = {
       "frames": 1,
       "w": 32,
       "h": 32,
-      "x": 64,
+      "x": 32,
       "y": 194
     }
   },
@@ -760,8 +771,8 @@ export const sprites = {
       "frames": 1,
       "w": 48,
       "h": 48,
-      "x": 224,
-      "y": 0
+      "x": 212,
+      "y": 16
     }
   },
   "stone_slate_background_2x": {
@@ -771,8 +782,8 @@ export const sprites = {
       "frames": 1,
       "w": 48,
       "h": 48,
-      "x": 212,
-      "y": 48
+      "x": 224,
+      "y": 64
     }
   },
   "stone_slate_border": {
@@ -782,8 +793,8 @@ export const sprites = {
       "frames": 1,
       "w": 16,
       "h": 16,
-      "x": 196,
-      "y": 64
+      "x": 164,
+      "y": 96
     }
   },
   "stone_slate_border_selected": {
@@ -793,8 +804,8 @@ export const sprites = {
       "frames": 1,
       "w": 16,
       "h": 16,
-      "x": 196,
-      "y": 80
+      "x": 164,
+      "y": 144
     }
   },
   "stone_slate_button_2x": {
@@ -805,7 +816,7 @@ export const sprites = {
       "w": 48,
       "h": 48,
       "x": 224,
-      "y": 96
+      "y": 112
     }
   },
   "stone_slate_dark_background_2x": {
@@ -816,7 +827,7 @@ export const sprites = {
       "w": 48,
       "h": 48,
       "x": 196,
-      "y": 144
+      "y": 160
     }
   },
   "stone_wood_walls_bottom": {
@@ -827,7 +838,7 @@ export const sprites = {
       "w": 20,
       "h": 20,
       "x": 244,
-      "y": 144
+      "y": 160
     }
   },
   "stone_wood_walls_br": {
@@ -838,7 +849,7 @@ export const sprites = {
       "w": 20,
       "h": 20,
       "x": 244,
-      "y": 164
+      "y": 180
     }
   },
   "stone_wood_walls_horizontal": {
@@ -849,7 +860,7 @@ export const sprites = {
       "w": 20,
       "h": 20,
       "x": 244,
-      "y": 184
+      "y": 200
     }
   },
   "stone_wood_walls_lb": {
@@ -859,8 +870,8 @@ export const sprites = {
       "frames": 1,
       "w": 20,
       "h": 20,
-      "x": 164,
-      "y": 204
+      "x": 64,
+      "y": 194
     }
   },
   "stone_wood_walls_lbr": {
@@ -870,8 +881,8 @@ export const sprites = {
       "frames": 1,
       "w": 20,
       "h": 20,
-      "x": 184,
-      "y": 204
+      "x": 164,
+      "y": 192
     }
   },
   "stone_wood_walls_left": {
@@ -881,8 +892,8 @@ export const sprites = {
       "frames": 1,
       "w": 20,
       "h": 20,
-      "x": 204,
-      "y": 204
+      "x": 84,
+      "y": 194
     }
   },
   "stone_wood_walls_lu": {
@@ -892,8 +903,8 @@ export const sprites = {
       "frames": 1,
       "w": 20,
       "h": 20,
-      "x": 224,
-      "y": 192
+      "x": 104,
+      "y": 184
     }
   },
   "stone_wood_walls_lub": {
@@ -903,7 +914,7 @@ export const sprites = {
       "frames": 1,
       "w": 20,
       "h": 20,
-      "x": 244,
+      "x": 104,
       "y": 204
     }
   },
@@ -914,8 +925,8 @@ export const sprites = {
       "frames": 1,
       "w": 20,
       "h": 20,
-      "x": 96,
-      "y": 184
+      "x": 0,
+      "y": 226
     }
   },
   "stone_wood_walls_lurb": {
@@ -925,8 +936,8 @@ export const sprites = {
       "frames": 1,
       "w": 20,
       "h": 20,
-      "x": 96,
-      "y": 204
+      "x": 20,
+      "y": 226
     }
   },
   "stone_wood_walls_right": {
@@ -936,8 +947,8 @@ export const sprites = {
       "frames": 1,
       "w": 20,
       "h": 20,
-      "x": 224,
-      "y": 212
+      "x": 40,
+      "y": 226
     }
   },
   "stone_wood_walls_scaffold": {
@@ -947,7 +958,7 @@ export const sprites = {
       "frames": 1,
       "w": 20,
       "h": 20,
-      "x": 0,
+      "x": 60,
       "y": 226
     }
   },
@@ -958,8 +969,8 @@ export const sprites = {
       "frames": 1,
       "w": 20,
       "h": 20,
-      "x": 20,
-      "y": 226
+      "x": 80,
+      "y": 224
     }
   },
   "stone_wood_walls_ubr": {
@@ -969,8 +980,8 @@ export const sprites = {
       "frames": 1,
       "w": 20,
       "h": 20,
-      "x": 40,
-      "y": 226
+      "x": 100,
+      "y": 224
     }
   },
   "stone_wood_walls_up": {
@@ -980,8 +991,8 @@ export const sprites = {
       "frames": 1,
       "w": 20,
       "h": 20,
-      "x": 60,
-      "y": 226
+      "x": 120,
+      "y": 224
     }
   },
   "stone_wood_walls_ur": {
@@ -991,8 +1002,8 @@ export const sprites = {
       "frames": 1,
       "w": 20,
       "h": 20,
-      "x": 80,
-      "y": 226
+      "x": 140,
+      "y": 208
     }
   },
   "stone_wood_walls_vertical": {
@@ -1002,8 +1013,8 @@ export const sprites = {
       "frames": 1,
       "w": 20,
       "h": 20,
-      "x": 244,
-      "y": 224
+      "x": 160,
+      "y": 220
     }
   },
   "swipe_effect": {
@@ -1057,8 +1068,8 @@ export const sprites = {
       "frames": 1,
       "w": 32,
       "h": 32,
-      "x": 116,
-      "y": 208
+      "x": 136,
+      "y": 244
     }
   },
   "worker_skill": {
@@ -1068,8 +1079,8 @@ export const sprites = {
       "frames": 1,
       "w": 32,
       "h": 32,
-      "x": 136,
-      "y": 244
+      "x": 168,
+      "y": 240
     }
   }
 };

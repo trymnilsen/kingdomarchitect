@@ -2,6 +2,7 @@ import { sprites2 } from "../../../asset/sprite.js";
 import { Bounds } from "../../../common/bounds.js";
 import { Point } from "../../../common/point.js";
 import { RenderContext } from "../../../rendering/renderContext.js";
+import { RenderVisibilityMap } from "../../../rendering/renderVisibilityMap.js";
 import { ChunkSize } from "../../chunk.js";
 import { getTileId, TileSize } from "../../tile/tile.js";
 import { EntityComponent } from "../entityComponent.js";
@@ -20,6 +21,7 @@ export type GroundChunk = {
 type TilesBundle = {
     tileMap: Record<string, GroundTile>;
     chunkMap: Record<string, GroundChunk>;
+    discoveredTiles: Record<string, boolean>;
 };
 
 type TileMap = Record<string, GroundTile>;
@@ -30,6 +32,7 @@ export class TilesComponent
     implements Ground
 {
     private tileMap: TileMap = {};
+    private discoveredTiles: { [id: string]: boolean } = {};
     private _chunkMap: GroundChunkMap = {};
 
     get chunkMap(): Readonly<Record<string, Readonly<GroundChunk>>> {
@@ -74,8 +77,23 @@ export class TilesComponent
         return Object.values(this.tileMap).filter(predicate);
     }
 
-    setTile(tile: GroundTile) {
-        this.tileMap[getTileId(tile.tileX, tile.tileY)] = tile;
+    getAllTiles(): ReadonlyArray<GroundTile> {
+        return Object.values(this.tileMap);
+    }
+
+    getDiscoveredTiles(): ReadonlyArray<GroundTile> {
+        return this.getTiles((tile) => {
+            const isDiscovered =
+                this.discoveredTiles[getTileId(tile.tileX, tile.tileY)];
+
+            return !!isDiscovered;
+        });
+    }
+
+    setTile(tile: GroundTile, discovered: boolean = false) {
+        const tileId = getTileId(tile.tileX, tile.tileY);
+        this.tileMap[tileId] = tile;
+        this.discoveredTiles[tileId] = discovered;
     }
 
     removeTile(x: number, y: number) {
@@ -86,32 +104,57 @@ export class TilesComponent
         this._chunkMap[getTileId(chunk.chunkX, chunk.chunkY)] = chunk;
     }
 
-    override onDraw(context: RenderContext): void {
+    override onDraw(
+        context: RenderContext,
+        _screenPosition: Point,
+        visiblityMap: RenderVisibilityMap,
+    ): void {
         for (const tileId in this.tileMap) {
             const tile = this.tileMap[tileId];
-            context.drawRectangle({
-                x: tile.tileX * TileSize,
-                y: tile.tileY * TileSize,
-                width: TileSize - 2,
-                height: TileSize - 2,
-                fill: "green",
-            });
+            if (!!this.discoveredTiles[tileId]) {
+                const visibility = visiblityMap.isVisible({
+                    x: tile.tileX,
+                    y: tile.tileY,
+                });
+
+                if (visibility) {
+                    context.drawRectangle({
+                        x: tile.tileX * TileSize,
+                        y: tile.tileY * TileSize,
+                        width: TileSize - 2,
+                        height: TileSize - 2,
+                        fill: "green",
+                    });
+                } else {
+                    context.drawRectangle({
+                        x: tile.tileX * TileSize,
+                        y: tile.tileY * TileSize,
+                        width: TileSize - 2,
+                        height: TileSize - 2,
+                        fill: "darkgreen",
+                    });
+                }
+            }
         }
     }
 
     override fromComponentBundle(bundle: TilesBundle): void {
         this.tileMap = bundle.tileMap;
         this._chunkMap = bundle.chunkMap;
+        this.discoveredTiles = bundle.discoveredTiles;
     }
+
     override toComponentBundle(): TilesBundle {
         return {
             tileMap: this.tileMap,
             chunkMap: this._chunkMap,
+            discoveredTiles: this.discoveredTiles,
         };
     }
 
     static createInstance(): TilesComponent {
         const tileMap: TileMap = {};
+        const tileLayerMap = {};
         const chunkMap: GroundChunkMap = {};
         for (let x = 0; x < ChunkSize; x++) {
             for (let y = 0; y < ChunkSize; y++) {
@@ -120,6 +163,8 @@ export class TilesComponent
                     tileX: x,
                     tileY: y,
                 };
+
+                tileLayerMap[id] = 0;
             }
         }
 
@@ -131,6 +176,7 @@ export class TilesComponent
         const tilesBundle: TilesBundle = {
             chunkMap,
             tileMap,
+            discoveredTiles: tileLayerMap,
         };
 
         const instance = new TilesComponent();

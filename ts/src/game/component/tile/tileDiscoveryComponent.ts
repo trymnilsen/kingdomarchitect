@@ -6,12 +6,16 @@ import { Point, addPoint, adjacentPoints } from "../../../common/point.js";
 import { createRandomTileSet } from "../../../data/tileset/randomTileSet.js";
 import { ChunkSize, getChunkPosition } from "../../chunk.js";
 import { Entity } from "../../entity/entity.js";
+import { TilesetGenerator } from "../../tile/tilesetGenerator.js";
 import { EntityComponent, StatelessComponent } from "../entityComponent.js";
 import { ChunkMapComponent } from "../root/chunk/chunkMapComponent.js";
 import { PathFindingComponent } from "../root/path/pathFindingComponent.js";
+import { TileGeneratorComponent } from "./tileGeneratorComponent.js";
 import { TilesComponent } from "./tilesComponent.js";
 
 export class TileDiscoveryComponent extends StatelessComponent {
+    private generator = new TilesetGenerator();
+
     override onUpdate(_tick: number): void {
         //get adjacent tiles
         const adjacentTiles = adjacentPointsWithPattern(
@@ -46,10 +50,15 @@ export class TileDiscoveryComponent extends StatelessComponent {
                 tileComponent,
                 pathFindingComponent,
             );
-            return true;
-        } else {
-            return false;
         }
+
+        tileComponent.setTile(
+            {
+                tileX: point.x,
+                tileY: point.y,
+            },
+            true,
+        );
     }
 
     private unlockChunk(
@@ -60,25 +69,23 @@ export class TileDiscoveryComponent extends StatelessComponent {
     ) {
         const chunk = getChunkPosition(point);
         const chunkStart = this.chunkStartPosition(chunk);
-        const tileset = createRandomTileSet({
+        const tileset = this.generator.getRandomTileset(rootEntity, {
             chunkX: chunk.x,
             chunkY: chunk.y,
         });
 
-        const tiles = tileset.factory.createTiles();
-        for (const tile of tiles) {
+        for (const tile of tileset.tiles) {
             tileComponent.setTile({
-                tileX: tile.tileX,
-                tileY: tile.tileY,
+                tileX: tile.x,
+                tileY: tile.y,
             });
             pathFindingComponent.invalidateGraphPoint({
-                x: tile.tileX,
-                y: tile.tileY,
+                x: tile.x,
+                y: tile.y,
             });
         }
 
-        const entities = tileset.factory.createEntities();
-        for (const entity of entities) {
+        for (const entity of tileset.entities) {
             rootEntity.addChild(entity);
         }
 

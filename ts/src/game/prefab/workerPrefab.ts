@@ -14,6 +14,7 @@ import { EnergyComponent } from "../component/energy/energyComponent.js";
 import { WorkerSpriteComponent } from "../component/actor/mob/workerSpriteComponent.js";
 import { EffectComponent } from "../component/effect/effectComponent.js";
 import { TileDiscoveryComponent } from "../component/tile/tileDiscoveryComponent.js";
+import { VisibilityComponent } from "../component/visibility/visibilityComponent.js";
 
 export function workerPrefab(id: string): Entity {
     const worker = new Entity(id);
@@ -24,6 +25,7 @@ export function workerPrefab(id: string): Entity {
     const movementComponent = new MovementComponent();
     const energyComponent = new EnergyComponent();
     const effectComponent = new EffectComponent();
+    const visibilityComponent = new VisibilityComponent();
     const tileDiscoveryComponent = new TileDiscoveryComponent();
     energyComponent.setEnergy(10000);
     const healthComponent = HealthComponent.createInstance(100, 100);
@@ -39,6 +41,7 @@ export function workerPrefab(id: string): Entity {
     worker.addComponent(healthComponent);
     worker.addComponent(effectComponent);
     worker.addComponent(tileDiscoveryComponent);
+    worker.addComponent(visibilityComponent);
 
     return worker;
 }
