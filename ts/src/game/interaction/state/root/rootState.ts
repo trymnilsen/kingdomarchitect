@@ -21,7 +21,6 @@ import { InteractionState } from "../../handler/interactionState.js";
 import { UIActionbarItem } from "../../view/actionbar/uiActionbar.js";
 import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold.js";
 import { AlertMessageState } from "../common/alertMessageState.js";
-import { LandUnlockState } from "../land/landUnlockState.js";
 import { MenuState } from "../menu/menuState.js";
 import { ActorSelectionState } from "../selection/actor/actorSelectionState.js";
 import { SelectionState } from "../selection/selectionState.js";
@@ -51,13 +50,6 @@ export class RootState extends InteractionState {
                 icon: sprites2.empty_sprite,
                 onClick: () => {
                     this.context.stateChanger.push(new BuildingState());
-                },
-            },
-            {
-                text: "Land",
-                icon: sprites2.empty_sprite,
-                onClick: () => {
-                    this.context.stateChanger.push(new LandUnlockState());
                 },
             },
             {
