@@ -25,7 +25,7 @@ export function createTestRootNode(
     const tilesComponent = new TilesComponent();
     for (let x = 0; x < width; x++) {
         for (let y = 0; y < height; y++) {
-            tilesComponent.setTile({ tileX: x, tileY: y });
+            tilesComponent.setTile({ tileX: x, tileY: y }, true);
         }
     }
     entity.addComponent(tilesComponent);

@@ -8,7 +8,6 @@ import { ChunkMapComponent } from "../component/root/chunk/chunkMapComponent.js"
 import { createLazyGraphFromRootNode } from "../component/root/path/generateGraph.js";
 import { PathFindingComponent } from "../component/root/path/pathFindingComponent.js";
 import { TileDiscoveryComponent } from "../component/tile/tileDiscoveryComponent.js";
-import { TileGeneratorComponent } from "../component/tile/tileGeneratorComponent.js";
 import { TilesComponent } from "../component/tile/tilesComponent.js";
 import { farmPrefab } from "../prefab/farmPrefab.js";
 import { housePrefab } from "../prefab/housePrefab.js";
@@ -27,7 +26,6 @@ export function createRootEntity(): Entity {
     rootEntity.addComponent(jobQueueComponent);
     rootEntity.addComponent(chunkmapComponent);
     rootEntity.addComponent(new JobSchedulerComponent());
-    rootEntity.addComponent(new TileGeneratorComponent());
     rootEntity.addComponent(new ForrestComponent());
     const pathFindingComponent = new PathFindingComponent();
     rootEntity.addComponent(pathFindingComponent);

@@ -10,6 +10,8 @@ import { Entity } from "./entity/entity.js";
 import { createRootEntity } from "./entity/rootEntity.js";
 import { TileSize } from "./tile/tile.js";
 import { GamePersister } from "../persistence/gamePersister.js";
+import { RenderVisibilityMap } from "../rendering/renderVisibilityMap.js";
+import { VisibilityComponent } from "./component/visibility/visibilityComponent.js";
 
 export class Game {
     private renderer: Renderer;
@@ -21,6 +23,8 @@ export class Game {
     private currentTick = 0;
     private world: Entity;
     private gamePersister: GamePersister;
+    private visibilityMap: RenderVisibilityMap = new RenderVisibilityMap();
+
     constructor(domElementWrapperSelector: string) {
         // Get the canvas
         const canvasElement: HTMLCanvasElement | null = document.querySelector(
@@ -118,27 +122,42 @@ export class Game {
             x: TileSize * 5,
             y: TileSize * 5,
         });
+        this.updateVisibilityMap();
         this.render();
     }
 
     private onTick = () => {
-        performance.mark("tick-start");
+        //performance.mark("tick-start");
         this.currentTick += 1;
         this.gameTime.updateTick(this.currentTick);
         this.world.onUpdate(this.currentTick);
         this.interactionHandler.onUpdate(this.currentTick);
+        this.updateVisibilityMap();
         this.render();
         try {
             this.saveGame();
         } catch (err) {
             console.error(err);
         }
-        performance.measure("onTick duration", "tick-start");
+        //performance.measure("onTick duration", "tick-start");
     };
 
     private updateCamera(newPosition: Point) {
         this.renderer.camera.position = newPosition;
         this.render();
+    }
+
+    private updateVisibilityMap() {
+        this.visibilityMap.clear();
+        const visibilityComponents =
+            this.world.queryComponents(VisibilityComponent);
+
+        for (const visibilityComponent of visibilityComponents) {
+            const visiblePoints = visibilityComponent.getVisibility();
+            for (const visiblePoint of visiblePoints) {
+                this.visibilityMap.setIsVisible(visiblePoint, true);
+            }
+        }
     }
 
     private onInput(inputEvent: InputEvent) {
@@ -178,7 +197,7 @@ export class Game {
     private render() {
         //const renderStart = performance.now();
         this.renderer.clearScreen();
-        this.world.onDraw(this.renderer.context);
+        this.world.onDraw(this.renderer.context, this.visibilityMap);
         this.interactionHandler.onDraw(this.renderer.context);
         this.renderer.renderDeferred();
         //const renderEnd = performance.now();

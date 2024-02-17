@@ -22,9 +22,9 @@ import { PathFindingComponent } from "../src/game/component/root/path/pathFindin
 import { SpriteComponent } from "../src/game/component/draw/spriteComponent.js";
 import { TenantComponent } from "../src/game/component/housing/tenantComponent.js";
 import { TileDiscoveryComponent } from "../src/game/component/tile/tileDiscoveryComponent.js";
-import { TileGeneratorComponent } from "../src/game/component/tile/tileGeneratorComponent.js";
 import { TilesComponent } from "../src/game/component/tile/tilesComponent.js";
 import { TreeComponent } from "../src/game/component/resource/treeComponent.js";
+import { VisibilityComponent } from "../src/game/component/visibility/visibilityComponent.js";
 import { WorkerBehaviorComponent } from "../src/game/component/behavior/workerBehaviorComponent.js";
 import { WorkerSpriteComponent } from "../src/game/component/actor/mob/workerSpriteComponent.js";
 
@@ -51,9 +51,9 @@ export const componentLoaders: ConstructorFunction<EntityComponent>[] = [
     SpriteComponent,
     TenantComponent,
     TileDiscoveryComponent,
-    TileGeneratorComponent,
     TilesComponent,
     TreeComponent,
+    VisibilityComponent,
     WorkerBehaviorComponent,
     WorkerSpriteComponent,
 ];

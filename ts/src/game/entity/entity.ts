@@ -14,8 +14,13 @@ import {
     zeroPoint,
 } from "../../common/point.js";
 import { RenderContext } from "../../rendering/renderContext.js";
+import { RenderVisibilityMap } from "../../rendering/renderVisibilityMap.js";
 import { ComponentEvent } from "../component/componentEvent.js";
+import { ComponentQueryCache } from "../component/componentQueryCache.js";
 import { EntityComponent } from "../component/entityComponent.js";
+import { TilesComponent } from "../component/tile/tilesComponent.js";
+import { TileSize } from "../tile/tile.js";
+import { selectFromChild } from "./child/select.js";
 import { visitChildren } from "./child/visit.js";
 import { entityWithId } from "./child/withId.js";
 import { EntityEvent } from "./entityEvent.js";
@@ -37,6 +42,7 @@ export class Entity {
     >();
     private _entityEvents = new Event<EntityEvent>();
     private _componentsMap = new Map<string, EntityComponent>();
+    private _componentsQueryCache?: ComponentQueryCache;
 
     constructor(readonly id: string) {}
 
@@ -271,6 +277,12 @@ export class Entity {
         }
 
         this._componentsMap.set(componentName, entityComponent);
+
+        this.bubbleEvent({
+            id: "component_added",
+            source: this,
+            item: entityComponent,
+        });
     }
 
     /**
@@ -285,6 +297,13 @@ export class Entity {
             if (this._parent) {
                 entityComponent.onStop(0);
             }
+
+            this.bubbleEvent({
+                id: "component_removed",
+                source: this,
+                item: entityComponent,
+            });
+
             return true;
         } else {
             return false;
@@ -361,24 +380,61 @@ export class Entity {
     }
 
     /**
+     * Lookup all components of the given type on this entity and
+     * all of the nested children
+     * @param filterType the of components to query for
+     */
+    queryComponents<TFilter extends EntityComponent>(
+        filterType: ConstructorFunction<TFilter>,
+    ): TFilter[] {
+        if (!this._componentsQueryCache) {
+            this._componentsQueryCache = new ComponentQueryCache();
+        }
+
+        const cachedList = this._componentsQueryCache.getComponents(filterType);
+        if (!!cachedList) {
+            return cachedList;
+        }
+
+        //No cached entries found, iterate over all the nested children for
+        //the given component type
+        const childComponents = selectFromChild(this, (child) => {
+            return child.getComponent(filterType);
+        });
+
+        this._componentsQueryCache.setComponents(filterType, childComponents);
+
+        return childComponents;
+    }
+
+    /**
      * Request the entity runs its onDraw for components and children.
      * Note: this method has a varying frequency of updates. Any logic that
      * needs a consistent update cycle should be called in onUpdate
      * @param renderContext the context used to render anything to the canvas
      */
-    onDraw(renderContext: RenderContext) {
+    onDraw(renderContext: RenderContext, visibilityMap: RenderVisibilityMap) {
         if (this._componentsMap.size > 0) {
-            //Calculating the screen position once for components
-            const screenPosition = renderContext.camera.tileSpaceToScreenSpace(
-                this._worldPosition,
-            );
-            for (const component of this._componentsMap) {
-                component[1].onDraw(renderContext, screenPosition);
+            const isVisible = visibilityMap.isVisible(this.worldPosition);
+            if (isVisible || this._isGameRoot) {
+                //Calculating the screen position once for components
+                const screenPosition =
+                    renderContext.camera.tileSpaceToScreenSpace(
+                        this._worldPosition,
+                    );
+
+                for (const component of this._componentsMap) {
+                    component[1].onDraw(
+                        renderContext,
+                        screenPosition,
+                        visibilityMap,
+                    );
+                }
             }
         }
 
         for (const child of this._children) {
-            child.onDraw(renderContext);
+            child.onDraw(renderContext, visibilityMap);
         }
     }
 
@@ -427,8 +483,24 @@ export class Entity {
     publishComponentEvent() {}
 
     bubbleEvent(event: EntityEvent) {
-        this._entityEvents.publish(event);
-        this._parent?.bubbleEvent(event);
+        try {
+            if (!!this._componentsQueryCache) {
+                if (event.id == "child_added" || event.id == "child_removed") {
+                    this._componentsQueryCache.clearAll();
+                } else if (
+                    event.id == "component_added" ||
+                    event.id == "component_removed"
+                ) {
+                    const constructorFn = Object.getPrototypeOf(event.item);
+                    this._componentsQueryCache.clearEntry(constructorFn);
+                }
+            }
+
+            this._entityEvents.publish(event);
+            this._parent?.bubbleEvent(event);
+        } catch (e) {
+            console.error(`Failed to bubble event: ${event.id}`, e, event);
+        }
     }
 }
 

@@ -152,8 +152,7 @@ export class EquipItemConfirmState extends InteractionState {
 
     private drawWorker(context: RenderContext, worker: Entity) {
         if (isWorker(worker)) {
-            worker.onDraw(context);
-
+            //worker.onDraw(context);
             /*
             const screenPosition = context.camera.tileSpaceToScreenSpace(
                 worker.worldPosition
