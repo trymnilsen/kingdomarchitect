@@ -122,6 +122,7 @@ export class Game {
             x: TileSize * 5,
             y: TileSize * 5,
         });
+        this.updateVisibilityMap();
         this.render();
     }
 

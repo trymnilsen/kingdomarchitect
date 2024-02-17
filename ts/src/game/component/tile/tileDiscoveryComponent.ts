@@ -1,6 +1,6 @@
 import {
     adjacentPointsWithPattern,
-    diamondPattern,
+    largeDiamondPattern,
 } from "../../../common/pattern.js";
 import { Point, addPoint, adjacentPoints } from "../../../common/point.js";
 import { createRandomTileSet } from "../../../data/tileset/randomTileSet.js";
@@ -10,7 +10,6 @@ import { TilesetGenerator } from "../../tile/tilesetGenerator.js";
 import { EntityComponent, StatelessComponent } from "../entityComponent.js";
 import { ChunkMapComponent } from "../root/chunk/chunkMapComponent.js";
 import { PathFindingComponent } from "../root/path/pathFindingComponent.js";
-import { TileGeneratorComponent } from "./tileGeneratorComponent.js";
 import { TilesComponent } from "./tilesComponent.js";
 
 export class TileDiscoveryComponent extends StatelessComponent {
@@ -20,7 +19,7 @@ export class TileDiscoveryComponent extends StatelessComponent {
         //get adjacent tiles
         const adjacentTiles = adjacentPointsWithPattern(
             this.entity.worldPosition,
-            diamondPattern,
+            largeDiamondPattern,
         );
         const rootEntity = this.entity.getRootEntity();
         const tileMapComponent = rootEntity.requireComponent(TilesComponent);

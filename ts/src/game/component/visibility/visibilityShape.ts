@@ -12,6 +12,14 @@ export class VisibilityShape {
     private _pattern: Point[] = [];
     private _offsetPattern: Point[] = [];
 
+    get pattern(): Point[] {
+        return this._pattern;
+    }
+
+    get point(): Point {
+        return this._point;
+    }
+
     updatePoint(point: Point) {
         this._point = point;
         this.calculateOffsetPoints();

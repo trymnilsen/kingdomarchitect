@@ -4,6 +4,9 @@ import { BuildingComponent } from "../component/building/buildingComponent.js";
 import { HousingComponent } from "../component/housing/housingComponent.js";
 import { HealthComponent } from "../component/health/healthComponent.js";
 import { Entity } from "../entity/entity.js";
+import { VisibilityComponent } from "../component/visibility/visibilityComponent.js";
+import { largeDiamondPattern } from "../../common/pattern.js";
+import { zeroPoint } from "../../common/point.js";
 
 export function housePrefab(id: string, scaffold: boolean): Entity {
     const house = new Entity(id);
@@ -24,8 +27,13 @@ export function housePrefab(id: string, scaffold: boolean): Entity {
         min: 0,
         max: 100,
     });
+    const visibilityComponent = VisibilityComponent.createInstance(
+        largeDiamondPattern,
+        zeroPoint(),
+    );
 
     const housingComponent = new HousingComponent();
+    house.addComponent(visibilityComponent);
     house.addComponent(buildingComponent);
     house.addComponent(healthComponent);
     house.addComponent(housingComponent);

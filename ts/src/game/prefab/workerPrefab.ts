@@ -15,6 +15,8 @@ import { WorkerSpriteComponent } from "../component/actor/mob/workerSpriteCompon
 import { EffectComponent } from "../component/effect/effectComponent.js";
 import { TileDiscoveryComponent } from "../component/tile/tileDiscoveryComponent.js";
 import { VisibilityComponent } from "../component/visibility/visibilityComponent.js";
+import { largeDiamondPattern } from "../../common/pattern.js";
+import { zeroPoint } from "../../common/point.js";
 
 export function workerPrefab(id: string): Entity {
     const worker = new Entity(id);
@@ -25,7 +27,11 @@ export function workerPrefab(id: string): Entity {
     const movementComponent = new MovementComponent();
     const energyComponent = new EnergyComponent();
     const effectComponent = new EffectComponent();
-    const visibilityComponent = new VisibilityComponent();
+    const visibilityComponent = VisibilityComponent.createInstance(
+        largeDiamondPattern,
+        zeroPoint(),
+    );
+
     const tileDiscoveryComponent = new TileDiscoveryComponent();
     energyComponent.setEnergy(10000);
     const healthComponent = HealthComponent.createInstance(100, 100);
