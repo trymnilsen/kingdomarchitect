@@ -47,6 +47,8 @@ Kingdom architects is intended to be a combined simulation and city building gam
 ### Goals for the project
 - Play both using the keyboard and mouse/touch.
 - Only depend on browser-apis, no extra libraries.
+- Kingdoms are ephemeral, they only exists within the memory of the browser. Once its closed only bards will sing the tales of your kingdom. Something rewarding should happen from the start.
+- Progress in some way should be able to be carried over into future kingdoms, rogue-lite style.
 
 ## 🙋 Contributing
 ### I have a suggestion for a feature
