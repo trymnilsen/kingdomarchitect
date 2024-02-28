@@ -14,7 +14,7 @@ type HealthBundle = {
     showHealthbarThreshold: NumberRange;
 };
 
-export class HealthComponent extends EntityComponent<HealthBundle> {
+export class HealthComponent extends EntityComponent {
     private _health = 0;
     private _maxHealth = 0;
     private _showHealthBarThreshold: NumberRange = zeroNumberRange();
@@ -32,18 +32,15 @@ export class HealthComponent extends EntityComponent<HealthBundle> {
         return this._health;
     }
 
-    static createInstance(
+    constructor(
         currentHealth: number,
         maxHealth: number,
         showHealthBarThreshold: NumberRange = { min: 0, max: maxHealth },
-    ): HealthComponent {
-        const instance = new HealthComponent();
-        instance.fromComponentBundle({
-            health: currentHealth,
-            maxHealth: maxHealth,
-            showHealthbarThreshold: showHealthBarThreshold,
-        });
-        return instance;
+    ) {
+        super();
+        this._health = currentHealth;
+        this._maxHealth = maxHealth;
+        this._showHealthBarThreshold = showHealthBarThreshold;
     }
 
     /**
@@ -138,19 +135,5 @@ export class HealthComponent extends EntityComponent<HealthBundle> {
                 color: this.healthBubble < 0 ? "lime" : "red",
             });
         }
-    }
-
-    override fromComponentBundle(bundle: HealthBundle): void {
-        this._health = bundle.health;
-        this._maxHealth = bundle.maxHealth;
-        this._showHealthBarThreshold = bundle.showHealthbarThreshold;
-    }
-
-    override toComponentBundle(): HealthBundle {
-        return {
-            health: this._health,
-            maxHealth: this._maxHealth,
-            showHealthbarThreshold: this._showHealthBarThreshold,
-        };
     }
 }

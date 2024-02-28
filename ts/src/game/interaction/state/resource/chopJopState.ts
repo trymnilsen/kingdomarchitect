@@ -135,7 +135,7 @@ export class ChopJobState extends InteractionState {
 
             this.context.root
                 .requireComponent(JobQueueComponent)
-                .addJob(ChopTreeJob.createInstance(treeComponent));
+                .addJob(new ChopTreeJob(treeEntity));
         }
 
         console.log("Clear state changer job");

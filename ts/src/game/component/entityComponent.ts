@@ -5,9 +5,7 @@ import { RenderVisibilityMap } from "../../rendering/renderVisibilityMap.js";
 import { Entity } from "../entity/entity.js";
 import { ComponentEvent } from "./componentEvent.js";
 
-export abstract class EntityComponent<
-    PersistedDataType extends JSONValue = JSONValue,
-> {
+export abstract class EntityComponent {
     private _entity?: Entity;
 
     get entity(): Entity {
@@ -44,39 +42,12 @@ export abstract class EntityComponent<
         _visibilityMap: RenderVisibilityMap,
     ) {}
 
-    /**
-     * Invoked when component is restored from a save. The component should
-     * reset its state to match the given bundle
-     * @param bundle
-     */
-    abstract fromComponentBundle(bundle: PersistedDataType): void;
-    /**
-     * Invoked when the component is meant to save its state. The returned
-     * bundle will later be used to restore this component fra the savestate
-     */
-    abstract toComponentBundle(): PersistedDataType;
-
     protected publishEvent(event: ComponentEvent<EntityComponent>) {
         if (this._entity) {
             this._entity.componentEvents.publish(event);
         } else {
             console.warn("No entity set, event is not published", this, event);
         }
-    }
-}
-
-/**
- * A component that does not persist any state. This class can be used when
- * the component solely does updating logic and the scaffolding of a to and from
- * bundle implementation is not needed or for cases where component are used as
- * indicators based or their presence or not. Non persisted components still
- * needs to be added to the `ComponentLoader`, they're just not saved with any
- * state.
- */
-export abstract class StatelessComponent extends EntityComponent {
-    override fromComponentBundle(): void {}
-    override toComponentBundle() {
-        return {};
     }
 }
 

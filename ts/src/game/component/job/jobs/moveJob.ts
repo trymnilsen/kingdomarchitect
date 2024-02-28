@@ -4,23 +4,13 @@ import { TileSize } from "../../../tile/tile.js";
 import { Job } from "../job.js";
 import { JobConstraint } from "../jobConstraint.js";
 
-type MoveBundle = {
-    path: Point[];
-};
-
 /**
  * Represents a job that will move through a specific path and complete once
  * the actor of this job is at the end of the path
  */
-export class MoveJob extends Job<MoveBundle> {
-    private path: Point[] = [];
-
-    static createInstance(path: Point[]) {
-        const instance = new MoveJob();
-        instance.bundle = {
-            path: path.reverse(),
-        };
-        return instance;
+export class MoveJob extends Job {
+    constructor(private path: Point[]) {
+        super();
     }
 
     update(): void {
@@ -42,15 +32,5 @@ export class MoveJob extends Job<MoveBundle> {
                 fill: "purple",
             });
         }
-    }
-
-    protected override onFromPersistedState(bundle: MoveBundle): void {
-        this.path = bundle.path;
-    }
-
-    protected override onPersistJobState(): MoveBundle {
-        return {
-            path: this.path,
-        };
     }
 }

@@ -4,7 +4,7 @@ import { Entity } from "../entity/entity.js";
 
 export function ruinsPrefab(id: string): Entity {
     const ruinsPrefab = new Entity(id);
-    const spriteDrawer = SpriteComponent.createInstance(
+    const spriteDrawer = new SpriteComponent(
         sprites2.ruins,
         {
             x: 3,

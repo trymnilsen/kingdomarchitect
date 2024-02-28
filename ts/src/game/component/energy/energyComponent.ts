@@ -1,11 +1,7 @@
 import { InvalidArgumentError } from "../../../common/error/invalidArgumentError.js";
 import { EntityComponent } from "../entityComponent.js";
 
-type EnergyBundle = {
-    amount: number;
-};
-
-export class EnergyComponent extends EntityComponent<EnergyBundle> {
+export class EnergyComponent extends EntityComponent {
     private currentAmount: number = 0;
 
     public get energy(): number {
@@ -32,14 +28,5 @@ export class EnergyComponent extends EntityComponent<EnergyBundle> {
 
     setEnergy(amount: number) {
         this.currentAmount = Math.max(0, amount);
-    }
-
-    override fromComponentBundle(bundle: EnergyBundle): void {
-        this.currentAmount = bundle.amount;
-    }
-    override toComponentBundle(): EnergyBundle {
-        return {
-            amount: this.currentAmount,
-        };
     }
 }

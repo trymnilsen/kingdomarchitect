@@ -1,9 +1,9 @@
-import { StatelessComponent } from "../../../src/game/component/entityComponent.js";
+import { EntityComponent } from "../../../src/game/component/entityComponent.js";
 
 /**
  * A stub of a component for use with testing
  */
-export class StubComponent extends StatelessComponent {
+export class StubComponent extends EntityComponent {
     constructor(
         private callbacks?: {
             onStart?: () => void;

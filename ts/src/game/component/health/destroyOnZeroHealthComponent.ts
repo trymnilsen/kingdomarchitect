@@ -1,8 +1,8 @@
 import { TypedEventHandle } from "../../../common/event/typedEvent.js";
-import { StatelessComponent } from "../entityComponent.js";
+import { EntityComponent } from "../entityComponent.js";
 import { HealthEvent } from "./healthEvent.js";
 
-export class DestroyOnZeroHealthComponent extends StatelessComponent {
+export class DestroyOnZeroHealthComponent extends EntityComponent {
     private healthEventHandle: TypedEventHandle | undefined;
     override onStart(): void {
         this.healthEventHandle = this.entity.componentEvents.listen(

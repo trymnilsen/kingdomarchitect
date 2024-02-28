@@ -7,16 +7,11 @@ import { EntityComponent } from "../entityComponent.js";
 import { HealthComponent } from "../health/healthComponent.js";
 import { TenantComponent } from "./tenantComponent.js";
 
-type HousingBundle = {
-    startTime: number;
-    residentEntityId: string | null;
-};
-
 /**
  * The housing component manages npcs living in a building and
  * spawing the npcs/workers if there are no-one living here
  */
-export class HousingComponent extends EntityComponent<HousingBundle> {
+export class HousingComponent extends EntityComponent {
     private startTime = 0;
     private _residentEntityId: string | null = null;
 
@@ -69,18 +64,6 @@ export class HousingComponent extends EntityComponent<HousingBundle> {
                 this.entity.getRootEntity().addChild(worker);
             }
         }
-    }
-
-    override fromComponentBundle(bundle: HousingBundle): void {
-        this._residentEntityId = bundle.residentEntityId;
-        this.startTime = bundle.startTime;
-    }
-
-    override toComponentBundle(): HousingBundle {
-        return {
-            startTime: this.startTime,
-            residentEntityId: this._residentEntityId,
-        };
     }
 
     private setHouseOnTenant(entity: Entity) {

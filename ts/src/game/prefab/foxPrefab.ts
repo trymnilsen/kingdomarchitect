@@ -13,7 +13,7 @@ import { Entity } from "../entity/entity.js";
 
 export function foxPrefab(id: string): Entity {
     const fox = new Entity(id);
-    const spriteDrawer = SpriteComponent.createInstance(
+    const spriteDrawer = new SpriteComponent(
         sprites2.fox,
         {
             x: 3,
@@ -21,11 +21,11 @@ export function foxPrefab(id: string): Entity {
         },
         { x: 32, y: 32 },
     );
-    const aggroComponent = AggroComponent.createInstance(1);
+    const aggroComponent = new AggroComponent(1);
     aggroComponent.aggroMode = AggroMode.Defensive;
     const jobRunnerComponent = new JobRunnerComponent();
     const idleMobComponent = new IdleMobComponent();
-    const healthComponent = HealthComponent.createInstance(100, 100);
+    const healthComponent = new HealthComponent(100, 100);
     jobRunnerComponent.isOpenForExternalJobs = false;
 
     fox.addComponent(idleMobComponent);

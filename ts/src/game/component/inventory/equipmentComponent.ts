@@ -6,7 +6,7 @@ import {
 import { EntityComponent } from "../entityComponent.js";
 import { InventoryComponent } from "./inventoryComponent.js";
 
-export class EquipmentComponent extends EntityComponent<EquipmentBundle> {
+export class EquipmentComponent extends EntityComponent {
     private _mainItem: InternalEquipmentSlot;
     private _otherItem: InternalEquipmentSlot;
 
@@ -31,18 +31,6 @@ export class EquipmentComponent extends EntityComponent<EquipmentBundle> {
         );
     }
 
-    override fromComponentBundle(bundle: EquipmentBundle): void {
-        this._mainItem.setItemWithoutCallback(bundle.mainItem);
-        this._otherItem.setItemWithoutCallback(bundle.otherItem);
-    }
-
-    override toComponentBundle(): EquipmentBundle {
-        return {
-            mainItem: this._mainItem.getItem(),
-            otherItem: this._otherItem.getItem(),
-        };
-    }
-
     private removeCurrentlyEquipedItemIfNeeded = (
         previousItem: EquipmentSlotItem,
         _newItem: EquipmentSlotItem,
@@ -64,11 +52,6 @@ export interface EquipmentSlot {
 }
 
 export type EquipmentSlotItem = InventoryItem | null;
-
-type EquipmentBundle = {
-    mainItem: EquipmentSlotItem;
-    otherItem: EquipmentSlotItem;
-};
 
 class InternalEquipmentSlot implements EquipmentSlot {
     private _value: EquipmentSlotItem = null;

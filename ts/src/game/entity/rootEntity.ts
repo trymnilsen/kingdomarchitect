@@ -19,7 +19,7 @@ export function createRootEntity(): Entity {
     const rootEntity = new Entity("root");
     const jobQueueComponent = new JobQueueComponent();
     const inventoryComponent = new InventoryComponent();
-    const groundComponent = TilesComponent.createInstance();
+    const groundComponent = new TilesComponent();
     const chunkmapComponent = new ChunkMapComponent();
     rootEntity.addComponent(inventoryComponent);
     rootEntity.addComponent(groundComponent);

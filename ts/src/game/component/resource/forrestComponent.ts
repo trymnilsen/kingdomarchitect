@@ -2,9 +2,9 @@ import { generateId } from "../../../common/idGenerator.js";
 import { firstChildWhere } from "../../entity/child/first.js";
 import { foxPrefab } from "../../prefab/foxPrefab.js";
 import { FoxComponent } from "../actor/animal/foxComponent.js";
-import { StatelessComponent } from "../entityComponent.js";
+import { EntityComponent } from "../entityComponent.js";
 
-export class ForrestComponent extends StatelessComponent {
+export class ForrestComponent extends EntityComponent {
     override onUpdate(tick: number): void {
         if (tick % 60 == 0) {
             const foxes = firstChildWhere(this.entity, (child) => {

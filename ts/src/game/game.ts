@@ -9,7 +9,6 @@ import { InteractionHandler } from "./interaction/handler/interactionHandler.js"
 import { Entity } from "./entity/entity.js";
 import { createRootEntity } from "./entity/rootEntity.js";
 import { TileSize } from "./tile/tile.js";
-import { GamePersister } from "../persistence/gamePersister.js";
 import { RenderVisibilityMap } from "../rendering/renderVisibilityMap.js";
 import { VisibilityComponent } from "./component/visibility/visibilityComponent.js";
 
@@ -22,7 +21,6 @@ export class Game {
     private interactionHandler: InteractionHandler;
     private currentTick = 0;
     private world: Entity;
-    private gamePersister: GamePersister;
     private visibilityMap: RenderVisibilityMap = new RenderVisibilityMap();
 
     constructor(domElementWrapperSelector: string) {
@@ -35,7 +33,6 @@ export class Game {
             throw new Error("Canvas element not found");
         }
         this.gameTime = new MutableGameTime();
-        this.gamePersister = new GamePersister();
         // Input
         this.input = new Input();
         this.touchInput = new TouchInput(canvasElement);
@@ -48,13 +45,7 @@ export class Game {
             this.gameTime,
         );
 
-        if (this.gamePersister.hasSaveData) {
-            const loadedItems = this.gamePersister.loadWorld();
-            this.renderer.camera.position = loadedItems.cameraPosition;
-            this.world = loadedItems.rootEntity;
-        } else {
-            this.world = createRootEntity();
-        }
+        this.world = createRootEntity();
 
         /*
         window.saveGame = () => {
@@ -134,11 +125,6 @@ export class Game {
         this.interactionHandler.onUpdate(this.currentTick);
         this.updateVisibilityMap();
         this.render();
-        try {
-            this.saveGame();
-        } catch (err) {
-            console.error(err);
-        }
         //performance.measure("onTick duration", "tick-start");
     };
 
@@ -202,9 +188,5 @@ export class Game {
         this.renderer.renderDeferred();
         //const renderEnd = performance.now();
         //console.log("⏱render time: ", renderEnd - renderStart);
-    }
-
-    private saveGame() {
-        this.gamePersister.save(this.world, this.renderer.camera);
     }
 }

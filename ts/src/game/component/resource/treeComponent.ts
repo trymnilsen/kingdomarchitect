@@ -16,21 +16,13 @@ type TreeBundle = {
     chopState: TreeComponentChopState;
 };
 
-export class TreeComponent extends EntityComponent<TreeBundle> {
+export class TreeComponent extends EntityComponent {
     private chopTime?: number;
-    private tree = 1;
     private previousTick = 0;
     private chopState: TreeComponentChopState = TreeComponentChopState.Full;
 
-    static createInstance(tree: number): TreeComponent {
-        const instance = new TreeComponent();
-        instance.fromComponentBundle({
-            tree: tree,
-            previousTick: 0,
-            chopState: TreeComponentChopState.Full,
-        });
-
-        return instance;
+    constructor(private tree: number) {
+        super();
     }
 
     startChop() {
@@ -72,21 +64,5 @@ export class TreeComponent extends EntityComponent<TreeBundle> {
             targetWidth: 32,
             targetHeight: 32,
         });
-    }
-
-    override fromComponentBundle(bundle: TreeBundle): void {
-        this.chopState = bundle.chopState;
-        this.chopTime = bundle.chopTime;
-        this.previousTick = bundle.previousTick;
-        this.tree = bundle.tree;
-    }
-
-    override toComponentBundle(): TreeBundle {
-        return {
-            chopState: this.chopState,
-            chopTime: this.chopTime,
-            previousTick: this.previousTick,
-            tree: this.tree,
-        };
     }
 }

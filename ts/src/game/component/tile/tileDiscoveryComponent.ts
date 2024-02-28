@@ -7,12 +7,12 @@ import { createRandomTileSet } from "../../../data/tileset/randomTileSet.js";
 import { ChunkSize, getChunkPosition } from "../../chunk.js";
 import { Entity } from "../../entity/entity.js";
 import { TilesetGenerator } from "../../tile/tilesetGenerator.js";
-import { EntityComponent, StatelessComponent } from "../entityComponent.js";
+import { EntityComponent } from "../entityComponent.js";
 import { ChunkMapComponent } from "../root/chunk/chunkMapComponent.js";
 import { PathFindingComponent } from "../root/path/pathFindingComponent.js";
 import { TilesComponent } from "./tilesComponent.js";
 
-export class TileDiscoveryComponent extends StatelessComponent {
+export class TileDiscoveryComponent extends EntityComponent {
     private generator = new TilesetGenerator();
 
     override onUpdate(_tick: number): void {
