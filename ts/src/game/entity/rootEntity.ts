@@ -27,6 +27,7 @@ export function createRootEntity(): Entity {
     rootEntity.addComponent(chunkmapComponent);
     rootEntity.addComponent(new JobSchedulerComponent());
     rootEntity.addComponent(new ForrestComponent());
+    rootEntity.addComponent(new TileDiscoveryComponent());
     const pathFindingComponent = new PathFindingComponent();
     rootEntity.addComponent(pathFindingComponent);
     rootEntity.toggleIsGameRoot(true);

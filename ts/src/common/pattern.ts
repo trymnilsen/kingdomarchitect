@@ -2,7 +2,7 @@ import { Point, addPoint } from "./point.js";
 
 export function adjacentPointsWithPattern(
     point: Point,
-    pattern: Point[],
+    pattern: ReadonlyArray<Point>,
 ): Point[] {
     const points: Point[] = [];
     for (const patternPoint of pattern) {

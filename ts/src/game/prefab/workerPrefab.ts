@@ -13,7 +13,6 @@ import { MovementComponent } from "../component/movement/movementComponent.js";
 import { EnergyComponent } from "../component/energy/energyComponent.js";
 import { WorkerSpriteComponent } from "../component/actor/mob/workerSpriteComponent.js";
 import { EffectComponent } from "../component/effect/effectComponent.js";
-import { TileDiscoveryComponent } from "../component/tile/tileDiscoveryComponent.js";
 import { VisibilityComponent } from "../component/visibility/visibilityComponent.js";
 import { largeDiamondPattern } from "../../common/pattern.js";
 import { zeroPoint } from "../../common/point.js";
@@ -32,7 +31,6 @@ export function workerPrefab(id: string): Entity {
         zeroPoint(),
     );
 
-    const tileDiscoveryComponent = new TileDiscoveryComponent();
     energyComponent.setEnergy(10000);
     const healthComponent = new HealthComponent(100, 100);
     const aggroComponent = new AggroComponent(5);
@@ -46,7 +44,6 @@ export function workerPrefab(id: string): Entity {
     worker.addComponent(new WorkerSpriteComponent());
     worker.addComponent(healthComponent);
     worker.addComponent(effectComponent);
-    worker.addComponent(tileDiscoveryComponent);
     worker.addComponent(visibilityComponent);
 
     return worker;

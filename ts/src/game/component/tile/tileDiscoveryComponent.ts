@@ -15,21 +15,15 @@ import { TilesComponent } from "./tilesComponent.js";
 export class TileDiscoveryComponent extends EntityComponent {
     private generator = new TilesetGenerator();
 
-    override onUpdate(_tick: number): void {
-        //get adjacent tiles
-        const adjacentTiles = adjacentPointsWithPattern(
-            this.entity.worldPosition,
-            largeDiamondPattern,
-        );
-        const rootEntity = this.entity.getRootEntity();
-        const tileMapComponent = rootEntity.requireComponent(TilesComponent);
+    unlockTiles(_position: Point, pattern: ReadonlyArray<Point>) {
+        const tileMapComponent = this.entity.requireComponent(TilesComponent);
         const pathFindingComponent =
-            rootEntity.requireComponent(PathFindingComponent);
+            this.entity.requireComponent(PathFindingComponent);
 
-        for (const tile of adjacentTiles) {
+        for (const tile of pattern) {
             this.discoverTile(
                 tile,
-                rootEntity,
+                this.entity,
                 tileMapComponent,
                 pathFindingComponent,
             );

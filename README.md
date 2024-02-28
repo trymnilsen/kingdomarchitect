@@ -14,7 +14,7 @@ You can either clone this repository and run it based on the instructions on how
 
 ### How to play
 - Gather resources
-- Unlock land
+- Unlock lands
 - Build houses to spawn workers
 - Level up the skills of workers as wizards, knights or archers
 - Defend against enemy mobs

@@ -10,6 +10,7 @@ import { TypedEvent } from "../../common/event/typedEvent.js";
 import {
     addPoint,
     Point,
+    pointEquals,
     subtractPoint,
     zeroPoint,
 } from "../../common/point.js";
@@ -82,8 +83,10 @@ export class Entity {
      * Set the position of this entity locally in its own space
      */
     set position(position: Point) {
-        this._localPosition = position;
-        this.updateTransform();
+        if (!pointEquals(this._localPosition, position)) {
+            this._localPosition = position;
+            this.updateTransform();
+        }
     }
 
     /**
@@ -99,16 +102,18 @@ export class Entity {
      * the wanted world position
      */
     set worldPosition(position: Point) {
-        this._worldPosition = position;
-        if (this.parent) {
-            this._localPosition = subtractPoint(
-                position,
-                this.parent.worldPosition,
-            );
-        } else {
-            this._localPosition = position;
+        if (!pointEquals(this._worldPosition, position)) {
+            this._worldPosition = position;
+            if (this.parent) {
+                this._localPosition = subtractPoint(
+                    position,
+                    this.parent.worldPosition,
+                );
+            } else {
+                this._localPosition = position;
+            }
+            this.updateTransform();
         }
-        this.updateTransform();
     }
 
     /**

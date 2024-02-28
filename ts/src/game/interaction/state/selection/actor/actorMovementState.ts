@@ -158,7 +158,7 @@ export class ActorMovementState extends InteractionState {
         this.context.root
             .requireComponent(JobQueueComponent)
             .addJob(
-                new MoveJob(this.path),
+                new MoveJob(this.path.reverse()),
                 entityInstanceConstraint(this.entity.id),
             );
     }
