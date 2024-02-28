@@ -2,22 +2,12 @@ import { Entity } from "../../../entity/entity.js";
 import { HealthComponent } from "../../health/healthComponent.js";
 import { Job } from "../../job/job.js";
 
-type AttackJobBundle = {
-    entityId: string;
-    damage: number;
-};
-
-export class AttackJob extends Job<AttackJobBundle> {
-    private target: Entity | null = null;
-    private damage = 0;
-
-    static createInstance(entityId: string, damage: number): AttackJob {
-        const instance = new AttackJob();
-        instance.bundle = {
-            entityId,
-            damage,
-        };
-        return instance;
+export class AttackJob extends Job {
+    constructor(
+        private target: Entity,
+        private damage: number,
+    ) {
+        super();
     }
 
     override update(): void {
@@ -50,21 +40,5 @@ export class AttackJob extends Job<AttackJobBundle> {
             //(forexample because of an interupt) we will path again
             //this.movement.path(point);
         }
-    }
-
-    protected override onPersistJobState(): AttackJobBundle {
-        throw new Error("Method not implemented.");
-    }
-
-    protected override onFromPersistedState(bundle: AttackJobBundle): void {
-        const entityWithId = this.entity
-            .getRootEntity()
-            .findEntity(bundle.entityId);
-        if (!entityWithId) {
-            throw new Error("Unable to restore ");
-        }
-
-        this.target = entityWithId;
-        this.damage = bundle.damage;
     }
 }

@@ -6,6 +6,8 @@ import { woodResourceItem } from "../../../../data/inventory/resources.js";
 import { RenderContext } from "../../../../rendering/renderContext.js";
 import { uiBox } from "../../../../ui/dsl/uiBoxDsl.js";
 import { fillUiSize } from "../../../../ui/uiSize.js";
+import { BuildingComponent } from "../../../component/building/buildingComponent.js";
+import { HealthComponent } from "../../../component/health/healthComponent.js";
 import { InventoryComponent } from "../../../component/inventory/inventoryComponent.js";
 import { workerConstraint } from "../../../component/job/jobConstraint.js";
 import { JobQueueComponent } from "../../../component/job/jobQueueComponent.js";
@@ -179,8 +181,11 @@ export class BuildConfirmState extends InteractionState {
                 house.position = selection;
                 const root = this.context.root;
                 root.addChild(house);
+                const buildingComponent =
+                    house.requireComponent(BuildingComponent);
+                const healthComponent = house.requireComponent(HealthComponent);
                 root.requireComponent(JobQueueComponent).addJob(
-                    BuildJob.createInstance(house),
+                    new BuildJob(buildingComponent, healthComponent),
                     workerConstraint(),
                 );
             }

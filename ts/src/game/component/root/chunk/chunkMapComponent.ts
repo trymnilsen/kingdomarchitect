@@ -8,12 +8,12 @@ import { getChunkId, getChunkPosition } from "../../../chunk.js";
 import { visitChildren } from "../../../entity/child/visit.js";
 import { Entity } from "../../../entity/entity.js";
 import { EntityEvent } from "../../../entity/entityEvent.js";
-import { StatelessComponent } from "../../entityComponent.js";
+import { EntityComponent } from "../../entityComponent.js";
 import { ChunkMapUpdateEvent } from "./chunkMapUpdateEvent.js";
 
 type ChunkMap = Record<string, Record<string, Entity>>;
 
-export class ChunkMapComponent extends StatelessComponent {
+export class ChunkMapComponent extends EntityComponent {
     /**
      * Holds a map of entities within a given chunk
      */

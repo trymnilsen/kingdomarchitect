@@ -11,14 +11,7 @@ import { RenderContext } from "../../../rendering/renderContext.js";
 import { EntityComponent } from "../entityComponent.js";
 import { ChunkMapComponent } from "../root/chunk/chunkMapComponent.js";
 
-type BuildingComponentBundle = {
-    buildingSprite: Sprite2;
-    scaffoldSprite: Sprite2;
-    buildingId: string;
-    isScaffolded: boolean;
-};
-
-export class BuildingComponent extends EntityComponent<BuildingComponentBundle> {
+export class BuildingComponent extends EntityComponent {
     private buildingSprite: Sprite2 = emptySprite;
     private scaffoldSprite: Sprite2 = emptySprite;
     private _building: Building = nullBuilding;
@@ -28,24 +21,15 @@ export class BuildingComponent extends EntityComponent<BuildingComponentBundle> 
         return this._building;
     }
 
-    constructor() {
-        super();
-    }
-
-    static createInstance(
+    constructor(
         buildingSprite: Sprite2,
         scaffoldSprite: Sprite2,
-        buildingId: string,
-    ): BuildingComponent {
-        const instance = new BuildingComponent();
-        instance.fromComponentBundle({
-            buildingId: buildingId,
-            buildingSprite: buildingSprite,
-            scaffoldSprite: scaffoldSprite,
-            isScaffolded: true,
-        });
-
-        return instance;
+        building: Building,
+    ) {
+        super();
+        this.buildingSprite = buildingSprite;
+        this.scaffoldSprite = scaffoldSprite;
+        this._building = building;
     }
 
     finishBuild() {
@@ -96,29 +80,6 @@ export class BuildingComponent extends EntityComponent<BuildingComponentBundle> 
                 targetHeight: 32,
             });
         }
-    }
-
-    override fromComponentBundle(bundle: BuildingComponentBundle): void {
-        this.buildingSprite = bundle.buildingSprite;
-        this.scaffoldSprite = bundle.scaffoldSprite;
-        this.isScaffolded = bundle.isScaffolded;
-        const building = getBuildingById(bundle.buildingId);
-        if (building) {
-            this._building = building;
-        } else if (bundle.buildingId === nullBuildingId) {
-            this._building = nullBuilding;
-        } else {
-            console.error("No building found with id: ", bundle.buildingId);
-        }
-    }
-
-    override toComponentBundle(): BuildingComponentBundle {
-        return {
-            buildingId: this.building.id,
-            buildingSprite: this.buildingSprite,
-            scaffoldSprite: this.scaffoldSprite,
-            isScaffolded: this.isScaffolded,
-        };
     }
 
     private getAdjacency(): AdjacentBuildings {

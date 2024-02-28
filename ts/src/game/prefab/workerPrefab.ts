@@ -27,15 +27,15 @@ export function workerPrefab(id: string): Entity {
     const movementComponent = new MovementComponent();
     const energyComponent = new EnergyComponent();
     const effectComponent = new EffectComponent();
-    const visibilityComponent = VisibilityComponent.createInstance(
+    const visibilityComponent = new VisibilityComponent(
         largeDiamondPattern,
         zeroPoint(),
     );
 
     const tileDiscoveryComponent = new TileDiscoveryComponent();
     energyComponent.setEnergy(10000);
-    const healthComponent = HealthComponent.createInstance(100, 100);
-    const aggroComponent = AggroComponent.createInstance(5);
+    const healthComponent = new HealthComponent(100, 100);
+    const aggroComponent = new AggroComponent(5);
     aggroComponent.aggroMode = AggroMode.Defensive;
     worker.addComponent(jobRunner);
     worker.addComponent(workerBehaviorComponent);

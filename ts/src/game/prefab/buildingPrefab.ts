@@ -14,23 +14,20 @@ export function buildingPrefab(
     extraComponents: EntityComponent[],
 ): Entity {
     const entity = new Entity(id);
-    const buildingComponent = BuildingComponent.createInstance(
+    const buildingComponent = new BuildingComponent(
         building.icon,
         sprites2.wooden_house_scaffold,
-        building.id,
+        building,
     );
 
     const currentHealth = 10;
-    const healthComponent = HealthComponent.createInstance(currentHealth, 100);
+    const healthComponent = new HealthComponent(currentHealth, 100);
     let pattern = diamondPattern;
     if (building.id == "stonetower") {
         pattern = largeDiamondPattern;
     }
 
-    const visibilityComponent = VisibilityComponent.createInstance(
-        pattern,
-        zeroPoint(),
-    );
+    const visibilityComponent = new VisibilityComponent(pattern, zeroPoint());
 
     entity.addComponent(buildingComponent);
     entity.addComponent(healthComponent);

@@ -4,7 +4,7 @@ import { Entity } from "../entity/entity.js";
 
 export function farmPrefab(id: string): Entity {
     const farm = new Entity(id);
-    const spriteDrawer = SpriteComponent.createInstance(
+    const spriteDrawer = new SpriteComponent(
         sprites2.farm_4,
         {
             x: 3,

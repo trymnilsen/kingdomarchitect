@@ -1,3 +1,3 @@
-import { StatelessComponent } from "../../entityComponent.js";
+import { EntityComponent } from "../../entityComponent.js";
 
-export class FoxComponent extends StatelessComponent {}
+export class FoxComponent extends EntityComponent {}

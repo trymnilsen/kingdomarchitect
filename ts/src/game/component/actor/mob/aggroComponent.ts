@@ -23,12 +23,13 @@ type AggroComponentBundle = {
  * a job to attack it if the mode is set to agressive. Upon receiving damage it
  * will assign the attack job regardless of [AggroMode]
  */
-export class AggroComponent extends EntityComponent<AggroComponentBundle> {
+export class AggroComponent extends EntityComponent {
     private _aggroMode: AggroMode = AggroMode.Agressive;
     private healthEventHandle: TypedEventHandle | undefined;
-    //TODO: Move damage from field here to a value from the equipment on
-    //the entity
-    private damage = 0;
+
+    constructor(private damage: number) {
+        super();
+    }
 
     get aggroMode(): AggroMode {
         return this._aggroMode;
@@ -53,10 +54,7 @@ export class AggroComponent extends EntityComponent<AggroComponentBundle> {
                     // damage if the aggro is larger
                     if (!hasAttackJob) {
                         jobRunner.assignJob(
-                            AttackJob.createInstance(
-                                event.causeEntity.id,
-                                this.damage,
-                            ),
+                            new AttackJob(event.causeEntity, this.damage),
                         );
                     }
                 }
@@ -93,32 +91,9 @@ export class AggroComponent extends EntityComponent<AggroComponentBundle> {
                 const hasAttackJob = jobRunner.activeJob instanceof AttackJob;
 
                 if (!hasAttackJob) {
-                    jobRunner.assignJob(
-                        AttackJob.createInstance(actor.id, this.damage),
-                    );
+                    jobRunner.assignJob(new AttackJob(actor, this.damage));
                 }
             }
         }
-    }
-
-    override fromComponentBundle(bundle: AggroComponentBundle): void {
-        this._aggroMode = bundle.aggroMode;
-        this.damage = bundle.damage;
-    }
-
-    override toComponentBundle(): AggroComponentBundle {
-        return {
-            aggroMode: this.aggroMode,
-            damage: this.damage,
-        };
-    }
-
-    static createInstance(damage: number): AggroComponent {
-        const instance = new AggroComponent();
-        instance.fromComponentBundle({
-            damage: damage,
-            aggroMode: AggroMode.Agressive,
-        });
-        return instance;
     }
 }

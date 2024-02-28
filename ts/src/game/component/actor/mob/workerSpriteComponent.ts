@@ -3,10 +3,10 @@ import { JSONValue } from "../../../../common/object.js";
 import { Point } from "../../../../common/point.js";
 import { ItemCategory } from "../../../../data/inventory/inventoryItem.js";
 import { RenderContext } from "../../../../rendering/renderContext.js";
-import { EntityComponent, StatelessComponent } from "../../entityComponent.js";
+import { EntityComponent } from "../../entityComponent.js";
 import { EquipmentComponent } from "../../inventory/equipmentComponent.js";
 
-export class WorkerSpriteComponent extends StatelessComponent {
+export class WorkerSpriteComponent extends EntityComponent {
     override onDraw(context: RenderContext, screenPosition: Point): void {
         const sprite = this.getSprite();
         context.drawScreenSpaceSprite({

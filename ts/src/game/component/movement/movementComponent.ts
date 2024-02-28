@@ -16,11 +16,7 @@ import {
 } from "./currentMovement.js";
 import { MovementResult } from "./movementResult.js";
 
-type MovementBundle = {
-    currentMovement: CurrentMovement;
-};
-
-export class MovementComponent extends EntityComponent<MovementBundle> {
+export class MovementComponent extends EntityComponent {
     private _currentMovement: CurrentMovement = null;
     /**
      * The concept of shuffling is to "move out of the way". Another actor or
@@ -167,14 +163,5 @@ export class MovementComponent extends EntityComponent<MovementBundle> {
     private setCurrentMovement(movement: CurrentMovement) {
         this._currentMovement = movement;
         this.publishEvent(new CurrentMovementUpdatedEvent(movement, this));
-    }
-
-    override fromComponentBundle(bundle: MovementBundle): void {
-        this._currentMovement = bundle.currentMovement;
-    }
-    override toComponentBundle(): MovementBundle {
-        return {
-            currentMovement: this._currentMovement,
-        };
     }
 }

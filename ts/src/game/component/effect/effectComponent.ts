@@ -3,11 +3,7 @@ import { Effect } from "../../../data/effect/effect.js";
 import { EntityComponent } from "../entityComponent.js";
 import { effectProcList } from "./effectProcList.js";
 
-type EffectBundle = {
-    activeEffects: Effect[];
-};
-
-export class EffectComponent extends EntityComponent<EffectBundle> {
+export class EffectComponent extends EntityComponent {
     private activeEffects: Effect[] = [];
 
     addEffect(effect: Effect) {
@@ -33,15 +29,5 @@ export class EffectComponent extends EntityComponent<EffectBundle> {
                 this.activeEffects.splice(i, 1);
             }
         }
-    }
-
-    override fromComponentBundle(bundle: EffectBundle): void {
-        this.activeEffects = bundle.activeEffects;
-    }
-
-    override toComponentBundle(): EffectBundle {
-        return {
-            activeEffects: this.activeEffects,
-        };
     }
 }

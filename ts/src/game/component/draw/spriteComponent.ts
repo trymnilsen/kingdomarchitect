@@ -3,29 +3,16 @@ import { Point, zeroPoint } from "../../../common/point.js";
 import { RenderContext } from "../../../rendering/renderContext.js";
 import { EntityComponent } from "../entityComponent.js";
 
-type SpriteComponentBundle = {
-    sprite: string;
-    offset: Point;
-    size?: Point;
-};
-
-export class SpriteComponent extends EntityComponent<SpriteComponentBundle> {
+export class SpriteComponent extends EntityComponent {
     private sprite: Sprite2 = emptySprite;
     private offset: Point = zeroPoint();
     private size?: Point;
 
-    static createInstance(
-        sprite: Sprite2,
-        offset: Point,
-        size?: Point,
-    ): SpriteComponent {
-        const instance = new SpriteComponent();
-        instance.fromComponentBundle({
-            offset: offset,
-            sprite: sprite.id,
-            size: size,
-        });
-        return instance;
+    constructor(sprite: Sprite2, offset: Point, size?: Point) {
+        super();
+        this.sprite = sprite;
+        this.offset = offset;
+        this.size = size;
     }
 
     updateSprite(sprite: Sprite2) {
@@ -57,24 +44,5 @@ export class SpriteComponent extends EntityComponent<SpriteComponentBundle> {
             targetHeight: targetHeight,
             targetWidth: targetWidth,
         });
-    }
-
-    override fromComponentBundle(bundle: SpriteComponentBundle): void {
-        const sprite = sprites2[bundle.sprite] as Sprite2;
-        if (!sprite) {
-            throw new Error(`No sprite with id ${bundle.sprite}`);
-        }
-
-        this.sprite = sprite;
-        this.offset = bundle.offset;
-        this.size = bundle.size;
-    }
-
-    override toComponentBundle(): SpriteComponentBundle {
-        return {
-            sprite: this.sprite.id,
-            offset: this.offset,
-            size: this.size,
-        };
     }
 }

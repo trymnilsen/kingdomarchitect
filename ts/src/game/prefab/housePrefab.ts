@@ -10,10 +10,10 @@ import { zeroPoint } from "../../common/point.js";
 
 export function housePrefab(id: string, scaffold: boolean): Entity {
     const house = new Entity(id);
-    const buildingComponent = BuildingComponent.createInstance(
+    const buildingComponent = new BuildingComponent(
         sprites2.wooden_house,
         sprites2.wooden_house_scaffold,
-        woodenBuildings[0].id,
+        woodenBuildings[0],
     );
 
     let currentHealth = 100;
@@ -23,11 +23,11 @@ export function housePrefab(id: string, scaffold: boolean): Entity {
         buildingComponent.finishBuild();
     }
 
-    const healthComponent = HealthComponent.createInstance(currentHealth, 100, {
+    const healthComponent = new HealthComponent(currentHealth, 100, {
         min: 0,
         max: 100,
     });
-    const visibilityComponent = VisibilityComponent.createInstance(
+    const visibilityComponent = new VisibilityComponent(
         largeDiamondPattern,
         zeroPoint(),
     );

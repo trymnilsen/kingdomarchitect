@@ -3,21 +3,12 @@ import { jobDebug } from "../../../constants.js";
 import { RenderContext } from "../../../rendering/renderContext.js";
 import { EntityComponent } from "../entityComponent.js";
 import { Job } from "./job.js";
-import { JobBundle } from "./jobBundle.js";
-import { createJobFromBundle } from "./jobBundleHelper.js";
 import { isJobApplicableForEntity } from "./jobConstraint.js";
 import { JobOwner } from "./jobOwner.js";
 import { JobQueueComponent } from "./jobQueueComponent.js";
 import { JobState } from "./jobState.js";
 
-type JobRunnerBundle = {
-    jobStack: JobBundle[];
-};
-
-export class JobRunnerComponent
-    extends EntityComponent<JobRunnerBundle>
-    implements JobOwner
-{
+export class JobRunnerComponent extends EntityComponent implements JobOwner {
     /**
      * Jobs can be interupted and paused while running
      * To enable resuming jobs we keep them in a stack
@@ -67,13 +58,6 @@ export class JobRunnerComponent
         this.jobStack.push(job);
         job.entity = this.entity;
         job.owner = this;
-        if (job.bundle) {
-            job.fromJobBundle({
-                data: job.bundle,
-                jobState: JobState.NotStarted,
-                type: job.constructor.name,
-            });
-        }
         try {
             job.onStart();
         } catch (e) {
@@ -105,21 +89,6 @@ export class JobRunnerComponent
         if (this.activeJob) {
             this.activeJob.onDraw(context);
         }
-    }
-
-    override fromComponentBundle(bundle: JobRunnerBundle): void {
-        this.jobStack = bundle.jobStack.map((jobBundle) => {
-            const job = createJobFromBundle(jobBundle);
-            job.entity = this.entity;
-            job.owner = this;
-            return job;
-        });
-    }
-
-    override toComponentBundle(): JobRunnerBundle {
-        return {
-            jobStack: this.jobStack.map((job) => job.toJobBundle()),
-        };
     }
 
     private endJob() {

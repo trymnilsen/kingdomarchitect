@@ -19,9 +19,9 @@ type ChopTreeBundle = {
  * it down. If the tree is adjacent to the actor doing it, the moving part will
  * be skipped.
  */
-export class ChopTreeJob extends Job<ChopTreeBundle> {
-    private _target: Entity | null = null;
-    private healthComponent: HealthComponent | null = null;
+export class ChopTreeJob extends Job {
+    private _target: Entity;
+    private healthComponent: HealthComponent;
     private blinkingAnimation: BlinkingImageAnimation =
         new BlinkingImageAnimation({
             x: 0,
@@ -33,24 +33,18 @@ export class ChopTreeJob extends Job<ChopTreeBundle> {
         return this._target;
     }
 
-    static createInstance(tree: TreeComponent) {
-        const instance = new ChopTreeJob();
-        instance.bundle = {
-            targetEntityId: tree.entity.id,
-        };
-        return instance;
+    constructor(entity: Entity) {
+        super();
+        this._target = entity;
+        this.healthComponent = entity.requireComponent(HealthComponent);
     }
 
     override onStart(): void {
         super.onStart();
-        assertEntity(this._target);
         this._target.requireComponent(TreeComponent).startChop();
     }
 
     update(): void {
-        assertEntity(this._target);
-        assertEntityComponent(this.healthComponent);
-
         if (this.adjacentTo(this._target.worldPosition)) {
             if (this.healthComponent.health >= 20) {
                 console.log("Health mte 20");
@@ -97,21 +91,5 @@ export class ChopTreeJob extends Job<ChopTreeBundle> {
         });
 
         this.blinkingAnimation.onDraw(renderContext);
-    }
-
-    protected override onPersistJobState(): ChopTreeBundle {
-        return {
-            targetEntityId: this.bundle!.targetEntityId,
-        };
-    }
-    protected override onFromPersistedState(bundle: ChopTreeBundle): void {
-        const entityWithId = this.entity
-            .getRootEntity()
-            .findEntity(bundle.targetEntityId);
-
-        assertEntity(entityWithId);
-
-        this._target = entityWithId;
-        this.healthComponent = entityWithId.requireComponent(HealthComponent);
     }
 }

@@ -2,13 +2,13 @@ import { TypedEventHandle } from "../../../../common/event/typedEvent.js";
 import { addPoint, Point, pointEquals } from "../../../../common/point.js";
 import { GraphNode } from "../../../../path/graph/graph.js";
 import { PathSearch } from "../../../../path/search.js";
-import { StatelessComponent } from "../../entityComponent.js";
+import { EntityComponent } from "../../entityComponent.js";
 import { TileMapUpdateEvent } from "../../tile/tileMapUpdatedEvent.js";
 import { ChunkMapUpdateEvent } from "../chunk/chunkMapUpdateEvent.js";
 import { createLazyGraphFromRootNode } from "./generateGraph.js";
 import { PathResult, PathResultStatus } from "./pathResult.js";
 
-export class PathFindingComponent extends StatelessComponent {
+export class PathFindingComponent extends EntityComponent {
     private tileEventListener: TypedEventHandle | undefined;
     private chunkMapEventListener: TypedEventHandle | undefined;
     protected pathSearch: PathSearch | null = null;

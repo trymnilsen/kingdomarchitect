@@ -1,6 +1,6 @@
 import { InvalidStateError } from "../../../common/error/invalidStateError.js";
 import { EventHandle } from "../../../common/event.js";
-import { StatelessComponent } from "../entityComponent.js";
+import { EntityComponent } from "../entityComponent.js";
 import { isJobApplicableForEntity } from "./jobConstraint.js";
 import { JobQueueComponent } from "./jobQueueComponent.js";
 import { JobRunnerComponent } from "./jobRunnerComponent.js";
@@ -12,7 +12,7 @@ import { ScheduledJob } from "./scheduledJob.js";
  * that runner. This code is split out from the queue to avoid circular
  * dependencies between the JobRunner and JobQueue.
  */
-export class JobSchedulerComponent extends StatelessComponent {
+export class JobSchedulerComponent extends EntityComponent {
     private jobQueueAddedListener: EventHandle | undefined;
     private queue: JobQueueComponent | undefined;
     override onStart(): void {

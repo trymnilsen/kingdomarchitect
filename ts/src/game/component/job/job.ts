@@ -4,7 +4,6 @@ import { JSONValue } from "../../../common/object.js";
 import { Point, isPointAdjacentTo } from "../../../common/point.js";
 import { RenderContext } from "../../../rendering/renderContext.js";
 import { Entity } from "../../entity/entity.js";
-import { JobBundle } from "./jobBundle.js";
 import { JobConstraint } from "./jobConstraint.js";
 import { JobOwner } from "./jobOwner.js";
 import { JobState } from "./jobState.js";
@@ -20,25 +19,12 @@ export enum JobCompletedResult {
  * chopping a tree or collecting a chest is implemented as jobs. Actions that
  * interupts such as attacks are also implemented as jobs.
  */
-export abstract class Job<T extends JSONValue = JSONValue> {
+export abstract class Job {
     private _entity: Entity | null = null;
     private _jobState: JobState = JobState.NotStarted;
     private _startTick = 0;
     private _owner: JobOwner | null = null;
-    private _bundle: T | null = null;
-    /**
-     * Return the bundle this job was saved with
-     */
-    get bundle(): T | null {
-        return this._bundle;
-    }
 
-    /**
-     * Set the persisted bundle used for this job
-     */
-    set bundle(value: T) {
-        this._bundle = value;
-    }
     /**
      * Return the owner for this job. The owner of a job is responsible for
      * executing it is functions and handling completion and aborting.
@@ -137,32 +123,6 @@ export abstract class Job<T extends JSONValue = JSONValue> {
     }
 
     /**
-     * Restore the job from a persisted job bundle
-     * @param bundle the persisted data to restore
-     */
-    fromJobBundle(bundle: JobBundle<T>): void {
-        this._jobState = bundle.jobState;
-        this._bundle = bundle.data;
-        this.onFromPersistedState(bundle.data);
-    }
-
-    /**
-     * Save the state of this job to a job bundle. Will include generic and
-     * helper state as well as custom data persisted by any implementations of
-     * this job
-     */
-    toJobBundle(): JobBundle<T> {
-        const jobState = this.onPersistJobState();
-        const bundle: JobBundle<T> = {
-            jobState: this._jobState,
-            data: jobState,
-            type: this.constructor.name,
-        };
-
-        return bundle;
-    }
-
-    /**
      * Abort this job, setting its state to completed and publishing completion
      */
     abort() {
@@ -225,21 +185,6 @@ export abstract class Job<T extends JSONValue = JSONValue> {
      * @param tick the game tick
      */
     abstract update(tick: number): void;
-
-    /**
-     * Request that the job create an object that is used to presist its state
-     */
-    protected onPersistJobState(): T {
-        return {} as T;
-    }
-
-    /**
-     * Invoked on restore to reset the state of this job after recreating the
-     * game from saved state. Will be called after the entity is set if any
-     * so logic requiring the entity tree can be used here.
-     * @param bundle provides the locally saved bundle as a non-nullable value
-     */
-    protected onFromPersistedState(_bundle: T) {}
 
     /**
      * Check if a point is adjacent to the entity of this job

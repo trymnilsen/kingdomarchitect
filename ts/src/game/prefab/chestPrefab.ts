@@ -6,7 +6,7 @@ import { Entity } from "../entity/entity.js";
 
 export function chestPrefab(id: string, initialItems: InventoryItem[]): Entity {
     const chest = new Entity(id);
-    const spriteDrawer = SpriteComponent.createInstance(
+    const spriteDrawer = new SpriteComponent(
         sprites2.chest_gold,
         {
             x: 3,
@@ -18,7 +18,7 @@ export function chestPrefab(id: string, initialItems: InventoryItem[]): Entity {
         },
     );
 
-    const chestComponent = ChestComponent.createInstance(initialItems);
+    const chestComponent = new ChestComponent(initialItems);
 
     chest.addComponent(chestComponent);
     chest.addComponent(spriteDrawer);

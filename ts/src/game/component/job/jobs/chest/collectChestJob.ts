@@ -3,19 +3,9 @@ import { MovementComponent } from "../../../movement/movementComponent.js";
 import { ChestComponent } from "../../../resource/chestComponent.js";
 import { Job } from "../../job.js";
 
-type CollectChestBundle = {
-    entityId: string;
-};
-
-export class CollectChestJob extends Job<CollectChestBundle> {
-    private chest: ChestComponent | null = null;
-
-    static createInstance(chestComponent: ChestComponent): CollectChestJob {
-        const instance = new CollectChestJob();
-        instance.bundle = {
-            entityId: chestComponent.entity.id,
-        };
-        return instance;
+export class CollectChestJob extends Job {
+    constructor(private chest: ChestComponent) {
+        super();
     }
 
     override update(): void {
@@ -41,28 +31,5 @@ export class CollectChestJob extends Job<CollectChestBundle> {
 
             movementComponent.pathTo(this.chest.entity.worldPosition);
         }
-    }
-
-    protected override onPersistJobState(): CollectChestBundle {
-        if (!this.chest) {
-            return {} as CollectChestBundle;
-        } else {
-            return {
-                entityId: this.chest?.entity.id,
-            };
-        }
-    }
-
-    protected override onFromPersistedState(bundle: CollectChestBundle): void {
-        const entityWithId = this.entity
-            .getRootEntity()
-            .findEntity(bundle.entityId);
-
-        if (!entityWithId) {
-            throw new Error(`No entity with id ${entityWithId} found`);
-        }
-
-        const chestComponent = entityWithId.requireComponent(ChestComponent);
-        this.chest = chestComponent;
     }
 }

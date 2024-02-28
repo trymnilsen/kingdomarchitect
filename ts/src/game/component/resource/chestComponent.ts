@@ -1,27 +1,15 @@
 import { InventoryItem } from "../../../data/inventory/inventoryItem.js";
 import { EntityComponent } from "../entityComponent.js";
 
-type ChestBundle = {
-    items: InventoryItem[];
-};
+export class ChestComponent extends EntityComponent {
+    private _items: InventoryItem[];
 
-export class ChestComponent extends EntityComponent<ChestBundle> {
-    items: InventoryItem[] = [];
-
-    static createInstance(items: InventoryItem[]): ChestComponent {
-        const instance = new ChestComponent();
-        instance.fromComponentBundle({
-            items: items,
-        });
-        return instance;
+    public get items(): ReadonlyArray<InventoryItem> {
+        return this._items;
     }
 
-    override fromComponentBundle(bundle: ChestBundle): void {
-        this.items = bundle.items;
-    }
-    override toComponentBundle(): ChestBundle {
-        return {
-            items: this.items,
-        };
+    constructor(items: InventoryItem[]) {
+        super();
+        this._items = items;
     }
 }
