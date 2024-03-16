@@ -1,6 +1,7 @@
-import { createChestTileset } from "../../data/tileset2/chestTile.js";
-import { createForrestTileset } from "../../data/tileset2/forrestTile.js";
-import { Tileset } from "../../data/tileset2/tileset.js";
+import { createChestTileset } from "../../data/tileset/chestTile.js";
+import { createForrestTileset } from "../../data/tileset/forrestTile.js";
+import { createTentTile } from "../../data/tileset/tentTile.js";
+import { Tileset } from "../../data/tileset/tileset.js";
 import {
     GroundChunk,
     TilesComponent,
@@ -13,6 +14,8 @@ export class TilesetGenerator {
         const numberOfChunks = Object.keys(tilecomponent.chunkMap).length;
 
         switch (numberOfChunks) {
+            case 7:
+                return createTentTile(chunk);
             case 6:
                 return createChestTileset(chunk);
             default:

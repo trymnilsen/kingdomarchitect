@@ -53,6 +53,8 @@ export class UIInventoryGridItem extends UIButton {
         context.drawScreenSpaceSprite({
             x: this.screenPosition.x + 4,
             y: this.screenPosition.y + 4,
+            targetWidth: 32,
+            targetHeight: 32,
             sprite: this.sprite,
         });
 

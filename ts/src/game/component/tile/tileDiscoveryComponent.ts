@@ -3,7 +3,6 @@ import {
     largeDiamondPattern,
 } from "../../../common/pattern.js";
 import { Point, addPoint, adjacentPoints } from "../../../common/point.js";
-import { createRandomTileSet } from "../../../data/tileset/randomTileSet.js";
 import { ChunkSize, getChunkPosition } from "../../chunk.js";
 import { Entity } from "../../entity/entity.js";
 import { TilesetGenerator } from "../../tile/tilesetGenerator.js";
@@ -78,11 +77,11 @@ export class TileDiscoveryComponent extends EntityComponent {
             });
         }
 
+        tileComponent.setChunk({ chunkX: chunk.x, chunkY: chunk.y });
+
         for (const entity of tileset.entities) {
             rootEntity.addChild(entity);
         }
-
-        tileComponent.setChunk({ chunkX: chunk.x, chunkY: chunk.y });
     }
 
     private chunkStartPosition(chunkPosition: Point): Point {
