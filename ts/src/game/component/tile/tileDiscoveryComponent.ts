@@ -12,7 +12,9 @@ import { PathFindingComponent } from "../root/path/pathFindingComponent.js";
 import { TilesComponent } from "./tilesComponent.js";
 
 export class TileDiscoveryComponent extends EntityComponent {
-    private generator = new TilesetGenerator();
+    constructor(private generator: TilesetGenerator) {
+        super();
+    }
 
     unlockTiles(_position: Point, pattern: ReadonlyArray<Point>) {
         const tileMapComponent = this.entity.requireComponent(TilesComponent);

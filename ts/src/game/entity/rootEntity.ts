@@ -14,6 +14,7 @@ import { housePrefab } from "../prefab/housePrefab.js";
 import { treePrefab } from "../prefab/treePrefab.js";
 import { wellPrefab } from "../prefab/wellPrefab.js";
 import { workerPrefab } from "../prefab/workerPrefab.js";
+import { TilesetGenerator } from "../tile/tilesetGenerator.js";
 import { Entity } from "./entity.js";
 
 export function createRootEntity(): Entity {
@@ -22,13 +23,14 @@ export function createRootEntity(): Entity {
     const inventoryComponent = new InventoryComponent();
     const groundComponent = new TilesComponent();
     const chunkmapComponent = new ChunkMapComponent();
+    const tilegenerator = new TilesetGenerator();
     rootEntity.addComponent(inventoryComponent);
     rootEntity.addComponent(groundComponent);
     rootEntity.addComponent(jobQueueComponent);
     rootEntity.addComponent(chunkmapComponent);
     rootEntity.addComponent(new JobSchedulerComponent());
     rootEntity.addComponent(new ForrestComponent());
-    rootEntity.addComponent(new TileDiscoveryComponent());
+    rootEntity.addComponent(new TileDiscoveryComponent(tilegenerator));
     const pathFindingComponent = new PathFindingComponent();
     rootEntity.addComponent(pathFindingComponent);
     rootEntity.toggleIsGameRoot(true);
