@@ -25,11 +25,13 @@ export class BuildingComponent extends EntityComponent {
         buildingSprite: Sprite2,
         scaffoldSprite: Sprite2,
         building: Building,
+        isScaffolded: boolean = true,
     ) {
         super();
         this.buildingSprite = buildingSprite;
         this.scaffoldSprite = scaffoldSprite;
         this._building = building;
+        this.isScaffolded = isScaffolded;
     }
 
     finishBuild() {
@@ -37,6 +39,10 @@ export class BuildingComponent extends EntityComponent {
         if (this._building.adjacencySprite) {
             this.updateAdjacentBuildings();
         }
+    }
+
+    override onStart(_tick: number): void {
+        this.updateAdjacentBuildings();
     }
 
     /**

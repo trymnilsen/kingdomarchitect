@@ -4,7 +4,7 @@ import {
     adjacentPoints,
     pointEquals,
 } from "../../../../common/point.js";
-import { getChunkId, getChunkPosition } from "../../../chunk.js";
+import { getChunkId, getChunkPosition } from "../../../map/chunk.js";
 import { visitChildren } from "../../../entity/child/visit.js";
 import { Entity } from "../../../entity/entity.js";
 import { EntityEvent } from "../../../entity/entityEvent.js";
@@ -27,7 +27,7 @@ export class ChunkMapComponent extends EntityComponent {
     private entityEventHandle: EventHandle | null = null;
 
     getEntityAt(worldPosition: Point): Entity[] {
-        const position = getChunkPosition(worldPosition);
+        const position = getChunkPosition(worldPosition.x, worldPosition.y);
         // We include any adjacent chunks to get any entitys that has bounds
         // stretching into the chunk of the position but has a world position
         // in an adjacent chunk
@@ -90,7 +90,11 @@ export class ChunkMapComponent extends EntityComponent {
     }
 
     private addEntityToChunkMap(entity: Entity) {
-        const chunkPosition = getChunkPosition(entity.worldPosition);
+        const chunkPosition = getChunkPosition(
+            entity.worldPosition.x,
+            entity.worldPosition.y,
+        );
+
         const chunkId = getChunkId(chunkPosition);
         const chunk = this.chunkMap[chunkId];
         if (!chunk) {
@@ -104,7 +108,10 @@ export class ChunkMapComponent extends EntityComponent {
 
     private updateChunkMapForEntity(entity: Entity) {
         const oldChunkId = this.entityChunks[entity.id];
-        const newChunkId = getChunkId(getChunkPosition(entity.worldPosition));
+        const newChunkId = getChunkId(
+            getChunkPosition(entity.worldPosition.x, entity.worldPosition.y),
+        );
+
         if (oldChunkId != newChunkId) {
             // No need to remove entity from the chunk map if its not present
             if (oldChunkId) {

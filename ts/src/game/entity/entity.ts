@@ -20,7 +20,7 @@ import { ComponentEvent } from "../component/componentEvent.js";
 import { ComponentQueryCache } from "../component/componentQueryCache.js";
 import { EntityComponent } from "../component/entityComponent.js";
 import { TilesComponent } from "../component/tile/tilesComponent.js";
-import { TileSize } from "../tile/tile.js";
+import { TileSize } from "../map/tile.js";
 import { selectFromChild } from "./child/select.js";
 import { visitChildren } from "./child/visit.js";
 import { entityWithId } from "./child/withId.js";
@@ -420,6 +420,7 @@ export class Entity {
      */
     onDraw(renderContext: RenderContext, visibilityMap: RenderVisibilityMap) {
         if (this._componentsMap.size > 0) {
+            /*
             const isVisible = visibilityMap.isVisible(this.worldPosition);
             if (isVisible || this._isGameRoot) {
                 //Calculating the screen position once for components
@@ -435,6 +436,17 @@ export class Entity {
                         visibilityMap,
                     );
                 }
+            }*/
+            const screenPosition = renderContext.camera.tileSpaceToScreenSpace(
+                this._worldPosition,
+            );
+
+            for (const component of this._componentsMap) {
+                component[1].onDraw(
+                    renderContext,
+                    screenPosition,
+                    visibilityMap,
+                );
             }
         }
 

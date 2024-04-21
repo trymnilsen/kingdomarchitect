@@ -3,14 +3,16 @@ import { Bounds } from "../../../common/bounds.js";
 import { Point } from "../../../common/point.js";
 import { RenderContext } from "../../../rendering/renderContext.js";
 import { RenderVisibilityMap } from "../../../rendering/renderVisibilityMap.js";
-import { ChunkSize } from "../../chunk.js";
-import { getTileId, TileSize } from "../../tile/tile.js";
+import { BiomeType, biomes } from "../../map/biome/biome.js";
+import { ChunkSize, getChunkId, getChunkPosition } from "../../map/chunk.js";
+import { getTileId, TileSize } from "../../map/tile.js";
 import { EntityComponent } from "../entityComponent.js";
 import { Ground } from "./ground.js";
 
 export type GroundTile = {
     tileX: number;
     tileY: number;
+    type?: BiomeType;
 };
 
 export type GroundChunk = {
@@ -41,6 +43,7 @@ export class TilesComponent extends EntityComponent implements Ground {
         const tileMap: TileMap = {};
         const tileLayerMap = {};
         const chunkMap: GroundChunkMap = {};
+        /*
         for (let x = 0; x < ChunkSize; x++) {
             for (let y = 0; y < ChunkSize; y++) {
                 const id = getTileId(x, y);
@@ -56,7 +59,7 @@ export class TilesComponent extends EntityComponent implements Ground {
         chunkMap[getTileId(0, 0)] = {
             chunkX: 0,
             chunkY: 0,
-        };
+        };*/
 
         this._chunkMap = chunkMap;
         this.tileMap = tileMap;
@@ -118,6 +121,14 @@ export class TilesComponent extends EntityComponent implements Ground {
         const tileId = getTileId(tile.tileX, tile.tileY);
         this.tileMap[tileId] = tile;
         this.discoveredTiles[tileId] = discovered;
+        const chunkPosition = getChunkPosition(tile.tileX, tile.tileX);
+        const chunkId = getTileId(chunkPosition.x, chunkPosition.y);
+        if (!this._chunkMap[chunkId]) {
+            this._chunkMap[chunkId] = {
+                chunkX: chunkPosition.x,
+                chunkY: chunkPosition.y,
+            };
+        }
     }
 
     removeTile(x: number, y: number) {
@@ -140,6 +151,11 @@ export class TilesComponent extends EntityComponent implements Ground {
                     x: tile.tileX,
                     y: tile.tileY,
                 });
+                let color = "green";
+                const type = tile.type;
+                if (!!type) {
+                    color = biomes[type].color;
+                }
 
                 if (visibility) {
                     context.drawRectangle({
@@ -147,7 +163,7 @@ export class TilesComponent extends EntityComponent implements Ground {
                         y: tile.tileY * TileSize,
                         width: TileSize - 2,
                         height: TileSize - 2,
-                        fill: "green",
+                        fill: color,
                     });
                 } else {
                     context.drawRectangle({
@@ -155,7 +171,7 @@ export class TilesComponent extends EntityComponent implements Ground {
                         y: tile.tileY * TileSize,
                         width: TileSize - 2,
                         height: TileSize - 2,
-                        fill: "darkgreen",
+                        fill: color, // TODO: tint/make an undiscovered color
                     });
                 }
             }

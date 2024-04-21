@@ -1,5 +1,5 @@
 import { Axis } from "./direction.js";
-import { Point, addPoint } from "./point.js";
+import { Point, addPoint, subtractPoint } from "./point.js";
 import { NumberRange } from "./range.js";
 
 /**
@@ -200,4 +200,51 @@ export function getBounds(points: Point[]): Bounds {
         x2: maxX,
         y2: maxY,
     };
+}
+
+/**
+ * Find all the positions where the provided bounds fit within in the container
+ * @param container the container to fit the bounds within
+ * @param bounds the bounds to attempt to fit within the container
+ * @param predicate optional predicate run for each candidate, can be used to
+ * filter out options. A truthy value means the candiadate is applicable
+ */
+export function getAllPositionsBoundsFitWithinBounds(
+    container: Point,
+    size: Point,
+    isApplicablePredicate?: (candidate: Bounds) => boolean,
+): Bounds[] {
+    //If the bounds are larger than the container no point in trying
+    if (container.x < size.x || container.y < size.y) {
+        return [];
+    }
+
+    const positions: Bounds[] = [];
+    // There is no point in searching beyond the size of the container minus the
+    // size of the bounds. As the bounds wont fit there without overflowing.
+    // e.g a container with the size of 12,12 and a bounds of size 4,4 cannot
+    // fit at 9,9 as the x2,y2 coords of the bounds would the be 13,13 and lay
+    // outside of the container
+    const searchSize = subtractPoint(container, size);
+    for (let x = 0; x < searchSize.x; x++) {
+        for (let y = 0; y < searchSize.y; y++) {
+            const candidate: Bounds = {
+                x1: x,
+                y1: y,
+                x2: x + size.x,
+                y2: y + size.y,
+            };
+            let applicable = true;
+
+            if (isApplicablePredicate) {
+                applicable = !!isApplicablePredicate(candidate);
+            }
+
+            if (applicable) {
+                positions.push(candidate);
+            }
+        }
+    }
+
+    return positions;
 }

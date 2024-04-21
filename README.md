@@ -7,7 +7,7 @@
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-f8bc45.svg)](https://github.com/prettier/prettier)
 
 
-![Screenshot of the game](screenshot/gameplay.png)
+![Screenshot of the game](doc/screenshot/gameplay.png)
 
 ## 🕹️ Play
 You can either clone this repository and run it based on the instructions on how to run the game below, or try the last version out at [https://kingdomarchitect.netlify.app](https://kingdomarchitect.netlify.app)

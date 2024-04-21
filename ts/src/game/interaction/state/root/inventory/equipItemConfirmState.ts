@@ -13,8 +13,8 @@ import { InventoryComponent } from "../../../../component/inventory/inventoryCom
 import { ChunkMapComponent } from "../../../../component/root/chunk/chunkMapComponent.js";
 import { firstChildWhere } from "../../../../entity/child/first.js";
 import { Entity } from "../../../../entity/entity.js";
-import { GroundTile } from "../../../../tile/ground.js";
-import { TileSize } from "../../../../tile/tile.js";
+import { GroundTile } from "../../../../map/tile.js";
+import { TileSize } from "../../../../map/tile.js";
 import { InteractionState } from "../../../handler/interactionState.js";
 import { StateContext } from "../../../handler/stateContext.js";
 import { UIActionbarItem } from "../../../view/actionbar/uiActionbar.js";

@@ -10,7 +10,7 @@ import { SpriteComponent } from "../../../../component/draw/spriteComponent.js";
 import { EquipmentComponent } from "../../../../component/inventory/equipmentComponent.js";
 import { InventoryComponent } from "../../../../component/inventory/inventoryComponent.js";
 import { Entity } from "../../../../entity/entity.js";
-import { TileSize } from "../../../../tile/tile.js";
+import { TileSize } from "../../../../map/tile.js";
 import { InteractionState } from "../../../handler/interactionState.js";
 import { UIActionbarItem } from "../../../view/actionbar/uiActionbar.js";
 import { CharacterSkillState } from "../../character/characterSkillState.js";

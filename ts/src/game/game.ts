@@ -8,9 +8,10 @@ import { Renderer } from "../rendering/renderer.js";
 import { InteractionHandler } from "./interaction/handler/interactionHandler.js";
 import { Entity } from "./entity/entity.js";
 import { createRootEntity } from "./entity/rootEntity.js";
-import { TileSize } from "./tile/tile.js";
+import { TileSize } from "./map/tile.js";
 import { RenderVisibilityMap } from "../rendering/renderVisibilityMap.js";
 import { VisibilityComponent } from "./component/visibility/visibilityComponent.js";
+import { generateMap } from "./map/mapGenerator.js";
 
 export class Game {
     private renderer: Renderer;
@@ -32,12 +33,13 @@ export class Game {
         if (canvasElement == null) {
             throw new Error("Canvas element not found");
         }
-        this.gameTime = new MutableGameTime();
+
         // Input
         this.input = new Input();
         this.touchInput = new TouchInput(canvasElement);
 
-        // Rendering and scenes
+        // Rendering
+        this.gameTime = new MutableGameTime();
         this.assetLoader = new AssetLoader();
         this.renderer = new Renderer(
             canvasElement,
@@ -45,18 +47,10 @@ export class Game {
             this.gameTime,
         );
 
+        // World
         this.world = createRootEntity();
-
-        /*
-        window.saveGame = () => {
-            this.saveGame();
-        };
-
-        window.clearGame = () => {
-            console.log("Clear game");
-            window.localStorage.clear();
-        };*/
-
+        generateMap(this.world);
+        // UI states handling
         this.interactionHandler = new InteractionHandler(
             this.world,
             this.renderer.camera,
@@ -73,12 +67,6 @@ export class Game {
             this.render();
             return tapResult;
         };
-
-        /*
-        this.touchInput.onTapUp = (position: Point) => {
-            this.currentScene.onTapUp(position);
-            this.render();
-        };*/
 
         this.touchInput.onPan = (
             movement: Point,
@@ -109,11 +97,8 @@ export class Game {
         });
 
         setInterval(this.onTick, 1000);
-        this.updateCamera({
-            x: TileSize * 5,
-            y: TileSize * 5,
-        });
-        this.updateVisibilityMap();
+
+        //this.updateVisibilityMap();
         this.render();
     }
 
@@ -123,7 +108,7 @@ export class Game {
         this.gameTime.updateTick(this.currentTick);
         this.world.onUpdate(this.currentTick);
         this.interactionHandler.onUpdate(this.currentTick);
-        this.updateVisibilityMap();
+        //this.updateVisibilityMap();
         this.render();
         //performance.measure("onTick duration", "tick-start");
     };

@@ -1,6 +1,6 @@
 import { Point } from "../../common/point.js";
 import { GroundTile } from "../component/tile/tilesComponent.js";
-import { isTile } from "../tile/ground.js";
+import { isTile } from "../map/tile.js";
 import { SelectedWorldItem } from "./selectedWorldItem.js";
 
 export class SelectedTileItem implements SelectedWorldItem {

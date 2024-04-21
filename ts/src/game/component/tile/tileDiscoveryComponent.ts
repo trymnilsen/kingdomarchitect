@@ -3,15 +3,15 @@ import {
     largeDiamondPattern,
 } from "../../../common/pattern.js";
 import { Point, addPoint, adjacentPoints } from "../../../common/point.js";
-import { ChunkSize, getChunkPosition } from "../../chunk.js";
+import { ChunkSize, getChunkPosition } from "../../map/chunk.js";
 import { Entity } from "../../entity/entity.js";
-import { TilesetGenerator } from "../../tile/tilesetGenerator.js";
 import { EntityComponent } from "../entityComponent.js";
 import { ChunkMapComponent } from "../root/chunk/chunkMapComponent.js";
 import { PathFindingComponent } from "../root/path/pathFindingComponent.js";
 import { TilesComponent } from "./tilesComponent.js";
 
-export class TileDiscoveryComponent extends EntityComponent {
+/*
+class TileDiscoveryComponent extends EntityComponent {
     constructor(private generator: TilesetGenerator) {
         super();
     }
@@ -93,3 +93,4 @@ export class TileDiscoveryComponent extends EntityComponent {
         };
     }
 }
+*/

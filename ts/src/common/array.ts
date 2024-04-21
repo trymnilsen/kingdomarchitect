@@ -8,6 +8,38 @@ export function randomEntry<T>(array: T[]): T {
     return array[randomIndex];
 }
 
+/**
+ * Sort the array based on the values provided by the sort function.
+ * The values provided will use the default array sorting for sorting the
+ * the items in the initial array
+ * @param array the array of items to sort
+ * @param sortFn a function for
+ */
+export function sortBy<T>(array: T[], sortFn: (item: T) => number): T[] {
+    return array
+        .map((item) => {
+            return {
+                sortKey: sortFn(item),
+                item: item,
+            };
+        })
+        .sort((a, b) => {
+            return b.sortKey - a.sortKey;
+        })
+        .map((item) => {
+            return item.item;
+        });
+}
+
+/**
+ * Picks a random item for the list based on the weights supplied.
+ * [a,b] with weights [1,2] makes `b` twice as likely to be picked as `a`.
+ * Will throw an error if the items and weights array are not the same size.
+ * @param items the items to pick from. Cannot be empty.
+ * @param weights the weights if items to pick. A weight of 0 means not
+ * possible to pick and will be filtered out
+ * @returns the selected "random" entry.
+ */
 export function weightedRandomEntry<T>(items: T[], weights: number[]): T {
     if (items.length !== weights.length) {
         throw new Error("Items and weights must be of the same size");
@@ -21,13 +53,22 @@ export function weightedRandomEntry<T>(items: T[], weights: number[]): T {
         return items[0];
     }
 
+    // Filter out items that have a weight of 0 as this will mess with
+    // the comulative weights
+    const filteredItems = items.filter((_item, index) => {
+        return weights[index] != 0;
+    });
+    const filteredWeights = weights.filter((weight) => {
+        return weight != 0;
+    });
     // Preparing the cumulative weights array.
     // For example:
     // - weights = [1, 4, 3]
     // - cumulativeWeights = [1, 5, 8]
     const cumulativeWeights: number[] = [];
-    for (let i = 0; i < weights.length; i += 1) {
-        cumulativeWeights[i] = weights[i] + (cumulativeWeights[i - 1] || 0);
+    for (let i = 0; i < filteredWeights.length; i += 1) {
+        cumulativeWeights[i] =
+            filteredWeights[i] + (cumulativeWeights[i - 1] || 0);
     }
 
     // Getting the random number in a range of [0...sum(weights)]
@@ -40,13 +81,13 @@ export function weightedRandomEntry<T>(items: T[], weights: number[]): T {
 
     // Picking the random item based on its weight.
     // The items with higher weight will be picked more often.
-    for (let itemIndex = 0; itemIndex < items.length; itemIndex += 1) {
+    for (let itemIndex = 0; itemIndex < filteredItems.length; itemIndex += 1) {
         if (cumulativeWeights[itemIndex] >= randomNumber) {
-            return items[itemIndex];
+            return filteredItems[itemIndex];
         }
     }
 
-    return items[0];
+    return filteredItems[0];
 }
 
 export function removeItem<T>(array: T[], item: T): boolean {

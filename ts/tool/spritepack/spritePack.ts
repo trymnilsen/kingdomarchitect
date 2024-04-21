@@ -357,7 +357,10 @@ async function extractSprite(
 function getSpriteFrames(spriteDefinition: SpriteDefinition): Rectangle[] {
     const frames: Rectangle[] = [];
     frames.push(spriteDefinition);
-    const numberOfFrames = spriteDefinition.frames;
+    const numberOfFrames = spriteDefinition.frames || 1;
+    if (!numberOfFrames) {
+        throw new Error("Frames not defined");
+    }
     if (numberOfFrames && numberOfFrames > 1) {
         for (let i = 1; i < numberOfFrames; i++) {
             frames.push({
@@ -392,5 +395,5 @@ type PackedSprite = {
 };
 
 interface SpriteDefinition extends Rectangle {
-    frames: number;
+    frames?: number;
 }

@@ -1,15 +1,15 @@
-import { Point } from "../common/point.js";
+import { Point } from "../../common/point.js";
 
-export const ChunkSize = 3;
+export const ChunkSize = 8;
 
 /**
  * Get the chunk the given world position is in
  * @param worldPosition
  * @returns the point of the chunk, in chunk space
  */
-export function getChunkPosition(worldPosition: Point): Point {
-    const chunkX = Math.floor(worldPosition.x / ChunkSize);
-    const chunkY = Math.floor(worldPosition.y / ChunkSize);
+export function getChunkPosition(x: number, y: number): Point {
+    const chunkX = Math.floor(x / ChunkSize);
+    const chunkY = Math.floor(y / ChunkSize);
     return {
         x: chunkX,
         y: chunkY,

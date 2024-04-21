@@ -7,7 +7,7 @@ import { ChopTreeJob } from "../../../component/job/jobs/chopTreeJob.js";
 import { TreeComponent } from "../../../component/resource/treeComponent.js";
 import { ChunkMapComponent } from "../../../component/root/chunk/chunkMapComponent.js";
 import { Entity } from "../../../entity/entity.js";
-import { GroundTile } from "../../../tile/ground.js";
+import { GroundTile } from "../../../map/tile.js";
 import { InteractionState } from "../../handler/interactionState.js";
 import { BoxSelectionMode } from "../../selection/boxSelectionMode.js";
 import { LineSelectionMode } from "../../selection/lineSelectionMode.js";

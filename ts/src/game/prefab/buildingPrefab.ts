@@ -12,12 +12,14 @@ export function buildingPrefab(
     id: string,
     building: Building,
     extraComponents: EntityComponent[],
+    scaffold: boolean = true,
 ): Entity {
     const entity = new Entity(id);
     const buildingComponent = new BuildingComponent(
         building.icon,
         sprites2.wooden_house_scaffold,
         building,
+        scaffold,
     );
 
     const currentHealth = 10;
