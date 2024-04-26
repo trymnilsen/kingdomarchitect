@@ -23,9 +23,9 @@ export function createDesertBiome(
     generateOasis(existingBiomes, biomeMap);
     generateForts(biomeMap);
     generateDesertRuins(biomeMap);
-    generateCactii(biomeMap);
-    generateTumbleweed();
     generateNonPlayerKingdom();
+    generateTumbleweed();
+    generateCactii(biomeMap);
     generateConnectionPoints();
     return biomeMap;
 }
