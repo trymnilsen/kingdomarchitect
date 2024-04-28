@@ -155,7 +155,6 @@ export class TouchInput {
             }
         } else if (this.onTapPosition != null) {
             if (distance(this.onTapPosition, position) > 5) {
-                console.log("Drag started");
                 this.isDragging = true;
             }
         }

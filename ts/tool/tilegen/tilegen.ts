@@ -44,6 +44,7 @@ async function run() {
 
         const tileset: Tileset = {
             variants: [],
+            name: config.name,
         };
 
         for (let i = 0; i < configFiles.length; i++) {
@@ -94,9 +95,7 @@ async function run() {
     }
 
     const tilesetsJson = JSON.stringify(tilesets, null, 2);
-    const generatedTypescript = [
-        "export const tilesets = " + tilesetsJson + ";",
-    ].join(EOL);
+    const generatedTypescript = "export const tilesets = " + tilesetsJson + ";";
 
     // Write all sprites to json
     await fs.writeFile(

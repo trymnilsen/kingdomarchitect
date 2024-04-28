@@ -19,8 +19,9 @@ import { buildingPrefab } from "../../../prefab/buildingPrefab.js";
 import { farmPrefab } from "../../../prefab/farmPrefab.js";
 import { housePrefab } from "../../../prefab/housePrefab.js";
 import { wellPrefab } from "../../../prefab/wellPrefab.js";
-import { TilesetVariant } from "../../tileset.js";
-import { BiomeEntry } from "../biome.js";
+import { TilesetVariant, getLargestSize } from "../../tileset.js";
+import { placeTileset } from "../../tilesetPlacer.js";
+import { BiomeEntry, BiomeType } from "../biome.js";
 import {
     BiomeMap,
     BiomeMapItem,
@@ -28,27 +29,20 @@ import {
 } from "../biomeMap.js";
 
 export function generateForts(biomeMap: BiomeMap) {
-    const shouldPlaceForts = Math.random() > 0.6;
+    const shouldPlaceForts = Math.random() > getFortWeight(biomeMap.type);
     if (shouldPlaceForts) {
-        const possibleForPositions = getAllPositionsBoundsFitWithinBounds(
-            { x: 32, y: 32 },
-            { x: 5, y: 5 },
-            (candidate) => biomeMap.isSpotAvailable(candidate),
-        );
+        placeTileset(tilesets.fort, biomeMap, createEntityFactory);
+    }
+}
 
-        if (possibleForPositions.length > 0) {
-            const oasisPosition = randomEntry(
-                shuffleItems(possibleForPositions),
-            );
-
-            const tileset = randomEntry(tilesets.fort.variants);
-            biomeMap.setItem({
-                name: "fort",
-                point: { x: oasisPosition.x1, y: oasisPosition.y1 },
-                size: sizeOfBounds(oasisPosition),
-                factory: createEntityFactory(tileset),
-            });
-        }
+function getFortWeight(type: BiomeType): number {
+    switch (type) {
+        case "forrest":
+        case "snow":
+        case "plains":
+            return 0.1;
+        default:
+            return 0.4;
     }
 }
 

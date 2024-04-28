@@ -8,6 +8,7 @@
       "moduleResolution": "Bundler",
       "noFallthroughCasesInSwitch": true,
       "noImplicitAny": false,
+      "noEmitOnError": true,
       "noImplicitOverride": true,
       "noImplicitReturns": true,
       "noImplicitThis": true,

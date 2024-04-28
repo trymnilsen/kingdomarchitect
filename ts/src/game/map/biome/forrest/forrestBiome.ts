@@ -13,13 +13,12 @@ import { generateForrestLake } from "./forrestLake.js";
 
 export function createForrestBiome(biome: BiomeEntry) {
     const biomeMap = new BiomeMap(biome.point, biome.type);
-    generateForrestLake();
+    generateForrestLake(biomeMap);
     generateSmallMountains();
-    generatePonds();
-    generateForrest();
+    generateForrest(biomeMap);
     generateNonPlayerKingdom();
     generateForts(biomeMap);
-    generateRandomTrees();
+    generateRandomTrees(biomeMap);
     generateRandomBuildings();
     generateMines();
     generateConnectionPoints();

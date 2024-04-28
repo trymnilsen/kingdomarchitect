@@ -351,7 +351,8 @@ export const tilesets = {
         ],
         "variant": 5
       }
-    ]
+    ],
+    "name": "desertRuins"
   },
   "desert": {
     "variants": [
@@ -1034,7 +1035,8 @@ export const tilesets = {
         ],
         "variant": 9
       }
-    ]
+    ],
+    "name": "desert"
   },
   "forrest": {
     "variants": [
@@ -6680,7 +6682,8 @@ export const tilesets = {
         ],
         "variant": 15
       }
-    ]
+    ],
+    "name": "forrest"
   },
   "pond": {
     "variants": [
@@ -11199,7 +11202,8 @@ export const tilesets = {
         ],
         "variant": 27
       }
-    ]
+    ],
+    "name": "pond"
   },
   "fort": {
     "variants": [
@@ -11722,13 +11726,6 @@ export const tilesets = {
             "position": {
               "x": 5,
               "y": 4
-            },
-            "id": "wall"
-          },
-          {
-            "position": {
-              "x": 5,
-              "y": 5
             },
             "id": "wall"
           }
@@ -13317,6 +13314,7 @@ export const tilesets = {
         ],
         "variant": 9
       }
-    ]
+    ],
+    "name": "fort"
   }
 };

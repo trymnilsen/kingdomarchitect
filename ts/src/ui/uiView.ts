@@ -427,7 +427,7 @@ export abstract class UIView implements FocusGroup {
 
             if (startHitTest && endHitTest) {
                 // If both start and end is hit
-                console.log("View: Tap up withing view", this);
+                // console.log("View: Tap up withing view", this);
                 this.onTapUp(event.position, false);
                 const tapResult = this.onTap(event.position);
                 return tapResult;
@@ -445,7 +445,7 @@ export abstract class UIView implements FocusGroup {
             // from `this.isUITapEventWithinBounds` that the tap is intended
             // for this view
             if (this.hitTest(event.position)) {
-                console.log("View: Tap down on view", this);
+                // console.log("View: Tap down on view", this);
                 const tapResult = this.onTapDown(event.position);
                 return tapResult;
             }
