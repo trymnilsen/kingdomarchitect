@@ -15,6 +15,7 @@ import {
     BiomeMapItem,
     BiomeMapItemEntityFactory,
 } from "../biomeMap.js";
+import { BiomeMapCollection } from "../biomeMapCollection.js";
 
 export function generateForrestLake(map: BiomeMap) {
     const maxBudget = (32 * 32) / 10;
@@ -36,7 +37,7 @@ function lakeFactory(tilesetVariant: TilesetVariant) {
     return (
         item: BiomeMapItem,
         biome: BiomeMap,
-        _allMaps: ReadonlyArray<BiomeMap>,
+        _allMaps: BiomeMapCollection,
         rootEntity: Entity,
     ) => {
         for (const entity of tilesetVariant.entities) {

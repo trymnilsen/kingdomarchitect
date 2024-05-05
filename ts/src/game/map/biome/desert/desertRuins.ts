@@ -20,6 +20,7 @@ import {
     BiomeMapItem,
     BiomeMapItemEntityFactory,
 } from "../biomeMap.js";
+import { BiomeMapCollection } from "../biomeMapCollection.js";
 
 export function generateDesertRuins(biomeMap: BiomeMap) {
     const ruinsCount = weightedRandomEntry(
@@ -55,7 +56,7 @@ function createEntityFactory(
     return (
         item: BiomeMapItem,
         biome: BiomeMap,
-        _allMaps: ReadonlyArray<BiomeMap>,
+        _allMaps: BiomeMapCollection,
         rootEntity: Entity,
     ) => {
         for (const entity of tileset.entities) {

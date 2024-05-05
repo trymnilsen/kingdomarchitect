@@ -20,6 +20,13 @@ export function zeroPoint(): Point {
     };
 }
 
+export function floorPoint(point: Point): Point {
+    return {
+        x: Math.floor(point.x),
+        y: Math.floor(point.y),
+    };
+}
+
 export function pointGrid(width: number, height: number): Point[] {
     const points: Point[] = [];
     for (let x = 0; x < width; x++) {

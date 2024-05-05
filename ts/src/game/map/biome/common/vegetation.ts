@@ -7,9 +7,15 @@ import {
     BiomeMapItem,
     BiomeMapItemEntityFactory,
 } from "../biomeMap.js";
+import { BiomeMapCollection } from "../biomeMapCollection.js";
 
-export function generateRandomTrees(map: BiomeMap) {
-    const randomAmount = 64 + Math.floor(Math.random() * 200);
+export function generateRandomTrees(
+    map: BiomeMap,
+    minAmount: number = 64,
+    randomMultiplier: number = 200,
+) {
+    const randomAmount =
+        minAmount + Math.floor(Math.random() * randomMultiplier);
     placeRandomEntity(map, "tree", randomAmount, treeFactory);
 }
 
@@ -18,7 +24,7 @@ export function generateRandomBushes() {}
 function treeFactory(
     item: BiomeMapItem,
     biome: BiomeMap,
-    _allMaps: ReadonlyArray<BiomeMap>,
+    _allMaps: BiomeMapCollection,
     rootEntity: Entity,
 ) {
     const position = biome.worldPosition(item);

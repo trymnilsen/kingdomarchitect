@@ -4,6 +4,7 @@ import { TilesComponent } from "../component/tile/tilesComponent.js";
 import { Entity } from "../entity/entity.js";
 import { BiomeEntry, BiomeType, biomes } from "./biome/biome.js";
 import { BiomeMap } from "./biome/biomeMap.js";
+import { BiomeMapCollection } from "./biome/biomeMapCollection.js";
 import { createDesertBiome } from "./biome/desert/desertBiome.js";
 import { createForrestBiome } from "./biome/forrest/forrestBiome.js";
 import { createMountainsBiome } from "./biome/mountains/mountainBiome.js";
@@ -16,8 +17,9 @@ import { CHUNK_SIZE, NUMBER_OF_BIOMES } from "./constants.js";
 export function generateMap(rootEntity: Entity) {
     const biomes = generateBiomes();
     console.log("created biomes", biomes);
-    const biomeMaps = createBiomeMaps(biomes, rootEntity);
-    for (const biomeMap of biomeMaps) {
+    const shuffledBiomes = shuffleItems(biomes);
+    const biomeMaps = createBiomeMaps(shuffledBiomes, rootEntity);
+    for (const biomeMap of biomeMaps.maps) {
         createTilesForBiomes(biomeMap, rootEntity);
         createEntitiesForBiomes(biomeMap, rootEntity, biomeMaps);
     }
@@ -26,41 +28,41 @@ export function generateMap(rootEntity: Entity) {
 function createBiomeMaps(
     biomes: BiomeEntry[],
     _rootEntity: Entity,
-): BiomeMap[] {
-    const biomeMaps: BiomeMap[] = [];
+): BiomeMapCollection {
+    const biomeMaps = new BiomeMapCollection(biomes);
     for (const biome of biomes) {
         switch (biome.type) {
             case "desert":
-                const desertBiome = createDesertBiome(biomes, biomeMaps, biome);
-                biomeMaps.push(desertBiome);
+                const desertBiome = createDesertBiome(biome, biomeMaps);
+                biomeMaps.addBiomeMap(desertBiome);
                 break;
             case "forrest":
-                const forrestBiome = createForrestBiome(biome);
-                biomeMaps.push(forrestBiome);
+                const forrestBiome = createForrestBiome(biome, biomeMaps);
+                biomeMaps.addBiomeMap(forrestBiome);
                 break;
             case "mountains":
-                const mountainBiome = createMountainsBiome(biome);
-                biomeMaps.push(mountainBiome);
+                const mountainBiome = createMountainsBiome(biome, biomeMaps);
+                biomeMaps.addBiomeMap(mountainBiome);
                 break;
             case "plains":
-                const plainsBiome = createPlainsBiome(biome);
-                biomeMaps.push(plainsBiome);
+                const plainsBiome = createPlainsBiome(biome, biomeMaps);
+                biomeMaps.addBiomeMap(plainsBiome);
                 break;
             case "snow":
-                const snowBiome = createSnowBiome(biome);
-                biomeMaps.push(snowBiome);
+                const snowBiome = createSnowBiome(biome, biomeMaps);
+                biomeMaps.addBiomeMap(snowBiome);
                 break;
             case "swamp":
-                const swampBiome = createSwampBiome(biome);
-                biomeMaps.push(swampBiome);
+                const swampBiome = createSwampBiome(biome, biomeMaps);
+                biomeMaps.addBiomeMap(swampBiome);
                 break;
             case "taint":
-                const taintBiome = createTaintBiome(biome);
-                biomeMaps.push(taintBiome);
+                const taintBiome = createTaintBiome(biome, biomeMaps);
+                biomeMaps.addBiomeMap(taintBiome);
                 break;
             default:
                 const defaultMap = new BiomeMap(biome.point, biome.type);
-                biomeMaps.push(defaultMap);
+                biomeMaps.addBiomeMap(defaultMap);
                 break;
         }
     }
@@ -71,7 +73,7 @@ function createBiomeMaps(
 function createEntitiesForBiomes(
     biome: BiomeMap,
     rootEntity: Entity,
-    biomeMaps: BiomeMap[],
+    biomeMaps: BiomeMapCollection,
 ) {
     for (const biomeItem of biome.items) {
         biomeItem.factory(biomeItem, biome, biomeMaps, rootEntity);

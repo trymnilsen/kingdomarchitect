@@ -45,6 +45,10 @@ export type Bounds = {
     y2: number;
 };
 
+export function pointWithinBounds(point: Point, bounds: Bounds): boolean {
+    return withinRectangle(point, bounds.x1, bounds.y1, bounds.x2, bounds.y2);
+}
+
 export function boundsCenter(bounds: Bounds): Point {
     const width = bounds.x2 - bounds.x1;
     const height = bounds.y2 - bounds.y1;

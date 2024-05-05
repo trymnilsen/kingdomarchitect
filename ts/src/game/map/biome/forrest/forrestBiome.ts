@@ -1,5 +1,6 @@
 import { BiomeEntry } from "../biome.js";
 import { BiomeMap } from "../biomeMap.js";
+import { BiomeMapCollection } from "../biomeMapCollection.js";
 import { generateRandomBuildings } from "../common/buildings.js";
 import { generateConnectionPoints } from "../common/connectionPoints.js";
 import { generateForts } from "../common/forts.js";
@@ -11,7 +12,10 @@ import { generateRandomTrees } from "../common/vegetation.js";
 import { generateForrest } from "./forrest.js";
 import { generateForrestLake } from "./forrestLake.js";
 
-export function createForrestBiome(biome: BiomeEntry) {
+export function createForrestBiome(
+    biome: BiomeEntry,
+    biomes: BiomeMapCollection,
+) {
     const biomeMap = new BiomeMap(biome.point, biome.type);
     generateForrestLake(biomeMap);
     generateSmallMountains();
@@ -21,6 +25,6 @@ export function createForrestBiome(biome: BiomeEntry) {
     generateRandomTrees(biomeMap);
     generateRandomBuildings();
     generateMines();
-    generateConnectionPoints();
+    generateConnectionPoints(biomeMap, biomes);
     return biomeMap;
 }

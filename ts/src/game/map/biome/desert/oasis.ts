@@ -25,12 +25,13 @@ import {
     BiomeMapItem,
     BiomeMapItemEntityFactory,
 } from "../biomeMap.js";
+import { BiomeMapCollection } from "../biomeMapCollection.js";
 
 export function generateOasis(
-    existingBiomes: BiomeEntry[],
+    biomes: BiomeMapCollection,
     biomeMap: BiomeMap,
 ): BiomeMap {
-    const numberOfOasisesToMake = getNumberOfOasises(existingBiomes);
+    const numberOfOasisesToMake = getNumberOfOasises(biomes);
     for (let i = 0; i < numberOfOasisesToMake; i++) {
         const possibleOasisPositions = getAllPositionsBoundsFitWithinBounds(
             { x: 32, y: 32 },
@@ -56,8 +57,8 @@ export function generateOasis(
     return biomeMap;
 }
 
-function getNumberOfOasises(existingBiomes: BiomeEntry[]): number {
-    const alreadyHasDesertBiome = existingBiomes.some(
+function getNumberOfOasises(existingBiomes: BiomeMapCollection): number {
+    const alreadyHasDesertBiome = existingBiomes.maps.some(
         (biome) => biome.type == "desert",
     );
     // If there already is a desert biome we allow no oasises
@@ -77,7 +78,7 @@ function createEntityFactory(
     return (
         item: BiomeMapItem,
         biome: BiomeMap,
-        _allMaps: ReadonlyArray<BiomeMap>,
+        _allMaps: BiomeMapCollection,
         rootEntity: Entity,
     ) => {
         for (const entity of tileset.entities) {

@@ -97,4 +97,25 @@ export class FixedGraph implements Graph {
             }
         }
     }
+
+    static createWithWidthAndHeight(
+        width: number,
+        height: number,
+        weight: (point: Point) => number,
+    ): FixedGraph {
+        return new FixedGraph(() => {
+            const weightGraph: number[][] = [];
+            for (let x = 0; x < width; x++) {
+                weightGraph[x] = [];
+                for (let y = 0; y < height; y++) {
+                    weightGraph[x][y] = weight({ x, y });
+                }
+            }
+            return {
+                weights: weightGraph,
+                offsetX: 0,
+                offsetY: 0,
+            };
+        });
+    }
 }

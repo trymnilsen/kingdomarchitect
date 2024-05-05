@@ -10,6 +10,7 @@ import {
     BiomeMapItem,
     BiomeMapItemEntityFactory,
 } from "../biomeMap.js";
+import { BiomeMapCollection } from "../biomeMapCollection.js";
 
 export function generateCactii(biomeMap: BiomeMap) {
     const points: Point[] = [];
@@ -48,7 +49,7 @@ function createEntityFactory(): BiomeMapItemEntityFactory {
     return (
         item: BiomeMapItem,
         biome: BiomeMap,
-        _allMaps: ReadonlyArray<BiomeMap>,
+        _allMaps: BiomeMapCollection,
         rootEntity: Entity,
     ) => {
         const position = biome.worldPosition(item);

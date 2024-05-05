@@ -7,6 +7,7 @@ import { treePrefab } from "../../../prefab/treePrefab.js";
 import { TilesetVariant } from "../../tileset.js";
 import { placeTileset } from "../../tilesetPlacer.js";
 import { BiomeMap, BiomeMapItem } from "../biomeMap.js";
+import { BiomeMapCollection } from "../biomeMapCollection.js";
 
 export function generateForrest(map: BiomeMap) {
     const maxBudget = (32 * 32) / 4;
@@ -28,7 +29,7 @@ function treeFactory(tilesetVariant: TilesetVariant) {
     return (
         item: BiomeMapItem,
         biome: BiomeMap,
-        _allMaps: ReadonlyArray<BiomeMap>,
+        _allMaps: BiomeMapCollection,
         rootEntity: Entity,
     ) => {
         for (const entity of tilesetVariant.entities) {

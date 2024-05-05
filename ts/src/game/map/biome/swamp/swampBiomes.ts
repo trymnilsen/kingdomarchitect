@@ -1,5 +1,6 @@
 import { BiomeEntry } from "../biome.js";
 import { BiomeMap } from "../biomeMap.js";
+import { BiomeMapCollection } from "../biomeMapCollection.js";
 import { generateConnectionPoints } from "../common/connectionPoints.js";
 import { generateForts } from "../common/forts.js";
 import { generateNonPlayerKingdom } from "../common/nonPlayerKingdom.js";
@@ -10,7 +11,10 @@ import {
     generateSwampPlants,
 } from "./swampVegetation.js";
 
-export function createSwampBiome(biome: BiomeEntry) {
+export function createSwampBiome(
+    biome: BiomeEntry,
+    biomes: BiomeMapCollection,
+) {
     const biomeMap = new BiomeMap(biome.point, biome.type);
     generateSwampPonds();
     generateHangingTrees();
@@ -18,6 +22,6 @@ export function createSwampBiome(biome: BiomeEntry) {
     generateNonPlayerKingdom();
     generateForts(biomeMap);
     generateSwampBuildings();
-    generateConnectionPoints();
+    generateConnectionPoints(biomeMap, biomes);
     return biomeMap;
 }
