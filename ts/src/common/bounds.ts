@@ -206,6 +206,17 @@ export function getBounds(points: Point[]): Bounds {
     };
 }
 
+export function randomPointInBounds(bounds: Bounds): Point {
+    const size = sizeOfBounds(bounds);
+    const x = Math.floor(Math.random() * size.x);
+    const y = Math.floor(Math.random() * size.y);
+
+    return {
+        x: bounds.x1 + x,
+        y: bounds.y1 + y,
+    };
+}
+
 /**
  * Find all the positions where the provided bounds fit within in the container
  * @param container the container to fit the bounds within

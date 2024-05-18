@@ -1,10 +1,11 @@
-import { randomEntry } from "../../../../common/array.js";
+import { randomEntry, removeItem } from "../../../../common/array.js";
 import {
     Bounds,
     boundsCenter,
     boundsOverlap,
     getAllPositionsBoundsFitWithinBounds,
     pointWithinBounds,
+    randomPointInBounds,
     sizeOfBounds,
 } from "../../../../common/bounds.js";
 import { Axis, Direction, getAxis } from "../../../../common/direction.js";
@@ -13,6 +14,8 @@ import {
     Point,
     addPoint,
     floorPoint,
+    manhattanDistance,
+    manhattanPath,
     zeroPoint,
 } from "../../../../common/point.js";
 import { FixedGraph } from "../../../../path/graph/fixedGraph.js";
@@ -42,7 +45,7 @@ export function createMountainsBiome(
     generateConnectionPoints(biomeMap, biomes);
     //TODO: Visualize paths for connections
     //TODO: Make sure all carveouts are connected
-    //connectCarveouts(mountainMap, biomeMap);
+    connectCarveouts(mountainMap, biomeMap);
     blobbifyMountains();
     createStoneFromMountainMap(mountainMap, biomeMap);
     generateRandomTrees(biomeMap, 8, 32);
@@ -109,26 +112,11 @@ function addCarveouts(mountainMap: MountainMap, biomeMap: BiomeMap) {
 }
 
 function connectCarveouts(mountainMap: MountainMap, biomeMap: BiomeMap) {
-    //Build a graph of the mountain map
-    const graph = FixedGraph.createWithWidthAndHeight(32, 32, (point) => {
-        if (!biomeMap.isPointAvailable(point)) {
-            return 1000;
-        }
-        const withinBounds = mountainMap.bounds.some((bound) =>
-            pointWithinBounds(point, bound),
-        );
-
-        if (withinBounds) {
-            return 1;
-        }
-        return 20;
-    });
     //for each bound, pick another bound and pathfind
     //set path as low weight
     //remove from list of non connected bounds
     //repeat until list of non connected is set
     //loop over connection points and add pathfind to bounds
-    const pathSearch = new PathSearch(graph);
     //We need a copy of the original carveouts
     const originalBounds = [...mountainMap.bounds];
     //Make a copy to pick bounds to path from
@@ -139,29 +127,59 @@ function connectCarveouts(mountainMap: MountainMap, biomeMap: BiomeMap) {
             break;
         }
 
-        const otherBounds = randomEntry(
-            originalBounds.filter((otherCandidate) => {
-                return boundsOverlap(otherCandidate, bound);
-            }),
+        const boundPoint = randomPointInBounds(bound);
+
+        const otherBounds = originalBounds.filter(
+            (originalBound) => originalBound != bound,
         );
 
-        const pathResult = pathSearch.search(
-            floorPoint(boundsCenter(bound)),
-            floorPoint(boundsCenter(otherBounds)),
-            false,
-            (node) => node.weight,
-        );
-
-        for (const point of pathResult.path) {
-            mountainMap.bounds.push({
-                x1: point.x,
-                y1: point.y,
-                x2: point.x + 1,
-                y2: point.y + 1,
-            });
+        if (otherBounds.length == 0) {
+            break;
         }
 
-        graph.invalidatePoint();
+        const closestOtherBound = otherBounds.reduce(
+            (closestBound, candidate) => {
+                const distance = manhattanDistance(
+                    boundsCenter(closestBound.item),
+                    boundsCenter(candidate),
+                );
+
+                if (distance < closestBound.distance) {
+                    return {
+                        distance: distance,
+                        item: candidate,
+                    };
+                } else {
+                    return closestBound;
+                }
+            },
+            { distance: Number.MAX_SAFE_INTEGER, item: otherBounds[0] },
+        );
+
+        const closestOtherBoundPoint = boundsCenter(closestOtherBound.item);
+        const boundCenter = boundsCenter(bound);
+        const path = manhattanPath(
+            {
+                x: Math.floor(boundCenter.x),
+                y: Math.floor(boundCenter.y),
+            },
+            {
+                x: Math.floor(closestOtherBoundPoint.x),
+                y: Math.floor(closestOtherBoundPoint.y),
+            },
+        );
+
+        if (path.length > 0) {
+            removeItem(bounds, closestOtherBound.item);
+            for (const point of path) {
+                mountainMap.bounds.push({
+                    x1: point.x,
+                    y1: point.y,
+                    x2: point.x + 1,
+                    y2: point.y + 1,
+                });
+            }
+        }
     }
 
     function connectionPointsToPoint(direction: Direction) {
@@ -208,15 +226,32 @@ function connectCarveouts(mountainMap: MountainMap, biomeMap: BiomeMap) {
             break;
         }
 
-        const otherBounds = randomEntry(originalBounds);
-        const pathResult = pathSearch.search(
-            point,
-            floorPoint(boundsCenter(otherBounds)),
-            false,
-            (node) => node.weight,
-        );
+        const closestBound = originalBounds.reduce(
+            (closest, candidate) => {
+                const distance = manhattanDistance(
+                    point,
+                    boundsCenter(candidate),
+                );
 
-        for (const point of pathResult.path) {
+                if (distance < closest.distance) {
+                    return {
+                        distance: distance,
+                        item: candidate,
+                    };
+                } else {
+                    return closest;
+                }
+            },
+            { distance: Number.MAX_SAFE_INTEGER, item: originalBounds[0] },
+        );
+        const closestBoundCenter = boundsCenter(closestBound.item);
+
+        const path = manhattanPath(point, {
+            x: Math.floor(closestBoundCenter.x),
+            y: Math.floor(closestBoundCenter.y),
+        });
+
+        for (const point of path) {
             mountainMap.bounds.push({
                 x1: point.x,
                 y1: point.y,

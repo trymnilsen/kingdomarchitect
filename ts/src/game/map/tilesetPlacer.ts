@@ -53,7 +53,8 @@ export function placeTileset(
 
     // Got here? No variants available
     console.log(
-        `No variant for ${tileset.name} found that fits available space for in ${map.type} at ${map.point}`,
+        `No variant for ${tileset.name} found that fits available space for in ${map.type} at`,
+        map.point,
     );
 
     return null;

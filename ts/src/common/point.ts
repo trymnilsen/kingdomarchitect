@@ -153,6 +153,54 @@ export function distanceSquared(from: Point, to: Point): number {
     const yDiff = to.y - from.y;
     return xDiff * xDiff + yDiff * yDiff;
 }
+export function manhattanPath(from: Point, to: Point): Point[] {
+    if (pointEquals(from, to)) {
+        return [];
+    }
+
+    const xRange = to.x - from.x;
+    const yRange = to.y - from.y;
+    const positions: Point[] = [];
+
+    // 1 is subtracted from the range to avoid pushing a duplicate
+    // position where the horizontal line (made here) and the
+    // vertical lines meet
+    for (let x = 0; x < Math.abs(xRange); x++) {
+        let direction = 1;
+        if (xRange < 0) {
+            direction = -1;
+        }
+
+        const xPosition = from.x + x * direction;
+        positions.push({
+            x: xPosition,
+            y: from.y,
+        });
+    }
+
+    for (let y = 0; y < Math.abs(yRange); y++) {
+        let direction = 1;
+        if (yRange < 0) {
+            direction = -1;
+        }
+
+        const yPosition = from.y + y * direction;
+        positions.push({
+            x: to.x,
+            y: yPosition,
+        });
+    }
+
+    positions.push(to);
+
+    //Filter out duplicates
+    const filteredPositions = positions.filter(
+        (value, index, self) =>
+            index === self.findIndex((t) => t.x === value.x && t.y === value.y),
+    );
+
+    return filteredPositions;
+}
 
 export function manhattanDistance(from: Point, to: Point): number {
     return Math.abs(to.x - from.x) + Math.abs(to.y - from.y);
