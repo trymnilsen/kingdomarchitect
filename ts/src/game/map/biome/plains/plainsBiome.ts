@@ -7,7 +7,10 @@ import { generateForts } from "../common/forts.js";
 import { generateNonPlayerKingdom } from "../common/nonPlayerKingdom.js";
 import { generatePonds } from "../common/pond.js";
 import { generateStones } from "../common/stone.js";
-import { generateRandomBushes } from "../common/vegetation.js";
+import {
+    generateRandomBushes,
+    generateRandomTrees,
+} from "../common/vegetation.js";
 
 export function createPlainsBiome(
     biome: BiomeEntry,
@@ -19,6 +22,7 @@ export function createPlainsBiome(
     generateForts(biomeMap);
     generateRandomBuildings();
     generateRandomBushes();
+    generateRandomTrees(biomeMap, 8, 32);
     generateStones();
     generateConnectionPoints(biomeMap, biomes);
     return biomeMap;

@@ -16,11 +16,11 @@ export function createSwampBiome(
     biomes: BiomeMapCollection,
 ) {
     const biomeMap = new BiomeMap(biome.point, biome.type);
-    generateHangingTrees();
     generateSwampPlants();
     generateNonPlayerKingdom();
     generateForts(biomeMap);
     generateSwampPonds(biomeMap);
+    generateHangingTrees(biomeMap);
     generateSwampBuildings();
     generateConnectionPoints(biomeMap, biomes);
     return biomeMap;

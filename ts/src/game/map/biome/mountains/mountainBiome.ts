@@ -48,7 +48,7 @@ export function createMountainsBiome(
     connectCarveouts(mountainMap, biomeMap);
     blobbifyMountains();
     createStoneFromMountainMap(mountainMap, biomeMap);
-    generateRandomTrees(biomeMap, 8, 32);
+    generateRandomTrees(biomeMap, 32, 32);
     generateStones();
     generateMines();
     return biomeMap;
