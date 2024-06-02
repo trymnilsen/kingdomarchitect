@@ -16,6 +16,7 @@ import {
     zeroPoint,
 } from "../../../../common/point.js";
 import { SpriteComponent } from "../../../component/draw/spriteComponent.js";
+import { WeightComponent } from "../../../component/movement/weightComponent.js";
 import { WaterComponent } from "../../../component/world/waterComponent.js";
 import { Entity } from "../../../entity/entity.js";
 import { TilesetVariant } from "../../tileset.js";
@@ -86,6 +87,7 @@ function createEntityFactory(
                 case "water":
                     const waterEntity = new Entity(generateId("water"));
                     waterEntity.addComponent(new WaterComponent());
+                    waterEntity.addComponent(new WeightComponent(100));
                     waterEntity.worldPosition = addPoint(
                         biome.worldPosition(item),
                         entity.position,
@@ -94,6 +96,7 @@ function createEntityFactory(
                     break;
                 case "desertpalm":
                     const desertEntity = new Entity(generateId("palm"));
+                    desertEntity.addComponent(new WeightComponent(10));
                     desertEntity.addComponent(
                         new SpriteComponent(
                             sprites2.coconut_tree,
@@ -109,6 +112,7 @@ function createEntityFactory(
                     break;
                 case "wineruin":
                     const wineruinEntity = new Entity(generateId("ruin"));
+                    wineruinEntity.addComponent(new WeightComponent(100));
                     wineruinEntity.addComponent(
                         new SpriteComponent(
                             sprites2.desert_ruin_two_floor_vines,

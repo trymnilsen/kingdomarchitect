@@ -15,7 +15,7 @@ export function createTaintBiome(
     biome: BiomeEntry,
     biomes: BiomeMapCollection,
 ) {
-    const biomeMap = new BiomeMap(biome.point, biome.type);
+    const biomeMap = biomes.getBiomeMap(biome);
     generateTaintPortals();
     generateTaintedTrees();
     generateTaintedDeadTrees();

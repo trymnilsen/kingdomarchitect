@@ -39,4 +39,7 @@ export const biomes = {
 };
 
 export type BiomeType = keyof typeof biomes;
-export type BiomeEntry = { type: BiomeType; point: Point };
+export type BiomeEntry = {
+    type: BiomeType;
+    point: Point;
+};

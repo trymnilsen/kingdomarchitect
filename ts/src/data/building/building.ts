@@ -5,7 +5,7 @@ export type Building = {
     icon: Sprite2;
     name: string;
     id: string;
-    scale: 1 | 2;
+    scale: 1 | 2 | 4;
     adjacencySprite?: (adjacentBuildings: Adjacency) => Sprite2;
 };
 

@@ -6,6 +6,7 @@ import {
 } from "../../../../common/bounds.js";
 import { generateId } from "../../../../common/idGenerator.js";
 import { addPoint } from "../../../../common/point.js";
+import { WeightComponent } from "../../../component/movement/weightComponent.js";
 import { WaterComponent } from "../../../component/world/waterComponent.js";
 import { Entity } from "../../../entity/entity.js";
 import { Tileset, TilesetVariant, getLargestSize } from "../../tileset.js";
@@ -45,6 +46,7 @@ function lakeFactory(tilesetVariant: TilesetVariant) {
                 case "water":
                     const waterEntity = new Entity(generateId("water"));
                     waterEntity.addComponent(new WaterComponent());
+                    waterEntity.addComponent(new WeightComponent(100));
                     waterEntity.worldPosition = addPoint(
                         biome.worldPosition(item),
                         entity.position,

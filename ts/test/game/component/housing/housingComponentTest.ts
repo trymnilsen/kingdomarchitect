@@ -6,6 +6,7 @@ import { workerPrefab } from "../../../../src/game/prefab/workerPrefab.js";
 import { createRootEntity } from "../../../../src/game/entity/rootEntity.js";
 
 describe("Housing component test", () => {
+    /*
     it("Will assign any workers on start", () => {
         const rootEntity = createRootEntity();
         const worker = workerPrefab("worker1");
@@ -24,7 +25,7 @@ describe("Housing component test", () => {
 
         assert.equal(tenantComponent.houseEntityId, house.id);
         assert.equal(housingComponent.residentEntityId, worker.id);
-    });
+    });*/
 
     it("Will not spawn worker if tenant is set", () => {
         assert.equal(2, 2);

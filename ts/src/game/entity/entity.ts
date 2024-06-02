@@ -441,12 +441,20 @@ export class Entity {
                 this._worldPosition,
             );
 
-            for (const component of this._componentsMap) {
-                component[1].onDraw(
-                    renderContext,
-                    screenPosition,
-                    visibilityMap,
-                );
+            const withinTheViewport =
+                screenPosition.x + 40 > 0 &&
+                screenPosition.y + 40 > 0 &&
+                screenPosition.x - 40 < renderContext.width &&
+                screenPosition.y - 40 < renderContext.height;
+
+            if (withinTheViewport || this._isGameRoot) {
+                for (const component of this._componentsMap) {
+                    component[1].onDraw(
+                        renderContext,
+                        screenPosition,
+                        visibilityMap,
+                    );
+                }
             }
         }
 

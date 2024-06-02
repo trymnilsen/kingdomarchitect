@@ -123,5 +123,5 @@ export class PathFindingComponent extends EntityComponent {
 
 const defaultWeightModifier = (node: GraphNode) => node.weight;
 const blockBuildingsModifier = (node: GraphNode) => {
-    return node.weight >= 100 ? 0 : node.weight;
+    return node.weight >= 20 ? 0 : node.weight;
 };

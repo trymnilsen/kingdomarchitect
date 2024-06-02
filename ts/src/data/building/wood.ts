@@ -6,7 +6,7 @@ export const woodenBuildings: Building[] = [
         id: "woodenhouse",
         icon: sprites2.wooden_house,
         name: "Wooden House",
-        scale: 1,
+        scale: 4,
     },
     {
         id: "forrester",
@@ -18,6 +18,18 @@ export const woodenBuildings: Building[] = [
         id: "bowyer",
         icon: sprites2.building_bowyer,
         name: "Bowyer",
+        scale: 2,
+    },
+    {
+        id: "stockpile",
+        icon: sprites2.stockpile,
+        name: "Stockpile",
+        scale: 2,
+    },
+    {
+        id: "warehouse",
+        icon: sprites2.warehouse,
+        name: "Warehouse",
         scale: 2,
     },
 ];

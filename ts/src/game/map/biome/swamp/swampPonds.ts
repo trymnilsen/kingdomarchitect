@@ -2,6 +2,7 @@ import { tilesets } from "../../../../../generated/tilesets.js";
 import { sizeOfBounds } from "../../../../common/bounds.js";
 import { generateId } from "../../../../common/idGenerator.js";
 import { addPoint } from "../../../../common/point.js";
+import { WeightComponent } from "../../../component/movement/weightComponent.js";
 import { WaterComponent } from "../../../component/world/waterComponent.js";
 import { Entity } from "../../../entity/entity.js";
 import { Tileset, TilesetVariant } from "../../tileset.js";
@@ -48,6 +49,7 @@ function lakeFactory(tilesetVariant: TilesetVariant) {
                         biome.worldPosition(item),
                         entity.position,
                     );
+                    waterEntity.addComponent(new WeightComponent(100));
                     rootEntity.addChild(waterEntity);
                     break;
                 default:

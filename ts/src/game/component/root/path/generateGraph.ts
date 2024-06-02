@@ -10,6 +10,7 @@ import { LazyGraph } from "../../../../path/graph/lazyGraph.js";
 import { Entity } from "../../../entity/entity.js";
 import { WorkerBehaviorComponent } from "../../behavior/workerBehaviorComponent.js";
 import { BuildingComponent } from "../../building/buildingComponent.js";
+import { WeightComponent } from "../../movement/weightComponent.js";
 import { TreeComponent } from "../../resource/treeComponent.js";
 import { TilesComponent } from "../../tile/tilesComponent.js";
 import { ChunkMapComponent } from "../chunk/chunkMapComponent.js";
@@ -76,7 +77,7 @@ function getWeightAtPoint(
     rootEntity: Entity,
     groundComponent: TilesComponent,
 ): number {
-    let weight = 1000;
+    let weight = 25;
     const ground = groundComponent.getTile({
         x: point.x,
         y: point.y,
@@ -84,7 +85,7 @@ function getWeightAtPoint(
     if (!ground) {
         weight = 0;
     } else {
-        weight = 10;
+        weight = 2;
     }
 
     const entities = rootEntity
@@ -97,10 +98,16 @@ function getWeightAtPoint(
     if (entities.length > 0) {
         let entityWeight = 0;
         for (const entity of entities) {
+            const weightComponent = entity.getComponent(WeightComponent);
+            if (!!weightComponent) {
+                entityWeight = weightComponent.weight;
+                continue;
+            }
+
             const buildingComponent = entity.getComponent(BuildingComponent);
 
             if (buildingComponent) {
-                entityWeight = 500;
+                entityWeight = 100;
             }
 
             const workerComponent = entity.getComponent(
@@ -108,12 +115,12 @@ function getWeightAtPoint(
             );
 
             if (workerComponent) {
-                entityWeight = 500;
+                entityWeight = 20;
             }
 
             const treeComponent = entity.getComponent(TreeComponent);
             if (treeComponent) {
-                entityWeight = 200;
+                entityWeight = 30;
             }
         }
 

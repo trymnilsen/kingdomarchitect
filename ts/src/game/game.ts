@@ -1,5 +1,11 @@
 import { AssetLoader } from "../asset/loader/assetLoader.js";
-import { changeX, changeY, invert, Point } from "../common/point.js";
+import {
+    changeX,
+    changeY,
+    invert,
+    multiplyPoint,
+    Point,
+} from "../common/point.js";
 import { MutableGameTime } from "../common/time.js";
 import { Input, InputEvent } from "../input/input.js";
 import { InputActionType } from "../input/inputAction.js";
@@ -12,6 +18,7 @@ import { TileSize } from "./map/tile.js";
 import { RenderVisibilityMap } from "../rendering/renderVisibilityMap.js";
 import { VisibilityComponent } from "./component/visibility/visibilityComponent.js";
 import { generateMap } from "./map/mapGenerator.js";
+import { firstChildWhere } from "./entity/child/first.js";
 
 export class Game {
     private renderer: Renderer;
@@ -50,6 +57,18 @@ export class Game {
         // World
         this.world = createRootEntity();
         generateMap(this.world);
+        //Set the camera position
+        const playerEntity = firstChildWhere(this.world, (child) => {
+            return child.id.includes("player-worker");
+        });
+        if (!!playerEntity) {
+            const newPosition = multiplyPoint(
+                playerEntity.worldPosition,
+                TileSize,
+            );
+            this.renderer.camera.position = newPosition;
+        }
+
         // UI states handling
         this.interactionHandler = new InteractionHandler(
             this.world,
@@ -166,12 +185,14 @@ export class Game {
     }
 
     private render() {
-        //const renderStart = performance.now();
+        const renderStart = performance.now();
         this.renderer.clearScreen();
         this.world.onDraw(this.renderer.context, this.visibilityMap);
         this.interactionHandler.onDraw(this.renderer.context);
         this.renderer.renderDeferred();
-        //const renderEnd = performance.now();
-        //console.log("⏱render time: ", renderEnd - renderStart);
+        performance.measure;
+        //performance.measure("render duration", "render-start");
+        const renderEnd = performance.now();
+        console.log("⏱render time: ", renderEnd - renderStart);
     }
 }

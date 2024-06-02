@@ -15,7 +15,7 @@ export function createSwampBiome(
     biome: BiomeEntry,
     biomes: BiomeMapCollection,
 ) {
-    const biomeMap = new BiomeMap(biome.point, biome.type);
+    const biomeMap = biomes.getBiomeMap(biome);
     generateSwampPlants();
     generateNonPlayerKingdom();
     generateForts(biomeMap);

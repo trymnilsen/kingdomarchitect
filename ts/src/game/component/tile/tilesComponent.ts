@@ -147,6 +147,24 @@ export class TilesComponent extends EntityComponent implements Ground {
         for (const tileId in this.tileMap) {
             const tile = this.tileMap[tileId];
             if (!!this.discoveredTiles[tileId]) {
+                const tilePosition = {
+                    x: tile.tileX,
+                    y: tile.tileY,
+                };
+
+                const screenPosition =
+                    context.camera.tileSpaceToScreenSpace(tilePosition);
+
+                const withinTheViewport =
+                    screenPosition.x + 40 > 0 &&
+                    screenPosition.y + 40 > 0 &&
+                    screenPosition.x - 40 < context.width &&
+                    screenPosition.y - 40 < context.height;
+
+                if (!withinTheViewport) {
+                    continue;
+                }
+
                 const visibility = visiblityMap.isVisible({
                     x: tile.tileX,
                     y: tile.tileY,

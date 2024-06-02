@@ -4,6 +4,7 @@ import { Bounds } from "../../../../common/bounds.js";
 import { generateId } from "../../../../common/idGenerator.js";
 import { Point, addPoint } from "../../../../common/point.js";
 import { SpriteComponent } from "../../../component/draw/spriteComponent.js";
+import { WeightComponent } from "../../../component/movement/weightComponent.js";
 import { Entity } from "../../../entity/entity.js";
 import { placeRandomEntity } from "../../tilesetPlacer.js";
 import {
@@ -67,6 +68,7 @@ function createEntityFactory(): BiomeMapItemEntityFactory {
                 { x: 32, y: 32 },
             ),
         );
+        cactiEntity.addComponent(new WeightComponent(10));
         cactiEntity.worldPosition = position;
         rootEntity.addChild(cactiEntity);
     };
@@ -89,6 +91,7 @@ function tumbleWeedFactory(
             { x: 32, y: 32 },
         ),
     );
+    tumbleweedEntity.addComponent(new WeightComponent(5));
     tumbleweedEntity.worldPosition = position;
     rootEntity.addChild(tumbleweedEntity);
 }

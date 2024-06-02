@@ -18,7 +18,7 @@ export function createDesertBiome(
     biome: BiomeEntry,
     biomes: BiomeMapCollection,
 ): BiomeMap {
-    const biomeMap = new BiomeMap(biome.point, biome.type);
+    const biomeMap = biomes.getBiomeMap(biome);
     //Generate Oasises
     generateOasis(biomes, biomeMap);
     generateForts(biomeMap);

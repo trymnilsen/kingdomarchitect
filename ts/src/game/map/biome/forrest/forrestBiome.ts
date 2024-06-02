@@ -16,7 +16,7 @@ export function createForrestBiome(
     biome: BiomeEntry,
     biomes: BiomeMapCollection,
 ) {
-    const biomeMap = new BiomeMap(biome.point, biome.type);
+    const biomeMap = biomes.getBiomeMap(biome);
     generateForrestLake(biomeMap);
     generateSmallMountains();
     generateForrest(biomeMap);

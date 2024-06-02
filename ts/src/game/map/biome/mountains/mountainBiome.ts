@@ -20,6 +20,7 @@ import {
 } from "../../../../common/point.js";
 import { FixedGraph } from "../../../../path/graph/fixedGraph.js";
 import { PathSearch } from "../../../../path/search.js";
+import { WeightComponent } from "../../../component/movement/weightComponent.js";
 import { MountainComponent } from "../../../component/world/mountainComponent.js";
 import { Entity } from "../../../entity/entity.js";
 import { BiomeEntry } from "../biome.js";
@@ -28,14 +29,14 @@ import { BiomeMapCollection } from "../biomeMapCollection.js";
 import { generateConnectionPoints } from "../common/connectionPoints.js";
 import { generateForts } from "../common/forts.js";
 import { generateMines } from "../common/mine.js";
-import { generateStones } from "../common/stone.js";
+import { generateRandomStones } from "../common/stone.js";
 import { generateRandomTrees } from "../common/vegetation.js";
 
 export function createMountainsBiome(
     biome: BiomeEntry,
     biomes: BiomeMapCollection,
 ) {
-    const biomeMap = new BiomeMap(biome.point, biome.type);
+    const biomeMap = biomes.getBiomeMap(biome);
     const mountainMap: MountainMap = {
         bounds: [],
     };
@@ -49,7 +50,7 @@ export function createMountainsBiome(
     blobbifyMountains();
     createStoneFromMountainMap(mountainMap, biomeMap);
     generateRandomTrees(biomeMap, 32, 32);
-    generateStones();
+    generateRandomStones(biomeMap, 32, 64);
     generateMines();
     return biomeMap;
 }
@@ -298,6 +299,7 @@ function mountainFactory(
     const position = biome.worldPosition(item);
     const mountainEntity = new Entity(generateId("mountain"));
     mountainEntity.addComponent(new MountainComponent());
+    mountainEntity.addComponent(new WeightComponent(100));
     mountainEntity.worldPosition = position;
     rootEntity.addChild(mountainEntity);
 }

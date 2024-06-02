@@ -32,10 +32,10 @@ export function housePrefab(id: string, scaffold: boolean): Entity {
         zeroPoint(),
     );
 
-    const housingComponent = new HousingComponent();
+    //const housingComponent = new HousingComponent();
     house.addComponent(visibilityComponent);
     house.addComponent(buildingComponent);
     house.addComponent(healthComponent);
-    house.addComponent(housingComponent);
+    //house.addComponent(housingComponent);
     return house;
 }

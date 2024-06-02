@@ -1,0 +1,20 @@
+{
+    "gate_horizontal": {
+        "x": 0,
+        "y": 0,
+        "w": 20,
+        "h": 20
+    },
+    "gate_horizontal_closed": {
+        "x": 20,
+        "y": 0,
+        "w": 20,
+        "h": 20
+    },
+    "gate_horizontal_preview": {
+        "x": 40,
+        "y": 0,
+        "w": 20,
+        "h": 20
+    }
+}

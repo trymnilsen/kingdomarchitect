@@ -11,6 +11,12 @@ export const stoneBuildings: Building[] = [
         adjacencySprite: wallAdjacency,
     },
     {
+        id: "gate",
+        icon: sprites2.gate_horizontal_preview,
+        name: "Gate",
+        scale: 4,
+    },
+    {
         id: "stonetower",
         icon: sprites2.building_tower,
         name: "Stone tower",

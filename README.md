@@ -117,12 +117,5 @@ Some tests already exists for the game, these are made with the built in node te
 
 To optimize, remove unused parts of images and bundling them together into a spritebin the `spritepack` npm task can be used. If you update any of the images in `asset` you need to run this task to get the updated version to show up in game. The source for this can be found in `ts/tool/spritepack`.
 
-#### Typelistgen
-- **Task:** `generate-loaders`
-- **Note:** typescript sources needs to be built before the task can run
-
-To support persisting and loading the state of components and jobs, we need a list of the constructors for all components and jobs. To update the generated list of these, or the path for their imports run the `generate-loaders`
-npm task.
-
 ## ❓ FAQ
 No questions so far

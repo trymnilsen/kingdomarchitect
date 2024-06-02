@@ -11,7 +11,7 @@
         "start": "http-server -c-1",
         "build": "tsc && rollup -c",
         "tilegen": "tsc && node build/tool/tilegen/tilegen.js",
-        "spritepack": "tsc && node build/tool/spritepack/spritePack.js",
+        "spritepack": "tsc && node build/tool/spritepack/spritePack.js && npm run bundle",
         "test": "tsc && mocha",
         "bundle": "rollup -c",
         "format": "prettier ts/ --write",

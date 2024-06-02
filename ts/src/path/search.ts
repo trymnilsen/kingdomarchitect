@@ -1,4 +1,4 @@
-import { Point, pointEquals } from "../common/point.js";
+import { Point, distance, pointEquals } from "../common/point.js";
 import { BinaryHeap } from "./binaryHeap.js";
 import { Graph, GraphNode } from "./graph/graph.js";
 import { manhattanDistance } from "./pathHeuristics.js";
@@ -51,7 +51,7 @@ export class PathSearch {
         const openHeap = this.createHeap();
         //var closestNode = start; // set start node to be closest if required
 
-        start.h = manhattanDistance(start, end);
+        start.h = distance(start, end);
         this.graph.markDirtyNode(start);
 
         openHeap.push(start);
@@ -91,15 +91,16 @@ export class PathSearch {
                 // to current node. We need to check if the path we
                 // have arrived at this neighbor is the shortest one
                 // we have seen yet.
-                const gScore = currentNode.g + neighborWeight;
+                const gScore = currentNode.g;
                 const beenVisited = neighbor.visited;
 
                 if (!beenVisited || gScore < neighbor.g) {
                     // Found an optimal (so far) path to this node.
                     // Take score for node to see how good it is.
+                    const distanceToTheEnd = distance(neighbor, end);
                     neighbor.visited = true;
                     neighbor.parent = currentNode;
-                    neighbor.h = manhattanDistance(neighbor, end);
+                    neighbor.h = distanceToTheEnd + neighborWeight * 0.5;
                     neighbor.g = gScore;
                     neighbor.f = neighbor.g + neighbor.h;
                     this.graph.markDirtyNode(neighbor);

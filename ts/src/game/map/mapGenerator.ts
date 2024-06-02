@@ -1,10 +1,15 @@
-import { shuffleItems, weightedRandomEntry } from "../../common/array.js";
+import {
+    randomEntry,
+    shuffleItems,
+    weightedRandomEntry,
+} from "../../common/array.js";
 import { Point, adjacentPoints, pointEquals } from "../../common/point.js";
 import { TilesComponent } from "../component/tile/tilesComponent.js";
 import { Entity } from "../entity/entity.js";
 import { BiomeEntry, BiomeType, biomes } from "./biome/biome.js";
 import { BiomeMap } from "./biome/biomeMap.js";
 import { BiomeMapCollection } from "./biome/biomeMapCollection.js";
+import { addPlayerToBiome } from "./biome/common/player.js";
 import { createDesertBiome } from "./biome/desert/desertBiome.js";
 import { createForrestBiome } from "./biome/forrest/forrestBiome.js";
 import { createMountainsBiome } from "./biome/mountains/mountainBiome.js";
@@ -30,39 +35,35 @@ function createBiomeMaps(
     _rootEntity: Entity,
 ): BiomeMapCollection {
     const biomeMaps = new BiomeMapCollection(biomes);
+    // Pick the player biome
+    addPlayerToBiome(biomeMaps, randomEntry(biomes));
+
+    // Pick biomes to add non player kingdoms to
     for (const biome of biomes) {
         switch (biome.type) {
             case "desert":
-                const desertBiome = createDesertBiome(biome, biomeMaps);
-                biomeMaps.addBiomeMap(desertBiome);
+                createDesertBiome(biome, biomeMaps);
                 break;
             case "forrest":
-                const forrestBiome = createForrestBiome(biome, biomeMaps);
-                biomeMaps.addBiomeMap(forrestBiome);
+                createForrestBiome(biome, biomeMaps);
                 break;
             case "mountains":
-                const mountainBiome = createMountainsBiome(biome, biomeMaps);
-                biomeMaps.addBiomeMap(mountainBiome);
+                createMountainsBiome(biome, biomeMaps);
                 break;
             case "plains":
-                const plainsBiome = createPlainsBiome(biome, biomeMaps);
-                biomeMaps.addBiomeMap(plainsBiome);
+                createPlainsBiome(biome, biomeMaps);
                 break;
             case "snow":
-                const snowBiome = createSnowBiome(biome, biomeMaps);
-                biomeMaps.addBiomeMap(snowBiome);
+                createSnowBiome(biome, biomeMaps);
                 break;
             case "swamp":
-                const swampBiome = createSwampBiome(biome, biomeMaps);
-                biomeMaps.addBiomeMap(swampBiome);
+                createSwampBiome(biome, biomeMaps);
                 break;
             case "taint":
-                const taintBiome = createTaintBiome(biome, biomeMaps);
-                biomeMaps.addBiomeMap(taintBiome);
+                createTaintBiome(biome, biomeMaps);
                 break;
             default:
-                const defaultMap = new BiomeMap(biome.point, biome.type);
-                biomeMaps.addBiomeMap(defaultMap);
+                console.warn("Unknown biome type", biome);
                 break;
         }
     }

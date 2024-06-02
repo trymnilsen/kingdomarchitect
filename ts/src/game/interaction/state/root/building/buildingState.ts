@@ -221,9 +221,9 @@ export class BuildingState extends InteractionState {
         const scale = building.scale * 2;
         return uiBox({
             width: 300,
-            height: 400,
+            height: fillUiSize,
             padding: {
-                bottom: 32,
+                bottom: 40,
                 left: 24,
                 top: 32,
                 right: 40,
@@ -285,6 +285,37 @@ export class BuildingState extends InteractionState {
                                 width: fillUiSize,
                             }),
                             weight: 1,
+                        },
+                        {
+                            child: uiButton({
+                                onTapCallback: () => {},
+                                padding: allSides(16),
+                                defaultBackground: ninePatchBackground({
+                                    sprite: sprites2.book_grid_item,
+                                    sides: allSides(6),
+                                    scale: 1,
+                                }),
+                                onTappedBackground: ninePatchBackground({
+                                    sprite: sprites2.book_grid_item_focused,
+                                    sides: allSides(6),
+                                    scale: 1,
+                                }),
+                                children: [
+                                    uiText({
+                                        padding: symmetricSides(0, 8),
+                                        text: "Build",
+                                        style: {
+                                            color: bookInkColor,
+                                            font: "Silkscreen",
+                                            size: 20,
+                                        },
+                                        width: fillUiSize,
+                                        height: wrapUiSize,
+                                    }),
+                                ],
+                                width: fillUiSize,
+                                height: wrapUiSize,
+                            }),
                         },
                     ],
                 }),

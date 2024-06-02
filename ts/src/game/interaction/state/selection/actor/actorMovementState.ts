@@ -104,18 +104,29 @@ export class ActorMovementState extends InteractionState {
                 x: searchedNode.x,
                 y: searchedNode.y,
             });
+
+            const withinTheViewport =
+                position.x + 40 > 0 &&
+                position.y + 40 > 0 &&
+                position.x - 40 < context.width &&
+                position.y - 40 < context.height;
+
+            if (!withinTheViewport) {
+                continue;
+            }
+
             if (searchedNode.visited) {
                 context.drawScreenSpaceRectangle({
                     x: position.x,
                     y: position.y,
                     width: 4,
                     height: 4,
-                    fill: "blue",
+                    fill: "white",
                 });
             }
             if (searchedNode.weight == 0) {
                 context.drawScreenSpaceRectangle({
-                    x: position.x + 4,
+                    x: position.x + 8,
                     y: position.y,
                     width: 4,
                     height: 4,
@@ -129,25 +140,7 @@ export class ActorMovementState extends InteractionState {
                 color: "black",
                 x: position.x,
                 y: position.y,
-                text: `c: ${searchedNode.totalCost}`,
-            });
-
-            context.drawText({
-                size: 12,
-                font: "arial",
-                color: "black",
-                x: position.x,
-                y: position.y + 12,
                 text: `w: ${searchedNode.weight}`,
-            });
-
-            context.drawText({
-                size: 12,
-                font: "arial",
-                color: "black",
-                x: position.x,
-                y: position.y + 24,
-                text: `${searchedNode.x},${searchedNode.y}`,
             });
         }
 

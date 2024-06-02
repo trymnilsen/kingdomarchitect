@@ -1,6 +1,7 @@
 import { sprites2 } from "../../../../asset/sprite.js";
 import { generateId } from "../../../../common/idGenerator.js";
 import { SpriteComponent } from "../../../component/draw/spriteComponent.js";
+import { WeightComponent } from "../../../component/movement/weightComponent.js";
 import { Entity } from "../../../entity/entity.js";
 import { treePrefab } from "../../../prefab/treePrefab.js";
 import { placeRandomEntity } from "../../tilesetPlacer.js";
@@ -39,6 +40,7 @@ function treeFactory(
             { x: 32, y: 32 },
         ),
     );
+    tumbleweedEntity.addComponent(new WeightComponent(10));
     tumbleweedEntity.worldPosition = position;
     rootEntity.addChild(tumbleweedEntity);
 }

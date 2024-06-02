@@ -12,6 +12,7 @@ import {
 import { generateId } from "../../../../common/idGenerator.js";
 import { Point, addPoint } from "../../../../common/point.js";
 import { SpriteComponent } from "../../../component/draw/spriteComponent.js";
+import { WeightComponent } from "../../../component/movement/weightComponent.js";
 import { WaterComponent } from "../../../component/world/waterComponent.js";
 import { Entity } from "../../../entity/entity.js";
 import { TilesetVariant } from "../../tileset.js";
@@ -91,11 +92,13 @@ function createCactiEntity(position: Point, rootEntity: Entity) {
     cactiEntity.addComponent(
         new SpriteComponent(sprites2.cactus, { x: 2, y: 2 }, { x: 32, y: 32 }),
     );
+    cactiEntity.addComponent(new WeightComponent(10));
     cactiEntity.worldPosition = position;
     rootEntity.addChild(cactiEntity);
 }
 function createDesertPalmEntity(position: Point, rootEntity: Entity) {
     const palmEntity = new Entity(generateId("palm"));
+    palmEntity.addComponent(new WeightComponent(10));
     palmEntity.addComponent(
         new SpriteComponent(
             sprites2.coconut_tree,
@@ -115,6 +118,7 @@ function createDoubleRuinEntity(position: Point, rootEntity: Entity) {
             { x: 32, y: 32 },
         ),
     );
+    doubleRuinEntity.addComponent(new WeightComponent(100));
     doubleRuinEntity.worldPosition = position;
     rootEntity.addChild(doubleRuinEntity);
 }
@@ -128,6 +132,7 @@ function createSingleRuinEntity(position: Point, rootEntity: Entity) {
             { x: 32, y: 32 },
         ),
     );
+    singleRuinEntity.addComponent(new WeightComponent(100));
     singleRuinEntity.worldPosition = position;
     rootEntity.addChild(singleRuinEntity);
 }
@@ -135,6 +140,7 @@ function createSingleRuinEntity(position: Point, rootEntity: Entity) {
 function createWaterEntity(position: Point, rootEntity: Entity) {
     const waterEntity = new Entity(generateId("water"));
     waterEntity.addComponent(new WaterComponent());
+    waterEntity.addComponent(new WeightComponent(100));
     waterEntity.worldPosition = position;
     rootEntity.addChild(waterEntity);
 }

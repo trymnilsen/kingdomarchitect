@@ -1,6 +1,7 @@
 import {
     Bounds,
     boundsOverlap,
+    getAllPositionsBoundsFitWithinBounds,
     pointWithinBounds,
 } from "../../../common/bounds.js";
 import { Direction } from "../../../common/direction.js";
@@ -84,6 +85,17 @@ export class BiomeMap {
                 this._connectionPoints.down.push(offset);
                 break;
         }
+    }
+
+    getAvailableSpots(sizeToPlace: Point): Bounds[] {
+        return getAllPositionsBoundsFitWithinBounds(
+            {
+                x: 32,
+                y: 32,
+            },
+            sizeToPlace,
+            (candidate) => this.isSpotAvailable(candidate),
+        );
     }
 
     isSpotAvailable(candidate: Bounds): boolean {
