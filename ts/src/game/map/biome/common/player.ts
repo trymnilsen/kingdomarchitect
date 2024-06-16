@@ -5,7 +5,16 @@ import {
 } from "../../../../common/bounds.js";
 import { generateId } from "../../../../common/idGenerator.js";
 import { Point, addPoint } from "../../../../common/point.js";
+import {
+    bowItem,
+    hammerItem,
+    swordItem,
+    wizardHat,
+} from "../../../../data/inventory/equipment.js";
+import { InventoryItem } from "../../../../data/inventory/inventoryItem.js";
+import { goldCoins } from "../../../../data/inventory/resources.js";
 import { Entity } from "../../../entity/entity.js";
+import { chestPrefab } from "../../../prefab/chestPrefab.js";
 import { farmPrefab } from "../../../prefab/farmPrefab.js";
 import { housePrefab } from "../../../prefab/housePrefab.js";
 import { treePrefab } from "../../../prefab/treePrefab.js";
@@ -27,8 +36,8 @@ function generatePlayerEntity(biomeMap: BiomeMap) {
     //Get available bounds
     //Place
     const playerSpace = {
-        x: 3,
-        y: 3,
+        x: 5,
+        y: 5,
     };
     const playerStartBounds = biomeMap.getAvailableSpots(playerSpace);
     const pickedBounds = randomEntry(playerStartBounds);
@@ -63,12 +72,22 @@ function addPlayerEntities(rootEntity: Entity, worldPosition: Point) {
     const firstHouse = housePrefab(generateId("house"), false);
     const firstFarm = farmPrefab(generateId("farm"));
     const well = wellPrefab(generateId("well"));
-    firstFarm.position = addPoint(worldPosition, { x: 1, y: 0 });
-    firstHouse.position = addPoint(worldPosition, { x: 0, y: 0 });
-    firstWorker.position = addPoint(worldPosition, { x: 0, y: 1 });
-    well.position = addPoint(worldPosition, { x: 1, y: 1 });
+    const chestItems: InventoryItem[] = [
+        goldCoins,
+        swordItem,
+        hammerItem,
+        wizardHat,
+        bowItem,
+    ];
+    const chestEntity = chestPrefab(generateId("chest"), chestItems);
+    chestEntity.position = addPoint(worldPosition, { x: 3, y: 2 });
+    firstFarm.position = addPoint(worldPosition, { x: 2, y: 1 });
+    firstHouse.position = addPoint(worldPosition, { x: 1, y: 1 });
+    firstWorker.position = addPoint(worldPosition, { x: 1, y: 2 });
+    well.position = addPoint(worldPosition, { x: 2, y: 2 });
     rootEntity.addChild(firstFarm);
     rootEntity.addChild(firstWorker);
     rootEntity.addChild(firstHouse);
     rootEntity.addChild(well);
+    rootEntity.addChild(chestEntity);
 }

@@ -31,6 +31,7 @@ import { generateForts } from "../common/forts.js";
 import { generateMines } from "../common/mine.js";
 import { generateRandomStones } from "../common/stone.js";
 import { generateRandomTrees } from "../common/vegetation.js";
+import { generatePineTrees } from "./mountainVegetation.js";
 
 export function createMountainsBiome(
     biome: BiomeEntry,
@@ -49,8 +50,8 @@ export function createMountainsBiome(
     connectCarveouts(mountainMap, biomeMap);
     blobbifyMountains();
     createStoneFromMountainMap(mountainMap, biomeMap);
-    generateRandomTrees(biomeMap, 32, 32);
-    generateRandomStones(biomeMap, 32, 64);
+    generatePineTrees(biomeMap, 32, 32);
+    generateRandomStones(biomeMap, 8, 32);
     generateMines();
     return biomeMap;
 }
