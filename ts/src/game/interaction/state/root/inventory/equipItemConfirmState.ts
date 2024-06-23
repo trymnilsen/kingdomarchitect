@@ -9,7 +9,7 @@ import { fillUiSize } from "../../../../../ui/uiSize.js";
 import { WorkerBehaviorComponent } from "../../../../component/behavior/workerBehaviorComponent.js";
 import { SpriteComponent } from "../../../../component/draw/spriteComponent.js";
 import { EquipmentComponent } from "../../../../component/inventory/equipmentComponent.js";
-import { InventoryComponent } from "../../../../component/inventory/inventoryComponent.js";
+import { InventoryComponent2 } from "../../../../component/inventory/inventoryComponent.js";
 import { ChunkMapComponent } from "../../../../component/root/chunk/chunkMapComponent.js";
 import { firstChildWhere } from "../../../../entity/child/first.js";
 import { Entity } from "../../../../entity/entity.js";
@@ -113,15 +113,14 @@ export class EquipItemConfirmState extends InteractionState {
     }
 
     private confirmEquip() {
-        const inventoryComponent =
-            this.context.root.getComponent(InventoryComponent);
-
-        if (!inventoryComponent) {
-            throw new Error("No inventory component present on root entity");
-        }
-
         if (this.cursorSelection == null) {
             throw new Error("Cannot confirm equip on empty selection");
+        }
+
+        const inventoryComponent =
+            this.cursorSelection.getComponent(InventoryComponent2);
+        if (!inventoryComponent) {
+            throw new Error("No inventory component present on root entity");
         }
 
         const equipmentComponent =

@@ -20,7 +20,7 @@ import { EntityComponent } from "../entityComponent.js";
 
 export type InventoryMap = Record<string, InventoryItemQuantity>;
 
-export class InventoryComponent extends EntityComponent {
+export class InventoryComponent2 extends EntityComponent {
     private _items: InventoryMap = {
         [woodResourceItem.id]: {
             amount: 200000,

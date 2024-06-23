@@ -20,7 +20,8 @@ import { UIView } from "../../../../../ui/uiView.js";
 import { UIFlowGrid } from "../../../../../ui/view/uiFlowGrid.js";
 import { UIMasterDetails } from "../../../../../ui/view/uiMasterDetail.js";
 import { OpenBookUIBackground } from "../../../../../ui/visual/bookBackground.js";
-import { InventoryComponent } from "../../../../component/inventory/inventoryComponent.js";
+import { InventoryComponent2 } from "../../../../component/inventory/inventoryComponent.js";
+import { Entity } from "../../../../entity/entity.js";
 import { InteractionState } from "../../../handler/interactionState.js";
 import { StateContext } from "../../../handler/stateContext.js";
 import { UIActionbarItem } from "../../../view/actionbar/uiActionbar.js";
@@ -31,7 +32,6 @@ import { UIInventoryGridItem } from "./uiInventoryGridItem.js";
 
 export class InventoryState extends InteractionState {
     private _masterDetailsView!: UIMasterDetails;
-    private _equipAction: InventoryEquipAction;
     private _selectedGridItemView: UIInventoryGridItem | undefined;
     private _scaffold: UIActionbarScaffold | null = null;
     private _items: InventoryItemList = [];
@@ -41,9 +41,8 @@ export class InventoryState extends InteractionState {
         return true;
     }
 
-    constructor(equipmentAction: InventoryEquipAction) {
+    constructor(private forEntity: Entity) {
         super();
-        this._equipAction = equipmentAction;
     }
 
     override onActive(): void {
@@ -96,7 +95,7 @@ export class InventoryState extends InteractionState {
 
     private getInventoryItemList() {
         const inventoryComponent =
-            this.context.root.getComponent(InventoryComponent);
+            this.forEntity.getComponent(InventoryComponent2);
 
         if (!inventoryComponent) {
             throw new Error("No inventory component on root entity");
@@ -325,18 +324,13 @@ export class InventoryState extends InteractionState {
 
             const activeItem = this._items[this._activeItem];
 
-            if (activeItem && this._equipAction.isApplicable(activeItem.item)) {
-                actions.push({
-                    text: "Equip",
-                    icon: sprites2.empty_sprite,
-                    onClick: () => {
-                        this._equipAction.onEquip(
-                            activeItem.item,
-                            this.context,
-                        );
-                    },
-                });
-            }
+            actions.push({
+                text: "Equip",
+                icon: sprites2.empty_sprite,
+                onClick: () => {
+                    //this._equipAction.onEquip(activeItem.item, this.context);
+                },
+            });
 
             actions.push({
                 text: "Cancel",

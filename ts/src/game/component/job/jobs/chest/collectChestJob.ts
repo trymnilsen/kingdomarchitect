@@ -1,4 +1,4 @@
-import { InventoryComponent } from "../../../inventory/inventoryComponent.js";
+import { InventoryComponent2 } from "../../../inventory/inventoryComponent.js";
 import { MovementComponent } from "../../../movement/movementComponent.js";
 import { ChestComponent } from "../../../resource/chestComponent.js";
 import { Job } from "../../job.js";
@@ -14,9 +14,7 @@ export class CollectChestJob extends Job {
         }
 
         if (this.adjacentTo(this.chest.entity.worldPosition)) {
-            const inventory = this.chest.entity
-                .getRootEntity()
-                .requireComponent(InventoryComponent);
+            const inventory = this.entity.requireComponent(InventoryComponent2);
 
             for (const item of this.chest.items) {
                 inventory.addInventoryItem(item, 1);

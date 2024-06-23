@@ -8,7 +8,6 @@ import { uiBox } from "../../../../ui/dsl/uiBoxDsl.js";
 import { fillUiSize } from "../../../../ui/uiSize.js";
 import { BuildingComponent } from "../../../component/building/buildingComponent.js";
 import { HealthComponent } from "../../../component/health/healthComponent.js";
-import { InventoryComponent } from "../../../component/inventory/inventoryComponent.js";
 import { workerConstraint } from "../../../component/job/jobConstraint.js";
 import { JobQueueComponent } from "../../../component/job/jobQueueComponent.js";
 import { BuildJob } from "../../../component/job/jobs/buildJob.js";
@@ -152,11 +151,13 @@ export class BuildConfirmState extends InteractionState {
 
     private confirmBuildSelection() {
         const rootEntity = this.context.root;
+
+        /*
         const inventoryComponent = rootEntity.getComponent(InventoryComponent);
 
         if (!inventoryComponent) {
             throw new Error("No inventory component of root entity");
-        }
+        }*/
 
         const selections = this.buildMode.getSelection();
         const isAllTilesAvailable = selections.every((item) => {
@@ -170,10 +171,11 @@ export class BuildConfirmState extends InteractionState {
             return;
         }
 
-        const removeResult = inventoryComponent.removeInventoryItem(
+        const removeResult = false;
+        /*inventoryComponent.removeInventoryItem(
             woodResourceItem.id,
             10 * selections.length,
-        );
+        );*/
 
         if (removeResult) {
             for (const selection of selections) {
@@ -193,7 +195,10 @@ export class BuildConfirmState extends InteractionState {
             this.context.stateChanger.clear();
         } else {
             this.context.stateChanger.push(
-                new AlertMessageState("Oh no", "Not enough resources"),
+                new AlertMessageState(
+                    "Not implemented",
+                    "Migrating to individual stashes",
+                ),
             );
         }
     }

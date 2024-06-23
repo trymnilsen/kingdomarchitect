@@ -53,15 +53,6 @@ export class RootState extends InteractionState {
                 },
             },
             {
-                text: "Stash",
-                icon: sprites2.empty_sprite,
-                onClick: () => {
-                    this.context.stateChanger.push(
-                        new InventoryState(new ConfirmEquipAction()),
-                    );
-                },
-            },
-            {
                 text: "Quest",
                 icon: sprites2.empty_sprite,
                 onClick: () => {

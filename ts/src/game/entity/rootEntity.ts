@@ -1,6 +1,5 @@
 import { generateId } from "../../common/idGenerator.js";
 import { PathSearch } from "../../path/search.js";
-import { InventoryComponent } from "../component/inventory/inventoryComponent.js";
 import { JobQueueComponent } from "../component/job/jobQueueComponent.js";
 import { JobSchedulerComponent } from "../component/job/jobSchedulerComponent.js";
 import { ForrestComponent } from "../component/resource/forrestComponent.js";
@@ -18,10 +17,8 @@ import { Entity } from "./entity.js";
 export function createRootEntity(): Entity {
     const rootEntity = new Entity("root");
     const jobQueueComponent = new JobQueueComponent();
-    const inventoryComponent = new InventoryComponent();
     const groundComponent = new TilesComponent();
     const chunkmapComponent = new ChunkMapComponent();
-    rootEntity.addComponent(inventoryComponent);
     rootEntity.addComponent(groundComponent);
     rootEntity.addComponent(jobQueueComponent);
     rootEntity.addComponent(chunkmapComponent);

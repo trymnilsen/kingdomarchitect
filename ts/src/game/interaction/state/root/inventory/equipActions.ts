@@ -6,7 +6,7 @@ import {
     EquipmentComponent,
     EquipmentSlot,
 } from "../../../../component/inventory/equipmentComponent.js";
-import { InventoryComponent } from "../../../../component/inventory/inventoryComponent.js";
+import { InventoryComponent2 } from "../../../../component/inventory/inventoryComponent.js";
 import { Entity } from "../../../../entity/entity.js";
 import { StateContext } from "../../../handler/stateContext.js";
 import { EquipItemConfirmState } from "./equipItemConfirmState.js";
@@ -42,7 +42,7 @@ export class EquipOnActorAction implements InventoryEquipAction {
 
     onEquip(item: InventoryItem, stateContext: StateContext) {
         const inventoryComponent =
-            this.entity.getAncestorComponent(InventoryComponent);
+            this.entity.getComponent(InventoryComponent2);
 
         inventoryComponent?.removeInventoryItem(item.id, 1);
         this.equipmentSlot.setItem(item);

@@ -4,7 +4,7 @@ import {
     ItemTag,
 } from "../../../data/inventory/inventoryItem.js";
 import { EntityComponent } from "../entityComponent.js";
-import { InventoryComponent } from "./inventoryComponent.js";
+import { InventoryComponent2 } from "./inventoryComponent.js";
 
 export class EquipmentComponent extends EntityComponent {
     private _mainItem: InternalEquipmentSlot;
@@ -38,7 +38,7 @@ export class EquipmentComponent extends EntityComponent {
         if (!!previousItem) {
             //Return the item to the inventory
             const inventoryComponent =
-                this.entity.getAncestorComponent(InventoryComponent);
+                this.entity.getComponent(InventoryComponent2);
 
             inventoryComponent?.addInventoryItem(previousItem, 1);
         }

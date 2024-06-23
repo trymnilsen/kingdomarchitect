@@ -3,7 +3,7 @@ import { woodResourceItem } from "../../../../data/inventory/resources.js";
 import { RenderContext } from "../../../../rendering/renderContext.js";
 import { BlinkingImageAnimation } from "../../../../rendering/visual/blinkingImageAnimation.js";
 import { HealthComponent } from "../../../component/health/healthComponent.js";
-import { InventoryComponent } from "../../../component/inventory/inventoryComponent.js";
+import { InventoryComponent2 } from "../../../component/inventory/inventoryComponent.js";
 import { TreeComponent } from "../../../component/resource/treeComponent.js";
 import { Entity, assertEntity } from "../../../entity/entity.js";
 import { assertEntityComponent } from "../../entityComponent.js";
@@ -56,7 +56,7 @@ export class ChopTreeJob extends Job {
                 const treeComponent =
                     this._target.requireComponent(TreeComponent);
                 const inventoryComponent =
-                    this._target.getAncestorComponent(InventoryComponent);
+                    this.entity.getComponent(InventoryComponent2);
                 if (!inventoryComponent) {
                     throw new Error(
                         "No inventory component on ancestor of entity for ChopTreeJob",

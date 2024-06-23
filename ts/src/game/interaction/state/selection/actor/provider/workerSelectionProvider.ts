@@ -12,7 +12,7 @@ import {
     EquipmentComponent,
     EquipmentSlot,
 } from "../../../../../component/inventory/equipmentComponent.js";
-import { InventoryComponent } from "../../../../../component/inventory/inventoryComponent.js";
+import { InventoryComponent2 } from "../../../../../component/inventory/inventoryComponent.js";
 import { Entity } from "../../../../../entity/entity.js";
 import { StateContext } from "../../../../handler/stateContext.js";
 import { UIActionbarItem } from "../../../../view/actionbar/uiActionbar.js";
@@ -109,7 +109,7 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
     }
 
     private getOtherActions(
-        stateContext: StateContext,
+        _stateContext: StateContext,
         selectedEntity: Entity,
         otherItem: EquipmentSlot,
     ): UIActionbarItem[] {
@@ -127,7 +127,7 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
                     const effectComponent =
                         selectedEntity.getComponent(EffectComponent);
                     const inventoryComponent =
-                        stateContext.root.requireComponent(InventoryComponent);
+                        selectedEntity.requireComponent(InventoryComponent2);
 
                     const item = otherItem.getItem();
                     let effect: Effect | null = null;
@@ -163,6 +163,15 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
                 },
             },
             {
+                text: "Stash",
+                icon: sprites2.empty_sprite,
+                onClick: () => {
+                    stateContext.stateChanger.push(
+                        new InventoryState(selectedEntity),
+                    );
+                },
+            },
+            {
                 text: "Skills",
                 onClick: () => {
                     stateContext.stateChanger.push(new CharacterSkillState());
@@ -182,19 +191,14 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
     private getEmptyMainEquipmentAction(
         stateContext: StateContext,
         selectedEntity: Entity,
-        equipmentComponent: EquipmentComponent,
+        _equipmentComponent: EquipmentComponent,
     ): UIActionbarItem[] {
         return [
             {
                 text: "Equip",
                 onClick: () => {
                     stateContext.stateChanger.push(
-                        new InventoryState(
-                            new EquipOnActorAction(
-                                selectedEntity,
-                                equipmentComponent.mainItem,
-                            ),
-                        ),
+                        new InventoryState(selectedEntity),
                     );
                 },
                 icon: sprites2.empty_sprite,
@@ -205,19 +209,14 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
     private getEmptyOtherEquipmentAction(
         stateContext: StateContext,
         selectedEntity: Entity,
-        equipmentComponent: EquipmentComponent,
+        _equipmentComponent: EquipmentComponent,
     ): UIActionbarItem[] {
         return [
             {
                 text: "Equip",
                 onClick: () => {
                     stateContext.stateChanger.push(
-                        new InventoryState(
-                            new EquipOnActorAction(
-                                selectedEntity,
-                                equipmentComponent.otherItem,
-                            ),
-                        ),
+                        new InventoryState(selectedEntity),
                     );
                 },
                 icon: sprites2.empty_sprite,
@@ -235,7 +234,7 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
                 text: "Unequip",
                 onClick: () => {
                     const inventoryComponent =
-                        stateContext.root.requireComponent(InventoryComponent);
+                        stateContext.root.requireComponent(InventoryComponent2);
                     const equipmentComponent =
                         selectedEntity.requireComponent(EquipmentComponent);
 
