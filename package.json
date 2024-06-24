@@ -37,6 +37,6 @@
         "prettier": "^3.3.2",
         "rollup": "^3.29.4",
         "source-map-support": "^0.5.21",
-        "typescript": "^5.4.5"
+        "typescript": "^5.5.2"
     }
 }
