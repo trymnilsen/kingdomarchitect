@@ -193,6 +193,6 @@ export class Game {
         performance.measure;
         //performance.measure("render duration", "render-start");
         const renderEnd = performance.now();
-        console.log("⏱render time: ", renderEnd - renderStart);
+        //console.log("⏱render time: ", renderEnd - renderStart);
     }
 }

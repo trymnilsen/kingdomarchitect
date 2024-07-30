@@ -14,6 +14,7 @@ import { LineSelectionMode } from "../../selection/lineSelectionMode.js";
 import { SelectionMode } from "../../selection/selectionMode.js";
 import { SingleSelectionMode } from "../../selection/singleSelectionMode.js";
 import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold.js";
+import { AlertMessageState } from "../common/alertMessageState.js";
 
 export class ChopJobState extends InteractionState {
     private chopMode: SelectionMode;
@@ -117,6 +118,7 @@ export class ChopJobState extends InteractionState {
 
     private scheduleChop() {
         console.log("Schedule chop tree job");
+        let hadTreeInSelection = false;
         for (const point of this.chopMode.getSelection()) {
             const treeEntity = this.context.root
                 .requireComponent(ChunkMapComponent)
@@ -133,12 +135,19 @@ export class ChopJobState extends InteractionState {
                 continue;
             }
 
+            hadTreeInSelection = true;
+
             this.context.root
                 .requireComponent(JobQueueComponent)
                 .addJob(new ChopTreeJob(treeEntity));
         }
 
-        console.log("Clear state changer job");
-        this.context.stateChanger.clear();
+        if (hadTreeInSelection) {
+            this.context.stateChanger.clear();
+        } else {
+            this.context.stateChanger.push(
+                new AlertMessageState("Oh no", "No tree selected"),
+            );
+        }
     }
 }

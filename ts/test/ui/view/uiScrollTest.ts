@@ -1,6 +1,6 @@
 import * as assert from "node:assert";
 
-describe("uiScroll test", () => {
+describe("UiScroll", () => {
     it("Shows scroll buttons", () => {
         assert.equal(2, 2);
     });

@@ -16,7 +16,7 @@ import {
     zeroPoint,
 } from "../../src/common/point.js";
 
-describe("Point test", () => {
+describe("Point", () => {
     it("zero point is not mutable", () => {
         const firstZeroPoint = zeroPoint();
         const secondZeroPoint = zeroPoint();

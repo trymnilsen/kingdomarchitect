@@ -1,20 +1,17 @@
 import { Entity } from "../../../../../entity/entity.js";
+import { SelectedWorldItem } from "../../../../../selection/selectedWorldItem.js";
 import { StateContext } from "../../../../handler/stateContext.js";
+import { ButtonCollection } from "../../../../view/actionbar/buttonCollection.js";
 import { UIActionbarItem } from "../../../../view/actionbar/uiActionbar.js";
-
-export type ButtonSelection = {
-    left: ReadonlyArray<UIActionbarItem>;
-    right: ReadonlyArray<UIActionbarItem>;
-};
 
 export interface ActorSelectionProvider {
     provideButtons(
         stateContext: StateContext,
-        selectedEntity: Entity,
-    ): ButtonSelection;
+        selection: SelectedWorldItem,
+    ): ButtonCollection;
 }
 
-export const emptySelection: ButtonSelection = {
+export const emptySelection: ButtonCollection = {
     left: [],
     right: [],
 };

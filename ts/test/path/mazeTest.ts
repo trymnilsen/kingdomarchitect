@@ -2,7 +2,7 @@ import { FixedGraph } from "../../src/path/graph/fixedGraph.js";
 import { PathSearch } from "../../src/path/search.js";
 import { createGraphFromTestFile, verifyPath } from "./testGraph.js";
 
-describe("Maze tests", () => {
+describe("Maze", () => {
     it("Maze 1", async () => {
         const graph = await createGraphFromTestFile("maze1.png");
         const pathSearch = new PathSearch(

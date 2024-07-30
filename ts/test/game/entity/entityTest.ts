@@ -4,7 +4,7 @@ import { RequireError } from "../../../src/common/error/requireError.js";
 import { Entity } from "../../../src/game/entity/entity.js";
 import { createRootEntity } from "../../../src/game/entity/rootEntity.js";
 
-describe("Entity test", () => {
+describe("Entity", () => {
     it("Add child entity", () => {
         const parent = new Entity("1");
         const firstChild = new Entity("2");

@@ -1,6 +1,6 @@
 import * as assert from "node:assert";
 
-describe("uiRow test", () => {
+describe("UiRow", () => {
     it("does not allow to add children with fill space and now weight", () => {
         assert.equal(2, 2);
     });

@@ -19,10 +19,10 @@ import { InteractionState } from "../../../handler/interactionState.js";
 import { BuildConfirmState } from "../../building2/buildConfirmState.js";
 import { UIBookLayout, UIBookLayoutTab } from "../../../view/uiBookLayout.js";
 import { Building } from "../../../../../data/building/building.js";
-import { woodenBuildings } from "../../../../../data/building/wood.js";
-import { stoneBuildings } from "../../../../../data/building/stone.js";
-import { goldBuildings } from "../../../../../data/building/gold.js";
-import { foodBuildings } from "../../../../../data/building/food.js";
+import { woodenBuildings } from "../../../../../data/building/wood/wood.js";
+import { stoneBuildings } from "../../../../../data/building/stone/stone.js";
+import { goldBuildings } from "../../../../../data/building/gold/gold.js";
+import { foodBuildings } from "../../../../../data/building/food/food.js";
 import { SpriteBackground } from "../../../../../ui/uiBackground.js";
 import {
     UIActionbar,
@@ -30,6 +30,7 @@ import {
     UIActionbarItem,
 } from "../../../view/actionbar/uiActionbar.js";
 import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold.js";
+import { growBuildings } from "../../../../../data/building/grow/grow.js";
 
 export class BuildingState extends InteractionState {
     private _masterDetailsView: UIBookLayout;
@@ -102,6 +103,9 @@ export class BuildingState extends InteractionState {
                 this._activeBuildings = goldBuildings;
                 break;
             case 3:
+                this._activeBuildings = growBuildings;
+                break;
+            case 4:
                 this._activeBuildings = foodBuildings;
                 break;
             default:
@@ -349,6 +353,13 @@ export class BuildingState extends InteractionState {
             {
                 icon: sprites2.resource_corn,
                 isSelected: selectedTab == 3,
+                onTap: (index) => {
+                    this.tabSelected(index);
+                },
+            },
+            {
+                icon: sprites2.building_mill,
+                isSelected: selectedTab == 4,
                 onTap: (index) => {
                     this.tabSelected(index);
                 },

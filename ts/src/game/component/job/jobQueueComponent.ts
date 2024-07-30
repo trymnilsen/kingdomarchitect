@@ -4,10 +4,9 @@ import { RenderContext } from "../../../rendering/renderContext.js";
 import { Entity } from "../../entity/entity.js";
 import { EntityComponent } from "../entityComponent.js";
 import { Job } from "./job.js";
-import { JobConstraint, isJobApplicableForEntity } from "./jobConstraint.js";
+import { JobConstraint } from "./jobConstraint.js";
 import { JobOwner } from "./jobOwner.js";
 import { JobQueue } from "./jobQueue.js";
-import { ScheduledJob } from "./scheduledJob.js";
 
 /**
  * The job queue components holds a list of pending jobs that are not run
@@ -21,30 +20,27 @@ export class JobQueueComponent
     extends EntityComponent
     implements JobQueue, JobOwner
 {
-    private _pendingJobs: ScheduledJob[] = [];
-    private _jobScheduledEvent: Event<ScheduledJob> = new Event<ScheduledJob>();
+    private _pendingJobs: Job[] = [];
+    private _jobScheduledEvent: Event<Job> = new Event<Job>();
 
-    get pendingJobs(): ScheduledJob[] {
+    get pendingJobs(): Job[] {
         return this._pendingJobs;
     }
 
-    get jobScheduledEvent(): EventListener<ScheduledJob> {
+    get jobScheduledEvent(): EventListener<Job> {
         return this._jobScheduledEvent;
     }
 
-    addJob(job: Job, constraint?: JobConstraint): void {
-        const scheduledJob = {
-            job,
-            constraint,
-        };
+    addJob(job: Job): void {
+        const scheduledJob = job;
         this._pendingJobs.push(scheduledJob);
         job.owner = this;
         this._jobScheduledEvent.publish(scheduledJob);
     }
 
     removeJob(job: Job): void {
-        const filteredList = this._pendingJobs.filter((scheduledJob) => {
-            return scheduledJob.job !== job;
+        const filteredList = this._pendingJobs.filter((item) => {
+            return item !== job;
         });
 
         const itemsRemoved = this._pendingJobs.length - filteredList.length;
@@ -59,22 +55,32 @@ export class JobQueueComponent
         this._pendingJobs = filteredList;
     }
 
-    getApplicableJobs(entity: Entity): Job[] {
-        return this._pendingJobs
-            .filter((scheduledJob) => {
-                if (scheduledJob.constraint) {
-                    return isJobApplicableForEntity(
-                        scheduledJob.job,
-                        scheduledJob.constraint,
-                        entity,
-                    );
-                } else {
-                    return true;
-                }
-            })
-            .map((scheduledJob) => scheduledJob.job);
+    getApplicableJob(entity: Entity): Job | null {
+        if (this._pendingJobs.length == 0) {
+            return null;
+        }
+
+        let mostApplicableJob: Job | null = null;
+        let bestRank = 0;
+
+        for (const job of this._pendingJobs) {
+            const constraintRank = job.getConstraintRank(entity);
+            if (constraintRank == 0) {
+                continue;
+            }
+
+            if (constraintRank > bestRank) {
+                bestRank = constraintRank;
+                mostApplicableJob = job;
+            }
+        }
+
+        return mostApplicableJob;
     }
 
+    onReturnToQueue(): void {
+        //No op for jobs already in the queue
+    }
     onAbort(job: Job): void {
         this.removeJob(job);
     }
@@ -85,7 +91,7 @@ export class JobQueueComponent
 
     override onDraw(context: RenderContext): void {
         for (const pendingJob of this._pendingJobs) {
-            pendingJob.job.onDraw(context);
+            pendingJob.onDraw(context);
         }
     }
 }

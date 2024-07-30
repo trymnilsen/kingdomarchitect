@@ -1,6 +1,6 @@
 import * as assert from "node:assert";
 
-describe("Job test", () => {
+describe("Job", () => {
     it("cannot set start tick after it has been set", () => {
         assert.equal(2, 2);
     });

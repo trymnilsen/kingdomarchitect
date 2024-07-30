@@ -18,6 +18,11 @@ export class CommitableInteractionStateChanger
         return this.operations.length > 0;
     }
 
+    /**
+     * Push the given state to the stack of states, will allow poping back to it
+     * @param state
+     * @param onPop
+     */
     push(state: InteractionState, onPop?: (value: unknown) => void) {
         this.operations.push({
             type: "push",
@@ -26,6 +31,11 @@ export class CommitableInteractionStateChanger
         });
     }
 
+    /**
+     * Replace the current state with the given,
+     * the current state will be disposed
+     * @param state
+     */
     replace(state: InteractionState): void {
         this.operations.push({
             type: "replace",
@@ -33,6 +43,10 @@ export class CommitableInteractionStateChanger
         });
     }
 
+    /**
+     * Pop and dispose the current state
+     * @param result
+     */
     pop(result: unknown): void {
         this.operations.push({
             type: "pop",

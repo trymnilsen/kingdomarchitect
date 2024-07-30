@@ -1,6 +1,6 @@
 import * as assert from "node:assert";
 
-describe("Sides test", () => {
+describe("Sides", () => {
     it("can create with all sides equal", () => {
         assert.equal(2, 2);
     });

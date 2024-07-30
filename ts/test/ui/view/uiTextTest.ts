@@ -1,6 +1,6 @@
 import * as assert from "node:assert";
 
-describe("uiText test", () => {
+describe("UiText", () => {
     it("measures text", () => {
         assert.equal(2, 2);
     });

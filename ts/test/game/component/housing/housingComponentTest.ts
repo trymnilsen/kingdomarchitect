@@ -5,7 +5,7 @@ import { housePrefab } from "../../../../src/game/prefab/housePrefab.js";
 import { workerPrefab } from "../../../../src/game/prefab/workerPrefab.js";
 import { createRootEntity } from "../../../../src/game/entity/rootEntity.js";
 
-describe("Housing component test", () => {
+describe("HousingComponent", () => {
     /*
     it("Will assign any workers on start", () => {
         const rootEntity = createRootEntity();

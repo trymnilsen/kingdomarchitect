@@ -1,6 +1,6 @@
 import * as assert from "node:assert";
 
-describe("Camera test", () => {
+describe("Camera", () => {
     it("convert from world space to tile space", () => {
         assert.equal(2, 2);
     });

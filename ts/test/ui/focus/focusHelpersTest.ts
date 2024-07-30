@@ -1,6 +1,6 @@
 import * as assert from "node:assert";
 
-describe("getFocusableViews test", () => {
+describe("getFocusableViews", () => {
     it("can get focusable views", () => {
         assert.equal(2, 2);
     });
@@ -9,7 +9,7 @@ describe("getFocusableViews test", () => {
     });
 });
 
-describe("getClosestFocusableView test", () => {
+describe("getClosestFocusableView", () => {
     it("will return null when there is no closest view", () => {
         assert.equal(2, 2);
     });

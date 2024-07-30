@@ -24,6 +24,7 @@ export abstract class Job {
     private _jobState: JobState = JobState.NotStarted;
     private _startTick = 0;
     private _owner: JobOwner | null = null;
+    private _constraints: JobConstraint[] = [];
 
     /**
      * Return the owner for this job. The owner of a job is responsible for
@@ -122,6 +123,38 @@ export abstract class Job {
         return false;
     }
 
+    constructor(constraints: JobConstraint[] = []) {
+        this._constraints = constraints;
+    }
+
+    getConstraintRank(entity: Entity): number {
+        if (this._constraints.length == 0) {
+            //No constraints means anybody can take this job
+            return 1;
+        }
+
+        let totalRank = 0;
+        for (const constraint of this._constraints) {
+            const rank = constraint.rankEntity(entity);
+            if (rank == 0) {
+                //A rank of 0 from a constraint will short-circuit the others
+                return 0;
+            } else {
+                totalRank += rank;
+            }
+        }
+        const averageRank = totalRank / this._constraints.length;
+        return averageRank;
+    }
+
+    returnToQueue() {
+        if (this._owner) {
+            console.log("Returning job to queue", this);
+            this._owner.onReturnToQueue();
+        } else {
+            console.warn("Job was aborted without any owner", this);
+        }
+    }
     /**
      * Abort this job, setting its state to completed and publishing completion
      */
@@ -140,7 +173,7 @@ export abstract class Job {
      * take on new jobs
      */
     complete() {
-        console.debug("Job completed", this);
+        //console.debug("Job completed", this);
         this._jobState = JobState.Completed;
         if (this._owner) {
             this._owner.onComplete(this as Job);

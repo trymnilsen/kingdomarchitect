@@ -127,7 +127,7 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
         const textMetrics = this.canvasContext.measureText(text);
         return {
             width: Math.ceil(textMetrics.width),
-            height: Math.ceil(textMetrics.actualBoundingBoxDescent),
+            height: Math.ceil(textMetrics.fontBoundingBoxDescent),
         };
     }
 

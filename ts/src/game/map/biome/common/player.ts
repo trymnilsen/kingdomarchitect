@@ -10,9 +10,9 @@ import {
     hammerItem,
     swordItem,
     wizardHat,
-} from "../../../../data/inventory/equipment.js";
+} from "../../../../data/inventory/items/equipment.js";
 import { InventoryItem } from "../../../../data/inventory/inventoryItem.js";
-import { goldCoins } from "../../../../data/inventory/resources.js";
+import { goldCoins } from "../../../../data/inventory/items/resources.js";
 import { Entity } from "../../../entity/entity.js";
 import { chestPrefab } from "../../../prefab/chestPrefab.js";
 import { farmPrefab } from "../../../prefab/farmPrefab.js";

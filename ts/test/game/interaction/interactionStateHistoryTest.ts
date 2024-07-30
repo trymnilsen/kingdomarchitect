@@ -1,6 +1,6 @@
 import * as assert from "node:assert";
 
-describe("InteractionStateHistory test", () => {
+describe("InteractionStateHistory", () => {
     it("push state", () => {
         assert.equal(2, 2);
     });

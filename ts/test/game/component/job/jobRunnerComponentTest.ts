@@ -4,17 +4,17 @@ import { JobRunnerComponent } from "../../../../src/game/component/job/jobRunner
 import { Entity } from "../../../../src/game/entity/entity.js";
 import { MoveJob } from "../../../../src/game/component/job/jobs/moveJob.js";
 
-describe("JobRunnerComponent Tests", () => {
+describe("JobRunnerComponent", () => {
     it("Set active job to the assigned job", () => {
         const runner = getRunner();
-        const moveToJob = new MoveJob([]);
+        const moveToJob = new MoveJob([], runner.entity);
         runner.assignJob(moveToJob);
         assert.equal(runner.activeJob, moveToJob);
     });
 
     it("can get active job", () => {
         const runner = getRunner();
-        const moveToJob = new MoveJob([]);
+        const moveToJob = new MoveJob([], runner.entity);
         assert.equal(runner.activeJob, undefined);
         runner.assignJob(moveToJob);
         assert.equal(runner.activeJob, moveToJob);
@@ -22,7 +22,7 @@ describe("JobRunnerComponent Tests", () => {
 
     it("owner of job is updated on assign", () => {
         const runner = getRunner();
-        const moveToJob = new MoveJob([]);
+        const moveToJob = new MoveJob([], runner.entity);
         assert.equal(moveToJob.owner, null);
         runner.assignJob(moveToJob);
         assert.equal(moveToJob.owner, runner);

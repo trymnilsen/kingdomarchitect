@@ -11,9 +11,9 @@ import {
     hammerItem,
     swordItem,
     wizardHat,
-} from "../inventory/equipment.js";
+} from "../inventory/items/equipment.js";
 import { InventoryItem } from "../inventory/inventoryItem.js";
-import { goldCoins } from "../inventory/resources.js";
+import { goldCoins } from "../inventory/items/resources.js";
 import { Tileset } from "./tileset.js";
 
 export function createTentTile(ground: GroundChunk): Tileset {

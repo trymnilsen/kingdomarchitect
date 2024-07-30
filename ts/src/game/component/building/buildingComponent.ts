@@ -7,18 +7,51 @@ import {
     nullBuildingId,
 } from "../../../data/building/building.js";
 import { getBuildingById } from "../../../data/building/buildings.js";
+import { InventoryItemQuantity } from "../../../data/inventory/inventoryItemQuantity.js";
+import { woodResourceItem } from "../../../data/inventory/items/resources.js";
 import { RenderContext } from "../../../rendering/renderContext.js";
 import { EntityComponent } from "../entityComponent.js";
 import { ChunkMapComponent } from "../root/chunk/chunkMapComponent.js";
+
+const neededBuildResources = [
+    {
+        item: woodResourceItem,
+        amount: 20,
+    },
+];
 
 export class BuildingComponent extends EntityComponent {
     private buildingSprite: Sprite2 = emptySprite;
     private scaffoldSprite: Sprite2 = emptySprite;
     private _building: Building = nullBuilding;
     private isScaffolded = true;
+    private _providedItems: { [id: string]: number } = {};
 
     get building(): Readonly<Building> {
         return this._building;
+    }
+
+    get remainingItems(): ReadonlyArray<InventoryItemQuantity> {
+        //TODO: can be optimized with a map not null?
+        return neededBuildResources
+            .filter((resourceNeeded) => {
+                const providedAmount =
+                    this._providedItems[resourceNeeded.item.id] ?? 0;
+                //If the provided amount is less than needed we return true
+                //this should give us a list of the items remaining
+                return providedAmount < resourceNeeded.amount;
+            })
+            .map((resourceNeeded) => {
+                //We transform the list from a list of the amount currently provided
+                //to a list of the amount of items remaining
+                const providedAmount =
+                    this._providedItems[resourceNeeded.item.id] ?? 0;
+
+                return {
+                    item: resourceNeeded.item,
+                    amount: Math.max(0, resourceNeeded.amount - providedAmount),
+                };
+            });
     }
 
     constructor(
@@ -32,6 +65,20 @@ export class BuildingComponent extends EntityComponent {
         this.scaffoldSprite = scaffoldSprite;
         this._building = building;
         this.isScaffolded = isScaffolded;
+    }
+
+    supplyBuildingMaterial(items: InventoryItemQuantity[]) {
+        for (const buildingMaterial of items) {
+            const existingItemAmount =
+                this._providedItems[buildingMaterial.item.id];
+            if (!existingItemAmount) {
+                this._providedItems[buildingMaterial.item.id] =
+                    buildingMaterial.amount;
+            } else {
+                this._providedItems[buildingMaterial.item.id] =
+                    existingItemAmount + buildingMaterial.amount;
+            }
+        }
     }
 
     finishBuild() {

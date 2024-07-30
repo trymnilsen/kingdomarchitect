@@ -9,6 +9,7 @@ import { EnergyComponent } from "../energy/energyComponent.js";
 import { EntityComponent } from "../entityComponent.js";
 import { ChunkMapComponent } from "../root/chunk/chunkMapComponent.js";
 import { PathFindingComponent } from "../root/path/pathFindingComponent.js";
+import { getWeightAtPoint } from "../root/path/weight.js";
 import { TilesComponent } from "../tile/tilesComponent.js";
 import {
     CurrentMovement,
@@ -151,13 +152,12 @@ export class MovementComponent extends EntityComponent {
 
     private isPositionAvailable(point: Point): boolean {
         const rootEntity = this.entity.getRootEntity();
-        const entitiesAt = rootEntity
-            .requireComponent(ChunkMapComponent)
-            .getEntityAt(point);
+        const tileComponent = rootEntity.requireComponent(TilesComponent);
+        const weightAt = getWeightAtPoint(point, rootEntity, tileComponent);
 
-        const tile = rootEntity.requireComponent(TilesComponent).getTile(point);
+        const tile = tileComponent.getTile(point);
 
-        return entitiesAt.length == 0 && !!tile;
+        return weightAt > 0 && !!tile;
     }
 
     private setCurrentMovement(movement: CurrentMovement) {

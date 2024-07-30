@@ -1,5 +1,5 @@
 import { sprites2 } from "../../../../asset/sprite.js";
-import { woodResourceItem } from "../../../../data/inventory/resources.js";
+import { woodResourceItem } from "../../../../data/inventory/items/resources.js";
 import { RenderContext } from "../../../../rendering/renderContext.js";
 import { BlinkingImageAnimation } from "../../../../rendering/visual/blinkingImageAnimation.js";
 import { HealthComponent } from "../../../component/health/healthComponent.js";
@@ -8,6 +8,7 @@ import { TreeComponent } from "../../../component/resource/treeComponent.js";
 import { Entity, assertEntity } from "../../../entity/entity.js";
 import { assertEntityComponent } from "../../entityComponent.js";
 import { MovementComponent } from "../../movement/movementComponent.js";
+import { IsWorkerJobConstraint } from "../constraint/isWorkerJobConstraint.js";
 import { Job } from "../job.js";
 
 type ChopTreeBundle = {
@@ -34,7 +35,7 @@ export class ChopTreeJob extends Job {
     }
 
     constructor(entity: Entity) {
-        super();
+        super([new IsWorkerJobConstraint()]);
         this._target = entity;
         this.healthComponent = entity.requireComponent(HealthComponent);
     }

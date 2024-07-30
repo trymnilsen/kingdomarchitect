@@ -14,38 +14,46 @@ import {
 } from "../../../../../component/inventory/equipmentComponent.js";
 import { InventoryComponent2 } from "../../../../../component/inventory/inventoryComponent.js";
 import { Entity } from "../../../../../entity/entity.js";
+import { SelectedEntityItem } from "../../../../../selection/selectedEntityItem.js";
+import { SelectedWorldItem } from "../../../../../selection/selectedWorldItem.js";
 import { StateContext } from "../../../../handler/stateContext.js";
+import { ButtonCollection } from "../../../../view/actionbar/buttonCollection.js";
 import { UIActionbarItem } from "../../../../view/actionbar/uiActionbar.js";
 import { CharacterSkillState } from "../../../character/characterSkillState.js";
+import { AlertMessageState } from "../../../common/alertMessageState.js";
 import { EquipOnActorAction } from "../../../root/inventory/equipActions.js";
 import { InventoryState } from "../../../root/inventory/inventoryState.js";
 import { ActorMovementState } from "../actorMovementState.js";
 import {
     ActorSelectionProvider,
-    ButtonSelection,
     emptySelection,
 } from "./actorSelectionProvider.js";
 
 export class WorkerSelectionProvider implements ActorSelectionProvider {
     provideButtons(
         stateContext: StateContext,
-        selectedEntity: Entity,
-    ): ButtonSelection {
-        const equipmentComponent =
-            selectedEntity.getComponent(EquipmentComponent);
-        const workerComponent = selectedEntity.getComponent(
-            WorkerBehaviorComponent,
-        );
+        selection: SelectedWorldItem,
+    ): ButtonCollection {
+        if (selection instanceof SelectedEntityItem) {
+            const selectedEntity = selection.entity;
+            const equipmentComponent =
+                selectedEntity.getComponent(EquipmentComponent);
+            const workerComponent = selectedEntity.getComponent(
+                WorkerBehaviorComponent,
+            );
 
-        if (!!equipmentComponent && !!workerComponent) {
-            return {
-                left: this.getPrimaryActions(stateContext, selectedEntity),
-                right: this.getEquipmentActions(
-                    stateContext,
-                    selectedEntity,
-                    equipmentComponent,
-                ),
-            };
+            if (!!equipmentComponent && !!workerComponent) {
+                return {
+                    left: this.getPrimaryActions(stateContext, selectedEntity),
+                    right: this.getEquipmentActions(
+                        stateContext,
+                        selectedEntity,
+                        equipmentComponent,
+                    ),
+                };
+            } else {
+                return emptySelection;
+            }
         } else {
             return emptySelection;
         }
@@ -104,6 +112,40 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
                 ),
             });
         }
+
+        items.push({
+            text: "Job",
+            icon: sprites2.empty_sprite,
+            children: [
+                {
+                    text: "Abort",
+                    onClick: () => {
+                        stateContext.stateChanger.push(
+                            new AlertMessageState("Oh no", "Not implemented"),
+                        );
+                    },
+                    icon: sprites2.empty_sprite,
+                },
+                {
+                    text: "Unassign",
+                    onClick: () => {
+                        stateContext.stateChanger.push(
+                            new AlertMessageState("Oh no", "Not implemented"),
+                        );
+                    },
+                    icon: sprites2.empty_sprite,
+                },
+                {
+                    text: "Close",
+                    onClick: () => {
+                        stateContext.stateChanger.push(
+                            new AlertMessageState("Oh no", "Not implemented"),
+                        );
+                    },
+                    icon: sprites2.empty_sprite,
+                },
+            ],
+        });
 
         return items;
     }

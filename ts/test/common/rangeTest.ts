@@ -5,7 +5,7 @@ import {
     rangeRandom,
 } from "../../src/common/range.js";
 
-describe("Range test", () => {
+describe("Range", () => {
     it("can pick random number in range", () => {
         const range: NumberRange = {
             min: 5,

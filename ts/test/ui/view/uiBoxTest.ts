@@ -1,6 +1,6 @@
 import * as assert from "node:assert";
 
-describe("uiBox test", () => {
+describe("UiBox", () => {
     it("sizes to largest child on wrap", () => {
         assert.equal(2, 2);
     });

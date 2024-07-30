@@ -1,6 +1,6 @@
 import * as assert from "node:assert";
 
-describe("Number test", () => {
+describe("Number", () => {
     it("does not clamp value if inbetween range", () => {
         assert.equal(2, 2);
     });

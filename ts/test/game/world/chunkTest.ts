@@ -1,6 +1,6 @@
 import * as assert from "node:assert";
 
-describe("Chunk Test", () => {
+describe("Chunk", () => {
     it("Get chunk position", () => {
         assert.equal(2, 2);
     });

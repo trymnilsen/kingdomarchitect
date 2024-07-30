@@ -22,6 +22,10 @@ export class InteractionStateHistory {
         return this.history[this.history.length - 1].state;
     }
 
+    get size(): number {
+        return this.history.length;
+    }
+
     constructor(private context: StateContext) {
         const rootState = new RootState();
         rootState.context = context;

@@ -1,6 +1,6 @@
 import * as assert from "node:assert";
 
-describe("Fixed graph test", () => {
+describe("FixedGraph", () => {
     it("Can get node at", () => {
         assert.equal(2, 2);
     });

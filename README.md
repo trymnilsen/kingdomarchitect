@@ -10,11 +10,15 @@
 ![Screenshot of the game](doc/screenshot/gameplay.png)
 
 ## 🕹️ Play
+
+> [!NOTE]  
+> This game is currently in development. There will be things that are broken/not working/not implemented.
+
 You can either clone this repository and run it based on the instructions on how to run the game below, or try the last version out at [https://kingdomarchitect.netlify.app](https://kingdomarchitect.netlify.app)
 
 ### How to play
 - Gather resources
-- Unlock lands
+- Discover new lands
 - Build houses to spawn workers
 - Level up the skills of workers as wizards, knights or archers
 - Defend against enemy mobs
@@ -46,8 +50,8 @@ Kingdom architects is intended to be a combined simulation and city building gam
 
 ### Goals for the project
 - Play both using the keyboard and mouse/touch.
-- Only depend on browser-apis, no extra libraries.
-- Kingdoms are ephemeral, they only exists within the memory of the browser. Once its closed only bards will sing the tales of your kingdom. Something rewarding should happen from the start.
+- Only depend on browser-apis, no extra libraries or third party frameworks.
+- Kingdoms are ephemeral, they only exists within the memory of the browser. Once it's closed only bards will sing the tales of your kingdom. Something rewarding should happen from the start.
 - Progress in some way should be able to be carried over into future kingdoms, rogue-lite style.
 
 ## 🙋 Contributing
@@ -75,11 +79,9 @@ The architecture of the game is loosely based around three concepts:
 - A state system for the HUD/GUI
 
 #### Game updates
-Ever second a timer invokes two code paths for most of the game components. An update function and a draw function.
+Every second a timer invokes two code paths for most of the game components. An update function and a draw function.
 The update function should only be invoked once per timer tick, but the draw method can be called multiple. Be wary of putting
-logic depending on a timed update as it will be invoked potentially more than one time per tick when input events happen or other
-actions are perfomed. Panning the gameworld is a good example of when the draw method of the different classes are invoked, this method
-is executed on each drag event from the browser.
+logic depending on a timed update in the draw code path as it will be invoked potentially more than one time per tick when input events happen or other actions are perfomed. Panning the gameworld is a good example of when the draw method of the different classes are invoked, this method is executed on each drag event from the browser.
 
 #### Entity component system
 A entity component system is in the works where all items in the world are tied to an entity with some amount of componets on it handle updates and draw actions. Some exceptions exists like tiles where all tiles belong to the same entity with a component that is responsible for drawing and handling all the tiles. All new game world items and data will be stored in components on entities. If you create new components or jobs, remember to run the [Typelistgen tooling](#typelistgen)

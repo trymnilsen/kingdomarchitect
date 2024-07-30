@@ -10,6 +10,7 @@ export class Event<T = object> implements EventListener<T> {
 
     listen(subscriber: EventSubscriptionHandler<T>): EventHandle {
         const listnerId = this.nextListenersId + 1;
+        this.nextListenersId = listnerId;
         this.listeners[listnerId] = subscriber;
         return () => {
             delete this.listeners[listnerId];

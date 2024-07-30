@@ -3,7 +3,6 @@ import { jobDebug } from "../../../constants.js";
 import { RenderContext } from "../../../rendering/renderContext.js";
 import { EntityComponent } from "../entityComponent.js";
 import { Job } from "./job.js";
-import { isJobApplicableForEntity } from "./jobConstraint.js";
 import { JobOwner } from "./jobOwner.js";
 import { JobQueueComponent } from "./jobQueueComponent.js";
 import { JobState } from "./jobState.js";
@@ -59,6 +58,7 @@ export class JobRunnerComponent extends EntityComponent implements JobOwner {
         job.entity = this.entity;
         job.owner = this;
         try {
+            job.jobState = JobState.Running;
             job.onStart();
         } catch (e) {
             console.error("Failed to start job", e, job);
@@ -66,6 +66,15 @@ export class JobRunnerComponent extends EntityComponent implements JobOwner {
         }
     }
 
+    onReturnToQueue(): void {
+        const currentJob = this.activeJob;
+        this.endJob();
+        if (currentJob) {
+            this.entity
+                .getAncestorComponent(JobQueueComponent)
+                ?.addJob(currentJob);
+        }
+    }
     onAbort(): void {
         this.endJob();
     }
@@ -76,7 +85,9 @@ export class JobRunnerComponent extends EntityComponent implements JobOwner {
     override onStart(tick: number): void {
         super.onStart(tick);
         // Request a job
-        this.requestNewJob();
+        if (!this.activeJob) {
+            this.requestNewJob();
+        }
     }
 
     override onUpdate(tick: number): void {
@@ -117,13 +128,12 @@ export class JobRunnerComponent extends EntityComponent implements JobOwner {
             return;
         }
 
-        const applicableJobs = queue.getApplicableJobs(this.entity);
-        if (applicableJobs.length > 0) {
-            const mostApplicableJob = applicableJobs[0];
+        const applicableJob = queue.getApplicableJob(this.entity);
+        if (!!applicableJob) {
             // Remove the job from the queue to avoid it being assigned
             // to some other entity as well
-            queue.removeJob(mostApplicableJob);
-            this.assignJob(mostApplicableJob);
+            queue.removeJob(applicableJob);
+            this.assignJob(applicableJob);
         }
     }
 }

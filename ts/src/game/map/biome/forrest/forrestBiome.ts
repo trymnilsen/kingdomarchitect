@@ -8,6 +8,7 @@ import { generateMines } from "../common/mine.js";
 import { generateSmallMountains } from "../common/mountain.js";
 import { generateNonPlayerKingdom } from "../common/nonPlayerKingdom.js";
 import { generatePonds } from "../common/pond.js";
+import { generateRandomStones } from "../common/stone.js";
 import { generateRandomTrees } from "../common/vegetation.js";
 import { generateForrest } from "./forrest.js";
 import { generateForrestLake } from "./forrestLake.js";
@@ -22,8 +23,9 @@ export function createForrestBiome(
     generateForrest(biomeMap);
     generateNonPlayerKingdom();
     generateForts(biomeMap);
-    generateRandomTrees(biomeMap);
+    generateRandomTrees(biomeMap, 32, 100);
     generateRandomBuildings();
+    generateRandomStones(biomeMap, 4, 16);
     generateMines();
     generateConnectionPoints(biomeMap, biomes);
     return biomeMap;

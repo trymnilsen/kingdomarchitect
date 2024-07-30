@@ -1,4 +1,7 @@
-import { hammerItem, swordItem } from "../../../data/inventory/equipment.js";
+import {
+    hammerItem,
+    swordItem,
+} from "../../../data/inventory/items/equipment.js";
 import { InventoryItem } from "../../../data/inventory/inventoryItem.js";
 import {
     InventoryItemList,
@@ -15,7 +18,7 @@ import {
     stoneResource,
     wheatResourceItem,
     woodResourceItem,
-} from "../../../data/inventory/resources.js";
+} from "../../../data/inventory/items/resources.js";
 import { EntityComponent } from "../entityComponent.js";
 
 export type InventoryMap = Record<string, InventoryItemQuantity>;
@@ -93,6 +96,18 @@ export class InventoryComponent2 extends EntityComponent {
         } else {
             return false;
         }
+    }
+
+    amountOf(itemId: string): number {
+        if (this._items[itemId]) {
+            return this._items[itemId].amount;
+        } else {
+            return 0;
+        }
+    }
+
+    clear() {
+        this._items = {};
     }
 
     removeInventoryItem(itemId: string, amount: number): boolean {

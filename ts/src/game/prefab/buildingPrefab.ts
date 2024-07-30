@@ -11,7 +11,7 @@ import { Entity } from "../entity/entity.js";
 export function buildingPrefab(
     id: string,
     building: Building,
-    extraComponents: EntityComponent[],
+    extraComponents: EntityComponent[] = [],
     scaffold: boolean = true,
 ): Entity {
     const entity = new Entity(id);

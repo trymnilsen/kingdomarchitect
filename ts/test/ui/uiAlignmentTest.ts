@@ -1,6 +1,6 @@
 import * as assert from "node:assert";
 
-describe("uiAlignment test", () => {
+describe("UiAlignment", () => {
     it("can calculate alignment with source size larger than target size", () => {
         assert.equal(2, 2);
     });

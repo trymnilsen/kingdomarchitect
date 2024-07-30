@@ -5,11 +5,9 @@
     "tasks": [
         {
             "type": "npm",
-            "script": "build",
-            "problemMatcher": [
-                "$tsc"
-            ],
-            "label": "npm: bundle",
+            "script": "bundle",
+            "dependsOn": ["build typescript"],
+            "label": "bundle typescript",
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -22,6 +20,23 @@
                 "showReuseMessage": true,
                 "clear": false
             }
+        },
+        {
+            "label": "build typescript",
+            "type": "typescript",
+            "tsconfig": "tsconfig.json",
+            "problemMatcher": [
+                "$tsc"
+            ],
+            "presentation": {
+                "echo": true,
+                "reveal": "never",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
         }
+        
     ]
 }

@@ -5,8 +5,13 @@ import { InputAction, InputActionType } from "../../../input/inputAction.js";
 import { OnTapEndEvent } from "../../../input/touchInput.js";
 import { Camera } from "../../../rendering/camera.js";
 import { RenderContext } from "../../../rendering/renderContext.js";
+import { ChunkMapComponent } from "../../component/root/chunk/chunkMapComponent.js";
 import { TilesComponent } from "../../component/tile/tilesComponent.js";
 import { Entity } from "../../entity/entity.js";
+import { SelectedEntityItem } from "../../selection/selectedEntityItem.js";
+import { SelectedTileItem } from "../../selection/selectedTileItem.js";
+import { SelectedWorldItem } from "../../selection/selectedWorldItem.js";
+import { SelectionState } from "../state/selection/selectionState.js";
 import { CommitableInteractionStateChanger } from "./interactionStateChanger.js";
 import { InteractionStateHistory } from "./interactionStateHistory.js";
 import { StateContext } from "./stateContext.js";
@@ -20,6 +25,7 @@ export class InteractionHandler {
     private world: Entity;
     private interactionStateChanger: CommitableInteractionStateChanger;
     private history: InteractionStateHistory;
+    private stateContext: StateContext;
 
     constructor(
         world: Entity,
@@ -30,14 +36,14 @@ export class InteractionHandler {
         this.interactionStateChanger = new CommitableInteractionStateChanger();
         this.world = world;
         this.camera = camera;
-        const stateContext: StateContext = {
+        this.stateContext = {
             root: this.world,
             assets: assets,
             stateChanger: this.interactionStateChanger,
             gameTime: time,
             camera: camera,
         };
-        this.history = new InteractionStateHistory(stateContext);
+        this.history = new InteractionStateHistory(this.stateContext);
     }
 
     onTapDown(screenPoint: Point): boolean {
@@ -109,9 +115,39 @@ export class InteractionHandler {
             if (tile) {
                 const tileTapHandled = currentState.onTileTap(tile);
 
-                // If the tap is not handled we treat it as a clear
                 if (!tileTapHandled) {
-                    this.interactionStateChanger.clear();
+                    console.log(
+                        "Tap not handled by state, checking for selection",
+                    );
+                    /*
+                    const selectionState = pickSelectionState(
+                        tile,
+                        this.stateContext,
+                    );*/
+
+                    const entitiesAt = this.stateContext.root
+                        .requireComponent(ChunkMapComponent)
+                        .getEntityAt({
+                            x: tile.tileX,
+                            y: tile.tileY,
+                        });
+
+                    let selection: SelectedWorldItem;
+                    if (entitiesAt.length > 0) {
+                        const entity = entitiesAt[0];
+                        selection = new SelectedEntityItem(entity);
+                    } else {
+                        //There was not entity at this place but we can still do
+                        //a check against tiles. E.g for building
+                        selection = new SelectedTileItem(tile);
+                    }
+
+                    const selectionState = new SelectionState(selection);
+                    if (this.history.size == 1) {
+                        this.interactionStateChanger.push(selectionState);
+                    } else {
+                        this.interactionStateChanger.replace(selectionState);
+                    }
                 }
             } else {
                 // Tap was not handled and we did not tap a tile

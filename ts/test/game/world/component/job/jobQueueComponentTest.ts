@@ -1,6 +1,6 @@
 import * as assert from "node:assert";
 
-describe("JobQueueComponent tests", () => {
+describe("JobQueueComponent", () => {
     it("Will immediately schedule job if available", () => {
         assert.equal(2, 2);
     });

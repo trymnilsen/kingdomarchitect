@@ -2,13 +2,12 @@ import { sprites2 } from "../../../../asset/sprite.js";
 import { Point } from "../../../../common/point.js";
 import { allSides } from "../../../../common/sides.js";
 import { Building } from "../../../../data/building/building.js";
-import { woodResourceItem } from "../../../../data/inventory/resources.js";
+import { woodResourceItem } from "../../../../data/inventory/items/resources.js";
 import { RenderContext } from "../../../../rendering/renderContext.js";
 import { uiBox } from "../../../../ui/dsl/uiBoxDsl.js";
 import { fillUiSize } from "../../../../ui/uiSize.js";
 import { BuildingComponent } from "../../../component/building/buildingComponent.js";
 import { HealthComponent } from "../../../component/health/healthComponent.js";
-import { workerConstraint } from "../../../component/job/jobConstraint.js";
 import { JobQueueComponent } from "../../../component/job/jobQueueComponent.js";
 import { BuildJob } from "../../../component/job/jobs/buildJob.js";
 import { ChunkMapComponent } from "../../../component/root/chunk/chunkMapComponent.js";
@@ -171,7 +170,7 @@ export class BuildConfirmState extends InteractionState {
             return;
         }
 
-        const removeResult = false;
+        const removeResult = true;
         /*inventoryComponent.removeInventoryItem(
             woodResourceItem.id,
             10 * selections.length,
@@ -185,20 +184,15 @@ export class BuildConfirmState extends InteractionState {
                 root.addChild(house);
                 const buildingComponent =
                     house.requireComponent(BuildingComponent);
-                const healthComponent = house.requireComponent(HealthComponent);
                 root.requireComponent(JobQueueComponent).addJob(
-                    new BuildJob(buildingComponent, healthComponent),
-                    workerConstraint(),
+                    new BuildJob(buildingComponent),
                 );
             }
 
             this.context.stateChanger.clear();
         } else {
             this.context.stateChanger.push(
-                new AlertMessageState(
-                    "Not implemented",
-                    "Migrating to individual stashes",
-                ),
+                new AlertMessageState("N/A", "TODO"),
             );
         }
     }

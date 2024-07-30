@@ -1,6 +1,6 @@
 import * as assert from "node:assert";
 
-describe("uiBookLayout", () => {
+describe("UiBookLayout", () => {
     it("will layout both left and right page", () => {
         assert.equal(2, 2);
     });

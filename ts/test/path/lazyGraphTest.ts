@@ -1,7 +1,7 @@
 import * as assert from "node:assert";
 import { LazyGraph } from "../../src/path/graph/lazyGraph.js";
 
-describe("Lazy graph test", () => {
+describe("LazyGraph", () => {
     it("Can get node at", () => {
         let times = 0;
         const lazyGraph = new LazyGraph(() => {

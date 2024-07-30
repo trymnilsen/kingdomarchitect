@@ -1,6 +1,6 @@
 import * as assert from "node:assert";
 
-describe("insertAndShift test", () => {
+describe("insertAndShift", () => {
     it("shifts nothing when inserted at the end", () => {
         assert.equal(2, 2);
     });

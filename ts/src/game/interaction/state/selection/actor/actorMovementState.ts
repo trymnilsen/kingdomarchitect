@@ -13,7 +13,6 @@ import { TileSize } from "../../../../map/tile.js";
 import { InteractionState } from "../../../handler/interactionState.js";
 import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold.js";
 import { MoveJob } from "../../../../component/job/jobs/moveJob.js";
-import { entityInstanceConstraint } from "../../../../component/job/jobConstraint.js";
 
 export class ActorMovementState extends InteractionState {
     private selectedPoint: Point | null = null;
@@ -33,7 +32,7 @@ export class ActorMovementState extends InteractionState {
             contentView,
             [
                 {
-                    text: "Move",
+                    text: "Confirm",
                     icon: sprites2.empty_sprite,
                     onClick: () => {
                         this.scheduleMovement();
@@ -142,6 +141,14 @@ export class ActorMovementState extends InteractionState {
                 y: position.y,
                 text: `w: ${searchedNode.weight}`,
             });
+            context.drawText({
+                size: 12,
+                font: "arial",
+                color: "black",
+                x: position.x,
+                y: position.y + 24,
+                text: `c: ${searchedNode.totalCost.toFixed(2)}`,
+            });
         }
 
         super.onDraw(context);
@@ -150,9 +157,6 @@ export class ActorMovementState extends InteractionState {
     private scheduleMovement() {
         this.context.root
             .requireComponent(JobQueueComponent)
-            .addJob(
-                new MoveJob(this.path.reverse()),
-                entityInstanceConstraint(this.entity.id),
-            );
+            .addJob(new MoveJob(this.path.reverse(), this.entity));
     }
 }

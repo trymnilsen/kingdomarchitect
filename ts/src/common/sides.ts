@@ -5,6 +5,16 @@ export type Sides = {
     bottom: number;
 };
 
+export enum HorizontalSide {
+    Left,
+    Right,
+}
+
+export enum VerticalSide {
+    Up,
+    Down,
+}
+
 export function allSides(size: number): Sides {
     return {
         top: size,

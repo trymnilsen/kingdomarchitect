@@ -1,6 +1,6 @@
 import * as assert from "node:assert";
 
-describe("Search test", () => {
+describe("PathSearch", () => {
     it("Can find path", () => {
         assert.equal(2, 2);
     });

@@ -1,12 +1,12 @@
 import { Sprite2 } from "../../asset/sprite.js";
 
 export type InventoryItem = {
-    id: string;
-    name: string;
-    asset: Sprite2;
-    hint?: string;
-    tag?: ItemTag[];
-    category?: ItemCategory;
+    readonly id: string;
+    readonly name: string;
+    readonly asset: Sprite2;
+    readonly hint?: string;
+    readonly tag?: readonly ItemTag[];
+    readonly category?: ItemCategory;
 };
 
 export enum ItemTag {

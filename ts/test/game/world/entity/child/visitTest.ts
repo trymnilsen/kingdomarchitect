@@ -2,7 +2,7 @@ import * as assert from "node:assert";
 import { Entity } from "../../../../../src/game/entity/entity.js";
 import { visitChildren } from "../../../../../src/game/entity/child/visit.js";
 
-describe("Visit tests", () => {
+describe("visitChildren", () => {
     it("Visit entities breadth first", () => {
         const root = new Entity("root");
         const parent1 = new Entity("parent1");

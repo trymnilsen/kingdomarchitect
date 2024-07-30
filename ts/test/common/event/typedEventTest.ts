@@ -1,6 +1,6 @@
 import * as assert from "node:assert";
 
-describe("Typed Event Test", () => {
+describe("TypedEvent", () => {
     it("Can listen", () => {
         assert.equal("2", "2");
     });

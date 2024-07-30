@@ -22,8 +22,6 @@ import { UIActionbarItem } from "../../view/actionbar/uiActionbar.js";
 import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold.js";
 import { AlertMessageState } from "../common/alertMessageState.js";
 import { MenuState } from "../menu/menuState.js";
-import { ActorSelectionState } from "../selection/actor/actorSelectionState.js";
-import { SelectionState } from "../selection/selectionState.js";
 import { BuildingState } from "./building/buildingState.js";
 import { ConfirmEquipAction } from "./inventory/equipActions.js";
 import { InventoryState } from "./inventory/inventoryState.js";
@@ -99,26 +97,7 @@ export class RootState extends InteractionState {
 
     override onTileTap(tile: GroundTile): boolean {
         console.log("RootState tap: ", tile);
-        let selection: SelectedWorldItem = new SelectedTileItem(tile);
-        const entitiesAt = this.context.root
-            .requireComponent(ChunkMapComponent)
-            .getEntityAt({
-                x: tile.tileX,
-                y: tile.tileY,
-            });
-
-        if (entitiesAt.length > 0) {
-            const actor = entitiesAt[0];
-            const behavior = actor.getComponent(WorkerBehaviorComponent);
-            if (behavior) {
-                this.context.stateChanger.push(new ActorSelectionState(actor));
-            } else {
-                selection = new SelectedEntityItem(entitiesAt[0]);
-                this.context.stateChanger.push(new SelectionState(selection));
-            }
-        }
-
-        return true;
+        return false;
     }
 }
 

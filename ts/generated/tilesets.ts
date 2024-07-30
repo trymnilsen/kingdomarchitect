@@ -11283,13 +11283,6 @@ export const tilesets = {
           },
           {
             "position": {
-              "x": 2,
-              "y": 4
-            },
-            "id": "wall"
-          },
-          {
-            "position": {
               "x": 3,
               "y": 0
             },
@@ -11466,13 +11459,6 @@ export const tilesets = {
           {
             "position": {
               "x": 3,
-              "y": 0
-            },
-            "id": "wall"
-          },
-          {
-            "position": {
-              "x": 3,
               "y": 2
             },
             "id": "well"
@@ -11621,13 +11607,6 @@ export const tilesets = {
             "position": {
               "x": 2,
               "y": 1
-            },
-            "id": "wall"
-          },
-          {
-            "position": {
-              "x": 2,
-              "y": 5
             },
             "id": "wall"
           },
@@ -11833,13 +11812,6 @@ export const tilesets = {
               "y": 1
             },
             "id": "house"
-          },
-          {
-            "position": {
-              "x": 3,
-              "y": 5
-            },
-            "id": "wall"
           },
           {
             "position": {
@@ -12082,13 +12054,6 @@ export const tilesets = {
           {
             "position": {
               "x": 5,
-              "y": 2
-            },
-            "id": "wall"
-          },
-          {
-            "position": {
-              "x": 5,
               "y": 3
             },
             "id": "wall"
@@ -12202,13 +12167,6 @@ export const tilesets = {
             "position": {
               "x": 2,
               "y": 5
-            },
-            "id": "wall"
-          },
-          {
-            "position": {
-              "x": 3,
-              "y": 0
             },
             "id": "wall"
           },
@@ -12452,13 +12410,6 @@ export const tilesets = {
           },
           {
             "position": {
-              "x": 3,
-              "y": 5
-            },
-            "id": "wall"
-          },
-          {
-            "position": {
               "x": 4,
               "y": 0
             },
@@ -12687,13 +12638,6 @@ export const tilesets = {
               "y": 1
             },
             "id": "tavern"
-          },
-          {
-            "position": {
-              "x": 3,
-              "y": 5
-            },
-            "id": "wall"
           },
           {
             "position": {
@@ -13006,13 +12950,6 @@ export const tilesets = {
           {
             "position": {
               "x": 6,
-              "y": 3
-            },
-            "id": "wall"
-          },
-          {
-            "position": {
-              "x": 6,
               "y": 4
             },
             "id": "wall"
@@ -13170,13 +13107,6 @@ export const tilesets = {
               "y": 1
             },
             "id": "gravestone"
-          },
-          {
-            "position": {
-              "x": 4,
-              "y": 6
-            },
-            "id": "wall"
           },
           {
             "position": {

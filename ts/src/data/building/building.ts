@@ -1,5 +1,6 @@
 import { Sprite2, emptySprite } from "../../asset/sprite.js";
 import { Adjacency } from "../../common/adjacency.js";
+import { InventoryItemIds } from "../inventory/inventoryItems.js";
 
 export type Building = {
     icon: Sprite2;
@@ -7,6 +8,7 @@ export type Building = {
     id: string;
     scale: 1 | 2 | 4;
     adjacencySprite?: (adjacentBuildings: Adjacency) => Sprite2;
+    resources?: { [key in InventoryItemIds]?: number };
 };
 
 export const nullBuildingId = "nullBuilding";

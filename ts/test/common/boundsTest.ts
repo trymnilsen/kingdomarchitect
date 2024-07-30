@@ -8,7 +8,7 @@ import {
 } from "../../src/common/bounds.js";
 import { Axis } from "../../src/common/direction.js";
 
-describe("Bounds tests", () => {
+describe("Bounds", () => {
     it("Is within rectangle", () => {
         const point = {
             x: 2,

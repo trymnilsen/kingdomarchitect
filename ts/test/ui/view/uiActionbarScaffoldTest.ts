@@ -1,6 +1,6 @@
 import * as assert from "node:assert";
 
-describe("uiActionbarScaffold test", () => {
+describe("UiActionbarScaffold", () => {
     it("Sizes main content to the size of constraints minus actionbar", () => {
         assert.equal(2, 2);
     });

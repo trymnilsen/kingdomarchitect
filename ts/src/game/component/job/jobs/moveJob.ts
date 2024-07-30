@@ -1,6 +1,8 @@
 import { Point } from "../../../../common/point.js";
 import { RenderContext } from "../../../../rendering/renderContext.js";
+import { Entity } from "../../../entity/entity.js";
 import { TileSize } from "../../../map/tile.js";
+import { IsInstanceJobConstraint } from "../constraint/isInstanceJobConstraint.js";
 import { Job } from "../job.js";
 import { JobConstraint } from "../jobConstraint.js";
 
@@ -9,8 +11,11 @@ import { JobConstraint } from "../jobConstraint.js";
  * the actor of this job is at the end of the path
  */
 export class MoveJob extends Job {
-    constructor(private path: Point[]) {
-        super();
+    constructor(
+        private path: Point[],
+        entity: Entity,
+    ) {
+        super([new IsInstanceJobConstraint(entity)]);
     }
 
     update(): void {

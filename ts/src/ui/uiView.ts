@@ -29,6 +29,22 @@ export type UIAction = {
     data: unknown;
 };
 
+export enum UIViewVisiblity {
+    /**
+     * The view is visible and should do layout and drawing
+     */
+    Visible,
+    /**
+     * The view is hidden and should not do layout or drawing
+     */
+    Hidden,
+    /**
+     * The view is considered invisible, but will still take up space.
+     * Should do layout but not drawing
+     */
+    Invisible,
+}
+
 /**
  * UIView is the base class for all UI elements, it supports basic functions
  * for getting and setting size and position, as well as handling input events.
@@ -49,6 +65,7 @@ export abstract class UIView implements FocusGroup {
     private _children: UIView[] = [];
     private _uiAction = new Event<UIAction>();
     private _focusState: FocusState | undefined;
+    private _visibility: UIViewVisiblity = UIViewVisiblity.Visible;
     protected _measuredSize: UISize | null = null;
     protected _isDirty = true;
 
@@ -243,6 +260,14 @@ export abstract class UIView implements FocusGroup {
             }
             return this._focusState;
         }
+    }
+
+    get visibility(): UIViewVisiblity {
+        return this._visibility;
+    }
+
+    set visibility(value: UIViewVisiblity) {
+        this._visibility = value;
     }
 
     constructor(size: UISize) {
