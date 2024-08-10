@@ -1,4 +1,5 @@
 import * as assert from "node:assert";
+import { describe, it } from "node:test";
 
 describe("UiAlignment", () => {
     it("can calculate alignment with source size larger than target size", () => {

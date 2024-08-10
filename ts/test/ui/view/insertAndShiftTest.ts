@@ -1,4 +1,5 @@
 import * as assert from "node:assert";
+import { describe, it } from "node:test";
 
 describe("insertAndShift", () => {
     it("shifts nothing when inserted at the end", () => {

@@ -1,4 +1,5 @@
 import * as assert from "node:assert";
+import { describe, it } from "node:test";
 
 describe("JobQueueComponent", () => {
     it("Will immediately schedule job if available", () => {

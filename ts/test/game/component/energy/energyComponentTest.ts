@@ -1,4 +1,5 @@
 import * as assert from "node:assert";
+import { describe, it } from "node:test";
 import { EnergyComponent } from "../../../../src/game/component/energy/energyComponent.js";
 
 describe("EnergyComponent", () => {

@@ -1,4 +1,5 @@
 import * as assert from "node:assert";
+import { describe, it } from "node:test";
 import { StubComponent } from "../component/stubComponent.js";
 import { RequireError } from "../../../src/common/error/requireError.js";
 import { Entity } from "../../../src/game/entity/entity.js";

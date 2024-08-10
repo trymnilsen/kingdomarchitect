@@ -1,4 +1,5 @@
 import * as assert from "node:assert";
+import { describe, it } from "node:test";
 
 describe("House prefab", () => {
     it("Can persist and load", () => {

@@ -1,4 +1,5 @@
 import * as assert from "node:assert";
+import { describe, it } from "node:test";
 
 describe("UiBox", () => {
     it("sizes to largest child on wrap", () => {

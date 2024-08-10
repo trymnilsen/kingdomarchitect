@@ -1,4 +1,5 @@
 import * as assert from "node:assert";
+import { describe, it } from "node:test";
 
 describe("JobQueueEntity", () => {
     it("Schedule job attempts to immediately assign job", () => {

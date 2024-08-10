@@ -1,4 +1,5 @@
 import * as assert from "node:assert";
+import { describe, it } from "node:test";
 
 describe("Job", () => {
     it("cannot set start tick after it has been set", () => {

@@ -1,4 +1,5 @@
 import * as assert from "node:assert";
+import { describe, it } from "node:test";
 
 import { JobRunnerComponent } from "../../../../src/game/component/job/jobRunnerComponent.js";
 import { Entity } from "../../../../src/game/entity/entity.js";

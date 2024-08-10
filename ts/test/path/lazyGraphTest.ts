@@ -1,4 +1,5 @@
 import * as assert from "node:assert";
+import { describe, it } from "node:test";
 import { LazyGraph } from "../../src/path/graph/lazyGraph.js";
 
 describe("LazyGraph", () => {

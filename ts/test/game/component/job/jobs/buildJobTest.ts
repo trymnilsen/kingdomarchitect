@@ -1,4 +1,5 @@
 import * as assert from "node:assert";
+import { describe, it } from "node:test";
 import { BuildJob } from "../../../../../src/game/component/job/jobs/buildJob.js";
 import { InventoryComponent2 } from "../../../../../src/game/component/inventory/inventoryComponent.js";
 import { JobTestHelper } from "../jobTestHelper.js";

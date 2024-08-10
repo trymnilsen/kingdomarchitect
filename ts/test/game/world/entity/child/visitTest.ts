@@ -1,4 +1,5 @@
 import * as assert from "node:assert";
+import { describe, it } from "node:test";
 import { Entity } from "../../../../../src/game/entity/entity.js";
 import { visitChildren } from "../../../../../src/game/entity/child/visit.js";
 
