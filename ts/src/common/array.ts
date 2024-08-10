@@ -119,3 +119,24 @@ export function shuffleItems<T>(array: T[]): T[] {
     }
     return array;
 }
+
+/**
+ * Loops over the array, applying the maping function to the values.
+ * Will return the first non null value provided by the mapper
+ * @param array
+ * @returns the first value mapped or null if none
+ */
+export function firstMap<T, R>(
+    array: T[],
+    mapper: (value: T) => R | null,
+): R | null {
+    for (let i = 0; i < array.length; i++) {
+        const element = array[i];
+        const mappingResult = mapper(element);
+        if (!!mappingResult) {
+            return mappingResult;
+        }
+    }
+
+    return null;
+}

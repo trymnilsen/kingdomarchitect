@@ -9,7 +9,7 @@ export const buildings = [
     ...goldBuildings,
     ...stoneBuildings,
     ...woodenBuildings,
-] as const;
+] as const satisfies Building[];
 
 export type BuildingIds = (typeof buildings)[number]["id"];
 

@@ -1,4 +1,8 @@
+import { sprites2 } from "../../../../asset/sprite.js";
+import { allSides } from "../../../../common/sides.js";
 import { subTitleTextStyle } from "../../../../rendering/text/textStyle.js";
+import { ninePatchBackground } from "../../../../ui/dsl/uiBackgroundDsl.js";
+import { uiBox } from "../../../../ui/dsl/uiBoxDsl.js";
 import { uiButton } from "../../../../ui/dsl/uiButtonDsl.js";
 import { uiColumn } from "../../../../ui/dsl/uiColumnDsl.js";
 import { spriteImageSource, uiImage } from "../../../../ui/dsl/uiImageDsl.js";
@@ -53,12 +57,22 @@ export class UIActionbarButton extends UIBox {
                         }),
                     },
                     {
-                        child: uiText({
-                            wrap: false,
+                        child: uiBox({
                             width: wrapUiSize,
                             height: wrapUiSize,
-                            text: item.text,
-                            style: subTitleTextStyle,
+                            background: ninePatchBackground({
+                                sprite: sprites2.book_grid_item_gray,
+                                sides: allSides(8),
+                            }),
+                            children: [
+                                uiText({
+                                    wrap: false,
+                                    width: wrapUiSize,
+                                    height: wrapUiSize,
+                                    text: item.text,
+                                    style: subTitleTextStyle,
+                                }),
+                            ],
                         }),
                     },
                 ],

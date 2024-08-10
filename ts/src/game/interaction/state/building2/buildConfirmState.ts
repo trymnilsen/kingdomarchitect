@@ -22,6 +22,9 @@ import { AlertMessageState } from "../common/alertMessageState.js";
 import { BuildMode } from "./mode/buildMode.js";
 import { LineBuildMode } from "./mode/lineBuildMode.js";
 import { SingleBuildMode } from "./mode/singleBuildMode.js";
+import { buildingApplicabilityList } from "./buildingApplicabilityList.js";
+import { BuildingApplicabilityResult } from "./buildingApplicability.js";
+import { firstMap as firstMapOrNull } from "../../../../common/array.js";
 
 export class BuildConfirmState extends InteractionState {
     private scaffold: UIActionbarScaffold | null = null;
@@ -37,7 +40,7 @@ export class BuildConfirmState extends InteractionState {
         const cursorPosition = this.buildMode.cursorSelection();
         this.selection = [
             {
-                isAvailable: this.isTileAvailable(cursorPosition),
+                isAvailable: this.isTileAvailable(cursorPosition).isApplicable,
                 x: cursorPosition.x,
                 y: cursorPosition.y,
             },
@@ -104,50 +107,6 @@ export class BuildConfirmState extends InteractionState {
         ];
     }
 
-    private onBuildModeSelected() {
-        /*
-        this.scaffold?.setLeftExpandedMenu(
-            [
-                {
-                    text: "Single",
-                    icon: sprites2.empty_sprite,
-                    onClick: () => {
-                        this.changeBuildMode(
-                            new SingleBuildMode(
-                                this.buildMode.cursorSelection()
-                            )
-                        );
-                    },
-                },
-                {
-                    text: "Line",
-                    icon: sprites2.empty_sprite,
-                    onClick: () => {
-                        this.changeBuildMode(
-                            new LineBuildMode(this.buildMode.cursorSelection())
-                        );
-                    },
-                },
-                /*
-            {
-                text: "Box",
-                icon: sprites2.empty_sprite,
-                onClick: () => {
-                    this.changeBuildMode(new BoxBuildMode());
-                },
-            },
-            {
-                text: "Toggle",
-                icon: sprites2.empty_sprite,
-                onClick: () => {
-                    this.changeBuildMode(new ToggleBuildMode());
-                },
-            },
-            ],
-            1
-        );*/
-    }
-
     private confirmBuildSelection() {
         const rootEntity = this.context.root;
 
@@ -159,13 +118,25 @@ export class BuildConfirmState extends InteractionState {
         }*/
 
         const selections = this.buildMode.getSelection();
-        const isAllTilesAvailable = selections.every((item) => {
-            return this.isTileAvailable(item);
+        if (selections.length == 0) {
+            this.context.stateChanger.push(
+                new AlertMessageState("Oh no", "No selection"),
+            );
+            return;
+        }
+
+        const tileError = firstMapOrNull(selections, (value) => {
+            const isAvailable = this.isTileAvailable(value);
+            if (isAvailable.isApplicable) {
+                return null;
+            } else {
+                return isAvailable;
+            }
         });
 
-        if (!isAllTilesAvailable) {
+        if (!!tileError) {
             this.context.stateChanger.push(
-                new AlertMessageState("Oh no", "Spot taken"),
+                new AlertMessageState("Oh no", tileError.reason),
             );
             return;
         }
@@ -226,7 +197,7 @@ export class BuildConfirmState extends InteractionState {
             const tileIsAvailable = this.isTileAvailable(selectedTile);
 
             return {
-                isAvailable: tileIsAvailable,
+                isAvailable: tileIsAvailable.isApplicable,
                 x: selectedTile.x,
                 y: selectedTile.y,
             };
@@ -273,17 +244,47 @@ export class BuildConfirmState extends InteractionState {
         super.onDraw(context);
     }
 
-    private isTileAvailable(tilePosition: Point): boolean {
+    private isTileAvailable(tilePosition: Point): BuildingApplicabilityResult {
         const rootEntity = this.context.root;
         const entitiesAt = rootEntity
             .requireComponent(ChunkMapComponent)
             .getEntityAt(tilePosition);
 
+        if (entitiesAt.length > 0) {
+            return {
+                isApplicable: false,
+                reason: "Spot taken",
+            };
+        }
+
         const tile = rootEntity
             .requireComponent(TilesComponent)
             .getTile(tilePosition);
 
-        return entitiesAt.length == 0 && !!tile;
+        if (!tile) {
+            return {
+                isApplicable: false,
+                reason: "No land",
+            };
+        }
+
+        const buildingApplicabilityCheck =
+            buildingApplicabilityList[this.building.id];
+
+        if (buildingApplicabilityCheck) {
+            const applicabilityResult = buildingApplicabilityCheck(
+                tilePosition,
+                this.context.root,
+            );
+
+            if (!applicabilityResult.isApplicable) {
+                return applicabilityResult;
+            }
+        }
+
+        return {
+            isApplicable: true,
+        };
     }
 }
 

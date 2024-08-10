@@ -14,6 +14,7 @@ import {
 } from "../../../../common/sides.js";
 import { subTitleTextStyle } from "../../../../rendering/text/textStyle.js";
 import { UIRenderContext } from "../../../../rendering/uiRenderContext.js";
+import { bookInkColor } from "../../../../ui/color.js";
 import { UILayoutContext } from "../../../../ui/uiLayoutContext.js";
 import { UISize } from "../../../../ui/uiSize.js";
 import { UIView } from "../../../../ui/uiView.js";
@@ -153,9 +154,19 @@ export class UIActionbarScaffold extends UIView {
                 }
             }
 
+            context.drawNinePatchSprite({
+                x: item.position.x,
+                y: item.position.y + 44,
+                width: item.width,
+                height: 32,
+                sprite: sprites2.book_border,
+                scale: 1,
+                sides: allSides(8),
+            });
+
             context.drawScreenspaceText({
                 text: item.text,
-                color: "white",
+                color: bookInkColor,
                 width: item.width,
                 align: "center",
                 x: item.position.x + item.textOffset,
