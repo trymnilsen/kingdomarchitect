@@ -21,6 +21,7 @@ export function chestPrefab(id: string, initialItems: InventoryItem[]): Entity {
 
     const chestComponent = new ChestComponent(initialItems);
     const inventoryComponent = new InventoryComponent2();
+    inventoryComponent.isCollectable = true;
     inventoryComponent.clear();
     for (const item of initialItems) {
         inventoryComponent.addInventoryItem(item, 1);

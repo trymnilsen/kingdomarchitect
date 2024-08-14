@@ -1,9 +1,0 @@
-{
-    "include": [
-        "build/src/**/*"
-    ],
-    "reporter": [
-      "lcov",
-      "text-summary"
-    ]
-  }

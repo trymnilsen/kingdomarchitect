@@ -24,11 +24,15 @@ export class BuildingComponent extends EntityComponent {
     private buildingSprite: Sprite2 = emptySprite;
     private scaffoldSprite: Sprite2 = emptySprite;
     private _building: Building = nullBuilding;
-    private isScaffolded = true;
+    private _isScaffolded = true;
     private _providedItems: { [id: string]: number } = {};
 
     get building(): Readonly<Building> {
         return this._building;
+    }
+
+    get isScaffolded(): boolean {
+        return this._isScaffolded;
     }
 
     get remainingItems(): ReadonlyArray<InventoryItemQuantity> {
@@ -64,7 +68,7 @@ export class BuildingComponent extends EntityComponent {
         this.buildingSprite = buildingSprite;
         this.scaffoldSprite = scaffoldSprite;
         this._building = building;
-        this.isScaffolded = isScaffolded;
+        this._isScaffolded = isScaffolded;
     }
 
     supplyBuildingMaterial(items: InventoryItemQuantity[]) {
@@ -82,7 +86,7 @@ export class BuildingComponent extends EntityComponent {
     }
 
     finishBuild() {
-        this.isScaffolded = false;
+        this._isScaffolded = false;
         if (this._building.adjacencySprite) {
             this.updateAdjacentBuildings();
         }

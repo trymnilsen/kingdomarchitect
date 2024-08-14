@@ -75,6 +75,16 @@ export class InventoryComponent2 extends EntityComponent {
         },
     };
 
+    private _isCollectable: boolean = false;
+
+    get isCollectable(): boolean {
+        return this._isCollectable;
+    }
+
+    set isCollectable(value: boolean) {
+        this._isCollectable = value;
+    }
+
     get items(): InventoryItemList {
         return Object.values(this._items);
     }

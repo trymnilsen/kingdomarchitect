@@ -8,6 +8,7 @@ import { ButtonCollection } from "../../view/actionbar/buttonCollection.js";
 import { UIActionbarItem } from "../../view/actionbar/uiActionbar.js";
 import { SelectionPresenter } from "../../view/selectionPresenter.js";
 import { ActorSelectionProvider } from "./actor/provider/actorSelectionProvider.js";
+import { CollectableProvider } from "./actor/provider/collectableProvider.js";
 import { TileSelectionProvider } from "./actor/provider/tileSelectionProvider.js";
 import { TreeSelectionProvider } from "./actor/provider/treeSelectionProvider.js";
 import { WorkerSelectionProvider } from "./actor/provider/workerSelectionProvider.js";
@@ -18,6 +19,7 @@ export class SelectionState extends InteractionState {
         new WorkerSelectionProvider(),
         new TreeSelectionProvider(),
         new TileSelectionProvider(),
+        new CollectableProvider(),
     ];
 
     constructor(private selection: SelectedWorldItem) {
