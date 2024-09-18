@@ -10,7 +10,7 @@ export class QuaryComponent extends EntityComponent {
     }
 
     override onUpdate(tick: number): void {
-        if (tick - this.previousSpawnTime > 5) {
+        if (tick - this.previousSpawnTime > 30) {
             this.previousSpawnTime = tick;
             const building = this.entity.getComponent(BuildingComponent);
             const inventory = this.entity.getComponent(InventoryComponent2);

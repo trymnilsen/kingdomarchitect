@@ -11,7 +11,10 @@ import { JumpingInventoryItem } from "../component/inventory/jumpingInventoryIte
 import { Entity } from "../entity/entity.js";
 import { buildingPrefab } from "./buildingPrefab.js";
 
-export function buildingFactory(building: Building): Entity {
+export function buildingFactory(
+    building: Building,
+    scaffold: boolean = true,
+): Entity {
     const extraComponents: EntityComponent[] = [];
     if (building.id == woodenHouse.id) {
         extraComponents.push(new HousingComponent());
@@ -24,5 +27,10 @@ export function buildingFactory(building: Building): Entity {
         extraComponents.push(new JumpingInventoryItem());
         extraComponents.push(new QuaryComponent());
     }
-    return buildingPrefab(generateId("building"), building, extraComponents);
+    return buildingPrefab(
+        generateId("building"),
+        building,
+        extraComponents,
+        scaffold,
+    );
 }

@@ -1,4 +1,6 @@
 import { InventoryComponent2 } from "../../../../../component/inventory/inventoryComponent.js";
+import { JobQueueComponent } from "../../../../../component/job/jobQueueComponent.js";
+import { CollectJob } from "../../../../../component/job/jobs/collectJob.js";
 import { SelectedEntityItem } from "../../../../../selection/selectedEntityItem.js";
 import { SelectedWorldItem } from "../../../../../selection/selectedWorldItem.js";
 import { StateContext } from "../../../../handler/stateContext.js";
@@ -10,7 +12,7 @@ import {
 
 export class CollectableProvider implements ActorSelectionProvider {
     provideButtons(
-        _stateContext: StateContext,
+        stateContext: StateContext,
         selection: SelectedWorldItem,
     ): ButtonCollection {
         if (selection instanceof SelectedEntityItem) {
@@ -26,7 +28,19 @@ export class CollectableProvider implements ActorSelectionProvider {
                     left: [
                         {
                             text: "Collect",
-                            onClick: () => {},
+                            onClick: () => {
+                                const queue =
+                                    stateContext.root.requireComponent(
+                                        JobQueueComponent,
+                                    );
+                                queue.addJob(
+                                    new CollectJob(
+                                        inventoryComponent.items[0].item,
+                                        inventoryComponent,
+                                    ),
+                                );
+                                stateContext.stateChanger.clear();
+                            },
                         },
                     ],
                     right: [],

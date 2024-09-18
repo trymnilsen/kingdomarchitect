@@ -21,9 +21,13 @@ export function buildingPrefab(
         building,
         scaffold,
     );
+    const maxHealth = 100;
+    let currentHealth = 10;
+    if (!scaffold) {
+        currentHealth = maxHealth;
+    }
 
-    const currentHealth = 10;
-    const healthComponent = new HealthComponent(currentHealth, 100);
+    const healthComponent = new HealthComponent(currentHealth, maxHealth);
     let pattern = diamondPattern;
     if (building.id == "stonetower") {
         pattern = largeDiamondPattern;

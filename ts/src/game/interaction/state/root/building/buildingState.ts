@@ -293,7 +293,7 @@ export class BuildingState extends InteractionState {
                         {
                             child: uiButton({
                                 onTapCallback: () => {},
-                                padding: allSides(16),
+                                padding: allSides(8),
                                 defaultBackground: ninePatchBackground({
                                     sprite: sprites2.book_grid_item,
                                     sides: allSides(6),
@@ -306,7 +306,12 @@ export class BuildingState extends InteractionState {
                                 }),
                                 children: [
                                     uiText({
-                                        padding: symmetricSides(0, 8),
+                                        padding: {
+                                            left: 0,
+                                            right: 0,
+                                            top: 0,
+                                            bottom: 8,
+                                        },
                                         text: "Build",
                                         style: {
                                             color: bookInkColor,

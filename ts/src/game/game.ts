@@ -6,7 +6,7 @@ import {
     multiplyPoint,
     Point,
 } from "../common/point.js";
-import { MutableGameTime } from "../common/time.js";
+
 import { Input, InputEvent } from "../input/input.js";
 import { InputActionType } from "../input/inputAction.js";
 import { TouchInput } from "../input/touchInput.js";
@@ -25,7 +25,6 @@ export class Game {
     private input: Input;
     private touchInput: TouchInput;
     private assetLoader: AssetLoader;
-    private gameTime: MutableGameTime;
     private interactionHandler: InteractionHandler;
     private currentTick = 0;
     private world: Entity;
@@ -46,13 +45,8 @@ export class Game {
         this.touchInput = new TouchInput(canvasElement);
 
         // Rendering
-        this.gameTime = new MutableGameTime();
         this.assetLoader = new AssetLoader();
-        this.renderer = new Renderer(
-            canvasElement,
-            this.assetLoader,
-            this.gameTime,
-        );
+        this.renderer = new Renderer(canvasElement, this.assetLoader);
 
         // World
         this.world = createRootEntity();

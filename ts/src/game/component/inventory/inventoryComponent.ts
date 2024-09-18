@@ -6,6 +6,7 @@ import { InventoryItem } from "../../../data/inventory/inventoryItem.js";
 import {
     InventoryItemList,
     InventoryItemQuantity,
+    InventoryItemTag,
 } from "../../../data/inventory/inventoryItemQuantity.js";
 import {
     bagOfGlitter,

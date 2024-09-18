@@ -140,3 +140,27 @@ export function firstMap<T, R>(
 
     return null;
 }
+
+/**
+ * Loop over an array and generate a map out of the values using the key
+ * selector function. In the event of non unique keys the last item will be
+ * set as the value for the key
+ * @param array the array to turn into an object
+ * @param keySelector a function to create the key for the array item
+ * @returns a map of items with a key and the array items
+ */
+export function arrayToOject<T>(
+    array: T[],
+    keySelector: (value: T) => string,
+): {
+    [id: string]: T;
+} {
+    const map = {};
+    for (let i = 0; i < array.length; i++) {
+        const element = array[i];
+        const key = keySelector(element);
+        map[key] = element;
+    }
+
+    return map;
+}

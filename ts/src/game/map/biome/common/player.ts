@@ -23,6 +23,9 @@ import { workerPrefab } from "../../../prefab/workerPrefab.js";
 import { BiomeEntry } from "../biome.js";
 import { BiomeMap, BiomeMapItem } from "../biomeMap.js";
 import { BiomeMapCollection } from "../biomeMapCollection.js";
+import { buildingPrefab } from "../../../prefab/buildingPrefab.js";
+import { woodenHouse } from "../../../../data/building/wood/house.js";
+import { buildingFactory } from "../../../prefab/buildingFactory.js";
 
 export function addPlayerToBiome(
     biomes: BiomeMapCollection,
@@ -69,7 +72,7 @@ function generatePlayerEntity(biomeMap: BiomeMap) {
 
 function addPlayerEntities(rootEntity: Entity, worldPosition: Point) {
     const firstWorker = workerPrefab(generateId("player-worker"));
-    const firstHouse = housePrefab(generateId("house"), false);
+    const firstHouse = buildingFactory(woodenHouse, false);
     const firstFarm = farmPrefab(generateId("farm"));
     const well = wellPrefab(generateId("well"));
     const chestItems: InventoryItem[] = [

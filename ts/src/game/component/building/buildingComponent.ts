@@ -25,6 +25,7 @@ export class BuildingComponent extends EntityComponent {
     private scaffoldSprite: Sprite2 = emptySprite;
     private _building: Building = nullBuilding;
     private _isScaffolded = true;
+    //TODO: Should we split this out?
     private _providedItems: { [id: string]: number } = {};
 
     get building(): Readonly<Building> {

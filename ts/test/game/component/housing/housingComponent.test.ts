@@ -1,7 +1,6 @@
 import * as assert from "node:assert";
 import { describe, it } from "node:test";
 import { HousingComponent } from "../../../../src/game/component/housing/housingComponent.js";
-import { TenantComponent } from "../../../../src/game/component/housing/tenantComponent.js";
 import { housePrefab } from "../../../../src/game/prefab/housePrefab.js";
 import { workerPrefab } from "../../../../src/game/prefab/workerPrefab.js";
 import { createRootEntity } from "../../../../src/game/entity/rootEntity.js";

@@ -1,5 +1,7 @@
 import { generateId } from "../../common/idGenerator.js";
 import { PathSearch } from "../../path/search.js";
+import { SpawnWorkerComponent } from "../component/actor/worker/spawnWorkerComponent.js";
+import { LodgingComponent } from "../component/housing/lodgingComponent.js";
 import { JobQueueComponent } from "../component/job/jobQueueComponent.js";
 import { JobSchedulerComponent } from "../component/job/jobSchedulerComponent.js";
 import { ForrestComponent } from "../component/resource/forrestComponent.js";
@@ -19,11 +21,14 @@ export function createRootEntity(): Entity {
     const jobQueueComponent = new JobQueueComponent();
     const groundComponent = new TilesComponent();
     const chunkmapComponent = new ChunkMapComponent();
+
     rootEntity.addComponent(groundComponent);
     rootEntity.addComponent(jobQueueComponent);
     rootEntity.addComponent(chunkmapComponent);
     rootEntity.addComponent(new JobSchedulerComponent());
     rootEntity.addComponent(new ForrestComponent());
+    rootEntity.addComponent(new LodgingComponent());
+    rootEntity.addComponent(new SpawnWorkerComponent());
     const pathFindingComponent = new PathFindingComponent();
     rootEntity.addComponent(pathFindingComponent);
     rootEntity.toggleIsGameRoot(true);

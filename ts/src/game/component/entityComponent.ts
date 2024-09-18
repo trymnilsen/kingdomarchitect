@@ -24,8 +24,6 @@ export abstract class EntityComponent {
      * Called when the component is started, this is either
      * when its added to an entity that is attached or when the entity
      * the component is added on is added to an entity that is attached.
-     * The entity tree is guaranteed to be built from save-data if any
-     * at this point
      * @param tick
      */
     onStart(_tick: number) {}

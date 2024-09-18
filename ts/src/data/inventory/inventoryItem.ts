@@ -5,7 +5,6 @@ export type InventoryItem = {
     readonly name: string;
     readonly asset: Sprite2;
     readonly hint?: string;
-    readonly tag?: readonly ItemTag[];
     readonly category?: ItemCategory;
 };
 
