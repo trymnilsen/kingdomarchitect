@@ -19,6 +19,7 @@ import { RenderVisibilityMap } from "../rendering/renderVisibilityMap.js";
 import { VisibilityComponent } from "./component/visibility/visibilityComponent.js";
 import { generateMap } from "./map/mapGenerator.js";
 import { firstChildWhere } from "./entity/child/first.js";
+import { GameTime } from "../common/time.js";
 
 export class Game {
     private renderer: Renderer;
@@ -28,6 +29,7 @@ export class Game {
     private interactionHandler: InteractionHandler;
     private currentTick = 0;
     private world: Entity;
+    private gameTime: GameTime = new GameTime();
     private visibilityMap: RenderVisibilityMap = new RenderVisibilityMap();
 
     constructor(domElementWrapperSelector: string) {
@@ -50,6 +52,7 @@ export class Game {
 
         // World
         this.world = createRootEntity();
+        this.world.gameTime = this.gameTime;
         generateMap(this.world);
         //Set the camera position
         const playerEntity = firstChildWhere(this.world, (child) => {
@@ -118,7 +121,7 @@ export class Game {
     private onTick = () => {
         //performance.mark("tick-start");
         this.currentTick += 1;
-        this.gameTime.updateTick(this.currentTick);
+        this.gameTime.tick = this.currentTick;
         this.world.onUpdate(this.currentTick);
         this.interactionHandler.onUpdate(this.currentTick);
         //this.updateVisibilityMap();

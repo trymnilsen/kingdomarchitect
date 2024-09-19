@@ -14,6 +14,7 @@ import {
     subtractPoint,
     zeroPoint,
 } from "../../common/point.js";
+import { GameTime } from "../../common/time.js";
 import { RenderContext } from "../../rendering/renderContext.js";
 import { RenderVisibilityMap } from "../../rendering/renderVisibilityMap.js";
 import { ComponentEvent } from "../component/componentEvent.js";
@@ -44,6 +45,7 @@ export class Entity {
     private _entityEvents = new Event<EntityEvent>();
     private _componentsMap = new Map<string, EntityComponent>();
     private _componentsQueryCache?: ComponentQueryCache;
+    private _gameTime?: GameTime;
 
     constructor(readonly id: string) {}
 
@@ -136,6 +138,20 @@ export class Entity {
         return Array.from(this._componentsMap.values());
     }
 
+    public get gameTime(): GameTime {
+        if (!!this._gameTime) {
+            return this._gameTime;
+        } else {
+            throw new Error(
+                "No gametime set, this entity is perhaps not added to a root entity?",
+            );
+        }
+    }
+
+    public set gameTime(v: GameTime | undefined) {
+        this._gameTime = v;
+    }
+
     /**
      * Set if this entity is the root of the entity tree
      */
@@ -175,6 +191,7 @@ export class Entity {
                 "Entity is already added to another entity",
             );
         }
+
         if (index != null) {
             this._children.splice(index, 0, entity);
         } else {
@@ -182,6 +199,7 @@ export class Entity {
         }
         //Update the world position of the entity
         entity.parent = this;
+        entity.gameTime = this._gameTime;
         // Update the transform of the entity (also bubbles a transform
         // change adding the entity ot the chunk map if its not present)
         entity.updateTransform();

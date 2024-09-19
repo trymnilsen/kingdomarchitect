@@ -25,7 +25,6 @@ import { MenuState } from "../menu/menuState.js";
 import { BuildingState } from "./building/buildingState.js";
 import { ConfirmEquipAction } from "./inventory/equipActions.js";
 import { InventoryState } from "./inventory/inventoryState.js";
-import { UITimeline } from "./ui/uiTimeline.js";
 
 export class RootState extends InteractionState {
     override getFocusGroups(): FocusGroup[] {

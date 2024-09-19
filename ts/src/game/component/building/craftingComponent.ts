@@ -15,12 +15,13 @@ import { InventoryComponent2 } from "../inventory/inventoryComponent.js";
  */
 export class CraftingComponent extends EntityComponent {
     private craftingQueue: InventoryItemIds[] = [];
-
     private queueTime: number = 0;
 
+    public get lastCraftTime(): number {
+        return this.queueTime;
+    }
+
     queueCrafting(itemId: InventoryItemIds) {
-        //If there is no queue set, update the queuetime to make the item at
-        //the right time
         if (this.craftingQueue.length == 0) {
             this.queueTime = this.entity.gameTime.tick;
         }
@@ -28,20 +29,17 @@ export class CraftingComponent extends EntityComponent {
     }
 
     override onUpdate(tick: number): void {
-        const timeSpentCrafting = tick - this.queueTime;
-        const inventory = this.entity.requireComponent(InventoryComponent2);
+        if (this.craftingQueue.length == 0) {
+            return;
+        }
+
+        const timeSinceLastCraft = tick - this.queueTime;
+        //const inventory = this.entity.requireComponent(InventoryComponent2);
         const collectableComponent = this.entity.requireComponent(
             CollectableInventoryItemComponent,
         );
 
-        //The inventory might have the two types of items in its inventory
-        //The crafted item that we want to show
-        //items needed for crafting. Should we keep crafting items in this
-        //component? That makes it more complex for a building to drop its items
-        //if destroyed?
-        //Should there be a "ProducedItemComponent" that combines jumping?
-        //Maybe a collectable component?
-        if (timeSpentCrafting > 30 && !collectableComponent.currentItem) {
+        if (timeSinceLastCraft > 30 && !collectableComponent.currentItem) {
             const toCraft = this.craftingQueue.shift();
             if (!!toCraft) {
                 const item = inventoryItemsMap[toCraft];

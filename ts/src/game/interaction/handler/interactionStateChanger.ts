@@ -4,7 +4,7 @@ import { InteractionStateHistory } from "./interactionStateHistory.js";
 export type InteractionStateChanger = {
     push(state: InteractionState, onPop?: (result: unknown) => void): void;
     replace(state: InteractionState): void;
-    pop(result: unknown): void;
+    pop(result?: unknown): void;
     clear(): void;
     hasOperations: boolean;
 };

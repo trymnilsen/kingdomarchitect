@@ -21,6 +21,7 @@ import { UIView } from "../../../../ui/uiView.js";
 import { InteractionState } from "../../handler/interactionState.js";
 import { UIBookLayout } from "../../view/uiBookLayout.js";
 import { BuildingComponent } from "../../../component/building/buildingComponent.js";
+import { CraftingComponent } from "../../../component/building/craftingComponent.js";
 
 export interface BookListAdapter {
     getTabs(): string[];
@@ -189,6 +190,7 @@ export class BookListState extends InteractionState {
                                 child: uiButton({
                                     onTapCallback: () => {
                                         this.onDetailsButton();
+                                        this.context.stateChanger.pop();
                                     },
                                     padding: allSides(16),
                                     defaultBackground: ninePatchBackground({
@@ -293,22 +295,24 @@ export class BookListState extends InteractionState {
     }
 }
 
-const items: BookListItem[] = [swordItem, bowItem, wizardHat, hammerItem].map(
-    (item) => {
-        return {
-            image: item.asset,
-            name: item.name,
-        };
-    },
-);
+const items = [swordItem, bowItem, wizardHat, hammerItem];
+const bookItems = items.map((item) => {
+    return {
+        image: item.asset,
+        name: item.name,
+    };
+});
 
 export class CraftWithBuildingState extends BookListState {
     constructor(private building: BuildingComponent) {
-        super(new BlacksmithAdapter(items));
+        super(new BlacksmithAdapter(bookItems));
     }
 
     protected override onDetailsButton(): void {
         const selected = items[this.selectedItem];
-        const 
+        const craftingComponent =
+            this.building.entity.requireComponent(CraftingComponent);
+
+        craftingComponent.queueCrafting(selected.id);
     }
 }
