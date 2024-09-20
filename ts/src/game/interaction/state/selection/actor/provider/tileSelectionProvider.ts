@@ -23,7 +23,7 @@ export class TileSelectionProvider implements ActorSelectionProvider {
                         icon: sprites2.empty_sprite,
                         onClick: () => {
                             stateContext.stateChanger.replace(
-                                new BuildingState(),
+                                new BuildingState(selection.tilePosition),
                             );
                         },
                     },

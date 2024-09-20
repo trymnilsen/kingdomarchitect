@@ -43,13 +43,6 @@ export class RootState extends InteractionState {
 
         const actionItems: UIActionbarItem[] = [
             {
-                text: "Build",
-                icon: sprites2.empty_sprite,
-                onClick: () => {
-                    this.context.stateChanger.push(new BuildingState());
-                },
-            },
-            {
                 text: "Quest",
                 icon: sprites2.empty_sprite,
                 onClick: () => {

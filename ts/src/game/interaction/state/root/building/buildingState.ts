@@ -31,6 +31,7 @@ import {
 } from "../../../view/actionbar/uiActionbar.js";
 import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold.js";
 import { growBuildings } from "../../../../../data/building/grow/grow.js";
+import { Point } from "../../../../../common/point.js";
 
 export class BuildingState extends InteractionState {
     private _masterDetailsView: UIBookLayout;
@@ -42,7 +43,7 @@ export class BuildingState extends InteractionState {
         return true;
     }
 
-    constructor() {
+    constructor(buildingPosition: Point) {
         super();
 
         const rightItems: UIActionbarItem[] = [
@@ -52,7 +53,10 @@ export class BuildingState extends InteractionState {
                 onClick: () => {
                     console.log("Build selected: ", this._selectedBuilding);
                     this.context.stateChanger.replace(
-                        new BuildConfirmState(this._selectedBuilding),
+                        new BuildConfirmState(
+                            this._selectedBuilding,
+                            buildingPosition,
+                        ),
                     );
                 },
             },

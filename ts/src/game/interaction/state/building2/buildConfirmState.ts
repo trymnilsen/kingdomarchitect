@@ -29,11 +29,15 @@ import { firstMap as firstMapOrNull } from "../../../../common/array.js";
 export class BuildConfirmState extends InteractionState {
     private scaffold: UIActionbarScaffold | null = null;
     private blinkScaffold = true;
-    private buildMode: BuildMode = new SingleBuildMode({ x: 1, y: 1 });
+    private buildMode: BuildMode;
     private selection: SelectedTile[] = [];
 
-    constructor(private building: Building) {
+    constructor(
+        private building: Building,
+        private cursorPosition: Point,
+    ) {
         super();
+        this.buildMode = new SingleBuildMode(cursorPosition);
     }
 
     override onActive(): void {
