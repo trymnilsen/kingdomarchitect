@@ -1,4 +1,4 @@
-import { CollectableInventoryItemComponent } from "../../../../../component/inventory/collectableInventoryItemComponent.js";
+import { CraftingOutputTag } from "../../../../../../data/inventory/inventoryItemQuantity.js";
 import { InventoryComponent2 } from "../../../../../component/inventory/inventoryComponent.js";
 import { JobQueueComponent } from "../../../../../component/job/jobQueueComponent.js";
 import { CollectJob } from "../../../../../component/job/jobs/collectJob.js";
@@ -27,55 +27,16 @@ export class CollectableProvider implements ActorSelectionProvider {
                 inventoryComponent.isCollectable
             ) {
                 return {
-                    left: [
-                        ...this.getInventoryComponentItems(
-                            selection,
-                            stateContext,
-                        ),
-                        ...this.getCollectableComponentItems(
-                            selection,
-                            stateContext,
-                        ),
-                    ],
+                    left: this.getInventoryComponentItems(
+                        selection,
+                        stateContext,
+                    ),
                     right: [],
                 };
             }
         }
 
         return emptySelection;
-    }
-
-    private getCollectableComponentItems(
-        selection: SelectedEntityItem,
-        stateContext: StateContext,
-    ): UIActionbarItem[] {
-        const collectableComponent = selection.entity.getComponent(
-            CollectableInventoryItemComponent,
-        );
-
-        if (collectableComponent && !!collectableComponent.currentItem) {
-            return [
-                {
-                    text: "Collect",
-                    onClick: () => {
-                        const queue =
-                            stateContext.root.requireComponent(
-                                JobQueueComponent,
-                            );
-                        /*
-                        queue.addJob(
-                            new CollectJob(
-                                inventoryComponent.items[0].item,
-                                inventoryComponent,
-                            ),
-                        );*/
-                        stateContext.stateChanger.clear();
-                    },
-                },
-            ];
-        } else {
-            return [];
-        }
     }
 
     private getInventoryComponentItems(
@@ -85,11 +46,15 @@ export class CollectableProvider implements ActorSelectionProvider {
         const inventoryComponent =
             selection.entity.getComponent(InventoryComponent2);
 
-        if (
-            inventoryComponent &&
-            inventoryComponent.items.length > 0 &&
-            inventoryComponent.isCollectable
-        ) {
+        if (!inventoryComponent || !inventoryComponent.isCollectable) {
+            return [];
+        }
+
+        const itemToCollect = inventoryComponent.items.filter(
+            (entry) => entry.tag == CraftingOutputTag,
+        )[0];
+
+        if (!!itemToCollect) {
             return [
                 {
                     text: "Collect",
@@ -98,12 +63,15 @@ export class CollectableProvider implements ActorSelectionProvider {
                             stateContext.root.requireComponent(
                                 JobQueueComponent,
                             );
+
                         queue.addJob(
                             new CollectJob(
-                                inventoryComponent.items[0].item,
+                                itemToCollect.item,
                                 inventoryComponent,
+                                CraftingOutputTag,
                             ),
                         );
+
                         stateContext.stateChanger.clear();
                     },
                 },

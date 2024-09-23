@@ -1,6 +1,7 @@
 import { Sprite2 } from "../../../asset/sprite.js";
 import { Point } from "../../../common/point.js";
 import { InventoryItem } from "../../../data/inventory/inventoryItem.js";
+import { CraftingOutputTag } from "../../../data/inventory/inventoryItemQuantity.js";
 import { RenderContext } from "../../../rendering/renderContext.js";
 import { RenderVisibilityMap } from "../../../rendering/renderVisibilityMap.js";
 import { EntityComponent } from "../entityComponent.js";
@@ -20,7 +21,10 @@ export class JumpingInventoryItem extends EntityComponent {
             this.entity.getComponent(InventoryComponent2);
 
         if (!!inventoryComponent) {
-            const item = inventoryComponent.items[0];
+            const item = inventoryComponent.items.filter(
+                (entry) => entry.tag == CraftingOutputTag,
+            )[0];
+
             if (!!item) {
                 this.sprite = item.item.asset;
             } else {

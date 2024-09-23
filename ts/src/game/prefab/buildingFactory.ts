@@ -8,7 +8,6 @@ import { CraftingComponent } from "../component/building/craftingComponent.js";
 import { QuaryComponent } from "../component/building/quaryComponent.js";
 import { EntityComponent } from "../component/entityComponent.js";
 import { HousingComponent } from "../component/housing/housingComponent.js";
-import { CollectableInventoryItemComponent } from "../component/inventory/collectableInventoryItemComponent.js";
 import { InventoryComponent2 } from "../component/inventory/inventoryComponent.js";
 import { JumpingInventoryItem } from "../component/inventory/jumpingInventoryItem.js";
 import { Entity } from "../entity/entity.js";
@@ -25,13 +24,15 @@ export function buildingFactory(
     if (building.id == quary.id) {
         const inventory = new InventoryComponent2();
         inventory.isCollectable = true;
-        inventory.clear();
         extraComponents.push(inventory);
         extraComponents.push(new JumpingInventoryItem());
         extraComponents.push(new QuaryComponent());
     }
     if (building.id == blacksmith.id) {
-        extraComponents.push(new CollectableInventoryItemComponent());
+        const inventory = new InventoryComponent2();
+        inventory.isCollectable = true;
+        extraComponents.push(inventory);
+        extraComponents.push(new JumpingInventoryItem());
         extraComponents.push(new CraftingComponent());
     }
 

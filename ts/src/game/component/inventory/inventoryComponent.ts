@@ -6,7 +6,6 @@ import { InventoryItem } from "../../../data/inventory/inventoryItem.js";
 import {
     InventoryItemList,
     InventoryItemQuantity,
-    InventoryItemTag,
 } from "../../../data/inventory/inventoryItemQuantity.js";
 import {
     bagOfGlitter,
@@ -21,61 +20,10 @@ import {
     woodResourceItem,
 } from "../../../data/inventory/items/resources.js";
 import { EntityComponent } from "../entityComponent.js";
-
-export type InventoryMap = Record<string, InventoryItemQuantity>;
+import { removeItem } from "../../../common/array.js";
 
 export class InventoryComponent2 extends EntityComponent {
-    private _items: InventoryMap = {
-        [woodResourceItem.id]: {
-            amount: 200000,
-            item: woodResourceItem,
-        },
-        [wheatResourceItem.id]: {
-            amount: 200000,
-            item: wheatResourceItem,
-        },
-        [stoneResource.id]: {
-            amount: 47,
-            item: stoneResource,
-        },
-        [bagOfGlitter.id]: {
-            amount: 1,
-            item: bagOfGlitter,
-        },
-        [gemResource.id]: {
-            amount: 3,
-            item: gemResource,
-        },
-        [goldCoins.id]: {
-            amount: 219,
-            item: goldCoins,
-        },
-        [healthPotion.id]: {
-            amount: 2,
-            item: healthPotion,
-        },
-        [manaPotion.id]: {
-            amount: 1,
-            item: manaPotion,
-        },
-        [scroll.id]: {
-            amount: 1,
-            item: scroll,
-        },
-        [blueBook.id]: {
-            amount: 1,
-            item: blueBook,
-        },
-        [swordItem.id]: {
-            amount: 1,
-            item: swordItem,
-        },
-        [hammerItem.id]: {
-            amount: 1,
-            item: hammerItem,
-        },
-    };
-
+    private _items: InventoryItemQuantity[] = [];
     private _isCollectable: boolean = false;
 
     get isCollectable(): boolean {
@@ -87,54 +35,129 @@ export class InventoryComponent2 extends EntityComponent {
     }
 
     get items(): InventoryItemList {
-        return Object.values(this._items);
+        return this._items;
     }
 
-    addInventoryItem(item: InventoryItem, amount: number) {
-        if (!this._items[item.id]) {
-            this._items[item.id] = {
-                amount,
-                item,
-            };
-        } else {
-            this._items[item.id].amount += amount;
+    constructor(initialItems?: InventoryItemQuantity[]) {
+        super();
+        if (!!initialItems) {
+            this._items = initialItems;
         }
     }
 
-    hasAmount(itemId: string, amount: number): boolean {
-        if (this._items[itemId]) {
-            return this._items[itemId].amount >= amount;
+    addInventoryItem(item: InventoryItem, amount: number, tag?: string) {
+        if (amount < 1) {
+            throw new Error("Amount needs to be a number larger than 0");
+        }
+
+        let existingEntry = this._items.find(
+            (entry) => entry.item.id == item.id && entry.tag == tag,
+        );
+
+        if (!!existingEntry) {
+            existingEntry.amount += amount;
         } else {
-            return false;
+            this._items.push({
+                item: item,
+                amount: amount,
+                tag: tag,
+            });
         }
     }
 
-    amountOf(itemId: string): number {
-        if (this._items[itemId]) {
-            return this._items[itemId].amount;
-        } else {
-            return 0;
-        }
+    amountOf(itemId: string, tag?: string): number {
+        return this._items.reduce((accumulator, value) => {
+            if (value.item.id == itemId) {
+                // If tag is not set add it to accumulator regardless
+                if (!tag) {
+                    return accumulator + value.amount;
+                }
+
+                // Check if the tag matches
+                if (tag == value.tag) {
+                    return accumulator + value.amount;
+                } else {
+                    return accumulator;
+                }
+            } else {
+                return accumulator;
+            }
+        }, 0);
     }
 
     clear() {
-        this._items = {};
+        this._items = [];
     }
 
-    removeInventoryItem(itemId: string, amount: number): boolean {
-        const item = this._items[itemId];
-        if (item) {
-            if (item.amount > amount) {
+    removeInventoryItem(itemId: string, amount: number, tag?: string): boolean {
+        const item = this._items.find(
+            (entry) => entry.item.id == itemId && entry.tag == tag,
+        );
+
+        if (!!item) {
+            const amountAfterRemove = item.amount - amount;
+            if (amountAfterRemove > 0) {
                 item.amount -= amount;
                 return true;
-            } else if (item.amount == amount) {
-                delete this._items[itemId];
+            } else if (amountAfterRemove === 0) {
+                removeItem(this._items, item);
                 return true;
-            } else {
-                return false;
             }
-        } else {
-            return false;
         }
+
+        return false;
     }
+}
+
+export function defaultInventoryItems(): InventoryItemQuantity[] {
+    return [
+        {
+            amount: 200000,
+            item: woodResourceItem,
+        },
+        {
+            amount: 200000,
+            item: wheatResourceItem,
+        },
+        {
+            amount: 47,
+            item: stoneResource,
+        },
+        {
+            amount: 1,
+            item: bagOfGlitter,
+        },
+        {
+            amount: 3,
+            item: gemResource,
+        },
+        {
+            amount: 219,
+            item: goldCoins,
+        },
+        {
+            amount: 2,
+            item: healthPotion,
+        },
+        {
+            amount: 1,
+            item: manaPotion,
+        },
+        {
+            amount: 1,
+            item: scroll,
+        },
+        {
+            amount: 1,
+            item: blueBook,
+        },
+        {
+            amount: 1,
+            item: swordItem,
+        },
+        {
+            amount: 1,
+            item: hammerItem,
+        },
+    ];
 }

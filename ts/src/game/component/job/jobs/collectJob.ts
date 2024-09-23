@@ -9,6 +9,7 @@ export class CollectJob extends Job {
     constructor(
         private item: InventoryItem,
         private fromInventory: InventoryComponent2,
+        private tag?: string,
     ) {
         super([new IsWorkerJobConstraint()]);
     }
@@ -17,10 +18,14 @@ export class CollectJob extends Job {
         if (this.adjacentTo(this.fromInventory.entity.worldPosition)) {
             const inventory = this.entity.requireComponent(InventoryComponent2);
 
-            const amountToRemove = this.fromInventory.amountOf(this.item.id);
+            const amountToRemove = this.fromInventory.amountOf(
+                this.item.id,
+                this.tag,
+            );
             const removeResult = this.fromInventory.removeInventoryItem(
                 this.item.id,
                 amountToRemove,
+                this.tag,
             );
             inventory.addInventoryItem(this.item, amountToRemove);
 

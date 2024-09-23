@@ -16,7 +16,10 @@ import { EffectComponent } from "../component/effect/effectComponent.js";
 import { VisibilityComponent } from "../component/visibility/visibilityComponent.js";
 import { largeDiamondPattern } from "../../common/pattern.js";
 import { zeroPoint } from "../../common/point.js";
-import { InventoryComponent2 } from "../component/inventory/inventoryComponent.js";
+import {
+    defaultInventoryItems,
+    InventoryComponent2,
+} from "../component/inventory/inventoryComponent.js";
 
 export function workerPrefab(id: string): Entity {
     const worker = new Entity(id);
@@ -31,8 +34,7 @@ export function workerPrefab(id: string): Entity {
         largeDiamondPattern,
         zeroPoint(),
     );
-    const inventoryComponent = new InventoryComponent2();
-
+    const inventoryComponent = new InventoryComponent2(defaultInventoryItems());
     energyComponent.setEnergy(10000);
     const healthComponent = new HealthComponent(100, 100);
     const aggroComponent = new AggroComponent(5);

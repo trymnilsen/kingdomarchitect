@@ -1,10 +1,9 @@
-import { InventoryItemTag } from "../../../data/inventory/inventoryItemQuantity.js";
+import { CraftingOutputTag } from "../../../data/inventory/inventoryItemQuantity.js";
 import {
     InventoryItemIds,
     inventoryItemsMap,
 } from "../../../data/inventory/inventoryItems.js";
 import { EntityComponent } from "../entityComponent.js";
-import { CollectableInventoryItemComponent } from "../inventory/collectableInventoryItemComponent.js";
 import { InventoryComponent2 } from "../inventory/inventoryComponent.js";
 
 /*
@@ -34,18 +33,19 @@ export class CraftingComponent extends EntityComponent {
         }
 
         const timeSinceLastCraft = tick - this.queueTime;
-        //const inventory = this.entity.requireComponent(InventoryComponent2);
-        const collectableComponent = this.entity.requireComponent(
-            CollectableInventoryItemComponent,
+        const inventoryComponent =
+            this.entity.requireComponent(InventoryComponent2);
+        const hasAlreadyCraftedOuput = inventoryComponent.items.some(
+            (item) => item.tag == CraftingOutputTag,
         );
 
-        if (timeSinceLastCraft > 30 && !collectableComponent.currentItem) {
+        if (timeSinceLastCraft > 30 && !hasAlreadyCraftedOuput) {
             const toCraft = this.craftingQueue.shift();
             if (!!toCraft) {
                 const item = inventoryItemsMap[toCraft];
                 //Update the queue time to make the next time use time to craft
                 this.queueTime = tick;
-                collectableComponent.currentItem = item;
+                inventoryComponent.addInventoryItem(item, 1, CraftingOutputTag);
             }
         }
     }

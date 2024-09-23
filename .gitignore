@@ -13,6 +13,7 @@ pids
 
 #built files
 build
+lcov.info
 .builds
 *.tsbuildinfo
 public/dist

@@ -22,9 +22,27 @@
             }
         },
         {
+            "command": "rm -rf build",
+            "type": "shell",
+            "label": "clean",
+            "options": {
+                "cwd": "${workspaceFolder}/"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "echo": true,
+                "reveal": "never",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        },
+        {
             "label": "build typescript",
             "type": "typescript",
             "tsconfig": "tsconfig.json",
+            "dependsOn": ["clean"],
             "problemMatcher": [
                 "$tsc"
             ],

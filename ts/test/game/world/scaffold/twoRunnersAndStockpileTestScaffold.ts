@@ -41,7 +41,6 @@ export class TwoRunnersAndStockpileTestScaffold extends WorldTestScaffold {
         }
 
         const inventoryComponent = new InventoryComponent2();
-        inventoryComponent.clear();
 
         this._stockpile = new EntityTestProxy(
             buildingPrefab(

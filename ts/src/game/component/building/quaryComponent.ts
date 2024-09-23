@@ -1,3 +1,4 @@
+import { CraftingOutputTag } from "../../../data/inventory/inventoryItemQuantity.js";
 import { stoneResource } from "../../../data/inventory/items/resources.js";
 import { EntityComponent } from "../entityComponent.js";
 import { InventoryComponent2 } from "../inventory/inventoryComponent.js";
@@ -15,13 +16,15 @@ export class QuaryComponent extends EntityComponent {
             const building = this.entity.getComponent(BuildingComponent);
             const inventory = this.entity.getComponent(InventoryComponent2);
             if (inventory && building?.isScaffolded == false) {
-                const alreadyHasStone = inventory.hasAmount(
-                    stoneResource.id,
-                    1,
-                );
+                const alreadyHasStone =
+                    inventory.amountOf(stoneResource.id) > 0;
 
                 if (!alreadyHasStone) {
-                    inventory.addInventoryItem(stoneResource, 1);
+                    inventory.addInventoryItem(
+                        stoneResource,
+                        1,
+                        CraftingOutputTag,
+                    );
                 }
             }
         }
