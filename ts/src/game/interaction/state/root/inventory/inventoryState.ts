@@ -20,6 +20,7 @@ import { UIView } from "../../../../../ui/uiView.js";
 import { UIFlowGrid } from "../../../../../ui/view/uiFlowGrid.js";
 import { UIMasterDetails } from "../../../../../ui/view/uiMasterDetail.js";
 import { OpenBookUIBackground } from "../../../../../ui/visual/bookBackground.js";
+import { EquipmentComponent } from "../../../../component/inventory/equipmentComponent.js";
 import { InventoryComponent2 } from "../../../../component/inventory/inventoryComponent.js";
 import { Entity } from "../../../../entity/entity.js";
 import { InteractionState } from "../../../handler/interactionState.js";
@@ -27,7 +28,6 @@ import { StateContext } from "../../../handler/stateContext.js";
 import { UIActionbarItem } from "../../../view/actionbar/uiActionbar.js";
 import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold.js";
 import { AlertMessageState } from "../../common/alertMessageState.js";
-import { EquipItemConfirmState } from "./equipItemConfirmState.js";
 import { UIInventoryGridItem } from "./uiInventoryGridItem.js";
 
 export class InventoryState extends InteractionState {
@@ -41,7 +41,8 @@ export class InventoryState extends InteractionState {
         return true;
     }
 
-    constructor(private forEntity: Entity) {
+    //Todo: add parameters for filtering and button providers
+    constructor(private forInventory: InventoryComponent2) {
         super();
     }
 
@@ -94,14 +95,7 @@ export class InventoryState extends InteractionState {
     }
 
     private getInventoryItemList() {
-        const inventoryComponent =
-            this.forEntity.getComponent(InventoryComponent2);
-
-        if (!inventoryComponent) {
-            throw new Error("No inventory component on root entity");
-        }
-
-        this._items = inventoryComponent.items;
+        this._items = this.forInventory.items;
     }
 
     private getMasterGridView(): UIView {
@@ -328,7 +322,7 @@ export class InventoryState extends InteractionState {
                 text: "Equip",
                 icon: sprites2.empty_sprite,
                 onClick: () => {
-                    //this._equipAction.onEquip(activeItem.item, this.context);
+                    this.onEquip(activeItem.item);
                 },
             });
 
@@ -341,6 +335,24 @@ export class InventoryState extends InteractionState {
             });
 
             return actions;
+        }
+    }
+
+    private onEquip(item: InventoryItem) {
+        const equipmentComponent =
+            this.forInventory.entity.getComponent(EquipmentComponent);
+
+        if (!equipmentComponent) {
+            this.context.stateChanger.push(
+                new AlertMessageState("Uh oh", "Not available"),
+            );
+            return;
+        }
+
+        const removeResult = this.forInventory.removeInventoryItem(item.id, 1);
+        if (removeResult) {
+            equipmentComponent.mainItem.setItem(item);
+            this.context.stateChanger.pop();
         }
     }
 }
@@ -358,9 +370,4 @@ export function getAssetImage(index: number): Sprite2 | null {
         default:
             return null;
     }
-}
-
-export interface InventoryEquipAction {
-    onEquip(item: InventoryItem, stateContext: StateContext);
-    isApplicable(item: InventoryItem): boolean;
 }

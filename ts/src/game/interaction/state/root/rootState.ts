@@ -23,7 +23,6 @@ import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold.js
 import { AlertMessageState } from "../common/alertMessageState.js";
 import { MenuState } from "../menu/menuState.js";
 import { BuildingState } from "./building/buildingState.js";
-import { ConfirmEquipAction } from "./inventory/equipActions.js";
 import { InventoryState } from "./inventory/inventoryState.js";
 
 export class RootState extends InteractionState {

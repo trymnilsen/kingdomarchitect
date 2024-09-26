@@ -21,7 +21,6 @@ import { ButtonCollection } from "../../../../view/actionbar/buttonCollection.js
 import { UIActionbarItem } from "../../../../view/actionbar/uiActionbar.js";
 import { CharacterSkillState } from "../../../character/characterSkillState.js";
 import { AlertMessageState } from "../../../common/alertMessageState.js";
-import { EquipOnActorAction } from "../../../root/inventory/equipActions.js";
 import { InventoryState } from "../../../root/inventory/inventoryState.js";
 import { ActorMovementState } from "../actorMovementState.js";
 import {
@@ -208,8 +207,11 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
                 text: "Stash",
                 icon: sprites2.empty_sprite,
                 onClick: () => {
+                    const inventory =
+                        selectedEntity.requireComponent(InventoryComponent2);
+
                     stateContext.stateChanger.push(
-                        new InventoryState(selectedEntity),
+                        new InventoryState(inventory),
                     );
                 },
             },
@@ -239,8 +241,11 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
             {
                 text: "Equip",
                 onClick: () => {
+                    const inventory =
+                        selectedEntity.requireComponent(InventoryComponent2);
+
                     stateContext.stateChanger.push(
-                        new InventoryState(selectedEntity),
+                        new InventoryState(inventory),
                     );
                 },
                 icon: sprites2.empty_sprite,
@@ -257,8 +262,11 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
             {
                 text: "Equip",
                 onClick: () => {
+                    const inventory =
+                        selectedEntity.requireComponent(InventoryComponent2);
+
                     stateContext.stateChanger.push(
-                        new InventoryState(selectedEntity),
+                        new InventoryState(inventory),
                     );
                 },
                 icon: sprites2.empty_sprite,
