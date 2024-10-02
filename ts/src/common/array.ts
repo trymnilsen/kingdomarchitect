@@ -4,8 +4,8 @@
  * @returns the randomly selected item
  */
 export function randomEntry<T>(array: T[]): T {
+    //TODO: return early if array is empty
     const randomIndex = Math.floor(Math.random() * array.length);
-    // TODO: Return null or undefined if array size is 0
     return array[randomIndex];
 }
 
