@@ -8,4 +8,7 @@ jobs:
       - name: "TODO to Issue"
         uses: "alstr/todo-to-issue-action@v5"
         with:
-          IDENTIFIERS: "[{\"name\": \"TODO\", \"labels\": [\"todo\"]}]\""
+          IDENTIFIERS:
+            - name: "TODO"
+              labels:
+                - todo
