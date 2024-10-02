@@ -45,8 +45,6 @@ export function createMountainsBiome(
     generateForts(biomeMap);
     addCarveouts(mountainMap, biomeMap);
     generateConnectionPoints(biomeMap, biomes);
-    //TODO: Visualize paths for connections
-    //TODO: Make sure all carveouts are connected
     connectCarveouts(mountainMap, biomeMap);
     blobbifyMountains();
     createStoneFromMountainMap(mountainMap, biomeMap);

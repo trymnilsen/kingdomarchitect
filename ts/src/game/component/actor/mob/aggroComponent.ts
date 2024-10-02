@@ -50,8 +50,7 @@ export class AggroComponent extends EntityComponent {
                     const hasAttackJob =
                         jobRunner.activeJob instanceof AttackJob;
 
-                    //TODO: Expand this logic to allow switching target on
-                    // damage if the aggro is larger
+                    // TODO: Expand logic to allow switching target if the aggro is larger
                     if (!hasAttackJob) {
                         jobRunner.assignJob(
                             new AttackJob(event.causeEntity, this.damage),

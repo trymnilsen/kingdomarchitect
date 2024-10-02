@@ -25,7 +25,7 @@ export class BuildingComponent extends EntityComponent {
     private scaffoldSprite: Sprite2 = emptySprite;
     private _building: Building = nullBuilding;
     private _isScaffolded = true;
-    //TODO: Should we split this out?
+    //TODO: Use inventory component with a tag for the provided items
     private _providedItems: { [id: string]: number } = {};
 
     get building(): Readonly<Building> {
@@ -37,7 +37,7 @@ export class BuildingComponent extends EntityComponent {
     }
 
     get remainingItems(): ReadonlyArray<InventoryItemQuantity> {
-        //TODO: can be optimized with a map not null?
+        //TODO: Optimize with a map not null
         return neededBuildResources
             .filter((resourceNeeded) => {
                 const providedAmount =

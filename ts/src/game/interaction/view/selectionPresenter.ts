@@ -9,6 +9,8 @@ import { uiBox } from "../../../ui/dsl/uiBoxDsl.js";
 import { uiButton } from "../../../ui/dsl/uiButtonDsl.js";
 import { uiColumn } from "../../../ui/dsl/uiColumnDsl.js";
 import { spriteImageSource, uiImage } from "../../../ui/dsl/uiImageDsl.js";
+import { uiRow } from "../../../ui/dsl/uiRowDsl.js";
+import { uiSpace } from "../../../ui/dsl/uiSpaceDsl.js";
 import { uiStack } from "../../../ui/dsl/uiStack.js";
 import { uiText } from "../../../ui/dsl/uiTextDsl.js";
 import { uiAlignment } from "../../../ui/uiAlignment.js";
@@ -22,6 +24,7 @@ import { actionbarWidth } from "./actionbar/uiActionbarConstants.js";
 import { UIActionbarScaffold } from "./actionbar/uiActionbarScaffold.js";
 import { SelectionTile } from "./selectionTile.js";
 import { StatePresenter } from "./statePresenter.js";
+import { UISelectorInfoPanel } from "./uiSelectionInfoPanel.js";
 
 export class SelectionPresenter implements StatePresenter {
     private scaffold: UIActionbarScaffold;
@@ -30,6 +33,7 @@ export class SelectionPresenter implements StatePresenter {
     private expandedMenuPadding: UIBox;
     private leftSelectionTile: SelectionTile;
     private rightSelectionTile: SelectionTile;
+    private selectionInfo: UISelectorInfoPanel;
 
     get root(): UIView {
         return this.scaffold;
@@ -51,6 +55,10 @@ export class SelectionPresenter implements StatePresenter {
             height: wrapUiSize,
         });
         this.expandedMenuPadding.addView(this.expandedMenu);
+        this.selectionInfo = new UISelectorInfoPanel({
+            width: wrapUiSize,
+            height: wrapUiSize,
+        });
 
         const content = uiBox({
             width: fillUiSize,
@@ -59,6 +67,29 @@ export class SelectionPresenter implements StatePresenter {
             alignment: uiAlignment.bottomCenter,
             //background: colorBackground("#FF00FF44"),
             children: [
+                uiRow({
+                    width: fillUiSize,
+                    height: wrapUiSize,
+                    children: [
+                        {
+                            child: this.selectionInfo,
+                        },
+                        {
+                            child: uiSpace({
+                                width: fillUiSize,
+                                height: 1,
+                                id: "emptyspace",
+                            }),
+                            weight: 1,
+                        },
+                        {
+                            child: new UISelectorInfoPanel({
+                                width: wrapUiSize,
+                                height: wrapUiSize,
+                            }),
+                        },
+                    ],
+                }),
                 /*uiStack({
                     height: wrapUiSize,
                     width: fillUiSize,

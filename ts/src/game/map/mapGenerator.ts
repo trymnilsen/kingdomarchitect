@@ -67,7 +67,7 @@ function createBiomeMaps(
                 break;
         }
     }
-    //TODO: Do a second pass to connect things like roads, rivers and such
+    //TODO: Do a second pass to connect things like roads, rivers and such in other biomes
     return biomeMaps;
 }
 

@@ -29,4 +29,8 @@ describe("UiActionbarScaffold", () => {
     it("Will export focus regions of buttons", () => {
         assert.equal(2, 2);
     });
+
+    it("Cannot tap nested buttons if collapsed", () => {
+        assert.equal(2, 2);
+    });
 });

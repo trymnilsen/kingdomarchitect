@@ -100,7 +100,7 @@ export class UIText extends UIView {
                     this.screenPosition.x +
                     this._textAlignmentOffset.x +
                     this.padding.left,
-                //TODO: The y position for offsets seems off?
+                //TODO(#11): Correct the y-offset
                 y:
                     this.screenPosition.y +
                     this._textAlignmentOffset.y +

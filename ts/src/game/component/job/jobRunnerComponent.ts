@@ -45,7 +45,7 @@ export class JobRunnerComponent extends EntityComponent implements JobOwner {
                 try {
                     currentJob.onSuspend();
                 } catch (e) {
-                    //TODO: should we abort the job if it fails to suspend?
+                    //TODO: Abort the job if it fails to suspend
                     console.error("Failed to suspend job", e, currentJob);
                 }
             } else {

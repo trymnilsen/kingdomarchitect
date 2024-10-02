@@ -90,7 +90,6 @@ export class BuildJob extends Job {
             }
             //Move towards stockpile
             if (this.adjacentTo(stockpile.entity.worldPosition)) {
-                //TODO: Transfer from inventory of stockpile
                 const amountToTake = Math.min(
                     buildResources.amount,
                     stockpile.amountOf(buildResources.item.id),
@@ -122,7 +121,7 @@ export class BuildJob extends Job {
             .getRootEntity()
             .queryComponents(InventoryComponent2)
             .filter((component) => {
-                // TODO: we should have a better way to check this, maybe a
+                // TODO: Improve the check for if the entity with inventory is a stockpile
                 const doesNotHaveAJobRunner =
                     component.entity.getComponent(JobRunnerComponent) == null;
 

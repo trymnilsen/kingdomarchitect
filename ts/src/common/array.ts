@@ -5,6 +5,7 @@
  */
 export function randomEntry<T>(array: T[]): T {
     const randomIndex = Math.floor(Math.random() * array.length);
+    // TODO: Return null or undefined if array size is 0
     return array[randomIndex];
 }
 

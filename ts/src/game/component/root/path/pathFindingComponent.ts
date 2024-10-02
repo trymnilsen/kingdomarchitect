@@ -24,8 +24,6 @@ export class PathFindingComponent extends EntityComponent {
         this.tileEventListener = this.entity.componentEvents.listen(
             TileMapUpdateEvent,
             () => {
-                // TODO: I dont think we need to handle this as it would just
-                // remove this position that was not there yet from the graph
                 this.invalidateGraphPoint({ x: 0, y: 0 });
             },
         );

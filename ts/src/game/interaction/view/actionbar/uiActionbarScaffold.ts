@@ -517,7 +517,11 @@ export class UIActionbarScaffold extends UIView {
                 return handled;
             }
 
-            if (button.children.length > 0) {
+            const isPathOfSelected =
+                this.selectedPath != "" &&
+                button.path.startsWith(this.selectedPath);
+
+            if (button.children.length > 0 && isPathOfSelected) {
                 const childTapResult = this.checkForTapOnButton(
                     point,
                     button.children,

@@ -189,7 +189,7 @@ export class TilesComponent extends EntityComponent implements Ground {
                         y: tile.tileY * TileSize,
                         width: TileSize - 2,
                         height: TileSize - 2,
-                        fill: color, // TODO: tint/make an undiscovered color
+                        fill: color, // TODO: Tint/make an undiscovered color for undiscovered tiles
                     });
                 }
             }

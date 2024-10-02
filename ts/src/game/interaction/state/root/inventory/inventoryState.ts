@@ -41,7 +41,7 @@ export class InventoryState extends InteractionState {
         return true;
     }
 
-    //Todo: add parameters for filtering and button providers
+    //TODO: Add parameters for filtering and button providers for selected item
     constructor(private forInventory: InventoryComponent2) {
         super();
     }

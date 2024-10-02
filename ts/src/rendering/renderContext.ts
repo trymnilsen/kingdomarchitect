@@ -264,9 +264,8 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
 
     /**
      * Draw text to the canvas using coordinates in screenspace
-     * TODO: This seems to be the same as `drawText`
      */
     drawScreenspaceText(text: TextConfiguration): void {
-        textRenderer(text, this.canvasContext);
+        this.drawText(text);
     }
 }

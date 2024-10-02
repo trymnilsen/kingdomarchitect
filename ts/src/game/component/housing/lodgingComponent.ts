@@ -17,7 +17,6 @@ export class LodgingComponent extends EntityComponent {
     private performLodgingCheck() {
         //Query for all house buildings
         //Query for all workers
-        //If more houses than workers, spawn a worker
         //If more workers than houses set homeless effect
         //remove homeless effect if need
         const houses = this.entity.queryComponents(HousingComponent);

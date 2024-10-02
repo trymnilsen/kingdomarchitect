@@ -6,7 +6,12 @@ import {
     sizeOfBounds,
 } from "../../../../common/bounds.js";
 import { generateId } from "../../../../common/idGenerator.js";
-import { Point, addPoint } from "../../../../common/point.js";
+import {
+    Point,
+    addPoint,
+    pointEquals,
+    pointGrid,
+} from "../../../../common/point.js";
 import {
     buildings,
     getBuildingById,
@@ -18,6 +23,7 @@ import { Entity } from "../../../entity/entity.js";
 import { buildingPrefab } from "../../../prefab/buildingPrefab.js";
 import { farmPrefab } from "../../../prefab/farmPrefab.js";
 import { housePrefab } from "../../../prefab/housePrefab.js";
+import { mobPrefab } from "../../../prefab/mobPrefab.js";
 import { wellPrefab } from "../../../prefab/wellPrefab.js";
 import { TilesetVariant, getLargestSize } from "../../tileset.js";
 import { placeTileset } from "../../tilesetPlacer.js";
@@ -56,35 +62,49 @@ function createEntityFactory(
         _allMaps: BiomeMapCollection,
         rootEntity: Entity,
     ) => {
-        for (const entity of tileset.entities) {
-            const position = addPoint(
-                biome.worldPosition(item),
-                entity.position,
+        const itemPosition = biome.worldPosition(item);
+        const fortEntity = new Entity(generateId("fort"));
+        rootEntity.addChild(fortEntity);
+        const availablePosition = pointGrid(tileset.width, tileset.height)
+            .map((point) => addPoint(point, itemPosition))
+            .filter(
+                (point) =>
+                    !tileset.entities.some((tilesetEntity) =>
+                        pointEquals(point, tilesetEntity.position),
+                    ),
             );
+
+        const mobPosition = randomEntry(availablePosition);
+        const mob = mobPrefab(generateId("mob"));
+        mob.position = mobPosition;
+        fortEntity.addChild(mob);
+
+        for (const entity of tileset.entities) {
+            const position = addPoint(itemPosition, entity.position);
             switch (entity.id) {
                 case "farm":
-                    createFarmEntity(position, rootEntity);
+                    createFarmEntity(position, fortEntity);
                     break;
                 case "tavern":
-                    createTavernEntity(position, rootEntity);
+                    createTavernEntity(position, fortEntity);
                     break;
                 case "well":
-                    createWellEntity(position, rootEntity);
+                    createWellEntity(position, fortEntity);
                     break;
                 case "house":
-                    createHouseEntity(position, rootEntity);
+                    createHouseEntity(position, fortEntity);
                     break;
                 case "windmill":
-                    createWindmillEntity(position, rootEntity);
+                    createWindmillEntity(position, fortEntity);
                     break;
                 case "barracks":
-                    createBarracksEntity(position, rootEntity);
+                    createBarracksEntity(position, fortEntity);
                     break;
                 case "gravestone":
-                    createGravestoneEntity(position, rootEntity);
+                    createGravestoneEntity(position, fortEntity);
                     break;
                 case "wall":
-                    createWallEntity(position, rootEntity);
+                    createWallEntity(position, fortEntity);
                     break;
                 default:
                     break;

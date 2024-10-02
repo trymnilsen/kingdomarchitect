@@ -20,7 +20,7 @@ export function uiColumn(columnProperties: UIColumnProperties): UIColumn {
         height: columnProperties.height,
     });
 
-    if (columnProperties.horizontalAlignment) {
+    if (columnProperties.horizontalAlignment !== undefined) {
         column.horizontalAlignment = columnProperties.horizontalAlignment;
     }
 

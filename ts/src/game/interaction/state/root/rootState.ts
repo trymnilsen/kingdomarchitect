@@ -98,9 +98,11 @@ class WorldFocusGroup implements FocusGroup {
         private rootNode: Entity,
         private camera: Camera,
     ) {}
+
     onFocusActionInput(): boolean {
         return false;
     }
+
     getFocusBounds(): Bounds | null {
         if (!this.currentFocus) {
             return null;
@@ -119,6 +121,7 @@ class WorldFocusGroup implements FocusGroup {
         };
         return bounds;
     }
+
     moveFocus(
         direction: Direction,
         currentFocusBounds: Bounds | null,
@@ -133,7 +136,7 @@ class WorldFocusGroup implements FocusGroup {
             TileSize,
         );
 
-        //TODO: Optimize finding the closest tile, no need to loop over all
+        //TODO: Optimize finding the closest focusable tile, no need to loop over all of them
         const worldPosition = this.camera.screenToWorld(centerPosition);
         const tilesComponent = this.rootNode.requireComponent(TilesComponent);
 
