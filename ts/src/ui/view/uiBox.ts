@@ -10,6 +10,7 @@ import { calculateAlignment, uiAlignment } from "../uiAlignment.js";
 import { UIBackground } from "../uiBackground.js";
 import { UILayoutContext } from "../uiLayoutContext.js";
 import { fillUiSize, UISize, wrapUiSize } from "../uiSize.js";
+import { UIViewVisiblity } from "../uiView.js";
 import { UIViewGroup } from "../uiViewGroup.js";
 
 export class UIBox extends UIViewGroup {
@@ -141,15 +142,17 @@ export class UIBox extends UIViewGroup {
     }
 
     draw(context: UIRenderContext): void {
-        if (this._background && this.isLayedOut) {
-            this._background.draw(
-                context,
-                this.screenPosition,
-                this.measuredSize,
-            );
-        }
-        for (const child of this.children) {
-            child.draw(context);
+        if (this.visibility == UIViewVisiblity.Visible) {
+            if (this._background && this.isLayedOut) {
+                this._background.draw(
+                    context,
+                    this.screenPosition,
+                    this.measuredSize,
+                );
+            }
+            for (const child of this.children) {
+                child.draw(context);
+            }
         }
     }
 

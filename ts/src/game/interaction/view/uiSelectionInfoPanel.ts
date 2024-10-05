@@ -1,16 +1,10 @@
-import { wrap } from "module";
 import { sprites2 } from "../../../asset/sprite.js";
-import { Point } from "../../../common/point.js";
 import { allSides } from "../../../common/sides.js";
 import {
     graySubTitleTextStyle,
     subTitleTextStyle,
 } from "../../../rendering/text/textStyle.js";
-import { UIRenderContext } from "../../../rendering/uiRenderContext.js";
-import {
-    colorBackground,
-    ninePatchBackground,
-} from "../../../ui/dsl/uiBackgroundDsl.js";
+import { ninePatchBackground } from "../../../ui/dsl/uiBackgroundDsl.js";
 import { uiBox } from "../../../ui/dsl/uiBoxDsl.js";
 import { uiColumn } from "../../../ui/dsl/uiColumnDsl.js";
 import { spriteImageSource, uiImage } from "../../../ui/dsl/uiImageDsl.js";
@@ -18,15 +12,50 @@ import { uiRow } from "../../../ui/dsl/uiRowDsl.js";
 import { uiSpace } from "../../../ui/dsl/uiSpaceDsl.js";
 import { uiText } from "../../../ui/dsl/uiTextDsl.js";
 import { HorizontalAlignment } from "../../../ui/uiAlignment.js";
-import { NinePatchBackground } from "../../../ui/uiBackground.js";
-import { UILayoutContext } from "../../../ui/uiLayoutContext.js";
 import { UISize, wrapUiSize } from "../../../ui/uiSize.js";
-import { UIView } from "../../../ui/uiView.js";
+import { UIViewVisiblity } from "../../../ui/uiView.js";
 import { UIBox } from "../../../ui/view/uiBox.js";
+import { UIImage } from "../../../ui/view/uiImage.js";
+import { UISpriteImageSource } from "../../../ui/view/uiImageSource.js";
+import { UIText } from "../../../ui/view/uiText.js";
+import { SelectionInfo } from "../../component/selection/selectionInfo.js";
 
 export class UISelectorInfoPanel extends UIBox {
+    private _selectionInfo: SelectionInfo | null = null;
+    private _icon: UIImage;
+    private _titleText: UIText;
+    private _subtitleText: UIText;
+
+    public get selectionInfo(): SelectionInfo | null {
+        return this._selectionInfo;
+    }
+
+    public set selectionInfo(value: SelectionInfo | null) {
+        this.updateSelection(value);
+    }
+
     constructor(size: UISize) {
         super(size);
+        this.visibility = UIViewVisiblity.Invisible;
+
+        this._icon = uiImage({
+            width: 32,
+            height: 32,
+            image: spriteImageSource(sprites2.building_blacksmith),
+        });
+        this._titleText = uiText({
+            text: "",
+            width: wrapUiSize,
+            height: wrapUiSize,
+            style: subTitleTextStyle,
+        });
+        this._subtitleText = uiText({
+            text: "",
+            width: wrapUiSize,
+            height: wrapUiSize,
+            style: graySubTitleTextStyle,
+        });
+
         this.addView(
             uiColumn({
                 width: wrapUiSize,
@@ -47,13 +76,7 @@ export class UISelectorInfoPanel extends UIBox {
                                     height: wrapUiSize,
                                     children: [
                                         {
-                                            child: uiImage({
-                                                width: 32,
-                                                height: 32,
-                                                image: spriteImageSource(
-                                                    sprites2.building_blacksmith,
-                                                ),
-                                            }),
+                                            child: this._icon,
                                         },
                                         {
                                             child: uiSpace({
@@ -69,20 +92,11 @@ export class UISelectorInfoPanel extends UIBox {
                                                     HorizontalAlignment.Left,
                                                 children: [
                                                     {
-                                                        child: uiText({
-                                                            text: "Bobs and bits",
-                                                            width: wrapUiSize,
-                                                            height: wrapUiSize,
-                                                            style: subTitleTextStyle,
-                                                        }),
+                                                        child: this._titleText,
                                                     },
                                                     {
-                                                        child: uiText({
-                                                            text: "Blacksmith",
-                                                            width: wrapUiSize,
-                                                            height: wrapUiSize,
-                                                            style: graySubTitleTextStyle,
-                                                        }),
+                                                        child: this
+                                                            ._subtitleText,
                                                     },
                                                 ],
                                             }),
@@ -95,5 +109,17 @@ export class UISelectorInfoPanel extends UIBox {
                 ],
             }),
         );
+    }
+
+    private updateSelection(selection: SelectionInfo | null) {
+        this._selectionInfo = selection;
+        if (!!selection) {
+            this.visibility = UIViewVisiblity.Visible;
+            this._icon.image = new UISpriteImageSource(selection.icon);
+            this._titleText.text = selection.title;
+            this._subtitleText.text = selection.subtitle;
+        } else {
+            this.visibility = UIViewVisiblity.Invisible;
+        }
     }
 }

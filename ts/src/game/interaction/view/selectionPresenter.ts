@@ -19,10 +19,10 @@ import { fillUiSize, wrapUiSize } from "../../../ui/uiSize.js";
 import { UIView } from "../../../ui/uiView.js";
 import { UIBox } from "../../../ui/view/uiBox.js";
 import { UIColumn } from "../../../ui/view/uiColumn.js";
+import { SelectionInfo } from "../../component/selection/selectionInfo.js";
 import { UIActionbarItem } from "./actionbar/uiActionbar.js";
 import { actionbarWidth } from "./actionbar/uiActionbarConstants.js";
 import { UIActionbarScaffold } from "./actionbar/uiActionbarScaffold.js";
-import { SelectionTile } from "./selectionTile.js";
 import { StatePresenter } from "./statePresenter.js";
 import { UISelectorInfoPanel } from "./uiSelectionInfoPanel.js";
 
@@ -31,8 +31,6 @@ export class SelectionPresenter implements StatePresenter {
 
     private expandedMenu: UIColumn;
     private expandedMenuPadding: UIBox;
-    private leftSelectionTile: SelectionTile;
-    private rightSelectionTile: SelectionTile;
     private selectionInfo: UISelectorInfoPanel;
 
     get root(): UIView {
@@ -43,8 +41,6 @@ export class SelectionPresenter implements StatePresenter {
         private leftActionbarItems: ReadonlyArray<UIActionbarItem>,
         private rightActionbarItems: ReadonlyArray<UIActionbarItem>,
     ) {
-        this.leftSelectionTile = new SelectionTile(HorizontalSide.Left);
-        this.rightSelectionTile = new SelectionTile(HorizontalSide.Right);
         this.expandedMenu = new UIColumn({
             width: wrapUiSize,
             height: wrapUiSize,
@@ -64,32 +60,10 @@ export class SelectionPresenter implements StatePresenter {
             width: fillUiSize,
             height: fillUiSize,
             padding: allSides(12),
-            alignment: uiAlignment.bottomCenter,
+            alignment: uiAlignment.bottomLeft,
             //background: colorBackground("#FF00FF44"),
             children: [
-                uiRow({
-                    width: fillUiSize,
-                    height: wrapUiSize,
-                    children: [
-                        {
-                            child: this.selectionInfo,
-                        },
-                        {
-                            child: uiSpace({
-                                width: fillUiSize,
-                                height: 1,
-                                id: "emptyspace",
-                            }),
-                            weight: 1,
-                        },
-                        {
-                            child: new UISelectorInfoPanel({
-                                width: wrapUiSize,
-                                height: wrapUiSize,
-                            }),
-                        },
-                    ],
-                }),
+                this.selectionInfo,
                 /*uiStack({
                     height: wrapUiSize,
                     width: fillUiSize,
@@ -112,6 +86,10 @@ export class SelectionPresenter implements StatePresenter {
 
     setRightMenu(items: ReadonlyArray<UIActionbarItem>) {
         this.scaffold.setRightMenu(items);
+    }
+
+    setSelectionInfo(item: SelectionInfo | null) {
+        this.selectionInfo.selectionInfo = item;
     }
 
     setExpandedMenu(items: UIActionbarItem[]) {

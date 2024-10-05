@@ -1,7 +1,11 @@
 import { sprites2 } from "../../../../asset/sprite.js";
 import { allSides } from "../../../../common/sides.js";
 import { RenderContext } from "../../../../rendering/renderContext.js";
+import { SelectionInfo } from "../../../component/selection/selectionInfo.js";
+import { SelectionInfoComponent } from "../../../component/selection/selectionInfoComponent.js";
 import { TileSize } from "../../../map/tile.js";
+import { SelectedEntityItem } from "../../../selection/selectedEntityItem.js";
+import { SelectedTileItem } from "../../../selection/selectedTileItem.js";
 import { SelectedWorldItem } from "../../../selection/selectedWorldItem.js";
 import { InteractionState } from "../../handler/interactionState.js";
 import { ButtonCollection } from "../../view/actionbar/buttonCollection.js";
@@ -31,6 +35,7 @@ export class SelectionState extends InteractionState {
     override onActive(): void {
         const items = this.getActionItems();
         this.presenter = new SelectionPresenter(items.left, items.right);
+        this.presenter.setSelectionInfo(this.getSelectionInfo());
         this.view = this.presenter.root;
     }
 
@@ -54,6 +59,33 @@ export class SelectionState extends InteractionState {
             x: cursorWorldPosition.x,
             y: cursorWorldPosition.y,
         });
+    }
+
+    private getSelectionInfo(): SelectionInfo | null {
+        if (this.selection instanceof SelectedTileItem) {
+            const type = this.selection.groundTile.type;
+            if (!!type) {
+                return {
+                    title: type,
+                    subtitle: "Tile",
+                    icon: sprites2.blue_book,
+                };
+            } else {
+                return null;
+            }
+        } else if (this.selection instanceof SelectedEntityItem) {
+            const selectionComponent = this.selection.entity.getComponent(
+                SelectionInfoComponent,
+            );
+
+            if (!selectionComponent) {
+                return null;
+            }
+
+            return selectionComponent.getSelectionInfo();
+        } else {
+            return null;
+        }
     }
 
     private getActionItems(): ButtonCollection {

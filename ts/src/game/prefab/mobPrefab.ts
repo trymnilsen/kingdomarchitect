@@ -8,6 +8,8 @@ import { SpriteComponent } from "../component/draw/spriteComponent.js";
 import { DestroyOnZeroHealthComponent } from "../component/health/destroyOnZeroHealthComponent.js";
 import { HealthComponent } from "../component/health/healthComponent.js";
 import { JobRunnerComponent } from "../component/job/jobRunnerComponent.js";
+import { StaticSelectionInfoProvider } from "../component/selection/provider/staticSelectionInfoProvider.js";
+import { SelectionInfoComponent } from "../component/selection/selectionInfoComponent.js";
 import { Entity } from "../entity/entity.js";
 
 export function mobPrefab(id: string): Entity {
@@ -25,6 +27,9 @@ export function mobPrefab(id: string): Entity {
     const jobRunnerComponent = new JobRunnerComponent();
     const idleMobComponent = new IdleMobComponent();
     const healthComponent = new HealthComponent(100, 100);
+    const selectionInfo = new SelectionInfoComponent(
+        new StaticSelectionInfoProvider(sprites2.goblin, "Goblin", "Hostile"),
+    );
     jobRunnerComponent.isOpenForExternalJobs = false;
 
     goblin.addComponent(idleMobComponent);
@@ -32,6 +37,7 @@ export function mobPrefab(id: string): Entity {
     goblin.addComponent(spriteDrawer);
     goblin.addComponent(healthComponent);
     goblin.addComponent(aggroComponent);
+    goblin.addComponent(selectionInfo);
     goblin.addComponent(new DestroyOnZeroHealthComponent());
 
     return goblin;
