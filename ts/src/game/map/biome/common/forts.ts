@@ -2,8 +2,10 @@ import { tilesets } from "../../../../../generated/tilesets.js";
 import { sprites2 } from "../../../../asset/sprite.js";
 import { randomEntry, shuffleItems } from "../../../../common/array.js";
 import {
+    Bounds,
     getAllPositionsBoundsFitWithinBounds,
     sizeOfBounds,
+    zeroBounds,
 } from "../../../../common/bounds.js";
 import { generateId } from "../../../../common/idGenerator.js";
 import {
@@ -19,6 +21,7 @@ import {
 import { BuildingComponent } from "../../../component/building/buildingComponent.js";
 import { SpriteComponent } from "../../../component/draw/spriteComponent.js";
 import { HealthComponent } from "../../../component/health/healthComponent.js";
+import { NpcAreaComponent } from "../../../component/npc/npcAreaComponent.js";
 import { Entity } from "../../../entity/entity.js";
 import { buildingPrefab } from "../../../prefab/buildingPrefab.js";
 import { farmPrefab } from "../../../prefab/farmPrefab.js";
@@ -64,21 +67,9 @@ function createEntityFactory(
     ) => {
         const itemPosition = biome.worldPosition(item);
         const fortEntity = new Entity(generateId("fort"));
+
         rootEntity.addChild(fortEntity);
-        const availablePosition = pointGrid(tileset.width, tileset.height)
-            .map((point) => addPoint(point, itemPosition))
-            .filter(
-                (point) =>
-                    !tileset.entities.some((tilesetEntity) =>
-                        pointEquals(point, tilesetEntity.position),
-                    ),
-            );
-
-        const mobPosition = randomEntry(availablePosition);
-        const mob = mobPrefab(generateId("mob"));
-        mob.position = mobPosition;
-        fortEntity.addChild(mob);
-
+        const spawnPoints: Point[] = [];
         for (const entity of tileset.entities) {
             const position = addPoint(itemPosition, entity.position);
             switch (entity.id) {
@@ -106,9 +97,27 @@ function createEntityFactory(
                 case "wall":
                     createWallEntity(position, fortEntity);
                     break;
+                case "spawn":
+                    spawnPoints.push(position);
+                    break;
                 default:
                     break;
             }
+        }
+        const bounds: Bounds = {
+            x1: itemPosition.x,
+            y1: itemPosition.y,
+            x2: itemPosition.x + item.size.x,
+            y2: itemPosition.y + item.size.y,
+        };
+        const areaComponent = new NpcAreaComponent(bounds, spawnPoints);
+        fortEntity.addComponent(areaComponent);
+
+        if (spawnPoints.length > 0) {
+            const mobPosition = randomEntry(spawnPoints);
+            const mob = mobPrefab(generateId("mob"));
+            mob.position = mobPosition;
+            fortEntity.addChild(mob);
         }
     };
 }

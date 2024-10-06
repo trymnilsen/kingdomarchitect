@@ -9,5 +9,6 @@ export const fortTilesetConfig = {
         "#D60000": "barracks",
         "#DEDEDE": "gravestone",
         "#464646": "wall",
+        "#00FF62": "spawn",
     },
 };

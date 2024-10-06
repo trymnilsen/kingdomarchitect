@@ -11283,6 +11283,27 @@ export const tilesets = {
           },
           {
             "position": {
+              "x": 2,
+              "y": 1
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 2,
+              "y": 2
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 2,
+              "y": 3
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
               "x": 3,
               "y": 0
             },
@@ -11301,6 +11322,13 @@ export const tilesets = {
               "y": 2
             },
             "id": "farm"
+          },
+          {
+            "position": {
+              "x": 3,
+              "y": 3
+            },
+            "id": "spawn"
           },
           {
             "position": {
@@ -11452,6 +11480,27 @@ export const tilesets = {
           {
             "position": {
               "x": 2,
+              "y": 1
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 2,
+              "y": 2
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 2,
+              "y": 3
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 2,
               "y": 4
             },
             "id": "wall"
@@ -11459,9 +11508,23 @@ export const tilesets = {
           {
             "position": {
               "x": 3,
+              "y": 1
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 3,
               "y": 2
             },
             "id": "well"
+          },
+          {
+            "position": {
+              "x": 3,
+              "y": 3
+            },
+            "id": "spawn"
           },
           {
             "position": {
@@ -11476,6 +11539,13 @@ export const tilesets = {
               "y": 0
             },
             "id": "wall"
+          },
+          {
+            "position": {
+              "x": 4,
+              "y": 1
+            },
+            "id": "spawn"
           },
           {
             "position": {
@@ -11612,6 +11682,27 @@ export const tilesets = {
           },
           {
             "position": {
+              "x": 2,
+              "y": 2
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 2,
+              "y": 3
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 2,
+              "y": 4
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
               "x": 3,
               "y": 0
             },
@@ -11627,9 +11718,23 @@ export const tilesets = {
           {
             "position": {
               "x": 3,
+              "y": 2
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 3,
               "y": 3
             },
             "id": "well"
+          },
+          {
+            "position": {
+              "x": 3,
+              "y": 4
+            },
+            "id": "spawn"
           },
           {
             "position": {
@@ -11651,6 +11756,13 @@ export const tilesets = {
               "y": 1
             },
             "id": "barracks"
+          },
+          {
+            "position": {
+              "x": 4,
+              "y": 2
+            },
+            "id": "spawn"
           },
           {
             "position": {
@@ -11795,6 +11907,27 @@ export const tilesets = {
           {
             "position": {
               "x": 2,
+              "y": 2
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 2,
+              "y": 3
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 2,
+              "y": 4
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 2,
               "y": 5
             },
             "id": "wall"
@@ -11812,6 +11945,27 @@ export const tilesets = {
               "y": 1
             },
             "id": "house"
+          },
+          {
+            "position": {
+              "x": 3,
+              "y": 2
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 3,
+              "y": 3
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 3,
+              "y": 4
+            },
+            "id": "spawn"
           },
           {
             "position": {
@@ -11977,6 +12131,27 @@ export const tilesets = {
           {
             "position": {
               "x": 2,
+              "y": 2
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 2,
+              "y": 3
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 2,
+              "y": 4
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 2,
               "y": 5
             },
             "id": "wall"
@@ -11998,6 +12173,27 @@ export const tilesets = {
           {
             "position": {
               "x": 3,
+              "y": 2
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 3,
+              "y": 3
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 3,
+              "y": 4
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 3,
               "y": 5
             },
             "id": "wall"
@@ -12015,6 +12211,13 @@ export const tilesets = {
               "y": 1
             },
             "id": "farm"
+          },
+          {
+            "position": {
+              "x": 4,
+              "y": 2
+            },
+            "id": "spawn"
           },
           {
             "position": {
@@ -12131,6 +12334,13 @@ export const tilesets = {
           {
             "position": {
               "x": 1,
+              "y": 2
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 1,
               "y": 3
             },
             "id": "house"
@@ -12159,6 +12369,20 @@ export const tilesets = {
           {
             "position": {
               "x": 2,
+              "y": 2
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 2,
+              "y": 3
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 2,
               "y": 4
             },
             "id": "wall"
@@ -12169,6 +12393,20 @@ export const tilesets = {
               "y": 5
             },
             "id": "wall"
+          },
+          {
+            "position": {
+              "x": 3,
+              "y": 1
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 3,
+              "y": 2
+            },
+            "id": "spawn"
           },
           {
             "position": {
@@ -12197,6 +12435,27 @@ export const tilesets = {
               "y": 0
             },
             "id": "wall"
+          },
+          {
+            "position": {
+              "x": 4,
+              "y": 1
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 4,
+              "y": 2
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 4,
+              "y": 3
+            },
+            "id": "spawn"
           },
           {
             "position": {
@@ -12232,6 +12491,20 @@ export const tilesets = {
               "y": 2
             },
             "id": "barracks"
+          },
+          {
+            "position": {
+              "x": 5,
+              "y": 3
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 5,
+              "y": 4
+            },
+            "id": "spawn"
           },
           {
             "position": {
@@ -12348,6 +12621,13 @@ export const tilesets = {
           {
             "position": {
               "x": 1,
+              "y": 2
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 1,
               "y": 3
             },
             "id": "farm"
@@ -12383,6 +12663,13 @@ export const tilesets = {
           {
             "position": {
               "x": 2,
+              "y": 2
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 2,
               "y": 3
             },
             "id": "well"
@@ -12410,6 +12697,34 @@ export const tilesets = {
           },
           {
             "position": {
+              "x": 3,
+              "y": 1
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 3,
+              "y": 2
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 3,
+              "y": 3
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 3,
+              "y": 4
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
               "x": 4,
               "y": 0
             },
@@ -12421,6 +12736,27 @@ export const tilesets = {
               "y": 1
             },
             "id": "house"
+          },
+          {
+            "position": {
+              "x": 4,
+              "y": 2
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 4,
+              "y": 3
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 4,
+              "y": 4
+            },
+            "id": "spawn"
           },
           {
             "position": {
@@ -12442,6 +12778,13 @@ export const tilesets = {
               "y": 1
             },
             "id": "house"
+          },
+          {
+            "position": {
+              "x": 5,
+              "y": 2
+            },
+            "id": "spawn"
           },
           {
             "position": {
@@ -12614,9 +12957,23 @@ export const tilesets = {
           {
             "position": {
               "x": 2,
+              "y": 2
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 2,
               "y": 3
             },
             "id": "well"
+          },
+          {
+            "position": {
+              "x": 2,
+              "y": 4
+            },
+            "id": "spawn"
           },
           {
             "position": {
@@ -12641,6 +12998,27 @@ export const tilesets = {
           },
           {
             "position": {
+              "x": 3,
+              "y": 2
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 3,
+              "y": 3
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 3,
+              "y": 4
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
               "x": 4,
               "y": 0
             },
@@ -12649,9 +13027,30 @@ export const tilesets = {
           {
             "position": {
               "x": 4,
+              "y": 1
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 4,
+              "y": 2
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 4,
               "y": 3
             },
             "id": "well"
+          },
+          {
+            "position": {
+              "x": 4,
+              "y": 4
+            },
+            "id": "spawn"
           },
           {
             "position": {
@@ -12666,6 +13065,20 @@ export const tilesets = {
               "y": 0
             },
             "id": "wall"
+          },
+          {
+            "position": {
+              "x": 5,
+              "y": 1
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 5,
+              "y": 2
+            },
+            "id": "spawn"
           },
           {
             "position": {
@@ -12845,6 +13258,20 @@ export const tilesets = {
           {
             "position": {
               "x": 2,
+              "y": 3
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 2,
+              "y": 4
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 2,
               "y": 5
             },
             "id": "wall"
@@ -12866,6 +13293,27 @@ export const tilesets = {
           {
             "position": {
               "x": 3,
+              "y": 2
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 3,
+              "y": 3
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 3,
+              "y": 4
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 3,
               "y": 5
             },
             "id": "wall"
@@ -12883,6 +13331,13 @@ export const tilesets = {
               "y": 1
             },
             "id": "house"
+          },
+          {
+            "position": {
+              "x": 4,
+              "y": 2
+            },
+            "id": "spawn"
           },
           {
             "position": {
@@ -12894,6 +13349,13 @@ export const tilesets = {
           {
             "position": {
               "x": 4,
+              "y": 4
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 4,
               "y": 5
             },
             "id": "wall"
@@ -12911,6 +13373,20 @@ export const tilesets = {
               "y": 1
             },
             "id": "house"
+          },
+          {
+            "position": {
+              "x": 5,
+              "y": 2
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 5,
+              "y": 3
+            },
+            "id": "spawn"
           },
           {
             "position": {
@@ -13020,6 +13496,13 @@ export const tilesets = {
           {
             "position": {
               "x": 1,
+              "y": 4
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 1,
               "y": 5
             },
             "id": "house"
@@ -13044,6 +13527,20 @@ export const tilesets = {
               "y": 3
             },
             "id": "house"
+          },
+          {
+            "position": {
+              "x": 2,
+              "y": 4
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 2,
+              "y": 5
+            },
+            "id": "spawn"
           },
           {
             "position": {
@@ -13083,6 +13580,13 @@ export const tilesets = {
           {
             "position": {
               "x": 3,
+              "y": 4
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 3,
               "y": 5
             },
             "id": "house"
@@ -13110,6 +13614,34 @@ export const tilesets = {
           },
           {
             "position": {
+              "x": 4,
+              "y": 2
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 4,
+              "y": 3
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 4,
+              "y": 4
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
+              "x": 4,
+              "y": 5
+            },
+            "id": "spawn"
+          },
+          {
+            "position": {
               "x": 5,
               "y": 0
             },
@@ -13121,6 +13653,13 @@ export const tilesets = {
               "y": 1
             },
             "id": "gravestone"
+          },
+          {
+            "position": {
+              "x": 5,
+              "y": 2
+            },
+            "id": "spawn"
           },
           {
             "position": {
@@ -13163,6 +13702,13 @@ export const tilesets = {
               "y": 1
             },
             "id": "barracks"
+          },
+          {
+            "position": {
+              "x": 6,
+              "y": 2
+            },
+            "id": "spawn"
           },
           {
             "position": {
