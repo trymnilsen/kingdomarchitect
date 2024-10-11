@@ -1,6 +1,6 @@
 import { Event, EventListener } from "../../../common/event.js";
 import { Point } from "../../../common/point.js";
-import { RenderContext } from "../../../rendering/renderContext.js";
+import { RenderScope } from "../../../rendering/renderContext.js";
 import { Entity } from "../../entity/entity.js";
 import { EntityComponent } from "../entityComponent.js";
 import { Job } from "./job.js";
@@ -89,7 +89,7 @@ export class JobQueueComponent
         this.removeJob(job);
     }
 
-    override onDraw(context: RenderContext): void {
+    override onDraw(context: RenderScope): void {
         for (const pendingJob of this._pendingJobs) {
             pendingJob.onDraw(context);
         }

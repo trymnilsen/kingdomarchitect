@@ -7,7 +7,7 @@ import {
 import { Direction } from "../common/direction.js";
 import { Event, EventListener } from "../common/event.js";
 import { addPoint, Point, zeroPoint } from "../common/point.js";
-import { UIRenderContext } from "../rendering/uiRenderContext.js";
+import { UIRenderScope } from "../rendering/uiRenderContext.js";
 import {
     tapStartType,
     tapType,
@@ -21,7 +21,7 @@ import {
     getFocusableViews,
 } from "./focus/focusHelpers.js";
 import { FocusState } from "./focus/focusState.js";
-import { UILayoutContext } from "./uiLayoutContext.js";
+import { UILayoutScope } from "./uiLayoutContext.js";
 import { fillUiSize, UISize, zeroSize } from "./uiSize.js";
 
 export type UIAction = {
@@ -529,15 +529,12 @@ export abstract class UIView implements FocusGroup {
      * @param constraints the size constraints for the parent
      * @return the size of the view
      */
-    abstract layout(
-        layoutContext: UILayoutContext,
-        constraints: UISize,
-    ): UISize;
+    abstract layout(layoutContext: UILayoutScope, constraints: UISize): UISize;
 
     /**
      * Request to draw this view
      */
-    abstract draw(context: UIRenderContext): void;
+    abstract draw(context: UIRenderScope): void;
 
     /**
      * Handle the input event by attempting to focus the closest

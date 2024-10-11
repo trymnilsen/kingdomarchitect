@@ -1,5 +1,5 @@
 import { Point } from "../../../../common/point.js";
-import { RenderContext } from "../../../../rendering/renderContext.js";
+import { RenderScope } from "../../../../rendering/renderContext.js";
 import { Entity } from "../../../entity/entity.js";
 import { TileSize } from "../../../map/tile.js";
 import { IsInstanceJobConstraint } from "../constraint/isInstanceJobConstraint.js";
@@ -27,7 +27,7 @@ export class MoveJob extends Job {
         }
     }
 
-    override onDraw(renderContext: RenderContext): void {
+    override onDraw(renderContext: RenderScope): void {
         for (const pathPoint of this.path) {
             renderContext.drawRectangle({
                 x: pathPoint.x * TileSize + 14,

@@ -1,6 +1,6 @@
 import { sprites2 } from "../../../../asset/sprite.js";
 import { allSides } from "../../../../common/sides.js";
-import { RenderContext } from "../../../../rendering/renderContext.js";
+import { RenderScope } from "../../../../rendering/renderContext.js";
 import { SelectionInfo } from "../../../component/selection/selectionInfo.js";
 import { SelectionInfoComponent } from "../../../component/selection/selectionInfoComponent.js";
 import { TileSize } from "../../../map/tile.js";
@@ -43,7 +43,7 @@ export class SelectionState extends InteractionState {
         this.updateActionbarItems();
     }
 
-    override onDraw(context: RenderContext): void {
+    override onDraw(context: RenderScope): void {
         super.onDraw(context);
 
         const cursorWorldPosition = context.camera.tileSpaceToScreenSpace(

@@ -1,6 +1,6 @@
 import { Point } from "../../common/point.js";
 import { SpriteConfiguration } from "../items/sprite.js";
-import { RenderContext } from "../renderContext.js";
+import { RenderScope } from "../renderContext.js";
 
 /**
  * BlinkingImageAnimation is a helperclass for rendering images that
@@ -35,7 +35,7 @@ export class BlinkingImageAnimation {
      * off
      * @param context the context used for rendering
      */
-    onDraw(context: RenderContext) {
+    onDraw(context: RenderScope) {
         if (this.frame % 2) {
             context.drawSprite(this.sprite);
         }

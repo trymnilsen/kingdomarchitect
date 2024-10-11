@@ -1,9 +1,9 @@
 import { Sprite2, sprites2 } from "../../../../../asset/sprite.js";
 import { allSides } from "../../../../../common/sides.js";
-import { UIRenderContext } from "../../../../../rendering/uiRenderContext.js";
+import { UIRenderScope } from "../../../../../rendering/uiRenderContext.js";
 import { UIThemeType } from "../../../../../ui/color.js";
 import { ninePatchBackground } from "../../../../../ui/dsl/uiBackgroundDsl.js";
-import { UILayoutContext } from "../../../../../ui/uiLayoutContext.js";
+import { UILayoutScope } from "../../../../../ui/uiLayoutContext.js";
 import { fillUiSize, UISize } from "../../../../../ui/uiSize.js";
 import { UIButton } from "../../../../../ui/view/uiButton.js";
 
@@ -32,7 +32,7 @@ export class UIInventoryGridItem extends UIButton {
     }
 
     override layout(
-        _layoutContext: UILayoutContext,
+        _layoutContext: UILayoutScope,
         constraints: UISize,
     ): UISize {
         this._measuredSize = {
@@ -42,7 +42,7 @@ export class UIInventoryGridItem extends UIButton {
         return this._measuredSize;
     }
 
-    override draw(context: UIRenderContext): void {
+    override draw(context: UIRenderScope): void {
         super.draw(context);
         const size = this._measuredSize;
 

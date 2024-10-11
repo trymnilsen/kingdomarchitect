@@ -13,9 +13,9 @@ import {
     totalVertical,
 } from "../../../../common/sides.js";
 import { subTitleTextStyle } from "../../../../rendering/text/textStyle.js";
-import { UIRenderContext } from "../../../../rendering/uiRenderContext.js";
+import { UIRenderScope } from "../../../../rendering/uiRenderContext.js";
 import { bookInkColor } from "../../../../ui/color.js";
-import { UILayoutContext } from "../../../../ui/uiLayoutContext.js";
+import { UILayoutScope } from "../../../../ui/uiLayoutContext.js";
 import { UISize } from "../../../../ui/uiSize.js";
 import { UIView } from "../../../../ui/uiView.js";
 import { UIActionbarItem } from "./uiActionbar.js";
@@ -71,10 +71,7 @@ export class UIActionbarScaffold extends UIView {
         return true;
     }
 
-    override layout(
-        layoutContext: UILayoutContext,
-        constraints: UISize,
-    ): UISize {
+    override layout(layoutContext: UILayoutScope, constraints: UISize): UISize {
         //Measure the actionbars first
         //We start with the left actionbar as it should be collapsed last
         //if there is not enough space
@@ -105,7 +102,7 @@ export class UIActionbarScaffold extends UIView {
         return this._measuredSize;
     }
 
-    override draw(context: UIRenderContext): void {
+    override draw(context: UIRenderScope): void {
         this.contentView.draw(context);
         if (this.buttons.length > 0) {
             this.drawActionbar(context, this.buttons);
@@ -123,7 +120,7 @@ export class UIActionbarScaffold extends UIView {
      * @param actionbar
      */
     private drawActionbar(
-        context: UIRenderContext,
+        context: UIRenderScope,
         actionbar: ActionbarButton[],
     ) {
         for (const item of actionbar) {
@@ -188,7 +185,7 @@ export class UIActionbarScaffold extends UIView {
      * @returns the sized used for the actionbar
      */
     private layoutActionbar(
-        layoutContext: UILayoutContext,
+        layoutContext: UILayoutScope,
         paddedConstraints: UISize,
     ): UISize {
         //Get the size of the first level of the left tree
@@ -281,7 +278,7 @@ export class UIActionbarScaffold extends UIView {
      */
     private layoutActionItems(
         actionbarItems: ReadonlyArray<UIActionbarItem>,
-        layoutContext: UILayoutContext,
+        layoutContext: UILayoutScope,
         width: number,
         height: number,
         anchor: Point,
@@ -388,7 +385,7 @@ export class UIActionbarScaffold extends UIView {
      * @returns
      */
     private layoutSingleActionbar(
-        _layoutContext: UILayoutContext,
+        _layoutContext: UILayoutScope,
         items: ReadonlyArray<UIActionbarItem>,
         orientation: Axis,
     ): SingleActionbarLayout {
@@ -541,7 +538,7 @@ export class UIActionbarScaffold extends UIView {
      * @param paddedConstraints constraints minus padding and actionbar height
      */
     private layoutContentView(
-        layoutContext: UILayoutContext,
+        layoutContext: UILayoutScope,
         constraints: UISize,
     ) {
         this.contentView.layout(layoutContext, constraints);

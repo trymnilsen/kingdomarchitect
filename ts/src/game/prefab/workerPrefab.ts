@@ -20,6 +20,9 @@ import {
     defaultInventoryItems,
     InventoryComponent2,
 } from "../component/inventory/inventoryComponent.js";
+import { SelectionInfoComponent } from "../component/selection/selectionInfoComponent.js";
+import { WorkerSelectionProvider } from "../interaction/state/selection/actor/provider/workerSelectionProvider.js";
+import { WorkerSelectionInfoProvider } from "../component/selection/provider/workerSelectionInfoProvider.js";
 
 export function workerPrefab(id: string): Entity {
     const worker = new Entity(id);
@@ -45,6 +48,9 @@ export function workerPrefab(id: string): Entity {
     worker.addComponent(aggroComponent);
     worker.addComponent(movementComponent);
     worker.addComponent(energyComponent);
+    worker.addComponent(
+        new SelectionInfoComponent(new WorkerSelectionInfoProvider()),
+    );
     worker.addComponent(new WorkerSpriteComponent());
     worker.addComponent(healthComponent);
     worker.addComponent(effectComponent);

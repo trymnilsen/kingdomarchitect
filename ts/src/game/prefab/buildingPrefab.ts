@@ -5,6 +5,8 @@ import { Building } from "../../data/building/building.js";
 import { BuildingComponent } from "../component/building/buildingComponent.js";
 import { EntityComponent } from "../component/entityComponent.js";
 import { HealthComponent } from "../component/health/healthComponent.js";
+import { StaticSelectionInfoProvider } from "../component/selection/provider/staticSelectionInfoProvider.js";
+import { SelectionInfoComponent } from "../component/selection/selectionInfoComponent.js";
 import { VisibilityComponent } from "../component/visibility/visibilityComponent.js";
 import { Entity } from "../entity/entity.js";
 
@@ -35,6 +37,15 @@ export function buildingPrefab(
 
     const visibilityComponent = new VisibilityComponent(pattern, zeroPoint());
 
+    entity.addComponent(
+        new SelectionInfoComponent(
+            new StaticSelectionInfoProvider(
+                building.icon,
+                building.name,
+                "Building",
+            ),
+        ),
+    );
     entity.addComponent(buildingComponent);
     entity.addComponent(healthComponent);
     entity.addComponent(visibilityComponent);

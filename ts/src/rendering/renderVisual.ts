@@ -1,5 +1,5 @@
-import { RenderContext } from "./renderContext.js";
+import { RenderScope } from "./renderContext.js";
 
 export type RenderVisual = {
-    onDraw(context: RenderContext): void;
+    onDraw(context: RenderScope): void;
 };

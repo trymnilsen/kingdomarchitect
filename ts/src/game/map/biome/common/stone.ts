@@ -3,6 +3,8 @@ import { generateId } from "../../../../common/idGenerator.js";
 import { SpriteComponent } from "../../../component/draw/spriteComponent.js";
 import { WeightComponent } from "../../../component/movement/weightComponent.js";
 import { StoneComponent } from "../../../component/resource/stoneComponent.js";
+import { StaticSelectionInfoProvider } from "../../../component/selection/provider/staticSelectionInfoProvider.js";
+import { SelectionInfoComponent } from "../../../component/selection/selectionInfoComponent.js";
 import { Entity } from "../../../entity/entity.js";
 import { placeRandomEntity } from "../../tilesetPlacer.js";
 import {
@@ -35,6 +37,15 @@ function stoneFactory(
     const sprite = getStoneSprite(biome);
     cactiEntity.addComponent(
         new SpriteComponent(sprite, { x: 2, y: 2 }, { x: 32, y: 32 }),
+    );
+    cactiEntity.addComponent(
+        new SelectionInfoComponent(
+            new StaticSelectionInfoProvider(
+                sprites2.stone,
+                "Stone",
+                "Resource",
+            ),
+        ),
     );
     cactiEntity.addComponent(new StoneComponent());
     cactiEntity.addComponent(new WeightComponent(50));

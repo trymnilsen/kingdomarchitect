@@ -1,6 +1,6 @@
 import { sprites2 } from "../../../asset/sprite.js";
 import { Point } from "../../../common/point.js";
-import { RenderContext } from "../../../rendering/renderContext.js";
+import { RenderScope } from "../../../rendering/renderContext.js";
 import { EntityComponent } from "../entityComponent.js";
 import { HealthComponent } from "../health/healthComponent.js";
 
@@ -38,7 +38,7 @@ export class TreeComponent extends EntityComponent {
         this.previousTick = tick;
     }
 
-    override onDraw(context: RenderContext, screenPosition: Point): void {
+    override onDraw(context: RenderScope, screenPosition: Point): void {
         const health = this.entity?.getComponent(HealthComponent);
 
         if (!health) {

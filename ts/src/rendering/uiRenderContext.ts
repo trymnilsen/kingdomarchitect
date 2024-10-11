@@ -7,14 +7,14 @@ import {
 } from "./items/sprite.js";
 import { TextConfiguration } from "./items/text.js";
 
-export type UIRenderContext = {
+export type UIRenderScope = {
     drawScreenSpaceSprite(sprite: SpriteConfiguration): void;
     drawNinePatchSprite(image: NinePatchSpriteConfiguration): void;
     drawScreenSpaceRectangle(rectangle: RectangleConfiguration): void;
     drawScreenspaceText(text: TextConfiguration): void;
     drawWithClip(
         bounds: Bounds,
-        drawFunction: (context: UIRenderContext) => void,
+        drawFunction: (context: UIRenderScope) => void,
     ): void;
     drawLine(
         x1: number,

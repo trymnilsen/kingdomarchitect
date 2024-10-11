@@ -1,6 +1,6 @@
 import { Point } from "../../../common/point.js";
 import { jobDebug } from "../../../constants.js";
-import { RenderContext } from "../../../rendering/renderContext.js";
+import { RenderScope } from "../../../rendering/renderContext.js";
 import { EntityComponent } from "../entityComponent.js";
 import { Job } from "./job.js";
 import { JobOwner } from "./jobOwner.js";
@@ -96,7 +96,7 @@ export class JobRunnerComponent extends EntityComponent implements JobOwner {
         }
     }
 
-    override onDraw(context: RenderContext): void {
+    override onDraw(context: RenderScope): void {
         if (this.activeJob) {
             this.activeJob.onDraw(context);
         }

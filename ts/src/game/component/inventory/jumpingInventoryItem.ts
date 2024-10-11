@@ -2,7 +2,7 @@ import { Sprite2 } from "../../../asset/sprite.js";
 import { Point } from "../../../common/point.js";
 import { InventoryItem } from "../../../data/inventory/inventoryItem.js";
 import { CraftingOutputTag } from "../../../data/inventory/inventoryItemQuantity.js";
-import { RenderContext } from "../../../rendering/renderContext.js";
+import { RenderScope } from "../../../rendering/renderContext.js";
 import { RenderVisibilityMap } from "../../../rendering/renderVisibilityMap.js";
 import { EntityComponent } from "../entityComponent.js";
 import { InventoryComponent2 } from "./inventoryComponent.js";
@@ -35,7 +35,7 @@ export class JumpingInventoryItem extends EntityComponent {
         }
     }
     override onDraw(
-        context: RenderContext,
+        context: RenderScope,
         screenPosition: Point,
         _visibilityMap: RenderVisibilityMap,
     ): void {

@@ -5,10 +5,10 @@ import {
     totalVertical,
     zeroSides,
 } from "../../common/sides.js";
-import { UIRenderContext } from "../../rendering/uiRenderContext.js";
+import { UIRenderScope } from "../../rendering/uiRenderContext.js";
 import { calculateAlignment, uiAlignment } from "../uiAlignment.js";
 import { UIBackground } from "../uiBackground.js";
-import { UILayoutContext } from "../uiLayoutContext.js";
+import { UILayoutScope } from "../uiLayoutContext.js";
 import { fillUiSize, UISize, wrapUiSize } from "../uiSize.js";
 import { UIViewVisiblity } from "../uiView.js";
 import { UIViewGroup } from "../uiViewGroup.js";
@@ -43,7 +43,7 @@ export class UIBox extends UIViewGroup {
         return !!this._background && this.withinViewBounds(screenPoint);
     }
 
-    layout(layoutContext: UILayoutContext, constraints: UISize): UISize {
+    layout(layoutContext: UILayoutScope, constraints: UISize): UISize {
         let widthConstraint = 0;
         let heightConstraint = 0;
 
@@ -141,7 +141,7 @@ export class UIBox extends UIViewGroup {
         return measuredSize;
     }
 
-    draw(context: UIRenderContext): void {
+    draw(context: UIRenderScope): void {
         if (this.visibility == UIViewVisiblity.Visible) {
             if (this._background && this.isLayedOut) {
                 this._background.draw(

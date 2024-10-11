@@ -1,6 +1,6 @@
-import { UIRenderContext } from "../../rendering/uiRenderContext.js";
+import { UIRenderScope } from "../../rendering/uiRenderContext.js";
 import { VerticalAlignment } from "../uiAlignment.js";
-import { UILayoutContext } from "../uiLayoutContext.js";
+import { UILayoutScope } from "../uiLayoutContext.js";
 import { UISize, fillUiSize, wrapUiSize } from "../uiSize.js";
 import { UIView } from "../uiView.js";
 import { UIViewGroup } from "../uiViewGroup.js";
@@ -48,7 +48,7 @@ export class UIRow extends UIViewGroup {
         return false;
     }
 
-    layout(context: UILayoutContext, constraints: UISize): UISize {
+    layout(context: UILayoutScope, constraints: UISize): UISize {
         const offsets: AxisPlacement[] = [];
         let measuredWidth = 0;
         let measuredHeight = 0;
@@ -151,7 +151,7 @@ export class UIRow extends UIViewGroup {
         return this._measuredSize;
     }
 
-    draw(context: UIRenderContext): void {
+    draw(context: UIRenderScope): void {
         for (const child of this.children) {
             child.draw(context);
         }

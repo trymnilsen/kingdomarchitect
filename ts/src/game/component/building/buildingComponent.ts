@@ -9,7 +9,7 @@ import {
 import { getBuildingById } from "../../../data/building/buildings.js";
 import { InventoryItemQuantity } from "../../../data/inventory/inventoryItemQuantity.js";
 import { woodResourceItem } from "../../../data/inventory/items/resources.js";
-import { RenderContext } from "../../../rendering/renderContext.js";
+import { RenderScope } from "../../../rendering/renderContext.js";
 import { EntityComponent } from "../entityComponent.js";
 import { ChunkMapComponent } from "../root/chunk/chunkMapComponent.js";
 
@@ -116,7 +116,7 @@ export class BuildingComponent extends EntityComponent {
         }
     }
 
-    override onDraw(context: RenderContext, screenPosition: Point): void {
+    override onDraw(context: RenderScope, screenPosition: Point): void {
         let sprite = this.buildingSprite;
         if (this.isScaffolded) {
             sprite = this.scaffoldSprite;

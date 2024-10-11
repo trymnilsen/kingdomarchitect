@@ -2,18 +2,18 @@ import { AssetLoader } from "../asset/loader/assetLoader.js";
 import { rgbToHex } from "../common/color.js";
 import { GameTime } from "../common/time.js";
 import { Camera } from "./camera.js";
-import { RenderContext } from "./renderContext.js";
+import { RenderScope } from "./renderContext.js";
 
 export class Renderer {
     private canvasContext: CanvasRenderingContext2D;
     private currentCamera: Camera;
-    private renderContext: RenderContext;
+    private renderContext: RenderScope;
 
     get camera(): Camera {
         return this.currentCamera;
     }
 
-    get context(): RenderContext {
+    get context(): RenderScope {
         return this.renderContext;
     }
 
@@ -30,7 +30,7 @@ export class Renderer {
         this.canvasContext.canvas.width = window.innerWidth;
         this.canvasContext.canvas.height = window.innerHeight;
         this.canvasContext.imageSmoothingEnabled = false;
-        this.renderContext = new RenderContext(
+        this.renderContext = new RenderScope(
             context,
             this.camera,
             assetLoader,

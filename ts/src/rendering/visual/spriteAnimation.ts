@@ -1,6 +1,6 @@
 import { Sprite2 } from "../../asset/sprite.js";
 import { addPoint, Point, zeroPoint } from "../../common/point.js";
-import { RenderContext } from "../renderContext.js";
+import { RenderScope } from "../renderContext.js";
 
 export class SpriteAnimation {
     private currentFrame = 0;
@@ -11,7 +11,7 @@ export class SpriteAnimation {
         this.position = point;
     }
 
-    onDraw(context: RenderContext) {
+    onDraw(context: RenderScope) {
         const worldspacePosition = addPoint(
             context.camera.tileSpaceToWorldSpace(this.position),
             {

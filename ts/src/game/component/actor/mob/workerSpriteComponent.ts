@@ -2,12 +2,12 @@ import { Sprite2, sprites2 } from "../../../../asset/sprite.js";
 import { JSONValue } from "../../../../common/object.js";
 import { Point } from "../../../../common/point.js";
 import { ItemCategory } from "../../../../data/inventory/inventoryItem.js";
-import { RenderContext } from "../../../../rendering/renderContext.js";
+import { RenderScope } from "../../../../rendering/renderContext.js";
 import { EntityComponent } from "../../entityComponent.js";
 import { EquipmentComponent } from "../../inventory/equipmentComponent.js";
 
 export class WorkerSpriteComponent extends EntityComponent {
-    override onDraw(context: RenderContext, screenPosition: Point): void {
+    override onDraw(context: RenderScope, screenPosition: Point): void {
         const sprite = this.getSprite();
         context.drawScreenSpaceSprite({
             sprite: sprite,
@@ -18,7 +18,7 @@ export class WorkerSpriteComponent extends EntityComponent {
         });
     }
 
-    private getSprite(): Sprite2 {
+    public getSprite(): Sprite2 {
         const equipment = this.entity.requireComponent(EquipmentComponent);
         const mainItem = equipment.mainItem.getItem();
         if (mainItem) {

@@ -1,4 +1,4 @@
-import { UILayoutContext } from "../uiLayoutContext.js";
+import { UILayoutScope } from "../uiLayoutContext.js";
 import { UISize, fillUiSize, wrapUiSize } from "../uiSize.js";
 import { UIView } from "../uiView.js";
 
@@ -17,7 +17,7 @@ export class UISpace extends UIView {
     hitTest(): boolean {
         return false;
     }
-    layout(_layoutContext: UILayoutContext, constraints: UISize): UISize {
+    layout(_layoutContext: UILayoutScope, constraints: UISize): UISize {
         let measuredWidth = 0;
         let measuredHeight = 0;
 

@@ -2,7 +2,7 @@ import { InvalidStateError } from "../../../common/error/invalidStateError.js";
 import { NotInitializedError } from "../../../common/error/notInitializedError.js";
 import { JSONValue } from "../../../common/object.js";
 import { Point, isPointAdjacentTo } from "../../../common/point.js";
-import { RenderContext } from "../../../rendering/renderContext.js";
+import { RenderScope } from "../../../rendering/renderContext.js";
 import { Entity } from "../../entity/entity.js";
 import { JobConstraint } from "./jobConstraint.js";
 import { JobOwner } from "./jobOwner.js";
@@ -209,7 +209,7 @@ export abstract class Job {
      * logic should consider that entity can be null and the job not started
      * @param renderContext the context to render to
      */
-    onDraw(_renderContext: RenderContext) {}
+    onDraw(_renderContext: RenderScope) {}
 
     /**
      * Request to update this job. Called when attached to an actor and running

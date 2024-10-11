@@ -1,7 +1,7 @@
 import { addPoint } from "../../common/point.js";
-import { UIRenderContext } from "../../rendering/uiRenderContext.js";
+import { UIRenderScope } from "../../rendering/uiRenderContext.js";
 import { UIBackground } from "../uiBackground.js";
-import { UILayoutContext } from "../uiLayoutContext.js";
+import { UILayoutScope } from "../uiLayoutContext.js";
 import { UISize } from "../uiSize.js";
 import { UIView } from "../uiView.js";
 
@@ -67,7 +67,7 @@ export class UIMasterDetails extends UIView {
         return !!this.background;
     }
 
-    layout(layoutContext: UILayoutContext, constraints: UISize): UISize {
+    layout(layoutContext: UILayoutScope, constraints: UISize): UISize {
         if (constraints.width < 600) {
             this._mode = UIMasterDetailsMode.Single;
             const measuredSize: UISize = {
@@ -101,7 +101,7 @@ export class UIMasterDetails extends UIView {
         }
     }
 
-    draw(context: UIRenderContext): void {
+    draw(context: UIRenderScope): void {
         if (this.isLayedOut) {
             let backgroundOffset = { x: 0, y: 0 };
             if (

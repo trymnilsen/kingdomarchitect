@@ -1,6 +1,6 @@
 import { Sprite2, emptySprite, sprites2 } from "../../../asset/sprite.js";
 import { Point, zeroPoint } from "../../../common/point.js";
-import { RenderContext } from "../../../rendering/renderContext.js";
+import { RenderScope } from "../../../rendering/renderContext.js";
 import { EntityComponent } from "../entityComponent.js";
 
 export class SpriteComponent extends EntityComponent {
@@ -19,7 +19,7 @@ export class SpriteComponent extends EntityComponent {
         this.sprite = sprite;
     }
 
-    override onDraw(context: RenderContext, screenPosition: Point): void {
+    override onDraw(context: RenderScope, screenPosition: Point): void {
         const scale = 1;
 
         let targetWidth = this.size?.x;

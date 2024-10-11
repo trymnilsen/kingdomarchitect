@@ -6,9 +6,9 @@ import {
     zeroSides,
 } from "../../common/sides.js";
 import { defaultTextStyle, TextStyle } from "../../rendering/text/textStyle.js";
-import { UIRenderContext } from "../../rendering/uiRenderContext.js";
+import { UIRenderScope } from "../../rendering/uiRenderContext.js";
 import { calculateAlignment, uiAlignment } from "../uiAlignment.js";
-import { UILayoutContext } from "../uiLayoutContext.js";
+import { UILayoutScope } from "../uiLayoutContext.js";
 import {
     fillUiSize,
     UISize,
@@ -68,7 +68,7 @@ export class UIText extends UIView {
         return this.withinViewBounds(screenPoint);
     }
 
-    layout(layoutContext: UILayoutContext, constraints: UISize): UISize {
+    layout(layoutContext: UILayoutScope, constraints: UISize): UISize {
         // Calculating the text runs can be expensive so if the constraints
         // or the text has changed we return early
         if (
@@ -90,7 +90,7 @@ export class UIText extends UIView {
         }
     }
 
-    draw(context: UIRenderContext): void {
+    draw(context: UIRenderScope): void {
         for (let i = 0; i < this._textRuns.length; i++) {
             const run = this._textRuns[i];
             context.drawScreenspaceText({
@@ -153,7 +153,7 @@ export class UIText extends UIView {
 
     private layoutMultiRunText(
         constraints: UISize,
-        layoutContext: UILayoutContext,
+        layoutContext: UILayoutScope,
     ): UISize {
         const horizontalPadding = totalHorizontal(this.padding);
         const verticalPadding = totalVertical(this.padding);

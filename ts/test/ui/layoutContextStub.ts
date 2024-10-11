@@ -1,12 +1,12 @@
 import { Sprite2 } from "../../src/asset/sprite.js";
-import { UILayoutContext } from "../../src/ui/uiLayoutContext.js";
+import { UILayoutScope } from "../../src/ui/uiLayoutContext.js";
 import { UISize } from "../../src/ui/uiSize.js";
 import { UIView } from "../../src/ui/uiView.js";
 
 /**
  * A test layout context. Implementation should not be depended upon.
  */
-export class LayoutContextStub implements UILayoutContext {
+export class LayoutContextStub implements UILayoutScope {
     measureText(): UISize {
         return { width: 0, height: 0 };
     }

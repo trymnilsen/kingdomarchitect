@@ -1,11 +1,11 @@
 import { Point } from "../../../common/point.js";
-import { RenderContext } from "../../../rendering/renderContext.js";
+import { RenderScope } from "../../../rendering/renderContext.js";
 import { RenderVisibilityMap } from "../../../rendering/renderVisibilityMap.js";
 import { EntityComponent } from "../entityComponent.js";
 
 export class MountainComponent extends EntityComponent {
     override onDraw(
-        context: RenderContext,
+        context: RenderScope,
         _screenPosition: Point,
         _visibilityMap: RenderVisibilityMap,
     ): void {

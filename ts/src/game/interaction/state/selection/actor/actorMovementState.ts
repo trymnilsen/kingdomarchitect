@@ -2,7 +2,7 @@ import { sprites2 } from "../../../../../asset/sprite.js";
 import { Point } from "../../../../../common/point.js";
 import { allSides } from "../../../../../common/sides.js";
 import { SearchedNode } from "../../../../../path/search.js";
-import { RenderContext } from "../../../../../rendering/renderContext.js";
+import { RenderScope } from "../../../../../rendering/renderContext.js";
 import { uiBox } from "../../../../../ui/dsl/uiBoxDsl.js";
 import { fillUiSize } from "../../../../../ui/uiSize.js";
 import { JobQueueComponent } from "../../../../component/job/jobQueueComponent.js";
@@ -71,7 +71,7 @@ export class ActorMovementState extends InteractionState {
         return true;
     }
 
-    override onDraw(context: RenderContext): void {
+    override onDraw(context: RenderScope): void {
         for (const pathPoint of this.path) {
             context.drawRectangle({
                 x: pathPoint.x * TileSize + 14,

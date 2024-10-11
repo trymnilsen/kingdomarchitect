@@ -1,7 +1,7 @@
 import { Point } from "../../common/point.js";
 import { zeroSides } from "../../common/sides.js";
-import { UIRenderContext } from "../../rendering/uiRenderContext.js";
-import { UILayoutContext } from "../uiLayoutContext.js";
+import { UIRenderScope } from "../../rendering/uiRenderContext.js";
+import { UILayoutScope } from "../uiLayoutContext.js";
 import { fillUiSize, UISize, zeroSize } from "../uiSize.js";
 import { UIView } from "../uiView.js";
 import { UIViewGroup } from "../uiViewGroup.js";
@@ -16,10 +16,7 @@ export class UIStack extends UIViewGroup {
         return false;
     }
 
-    override layout(
-        layoutContext: UILayoutContext,
-        constraints: UISize,
-    ): UISize {
+    override layout(layoutContext: UILayoutScope, constraints: UISize): UISize {
         if (this.children.length == 0) {
             this._measuredSize = zeroSize();
             return this._measuredSize;
@@ -90,7 +87,7 @@ export class UIStack extends UIViewGroup {
         return measuredSize;
     }
 
-    override draw(context: UIRenderContext): void {
+    override draw(context: UIRenderScope): void {
         for (const child of this.children) {
             child.draw(context);
         }

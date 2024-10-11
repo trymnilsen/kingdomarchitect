@@ -1,5 +1,5 @@
 import { sprites2 } from "../../../../asset/sprite.js";
-import { RenderContext } from "../../../../rendering/renderContext.js";
+import { RenderScope } from "../../../../rendering/renderContext.js";
 import { uiBox } from "../../../../ui/dsl/uiBoxDsl.js";
 import { fillUiSize } from "../../../../ui/uiSize.js";
 import { JobQueueComponent } from "../../../component/job/jobQueueComponent.js";
@@ -98,7 +98,7 @@ export class ChopJobState extends InteractionState {
         return true;
     }
 
-    override onDraw(context: RenderContext): void {
+    override onDraw(context: RenderScope): void {
         const selection = this.chopMode.getSelection();
         for (const cursor of selection) {
             const cursorWorldPosition = context.camera.tileSpaceToWorldSpace({

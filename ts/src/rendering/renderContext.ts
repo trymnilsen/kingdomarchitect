@@ -1,6 +1,6 @@
 import { AssetLoader } from "../asset/loader/assetLoader.js";
 import { Sprite2 } from "../asset/sprite.js";
-import { UILayoutContext } from "../ui/uiLayoutContext.js";
+import { UILayoutScope } from "../ui/uiLayoutContext.js";
 import { UISize } from "../ui/uiSize.js";
 import { Camera } from "./camera.js";
 import {
@@ -15,24 +15,31 @@ import {
 } from "./items/rectangle.js";
 import { TextConfiguration, textRenderer } from "./items/text.js";
 import { TextStyle } from "./text/textStyle.js";
-import { UIRenderContext } from "./uiRenderContext.js";
+import { UIRenderScope } from "./uiRenderContext.js";
 import { Bounds } from "../common/bounds.js";
 import { sprites } from "../../generated/sprites.js";
+import { CanvasContext } from "./canvasContext.js";
 
-export type DrawFunction = (context: RenderContext) => void;
+export type DrawFunction = (context: RenderScope) => void;
+
+// renderer -> creates render context -> holds camera, canvas context for main and offscreen -> creates scope
+// scope for offscreen and scope for main. Scope is passed to draw function and entities ++
+// scope has reference to context for creating new scope on offscreen tint call. Scope holds ref to deferred calls
+// rename render context to scope, create new context class
 
 /**
  * The rendercontext combines the access to the camera, assets and canvas
  * allowing drawing to the screen and convertion of tilespace to screenspace
  */
-export class RenderContext implements UIRenderContext, UILayoutContext {
-    private canvasContext: CanvasRenderingContext2D;
+export class RenderScope implements UIRenderScope, UILayoutScope {
+    private canvasContext: CanvasContext;
     private _camera: Camera;
     private _assetLoader: AssetLoader;
     private _deferredRenderCalls: DrawFunction[] = [];
     private _width: number;
     private _height: number;
-
+    private _offscreenCanvas: OffscreenCanvas;
+    private _offscreenContext: CanvasContext;
     /**
      * The currently active camera for the render context
      */
@@ -73,6 +80,12 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
         this._assetLoader = assetLoader;
         this._width = width;
         this._height = height;
+        this._offscreenCanvas = new OffscreenCanvas(this.width, this.height);
+        const context = this._offscreenCanvas.getContext("2d");
+        if (!context) {
+            throw new Error("Unable to get offscreen canvas");
+        }
+        this._offscreenContext = context;
     }
 
     updateSize(width: number, height: number): void {
@@ -143,6 +156,23 @@ export class RenderContext implements UIRenderContext, UILayoutContext {
             );
             this.canvasContext.clip();
             drawFunction(this);
+        } finally {
+            this.canvasContext.restore();
+        }
+    }
+
+    drawWithTint(
+        mode: GlobalCompositeOperation,
+        source: DrawFunction,
+        color: string,
+    ): void {
+        this._offscreenContext.clearRect(0, 0, this._width, this._height);
+        const bitmap = this._offscreenCanvas.transferToImageBitmap();
+
+        try {
+            this.canvasContext.drawImage(bitmap, 0, 0);
+            this.canvasContext.save();
+            this.canvasContext.globalCompositeOperation = mode;
         } finally {
             this.canvasContext.restore();
         }

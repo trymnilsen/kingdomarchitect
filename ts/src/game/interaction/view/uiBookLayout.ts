@@ -2,14 +2,14 @@ import { Sprite2, sprites2 } from "../../../asset/sprite.js";
 import { Point, addPoint } from "../../../common/point.js";
 import { allSides } from "../../../common/sides.js";
 import { uiDebug } from "../../../constants.js";
-import { UIRenderContext } from "../../../rendering/uiRenderContext.js";
+import { UIRenderScope } from "../../../rendering/uiRenderContext.js";
 import { ninePatchBackground } from "../../../ui/dsl/uiBackgroundDsl.js";
 import { uiButton } from "../../../ui/dsl/uiButtonDsl.js";
 import { ColumnChild, uiColumn } from "../../../ui/dsl/uiColumnDsl.js";
 import { spriteImageSource, uiImage } from "../../../ui/dsl/uiImageDsl.js";
 import { uiSpace } from "../../../ui/dsl/uiSpaceDsl.js";
 import { HorizontalAlignment, uiAlignment } from "../../../ui/uiAlignment.js";
-import { UILayoutContext } from "../../../ui/uiLayoutContext.js";
+import { UILayoutScope } from "../../../ui/uiLayoutContext.js";
 import { UISize, wrapUiSize, zeroSize } from "../../../ui/uiSize.js";
 import { UIView } from "../../../ui/uiView.js";
 import { NullView } from "../../../ui/view/nullView.js";
@@ -145,10 +145,7 @@ export class UIBookLayout extends UIView {
         return false;
     }
 
-    override layout(
-        layoutContext: UILayoutContext,
-        constraints: UISize,
-    ): UISize {
+    override layout(layoutContext: UILayoutScope, constraints: UISize): UISize {
         const availableSize = {
             width: constraints.width - horizontalPadding * 2,
             height: constraints.height - verticalPadding * 2,
@@ -214,7 +211,7 @@ export class UIBookLayout extends UIView {
         return size;
     }
 
-    override draw(context: UIRenderContext): void {
+    override draw(context: UIRenderScope): void {
         if (!this._measuredSize) {
             throw new Error("Measured size is not set, cannot draw");
         }

@@ -1,5 +1,6 @@
 import { Sprite2 } from "../../asset/sprite.js";
 import { Sides } from "../../common/sides.js";
+import { CanvasContext } from "../canvasContext.js";
 import { RenderItemConfiguration } from "./renderItemConfiguration.js";
 
 export type SpriteConfiguration = {
@@ -28,7 +29,7 @@ export function spriteRenderer(
     targetHeight: number,
     frame: number,
     binAsset: HTMLImageElement,
-    context: CanvasRenderingContext2D,
+    context: CanvasContext,
 ) {
     x = Math.floor(x);
     y = Math.floor(y);
@@ -84,7 +85,7 @@ export function ninePatchImageRenderer(
     right: number,
     scale: number,
     binAsset: HTMLImageElement,
-    context: CanvasRenderingContext2D,
+    context: CanvasContext,
 ) {
     x = Math.floor(x);
     y = Math.floor(y);

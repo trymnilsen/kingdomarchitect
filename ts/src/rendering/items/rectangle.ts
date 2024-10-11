@@ -1,3 +1,4 @@
+import { CanvasContext } from "../canvasContext.js";
 import { RenderItemConfiguration } from "./renderItemConfiguration.js";
 
 export type RectangleConfiguration = {
@@ -10,7 +11,7 @@ export type RectangleConfiguration = {
 
 export function rectangleRenderer(
     config: RectangleConfiguration,
-    context: CanvasRenderingContext2D,
+    context: CanvasContext,
 ) {
     if (config.fill) {
         context.fillStyle = config.fill;

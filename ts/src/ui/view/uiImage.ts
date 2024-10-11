@@ -1,6 +1,6 @@
 import { Point } from "../../common/point.js";
-import { UIRenderContext } from "../../rendering/uiRenderContext.js";
-import { UILayoutContext } from "../uiLayoutContext.js";
+import { UIRenderScope } from "../../rendering/uiRenderContext.js";
+import { UILayoutScope } from "../uiLayoutContext.js";
 import { UISize, fillUiSize, wrapUiSize } from "../uiSize.js";
 import { UIView } from "../uiView.js";
 import { UIImageSource } from "./uiImageSource.js";
@@ -30,7 +30,7 @@ export class UIImage extends UIView {
         return this.withinViewBounds(screenPoint);
     }
 
-    layout(layoutContext: UILayoutContext, constraints: UISize): UISize {
+    layout(layoutContext: UILayoutScope, constraints: UISize): UISize {
         if (!this._image) {
             return constraints;
         }
@@ -75,7 +75,7 @@ export class UIImage extends UIView {
 
         return measuredSize;
     }
-    draw(context: UIRenderContext): void {
+    draw(context: UIRenderScope): void {
         this._image?.draw(context, this.screenPosition, this._imageDrawSize);
     }
     isInteractable(): boolean {

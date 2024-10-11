@@ -6,7 +6,7 @@ import {
     InputActionType,
     getDirectionFromInputType,
 } from "../../../input/inputAction.js";
-import { RenderContext } from "../../../rendering/renderContext.js";
+import { RenderScope } from "../../../rendering/renderContext.js";
 import { UIEvent } from "../../../ui/event/uiEvent.js";
 import { FocusGroup } from "../../../ui/focus/focusGroup.js";
 import { FocusState } from "../../../ui/focus/focusState.js";
@@ -179,7 +179,7 @@ export abstract class InteractionState {
      * needs a consistent update cycle should be called in onUpdate
      * @param context Render context with access to camera and drawing methods
      */
-    onDraw(context: RenderContext): void {
+    onDraw(context: RenderScope): void {
         if (this._view) {
             //const start = performance.now();
             if (this._view.isDirty) {
@@ -246,7 +246,7 @@ export abstract class InteractionState {
         return consumedInput;
     }
 
-    private drawFocus(context: RenderContext) {
+    private drawFocus(context: RenderScope) {
         const currentFocusGroup = this.getCurrentFocusGroup();
         if (!currentFocusGroup) {
             return;

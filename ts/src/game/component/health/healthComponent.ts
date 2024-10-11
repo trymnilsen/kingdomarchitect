@@ -3,7 +3,7 @@ import {
     NumberRange,
     zeroRange as zeroNumberRange,
 } from "../../../common/range.js";
-import { RenderContext } from "../../../rendering/renderContext.js";
+import { RenderScope } from "../../../rendering/renderContext.js";
 import { Entity } from "../../entity/entity.js";
 import { EntityComponent } from "../entityComponent.js";
 import { HealthEvent } from "./healthEvent.js";
@@ -98,7 +98,7 @@ export class HealthComponent extends EntityComponent {
         }
     }
 
-    override onDraw(context: RenderContext, screenPosition: Point): void {
+    override onDraw(context: RenderScope, screenPosition: Point): void {
         if (
             this._health > this._showHealthBarThreshold.min &&
             this._health < this._showHealthBarThreshold.max

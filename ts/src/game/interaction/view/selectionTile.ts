@@ -5,7 +5,7 @@ import {
     subTitleTextStyle,
     titleTextStyle,
 } from "../../../rendering/text/textStyle.js";
-import { UIRenderContext } from "../../../rendering/uiRenderContext.js";
+import { UIRenderScope } from "../../../rendering/uiRenderContext.js";
 import { bookFill, bookInkColor, stoneFill } from "../../../ui/color.js";
 import {
     boxBackground,
@@ -19,7 +19,7 @@ import { uiRow } from "../../../ui/dsl/uiRowDsl.js";
 import { uiSpace } from "../../../ui/dsl/uiSpaceDsl.js";
 import { uiText } from "../../../ui/dsl/uiTextDsl.js";
 import { HorizontalAlignment } from "../../../ui/uiAlignment.js";
-import { UILayoutContext } from "../../../ui/uiLayoutContext.js";
+import { UILayoutScope } from "../../../ui/uiLayoutContext.js";
 import {
     fillUiSize,
     UISize,
@@ -111,10 +111,7 @@ export class SelectionTile extends UIBox {
         );
     }
 
-    override layout(
-        layoutContext: UILayoutContext,
-        constraints: UISize,
-    ): UISize {
+    override layout(layoutContext: UILayoutScope, constraints: UISize): UISize {
         if (this.visibility != UIViewVisiblity.Hidden) {
             const layoutResult = super.layout(layoutContext, constraints);
             this._measuredSize = layoutResult;
@@ -124,7 +121,7 @@ export class SelectionTile extends UIBox {
         }
     }
 
-    override draw(context: UIRenderContext): void {
+    override draw(context: UIRenderScope): void {
         if (this.visibility == UIViewVisiblity.Visible) {
             super.draw(context);
         }

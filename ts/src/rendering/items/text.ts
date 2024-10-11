@@ -23,6 +23,7 @@ export class TextVisual extends RenderNode {
 }
  */
 
+import { CanvasContext } from "../canvasContext.js";
 import { RenderItemConfiguration } from "./renderItemConfiguration.js";
 
 export type TextConfiguration = {
@@ -37,7 +38,7 @@ export type TextConfiguration = {
 
 export function configureText(
     renderItem: TextConfiguration,
-    context: CanvasRenderingContext2D,
+    context: CanvasContext,
 ) {
     let fontString = `${renderItem.size}px ${renderItem.font}`;
     //let alignOffset = 0;
@@ -60,7 +61,7 @@ export function configureText(
 
 export function textRenderer(
     renderItem: TextConfiguration,
-    context: CanvasRenderingContext2D,
+    context: CanvasContext,
 ) {
     configureText(renderItem, context);
     context.fillText(

@@ -1,5 +1,5 @@
-import { UIRenderContext } from "../../rendering/uiRenderContext.js";
-import { UILayoutContext } from "../uiLayoutContext.js";
+import { UIRenderScope } from "../../rendering/uiRenderContext.js";
+import { UILayoutScope } from "../uiLayoutContext.js";
 import { fillUiSize, UISize, wrapUiSize } from "../uiSize.js";
 import { UIViewGroup } from "../uiViewGroup.js";
 
@@ -32,7 +32,7 @@ export class UIFlowGrid extends UIViewGroup {
         //This layout itself is not interactable, only its children
         return false;
     }
-    layout(layoutContext: UILayoutContext, constraints: UISize): UISize {
+    layout(layoutContext: UILayoutScope, constraints: UISize): UISize {
         if (
             constraints.width < this._gridItemMinimumSize ||
             constraints.height < this._gridItemMinimumSize
@@ -100,7 +100,7 @@ export class UIFlowGrid extends UIViewGroup {
         this._measuredSize = measuredSize;
         return measuredSize;
     }
-    draw(context: UIRenderContext): void {
+    draw(context: UIRenderScope): void {
         for (const child of this.children) {
             child.draw(context);
         }

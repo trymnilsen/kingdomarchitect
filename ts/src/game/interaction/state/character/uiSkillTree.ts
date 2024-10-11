@@ -7,8 +7,8 @@ import {
     SkillTree,
 } from "../../../../data/skill/skill.js";
 import { skills } from "../../../../data/skill/skills.js";
-import { UIRenderContext } from "../../../../rendering/uiRenderContext.js";
-import { UILayoutContext } from "../../../../ui/uiLayoutContext.js";
+import { UIRenderScope } from "../../../../rendering/uiRenderContext.js";
+import { UILayoutScope } from "../../../../ui/uiLayoutContext.js";
 import { UISize } from "../../../../ui/uiSize.js";
 import { UIView } from "../../../../ui/uiView.js";
 
@@ -29,7 +29,7 @@ export class UISkillTree extends UIView {
     hitTest(): boolean {
         return true;
     }
-    layout(_layoutContext: UILayoutContext, constraints: UISize): UISize {
+    layout(_layoutContext: UILayoutScope, constraints: UISize): UISize {
         this._measuredSize = {
             width: constraints.width,
             height: constraints.height,
@@ -45,7 +45,7 @@ export class UISkillTree extends UIView {
         return this._measuredSize;
     }
 
-    draw(context: UIRenderContext): void {
+    draw(context: UIRenderScope): void {
         const bounds = {
             x1: this.screenPosition.x + this.drawBounds.x1,
             y1: this.screenPosition.y + this.drawBounds.y1,
@@ -99,7 +99,7 @@ export class UISkillTree extends UIView {
     }
 
     private drawSkillCategory(
-        context: UIRenderContext,
+        context: UIRenderScope,
         screenPositionWithScrollTranslation: Point,
         skills: SkillTree,
         category: SkillCategory,

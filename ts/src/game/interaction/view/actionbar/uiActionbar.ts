@@ -1,8 +1,8 @@
 import { Sprite2 } from "../../../../asset/sprite.js";
 import { Point } from "../../../../common/point.js";
-import { UIRenderContext } from "../../../../rendering/uiRenderContext.js";
+import { UIRenderScope } from "../../../../rendering/uiRenderContext.js";
 import { UIBackground } from "../../../../ui/uiBackground.js";
-import { UILayoutContext } from "../../../../ui/uiLayoutContext.js";
+import { UILayoutScope } from "../../../../ui/uiLayoutContext.js";
 import { UISize } from "../../../../ui/uiSize.js";
 import { UIView } from "../../../../ui/uiView.js";
 import { UIActionbarButton } from "./uiActionbarButton.js";
@@ -46,10 +46,7 @@ export class UIActionbar extends UIView {
     override hitTest(): boolean {
         return false;
     }
-    override layout(
-        layoutContext: UILayoutContext,
-        constraints: UISize,
-    ): UISize {
+    override layout(layoutContext: UILayoutScope, constraints: UISize): UISize {
         let usedWidth = 0;
         for (const child of this.children) {
             const constraint = {
@@ -71,7 +68,7 @@ export class UIActionbar extends UIView {
 
         return this._measuredSize;
     }
-    override draw(context: UIRenderContext): void {
+    override draw(context: UIRenderScope): void {
         for (const child of this.children) {
             child.draw(context);
         }

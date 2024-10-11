@@ -1,8 +1,8 @@
 import { Point, addPoint, zeroPoint } from "../../../common/point.js";
 import { titleTextStyle } from "../../../rendering/text/textStyle.js";
-import { UIRenderContext } from "../../../rendering/uiRenderContext.js";
+import { UIRenderScope } from "../../../rendering/uiRenderContext.js";
 import { bookInkColor } from "../../../ui/color.js";
-import { UILayoutContext } from "../../../ui/uiLayoutContext.js";
+import { UILayoutScope } from "../../../ui/uiLayoutContext.js";
 import { UISize } from "../../../ui/uiSize.js";
 import { UIBox } from "./../../../ui/view/uiBox.js";
 
@@ -30,10 +30,7 @@ export class UIBorderTitle extends UIBox {
         throw new Error("Method not implemented.");
     }
 
-    override layout(
-        layoutContext: UILayoutContext,
-        constraints: UISize,
-    ): UISize {
+    override layout(layoutContext: UILayoutScope, constraints: UISize): UISize {
         const titleSize = layoutContext.measureText(
             this._title,
             titleTextStyle,
@@ -85,7 +82,7 @@ export class UIBorderTitle extends UIBox {
         return boxSize;
     }
 
-    override draw(context: UIRenderContext): void {
+    override draw(context: UIRenderScope): void {
         super.draw(context);
         if (!this._measuredSize) {
             throw new Error("UIBorderTitle must be measured before drawing");

@@ -4,7 +4,7 @@ import { GameTime } from "../../../common/time.js";
 import { InputAction, InputActionType } from "../../../input/inputAction.js";
 import { OnTapEndEvent } from "../../../input/touchInput.js";
 import { Camera } from "../../../rendering/camera.js";
-import { RenderContext } from "../../../rendering/renderContext.js";
+import { RenderScope } from "../../../rendering/renderContext.js";
 import { ChunkMapComponent } from "../../component/root/chunk/chunkMapComponent.js";
 import { TilesComponent } from "../../component/tile/tilesComponent.js";
 import { Entity } from "../../entity/entity.js";
@@ -182,7 +182,7 @@ export class InteractionHandler {
         this.history.state.onUpdate(tick);
     }
 
-    onDraw(renderContext: RenderContext) {
+    onDraw(renderContext: RenderScope) {
         if (this.history.state.isModal) {
             renderContext.drawScreenSpaceRectangle({
                 x: 0,
