@@ -1,6 +1,6 @@
 import { sprites2 } from "../../../asset/sprite.js";
 import { Point } from "../../../common/point.js";
-import { RenderScope } from "../../../rendering/renderContext.js";
+import { RenderScope } from "../../../rendering/renderScope.js";
 import { EntityComponent } from "../entityComponent.js";
 import { HealthComponent } from "../health/healthComponent.js";
 

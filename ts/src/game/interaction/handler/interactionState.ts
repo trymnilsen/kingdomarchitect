@@ -6,7 +6,7 @@ import {
     InputActionType,
     getDirectionFromInputType,
 } from "../../../input/inputAction.js";
-import { RenderScope } from "../../../rendering/renderContext.js";
+import { RenderScope } from "../../../rendering/renderScope.js";
 import { UIEvent } from "../../../ui/event/uiEvent.js";
 import { FocusGroup } from "../../../ui/focus/focusGroup.js";
 import { FocusState } from "../../../ui/focus/focusState.js";

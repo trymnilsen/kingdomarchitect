@@ -1,6 +1,6 @@
 import { sprites2 } from "../../../../asset/sprite.js";
 import { woodResourceItem } from "../../../../data/inventory/items/resources.js";
-import { RenderScope } from "../../../../rendering/renderContext.js";
+import { RenderScope } from "../../../../rendering/renderScope.js";
 import { BlinkingImageAnimation } from "../../../../rendering/visual/blinkingImageAnimation.js";
 import { HealthComponent } from "../../../component/health/healthComponent.js";
 import { InventoryComponent2 } from "../../../component/inventory/inventoryComponent.js";

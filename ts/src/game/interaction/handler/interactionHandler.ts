@@ -4,7 +4,7 @@ import { GameTime } from "../../../common/time.js";
 import { InputAction, InputActionType } from "../../../input/inputAction.js";
 import { OnTapEndEvent } from "../../../input/touchInput.js";
 import { Camera } from "../../../rendering/camera.js";
-import { RenderScope } from "../../../rendering/renderContext.js";
+import { RenderScope } from "../../../rendering/renderScope.js";
 import { ChunkMapComponent } from "../../component/root/chunk/chunkMapComponent.js";
 import { TilesComponent } from "../../component/tile/tilesComponent.js";
 import { Entity } from "../../entity/entity.js";

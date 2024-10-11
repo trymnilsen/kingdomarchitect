@@ -2,7 +2,7 @@ import { Sprite2 } from "../../../asset/sprite.js";
 import { Point } from "../../../common/point.js";
 import { InventoryItem } from "../../../data/inventory/inventoryItem.js";
 import { CraftingOutputTag } from "../../../data/inventory/inventoryItemQuantity.js";
-import { RenderScope } from "../../../rendering/renderContext.js";
+import { RenderScope } from "../../../rendering/renderScope.js";
 import { RenderVisibilityMap } from "../../../rendering/renderVisibilityMap.js";
 import { EntityComponent } from "../entityComponent.js";
 import { InventoryComponent2 } from "./inventoryComponent.js";

@@ -1,6 +1,6 @@
 import { Sprite2, emptySprite, sprites2 } from "../../../asset/sprite.js";
 import { Point, zeroPoint } from "../../../common/point.js";
-import { RenderScope } from "../../../rendering/renderContext.js";
+import { RenderScope } from "../../../rendering/renderScope.js";
 import { EntityComponent } from "../entityComponent.js";
 
 export class SpriteComponent extends EntityComponent {

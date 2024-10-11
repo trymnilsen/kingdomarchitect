@@ -2,7 +2,7 @@ import { InvalidStateError } from "../../../common/error/invalidStateError.js";
 import { NotInitializedError } from "../../../common/error/notInitializedError.js";
 import { JSONValue } from "../../../common/object.js";
 import { Point, isPointAdjacentTo } from "../../../common/point.js";
-import { RenderScope } from "../../../rendering/renderContext.js";
+import { RenderScope } from "../../../rendering/renderScope.js";
 import { Entity } from "../../entity/entity.js";
 import { JobConstraint } from "./jobConstraint.js";
 import { JobOwner } from "./jobOwner.js";

@@ -9,7 +9,7 @@ import {
 import { getBuildingById } from "../../../data/building/buildings.js";
 import { InventoryItemQuantity } from "../../../data/inventory/inventoryItemQuantity.js";
 import { woodResourceItem } from "../../../data/inventory/items/resources.js";
-import { RenderScope } from "../../../rendering/renderContext.js";
+import { RenderScope } from "../../../rendering/renderScope.js";
 import { EntityComponent } from "../entityComponent.js";
 import { ChunkMapComponent } from "../root/chunk/chunkMapComponent.js";
 

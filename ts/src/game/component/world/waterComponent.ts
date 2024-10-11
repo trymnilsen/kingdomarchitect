@@ -1,5 +1,5 @@
 import { Point } from "../../../common/point.js";
-import { RenderScope } from "../../../rendering/renderContext.js";
+import { RenderScope } from "../../../rendering/renderScope.js";
 import { RenderVisibilityMap } from "../../../rendering/renderVisibilityMap.js";
 import { EntityComponent } from "../entityComponent.js";
 

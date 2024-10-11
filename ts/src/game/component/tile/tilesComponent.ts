@@ -1,7 +1,7 @@
 import { sprites2 } from "../../../asset/sprite.js";
 import { Bounds } from "../../../common/bounds.js";
 import { Point } from "../../../common/point.js";
-import { RenderScope } from "../../../rendering/renderContext.js";
+import { RenderScope } from "../../../rendering/renderScope.js";
 import { RenderVisibilityMap } from "../../../rendering/renderVisibilityMap.js";
 import { BiomeType, biomes } from "../../map/biome/biome.js";
 import { ChunkSize, getChunkId, getChunkPosition } from "../../map/chunk.js";

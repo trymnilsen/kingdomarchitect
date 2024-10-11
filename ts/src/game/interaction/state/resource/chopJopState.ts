@@ -1,5 +1,5 @@
 import { sprites2 } from "../../../../asset/sprite.js";
-import { RenderScope } from "../../../../rendering/renderContext.js";
+import { RenderScope } from "../../../../rendering/renderScope.js";
 import { uiBox } from "../../../../ui/dsl/uiBoxDsl.js";
 import { fillUiSize } from "../../../../ui/uiSize.js";
 import { JobQueueComponent } from "../../../component/job/jobQueueComponent.js";

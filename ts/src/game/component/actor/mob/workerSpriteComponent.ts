@@ -2,7 +2,7 @@ import { Sprite2, sprites2 } from "../../../../asset/sprite.js";
 import { JSONValue } from "../../../../common/object.js";
 import { Point } from "../../../../common/point.js";
 import { ItemCategory } from "../../../../data/inventory/inventoryItem.js";
-import { RenderScope } from "../../../../rendering/renderContext.js";
+import { RenderScope } from "../../../../rendering/renderScope.js";
 import { EntityComponent } from "../../entityComponent.js";
 import { EquipmentComponent } from "../../inventory/equipmentComponent.js";
 

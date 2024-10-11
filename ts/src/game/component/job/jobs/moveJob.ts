@@ -1,5 +1,5 @@
 import { Point } from "../../../../common/point.js";
-import { RenderScope } from "../../../../rendering/renderContext.js";
+import { RenderScope } from "../../../../rendering/renderScope.js";
 import { Entity } from "../../../entity/entity.js";
 import { TileSize } from "../../../map/tile.js";
 import { IsInstanceJobConstraint } from "../constraint/isInstanceJobConstraint.js";

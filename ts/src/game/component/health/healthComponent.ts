@@ -3,7 +3,7 @@ import {
     NumberRange,
     zeroRange as zeroNumberRange,
 } from "../../../common/range.js";
-import { RenderScope } from "../../../rendering/renderContext.js";
+import { RenderScope } from "../../../rendering/renderScope.js";
 import { Entity } from "../../entity/entity.js";
 import { EntityComponent } from "../entityComponent.js";
 import { HealthEvent } from "./healthEvent.js";

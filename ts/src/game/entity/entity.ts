@@ -15,7 +15,7 @@ import {
     zeroPoint,
 } from "../../common/point.js";
 import { GameTime } from "../../common/time.js";
-import { RenderScope } from "../../rendering/renderContext.js";
+import { RenderScope } from "../../rendering/renderScope.js";
 import { RenderVisibilityMap } from "../../rendering/renderVisibilityMap.js";
 import { ComponentEvent } from "../component/componentEvent.js";
 import { ComponentQueryCache } from "../component/componentQueryCache.js";

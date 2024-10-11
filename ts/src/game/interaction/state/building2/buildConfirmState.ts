@@ -3,7 +3,7 @@ import { Point } from "../../../../common/point.js";
 import { allSides } from "../../../../common/sides.js";
 import { Building } from "../../../../data/building/building.js";
 import { woodResourceItem } from "../../../../data/inventory/items/resources.js";
-import { RenderScope } from "../../../../rendering/renderContext.js";
+import { RenderScope } from "../../../../rendering/renderScope.js";
 import { uiBox } from "../../../../ui/dsl/uiBoxDsl.js";
 import { fillUiSize } from "../../../../ui/uiSize.js";
 import { BuildingComponent } from "../../../component/building/buildingComponent.js";

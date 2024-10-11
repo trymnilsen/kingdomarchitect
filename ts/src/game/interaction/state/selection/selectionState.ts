@@ -1,6 +1,6 @@
 import { sprites2 } from "../../../../asset/sprite.js";
 import { allSides } from "../../../../common/sides.js";
-import { RenderScope } from "../../../../rendering/renderContext.js";
+import { RenderScope } from "../../../../rendering/renderScope.js";
 import { SelectionInfo } from "../../../component/selection/selectionInfo.js";
 import { SelectionInfoComponent } from "../../../component/selection/selectionInfoComponent.js";
 import { TileSize } from "../../../map/tile.js";

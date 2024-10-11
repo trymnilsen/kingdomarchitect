@@ -2,7 +2,7 @@ import { AssetLoader } from "../asset/loader/assetLoader.js";
 import { rgbToHex } from "../common/color.js";
 import { GameTime } from "../common/time.js";
 import { Camera } from "./camera.js";
-import { RenderScope } from "./renderContext.js";
+import { RenderScope } from "./renderScope.js";
 
 export class Renderer {
     private canvasContext: CanvasRenderingContext2D;

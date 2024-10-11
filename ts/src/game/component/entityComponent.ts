@@ -1,6 +1,6 @@
 import { JSONValue } from "../../common/object.js";
 import { Point } from "../../common/point.js";
-import { RenderScope } from "../../rendering/renderContext.js";
+import { RenderScope } from "../../rendering/renderScope.js";
 import { RenderVisibilityMap } from "../../rendering/renderVisibilityMap.js";
 import { Entity } from "../entity/entity.js";
 import { ComponentEvent } from "./componentEvent.js";

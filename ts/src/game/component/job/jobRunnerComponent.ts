@@ -1,6 +1,6 @@
 import { Point } from "../../../common/point.js";
 import { jobDebug } from "../../../constants.js";
-import { RenderScope } from "../../../rendering/renderContext.js";
+import { RenderScope } from "../../../rendering/renderScope.js";
 import { EntityComponent } from "../entityComponent.js";
 import { Job } from "./job.js";
 import { JobOwner } from "./jobOwner.js";

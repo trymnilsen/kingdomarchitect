@@ -1,6 +1,6 @@
 import { Point } from "../../common/point.js";
 import { TileSize } from "../../game/map/tile.js";
-import { RenderScope } from "../renderContext.js";
+import { RenderScope } from "../renderScope.js";
 import { RenderVisual } from "../renderVisual.js";
 
 export class RoadVisual implements RenderVisual {
