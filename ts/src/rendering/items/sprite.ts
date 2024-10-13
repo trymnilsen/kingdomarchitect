@@ -8,6 +8,7 @@ export type SpriteConfiguration = {
     frame?: number;
     targetWidth?: number;
     targetHeight?: number;
+    tint?: string;
 } & RenderItemConfiguration;
 
 export type NinePatchSpriteConfiguration = {
@@ -28,7 +29,7 @@ export function spriteRenderer(
     targetWidth: number,
     targetHeight: number,
     frame: number,
-    binAsset: HTMLImageElement,
+    binAsset: CanvasImageSource,
     context: CanvasContext,
 ) {
     x = Math.floor(x);

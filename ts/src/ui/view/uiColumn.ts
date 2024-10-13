@@ -71,6 +71,10 @@ export class UIColumn extends UIViewGroup {
             const layoutSize = child.layout(context, constraints);
             const newTotalHeight = measuredHeight + layoutSize.height;
             if (newTotalHeight > constraints.height) {
+                console.log(
+                    `Attempted to layout column with not enough space constraints: ${constraints.height} newTotal: ${newTotalHeight} children: ${this.children.length} i: ${i}`,
+                );
+
                 throw new Error("Non weighted column children height overflow");
             }
 

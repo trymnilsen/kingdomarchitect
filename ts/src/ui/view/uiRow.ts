@@ -68,7 +68,10 @@ export class UIRow extends UIViewGroup {
             const layoutSize = child.layout(context, constraints);
             const newTotalWidth = measuredWidth + layoutSize.width;
             if (newTotalWidth > constraints.width) {
-                throw new Error("Non weighted column children width overflow");
+                console.log(
+                    `Attempted to layout row with not enough space constraints: ${constraints.width} newTotal: ${newTotalWidth} children: ${this.children.length} i: ${i}`,
+                );
+                throw new Error(`Non weighted row children width overflow`);
             }
 
             // Set the offset of this item to the total measure height of past

@@ -19,6 +19,7 @@ import { UIRenderScope } from "./uiRenderContext.js";
 import { Bounds } from "../common/bounds.js";
 import { sprites } from "../../generated/sprites.js";
 import { CanvasContext } from "./canvasContext.js";
+import { SpriteCache } from "./spriteCache.js";
 
 export type DrawFunction = (context: RenderScope) => void;
 
@@ -33,6 +34,7 @@ export type DrawFunction = (context: RenderScope) => void;
  */
 export class RenderScope implements UIRenderScope, UILayoutScope {
     private canvasContext: CanvasContext;
+    private spriteCache: SpriteCache;
     private _camera: Camera;
     private _assetLoader: AssetLoader;
     private _deferredRenderCalls: DrawFunction[] = [];
@@ -72,9 +74,11 @@ export class RenderScope implements UIRenderScope, UILayoutScope {
         canvasContext: CanvasRenderingContext2D,
         camera: Camera,
         assetLoader: AssetLoader,
+        spriteCache: SpriteCache,
         width: number,
         height: number,
     ) {
+        this.spriteCache = spriteCache;
         this.canvasContext = canvasContext;
         this._camera = camera;
         this._assetLoader = assetLoader;
@@ -161,23 +165,6 @@ export class RenderScope implements UIRenderScope, UILayoutScope {
         }
     }
 
-    drawWithTint(
-        mode: GlobalCompositeOperation,
-        source: DrawFunction,
-        color: string,
-    ): void {
-        this._offscreenContext.clearRect(0, 0, this._width, this._height);
-        const bitmap = this._offscreenCanvas.transferToImageBitmap();
-
-        try {
-            this.canvasContext.drawImage(bitmap, 0, 0);
-            this.canvasContext.save();
-            this.canvasContext.globalCompositeOperation = mode;
-        } finally {
-            this.canvasContext.restore();
-        }
-    }
-
     drawDeferred(drawFunction: DrawFunction): void {
         this._deferredRenderCalls.push(drawFunction);
     }
@@ -220,6 +207,7 @@ export class RenderScope implements UIRenderScope, UILayoutScope {
         const transformedConfiguration = Object.assign({}, sprite);
         transformedConfiguration.x = transformedX;
         transformedConfiguration.y = transformedY;
+
         this.drawScreenSpaceSprite(transformedConfiguration);
     }
 
@@ -242,19 +230,77 @@ export class RenderScope implements UIRenderScope, UILayoutScope {
         if (sprite.frame) {
             frame = sprite.frame;
         }
-        spriteRenderer(
-            sprite.x,
-            sprite.y,
-            spriteBounds.x,
-            spriteBounds.y,
-            spriteBounds.w,
-            spriteBounds.h,
-            targetWidth,
-            targetHeight,
-            frame,
-            this._assetLoader.getBinAsset(sprite.sprite.bin),
-            this.canvasContext,
-        );
+
+        if (!!sprite.tint) {
+            // If we are tinting the sprite we first need to draw it to an
+            // offscreen canvas. We can use compositing to change the color
+            // and then save it as an image. This image will be used with the
+            // sprite renderer method rather than the "raw" sprite
+            let cachedBitmap = this.spriteCache.getSprite(sprite);
+            if (!cachedBitmap) {
+                const offscreenCanvas = new OffscreenCanvas(
+                    targetWidth,
+                    targetHeight,
+                );
+
+                const context = offscreenCanvas.getContext("2d");
+
+                if (!context) {
+                    console.error("No context available, cannot tint");
+                    return;
+                }
+                context.imageSmoothingEnabled = false;
+
+                context.fillStyle = sprite.tint;
+                context.fillRect(0, 0, targetWidth, targetHeight);
+                context.globalCompositeOperation = "destination-in";
+                spriteRenderer(
+                    0,
+                    0,
+                    spriteBounds.x,
+                    spriteBounds.y,
+                    spriteBounds.w,
+                    spriteBounds.h,
+                    targetWidth,
+                    targetHeight,
+                    frame,
+                    this._assetLoader.getBinAsset(sprite.sprite.bin),
+                    context,
+                );
+
+                const bitmap = offscreenCanvas.transferToImageBitmap();
+                this.spriteCache.setSprite(bitmap, sprite);
+                cachedBitmap = bitmap;
+            }
+
+            spriteRenderer(
+                sprite.x,
+                sprite.y,
+                0,
+                0,
+                targetWidth,
+                targetHeight,
+                targetWidth,
+                targetHeight,
+                frame,
+                cachedBitmap,
+                this.canvasContext,
+            );
+        } else {
+            spriteRenderer(
+                sprite.x,
+                sprite.y,
+                spriteBounds.x,
+                spriteBounds.y,
+                spriteBounds.w,
+                spriteBounds.h,
+                targetWidth,
+                targetHeight,
+                frame,
+                this._assetLoader.getBinAsset(sprite.sprite.bin),
+                this.canvasContext,
+            );
+        }
     }
 
     /**
