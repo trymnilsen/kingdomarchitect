@@ -39,11 +39,12 @@ export class InteractionHandler {
         camera: Camera,
         assets: AssetLoader,
         time: GameTime,
+        visibilityChange: () => void,
     ) {
         this.statusbar = new InteractionHandlerStatusbarPresenter(
             "sdfsdfdasfsd",
             () => {
-                console.log("fooo");
+                visibilityChange();
             },
         );
         this.interactionStateChanger = new CommitableInteractionStateChanger();

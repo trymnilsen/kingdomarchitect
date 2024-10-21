@@ -91,7 +91,7 @@ function createTilesForBiomes(biomeMap: BiomeMap, rootEntity: Entity) {
                     tileY: biomeMap.point.y * 32 + y,
                     type: biomeMap.type,
                 },
-                true,
+                false,
             );
         }
     }

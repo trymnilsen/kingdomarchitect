@@ -117,6 +117,13 @@ export class TilesComponent extends EntityComponent implements Ground {
         });
     }
 
+    discoverTile(tilePosition: Point) {
+        const tileId = getTileId(tilePosition.x, tilePosition.y);
+        if (!!this.tileMap[tileId]) {
+            this.discoveredTiles[tileId] = true;
+        }
+    }
+
     setTile(tile: GroundTile, discovered: boolean = false) {
         const tileId = getTileId(tile.tileX, tile.tileY);
         this.tileMap[tileId] = tile;
@@ -146,7 +153,7 @@ export class TilesComponent extends EntityComponent implements Ground {
     ): void {
         for (const tileId in this.tileMap) {
             const tile = this.tileMap[tileId];
-            if (!!this.discoveredTiles[tileId]) {
+            if (!visiblityMap.useVisibility || !!this.discoveredTiles[tileId]) {
                 const tilePosition = {
                     x: tile.tileX,
                     y: tile.tileY,

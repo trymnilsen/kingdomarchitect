@@ -1,6 +1,16 @@
 import { Point } from "../common/point.js";
 
 export class RenderVisibilityMap {
+    private _useVisibility = true;
+
+    public get useVisibility(): boolean {
+        return this._useVisibility;
+    }
+
+    public set useVisibility(v: boolean) {
+        this._useVisibility = v;
+    }
+
     private visibilityMap = new Map<string, boolean>();
     isVisible(point: Point) {
         const pointId = this.pointId(point);

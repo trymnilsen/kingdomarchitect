@@ -74,6 +74,10 @@ export class Game {
             this.renderer.camera,
             this.assetLoader,
             this.gameTime,
+            () => {
+                this.visibilityMap.useVisibility =
+                    !this.visibilityMap.useVisibility;
+            },
         );
     }
 
@@ -116,7 +120,7 @@ export class Game {
 
         setInterval(this.onTick, 200);
 
-        //this.updateVisibilityMap();
+        this.updateVisibilityMap();
         this.render(DrawMode.Gesture);
     }
 
@@ -127,7 +131,7 @@ export class Game {
             this.gameTime.tick = this.updateTick;
             this.world.onUpdate(this.updateTick);
             this.interactionHandler.onUpdate(this.updateTick);
-            //this.updateVisibilityMap();
+            this.updateVisibilityMap();
         }
         this.render(DrawMode.Tick);
     };
@@ -139,13 +143,15 @@ export class Game {
 
     private updateVisibilityMap() {
         this.visibilityMap.clear();
-        const visibilityComponents =
-            this.world.queryComponents(VisibilityComponent);
+        if (this.visibilityMap.useVisibility) {
+            const visibilityComponents =
+                this.world.queryComponents(VisibilityComponent);
 
-        for (const visibilityComponent of visibilityComponents) {
-            const visiblePoints = visibilityComponent.getVisibility();
-            for (const visiblePoint of visiblePoints) {
-                this.visibilityMap.setIsVisible(visiblePoint, true);
+            for (const visibilityComponent of visibilityComponents) {
+                const visiblePoints = visibilityComponent.getVisibility();
+                for (const visiblePoint of visiblePoints) {
+                    this.visibilityMap.setIsVisible(visiblePoint, true);
+                }
             }
         }
     }

@@ -6,6 +6,7 @@ import {
 import { Point } from "../../../common/point.js";
 import { EntityEvent } from "../../entity/entityEvent.js";
 import { EntityComponent } from "../entityComponent.js";
+import { TilesComponent } from "../tile/tilesComponent.js";
 import { VisibilityShape } from "./visibilityShape.js";
 
 export class VisibilityComponent extends EntityComponent {
@@ -39,19 +40,17 @@ export class VisibilityComponent extends EntityComponent {
     private onEntityEvent(event: EntityEvent) {
         if (event.id == "transform" && event.source == this.entity) {
             this.shape.updatePoint(this.entity.worldPosition);
-            //this.unlockOnVisibilityChange();
+            this.unlockOnVisibilityChange();
         }
     }
 
     private unlockOnVisibilityChange() {
-        /*
-        const tileDiscoveryComponent = this.entity
+        const tileComponent = this.entity
             .getRootEntity()
-            .requireComponent(TileDiscoveryComponent);
+            .requireComponent(TilesComponent);
 
-        tileDiscoveryComponent.unlockTiles(
-            this.entity.worldPosition,
-            this.getVisibility(),
-        );*/
+        for (const point of this.getVisibility()) {
+            tileComponent.discoverTile(point);
+        }
     }
 }

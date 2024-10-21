@@ -443,32 +443,33 @@ export class Entity {
         mode: DrawMode,
     ) {
         if (this._componentsMap.size > 0) {
-            /*
             const isVisible = visibilityMap.isVisible(this.worldPosition);
-            if (isVisible || this._isGameRoot) {
+            if (!visibilityMap.useVisibility || isVisible || this._isGameRoot) {
                 //Calculating the screen position once for components
                 const screenPosition =
                     renderContext.camera.tileSpaceToScreenSpace(
                         this._worldPosition,
                     );
 
+                const withinTheViewport =
+                    screenPosition.x + 40 > 0 &&
+                    screenPosition.y + 40 > 0 &&
+                    screenPosition.x - 40 < renderContext.width &&
+                    screenPosition.y - 40 < renderContext.height;
+
                 for (const component of this._componentsMap) {
                     component[1].onDraw(
                         renderContext,
                         screenPosition,
                         visibilityMap,
+                        mode,
                     );
                 }
-            }*/
+            }
+            /*
             const screenPosition = renderContext.camera.tileSpaceToScreenSpace(
                 this._worldPosition,
             );
-
-            const withinTheViewport =
-                screenPosition.x + 40 > 0 &&
-                screenPosition.y + 40 > 0 &&
-                screenPosition.x - 40 < renderContext.width &&
-                screenPosition.y - 40 < renderContext.height;
 
             if (withinTheViewport || this._isGameRoot) {
                 for (const component of this._componentsMap) {
@@ -479,7 +480,7 @@ export class Entity {
                         mode,
                     );
                 }
-            }
+            }*/
         }
 
         for (const child of this._children) {
