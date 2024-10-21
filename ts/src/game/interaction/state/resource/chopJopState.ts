@@ -19,6 +19,10 @@ import { AlertMessageState } from "../common/alertMessageState.js";
 export class ChopJobState extends InteractionState {
     private chopMode: SelectionMode;
 
+    override get stateName(): string {
+        return "Chop tree";
+    }
+
     constructor(selection: Entity) {
         super();
         this.chopMode = new SingleSelectionMode(selection.worldPosition);

@@ -15,6 +15,7 @@ import {
     zeroPoint,
 } from "../../common/point.js";
 import { GameTime } from "../../common/time.js";
+import { DrawMode } from "../../rendering/drawMode.js";
 import { RenderScope } from "../../rendering/renderScope.js";
 import { RenderVisibilityMap } from "../../rendering/renderVisibilityMap.js";
 import { ComponentEvent } from "../component/componentEvent.js";
@@ -436,7 +437,11 @@ export class Entity {
      * needs a consistent update cycle should be called in onUpdate
      * @param renderContext the context used to render anything to the canvas
      */
-    onDraw(renderContext: RenderScope, visibilityMap: RenderVisibilityMap) {
+    onDraw(
+        renderContext: RenderScope,
+        visibilityMap: RenderVisibilityMap,
+        mode: DrawMode,
+    ) {
         if (this._componentsMap.size > 0) {
             /*
             const isVisible = visibilityMap.isVisible(this.worldPosition);
@@ -471,13 +476,14 @@ export class Entity {
                         renderContext,
                         screenPosition,
                         visibilityMap,
+                        mode,
                     );
                 }
             }
         }
 
         for (const child of this._children) {
-            child.onDraw(renderContext, visibilityMap);
+            child.onDraw(renderContext, visibilityMap, mode);
         }
     }
 

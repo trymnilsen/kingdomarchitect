@@ -1,10 +1,15 @@
 import { AssetLoader } from "../../../asset/loader/assetLoader.js";
+import { sprites2 } from "../../../asset/sprite.js";
 import { Point } from "../../../common/point.js";
+import { allSides } from "../../../common/sides.js";
 import { GameTime } from "../../../common/time.js";
 import { InputAction, InputActionType } from "../../../input/inputAction.js";
 import { OnTapEndEvent } from "../../../input/touchInput.js";
 import { Camera } from "../../../rendering/camera.js";
 import { RenderScope } from "../../../rendering/renderScope.js";
+import { subTitleTextStyle } from "../../../rendering/text/textStyle.js";
+import { bookInkColor } from "../../../ui/color.js";
+import { UIView } from "../../../ui/uiView.js";
 import { ChunkMapComponent } from "../../component/root/chunk/chunkMapComponent.js";
 import { TilesComponent } from "../../component/tile/tilesComponent.js";
 import { Entity } from "../../entity/entity.js";
@@ -12,6 +17,7 @@ import { SelectedEntityItem } from "../../selection/selectedEntityItem.js";
 import { SelectedTileItem } from "../../selection/selectedTileItem.js";
 import { SelectedWorldItem } from "../../selection/selectedWorldItem.js";
 import { SelectionState } from "../state/selection/selectionState.js";
+import { InteractionHandlerStatusbarPresenter } from "./interactionHandlerStatusbarPresenter.js";
 import { CommitableInteractionStateChanger } from "./interactionStateChanger.js";
 import { InteractionStateHistory } from "./interactionStateHistory.js";
 import { StateContext } from "./stateContext.js";
@@ -26,6 +32,7 @@ export class InteractionHandler {
     private interactionStateChanger: CommitableInteractionStateChanger;
     private history: InteractionStateHistory;
     private stateContext: StateContext;
+    private statusbar: InteractionHandlerStatusbarPresenter;
 
     constructor(
         world: Entity,
@@ -33,6 +40,7 @@ export class InteractionHandler {
         assets: AssetLoader,
         time: GameTime,
     ) {
+        this.statusbar = new InteractionHandlerStatusbarPresenter("", () => {});
         this.interactionStateChanger = new CommitableInteractionStateChanger();
         this.world = world;
         this.camera = camera;
@@ -182,16 +190,57 @@ export class InteractionHandler {
         this.history.state.onUpdate(tick);
     }
 
-    onDraw(renderContext: RenderScope) {
+    onDraw(renderScope: RenderScope) {
         if (this.history.state.isModal) {
-            renderContext.drawScreenSpaceRectangle({
+            renderScope.drawScreenSpaceRectangle({
                 x: 0,
                 y: 0,
-                width: renderContext.width,
-                height: renderContext.height,
+                width: renderScope.width,
+                height: renderScope.height,
                 fill: "rgba(20, 20, 20, 0.8)",
             });
         }
-        this.history.state.onDraw(renderContext);
+        if (this.history.size > 1) {
+            const name = this.history.state.stateName;
+            const style = Object.assign({}, subTitleTextStyle);
+            style.color = bookInkColor;
+            const size = renderScope.measureText(name, style);
+            const textBoxX = 32 + size.height + 16;
+            renderScope.drawNinePatchSprite({
+                x: 32,
+                y: 32,
+                width: size.height + 16,
+                height: size.height + 16,
+                sprite: sprites2.book_border,
+                scale: 1,
+                sides: allSides(8),
+            });
+
+            renderScope.drawScreenSpaceSprite({
+                sprite: sprites2.times,
+                x: 42,
+                y: 42,
+                targetHeight: 16,
+                targetWidth: 16,
+            });
+
+            renderScope.drawNinePatchSprite({
+                x: textBoxX,
+                y: 32,
+                width: size.width + 32,
+                height: size.height + 16,
+                sprite: sprites2.book_border,
+                scale: 1,
+                sides: allSides(8),
+            });
+
+            renderScope.drawTextWithStyle(
+                name,
+                { x: textBoxX + 16, y: 40 },
+                style,
+            );
+        }
+
+        this.history.state.onDraw(renderScope);
     }
 }

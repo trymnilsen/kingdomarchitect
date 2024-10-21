@@ -13,9 +13,14 @@ import { UIButton } from "../../../../ui/view/uiButton.js";
 import { InteractionState } from "../../handler/interactionState.js";
 
 export class MenuState extends InteractionState {
+    override get stateName(): string {
+        return "Menu";
+    }
+
     override get isModal(): boolean {
         return true;
     }
+
     override onActive(): void {
         const contentView = uiBox({
             width: fillUiSize,

@@ -7,18 +7,8 @@ import { EntityComponent } from "../../entityComponent.js";
 import { EquipmentComponent } from "../../inventory/equipmentComponent.js";
 
 export class WorkerSpriteComponent extends EntityComponent {
-    private tintMe = false;
-    override onUpdate(_tick: number): void {
-        this.tintMe = !this.tintMe;
-    }
     override onDraw(context: RenderScope, screenPosition: Point): void {
         const sprite = this.getSprite();
-        let tint: string | undefined = undefined;
-        const equipment = this.entity.requireComponent(EquipmentComponent);
-        const mainItem = equipment.mainItem.getItem();
-        if (mainItem?.category == ItemCategory.Melee) {
-            tint = "white";
-        }
 
         context.drawScreenSpaceSprite({
             sprite: sprite,
@@ -26,7 +16,6 @@ export class WorkerSpriteComponent extends EntityComponent {
             y: screenPosition.y + 2,
             targetHeight: 32,
             targetWidth: 32,
-            tint: tint,
         });
     }
 

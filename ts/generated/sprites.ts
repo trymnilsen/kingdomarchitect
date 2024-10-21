@@ -1072,6 +1072,17 @@ export const sprites = {
       "y": 0
     }
   },
+  "light": {
+    "bin": "0",
+    "id": "light",
+    "defintion": {
+      "frames": 1,
+      "w": 16,
+      "h": 16,
+      "x": 158,
+      "y": 210
+    }
+  },
   "mana_potion": {
     "bin": "0",
     "id": "mana_potion",
@@ -1145,8 +1156,8 @@ export const sprites = {
       "frames": 1,
       "w": 16,
       "h": 16,
-      "x": 158,
-      "y": 210
+      "x": 182,
+      "y": 160
     }
   },
   "stone_slate_border_selected": {
@@ -1156,7 +1167,7 @@ export const sprites = {
       "frames": 1,
       "w": 16,
       "h": 16,
-      "x": 182,
+      "x": 198,
       "y": 160
     }
   },
@@ -1400,6 +1411,17 @@ export const sprites = {
       "h": 32,
       "x": 276,
       "y": 72
+    }
+  },
+  "times": {
+    "bin": "0",
+    "id": "times",
+    "defintion": {
+      "frames": 1,
+      "w": 16,
+      "h": 16,
+      "x": 212,
+      "y": 260
     }
   },
   "wizard_hat_skill": {

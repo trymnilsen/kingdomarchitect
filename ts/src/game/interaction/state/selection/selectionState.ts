@@ -28,6 +28,10 @@ export class SelectionState extends InteractionState {
         new BlacksmithSelectionProvider(),
     ];
 
+    override get stateName(): string {
+        return "Selection";
+    }
+
     constructor(private selection: SelectedWorldItem) {
         super();
     }

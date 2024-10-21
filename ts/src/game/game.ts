@@ -20,6 +20,7 @@ import { VisibilityComponent } from "./component/visibility/visibilityComponent.
 import { generateMap } from "./map/mapGenerator.js";
 import { firstChildWhere } from "./entity/child/first.js";
 import { GameTime } from "../common/time.js";
+import { DrawMode } from "../rendering/drawMode.js";
 
 export class Game {
     private renderer: Renderer;
@@ -27,7 +28,8 @@ export class Game {
     private touchInput: TouchInput;
     private assetLoader: AssetLoader;
     private interactionHandler: InteractionHandler;
-    private currentTick = 0;
+    private drawTick = 0;
+    private updateTick = 0;
     private world: Entity;
     private gameTime: GameTime = new GameTime();
     private visibilityMap: RenderVisibilityMap = new RenderVisibilityMap();
@@ -80,7 +82,7 @@ export class Game {
 
         this.touchInput.onTapDown = (position: Point) => {
             const tapResult = this.interactionHandler.onTapDown(position);
-            this.render();
+            this.render(DrawMode.Gesture);
             return tapResult;
         };
 
@@ -100,38 +102,39 @@ export class Game {
                 this.renderer.camera.translate(invert(movement));
             }
 
-            this.render();
+            this.render(DrawMode.Gesture);
         };
 
         this.touchInput.onTapEnd = (tapEndEvent) => {
             this.interactionHandler.onTapUp(tapEndEvent);
-            this.render();
+            this.render(DrawMode.Gesture);
         };
 
         this.input.onInput.listen((inputEvent) => {
             this.onInput(inputEvent);
         });
 
-        setInterval(this.onTick, 1000);
+        setInterval(this.onTick, 200);
 
         //this.updateVisibilityMap();
-        this.render();
+        this.render(DrawMode.Gesture);
     }
 
     private onTick = () => {
-        //performance.mark("tick-start");
-        this.currentTick += 1;
-        this.gameTime.tick = this.currentTick;
-        this.world.onUpdate(this.currentTick);
-        this.interactionHandler.onUpdate(this.currentTick);
-        //this.updateVisibilityMap();
-        this.render();
-        //performance.measure("onTick duration", "tick-start");
+        this.drawTick += 1;
+        if (this.drawTick % 5 == 0) {
+            this.updateTick += 1;
+            this.gameTime.tick = this.updateTick;
+            this.world.onUpdate(this.updateTick);
+            this.interactionHandler.onUpdate(this.updateTick);
+            //this.updateVisibilityMap();
+        }
+        this.render(DrawMode.Tick);
     };
 
     private updateCamera(newPosition: Point) {
         this.renderer.camera.position = newPosition;
-        this.render();
+        this.render(DrawMode.Gesture);
     }
 
     private updateVisibilityMap() {
@@ -178,13 +181,13 @@ export class Game {
             this.interactionHandler.onInput(inputEvent.action);
         }
 
-        this.render();
+        this.render(DrawMode.Gesture);
     }
 
-    private render() {
+    private render(drawMode: DrawMode) {
         const renderStart = performance.now();
         this.renderer.clearScreen();
-        this.world.onDraw(this.renderer.context, this.visibilityMap);
+        this.world.onDraw(this.renderer.context, this.visibilityMap, drawMode);
         this.interactionHandler.onDraw(this.renderer.context);
         this.renderer.renderDeferred();
         performance.measure;

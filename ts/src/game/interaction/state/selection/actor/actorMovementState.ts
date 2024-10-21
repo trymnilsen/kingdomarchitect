@@ -19,6 +19,10 @@ export class ActorMovementState extends InteractionState {
     private path: Point[] = [];
     private graph: SearchedNode[] = [];
 
+    override get stateName(): string {
+        return "Confirm movement";
+    }
+
     constructor(private entity: Entity) {
         super();
     }

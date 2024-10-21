@@ -60,6 +60,10 @@ export class BookListState extends InteractionState {
         return true;
     }
 
+    override get stateName(): string {
+        return "Craft";
+    }
+
     constructor(protected adapter: BookListAdapter) {
         super();
         this._bookView = new UIBookLayout();

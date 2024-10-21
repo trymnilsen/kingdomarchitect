@@ -44,6 +44,10 @@ export class CharacterSkillState extends InteractionState {
         return true;
     }
 
+    override get stateName(): string {
+        return "Skills";
+    }
+
     constructor() {
         super();
         this._activeSkillTree = meleeSkills;

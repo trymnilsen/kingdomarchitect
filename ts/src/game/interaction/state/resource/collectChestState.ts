@@ -17,6 +17,10 @@ import { UIInventoryGridItem } from "../root/inventory/uiInventoryGridItem.js";
 export class CollectChestState extends InteractionState {
     private _actionbar!: UIView;
 
+    override get stateName(): string {
+        return "Collect chest";
+    }
+
     override get isModal(): boolean {
         return true;
     }

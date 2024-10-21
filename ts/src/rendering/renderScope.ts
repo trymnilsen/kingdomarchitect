@@ -20,6 +20,7 @@ import { Bounds } from "../common/bounds.js";
 import { sprites } from "../../generated/sprites.js";
 import { CanvasContext } from "./canvasContext.js";
 import { SpriteCache } from "./spriteCache.js";
+import { Point } from "../common/point.js";
 
 export type DrawFunction = (context: RenderScope) => void;
 
@@ -336,6 +337,20 @@ export class RenderScope implements UIRenderScope, UILayoutScope {
      */
     drawText(text: TextConfiguration) {
         textRenderer(text, this.canvasContext);
+    }
+
+    drawTextWithStyle(text: string, point: Point, style: TextStyle) {
+        textRenderer(
+            {
+                text: text,
+                x: point.x,
+                y: point.y,
+                font: style.font,
+                color: style.color,
+                size: style.size,
+            },
+            this.canvasContext,
+        );
     }
 
     /**

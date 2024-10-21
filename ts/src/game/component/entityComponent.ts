@@ -1,5 +1,6 @@
 import { JSONValue } from "../../common/object.js";
 import { Point } from "../../common/point.js";
+import { DrawMode } from "../../rendering/drawMode.js";
 import { RenderScope } from "../../rendering/renderScope.js";
 import { RenderVisibilityMap } from "../../rendering/renderVisibilityMap.js";
 import { Entity } from "../entity/entity.js";
@@ -38,6 +39,7 @@ export abstract class EntityComponent {
         _context: RenderScope,
         _screenPosition: Point,
         _visibilityMap: RenderVisibilityMap,
+        _drawMode: DrawMode,
     ) {}
 
     protected publishEvent(event: ComponentEvent<EntityComponent>) {

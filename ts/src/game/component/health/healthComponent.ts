@@ -5,6 +5,8 @@ import {
 } from "../../../common/range.js";
 import { RenderScope } from "../../../rendering/renderScope.js";
 import { Entity } from "../../entity/entity.js";
+import { SpriteComponent } from "../draw/spriteComponent.js";
+import { damageTint } from "../draw/spriteTint.js";
 import { EntityComponent } from "../entityComponent.js";
 import { HealthEvent } from "./healthEvent.js";
 
@@ -54,6 +56,11 @@ export class HealthComponent extends EntityComponent {
         const newHealth = Math.max(0, oldHealth - amount);
         this._health = newHealth;
         this.healthBubble = amount;
+        const spriteComponent = this.entity.getComponent(SpriteComponent);
+        if (!!spriteComponent) {
+            spriteComponent.tint = damageTint();
+        }
+
         this.publishEvent(new HealthEvent(oldHealth, newHealth, source, this));
         return 0;
     }

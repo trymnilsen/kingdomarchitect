@@ -25,6 +25,15 @@ export abstract class InteractionState {
     private _view: UIView | null = null;
     private _cachedFocusGroups: FocusGroup[] = [];
     private _currentFocusGroupIndex = 0;
+
+    /**
+     * Get the name of this interaction state
+     *
+     * @readonly
+     */
+    get stateName(): string {
+        return "State";
+    }
     /**
      * Retrieve the currently set root view of the this state
      */

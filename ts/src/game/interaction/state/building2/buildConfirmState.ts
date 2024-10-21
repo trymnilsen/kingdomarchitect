@@ -32,6 +32,10 @@ export class BuildConfirmState extends InteractionState {
     private buildMode: BuildMode;
     private selection: SelectedTile[] = [];
 
+    override get stateName(): string {
+        return "Confirm build";
+    }
+
     constructor(
         private building: Building,
         private cursorPosition: Point,

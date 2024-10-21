@@ -43,6 +43,10 @@ export class BuildingState extends InteractionState {
         return true;
     }
 
+    override get stateName(): string {
+        return "Build";
+    }
+
     constructor(buildingPosition: Point) {
         super();
 
