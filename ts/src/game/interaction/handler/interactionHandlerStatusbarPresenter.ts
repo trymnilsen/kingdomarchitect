@@ -1,13 +1,17 @@
 import { sprites2 } from "../../../asset/sprite.js";
 import { allSides } from "../../../common/sides.js";
 import { subTitleTextStyle } from "../../../rendering/text/textStyle.js";
-import { ninePatchBackground } from "../../../ui/dsl/uiBackgroundDsl.js";
+import {
+    colorBackground,
+    ninePatchBackground,
+} from "../../../ui/dsl/uiBackgroundDsl.js";
 import { uiBox } from "../../../ui/dsl/uiBoxDsl.js";
 import { uiButton } from "../../../ui/dsl/uiButtonDsl.js";
 import { spriteImageSource, uiImage } from "../../../ui/dsl/uiImageDsl.js";
 import { uiRow } from "../../../ui/dsl/uiRowDsl.js";
 import { uiSpace } from "../../../ui/dsl/uiSpaceDsl.js";
 import { uiText } from "../../../ui/dsl/uiTextDsl.js";
+import { uiAlignment } from "../../../ui/uiAlignment.js";
 import { fillUiSize, wrapUiSize } from "../../../ui/uiSize.js";
 import { UIView } from "../../../ui/uiView.js";
 import { UIText } from "../../../ui/view/uiText.js";
@@ -39,10 +43,12 @@ export class InteractionHandlerStatusbarPresenter {
             width: fillUiSize,
             height: wrapUiSize,
             padding: allSides(16),
+            //background: colorBackground("red"),
+            //alignment: uiAlignment.center,
             children: [
                 uiRow({
                     width: fillUiSize,
-                    height: wrapUiSize,
+                    height: 32,
                     children: [
                         {
                             child: uiBox({
@@ -53,6 +59,7 @@ export class InteractionHandlerStatusbarPresenter {
                                     scale: 1,
                                     sides: allSides(8),
                                 }),
+                                padding: allSides(8),
                                 children: [
                                     uiImage({
                                         width: 16,
@@ -68,6 +75,7 @@ export class InteractionHandlerStatusbarPresenter {
                             child: uiBox({
                                 width: wrapUiSize,
                                 height: 32,
+                                padding: allSides(8),
                                 background: ninePatchBackground({
                                     sprite: sprites2.book_border,
                                     scale: 1,
@@ -79,7 +87,7 @@ export class InteractionHandlerStatusbarPresenter {
                         {
                             weight: 1,
                             child: uiSpace({
-                                width: fillUiSize,
+                                width: 32,
                                 height: 32,
                                 id: "space",
                             }),
@@ -88,8 +96,9 @@ export class InteractionHandlerStatusbarPresenter {
                             child: uiButton({
                                 width: 32,
                                 height: 32,
+                                padding: allSides(8),
                                 onTappedBackground: ninePatchBackground({
-                                    sprite: sprites2.book_border,
+                                    sprite: sprites2.book_grid_item,
                                     scale: 1,
                                     sides: allSides(8),
                                 }),

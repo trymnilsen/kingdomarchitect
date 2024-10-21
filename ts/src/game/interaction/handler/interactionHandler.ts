@@ -40,7 +40,12 @@ export class InteractionHandler {
         assets: AssetLoader,
         time: GameTime,
     ) {
-        this.statusbar = new InteractionHandlerStatusbarPresenter("", () => {});
+        this.statusbar = new InteractionHandlerStatusbarPresenter(
+            "sdfsdfdasfsd",
+            () => {
+                console.log("fooo");
+            },
+        );
         this.interactionStateChanger = new CommitableInteractionStateChanger();
         this.world = world;
         this.camera = camera;
@@ -55,6 +60,16 @@ export class InteractionHandler {
     }
 
     onTapDown(screenPoint: Point): boolean {
+        //Check for statusbar tap
+        const statusbarHandledTap = this.statusbar.rootView.dispatchUIEvent({
+            type: "tapStart",
+            position: screenPoint,
+        });
+
+        if (statusbarHandledTap) {
+            return true;
+        }
+
         const state = this.history.state;
         const stateHandledTap = state.dispatchUIEvent({
             type: "tapStart",
@@ -71,9 +86,24 @@ export class InteractionHandler {
     }
 
     onTapUp(tapUpEvent: OnTapEndEvent): void {
-        const currentState = this.history.state;
         const screenPoint = tapUpEvent.position;
+        this.statusbar.rootView.dispatchUIEvent({
+            type: "tapUp",
+            position: screenPoint,
+            startPosition: tapUpEvent.startPosition,
+        });
 
+        const statusbarTapResult = this.statusbar.rootView.dispatchUIEvent({
+            type: "tap",
+            position: screenPoint,
+            startPosition: tapUpEvent.startPosition,
+        });
+
+        if (statusbarTapResult) {
+            return;
+        }
+
+        const currentState = this.history.state;
         //We dispatch two events as they are handled differently when it comes
         //to applicability. `tap` requires both position and startposition to
         //be withing the bounds. `tapUp` requires only startposition. A view
@@ -201,44 +231,12 @@ export class InteractionHandler {
             });
         }
         if (this.history.size > 1) {
-            const name = this.history.state.stateName;
-            const style = Object.assign({}, subTitleTextStyle);
-            style.color = bookInkColor;
-            const size = renderScope.measureText(name, style);
-            const textBoxX = 32 + size.height + 16;
-            renderScope.drawNinePatchSprite({
-                x: 32,
-                y: 32,
-                width: size.height + 16,
-                height: size.height + 16,
-                sprite: sprites2.book_border,
-                scale: 1,
-                sides: allSides(8),
+            this.statusbar.rootView.layout(renderScope, {
+                width: renderScope.width,
+                height: renderScope.height,
             });
-
-            renderScope.drawScreenSpaceSprite({
-                sprite: sprites2.times,
-                x: 42,
-                y: 42,
-                targetHeight: 16,
-                targetWidth: 16,
-            });
-
-            renderScope.drawNinePatchSprite({
-                x: textBoxX,
-                y: 32,
-                width: size.width + 32,
-                height: size.height + 16,
-                sprite: sprites2.book_border,
-                scale: 1,
-                sides: allSides(8),
-            });
-
-            renderScope.drawTextWithStyle(
-                name,
-                { x: textBoxX + 16, y: 40 },
-                style,
-            );
+            this.statusbar.rootView.updateTransform();
+            this.statusbar.rootView.draw(renderScope);
         }
 
         this.history.state.onDraw(renderScope);
