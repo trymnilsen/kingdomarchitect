@@ -179,7 +179,11 @@ export class TilesComponent extends EntityComponent implements Ground {
                 let color = "green";
                 const type = tile.type;
                 if (!!type) {
-                    color = biomes[type].color;
+                    if (!visiblityMap.useVisibility || visibility) {
+                        color = biomes[type].color;
+                    } else {
+                        color = biomes[type].tint;
+                    }
                 }
 
                 if (visibility) {

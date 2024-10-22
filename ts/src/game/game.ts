@@ -77,6 +77,8 @@ export class Game {
             () => {
                 this.visibilityMap.useVisibility =
                     !this.visibilityMap.useVisibility;
+                this.updateVisibilityMap();
+                this.render(DrawMode.Gesture);
             },
         );
     }
