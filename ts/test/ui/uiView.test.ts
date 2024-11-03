@@ -4,48 +4,6 @@ import { uiBox } from "../../src/ui/dsl/uiBoxDsl.js";
 import { doTestLayout } from "./layoutContextStub.js";
 
 describe("UiView", () => {
-    it("has 4 corners", () => {
-        const view = uiBox({
-            width: 200,
-            height: 200,
-        });
-        const corners = view.corners;
-        assert.equal(corners.length, 4);
-    });
-
-    it("corners are same as position if layout has not been done", () => {
-        const view = uiBox({
-            width: 200,
-            height: 200,
-        });
-        const position = { x: 15, y: 20 };
-        view.screenPosition = position;
-        const corners = view.corners;
-        assert.deepEqual(corners[0], position);
-        assert.deepEqual(corners[1], position);
-        assert.deepEqual(corners[2], position);
-        assert.deepEqual(corners[3], position);
-    });
-
-    it("corners are position plus size if layout has been done", () => {
-        const view = uiBox({
-            width: 200,
-            height: 200,
-        });
-        view.offset = { x: 15, y: 20 };
-        doTestLayout(view, { width: 200, height: 200 });
-
-        const corners = view.corners;
-        //Top left
-        assert.deepEqual(corners[0], { x: 15, y: 20 });
-        //Top right
-        assert.deepEqual(corners[1], { x: 215, y: 20 });
-        //Bottom right
-        assert.deepEqual(corners[2], { x: 215, y: 220 });
-        //Bottom left
-        assert.deepEqual(corners[3], { x: 15, y: 220 });
-    });
-
     it("has a center in the middle of position and size", () => {
         const view = uiBox({
             width: 200,

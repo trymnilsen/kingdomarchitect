@@ -23,6 +23,10 @@ export function withinRectangle(
     return point.x >= x1 && point.x <= x2 && point.y >= y1 && point.y <= y2;
 }
 
+export function boundsEquals(b1: Bounds, b2: Bounds) {
+    return b1.x1 == b2.x1 && b1.y1 == b2.y1 && b1.x2 == b2.x2 && b1.y2 == b2.y2;
+}
+
 /**
  * Represents a rectangle large enough to encompass something.
  */
@@ -160,16 +164,16 @@ export function boundsContains(outer: Bounds, inner: Bounds): boolean {
 
 /**
  * Checks if the first bounds overlap the second bounds
- * @param first the first rectangle
- * @param second the second rectangle to check if overlaps the first
+ * @param b1 the first rectangle
+ * @param b2 the second rectangle to check if overlaps the first
  * @returns if the two bounds overlap
  */
-export function boundsOverlap(first: Bounds, second: Bounds): boolean {
+export function boundsOverlap(b1: Bounds, b2: Bounds): boolean {
     return (
-        first.x1 < second.x2 &&
-        first.x2 > second.x1 &&
-        first.y1 < second.y2 &&
-        first.y2 > second.y1
+        b1.x1 <= b2.x2 && // b1's left edge is to the left of or aligned with b2's right edge
+        b1.x2 >= b2.x1 && // b1's right edge is to the right of or aligned with b2's left edge
+        b1.y1 <= b2.y2 && // b1's top edge is above or aligned with b2's bottom edge
+        b1.y2 >= b2.y1 // b1's bottom edge is below or aligned with b2's top edge
     );
 }
 
@@ -262,4 +266,17 @@ export function getAllPositionsBoundsFitWithinBounds(
     }
 
     return positions;
+}
+
+export function getCorners(bound: Bounds): Point[] {
+    return [
+        //Top left
+        { x: bound.x1, y: bound.y1 },
+        //Top right
+        { x: bound.x2, y: bound.y1 },
+        //Bottom right
+        { x: bound.x2, y: bound.y2 },
+        //Bottom left
+        { x: bound.x1, y: bound.y2 },
+    ];
 }

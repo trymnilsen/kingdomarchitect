@@ -9,11 +9,11 @@ export type Visitable = {
  * @param visitor the function to run on each visit of an entity.
  *  return true to stop visiting
  */
-export function visitChildren(
-    visitable: Visitable,
-    visitor: (visitable: Visitable) => boolean,
+export function visitChildren<T extends Visitable = Visitable>(
+    visitable: T,
+    visitor: (visitable: T) => boolean,
 ): void {
-    const searchEntities = [visitable];
+    const searchEntities: T[] = [visitable];
 
     while (searchEntities.length > 0) {
         // Pick the first entity in the search list
@@ -28,7 +28,7 @@ export function visitChildren(
 
         // Add the children of this entity to nodes to search
         for (const child of visitable.children) {
-            searchEntities.push(child);
+            searchEntities.push(child as T);
         }
     }
 }

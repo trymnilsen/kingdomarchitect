@@ -24,6 +24,7 @@ import { AlertMessageState } from "../common/alertMessageState.js";
 import { MenuState } from "../menu/menuState.js";
 import { BuildingState } from "./building/buildingState.js";
 import { InventoryState } from "./inventory/inventoryState.js";
+import { ScrollInteractionState } from "../scrolls/scrollState.js";
 
 export class RootState extends InteractionState {
     override getFocusGroups(): FocusGroup[] {
@@ -47,6 +48,15 @@ export class RootState extends InteractionState {
                 onClick: () => {
                     this.context.stateChanger.push(
                         new AlertMessageState("Oh no", "Not implemented"),
+                    );
+                },
+            },
+            {
+                text: "Scroll",
+                icon: sprites2.empty_sprite,
+                onClick: () => {
+                    this.context.stateChanger.push(
+                        new ScrollInteractionState(),
                     );
                 },
             },

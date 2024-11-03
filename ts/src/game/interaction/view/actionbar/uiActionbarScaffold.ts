@@ -1,6 +1,7 @@
 import { sprites2 } from "../../../../asset/sprite.js";
 import {
     Bounds,
+    boundsCenter,
     sizeOfBounds,
     withinRectangle,
 } from "../../../../common/bounds.js";
@@ -15,6 +16,7 @@ import {
 import { subTitleTextStyle } from "../../../../rendering/text/textStyle.js";
 import { UIRenderScope } from "../../../../rendering/uiRenderContext.js";
 import { bookInkColor } from "../../../../ui/color.js";
+import { FocusNode } from "../../../../ui/focus/focusHelpers.js";
 import { UILayoutScope } from "../../../../ui/uiLayoutContext.js";
 import { UISize } from "../../../../ui/uiSize.js";
 import { UIView } from "../../../../ui/uiView.js";
@@ -24,6 +26,7 @@ export class UIActionbarScaffold extends UIView {
     private _sides: Sides = allSides(16);
     private buttons: ActionbarButton[] = [];
     private selectedPath = "";
+    private _focusNodes: FocusNode[] = [];
 
     /**
      * Get the padding for the content and action bar
@@ -37,6 +40,10 @@ export class UIActionbarScaffold extends UIView {
      */
     set sides(value: Sides) {
         this._sides = value;
+    }
+
+    override get focusNodes(): FocusNode[] | null {
+        return this._focusNodes;
     }
 
     constructor(
@@ -84,6 +91,38 @@ export class UIActionbarScaffold extends UIView {
             layoutContext,
             paddedConstraints,
         );
+
+        const nodes: FocusNode[] = [];
+        const buttonMapper = (buttons: ActionbarButton[]) => {
+            for (const button of buttons) {
+                const node = {
+                    bounds: {
+                        x1: button.position.x - 4,
+                        y1: button.position.y + 44 - 4,
+                        x2: button.position.x + button.width + 4,
+                        y2: button.position.y + 44 + 32 + 4,
+                    },
+                    onFocus: () => {},
+                    onFocusLost: () => {},
+                    onFocusTapActivate: (node) => {
+                        this.onTap(boundsCenter(node.bounds));
+                        return true;
+                    },
+                };
+                nodes.push(node);
+
+                const isPathOfSelected =
+                    this.selectedPath != "" &&
+                    button.path.startsWith(this.selectedPath);
+
+                if (button.children.length > 0 && isPathOfSelected) {
+                    buttonMapper(button.children);
+                }
+            }
+        };
+
+        buttonMapper(this.buttons);
+        this._focusNodes = nodes;
 
         const contentConstraints = {
             width: paddedConstraints.width,

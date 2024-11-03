@@ -4,7 +4,10 @@ import { TileSize } from "../game/map/tile.js";
 export class Camera {
     private _position: Point;
     private _halfWindowSize: Point;
-    constructor(private windowSize: Point) {
+    private _windowSize: Point;
+
+    constructor(windowSize: Point) {
+        this._windowSize = windowSize;
         this._position = { x: 0, y: 0 };
         this._halfWindowSize = {
             x: Math.floor(windowSize.x / 2),
@@ -21,6 +24,10 @@ export class Camera {
             x: Math.floor(point.x),
             y: Math.floor(point.y),
         };
+    }
+
+    get windowSize(): Point {
+        return this._windowSize;
     }
 
     worldSpaceToTileSpace(worldSpace: Point): Point {

@@ -1,14 +1,15 @@
 import { manhattanDistance } from "../../common/point.js";
 import { UIView } from "../uiView.js";
+import { FocusNode } from "./focusHelpers.js";
 
 export class FocusState {
-    private _currentFocus: UIView | null = null;
+    private _currentFocus: FocusNode | null = null;
 
-    get currentFocus(): UIView | null {
+    get currentFocus(): FocusNode | null {
         return this._currentFocus;
     }
 
-    setFocus(view: UIView) {
+    setFocus(view: FocusNode) {
         if (this._currentFocus) {
             this._currentFocus.onFocusLost();
         }
@@ -20,7 +21,7 @@ export class FocusState {
      * Set the focus to the first item
      * @param ofView
      */
-    setFirstFocus(views: UIView[]): boolean {
+    setFirstFocus(views: FocusNode[]): boolean {
         if (views.length == 0) {
             return false;
         } else {
@@ -29,7 +30,7 @@ export class FocusState {
             for (const view of views) {
                 const viewDistance = manhattanDistance(
                     { x: 0, y: 0 },
-                    view.screenPosition,
+                    { x: view.bounds.x1, y: view.bounds.y1 },
                 );
                 if (viewDistance < closestDistance) {
                     closestDistance = viewDistance;

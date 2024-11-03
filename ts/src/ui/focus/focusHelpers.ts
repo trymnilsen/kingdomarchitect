@@ -3,37 +3,55 @@ import {
     boundsCenter,
     boundsContains,
     boundsOverlap,
+    getCorners,
+    sizeOfBounds,
 } from "../../common/bounds.js";
 import { Direction, invertDirection } from "../../common/direction.js";
 import { InvalidArgumentError } from "../../common/error/invalidArgumentError.js";
 import {
+    addPoint,
     closestPointOnLine,
     manhattanDistance,
     Point,
 } from "../../common/point.js";
+import { visitChildren } from "../../common/visit/visit.js";
 import { UIView } from "../uiView.js";
 
-export function getFocusableViews(rootView: UIView): UIView[] {
-    return rootView.getViews((view) => view.isFocusable);
+export interface FocusNode {
+    bounds: Bounds;
+    onFocus(): void;
+    onFocusLost(): void;
+    onFocusTapActivate(node: FocusNode): boolean;
 }
 
-export function getClosestFocusableView(
-    focusableViews: UIView[],
+export function getFocusableNodes(rootView: UIView): FocusNode[] {
+    const nodes: FocusNode[] = [];
+    visitChildren(rootView, (child) => {
+        if (!!child.focusNodes && child.focusNodes.length > 0) {
+            nodes.push(...child.focusNodes);
+        }
+        return false;
+    });
+    return nodes;
+}
+
+export function getClosestFocusableNode(
+    focusableNodes: FocusNode[],
     currentFocusBounds: Bounds,
     direction: Direction,
-): UIView | null {
-    const adjacentViews = getPrioritisedViews(
-        focusableViews,
+): FocusNode | null {
+    const adjacentNodes = getPrioritisedNodes(
+        focusableNodes,
         currentFocusBounds,
         direction,
     );
 
-    if (adjacentViews.length > 0) {
-        const closestView = closestViewByEdge(
+    if (adjacentNodes.length > 0) {
+        const closestNode = closestNodeByEdge(
             currentFocusBounds,
-            adjacentViews,
+            adjacentNodes,
         );
-        return closestView;
+        return closestNode;
     } else {
         return null;
     }
@@ -164,17 +182,17 @@ export function getClosestFocusableView(
  * that would be aligned on the top of the cfv
 
  *
- * @param focusableViews the views to check if are applicable
+ * @param focusableNodes the views to check if are applicable
  * @param currentFocusBounds the currently focused bounds we are moving away from
  * @param direction the direction we are moving in
  * @returns a list view views that are considered the best candidates to move to
  */
-function getPrioritisedViews(
-    focusableViews: UIView[],
+function getPrioritisedNodes(
+    focusableNodes: FocusNode[],
     currentFocusBounds: Bounds,
     direction: Direction,
-): UIView[] {
-    const viewsInDirection = focusableViews.filter((view) => {
+): FocusNode[] {
+    const viewsInDirection = focusableNodes.filter((view) => {
         return isViewInDirection(
             view,
             boundsCenter(currentFocusBounds),
@@ -220,10 +238,11 @@ function getPrioritisedViews(
     const completelyPastEdgeViews = viewsInDirection.filter((view) => {
         //Check that all corners are past the view edge
         const edge = getDirectionalEdge(currentFocusBounds, direction);
-        return view.corners.every((corner) =>
+        return getCorners(view.bounds).every((corner) =>
             isPointPastEdge(direction, corner, edge.start),
         );
     });
+
     if (completelyPastEdgeViews.length > 0) {
         return completelyPastEdgeViews;
     }
@@ -321,11 +340,11 @@ function isPointPastEdge(
  * @param direction the direction we a want to test against
  */
 function isViewInDirection(
-    view: UIView,
+    view: FocusNode,
     origin: Point,
     direction: Direction,
 ): boolean {
-    const hasCornerInDirection = view.corners.some((corner) => {
+    const hasCornerInDirection = getCorners(view.bounds).some((corner) => {
         return isPointPastEdge(direction, corner, origin);
     });
     return hasCornerInDirection;
@@ -338,12 +357,12 @@ function isViewInDirection(
  * @param fromBounds
  * @param views
  */
-function closestViewByEdge(fromBounds: Bounds, views: UIView[]): UIView {
+function closestNodeByEdge(fromBounds: Bounds, views: FocusNode[]): FocusNode {
     if (views.length == 0) {
         throw new InvalidArgumentError("views cannot be empty");
     }
     const fromViewPoint = boundsCenter(fromBounds);
-    let closestView: UIView = views[0];
+    let closestView: FocusNode = views[0];
     let closestViewDistance = Number.MAX_SAFE_INTEGER;
 
     for (const view of views) {

@@ -42,7 +42,7 @@ export class InteractionHandler {
         visibilityChange: () => void,
     ) {
         this.statusbar = new InteractionHandlerStatusbarPresenter(
-            "sdfsdfdasfsd",
+            "state name",
             () => {
                 visibilityChange();
             },

@@ -1,5 +1,6 @@
 import { withinRectangle } from "../../common/bounds.js";
 import { Point } from "../../common/point.js";
+import { FocusNode } from "../focus/focusHelpers.js";
 import { UIBackground } from "../uiBackground.js";
 import { UIBox } from "./uiBox.js";
 
@@ -25,8 +26,8 @@ export class UIButton extends UIBox {
         this._defaultBackground = background;
     }
 
-    override get isFocusable(): boolean {
-        return true;
+    override get focusNodes(): FocusNode[] | null {
+        return [this];
     }
 
     override onTapDown(): boolean {

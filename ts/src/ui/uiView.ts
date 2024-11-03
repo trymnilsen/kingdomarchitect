@@ -1,6 +1,7 @@
 import {
     Bounds,
     boundsCenter,
+    boundsEquals,
     boundsOverlap,
     withinRectangle,
 } from "../common/bounds.js";
@@ -17,8 +18,9 @@ import {
 } from "./event/uiEvent.js";
 import { FocusGroup } from "./focus/focusGroup.js";
 import {
-    getClosestFocusableView,
-    getFocusableViews,
+    FocusNode,
+    getClosestFocusableNode,
+    getFocusableNodes,
 } from "./focus/focusHelpers.js";
 import { FocusState } from "./focus/focusState.js";
 import { UILayoutScope } from "./uiLayoutContext.js";
@@ -56,7 +58,7 @@ export enum UIViewVisiblity {
  * a row or a column you should extend the uiViewGroup class which exposes the
  * addView and removeView methods publicly.
  */
-export abstract class UIView implements FocusGroup {
+export abstract class UIView implements FocusGroup, FocusNode {
     private _parent: UIView | null = null;
     private _screenPosition: Point = zeroPoint();
     private _offset: Point = zeroPoint();
@@ -162,46 +164,12 @@ export abstract class UIView implements FocusGroup {
 
     /**
      * Is this view considered focusable? If a view is focusable it will
-     * able considered for keyboard and directional navigation
+     * able considered for keyboard and directional navigation. As a view can
+     * have multiple selectable regions multiple nodes can be returned.
+     * An empty array or null makes the view not be focusable
      */
-    get isFocusable(): boolean {
-        return false;
-    }
-
-    /**
-     * The corners in a clockwise order. Will return an array of four points.
-     * Note: If the view has not been layed out they will all be the value of
-     * the default screenPosition.
-     */
-    get corners(): Point[] {
-        if (this._measuredSize) {
-            return [
-                //Top left
-                this._screenPosition,
-                //Top right
-                addPoint(this._screenPosition, {
-                    x: this._measuredSize.width,
-                    y: 0,
-                }),
-                //Bottom right
-                addPoint(this._screenPosition, {
-                    x: this._measuredSize.width,
-                    y: this._measuredSize.height,
-                }),
-                //Bottom left
-                addPoint(this._screenPosition, {
-                    x: 0,
-                    y: this._measuredSize.height,
-                }),
-            ];
-        } else {
-            return [
-                this._screenPosition,
-                this._screenPosition,
-                this._screenPosition,
-                this._screenPosition,
-            ];
-        }
+    get focusNodes(): FocusNode[] | null {
+        return null;
     }
 
     /**
@@ -298,7 +266,11 @@ export abstract class UIView implements FocusGroup {
             return false;
         }
 
-        return currentFocus.onTap(boundsCenter(currentFocus.bounds));
+        return currentFocus.onFocusTapActivate(currentFocus);
+    }
+
+    onFocusTapActivate(node: FocusNode): boolean {
+        return this.onTap(boundsCenter(node.bounds));
     }
 
     /**
@@ -556,9 +528,13 @@ export abstract class UIView implements FocusGroup {
             y2: window.innerHeight,
         };
         const currentlyFocusedView = this.focusState.currentFocus;
-        const focusableViews = getFocusableViews(this).filter((view) => {
+        const focusableViews = getFocusableNodes(this).filter((view) => {
             return (
                 view != currentlyFocusedView &&
+                !(
+                    currentlyFocusedView?.bounds &&
+                    boundsEquals(view.bounds, currentlyFocusedView.bounds)
+                ) &&
                 boundsOverlap(view.bounds, viewPortBounds)
             );
         });
@@ -566,7 +542,7 @@ export abstract class UIView implements FocusGroup {
         if (!!currentFocusBounds && !!currentlyFocusedView) {
             //Find the view from the directional sector that has an edge
             // closest to currently selected view
-            const closestView = getClosestFocusableView(
+            const closestView = getClosestFocusableNode(
                 focusableViews,
                 currentFocusBounds,
                 direction,
@@ -578,7 +554,7 @@ export abstract class UIView implements FocusGroup {
                 return false;
             }
         } else {
-            //No current focus exist so we pick the view closest to the top left
+            //No current focus exist so we pick the view considered to be closest
             const firstFocusResult =
                 this.focusState.setFirstFocus(focusableViews);
             return firstFocusResult;

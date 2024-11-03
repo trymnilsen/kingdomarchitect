@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 import {
     absBounds,
     Bounds,
+    boundsOverlap,
     getBoundsAxis,
     withinRectangle,
     zeroBounds,
@@ -108,11 +109,89 @@ describe("Bounds", () => {
         assert.equal(2, 2);
     });
 
-    it("is bounds overlapping", () => {
+    it("overlaps: fully overlapping rectangles", () => {
+        const b1: Bounds = { x1: 0, y1: 0, x2: 10, y2: 10 };
+        const b2: Bounds = { x1: 2, y1: 2, x2: 8, y2: 8 };
+        assert.strictEqual(boundsOverlap(b1, b2), true);
+    });
+
+    it("overlaps: partially overlapping rectangles", () => {
+        const b1: Bounds = { x1: 0, y1: 0, x2: 10, y2: 10 };
+        const b2: Bounds = { x1: 8, y1: 8, x2: 12, y2: 12 };
+        assert.strictEqual(boundsOverlap(b1, b2), true);
+    });
+
+    it("overlaps: not overlapping rectangles (b2 right of b1)", () => {
+        const b1: Bounds = { x1: 0, y1: 0, x2: 10, y2: 10 };
+        const b2: Bounds = { x1: 11, y1: 0, x2: 20, y2: 10 };
+        assert.strictEqual(boundsOverlap(b1, b2), false);
+    });
+
+    it("overlaps: not overlapping rectangles (b2 above b1)", () => {
+        const b1: Bounds = { x1: 0, y1: 0, x2: 10, y2: 10 };
+        const b2: Bounds = { x1: 0, y1: 11, x2: 10, y2: 20 };
+        assert.strictEqual(boundsOverlap(b1, b2), false);
+    });
+
+    it("overlaps: touching edge (right edge of b1 touching left edge of b2)", () => {
+        const b1: Bounds = { x1: 0, y1: 0, x2: 10, y2: 10 };
+        const b2: Bounds = { x1: 10, y1: 0, x2: 20, y2: 10 };
+        assert.strictEqual(boundsOverlap(b1, b2), true);
+    });
+
+    it("overlaps: touching edge (bottom edge of b1 touching top edge of b2)", () => {
+        const b1: Bounds = { x1: 0, y1: 0, x2: 10, y2: 10 };
+        const b2: Bounds = { x1: 0, y1: 10, x2: 10, y2: 20 };
+        assert.strictEqual(boundsOverlap(b1, b2), true);
+    });
+
+    it("overlaps: left edge of b1 touching right edge of b2", () => {
+        const b1: Bounds = { x1: 10, y1: 0, x2: 20, y2: 10 };
+        const b2: Bounds = { x1: 0, y1: 0, x2: 10, y2: 10 };
+        assert.strictEqual(boundsOverlap(b1, b2), true);
+    });
+
+    it("overlaps: right edge of b1 touching left edge of b2", () => {
+        const b1: Bounds = { x1: 0, y1: 0, x2: 10, y2: 10 };
+        const b2: Bounds = { x1: 10, y1: 0, x2: 20, y2: 10 };
+        assert.strictEqual(boundsOverlap(b1, b2), true);
+    });
+
+    it("overlaps: top edge of b1 touching bottom edge of b2", () => {
+        const b1: Bounds = { x1: 0, y1: 10, x2: 10, y2: 20 };
+        const b2: Bounds = { x1: 0, y1: 0, x2: 10, y2: 10 };
+        assert.strictEqual(boundsOverlap(b1, b2), true);
+    });
+
+    it("overlaps: bottom edge of b1 touching top edge of b2", () => {
+        const b1: Bounds = { x1: 0, y1: 0, x2: 10, y2: 10 };
+        const b2: Bounds = { x1: 0, y1: 10, x2: 10, y2: 20 };
+        assert.strictEqual(boundsOverlap(b1, b2), true);
+    });
+
+    it("overlaps: top left corner of b1 touching bottom right corner of b2 (overlap)", () => {
+        const b1: Bounds = { x1: 10, y1: 10, x2: 20, y2: 20 };
+        const b2: Bounds = { x1: 0, y1: 0, x2: 10, y2: 10 };
+        assert.strictEqual(boundsOverlap(b1, b2), true);
+    });
+
+    it("overlaps: bottom right corner of b1 touching top left corner of b2 (overlap)", () => {
+        const b1: Bounds = { x1: 0, y1: 0, x2: 10, y2: 10 };
+        const b2: Bounds = { x1: 10, y1: 10, x2: 20, y2: 20 };
+        assert.strictEqual(boundsOverlap(b1, b2), true);
+    });
+
+    it("overlaps: no overlap with gap", () => {
+        const b1: Bounds = { x1: 0, y1: 0, x2: 5, y2: 5 };
+        const b2: Bounds = { x1: 6, y1: 6, x2: 10, y2: 10 };
+        assert.strictEqual(boundsOverlap(b1, b2), false);
+    });
+
+    it("bounds has four corners", () => {
         assert.equal(2, 2);
     });
 
-    it("is bounds not overlapping", () => {
+    it("corners of bounds are the same as bounds values", () => {
         assert.equal(2, 2);
     });
 });

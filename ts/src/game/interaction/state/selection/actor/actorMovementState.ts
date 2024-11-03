@@ -145,6 +145,15 @@ export class ActorMovementState extends InteractionState {
                 y: position.y,
                 text: `w: ${searchedNode.weight}`,
             });
+            /*
+            context.drawText({
+                size: 12,
+                font: "arial",
+                color: "black",
+                x: position.x,
+                y: position.y + 16,
+                text: `g: ${searchedNode.g}`,
+            });
             context.drawText({
                 size: 12,
                 font: "arial",
@@ -152,7 +161,7 @@ export class ActorMovementState extends InteractionState {
                 x: position.x,
                 y: position.y + 24,
                 text: `c: ${searchedNode.totalCost.toFixed(2)}`,
-            });
+            });*/
         }
 
         super.onDraw(context);
