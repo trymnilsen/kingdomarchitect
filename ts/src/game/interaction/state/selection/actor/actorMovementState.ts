@@ -170,6 +170,6 @@ export class ActorMovementState extends InteractionState {
     private scheduleMovement() {
         this.context.root
             .requireComponent(JobQueueComponent)
-            .addJob(new MoveJob(this.path.reverse(), this.entity));
+            .addJob(new MoveJob(this.path.reverse()[0], this.entity));
     }
 }

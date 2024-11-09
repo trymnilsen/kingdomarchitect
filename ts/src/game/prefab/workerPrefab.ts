@@ -23,6 +23,9 @@ import {
 import { SelectionInfoComponent } from "../component/selection/selectionInfoComponent.js";
 import { WorkerSelectionProvider } from "../interaction/state/selection/actor/provider/workerSelectionProvider.js";
 import { WorkerSelectionInfoProvider } from "../component/selection/provider/workerSelectionInfoProvider.js";
+import { SpriteStateMachine } from "../component/draw/spriteProvider/statemachine/spriteStateMachine.js";
+import { SpriteAction } from "../component/draw/spriteProvider/statemachine/spriteAction.js";
+import { knightSpriteFactory } from "../component/draw/factory/knightSpriteFactory.js";
 
 export function workerPrefab(id: string): Entity {
     const worker = new Entity(id);
@@ -51,7 +54,15 @@ export function workerPrefab(id: string): Entity {
     worker.addComponent(
         new SelectionInfoComponent(new WorkerSelectionInfoProvider()),
     );
-    worker.addComponent(new WorkerSpriteComponent());
+    worker.addComponent(
+        new SpriteStateMachine(SpriteAction.MoveDown, knightSpriteFactory),
+    );
+    worker.addComponent(
+        new SpriteComponent(sprites2.bowman, zeroPoint(), {
+            x: 32,
+            y: 32,
+        }),
+    );
     worker.addComponent(healthComponent);
     worker.addComponent(effectComponent);
     worker.addComponent(visibilityComponent);

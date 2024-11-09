@@ -8,6 +8,7 @@ export class StaticSpriteProvider implements SpriteProvider {
     private spriteConfig: SpriteProviderConfig;
     constructor(sprite: Sprite2) {
         this.spriteConfig = {
+            frame: 0,
             offset: zeroPoint(),
             sprite: sprite,
         };

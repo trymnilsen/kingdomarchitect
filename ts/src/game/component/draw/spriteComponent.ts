@@ -4,6 +4,8 @@ import { DrawMode } from "../../../rendering/drawMode.js";
 import { RenderScope } from "../../../rendering/renderScope.js";
 import { RenderVisibilityMap } from "../../../rendering/renderVisibilityMap.js";
 import { EntityComponent } from "../entityComponent.js";
+import { SpriteProviderConfig } from "./spriteProvider/spriteProvider.js";
+import { SpriteStateMachine } from "./spriteProvider/statemachine/spriteStateMachine.js";
 import { SpriteTint } from "./spriteTint.js";
 
 export class SpriteComponent extends EntityComponent {
@@ -73,8 +75,17 @@ export class SpriteComponent extends EntityComponent {
             }
         }
 
+        let spriteConfig: SpriteProviderConfig | null = null;
+        let frame = 0;
+        const component = this.entity.getComponent(SpriteStateMachine);
+        if (component) {
+            spriteConfig = component.updateSpriteConfiguration(0, drawMode);
+            frame = spriteConfig.frame;
+        }
+
         context.drawScreenSpaceSprite({
-            sprite: this.sprite,
+            frame: frame,
+            sprite: spriteConfig?.sprite ?? this.sprite,
             x: screenPosition.x + this.offset.x,
             y: screenPosition.y + this.offset.y,
             targetHeight: targetHeight,

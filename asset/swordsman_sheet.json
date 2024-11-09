@@ -4,6 +4,27 @@
         "y": 0,
         "w": 16,
         "h": 16,
-        "frames": 1
+        "frames": 5
+    },
+    "knight_up": {
+        "x": 0,
+        "y": 16,
+        "w": 16,
+        "h": 16,
+        "frames": 5
+    },
+    "knight_right": {
+        "x": 0,
+        "y": 32,
+        "w": 16,
+        "h": 16,
+        "frames": 5
+    },
+    "knight_left": {
+        "x": 0,
+        "y": 48,
+        "w": 16,
+        "h": 16,
+        "frames": 5
     }
 }

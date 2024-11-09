@@ -1,10 +1,13 @@
 import {
     Point,
+    getDirection,
     isPointAdjacentTo,
     manhattanDistance,
     pointEquals,
 } from "../../../common/point.js";
 import { PathOptions } from "../../../path/pathOptions.js";
+import { getAnimationStateFromMovementDirection } from "../draw/spriteProvider/statemachine/spriteAction.js";
+import { SpriteStateMachine } from "../draw/spriteProvider/statemachine/spriteStateMachine.js";
 import { EnergyComponent } from "../energy/energyComponent.js";
 import { EntityComponent } from "../entityComponent.js";
 import { ChunkMapComponent } from "../root/chunk/chunkMapComponent.js";
@@ -112,7 +115,21 @@ export class MovementComponent extends EntityComponent {
         if (nextStep) {
             const isPositionAvailable = this.isPositionAvailable(nextStep);
             if (isPositionAvailable) {
+                const direction = getDirection(
+                    this.entity.worldPosition,
+                    nextStep,
+                );
                 this.entity.worldPosition = nextStep;
+                if (direction) {
+                    const component =
+                        this.entity.getComponent(SpriteStateMachine);
+                    if (component) {
+                        const animationDirection =
+                            getAnimationStateFromMovementDirection(direction);
+                        component.setState(animationDirection);
+                    }
+                }
+
                 return MovementResult.Ok;
             } else {
                 const newPath = this.generatePath(
