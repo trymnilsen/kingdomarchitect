@@ -26,5 +26,33 @@
         "w": 16,
         "h": 16,
         "frames": 5
+    },
+    "knight_idle_down": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16,
+        "frames": 2
+    },
+    "knight_idle_up": {
+        "x": 0,
+        "y": 16,
+        "w": 16,
+        "h": 16,
+        "frames": 2
+    },
+    "knight_idle_right": {
+        "x": 0,
+        "y": 32,
+        "w": 16,
+        "h": 16,
+        "frames": 2
+    },
+    "knight_idle_left": {
+        "x": 0,
+        "y": 48,
+        "w": 16,
+        "h": 16,
+        "frames": 2
     }
 }

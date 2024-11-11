@@ -135,6 +135,7 @@ export class Game {
             this.interactionHandler.onUpdate(this.updateTick);
             this.updateVisibilityMap();
         }
+        this.renderer.context.drawTick = this.drawTick;
         this.render(DrawMode.Tick);
     };
 

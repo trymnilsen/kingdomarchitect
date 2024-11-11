@@ -43,6 +43,8 @@ export class RenderScope implements UIRenderScope, UILayoutScope {
     private _height: number;
     private _offscreenCanvas: OffscreenCanvas;
     private _offscreenContext: CanvasContext;
+
+    drawTick: number = 0;
     /**
      * The currently active camera for the render context
      */

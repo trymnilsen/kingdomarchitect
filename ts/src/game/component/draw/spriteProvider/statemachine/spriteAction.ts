@@ -1,27 +1,13 @@
 import { Direction } from "../../../../../common/direction.js";
 
+// This should be a object instead to handle direction better
 export enum SpriteAction {
-    MoveLeft,
-    MoveRight,
-    MoveUp,
-    MoveDown,
-    AttackLeft,
-    AttackRight,
-    AttackUp,
-    AttackDown,
+    Move,
+    Attack,
+    Idle,
 }
 
-export function getAnimationStateFromMovementDirection(
-    direction: Direction,
-): SpriteAction {
-    switch (direction) {
-        case Direction.Down:
-            return SpriteAction.MoveDown;
-        case Direction.Up:
-            return SpriteAction.MoveUp;
-        case Direction.Left:
-            return SpriteAction.MoveLeft;
-        case Direction.Right:
-            return SpriteAction.MoveRight;
-    }
-}
+export type SpriteActionState = {
+    direction: Direction;
+    action: SpriteAction;
+};

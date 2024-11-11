@@ -79,7 +79,10 @@ export class SpriteComponent extends EntityComponent {
         let frame = 0;
         const component = this.entity.getComponent(SpriteStateMachine);
         if (component) {
-            spriteConfig = component.updateSpriteConfiguration(0, drawMode);
+            spriteConfig = component.updateSpriteConfiguration(
+                context.drawTick,
+                drawMode,
+            );
             frame = spriteConfig.frame;
         }
 

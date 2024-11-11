@@ -6,7 +6,7 @@ import {
     pointEquals,
 } from "../../../common/point.js";
 import { PathOptions } from "../../../path/pathOptions.js";
-import { getAnimationStateFromMovementDirection } from "../draw/spriteProvider/statemachine/spriteAction.js";
+import { SpriteAction } from "../draw/spriteProvider/statemachine/spriteAction.js";
 import { SpriteStateMachine } from "../draw/spriteProvider/statemachine/spriteStateMachine.js";
 import { EnergyComponent } from "../energy/energyComponent.js";
 import { EntityComponent } from "../entityComponent.js";
@@ -124,9 +124,10 @@ export class MovementComponent extends EntityComponent {
                     const component =
                         this.entity.getComponent(SpriteStateMachine);
                     if (component) {
-                        const animationDirection =
-                            getAnimationStateFromMovementDirection(direction);
-                        component.setState(animationDirection);
+                        component.setState({
+                            direction: direction,
+                            action: SpriteAction.Move,
+                        });
                     }
                 }
 

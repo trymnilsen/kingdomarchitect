@@ -1,4 +1,5 @@
 import { Sprite2 } from "../../../../../asset/sprite.js";
+import { Direction } from "../../../../../common/direction.js";
 import { Point } from "../../../../../common/point.js";
 import { DrawMode } from "../../../../../rendering/drawMode.js";
 import { RenderScope } from "../../../../../rendering/renderScope.js";
@@ -7,29 +8,36 @@ import { Entity } from "../../../../entity/entity.js";
 import { EntityComponent } from "../../../entityComponent.js";
 import { SpriteProvider, SpriteProviderConfig } from "../spriteProvider.js";
 import { AnimationState } from "./animationState.js";
-import { SpriteAction } from "./spriteAction.js";
+import { SpriteAction, SpriteActionState } from "./spriteAction.js";
 
 export class SpriteStateMachine extends EntityComponent {
-    private _currentState: SpriteAction;
-    private _currentAnimation: AnimationState;
+    private _currentState: SpriteActionState;
+    private _currentAnimation!: AnimationState;
 
     public get sprite(): SpriteProviderConfig {
         return this._currentAnimation.spriteConfiguration;
     }
 
-    private _animationFactory: (state: SpriteAction) => AnimationState;
+    private _animationFactory: (state: SpriteActionState) => AnimationState;
+    //Set default state
     constructor(
-        initialState: SpriteAction,
-        animationFactory: (state: SpriteAction) => AnimationState,
+        animationFactory: (state: SpriteActionState) => AnimationState,
     ) {
         super();
-        this._currentState = initialState;
+        this._currentState = {
+            direction: Direction.Down,
+            action: SpriteAction.Idle,
+        };
+
         this._animationFactory = animationFactory;
-        this._currentAnimation = animationFactory(initialState);
+        this.setAnimationState(animationFactory(this._currentState));
     }
 
-    setState(newState: SpriteAction, restartOnCurrent: boolean = false) {
-        if (newState != this._currentState || restartOnCurrent) {
+    setState(newState: SpriteActionState, restartOnCurrent: boolean = false) {
+        if (
+            !this.stateEqual(newState, this._currentState) ||
+            restartOnCurrent
+        ) {
             const newAnimation = this._animationFactory(newState);
             console.log(
                 "Setting statemachine state: updated state",
@@ -37,7 +45,7 @@ export class SpriteStateMachine extends EntityComponent {
                 this._currentState,
             );
             this._currentState = newState;
-            this._currentAnimation = newAnimation;
+            this.setAnimationState(newAnimation);
         } else {
             console.log(
                 "Setting statemachine state: new state was same as current",
@@ -50,14 +58,26 @@ export class SpriteStateMachine extends EntityComponent {
         drawTick: number,
         drawMode: DrawMode,
     ): SpriteProviderConfig {
+        const currentAnimation = this._currentAnimation;
         if (drawMode == DrawMode.Tick) {
-            this._currentAnimation.onDrawUpdate(drawTick);
+            currentAnimation.onDrawUpdate(drawTick);
         }
 
-        return this._currentAnimation.spriteConfiguration;
+        return currentAnimation.spriteConfiguration;
     }
-    override onUpdate(tick: number): void {
-        this._currentAnimation.onUpdate(tick, this.entity);
+
+    private setAnimationState(state: AnimationState) {
+        this._currentAnimation = state;
+        state.finished = () => {
+            this.setState({
+                direction: this._currentState.direction,
+                action: SpriteAction.Idle,
+            });
+        };
+    }
+
+    private stateEqual(a: SpriteActionState, b: SpriteActionState): boolean {
+        return a.action == b.action && a.direction == b.direction;
     }
 
     /*

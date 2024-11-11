@@ -54,9 +54,7 @@ export function workerPrefab(id: string): Entity {
     worker.addComponent(
         new SelectionInfoComponent(new WorkerSelectionInfoProvider()),
     );
-    worker.addComponent(
-        new SpriteStateMachine(SpriteAction.MoveDown, knightSpriteFactory),
-    );
+    worker.addComponent(new SpriteStateMachine(knightSpriteFactory));
     worker.addComponent(
         new SpriteComponent(sprites2.bowman, zeroPoint(), {
             x: 32,
