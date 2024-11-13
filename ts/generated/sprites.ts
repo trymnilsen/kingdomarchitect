@@ -1523,6 +1523,17 @@ export const sprites = {
       "y": 112
     }
   },
+  "training_dummy": {
+    "bin": "0",
+    "id": "training_dummy",
+    "defintion": {
+      "frames": 1,
+      "w": 16,
+      "h": 16,
+      "x": 292,
+      "y": 208
+    }
+  },
   "wizard_hat_skill": {
     "bin": "0",
     "id": "wizard_hat_skill",

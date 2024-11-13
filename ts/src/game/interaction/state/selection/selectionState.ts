@@ -12,6 +12,7 @@ import { ButtonCollection } from "../../view/actionbar/buttonCollection.js";
 import { UIActionbarItem } from "../../view/actionbar/uiActionbar.js";
 import { SelectionPresenter } from "../../view/selectionPresenter.js";
 import { ActorSelectionProvider } from "./actor/provider/actorSelectionProvider.js";
+import { AttackSelectionProvider } from "./actor/provider/attackSelectionProvider.js";
 import { BlacksmithSelectionProvider } from "./actor/provider/blacksmithSelectionProvider.js";
 import { CollectableProvider } from "./actor/provider/collectableProvider.js";
 import { TileSelectionProvider } from "./actor/provider/tileSelectionProvider.js";
@@ -26,6 +27,7 @@ export class SelectionState extends InteractionState {
         new TileSelectionProvider(),
         new CollectableProvider(),
         new BlacksmithSelectionProvider(),
+        new AttackSelectionProvider(),
     ];
 
     override get stateName(): string {

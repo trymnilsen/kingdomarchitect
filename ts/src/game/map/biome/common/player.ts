@@ -26,6 +26,7 @@ import { BiomeMapCollection } from "../biomeMapCollection.js";
 import { buildingPrefab } from "../../../prefab/buildingPrefab.js";
 import { woodenHouse } from "../../../../data/building/wood/house.js";
 import { buildingFactory } from "../../../prefab/buildingFactory.js";
+import { trainingDummyPrefab } from "../../../prefab/trainingDummyPrefab.js";
 
 export function addPlayerToBiome(
     biomes: BiomeMapCollection,
@@ -83,11 +84,14 @@ function addPlayerEntities(rootEntity: Entity, worldPosition: Point) {
         bowItem,
     ];
     const chestEntity = chestPrefab(generateId("chest"), chestItems);
+    const trainingDummy = trainingDummyPrefab(generateId("trainingdummy"));
+    trainingDummy.position = addPoint(worldPosition, { x: 0, y: 1 });
     chestEntity.position = addPoint(worldPosition, { x: 3, y: 2 });
     firstFarm.position = addPoint(worldPosition, { x: 2, y: 1 });
     firstHouse.position = addPoint(worldPosition, { x: 1, y: 1 });
     firstWorker.position = addPoint(worldPosition, { x: 1, y: 2 });
     well.position = addPoint(worldPosition, { x: 2, y: 2 });
+    rootEntity.addChild(trainingDummy);
     rootEntity.addChild(firstFarm);
     rootEntity.addChild(firstWorker);
     rootEntity.addChild(firstHouse);
