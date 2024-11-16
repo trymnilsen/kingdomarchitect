@@ -1,4 +1,8 @@
+import { AttackJob } from "../../../../../component/actor/mob/attackJob.js";
+import { WorkerBehaviorComponent } from "../../../../../component/behavior/workerBehaviorComponent.js";
+import { BuildingComponent } from "../../../../../component/building/buildingComponent.js";
 import { HealthComponent } from "../../../../../component/health/healthComponent.js";
+import { JobQueueComponent } from "../../../../../component/job/jobQueueComponent.js";
 import { SelectedEntityItem } from "../../../../../selection/selectedEntityItem.js";
 import { SelectedWorldItem } from "../../../../../selection/selectedWorldItem.js";
 import { StateContext } from "../../../../handler/stateContext.js";
@@ -10,7 +14,7 @@ import {
 
 export class AttackSelectionProvider implements ActorSelectionProvider {
     provideButtons(
-        _stateContext: StateContext,
+        stateContext: StateContext,
         selection: SelectedWorldItem,
     ): ButtonCollection {
         if (selection instanceof SelectedEntityItem) {
@@ -18,11 +22,30 @@ export class AttackSelectionProvider implements ActorSelectionProvider {
                 selection.entity.getComponent(HealthComponent);
 
             if (!!healthComponent) {
+                if (!!selection.entity.getComponent(BuildingComponent)) {
+                    return emptySelection;
+                }
+
+                if (!!selection.entity.getComponent(WorkerBehaviorComponent)) {
+                    return emptySelection;
+                }
+
                 return {
                     left: [
                         {
                             text: "Attack",
-                            onClick: () => {},
+                            onClick: () => {
+                                const jobQueue =
+                                    stateContext.root.requireComponent(
+                                        JobQueueComponent,
+                                    );
+
+                                jobQueue.addJob(
+                                    new AttackJob(selection.entity, 5),
+                                );
+
+                                stateContext.stateChanger.clear();
+                            },
                         },
                     ],
                     right: [],

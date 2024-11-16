@@ -56,10 +56,14 @@ export function workerPrefab(id: string): Entity {
     );
     worker.addComponent(new SpriteStateMachine(knightSpriteFactory));
     worker.addComponent(
-        new SpriteComponent(sprites2.bowman, zeroPoint(), {
-            x: 32,
-            y: 32,
-        }),
+        new SpriteComponent(
+            sprites2.bowman,
+            { x: 2, y: 0 },
+            {
+                x: 32,
+                y: 32,
+            },
+        ),
     );
     worker.addComponent(healthComponent);
     worker.addComponent(effectComponent);

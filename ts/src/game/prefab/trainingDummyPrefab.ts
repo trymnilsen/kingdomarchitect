@@ -10,10 +10,14 @@ export function trainingDummyPrefab(id: string): Entity {
     const entity = new Entity(id);
 
     entity.addComponent(
-        new SpriteComponent(sprites2.training_dummy, zeroPoint(), {
-            x: 32,
-            y: 32,
-        }),
+        new SpriteComponent(
+            sprites2.training_dummy,
+            { x: 2, y: 0 },
+            {
+                x: 32,
+                y: 32,
+            },
+        ),
     );
     entity.addComponent(new HealthComponent(50, 50));
     entity.addComponent(
