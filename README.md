@@ -7,7 +7,7 @@
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-f8bc45.svg)](https://github.com/prettier/prettier)
 
 
-![Screenshot of the game](doc/screenshot/gameplay.png)
+![Screenshot of the game](doc/screenshot/screenshot.gif)
 
 ## 🕹️ Play
 
