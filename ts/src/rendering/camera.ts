@@ -6,6 +6,10 @@ export class Camera {
     private _halfWindowSize: Point;
     private _windowSize: Point;
 
+    /**
+     * Create a new camera
+     * @param windowSize the size of the viewport, x is width and y is height
+     */
     constructor(windowSize: Point) {
         this._windowSize = windowSize;
         this._position = { x: 0, y: 0 };
@@ -15,10 +19,19 @@ export class Camera {
         };
     }
 
+    /**
+     * Retrieve the position of the camera. The position is a pixel
+     * coordinate relative to the window/viewport
+     */
     get position(): Point {
         return this._position;
     }
 
+    /**
+     * Sets the position of the camera
+     * Removes any decimals to make sure we dont end up between
+     * pixels
+     */
     set position(point: Point) {
         this._position = {
             x: Math.floor(point.x),
