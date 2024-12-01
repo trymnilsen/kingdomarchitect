@@ -1,7 +1,7 @@
+import { ConstructorFunction } from "../common/constructor.js";
+
 export abstract class EcsComponent {}
-export type ComponentFn<T extends EcsComponent = EcsComponent> = new (
-    ...args: any[]
-) => T;
+export type ComponentFn = ConstructorFunction<EcsComponent>;
 
 /*
 export class ComponentRegistry {

@@ -1,1 +1,5 @@
-export function runAggroSystem(_tick: number) {}
+import { createSystem, EcsSystem } from "../../ecs/ecsSystem.js";
+
+export function createAggroSystem(): EcsSystem {
+    return createSystem({}).build();
+}

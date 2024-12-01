@@ -4,8 +4,8 @@ export interface ReadableSet<T> {
 }
 
 export class SparseSet<T> implements ReadableSet<T> {
-    private dense: Array<T>;
-    private sparse: Map<T, number>;
+    dense: Array<T>;
+    sparse: Map<T, number>;
 
     constructor() {
         this.dense = [];

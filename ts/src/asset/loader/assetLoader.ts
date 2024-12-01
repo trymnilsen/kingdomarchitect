@@ -34,8 +34,10 @@ export class AssetLoader {
     }
 
     private async loadAsset(name: string, filename: string) {
+        console.log(`Load asset ${filename}`);
         const imageElement = await this.fetchAsset(filename);
         this._assets[name] = imageElement;
+        console.log(`Loaded asset ${filename}`);
     }
 
     private fetchAsset(name: string): Promise<HTMLImageElement> {

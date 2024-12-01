@@ -2,6 +2,8 @@ import { ComponentFn, EcsComponent } from "./ecsComponent.js";
 import { EcsEntity, EcsSystem, QueryData, QueryObject } from "./ecsSystem.js";
 import { SparseSet } from "../common/structure/sparseSet.js";
 import { hasOwnProperty } from "../common/object.js";
+import { EcsEvent } from "./ecsEvent.js";
+import { EcsWorldScope } from "./ecsWorldScope.js";
 
 export type MutableQueryData<T extends QueryObject = QueryObject> = {
     [P in keyof T]: SparseSet<InstanceType<T[P]>>;
@@ -12,20 +14,32 @@ export type QueryMap<T extends QueryObject = QueryObject> = Map<
     MutableQueryData<T>
 >;
 
-export class EcsWorld {
+export class EcsWorld implements EcsWorldScope {
+    private systems: EcsSystem[] = [];
     private components: Map<EcsEntity, Map<Function, EcsComponent>> = new Map();
     private queryMap: QueryMap = new Map();
-    private systems: EcsSystem[] = [];
     private nextEntityId: number = 1;
 
-    update() {
-        for (const system of this.systems) {
+    dispatchEvent(event: EcsEvent) {
+        for (let i = 0; i < this.systems.length; i++) {
+            const system = this.systems[i];
+            if (!system.hasEvent(event)) {
+                continue;
+            }
+
             const queryMapResult = this.queryMap.get(system.query);
-            //TODO Benchmark the difference between caching and not
             if (!!queryMapResult) {
-                system.runUpdate(queryMapResult, 0);
-            } else {
-                const components = {};
+                try {
+                    system.onEvent(queryMapResult, event, this);
+                } catch (err) {
+                    console.error(
+                        "Failed running dispatch for system",
+                        system,
+                        event,
+                        err,
+                    );
+                    throw err;
+                }
             }
         }
     }
@@ -98,7 +112,7 @@ export class EcsWorld {
         }
     }
 
-    addSystem<T extends QueryObject>(system: EcsSystem<T>) {
+    addSystem(system: EcsSystem) {
         this.systems.push(system as EcsSystem);
         const queryData: MutableQueryData = {};
         //Build query for query map
@@ -161,7 +175,7 @@ export class EcsWorld {
      * Checks if the entity has the components need to match the query provided
      * If it does an object with the same keys as the query and the instances
      * of the components on the entity is returned. All components in the
-     * query needs to be present to be considered a match. Components not in the
+     * query needs to be present to be conssidered a match. Components not in the
      * query but existing on the entity is ignored and not added to the returned
      * object
      * @param entity the entity to check for components on

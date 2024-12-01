@@ -1,9 +1,15 @@
 import assert from "assert";
 import { describe, it, beforeEach } from "node:test";
 import { EcsComponent } from "../../src/ecs/ecsComponent.js";
-import { EcsSystem, QueryData, QueryObject } from "../../src/ecs/ecsSystem.js";
+import {
+    createSystem,
+    EcsSystem,
+    QueryData,
+    QueryObject,
+} from "../../src/ecs/ecsSystem.js";
 import { EcsWorld } from "../../src/ecs/ecsWorld.js";
 import { SparseSet } from "../../src/common/structure/sparseSet.js";
+import { EcsInitEvent, EcsUpdateEvent } from "../../src/ecs/ecsEvent.js";
 
 class Position extends EcsComponent {
     constructor(
@@ -137,15 +143,15 @@ describe("EcsWorld", () => {
             const query = { position: Position, velocity: Velocity };
             let processedEntities: QueryData[] = [];
 
-            const system = new EcsSystem(query);
-            system.withUpdate((components) => {
-                // Collect the processed entities to assert later
-                processedEntities.push(components);
-            });
+            const system = createSystem(query)
+                .onEvent(EcsUpdateEvent, (query, _event) => {
+                    processedEntities.push(query);
+                })
+                .build();
 
             // Add the system to the world and trigger update
             ecsWorld.addSystem(system);
-            ecsWorld.update();
+            ecsWorld.dispatchEvent(new EcsUpdateEvent());
 
             // Assert that only entity1 (with both Position and Velocity) was processed
             const entries = Object.entries(processedEntities[0]);
@@ -174,25 +180,42 @@ describe("EcsWorld", () => {
             const query = { position: Position, velocity: Velocity };
             let processedEntities: { [id: string]: EcsComponent }[] = [];
 
-            const system = new EcsSystem(query);
-            system.withUpdate((components) => {
-                // Collect the processed entities to assert later
-                processedEntities = [];
+            const system = createSystem(query)
+                .onEvent(EcsUpdateEvent, (query, _event) => {
+                    // Collect the processed entities to assert later
+                    processedEntities = [];
 
-                for (const [key, set] of Object.entries(components)) {
-                    for (let i = 0; i < set.size; i++) {
-                        const component = set.elementAt(i);
-                        processedEntities.push({ [key]: component });
+                    for (const [key, set] of Object.entries(query)) {
+                        for (let i = 0; i < set.size; i++) {
+                            const component = set.elementAt(i);
+                            processedEntities.push({ [key]: component });
+                        }
                     }
-                }
-            });
+                })
+                .build();
 
             // Add the system to the world and trigger update
             ecsWorld.addSystem(system);
-            ecsWorld.update();
+            ecsWorld.dispatchEvent(new EcsUpdateEvent());
 
             // Assert that no entities were processed
             assert.strictEqual(processedEntities.length, 0);
+        });
+    });
+
+    describe("Dispatch", () => {
+        it("should dispatch event when query is empty", () => {
+            const ecsWorld = new EcsWorld();
+            let initInvoked = false;
+            const system = createSystem({})
+                .onEvent(EcsInitEvent, (_query, _event) => {
+                    initInvoked = true;
+                })
+                .build();
+
+            ecsWorld.addSystem(system);
+            ecsWorld.dispatchEvent(new EcsInitEvent());
+            assert.equal(initInvoked, true);
         });
     });
 });

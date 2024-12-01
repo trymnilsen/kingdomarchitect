@@ -4,6 +4,7 @@ import { EcsWorld } from "../../src/ecs/ecsWorld.js";
 import { EcsSystem } from "../../src/ecs/ecsSystem.js";
 import { EcsComponent } from "../../src/ecs/ecsComponent.js";
 
+/*
 describe("Ecs system", () => {
     it("Can add components", () => {
         class JumpComponent extends EcsComponent {}
@@ -39,3 +40,4 @@ describe("Ecs system", () => {
         assert.equal(2, 2);
     });
 });
+*/

@@ -100,8 +100,10 @@ export class MiniBench<T = unknown> {
     }
 
     run(): TestResult[] {
+        console.log("Starting warmup");
         //Run a warmout round
         for (const test of this.tests) {
+            console.log("Warming up: ", test.name);
             let data: any;
             if (!!test.setup) {
                 data = test.setup();
@@ -113,6 +115,7 @@ export class MiniBench<T = unknown> {
         for (let i = 0; i < this.tests.length; i++) {
             const test = this.tests[i];
             const timings: bigint[] = [];
+            console.log(`Running ${test.name} with ${this.samples} samples`);
             for (let j = 0; j < this.samples; j++) {
                 let data: any;
                 if (!!test.setup) {
