@@ -7,8 +7,17 @@ import { EcsWorldScope } from "./ecsWorldScope.js";
 
 export type EcsEntity = number;
 export type QueryData<T extends QueryObject = QueryObject> = {
-    [P in keyof T]: ReadableSet<InstanceType<T[P]>>;
+    [P in keyof T]: InstanceType<T[P]>;
 };
+/*
+export type ArrayQueryData<T extends QueryObject = QueryObject> =
+    QueryDataObject<T>[];
+export type MutableQueryData<T extends QueryObject = QueryObject> = SparseSet<
+    QueryDataObject<T>
+>;
+export type QueryData<T extends QueryObject = QueryObject> = ReadableSet<
+    QueryDataObject<T>
+>;*/
 
 export interface QueryObject<T extends ComponentFn = ComponentFn> {
     [componentName: string]: T;
@@ -16,14 +25,18 @@ export interface QueryObject<T extends ComponentFn = ComponentFn> {
 
 export interface EcsSystem {
     hasEvent(event: EcsEvent): boolean;
-    onEvent(query: QueryData, event: EcsEvent, worldScope: EcsWorldScope): void;
+    onEvent(
+        query: Iterator<QueryData>,
+        event: EcsEvent,
+        worldScope: EcsWorldScope,
+    ): void;
     readonly query: Readonly<QueryObject>;
 }
 
 export type EventFunction<
     T extends QueryObject = QueryObject,
     TData extends EcsEvent = EcsEvent,
-> = (query: QueryData<T>, event: TData, world: EcsWorldScope) => void;
+> = (query: Iterator<QueryData<T>>, event: TData, world: EcsWorldScope) => void;
 
 export class SystemBuilder<T extends QueryObject = QueryObject> {
     private events: Map<EcsEventFn, EventFunction<T>> = new Map();
@@ -77,7 +90,7 @@ class BuiltEcsSystem implements EcsSystem {
     }
 
     onEvent(
-        query: QueryData,
+        query: Iterator<QueryData>,
         event: EcsEvent,
         worldScope: EcsWorldScope,
     ): void {

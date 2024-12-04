@@ -5,20 +5,23 @@ import { hasOwnProperty } from "../common/object.js";
 import { EcsEvent } from "./ecsEvent.js";
 import { EcsWorldScope } from "./ecsWorldScope.js";
 
-export type MutableQueryData<T extends QueryObject = QueryObject> = {
-    [P in keyof T]: SparseSet<InstanceType<T[P]>>;
-};
-
-export type QueryMap<T extends QueryObject = QueryObject> = Map<
-    T,
-    MutableQueryData<T>
+export type QueryMap2<TQueryMap extends QueryObject = QueryObject> = Map<
+    TQueryMap,
+    Map<EcsEntity, QueryData<TQueryMap>>
 >;
 
 export class EcsWorld implements EcsWorldScope {
     private systems: EcsSystem[] = [];
     private components: Map<EcsEntity, Map<Function, EcsComponent>> = new Map();
-    private queryMap: QueryMap = new Map();
+    private queryMap: QueryMap2 = new Map();
     private nextEntityId: number = 1;
+
+    constructor(systems: EcsSystem[]) {
+        this.systems = systems;
+        for (const system of systems) {
+            this.queryMap.set(system.query, new Map());
+        }
+    }
 
     dispatchEvent(event: EcsEvent) {
         for (let i = 0; i < this.systems.length; i++) {
@@ -30,7 +33,7 @@ export class EcsWorld implements EcsWorldScope {
             const queryMapResult = this.queryMap.get(system.query);
             if (!!queryMapResult) {
                 try {
-                    system.onEvent(queryMapResult, event, this);
+                    system.onEvent(queryMapResult.values(), event, this);
                 } catch (err) {
                     console.error(
                         "Failed running dispatch for system",
@@ -61,40 +64,12 @@ export class EcsWorld implements EcsWorldScope {
         //Update the cache of queries when a component is added
         //to avoid taking this cost in the update loop
         //Add to query map
-        for (const system of this.systems) {
-            const set = this.getQueryMapSetForComponent(
-                system,
-                component.constructor as ComponentFn,
-            );
-
-            if (!!set) {
-                set.add(component);
-            }
-        }
+        this.updateQueryMapForEntity(entity);
     }
 
     removeComponent(entity: EcsEntity, component: EcsComponent) {
-        const componentMap = this.components.get(entity);
-        //Remove the component from the component map
-        const componentFn = component.constructor as ComponentFn;
-        if (!!componentMap) {
-            componentMap.delete(componentFn);
-            //If this causes the map to be empty we remove the map
-            if (componentMap.size == 0) {
-                this.components.delete(entity);
-            }
-        }
-
-        //Remove it from the query map also
-        const querySets = this.systems
-            .map((system) => {
-                return this.getQueryMapSetForComponent(system, componentFn);
-            })
-            .filter((item) => item != null);
-
-        for (const querySet of querySets) {
-            querySet.delete(component);
-        }
+        this.removeComponentInternal(entity, component);
+        this.updateQueryMapForEntity(entity);
     }
 
     hasEntity(entity: EcsEntity): boolean {
@@ -107,68 +82,69 @@ export class EcsWorld implements EcsWorldScope {
         const components = this.components.get(entity);
         if (!!components) {
             for (const component of components) {
-                this.removeComponent(entity, component[1]);
+                this.removeComponentInternal(entity, component[1]);
+            }
+        }
+        //Run the check once after removing all components
+        this.updateQueryMapForEntity(entity);
+    }
+
+    //TODO: this needs a better name
+    private removeComponentInternal(
+        entity: EcsEntity,
+        component: EcsComponent,
+    ) {
+        const componentMap = this.components.get(entity);
+        //Remove the component from the component map
+        const componentFn = component.constructor as ComponentFn;
+        if (!!componentMap) {
+            componentMap.delete(componentFn);
+            //If this causes the map to be empty we remove the map
+            if (componentMap.size == 0) {
+                this.components.delete(entity);
             }
         }
     }
 
-    addSystem(system: EcsSystem) {
-        this.systems.push(system as EcsSystem);
-        const queryData: MutableQueryData = {};
-        //Build query for query map
-        for (const key in system.query) {
-            if (!hasOwnProperty(system.query, key)) {
-                continue;
+    /**
+     * Loop over all systems and check if the query of that system matches the
+     * entity. If it does not remove it from the query map if present and
+     * add it to the query map if it matches but is not present
+     * @param entity
+     */
+    private updateQueryMapForEntity(entity: EcsEntity) {
+        //First check if the entity exists still in the component map
+        //it might have been removed. No need to continue further if it does not
+        //exists ¯\_(ツ)_/¯.
+        if (!this.components.has(entity)) {
+            for (const system of this.systems) {
+                this.clearQueryMapForEntity(entity, system);
             }
 
-            const component = system.query[key];
-            queryData[key] = new SparseSet();
+            return;
         }
 
-        //Find entities with components matching the query
-        for (const [entity, componentMap] of this.components) {
-            const entityQuery = this.queryEntity(entity, system.query);
-            if (!entityQuery) {
-                continue;
-            }
-
-            for (const key in entityQuery) {
-                if (!hasOwnProperty(entityQuery, key)) {
-                    continue;
+        for (const system of this.systems) {
+            const queryResult = this.queryEntity(entity, system.query);
+            if (!!queryResult) {
+                const map = this.queryMap.get(system.query);
+                if (!map) {
+                    throw new Error(
+                        "Possible data corruption, no map instance for system",
+                    );
                 }
 
-                queryData[key].add(entityQuery[key]);
+                map.set(entity, queryResult);
+            } else {
+                // The entity did not match the query for the system, we should
+                // remove it
+                this.clearQueryMapForEntity(entity, system);
             }
         }
-
-        this.queryMap.set(system.query, queryData);
     }
 
-    private getQueryMapSetForComponent(
-        system: EcsSystem,
-        component: ComponentFn,
-    ): SparseSet<EcsComponent> | null {
-        const query = system.query;
-        const queryData = this.queryMap.get(query);
-        if (!queryData) {
-            return null;
-        }
-
-        const queryKey = Object.entries(query).find(
-            ([_, value]) => value == component,
-        );
-
-        //If this query does not contain the component, return
-        if (!queryKey) {
-            return null;
-        }
-
-        const sparseSet = queryData[queryKey[0]];
-        if (!!sparseSet) {
-            return sparseSet;
-        } else {
-            throw new Error("Corrupt data, query had key not in query data");
-        }
+    private clearQueryMapForEntity(entity: EcsEntity, system: EcsSystem) {
+        this.queryMap.get(system.query)?.delete(entity);
     }
 
     /**

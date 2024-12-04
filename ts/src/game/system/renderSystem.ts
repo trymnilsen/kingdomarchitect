@@ -10,8 +10,8 @@ export function createRenderSystem(): EcsSystem {
         drawable: DrawableComponent,
         transform: TransformComponent,
     })
-        .onEvent(EcsRenderEvent, (query, event) => {
-            renderDrawables(query.drawable, event.renderScope);
+        .onEvent(EcsRenderEvent, (_query, _event) => {
+            //renderDrawables(query.drawable, event.renderScope);
         })
         .build();
 }

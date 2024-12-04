@@ -1,531 +1,322 @@
-import { it, beforeEach, describe } from "node:test";
-import assert from "node:assert/strict";
+import { test } from "node:test";
+import assert from "node:assert";
 import { SparseSet } from "../../../src/common/structure/sparseSet.js";
 
-interface Entry {
+interface MyEntity {
     id: number;
-    value?: string;
+    name: string;
 }
 
-describe("Sparse set", () => {
-    let sparseSet: SparseSet<Entry>;
-    beforeEach(() => {
-        sparseSet = new SparseSet<Entry>();
-    });
+test("SparseSet: Add and check size", () => {
+    const sparseSet = new SparseSet<MyEntity>((item) => item.id.toString());
+    const entity1 = { id: 1, name: "Alice" };
 
-    describe("Init", () => {
-        it("SparseSet initializes correctly", () => {
-            assert.strictEqual(
-                sparseSet.size,
-                0,
-                "Size should be 0 on initialization",
-            );
-            assert.deepStrictEqual(
-                [...sparseSet.sparse.keys()],
-                [],
-                "Sparse map should be empty",
-            );
-            assert.deepStrictEqual(
-                sparseSet.dense,
-                [],
-                "Dense array should be empty",
-            );
-        });
-    });
+    sparseSet.add(entity1);
 
-    describe("Add", () => {
-        it("add() inserts elements correctly", () => {
-            sparseSet.add({ id: 1 });
-            sparseSet.add({ id: 2 });
+    assert.strictEqual(
+        sparseSet.size,
+        1,
+        "Size should be 1 after adding an item",
+    );
+});
 
-            assert.strictEqual(
-                sparseSet.size,
-                2,
-                "Size should reflect the number of elements",
-            );
-            assert.deepStrictEqual(
-                sparseSet.elementAt(0),
-                { id: 1 },
-                "First element should match",
-            );
-            assert.deepStrictEqual(
-                sparseSet.elementAt(1),
-                { id: 2 },
-                "Second element should match",
-            );
-        });
+test("SparseSet: Add and contains", () => {
+    const sparseSet = new SparseSet<MyEntity>((item) => item.id.toString());
+    const entity1 = { id: 1, name: "Alice" };
+    const entity2 = { id: 2, name: "Bob" };
 
-        it("add() ignores duplicate keys", () => {
-            const sameObject = { id: 1 };
-            sparseSet.add(sameObject);
-            sparseSet.add(sameObject);
+    sparseSet.add(entity1);
+    sparseSet.add(entity2);
 
-            assert.strictEqual(
-                sparseSet.size,
-                1,
-                "Size should not increase for duplicate keys",
-            );
-        });
+    assert.ok(sparseSet.contains(entity1), "Should contain entity1");
+    assert.ok(sparseSet.contains(entity2), "Should contain entity2");
+});
 
-        it("add() handles large numbers of elements efficiently", () => {
-            const items: Entry[] = [];
-            for (let i = 1; i <= 1000; i++) {
-                items.push({ id: i });
-            }
+test("SparseSet: Delete item and verify size and contains", () => {
+    const sparseSet = new SparseSet<MyEntity>((item) => item.id.toString());
+    const entity1 = { id: 1, name: "Alice" };
+    const entity2 = { id: 2, name: "Bob" };
 
-            for (let i = 1; i <= 1000; i++) {
-                sparseSet.add(items[i]);
-            }
+    sparseSet.add(entity1);
+    sparseSet.add(entity2);
 
-            assert.strictEqual(
-                sparseSet.size,
-                1000,
-                "Size should reflect all added elements",
-            );
+    sparseSet.delete(entity1);
 
-            for (let i = 1; i <= 1000; i++) {
-                assert.strictEqual(
-                    sparseSet.contains(items[i]),
-                    true,
-                    `Should contain key ${i}`,
-                );
-            }
-        });
-    });
+    assert.strictEqual(
+        sparseSet.size,
+        1,
+        "Size should be 1 after deleting an item",
+    );
+    assert.ok(!sparseSet.contains(entity1), "Should no longer contain entity1");
+    assert.ok(sparseSet.contains(entity2), "Should still contain entity2");
+});
 
-    describe("access", () => {
-        it("contains() checks existence of elements correctly", () => {
-            const entry = { id: 1 };
+test("SparseSet: Element order and deletion consistency", () => {
+    const sparseSet = new SparseSet<MyEntity>((item) => item.id.toString());
+    const entity1 = { id: 1, name: "Alice" };
+    const entity2 = { id: 2, name: "Bob" };
+    const entity3 = { id: 3, name: "Charlie" };
 
-            sparseSet.add(entry);
+    sparseSet.add(entity1);
+    sparseSet.add(entity2);
+    sparseSet.add(entity3);
 
-            assert.strictEqual(
-                sparseSet.contains(entry),
-                true,
-                "Should contain the added element",
-            );
-            assert.strictEqual(
-                sparseSet.contains({ id: 2 }),
-                false,
-                "Should not contain an unadded element",
-            );
-        });
+    sparseSet.delete(entity2);
 
-        it("elementAt() retrieves elements by index", () => {
-            sparseSet.add({ id: 1 });
-            sparseSet.add({ id: 2 });
+    assert.strictEqual(
+        sparseSet.size,
+        2,
+        "Size should be 2 after deleting one item",
+    );
+    assert.strictEqual(
+        sparseSet.elementAt(0),
+        entity1,
+        "First element should be entity1",
+    );
+    assert.strictEqual(
+        sparseSet.elementAt(1),
+        entity3,
+        "Second element should be entity3",
+    );
+});
 
-            assert.deepStrictEqual(
-                sparseSet.elementAt(0),
-                { id: 1 },
-                "Should return correct element at index 0",
-            );
-            assert.deepStrictEqual(
-                sparseSet.elementAt(1),
-                { id: 2 },
-                "Should return correct element at index 1",
-            );
-        });
+test("SparseSet: Prevent duplicates", () => {
+    const sparseSet = new SparseSet<MyEntity>((item) => item.id.toString());
+    const entity1 = { id: 1, name: "Alice" };
 
-        it("elementAt() works correctly after interleaved operations", () => {
-            const toDelete = { id: 2 };
-            sparseSet.add({ id: 1 });
-            sparseSet.add(toDelete);
-            sparseSet.add({ id: 3 });
-            sparseSet.delete(toDelete);
-            sparseSet.add({ id: 4 });
+    sparseSet.add(entity1);
+    sparseSet.add(entity1); // Try adding the same item again
 
-            assert.strictEqual(
-                sparseSet.size,
-                3,
-                "Size should reflect current elements",
-            );
-            assert.deepStrictEqual(
-                sparseSet.elementAt(0),
-                { id: 1 },
-                "First element should be correct",
-            );
-            assert.deepStrictEqual(
-                sparseSet.elementAt(1),
-                { id: 3 },
-                "Second element should be correct",
-            );
-            assert.deepStrictEqual(
-                sparseSet.elementAt(2),
-                { id: 4 },
-                "Third element should be correct",
-            );
-        });
+    assert.strictEqual(
+        sparseSet.size,
+        1,
+        "Size should remain 1 after attempting to add a duplicate",
+    );
+});
 
-        it("elementAt() throws for out-of-bounds indices", () => {
-            sparseSet.add({ id: 1 });
+test("SparseSet: Out of bounds access", () => {
+    const sparseSet = new SparseSet<MyEntity>((item) => item.id.toString());
+    const entity1 = { id: 1, name: "Alice" };
 
-            assert.throws(
-                () => sparseSet.elementAt(-1),
-                "Should throw for negative index",
-            );
-            assert.throws(
-                () => sparseSet.elementAt(1),
-                "Should throw for index out of bounds",
-            );
-        });
+    sparseSet.add(entity1);
 
-        it("contains() returns false for invalid sparse map entries", () => {
-            sparseSet.add({ id: 1 });
-            sparseSet.sparse.set({ id: 4 }, 0); // Manually corrupt the sparse map
+    assert.throws(
+        () => sparseSet.elementAt(-1),
+        /Index out of bounds/,
+        "Negative index should throw an error",
+    );
+    assert.throws(
+        () => sparseSet.elementAt(1),
+        /Index out of bounds/,
+        "Index out of range should throw an error",
+    );
+});
 
-            assert.strictEqual(
-                sparseSet.contains({ id: 4 }),
-                false,
-                "Should not find keys with invalid sparse map entries",
-            );
-        });
-    });
+test("SparseSet: elementAt() works correctly after interleaved operations", () => {
+    const sparseSet = new SparseSet<MyEntity>((item) => item.id.toString());
+    const entity1 = { id: 1, name: "Alice" };
+    const entity2 = { id: 2, name: "Bob" };
+    const entity3 = { id: 3, name: "Charlie" };
 
-    describe("delete", () => {
-        it("delete() removes elements correctly", () => {
-            const toRemove = { id: 1 };
-            const toKeep = { id: 2 };
-            sparseSet.add(toRemove);
-            sparseSet.add(toKeep);
-            sparseSet.delete(toRemove);
+    sparseSet.add(entity1);
+    sparseSet.add(entity2);
+    sparseSet.delete(entity1);
+    sparseSet.add(entity3);
 
-            assert.strictEqual(
-                sparseSet.size,
-                1,
-                "Size should decrease after deletion",
-            );
-            assert.strictEqual(
-                sparseSet.contains(toRemove),
-                false,
-                "Deleted element should not exist",
-            );
-            assert.strictEqual(
-                sparseSet.contains(toKeep),
-                true,
-                "Other elements should remain intact",
-            );
-        });
+    assert.strictEqual(
+        sparseSet.elementAt(0),
+        entity3,
+        "First element should be entity3",
+    );
+    assert.strictEqual(
+        sparseSet.elementAt(1),
+        entity2,
+        "Second element should be entity2",
+    );
+});
 
-        it("delete() handles non-existent keys gracefully", () => {
-            const toAdd = { id: 1 };
-            sparseSet.add(toAdd);
-            sparseSet.delete({ id: 5 }); // Attempting to delete a non-existent key
+test("SparseSet: delete() maintains sparse-dense consistency", () => {
+    const sparseSet = new SparseSet<MyEntity>((item) => item.id.toString());
+    const entity1 = { id: 1, name: "Alice" };
+    const entity2 = { id: 2, name: "Bob" };
+    const entity3 = { id: 3, name: "Charlie" };
 
-            assert.strictEqual(
-                sparseSet.size,
-                1,
-                "Size should remain unchanged",
-            );
-            assert.strictEqual(
-                sparseSet.contains(toAdd),
-                true,
-                "Existing elements should remain intact",
-            );
-        });
-        /*
-        it("delete() maintains sparse-dense consistency", () => {
-            sparseSet.add(1, { id: 1 });
-            sparseSet.add(2, { id: 2 });
-            sparseSet.add(3, { id: 3 });
+    sparseSet.add(entity1);
+    sparseSet.add(entity2);
+    sparseSet.add(entity3);
 
-            sparseSet.delete(2);
+    sparseSet.delete(entity2);
 
-            assert.strictEqual(
-                sparseSet.size,
-                2,
-                "Size should decrease correctly",
-            );
-            assert.strictEqual(
-                sparseSet.contains(2),
-                false,
-                "Deleted element should not exist",
-            );
-            assert.strictEqual(
-                sparseSet.contains(3),
-                true,
-                "Last element should have been moved",
-            );
-            assert.deepStrictEqual(
-                sparseSet.elementAt(1),
-                { id: 3 },
-                "Last element should now be at index of deleted element",
-            );
-        });
+    // Check sparse-dense consistency
+    assert.strictEqual(
+        sparseSet.contains(entity1),
+        true,
+        "Sparse set should still contain entity1",
+    );
+    assert.strictEqual(
+        sparseSet.contains(entity3),
+        true,
+        "Sparse set should still contain entity3",
+    );
+    assert.strictEqual(
+        sparseSet.contains(entity2),
+        false,
+        "Sparse set should no longer contain entity2",
+    );
+});
 
-        it("SparseSet handles edge cases for empty sets", () => {
-            assert.strictEqual(
-                sparseSet.size,
-                0,
-                "Size should be 0 for an empty set",
-            );
-            assert.strictEqual(
-                sparseSet.contains(1),
-                false,
-                "Empty set should not contain any elements",
-            );
-            sparseSet.delete(1); // Deleting a non-existent element
-            assert.strictEqual(
-                sparseSet.size,
-                0,
-                "Size should remain 0 after deleting a non-existent element",
-            );
-        });
+test("SparseSet: delete() handles repeated deletions gracefully", () => {
+    const sparseSet = new SparseSet<MyEntity>((item) => item.id.toString());
+    const entity1 = { id: 1, name: "Alice" };
 
-        it("delete() handles repeated deletions gracefully", () => {
-            sparseSet.add(1, { id: 1 });
-            sparseSet.delete(1);
-            sparseSet.delete(1); // Attempt to delete the same key again
+    sparseSet.add(entity1);
 
-            assert.strictEqual(
-                sparseSet.size,
-                0,
-                "Size should remain 0 after repeated deletions",
-            );
-            assert.strictEqual(
-                sparseSet.contains(1),
-                false,
-                "Key should not exist after deletion",
-            );
-        });
+    sparseSet.delete(entity1);
+    sparseSet.delete(entity1); // Deleting again should not cause errors
 
-        it("delete() works correctly for large sets", () => {
-            for (let i = 1; i <= 1000; i++) {
-                sparseSet.add(i, { id: i });
-            }
+    assert.strictEqual(
+        sparseSet.size,
+        0,
+        "Size should remain 0 after repeated deletions",
+    );
+    assert.strictEqual(
+        sparseSet.contains(entity1),
+        false,
+        "Entity1 should not be contained after deletion",
+    );
+});
 
-            for (let i = 1; i <= 500; i++) {
-                sparseSet.delete(i);
-            }
+test("SparseSet: handles re-adding after deletion correctly", () => {
+    const sparseSet = new SparseSet<MyEntity>((item) => item.id.toString());
+    const entity1 = { id: 1, name: "Alice" };
 
-            assert.strictEqual(
-                sparseSet.size,
-                500,
-                "Size should reflect remaining elements",
-            );
+    sparseSet.add(entity1);
+    sparseSet.delete(entity1);
+    sparseSet.add(entity1); // Re-add the same item
 
-            for (let i = 1; i <= 500; i++) {
-                assert.strictEqual(
-                    sparseSet.contains(i),
-                    false,
-                    `Should not contain deleted key ${i}`,
-                );
-            }
+    assert.strictEqual(
+        sparseSet.size,
+        1,
+        "Size should be 1 after re-adding an item",
+    );
+    assert.ok(
+        sparseSet.contains(entity1),
+        "Entity1 should be contained after re-adding",
+    );
+});
 
-            for (let i = 501; i <= 1000; i++) {
-                assert.strictEqual(
-                    sparseSet.contains(i),
-                    true,
-                    `Should still contain key ${i}`,
-                );
-            }
-        });
+test("SparseSet: add handles empty and complex objects", () => {
+    const sparseSet = new SparseSet<Record<string, unknown>>((item) =>
+        JSON.stringify(item),
+    );
 
-        it("SparseSet handles deletion of the last element", () => {
-            sparseSet.add(1, { id: 1 });
-            sparseSet.add(2, { id: 2 });
-            sparseSet.add(3, { id: 3 });
-            sparseSet.delete(3);
+    const entity1 = {};
+    const entity2 = { nested: { value: 42 } };
 
-            assert.strictEqual(
-                sparseSet.size,
-                2,
-                "Size should decrease after deleting the last element",
-            );
-            assert.strictEqual(
-                sparseSet.contains(3),
-                false,
-                "Deleted element should not exist",
-            );
-            assert.strictEqual(
-                sparseSet.contains(1),
-                true,
-                "Other elements should remain intact",
-            );
-            assert.strictEqual(
-                sparseSet.contains(2),
-                true,
-                "Other elements should remain intact",
-            );
-        });
+    sparseSet.add(entity1);
+    sparseSet.add(entity2);
 
-        it("delete() does nothing for nonexistent keys", () => {
-            sparseSet.add(1, { id: 1 });
-            sparseSet.delete(2); // Attempt to delete a key that was never added
+    assert.strictEqual(
+        sparseSet.size,
+        2,
+        "Size should be 2 after adding complex objects",
+    );
+    assert.ok(sparseSet.contains(entity1), "Should contain empty object");
+    assert.ok(sparseSet.contains(entity2), "Should contain nested object");
+});
 
-            assert.strictEqual(
-                sparseSet.size,
-                1,
-                "Size should remain unchanged",
-            );
-            assert.strictEqual(
-                sparseSet.contains(1),
-                true,
-                "Existing keys should remain intact",
-            );
-        });*/
-    });
+test("SparseSet: edge case of deleting last element", () => {
+    const sparseSet = new SparseSet<MyEntity>((item) => item.id.toString());
+    const entity1 = { id: 1, name: "Alice" };
+    const entity2 = { id: 2, name: "Bob" };
 
-    describe("mixed operations", () => {
-        /*
-        it("SparseSet handles consecutive adds and deletes", () => {
-            sparseSet.add(1, { id: 1 });
-            sparseSet.add(2, { id: 2 });
-            sparseSet.add(3, { id: 3 });
+    sparseSet.add(entity1);
+    sparseSet.add(entity2);
 
-            sparseSet.delete(2);
-            sparseSet.add(2, { id: 2 }); // Re-add the deleted key
+    sparseSet.delete(entity2);
 
-            assert.strictEqual(
-                sparseSet.size,
-                3,
-                "Size should remain correct after consecutive operations",
-            );
-            assert.strictEqual(
-                sparseSet.contains(1),
-                true,
-                "Should still contain key 1",
-            );
-            assert.strictEqual(
-                sparseSet.contains(2),
-                true,
-                "Should contain re-added key 2",
-            );
-            assert.strictEqual(
-                sparseSet.contains(3),
-                true,
-                "Should still contain key 3",
-            );
-        });
+    assert.strictEqual(
+        sparseSet.size,
+        1,
+        "Size should be 1 after deleting last element",
+    );
+    assert.ok(sparseSet.contains(entity1), "Should still contain entity1");
+    assert.ok(!sparseSet.contains(entity2), "Should no longer contain entity2");
+});
 
-        it("SparseSet handles re-adding after deletion correctly", () => {
-            sparseSet.add(1, { id: 1 });
-            sparseSet.delete(1);
-            sparseSet.add(1, { id: 1 });
+test("SparseSet: delete all and re-add works correctly", () => {
+    const sparseSet = new SparseSet<MyEntity>((item) => item.id.toString());
+    const entity1 = { id: 1, name: "Alice" };
+    const entity2 = { id: 2, name: "Bob" };
 
-            assert.strictEqual(
-                sparseSet.size,
-                1,
-                "Size should reflect the re-added element",
-            );
-            assert.strictEqual(
-                sparseSet.contains(1),
-                true,
-                "Should contain re-added key",
-            );
-        });
+    sparseSet.add(entity1);
+    sparseSet.add(entity2);
 
-        it("SparseSet maintains integrity after clearing and re-adding", () => {
-            sparseSet.add(1, { id: 1 });
-            sparseSet.add(2, { id: 2 });
-            sparseSet.delete(1);
-            sparseSet.delete(2);
+    sparseSet.delete(entity1);
+    sparseSet.delete(entity2);
 
-            assert.strictEqual(
-                sparseSet.size,
-                0,
-                "Size should be 0 after clearing the set",
-            );
+    assert.strictEqual(
+        sparseSet.size,
+        0,
+        "Size should be 0 after deleting all elements",
+    );
 
-            sparseSet.add(3, { id: 3 });
-            sparseSet.add(4, { id: 4 });
+    sparseSet.add(entity1);
+    sparseSet.add(entity2);
 
-            assert.strictEqual(
-                sparseSet.size,
-                2,
-                "Size should reflect re-added elements",
-            );
-            assert.strictEqual(
-                sparseSet.contains(3),
-                true,
-                "Should contain re-added key 3",
-            );
-            assert.strictEqual(
-                sparseSet.contains(4),
-                true,
-                "Should contain re-added key 4",
-            );
-        });
+    assert.strictEqual(
+        sparseSet.size,
+        2,
+        "Size should be 2 after re-adding elements",
+    );
+    assert.ok(
+        sparseSet.contains(entity1),
+        "Should contain entity1 after re-adding",
+    );
+    assert.ok(
+        sparseSet.contains(entity2),
+        "Should contain entity2 after re-adding",
+    );
+});
 
-        it("SparseSet does not corrupt internal state when keys conflict", () => {
-            sparseSet.add(1, { id: 1 });
-            sparseSet.add(1, { id: 1 }); // Attempting to add a duplicate key
+test("SparseSet: elements maintain proper order during swaps", () => {
+    const sparseSet = new SparseSet<MyEntity>((item) => item.id.toString());
+    const entity1 = { id: 1, name: "Alice" };
+    const entity2 = { id: 2, name: "Bob" };
+    const entity3 = { id: 3, name: "Charlie" };
 
-            assert.strictEqual(
-                sparseSet.size,
-                1,
-                "Size should not increase for duplicate keys",
-            );
-            assert.strictEqual(
-                sparseSet.contains(1),
-                true,
-                "Should still contain the original key",
-            );
-        });
+    sparseSet.add(entity1);
+    sparseSet.add(entity2);
+    sparseSet.add(entity3);
 
-        it("SparseSet allows reuse after clearing all elements", () => {
-            sparseSet.add(1, { id: 1 });
-            sparseSet.add(2, { id: 2 });
-            sparseSet.delete(1);
-            sparseSet.delete(2);
+    sparseSet.delete(entity1);
 
-            sparseSet.add(3, { id: 3 });
+    assert.strictEqual(
+        sparseSet.elementAt(0),
+        entity3,
+        "After deletion, entity3 should occupy position 0",
+    );
+    assert.strictEqual(
+        sparseSet.elementAt(1),
+        entity2,
+        "After deletion, entity2 should occupy position 1",
+    );
+});
 
-            assert.strictEqual(
-                sparseSet.size,
-                1,
-                "Size should reflect new addition after clearing",
-            );
-            assert.strictEqual(
-                sparseSet.contains(1),
-                false,
-                "Old keys should not exist",
-            );
-            assert.strictEqual(
-                sparseSet.contains(2),
-                false,
-                "Old keys should not exist",
-            );
-            assert.strictEqual(
-                sparseSet.contains(3),
-                true,
-                "New key should exist",
-            );
-        });
+test("SparseSet: adding the same object twice maintains consistency", () => {
+    const sparseSet = new SparseSet<MyEntity>((item) => item.id.toString());
+    const entity1 = { id: 1, name: "Alice" };
 
-        it("SparseSet handles repeated additions and deletions of the same key", () => {
-            sparseSet.add(1, { id: 1 });
-            sparseSet.delete(1);
-            sparseSet.add(1, { id: 1 });
+    sparseSet.add(entity1);
+    sparseSet.add(entity1); // Adding the same object again should do nothing
 
-            assert.strictEqual(
-                sparseSet.size,
-                1,
-                "Size should reflect latest addition",
-            );
-            assert.strictEqual(
-                sparseSet.contains(1),
-                true,
-                "Should contain the re-added key",
-            );
-        });
-
-        it("Order in dense array remains valid after multiple operations", () => {
-            sparseSet.add(1, { id: 1 });
-            sparseSet.add(2, { id: 2 });
-            sparseSet.add(3, { id: 3 });
-            sparseSet.delete(2);
-
-            assert.deepStrictEqual(
-                sparseSet.elementAt(0),
-                { id: 1 },
-                "First element should remain unchanged",
-            );
-            assert.deepStrictEqual(
-                sparseSet.elementAt(1),
-                { id: 3 },
-                "Last element should replace the deleted one",
-            );
-        });*/
-    });
+    assert.strictEqual(
+        sparseSet.size,
+        1,
+        "Size should remain 1 after trying to add a duplicate",
+    );
+    assert.ok(
+        sparseSet.contains(entity1),
+        "SparseSet should still contain the item",
+    );
 });
