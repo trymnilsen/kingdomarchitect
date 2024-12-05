@@ -1,30 +1,30 @@
-import { ReadableSet } from "../../common/structure/sparseSet.js";
 import { EcsRenderEvent } from "../../ecs/ecsEvent.js";
-import { createSystem, EcsSystem } from "../../ecs/ecsSystem.js";
+import { createSystem, EcsSystem, QueryData } from "../../ecs/ecsSystem.js";
 import { RenderScope } from "../../rendering/renderScope.js";
 import { DrawableComponent } from "../ecsComponent/drawable/drawableComponent.js";
 import { TransformComponent } from "../ecsComponent/transformComponent.js";
 
+const query = {
+    drawable: DrawableComponent,
+    transform: TransformComponent,
+};
+
 export function createRenderSystem(): EcsSystem {
-    return createSystem({
-        drawable: DrawableComponent,
-        transform: TransformComponent,
-    })
-        .onEvent(EcsRenderEvent, (_query, _event) => {
-            //renderDrawables(query.drawable, event.renderScope);
+    return createSystem(query)
+        .onEvent(EcsRenderEvent, (query, event) => {
+            renderDrawables(query, event.renderScope);
         })
         .build();
 }
 
 function renderDrawables(
-    drawables: ReadableSet<DrawableComponent>,
+    entities: Iterable<QueryData<typeof query>>,
     renderScope: RenderScope,
 ) {
-    for (let i = 0; i < drawables.size; i++) {
-        const drawable = drawables.elementAt(i);
-        if (drawable.sprite) {
+    for (const entity of entities) {
+        if (entity.drawable.sprite) {
             renderScope.drawSprite({
-                sprite: drawable.sprite,
+                sprite: entity.drawable.sprite,
                 x: 0,
                 y: 0,
             });

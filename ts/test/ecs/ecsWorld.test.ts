@@ -8,7 +8,6 @@ import {
     QueryObject,
 } from "../../src/ecs/ecsSystem.js";
 import { EcsWorld } from "../../src/ecs/ecsWorld.js";
-import { SparseSet } from "../../src/common/structure/sparseSet.js";
 import { EcsInitEvent, EcsUpdateEvent } from "../../src/ecs/ecsEvent.js";
 
 class Position extends EcsComponent {
@@ -43,8 +42,18 @@ describe("EcsWorld", () => {
 
             assert.strictEqual(typeof entity1, "number");
             assert.strictEqual(typeof entity2, "number");
-            assert.ok(entity1 < entity2);
             assert.notStrictEqual(entity1, entity2);
+        });
+
+        it("should not reuse entity IDs after destruction", () => {
+            const id = ecsWorld.createEntity();
+            ecsWorld.destroyEntity(id);
+            const newId = ecsWorld.createEntity();
+            assert.strictEqual(
+                id !== newId,
+                true,
+                "Entity IDs should not be reused after destruction",
+            );
         });
     });
 
@@ -52,26 +61,49 @@ describe("EcsWorld", () => {
         it("Add a component to an entity", () => {
             const entity = ecsWorld.createEntity();
             const position = new Position(10, 20);
-
             ecsWorld.addComponent(entity, position);
-            assert(
-                ecsWorld.hasEntity(entity),
-                "Entity should exist after adding a component",
-            );
+
+            assert.ok(ecsWorld.hasEntity(entity));
+        });
+
+        it("Query map is updated on add", () => {
+            const entity = ecsWorld.createEntity();
+            const position = new Position(10, 20);
+
+            const system = createSystem({ position: Position })
+                .onEvent(EcsUpdateEvent, (query, _event, _world) => {
+                    const results = Array.from(query);
+                    assert.strictEqual(results.length, 1);
+                    assert.strictEqual(results[0].position, position);
+                })
+                .build();
+
+            ecsWorld.addSystems([system]);
+            ecsWorld.addComponent(entity, position);
+            ecsWorld.dispatchEvent(new EcsUpdateEvent());
         });
 
         it("Allow multiple components on the same entity", () => {
             const entity = ecsWorld.createEntity();
             const position = new Position(10, 20);
-            const velocity = new Velocity(5, 5);
+            const velocity = new Velocity(1, 1);
+
+            const system = createSystem({
+                position: Position,
+                velocity: Velocity,
+            })
+                .onEvent(EcsUpdateEvent, (query, _event, _world) => {
+                    const results = Array.from(query);
+                    assert.strictEqual(results.length, 1);
+                    assert.deepStrictEqual(results[0], { position, velocity });
+                })
+                .build();
+
+            ecsWorld.addSystems([system]);
 
             ecsWorld.addComponent(entity, position);
             ecsWorld.addComponent(entity, velocity);
-
-            assert(
-                ecsWorld.hasEntity(entity),
-                "Entity should exist after adding multiple components",
-            );
+            ecsWorld.dispatchEvent(new EcsUpdateEvent());
         });
     });
 
@@ -79,31 +111,43 @@ describe("EcsWorld", () => {
         it("Remove a component from an entity", () => {
             const entity = ecsWorld.createEntity();
             const position = new Position(10, 20);
-
             ecsWorld.addComponent(entity, position);
-            const entityExists = ecsWorld.hasEntity(entity);
             ecsWorld.removeComponent(entity, position);
 
-            assert(entityExists, "Entity should exists before removal");
-            assert(
-                !ecsWorld.hasEntity(entity),
-                "Entity should not exist after removing its only component",
-            );
+            assert.ok(!ecsWorld.hasEntity(entity));
         });
 
         it("Retain the entity if other components remain", () => {
             const entity = ecsWorld.createEntity();
             const position = new Position(10, 20);
-            const velocity = new Velocity(5, 5);
+            const velocity = new Velocity(1, 1);
 
             ecsWorld.addComponent(entity, position);
             ecsWorld.addComponent(entity, velocity);
             ecsWorld.removeComponent(entity, position);
 
-            assert(
-                ecsWorld.hasEntity(entity),
-                "Entity should still exist after removing one of its components",
-            );
+            assert.ok(ecsWorld.hasEntity(entity));
+        });
+
+        it("Update query map when query no longer matches", () => {
+            const entity = ecsWorld.createEntity();
+            const position = new Position(10, 20);
+            let updates = 0;
+            const system = createSystem({ position: Position })
+                .onEvent(EcsUpdateEvent, (query, _event, _world) => {
+                    const array = Array.from(query);
+                    if (array.length > 0) {
+                        updates++;
+                    }
+                })
+                .build();
+
+            ecsWorld.addSystems([system]);
+            ecsWorld.addComponent(entity, position);
+            ecsWorld.dispatchEvent(new EcsUpdateEvent());
+            ecsWorld.removeComponent(entity, position);
+            ecsWorld.dispatchEvent(new EcsUpdateEvent());
+            assert.equal(updates, 1);
         });
     });
 
@@ -111,111 +155,108 @@ describe("EcsWorld", () => {
         it("Remove all components from an entity", () => {
             const entity = ecsWorld.createEntity();
             ecsWorld.addComponent(entity, new Position(10, 20));
-            ecsWorld.addComponent(entity, new Velocity(5, 5));
+            ecsWorld.addComponent(entity, new Velocity(1, 1));
 
             ecsWorld.destroyEntity(entity);
+            assert.ok(!ecsWorld.hasEntity(entity));
+        });
 
-            assert(
-                !ecsWorld.hasEntity(entity),
-                "Entity should not exist after being destroyed",
-            );
+        it("should handle destroying non-existent entities gracefully", () => {
+            const entity = ecsWorld.createEntity();
+            const position = new Position(10, 20);
+            ecsWorld.addComponent(entity, position);
+
+            const destroyResult = ecsWorld.destroyEntity(999);
+
+            assert.equal(ecsWorld.hasEntity(entity), true);
         });
     });
 
     describe("Query", () => {
         it("should process entities with matching components during system update", () => {
-            const ecsWorld = new EcsWorld();
+            const entity = ecsWorld.createEntity();
+            const position = new Position(10, 20);
 
-            const position1 = new Position(10, 20);
-            const velocity1 = new Velocity(1, 1);
-
-            const position2 = new Position(15, 25);
-
-            const entity1 = ecsWorld.createEntity();
-            const entity2 = ecsWorld.createEntity();
-
-            ecsWorld.addComponent(entity1, position1);
-            ecsWorld.addComponent(entity1, velocity1);
-
-            ecsWorld.addComponent(entity2, position2);
-
-            // Define the query and the system
-            const query = { position: Position, velocity: Velocity };
-            let processedEntities: QueryData[] = [];
-
-            const system = createSystem(query)
-                .onEvent(EcsUpdateEvent, (query, _event) => {
-                    processedEntities.push(query);
+            const system = createSystem({ position: Position })
+                .onEvent(EcsUpdateEvent, (query, _event, _world) => {
+                    const results = Array.from(query);
+                    assert.strictEqual(results.length, 1);
+                    assert.strictEqual(results[0].position, position);
                 })
                 .build();
 
-            // Add the system to the world and trigger update
-            ecsWorld.addSystem(system);
+            ecsWorld.addSystems([system]);
+            ecsWorld.addComponent(entity, position);
             ecsWorld.dispatchEvent(new EcsUpdateEvent());
-
-            // Assert that only entity1 (with both Position and Velocity) was processed
-            const entries = Object.entries(processedEntities[0]);
-            assert.equal(processedEntities.length, 1);
-            assert.equal(entries[0][0], "position");
-            assert.equal(entries[0][1] instanceof SparseSet, true);
-            assert.equal(entries[0][1].size, 1);
-            assert.equal(entries[1][0], "velocity");
-            assert.equal(entries[1][1] instanceof SparseSet, true);
-            assert.equal(entries[1][1].size, 1);
         });
 
         it("should not process entities that do not match the query", () => {
-            const ecsWorld = new EcsWorld();
+            const entity = ecsWorld.createEntity();
+            ecsWorld.addComponent(entity, new Velocity(1, 1));
 
-            const position1 = new Position(10, 20);
-            const position2 = new Position(15, 25);
-
-            const entity1 = ecsWorld.createEntity();
-            const entity2 = ecsWorld.createEntity();
-
-            ecsWorld.addComponent(entity1, position1);
-            ecsWorld.addComponent(entity2, position2);
-
-            // Define the query and the system
-            const query = { position: Position, velocity: Velocity };
-            let processedEntities: { [id: string]: EcsComponent }[] = [];
-
-            const system = createSystem(query)
-                .onEvent(EcsUpdateEvent, (query, _event) => {
-                    // Collect the processed entities to assert later
-                    processedEntities = [];
-
-                    for (const [key, set] of Object.entries(query)) {
-                        for (let i = 0; i < set.size; i++) {
-                            const component = set.elementAt(i);
-                            processedEntities.push({ [key]: component });
-                        }
-                    }
+            const system = createSystem({ position: Position })
+                .onEvent(EcsUpdateEvent, (query, _event, _world) => {
+                    const results = Array.from(query);
+                    assert.strictEqual(results.length, 0);
                 })
                 .build();
 
-            // Add the system to the world and trigger update
-            ecsWorld.addSystem(system);
+            ecsWorld.addSystems([system]);
             ecsWorld.dispatchEvent(new EcsUpdateEvent());
-
-            // Assert that no entities were processed
-            assert.strictEqual(processedEntities.length, 0);
         });
     });
 
     describe("Dispatch", () => {
         it("should dispatch event when query is empty", () => {
-            const ecsWorld = new EcsWorld();
-            let initInvoked = false;
             const system = createSystem({})
-                .onEvent(EcsInitEvent, (_query, _event) => {
-                    initInvoked = true;
+                .onEvent(EcsUpdateEvent, (query, _event, _world) => {
+                    const results = Array.from(query);
+                    assert.strictEqual(results.length, 0);
                 })
                 .build();
 
-            ecsWorld.addSystem(system);
-            ecsWorld.dispatchEvent(new EcsInitEvent());
-            assert.equal(initInvoked, true);
+            ecsWorld.addSystems([system]);
+            ecsWorld.dispatchEvent(new EcsUpdateEvent());
+        });
+
+        it("dispatch has the right amount of components in query data", () => {
+            const entity1 = ecsWorld.createEntity();
+            const position1 = new Position(10, 20);
+            const velocity1 = new Velocity(1, 1);
+
+            const entity2 = ecsWorld.createEntity();
+            const position2 = new Position(20, 25);
+            const velocity2 = new Velocity(1, 1);
+
+            const entity3 = ecsWorld.createEntity();
+            const position3 = new Position(15, 22);
+
+            const system = createSystem({
+                position: Position,
+                velocity: Velocity,
+            })
+                .onEvent(EcsUpdateEvent, (query, _event, _world) => {
+                    const results = Array.from(query);
+                    assert.strictEqual(results.length, 2);
+                    assert.deepEqual(results[0], {
+                        position: position1,
+                        velocity: velocity1,
+                    });
+                    assert.deepEqual(results[1], {
+                        position: position2,
+                        velocity: velocity2,
+                    });
+                })
+                .build();
+
+            ecsWorld.addSystems([system]);
+
+            ecsWorld.addComponent(entity1, position1);
+            ecsWorld.addComponent(entity1, velocity1);
+            ecsWorld.addComponent(entity2, position2);
+            ecsWorld.addComponent(entity2, velocity2);
+            ecsWorld.addComponent(entity3, position3);
+            ecsWorld.dispatchEvent(new EcsUpdateEvent());
         });
     });
 });

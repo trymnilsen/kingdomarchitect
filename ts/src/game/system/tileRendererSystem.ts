@@ -13,14 +13,15 @@ export function createTileRenderSystem(): EcsSystem {
     return createSystem({
         tiles: TileComponent,
     })
-        .onEvent(EcsRenderEvent, (_query, _event) => {
-            /*if (query.tiles.size == 1) {
-                const tileComponent = query.tiles.elementAt(0);
+        .onEvent(EcsRenderEvent, (query, event) => {
+            const tileComponent = Array.from(query)?.at(0)?.tiles;
+
+            if (tileComponent) {
                 renderTiles(
                     event.renderScope,
                     Object.values(tileComponent.tiles),
                 );
-            }*/
+            }
         })
         .build();
 }

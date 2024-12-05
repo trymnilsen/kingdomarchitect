@@ -1,6 +1,5 @@
 import { ComponentFn, EcsComponent } from "./ecsComponent.js";
 import { EcsEntity, EcsSystem, QueryData, QueryObject } from "./ecsSystem.js";
-import { SparseSet } from "../common/structure/sparseSet.js";
 import { hasOwnProperty } from "../common/object.js";
 import { EcsEvent } from "./ecsEvent.js";
 import { EcsWorldScope } from "./ecsWorldScope.js";
@@ -16,13 +15,23 @@ export class EcsWorld implements EcsWorldScope {
     private queryMap: QueryMap2 = new Map();
     private nextEntityId: number = 1;
 
-    constructor(systems: EcsSystem[]) {
+    /**
+     * Adds a system to the world. Should be run before any dispatching
+     * @param systems a list of systems to add
+     */
+    addSystems(systems: EcsSystem[]) {
         this.systems = systems;
         for (const system of systems) {
             this.queryMap.set(system.query, new Map());
         }
     }
 
+    /**
+     * Dispatches an ECS event to all systems that might be listening for the
+     * event. Each system will get the matching components for their query in
+     * the event listener
+     * @param event the Event to dispatch
+     */
     dispatchEvent(event: EcsEvent) {
         for (let i = 0; i < this.systems.length; i++) {
             const system = this.systems[i];
@@ -51,6 +60,11 @@ export class EcsWorld implements EcsWorldScope {
         return this.nextEntityId++;
     }
 
+    /**
+     * Adds a component to an entity and updates the query cache
+     * @param entity the entity to attach the component to
+     * @param component the component to add
+     */
     addComponent(entity: EcsEntity, component: EcsComponent) {
         //Add the components to our container as well
         let componentContainer = this.components.get(entity);
@@ -67,16 +81,39 @@ export class EcsWorld implements EcsWorldScope {
         this.updateQueryMapForEntity(entity);
     }
 
+    /**
+     * Removes a component from a given entity and updates the query map for
+     * this entity
+     * @param entity the entity to remove the component from
+     * @param component the component instance to remove
+     */
     removeComponent(entity: EcsEntity, component: EcsComponent) {
         this.removeComponentInternal(entity, component);
         this.updateQueryMapForEntity(entity);
     }
 
+    /**
+     * Check if this system has a given entity
+     * @param entity
+     * @returns if the world has any components attached to this entity
+     */
     hasEntity(entity: EcsEntity): boolean {
         const components = this.components.get(entity);
         return !!components && components.size > 0;
     }
 
+    /**
+     * Retrieve all systems
+     * @returns a readonly list of all systems in this world
+     */
+    allSystems(): ReadonlyArray<EcsSystem> {
+        return this.systems;
+    }
+
+    /**
+     * Destroyes and removes an entity, effectively removing all components
+     * @param entity the entity to remove
+     */
     destroyEntity(entity: EcsEntity) {
         //Remove all components on entity
         const components = this.components.get(entity);
@@ -89,7 +126,12 @@ export class EcsWorld implements EcsWorldScope {
         this.updateQueryMapForEntity(entity);
     }
 
-    //TODO: this needs a better name
+    /**
+     * Removes a component from an entity. Will remove the entity if this is the
+     * last component
+     * @param entity the entity the component we want to remove is located on
+     * @param component the instance of the component to remove
+     */
     private removeComponentInternal(
         entity: EcsEntity,
         component: EcsComponent,

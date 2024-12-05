@@ -56,9 +56,8 @@ export class Game2 {
         // Input
         this.input = new Input();
         this.touchInput = new TouchInput(canvasElement);
-
-        this.world = new EcsWorld();
         // UI states handling
+        this.world = new EcsWorld();
         this.interactionHandler = new InteractionHandler(
             new Entity("foo"),
             this.renderer.camera,
@@ -66,12 +65,27 @@ export class Game2 {
             this.gameTime,
             () => {},
         );
+        this.world.addSystems([
+            createWorldGenerationSystem(),
+            createAggroSystem(),
+            createBattleQueueSystem(),
+            createCraftingSystem(),
+            createEffectSystem(),
+            createHealthQueueSystem(),
+            createHousingSystem(),
+            createJobSystem(),
+            createBuildingSystem(),
+            createTileRenderSystem(),
+            createRenderSystem(),
+            createResourceSystem(),
+            createUiSystem(this.interactionHandler, this.renderer.camera),
+            createVisibilitySystem(),
+        ]);
     }
 
     async bootstrap(): Promise<void> {
         console.log("Bootstrap game");
         const loaderPromise = this.assetLoader.load();
-        this.setupSystems();
         this.setupInput();
         await loaderPromise;
         console.log("Bootstrap game finished");
@@ -89,25 +103,6 @@ export class Game2 {
         }
 
         this.render(DrawMode.Tick);
-    }
-
-    private setupSystems() {
-        this.world.addSystem(createWorldGenerationSystem());
-        this.world.addSystem(createAggroSystem());
-        this.world.addSystem(createBattleQueueSystem());
-        this.world.addSystem(createCraftingSystem());
-        this.world.addSystem(createEffectSystem());
-        this.world.addSystem(createHealthQueueSystem());
-        this.world.addSystem(createHousingSystem());
-        this.world.addSystem(createJobSystem());
-        this.world.addSystem(createBuildingSystem());
-        this.world.addSystem(createTileRenderSystem());
-        this.world.addSystem(createRenderSystem());
-        this.world.addSystem(createResourceSystem());
-        this.world.addSystem(
-            createUiSystem(this.interactionHandler, this.renderer.camera),
-        );
-        this.world.addSystem(createVisibilitySystem());
     }
 
     private setupInput() {
