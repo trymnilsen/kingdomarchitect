@@ -199,7 +199,7 @@ export class Game {
         this.world.onDraw(this.renderer.context, this.visibilityMap, drawMode);
         this.interactionHandler.onDraw(this.renderer.context);
         this.renderer.renderDeferred();
-        performance.measure;
+        //performance.measure;
         //performance.measure("render duration", "render-start");
         const renderEnd = performance.now();
         //console.log("⏱render time: ", renderEnd - renderStart);
