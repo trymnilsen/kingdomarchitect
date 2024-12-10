@@ -4,7 +4,6 @@ import { ComponentFn, EcsComponent } from "./ecsComponent.js";
 import { EcsEvent, EcsEventFn } from "./ecsEvent.js";
 import { EcsWorldScope } from "./ecsWorldScope.js";
 
-export type EcsEntity = number;
 export type QueryData<T extends QueryObject = QueryObject> = {
     [P in keyof T]: InstanceType<T[P]>;
 };

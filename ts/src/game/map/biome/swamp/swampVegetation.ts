@@ -1,5 +1,6 @@
 import { sprites2 } from "../../../../asset/sprite.js";
 import { generateId } from "../../../../common/idGenerator.js";
+import { EcsWorldScope } from "../../../../ecs/ecsWorldScope.js";
 import { SpriteComponent } from "../../../component/draw/spriteComponent.js";
 import { WeightComponent } from "../../../component/movement/weightComponent.js";
 import { Entity } from "../../../entity/entity.js";
@@ -29,8 +30,9 @@ function treeFactory(
     item: BiomeMapItem,
     biome: BiomeMap,
     _allMaps: BiomeMapCollection,
-    rootEntity: Entity,
+    _world: EcsWorldScope,
 ) {
+    throw new Error("Not re-implemented");
     const position = biome.worldPosition(item);
     const tumbleweedEntity = new Entity(generateId("swamptree"));
     tumbleweedEntity.addComponent(
@@ -42,5 +44,5 @@ function treeFactory(
     );
     tumbleweedEntity.addComponent(new WeightComponent(10));
     tumbleweedEntity.worldPosition = position;
-    rootEntity.addChild(tumbleweedEntity);
+    //rootEntity.addChild(tumbleweedEntity);
 }

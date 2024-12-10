@@ -22,6 +22,7 @@ import { firstChildWhere } from "./entity/child/first.js";
 import { GameTime } from "../common/time.js";
 import { DrawMode } from "../rendering/drawMode.js";
 
+/*
 export class Game {
     private renderer: Renderer;
     private input: Input;
@@ -205,3 +206,4 @@ export class Game {
         //console.log("⏱render time: ", renderEnd - renderStart);
     }
 }
+*/

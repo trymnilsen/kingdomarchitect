@@ -138,6 +138,7 @@ export class UIActionbarScaffold extends UIView {
             height: constraints.height,
         };
 
+        this._isDirty = false;
         return this._measuredSize;
     }
 

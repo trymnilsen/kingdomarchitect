@@ -65,22 +65,7 @@ export class Game2 {
             this.gameTime,
             () => {},
         );
-        this.world.addSystems([
-            createWorldGenerationSystem(),
-            createAggroSystem(),
-            createBattleQueueSystem(),
-            createCraftingSystem(),
-            createEffectSystem(),
-            createHealthQueueSystem(),
-            createHousingSystem(),
-            createJobSystem(),
-            createBuildingSystem(),
-            createTileRenderSystem(),
-            createRenderSystem(),
-            createResourceSystem(),
-            createUiSystem(this.interactionHandler, this.renderer.camera),
-            createVisibilitySystem(),
-        ]);
+        this.setupSystems();
     }
 
     async bootstrap(): Promise<void> {
@@ -103,6 +88,25 @@ export class Game2 {
         }
 
         this.render(DrawMode.Tick);
+    }
+
+    private setupSystems() {
+        this.world.addSystems([
+            createWorldGenerationSystem(),
+            createAggroSystem(),
+            createBattleQueueSystem(),
+            createCraftingSystem(),
+            createEffectSystem(),
+            createHealthQueueSystem(),
+            createHousingSystem(),
+            createJobSystem(),
+            createBuildingSystem(),
+            createTileRenderSystem(),
+            createRenderSystem(),
+            createResourceSystem(),
+            createUiSystem(this.interactionHandler, this.renderer.camera),
+            createVisibilitySystem(),
+        ]);
     }
 
     private setupInput() {

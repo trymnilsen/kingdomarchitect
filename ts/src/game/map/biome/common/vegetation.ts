@@ -1,4 +1,5 @@
 import { generateId } from "../../../../common/idGenerator.js";
+import { EcsWorldScope } from "../../../../ecs/ecsWorldScope.js";
 import { Entity } from "../../../entity/entity.js";
 import { treePrefab } from "../../../prefab/treePrefab.js";
 import { placeRandomEntity } from "../../tilesetPlacer.js";
@@ -25,11 +26,12 @@ function treeFactory(
     item: BiomeMapItem,
     biome: BiomeMap,
     _allMaps: BiomeMapCollection,
-    rootEntity: Entity,
+    _world: EcsWorldScope,
 ) {
+    throw new Error("Not re-implemented");
     const position = biome.worldPosition(item);
     const variant = Math.floor(Math.random() * 3);
     const tree = treePrefab(generateId("tree"), variant);
     tree.worldPosition = position;
-    rootEntity.addChild(tree);
+    //rootEntity.addChild(tree);
 }

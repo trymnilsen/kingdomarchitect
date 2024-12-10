@@ -6,6 +6,7 @@ import {
 } from "../../../common/bounds.js";
 import { Direction } from "../../../common/direction.js";
 import { Point } from "../../../common/point.js";
+import { EcsWorldScope } from "../../../ecs/ecsWorldScope.js";
 import { Entity } from "../../entity/entity.js";
 import { BiomeType } from "./biome.js";
 import { BiomeMapCollection } from "./biomeMapCollection.js";
@@ -14,7 +15,7 @@ export type BiomeMapItemEntityFactory = (
     item: BiomeMapItem,
     biome: BiomeMap,
     allBiomes: BiomeMapCollection,
-    rootEntity: Entity,
+    world: EcsWorldScope,
 ) => void;
 
 export interface BiomeMapItem {

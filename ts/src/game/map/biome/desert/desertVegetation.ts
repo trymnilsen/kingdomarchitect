@@ -3,6 +3,7 @@ import { shuffleItems, weightedRandomEntry } from "../../../../common/array.js";
 import { Bounds } from "../../../../common/bounds.js";
 import { generateId } from "../../../../common/idGenerator.js";
 import { Point, addPoint } from "../../../../common/point.js";
+import { EcsWorldScope } from "../../../../ecs/ecsWorldScope.js";
 import { SpriteComponent } from "../../../component/draw/spriteComponent.js";
 import { WeightComponent } from "../../../component/movement/weightComponent.js";
 import { Entity } from "../../../entity/entity.js";
@@ -57,8 +58,9 @@ function createEntityFactory(): BiomeMapItemEntityFactory {
         item: BiomeMapItem,
         biome: BiomeMap,
         _allMaps: BiomeMapCollection,
-        rootEntity: Entity,
+        _world: EcsWorldScope,
     ) => {
+        throw new Error("Not reimplemented");
         const position = biome.worldPosition(item);
         const cactiEntity = new Entity(generateId("cacti"));
         cactiEntity.addComponent(
@@ -70,7 +72,7 @@ function createEntityFactory(): BiomeMapItemEntityFactory {
         );
         cactiEntity.addComponent(new WeightComponent(10));
         cactiEntity.worldPosition = position;
-        rootEntity.addChild(cactiEntity);
+        //rootEntity.addChild(cactiEntity);
     };
 }
 
@@ -80,8 +82,9 @@ function tumbleWeedFactory(
     item: BiomeMapItem,
     biome: BiomeMap,
     _allMaps: BiomeMapCollection,
-    rootEntity: Entity,
+    _world: EcsWorldScope,
 ) {
+    throw new Error("Not re-implemented");
     const position = biome.worldPosition(item);
     const tumbleweedEntity = new Entity(generateId("tumbleweed"));
     tumbleweedEntity.addComponent(
@@ -93,5 +96,5 @@ function tumbleWeedFactory(
     );
     tumbleweedEntity.addComponent(new WeightComponent(5));
     tumbleweedEntity.worldPosition = position;
-    rootEntity.addChild(tumbleweedEntity);
+    //rootEntity.addChild(tumbleweedEntity);
 }

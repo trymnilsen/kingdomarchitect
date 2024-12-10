@@ -15,6 +15,7 @@ export abstract class EcsEvent {
         this._handled = true;
     }
 }
+
 export type EcsEventFn = ConstructorFunction<EcsEvent>;
 export class EcsUpdateEvent extends EcsEvent {}
 export class EcsInitEvent extends EcsEvent {}

@@ -44,8 +44,15 @@ function handleInput(
             handlePan(interactionHandler, camera, event.data);
             break;
         case "tap-down":
+            const tapHandled = interactionHandler.onTapDown(
+                event.data.position,
+            );
+            if (tapHandled) {
+                event.markHandled();
+            }
             break;
         case "tap-end":
+            interactionHandler.onTapUp(event.data);
             break;
     }
 }

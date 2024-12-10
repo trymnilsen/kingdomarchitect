@@ -2,6 +2,7 @@ import { tilesets } from "../../../../../generated/tilesets.js";
 import { sizeOfBounds } from "../../../../common/bounds.js";
 import { generateId } from "../../../../common/idGenerator.js";
 import { addPoint } from "../../../../common/point.js";
+import { EcsWorldScope } from "../../../../ecs/ecsWorldScope.js";
 import { Entity } from "../../../entity/entity.js";
 import { treePrefab } from "../../../prefab/treePrefab.js";
 import { TilesetVariant } from "../../tileset.js";
@@ -30,8 +31,9 @@ function treeFactory(tilesetVariant: TilesetVariant) {
         item: BiomeMapItem,
         biome: BiomeMap,
         _allMaps: BiomeMapCollection,
-        rootEntity: Entity,
+        _world: EcsWorldScope,
     ) => {
+        throw new Error("Not re-implemented");
         for (const entity of tilesetVariant.entities) {
             switch (entity.id) {
                 case "forrest":
@@ -45,7 +47,7 @@ function treeFactory(tilesetVariant: TilesetVariant) {
                         biome.worldPosition(item),
                         entity.position,
                     );
-                    rootEntity.addChild(treeEntity);
+                    //rootEntity.addChild(treeEntity);
                     break;
                 default:
                     break;

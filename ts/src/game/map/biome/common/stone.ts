@@ -1,5 +1,6 @@
 import { Sprite2, sprites2 } from "../../../../asset/sprite.js";
 import { generateId } from "../../../../common/idGenerator.js";
+import { EcsWorldScope } from "../../../../ecs/ecsWorldScope.js";
 import { SpriteComponent } from "../../../component/draw/spriteComponent.js";
 import { WeightComponent } from "../../../component/movement/weightComponent.js";
 import { StoneComponent } from "../../../component/resource/stoneComponent.js";
@@ -30,8 +31,9 @@ function stoneFactory(
     item: BiomeMapItem,
     biome: BiomeMap,
     _allMaps: BiomeMapCollection,
-    rootEntity: Entity,
+    _world: EcsWorldScope,
 ) {
+    throw new Error("No reimplemented");
     const position = biome.worldPosition(item);
     const cactiEntity = new Entity(generateId("stone"));
     const sprite = getStoneSprite(biome);
@@ -50,7 +52,7 @@ function stoneFactory(
     cactiEntity.addComponent(new StoneComponent());
     cactiEntity.addComponent(new WeightComponent(50));
     cactiEntity.worldPosition = position;
-    rootEntity.addChild(cactiEntity);
+    //rootEntity.addChild(cactiEntity);
 }
 
 function getStoneSprite(biome: BiomeMap): Sprite2 {

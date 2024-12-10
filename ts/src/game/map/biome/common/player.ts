@@ -27,6 +27,7 @@ import { buildingPrefab } from "../../../prefab/buildingPrefab.js";
 import { woodenHouse } from "../../../../data/building/wood/house.js";
 import { buildingFactory } from "../../../prefab/buildingFactory.js";
 import { trainingDummyPrefab } from "../../../prefab/trainingDummyPrefab.js";
+import { EcsWorldScope } from "../../../../ecs/ecsWorldScope.js";
 
 export function addPlayerToBiome(
     biomes: BiomeMapCollection,
@@ -63,10 +64,11 @@ function generatePlayerEntity(biomeMap: BiomeMap) {
             item: BiomeMapItem,
             biome: BiomeMap,
             _allBiomes: BiomeMapCollection,
-            rootEntity: Entity,
+            _world: EcsWorldScope,
         ) => {
+            throw new Error("Not reimplemented");
             const worldPoint = biome.worldPosition(item);
-            addPlayerEntities(rootEntity, worldPoint);
+            addPlayerEntities(new Entity("foo"), worldPoint);
         },
     });
 }

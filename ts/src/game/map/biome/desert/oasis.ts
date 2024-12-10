@@ -15,6 +15,7 @@ import {
     multiplyPoint,
     zeroPoint,
 } from "../../../../common/point.js";
+import { EcsWorldScope } from "../../../../ecs/ecsWorldScope.js";
 import { SpriteComponent } from "../../../component/draw/spriteComponent.js";
 import { WeightComponent } from "../../../component/movement/weightComponent.js";
 import { WaterComponent } from "../../../component/world/waterComponent.js";
@@ -80,8 +81,10 @@ function createEntityFactory(
         item: BiomeMapItem,
         biome: BiomeMap,
         _allMaps: BiomeMapCollection,
-        rootEntity: Entity,
+        _world: EcsWorldScope,
     ) => {
+        throw new Error("Not reimplemented");
+        const rootEntity = new Entity("foo");
         for (const entity of tileset.entities) {
             switch (entity.id) {
                 case "water":
