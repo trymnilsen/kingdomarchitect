@@ -26,7 +26,7 @@
     },
     "dependencies": {
         "@edugis/rollup-plugin-sourcemaps": "0.6.4",
-        "@types/node": "^22.8.7",
+        "@types/node": "^22.10.2",
         "@types/pngjs": "^6.0.5",
         "http-server": "^14.1.1",
         "maxrects-packer": "^2.7.3",
