@@ -8,7 +8,7 @@ import {
     QueryObject,
 } from "../../src/ecs/ecsSystem.js";
 import { EcsWorld } from "../../src/ecs/ecsWorld.js";
-import { EcsInitEvent, EcsUpdateEvent } from "../../src/ecs/ecsEvent.js";
+import { EcsUpdateEvent } from "../../src/ecs/event/ecsUpdateEvent.js";
 
 class Position extends EcsComponent {
     constructor(
@@ -63,7 +63,7 @@ describe("EcsWorld", () => {
             const position = new Position(10, 20);
             ecsWorld.addComponent(entity, position);
 
-            assert.ok(ecsWorld.hasEntity(entity));
+            assert.ok(ecsWorld.components.hasEntity(entity));
         });
 
         it("Query map is updated on add", () => {
@@ -105,6 +105,13 @@ describe("EcsWorld", () => {
             ecsWorld.addComponent(entity, velocity);
             ecsWorld.dispatchEvent(new EcsUpdateEvent());
         });
+
+        it("should set entity id on component", () => {
+            const entity = ecsWorld.createEntity();
+            const position = new Position(10, 20);
+            ecsWorld.addComponent(entity, position);
+            assert.strictEqual(position.entity, entity);
+        });
     });
 
     describe("removeComponent", () => {
@@ -114,7 +121,7 @@ describe("EcsWorld", () => {
             ecsWorld.addComponent(entity, position);
             ecsWorld.removeComponent(entity, position);
 
-            assert.ok(!ecsWorld.hasEntity(entity));
+            assert.ok(!ecsWorld.components.hasEntity(entity));
         });
 
         it("Retain the entity if other components remain", () => {
@@ -126,7 +133,7 @@ describe("EcsWorld", () => {
             ecsWorld.addComponent(entity, velocity);
             ecsWorld.removeComponent(entity, position);
 
-            assert.ok(ecsWorld.hasEntity(entity));
+            assert.ok(ecsWorld.components.hasEntity(entity));
         });
 
         it("Update query map when query no longer matches", () => {
@@ -149,6 +156,15 @@ describe("EcsWorld", () => {
             ecsWorld.dispatchEvent(new EcsUpdateEvent());
             assert.equal(updates, 1);
         });
+
+        it("should remove entity id on component", () => {
+            const entity = ecsWorld.createEntity();
+            const position = new Position(10, 20);
+            ecsWorld.addComponent(entity, position);
+            assert.strictEqual(position.entity, entity);
+            ecsWorld.removeComponent(entity, position);
+            assert.strictEqual(position.entity, undefined);
+        });
     });
 
     describe("destroyEntity", () => {
@@ -158,7 +174,7 @@ describe("EcsWorld", () => {
             ecsWorld.addComponent(entity, new Velocity(1, 1));
 
             ecsWorld.destroyEntity(entity);
-            assert.ok(!ecsWorld.hasEntity(entity));
+            assert.ok(!ecsWorld.components.hasEntity(entity));
         });
 
         it("should handle destroying non-existent entities gracefully", () => {
@@ -168,7 +184,18 @@ describe("EcsWorld", () => {
 
             const destroyResult = ecsWorld.destroyEntity(999);
 
-            assert.equal(ecsWorld.hasEntity(entity), true);
+            assert.equal(ecsWorld.components.hasEntity(entity), true);
+        });
+
+        it("should set entity id to undefined on all components", () => {
+            const entity = ecsWorld.createEntity();
+            const position = new Position(10, 20);
+            const velocity = new Velocity(1, 1);
+            ecsWorld.addComponent(entity, position);
+            ecsWorld.addComponent(entity, velocity);
+            ecsWorld.destroyEntity(entity);
+            assert.strictEqual(position.entity, undefined);
+            assert.strictEqual(velocity.entity, undefined);
         });
     });
 

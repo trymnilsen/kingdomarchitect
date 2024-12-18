@@ -1,5 +1,5 @@
-import { EcsUpdateEvent } from "../../ecs/ecsEvent.js";
 import { createSystem, EcsSystem } from "../../ecs/ecsSystem.js";
+import { EcsUpdateEvent } from "../../ecs/event/ecsUpdateEvent.js";
 import { BuildingComponent } from "../ecsComponent/building/buildingComponent.js";
 import { DrawableComponent } from "../ecsComponent/drawable/drawableComponent.js";
 

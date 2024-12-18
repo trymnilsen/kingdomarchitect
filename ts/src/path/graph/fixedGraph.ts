@@ -14,12 +14,11 @@ export class FixedGraph implements Graph {
     private _offsetX = 0;
     private _offsetY = 0;
 
-    get offsetX(): number {
-        return this._offsetX;
-    }
-
-    get offsetY(): number {
-        return this._offsetY;
+    public get offset(): Readonly<Point> {
+        return {
+            x: this._offsetX,
+            y: this._offsetY,
+        };
     }
 
     constructor(private weightFunction: WeightFunction) {

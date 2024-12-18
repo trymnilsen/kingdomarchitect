@@ -340,7 +340,8 @@ export abstract class UIView implements FocusGroup, FocusNode {
      */
     withinViewBounds(point: Point): boolean {
         return withinRectangle(
-            point,
+            point.x,
+            point.y,
             this.screenPosition.x,
             this.screenPosition.y,
             this.screenPosition.x + this.measuredSize.width,

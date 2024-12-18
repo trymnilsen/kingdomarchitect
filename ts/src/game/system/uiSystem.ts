@@ -1,24 +1,26 @@
 import { invert } from "../../common/point.js";
+import { createSystem, EcsSystem } from "../../ecs/ecsSystem.js";
+import { RootEntity } from "../../ecs/ecsWorldScope.js";
 import {
     EcsInputEvent,
     EcsInputPanData,
-    EcsRenderEvent,
-} from "../../ecs/ecsEvent.js";
-import { createSystem, EcsSystem } from "../../ecs/ecsSystem.js";
+} from "../../ecs/event/ecsInputEvent.js";
+import { EcsRenderEvent } from "../../ecs/event/ecsRenderEvent.js";
 import { Camera } from "../../rendering/camera.js";
 import { DrawMode } from "../../rendering/drawMode.js";
 import { RenderScope } from "../../rendering/renderScope.js";
+import { ChunkMapComponent } from "../ecsComponent/world/chunkmapComponent.js";
 import { InteractionHandler } from "../interaction/handler/interactionHandler.js";
 
 export function createUiSystem(
     interactionHandler: InteractionHandler,
     camera: Camera,
 ): EcsSystem {
-    return createSystem({})
-        .onEvent(EcsInputEvent, (_query, event, _world) => {
+    return createSystem()
+        .onEvent(EcsInputEvent, (_query, event) => {
             handleInput(interactionHandler, camera, event);
         })
-        .onEvent(EcsRenderEvent, (_query, event, _world) => {
+        .onEvent(EcsRenderEvent, (_query, event) => {
             renderUI(interactionHandler, event.renderScope);
         })
         .build();

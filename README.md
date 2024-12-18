@@ -74,17 +74,16 @@ Install the required development packages (typescript and rollup) with `npm i`. 
 
 ### Concepts
 The architecture of the game is loosely based around three concepts:
-- A timer ticking each second
-- An entity tree and component system
+- A timer ticking
+- An entity component system for the gameplay logic
 - A state system for the HUD/GUI
 
 #### Game updates
-Every second a timer invokes two code paths for most of the game components. An update function and a draw function.
-The update function should only be invoked once per timer tick, but the draw method can be called multiple. Be wary of putting
-logic depending on a timed update in the draw code path as it will be invoked potentially more than one time per tick when input events happen or other actions are perfomed. Panning the gameworld is a good example of when the draw method of the different classes are invoked, this method is executed on each drag event from the browser.
+Every 200ms a timer invokes two code paths for most of the game components. An update function and a draw function.
+The update function should only be invoked once per every 5th tick, effectively ticking every second. The draw logic will be called at least every tick, but might be invoked more often if there is input or other events occuring that should trigger a redraw. Be wary of putting logic depending on a timed update in the draw code path. Panning the gameworld is a good example of when the draw method of the different classes are invoked, this method is executed on each drag event from the browser.
 
 #### Entity component system
-A entity component system is in the works where all items in the world are tied to an entity with some amount of componets on it handle updates and draw actions. Some exceptions exists like tiles where all tiles belong to the same entity with a component that is responsible for drawing and handling all the tiles. All new game world items and data will be stored in components on entities. If you create new components or jobs, remember to run the [Typelistgen tooling](#typelistgen)
+The architecture of the game code is based around a variant of an Entity component system. Systems can set up queries for components, and schedule themselves using events. Example of events are for rendering, update or input, but also for transforms or changes to the list of entities. Events are interupting within a system. If a transform event is triggered and dispatched within a system, it will immediately run the systems listenering. This is intended for supporting systems that might update collision maps, pathfinding graphs or visibility maps. Components extend the EcsComponent type, an empty class. This is to assert that components have a constructor, which is used as they key for lookups. Entities are aliased from numbers, they dont contain anything other than their ID. This id is used to group components making a group of component a logical entity. Lastly the World binds it all together. It keeps a collection of all components and their relation to an entity, and a collection of all the systems and the logic for dispatching events to them.
 
 #### A state system for the HUD/GUI
 Items that are not directly connected to the game world, like menus and screens are considered `InteractionStates` these are screens that can be navigated to and from in a stack. States can draw custom actions and handle events as well as setting up complex views using the custom UI system

@@ -1,6 +1,6 @@
-import { Point } from "../../common/point.js";
-import { GroundTile } from "../component/tile/tilesComponent.js";
-import { isTile } from "../map/tile.js";
+import { Point } from "../../../../../common/point.js";
+import { GroundTile } from "../../../../component/tile/tilesComponent.js";
+import { isTile } from "../../../../map/tile.js";
 import { SelectedWorldItem } from "./selectedWorldItem.js";
 
 export class SelectedTileItem implements SelectedWorldItem {
@@ -9,12 +9,6 @@ export class SelectedTileItem implements SelectedWorldItem {
         return {
             x: this.groundTile.tileX,
             y: this.groundTile.tileY,
-        };
-    }
-    get selectionSize(): Point {
-        return {
-            x: 1,
-            y: 1,
         };
     }
     isSelectedItem(item: unknown): boolean {

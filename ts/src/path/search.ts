@@ -2,15 +2,13 @@ import { Point, distance, pointEquals } from "../common/point.js";
 import { BinaryHeap } from "../common/structure/binaryHeap.js";
 import { Graph, GraphNode } from "./graph/graph.js";
 import { manhattanDistance } from "./pathHeuristics.js";
+import { SearchedNode, SearchResult } from "./searchResult.js";
 
 export class PathSearch {
     private graph: Graph;
 
     get offset(): Point {
-        return {
-            x: this.graph.offsetX,
-            y: this.graph.offsetY,
-        };
+        return this.offset;
     }
 
     constructor(graph: Graph) {
@@ -169,17 +167,3 @@ export class PathSearch {
         });
     }
 }
-
-export type SearchedNode = {
-    x: number;
-    y: number;
-    weight: number;
-    g: number;
-    visited: boolean;
-    totalCost: number;
-};
-
-export type SearchResult = {
-    path: Point[];
-    graph: SearchedNode[];
-};

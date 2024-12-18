@@ -165,3 +165,44 @@ export function arrayToOject<T>(
 
     return map;
 }
+
+export function forEachOf<T>(items: T | T[], onEach: (item: T) => void) {
+    if (Array.isArray(items)) {
+        for (const component of items) {
+            onEach(component);
+        }
+    } else {
+        onEach(items);
+    }
+}
+
+declare global {
+    interface Array<T> {
+        /**
+         * Returns the first element of the array
+         * @throws if the size is 0
+         */
+        first(): T;
+        /**
+         * Returns the first element of the array
+         * @throws if the size is 0
+         */
+        last(): T;
+    }
+}
+
+Array.prototype.first = function () {
+    if (this.length < 1) {
+        throw new Error("Array has no first element");
+    }
+
+    return this[0];
+};
+
+Array.prototype.last = function () {
+    if (this.length < 1) {
+        throw new Error("Array has no last element");
+    }
+
+    return this[0];
+};

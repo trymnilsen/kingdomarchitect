@@ -1,11 +1,17 @@
-import { ComponentFn, EcsComponent } from "./ecsComponent.js";
-import { EcsSystem, QueryData, QueryObject } from "./ecsSystem.js";
-import { hasOwnProperty } from "../common/object.js";
-import { EcsEvent } from "./ecsEvent.js";
-import { EcsWorldScope } from "./ecsWorldScope.js";
-import { Point, zeroPoint } from "../common/point.js";
-import { EcsComponentRegistry } from "./ecsComponentRegistry.js";
+import { EcsComponent } from "./ecsComponent.js";
+import {
+    EcsComponentRegistry,
+    MutableEcsComponentRegistry,
+} from "./ecsComponentRegistry.js";
 import { EcsEntity } from "./ecsEntity.js";
+import { EcsSystem, QueryData, QueryObject } from "./ecsSystem.js";
+import { EcsWorldScope, RootEntity } from "./ecsWorldScope.js";
+import {
+    ComponentEventType,
+    EcsComponentEvent,
+} from "./event/ecsComponentEvent.js";
+import { EcsEvent } from "./event/ecsEvent.js";
+import { EcsTransformEvent } from "./event/ecsTransformEvent.js";
 import { TransformComponent } from "./transformComponent.js";
 
 export type QueryMap<TQueryMap extends QueryObject = QueryObject> = Map<
@@ -15,59 +21,63 @@ export type QueryMap<TQueryMap extends QueryObject = QueryObject> = Map<
 
 export class EcsWorld implements EcsWorldScope {
     private systems: EcsSystem[] = [];
-    private componentCollection = new EcsComponentRegistry();
+    private componentCollection = new MutableEcsComponentRegistry();
     private queryMap: QueryMap = new Map();
-    private nextEntityId: number = 1;
+    private nextEntityId: number = RootEntity + 1;
+
+    public get components(): EcsComponentRegistry {
+        return this.componentCollection;
+    }
 
     addComponent(entity: EcsEntity, component: EcsComponent) {
         this.componentCollection.addComponent(entity, component);
         this.updateQueryMapForEntity(entity);
+        this.dispatchComponentEvent(component, ComponentEventType.Add);
     }
 
     removeComponent(entity: EcsEntity, component: EcsComponent) {
+        if (!this.componentCollection.hasEntity(entity)) {
+            return;
+        }
+
         this.componentCollection.removeComponent(entity, component);
         this.updateQueryMapForEntity(entity);
+        this.dispatchComponentEvent(component, ComponentEventType.Remove);
     }
 
-    createEntity(initialPoint: Point = zeroPoint()): EcsEntity {
-        const entityId = this.nextEntityId++;
-        this.addComponent(entityId, new TransformComponent(initialPoint));
-        return entityId;
+    createEntity(): EcsEntity {
+        return this.nextEntityId++;
     }
 
     destroyEntity(entity: EcsEntity) {
-        this.componentCollection.removeAllForEntity(entity);
-        //TODO: Remove any potential children and update parent list
-        this.updateQueryMapForEntity(entity);
-    }
-
-    setParent(child: EcsEntity, parent: EcsEntity) {
-        const parentTransform = this.transformOf(parent);
-        const childTransform = this.transformOf(child);
-        //TODO: Verify that there is not a circular loop of children
-        childTransform.parent = parent;
-        if (!parentTransform.children) {
-            parentTransform.children = new Set();
+        const components = this.componentCollection.getComponents(entity);
+        if (!components) {
+            return;
         }
 
-        parentTransform.children.add(child);
+        this.componentCollection.removeAllForEntity(entity);
+        this.updateQueryMapForEntity(entity);
+        this.dispatchComponentEvent(
+            Array.from(components.values()),
+            ComponentEventType.Remove,
+        );
     }
 
-    setLocalEntityPosition(entity: EcsEntity, position: Point) {
-        throw new Error("Method not implemented.");
-    }
+    updateTransform(entity: EcsEntity, x: number, y: number): void {
+        const transform = this.components.getComponent(
+            entity,
+            TransformComponent,
+        );
+        if (!transform) {
+            return;
+        }
 
-    setWorldEntityPosition(entity: EcsEntity, position: Point) {
-        throw new Error("Method not implemented.");
-    }
-
-    /**
-     * Check if this system has a given entity
-     * @param entity
-     * @returns if the world has any components attached to this entity
-     */
-    hasEntity(entity: EcsEntity): boolean {
-        return this.componentCollection.hasEntity(entity);
+        const position = { x: transform.position.x, y: transform.position.y };
+        transform.position.x = x;
+        transform.position.y = y;
+        this.dispatchEvent(
+            new EcsTransformEvent(transform, transform.position, position),
+        );
     }
 
     /**
@@ -119,6 +129,13 @@ export class EcsWorld implements EcsWorldScope {
         }
     }
 
+    private dispatchComponentEvent(
+        component: EcsComponent | EcsComponent[],
+        eventType: ComponentEventType,
+    ) {
+        this.dispatchEvent(new EcsComponentEvent(component, eventType));
+    }
+
     /**
      * Loop over all systems and check if the query of that system matches the
      * entity. If it does not remove it from the query map if present and
@@ -162,19 +179,5 @@ export class EcsWorld implements EcsWorldScope {
 
     private clearQueryMapForEntity(entity: EcsEntity, system: EcsSystem) {
         this.queryMap.get(system.query)?.delete(entity);
-    }
-
-    private transformOf(entity: EcsEntity): TransformComponent {
-        const component = this.componentCollection.getComponent(
-            entity,
-            TransformComponent,
-        );
-        if (!component) {
-            throw new Error(
-                `entity ${entity} did not have a transform component`,
-            );
-        }
-
-        return component as TransformComponent;
     }
 }

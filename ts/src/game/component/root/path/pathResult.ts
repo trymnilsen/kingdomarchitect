@@ -1,5 +1,5 @@
 import { Point } from "../../../../common/point.js";
-import { SearchedNode } from "../../../../path/search.js";
+import { SearchedNode } from "../../../../path/searchResult.js";
 
 /**
  * Status of a path search result

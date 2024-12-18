@@ -1,8 +1,10 @@
 import { ConstructorFunction } from "../common/constructor.js";
 import { RenderScope } from "../rendering/renderScope.js";
 import { ComponentFn, EcsComponent } from "./ecsComponent.js";
-import { EcsEvent, EcsEventFn } from "./ecsEvent.js";
+import { EcsEvent, EcsEventFn } from "./event/ecsEvent.js";
 import { EcsWorldScope } from "./ecsWorldScope.js";
+
+export const EmptyQuery = {};
 
 export type QueryData<T extends QueryObject = QueryObject> = {
     [P in keyof T]: InstanceType<T[P]>;
@@ -59,7 +61,7 @@ export class SystemBuilder<T extends QueryObject = QueryObject> {
 }
 
 export function createSystem<T extends QueryObject>(
-    query: T,
+    query: T = EmptyQuery as T,
 ): SystemBuilder<T> {
     return new SystemBuilder(query);
 }
@@ -74,6 +76,8 @@ class BuiltEcsSystem implements EcsSystem {
     ) {}
 
     hasEvent(event: EcsEvent): boolean {
+        //Todo: i should expand events to have an evaluator so that events for
+        //components matching the query can be triggered
         const eventType = event.constructor;
         return this.events.has(eventType);
     }

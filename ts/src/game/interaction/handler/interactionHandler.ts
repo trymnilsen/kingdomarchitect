@@ -3,6 +3,8 @@ import { sprites2 } from "../../../asset/sprite.js";
 import { Point } from "../../../common/point.js";
 import { allSides } from "../../../common/sides.js";
 import { GameTime } from "../../../common/time.js";
+import { EcsWorldScope } from "../../../ecs/ecsWorldScope.js";
+import { TransformComponent } from "../../../ecs/transformComponent.js";
 import { InputAction, InputActionType } from "../../../input/inputAction.js";
 import { OnTapEndEvent } from "../../../input/touchInput.js";
 import { Camera } from "../../../rendering/camera.js";
@@ -12,10 +14,12 @@ import { bookInkColor } from "../../../ui/color.js";
 import { UIView } from "../../../ui/uiView.js";
 import { ChunkMapComponent } from "../../component/root/chunk/chunkMapComponent.js";
 import { TilesComponent } from "../../component/tile/tilesComponent.js";
+import { TileComponent } from "../../ecsComponent/world/tileComponent.js";
+import { queryPointForEntities } from "../../ecsComponent/world/worldQuery.js";
 import { Entity } from "../../entity/entity.js";
-import { SelectedEntityItem } from "../../selection/selectedEntityItem.js";
-import { SelectedTileItem } from "../../selection/selectedTileItem.js";
-import { SelectedWorldItem } from "../../selection/selectedWorldItem.js";
+import { SelectedEntityItem } from "../state/selection/item/selectedEntityItem.js";
+import { SelectedTileItem } from "../state/selection/item/selectedTileItem.js";
+import { SelectedWorldItem } from "../state/selection/item/selectedWorldItem.js";
 import { SelectionState } from "../state/selection/selectionState.js";
 import { InteractionHandlerStatusbarPresenter } from "./interactionHandlerStatusbarPresenter.js";
 import { CommitableInteractionStateChanger } from "./interactionStateChanger.js";
@@ -29,6 +33,7 @@ import { StateContext } from "./stateContext.js";
 export class InteractionHandler {
     private camera: Camera;
     private world: Entity;
+    private worldScope: EcsWorldScope;
     private interactionStateChanger: CommitableInteractionStateChanger;
     private history: InteractionStateHistory;
     private stateContext: StateContext;
@@ -36,6 +41,7 @@ export class InteractionHandler {
 
     constructor(
         world: Entity,
+        worldScope: EcsWorldScope,
         camera: Camera,
         assets: AssetLoader,
         time: GameTime,
@@ -49,9 +55,11 @@ export class InteractionHandler {
         );
         this.interactionStateChanger = new CommitableInteractionStateChanger();
         this.world = world;
+        this.worldScope = worldScope;
         this.camera = camera;
         this.stateContext = {
             root: this.world,
+            world: this.worldScope,
             assets: assets,
             stateChanger: this.interactionStateChanger,
             gameTime: time,
@@ -147,12 +155,16 @@ export class InteractionHandler {
                 this.camera.worldSpaceToTileSpace(worldPosition);
 
             // Check if a tile was clicked at this position
-            const tile = this.world
-                .requireComponent(TilesComponent)
-                .getTile(tilePosition);
+            const tile = this.worldScope.components
+                .queryComponents(TileComponent)
+                .at(0)
+                ?.getTile(tilePosition.x, tilePosition.y);
 
-            if (tile) {
-                const tileTapHandled = currentState.onTileTap(tile);
+            if (!!tile) {
+                const tileTapHandled = currentState.onTileTap({
+                    tileX: tile.x,
+                    tileY: tile.y,
+                });
 
                 if (!tileTapHandled) {
                     console.log(
@@ -164,28 +176,41 @@ export class InteractionHandler {
                         this.stateContext,
                     );*/
 
-                    const entitiesAt = this.stateContext.root
-                        .requireComponent(ChunkMapComponent)
-                        .getEntityAt({
-                            x: tile.tileX,
-                            y: tile.tileY,
-                        });
+                    const entitiesAt = queryPointForEntities(
+                        this.worldScope,
+                        tile,
+                    );
 
-                    let selection: SelectedWorldItem;
+                    let selection: SelectedWorldItem | null = null;
                     if (entitiesAt.length > 0) {
                         const entity = entitiesAt[0];
-                        selection = new SelectedEntityItem(entity);
+                        const transform =
+                            this.worldScope.components.getComponent(
+                                entity,
+                                TransformComponent,
+                            );
+                        if (!!transform) {
+                            selection = new SelectedEntityItem(transform);
+                        }
                     } else {
                         //There was not entity at this place but we can still do
                         //a check against tiles. E.g for building
-                        selection = new SelectedTileItem(tile);
+                        selection = new SelectedTileItem({
+                            tileX: tile.x,
+                            tileY: tile.y,
+                            type: tile.type,
+                        });
                     }
 
-                    const selectionState = new SelectionState(selection);
-                    if (this.history.size == 1) {
-                        this.interactionStateChanger.push(selectionState);
-                    } else {
-                        this.interactionStateChanger.replace(selectionState);
+                    if (!!selection) {
+                        const selectionState = new SelectionState(selection);
+                        if (this.history.size == 1) {
+                            this.interactionStateChanger.push(selectionState);
+                        } else {
+                            this.interactionStateChanger.replace(
+                                selectionState,
+                            );
+                        }
                     }
                 }
             } else {

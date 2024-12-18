@@ -1,5 +1,5 @@
-import { EcsRenderEvent } from "../../ecs/ecsEvent.js";
 import { createSystem, EcsSystem, QueryData } from "../../ecs/ecsSystem.js";
+import { EcsRenderEvent } from "../../ecs/event/ecsRenderEvent.js";
 import { TransformComponent } from "../../ecs/transformComponent.js";
 import { RenderScope } from "../../rendering/renderScope.js";
 import { DrawableComponent } from "../ecsComponent/drawable/drawableComponent.js";

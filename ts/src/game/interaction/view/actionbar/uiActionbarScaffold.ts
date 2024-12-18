@@ -528,7 +528,8 @@ export class UIActionbarScaffold extends UIView {
         for (const button of buttons) {
             if (
                 withinRectangle(
-                    point,
+                    point.x,
+                    point.y,
                     button.position.x,
                     button.position.y,
                     button.position.x + button.width,

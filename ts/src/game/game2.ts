@@ -1,28 +1,32 @@
 import { AssetLoader } from "../asset/loader/assetLoader.js";
 import { Point } from "../common/point.js";
 import { GameTime } from "../common/time.js";
-import { createHealEffect } from "../data/effect/health/healEffect.js";
-import {
-    EcsInitEvent,
-    EcsInputEvent,
-    EcsRenderEvent,
-    EcsUpdateEvent,
-} from "../ecs/ecsEvent.js";
 import { EcsWorld } from "../ecs/ecsWorld.js";
+import { RootEntity } from "../ecs/ecsWorldScope.js";
+import { EcsInitEvent } from "../ecs/event/ecsInitEvent.js";
+import { EcsInputEvent } from "../ecs/event/ecsInputEvent.js";
+import { EcsRenderEvent } from "../ecs/event/ecsRenderEvent.js";
+import { EcsUpdateEvent } from "../ecs/event/ecsUpdateEvent.js";
 import { Input } from "../input/input.js";
 import { TouchInput } from "../input/touchInput.js";
+import { LazyGraph } from "../path/graph/lazyGraph.js";
 import { DrawMode } from "../rendering/drawMode.js";
 import { Renderer } from "../rendering/renderer.js";
+import { ChunkMapComponent } from "./ecsComponent/world/chunkmapComponent.js";
+import { PathfindingComponent } from "./ecsComponent/world/pathfindingComponent.js";
+import { queryWeight } from "./ecsComponent/world/worldQuery.js";
 import { Entity } from "./entity/entity.js";
 import { InteractionHandler } from "./interaction/handler/interactionHandler.js";
 import { createAggroSystem } from "./system/aggroSystem.js";
 import { createBattleQueueSystem } from "./system/battleQueueSystem.js";
 import { createBuildingSystem } from "./system/buildingSystem.js";
+import { createCollisionSystem } from "./system/collisionMapSystem.js";
 import { createCraftingSystem } from "./system/craftingSystem.js";
 import { createEffectSystem } from "./system/effectSystem.js";
 import { createHealthQueueSystem } from "./system/healthQueueSystem.js";
 import { createHousingSystem } from "./system/housingSystem.js";
 import { createJobSystem } from "./system/jobSystem.js";
+import { createPathfindingSystem } from "./system/pathfindingSystem.js";
 import { createRenderSystem } from "./system/renderSystem.js";
 import { createResourceSystem } from "./system/resourceSystem.js";
 import { createTileRenderSystem } from "./system/tileRendererSystem.js";
@@ -40,7 +44,6 @@ export class Game2 {
     private drawTick = 0;
     private updateTick = 0;
     private gameTime: GameTime = new GameTime();
-
     constructor(domElementWrapperSelector: string) {
         // Get the canvas
         const canvasElement: HTMLCanvasElement | null = document.querySelector(
@@ -60,12 +63,14 @@ export class Game2 {
         this.world = new EcsWorld();
         this.interactionHandler = new InteractionHandler(
             new Entity("foo"),
+            this.world,
             this.renderer.camera,
             this.assetLoader,
             this.gameTime,
             () => {},
         );
         this.setupSystems();
+        this.setupRootComponents();
     }
 
     async bootstrap(): Promise<void> {
@@ -93,6 +98,7 @@ export class Game2 {
     private setupSystems() {
         this.world.addSystems([
             createWorldGenerationSystem(),
+            createCollisionSystem(),
             createAggroSystem(),
             createBattleQueueSystem(),
             createCraftingSystem(),
@@ -100,6 +106,7 @@ export class Game2 {
             createHealthQueueSystem(),
             createHousingSystem(),
             createJobSystem(),
+            createPathfindingSystem(),
             createBuildingSystem(),
             createTileRenderSystem(),
             createRenderSystem(),
@@ -107,6 +114,18 @@ export class Game2 {
             createUiSystem(this.interactionHandler, this.renderer.camera),
             createVisibilitySystem(),
         ]);
+    }
+
+    private setupRootComponents() {
+        this.world.addComponent(RootEntity, new ChunkMapComponent());
+        this.world.addComponent(
+            RootEntity,
+            new PathfindingComponent(
+                new LazyGraph((point) => {
+                    return queryWeight(this.world, point);
+                }),
+            ),
+        );
     }
 
     private setupInput() {

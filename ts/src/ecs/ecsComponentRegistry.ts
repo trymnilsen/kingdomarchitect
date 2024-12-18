@@ -1,7 +1,38 @@
 import { ComponentFn, EcsComponent } from "./ecsComponent.js";
-import { EcsEntity, QueryObject } from "./ecsSystem.js";
+import { EcsEntity } from "./ecsEntity.js";
+import { QueryObject } from "./ecsSystem.js";
 
-export class EcsComponentRegistry {
+/**
+ * A collection of components and their relation to entities.
+ * Allows for create and delete operations as well as query functions
+ */
+export interface EcsComponentRegistry {
+    /**
+     * Check if this world has a given entity
+     * @param entity
+     * @returns if the world has any components attached to this entity
+     */
+    hasEntity(entity: EcsEntity): boolean;
+    /**
+     * Query and retrieve a list of entities containing a given type
+     * @param componentType constructor for the component type
+     */
+    queryEntities(componentType: ComponentFn): EcsEntity[];
+    /**
+     * Query and retrieve a list of components on entities.
+     * @param componentType
+     */
+    queryComponents<T extends EcsComponent>(componentType: ComponentFn<T>): T[];
+    /*
+     * Get the component of a given type on an specific entity
+     */
+    getComponent<T extends EcsComponent>(
+        entity: EcsEntity,
+        componentType: ComponentFn<T>,
+    ): T | null;
+}
+
+export class MutableEcsComponentRegistry implements EcsComponentRegistry {
     private components: Map<EcsEntity, Map<Function, EcsComponent>> = new Map();
 
     /**
@@ -26,7 +57,7 @@ export class EcsComponentRegistry {
             componentContainer = new Map();
             this.components.set(entity, componentContainer);
         }
-
+        component.entity = entity;
         componentContainer.set(componentFn, component);
     }
 
@@ -42,6 +73,10 @@ export class EcsComponentRegistry {
         const componentMap = this.components.get(entity);
 
         if (componentMap) {
+            const component = componentMap.get(componentFn);
+            if (!!component) {
+                component.entity = undefined;
+            }
             componentMap.delete(componentFn);
             if (componentMap.size === 0) {
                 this.components.delete(entity);
@@ -55,7 +90,46 @@ export class EcsComponentRegistry {
      * @param entity The entity to remove from the registry.
      */
     removeAllForEntity(entity: EcsEntity) {
-        this.components.delete(entity);
+        const components = this.components.get(entity);
+        if (!!components) {
+            const componentsOnEntity = components.values();
+            for (const component of componentsOnEntity) {
+                //Reuse the logic for removing a single component
+                this.removeComponent(entity, component);
+            }
+        }
+    }
+
+    queryEntities(componentType: ComponentFn): EcsEntity[] {
+        const entities: EcsEntity[] = [];
+        for (const [entity, componentList] of this.components) {
+            if (componentList.has(componentType)) {
+                entities.push(entity);
+            }
+        }
+
+        return entities;
+    }
+
+    queryComponents<T extends EcsComponent>(
+        componentType: ComponentFn<T>,
+    ): T[] {
+        const components: T[] = [];
+        for (const [entity, componentList] of this.components) {
+            const component = componentList.get(componentType);
+            if (!!component) {
+                components.push(component as T);
+            }
+        }
+
+        return components;
+    }
+
+    getComponent<T extends EcsComponent>(
+        entity: EcsEntity,
+        componentType: ComponentFn,
+    ): T | null {
+        return (this.components.get(entity)?.get(componentType) as T) || null;
     }
 
     /**
@@ -67,13 +141,6 @@ export class EcsComponentRegistry {
      */
     getComponents(entity: EcsEntity): Map<Function, EcsComponent> | null {
         return this.components.get(entity) ?? null;
-    }
-
-    getComponent<T extends EcsComponent>(
-        entity: EcsEntity,
-        componentType: ComponentFn,
-    ): T | null {
-        return (this.components.get(entity)?.get(componentType) as T) || null;
     }
 
     /**

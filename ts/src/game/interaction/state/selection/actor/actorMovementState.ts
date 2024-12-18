@@ -1,18 +1,21 @@
 import { sprites2 } from "../../../../../asset/sprite.js";
 import { Point } from "../../../../../common/point.js";
 import { allSides } from "../../../../../common/sides.js";
-import { SearchedNode } from "../../../../../path/search.js";
+import { entityOf } from "../../../../../ecs/ecsComponent.js";
+import { TransformComponent } from "../../../../../ecs/transformComponent.js";
+import { SearchedNode } from "../../../../../path/searchResult.js";
 import { RenderScope } from "../../../../../rendering/renderScope.js";
 import { uiBox } from "../../../../../ui/dsl/uiBoxDsl.js";
 import { fillUiSize } from "../../../../../ui/uiSize.js";
 import { JobQueueComponent } from "../../../../component/job/jobQueueComponent.js";
+import { MoveJob } from "../../../../component/job/jobs/moveJob.js";
 import { PathFindingComponent } from "../../../../component/root/path/pathFindingComponent.js";
-import { Entity } from "../../../../entity/entity.js";
-import { GroundTile } from "../../../../map/tile.js";
-import { TileSize } from "../../../../map/tile.js";
+import { JobComponent } from "../../../../ecsComponent/job/jobComponent.js";
+import { makeMovementJob } from "../../../../ecsComponent/job/jobs/movementJob.js";
+import { queryPath } from "../../../../ecsComponent/world/worldQuery.js";
+import { GroundTile, TileSize } from "../../../../map/tile.js";
 import { InteractionState } from "../../../handler/interactionState.js";
 import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold.js";
-import { MoveJob } from "../../../../component/job/jobs/moveJob.js";
 
 export class ActorMovementState extends InteractionState {
     private selectedPoint: Point | null = null;
@@ -23,7 +26,7 @@ export class ActorMovementState extends InteractionState {
         return "Confirm movement";
     }
 
-    constructor(private entity: Entity) {
+    constructor(private transform: TransformComponent) {
         super();
     }
     override onActive(): void {
@@ -65,9 +68,11 @@ export class ActorMovementState extends InteractionState {
         };
         this.selectedPoint = toPoint;
 
-        const path = this.context.root
-            .requireComponent(PathFindingComponent)
-            .findPath(this.entity.worldPosition, toPoint);
+        const path = queryPath(
+            this.context.world,
+            this.transform.position,
+            toPoint,
+        );
 
         this.graph = path.graph;
         this.path = path.path;
@@ -168,8 +173,14 @@ export class ActorMovementState extends InteractionState {
     }
 
     private scheduleMovement() {
-        this.context.root
-            .requireComponent(JobQueueComponent)
-            .addJob(new MoveJob(this.path.reverse()[0], this.entity));
+        const jobComponent = this.context.world.components.getComponent(
+            entityOf(this.transform),
+            JobComponent,
+        );
+        if (!!jobComponent && !!this.selectedPoint) {
+            jobComponent.jobs.push(
+                makeMovementJob(this.selectedPoint, this.path),
+            );
+        }
     }
 }

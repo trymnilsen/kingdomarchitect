@@ -12,9 +12,9 @@ import { WorkerBehaviorComponent } from "../../../component/behavior/workerBehav
 import { ChunkMapComponent } from "../../../component/root/chunk/chunkMapComponent.js";
 import { TilesComponent } from "../../../component/tile/tilesComponent.js";
 import { Entity } from "../../../entity/entity.js";
-import { SelectedEntityItem } from "../../../selection/selectedEntityItem.js";
-import { SelectedTileItem } from "../../../selection/selectedTileItem.js";
-import { SelectedWorldItem } from "../../../selection/selectedWorldItem.js";
+import { SelectedEntityItem } from "../selection/item/selectedEntityItem.js";
+import { SelectedTileItem } from "../selection/item/selectedTileItem.js";
+import { SelectedWorldItem } from "../selection/item/selectedWorldItem.js";
 import { GroundTile } from "../../../map/tile.js";
 import { HalfTileSize, TileSize } from "../../../map/tile.js";
 import { InteractionState } from "../../handler/interactionState.js";

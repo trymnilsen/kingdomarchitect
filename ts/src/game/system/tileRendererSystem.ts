@@ -1,5 +1,5 @@
-import { EcsRenderEvent } from "../../ecs/ecsEvent.js";
 import { createSystem, EcsSystem } from "../../ecs/ecsSystem.js";
+import { EcsRenderEvent } from "../../ecs/event/ecsRenderEvent.js";
 import { RenderScope } from "../../rendering/renderScope.js";
 import { TilesComponent } from "../component/tile/tilesComponent.js";
 import {
