@@ -64,17 +64,16 @@ function generatePlayerEntity(biomeMap: BiomeMap) {
             item: BiomeMapItem,
             biome: BiomeMap,
             _allBiomes: BiomeMapCollection,
-            _world: EcsWorldScope,
+            world: EcsWorldScope,
         ) => {
-            throw new Error("Not reimplemented");
             const worldPoint = biome.worldPosition(item);
-            addPlayerEntities(new Entity("foo"), worldPoint);
+            addPlayerEntities(world, worldPoint);
         },
     });
 }
 
-function addPlayerEntities(rootEntity: Entity, worldPosition: Point) {
-    const firstWorker = workerPrefab(generateId("player-worker"));
+function addPlayerEntities(_world: EcsWorldScope, worldPosition: Point) {
+    //const firstWorker = workerPrefab(generateId("player-worker"));
     const firstHouse = buildingFactory(woodenHouse, false);
     const firstFarm = farmPrefab(generateId("farm"));
     const well = wellPrefab(generateId("well"));
@@ -91,12 +90,14 @@ function addPlayerEntities(rootEntity: Entity, worldPosition: Point) {
     chestEntity.position = addPoint(worldPosition, { x: 3, y: 2 });
     firstFarm.position = addPoint(worldPosition, { x: 2, y: 1 });
     firstHouse.position = addPoint(worldPosition, { x: 1, y: 1 });
-    firstWorker.position = addPoint(worldPosition, { x: 1, y: 2 });
+    //firstWorker.position = addPoint(worldPosition, { x: 1, y: 2 });
     well.position = addPoint(worldPosition, { x: 2, y: 2 });
+    /*
     rootEntity.addChild(trainingDummy);
     rootEntity.addChild(firstFarm);
     rootEntity.addChild(firstWorker);
     rootEntity.addChild(firstHouse);
     rootEntity.addChild(well);
     rootEntity.addChild(chestEntity);
+    */
 }

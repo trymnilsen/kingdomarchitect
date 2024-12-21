@@ -1,6 +1,12 @@
 import { sprites2 } from "../../asset/sprite.js";
 import { zeroPoint } from "../../common/point.js";
+import { well } from "../../data/building/food/well.js";
 import { woodenHouse } from "../../data/building/wood/house.js";
+import {
+    stoneResource,
+    wheatResourceItem,
+    woodResourceItem,
+} from "../../data/inventory/items/resources.js";
 import { createSystem, EcsSystem } from "../../ecs/ecsSystem.js";
 import { EcsWorldScope, RootEntity } from "../../ecs/ecsWorldScope.js";
 import { EcsInitEvent } from "../../ecs/event/ecsInitEvent.js";
@@ -12,13 +18,15 @@ import { DrawableComponent } from "../ecsComponent/drawable/drawableComponent.js
 import { JobComponent } from "../ecsComponent/job/jobComponent.js";
 import { ColliderComponent } from "../ecsComponent/world/colliderComponent.js";
 import { TileComponent, tileId } from "../ecsComponent/world/tileComponent.js";
+import { buildingPrefab } from "../ecsPrefab/buildingPrefab.js";
+import { resourcePrefab } from "../ecsPrefab/resourcePrefab.js";
 import { generateMap } from "../map/mapGenerator.js";
 
 export function createWorldGenerationSystem(): EcsSystem {
     return createSystem()
         .onEvent(EcsInitEvent, (_query, _event, world) => {
-            generateMap(world);
-            //generateWorld(world);
+            //generateMap(world);
+            generateWorld(world);
         })
         .build();
 }
@@ -36,9 +44,9 @@ function generateWorld(world: EcsWorldScope) {
         }
     }
     world.addComponent(RootEntity, tileComponent);
+    /*
     const houseEntity = world.createEntity();
     const farmEntity = world.createEntity();
-    const wellEntity = world.createEntity();
     const knightEntity = world.createEntity();
 
     //House
@@ -69,8 +77,16 @@ function generateWorld(world: EcsWorldScope) {
     const transformWellComponent = new TransformComponent({ x: 4, y: 4 });
     world.addComponent(wellEntity, drawableWellComponent);
     world.addComponent(wellEntity, transformWellComponent);
+    */
 
+    //const farmEntity = buildingPrefab(world, well);
+    const wellEntity = buildingPrefab(world, well, { x: 4, y: 4 });
+    const houseEntity = buildingPrefab(world, woodenHouse, { x: 3, y: 3 });
+    const farm = resourcePrefab(world, wheatResourceItem, { x: 4, y: 3 });
+    const stone = resourcePrefab(world, stoneResource, { x: 1, y: 4 });
+    const tree = resourcePrefab(world, woodResourceItem, { x: 4, y: 1 });
     //knight
+    const knightEntity = world.createEntity();
     const drawableKnightComponent = new DrawableComponent(sprites2.knight);
     const transformKnightComponent = new TransformComponent({ x: 3, y: 4 });
     const colliderComponent = new ColliderComponent();
