@@ -5,9 +5,18 @@ export type LazyGraphNodeFunction = (point: Point) => number | null;
 
 export class LazyGraph implements Graph {
     private _nodes: Record<number, Record<number, GraphNode>> = {};
+    private offsetX = 0;
+    private offsetY = 0;
+
+    public get offset(): Readonly<Point> {
+        return {
+            x: this.offsetX,
+            y: this.offsetY,
+        };
+    }
+
     constructor(private nodeFunction: LazyGraphNodeFunction) {}
-    offsetX = 0;
-    offsetY = 0;
+
     /**
      * Invalidate a point lazily. This means it is deleted by not
      * re-generated until its needed

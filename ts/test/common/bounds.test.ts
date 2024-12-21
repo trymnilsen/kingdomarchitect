@@ -16,7 +16,7 @@ describe("Bounds", () => {
             x: 2,
             y: 2,
         };
-        const within = withinRectangle(point, 1, 1, 5, 5);
+        const within = withinRectangle(point.x, point.y, 1, 1, 5, 5);
         assert.equal(within, true);
     });
 
@@ -25,7 +25,7 @@ describe("Bounds", () => {
             x: 2,
             y: 0,
         };
-        const within = withinRectangle(point, 1, 1, 5, 5);
+        const within = withinRectangle(point.x, point.y, 1, 1, 5, 5);
         assert.equal(within, false);
     });
 
@@ -34,7 +34,7 @@ describe("Bounds", () => {
             x: 0,
             y: 2,
         };
-        const within = withinRectangle(point, 1, 1, 5, 5);
+        const within = withinRectangle(point.x, point.y, 1, 1, 5, 5);
         assert.equal(within, false);
     });
 
@@ -43,7 +43,7 @@ describe("Bounds", () => {
             x: 6,
             y: 2,
         };
-        const within = withinRectangle(point, 1, 1, 5, 5);
+        const within = withinRectangle(point.x, point.y, 1, 1, 5, 5);
         assert.equal(within, false);
     });
 
@@ -52,7 +52,7 @@ describe("Bounds", () => {
             x: 2,
             y: 6,
         };
-        const within = withinRectangle(point, 1, 1, 5, 5);
+        const within = withinRectangle(point.x, point.y, 1, 1, 5, 5);
         assert.equal(within, false);
     });
 

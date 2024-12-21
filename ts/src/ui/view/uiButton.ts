@@ -56,7 +56,8 @@ export class UIButton extends UIBox {
 
     override hitTest(screenPoint: Point): boolean {
         return withinRectangle(
-            screenPoint,
+            screenPoint.x,
+            screenPoint.y,
             this.screenPosition.x,
             this.screenPosition.y,
             this.screenPosition.x + this.measuredSize.width,

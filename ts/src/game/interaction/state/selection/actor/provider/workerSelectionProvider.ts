@@ -14,8 +14,8 @@ import {
 } from "../../../../../component/inventory/equipmentComponent.js";
 import { InventoryComponent2 } from "../../../../../component/inventory/inventoryComponent.js";
 import { Entity } from "../../../../../entity/entity.js";
-import { SelectedEntityItem } from "../../../../../selection/selectedEntityItem.js";
-import { SelectedWorldItem } from "../../../../../selection/selectedWorldItem.js";
+import { SelectedEntityItem } from "../../item/selectedEntityItem.js";
+import { SelectedWorldItem } from "../../item/selectedWorldItem.js";
 import { StateContext } from "../../../../handler/stateContext.js";
 import { ButtonCollection } from "../../../../view/actionbar/buttonCollection.js";
 import { UIActionbarItem } from "../../../../view/actionbar/uiActionbar.js";
@@ -30,34 +30,33 @@ import {
 
 export class WorkerSelectionProvider implements ActorSelectionProvider {
     provideButtons(
-        stateContext: StateContext,
-        selection: SelectedWorldItem,
+        _stateContext: StateContext,
+        _selection: SelectedEntityItem,
     ): ButtonCollection {
-        if (selection instanceof SelectedEntityItem) {
-            const selectedEntity = selection.entity;
-            const equipmentComponent =
-                selectedEntity.getComponent(EquipmentComponent);
-            const workerComponent = selectedEntity.getComponent(
-                WorkerBehaviorComponent,
-            );
+        return emptySelection;
+        /*
+        const selectedEntity = selection.entity;
+        const equipmentComponent =
+            selectedEntity.getComponent(EquipmentComponent);
+        const workerComponent = selectedEntity.getComponent(
+            WorkerBehaviorComponent,
+        );
 
-            if (!!equipmentComponent && !!workerComponent) {
-                return {
-                    left: this.getPrimaryActions(stateContext, selectedEntity),
-                    right: this.getEquipmentActions(
-                        stateContext,
-                        selectedEntity,
-                        equipmentComponent,
-                    ),
-                };
-            } else {
-                return emptySelection;
-            }
+        if (!!equipmentComponent && !!workerComponent) {
+            return {
+                left: this.getPrimaryActions(stateContext, selectedEntity),
+                right: this.getEquipmentActions(
+                    stateContext,
+                    selectedEntity,
+                    equipmentComponent,
+                ),
+            };
         } else {
             return emptySelection;
-        }
+        }*/
     }
 
+    /*
     private getEquipmentActions(
         stateContext: StateContext,
         selectedEntity: Entity,
@@ -307,5 +306,5 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
                 icon: sprites2.empty_sprite,
             },
         ];
-    }
+    }*/
 }

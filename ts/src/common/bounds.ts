@@ -6,7 +6,8 @@ import { NumberRange } from "./range.js";
  * Check if the given point is within the given rectangle represented by the
  * x1, y1, x2 and y2 edges. A point on the same coordinate as the edge is
  * considered to be inside the rectangle
- * @param point the point to check
+ * @param px the x coordinate of the point to check
+ * @param py the y coordinate of the point to check
  * @param x1 the left edge
  * @param y1 the upper edge
  * @param x2 the right edge
@@ -14,13 +15,14 @@ import { NumberRange } from "./range.js";
  * @returns if the point is with the rectangle.
  */
 export function withinRectangle(
-    point: Point,
+    px: number,
+    py: number,
     x1: number,
     y1: number,
     x2: number,
     y2: number,
 ) {
-    return point.x >= x1 && point.x <= x2 && point.y >= y1 && point.y <= y2;
+    return px >= x1 && px <= x2 && py >= y1 && py <= y2;
 }
 
 export function boundsEquals(b1: Bounds, b2: Bounds) {
@@ -50,7 +52,14 @@ export type Bounds = {
 };
 
 export function pointWithinBounds(point: Point, bounds: Bounds): boolean {
-    return withinRectangle(point, bounds.x1, bounds.y1, bounds.x2, bounds.y2);
+    return withinRectangle(
+        point.x,
+        point.y,
+        bounds.x1,
+        bounds.y1,
+        bounds.x2,
+        bounds.y2,
+    );
 }
 
 export function boundsCenter(bounds: Bounds): Point {

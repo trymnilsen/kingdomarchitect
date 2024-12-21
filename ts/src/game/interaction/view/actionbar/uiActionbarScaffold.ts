@@ -138,6 +138,7 @@ export class UIActionbarScaffold extends UIView {
             height: constraints.height,
         };
 
+        this._isDirty = false;
         return this._measuredSize;
     }
 
@@ -527,7 +528,8 @@ export class UIActionbarScaffold extends UIView {
         for (const button of buttons) {
             if (
                 withinRectangle(
-                    point,
+                    point.x,
+                    point.y,
                     button.position.x,
                     button.position.y,
                     button.position.x + button.width,

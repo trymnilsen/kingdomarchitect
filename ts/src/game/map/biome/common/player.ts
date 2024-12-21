@@ -27,6 +27,7 @@ import { buildingPrefab } from "../../../prefab/buildingPrefab.js";
 import { woodenHouse } from "../../../../data/building/wood/house.js";
 import { buildingFactory } from "../../../prefab/buildingFactory.js";
 import { trainingDummyPrefab } from "../../../prefab/trainingDummyPrefab.js";
+import { EcsWorldScope } from "../../../../ecs/ecsWorldScope.js";
 
 export function addPlayerToBiome(
     biomes: BiomeMapCollection,
@@ -63,16 +64,16 @@ function generatePlayerEntity(biomeMap: BiomeMap) {
             item: BiomeMapItem,
             biome: BiomeMap,
             _allBiomes: BiomeMapCollection,
-            rootEntity: Entity,
+            world: EcsWorldScope,
         ) => {
             const worldPoint = biome.worldPosition(item);
-            addPlayerEntities(rootEntity, worldPoint);
+            addPlayerEntities(world, worldPoint);
         },
     });
 }
 
-function addPlayerEntities(rootEntity: Entity, worldPosition: Point) {
-    const firstWorker = workerPrefab(generateId("player-worker"));
+function addPlayerEntities(_world: EcsWorldScope, worldPosition: Point) {
+    //const firstWorker = workerPrefab(generateId("player-worker"));
     const firstHouse = buildingFactory(woodenHouse, false);
     const firstFarm = farmPrefab(generateId("farm"));
     const well = wellPrefab(generateId("well"));
@@ -89,12 +90,14 @@ function addPlayerEntities(rootEntity: Entity, worldPosition: Point) {
     chestEntity.position = addPoint(worldPosition, { x: 3, y: 2 });
     firstFarm.position = addPoint(worldPosition, { x: 2, y: 1 });
     firstHouse.position = addPoint(worldPosition, { x: 1, y: 1 });
-    firstWorker.position = addPoint(worldPosition, { x: 1, y: 2 });
+    //firstWorker.position = addPoint(worldPosition, { x: 1, y: 2 });
     well.position = addPoint(worldPosition, { x: 2, y: 2 });
+    /*
     rootEntity.addChild(trainingDummy);
     rootEntity.addChild(firstFarm);
     rootEntity.addChild(firstWorker);
     rootEntity.addChild(firstHouse);
     rootEntity.addChild(well);
     rootEntity.addChild(chestEntity);
+    */
 }

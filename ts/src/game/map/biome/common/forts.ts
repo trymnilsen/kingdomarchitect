@@ -18,6 +18,7 @@ import {
     buildings,
     getBuildingById,
 } from "../../../../data/building/buildings.js";
+import { EcsWorldScope } from "../../../../ecs/ecsWorldScope.js";
 import { BuildingComponent } from "../../../component/building/buildingComponent.js";
 import { SpriteComponent } from "../../../component/draw/spriteComponent.js";
 import { HealthComponent } from "../../../component/health/healthComponent.js";
@@ -57,18 +58,18 @@ function getFortWeight(type: BiomeType): number {
 }
 
 function createEntityFactory(
-    tileset: TilesetVariant,
+    _tileset: TilesetVariant,
 ): BiomeMapItemEntityFactory {
     return (
         item: BiomeMapItem,
         biome: BiomeMap,
         _allMaps: BiomeMapCollection,
-        rootEntity: Entity,
+        _world: EcsWorldScope,
     ) => {
         const itemPosition = biome.worldPosition(item);
         const fortEntity = new Entity(generateId("fort"));
-
-        rootEntity.addChild(fortEntity);
+        throw new Error("Not re-implemented");
+        /*rootEntity.addChild(fortEntity);
         const spawnPoints: Point[] = [];
         for (const entity of tileset.entities) {
             const position = addPoint(itemPosition, entity.position);
@@ -118,7 +119,7 @@ function createEntityFactory(
             const mob = mobPrefab(generateId("mob"));
             mob.position = mobPosition;
             fortEntity.addChild(mob);
-        }
+        }*/
     };
 }
 

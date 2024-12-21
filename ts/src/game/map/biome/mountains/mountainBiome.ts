@@ -18,6 +18,7 @@ import {
     manhattanPath,
     zeroPoint,
 } from "../../../../common/point.js";
+import { EcsWorldScope } from "../../../../ecs/ecsWorldScope.js";
 import { FixedGraph } from "../../../../path/graph/fixedGraph.js";
 import { PathSearch } from "../../../../path/search.js";
 import { WeightComponent } from "../../../component/movement/weightComponent.js";
@@ -293,12 +294,14 @@ function mountainFactory(
     item: BiomeMapItem,
     biome: BiomeMap,
     _allMaps: BiomeMapCollection,
-    rootEntity: Entity,
+    _world: EcsWorldScope,
 ) {
+    throw new Error("Not re-implemented");
+
     const position = biome.worldPosition(item);
     const mountainEntity = new Entity(generateId("mountain"));
     mountainEntity.addComponent(new MountainComponent());
     mountainEntity.addComponent(new WeightComponent(100));
     mountainEntity.worldPosition = position;
-    rootEntity.addChild(mountainEntity);
+    // rootEntity.addChild(mountainEntity);
 }

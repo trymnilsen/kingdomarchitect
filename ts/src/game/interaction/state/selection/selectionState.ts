@@ -4,9 +4,6 @@ import { RenderScope } from "../../../../rendering/renderScope.js";
 import { SelectionInfo } from "../../../component/selection/selectionInfo.js";
 import { SelectionInfoComponent } from "../../../component/selection/selectionInfoComponent.js";
 import { TileSize } from "../../../map/tile.js";
-import { SelectedEntityItem } from "../../../selection/selectedEntityItem.js";
-import { SelectedTileItem } from "../../../selection/selectedTileItem.js";
-import { SelectedWorldItem } from "../../../selection/selectedWorldItem.js";
 import { InteractionState } from "../../handler/interactionState.js";
 import { ButtonCollection } from "../../view/actionbar/buttonCollection.js";
 import { UIActionbarItem } from "../../view/actionbar/uiActionbar.js";
@@ -15,12 +12,17 @@ import { ActorSelectionProvider } from "./actor/provider/actorSelectionProvider.
 import { AttackSelectionProvider } from "./actor/provider/attackSelectionProvider.js";
 import { BlacksmithSelectionProvider } from "./actor/provider/blacksmithSelectionProvider.js";
 import { CollectableProvider } from "./actor/provider/collectableProvider.js";
+import { PlayerControllableCharacterSelectionProvider } from "./actor/provider/playerControllableCharacterSelectionProvider.js";
 import { TileSelectionProvider } from "./actor/provider/tileSelectionProvider.js";
 import { TreeSelectionProvider } from "./actor/provider/treeSelectionProvider.js";
 import { WorkerSelectionProvider } from "./actor/provider/workerSelectionProvider.js";
+import { SelectedEntityItem } from "./item/selectedEntityItem.js";
+import { SelectedTileItem } from "./item/selectedTileItem.js";
+import { SelectedWorldItem } from "./item/selectedWorldItem.js";
 
 export class SelectionState extends InteractionState {
     private presenter: SelectionPresenter | null = null;
+
     private providers: ActorSelectionProvider[] = [
         new WorkerSelectionProvider(),
         new TreeSelectionProvider(),
@@ -28,6 +30,7 @@ export class SelectionState extends InteractionState {
         new CollectableProvider(),
         new BlacksmithSelectionProvider(),
         new AttackSelectionProvider(),
+        new PlayerControllableCharacterSelectionProvider(),
     ];
 
     override get stateName(): string {
@@ -58,8 +61,8 @@ export class SelectionState extends InteractionState {
 
         context.drawNinePatchSprite({
             sprite: sprites2.cursor,
-            height: this.selection.selectionSize.x * TileSize,
-            width: this.selection.selectionSize.y * TileSize,
+            height: TileSize,
+            width: TileSize,
             scale: 1.0,
             sides: allSides(12.0),
             x: cursorWorldPosition.x,
@@ -80,15 +83,11 @@ export class SelectionState extends InteractionState {
                 return null;
             }
         } else if (this.selection instanceof SelectedEntityItem) {
-            const selectionComponent = this.selection.entity.getComponent(
-                SelectionInfoComponent,
-            );
-
-            if (!selectionComponent) {
-                return null;
-            }
-
-            return selectionComponent.getSelectionInfo();
+            return {
+                title: `entity: ${this.selection.transform.entity}`,
+                subtitle: "entity",
+                icon: sprites2.wizard_hat_skill,
+            };
         } else {
             return null;
         }
@@ -99,9 +98,14 @@ export class SelectionState extends InteractionState {
         const rightItems: UIActionbarItem[] = [];
 
         for (const provider of this.providers) {
-            const item = provider.provideButtons(this.context, this.selection);
-            leftItems.push(...item.left);
-            rightItems.push(...item.right);
+            if (this.selection instanceof SelectedEntityItem) {
+                const item = provider.provideButtons(
+                    this.context,
+                    this.selection,
+                );
+                leftItems.push(...item.left);
+                rightItems.push(...item.right);
+            }
         }
 
         return {

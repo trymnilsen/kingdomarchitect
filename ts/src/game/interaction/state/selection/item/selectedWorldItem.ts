@@ -1,4 +1,4 @@
-import { Point } from "../../common/point.js";
+import { Point } from "../../../../../common/point.js";
 
 /**
  * Class wrapping items that can be selected. Different types of items
@@ -10,7 +10,6 @@ export type SelectedWorldItem = {
      * Will be updated if the selected item moves.
      */
     get tilePosition(): Point;
-    get selectionSize(): Point;
     /**
      * Checks if the two items, the item wrapped by this class and the
      * new item are refering to the same item. This check will be different

@@ -6,6 +6,7 @@ import {
 } from "../../../../common/bounds.js";
 import { generateId } from "../../../../common/idGenerator.js";
 import { addPoint } from "../../../../common/point.js";
+import { EcsWorldScope } from "../../../../ecs/ecsWorldScope.js";
 import { WeightComponent } from "../../../component/movement/weightComponent.js";
 import { WaterComponent } from "../../../component/world/waterComponent.js";
 import { Entity } from "../../../entity/entity.js";
@@ -39,8 +40,10 @@ function lakeFactory(tilesetVariant: TilesetVariant) {
         item: BiomeMapItem,
         biome: BiomeMap,
         _allMaps: BiomeMapCollection,
-        rootEntity: Entity,
+        _world: EcsWorldScope,
     ) => {
+        throw new Error("Not re-implemented");
+
         for (const entity of tilesetVariant.entities) {
             switch (entity.id) {
                 case "water":
@@ -51,7 +54,7 @@ function lakeFactory(tilesetVariant: TilesetVariant) {
                         biome.worldPosition(item),
                         entity.position,
                     );
-                    rootEntity.addChild(waterEntity);
+                    //rootEntity.addChild(waterEntity);
                     break;
                 default:
                     break;

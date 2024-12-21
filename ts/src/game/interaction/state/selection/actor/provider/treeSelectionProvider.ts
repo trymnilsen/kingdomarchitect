@@ -1,8 +1,8 @@
 import { sprites2 } from "../../../../../../asset/sprite.js";
 import { TreeComponent } from "../../../../../component/resource/treeComponent.js";
 import { Entity } from "../../../../../entity/entity.js";
-import { SelectedEntityItem } from "../../../../../selection/selectedEntityItem.js";
-import { SelectedWorldItem } from "../../../../../selection/selectedWorldItem.js";
+import { SelectedEntityItem } from "../../item/selectedEntityItem.js";
+import { SelectedWorldItem } from "../../item/selectedWorldItem.js";
 import { StateContext } from "../../../../handler/stateContext.js";
 import { ButtonCollection } from "../../../../view/actionbar/buttonCollection.js";
 import { ChopJobState } from "../../../resource/chopJopState.js";
@@ -13,10 +13,12 @@ import {
 
 export class TreeSelectionProvider implements ActorSelectionProvider {
     provideButtons(
-        stateContext: StateContext,
-        selection: SelectedWorldItem,
+        _stateContext: StateContext,
+        _selection: SelectedEntityItem,
     ): ButtonCollection {
-        if (selection instanceof SelectedEntityItem) {
+        return emptySelection;
+
+        /*
             const selectedEntity = selection.entity;
             const treeComponent = selectedEntity.getComponent(TreeComponent);
             if (!!treeComponent) {
@@ -39,6 +41,6 @@ export class TreeSelectionProvider implements ActorSelectionProvider {
             }
         } else {
             return emptySelection;
-        }
+        }*/
     }
 }

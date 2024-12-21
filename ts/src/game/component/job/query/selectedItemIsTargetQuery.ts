@@ -1,6 +1,6 @@
-import { SelectedEntityItem } from "../../../selection/selectedEntityItem.js";
-import { SelectedTileItem } from "../../../selection/selectedTileItem.js";
-import { SelectedWorldItem } from "../../../selection/selectedWorldItem.js";
+import { SelectedEntityItem } from "../../../interaction/state/selection/item/selectedEntityItem.js";
+import { SelectedTileItem } from "../../../interaction/state/selection/item/selectedTileItem.js";
+import { SelectedWorldItem } from "../../../interaction/state/selection/item/selectedWorldItem.js";
 import { Job } from "../job.js";
 import { ChopTreeJob } from "../jobs/chopTreeJob.js";
 import { JobQuery } from "./jobQuery.js";
@@ -16,7 +16,7 @@ export class SelectedItemIsTargetQuery implements JobQuery {
         if (job instanceof ChopTreeJob) {
             const selection = job.target;
             if (selection instanceof SelectedEntityItem) {
-                return this.selection.isSelectedItem(selection.entity);
+                return this.selection.isSelectedItem(selection.transform);
             } else if (selection instanceof SelectedTileItem) {
                 return this.selection.isSelectedItem(selection.groundTile);
             } else {

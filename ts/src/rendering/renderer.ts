@@ -78,5 +78,5 @@ export class Renderer {
     }
 }
 
-const dayClearColor = rgbToHex(0, 50, 20);
+const dayClearColor = rgbToHex(61, 35, 46);
 const nightClearColor = rgbToHex(30, 0, 50);

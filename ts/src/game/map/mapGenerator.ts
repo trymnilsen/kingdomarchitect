@@ -4,7 +4,8 @@ import {
     weightedRandomEntry,
 } from "../../common/array.js";
 import { Point, adjacentPoints, pointEquals } from "../../common/point.js";
-import { TilesComponent } from "../component/tile/tilesComponent.js";
+import { EcsWorldScope } from "../../ecs/ecsWorldScope.js";
+import { TileComponent, tileId } from "../ecsComponent/world/tileComponent.js";
 import { Entity } from "../entity/entity.js";
 import { BiomeEntry, BiomeType, biomes } from "./biome/biome.js";
 import { BiomeMap } from "./biome/biomeMap.js";
@@ -19,21 +20,22 @@ import { createSwampBiome } from "./biome/swamp/swampBiomes.js";
 import { createTaintBiome } from "./biome/taint/taintBiome.js";
 import { CHUNK_SIZE, NUMBER_OF_BIOMES } from "./constants.js";
 
-export function generateMap(rootEntity: Entity) {
+export function generateMap(world: EcsWorldScope) {
     const biomes = generateBiomes();
     console.log("created biomes", biomes);
     const shuffledBiomes = shuffleItems(biomes);
-    const biomeMaps = createBiomeMaps(shuffledBiomes, rootEntity);
+    const biomeMaps = createBiomeMaps(shuffledBiomes);
+    const tileComponent = new TileComponent();
+    const rootEntity = world.createEntity();
+    world.addComponent(rootEntity, tileComponent);
+
     for (const biomeMap of biomeMaps.maps) {
-        createTilesForBiomes(biomeMap, rootEntity);
-        createEntitiesForBiomes(biomeMap, rootEntity, biomeMaps);
+        createTilesForBiomes(biomeMap, tileComponent);
+        createEntitiesForBiomes(biomeMap, world, biomeMaps);
     }
 }
 
-function createBiomeMaps(
-    biomes: BiomeEntry[],
-    _rootEntity: Entity,
-): BiomeMapCollection {
+function createBiomeMaps(biomes: BiomeEntry[]): BiomeMapCollection {
     const biomeMaps = new BiomeMapCollection(biomes);
     // Pick the player biome
     addPlayerToBiome(biomeMaps, randomEntry(biomes));
@@ -73,26 +75,24 @@ function createBiomeMaps(
 
 function createEntitiesForBiomes(
     biome: BiomeMap,
-    rootEntity: Entity,
+    world: EcsWorldScope,
     biomeMaps: BiomeMapCollection,
 ) {
     for (const biomeItem of biome.items) {
-        biomeItem.factory(biomeItem, biome, biomeMaps, rootEntity);
+        biomeItem.factory(biomeItem, biome, biomeMaps, world);
     }
 }
 
-function createTilesForBiomes(biomeMap: BiomeMap, rootEntity: Entity) {
-    const component = rootEntity.requireComponent(TilesComponent);
+function createTilesForBiomes(biomeMap: BiomeMap, tiles: TileComponent) {
     for (let x = 0; x < 32; x++) {
         for (let y = 0; y < 32; y++) {
-            component.setTile(
-                {
-                    tileX: biomeMap.point.x * 32 + x,
-                    tileY: biomeMap.point.y * 32 + y,
-                    type: biomeMap.type,
-                },
-                false,
-            );
+            const tx = biomeMap.point.x * 32 + x;
+            const ty = biomeMap.point.y * 32 + y;
+            tiles.tiles[tileId(tx, ty)] = {
+                x: tx,
+                y: ty,
+                type: biomeMap.type,
+            };
         }
     }
 }
@@ -164,12 +164,6 @@ function generateBiomes(): BiomeEntry[] {
             validBiomeTypesForGeneration,
             Object.values(randomWeights),
         );
-
-        /*
-        console.log("Random biome picked:", nextBiomeType);
-        console.log("With weights", randomWeights);
-        console.log("before biomes", biomeMap);
-        */
 
         biomeMap.push({
             type: nextBiomeType,

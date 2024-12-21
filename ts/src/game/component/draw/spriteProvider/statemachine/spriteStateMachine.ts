@@ -39,19 +39,8 @@ export class SpriteStateMachine extends EntityComponent {
             restartOnCurrent
         ) {
             const newAnimation = this._animationFactory(newState);
-            console.log(
-                "Setting statemachine state: updated state",
-                newState,
-                this._currentState,
-            );
             this._currentState = newState;
             this.setAnimationState(newAnimation);
-        } else {
-            console.log(
-                "Setting statemachine state: new state was same as current",
-                newState,
-                this._currentState,
-            );
         }
     }
     updateSpriteConfiguration(

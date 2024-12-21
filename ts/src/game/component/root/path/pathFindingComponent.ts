@@ -2,6 +2,10 @@ import { TypedEventHandle } from "../../../../common/event/typedEvent.js";
 import { addPoint, Point, pointEquals } from "../../../../common/point.js";
 import { GraphNode } from "../../../../path/graph/graph.js";
 import { PathSearch } from "../../../../path/search.js";
+import {
+    blockBuildingsModifier,
+    defaultWeightModifier,
+} from "../../../../path/searchModifier.js";
 import { EntityComponent } from "../../entityComponent.js";
 import { TileMapUpdateEvent } from "../../tile/tileMapUpdatedEvent.js";
 import { ChunkMapUpdateEvent } from "../chunk/chunkMapUpdateEvent.js";
@@ -118,8 +122,3 @@ export class PathFindingComponent extends EntityComponent {
         this.pathSearch.invalidateGraphPoint(point);
     }
 }
-
-const defaultWeightModifier = (node: GraphNode) => node.weight;
-const blockBuildingsModifier = (node: GraphNode) => {
-    return node.weight >= 20 ? 0 : node.weight;
-};
