@@ -10,7 +10,9 @@ import { ColliderComponent } from "../ecsComponent/world/colliderComponent.js";
 export function workerPrefab(world: EcsWorldScope): EcsEntity {
     const entity = world.createEntity();
     //knight
-    const drawableKnightComponent = new DrawableComponent(sprites2.knight);
+    const drawableKnightComponent = new DrawableComponent({
+        sprite: sprites2.knight,
+    });
     const transformKnightComponent = new TransformComponent({ x: 3, y: 4 });
     const colliderComponent = new ColliderComponent();
     world.addComponent(entity, drawableKnightComponent);

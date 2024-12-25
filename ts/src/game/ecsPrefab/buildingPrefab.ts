@@ -17,7 +17,7 @@ export function buildingPrefab(
     world.addComponent(entity, new BuildingComponent(building, false));
     world.addComponent(
         entity,
-        new DrawableComponent(building.icon, { x: 2, y: 2 }),
+        new DrawableComponent({ sprite: building.icon }, { x: 2, y: 2 }),
     );
     world.addComponent(entity, new ColliderComponent());
     return entity;

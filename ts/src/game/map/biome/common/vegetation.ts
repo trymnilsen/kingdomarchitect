@@ -1,5 +1,13 @@
 import { generateId } from "../../../../common/idGenerator.js";
+import { randomNumber } from "../../../../common/number.js";
+import { Resource } from "../../../../data/resource/resource.js";
+import {
+    tree1Resource,
+    tree2Resource,
+    tree3Resource,
+} from "../../../../data/resource/tree.js";
 import { EcsWorldScope } from "../../../../ecs/ecsWorldScope.js";
+import { resourcePrefab } from "../../../ecsPrefab/resourcePrefab.js";
 import { Entity } from "../../../entity/entity.js";
 import { treePrefab } from "../../../prefab/treePrefab.js";
 import { placeRandomEntity } from "../../tilesetPlacer.js";
@@ -26,12 +34,23 @@ function treeFactory(
     item: BiomeMapItem,
     biome: BiomeMap,
     _allMaps: BiomeMapCollection,
-    _world: EcsWorldScope,
+    world: EcsWorldScope,
 ) {
-    throw new Error("Not re-implemented");
-    const position = biome.worldPosition(item);
-    const variant = Math.floor(Math.random() * 3);
-    const tree = treePrefab(generateId("tree"), variant);
-    tree.worldPosition = position;
-    //rootEntity.addChild(tree);
+    resourcePrefab(
+        world,
+        randomForrestTreeResource(),
+        biome.worldPosition(item),
+    );
+}
+
+export function randomForrestTreeResource(): Resource {
+    const treeVariant = randomNumber(3);
+    switch (treeVariant) {
+        case 1:
+            return tree2Resource;
+        case 2:
+            return tree3Resource;
+        default:
+            return tree1Resource;
+    }
 }

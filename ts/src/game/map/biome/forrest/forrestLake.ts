@@ -9,6 +9,7 @@ import { addPoint } from "../../../../common/point.js";
 import { EcsWorldScope } from "../../../../ecs/ecsWorldScope.js";
 import { WeightComponent } from "../../../component/movement/weightComponent.js";
 import { WaterComponent } from "../../../component/world/waterComponent.js";
+import { waterPrefab } from "../../../ecsPrefab/waterPrefab.js";
 import { Entity } from "../../../entity/entity.js";
 import { Tileset, TilesetVariant, getLargestSize } from "../../tileset.js";
 import { placeTileset } from "../../tilesetPlacer.js";
@@ -40,21 +41,16 @@ function lakeFactory(tilesetVariant: TilesetVariant) {
         item: BiomeMapItem,
         biome: BiomeMap,
         _allMaps: BiomeMapCollection,
-        _world: EcsWorldScope,
+        world: EcsWorldScope,
     ) => {
-        throw new Error("Not re-implemented");
-
         for (const entity of tilesetVariant.entities) {
             switch (entity.id) {
                 case "water":
-                    const waterEntity = new Entity(generateId("water"));
-                    waterEntity.addComponent(new WaterComponent());
-                    waterEntity.addComponent(new WeightComponent(100));
-                    waterEntity.worldPosition = addPoint(
+                    const position = addPoint(
                         biome.worldPosition(item),
                         entity.position,
                     );
-                    //rootEntity.addChild(waterEntity);
+                    waterPrefab(position, world);
                     break;
                 default:
                     break;

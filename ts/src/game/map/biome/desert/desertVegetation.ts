@@ -3,9 +3,14 @@ import { shuffleItems, weightedRandomEntry } from "../../../../common/array.js";
 import { Bounds } from "../../../../common/bounds.js";
 import { generateId } from "../../../../common/idGenerator.js";
 import { Point, addPoint } from "../../../../common/point.js";
+import {
+    cactiiResource,
+    tumbleweedResource,
+} from "../../../../data/resource/tree.js";
 import { EcsWorldScope } from "../../../../ecs/ecsWorldScope.js";
 import { SpriteComponent } from "../../../component/draw/spriteComponent.js";
 import { WeightComponent } from "../../../component/movement/weightComponent.js";
+import { resourcePrefab } from "../../../ecsPrefab/resourcePrefab.js";
 import { Entity } from "../../../entity/entity.js";
 import { placeRandomEntity } from "../../tilesetPlacer.js";
 import {
@@ -16,63 +21,24 @@ import {
 import { BiomeMapCollection } from "../biomeMapCollection.js";
 
 export function generateTumbleweed(map: BiomeMap) {
-    const randomAmount = 16 + Math.floor(Math.random() * 32);
+    const randomAmount = 8 + Math.floor(Math.random() * 16);
     placeRandomEntity(map, "tumbleweed", randomAmount, tumbleWeedFactory);
 }
 
-export function generateCactii(biomeMap: BiomeMap) {
-    const points: Point[] = [];
-    for (let x = 0; x < 32; x++) {
-        for (let y = 0; y < 32; y++) {
-            const pointCandidate: Bounds = {
-                x1: x,
-                y1: y,
-                x2: x + 1,
-                y2: y + 1,
-            };
-            if (biomeMap.isSpotAvailable(pointCandidate)) {
-                points.push({ x, y });
-            }
-        }
-    }
-    const shuffledPoints = shuffleItems(points);
-    const numberOfCacti = Math.min(
-        shuffledPoints.length - 1,
-        32 + Math.floor(Math.random() * 100),
-    );
-    if (numberOfCacti > 0) {
-        for (let i = 0; i < numberOfCacti; i++) {
-            const point = shuffledPoints[i];
-            biomeMap.setItem({
-                name: "cacti",
-                point: { x: point.x, y: point.y },
-                size: { x: 1, y: 1 },
-                factory: createEntityFactory(),
-            });
-        }
-    }
+export function generateCactii(map: BiomeMap) {
+    const randomAmount = 48 + Math.floor(Math.random() * 32);
+    placeRandomEntity(map, "cactii", randomAmount, cactiiFactory());
 }
 
-function createEntityFactory(): BiomeMapItemEntityFactory {
+function cactiiFactory(): BiomeMapItemEntityFactory {
     return (
         item: BiomeMapItem,
         biome: BiomeMap,
         _allMaps: BiomeMapCollection,
-        _world: EcsWorldScope,
+        world: EcsWorldScope,
     ) => {
-        throw new Error("Not reimplemented");
         const position = biome.worldPosition(item);
-        const cactiEntity = new Entity(generateId("cacti"));
-        cactiEntity.addComponent(
-            new SpriteComponent(
-                sprites2.cactus,
-                { x: 2, y: 2 },
-                { x: 32, y: 32 },
-            ),
-        );
-        cactiEntity.addComponent(new WeightComponent(10));
-        cactiEntity.worldPosition = position;
-        //rootEntity.addChild(cactiEntity);
+        resourcePrefab(world, cactiiResource, position);
     };
 }
 
@@ -82,19 +48,8 @@ function tumbleWeedFactory(
     item: BiomeMapItem,
     biome: BiomeMap,
     _allMaps: BiomeMapCollection,
-    _world: EcsWorldScope,
+    world: EcsWorldScope,
 ) {
-    throw new Error("Not re-implemented");
     const position = biome.worldPosition(item);
-    const tumbleweedEntity = new Entity(generateId("tumbleweed"));
-    tumbleweedEntity.addComponent(
-        new SpriteComponent(
-            sprites2.tumbleweed_1,
-            { x: 2, y: 2 },
-            { x: 32, y: 32 },
-        ),
-    );
-    tumbleweedEntity.addComponent(new WeightComponent(5));
-    tumbleweedEntity.worldPosition = position;
-    //rootEntity.addChild(tumbleweedEntity);
+    resourcePrefab(world, tumbleweedResource, position);
 }

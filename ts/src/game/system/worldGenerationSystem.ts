@@ -1,5 +1,6 @@
 import { sprites2 } from "../../asset/sprite.js";
-import { zeroPoint } from "../../common/point.js";
+import { randomEntry } from "../../common/array.js";
+import { Point, zeroPoint } from "../../common/point.js";
 import { well } from "../../data/building/food/well.js";
 import { woodenHouse } from "../../data/building/wood/house.js";
 import {
@@ -7,9 +8,10 @@ import {
     wheatResourceItem,
     woodResourceItem,
 } from "../../data/inventory/items/resources.js";
-import { createSystem, EcsSystem } from "../../ecs/ecsSystem.js";
+import { createSystem, EcsSystem, EmptyQuery } from "../../ecs/ecsSystem.js";
 import { EcsWorldScope, RootEntity } from "../../ecs/ecsWorldScope.js";
 import { EcsInitEvent } from "../../ecs/event/ecsInitEvent.js";
+import { EcsTransformEvent } from "../../ecs/event/ecsTransformEvent.js";
 import { TransformComponent } from "../../ecs/transformComponent.js";
 import { TilesComponent } from "../component/tile/tilesComponent.js";
 import { PlayerControllableActorComponent } from "../ecsComponent/actor/playerControllableActorComponent.js";
@@ -20,79 +22,37 @@ import { ColliderComponent } from "../ecsComponent/world/colliderComponent.js";
 import { TileComponent, tileId } from "../ecsComponent/world/tileComponent.js";
 import { buildingPrefab } from "../ecsPrefab/buildingPrefab.js";
 import { resourcePrefab } from "../ecsPrefab/resourcePrefab.js";
+import { BiomeType } from "../map/biome/biome.js";
+import { BiomeMap } from "../map/biome/biomeMap.js";
+import { randomBiomeType } from "../map/generate/generate.js";
+import { inflateBiome } from "../map/generate/inflate.js";
+import { generatePlayerStartArea } from "../map/generate/player.js";
 import { generateMap } from "../map/mapGenerator.js";
 
 export function createWorldGenerationSystem(): EcsSystem {
-    return createSystem()
+    return createSystem(EmptyQuery)
         .onEvent(EcsInitEvent, (_query, _event, world) => {
             //generateMap(world);
-            generateWorld(world);
+            //generateWorld(world);
+            createFirstChunk(world);
+        })
+        .onEvent(EcsTransformEvent, (_query, event, world) => {
+            createAdditionalChunk(event.newPosition, world);
         })
         .build();
 }
 
-function generateWorld(world: EcsWorldScope) {
-    //3x3 tiles
-    const tileComponent = new TileComponent();
-    for (let x = 0; x < 7; x++) {
-        for (let y = 0; y < 7; y++) {
-            tileComponent.tiles[tileId(x, y)] = {
-                x,
-                y,
-                type: "forrest",
-            };
-        }
-    }
-    world.addComponent(RootEntity, tileComponent);
-    /*
-    const houseEntity = world.createEntity();
-    const farmEntity = world.createEntity();
-    const knightEntity = world.createEntity();
-
-    //House
-    const buildingComponent = new BuildingComponent(woodenHouse, false);
-    const transformComponent = new TransformComponent({ x: 3, y: 3 });
-    const drawableComponent = new DrawableComponent(sprites2.wooden_house, {
-        x: 2,
-        y: 2,
-    });
-    world.addComponent(houseEntity, buildingComponent);
-    world.addComponent(houseEntity, drawableComponent);
-    world.addComponent(houseEntity, transformComponent);
-
-    //Farm
-    const drawableFarmComponent = new DrawableComponent(sprites2.farm_3, {
-        x: 2,
-        y: 0,
-    });
-    const transformFarmComponent = new TransformComponent({ x: 4, y: 3 });
-    world.addComponent(farmEntity, drawableFarmComponent);
-    world.addComponent(farmEntity, transformFarmComponent);
-
-    //Well
-    const drawableWellComponent = new DrawableComponent(sprites2.well, {
-        x: 2,
-        y: 2,
-    });
-    const transformWellComponent = new TransformComponent({ x: 4, y: 4 });
-    world.addComponent(wellEntity, drawableWellComponent);
-    world.addComponent(wellEntity, transformWellComponent);
-    */
-
-    //const farmEntity = buildingPrefab(world, well);
-    const wellEntity = buildingPrefab(world, well, { x: 4, y: 4 });
-    const houseEntity = buildingPrefab(world, woodenHouse, { x: 3, y: 3 });
-    const farm = resourcePrefab(world, wheatResourceItem, { x: 4, y: 3 });
-    const stone = resourcePrefab(world, stoneResource, { x: 1, y: 4 });
-    const tree = resourcePrefab(world, woodResourceItem, { x: 4, y: 1 });
-    //knight
-    const knightEntity = world.createEntity();
-    const drawableKnightComponent = new DrawableComponent(sprites2.knight);
-    const transformKnightComponent = new TransformComponent({ x: 3, y: 4 });
-    const colliderComponent = new ColliderComponent();
-    world.addComponent(knightEntity, drawableKnightComponent);
-    world.addComponent(knightEntity, transformKnightComponent);
-    world.addComponent(knightEntity, colliderComponent);
-    world.addComponent(knightEntity, new PlayerControllableActorComponent());
-    world.addComponent(knightEntity, new JobComponent());
+function createFirstChunk(world: EcsWorldScope) {
+    const biomeType: BiomeType = randomEntry([
+        "desert",
+        "forrest",
+        "snow",
+        "swamp",
+    ]);
+    const chunkPosition = { x: 0, y: 0 };
+    const biomeMap = new BiomeMap(chunkPosition, biomeType);
+    generatePlayerStartArea(biomeMap);
+    inflateBiome(biomeMap, chunkPosition, world);
 }
+
+function createAdditionalChunk(_point: Point, _world: EcsWorldScope) {}

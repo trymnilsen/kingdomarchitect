@@ -20,12 +20,12 @@ export function createDesertBiome(
 ): BiomeMap {
     const biomeMap = biomes.getBiomeMap(biome);
     //Generate Oasises
-    generateOasis(biomes, biomeMap);
+    generateOasis(biomeMap);
     generateForts(biomeMap);
     generateDesertRuins(biomeMap);
     generateNonPlayerKingdom();
     generateTumbleweed(biomeMap);
     generateCactii(biomeMap);
-    generateConnectionPoints(biomeMap, biomes);
+    //generateConnectionPoints(biomeMap, biomes);
     return biomeMap;
 }

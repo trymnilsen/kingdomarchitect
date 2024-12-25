@@ -3,12 +3,14 @@ import { sizeOfBounds } from "../../../../common/bounds.js";
 import { generateId } from "../../../../common/idGenerator.js";
 import { addPoint } from "../../../../common/point.js";
 import { EcsWorldScope } from "../../../../ecs/ecsWorldScope.js";
+import { resourcePrefab } from "../../../ecsPrefab/resourcePrefab.js";
 import { Entity } from "../../../entity/entity.js";
 import { treePrefab } from "../../../prefab/treePrefab.js";
 import { TilesetVariant } from "../../tileset.js";
 import { placeTileset } from "../../tilesetPlacer.js";
 import { BiomeMap, BiomeMapItem } from "../biomeMap.js";
 import { BiomeMapCollection } from "../biomeMapCollection.js";
+import { randomForrestTreeResource } from "../common/vegetation.js";
 
 export function generateForrest(map: BiomeMap) {
     const maxBudget = (32 * 32) / 4;
@@ -31,23 +33,20 @@ function treeFactory(tilesetVariant: TilesetVariant) {
         item: BiomeMapItem,
         biome: BiomeMap,
         _allMaps: BiomeMapCollection,
-        _world: EcsWorldScope,
+        world: EcsWorldScope,
     ) => {
-        throw new Error("Not re-implemented");
         for (const entity of tilesetVariant.entities) {
             switch (entity.id) {
                 case "forrest":
-                    const treeVariant = Math.floor(Math.random() * 3);
-                    const treeEntity = treePrefab(
-                        generateId("tree"),
-                        treeVariant,
-                    );
-
-                    treeEntity.worldPosition = addPoint(
+                    const position = addPoint(
                         biome.worldPosition(item),
                         entity.position,
                     );
-                    //rootEntity.addChild(treeEntity);
+                    resourcePrefab(
+                        world,
+                        randomForrestTreeResource(),
+                        position,
+                    );
                     break;
                 default:
                     break;

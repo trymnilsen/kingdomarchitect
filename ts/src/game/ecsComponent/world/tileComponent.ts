@@ -14,6 +14,14 @@ export class TileComponent extends EcsComponent {
     getTile(x: number, y: number) {
         return this.tiles[tileId(x, y)];
     }
+
+    setTile(x: number, y: number, biomeType: BiomeType) {
+        this.tiles[tileId(x, y)] = {
+            x: x,
+            y: y,
+            type: biomeType,
+        };
+    }
 }
 
 export function tileId(x: number, y: number) {

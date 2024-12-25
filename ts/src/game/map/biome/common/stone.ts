@@ -1,11 +1,13 @@
 import { Sprite2, sprites2 } from "../../../../asset/sprite.js";
 import { generateId } from "../../../../common/idGenerator.js";
+import { stoneResource } from "../../../../data/resource/stone.js";
 import { EcsWorldScope } from "../../../../ecs/ecsWorldScope.js";
 import { SpriteComponent } from "../../../component/draw/spriteComponent.js";
 import { WeightComponent } from "../../../component/movement/weightComponent.js";
 import { StoneComponent } from "../../../component/resource/stoneComponent.js";
 import { StaticSelectionInfoProvider } from "../../../component/selection/provider/staticSelectionInfoProvider.js";
 import { SelectionInfoComponent } from "../../../component/selection/selectionInfoComponent.js";
+import { resourcePrefab } from "../../../ecsPrefab/resourcePrefab.js";
 import { Entity } from "../../../entity/entity.js";
 import { placeRandomEntity } from "../../tilesetPlacer.js";
 import {
@@ -31,30 +33,13 @@ function stoneFactory(
     item: BiomeMapItem,
     biome: BiomeMap,
     _allMaps: BiomeMapCollection,
-    _world: EcsWorldScope,
+    world: EcsWorldScope,
 ) {
-    throw new Error("No reimplemented");
     const position = biome.worldPosition(item);
-    const cactiEntity = new Entity(generateId("stone"));
-    const sprite = getStoneSprite(biome);
-    cactiEntity.addComponent(
-        new SpriteComponent(sprite, { x: 2, y: 2 }, { x: 32, y: 32 }),
-    );
-    cactiEntity.addComponent(
-        new SelectionInfoComponent(
-            new StaticSelectionInfoProvider(
-                sprites2.stone,
-                "Stone",
-                "Resource",
-            ),
-        ),
-    );
-    cactiEntity.addComponent(new StoneComponent());
-    cactiEntity.addComponent(new WeightComponent(50));
-    cactiEntity.worldPosition = position;
-    //rootEntity.addChild(cactiEntity);
+    resourcePrefab(world, stoneResource, position);
 }
 
+/*
 function getStoneSprite(biome: BiomeMap): Sprite2 {
     const variant = Math.floor(Math.random() * 3);
     if (biome.type == "snow") {
@@ -85,4 +70,4 @@ function getStoneSprite(biome: BiomeMap): Sprite2 {
                 return sprites2.stone3;
         }
     }
-}
+}*/

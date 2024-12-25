@@ -1,37 +1,21 @@
 import { tilesets } from "../../../../../generated/tilesets.js";
-import { sprites2 } from "../../../../asset/sprite.js";
-import { randomEntry, shuffleItems } from "../../../../common/array.js";
-import {
-    Bounds,
-    getAllPositionsBoundsFitWithinBounds,
-    sizeOfBounds,
-    zeroBounds,
-} from "../../../../common/bounds.js";
-import { generateId } from "../../../../common/idGenerator.js";
-import {
-    Point,
-    addPoint,
-    pointEquals,
-    pointGrid,
-} from "../../../../common/point.js";
-import {
-    buildings,
-    getBuildingById,
-} from "../../../../data/building/buildings.js";
+import { Bounds } from "../../../../common/bounds.js";
+import { Point, addPoint } from "../../../../common/point.js";
+import { tavern } from "../../../../data/building/food/tavern.js";
+import { well } from "../../../../data/building/food/well.js";
+import { windmill } from "../../../../data/building/food/windmill.js";
+import { gravestone } from "../../../../data/building/gold/gravestone.js";
+import { barracks } from "../../../../data/building/stone/barracks.js";
+import { stoneWall } from "../../../../data/building/stone/wall.js";
+import { woodenHouse } from "../../../../data/building/wood/house.js";
+import { farmResource } from "../../../../data/resource/food.js";
 import { EcsWorldScope } from "../../../../ecs/ecsWorldScope.js";
-import { BuildingComponent } from "../../../component/building/buildingComponent.js";
-import { SpriteComponent } from "../../../component/draw/spriteComponent.js";
-import { HealthComponent } from "../../../component/health/healthComponent.js";
-import { NpcAreaComponent } from "../../../component/npc/npcAreaComponent.js";
-import { Entity } from "../../../entity/entity.js";
-import { buildingPrefab } from "../../../prefab/buildingPrefab.js";
-import { farmPrefab } from "../../../prefab/farmPrefab.js";
-import { housePrefab } from "../../../prefab/housePrefab.js";
-import { mobPrefab } from "../../../prefab/mobPrefab.js";
-import { wellPrefab } from "../../../prefab/wellPrefab.js";
-import { TilesetVariant, getLargestSize } from "../../tileset.js";
+import { NpcAreaComponent } from "../../../ecsComponent/actor/npcAreaComponent.js";
+import { buildingPrefab } from "../../../ecsPrefab/buildingPrefab.js";
+import { resourcePrefab } from "../../../ecsPrefab/resourcePrefab.js";
+import { TilesetVariant } from "../../tileset.js";
 import { placeTileset } from "../../tilesetPlacer.js";
-import { BiomeEntry, BiomeType } from "../biome.js";
+import { BiomeType } from "../biome.js";
 import {
     BiomeMap,
     BiomeMapItem,
@@ -40,7 +24,7 @@ import {
 import { BiomeMapCollection } from "../biomeMapCollection.js";
 
 export function generateForts(biomeMap: BiomeMap) {
-    const shouldPlaceForts = Math.random() > getFortWeight(biomeMap.type);
+    const shouldPlaceForts = true; //Math.random() > getFortWeight(biomeMap.type);
     if (shouldPlaceForts) {
         placeTileset(tilesets.fort, biomeMap, createEntityFactory);
     }
@@ -51,52 +35,49 @@ function getFortWeight(type: BiomeType): number {
         case "forrest":
         case "snow":
         case "plains":
-            return 0.1;
+            return 0;
         default:
-            return 0.4;
+            return 0;
     }
 }
 
 function createEntityFactory(
-    _tileset: TilesetVariant,
+    tileset: TilesetVariant,
 ): BiomeMapItemEntityFactory {
     return (
         item: BiomeMapItem,
         biome: BiomeMap,
         _allMaps: BiomeMapCollection,
-        _world: EcsWorldScope,
+        world: EcsWorldScope,
     ) => {
         const itemPosition = biome.worldPosition(item);
-        const fortEntity = new Entity(generateId("fort"));
-        throw new Error("Not re-implemented");
-        /*rootEntity.addChild(fortEntity);
         const spawnPoints: Point[] = [];
         for (const entity of tileset.entities) {
             const position = addPoint(itemPosition, entity.position);
             switch (entity.id) {
                 case "farm":
-                    createFarmEntity(position, fortEntity);
+                    resourcePrefab(world, farmResource, position);
                     break;
                 case "tavern":
-                    createTavernEntity(position, fortEntity);
+                    buildingPrefab(world, tavern, position);
                     break;
                 case "well":
-                    createWellEntity(position, fortEntity);
+                    buildingPrefab(world, well, position);
                     break;
                 case "house":
-                    createHouseEntity(position, fortEntity);
+                    buildingPrefab(world, woodenHouse, position);
                     break;
                 case "windmill":
-                    createWindmillEntity(position, fortEntity);
+                    buildingPrefab(world, windmill, position);
                     break;
                 case "barracks":
-                    createBarracksEntity(position, fortEntity);
+                    buildingPrefab(world, barracks, position);
                     break;
                 case "gravestone":
-                    createGravestoneEntity(position, fortEntity);
+                    buildingPrefab(world, gravestone, position);
                     break;
                 case "wall":
-                    createWallEntity(position, fortEntity);
+                    buildingPrefab(world, stoneWall, position);
                     break;
                 case "spawn":
                     spawnPoints.push(position);
@@ -105,103 +86,17 @@ function createEntityFactory(
                     break;
             }
         }
+
         const bounds: Bounds = {
             x1: itemPosition.x,
             y1: itemPosition.y,
             x2: itemPosition.x + item.size.x,
             y2: itemPosition.y + item.size.y,
         };
-        const areaComponent = new NpcAreaComponent(bounds, spawnPoints);
-        fortEntity.addComponent(areaComponent);
 
-        if (spawnPoints.length > 0) {
-            const mobPosition = randomEntry(spawnPoints);
-            const mob = mobPrefab(generateId("mob"));
-            mob.position = mobPosition;
-            fortEntity.addChild(mob);
-        }*/
+        const areaEntity = world.createEntity();
+        const areaComponent = new NpcAreaComponent();
+        areaComponent.bounds = bounds;
+        areaComponent.spawnPoints = spawnPoints;
     };
-}
-
-function createFarmEntity(position: Point, rootEntity: Entity) {
-    const farm = farmPrefab(generateId("farm"));
-    farm.worldPosition = position;
-    rootEntity.addChild(farm);
-}
-
-function createTavernEntity(position: Point, rootEntity: Entity) {
-    const tavernEntity = new Entity(generateId("tavern"));
-    tavernEntity.addComponent(
-        new SpriteComponent(
-            sprites2.building_tavern,
-            { x: 2, y: 2 },
-            { x: 32, y: 32 },
-        ),
-    );
-    tavernEntity.worldPosition = position;
-    rootEntity.addChild(tavernEntity);
-}
-
-function createWellEntity(position: Point, rootEntity: Entity) {
-    const well = wellPrefab(generateId("well"));
-    well.worldPosition = position;
-    rootEntity.addChild(well);
-}
-
-function createHouseEntity(position: Point, rootEntity: Entity) {
-    const house = housePrefab(generateId("house"), false);
-    house.worldPosition = position;
-    rootEntity.addChild(house);
-}
-
-function createWindmillEntity(position: Point, rootEntity: Entity) {
-    const windmillEntity = new Entity(generateId("windmill"));
-    windmillEntity.addComponent(
-        new SpriteComponent(
-            sprites2.building_mill,
-            { x: 2, y: 2 },
-            { x: 32, y: 32 },
-        ),
-    );
-    windmillEntity.worldPosition = position;
-    rootEntity.addChild(windmillEntity);
-}
-
-function createBarracksEntity(position: Point, rootEntity: Entity) {
-    const barracksEntity = new Entity(generateId("barracks"));
-    barracksEntity.addComponent(
-        new SpriteComponent(
-            sprites2.goblin_house,
-            { x: 2, y: 2 },
-            { x: 32, y: 32 },
-        ),
-    );
-    barracksEntity.worldPosition = position;
-    rootEntity.addChild(barracksEntity);
-}
-
-function createGravestoneEntity(position: Point, rootEntity: Entity) {
-    const gravestoneEntity = new Entity(generateId("gravestone"));
-    gravestoneEntity.addComponent(
-        new SpriteComponent(
-            sprites2.building_tombstone,
-            { x: 2, y: 2 },
-            { x: 32, y: 32 },
-        ),
-    );
-    gravestoneEntity.worldPosition = position;
-    rootEntity.addChild(gravestoneEntity);
-}
-
-function createWallEntity(position: Point, rootEntity: Entity) {
-    const wallEntity = buildingPrefab(
-        generateId("building"),
-        getBuildingById("stonewall")!,
-        [],
-        false,
-    );
-    wallEntity.requireComponent(HealthComponent).healToMax();
-    //wallEntity.requireComponent(BuildingComponent).finishBuild();
-    wallEntity.worldPosition = position;
-    rootEntity.addChild(wallEntity);
 }

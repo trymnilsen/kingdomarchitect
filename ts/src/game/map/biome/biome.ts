@@ -43,7 +43,7 @@ export const biomes = {
         modifier: 10,
         generate: true,
     },
-};
+} as const;
 
 export type BiomeType = keyof typeof biomes;
 export type BiomeEntry = {

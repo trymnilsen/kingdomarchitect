@@ -4,18 +4,16 @@ import {
     stoneResource,
     wheatResourceItem,
 } from "../../data/inventory/items/resources.js";
+import { Resource } from "../../data/resource/resource.js";
 import { EcsWorldScope } from "../../ecs/ecsWorldScope.js";
 import { TransformComponent } from "../../ecs/transformComponent.js";
 import { DrawableComponent } from "../ecsComponent/drawable/drawableComponent.js";
-import {
-    ResourceComponent,
-    ResourceType,
-} from "../ecsComponent/resource/resourceComponent.js";
+import { ResourceComponent } from "../ecsComponent/resource/resourceComponent.js";
 import { ColliderComponent } from "../ecsComponent/world/colliderComponent.js";
 
 export function resourcePrefab(
     world: EcsWorldScope,
-    resource: ResourceType,
+    resource: Resource,
     initialPosition: Point,
 ) {
     const entity = world.createEntity();
@@ -24,18 +22,7 @@ export function resourcePrefab(
     world.addComponent(entity, new ResourceComponent(resource));
     world.addComponent(
         entity,
-        new DrawableComponent(resourceToDrawable(resource)),
+        new DrawableComponent({ sprite: resource.asset }),
     );
     return entity;
-}
-
-function resourceToDrawable(resource: ResourceType): Sprite2 {
-    switch (resource.id) {
-        case "stone":
-            return sprites2.stone;
-        case "wheat":
-            return sprites2.farm_2;
-        case "wood":
-            return sprites2.tree_2;
-    }
 }
