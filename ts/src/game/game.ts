@@ -5,6 +5,7 @@ import {
     invert,
     multiplyPoint,
     Point,
+    zeroPoint,
 } from "../common/point.js";
 
 import { Input, InputEvent } from "../input/input.js";
@@ -21,52 +22,60 @@ import { generateMap } from "./map/mapGenerator.js";
 import { firstChildWhere } from "./entity/child/first.js";
 import { GameTime } from "../common/time.js";
 import { DrawMode } from "../rendering/drawMode.js";
+import { SpatialChunkMapComponent } from "./component/world/spatialChunkMapComponent.js";
+import { Camera } from "../rendering/camera.js";
 
 export class Game {
-    private renderer: Renderer;
-    private input: Input;
-    private touchInput: TouchInput;
+    private renderer!: Renderer;
+    private input!: Input;
+    private touchInput!: TouchInput;
+    private interactionHandler!: InteractionHandler;
+
     private assetLoader: AssetLoader;
-    private interactionHandler: InteractionHandler;
     private drawTick = 0;
     private updateTick = 0;
     private world: Entity;
+    private camera: Camera;
     private gameTime: GameTime = new GameTime();
     private visibilityMap: RenderVisibilityMap = new RenderVisibilityMap();
 
-    constructor(domElementWrapperSelector: string) {
+    constructor(
+        private domElementWrapperSelector: string,
+        rootNode: Entity,
+        assetLoader: AssetLoader,
+    ) {
+        // Rendering
+        this.assetLoader = assetLoader;
+        this.camera = new Camera({
+            x: window.innerWidth,
+            y: window.innerHeight,
+        });
+        // World
+        this.world = rootNode;
+        this.world.gameTime = this.gameTime;
+    }
+
+    async bootstrap(): Promise<void> {
+        console.log("bootstrap");
+        // Init systems
         // Get the canvas
         const canvasElement: HTMLCanvasElement | null = document.querySelector(
-            `#${domElementWrapperSelector}`,
+            `#${this.domElementWrapperSelector}`,
         );
 
         if (canvasElement == null) {
             throw new Error("Canvas element not found");
         }
 
+        this.renderer = new Renderer(
+            canvasElement,
+            this.assetLoader,
+            this.camera,
+        );
+
         // Input
         this.input = new Input();
         this.touchInput = new TouchInput(canvasElement);
-
-        // Rendering
-        this.assetLoader = new AssetLoader();
-        this.renderer = new Renderer(canvasElement, this.assetLoader);
-
-        // World
-        this.world = createRootEntity();
-        this.world.gameTime = this.gameTime;
-        generateMap(this.world);
-        //Set the camera position
-        const playerEntity = firstChildWhere(this.world, (child) => {
-            return child.id.includes("player-worker");
-        });
-        if (!!playerEntity) {
-            const newPosition = multiplyPoint(
-                playerEntity.worldPosition,
-                TileSize,
-            );
-            this.renderer.camera.position = newPosition;
-        }
 
         // UI states handling
         this.interactionHandler = new InteractionHandler(
@@ -81,10 +90,22 @@ export class Game {
                 this.render(DrawMode.Gesture);
             },
         );
-    }
 
-    async bootstrap(): Promise<void> {
-        await this.assetLoader.load();
+        //Set the camera position
+        const playerEntity = firstChildWhere(this.world, (child) => {
+            return child.id.includes("player-worker");
+        });
+        if (!!playerEntity) {
+            const newPosition = multiplyPoint(
+                playerEntity.worldPosition,
+                TileSize,
+            );
+            this.renderer.camera.position = newPosition;
+        }
+
+        this.updateVisibilityMap();
+
+        await this.assetLoader.loaderPromise;
 
         this.touchInput.onTapDown = (position: Point) => {
             const tapResult = this.interactionHandler.onTapDown(position);
@@ -121,8 +142,6 @@ export class Game {
         });
 
         setInterval(this.onTick, 200);
-
-        this.updateVisibilityMap();
         this.render(DrawMode.Gesture);
     }
 
@@ -149,11 +168,15 @@ export class Game {
         if (this.visibilityMap.useVisibility) {
             const visibilityComponents =
                 this.world.queryComponents(VisibilityComponent);
-
-            for (const visibilityComponent of visibilityComponents) {
-                const visiblePoints = visibilityComponent.getVisibility();
-                for (const visiblePoint of visiblePoints) {
-                    this.visibilityMap.setIsVisible(visiblePoint, true);
+            for (let i = 0; i < visibilityComponents.length; i++) {
+                const component = visibilityComponents[i];
+                const visiblePoints = component.getVisibility();
+                for (let p = 0; p < visiblePoints.length; p++) {
+                    this.visibilityMap.setIsVisible(
+                        visiblePoints[p].x,
+                        visiblePoints[p].y,
+                        true,
+                    );
                 }
             }
         }
@@ -196,12 +219,50 @@ export class Game {
     private render(drawMode: DrawMode) {
         const renderStart = performance.now();
         this.renderer.clearScreen();
-        this.world.onDraw(this.renderer.context, this.visibilityMap, drawMode);
+        //TODO: use the world/root entity to get chunkmap
+        //get entities within the viewport
+        //call draw on these
+        if (true) {
+            const spatialMap = this.world.requireComponent(
+                SpatialChunkMapComponent,
+            );
+            const viewport = this.renderer.camera.tileSpaceViewPort;
+            const entities = spatialMap.getEntitiesWithin(viewport);
+            this.world.onDraw(
+                this.renderer.context,
+                this.visibilityMap,
+                drawMode,
+                false,
+            );
+
+            for (let i = 0; i < entities.length; i++) {
+                const entity = entities[i];
+                if (entity.isGameRoot) {
+                    continue;
+                }
+
+                entity.onDraw(
+                    this.renderer.context,
+                    this.visibilityMap,
+                    drawMode,
+                    false,
+                );
+            }
+        } else {
+            this.world.onDraw(
+                this.renderer.context,
+                this.visibilityMap,
+                drawMode,
+            );
+        }
+        const renderEnd = performance.now();
+        performance.measure("render duration", {
+            start: renderStart,
+            end: renderEnd,
+        });
         this.interactionHandler.onDraw(this.renderer.context);
         this.renderer.renderDeferred();
-        performance.measure;
-        //performance.measure("render duration", "render-start");
-        const renderEnd = performance.now();
+
         //console.log("⏱render time: ", renderEnd - renderStart);
     }
 }

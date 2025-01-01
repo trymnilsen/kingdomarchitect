@@ -30,7 +30,7 @@ type TileMap = Record<string, GroundTile>;
 type GroundChunkMap = Record<string, GroundChunk>;
 
 export class TilesComponent extends EntityComponent implements Ground {
-    private tileMap: TileMap = {};
+    private tileMap: Map<string, GroundTile> = new Map();
     private discoveredTiles: { [id: string]: boolean } = {};
     private _chunkMap: GroundChunkMap = {};
 
@@ -40,7 +40,6 @@ export class TilesComponent extends EntityComponent implements Ground {
 
     constructor() {
         super();
-        const tileMap: TileMap = {};
         const tileLayerMap = {};
         const chunkMap: GroundChunkMap = {};
         /*
@@ -62,7 +61,6 @@ export class TilesComponent extends EntityComponent implements Ground {
         };*/
 
         this._chunkMap = chunkMap;
-        this.tileMap = tileMap;
         this.discoveredTiles = tileLayerMap;
     }
 
@@ -97,15 +95,17 @@ export class TilesComponent extends EntityComponent implements Ground {
     }
 
     getTile(tilePosition: Point): GroundTile | null {
-        return this.tileMap[getTileId(tilePosition.x, tilePosition.y)] || null;
+        return (
+            this.tileMap.get(getTileId(tilePosition.x, tilePosition.y)) || null
+        );
     }
 
     getTiles(predicate: (tile: GroundTile) => boolean): GroundTile[] {
-        return Object.values(this.tileMap).filter(predicate);
+        return Array.from(this.tileMap.values()).filter(predicate);
     }
 
     getAllTiles(): ReadonlyArray<GroundTile> {
-        return Object.values(this.tileMap);
+        return Array.from(this.tileMap.values());
     }
 
     getDiscoveredTiles(): ReadonlyArray<GroundTile> {
@@ -119,14 +119,14 @@ export class TilesComponent extends EntityComponent implements Ground {
 
     discoverTile(tilePosition: Point) {
         const tileId = getTileId(tilePosition.x, tilePosition.y);
-        if (!!this.tileMap[tileId]) {
+        if (this.tileMap.has(tileId)) {
             this.discoveredTiles[tileId] = true;
         }
     }
 
     setTile(tile: GroundTile, discovered: boolean = false) {
         const tileId = getTileId(tile.tileX, tile.tileY);
-        this.tileMap[tileId] = tile;
+        this.tileMap.set(tileId, tile);
         this.discoveredTiles[tileId] = discovered;
         const chunkPosition = getChunkPosition(tile.tileX, tile.tileX);
         const chunkId = getTileId(chunkPosition.x, chunkPosition.y);
@@ -139,7 +139,7 @@ export class TilesComponent extends EntityComponent implements Ground {
     }
 
     removeTile(x: number, y: number) {
-        delete this.tileMap[getTileId(x, y)];
+        this.tileMap.delete(getTileId(x, y));
     }
 
     setChunk(chunk: GroundChunk) {
@@ -151,31 +151,30 @@ export class TilesComponent extends EntityComponent implements Ground {
         _screenPosition: Point,
         visiblityMap: RenderVisibilityMap,
     ): void {
-        for (const tileId in this.tileMap) {
-            const tile = this.tileMap[tileId];
+        for (const [tileId, tile] of this.tileMap) {
+            const tilePosition = {
+                x: tile.tileX,
+                y: tile.tileY,
+            };
+            const screenPosition =
+                context.camera.tileSpaceToScreenSpace(tilePosition);
+
+            const withinTheViewport =
+                screenPosition.x + 40 > 0 &&
+                screenPosition.y + 40 > 0 &&
+                screenPosition.x - 40 < context.width &&
+                screenPosition.y - 40 < context.height;
+
+            if (!withinTheViewport) {
+                continue;
+            }
+
             if (!visiblityMap.useVisibility || !!this.discoveredTiles[tileId]) {
-                const tilePosition = {
-                    x: tile.tileX,
-                    y: tile.tileY,
-                };
+                const visibility = visiblityMap.isVisible(
+                    tile.tileX,
+                    tile.tileY,
+                );
 
-                const screenPosition =
-                    context.camera.tileSpaceToScreenSpace(tilePosition);
-
-                const withinTheViewport =
-                    screenPosition.x + 40 > 0 &&
-                    screenPosition.y + 40 > 0 &&
-                    screenPosition.x - 40 < context.width &&
-                    screenPosition.y - 40 < context.height;
-
-                if (!withinTheViewport) {
-                    continue;
-                }
-
-                const visibility = visiblityMap.isVisible({
-                    x: tile.tileX,
-                    y: tile.tileY,
-                });
                 let color = "green";
                 const type = tile.type;
                 if (!!type) {

@@ -441,9 +441,14 @@ export class Entity {
         renderContext: RenderScope,
         visibilityMap: RenderVisibilityMap,
         mode: DrawMode,
+        propegate: boolean = true,
     ) {
         if (this._componentsMap.size > 0) {
-            const isVisible = visibilityMap.isVisible(this.worldPosition);
+            const isVisible = visibilityMap.isVisible(
+                this.worldPosition.x,
+                this.worldPosition.y,
+            );
+
             if (!visibilityMap.useVisibility || isVisible || this._isGameRoot) {
                 //Calculating the screen position once for components
                 const screenPosition =
@@ -457,8 +462,8 @@ export class Entity {
                     screenPosition.x - 40 < renderContext.width &&
                     screenPosition.y - 40 < renderContext.height;
 
-                for (const component of this._componentsMap) {
-                    component[1].onDraw(
+                for (const component of this._componentsMap.values()) {
+                    component.onDraw(
                         renderContext,
                         screenPosition,
                         visibilityMap,
@@ -482,9 +487,10 @@ export class Entity {
                 }
             }*/
         }
-
-        for (const child of this._children) {
-            child.onDraw(renderContext, visibilityMap, mode);
+        if (propegate) {
+            for (let i = 0; i < this._children.length; i++) {
+                this._children[i].onDraw(renderContext, visibilityMap, mode);
+            }
         }
     }
 
@@ -493,12 +499,12 @@ export class Entity {
      * @param tick the current game time tick
      */
     onUpdate(tick: number) {
-        for (const component of this._componentsMap) {
-            component[1].onUpdate(tick);
+        for (const component of this._componentsMap.values()) {
+            component.onUpdate(tick);
         }
 
-        for (const child of this._children) {
-            child.onUpdate(tick);
+        for (let i = 0; i < this._children.length; i++) {
+            this._children[i].onUpdate(tick);
         }
     }
 
@@ -525,8 +531,8 @@ export class Entity {
             source: this,
         });
         // Update children
-        for (const child of this._children) {
-            child.updateTransform();
+        for (let i = 0; i < this._children.length; i++) {
+            this._children[i].updateTransform();
         }
     }
 

@@ -22,6 +22,7 @@ export function generateSwampPonds(map: BiomeMap) {
     };
     let usedBudget = 0;
     while (usedBudget < tileBudget) {
+        console.log("Attempting to place swamp pond", usedBudget, tileBudget);
         const placedBounds = placeTileset(smallPonds, map, lakeFactory);
         if (placedBounds) {
             const size = sizeOfBounds(placedBounds);

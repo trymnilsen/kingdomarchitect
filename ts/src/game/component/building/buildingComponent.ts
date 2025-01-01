@@ -11,7 +11,7 @@ import { InventoryItemQuantity } from "../../../data/inventory/inventoryItemQuan
 import { woodResourceItem } from "../../../data/inventory/items/resources.js";
 import { RenderScope } from "../../../rendering/renderScope.js";
 import { EntityComponent } from "../entityComponent.js";
-import { ChunkMapComponent } from "../root/chunk/chunkMapComponent.js";
+import { SpatialChunkMapComponent } from "../world/spatialChunkMapComponent.js";
 
 const neededBuildResources = [
     {
@@ -190,8 +190,8 @@ export class BuildingComponent extends EntityComponent {
     private getBuildingAtPoint(point: Point): BuildingComponent | null {
         const rootEntity = this.entity.getRootEntity();
         const entities = rootEntity
-            .requireComponent(ChunkMapComponent)
-            .getEntityAt(point);
+            .requireComponent(SpatialChunkMapComponent)
+            .getEntitiesAt(point.x, point.y);
 
         let buildingComponent: BuildingComponent | null = null;
         for (const entity of entities) {

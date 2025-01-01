@@ -3,9 +3,9 @@ import { generateId } from "../../../../src/common/idGenerator.js";
 import { addPoint } from "../../../../src/common/point.js";
 import { EnergyComponent } from "../../../../src/game/component/energy/energyComponent.js";
 import { MovementComponent } from "../../../../src/game/component/movement/movementComponent.js";
-import { ChunkMapComponent } from "../../../../src/game/component/root/chunk/chunkMapComponent.js";
 import { PathFindingComponent } from "../../../../src/game/component/root/path/pathFindingComponent.js";
 import { TilesComponent } from "../../../../src/game/component/tile/tilesComponent.js";
+import { SpatialChunkMapComponent } from "../../../../src/game/component/world/spatialChunkMapComponent.js";
 import { Entity } from "../../../../src/game/entity/entity.js";
 import { createEmptyGraph } from "../../../path/testGraph.js";
 import { MovementComponentWrapper } from "./movementComponentWrapper.js";
@@ -30,7 +30,7 @@ export function createTestRootNode(
     }
     entity.addComponent(tilesComponent);
     // Add the last dependencies
-    const chunkComponent = new ChunkMapComponent();
+    const chunkComponent = new SpatialChunkMapComponent();
     entity.addComponent(chunkComponent);
     entity.addComponent(new PathFindingComponent());
 

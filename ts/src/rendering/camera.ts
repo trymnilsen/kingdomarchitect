@@ -1,4 +1,10 @@
-import { addPoint, multiplyPoint, Point } from "../common/point.js";
+import { Bounds } from "../common/bounds.js";
+import {
+    addPoint,
+    multiplyPoint,
+    Point,
+    subtractPoint,
+} from "../common/point.js";
 import { TileSize } from "../game/map/tile.js";
 
 export class Camera {
@@ -17,6 +23,20 @@ export class Camera {
 
     get position(): Point {
         return this._position;
+    }
+
+    get tileSpaceViewPort(): Bounds {
+        const offsetCameraPosition = subtractPoint(
+            this._position,
+            this._halfWindowSize,
+        );
+        const tilespace = this.worldSpaceToTileSpace(offsetCameraPosition);
+        return {
+            x1: tilespace.x,
+            y1: tilespace.y,
+            x2: tilespace.x + Math.floor(this._windowSize.x / TileSize),
+            y2: tilespace.y + Math.floor(this._windowSize.y / TileSize),
+        };
     }
 
     set position(point: Point) {

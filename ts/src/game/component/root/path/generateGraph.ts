@@ -1,6 +1,5 @@
 import { absBounds } from "../../../../common/bounds.js";
 import { InvalidArgumentError } from "../../../../common/error/invalidArgumentError.js";
-import { Point } from "../../../../common/point.js";
 import {
     FixedGraph,
     WeightFunction,
@@ -8,12 +7,7 @@ import {
 import { Graph } from "../../../../path/graph/graph.js";
 import { LazyGraph } from "../../../../path/graph/lazyGraph.js";
 import { Entity } from "../../../entity/entity.js";
-import { WorkerBehaviorComponent } from "../../behavior/workerBehaviorComponent.js";
-import { BuildingComponent } from "../../building/buildingComponent.js";
-import { WeightComponent } from "../../movement/weightComponent.js";
-import { TreeComponent } from "../../resource/treeComponent.js";
 import { TilesComponent } from "../../tile/tilesComponent.js";
-import { ChunkMapComponent } from "../chunk/chunkMapComponent.js";
 import { getWeightAtPoint } from "./weight.js";
 
 /**

@@ -3,9 +3,11 @@ import {
     boundsOverlap,
     getAllPositionsBoundsFitWithinBounds,
     pointWithinBounds,
+    sizeOfBounds,
 } from "../../../common/bounds.js";
 import { Direction } from "../../../common/direction.js";
-import { Point } from "../../../common/point.js";
+import { encodePosition, Point } from "../../../common/point.js";
+import { SparseSet } from "../../../common/structure/sparseSet.js";
 import { Entity } from "../../entity/entity.js";
 import { BiomeType } from "./biome.js";
 import { BiomeMapCollection } from "./biomeMapCollection.js";
@@ -40,8 +42,13 @@ export class BiomeMap {
         down: [],
     };
 
+    private _availablePoints = new SparseSet<number>();
     private _point: Point;
     private _type: BiomeType;
+
+    public get availablePoints(): SparseSet<number> {
+        return this._availablePoints;
+    }
 
     public get items(): ReadonlyArray<BiomeMapItem> {
         return this._items;
@@ -62,6 +69,11 @@ export class BiomeMap {
     constructor(point: Point, type: BiomeType) {
         this._point = point;
         this._type = type;
+        for (let x = 0; x < 32; x++) {
+            for (let y = 0; y < 32; y++) {
+                this._availablePoints.add(encodePosition(x, y));
+            }
+        }
     }
 
     getConectionPointsForEdge(
@@ -101,32 +113,40 @@ export class BiomeMap {
     isSpotAvailable(candidate: Bounds): boolean {
         // If there is any items that overlap with the candidate, the position is
         // not available
-        return !this._items.some((biomeItem) => {
-            const itemBounds: Bounds = {
-                x1: biomeItem.point.x,
-                y1: biomeItem.point.y,
-                x2: biomeItem.point.x + biomeItem.size.x,
-                y2: biomeItem.point.y + biomeItem.size.y,
-            };
-            return boundsOverlap(itemBounds, candidate);
-        });
+        // Do a quick first pass
+        const firstPoint = encodePosition(candidate.x1, candidate.y1);
+        if (!this._availablePoints.contains(firstPoint)) {
+            return false;
+        }
+
+        const size = sizeOfBounds(candidate);
+        for (let x = 0; x < size.x; x++) {
+            const cx = candidate.x1 + x;
+            for (let y = 0; y < size.y; y++) {
+                const cy = candidate.y1 + y;
+                // If the point is not available we can return early
+                if (!this._availablePoints.contains(encodePosition(cx, cy))) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     isPointAvailable(point: Point): boolean {
-        return !this._items.some((biomeItem) => {
-            const itemBounds: Bounds = {
-                x1: biomeItem.point.x,
-                y1: biomeItem.point.y,
-                x2: biomeItem.point.x + biomeItem.size.x,
-                y2: biomeItem.point.y + biomeItem.size.y,
-            };
-
-            return pointWithinBounds(point, itemBounds);
-        });
+        return this._availablePoints.contains(encodePosition(point.x, point.y));
     }
 
     setItem(item: BiomeMapItem) {
         this._items.push(item);
+        for (let x = 0; x < item.size.x; x++) {
+            const ix = item.point.x + x;
+            for (let y = 0; y < item.size.y; y++) {
+                const iy = item.point.y + y;
+                this._availablePoints.delete(encodePosition(ix, iy));
+            }
+        }
     }
 
     worldPosition(item: BiomeMapItem): Point {

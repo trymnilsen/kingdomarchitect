@@ -26,6 +26,9 @@ export function generateMap(rootEntity: Entity) {
     const biomeMaps = createBiomeMaps(shuffledBiomes, rootEntity);
     for (const biomeMap of biomeMaps.maps) {
         createTilesForBiomes(biomeMap, rootEntity);
+    }
+
+    for (const biomeMap of biomeMaps.maps) {
         createEntitiesForBiomes(biomeMap, rootEntity, biomeMaps);
     }
 }
@@ -83,6 +86,7 @@ function createEntitiesForBiomes(
 
 function createTilesForBiomes(biomeMap: BiomeMap, rootEntity: Entity) {
     const component = rootEntity.requireComponent(TilesComponent);
+    console.log("Creating tiles for", biomeMap);
     for (let x = 0; x < 32; x++) {
         for (let y = 0; y < 32; y++) {
             component.setTile(

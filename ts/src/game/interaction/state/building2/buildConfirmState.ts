@@ -10,7 +10,6 @@ import { BuildingComponent } from "../../../component/building/buildingComponent
 import { HealthComponent } from "../../../component/health/healthComponent.js";
 import { JobQueueComponent } from "../../../component/job/jobQueueComponent.js";
 import { BuildJob } from "../../../component/job/jobs/buildJob.js";
-import { ChunkMapComponent } from "../../../component/root/chunk/chunkMapComponent.js";
 import { TilesComponent } from "../../../component/tile/tilesComponent.js";
 import { buildingFactory } from "../../../prefab/buildingFactory.js";
 import { GroundTile } from "../../../map/tile.js";
@@ -25,6 +24,7 @@ import { SingleBuildMode } from "./mode/singleBuildMode.js";
 import { buildingApplicabilityList } from "./buildingApplicabilityList.js";
 import { BuildingApplicabilityResult } from "./buildingApplicability.js";
 import { firstMap as firstMapOrNull } from "../../../../common/array.js";
+import { SpatialChunkMapComponent } from "../../../component/world/spatialChunkMapComponent.js";
 
 export class BuildConfirmState extends InteractionState {
     private scaffold: UIActionbarScaffold | null = null;
@@ -255,8 +255,8 @@ export class BuildConfirmState extends InteractionState {
     private isTileAvailable(tilePosition: Point): BuildingApplicabilityResult {
         const rootEntity = this.context.root;
         const entitiesAt = rootEntity
-            .requireComponent(ChunkMapComponent)
-            .getEntityAt(tilePosition);
+            .requireComponent(SpatialChunkMapComponent)
+            .getEntitiesAt(tilePosition.x, tilePosition.y);
 
         if (entitiesAt.length > 0) {
             return {

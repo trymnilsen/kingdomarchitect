@@ -5,7 +5,7 @@ import { fillUiSize } from "../../../../ui/uiSize.js";
 import { JobQueueComponent } from "../../../component/job/jobQueueComponent.js";
 import { ChopTreeJob } from "../../../component/job/jobs/chopTreeJob.js";
 import { TreeComponent } from "../../../component/resource/treeComponent.js";
-import { ChunkMapComponent } from "../../../component/root/chunk/chunkMapComponent.js";
+import { SpatialChunkMapComponent } from "../../../component/world/spatialChunkMapComponent.js";
 import { Entity } from "../../../entity/entity.js";
 import { GroundTile } from "../../../map/tile.js";
 import { InteractionState } from "../../handler/interactionState.js";
@@ -125,8 +125,8 @@ export class ChopJobState extends InteractionState {
         let hadTreeInSelection = false;
         for (const point of this.chopMode.getSelection()) {
             const treeEntity = this.context.root
-                .requireComponent(ChunkMapComponent)
-                .getEntityAt(point)
+                .requireComponent(SpatialChunkMapComponent)
+                .getEntitiesAt(point.x, point.y)
                 .find((entity) => entity.getComponent(TreeComponent));
 
             if (!treeEntity) {

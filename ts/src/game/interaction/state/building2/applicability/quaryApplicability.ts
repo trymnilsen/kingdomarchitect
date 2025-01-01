@@ -1,6 +1,6 @@
 import { adjacentPoints, Point } from "../../../../../common/point.js";
 import { StoneComponent } from "../../../../component/resource/stoneComponent.js";
-import { ChunkMapComponent } from "../../../../component/root/chunk/chunkMapComponent.js";
+import { SpatialChunkMapComponent } from "../../../../component/world/spatialChunkMapComponent.js";
 import { Entity } from "../../../../entity/entity.js";
 import { BuildingApplicability } from "../buildingApplicability.js";
 
@@ -11,8 +11,8 @@ export const quaryApplicability: BuildingApplicability = (
     const points = adjacentPoints(point);
     const hasAdjacent = points.some((adjacentPoint) => {
         const entities = world
-            .requireComponent(ChunkMapComponent)
-            .getEntityAt(adjacentPoint);
+            .requireComponent(SpatialChunkMapComponent)
+            .getEntitiesAt(adjacentPoint.x, adjacentPoint.y);
 
         const entityContainsStone = entities.some(
             (entity) => !!entity.getComponent(StoneComponent),

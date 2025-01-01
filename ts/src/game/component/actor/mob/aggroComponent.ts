@@ -5,7 +5,7 @@ import { WorkerBehaviorComponent } from "../../behavior/workerBehaviorComponent.
 import { EntityComponent } from "../../entityComponent.js";
 import { HealthEvent } from "../../health/healthEvent.js";
 import { JobRunnerComponent } from "../../job/jobRunnerComponent.js";
-import { ChunkMapComponent } from "../../root/chunk/chunkMapComponent.js";
+import { SpatialChunkMapComponent } from "../../world/spatialChunkMapComponent.js";
 import { AttackJob } from "./attackJob.js";
 
 export enum AggroMode {
@@ -75,10 +75,10 @@ export class AggroComponent extends EntityComponent {
         );
         const chunkMap = this.entity
             .getRootEntity()
-            .requireComponent(ChunkMapComponent);
+            .requireComponent(SpatialChunkMapComponent);
 
         for (const point of adjacentPoint) {
-            const entities = chunkMap.getEntityAt(point);
+            const entities = chunkMap.getEntitiesAt(point.x, point.y);
             const actor = entities.find((item) => {
                 return !!item.getComponent(WorkerBehaviorComponent);
             });

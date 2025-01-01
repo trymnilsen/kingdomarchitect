@@ -1,13 +1,13 @@
 import { adjacentPoints, Point } from "../../../../common/point.js";
 import { Entity } from "../../../entity/entity.js";
 import { TilesComponent } from "../../tile/tilesComponent.js";
-import { ChunkMapComponent } from "../chunk/chunkMapComponent.js";
+import { SpatialChunkMapComponent } from "../../world/spatialChunkMapComponent.js";
 import { getWeightAtPoint } from "./weight.js";
 
 export function findClosestAvailablePosition(entity: Entity): Point | null {
     const root = entity.getRootEntity();
     const groundComponent = root.requireComponent(TilesComponent);
-    const chunkMap = root.requireComponent(ChunkMapComponent);
+    const chunkMap = root.requireComponent(SpatialChunkMapComponent);
 
     const entitiesToVisit: Entity[] = [entity];
     const visitedEntities = new Set<string>();
@@ -34,7 +34,7 @@ export function findClosestAvailablePosition(entity: Entity): Point | null {
 
         const adjacent = adjacentPoints(nextVisit.worldPosition);
         const adjacentEntities = adjacent.flatMap((adjacentPoint) => {
-            return chunkMap.getEntityAt(adjacentPoint);
+            return chunkMap.getEntitiesAt(adjacentPoint.x, adjacentPoint.y);
         });
 
         for (const adjacentEntity of adjacentEntities) {

@@ -9,7 +9,6 @@ import { FocusGroup } from "../../../../ui/focus/focusGroup.js";
 import { uiAlignment } from "../../../../ui/uiAlignment.js";
 import { fillUiSize } from "../../../../ui/uiSize.js";
 import { WorkerBehaviorComponent } from "../../../component/behavior/workerBehaviorComponent.js";
-import { ChunkMapComponent } from "../../../component/root/chunk/chunkMapComponent.js";
 import { TilesComponent } from "../../../component/tile/tilesComponent.js";
 import { Entity } from "../../../entity/entity.js";
 import { SelectedEntityItem } from "../../../selection/selectedEntityItem.js";

@@ -2,7 +2,7 @@ import * as assert from "node:assert";
 import { describe, it } from "node:test";
 import { Entity } from "../../../src/game/entity/entity.js";
 import { createRootEntity } from "../../../src/game/entity/rootEntity.js";
-import { ChunkMapComponent } from "../../../src/game/component/root/chunk/chunkMapComponent.js";
+import { SpatialChunkMapComponent } from "../../../src/game/component/world/spatialChunkMapComponent.js";
 
 describe("RootEntity", () => {
     it("Can get entity at position", () => {
@@ -17,25 +17,16 @@ describe("RootEntity", () => {
         rootEntity.addChild(secondItem);
 
         const entitiesAtFirstPoint = rootEntity
-            .requireComponent(ChunkMapComponent)
-            .getEntityAt({
-                x: -2,
-                y: -1,
-            });
+            .requireComponent(SpatialChunkMapComponent)
+            .getEntitiesAt(-2, -1);
 
         const entitiesAtSecondPoint = rootEntity
-            .requireComponent(ChunkMapComponent)
-            .getEntityAt({
-                x: 4,
-                y: 5,
-            });
+            .requireComponent(SpatialChunkMapComponent)
+            .getEntitiesAt(4, 5);
 
         const entitiesAtThirdPoint = rootEntity
-            .requireComponent(ChunkMapComponent)
-            .getEntityAt({
-                x: 5,
-                y: 3,
-            });
+            .requireComponent(SpatialChunkMapComponent)
+            .getEntitiesAt(5, 3);
 
         assert.equal(entitiesAtFirstPoint.length, 1);
         assert.equal(entitiesAtSecondPoint.length, 1);
