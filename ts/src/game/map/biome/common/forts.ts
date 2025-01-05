@@ -1,7 +1,12 @@
 import { tilesets } from "../../../../../generated/tilesets.js";
 import { sprites2 } from "../../../../asset/sprite.js";
 import { randomEntry, shuffleItems } from "../../../../common/array.js";
-import { Bounds, sizeOfBounds, zeroBounds } from "../../../../common/bounds.js";
+import {
+    Bounds,
+    getAllPositionsBoundsFitWithinBounds,
+    sizeOfBounds,
+    zeroBounds,
+} from "../../../../common/bounds.js";
 import { generateId } from "../../../../common/idGenerator.js";
 import {
     Point,
@@ -24,6 +29,7 @@ import { housePrefab } from "../../../prefab/housePrefab.js";
 import { mobPrefab } from "../../../prefab/mobPrefab.js";
 import { wellPrefab } from "../../../prefab/wellPrefab.js";
 import { TilesetVariant, getLargestSize } from "../../tileset.js";
+import { placeTileset } from "../../tilesetPlacer.js";
 import { BiomeEntry, BiomeType } from "../biome.js";
 import {
     BiomeMap,
@@ -35,7 +41,7 @@ import { BiomeMapCollection } from "../biomeMapCollection.js";
 export function generateForts(biomeMap: BiomeMap) {
     const shouldPlaceForts = Math.random() > getFortWeight(biomeMap.type);
     if (shouldPlaceForts) {
-        biomeMap.placeTileset(tilesets.fort, createEntityFactory);
+        placeTileset(tilesets.fort, biomeMap, createEntityFactory);
     }
 }
 

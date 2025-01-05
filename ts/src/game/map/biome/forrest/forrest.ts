@@ -5,6 +5,7 @@ import { addPoint } from "../../../../common/point.js";
 import { Entity } from "../../../entity/entity.js";
 import { treePrefab } from "../../../prefab/treePrefab.js";
 import { TilesetVariant } from "../../tileset.js";
+import { placeTileset } from "../../tilesetPlacer.js";
 import { BiomeMap, BiomeMapItem } from "../biomeMap.js";
 import { BiomeMapCollection } from "../biomeMapCollection.js";
 
@@ -13,7 +14,7 @@ export function generateForrest(map: BiomeMap) {
     const tileBudget = Math.floor(Math.random() * maxBudget) + maxBudget;
     let usedBudget = 0;
     while (usedBudget < tileBudget) {
-        const placedBounds = map.placeTileset(tilesets.forrest, treeFactory);
+        const placedBounds = placeTileset(tilesets.forrest, map, treeFactory);
         if (placedBounds) {
             const size = sizeOfBounds(placedBounds);
             const amount = size.x * size.y;

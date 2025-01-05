@@ -6,6 +6,7 @@ import { WeightComponent } from "../../../component/movement/weightComponent.js"
 import { WaterComponent } from "../../../component/world/waterComponent.js";
 import { Entity } from "../../../entity/entity.js";
 import { Tileset, TilesetVariant } from "../../tileset.js";
+import { placeTileset } from "../../tilesetPlacer.js";
 import { BiomeMap, BiomeMapItem } from "../biomeMap.js";
 import { BiomeMapCollection } from "../biomeMapCollection.js";
 
@@ -21,8 +22,7 @@ export function generateSwampPonds(map: BiomeMap) {
     };
     let usedBudget = 0;
     while (usedBudget < tileBudget) {
-        console.log("Attempting to place swamp pond", usedBudget, tileBudget);
-        const placedBounds = map.placeTileset(smallPonds, lakeFactory);
+        const placedBounds = placeTileset(smallPonds, map, lakeFactory);
         if (placedBounds) {
             const size = sizeOfBounds(placedBounds);
             const amount = size.x * size.y;

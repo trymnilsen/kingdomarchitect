@@ -18,7 +18,6 @@ import {
     manhattanPath,
     zeroPoint,
 } from "../../../../common/point.js";
-import { QuadTree } from "../../../../common/structure/quadtree.js";
 import { FixedGraph } from "../../../../path/graph/fixedGraph.js";
 import { PathSearch } from "../../../../path/search.js";
 import { WeightComponent } from "../../../component/movement/weightComponent.js";
@@ -60,8 +59,6 @@ interface MountainMap {
 }
 
 function addCarveouts(mountainMap: MountainMap, biomeMap: BiomeMap) {
-    const quadTree = new QuadTree({ x: 0, y: 0, width: 32, height: 32 });
-    quadTree.insert({ x: 0, y: 0, width: 32, height: 32 });
     //Add items in biome to bounds
     for (const biomeItem of biomeMap.items) {
         mountainMap.bounds.push({
@@ -88,7 +85,6 @@ function addCarveouts(mountainMap: MountainMap, biomeMap: BiomeMap) {
         const width = minWidth + Math.floor(Math.random() * sizeMultiplier) + 3;
         const height =
             minHeight + Math.floor(Math.random() * sizeMultiplier) + 3;
-
         const possibleBounds = getAllPositionsBoundsFitWithinBounds(
             {
                 x: 32,
@@ -282,14 +278,12 @@ function createStoneFromMountainMap(
             );
 
             if (!withinBounds) {
-                biomeMap.placeItemWithPosition(
-                    {
-                        factory: mountainFactory,
-                        name: "mountain",
-                        size: { x: 1, y: 1 },
-                    },
-                    point,
-                );
+                biomeMap.setItem({
+                    factory: mountainFactory,
+                    name: "mountain",
+                    point: point,
+                    size: { x: 1, y: 1 },
+                });
             }
         }
     }

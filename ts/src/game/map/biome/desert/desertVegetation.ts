@@ -6,6 +6,7 @@ import { Point, addPoint } from "../../../../common/point.js";
 import { SpriteComponent } from "../../../component/draw/spriteComponent.js";
 import { WeightComponent } from "../../../component/movement/weightComponent.js";
 import { Entity } from "../../../entity/entity.js";
+import { placeRandomEntity } from "../../tilesetPlacer.js";
 import {
     BiomeMap,
     BiomeMapItem,
@@ -15,18 +16,40 @@ import { BiomeMapCollection } from "../biomeMapCollection.js";
 
 export function generateTumbleweed(map: BiomeMap) {
     const randomAmount = 16 + Math.floor(Math.random() * 32);
-    map.placeItems(
-        { name: "tumbleweed", factory: tumbleWeedFactory },
-        randomAmount,
-    );
+    placeRandomEntity(map, "tumbleweed", randomAmount, tumbleWeedFactory);
 }
 
 export function generateCactii(biomeMap: BiomeMap) {
-    const amount = 16 + Math.floor(Math.random() * 100);
-    biomeMap.placeItems(
-        { name: "cacti", factory: createEntityFactory },
-        amount,
+    const points: Point[] = [];
+    for (let x = 0; x < 32; x++) {
+        for (let y = 0; y < 32; y++) {
+            const pointCandidate: Bounds = {
+                x1: x,
+                y1: y,
+                x2: x + 1,
+                y2: y + 1,
+            };
+            if (biomeMap.isSpotAvailable(pointCandidate)) {
+                points.push({ x, y });
+            }
+        }
+    }
+    const shuffledPoints = shuffleItems(points);
+    const numberOfCacti = Math.min(
+        shuffledPoints.length - 1,
+        32 + Math.floor(Math.random() * 100),
     );
+    if (numberOfCacti > 0) {
+        for (let i = 0; i < numberOfCacti; i++) {
+            const point = shuffledPoints[i];
+            biomeMap.setItem({
+                name: "cacti",
+                point: { x: point.x, y: point.y },
+                size: { x: 1, y: 1 },
+                factory: createEntityFactory(),
+            });
+        }
+    }
 }
 
 function createEntityFactory(): BiomeMapItemEntityFactory {

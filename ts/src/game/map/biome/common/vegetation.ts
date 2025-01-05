@@ -1,6 +1,7 @@
 import { generateId } from "../../../../common/idGenerator.js";
 import { Entity } from "../../../entity/entity.js";
 import { treePrefab } from "../../../prefab/treePrefab.js";
+import { placeRandomEntity } from "../../tilesetPlacer.js";
 import {
     BiomeMap,
     BiomeMapItem,
@@ -15,7 +16,7 @@ export function generateRandomTrees(
 ) {
     const randomAmount =
         minAmount + Math.floor(Math.random() * randomMultiplier);
-    map.placeItems({ name: "tree", factory: treeFactory }, randomAmount);
+    placeRandomEntity(map, "tree", randomAmount, treeFactory);
 }
 
 export function generateRandomBushes() {}

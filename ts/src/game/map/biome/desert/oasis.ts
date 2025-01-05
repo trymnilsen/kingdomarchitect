@@ -5,7 +5,10 @@ import {
     shuffleItems,
     weightedRandomEntry,
 } from "../../../../common/array.js";
-import { sizeOfBounds } from "../../../../common/bounds.js";
+import {
+    getAllPositionsBoundsFitWithinBounds,
+    sizeOfBounds,
+} from "../../../../common/bounds.js";
 import { generateId } from "../../../../common/idGenerator.js";
 import {
     addPoint,
@@ -31,10 +34,25 @@ export function generateOasis(
 ): BiomeMap {
     const numberOfOasisesToMake = getNumberOfOasises(biomes);
     for (let i = 0; i < numberOfOasisesToMake; i++) {
-        const placedBounds = biomeMap.placeTileset(
-            tilesets.desert,
-            createEntityFactory,
+        const possibleOasisPositions = getAllPositionsBoundsFitWithinBounds(
+            { x: 32, y: 32 },
+            { x: 5, y: 5 },
+            (candidate) => biomeMap.isSpotAvailable(candidate),
         );
+
+        if (possibleOasisPositions.length > 0) {
+            const oasisPosition = randomEntry(
+                shuffleItems(possibleOasisPositions),
+            );
+
+            const tileset = randomEntry(tilesets.desert.variants);
+            biomeMap.setItem({
+                name: "oasis",
+                point: { x: oasisPosition.x1, y: oasisPosition.y1 },
+                size: sizeOfBounds(oasisPosition),
+                factory: createEntityFactory(tileset),
+            });
+        }
     }
 
     return biomeMap;

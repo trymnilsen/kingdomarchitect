@@ -1,5 +1,8 @@
 import { randomEntry } from "../../../../common/array.js";
-import { sizeOfBounds } from "../../../../common/bounds.js";
+import {
+    getAllPositionsBoundsFitWithinBounds,
+    sizeOfBounds,
+} from "../../../../common/bounds.js";
 import { generateId } from "../../../../common/idGenerator.js";
 import { Point, addPoint } from "../../../../common/point.js";
 import {
@@ -34,8 +37,27 @@ export function addPlayerToBiome(
 }
 
 function generatePlayerEntity(biomeMap: BiomeMap) {
-    const placement = biomeMap.placeItem({
-        size: { x: 5, y: 5 },
+    //Get available bounds
+    //Place
+    const playerSpace = {
+        x: 5,
+        y: 5,
+    };
+    const playerStartBounds = biomeMap.getAvailableSpots(playerSpace);
+    const pickedBounds = randomEntry(playerStartBounds);
+    console.log(
+        "adding player at: ",
+        pickedBounds,
+        biomeMap.point,
+        biomeMap.type,
+    );
+    const size = sizeOfBounds(pickedBounds);
+    biomeMap.setItem({
+        point: {
+            x: pickedBounds.x1,
+            y: pickedBounds.y1,
+        },
+        size: size,
         name: "player",
         factory: (
             item: BiomeMapItem,
@@ -47,12 +69,6 @@ function generatePlayerEntity(biomeMap: BiomeMap) {
             addPlayerEntities(rootEntity, worldPoint);
         },
     });
-
-    console.log("adding player at: ", placement, biomeMap.point, biomeMap.type);
-
-    if (!placement) {
-        throw new Error("No space for player");
-    }
 }
 
 function addPlayerEntities(rootEntity: Entity, worldPosition: Point) {
