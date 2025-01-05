@@ -1,5 +1,4 @@
-import * as assert from "node:assert";
-import { describe, it } from "node:test";
+import { describe, it, expect } from "vitest";
 import { InventoryComponent2 } from "../../../../src/game/component/inventory/inventoryComponent.js";
 import {
     stoneResource,
@@ -21,9 +20,9 @@ describe("InventoryComponent", () => {
             (item) => item.item.id == stoneResource.id && item.amount == 5,
         );
 
-        assert.equal(items.length, 2);
-        assert.equal(hasWoodResource, true);
-        assert.equal(hasStoneResource, true);
+        expect(items.length).toBe(2);
+        expect(hasWoodResource).toBe(true);
+        expect(hasStoneResource).toBe(true);
     });
 
     it("adding inventory item to existing entry", () => {
@@ -37,15 +36,15 @@ describe("InventoryComponent", () => {
             (item) => item.item.id == woodResourceItem.id && item.amount == 8,
         );
 
-        assert.equal(items.length, 2);
-        assert.equal(hasWoodResource, true);
+        expect(items.length).toBe(2);
+        expect(hasWoodResource).toBe(true);
     });
 
     it("cannot add items with negative amount", () => {
         const component = new InventoryComponent2();
-        assert.throws(() => {
+        expect(() => {
             component.addInventoryItem(woodResourceItem, -2);
-        });
+        }).toThrow();
     });
 
     it("remove full partial amount from inventory item", () => {
@@ -56,8 +55,8 @@ describe("InventoryComponent", () => {
             3,
         );
         const woodEntry = component.items[0];
-        assert.equal(removeResult, true);
-        assert.equal(woodEntry.amount, 4);
+        expect(removeResult).toBe(true);
+        expect(woodEntry.amount).toBe(4);
     });
 
     it("attempt to remove more than available amount fails", () => {
@@ -68,8 +67,8 @@ describe("InventoryComponent", () => {
             8,
         );
         const woodEntry = component.items[0];
-        assert.equal(removeResult, false);
-        assert.equal(woodEntry.amount, 7);
+        expect(removeResult).toBe(false);
+        expect(woodEntry.amount).toBe(7);
     });
 
     it("adds inventory item to group with equal tags", () => {
@@ -92,9 +91,9 @@ describe("InventoryComponent", () => {
                 item.tag == "output",
         );
 
-        assert.equal(items.length, 2);
-        assert.equal(inputItems, true);
-        assert.equal(outputItems, true);
+        expect(items.length).toBe(2);
+        expect(inputItems).toBe(true);
+        expect(outputItems).toBe(true);
     });
 
     it("adding without tag does not add to tagged group", () => {
@@ -117,9 +116,9 @@ describe("InventoryComponent", () => {
                 item.tag === undefined,
         );
 
-        assert.equal(items.length, 2);
-        assert.equal(nonTagged, true);
-        assert.equal(outputItems, true);
+        expect(items.length).toBe(2);
+        expect(nonTagged).toBe(true);
+        expect(outputItems).toBe(true);
     });
 
     it("amount of should only count with same tag if provided", () => {
@@ -127,7 +126,7 @@ describe("InventoryComponent", () => {
         component.addInventoryItem(woodResourceItem, 2, "output");
         component.addInventoryItem(woodResourceItem, 5);
 
-        assert.equal(component.amountOf(woodResourceItem.id, "output"), 2);
+        expect(component.amountOf(woodResourceItem.id, "output")).toBe(2);
     });
 
     it("amount of without tag should count across all tags", () => {
@@ -135,7 +134,7 @@ describe("InventoryComponent", () => {
         component.addInventoryItem(woodResourceItem, 2, "output");
         component.addInventoryItem(woodResourceItem, 5);
 
-        assert.equal(component.amountOf(woodResourceItem.id), 7);
+        expect(component.amountOf(woodResourceItem.id)).toBe(7);
     });
 
     it("remove with tag should only remove with equal tag", () => {
@@ -144,6 +143,6 @@ describe("InventoryComponent", () => {
         component.addInventoryItem(woodResourceItem, 5);
 
         component.removeInventoryItem(woodResourceItem.id, 2, "output");
-        assert.equal(component.amountOf(woodResourceItem.id), 5);
+        expect(component.amountOf(woodResourceItem.id)).toBe(5);
     });
 });

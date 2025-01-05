@@ -1,16 +1,12 @@
 import { tilesets } from "../../../../../generated/tilesets.js";
 import { randomEntry, shuffleItems } from "../../../../common/array.js";
-import {
-    getAllPositionsBoundsFitWithinBounds,
-    sizeOfBounds,
-} from "../../../../common/bounds.js";
+import { sizeOfBounds } from "../../../../common/bounds.js";
 import { generateId } from "../../../../common/idGenerator.js";
 import { addPoint } from "../../../../common/point.js";
 import { WeightComponent } from "../../../component/movement/weightComponent.js";
 import { WaterComponent } from "../../../component/world/waterComponent.js";
 import { Entity } from "../../../entity/entity.js";
 import { Tileset, TilesetVariant, getLargestSize } from "../../tileset.js";
-import { placeTileset } from "../../tilesetPlacer.js";
 import {
     BiomeMap,
     BiomeMapItem,
@@ -23,7 +19,7 @@ export function generateForrestLake(map: BiomeMap) {
     const tileBudget = Math.floor(Math.random() * maxBudget);
     let usedBudget = 0;
     while (usedBudget < tileBudget) {
-        const placedBounds = placeTileset(tilesets.pond, map, lakeFactory);
+        const placedBounds = map.placeTileset(tilesets.pond, lakeFactory);
         if (placedBounds) {
             const size = sizeOfBounds(placedBounds);
             const amount = size.x * size.y;

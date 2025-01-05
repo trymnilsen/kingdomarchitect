@@ -1,5 +1,4 @@
-import * as assert from "node:assert";
-import { describe, it } from "node:test";
+import { describe, it, expect } from "vitest";
 import { Entity } from "../../../src/game/entity/entity.js";
 import { createRootEntity } from "../../../src/game/entity/rootEntity.js";
 import { SpatialChunkMapComponent } from "../../../src/game/component/world/spatialChunkMapComponent.js";
@@ -28,19 +27,19 @@ describe("RootEntity", () => {
             .requireComponent(SpatialChunkMapComponent)
             .getEntitiesAt(5, 3);
 
-        assert.equal(entitiesAtFirstPoint.length, 1);
-        assert.equal(entitiesAtSecondPoint.length, 1);
-        assert.equal(entitiesAtThirdPoint.length, 0);
-        assert.strictEqual(entitiesAtFirstPoint[0], firstItem);
-        assert.strictEqual(entitiesAtSecondPoint[0], secondItem);
+        expect(entitiesAtFirstPoint.length).toBe(1);
+        expect(entitiesAtSecondPoint.length).toBe(1);
+        expect(entitiesAtThirdPoint.length).toBe(0);
+        expect(entitiesAtFirstPoint[0]).toStrictEqual(firstItem);
+        expect(entitiesAtSecondPoint[0]).toStrictEqual(secondItem);
     });
     it("Can get entity at position in adjacent chunk with bounds", () => {
-        assert.equal(2, 2);
+        expect(2).toBe(2);
     });
     it("Updates chunk map on position change of child", () => {
-        assert.equal(2, 2);
+        expect(2).toBe(2);
     });
     it("Updates chunk map when child is added or removed", () => {
-        assert.equal(2, 2);
+        expect(2).toBe(2);
     });
 });

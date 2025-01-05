@@ -1,16 +1,15 @@
-import * as assert from "node:assert";
-import { describe, it } from "node:test";
+import { describe, it, expect } from "vitest";
 
 describe("JobQueueEntity", () => {
     it("Schedule job attempts to immediately assign job", () => {
-        assert.equal(2, 2);
+        expect(2).toBe(2);
     });
 
     it("Schedule job pushes job to pending if no entity is available", () => {
-        assert.equal(2, 2);
+        expect(2).toBe(2);
     });
 
     it("Can remove job", () => {
-        assert.equal(2, 2);
+        expect(2).toBe(2);
     });
 });

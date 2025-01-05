@@ -5,10 +5,7 @@ import {
     shuffleItems,
     weightedRandomEntry,
 } from "../../../../common/array.js";
-import {
-    getAllPositionsBoundsFitWithinBounds,
-    sizeOfBounds,
-} from "../../../../common/bounds.js";
+import { sizeOfBounds } from "../../../../common/bounds.js";
 import { generateId } from "../../../../common/idGenerator.js";
 import { Point, addPoint } from "../../../../common/point.js";
 import { SpriteComponent } from "../../../component/draw/spriteComponent.js";
@@ -29,25 +26,10 @@ export function generateDesertRuins(biomeMap: BiomeMap) {
         [5, 20, 50, 100, 50, 25, 10, 5, 2, 2],
     );
     for (let i = 0; i < ruinsCount; i++) {
-        const possibleForPositions = getAllPositionsBoundsFitWithinBounds(
-            { x: 32, y: 32 },
-            { x: 5, y: 5 },
-            (candidate) => biomeMap.isSpotAvailable(candidate),
+        const placedBounds = biomeMap.placeTileset(
+            tilesets.desertRuins,
+            createEntityFactory,
         );
-
-        if (possibleForPositions.length > 0) {
-            const oasisPosition = randomEntry(
-                shuffleItems(possibleForPositions),
-            );
-
-            const tileset = randomEntry(tilesets.desertRuins.variants);
-            biomeMap.setItem({
-                name: "desertRuins",
-                point: { x: oasisPosition.x1, y: oasisPosition.y1 },
-                size: sizeOfBounds(oasisPosition),
-                factory: createEntityFactory(tileset),
-            });
-        }
     }
 }
 

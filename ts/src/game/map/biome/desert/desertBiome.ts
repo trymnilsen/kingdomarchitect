@@ -1,8 +1,4 @@
-import {
-    Bounds,
-    boundsOverlap,
-    getAllPositionsBoundsFitWithinBounds,
-} from "../../../../common/bounds.js";
+import { Bounds, boundsOverlap } from "../../../../common/bounds.js";
 import { Entity } from "../../../entity/entity.js";
 import { BiomeEntry } from "../biome.js";
 import { BiomeMap } from "../biomeMap.js";

@@ -4,7 +4,6 @@ import { SpriteComponent } from "../../../component/draw/spriteComponent.js";
 import { WeightComponent } from "../../../component/movement/weightComponent.js";
 import { Entity } from "../../../entity/entity.js";
 import { treePrefab } from "../../../prefab/treePrefab.js";
-import { placeRandomEntity } from "../../tilesetPlacer.js";
 import { BiomeEntry } from "../biome.js";
 import { BiomeMap, BiomeMapItem } from "../biomeMap.js";
 import { BiomeMapCollection } from "../biomeMapCollection.js";
@@ -40,7 +39,7 @@ function generatePineTrees(
 ) {
     const randomAmount =
         minAmount + Math.floor(Math.random() * randomMultiplier);
-    placeRandomEntity(map, "tree", randomAmount, treeFactory);
+    map.placeItems({ name: "tree", factory: treeFactory }, randomAmount);
 }
 
 export function generateRandomBushes() {}

@@ -15,7 +15,7 @@ function createGame(): Game {
 }
 
 async function bootstrap() {
-    console.log("Bootstrapping");
+    console.log("Bootstrapping!");
     try {
         await game.bootstrap();
     } catch (e) {

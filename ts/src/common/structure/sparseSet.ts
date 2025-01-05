@@ -37,9 +37,9 @@ export class SparseSet<T> implements ReadableSet<T> {
         */
     }
 
-    delete(key: T) {
+    delete(key: T): boolean {
         if (!this.contains(key)) {
-            return;
+            return false;
         }
 
         const denseIndex = this.sparse.get(key)!;
@@ -53,6 +53,7 @@ export class SparseSet<T> implements ReadableSet<T> {
 
         // Remove the key from the sparse map
         this.sparse.delete(key);
+        return true;
     }
 
     add(item: T) {

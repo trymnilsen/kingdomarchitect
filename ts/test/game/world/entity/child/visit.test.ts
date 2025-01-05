@@ -1,5 +1,4 @@
-import * as assert from "node:assert";
-import { describe, it } from "node:test";
+import { describe, it, expect } from "vitest";
 import { Entity } from "../../../../../src/game/entity/entity.js";
 import { visitChildren } from "../../../../../src/game/entity/child/visit.js";
 
@@ -28,7 +27,7 @@ describe("visitChildren", () => {
             return false;
         });
 
-        assert.deepEqual(ids, [
+        expect(ids).deep.equal([
             "root",
             "parent1",
             "parent2",
@@ -54,6 +53,6 @@ describe("visitChildren", () => {
             return true;
         });
 
-        assert.deepEqual(ids, ["root"]);
+        expect(ids).deep.equal(["root"]);
     });
 });

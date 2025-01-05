@@ -1,5 +1,4 @@
-import * as assert from "node:assert";
-import { describe, it } from "node:test";
+import { describe, it, expect } from "vitest";
 import {
     addMovementActor,
     createTestRootNode,
@@ -34,7 +33,7 @@ describe("MovementComponent", () => {
             actorMovementWrapper.movementComponent.pathTo(target, false);
             actorMovementWrapper.movementComponent.pathTo(target, false);
 
-            assert.deepEqual(actorMovementWrapper.entity.position, target);
+            expect(actorMovementWrapper.entity.position).deep.equal(target);
         });
 
         it("Path towards uses cached path if target is the same", () => {
@@ -48,8 +47,8 @@ describe("MovementComponent", () => {
                 });
             }
 
-            assert.equal(movementActor.entityMovement.length, 3);
-            assert.equal(movementActor.movementUpdates, 1);
+            expect(movementActor.entityMovement.length).toBe(3);
+            expect(movementActor.movementUpdates).toBe(1);
         });
 
         it("Path towards will regenerate path on new target", () => {
@@ -68,7 +67,7 @@ describe("MovementComponent", () => {
                 y: 7,
             });
 
-            assert.equal(movementActor.movementUpdates, 2);
+            expect(movementActor.movementUpdates).toBe(2);
         });
 
         it("Sets the current movement on target set", () => {
@@ -84,7 +83,7 @@ describe("MovementComponent", () => {
                 y: 4,
             });
 
-            assert.equal(movementSet, true);
+            expect(movementSet).toBe(true);
         });
 
         it("Path to will attempt to move partially and then return no path", () => {
@@ -111,14 +110,14 @@ describe("MovementComponent", () => {
                 }
             }
 
-            assert.equal(result, MovementResult.NoPath);
+            expect(result).toBe(MovementResult.NoPath);
         });
 
         it("Path to will return false if movement in not possible and partial path is false", () => {
             //Need to add obstacles to path search
             //potentially need to path a few times before reaching obstacle
             //assert result
-            assert.equal(2, 2);
+            expect(2).toBe(2);
         });
 
         it("Path will require energy", () => {
@@ -139,7 +138,7 @@ describe("MovementComponent", () => {
                 actor.movementComponent.pathTo(target, false);
             }
 
-            assert.equal(actor.energyComponent.energy, 70);
+            expect(actor.energyComponent.energy).toBe(70);
         });
 
         it("Path to will not generate path or use energy if target is the same as current", () => {
@@ -150,9 +149,9 @@ describe("MovementComponent", () => {
                 movementActor.entity.worldPosition,
             );
 
-            assert.equal(pathToResult, MovementResult.AtPoint);
-            assert.equal(movementActor.entityMovement.length, 0);
-            assert.equal(movementActor.movementUpdates, 0);
+            expect(pathToResult).toBe(MovementResult.AtPoint);
+            expect(movementActor.entityMovement.length).toBe(0);
+            expect(movementActor.movementUpdates).toBe(0);
         });
 
         it("Path to will not move if no energy is available", () => {
@@ -170,7 +169,7 @@ describe("MovementComponent", () => {
                 movementResults.push(result);
             }
 
-            assert.deepEqual(movementResults, [
+            expect(movementResults).deep.equal([
                 MovementResult.Ok,
                 MovementResult.Ok,
                 MovementResult.NotEnoughEnergy,
@@ -195,7 +194,7 @@ describe("MovementComponent", () => {
             actor.movementComponent.pathTo(target, true);
             actor.movementComponent.pathTo(target, true);
 
-            assert.deepEqual(actor.entityMovement, [
+            expect(actor.entityMovement).deep.equal([
                 { x: 2, y: 2 },
                 { x: 3, y: 2 },
                 { x: 4, y: 2 },
@@ -225,8 +224,8 @@ describe("MovementComponent", () => {
             actor.movementComponent.pathTo(target);
             actor.movementComponent.pathTo(target);
 
-            assert.equal(actor.movementUpdates, 1);
-            assert.deepEqual(actor.entityMovement, [
+            expect(actor.movementUpdates).toBe(1);
+            expect(actor.entityMovement).deep.equal([
                 { x: 5, y: 2 },
                 { x: 5, y: 3 },
                 { x: 6, y: 4 },
@@ -246,8 +245,8 @@ describe("MovementComponent", () => {
             actor.movementComponent.onUpdate(30);
             actor.movementComponent.pathTo({ x: 3, y: 3 });
 
-            assert.equal(actor.entityMovement.length, 2);
-            assert.deepEqual(actor.entityMovement, [
+            expect(actor.entityMovement.length).toBe(2);
+            expect(actor.entityMovement).deep.equal([
                 { x: 1, y: 0 },
                 { x: 1, y: 1 },
             ]);
@@ -272,18 +271,17 @@ describe("MovementComponent", () => {
             movementActor.movementComponent.pathTo({ x: 4, y: 6 });
             movementActor.movementComponent.pathTo({ x: 4, y: 6 });
 
-            assert.equal(obstructedResult, MovementResult.Obstructed);
-            assert.equal(movementActor.movementUpdates, 2);
+            expect(obstructedResult).toBe(MovementResult.Obstructed);
+            expect(movementActor.movementUpdates).toBe(2);
             const hasPointInRemovedTileLine = movementActor.entityMovement.some(
                 (point) => {
                     return point.x >= 2 && point.x <= 6 && point.y == 4;
                 },
             );
-            assert.equal(
+            expect(
                 hasPointInRemovedTileLine,
-                false,
                 "Movement inside removed tile line",
-            );
+            ).toBe(false);
         });
 
         it("Regenerate path if the current position has moved to a not adjacent position", () => {
@@ -309,91 +307,91 @@ describe("MovementComponent", () => {
             actor.movementComponent.pathTo(target);
             actor.movementComponent.pathTo(target);
 
-            assert.equal(actor.movementUpdates, 2);
+            expect(actor.movementUpdates).toBe(2);
         });
 
         it("Will persist the current movement for the movement component", () => {
-            assert.equal(2, 2);
+            expect(2).toBe(2);
         });
     });
 
     describe("Shuffling", () => {
         it("Movement will check for actor in the way and requesting shuffling", () => {
-            assert.equal(2, 2);
+            expect(2).toBe(2);
         });
 
         it("Shuffling will return a float number if possible", () => {
-            assert.equal(2, 2);
+            expect(2).toBe(2);
         });
 
         it("Shuffling will return 0 if not possible", () => {
-            assert.equal(2, 2);
+            expect(2).toBe(2);
         });
 
         it("Shuffling will move to adjacent tile if available", () => {
-            assert.equal(2, 2);
+            expect(2).toBe(2);
         });
 
         it("Shuffling will move perpendicular to incoming movement", () => {
-            assert.equal(2, 2);
+            expect(2).toBe(2);
         });
 
         it("Shuffling will propagate shuffling if actor is in the way", () => {
-            assert.equal(2, 2);
+            expect(2).toBe(2);
         });
 
         it("A shuffled actor will return to their path if possible", () => {
-            assert.equal(2, 2);
+            expect(2).toBe(2);
         });
 
         it("Shuffling will consume energy", () => {
-            assert.equal(2, 2);
+            expect(2).toBe(2);
         });
 
         it("Shuffling will return 0 if no energy is available", () => {
-            assert.equal(2, 2);
+            expect(2).toBe(2);
         });
 
         it("A shuffled actor will not take a movement on their turn", () => {
-            assert.equal(2, 2);
+            expect(2).toBe(2);
         });
 
         it("A shuffled actor will regenerate path if not possible to return to their intended path", () => {
-            assert.equal(2, 2);
+            expect(2).toBe(2);
         });
     });
 
     describe("Scenarios", () => {
         it("given an open area, two actors should make their way without regenration and shuffling", () => {
-            assert.equal(2, 2);
+            expect(2).toBe(2);
         });
 
         it("given a corridor with a width of 2, two actors should request shuffling once", () => {
-            assert.equal(2, 2);
+            expect(2).toBe(2);
         });
 
         it("given a corridor with an intial width of 1 and then 2, two actors will request shuffling twice", () => {
-            assert.equal(2, 2);
+            expect(2).toBe(2);
         });
 
         it("given a corridor with an intial width of 1, two actors wont be stuck shuffling eachother", () => {
-            assert.equal(2, 2);
+            expect(2).toBe(2);
         });
 
         it("given a corridor with a width of 2, two actors should pass each other without shuffling", () => {
-            assert.equal(2, 2);
+            expect(2).toBe(2);
         });
 
         it("given a corridor with a width of 2, four actors will reach the endpoint", () => {
-            assert.equal(2, 2);
+            expect(2).toBe(2);
         });
 
         it("given a corridor with a width of 8, four actors will reach the endpoint", () => {
-            assert.equal(2, 2);
+            expect(2).toBe(2);
         });
 
         it("given a map with a bottleneck with a width 1 and a height of 4, 16 actors will reach the endpoint", () => {
-            assert.equal(2, 2);
+            expect(2).toBe(2);
         });
     });
 });

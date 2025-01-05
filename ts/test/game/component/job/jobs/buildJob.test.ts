@@ -1,5 +1,4 @@
-import * as assert from "node:assert";
-import { describe, it } from "node:test";
+import { describe, it, expect } from "vitest";
 import { BuildJob } from "../../../../../src/game/component/job/jobs/buildJob.js";
 import { InventoryComponent2 } from "../../../../../src/game/component/inventory/inventoryComponent.js";
 import { JobTestHelper } from "../jobTestHelper.js";
@@ -31,15 +30,11 @@ describe("BuildJob", () => {
             .requireComponent(JobQueueComponent)
             .addJob(buildJob);
 
-        assert.equal(
-            buildJob.jobState,
+        expect(buildJob.jobState, "Job was not in correct state").toBe(
             JobState.Running,
-            "Job was not in correct state",
         );
-        assert.equal(
-            buildJob.entity,
+        expect(buildJob.entity, "Job was not assigned to correct runner").toBe(
             scaffold.secondWorker.entity,
-            "Job was not assigned to correct runner",
         );
     });
 
@@ -70,23 +65,23 @@ describe("BuildJob", () => {
             scaffold.stockpile.entity.worldPosition,
         );
 
-        assert.equal(wasAdjacent, true);
-        assert.equal(amountAfter, 0);
+        expect(wasAdjacent).toBe(true);
+        expect(amountAfter).toBe(0);
     });
 
     it("Will return job to queue if there is no available resources", () => {
-        assert.equal(2, 2);
+        expect(2).toBe(2);
     });
 
     it("Will move to building site if not adjacent to", () => {
-        assert.equal(2, 2);
+        expect(2).toBe(2);
     });
 
     it("Will increment build amount if adjacent and building has resource", () => {
-        assert.equal(2, 2);
+        expect(2).toBe(2);
     });
 
     it("Will transfer own resources if needed resources is not full", () => {
-        assert.equal(2, 2);
+        expect(2).toBe(2);
     });
 });

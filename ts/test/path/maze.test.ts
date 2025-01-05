@@ -1,7 +1,7 @@
 import { FixedGraph } from "../../src/path/graph/fixedGraph.js";
 import { PathSearch } from "../../src/path/search.js";
 import { createGraphFromTestFile, verifyPath } from "./testGraph.js";
-import { describe, it } from "node:test";
+import { describe, it, expect } from "vitest";
 
 describe("Maze", () => {
     it("Maze 1", async () => {

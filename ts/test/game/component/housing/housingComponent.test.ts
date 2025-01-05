@@ -1,5 +1,4 @@
-import * as assert from "node:assert";
-import { describe, it } from "node:test";
+import { describe, it, expect } from "vitest";
 import { HousingComponent } from "../../../../src/game/component/housing/housingComponent.js";
 import { housePrefab } from "../../../../src/game/prefab/housePrefab.js";
 import { workerPrefab } from "../../../../src/game/prefab/workerPrefab.js";
@@ -23,15 +22,15 @@ describe("HousingComponent", () => {
             assert.fail("Worker entity had no tenant component");
         }
 
-        assert.equal(tenantComponent.houseEntityId, house.id);
-        assert.equal(housingComponent.residentEntityId, worker.id);
+        expect(tenantComponent.houseEntityId).toBe(house.id);
+        expect(housingComponent.residentEntityId).toBe(worker.id);
     });*/
 
     it("Will not spawn worker if tenant is set", () => {
-        assert.equal(2, 2);
+        expect(2).toBe(2);
     });
 
     it("Will spawn worker if tenant is not set", () => {
-        assert.equal(2, 2);
+        expect(2).toBe(2);
     });
 });

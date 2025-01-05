@@ -1,3 +1,4 @@
+import { factory } from "typescript";
 import { Sprite2, sprites2 } from "../../../../asset/sprite.js";
 import { generateId } from "../../../../common/idGenerator.js";
 import { SpriteComponent } from "../../../component/draw/spriteComponent.js";
@@ -6,7 +7,6 @@ import { StoneComponent } from "../../../component/resource/stoneComponent.js";
 import { StaticSelectionInfoProvider } from "../../../component/selection/provider/staticSelectionInfoProvider.js";
 import { SelectionInfoComponent } from "../../../component/selection/selectionInfoComponent.js";
 import { Entity } from "../../../entity/entity.js";
-import { placeRandomEntity } from "../../tilesetPlacer.js";
 import {
     BiomeMap,
     BiomeMapItem,
@@ -21,7 +21,7 @@ export function generateRandomStones(
 ) {
     const randomAmount =
         minAmount + Math.floor(Math.random() * randomMultiplier);
-    placeRandomEntity(map, "stone", randomAmount, stoneFactory);
+    map.placeItems({ name: "stone", factory: stoneFactory }, randomAmount);
 }
 
 export function generateRandomBushes() {}
