@@ -33,7 +33,7 @@ export class TilesComponent extends EntityComponent implements Ground {
     private tileMap: Map<string, GroundTile> = new Map();
     private discoveredTiles: { [id: string]: boolean } = {};
     private _chunkMap: GroundChunkMap = {};
-
+    
     get chunkMap(): Readonly<Record<string, Readonly<GroundChunk>>> {
         return this._chunkMap;
     }

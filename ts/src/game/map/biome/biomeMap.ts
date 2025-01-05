@@ -56,6 +56,10 @@ export class BiomeMap {
         return this._items;
     }
 
+    public get itemTree(): QuadTree {
+        return this._itemsTree;
+    }
+
     public get point(): Readonly<Point> {
         return this._point;
     }

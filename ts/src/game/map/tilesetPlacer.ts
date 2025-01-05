@@ -5,6 +5,9 @@ import {
     sizeOfBounds,
 } from "../../common/bounds.js";
 import { decodePosition, Point, subtractPoint } from "../../common/point.js";
+import { QuadTree } from "../../common/structure/quadtree.js";
+import { intersectRect } from "../../common/structure/rectangle.js";
+import { SparseSet } from "../../common/structure/sparseSet.js";
 import { BiomeMap, BiomeMapItemEntityFactory } from "./biome/biomeMap.js";
 import { Tileset, TilesetVariant, getLargestSize } from "./tileset.js";
 
@@ -14,6 +17,8 @@ export function placeTileset(
     factory: (tileset: TilesetVariant) => BiomeMapItemEntityFactory,
 ): Bounds | null {
     let availableVariants = tileset.variants;
+    const skipedPoints = new Set<number>();
+
     while (availableVariants.length > 0) {
         const variant = randomEntry(availableVariants);
         const size = {
@@ -21,35 +26,44 @@ export function placeTileset(
             y: variant.height,
         };
 
-        const positions = map.availablePoints.dense.filter((position) => {
-            const { x, y } = decodePosition(position);
-            if (x + size.x > 32 || y + size.y > 32) {
-                return false;
+        let point: Point | null = null;
+
+        for (let i = 0; i < map.availablePoints.dense.length; i++) {
+            const availablePoint = map.availablePoints.dense[i];
+            if (skipedPoints.has(availablePoint)) {
+                continue;
             }
 
-            return map.isSpotAvailable({
-                x1: x,
-                y1: y,
-                x2: x + size.x,
-                y2: y + size.y,
+            const decodedPoint = decodePosition(availablePoint);
+            if (decodedPoint.x + size.x > 31 || decodedPoint.y + size.y > 31) {
+                continue;
+            }
+            const query = map.itemTree.query({
+                x: decodedPoint.x,
+                y: decodedPoint.y,
+                width: size.x,
+                height: size.y,
             });
-        });
 
-        if (positions.length > 0) {
-            const tilesetPosition = randomEntry(positions);
-            const { x, y } = decodePosition(tilesetPosition);
+            if (query.length == 0) {
+                point = decodedPoint;
+                break;
+            }
+        }
+
+        if (point) {
             map.setItem({
                 name: tileset.name,
-                point: { x: x, y: y },
+                point: { x: point.x, y: point.y },
                 size: size,
                 factory: factory(variant),
             });
 
             return {
-                x1: x,
-                y1: y,
-                x2: x + size.x,
-                y2: y + size.y,
+                x1: point.x,
+                y1: point.y,
+                x2: point.x + size.x,
+                y2: point.y + size.y,
             };
         } else {
             //Filter out this variant, we can also filter out items that are
