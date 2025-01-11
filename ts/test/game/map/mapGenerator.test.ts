@@ -1,8 +1,7 @@
-import * as assert from "node:assert";
-import { describe, it } from "node:test";
+import { describe, it, expect } from "vitest";
 
 describe("MapGenerator", () => {
     it("All biomes adds a player", () => {
-        assert.equal(2, 2);
+        expect(2).toBe(2);
     });
 });

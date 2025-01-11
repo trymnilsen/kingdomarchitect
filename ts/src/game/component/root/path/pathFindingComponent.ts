@@ -4,13 +4,11 @@ import { GraphNode } from "../../../../path/graph/graph.js";
 import { PathSearch } from "../../../../path/search.js";
 import { EntityComponent } from "../../entityComponent.js";
 import { TileMapUpdateEvent } from "../../tile/tileMapUpdatedEvent.js";
-import { ChunkMapUpdateEvent } from "../chunk/chunkMapUpdateEvent.js";
 import { createLazyGraphFromRootNode } from "./generateGraph.js";
 import { PathResult, PathResultStatus } from "./pathResult.js";
 
 export class PathFindingComponent extends EntityComponent {
     private tileEventListener: TypedEventHandle | undefined;
-    private chunkMapEventListener: TypedEventHandle | undefined;
     protected pathSearch: PathSearch | null = null;
 
     constructor() {
@@ -27,17 +25,12 @@ export class PathFindingComponent extends EntityComponent {
                 this.invalidateGraphPoint({ x: 0, y: 0 });
             },
         );
-        this.chunkMapEventListener = this.entity.componentEvents.listen(
-            ChunkMapUpdateEvent,
-            (event) => {
-                this.invalidateGraphPoint(event.pointUpdated);
-            },
-        );
+
+        //TODO: invalidate graph on movement
     }
 
     override onStop(): void {
         this.tileEventListener?.dispose();
-        this.chunkMapEventListener?.dispose();
     }
 
     findPath(from: Point, to: Point, blockBuildings?: boolean): PathResult {

@@ -18,16 +18,17 @@ export class Renderer {
         return this.renderContext;
     }
 
-    constructor(canvasElement: HTMLCanvasElement, assetLoader: AssetLoader) {
+    constructor(
+        canvasElement: HTMLCanvasElement,
+        assetLoader: AssetLoader,
+        camera: Camera,
+    ) {
         const context = canvasElement.getContext("2d");
         if (!context) {
             throw Error("Unable to get 2d context from canvas");
         }
         const spriteCache = new SpriteCache();
-        this.currentCamera = new Camera({
-            x: window.innerWidth,
-            y: window.innerHeight,
-        });
+        this.currentCamera = camera;
         this.canvasContext = context;
         this.canvasContext.canvas.width = window.innerWidth;
         this.canvasContext.canvas.height = window.innerHeight;

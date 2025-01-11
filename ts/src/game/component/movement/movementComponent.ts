@@ -10,7 +10,6 @@ import { SpriteAction } from "../draw/spriteProvider/statemachine/spriteAction.j
 import { SpriteStateMachine } from "../draw/spriteProvider/statemachine/spriteStateMachine.js";
 import { EnergyComponent } from "../energy/energyComponent.js";
 import { EntityComponent } from "../entityComponent.js";
-import { ChunkMapComponent } from "../root/chunk/chunkMapComponent.js";
 import { PathFindingComponent } from "../root/path/pathFindingComponent.js";
 import { getWeightAtPoint } from "../root/path/weight.js";
 import { TilesComponent } from "../tile/tilesComponent.js";

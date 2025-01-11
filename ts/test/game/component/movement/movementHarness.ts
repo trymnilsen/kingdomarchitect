@@ -3,9 +3,9 @@ import { generateId } from "../../../../src/common/idGenerator.js";
 import { addPoint } from "../../../../src/common/point.js";
 import { EnergyComponent } from "../../../../src/game/component/energy/energyComponent.js";
 import { MovementComponent } from "../../../../src/game/component/movement/movementComponent.js";
-import { ChunkMapComponent } from "../../../../src/game/component/root/chunk/chunkMapComponent.js";
 import { PathFindingComponent } from "../../../../src/game/component/root/path/pathFindingComponent.js";
 import { TilesComponent } from "../../../../src/game/component/tile/tilesComponent.js";
+import { SpatialChunkMapComponent } from "../../../../src/game/component/world/spatialChunkMapComponent.js";
 import { Entity } from "../../../../src/game/entity/entity.js";
 import { createEmptyGraph } from "../../../path/testGraph.js";
 import { MovementComponentWrapper } from "./movementComponentWrapper.js";
@@ -14,23 +14,22 @@ import { MovementComponentWrapper } from "./movementComponentWrapper.js";
  * Create a root-node for a test with all components needed
  * @returns the root node for the world we can use in the test
  */
-export function createTestRootNode(
-    width: number = 8,
-    height: number = 8,
-): Entity {
+export function createTestRootNode(): Entity {
     // Create entity
     const entity = new Entity("rootNode");
     entity.toggleIsGameRoot(true);
     // Set the grid of tiles
     const tilesComponent = new TilesComponent();
-    for (let x = 0; x < width; x++) {
-        for (let y = 0; y < height; y++) {
-            tilesComponent.setTile({ tileX: x, tileY: y }, true);
-        }
-    }
+    tilesComponent.setChunk({
+        chunkX: 0,
+        chunkY: 0,
+        discovered: new Set(),
+        type: "forrest",
+    });
+
     entity.addComponent(tilesComponent);
     // Add the last dependencies
-    const chunkComponent = new ChunkMapComponent();
+    const chunkComponent = new SpatialChunkMapComponent();
     entity.addComponent(chunkComponent);
     entity.addComponent(new PathFindingComponent());
 
@@ -58,6 +57,7 @@ export function addMovementActor(rootNode: Entity): MovementComponentWrapper {
     return wrapper;
 }
 
+/*
 export function removeTile(rootNode: Entity, x: number, y: number) {
     const tiles = rootNode.requireComponent(TilesComponent);
     tiles.removeTile(x, y);
@@ -65,7 +65,9 @@ export function removeTile(rootNode: Entity, x: number, y: number) {
         .requireComponent(PathFindingComponent)
         .invalidateGraphPoint({ x, y });
 }
+*/
 
+/*
 export function removeTileLine(
     rootNode: Entity,
     x: number,
@@ -95,3 +97,4 @@ export function removeTileLine(
         removeTile(rootNode, point.x, point.y);
     }
 }
+*/

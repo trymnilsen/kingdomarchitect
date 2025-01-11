@@ -29,7 +29,7 @@ export class TwoRunnersAndStockpileTestScaffold extends WorldTestScaffold {
     }
 
     constructor() {
-        super({ x: 8, y: 8 });
+        super();
         const stockpileBuilding = getBuildingById("stockpile");
         if (!stockpileBuilding) {
             throw Error("No building with stockpile id");

@@ -9,7 +9,6 @@ import { FocusGroup } from "../../../../ui/focus/focusGroup.js";
 import { uiAlignment } from "../../../../ui/uiAlignment.js";
 import { fillUiSize } from "../../../../ui/uiSize.js";
 import { WorkerBehaviorComponent } from "../../../component/behavior/workerBehaviorComponent.js";
-import { ChunkMapComponent } from "../../../component/root/chunk/chunkMapComponent.js";
 import { TilesComponent } from "../../../component/tile/tilesComponent.js";
 import { Entity } from "../../../entity/entity.js";
 import { SelectedEntityItem } from "../../../selection/selectedEntityItem.js";
@@ -150,6 +149,8 @@ class WorldFocusGroup implements FocusGroup {
         const worldPosition = this.camera.screenToWorld(centerPosition);
         const tilesComponent = this.rootNode.requireComponent(TilesComponent);
 
+        throw new Error("Reimplement");
+        /*
         const tiles = tilesComponent.getTiles(() => true);
         let closestTile = tiles[0];
         let closestDistance = Number.MAX_SAFE_INTEGER;
@@ -168,6 +169,7 @@ class WorldFocusGroup implements FocusGroup {
         }
 
         this.currentFocus = closestTile;
+        */
 
         return true;
     }

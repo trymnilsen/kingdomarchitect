@@ -2,8 +2,13 @@ import { bins } from "../../../generated/sprites.js";
 
 export class AssetLoader {
     private _assets: Record<string, HTMLImageElement> = {};
+    private _loaderPromise?: Promise<unknown>;
 
-    async load(): Promise<void> {
+    public get loaderPromise(): Promise<unknown> | undefined {
+        return this._loaderPromise;
+    }
+
+    load() {
         const loadPromises: Promise<unknown>[] = [];
 
         loadPromises.push(this.loadFonts());
@@ -12,7 +17,7 @@ export class AssetLoader {
             loadPromises.push(this.loadAsset(bin.name, bin.filename));
         }
 
-        await Promise.all(loadPromises);
+        this._loaderPromise = Promise.all(loadPromises);
     }
 
     getBinAsset(binName: string): HTMLImageElement {

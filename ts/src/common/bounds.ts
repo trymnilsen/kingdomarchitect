@@ -246,11 +246,12 @@ export function getAllPositionsBoundsFitWithinBounds(
     // outside of the container
     const searchSize = subtractPoint(container, size);
     for (let x = 0; x < searchSize.x; x++) {
+        const candidateX2 = x + size.x;
         for (let y = 0; y < searchSize.y; y++) {
             const candidate: Bounds = {
                 x1: x,
                 y1: y,
-                x2: x + size.x,
+                x2: candidateX2,
                 y2: y + size.y,
             };
             let applicable = true;

@@ -3,9 +3,12 @@ import {
     boundsOverlap,
     getAllPositionsBoundsFitWithinBounds,
     pointWithinBounds,
+    sizeOfBounds,
 } from "../../../common/bounds.js";
 import { Direction } from "../../../common/direction.js";
-import { Point } from "../../../common/point.js";
+import { encodePosition, Point } from "../../../common/point.js";
+import { QuadTree } from "../../../common/structure/quadtree.js";
+import { SparseSet } from "../../../common/structure/sparseSet.js";
 import { Entity } from "../../entity/entity.js";
 import { BiomeType } from "./biome.js";
 import { BiomeMapCollection } from "./biomeMapCollection.js";
@@ -40,11 +43,21 @@ export class BiomeMap {
         down: [],
     };
 
+    private _availablePoints = new SparseSet<number>();
+    private _itemsTree = new QuadTree({ x: 0, y: 0, width: 32, height: 32 });
     private _point: Point;
     private _type: BiomeType;
 
+    public get availablePoints(): SparseSet<number> {
+        return this._availablePoints;
+    }
+
     public get items(): ReadonlyArray<BiomeMapItem> {
         return this._items;
+    }
+
+    public get itemTree(): QuadTree {
+        return this._itemsTree;
     }
 
     public get point(): Readonly<Point> {
@@ -62,6 +75,11 @@ export class BiomeMap {
     constructor(point: Point, type: BiomeType) {
         this._point = point;
         this._type = type;
+        for (let x = 0; x < 32; x++) {
+            for (let y = 0; y < 32; y++) {
+                this._availablePoints.add(encodePosition(x, y));
+            }
+        }
     }
 
     getConectionPointsForEdge(
@@ -99,34 +117,35 @@ export class BiomeMap {
     }
 
     isSpotAvailable(candidate: Bounds): boolean {
-        // If there is any items that overlap with the candidate, the position is
-        // not available
-        return !this._items.some((biomeItem) => {
-            const itemBounds: Bounds = {
-                x1: biomeItem.point.x,
-                y1: biomeItem.point.y,
-                x2: biomeItem.point.x + biomeItem.size.x,
-                y2: biomeItem.point.y + biomeItem.size.y,
-            };
-            return boundsOverlap(itemBounds, candidate);
+        const size = sizeOfBounds(candidate);
+        const items = this._itemsTree.query({
+            x: candidate.x1,
+            y: candidate.y1,
+            width: size.x,
+            height: size.y,
         });
+        return items.length == 0;
     }
 
     isPointAvailable(point: Point): boolean {
-        return !this._items.some((biomeItem) => {
-            const itemBounds: Bounds = {
-                x1: biomeItem.point.x,
-                y1: biomeItem.point.y,
-                x2: biomeItem.point.x + biomeItem.size.x,
-                y2: biomeItem.point.y + biomeItem.size.y,
-            };
-
-            return pointWithinBounds(point, itemBounds);
-        });
+        return this._availablePoints.contains(encodePosition(point.x, point.y));
     }
 
     setItem(item: BiomeMapItem) {
         this._items.push(item);
+        this._itemsTree.insert({
+            x: item.point.x,
+            y: item.point.y,
+            width: item.size.x,
+            height: item.size.y,
+        });
+        for (let x = 0; x < item.size.x; x++) {
+            const ix = item.point.x + x;
+            for (let y = 0; y < item.size.y; y++) {
+                const iy = item.point.y + y;
+                this._availablePoints.delete(encodePosition(ix, iy));
+            }
+        }
     }
 
     worldPosition(item: BiomeMapItem): Point {

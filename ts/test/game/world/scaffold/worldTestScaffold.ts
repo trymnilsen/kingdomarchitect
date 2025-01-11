@@ -9,21 +9,15 @@ export abstract class WorldTestScaffold {
         return this._rootEntity;
     }
 
-    constructor(size: Point) {
+    constructor() {
         this._rootEntity = createRootEntity();
         const component = this._rootEntity.requireComponent(TilesComponent);
-        for (let x = 0; x < size.x; x++) {
-            for (let y = 0; y < size.y; y++) {
-                component.setTile(
-                    {
-                        tileX: x,
-                        tileY: y,
-                        type: "forrest",
-                    },
-                    true,
-                );
-            }
-        }
+        component.setChunk({
+            chunkX: 0,
+            chunkY: 0,
+            discovered: new Set(),
+            type: "forrest",
+        });
     }
 
     runUpdates(_ticks: number) {

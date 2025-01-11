@@ -1,7 +1,7 @@
 import { Point } from "../common/point.js";
 
 export class RenderVisibilityMap {
-    private _useVisibility = true;
+    private _useVisibility = false;
 
     public get useVisibility(): boolean {
         return this._useVisibility;
@@ -11,14 +11,14 @@ export class RenderVisibilityMap {
         this._useVisibility = v;
     }
 
-    private visibilityMap = new Map<string, boolean>();
-    isVisible(point: Point) {
-        const pointId = this.pointId(point);
+    private visibilityMap = new Map<number, boolean>();
+    isVisible(x: number, y: number) {
+        const pointId = this.makeNumberId(x, y);
         return this.visibilityMap.has(pointId);
     }
 
-    setIsVisible(point: Point, isVisible: boolean) {
-        const pointId = this.pointId(point);
+    setIsVisible(x: number, y: number, isVisible: boolean) {
+        const pointId = this.makeNumberId(x, y);
         if (isVisible) {
             this.visibilityMap.set(pointId, true);
         } else {
@@ -30,7 +30,7 @@ export class RenderVisibilityMap {
         this.visibilityMap.clear();
     }
 
-    private pointId(point: Point): string {
-        return `${point.x}_${point.y}`;
+    private makeNumberId(x: number, y: number): number {
+        return ((x & 0xffff) << 16) | (y & 0xffff);
     }
 }

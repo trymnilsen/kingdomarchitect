@@ -400,3 +400,13 @@ export function isPoint(value: unknown): value is Point {
 
     return "x" in value && "y" in value;
 }
+
+export function encodePosition(x: number, y: number): number {
+    return ((x & 0xffff) << 16) | (y & 0xffff);
+}
+
+export function decodePosition(encoded: number): Point {
+    const x = (encoded >> 16) & 0xffff; // Extract the upper 16 bits and mask them to 16 bits
+    const y = encoded & 0xffff; // Extract the lower 16 bits
+    return { x, y };
+}

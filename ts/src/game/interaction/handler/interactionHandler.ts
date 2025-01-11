@@ -10,8 +10,8 @@ import { RenderScope } from "../../../rendering/renderScope.js";
 import { subTitleTextStyle } from "../../../rendering/text/textStyle.js";
 import { bookInkColor } from "../../../ui/color.js";
 import { UIView } from "../../../ui/uiView.js";
-import { ChunkMapComponent } from "../../component/root/chunk/chunkMapComponent.js";
 import { TilesComponent } from "../../component/tile/tilesComponent.js";
+import { SpatialChunkMapComponent } from "../../component/world/spatialChunkMapComponent.js";
 import { Entity } from "../../entity/entity.js";
 import { SelectedEntityItem } from "../../selection/selectedEntityItem.js";
 import { SelectedTileItem } from "../../selection/selectedTileItem.js";
@@ -165,11 +165,8 @@ export class InteractionHandler {
                     );*/
 
                     const entitiesAt = this.stateContext.root
-                        .requireComponent(ChunkMapComponent)
-                        .getEntityAt({
-                            x: tile.tileX,
-                            y: tile.tileY,
-                        });
+                        .requireComponent(SpatialChunkMapComponent)
+                        .getEntitiesAt(tile.tileX, tile.tileY);
 
                     let selection: SelectedWorldItem;
                     if (entitiesAt.length > 0) {

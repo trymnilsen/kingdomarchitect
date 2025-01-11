@@ -5,7 +5,7 @@ import { BuildingComponent } from "../../building/buildingComponent.js";
 import { WeightComponent } from "../../movement/weightComponent.js";
 import { TreeComponent } from "../../resource/treeComponent.js";
 import { TilesComponent } from "../../tile/tilesComponent.js";
-import { ChunkMapComponent } from "../chunk/chunkMapComponent.js";
+import { SpatialChunkMapComponent } from "../../world/spatialChunkMapComponent.js";
 
 export function getWeightAtPoint(
     point: Point,
@@ -24,11 +24,8 @@ export function getWeightAtPoint(
     }
 
     const entities = rootEntity
-        .requireComponent(ChunkMapComponent)
-        .getEntityAt({
-            x: point.x,
-            y: point.y,
-        });
+        .requireComponent(SpatialChunkMapComponent)
+        .getEntitiesAt(point.x, point.y);
 
     if (entities.length > 0) {
         let entityWeight = 0;

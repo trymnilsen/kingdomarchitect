@@ -4,7 +4,10 @@ import {
     getAllPositionsBoundsFitWithinBounds,
     sizeOfBounds,
 } from "../../common/bounds.js";
-import { Point, subtractPoint } from "../../common/point.js";
+import { decodePosition, Point, subtractPoint } from "../../common/point.js";
+import { QuadTree } from "../../common/structure/quadtree.js";
+import { intersectRect } from "../../common/structure/rectangle.js";
+import { SparseSet } from "../../common/structure/sparseSet.js";
 import { BiomeMap, BiomeMapItemEntityFactory } from "./biome/biomeMap.js";
 import { Tileset, TilesetVariant, getLargestSize } from "./tileset.js";
 
@@ -14,6 +17,8 @@ export function placeTileset(
     factory: (tileset: TilesetVariant) => BiomeMapItemEntityFactory,
 ): Bounds | null {
     let availableVariants = tileset.variants;
+    const skipedPoints = new Set<number>();
+
     while (availableVariants.length > 0) {
         const variant = randomEntry(availableVariants);
         const size = {
@@ -21,23 +26,45 @@ export function placeTileset(
             y: variant.height,
         };
 
-        const positions = getAllPositionsBoundsFitWithinBounds(
-            { x: 32, y: 32 },
-            size,
-            (candidate) => map.isSpotAvailable(candidate),
-        );
+        let point: Point | null = null;
 
-        if (positions.length > 0) {
-            const tilesetPosition = randomEntry(shuffleItems(positions));
+        for (let i = 0; i < map.availablePoints.dense.length; i++) {
+            const availablePoint = map.availablePoints.dense[i];
+            if (skipedPoints.has(availablePoint)) {
+                continue;
+            }
 
+            const decodedPoint = decodePosition(availablePoint);
+            if (decodedPoint.x + size.x > 31 || decodedPoint.y + size.y > 31) {
+                continue;
+            }
+            const query = map.itemTree.query({
+                x: decodedPoint.x,
+                y: decodedPoint.y,
+                width: size.x,
+                height: size.y,
+            });
+
+            if (query.length == 0) {
+                point = decodedPoint;
+                break;
+            }
+        }
+
+        if (point) {
             map.setItem({
                 name: tileset.name,
-                point: { x: tilesetPosition.x1, y: tilesetPosition.y1 },
-                size: sizeOfBounds(tilesetPosition),
+                point: { x: point.x, y: point.y },
+                size: size,
                 factory: factory(variant),
             });
 
-            return tilesetPosition;
+            return {
+                x1: point.x,
+                y1: point.y,
+                x2: point.x + size.x,
+                y2: point.y + size.y,
+            };
         } else {
             //Filter out this variant, we can also filter out items that are
             //larger in both width and height
@@ -65,37 +92,20 @@ export function placeRandomEntity(
     name: string,
     amount: number,
     factory: BiomeMapItemEntityFactory,
-): number {
+): void {
     if (amount < 1) {
-        return 0;
+        return;
     }
 
-    const points: Point[] = [];
-    for (let x = 0; x < 32; x++) {
-        for (let y = 0; y < 32; y++) {
-            const pointCandidate: Bounds = {
-                x1: x,
-                y1: y,
-                x2: x + 1,
-                y2: y + 1,
-            };
-            if (map.isSpotAvailable(pointCandidate)) {
-                points.push({ x, y });
-            }
-        }
-    }
-
-    const shuffledPoints = shuffleItems(points);
-    const amountClamped = Math.min(shuffledPoints.length - 1, amount);
-    for (let i = 0; i < amountClamped; i++) {
-        const point = shuffledPoints[i];
-        map.setItem({
+    while (amount > 0 && map.availablePoints.size > 0) {
+        const randomPoint = randomEntry(map.availablePoints.dense);
+        const decodedPoint = decodePosition(randomPoint);
+        const point = map.setItem({
             name: name,
-            point: { x: point.x, y: point.y },
+            point: { x: decodedPoint.x, y: decodedPoint.y },
             size: { x: 1, y: 1 },
             factory: factory,
         });
+        amount--;
     }
-
-    return amountClamped;
 }

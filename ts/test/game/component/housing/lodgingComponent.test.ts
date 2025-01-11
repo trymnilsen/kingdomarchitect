@@ -1,11 +1,10 @@
-import * as assert from "node:assert";
-import { describe, it } from "node:test";
+import { describe, it, expect } from "vitest";
 
 describe("LodgingComponent", () => {
     it("Will set resident on housing", () => {
-        assert.equal(2, 2);
+        expect(2).toBe(2);
     });
     it("Check if resident id exists in workers", () => {
-        assert.equal(2, 2);
+        expect(2).toBe(2);
     });
 });

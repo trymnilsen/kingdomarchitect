@@ -1,5 +1,4 @@
-import * as assert from "node:assert";
-import { describe, it } from "node:test";
+import { describe, it, expect } from "vitest";
 
 describe("SpawnWorkerComponent", () => {
     it("Will spawn worker if there are houses", () => {});

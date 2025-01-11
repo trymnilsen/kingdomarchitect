@@ -1,32 +1,31 @@
-import * as assert from "node:assert";
-import { describe, it } from "node:test";
+import { describe, it, expect } from "vitest";
 
 describe("HealthComponent", () => {
     it("can get health", () => {
-        assert.equal(2, 2);
+        expect(2).toBe(2);
     });
 
     it("can get health percentage", () => {
-        assert.equal(2, 2);
+        expect(2).toBe(2);
     });
 
     it("damage reduces health", () => {
-        assert.equal(2, 2);
+        expect(2).toBe(2);
     });
 
     it("damage sends component event", () => {
-        assert.equal(2, 2);
+        expect(2).toBe(2);
     });
 
     it("heal increases health", () => {
-        assert.equal(2, 2);
+        expect(2).toBe(2);
     });
 
     it("heal sends component event", () => {
-        assert.equal(2, 2);
+        expect(2).toBe(2);
     });
 
     it("healToMax sets health to max", () => {
-        assert.equal(2, 2);
+        expect(2).toBe(2);
     });
 });
