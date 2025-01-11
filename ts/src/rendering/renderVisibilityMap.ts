@@ -1,7 +1,7 @@
 import { Point } from "../common/point.js";
 
 export class RenderVisibilityMap {
-    private _useVisibility = true;
+    private _useVisibility = false;
 
     public get useVisibility(): boolean {
         return this._useVisibility;

@@ -60,18 +60,4 @@ describe("QuadTree", () => {
             "QuadTree should subdivide after reaching capacity",
         ).to.toBeTruthy();
     });
-
-    it("should return null when no non-colliding position is possible", () => {
-        const bounds = { x: 0, y: 0, width: 10, height: 10 };
-        const quadTree = new QuadTree(bounds);
-
-        // Fill the entire quad tree
-        quadTree.insert({ x: 0, y: 0, width: 10, height: 10 });
-
-        const rect = quadTree.findRandomNonCollidingPosition(5, 5);
-
-        expect(rect, "Should return null when no position is possible").toBe(
-            null,
-        );
-    });
 });

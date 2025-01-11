@@ -169,6 +169,7 @@ export class Entity {
 
         this._isGameRoot = value;
         if (value) {
+            //TODO: If lifecycle is removed from components this can be removed
             visitChildren(this, (entity) => {
                 for (const component of entity.components) {
                     component.onStart(0);

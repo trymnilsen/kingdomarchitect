@@ -88,18 +88,12 @@ function createEntitiesForBiomes(
 
 function createTilesForBiomes(biomeMap: BiomeMap, rootEntity: Entity) {
     const component = rootEntity.requireComponent(TilesComponent);
-    for (let x = 0; x < 32; x++) {
-        for (let y = 0; y < 32; y++) {
-            component.setTile(
-                {
-                    tileX: biomeMap.point.x * 32 + x,
-                    tileY: biomeMap.point.y * 32 + y,
-                    type: biomeMap.type,
-                },
-                false,
-            );
-        }
-    }
+    component.setChunk({
+        chunkX: biomeMap.point.x,
+        chunkY: biomeMap.point.y,
+        discovered: new Set(),
+        type: biomeMap.type,
+    });
 }
 
 function generateBiomes(): BiomeEntry[] {

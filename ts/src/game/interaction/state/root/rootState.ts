@@ -149,6 +149,8 @@ class WorldFocusGroup implements FocusGroup {
         const worldPosition = this.camera.screenToWorld(centerPosition);
         const tilesComponent = this.rootNode.requireComponent(TilesComponent);
 
+        throw new Error("Reimplement");
+        /*
         const tiles = tilesComponent.getTiles(() => true);
         let closestTile = tiles[0];
         let closestDistance = Number.MAX_SAFE_INTEGER;
@@ -167,6 +169,7 @@ class WorldFocusGroup implements FocusGroup {
         }
 
         this.currentFocus = closestTile;
+        */
 
         return true;
     }

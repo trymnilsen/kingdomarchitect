@@ -29,50 +29,24 @@ type TilesBundle = {
 type TileMap = Record<string, GroundTile>;
 type GroundChunkMap = Record<string, GroundChunk>;
 
-export class TilesComponent extends EntityComponent implements Ground {
-    private tileMap: Map<string, GroundTile> = new Map();
-    private discoveredTiles: { [id: string]: boolean } = {};
-    private _chunkMap: GroundChunkMap = {};
-    
-    get chunkMap(): Readonly<Record<string, Readonly<GroundChunk>>> {
-        return this._chunkMap;
-    }
+type TileChunk = {
+    chunkX: number;
+    chunkY: number;
+    discovered: Set<string>;
+    type: BiomeType;
+};
 
-    constructor() {
-        super();
-        const tileLayerMap = {};
-        const chunkMap: GroundChunkMap = {};
-        /*
-        for (let x = 0; x < ChunkSize; x++) {
-            for (let y = 0; y < ChunkSize; y++) {
-                const id = getTileId(x, y);
-                tileMap[id] = {
-                    tileX: x,
-                    tileY: y,
-                };
-
-                tileLayerMap[id] = 0;
-            }
-        }
-
-        chunkMap[getTileId(0, 0)] = {
-            chunkX: 0,
-            chunkY: 0,
-        };*/
-
-        this._chunkMap = chunkMap;
-        this.discoveredTiles = tileLayerMap;
-    }
+export class TilesComponent extends EntityComponent {
+    private chunks = new Map<string, TileChunk>();
 
     getBounds(): Bounds {
         //Loop over chunk map and get min and max
         //multiply this to get tile bounds
-        const chunks = Object.values(this._chunkMap);
         let minX = Number.MAX_SAFE_INTEGER;
         let minY = Number.MAX_SAFE_INTEGER;
         let maxX = Number.MIN_SAFE_INTEGER;
         let maxY = Number.MIN_SAFE_INTEGER;
-        for (const chunk of chunks) {
+        for (const [id, chunk] of this.chunks) {
             if (chunk.chunkX > maxX) {
                 maxX = chunk.chunkX;
             }
@@ -95,35 +69,33 @@ export class TilesComponent extends EntityComponent implements Ground {
     }
 
     getTile(tilePosition: Point): GroundTile | null {
-        return (
-            this.tileMap.get(getTileId(tilePosition.x, tilePosition.y)) || null
-        );
-    }
+        const chunkId = this.makeChunkId(tilePosition.x, tilePosition.y);
+        const chunk = this.chunks.get(chunkId);
+        if (!chunk) {
+            return null;
+        }
 
-    getTiles(predicate: (tile: GroundTile) => boolean): GroundTile[] {
-        return Array.from(this.tileMap.values()).filter(predicate);
-    }
-
-    getAllTiles(): ReadonlyArray<GroundTile> {
-        return Array.from(this.tileMap.values());
-    }
-
-    getDiscoveredTiles(): ReadonlyArray<GroundTile> {
-        return this.getTiles((tile) => {
-            const isDiscovered =
-                this.discoveredTiles[getTileId(tile.tileX, tile.tileY)];
-
-            return !!isDiscovered;
-        });
+        const tileId = getTileId(tilePosition.x, tilePosition.y);
+        return {
+            tileX: tilePosition.x,
+            tileY: tilePosition.y,
+            type: chunk.type,
+        };
     }
 
     discoverTile(tilePosition: Point) {
-        const tileId = getTileId(tilePosition.x, tilePosition.y);
-        if (this.tileMap.has(tileId)) {
-            this.discoveredTiles[tileId] = true;
+        const chunkId = this.makeChunkId(tilePosition.x, tilePosition.y);
+        const chunk = this.chunks.get(chunkId);
+
+        if (!!chunk) {
+            const tileId = getTileId(tilePosition.x, tilePosition.y);
+            chunk.discovered.add(tileId);
+        } else {
+            console.log("Cannot discover tile", tilePosition, chunkId);
         }
     }
 
+    /*
     setTile(tile: GroundTile, discovered: boolean = false) {
         const tileId = getTileId(tile.tileX, tile.tileY);
         this.tileMap.set(tileId, tile);
@@ -136,14 +108,17 @@ export class TilesComponent extends EntityComponent implements Ground {
                 chunkY: chunkPosition.y,
             };
         }
+    }*/
+
+    setChunk(chunk: TileChunk) {
+        const chunkId = getTileId(chunk.chunkX, chunk.chunkY);
+        this.chunks.set(chunkId, chunk);
     }
 
-    removeTile(x: number, y: number) {
-        this.tileMap.delete(getTileId(x, y));
-    }
-
-    setChunk(chunk: GroundChunk) {
-        this._chunkMap[getTileId(chunk.chunkX, chunk.chunkY)] = chunk;
+    private makeChunkId(x: number, y: number) {
+        const cx = Math.floor(x / 32);
+        const cy = Math.floor(y / 32);
+        return getTileId(cx, cy);
     }
 
     override onDraw(
@@ -151,17 +126,17 @@ export class TilesComponent extends EntityComponent implements Ground {
         _screenPosition: Point,
         visiblityMap: RenderVisibilityMap,
     ): void {
-        for (const [tileId, tile] of this.tileMap) {
-            const tilePosition = {
-                x: tile.tileX,
-                y: tile.tileY,
+        for (const [chunkId, chunk] of this.chunks) {
+            const chunkPosition = {
+                x: chunk.chunkX * 32,
+                y: chunk.chunkY * 32,
             };
             const screenPosition =
-                context.camera.tileSpaceToScreenSpace(tilePosition);
+                context.camera.tileSpaceToScreenSpace(chunkPosition);
 
             const withinTheViewport =
-                screenPosition.x + 40 > 0 &&
-                screenPosition.y + 40 > 0 &&
+                screenPosition.x + 32 * 40 > 0 &&
+                screenPosition.y + 32 * 40 > 0 &&
                 screenPosition.x - 40 < context.width &&
                 screenPosition.y - 40 < context.height;
 
@@ -169,34 +144,33 @@ export class TilesComponent extends EntityComponent implements Ground {
                 continue;
             }
 
-            if (!visiblityMap.useVisibility || !!this.discoveredTiles[tileId]) {
-                const visibility = visiblityMap.isVisible(
-                    tile.tileX,
-                    tile.tileY,
-                );
-
-                let color = "green";
-                const type = tile.type;
-                if (!!type) {
-                    if (!visiblityMap.useVisibility || visibility) {
-                        color = biomes[type].color;
-                    } else {
-                        color = biomes[type].tint;
-                    }
+            for (let x = 0; x < 32; x++) {
+                const tileX = screenPosition.x + x * 40;
+                const xWithin = tileX + 40 > 0 && tileX - 40 < context.width;
+                if (!xWithin) {
+                    continue;
                 }
 
-                if (visibility) {
-                    context.drawRectangle({
-                        x: tile.tileX * TileSize,
-                        y: tile.tileY * TileSize,
-                        width: TileSize - 2,
-                        height: TileSize - 2,
-                        fill: color,
-                    });
-                } else {
-                    context.drawRectangle({
-                        x: tile.tileX * TileSize,
-                        y: tile.tileY * TileSize,
+                for (let y = 0; y < 32; y++) {
+                    const tileY = screenPosition.y + y * 40;
+                    let visible = true;
+
+                    if (visiblityMap.useVisibility) {
+                        if (!chunk.discovered.has(getTileId(x, y))) {
+                            continue;
+                        }
+
+                        visible = visiblityMap.isVisible(tileX, tileY);
+                    }
+
+                    let color = biomes[chunk.type].color;
+                    if (!visible) {
+                        biomes[chunk.type].tint;
+                    }
+
+                    context.drawScreenSpaceRectangle({
+                        x: tileX,
+                        y: tileY,
                         width: TileSize - 2,
                         height: TileSize - 2,
                         fill: color,

@@ -141,6 +141,7 @@ export class QuadTree {
         );
     }
 
+    /*
     findRandomNonCollidingPosition(
         width: number,
         height: number,
@@ -186,9 +187,10 @@ export class QuadTree {
         }
 
         return null; // No valid region found
-    }
+    }*/
 }
 
+/*
 export function placeWithTilesplit(
     quadTree: QuadTree,
     width: number,
@@ -229,4 +231,4 @@ export function placeWithTilesplit(
         return null;
     }
     console.profileEnd("placeWithTilesplit");
-}
+}*/

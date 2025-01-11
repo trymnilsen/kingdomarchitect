@@ -1,8 +1,5 @@
 import { encodePosition, Point } from "../../../src/common/point.js";
-import {
-    placeWithTilesplit,
-    QuadTree,
-} from "../../../src/common/structure/quadtree.js";
+import { QuadTree } from "../../../src/common/structure/quadtree.js";
 import {
     Rectangle,
     splitRectangle,
@@ -213,6 +210,7 @@ bench.add({
     },
 });
 
+/*
 bench.add({
     name: "rectangle split - 100",
     run: () => {
@@ -240,6 +238,6 @@ bench.add({
         }
     },
 });
-
+*/
 const result = bench.run();
 logTable(result);
