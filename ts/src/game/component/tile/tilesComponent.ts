@@ -114,8 +114,8 @@ export class TilesComponent extends EntityComponent {
     }
 
     private makeChunkId(x: number, y: number) {
-        const cx = Math.floor(x / 32);
-        const cy = Math.floor(y / 32);
+        const cx = Math.floor(x / ChunkSize);
+        const cy = Math.floor(y / ChunkSize);
         return getTileId(cx, cy);
     }
 
@@ -126,15 +126,15 @@ export class TilesComponent extends EntityComponent {
     ): void {
         for (const [chunkId, chunk] of this.chunks) {
             const chunkPosition = {
-                x: chunk.chunkX * 32,
-                y: chunk.chunkY * 32,
+                x: chunk.chunkX * ChunkSize,
+                y: chunk.chunkY * ChunkSize,
             };
             const screenPosition =
                 context.camera.tileSpaceToScreenSpace(chunkPosition);
 
             const withinTheViewport =
-                screenPosition.x + 32 * 40 > 0 &&
-                screenPosition.y + 32 * 40 > 0 &&
+                screenPosition.x + ChunkSize * 40 > 0 &&
+                screenPosition.y + ChunkSize * 40 > 0 &&
                 screenPosition.x - 40 < context.width &&
                 screenPosition.y - 40 < context.height;
 
@@ -142,14 +142,14 @@ export class TilesComponent extends EntityComponent {
                 continue;
             }
 
-            for (let x = 0; x < 32; x++) {
+            for (let x = 0; x < ChunkSize; x++) {
                 const tileX = screenPosition.x + x * 40;
                 const xWithin = tileX + 40 > 0 && tileX - 40 < context.width;
                 if (!xWithin) {
                     continue;
                 }
 
-                for (let y = 0; y < 32; y++) {
+                for (let y = 0; y < ChunkSize; y++) {
                     const tileY = screenPosition.y + y * 40;
                     let visible = true;
 

@@ -24,12 +24,13 @@ import { GameTime } from "../common/time.js";
 import { DrawMode } from "../rendering/drawMode.js";
 import { SpatialChunkMapComponent } from "./component/world/spatialChunkMapComponent.js";
 import { Camera } from "../rendering/camera.js";
+import { addInitialPlayerChunk } from "./map/player.js";
 
 export class Game {
-    private renderer!: Renderer;
-    private input!: Input;
-    private touchInput!: TouchInput;
-    private interactionHandler!: InteractionHandler;
+    private renderer: Renderer;
+    private input: Input;
+    private touchInput: TouchInput;
+    private interactionHandler: InteractionHandler;
 
     private assetLoader: AssetLoader;
     private drawTick = 0;
@@ -39,26 +40,18 @@ export class Game {
     private gameTime: GameTime = new GameTime();
     private visibilityMap: RenderVisibilityMap = new RenderVisibilityMap();
 
-    constructor(
-        private domElementWrapperSelector: string,
-        rootNode: Entity,
-        assetLoader: AssetLoader,
-    ) {
+    constructor(private domElementWrapperSelector: string) {
+        this.world = createRootEntity();
+        this.assetLoader = new AssetLoader();
         // Rendering
-        this.assetLoader = assetLoader;
+
         this.camera = new Camera({
             x: window.innerWidth,
             y: window.innerHeight,
         });
         // World
-        this.world = rootNode;
         this.world.gameTime = this.gameTime;
-    }
 
-    async bootstrap(): Promise<void> {
-        console.log("bootstrap");
-        // Init systems
-        // Get the canvas
         const canvasElement: HTMLCanvasElement | null = document.querySelector(
             `#${this.domElementWrapperSelector}`,
         );
@@ -90,10 +83,15 @@ export class Game {
                 this.render(DrawMode.Gesture);
             },
         );
+    }
 
+    async bootstrap(): Promise<void> {
+        console.log("bootstrap");
+        this.assetLoader.load();
+        addInitialPlayerChunk(this.world);
         //Set the camera position
         const playerEntity = firstChildWhere(this.world, (child) => {
-            return child.id.includes("player-worker");
+            return child.id.includes("worker");
         });
         if (!!playerEntity) {
             const newPosition = multiplyPoint(

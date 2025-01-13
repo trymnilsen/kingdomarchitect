@@ -3,6 +3,11 @@
 
 <head>
     <style>
+        @font-face {
+            font-family: 'silkscreen';
+            src: url('/asset/silkscreen_regular.ttf');
+        }
+
         html,
         body {
             background:  rgb(0, 50, 20);
@@ -11,6 +16,7 @@
             padding: 0;
             margin: 0;
             overflow: hidden;
+            font-family: silkscreen;
         }
     </style>
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -30,7 +36,7 @@
 </head>
 
 <body>
-    <img src="asset/bin-0.png" aria-hidden="true" style="display: none;"/>
+    <img src="asset/bin-0.png" id="bin-0" aria-hidden="true" style="display: none;"/>
     <noscript>
         Kingdom Architect requires scripting to be turned on
     </noscript>
