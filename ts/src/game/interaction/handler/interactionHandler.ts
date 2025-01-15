@@ -228,6 +228,9 @@ export class InteractionHandler {
                 fill: "rgba(20, 20, 20, 0.8)",
             });
         }
+
+        this.history.state.onDraw(renderScope);
+
         if (this.history.size > 1) {
             this.statusbar.rootView.layout(renderScope, {
                 width: renderScope.width,
@@ -236,7 +239,5 @@ export class InteractionHandler {
             this.statusbar.rootView.updateTransform();
             this.statusbar.rootView.draw(renderScope);
         }
-
-        this.history.state.onDraw(renderScope);
     }
 }

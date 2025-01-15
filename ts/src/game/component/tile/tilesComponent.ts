@@ -37,7 +37,15 @@ type TileChunk = {
 };
 
 export class TilesComponent extends EntityComponent {
-    private chunks = new Map<string, TileChunk>();
+    private _chunks = new Map<string, TileChunk>();
+
+    public get chunks(): Iterable<Readonly<TileChunk>> {
+        return this._chunks.values();
+    }
+
+    hasChunk(position: Point): boolean {
+        return this._chunks.has(getTileId(position.x, position.y));
+    }
 
     getBounds(): Bounds {
         //Loop over chunk map and get min and max
@@ -46,7 +54,7 @@ export class TilesComponent extends EntityComponent {
         let minY = Number.MAX_SAFE_INTEGER;
         let maxX = Number.MIN_SAFE_INTEGER;
         let maxY = Number.MIN_SAFE_INTEGER;
-        for (const [id, chunk] of this.chunks) {
+        for (const [id, chunk] of this._chunks) {
             if (chunk.chunkX > maxX) {
                 maxX = chunk.chunkX;
             }
@@ -70,7 +78,7 @@ export class TilesComponent extends EntityComponent {
 
     getTile(tilePosition: Point): GroundTile | null {
         const chunkId = this.makeChunkId(tilePosition.x, tilePosition.y);
-        const chunk = this.chunks.get(chunkId);
+        const chunk = this._chunks.get(chunkId);
         if (!chunk) {
             return null;
         }
@@ -85,7 +93,7 @@ export class TilesComponent extends EntityComponent {
 
     discoverTile(tilePosition: Point) {
         const chunkId = this.makeChunkId(tilePosition.x, tilePosition.y);
-        const chunk = this.chunks.get(chunkId);
+        const chunk = this._chunks.get(chunkId);
 
         if (!!chunk) {
             const tileId = getTileId(tilePosition.x, tilePosition.y);
@@ -110,7 +118,7 @@ export class TilesComponent extends EntityComponent {
 
     setChunk(chunk: TileChunk) {
         const chunkId = getTileId(chunk.chunkX, chunk.chunkY);
-        this.chunks.set(chunkId, chunk);
+        this._chunks.set(chunkId, chunk);
     }
 
     private makeChunkId(x: number, y: number) {
@@ -124,7 +132,7 @@ export class TilesComponent extends EntityComponent {
         _screenPosition: Point,
         visiblityMap: RenderVisibilityMap,
     ): void {
-        for (const [chunkId, chunk] of this.chunks) {
+        for (const [chunkId, chunk] of this._chunks) {
             const chunkPosition = {
                 x: chunk.chunkX * ChunkSize,
                 y: chunk.chunkY * ChunkSize,
