@@ -1,7 +1,8 @@
 import { Point } from "../../common/point.js";
+import { TileSize } from "./tile.js";
 
 export const ChunkSize = 8;
-
+export const ChunkDimension = ChunkSize * TileSize;
 /**
  * Get the chunk the given world position is in
  * @param worldPosition
