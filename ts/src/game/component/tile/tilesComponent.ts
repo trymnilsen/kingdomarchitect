@@ -4,7 +4,12 @@ import { Point } from "../../../common/point.js";
 import { RenderScope } from "../../../rendering/renderScope.js";
 import { RenderVisibilityMap } from "../../../rendering/renderVisibilityMap.js";
 import { BiomeType, biomes } from "../../map/biome/biome.js";
-import { ChunkSize, getChunkId, getChunkPosition } from "../../map/chunk.js";
+import {
+    ChunkDimension,
+    ChunkSize,
+    getChunkId,
+    getChunkPosition,
+} from "../../map/chunk.js";
 import { getTileId, TileSize } from "../../map/tile.js";
 import { EntityComponent } from "../entityComponent.js";
 import { Ground } from "./ground.js";
@@ -182,6 +187,44 @@ export class TilesComponent extends EntityComponent {
                         fill: color,
                     });
                 }
+            }
+
+            if (visiblityMap.useVisibility) {
+                context.drawDottedLine(
+                    screenPosition.x + 8,
+                    screenPosition.y + 4,
+                    screenPosition.x + ChunkDimension - 8,
+                    screenPosition.y + 4,
+                    biomes.forrest.tint,
+                    8,
+                );
+
+                context.drawDottedLine(
+                    screenPosition.x + ChunkDimension - 4,
+                    screenPosition.y + 8,
+                    screenPosition.x + ChunkDimension - 4,
+                    screenPosition.y + ChunkDimension - 8,
+                    biomes.forrest.tint,
+                    8,
+                );
+
+                context.drawDottedLine(
+                    screenPosition.x + 8,
+                    screenPosition.y + ChunkDimension - 4,
+                    screenPosition.x + ChunkDimension - 8,
+                    screenPosition.y + ChunkDimension - 4,
+                    biomes.forrest.tint,
+                    8,
+                );
+
+                context.drawDottedLine(
+                    screenPosition.x + 4,
+                    screenPosition.y + 8,
+                    screenPosition.x + 4,
+                    screenPosition.y + ChunkDimension - 8,
+                    biomes.forrest.tint,
+                    8,
+                );
             }
         }
     }
