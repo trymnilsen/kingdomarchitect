@@ -11,3 +11,11 @@ export function rgbToHex(r: number, g: number, b: number) {
     const blue = numToHex(b);
     return "#" + red + green + blue;
 }
+
+export function randomColor(): string {
+    return rgbToHex(
+        Math.floor(Math.random() * 16) * 16,
+        Math.floor(Math.random() * 16) * 16,
+        Math.floor(Math.random() * 16) * 16,
+    );
+}
