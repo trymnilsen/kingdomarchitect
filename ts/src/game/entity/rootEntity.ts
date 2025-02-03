@@ -32,22 +32,4 @@ export function createRootEntity(): Entity {
     rootEntity.addComponent(pathFindingComponent);
     rootEntity.toggleIsGameRoot(true);
     return rootEntity;
-    /*
-    //Set up initial entities
-    const firstWorker = workerPrefab(generateId("worker"));
-    const firstHouse = housePrefab(generateId("house"), false);
-    const firstFarm = farmPrefab(generateId("farm"));
-    const firstTree = treePrefab(generateId("tree"), 1);
-    const well = wellPrefab(generateId("well"));
-    firstFarm.position = { x: 1, y: 0 };
-    firstHouse.position = { x: 0, y: 0 };
-    firstTree.position = { x: 2, y: 2 };
-    firstWorker.position = { x: 0, y: 1 };
-    well.position = { x: 1, y: 1 };
-    rootEntity.addChild(firstFarm);
-    rootEntity.addChild(firstWorker);
-    rootEntity.addChild(firstHouse);
-    rootEntity.addChild(firstTree);
-    rootEntity.addChild(well);
-    */
 }

@@ -5,25 +5,16 @@ import { generateMap } from "./game/map/mapGenerator.js";
 
 const canvasElementId = "gameCanvas";
 
-function createGame(): Game {
-    const rootNode = createRootEntity();
-    const assetLoader = new AssetLoader();
-    const assets = assetLoader.load();
-    const game = new Game(canvasElementId, rootNode, assetLoader);
-    generateMap(rootNode);
-    return game;
-}
-
 async function bootstrap() {
     console.log("Bootstrapping!");
     try {
+        const game = new Game(canvasElementId);
         await game.bootstrap();
     } catch (e) {
         console.error("Failed to bootstrap game: ", e);
     }
 }
 
-const game = createGame();
 document.addEventListener(
     "DOMContentLoaded",
     () => {

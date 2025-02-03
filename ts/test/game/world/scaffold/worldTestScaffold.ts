@@ -1,3 +1,4 @@
+import { randomColor } from "../../../../src/common/color.js";
 import { Point } from "../../../../src/common/point.js";
 import { TilesComponent } from "../../../../src/game/component/tile/tilesComponent.js";
 import { Entity } from "../../../../src/game/entity/entity.js";
@@ -16,7 +17,14 @@ export abstract class WorldTestScaffold {
             chunkX: 0,
             chunkY: 0,
             discovered: new Set(),
-            type: "forrest",
+            volume: {
+                id: "testvolume",
+                type: "forrest",
+                chunks: [{ x: 0, y: 0 }],
+                maxSize: 4,
+                size: 1,
+                debugColor: randomColor(),
+            },
         });
     }
 

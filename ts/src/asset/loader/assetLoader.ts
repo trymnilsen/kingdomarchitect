@@ -11,7 +11,7 @@ export class AssetLoader {
     load() {
         const loadPromises: Promise<unknown>[] = [];
 
-        loadPromises.push(this.loadFonts());
+        //loadPromises.push(this.loadFonts());
 
         for (const bin of bins) {
             loadPromises.push(this.loadAsset(bin.name, bin.filename));
@@ -39,8 +39,18 @@ export class AssetLoader {
     }
 
     private async loadAsset(name: string, filename: string) {
-        const imageElement = await this.fetchAsset(filename);
-        this._assets[name] = imageElement;
+        const domImage = document.getElementById(`bin-${name}`);
+        if (domImage && domImage instanceof HTMLImageElement) {
+            console.log(`Image ${name} existed as dom image waiting for load`);
+            if (!domImage.complete) {
+                await this.promisifyExistingImage(domImage);
+            }
+            this._assets[name] = domImage;
+        } else {
+            console.log(`Image ${name} was not found in dom, creating`);
+            const imageElement = await this.fetchAsset(filename);
+            this._assets[name] = imageElement;
+        }
     }
 
     private fetchAsset(name: string): Promise<HTMLImageElement> {
@@ -53,6 +63,21 @@ export class AssetLoader {
                 reject();
             });
             element.src = "asset/" + name;
+        });
+    }
+
+    private promisifyExistingImage(
+        image: HTMLImageElement,
+    ): Promise<HTMLImageElement> {
+        return new Promise((resolve, reject) => {
+            image.addEventListener("load", () => {
+                console.log("Image loaded");
+                resolve(image);
+            });
+            image.addEventListener("error", () => {
+                console.log("Error loading image");
+                reject();
+            });
         });
     }
 }

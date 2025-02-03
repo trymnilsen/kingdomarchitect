@@ -24,6 +24,7 @@ import { MenuState } from "../menu/menuState.js";
 import { BuildingState } from "./building/buildingState.js";
 import { InventoryState } from "./inventory/inventoryState.js";
 import { ScrollInteractionState } from "../scrolls/scrollState.js";
+import { LandUnlockState } from "../unlock/landUnlockState.js";
 
 export class RootState extends InteractionState {
     override getFocusGroups(): FocusGroup[] {
@@ -57,6 +58,22 @@ export class RootState extends InteractionState {
                     this.context.stateChanger.push(
                         new ScrollInteractionState(),
                     );
+                },
+            },
+            {
+                text: "Map",
+                icon: sprites2.empty_sprite,
+                onClick: () => {
+                    this.context.stateChanger.push(
+                        new AlertMessageState("Oh no", "Not implemented"),
+                    );
+                },
+            },
+            {
+                text: "Land",
+                icon: sprites2.empty_sprite,
+                onClick: () => {
+                    this.context.stateChanger.push(new LandUnlockState());
                 },
             },
         ];
