@@ -32,7 +32,7 @@
         "maxrects-packer": "^2.7.3",
         "pngjs": "^7.0.0",
         "prettier": "^3.4.2",
-        "rollup": "^3.29.5",
+        "rollup": "^4.34.1",
         "source-map-support": "^0.5.21",
         "typescript": "^5.7.3",
         "@vitest/coverage-v8": "^2.1.8",
