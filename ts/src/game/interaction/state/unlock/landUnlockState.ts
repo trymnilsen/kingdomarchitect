@@ -14,6 +14,7 @@ import { uiBox } from "../../../../ui/dsl/uiBoxDsl.js";
 import { fillUiSize } from "../../../../ui/uiSize.js";
 import { TilesComponent } from "../../../component/tile/tilesComponent.js";
 import { ChunkDimension, ChunkSize } from "../../../map/chunk.js";
+import { generateChunk } from "../../../map/chunkGenerator.js";
 import { GroundTile, TileSize } from "../../../map/tile.js";
 import { InteractionState } from "../../handler/interactionState.js";
 import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold.js";
@@ -84,25 +85,11 @@ export class LandUnlockState extends InteractionState {
 
     private unlockSelected() {
         if (this.cursor) {
-            const tileComponent =
-                this.context.root.requireComponent(TilesComponent);
             const chunkPoint = {
                 x: Math.floor(this.cursor.x / ChunkSize / TileSize),
                 y: Math.floor(this.cursor.y / ChunkSize / TileSize),
             };
-            tileComponent.setChunk({
-                chunkX: chunkPoint.x,
-                chunkY: chunkPoint.y,
-                type: randomEntry([
-                    "desert",
-                    "forrest",
-                    "swamp",
-                    "snow",
-                    "plains",
-                ]),
-                discovered: new Set(),
-            });
-
+            const generated = generateChunk(this.context.root, chunkPoint);
             this.setUnlockableChunks();
         }
     }

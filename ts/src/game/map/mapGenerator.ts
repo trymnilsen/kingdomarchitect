@@ -86,14 +86,16 @@ function createEntitiesForBiomes(
     }
 }
 
-function createTilesForBiomes(biomeMap: BiomeMap, rootEntity: Entity) {
+function createTilesForBiomes(_biomeMap: BiomeMap, rootEntity: Entity) {
     const component = rootEntity.requireComponent(TilesComponent);
+    throw new Error("Re-implement");
+    /*
     component.setChunk({
         chunkX: biomeMap.point.x,
         chunkY: biomeMap.point.y,
         discovered: new Set(),
         type: biomeMap.type,
-    });
+    });*/
 }
 
 function generateBiomes(): BiomeEntry[] {

@@ -13,6 +13,7 @@ import {
 import { getTileId, TileSize } from "../../map/tile.js";
 import { EntityComponent } from "../entityComponent.js";
 import { Ground } from "./ground.js";
+import { Volume } from "./volume.js";
 
 export type GroundTile = {
     tileX: number;
@@ -34,11 +35,11 @@ type TilesBundle = {
 type TileMap = Record<string, GroundTile>;
 type GroundChunkMap = Record<string, GroundChunk>;
 
-type TileChunk = {
+export type TileChunk = {
     chunkX: number;
     chunkY: number;
+    volume: Volume;
     discovered: Set<string>;
-    type: BiomeType;
 };
 
 export class TilesComponent extends EntityComponent {
@@ -46,6 +47,10 @@ export class TilesComponent extends EntityComponent {
 
     public get chunks(): Iterable<Readonly<TileChunk>> {
         return this._chunks.values();
+    }
+
+    public get numberOfChunks(): number {
+        return this._chunks.size;
     }
 
     hasChunk(position: Point): boolean {
@@ -81,6 +86,11 @@ export class TilesComponent extends EntityComponent {
         };
     }
 
+    getChunk(chunkPosition): TileChunk | null {
+        const chunkId = getTileId(chunkPosition.x, chunkPosition.y);
+        return this._chunks.get(chunkId) ?? null;
+    }
+
     getTile(tilePosition: Point): GroundTile | null {
         const chunkId = this.makeChunkId(tilePosition.x, tilePosition.y);
         const chunk = this._chunks.get(chunkId);
@@ -92,7 +102,7 @@ export class TilesComponent extends EntityComponent {
         return {
             tileX: tilePosition.x,
             tileY: tilePosition.y,
-            type: chunk.type,
+            type: chunk.volume.type,
         };
     }
 
@@ -174,9 +184,9 @@ export class TilesComponent extends EntityComponent {
                         visible = visiblityMap.isVisible(tileX, tileY);
                     }
 
-                    let color = biomes[chunk.type].color;
+                    let color = biomes[chunk.volume.type].color;
                     if (!visible) {
-                        biomes[chunk.type].tint;
+                        biomes[chunk.volume.type].tint;
                     }
 
                     context.drawScreenSpaceRectangle({
@@ -188,6 +198,48 @@ export class TilesComponent extends EntityComponent {
                     });
                 }
             }
+
+            context.drawScreenSpaceRectangle({
+                x: screenPosition.x + 16,
+                y: screenPosition.y + 16,
+                width: ChunkDimension - 32,
+                height: ChunkDimension - 32,
+                strokeWidth: 2,
+                strokeColor: chunk.volume.debugColor,
+            });
+
+            context.drawText({
+                text: chunk.volume.id,
+                x: screenPosition.x + 16,
+                y: screenPosition.y + 16,
+                color: "black",
+                size: 14,
+                font: "arial",
+            });
+            context.drawText({
+                text: chunk.volume.debugColor,
+                x: screenPosition.x + 16,
+                y: screenPosition.y + 16 + 20,
+                color: "black",
+                size: 14,
+                font: "arial",
+            });
+            context.drawText({
+                text: `maxSize: ${chunk.volume.maxSize}`,
+                x: screenPosition.x + 16,
+                y: screenPosition.y + 16 + 40,
+                color: "black",
+                size: 14,
+                font: "arial",
+            });
+            context.drawText({
+                text: `size: ${chunk.volume.size}`,
+                x: screenPosition.x + 16,
+                y: screenPosition.y + 16 + 60,
+                color: "black",
+                size: 14,
+                font: "arial",
+            });
 
             if (visiblityMap.useVisibility) {
                 context.drawDottedLine(

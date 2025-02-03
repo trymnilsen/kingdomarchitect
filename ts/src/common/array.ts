@@ -165,3 +165,17 @@ export function arrayToOject<T>(
 
     return map;
 }
+
+export function mapNotNullDistinct<T, U>(
+    array: T[],
+    mapFn: (item: T) => U | null | undefined,
+): U[] {
+    const result = new Set<U>();
+    for (const item of array) {
+        const mapped = mapFn(item);
+        if (mapped !== null && mapped !== undefined) {
+            result.add(mapped);
+        }
+    }
+    return Array.from(result);
+}
