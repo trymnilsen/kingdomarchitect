@@ -23,7 +23,7 @@ import { LineBuildMode } from "./mode/lineBuildMode.js";
 import { SingleBuildMode } from "./mode/singleBuildMode.js";
 import { buildingApplicabilityList } from "./buildingApplicabilityList.js";
 import { BuildingApplicabilityResult } from "./buildingApplicability.js";
-import { firstMap as firstMapOrNull } from "../../../../common/array.js";
+import { findMapped } from "../../../../common/array.js";
 import { SpatialChunkMapComponent } from "../../../component/world/spatialChunkMapComponent.js";
 
 export class BuildConfirmState extends InteractionState {
@@ -133,7 +133,7 @@ export class BuildConfirmState extends InteractionState {
             return;
         }
 
-        const tileError = firstMapOrNull(selections, (value) => {
+        const tileError = findMapped(selections, (value) => {
             const isAvailable = this.isTileAvailable(value);
             if (isAvailable.isApplicable) {
                 return null;

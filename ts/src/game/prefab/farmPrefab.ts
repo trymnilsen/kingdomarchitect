@@ -1,8 +1,9 @@
 import { sprites2 } from "../../asset/sprite.js";
+import { generateId } from "../../common/idGenerator.js";
 import { SpriteComponent } from "../component/draw/spriteComponent.js";
 import { Entity } from "../entity/entity.js";
 
-export function farmPrefab(id: string): Entity {
+export function farmPrefab(id: string = generateId("farm")): Entity {
     const farm = new Entity(id);
     const spriteDrawer = new SpriteComponent(
         sprites2.farm_4,

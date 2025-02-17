@@ -1,10 +1,9 @@
 import { AssetLoader } from "./asset/loader/assetLoader.js";
 import { createRootEntity } from "./game/entity/rootEntity.js";
 import { Game } from "./game/game.js";
-import { generateMap } from "./game/map/mapGenerator.js";
 
 const canvasElementId = "gameCanvas";
-
+console.log("Booting!");
 async function bootstrap() {
     console.log("Bootstrapping!");
     try {

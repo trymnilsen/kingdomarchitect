@@ -17,7 +17,7 @@ import { trainingDummyPrefab } from "../prefab/trainingDummyPrefab.js";
 import { treePrefab } from "../prefab/treePrefab.js";
 import { wellPrefab } from "../prefab/wellPrefab.js";
 import { workerPrefab } from "../prefab/workerPrefab.js";
-import { spawnTree } from "./util/vegetation.js";
+import { spawnTree } from "./item/vegetation.js";
 
 export function addInitialPlayerChunk(rootEntity: Entity) {
     rootEntity.requireComponent(TilesComponent).setChunk({

@@ -7,8 +7,12 @@ import { Entity } from "../entity/entity.js";
 import { VisibilityComponent } from "../component/visibility/visibilityComponent.js";
 import { largeDiamondPattern } from "../../common/pattern.js";
 import { zeroPoint } from "../../common/point.js";
+import { generateId } from "../../common/idGenerator.js";
 
-export function housePrefab(id: string, scaffold: boolean): Entity {
+export function housePrefab(
+    id: string = generateId("house"),
+    scaffold: boolean = false,
+): Entity {
     const house = new Entity(id);
     const buildingComponent = new BuildingComponent(
         sprites2.wooden_house,

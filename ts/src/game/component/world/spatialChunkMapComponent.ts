@@ -28,6 +28,7 @@ export class SpatialChunkMapComponent extends EntityComponent {
                 break;
         }
     }
+
     /**
      * Adds an entity to the chunk map using its world position
      * to determine which chunk it should be in
@@ -111,6 +112,16 @@ export class SpatialChunkMapComponent extends EntityComponent {
         }
 
         return entities;
+    }
+
+    getEntitiesInChunk(chunkPosition: Point): Entity[] {
+        const chunkKey = encodePosition(chunkPosition.x, chunkPosition.y);
+        const chunk = this.chunks.get(chunkKey);
+        if (!!chunk) {
+            return chunk.dense;
+        } else {
+            return [];
+        }
     }
 
     getEntitiesWithin(bounds: Bounds): Entity[] {

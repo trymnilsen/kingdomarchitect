@@ -3,7 +3,7 @@ import { generateId } from "../../common/idGenerator.js";
 import { Point } from "../../common/point.js";
 import { GroundChunk } from "../../game/component/tile/tilesComponent.js";
 import { Entity } from "../../game/entity/entity.js";
-import { barbarianCampPrefab } from "../../game/prefab/barbarianCampPrefab.js";
+import { orcHousePrefab } from "../../game/prefab/orcHousePrefab.js";
 import { chestPrefab } from "../../game/prefab/chestPrefab.js";
 import { mobPrefab } from "../../game/prefab/mobPrefab.js";
 import { tentPrefab } from "../../game/prefab/tentPrefab.js";
@@ -35,7 +35,7 @@ export function barbarianTile(ground: GroundChunk): Tileset {
     bounds.x2 += 1;
 
     const entities: Entity[] = [];
-    const campEntity = barbarianCampPrefab(generateId("camp"));
+    const campEntity = orcHousePrefab(generateId("camp"));
     campEntity.worldPosition = {
         x: ground.chunkX * 3 + 1,
         y: ground.chunkY * 3 + 1,

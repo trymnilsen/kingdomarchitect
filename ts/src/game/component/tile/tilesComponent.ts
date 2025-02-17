@@ -3,7 +3,7 @@ import { Bounds } from "../../../common/bounds.js";
 import { Point } from "../../../common/point.js";
 import { RenderScope } from "../../../rendering/renderScope.js";
 import { RenderVisibilityMap } from "../../../rendering/renderVisibilityMap.js";
-import { BiomeType, biomes } from "../../map/biome/biome.js";
+import { BiomeType, biomes } from "../../map/biome.js";
 import {
     ChunkDimension,
     ChunkSize,
@@ -41,6 +41,15 @@ export type TileChunk = {
     volume: Volume;
     discovered: Set<string>;
 };
+
+export function getChunkBounds(tileChunk: TileChunk): Bounds {
+    return {
+        x1: tileChunk.chunkX * ChunkSize,
+        y1: tileChunk.chunkY * ChunkSize,
+        x2: (tileChunk.chunkX + 1) * ChunkSize,
+        y2: (tileChunk.chunkY + 1) * ChunkSize,
+    };
+}
 
 export class TilesComponent extends EntityComponent {
     private _chunks = new Map<string, TileChunk>();
@@ -114,7 +123,7 @@ export class TilesComponent extends EntityComponent {
             const tileId = getTileId(tilePosition.x, tilePosition.y);
             chunk.discovered.add(tileId);
         } else {
-            console.log("Cannot discover tile", tilePosition, chunkId);
+            //console.log("Cannot discover tile", tilePosition, chunkId);
         }
     }
 
