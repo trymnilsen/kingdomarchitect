@@ -18,7 +18,6 @@ import { createRootEntity } from "./entity/rootEntity.js";
 import { TileSize } from "./map/tile.js";
 import { RenderVisibilityMap } from "../rendering/renderVisibilityMap.js";
 import { VisibilityComponent } from "./component/visibility/visibilityComponent.js";
-import { generateMap } from "./map/mapGenerator.js";
 import { firstChildWhere } from "./entity/child/first.js";
 import { GameTime } from "../common/time.js";
 import { DrawMode } from "../rendering/drawMode.js";
@@ -104,7 +103,7 @@ export class Game {
         this.updateVisibilityMap();
 
         await this.assetLoader.loaderPromise;
-
+        console.log("Finished loading");
         this.touchInput.onTapDown = (position: Point) => {
             const tapResult = this.interactionHandler.onTapDown(position);
             this.render(DrawMode.Gesture);

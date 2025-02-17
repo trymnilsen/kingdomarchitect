@@ -127,7 +127,7 @@ export function shuffleItems<T>(array: T[]): T[] {
  * @param array
  * @returns the first value mapped or null if none
  */
-export function firstMap<T, R>(
+export function findMapped<T, R>(
     array: T[],
     mapper: (value: T) => R | null,
 ): R | null {

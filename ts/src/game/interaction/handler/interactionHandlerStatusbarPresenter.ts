@@ -42,8 +42,8 @@ export class InteractionHandlerStatusbarPresenter {
         this._rootView = uiBox({
             width: fillUiSize,
             height: wrapUiSize,
-            padding: allSides(16),
-            //background: colorBackground("red"),
+            padding: allSides(8),
+            background: colorBackground("#191a19"),
             //alignment: uiAlignment.center,
             children: [
                 uiRow({
