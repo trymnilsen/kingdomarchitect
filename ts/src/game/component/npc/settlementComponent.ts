@@ -1,3 +1,10 @@
 import { EntityComponent } from "../entityComponent.js";
 
-export class SettlementComponent extends EntityComponent {}
+export enum SettlementType {
+    Orc,
+    Human,
+}
+
+export class SettlementComponent extends EntityComponent {
+    public type: SettlementType = SettlementType.Human;
+}

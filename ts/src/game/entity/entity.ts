@@ -204,7 +204,16 @@ export class Entity {
         entity.gameTime = this._gameTime;
         // Update the transform of the entity (also bubbles a transform
         // change adding the entity ot the chunk map if its not present)
-        entity.updateTransform();
+        // We want the world position to be the same, so we need to calculate
+        // a new local position. Setting the local position also trigges and
+        // update transform
+        const newLocal = subtractPoint(
+            entity.worldPosition,
+            this.worldPosition,
+        );
+        this._localPosition = newLocal;
+        //entity.updateTransform();
+
         // Bubble change
         this.bubbleEvent({
             id: "child_added",

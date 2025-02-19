@@ -28,7 +28,10 @@ export function generateChunk(rootEntity: Entity, chunkPoint: Point) {
     const createNewVolume = Math.random() > 0.8;
 
     let chunk: TileChunk | undefined = undefined;
-    if (createNewVolume || adjacentVolumes.length == 0) {
+    if (
+        tileComponent.numberOfChunks > 1 &&
+        (createNewVolume || adjacentVolumes.length == 0)
+    ) {
         const maxSize = weightedRandomEntry(
             [1, 2, 4, 8, 12, 16, 24, 32],
             [1, 2, 5, 10, 10, 8, 6, 4],
@@ -59,7 +62,13 @@ export function generateChunk(rootEntity: Entity, chunkPoint: Point) {
         //and expand the largest
         const chosenVolume = weightedRandomEntry(
             adjacentVolumes,
-            adjacentVolumes.map((volume) => volume.maxSize),
+            adjacentVolumes.map(
+                (volume) =>
+                    volume.maxSize +
+                    Math.floor(
+                        ((volume.maxSize - volume.size) / volume.maxSize) * 32,
+                    ),
+            ),
         );
         chosenVolume.size += 1;
         chosenVolume.chunks.push({ x: chunkPoint.x, y: chunkPoint.y });

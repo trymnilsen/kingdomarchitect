@@ -20,12 +20,14 @@ import { workerPrefab } from "../prefab/workerPrefab.js";
 import { spawnTree } from "./item/vegetation.js";
 
 export function addInitialPlayerChunk(rootEntity: Entity) {
+    const chunkEntity = new Entity("chunk");
+    rootEntity.addChild(chunkEntity);
     rootEntity.requireComponent(TilesComponent).setChunk({
         chunkX: 0,
         chunkY: 0,
         volume: {
             id: generateId("volume"),
-            maxSize: Math.ceil(Math.random() * 4),
+            maxSize: Math.floor(Math.random() * 4) + 2,
             type: "forrest",
             size: 1,
             chunks: [{ x: 0, y: 0 }],
@@ -56,11 +58,11 @@ export function addInitialPlayerChunk(rootEntity: Entity) {
     firstWorker.position = { x: 0 + randomOffsetX, y: 1 + randomOffsetY };
     well.position = { x: 1 + randomOffsetX, y: 1 + randomOffsetY };
     trainingDummy.position = { x: 1, y: 1 };
-    rootEntity.addChild(firstFarm);
-    rootEntity.addChild(firstWorker);
-    rootEntity.addChild(firstHouse);
-    rootEntity.addChild(firstTree);
-    rootEntity.addChild(well);
-    rootEntity.addChild(chest);
-    spawnTree(16, { x: 0, y: 0 }, rootEntity);
+    chunkEntity.addChild(firstFarm);
+    chunkEntity.addChild(firstWorker);
+    chunkEntity.addChild(firstHouse);
+    chunkEntity.addChild(firstTree);
+    chunkEntity.addChild(well);
+    chunkEntity.addChild(chest);
+    spawnTree(16, { x: 0, y: 0 }, chunkEntity);
 }
