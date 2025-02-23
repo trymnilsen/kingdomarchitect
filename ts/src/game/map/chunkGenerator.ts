@@ -34,7 +34,7 @@ export function generateChunk(rootEntity: Entity, chunkPoint: Point) {
     ) {
         const maxSize = weightedRandomEntry(
             [1, 2, 4, 8, 12, 16, 24, 32],
-            [1, 2, 5, 10, 10, 8, 6, 4],
+            [1, 5, 20, 10, 5, 4, 2, 1],
         );
         const volumeType = randomEntry([
             "desert",
