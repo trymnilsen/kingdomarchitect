@@ -14,12 +14,18 @@ import {
     subtractPoint,
     zeroPoint,
 } from "../../common/point.js";
+import { ReadableSet } from "../../common/structure/sparseSet.js";
 import { GameTime } from "../../common/time.js";
 import { DrawMode } from "../../rendering/drawMode.js";
 import { RenderScope } from "../../rendering/renderScope.js";
 import { RenderVisibilityMap } from "../../rendering/renderVisibilityMap.js";
 import { ComponentEvent } from "../component/componentEvent.js";
 import { ComponentQueryCache } from "../component/componentQueryCache.js";
+import {
+    ComponentsQueryCache2 as ComponentQueryCache2,
+    QueryData,
+    QueryObject,
+} from "../component/componentQueryCache2.js";
 import { EntityComponent } from "../component/entityComponent.js";
 import { TilesComponent } from "../component/tile/tilesComponent.js";
 import { TileSize } from "../map/tile.js";
@@ -46,6 +52,7 @@ export class Entity {
     private _entityEvents = new Event<EntityEvent>();
     private _componentsMap = new Map<string, EntityComponent>();
     private _componentsQueryCache?: ComponentQueryCache;
+    private _componentsQueryCache2?: ComponentQueryCache2;
     private _gameTime?: GameTime;
 
     constructor(readonly id: string) {}
@@ -441,6 +448,18 @@ export class Entity {
         return childComponents;
     }
 
+    queryComponents2<T extends QueryObject>(
+        queryObject: T,
+    ): Iterable<QueryData<T>> {
+        let cache = this._componentsQueryCache2;
+        if (!cache) {
+            cache = new ComponentQueryCache2(this.getRootEntity());
+            this._componentsQueryCache2 = cache;
+        }
+
+        return cache.query(queryObject);
+    }
+
     /**
      * Request the entity runs its onDraw for components and children.
      * Note: this method has a varying frequency of updates. Any logic that
@@ -550,6 +569,25 @@ export class Entity {
 
     bubbleEvent(event: EntityEvent) {
         try {
+            if (!!this._componentsQueryCache2) {
+                switch (event.id) {
+                    case "child_added":
+                        this._componentsQueryCache2.addEntity(event.target);
+                        break;
+                    case "child_removed":
+                        this._componentsQueryCache2.removeEntity(event.target);
+                        break;
+                    case "component_added":
+                        this._componentsQueryCache2.addComponent(event.item);
+                        break;
+                    case "component_removed":
+                        this._componentsQueryCache2.removeComponent(event.item);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
             if (!!this._componentsQueryCache) {
                 if (event.id == "child_added" || event.id == "child_removed") {
                     this._componentsQueryCache.clearAll();
