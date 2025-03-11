@@ -90,8 +90,6 @@ export class TilesComponent extends EntityComponent {
         if (!!chunk) {
             const tileId = getTileId(tilePosition.x, tilePosition.y);
             chunk.discovered.add(tileId);
-        } else {
-            console.log("Cannot discover tile", tilePosition, chunkId);
         }
     }
 
