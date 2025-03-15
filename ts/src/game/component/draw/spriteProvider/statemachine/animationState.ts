@@ -39,7 +39,6 @@ export class LoopingAnimationState extends AnimationState {
         if (drawTick % this.ticksPerFrame != 0) {
             return;
         }
-
         const clampedFrame =
             (this._currentFrame + 1) % this.sprite.defintion.frames;
         this._currentFrame = clampedFrame;

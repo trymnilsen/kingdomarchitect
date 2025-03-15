@@ -59,7 +59,7 @@ export function addInitialPlayerChunk(rootEntity: Entity) {
     well.position = { x: 1 + randomOffsetX, y: 1 + randomOffsetY };
     trainingDummy.position = { x: 1, y: 1 };
     chunkEntity.addChild(firstFarm);
-    chunkEntity.addChild(firstWorker);
+    chunkEntity.getRootEntity().addChild(firstWorker);
     chunkEntity.addChild(firstHouse);
     chunkEntity.addChild(firstTree);
     chunkEntity.addChild(well);

@@ -5,7 +5,7 @@
     "tasks": [
         {
             "type": "npm",
-            "script": "bundle",
+            "script": "build",
             "dependsOn": ["build typescript"],
             "label": "bundle typescript",
             "group": {

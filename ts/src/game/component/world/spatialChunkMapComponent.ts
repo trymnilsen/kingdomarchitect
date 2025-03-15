@@ -50,12 +50,12 @@ export class SpatialChunkMapComponent extends EntityComponent {
      */
     removeEntity(entity: Entity): void {
         const chunkForEntity = this.entityChunkMap.get(entity.id);
-        if (!chunkForEntity) {
+        if (chunkForEntity === undefined) {
             return;
         }
 
         const chunk = this.chunks.get(chunkForEntity);
-        if (!chunk) {
+        if (chunk === undefined) {
             return;
         }
 
@@ -65,7 +65,7 @@ export class SpatialChunkMapComponent extends EntityComponent {
 
     updateEntity(entity: Entity): void {
         const currentChunkId = this.entityChunkMap.get(entity.id);
-        if (!currentChunkId) {
+        if (currentChunkId === undefined) {
             this.addEntity(entity);
             return;
         }
@@ -73,7 +73,7 @@ export class SpatialChunkMapComponent extends EntityComponent {
         const chunkX = Math.floor(entity.worldPosition.x / ChunkSize);
         const chunkY = Math.floor(entity.worldPosition.y / ChunkSize);
         const newChunkKey = encodePosition(chunkX, chunkY);
-        if (currentChunkId == newChunkKey) {
+        if (currentChunkId === newChunkKey) {
             return;
         }
         const currentChunk = this.getOrCreateChunk(currentChunkId);

@@ -62,8 +62,8 @@ export function getRandomAxis(): Axis {
 }
 
 export enum Axis {
-    XAxis,
-    YAxis,
+    XAxis = "XAxis",
+    YAxis = "YAxis",
 }
 
 export const verticalDirections: Readonly<Direction[]> = [
