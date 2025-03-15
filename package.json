@@ -14,7 +14,7 @@
         "spritepack": "tsc && node build/tool/spritepack/spritePack.js && npm run build",
         "test": "vitest run",        
         "format": "prettier ts/ --write",
-        "check-format": "prettier ts/ --check"
+        "check-format": "prettier --check ts/**/*.ts"
     },
     "repository": {
         "type": "git",
