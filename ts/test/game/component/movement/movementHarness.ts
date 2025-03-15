@@ -1,3 +1,4 @@
+import { randomColor } from "../../../../src/common/color.js";
 import { Axis } from "../../../../src/common/direction.js";
 import { generateId } from "../../../../src/common/idGenerator.js";
 import { addPoint } from "../../../../src/common/point.js";
@@ -24,7 +25,14 @@ export function createTestRootNode(): Entity {
         chunkX: 0,
         chunkY: 0,
         discovered: new Set(),
-        type: "forrest",
+        volume: {
+            id: "testvolume",
+            type: "forrest",
+            chunks: [{ x: 0, y: 0 }],
+            maxSize: 4,
+            size: 1,
+            debugColor: randomColor(),
+        },
     });
 
     entity.addComponent(tilesComponent);

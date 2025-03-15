@@ -1,7 +1,9 @@
+import { Bounds } from "../../common/bounds.js";
 import { Point } from "../../common/point.js";
+import { TileSize } from "./tile.js";
 
 export const ChunkSize = 8;
-
+export const ChunkDimension = ChunkSize * TileSize;
 /**
  * Get the chunk the given world position is in
  * @param worldPosition
@@ -23,4 +25,13 @@ export function getChunkPosition(x: number, y: number): Point {
  */
 export function getChunkId(chunkPosition: Point): string {
     return `x${chunkPosition.x}y${chunkPosition.y}`;
+}
+
+export function getChunkBounds(chunk: Point): Bounds {
+    return {
+        x1: chunk.x * ChunkSize,
+        y1: chunk.y * ChunkSize,
+        x2: (chunk.x + 1) * ChunkSize - 1,
+        y2: (chunk.y + 1) * ChunkSize - 1,
+    };
 }

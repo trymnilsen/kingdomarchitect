@@ -100,6 +100,19 @@ export class RenderScope implements UIRenderScope, UILayoutScope {
         this._height = height;
     }
 
+    drawDottedLine(
+        x1: number,
+        y1: number,
+        x2: number,
+        y2: number,
+        color: string,
+        width: number,
+    ): void {
+        this.canvasContext.setLineDash([10, 10]);
+        this.drawLine(x1, y1, x2, y2, color, width);
+        this.canvasContext.setLineDash([]);
+    }
+
     drawLine(
         x1: number,
         y1: number,

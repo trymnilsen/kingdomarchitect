@@ -127,7 +127,7 @@ export function shuffleItems<T>(array: T[]): T[] {
  * @param array
  * @returns the first value mapped or null if none
  */
-export function firstMap<T, R>(
+export function findMapped<T, R>(
     array: T[],
     mapper: (value: T) => R | null,
 ): R | null {
@@ -164,4 +164,18 @@ export function arrayToOject<T>(
     }
 
     return map;
+}
+
+export function mapNotNullDistinct<T, U>(
+    array: T[],
+    mapFn: (item: T) => U | null | undefined,
+): U[] {
+    const result = new Set<U>();
+    for (const item of array) {
+        const mapped = mapFn(item);
+        if (mapped !== null && mapped !== undefined) {
+            result.add(mapped);
+        }
+    }
+    return Array.from(result);
 }

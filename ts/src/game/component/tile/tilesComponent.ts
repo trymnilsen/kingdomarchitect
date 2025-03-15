@@ -3,11 +3,17 @@ import { Bounds } from "../../../common/bounds.js";
 import { Point } from "../../../common/point.js";
 import { RenderScope } from "../../../rendering/renderScope.js";
 import { RenderVisibilityMap } from "../../../rendering/renderVisibilityMap.js";
-import { BiomeType, biomes } from "../../map/biome/biome.js";
-import { ChunkSize, getChunkId, getChunkPosition } from "../../map/chunk.js";
+import { BiomeType, biomes } from "../../map/biome.js";
+import {
+    ChunkDimension,
+    ChunkSize,
+    getChunkId,
+    getChunkPosition,
+} from "../../map/chunk.js";
 import { getTileId, TileSize } from "../../map/tile.js";
 import { EntityComponent } from "../entityComponent.js";
 import { Ground } from "./ground.js";
+import { Volume } from "./volume.js";
 
 export type GroundTile = {
     tileX: number;
@@ -29,15 +35,36 @@ type TilesBundle = {
 type TileMap = Record<string, GroundTile>;
 type GroundChunkMap = Record<string, GroundChunk>;
 
-type TileChunk = {
+export type TileChunk = {
     chunkX: number;
     chunkY: number;
+    volume: Volume;
     discovered: Set<string>;
-    type: BiomeType;
 };
 
+export function getChunkBounds(tileChunk: TileChunk): Bounds {
+    return {
+        x1: tileChunk.chunkX * ChunkSize,
+        y1: tileChunk.chunkY * ChunkSize,
+        x2: (tileChunk.chunkX + 1) * ChunkSize,
+        y2: (tileChunk.chunkY + 1) * ChunkSize,
+    };
+}
+
 export class TilesComponent extends EntityComponent {
-    private chunks = new Map<string, TileChunk>();
+    private _chunks = new Map<string, TileChunk>();
+
+    public get chunks(): Iterable<Readonly<TileChunk>> {
+        return this._chunks.values();
+    }
+
+    public get numberOfChunks(): number {
+        return this._chunks.size;
+    }
+
+    hasChunk(position: Point): boolean {
+        return this._chunks.has(getTileId(position.x, position.y));
+    }
 
     getBounds(): Bounds {
         //Loop over chunk map and get min and max
@@ -46,7 +73,7 @@ export class TilesComponent extends EntityComponent {
         let minY = Number.MAX_SAFE_INTEGER;
         let maxX = Number.MIN_SAFE_INTEGER;
         let maxY = Number.MIN_SAFE_INTEGER;
-        for (const [id, chunk] of this.chunks) {
+        for (const [id, chunk] of this._chunks) {
             if (chunk.chunkX > maxX) {
                 maxX = chunk.chunkX;
             }
@@ -68,9 +95,14 @@ export class TilesComponent extends EntityComponent {
         };
     }
 
+    getChunk(chunkPosition): TileChunk | null {
+        const chunkId = getTileId(chunkPosition.x, chunkPosition.y);
+        return this._chunks.get(chunkId) ?? null;
+    }
+
     getTile(tilePosition: Point): GroundTile | null {
         const chunkId = this.makeChunkId(tilePosition.x, tilePosition.y);
-        const chunk = this.chunks.get(chunkId);
+        const chunk = this._chunks.get(chunkId);
         if (!chunk) {
             return null;
         }
@@ -79,13 +111,13 @@ export class TilesComponent extends EntityComponent {
         return {
             tileX: tilePosition.x,
             tileY: tilePosition.y,
-            type: chunk.type,
+            type: chunk.volume.type,
         };
     }
 
     discoverTile(tilePosition: Point) {
         const chunkId = this.makeChunkId(tilePosition.x, tilePosition.y);
-        const chunk = this.chunks.get(chunkId);
+        const chunk = this._chunks.get(chunkId);
 
         if (!!chunk) {
             const tileId = getTileId(tilePosition.x, tilePosition.y);
@@ -110,12 +142,12 @@ export class TilesComponent extends EntityComponent {
 
     setChunk(chunk: TileChunk) {
         const chunkId = getTileId(chunk.chunkX, chunk.chunkY);
-        this.chunks.set(chunkId, chunk);
+        this._chunks.set(chunkId, chunk);
     }
 
     private makeChunkId(x: number, y: number) {
-        const cx = Math.floor(x / 32);
-        const cy = Math.floor(y / 32);
+        const cx = Math.floor(x / ChunkSize);
+        const cy = Math.floor(y / ChunkSize);
         return getTileId(cx, cy);
     }
 
@@ -124,17 +156,17 @@ export class TilesComponent extends EntityComponent {
         _screenPosition: Point,
         visiblityMap: RenderVisibilityMap,
     ): void {
-        for (const [chunkId, chunk] of this.chunks) {
+        for (const [chunkId, chunk] of this._chunks) {
             const chunkPosition = {
-                x: chunk.chunkX * 32,
-                y: chunk.chunkY * 32,
+                x: chunk.chunkX * ChunkSize,
+                y: chunk.chunkY * ChunkSize,
             };
             const screenPosition =
                 context.camera.tileSpaceToScreenSpace(chunkPosition);
 
             const withinTheViewport =
-                screenPosition.x + 32 * 40 > 0 &&
-                screenPosition.y + 32 * 40 > 0 &&
+                screenPosition.x + ChunkSize * 40 > 0 &&
+                screenPosition.y + ChunkSize * 40 > 0 &&
                 screenPosition.x - 40 < context.width &&
                 screenPosition.y - 40 < context.height;
 
@@ -142,14 +174,14 @@ export class TilesComponent extends EntityComponent {
                 continue;
             }
 
-            for (let x = 0; x < 32; x++) {
+            for (let x = 0; x < ChunkSize; x++) {
                 const tileX = screenPosition.x + x * 40;
                 const xWithin = tileX + 40 > 0 && tileX - 40 < context.width;
                 if (!xWithin) {
                     continue;
                 }
 
-                for (let y = 0; y < 32; y++) {
+                for (let y = 0; y < ChunkSize; y++) {
                     const tileY = screenPosition.y + y * 40;
                     let visible = true;
 
@@ -161,9 +193,9 @@ export class TilesComponent extends EntityComponent {
                         visible = visiblityMap.isVisible(tileX, tileY);
                     }
 
-                    let color = biomes[chunk.type].color;
+                    let color = biomes[chunk.volume.type].color;
                     if (!visible) {
-                        biomes[chunk.type].tint;
+                        biomes[chunk.volume.type].tint;
                     }
 
                     context.drawScreenSpaceRectangle({
@@ -174,6 +206,86 @@ export class TilesComponent extends EntityComponent {
                         fill: color,
                     });
                 }
+            }
+
+            context.drawScreenSpaceRectangle({
+                x: screenPosition.x + 16,
+                y: screenPosition.y + 16,
+                width: ChunkDimension - 32,
+                height: ChunkDimension - 32,
+                strokeWidth: 2,
+                strokeColor: chunk.volume.debugColor,
+            });
+
+            context.drawText({
+                text: chunk.volume.id,
+                x: screenPosition.x + 16,
+                y: screenPosition.y + 16,
+                color: "black",
+                size: 14,
+                font: "arial",
+            });
+            context.drawText({
+                text: chunk.volume.debugColor,
+                x: screenPosition.x + 16,
+                y: screenPosition.y + 16 + 20,
+                color: "black",
+                size: 14,
+                font: "arial",
+            });
+            context.drawText({
+                text: `maxSize: ${chunk.volume.maxSize}`,
+                x: screenPosition.x + 16,
+                y: screenPosition.y + 16 + 40,
+                color: "black",
+                size: 14,
+                font: "arial",
+            });
+            context.drawText({
+                text: `size: ${chunk.volume.size}`,
+                x: screenPosition.x + 16,
+                y: screenPosition.y + 16 + 60,
+                color: "black",
+                size: 14,
+                font: "arial",
+            });
+
+            if (visiblityMap.useVisibility) {
+                context.drawDottedLine(
+                    screenPosition.x + 8,
+                    screenPosition.y + 4,
+                    screenPosition.x + ChunkDimension - 8,
+                    screenPosition.y + 4,
+                    biomes.forrest.tint,
+                    8,
+                );
+
+                context.drawDottedLine(
+                    screenPosition.x + ChunkDimension - 4,
+                    screenPosition.y + 8,
+                    screenPosition.x + ChunkDimension - 4,
+                    screenPosition.y + ChunkDimension - 8,
+                    biomes.forrest.tint,
+                    8,
+                );
+
+                context.drawDottedLine(
+                    screenPosition.x + 8,
+                    screenPosition.y + ChunkDimension - 4,
+                    screenPosition.x + ChunkDimension - 8,
+                    screenPosition.y + ChunkDimension - 4,
+                    biomes.forrest.tint,
+                    8,
+                );
+
+                context.drawDottedLine(
+                    screenPosition.x + 4,
+                    screenPosition.y + 8,
+                    screenPosition.x + 4,
+                    screenPosition.y + ChunkDimension - 8,
+                    biomes.forrest.tint,
+                    8,
+                );
             }
         }
     }
