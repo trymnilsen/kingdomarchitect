@@ -119,7 +119,7 @@ export class BuildJob extends Job {
     private findClosestStockpile(): InventoryComponent2 | null {
         const inventories = this.entity
             .getRootEntity()
-            .queryComponents(InventoryComponent2)
+            .queryComponentsOld(InventoryComponent2)
             .filter((component) => {
                 // TODO: Improve the check for if the entity with inventory is a stockpile
                 const doesNotHaveAJobRunner =

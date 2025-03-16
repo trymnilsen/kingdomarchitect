@@ -40,7 +40,7 @@ export class JobSchedulerComponent extends EntityComponent {
     private assignJobToAvailableEntity(scheduledJob: Job) {
         const runners = this.entity
             .getRootEntity()
-            .queryComponents(JobRunnerComponent);
+            .queryComponentsOld(JobRunnerComponent);
 
         const candidates: { runner: JobRunnerComponent; rank: number }[] = [];
         for (const runner of runners) {

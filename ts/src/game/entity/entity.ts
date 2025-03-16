@@ -14,12 +14,19 @@ import {
     subtractPoint,
     zeroPoint,
 } from "../../common/point.js";
+import { ReadableSet, SparseSet } from "../../common/structure/sparseSet.js";
 import { GameTime } from "../../common/time.js";
 import { DrawMode } from "../../rendering/drawMode.js";
 import { RenderScope } from "../../rendering/renderScope.js";
 import { RenderVisibilityMap } from "../../rendering/renderVisibilityMap.js";
 import { ComponentEvent } from "../component/componentEvent.js";
 import { ComponentQueryCache } from "../component/componentQueryCache.js";
+import {
+    ComponentsQueryCache2 as ComponentQueryCache2,
+    QueryData,
+    QueryObject,
+    ComponentMap,
+} from "../component/componentQueryCache2.js";
 import { EntityComponent } from "../component/entityComponent.js";
 import { TilesComponent } from "../component/tile/tilesComponent.js";
 import { TileSize } from "../map/tile.js";
@@ -46,9 +53,10 @@ export class Entity {
     private _entityEvents = new Event<EntityEvent>();
     private _componentsMap = new Map<string, EntityComponent>();
     private _componentsQueryCache?: ComponentQueryCache;
+    private _componentsQueryCache2?: ComponentQueryCache2;
     private _gameTime?: GameTime;
 
-    constructor(readonly id: string) {}
+    constructor(readonly id: EntityId) {}
 
     /**
      * Returns the parent entity of this entity, can be null if this is the root
@@ -418,7 +426,7 @@ export class Entity {
      * all of the nested children
      * @param filterType the of components to query for
      */
-    queryComponents<TFilter extends EntityComponent>(
+    queryComponentsOld<TFilter extends EntityComponent>(
         filterType: ConstructorFunction<TFilter>,
     ): TFilter[] {
         if (!this._componentsQueryCache) {
@@ -439,6 +447,37 @@ export class Entity {
         this._componentsQueryCache.setComponents(filterType, childComponents);
 
         return childComponents;
+    }
+
+    queryComponents<T extends ConstructorFunction<EntityComponent>>(
+        component: T,
+    ): ReadableSet<InstanceType<T>, EntityId> {
+        //How do we avoid three (or two when old is removed) caches
+        const set = new SparseSet<InstanceType<T>, EntityId>(
+            (item) => item.entity.id,
+        );
+
+        visitChildren(this, (child) => {
+            const matchingComponent = child.getComponent(component);
+            if (matchingComponent) {
+                set.add(matchingComponent as InstanceType<T>);
+            }
+            return false;
+        });
+
+        return set;
+    }
+
+    queryMultipleComponents<T extends QueryObject>(
+        queryObject: T,
+    ): Iterable<QueryData<T>> {
+        let cache = this._componentsQueryCache2;
+        if (!cache) {
+            cache = new ComponentQueryCache2(this.getRootEntity());
+            this._componentsQueryCache2 = cache;
+        }
+
+        return cache.query(queryObject);
     }
 
     /**
@@ -550,6 +589,25 @@ export class Entity {
 
     bubbleEvent(event: EntityEvent) {
         try {
+            if (!!this._componentsQueryCache2) {
+                switch (event.id) {
+                    case "child_added":
+                        this._componentsQueryCache2.addEntity(event.target);
+                        break;
+                    case "child_removed":
+                        this._componentsQueryCache2.removeEntity(event.target);
+                        break;
+                    case "component_added":
+                        this._componentsQueryCache2.addComponent(event.item);
+                        break;
+                    case "component_removed":
+                        this._componentsQueryCache2.removeComponent(event.item);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
             if (!!this._componentsQueryCache) {
                 if (event.id == "child_added" || event.id == "child_removed") {
                     this._componentsQueryCache.clearAll();
@@ -580,6 +638,11 @@ export function assertEntity(
         throw new Error("Entity has not been resolved from id");
     }
 }
+
+/**
+ * Makes it more readable that we are referring to a an Entity ID
+ */
+export type EntityId = string;
 /*
 type Data = { foo: string };
 
