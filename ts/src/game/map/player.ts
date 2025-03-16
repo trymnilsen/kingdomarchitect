@@ -8,6 +8,7 @@ import {
     wizardHat,
 } from "../../data/inventory/items/equipment.js";
 import { goldCoins } from "../../data/inventory/items/resources.js";
+import { HousingComponent } from "../component/building/housingComponent.js";
 import { TilesComponent } from "../component/tile/tilesComponent.js";
 import { Entity } from "../entity/entity.js";
 import { chestPrefab } from "../prefab/chestPrefab.js";
@@ -57,6 +58,7 @@ export function addInitialPlayerChunk(rootEntity: Entity) {
     firstTree.position = { x: 2 + randomOffsetX, y: 2 + randomOffsetY };
     firstWorker.position = { x: 0 + randomOffsetX, y: 1 + randomOffsetY };
     well.position = { x: 1 + randomOffsetX, y: 1 + randomOffsetY };
+    firstHouse.requireComponent(HousingComponent).residentId = firstWorker.id;
     trainingDummy.position = { x: 1, y: 1 };
     chunkEntity.addChild(firstFarm);
     chunkEntity.addChild(firstWorker);

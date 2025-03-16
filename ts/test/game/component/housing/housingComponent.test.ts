@@ -1,5 +1,4 @@
 import { describe, it, expect } from "vitest";
-import { HousingComponent } from "../../../../src/game/component/housing/housingComponent.js";
 import { housePrefab } from "../../../../src/game/prefab/housePrefab.js";
 import { workerPrefab } from "../../../../src/game/prefab/workerPrefab.js";
 import { createRootEntity } from "../../../../src/game/entity/rootEntity.js";

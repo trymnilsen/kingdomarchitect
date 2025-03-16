@@ -14,7 +14,7 @@ import {
     subtractPoint,
     zeroPoint,
 } from "../../common/point.js";
-import { ReadableSet } from "../../common/structure/sparseSet.js";
+import { ReadableSet, SparseSet } from "../../common/structure/sparseSet.js";
 import { GameTime } from "../../common/time.js";
 import { DrawMode } from "../../rendering/drawMode.js";
 import { RenderScope } from "../../rendering/renderScope.js";
@@ -447,6 +447,25 @@ export class Entity {
         this._componentsQueryCache.setComponents(filterType, childComponents);
 
         return childComponents;
+    }
+
+    queryComponents<T extends ConstructorFunction<EntityComponent>>(
+        component: T,
+    ): ReadableSet<InstanceType<T>, EntityId> {
+        //How do we avoid three (or two when old is removed) caches
+        const set = new SparseSet<InstanceType<T>, EntityId>(
+            (item) => item.entity.id,
+        );
+
+        visitChildren(this, (child) => {
+            const matchingComponent = child.getComponent(component);
+            if (matchingComponent) {
+                set.add(matchingComponent as InstanceType<T>);
+            }
+            return false;
+        });
+
+        return set;
     }
 
     queryMultipleComponents<T extends QueryObject>(

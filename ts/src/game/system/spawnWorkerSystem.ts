@@ -16,12 +16,16 @@ import { workerPrefab } from "../prefab/workerPrefab.js";
 // Entity Event Add Worker -> runs system, check for available houses
 
 export function spawnWorkerSystem(rootEntity: Entity) {
-    const buildings = queryComponents(HousingComponent);
-    const workers = queryComponents(WorkerBehaviorComponent);
+    const buildings = rootEntity.queryComponents(HousingComponent);
+    const workers = rootEntity.queryComponents(WorkerBehaviorComponent);
     const availableHouses: HousingComponent[] = [];
     const workersWithHouse: Set<string> = new Set();
     for (let i = 0; i < buildings.size; i++) {
         const building = buildings.elementAt(i);
+        const component = building.entity.getComponent(BuildingComponent);
+        if (component && component.isScaffolded) {
+            continue;
+        }
         //Check if the resident id is still valid
         const resident = building.residentId;
         if (!!resident) {
@@ -33,9 +37,10 @@ export function spawnWorkerSystem(rootEntity: Entity) {
             } else {
                 //Add the residentId so we can skip it later when looking for
                 //homeless workers
+                workersWithHouse.add(resident);
             }
         } else {
-            //No resident, add this as an available dwelling
+            //No resident, add this sas an available dwelling
             availableHouses.push(building);
         }
     }
@@ -75,6 +80,6 @@ export function spawnWorkerSystem(rootEntity: Entity) {
     }
 }
 
-function removeHomelessEffect(entity: Entity) {}
+function removeHomelessEffect(_entity: Entity) {}
 
-function addHomelessEffect(entity: Entity) {}
+function addHomelessEffect(_entity: Entity) {}
