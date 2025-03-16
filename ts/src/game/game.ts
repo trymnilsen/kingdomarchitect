@@ -24,6 +24,7 @@ import { DrawMode } from "../rendering/drawMode.js";
 import { SpatialChunkMapComponent } from "./component/world/spatialChunkMapComponent.js";
 import { Camera } from "../rendering/camera.js";
 import { addInitialPlayerChunk } from "./map/player.js";
+import { spawnWorkerSystem } from "./system/spawnWorkerSystem.js";
 
 export class Game {
     private renderer: Renderer;
@@ -148,6 +149,7 @@ export class Game {
             this.updateTick += 1;
             this.gameTime.tick = this.updateTick;
             this.world.onUpdate(this.updateTick);
+            spawnWorkerSystem(this.world);
             this.interactionHandler.onUpdate(this.updateTick);
             this.updateVisibilityMap();
         }
@@ -164,7 +166,7 @@ export class Game {
         this.visibilityMap.clear();
         if (this.visibilityMap.useVisibility) {
             const visibilityComponents =
-                this.world.queryComponents(VisibilityComponent);
+                this.world.queryComponentsOld(VisibilityComponent);
             for (let i = 0; i < visibilityComponents.length; i++) {
                 const component = visibilityComponents[i];
                 const visiblePoints = component.getVisibility();

@@ -25,6 +25,7 @@ import {
     ComponentsQueryCache2 as ComponentQueryCache2,
     QueryData,
     QueryObject,
+    ComponentMap,
 } from "../component/componentQueryCache2.js";
 import { EntityComponent } from "../component/entityComponent.js";
 import { TilesComponent } from "../component/tile/tilesComponent.js";
@@ -55,7 +56,7 @@ export class Entity {
     private _componentsQueryCache2?: ComponentQueryCache2;
     private _gameTime?: GameTime;
 
-    constructor(readonly id: string) {}
+    constructor(readonly id: EntityId) {}
 
     /**
      * Returns the parent entity of this entity, can be null if this is the root
@@ -425,7 +426,7 @@ export class Entity {
      * all of the nested children
      * @param filterType the of components to query for
      */
-    queryComponents<TFilter extends EntityComponent>(
+    queryComponentsOld<TFilter extends EntityComponent>(
         filterType: ConstructorFunction<TFilter>,
     ): TFilter[] {
         if (!this._componentsQueryCache) {
@@ -448,7 +449,7 @@ export class Entity {
         return childComponents;
     }
 
-    queryComponents2<T extends QueryObject>(
+    queryMultipleComponents<T extends QueryObject>(
         queryObject: T,
     ): Iterable<QueryData<T>> {
         let cache = this._componentsQueryCache2;
@@ -618,6 +619,11 @@ export function assertEntity(
         throw new Error("Entity has not been resolved from id");
     }
 }
+
+/**
+ * Makes it more readable that we are referring to a an Entity ID
+ */
+export type EntityId = string;
 /*
 type Data = { foo: string };
 

@@ -4,6 +4,11 @@ import { selectFromChild } from "../entity/child/select.js";
 import { Entity } from "../entity/entity.js";
 import { EntityComponent } from "./entityComponent.js";
 
+export type ComponentMap<T extends ConstructorFunction<EntityComponent>[]> = {
+    [K in T[number] as K extends { name: infer Name extends string }
+        ? Name
+        : never]: InstanceType<K>;
+};
 export type QueryData<T extends QueryObject = QueryObject> = {
     [P in keyof T]: InstanceType<T[P]>;
 };

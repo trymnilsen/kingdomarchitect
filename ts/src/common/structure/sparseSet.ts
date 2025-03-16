@@ -1,19 +1,31 @@
-export interface ReadableSet<T> {
+export interface ReadableSet<T, K = T> {
     size: number;
     elementAt(index: number): T;
+    get(key: K): T | undefined;
 }
 
-export class SparseSet<T> implements ReadableSet<T> {
+export class SparseSet<T, K = T> implements ReadableSet<T, K> {
     dense: Array<T>;
-    sparse: Map<T, number>;
+    sparse: Map<K, number>;
+    private keySelector: (item: T) => K;
 
-    constructor() {
+    constructor(keySelector: (item: T) => K = (item) => item as unknown as K) {
         this.dense = [];
-        this.sparse = new Map<T, number>();
+        this.sparse = new Map<K, number>();
+        this.keySelector = keySelector;
     }
 
     get size(): number {
         return this.dense.length;
+    }
+
+    get(key: K) {
+        const index = this.sparse.get(key);
+        if (index !== undefined) {
+            return this.dense[index];
+        } else {
+            return undefined;
+        }
     }
 
     elementAt(index: number): T {
@@ -23,7 +35,7 @@ export class SparseSet<T> implements ReadableSet<T> {
         return this.dense[index];
     }
 
-    contains(key: T) {
+    contains(key: K) {
         return this.sparse.has(key);
 
         /*
@@ -37,7 +49,7 @@ export class SparseSet<T> implements ReadableSet<T> {
         */
     }
 
-    delete(key: T): boolean {
+    delete(key: K): boolean {
         if (!this.contains(key)) {
             return false;
         }
@@ -48,7 +60,7 @@ export class SparseSet<T> implements ReadableSet<T> {
         // If we're not removing the last element, swap and update indices
         if (denseIndex < this.dense.length) {
             this.dense[denseIndex] = lastItem;
-            this.sparse.set(lastItem, denseIndex);
+            this.sparse.set(this.keySelector(lastItem), denseIndex);
         }
 
         // Remove the key from the sparse map
@@ -57,11 +69,12 @@ export class SparseSet<T> implements ReadableSet<T> {
     }
 
     add(item: T) {
-        if (this.contains(item)) {
+        const key = this.keySelector(item);
+        if (this.contains(key)) {
             return;
         }
 
-        this.sparse.set(item, this.dense.length);
+        this.sparse.set(key, this.dense.length);
         this.dense.push(item);
     }
 }
