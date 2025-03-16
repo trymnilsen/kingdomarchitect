@@ -1,4 +1,8 @@
-import { adjacentPoints, Point } from "../../../../common/point.js";
+import {
+    adjacentPoints,
+    encodePosition,
+    Point,
+} from "../../../../common/point.js";
 import { Entity } from "../../../entity/entity.js";
 import { TilesComponent } from "../../tile/tilesComponent.js";
 import { SpatialChunkMapComponent } from "../../world/spatialChunkMapComponent.js";
@@ -9,38 +13,38 @@ export function findClosestAvailablePosition(entity: Entity): Point | null {
     const groundComponent = root.requireComponent(TilesComponent);
     const chunkMap = root.requireComponent(SpatialChunkMapComponent);
 
-    const entitiesToVisit: Entity[] = [entity];
-    const visitedEntities = new Set<string>();
+    const PointsToVisit: Point[] = [entity.worldPosition];
+    const visitedPoints = new Set<number>();
 
-    while (entitiesToVisit.length > 0) {
-        const nextVisit = entitiesToVisit.pop();
+    while (PointsToVisit.length > 0) {
+        const nextVisit = PointsToVisit.pop();
         if (!nextVisit) {
             return null;
         }
 
-        const weight = getWeightAtPoint(
-            nextVisit.worldPosition,
-            root,
-            groundComponent,
-        );
+        const weight = getWeightAtPoint(nextVisit, root, groundComponent);
 
         if (weight == 0) {
             continue;
         }
 
         if (weight < 5) {
-            return nextVisit.worldPosition;
+            return nextVisit;
         }
 
-        const adjacent = adjacentPoints(nextVisit.worldPosition);
-        const adjacentEntities = adjacent.flatMap((adjacentPoint) => {
-            return chunkMap.getEntitiesAt(adjacentPoint.x, adjacentPoint.y);
+        const adjacent = adjacentPoints(nextVisit);
+        const adjacentEntities = adjacent.filter((adjacentPoint) => {
+            return (
+                chunkMap.getEntitiesAt(adjacentPoint.x, adjacentPoint.y)
+                    .length == 0
+            );
         });
 
         for (const adjacentEntity of adjacentEntities) {
-            if (!visitedEntities.has(adjacentEntity.id)) {
-                visitedEntities.add(adjacentEntity.id);
-                entitiesToVisit.push(adjacentEntity);
+            const pointId = encodePosition(adjacentEntity.x, adjacentEntity.y);
+            if (!visitedPoints.has(pointId)) {
+                visitedPoints.add(pointId);
+                PointsToVisit.push(adjacentEntity);
             }
         }
     }
