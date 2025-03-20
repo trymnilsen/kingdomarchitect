@@ -3,8 +3,8 @@ import { WorkerBehaviorComponent } from "../../../../../component/behavior/worke
 import { BuildingComponent } from "../../../../../component/building/buildingComponent.js";
 import { HealthComponent } from "../../../../../component/health/healthComponent.js";
 import { JobQueueComponent } from "../../../../../component/job/jobQueueComponent.js";
-import { SelectedEntityItem } from "../../../../../selection/selectedEntityItem.js";
-import { SelectedWorldItem } from "../../../../../selection/selectedWorldItem.js";
+import { SelectedEntityItem } from "../../../../../../module/selection/selectedEntityItem.js";
+import { SelectedWorldItem } from "../../../../../../module/selection/selectedWorldItem.js";
 import { StateContext } from "../../../../handler/stateContext.js";
 import { ButtonCollection } from "../../../../view/actionbar/buttonCollection.js";
 import {

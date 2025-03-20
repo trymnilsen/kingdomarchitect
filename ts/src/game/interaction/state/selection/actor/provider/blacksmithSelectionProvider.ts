@@ -1,9 +1,9 @@
 import { sprites2 } from "../../../../../../asset/sprite.js";
 import { blacksmith } from "../../../../../../data/building/stone/blacksmith.js";
 import { BuildingComponent } from "../../../../../component/building/buildingComponent.js";
-import { SelectedEntityItem } from "../../../../../selection/selectedEntityItem.js";
-import { SelectedTileItem } from "../../../../../selection/selectedTileItem.js";
-import { SelectedWorldItem } from "../../../../../selection/selectedWorldItem.js";
+import { SelectedEntityItem } from "../../../../../../module/selection/selectedEntityItem.js";
+import { SelectedTileItem } from "../../../../../../module/selection/selectedTileItem.js";
+import { SelectedWorldItem } from "../../../../../../module/selection/selectedWorldItem.js";
 import { StateContext } from "../../../../handler/stateContext.js";
 import { ButtonCollection } from "../../../../view/actionbar/buttonCollection.js";
 import { CraftWithBuildingState } from "../../../craft/craftWithBuildingState.js";

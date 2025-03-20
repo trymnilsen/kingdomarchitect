@@ -1,6 +1,6 @@
-import { SelectedEntityItem } from "../../../selection/selectedEntityItem.js";
-import { SelectedTileItem } from "../../../selection/selectedTileItem.js";
-import { SelectedWorldItem } from "../../../selection/selectedWorldItem.js";
+import { SelectedEntityItem } from "../../../../module/selection/selectedEntityItem.js";
+import { SelectedTileItem } from "../../../../module/selection/selectedTileItem.js";
+import { SelectedWorldItem } from "../../../../module/selection/selectedWorldItem.js";
 import { Job } from "../job.js";
 import { ChopTreeJob } from "../jobs/chopTreeJob.js";
 import { JobQuery } from "./jobQuery.js";

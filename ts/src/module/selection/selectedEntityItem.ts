@@ -1,5 +1,5 @@
 import { Point } from "../../common/point.js";
-import { Entity } from "../entity/entity.js";
+import { Entity } from "../../game/entity/entity.js";
 import { SelectedWorldItem } from "./selectedWorldItem.js";
 
 export class SelectedEntityItem implements SelectedWorldItem {
