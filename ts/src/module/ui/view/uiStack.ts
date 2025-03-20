@@ -1,6 +1,6 @@
-import { Point } from "../../common/point.js";
-import { zeroSides } from "../../common/sides.js";
-import { UIRenderScope } from "../../rendering/uiRenderContext.js";
+import { Point } from "../../../common/point.js";
+import { zeroSides } from "../../../common/sides.js";
+import { UIRenderScope } from "../../../rendering/uiRenderContext.js";
 import { UILayoutScope } from "../uiLayoutContext.js";
 import { fillUiSize, UISize, zeroSize } from "../uiSize.js";
 import { UIView } from "../uiView.js";

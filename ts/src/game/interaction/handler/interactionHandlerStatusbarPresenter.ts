@@ -4,17 +4,20 @@ import { subTitleTextStyle } from "../../../rendering/text/textStyle.js";
 import {
     colorBackground,
     ninePatchBackground,
-} from "../../../ui/dsl/uiBackgroundDsl.js";
-import { uiBox } from "../../../ui/dsl/uiBoxDsl.js";
-import { uiButton } from "../../../ui/dsl/uiButtonDsl.js";
-import { spriteImageSource, uiImage } from "../../../ui/dsl/uiImageDsl.js";
-import { uiRow } from "../../../ui/dsl/uiRowDsl.js";
-import { uiSpace } from "../../../ui/dsl/uiSpaceDsl.js";
-import { uiText } from "../../../ui/dsl/uiTextDsl.js";
-import { uiAlignment } from "../../../ui/uiAlignment.js";
-import { fillUiSize, wrapUiSize } from "../../../ui/uiSize.js";
-import { UIView } from "../../../ui/uiView.js";
-import { UIText } from "../../../ui/view/uiText.js";
+} from "../../../module/ui/dsl/uiBackgroundDsl.js";
+import { uiBox } from "../../../module/ui/dsl/uiBoxDsl.js";
+import { uiButton } from "../../../module/ui/dsl/uiButtonDsl.js";
+import {
+    spriteImageSource,
+    uiImage,
+} from "../../../module/ui/dsl/uiImageDsl.js";
+import { uiRow } from "../../../module/ui/dsl/uiRowDsl.js";
+import { uiSpace } from "../../../module/ui/dsl/uiSpaceDsl.js";
+import { uiText } from "../../../module/ui/dsl/uiTextDsl.js";
+import { uiAlignment } from "../../../module/ui/uiAlignment.js";
+import { fillUiSize, wrapUiSize } from "../../../module/ui/uiSize.js";
+import { UIView } from "../../../module/ui/uiView.js";
+import { UIText } from "../../../module/ui/view/uiText.js";
 
 export class InteractionHandlerStatusbarPresenter {
     private _rootView: UIView;

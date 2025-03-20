@@ -1,11 +1,11 @@
 import { Sprite2, sprites2 } from "../../../../../module/asset/sprite.js";
 import { allSides } from "../../../../../common/sides.js";
 import { UIRenderScope } from "../../../../../rendering/uiRenderContext.js";
-import { UIThemeType } from "../../../../../ui/color.js";
-import { ninePatchBackground } from "../../../../../ui/dsl/uiBackgroundDsl.js";
-import { UILayoutScope } from "../../../../../ui/uiLayoutContext.js";
-import { fillUiSize, UISize } from "../../../../../ui/uiSize.js";
-import { UIButton } from "../../../../../ui/view/uiButton.js";
+import { UIThemeType } from "../../../../../module/ui/color.js";
+import { ninePatchBackground } from "../../../../../module/ui/dsl/uiBackgroundDsl.js";
+import { UILayoutScope } from "../../../../../module/ui/uiLayoutContext.js";
+import { fillUiSize, UISize } from "../../../../../module/ui/uiSize.js";
+import { UIButton } from "../../../../../module/ui/view/uiButton.js";
 
 export class UIInventoryGridItem extends UIButton {
     constructor(

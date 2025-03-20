@@ -3,18 +3,24 @@ import { Point, addPoint } from "../../../common/point.js";
 import { allSides } from "../../../common/sides.js";
 import { uiDebug } from "../../../constants.js";
 import { UIRenderScope } from "../../../rendering/uiRenderContext.js";
-import { ninePatchBackground } from "../../../ui/dsl/uiBackgroundDsl.js";
-import { uiButton } from "../../../ui/dsl/uiButtonDsl.js";
-import { ColumnChild, uiColumn } from "../../../ui/dsl/uiColumnDsl.js";
-import { spriteImageSource, uiImage } from "../../../ui/dsl/uiImageDsl.js";
-import { uiSpace } from "../../../ui/dsl/uiSpaceDsl.js";
-import { HorizontalAlignment, uiAlignment } from "../../../ui/uiAlignment.js";
-import { UILayoutScope } from "../../../ui/uiLayoutContext.js";
-import { UISize, wrapUiSize, zeroSize } from "../../../ui/uiSize.js";
-import { UIView } from "../../../ui/uiView.js";
-import { NullView } from "../../../ui/view/nullView.js";
-import { UIColumn } from "../../../ui/view/uiColumn.js";
-import { OpenBookUIBackground } from "../../../ui/visual/bookBackground.js";
+import { ninePatchBackground } from "../../../module/ui/dsl/uiBackgroundDsl.js";
+import { uiButton } from "../../../module/ui/dsl/uiButtonDsl.js";
+import { ColumnChild, uiColumn } from "../../../module/ui/dsl/uiColumnDsl.js";
+import {
+    spriteImageSource,
+    uiImage,
+} from "../../../module/ui/dsl/uiImageDsl.js";
+import { uiSpace } from "../../../module/ui/dsl/uiSpaceDsl.js";
+import {
+    HorizontalAlignment,
+    uiAlignment,
+} from "../../../module/ui/uiAlignment.js";
+import { UILayoutScope } from "../../../module/ui/uiLayoutContext.js";
+import { UISize, wrapUiSize, zeroSize } from "../../../module/ui/uiSize.js";
+import { UIView } from "../../../module/ui/uiView.js";
+import { NullView } from "../../../module/ui/view/nullView.js";
+import { UIColumn } from "../../../module/ui/view/uiColumn.js";
+import { OpenBookUIBackground } from "../../../module/ui/visual/bookBackground.js";
 /**
  * Create a view that has two sections, a left and right page (sometimes
  * referred to as the details page). Optional tabs can be added on the left

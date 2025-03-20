@@ -4,11 +4,11 @@ import {
     boundsEquals,
     boundsOverlap,
     withinRectangle,
-} from "../common/bounds.js";
-import { Direction } from "../common/direction.js";
-import { Event, EventListener } from "../common/event.js";
-import { addPoint, Point, zeroPoint } from "../common/point.js";
-import { UIRenderScope } from "../rendering/uiRenderContext.js";
+} from "../../common/bounds.js";
+import { Direction } from "../../common/direction.js";
+import { Event, EventListener } from "../../common/event.js";
+import { addPoint, Point, zeroPoint } from "../../common/point.js";
+import { UIRenderScope } from "../../rendering/uiRenderContext.js";
 import {
     tapStartType,
     tapType,

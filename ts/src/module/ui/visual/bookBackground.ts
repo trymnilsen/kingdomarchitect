@@ -1,7 +1,7 @@
-import { sprites2 } from "../../module/asset/sprite.js";
-import { Point } from "../../common/point.js";
-import { allSides } from "../../common/sides.js";
-import { UIRenderScope } from "../../rendering/uiRenderContext.js";
+import { sprites2 } from "../../asset/sprite.js";
+import { Point } from "../../../common/point.js";
+import { allSides } from "../../../common/sides.js";
+import { UIRenderScope } from "../../../rendering/uiRenderContext.js";
 import { UIBackground } from "../uiBackground.js";
 import { UISize } from "../uiSize.js";
 

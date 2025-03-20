@@ -1,7 +1,7 @@
 import { sprites2 } from "../../../../module/asset/sprite.js";
 import { RenderScope } from "../../../../rendering/renderScope.js";
-import { uiBox } from "../../../../ui/dsl/uiBoxDsl.js";
-import { fillUiSize } from "../../../../ui/uiSize.js";
+import { uiBox } from "../../../../module/ui/dsl/uiBoxDsl.js";
+import { fillUiSize } from "../../../../module/ui/uiSize.js";
 import { JobQueueComponent } from "../../../component/job/jobQueueComponent.js";
 import { ChopTreeJob } from "../../../component/job/jobs/chopTreeJob.js";
 import { TreeComponent } from "../../../component/resource/treeComponent.js";

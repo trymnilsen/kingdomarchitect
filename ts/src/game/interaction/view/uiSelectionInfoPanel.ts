@@ -4,20 +4,23 @@ import {
     graySubTitleTextStyle,
     subTitleTextStyle,
 } from "../../../rendering/text/textStyle.js";
-import { ninePatchBackground } from "../../../ui/dsl/uiBackgroundDsl.js";
-import { uiBox } from "../../../ui/dsl/uiBoxDsl.js";
-import { uiColumn } from "../../../ui/dsl/uiColumnDsl.js";
-import { spriteImageSource, uiImage } from "../../../ui/dsl/uiImageDsl.js";
-import { uiRow } from "../../../ui/dsl/uiRowDsl.js";
-import { uiSpace } from "../../../ui/dsl/uiSpaceDsl.js";
-import { uiText } from "../../../ui/dsl/uiTextDsl.js";
-import { HorizontalAlignment } from "../../../ui/uiAlignment.js";
-import { UISize, wrapUiSize } from "../../../ui/uiSize.js";
-import { UIViewVisiblity } from "../../../ui/uiView.js";
-import { UIBox } from "../../../ui/view/uiBox.js";
-import { UIImage } from "../../../ui/view/uiImage.js";
-import { UISpriteImageSource } from "../../../ui/view/uiImageSource.js";
-import { UIText } from "../../../ui/view/uiText.js";
+import { ninePatchBackground } from "../../../module/ui/dsl/uiBackgroundDsl.js";
+import { uiBox } from "../../../module/ui/dsl/uiBoxDsl.js";
+import { uiColumn } from "../../../module/ui/dsl/uiColumnDsl.js";
+import {
+    spriteImageSource,
+    uiImage,
+} from "../../../module/ui/dsl/uiImageDsl.js";
+import { uiRow } from "../../../module/ui/dsl/uiRowDsl.js";
+import { uiSpace } from "../../../module/ui/dsl/uiSpaceDsl.js";
+import { uiText } from "../../../module/ui/dsl/uiTextDsl.js";
+import { HorizontalAlignment } from "../../../module/ui/uiAlignment.js";
+import { UISize, wrapUiSize } from "../../../module/ui/uiSize.js";
+import { UIViewVisiblity } from "../../../module/ui/uiView.js";
+import { UIBox } from "../../../module/ui/view/uiBox.js";
+import { UIImage } from "../../../module/ui/view/uiImage.js";
+import { UISpriteImageSource } from "../../../module/ui/view/uiImageSource.js";
+import { UIText } from "../../../module/ui/view/uiText.js";
 import { SelectionInfo } from "../../component/selection/selectionInfo.js";
 
 export class UISelectorInfoPanel extends UIBox {

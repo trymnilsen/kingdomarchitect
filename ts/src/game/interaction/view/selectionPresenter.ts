@@ -4,21 +4,24 @@ import { subTitleTextStyle } from "../../../rendering/text/textStyle.js";
 import {
     colorBackground,
     ninePatchBackground,
-} from "../../../ui/dsl/uiBackgroundDsl.js";
-import { uiBox } from "../../../ui/dsl/uiBoxDsl.js";
-import { uiButton } from "../../../ui/dsl/uiButtonDsl.js";
-import { uiColumn } from "../../../ui/dsl/uiColumnDsl.js";
-import { spriteImageSource, uiImage } from "../../../ui/dsl/uiImageDsl.js";
-import { uiRow } from "../../../ui/dsl/uiRowDsl.js";
-import { uiSpace } from "../../../ui/dsl/uiSpaceDsl.js";
-import { uiStack } from "../../../ui/dsl/uiStack.js";
-import { uiText } from "../../../ui/dsl/uiTextDsl.js";
-import { uiAlignment } from "../../../ui/uiAlignment.js";
-import { SpriteBackground } from "../../../ui/uiBackground.js";
-import { fillUiSize, wrapUiSize } from "../../../ui/uiSize.js";
-import { UIView } from "../../../ui/uiView.js";
-import { UIBox } from "../../../ui/view/uiBox.js";
-import { UIColumn } from "../../../ui/view/uiColumn.js";
+} from "../../../module/ui/dsl/uiBackgroundDsl.js";
+import { uiBox } from "../../../module/ui/dsl/uiBoxDsl.js";
+import { uiButton } from "../../../module/ui/dsl/uiButtonDsl.js";
+import { uiColumn } from "../../../module/ui/dsl/uiColumnDsl.js";
+import {
+    spriteImageSource,
+    uiImage,
+} from "../../../module/ui/dsl/uiImageDsl.js";
+import { uiRow } from "../../../module/ui/dsl/uiRowDsl.js";
+import { uiSpace } from "../../../module/ui/dsl/uiSpaceDsl.js";
+import { uiStack } from "../../../module/ui/dsl/uiStack.js";
+import { uiText } from "../../../module/ui/dsl/uiTextDsl.js";
+import { uiAlignment } from "../../../module/ui/uiAlignment.js";
+import { SpriteBackground } from "../../../module/ui/uiBackground.js";
+import { fillUiSize, wrapUiSize } from "../../../module/ui/uiSize.js";
+import { UIView } from "../../../module/ui/uiView.js";
+import { UIBox } from "../../../module/ui/view/uiBox.js";
+import { UIColumn } from "../../../module/ui/view/uiColumn.js";
 import { SelectionInfo } from "../../component/selection/selectionInfo.js";
 import { UIActionbarItem } from "./actionbar/uiActionbar.js";
 import { actionbarWidth } from "./actionbar/uiActionbarConstants.js";

@@ -1,12 +1,15 @@
-import { Point, zeroPoint } from "../../common/point.js";
+import { Point, zeroPoint } from "../../../common/point.js";
 import {
     Sides,
     totalHorizontal,
     totalVertical,
     zeroSides,
-} from "../../common/sides.js";
-import { defaultTextStyle, TextStyle } from "../../rendering/text/textStyle.js";
-import { UIRenderScope } from "../../rendering/uiRenderContext.js";
+} from "../../../common/sides.js";
+import {
+    defaultTextStyle,
+    TextStyle,
+} from "../../../rendering/text/textStyle.js";
+import { UIRenderScope } from "../../../rendering/uiRenderContext.js";
 import { calculateAlignment, uiAlignment } from "../uiAlignment.js";
 import { UILayoutScope } from "../uiLayoutContext.js";
 import {

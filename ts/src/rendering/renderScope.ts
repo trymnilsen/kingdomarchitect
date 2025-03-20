@@ -1,7 +1,7 @@
 import { AssetLoader } from "../module/asset/loader/assetLoader.js";
 import { Sprite2 } from "../module/asset/sprite.js";
-import { UILayoutScope } from "../ui/uiLayoutContext.js";
-import { UISize } from "../ui/uiSize.js";
+import { UILayoutScope } from "../module/ui/uiLayoutContext.js";
+import { UISize } from "../module/ui/uiSize.js";
 import { Camera } from "./camera.js";
 import {
     NinePatchSpriteConfiguration,

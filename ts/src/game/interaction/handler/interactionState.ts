@@ -7,10 +7,10 @@ import {
     getDirectionFromInputType,
 } from "../../../input/inputAction.js";
 import { RenderScope } from "../../../rendering/renderScope.js";
-import { UIEvent } from "../../../ui/event/uiEvent.js";
-import { FocusGroup } from "../../../ui/focus/focusGroup.js";
-import { FocusState } from "../../../ui/focus/focusState.js";
-import { UIView } from "../../../ui/uiView.js";
+import { UIEvent } from "../../../module/ui/event/uiEvent.js";
+import { FocusGroup } from "../../../module/ui/focus/focusGroup.js";
+import { FocusState } from "../../../module/ui/focus/focusState.js";
+import { UIView } from "../../../module/ui/uiView.js";
 import { GroundTile } from "../../map/tile.js";
 import { InteractionStateChanger } from "./interactionStateChanger.js";
 import { StateContext } from "./stateContext.js";

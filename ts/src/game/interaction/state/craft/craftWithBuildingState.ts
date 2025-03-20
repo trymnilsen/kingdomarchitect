@@ -6,18 +6,21 @@ import {
     swordItem,
     wizardHat,
 } from "../../../../data/inventory/items/equipment.js";
-import { bookInkColor } from "../../../../ui/color.js";
-import { ninePatchBackground } from "../../../../ui/dsl/uiBackgroundDsl.js";
-import { uiBox } from "../../../../ui/dsl/uiBoxDsl.js";
-import { uiButton } from "../../../../ui/dsl/uiButtonDsl.js";
-import { uiColumn } from "../../../../ui/dsl/uiColumnDsl.js";
-import { spriteImageSource, uiImage } from "../../../../ui/dsl/uiImageDsl.js";
-import { uiRow } from "../../../../ui/dsl/uiRowDsl.js";
-import { uiSpace } from "../../../../ui/dsl/uiSpaceDsl.js";
-import { uiText } from "../../../../ui/dsl/uiTextDsl.js";
-import { uiAlignment } from "../../../../ui/uiAlignment.js";
-import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize.js";
-import { UIView } from "../../../../ui/uiView.js";
+import { bookInkColor } from "../../../../module/ui/color.js";
+import { ninePatchBackground } from "../../../../module/ui/dsl/uiBackgroundDsl.js";
+import { uiBox } from "../../../../module/ui/dsl/uiBoxDsl.js";
+import { uiButton } from "../../../../module/ui/dsl/uiButtonDsl.js";
+import { uiColumn } from "../../../../module/ui/dsl/uiColumnDsl.js";
+import {
+    spriteImageSource,
+    uiImage,
+} from "../../../../module/ui/dsl/uiImageDsl.js";
+import { uiRow } from "../../../../module/ui/dsl/uiRowDsl.js";
+import { uiSpace } from "../../../../module/ui/dsl/uiSpaceDsl.js";
+import { uiText } from "../../../../module/ui/dsl/uiTextDsl.js";
+import { uiAlignment } from "../../../../module/ui/uiAlignment.js";
+import { fillUiSize, wrapUiSize } from "../../../../module/ui/uiSize.js";
+import { UIView } from "../../../../module/ui/uiView.js";
 import { InteractionState } from "../../handler/interactionState.js";
 import { UIBookLayout } from "../../view/uiBookLayout.js";
 import { BuildingComponent } from "../../../component/building/buildingComponent.js";

@@ -8,9 +8,9 @@ import {
 } from "../../../../data/skill/skill.js";
 import { skills } from "../../../../data/skill/skills.js";
 import { UIRenderScope } from "../../../../rendering/uiRenderContext.js";
-import { UILayoutScope } from "../../../../ui/uiLayoutContext.js";
-import { UISize } from "../../../../ui/uiSize.js";
-import { UIView } from "../../../../ui/uiView.js";
+import { UILayoutScope } from "../../../../module/ui/uiLayoutContext.js";
+import { UISize } from "../../../../module/ui/uiSize.js";
+import { UIView } from "../../../../module/ui/uiView.js";
 
 export class UISkillTree extends UIView {
     private scrollTranslation: Point = {

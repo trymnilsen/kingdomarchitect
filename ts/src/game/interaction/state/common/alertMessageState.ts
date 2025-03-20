@@ -1,13 +1,13 @@
 import { sprites2 } from "../../../../module/asset/sprite.js";
 import { allSides, symmetricSides } from "../../../../common/sides.js";
-import { bookInkColor } from "../../../../ui/color.js";
-import { ninePatchBackground } from "../../../../ui/dsl/uiBackgroundDsl.js";
-import { uiBox } from "../../../../ui/dsl/uiBoxDsl.js";
-import { uiButton } from "../../../../ui/dsl/uiButtonDsl.js";
-import { uiColumn } from "../../../../ui/dsl/uiColumnDsl.js";
-import { uiSpace } from "../../../../ui/dsl/uiSpaceDsl.js";
-import { uiText } from "../../../../ui/dsl/uiTextDsl.js";
-import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize.js";
+import { bookInkColor } from "../../../../module/ui/color.js";
+import { ninePatchBackground } from "../../../../module/ui/dsl/uiBackgroundDsl.js";
+import { uiBox } from "../../../../module/ui/dsl/uiBoxDsl.js";
+import { uiButton } from "../../../../module/ui/dsl/uiButtonDsl.js";
+import { uiColumn } from "../../../../module/ui/dsl/uiColumnDsl.js";
+import { uiSpace } from "../../../../module/ui/dsl/uiSpaceDsl.js";
+import { uiText } from "../../../../module/ui/dsl/uiTextDsl.js";
+import { fillUiSize, wrapUiSize } from "../../../../module/ui/uiSize.js";
 import { InteractionState } from "../../handler/interactionState.js";
 
 export class AlertMessageState extends InteractionState {

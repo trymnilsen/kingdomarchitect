@@ -1,10 +1,10 @@
 import { Point, addPoint, zeroPoint } from "../../../common/point.js";
 import { titleTextStyle } from "../../../rendering/text/textStyle.js";
 import { UIRenderScope } from "../../../rendering/uiRenderContext.js";
-import { bookInkColor } from "../../../ui/color.js";
-import { UILayoutScope } from "../../../ui/uiLayoutContext.js";
-import { UISize } from "../../../ui/uiSize.js";
-import { UIBox } from "./../../../ui/view/uiBox.js";
+import { bookInkColor } from "../../../module/ui/color.js";
+import { UILayoutScope } from "../../../module/ui/uiLayoutContext.js";
+import { UISize } from "../../../module/ui/uiSize.js";
+import { UIBox } from "../../../module/ui/view/uiBox.js";
 
 export class UIBorderTitle extends UIBox {
     private _title = "";

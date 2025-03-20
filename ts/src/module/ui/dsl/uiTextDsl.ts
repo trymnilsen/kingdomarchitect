@@ -1,6 +1,6 @@
-import { Point } from "../../common/point.js";
-import { Sides } from "../../common/sides.js";
-import { TextStyle } from "../../rendering/text/textStyle.js";
+import { Point } from "../../../common/point.js";
+import { Sides } from "../../../common/sides.js";
+import { TextStyle } from "../../../rendering/text/textStyle.js";
 import { UIText } from "../view/uiText.js";
 import { UIViewProperties } from "./uiViewDsl.js";
 

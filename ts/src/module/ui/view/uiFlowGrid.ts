@@ -1,4 +1,4 @@
-import { UIRenderScope } from "../../rendering/uiRenderContext.js";
+import { UIRenderScope } from "../../../rendering/uiRenderContext.js";
 import { UILayoutScope } from "../uiLayoutContext.js";
 import { fillUiSize, UISize, wrapUiSize } from "../uiSize.js";
 import { UIViewGroup } from "../uiViewGroup.js";

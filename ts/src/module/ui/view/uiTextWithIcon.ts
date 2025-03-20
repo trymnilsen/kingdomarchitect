@@ -1,5 +1,8 @@
-import { Point } from "../../common/point.js";
-import { defaultTextStyle, TextStyle } from "../../rendering/text/textStyle.js";
+import { Point } from "../../../common/point.js";
+import {
+    defaultTextStyle,
+    TextStyle,
+} from "../../../rendering/text/textStyle.js";
 import { HorizontalAlignment } from "../uiAlignment.js";
 import { UISize } from "../uiSize.js";
 import { UIView } from "../uiView.js";

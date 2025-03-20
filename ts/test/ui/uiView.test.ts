@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { uiBox } from "../../src/ui/dsl/uiBoxDsl.js";
+import { uiBox } from "../../src/module/ui/dsl/uiBoxDsl.js";
 import { doTestLayout } from "./layoutContextStub.js";
 
 describe("UiView", () => {

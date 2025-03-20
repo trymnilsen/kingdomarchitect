@@ -1,11 +1,11 @@
-import { addPoint, Point } from "../../common/point.js";
+import { addPoint, Point } from "../../../common/point.js";
 import {
     Sides,
     totalHorizontal,
     totalVertical,
     zeroSides,
-} from "../../common/sides.js";
-import { UIRenderScope } from "../../rendering/uiRenderContext.js";
+} from "../../../common/sides.js";
+import { UIRenderScope } from "../../../rendering/uiRenderContext.js";
 import { calculateAlignment, uiAlignment } from "../uiAlignment.js";
 import { UIBackground } from "../uiBackground.js";
 import { UILayoutScope } from "../uiLayoutContext.js";

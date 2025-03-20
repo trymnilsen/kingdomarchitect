@@ -1,5 +1,5 @@
-import { clamp } from "../common/number.js";
-import { Point } from "../common/point.js";
+import { clamp } from "../../common/number.js";
+import { Point } from "../../common/point.js";
 
 export enum HorizontalAlignment {
     Left,

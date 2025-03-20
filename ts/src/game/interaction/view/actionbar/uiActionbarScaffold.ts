@@ -15,11 +15,11 @@ import {
 } from "../../../../common/sides.js";
 import { subTitleTextStyle } from "../../../../rendering/text/textStyle.js";
 import { UIRenderScope } from "../../../../rendering/uiRenderContext.js";
-import { bookInkColor } from "../../../../ui/color.js";
-import { FocusNode } from "../../../../ui/focus/focusHelpers.js";
-import { UILayoutScope } from "../../../../ui/uiLayoutContext.js";
-import { UISize } from "../../../../ui/uiSize.js";
-import { UIView } from "../../../../ui/uiView.js";
+import { bookInkColor } from "../../../../module/ui/color.js";
+import { FocusNode } from "../../../../module/ui/focus/focusHelpers.js";
+import { UILayoutScope } from "../../../../module/ui/uiLayoutContext.js";
+import { UISize } from "../../../../module/ui/uiSize.js";
+import { UIView } from "../../../../module/ui/uiView.js";
 import { UIActionbarItem } from "./uiActionbar.js";
 
 export class UIActionbarScaffold extends UIView {

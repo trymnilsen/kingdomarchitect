@@ -5,21 +5,24 @@ import {
     ItemTag,
 } from "../../../../../data/inventory/inventoryItem.js";
 import { InventoryItemList } from "../../../../../data/inventory/inventoryItemQuantity.js";
-import { UIThemeType, bookInkColor } from "../../../../../ui/color.js";
-import { ninePatchBackground } from "../../../../../ui/dsl/uiBackgroundDsl.js";
-import { uiBox } from "../../../../../ui/dsl/uiBoxDsl.js";
-import { ColumnChild, uiColumn } from "../../../../../ui/dsl/uiColumnDsl.js";
+import { UIThemeType, bookInkColor } from "../../../../../module/ui/color.js";
+import { ninePatchBackground } from "../../../../../module/ui/dsl/uiBackgroundDsl.js";
+import { uiBox } from "../../../../../module/ui/dsl/uiBoxDsl.js";
+import {
+    ColumnChild,
+    uiColumn,
+} from "../../../../../module/ui/dsl/uiColumnDsl.js";
 import {
     spriteImageSource,
     uiImage,
-} from "../../../../../ui/dsl/uiImageDsl.js";
-import { uiText } from "../../../../../ui/dsl/uiTextDsl.js";
-import { uiAlignment } from "../../../../../ui/uiAlignment.js";
-import { fillUiSize, wrapUiSize } from "../../../../../ui/uiSize.js";
-import { UIView } from "../../../../../ui/uiView.js";
-import { UIFlowGrid } from "../../../../../ui/view/uiFlowGrid.js";
-import { UIMasterDetails } from "../../../../../ui/view/uiMasterDetail.js";
-import { OpenBookUIBackground } from "../../../../../ui/visual/bookBackground.js";
+} from "../../../../../module/ui/dsl/uiImageDsl.js";
+import { uiText } from "../../../../../module/ui/dsl/uiTextDsl.js";
+import { uiAlignment } from "../../../../../module/ui/uiAlignment.js";
+import { fillUiSize, wrapUiSize } from "../../../../../module/ui/uiSize.js";
+import { UIView } from "../../../../../module/ui/uiView.js";
+import { UIFlowGrid } from "../../../../../module/ui/view/uiFlowGrid.js";
+import { UIMasterDetails } from "../../../../../module/ui/view/uiMasterDetail.js";
+import { OpenBookUIBackground } from "../../../../../module/ui/visual/bookBackground.js";
 import { EquipmentComponent } from "../../../../component/inventory/equipmentComponent.js";
 import { InventoryComponent2 } from "../../../../component/inventory/inventoryComponent.js";
 import { Entity } from "../../../../entity/entity.js";

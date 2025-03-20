@@ -5,16 +5,16 @@ import {
     boundsOverlap,
     getCorners,
     sizeOfBounds,
-} from "../../common/bounds.js";
-import { Direction, invertDirection } from "../../common/direction.js";
-import { InvalidArgumentError } from "../../common/error/invalidArgumentError.js";
+} from "../../../common/bounds.js";
+import { Direction, invertDirection } from "../../../common/direction.js";
+import { InvalidArgumentError } from "../../../common/error/invalidArgumentError.js";
 import {
     addPoint,
     closestPointOnLine,
     manhattanDistance,
     Point,
-} from "../../common/point.js";
-import { visitChildren } from "../../common/visit/visit.js";
+} from "../../../common/point.js";
+import { visitChildren } from "../../../common/visit/visit.js";
 import { UIView } from "../uiView.js";
 
 export interface FocusNode {

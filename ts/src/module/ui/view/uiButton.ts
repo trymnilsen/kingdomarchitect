@@ -1,5 +1,5 @@
-import { withinRectangle } from "../../common/bounds.js";
-import { Point } from "../../common/point.js";
+import { withinRectangle } from "../../../common/bounds.js";
+import { Point } from "../../../common/point.js";
 import { FocusNode } from "../focus/focusHelpers.js";
 import { UIBackground } from "../uiBackground.js";
 import { UIBox } from "./uiBox.js";

@@ -1,20 +1,20 @@
 import { Sprite2, sprites2 } from "../../../../../module/asset/sprite.js";
 import { allSides, symmetricSides } from "../../../../../common/sides.js";
-import { bookInkColor } from "../../../../../ui/color.js";
-import { ninePatchBackground } from "../../../../../ui/dsl/uiBackgroundDsl.js";
-import { uiBox } from "../../../../../ui/dsl/uiBoxDsl.js";
-import { uiButton } from "../../../../../ui/dsl/uiButtonDsl.js";
-import { uiColumn } from "../../../../../ui/dsl/uiColumnDsl.js";
+import { bookInkColor } from "../../../../../module/ui/color.js";
+import { ninePatchBackground } from "../../../../../module/ui/dsl/uiBackgroundDsl.js";
+import { uiBox } from "../../../../../module/ui/dsl/uiBoxDsl.js";
+import { uiButton } from "../../../../../module/ui/dsl/uiButtonDsl.js";
+import { uiColumn } from "../../../../../module/ui/dsl/uiColumnDsl.js";
 import {
     spriteImageSource,
     uiImage,
-} from "../../../../../ui/dsl/uiImageDsl.js";
-import { uiRow } from "../../../../../ui/dsl/uiRowDsl.js";
-import { uiSpace } from "../../../../../ui/dsl/uiSpaceDsl.js";
-import { uiText } from "../../../../../ui/dsl/uiTextDsl.js";
-import { uiAlignment } from "../../../../../ui/uiAlignment.js";
-import { UIView } from "../../../../../ui/uiView.js";
-import { fillUiSize, wrapUiSize } from "../../../../../ui/uiSize.js";
+} from "../../../../../module/ui/dsl/uiImageDsl.js";
+import { uiRow } from "../../../../../module/ui/dsl/uiRowDsl.js";
+import { uiSpace } from "../../../../../module/ui/dsl/uiSpaceDsl.js";
+import { uiText } from "../../../../../module/ui/dsl/uiTextDsl.js";
+import { uiAlignment } from "../../../../../module/ui/uiAlignment.js";
+import { UIView } from "../../../../../module/ui/uiView.js";
+import { fillUiSize, wrapUiSize } from "../../../../../module/ui/uiSize.js";
 import { InteractionState } from "../../../handler/interactionState.js";
 import { BuildConfirmState } from "../../building2/buildConfirmState.js";
 import { UIBookLayout, UIBookLayoutTab } from "../../../view/uiBookLayout.js";
@@ -23,7 +23,7 @@ import { woodenBuildings } from "../../../../../data/building/wood/wood.js";
 import { stoneBuildings } from "../../../../../data/building/stone/stone.js";
 import { goldBuildings } from "../../../../../data/building/gold/gold.js";
 import { foodBuildings } from "../../../../../data/building/food/food.js";
-import { SpriteBackground } from "../../../../../ui/uiBackground.js";
+import { SpriteBackground } from "../../../../../module/ui/uiBackground.js";
 import {
     UIActionbar,
     UIActionbarAlignment,

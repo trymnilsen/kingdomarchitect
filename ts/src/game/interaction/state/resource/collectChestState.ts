@@ -1,11 +1,11 @@
 import { sprites2 } from "../../../../module/asset/sprite.js";
 import { allSides } from "../../../../common/sides.js";
-import { UIThemeType } from "../../../../ui/color.js";
-import { ninePatchBackground } from "../../../../ui/dsl/uiBackgroundDsl.js";
-import { uiBox } from "../../../../ui/dsl/uiBoxDsl.js";
-import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize.js";
-import { UIView } from "../../../../ui/uiView.js";
-import { UIFlowGrid } from "../../../../ui/view/uiFlowGrid.js";
+import { UIThemeType } from "../../../../module/ui/color.js";
+import { ninePatchBackground } from "../../../../module/ui/dsl/uiBackgroundDsl.js";
+import { uiBox } from "../../../../module/ui/dsl/uiBoxDsl.js";
+import { fillUiSize, wrapUiSize } from "../../../../module/ui/uiSize.js";
+import { UIView } from "../../../../module/ui/uiView.js";
+import { UIFlowGrid } from "../../../../module/ui/view/uiFlowGrid.js";
 import { JobQueueComponent } from "../../../component/job/jobQueueComponent.js";
 import { CollectChestJob } from "../../../component/job/jobs/chest/collectChestJob.js";
 import { ChestComponent } from "../../../component/resource/chestComponent.js";

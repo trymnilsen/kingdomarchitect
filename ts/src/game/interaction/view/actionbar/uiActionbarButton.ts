@@ -1,16 +1,19 @@
 import { sprites2 } from "../../../../module/asset/sprite.js";
 import { allSides } from "../../../../common/sides.js";
 import { subTitleTextStyle } from "../../../../rendering/text/textStyle.js";
-import { ninePatchBackground } from "../../../../ui/dsl/uiBackgroundDsl.js";
-import { uiBox } from "../../../../ui/dsl/uiBoxDsl.js";
-import { uiButton } from "../../../../ui/dsl/uiButtonDsl.js";
-import { uiColumn } from "../../../../ui/dsl/uiColumnDsl.js";
-import { spriteImageSource, uiImage } from "../../../../ui/dsl/uiImageDsl.js";
-import { uiText } from "../../../../ui/dsl/uiTextDsl.js";
-import { UIBackground } from "../../../../ui/uiBackground.js";
-import { wrapUiSize } from "../../../../ui/uiSize.js";
-import { UIView } from "../../../../ui/uiView.js";
-import { UIBox } from "../../../../ui/view/uiBox.js";
+import { ninePatchBackground } from "../../../../module/ui/dsl/uiBackgroundDsl.js";
+import { uiBox } from "../../../../module/ui/dsl/uiBoxDsl.js";
+import { uiButton } from "../../../../module/ui/dsl/uiButtonDsl.js";
+import { uiColumn } from "../../../../module/ui/dsl/uiColumnDsl.js";
+import {
+    spriteImageSource,
+    uiImage,
+} from "../../../../module/ui/dsl/uiImageDsl.js";
+import { uiText } from "../../../../module/ui/dsl/uiTextDsl.js";
+import { UIBackground } from "../../../../module/ui/uiBackground.js";
+import { wrapUiSize } from "../../../../module/ui/uiSize.js";
+import { UIView } from "../../../../module/ui/uiView.js";
+import { UIBox } from "../../../../module/ui/view/uiBox.js";
 import { UIActionbarItem } from "./uiActionbar.js";
 import { actionbarHeight, actionbarWidth } from "./uiActionbarConstants.js";
 

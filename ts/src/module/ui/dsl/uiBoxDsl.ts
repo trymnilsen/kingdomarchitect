@@ -1,5 +1,5 @@
-import { Point } from "../../common/point.js";
-import { Sides } from "../../common/sides.js";
+import { Point } from "../../../common/point.js";
+import { Sides } from "../../../common/sides.js";
 import { UIBackground } from "../uiBackground.js";
 import { UIView } from "../uiView.js";
 import { UIBox } from "../view/uiBox.js";

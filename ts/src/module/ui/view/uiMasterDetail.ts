@@ -1,5 +1,5 @@
-import { addPoint } from "../../common/point.js";
-import { UIRenderScope } from "../../rendering/uiRenderContext.js";
+import { addPoint } from "../../../common/point.js";
+import { UIRenderScope } from "../../../rendering/uiRenderContext.js";
 import { UIBackground } from "../uiBackground.js";
 import { UILayoutScope } from "../uiLayoutContext.js";
 import { UISize } from "../uiSize.js";

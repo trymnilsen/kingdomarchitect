@@ -6,28 +6,31 @@ import {
     titleTextStyle,
 } from "../../../rendering/text/textStyle.js";
 import { UIRenderScope } from "../../../rendering/uiRenderContext.js";
-import { bookFill, bookInkColor, stoneFill } from "../../../ui/color.js";
+import { bookFill, bookInkColor, stoneFill } from "../../../module/ui/color.js";
 import {
     boxBackground,
     colorBackground,
     ninePatchBackground,
-} from "../../../ui/dsl/uiBackgroundDsl.js";
-import { uiBox } from "../../../ui/dsl/uiBoxDsl.js";
-import { uiColumn } from "../../../ui/dsl/uiColumnDsl.js";
-import { spriteImageSource, uiImage } from "../../../ui/dsl/uiImageDsl.js";
-import { uiRow } from "../../../ui/dsl/uiRowDsl.js";
-import { uiSpace } from "../../../ui/dsl/uiSpaceDsl.js";
-import { uiText } from "../../../ui/dsl/uiTextDsl.js";
-import { HorizontalAlignment } from "../../../ui/uiAlignment.js";
-import { UILayoutScope } from "../../../ui/uiLayoutContext.js";
+} from "../../../module/ui/dsl/uiBackgroundDsl.js";
+import { uiBox } from "../../../module/ui/dsl/uiBoxDsl.js";
+import { uiColumn } from "../../../module/ui/dsl/uiColumnDsl.js";
+import {
+    spriteImageSource,
+    uiImage,
+} from "../../../module/ui/dsl/uiImageDsl.js";
+import { uiRow } from "../../../module/ui/dsl/uiRowDsl.js";
+import { uiSpace } from "../../../module/ui/dsl/uiSpaceDsl.js";
+import { uiText } from "../../../module/ui/dsl/uiTextDsl.js";
+import { HorizontalAlignment } from "../../../module/ui/uiAlignment.js";
+import { UILayoutScope } from "../../../module/ui/uiLayoutContext.js";
 import {
     fillUiSize,
     UISize,
     wrapUiSize,
     zeroSize,
-} from "../../../ui/uiSize.js";
-import { UIView, UIViewVisiblity } from "../../../ui/uiView.js";
-import { UIBox } from "../../../ui/view/uiBox.js";
+} from "../../../module/ui/uiSize.js";
+import { UIView, UIViewVisiblity } from "../../../module/ui/uiView.js";
+import { UIBox } from "../../../module/ui/view/uiBox.js";
 
 export class SelectionTile extends UIBox {
     constructor(contentAlignment: HorizontalSide) {

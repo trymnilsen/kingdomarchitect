@@ -1,10 +1,10 @@
 import { Sprite2 } from "../../../../module/asset/sprite.js";
 import { Point } from "../../../../common/point.js";
 import { UIRenderScope } from "../../../../rendering/uiRenderContext.js";
-import { UIBackground } from "../../../../ui/uiBackground.js";
-import { UILayoutScope } from "../../../../ui/uiLayoutContext.js";
-import { UISize } from "../../../../ui/uiSize.js";
-import { UIView } from "../../../../ui/uiView.js";
+import { UIBackground } from "../../../../module/ui/uiBackground.js";
+import { UILayoutScope } from "../../../../module/ui/uiLayoutContext.js";
+import { UISize } from "../../../../module/ui/uiSize.js";
+import { UIView } from "../../../../module/ui/uiView.js";
 import { UIActionbarButton } from "./uiActionbarButton.js";
 
 export type UIActionbarItem = {

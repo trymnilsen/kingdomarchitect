@@ -10,18 +10,18 @@ import {
     SkillCategory,
     SkillTree,
 } from "../../../../data/skill/skill.js";
-import { bookInkColor } from "../../../../ui/color.js";
-import { uiBox } from "../../../../ui/dsl/uiBoxDsl.js";
-import { uiColumn } from "../../../../ui/dsl/uiColumnDsl.js";
-import { uiRow } from "../../../../ui/dsl/uiRowDsl.js";
-import { uiText } from "../../../../ui/dsl/uiTextDsl.js";
+import { bookInkColor } from "../../../../module/ui/color.js";
+import { uiBox } from "../../../../module/ui/dsl/uiBoxDsl.js";
+import { uiColumn } from "../../../../module/ui/dsl/uiColumnDsl.js";
+import { uiRow } from "../../../../module/ui/dsl/uiRowDsl.js";
+import { uiText } from "../../../../module/ui/dsl/uiTextDsl.js";
 import {
     HorizontalAlignment,
     VerticalAlignment,
     uiAlignment,
-} from "../../../../ui/uiAlignment.js";
-import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize.js";
-import { UIView } from "../../../../ui/uiView.js";
+} from "../../../../module/ui/uiAlignment.js";
+import { fillUiSize, wrapUiSize } from "../../../../module/ui/uiSize.js";
+import { UIView } from "../../../../module/ui/uiView.js";
 import { InteractionState } from "../../handler/interactionState.js";
 import { UIActionbarItem } from "../../view/actionbar/uiActionbar.js";
 import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold.js";
@@ -31,10 +31,10 @@ import {
     UIBookLayoutTab,
 } from "../../view/uiBookLayout.js";
 import { UISkillCategoryTree } from "./uiSkillCategoryTree.js";
-import { SpriteBackground } from "../../../../ui/uiBackground.js";
-import { uiImage } from "../../../../ui/dsl/uiImageDsl.js";
-import { UISpriteImageSource } from "../../../../ui/view/uiImageSource.js";
-import { colorBackground } from "../../../../ui/dsl/uiBackgroundDsl.js";
+import { SpriteBackground } from "../../../../module/ui/uiBackground.js";
+import { uiImage } from "../../../../module/ui/dsl/uiImageDsl.js";
+import { UISpriteImageSource } from "../../../../module/ui/view/uiImageSource.js";
+import { colorBackground } from "../../../../module/ui/dsl/uiBackgroundDsl.js";
 
 export class CharacterSkillState extends InteractionState {
     private _masterDetailsView: UIBookLayout;
