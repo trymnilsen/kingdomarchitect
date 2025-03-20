@@ -29,6 +29,7 @@ export function findClosestAvailablePosition(entity: Entity): Point | null {
         }
 
         if (weight < 5) {
+            //TODO we should do a path search so we dont spawn characters within a small hole
             return nextVisit;
         }
 

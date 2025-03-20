@@ -1,7 +1,7 @@
 import { TypedEventHandle } from "../../../../common/event/typedEvent.js";
 import { addPoint, Point, pointEquals } from "../../../../common/point.js";
-import { GraphNode } from "../../../../path/graph/graph.js";
-import { PathSearch } from "../../../../path/search.js";
+import { GraphNode } from "../../../../module/path/graph/graph.js";
+import { PathSearch } from "../../../../module/path/search.js";
 import { EntityComponent } from "../../entityComponent.js";
 import { TileMapUpdateEvent } from "../../tile/tileMapUpdatedEvent.js";
 import { createLazyGraphFromRootNode } from "./generateGraph.js";

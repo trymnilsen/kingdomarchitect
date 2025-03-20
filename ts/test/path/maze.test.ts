@@ -1,5 +1,5 @@
-import { FixedGraph } from "../../src/path/graph/fixedGraph.js";
-import { PathSearch } from "../../src/path/search.js";
+import { FixedGraph } from "../../src/module/path/graph/fixedGraph.js";
+import { PathSearch } from "../../src/module/path/search.js";
 import { createGraphFromTestFile, verifyPath } from "./testGraph.js";
 import { describe, it, expect } from "vitest";
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { LazyGraph } from "../../src/path/graph/lazyGraph.js";
+import { LazyGraph } from "../../src/module/path/graph/lazyGraph.js";
 
 describe("LazyGraph", () => {
     it("Can get node at", () => {

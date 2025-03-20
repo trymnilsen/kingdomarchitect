@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import * as path from "path";
 import { Point, pointEquals, zeroPoint } from "../../src/common/point.js";
 import { getPixelColor, readPng } from "../../tool/spritepack/pngHelper.js";
-import { FixedGraph } from "../../src/path/graph/fixedGraph.js";
+import { FixedGraph } from "../../src/module/path/graph/fixedGraph.js";
 
 /**
  * Create an empty graph with the given size for testing. The graph will be

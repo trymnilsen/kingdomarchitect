@@ -1,5 +1,5 @@
-import { Point, distance, pointEquals } from "../common/point.js";
-import { BinaryHeap } from "../common/structure/binaryHeap.js";
+import { Point, distance, pointEquals } from "../../common/point.js";
+import { BinaryHeap } from "../../common/structure/binaryHeap.js";
 import { Graph, GraphNode } from "./graph/graph.js";
 import { manhattanDistance } from "./pathHeuristics.js";
 

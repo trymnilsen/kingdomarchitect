@@ -1,5 +1,5 @@
 import { generateId } from "../../common/idGenerator.js";
-import { PathSearch } from "../../path/search.js";
+import { PathSearch } from "../../module/path/search.js";
 import { JobQueueComponent } from "../component/job/jobQueueComponent.js";
 import { JobSchedulerComponent } from "../component/job/jobSchedulerComponent.js";
 import { ForrestComponent } from "../component/resource/forrestComponent.js";

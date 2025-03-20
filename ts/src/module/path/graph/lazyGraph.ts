@@ -1,4 +1,4 @@
-import { Point } from "../../common/point.js";
+import { Point } from "../../../common/point.js";
 import { Graph, GraphNode } from "./graph.js";
 
 export type LazyGraphNodeFunction = (point: Point) => number | null;

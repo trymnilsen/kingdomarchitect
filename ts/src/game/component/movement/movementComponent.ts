@@ -5,7 +5,7 @@ import {
     manhattanDistance,
     pointEquals,
 } from "../../../common/point.js";
-import { PathOptions } from "../../../path/pathOptions.js";
+import { PathOptions } from "../../../module/path/pathOptions.js";
 import { SpriteAction } from "../draw/spriteProvider/statemachine/spriteAction.js";
 import { SpriteStateMachine } from "../draw/spriteProvider/statemachine/spriteStateMachine.js";
 import { EnergyComponent } from "../energy/energyComponent.js";

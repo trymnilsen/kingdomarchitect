@@ -3,9 +3,9 @@ import { InvalidArgumentError } from "../../../../common/error/invalidArgumentEr
 import {
     FixedGraph,
     WeightFunction,
-} from "../../../../path/graph/fixedGraph.js";
-import { Graph } from "../../../../path/graph/graph.js";
-import { LazyGraph } from "../../../../path/graph/lazyGraph.js";
+} from "../../../../module/path/graph/fixedGraph.js";
+import { Graph } from "../../../../module/path/graph/graph.js";
+import { LazyGraph } from "../../../../module/path/graph/lazyGraph.js";
 import { Entity } from "../../../entity/entity.js";
 import { TilesComponent } from "../../tile/tilesComponent.js";
 import { getWeightAtPoint } from "./weight.js";

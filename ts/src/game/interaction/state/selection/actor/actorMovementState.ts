@@ -1,7 +1,7 @@
 import { sprites2 } from "../../../../../asset/sprite.js";
 import { Point } from "../../../../../common/point.js";
 import { allSides } from "../../../../../common/sides.js";
-import { SearchedNode } from "../../../../../path/search.js";
+import { SearchedNode } from "../../../../../module/path/search.js";
 import { RenderScope } from "../../../../../rendering/renderScope.js";
 import { uiBox } from "../../../../../ui/dsl/uiBoxDsl.js";
 import { fillUiSize } from "../../../../../ui/uiSize.js";
