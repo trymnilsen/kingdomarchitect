@@ -1,4 +1,4 @@
-import { sprites2 } from "../../../../asset/sprite.js";
+import { sprites2 } from "../../../../module/asset/sprite.js";
 import { allSides } from "../../../../common/sides.js";
 import { RenderScope } from "../../../../rendering/renderScope.js";
 import { SelectionInfo } from "../../../component/selection/selectionInfo.js";

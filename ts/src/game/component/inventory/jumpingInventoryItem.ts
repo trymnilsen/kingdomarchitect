@@ -1,4 +1,4 @@
-import { Sprite2 } from "../../../asset/sprite.js";
+import { Sprite2 } from "../../../module/asset/sprite.js";
 import { Point } from "../../../common/point.js";
 import { InventoryItem } from "../../../data/inventory/inventoryItem.js";
 import { CraftingOutputTag } from "../../../data/inventory/inventoryItemQuantity.js";

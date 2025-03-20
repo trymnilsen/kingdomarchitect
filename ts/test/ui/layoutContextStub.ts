@@ -1,4 +1,4 @@
-import { Sprite2 } from "../../src/asset/sprite.js";
+import { Sprite2 } from "../../src/module/asset/sprite.js";
 import { UILayoutScope } from "../../src/ui/uiLayoutContext.js";
 import { UISize } from "../../src/ui/uiSize.js";
 import { UIView } from "../../src/ui/uiView.js";

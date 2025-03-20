@@ -1,4 +1,4 @@
-import { sprites2 } from "../../../../asset/sprite.js";
+import { sprites2 } from "../../../../module/asset/sprite.js";
 import { Bounds, zeroBounds } from "../../../../common/bounds.js";
 import { Point, addPoint, zeroPoint } from "../../../../common/point.js";
 import {

@@ -1,5 +1,5 @@
-import { AssetLoader } from "../../../asset/loader/assetLoader.js";
-import { sprites2 } from "../../../asset/sprite.js";
+import { AssetLoader } from "../../../module/asset/loader/assetLoader.js";
+import { sprites2 } from "../../../module/asset/sprite.js";
 import { Point } from "../../../common/point.js";
 import { allSides } from "../../../common/sides.js";
 import { GameTime } from "../../../common/time.js";

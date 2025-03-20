@@ -1,4 +1,4 @@
-import { Sprite2 } from "../../../../asset/sprite.js";
+import { Sprite2 } from "../../../../module/asset/sprite.js";
 import { Entity } from "../../../entity/entity.js";
 import { SelectionInfo } from "../selectionInfo.js";
 import { SelectionInfoProvider } from "../selectionInfoProvider.js";

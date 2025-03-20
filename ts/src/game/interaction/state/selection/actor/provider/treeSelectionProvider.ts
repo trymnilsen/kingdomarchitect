@@ -1,4 +1,4 @@
-import { sprites2 } from "../../../../../../asset/sprite.js";
+import { sprites2 } from "../../../../../../module/asset/sprite.js";
 import { TreeComponent } from "../../../../../component/resource/treeComponent.js";
 import { Entity } from "../../../../../entity/entity.js";
 import { SelectedEntityItem } from "../../../../../../module/selection/selectedEntityItem.js";

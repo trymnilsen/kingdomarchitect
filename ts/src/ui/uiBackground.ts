@@ -1,4 +1,4 @@
-import { Sprite2 } from "../asset/sprite.js";
+import { Sprite2 } from "../module/asset/sprite.js";
 import { Point } from "../common/point.js";
 import { Sides } from "../common/sides.js";
 import { UIRenderScope } from "../rendering/uiRenderContext.js";

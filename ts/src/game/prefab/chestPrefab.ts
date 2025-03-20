@@ -1,4 +1,4 @@
-import { sprites2 } from "../../asset/sprite.js";
+import { sprites2 } from "../../module/asset/sprite.js";
 import { InventoryItem } from "../../data/inventory/inventoryItem.js";
 import { SpriteComponent } from "../component/draw/spriteComponent.js";
 import { InventoryComponent2 } from "../component/inventory/inventoryComponent.js";

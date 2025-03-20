@@ -1,4 +1,4 @@
-import { Sprite2, sprites2 } from "../../../../asset/sprite.js";
+import { Sprite2, sprites2 } from "../../../../module/asset/sprite.js";
 import { ItemCategory } from "../../../../data/inventory/inventoryItem.js";
 import { Entity } from "../../../entity/entity.js";
 import { WorkerSpriteComponent } from "../../actor/mob/workerSpriteComponent.js";

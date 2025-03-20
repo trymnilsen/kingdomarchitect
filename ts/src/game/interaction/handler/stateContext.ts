@@ -1,4 +1,4 @@
-import { AssetLoader } from "../../../asset/loader/assetLoader.js";
+import { AssetLoader } from "../../../module/asset/loader/assetLoader.js";
 import { GameTime } from "../../../common/time.js";
 import { Camera } from "../../../rendering/camera.js";
 import { Entity } from "../../entity/entity.js";

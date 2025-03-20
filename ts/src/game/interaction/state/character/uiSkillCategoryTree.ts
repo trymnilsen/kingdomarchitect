@@ -1,4 +1,4 @@
-import { Sprite2, sprites2 } from "../../../../asset/sprite.js";
+import { Sprite2, sprites2 } from "../../../../module/asset/sprite.js";
 import { allSides } from "../../../../common/sides.js";
 import {
     Skill,

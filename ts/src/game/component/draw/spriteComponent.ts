@@ -1,4 +1,8 @@
-import { Sprite2, emptySprite, sprites2 } from "../../../asset/sprite.js";
+import {
+    Sprite2,
+    emptySprite,
+    sprites2,
+} from "../../../module/asset/sprite.js";
 import { Point, zeroPoint } from "../../../common/point.js";
 import { DrawMode } from "../../../rendering/drawMode.js";
 import { RenderScope } from "../../../rendering/renderScope.js";

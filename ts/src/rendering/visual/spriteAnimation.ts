@@ -1,4 +1,4 @@
-import { Sprite2 } from "../../asset/sprite.js";
+import { Sprite2 } from "../../module/asset/sprite.js";
 import { addPoint, Point, zeroPoint } from "../../common/point.js";
 import { RenderScope } from "../renderScope.js";
 

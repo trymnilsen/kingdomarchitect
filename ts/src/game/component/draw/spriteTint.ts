@@ -1,4 +1,4 @@
-import { Sprite2, emptySprite } from "../../../asset/sprite";
+import { Sprite2, emptySprite } from "../../../module/asset/sprite";
 import { Point, zeroPoint } from "../../../common/point";
 import { EntityComponent } from "../entityComponent";
 

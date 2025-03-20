@@ -1,4 +1,4 @@
-import { sprites2 } from "../../../../asset/sprite.js";
+import { sprites2 } from "../../../../module/asset/sprite.js";
 import { RenderScope } from "../../../../rendering/renderScope.js";
 import { uiBox } from "../../../../ui/dsl/uiBoxDsl.js";
 import { fillUiSize } from "../../../../ui/uiSize.js";

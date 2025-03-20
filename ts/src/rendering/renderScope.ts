@@ -1,5 +1,5 @@
-import { AssetLoader } from "../asset/loader/assetLoader.js";
-import { Sprite2 } from "../asset/sprite.js";
+import { AssetLoader } from "../module/asset/loader/assetLoader.js";
+import { Sprite2 } from "../module/asset/sprite.js";
 import { UILayoutScope } from "../ui/uiLayoutContext.js";
 import { UISize } from "../ui/uiSize.js";
 import { Camera } from "./camera.js";

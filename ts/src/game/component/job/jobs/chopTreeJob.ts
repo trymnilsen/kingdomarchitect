@@ -1,4 +1,4 @@
-import { sprites2 } from "../../../../asset/sprite.js";
+import { sprites2 } from "../../../../module/asset/sprite.js";
 import { woodResourceItem } from "../../../../data/inventory/items/resources.js";
 import { RenderScope } from "../../../../rendering/renderScope.js";
 import { BlinkingImageAnimation } from "../../../../rendering/visual/blinkingImageAnimation.js";

@@ -1,4 +1,4 @@
-import { Sprite2, emptySprite } from "../../../asset/sprite.js";
+import { Sprite2, emptySprite } from "../../../module/asset/sprite.js";
 import { Adjacency } from "../../../common/adjacency.js";
 import { Point } from "../../../common/point.js";
 import {

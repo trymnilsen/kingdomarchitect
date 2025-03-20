@@ -1,4 +1,4 @@
-import { Sprite2 } from "../../../../../asset/sprite.js";
+import { Sprite2 } from "../../../../../module/asset/sprite.js";
 import { Direction } from "../../../../../common/direction.js";
 import { Point } from "../../../../../common/point.js";
 import { DrawMode } from "../../../../../rendering/drawMode.js";

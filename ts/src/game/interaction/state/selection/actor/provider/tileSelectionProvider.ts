@@ -1,4 +1,4 @@
-import { sprites2 } from "../../../../../../asset/sprite.js";
+import { sprites2 } from "../../../../../../module/asset/sprite.js";
 import { SelectedTileItem } from "../../../../../../module/selection/selectedTileItem.js";
 import { SelectedWorldItem } from "../../../../../../module/selection/selectedWorldItem.js";
 import { StateContext } from "../../../../handler/stateContext.js";

@@ -1,4 +1,4 @@
-import { Sprite2, Sprite2Id } from "../../asset/sprite.js";
+import { Sprite2, Sprite2Id } from "../../module/asset/sprite.js";
 import { JSONValue } from "../../common/object.js";
 
 export type Effect<T = JSONValue> = {

@@ -1,4 +1,4 @@
-import { Sprite2 } from "../../asset/sprite.js";
+import { Sprite2 } from "../../module/asset/sprite.js";
 
 export type InventoryItem = {
     readonly id: string;

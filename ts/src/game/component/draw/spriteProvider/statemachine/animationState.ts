@@ -1,4 +1,4 @@
-import { Sprite2 } from "../../../../../asset/sprite.js";
+import { Sprite2 } from "../../../../../module/asset/sprite.js";
 import { zeroPoint } from "../../../../../common/point.js";
 import { Entity } from "../../../../entity/entity.js";
 import { SpriteProviderConfig } from "../spriteProvider.js";

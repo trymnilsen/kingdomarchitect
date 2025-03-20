@@ -1,7 +1,7 @@
 import { UIViewProperties } from "./uiViewDsl.js";
 import { UIImage } from "../view/uiImage.js";
 import { UIImageSource, UISpriteImageSource } from "../view/uiImageSource.js";
-import { Sprite2 } from "../../asset/sprite.js";
+import { Sprite2 } from "../../module/asset/sprite.js";
 
 export type UIImageProperties = {
     image: UIImageSource;

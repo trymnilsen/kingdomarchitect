@@ -1,4 +1,4 @@
-import { sprites2 } from "../../asset/sprite.js";
+import { sprites2 } from "../../module/asset/sprite.js";
 import { HealthComponent } from "../component/health/healthComponent.js";
 import { TreeComponent } from "../component/resource/treeComponent.js";
 import { StaticSelectionInfoProvider } from "../component/selection/provider/staticSelectionInfoProvider.js";

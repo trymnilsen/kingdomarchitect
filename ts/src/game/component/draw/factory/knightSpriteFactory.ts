@@ -1,4 +1,4 @@
-import { sprites2 } from "../../../../asset/sprite.js";
+import { sprites2 } from "../../../../module/asset/sprite.js";
 import { Direction } from "../../../../common/direction.js";
 import {
     AnimationState,

@@ -1,4 +1,4 @@
-import { AssetLoader } from "./asset/loader/assetLoader.js";
+import { AssetLoader } from "./module/asset/loader/assetLoader.js";
 import { createRootEntity } from "./game/entity/rootEntity.js";
 import { Game } from "./game/game.js";
 

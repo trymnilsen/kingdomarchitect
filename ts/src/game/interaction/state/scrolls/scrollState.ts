@@ -1,4 +1,4 @@
-import { sprites2 } from "../../../../asset/sprite.js";
+import { sprites2 } from "../../../../module/asset/sprite.js";
 import { Point } from "../../../../common/point.js";
 import { RenderScope } from "../../../../rendering/renderScope.js";
 import { biomes } from "../../../map/biome.js";

@@ -1,4 +1,4 @@
-import { sprites2 } from "../../asset/sprite.js";
+import { sprites2 } from "../../module/asset/sprite.js";
 import { zeroPoint } from "../../common/point.js";
 import { SpriteComponent } from "../component/draw/spriteComponent.js";
 import { HealthComponent } from "../component/health/healthComponent.js";

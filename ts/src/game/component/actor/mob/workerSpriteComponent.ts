@@ -1,4 +1,4 @@
-import { Sprite2, sprites2 } from "../../../../asset/sprite.js";
+import { Sprite2, sprites2 } from "../../../../module/asset/sprite.js";
 import { JSONValue } from "../../../../common/object.js";
 import { Point } from "../../../../common/point.js";
 import { ItemCategory } from "../../../../data/inventory/inventoryItem.js";

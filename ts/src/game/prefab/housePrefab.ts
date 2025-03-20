@@ -1,4 +1,4 @@
-import { sprites2 } from "../../asset/sprite.js";
+import { sprites2 } from "../../module/asset/sprite.js";
 import { woodenBuildings } from "../../data/building/wood/wood.js";
 import { BuildingComponent } from "../component/building/buildingComponent.js";
 import { HealthComponent } from "../component/health/healthComponent.js";

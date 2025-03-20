@@ -1,4 +1,4 @@
-import { sprites2 } from "../../../../asset/sprite.js";
+import { sprites2 } from "../../../../module/asset/sprite.js";
 import { Bounds, boundsCenter } from "../../../../common/bounds.js";
 import { Direction } from "../../../../common/direction.js";
 import { manhattanDistance, shiftPoint } from "../../../../common/point.js";
