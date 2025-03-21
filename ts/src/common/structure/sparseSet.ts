@@ -37,16 +37,6 @@ export class SparseSet<T, K = T> implements ReadableSet<T, K> {
 
     contains(key: K) {
         return this.sparse.has(key);
-
-        /*
-        if (denseIndex === undefined || denseIndex >= this.dense.length) {
-            return false;
-        }
-
-        let denseItem = this.dense[denseIndex];
-
-        return denseItem === key;
-        */
     }
 
     delete(key: K): boolean {

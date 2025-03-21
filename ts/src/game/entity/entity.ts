@@ -362,7 +362,7 @@ export class Entity {
      * ````
      *
      * @param filterType the type of the component to get
-     * @returns the component if it exists or null
+     * @returns the component if it exists or null if it is not present on the entity
      */
     getComponent<TFilter extends EntityComponent>(
         filterType: ConstructorFunction<TFilter>,

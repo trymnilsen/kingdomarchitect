@@ -13,26 +13,10 @@ import { SpriteStateMachine } from "./spriteProvider/statemachine/spriteStateMac
 import { SpriteTint } from "./spriteTint.js";
 
 export class SpriteComponent extends EntityComponent {
-    private sprite: Sprite2 = emptySprite;
-    private offset: Point = zeroPoint();
-    private size?: Point;
-    private _tint: SpriteTint | null = null;
-
-    /**
-     * Retrieve the currently set tint on the sprite. Can be null if none is set
-     */
-    public get tint(): Readonly<SpriteTint> | null {
-        return this._tint;
-    }
-
-    /**
-     * Set the tint for the sprite component, see [SpriteTint] for the different
-     * options that can be set as well as helper methods for creating tints
-     */
-    public set tint(v: SpriteTint | null) {
-        console.log("Setting sprite tint", v);
-        this._tint = v;
-    }
+    public sprite: Sprite2 = emptySprite;
+    public offset: Point = zeroPoint();
+    public size?: Point;
+    public tint: SpriteTint | null = null;
 
     constructor(sprite: Sprite2, offset: Point, size?: Point) {
         super();
@@ -68,14 +52,14 @@ export class SpriteComponent extends EntityComponent {
             targetHeight = context.measureSprite(this.sprite).height * scale;
         }
 
-        if (drawMode == DrawMode.Tick && !!this._tint) {
+        if (drawMode == DrawMode.Tick && !!this.tint) {
             // if there are no frames left, clear it
-            if (this._tint.frames == 0) {
+            if (this.tint.frames == 0) {
                 console.log("Resetting sprite tint");
-                this._tint = null;
-            } else if (this._tint.frames > 0) {
+                this.tint = null;
+            } else if (this.tint.frames > 0) {
                 console.log("Subtracting sprite tint");
-                this._tint.frames -= 1;
+                this.tint.frames -= 1;
             }
         }
 
@@ -97,7 +81,7 @@ export class SpriteComponent extends EntityComponent {
             y: screenPosition.y + this.offset.y,
             targetHeight: targetHeight,
             targetWidth: targetWidth,
-            tint: this._tint?.color,
+            tint: this.tint?.color,
         });
     }
 }

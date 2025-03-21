@@ -24,7 +24,8 @@ import { DrawMode } from "../rendering/drawMode.js";
 import { SpatialChunkMapComponent } from "./component/world/spatialChunkMapComponent.js";
 import { Camera } from "../rendering/camera.js";
 import { addInitialPlayerChunk } from "./map/player.js";
-import { spawnWorkerSystem } from "./system/spawnWorkerSystem.js";
+import { housingSystem } from "./system/housingSystem.js";
+import { renderSystem } from "./system/renderSystem.js";
 
 export class Game {
     private renderer: Renderer;
@@ -148,8 +149,9 @@ export class Game {
         if (this.drawTick % 5 == 0) {
             this.updateTick += 1;
             this.gameTime.tick = this.updateTick;
+            //TODO: Do smart scheduling
             this.world.onUpdate(this.updateTick);
-            spawnWorkerSystem(this.world);
+            housingSystem(this.world);
             this.interactionHandler.onUpdate(this.updateTick);
             this.updateVisibilityMap();
         }
@@ -216,24 +218,26 @@ export class Game {
     }
 
     private render(drawMode: DrawMode) {
-        const renderStart = performance.now();
         this.renderer.clearScreen();
         //TODO: use the world/root entity to get chunkmap
         //get entities within the viewport
         //call draw on these
         if (true) {
-            const spatialMap = this.world.requireComponent(
-                SpatialChunkMapComponent,
-            );
-            const viewport = this.renderer.camera.tileSpaceViewPort;
-            const entities = spatialMap.getEntitiesWithin(viewport);
+            /*
             this.world.onDraw(
                 this.renderer.context,
                 this.visibilityMap,
                 drawMode,
                 false,
-            );
+            );*/
 
+            renderSystem(
+                this.world,
+                this.renderer.context,
+                this.visibilityMap,
+                drawMode,
+            );
+            /*
             for (let i = 0; i < entities.length; i++) {
                 const entity = entities[i];
                 if (entity.isGameRoot) {
@@ -246,7 +250,7 @@ export class Game {
                     drawMode,
                     false,
                 );
-            }
+            }*/
         } else {
             this.world.onDraw(
                 this.renderer.context,
@@ -254,11 +258,7 @@ export class Game {
                 drawMode,
             );
         }
-        const renderEnd = performance.now();
-        performance.measure("render duration", {
-            start: renderStart,
-            end: renderEnd,
-        });
+
         this.interactionHandler.onDraw(this.renderer.context);
         this.renderer.renderDeferred();
 

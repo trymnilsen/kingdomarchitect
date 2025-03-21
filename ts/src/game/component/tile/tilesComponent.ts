@@ -52,7 +52,7 @@ export function getChunkBounds(tileChunk: TileChunk): Bounds {
 }
 
 export class TilesComponent extends EntityComponent {
-    private _chunks = new Map<string, TileChunk>();
+    public _chunks = new Map<string, TileChunk>();
 
     public get chunks(): Iterable<Readonly<TileChunk>> {
         return this._chunks.values();

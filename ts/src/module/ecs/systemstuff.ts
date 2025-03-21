@@ -35,7 +35,7 @@ type ComponentRegistry = {
     [C in AllComponents as C["id"]]: C;
 };
 
-function getComponent<T extends ComponentID>(id: T): ComponentRegistry[T] {
+function getComponent<T extends ComponentID>(_id: T): ComponentRegistry[T] {
     throw new Error("Not implemented");
 }
 

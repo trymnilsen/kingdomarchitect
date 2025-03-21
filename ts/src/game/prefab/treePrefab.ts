@@ -1,6 +1,11 @@
+import { zeroPoint } from "../../common/point.js";
 import { sprites2 } from "../../module/asset/sprite.js";
+import { SpriteComponent } from "../component/draw/spriteComponent.js";
 import { HealthComponent } from "../component/health/healthComponent.js";
-import { TreeComponent } from "../component/resource/treeComponent.js";
+import {
+    getTreeSprite,
+    TreeComponent,
+} from "../component/resource/treeComponent.js";
 import { StaticSelectionInfoProvider } from "../component/selection/provider/staticSelectionInfoProvider.js";
 import { SelectionInfoComponent } from "../component/selection/selectionInfoComponent.js";
 import { Entity } from "../entity/entity.js";
@@ -20,6 +25,10 @@ export function treePrefab(id: string, variation: number): Entity {
                 "Resource",
             ),
         ),
+    );
+    const treeSprite = getTreeSprite(variation);
+    tree.addComponent(
+        new SpriteComponent(treeSprite, { x: 4, y: 4 }, { x: 32, y: 32 }),
     );
     tree.addComponent(treeComponent);
     tree.addComponent(healthComponent);

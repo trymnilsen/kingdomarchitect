@@ -11,11 +11,7 @@ import { findClosestAvailablePosition } from "../component/root/path/availabilit
 import { Entity, type EntityId } from "../entity/entity.js";
 import { workerPrefab } from "../prefab/workerPrefab.js";
 
-// Entity Event Remove Worker -> runs system, remove from house (afford to loop over)
-// Entity Event Add House -> runs system, check workers without house
-// Entity Event Add Worker -> runs system, check for available houses
-
-export function spawnWorkerSystem(rootEntity: Entity) {
+export function housingSystem(rootEntity: Entity) {
     const buildings = rootEntity.queryComponents(HousingComponent);
     const workers = rootEntity.queryComponents(WorkerBehaviorComponent);
     const availableHouses: HousingComponent[] = [];

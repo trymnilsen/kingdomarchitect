@@ -1,4 +1,4 @@
-import { sprites2 } from "../../../module/asset/sprite.js";
+import { sprites2, type Sprite2 } from "../../../module/asset/sprite.js";
 import { Point } from "../../../common/point.js";
 import { RenderScope } from "../../../rendering/renderScope.js";
 import { EntityComponent } from "../entityComponent.js";
@@ -65,4 +65,15 @@ export class TreeComponent extends EntityComponent {
             targetHeight: 32,
         });
     }
+}
+
+export function getTreeSprite(variation: number): Sprite2 {
+    let sprite = sprites2.tree_1;
+    if (variation >= 2.0) {
+        sprite = sprites2.tree_2;
+    }
+    if (variation >= 3.0) {
+        sprite = sprites2.tree_3;
+    }
+    return sprite;
 }

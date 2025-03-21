@@ -179,3 +179,15 @@ export function mapNotNullDistinct<T, U>(
     }
     return Array.from(result);
 }
+
+export function* mapAndFilter<T, U>(
+    arr: T[],
+    mappingFunction: (item: T) => U | null,
+): Generator<U, void, undefined> {
+    for (const item of arr) {
+        const mappedValue = mappingFunction(item);
+        if (mappedValue !== null) {
+            yield mappedValue;
+        }
+    }
+}
