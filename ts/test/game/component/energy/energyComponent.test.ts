@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { EnergyComponent } from "../../../../src/game/component/energy/energyComponent.js";
+import { EnergyComponent } from "../../../../src/game/componentOld/energy/energyComponent.js";
 
 describe("EnergyComponent", () => {
     it("Can increment energy", () => {

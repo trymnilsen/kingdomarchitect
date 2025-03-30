@@ -1,4 +1,4 @@
-import { EntityComponent } from "../../../src/game/component/entityComponent.js";
+import { EntityComponent } from "../../../src/game/componentOld/entityComponent.js";
 
 /**
  * A stub of a component for use with testing

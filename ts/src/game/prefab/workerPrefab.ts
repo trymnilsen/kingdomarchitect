@@ -1,31 +1,31 @@
-import { JobRunnerComponent } from "../component/job/jobRunnerComponent.js";
-import { SpriteComponent } from "../component/draw/spriteComponent.js";
-import { WorkerBehaviorComponent } from "../component/behavior/workerBehaviorComponent.js";
+import { JobRunnerComponent } from "../componentOld/job/jobRunnerComponent.js";
+import { SpriteComponent } from "../componentOld/draw/spriteComponent.js";
+import { WorkerBehaviorComponent } from "../componentOld/behavior/workerBehaviorComponent.js";
 import { Entity } from "../entity/entity.js";
 import { sprites2 } from "../../module/asset/sprite.js";
-import { EquipmentComponent } from "../component/inventory/equipmentComponent.js";
-import { HealthComponent } from "../component/health/healthComponent.js";
+import { EquipmentComponent } from "../componentOld/inventory/equipmentComponent.js";
+import { HealthComponent } from "../componentOld/health/healthComponent.js";
 import {
     AggroComponent,
     AggroMode,
-} from "../component/actor/mob/aggroComponent.js";
-import { MovementComponent } from "../component/movement/movementComponent.js";
-import { EnergyComponent } from "../component/energy/energyComponent.js";
-import { WorkerSpriteComponent } from "../component/actor/mob/workerSpriteComponent.js";
-import { EffectComponent } from "../component/effect/effectComponent.js";
-import { VisibilityComponent } from "../component/visibility/visibilityComponent.js";
+} from "../componentOld/actor/mob/aggroComponent.js";
+import { MovementComponent } from "../componentOld/movement/movementComponent.js";
+import { EnergyComponent } from "../componentOld/energy/energyComponent.js";
+import { WorkerSpriteComponent } from "../componentOld/actor/mob/workerSpriteComponent.js";
+import { EffectComponent } from "../componentOld/effect/effectComponent.js";
+import { VisibilityComponent } from "../componentOld/visibility/visibilityComponent.js";
 import { largeDiamondPattern } from "../../common/pattern.js";
 import { zeroPoint } from "../../common/point.js";
 import {
     defaultInventoryItems,
     InventoryComponent2,
-} from "../component/inventory/inventoryComponent.js";
-import { SelectionInfoComponent } from "../component/selection/selectionInfoComponent.js";
+} from "../componentOld/inventory/inventoryComponent.js";
+import { SelectionInfoComponent } from "../componentOld/selection/selectionInfoComponent.js";
 import { WorkerSelectionProvider } from "../interaction/state/selection/actor/provider/workerSelectionProvider.js";
-import { WorkerSelectionInfoProvider } from "../component/selection/provider/workerSelectionInfoProvider.js";
-import { SpriteStateMachine } from "../component/draw/spriteProvider/statemachine/spriteStateMachine.js";
-import { SpriteAction } from "../component/draw/spriteProvider/statemachine/spriteAction.js";
-import { knightSpriteFactory } from "../component/draw/factory/knightSpriteFactory.js";
+import { WorkerSelectionInfoProvider } from "../componentOld/selection/provider/workerSelectionInfoProvider.js";
+import { SpriteStateMachine } from "../componentOld/draw/spriteProvider/statemachine/spriteStateMachine.js";
+import { SpriteAction } from "../componentOld/draw/spriteProvider/statemachine/spriteAction.js";
+import { knightSpriteFactory } from "../componentOld/draw/factory/knightSpriteFactory.js";
 
 export function workerPrefab(id: string): Entity {
     const worker = new Entity(id);

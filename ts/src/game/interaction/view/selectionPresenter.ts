@@ -22,7 +22,7 @@ import { fillUiSize, wrapUiSize } from "../../../module/ui/uiSize.js";
 import { UIView } from "../../../module/ui/uiView.js";
 import { UIBox } from "../../../module/ui/view/uiBox.js";
 import { UIColumn } from "../../../module/ui/view/uiColumn.js";
-import { SelectionInfo } from "../../component/selection/selectionInfo.js";
+import { SelectionInfo } from "../../componentOld/selection/selectionInfo.js";
 import { UIActionbarItem } from "./actionbar/uiActionbar.js";
 import { actionbarWidth } from "./actionbar/uiActionbarConstants.js";
 import { UIActionbarScaffold } from "./actionbar/uiActionbarScaffold.js";

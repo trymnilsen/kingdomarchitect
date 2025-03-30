@@ -5,14 +5,14 @@ import {
     ItemTag,
 } from "../../../../../../data/inventory/inventoryItem.js";
 import { itemEffectFactoryList } from "../../../../../../data/inventory/itemEffectFactoryList.js";
-import { WorkerBehaviorComponent } from "../../../../../component/behavior/workerBehaviorComponent.js";
-import { SpriteComponent } from "../../../../../component/draw/spriteComponent.js";
-import { EffectComponent } from "../../../../../component/effect/effectComponent.js";
+import { WorkerBehaviorComponent } from "../../../../../componentOld/behavior/workerBehaviorComponent.js";
+import { SpriteComponent } from "../../../../../componentOld/draw/spriteComponent.js";
+import { EffectComponent } from "../../../../../componentOld/effect/effectComponent.js";
 import {
     EquipmentComponent,
     EquipmentSlot,
-} from "../../../../../component/inventory/equipmentComponent.js";
-import { InventoryComponent2 } from "../../../../../component/inventory/inventoryComponent.js";
+} from "../../../../../componentOld/inventory/equipmentComponent.js";
+import { InventoryComponent2 } from "../../../../../componentOld/inventory/inventoryComponent.js";
 import { Entity } from "../../../../../entity/entity.js";
 import { SelectedEntityItem } from "../../../../../../module/selection/selectedEntityItem.js";
 import { SelectedWorldItem } from "../../../../../../module/selection/selectedWorldItem.js";

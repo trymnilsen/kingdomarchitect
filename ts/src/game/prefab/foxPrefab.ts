@@ -1,14 +1,14 @@
 import { sprites2 } from "../../module/asset/sprite.js";
-import { FoxComponent } from "../component/actor/animal/foxComponent.js";
-import { IdleMobComponent } from "../component/actor/mob/IdleMobComponent.js";
+import { FoxComponent } from "../componentOld/actor/animal/foxComponent.js";
+import { IdleMobComponent } from "../componentOld/actor/mob/IdleMobComponent.js";
 import {
     AggroComponent,
     AggroMode,
-} from "../component/actor/mob/aggroComponent.js";
-import { SpriteComponent } from "../component/draw/spriteComponent.js";
-import { DestroyOnZeroHealthComponent } from "../component/health/destroyOnZeroHealthComponent.js";
-import { HealthComponent } from "../component/health/healthComponent.js";
-import { JobRunnerComponent } from "../component/job/jobRunnerComponent.js";
+} from "../componentOld/actor/mob/aggroComponent.js";
+import { SpriteComponent } from "../componentOld/draw/spriteComponent.js";
+import { DestroyOnZeroHealthComponent } from "../componentOld/health/destroyOnZeroHealthComponent.js";
+import { HealthComponent } from "../componentOld/health/healthComponent.js";
+import { JobRunnerComponent } from "../componentOld/job/jobRunnerComponent.js";
 import { Entity } from "../entity/entity.js";
 
 export function foxPrefab(id: string): Entity {

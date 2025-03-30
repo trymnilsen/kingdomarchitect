@@ -23,8 +23,8 @@ import { fillUiSize, wrapUiSize } from "../../../../module/ui/uiSize.js";
 import { UIView } from "../../../../module/ui/uiView.js";
 import { InteractionState } from "../../handler/interactionState.js";
 import { UIBookLayout } from "../../view/uiBookLayout.js";
-import { BuildingComponent } from "../../../component/building/buildingComponent.js";
-import { CraftingComponent } from "../../../component/building/craftingComponent.js";
+import { BuildingComponent } from "../../../componentOld/building/buildingComponent.js";
+import { CraftingComponent } from "../../../componentOld/building/craftingComponent.js";
 
 export interface BookListAdapter {
     getTabs(): string[];

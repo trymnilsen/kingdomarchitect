@@ -1,8 +1,8 @@
 import { sprites2 } from "../../module/asset/sprite.js";
 import { InventoryItem } from "../../data/inventory/inventoryItem.js";
-import { SpriteComponent } from "../component/draw/spriteComponent.js";
-import { InventoryComponent2 } from "../component/inventory/inventoryComponent.js";
-import { ChestComponent } from "../component/resource/chestComponent.js";
+import { SpriteComponent } from "../componentOld/draw/spriteComponent.js";
+import { InventoryComponent2 } from "../componentOld/inventory/inventoryComponent.js";
+import { ChestComponent } from "../componentOld/resource/chestComponent.js";
 import { Entity } from "../entity/entity.js";
 
 export function chestPrefab(id: string, initialItems: InventoryItem[]): Entity {

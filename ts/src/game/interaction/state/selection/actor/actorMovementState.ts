@@ -5,14 +5,14 @@ import { SearchedNode } from "../../../../../module/path/search.js";
 import { RenderScope } from "../../../../../rendering/renderScope.js";
 import { uiBox } from "../../../../../module/ui/dsl/uiBoxDsl.js";
 import { fillUiSize } from "../../../../../module/ui/uiSize.js";
-import { JobQueueComponent } from "../../../../component/job/jobQueueComponent.js";
-import { PathFindingComponent } from "../../../../component/root/path/pathFindingComponent.js";
+import { JobQueueComponent } from "../../../../componentOld/job/jobQueueComponent.js";
+import { PathFindingComponent } from "../../../../componentOld/root/path/pathFindingComponent.js";
 import { Entity } from "../../../../entity/entity.js";
 import { GroundTile } from "../../../../map/tile.js";
 import { TileSize } from "../../../../map/tile.js";
 import { InteractionState } from "../../../handler/interactionState.js";
 import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold.js";
-import { MoveJob } from "../../../../component/job/jobs/moveJob.js";
+import { MoveJob } from "../../../../componentOld/job/jobs/moveJob.js";
 
 export class ActorMovementState extends InteractionState {
     private selectedPoint: Point | null = null;

@@ -1,15 +1,14 @@
-import { mapAndFilter } from "../../common/array.js";
 import type { Bounds } from "../../common/bounds.js";
 import { encodePosition } from "../../common/point.js";
+import { EcsSystem } from "../../module/ecs/ecsSystem.js";
 import { DrawMode } from "../../rendering/drawMode.js";
 import type { RenderScope } from "../../rendering/renderScope.js";
 import type { RenderVisibilityMap } from "../../rendering/renderVisibilityMap.js";
-import { SpriteComponent } from "../component/draw/spriteComponent.js";
-import type { SpriteProviderConfig } from "../component/draw/spriteProvider/spriteProvider.js";
-import { SpriteStateMachine } from "../component/draw/spriteProvider/statemachine/spriteStateMachine.js";
-import type { EntityComponent } from "../component/entityComponent.js";
-import { TilesComponent } from "../component/tile/tilesComponent.js";
-import { SpatialChunkMapComponent } from "../component/world/spatialChunkMapComponent.js";
+import { SpriteComponent } from "../componentOld/draw/spriteComponent.js";
+import type { SpriteProviderConfig } from "../componentOld/draw/spriteProvider/spriteProvider.js";
+import { SpriteStateMachine } from "../componentOld/draw/spriteProvider/statemachine/spriteStateMachine.js";
+import { TilesComponent } from "../componentOld/tile/tilesComponent.js";
+import { SpatialChunkMapComponent } from "../componentOld/world/spatialChunkMapComponent.js";
 import type { Entity } from "../entity/entity.js";
 import { biomes } from "../map/biome.js";
 import { ChunkDimension, ChunkSize } from "../map/chunk.js";
@@ -20,7 +19,11 @@ type EntityComponentPair = {
     spriteComponent: SpriteComponent;
 };
 
-export function renderSystem(
+export const renderSystem: EcsSystem = {
+    onRender,
+};
+
+function onRender(
     rootEntity: Entity,
     renderContext: RenderScope,
     visibilityMap: RenderVisibilityMap,

@@ -1,11 +1,11 @@
 import { Event } from "../../../../src/common/event.js";
 import { Point } from "../../../../src/common/point.js";
-import { EnergyComponent } from "../../../../src/game/component/energy/energyComponent.js";
+import { EnergyComponent } from "../../../../src/game/componentOld/energy/energyComponent.js";
 import {
     CurrentMovement,
     CurrentMovementUpdatedEvent,
-} from "../../../../src/game/component/movement/currentMovement.js";
-import { MovementComponent } from "../../../../src/game/component/movement/movementComponent.js";
+} from "../../../../src/game/componentOld/movement/currentMovement.js";
+import { MovementComponent } from "../../../../src/game/componentOld/movement/movementComponent.js";
 import { Entity } from "../../../../src/game/entity/entity.js";
 import { EntityEvent } from "../../../../src/game/entity/entityEvent.js";
 import { BoundMethod } from "../../../../util/boundDecorator.js";

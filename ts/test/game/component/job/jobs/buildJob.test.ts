@@ -1,16 +1,16 @@
 import { describe, it, expect } from "vitest";
-import { BuildJob } from "../../../../../src/game/component/job/jobs/buildJob.js";
-import { InventoryComponent2 } from "../../../../../src/game/component/inventory/inventoryComponent.js";
+import { BuildJob } from "../../../../../src/game/componentOld/job/jobs/buildJob.js";
+import { InventoryComponent2 } from "../../../../../src/game/componentOld/inventory/inventoryComponent.js";
 import { JobTestHelper } from "../jobTestHelper.js";
 import { InventoryItemQuantity } from "../../../../../src/data/inventory/inventoryItemQuantity.js";
 import { woodResourceItem } from "../../../../../src/data/inventory/items/resources.js";
 import { buildingPrefab } from "../../../../../src/game/prefab/buildingPrefab.js";
 import { generateId } from "../../../../../src/common/idGenerator.js";
 import { foodBuildings } from "../../../../../src/data/building/food/food.js";
-import { BuildingComponent } from "../../../../../src/game/component/building/buildingComponent.js";
+import { BuildingComponent } from "../../../../../src/game/componentOld/building/buildingComponent.js";
 import { TwoRunnersAndStockpileTestScaffold } from "../../../world/scaffold/twoRunnersAndStockpileTestScaffold.js";
-import { JobQueueComponent } from "../../../../../src/game/component/job/jobQueueComponent.js";
-import { JobState } from "../../../../../src/game/component/job/jobState.js";
+import { JobQueueComponent } from "../../../../../src/game/componentOld/job/jobQueueComponent.js";
+import { JobState } from "../../../../../src/game/componentOld/job/jobState.js";
 
 describe("BuildJob", () => {
     it("Scheduling job will look for runners with a full inventory", () => {

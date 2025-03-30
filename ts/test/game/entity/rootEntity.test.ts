@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { Entity } from "../../../src/game/entity/entity.js";
 import { createRootEntity } from "../../../src/game/entity/rootEntity.js";
-import { SpatialChunkMapComponent } from "../../../src/game/component/world/spatialChunkMapComponent.js";
+import { SpatialChunkMapComponent } from "../../../src/game/componentOld/world/spatialChunkMapComponent.js";
 
 describe("RootEntity", () => {
     it("Can get entity at position", () => {

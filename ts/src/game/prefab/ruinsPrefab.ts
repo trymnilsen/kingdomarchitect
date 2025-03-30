@@ -1,5 +1,5 @@
 import { sprites2 } from "../../module/asset/sprite.js";
-import { SpriteComponent } from "../component/draw/spriteComponent.js";
+import { SpriteComponent } from "../componentOld/draw/spriteComponent.js";
 import { Entity } from "../entity/entity.js";
 
 export function ruinsPrefab(id: string): Entity {

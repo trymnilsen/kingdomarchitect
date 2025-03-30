@@ -9,9 +9,9 @@ import {
 import {
     SettlementComponent,
     SettlementType,
-} from "../../component/npc/settlementComponent.js";
-import { TileChunk } from "../../component/tile/tilesComponent.js";
-import { SpatialChunkMapComponent } from "../../component/world/spatialChunkMapComponent.js";
+} from "../../componentOld/npc/settlementComponent.js";
+import { TileChunk } from "../../componentOld/tile/tilesComponent.js";
+import { SpatialChunkMapComponent } from "../../componentOld/world/spatialChunkMapComponent.js";
 import { Entity } from "../../entity/entity.js";
 import { farmPrefab } from "../../prefab/farmPrefab.js";
 import { housePrefab } from "../../prefab/housePrefab.js";

@@ -1,8 +1,8 @@
 import { describe, it, expect } from "vitest";
 
-import { JobRunnerComponent } from "../../../../src/game/component/job/jobRunnerComponent.js";
+import { JobRunnerComponent } from "../../../../src/game/componentOld/job/jobRunnerComponent.js";
 import { Entity } from "../../../../src/game/entity/entity.js";
-import { MoveJob } from "../../../../src/game/component/job/jobs/moveJob.js";
+import { MoveJob } from "../../../../src/game/componentOld/job/jobs/moveJob.js";
 import { zeroPoint } from "../../../../src/common/point.js";
 
 describe("JobRunnerComponent", () => {

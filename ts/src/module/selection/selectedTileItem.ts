@@ -1,5 +1,5 @@
 import { Point } from "../../common/point.js";
-import { GroundTile } from "../../game/component/tile/tilesComponent.js";
+import { GroundTile } from "../../game/componentOld/tile/tilesComponent.js";
 import { isTile } from "../../game/map/tile.js";
 import { SelectedWorldItem } from "./selectedWorldItem.js";
 

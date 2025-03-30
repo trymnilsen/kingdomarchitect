@@ -8,8 +8,8 @@ import {
     wizardHat,
 } from "../../data/inventory/items/equipment.js";
 import { goldCoins } from "../../data/inventory/items/resources.js";
-import { HousingComponent } from "../component/building/housingComponent.js";
-import { TilesComponent } from "../component/tile/tilesComponent.js";
+import { HousingComponent } from "../componentOld/building/housingComponent.js";
+import { TilesComponent } from "../componentOld/tile/tilesComponent.js";
 import { Entity } from "../entity/entity.js";
 import { chestPrefab } from "../prefab/chestPrefab.js";
 import { farmPrefab } from "../prefab/farmPrefab.js";

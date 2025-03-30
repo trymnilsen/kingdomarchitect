@@ -19,16 +19,16 @@ import { GameTime } from "../../common/time.js";
 import { DrawMode } from "../../rendering/drawMode.js";
 import { RenderScope } from "../../rendering/renderScope.js";
 import { RenderVisibilityMap } from "../../rendering/renderVisibilityMap.js";
-import { ComponentEvent } from "../component/componentEvent.js";
-import { ComponentQueryCache } from "../component/componentQueryCache.js";
+import { ComponentEvent } from "../componentOld/componentEvent.js";
+import { ComponentQueryCache } from "../componentOld/componentQueryCache.js";
 import {
     ComponentsQueryCache2 as ComponentQueryCache2,
     QueryData,
     QueryObject,
     ComponentMap,
-} from "../component/componentQueryCache2.js";
-import { EntityComponent } from "../component/entityComponent.js";
-import { TilesComponent } from "../component/tile/tilesComponent.js";
+} from "../componentOld/componentQueryCache2.js";
+import { EntityComponent } from "../componentOld/entityComponent.js";
+import { TilesComponent } from "../componentOld/tile/tilesComponent.js";
 import { TileSize } from "../map/tile.js";
 import { selectFromChild } from "./child/select.js";
 import { visitChildren } from "./child/visit.js";

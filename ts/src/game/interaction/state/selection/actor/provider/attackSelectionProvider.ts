@@ -1,8 +1,8 @@
-import { AttackJob } from "../../../../../component/actor/mob/attackJob.js";
-import { WorkerBehaviorComponent } from "../../../../../component/behavior/workerBehaviorComponent.js";
-import { BuildingComponent } from "../../../../../component/building/buildingComponent.js";
-import { HealthComponent } from "../../../../../component/health/healthComponent.js";
-import { JobQueueComponent } from "../../../../../component/job/jobQueueComponent.js";
+import { AttackJob } from "../../../../../componentOld/actor/mob/attackJob.js";
+import { WorkerBehaviorComponent } from "../../../../../componentOld/behavior/workerBehaviorComponent.js";
+import { BuildingComponent } from "../../../../../componentOld/building/buildingComponent.js";
+import { HealthComponent } from "../../../../../componentOld/health/healthComponent.js";
+import { JobQueueComponent } from "../../../../../componentOld/job/jobQueueComponent.js";
 import { SelectedEntityItem } from "../../../../../../module/selection/selectedEntityItem.js";
 import { SelectedWorldItem } from "../../../../../../module/selection/selectedWorldItem.js";
 import { StateContext } from "../../../../handler/stateContext.js";

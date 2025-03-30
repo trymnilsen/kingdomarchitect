@@ -1,6 +1,6 @@
 import { sprites2 } from "../../module/asset/sprite.js";
 import { generateId } from "../../common/idGenerator.js";
-import { SpriteComponent } from "../component/draw/spriteComponent.js";
+import { SpriteComponent } from "../componentOld/draw/spriteComponent.js";
 import { Entity } from "../entity/entity.js";
 
 export function orcHousePrefab(id: string = generateId("orcHouse")): Entity {

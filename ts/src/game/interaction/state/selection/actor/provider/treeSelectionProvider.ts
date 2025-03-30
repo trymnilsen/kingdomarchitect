@@ -1,5 +1,5 @@
 import { sprites2 } from "../../../../../../module/asset/sprite.js";
-import { TreeComponent } from "../../../../../component/resource/treeComponent.js";
+import { TreeComponent } from "../../../../../componentOld/resource/treeComponent.js";
 import { Entity } from "../../../../../entity/entity.js";
 import { SelectedEntityItem } from "../../../../../../module/selection/selectedEntityItem.js";
 import { SelectedWorldItem } from "../../../../../../module/selection/selectedWorldItem.js";

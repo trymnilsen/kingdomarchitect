@@ -1,6 +1,6 @@
 import { randomColor } from "../../../../src/common/color.js";
 import { Point } from "../../../../src/common/point.js";
-import { TilesComponent } from "../../../../src/game/component/tile/tilesComponent.js";
+import { TilesComponent } from "../../../../src/game/componentOld/tile/tilesComponent.js";
 import { Entity } from "../../../../src/game/entity/entity.js";
 import { createRootEntity } from "../../../../src/game/entity/rootEntity.js";
 

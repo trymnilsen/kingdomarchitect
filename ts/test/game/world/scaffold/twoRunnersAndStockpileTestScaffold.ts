@@ -1,6 +1,6 @@
 import { generateId } from "../../../../src/common/idGenerator.js";
 import { getBuildingById } from "../../../../src/data/building/buildings.js";
-import { InventoryComponent2 } from "../../../../src/game/component/inventory/inventoryComponent.js";
+import { InventoryComponent2 } from "../../../../src/game/componentOld/inventory/inventoryComponent.js";
 import { buildingPrefab } from "../../../../src/game/prefab/buildingPrefab.js";
 import { workerPrefab } from "../../../../src/game/prefab/workerPrefab.js";
 import { EntityTestProxy } from "../entityTestProxy.js";

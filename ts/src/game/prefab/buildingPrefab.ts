@@ -2,12 +2,12 @@ import { sprites2 } from "../../module/asset/sprite.js";
 import { diamondPattern, largeDiamondPattern } from "../../common/pattern.js";
 import { zeroPoint } from "../../common/point.js";
 import { Building } from "../../data/building/building.js";
-import { BuildingComponent } from "../component/building/buildingComponent.js";
-import { EntityComponent } from "../component/entityComponent.js";
-import { HealthComponent } from "../component/health/healthComponent.js";
-import { StaticSelectionInfoProvider } from "../component/selection/provider/staticSelectionInfoProvider.js";
-import { SelectionInfoComponent } from "../component/selection/selectionInfoComponent.js";
-import { VisibilityComponent } from "../component/visibility/visibilityComponent.js";
+import { BuildingComponent } from "../componentOld/building/buildingComponent.js";
+import { EntityComponent } from "../componentOld/entityComponent.js";
+import { HealthComponent } from "../componentOld/health/healthComponent.js";
+import { StaticSelectionInfoProvider } from "../componentOld/selection/provider/staticSelectionInfoProvider.js";
+import { SelectionInfoComponent } from "../componentOld/selection/selectionInfoComponent.js";
+import { VisibilityComponent } from "../componentOld/visibility/visibilityComponent.js";
 import { Entity } from "../entity/entity.js";
 
 export function buildingPrefab(

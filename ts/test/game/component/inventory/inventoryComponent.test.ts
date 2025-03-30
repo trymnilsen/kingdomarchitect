@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { InventoryComponent2 } from "../../../../src/game/component/inventory/inventoryComponent.js";
+import { InventoryComponent2 } from "../../../../src/game/componentOld/inventory/inventoryComponent.js";
 import {
     stoneResource,
     woodResourceItem,

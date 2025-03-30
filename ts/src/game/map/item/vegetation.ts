@@ -5,11 +5,11 @@ import {
     multiplyPoint,
 } from "../../../common/point.js";
 import { SparseSet } from "../../../common/structure/sparseSet.js";
-import { TileChunk } from "../../component/tile/tilesComponent.js";
+import { TileChunk } from "../../componentOld/tile/tilesComponent.js";
 import { Entity } from "../../entity/entity.js";
 import { treePrefab } from "../../prefab/treePrefab.js";
 import { encodePosition, Point } from "../../../common/point.js";
-import { SpatialChunkMapComponent } from "../../component/world/spatialChunkMapComponent.js";
+import { SpatialChunkMapComponent } from "../../componentOld/world/spatialChunkMapComponent.js";
 import { ChunkSize, getChunkBounds } from "../chunk.js";
 
 export function spawnTree(amount: number, chunk: Point, rootEntity: Entity) {

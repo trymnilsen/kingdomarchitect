@@ -1,6 +1,6 @@
 import { sprites2 } from "../../../../../../module/asset/sprite.js";
 import { blacksmith } from "../../../../../../data/building/stone/blacksmith.js";
-import { BuildingComponent } from "../../../../../component/building/buildingComponent.js";
+import { BuildingComponent } from "../../../../../componentOld/building/buildingComponent.js";
 import { SelectedEntityItem } from "../../../../../../module/selection/selectedEntityItem.js";
 import { SelectedTileItem } from "../../../../../../module/selection/selectedTileItem.js";
 import { SelectedWorldItem } from "../../../../../../module/selection/selectedWorldItem.js";

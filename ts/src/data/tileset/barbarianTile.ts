@@ -1,7 +1,7 @@
 import { getBounds } from "../../common/bounds.js";
 import { generateId } from "../../common/idGenerator.js";
 import { Point } from "../../common/point.js";
-import { GroundChunk } from "../../game/component/tile/tilesComponent.js";
+import { GroundChunk } from "../../game/componentOld/tile/tilesComponent.js";
 import { Entity } from "../../game/entity/entity.js";
 import { orcHousePrefab } from "../../game/prefab/orcHousePrefab.js";
 import { chestPrefab } from "../../game/prefab/chestPrefab.js";

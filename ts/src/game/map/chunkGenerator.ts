@@ -6,8 +6,11 @@ import {
 import { randomColor } from "../../common/color.js";
 import { generateId } from "../../common/idGenerator.js";
 import { adjacentPoints, Point } from "../../common/point.js";
-import { TileChunk, TilesComponent } from "../component/tile/tilesComponent.js";
-import { Volume } from "../component/tile/volume.js";
+import {
+    TileChunk,
+    TilesComponent,
+} from "../componentOld/tile/tilesComponent.js";
+import { Volume } from "../componentOld/tile/volume.js";
 import { Entity } from "../entity/entity.js";
 import { generateDesert } from "./biome/desert.js";
 import { generateForrest } from "./biome/forrest.js";

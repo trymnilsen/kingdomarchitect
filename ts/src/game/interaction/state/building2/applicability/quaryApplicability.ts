@@ -1,6 +1,6 @@
 import { adjacentPoints, Point } from "../../../../../common/point.js";
-import { StoneComponent } from "../../../../component/resource/stoneComponent.js";
-import { SpatialChunkMapComponent } from "../../../../component/world/spatialChunkMapComponent.js";
+import { StoneComponent } from "../../../../componentOld/resource/stoneComponent.js";
+import { SpatialChunkMapComponent } from "../../../../componentOld/world/spatialChunkMapComponent.js";
 import { Entity } from "../../../../entity/entity.js";
 import { BuildingApplicability } from "../buildingApplicability.js";
 

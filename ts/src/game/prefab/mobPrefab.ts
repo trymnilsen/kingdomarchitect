@@ -1,15 +1,15 @@
 import { sprites2 } from "../../module/asset/sprite.js";
-import { IdleMobComponent } from "../component/actor/mob/IdleMobComponent.js";
+import { IdleMobComponent } from "../componentOld/actor/mob/IdleMobComponent.js";
 import {
     AggroComponent,
     AggroMode,
-} from "../component/actor/mob/aggroComponent.js";
-import { SpriteComponent } from "../component/draw/spriteComponent.js";
-import { DestroyOnZeroHealthComponent } from "../component/health/destroyOnZeroHealthComponent.js";
-import { HealthComponent } from "../component/health/healthComponent.js";
-import { JobRunnerComponent } from "../component/job/jobRunnerComponent.js";
-import { StaticSelectionInfoProvider } from "../component/selection/provider/staticSelectionInfoProvider.js";
-import { SelectionInfoComponent } from "../component/selection/selectionInfoComponent.js";
+} from "../componentOld/actor/mob/aggroComponent.js";
+import { SpriteComponent } from "../componentOld/draw/spriteComponent.js";
+import { DestroyOnZeroHealthComponent } from "../componentOld/health/destroyOnZeroHealthComponent.js";
+import { HealthComponent } from "../componentOld/health/healthComponent.js";
+import { JobRunnerComponent } from "../componentOld/job/jobRunnerComponent.js";
+import { StaticSelectionInfoProvider } from "../componentOld/selection/provider/staticSelectionInfoProvider.js";
+import { SelectionInfoComponent } from "../componentOld/selection/selectionInfoComponent.js";
 import { Entity } from "../entity/entity.js";
 
 export function mobPrefab(id: string): Entity {

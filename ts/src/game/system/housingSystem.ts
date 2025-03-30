@@ -3,11 +3,11 @@ import type { ConstructorFunction } from "../../common/constructor.js";
 import { generateId } from "../../common/idGenerator.js";
 import type { ReadableSet } from "../../common/structure/sparseSet.js";
 import { woodenHouse } from "../../data/building/wood/house.js";
-import { WorkerBehaviorComponent } from "../component/behavior/workerBehaviorComponent.js";
-import { BuildingComponent } from "../component/building/buildingComponent.js";
-import { HousingComponent } from "../component/building/housingComponent.js";
-import type { EntityComponent } from "../component/entityComponent.js";
-import { findClosestAvailablePosition } from "../component/root/path/availability.js";
+import { WorkerBehaviorComponent } from "../componentOld/behavior/workerBehaviorComponent.js";
+import { BuildingComponent } from "../componentOld/building/buildingComponent.js";
+import { HousingComponent } from "../componentOld/building/housingComponent.js";
+import type { EntityComponent } from "../componentOld/entityComponent.js";
+import { findClosestAvailablePosition } from "../componentOld/root/path/availability.js";
 import { Entity, type EntityId } from "../entity/entity.js";
 import { workerPrefab } from "../prefab/workerPrefab.js";
 

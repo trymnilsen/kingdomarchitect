@@ -1,30 +1,28 @@
-import { AssetLoader } from "../module/asset/loader/assetLoader.js";
 import {
     changeX,
     changeY,
     invert,
     multiplyPoint,
     Point,
-    zeroPoint,
 } from "../common/point.js";
+import { AssetLoader } from "../module/asset/loader/assetLoader.js";
 
+import { GameTime } from "../common/time.js";
 import { Input, InputEvent } from "../input/input.js";
 import { InputActionType } from "../input/inputAction.js";
 import { TouchInput } from "../input/touchInput.js";
+import { EcsWorld } from "../module/ecs/ecsWorld.js";
+import { Camera } from "../rendering/camera.js";
+import { DrawMode } from "../rendering/drawMode.js";
 import { Renderer } from "../rendering/renderer.js";
-import { InteractionHandler } from "./interaction/handler/interactionHandler.js";
+import { RenderVisibilityMap } from "../rendering/renderVisibilityMap.js";
+import { VisibilityComponent } from "./componentOld/visibility/visibilityComponent.js";
+import { firstChildWhere } from "./entity/child/first.js";
 import { Entity } from "./entity/entity.js";
 import { createRootEntity } from "./entity/rootEntity.js";
-import { TileSize } from "./map/tile.js";
-import { RenderVisibilityMap } from "../rendering/renderVisibilityMap.js";
-import { VisibilityComponent } from "./component/visibility/visibilityComponent.js";
-import { firstChildWhere } from "./entity/child/first.js";
-import { GameTime } from "../common/time.js";
-import { DrawMode } from "../rendering/drawMode.js";
-import { SpatialChunkMapComponent } from "./component/world/spatialChunkMapComponent.js";
-import { Camera } from "../rendering/camera.js";
+import { InteractionHandler } from "./interaction/handler/interactionHandler.js";
 import { addInitialPlayerChunk } from "./map/player.js";
-import { housingSystem } from "./system/housingSystem.js";
+import { TileSize } from "./map/tile.js";
 import { renderSystem } from "./system/renderSystem.js";
 
 export class Game {
@@ -39,13 +37,14 @@ export class Game {
     private world: Entity;
     private camera: Camera;
     private gameTime: GameTime = new GameTime();
+    private ecsWorld: EcsWorld;
     private visibilityMap: RenderVisibilityMap = new RenderVisibilityMap();
 
     constructor(private domElementWrapperSelector: string) {
         this.world = createRootEntity();
+        this.ecsWorld = new EcsWorld(this.world);
         this.assetLoader = new AssetLoader();
         // Rendering
-
         this.camera = new Camera({
             x: window.innerWidth,
             y: window.innerHeight,
@@ -84,6 +83,12 @@ export class Game {
                 this.render(DrawMode.Gesture);
             },
         );
+
+        this.addSystems();
+    }
+
+    private addSystems() {
+        this.ecsWorld.addSystem(renderSystem);
     }
 
     async bootstrap(): Promise<void> {
@@ -149,9 +154,9 @@ export class Game {
         if (this.drawTick % 5 == 0) {
             this.updateTick += 1;
             this.gameTime.tick = this.updateTick;
-            //TODO: Do smart scheduling
-            this.world.onUpdate(this.updateTick);
-            housingSystem(this.world);
+            this.ecsWorld.runUpdate(this.updateTick);
+            //this.world.onUpdate(this.updateTick);
+            //housingSystem(this.world);
             this.interactionHandler.onUpdate(this.updateTick);
             this.updateVisibilityMap();
         }
@@ -222,42 +227,11 @@ export class Game {
         //TODO: use the world/root entity to get chunkmap
         //get entities within the viewport
         //call draw on these
-        if (true) {
-            /*
-            this.world.onDraw(
-                this.renderer.context,
-                this.visibilityMap,
-                drawMode,
-                false,
-            );*/
-
-            renderSystem(
-                this.world,
-                this.renderer.context,
-                this.visibilityMap,
-                drawMode,
-            );
-            /*
-            for (let i = 0; i < entities.length; i++) {
-                const entity = entities[i];
-                if (entity.isGameRoot) {
-                    continue;
-                }
-
-                entity.onDraw(
-                    this.renderer.context,
-                    this.visibilityMap,
-                    drawMode,
-                    false,
-                );
-            }*/
-        } else {
-            this.world.onDraw(
-                this.renderer.context,
-                this.visibilityMap,
-                drawMode,
-            );
-        }
+        this.ecsWorld.runRender(
+            this.renderer.context,
+            this.visibilityMap,
+            drawMode,
+        );
 
         this.interactionHandler.onDraw(this.renderer.context);
         this.renderer.renderDeferred();

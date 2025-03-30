@@ -1,12 +1,12 @@
 import { describe, it, expect } from "vitest";
 import { addMovementActor, createTestRootNode } from "./movementHarness.js";
-import { PathFindingComponent } from "../../../../src/game/component/root/path/pathFindingComponent.js";
+import { PathFindingComponent } from "../../../../src/game/componentOld/root/path/pathFindingComponent.js";
 import {
     Point,
     addPoint,
     subtractPoint,
 } from "../../../../src/common/point.js";
-import { MovementResult } from "../../../../src/game/component/movement/movementResult.js";
+import { MovementResult } from "../../../../src/game/componentOld/movement/movementResult.js";
 import { Axis } from "../../../../src/common/direction.js";
 
 describe("MovementComponent", () => {

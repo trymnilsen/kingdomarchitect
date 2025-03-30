@@ -3,8 +3,8 @@ import { Entity } from "../../../src/game/entity/entity.js";
 import {
     ComponentsQueryCache2,
     QueryObject,
-} from "../../../src/game/component/componentQueryCache2.js";
-import { EntityComponent } from "../../../src/game/component/entityComponent.js";
+} from "../../../src/game/componentOld/componentQueryCache2.js";
+import { EntityComponent } from "../../../src/game/componentOld/entityComponent.js";
 
 class FakeComponent extends EntityComponent {}
 

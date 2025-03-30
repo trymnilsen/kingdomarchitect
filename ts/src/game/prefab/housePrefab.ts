@@ -1,13 +1,13 @@
 import { sprites2 } from "../../module/asset/sprite.js";
 import { woodenBuildings } from "../../data/building/wood/wood.js";
-import { BuildingComponent } from "../component/building/buildingComponent.js";
-import { HealthComponent } from "../component/health/healthComponent.js";
+import { BuildingComponent } from "../componentOld/building/buildingComponent.js";
+import { HealthComponent } from "../componentOld/health/healthComponent.js";
 import { Entity } from "../entity/entity.js";
-import { VisibilityComponent } from "../component/visibility/visibilityComponent.js";
+import { VisibilityComponent } from "../componentOld/visibility/visibilityComponent.js";
 import { largeDiamondPattern } from "../../common/pattern.js";
 import { zeroPoint } from "../../common/point.js";
 import { generateId } from "../../common/idGenerator.js";
-import { HousingComponent } from "../component/building/housingComponent.js";
+import { HousingComponent } from "../componentOld/building/housingComponent.js";
 
 export function housePrefab(
     id: string = generateId("house"),

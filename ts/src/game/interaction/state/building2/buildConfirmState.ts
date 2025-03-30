@@ -6,11 +6,11 @@ import { woodResourceItem } from "../../../../data/inventory/items/resources.js"
 import { RenderScope } from "../../../../rendering/renderScope.js";
 import { uiBox } from "../../../../module/ui/dsl/uiBoxDsl.js";
 import { fillUiSize } from "../../../../module/ui/uiSize.js";
-import { BuildingComponent } from "../../../component/building/buildingComponent.js";
-import { HealthComponent } from "../../../component/health/healthComponent.js";
-import { JobQueueComponent } from "../../../component/job/jobQueueComponent.js";
-import { BuildJob } from "../../../component/job/jobs/buildJob.js";
-import { TilesComponent } from "../../../component/tile/tilesComponent.js";
+import { BuildingComponent } from "../../../componentOld/building/buildingComponent.js";
+import { HealthComponent } from "../../../componentOld/health/healthComponent.js";
+import { JobQueueComponent } from "../../../componentOld/job/jobQueueComponent.js";
+import { BuildJob } from "../../../componentOld/job/jobs/buildJob.js";
+import { TilesComponent } from "../../../componentOld/tile/tilesComponent.js";
 import { buildingFactory } from "../../../prefab/buildingFactory.js";
 import { GroundTile } from "../../../map/tile.js";
 import { TileSize } from "../../../map/tile.js";
@@ -24,7 +24,7 @@ import { SingleBuildMode } from "./mode/singleBuildMode.js";
 import { buildingApplicabilityList } from "./buildingApplicabilityList.js";
 import { BuildingApplicabilityResult } from "./buildingApplicability.js";
 import { findMapped } from "../../../../common/array.js";
-import { SpatialChunkMapComponent } from "../../../component/world/spatialChunkMapComponent.js";
+import { SpatialChunkMapComponent } from "../../../componentOld/world/spatialChunkMapComponent.js";
 
 export class BuildConfirmState extends InteractionState {
     private scaffold: UIActionbarScaffold | null = null;

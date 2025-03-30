@@ -12,7 +12,7 @@ import { allSides } from "../../../../common/sides.js";
 import { RenderScope } from "../../../../rendering/renderScope.js";
 import { uiBox } from "../../../../module/ui/dsl/uiBoxDsl.js";
 import { fillUiSize } from "../../../../module/ui/uiSize.js";
-import { TilesComponent } from "../../../component/tile/tilesComponent.js";
+import { TilesComponent } from "../../../componentOld/tile/tilesComponent.js";
 import { ChunkDimension, ChunkSize } from "../../../map/chunk.js";
 import { generateChunk } from "../../../map/chunkGenerator.js";
 import { GroundTile, TileSize } from "../../../map/tile.js";

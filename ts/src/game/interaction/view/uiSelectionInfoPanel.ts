@@ -21,7 +21,7 @@ import { UIBox } from "../../../module/ui/view/uiBox.js";
 import { UIImage } from "../../../module/ui/view/uiImage.js";
 import { UISpriteImageSource } from "../../../module/ui/view/uiImageSource.js";
 import { UIText } from "../../../module/ui/view/uiText.js";
-import { SelectionInfo } from "../../component/selection/selectionInfo.js";
+import { SelectionInfo } from "../../componentOld/selection/selectionInfo.js";
 
 export class UISelectorInfoPanel extends UIBox {
     private _selectionInfo: SelectionInfo | null = null;

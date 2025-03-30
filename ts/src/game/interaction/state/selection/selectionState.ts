@@ -1,8 +1,8 @@
 import { sprites2 } from "../../../../module/asset/sprite.js";
 import { allSides } from "../../../../common/sides.js";
 import { RenderScope } from "../../../../rendering/renderScope.js";
-import { SelectionInfo } from "../../../component/selection/selectionInfo.js";
-import { SelectionInfoComponent } from "../../../component/selection/selectionInfoComponent.js";
+import { SelectionInfo } from "../../../componentOld/selection/selectionInfo.js";
+import { SelectionInfoComponent } from "../../../componentOld/selection/selectionInfoComponent.js";
 import { TileSize } from "../../../map/tile.js";
 import { SelectedEntityItem } from "../../../../module/selection/selectedEntityItem.js";
 import { SelectedTileItem } from "../../../../module/selection/selectedTileItem.js";

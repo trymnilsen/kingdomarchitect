@@ -1,7 +1,7 @@
 import { CraftingOutputTag } from "../../../../../../data/inventory/inventoryItemQuantity.js";
-import { InventoryComponent2 } from "../../../../../component/inventory/inventoryComponent.js";
-import { JobQueueComponent } from "../../../../../component/job/jobQueueComponent.js";
-import { CollectJob } from "../../../../../component/job/jobs/collectJob.js";
+import { InventoryComponent2 } from "../../../../../componentOld/inventory/inventoryComponent.js";
+import { JobQueueComponent } from "../../../../../componentOld/job/jobQueueComponent.js";
+import { CollectJob } from "../../../../../componentOld/job/jobs/collectJob.js";
 import { SelectedEntityItem } from "../../../../../../module/selection/selectedEntityItem.js";
 import { SelectedWorldItem } from "../../../../../../module/selection/selectedWorldItem.js";
 import { StateContext } from "../../../../handler/stateContext.js";

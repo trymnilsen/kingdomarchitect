@@ -1,9 +1,9 @@
 import { sprites2 } from "../../module/asset/sprite.js";
 import { zeroPoint } from "../../common/point.js";
-import { SpriteComponent } from "../component/draw/spriteComponent.js";
-import { HealthComponent } from "../component/health/healthComponent.js";
-import { StaticSelectionInfoProvider } from "../component/selection/provider/staticSelectionInfoProvider.js";
-import { SelectionInfoComponent } from "../component/selection/selectionInfoComponent.js";
+import { SpriteComponent } from "../componentOld/draw/spriteComponent.js";
+import { HealthComponent } from "../componentOld/health/healthComponent.js";
+import { StaticSelectionInfoProvider } from "../componentOld/selection/provider/staticSelectionInfoProvider.js";
+import { SelectionInfoComponent } from "../componentOld/selection/selectionInfoComponent.js";
 import { Entity } from "../entity/entity.js";
 
 export function trainingDummyPrefab(id: string): Entity {
