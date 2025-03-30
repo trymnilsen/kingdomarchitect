@@ -23,20 +23,9 @@ export type EcsEntityEventFunction<T extends EntityEvent> = (
 
 export type EcsInitFunction = (rootEntity: Entity) => void;
 
-type Foo = Record<string, any>;
-type String1 = "hello" | "hi";
-type String2 = "heya" | "greetings";
-type AllStrings = String1 | String2;
-
 type EcsComponent = {
     constructor: Function;
 };
-
-class Foobar {
-    hello?: string;
-}
-
-const bar: EcsComponent = new Foobar();
 
 export type EcsEntityEvents = Partial<{
     [k in EntityEvent["id"]]: EcsEntityEventFunction<EntityEventMap[k]>;

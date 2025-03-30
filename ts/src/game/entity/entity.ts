@@ -19,6 +19,7 @@ import { GameTime } from "../../common/time.js";
 import { DrawMode } from "../../rendering/drawMode.js";
 import { RenderScope } from "../../rendering/renderScope.js";
 import { RenderVisibilityMap } from "../../rendering/renderVisibilityMap.js";
+import type { ComponentType } from "../component/component.js";
 import { ComponentEvent } from "../componentOld/componentEvent.js";
 import { ComponentQueryCache } from "../componentOld/componentQueryCache.js";
 import {
@@ -52,6 +53,7 @@ export class Entity {
     >();
     private _entityEvents = new Event<EntityEvent>();
     private _componentsMap = new Map<string, EntityComponent>();
+    private _ecsComponents = new Map<string, ComponentType>();
     private _componentsQueryCache?: ComponentQueryCache;
     private _componentsQueryCache2?: ComponentQueryCache2;
     private _gameTime?: GameTime;
@@ -327,6 +329,19 @@ export class Entity {
         });
     }
 
+    addEcsComponent(ecsComponent: ComponentType) {
+        const componentName = getConstructorName(ecsComponent);
+        this._ecsComponents.set(componentName, ecsComponent);
+    }
+
+    getEcsComponent<TFilter extends ComponentType>(
+        filterType: ConstructorFunction<TFilter>,
+    ): TFilter | null {
+        const componentId = filterType.name;
+        const component = this._ecsComponents.get(componentId) as TFilter;
+        return component || null;
+    }
+
     /**
      * Removes a component from the entity
      * @param entityComponent the component to remove
@@ -447,6 +462,23 @@ export class Entity {
         this._componentsQueryCache.setComponents(filterType, childComponents);
 
         return childComponents;
+    }
+
+    queryEcsComponents<T extends ConstructorFunction<ComponentType>>(
+        component: T,
+    ): Map<EntityId, InstanceType<T>> {
+        //How do we avoid three (or two when old is removed) caches
+        const map = new Map<EntityId, InstanceType<T>>();
+
+        visitChildren(this, (child) => {
+            const matchingComponent = child.getEcsComponent(component);
+            if (matchingComponent) {
+                map.set(child.id, matchingComponent as InstanceType<T>);
+            }
+            return false;
+        });
+
+        return map;
     }
 
     queryComponents<T extends ConstructorFunction<EntityComponent>>(

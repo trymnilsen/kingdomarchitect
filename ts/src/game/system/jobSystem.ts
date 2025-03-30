@@ -7,7 +7,8 @@ export const JobSystem: EcsSystem = {
 };
 
 function updateJobs(rootEntity: Entity, gameTime: number) {
-    const runners: Map<string, JobRunnerComponent> = queryComponents();
+    const runners: Map<string, JobRunnerComponent> =
+        rootEntity.queryEcsComponents(JobRunnerComponent);
     for (const [entityId, component] of runners) {
         if (!!component.currentJob) {
             runJob(rootEntity, entityId, component);

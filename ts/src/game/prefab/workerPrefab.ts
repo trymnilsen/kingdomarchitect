@@ -1,4 +1,5 @@
 import { JobRunnerComponent } from "../componentOld/job/jobRunnerComponent.js";
+import { JobRunnerComponent as JobRunnerEcsComponent } from "../component/jobRunnerComponent.js";
 import { SpriteComponent } from "../componentOld/draw/spriteComponent.js";
 import { WorkerBehaviorComponent } from "../componentOld/behavior/workerBehaviorComponent.js";
 import { Entity } from "../entity/entity.js";
@@ -69,6 +70,6 @@ export function workerPrefab(id: string): Entity {
     worker.addComponent(effectComponent);
     worker.addComponent(visibilityComponent);
     worker.addComponent(inventoryComponent);
-
+    worker.addEcsComponent(new JobRunnerEcsComponent());
     return worker;
 }
