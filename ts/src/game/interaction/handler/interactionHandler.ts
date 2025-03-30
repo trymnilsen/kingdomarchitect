@@ -3,8 +3,11 @@ import { sprites2 } from "../../../module/asset/sprite.js";
 import { Point } from "../../../common/point.js";
 import { allSides } from "../../../common/sides.js";
 import { GameTime } from "../../../common/time.js";
-import { InputAction, InputActionType } from "../../../input/inputAction.js";
-import { OnTapEndEvent } from "../../../input/touchInput.js";
+import {
+    InputAction,
+    InputActionType,
+} from "../../../module/input/inputAction.js";
+import { OnTapEndEvent } from "../../../module/input/touchInput.js";
 import { Camera } from "../../../rendering/camera.js";
 import { RenderScope } from "../../../rendering/renderScope.js";
 import { subTitleTextStyle } from "../../../rendering/text/textStyle.js";

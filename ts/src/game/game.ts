@@ -8,9 +8,9 @@ import {
 import { AssetLoader } from "../module/asset/loader/assetLoader.js";
 
 import { GameTime } from "../common/time.js";
-import { Input, InputEvent } from "../input/input.js";
-import { InputActionType } from "../input/inputAction.js";
-import { TouchInput } from "../input/touchInput.js";
+import { Input, InputEvent } from "../module/input/input.js";
+import { InputActionType } from "../module/input/inputAction.js";
+import { TouchInput } from "../module/input/touchInput.js";
 import { EcsWorld } from "../module/ecs/ecsWorld.js";
 import { Camera } from "../rendering/camera.js";
 import { DrawMode } from "../rendering/drawMode.js";

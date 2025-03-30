@@ -1,4 +1,4 @@
-import { Direction } from "../common/direction.js";
+import { Direction } from "../../common/direction.js";
 
 export enum InputActionType {
     LEFT_PRESS = "LEFT_PRESS",

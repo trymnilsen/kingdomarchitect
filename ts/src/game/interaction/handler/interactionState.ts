@@ -5,7 +5,7 @@ import {
     InputAction,
     InputActionType,
     getDirectionFromInputType,
-} from "../../../input/inputAction.js";
+} from "../../../module/input/inputAction.js";
 import { RenderScope } from "../../../rendering/renderScope.js";
 import { UIEvent } from "../../../module/ui/event/uiEvent.js";
 import { FocusGroup } from "../../../module/ui/focus/focusGroup.js";
