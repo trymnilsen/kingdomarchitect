@@ -1,8 +1,11 @@
+import type { ConstructorFunction } from "../../common/constructor.js";
 import { Entity } from "../../game/entity/entity.js";
 import { EntityEventMap } from "../../game/entity/entityEvent.js";
 import { DrawMode } from "../../rendering/drawMode.js";
 import { RenderScope } from "../../rendering/renderScope.js";
 import { RenderVisibilityMap } from "../../rendering/renderVisibilityMap.js";
+import type { EntityAction } from "../action/entityAction.js";
+import type { EntityId } from "./ecsEntity.js";
 import {
     EcsEntityEventFunction,
     EcsEntityEvents,
@@ -18,7 +21,17 @@ type EcsEntityEventHandlersMap = {
     // Note: We are NOT using Partial<> here, so all keys are mandatory.
 };
 
-export class EcsWorld {
+export type ParameterlessClassConstructor = new () => object;
+export type EcsComponent = { constructor: ParameterlessClassConstructor };
+
+export interface EcsWorld {
+    query<T extends ParameterlessClassConstructor>(
+        component: T,
+    ): Map<EntityId, InstanceType<T>>;
+    dispatch<T extends EntityAction>(action: T);
+}
+
+export class Ecs {
     private renderSystems: EcsRenderFunction[] = [];
     private initSystems: EcsInitFunction[] = [];
     private updateSystems: EcsUpdateFunction[] = [];

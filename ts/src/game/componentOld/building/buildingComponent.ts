@@ -34,7 +34,7 @@ export class BuildingComponent extends EntityComponent {
 
     get isScaffolded(): boolean {
         return this._isScaffolded;
-    }
+    }   
 
     get remainingItems(): ReadonlyArray<InventoryItemQuantity> {
         //TODO: Optimize with a map not null

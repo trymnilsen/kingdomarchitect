@@ -3,21 +3,19 @@ import { EntityEvent, EntityEventMap } from "../../game/entity/entityEvent.js";
 import { DrawMode } from "../../rendering/drawMode.js";
 import { RenderScope } from "../../rendering/renderScope.js";
 import { RenderVisibilityMap } from "../../rendering/renderVisibilityMap.js";
+import type { EcsWorld } from "./ecsWorld.js";
 
 export type EcsRenderFunction = (
-    rootEntity: Entity,
+    world: EcsWorld,
     renderScope: RenderScope,
     visibilityMap: RenderVisibilityMap,
     drawMode: DrawMode,
 ) => void;
 
-export type EcsUpdateFunction = (
-    rootEntity: Entity,
-    updateTime: number,
-) => void;
+export type EcsUpdateFunction = (world: EcsWorld, updateTime: number) => void;
 
 export type EcsEntityEventFunction<T extends EntityEvent> = (
-    rootEntity: Entity,
+    world: EcsWorld,
     event: T,
 ) => void;
 
