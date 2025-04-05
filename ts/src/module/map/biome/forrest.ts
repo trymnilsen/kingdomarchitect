@@ -9,6 +9,6 @@ import { spawnTree } from "../item/vegetation.js";
 
 export function generateForrest(chunk: TileChunk, rootEntity: Entity) {
     placeSettlement(chunk, rootEntity);
-    spawnTree(16, { x: chunk.chunkX, y: chunk.chunkY }, rootEntity);
+    //spawnTree(16, { x: chunk.chunkX, y: chunk.chunkY }, rootEntity);
     placeRocks(chunk, rootEntity);
 }

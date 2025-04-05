@@ -1,5 +1,5 @@
 import type { Bounds } from "../../common/bounds.js";
-import { encodePosition } from "../../common/point.js";
+import { encodePosition, type Point } from "../../common/point.js";
 import { EcsSystem } from "../../module/ecs/ecsSystem.js";
 import { DrawMode } from "../../rendering/drawMode.js";
 import type { RenderScope } from "../../rendering/renderScope.js";
@@ -10,6 +10,7 @@ import { ChunkDimension, ChunkSize } from "../../module/map/chunk.js";
 import { getTileId, TileSize } from "../../module/map/tile.js";
 import { SpriteComponent } from "../component/spriteComponent.js";
 import type { EcsWorld } from "../../module/ecs/ecsWorld.js";
+import { TileComponent } from "../component/tileComponent.js";
 
 export const renderSystem: EcsSystem = {
     onRender,
@@ -23,17 +24,20 @@ function onRender(
 ) {
     const renderStart = performance.now();
     const viewport = renderScope.camera.tileSpaceViewPort;
-
-    drawTiles(world, renderContext, visibilityMap);
+    //TODO: If i make a map/set structure with both string and instance keys
+    //i can add a first method to it to avoid getting values
+    const tiles = Array.from(world.query(TileComponent).values())[0];
+    drawTiles(tiles, renderScope, visibilityMap);
     const query = world.queryWithin(viewport, SpriteComponent);
 
-    const sortedSprites = query.components.sort(
-        (a, b) => a.entity.worldPosition.y - b.entity.worldPosition.y,
+    const sortedSprites = Array.from(query.entries()).sort(
+        (a, b) => a[0].worldPosition.y - b[0].worldPosition.y,
     );
 
     for (let i = 0; i < sortedSprites.length; i++) {
-        const sprite = sortedSprites[i];
-        drawSprite(rootEntity, renderContext, sprite.spriteComponent, mode);
+        const sprite = sortedSprites[i][1];
+        const position = sortedSprites[i][0].worldPosition;
+        drawSprite(sprite, position, renderScope, drawMode);
     }
 
     const renderEnd = performance.now();
@@ -44,10 +48,10 @@ function onRender(
 }
 
 function drawSprite(
-    _rootEntity: Entity,
-    renderContext: RenderScope,
     spriteComponent: SpriteComponent,
-    drawMode: DrawMode,
+    position: Point,
+    renderContext: RenderScope,
+    _drawMode: DrawMode,
 ) {
     const scale = 1;
 
@@ -68,6 +72,7 @@ function drawSprite(
             renderContext.measureSprite(spriteComponent.sprite).height * scale;
     }
 
+    /*
     if (drawMode == DrawMode.Tick && !!spriteComponent.tint) {
         // if there are no frames left, clear it
         if (spriteComponent.tint.frames == 0) {
@@ -77,8 +82,9 @@ function drawSprite(
             console.log("Subtracting sprite tint");
             spriteComponent.tint.frames -= 1;
         }
-    }
+    }*/
 
+    /*
     let spriteConfig: SpriteProviderConfig | null = null;
     let frame = 0;
     const component = spriteComponent.entity.getComponent(SpriteStateMachine);
@@ -88,15 +94,13 @@ function drawSprite(
             drawMode,
         );
         frame = spriteConfig.frame;
-    }
+    }*/
 
-    const screenPosition = renderContext.camera.tileSpaceToScreenSpace(
-        spriteComponent.entity.worldPosition,
-    );
+    const screenPosition =
+        renderContext.camera.tileSpaceToScreenSpace(position);
 
     renderContext.drawScreenSpaceSprite({
-        frame: frame,
-        sprite: spriteConfig?.sprite ?? spriteComponent.sprite,
+        sprite: spriteComponent.sprite,
         x: screenPosition.x + spriteComponent.offset.x,
         y: screenPosition.y + spriteComponent.offset.y,
         targetHeight: targetHeight,
@@ -123,12 +127,11 @@ function getVisibleChunks(bounds: Bounds): number[] {
 }
 
 function drawTiles(
-    rootEntity: Entity,
+    tiles: TileComponent,
     renderContext: RenderScope,
     visibilityMap: RenderVisibilityMap,
 ) {
-    const tileComponent = rootEntity.requireComponent(TilesComponent);
-    for (const [chunkId, chunk] of tileComponent._chunks) {
+    for (const [chunkId, chunk] of tiles.chunks) {
         const chunkPosition = {
             x: chunk.chunkX * ChunkSize,
             y: chunk.chunkY * ChunkSize,

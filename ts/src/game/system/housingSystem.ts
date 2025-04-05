@@ -3,14 +3,19 @@ import type { ConstructorFunction } from "../../common/constructor.js";
 import { generateId } from "../../common/idGenerator.js";
 import type { ReadableSet } from "../../common/structure/sparseSet.js";
 import { woodenHouse } from "../../data/building/wood/house.js";
-import type { EntityComponent } from "../componentOld/entityComponent.js";
-import { findClosestAvailablePosition } from "../componentOld/root/path/availability.js";
+import type { EcsSystem } from "../../module/ecs/ecsSystem.js";
+import type { EcsWorld } from "../../module/ecs/ecsWorld.js";
 import { Entity, type EntityId } from "../entity/entity.js";
-import { workerPrefab } from "../prefabOld/workerPrefab.js";
 
-export function housingSystem(rootEntity: Entity) {
-    const buildings = rootEntity.queryComponents(HousingComponent);
-    const workers = rootEntity.queryComponents(WorkerBehaviorComponent);
+//TODO: Make a housing component and re-implement
+/*
+export const housingSystem: EcsSystem = {
+    onUpdate,
+};
+
+function onUpdate(world: EcsWorld) {
+    const buildings = world.query(HousingComponent);
+    const workers = world.query(WorkerBehaviorComponent);
     const availableHouses: HousingComponent[] = [];
     const workersWithHouse: Set<string> = new Set();
     for (let i = 0; i < buildings.size; i++) {
@@ -76,3 +81,4 @@ export function housingSystem(rootEntity: Entity) {
 function removeHomelessEffect(_entity: Entity) {}
 
 function addHomelessEffect(_entity: Entity) {}
+*/

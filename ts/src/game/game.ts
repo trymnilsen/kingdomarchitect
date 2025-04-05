@@ -33,7 +33,6 @@ export class Game {
     private assetLoader: AssetLoader;
     private drawTick = 0;
     private updateTick = 0;
-    private world: Entity;
     private camera: Camera;
     private gameTime: GameTime = new GameTime();
     private ecsWorld: Ecs;
@@ -41,8 +40,7 @@ export class Game {
 
     constructor(private domElementWrapperSelector: string) {
         //TODO: Setting up root entity should be updated
-        this.world = createRootEntity();
-        this.ecsWorld = new Ecs(this.world);
+        this.ecsWorld = new Ecs();
         this.assetLoader = new AssetLoader();
         // Rendering
         this.camera = new Camera({
@@ -50,7 +48,7 @@ export class Game {
             y: window.innerHeight,
         });
         // World
-        this.world.gameTime = this.gameTime;
+        //this.ecsWorld.gameTime = this.gameTime;
 
         const canvasElement: HTMLCanvasElement | null = document.querySelector(
             `#${this.domElementWrapperSelector}`,
@@ -72,7 +70,7 @@ export class Game {
 
         // UI states handling
         this.interactionHandler = new InteractionHandler(
-            this.world,
+            this.ecsWorld.root,
             this.renderer.camera,
             this.assetLoader,
             this.gameTime,
@@ -94,9 +92,9 @@ export class Game {
     async bootstrap(): Promise<void> {
         console.log("bootstrap");
         this.assetLoader.load();
-        addInitialPlayerChunk(this.world);
+        addInitialPlayerChunk(this.ecsWorld.root);
         //Set the camera position
-        const playerEntity = firstChildWhere(this.world, (child) => {
+        const playerEntity = firstChildWhere(this.ecsWorld.root, (child) => {
             return child.id.includes("worker");
         });
         if (!!playerEntity) {

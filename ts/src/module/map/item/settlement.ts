@@ -6,19 +6,10 @@ import {
     Point,
     pointGrid,
 } from "../../../common/point.js";
-import {
-    SettlementComponent,
-    SettlementType,
-} from "../../componentOld/npc/settlementComponent.js";
-import { TileChunk } from "../../componentOld/tile/tilesComponent.js";
-import { SpatialChunkMapComponent } from "../../componentOld/world/spatialChunkMapComponent.js";
 import { Entity } from "../../../game/entity/entity.js";
-import { farmPrefab } from "../../../game/prefabOld/farmPrefab.js";
-import { housePrefab } from "../../../game/prefabOld/housePrefab.js";
-import { orcHousePrefab } from "../../../game/prefabOld/orcHousePrefab.js";
-import { ChunkSize } from "../chunk.js";
+import { ChunkSize, type TileChunk } from "../chunk.js";
 
-export function placeSettlement(chunk: TileChunk, chunkEntity: Entity) {
+export function placeSettlement(chunk: TileChunk, _chunkEntity: Entity) {
     if (chunk.volume.id === "volume1") {
         return;
     }
@@ -30,6 +21,7 @@ export function placeSettlement(chunk: TileChunk, chunkEntity: Entity) {
     }
     console.log(`placeSettlement - Proc ${procValue} > 0.5, adding settlement`);
 
+    /*
     const chunkMapComponent = chunkEntity.getAncestorComponent(
         SpatialChunkMapComponent,
     );
@@ -64,13 +56,15 @@ export function placeSettlement(chunk: TileChunk, chunkEntity: Entity) {
             console.log("Add human settlement to", chunk.volume.id);
             placeHumanSettlement(chunk, chunkEntity, point);
         }
-    }
+    }*/
 }
 
-function placeOrcSettlement(chunkEntity: Entity, position: Point) {
+function placeOrcSettlement(chunkEntity: Entity, _position: Point) {
     const settlementEntity = new Entity(generateId("settlement"));
     chunkEntity.addChild(settlementEntity);
 
+    /*
+    //TODO: Reimplement prefab
     const orcHouseEntity = orcHousePrefab();
     const farmEntity = farmPrefab();
 
@@ -86,13 +80,16 @@ function placeOrcSettlement(chunkEntity: Entity, position: Point) {
     const settlementComponent = new SettlementComponent();
     settlementComponent.type = SettlementType.Orc;
     chunkEntity.addComponent(settlementComponent);
+    */
 }
 
 function placeHumanSettlement(
     _chunk: TileChunk,
-    chunkEntity: Entity,
-    position: Point,
+    _chunkEntity: Entity,
+    _position: Point,
 ) {
+    //TODO: Reimplement prefabs
+    /*
     chunkEntity.addComponent(new SettlementComponent());
 
     const houseEntity = housePrefab();
@@ -107,4 +104,5 @@ function placeHumanSettlement(
     farmEntity.worldPosition = addPoint(position, farmPosition);
     chunkEntity.addChild(houseEntity);
     chunkEntity.addChild(farmEntity);
+    */
 }

@@ -7,7 +7,8 @@ export const JobSystem: EcsSystem = {
     onUpdate: updateJobs,
 };
 
-function updateJobs(world: EcsWorld, gameTime: number) {
+function updateJobs(_world: EcsWorld, _gameTime: number) {
+    /*
     const runners = world.query(JobRunnerComponent);
     for (const [entityId, component] of runners) {
         if (!!component.currentJob) {
@@ -16,10 +17,11 @@ function updateJobs(world: EcsWorld, gameTime: number) {
     }
 
     world.dispatch();
+    */
 }
 
 function runJob(
-    rootEntity: Entity,
-    entityId: string,
-    component: JobRunnerComponent,
+    _rootEntity: Entity,
+    _entityId: string,
+    _component: JobRunnerComponent,
 ) {}

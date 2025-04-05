@@ -1,6 +1,7 @@
 import type { Bounds } from "../../common/bounds.js";
 import type { ConstructorFunction } from "../../common/constructor.js";
 import type { ComponentType } from "../../game/component/component.js";
+import { TileComponent } from "../../game/component/tileComponent.js";
 import { Entity } from "../../game/entity/entity.js";
 import { EntityEventMap } from "../../game/entity/entityEvent.js";
 import { DrawMode } from "../../rendering/drawMode.js";
@@ -23,21 +24,23 @@ type EcsEntityEventHandlersMap = {
     // Note: We are NOT using Partial<> here, so all keys are mandatory.
 };
 
-export type ParameterlessClassConstructor = new () => object;
+export type ParameterlessClassConstructor<
+    T extends ComponentType = ComponentType,
+> = new () => T;
 export type EcsComponent = { constructor: ParameterlessClassConstructor };
 
 export interface EcsWorld {
     query<T extends ParameterlessClassConstructor>(
         component: T,
-    ): Map<EntityId, InstanceType<T>>;
-    query<T extends ParameterlessClassConstructor>(
+    ): Map<Entity, InstanceType<T>>;
+    queryWithin<T extends ParameterlessClassConstructor>(
         viewport: Bounds,
         component: T,
-    ): Map<EntityId, InstanceType<T>>;
+    ): Map<Entity, InstanceType<T>>;
     dispatch<T extends EntityAction>(action: T);
 }
 
-export class Ecs {
+export class Ecs implements EcsWorld {
     private renderSystems: EcsRenderFunction[] = [];
     private initSystems: EcsInitFunction[] = [];
     private updateSystems: EcsUpdateFunction[] = [];
@@ -50,8 +53,31 @@ export class Ecs {
     };
     private rootEntity: Entity;
 
-    constructor(rootEntity: Entity) {
-        this.rootEntity = rootEntity;
+    public get root(): Entity {
+        return this.rootEntity;
+    }
+
+    constructor() {
+        this.rootEntity = new Entity("root");
+        this.rootEntity.addEcsComponent(new TileComponent());
+    }
+
+    query<T extends ParameterlessClassConstructor>(
+        component: T,
+    ): Map<Entity, InstanceType<T>> {
+        return this.rootEntity.queryComponents(component);
+    }
+
+    queryWithin<T extends ParameterlessClassConstructor>(
+        _viewport: Bounds,
+        component: T,
+    ): Map<Entity, InstanceType<T>> {
+        //TODO: Return only inside bounds based on the chunk map resource
+        return this.query(component);
+    }
+
+    dispatch<T extends EntityAction>(_action: T) {
+        throw new Error("Method not implemented.");
     }
 
     addSystem(system: EcsSystem) {
@@ -104,16 +130,14 @@ export class Ecs {
     ) {
         for (let i = 0; i < this.renderSystems.length; i++) {
             const system = this.renderSystems[i];
-            system(this.rootEntity, renderScope, visiblityMap, drawMode);
+            system(this, renderScope, visiblityMap, drawMode);
         }
     }
 
     runUpdate(gameTime: number) {
         for (let i = 0; i < this.updateSystems.length; i++) {
             const system = this.updateSystems[i];
-            system(this.rootEntity, gameTime);
+            system(this, gameTime);
         }
     }
-
-    queryWithin(): Map<Entity, ComponentType> {}
 }

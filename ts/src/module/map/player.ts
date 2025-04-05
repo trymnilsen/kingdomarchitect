@@ -8,13 +8,18 @@ import {
     wizardHat,
 } from "../../data/inventory/items/equipment.js";
 import { goldCoins } from "../../data/inventory/items/resources.js";
+import { TileComponent } from "../../game/component/tileComponent.js";
 import { Entity } from "../../game/entity/entity.js";
+import { workerPrefab } from "../../game/prefab/workerPrefab.js";
 import { spawnTree } from "./item/vegetation.js";
 
 export function addInitialPlayerChunk(rootEntity: Entity) {
     const chunkEntity = new Entity("chunk");
     rootEntity.addChild(chunkEntity);
-    rootEntity.requireComponent(TilesComponent).setChunk({
+    const tiles = Array.from(
+        rootEntity.queryComponents(TileComponent).values(),
+    )[0];
+    tiles.setChunk({
         chunkX: 0,
         chunkY: 0,
         volume: {
@@ -27,6 +32,9 @@ export function addInitialPlayerChunk(rootEntity: Entity) {
         },
         discovered: new Set(),
     });
+    const firstWorker = workerPrefab();
+    chunkEntity.addChild(firstWorker);
+    /*
     const firstWorker = workerPrefab(generateId("worker"));
     const firstHouse = housePrefab(generateId("house"), false);
     const firstFarm = farmPrefab(generateId("farm"));
@@ -58,4 +66,5 @@ export function addInitialPlayerChunk(rootEntity: Entity) {
     chunkEntity.addChild(well);
     chunkEntity.addChild(chest);
     spawnTree(16, { x: 0, y: 0 }, chunkEntity);
+    */
 }

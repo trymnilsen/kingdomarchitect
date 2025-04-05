@@ -5,14 +5,13 @@ import {
     multiplyPoint,
 } from "../../../common/point.js";
 import { SparseSet } from "../../../common/structure/sparseSet.js";
-import { TileChunk } from "../../componentOld/tile/tilesComponent.js";
 import { Entity } from "../../../game/entity/entity.js";
-import { treePrefab } from "../../../game/prefabOld/treePrefab.js";
 import { encodePosition, Point } from "../../../common/point.js";
-import { SpatialChunkMapComponent } from "../../componentOld/world/spatialChunkMapComponent.js";
 import { ChunkSize, getChunkBounds } from "../chunk.js";
 
-export function spawnTree(amount: number, chunk: Point, rootEntity: Entity) {
+export function spawnTree(_amount: number, _chunk: Point, _rootEntity: Entity) {
+    /*
+    TODO: Use chunkmap from ecs
     const chunkMap = rootEntity.getAncestorComponent(SpatialChunkMapComponent);
     if (!chunkMap) {
         throw new Error("No chunk map component found");
@@ -55,5 +54,5 @@ export function spawnTree(amount: number, chunk: Point, rootEntity: Entity) {
             skipPoints.add(encodedPoint);
             break;
         }
-    }
+    }*/
 }

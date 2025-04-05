@@ -6,6 +6,7 @@ import {
 import { randomColor } from "../../common/color.js";
 import { generateId } from "../../common/idGenerator.js";
 import { adjacentPoints, Point } from "../../common/point.js";
+import { TileComponent } from "../../game/component/tileComponent.js";
 import { Entity } from "../../game/entity/entity.js";
 import { generateDesert } from "./biome/desert.js";
 import { generateForrest } from "./biome/forrest.js";
@@ -14,20 +15,23 @@ import { generatePlains } from "./biome/plains.js";
 import { generateSnow } from "./biome/snow.js";
 import { generateSwamp } from "./biome/swamp.js";
 import { generateTaint } from "./biome/taint.js";
-import { ChunkSize } from "./chunk.js";
+import { ChunkSize, type TileChunk } from "./chunk.js";
+import type { Volume } from "./volume.js";
 
 export function generateChunk(rootEntity: Entity, chunkPoint: Point) {
-    const tileComponent = rootEntity.requireComponent(TilesComponent);
+    const tiles = Array.from(
+        rootEntity.queryComponents(TileComponent).values(),
+    )[0];
     // Find available volumes with available space
     const adjacentVolumes = mapNotNullDistinct(
         adjacentPoints(chunkPoint),
-        (item) => tileComponent.getChunk(item)?.volume,
+        (item) => tiles.getChunk(item)?.volume,
     ).filter((volume) => volume.size < volume.maxSize);
     const createNewVolume = Math.random() > 0.8;
 
     let chunk: TileChunk | undefined = undefined;
     if (
-        tileComponent.numberOfChunks > 1 &&
+        tiles.chunks.size > 1 &&
         (createNewVolume || adjacentVolumes.length == 0)
     ) {
         const maxSize = weightedRandomEntry(
@@ -78,7 +82,7 @@ export function generateChunk(rootEntity: Entity, chunkPoint: Point) {
         };
     }
 
-    tileComponent.setChunk(chunk);
+    tiles.setChunk(chunk);
     generateChunkEntities(chunk, rootEntity);
 }
 

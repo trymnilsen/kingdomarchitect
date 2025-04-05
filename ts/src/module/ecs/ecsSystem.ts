@@ -6,7 +6,7 @@ import { RenderVisibilityMap } from "../../rendering/renderVisibilityMap.js";
 import type { EcsWorld } from "./ecsWorld.js";
 
 export type EcsRenderFunction = (
-    world: EcsWorld,
+    rootEntity: EcsWorld,
     renderScope: RenderScope,
     visibilityMap: RenderVisibilityMap,
     drawMode: DrawMode,
@@ -20,10 +20,6 @@ export type EcsEntityEventFunction<T extends EntityEvent> = (
 ) => void;
 
 export type EcsInitFunction = (rootEntity: Entity) => void;
-
-type EcsComponent = {
-    constructor: Function;
-};
 
 export type EcsEntityEvents = Partial<{
     [k in EntityEvent["id"]]: EcsEntityEventFunction<EntityEventMap[k]>;
