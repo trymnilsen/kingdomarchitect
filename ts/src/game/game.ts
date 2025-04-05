@@ -11,18 +11,17 @@ import { GameTime } from "../common/time.js";
 import { Input, InputEvent } from "../module/input/input.js";
 import { InputActionType } from "../module/input/inputAction.js";
 import { TouchInput } from "../module/input/touchInput.js";
-import { EcsWorld } from "../module/ecs/ecsWorld.js";
+import { Ecs, EcsWorld } from "../module/ecs/ecsWorld.js";
 import { Camera } from "../rendering/camera.js";
 import { DrawMode } from "../rendering/drawMode.js";
 import { Renderer } from "../rendering/renderer.js";
 import { RenderVisibilityMap } from "../rendering/renderVisibilityMap.js";
-import { VisibilityComponent } from "./componentOld/visibility/visibilityComponent.js";
 import { firstChildWhere } from "./entity/child/first.js";
 import { Entity } from "./entity/entity.js";
 import { createRootEntity } from "./entity/rootEntity.js";
 import { InteractionHandler } from "./interaction/handler/interactionHandler.js";
-import { addInitialPlayerChunk } from "./map/player.js";
-import { TileSize } from "./map/tile.js";
+import { addInitialPlayerChunk } from "../module/map/player.js";
+import { TileSize } from "../module/map/tile.js";
 import { renderSystem } from "./system/renderSystem.js";
 
 export class Game {
@@ -37,12 +36,13 @@ export class Game {
     private world: Entity;
     private camera: Camera;
     private gameTime: GameTime = new GameTime();
-    private ecsWorld: EcsWorld;
+    private ecsWorld: Ecs;
     private visibilityMap: RenderVisibilityMap = new RenderVisibilityMap();
 
     constructor(private domElementWrapperSelector: string) {
+        //TODO: Setting up root entity should be updated
         this.world = createRootEntity();
-        this.ecsWorld = new EcsWorld(this.world);
+        this.ecsWorld = new Ecs(this.world);
         this.assetLoader = new AssetLoader();
         // Rendering
         this.camera = new Camera({
@@ -172,6 +172,7 @@ export class Game {
     private updateVisibilityMap() {
         this.visibilityMap.clear();
         if (this.visibilityMap.useVisibility) {
+            /*
             const visibilityComponents =
                 this.world.queryComponentsOld(VisibilityComponent);
             for (let i = 0; i < visibilityComponents.length; i++) {
@@ -184,7 +185,7 @@ export class Game {
                         true,
                     );
                 }
-            }
+            }*/
         }
     }
 

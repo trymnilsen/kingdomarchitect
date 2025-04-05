@@ -1,8 +1,3 @@
-import { AttackJob } from "../../../../../componentOld/actor/mob/attackJob.js";
-import { WorkerBehaviorComponent } from "../../../../../componentOld/behavior/workerBehaviorComponent.js";
-import { BuildingComponent } from "../../../../../componentOld/building/buildingComponent.js";
-import { HealthComponent } from "../../../../../componentOld/health/healthComponent.js";
-import { JobQueueComponent } from "../../../../../componentOld/job/jobQueueComponent.js";
 import { SelectedEntityItem } from "../../../../../../module/selection/selectedEntityItem.js";
 import { SelectedWorldItem } from "../../../../../../module/selection/selectedWorldItem.js";
 import { StateContext } from "../../../../handler/stateContext.js";
@@ -14,9 +9,11 @@ import {
 
 export class AttackSelectionProvider implements ActorSelectionProvider {
     provideButtons(
-        stateContext: StateContext,
-        selection: SelectedWorldItem,
+        _stateContext: StateContext,
+        _selection: SelectedWorldItem,
     ): ButtonCollection {
+        /*
+        TODO: Reimplement this attack selection provider
         if (selection instanceof SelectedEntityItem) {
             const healthComponent =
                 selection.entity.getComponent(HealthComponent);
@@ -51,7 +48,7 @@ export class AttackSelectionProvider implements ActorSelectionProvider {
                     right: [],
                 };
             }
-        }
+        }*/
 
         return emptySelection;
     }

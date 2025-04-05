@@ -5,14 +5,6 @@ import {
     ItemTag,
 } from "../../../../../../data/inventory/inventoryItem.js";
 import { itemEffectFactoryList } from "../../../../../../data/inventory/itemEffectFactoryList.js";
-import { WorkerBehaviorComponent } from "../../../../../componentOld/behavior/workerBehaviorComponent.js";
-import { SpriteComponent } from "../../../../../componentOld/draw/spriteComponent.js";
-import { EffectComponent } from "../../../../../componentOld/effect/effectComponent.js";
-import {
-    EquipmentComponent,
-    EquipmentSlot,
-} from "../../../../../componentOld/inventory/equipmentComponent.js";
-import { InventoryComponent2 } from "../../../../../componentOld/inventory/inventoryComponent.js";
 import { Entity } from "../../../../../entity/entity.js";
 import { SelectedEntityItem } from "../../../../../../module/selection/selectedEntityItem.js";
 import { SelectedWorldItem } from "../../../../../../module/selection/selectedWorldItem.js";
@@ -30,9 +22,11 @@ import {
 
 export class WorkerSelectionProvider implements ActorSelectionProvider {
     provideButtons(
-        stateContext: StateContext,
-        selection: SelectedWorldItem,
+        _stateContext: StateContext,
+        _selection: SelectedWorldItem,
     ): ButtonCollection {
+        //TODO: Reimplement selection of a worker
+        /*
         if (selection instanceof SelectedEntityItem) {
             const selectedEntity = selection.entity;
             const equipmentComponent =
@@ -55,9 +49,10 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
             }
         } else {
             return emptySelection;
-        }
+        }*/
+        return emptySelection;
     }
-
+    /*
     private getEquipmentActions(
         stateContext: StateContext,
         selectedEntity: Entity,
@@ -308,4 +303,5 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
             },
         ];
     }
+        */
 }

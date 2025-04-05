@@ -5,14 +5,11 @@ import { SearchedNode } from "../../../../../module/path/search.js";
 import { RenderScope } from "../../../../../rendering/renderScope.js";
 import { uiBox } from "../../../../../module/ui/dsl/uiBoxDsl.js";
 import { fillUiSize } from "../../../../../module/ui/uiSize.js";
-import { JobQueueComponent } from "../../../../componentOld/job/jobQueueComponent.js";
-import { PathFindingComponent } from "../../../../componentOld/root/path/pathFindingComponent.js";
 import { Entity } from "../../../../entity/entity.js";
-import { GroundTile } from "../../../../map/tile.js";
-import { TileSize } from "../../../../map/tile.js";
+import { GroundTile } from "../../../../../module/map/tile.js";
+import { TileSize } from "../../../../../module/map/tile.js";
 import { InteractionState } from "../../../handler/interactionState.js";
 import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold.js";
-import { MoveJob } from "../../../../componentOld/job/jobs/moveJob.js";
 
 export class ActorMovementState extends InteractionState {
     private selectedPoint: Point | null = null;
@@ -65,12 +62,14 @@ export class ActorMovementState extends InteractionState {
         };
         this.selectedPoint = toPoint;
 
+        /*
         const path = this.context.root
             .requireComponent(PathFindingComponent)
             .findPath(this.entity.worldPosition, toPoint);
-
+        
         this.graph = path.graph;
         this.path = path.path;
+        */
 
         return true;
     }
@@ -168,8 +167,11 @@ export class ActorMovementState extends InteractionState {
     }
 
     private scheduleMovement() {
+        //TODO: Schedule making the movement
+        /*
         this.context.root
             .requireComponent(JobQueueComponent)
             .addJob(new MoveJob(this.path.reverse()[0], this.entity));
+            */
     }
 }

@@ -1,7 +1,7 @@
 import { sprites2 } from "../../../../module/asset/sprite.js";
 import { Point } from "../../../../common/point.js";
 import { RenderScope } from "../../../../rendering/renderScope.js";
-import { biomes } from "../../../map/biome.js";
+import { biomes } from "../../../../module/map/biome.js";
 import { InteractionState } from "../../handler/interactionState.js";
 
 export class ScrollInteractionState extends InteractionState {

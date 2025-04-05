@@ -23,8 +23,6 @@ import { fillUiSize, wrapUiSize } from "../../../../module/ui/uiSize.js";
 import { UIView } from "../../../../module/ui/uiView.js";
 import { InteractionState } from "../../handler/interactionState.js";
 import { UIBookLayout } from "../../view/uiBookLayout.js";
-import { BuildingComponent } from "../../../componentOld/building/buildingComponent.js";
-import { CraftingComponent } from "../../../componentOld/building/craftingComponent.js";
 
 export interface BookListAdapter {
     getTabs(): string[];
@@ -310,6 +308,7 @@ const bookItems = items.map((item) => {
     };
 });
 
+/*
 export class CraftWithBuildingState extends BookListState {
     constructor(private building: BuildingComponent) {
         super(new BlacksmithAdapter(bookItems));
@@ -322,4 +321,4 @@ export class CraftWithBuildingState extends BookListState {
 
         craftingComponent.queueCrafting(selected.id);
     }
-}
+}*/

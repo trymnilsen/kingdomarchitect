@@ -15,11 +15,13 @@ export class EntityTestProxy {
     constructor(entity: Entity) {
         this._entity = entity;
         this._movement = new CapturedMovement();
+        //TODO: we should listen to events with overriding bubble
+        /*
         this._entity.entityEvents.listen((entityEvent) => {
             if (entityEvent.id == "transform") {
                 this._movement.addMovement(entityEvent.source.worldPosition);
             }
-        });
+        });*/
     }
 }
 

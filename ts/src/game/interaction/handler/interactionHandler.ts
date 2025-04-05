@@ -13,8 +13,6 @@ import { RenderScope } from "../../../rendering/renderScope.js";
 import { subTitleTextStyle } from "../../../rendering/text/textStyle.js";
 import { bookInkColor } from "../../../module/ui/color.js";
 import { UIView } from "../../../module/ui/uiView.js";
-import { TilesComponent } from "../../componentOld/tile/tilesComponent.js";
-import { SpatialChunkMapComponent } from "../../componentOld/world/spatialChunkMapComponent.js";
 import { Entity } from "../../entity/entity.js";
 import { SelectedEntityItem } from "../../../module/selection/selectedEntityItem.js";
 import { SelectedTileItem } from "../../../module/selection/selectedTileItem.js";
@@ -150,9 +148,11 @@ export class InteractionHandler {
                 this.camera.worldSpaceToTileSpace(worldPosition);
 
             // Check if a tile was clicked at this position
-            const tile = this.world
+            const tile = null;
+            //TODO: Reimplement
+            /*this.world
                 .requireComponent(TilesComponent)
-                .getTile(tilePosition);
+                .getTile(tilePosition);*/
 
             if (tile) {
                 const tileTapHandled = currentState.onTileTap(tile);
@@ -167,9 +167,11 @@ export class InteractionHandler {
                         this.stateContext,
                     );*/
 
-                    const entitiesAt = this.stateContext.root
+                    const entitiesAt = [];
+                    //TODO: Reimplement this with ECS components
+                    /*this.stateContext.root
                         .requireComponent(SpatialChunkMapComponent)
-                        .getEntitiesAt(tile.tileX, tile.tileY);
+                        .getEntitiesAt(tile.tileX, tile.tileY);*/
 
                     let selection: SelectedWorldItem;
                     if (entitiesAt.length > 0) {

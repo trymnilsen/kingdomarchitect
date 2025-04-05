@@ -8,14 +8,12 @@ import { uiBox } from "../../../../module/ui/dsl/uiBoxDsl.js";
 import { FocusGroup } from "../../../../module/ui/focus/focusGroup.js";
 import { uiAlignment } from "../../../../module/ui/uiAlignment.js";
 import { fillUiSize } from "../../../../module/ui/uiSize.js";
-import { WorkerBehaviorComponent } from "../../../componentOld/behavior/workerBehaviorComponent.js";
-import { TilesComponent } from "../../../componentOld/tile/tilesComponent.js";
 import { Entity } from "../../../entity/entity.js";
 import { SelectedEntityItem } from "../../../../module/selection/selectedEntityItem.js";
 import { SelectedTileItem } from "../../../../module/selection/selectedTileItem.js";
 import { SelectedWorldItem } from "../../../../module/selection/selectedWorldItem.js";
-import { GroundTile } from "../../../map/tile.js";
-import { HalfTileSize, TileSize } from "../../../map/tile.js";
+import { GroundTile } from "../../../../module/map/tile.js";
+import { HalfTileSize, TileSize } from "../../../../module/map/tile.js";
 import { InteractionState } from "../../handler/interactionState.js";
 import { UIActionbarItem } from "../../view/actionbar/uiActionbar.js";
 import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold.js";
@@ -164,9 +162,8 @@ class WorldFocusGroup implements FocusGroup {
 
         //TODO: Optimize finding the closest focusable tile, no need to loop over all of them
         const worldPosition = this.camera.screenToWorld(centerPosition);
-        const tilesComponent = this.rootNode.requireComponent(TilesComponent);
-
-        throw new Error("Reimplement");
+        //const tilesComponent = this.rootNode.requireComponent(TilesComponent);
+        //TODO: Reimplement moving the focus around
         /*
         const tiles = tilesComponent.getTiles(() => true);
         let closestTile = tiles[0];

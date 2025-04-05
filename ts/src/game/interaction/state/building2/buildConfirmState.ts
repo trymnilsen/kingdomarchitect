@@ -6,14 +6,8 @@ import { woodResourceItem } from "../../../../data/inventory/items/resources.js"
 import { RenderScope } from "../../../../rendering/renderScope.js";
 import { uiBox } from "../../../../module/ui/dsl/uiBoxDsl.js";
 import { fillUiSize } from "../../../../module/ui/uiSize.js";
-import { BuildingComponent } from "../../../componentOld/building/buildingComponent.js";
-import { HealthComponent } from "../../../componentOld/health/healthComponent.js";
-import { JobQueueComponent } from "../../../componentOld/job/jobQueueComponent.js";
-import { BuildJob } from "../../../componentOld/job/jobs/buildJob.js";
-import { TilesComponent } from "../../../componentOld/tile/tilesComponent.js";
-import { buildingFactory } from "../../../prefab/buildingFactory.js";
-import { GroundTile } from "../../../map/tile.js";
-import { TileSize } from "../../../map/tile.js";
+import { GroundTile } from "../../../../module/map/tile.js";
+import { TileSize } from "../../../../module/map/tile.js";
 import { InteractionState } from "../../handler/interactionState.js";
 import { UIActionbarItem } from "../../view/actionbar/uiActionbar.js";
 import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold.js";
@@ -24,7 +18,7 @@ import { SingleBuildMode } from "./mode/singleBuildMode.js";
 import { buildingApplicabilityList } from "./buildingApplicabilityList.js";
 import { BuildingApplicabilityResult } from "./buildingApplicability.js";
 import { findMapped } from "../../../../common/array.js";
-import { SpatialChunkMapComponent } from "../../../componentOld/world/spatialChunkMapComponent.js";
+import { buildingFactory } from "../../../prefab/buildingFactory.js";
 
 export class BuildConfirmState extends InteractionState {
     private scaffold: UIActionbarScaffold | null = null;
@@ -161,11 +155,13 @@ export class BuildConfirmState extends InteractionState {
                 house.position = selection;
                 const root = this.context.root;
                 root.addChild(house);
+                //TODO: Reimplement with ECS
+                /*
                 const buildingComponent =
                     house.requireComponent(BuildingComponent);
                 root.requireComponent(JobQueueComponent).addJob(
                     new BuildJob(buildingComponent),
-                );
+                );*/
             }
 
             this.context.stateChanger.clear();
@@ -185,11 +181,13 @@ export class BuildConfirmState extends InteractionState {
         this.context.stateChanger.clear();
     }
 
-    override onTap(_screenPosition: Point, worldPosition: Point): boolean {
+    override onTap(_screenPosition: Point, _worldPosition: Point): boolean {
+        /*
         const isTileAtPosition = this.context.root
             .requireComponent(TilesComponent)
             .getTile(worldPosition);
-
+        */
+        //TODO: this was not used before, is it needed?
         return false;
     }
 
@@ -252,8 +250,14 @@ export class BuildConfirmState extends InteractionState {
         super.onDraw(context);
     }
 
-    private isTileAvailable(tilePosition: Point): BuildingApplicabilityResult {
+    private isTileAvailable(_tilePosition: Point): BuildingApplicabilityResult {
         const rootEntity = this.context.root;
+        //TODO: Reimplemenet
+        return {
+            isApplicable: false,
+            reason: "Implement me",
+        };
+        /*
         const entitiesAt = rootEntity
             .requireComponent(SpatialChunkMapComponent)
             .getEntitiesAt(tilePosition.x, tilePosition.y);
@@ -292,7 +296,7 @@ export class BuildConfirmState extends InteractionState {
 
         return {
             isApplicable: true,
-        };
+        };*/
     }
 }
 

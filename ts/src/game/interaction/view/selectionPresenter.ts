@@ -22,12 +22,12 @@ import { fillUiSize, wrapUiSize } from "../../../module/ui/uiSize.js";
 import { UIView } from "../../../module/ui/uiView.js";
 import { UIBox } from "../../../module/ui/view/uiBox.js";
 import { UIColumn } from "../../../module/ui/view/uiColumn.js";
-import { SelectionInfo } from "../../componentOld/selection/selectionInfo.js";
 import { UIActionbarItem } from "./actionbar/uiActionbar.js";
 import { actionbarWidth } from "./actionbar/uiActionbarConstants.js";
 import { UIActionbarScaffold } from "./actionbar/uiActionbarScaffold.js";
 import { StatePresenter } from "./statePresenter.js";
 import { UISelectorInfoPanel } from "./uiSelectionInfoPanel.js";
+import type { SelectionInfo } from "../state/selection/selectionInfo.js";
 
 export class SelectionPresenter implements StatePresenter {
     private scaffold: UIActionbarScaffold;

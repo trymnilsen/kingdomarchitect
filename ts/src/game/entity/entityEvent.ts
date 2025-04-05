@@ -1,4 +1,4 @@
-import { EntityComponent } from "../componentOld/entityComponent.js";
+import type { ComponentType } from "../component/component.js";
 import { Entity } from "./entity.js";
 
 export type EntityEvent =
@@ -35,5 +35,5 @@ export type EntityChildrenUpdatedEvent = {
 export type ComponentsUpdatedEvent = {
     id: "component_added" | "component_removed";
     source: Entity;
-    item: EntityComponent;
+    item: ComponentType;
 };

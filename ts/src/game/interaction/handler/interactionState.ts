@@ -11,7 +11,7 @@ import { UIEvent } from "../../../module/ui/event/uiEvent.js";
 import { FocusGroup } from "../../../module/ui/focus/focusGroup.js";
 import { FocusState } from "../../../module/ui/focus/focusState.js";
 import { UIView } from "../../../module/ui/uiView.js";
-import { GroundTile } from "../../map/tile.js";
+import { GroundTile } from "../../../module/map/tile.js";
 import { InteractionStateChanger } from "./interactionStateChanger.js";
 import { StateContext } from "./stateContext.js";
 

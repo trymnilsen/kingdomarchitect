@@ -12,10 +12,9 @@ import { allSides } from "../../../../common/sides.js";
 import { RenderScope } from "../../../../rendering/renderScope.js";
 import { uiBox } from "../../../../module/ui/dsl/uiBoxDsl.js";
 import { fillUiSize } from "../../../../module/ui/uiSize.js";
-import { TilesComponent } from "../../../componentOld/tile/tilesComponent.js";
-import { ChunkDimension, ChunkSize } from "../../../map/chunk.js";
-import { generateChunk } from "../../../map/chunkGenerator.js";
-import { GroundTile, TileSize } from "../../../map/tile.js";
+import { ChunkDimension, ChunkSize } from "../../../../module/map/chunk.js";
+import { generateChunk } from "../../../../module/map/chunkGenerator.js";
+import { GroundTile, TileSize } from "../../../../module/map/tile.js";
 import { InteractionState } from "../../handler/interactionState.js";
 import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold.js";
 
@@ -95,7 +94,7 @@ export class LandUnlockState extends InteractionState {
     }
 
     private setUnlockableChunks() {
-        //Todo: Optimize when i feel like it
+        /*
         const tileComponent =
             this.context.root.requireComponent(TilesComponent);
         const chunks = tileComponent.chunks;
@@ -149,6 +148,7 @@ export class LandUnlockState extends InteractionState {
         if (this.unlockPoints.length > 0) {
             this.cursor = this.unlockPoints[0];
         }
+            */
     }
 
     override onDraw(context: RenderScope): void {

@@ -1,14 +1,12 @@
-import { sprites2 } from "../../../../module/asset/sprite.js";
 import { allSides } from "../../../../common/sides.js";
+import { sprites2 } from "../../../../module/asset/sprite.js";
 import { UIThemeType } from "../../../../module/ui/color.js";
 import { ninePatchBackground } from "../../../../module/ui/dsl/uiBackgroundDsl.js";
 import { uiBox } from "../../../../module/ui/dsl/uiBoxDsl.js";
 import { fillUiSize, wrapUiSize } from "../../../../module/ui/uiSize.js";
 import { UIView } from "../../../../module/ui/uiView.js";
 import { UIFlowGrid } from "../../../../module/ui/view/uiFlowGrid.js";
-import { JobQueueComponent } from "../../../componentOld/job/jobQueueComponent.js";
-import { CollectChestJob } from "../../../componentOld/job/jobs/chest/collectChestJob.js";
-import { ChestComponent } from "../../../componentOld/resource/chestComponent.js";
+import type { Entity } from "../../../entity/entity.js";
 import { InteractionState } from "../../handler/interactionState.js";
 import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold.js";
 import { UIBorderTitle } from "../../view/uiBorderTitle.js";
@@ -25,7 +23,7 @@ export class CollectChestState extends InteractionState {
         return true;
     }
 
-    constructor(private chest: ChestComponent) {
+    constructor(private chestEntity: Entity) {
         super();
     }
 
@@ -87,6 +85,8 @@ export class CollectChestState extends InteractionState {
     }
 
     private scheduleCollectJob() {
+        //TODO: Reimplement collecting a chest
+        /*
         const collectJob = new CollectChestJob(this.chest);
 
         this.context.root
@@ -94,6 +94,7 @@ export class CollectChestState extends InteractionState {
             .addJob(collectJob);
 
         this.context.stateChanger.clear();
+        */
     }
 
     private itemSelected(_index: number, _gridItem: UIInventoryGridItem) {}
@@ -106,6 +107,8 @@ export class CollectChestState extends InteractionState {
         gridView.id = "chestGrid";
         gridView.gridItemSize = 50;
 
+        /*
+        TODO: Reimplement showing the chest content
         for (let i = 0; i < 8; i++) {
             const inventoryItem = this.chest.items[i];
             if (inventoryItem) {
@@ -135,6 +138,7 @@ export class CollectChestState extends InteractionState {
                 );
             }
         }
+            */
 
         return gridView;
     }

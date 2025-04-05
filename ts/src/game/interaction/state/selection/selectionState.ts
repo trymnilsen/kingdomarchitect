@@ -1,9 +1,7 @@
 import { sprites2 } from "../../../../module/asset/sprite.js";
 import { allSides } from "../../../../common/sides.js";
 import { RenderScope } from "../../../../rendering/renderScope.js";
-import { SelectionInfo } from "../../../componentOld/selection/selectionInfo.js";
-import { SelectionInfoComponent } from "../../../componentOld/selection/selectionInfoComponent.js";
-import { TileSize } from "../../../map/tile.js";
+import { TileSize } from "../../../../module/map/tile.js";
 import { SelectedEntityItem } from "../../../../module/selection/selectedEntityItem.js";
 import { SelectedTileItem } from "../../../../module/selection/selectedTileItem.js";
 import { SelectedWorldItem } from "../../../../module/selection/selectedWorldItem.js";
@@ -18,6 +16,7 @@ import { CollectableProvider } from "./actor/provider/collectableProvider.js";
 import { TileSelectionProvider } from "./actor/provider/tileSelectionProvider.js";
 import { TreeSelectionProvider } from "./actor/provider/treeSelectionProvider.js";
 import { WorkerSelectionProvider } from "./actor/provider/workerSelectionProvider.js";
+import type { SelectionInfo } from "./selectionInfo.js";
 
 export class SelectionState extends InteractionState {
     private presenter: SelectionPresenter | null = null;
@@ -80,6 +79,7 @@ export class SelectionState extends InteractionState {
                 return null;
             }
         } else if (this.selection instanceof SelectedEntityItem) {
+            /*
             const selectionComponent = this.selection.entity.getComponent(
                 SelectionInfoComponent,
             );
@@ -89,6 +89,8 @@ export class SelectionState extends InteractionState {
             }
 
             return selectionComponent.getSelectionInfo();
+            */
+            return null;
         } else {
             return null;
         }

@@ -5,7 +5,7 @@ import {
     Point,
     subtractPoint,
 } from "../common/point.js";
-import { TileSize } from "../game/map/tile.js";
+import { TileSize } from "../module/map/tile.js";
 
 export class Camera {
     private _position: Point;

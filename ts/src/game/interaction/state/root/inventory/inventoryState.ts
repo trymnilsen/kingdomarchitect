@@ -23,8 +23,6 @@ import { UIView } from "../../../../../module/ui/uiView.js";
 import { UIFlowGrid } from "../../../../../module/ui/view/uiFlowGrid.js";
 import { UIMasterDetails } from "../../../../../module/ui/view/uiMasterDetail.js";
 import { OpenBookUIBackground } from "../../../../../module/ui/visual/bookBackground.js";
-import { EquipmentComponent } from "../../../../componentOld/inventory/equipmentComponent.js";
-import { InventoryComponent2 } from "../../../../componentOld/inventory/inventoryComponent.js";
 import { Entity } from "../../../../entity/entity.js";
 import { InteractionState } from "../../../handler/interactionState.js";
 import { StateContext } from "../../../handler/stateContext.js";
@@ -32,6 +30,7 @@ import { UIActionbarItem } from "../../../view/actionbar/uiActionbar.js";
 import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold.js";
 import { AlertMessageState } from "../../common/alertMessageState.js";
 import { UIInventoryGridItem } from "./uiInventoryGridItem.js";
+import type { InventoryComponent } from "../../../../component/inventoryComponent.js";
 
 export class InventoryState extends InteractionState {
     private _masterDetailsView!: UIMasterDetails;
@@ -49,7 +48,7 @@ export class InventoryState extends InteractionState {
     }
 
     //TODO: Add parameters for filtering and button providers for selected item
-    constructor(private forInventory: InventoryComponent2) {
+    constructor(private forInventory: InventoryComponent) {
         super();
     }
 
@@ -345,7 +344,9 @@ export class InventoryState extends InteractionState {
         }
     }
 
-    private onEquip(item: InventoryItem) {
+    private onEquip(_item: InventoryItem) {
+        //TODO: Reimplement onEquip with new equipment component
+        /*
         const equipmentComponent =
             this.forInventory.entity.getComponent(EquipmentComponent);
 
@@ -360,7 +361,7 @@ export class InventoryState extends InteractionState {
         if (removeResult) {
             equipmentComponent.mainItem.setItem(item);
             this.context.stateChanger.pop();
-        }
+        }*/
     }
 }
 

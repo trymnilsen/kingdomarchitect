@@ -1,7 +1,4 @@
 import { CraftingOutputTag } from "../../../../../../data/inventory/inventoryItemQuantity.js";
-import { InventoryComponent2 } from "../../../../../componentOld/inventory/inventoryComponent.js";
-import { JobQueueComponent } from "../../../../../componentOld/job/jobQueueComponent.js";
-import { CollectJob } from "../../../../../componentOld/job/jobs/collectJob.js";
 import { SelectedEntityItem } from "../../../../../../module/selection/selectedEntityItem.js";
 import { SelectedWorldItem } from "../../../../../../module/selection/selectedWorldItem.js";
 import { StateContext } from "../../../../handler/stateContext.js";
@@ -14,9 +11,11 @@ import {
 
 export class CollectableProvider implements ActorSelectionProvider {
     provideButtons(
-        stateContext: StateContext,
-        selection: SelectedWorldItem,
+        _stateContext: StateContext,
+        _selection: SelectedWorldItem,
     ): ButtonCollection {
+        /*
+        TODO: Reimplement collectable provider
         if (selection instanceof SelectedEntityItem) {
             const inventoryComponent =
                 selection.entity.getComponent(InventoryComponent2);
@@ -35,10 +34,10 @@ export class CollectableProvider implements ActorSelectionProvider {
                 };
             }
         }
-
+        */
         return emptySelection;
     }
-
+    /*
     private getInventoryComponentItems(
         selection: SelectedEntityItem,
         stateContext: StateContext,
@@ -79,5 +78,5 @@ export class CollectableProvider implements ActorSelectionProvider {
         } else {
             return [];
         }
-    }
+    }*/
 }

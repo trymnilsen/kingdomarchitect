@@ -1,4 +1,6 @@
+import type { Bounds } from "../../common/bounds.js";
 import type { ConstructorFunction } from "../../common/constructor.js";
+import type { ComponentType } from "../../game/component/component.js";
 import { Entity } from "../../game/entity/entity.js";
 import { EntityEventMap } from "../../game/entity/entityEvent.js";
 import { DrawMode } from "../../rendering/drawMode.js";
@@ -26,6 +28,10 @@ export type EcsComponent = { constructor: ParameterlessClassConstructor };
 
 export interface EcsWorld {
     query<T extends ParameterlessClassConstructor>(
+        component: T,
+    ): Map<EntityId, InstanceType<T>>;
+    query<T extends ParameterlessClassConstructor>(
+        viewport: Bounds,
         component: T,
     ): Map<EntityId, InstanceType<T>>;
     dispatch<T extends EntityAction>(action: T);
@@ -108,4 +114,6 @@ export class Ecs {
             system(this.rootEntity, gameTime);
         }
     }
+
+    queryWithin(): Map<Entity, ComponentType> {}
 }

@@ -2,12 +2,8 @@ import { sprites2 } from "../../../../module/asset/sprite.js";
 import { RenderScope } from "../../../../rendering/renderScope.js";
 import { uiBox } from "../../../../module/ui/dsl/uiBoxDsl.js";
 import { fillUiSize } from "../../../../module/ui/uiSize.js";
-import { JobQueueComponent } from "../../../componentOld/job/jobQueueComponent.js";
-import { ChopTreeJob } from "../../../componentOld/job/jobs/chopTreeJob.js";
-import { TreeComponent } from "../../../componentOld/resource/treeComponent.js";
-import { SpatialChunkMapComponent } from "../../../componentOld/world/spatialChunkMapComponent.js";
 import { Entity } from "../../../entity/entity.js";
-import { GroundTile } from "../../../map/tile.js";
+import { GroundTile } from "../../../../module/map/tile.js";
 import { InteractionState } from "../../handler/interactionState.js";
 import { BoxSelectionMode } from "../../selection/boxSelectionMode.js";
 import { LineSelectionMode } from "../../selection/lineSelectionMode.js";
@@ -124,16 +120,20 @@ export class ChopJobState extends InteractionState {
         console.log("Schedule chop tree job");
         let hadTreeInSelection = false;
         for (const point of this.chopMode.getSelection()) {
-            const treeEntity = this.context.root
+            //TODO: Reimplement chop, maybe a "collect resource" state?
+            const treeEntity = null;
+            /*
+            this.context.root
                 .requireComponent(SpatialChunkMapComponent)
                 .getEntitiesAt(point.x, point.y)
                 .find((entity) => entity.getComponent(TreeComponent));
-
+            */
             if (!treeEntity) {
                 continue;
             }
 
-            const treeComponent = treeEntity.getComponent(TreeComponent);
+            const treeComponent = null;
+            //treeEntity.getComponent(TreeComponent);
 
             if (!treeComponent) {
                 continue;
@@ -141,9 +141,11 @@ export class ChopJobState extends InteractionState {
 
             hadTreeInSelection = true;
 
+            /*
             this.context.root
                 .requireComponent(JobQueueComponent)
                 .addJob(new ChopTreeJob(treeEntity));
+                */
         }
 
         if (hadTreeInSelection) {

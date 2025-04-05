@@ -4,46 +4,30 @@ import { EcsSystem } from "../../module/ecs/ecsSystem.js";
 import { DrawMode } from "../../rendering/drawMode.js";
 import type { RenderScope } from "../../rendering/renderScope.js";
 import type { RenderVisibilityMap } from "../../rendering/renderVisibilityMap.js";
-import { SpriteComponent } from "../componentOld/draw/spriteComponent.js";
-import type { SpriteProviderConfig } from "../componentOld/draw/spriteProvider/spriteProvider.js";
-import { SpriteStateMachine } from "../componentOld/draw/spriteProvider/statemachine/spriteStateMachine.js";
-import { TilesComponent } from "../componentOld/tile/tilesComponent.js";
-import { SpatialChunkMapComponent } from "../componentOld/world/spatialChunkMapComponent.js";
 import type { Entity } from "../entity/entity.js";
-import { biomes } from "../map/biome.js";
-import { ChunkDimension, ChunkSize } from "../map/chunk.js";
-import { getTileId, TileSize } from "../map/tile.js";
-
-type EntityComponentPair = {
-    entity: Entity;
-    spriteComponent: SpriteComponent;
-};
+import { biomes } from "../../module/map/biome.js";
+import { ChunkDimension, ChunkSize } from "../../module/map/chunk.js";
+import { getTileId, TileSize } from "../../module/map/tile.js";
+import { SpriteComponent } from "../component/spriteComponent.js";
+import type { EcsWorld } from "../../module/ecs/ecsWorld.js";
 
 export const renderSystem: EcsSystem = {
     onRender,
 };
 
 function onRender(
-    rootEntity: Entity,
-    renderContext: RenderScope,
+    world: EcsWorld,
+    renderScope: RenderScope,
     visibilityMap: RenderVisibilityMap,
-    mode: DrawMode,
+    drawMode: DrawMode,
 ) {
     const renderStart = performance.now();
-    const spatialMap = rootEntity.requireComponent(SpatialChunkMapComponent);
-    const viewport = renderContext.camera.tileSpaceViewPort;
-    const entities = spatialMap.getEntitiesWithin(viewport);
-    const components: EntityComponentPair[] = [];
-    drawTiles(rootEntity, renderContext, visibilityMap);
-    for (let i = 0; i < entities.length; i++) {
-        const entity = entities[i];
-        const spriteComponent = entity.getComponent(SpriteComponent);
-        if (spriteComponent) {
-            components.push({ entity, spriteComponent });
-        }
-    }
+    const viewport = renderScope.camera.tileSpaceViewPort;
 
-    const sortedSprites = components.sort(
+    drawTiles(world, renderContext, visibilityMap);
+    const query = world.queryWithin(viewport, SpriteComponent);
+
+    const sortedSprites = query.components.sort(
         (a, b) => a.entity.worldPosition.y - b.entity.worldPosition.y,
     );
 

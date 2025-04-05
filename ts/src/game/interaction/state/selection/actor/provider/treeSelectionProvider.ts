@@ -1,5 +1,4 @@
 import { sprites2 } from "../../../../../../module/asset/sprite.js";
-import { TreeComponent } from "../../../../../componentOld/resource/treeComponent.js";
 import { Entity } from "../../../../../entity/entity.js";
 import { SelectedEntityItem } from "../../../../../../module/selection/selectedEntityItem.js";
 import { SelectedWorldItem } from "../../../../../../module/selection/selectedWorldItem.js";
@@ -13,9 +12,11 @@ import {
 
 export class TreeSelectionProvider implements ActorSelectionProvider {
     provideButtons(
-        stateContext: StateContext,
-        selection: SelectedWorldItem,
+        _stateContext: StateContext,
+        _selection: SelectedWorldItem,
     ): ButtonCollection {
+        /*
+        TODO: Reimplement selection of resources
         if (selection instanceof SelectedEntityItem) {
             const selectedEntity = selection.entity;
             const treeComponent = selectedEntity.getComponent(TreeComponent);
@@ -39,6 +40,7 @@ export class TreeSelectionProvider implements ActorSelectionProvider {
             }
         } else {
             return emptySelection;
-        }
+        }*/
+        return emptySelection;
     }
 }

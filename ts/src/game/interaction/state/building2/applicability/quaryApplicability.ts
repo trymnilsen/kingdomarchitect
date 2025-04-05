@@ -1,13 +1,17 @@
 import { adjacentPoints, Point } from "../../../../../common/point.js";
-import { StoneComponent } from "../../../../componentOld/resource/stoneComponent.js";
-import { SpatialChunkMapComponent } from "../../../../componentOld/world/spatialChunkMapComponent.js";
 import { Entity } from "../../../../entity/entity.js";
 import { BuildingApplicability } from "../buildingApplicability.js";
 
 export const quaryApplicability: BuildingApplicability = (
-    point: Point,
-    world: Entity,
+    _point: Point,
+    _world: Entity,
 ) => {
+    //TODO: Reimplement me
+    return {
+        isApplicable: false,
+        reason: "Needs to be next to stone",
+    };
+    /*
     const points = adjacentPoints(point);
     const hasAdjacent = points.some((adjacentPoint) => {
         const entities = world
@@ -30,5 +34,5 @@ export const quaryApplicability: BuildingApplicability = (
             isApplicable: false,
             reason: "Needs to be next to stone",
         };
-    }
+    }*/
 };
