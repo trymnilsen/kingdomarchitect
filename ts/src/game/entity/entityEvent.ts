@@ -6,7 +6,9 @@ export type EntityEvent =
     | EntityChildrenUpdatedEvent
     | ComponentsUpdatedEvent;
 
-type FindEventById<Id extends EntityEvent["id"], EventUnion = EntityEvent> =
+export type EntityEventId = EntityEvent["id"];
+
+type FindEventById<Id extends EntityEventId, EventUnion = EntityEvent> =
     // Distribute over the EventUnion (EntityEvent)
     EventUnion extends { id: infer EventIdType }
         ? // Check if the target Id (e.g., "child_added") is assignable to this specific Event's id type (e.g., "child_added" | "child_removed")
@@ -18,7 +20,7 @@ type FindEventById<Id extends EntityEvent["id"], EventUnion = EntityEvent> =
 
 // The dynamically generated map using the helper
 export type EntityEventMap = {
-    [K in EntityEvent["id"]]: FindEventById<K>;
+    [K in EntityEventId]: FindEventById<K>;
 };
 
 export type EntityTransformEvent = {

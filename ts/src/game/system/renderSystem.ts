@@ -1,23 +1,22 @@
 import type { Bounds } from "../../common/bounds.js";
 import { encodePosition, type Point } from "../../common/point.js";
 import { EcsSystem } from "../../module/ecs/ecsSystem.js";
-import { DrawMode } from "../../rendering/drawMode.js";
-import type { RenderScope } from "../../rendering/renderScope.js";
-import type { RenderVisibilityMap } from "../../rendering/renderVisibilityMap.js";
-import type { Entity } from "../entity/entity.js";
 import { biomes } from "../../module/map/biome.js";
 import { ChunkDimension, ChunkSize } from "../../module/map/chunk.js";
 import { getTileId, TileSize } from "../../module/map/tile.js";
+import { DrawMode } from "../../rendering/drawMode.js";
+import type { RenderScope } from "../../rendering/renderScope.js";
+import type { RenderVisibilityMap } from "../../rendering/renderVisibilityMap.js";
 import { SpriteComponent } from "../component/spriteComponent.js";
-import type { EcsWorld } from "../../module/ecs/ecsWorld.js";
 import { TileComponent } from "../component/tileComponent.js";
+import type { Entity } from "../entity/entity.js";
 
 export const renderSystem: EcsSystem = {
     onRender,
 };
 
 function onRender(
-    world: EcsWorld,
+    rootEntity: Entity,
     renderScope: RenderScope,
     visibilityMap: RenderVisibilityMap,
     drawMode: DrawMode,
@@ -26,9 +25,11 @@ function onRender(
     const viewport = renderScope.camera.tileSpaceViewPort;
     //TODO: If i make a map/set structure with both string and instance keys
     //i can add a first method to it to avoid getting values
-    const tiles = Array.from(world.query(TileComponent).values())[0];
+    const tiles = Array.from(
+        rootEntity.queryComponents(TileComponent).values(),
+    )[0];
     drawTiles(tiles, renderScope, visibilityMap);
-    const query = world.queryWithin(viewport, SpriteComponent);
+    const query = rootEntity.queryComponentsWithin(viewport, SpriteComponent);
 
     const sortedSprites = Array.from(query.entries()).sort(
         (a, b) => a[0].worldPosition.y - b[0].worldPosition.y,
@@ -53,7 +54,7 @@ function drawSprite(
     renderContext: RenderScope,
     _drawMode: DrawMode,
 ) {
-    const scale = 1;
+    const scale = 2;
 
     let targetWidth = spriteComponent.size?.x;
     let targetHeight = spriteComponent.size?.y;

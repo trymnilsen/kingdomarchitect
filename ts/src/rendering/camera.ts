@@ -26,6 +26,7 @@ export class Camera {
     }
 
     get tileSpaceViewPort(): Bounds {
+        //TODO: Update this on camera move rather than get or make a _isDirtyFlag
         const offsetCameraPosition = subtractPoint(
             this._position,
             this._halfWindowSize,

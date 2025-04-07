@@ -1,28 +1,21 @@
-import {
-    changeX,
-    changeY,
-    invert,
-    multiplyPoint,
-    Point,
-} from "../common/point.js";
+import { invert, multiplyPoint, Point } from "../common/point.js";
 import { AssetLoader } from "../module/asset/loader/assetLoader.js";
 
 import { GameTime } from "../common/time.js";
+import { EcsWorld } from "../module/ecs/ecsWorld.js";
 import { Input, InputEvent } from "../module/input/input.js";
-import { InputActionType } from "../module/input/inputAction.js";
 import { TouchInput } from "../module/input/touchInput.js";
-import { Ecs, EcsWorld } from "../module/ecs/ecsWorld.js";
+import { addInitialPlayerChunk } from "../module/map/player.js";
+import { TileSize } from "../module/map/tile.js";
 import { Camera } from "../rendering/camera.js";
 import { DrawMode } from "../rendering/drawMode.js";
 import { Renderer } from "../rendering/renderer.js";
 import { RenderVisibilityMap } from "../rendering/renderVisibilityMap.js";
 import { firstChildWhere } from "./entity/child/first.js";
-import { Entity } from "./entity/entity.js";
-import { createRootEntity } from "./entity/rootEntity.js";
 import { InteractionHandler } from "./interaction/handler/interactionHandler.js";
-import { addInitialPlayerChunk } from "../module/map/player.js";
-import { TileSize } from "../module/map/tile.js";
+import { chunkMapSystem } from "./system/chunkMapSystem.js";
 import { renderSystem } from "./system/renderSystem.js";
+import { WorldGenerationSystem } from "./system/worldGenerationSystem.js";
 
 export class Game {
     private renderer: Renderer;
@@ -35,20 +28,17 @@ export class Game {
     private updateTick = 0;
     private camera: Camera;
     private gameTime: GameTime = new GameTime();
-    private ecsWorld: Ecs;
+    private ecsWorld: EcsWorld;
     private visibilityMap: RenderVisibilityMap = new RenderVisibilityMap();
 
     constructor(private domElementWrapperSelector: string) {
-        //TODO: Setting up root entity should be updated
-        this.ecsWorld = new Ecs();
+        this.ecsWorld = new EcsWorld();
         this.assetLoader = new AssetLoader();
         // Rendering
         this.camera = new Camera({
             x: window.innerWidth,
             y: window.innerHeight,
         });
-        // World
-        //this.ecsWorld.gameTime = this.gameTime;
 
         const canvasElement: HTMLCanvasElement | null = document.querySelector(
             `#${this.domElementWrapperSelector}`,
@@ -77,7 +67,6 @@ export class Game {
             () => {
                 this.visibilityMap.useVisibility =
                     !this.visibilityMap.useVisibility;
-                this.updateVisibilityMap();
                 this.render(DrawMode.Gesture);
             },
         );
@@ -87,12 +76,14 @@ export class Game {
 
     private addSystems() {
         this.ecsWorld.addSystem(renderSystem);
+        this.ecsWorld.addSystem(chunkMapSystem);
+        this.ecsWorld.addSystem(WorldGenerationSystem);
     }
 
     async bootstrap(): Promise<void> {
         console.log("bootstrap");
         this.assetLoader.load();
-        addInitialPlayerChunk(this.ecsWorld.root);
+        this.ecsWorld.runInit();
         //Set the camera position
         const playerEntity = firstChildWhere(this.ecsWorld.root, (child) => {
             return child.id.includes("worker");
@@ -105,10 +96,14 @@ export class Game {
             this.renderer.camera.position = newPosition;
         }
 
-        this.updateVisibilityMap();
-
         await this.assetLoader.loaderPromise;
         console.log("Finished loading");
+        this.setupInputListeners();
+        setInterval(this.onTick, 200);
+        this.render(DrawMode.Gesture);
+    }
+
+    private setupInputListeners() {
         this.touchInput.onTapDown = (position: Point) => {
             const tapResult = this.interactionHandler.onTapDown(position);
             this.render(DrawMode.Gesture);
@@ -142,9 +137,6 @@ export class Game {
         this.input.onInput.listen((inputEvent) => {
             this.onInput(inputEvent);
         });
-
-        setInterval(this.onTick, 200);
-        this.render(DrawMode.Gesture);
     }
 
     private onTick = () => {
@@ -153,10 +145,7 @@ export class Game {
             this.updateTick += 1;
             this.gameTime.tick = this.updateTick;
             this.ecsWorld.runUpdate(this.updateTick);
-            //this.world.onUpdate(this.updateTick);
-            //housingSystem(this.world);
             this.interactionHandler.onUpdate(this.updateTick);
-            this.updateVisibilityMap();
         }
         this.renderer.context.drawTick = this.drawTick;
         this.render(DrawMode.Tick);
@@ -167,65 +156,13 @@ export class Game {
         this.render(DrawMode.Gesture);
     }
 
-    private updateVisibilityMap() {
-        this.visibilityMap.clear();
-        if (this.visibilityMap.useVisibility) {
-            /*
-            const visibilityComponents =
-                this.world.queryComponentsOld(VisibilityComponent);
-            for (let i = 0; i < visibilityComponents.length; i++) {
-                const component = visibilityComponents[i];
-                const visiblePoints = component.getVisibility();
-                for (let p = 0; p < visiblePoints.length; p++) {
-                    this.visibilityMap.setIsVisible(
-                        visiblePoints[p].x,
-                        visiblePoints[p].y,
-                        true,
-                    );
-                }
-            }*/
-        }
-    }
-
     private onInput(inputEvent: InputEvent) {
-        if (inputEvent.action.isShifted) {
-            switch (inputEvent.action.action) {
-                case InputActionType.ACTION_PRESS:
-                    this.interactionHandler.onInput(inputEvent.action);
-                    break;
-                case InputActionType.UP_PRESS:
-                    this.updateCamera(
-                        changeY(this.renderer.camera.position, -TileSize),
-                    );
-                    break;
-                case InputActionType.DOWN_PRESS:
-                    this.updateCamera(
-                        changeY(this.renderer.camera.position, TileSize),
-                    );
-                    break;
-                case InputActionType.LEFT_PRESS:
-                    this.updateCamera(
-                        changeX(this.renderer.camera.position, -TileSize),
-                    );
-                    break;
-                case InputActionType.RIGHT_PRESS:
-                    this.updateCamera(
-                        changeX(this.renderer.camera.position, TileSize),
-                    );
-                    break;
-            }
-        } else {
-            this.interactionHandler.onInput(inputEvent.action);
-        }
-
+        this.interactionHandler.onInput(inputEvent.action);
         this.render(DrawMode.Gesture);
     }
 
     private render(drawMode: DrawMode) {
         this.renderer.clearScreen();
-        //TODO: use the world/root entity to get chunkmap
-        //get entities within the viewport
-        //call draw on these
         this.ecsWorld.runRender(
             this.renderer.context,
             this.visibilityMap,
@@ -234,7 +171,5 @@ export class Game {
 
         this.interactionHandler.onDraw(this.renderer.context);
         this.renderer.renderDeferred();
-
-        //console.log("⏱render time: ", renderEnd - renderStart);
     }
 }

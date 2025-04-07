@@ -19,12 +19,19 @@ import { GameTime } from "../../common/time.js";
 import { DrawMode } from "../../rendering/drawMode.js";
 import { RenderScope } from "../../rendering/renderScope.js";
 import { RenderVisibilityMap } from "../../rendering/renderVisibilityMap.js";
-import type { ComponentType } from "../component/component.js";
+import type {
+    ComponentType,
+    ParameterlessClassConstructor,
+} from "../component/component.js";
 import { TileSize } from "../../module/map/tile.js";
 import { selectFromChild } from "./child/select.js";
 import { visitChildren } from "./child/visit.js";
 import { entityWithId } from "./child/withId.js";
-import { EntityEvent } from "./entityEvent.js";
+import { EntityEvent, type EntityEventId } from "./entityEvent.js";
+import type { Bounds } from "../../common/bounds.js";
+import type { EntityAction } from "../../module/action/entityAction.js";
+
+type EntityEvents = Map<EntityEventId, (event: EntityEvent) => void>;
 
 /**
  * Represents a node in the entity tree used to create a scenegraph for the
@@ -38,7 +45,7 @@ export class Entity {
     private _children: Entity[] = [];
     private _localPosition: Point = zeroPoint();
     private _worldPosition: Point = zeroPoint();
-
+    private _entityEvents?: EntityEvents;
     private _ecsComponents = new Map<string, ComponentType>();
     private _gameTime?: GameTime;
 
@@ -121,7 +128,7 @@ export class Entity {
         return this._children;
     }
 
-    public get gameTime(): GameTime {
+    get gameTime(): GameTime {
         if (!!this._gameTime) {
             return this._gameTime;
         } else {
@@ -131,8 +138,12 @@ export class Entity {
         }
     }
 
-    public set gameTime(v: GameTime | undefined) {
+    set gameTime(v: GameTime | undefined) {
         this._gameTime = v;
+    }
+
+    get entityEvents(): EntityEvents | undefined {
+        return this._entityEvents;
     }
 
     /**
@@ -268,7 +279,18 @@ export class Entity {
         return component || null;
     }
 
-    queryComponents<T extends ConstructorFunction<ComponentType>>(
+    requireEcsComponent<TFilter extends ComponentType>(
+        filterType: ConstructorFunction<TFilter>,
+    ): TFilter {
+        const component = this.getEcsComponent(filterType);
+        if (!component) {
+            throw new Error(`No component of type ${filterType.name}`);
+        }
+
+        return component;
+    }
+
+    queryComponents<T extends ParameterlessClassConstructor>(
         component: T,
     ): Map<Entity, InstanceType<T>> {
         //How do we avoid three (or two when old is removed) caches
@@ -283,6 +305,18 @@ export class Entity {
         });
 
         return map;
+    }
+
+    queryComponentsWithin<T extends ParameterlessClassConstructor>(
+        _bounds: Bounds,
+        component: T,
+    ): Map<Entity, InstanceType<T>> {
+        //TODO: Return only inside bounds based on the chunk map resource
+        return this.queryComponents(component);
+    }
+
+    dispatchAction<T extends EntityAction>(_action: T) {
+        throw new Error("Method not implemented.");
     }
 
     /**
@@ -352,6 +386,18 @@ export class Entity {
         } catch (e) {
             console.error(`Failed to bubble event: ${event.id}`, e, event);
         }*/
+        this._entityEvents?.forEach((value, key) => {
+            if (key === event.id) {
+                try {
+                    value(event);
+                } catch (err) {
+                    console.error(
+                        "Error while sending bubbled entity event to listener",
+                        err,
+                    );
+                }
+            }
+        });
         this._parent?.bubbleEvent(event);
     }
 }

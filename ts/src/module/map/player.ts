@@ -7,9 +7,11 @@ import {
     swordItem,
     wizardHat,
 } from "../../data/inventory/items/equipment.js";
+import { treeResource } from "../../data/inventory/items/naturalResource.js";
 import { goldCoins } from "../../data/inventory/items/resources.js";
 import { TileComponent } from "../../game/component/tileComponent.js";
 import { Entity } from "../../game/entity/entity.js";
+import { ResourcePrefab as resourcePrefab } from "../../game/prefab/resourcePrefab.js";
 import { workerPrefab } from "../../game/prefab/workerPrefab.js";
 import { spawnTree } from "./item/vegetation.js";
 
@@ -32,8 +34,14 @@ export function addInitialPlayerChunk(rootEntity: Entity) {
         },
         discovered: new Set(),
     });
+    const randomOffsetX = Math.round(Math.random() * 3) + 1;
+    const randomOffsetY = Math.round(Math.random() * 3) + 1;
     const firstWorker = workerPrefab();
+    const firstTree = resourcePrefab(treeResource);
+    firstTree.position = { x: 2 + randomOffsetX, y: 2 + randomOffsetY };
+    firstWorker.position = { x: 0 + randomOffsetX, y: 1 + randomOffsetY };
     chunkEntity.addChild(firstWorker);
+    chunkEntity.addChild(firstTree);
     /*
     const firstWorker = workerPrefab(generateId("worker"));
     const firstHouse = housePrefab(generateId("house"), false);

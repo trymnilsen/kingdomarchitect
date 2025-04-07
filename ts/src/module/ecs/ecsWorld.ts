@@ -1,3 +1,4 @@
+import { sys } from "typescript";
 import type { Bounds } from "../../common/bounds.js";
 import type { ConstructorFunction } from "../../common/constructor.js";
 import type { ComponentType } from "../../game/component/component.js";
@@ -24,23 +25,7 @@ type EcsEntityEventHandlersMap = {
     // Note: We are NOT using Partial<> here, so all keys are mandatory.
 };
 
-export type ParameterlessClassConstructor<
-    T extends ComponentType = ComponentType,
-> = new () => T;
-export type EcsComponent = { constructor: ParameterlessClassConstructor };
-
-export interface EcsWorld {
-    query<T extends ParameterlessClassConstructor>(
-        component: T,
-    ): Map<Entity, InstanceType<T>>;
-    queryWithin<T extends ParameterlessClassConstructor>(
-        viewport: Bounds,
-        component: T,
-    ): Map<Entity, InstanceType<T>>;
-    dispatch<T extends EntityAction>(action: T);
-}
-
-export class Ecs implements EcsWorld {
+export class EcsWorld {
     private renderSystems: EcsRenderFunction[] = [];
     private initSystems: EcsInitFunction[] = [];
     private updateSystems: EcsUpdateFunction[] = [];
@@ -60,24 +45,6 @@ export class Ecs implements EcsWorld {
     constructor() {
         this.rootEntity = new Entity("root");
         this.rootEntity.addEcsComponent(new TileComponent());
-    }
-
-    query<T extends ParameterlessClassConstructor>(
-        component: T,
-    ): Map<Entity, InstanceType<T>> {
-        return this.rootEntity.queryComponents(component);
-    }
-
-    queryWithin<T extends ParameterlessClassConstructor>(
-        _viewport: Bounds,
-        component: T,
-    ): Map<Entity, InstanceType<T>> {
-        //TODO: Return only inside bounds based on the chunk map resource
-        return this.query(component);
-    }
-
-    dispatch<T extends EntityAction>(_action: T) {
-        throw new Error("Method not implemented.");
     }
 
     addSystem(system: EcsSystem) {
@@ -123,6 +90,13 @@ export class Ecs implements EcsWorld {
         }
     }
 
+    runInit() {
+        for (let i = 0; i < this.initSystems.length; i++) {
+            const system = this.initSystems[i];
+            system(this.root);
+        }
+    }
+
     runRender(
         renderScope: RenderScope,
         visiblityMap: RenderVisibilityMap,
@@ -130,14 +104,14 @@ export class Ecs implements EcsWorld {
     ) {
         for (let i = 0; i < this.renderSystems.length; i++) {
             const system = this.renderSystems[i];
-            system(this, renderScope, visiblityMap, drawMode);
+            system(this.root, renderScope, visiblityMap, drawMode);
         }
     }
 
     runUpdate(gameTime: number) {
         for (let i = 0; i < this.updateSystems.length; i++) {
             const system = this.updateSystems[i];
-            system(this, gameTime);
+            system(this.root, gameTime);
         }
     }
 }
