@@ -1,5 +1,5 @@
 import { Entity } from "../../game/entity/entity.js";
-import { EntityEvent, EntityEventMap } from "../../game/entity/entityEvent.js";
+import { EntityEvent, EntityEventType } from "../../game/entity/entityEvent.js";
 import { DrawMode } from "../../rendering/drawMode.js";
 import { RenderScope } from "../../rendering/renderScope.js";
 import { RenderVisibilityMap } from "../../rendering/renderVisibilityMap.js";
@@ -21,7 +21,7 @@ export type EcsEntityEventFunction<T extends EntityEvent> = (
 export type EcsInitFunction = (rootEntity: Entity) => void;
 
 export type EcsEntityEvents = Partial<{
-    [k in EntityEvent["id"]]: EcsEntityEventFunction<EntityEventMap[k]>;
+    [k in EntityEvent["id"]]: EcsEntityEventFunction<EntityEventType[k]>;
 }>;
 
 export interface EcsSystem {

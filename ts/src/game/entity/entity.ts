@@ -31,8 +31,6 @@ import { EntityEvent, type EntityEventId } from "./entityEvent.js";
 import type { Bounds } from "../../common/bounds.js";
 import type { EntityAction } from "../../module/action/entityAction.js";
 
-type EntityEvents = Map<EntityEventId, (event: EntityEvent) => void>;
-
 /**
  * Represents a node in the entity tree used to create a scenegraph for the
  * game. Entities has positions and components attached to them.
@@ -45,7 +43,7 @@ export class Entity {
     private _children: Entity[] = [];
     private _localPosition: Point = zeroPoint();
     private _worldPosition: Point = zeroPoint();
-    private _entityEvents?: EntityEvents;
+    private _entityEvents?: (event: EntityEvent) => void;
     private _ecsComponents = new Map<string, ComponentType>();
     private _gameTime?: GameTime;
 
@@ -142,8 +140,12 @@ export class Entity {
         this._gameTime = v;
     }
 
-    get entityEvents(): EntityEvents | undefined {
+    get entityEvent(): ((event: EntityEvent) => void) | undefined {
         return this._entityEvents;
+    }
+
+    set entityEvent(value: ((event: EntityEvent) => void) | undefined) {
+        this._entityEvents = value;
     }
 
     /**
@@ -383,21 +385,14 @@ export class Entity {
 
             this._entityEvents.publish(event);
             this._parent?.bubbleEvent(event);
-        } catch (e) {
-            console.error(`Failed to bubble event: ${event.id}`, e, event);
         }*/
-        this._entityEvents?.forEach((value, key) => {
-            if (key === event.id) {
-                try {
-                    value(event);
-                } catch (err) {
-                    console.error(
-                        "Error while sending bubbled entity event to listener",
-                        err,
-                    );
-                }
+        if (!!this._entityEvents) {
+            try {
+                this._entityEvents(event);
+            } catch (e) {
+                console.error(`Failed to bubble event: ${event.id}`, e, event);
             }
-        });
+        }
         this._parent?.bubbleEvent(event);
     }
 }

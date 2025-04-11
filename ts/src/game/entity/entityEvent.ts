@@ -19,7 +19,7 @@ type FindEventById<Id extends EntityEventId, EventUnion = EntityEvent> =
         : never;
 
 // The dynamically generated map using the helper
-export type EntityEventMap = {
+export type EntityEventType = {
     [K in EntityEventId]: FindEventById<K>;
 };
 

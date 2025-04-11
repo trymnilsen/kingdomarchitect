@@ -31,7 +31,7 @@ function onEntityAdded(
     entityEvent: EntityChildrenUpdatedEvent,
 ) {
     const chunkMap = rootEntity.requireEcsComponent(ChunkMapComponent);
-    chunkMap.addEntity(entityEvent.source);
+    chunkMap.addEntity(entityEvent.target);
 }
 
 function onEntityRemoved(
@@ -39,5 +39,5 @@ function onEntityRemoved(
     entityEvent: EntityChildrenUpdatedEvent,
 ) {
     const chunkMap = rootEntity.requireEcsComponent(ChunkMapComponent);
-    chunkMap.removeEntity(entityEvent.source);
+    chunkMap.removeEntity(entityEvent.target);
 }

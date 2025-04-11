@@ -11,7 +11,7 @@ import { treeResource } from "../../data/inventory/items/naturalResource.js";
 import { goldCoins } from "../../data/inventory/items/resources.js";
 import { TileComponent } from "../../game/component/tileComponent.js";
 import { Entity } from "../../game/entity/entity.js";
-import { ResourcePrefab as resourcePrefab } from "../../game/prefab/resourcePrefab.js";
+import { resourcePrefab as resourcePrefab } from "../../game/prefab/resourcePrefab.js";
 import { workerPrefab } from "../../game/prefab/workerPrefab.js";
 import { spawnTree } from "./item/vegetation.js";
 
@@ -42,6 +42,7 @@ export function addInitialPlayerChunk(rootEntity: Entity) {
     firstWorker.position = { x: 0 + randomOffsetX, y: 1 + randomOffsetY };
     chunkEntity.addChild(firstWorker);
     chunkEntity.addChild(firstTree);
+    spawnTree(16, { x: 0, y: 0 }, chunkEntity);
     /*
     const firstWorker = workerPrefab(generateId("worker"));
     const firstHouse = housePrefab(generateId("house"), false);
@@ -73,6 +74,6 @@ export function addInitialPlayerChunk(rootEntity: Entity) {
     chunkEntity.addChild(firstTree);
     chunkEntity.addChild(well);
     chunkEntity.addChild(chest);
-    spawnTree(16, { x: 0, y: 0 }, chunkEntity);
+    
     */
 }

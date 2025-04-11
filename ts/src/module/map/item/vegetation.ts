@@ -8,11 +8,12 @@ import { SparseSet } from "../../../common/structure/sparseSet.js";
 import { Entity } from "../../../game/entity/entity.js";
 import { encodePosition, Point } from "../../../common/point.js";
 import { ChunkSize, getChunkBounds } from "../chunk.js";
+import { ChunkMapComponent } from "../../../game/component/chunkMapComponent.js";
+import { resourcePrefab } from "../../../game/prefab/resourcePrefab.js";
+import { treeResource } from "../../../data/inventory/items/naturalResource.js";
 
-export function spawnTree(_amount: number, _chunk: Point, _rootEntity: Entity) {
-    /*
-    TODO: Use chunkmap from ecs
-    const chunkMap = rootEntity.getAncestorComponent(SpatialChunkMapComponent);
+export function spawnTree(amount: number, chunk: Point, entity: Entity) {
+    const chunkMap = entity.getRootEntity().getEcsComponent(ChunkMapComponent);
     if (!chunkMap) {
         throw new Error("No chunk map component found");
     }
@@ -41,18 +42,15 @@ export function spawnTree(_amount: number, _chunk: Point, _rootEntity: Entity) {
                 continue;
             }
 
-            const tree = treePrefab(
-                generateId("tree"),
-                Math.floor(Math.random() * 3),
-            );
+            const tree = resourcePrefab(treeResource);
             tree.worldPosition = {
                 x: chunkBounds.x1 + x,
                 y: chunkBounds.y1 + y,
             };
 
-            rootEntity.addChild(tree);
+            entity.addChild(tree);
             skipPoints.add(encodedPoint);
             break;
         }
-    }*/
+    }
 }
