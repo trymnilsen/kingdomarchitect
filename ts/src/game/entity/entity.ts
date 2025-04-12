@@ -1,12 +1,10 @@
 import { removeItem } from "../../common/array.js";
+import type { Bounds } from "../../common/bounds.js";
 import {
     ConstructorFunction,
     getConstructorName,
 } from "../../common/constructor.js";
 import { InvalidArgumentError } from "../../common/error/invalidArgumentError.js";
-import { RequireError } from "../../common/error/requireError.js";
-import { Event, EventListener } from "../../common/event.js";
-import { TypedEvent } from "../../common/event/typedEvent.js";
 import {
     addPoint,
     Point,
@@ -14,22 +12,16 @@ import {
     subtractPoint,
     zeroPoint,
 } from "../../common/point.js";
-import { ReadableSet, SparseSet } from "../../common/structure/sparseSet.js";
 import { GameTime } from "../../common/time.js";
-import { DrawMode } from "../../rendering/drawMode.js";
-import { RenderScope } from "../../rendering/renderScope.js";
-import { RenderVisibilityMap } from "../../rendering/renderVisibilityMap.js";
+import type { ActionDispatcher } from "../../module/action/actionDispatcher.js";
+import type { EntityAction } from "../../module/action/entityAction.js";
 import type {
     ComponentType,
     ParameterlessClassConstructor,
 } from "../component/component.js";
-import { TileSize } from "../../module/map/tile.js";
-import { selectFromChild } from "./child/select.js";
 import { visitChildren } from "./child/visit.js";
 import { entityWithId } from "./child/withId.js";
-import { EntityEvent, type EntityEventId } from "./entityEvent.js";
-import type { Bounds } from "../../common/bounds.js";
-import type { EntityAction } from "../../module/action/entityAction.js";
+import { EntityEvent } from "./entityEvent.js";
 
 /**
  * Represents a node in the entity tree used to create a scenegraph for the
@@ -46,6 +38,7 @@ export class Entity {
     private _entityEvents?: (event: EntityEvent) => void;
     private _ecsComponents = new Map<string, ComponentType>();
     private _gameTime?: GameTime;
+    private _actionDispatch?: ActionDispatcher;
 
     constructor(readonly id: EntityId) {}
 
@@ -317,9 +310,7 @@ export class Entity {
         return this.queryComponents(component);
     }
 
-    dispatchAction<T extends EntityAction>(_action: T) {
-        throw new Error("Method not implemented.");
-    }
+    dispatchAction<T extends EntityAction>(_action: T) {}
 
     /**
      * Update the world position of this entity based on a parent position.

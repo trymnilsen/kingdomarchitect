@@ -18,6 +18,7 @@ import { generateTaint } from "./biome/taint.js";
 import { ChunkSize, type TileChunk } from "./chunk.js";
 import type { Volume } from "./volume.js";
 
+//TODO: should return a structure describing the unlock for the action
 export function generateChunk(rootEntity: Entity, chunkPoint: Point) {
     const tiles = Array.from(
         rootEntity.queryComponents(TileComponent).values(),

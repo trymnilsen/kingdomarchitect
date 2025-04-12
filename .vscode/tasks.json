@@ -6,7 +6,7 @@
         {
             "type": "npm",
             "script": "build",
-            //"dependsOn": ["build typescript"],
+            "dependsOn": ["build typescript"],
             "label": "bundle typescript",
             "group": {
                 "kind": "build",

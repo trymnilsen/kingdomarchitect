@@ -88,9 +88,12 @@ export class SelectionState extends InteractionState {
                 return null;
             }
 
-            return selectionComponent.getSelectionInfo();
-            */
-            return null;
+            return selectionComponent.getSelectionInfo();*/
+            return {
+                icon: sprites2.archer_skill,
+                subtitle: "selected",
+                title: "Entity",
+            };
         } else {
             return null;
         }

@@ -22,6 +22,8 @@ import { InteractionHandlerStatusbarPresenter } from "./interactionHandlerStatus
 import { CommitableInteractionStateChanger } from "./interactionStateChanger.js";
 import { InteractionStateHistory } from "./interactionStateHistory.js";
 import { StateContext } from "./stateContext.js";
+import { TileComponent } from "../../component/tileComponent.js";
+import { ChunkMapComponent } from "../../component/chunkMapComponent.js";
 
 /**
  * The interactionHandler recieves input taps and forward them to the currently
@@ -148,11 +150,9 @@ export class InteractionHandler {
                 this.camera.worldSpaceToTileSpace(worldPosition);
 
             // Check if a tile was clicked at this position
-            const tile = null;
-            //TODO: Reimplement
-            /*this.world
-                .requireComponent(TilesComponent)
-                .getTile(tilePosition);*/
+            const tile = this.world
+                .getEcsComponent(TileComponent)
+                ?.getTile(tilePosition);
 
             if (tile) {
                 const tileTapHandled = currentState.onTileTap(tile);
@@ -167,11 +167,9 @@ export class InteractionHandler {
                         this.stateContext,
                     );*/
 
-                    const entitiesAt = [];
-                    //TODO: Reimplement this with ECS components
-                    /*this.stateContext.root
-                        .requireComponent(SpatialChunkMapComponent)
-                        .getEntitiesAt(tile.tileX, tile.tileY);*/
+                    const entitiesAt = this.stateContext.root
+                        .requireEcsComponent(ChunkMapComponent)
+                        .getEntitiesAt(tile.tileX, tile.tileY);
 
                     let selection: SelectedWorldItem;
                     if (entitiesAt.length > 0) {

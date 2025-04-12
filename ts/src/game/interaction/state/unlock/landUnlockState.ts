@@ -17,6 +17,7 @@ import { generateChunk } from "../../../../module/map/chunkGenerator.js";
 import { GroundTile, TileSize } from "../../../../module/map/tile.js";
 import { InteractionState } from "../../handler/interactionState.js";
 import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold.js";
+import { TileComponent } from "../../../component/tileComponent.js";
 
 export class LandUnlockState extends InteractionState {
     private unlockPoints: Point[] = [];
@@ -94,9 +95,8 @@ export class LandUnlockState extends InteractionState {
     }
 
     private setUnlockableChunks() {
-        /*
         const tileComponent =
-            this.context.root.requireComponent(TilesComponent);
+            this.context.root.requireEcsComponent(TileComponent);
         const chunks = tileComponent.chunks;
         const unlockablePositions = new Set<number>();
         this.unlockPoints = [];
@@ -114,7 +114,7 @@ export class LandUnlockState extends InteractionState {
             }
         };
 
-        for (const chunk of chunks) {
+        for (const [key, chunk] of chunks) {
             const left = shiftPoint(
                 { x: chunk.chunkX, y: chunk.chunkY },
                 Direction.Left,
@@ -148,7 +148,6 @@ export class LandUnlockState extends InteractionState {
         if (this.unlockPoints.length > 0) {
             this.cursor = this.unlockPoints[0];
         }
-            */
     }
 
     override onDraw(context: RenderScope): void {
