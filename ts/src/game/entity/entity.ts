@@ -141,6 +141,14 @@ export class Entity {
         this._entityEvents = value;
     }
 
+    get actionDispatch(): ActionDispatcher | undefined {
+        return this._actionDispatch;
+    }
+
+    set actionDispatch(value: ActionDispatcher | undefined) {
+        this._actionDispatch = value;
+    }
+
     /**
      * Set if this entity is the root of the entity tree
      */
@@ -310,7 +318,11 @@ export class Entity {
         return this.queryComponents(component);
     }
 
-    dispatchAction<T extends EntityAction>(_action: T) {}
+    dispatchAction<T extends EntityAction>(action: T) {
+        if (this._actionDispatch) {
+            this._actionDispatch(action);
+        }
+    }
 
     /**
      * Update the world position of this entity based on a parent position.

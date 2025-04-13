@@ -16,6 +16,8 @@ import { InteractionHandler } from "./interaction/handler/interactionHandler.js"
 import { chunkMapSystem } from "./system/chunkMapSystem.js";
 import { renderSystem } from "./system/renderSystem.js";
 import { WorldGenerationSystem } from "./system/worldGenerationSystem.js";
+import { createRootDispatcher } from "./action/dispatcher/rootDispatcher.js";
+import type { ActionDispatcher } from "../module/action/actionDispatcher.js";
 
 export class Game {
     private renderer: Renderer;
@@ -30,9 +32,12 @@ export class Game {
     private gameTime: GameTime = new GameTime();
     private ecsWorld: EcsWorld;
     private visibilityMap: RenderVisibilityMap = new RenderVisibilityMap();
+    private actionDispatcher: ActionDispatcher;
 
     constructor(private domElementWrapperSelector: string) {
         this.ecsWorld = new EcsWorld();
+        this.actionDispatcher = createRootDispatcher(this.ecsWorld.root);
+        this.ecsWorld.root.actionDispatch = this.actionDispatcher;
         this.assetLoader = new AssetLoader();
         // Rendering
         this.camera = new Camera({

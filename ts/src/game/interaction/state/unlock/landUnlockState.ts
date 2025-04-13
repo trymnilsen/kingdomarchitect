@@ -18,6 +18,7 @@ import { GroundTile, TileSize } from "../../../../module/map/tile.js";
 import { InteractionState } from "../../handler/interactionState.js";
 import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold.js";
 import { TileComponent } from "../../../component/tileComponent.js";
+import { makeUnlockChunkAction } from "../../../action/world/unlockChunkAction.js";
 
 export class LandUnlockState extends InteractionState {
     private unlockPoints: Point[] = [];
@@ -89,7 +90,8 @@ export class LandUnlockState extends InteractionState {
                 x: Math.floor(this.cursor.x / ChunkSize / TileSize),
                 y: Math.floor(this.cursor.y / ChunkSize / TileSize),
             };
-            const generated = generateChunk(this.context.root, chunkPoint);
+
+            this.context.root.dispatchAction(makeUnlockChunkAction(chunkPoint));
             this.setUnlockableChunks();
         }
     }
