@@ -1,17 +1,12 @@
 import { randomColor } from "../../common/color.js";
 import { generateId } from "../../common/idGenerator.js";
-import { InventoryItem } from "../../data/inventory/inventoryItem.js";
-import {
-    bowItem,
-    hammerItem,
-    swordItem,
-    wizardHat,
-} from "../../data/inventory/items/equipment.js";
 import { treeResource } from "../../data/inventory/items/naturalResource.js";
-import { goldCoins } from "../../data/inventory/items/resources.js";
+import { makeSetTilesAction } from "../../game/action/world/setTilesAction.js";
+import { makeUnlockChunkAction } from "../../game/action/world/unlockChunkAction.js";
+import { ChunkMapComponent } from "../../game/component/chunkMapComponent.js";
 import { TileComponent } from "../../game/component/tileComponent.js";
 import { Entity } from "../../game/entity/entity.js";
-import { resourcePrefab as resourcePrefab } from "../../game/prefab/resourcePrefab.js";
+import { resourcePrefab } from "../../game/prefab/resourcePrefab.js";
 import { workerPrefab } from "../../game/prefab/workerPrefab.js";
 import { spawnTree } from "./item/vegetation.js";
 
@@ -21,19 +16,21 @@ export function addInitialPlayerChunk(rootEntity: Entity) {
     const tiles = Array.from(
         rootEntity.queryComponents(TileComponent).values(),
     )[0];
-    tiles.setChunk({
-        chunkX: 0,
-        chunkY: 0,
-        volume: {
-            id: generateId("volume"),
-            maxSize: Math.floor(Math.random() * 4) + 2,
-            type: "forrest",
-            size: 1,
-            chunks: [{ x: 0, y: 0 }],
-            debugColor: randomColor(),
-        },
-        discovered: new Set(),
-    });
+
+    chunkEntity.dispatchAction(
+        makeSetTilesAction({
+            chunkX: 0,
+            chunkY: 0,
+            volume: {
+                id: generateId("volume"),
+                maxSize: Math.floor(Math.random() * 4) + 2,
+                type: "forrest",
+                size: 1,
+                chunks: [{ x: 0, y: 0 }],
+                debugColor: randomColor(),
+            },
+        }),
+    );
     const randomOffsetX = Math.round(Math.random() * 3) + 1;
     const randomOffsetY = Math.round(Math.random() * 3) + 1;
     const firstWorker = workerPrefab();
@@ -42,7 +39,14 @@ export function addInitialPlayerChunk(rootEntity: Entity) {
     firstWorker.position = { x: 0 + randomOffsetX, y: 1 + randomOffsetY };
     chunkEntity.addChild(firstWorker);
     chunkEntity.addChild(firstTree);
-    spawnTree(16, { x: 0, y: 0 }, chunkEntity);
+    const chunkMap = chunkEntity
+        .getRootEntity()
+        .requireEcsComponent(ChunkMapComponent);
+
+    const trees = spawnTree(16, { x: 0, y: 0 }, chunkMap);
+    for (const tree of trees) {
+        chunkEntity.addChild(tree);
+    }
     /*
     const firstWorker = workerPrefab(generateId("worker"));
     const firstHouse = housePrefab(generateId("house"), false);

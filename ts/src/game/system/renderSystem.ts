@@ -161,10 +161,12 @@ function drawTiles(
                 const tileY = screenPosition.y + y * 40;
                 let visible = true;
 
-                if (visibilityMap.useVisibility) {
+                if (visibilityMap.useVisibility && false) {
+                    //TODO: Reimplement
+                    /*
                     if (!chunk.discovered.has(getTileId(x, y))) {
                         continue;
-                    }
+                    }*/
 
                     visible = visibilityMap.isVisible(tileX, tileY);
                 }

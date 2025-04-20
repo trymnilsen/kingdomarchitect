@@ -2,6 +2,7 @@ import type { ActionDispatcher } from "../../../module/action/actionDispatcher.j
 import type { EntityAction } from "../../../module/action/entityAction.js";
 import { generateChunk } from "../../../module/map/chunkGenerator.js";
 import type { Entity } from "../../entity/entity.js";
+import { setTilesId } from "../world/setTilesAction.js";
 import {
     unlockChunkId,
     type UnlockChunkAction,
@@ -28,6 +29,8 @@ function worldDispatcher(action: EntityAction, root: Entity) {
         case unlockChunkId:
             generateChunk(root, (action as UnlockChunkAction).chunkPoint);
             break;
+        case setTilesId:
+
         default:
             break;
     }

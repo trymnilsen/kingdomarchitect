@@ -6,6 +6,7 @@ import {
 import { randomColor } from "../../common/color.js";
 import { generateId } from "../../common/idGenerator.js";
 import { adjacentPoints, Point } from "../../common/point.js";
+import { makeSetTilesAction } from "../../game/action/world/setTilesAction.js";
 import { TileComponent } from "../../game/component/tileComponent.js";
 import { Entity } from "../../game/entity/entity.js";
 import { generateDesert } from "./biome/desert.js";
@@ -58,7 +59,6 @@ export function generateChunk(rootEntity: Entity, chunkPoint: Point) {
             chunkX: chunkPoint.x,
             chunkY: chunkPoint.y,
             volume: volume,
-            discovered: new Set<string>(),
         };
     } else {
         //Weight the items based on maxSize, making it most likely to pick
@@ -79,11 +79,10 @@ export function generateChunk(rootEntity: Entity, chunkPoint: Point) {
             chunkX: chunkPoint.x,
             chunkY: chunkPoint.y,
             volume: chosenVolume,
-            discovered: new Set<string>(),
         };
     }
 
-    tiles.setChunk(chunk);
+    rootEntity.dispatchAction(makeSetTilesAction(chunk));
     generateChunkEntities(chunk, rootEntity);
 }
 

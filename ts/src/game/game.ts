@@ -15,9 +15,11 @@ import { firstChildWhere } from "./entity/child/first.js";
 import { InteractionHandler } from "./interaction/handler/interactionHandler.js";
 import { chunkMapSystem } from "./system/chunkMapSystem.js";
 import { renderSystem } from "./system/renderSystem.js";
-import { WorldGenerationSystem } from "./system/worldGenerationSystem.js";
+import { worldGenerationSystem } from "./system/worldGenerationSystem.js";
 import { createRootDispatcher } from "./action/dispatcher/rootDispatcher.js";
 import type { ActionDispatcher } from "../module/action/actionDispatcher.js";
+import { GameServerConnection } from "./connection/gameServerConnection.js";
+import { WebworkerServerConnection } from "./connection/webworkerServerConnection.js";
 
 export class Game {
     private renderer: Renderer;
@@ -33,6 +35,7 @@ export class Game {
     private ecsWorld: EcsWorld;
     private visibilityMap: RenderVisibilityMap = new RenderVisibilityMap();
     private actionDispatcher: ActionDispatcher;
+    private gameServer: GameServerConnection;
 
     constructor(private domElementWrapperSelector: string) {
         this.ecsWorld = new EcsWorld();
@@ -75,14 +78,17 @@ export class Game {
                 this.render(DrawMode.Gesture);
             },
         );
-
+        this.gameServer = new WebworkerServerConnection();
+        this.gameServer.onMessage.listen((message) => {
+            console.log("Gameserver message: ", message);
+        });
         this.addSystems();
     }
 
     private addSystems() {
         this.ecsWorld.addSystem(renderSystem);
         this.ecsWorld.addSystem(chunkMapSystem);
-        this.ecsWorld.addSystem(WorldGenerationSystem);
+        //this.ecsWorld.addSystem(worldGenerationSystem);
     }
 
     async bootstrap(): Promise<void> {

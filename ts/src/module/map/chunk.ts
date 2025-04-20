@@ -46,5 +46,4 @@ export type TileChunk = {
     chunkX: number;
     chunkY: number;
     volume: Volume;
-    discovered: Set<string>;
 };

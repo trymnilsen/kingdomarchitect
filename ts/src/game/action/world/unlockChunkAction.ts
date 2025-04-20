@@ -1,6 +1,5 @@
 import type { Point } from "../../../common/point.js";
 import type { EntityAction } from "../../../module/action/entityAction.js";
-import type { Entity } from "../../entity/entity.js";
 
 export interface UnlockChunkAction extends EntityAction {
     chunkPoint: Point;

@@ -149,6 +149,9 @@ export class Entity {
         this._actionDispatch = value;
     }
 
+    get components(): ReadonlyArray<Readonly<ComponentType>> {
+        return Array.from(this._ecsComponents.values());
+    }
     /**
      * Set if this entity is the root of the entity tree
      */
@@ -295,7 +298,7 @@ export class Entity {
 
     queryComponents<T extends ParameterlessClassConstructor>(
         component: T,
-    ): Map<Entity, InstanceType<T>> {
+    ): ReadonlyMap<Entity, InstanceType<T>> {
         //How do we avoid three (or two when old is removed) caches
         const map = new Map<Entity, InstanceType<T>>();
 
@@ -313,7 +316,7 @@ export class Entity {
     queryComponentsWithin<T extends ParameterlessClassConstructor>(
         _bounds: Bounds,
         component: T,
-    ): Map<Entity, InstanceType<T>> {
+    ): ReadonlyMap<Entity, InstanceType<T>> {
         //TODO: Return only inside bounds based on the chunk map resource
         return this.queryComponents(component);
     }

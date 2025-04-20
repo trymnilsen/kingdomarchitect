@@ -1,22 +1,19 @@
-import { generateId } from "../../../common/idGenerator.js";
-import {
-    addPoint,
-    decodePosition,
-    multiplyPoint,
-} from "../../../common/point.js";
-import { SparseSet } from "../../../common/structure/sparseSet.js";
-import { Entity } from "../../../game/entity/entity.js";
 import { encodePosition, Point } from "../../../common/point.js";
-import { ChunkSize, getChunkBounds } from "../chunk.js";
-import { ChunkMapComponent } from "../../../game/component/chunkMapComponent.js";
-import { resourcePrefab } from "../../../game/prefab/resourcePrefab.js";
 import { treeResource } from "../../../data/inventory/items/naturalResource.js";
+import { ChunkMapComponent } from "../../../game/component/chunkMapComponent.js";
+import { Entity } from "../../../game/entity/entity.js";
+import { resourcePrefab } from "../../../game/prefab/resourcePrefab.js";
+import { ChunkSize, getChunkBounds } from "../chunk.js";
 
-export function spawnTree(amount: number, chunk: Point, entity: Entity) {
-    const chunkMap = entity.getRootEntity().getEcsComponent(ChunkMapComponent);
+export function spawnTree(
+    amount: number,
+    chunk: Point,
+    chunkMap: ChunkMapComponent,
+): Entity[] {
     if (!chunkMap) {
         throw new Error("No chunk map component found");
     }
+    const entities: Entity[] = [];
     const chunkBounds = getChunkBounds(chunk);
     const items = chunkMap.getEntitiesWithin(chunkBounds);
     const skipPoints = new Set<number>();
@@ -48,9 +45,11 @@ export function spawnTree(amount: number, chunk: Point, entity: Entity) {
                 y: chunkBounds.y1 + y,
             };
 
-            entity.addChild(tree);
+            entities.push(tree);
             skipPoints.add(encodedPoint);
             break;
         }
     }
+
+    return entities;
 }
