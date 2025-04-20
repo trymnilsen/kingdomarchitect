@@ -1,8 +1,9 @@
 import type { ActionDispatcher } from "../../../module/action/actionDispatcher.js";
 import type { EntityAction } from "../../../module/action/entityAction.js";
 import { generateChunk } from "../../../module/map/chunkGenerator.js";
+import { TileComponent } from "../../component/tileComponent.js";
 import type { Entity } from "../../entity/entity.js";
-import { setTilesId } from "../world/setTilesAction.js";
+import { setTilesId, type SetTilesAction } from "../world/setTilesAction.js";
 import {
     unlockChunkId,
     type UnlockChunkAction,
@@ -30,7 +31,10 @@ function worldDispatcher(action: EntityAction, root: Entity) {
             generateChunk(root, (action as UnlockChunkAction).chunkPoint);
             break;
         case setTilesId:
-
+            root.requireEcsComponent(TileComponent).setChunk(
+                (action as SetTilesAction).chunk,
+            );
+            break;
         default:
             break;
     }

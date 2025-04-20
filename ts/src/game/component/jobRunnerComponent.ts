@@ -1,3 +1,4 @@
+import type { JSONValue } from "../../common/object.js";
 import { Point } from "../../common/point.js";
 
 interface Job {

@@ -1,3 +1,4 @@
+import { getConstructorName } from "../common/constructor.js";
 import { EcsSystem } from "../module/ecs/ecsSystem.js";
 import type { GameServerMessageEntry } from "./gameServerMessageBus.js";
 
@@ -6,15 +7,24 @@ export function makeReplicatedEntitiesSystem(
 ): EcsSystem {
     return {
         onEntityEvent: {
-            child_added: (entity) => {
+            child_added: (_root, event) => {
+                if (event.target.isGameRoot) {
+                    return;
+                }
                 postMessage({
                     id: "addEntity",
                     entity: {
-                        id: entity.id,
-                        parent: entity.parent?.id,
-                        position: entity.worldPosition,
+                        id: event.target.id,
+                        parent: event.target.parent?.id,
+                        position: event.target.worldPosition,
                     },
-                    components: entity.components,
+                    components: event.target.components.map((component) => {
+                        return {
+                            id: getConstructorName(component),
+                            data: component,
+                        };
+                        //TODO: Fix any
+                    }) as any,
                 });
             },
         },

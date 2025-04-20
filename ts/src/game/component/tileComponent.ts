@@ -1,3 +1,4 @@
+import type { JSONValue } from "../../common/object.js";
 import type { Point } from "../../common/point.js";
 import { ChunkSize, type TileChunk } from "../../module/map/chunk.js";
 import { getTileId, type GroundTile } from "../../module/map/tile.js";

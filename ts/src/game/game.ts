@@ -20,6 +20,7 @@ import { createRootDispatcher } from "./action/dispatcher/rootDispatcher.js";
 import type { ActionDispatcher } from "../module/action/actionDispatcher.js";
 import { GameServerConnection } from "./connection/gameServerConnection.js";
 import { WebworkerServerConnection } from "./connection/webworkerServerConnection.js";
+import { handleGameMessage } from "./action/messages/gameMessageHandler.js";
 
 export class Game {
     private renderer: Renderer;
@@ -80,7 +81,7 @@ export class Game {
         );
         this.gameServer = new WebworkerServerConnection();
         this.gameServer.onMessage.listen((message) => {
-            console.log("Gameserver message: ", message);
+            handleGameMessage(message, this.ecsWorld.root);
         });
         this.addSystems();
     }

@@ -17,7 +17,7 @@ export function addInitialPlayerChunk(rootEntity: Entity) {
         rootEntity.queryComponents(TileComponent).values(),
     )[0];
 
-    chunkEntity.dispatchAction(
+    rootEntity.dispatchAction(
         makeSetTilesAction({
             chunkX: 0,
             chunkY: 0,

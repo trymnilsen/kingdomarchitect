@@ -1,7 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { RequireError } from "../../../src/common/error/requireError.js";
 import { Entity } from "../../../src/game/entity/entity.js";
-import { createRootEntity } from "../../../src/game/entity/rootEntity.js";
 
 describe("Entity", () => {
     it("Add child entity", () => {

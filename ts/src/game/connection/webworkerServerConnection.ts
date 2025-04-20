@@ -1,11 +1,12 @@
 import { Event } from "../../common/event.js";
+import type { GameServerMessage } from "../../server/gameServerMessageBus.js";
 import { GameServerConnection } from "./gameServerConnection.js";
 
 export class WebworkerServerConnection implements GameServerConnection {
     private worker: Worker;
-    private _onMessageEvent: Event<object>;
+    private _onMessageEvent: Event<GameServerMessage>;
 
-    public get onMessage(): Event<object> {
+    public get onMessage(): Event<GameServerMessage> {
         return this._onMessageEvent;
     }
 
@@ -14,8 +15,7 @@ export class WebworkerServerConnection implements GameServerConnection {
         this._onMessageEvent = new Event();
         this.worker = new Worker("dist/server/webWorkerServer.js");
         this.worker.onmessage = (message) => {
-            console.log("Message from worker: ", message);
-            this._onMessageEvent.publish(message);
+            this._onMessageEvent.publish(message.data);
         };
     }
     postCommand() {
