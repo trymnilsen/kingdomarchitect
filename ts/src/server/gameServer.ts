@@ -1,5 +1,6 @@
 import { createRootDispatcher } from "../game/action/dispatcher/rootDispatcher.js";
 import { chunkMapSystem } from "../game/system/chunkMapSystem.js";
+import { pathfindingSystem } from "../game/system/pathfindingSystem.js";
 import { worldGenerationSystem } from "../game/system/worldGenerationSystem.js";
 import type { ActionDispatcher } from "../module/action/actionDispatcher.js";
 import type { EntityAction } from "../module/action/entityAction.js";
@@ -27,6 +28,7 @@ export class GameServer {
 
     private addSystems() {
         this.world.addSystem(chunkMapSystem);
+        this.world.addSystem(pathfindingSystem);
         this.world.addSystem(worldGenerationSystem);
         this.world.addSystem(
             makeReplicatedEntitiesSystem((message) => {

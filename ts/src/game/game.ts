@@ -21,6 +21,7 @@ import type { ActionDispatcher } from "../module/action/actionDispatcher.js";
 import { GameServerConnection } from "./connection/gameServerConnection.js";
 import { WebworkerServerConnection } from "./connection/webworkerServerConnection.js";
 import { handleGameMessage } from "./action/messages/gameMessageHandler.js";
+import { pathfindingSystem } from "./system/pathfindingSystem.js";
 
 export class Game {
     private renderer: Renderer;
@@ -89,6 +90,7 @@ export class Game {
     private addSystems() {
         this.ecsWorld.addSystem(renderSystem);
         this.ecsWorld.addSystem(chunkMapSystem);
+        this.ecsWorld.addSystem(pathfindingSystem);
         //this.ecsWorld.addSystem(worldGenerationSystem);
     }
 

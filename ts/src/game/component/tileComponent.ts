@@ -1,3 +1,4 @@
+import type { Bounds } from "../../common/bounds.js";
 import type { JSONValue } from "../../common/object.js";
 import type { Point } from "../../common/point.js";
 import { ChunkSize, type TileChunk } from "../../module/map/chunk.js";
@@ -32,6 +33,35 @@ export class TileComponent {
             tileX: tilePosition.x,
             tileY: tilePosition.y,
             type: chunk.volume.type,
+        };
+    }
+
+    getBounds(): Bounds {
+        //Loop over chunk map and get min and max
+        //multiply this to get tile bounds
+        let minX = Number.MAX_SAFE_INTEGER;
+        let minY = Number.MAX_SAFE_INTEGER;
+        let maxX = Number.MIN_SAFE_INTEGER;
+        let maxY = Number.MIN_SAFE_INTEGER;
+        for (const [id, chunk] of this.chunks) {
+            if (chunk.chunkX > maxX) {
+                maxX = chunk.chunkX;
+            }
+            if (chunk.chunkX < minX) {
+                minX = chunk.chunkX;
+            }
+            if (chunk.chunkY > maxY) {
+                maxY = chunk.chunkY;
+            }
+            if (chunk.chunkY < minY) {
+                minY = chunk.chunkY;
+            }
+        }
+        return {
+            x1: minX * ChunkSize,
+            y1: minY * ChunkSize,
+            x2: maxX * ChunkSize + ChunkSize - 1,
+            y2: maxY * ChunkSize + ChunkSize - 1,
         };
     }
 

@@ -19,37 +19,38 @@ import {
     ActorSelectionProvider,
     emptySelection,
 } from "./actorSelectionProvider.js";
+import { InventoryComponent } from "../../../../../component/inventoryComponent.js";
+import { PlayerUnitComponent } from "../../../../../component/playerUnitComponent.js";
 
 export class WorkerSelectionProvider implements ActorSelectionProvider {
     provideButtons(
-        _stateContext: StateContext,
-        _selection: SelectedWorldItem,
+        stateContext: StateContext,
+        selection: SelectedWorldItem,
     ): ButtonCollection {
         //TODO: Reimplement selection of a worker
-        /*
         if (selection instanceof SelectedEntityItem) {
             const selectedEntity = selection.entity;
-            const equipmentComponent =
-                selectedEntity.getComponent(EquipmentComponent);
-            const workerComponent = selectedEntity.getComponent(
-                WorkerBehaviorComponent,
-            );
+            //const equipmentComponent = selectedEntity.getComponent(EquipmentComponent);
+            const playerUnit =
+                selectedEntity.getEcsComponent(PlayerUnitComponent);
 
-            if (!!equipmentComponent && !!workerComponent) {
+            if (!!playerUnit) {
                 return {
                     left: this.getPrimaryActions(stateContext, selectedEntity),
-                    right: this.getEquipmentActions(
+                    right: [],
+                    /*
+                    this.getEquipmentActions(
                         stateContext,
                         selectedEntity,
                         equipmentComponent,
-                    ),
+                    ),*/
                 };
             } else {
                 return emptySelection;
             }
         } else {
             return emptySelection;
-        }*/
+        }
         return emptySelection;
     }
     /*
@@ -184,7 +185,7 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
             },
         ];
     }
-
+    */
     private getPrimaryActions(
         stateContext: StateContext,
         selectedEntity: Entity,
@@ -203,7 +204,7 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
                 icon: sprites2.empty_sprite,
                 onClick: () => {
                     const inventory =
-                        selectedEntity.requireComponent(InventoryComponent2);
+                        selectedEntity.requireEcsComponent(InventoryComponent);
 
                     stateContext.stateChanger.push(
                         new InventoryState(inventory),
@@ -227,6 +228,7 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
         return items;
     }
 
+    /*
     private getEmptyMainEquipmentAction(
         stateContext: StateContext,
         selectedEntity: Entity,
@@ -303,5 +305,5 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
             },
         ];
     }
-        */
+    */
 }

@@ -1,3 +1,4 @@
+import { PathfindingGraphComponent } from "../../game/component/pathfindingGraphComponent.js";
 import { TileComponent } from "../../game/component/tileComponent.js";
 import { Entity } from "../../game/entity/entity.js";
 import {

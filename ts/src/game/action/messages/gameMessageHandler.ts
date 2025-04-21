@@ -8,6 +8,7 @@ import { ChunkMapComponent } from "../../component/chunkMapComponent.js";
 import type { ComponentType } from "../../component/component.js";
 import { InventoryComponent } from "../../component/inventoryComponent.js";
 import { JobRunnerComponent } from "../../component/jobRunnerComponent.js";
+import { PlayerUnitComponent } from "../../component/playerUnitComponent.js";
 import { ResourceComponent } from "../../component/resourceComponent.js";
 import { SpriteComponent } from "../../component/spriteComponent.js";
 import { TileComponent } from "../../component/tileComponent.js";
@@ -78,4 +79,5 @@ const componentFactory = {
     [SpriteComponent.name]: () => new SpriteComponent(),
     [InventoryComponent.name]: () => new InventoryComponent(),
     [ResourceComponent.name]: () => new ResourceComponent(),
+    [PlayerUnitComponent.name]: () => new PlayerUnitComponent(),
 };

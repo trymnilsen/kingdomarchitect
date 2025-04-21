@@ -10,6 +10,7 @@ import { GroundTile } from "../../../../../module/map/tile.js";
 import { TileSize } from "../../../../../module/map/tile.js";
 import { InteractionState } from "../../../handler/interactionState.js";
 import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold.js";
+import { queryPath } from "../../../../../module/query/pathQuery.js";
 
 export class ActorMovementState extends InteractionState {
     private selectedPoint: Point | null = null;
@@ -62,6 +63,14 @@ export class ActorMovementState extends InteractionState {
         };
         this.selectedPoint = toPoint;
 
+        const path = queryPath(
+            this.context.root,
+            this.entity.worldPosition,
+            toPoint,
+        );
+
+        this.path = path.path;
+        this.graph = path.graph;
         /*
         const path = this.context.root
             .requireComponent(PathFindingComponent)
