@@ -1,14 +1,7 @@
 import type { JSONValue } from "../../common/object.js";
 import { Point } from "../../common/point.js";
-
-interface Job {
-    id: string;
-}
-
-interface MoveToJob extends Job {
-    position: Point;
-}
+import type { Job } from "../job/job.js";
 
 export class JobRunnerComponent {
-    currentJob: MoveToJob | null = null;
+    currentJob: Job | null = null;
 }

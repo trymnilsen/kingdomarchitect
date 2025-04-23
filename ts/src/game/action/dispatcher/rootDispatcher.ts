@@ -20,6 +20,8 @@ export function createRootDispatcher(root: Entity): ActionDispatcher {
             case "world":
                 worldDispatcher(action, root);
                 break;
+            case "actor":
+                break;
         }
     };
 }
@@ -39,3 +41,5 @@ function worldDispatcher(action: EntityAction, root: Entity) {
             break;
     }
 }
+
+function actionDispatcher(action: EntityAction, root: Entity) {}

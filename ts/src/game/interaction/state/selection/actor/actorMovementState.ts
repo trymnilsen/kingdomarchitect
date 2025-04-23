@@ -11,6 +11,7 @@ import { TileSize } from "../../../../../module/map/tile.js";
 import { InteractionState } from "../../../handler/interactionState.js";
 import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold.js";
 import { queryPath } from "../../../../../module/query/pathQuery.js";
+import { makeQueueJobAction } from "../../../../action/job/queueJobAction.js";
 
 export class ActorMovementState extends InteractionState {
     private selectedPoint: Point | null = null;
@@ -71,14 +72,6 @@ export class ActorMovementState extends InteractionState {
 
         this.path = path.path;
         this.graph = path.graph;
-        /*
-        const path = this.context.root
-            .requireComponent(PathFindingComponent)
-            .findPath(this.entity.worldPosition, toPoint);
-        
-        this.graph = path.graph;
-        this.path = path.path;
-        */
 
         return true;
     }
@@ -176,6 +169,14 @@ export class ActorMovementState extends InteractionState {
     }
 
     private scheduleMovement() {
+        if (this.context.root.actionDispatch) {
+            this.context.root.actionDispatch(
+                makeQueueJobAction({
+                    id: "moveToPoint",
+                }),
+            );
+        }
+
         //TODO: Schedule making the movement
         /*
         this.context.root
