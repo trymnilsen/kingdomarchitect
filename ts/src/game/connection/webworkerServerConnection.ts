@@ -1,4 +1,5 @@
 import { Event } from "../../common/event.js";
+import type { EntityAction } from "../../module/action/entityAction.js";
 import type { GameServerMessage } from "../../server/gameServerMessageBus.js";
 import { GameServerConnection } from "./gameServerConnection.js";
 
@@ -18,7 +19,11 @@ export class WebworkerServerConnection implements GameServerConnection {
             this._onMessageEvent.publish(message.data);
         };
     }
-    postCommand() {
-        //this.worker.postMessage("foo");
+    postAction(action: EntityAction) {
+        const message: GameServerMessage = {
+            entries: [{ id: "entityAction", entityAction: action }],
+        };
+        console.log("Sending message", message);
+        this.worker.postMessage(message);
     }
 }

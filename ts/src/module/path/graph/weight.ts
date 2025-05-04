@@ -1,16 +1,20 @@
 import type { Point } from "../../../common/point.js";
-import { ChunkMapComponent } from "../../../game/component/chunkMapComponent.js";
-import { ResourceComponent } from "../../../game/component/resourceComponent.js";
-import type { TileComponent } from "../../../game/component/tileComponent.js";
+import {
+    ChunkMapComponentId,
+    getEntitiesAt,
+} from "../../../game/component/chunkMapComponent.js";
+import { ResourceComponentId } from "../../../game/component/resourceComponent.js";
+import {
+    getTile,
+    TileComponentId,
+    type TileComponent,
+} from "../../../game/component/tileComponent.js";
 import type { Entity } from "../../../game/entity/entity.js";
 
-export function getWeightAtPoint(
-    point: Point,
-    rootEntity: Entity,
-    tileComponent: TileComponent,
-): number {
+export function getWeightAtPoint(point: Point, rootEntity: Entity): number {
     let weight = 25;
-    const ground = tileComponent.getTile({
+    const tileComponent = rootEntity.requireEcsComponent(TileComponentId);
+    const ground = getTile(tileComponent, {
         x: point.x,
         y: point.y,
     });
@@ -20,9 +24,8 @@ export function getWeightAtPoint(
         weight = 2;
     }
 
-    const entities = rootEntity
-        .requireEcsComponent(ChunkMapComponent)
-        .getEntitiesAt(point.x, point.y);
+    const chunkMap = rootEntity.requireEcsComponent(ChunkMapComponentId);
+    const entities = getEntitiesAt(chunkMap, point.x, point.y);
 
     if (entities.length > 0) {
         let entityWeight = 0;
@@ -52,7 +55,8 @@ export function getWeightAtPoint(
             if (treeComponent) {
                 entityWeight = 30;
             }*/
-            const resourceComponent = entity.getEcsComponent(ResourceComponent);
+            const resourceComponent =
+                entity.getEcsComponent(ResourceComponentId);
             if (!!resourceComponent) {
                 entityWeight = 30;
             }

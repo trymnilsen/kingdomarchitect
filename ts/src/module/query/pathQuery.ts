@@ -1,5 +1,8 @@
 import { addPoint, pointEquals, type Point } from "../../common/point.js";
-import { PathfindingGraphComponent } from "../../game/component/pathfindingGraphComponent.js";
+import {
+    PathfindingGraphComponent,
+    PathfindingGraphComponentId,
+} from "../../game/component/pathfindingGraphComponent.js";
 import type { Entity } from "../../game/entity/entity.js";
 import type { GraphNode } from "../path/graph/graph.js";
 import { aStarSearch, type SearchedNode } from "../path/search.js";
@@ -10,7 +13,7 @@ export function queryPath(
     to: Point,
 ): PathResult {
     const graphComponent = rootEntity.getEcsComponent(
-        PathfindingGraphComponent,
+        PathfindingGraphComponentId,
     );
     if (!graphComponent) {
         throw new Error(

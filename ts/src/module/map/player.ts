@@ -2,9 +2,8 @@ import { randomColor } from "../../common/color.js";
 import { generateId } from "../../common/idGenerator.js";
 import { treeResource } from "../../data/inventory/items/naturalResource.js";
 import { makeSetTilesAction } from "../../game/action/world/setTilesAction.js";
-import { makeUnlockChunkAction } from "../../game/action/world/unlockChunkAction.js";
-import { ChunkMapComponent } from "../../game/component/chunkMapComponent.js";
-import { TileComponent } from "../../game/component/tileComponent.js";
+import { ChunkMapComponentId } from "../../game/component/chunkMapComponent.js";
+import { TileComponentId } from "../../game/component/tileComponent.js";
 import { Entity } from "../../game/entity/entity.js";
 import { resourcePrefab } from "../../game/prefab/resourcePrefab.js";
 import { workerPrefab } from "../../game/prefab/workerPrefab.js";
@@ -13,9 +12,7 @@ import { spawnTree } from "./item/vegetation.js";
 export function addInitialPlayerChunk(rootEntity: Entity) {
     const chunkEntity = new Entity("chunk");
     rootEntity.addChild(chunkEntity);
-    const tiles = Array.from(
-        rootEntity.queryComponents(TileComponent).values(),
-    )[0];
+    const tiles = rootEntity.requireEcsComponent(TileComponentId);
 
     rootEntity.dispatchAction(
         makeSetTilesAction({
@@ -41,7 +38,7 @@ export function addInitialPlayerChunk(rootEntity: Entity) {
     chunkEntity.addChild(firstTree);
     const chunkMap = chunkEntity
         .getRootEntity()
-        .requireEcsComponent(ChunkMapComponent);
+        .requireEcsComponent(ChunkMapComponentId);
 
     const trees = spawnTree(16, { x: 0, y: 0 }, chunkMap);
     for (const tree of trees) {

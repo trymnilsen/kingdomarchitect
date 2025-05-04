@@ -30,9 +30,35 @@ export function damageTint(): SpriteTint {
     };
 }
 
-export class SpriteComponent {
-    sprite: Sprite2 = emptySprite;
-    offset: Point = zeroPoint();
+export type SpriteComponent = {
+    id: typeof SpriteComponentId;
+    sprite: Sprite2;
+    offset?: Point;
     size?: Point;
-    tint: SpriteTint | null = null;
+    tint?: SpriteTint;
+};
+
+/**
+ * Creates a new sprite component
+ * @param sprite the sprite to use
+ * @param offset an optional offset
+ * @param size an optional size
+ * @param tint an optional tint
+ * @returns the constructed SpriteComponent
+ */
+export function createSpriteComponent(
+    sprite: Sprite2,
+    offset?: Point,
+    size?: Point,
+    tint?: SpriteTint,
+): SpriteComponent {
+    return {
+        id: SpriteComponentId,
+        sprite,
+        offset,
+        size,
+        tint,
+    };
 }
+
+export const SpriteComponentId = "Sprite";

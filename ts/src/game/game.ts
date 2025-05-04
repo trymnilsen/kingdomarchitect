@@ -22,6 +22,7 @@ import { GameServerConnection } from "./connection/gameServerConnection.js";
 import { WebworkerServerConnection } from "./connection/webworkerServerConnection.js";
 import { handleGameMessage } from "./action/messages/gameMessageHandler.js";
 import { pathfindingSystem } from "./system/pathfindingSystem.js";
+import type { EntityAction } from "../module/action/entityAction.js";
 
 export class Game {
     private renderer: Renderer;
@@ -41,8 +42,15 @@ export class Game {
 
     constructor(private domElementWrapperSelector: string) {
         this.ecsWorld = new EcsWorld();
+        this.gameServer = new WebworkerServerConnection();
+        this.gameServer.onMessage.listen((message) => {
+            handleGameMessage(message, this.ecsWorld.root);
+        });
         this.actionDispatcher = createRootDispatcher(this.ecsWorld.root);
-        this.ecsWorld.root.actionDispatch = this.actionDispatcher;
+        this.ecsWorld.root.actionDispatch = (action: EntityAction) => {
+            this.actionDispatcher(action);
+            this.gameServer.postAction(action);
+        };
         this.assetLoader = new AssetLoader();
         // Rendering
         this.camera = new Camera({
@@ -80,10 +88,7 @@ export class Game {
                 this.render(DrawMode.Gesture);
             },
         );
-        this.gameServer = new WebworkerServerConnection();
-        this.gameServer.onMessage.listen((message) => {
-            handleGameMessage(message, this.ecsWorld.root);
-        });
+
         this.addSystems();
     }
 
@@ -99,16 +104,8 @@ export class Game {
         this.assetLoader.load();
         this.ecsWorld.runInit();
         //Set the camera position
-        const playerEntity = firstChildWhere(this.ecsWorld.root, (child) => {
-            return child.id.includes("worker");
-        });
-        if (!!playerEntity) {
-            const newPosition = multiplyPoint(
-                playerEntity.worldPosition,
-                TileSize,
-            );
-            this.renderer.camera.position = newPosition;
-        }
+        const newPosition = multiplyPoint({ x: 4, y: 4 }, TileSize);
+        this.renderer.camera.position = newPosition;
 
         await this.assetLoader.loaderPromise;
         console.log("Finished loading");

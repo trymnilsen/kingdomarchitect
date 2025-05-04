@@ -17,7 +17,11 @@ import { generateChunk } from "../../../../module/map/chunkGenerator.js";
 import { GroundTile, TileSize } from "../../../../module/map/tile.js";
 import { InteractionState } from "../../handler/interactionState.js";
 import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold.js";
-import { TileComponent } from "../../../component/tileComponent.js";
+import {
+    TileComponent,
+    TileComponentId,
+    hasChunk,
+} from "../../../component/tileComponent.js";
 import { makeUnlockChunkAction } from "../../../action/world/unlockChunkAction.js";
 
 export class LandUnlockState extends InteractionState {
@@ -98,7 +102,8 @@ export class LandUnlockState extends InteractionState {
 
     private setUnlockableChunks() {
         const tileComponent =
-            this.context.root.requireEcsComponent(TileComponent);
+            this.context.root.requireEcsComponent(TileComponentId);
+
         const chunks = tileComponent.chunks;
         const unlockablePositions = new Set<number>();
         this.unlockPoints = [];
@@ -106,7 +111,7 @@ export class LandUnlockState extends InteractionState {
             const asEncoded = encodePosition(point.x, point.y);
             if (
                 !unlockablePositions.has(asEncoded) &&
-                !tileComponent.hasChunk(point)
+                !hasChunk(tileComponent, point)
             ) {
                 unlockablePositions.add(asEncoded);
                 this.unlockPoints.push({

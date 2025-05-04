@@ -19,8 +19,14 @@ import {
     ActorSelectionProvider,
     emptySelection,
 } from "./actorSelectionProvider.js";
-import { InventoryComponent } from "../../../../../component/inventoryComponent.js";
-import { PlayerUnitComponent } from "../../../../../component/playerUnitComponent.js";
+import {
+    InventoryComponent,
+    InventoryComponentId,
+} from "../../../../../component/inventoryComponent.js";
+import {
+    PlayerUnitComponent,
+    PlayerUnitComponentId,
+} from "../../../../../component/playerUnitComponent.js";
 
 export class WorkerSelectionProvider implements ActorSelectionProvider {
     provideButtons(
@@ -31,8 +37,9 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
         if (selection instanceof SelectedEntityItem) {
             const selectedEntity = selection.entity;
             //const equipmentComponent = selectedEntity.getComponent(EquipmentComponent);
-            const playerUnit =
-                selectedEntity.getEcsComponent(PlayerUnitComponent);
+            const playerUnit = selectedEntity.getEcsComponent(
+                PlayerUnitComponentId,
+            );
 
             if (!!playerUnit) {
                 return {
@@ -204,7 +211,9 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
                 icon: sprites2.empty_sprite,
                 onClick: () => {
                     const inventory =
-                        selectedEntity.requireEcsComponent(InventoryComponent);
+                        selectedEntity.requireEcsComponent(
+                            InventoryComponentId,
+                        );
 
                     stateContext.stateChanger.push(
                         new InventoryState(inventory),

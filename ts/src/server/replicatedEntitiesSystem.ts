@@ -7,6 +7,20 @@ export function makeReplicatedEntitiesSystem(
 ): EcsSystem {
     return {
         onEntityEvent: {
+            component_updated: (_root, event) => {
+                postMessage({
+                    id: "setComponent",
+                    component: event.item,
+                    entity: event.source.id,
+                });
+            },
+            transform: (_root, event) => {
+                postMessage({
+                    id: "transform",
+                    entityId: event.source.id,
+                    position: event.source.worldPosition,
+                });
+            },
             child_added: (_root, event) => {
                 if (event.target.isGameRoot) {
                     return;
@@ -18,13 +32,7 @@ export function makeReplicatedEntitiesSystem(
                         parent: event.target.parent?.id,
                         position: event.target.worldPosition,
                     },
-                    components: event.target.components.map((component) => {
-                        return {
-                            id: getConstructorName(component),
-                            data: component,
-                        };
-                        //TODO: Fix any
-                    }) as any,
+                    components: event.target.components,
                 });
             },
         },

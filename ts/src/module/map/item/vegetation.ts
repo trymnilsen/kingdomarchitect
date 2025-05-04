@@ -1,6 +1,9 @@
 import { encodePosition, Point } from "../../../common/point.js";
 import { treeResource } from "../../../data/inventory/items/naturalResource.js";
-import { ChunkMapComponent } from "../../../game/component/chunkMapComponent.js";
+import {
+    ChunkMapComponent,
+    getEntitiesInChunkMapWithin,
+} from "../../../game/component/chunkMapComponent.js";
 import { Entity } from "../../../game/entity/entity.js";
 import { resourcePrefab } from "../../../game/prefab/resourcePrefab.js";
 import { ChunkSize, getChunkBounds } from "../chunk.js";
@@ -15,7 +18,7 @@ export function spawnTree(
     }
     const entities: Entity[] = [];
     const chunkBounds = getChunkBounds(chunk);
-    const items = chunkMap.getEntitiesWithin(chunkBounds);
+    const items = getEntitiesInChunkMapWithin(chunkMap, chunkBounds);
     const skipPoints = new Set<number>();
     for (let i = 0; i < items.length; i++) {
         const item = items[i];

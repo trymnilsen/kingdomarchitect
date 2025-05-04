@@ -18,7 +18,12 @@ import { SingleBuildMode } from "./mode/singleBuildMode.js";
 import { buildingApplicabilityList } from "./buildingApplicabilityList.js";
 import { BuildingApplicabilityResult } from "./buildingApplicability.js";
 import { findMapped } from "../../../../common/array.js";
-import { buildingFactory } from "../../../prefab/buildingFactory.js";
+import {
+    ChunkMapComponentId,
+    getEntitiesAt,
+} from "../../../component/chunkMapComponent.js";
+import { getTile, TileComponentId } from "../../../component/tileComponent.js";
+import { makeBuildBuildingAction } from "../../../action/world/buildingAction.js";
 
 export class BuildConfirmState extends InteractionState {
     private scaffold: UIActionbarScaffold | null = null;
@@ -112,13 +117,6 @@ export class BuildConfirmState extends InteractionState {
     private confirmBuildSelection() {
         const rootEntity = this.context.root;
 
-        /*
-        const inventoryComponent = rootEntity.getComponent(InventoryComponent);
-
-        if (!inventoryComponent) {
-            throw new Error("No inventory component of root entity");
-        }*/
-
         const selections = this.buildMode.getSelection();
         if (selections.length == 0) {
             this.context.stateChanger.push(
@@ -144,24 +142,12 @@ export class BuildConfirmState extends InteractionState {
         }
 
         const removeResult = true;
-        /*inventoryComponent.removeInventoryItem(
-            woodResourceItem.id,
-            10 * selections.length,
-        );*/
 
         if (removeResult) {
             for (const selection of selections) {
-                const house = buildingFactory(this.building);
-                house.position = selection;
-                const root = this.context.root;
-                root.addChild(house);
-                //TODO: Reimplement with ECS
-                /*
-                const buildingComponent =
-                    house.requireComponent(BuildingComponent);
-                root.requireComponent(JobQueueComponent).addJob(
-                    new BuildJob(buildingComponent),
-                );*/
+                this.context.root.dispatchAction(
+                    makeBuildBuildingAction(this.building, selection),
+                );
             }
 
             this.context.stateChanger.clear();
@@ -250,17 +236,14 @@ export class BuildConfirmState extends InteractionState {
         super.onDraw(context);
     }
 
-    private isTileAvailable(_tilePosition: Point): BuildingApplicabilityResult {
+    private isTileAvailable(tilePosition: Point): BuildingApplicabilityResult {
         const rootEntity = this.context.root;
-        //TODO: Reimplemenet
-        return {
-            isApplicable: false,
-            reason: "Implement me",
-        };
-        /*
-        const entitiesAt = rootEntity
-            .requireComponent(SpatialChunkMapComponent)
-            .getEntitiesAt(tilePosition.x, tilePosition.y);
+        const chunkMap = rootEntity.requireEcsComponent(ChunkMapComponentId);
+        const entitiesAt = getEntitiesAt(
+            chunkMap,
+            tilePosition.x,
+            tilePosition.y,
+        );
 
         if (entitiesAt.length > 0) {
             return {
@@ -269,9 +252,8 @@ export class BuildConfirmState extends InteractionState {
             };
         }
 
-        const tile = rootEntity
-            .requireComponent(TilesComponent)
-            .getTile(tilePosition);
+        const tileComponent = rootEntity.requireEcsComponent(TileComponentId);
+        const tile = getTile(tileComponent, tilePosition);
 
         if (!tile) {
             return {
@@ -296,7 +278,7 @@ export class BuildConfirmState extends InteractionState {
 
         return {
             isApplicable: true,
-        };*/
+        };
     }
 }
 

@@ -5,7 +5,7 @@ import type {
     TransformMessage,
 } from "../../../server/gameServerMessageBus.js";
 import { ChunkMapComponent } from "../../component/chunkMapComponent.js";
-import type { ComponentType } from "../../component/component.js";
+import type { Components } from "../../component/component.js";
 import { InventoryComponent } from "../../component/inventoryComponent.js";
 import { JobRunnerComponent } from "../../component/jobRunnerComponent.js";
 import { PlayerUnitComponent } from "../../component/playerUnitComponent.js";
@@ -24,6 +24,9 @@ export function handleGameMessage(message: GameServerMessage, root: Entity) {
             case "transform":
                 transformEntity(entry, root);
                 break;
+            case "setComponent":
+                setComponent(root, entry.entity, entry.component);
+                break;
             case "entityAction":
                 if (root.actionDispatch) {
                     root.actionDispatch(entry.entityAction);
@@ -33,6 +36,16 @@ export function handleGameMessage(message: GameServerMessage, root: Entity) {
                 break;
         }
     }
+}
+
+function setComponent(root: Entity, entityId: string, component: Components) {
+    const entity = root.findEntity(entityId);
+    if (!entity) {
+        console.warn("Entity not found", entityId);
+        return;
+    }
+
+    entity.setEcsComponent(component);
 }
 
 function createEntity(addEntityMessage: AddEntityMessage, root: Entity) {
@@ -50,8 +63,7 @@ function createEntity(addEntityMessage: AddEntityMessage, root: Entity) {
     parent.addChild(newEntity);
     newEntity.worldPosition = addEntityMessage.entity.position;
     for (const component of addEntityMessage.components) {
-        const componentInstance = buildComponent(component.id, component.data);
-        newEntity.addEcsComponent(componentInstance);
+        newEntity.setEcsComponent(component);
     }
 }
 function transformEntity(transformMessage: TransformMessage, root: Entity) {
@@ -64,20 +76,3 @@ function transformEntity(transformMessage: TransformMessage, root: Entity) {
 
     entity.worldPosition = transformMessage.position;
 }
-function buildComponent(id: string, data: ComponentType): ComponentType {
-    const component = componentFactory[id];
-    if (!component) {
-        throw new Error(`no component factory for ${id}`);
-    }
-    const componentInstance = component();
-    const withData = Object.assign(componentInstance, data);
-    return withData;
-}
-
-const componentFactory = {
-    [JobRunnerComponent.name]: () => new JobRunnerComponent(),
-    [SpriteComponent.name]: () => new SpriteComponent(),
-    [InventoryComponent.name]: () => new InventoryComponent(),
-    [ResourceComponent.name]: () => new ResourceComponent(),
-    [PlayerUnitComponent.name]: () => new PlayerUnitComponent(),
-};

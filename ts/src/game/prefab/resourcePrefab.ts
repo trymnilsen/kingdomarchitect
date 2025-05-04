@@ -1,19 +1,14 @@
-import {
-    treeResource,
-    type NaturalResource,
-} from "../../data/inventory/items/naturalResource.js";
-import { ResourceComponent } from "../component/resourceComponent.js";
-import { SpriteComponent } from "../component/spriteComponent.js";
+import { type NaturalResource } from "../../data/inventory/items/naturalResource.js";
+import { createResourceComponent } from "../component/resourceComponent.js";
+import { createSpriteComponent } from "../component/spriteComponent.js";
 import { Entity } from "../entity/entity.js";
 
 export function resourcePrefab(item: NaturalResource): Entity {
     const entity = new Entity("resource");
-    const resource = new ResourceComponent();
-    const spriteComponent = new SpriteComponent();
-    resource.resource = item;
-    spriteComponent.sprite = item.asset;
+    const resource = createResourceComponent(item);
+    const spriteComponent = createSpriteComponent(item.asset);
 
-    entity.addEcsComponent(resource);
-    entity.addEcsComponent(spriteComponent);
+    entity.setEcsComponent(resource);
+    entity.setEcsComponent(spriteComponent);
     return entity;
 }

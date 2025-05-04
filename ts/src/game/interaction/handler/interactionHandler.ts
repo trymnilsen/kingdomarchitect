@@ -22,8 +22,16 @@ import { InteractionHandlerStatusbarPresenter } from "./interactionHandlerStatus
 import { CommitableInteractionStateChanger } from "./interactionStateChanger.js";
 import { InteractionStateHistory } from "./interactionStateHistory.js";
 import { StateContext } from "./stateContext.js";
-import { TileComponent } from "../../component/tileComponent.js";
-import { ChunkMapComponent } from "../../component/chunkMapComponent.js";
+import {
+    getTile,
+    TileComponent,
+    TileComponentId,
+} from "../../component/tileComponent.js";
+import {
+    ChunkMapComponent,
+    ChunkMapComponentId,
+    getEntitiesAt,
+} from "../../component/chunkMapComponent.js";
 
 /**
  * The interactionHandler recieves input taps and forward them to the currently
@@ -150,9 +158,10 @@ export class InteractionHandler {
                 this.camera.worldSpaceToTileSpace(worldPosition);
 
             // Check if a tile was clicked at this position
-            const tile = this.world
-                .getEcsComponent(TileComponent)
-                ?.getTile(tilePosition);
+            const tileComponent =
+                this.world.requireEcsComponent(TileComponentId);
+
+            const tile = getTile(tileComponent, tilePosition);
 
             if (tile) {
                 const tileTapHandled = currentState.onTileTap(tile);
@@ -166,10 +175,16 @@ export class InteractionHandler {
                         tile,
                         this.stateContext,
                     );*/
+                    const chunkMap =
+                        this.stateContext.root.requireEcsComponent(
+                            ChunkMapComponentId,
+                        );
 
-                    const entitiesAt = this.stateContext.root
-                        .requireEcsComponent(ChunkMapComponent)
-                        .getEntitiesAt(tile.tileX, tile.tileY);
+                    const entitiesAt = getEntitiesAt(
+                        chunkMap,
+                        tile.tileX,
+                        tile.tileY,
+                    );
 
                     let selection: SelectedWorldItem;
                     if (entitiesAt.length > 0) {
@@ -234,7 +249,6 @@ export class InteractionHandler {
 
         this.history.state.onDraw(renderScope);
 
-        /*
         if (this.history.size > 1) {
             this.statusbar.rootView.layout(renderScope, {
                 width: renderScope.width,
@@ -242,6 +256,6 @@ export class InteractionHandler {
             });
             this.statusbar.rootView.updateTransform();
             this.statusbar.rootView.draw(renderScope);
-        }*/
+        }
     }
 }

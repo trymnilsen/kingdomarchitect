@@ -1,4 +1,4 @@
-import type { ComponentType } from "../component/component.js";
+import type { Components } from "../component/component.js";
 import { Entity } from "./entity.js";
 
 export type EntityEvent =
@@ -35,7 +35,24 @@ export type EntityChildrenUpdatedEvent = {
 };
 
 export type ComponentsUpdatedEvent = {
-    id: "component_added" | "component_removed";
+    id:
+        | typeof componentAddedId
+        | typeof componentRemovedId
+        | typeof componentUpdatedId;
     source: Entity;
-    item: ComponentType;
+    item: Components;
 };
+
+/**
+ * The id of the ComponentsUpdatedEvent when a component has been added to an entity
+ */
+const componentAddedId = "component_added";
+/**
+ * The id of the ComponentsUpdatedEvent when a component has been removed from an entity
+ */
+const componentRemovedId = "component_removed";
+/**
+ * The id of the ComponentsUpdatedEvent when a component has been updated. This
+ * is triggered manually with the invalidateComponent method on an entity
+ */
+const componentUpdatedId = "component_updated";

@@ -1,5 +1,5 @@
 import type { Point } from "../common/point.js";
-import type { ComponentType } from "../game/component/component.js";
+import type { Components } from "../game/component/component.js";
 import type { EntityAction } from "../module/action/entityAction.js";
 import type { BiomeType } from "../module/map/biome.js";
 import type { Volume } from "../module/map/volume.js";
@@ -13,6 +13,7 @@ export type GameServerMessage = {
 };
 
 export type GameServerMessageEntry =
+    | SetComponentMessage
     | AddEntityMessage
     | TransformMessage
     | EntityActionMessage;
@@ -24,12 +25,12 @@ export type AddEntityMessage = {
         position: Point;
         parent?: string;
     };
-    components: { id: string; data: ComponentType }[];
+    components: readonly Components[];
 };
 
-export type AddComponentMessage = {
-    id: "addComponent";
-    component: ComponentType;
+export type SetComponentMessage = {
+    id: "setComponent";
+    component: Components;
     entity: string;
 };
 

@@ -4,140 +4,95 @@ import { SparseSet } from "../../common/structure/sparseSet.js";
 import { ChunkSize } from "../../module/map/chunk.js";
 import type { Entity } from "../entity/entity.js";
 
-export class ChunkMapComponent {
-    chunks: Map<number, SparseSet<Entity>> = new Map();
-    entityChunkMap: Map<string, number> = new Map();
+export type ChunkMapComponent = {
+    id: typeof ChunkMapComponentId;
+    chunks: Map<number, SparseSet<Entity>>;
+    entityChunkMap: Map<string, number>;
+};
 
-    /**
-     * Adds an entity to the chunk map using its world position
-     * to determine which chunk it should be in
-     * @param entity the entity to add
-     */
-    addEntity(entity: Entity): void {
-        // Convert to chunk coordinates
-        const chunkX = Math.floor(entity.worldPosition.x / ChunkSize);
-        const chunkY = Math.floor(entity.worldPosition.y / ChunkSize);
+export const ChunkMapComponentId = "ChunkMap";
+
+export function createChunkMapComponent(): ChunkMapComponent {
+    return {
+        id: ChunkMapComponentId,
+        chunks: new Map(),
+        entityChunkMap: new Map(),
+    };
+}
+
+/**
+ * Gets all entities in the chunk at the given world position
+ * @param x the x coordinate
+ * @param y the y coordinate
+ * @returns an array of entities within the chunk at the given position
+ */
+export function getEntitiesAt(
+    chunkMap: ChunkMapComponent,
+    x: number,
+    y: number,
+): Entity[] {
+    // Convert to chunk coordinates
+    const chunkX = Math.floor(x / ChunkSize);
+    const chunkY = Math.floor(y / ChunkSize);
+    const chunkKey = encodePosition(chunkX, chunkY);
+
+    const chunk = chunkMap.chunks.get(chunkKey);
+    if (!chunk) {
+        return [];
+    }
+
+    const entities: Entity[] = [];
+    for (let i = 0; i < chunk.size; i++) {
+        const entity = chunk.elementAt(i);
+        const atPosition =
+            entity.worldPosition.x === x && entity.worldPosition.y === y;
+        if (atPosition) {
+            entities.push(entity);
+        }
+    }
+
+    return entities;
+}
+
+export function getEntitiesInChunkMapWithin(
+    chunkMap: ChunkMapComponent,
+    bounds: Bounds,
+): Entity[] {
+    const startChunkX = Math.floor(bounds.x1 / ChunkSize);
+    const startChunkY = Math.floor(bounds.y1 / ChunkSize);
+    const endChunkX = Math.ceil(bounds.x2 / ChunkSize) + 1;
+    const endChunkY = Math.ceil(bounds.y2 / ChunkSize) + 1;
+    const xChunks = endChunkX - startChunkX;
+    const yChunks = endChunkY - startChunkY;
+
+    const entities: Entity[] = [];
+    const totalChunks = xChunks * yChunks;
+
+    for (let i = 0; i < totalChunks; i++) {
+        // Convert the linear index `i` to chunk coordinates
+        const chunkX = startChunkX + (i % xChunks);
+        const chunkY = startChunkY + Math.floor(i / xChunks);
         const chunkKey = encodePosition(chunkX, chunkY);
-        const chunk = this.getOrCreateChunk(chunkKey);
-        this.entityChunkMap.set(entity.id, chunkKey);
-        chunk.add(entity);
+
+        const chunk = chunkMap.chunks.get(chunkKey);
+        if (!chunk || chunk.size === 0) continue;
+
+        // Collect entities
+        entities.push(...chunk.dense);
     }
 
-    /**
-     * Removes an entity from the chunk map
-     * @param entity the entity to remove
-     */
-    removeEntity(entity: Entity): void {
-        const chunkForEntity = this.entityChunkMap.get(entity.id);
-        if (chunkForEntity === undefined) {
-            return;
-        }
+    return entities;
+}
 
-        const chunk = this.chunks.get(chunkForEntity);
-        if (chunk === undefined) {
-            return;
-        }
-
-        chunk.delete(entity);
-        this.entityChunkMap.delete(entity.id);
-    }
-
-    updateEntity(entity: Entity): void {
-        const currentChunkId = this.entityChunkMap.get(entity.id);
-        if (currentChunkId === undefined) {
-            this.addEntity(entity);
-            return;
-        }
-
-        const chunkX = Math.floor(entity.worldPosition.x / ChunkSize);
-        const chunkY = Math.floor(entity.worldPosition.y / ChunkSize);
-        const newChunkKey = encodePosition(chunkX, chunkY);
-        if (currentChunkId === newChunkKey) {
-            return;
-        }
-        const currentChunk = this.getOrCreateChunk(currentChunkId);
-        currentChunk.delete(entity);
-
-        this.entityChunkMap.set(entity.id, newChunkKey);
-        const newChunk = this.getOrCreateChunk(newChunkKey);
-        newChunk.add(entity);
-    }
-
-    /**
-     * Gets all entities in the chunk at the given world position
-     * @param x the x coordinate
-     * @param y the y coordinate
-     * @returns an array of entities within the chunk at the given position
-     */
-    getEntitiesAt(x: number, y: number): Entity[] {
-        // Convert to chunk coordinates
-        const chunkX = Math.floor(x / ChunkSize);
-        const chunkY = Math.floor(y / ChunkSize);
-        const chunkKey = encodePosition(chunkX, chunkY);
-
-        const chunk = this.chunks.get(chunkKey);
-        if (!chunk) {
-            return [];
-        }
-
-        const entities: Entity[] = [];
-        for (let i = 0; i < chunk.size; i++) {
-            const entity = chunk.elementAt(i);
-            const atPosition =
-                entity.worldPosition.x === x && entity.worldPosition.y === y;
-            if (atPosition) {
-                entities.push(entity);
-            }
-        }
-
-        return entities;
-    }
-
-    getEntitiesInChunk(chunkPosition: Point): Entity[] {
-        const chunkKey = encodePosition(chunkPosition.x, chunkPosition.y);
-        const chunk = this.chunks.get(chunkKey);
-        if (!!chunk) {
-            return chunk.dense;
-        } else {
-            return [];
-        }
-    }
-
-    getEntitiesWithin(bounds: Bounds): Entity[] {
-        const startChunkX = Math.floor(bounds.x1 / ChunkSize);
-        const startChunkY = Math.floor(bounds.y1 / ChunkSize);
-        const endChunkX = Math.ceil(bounds.x2 / ChunkSize) + 1;
-        const endChunkY = Math.ceil(bounds.y2 / ChunkSize) + 1;
-        const xChunks = endChunkX - startChunkX;
-        const yChunks = endChunkY - startChunkY;
-
-        const entities: Entity[] = [];
-        const totalChunks = xChunks * yChunks;
-
-        for (let i = 0; i < totalChunks; i++) {
-            // Convert the linear index `i` to chunk coordinates
-            const chunkX = startChunkX + (i % xChunks);
-            const chunkY = startChunkY + Math.floor(i / xChunks);
-            const chunkKey = encodePosition(chunkX, chunkY);
-
-            const chunk = this.chunks.get(chunkKey);
-            if (!chunk || chunk.size === 0) continue;
-
-            // Collect entities
-            entities.push(...chunk.dense);
-        }
-
-        return entities;
-    }
-
-    private getOrCreateChunk(chunkKey: number): SparseSet<Entity> {
-        const chunk = this.chunks.get(chunkKey);
-        if (!!chunk) {
-            return chunk;
-        } else {
-            const set = new SparseSet<Entity>();
-            this.chunks.set(chunkKey, set);
-            return set;
-        }
+function getEntitiesInChunk(
+    chunkMap: ChunkMapComponent,
+    chunkPosition: Point,
+): Entity[] {
+    const chunkKey = encodePosition(chunkPosition.x, chunkPosition.y);
+    const chunk = chunkMap.chunks.get(chunkKey);
+    if (!!chunk) {
+        return chunk.dense;
+    } else {
+        return [];
     }
 }

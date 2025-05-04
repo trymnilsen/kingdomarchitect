@@ -1,5 +1,8 @@
 import { PathfindingGraphComponent } from "../../game/component/pathfindingGraphComponent.js";
-import { TileComponent } from "../../game/component/tileComponent.js";
+import {
+    createTileComponent,
+    TileComponent,
+} from "../../game/component/tileComponent.js";
 import { Entity } from "../../game/entity/entity.js";
 import {
     EntityEventType,
@@ -31,6 +34,7 @@ export class EcsWorld {
         child_removed: [],
         component_added: [],
         component_removed: [],
+        component_updated: [],
         transform: [],
     };
     private rootEntity: Entity;
@@ -41,7 +45,7 @@ export class EcsWorld {
 
     constructor() {
         this.rootEntity = new Entity("root");
-        this.rootEntity.addEcsComponent(new TileComponent());
+        this.rootEntity.setEcsComponent(createTileComponent());
         this.rootEntity.entityEvent = this.runEvent;
     }
 
@@ -78,6 +82,11 @@ export class EcsWorld {
             if (entityEventsFromSystem.component_removed) {
                 this.entityEvents.component_removed.push(
                     entityEventsFromSystem.component_removed as EcsEntityEventFunction<EntityEvent>,
+                );
+            }
+            if (entityEventsFromSystem.component_updated) {
+                this.entityEvents.component_updated.push(
+                    entityEventsFromSystem.component_updated as EcsEntityEventFunction<EntityEvent>,
                 );
             }
             if (entityEventsFromSystem.transform) {

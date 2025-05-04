@@ -3,12 +3,19 @@ import { encodePosition, type Point } from "../../common/point.js";
 import { EcsSystem } from "../../module/ecs/ecsSystem.js";
 import { biomes } from "../../module/map/biome.js";
 import { ChunkDimension, ChunkSize } from "../../module/map/chunk.js";
-import { getTileId, TileSize } from "../../module/map/tile.js";
+import { TileSize } from "../../module/map/tile.js";
 import { DrawMode } from "../../rendering/drawMode.js";
 import type { RenderScope } from "../../rendering/renderScope.js";
 import type { RenderVisibilityMap } from "../../rendering/renderVisibilityMap.js";
-import { SpriteComponent } from "../component/spriteComponent.js";
-import { TileComponent } from "../component/tileComponent.js";
+import {
+    HealthComponentId,
+    type HealthComponent,
+} from "../component/healthComponent.js";
+import {
+    SpriteComponent,
+    SpriteComponentId,
+} from "../component/spriteComponent.js";
+import { TileComponent, TileComponentId } from "../component/tileComponent.js";
 import type { Entity } from "../entity/entity.js";
 
 export const renderSystem: EcsSystem = {
@@ -25,11 +32,9 @@ function onRender(
     const viewport = renderScope.camera.tileSpaceViewPort;
     //TODO: If i make a map/set structure with both string and instance keys
     //i can add a first method to it to avoid getting values
-    const tiles = Array.from(
-        rootEntity.queryComponents(TileComponent).values(),
-    )[0];
+    const tiles = rootEntity.requireEcsComponent(TileComponentId);
     drawTiles(tiles, renderScope, visibilityMap);
-    const query = rootEntity.queryComponentsWithin(viewport, SpriteComponent);
+    const query = rootEntity.queryComponentsWithin(viewport, SpriteComponentId);
 
     const sortedSprites = Array.from(query.entries()).sort(
         (a, b) => a[0].worldPosition.y - b[0].worldPosition.y,
@@ -41,10 +46,52 @@ function onRender(
         drawSprite(sprite, position, renderScope, drawMode);
     }
 
+    const healthbars = rootEntity.queryComponentsWithin(
+        viewport,
+        HealthComponentId,
+    );
+
+    for (const [entity, healthComponent] of healthbars) {
+        if (healthComponent.currentHp == healthComponent.maxHp) {
+            continue;
+        }
+        drawHealthbar(renderScope, entity, healthComponent);
+    }
+
     const renderEnd = performance.now();
     performance.measure("render duration", {
         start: renderStart,
         end: renderEnd,
+    });
+}
+
+function drawHealthbar(
+    renderContext: RenderScope,
+    entity: Entity,
+    healthComponent: HealthComponent,
+) {
+    const screenPosition = renderContext.camera.tileSpaceToScreenSpace(
+        entity.worldPosition,
+    );
+    const healthbarWidth = 32;
+    const maxHp = healthComponent.maxHp > 0 ? healthComponent.maxHp : 1;
+    const percentageWidth = Math.floor(
+        (healthbarWidth - 4) * (healthComponent.currentHp / maxHp),
+    );
+
+    renderContext.drawScreenSpaceRectangle({
+        x: screenPosition.x,
+        y: screenPosition.y,
+        width: healthbarWidth,
+        height: 8,
+        fill: "black",
+    });
+    renderContext.drawScreenSpaceRectangle({
+        x: screenPosition.x + 2,
+        y: screenPosition.y + 2,
+        width: percentageWidth,
+        height: 4,
+        fill: "green",
     });
 }
 
@@ -99,11 +146,12 @@ function drawSprite(
 
     const screenPosition =
         renderContext.camera.tileSpaceToScreenSpace(position);
-
+    const offsetX = spriteComponent.offset?.x ?? 0;
+    const offsetY = spriteComponent.offset?.y ?? 0;
     renderContext.drawScreenSpaceSprite({
         sprite: spriteComponent.sprite,
-        x: screenPosition.x + spriteComponent.offset.x,
-        y: screenPosition.y + spriteComponent.offset.y,
+        x: screenPosition.x + offsetX,
+        y: screenPosition.y + offsetY,
         targetHeight: targetHeight,
         targetWidth: targetWidth,
         tint: spriteComponent.tint?.color,

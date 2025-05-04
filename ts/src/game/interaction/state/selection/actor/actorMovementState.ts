@@ -12,6 +12,7 @@ import { InteractionState } from "../../../handler/interactionState.js";
 import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold.js";
 import { queryPath } from "../../../../../module/query/pathQuery.js";
 import { makeQueueJobAction } from "../../../../action/job/queueJobAction.js";
+import type { MoveToJob } from "../../../../job/moveToPointJob.js";
 
 export class ActorMovementState extends InteractionState {
     private selectedPoint: Point | null = null;
@@ -169,19 +170,16 @@ export class ActorMovementState extends InteractionState {
     }
 
     private scheduleMovement() {
-        if (this.context.root.actionDispatch) {
+        if (this.context.root.actionDispatch && this.selectedPoint) {
+            const job: MoveToJob = {
+                id: "moveToJob",
+                position: this.selectedPoint,
+                path: [],
+            };
+
             this.context.root.actionDispatch(
-                makeQueueJobAction({
-                    id: "moveToPoint",
-                }),
+                makeQueueJobAction(job, this.entity),
             );
         }
-
-        //TODO: Schedule making the movement
-        /*
-        this.context.root
-            .requireComponent(JobQueueComponent)
-            .addJob(new MoveJob(this.path.reverse()[0], this.entity));
-            */
     }
 }

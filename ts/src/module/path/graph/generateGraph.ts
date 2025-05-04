@@ -1,6 +1,9 @@
 import { absBounds } from "../../../common/bounds.js";
 import { InvalidArgumentError } from "../../../common/error/invalidArgumentError.js";
-import { TileComponent } from "../../../game/component/tileComponent.js";
+import {
+    getBoundsForTiles,
+    TileComponentId,
+} from "../../../game/component/tileComponent.js";
 import type { Entity } from "../../../game/entity/entity.js";
 import { FixedGraph, WeightFunction } from "./fixedGraph.js";
 import type { Graph } from "./graph.js";
@@ -9,14 +12,14 @@ import { getWeightAtPoint } from "./weight.js";
 
 export function createGraphFromNodes(rootEntity: Entity): FixedGraph {
     const weightFunction: WeightFunction = () => {
-        const groundComponent = rootEntity.getEcsComponent(TileComponent);
+        const groundComponent = rootEntity.getEcsComponent(TileComponentId);
         if (!groundComponent) {
             throw new InvalidArgumentError(
                 "Root entity needs a tiles component",
             );
         }
 
-        const bounds = groundComponent.getBounds();
+        const bounds = getBoundsForTiles(groundComponent);
 
         const offsetBounds = absBounds(bounds);
         const weightGraph: number[][] = [];
@@ -32,7 +35,6 @@ export function createGraphFromNodes(rootEntity: Entity): FixedGraph {
                         y: tilePositionYWithoutOffset,
                     },
                     rootEntity,
-                    groundComponent,
                 );
             }
         }
@@ -49,12 +51,7 @@ export function createGraphFromNodes(rootEntity: Entity): FixedGraph {
 }
 
 export function createLazyGraphFromRootNode(node: Entity): Graph {
-    const groundComponent = node.getEcsComponent(TileComponent);
-    if (!groundComponent) {
-        throw new Error("No ground component on root node");
-    }
-
     return new LazyGraph((point) => {
-        return getWeightAtPoint(point, node, groundComponent);
+        return getWeightAtPoint(point, node);
     });
 }

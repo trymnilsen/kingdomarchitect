@@ -4,70 +4,109 @@ import type { Point } from "../../common/point.js";
 import { ChunkSize, type TileChunk } from "../../module/map/chunk.js";
 import { getTileId, type GroundTile } from "../../module/map/tile.js";
 
-export class TileComponent {
-    chunks = new Map<string, TileChunk>();
+export type TileComponent = {
+    id: typeof TileComponentId;
+    chunks: Map<string, TileChunk>;
+};
 
-    setChunk(chunk: TileChunk) {
-        const chunkId = getTileId(chunk.chunkX, chunk.chunkY);
-        this.chunks.set(chunkId, chunk);
+export function createTileComponent(): TileComponent {
+    return {
+        id: TileComponentId,
+        chunks: new Map(),
+    };
+}
+
+export const TileComponentId = "Tile";
+
+/**
+ * Set the given chunk on a tilecomponent
+ * @param component the source component
+ * @param chunk the chunk to set
+ */
+export function setChunk(component: TileComponent, chunk: TileChunk) {
+    const chunkId = getTileId(chunk.chunkX, chunk.chunkY);
+    component.chunks.set(chunkId, chunk);
+}
+
+/**
+ * Check if the tile component has an chunk at the given position
+ * @param component the source component
+ * @param position the position to check, on chunk coordinates
+ * @returns true or false
+ */
+export function hasChunk(component: TileComponent, position: Point): boolean {
+    return component.chunks.has(getTileId(position.x, position.y));
+}
+
+/**
+ * Retrieve the TileChunk at the given position
+ * @param component the source component
+ * @param chunkPosition the position in chunk coordinates
+ * @returns the chunk or null if there is none
+ */
+export function getChunk(
+    component: TileComponent,
+    chunkPosition: Point,
+): TileChunk | null {
+    const chunkId = getTileId(chunkPosition.x, chunkPosition.y);
+    return component.chunks.get(chunkId) ?? null;
+}
+
+/**
+ * Retrieve the ground tile at the given position
+ * @param component
+ * @param tilePosition
+ * @returns
+ */
+export function getTile(
+    component: TileComponent,
+    tilePosition: Point,
+): GroundTile | null {
+    const chunkId = makeChunkId(tilePosition.x, tilePosition.y);
+    const chunk = component.chunks.get(chunkId);
+    if (!chunk) {
+        return null;
     }
 
-    hasChunk(position: Point): boolean {
-        return this.chunks.has(getTileId(position.x, position.y));
-    }
+    const tileId = getTileId(tilePosition.x, tilePosition.y);
+    return {
+        tileX: tilePosition.x,
+        tileY: tilePosition.y,
+        type: chunk.volume.type,
+    };
+}
 
-    getChunk(chunkPosition: Point) {
-        const chunkId = getTileId(chunkPosition.x, chunkPosition.y);
-        return this.chunks.get(chunkId) ?? null;
-    }
-
-    getTile(tilePosition: Point): GroundTile | null {
-        const chunkId = this.makeChunkId(tilePosition.x, tilePosition.y);
-        const chunk = this.chunks.get(chunkId);
-        if (!chunk) {
-            return null;
+export function getBoundsForTiles(component: TileComponent): Bounds {
+    //Loop over chunk map and get min and max
+    //multiply this to get tile bounds
+    let minX = Number.MAX_SAFE_INTEGER;
+    let minY = Number.MAX_SAFE_INTEGER;
+    let maxX = Number.MIN_SAFE_INTEGER;
+    let maxY = Number.MIN_SAFE_INTEGER;
+    for (const [id, chunk] of component.chunks) {
+        if (chunk.chunkX > maxX) {
+            maxX = chunk.chunkX;
         }
-
-        const tileId = getTileId(tilePosition.x, tilePosition.y);
-        return {
-            tileX: tilePosition.x,
-            tileY: tilePosition.y,
-            type: chunk.volume.type,
-        };
-    }
-
-    getBounds(): Bounds {
-        //Loop over chunk map and get min and max
-        //multiply this to get tile bounds
-        let minX = Number.MAX_SAFE_INTEGER;
-        let minY = Number.MAX_SAFE_INTEGER;
-        let maxX = Number.MIN_SAFE_INTEGER;
-        let maxY = Number.MIN_SAFE_INTEGER;
-        for (const [id, chunk] of this.chunks) {
-            if (chunk.chunkX > maxX) {
-                maxX = chunk.chunkX;
-            }
-            if (chunk.chunkX < minX) {
-                minX = chunk.chunkX;
-            }
-            if (chunk.chunkY > maxY) {
-                maxY = chunk.chunkY;
-            }
-            if (chunk.chunkY < minY) {
-                minY = chunk.chunkY;
-            }
+        if (chunk.chunkX < minX) {
+            minX = chunk.chunkX;
         }
-        return {
-            x1: minX * ChunkSize,
-            y1: minY * ChunkSize,
-            x2: maxX * ChunkSize + ChunkSize - 1,
-            y2: maxY * ChunkSize + ChunkSize - 1,
-        };
+        if (chunk.chunkY > maxY) {
+            maxY = chunk.chunkY;
+        }
+        if (chunk.chunkY < minY) {
+            minY = chunk.chunkY;
+        }
     }
+    return {
+        x1: minX * ChunkSize,
+        y1: minY * ChunkSize,
+        x2: maxX * ChunkSize + ChunkSize - 1,
+        y2: maxY * ChunkSize + ChunkSize - 1,
+    };
+}
 
-    private makeChunkId(x: number, y: number) {
-        const cx = Math.floor(x / ChunkSize);
-        const cy = Math.floor(y / ChunkSize);
-        return getTileId(cx, cy);
-    }
+function makeChunkId(x: number, y: number) {
+    const cx = Math.floor(x / ChunkSize);
+    const cy = Math.floor(y / ChunkSize);
+    return getTileId(cx, cy);
 }

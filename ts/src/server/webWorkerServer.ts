@@ -14,4 +14,4 @@ const messageBus: GameServerMessageBus = {
     },
 };
 const gameServer = new GameServer(messageBus);
-self.onmessage = (message) => gameServer.onCommand(message);
+onmessage = (message) => gameServer.onCommand(message.data);

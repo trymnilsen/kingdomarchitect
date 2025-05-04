@@ -1,14 +1,15 @@
 import { generateId } from "../../common/idGenerator.js";
 import { sprites2 } from "../../module/asset/sprite.js";
-import { PlayerUnitComponent } from "../component/playerUnitComponent.js";
-import { SpriteComponent } from "../component/spriteComponent.js";
+import { createJobRunnerComponent } from "../component/jobRunnerComponent.js";
+import { createPlayerUnitComponent } from "../component/playerUnitComponent.js";
+import { createSpriteComponent } from "../component/spriteComponent.js";
 import { Entity } from "../entity/entity.js";
 
 export function workerPrefab(): Entity {
     const entity = new Entity(generateId("worker"));
-    const spriteComponent = new SpriteComponent();
-    spriteComponent.sprite = sprites2.knight;
-    entity.addEcsComponent(spriteComponent);
-    entity.addEcsComponent(new PlayerUnitComponent());
+    const spriteComponent = createSpriteComponent(sprites2.knight);
+    entity.setEcsComponent(spriteComponent);
+    entity.setEcsComponent(createPlayerUnitComponent());
+    entity.setEcsComponent(createJobRunnerComponent());
     return entity;
 }

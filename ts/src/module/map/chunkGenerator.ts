@@ -7,7 +7,11 @@ import { randomColor } from "../../common/color.js";
 import { generateId } from "../../common/idGenerator.js";
 import { adjacentPoints, Point } from "../../common/point.js";
 import { makeSetTilesAction } from "../../game/action/world/setTilesAction.js";
-import { TileComponent } from "../../game/component/tileComponent.js";
+import {
+    getChunk,
+    TileComponent,
+    TileComponentId,
+} from "../../game/component/tileComponent.js";
 import { Entity } from "../../game/entity/entity.js";
 import { generateDesert } from "./biome/desert.js";
 import { generateForrest } from "./biome/forrest.js";
@@ -21,13 +25,11 @@ import type { Volume } from "./volume.js";
 
 //TODO: should return a structure describing the unlock for the action
 export function generateChunk(rootEntity: Entity, chunkPoint: Point) {
-    const tiles = Array.from(
-        rootEntity.queryComponents(TileComponent).values(),
-    )[0];
+    const tiles = rootEntity.requireEcsComponent(TileComponentId);
     // Find available volumes with available space
     const adjacentVolumes = mapNotNullDistinct(
         adjacentPoints(chunkPoint),
-        (item) => tiles.getChunk(item)?.volume,
+        (item) => getChunk(tiles, item)?.volume,
     ).filter((volume) => volume.size < volume.maxSize);
     const createNewVolume = Math.random() > 0.8;
 

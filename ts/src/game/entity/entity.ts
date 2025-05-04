@@ -1,9 +1,6 @@
 import { removeItem } from "../../common/array.js";
 import type { Bounds } from "../../common/bounds.js";
-import {
-    ConstructorFunction,
-    getConstructorName,
-} from "../../common/constructor.js";
+import { getConstructorName } from "../../common/constructor.js";
 import { InvalidArgumentError } from "../../common/error/invalidArgumentError.js";
 import {
     addPoint,
@@ -16,8 +13,9 @@ import { GameTime } from "../../common/time.js";
 import type { ActionDispatcher } from "../../module/action/actionDispatcher.js";
 import type { EntityAction } from "../../module/action/entityAction.js";
 import type {
-    ComponentType,
-    ParameterlessClassConstructor,
+    BaseComponent,
+    ComponentID,
+    Components,
 } from "../component/component.js";
 import { visitChildren } from "./child/visit.js";
 import { entityWithId } from "./child/withId.js";
@@ -36,7 +34,7 @@ export class Entity {
     private _localPosition: Point = zeroPoint();
     private _worldPosition: Point = zeroPoint();
     private _entityEvents?: (event: EntityEvent) => void;
-    private _ecsComponents = new Map<string, ComponentType>();
+    private _ecsComponents = new Map<string, Components>();
     private _gameTime?: GameTime;
     private _actionDispatch?: ActionDispatcher;
 
@@ -149,7 +147,7 @@ export class Entity {
         this._actionDispatch = value;
     }
 
-    get components(): ReadonlyArray<Readonly<ComponentType>> {
+    get components(): ReadonlyArray<Readonly<Components>> {
         return Array.from(this._ecsComponents.values());
     }
     /**
@@ -272,40 +270,45 @@ export class Entity {
         }
     }
 
-    addEcsComponent(ecsComponent: ComponentType) {
-        const componentName = getConstructorName(ecsComponent);
-        this._ecsComponents.set(componentName, ecsComponent);
+    setEcsComponent(ecsComponent: Components & BaseComponent) {
+        this._ecsComponents.set(ecsComponent.id, ecsComponent);
     }
 
-    getEcsComponent<TFilter extends ComponentType>(
-        filterType: ConstructorFunction<TFilter>,
-    ): TFilter | null {
-        const componentId = filterType.name;
-        const component = this._ecsComponents.get(componentId) as TFilter;
-        return component || null;
-    }
-
-    requireEcsComponent<TFilter extends ComponentType>(
-        filterType: ConstructorFunction<TFilter>,
-    ): TFilter {
-        const component = this.getEcsComponent(filterType);
+    getEcsComponent<ID extends ComponentID>(
+        componentId: ID,
+    ): Extract<Components, { id: ID }> | null {
+        const component = this._ecsComponents.get(componentId);
         if (!component) {
-            throw new Error(`No component of type ${filterType.name}`);
+            return null;
+        }
+
+        return component as Extract<Components, { id: ID }>;
+    }
+
+    requireEcsComponent<ID extends ComponentID>(
+        componentId: ID,
+    ): Extract<Components, { id: ID }> {
+        const component = this.getEcsComponent(componentId);
+        if (!component) {
+            throw new Error(`No component of type ${componentId}`);
         }
 
         return component;
     }
 
-    queryComponents<T extends ParameterlessClassConstructor>(
-        component: T,
-    ): ReadonlyMap<Entity, InstanceType<T>> {
+    queryComponents<ID extends ComponentID>(
+        componentId: ID,
+    ): ReadonlyMap<Entity, Extract<Components, { id: ID }>> {
         //How do we avoid three (or two when old is removed) caches
-        const map = new Map<Entity, InstanceType<T>>();
+        const map = new Map<Entity, Extract<Components, { id: ID }>>();
 
         visitChildren(this, (child) => {
-            const matchingComponent = child.getEcsComponent(component);
+            const matchingComponent = child.getEcsComponent(componentId);
             if (matchingComponent) {
-                map.set(child, matchingComponent as InstanceType<T>);
+                map.set(
+                    child,
+                    matchingComponent as Extract<Components, { id: ID }>,
+                );
             }
             return false;
         });
@@ -313,14 +316,34 @@ export class Entity {
         return map;
     }
 
-    queryComponentsWithin<T extends ParameterlessClassConstructor>(
+    queryComponentsWithin<ID extends ComponentID>(
         _bounds: Bounds,
-        component: T,
-    ): ReadonlyMap<Entity, InstanceType<T>> {
+        componentId: ID,
+    ): ReadonlyMap<Entity, Extract<Components, { id: ID }>> {
         //TODO: Return only inside bounds based on the chunk map resource
-        return this.queryComponents(component);
+        return this.queryComponents(componentId);
     }
 
+    /**
+     * Invalidate a component signaling that it has changed
+     * Will emit an entity event that can be listened to
+     * @param componentId the component that changed
+     */
+    invalidateComponent(componentId: ComponentID) {
+        const component = this.getEcsComponent(componentId);
+        if (!!component) {
+            this.bubbleEvent({
+                id: "component_updated",
+                item: component,
+                source: this,
+            });
+        }
+    }
+
+    /**
+     * Dispatch an action to the action dispatcher if one is attached to the entity
+     * @param action action to dispatch
+     */
     dispatchAction<T extends EntityAction>(action: T) {
         if (this._actionDispatch) {
             this._actionDispatch(action);

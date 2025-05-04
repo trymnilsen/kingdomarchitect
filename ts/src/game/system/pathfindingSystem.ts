@@ -1,7 +1,11 @@
 import type { EcsSystem } from "../../module/ecs/ecsSystem.js";
 import { createLazyGraphFromRootNode } from "../../module/path/graph/generateGraph.js";
 import { LazyGraph } from "../../module/path/graph/lazyGraph.js";
-import { PathfindingGraphComponent } from "../component/pathfindingGraphComponent.js";
+import { PathCache } from "../../module/path/pathCache.js";
+import {
+    PathfindingGraphComponent,
+    PathfindingGraphComponentId,
+} from "../component/pathfindingGraphComponent.js";
 import type { Entity } from "../entity/entity.js";
 import type {
     EntityChildrenUpdatedEvent,
@@ -18,15 +22,20 @@ export const pathfindingSystem: EcsSystem = {
 };
 
 function init(root: Entity) {
-    const component = new PathfindingGraphComponent();
-    component.graph = createLazyGraphFromRootNode(root);
-    root.addEcsComponent(component);
+    const component: PathfindingGraphComponent = {
+        id: PathfindingGraphComponentId,
+        pathCache: new PathCache(),
+        graph: createLazyGraphFromRootNode(root),
+    };
+
+    root.setEcsComponent(component);
 }
 
 function onTransform(rootEntity: Entity, entityEvent: EntityTransformEvent) {
     const graphComponent = rootEntity.requireEcsComponent(
-        PathfindingGraphComponent,
+        PathfindingGraphComponentId,
     );
+
     graphComponent.graph?.invalidatePoint(entityEvent.source.worldPosition);
 }
 
@@ -35,8 +44,9 @@ function onEntityAdded(
     entityEvent: EntityChildrenUpdatedEvent,
 ) {
     const graphComponent = rootEntity.requireEcsComponent(
-        PathfindingGraphComponent,
+        PathfindingGraphComponentId,
     );
+
     graphComponent.graph?.invalidatePoint(entityEvent.target.worldPosition);
 }
 
@@ -45,7 +55,7 @@ function onEntityRemoved(
     entityEvent: EntityChildrenUpdatedEvent,
 ) {
     const graphComponent = rootEntity.requireEcsComponent(
-        PathfindingGraphComponent,
+        PathfindingGraphComponentId,
     );
     graphComponent.graph?.invalidatePoint(entityEvent.target.worldPosition);
 }
