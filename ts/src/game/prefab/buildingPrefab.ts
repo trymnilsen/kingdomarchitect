@@ -12,7 +12,7 @@ export function buildingPrefab(
 ): Entity {
     const entity = new Entity(generateId("building"));
     entity.setEcsComponent(createBuildingComponent(building));
-    entity.setEcsComponent(createHealthComponent(0, 100));
+    entity.setEcsComponent(createHealthComponent(10, 100));
     entity.setEcsComponent(
         createSpriteComponent(
             startScaffolded ? sprites2.wooden_house_scaffold : building.icon,

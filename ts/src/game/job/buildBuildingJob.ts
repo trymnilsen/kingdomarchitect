@@ -32,9 +32,9 @@ export const buildBuildingHandler: JobHandler<BuildBuildingJob> = (
     if (isPointAdjacentTo(buildingEntity.worldPosition, entity.worldPosition)) {
         const healthComponent =
             buildingEntity.requireEcsComponent(HealthComponentId);
-        const amountHealed = heal(healthComponent, 10);
+        heal(healthComponent, 10);
         buildingEntity.invalidateComponent(HealthComponentId);
-        if (amountHealed == 0) {
+        if (healthComponent.currentHp >= healthComponent.maxHp) {
             const spriteComponent =
                 buildingEntity.getEcsComponent(SpriteComponentId);
 
@@ -42,7 +42,6 @@ export const buildBuildingHandler: JobHandler<BuildBuildingJob> = (
                 spriteComponent.sprite = buildingComponent.building.icon;
             }
             buildingEntity.invalidateComponent(SpriteComponentId);
-
             completeJob(entity);
         }
     } else {
