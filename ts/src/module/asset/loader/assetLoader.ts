@@ -11,8 +11,7 @@ export class AssetLoader {
     load() {
         const loadPromises: Promise<unknown>[] = [];
 
-        //loadPromises.push(this.loadFonts());
-
+        loadPromises.push(this.loadFonts());
         for (const bin of bins) {
             loadPromises.push(this.loadAsset(bin.name, bin.filename));
         }
