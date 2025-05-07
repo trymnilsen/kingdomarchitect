@@ -1,9 +1,9 @@
-import type { EntityAction } from "../../../module/action/entityAction.js";
-import { JobRunnerComponentId } from "../../component/jobRunnerComponent.js";
-import type { Entity } from "../../entity/entity.js";
-import { buildingPrefab } from "../../prefab/buildingPrefab.js";
-import type { QueueJobAction } from "../job/queueJobAction.js";
-import type { BuildBuildingAction } from "../world/buildingAction.js";
+import type { EntityAction } from "../../../../module/action/entityAction.js";
+import { JobRunnerComponentId } from "../../../component/jobRunnerComponent.js";
+import type { Entity } from "../../../entity/entity.js";
+import { buildingPrefab } from "../../../prefab/buildingPrefab.js";
+import type { QueueJobAction } from "../../job/queueJobAction.js";
+import type { BuildBuildingAction } from "../../world/buildingAction.js";
 
 export function buildingDispatcher(action: EntityAction, root: Entity) {
     const actionId = action.id[1];

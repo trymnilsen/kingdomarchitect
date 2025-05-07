@@ -45,5 +45,5 @@ export function getChunkBounds(chunk: Point): Bounds {
 export type TileChunk = {
     chunkX: number;
     chunkY: number;
-    volume: Volume;
+    volume?: Volume;
 };

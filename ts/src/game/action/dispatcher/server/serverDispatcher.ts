@@ -1,9 +1,9 @@
-import type { ActionDispatcher } from "../../../module/action/actionDispatcher.js";
-import type { EntityAction } from "../../../module/action/entityAction.js";
-import type { Entity } from "../../entity/entity.js";
-import { actorDispatcher } from "./actorDispatcher.js";
+import type { ActionDispatcher } from "../../../../module/action/actionDispatcher.js";
+import type { EntityAction } from "../../../../module/action/entityAction.js";
+import type { Entity } from "../../../entity/entity.js";
+import { actorDispatcher } from "../common/actorDispatcher.js";
 import { buildingDispatcher } from "./buildingDispatcher.js";
-import { worldDispatcher } from "./worldDispatcher.js";
+import { serverWorldDispatcher } from "./serverWorldDispatcher.js";
 
 export function createServerDispatcher(root: Entity): ActionDispatcher {
     return (action: EntityAction) => {
@@ -14,7 +14,7 @@ export function createServerDispatcher(root: Entity): ActionDispatcher {
         const category = action.id[0];
         switch (category) {
             case "world":
-                worldDispatcher(action, root);
+                serverWorldDispatcher(action, root);
                 break;
             case "actor":
                 actorDispatcher(action, root);

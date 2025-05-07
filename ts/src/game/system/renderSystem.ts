@@ -181,6 +181,10 @@ function drawTiles(
     visibilityMap: RenderVisibilityMap,
 ) {
     for (const [chunkId, chunk] of tiles.chunks) {
+        if (!chunk.volume) {
+            continue;
+        }
+
         const chunkPosition = {
             x: chunk.chunkX * ChunkSize,
             y: chunk.chunkY * ChunkSize,
