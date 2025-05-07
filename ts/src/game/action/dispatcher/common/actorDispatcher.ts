@@ -1,7 +1,7 @@
-import type { EntityAction } from "../../../module/action/entityAction.js";
-import { JobRunnerComponentId } from "../../component/jobRunnerComponent.js";
-import type { Entity } from "../../entity/entity.js";
-import type { QueueJobAction } from "../job/queueJobAction.js";
+import type { EntityAction } from "../../../../module/action/entityAction.js";
+import { JobRunnerComponentId } from "../../../component/jobRunnerComponent.js";
+import type { Entity } from "../../../entity/entity.js";
+import type { QueueJobAction } from "../../job/queueJobAction.js";
 
 export function actorDispatcher(action: EntityAction, root: Entity) {
     const actionId = action.id[1];

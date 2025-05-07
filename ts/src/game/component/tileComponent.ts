@@ -72,7 +72,7 @@ export function getTile(
     return {
         tileX: tilePosition.x,
         tileY: tilePosition.y,
-        type: chunk.volume.type,
+        type: chunk.volume?.type,
     };
 }
 

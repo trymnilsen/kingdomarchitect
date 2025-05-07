@@ -10,7 +10,7 @@ import { Entity } from "../../../game/entity/entity.js";
 import { ChunkSize, type TileChunk } from "../chunk.js";
 
 export function placeSettlement(chunk: TileChunk, _chunkEntity: Entity) {
-    if (chunk.volume.id === "volume1") {
+    if (!chunk.volume || chunk.volume.id === "volume1") {
         return;
     }
     //Decide if no settlement, orcs or humans

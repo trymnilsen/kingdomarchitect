@@ -1,4 +1,4 @@
-import { createServerDispatcher } from "../game/action/dispatcher/serverDispatcher.js";
+import { createServerDispatcher } from "../game/action/dispatcher/server/serverDispatcher.js";
 import { chunkMapSystem } from "../game/system/chunkMapSystem.js";
 import { JobSystem } from "../game/system/jobSystem.js";
 import { pathfindingSystem } from "../game/system/pathfindingSystem.js";

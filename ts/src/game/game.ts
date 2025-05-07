@@ -16,7 +16,7 @@ import { InteractionHandler } from "./interaction/handler/interactionHandler.js"
 import { chunkMapSystem } from "./system/chunkMapSystem.js";
 import { renderSystem } from "./system/renderSystem.js";
 import { worldGenerationSystem } from "./system/worldGenerationSystem.js";
-import { createRootDispatcher } from "./action/dispatcher/rootDispatcher.js";
+import { createClientDispatcher } from "./action/dispatcher/client/clientDispatcher.js";
 import type { ActionDispatcher } from "../module/action/actionDispatcher.js";
 import { GameServerConnection } from "./connection/gameServerConnection.js";
 import { WebworkerServerConnection } from "./connection/webworkerServerConnection.js";
@@ -46,7 +46,7 @@ export class Game {
         this.gameServer.onMessage.listen((message) => {
             handleGameMessage(message, this.ecsWorld.root);
         });
-        this.actionDispatcher = createRootDispatcher(this.ecsWorld.root);
+        this.actionDispatcher = createClientDispatcher(this.ecsWorld.root);
         this.ecsWorld.root.actionDispatch = (action: EntityAction) => {
             this.actionDispatcher(action);
             this.gameServer.postAction(action);
