@@ -1,5 +1,6 @@
 import { generateId } from "../../common/idGenerator.js";
 import { sprites2 } from "../../module/asset/sprite.js";
+import { createEquipmentComponent } from "../component/equipmentComponent.js";
 import { createJobRunnerComponent } from "../component/jobRunnerComponent.js";
 import { createPlayerUnitComponent } from "../component/playerUnitComponent.js";
 import { createSpriteComponent } from "../component/spriteComponent.js";
@@ -11,5 +12,6 @@ export function workerPrefab(): Entity {
     entity.setEcsComponent(spriteComponent);
     entity.setEcsComponent(createPlayerUnitComponent());
     entity.setEcsComponent(createJobRunnerComponent());
+    entity.setEcsComponent(createEquipmentComponent());
     return entity;
 }
