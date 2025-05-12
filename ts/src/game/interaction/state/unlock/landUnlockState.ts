@@ -96,8 +96,8 @@ export class LandUnlockState extends InteractionState {
             };
 
             this.context.root.dispatchAction(makeUnlockChunkAction(chunkPoint));
-            this.context.stateChanger.pop();
-            //this.setUnlockableChunks();
+            //this.context.stateChanger.pop();
+            this.setUnlockableChunks();
         }
     }
 

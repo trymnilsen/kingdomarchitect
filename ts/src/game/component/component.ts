@@ -1,5 +1,6 @@
 import type { BuildingComponent } from "./buildingComponent.js";
 import type { ChunkMapComponent } from "./chunkMapComponent.js";
+import type { EquipmentComponent } from "./equipmentComponent.js";
 import type { HealthComponent } from "./healthComponent.js";
 import type { InventoryComponent } from "./inventoryComponent.js";
 import type { JobQueueComponent } from "./jobQueueComponent.js";
@@ -21,6 +22,7 @@ export type Components =
     | JobQueueComponent
     | BuildingComponent
     | HealthComponent
+    | EquipmentComponent
     | PathfindingGraphComponent;
 
 export interface BaseComponent {
