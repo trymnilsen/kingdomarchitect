@@ -30,7 +30,7 @@
         "maxrects-packer": "^2.7.3",
         "pngjs": "^7.0.0",
         "prettier": "^3.5.3",
-        "rolldown": "^1.0.0-beta.4",
+        "rolldown": "^1.0.0-beta.9",
         "typescript": "^5.8.3",
         "vitest": "^3.1.1"
     }
