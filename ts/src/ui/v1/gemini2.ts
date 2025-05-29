@@ -646,7 +646,7 @@ const CounterBox = createComponent<{ initialCount?: number }>(
                 );
             };
         }, []); // Empty dependency array: runs only on mount, cleans up only on unmount
-
+        console.count("UICounterBox");
         return uiColumn({
             children: [
                 TextBox({ text: `Count: ${count}` }),
@@ -724,37 +724,3 @@ export const App = createComponent<{}>(
 </body>
 </html>
 */
-
-// For self-contained execution simulation (e.g., Node.js or simple script tag without modules)
-// You might need to adapt the import/export and trigger manually.
-if (typeof document !== "undefined") {
-    // Ensure the DOM is ready before trying to find the container
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", () => {
-            const appContainer =
-                document.getElementById("canvas-container") ||
-                document.createElement("div"); // Fallback to creating div
-            if (!document.getElementById("canvas-container")) {
-                appContainer.id = "canvas-container";
-                document.body.appendChild(appContainer);
-            }
-            render(App({}), appContainer);
-        });
-    } else {
-        // DOM already loaded
-        const appContainer =
-            document.getElementById("canvas-container") ||
-            document.createElement("div"); // Fallback
-        if (!document.getElementById("canvas-container")) {
-            appContainer.id = "canvas-container";
-            document.body.appendChild(appContainer);
-        }
-        render(App({}), appContainer);
-    }
-} else {
-    console.log(
-        "Simulating render without DOM. Call render(App({}), yourCanvasContext);",
-    );
-    // Simulate first render (won't show UI, but logs might work)
-    render(App({}), null);
-}
