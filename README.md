@@ -76,7 +76,7 @@ Install the required development packages (typescript and rollup) with `npm i`. 
 The architecture of the game is loosely based around three concepts:
 - A timer ticking each second
 - An entity tree and component system
-- A state system for the HUD/GUI
+- A state system for the HUD with a declarative UI
 
 #### Game updates
 Every second a timer invokes two code paths for most of the game components. An update function and a draw function.

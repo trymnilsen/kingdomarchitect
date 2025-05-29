@@ -1,4 +1,4 @@
-import { render, App } from "./gemini2.js";
+//import { App } from "./app.js";
 
 document.addEventListener(
     "DOMContentLoaded",
@@ -20,10 +20,12 @@ document.addEventListener(
 
         // --- Start UI --
         renderUI(canvasElement, App);
-        */
+
         const appContainer = document.createElement("div");
         document.body.appendChild(appContainer);
         render(App({}), appContainer);
+        */
+        //render(App());
     },
     false,
 );
