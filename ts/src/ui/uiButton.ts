@@ -10,7 +10,7 @@ export const uiButton = createUiComponent(({ withGesture: useGesture }) => {
 
     return uiBox({
         padding: 8,
-        color: "blue",
+        color: "green",
         child: uiText({
             content: "Click me",
             textStyle: defaultTextStyle,
