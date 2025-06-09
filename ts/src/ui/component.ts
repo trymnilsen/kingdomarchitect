@@ -1,17 +1,50 @@
+import type { Bounds } from "../common/bounds.js";
+import type { Rectangle } from "../common/structure/rectangle.js";
+import type { UIEvent } from "../module/ui/event/uiEvent.js";
+import type { UILayoutScope } from "../module/ui/uiLayoutContext.js";
+import type { UISize } from "../module/ui/uiSize.js";
+import type { UIRenderScope } from "../rendering/uiRenderContext.js";
+import type { UiNode } from "./render.js";
+
+export type LayoutInfo = {
+    width: number;
+    height: number;
+    x: number;
+    y: number;
+};
+
+/**
+ * The function provided to a layout hook
+ * @param constraints the constraints available
+ */
+export type LayoutHook = (
+    constraints: UISize,
+    node: UiNode,
+    layout: (constraints: UISize, node: UiNode) => UISize,
+    measure: UILayoutScope,
+) => UISize;
+
+export type DrawHook = (context: UIRenderScope, region: Rectangle) => void;
+
 export type ComponentContext<P extends {}> = {
     props: P;
-    useState: <S>(initalValue: S) => [S, (newValue: S) => void];
-    useEffect: (fn: () => void, deps: any[]) => void;
+    /**
+     * Set a custom layout hook for this component
+     * @param layout the LayoutHook to invoke during layout
+     * @returns
+     */
+    withLayout: (layout: LayoutHook) => void;
+    withDraw: (draw: DrawHook) => void;
+    withGesture: (handler: (uiEvent: UIEvent) => boolean) => void;
+    withState: <S>(initalValue: S) => [S, (newValue: S) => void];
+    withEffect: (fn: () => void, deps?: any[]) => void;
 };
+
 export type ComponentDescriptor<P extends {} = any> = {
     type: Function; //The component factory method, typed as function as we mostly use it for identity at runtime
     renderFn: RenderFunction<P>; // The function containing hooks and returning a PrimitiveDescriptor
     props: P;
     key?: string | number; // For list reconciliation
-};
-
-export type UiNode = ComponentDescriptor & {
-    children: UiNode[];
 };
 
 export type ComponentDescriptorWithChildren = ComponentDescriptor & {

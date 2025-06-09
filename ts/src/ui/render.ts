@@ -1,9 +1,21 @@
 import { removeItem } from "../common/array.js";
+import { addPoint, zeroPoint, type Point } from "../common/point.js";
+import type { Rectangle } from "../common/structure/rectangle.js";
+import type { UISize } from "../module/ui/uiSize.js";
+import type { RenderScope } from "../rendering/renderScope.js";
 import type {
     ComponentContext,
     ComponentDescriptor,
     ComponentDescriptorWithChildren,
+    DrawHook,
+    LayoutHook,
 } from "./component.js";
+import { setLayout } from "./layout.js";
+
+export type LayoutInfo = {
+    offset: Point;
+    region: Rectangle;
+};
 
 /**
  * Ui is an extension of the component descriptor and builds up the tree of
@@ -15,7 +27,15 @@ export type UiNode = {
     children: UiNode[];
     descriptor: ComponentDescriptor;
     generation: number;
+    layout?: LayoutInfo;
 };
+
+type Hook = {
+    type: keyof Omit<ComponentContext<{}>, "props">;
+    fn: () => void;
+};
+
+const zeroOffset = zeroPoint();
 
 export class UiRenderer {
     //A reference to the top root component
@@ -24,68 +44,155 @@ export class UiRenderer {
     //We keep a map of our hooks for look up, the first key is component
     //the hook belongs to. Then we have a map with hookIndex as the key
     //and the hook itself
-    private hooks: Map<ComponentDescriptor, Map<number, () => void>> =
-        new Map();
+    private hooks: Map<UiNode, Map<number, Hook>> = new Map();
 
+    constructor(private renderScope: RenderScope) {}
     /**
      * Render a new tree of components based on the root component
      * @param descriptor the descriptor for the root node, for example app()
      */
     renderComponent(descriptor: ComponentDescriptor) {
-        //compose the new tree
-        //TODO if the descriptor is different from the current one we need to dispose
-        this.currentGeneration += 1;
-        const newTree = this.composeComponent(null, descriptor);
+        // The root-level reconciliation is slightly different
+        const rootNodeToCompose =
+            this.currentTree?.descriptor.type === descriptor.type
+                ? this.currentTree
+                : undefined;
+
+        const newTree = this.composeNode(rootNodeToCompose, descriptor);
+
+        // If we created an entirely new root, cleanup the old tree
+        if (this.currentTree && this.currentTree !== newTree) {
+            this.cleanupChild(this.currentTree);
+        }
+
         this.currentTree = newTree;
-        //Run layout on tree
-        //Run draw on tree
+        this.performLayout(this.renderScope.size, newTree);
+        this.updateTransform(newTree, zeroOffset);
+        this.performDraw(newTree);
     }
 
-    /**
-     * Based on a list of children, will attempt to find an existing node or
-     * create a new one
-     * @param oldChildren
-     * @param descriptor
-     */
-    private reconcileNode(
-        parent: UiNode | null,
-        descriptor: ComponentDescriptor,
-    ): UiNode {
-        let children = parent?.children;
-        if (!children && !parent) {
-            children = this.currentTree ? [this.currentTree] : [];
+    private updateTransform(node: UiNode, parentOffset: Point) {
+        if (!node.layout) {
+            throw new Error("Layout not set for node");
         }
+        const totalOffset = addPoint(node.layout.offset, parentOffset);
+        node.layout.region.x = totalOffset.x;
+        node.layout.region.y = totalOffset.y;
 
-        if (!children) {
-            throw new Error("Cannot find any children, unable to reconile");
+        for (const child of node.children) {
+            this.updateTransform(child, totalOffset);
         }
+    }
 
-        //look for any children where type and key matches
-        const matchingKeyNode = children.find(
-            (node) =>
-                node.descriptor.type == descriptor.type &&
-                !!node.descriptor.key &&
-                node.descriptor.key == descriptor.key,
+    private performLayout(constraints: UISize, node: UiNode): UISize {
+        console.log("Perform layout for", node);
+        const layoutHook = Array.from(
+            this.hooks.get(node)?.values() ?? [],
+        ).find((item) => item.type == "withLayout");
+
+        if (layoutHook) {
+            const layoutFn = layoutHook.fn as unknown as LayoutHook;
+            const childLayout: (constraints: UISize, node: UiNode) => UISize = (
+                childConstraints,
+                childNode,
+            ) => {
+                return this.performLayout(childConstraints, childNode);
+            };
+
+            const size = layoutFn(
+                constraints,
+                node,
+                childLayout,
+                this.renderScope,
+            );
+
+            setLayout(node, size);
+            return size;
+        } else {
+            //No default hook, assume the the size of the incomming constraints
+            //before looping into children
+            setLayout(node, constraints);
+            for (const child of node.children) {
+                this.performLayout(constraints, child);
+            }
+            return constraints;
+        }
+    }
+
+    private performDraw(node: UiNode) {
+        const drawHook = Array.from(this.hooks.get(node)?.values() ?? []).find(
+            (item) => item.type == "withDraw",
         );
-        if (!!matchingKeyNode) {
-            return this.updateNodeWithDescriptor(matchingKeyNode, descriptor);
+
+        if (drawHook) {
+            if (node.layout) {
+                const drawFn = drawHook as unknown as DrawHook;
+                drawFn(this.renderScope, node.layout.region);
+            } else {
+                console.error("Node has not been layed out, cannot draw");
+            }
         }
 
-        //look for any matching type
-        //TODO: Change this? Is it too loose should we also add index matching
-        const matchingTypeNode = children.find(
-            (node) => node.descriptor.type == descriptor.type,
-        );
-        if (!!matchingTypeNode) {
-            return this.updateNodeWithDescriptor(matchingTypeNode, descriptor);
+        for (const child of node.children) {
+            this.performDraw(child);
+        }
+    }
+
+    private reconcileChildren(
+        parent: UiNode,
+        newChildDescriptors: ComponentDescriptor[],
+    ): UiNode[] {
+        const newChildren: UiNode[] = [];
+        const oldChildren = parent.children;
+
+        // Create a map of old keyed children for fast lookups
+        const oldKeyedChildren = new Map<string | number, UiNode>();
+        const oldUnkeyedChildren: UiNode[] = [];
+        for (const child of oldChildren) {
+            if (child.descriptor.key != null) {
+                oldKeyedChildren.set(child.descriptor.key, child);
+            } else {
+                oldUnkeyedChildren.push(child);
+            }
         }
 
-        //No matches create a new one
-        return {
-            generation: 0,
-            children: [],
-            descriptor: descriptor,
-        };
+        let unkeyedIndex = 0;
+
+        // --- Main Reconciliation Loop ---
+        for (const descriptor of newChildDescriptors) {
+            let oldNode: UiNode | undefined = undefined;
+
+            // 1. Try to find a match by key
+            if (descriptor.key != null) {
+                oldNode = oldKeyedChildren.get(descriptor.key);
+                if (oldNode) {
+                    oldKeyedChildren.delete(descriptor.key); // Mark as used
+                }
+            }
+            // 2. If no key, try to find a match by type at the current index
+            else if (unkeyedIndex < oldUnkeyedChildren.length) {
+                const potentialMatch = oldUnkeyedChildren[unkeyedIndex];
+                if (potentialMatch.descriptor.type === descriptor.type) {
+                    oldNode = potentialMatch;
+                    unkeyedIndex++;
+                }
+            }
+
+            // 3. Compose the child (either updating an old node or creating a new one)
+            const newChildNode = this.composeNode(oldNode, descriptor);
+            newChildren.push(newChildNode);
+        }
+
+        // --- Cleanup ---
+        // Any nodes left in the maps/arrays are unmounted
+        for (const unusedNode of oldKeyedChildren.values()) {
+            this.cleanupChild(unusedNode);
+        }
+        for (let i = unkeyedIndex; i < oldUnkeyedChildren.length; i++) {
+            this.cleanupChild(oldUnkeyedChildren[i]);
+        }
+
+        return newChildren;
     }
 
     private updateNodeWithDescriptor(
@@ -96,65 +203,94 @@ export class UiRenderer {
         return node;
     }
 
-    private composeComponent(
-        parent: UiNode | null,
+    // Was composeComponent, now focused on a single node
+    private composeNode(
+        oldNode: UiNode | undefined,
         descriptor: ComponentDescriptor,
     ): UiNode {
-        const currentNode = this.reconcileNode(parent, descriptor);
-        //If the generation is zero, its a new node so we assign the current
-        if (currentNode.generation === 0) {
-            currentNode.generation = this.currentGeneration;
-        }
-        const componentContext = this.buildComponentContext(currentNode);
-        //Run render method on the node
-        const renderOutput = descriptor.renderFn(componentContext);
-        if (!!renderOutput) {
-            const children = Array.isArray(renderOutput)
-                ? renderOutput
-                : [renderOutput];
-            //Run render on the remaining children
-            for (const child of children) {
-                const composedChild = this.composeComponent(currentNode, child);
-                //TODO: needs to be a set to avoid pushing duplicates?
-                node.children.push(composedChild);
-            }
-        }
+        // 1. Reconcile the node itself (update or create)
+        const currentNode: UiNode = oldNode
+            ? this.updateNodeWithDescriptor(oldNode, descriptor)
+            : {
+                  generation: this.currentGeneration,
+                  children: [],
+                  descriptor: descriptor,
+              };
 
-        //TODO - do a loop over and dispose of any nodes that are not in the
-        //current generation
-        for (const child of currentNode.children) {
-            if (child.generation < this.currentGeneration) {
-                this.cleanupChild(child);
-            }
-        }
-        return node;
+        currentNode.generation = this.currentGeneration;
+
+        // 2. Build context and get new child descriptors
+        const componentContext = this.buildComponentContext(currentNode);
+        const renderOutput = descriptor.renderFn(componentContext);
+        const newChildDescriptors = renderOutput
+            ? Array.isArray(renderOutput)
+                ? renderOutput
+                : [renderOutput]
+            : [];
+
+        // 3. Delegate child reconciliation to the new function
+        currentNode.children = this.reconcileChildren(
+            currentNode,
+            newChildDescriptors,
+        );
+
+        return currentNode;
     }
 
     private cleanupChild(uiNode: UiNode) {
-        throw new Error("Not implemented");
+        //Dispose for children and up
+        for (const child of uiNode.children) {
+            this.cleanupChild(child);
+        }
+        //Get any hooks for this node
+        const nodeHooks = this.hooks.get(uiNode);
+        if (nodeHooks) {
+            //TODO: implement this
+        }
+
+        this.hooks.delete(uiNode);
     }
 
-    private buildComponentContext(
-        descriptor: ComponentDescriptor,
-    ): ComponentContext<{}> {
+    private buildComponentContext(node: UiNode): ComponentContext<{}> {
         let hookIndex = 0;
         return {
-            props: descriptor.props,
-            useEffect: (fn, _deps) => {
-                let hookMap = this.hooks.get(descriptor);
+            props: node.descriptor.props,
+            withDraw: () => {},
+            withGesture: () => {},
+            withLayout: (fn) => {
+                let hookMap = this.hooks.get(node);
                 if (!hookMap) {
                     hookMap = new Map();
-                    this.hooks.set(descriptor, hookMap);
+                    this.hooks.set(node, hookMap);
                 }
 
-                const hook = hookMap.get(hookIndex);
+                const hook = hookMap.has(hookIndex);
                 if (!hook) {
-                    hookMap.set(hookIndex, fn);
+                    hookMap.set(hookIndex, {
+                        type: "withLayout",
+                        fn: fn as any, //TODO: Figure out this typing, maybe union?
+                    });
+                }
+                hookIndex++;
+            },
+            withEffect: (fn, _deps) => {
+                let hookMap = this.hooks.get(node);
+                if (!hookMap) {
+                    hookMap = new Map();
+                    this.hooks.set(node, hookMap);
+                }
+
+                const hook = hookMap.has(hookIndex);
+                if (!hook) {
+                    hookMap.set(hookIndex, {
+                        type: "withEffect",
+                        fn: fn,
+                    });
                     fn();
                 }
                 hookIndex++;
             },
-            useState: (val) => [val, () => {}],
+            withState: (val) => [val, () => {}],
         };
     }
 }
