@@ -69,6 +69,10 @@ document.addEventListener(
         const renderer = new Renderer(canvasElement, assetLoader, camera);
         const uiRender = new UiRenderer(renderer.context);
         uiRender.renderComponent(root());
+        uiRender.renderComponent(root());
+        uiRender.renderComponent(root());
+        uiRender.renderComponent(root());
+        uiRender.renderComponent(root());
     },
     false,
 );

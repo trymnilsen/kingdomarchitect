@@ -1,4 +1,5 @@
 import { createUiComponent, type ComponentDescriptor } from "./component.js";
+import { setLayoutOffset } from "./layout.js";
 
 type UiBoxProps = {
     child: ComponentDescriptor;
@@ -9,11 +10,15 @@ type UiBoxProps = {
 export const uiBox = createUiComponent<UiBoxProps>(
     ({ props, withLayout, withDraw }) => {
         withLayout((constraints, node, layout) => {
-            const width = constraints.width - props.padding;
-            const height = constraints.height - props.padding;
+            const width = constraints.width - props.padding * 2;
+            const height = constraints.height - props.padding * 2;
 
             if (node.children.length == 1) {
                 layout({ width, height }, node.children[0]);
+                setLayoutOffset(node.children[0], {
+                    x: props.padding,
+                    y: props.padding,
+                });
             }
 
             return {

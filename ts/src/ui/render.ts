@@ -26,7 +26,6 @@ export type LayoutInfo = {
 export type UiNode = {
     children: UiNode[];
     descriptor: ComponentDescriptor;
-    generation: number;
     layout?: LayoutInfo;
 };
 
@@ -52,6 +51,7 @@ export class UiRenderer {
      * @param descriptor the descriptor for the root node, for example app()
      */
     renderComponent(descriptor: ComponentDescriptor) {
+        const start = performance.now();
         // The root-level reconciliation is slightly different
         const rootNodeToCompose =
             this.currentTree?.descriptor.type === descriptor.type
@@ -68,7 +68,9 @@ export class UiRenderer {
         this.currentTree = newTree;
         this.performLayout(this.renderScope.size, newTree);
         this.updateTransform(newTree, zeroOffset);
+        console.log("Layout performed", newTree);
         this.performDraw(newTree);
+        console.log("Render time: ", performance.now() - start);
     }
 
     private updateTransform(node: UiNode, parentOffset: Point) {
@@ -85,7 +87,6 @@ export class UiRenderer {
     }
 
     private performLayout(constraints: UISize, node: UiNode): UISize {
-        console.log("Perform layout for", node);
         const layoutHook = Array.from(
             this.hooks.get(node)?.values() ?? [],
         ).find((item) => item.type == "withLayout");
@@ -126,7 +127,7 @@ export class UiRenderer {
 
         if (drawHook) {
             if (node.layout) {
-                const drawFn = drawHook as unknown as DrawHook;
+                const drawFn = drawHook.fn as unknown as DrawHook;
                 drawFn(this.renderScope, node.layout.region);
             } else {
                 console.error("Node has not been layed out, cannot draw");
@@ -212,12 +213,9 @@ export class UiRenderer {
         const currentNode: UiNode = oldNode
             ? this.updateNodeWithDescriptor(oldNode, descriptor)
             : {
-                  generation: this.currentGeneration,
                   children: [],
                   descriptor: descriptor,
               };
-
-        currentNode.generation = this.currentGeneration;
 
         // 2. Build context and get new child descriptors
         const componentContext = this.buildComponentContext(currentNode);
@@ -255,7 +253,22 @@ export class UiRenderer {
         let hookIndex = 0;
         return {
             props: node.descriptor.props,
-            withDraw: () => {},
+            withDraw: (fn) => {
+                let hookMap = this.hooks.get(node);
+                if (!hookMap) {
+                    hookMap = new Map();
+                    this.hooks.set(node, hookMap);
+                }
+
+                const hook = hookMap.has(hookIndex);
+                if (!hook) {
+                    hookMap.set(hookIndex, {
+                        type: "withDraw",
+                        fn: fn as any, //TODO: Figure out this typing, maybe union?
+                    });
+                }
+                hookIndex++;
+            },
             withGesture: () => {},
             withLayout: (fn) => {
                 let hookMap = this.hooks.get(node);

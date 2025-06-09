@@ -237,6 +237,7 @@ export class InteractionHandler {
     }
 
     onDraw(renderScope: RenderScope) {
+        const start = performance.now();
         if (this.history.state.isModal) {
             renderScope.drawScreenSpaceRectangle({
                 x: 0,
@@ -257,5 +258,6 @@ export class InteractionHandler {
             this.statusbar.rootView.updateTransform();
             this.statusbar.rootView.draw(renderScope);
         }
+        console.log("Interaction state draw", performance.now() - start);
     }
 }
