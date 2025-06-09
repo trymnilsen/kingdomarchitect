@@ -1,10 +1,7 @@
+import type { UISize } from "../../module/ui/uiSize.js";
 import { Bounds, sizeOfBounds } from "../bounds.js";
-export interface Rectangle {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-}
+import type { Point } from "../point.js";
+export type Rectangle = Point & UISize;
 
 export function intersectRect(a: Rectangle, b: Rectangle): Rectangle | null {
     const xOverlap = Math.max(

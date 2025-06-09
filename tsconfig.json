@@ -3,7 +3,7 @@
       "declaration": false,
       "esModuleInterop": true,
       "experimentalDecorators": false,
-      "incremental": false,
+      "incremental": true,
       "module": "ES2022",
       "moduleResolution": "Bundler",
       "noFallthroughCasesInSwitch": true,
