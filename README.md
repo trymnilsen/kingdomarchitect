@@ -1,9 +1,8 @@
 # 🏰 Kingdom Architect
-> Medieval simulation and city builder game for the browser.
+> Medieval simulation and city builder game for the browser. Built with a custom ECS, declarative UI and rendering to a 2D canvas.
 
-![GitHub License](https://img.shields.io/github/license/trymnilsen/kingdomarchitect)
-![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/trymnilsen/kingdomarchitect/main.yml)
-[![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg)](https://www.typescriptlang.org/)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/trymnilsen/kingdomarchitect/main.yml)
+[![Written in TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg)](https://www.typescriptlang.org/)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-f8bc45.svg)](https://github.com/prettier/prettier)
 
 
@@ -35,25 +34,30 @@ Tap the item you would like to select or activate
 - `K`: Activate the second secondary actionbar item
 
 ## 📜 About the project
-Kingdom architects is intended to be a combined simulation and city building game around building your own kingdom and protecting it from hordes of evil monsters. It is intended to be single-player and playable both on mobile screens and desktop size clients. Your kingdom might last for decades or only seconds, who knows what the legends of your reign will be.
+Kingdom architects is intended to be a combined simulation and city building game around building your own kingdom and protecting it from hordes of evil monsters. Explore, build and complete quests. It is intended to be single or multi-player and playable both on mobile screens and desktop size clients. Your kingdom might last for decades or only seconds, who knows what the legends of your reign will be.
 
 ### Goals for the project
+- Make it fun.
 - Play both using the keyboard and mouse/touch.
 - Only depend on browser-apis, no extra libraries or third party frameworks.
-- Kingdoms are ephemeral, they only exists within the memory of the browser. Once it's closed only bards will sing the tales of your kingdom. Something rewarding should happen from the start.
 - Progress in some way should be able to be carried over into future kingdoms, rogue-lite style.
 
 ## 🧱 Parts
 
-### Entity component system
 ### Declarative UI framework
-### HUD state
-### Multiplayer
+
+### Entity component system
+
 ### Rendering
+
+### HUD state
+
+### Multiplayer
+
 
 ## 🙋 Contributing
 ### I have a suggestion for a feature
-Great, if you feel like it aligns with the goal for the project open a thread under discussion with some details on your idea
+Great, if you feel like it aligns with the about and goal for the project open a thread under discussion with some details on your idea.
 
 ### I have found a bug
 Fantastic, getting bug reports is important. File an issue with steps to reproduce 🙏.
@@ -67,7 +71,7 @@ Wow, thanks! First see if there are any open issues or open a thread under discu
 - An editor to edit typescript with
 
 ### Get set up
-Install the required development packages (typescript and rollup) with `npm i`. Build and bundle the typescript source with `npm run build`. `npm run start` will start a development server and give you a link to test out the game locally. Use your favourite IDE to edit any typescript game code. If you want to contribute on the development on the game, here follows some notes on the architecture for the game/application and some tools used during development.
+Install the required development packages (typescript and rolldown) with `npm i`. Build and bundle the typescript source with `npm run build`. `npm run start` will start a development server and give you a link to test out the game locally. Use your favourite IDE to edit any typescript game code. If you want to contribute on the development on the game, here follows some notes on the architecture for the game/application and some tools used during development.
 
 ### Concepts
 The architecture of the game is loosely based around three concepts:

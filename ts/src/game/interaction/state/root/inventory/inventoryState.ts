@@ -85,7 +85,7 @@ export class InventoryState extends InteractionState {
         });
 
         this._scaffold = scaffoldView;
-        this.view = scaffoldView;
+        //this.view = scaffoldView;
     }
 
     private itemSelected(index: number, view: UIInventoryGridItem) {

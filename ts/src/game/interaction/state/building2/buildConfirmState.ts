@@ -64,7 +64,7 @@ export class BuildConfirmState extends InteractionState {
             height: fillUiSize,
         });
         this.scaffold = scaffold;
-        this.view = scaffold;
+        //this.view = scaffold;
     }
 
     private getActionItems(): UIActionbarItem[] {

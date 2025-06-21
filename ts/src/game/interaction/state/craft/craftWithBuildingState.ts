@@ -69,12 +69,13 @@ export class BookListState extends InteractionState {
         super();
         this._bookView = new UIBookLayout();
         this.setSelectedItem(0);
+        /*
         this.view = uiBox({
             width: fillUiSize,
             height: fillUiSize,
             alignment: uiAlignment.center,
             children: [this._bookView],
-        });
+        });*/
     }
 
     protected onDetailsButton() {}

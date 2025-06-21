@@ -72,7 +72,7 @@ export class MenuState extends InteractionState {
                 }),
             ],
         });
-        this.view = contentView;
+        //this.view = contentView;
     }
 }
 

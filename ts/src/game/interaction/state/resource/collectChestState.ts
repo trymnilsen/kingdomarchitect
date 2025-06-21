@@ -81,7 +81,7 @@ export class CollectChestState extends InteractionState {
             [],
             { width: fillUiSize, height: fillUiSize },
         );
-        this.view = scaffoldView;
+        //this.view = scaffoldView;
     }
 
     private scheduleCollectJob() {

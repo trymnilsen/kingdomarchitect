@@ -1,52 +1,158 @@
-//import { App } from "./app.js";
-
-import type { Sides } from "../common/sides.js";
+import { allSides, type Sides } from "../common/sides.js";
 import { AssetLoader } from "../module/asset/loader/assetLoader.js";
+import { sprites2 } from "../module/asset/sprite.js";
+import { ninePatchBackground } from "../module/ui/dsl/uiBackgroundDsl.js";
+import { uiAlignment } from "../module/ui/uiAlignment.js";
+import { SpriteBackground } from "../module/ui/uiBackground.js";
+import { fillUiSize, wrapUiSize, zeroSize } from "../module/ui/uiSize.js";
 import { Camera } from "../rendering/camera.js";
 import { Renderer } from "../rendering/renderer.js";
 import { defaultTextStyle } from "../rendering/text/textStyle.js";
-import { createUiComponent, type ComponentDescriptor } from "./component.js";
-import { UiRenderer } from "./render.js";
+import {
+    createComponent,
+    PlacedChild,
+    UiRenderer,
+    type ComponentDescriptor,
+    type UISize,
+} from "./ui.js";
 import { uiBox } from "./uiBox.js";
-import { uiButton } from "./uiButton.js";
-import { uiColumn } from "./uiColumn.js";
+import { CrossAxisAlignment, uiColumn, uiRow } from "./uiSequence.js";
 import { uiText } from "./uiText.js";
 
-const root = createUiComponent(({ withEffect }) => {
-    withEffect(() => {
-        console.log("HUD created");
-    });
-
+const uiMenuButton = createComponent<{ label: string }>(({ props }) => {
     return uiColumn({
+        width: wrapUiSize,
+        height: wrapUiSize,
+        crossAxisAlignment: CrossAxisAlignment.Center,
         children: [
-            //TODO: These uiBoxes seems to get both children, some bug in reconcile here
-            //The bug is that the reconciliation of the second uiBox looks at
-            //the children of parent (uiColumn) and finds a single uiBox, the
-            //red one. It takes this and fills it with the descriptor of the blue
-            //this will add the child of this to that box.
-            //Fixes:
-            //- The reconciliation should use the previous output, (stored on node?).hmmm but we want the node not the descriptor
-            //- We should remove the node or mark it when it has been "reconciled" to avoid picking the same first node for both red and blue uibox
             uiBox({
-                child: uiText({ content: "test", textStyle: defaultTextStyle }),
-                padding: 16,
-                color: "red",
+                width: 56,
+                height: 56,
+                background: ninePatchBackground({
+                    sprite: sprites2.stone_slate_background_2x,
+                    sides: allSides(8),
+                }),
             }),
             uiBox({
-                child: uiColumn({
-                    children: [
-                        uiText({
-                            content: "foobar",
-                            textStyle: defaultTextStyle,
-                        }),
-                        uiButton(),
-                    ],
+                width: wrapUiSize,
+                height: wrapUiSize,
+                child: uiText({
+                    content: props.label,
                 }),
-                padding: 16,
-                color: "blue",
+                background: ninePatchBackground({
+                    sprite: sprites2.book_grid_item_gray,
+                    sides: allSides(8),
+                }),
             }),
         ],
     });
+});
+
+const leftButtonLabels = ["Move", "Stash", "Skills", "Stats", "Close"];
+const rightButtonLabels = ["Main", "Other"];
+enum MenuState {
+    closed,
+    left,
+    main,
+    other,
+}
+
+type MeasuredButtons = {
+    totalWidth: number;
+    maxHeight: number;
+    sizes: UISize[];
+};
+
+const scaffold = createComponent(
+    ({ constraints, measureDescriptor, withState }) => {
+        const [menuState, setMenuState] = withState(MenuState.closed);
+        const leftButtons = leftButtonLabels.map((label) =>
+            uiMenuButton({ label }),
+        );
+        const rightButtons = rightButtonLabels.map((label) =>
+            uiMenuButton({ label }),
+        );
+
+        function measureButtons(
+            descriptors: ComponentDescriptor[],
+        ): MeasuredButtons {
+            let totalWidth = 0;
+            let maxHeight = 0;
+            const sizes: UISize[] = [];
+            for (let index = 0; index < descriptors.length; index++) {
+                const descriptor = descriptors[index];
+                const buttonSize = measureDescriptor(
+                    descriptor.key ?? index,
+                    descriptor,
+                    constraints,
+                );
+                if (buttonSize.height > maxHeight) {
+                    maxHeight = buttonSize.height;
+                }
+                totalWidth += buttonSize.width;
+                sizes.push(buttonSize);
+            }
+            return { totalWidth, maxHeight, sizes };
+        }
+
+        const leftSize = measureButtons(leftButtons);
+        const rightSize = measureButtons(rightButtons);
+
+        //Both fit, lay them out normally
+        const width = leftSize.totalWidth + rightSize.totalWidth;
+        const height = Math.max(leftSize.maxHeight, rightSize.maxHeight);
+        if (width <= constraints.width) {
+            let buttonX = 0;
+            const left = leftButtons.map<PlacedChild>((button, index) => {
+                const buttonSize = leftSize.sizes[index];
+                const y = constraints.height - buttonSize.height;
+                const x = buttonX + buttonSize.width;
+                buttonX = x;
+                return {
+                    offset: { x, y },
+                    descriptor: button,
+                };
+            });
+
+            const mainButton: PlacedChild = {
+                descriptor: rightButtons[0],
+                offset: {
+                    x: constraints.width - rightSize.totalWidth,
+                    y: constraints.height - rightSize.sizes[0].height,
+                },
+            };
+            const otherButton: PlacedChild = {
+                descriptor: rightButtons[1],
+                offset: {
+                    x: constraints.width - rightSize.sizes[1].width,
+                    y: constraints.height - rightSize.sizes[1].height,
+                },
+            };
+
+            const menu: PlacedChild[] = [];
+            switch (menuState) {
+                case MenuState.left:
+                    break;
+                case MenuState.main:
+                    break;
+                case MenuState.other:
+                    break;
+                default:
+                    break;
+            }
+
+            return {
+                children: [...left, ...menu, mainButton, otherButton],
+                size: { width, height },
+            };
+        } else {
+            return { children: [], size: zeroSize() };
+        }
+    },
+);
+
+const root = createComponent(() => {
+    return scaffold();
 });
 
 document.addEventListener(
@@ -68,10 +174,12 @@ document.addEventListener(
 
         const renderer = new Renderer(canvasElement, assetLoader, camera);
         const uiRender = new UiRenderer(renderer.context);
-        uiRender.renderComponent(root());
-        uiRender.renderComponent(root());
-        uiRender.renderComponent(root());
-        uiRender.renderComponent(root());
+
+        canvasElement.addEventListener("mousedown", (event) => {
+            console.log("Dispatcing event", event);
+            //uiRender.dispatchInput(event.x, event.y);
+        });
+
         uiRender.renderComponent(root());
     },
     false,
