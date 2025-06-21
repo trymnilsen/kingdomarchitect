@@ -85,7 +85,7 @@ export class ChopJobState extends InteractionState {
             { width: fillUiSize, height: fillUiSize },
         );
 
-        this.view = scaffoldView;
+        //this.view = scaffoldView;
     }
 
     override onTileTap(tile: GroundTile): boolean {

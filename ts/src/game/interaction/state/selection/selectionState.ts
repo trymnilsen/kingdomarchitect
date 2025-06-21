@@ -41,7 +41,7 @@ export class SelectionState extends InteractionState {
         const items = this.getActionItems();
         this.presenter = new SelectionPresenter(items.left, items.right);
         this.presenter.setSelectionInfo(this.getSelectionInfo());
-        this.view = this.presenter.root;
+        //this.view = this.presenter.root;
     }
 
     override onUpdate(_tick: number): void {

@@ -1,13 +1,17 @@
-import { removeItem } from "../common/array.js";
-import { addPoint, zeroPoint, type Point } from "../common/point.js";
-import type { Rectangle } from "../common/structure/rectangle.js";
-import type { UISize } from "../module/ui/uiSize.js";
-import type { RenderScope } from "../rendering/renderScope.js";
+import { removeItem } from "../../../common/array.js";
+import { addPoint, zeroPoint, type Point } from "../../../common/point.js";
+import {
+    withinRectangle,
+    type Rectangle,
+} from "../../../common/structure/rectangle.js";
+import type { UIEvent } from "../event/uiEvent.js";
+import type { UISize } from "../uiSize.js";
+import type { RenderScope } from "../../../rendering/renderScope.js";
 import type {
     ComponentContext,
     ComponentDescriptor,
-    ComponentDescriptorWithChildren,
     DrawHook,
+    GestureHook,
     LayoutHook,
 } from "./component.js";
 import { setLayout } from "./layout.js";
@@ -67,23 +71,47 @@ export class UiRenderer {
 
         this.currentTree = newTree;
         this.performLayout(this.renderScope.size, newTree);
-        this.updateTransform(newTree, zeroOffset);
         console.log("Layout performed", newTree);
-        this.performDraw(newTree);
+        this.performDraw(newTree, zeroOffset);
         console.log("Render time: ", performance.now() - start);
     }
 
-    private updateTransform(node: UiNode, parentOffset: Point) {
-        if (!node.layout) {
-            throw new Error("Layout not set for node");
+    dispatchInput(event: UIEvent) {
+        if (this.currentTree) {
+            this.performInput(this.currentTree, event);
         }
-        const totalOffset = addPoint(node.layout.offset, parentOffset);
-        node.layout.region.x = totalOffset.x;
-        node.layout.region.y = totalOffset.y;
+    }
 
+    private performInput(node: UiNode, event: UIEvent): boolean {
         for (const child of node.children) {
-            this.updateTransform(child, totalOffset);
+            const wasHandled = this.performInput(child, event);
+            if (wasHandled) {
+                return true;
+            }
         }
+
+        const hooks = this.hooks.get(node);
+        if (node.layout && hooks) {
+            const gestureHook = Array.from(
+                this.hooks.get(node)?.values() ?? [],
+            ).find((item) => item.type == "withGesture");
+            if (gestureHook) {
+                const gestureFn = gestureHook.fn as unknown as GestureHook;
+                const point = event.position;
+                const within = withinRectangle(point, node.layout.region);
+                if (within) {
+                    const inputResult = gestureFn({
+                        type: "tapStart",
+                        position: point,
+                    });
+                    if (inputResult) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
     private performLayout(constraints: UISize, node: UiNode): UISize {
@@ -120,22 +148,24 @@ export class UiRenderer {
         }
     }
 
-    private performDraw(node: UiNode) {
+    private performDraw(node: UiNode, parentPosition: Point) {
+        if (!node.layout) {
+            throw new Error("Cannot draw node, no layout");
+        }
         const drawHook = Array.from(this.hooks.get(node)?.values() ?? []).find(
             (item) => item.type == "withDraw",
         );
 
         if (drawHook) {
-            if (node.layout) {
-                const drawFn = drawHook.fn as unknown as DrawHook;
-                drawFn(this.renderScope, node.layout.region);
-            } else {
-                console.error("Node has not been layed out, cannot draw");
-            }
+            const drawFn = drawHook.fn as unknown as DrawHook;
+            drawFn(this.renderScope, node.layout.region);
         }
 
+        const regionPoint = addPoint(node.layout.offset, parentPosition);
+        node.layout.region.x = regionPoint.x;
+        node.layout.region.y = regionPoint.y;
         for (const child of node.children) {
-            this.performDraw(child);
+            this.performDraw(child, regionPoint);
         }
     }
 
@@ -269,7 +299,22 @@ export class UiRenderer {
                 }
                 hookIndex++;
             },
-            withGesture: () => {},
+            withGesture: (fn) => {
+                let hookMap = this.hooks.get(node);
+                if (!hookMap) {
+                    hookMap = new Map();
+                    this.hooks.set(node, hookMap);
+                }
+
+                const hook = hookMap.has(hookIndex);
+                if (!hook) {
+                    hookMap.set(hookIndex, {
+                        type: "withGesture",
+                        fn: fn as any, //TODO: Figure out this typing, maybe union?
+                    });
+                }
+                hookIndex++;
+            },
             withLayout: (fn) => {
                 let hookMap = this.hooks.get(node);
                 if (!hookMap) {

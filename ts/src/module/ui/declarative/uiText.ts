@@ -1,4 +1,4 @@
-import type { TextStyle } from "../rendering/text/textStyle.js";
+import type { TextStyle } from "../../../rendering/text/textStyle.js";
 import { createUiComponent } from "./component.js";
 import { setLayout } from "./layout.js";
 

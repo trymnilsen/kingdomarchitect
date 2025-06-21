@@ -1,9 +1,9 @@
 import { describe, expect, test } from "vitest";
-import { UiRenderer } from "../../src/ui/render.js";
+import { UiRenderer } from "../../src/module/ui/declarative/render.js";
 import {
     createUiComponent,
     type ComponentDescriptor,
-} from "../../src/ui/component.js";
+} from "../../src/module/ui/declarative/component.js";
 
 type ChildrenProp = {
     children: ComponentDescriptor[];

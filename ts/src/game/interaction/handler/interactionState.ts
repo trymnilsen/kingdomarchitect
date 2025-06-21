@@ -14,6 +14,7 @@ import { UIView } from "../../../module/ui/uiView.js";
 import { GroundTile } from "../../../module/map/tile.js";
 import { InteractionStateChanger } from "./interactionStateChanger.js";
 import { StateContext } from "./stateContext.js";
+import type { ComponentDescriptor } from "../../../module/ui/declarative/component.js";
 
 /**
  * Interaction is built up as a simple state machine. Each state can via the
@@ -22,7 +23,6 @@ import { StateContext } from "./stateContext.js";
  */
 export abstract class InteractionState {
     private _context: StateContext | undefined;
-    private _view: UIView | null = null;
     private _cachedFocusGroups: FocusGroup[] = [];
     private _currentFocusGroupIndex = 0;
 
@@ -33,21 +33,6 @@ export abstract class InteractionState {
      */
     get stateName(): string {
         return "State";
-    }
-    /**
-     * Retrieve the currently set root view of the this state
-     */
-    get view(): UIView | null {
-        return this._view;
-    }
-    /**
-     * Sets the view of this state, will be used for checking UIEvent's and
-     * drawn automatically
-     */
-    protected set view(value: UIView | null) {
-        this._view = value;
-        this._currentFocusGroupIndex = 0;
-        this._cachedFocusGroups = this.getFocusGroups();
     }
 
     /**
@@ -78,17 +63,23 @@ export abstract class InteractionState {
         return false;
     }
 
+    getView(): ComponentDescriptor | null {
+        return null;
+    }
+
     /**
      * Retrieve the focus groups for this interaction state,
      * defaults to return the root view if any. Implemented as a
      * method and not a property to allow easy overriding.
      */
     getFocusGroups(): FocusGroup[] {
+        /*
         if (this._view) {
             return [this._view];
         } else {
-            return [];
-        }
+         */
+        return [];
+        //}
     }
 
     /**
@@ -124,13 +115,15 @@ export abstract class InteractionState {
         return false;
         */
 
-        //console.log("UI Event: ", event);
+        console.log("UI Event: ", event);
+        return false;
+        /*
         if (this._view) {
             const handled = this._view.dispatchUIEvent(event);
             return handled;
         } else {
             return false;
-        }
+        }*/
     }
 
     /**
@@ -170,7 +163,7 @@ export abstract class InteractionState {
      * the view is properly disposed
      */
     onInactive(): void {
-        this._view?.dispose();
+        //this._view?.dispose();
     }
 
     /**
@@ -188,22 +181,7 @@ export abstract class InteractionState {
      * needs a consistent update cycle should be called in onUpdate
      * @param context Render context with access to camera and drawing methods
      */
-    onDraw(context: RenderScope): void {
-        if (this._view) {
-            //const start = performance.now();
-            if (this._view.isDirty) {
-                this._view.layout(context, {
-                    width: context.width,
-                    height: context.height,
-                });
-            }
-            this._view.updateTransform();
-            this._view.draw(context);
-            this.drawFocus(context);
-            //const end = performance.now();
-            //console.log(`build state draw: ${end - start}`);
-        }
-    }
+    onDraw(_context: RenderScope): void {}
 
     /**
      * An input event has occured, like the directional keys or action key was
@@ -217,7 +195,7 @@ export abstract class InteractionState {
         input: InputAction,
         _stateChanger: InteractionStateChanger,
     ): boolean {
-        const view = this.view;
+        const view = false;
         const direction = getDirectionFromInputType(input.action);
         if (!view) {
             return false;

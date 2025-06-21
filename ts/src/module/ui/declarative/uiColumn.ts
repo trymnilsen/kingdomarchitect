@@ -10,7 +10,9 @@ export const uiColumn = createUiComponent<UiColumnProps>(
         withLayout((constraints, node, layout) => {
             //Number of children
             const numberOfChildren = node.children.length;
-            const sizePerItem = constraints.height / numberOfChildren;
+            const sizePerItem = Math.floor(
+                constraints.height / numberOfChildren,
+            );
             let totalHeight = 0;
             for (const child of node.children) {
                 const childSize = layout(

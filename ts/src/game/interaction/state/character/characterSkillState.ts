@@ -85,10 +85,11 @@ export class CharacterSkillState extends InteractionState {
             children: [this._masterDetailsView],
         });
 
+        /*
         this.view = new UIActionbarScaffold(contentView, items, [], {
             width: fillUiSize,
             height: fillUiSize,
-        });
+        });*/
     }
 
     private tabSelected(index: number) {

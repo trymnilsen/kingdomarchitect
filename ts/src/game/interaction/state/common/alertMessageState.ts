@@ -53,6 +53,7 @@ export class AlertMessageState extends InteractionState {
             height: wrapUiSize,
         });
 
+        /*
         this.view = uiBox({
             width: fillUiSize,
             height: fillUiSize,
@@ -111,7 +112,7 @@ export class AlertMessageState extends InteractionState {
                     ],
                 }),
             ],
-        });
+        });*/
     }
 
     override get isModal(): boolean {

@@ -60,7 +60,7 @@ export class LandUnlockState extends InteractionState {
             { width: fillUiSize, height: fillUiSize },
         );
 
-        this.view = scaffoldView;
+        //this.view = scaffoldView;
     }
 
     override onActive(): void {

@@ -98,7 +98,7 @@ export class BuildingState extends InteractionState {
             { width: fillUiSize, height: fillUiSize },
         );
 
-        this.view = scaffoldState;
+        //this.view = scaffoldState;
     }
 
     private tabSelected(index: number) {

@@ -1,10 +1,11 @@
-import type { Bounds } from "../common/bounds.js";
-import type { Rectangle } from "../common/structure/rectangle.js";
-import type { UIEvent } from "../module/ui/event/uiEvent.js";
-import type { UILayoutScope } from "../module/ui/uiLayoutContext.js";
-import type { UISize } from "../module/ui/uiSize.js";
-import type { UIRenderScope } from "../rendering/uiRenderContext.js";
+import type { Bounds } from "../../../common/bounds.js";
+import type { Rectangle } from "../../../common/structure/rectangle.js";
+import type { UIEvent } from "../event/uiEvent.js";
+import type { UILayoutScope } from "../uiLayoutContext.js";
+import type { UISize } from "../uiSize.js";
+import type { UIRenderScope } from "../../../rendering/uiRenderContext.js";
 import type { UiNode } from "./render.js";
+import type { Point } from "../../../common/point.js";
 
 export type LayoutInfo = {
     width: number;
@@ -26,19 +27,26 @@ export type LayoutHook = (
 
 export type DrawHook = (context: UIRenderScope, region: Rectangle) => void;
 
-export type ComponentContext<P extends {}> = {
+export type GestureHook = (uiEvent: UIEvent) => boolean;
+
+export interface ComponentContext<P extends {}> {
     props: P;
     /**
      * Set a custom layout hook for this component
      * @param layout the LayoutHook to invoke during layout
      * @returns
      */
-    withLayout: (layout: LayoutHook) => void;
-    withDraw: (draw: DrawHook) => void;
-    withGesture: (handler: (uiEvent: UIEvent) => boolean) => void;
-    withState: <S>(initalValue: S) => [S, (newValue: S) => void];
-    withEffect: (fn: () => void, deps?: any[]) => void;
-};
+    //withLayout: (layout: LayoutHook) => void;
+    measure(
+        slotId: any,
+        descriptor: ComponentDescriptor,
+        constraints: UISize,
+    ): UISize;
+    withDraw(draw: DrawHook): void;
+    withGesture(handler: GestureHook): void;
+    withState<S>(initalValue: S): [S, (newValue: S) => void];
+    withEffect(fn: () => void, deps?: any[]): void;
+}
 
 export type ComponentDescriptor<P extends {} = any> = {
     type: Function; //The component factory method, typed as function as we mostly use it for identity at runtime
@@ -47,14 +55,15 @@ export type ComponentDescriptor<P extends {} = any> = {
     key?: string | number; // For list reconciliation
 };
 
-export type ComponentDescriptorWithChildren = ComponentDescriptor & {
-    children: ComponentDescriptor[];
+export type ComponentWithLayoutDescriptor = {
+    offset: Point;
+    componentDescriptor: ComponentDescriptor;
 };
 
 // The function containing component logic and hooks
 type RenderFunction<P extends {}> = (
     context: ComponentContext<P>,
-) => ComponentDescriptor | ComponentDescriptor[] | void;
+) => ComponentDescriptor | ComponentWithLayoutDescriptor | void | null;
 
 /**
  * A type representing an object that must be empty (no properties).

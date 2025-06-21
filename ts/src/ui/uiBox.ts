@@ -1,42 +1,32 @@
-import { createUiComponent, type ComponentDescriptor } from "./component.js";
-import { setLayoutOffset } from "./layout.js";
+import type { UIBackground } from "../module/ui/uiBackground.js";
+import { zeroSize } from "../module/ui/uiSize.js";
+import { createComponent, type ComponentDescriptor } from "./ui.js";
 
 type UiBoxProps = {
-    child: ComponentDescriptor;
-    padding: number;
-    color: string;
+    child?: ComponentDescriptor;
+    padding?: number;
+    background: UIBackground;
+    width: number;
+    height: number;
 };
 
-export const uiBox = createUiComponent<UiBoxProps>(
-    ({ props, withLayout, withDraw }) => {
-        withLayout((constraints, node, layout) => {
-            const width = constraints.width - props.padding * 2;
-            const height = constraints.height - props.padding * 2;
-
-            if (node.children.length == 1) {
-                layout({ width, height }, node.children[0]);
-                setLayoutOffset(node.children[0], {
-                    x: props.padding,
-                    y: props.padding,
-                });
-            }
-
-            return {
-                width: constraints.width,
-                height: constraints.height,
-            };
-        });
-
-        withDraw((scope, region) => {
-            scope.drawScreenSpaceRectangle({
-                x: region.x,
-                y: region.y,
-                width: region.width,
-                height: region.height,
-                fill: props.color,
-            });
-        });
-
+export const uiBox = createComponent<UiBoxProps>(({ props, withDraw }) => {
+    withDraw((scope, region) => {
+        /*
+        scope.drawScreenSpaceRectangle({
+            x: region.x,
+            y: region.y,
+            width: region.width,
+            height: region.height,
+            fill: props.color,
+        });*/
+    });
+    if (props.child) {
         return props.child;
-    },
-);
+    } else {
+        return {
+            children: [],
+            size: zeroSize(),
+        };
+    }
+});

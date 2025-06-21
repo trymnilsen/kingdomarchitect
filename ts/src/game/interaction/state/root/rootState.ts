@@ -7,7 +7,7 @@ import { Camera } from "../../../../rendering/camera.js";
 import { uiBox } from "../../../../module/ui/dsl/uiBoxDsl.js";
 import { FocusGroup } from "../../../../module/ui/focus/focusGroup.js";
 import { uiAlignment } from "../../../../module/ui/uiAlignment.js";
-import { fillUiSize } from "../../../../module/ui/uiSize.js";
+import { fillUiSize, wrapUiSize } from "../../../../module/ui/uiSize.js";
 import { Entity } from "../../../entity/entity.js";
 import { SelectedEntityItem } from "../../../../module/selection/selectedEntityItem.js";
 import { SelectedTileItem } from "../../../../module/selection/selectedTileItem.js";
@@ -23,19 +23,35 @@ import { BuildingState } from "./building/buildingState.js";
 import { InventoryState } from "./inventory/inventoryState.js";
 import { ScrollInteractionState } from "../scrolls/scrollState.js";
 import { LandUnlockState } from "../unlock/landUnlockState.js";
+import type { ComponentDescriptor } from "../../../../module/ui/declarative/component.js";
 
 export class RootState extends InteractionState {
     override getFocusGroups(): FocusGroup[] {
+        return [new WorldFocusGroup(this.context.root, this.context.camera)];
+        /*
         const groups: FocusGroup[] = [];
         if (this.view) {
             groups.push(this.view);
         }
         groups.push(
-            new WorldFocusGroup(this.context.root, this.context.camera),
+            ,
         );
 
-        return groups;
+        return groups;*/
     }
+    /*
+    override getView(): ComponentDescriptor | null {
+        return uiBox({
+            alignment: uiAlignment.bottomCenter
+            width: fillUiSize,
+            height: wrapUiSize,
+            children: [
+                uiRow({
+                    children: buttons.map((button) => uiMenuButton(button))
+                })
+            ]
+        })
+    }*/
     override onActive(): void {
         super.onActive();
 
@@ -107,7 +123,7 @@ export class RootState extends InteractionState {
             { width: fillUiSize, height: fillUiSize },
         );
 
-        this.view = scaffoldState;
+        //this.view = scaffoldState;
     }
 
     override onTileTap(tile: GroundTile): boolean {
