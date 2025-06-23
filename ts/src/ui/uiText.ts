@@ -1,29 +1,13 @@
 import type { TextStyle } from "../rendering/text/textStyle.js";
-import { createUiComponent } from "./component.js";
-import { setLayout } from "./layout.js";
+import { createComponent } from "./ui.js";
 
 export type UiTextProps = {
     content: string;
     textStyle: TextStyle;
 };
-export const uiText = createUiComponent<UiTextProps>(
-    ({ props, withLayout: useLayout, withDraw: useDraw }) => {
-        useLayout((constraints, _node, _layout, measure) => {
-            const textSize = measure.measureText(
-                props.content,
-                props.textStyle,
-            );
-            const size = {
-                width: Math.floor(Math.min(textSize.width, constraints.width)),
-                height: Math.floor(
-                    Math.min(textSize.height, constraints.height),
-                ),
-            };
-
-            return size;
-        });
-
-        useDraw((context, region) => {
+export const uiText = createComponent<UiTextProps>(
+    ({ props, withDraw, measureText }) => {
+        withDraw((context, region) => {
             context.drawScreenspaceText({
                 text: props.content,
                 font: props.textStyle.font,
@@ -33,5 +17,12 @@ export const uiText = createUiComponent<UiTextProps>(
                 y: region.y,
             });
         });
+
+        const size = measureText(props.content, props.textStyle);
+
+        return {
+            children: [],
+            size: size,
+        };
     },
 );
