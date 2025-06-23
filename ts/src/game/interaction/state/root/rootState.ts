@@ -23,7 +23,6 @@ import { BuildingState } from "./building/buildingState.js";
 import { InventoryState } from "./inventory/inventoryState.js";
 import { ScrollInteractionState } from "../scrolls/scrollState.js";
 import { LandUnlockState } from "../unlock/landUnlockState.js";
-import type { ComponentDescriptor } from "../../../../module/ui/declarative/component.js";
 
 export class RootState extends InteractionState {
     override getFocusGroups(): FocusGroup[] {

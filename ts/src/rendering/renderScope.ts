@@ -161,7 +161,10 @@ export class RenderScope implements UIRenderScope, UILayoutScope {
         const textMetrics = this.canvasContext.measureText(text);
         return {
             width: Math.ceil(textMetrics.width),
-            height: Math.ceil(textMetrics.fontBoundingBoxDescent),
+            height: Math.ceil(
+                textMetrics.fontBoundingBoxAscent +
+                    textMetrics.fontBoundingBoxDescent,
+            ),
         };
     }
 

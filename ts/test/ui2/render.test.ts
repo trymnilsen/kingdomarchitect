@@ -1,3 +1,4 @@
+/*
 import { describe, expect, test } from "vitest";
 import { UiRenderer } from "../../src/module/ui/declarative/render.js";
 import {
@@ -97,7 +98,6 @@ const launchedEffectView = createUiComponent(({ withEffect: useEffect }) => {
 });
 
 describe("renderer", () => {
-    /*
     test("generate descriptor tree", () => {
         const renderer = new UiRenderer();
         renderer.renderComponent(root());
@@ -112,5 +112,5 @@ describe("renderer", () => {
         renderer.renderComponent(launchedEffect2());
         renderer.renderComponent(launchedEffect1());
         expect(5).toBe(5);
-    });*/
-});
+    });
+});*/

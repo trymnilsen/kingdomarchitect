@@ -14,7 +14,8 @@ import { UIView } from "../../../module/ui/uiView.js";
 import { GroundTile } from "../../../module/map/tile.js";
 import { InteractionStateChanger } from "./interactionStateChanger.js";
 import { StateContext } from "./stateContext.js";
-import type { ComponentDescriptor } from "../../../module/ui/declarative/component.js";
+
+export type ComponentDescriptor = any;
 
 /**
  * Interaction is built up as a simple state machine. Each state can via the

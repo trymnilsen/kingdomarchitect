@@ -20,9 +20,10 @@ import { CrossAxisAlignment, uiColumn, uiRow } from "./uiSequence.js";
 import { uiText } from "./uiText.js";
 
 const uiMenuButton = createComponent<{ label: string }>(({ props }) => {
+    //Children here not visited
     return uiColumn({
-        width: wrapUiSize,
-        height: wrapUiSize,
+        width: 100,
+        height: 100,
         crossAxisAlignment: CrossAxisAlignment.Center,
         children: [
             uiBox({
@@ -34,13 +35,14 @@ const uiMenuButton = createComponent<{ label: string }>(({ props }) => {
                 }),
             }),
             uiBox({
-                width: wrapUiSize,
-                height: wrapUiSize,
+                width: 100,
+                height: 32,
                 child: uiText({
+                    textStyle: defaultTextStyle,
                     content: props.label,
                 }),
                 background: ninePatchBackground({
-                    sprite: sprites2.book_grid_item_gray,
+                    sprite: sprites2.book_grid_item,
                     sides: allSides(8),
                 }),
             }),
@@ -106,28 +108,27 @@ const scaffold = createComponent(
             const left = leftButtons.map<PlacedChild>((button, index) => {
                 const buttonSize = leftSize.sizes[index];
                 const y = constraints.height - buttonSize.height;
-                const x = buttonX + buttonSize.width;
-                buttonX = x;
+                const x = buttonX;
+                buttonX += buttonSize.width;
                 return {
                     offset: { x, y },
-                    descriptor: button,
+                    ...button,
                 };
             });
 
-            const mainButton: PlacedChild = {
-                descriptor: rightButtons[0],
+            const mainButton: PlacedChild = Object.assign(rightButtons[0], {
                 offset: {
                     x: constraints.width - rightSize.totalWidth,
                     y: constraints.height - rightSize.sizes[0].height,
                 },
-            };
-            const otherButton: PlacedChild = {
-                descriptor: rightButtons[1],
+            });
+
+            const otherButton: PlacedChild = Object.assign(rightButtons[1], {
                 offset: {
                     x: constraints.width - rightSize.sizes[1].width,
                     y: constraints.height - rightSize.sizes[1].height,
                 },
-            };
+            });
 
             const menu: PlacedChild[] = [];
             switch (menuState) {
@@ -157,8 +158,10 @@ const root = createComponent(() => {
 
 document.addEventListener(
     "DOMContentLoaded",
-    () => {
+    async () => {
         const assetLoader = new AssetLoader();
+        assetLoader.load();
+        await assetLoader.loaderPromise;
         // Rendering
         const camera = new Camera({
             x: window.innerWidth,

@@ -12,21 +12,19 @@ type UiBoxProps = {
 
 export const uiBox = createComponent<UiBoxProps>(({ props, withDraw }) => {
     withDraw((scope, region) => {
-        /*
-        scope.drawScreenSpaceRectangle({
-            x: region.x,
-            y: region.y,
-            width: region.width,
-            height: region.height,
-            fill: props.color,
-        });*/
+        if (props.background) {
+            props.background.draw(scope, region, region);
+        }
     });
     if (props.child) {
         return props.child;
     } else {
         return {
             children: [],
-            size: zeroSize(),
+            size: {
+                width: props.width,
+                height: props.height,
+            },
         };
     }
 });

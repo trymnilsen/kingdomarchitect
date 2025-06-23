@@ -46,14 +46,57 @@ Kingdom architects is intended to be a combined simulation and city building gam
 
 ### Declarative UI framework
 
+A declarative UI for making UI's. Features non global hooks, state reconciliation and a combined layout and composition phase.
+
+**Example:**
+
+````
+const healthbar = createComponent<{ initialHealth: number }>(
+    ({ props, withState, withEffect }) => {
+        withEffect(() => {
+            console.log('mounted!')
+            return () => {
+                console.log('disposed!');
+            }
+        })
+
+        const [health, setHealth] = withState(props.initialHealth)
+        
+        return uiColumn({
+            children: [
+                uiText({
+                    content: `current health: ${health}`,
+                    textStyle: defaultTextStyle,
+                }),
+                uiButton({
+                    label: 'increase hp',
+                    onClick: () => {
+                        setHealth(health + 1)
+                    }
+                })
+            ],
+            height: wrapUiSize,
+            width: fillUiSize,
+        })
+    },
+);
+````
+
 ### Entity component system
+
+An implementation of an ECS system with behaviours organised as systems and an entity tree that can be queried for components.
 
 ### Rendering
 
+A rendering system with drawing for shapes, nine-patch sprites and animations via generated spritesheets.
+
 ### HUD state
+
+A HUD state system for navigation.
 
 ### Multiplayer
 
+Mulitplayer and singleplayer is generalised using a server running either remote or in a webworker.
 
 ## 🙋 Contributing
 ### I have a suggestion for a feature

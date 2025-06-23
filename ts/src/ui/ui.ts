@@ -2,8 +2,11 @@
 // 1. UTILITIES & BASIC TYPES (Unchanged)
 // ===================================================================
 
+import { nameof } from "../common/nameof.js";
 import { addPoint } from "../common/point.js";
+import { zeroSize } from "../module/ui/uiSize.js";
 import type { RenderScope } from "../rendering/renderScope.js";
+import type { TextStyle } from "../rendering/text/textStyle.js";
 
 export type Point = { x: number; y: number };
 export const zeroPoint = (): Point => ({ x: 0, y: 0 });
@@ -11,9 +14,13 @@ export const zeroPoint = (): Point => ({ x: 0, y: 0 });
 export type UISize = { width: number; height: number };
 export type Rectangle = { x: number; y: number; width: number; height: number };
 
-const isLayoutResult = (value: any): value is LayoutResult => {
+const isLayoutResult = (
+    value: LayoutResult | ComponentDescriptor,
+): value is LayoutResult => {
     return (
-        value && typeof value.size === "object" && Array.isArray(value.children)
+        value &&
+        typeof value[nameof<LayoutResult>("size")] === "object" &&
+        Array.isArray(value[nameof<LayoutResult>("children")])
     );
 };
 
@@ -42,10 +49,7 @@ export type UiNode = {
     measurementSlots?: Map<any, UiNode>;
 };
 
-export type PlacedChild = {
-    descriptor: ComponentDescriptor;
-    offset: Point;
-};
+export type PlacedChild = ComponentDescriptor & { offset: Point };
 
 export type LayoutResult = {
     size: UISize;
@@ -55,6 +59,7 @@ export type LayoutResult = {
 export type ComponentContext<P extends {}> = {
     props: P;
     constraints: UISize;
+    measureText: (text: string, textStyle: TextStyle) => UISize;
     measureDescriptor: (
         slotId: any,
         descriptor: ComponentDescriptor,
@@ -64,7 +69,7 @@ export type ComponentContext<P extends {}> = {
         state: T,
     ) => [T, (newValue: T | ((currentValue: T) => T)) => void];
     withDraw: (draw: (scope: any, region: Rectangle) => void) => void;
-    useEffect: (effect: () => (() => void) | void, deps?: any[]) => void;
+    withEffect: (effect: () => (() => void) | void, deps?: any[]) => void;
 };
 
 type RenderFunction<P extends {}> = (
@@ -136,13 +141,9 @@ export class UiRenderer {
             topLevelDescriptor,
         );
         if (this.currentTree) {
-            this._performLayout(this.currentTree, this.renderScope.size);
+            this._executeNode(this.currentTree, this.renderScope.size, false);
             this._performDraw(this.currentTree, zeroPoint());
         }
-    }
-
-    private _performLayout(node: UiNode, constraints: UISize): UISize {
-        return this._executeNode(node, constraints, false);
     }
 
     private _executeNode(
@@ -156,14 +157,16 @@ export class UiRenderer {
         const context: ComponentContext<any> = {
             props: node.descriptor.props,
             constraints: constraints,
-            withState: <T>(state: T) => [state, () => {}],
+            withState: <T>(state: T) => {
+                return [state, () => {}];
+            },
             withDraw: (drawFn) => {
                 if (isMeasurePass) return;
                 const nodeHooks = this.hooks.get(node) ?? { effects: [] };
                 nodeHooks.draw = drawFn;
                 this.hooks.set(node, nodeHooks);
             },
-            useEffect: (effectFn, deps) => {
+            withEffect: (effectFn, deps) => {
                 if (isMeasurePass) return; // Skip effects during measurement.
 
                 const currentHookIndex = hookIndex;
@@ -186,6 +189,9 @@ export class UiRenderer {
                     };
                 }
                 hookIndex++;
+            },
+            measureText: (text, style) => {
+                return this.renderScope.measureText(text, style);
             },
             measureDescriptor: (slotId, descriptor, measureConstraints) => {
                 activeMeasureSlots.add(slotId);
@@ -219,26 +225,26 @@ export class UiRenderer {
         }
 
         if (isLayoutResult(renderOutput)) {
-            const childDescriptors = renderOutput.children.map(
-                (p) => p.descriptor,
+            node.children = this._reconcileChildren(
+                node,
+                renderOutput.children,
             );
-            node.children = this._reconcileChildren(node, childDescriptors);
-
-            const childrenByKey = new Map(
-                node.children.map((c) => [c.descriptor.key, c]),
-            );
-            for (const placedChild of renderOutput.children) {
-                const childNode = childrenByKey.get(placedChild.descriptor.key);
-                if (childNode) {
-                    childNode.layout = {
-                        offset: placedChild.offset,
-                        region: { x: 0, y: 0, width: 0, height: 0 },
-                    };
-                }
-            }
 
             for (const childNode of node.children) {
-                this._performLayout(childNode, constraints);
+                // The descriptor on the reconciled node IS the PlacedChild object.
+                const placedChild = childNode.descriptor as PlacedChild;
+
+                // Apply the offset from the placement instruction.
+                if (!childNode.layout) {
+                    childNode.layout = {
+                        offset: zeroPoint(),
+                        region: { ...zeroPoint(), ...zeroSize() },
+                    };
+                }
+
+                childNode.layout.offset = placedChild.offset;
+
+                this._executeNode(childNode, constraints, false);
             }
 
             node.layout = {
@@ -256,9 +262,10 @@ export class UiRenderer {
                 };
                 return { width: 0, height: 0 };
             }
-            const delegateSize = this._performLayout(
+            const delegateSize = this._executeNode(
                 delegateChild,
                 constraints,
+                false,
             );
             node.layout = {
                 offset: node.layout?.offset ?? zeroPoint(),
@@ -394,29 +401,3 @@ export class UiRenderer {
         this.hooks.delete(node);
     }
 }
-
-// ===================================================================
-// 5. EXAMPLE PRIMITIVES & COMPONENTS (Updated Text component)
-// ===================================================================
-
-/**
- * FIX: The Text primitive is now much simpler. It only needs to register its
- * draw function. Its size is calculated externally by the measurement system.
- */
-const Text = createComponent<{ text: string }>((context) => {
-    context.withDraw((scope, region) => {
-        // scope.drawText(region.x, region.y, context.props.text);
-    });
-    // It doesn't need to return a size or children; this is handled by the framework.
-    // However, our model requires a return. We return an empty LayoutResult.
-    return { size: { width: 0, height: 0 }, children: [] };
-});
-
-const Rectangle = createComponent<{ size: UISize; color: string }>(
-    (context) => {
-        context.withDraw((scope, region) => {
-            /* ... */
-        });
-        return { size: context.props.size, children: [] };
-    },
-);

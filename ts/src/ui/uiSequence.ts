@@ -1,5 +1,10 @@
+import { zeroPoint } from "../common/point.js";
 import { zeroSize } from "../module/ui/uiSize.js";
-import { createComponent, type ComponentDescriptor } from "./ui.js";
+import {
+    createComponent,
+    PlacedChild,
+    type ComponentDescriptor,
+} from "./ui.js";
 
 export enum CrossAxisAlignment {
     Start,
@@ -20,10 +25,19 @@ type SequenceProps = {
     height: number;
 };
 
-const sequenceComponent = createComponent<SequenceProps>(() => {
+const sequenceComponent = createComponent<SequenceProps>(({ props }) => {
+    const itemSize = Math.floor(props.height / props.children.length);
     return {
-        size: zeroSize(),
-        children: [],
+        size: { width: props.width, height: props.height },
+        children: props.children.map<PlacedChild>((child, index) => {
+            return {
+                ...child,
+                offset: {
+                    x: 0,
+                    y: index * itemSize,
+                },
+            };
+        }),
     };
 });
 
