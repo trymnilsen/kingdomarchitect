@@ -22,6 +22,12 @@ export const subTitleTextStyle: TextStyle = {
     size: 16,
 };
 
+export const actionbarTextStyle: TextStyle = {
+    color: "black",
+    font: "Silkscreen",
+    size: 16,
+};
+
 export const graySubTitleTextStyle: TextStyle = {
     color: "#363636",
     font: "Silkscreen",

@@ -76,6 +76,8 @@ export class RenderScope implements UIRenderScope, UILayoutScope {
         return this._assetLoader;
     }
 
+    private textMeasureCache: Map<string, UISize> = new Map();
+
     constructor(
         canvasContext: CanvasRenderingContext2D,
         camera: Camera,
@@ -157,15 +159,24 @@ export class RenderScope implements UIRenderScope, UILayoutScope {
      * @return the measured size
      */
     measureText(text: string, textStyle: TextStyle): UISize {
-        this.canvasContext.font = `${textStyle.size}px ${textStyle.font}`;
-        const textMetrics = this.canvasContext.measureText(text);
-        return {
-            width: Math.ceil(textMetrics.width),
-            height: Math.ceil(
-                textMetrics.fontBoundingBoxAscent +
-                    textMetrics.fontBoundingBoxDescent,
-            ),
-        };
+        const font = `${textStyle.size}px ${textStyle.font}`;
+        this.canvasContext.font = font;
+        const cacheKey = text + font;
+        const cachedSize = this.textMeasureCache.get(cacheKey);
+        if (!!cachedSize) {
+            return cachedSize;
+        } else {
+            const textMetrics = this.canvasContext.measureText(text);
+            const size = {
+                width: Math.ceil(textMetrics.width),
+                height: Math.floor(
+                    textMetrics.fontBoundingBoxAscent +
+                        textMetrics.fontBoundingBoxDescent,
+                ),
+            };
+            this.textMeasureCache.set(cacheKey, size);
+            return size;
+        }
     }
 
     drawWithClip(bounds: Bounds, drawFunction: DrawFunction): void {

@@ -2,17 +2,39 @@
 // 1. UTILITIES & BASIC TYPES (Unchanged)
 // ===================================================================
 
-import { nameof } from "../common/nameof.js";
-import { addPoint } from "../common/point.js";
-import { zeroSize } from "../module/ui/uiSize.js";
-import type { RenderScope } from "../rendering/renderScope.js";
-import type { TextStyle } from "../rendering/text/textStyle.js";
+import { nameof } from "../../../common/nameof.js";
+import { addPoint } from "../../../common/point.js";
+import { fillUiSize, zeroSize } from "../uiSize.js";
+import type { RenderScope } from "../../../rendering/renderScope.js";
+import type { TextStyle } from "../../../rendering/text/textStyle.js";
+import { uiBox } from "./uiBox.js";
 
 export type Point = { x: number; y: number };
 export const zeroPoint = (): Point => ({ x: 0, y: 0 });
 
 export type UISize = { width: number; height: number };
 export type Rectangle = { x: number; y: number; width: number; height: number };
+
+// ===================================================================
+// GESTURE AND EVENT TYPES
+// ===================================================================
+
+export type UIEventType = "tap" | "tapDown" | "tapUp" | "tapCancel";
+
+export type UIEvent = {
+    type: UIEventType;
+    position: Point;
+    startPosition?: Point;
+    timestamp: number;
+};
+
+export type GestureHandler = (event: UIEvent) => boolean;
+
+export type GestureRegistration = {
+    eventType: UIEventType;
+    handler: GestureHandler;
+    hitTest?: (point: Point) => boolean;
+};
 
 const isLayoutResult = (
     value: LayoutResult | ComponentDescriptor,
@@ -26,10 +48,23 @@ const isLayoutResult = (
 
 // Helper to compare dependency arrays for effects.
 const depsAreEqual = (a: any[] | undefined, b: any[] | undefined): boolean => {
-    if (!a || !b || a.length !== b.length) return false;
-    for (let i = 0; i < a.length; i++) {
-        if (a[i] !== b[i]) return false;
+    // If the identities are the same (e.g., both undefined), they are equal.
+    if (a === b) {
+        return true;
     }
+
+    // If one is defined and the other isn't, or if lengths differ, they are not equal.
+    if (!a || !b || a.length !== b.length) {
+        return false;
+    }
+
+    // Check if all elements are strictly equal.
+    for (let i = 0; i < a.length; i++) {
+        if (a[i] !== b[i]) {
+            return false;
+        }
+    }
+
     return true;
 };
 
@@ -70,6 +105,11 @@ export type ComponentContext<P extends {}> = {
     ) => [T, (newValue: T | ((currentValue: T) => T)) => void];
     withDraw: (draw: (scope: any, region: Rectangle) => void) => void;
     withEffect: (effect: () => (() => void) | void, deps?: any[]) => void;
+    withGesture: (
+        eventType: UIEventType,
+        handler: GestureHandler,
+        hitTest?: (point: Point) => boolean,
+    ) => void;
 };
 
 type RenderFunction<P extends {}> = (
@@ -127,6 +167,7 @@ type EffectHook = {
 type NodeHooks = {
     effects: EffectHook[];
     draw?: (scope: any, region: Rectangle) => void;
+    gestures?: GestureRegistration[];
 };
 
 export class UiRenderer {
@@ -135,15 +176,87 @@ export class UiRenderer {
 
     constructor(private renderScope: RenderScope) {}
 
-    public renderComponent(topLevelDescriptor: ComponentDescriptor) {
+    public renderComponent(topLevelDescriptor: ComponentDescriptor | null) {
         this.currentTree = this._updateOrCreateNode(
             this.currentTree ?? undefined,
-            topLevelDescriptor,
+            topLevelDescriptor ??
+                uiBox({ width: fillUiSize, height: fillUiSize }),
         );
         if (this.currentTree) {
             this._executeNode(this.currentTree, this.renderScope.size, false);
             this._performDraw(this.currentTree, zeroPoint());
         }
+    }
+
+    /**
+     * Dispatch a UI event to the declarative UI tree
+     * Traverses the tree depth-first and checks for gesture handlers
+     * @param event The UI event to dispatch
+     * @returns true if the event was handled, false otherwise
+     */
+    public dispatchUIEvent(event: UIEvent): boolean {
+        if (!this.currentTree) {
+            return false;
+        }
+
+        return this._dispatchEventToNode(this.currentTree, event);
+    }
+
+    /**
+     * Recursively dispatch an event to a node and its children
+     * Children are checked first (depth-first) to allow deepest child to handle first
+     */
+    private _dispatchEventToNode(node: UiNode, event: UIEvent): boolean {
+        // First, try to dispatch to children (depth-first)
+        for (const child of node.children) {
+            if (this._dispatchEventToNode(child, event)) {
+                return true; // Event was handled by a child
+            }
+        }
+
+        // If no child handled it, check if this node has gesture handlers
+        const nodeHooks = this.hooks.get(node);
+        if (!nodeHooks?.gestures || !node.layout) {
+            return false;
+        }
+
+        const region = node.layout.region;
+
+        // Check if the event position is within this node's bounds
+        if (!this._isPointInRegion(event.position, region)) {
+            return false;
+        }
+
+        // Try each gesture handler for this event type
+        for (const gestureReg of nodeHooks.gestures) {
+            if (gestureReg.eventType !== event.type) {
+                continue; // Skip handlers for different event types
+            }
+
+            // Check custom hit test if provided
+            if (gestureReg.hitTest && !gestureReg.hitTest(event.position)) {
+                continue;
+            }
+
+            // Call the handler
+            if (gestureReg.handler(event)) {
+                return true; // Event was handled
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if a point is within a rectangular region
+     */
+    private _isPointInRegion(point: Point, region: Rectangle): boolean {
+        return (
+            point.x >= region.x &&
+            point.x <= region.x + region.width &&
+            point.y >= region.y &&
+            point.y <= region.y + region.height
+        );
     }
 
     private _executeNode(
@@ -153,10 +266,18 @@ export class UiRenderer {
     ): UISize {
         const activeMeasureSlots = new Set<any>();
         let hookIndex = 0; // Scoped to this execution run
+        const copiedConstraints = { ...constraints };
+
+        // Clear gestures array for this node to avoid accumulating handlers
+        if (!isMeasurePass) {
+            const nodeHooks = this.hooks.get(node) ?? { effects: [] };
+            nodeHooks.gestures = [];
+            this.hooks.set(node, nodeHooks);
+        }
 
         const context: ComponentContext<any> = {
             props: node.descriptor.props,
-            constraints: constraints,
+            constraints: copiedConstraints,
             withState: <T>(state: T) => {
                 return [state, () => {}];
             },
@@ -164,6 +285,19 @@ export class UiRenderer {
                 if (isMeasurePass) return;
                 const nodeHooks = this.hooks.get(node) ?? { effects: [] };
                 nodeHooks.draw = drawFn;
+                this.hooks.set(node, nodeHooks);
+            },
+            withGesture: (eventType, handler, hitTest) => {
+                if (isMeasurePass) return;
+                const nodeHooks = this.hooks.get(node) ?? { effects: [] };
+                if (!nodeHooks.gestures) {
+                    nodeHooks.gestures = [];
+                }
+                nodeHooks.gestures.push({
+                    eventType,
+                    handler,
+                    hitTest,
+                });
                 this.hooks.set(node, nodeHooks);
             },
             withEffect: (effectFn, deps) => {
@@ -243,8 +377,19 @@ export class UiRenderer {
                 }
 
                 childNode.layout.offset = placedChild.offset;
-
-                this._executeNode(childNode, constraints, false);
+                //TODO: Take our uIBookLayout, it will use MeasureDescriptor
+                //and correctly measure and place the left and right side. But
+                //size there is no size being provided on placedChild they are
+                //again measured here when we execute the node with the size of
+                //the child, not any size they got from a measure call. So they
+                //would say "im fill parent" and then get these copiedConstraints.
+                //how should we handle a case like this where a component has
+                //calculated custom constraints for its children. Should this
+                //be the responsibility of measure or something on PlacedChild?
+                //probably on placedChild as there is not connection between the
+                //"created" node in measureChild and the executed one outside of
+                //a layout pass
+                this._executeNode(childNode, copiedConstraints, false);
             }
 
             node.layout = {
@@ -264,7 +409,7 @@ export class UiRenderer {
             }
             const delegateSize = this._executeNode(
                 delegateChild,
-                constraints,
+                copiedConstraints,
                 false,
             );
             node.layout = {
