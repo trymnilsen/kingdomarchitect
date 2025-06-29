@@ -23,6 +23,16 @@ import { BuildingState } from "./building/buildingState.js";
 import { InventoryState } from "./inventory/inventoryState.js";
 import { ScrollInteractionState } from "../scrolls/scrollState.js";
 import { LandUnlockState } from "../unlock/landUnlockState.js";
+import type { ComponentDescriptor } from "../../../../module/ui/declarative/ui.js";
+import { uiScaffold } from "../../view2/uiScaffold.js";
+import { createInventoryComponent } from "../../../component/inventoryComponent.js";
+import { inventoryItems } from "../../../../data/inventory/inventoryItems.js";
+import { bowItem } from "../../../../data/inventory/items/equipment.js";
+import {
+    bagOfGlitter,
+    blueBook,
+    woodResourceItem,
+} from "../../../../data/inventory/items/resources.js";
 
 export class RootState extends InteractionState {
     override getFocusGroups(): FocusGroup[] {
@@ -37,6 +47,32 @@ export class RootState extends InteractionState {
         );
 
         return groups;*/
+    }
+    override getView(): ComponentDescriptor | null {
+        return uiScaffold({
+            onClick: () => {
+                const inventory = createInventoryComponent();
+                inventory.items = [
+                    {
+                        amount: 5,
+                        item: bowItem,
+                    },
+                    {
+                        amount: 54,
+                        item: woodResourceItem,
+                    },
+                    {
+                        amount: 432,
+                        item: bagOfGlitter,
+                    },
+                    {
+                        amount: 34,
+                        item: blueBook,
+                    },
+                ];
+                this.context.stateChanger.push(new InventoryState(inventory));
+            },
+        });
     }
     /*
     override getView(): ComponentDescriptor | null {

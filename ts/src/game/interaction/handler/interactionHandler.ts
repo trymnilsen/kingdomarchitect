@@ -32,6 +32,7 @@ import {
     ChunkMapComponentId,
     getEntitiesAt,
 } from "../../component/chunkMapComponent.js";
+import type { UiRenderer } from "../../../module/ui/declarative/ui.js";
 
 /**
  * The interactionHandler recieves input taps and forward them to the currently
@@ -44,12 +45,13 @@ export class InteractionHandler {
     private history: InteractionStateHistory;
     private stateContext: StateContext;
     private statusbar: InteractionHandlerStatusbarPresenter;
-
+    private uiRenderer: UiRenderer;
     constructor(
         world: Entity,
         camera: Camera,
         assets: AssetLoader,
         time: GameTime,
+        uiRenderer: UiRenderer,
         visibilityChange: () => void,
     ) {
         this.statusbar = new InteractionHandlerStatusbarPresenter(
@@ -58,6 +60,7 @@ export class InteractionHandler {
                 visibilityChange();
             },
         );
+        this.uiRenderer = uiRenderer;
         this.interactionStateChanger = new CommitableInteractionStateChanger();
         this.world = world;
         this.camera = camera;
@@ -82,18 +85,39 @@ export class InteractionHandler {
             return true;
         }
 
-        const state = this.history.state;
-        const stateHandledTap = state.dispatchUIEvent({
-            type: "tapStart",
+        // Try to dispatch to the declarative UI system
+        const declarativeEvent = {
+            type: "tapDown" as const,
             position: screenPoint,
-        });
+            timestamp: Date.now(),
+        };
+
+        const declarativeHandled =
+            this.uiRenderer.dispatchUIEvent(declarativeEvent);
+        if (declarativeHandled) {
+            return true;
+        }
+
+        // Old imperative system - commented out for future removal
+        // const state = this.history.state;
+        // const stateHandledTap = state.dispatchUIEvent({
+        //     type: "tapStart",
+        //     position: screenPoint,
+        // });
+        // if (!stateHandledTap && state.isModal) {
+        //     return true;
+        // } else {
+        //     return stateHandledTap;
+        // }
+
+        const state = this.history.state;
         //If the tap was not handled but the state is a modal it is still
         //considered handled by the handler. so that tapping the faded overlay
         //pops the state
-        if (!stateHandledTap && state.isModal) {
+        if (state.isModal) {
             return true;
         } else {
-            return stateHandledTap;
+            return false;
         }
     }
 
@@ -115,28 +139,57 @@ export class InteractionHandler {
             return;
         }
 
-        const currentState = this.history.state;
-        //We dispatch two events as they are handled differently when it comes
-        //to applicability. `tap` requires both position and startposition to
-        //be withing the bounds. `tapUp` requires only startposition. A view
-        //should also be able to handle one without affecting the other
-        currentState.dispatchUIEvent({
-            type: "tapUp",
+        // Route events directly to declarative UI system
+        const declarativeUpEvent = {
+            type: "tapUp" as const,
             position: screenPoint,
             startPosition: tapUpEvent.startPosition,
-        });
+            timestamp: Date.now(),
+        };
 
-        let onTapResult = currentState.dispatchUIEvent({
-            type: "tap",
+        const declarativeTapEvent = {
+            type: "tap" as const,
             position: screenPoint,
             startPosition: tapUpEvent.startPosition,
-        });
+            timestamp: Date.now(),
+        };
+
+        // Dispatch tapUp first
+        const declarativeUpHandled =
+            this.uiRenderer.dispatchUIEvent(declarativeUpEvent);
+
+        // Then dispatch tap event
+        let onTapResult = this.uiRenderer.dispatchUIEvent(declarativeTapEvent);
+
+        // Old imperative system - commented out for future removal
+        // if (!declarativeUpHandled && !onTapResult) {
+        //     const currentState = this.history.state;
+        //     currentState.dispatchUIEvent({
+        //         type: "tapUp",
+        //         position: screenPoint,
+        //         startPosition: tapUpEvent.startPosition,
+        //     });
+        //
+        //     onTapResult = currentState.dispatchUIEvent({
+        //         type: "tap",
+        //         position: screenPoint,
+        //         startPosition: tapUpEvent.startPosition,
+        //     });
+        //
+        //     const worldPosition = this.camera.screenToWorld(screenPoint);
+        //     if (!onTapResult) {
+        //         onTapResult = currentState.onTap(screenPoint, worldPosition);
+        //     }
+        // }
 
         const worldPosition = this.camera.screenToWorld(screenPoint);
-        // Check if the tap is handled by the state if its ignored by the view
-        if (!onTapResult) {
+        const currentState = this.history.state;
+
+        // If declarative UI didn't handle it, check if state can handle it
+        if (!declarativeUpHandled && !onTapResult) {
             onTapResult = currentState.onTap(screenPoint, worldPosition);
         }
+
         // If the tap was not handled in the ui or by the state itself
         // We will now check for either of the following:
 
@@ -237,7 +290,8 @@ export class InteractionHandler {
     }
 
     onDraw(renderScope: RenderScope) {
-        const start = performance.now();
+        //const start = performance.now();
+        performance.mark("InteractionStateDraw");
         if (this.history.state.isModal) {
             renderScope.drawScreenSpaceRectangle({
                 x: 0,
@@ -249,7 +303,7 @@ export class InteractionHandler {
         }
 
         this.history.state.onDraw(renderScope);
-
+        this.uiRenderer.renderComponent(this.history.state.getView());
         if (this.history.size > 1) {
             this.statusbar.rootView.layout(renderScope, {
                 width: renderScope.width,
@@ -258,6 +312,12 @@ export class InteractionHandler {
             this.statusbar.rootView.updateTransform();
             this.statusbar.rootView.draw(renderScope);
         }
-        console.log("Interaction state draw", performance.now() - start);
+        performance.mark("InteractionStateDrawEnd");
+        performance.measure(
+            "UI Drawing",
+            "InteractionStateDraw",
+            "InteractionStateDrawEnd",
+        );
+        //console.log("Interaction state draw", performance.now() - start);
     }
 }

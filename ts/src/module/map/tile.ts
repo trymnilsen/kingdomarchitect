@@ -1,3 +1,4 @@
+import { nameof } from "../../common/nameof.js";
 import type { BiomeType } from "./biome.js";
 
 export function getTileId(x: number, y: number) {

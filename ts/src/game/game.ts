@@ -23,6 +23,7 @@ import { WebworkerServerConnection } from "./connection/webworkerServerConnectio
 import { handleGameMessage } from "./action/messages/gameMessageHandler.js";
 import { pathfindingSystem } from "./system/pathfindingSystem.js";
 import type { EntityAction } from "../module/action/entityAction.js";
+import { UiRenderer } from "../module/ui/declarative/ui.js";
 
 export class Game {
     private renderer: Renderer;
@@ -82,6 +83,7 @@ export class Game {
             this.renderer.camera,
             this.assetLoader,
             this.gameTime,
+            new UiRenderer(this.renderer.context),
             () => {
                 this.visibilityMap.useVisibility =
                     !this.visibilityMap.useVisibility;

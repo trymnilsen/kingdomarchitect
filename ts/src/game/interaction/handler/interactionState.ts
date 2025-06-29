@@ -14,8 +14,7 @@ import { UIView } from "../../../module/ui/uiView.js";
 import { GroundTile } from "../../../module/map/tile.js";
 import { InteractionStateChanger } from "./interactionStateChanger.js";
 import { StateContext } from "./stateContext.js";
-
-export type ComponentDescriptor = any;
+import type { ComponentDescriptor } from "../../../module/ui/declarative/ui.js";
 
 /**
  * Interaction is built up as a simple state machine. Each state can via the
@@ -86,45 +85,21 @@ export abstract class InteractionState {
     /**
      * Dispatch a UI event to the currently set view
      *
-     * The dispatching is done using a depth first search, queueing views
-     * in a queue and looping over them with a while loop. This ensures that
-     * we have the referene to the view that handles the event and can compare
-     * them on later events when the event is dependent on previous events.
-     *
-     * For example on tap up should only trigger if tap down happened on the
-     * same view.
+     * This method is part of the old imperative UI system and is now deprecated
+     * in favor of the new declarative UI system. The InteractionHandler now
+     * dispatches events directly to the UiRenderer, bypassing InteractionState.
      *
      * @param event the event to dispatch to the view
      * @returns if the event was handled or not
      */
     dispatchUIEvent(event: UIEvent): boolean {
-        /*
-        const viewsToVisit = [this._view];
-
-        while (viewsToVisit.length > 0) {
-            // Pick the first view
-            const view = viewsToVisit.shift();
-            if (!view) {
-                throw new Error("Undefined view in queue with > 0 length");
-            }
-            // Add the children of this entity to nodes to search
-            for (const child of view.children) {
-                viewsToVisit.push(child);
-            }
-        }
-
+        // Old imperative UI system - commented out as we move to declarative UI
+        // The declarative UI system handles events directly in InteractionHandler
+        console.log(
+            "UI Event received in InteractionState (deprecated): ",
+            event,
+        );
         return false;
-        */
-
-        console.log("UI Event: ", event);
-        return false;
-        /*
-        if (this._view) {
-            const handled = this._view.dispatchUIEvent(event);
-            return handled;
-        } else {
-            return false;
-        }*/
     }
 
     /**
