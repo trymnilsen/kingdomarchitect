@@ -14,7 +14,7 @@ import { Camera } from "../../../../rendering/camera.js";
 import { createInventoryComponent } from "../../../component/inventoryComponent.js";
 import { Entity } from "../../../entity/entity.js";
 import { InteractionState } from "../../handler/interactionState.js";
-import { uiScaffold } from "../../view2/uiScaffold.js";
+import { uiScaffold } from "../../view/uiScaffold.js";
 import { AlertMessageState } from "../common/alertMessageState.js";
 import { MenuState } from "../menu/menuState.js";
 import { InventoryState } from "./inventory/inventoryState.js";

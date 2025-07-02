@@ -12,7 +12,7 @@ import { growBuildings } from "../../../../../data/building/grow/grow.js";
 import { Point } from "../../../../../common/point.js";
 import { createComponent } from "../../../../../module/ui/declarative/ui.js";
 import { uiBookLayout } from "../../../../../module/ui/declarative/uiBookLayout.js";
-import { uiScaffold } from "../../../view2/uiScaffold.js";
+import { uiScaffold } from "../../../view/uiScaffold.js";
 import { uiBox } from "../../../../../module/ui/declarative/uiBox.js";
 import { uiButton } from "../../../../../module/ui/declarative/uiButton.js";
 import {
@@ -23,7 +23,7 @@ import { uiImage } from "../../../../../module/ui/declarative/uiImage.js";
 import { uiSpace } from "../../../../../module/ui/declarative/uiSpace.js";
 import { uiText } from "../../../../../module/ui/declarative/uiText.js";
 import { fillUiSize, wrapUiSize } from "../../../../../module/ui/uiSize.js";
-import { ninePatchBackground } from "../../../../../module/ui/dsl/uiBackgroundDsl.js";
+import { ninePatchBackground } from "../../../../../module/ui/uiBackground.js";
 
 // Declarative UI building components
 const bookTextStyle = {

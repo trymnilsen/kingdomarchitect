@@ -1,20 +1,10 @@
+import { InventoryItem } from "../../../../../data/inventory/inventoryItem.js";
 import { Sprite2, sprites2 } from "../../../../../module/asset/sprite.js";
-import { allSides, symmetricSides } from "../../../../../common/sides.js";
-import {
-    InventoryItem,
-    ItemTag,
-} from "../../../../../data/inventory/inventoryItem.js";
-import { InventoryItemList } from "../../../../../data/inventory/inventoryItemQuantity.js";
-import { UIThemeType, bookInkColor } from "../../../../../module/ui/color.js";
 import { ComponentDescriptor } from "../../../../../module/ui/declarative/ui.js";
-import { Entity } from "../../../../entity/entity.js";
+import type { InventoryComponent } from "../../../../component/inventoryComponent.js";
 import { InteractionState } from "../../../handler/interactionState.js";
-import { StateContext } from "../../../handler/stateContext.js";
-import { UIActionbarItem } from "../../../view/actionbar/uiActionbar.js";
-import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold.js";
 import { AlertMessageState } from "../../common/alertMessageState.js";
 import { inventoryView } from "./inventoryView.js";
-import type { InventoryComponent } from "../../../../component/inventoryComponent.js";
 
 export class InventoryState extends InteractionState {
     private _selectedItemIndex = 0;

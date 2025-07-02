@@ -1,7 +1,7 @@
 import { Sprite2, sprites2 } from "../../../../../module/asset/sprite.js";
 import { allSides } from "../../../../../common/sides.js";
 import { UIThemeType } from "../../../../../module/ui/color.js";
-import { ninePatchBackground } from "../../../../../module/ui/dsl/uiBackgroundDsl.js";
+import { ninePatchBackground } from "../../../../../module/ui/uiBackground.js";
 import { createComponent } from "../../../../../module/ui/declarative/ui.js";
 import { uiButton } from "../../../../../module/ui/declarative/uiButton.js";
 import { uiImage } from "../../../../../module/ui/declarative/uiImage.js";

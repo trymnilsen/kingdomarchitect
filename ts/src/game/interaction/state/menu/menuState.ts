@@ -1,7 +1,7 @@
 import { allSides } from "../../../../common/sides.js";
 import { sprites2 } from "../../../../module/asset/sprite.js";
 import { bookInkColor } from "../../../../module/ui/color.js";
-import { ninePatchBackground } from "../../../../module/ui/dsl/uiBackgroundDsl.js";
+import { ninePatchBackground } from "../../../../module/ui/uiBackground.js";
 import { fillUiSize, wrapUiSize } from "../../../../module/ui/uiSize.js";
 import { InteractionState } from "../../handler/interactionState.js";
 import { type ComponentDescriptor } from "../../../../module/ui/declarative/ui.js";

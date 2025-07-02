@@ -13,7 +13,7 @@ import {
 } from "../../../../module/ui/declarative/uiSequence.js";
 import { uiSpace } from "../../../../module/ui/declarative/uiSpace.js";
 import { uiText } from "../../../../module/ui/declarative/uiText.js";
-import { ninePatchBackground } from "../../../../module/ui/dsl/uiBackgroundDsl.js";
+import { ninePatchBackground } from "../../../../module/ui/uiBackground.js";
 import { fillUiSize, wrapUiSize } from "../../../../module/ui/uiSize.js";
 import { InteractionState } from "../../handler/interactionState.js";
 

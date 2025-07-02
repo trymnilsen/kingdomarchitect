@@ -1,9 +1,6 @@
-import { CraftingOutputTag } from "../../../../../../data/inventory/inventoryItemQuantity.js";
-import { SelectedEntityItem } from "../../../../../../module/selection/selectedEntityItem.js";
 import { SelectedWorldItem } from "../../../../../../module/selection/selectedWorldItem.js";
 import { StateContext } from "../../../../handler/stateContext.js";
-import { ButtonCollection } from "../../../../view/actionbar/buttonCollection.js";
-import { UIActionbarItem } from "../../../../view/actionbar/uiActionbar.js";
+import { ButtonCollection } from "../../../../view/buttonCollection.js";
 import {
     ActorSelectionProvider,
     emptySelection,

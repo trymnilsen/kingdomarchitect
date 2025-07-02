@@ -1,28 +1,25 @@
-import { Sprite2, sprites2 } from "../../../../../module/asset/sprite.js";
-import { allSides, symmetricSides } from "../../../../../common/sides.js";
+import { allSides } from "../../../../../common/sides.js";
 import { InventoryItem } from "../../../../../data/inventory/inventoryItem.js";
 import {
     InventoryItemList,
     type InventoryItemQuantity,
 } from "../../../../../data/inventory/inventoryItemQuantity.js";
+import { sprites2 } from "../../../../../module/asset/sprite.js";
 import { UIThemeType, bookInkColor } from "../../../../../module/ui/color.js";
-import {
-    colorBackground,
-    ninePatchBackground,
-} from "../../../../../module/ui/dsl/uiBackgroundDsl.js";
-import { fillUiSize, wrapUiSize } from "../../../../../module/ui/uiSize.js";
 import {
     createComponent,
     type ComponentDescriptor,
 } from "../../../../../module/ui/declarative/ui.js";
-import { uiBox } from "../../../../../module/ui/declarative/uiBox.js";
-import { uiText } from "../../../../../module/ui/declarative/uiText.js";
-import { uiImage } from "../../../../../module/ui/declarative/uiImage.js";
-import { uiGrid } from "../../../../../module/ui/declarative/uiGrid.js";
 import { uiBookLayout } from "../../../../../module/ui/declarative/uiBookLayout.js";
+import { uiBox } from "../../../../../module/ui/declarative/uiBox.js";
+import { uiGrid } from "../../../../../module/ui/declarative/uiGrid.js";
+import { uiImage } from "../../../../../module/ui/declarative/uiImage.js";
 import { uiColumn } from "../../../../../module/ui/declarative/uiSequence.js";
-import { inventoryGridItem } from "./inventoryGridItem.js";
+import { uiText } from "../../../../../module/ui/declarative/uiText.js";
+import { ninePatchBackground } from "../../../../../module/ui/uiBackground.js";
+import { fillUiSize, wrapUiSize } from "../../../../../module/ui/uiSize.js";
 import type { InventoryComponent } from "../../../../component/inventoryComponent.js";
+import { inventoryGridItem } from "./inventoryGridItem.js";
 
 export type InventoryViewProps = {
     inventory: InventoryComponent;
