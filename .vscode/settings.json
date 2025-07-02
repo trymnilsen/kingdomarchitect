@@ -37,5 +37,6 @@
     "mochaExplorer.timeout": 0,
     "typescript.tsdk": "node_modules/typescript/lib",
     "intellicodeApiExamples.python.enabled": false,
-    "intellicodeApiExamples.typescript.enabled": false
+    "intellicodeApiExamples.typescript.enabled": false,
+    "oxc.configPath": "oxlintrc.json"
 }

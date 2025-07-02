@@ -1,38 +1,23 @@
-import { sprites2 } from "../../../../module/asset/sprite.js";
 import { Bounds, boundsCenter } from "../../../../common/bounds.js";
 import { Direction } from "../../../../common/direction.js";
-import { manhattanDistance, shiftPoint } from "../../../../common/point.js";
-import { allSides } from "../../../../common/sides.js";
-import { Camera } from "../../../../rendering/camera.js";
-import { uiBox } from "../../../../module/ui/dsl/uiBoxDsl.js";
-import { FocusGroup } from "../../../../module/ui/focus/focusGroup.js";
-import { uiAlignment } from "../../../../module/ui/uiAlignment.js";
-import { fillUiSize, wrapUiSize } from "../../../../module/ui/uiSize.js";
-import { Entity } from "../../../entity/entity.js";
-import { SelectedEntityItem } from "../../../../module/selection/selectedEntityItem.js";
-import { SelectedTileItem } from "../../../../module/selection/selectedTileItem.js";
-import { SelectedWorldItem } from "../../../../module/selection/selectedWorldItem.js";
-import { GroundTile } from "../../../../module/map/tile.js";
-import { HalfTileSize, TileSize } from "../../../../module/map/tile.js";
-import { InteractionState } from "../../handler/interactionState.js";
-import { UIActionbarItem } from "../../view/actionbar/uiActionbar.js";
-import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold.js";
-import { AlertMessageState } from "../common/alertMessageState.js";
-import { MenuState } from "../menu/menuState.js";
-import { BuildingState } from "./building/buildingState.js";
-import { InventoryState } from "./inventory/inventoryState.js";
-import { ScrollInteractionState } from "../scrolls/scrollState.js";
-import { LandUnlockState } from "../unlock/landUnlockState.js";
-import type { ComponentDescriptor } from "../../../../module/ui/declarative/ui.js";
-import { uiScaffold } from "../../view2/uiScaffold.js";
-import { createInventoryComponent } from "../../../component/inventoryComponent.js";
-import { inventoryItems } from "../../../../data/inventory/inventoryItems.js";
+import { shiftPoint } from "../../../../common/point.js";
 import { bowItem } from "../../../../data/inventory/items/equipment.js";
 import {
     bagOfGlitter,
     blueBook,
     woodResourceItem,
 } from "../../../../data/inventory/items/resources.js";
+import { GroundTile, TileSize } from "../../../../module/map/tile.js";
+import type { ComponentDescriptor } from "../../../../module/ui/declarative/ui.js";
+import { FocusGroup } from "../../../../module/ui/focus/focusGroup.js";
+import { Camera } from "../../../../rendering/camera.js";
+import { createInventoryComponent } from "../../../component/inventoryComponent.js";
+import { Entity } from "../../../entity/entity.js";
+import { InteractionState } from "../../handler/interactionState.js";
+import { uiScaffold } from "../../view2/uiScaffold.js";
+import { AlertMessageState } from "../common/alertMessageState.js";
+import { MenuState } from "../menu/menuState.js";
+import { InventoryState } from "./inventory/inventoryState.js";
 
 export class RootState extends InteractionState {
     override getFocusGroups(): FocusGroup[] {
@@ -50,115 +35,96 @@ export class RootState extends InteractionState {
     }
     override getView(): ComponentDescriptor | null {
         return uiScaffold({
-            onClick: () => {
-                const inventory = createInventoryComponent();
-                inventory.items = [
-                    {
-                        amount: 5,
-                        item: bowItem,
+            leftButtons: [
+                {
+                    label: "Move",
+                    onClick: () => {
+                        this.context.stateChanger.push(
+                            new AlertMessageState(
+                                "Move",
+                                "Not implemented yet",
+                            ),
+                        );
                     },
-                    {
-                        amount: 54,
-                        item: woodResourceItem,
+                },
+                {
+                    label: "Stash",
+                    onClick: () => {
+                        const inventory = createInventoryComponent();
+                        inventory.items = [
+                            {
+                                amount: 5,
+                                item: bowItem,
+                            },
+                            {
+                                amount: 54,
+                                item: woodResourceItem,
+                            },
+                            {
+                                amount: 432,
+                                item: bagOfGlitter,
+                            },
+                            {
+                                amount: 34,
+                                item: blueBook,
+                            },
+                        ];
+                        this.context.stateChanger.push(
+                            new InventoryState(inventory),
+                        );
                     },
-                    {
-                        amount: 432,
-                        item: bagOfGlitter,
+                },
+                {
+                    label: "Skills",
+                    onClick: () => {
+                        this.context.stateChanger.push(
+                            new AlertMessageState(
+                                "Skills",
+                                "Not implemented yet",
+                            ),
+                        );
                     },
-                    {
-                        amount: 34,
-                        item: blueBook,
+                },
+                {
+                    label: "Stats",
+                    onClick: () => {
+                        this.context.stateChanger.push(
+                            new AlertMessageState(
+                                "Stats",
+                                "Not implemented yet",
+                            ),
+                        );
                     },
-                ];
-                this.context.stateChanger.push(new InventoryState(inventory));
-            },
+                },
+                {
+                    label: "Close",
+                    onClick: () => {
+                        this.context.stateChanger.push(
+                            new AlertMessageState("Close", "Nothing to close"),
+                        );
+                    },
+                },
+            ],
+            rightButtons: [
+                {
+                    label: "Main",
+                    onClick: () => {
+                        this.context.stateChanger.push(new MenuState());
+                    },
+                },
+                {
+                    label: "Other",
+                    onClick: () => {
+                        this.context.stateChanger.push(
+                            new AlertMessageState(
+                                "Other",
+                                "Other menu not implemented",
+                            ),
+                        );
+                    },
+                },
+            ],
         });
-    }
-    /*
-    override getView(): ComponentDescriptor | null {
-        return uiBox({
-            alignment: uiAlignment.bottomCenter
-            width: fillUiSize,
-            height: wrapUiSize,
-            children: [
-                uiRow({
-                    children: buttons.map((button) => uiMenuButton(button))
-                })
-            ]
-        })
-    }*/
-    override onActive(): void {
-        super.onActive();
-
-        const actionItems: UIActionbarItem[] = [
-            {
-                text: "Quest",
-                icon: sprites2.empty_sprite,
-                onClick: () => {
-                    this.context.stateChanger.push(
-                        new AlertMessageState("Oh no", "Not implemented"),
-                    );
-                },
-            },
-            {
-                text: "Scroll",
-                icon: sprites2.empty_sprite,
-                onClick: () => {
-                    this.context.stateChanger.push(
-                        new ScrollInteractionState(),
-                    );
-                },
-            },
-            {
-                text: "Map",
-                icon: sprites2.empty_sprite,
-                onClick: () => {
-                    this.context.stateChanger.push(
-                        new AlertMessageState("Oh no", "Not implemented"),
-                    );
-                },
-            },
-            {
-                text: "Land",
-                icon: sprites2.empty_sprite,
-                onClick: () => {
-                    this.context.stateChanger.push(new LandUnlockState());
-                },
-            },
-        ];
-
-        const rightActionItems: UIActionbarItem[] = [
-            {
-                text: "Menu",
-                icon: sprites2.empty_sprite,
-                onClick: () => {
-                    this.context.stateChanger.push(new MenuState());
-                },
-            },
-        ];
-
-        /*
-        const timeline = new UITimeline(this.context.gameTime, {
-            width: fillUiSize,
-            height: 48,
-        });*/
-
-        const contentView = uiBox({
-            width: fillUiSize,
-            height: fillUiSize,
-            padding: allSides(16),
-            alignment: uiAlignment.topCenter,
-            children: [],
-        });
-
-        const scaffoldState = new UIActionbarScaffold(
-            contentView,
-            actionItems,
-            rightActionItems,
-            { width: fillUiSize, height: fillUiSize },
-        );
-
-        //this.view = scaffoldState;
     }
 
     override onTileTap(tile: GroundTile): boolean {

@@ -1,10 +1,6 @@
-import { sprites2 } from "../../../module/asset/sprite.js";
 import { allSides } from "../../../common/sides.js";
-import { subTitleTextStyle } from "../../../rendering/text/textStyle.js";
-import {
-    colorBackground,
-    ninePatchBackground,
-} from "../../../module/ui/dsl/uiBackgroundDsl.js";
+import { sprites2 } from "../../../module/asset/sprite.js";
+import { ninePatchBackground } from "../../../module/ui/dsl/uiBackgroundDsl.js";
 import { uiBox } from "../../../module/ui/dsl/uiBoxDsl.js";
 import { uiButton } from "../../../module/ui/dsl/uiButtonDsl.js";
 import {
@@ -14,10 +10,10 @@ import {
 import { uiRow } from "../../../module/ui/dsl/uiRowDsl.js";
 import { uiSpace } from "../../../module/ui/dsl/uiSpaceDsl.js";
 import { uiText } from "../../../module/ui/dsl/uiTextDsl.js";
-import { uiAlignment } from "../../../module/ui/uiAlignment.js";
 import { fillUiSize, wrapUiSize } from "../../../module/ui/uiSize.js";
 import { UIView } from "../../../module/ui/uiView.js";
 import { UIText } from "../../../module/ui/view/uiText.js";
+import { subTitleTextStyle } from "../../../rendering/text/textStyle.js";
 
 export class InteractionHandlerStatusbarPresenter {
     private _rootView: UIView;

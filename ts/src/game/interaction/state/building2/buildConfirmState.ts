@@ -1,29 +1,27 @@
-import { sprites2 } from "../../../../module/asset/sprite.js";
+import { findMapped } from "../../../../common/array.js";
 import { Point } from "../../../../common/point.js";
 import { allSides } from "../../../../common/sides.js";
 import { Building } from "../../../../data/building/building.js";
-import { woodResourceItem } from "../../../../data/inventory/items/resources.js";
-import { RenderScope } from "../../../../rendering/renderScope.js";
+import { sprites2 } from "../../../../module/asset/sprite.js";
+import { GroundTile, TileSize } from "../../../../module/map/tile.js";
 import { uiBox } from "../../../../module/ui/dsl/uiBoxDsl.js";
 import { fillUiSize } from "../../../../module/ui/uiSize.js";
-import { GroundTile } from "../../../../module/map/tile.js";
-import { TileSize } from "../../../../module/map/tile.js";
-import { InteractionState } from "../../handler/interactionState.js";
-import { UIActionbarItem } from "../../view/actionbar/uiActionbar.js";
-import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold.js";
-import { AlertMessageState } from "../common/alertMessageState.js";
-import { BuildMode } from "./mode/buildMode.js";
-import { LineBuildMode } from "./mode/lineBuildMode.js";
-import { SingleBuildMode } from "./mode/singleBuildMode.js";
-import { buildingApplicabilityList } from "./buildingApplicabilityList.js";
-import { BuildingApplicabilityResult } from "./buildingApplicability.js";
-import { findMapped } from "../../../../common/array.js";
+import { RenderScope } from "../../../../rendering/renderScope.js";
+import { makeBuildBuildingAction } from "../../../action/world/buildingAction.js";
 import {
     ChunkMapComponentId,
     getEntitiesAt,
 } from "../../../component/chunkMapComponent.js";
 import { getTile, TileComponentId } from "../../../component/tileComponent.js";
-import { makeBuildBuildingAction } from "../../../action/world/buildingAction.js";
+import { InteractionState } from "../../handler/interactionState.js";
+import { UIActionbarItem } from "../../view/actionbar/uiActionbar.js";
+import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold.js";
+import { AlertMessageState } from "../common/alertMessageState.js";
+import { BuildingApplicabilityResult } from "./buildingApplicability.js";
+import { buildingApplicabilityList } from "./buildingApplicabilityList.js";
+import { BuildMode } from "./mode/buildMode.js";
+import { LineBuildMode } from "./mode/lineBuildMode.js";
+import { SingleBuildMode } from "./mode/singleBuildMode.js";
 
 export class BuildConfirmState extends InteractionState {
     private scaffold: UIActionbarScaffold | null = null;

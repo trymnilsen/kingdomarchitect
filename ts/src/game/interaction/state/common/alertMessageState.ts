@@ -7,7 +7,11 @@ import {
 } from "../../../../module/ui/declarative/ui.js";
 import { uiBox } from "../../../../module/ui/declarative/uiBox.js";
 import { uiButton } from "../../../../module/ui/declarative/uiButton.js";
-import { uiColumn } from "../../../../module/ui/declarative/uiSequence.js";
+import {
+    CrossAxisAlignment,
+    uiColumn,
+} from "../../../../module/ui/declarative/uiSequence.js";
+import { uiSpace } from "../../../../module/ui/declarative/uiSpace.js";
 import { uiText } from "../../../../module/ui/declarative/uiText.js";
 import { ninePatchBackground } from "../../../../module/ui/dsl/uiBackgroundDsl.js";
 import { fillUiSize, wrapUiSize } from "../../../../module/ui/uiSize.js";
@@ -36,6 +40,7 @@ const alertMessage = createComponent<AlertMessageProps>(
                 child: uiColumn({
                     width: fillUiSize,
                     height: wrapUiSize,
+                    crossAxisAlignment: CrossAxisAlignment.Center,
                     gap: 16,
                     children: [
                         uiText({
@@ -53,6 +58,9 @@ const alertMessage = createComponent<AlertMessageProps>(
                                 font: "Silkscreen",
                                 size: 20,
                             },
+                        }),
+                        uiSpace({
+                            height: 32,
                         }),
                         uiButton({
                             width: fillUiSize,
