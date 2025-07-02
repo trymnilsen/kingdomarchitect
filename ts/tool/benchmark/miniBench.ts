@@ -33,7 +33,7 @@ function calculateStatisticsWithPercentiles(
     const mean = sum / total;
 
     // Calculate median
-    let median: BigInt;
+    let median: bigint;
     const mid = Number(total / 2n);
     if (total % 2n === 0n) {
         median = (sortedData[mid - 1] + sortedData[mid]) / 2n;
