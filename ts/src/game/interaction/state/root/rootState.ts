@@ -37,7 +37,7 @@ export class RootState extends InteractionState {
         return uiScaffold({
             leftButtons: [
                 {
-                    label: "Move",
+                    text: "Move",
                     onClick: () => {
                         this.context.stateChanger.push(
                             new AlertMessageState(
@@ -48,7 +48,7 @@ export class RootState extends InteractionState {
                     },
                 },
                 {
-                    label: "Stash",
+                    text: "Stash",
                     onClick: () => {
                         const inventory = createInventoryComponent();
                         inventory.items = [
@@ -75,7 +75,7 @@ export class RootState extends InteractionState {
                     },
                 },
                 {
-                    label: "Skills",
+                    text: "Skills",
                     onClick: () => {
                         this.context.stateChanger.push(
                             new AlertMessageState(
@@ -86,7 +86,7 @@ export class RootState extends InteractionState {
                     },
                 },
                 {
-                    label: "Stats",
+                    text: "Stats",
                     onClick: () => {
                         this.context.stateChanger.push(
                             new AlertMessageState(
@@ -97,7 +97,7 @@ export class RootState extends InteractionState {
                     },
                 },
                 {
-                    label: "Close",
+                    text: "Close",
                     onClick: () => {
                         this.context.stateChanger.push(
                             new AlertMessageState("Close", "Nothing to close"),
@@ -107,13 +107,13 @@ export class RootState extends InteractionState {
             ],
             rightButtons: [
                 {
-                    label: "Main",
+                    text: "Main",
                     onClick: () => {
                         this.context.stateChanger.push(new MenuState());
                     },
                 },
                 {
-                    label: "Other",
+                    text: "Other",
                     onClick: () => {
                         this.context.stateChanger.push(
                             new AlertMessageState(
