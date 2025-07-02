@@ -1,7 +1,10 @@
 import { Sprite2, sprites2 } from "../../../../../module/asset/sprite.js";
 import { allSides, symmetricSides } from "../../../../../common/sides.js";
 import { InventoryItem } from "../../../../../data/inventory/inventoryItem.js";
-import { InventoryItemList } from "../../../../../data/inventory/inventoryItemQuantity.js";
+import {
+    InventoryItemList,
+    type InventoryItemQuantity,
+} from "../../../../../data/inventory/inventoryItemQuantity.js";
 import { UIThemeType, bookInkColor } from "../../../../../module/ui/color.js";
 import {
     colorBackground,
@@ -73,34 +76,31 @@ export const inventoryView = createComponent<InventoryViewProps>(
 
         // Create grid
         const gridView = uiBox({
-            background: colorBackground("red"),
-            width: fillUiSize, // Adjusted to fit within book page margins (300 - 32)
-            height: fillUiSize, // Adjusted to fit within book page margins (400 - 32)
+            width: fillUiSize,
+            height: fillUiSize,
+            padding: 16,
+            child: uiGrid({
+                width: fillUiSize, // Adjusted to fit within book page margins (300 - 32)
+                height: fillUiSize, // Adjusted to fit within book page margins (400 - 32)
+                children: gridChildren,
+                gap: 8,
+            }),
         });
 
         // Create details view
         const detailsView = createDetailsView(items[selectedIndex]);
 
         return uiBookLayout({
-            leftPage: uiBox({
-                background: colorBackground("red"),
-                width: fillUiSize, // Adjusted to fit within book page margins (300 - 32)
-                height: fillUiSize, // Adjusted to fit within book page margins (400 - 32)
-            }),
-            rightPage: uiBox({
-                background: colorBackground("blue"),
-                width: fillUiSize, // Adjusted to fit within book page margins (300 - 32)
-                height: fillUiSize, // Adjusted to fit within book page margins (400 - 32)
-            }),
+            leftPage: gridView,
+            rightPage: detailsView,
         });
     },
     { displayName: "InventoryView" },
 );
 
-function createDetailsView(inventoryItem?: {
-    item: InventoryItem;
-    amount: number;
-}): ComponentDescriptor {
+function createDetailsView(
+    inventoryItem?: InventoryItemQuantity,
+): ComponentDescriptor {
     if (!inventoryItem) {
         return uiBox({
             width: 268, // Match the grid container width
@@ -187,8 +187,9 @@ function createDetailsView(inventoryItem?: {
     }
 
     return uiBox({
-        width: 268, // Match the grid container width
-        height: 368,
+        width: fillUiSize,
+        height: fillUiSize,
+        padding: 8,
         child: uiColumn({
             children: detailsChildren,
             width: fillUiSize,

@@ -135,6 +135,7 @@ export const uiScaffold = createComponent<ScaffoldProps>(
                 buttonX += buttonSize.width + spacing;
                 return {
                     offset: { x, y },
+                    size: buttonSize,
                     ...button,
                 };
             });
@@ -144,6 +145,7 @@ export const uiScaffold = createComponent<ScaffoldProps>(
                     x: constraints.width - rightSize.totalWidth - spacing,
                     y: constraints.height - rightSize.sizes[0].height,
                 },
+                size: rightSize.sizes[0],
             });
 
             const otherButton: PlacedChild = Object.assign(rightButtons[1], {
@@ -151,6 +153,7 @@ export const uiScaffold = createComponent<ScaffoldProps>(
                     x: constraints.width - rightSize.sizes[1].width,
                     y: constraints.height - rightSize.sizes[1].height,
                 },
+                size: rightSize.sizes[1],
             });
 
             const menu: PlacedChild[] = [];

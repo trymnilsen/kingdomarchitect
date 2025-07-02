@@ -61,6 +61,7 @@ export const uiBox = createComponent<UiBoxProps>(
 
             child = {
                 ...props.child,
+                size: childSize,
                 offset: props.padding
                     ? addPoint({ x: props.padding, y: props.padding }, position)
                     : position,

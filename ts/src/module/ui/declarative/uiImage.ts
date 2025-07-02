@@ -10,12 +10,12 @@ export type UiImageProps = {
 export const uiImage = createComponent<UiImageProps>(
     ({ props, withDraw }) => {
         withDraw((scope, region) => {
-            scope.drawSprite({
+            scope.drawScreenSpaceSprite({
                 sprite: props.sprite,
                 x: region.x,
                 y: region.y,
-                width: props.width,
-                height: props.height,
+                targetWidth: props.width,
+                targetHeight: props.height,
             });
         });
 
