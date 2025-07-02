@@ -1,38 +1,28 @@
-import { AssetLoader } from "../../../module/asset/loader/assetLoader.js";
-import { sprites2 } from "../../../module/asset/sprite.js";
 import { Point } from "../../../common/point.js";
-import { allSides } from "../../../common/sides.js";
 import { GameTime } from "../../../common/time.js";
+import { AssetLoader } from "../../../module/asset/loader/assetLoader.js";
 import {
     InputAction,
     InputActionType,
 } from "../../../module/input/inputAction.js";
 import { OnTapEndEvent } from "../../../module/input/touchInput.js";
-import { Camera } from "../../../rendering/camera.js";
-import { RenderScope } from "../../../rendering/renderScope.js";
-import { subTitleTextStyle } from "../../../rendering/text/textStyle.js";
-import { bookInkColor } from "../../../module/ui/color.js";
-import { UIView } from "../../../module/ui/uiView.js";
-import { Entity } from "../../entity/entity.js";
 import { SelectedEntityItem } from "../../../module/selection/selectedEntityItem.js";
 import { SelectedTileItem } from "../../../module/selection/selectedTileItem.js";
 import { SelectedWorldItem } from "../../../module/selection/selectedWorldItem.js";
+import type { UiRenderer } from "../../../module/ui/declarative/ui.js";
+import { Camera } from "../../../rendering/camera.js";
+import { RenderScope } from "../../../rendering/renderScope.js";
+import {
+    ChunkMapComponentId,
+    getEntitiesAt,
+} from "../../component/chunkMapComponent.js";
+import { getTile, TileComponentId } from "../../component/tileComponent.js";
+import { Entity } from "../../entity/entity.js";
 import { SelectionState } from "../state/selection/selectionState.js";
 import { InteractionHandlerStatusbarPresenter } from "./interactionHandlerStatusbarPresenter.js";
 import { CommitableInteractionStateChanger } from "./interactionStateChanger.js";
 import { InteractionStateHistory } from "./interactionStateHistory.js";
 import { StateContext } from "./stateContext.js";
-import {
-    getTile,
-    TileComponent,
-    TileComponentId,
-} from "../../component/tileComponent.js";
-import {
-    ChunkMapComponent,
-    ChunkMapComponentId,
-    getEntitiesAt,
-} from "../../component/chunkMapComponent.js";
-import type { UiRenderer } from "../../../module/ui/declarative/ui.js";
 
 /**
  * The interactionHandler recieves input taps and forward them to the currently

@@ -1,20 +1,18 @@
-import { sprites2 } from "../../../module/asset/sprite.js";
 import { Point } from "../../../common/point.js";
 import { allSides } from "../../../common/sides.js";
+import { sprites2 } from "../../../module/asset/sprite.js";
 import {
     InputAction,
     InputActionType,
     getDirectionFromInputType,
 } from "../../../module/input/inputAction.js";
-import { RenderScope } from "../../../rendering/renderScope.js";
+import { GroundTile } from "../../../module/map/tile.js";
+import type { ComponentDescriptor } from "../../../module/ui/declarative/ui.js";
 import { UIEvent } from "../../../module/ui/event/uiEvent.js";
 import { FocusGroup } from "../../../module/ui/focus/focusGroup.js";
-import { FocusState } from "../../../module/ui/focus/focusState.js";
-import { UIView } from "../../../module/ui/uiView.js";
-import { GroundTile } from "../../../module/map/tile.js";
+import { RenderScope } from "../../../rendering/renderScope.js";
 import { InteractionStateChanger } from "./interactionStateChanger.js";
 import { StateContext } from "./stateContext.js";
-import type { ComponentDescriptor } from "../../../module/ui/declarative/ui.js";
 
 /**
  * Interaction is built up as a simple state machine. Each state can via the

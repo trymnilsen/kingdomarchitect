@@ -23,6 +23,7 @@ type UiButtonProps = {
     label: string;
     onClick: () => void;
 };
+
 const uiMenuButton = createComponent<UiButtonProps>(
     ({ props, withGesture }) => {
         withGesture("tap", (_event) => {
@@ -62,8 +63,11 @@ const uiMenuButton = createComponent<UiButtonProps>(
     },
 );
 
-const leftButtonLabels = ["Move", "Stash", "Skills", "Stats", "Close"];
-const rightButtonLabels = ["Main", "Other"];
+type ScaffoldButton = {
+    label: string;
+    onClick: () => void;
+};
+
 enum MenuState {
     closed,
     left,
@@ -80,7 +84,8 @@ type MeasuredButtons = {
 const spacing = 8;
 
 type ScaffoldProps = {
-    onClick: () => void;
+    leftButtons?: ScaffoldButton[];
+    rightButtons?: ScaffoldButton[];
 };
 
 export const uiScaffold = createComponent<ScaffoldProps>(
@@ -88,12 +93,14 @@ export const uiScaffold = createComponent<ScaffoldProps>(
         withEffect(() => {
             console.log("mounted");
         });
-        const [menuState, setMenuState] = withState(MenuState.closed);
-        const leftButtons = leftButtonLabels.map((label) =>
-            uiMenuButton({ label, onClick: props.onClick }),
+        const [menuState, _setMenuState] = withState(MenuState.closed);
+
+        // Use props or defaults if not provided
+        const leftButtons = (props.leftButtons || []).map((button) =>
+            uiMenuButton({ label: button.label, onClick: button.onClick }),
         );
-        const rightButtons = rightButtonLabels.map((label) =>
-            uiMenuButton({ label, onClick: props.onClick }),
+        const rightButtons = (props.rightButtons || []).map((button) =>
+            uiMenuButton({ label: button.label, onClick: button.onClick }),
         );
 
         const measureButtons = (
@@ -113,6 +120,10 @@ export const uiScaffold = createComponent<ScaffoldProps>(
                     maxHeight = buttonSize.height;
                 }
                 totalWidth += buttonSize.width;
+                // Add spacing between buttons (but not after the last one)
+                if (index < descriptors.length - 1) {
+                    totalWidth += spacing;
+                }
                 sizes.push(buttonSize);
             }
             return { totalWidth, maxHeight, sizes };
@@ -124,15 +135,20 @@ export const uiScaffold = createComponent<ScaffoldProps>(
         //Both fit, lay them out normally
         const width = leftSize.totalWidth + rightSize.totalWidth;
         const height = Math.max(leftSize.maxHeight, rightSize.maxHeight);
-        const betweenSize =
-            (leftButtons.length - 1 + rightButtons.length - 1) * spacing;
-        if (width + betweenSize <= constraints.width) {
+        // Add spacing between left and right groups if both exist
+        const betweenGroupSpacing =
+            leftButtons.length > 0 && rightButtons.length > 0 ? spacing : 0;
+        if (width + betweenGroupSpacing <= constraints.width) {
             let buttonX = 0;
             const left = leftButtons.map<PlacedChild>((button, index) => {
                 const buttonSize = leftSize.sizes[index];
                 const y = constraints.height - buttonSize.height;
                 const x = buttonX;
-                buttonX += buttonSize.width + spacing;
+                buttonX += buttonSize.width;
+                // Add spacing between buttons (but not after the last one)
+                if (index < leftButtons.length - 1) {
+                    buttonX += spacing;
+                }
                 return {
                     offset: { x, y },
                     size: buttonSize,
@@ -140,21 +156,30 @@ export const uiScaffold = createComponent<ScaffoldProps>(
                 };
             });
 
-            const mainButton: PlacedChild = Object.assign(rightButtons[0], {
-                offset: {
-                    x: constraints.width - rightSize.totalWidth - spacing,
-                    y: constraints.height - rightSize.sizes[0].height,
-                },
-                size: rightSize.sizes[0],
-            });
+            let children: PlacedChild[] = [...left];
 
-            const otherButton: PlacedChild = Object.assign(rightButtons[1], {
-                offset: {
-                    x: constraints.width - rightSize.sizes[1].width,
-                    y: constraints.height - rightSize.sizes[1].height,
-                },
-                size: rightSize.sizes[1],
-            });
+            // Add right buttons - maintain order but align to right
+            if (rightButtons.length > 0) {
+                let rightButtonX = constraints.width - rightSize.totalWidth;
+                const right = rightButtons.map<PlacedChild>((button, index) => {
+                    const buttonSize = rightSize.sizes[index];
+                    const y = constraints.height - buttonSize.height;
+                    const x = rightButtonX;
+                    rightButtonX += buttonSize.width;
+
+                    // Add spacing between buttons (but not after the last one)
+                    if (index < rightButtons.length - 1) {
+                        rightButtonX += spacing;
+                    }
+
+                    return {
+                        offset: { x, y },
+                        size: buttonSize,
+                        ...button,
+                    };
+                });
+                children.push(...right);
+            }
 
             const menu: PlacedChild[] = [];
             switch (menuState) {
@@ -169,7 +194,7 @@ export const uiScaffold = createComponent<ScaffoldProps>(
             }
 
             return {
-                children: [...left, ...menu, mainButton, otherButton],
+                children: [...children, ...menu],
                 size: { width, height },
             };
         } else {
