@@ -1,7 +1,7 @@
 import { allSides } from "../common/sides.js";
 import { AssetLoader } from "../module/asset/loader/assetLoader.js";
 import { sprites2 } from "../module/asset/sprite.js";
-import { ninePatchBackground } from "../module/ui/dsl/uiBackgroundDsl.js";
+import { ninePatchBackground } from "../module/ui/uiBackground.js";
 import { wrapUiSize, zeroSize } from "../module/ui/uiSize.js";
 import { Camera } from "../rendering/camera.js";
 import { Renderer } from "../rendering/renderer.js";

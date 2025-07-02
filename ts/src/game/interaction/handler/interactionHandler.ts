@@ -19,7 +19,6 @@ import {
 import { getTile, TileComponentId } from "../../component/tileComponent.js";
 import { Entity } from "../../entity/entity.js";
 import { SelectionState } from "../state/selection/selectionState.js";
-import { InteractionHandlerStatusbarPresenter } from "./interactionHandlerStatusbarPresenter.js";
 import { CommitableInteractionStateChanger } from "./interactionStateChanger.js";
 import { InteractionStateHistory } from "./interactionStateHistory.js";
 import { StateContext } from "./stateContext.js";
@@ -34,7 +33,6 @@ export class InteractionHandler {
     private interactionStateChanger: CommitableInteractionStateChanger;
     private history: InteractionStateHistory;
     private stateContext: StateContext;
-    private statusbar: InteractionHandlerStatusbarPresenter;
     private uiRenderer: UiRenderer;
     constructor(
         world: Entity,
@@ -42,14 +40,8 @@ export class InteractionHandler {
         assets: AssetLoader,
         time: GameTime,
         uiRenderer: UiRenderer,
-        visibilityChange: () => void,
+        _visibilityChange: () => void,
     ) {
-        this.statusbar = new InteractionHandlerStatusbarPresenter(
-            "state name",
-            () => {
-                visibilityChange();
-            },
-        );
         this.uiRenderer = uiRenderer;
         this.interactionStateChanger = new CommitableInteractionStateChanger();
         this.world = world;
@@ -65,16 +57,6 @@ export class InteractionHandler {
     }
 
     onTapDown(screenPoint: Point): boolean {
-        //Check for statusbar tap
-        const statusbarHandledTap = this.statusbar.rootView.dispatchUIEvent({
-            type: "tapStart",
-            position: screenPoint,
-        });
-
-        if (statusbarHandledTap) {
-            return true;
-        }
-
         // Try to dispatch to the declarative UI system
         const declarativeEvent = {
             type: "tapDown" as const,
@@ -113,21 +95,6 @@ export class InteractionHandler {
 
     onTapUp(tapUpEvent: OnTapEndEvent): void {
         const screenPoint = tapUpEvent.position;
-        this.statusbar.rootView.dispatchUIEvent({
-            type: "tapUp",
-            position: screenPoint,
-            startPosition: tapUpEvent.startPosition,
-        });
-
-        const statusbarTapResult = this.statusbar.rootView.dispatchUIEvent({
-            type: "tap",
-            position: screenPoint,
-            startPosition: tapUpEvent.startPosition,
-        });
-
-        if (statusbarTapResult) {
-            return;
-        }
 
         // Route events directly to declarative UI system
         const declarativeUpEvent = {
@@ -294,14 +261,7 @@ export class InteractionHandler {
 
         this.history.state.onDraw(renderScope);
         this.uiRenderer.renderComponent(this.history.state.getView());
-        if (this.history.size > 1) {
-            this.statusbar.rootView.layout(renderScope, {
-                width: renderScope.width,
-                height: renderScope.height,
-            });
-            this.statusbar.rootView.updateTransform();
-            this.statusbar.rootView.draw(renderScope);
-        }
+
         performance.mark("InteractionStateDrawEnd");
         performance.measure(
             "UI Drawing",

@@ -1,16 +1,12 @@
-import { Sprite2, sprites2 } from "../../asset/sprite.js";
 import { addPoint } from "../../../common/point.js";
-import { allSides } from "../../../common/sides.js";
-import { ninePatchBackground } from "../dsl/uiBackgroundDsl.js";
-import { UISize, wrapUiSize } from "../uiSize.js";
+import { Sprite2 } from "../../asset/sprite.js";
+import { UISize } from "../uiSize.js";
 import { OpenBookUIBackground } from "../visual/bookBackground.js";
 import {
     createComponent,
     type ComponentDescriptor,
     type PlacedChild,
 } from "./ui.js";
-import { uiButton } from "./uiButton.js";
-import { uiImage } from "./uiImage.js";
 
 export type UIBookLayoutTab = {
     icon: Sprite2;

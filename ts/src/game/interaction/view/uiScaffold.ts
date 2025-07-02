@@ -12,7 +12,7 @@ import {
     uiColumn,
 } from "../../../module/ui/declarative/uiSequence.js";
 import { uiText } from "../../../module/ui/declarative/uiText.js";
-import { ninePatchBackground } from "../../../module/ui/dsl/uiBackgroundDsl.js";
+import { ninePatchBackground } from "../../../module/ui/uiBackground.js";
 import {
     wrapUiSize,
     zeroSize,

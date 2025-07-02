@@ -12,9 +12,8 @@ import { InventoryComponentId } from "../../../../../component/inventoryComponen
 import { PlayerUnitComponentId } from "../../../../../component/playerUnitComponent.js";
 import { Entity } from "../../../../../entity/entity.js";
 import { StateContext } from "../../../../handler/stateContext.js";
-import { ButtonCollection } from "../../../../view/actionbar/buttonCollection.js";
-import { UIActionbarItem } from "../../../../view/actionbar/uiActionbar.js";
-import { CharacterSkillState } from "../../../character/characterSkillState.js";
+import { ButtonCollection } from "../../../../view/buttonCollection.js";
+import { UIActionbarItem } from "../../../../view/uiActionbar.js";
 import { AlertMessageState } from "../../../common/alertMessageState.js";
 import { InventoryState } from "../../../root/inventory/inventoryState.js";
 import { ActorMovementState } from "../actorMovementState.js";
@@ -117,7 +116,9 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
             {
                 text: "Skills",
                 onClick: () => {
-                    stateContext.stateChanger.push(new CharacterSkillState());
+                    stateContext.stateChanger.push(
+                        new AlertMessageState("Not implement", "no skills"),
+                    );
                 },
             },
             {

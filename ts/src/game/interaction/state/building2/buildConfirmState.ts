@@ -4,8 +4,6 @@ import { allSides } from "../../../../common/sides.js";
 import { Building } from "../../../../data/building/building.js";
 import { sprites2 } from "../../../../module/asset/sprite.js";
 import { GroundTile, TileSize } from "../../../../module/map/tile.js";
-import { uiBox } from "../../../../module/ui/dsl/uiBoxDsl.js";
-import { fillUiSize } from "../../../../module/ui/uiSize.js";
 import { RenderScope } from "../../../../rendering/renderScope.js";
 import { makeBuildBuildingAction } from "../../../action/world/buildingAction.js";
 import {
@@ -14,8 +12,7 @@ import {
 } from "../../../component/chunkMapComponent.js";
 import { getTile, TileComponentId } from "../../../component/tileComponent.js";
 import { InteractionState } from "../../handler/interactionState.js";
-import { UIActionbarItem } from "../../view/actionbar/uiActionbar.js";
-import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold.js";
+import { UIActionbarItem } from "../../view/uiActionbar.js";
 import { AlertMessageState } from "../common/alertMessageState.js";
 import { BuildingApplicabilityResult } from "./buildingApplicability.js";
 import { buildingApplicabilityList } from "./buildingApplicabilityList.js";
@@ -24,7 +21,6 @@ import { LineBuildMode } from "./mode/lineBuildMode.js";
 import { SingleBuildMode } from "./mode/singleBuildMode.js";
 
 export class BuildConfirmState extends InteractionState {
-    private scaffold: UIActionbarScaffold | null = null;
     private blinkScaffold = true;
     private buildMode: BuildMode;
     private selection: SelectedTile[] = [];
@@ -52,17 +48,6 @@ export class BuildConfirmState extends InteractionState {
         ];
 
         const actions: UIActionbarItem[] = this.getActionItems();
-        const contentView = uiBox({
-            width: fillUiSize,
-            height: fillUiSize,
-        });
-
-        const scaffold = new UIActionbarScaffold(contentView, actions, [], {
-            width: fillUiSize,
-            height: fillUiSize,
-        });
-        this.scaffold = scaffold;
-        //this.view = scaffold;
     }
 
     private getActionItems(): UIActionbarItem[] {
@@ -158,7 +143,7 @@ export class BuildConfirmState extends InteractionState {
 
     private changeBuildMode(mode: BuildMode) {
         this.buildMode = mode;
-        this.scaffold?.setLeftMenu(this.getActionItems());
+        // this.scaffold?.setLeftMenu(this.getActionItems());
     }
 
     private cancel() {

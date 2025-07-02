@@ -6,8 +6,8 @@ import { SelectedEntityItem } from "../../../../module/selection/selectedEntityI
 import { SelectedTileItem } from "../../../../module/selection/selectedTileItem.js";
 import { SelectedWorldItem } from "../../../../module/selection/selectedWorldItem.js";
 import { InteractionState } from "../../handler/interactionState.js";
-import { ButtonCollection } from "../../view/actionbar/buttonCollection.js";
-import { UIActionbarItem } from "../../view/actionbar/uiActionbar.js";
+import { ButtonCollection } from "../../view/buttonCollection.js";
+import { UIActionbarItem } from "../../view/uiActionbar.js";
 import { ActorSelectionProvider } from "./actor/provider/actorSelectionProvider.js";
 import { AttackSelectionProvider } from "./actor/provider/attackSelectionProvider.js";
 import { BlacksmithSelectionProvider } from "./actor/provider/blacksmithSelectionProvider.js";
@@ -31,7 +31,7 @@ import {
     titleTextStyle,
     subTitleTextStyle,
 } from "../../../../rendering/text/textStyle.js";
-import { uiScaffold } from "../../view2/uiScaffold.js";
+import { uiScaffold } from "../../view/uiScaffold.js";
 
 export class SelectionState extends InteractionState {
     private providers: ActorSelectionProvider[] = [
