@@ -1,14 +1,85 @@
+import { allSides } from "../../../../common/sides.js";
 import { sprites2 } from "../../../../module/asset/sprite.js";
-import { allSides, symmetricSides } from "../../../../common/sides.js";
 import { bookInkColor } from "../../../../module/ui/color.js";
+import {
+    createComponent,
+    type ComponentDescriptor,
+} from "../../../../module/ui/declarative/ui.js";
+import { uiBox } from "../../../../module/ui/declarative/uiBox.js";
+import { uiButton } from "../../../../module/ui/declarative/uiButton.js";
+import { uiColumn } from "../../../../module/ui/declarative/uiSequence.js";
+import { uiText } from "../../../../module/ui/declarative/uiText.js";
 import { ninePatchBackground } from "../../../../module/ui/dsl/uiBackgroundDsl.js";
-import { uiBox } from "../../../../module/ui/dsl/uiBoxDsl.js";
-import { uiButton } from "../../../../module/ui/dsl/uiButtonDsl.js";
-import { uiColumn } from "../../../../module/ui/dsl/uiColumnDsl.js";
-import { uiSpace } from "../../../../module/ui/dsl/uiSpaceDsl.js";
-import { uiText } from "../../../../module/ui/dsl/uiTextDsl.js";
 import { fillUiSize, wrapUiSize } from "../../../../module/ui/uiSize.js";
 import { InteractionState } from "../../handler/interactionState.js";
+
+type AlertMessageProps = {
+    title: string;
+    text: string;
+    onOkTap: () => void;
+};
+
+const alertMessage = createComponent<AlertMessageProps>(
+    ({ props }) => {
+        return uiBox({
+            width: fillUiSize,
+            height: fillUiSize,
+            child: uiBox({
+                width: 300,
+                height: wrapUiSize,
+                background: ninePatchBackground({
+                    sprite: sprites2.stone_slate_background,
+                    sides: allSides(16),
+                    scale: 4,
+                }),
+                padding: 16,
+                child: uiColumn({
+                    width: fillUiSize,
+                    height: wrapUiSize,
+                    gap: 16,
+                    children: [
+                        uiText({
+                            content: props.title,
+                            textStyle: {
+                                color: bookInkColor,
+                                font: "Silkscreen",
+                                size: 32,
+                            },
+                        }),
+                        uiText({
+                            content: props.text,
+                            textStyle: {
+                                color: bookInkColor,
+                                font: "Silkscreen",
+                                size: 20,
+                            },
+                        }),
+                        uiButton({
+                            width: fillUiSize,
+                            height: wrapUiSize,
+                            padding: 16,
+                            background: ninePatchBackground({
+                                sprite: sprites2.stone_slate_border,
+                                sides: allSides(6),
+                                scale: 4,
+                            }),
+                            onTap: props.onOkTap,
+                            child: uiText({
+                                content: "Ok",
+                                textStyle: {
+                                    color: bookInkColor,
+                                    font: "Silkscreen",
+                                    size: 20,
+                                },
+                            }),
+                        }),
+                    ],
+                }),
+            }),
+        });
+    },
+    { displayName: "AlertMessage" },
+);
 
 export class AlertMessageState extends InteractionState {
     override get stateName(): string {
@@ -20,99 +91,16 @@ export class AlertMessageState extends InteractionState {
         private text: string,
     ) {
         super();
+    }
 
-        const okButton = uiButton({
-            onTapCallback: () => {
+    override getView(): ComponentDescriptor | null {
+        return alertMessage({
+            title: this.title,
+            text: this.text,
+            onOkTap: () => {
                 this.context.stateChanger.pop(undefined);
             },
-            padding: allSides(16),
-            defaultBackground: ninePatchBackground({
-                sprite: sprites2.stone_slate_border,
-                sides: allSides(6),
-                scale: 4,
-            }),
-            onTappedBackground: ninePatchBackground({
-                sprite: sprites2.stone_slate_border_selected,
-                sides: allSides(6),
-                scale: 4,
-            }),
-            children: [
-                uiText({
-                    padding: symmetricSides(0, 8),
-                    text: "Ok",
-                    style: {
-                        color: bookInkColor,
-                        font: "Silkscreen",
-                        size: 20,
-                    },
-                    width: fillUiSize,
-                    height: wrapUiSize,
-                }),
-            ],
-            width: fillUiSize,
-            height: wrapUiSize,
         });
-
-        /*
-        this.view = uiBox({
-            width: fillUiSize,
-            height: fillUiSize,
-            children: [
-                uiBox({
-                    padding: allSides(16),
-                    width: 300,
-                    height: wrapUiSize,
-                    background: ninePatchBackground({
-                        sprite: sprites2.stone_slate_background,
-                        sides: allSides(16),
-                        scale: 4,
-                    }),
-                    children: [
-                        uiColumn({
-                            width: fillUiSize,
-                            height: wrapUiSize,
-                            children: [
-                                {
-                                    child: uiText({
-                                        padding: symmetricSides(0, 8),
-                                        text: this.title,
-                                        style: {
-                                            color: bookInkColor,
-                                            font: "Silkscreen",
-                                            size: 32,
-                                        },
-                                        width: fillUiSize,
-                                        height: wrapUiSize,
-                                    }),
-                                },
-                                {
-                                    child: uiText({
-                                        padding: symmetricSides(0, 8),
-                                        text: this.text,
-                                        style: {
-                                            color: bookInkColor,
-                                            font: "Silkscreen",
-                                            size: 20,
-                                        },
-                                        width: fillUiSize,
-                                        height: wrapUiSize,
-                                    }),
-                                },
-                                {
-                                    child: uiSpace({
-                                        width: 16,
-                                        height: 16,
-                                    }),
-                                },
-                                {
-                                    child: okButton,
-                                },
-                            ],
-                        }),
-                    ],
-                }),
-            ],
-        });*/
     }
 
     override get isModal(): boolean {

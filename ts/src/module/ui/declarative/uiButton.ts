@@ -42,9 +42,16 @@ export const uiButton = createComponent<UiButtonProps>(
                 constraintsWithPadding,
             );
 
+            // Center the child within the button
+            const centerX =
+                padding + (constraintsWithPadding.width - childSize.width) / 2;
+            const centerY =
+                padding +
+                (constraintsWithPadding.height - childSize.height) / 2;
+
             child = {
                 ...props.child,
-                offset: { x: padding, y: padding },
+                offset: { x: centerX, y: centerY },
             };
         }
 

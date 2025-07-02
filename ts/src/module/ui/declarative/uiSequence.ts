@@ -156,13 +156,22 @@ const _uiSequence = createComponent<SequenceProps>(
                     crossAxisOffset,
                 );
 
+                const childSize = createPosition(
+                    measuredChild.mainAxisSize,
+                    measuredChild.crossAxisSize,
+                );
+
                 currentMainAxisOffset += measuredChild.mainAxisSize;
                 // Add gap and alignment spacing *between* items
                 if (index < childCount - 1) {
                     currentMainAxisOffset += gap + alignmentSpacing;
                 }
 
-                return { ...measuredChild.descriptor, offset };
+                return {
+                    ...measuredChild.descriptor,
+                    offset,
+                    size: { width: childSize.x, height: childSize.y },
+                };
             },
         );
 

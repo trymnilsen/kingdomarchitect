@@ -84,7 +84,7 @@ export type UiNode = {
     measurementSlots?: Map<any, UiNode>;
 };
 
-export type PlacedChild = ComponentDescriptor & { offset: Point };
+export type PlacedChild = ComponentDescriptor & { offset: Point; size: UISize };
 
 export type LayoutResult = {
     size: UISize;
@@ -126,11 +126,6 @@ export type ComponentDescriptor<P extends {} = any> = {
 // ===================================================================
 // 3. THE UNIFIED COMPONENT FACTORY (Unchanged)
 // ===================================================================
-
-/**
- * A type representing an object that must be empty (no properties).
- */
-type EmptyObject = Record<PropertyKey, never>;
 
 /**
  * This is the type of the function returned by createUiComponent.
@@ -377,19 +372,16 @@ export class UiRenderer {
                 }
 
                 childNode.layout.offset = placedChild.offset;
-                //TODO: Take our uIBookLayout, it will use MeasureDescriptor
-                //and correctly measure and place the left and right side. But
-                //size there is no size being provided on placedChild they are
-                //again measured here when we execute the node with the size of
-                //the child, not any size they got from a measure call. So they
-                //would say "im fill parent" and then get these copiedConstraints.
-                //how should we handle a case like this where a component has
-                //calculated custom constraints for its children. Should this
-                //be the responsibility of measure or something on PlacedChild?
-                //probably on placedChild as there is not connection between the
-                //"created" node in measureChild and the executed one outside of
-                //a layout pass
-                this._executeNode(childNode, copiedConstraints, false);
+                // When a parent layout calculates a child's size during the
+                // measure pass, that size must be preserved. Previously, the
+                // calculated size on placedChild was discarded after a
+                // measureDescriptor call. This caused the child to be incorrectly
+                // re-measured during the layout pass based on its own properties
+                // (e.g., "fill parent") instead of the dimensions determined by
+                // its parent. The fix was to add a size property to placedChild.
+                // This size is now applied to the childNode during layout,
+                // ensuring custom dimensions from a parent layout are always respected.
+                this._executeNode(childNode, { ...placedChild.size }, false);
             }
 
             node.layout = {
@@ -486,24 +478,6 @@ export class UiRenderer {
         }
 
         return newChildren;
-    }
-
-    private _updateTransform(node: UiNode, parentAbsoluteOffset: Point) {
-        if (!node.layout) return;
-
-        const absoluteOffset = {
-            x: parentAbsoluteOffset.x + node.layout.offset.x,
-            y: parentAbsoluteOffset.y + node.layout.offset.y,
-        };
-
-        node.layout.region.x = absoluteOffset.x;
-        node.layout.region.y = absoluteOffset.y;
-        node.layout.region.width = node.layout.region.width ?? 0;
-        node.layout.region.height = node.layout.region.height ?? 0;
-
-        for (const child of node.children) {
-            this._updateTransform(child, absoluteOffset);
-        }
     }
 
     private _performDraw(node: UiNode, parentPosition: Point) {

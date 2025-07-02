@@ -27,6 +27,7 @@
         "@types/node": "^24.0.3",
         "@types/pngjs": "^6.0.5",
         "maxrects-packer": "^2.7.3",
+        "oxlint": "^1.5.0",
         "pngjs": "^7.0.0",
         "prettier": "^3.5.3",
         "rolldown": "^1.0.0-beta.19",

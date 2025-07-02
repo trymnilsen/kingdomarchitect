@@ -88,6 +88,7 @@ export const uiBookLayout = createComponent<UiBookLayoutProps>(
             : { width: 0, height: 0 };
 
         // Measure tabs if they exist
+        /*
         let tabsSize = { width: 0, height: 0 };
         if (props.tabs && props.tabs.length > 0) {
             const tabsDescriptor = createTabsComponent(props.tabs);
@@ -96,7 +97,7 @@ export const uiBookLayout = createComponent<UiBookLayoutProps>(
                 tabsDescriptor,
                 { width: 100, height: 300 }, // Reasonable constraints for tabs
             );
-        }
+        }*/
 
         // Calculate book position to center it in the container
         const bookContainerWidth = bookWidth + horizontalPadding * 2;
@@ -136,6 +137,7 @@ export const uiBookLayout = createComponent<UiBookLayoutProps>(
                     x: centerX + horizontalPadding + 16, // 16px page margin
                     y: centerY + verticalPadding + 16,
                 },
+                size: leftPageSize,
             });
         }
 
@@ -152,9 +154,10 @@ export const uiBookLayout = createComponent<UiBookLayoutProps>(
                         16,
                     y: centerY + verticalPadding + 16,
                 },
+                size: rightPageSize,
             });
         }
-
+        /*
         // Add tabs positioned as actual book tabs on the left side
         if (props.tabs && props.tabs.length > 0) {
             children.push({
@@ -164,7 +167,7 @@ export const uiBookLayout = createComponent<UiBookLayoutProps>(
                     y: centerY + verticalPadding + 60, // Offset from top
                 },
             });
-        }
+        }*/
 
         return {
             size: {
@@ -178,6 +181,7 @@ export const uiBookLayout = createComponent<UiBookLayoutProps>(
 );
 
 // Helper function to create tabs component
+/*
 function createTabsComponent(tabs: UIBookLayoutTab[]): ComponentDescriptor {
     return createComponent<{}>(() => {
         const tabChildren: PlacedChild[] = [];
@@ -222,4 +226,4 @@ function createTabsComponent(tabs: UIBookLayoutTab[]): ComponentDescriptor {
             children: tabChildren,
         };
     })();
-}
+}*/
