@@ -6,6 +6,7 @@ import {
     type PlacedChild,
 } from "../../../module/ui/declarative/ui.js";
 import { uiBox } from "../../../module/ui/declarative/uiBox.js";
+import { uiImage } from "../../../module/ui/declarative/uiImage.js";
 import {
     CrossAxisAlignment,
     uiColumn,
@@ -20,18 +21,20 @@ import {
 import { actionbarTextStyle } from "../../../rendering/text/textStyle.js";
 
 type UiButtonProps = {
-    label: string;
-    onClick: () => void;
+    text: string;
+    onClick?: () => void;
+    icon?: import("../../../module/asset/sprite.js").Sprite2;
 };
 
 const uiMenuButton = createComponent<UiButtonProps>(
     ({ props, withGesture }) => {
-        withGesture("tap", (_event) => {
-            console.log(`Menu button tapped: ${props.label}`);
-            props.onClick();
-            // Handle the tap event, e.g., open a menu or perform an action
-            return true; // Indicate that the event was handled
-        });
+        if (props.onClick) {
+            withGesture("tap", (_event) => {
+                console.log(`Menu button tapped: ${props.text}`);
+                props.onClick?.();
+                return true;
+            });
+        }
         return uiColumn({
             width: wrapUiSize,
             height: wrapUiSize,
@@ -44,6 +47,13 @@ const uiMenuButton = createComponent<UiButtonProps>(
                         sprite: sprites2.stone_slate_background_2x,
                         sides: allSides(8),
                     }),
+                    child: props.icon
+                        ? uiImage({
+                              sprite: props.icon,
+                              width: 32,
+                              height: 32,
+                          })
+                        : undefined,
                 }),
                 uiBox({
                     width: wrapUiSize,
@@ -51,7 +61,7 @@ const uiMenuButton = createComponent<UiButtonProps>(
                     padding: 8,
                     child: uiText({
                         textStyle: actionbarTextStyle,
-                        content: props.label,
+                        content: props.text,
                     }),
                     background: ninePatchBackground({
                         sprite: sprites2.book_border,
@@ -64,8 +74,9 @@ const uiMenuButton = createComponent<UiButtonProps>(
 );
 
 type ScaffoldButton = {
-    label: string;
-    onClick: () => void;
+    text: string;
+    onClick?: () => void;
+    icon?: import("../../../module/asset/sprite.js").Sprite2;
 };
 
 enum MenuState {
@@ -86,6 +97,7 @@ const spacing = 8;
 type ScaffoldProps = {
     leftButtons?: ScaffoldButton[];
     rightButtons?: ScaffoldButton[];
+    content?: ComponentDescriptor;
 };
 
 export const uiScaffold = createComponent<ScaffoldProps>(
@@ -93,14 +105,22 @@ export const uiScaffold = createComponent<ScaffoldProps>(
         withEffect(() => {
             console.log("mounted");
         });
-        const [menuState, _setMenuState] = withState(MenuState.closed);
+        const [_menuState, _setMenuState] = withState(MenuState.closed);
 
         // Use props or defaults if not provided
         const leftButtons = (props.leftButtons || []).map((button) =>
-            uiMenuButton({ label: button.label, onClick: button.onClick }),
+            uiMenuButton({
+                text: button.text,
+                onClick: button.onClick,
+                icon: button.icon,
+            }),
         );
         const rightButtons = (props.rightButtons || []).map((button) =>
-            uiMenuButton({ label: button.label, onClick: button.onClick }),
+            uiMenuButton({
+                text: button.text,
+                onClick: button.onClick,
+                icon: button.icon,
+            }),
         );
 
         const measureButtons = (
@@ -181,23 +201,54 @@ export const uiScaffold = createComponent<ScaffoldProps>(
                 children.push(...right);
             }
 
-            const menu: PlacedChild[] = [];
-            switch (menuState) {
-                case MenuState.left:
-                    break;
-                case MenuState.main:
-                    break;
-                case MenuState.other:
-                    break;
-                default:
-                    break;
+            // Add content if provided - should fill the space above the buttons
+            if (props.content) {
+                const contentHeight = constraints.height - height - spacing;
+                const contentConstraints = {
+                    width: constraints.width,
+                    height: Math.max(0, contentHeight),
+                };
+
+                const contentSize = measureDescriptor(
+                    "content",
+                    props.content,
+                    contentConstraints,
+                );
+
+                children.push({
+                    offset: { x: 0, y: 0 },
+                    size: contentSize,
+                    ...props.content,
+                });
             }
 
             return {
-                children: [...children, ...menu],
-                size: { width, height },
+                children: children,
+                size: { width: constraints.width, height: constraints.height },
             };
         } else {
+            // Not enough space for buttons, just show content if available
+            if (props.content) {
+                const contentSize = measureDescriptor(
+                    "content",
+                    props.content,
+                    constraints,
+                );
+
+                return {
+                    children: [
+                        {
+                            offset: { x: 0, y: 0 },
+                            size: contentSize,
+                            ...props.content,
+                        },
+                    ],
+                    size: {
+                        width: constraints.width,
+                        height: constraints.height,
+                    },
+                };
+            }
             return { children: [], size: zeroSize() };
         }
     },
