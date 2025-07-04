@@ -4,7 +4,7 @@
 
 import { nameof } from "../../../common/nameof.js";
 import { addPoint } from "../../../common/point.js";
-import { fillUiSize, zeroSize } from "../uiSize.js";
+import { fillUiSize, wrapUiSize, zeroSize } from "../uiSize.js";
 import type { RenderScope } from "../../../rendering/renderScope.js";
 import type { TextStyle } from "../../../rendering/text/textStyle.js";
 import { uiBox } from "./uiBox.js";
@@ -404,11 +404,31 @@ export class UiRenderer {
                 copiedConstraints,
                 false,
             );
+
+            const width = delegateChild.descriptor.props.width;
+            const height = delegateChild.descriptor.props.heigt;
+
+            const size = {
+                width: delegateSize.width,
+                height: delegateSize.height,
+            };
+            if (width >= 0) {
+                size.width = width;
+            } else if (width == fillUiSize) {
+                size.width = copiedConstraints.width;
+            }
+
+            if (height >= 0) {
+                size.height = height;
+            } else if (height == fillUiSize) {
+                size.height = copiedConstraints.height;
+            }
+
             node.layout = {
                 offset: node.layout?.offset ?? zeroPoint(),
-                region: { ...zeroPoint(), ...delegateSize },
+                region: { x: 0, y: 0, width: size.width, height: size.height },
             };
-            return delegateSize;
+            return size;
         }
     }
 

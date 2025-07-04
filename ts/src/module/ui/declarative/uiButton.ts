@@ -1,5 +1,10 @@
 import type { UIBackground } from "../uiBackground.js";
-import { createComponent, type ComponentDescriptor } from "./ui.js";
+import { zeroSize } from "../uiSize.js";
+import {
+    createComponent,
+    type ComponentDescriptor,
+    type PlacedChild,
+} from "./ui.js";
 
 export type UiButtonProps = {
     child?: ComponentDescriptor;
@@ -34,7 +39,7 @@ export const uiButton = createComponent<UiButtonProps>(
             height: constraints.height - padding * 2,
         };
 
-        let child;
+        let child: PlacedChild | undefined;
         if (props.child) {
             const childSize = measureDescriptor(
                 "child",
@@ -52,12 +57,13 @@ export const uiButton = createComponent<UiButtonProps>(
             child = {
                 ...props.child,
                 offset: { x: centerX, y: centerY },
+                size: childSize,
             };
         }
 
         return {
             children: child ? [child] : [],
-            size,
+            size: child ? child.size : zeroSize(),
         };
     },
     { displayName: "UiButton" },
