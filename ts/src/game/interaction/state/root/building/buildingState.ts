@@ -23,7 +23,10 @@ import { uiImage } from "../../../../../module/ui/declarative/uiImage.js";
 import { uiSpace } from "../../../../../module/ui/declarative/uiSpace.js";
 import { uiText } from "../../../../../module/ui/declarative/uiText.js";
 import { fillUiSize, wrapUiSize } from "../../../../../module/ui/uiSize.js";
-import { ninePatchBackground } from "../../../../../module/ui/uiBackground.js";
+import {
+    colorBackground,
+    ninePatchBackground,
+} from "../../../../../module/ui/uiBackground.js";
 
 // Declarative UI building components
 const bookTextStyle = {
@@ -55,7 +58,7 @@ const buildingListItem = createComponent<{
     return uiButton({
         width: fillUiSize,
         height: wrapUiSize,
-        padding: 16,
+        padding: 0,
         background: ninePatchBackground({
             sprite: sprites2.book_grid_item,
             sides: allSides(8),
@@ -146,7 +149,8 @@ const buildingMasterView = createComponent<{
     return uiBox({
         width: fillUiSize,
         height: fillUiSize,
-        padding: 32,
+        padding: 0,
+        background: colorBackground("red"),
         child: uiColumn({
             width: fillUiSize,
             height: fillUiSize,
