@@ -19,7 +19,7 @@
       "resolveJsonModule": true,
       "rootDir": "./ts",
       "sourceMap": true,
-      "noEmit": true,
+      //"noEmit": true,
       "strictFunctionTypes": true,
       "strictNullChecks": true,
       "strictPropertyInitialization": true,
