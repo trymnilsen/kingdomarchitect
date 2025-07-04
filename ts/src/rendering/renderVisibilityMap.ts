@@ -1,5 +1,3 @@
-import { Point } from "../common/point.js";
-
 export class RenderVisibilityMap {
     private _useVisibility = false;
 

@@ -9,9 +9,7 @@ import {
 } from "../component/chunkMapComponent.js";
 import type { Entity } from "../entity/entity.js";
 import type {
-    ComponentsUpdatedEvent,
     EntityChildrenUpdatedEvent,
-    EntityEvent,
     EntityTransformEvent,
 } from "../entity/entityEvent.js";
 

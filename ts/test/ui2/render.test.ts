@@ -1,3 +1,4 @@
+// oxlint-disable no-empty-file
 /*
 import { describe, expect, test } from "vitest";
 import { UiRenderer } from "../../src/module/ui/declarative/render.js";

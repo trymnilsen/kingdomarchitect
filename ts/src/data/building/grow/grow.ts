@@ -1,5 +1,4 @@
 import { sprites2 } from "../../../module/asset/sprite.js";
-import { Building } from "./../building.js";
 
 export const farm = {
     id: "farm",

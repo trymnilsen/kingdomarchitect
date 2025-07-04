@@ -1,17 +1,9 @@
-import type { ActionDispatcher } from "../../../module/action/actionDispatcher.js";
 import type {
     AddEntityMessage,
     GameServerMessage,
     TransformMessage,
 } from "../../../server/gameServerMessageBus.js";
-import { ChunkMapComponent } from "../../component/chunkMapComponent.js";
 import type { Components } from "../../component/component.js";
-import { InventoryComponent } from "../../component/inventoryComponent.js";
-import { JobRunnerComponent } from "../../component/jobRunnerComponent.js";
-import { PlayerUnitComponent } from "../../component/playerUnitComponent.js";
-import { ResourceComponent } from "../../component/resourceComponent.js";
-import { SpriteComponent } from "../../component/spriteComponent.js";
-import { TileComponent } from "../../component/tileComponent.js";
 import { Entity } from "../../entity/entity.js";
 
 export function handleGameMessage(message: GameServerMessage, root: Entity) {

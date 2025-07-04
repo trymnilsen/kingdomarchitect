@@ -1,6 +1,5 @@
 import { removeItem } from "../../common/array.js";
 import type { Bounds } from "../../common/bounds.js";
-import { getConstructorName } from "../../common/constructor.js";
 import { InvalidArgumentError } from "../../common/error/invalidArgumentError.js";
 import {
     addPoint,

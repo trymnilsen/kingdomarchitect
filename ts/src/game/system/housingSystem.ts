@@ -1,12 +1,4 @@
-import { arrayToOject, randomEntry, removeItem } from "../../common/array.js";
-import type { ConstructorFunction } from "../../common/constructor.js";
-import { generateId } from "../../common/idGenerator.js";
-import type { ReadableSet } from "../../common/structure/sparseSet.js";
-import { woodenHouse } from "../../data/building/wood/house.js";
-import type { EcsSystem } from "../../module/ecs/ecsSystem.js";
-import type { EcsWorld } from "../../module/ecs/ecsWorld.js";
-import { Entity, type EntityId } from "../entity/entity.js";
-
+// oxlint-disable no-empty-file
 //TODO: Make a housing component and re-implement
 /*
 export const housingSystem: EcsSystem = {

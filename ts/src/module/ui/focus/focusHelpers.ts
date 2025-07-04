@@ -4,12 +4,10 @@ import {
     boundsContains,
     boundsOverlap,
     getCorners,
-    sizeOfBounds,
 } from "../../../common/bounds.js";
 import { Direction, invertDirection } from "../../../common/direction.js";
 import { InvalidArgumentError } from "../../../common/error/invalidArgumentError.js";
 import {
-    addPoint,
     closestPointOnLine,
     manhattanDistance,
     Point,

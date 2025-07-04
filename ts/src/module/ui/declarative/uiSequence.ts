@@ -1,5 +1,5 @@
-import { zeroPoint, type Point } from "../../../common/point.js";
-import { fillUiSize, wrapUiSize, zeroSize, type UISize } from "../uiSize.js";
+import { type Point } from "../../../common/point.js";
+import { fillUiSize, wrapUiSize, type UISize } from "../uiSize.js";
 import {
     createComponent,
     PlacedChild,

@@ -4,9 +4,9 @@
 
 import { nameof } from "../../../common/nameof.js";
 import { addPoint } from "../../../common/point.js";
-import { fillUiSize, wrapUiSize, zeroSize } from "../uiSize.js";
 import type { RenderScope } from "../../../rendering/renderScope.js";
 import type { TextStyle } from "../../../rendering/text/textStyle.js";
+import { fillUiSize, zeroSize } from "../uiSize.js";
 import { uiBox } from "./uiBox.js";
 
 export type Point = { x: number; y: number };

@@ -1,4 +1,3 @@
-import { AssetLoader } from "./module/asset/loader/assetLoader.js";
 import { Game } from "./game/game.js";
 
 const canvasElementId = "gameCanvas";

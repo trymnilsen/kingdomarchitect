@@ -1,8 +1,5 @@
 import { addPoint, pointEquals, type Point } from "../../common/point.js";
-import {
-    PathfindingGraphComponent,
-    PathfindingGraphComponentId,
-} from "../../game/component/pathfindingGraphComponent.js";
+import { PathfindingGraphComponentId } from "../../game/component/pathfindingGraphComponent.js";
 import type { Entity } from "../../game/entity/entity.js";
 import type { GraphNode } from "../path/graph/graph.js";
 import { aStarSearch, type SearchedNode } from "../path/search.js";

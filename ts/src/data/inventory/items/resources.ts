@@ -1,5 +1,5 @@
 import { sprites2 } from "../../../module/asset/sprite.js";
-import { InventoryItem, ItemCategory, ItemTag } from "./../inventoryItem.js";
+import { ItemTag } from "./../inventoryItem.js";
 
 export const woodResourceItem = {
     asset: sprites2.wood_resource,

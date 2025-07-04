@@ -1,8 +1,4 @@
-import { PathfindingGraphComponent } from "../../game/component/pathfindingGraphComponent.js";
-import {
-    createTileComponent,
-    TileComponent,
-} from "../../game/component/tileComponent.js";
+import { createTileComponent } from "../../game/component/tileComponent.js";
 import { Entity } from "../../game/entity/entity.js";
 import {
     EntityEventType,

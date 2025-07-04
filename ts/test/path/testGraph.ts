@@ -1,9 +1,8 @@
-import { describe, it } from "node:test";
 import assert from "node:assert";
 import * as path from "path";
 import { Point, pointEquals, zeroPoint } from "../../src/common/point.js";
-import { getPixelColor, readPng } from "../../tool/spritepack/pngHelper.js";
 import { FixedGraph } from "../../src/module/path/graph/fixedGraph.js";
+import { getPixelColor, readPng } from "../../tool/spritepack/pngHelper.js";
 
 /**
  * Create an empty graph with the given size for testing. The graph will be

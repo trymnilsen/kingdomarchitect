@@ -1,6 +1,5 @@
 import type { EcsSystem } from "../../module/ecs/ecsSystem.js";
 import { createLazyGraphFromRootNode } from "../../module/path/graph/generateGraph.js";
-import { LazyGraph } from "../../module/path/graph/lazyGraph.js";
 import { PathCache } from "../../module/path/pathCache.js";
 import {
     PathfindingGraphComponent,

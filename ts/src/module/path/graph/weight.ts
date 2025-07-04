@@ -7,7 +7,6 @@ import { ResourceComponentId } from "../../../game/component/resourceComponent.j
 import {
     getTile,
     TileComponentId,
-    type TileComponent,
 } from "../../../game/component/tileComponent.js";
 import type { Entity } from "../../../game/entity/entity.js";
 

@@ -1,5 +1,4 @@
 import type { EntityAction } from "../../../../module/action/entityAction.js";
-import { generateChunk } from "../../../../module/map/chunkGenerator.js";
 import { setChunk, TileComponentId } from "../../../component/tileComponent.js";
 import type { Entity } from "../../../entity/entity.js";
 import { setTilesId, type SetTilesAction } from "../../world/setTilesAction.js";

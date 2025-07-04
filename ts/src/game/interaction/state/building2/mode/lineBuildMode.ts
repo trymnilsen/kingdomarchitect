@@ -1,8 +1,4 @@
-import {
-    Point,
-    manhattanPath,
-    pointEquals,
-} from "../../../../../common/point.js";
+import { Point, manhattanPath } from "../../../../../common/point.js";
 import { BuildMode, BuildModeDescription } from "./buildMode.js";
 
 export class LineBuildMode implements BuildMode {

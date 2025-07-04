@@ -1,4 +1,4 @@
-import { adjacentPoints, Point } from "../../../../../common/point.js";
+import { Point } from "../../../../../common/point.js";
 import { Entity } from "../../../../entity/entity.js";
 import { BuildingApplicability } from "../buildingApplicability.js";
 

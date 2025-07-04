@@ -6,7 +6,6 @@ import {
 import { getWeightAtPoint } from "../../module/path/graph/weight.js";
 import { PathResultStatus, queryPath } from "../../module/query/pathQuery.js";
 import { JobRunnerComponentId } from "../component/jobRunnerComponent.js";
-import type { Entity } from "../entity/entity.js";
 import { completeJob, type Job, type JobHandler } from "./job.js";
 
 export interface MoveToJob extends Job {
