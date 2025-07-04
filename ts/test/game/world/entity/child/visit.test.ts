@@ -1,4 +1,5 @@
-import { describe, it, expect } from "vitest";
+import { describe, it } from "node:test";
+import assert from "node:assert";
 import { Entity } from "../../../../../src/game/entity/entity.js";
 import { visitChildren } from "../../../../../src/game/entity/child/visit.js";
 
@@ -26,8 +27,7 @@ describe("visitChildren", () => {
             ids.push(entity.id);
             return false;
         });
-
-        expect(ids).deep.equal([
+        const expected = [
             "root",
             "parent1",
             "parent2",
@@ -36,7 +36,8 @@ describe("visitChildren", () => {
             "child3",
             "grandchild1",
             "grandchild2",
-        ]);
+        ];
+        assert.deepStrictEqual(ids, expected);
     });
 
     it("Will stop visiting on true", () => {
@@ -52,7 +53,6 @@ describe("visitChildren", () => {
             ids.push(entity.id);
             return true;
         });
-
-        expect(ids).deep.equal(["root"]);
+        assert.deepStrictEqual(ids, ["root"]);
     });
 });

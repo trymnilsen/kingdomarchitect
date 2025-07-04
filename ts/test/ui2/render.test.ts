@@ -102,7 +102,7 @@ describe("renderer", () => {
         const renderer = new UiRenderer();
         renderer.renderComponent(root());
         renderer.renderComponent(root());
-        expect(5).toBe(5);
+        assert.strictEqual(5, 5);
     });
 
     test("launchedEffect", () => {
@@ -111,6 +111,6 @@ describe("renderer", () => {
         renderer.renderComponent(launchedEffect1());
         renderer.renderComponent(launchedEffect2());
         renderer.renderComponent(launchedEffect1());
-        expect(5).toBe(5);
+        assert.strictEqual(5, 5);
     });
 });*/

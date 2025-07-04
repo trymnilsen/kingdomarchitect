@@ -1,4 +1,5 @@
-import { describe, it, expect } from "vitest";
+import { describe, it } from "node:test";
+import assert from "node:assert";
 import {
     NumberRange,
     rangeDistance,
@@ -12,8 +13,8 @@ describe("Range", () => {
             max: 20,
         };
         const randomValue = rangeRandom(range);
-        expect(randomValue >= range.min).toBe(true);
-        expect(randomValue <= range.max).toBe(true);
+        assert.strictEqual(randomValue >= range.min, true);
+        assert.strictEqual(randomValue <= range.max, true);
     });
 
     it("can calculate distance of range", () => {
@@ -22,6 +23,6 @@ describe("Range", () => {
             max: 20,
         };
         const distance = rangeDistance(range);
-        expect(distance).toBe(15);
+        assert.strictEqual(distance, 15);
     });
 });
