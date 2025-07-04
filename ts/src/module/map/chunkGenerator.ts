@@ -9,7 +9,6 @@ import { adjacentPoints, Point } from "../../common/point.js";
 import { makeSetTilesAction } from "../../game/action/world/setTilesAction.js";
 import {
     getChunk,
-    TileComponent,
     TileComponentId,
 } from "../../game/component/tileComponent.js";
 import { Entity } from "../../game/entity/entity.js";

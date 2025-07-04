@@ -1,6 +1,5 @@
-import { describe, it } from "node:test";
 import assert from "node:assert";
-import { RequireError } from "../../../src/common/error/requireError.js";
+import { describe, it } from "node:test";
 import { Entity } from "../../../src/game/entity/entity.js";
 
 describe("Entity", () => {

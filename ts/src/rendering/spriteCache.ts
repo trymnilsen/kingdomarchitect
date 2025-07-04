@@ -1,4 +1,3 @@
-import { BitmapImage } from "../../tool/bitmapImage.js";
 import { SpriteConfiguration } from "./items/sprite.js";
 
 export class SpriteCache {

@@ -12,7 +12,7 @@
         "build:tsc": "tsc",
         "serve": "node ts/tool/dev-server.ts",
         "spritepack": "tsc && node build/tool/spritepack/spritePack.js && npm run build",
-        "test": "vitest --run --reporter=dot",
+        "test": "tsc && node --test --test-reporter=dot 'build/**/*.test.js'",
         "format": "prettier ts/ --write",
         "check-format": "prettier --check ts/**/*.ts"
     },
@@ -27,7 +27,6 @@
         "@types/node": "^24.0.3",
         "@types/pngjs": "^6.0.5",
         "maxrects-packer": "^2.7.3",
-        "oxlint": "^1.5.0",
         "pngjs": "^7.0.0",
         "prettier": "^3.5.3",
         "rolldown": "^1.0.0-beta.19",

@@ -1,7 +1,6 @@
 import type { ActionDispatcher } from "../../../../module/action/actionDispatcher.js";
 import type { EntityAction } from "../../../../module/action/entityAction.js";
 import type { Entity } from "../../../entity/entity.js";
-import { unlockChunkId } from "../../world/unlockChunkAction.js";
 import { actorDispatcher } from "../common/actorDispatcher.js";
 import { clientWorldDispatcher } from "./clientWorldDispatcher.js";
 

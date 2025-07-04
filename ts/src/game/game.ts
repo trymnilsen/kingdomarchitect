@@ -2,28 +2,25 @@ import { invert, multiplyPoint, Point } from "../common/point.js";
 import { AssetLoader } from "../module/asset/loader/assetLoader.js";
 
 import { GameTime } from "../common/time.js";
+import type { ActionDispatcher } from "../module/action/actionDispatcher.js";
+import type { EntityAction } from "../module/action/entityAction.js";
 import { EcsWorld } from "../module/ecs/ecsWorld.js";
 import { Input, InputEvent } from "../module/input/input.js";
 import { TouchInput } from "../module/input/touchInput.js";
-import { addInitialPlayerChunk } from "../module/map/player.js";
 import { TileSize } from "../module/map/tile.js";
+import { UiRenderer } from "../module/ui/declarative/ui.js";
 import { Camera } from "../rendering/camera.js";
 import { DrawMode } from "../rendering/drawMode.js";
 import { Renderer } from "../rendering/renderer.js";
 import { RenderVisibilityMap } from "../rendering/renderVisibilityMap.js";
-import { firstChildWhere } from "./entity/child/first.js";
-import { InteractionHandler } from "./interaction/handler/interactionHandler.js";
-import { chunkMapSystem } from "./system/chunkMapSystem.js";
-import { renderSystem } from "./system/renderSystem.js";
-import { worldGenerationSystem } from "./system/worldGenerationSystem.js";
 import { createClientDispatcher } from "./action/dispatcher/client/clientDispatcher.js";
-import type { ActionDispatcher } from "../module/action/actionDispatcher.js";
+import { handleGameMessage } from "./action/messages/gameMessageHandler.js";
 import { GameServerConnection } from "./connection/gameServerConnection.js";
 import { WebworkerServerConnection } from "./connection/webworkerServerConnection.js";
-import { handleGameMessage } from "./action/messages/gameMessageHandler.js";
+import { InteractionHandler } from "./interaction/handler/interactionHandler.js";
+import { chunkMapSystem } from "./system/chunkMapSystem.js";
 import { pathfindingSystem } from "./system/pathfindingSystem.js";
-import type { EntityAction } from "../module/action/entityAction.js";
-import { UiRenderer } from "../module/ui/declarative/ui.js";
+import { renderSystem } from "./system/renderSystem.js";
 
 export class Game {
     private renderer: Renderer;

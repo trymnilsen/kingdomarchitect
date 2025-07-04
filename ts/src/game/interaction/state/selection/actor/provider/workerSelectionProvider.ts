@@ -1,6 +1,3 @@
-import { Effect } from "../../../../../../data/effect/effect.js";
-import { InventoryItem } from "../../../../../../data/inventory/inventoryItem.js";
-import { itemEffectFactoryList } from "../../../../../../data/inventory/itemEffectFactoryList.js";
 import { sprites2 } from "../../../../../../module/asset/sprite.js";
 import { SelectedEntityItem } from "../../../../../../module/selection/selectedEntityItem.js";
 import { SelectedWorldItem } from "../../../../../../module/selection/selectedWorldItem.js";

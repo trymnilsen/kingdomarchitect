@@ -1,7 +1,7 @@
 import { addPoint } from "../../../common/point.js";
 import { calculateAlignment, uiAlignment } from "../uiAlignment.js";
 import type { UIBackground } from "../uiBackground.js";
-import { wrapUiSize, zeroSize } from "../uiSize.js";
+import { wrapUiSize } from "../uiSize.js";
 import {
     createComponent,
     type ComponentDescriptor,

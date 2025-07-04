@@ -1,5 +1,4 @@
 import { ConstructorFunction, getConstructorName } from "../constructor.js";
-import { InvalidArgumentError } from "../error/invalidArgumentError.js";
 import { EventSubscriptionHandler } from "../event.js";
 
 /**
