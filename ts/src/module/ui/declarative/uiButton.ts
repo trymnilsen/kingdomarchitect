@@ -1,5 +1,5 @@
 import type { UIBackground } from "../uiBackground.js";
-import { zeroSize } from "../uiSize.js";
+import { wrapUiSize, zeroSize, type UISize } from "../uiSize.js";
 import {
     createComponent,
     type ComponentDescriptor,
@@ -31,12 +31,19 @@ export const uiButton = createComponent<UiButtonProps>(
             }
         });
 
-        let size = { width: props.width, height: props.height };
+        let size = { width: constraints.width, height: constraints.height };
+        if (props.width >= 0) {
+            size.width = props.width;
+        }
+        if (props.height >= 0) {
+            size.height = props.height;
+        }
+
         const padding = props.padding ?? 0;
 
         const constraintsWithPadding = {
-            width: constraints.width - padding * 2,
-            height: constraints.height - padding * 2,
+            width: Math.max(0, size.width - padding * 2),
+            height: Math.max(0, size.height - padding * 2),
         };
 
         let child: PlacedChild | undefined;
@@ -48,22 +55,32 @@ export const uiButton = createComponent<UiButtonProps>(
             );
 
             // Center the child within the button
-            const centerX =
-                padding + (constraintsWithPadding.width - childSize.width) / 2;
-            const centerY =
+            const centerX = Math.floor(
+                padding + (constraintsWithPadding.width - childSize.width) / 2,
+            );
+            const centerY = Math.floor(
                 padding +
-                (constraintsWithPadding.height - childSize.height) / 2;
+                    (constraintsWithPadding.height - childSize.height) / 2,
+            );
 
             child = {
                 ...props.child,
                 offset: { x: centerX, y: centerY },
                 size: childSize,
             };
+
+            if (props.width === wrapUiSize) {
+                size.width = childSize.width + padding * 2;
+            }
+
+            if (props.height === wrapUiSize) {
+                size.height = childSize.height + padding * 2;
+            }
         }
 
         return {
             children: child ? [child] : [],
-            size: child ? child.size : zeroSize(),
+            size: size,
         };
     },
     { displayName: "UiButton" },

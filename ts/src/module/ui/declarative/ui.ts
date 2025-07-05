@@ -47,7 +47,7 @@ const isLayoutResult = (
 };
 
 // Helper to compare dependency arrays for effects.
-const depsAreEqual = (a: any[] | undefined, b: any[] | undefined): boolean => {
+const _depsAreEqual = (a: any[] | undefined, b: any[] | undefined): boolean => {
     // If the identities are the same (e.g., both undefined), they are equal.
     if (a === b) {
         return true;
@@ -260,7 +260,6 @@ export class UiRenderer {
         isMeasurePass: boolean,
     ): UISize {
         const activeMeasureSlots = new Set<any>();
-        let hookIndex = 0; // Scoped to this execution run
         const copiedConstraints = { ...constraints };
 
         // Clear gestures array for this node to avoid accumulating handlers
@@ -270,77 +269,12 @@ export class UiRenderer {
             this.hooks.set(node, nodeHooks);
         }
 
-        const context: ComponentContext<any> = {
-            props: node.descriptor.props,
-            constraints: copiedConstraints,
-            withState: <T>(state: T) => {
-                return [state, () => {}];
-            },
-            withDraw: (drawFn) => {
-                if (isMeasurePass) return;
-                const nodeHooks = this.hooks.get(node) ?? { effects: [] };
-                nodeHooks.draw = drawFn;
-                this.hooks.set(node, nodeHooks);
-            },
-            withGesture: (eventType, handler, hitTest) => {
-                if (isMeasurePass) return;
-                const nodeHooks = this.hooks.get(node) ?? { effects: [] };
-                if (!nodeHooks.gestures) {
-                    nodeHooks.gestures = [];
-                }
-                nodeHooks.gestures.push({
-                    eventType,
-                    handler,
-                    hitTest,
-                });
-                this.hooks.set(node, nodeHooks);
-            },
-            withEffect: (effectFn, deps) => {
-                if (isMeasurePass) return; // Skip effects during measurement.
-
-                const currentHookIndex = hookIndex;
-                const nodeHooks = this.hooks.get(node) ?? { effects: [] };
-                if (!this.hooks.has(node)) {
-                    this.hooks.set(node, nodeHooks);
-                }
-
-                const oldEffectHook = nodeHooks.effects[currentHookIndex];
-
-                if (!oldEffectHook || !depsAreEqual(oldEffectHook.deps, deps)) {
-                    // Run cleanup for the previous effect if it exists.
-                    oldEffectHook?.cleanup?.();
-
-                    // Run the new effect and store its cleanup function.
-                    const cleanup = effectFn();
-                    nodeHooks.effects[currentHookIndex] = {
-                        deps,
-                        cleanup: cleanup ?? undefined,
-                    };
-                }
-                hookIndex++;
-            },
-            measureText: (text, style) => {
-                return this.renderScope.measureText(text, style);
-            },
-            measureDescriptor: (slotId, descriptor, measureConstraints) => {
-                activeMeasureSlots.add(slotId);
-                if (!node.measurementSlots) {
-                    node.measurementSlots = new Map();
-                }
-
-                const oldMeasureNode = node.measurementSlots.get(slotId);
-                const newMeasureNode = this._updateOrCreateNode(
-                    oldMeasureNode,
-                    descriptor,
-                );
-                node.measurementSlots.set(slotId, newMeasureNode);
-                return this._executeNode(
-                    newMeasureNode,
-                    measureConstraints,
-                    true,
-                );
-            },
-        };
+        const context = this._buildComponentContext(
+            node,
+            copiedConstraints,
+            isMeasurePass,
+            activeMeasureSlots,
+        );
 
         const renderOutput = node.descriptor.renderFn(context);
 
@@ -538,5 +472,88 @@ export class UiRenderer {
         }
 
         this.hooks.delete(node);
+    }
+
+    private _buildComponentContext(
+        node: UiNode,
+        constraints: UISize,
+        isMeasurePass: boolean,
+        activeMeasureSlots: Set<any>,
+    ): ComponentContext<any> {
+        let hookIndex = 0;
+
+        return {
+            props: node.descriptor.props,
+            constraints: constraints,
+            withState: <T>(state: T) => {
+                return [state, () => {}];
+            },
+            withDraw: (drawFn) => {
+                if (isMeasurePass) return;
+                const nodeHooks = this.hooks.get(node) ?? { effects: [] };
+                nodeHooks.draw = drawFn;
+                this.hooks.set(node, nodeHooks);
+            },
+            withGesture: (eventType, handler, hitTest) => {
+                if (isMeasurePass) return;
+                const nodeHooks = this.hooks.get(node) ?? { effects: [] };
+                if (!nodeHooks.gestures) {
+                    nodeHooks.gestures = [];
+                }
+                nodeHooks.gestures.push({
+                    eventType,
+                    handler,
+                    hitTest,
+                });
+                this.hooks.set(node, nodeHooks);
+            },
+            withEffect: (effectFn, deps) => {
+                if (isMeasurePass) return; // Skip effects during measurement.
+
+                const currentHookIndex = hookIndex++;
+                const nodeHooks = this.hooks.get(node) ?? { effects: [] };
+                if (!this.hooks.has(node)) {
+                    this.hooks.set(node, nodeHooks);
+                }
+
+                const oldEffectHook = nodeHooks.effects[currentHookIndex];
+
+                if (
+                    !oldEffectHook ||
+                    !_depsAreEqual(oldEffectHook.deps, deps)
+                ) {
+                    // Run cleanup for the previous effect if it exists.
+                    oldEffectHook?.cleanup?.();
+
+                    // Run the new effect and store its cleanup function.
+                    const cleanup = effectFn();
+                    nodeHooks.effects[currentHookIndex] = {
+                        deps,
+                        cleanup: cleanup ?? undefined,
+                    };
+                }
+            },
+            measureText: (text, style) => {
+                return this.renderScope.measureText(text, style);
+            },
+            measureDescriptor: (slotId, descriptor, measureConstraints) => {
+                activeMeasureSlots.add(slotId);
+                if (!node.measurementSlots) {
+                    node.measurementSlots = new Map();
+                }
+
+                const oldMeasureNode = node.measurementSlots.get(slotId);
+                const newMeasureNode = this._updateOrCreateNode(
+                    oldMeasureNode,
+                    descriptor,
+                );
+                node.measurementSlots.set(slotId, newMeasureNode);
+                return this._executeNode(
+                    newMeasureNode,
+                    measureConstraints,
+                    true,
+                );
+            },
+        };
     }
 }

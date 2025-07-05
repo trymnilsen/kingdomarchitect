@@ -58,7 +58,7 @@ const buildingListItem = createComponent<{
     return uiButton({
         width: fillUiSize,
         height: wrapUiSize,
-        padding: 0,
+        padding: 8,
         background: ninePatchBackground({
             sprite: sprites2.book_grid_item,
             sides: allSides(8),
