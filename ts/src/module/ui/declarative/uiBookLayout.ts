@@ -1,5 +1,7 @@
 import { addPoint } from "../../../common/point.js";
-import { Sprite2 } from "../../asset/sprite.js";
+import { allSides } from "../../../common/sides.js";
+import { Sprite2, sprites2 } from "../../asset/sprite.js";
+import { ninePatchBackground } from "../uiBackground.js";
 import { UISize } from "../uiSize.js";
 import { OpenBookUIBackground } from "../visual/bookBackground.js";
 import {
@@ -7,6 +9,8 @@ import {
     type ComponentDescriptor,
     type PlacedChild,
 } from "./ui.js";
+import { uiButton } from "./uiButton.js";
+import { uiImage } from "./uiImage.js";
 
 export type UIBookLayoutTab = {
     icon: Sprite2;
@@ -70,7 +74,7 @@ export const uiBookLayout = createComponent<UiBookLayoutProps>(
         }
 
         const pageConstraints: UISize = {
-            width: pageWidth - 32, // Account for page margins
+            width: pageWidth - 40, // Account for page margins
             height: pageHeight - 32,
         };
 
@@ -84,16 +88,16 @@ export const uiBookLayout = createComponent<UiBookLayoutProps>(
             : { width: 0, height: 0 };
 
         // Measure tabs if they exist
-        /*
         let tabsSize = { width: 0, height: 0 };
+        let tabDescriptor: ComponentDescriptor | undefined;
         if (props.tabs && props.tabs.length > 0) {
-            const tabsDescriptor = createTabsComponent(props.tabs);
+            tabDescriptor = createTabsComponent(props.tabs);
             tabsSize = measureDescriptor(
                 "tabs",
-                tabsDescriptor,
+                tabDescriptor,
                 { width: 100, height: 300 }, // Reasonable constraints for tabs
             );
-        }*/
+        }
 
         // Calculate book position to center it in the container
         const bookContainerWidth = bookWidth + horizontalPadding * 2;
@@ -130,7 +134,7 @@ export const uiBookLayout = createComponent<UiBookLayoutProps>(
             children.push({
                 ...props.leftPage,
                 offset: {
-                    x: centerX + horizontalPadding + 16, // 16px page margin
+                    x: centerX + horizontalPadding + 28, // 16px page margin
                     y: centerY + verticalPadding + 16,
                 },
                 size: leftPageSize,
@@ -153,17 +157,18 @@ export const uiBookLayout = createComponent<UiBookLayoutProps>(
                 size: rightPageSize,
             });
         }
-        /*
+
         // Add tabs positioned as actual book tabs on the left side
-        if (props.tabs && props.tabs.length > 0) {
+        if (props.tabs && props.tabs.length > 0 && tabDescriptor) {
             children.push({
-                ...createTabsComponent(props.tabs),
+                ...tabDescriptor,
+                size: tabsSize,
                 offset: {
-                    x: centerX + bookOffset - 16, // Position tabs to the left of the book
+                    x: centerX + bookOffset + 8, // Position tabs to the left of the book
                     y: centerY + verticalPadding + 60, // Offset from top
                 },
             });
-        }*/
+        }
 
         return {
             size: {
@@ -177,7 +182,6 @@ export const uiBookLayout = createComponent<UiBookLayoutProps>(
 );
 
 // Helper function to create tabs component
-/*
 function createTabsComponent(tabs: UIBookLayoutTab[]): ComponentDescriptor {
     return createComponent<{}>(() => {
         const tabChildren: PlacedChild[] = [];
@@ -196,8 +200,8 @@ function createTabsComponent(tabs: UIBookLayoutTab[]): ComponentDescriptor {
                 },
                 child: uiImage({
                     sprite: tab.icon,
-                    width: 24,
-                    height: 24,
+                    width: 32,
+                    height: 32,
                 }),
                 background: ninePatchBackground({
                     sprite: sprites2.book_tab,
@@ -212,6 +216,10 @@ function createTabsComponent(tabs: UIBookLayoutTab[]): ComponentDescriptor {
                     x: tab.isSelected ? 0 : 8, // Indent non-selected tabs slightly
                     y: yOffset,
                 },
+                size: {
+                    width: tabWidth,
+                    height: tabHeight,
+                },
             });
 
             yOffset += tabHeight + 4; // Smaller gap between tabs
@@ -222,4 +230,4 @@ function createTabsComponent(tabs: UIBookLayoutTab[]): ComponentDescriptor {
             children: tabChildren,
         };
     })();
-}*/
+}

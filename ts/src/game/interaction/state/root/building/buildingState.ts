@@ -58,9 +58,14 @@ const buildingListItem = createComponent<{
     return uiButton({
         width: fillUiSize,
         height: wrapUiSize,
-        padding: 8,
+        padding: 12,
         background: ninePatchBackground({
             sprite: sprites2.book_grid_item,
+            sides: allSides(8),
+            scale: 1,
+        }),
+        pressedBackground: ninePatchBackground({
+            sprite: sprites2.book_grid_item_focused,
             sides: allSides(8),
             scale: 1,
         }),
@@ -149,8 +154,8 @@ const buildingMasterView = createComponent<{
     return uiBox({
         width: fillUiSize,
         height: fillUiSize,
-        padding: 0,
-        background: colorBackground("red"),
+        padding: 8,
+        //background: colorBackground("red"),
         child: uiColumn({
             width: fillUiSize,
             height: fillUiSize,
