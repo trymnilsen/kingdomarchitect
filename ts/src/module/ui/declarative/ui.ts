@@ -159,8 +159,13 @@ type EffectHook = {
     cleanup?: () => void;
 };
 
+type StateHook<T = any> = {
+    value: T;
+};
+
 type NodeHooks = {
     effects: EffectHook[];
+    states: StateHook[];
     draw?: (scope: any, region: Rectangle) => void;
     gestures?: GestureRegistration[];
 };
@@ -264,7 +269,10 @@ export class UiRenderer {
 
         // Clear gestures array for this node to avoid accumulating handlers
         if (!isMeasurePass) {
-            const nodeHooks = this.hooks.get(node) ?? { effects: [] };
+            const nodeHooks = this.hooks.get(node) ?? {
+                effects: [],
+                states: [],
+            };
             nodeHooks.gestures = [];
             this.hooks.set(node, nodeHooks);
         }
@@ -486,17 +494,50 @@ export class UiRenderer {
             props: node.descriptor.props,
             constraints: constraints,
             withState: <T>(state: T) => {
-                return [state, () => {}];
+                const currentHookIndex = hookIndex++;
+                const nodeHooks = this.hooks.get(node) ?? {
+                    effects: [],
+                    states: [],
+                };
+                if (!this.hooks.has(node)) {
+                    this.hooks.set(node, nodeHooks);
+                }
+
+                // Initialize state if this is the first time this hook is called
+                if (!nodeHooks.states[currentHookIndex]) {
+                    nodeHooks.states[currentHookIndex] = { value: state };
+                }
+
+                const currentState = nodeHooks.states[currentHookIndex]
+                    .value as T;
+                const setState = (newValue: T | ((currentValue: T) => T)) => {
+                    const updatedValue =
+                        typeof newValue === "function"
+                            ? (newValue as (currentValue: T) => T)(currentState)
+                            : newValue;
+                    nodeHooks.states[currentHookIndex].value = updatedValue;
+
+                    // Trigger re-render by re-executing the component
+                    //this.renderComponent(this.currentTree?.descriptor ?? null);
+                };
+
+                return [currentState, setState];
             },
             withDraw: (drawFn) => {
                 if (isMeasurePass) return;
-                const nodeHooks = this.hooks.get(node) ?? { effects: [] };
+                const nodeHooks = this.hooks.get(node) ?? {
+                    effects: [],
+                    states: [],
+                };
                 nodeHooks.draw = drawFn;
                 this.hooks.set(node, nodeHooks);
             },
             withGesture: (eventType, handler, hitTest) => {
                 if (isMeasurePass) return;
-                const nodeHooks = this.hooks.get(node) ?? { effects: [] };
+                const nodeHooks = this.hooks.get(node) ?? {
+                    effects: [],
+                    states: [],
+                };
                 if (!nodeHooks.gestures) {
                     nodeHooks.gestures = [];
                 }
@@ -511,7 +552,10 @@ export class UiRenderer {
                 if (isMeasurePass) return; // Skip effects during measurement.
 
                 const currentHookIndex = hookIndex++;
-                const nodeHooks = this.hooks.get(node) ?? { effects: [] };
+                const nodeHooks = this.hooks.get(node) ?? {
+                    effects: [],
+                    states: [],
+                };
                 if (!this.hooks.has(node)) {
                     this.hooks.set(node, nodeHooks);
                 }

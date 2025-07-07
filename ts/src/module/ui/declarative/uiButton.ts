@@ -11,22 +11,42 @@ export type UiButtonProps = {
     width: number;
     height: number;
     background?: UIBackground;
+    pressedBackground?: UIBackground;
     padding?: number;
     onTap?: () => void;
 };
 
 export const uiButton = createComponent<UiButtonProps>(
-    ({ props, withDraw, measureDescriptor, constraints, withGesture }) => {
+    ({
+        props,
+        withDraw,
+        measureDescriptor,
+        constraints,
+        withGesture,
+        withState,
+    }) => {
+        const [pressedState, setPressedState] = withState(false);
         // Handle tap events using the new gesture system
         if (props.onTap) {
             withGesture("tap", (_event) => {
                 props.onTap!();
                 return true; // Event was handled
             });
+            withGesture("tapDown", (_event) => {
+                console.log("down!");
+                setPressedState(true);
+                return true;
+            });
+            withGesture("tapCancel", (_event) => {
+                setPressedState(false);
+                return true;
+            });
         }
 
         withDraw((scope, region) => {
-            if (props.background) {
+            if (props.pressedBackground && pressedState) {
+                props.pressedBackground.draw(scope, region, region);
+            } else if (props.background) {
                 props.background.draw(scope, region, region);
             }
         });
