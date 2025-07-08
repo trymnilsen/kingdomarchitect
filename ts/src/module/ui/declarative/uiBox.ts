@@ -30,7 +30,7 @@ export const uiBox = createComponent<UiBoxProps>(
         if (props.height >= 0) {
             size.height = props.height;
         }
-        const constraintsWithPadding = constraints;
+        const constraintsWithPadding = { ...constraints };
         if (props.padding) {
             constraintsWithPadding.width -= props.padding * 2;
             constraintsWithPadding.height -= props.padding * 2;
@@ -51,9 +51,17 @@ export const uiBox = createComponent<UiBoxProps>(
                 size.height = childSize.height;
             }
 
+            if (props.padding && props.width == wrapUiSize) {
+                size.width += props.padding * 2;
+            }
+
+            if (props.padding && props.height == wrapUiSize) {
+                size.height += props.padding * 2;
+            }
+
             const position = calculateAlignment(
-                size.width,
-                size.height,
+                constraintsWithPadding.width,
+                constraintsWithPadding.height,
                 uiAlignment.center,
                 childSize.width,
                 childSize.height,
@@ -66,14 +74,6 @@ export const uiBox = createComponent<UiBoxProps>(
                     ? addPoint({ x: props.padding, y: props.padding }, position)
                     : position,
             };
-
-            if (props.padding && props.width == wrapUiSize) {
-                size.width += props.padding * 2;
-            }
-
-            if (props.padding && props.height == wrapUiSize) {
-                size.height += props.padding * 2;
-            }
         }
 
         return {
