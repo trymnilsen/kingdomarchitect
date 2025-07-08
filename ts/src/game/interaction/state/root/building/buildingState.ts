@@ -95,9 +95,10 @@ const buildingDetailsView = createComponent<{
     const scale = props.building.scale * 2;
 
     return uiBox({
-        width: 300,
+        width: fillUiSize,
         height: fillUiSize,
-        padding: 24,
+        background: colorBackground("red"),
+        padding: 8,
         child: uiColumn({
             width: fillUiSize,
             height: fillUiSize,
