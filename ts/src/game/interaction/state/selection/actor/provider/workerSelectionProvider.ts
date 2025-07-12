@@ -114,7 +114,7 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
                 text: "Skills",
                 onClick: () => {
                     stateContext.stateChanger.push(
-                        new AlertMessageState("Not implement", "no skills"),
+                        new AlertMessageState("Skills", "no skills"),
                     );
                 },
             },

@@ -1,6 +1,10 @@
 import { generateId } from "../../common/idGenerator.js";
 import { sprites2 } from "../../module/asset/sprite.js";
 import { createEquipmentComponent } from "../component/equipmentComponent.js";
+import {
+    createInventoryComponent,
+    defaultInventoryItems,
+} from "../component/inventoryComponent.js";
 import { createJobRunnerComponent } from "../component/jobRunnerComponent.js";
 import { createPlayerUnitComponent } from "../component/playerUnitComponent.js";
 import { createSpriteComponent } from "../component/spriteComponent.js";
@@ -13,5 +17,6 @@ export function workerPrefab(): Entity {
     entity.setEcsComponent(createPlayerUnitComponent());
     entity.setEcsComponent(createJobRunnerComponent());
     entity.setEcsComponent(createEquipmentComponent());
+    entity.setEcsComponent(createInventoryComponent(defaultInventoryItems()));
     return entity;
 }
