@@ -4,6 +4,7 @@ import { allSides } from "../../../../common/sides.js";
 import { Building } from "../../../../data/building/building.js";
 import { sprites2 } from "../../../../module/asset/sprite.js";
 import { GroundTile, TileSize } from "../../../../module/map/tile.js";
+import type { ComponentDescriptor } from "../../../../module/ui/declarative/ui.js";
 import { RenderScope } from "../../../../rendering/renderScope.js";
 import { makeBuildBuildingAction } from "../../../action/world/buildingAction.js";
 import {
@@ -12,7 +13,7 @@ import {
 } from "../../../component/chunkMapComponent.js";
 import { getTile, TileComponentId } from "../../../component/tileComponent.js";
 import { InteractionState } from "../../handler/interactionState.js";
-import { UIActionbarItem } from "../../view/uiActionbar.js";
+import { uiScaffold } from "../../view/uiScaffold.js";
 import { AlertMessageState } from "../common/alertMessageState.js";
 import { BuildingApplicabilityResult } from "./buildingApplicability.js";
 import { buildingApplicabilityList } from "./buildingApplicabilityList.js";
@@ -46,60 +47,53 @@ export class BuildConfirmState extends InteractionState {
                 y: cursorPosition.y,
             },
         ];
-
-        const actions: UIActionbarItem[] = this.getActionItems();
     }
 
-    private getActionItems(): UIActionbarItem[] {
-        return [
-            {
-                text: "Confirm",
-                icon: sprites2.empty_sprite,
-                onClick: () => {
-                    this.confirmBuildSelection();
-                },
-            },
-            {
-                text: this.buildMode.description.name,
-                icon: sprites2.empty_sprite,
-                children: [
-                    {
-                        text: "Single",
-                        icon: sprites2.empty_sprite,
-                        onClick: () => {
-                            this.changeBuildMode(
-                                new SingleBuildMode(
-                                    this.buildMode.cursorSelection(),
-                                ),
-                            );
-                        },
+    override getView(): ComponentDescriptor | null {
+        return uiScaffold({
+            leftButtons: [
+                {
+                    text: "Confirm",
+                    onClick: () => {
+                        this.confirmBuildSelection();
                     },
-                    {
-                        text: "Line",
-                        icon: sprites2.empty_sprite,
-                        onClick: () => {
-                            this.changeBuildMode(
-                                new LineBuildMode(
-                                    this.buildMode.cursorSelection(),
-                                ),
-                            );
-                        },
-                    },
-                ],
-            },
-            {
-                text: "Cancel",
-                icon: sprites2.empty_sprite,
-                onClick: () => {
-                    this.cancel();
                 },
-            },
-        ];
+                {
+                    text: this.buildMode.description.name,
+                    children: [
+                        {
+                            text: "Single",
+                            onClick: () => {
+                                this.changeBuildMode(
+                                    new SingleBuildMode(
+                                        this.buildMode.cursorSelection(),
+                                    ),
+                                );
+                            },
+                        },
+                        {
+                            text: "Line",
+                            onClick: () => {
+                                this.changeBuildMode(
+                                    new LineBuildMode(
+                                        this.buildMode.cursorSelection(),
+                                    ),
+                                );
+                            },
+                        },
+                    ],
+                },
+                {
+                    text: "Cancel",
+                    onClick: () => {
+                        this.cancel();
+                    },
+                },
+            ],
+        });
     }
 
     private confirmBuildSelection() {
-        const rootEntity = this.context.root;
-
         const selections = this.buildMode.getSelection();
         if (selections.length == 0) {
             this.context.stateChanger.push(
@@ -143,7 +137,6 @@ export class BuildConfirmState extends InteractionState {
 
     private changeBuildMode(mode: BuildMode) {
         this.buildMode = mode;
-        // this.scaffold?.setLeftMenu(this.getActionItems());
     }
 
     private cancel() {

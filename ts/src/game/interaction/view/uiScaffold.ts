@@ -23,15 +23,21 @@ import { actionbarTextStyle } from "../../../rendering/text/textStyle.js";
 type UiButtonProps = {
     text: string;
     onClick?: () => void;
+    onExpand?: () => void;
     icon?: import("../../../module/asset/sprite.js").Sprite2;
+    hasChildren?: boolean;
 };
 
 const uiMenuButton = createComponent<UiButtonProps>(
     ({ props, withGesture }) => {
-        if (props.onClick) {
+        if (props.onClick || props.onExpand) {
             withGesture("tap", (_event) => {
                 console.log(`Menu button tapped: ${props.text}`);
-                props.onClick?.();
+                if (props.hasChildren && props.onExpand) {
+                    props.onExpand();
+                } else if (props.onClick) {
+                    props.onClick();
+                }
                 return true;
             });
         }
@@ -77,6 +83,7 @@ type ScaffoldButton = {
     text: string;
     onClick?: () => void;
     icon?: import("../../../module/asset/sprite.js").Sprite2;
+    children?: ScaffoldButton[];
 };
 
 enum MenuState {
@@ -85,6 +92,11 @@ enum MenuState {
     main,
     other,
 }
+
+type ExpandedMenuState = {
+    expandedButtonIndex: number | null;
+    expandedGroup: "left" | "right" | null;
+};
 
 type MeasuredButtons = {
     totalWidth: number;
@@ -106,21 +118,53 @@ export const uiScaffold = createComponent<ScaffoldProps>(
             console.log("mounted");
         });
         const [_menuState, _setMenuState] = withState(MenuState.closed);
+        const [expandedMenu, setExpandedMenu] = withState<ExpandedMenuState>({
+            expandedButtonIndex: null,
+            expandedGroup: null,
+        });
+
+        // Helper function to create button handlers
+        const createButtonHandler = (
+            button: ScaffoldButton,
+            index: number,
+            group: "left" | "right",
+        ) => {
+            if (button.children && button.children.length > 0) {
+                return {
+                    ...button,
+                    hasChildren: true,
+                    onExpand: () => {
+                        if (
+                            expandedMenu.expandedButtonIndex === index &&
+                            expandedMenu.expandedGroup === group
+                        ) {
+                            // Collapse if already expanded
+                            setExpandedMenu({
+                                expandedButtonIndex: null,
+                                expandedGroup: null,
+                            });
+                        } else {
+                            // Expand this menu
+                            setExpandedMenu({
+                                expandedButtonIndex: index,
+                                expandedGroup: group,
+                            });
+                        }
+                    },
+                };
+            }
+            return {
+                ...button,
+                hasChildren: false,
+            };
+        };
 
         // Use props or defaults if not provided
-        const leftButtons = (props.leftButtons || []).map((button) =>
-            uiMenuButton({
-                text: button.text,
-                onClick: button.onClick,
-                icon: button.icon,
-            }),
+        const leftButtons = (props.leftButtons || []).map((button, index) =>
+            uiMenuButton(createButtonHandler(button, index, "left")),
         );
-        const rightButtons = (props.rightButtons || []).map((button) =>
-            uiMenuButton({
-                text: button.text,
-                onClick: button.onClick,
-                icon: button.icon,
-            }),
+        const rightButtons = (props.rightButtons || []).map((button, index) =>
+            uiMenuButton(createButtonHandler(button, index, "right")),
         );
 
         const measureButtons = (
@@ -179,9 +223,10 @@ export const uiScaffold = createComponent<ScaffoldProps>(
             let children: PlacedChild[] = [...left];
 
             // Add right buttons - maintain order but align to right
+            let right: PlacedChild[] = [];
             if (rightButtons.length > 0) {
                 let rightButtonX = constraints.width - rightSize.totalWidth;
-                const right = rightButtons.map<PlacedChild>((button, index) => {
+                right = rightButtons.map<PlacedChild>((button, index) => {
                     const buttonSize = rightSize.sizes[index];
                     const y = constraints.height - buttonSize.height;
                     const x = rightButtonX;
@@ -199,6 +244,74 @@ export const uiScaffold = createComponent<ScaffoldProps>(
                     };
                 });
                 children.push(...right);
+            }
+
+            // Handle expanded child menus
+            if (
+                expandedMenu.expandedButtonIndex !== null &&
+                expandedMenu.expandedGroup !== null
+            ) {
+                const isLeftGroup = expandedMenu.expandedGroup === "left";
+                const sourceButtons = isLeftGroup
+                    ? props.leftButtons || []
+                    : props.rightButtons || [];
+                const sourceButton =
+                    sourceButtons[expandedMenu.expandedButtonIndex];
+
+                if (sourceButton?.children) {
+                    // Create child menu buttons
+                    const childButtons = sourceButton.children.map((child) =>
+                        uiMenuButton({
+                            text: child.text,
+                            onClick: child.onClick
+                                ? () => {
+                                      // Close the expanded menu first
+                                      setExpandedMenu({
+                                          expandedButtonIndex: null,
+                                          expandedGroup: null,
+                                      });
+                                      // Then execute the child's action
+                                      child.onClick?.();
+                                  }
+                                : undefined,
+                            icon: child.icon,
+                            hasChildren: false,
+                        }),
+                    );
+
+                    // Measure child buttons
+                    const childSizes = childButtons.map(
+                        (childButton, childIndex) =>
+                            measureDescriptor(
+                                `child-${expandedMenu.expandedButtonIndex}-${childIndex}`,
+                                childButton,
+                                constraints,
+                            ),
+                    );
+
+                    // Find the parent button position
+                    const parentButtonData = isLeftGroup
+                        ? left[expandedMenu.expandedButtonIndex]
+                        : right[expandedMenu.expandedButtonIndex];
+
+                    if (parentButtonData) {
+                        // Layout children vertically above the parent button (for horizontal main menu)
+                        let childY = parentButtonData.offset.y;
+                        childButtons.forEach((childButton, childIndex) => {
+                            const childSize = childSizes[childIndex];
+                            childY -= childSize.height + spacing;
+
+                            children.push({
+                                offset: {
+                                    x: parentButtonData.offset.x,
+                                    y: Math.max(0, childY), // Ensure it doesn't go above screen
+                                },
+                                size: childSize,
+                                ...childButton,
+                            });
+                        });
+                    }
+                }
             }
 
             // Add content if provided - should fill the space above the buttons
