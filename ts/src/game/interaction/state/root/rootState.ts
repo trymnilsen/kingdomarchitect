@@ -37,90 +37,41 @@ export class RootState extends InteractionState {
         return uiScaffold({
             leftButtons: [
                 {
-                    text: "Move",
+                    text: "Quest",
                     onClick: () => {
                         this.context.stateChanger.push(
                             new AlertMessageState(
-                                "Move",
+                                "Quest",
                                 "Not implemented yet",
                             ),
                         );
                     },
                 },
                 {
-                    text: "Stash",
-                    onClick: () => {
-                        const inventory = createInventoryComponent();
-                        inventory.items = [
-                            {
-                                amount: 5,
-                                item: bowItem,
-                            },
-                            {
-                                amount: 54,
-                                item: woodResourceItem,
-                            },
-                            {
-                                amount: 432,
-                                item: bagOfGlitter,
-                            },
-                            {
-                                amount: 34,
-                                item: blueBook,
-                            },
-                        ];
-                        this.context.stateChanger.push(
-                            new InventoryState(inventory),
-                        );
-                    },
-                },
-                {
-                    text: "Skills",
+                    text: "Scroll",
                     onClick: () => {
                         this.context.stateChanger.push(
                             new AlertMessageState(
-                                "Skills",
+                                "Scroll",
                                 "Not implemented yet",
                             ),
                         );
                     },
                 },
                 {
-                    text: "Stats",
+                    text: "Map",
                     onClick: () => {
                         this.context.stateChanger.push(
-                            new AlertMessageState(
-                                "Stats",
-                                "Not implemented yet",
-                            ),
-                        );
-                    },
-                },
-                {
-                    text: "Close",
-                    onClick: () => {
-                        this.context.stateChanger.push(
-                            new AlertMessageState("Close", "Nothing to close"),
+                            new AlertMessageState("Map", "Not implemented yet"),
                         );
                     },
                 },
             ],
             rightButtons: [
                 {
-                    text: "Main",
+                    text: "Menu",
                     onClick: () => {
                         this.context.stateChanger.push(new MenuState());
-                    },
-                },
-                {
-                    text: "Other",
-                    onClick: () => {
-                        this.context.stateChanger.push(
-                            new AlertMessageState(
-                                "Other",
-                                "Other menu not implemented",
-                            ),
-                        );
                     },
                 },
             ],
