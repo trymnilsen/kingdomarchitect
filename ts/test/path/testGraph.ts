@@ -1,8 +1,8 @@
-import { describe, it, expect } from "vitest";
+import assert from "node:assert";
 import * as path from "path";
 import { Point, pointEquals, zeroPoint } from "../../src/common/point.js";
-import { getPixelColor, readPng } from "../../tool/spritepack/pngHelper.js";
 import { FixedGraph } from "../../src/module/path/graph/fixedGraph.js";
+import { getPixelColor, readPng } from "../../tool/spritepack/pngHelper.js";
 
 /**
  * Create an empty graph with the given size for testing. The graph will be
@@ -118,17 +118,18 @@ export function verifyPath(resultingPath: Point[], graph: TestGraph) {
         const id = pointId(point.x, point.y);
         const pointIsExpected = expectedPointsCopy[id];
         if (!pointIsExpected) {
-            expect.fail(`Point not expected ${id}`);
+            assert.fail(`Point not expected ${id}`);
         } else {
             delete expectedPointsCopy[id];
         }
     }
 
     const expectedPointsLeft = Object.values(expectedPointsCopy).length;
-    expect(
+    assert.equal(
         expectedPointsLeft,
+        0,
         "All expected points not visited by resulting path",
-    ).toBe(0);
+    );
 }
 
 type ExpectedPath = { [pointKey: string]: Point };

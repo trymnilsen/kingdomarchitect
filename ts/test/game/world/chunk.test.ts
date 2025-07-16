@@ -1,10 +1,11 @@
-import { describe, it, expect } from "vitest";
+import { describe, it } from "node:test";
+import assert from "node:assert";
 
 describe("Chunk", () => {
     it("Get chunk position", () => {
-        expect(2).toBe(2);
+        assert.strictEqual(2, 2);
     });
     it("Get chunk id", () => {
-        expect(2).toBe(2);
+        assert.strictEqual(2, 2);
     });
 });

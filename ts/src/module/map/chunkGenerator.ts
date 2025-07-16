@@ -9,7 +9,6 @@ import { adjacentPoints, Point } from "../../common/point.js";
 import { makeSetTilesAction } from "../../game/action/world/setTilesAction.js";
 import {
     getChunk,
-    TileComponent,
     TileComponentId,
 } from "../../game/component/tileComponent.js";
 import { Entity } from "../../game/entity/entity.js";
@@ -33,7 +32,7 @@ export function generateChunk(rootEntity: Entity, chunkPoint: Point) {
     ).filter((volume) => volume.size < volume.maxSize);
     const createNewVolume = Math.random() > 0.8;
 
-    let chunk: TileChunk | undefined = undefined;
+    let chunk: Required<TileChunk> | undefined = undefined;
     if (
         tiles.chunks.size > 1 &&
         (createNewVolume || adjacentVolumes.length == 0)
@@ -88,7 +87,7 @@ export function generateChunk(rootEntity: Entity, chunkPoint: Point) {
     generateChunkEntities(chunk, rootEntity);
 }
 
-function generateChunkEntities(chunk: TileChunk, rootEntity: Entity) {
+function generateChunkEntities(chunk: Required<TileChunk>, rootEntity: Entity) {
     const chunkEntity = new Entity(generateId("chunk"));
     chunkEntity.worldPosition = {
         x: chunk.chunkX * ChunkSize,

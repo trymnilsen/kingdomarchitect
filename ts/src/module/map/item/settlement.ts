@@ -1,16 +1,10 @@
-import { findMapped, randomEntry, removeItem } from "../../../common/array.js";
 import { generateId } from "../../../common/idGenerator.js";
-import {
-    addPoint,
-    multiplyPoint,
-    Point,
-    pointGrid,
-} from "../../../common/point.js";
+import { Point } from "../../../common/point.js";
 import { Entity } from "../../../game/entity/entity.js";
-import { ChunkSize, type TileChunk } from "../chunk.js";
+import { type TileChunk } from "../chunk.js";
 
 export function placeSettlement(chunk: TileChunk, _chunkEntity: Entity) {
-    if (chunk.volume.id === "volume1") {
+    if (!chunk.volume || chunk.volume.id === "volume1") {
         return;
     }
     //Decide if no settlement, orcs or humans

@@ -39,8 +39,7 @@ export class RenderScope implements UIRenderScope, UILayoutScope {
     private _camera: Camera;
     private _assetLoader: AssetLoader;
     private _deferredRenderCalls: DrawFunction[] = [];
-    private _width: number;
-    private _height: number;
+    private _size: UISize;
     private _offscreenCanvas: OffscreenCanvas;
     private _offscreenContext: CanvasContext;
 
@@ -56,14 +55,18 @@ export class RenderScope implements UIRenderScope, UILayoutScope {
      * The width of the canvas the context is drawing to
      */
     get width(): number {
-        return this._width;
+        return this._size.width;
     }
 
     /**
      * The height of the canvas the context is drawing to
      */
     get height(): number {
-        return this._height;
+        return this._size.height;
+    }
+
+    get size(): UISize {
+        return this._size;
     }
 
     /**
@@ -72,6 +75,8 @@ export class RenderScope implements UIRenderScope, UILayoutScope {
     get assetLoader(): AssetLoader {
         return this._assetLoader;
     }
+
+    private textMeasureCache: Map<string, UISize> = new Map();
 
     constructor(
         canvasContext: CanvasRenderingContext2D,
@@ -85,8 +90,7 @@ export class RenderScope implements UIRenderScope, UILayoutScope {
         this.canvasContext = canvasContext;
         this._camera = camera;
         this._assetLoader = assetLoader;
-        this._width = width;
-        this._height = height;
+        this._size = { width, height };
         this._offscreenCanvas = new OffscreenCanvas(this.width, this.height);
         const context = this._offscreenCanvas.getContext("2d");
         if (!context) {
@@ -96,8 +100,7 @@ export class RenderScope implements UIRenderScope, UILayoutScope {
     }
 
     updateSize(width: number, height: number): void {
-        this._width = width;
-        this._height = height;
+        this._size = { width, height };
     }
 
     drawDottedLine(
@@ -156,12 +159,24 @@ export class RenderScope implements UIRenderScope, UILayoutScope {
      * @return the measured size
      */
     measureText(text: string, textStyle: TextStyle): UISize {
-        this.canvasContext.font = `${textStyle.size}px ${textStyle.font}`;
-        const textMetrics = this.canvasContext.measureText(text);
-        return {
-            width: Math.ceil(textMetrics.width),
-            height: Math.ceil(textMetrics.fontBoundingBoxDescent),
-        };
+        const font = `${textStyle.size}px ${textStyle.font}`;
+        this.canvasContext.font = font;
+        const cacheKey = text + font;
+        const cachedSize = this.textMeasureCache.get(cacheKey);
+        if (!!cachedSize) {
+            return cachedSize;
+        } else {
+            const textMetrics = this.canvasContext.measureText(text);
+            const size = {
+                width: Math.ceil(textMetrics.width),
+                height: Math.floor(
+                    textMetrics.fontBoundingBoxAscent +
+                        textMetrics.fontBoundingBoxDescent,
+                ),
+            };
+            this.textMeasureCache.set(cacheKey, size);
+            return size;
+        }
     }
 
     drawWithClip(bounds: Bounds, drawFunction: DrawFunction): void {

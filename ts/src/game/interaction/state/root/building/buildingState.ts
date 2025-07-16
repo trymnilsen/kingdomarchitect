@@ -1,43 +1,235 @@
 import { Sprite2, sprites2 } from "../../../../../module/asset/sprite.js";
-import { allSides, symmetricSides } from "../../../../../common/sides.js";
+import { allSides } from "../../../../../common/sides.js";
 import { bookInkColor } from "../../../../../module/ui/color.js";
-import { ninePatchBackground } from "../../../../../module/ui/dsl/uiBackgroundDsl.js";
-import { uiBox } from "../../../../../module/ui/dsl/uiBoxDsl.js";
-import { uiButton } from "../../../../../module/ui/dsl/uiButtonDsl.js";
-import { uiColumn } from "../../../../../module/ui/dsl/uiColumnDsl.js";
-import {
-    spriteImageSource,
-    uiImage,
-} from "../../../../../module/ui/dsl/uiImageDsl.js";
-import { uiRow } from "../../../../../module/ui/dsl/uiRowDsl.js";
-import { uiSpace } from "../../../../../module/ui/dsl/uiSpaceDsl.js";
-import { uiText } from "../../../../../module/ui/dsl/uiTextDsl.js";
-import { uiAlignment } from "../../../../../module/ui/uiAlignment.js";
-import { UIView } from "../../../../../module/ui/uiView.js";
-import { fillUiSize, wrapUiSize } from "../../../../../module/ui/uiSize.js";
 import { InteractionState } from "../../../handler/interactionState.js";
 import { BuildConfirmState } from "../../building2/buildConfirmState.js";
-import { UIBookLayout, UIBookLayoutTab } from "../../../view/uiBookLayout.js";
 import { Building } from "../../../../../data/building/building.js";
 import { woodenBuildings } from "../../../../../data/building/wood/wood.js";
 import { stoneBuildings } from "../../../../../data/building/stone/stone.js";
 import { goldBuildings } from "../../../../../data/building/gold/gold.js";
 import { foodBuildings } from "../../../../../data/building/food/food.js";
-import { SpriteBackground } from "../../../../../module/ui/uiBackground.js";
-import {
-    UIActionbar,
-    UIActionbarAlignment,
-    UIActionbarItem,
-} from "../../../view/actionbar/uiActionbar.js";
-import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold.js";
 import { growBuildings } from "../../../../../data/building/grow/grow.js";
 import { Point } from "../../../../../common/point.js";
+import { createComponent } from "../../../../../module/ui/declarative/ui.js";
+import { uiBookLayout } from "../../../../../module/ui/declarative/uiBookLayout.js";
+import { uiScaffold } from "../../../view/uiScaffold.js";
+import { uiBox } from "../../../../../module/ui/declarative/uiBox.js";
+import { uiButton } from "../../../../../module/ui/declarative/uiButton.js";
+import {
+    uiRow,
+    uiColumn,
+} from "../../../../../module/ui/declarative/uiSequence.js";
+import { uiImage } from "../../../../../module/ui/declarative/uiImage.js";
+import { uiSpace } from "../../../../../module/ui/declarative/uiSpace.js";
+import { uiText } from "../../../../../module/ui/declarative/uiText.js";
+import { fillUiSize, wrapUiSize } from "../../../../../module/ui/uiSize.js";
+import {
+    colorBackground,
+    ninePatchBackground,
+} from "../../../../../module/ui/uiBackground.js";
+
+// Declarative UI building components
+const bookTextStyle = {
+    color: bookInkColor,
+    font: "Silkscreen",
+    size: 16,
+};
+
+const bookTitleStyle = {
+    color: bookInkColor,
+    font: "Silkscreen",
+    size: 20,
+};
+
+type BuildingListEntry = {
+    sprite: Sprite2;
+    name: string;
+};
+
+const buildingListItem = createComponent<{
+    building: BuildingListEntry;
+    onTap: () => void;
+}>(({ props, withGesture }) => {
+    withGesture("tap", () => {
+        props.onTap();
+        return true;
+    });
+
+    return uiButton({
+        width: fillUiSize,
+        height: wrapUiSize,
+        padding: 12,
+        background: ninePatchBackground({
+            sprite: sprites2.book_grid_item,
+            sides: allSides(8),
+            scale: 1,
+        }),
+        pressedBackground: ninePatchBackground({
+            sprite: sprites2.book_grid_item_focused,
+            sides: allSides(8),
+            scale: 1,
+        }),
+        child: uiRow({
+            width: fillUiSize,
+            height: wrapUiSize,
+            children: [
+                uiImage({
+                    sprite: props.building.sprite,
+                    width: 32,
+                    height: 32,
+                }),
+                uiSpace({ width: 16, height: 8 }),
+                uiText({
+                    content: props.building.name,
+                    textStyle: bookTextStyle,
+                }),
+            ],
+        }),
+    });
+});
+
+const buildingDetailsView = createComponent<{
+    building: Building;
+    onBuild: () => void;
+}>(({ props }) => {
+    const scale = props.building.scale * 2;
+
+    return uiBox({
+        width: fillUiSize,
+        height: fillUiSize,
+        background: colorBackground("red"),
+        padding: 8,
+        child: uiColumn({
+            width: fillUiSize,
+            height: fillUiSize,
+            children: [
+                uiBox({
+                    width: fillUiSize,
+                    height: 180,
+                    background: ninePatchBackground({
+                        sprite: sprites2.book_grid_item,
+                        sides: allSides(8),
+                        scale: 1,
+                    }),
+                    child: uiImage({
+                        sprite: props.building.icon,
+                        width: props.building.icon.defintion.w * scale,
+                        height: props.building.icon.defintion.h * scale,
+                    }),
+                }),
+                uiSpace({ width: 1, height: 8 }),
+                uiText({
+                    content: props.building.name,
+                    textStyle: bookTitleStyle,
+                }),
+                uiSpace({ width: 1, height: 8 }),
+                uiText({
+                    content: "Wood: 10",
+                    textStyle: bookTextStyle,
+                }),
+                uiSpace({ width: 1, height: fillUiSize }),
+                uiButton({
+                    width: fillUiSize,
+                    height: wrapUiSize,
+                    padding: 8,
+                    background: ninePatchBackground({
+                        sprite: sprites2.book_grid_item,
+                        sides: allSides(6),
+                        scale: 1,
+                    }),
+                    onTap: () => props.onBuild(),
+                    child: uiText({
+                        content: "Build",
+                        textStyle: bookTitleStyle,
+                    }),
+                }),
+            ],
+        }),
+    });
+});
+
+const buildingMasterView = createComponent<{
+    buildings: Building[];
+    onBuildingSelect: (index: number) => void;
+}>(({ props }) => {
+    return uiBox({
+        width: fillUiSize,
+        height: fillUiSize,
+        padding: 8,
+        //background: colorBackground("red"),
+        child: uiColumn({
+            width: fillUiSize,
+            height: fillUiSize,
+            gap: 8,
+            children: props.buildings.map((building, index) =>
+                buildingListItem({
+                    building: {
+                        sprite: building.icon,
+                        name: building.name,
+                    },
+                    onTap: () => props.onBuildingSelect(index),
+                }),
+            ),
+        }),
+    });
+});
+
+const buildingBookLayout = createComponent<{
+    activeBuildings: Building[];
+    selectedBuilding: Building;
+    onBuildingSelect: (index: number) => void;
+    onBuild: () => void;
+    onTabSelect: (index: number) => void;
+    selectedTab: number;
+}>(({ props }) => {
+    const masterView = buildingMasterView({
+        buildings: props.activeBuildings,
+        onBuildingSelect: props.onBuildingSelect,
+    });
+
+    const detailsView = buildingDetailsView({
+        building: props.selectedBuilding,
+        onBuild: props.onBuild,
+    });
+
+    return uiBookLayout({
+        leftPage: masterView,
+        rightPage: detailsView,
+        tabs: [
+            {
+                icon: sprites2.wood_resource,
+                isSelected: props.selectedTab === 0,
+                onTap: () => props.onTabSelect(0),
+            },
+            {
+                icon: sprites2.stone,
+                isSelected: props.selectedTab === 1,
+                onTap: () => props.onTabSelect(1),
+            },
+            {
+                icon: sprites2.gold_coins,
+                isSelected: props.selectedTab === 2,
+                onTap: () => props.onTabSelect(2),
+            },
+            {
+                icon: sprites2.resource_corn,
+                isSelected: props.selectedTab === 3,
+                onTap: () => props.onTabSelect(3),
+            },
+            {
+                icon: sprites2.building_mill,
+                isSelected: props.selectedTab === 4,
+                onTap: () => props.onTabSelect(4),
+            },
+        ],
+    });
+});
 
 export class BuildingState extends InteractionState {
-    private _masterDetailsView: UIBookLayout;
-
     private _activeBuildings: Building[] = [];
     private _selectedBuilding: Building;
+    private _selectedTab: number = 0;
+    private _buildingPosition: Point;
 
     override get isModal(): boolean {
         return true;
@@ -47,62 +239,52 @@ export class BuildingState extends InteractionState {
         return "Build";
     }
 
-    constructor(buildingPosition: Point) {
-        super();
-
-        const rightItems: UIActionbarItem[] = [
-            {
-                text: "Build",
-                icon: sprites2.empty_sprite,
-                onClick: () => {
-                    console.log("Build selected: ", this._selectedBuilding);
-                    this.context.stateChanger.replace(
-                        new BuildConfirmState(
-                            this._selectedBuilding,
-                            buildingPosition,
-                        ),
-                    );
-                },
-            },
-            {
-                text: "Cancel",
-                icon: sprites2.empty_sprite,
-                onClick: () => {
-                    this.context.stateChanger.pop(undefined);
-                },
-            },
-        ];
-
-        this._activeBuildings = woodenBuildings;
-        this._selectedBuilding = woodenBuildings[0];
-        const masterView = this.getMasterView();
-        const detailsView = this.getDetailsView(this._selectedBuilding);
-
-        this._masterDetailsView = new UIBookLayout();
-        this._masterDetailsView.leftPage = masterView;
-        this._masterDetailsView.rightPage = detailsView;
-        this._masterDetailsView.setTabs(this.getTabs(0));
-
-        const contentView = uiBox({
-            id: "buildStateLayout",
-            width: fillUiSize,
-            height: fillUiSize,
-            alignment: uiAlignment.center,
-            children: [this._masterDetailsView],
+    override getView() {
+        const scaffoldContent = buildingBookLayout({
+            activeBuildings: this._activeBuildings,
+            selectedBuilding: this._selectedBuilding,
+            onBuildingSelect: (index: number) => this.setActiveBuilding(index),
+            onBuild: () => this.buildSelected(),
+            onTabSelect: (index: number) => this.tabSelected(index),
+            selectedTab: this._selectedTab,
         });
 
-        const scaffoldState = new UIActionbarScaffold(
-            contentView,
-            rightItems,
-            [],
-            { width: fillUiSize, height: fillUiSize },
-        );
+        return uiScaffold({
+            content: scaffoldContent,
+            rightButtons: [
+                {
+                    text: "Build",
+                    icon: sprites2.empty_sprite,
+                    onClick: () => this.buildSelected(),
+                },
+                {
+                    text: "Cancel",
+                    icon: sprites2.empty_sprite,
+                    onClick: () => this.context.stateChanger.pop(undefined),
+                },
+            ],
+        });
+    }
 
-        this.view = scaffoldState;
+    constructor(buildingPosition: Point) {
+        super();
+        this._buildingPosition = buildingPosition;
+        this._activeBuildings = woodenBuildings;
+        this._selectedBuilding = woodenBuildings[0];
+    }
+
+    private buildSelected() {
+        console.log("Build selected: ", this._selectedBuilding);
+        this.context.stateChanger.replace(
+            new BuildConfirmState(
+                this._selectedBuilding,
+                this._buildingPosition,
+            ),
+        );
     }
 
     private tabSelected(index: number) {
-        this._masterDetailsView.setTabs(this.getTabs(index));
+        this._selectedTab = index;
         switch (index) {
             case 1:
                 this._activeBuildings = stoneBuildings;
@@ -120,268 +302,10 @@ export class BuildingState extends InteractionState {
                 this._activeBuildings = woodenBuildings;
                 break;
         }
-        const masterView = this.getMasterView();
-        this._masterDetailsView.leftPage = masterView;
+        this._selectedBuilding = this._activeBuildings[0];
     }
 
     private setActiveBuilding(index: number) {
-        const activeBuilding = this._activeBuildings[index];
-        const detailsView = this.getDetailsView(activeBuilding);
-        this._masterDetailsView.rightPage = detailsView;
-        this._selectedBuilding = activeBuilding;
-    }
-
-    private getMasterView(): UIView {
-        return uiBox({
-            width: fillUiSize,
-            height: fillUiSize,
-            alignment: uiAlignment.topLeft,
-            padding: {
-                left: 40,
-                right: 32,
-                top: 32,
-                bottom: 32,
-            },
-            children: [
-                uiColumn({
-                    children: this._activeBuildings.flatMap(
-                        (building, index) => {
-                            return [
-                                {
-                                    child: this.getBuildingListItem(
-                                        {
-                                            sprite: building.icon,
-                                            name: building.name,
-                                        },
-                                        index,
-                                    ),
-                                },
-                                {
-                                    child: uiSpace({ width: 1, height: 8 }),
-                                },
-                            ];
-                        },
-                    ),
-                    width: fillUiSize,
-                    height: fillUiSize,
-                }),
-            ],
-        });
-    }
-
-    private getBuildingListItem(
-        building: BuildingListEntry,
-        index: number,
-    ): UIView {
-        return uiButton({
-            padding: allSides(16),
-            width: fillUiSize,
-            height: wrapUiSize,
-            defaultBackground: ninePatchBackground({
-                sprite: sprites2.book_grid_item,
-                sides: allSides(8),
-                scale: 1,
-            }),
-            onTappedBackground: ninePatchBackground({
-                sprite: sprites2.book_grid_item_focused,
-                sides: allSides(8),
-                scale: 1,
-            }),
-            children: [
-                uiRow({
-                    width: fillUiSize,
-                    height: wrapUiSize,
-                    children: [
-                        {
-                            child: uiImage({
-                                width: 32,
-                                height: 32,
-                                image: spriteImageSource(building.sprite),
-                            }),
-                        },
-                        {
-                            child: uiSpace({
-                                width: 16,
-                                height: 8,
-                            }),
-                        },
-                        {
-                            child: uiText({
-                                id: "buildingName",
-                                alignment: uiAlignment.centerLeft,
-                                text: building.name,
-                                style: {
-                                    color: bookInkColor,
-                                    font: "Silkscreen",
-                                    size: 16,
-                                },
-                                width: fillUiSize,
-                                height: wrapUiSize,
-                            }),
-                            weight: 1,
-                        },
-                    ],
-                }),
-            ],
-            onTapCallback: () => {
-                this.setActiveBuilding(index);
-            },
-        });
-    }
-
-    private getDetailsView(building: Building): UIView {
-        const scale = building.scale * 2;
-        return uiBox({
-            width: 300,
-            height: fillUiSize,
-            padding: {
-                bottom: 40,
-                left: 24,
-                top: 32,
-                right: 40,
-            },
-            children: [
-                uiColumn({
-                    width: fillUiSize,
-                    height: fillUiSize,
-                    children: [
-                        {
-                            child: uiBox({
-                                height: 180,
-                                width: fillUiSize,
-                                background: ninePatchBackground({
-                                    sprite: sprites2.book_grid_item,
-                                    sides: allSides(8),
-                                    scale: 1,
-                                }),
-                                children: [
-                                    uiImage({
-                                        height: wrapUiSize,
-                                        width: wrapUiSize,
-                                        scale: scale,
-                                        image: spriteImageSource(building.icon),
-                                    }),
-                                ],
-                            }),
-                        },
-                        {
-                            child: uiText({
-                                padding: symmetricSides(0, 8),
-                                text: building.name,
-                                style: {
-                                    color: bookInkColor,
-                                    font: "Silkscreen",
-                                    size: 20,
-                                },
-                                width: fillUiSize,
-                                height: wrapUiSize,
-                            }),
-                        },
-                        {
-                            child: uiText({
-                                alignment: uiAlignment.centerLeft,
-                                text: `Wood: 10`,
-                                style: {
-                                    color: bookInkColor,
-                                    font: "Silkscreen",
-                                    size: 16,
-                                },
-                                width: fillUiSize,
-                                height: wrapUiSize,
-                            }),
-                        },
-                        {
-                            child: uiSpace({
-                                id: "middlespace",
-                                height: fillUiSize,
-                                width: fillUiSize,
-                            }),
-                            weight: 1,
-                        },
-                        {
-                            child: uiButton({
-                                onTapCallback: () => {},
-                                padding: allSides(8),
-                                defaultBackground: ninePatchBackground({
-                                    sprite: sprites2.book_grid_item,
-                                    sides: allSides(6),
-                                    scale: 1,
-                                }),
-                                onTappedBackground: ninePatchBackground({
-                                    sprite: sprites2.book_grid_item_focused,
-                                    sides: allSides(6),
-                                    scale: 1,
-                                }),
-                                children: [
-                                    uiText({
-                                        padding: {
-                                            left: 0,
-                                            right: 0,
-                                            top: 0,
-                                            bottom: 8,
-                                        },
-                                        text: "Build",
-                                        style: {
-                                            color: bookInkColor,
-                                            font: "Silkscreen",
-                                            size: 20,
-                                        },
-                                        width: fillUiSize,
-                                        height: wrapUiSize,
-                                    }),
-                                ],
-                                width: fillUiSize,
-                                height: wrapUiSize,
-                            }),
-                        },
-                    ],
-                }),
-            ],
-        });
-    }
-
-    private getTabs(selectedTab: number): UIBookLayoutTab[] {
-        return [
-            {
-                icon: sprites2.wood_resource,
-                isSelected: selectedTab == 0,
-                onTap: (index) => {
-                    this.tabSelected(index);
-                },
-            },
-            {
-                icon: sprites2.stone,
-                isSelected: selectedTab == 1,
-                onTap: (index) => {
-                    this.tabSelected(index);
-                },
-            },
-            {
-                icon: sprites2.gold_coins,
-                isSelected: selectedTab == 2,
-                onTap: (index) => {
-                    this.tabSelected(index);
-                },
-            },
-            {
-                icon: sprites2.resource_corn,
-                isSelected: selectedTab == 3,
-                onTap: (index) => {
-                    this.tabSelected(index);
-                },
-            },
-            {
-                icon: sprites2.building_mill,
-                isSelected: selectedTab == 4,
-                onTap: (index) => {
-                    this.tabSelected(index);
-                },
-            },
-        ];
+        this._selectedBuilding = this._activeBuildings[index];
     }
 }
-
-type BuildingListEntry = {
-    sprite: Sprite2;
-    name: string;
-};

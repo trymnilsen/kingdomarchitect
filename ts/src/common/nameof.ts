@@ -6,4 +6,4 @@
  * @param name the name of the parameter, constrained to properties on T
  * @returns the name of the property
  */
-const nameof = <T>(name: Extract<keyof T, string>): string => name;
+export const nameof = <T>(name: Extract<keyof T, string>): string => name;

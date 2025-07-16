@@ -1,7 +1,6 @@
-import { SelectedEntityItem } from "../../../../../../module/selection/selectedEntityItem.js";
 import { SelectedWorldItem } from "../../../../../../module/selection/selectedWorldItem.js";
 import { StateContext } from "../../../../handler/stateContext.js";
-import { ButtonCollection } from "../../../../view/actionbar/buttonCollection.js";
+import { ButtonCollection } from "../../../../view/buttonCollection.js";
 import {
     ActorSelectionProvider,
     emptySelection,

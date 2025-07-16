@@ -1,6 +1,5 @@
 import type { Point } from "../../common/point.js";
 import { PathResultStatus, queryPath } from "../../module/query/pathQuery.js";
-import { PathfindingGraphComponentId } from "../component/pathfindingGraphComponent.js";
 import type { Entity } from "../entity/entity.js";
 
 export enum MovementResult {

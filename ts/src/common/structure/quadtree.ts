@@ -1,4 +1,3 @@
-import { splitRectangle } from "./rectangle.js";
 import { SparseSet } from "./sparseSet.js";
 
 type Rectangle = { x: number; y: number; width: number; height: number };

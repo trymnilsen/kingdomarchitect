@@ -1,5 +1,3 @@
-import { Lifecycle } from "./event/lifecycle.js";
-
 /**
  * An event allows modeling updates to data.
  * You can listen to updates or publish them.

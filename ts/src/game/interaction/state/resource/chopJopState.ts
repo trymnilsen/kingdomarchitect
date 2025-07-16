@@ -1,15 +1,10 @@
 import { sprites2 } from "../../../../module/asset/sprite.js";
-import { RenderScope } from "../../../../rendering/renderScope.js";
-import { uiBox } from "../../../../module/ui/dsl/uiBoxDsl.js";
-import { fillUiSize } from "../../../../module/ui/uiSize.js";
-import { Entity } from "../../../entity/entity.js";
 import { GroundTile } from "../../../../module/map/tile.js";
+import { RenderScope } from "../../../../rendering/renderScope.js";
+import { Entity } from "../../../entity/entity.js";
 import { InteractionState } from "../../handler/interactionState.js";
-import { BoxSelectionMode } from "../../selection/boxSelectionMode.js";
-import { LineSelectionMode } from "../../selection/lineSelectionMode.js";
 import { SelectionMode } from "../../selection/selectionMode.js";
 import { SingleSelectionMode } from "../../selection/singleSelectionMode.js";
-import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold.js";
 import { AlertMessageState } from "../common/alertMessageState.js";
 
 export class ChopJobState extends InteractionState {
@@ -25,11 +20,7 @@ export class ChopJobState extends InteractionState {
     }
 
     override onActive(): void {
-        const contentView = uiBox({
-            width: fillUiSize,
-            height: fillUiSize,
-        });
-
+        /*
         const scaffoldView = new UIActionbarScaffold(
             contentView,
             [
@@ -83,9 +74,8 @@ export class ChopJobState extends InteractionState {
             ],
             [],
             { width: fillUiSize, height: fillUiSize },
-        );
-
-        this.view = scaffoldView;
+        );*/
+        //this.view = scaffoldView;
     }
 
     override onTileTap(tile: GroundTile): boolean {

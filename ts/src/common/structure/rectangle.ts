@@ -1,9 +1,20 @@
+import type { UISize } from "../../module/ui/uiSize.js";
 import { Bounds, sizeOfBounds } from "../bounds.js";
-export interface Rectangle {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
+import type { Point } from "../point.js";
+
+export type Rectangle = Point & UISize;
+
+export function withinRectangle(point: Point, rectangle: Rectangle): boolean {
+    // Check if the point's x-coordinate is within the rectangle's horizontal bounds.
+    const isWithinX =
+        point.x >= rectangle.x && point.x <= rectangle.x + rectangle.width;
+
+    // Check if the point's y-coordinate is within the rectangle's vertical bounds.
+    const isWithinY =
+        point.y >= rectangle.y && point.y <= rectangle.y + rectangle.height;
+
+    // The point is within the rectangle only if it's within both X and Y bounds.
+    return isWithinX && isWithinY;
 }
 
 export function intersectRect(a: Rectangle, b: Rectangle): Rectangle | null {
@@ -26,6 +37,7 @@ export function intersectRect(a: Rectangle, b: Rectangle): Rectangle | null {
     }
     return null;
 }
+
 export function splitRectangle(a: Rectangle, b: Rectangle): Rectangle[] {
     const intersection = intersectRect(a, b);
 

@@ -6,9 +6,8 @@ import { SelectedEntityItem } from "../../../../module/selection/selectedEntityI
 import { SelectedTileItem } from "../../../../module/selection/selectedTileItem.js";
 import { SelectedWorldItem } from "../../../../module/selection/selectedWorldItem.js";
 import { InteractionState } from "../../handler/interactionState.js";
-import { ButtonCollection } from "../../view/actionbar/buttonCollection.js";
-import { UIActionbarItem } from "../../view/actionbar/uiActionbar.js";
-import { SelectionPresenter } from "../../view/selectionPresenter.js";
+import { ButtonCollection } from "../../view/buttonCollection.js";
+import { UIActionbarItem } from "../../view/uiActionbar.js";
 import { ActorSelectionProvider } from "./actor/provider/actorSelectionProvider.js";
 import { AttackSelectionProvider } from "./actor/provider/attackSelectionProvider.js";
 import { BlacksmithSelectionProvider } from "./actor/provider/blacksmithSelectionProvider.js";
@@ -17,9 +16,24 @@ import { TileSelectionProvider } from "./actor/provider/tileSelectionProvider.js
 import { TreeSelectionProvider } from "./actor/provider/treeSelectionProvider.js";
 import { WorkerSelectionProvider } from "./actor/provider/workerSelectionProvider.js";
 import type { SelectionInfo } from "./selectionInfo.js";
+import { ComponentDescriptor } from "../../../../module/ui/declarative/ui.js";
+import { uiBox } from "../../../../module/ui/declarative/uiBox.js";
+import {
+    uiColumn,
+    uiRow,
+    CrossAxisAlignment,
+} from "../../../../module/ui/declarative/uiSequence.js";
+import { uiText } from "../../../../module/ui/declarative/uiText.js";
+import { uiImage } from "../../../../module/ui/declarative/uiImage.js";
+import { wrapUiSize } from "../../../../module/ui/uiSize.js";
+import { NinePatchBackground } from "../../../../module/ui/uiBackground.js";
+import {
+    titleTextStyle,
+    subTitleTextStyle,
+} from "../../../../rendering/text/textStyle.js";
+import { uiScaffold } from "../../view/uiScaffold.js";
 
 export class SelectionState extends InteractionState {
-    private presenter: SelectionPresenter | null = null;
     private providers: ActorSelectionProvider[] = [
         new WorkerSelectionProvider(),
         new TreeSelectionProvider(),
@@ -37,15 +51,37 @@ export class SelectionState extends InteractionState {
         super();
     }
 
-    override onActive(): void {
+    override getView(): ComponentDescriptor | null {
         const items = this.getActionItems();
-        this.presenter = new SelectionPresenter(items.left, items.right);
-        this.presenter.setSelectionInfo(this.getSelectionInfo());
-        this.view = this.presenter.root;
+        const selectionInfo = this.getSelectionInfo();
+
+        // Convert UIActionbarItems to ScaffoldButtons
+        const leftButtons = items.left.map((item) => ({
+            text: item.text,
+            onClick: item.onClick,
+            icon: item.icon,
+        }));
+
+        const rightButtons = items.right.map((item) => ({
+            text: item.text,
+            onClick: item.onClick,
+            icon: item.icon,
+        }));
+
+        // Create content that shows selection info
+        const content = selectionInfo
+            ? this.createSelectionInfoPanel(selectionInfo)
+            : undefined;
+
+        return uiScaffold({
+            leftButtons,
+            rightButtons,
+            content,
+        });
     }
 
     override onUpdate(_tick: number): void {
-        this.updateActionbarItems();
+        // No need to manually update UI - declarative UI will re-render when getView() is called
     }
 
     override onDraw(context: RenderScope): void {
@@ -99,6 +135,49 @@ export class SelectionState extends InteractionState {
         }
     }
 
+    private createSelectionInfoPanel(
+        selectionInfo: SelectionInfo,
+    ): ComponentDescriptor {
+        return uiBox({
+            width: wrapUiSize,
+            height: wrapUiSize,
+            padding: 8,
+            background: new NinePatchBackground(
+                sprites2.stone_slate_background,
+                allSides(8),
+                1.0,
+            ),
+            child: uiRow({
+                width: wrapUiSize,
+                height: wrapUiSize,
+                gap: 8,
+                crossAxisAlignment: CrossAxisAlignment.Center,
+                children: [
+                    uiImage({
+                        sprite: selectionInfo.icon,
+                        width: 32,
+                        height: 32,
+                    }),
+                    uiColumn({
+                        width: wrapUiSize,
+                        height: wrapUiSize,
+                        crossAxisAlignment: CrossAxisAlignment.Start,
+                        children: [
+                            uiText({
+                                content: selectionInfo.title,
+                                textStyle: titleTextStyle,
+                            }),
+                            uiText({
+                                content: selectionInfo.subtitle,
+                                textStyle: subTitleTextStyle,
+                            }),
+                        ],
+                    }),
+                ],
+            }),
+        });
+    }
+
     private getActionItems(): ButtonCollection {
         const leftItems: UIActionbarItem[] = [];
         const rightItems: UIActionbarItem[] = [];
@@ -113,11 +192,5 @@ export class SelectionState extends InteractionState {
             left: leftItems,
             right: rightItems,
         };
-    }
-
-    private updateActionbarItems() {
-        const items = this.getActionItems();
-        this.presenter?.setLeftMenu(items.left);
-        this.presenter?.setRightMenu(items.right);
     }
 }

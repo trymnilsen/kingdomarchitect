@@ -1,4 +1,3 @@
-import type { Point } from "../../common/point.js";
 import { JobRunnerComponentId } from "../component/jobRunnerComponent.js";
 import type { Entity } from "../entity/entity.js";
 import type { BuildBuildingJob } from "./buildBuildingJob.js";

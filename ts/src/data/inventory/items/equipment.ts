@@ -1,5 +1,5 @@
 import { sprites2 } from "../../../module/asset/sprite.js";
-import { InventoryItem, ItemCategory, ItemTag } from "./../inventoryItem.js";
+import { ItemCategory, ItemTag } from "./../inventoryItem.js";
 
 export const swordItem = {
     asset: sprites2.sword_skill,

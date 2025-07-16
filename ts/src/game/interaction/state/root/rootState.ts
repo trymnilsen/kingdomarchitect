@@ -1,113 +1,81 @@
-import { sprites2 } from "../../../../module/asset/sprite.js";
 import { Bounds, boundsCenter } from "../../../../common/bounds.js";
 import { Direction } from "../../../../common/direction.js";
-import { manhattanDistance, shiftPoint } from "../../../../common/point.js";
-import { allSides } from "../../../../common/sides.js";
-import { Camera } from "../../../../rendering/camera.js";
-import { uiBox } from "../../../../module/ui/dsl/uiBoxDsl.js";
+import { shiftPoint } from "../../../../common/point.js";
+import { bowItem } from "../../../../data/inventory/items/equipment.js";
+import {
+    bagOfGlitter,
+    blueBook,
+    woodResourceItem,
+} from "../../../../data/inventory/items/resources.js";
+import { GroundTile, TileSize } from "../../../../module/map/tile.js";
+import type { ComponentDescriptor } from "../../../../module/ui/declarative/ui.js";
 import { FocusGroup } from "../../../../module/ui/focus/focusGroup.js";
-import { uiAlignment } from "../../../../module/ui/uiAlignment.js";
-import { fillUiSize } from "../../../../module/ui/uiSize.js";
+import { Camera } from "../../../../rendering/camera.js";
+import { createInventoryComponent } from "../../../component/inventoryComponent.js";
 import { Entity } from "../../../entity/entity.js";
-import { SelectedEntityItem } from "../../../../module/selection/selectedEntityItem.js";
-import { SelectedTileItem } from "../../../../module/selection/selectedTileItem.js";
-import { SelectedWorldItem } from "../../../../module/selection/selectedWorldItem.js";
-import { GroundTile } from "../../../../module/map/tile.js";
-import { HalfTileSize, TileSize } from "../../../../module/map/tile.js";
 import { InteractionState } from "../../handler/interactionState.js";
-import { UIActionbarItem } from "../../view/actionbar/uiActionbar.js";
-import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold.js";
+import { uiScaffold } from "../../view/uiScaffold.js";
 import { AlertMessageState } from "../common/alertMessageState.js";
 import { MenuState } from "../menu/menuState.js";
-import { BuildingState } from "./building/buildingState.js";
 import { InventoryState } from "./inventory/inventoryState.js";
-import { ScrollInteractionState } from "../scrolls/scrollState.js";
-import { LandUnlockState } from "../unlock/landUnlockState.js";
 
 export class RootState extends InteractionState {
     override getFocusGroups(): FocusGroup[] {
+        return [new WorldFocusGroup(this.context.root, this.context.camera)];
+        /*
         const groups: FocusGroup[] = [];
         if (this.view) {
             groups.push(this.view);
         }
         groups.push(
-            new WorldFocusGroup(this.context.root, this.context.camera),
+            ,
         );
 
-        return groups;
+        return groups;*/
     }
-    override onActive(): void {
-        super.onActive();
-
-        const actionItems: UIActionbarItem[] = [
-            {
-                text: "Quest",
-                icon: sprites2.empty_sprite,
-                onClick: () => {
-                    this.context.stateChanger.push(
-                        new AlertMessageState("Oh no", "Not implemented"),
-                    );
+    override getView(): ComponentDescriptor | null {
+        return uiScaffold({
+            leftButtons: [
+                {
+                    text: "Quest",
+                    onClick: () => {
+                        this.context.stateChanger.push(
+                            new AlertMessageState(
+                                "Quest",
+                                "Not implemented yet",
+                            ),
+                        );
+                    },
                 },
-            },
-            {
-                text: "Scroll",
-                icon: sprites2.empty_sprite,
-                onClick: () => {
-                    this.context.stateChanger.push(
-                        new ScrollInteractionState(),
-                    );
+                {
+                    text: "Scroll",
+                    onClick: () => {
+                        this.context.stateChanger.push(
+                            new AlertMessageState(
+                                "Scroll",
+                                "Not implemented yet",
+                            ),
+                        );
+                    },
                 },
-            },
-            {
-                text: "Map",
-                icon: sprites2.empty_sprite,
-                onClick: () => {
-                    this.context.stateChanger.push(
-                        new AlertMessageState("Oh no", "Not implemented"),
-                    );
+                {
+                    text: "Map",
+                    onClick: () => {
+                        this.context.stateChanger.push(
+                            new AlertMessageState("Map", "Not implemented yet"),
+                        );
+                    },
                 },
-            },
-            {
-                text: "Land",
-                icon: sprites2.empty_sprite,
-                onClick: () => {
-                    this.context.stateChanger.push(new LandUnlockState());
+            ],
+            rightButtons: [
+                {
+                    text: "Menu",
+                    onClick: () => {
+                        this.context.stateChanger.push(new MenuState());
+                    },
                 },
-            },
-        ];
-
-        const rightActionItems: UIActionbarItem[] = [
-            {
-                text: "Menu",
-                icon: sprites2.empty_sprite,
-                onClick: () => {
-                    this.context.stateChanger.push(new MenuState());
-                },
-            },
-        ];
-
-        /*
-        const timeline = new UITimeline(this.context.gameTime, {
-            width: fillUiSize,
-            height: 48,
-        });*/
-
-        const contentView = uiBox({
-            width: fillUiSize,
-            height: fillUiSize,
-            padding: allSides(16),
-            alignment: uiAlignment.topCenter,
-            children: [],
+            ],
         });
-
-        const scaffoldState = new UIActionbarScaffold(
-            contentView,
-            actionItems,
-            rightActionItems,
-            { width: fillUiSize, height: fillUiSize },
-        );
-
-        this.view = scaffoldState;
     }
 
     override onTileTap(tile: GroundTile): boolean {

@@ -1,28 +1,14 @@
-import { sprites2 } from "../../../../module/asset/sprite.js";
-import { randomEntry } from "../../../../common/array.js";
 import { withinRectangle } from "../../../../common/bounds.js";
 import { Direction } from "../../../../common/direction.js";
-import {
-    addPoint,
-    encodePosition,
-    Point,
-    shiftPoint,
-} from "../../../../common/point.js";
+import { encodePosition, Point, shiftPoint } from "../../../../common/point.js";
 import { allSides } from "../../../../common/sides.js";
-import { RenderScope } from "../../../../rendering/renderScope.js";
-import { uiBox } from "../../../../module/ui/dsl/uiBoxDsl.js";
-import { fillUiSize } from "../../../../module/ui/uiSize.js";
+import { sprites2 } from "../../../../module/asset/sprite.js";
 import { ChunkDimension, ChunkSize } from "../../../../module/map/chunk.js";
-import { generateChunk } from "../../../../module/map/chunkGenerator.js";
-import { GroundTile, TileSize } from "../../../../module/map/tile.js";
-import { InteractionState } from "../../handler/interactionState.js";
-import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold.js";
-import {
-    TileComponent,
-    TileComponentId,
-    hasChunk,
-} from "../../../component/tileComponent.js";
+import { TileSize } from "../../../../module/map/tile.js";
+import { RenderScope } from "../../../../rendering/renderScope.js";
 import { makeUnlockChunkAction } from "../../../action/world/unlockChunkAction.js";
+import { hasChunk, TileComponentId } from "../../../component/tileComponent.js";
+import { InteractionState } from "../../handler/interactionState.js";
 
 export class LandUnlockState extends InteractionState {
     private unlockPoints: Point[] = [];
@@ -33,6 +19,7 @@ export class LandUnlockState extends InteractionState {
 
     constructor() {
         super();
+        /*
         const contentView = uiBox({
             width: fillUiSize,
             height: fillUiSize,
@@ -58,9 +45,9 @@ export class LandUnlockState extends InteractionState {
             ],
             [],
             { width: fillUiSize, height: fillUiSize },
-        );
+        );*/
 
-        this.view = scaffoldView;
+        //this.view = scaffoldView;
     }
 
     override onActive(): void {
@@ -96,6 +83,7 @@ export class LandUnlockState extends InteractionState {
             };
 
             this.context.root.dispatchAction(makeUnlockChunkAction(chunkPoint));
+            //this.context.stateChanger.pop();
             this.setUnlockableChunks();
         }
     }

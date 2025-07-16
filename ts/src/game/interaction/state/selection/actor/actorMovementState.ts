@@ -1,18 +1,16 @@
-import { sprites2 } from "../../../../../module/asset/sprite.js";
 import { Point } from "../../../../../common/point.js";
 import { allSides } from "../../../../../common/sides.js";
+import { sprites2 } from "../../../../../module/asset/sprite.js";
+import { GroundTile, TileSize } from "../../../../../module/map/tile.js";
 import { SearchedNode } from "../../../../../module/path/search.js";
-import { RenderScope } from "../../../../../rendering/renderScope.js";
-import { uiBox } from "../../../../../module/ui/dsl/uiBoxDsl.js";
-import { fillUiSize } from "../../../../../module/ui/uiSize.js";
-import { Entity } from "../../../../entity/entity.js";
-import { GroundTile } from "../../../../../module/map/tile.js";
-import { TileSize } from "../../../../../module/map/tile.js";
-import { InteractionState } from "../../../handler/interactionState.js";
-import { UIActionbarScaffold } from "../../../view/actionbar/uiActionbarScaffold.js";
 import { queryPath } from "../../../../../module/query/pathQuery.js";
+import { RenderScope } from "../../../../../rendering/renderScope.js";
+import type { ComponentDescriptor } from "../../../../../module/ui/declarative/ui.js";
 import { makeQueueJobAction } from "../../../../action/job/queueJobAction.js";
+import { Entity } from "../../../../entity/entity.js";
 import type { MoveToJob } from "../../../../job/moveToPointJob.js";
+import { InteractionState } from "../../../handler/interactionState.js";
+import { uiScaffold } from "../../../view/uiScaffold.js";
 
 export class ActorMovementState extends InteractionState {
     private selectedPoint: Point | null = null;
@@ -26,18 +24,12 @@ export class ActorMovementState extends InteractionState {
     constructor(private entity: Entity) {
         super();
     }
-    override onActive(): void {
-        const contentView = uiBox({
-            width: fillUiSize,
-            height: fillUiSize,
-        });
 
-        const scaffoldView = new UIActionbarScaffold(
-            contentView,
-            [
+    override getView(): ComponentDescriptor | null {
+        return uiScaffold({
+            leftButtons: [
                 {
                     text: "Confirm",
-                    icon: sprites2.empty_sprite,
                     onClick: () => {
                         this.scheduleMovement();
                         this.context.stateChanger.pop(null);
@@ -45,17 +37,12 @@ export class ActorMovementState extends InteractionState {
                 },
                 {
                     text: "Cancel",
-                    icon: sprites2.empty_sprite,
                     onClick: () => {
                         this.context.stateChanger.pop(null);
                     },
                 },
             ],
-            [],
-            { width: fillUiSize, height: fillUiSize },
-        );
-
-        this.view = scaffoldView;
+        });
     }
 
     override onTileTap(tile: GroundTile): boolean {

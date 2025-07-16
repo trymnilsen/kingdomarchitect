@@ -1,17 +1,16 @@
-import { sprites2 } from "../../../module/asset/sprite.js";
 import { Point } from "../../../common/point.js";
 import { allSides } from "../../../common/sides.js";
+import { sprites2 } from "../../../module/asset/sprite.js";
 import {
     InputAction,
     InputActionType,
     getDirectionFromInputType,
 } from "../../../module/input/inputAction.js";
-import { RenderScope } from "../../../rendering/renderScope.js";
+import { GroundTile } from "../../../module/map/tile.js";
+import type { ComponentDescriptor } from "../../../module/ui/declarative/ui.js";
 import { UIEvent } from "../../../module/ui/event/uiEvent.js";
 import { FocusGroup } from "../../../module/ui/focus/focusGroup.js";
-import { FocusState } from "../../../module/ui/focus/focusState.js";
-import { UIView } from "../../../module/ui/uiView.js";
-import { GroundTile } from "../../../module/map/tile.js";
+import { RenderScope } from "../../../rendering/renderScope.js";
 import { InteractionStateChanger } from "./interactionStateChanger.js";
 import { StateContext } from "./stateContext.js";
 
@@ -22,7 +21,6 @@ import { StateContext } from "./stateContext.js";
  */
 export abstract class InteractionState {
     private _context: StateContext | undefined;
-    private _view: UIView | null = null;
     private _cachedFocusGroups: FocusGroup[] = [];
     private _currentFocusGroupIndex = 0;
 
@@ -33,21 +31,6 @@ export abstract class InteractionState {
      */
     get stateName(): string {
         return "State";
-    }
-    /**
-     * Retrieve the currently set root view of the this state
-     */
-    get view(): UIView | null {
-        return this._view;
-    }
-    /**
-     * Sets the view of this state, will be used for checking UIEvent's and
-     * drawn automatically
-     */
-    protected set view(value: UIView | null) {
-        this._view = value;
-        this._currentFocusGroupIndex = 0;
-        this._cachedFocusGroups = this.getFocusGroups();
     }
 
     /**
@@ -78,59 +61,43 @@ export abstract class InteractionState {
         return false;
     }
 
+    getView(): ComponentDescriptor | null {
+        return null;
+    }
+
     /**
      * Retrieve the focus groups for this interaction state,
      * defaults to return the root view if any. Implemented as a
      * method and not a property to allow easy overriding.
      */
     getFocusGroups(): FocusGroup[] {
+        /*
         if (this._view) {
             return [this._view];
         } else {
-            return [];
-        }
+         */
+        return [];
+        //}
     }
 
     /**
      * Dispatch a UI event to the currently set view
      *
-     * The dispatching is done using a depth first search, queueing views
-     * in a queue and looping over them with a while loop. This ensures that
-     * we have the referene to the view that handles the event and can compare
-     * them on later events when the event is dependent on previous events.
-     *
-     * For example on tap up should only trigger if tap down happened on the
-     * same view.
+     * This method is part of the old imperative UI system and is now deprecated
+     * in favor of the new declarative UI system. The InteractionHandler now
+     * dispatches events directly to the UiRenderer, bypassing InteractionState.
      *
      * @param event the event to dispatch to the view
      * @returns if the event was handled or not
      */
     dispatchUIEvent(event: UIEvent): boolean {
-        /*
-        const viewsToVisit = [this._view];
-
-        while (viewsToVisit.length > 0) {
-            // Pick the first view
-            const view = viewsToVisit.shift();
-            if (!view) {
-                throw new Error("Undefined view in queue with > 0 length");
-            }
-            // Add the children of this entity to nodes to search
-            for (const child of view.children) {
-                viewsToVisit.push(child);
-            }
-        }
-
+        // Old imperative UI system - commented out as we move to declarative UI
+        // The declarative UI system handles events directly in InteractionHandler
+        console.log(
+            "UI Event received in InteractionState (deprecated): ",
+            event,
+        );
         return false;
-        */
-
-        //console.log("UI Event: ", event);
-        if (this._view) {
-            const handled = this._view.dispatchUIEvent(event);
-            return handled;
-        } else {
-            return false;
-        }
     }
 
     /**
@@ -170,7 +137,7 @@ export abstract class InteractionState {
      * the view is properly disposed
      */
     onInactive(): void {
-        this._view?.dispose();
+        //this._view?.dispose();
     }
 
     /**
@@ -188,22 +155,7 @@ export abstract class InteractionState {
      * needs a consistent update cycle should be called in onUpdate
      * @param context Render context with access to camera and drawing methods
      */
-    onDraw(context: RenderScope): void {
-        if (this._view) {
-            //const start = performance.now();
-            if (this._view.isDirty) {
-                this._view.layout(context, {
-                    width: context.width,
-                    height: context.height,
-                });
-            }
-            this._view.updateTransform();
-            this._view.draw(context);
-            this.drawFocus(context);
-            //const end = performance.now();
-            //console.log(`build state draw: ${end - start}`);
-        }
-    }
+    onDraw(_context: RenderScope): void {}
 
     /**
      * An input event has occured, like the directional keys or action key was
@@ -217,7 +169,7 @@ export abstract class InteractionState {
         input: InputAction,
         _stateChanger: InteractionStateChanger,
     ): boolean {
-        const view = this.view;
+        const view = false;
         const direction = getDirectionFromInputType(input.action);
         if (!view) {
             return false;

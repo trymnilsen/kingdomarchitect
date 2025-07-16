@@ -80,15 +80,15 @@ function drawHealthbar(
     );
 
     renderContext.drawScreenSpaceRectangle({
-        x: screenPosition.x,
-        y: screenPosition.y,
+        x: screenPosition.x + 3,
+        y: screenPosition.y + 24,
         width: healthbarWidth,
         height: 8,
         fill: "black",
     });
     renderContext.drawScreenSpaceRectangle({
-        x: screenPosition.x + 2,
-        y: screenPosition.y + 2,
+        x: screenPosition.x + 5,
+        y: screenPosition.y + 2 + 24,
         width: percentageWidth,
         height: 4,
         fill: "green",
@@ -181,6 +181,10 @@ function drawTiles(
     visibilityMap: RenderVisibilityMap,
 ) {
     for (const [chunkId, chunk] of tiles.chunks) {
+        if (!chunk.volume) {
+            continue;
+        }
+
         const chunkPosition = {
             x: chunk.chunkX * ChunkSize,
             y: chunk.chunkY * ChunkSize,

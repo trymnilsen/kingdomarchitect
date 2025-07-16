@@ -1,4 +1,3 @@
-import { arrayToOject } from "../../common/array.js";
 import { InventoryItem } from "./inventoryItem.js";
 import { equipmentItems } from "./items/equipment.js";
 import { resources } from "./items/resources.js";

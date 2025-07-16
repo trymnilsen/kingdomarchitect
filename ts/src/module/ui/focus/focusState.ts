@@ -1,5 +1,4 @@
 import { manhattanDistance } from "../../../common/point.js";
-import { UIView } from "../uiView.js";
 import { FocusNode } from "./focusHelpers.js";
 
 export class FocusState {

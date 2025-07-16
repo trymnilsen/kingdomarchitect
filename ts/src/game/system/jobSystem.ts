@@ -4,10 +4,7 @@ import {
     createJobQueueComponent,
     JobQueueComponentId,
 } from "../component/jobQueueComponent.js";
-import {
-    JobRunnerComponent,
-    JobRunnerComponentId,
-} from "../component/jobRunnerComponent.js";
+import { JobRunnerComponentId } from "../component/jobRunnerComponent.js";
 import { Entity } from "../entity/entity.js";
 import { buildBuildingHandler } from "../job/buildBuildingJob.js";
 import type { Job, JobHandler, JobId, Jobs } from "../job/job.js";

@@ -1,5 +1,4 @@
 import type { Bounds } from "../../common/bounds.js";
-import type { JSONValue } from "../../common/object.js";
 import type { Point } from "../../common/point.js";
 import { ChunkSize, type TileChunk } from "../../module/map/chunk.js";
 import { getTileId, type GroundTile } from "../../module/map/tile.js";
@@ -72,7 +71,7 @@ export function getTile(
     return {
         tileX: tilePosition.x,
         tileY: tilePosition.y,
-        type: chunk.volume.type,
+        type: chunk.volume?.type,
     };
 }
 

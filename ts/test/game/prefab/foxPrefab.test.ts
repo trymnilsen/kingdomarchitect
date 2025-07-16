@@ -1,7 +1,8 @@
-import { describe, it, expect } from "vitest";
+import { describe, it } from "node:test";
+import assert from "node:assert";
 
 describe("Fox prefab", () => {
     it("Can persist and load", () => {
-        expect(2).toBe(2);
+        assert.strictEqual(2, 2);
     });
 });

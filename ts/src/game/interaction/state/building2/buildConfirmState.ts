@@ -1,32 +1,27 @@
-import { sprites2 } from "../../../../module/asset/sprite.js";
+import { findMapped } from "../../../../common/array.js";
 import { Point } from "../../../../common/point.js";
 import { allSides } from "../../../../common/sides.js";
 import { Building } from "../../../../data/building/building.js";
-import { woodResourceItem } from "../../../../data/inventory/items/resources.js";
+import { sprites2 } from "../../../../module/asset/sprite.js";
+import { GroundTile, TileSize } from "../../../../module/map/tile.js";
+import type { ComponentDescriptor } from "../../../../module/ui/declarative/ui.js";
 import { RenderScope } from "../../../../rendering/renderScope.js";
-import { uiBox } from "../../../../module/ui/dsl/uiBoxDsl.js";
-import { fillUiSize } from "../../../../module/ui/uiSize.js";
-import { GroundTile } from "../../../../module/map/tile.js";
-import { TileSize } from "../../../../module/map/tile.js";
-import { InteractionState } from "../../handler/interactionState.js";
-import { UIActionbarItem } from "../../view/actionbar/uiActionbar.js";
-import { UIActionbarScaffold } from "../../view/actionbar/uiActionbarScaffold.js";
-import { AlertMessageState } from "../common/alertMessageState.js";
-import { BuildMode } from "./mode/buildMode.js";
-import { LineBuildMode } from "./mode/lineBuildMode.js";
-import { SingleBuildMode } from "./mode/singleBuildMode.js";
-import { buildingApplicabilityList } from "./buildingApplicabilityList.js";
-import { BuildingApplicabilityResult } from "./buildingApplicability.js";
-import { findMapped } from "../../../../common/array.js";
+import { makeBuildBuildingAction } from "../../../action/world/buildingAction.js";
 import {
     ChunkMapComponentId,
     getEntitiesAt,
 } from "../../../component/chunkMapComponent.js";
 import { getTile, TileComponentId } from "../../../component/tileComponent.js";
-import { makeBuildBuildingAction } from "../../../action/world/buildingAction.js";
+import { InteractionState } from "../../handler/interactionState.js";
+import { uiScaffold } from "../../view/uiScaffold.js";
+import { AlertMessageState } from "../common/alertMessageState.js";
+import { BuildingApplicabilityResult } from "./buildingApplicability.js";
+import { buildingApplicabilityList } from "./buildingApplicabilityList.js";
+import { BuildMode } from "./mode/buildMode.js";
+import { LineBuildMode } from "./mode/lineBuildMode.js";
+import { SingleBuildMode } from "./mode/singleBuildMode.js";
 
 export class BuildConfirmState extends InteractionState {
-    private scaffold: UIActionbarScaffold | null = null;
     private blinkScaffold = true;
     private buildMode: BuildMode;
     private selection: SelectedTile[] = [];
@@ -52,71 +47,53 @@ export class BuildConfirmState extends InteractionState {
                 y: cursorPosition.y,
             },
         ];
-
-        const actions: UIActionbarItem[] = this.getActionItems();
-        const contentView = uiBox({
-            width: fillUiSize,
-            height: fillUiSize,
-        });
-
-        const scaffold = new UIActionbarScaffold(contentView, actions, [], {
-            width: fillUiSize,
-            height: fillUiSize,
-        });
-        this.scaffold = scaffold;
-        this.view = scaffold;
     }
 
-    private getActionItems(): UIActionbarItem[] {
-        return [
-            {
-                text: "Confirm",
-                icon: sprites2.empty_sprite,
-                onClick: () => {
-                    this.confirmBuildSelection();
-                },
-            },
-            {
-                text: this.buildMode.description.name,
-                icon: sprites2.empty_sprite,
-                children: [
-                    {
-                        text: "Single",
-                        icon: sprites2.empty_sprite,
-                        onClick: () => {
-                            this.changeBuildMode(
-                                new SingleBuildMode(
-                                    this.buildMode.cursorSelection(),
-                                ),
-                            );
-                        },
+    override getView(): ComponentDescriptor | null {
+        return uiScaffold({
+            leftButtons: [
+                {
+                    text: "Confirm",
+                    onClick: () => {
+                        this.confirmBuildSelection();
                     },
-                    {
-                        text: "Line",
-                        icon: sprites2.empty_sprite,
-                        onClick: () => {
-                            this.changeBuildMode(
-                                new LineBuildMode(
-                                    this.buildMode.cursorSelection(),
-                                ),
-                            );
-                        },
-                    },
-                ],
-            },
-            {
-                text: "Cancel",
-                icon: sprites2.empty_sprite,
-                onClick: () => {
-                    this.cancel();
                 },
-            },
-        ];
+                {
+                    text: this.buildMode.description.name,
+                    children: [
+                        {
+                            text: "Single",
+                            onClick: () => {
+                                this.changeBuildMode(
+                                    new SingleBuildMode(
+                                        this.buildMode.cursorSelection(),
+                                    ),
+                                );
+                            },
+                        },
+                        {
+                            text: "Line",
+                            onClick: () => {
+                                this.changeBuildMode(
+                                    new LineBuildMode(
+                                        this.buildMode.cursorSelection(),
+                                    ),
+                                );
+                            },
+                        },
+                    ],
+                },
+                {
+                    text: "Cancel",
+                    onClick: () => {
+                        this.cancel();
+                    },
+                },
+            ],
+        });
     }
 
     private confirmBuildSelection() {
-        const rootEntity = this.context.root;
-
         const selections = this.buildMode.getSelection();
         if (selections.length == 0) {
             this.context.stateChanger.push(
@@ -160,7 +137,6 @@ export class BuildConfirmState extends InteractionState {
 
     private changeBuildMode(mode: BuildMode) {
         this.buildMode = mode;
-        this.scaffold?.setLeftMenu(this.getActionItems());
     }
 
     private cancel() {

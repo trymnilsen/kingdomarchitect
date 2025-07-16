@@ -1,4 +1,3 @@
-import { getConstructorName } from "../common/constructor.js";
 import { EcsSystem } from "../module/ecs/ecsSystem.js";
 import type { GameServerMessageEntry } from "./gameServerMessageBus.js";
 
