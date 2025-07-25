@@ -10,6 +10,8 @@ import type { PlayerUnitComponent } from "./playerUnitComponent.js";
 import type { ResourceComponent } from "./resourceComponent.js";
 import type { SpriteComponent } from "./spriteComponent.js";
 import type { TileComponent } from "./tileComponent.js";
+import type { VisibilityMapComponent } from "./visibilityMapComponent.js";
+import type { WorldDiscoveryComponent } from "./worldDiscoveryComponent.js";
 
 export type Components =
     | JobRunnerComponent
@@ -23,6 +25,8 @@ export type Components =
     | BuildingComponent
     | HealthComponent
     | EquipmentComponent
+    | WorldDiscoveryComponent
+    | VisibilityMapComponent
     | PathfindingGraphComponent;
 
 export interface BaseComponent {

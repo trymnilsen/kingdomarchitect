@@ -1,4 +1,5 @@
 import { createServerDispatcher } from "../game/action/dispatcher/server/serverDispatcher.js";
+import { createWorldDiscoveryComponent } from "../game/component/worldDiscoveryComponent.js";
 import { chunkMapSystem } from "../game/system/chunkMapSystem.js";
 import { JobSystem } from "../game/system/jobSystem.js";
 import { pathfindingSystem } from "../game/system/pathfindingSystem.js";
@@ -19,6 +20,9 @@ export class GameServer {
     constructor(private messageBus: GameServerMessageBus) {
         this.world = new EcsWorld();
         this.actionDispatcher = createServerDispatcher(this.world.root);
+        //Add the discovery component to the server scene, this is used only on
+        //the server to keep track of which tiles players have discovered
+        this.world.root.setEcsComponent(createWorldDiscoveryComponent());
         this.world.root.actionDispatch = (action: EntityAction) => {
             this.actionDispatcher(action);
             messageBus.postMessage({

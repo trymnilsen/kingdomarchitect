@@ -15,6 +15,10 @@ export class RenderVisibilityMap {
         return this.visibilityMap.has(pointId);
     }
 
+    hasDiscovered(worldTileX: number, worldTileY: number) {
+        const id = this.makeNumberId(worldTileX, worldTileY);
+    }
+
     setIsVisible(x: number, y: number, isVisible: boolean) {
         const pointId = this.makeNumberId(x, y);
         if (isVisible) {

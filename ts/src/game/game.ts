@@ -21,6 +21,7 @@ import { InteractionHandler } from "./interaction/handler/interactionHandler.js"
 import { chunkMapSystem } from "./system/chunkMapSystem.js";
 import { pathfindingSystem } from "./system/pathfindingSystem.js";
 import { renderSystem } from "./system/renderSystem.js";
+import { createVisibilityMapComponent } from "./component/visibilityMapComponent.js";
 
 export class Game {
     private renderer: Renderer;
@@ -40,6 +41,8 @@ export class Game {
 
     constructor(private domElementWrapperSelector: string) {
         this.ecsWorld = new EcsWorld();
+        this.addClientOnlyComponents();
+
         this.gameServer = new WebworkerServerConnection();
         this.gameServer.onMessage.listen((message) => {
             handleGameMessage(message, this.ecsWorld.root);
@@ -89,6 +92,10 @@ export class Game {
         );
 
         this.addSystems();
+    }
+
+    private addClientOnlyComponents() {
+        this.ecsWorld.root.setEcsComponent(createVisibilityMapComponent());
     }
 
     private addSystems() {

@@ -2,12 +2,10 @@ import { Entity } from "../../game/entity/entity.js";
 import { EntityEvent, EntityEventType } from "../../game/entity/entityEvent.js";
 import { DrawMode } from "../../rendering/drawMode.js";
 import { RenderScope } from "../../rendering/renderScope.js";
-import { RenderVisibilityMap } from "../../rendering/renderVisibilityMap.js";
 
 export type EcsRenderFunction = (
     root: Entity,
     renderScope: RenderScope,
-    visibilityMap: RenderVisibilityMap,
     drawMode: DrawMode,
 ) => void;
 

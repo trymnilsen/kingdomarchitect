@@ -6,7 +6,6 @@ import { ChunkDimension, ChunkSize } from "../../module/map/chunk.js";
 import { TileSize } from "../../module/map/tile.js";
 import { DrawMode } from "../../rendering/drawMode.js";
 import type { RenderScope } from "../../rendering/renderScope.js";
-import type { RenderVisibilityMap } from "../../rendering/renderVisibilityMap.js";
 import {
     HealthComponentId,
     type HealthComponent,
@@ -16,6 +15,11 @@ import {
     SpriteComponentId,
 } from "../component/spriteComponent.js";
 import { TileComponent, TileComponentId } from "../component/tileComponent.js";
+import {
+    hasDiscovered,
+    isVisible,
+    VisibilityMapComponentId,
+} from "../component/visibilityMapComponent.js";
 import type { Entity } from "../entity/entity.js";
 
 export const renderSystem: EcsSystem = {
@@ -25,7 +29,6 @@ export const renderSystem: EcsSystem = {
 function onRender(
     rootEntity: Entity,
     renderScope: RenderScope,
-    visibilityMap: RenderVisibilityMap,
     drawMode: DrawMode,
 ) {
     const renderStart = performance.now();
@@ -33,7 +36,7 @@ function onRender(
     //TODO: If i make a map/set structure with both string and instance keys
     //i can add a first method to it to avoid getting values
     const tiles = rootEntity.requireEcsComponent(TileComponentId);
-    drawTiles(tiles, renderScope, visibilityMap);
+    drawTiles(tiles, renderScope, rootEntity);
     const query = rootEntity.queryComponentsWithin(viewport, SpriteComponentId);
 
     const sortedSprites = Array.from(query.entries()).sort(
@@ -178,8 +181,9 @@ function getVisibleChunks(bounds: Bounds): number[] {
 function drawTiles(
     tiles: TileComponent,
     renderContext: RenderScope,
-    visibilityMap: RenderVisibilityMap,
+    rootEntity: Entity,
 ) {
+    const visibility = rootEntity.requireEcsComponent(VisibilityMapComponentId);
     for (const [chunkId, chunk] of tiles.chunks) {
         if (!chunk.volume) {
             continue;
@@ -203,24 +207,25 @@ function drawTiles(
         }
 
         for (let x = 0; x < ChunkSize; x++) {
-            const tileX = screenPosition.x + x * 40;
-            const xWithin = tileX + 40 > 0 && tileX - 40 < renderContext.width;
+            const screenTileX = screenPosition.x + x * 40;
+            const worldTileX = chunkPosition.x + x;
+            const xWithin =
+                screenTileX + 40 > 0 && screenTileX - 40 < renderContext.width;
             if (!xWithin) {
                 continue;
             }
 
             for (let y = 0; y < ChunkSize; y++) {
-                const tileY = screenPosition.y + y * 40;
+                const screenTileY = screenPosition.y + y * 40;
+                const worldTileY = chunkPosition.x + x;
                 let visible = true;
 
-                if (visibilityMap.useVisibility && false) {
-                    //TODO: Reimplement
-                    /*
-                    if (!chunk.discovered.has(getTileId(x, y))) {
+                if (!window.debugChunks) {
+                    if (hasDiscovered(visibility, worldTileX, worldTileY)) {
                         continue;
-                    }*/
+                    }
 
-                    visible = visibilityMap.isVisible(tileX, tileY);
+                    visible = isVisible(visibility, worldTileX, worldTileY);
                 }
 
                 let color = biomes[chunk.volume.type].color;
@@ -229,8 +234,8 @@ function drawTiles(
                 }
 
                 renderContext.drawScreenSpaceRectangle({
-                    x: tileX,
-                    y: tileY,
+                    x: screenTileX,
+                    y: screenTileY,
                     width: TileSize - 2,
                     height: TileSize - 2,
                     fill: color,
@@ -238,84 +243,48 @@ function drawTiles(
             }
         }
 
-        renderContext.drawScreenSpaceRectangle({
-            x: screenPosition.x + 16,
-            y: screenPosition.y + 16,
-            width: ChunkDimension - 32,
-            height: ChunkDimension - 32,
-            strokeWidth: 2,
-            strokeColor: chunk.volume.debugColor,
-        });
+        if (window.debugChunks) {
+            renderContext.drawScreenSpaceRectangle({
+                x: screenPosition.x + 16,
+                y: screenPosition.y + 16,
+                width: ChunkDimension - 32,
+                height: ChunkDimension - 32,
+                strokeWidth: 2,
+                strokeColor: chunk.volume.debugColor,
+            });
 
-        renderContext.drawText({
-            text: chunk.volume.id,
-            x: screenPosition.x + 16,
-            y: screenPosition.y + 16,
-            color: "black",
-            size: 14,
-            font: "arial",
-        });
-        renderContext.drawText({
-            text: chunk.volume.debugColor,
-            x: screenPosition.x + 16,
-            y: screenPosition.y + 16 + 20,
-            color: "black",
-            size: 14,
-            font: "arial",
-        });
-        renderContext.drawText({
-            text: `maxSize: ${chunk.volume.maxSize}`,
-            x: screenPosition.x + 16,
-            y: screenPosition.y + 16 + 40,
-            color: "black",
-            size: 14,
-            font: "arial",
-        });
-        renderContext.drawText({
-            text: `size: ${chunk.volume.size}`,
-            x: screenPosition.x + 16,
-            y: screenPosition.y + 16 + 60,
-            color: "black",
-            size: 14,
-            font: "arial",
-        });
-
-        if (visibilityMap.useVisibility) {
-            renderContext.drawDottedLine(
-                screenPosition.x + 8,
-                screenPosition.y + 4,
-                screenPosition.x + ChunkDimension - 8,
-                screenPosition.y + 4,
-                biomes.forrest.tint,
-                8,
-            );
-
-            renderContext.drawDottedLine(
-                screenPosition.x + ChunkDimension - 4,
-                screenPosition.y + 8,
-                screenPosition.x + ChunkDimension - 4,
-                screenPosition.y + ChunkDimension - 8,
-                biomes.forrest.tint,
-                8,
-            );
-
-            renderContext.drawDottedLine(
-                screenPosition.x + 8,
-                screenPosition.y + ChunkDimension - 4,
-                screenPosition.x + ChunkDimension - 8,
-                screenPosition.y + ChunkDimension - 4,
-                biomes.forrest.tint,
-                8,
-            );
-
-            renderContext.drawDottedLine(
-                screenPosition.x + 4,
-                screenPosition.y + 8,
-                screenPosition.x + 4,
-                screenPosition.y + ChunkDimension - 8,
-                biomes.forrest.tint,
-                8,
-            );
+            renderContext.drawText({
+                text: chunk.volume.id,
+                x: screenPosition.x + 16,
+                y: screenPosition.y + 16,
+                color: "black",
+                size: 14,
+                font: "arial",
+            });
+            renderContext.drawText({
+                text: chunk.volume.debugColor,
+                x: screenPosition.x + 16,
+                y: screenPosition.y + 16 + 20,
+                color: "black",
+                size: 14,
+                font: "arial",
+            });
+            renderContext.drawText({
+                text: `maxSize: ${chunk.volume.maxSize}`,
+                x: screenPosition.x + 16,
+                y: screenPosition.y + 16 + 40,
+                color: "black",
+                size: 14,
+                font: "arial",
+            });
+            renderContext.drawText({
+                text: `size: ${chunk.volume.size}`,
+                x: screenPosition.x + 16,
+                y: screenPosition.y + 16 + 60,
+                color: "black",
+                size: 14,
+                font: "arial",
+            });
         }
     }
 }

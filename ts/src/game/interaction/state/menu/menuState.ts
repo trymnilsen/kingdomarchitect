@@ -10,6 +10,12 @@ import { uiButton } from "../../../../module/ui/declarative/uiButton.js";
 import { uiColumn } from "../../../../module/ui/declarative/uiSequence.js";
 import { uiText } from "../../../../module/ui/declarative/uiText.js";
 
+declare global {
+    interface Window {
+        debugChunks: boolean;
+    }
+}
+
 export class MenuState extends InteractionState {
     override get stateName(): string {
         return "Menu";
@@ -44,6 +50,10 @@ export class MenuState extends InteractionState {
                         }),
                         this.getButtonView("Bindings", () => {}),
                         this.getButtonView("About", () => {}),
+                        this.getButtonView("DebugChunks", () => {
+                            window.debugChunks = !window.debugChunks;
+                            this.context.stateChanger.pop();
+                        }),
                     ],
                 }),
             }),
