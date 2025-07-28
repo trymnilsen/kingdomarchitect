@@ -1,12 +1,12 @@
 import { invert, multiplyPoint, Point } from "../common/point.js";
-import { AssetLoader } from "../module/asset/loader/assetLoader.js";
+import { AssetLoader } from "../asset/loader/assetLoader.js";
 
 import { GameTime } from "../common/time.js";
-import { EcsWorld } from "../module/ecs/ecsWorld.js";
-import { Input, InputEvent } from "../module/input/input.js";
-import { TouchInput } from "../module/input/touchInput.js";
-import { TileSize } from "../module/world/tile.js";
-import { UiRenderer } from "../module/ui/declarative/ui.js";
+import { EcsWorld } from "../common/ecs/ecsWorld.js";
+import { Input, InputEvent } from "../input/input.js";
+import { TouchInput } from "../input/touchInput.js";
+import { TileSize } from "./map/tile.js";
+import { UiRenderer } from "../ui/declarative/ui.js";
 import { Camera } from "../rendering/camera.js";
 import { DrawMode } from "../rendering/drawMode.js";
 import { Renderer } from "../rendering/renderer.js";
@@ -32,7 +32,6 @@ export class Game {
     private gameTime: GameTime = new GameTime();
     private ecsWorld: EcsWorld;
     private visibilityMap: RenderVisibilityMap = new RenderVisibilityMap();
-    private actionDispatcher: ActionDispatcher;
     private gameServer: GameServerConnection;
 
     constructor(private domElementWrapperSelector: string) {
@@ -40,11 +39,12 @@ export class Game {
         this.addClientOnlyComponents();
 
         this.gameServer = new WebworkerServerConnection();
+        /*
         this.gameServer.onMessage.listen((message) => {
             handleGameMessage(message, this.ecsWorld.root);
         });
         this.actionDispatcher = createClientDispatcher(this.ecsWorld.root);
-
+        */
         /*
         this.ecsWorld.root.actionDispatch = (action: EntityAction) => {
             this.actionDispatcher(action);

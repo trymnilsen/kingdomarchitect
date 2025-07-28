@@ -1,12 +1,13 @@
+import type { GameCommand } from "../command/gameCommand.js";
 import { Event } from "../../common/event.js";
-import type { GameServerMessage } from "../../server/gameServerMessageBus.js";
 import { GameServerConnection } from "./gameServerConnection.js";
+import type { GameMessage } from "../command/gameMessage.js";
 
 export class WebworkerServerConnection implements GameServerConnection {
     private worker: Worker;
-    private _onMessageEvent: Event<GameServerMessage>;
+    private _onMessageEvent: Event<GameMessage>;
 
-    public get onMessage(): Event<GameServerMessage> {
+    public get onMessage(): Event<GameMessage> {
         return this._onMessageEvent;
     }
 
@@ -18,11 +19,9 @@ export class WebworkerServerConnection implements GameServerConnection {
             this._onMessageEvent.publish(message.data);
         };
     }
-    postAction(action: EntityAction) {
-        const message: GameServerMessage = {
-            entries: [{ id: "entityAction", entityAction: action }],
-        };
-        console.log("Sending message", message);
-        this.worker.postMessage(message);
+
+    postCommand(command: GameCommand) {
+        console.log("Sending command", command);
+        this.worker.postMessage(command);
     }
 }

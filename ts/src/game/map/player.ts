@@ -13,6 +13,7 @@ export function addInitialPlayerChunk(rootEntity: Entity) {
     rootEntity.addChild(chunkEntity);
     const tiles = rootEntity.requireEcsComponent(TileComponentId);
 
+    /*
     rootEntity.dispatchAction(
         makeSetTilesAction({
             chunkX: 0,
@@ -26,7 +27,8 @@ export function addInitialPlayerChunk(rootEntity: Entity) {
                 debugColor: randomColor(),
             },
         }),
-    );
+    );*/
+
     const randomOffsetX = Math.round(Math.random() * 3) + 1;
     const randomOffsetY = Math.round(Math.random() * 3) + 1;
     const firstWorker = workerPrefab();

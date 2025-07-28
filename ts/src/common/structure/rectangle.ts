@@ -1,4 +1,4 @@
-import type { UISize } from "../../module/ui/uiSize.js";
+import type { UISize } from "../../ui/uiSize.js";
 import { Bounds, sizeOfBounds } from "../bounds.js";
 import type { Point } from "../point.js";
 

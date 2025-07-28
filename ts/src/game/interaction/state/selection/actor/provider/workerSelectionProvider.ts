@@ -1,6 +1,6 @@
-import { sprites2 } from "../../../../../../module/asset/sprite.js";
-import { SelectedEntityItem } from "../../../../../../module/selection/selectedEntityItem.js";
-import { SelectedWorldItem } from "../../../../../../module/selection/selectedWorldItem.js";
+import { sprites2 } from "../../../../../../asset/sprite.js";
+import { SelectedEntityItem } from "../../../../selection/selectedEntityItem.js";
+import { SelectedWorldItem } from "../../../../selection/selectedWorldItem.js";
 import {
     EquipmentComponentId,
     type EquipmentComponent,

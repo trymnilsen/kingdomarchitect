@@ -15,11 +15,4 @@ export default defineConfig([
             file: "public/dist/server/webWorkerServer.js",
         },
     },
-    {
-        input: "ts/src/ui/declarative.ts",
-        output: {
-            sourcemap: true,
-            file: "public/dist/ui.js",
-        },
-    },
 ]);

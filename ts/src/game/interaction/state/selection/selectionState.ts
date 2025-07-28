@@ -1,10 +1,10 @@
-import { sprites2 } from "../../../../module/asset/sprite.js";
+import { sprites2 } from "../../../../asset/sprite.js";
 import { allSides } from "../../../../common/sides.js";
 import { RenderScope } from "../../../../rendering/renderScope.js";
-import { TileSize } from "../../../../module/world/tile.js";
-import { SelectedEntityItem } from "../../../../module/selection/selectedEntityItem.js";
-import { SelectedTileItem } from "../../../../module/selection/selectedTileItem.js";
-import { SelectedWorldItem } from "../../../../module/selection/selectedWorldItem.js";
+import { TileSize } from "../../../map/tile.js";
+import { SelectedEntityItem } from "../../selection/selectedEntityItem.js";
+import { SelectedTileItem } from "../../selection/selectedTileItem.js";
+import { SelectedWorldItem } from "../../selection/selectedWorldItem.js";
 import { InteractionState } from "../../handler/interactionState.js";
 import { ButtonCollection } from "../../view/buttonCollection.js";
 import { UIActionbarItem } from "../../view/uiActionbar.js";
@@ -16,17 +16,17 @@ import { TileSelectionProvider } from "./actor/provider/tileSelectionProvider.js
 import { TreeSelectionProvider } from "./actor/provider/treeSelectionProvider.js";
 import { WorkerSelectionProvider } from "./actor/provider/workerSelectionProvider.js";
 import type { SelectionInfo } from "./selectionInfo.js";
-import { ComponentDescriptor } from "../../../../module/ui/declarative/ui.js";
-import { uiBox } from "../../../../module/ui/declarative/uiBox.js";
+import { ComponentDescriptor } from "../../../../ui/declarative/ui.js";
+import { uiBox } from "../../../../ui/declarative/uiBox.js";
 import {
     uiColumn,
     uiRow,
     CrossAxisAlignment,
-} from "../../../../module/ui/declarative/uiSequence.js";
-import { uiText } from "../../../../module/ui/declarative/uiText.js";
-import { uiImage } from "../../../../module/ui/declarative/uiImage.js";
-import { wrapUiSize } from "../../../../module/ui/uiSize.js";
-import { NinePatchBackground } from "../../../../module/ui/uiBackground.js";
+} from "../../../../ui/declarative/uiSequence.js";
+import { uiText } from "../../../../ui/declarative/uiText.js";
+import { uiImage } from "../../../../ui/declarative/uiImage.js";
+import { wrapUiSize } from "../../../../ui/uiSize.js";
+import { NinePatchBackground } from "../../../../ui/uiBackground.js";
 import {
     titleTextStyle,
     subTitleTextStyle,

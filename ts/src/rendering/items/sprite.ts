@@ -1,4 +1,4 @@
-import { Sprite2 } from "../../module/asset/sprite.js";
+import { Sprite2 } from "../../asset/sprite.js";
 import { Sides } from "../../common/sides.js";
 import { CanvasContext } from "../canvasContext.js";
 import { RenderItemConfiguration } from "./renderItemConfiguration.js";

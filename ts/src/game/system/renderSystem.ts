@@ -1,9 +1,9 @@
 import type { Bounds } from "../../common/bounds.js";
 import { encodePosition, type Point } from "../../common/point.js";
-import { EcsSystem } from "../../module/ecs/ecsSystem.js";
-import { biomes } from "../../module/world/biome.js";
-import { ChunkDimension, ChunkSize } from "../../module/world/chunk.js";
-import { TileSize } from "../../module/world/tile.js";
+import { EcsSystem } from "../../common/ecs/ecsSystem.js";
+import { biomes } from "../map/biome.js";
+import { ChunkDimension, ChunkSize } from "../map/chunk.js";
+import { TileSize } from "../map/tile.js";
 import { DrawMode } from "../../rendering/drawMode.js";
 import type { RenderScope } from "../../rendering/renderScope.js";
 import {

@@ -1,4 +1,4 @@
-import type { Sprite2 } from "../../../../module/asset/sprite.js";
+import type { Sprite2 } from "../../../../asset/sprite.js";
 
 export interface SelectionInfo {
     icon: Sprite2;

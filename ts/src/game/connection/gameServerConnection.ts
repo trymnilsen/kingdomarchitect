@@ -1,7 +1,8 @@
+import type { GameCommand } from "../command/gameCommand.js";
 import { Event } from "../../common/event.js";
-import type { GameServerMessage } from "../../server/gameServerMessageBus.js";
+import type { GameMessage } from "../command/gameMessage.js";
 
 export interface GameServerConnection {
-    readonly onMessage: Event<GameServerMessage>;
-    postAction(action: EntityAction);
+    readonly onMessage: Event<GameMessage>;
+    postCommand(command: GameCommand);
 }

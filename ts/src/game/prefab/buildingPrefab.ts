@@ -1,6 +1,6 @@
 import { generateId } from "../../common/idGenerator.js";
 import type { Building } from "../../data/building/building.js";
-import { sprites2 } from "../../module/asset/sprite.js";
+import { sprites2 } from "../../asset/sprite.js";
 import { createBuildingComponent } from "../component/buildingComponent.js";
 import { createHealthComponent } from "../component/healthComponent.js";
 import { createSpriteComponent } from "../component/spriteComponent.js";

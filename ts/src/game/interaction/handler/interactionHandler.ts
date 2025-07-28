@@ -1,15 +1,12 @@
 import { Point } from "../../../common/point.js";
 import { GameTime } from "../../../common/time.js";
-import { AssetLoader } from "../../../module/asset/loader/assetLoader.js";
-import {
-    InputAction,
-    InputActionType,
-} from "../../../module/input/inputAction.js";
-import { OnTapEndEvent } from "../../../module/input/touchInput.js";
-import { SelectedEntityItem } from "../../../module/selection/selectedEntityItem.js";
-import { SelectedTileItem } from "../../../module/selection/selectedTileItem.js";
-import { SelectedWorldItem } from "../../../module/selection/selectedWorldItem.js";
-import type { UiRenderer } from "../../../module/ui/declarative/ui.js";
+import { AssetLoader } from "../../../asset/loader/assetLoader.js";
+import { InputAction, InputActionType } from "../../../input/inputAction.js";
+import { OnTapEndEvent } from "../../../input/touchInput.js";
+import { SelectedEntityItem } from "../selection/selectedEntityItem.js";
+import { SelectedTileItem } from "../selection/selectedTileItem.js";
+import { SelectedWorldItem } from "../selection/selectedWorldItem.js";
+import type { UiRenderer } from "../../../ui/declarative/ui.js";
 import { Camera } from "../../../rendering/camera.js";
 import { RenderScope } from "../../../rendering/renderScope.js";
 import {

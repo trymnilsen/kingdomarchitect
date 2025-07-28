@@ -3,8 +3,8 @@ import {
     pointEquals,
     type Point,
 } from "../../common/point.js";
-import { getWeightAtPoint } from "../../module/path/graph/weight.js";
-import { PathResultStatus, queryPath } from "../../module/query/pathQuery.js";
+import { getWeightAtPoint } from "../map/path/graph/weight.js";
+import { PathResultStatus, queryPath } from "../map/query/pathQuery.js";
 import { JobRunnerComponentId } from "../component/jobRunnerComponent.js";
 import { completeJob, type Job, type JobHandler } from "./job.js";
 

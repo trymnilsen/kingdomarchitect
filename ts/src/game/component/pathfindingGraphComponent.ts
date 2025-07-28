@@ -1,5 +1,5 @@
-import type { Graph } from "../../module/path/graph/graph.js";
-import type { PathCache } from "../../module/path/pathCache.js";
+import type { Graph } from "../map/path/graph/graph.js";
+import type { PathCache } from "../map/path/pathCache.js";
 
 export type PathfindingGraphComponent = {
     id: typeof PathfindingGraphComponentId;

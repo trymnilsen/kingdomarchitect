@@ -1,6 +1,6 @@
-import { Sprite2, sprites2 } from "../../../../../module/asset/sprite.js";
+import { Sprite2, sprites2 } from "../../../../../asset/sprite.js";
 import { allSides } from "../../../../../common/sides.js";
-import { bookInkColor } from "../../../../../module/ui/color.js";
+import { bookInkColor } from "../../../../../ui/color.js";
 import { InteractionState } from "../../../handler/interactionState.js";
 import { BuildConfirmState } from "../../building2/buildConfirmState.js";
 import { Building } from "../../../../../data/building/building.js";
@@ -10,23 +10,20 @@ import { goldBuildings } from "../../../../../data/building/gold/gold.js";
 import { foodBuildings } from "../../../../../data/building/food/food.js";
 import { growBuildings } from "../../../../../data/building/grow/grow.js";
 import { Point } from "../../../../../common/point.js";
-import { createComponent } from "../../../../../module/ui/declarative/ui.js";
-import { uiBookLayout } from "../../../../../module/ui/declarative/uiBookLayout.js";
+import { createComponent } from "../../../../../ui/declarative/ui.js";
+import { uiBookLayout } from "../../../../../ui/declarative/uiBookLayout.js";
 import { uiScaffold } from "../../../view/uiScaffold.js";
-import { uiBox } from "../../../../../module/ui/declarative/uiBox.js";
-import { uiButton } from "../../../../../module/ui/declarative/uiButton.js";
-import {
-    uiRow,
-    uiColumn,
-} from "../../../../../module/ui/declarative/uiSequence.js";
-import { uiImage } from "../../../../../module/ui/declarative/uiImage.js";
-import { uiSpace } from "../../../../../module/ui/declarative/uiSpace.js";
-import { uiText } from "../../../../../module/ui/declarative/uiText.js";
-import { fillUiSize, wrapUiSize } from "../../../../../module/ui/uiSize.js";
+import { uiBox } from "../../../../../ui/declarative/uiBox.js";
+import { uiButton } from "../../../../../ui/declarative/uiButton.js";
+import { uiRow, uiColumn } from "../../../../../ui/declarative/uiSequence.js";
+import { uiImage } from "../../../../../ui/declarative/uiImage.js";
+import { uiSpace } from "../../../../../ui/declarative/uiSpace.js";
+import { uiText } from "../../../../../ui/declarative/uiText.js";
+import { fillUiSize, wrapUiSize } from "../../../../../ui/uiSize.js";
 import {
     colorBackground,
     ninePatchBackground,
-} from "../../../../../module/ui/uiBackground.js";
+} from "../../../../../ui/uiBackground.js";
 
 // Declarative UI building components
 const bookTextStyle = {

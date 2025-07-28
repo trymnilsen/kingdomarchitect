@@ -1,5 +1,5 @@
 import { type Point } from "../../common/point.js";
-import { type Sprite2 } from "../../module/asset/sprite.js";
+import { type Sprite2 } from "../../asset/sprite.js";
 
 /**
  * Defines a currently applied tint to a sprite

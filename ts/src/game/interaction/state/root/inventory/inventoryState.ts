@@ -1,6 +1,6 @@
 import { InventoryItem } from "../../../../../data/inventory/inventoryItem.js";
-import { Sprite2, sprites2 } from "../../../../../module/asset/sprite.js";
-import { ComponentDescriptor } from "../../../../../module/ui/declarative/ui.js";
+import { Sprite2, sprites2 } from "../../../../../asset/sprite.js";
+import { ComponentDescriptor } from "../../../../../ui/declarative/ui.js";
 import type { InventoryComponent } from "../../../../component/inventoryComponent.js";
 import { InteractionState } from "../../../handler/interactionState.js";
 import { AlertMessageState } from "../../common/alertMessageState.js";

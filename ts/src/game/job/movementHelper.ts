@@ -1,5 +1,5 @@
 import type { Point } from "../../common/point.js";
-import { PathResultStatus, queryPath } from "../../module/query/pathQuery.js";
+import { PathResultStatus, queryPath } from "../map/query/pathQuery.js";
 import type { Entity } from "../entity/entity.js";
 
 export enum MovementResult {

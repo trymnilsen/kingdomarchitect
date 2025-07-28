@@ -1,5 +1,5 @@
 import { rgbToHex } from "../common/color.js";
-import { AssetLoader } from "../module/asset/loader/assetLoader.js";
+import { AssetLoader } from "../asset/loader/assetLoader.js";
 import { Camera } from "./camera.js";
 import { RenderScope } from "./renderScope.js";
 import { SpriteCache } from "./spriteCache.js";

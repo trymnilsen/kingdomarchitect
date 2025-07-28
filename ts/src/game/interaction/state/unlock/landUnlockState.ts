@@ -2,11 +2,10 @@ import { withinRectangle } from "../../../../common/bounds.js";
 import { Direction } from "../../../../common/direction.js";
 import { encodePosition, Point, shiftPoint } from "../../../../common/point.js";
 import { allSides } from "../../../../common/sides.js";
-import { sprites2 } from "../../../../module/asset/sprite.js";
-import { ChunkDimension, ChunkSize } from "../../../../module/world/chunk.js";
-import { TileSize } from "../../../../module/world/tile.js";
+import { sprites2 } from "../../../../asset/sprite.js";
+import { ChunkDimension, ChunkSize } from "../../../map/chunk.js";
+import { TileSize } from "../../../map/tile.js";
 import { RenderScope } from "../../../../rendering/renderScope.js";
-import { makeUnlockChunkAction } from "../../../action/world/unlockChunkAction.js";
 import { hasChunk, TileComponentId } from "../../../component/tileComponent.js";
 import { InteractionState } from "../../handler/interactionState.js";
 
@@ -77,12 +76,12 @@ export class LandUnlockState extends InteractionState {
 
     private unlockSelected() {
         if (this.cursor) {
-            const chunkPoint = {
+            const _chunkPoint = {
                 x: Math.floor(this.cursor.x / ChunkSize / TileSize),
                 y: Math.floor(this.cursor.y / ChunkSize / TileSize),
             };
 
-            this.context.root.dispatchAction(makeUnlockChunkAction(chunkPoint));
+            //this.context.root.dispatchAction(makeUnlockChunkAction(chunkPoint));
             //this.context.stateChanger.pop();
             this.setUnlockableChunks();
         }

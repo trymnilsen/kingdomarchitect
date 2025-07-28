@@ -9,7 +9,6 @@ import {
     zeroPoint,
 } from "../../common/point.js";
 import { GameTime } from "../../common/time.js";
-import type { EntityAction } from "../../module/action/entityAction.js";
 import type {
     BaseComponent,
     ComponentID,

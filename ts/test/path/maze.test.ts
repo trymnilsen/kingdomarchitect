@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
-import { FixedGraph } from "../../src/module/path/graph/fixedGraph.js";
-import { aStarSearch } from "../../src/module/path/search.js";
+import { FixedGraph } from "../../src/game/map/path/graph/fixedGraph.js";
+import { aStarSearch } from "../../src/game/map/path/search.js";
 import { createGraphFromTestFile, verifyPath } from "./testGraph.js";
 
 describe("Maze", () => {

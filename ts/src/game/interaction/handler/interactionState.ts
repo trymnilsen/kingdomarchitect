@@ -1,15 +1,15 @@
 import { Point } from "../../../common/point.js";
 import { allSides } from "../../../common/sides.js";
-import { sprites2 } from "../../../module/asset/sprite.js";
+import { sprites2 } from "../../../asset/sprite.js";
 import {
     InputAction,
     InputActionType,
     getDirectionFromInputType,
-} from "../../../module/input/inputAction.js";
-import { GroundTile } from "../../../module/world/tile.js";
-import type { ComponentDescriptor } from "../../../module/ui/declarative/ui.js";
-import { UIEvent } from "../../../module/ui/event/uiEvent.js";
-import { FocusGroup } from "../../../module/ui/focus/focusGroup.js";
+} from "../../../input/inputAction.js";
+import { GroundTile } from "../../map/tile.js";
+import type { ComponentDescriptor } from "../../../ui/declarative/ui.js";
+import { UIEvent } from "../../../ui/event/uiEvent.js";
+import { FocusGroup } from "../../../ui/focus/focusGroup.js";
 import { RenderScope } from "../../../rendering/renderScope.js";
 import { InteractionStateChanger } from "./interactionStateChanger.js";
 import { StateContext } from "./stateContext.js";

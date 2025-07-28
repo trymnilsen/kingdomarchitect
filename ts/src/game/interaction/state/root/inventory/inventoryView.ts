@@ -4,20 +4,20 @@ import {
     InventoryItemList,
     type InventoryItemQuantity,
 } from "../../../../../data/inventory/inventoryItemQuantity.js";
-import { sprites2 } from "../../../../../module/asset/sprite.js";
-import { UIThemeType, bookInkColor } from "../../../../../module/ui/color.js";
+import { sprites2 } from "../../../../../asset/sprite.js";
+import { UIThemeType, bookInkColor } from "../../../../../ui/color.js";
 import {
     createComponent,
     type ComponentDescriptor,
-} from "../../../../../module/ui/declarative/ui.js";
-import { uiBookLayout } from "../../../../../module/ui/declarative/uiBookLayout.js";
-import { uiBox } from "../../../../../module/ui/declarative/uiBox.js";
-import { uiGrid } from "../../../../../module/ui/declarative/uiGrid.js";
-import { uiImage } from "../../../../../module/ui/declarative/uiImage.js";
-import { uiColumn } from "../../../../../module/ui/declarative/uiSequence.js";
-import { uiText } from "../../../../../module/ui/declarative/uiText.js";
-import { ninePatchBackground } from "../../../../../module/ui/uiBackground.js";
-import { fillUiSize, wrapUiSize } from "../../../../../module/ui/uiSize.js";
+} from "../../../../../ui/declarative/ui.js";
+import { uiBookLayout } from "../../../../../ui/declarative/uiBookLayout.js";
+import { uiBox } from "../../../../../ui/declarative/uiBox.js";
+import { uiGrid } from "../../../../../ui/declarative/uiGrid.js";
+import { uiImage } from "../../../../../ui/declarative/uiImage.js";
+import { uiColumn } from "../../../../../ui/declarative/uiSequence.js";
+import { uiText } from "../../../../../ui/declarative/uiText.js";
+import { ninePatchBackground } from "../../../../../ui/uiBackground.js";
+import { fillUiSize, wrapUiSize } from "../../../../../ui/uiSize.js";
 import type { InventoryComponent } from "../../../../component/inventoryComponent.js";
 import { inventoryGridItem } from "./inventoryGridItem.js";
 

@@ -18,15 +18,19 @@ export function createVisibilityMapComponent(): VisibilityMapComponent {
 }
 
 export function hasDiscovered(
-    visibilityComponent: VisibilityMapComponent,
-    x: number,
-    y: number,
-): boolean {}
+    _visibilityComponent: VisibilityMapComponent,
+    _x: number,
+    _y: number,
+): boolean {
+    throw new Error("Not implemented");
+}
 
 export function isVisible(
-    visibilityComponent: VisibilityMapComponent,
-    x: number,
-    y: number,
-): boolean {}
+    _visibilityComponent: VisibilityMapComponent,
+    _x: number,
+    _y: number,
+): boolean {
+    throw new Error("Not implemented");
+}
 
 export const VisibilityMapComponentId = "visibilityMap";

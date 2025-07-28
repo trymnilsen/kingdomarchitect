@@ -1,5 +1,5 @@
-import { sprites2 } from "../../../../module/asset/sprite.js";
-import { GroundTile } from "../../../../module/world/tile.js";
+import { sprites2 } from "../../../../asset/sprite.js";
+import { GroundTile } from "../../../map/tile.js";
 import { RenderScope } from "../../../../rendering/renderScope.js";
 import { Entity } from "../../../entity/entity.js";
 import { InteractionState } from "../../handler/interactionState.js";

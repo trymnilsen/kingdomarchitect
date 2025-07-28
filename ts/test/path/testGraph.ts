@@ -1,7 +1,7 @@
 import assert from "node:assert";
 import * as path from "path";
 import { Point, pointEquals, zeroPoint } from "../../src/common/point.js";
-import { FixedGraph } from "../../src/module/path/graph/fixedGraph.js";
+import { FixedGraph } from "../../src/game/map/path/graph/fixedGraph.js";
 import { getPixelColor, readPng } from "../../tool/spritepack/pngHelper.js";
 
 /**

@@ -1,5 +1,5 @@
 import { generateId } from "../../common/idGenerator.js";
-import { sprites2 } from "../../module/asset/sprite.js";
+import { sprites2 } from "../../asset/sprite.js";
 import { createEquipmentComponent } from "../component/equipmentComponent.js";
 import {
     createInventoryComponent,

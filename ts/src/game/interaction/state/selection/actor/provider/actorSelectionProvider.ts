@@ -1,4 +1,4 @@
-import { SelectedWorldItem } from "../../../../../../module/selection/selectedWorldItem.js";
+import { SelectedWorldItem } from "../../../../selection/selectedWorldItem.js";
 import { StateContext } from "../../../../handler/stateContext.js";
 import { ButtonCollection } from "../../../../view/buttonCollection.js";
 

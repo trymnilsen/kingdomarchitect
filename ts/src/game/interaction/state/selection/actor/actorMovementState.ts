@@ -1,12 +1,11 @@
 import { Point } from "../../../../../common/point.js";
 import { allSides } from "../../../../../common/sides.js";
-import { sprites2 } from "../../../../../module/asset/sprite.js";
-import { GroundTile, TileSize } from "../../../../../module/world/tile.js";
-import { SearchedNode } from "../../../../../module/path/search.js";
-import { queryPath } from "../../../../../module/query/pathQuery.js";
+import { sprites2 } from "../../../../../asset/sprite.js";
+import { GroundTile, TileSize } from "../../../../map/tile.js";
+import { SearchedNode } from "../../../../map/path/search.js";
+import { queryPath } from "../../../../map/query/pathQuery.js";
 import { RenderScope } from "../../../../../rendering/renderScope.js";
-import type { ComponentDescriptor } from "../../../../../module/ui/declarative/ui.js";
-import { makeQueueJobAction } from "../../../../action/job/queueJobAction.js";
+import type { ComponentDescriptor } from "../../../../../ui/declarative/ui.js";
 import { Entity } from "../../../../entity/entity.js";
 import type { MoveToJob } from "../../../../job/moveToPointJob.js";
 import { InteractionState } from "../../../handler/interactionState.js";
@@ -157,6 +156,7 @@ export class ActorMovementState extends InteractionState {
     }
 
     private scheduleMovement() {
+        /*
         if (this.context.root.actionDispatch && this.selectedPoint) {
             const job: MoveToJob = {
                 id: "moveToJob",
@@ -167,6 +167,6 @@ export class ActorMovementState extends InteractionState {
             this.context.root.actionDispatch(
                 makeQueueJobAction(job, this.entity),
             );
-        }
+        }*/
     }
 }

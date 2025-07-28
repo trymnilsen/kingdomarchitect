@@ -1,7 +1,7 @@
 import type { Bounds } from "../../common/bounds.js";
 import { encodePosition, type Point } from "../../common/point.js";
 import { SparseSet } from "../../common/structure/sparseSet.js";
-import { ChunkSize } from "../../module/world/chunk.js";
+import { ChunkSize } from "../map/chunk.js";
 import type { Entity } from "../entity/entity.js";
 
 export type ChunkMapComponent = {

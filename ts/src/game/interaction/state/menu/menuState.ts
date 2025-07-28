@@ -1,14 +1,14 @@
 import { allSides } from "../../../../common/sides.js";
-import { sprites2 } from "../../../../module/asset/sprite.js";
-import { bookInkColor } from "../../../../module/ui/color.js";
-import { ninePatchBackground } from "../../../../module/ui/uiBackground.js";
-import { fillUiSize, wrapUiSize } from "../../../../module/ui/uiSize.js";
+import { sprites2 } from "../../../../asset/sprite.js";
+import { bookInkColor } from "../../../../ui/color.js";
+import { ninePatchBackground } from "../../../../ui/uiBackground.js";
+import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize.js";
 import { InteractionState } from "../../handler/interactionState.js";
-import { type ComponentDescriptor } from "../../../../module/ui/declarative/ui.js";
-import { uiBox } from "../../../../module/ui/declarative/uiBox.js";
-import { uiButton } from "../../../../module/ui/declarative/uiButton.js";
-import { uiColumn } from "../../../../module/ui/declarative/uiSequence.js";
-import { uiText } from "../../../../module/ui/declarative/uiText.js";
+import { type ComponentDescriptor } from "../../../../ui/declarative/ui.js";
+import { uiBox } from "../../../../ui/declarative/uiBox.js";
+import { uiButton } from "../../../../ui/declarative/uiButton.js";
+import { uiColumn } from "../../../../ui/declarative/uiSequence.js";
+import { uiText } from "../../../../ui/declarative/uiText.js";
 
 declare global {
     interface Window {

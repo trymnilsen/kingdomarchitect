@@ -1,4 +1,4 @@
-import type { EcsSystem } from "../../module/ecs/ecsSystem.js";
+import type { EcsSystem } from "../../common/ecs/ecsSystem.js";
 import { addInitialPlayerChunk } from "../map/player.js";
 import type { Entity } from "../entity/entity.js";
 

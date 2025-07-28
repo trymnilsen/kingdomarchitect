@@ -1,8 +1,7 @@
-import { EcsSystem } from "../module/ecs/ecsSystem.js";
-import type { GameServerMessageEntry } from "./gameServerMessageBus.js";
+import { EcsSystem } from "../common/ecs/ecsSystem.js";
 
 export function makeReplicatedEntitiesSystem(
-    postMessage: (message: GameServerMessageEntry) => void,
+    postMessage: (message: any) => void,
 ): EcsSystem {
     return {
         onEntityEvent: {

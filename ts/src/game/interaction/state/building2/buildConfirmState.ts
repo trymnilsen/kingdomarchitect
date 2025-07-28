@@ -2,11 +2,10 @@ import { findMapped } from "../../../../common/array.js";
 import { Point } from "../../../../common/point.js";
 import { allSides } from "../../../../common/sides.js";
 import { Building } from "../../../../data/building/building.js";
-import { sprites2 } from "../../../../module/asset/sprite.js";
-import { GroundTile, TileSize } from "../../../../module/world/tile.js";
-import type { ComponentDescriptor } from "../../../../module/ui/declarative/ui.js";
+import { sprites2 } from "../../../../asset/sprite.js";
+import { GroundTile, TileSize } from "../../../map/tile.js";
+import type { ComponentDescriptor } from "../../../../ui/declarative/ui.js";
 import { RenderScope } from "../../../../rendering/renderScope.js";
-import { makeBuildBuildingAction } from "../../../action/world/buildingAction.js";
 import {
     ChunkMapComponentId,
     getEntitiesAt,
@@ -122,9 +121,10 @@ export class BuildConfirmState extends InteractionState {
 
         if (removeResult) {
             for (const selection of selections) {
+                /*
                 this.context.root.dispatchAction(
                     makeBuildBuildingAction(this.building, selection),
-                );
+                );*/
             }
 
             this.context.stateChanger.clear();

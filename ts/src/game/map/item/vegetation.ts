@@ -6,7 +6,7 @@ import {
 } from "../../component/chunkMapComponent.js";
 import { Entity } from "../../entity/entity.js";
 import { resourcePrefab } from "../../prefab/resourcePrefab.js";
-import { ChunkSize, getChunkBounds } from "../../../module/world/chunk.js";
+import { ChunkSize, getChunkBounds } from "../chunk.js";
 
 export function spawnTree(
     amount: number,

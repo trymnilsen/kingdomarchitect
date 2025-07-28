@@ -1,5 +1,5 @@
 import { removeItem } from "../../common/array.js";
-import { EcsSystem } from "../../module/ecs/ecsSystem.js";
+import { EcsSystem } from "../../common/ecs/ecsSystem.js";
 import {
     createJobQueueComponent,
     JobQueueComponentId,

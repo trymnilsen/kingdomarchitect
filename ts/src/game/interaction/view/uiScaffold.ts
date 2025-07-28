@@ -1,30 +1,26 @@
 import { allSides } from "../../../common/sides.js";
-import { sprites2 } from "../../../module/asset/sprite.js";
+import { sprites2 } from "../../../asset/sprite.js";
 import {
     createComponent,
     type ComponentDescriptor,
     type PlacedChild,
-} from "../../../module/ui/declarative/ui.js";
-import { uiBox } from "../../../module/ui/declarative/uiBox.js";
-import { uiImage } from "../../../module/ui/declarative/uiImage.js";
+} from "../../../ui/declarative/ui.js";
+import { uiBox } from "../../../ui/declarative/uiBox.js";
+import { uiImage } from "../../../ui/declarative/uiImage.js";
 import {
     CrossAxisAlignment,
     uiColumn,
-} from "../../../module/ui/declarative/uiSequence.js";
-import { uiText } from "../../../module/ui/declarative/uiText.js";
-import { ninePatchBackground } from "../../../module/ui/uiBackground.js";
-import {
-    wrapUiSize,
-    zeroSize,
-    type UISize,
-} from "../../../module/ui/uiSize.js";
+} from "../../../ui/declarative/uiSequence.js";
+import { uiText } from "../../../ui/declarative/uiText.js";
+import { ninePatchBackground } from "../../../ui/uiBackground.js";
+import { wrapUiSize, zeroSize, type UISize } from "../../../ui/uiSize.js";
 import { actionbarTextStyle } from "../../../rendering/text/textStyle.js";
 
 type UiButtonProps = {
     text: string;
     onClick?: () => void;
     onExpand?: () => void;
-    icon?: import("../../../module/asset/sprite.js").Sprite2;
+    icon?: import("../../../asset/sprite.js").Sprite2;
     hasChildren?: boolean;
 };
 
@@ -82,7 +78,7 @@ const uiMenuButton = createComponent<UiButtonProps>(
 type ScaffoldButton = {
     text: string;
     onClick?: () => void;
-    icon?: import("../../../module/asset/sprite.js").Sprite2;
+    icon?: import("../../../asset/sprite.js").Sprite2;
     children?: ScaffoldButton[];
 };
 
