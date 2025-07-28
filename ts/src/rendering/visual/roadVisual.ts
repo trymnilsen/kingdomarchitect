@@ -1,5 +1,5 @@
 import { Point } from "../../common/point.js";
-import { TileSize } from "../../module/map/tile.js";
+import { TileSize } from "../../module/world/tile.js";
 import { RenderScope } from "../renderScope.js";
 import { RenderVisual } from "../renderVisual.js";
 

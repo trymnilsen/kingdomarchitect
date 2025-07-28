@@ -4,8 +4,6 @@ import { chunkMapSystem } from "../game/system/chunkMapSystem.js";
 import { JobSystem } from "../game/system/jobSystem.js";
 import { pathfindingSystem } from "../game/system/pathfindingSystem.js";
 import { worldGenerationSystem } from "../game/system/worldGenerationSystem.js";
-import type { ActionDispatcher } from "../module/action/actionDispatcher.js";
-import type { EntityAction } from "../module/action/entityAction.js";
 import { EcsWorld } from "../module/ecs/ecsWorld.js";
 import {
     GameServerMessageBus,

@@ -3,10 +3,10 @@ import { treeResource } from "../../../data/inventory/items/naturalResource.js";
 import {
     ChunkMapComponent,
     getEntitiesInChunkMapWithin,
-} from "../../../game/component/chunkMapComponent.js";
-import { Entity } from "../../../game/entity/entity.js";
-import { resourcePrefab } from "../../../game/prefab/resourcePrefab.js";
-import { ChunkSize, getChunkBounds } from "../chunk.js";
+} from "../../component/chunkMapComponent.js";
+import { Entity } from "../../entity/entity.js";
+import { resourcePrefab } from "../../prefab/resourcePrefab.js";
+import { ChunkSize, getChunkBounds } from "../../../module/world/chunk.js";
 
 export function spawnTree(
     amount: number,

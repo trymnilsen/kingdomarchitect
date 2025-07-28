@@ -6,12 +6,8 @@ import {
 import { randomColor } from "../../common/color.js";
 import { generateId } from "../../common/idGenerator.js";
 import { adjacentPoints, Point } from "../../common/point.js";
-import { makeSetTilesAction } from "../../game/action/world/setTilesAction.js";
-import {
-    getChunk,
-    TileComponentId,
-} from "../../game/component/tileComponent.js";
-import { Entity } from "../../game/entity/entity.js";
+import { getChunk, TileComponentId } from "../component/tileComponent.js";
+import { Entity } from "../entity/entity.js";
 import { generateDesert } from "./biome/desert.js";
 import { generateForrest } from "./biome/forrest.js";
 import { generateMountains } from "./biome/mountains.js";
@@ -19,8 +15,8 @@ import { generatePlains } from "./biome/plains.js";
 import { generateSnow } from "./biome/snow.js";
 import { generateSwamp } from "./biome/swamp.js";
 import { generateTaint } from "./biome/taint.js";
-import { ChunkSize, type TileChunk } from "./chunk.js";
-import type { Volume } from "./volume.js";
+import { ChunkSize, type TileChunk } from "../../module/world/chunk.js";
+import type { Volume } from "../../module/world/volume.js";
 
 //TODO: should return a structure describing the unlock for the action
 export function generateChunk(rootEntity: Entity, chunkPoint: Point) {

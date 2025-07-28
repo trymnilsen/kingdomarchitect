@@ -1,7 +1,7 @@
 import { encodePosition } from "../../common/point.js";
 import { SparseSet } from "../../common/structure/sparseSet.js";
 import type { EcsSystem } from "../../module/ecs/ecsSystem.js";
-import { ChunkSize } from "../../module/map/chunk.js";
+import { ChunkSize } from "../../module/world/chunk.js";
 import {
     ChunkMapComponent,
     ChunkMapComponentId,

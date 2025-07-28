@@ -6,7 +6,7 @@ import {
     InputActionType,
     getDirectionFromInputType,
 } from "../../../module/input/inputAction.js";
-import { GroundTile } from "../../../module/map/tile.js";
+import { GroundTile } from "../../../module/world/tile.js";
 import type { ComponentDescriptor } from "../../../module/ui/declarative/ui.js";
 import { UIEvent } from "../../../module/ui/event/uiEvent.js";
 import { FocusGroup } from "../../../module/ui/focus/focusGroup.js";

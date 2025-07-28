@@ -9,7 +9,6 @@ import {
     zeroPoint,
 } from "../../common/point.js";
 import { GameTime } from "../../common/time.js";
-import type { ActionDispatcher } from "../../module/action/actionDispatcher.js";
 import type { EntityAction } from "../../module/action/entityAction.js";
 import type {
     BaseComponent,
@@ -35,7 +34,6 @@ export class Entity {
     private _entityEvents?: (event: EntityEvent) => void;
     private _ecsComponents = new Map<string, Components>();
     private _gameTime?: GameTime;
-    private _actionDispatch?: ActionDispatcher;
 
     constructor(readonly id: EntityId) {}
 
@@ -136,14 +134,6 @@ export class Entity {
 
     set entityEvent(value: ((event: EntityEvent) => void) | undefined) {
         this._entityEvents = value;
-    }
-
-    get actionDispatch(): ActionDispatcher | undefined {
-        return this._actionDispatch;
-    }
-
-    set actionDispatch(value: ActionDispatcher | undefined) {
-        this._actionDispatch = value;
     }
 
     get components(): ReadonlyArray<Readonly<Components>> {
@@ -336,16 +326,6 @@ export class Entity {
                 item: component,
                 source: this,
             });
-        }
-    }
-
-    /**
-     * Dispatch an action to the action dispatcher if one is attached to the entity
-     * @param action action to dispatch
-     */
-    dispatchAction<T extends EntityAction>(action: T) {
-        if (this._actionDispatch) {
-            this._actionDispatch(action);
         }
     }
 

@@ -1,12 +1,11 @@
 import { randomColor } from "../../common/color.js";
 import { generateId } from "../../common/idGenerator.js";
 import { treeResource } from "../../data/inventory/items/naturalResource.js";
-import { makeSetTilesAction } from "../../game/action/world/setTilesAction.js";
-import { ChunkMapComponentId } from "../../game/component/chunkMapComponent.js";
-import { TileComponentId } from "../../game/component/tileComponent.js";
-import { Entity } from "../../game/entity/entity.js";
-import { resourcePrefab } from "../../game/prefab/resourcePrefab.js";
-import { workerPrefab } from "../../game/prefab/workerPrefab.js";
+import { ChunkMapComponentId } from "../component/chunkMapComponent.js";
+import { TileComponentId } from "../component/tileComponent.js";
+import { Entity } from "../entity/entity.js";
+import { resourcePrefab } from "../prefab/resourcePrefab.js";
+import { workerPrefab } from "../prefab/workerPrefab.js";
 import { spawnTree } from "./item/vegetation.js";
 
 export function addInitialPlayerChunk(rootEntity: Entity) {

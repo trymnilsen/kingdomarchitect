@@ -3,7 +3,7 @@ import { Point } from "../../../../common/point.js";
 import { allSides } from "../../../../common/sides.js";
 import { Building } from "../../../../data/building/building.js";
 import { sprites2 } from "../../../../module/asset/sprite.js";
-import { GroundTile, TileSize } from "../../../../module/map/tile.js";
+import { GroundTile, TileSize } from "../../../../module/world/tile.js";
 import type { ComponentDescriptor } from "../../../../module/ui/declarative/ui.js";
 import { RenderScope } from "../../../../rendering/renderScope.js";
 import { makeBuildBuildingAction } from "../../../action/world/buildingAction.js";

@@ -2,19 +2,15 @@ import { invert, multiplyPoint, Point } from "../common/point.js";
 import { AssetLoader } from "../module/asset/loader/assetLoader.js";
 
 import { GameTime } from "../common/time.js";
-import type { ActionDispatcher } from "../module/action/actionDispatcher.js";
-import type { EntityAction } from "../module/action/entityAction.js";
 import { EcsWorld } from "../module/ecs/ecsWorld.js";
 import { Input, InputEvent } from "../module/input/input.js";
 import { TouchInput } from "../module/input/touchInput.js";
-import { TileSize } from "../module/map/tile.js";
+import { TileSize } from "../module/world/tile.js";
 import { UiRenderer } from "../module/ui/declarative/ui.js";
 import { Camera } from "../rendering/camera.js";
 import { DrawMode } from "../rendering/drawMode.js";
 import { Renderer } from "../rendering/renderer.js";
 import { RenderVisibilityMap } from "../rendering/renderVisibilityMap.js";
-import { createClientDispatcher } from "./action/dispatcher/client/clientDispatcher.js";
-import { handleGameMessage } from "./action/messages/gameMessageHandler.js";
 import { GameServerConnection } from "./connection/gameServerConnection.js";
 import { WebworkerServerConnection } from "./connection/webworkerServerConnection.js";
 import { InteractionHandler } from "./interaction/handler/interactionHandler.js";
@@ -48,10 +44,12 @@ export class Game {
             handleGameMessage(message, this.ecsWorld.root);
         });
         this.actionDispatcher = createClientDispatcher(this.ecsWorld.root);
+
+        /*
         this.ecsWorld.root.actionDispatch = (action: EntityAction) => {
             this.actionDispatcher(action);
             this.gameServer.postAction(action);
-        };
+        };*/
         this.assetLoader = new AssetLoader();
         // Rendering
         this.camera = new Camera({
@@ -180,11 +178,7 @@ export class Game {
 
     private render(drawMode: DrawMode) {
         this.renderer.clearScreen();
-        this.ecsWorld.runRender(
-            this.renderer.context,
-            this.visibilityMap,
-            drawMode,
-        );
+        this.ecsWorld.runRender(this.renderer.context, drawMode);
 
         this.interactionHandler.onDraw(this.renderer.context);
         this.renderer.renderDeferred();

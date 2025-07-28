@@ -7,7 +7,7 @@ import {
     blueBook,
     woodResourceItem,
 } from "../../../../data/inventory/items/resources.js";
-import { GroundTile, TileSize } from "../../../../module/map/tile.js";
+import { GroundTile, TileSize } from "../../../../module/world/tile.js";
 import type { ComponentDescriptor } from "../../../../module/ui/declarative/ui.js";
 import { FocusGroup } from "../../../../module/ui/focus/focusGroup.js";
 import { Camera } from "../../../../rendering/camera.js";

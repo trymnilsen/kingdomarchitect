@@ -1,7 +1,7 @@
 import type { Bounds } from "../../common/bounds.js";
 import type { Point } from "../../common/point.js";
-import { ChunkSize, type TileChunk } from "../../module/map/chunk.js";
-import { getTileId, type GroundTile } from "../../module/map/tile.js";
+import { ChunkSize, type TileChunk } from "../../module/world/chunk.js";
+import { getTileId, type GroundTile } from "../../module/world/tile.js";
 
 export type TileComponent = {
     id: typeof TileComponentId;

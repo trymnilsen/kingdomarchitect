@@ -1,7 +1,7 @@
 import { Point } from "../../../../../common/point.js";
 import { allSides } from "../../../../../common/sides.js";
 import { sprites2 } from "../../../../../module/asset/sprite.js";
-import { GroundTile, TileSize } from "../../../../../module/map/tile.js";
+import { GroundTile, TileSize } from "../../../../../module/world/tile.js";
 import { SearchedNode } from "../../../../../module/path/search.js";
 import { queryPath } from "../../../../../module/query/pathQuery.js";
 import { RenderScope } from "../../../../../rendering/renderScope.js";
