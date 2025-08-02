@@ -6,7 +6,7 @@ import { worldGenerationSystem } from "../game/system/worldGenerationSystem.js";
 import { EcsWorld } from "../common/ecs/ecsWorld.js";
 
 import { makeReplicatedEntitiesSystem } from "./replicatedEntitiesSystem.js";
-import type { GameCommand } from "../game/message/gameCommand.js";
+import type { GameCommand } from "./message/gameCommand.js";
 import { createEffectEmitterComponent } from "../game/component/effectEmitter.js";
 
 export class GameServer {

@@ -1,4 +1,4 @@
-import type { Volume } from "../../map/volume.js";
+import type { Volume } from "../../../game/map/volume.js";
 
 export type DiscoverTileEffect = {
     id: typeof discoverTileEffectId;

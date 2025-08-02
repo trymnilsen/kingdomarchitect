@@ -1,11 +1,13 @@
 import type { GameEffect } from "./effect/gameEffect.js";
+import type { GameCommand } from "./gameCommand.js";
 
 export type GameMessage =
     | AddEntityGameMessage
     | SetComponentGameMessage
     | ComponentDeltaGameMessage
     | TransformGameMessage
-    | EffectGameMessage;
+    | EffectGameMessage
+    | CommandGameMessage;
 
 export type AddEntityGameMessage = {
     type: "addEntity";
@@ -26,4 +28,9 @@ export type TransformGameMessage = {
 export type EffectGameMessage = {
     type: "effect";
     effect: GameEffect;
+};
+
+export type CommandGameMessage = {
+    type: "command";
+    command: GameCommand;
 };
