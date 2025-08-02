@@ -6,24 +6,15 @@ import { worldGenerationSystem } from "../game/system/worldGenerationSystem.js";
 import { EcsWorld } from "../common/ecs/ecsWorld.js";
 
 import { makeReplicatedEntitiesSystem } from "./replicatedEntitiesSystem.js";
-import type { GameCommand } from "../game/command/gameCommand.js";
+import type { GameCommand } from "../game/message/gameCommand.js";
+import { createEffectEmitterComponent } from "../game/component/effectEmitter.js";
 
 export class GameServer {
     private world: EcsWorld;
 
     constructor() {
         this.world = new EcsWorld();
-        //Add the discovery component to the server scene, this is used only on
-        //the server to keep track of which tiles players have discovered
-        this.world.root.setEcsComponent(createWorldDiscoveryComponent());
-        /*
-        this.world.root.actionDispatch = (action: EntityAction) => {
-            this.actionDispatcher(action);
-            messageBus.postMessage({
-                id: "entityAction",
-                entityAction: action,
-            });
-        };*/
+        this.addComponents();
         this.addSystems();
         this.world.runInit();
         setInterval(() => {
@@ -31,11 +22,17 @@ export class GameServer {
         }, 1000);
     }
 
+    private addComponents() {
+        this.world.root.setEcsComponent(createEffectEmitterComponent());
+        this.world.root.setEcsComponent(createWorldDiscoveryComponent());
+    }
+
     private addSystems() {
         this.world.addSystem(chunkMapSystem);
         this.world.addSystem(pathfindingSystem);
         this.world.addSystem(worldGenerationSystem);
         this.world.addSystem(JobSystem);
+        this.world.addSystem(makeReplicatedEntitiesSystem(() => {}));
     }
 
     onCommand(_command: GameCommand) {

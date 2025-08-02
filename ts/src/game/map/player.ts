@@ -1,7 +1,6 @@
-import { randomColor } from "../../common/color.js";
-import { generateId } from "../../common/idGenerator.js";
 import { treeResource } from "../../data/inventory/items/naturalResource.js";
 import { ChunkMapComponentId } from "../component/chunkMapComponent.js";
+import { EffectEmitterComponentId } from "../component/effectEmitter.js";
 import { TileComponentId } from "../component/tileComponent.js";
 import { Entity } from "../entity/entity.js";
 import { resourcePrefab } from "../prefab/resourcePrefab.js";
@@ -12,22 +11,9 @@ export function addInitialPlayerChunk(rootEntity: Entity) {
     const chunkEntity = new Entity("chunk");
     rootEntity.addChild(chunkEntity);
     const tiles = rootEntity.requireEcsComponent(TileComponentId);
-
-    /*
-    rootEntity.dispatchAction(
-        makeSetTilesAction({
-            chunkX: 0,
-            chunkY: 0,
-            volume: {
-                id: generateId("volume"),
-                maxSize: Math.floor(Math.random() * 4) + 2,
-                type: "forrest",
-                size: 1,
-                chunks: [{ x: 0, y: 0 }],
-                debugColor: randomColor(),
-            },
-        }),
-    );*/
+    const effectEmitter = rootEntity.requireEcsComponent(
+        EffectEmitterComponentId,
+    );
 
     const randomOffsetX = Math.round(Math.random() * 3) + 1;
     const randomOffsetY = Math.round(Math.random() * 3) + 1;
@@ -45,6 +31,8 @@ export function addInitialPlayerChunk(rootEntity: Entity) {
     for (const tree of trees) {
         chunkEntity.addChild(tree);
     }
+    //set discovery of tile for player
+    //broadcast discovery
     /*
     const firstWorker = workerPrefab(generateId("worker"));
     const firstHouse = housePrefab(generateId("house"), false);

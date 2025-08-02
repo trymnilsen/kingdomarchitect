@@ -1,3 +1,5 @@
+import type { GameEffect } from "./effect/gameEffect.js";
+
 export type GameMessage =
     | AddEntityGameMessage
     | SetComponentGameMessage
@@ -23,4 +25,5 @@ export type TransformGameMessage = {
 
 export type EffectGameMessage = {
     type: "effect";
+    effect: GameEffect;
 };

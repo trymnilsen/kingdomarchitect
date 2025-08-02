@@ -6,7 +6,6 @@ import {
 } from "../../game/entity/entityEvent.js";
 import { DrawMode } from "../../rendering/drawMode.js";
 import { RenderScope } from "../../rendering/renderScope.js";
-import { RenderVisibilityMap } from "../../rendering/renderVisibilityMap.js";
 import {
     EcsEntityEventFunction,
     EcsInitFunction,

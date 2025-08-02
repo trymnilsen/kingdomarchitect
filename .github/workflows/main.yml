@@ -8,6 +8,8 @@ jobs:
   compile:
     name: Compile with tsc
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -16,6 +18,8 @@ jobs:
   check-format:
     name: Check format with prettier
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -24,6 +28,8 @@ jobs:
   test:
     name: Run tests
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -32,6 +38,8 @@ jobs:
     name: Bundle compiled sources with Rollup
     runs-on: ubuntu-latest
     needs: [compile, check-format, test]
+    permissions:
+      contents: read
     steps:
       - name: Compile the source
         run: echo compile placeholder
@@ -39,6 +47,8 @@ jobs:
     name: Inject html for error and telemetry
     runs-on: ubuntu-latest
     needs: [bundle]
+    permissions:
+      contents: read
     steps:
       - name: Compile the source
         run: echo compile placeholder
