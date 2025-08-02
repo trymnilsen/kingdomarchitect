@@ -1,16 +1,15 @@
-import { describe, it } from "node:test";
-import assert from "node:assert";
+import { describe, it, expect } from "vitest";
 
 describe("Number", () => {
     it("does not clamp value if inbetween range", () => {
-        assert.strictEqual(2, 2);
+        expect(2).toBe(2);
     });
 
     it("clamps value to lower value", () => {
-        assert.strictEqual(2, 2);
+        expect(2).toBe(2);
     });
 
     it("clamps value to higher value", () => {
-        assert.strictEqual(2, 2);
+        expect(2).toBe(2);
     });
 });

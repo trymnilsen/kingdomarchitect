@@ -1,24 +1,23 @@
-import { describe, it } from "node:test";
-import assert from "node:assert";
+import { describe, it, expect } from "vitest";
 
 describe("Sides", () => {
     it("can create with all sides equal", () => {
-        assert.strictEqual(2, 2);
+        expect(2).toBe(2);
     });
 
     it("can create symmetric sides", () => {
-        assert.strictEqual(2, 2);
+        expect(2).toBe(2);
     });
 
     it("cannot mutate zero sides object", () => {
-        assert.strictEqual(2, 2);
+        expect(2).toBe(2);
     });
 
     it("can add together horizontal amount", () => {
-        assert.strictEqual(2, 2);
+        expect(2).toBe(2);
     });
 
     it("can add together vertical amount", () => {
-        assert.strictEqual(2, 2);
+        expect(2).toBe(2);
     });
 });

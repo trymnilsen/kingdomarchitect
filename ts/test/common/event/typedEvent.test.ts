@@ -1,8 +1,7 @@
-import { describe, it } from "node:test";
-import assert from "node:assert";
+import { describe, it, expect } from "vitest";
 
 describe("TypedEvent", () => {
     it("Can listen", () => {
-        assert.strictEqual("2", "2");
+        expect("2").toBe("2");
     });
 });

@@ -1,7 +1,6 @@
-import { Sprite2 } from "../../src/asset/sprite.js";
-import { UILayoutScope } from "../../src/ui/uiLayoutContext.js";
-import { UISize } from "../../src/ui/uiSize.js";
-import { UIView } from "../../src/ui/uiView.js";
+import type { Sprite2 } from "../../src/asset/sprite.js";
+import type { UILayoutScope } from "../../src/ui/uiLayoutContext.js";
+import type { UISize } from "../../src/ui/uiSize.js";
 
 /**
  * A test layout context. Implementation should not be depended upon.
@@ -16,14 +15,4 @@ export class LayoutContextStub implements UILayoutScope {
             height: sprite.defintion.h,
         };
     }
-}
-
-/**
- * A helper method for laying out UI. Will create a stub context layout
- * and run transform updates after layout
- * @param constraints the wanted incomming constraints
- */
-export function doTestLayout(view: UIView, constraints: UISize) {
-    view.layout(new LayoutContextStub(), constraints);
-    view.updateTransform();
 }

@@ -1,5 +1,4 @@
-import { describe, it } from "node:test";
-import assert from "node:assert";
+import { describe, it, expect } from "vitest";
 import { QuadTree } from "../../../src/common/structure/quadtree.js";
 
 // Define helper functions for testing
@@ -18,21 +17,18 @@ function createSampleTree(): QuadTree {
 describe("QuadTree", () => {
     it("should insert rectangles without errors", () => {
         const quadTree = createSampleTree();
-        assert.doesNotThrow(() => {
+
+        expect(() => {
             quadTree.insert({ x: 20, y: 20, width: 5, height: 5 });
-        });
+        }).not.toThrow();
     });
 
     it("should query a rectangle and find intersecting objects", () => {
         const quadTree = createSampleTree();
         const results = quadTree.query({ x: 5, y: 5, width: 30, height: 30 });
 
-        assert.strictEqual(
-            results.length,
-            1,
-            "Should find 1 intersecting rectangle",
-        );
-        assert.deepStrictEqual(results[0], {
+        expect(results.length, "Should find 1 intersecting rectangle").toBe(1);
+        expect(results[0]).to.deep.equal({
             x: 10,
             y: 10,
             width: 20,
@@ -44,10 +40,8 @@ describe("QuadTree", () => {
         const quadTree = createSampleTree();
         const results = quadTree.query({ x: 90, y: 90, width: 10, height: 10 });
 
-        assert.equal(
-            results.length,
+        expect(results.length, "Should find no intersecting rectangles").toBe(
             0,
-            "Should find no intersecting rectangles",
         );
     });
 
@@ -61,9 +55,9 @@ describe("QuadTree", () => {
         quadTree.insert({ x: 30, y: 30, width: 5, height: 5 });
         quadTree.insert({ x: 40, y: 40, width: 5, height: 5 });
 
-        assert.ok(
+        expect(
             quadTree.divided,
             "QuadTree should subdivide after reaching capacity",
-        );
+        ).to.toBeTruthy();
     });
 });

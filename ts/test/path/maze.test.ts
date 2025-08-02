@@ -1,7 +1,7 @@
-import { describe, it } from "node:test";
 import { FixedGraph } from "../../src/game/map/path/graph/fixedGraph.js";
 import { aStarSearch } from "../../src/game/map/path/search.js";
 import { createGraphFromTestFile, verifyPath } from "./testGraph.js";
+import { describe, it } from "vitest";
 
 describe("Maze", () => {
     it("Maze 1", async () => {

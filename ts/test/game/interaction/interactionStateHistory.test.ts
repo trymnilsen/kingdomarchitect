@@ -1,20 +1,19 @@
-import { describe, it } from "node:test";
-import assert from "node:assert";
+import { describe, it, expect } from "vitest";
 
 describe("InteractionStateHistory", () => {
     it("push state", () => {
-        assert.strictEqual(2, 2);
+        expect(2).toBe(2);
     });
 
     it("replace state", () => {
-        assert.strictEqual(2, 2);
+        expect(2).toBe(2);
     });
 
     it("pop state", () => {
-        assert.strictEqual(2, 2);
+        expect(2).toBe(2);
     });
 
     it("clear states", () => {
-        assert.strictEqual(2, 2);
+        expect(2).toBe(2);
     });
 });

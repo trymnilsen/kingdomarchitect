@@ -1,11 +1,10 @@
-import { describe, it } from "node:test";
-import assert from "node:assert";
+import { describe, it, expect } from "vitest";
 
 describe("weightedRandomEntry", () => {
     it("Will return random item", () => {
-        assert.strictEqual(2, 2);
+        expect(2).toBe(2);
     });
     it("Will filter out item with 0 weight", () => {
-        assert.strictEqual(2, 2);
+        expect(2).toBe(2);
     });
 });
