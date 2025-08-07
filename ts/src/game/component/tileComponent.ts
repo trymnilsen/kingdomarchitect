@@ -2,16 +2,19 @@ import type { Bounds } from "../../common/bounds.js";
 import type { Point } from "../../common/point.js";
 import { ChunkSize, type TileChunk } from "../map/chunk.js";
 import { getTileId, type GroundTile } from "../map/tile.js";
+import type { Volume } from "../map/volume.js";
 
 export type TileComponent = {
     id: typeof TileComponentId;
     chunks: Map<string, TileChunk>;
+    volume: Map<string, Volume>;
 };
 
 export function createTileComponent(): TileComponent {
     return {
         id: TileComponentId,
         chunks: new Map(),
+        volume: new Map(),
     };
 }
 

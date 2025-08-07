@@ -1,3 +1,6 @@
+import type { Point } from "../../common/point.js";
+import type { Components } from "../../game/component/component.js";
+import type { Entity } from "../../game/entity/entity.js";
 import type { GameEffect } from "./effect/gameEffect.js";
 import type { GameCommand } from "./gameCommand.js";
 
@@ -9,28 +12,45 @@ export type GameMessage =
     | EffectGameMessage
     | CommandGameMessage;
 
+export const AddEntityGameMessageType = "addEntity";
+export const SetComponentGameMessageType = "setComponent";
+export const ComponentDeltaGameMessageType = "componentDelta";
+export const TransformGameMessageType = "transform";
+export const EffectGameMessageType = "effect";
+export const CommandGameMessageType = "command";
+
 export type AddEntityGameMessage = {
-    type: "addEntity";
+    type: typeof AddEntityGameMessageType;
+    entity: {
+        id: string;
+        position: Point;
+        parent?: string;
+    };
+    components: readonly Components[];
 };
 
 export type SetComponentGameMessage = {
-    type: "setComponent";
+    type: typeof SetComponentGameMessageType;
+    component: Components;
+    entity: string;
 };
 
 export type ComponentDeltaGameMessage = {
-    type: "componentDelta";
+    type: typeof ComponentDeltaGameMessageType;
 };
 
 export type TransformGameMessage = {
-    type: "transform";
+    type: typeof TransformGameMessageType;
+    entity: string;
+    position: Point;
 };
 
 export type EffectGameMessage = {
-    type: "effect";
+    type: typeof EffectGameMessageType;
     effect: GameEffect;
 };
 
 export type CommandGameMessage = {
-    type: "command";
+    type: typeof CommandGameMessageType;
     command: GameCommand;
 };

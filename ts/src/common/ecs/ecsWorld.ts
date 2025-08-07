@@ -6,6 +6,7 @@ import {
 } from "../../game/entity/entityEvent.js";
 import { DrawMode } from "../../rendering/drawMode.js";
 import { RenderScope } from "../../rendering/renderScope.js";
+import type { GameCommand } from "../../server/message/gameCommand.js";
 import {
     EcsEntityEventFunction,
     EcsInitFunction,
@@ -40,6 +41,7 @@ export class EcsWorld {
 
     constructor() {
         this.rootEntity = new Entity("root");
+        this.rootEntity.toggleIsGameRoot(true);
         this.rootEntity.setEcsComponent(createTileComponent());
         this.rootEntity.entityEvent = this.runEvent;
     }
@@ -91,6 +93,8 @@ export class EcsWorld {
             }
         }
     }
+
+    runCommand(_command: GameCommand) {}
 
     runInit() {
         for (let i = 0; i < this.initSystems.length; i++) {

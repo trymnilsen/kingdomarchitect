@@ -1,5 +1,9 @@
 import type { Bounds } from "../../common/bounds.js";
-import { encodePosition, type Point } from "../../common/point.js";
+import {
+    encodePosition,
+    makeNumberId,
+    type Point,
+} from "../../common/point.js";
 import { EcsSystem } from "../../common/ecs/ecsSystem.js";
 import { biomes } from "../map/biome.js";
 import { ChunkDimension, ChunkSize } from "../map/chunk.js";
@@ -21,6 +25,8 @@ import {
     VisibilityMapComponentId,
 } from "../component/visibilityMapComponent.js";
 import type { Entity } from "../entity/entity.js";
+import { offsetPatternWithPoint } from "../../common/pattern.js";
+import { VisibilityComponentId } from "../component/visibilityComponent.js";
 
 export const renderSystem: EcsSystem = {
     onRender,
@@ -36,6 +42,29 @@ function onRender(
     //TODO: If i make a map/set structure with both string and instance keys
     //i can add a first method to it to avoid getting values
     const tiles = rootEntity.requireEcsComponent(TileComponentId);
+    const visibilityMap = rootEntity.requireEcsComponent(
+        VisibilityMapComponentId,
+    );
+    visibilityMap.visibility.clear();
+    //TODO: this might be able to piggyback of sprites? Are there entities without sprites but with visibility?
+    const visibilityComponents = rootEntity.queryComponentsWithin(
+        viewport,
+        VisibilityComponentId,
+    );
+    for (const visibilityComponent of visibilityComponents) {
+        const visiblePoints = offsetPatternWithPoint(
+            visibilityComponent[0].worldPosition,
+            visibilityComponent[1].pattern,
+        );
+        for (let i = 0; i < visiblePoints.length; i++) {
+            const numberId = makeNumberId(
+                visiblePoints[i].x,
+                visiblePoints[i].y,
+            );
+            visibilityMap.visibility.add(numberId);
+        }
+    }
+
     drawTiles(tiles, renderScope, rootEntity);
     const query = rootEntity.queryComponentsWithin(viewport, SpriteComponentId);
 
@@ -46,7 +75,10 @@ function onRender(
     for (let i = 0; i < sortedSprites.length; i++) {
         const sprite = sortedSprites[i][1];
         const position = sortedSprites[i][0].worldPosition;
-        drawSprite(sprite, position, renderScope, drawMode);
+        const visibility = isVisible(visibilityMap, position.x, position.y);
+        if (visibility) {
+            drawSprite(sprite, position, renderScope, drawMode);
+        }
     }
 
     const healthbars = rootEntity.queryComponentsWithin(
@@ -188,7 +220,7 @@ function drawTiles(
         if (!chunk.volume) {
             continue;
         }
-
+        const chunkNumberId = makeNumberId(chunk.chunkX, chunk.chunkY);
         const chunkPosition = {
             x: chunk.chunkX * ChunkSize,
             y: chunk.chunkY * ChunkSize,
@@ -221,7 +253,7 @@ function drawTiles(
                 let visible = true;
 
                 if (!window.debugChunks) {
-                    if (hasDiscovered(visibility, worldTileX, worldTileY)) {
+                    if (!hasDiscovered(visibility, chunkNumberId, x, y)) {
                         continue;
                     }
 

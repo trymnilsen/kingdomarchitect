@@ -1,3 +1,4 @@
+import { makeNumberId, type Point } from "../../common/point.js";
 import type { WorldDiscoveryData } from "./worldDiscoveryComponent.js";
 
 export type VisibilityMapComponent = {
@@ -18,19 +19,31 @@ export function createVisibilityMapComponent(): VisibilityMapComponent {
 }
 
 export function hasDiscovered(
-    _visibilityComponent: VisibilityMapComponent,
-    _x: number,
-    _y: number,
+    visibilityComponent: VisibilityMapComponent,
+    chunkId: number,
+    tileX: number,
+    tileY: number,
 ): boolean {
-    throw new Error("Not implemented");
+    if (visibilityComponent.discovered.fullyDiscoveredChunks.has(chunkId)) {
+        return true;
+    }
+
+    const partiallyDiscovered =
+        visibilityComponent.discovered.partiallyDiscoveredChunks.get(chunkId);
+
+    if (!partiallyDiscovered) {
+        return false;
+    }
+
+    return partiallyDiscovered.has(makeNumberId(tileX, tileY));
 }
 
 export function isVisible(
-    _visibilityComponent: VisibilityMapComponent,
-    _x: number,
-    _y: number,
+    visibilityComponent: VisibilityMapComponent,
+    x: number,
+    y: number,
 ): boolean {
-    throw new Error("Not implemented");
+    return visibilityComponent.visibility.has(makeNumberId(x, y));
 }
 
 export const VisibilityMapComponentId = "visibilityMap";

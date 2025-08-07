@@ -38,6 +38,10 @@ export function pointGrid(width: number, height: number): Point[] {
     return points;
 }
 
+export function makeNumberId(x: number, y: number): number {
+    return ((x & 0xffff) << 16) | (y & 0xffff);
+}
+
 /**
  * Adds the component of one point with the components of another
  * @param p1 the first addend

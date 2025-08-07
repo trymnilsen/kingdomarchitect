@@ -9,6 +9,7 @@ import {
     zeroPoint,
 } from "../../common/point.js";
 import { GameTime } from "../../common/time.js";
+import type { GameAction } from "../action/gameAction.js";
 import type {
     BaseComponent,
     ComponentID,
@@ -244,6 +245,8 @@ export class Entity {
     }
 
     findEntity(id: string): Entity | null {
+        //TODO: cache the result here to dont walk the tree on every call
+        //use entity events to invalidate cache on remove
         return entityWithId(this, id);
     }
 
@@ -309,6 +312,8 @@ export class Entity {
         componentId: ID,
     ): ReadonlyMap<Entity, Extract<Components, { id: ID }>> {
         //TODO: Return only inside bounds based on the chunk map resource
+        //TODO: We should return a structure, like a sparse set or something
+        //that allows us to quickly iterate over them
         return this.queryComponents(componentId);
     }
 
@@ -328,6 +333,16 @@ export class Entity {
         }
     }
 
+    updateComponent<ID extends ComponentID>(
+        componentId: ID,
+        updater: (component: Extract<Components, { id: ID }>) => void,
+    ) {
+        const component = this.getEcsComponent(componentId);
+        if (component) {
+            updater(component);
+            this.invalidateComponent(componentId);
+        }
+    }
     /**
      * Update the world position of this entity based on a parent position.
      * The world position is calculated based on the parent position and this

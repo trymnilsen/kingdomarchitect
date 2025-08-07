@@ -1,21 +1,25 @@
 import { EcsSystem } from "../common/ecs/ecsSystem.js";
+import type { GameMessage } from "./message/gameMessage.js";
 
 export function makeReplicatedEntitiesSystem(
-    postMessage: (message: any) => void,
+    postMessage: (message: GameMessage) => void,
 ): EcsSystem {
     return {
         onEntityEvent: {
             component_updated: (_root, event) => {
+                if (event.source.isGameRoot) {
+                    return;
+                }
                 postMessage({
-                    id: "setComponent",
+                    type: "setComponent",
                     component: event.item,
                     entity: event.source.id,
                 });
             },
             transform: (_root, event) => {
                 postMessage({
-                    id: "transform",
-                    entityId: event.source.id,
+                    type: "transform",
+                    entity: event.source.id,
                     position: event.source.worldPosition,
                 });
             },
@@ -24,7 +28,7 @@ export function makeReplicatedEntitiesSystem(
                     return;
                 }
                 postMessage({
-                    id: "addEntity",
+                    type: "addEntity",
                     entity: {
                         id: event.target.id,
                         parent: event.target.parent?.id,

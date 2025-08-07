@@ -1,9 +1,9 @@
 import type { Volume } from "../../../game/map/volume.js";
 
 export type DiscoverTileEffect = {
-    id: typeof discoverTileEffectId;
+    id: typeof DiscoverTileEffectId;
     tiles: { x: number; y: number; volume: string }[];
     volumes?: Volume[];
 };
 
-export const discoverTileEffectId = "discoverTile";
+export const DiscoverTileEffectId = "discoverTile";

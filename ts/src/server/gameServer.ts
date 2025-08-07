@@ -7,12 +7,13 @@ import { EcsWorld } from "../common/ecs/ecsWorld.js";
 
 import { makeReplicatedEntitiesSystem } from "./replicatedEntitiesSystem.js";
 import type { GameCommand } from "./message/gameCommand.js";
-import { createEffectEmitterComponent } from "../game/component/effectEmitter.js";
+import { createEffectEmitterComponent } from "../game/component/effectEmitterComponent.js";
+import type { GameMessage } from "./message/gameMessage.js";
 
 export class GameServer {
     private world: EcsWorld;
 
-    constructor() {
+    constructor(private postMessage: (message: GameMessage) => void) {
         this.world = new EcsWorld();
         this.addComponents();
         this.addSystems();
@@ -23,7 +24,14 @@ export class GameServer {
     }
 
     private addComponents() {
-        this.world.root.setEcsComponent(createEffectEmitterComponent());
+        this.world.root.setEcsComponent(
+            createEffectEmitterComponent((effect) => {
+                this.postMessage({
+                    type: "effect",
+                    effect,
+                });
+            }),
+        );
         this.world.root.setEcsComponent(createWorldDiscoveryComponent());
     }
 
@@ -32,16 +40,14 @@ export class GameServer {
         this.world.addSystem(pathfindingSystem);
         this.world.addSystem(worldGenerationSystem);
         this.world.addSystem(JobSystem);
-        this.world.addSystem(makeReplicatedEntitiesSystem(() => {}));
+        this.world.addSystem(
+            makeReplicatedEntitiesSystem((message) => {
+                this.postMessage(message);
+            }),
+        );
     }
 
-    onCommand(_command: GameCommand) {
-        /*
-        for (const entry of message.entries) {
-            console.log("Recieved message in server: ", entry);
-            if (entry.id == "entityAction") {
-                //this.actionDispatcher(entry.entityAction);
-            }
-        }*/
+    onCommand(command: GameCommand) {
+        this.world.runCommand(command);
     }
 }

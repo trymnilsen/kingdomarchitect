@@ -1,6 +1,6 @@
 import { Point, addPoint } from "./point.js";
 
-export function adjacentPointsWithPattern(
+export function offsetPatternWithPoint(
     point: Point,
     pattern: ReadonlyArray<Point>,
 ): Point[] {
@@ -28,9 +28,9 @@ export const diamondPattern = [
     { x: 0, y: 2 },
 ];
 
-export const largeDiamondPattern: Point[] = generateDiamondPoints(5);
+export const largeDiamondPattern: Point[] = generateDiamondPattern(5);
 
-function generateDiamondPoints(size: number): Point[] {
+export function generateDiamondPattern(size: number): Point[] {
     // Ensure size is an odd number for proper diamond shape
     if (size % 2 === 0) {
         size++;

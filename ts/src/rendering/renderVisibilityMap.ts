@@ -1,3 +1,5 @@
+import { makeNumberId } from "../common/point.js";
+
 export class RenderVisibilityMap {
     private _useVisibility = false;
 
@@ -11,16 +13,16 @@ export class RenderVisibilityMap {
 
     private visibilityMap = new Map<number, boolean>();
     isVisible(x: number, y: number) {
-        const pointId = this.makeNumberId(x, y);
+        const pointId = makeNumberId(x, y);
         return this.visibilityMap.has(pointId);
     }
 
     hasDiscovered(worldTileX: number, worldTileY: number) {
-        const id = this.makeNumberId(worldTileX, worldTileY);
+        const id = makeNumberId(worldTileX, worldTileY);
     }
 
     setIsVisible(x: number, y: number, isVisible: boolean) {
-        const pointId = this.makeNumberId(x, y);
+        const pointId = makeNumberId(x, y);
         if (isVisible) {
             this.visibilityMap.set(pointId, true);
         } else {
@@ -30,9 +32,5 @@ export class RenderVisibilityMap {
 
     clear() {
         this.visibilityMap.clear();
-    }
-
-    private makeNumberId(x: number, y: number): number {
-        return ((x & 0xffff) << 16) | (y & 0xffff);
     }
 }

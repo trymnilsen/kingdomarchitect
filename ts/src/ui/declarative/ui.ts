@@ -3,14 +3,11 @@
 // ===================================================================
 
 import { nameof } from "../../common/nameof.js";
-import { addPoint } from "../../common/point.js";
+import { addPoint, zeroPoint, type Point } from "../../common/point.js";
 import type { RenderScope } from "../../rendering/renderScope.js";
 import type { TextStyle } from "../../rendering/text/textStyle.js";
 import { fillUiSize, zeroSize } from "../uiSize.js";
 import { uiBox } from "./uiBox.js";
-
-export type Point = { x: number; y: number };
-export const zeroPoint = (): Point => ({ x: 0, y: 0 });
 
 export type UISize = { width: number; height: number };
 export type Rectangle = { x: number; y: number; width: number; height: number };

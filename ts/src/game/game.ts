@@ -18,6 +18,7 @@ import { chunkMapSystem } from "./system/chunkMapSystem.js";
 import { pathfindingSystem } from "./system/pathfindingSystem.js";
 import { renderSystem } from "./system/renderSystem.js";
 import { createVisibilityMapComponent } from "./component/visibilityMapComponent.js";
+import { handleGameMessage } from "../server/message/gameMessageHandler.js";
 
 export class Game {
     private renderer: Renderer;
@@ -39,19 +40,10 @@ export class Game {
         this.addClientOnlyComponents();
 
         this.gameServer = new WebworkerServerConnection();
-        /*
         this.gameServer.onMessage.listen((message) => {
-            handleGameMessage(message, this.ecsWorld.root);
+            handleGameMessage(this.ecsWorld.root, message);
         });
-        this.actionDispatcher = createClientDispatcher(this.ecsWorld.root);
-        */
-        /*
-        this.ecsWorld.root.actionDispatch = (action: EntityAction) => {
-            this.actionDispatcher(action);
-            this.gameServer.postAction(action);
-        };*/
         this.assetLoader = new AssetLoader();
-        // Rendering
         this.camera = new Camera({
             x: window.innerWidth,
             y: window.innerHeight,

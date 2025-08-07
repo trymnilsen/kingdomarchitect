@@ -9,6 +9,7 @@ import { createJobRunnerComponent } from "../component/jobRunnerComponent.js";
 import { createPlayerUnitComponent } from "../component/playerUnitComponent.js";
 import { createSpriteComponent } from "../component/spriteComponent.js";
 import { Entity } from "../entity/entity.js";
+import { createVisibilityComponent } from "../component/visibilityComponent.js";
 
 export function workerPrefab(): Entity {
     const entity = new Entity(generateId("worker"));
@@ -18,5 +19,6 @@ export function workerPrefab(): Entity {
     entity.setEcsComponent(createJobRunnerComponent());
     entity.setEcsComponent(createEquipmentComponent());
     entity.setEcsComponent(createInventoryComponent(defaultInventoryItems()));
+    entity.setEcsComponent(createVisibilityComponent());
     return entity;
 }

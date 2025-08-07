@@ -1,6 +1,6 @@
 import type { BuildingComponent } from "./buildingComponent.js";
 import type { ChunkMapComponent } from "./chunkMapComponent.js";
-import type { EffectEmitterComponent } from "./effectEmitter.js";
+import type { EffectEmitterComponent } from "./effectEmitterComponent.js";
 import type { EquipmentComponent } from "./equipmentComponent.js";
 import type { HealthComponent } from "./healthComponent.js";
 import type { InventoryComponent } from "./inventoryComponent.js";
@@ -11,6 +11,7 @@ import type { PlayerUnitComponent } from "./playerUnitComponent.js";
 import type { ResourceComponent } from "./resourceComponent.js";
 import type { SpriteComponent } from "./spriteComponent.js";
 import type { TileComponent } from "./tileComponent.js";
+import type { VisibilityComponent } from "./visibilityComponent.js";
 import type { VisibilityMapComponent } from "./visibilityMapComponent.js";
 import type { WorldDiscoveryComponent } from "./worldDiscoveryComponent.js";
 
@@ -28,6 +29,7 @@ export type Components =
     | EquipmentComponent
     | WorldDiscoveryComponent
     | VisibilityMapComponent
+    | VisibilityComponent
     | EffectEmitterComponent
     | PathfindingGraphComponent;
 
