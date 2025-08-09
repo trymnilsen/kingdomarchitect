@@ -7,11 +7,22 @@ import { getWeightAtPoint } from "../map/path/graph/weight.js";
 import { PathResultStatus, queryPath } from "../map/query/pathQuery.js";
 import { JobRunnerComponentId } from "../component/jobRunnerComponent.js";
 import { completeJob, type Job, type JobHandler } from "./job.js";
+import { VisibilityComponentId } from "../component/visibilityComponent.js";
+import { offsetPatternWithPoint } from "../../common/pattern.js";
+import { setDiscoveryForPlayer } from "../system/worldGenerationSystem.js";
 
 export interface MoveToJob extends Job {
     position: Point;
     path: Point[];
     id: typeof MoveToJobId;
+}
+
+export function MoveToJob(position: Point): MoveToJob {
+    return {
+        id: MoveToJobId,
+        path: [],
+        position,
+    };
 }
 
 export const MoveToJobId = "moveToJob";
@@ -67,6 +78,16 @@ export const moveToJobHandler: JobHandler<MoveToJob> = (entity, job) => {
 
     console.log("MoveToJob", entity, nextPoint);
     entity.worldPosition = nextPoint;
+    const visibility = entity.getEcsComponent(VisibilityComponentId);
+    if (visibility) {
+        const points = offsetPatternWithPoint(
+            entity.worldPosition,
+            visibility.pattern,
+        );
+
+        setDiscoveryForPlayer(entity.getRootEntity(), "player", points);
+    }
+
     //If we happen to be at the end now, we dont need to wait for next
     //tick to finish
     if (pointEquals(entity.worldPosition, job.position)) {

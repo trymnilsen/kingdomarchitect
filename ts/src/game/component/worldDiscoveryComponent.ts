@@ -67,6 +67,8 @@ export function discoverTile(
         return;
     }
 
+    //If the user now has discovered all the tiles in the chunk move it
+    //from partially discovered to discovered
     const tilesPerChunk = ChunkSize * ChunkSize;
     if (discoveredTilesInChunk.size >= tilesPerChunk) {
         playerData.partiallyDiscoveredChunks.delete(chunkId);
@@ -74,4 +76,49 @@ export function discoverTile(
     } else {
         discoveredTilesInChunk.add(tileId);
     }
+}
+
+export function hasDiscovered(
+    component: WorldDiscoveryComponent,
+    playerId: string,
+    position: Point,
+): boolean {
+    const playerData = component.discoveriesByUser.get(playerId);
+    if (!playerData) return false;
+
+    const chunkPos = getChunkPosition(position.x, position.y);
+    const chunkId = makeNumberId(chunkPos.x, chunkPos.y);
+
+    if (playerData.fullyDiscoveredChunks.has(chunkId)) return true;
+    const discoveredTiles = playerData.partiallyDiscoveredChunks.get(chunkId);
+    if (!discoveredTiles) return false;
+
+    const tileId = makeNumberId(position.x, position.y);
+    return discoveredTiles.has(tileId);
+}
+
+export function hasDiscoveredChunkByTilePosition(
+    component: WorldDiscoveryComponent,
+    playerId: string,
+    position: Point,
+): boolean {
+    return hasDiscoveredChunkByChunkPosition(
+        component,
+        playerId,
+        getChunkPosition(position.x, position.y),
+    );
+}
+
+export function hasDiscoveredChunkByChunkPosition(
+    component: WorldDiscoveryComponent,
+    playerId: string,
+    position: Point,
+): boolean {
+    const playerData = component.discoveriesByUser.get(playerId);
+    if (!playerData) return false;
+    const chunkId = makeNumberId(position.x, position.y);
+
+    if (playerData.fullyDiscoveredChunks.has(chunkId)) return true;
+    const discoveredTiles = playerData.partiallyDiscoveredChunks.has(chunkId);
+    return discoveredTiles;
 }

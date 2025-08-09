@@ -7,9 +7,10 @@ import { queryPath } from "../../../../map/query/pathQuery.js";
 import { RenderScope } from "../../../../../rendering/renderScope.js";
 import type { ComponentDescriptor } from "../../../../../ui/declarative/ui.js";
 import { Entity } from "../../../../entity/entity.js";
-import type { MoveToJob } from "../../../../job/moveToPointJob.js";
+import { MoveToJob } from "../../../../job/moveToPointJob.js";
 import { InteractionState } from "../../../handler/interactionState.js";
 import { uiScaffold } from "../../../view/uiScaffold.js";
+import { QueueJobCommand } from "../../../../../server/message/queueJobCommand.js";
 
 export class ActorMovementState extends InteractionState {
     private selectedPoint: Point | null = null;
@@ -156,17 +157,13 @@ export class ActorMovementState extends InteractionState {
     }
 
     private scheduleMovement() {
-        /*
-        if (this.context.root.actionDispatch && this.selectedPoint) {
-            const job: MoveToJob = {
-                id: "moveToJob",
-                position: this.selectedPoint,
-                path: [],
-            };
-
-            this.context.root.actionDispatch(
-                makeQueueJobAction(job, this.entity),
-            );
-        }*/
+        //todo: send command via context to server
+        //discover tiles on server
+        //sender tiles back
+        if (!this.selectedPoint) {
+            return;
+        }
+        const job = MoveToJob(this.selectedPoint);
+        this.context.commandDispatcher(QueueJobCommand(job));
     }
 }

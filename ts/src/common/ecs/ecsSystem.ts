@@ -19,11 +19,15 @@ export type EcsEntityEventFunction<T extends EntityEvent> = (
 
 export type EcsInitFunction = (rootEntity: Entity) => void;
 
+export type EcsCommandFunction = (root: Entity, command: GameCommand) => void;
+
 export type EcsEntityEvents = Partial<{
     [k in EntityEvent["id"]]: EcsEntityEventFunction<EntityEventType[k]>;
 }>;
 
-export type EcsCommand = { [id: string]: GameCommand };
+export type EcsCommand = {
+    [id: string]: EcsCommandFunction;
+};
 
 export interface EcsSystem {
     onRender?: EcsRenderFunction;

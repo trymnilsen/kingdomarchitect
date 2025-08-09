@@ -1,4 +1,4 @@
-import { Bounds } from "../common/bounds.js";
+import { Bounds, zeroBounds } from "../common/bounds.js";
 import {
     addPoint,
     multiplyPoint,
@@ -11,7 +11,8 @@ export class Camera {
     private _position: Point;
     private _halfWindowSize: Point;
     private _windowSize: Point;
-
+    private _viewPortIsDirty: boolean = true;
+    private _tilespaceViewport: Bounds = zeroBounds();
     constructor(windowSize: Point) {
         this._windowSize = windowSize;
         this._position = { x: 0, y: 0 };
@@ -26,18 +27,22 @@ export class Camera {
     }
 
     get tileSpaceViewPort(): Bounds {
-        //TODO: Update this on camera move rather than get or make a _isDirtyFlag
-        const offsetCameraPosition = subtractPoint(
-            this._position,
-            this._halfWindowSize,
-        );
-        const tilespace = this.worldSpaceToTileSpace(offsetCameraPosition);
-        return {
-            x1: tilespace.x,
-            y1: tilespace.y,
-            x2: tilespace.x + Math.floor(this._windowSize.x / TileSize),
-            y2: tilespace.y + Math.floor(this._windowSize.y / TileSize),
-        };
+        if (this._viewPortIsDirty) {
+            const offsetCameraPosition = subtractPoint(
+                this._position,
+                this._halfWindowSize,
+            );
+            const tilespace = this.worldSpaceToTileSpace(offsetCameraPosition);
+            this._tilespaceViewport = {
+                x1: tilespace.x,
+                y1: tilespace.y,
+                x2: tilespace.x + Math.floor(this._windowSize.x / TileSize),
+                y2: tilespace.y + Math.floor(this._windowSize.y / TileSize),
+            };
+            this._viewPortIsDirty = false;
+        }
+
+        return this._tilespaceViewport;
     }
 
     set position(point: Point) {
@@ -45,6 +50,7 @@ export class Camera {
             x: Math.floor(point.x),
             y: Math.floor(point.y),
         };
+        this._viewPortIsDirty = true;
     }
 
     get windowSize(): Point {

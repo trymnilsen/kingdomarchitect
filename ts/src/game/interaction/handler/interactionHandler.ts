@@ -19,6 +19,7 @@ import { SelectionState } from "../state/selection/selectionState.js";
 import { CommitableInteractionStateChanger } from "./interactionStateChanger.js";
 import { InteractionStateHistory } from "./interactionStateHistory.js";
 import { StateContext } from "./stateContext.js";
+import type { GameCommand } from "../../../server/message/gameCommand.js";
 
 /**
  * The interactionHandler recieves input taps and forward them to the currently
@@ -37,6 +38,7 @@ export class InteractionHandler {
         assets: AssetLoader,
         time: GameTime,
         uiRenderer: UiRenderer,
+        command: (command: GameCommand) => void,
         _visibilityChange: () => void,
     ) {
         this.uiRenderer = uiRenderer;
@@ -49,6 +51,7 @@ export class InteractionHandler {
             stateChanger: this.interactionStateChanger,
             gameTime: time,
             camera: camera,
+            commandDispatcher: command,
         };
         this.history = new InteractionStateHistory(this.stateContext);
     }

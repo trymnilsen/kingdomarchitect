@@ -13,6 +13,7 @@ import {
     EcsRenderFunction,
     EcsSystem,
     EcsUpdateFunction,
+    type EcsCommandFunction,
 } from "./ecsSystem.js";
 
 type EcsEntityEventHandlersMap = {
@@ -34,6 +35,7 @@ export class EcsWorld {
         transform: [],
     };
     private rootEntity: Entity;
+    private commandSystems: { [id: string]: EcsCommandFunction[] } = {};
 
     public get root(): Entity {
         return this.rootEntity;
@@ -57,6 +59,16 @@ export class EcsWorld {
 
         if (!!system.onInit) {
             this.initSystems.push(system.onInit);
+        }
+
+        if (!!system.onCommand) {
+            for (const [key, value] of Object.entries(system.onCommand)) {
+                if (!(key in this.commandSystems)) {
+                    this.commandSystems[key] = [];
+                }
+
+                this.commandSystems[key].push(value);
+            }
         }
 
         const entityEventsFromSystem = system.onEntityEvent;
@@ -94,7 +106,14 @@ export class EcsWorld {
         }
     }
 
-    runCommand(_command: GameCommand) {}
+    runCommand(command: GameCommand) {
+        const callbacks = this.commandSystems[command.id];
+        if (callbacks) {
+            for (const callback of callbacks) {
+                callback(this.rootEntity, command);
+            }
+        }
+    }
 
     runInit() {
         for (let i = 0; i < this.initSystems.length; i++) {

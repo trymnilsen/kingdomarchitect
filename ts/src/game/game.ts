@@ -74,6 +74,9 @@ export class Game {
             this.assetLoader,
             this.gameTime,
             new UiRenderer(this.renderer.context),
+            (command) => {
+                this.gameServer.postCommand(command);
+            },
             () => {
                 this.visibilityMap.useVisibility =
                     !this.visibilityMap.useVisibility;

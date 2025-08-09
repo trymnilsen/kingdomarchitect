@@ -249,7 +249,7 @@ function drawTiles(
 
             for (let y = 0; y < ChunkSize; y++) {
                 const screenTileY = screenPosition.y + y * 40;
-                const worldTileY = chunkPosition.x + x;
+                const worldTileY = chunkPosition.y + y;
                 let visible = true;
 
                 if (!window.debugChunks) {
@@ -262,7 +262,7 @@ function drawTiles(
 
                 let color = biomes[chunk.volume.type].color;
                 if (!visible) {
-                    biomes[chunk.volume.type].tint;
+                    color = biomes[chunk.volume.type].tint;
                 }
 
                 renderContext.drawScreenSpaceRectangle({
