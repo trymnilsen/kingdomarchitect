@@ -1,4 +1,4 @@
-import { makeNumberId } from "../../../common/point.js";
+import { makeNumberId, pointEquals } from "../../../common/point.js";
 import {
     setChunk,
     TileComponentId,
@@ -10,7 +10,6 @@ import {
     getChunkId,
     getChunkPosition,
 } from "../../../game/map/chunk.js";
-import { CHUNK_SIZE } from "../../../game/map/constants.js";
 import type { EffectGameMessage } from "../gameMessage.js";
 import {
     DiscoverTileEffectId,
@@ -53,14 +52,20 @@ function discoverTileEffect(root: Entity, effect: DiscoverTileEffect) {
                 chunkY: chunkPosition.y,
                 volume: volume,
             };
+            const volumeAlreadyHasChunk = volume.chunks.find((item) =>
+                pointEquals(item, chunkPosition),
+            );
+            if (!volumeAlreadyHasChunk) {
+                volume.chunks.push(chunkPosition);
+            }
             setChunk(tileComponent, chunk);
         }
 
         //Javascript is a bit funky when it comes to modulus so we need
         //to do an extra round to ensure that the value is positive
         //as our local space within a chunk always goes from 0 -> 7
-        const localX = ((tile.x % CHUNK_SIZE) + CHUNK_SIZE) % CHUNK_SIZE;
-        const localY = ((tile.y % CHUNK_SIZE) + CHUNK_SIZE) % CHUNK_SIZE;
+        const localX = ((tile.x % ChunkSize) + ChunkSize) % ChunkSize;
+        const localY = ((tile.y % ChunkSize) + ChunkSize) % ChunkSize;
 
         const size = ChunkSize * ChunkSize;
         const chunkId = makeNumberId(chunkPosition.x, chunkPosition.y);

@@ -76,7 +76,7 @@ function onRender(
         const sprite = sortedSprites[i][1];
         const position = sortedSprites[i][0].worldPosition;
         const visibility = isVisible(visibilityMap, position.x, position.y);
-        if (visibility) {
+        if (visibility || window.debugChunks) {
             drawSprite(sprite, position, renderScope, drawMode);
         }
     }
@@ -310,7 +310,7 @@ function drawTiles(
                 font: "arial",
             });
             renderContext.drawText({
-                text: `size: ${chunk.volume.size}`,
+                text: `size: ${chunk.volume.chunks.length}`,
                 x: screenPosition.x + 16,
                 y: screenPosition.y + 16 + 60,
                 color: "black",

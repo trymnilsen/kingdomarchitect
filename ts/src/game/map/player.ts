@@ -31,7 +31,6 @@ export function addInitialPlayerChunk(rootEntity: Entity): Point {
                 id: generateId("volume"),
                 maxSize: Math.floor(Math.random() * 4) + 2,
                 type: "forrest",
-                size: 1,
                 chunks: [{ x: 0, y: 0 }],
                 debugColor: randomColor(),
             },

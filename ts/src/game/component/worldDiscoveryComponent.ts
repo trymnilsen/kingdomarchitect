@@ -62,7 +62,11 @@ export function discoverTile(
         );
     }
 
-    const tileId = makeNumberId(tile.x, tile.y);
+    // Convert to local coordinates within the chunk (0-7)
+    const localX = ((tile.x % ChunkSize) + ChunkSize) % ChunkSize;
+    const localY = ((tile.y % ChunkSize) + ChunkSize) % ChunkSize;
+    const tileId = makeNumberId(localX, localY);
+
     if (discoveredTilesInChunk.has(tileId)) {
         return;
     }
@@ -70,7 +74,7 @@ export function discoverTile(
     //If the user now has discovered all the tiles in the chunk move it
     //from partially discovered to discovered
     const tilesPerChunk = ChunkSize * ChunkSize;
-    if (discoveredTilesInChunk.size >= tilesPerChunk) {
+    if (discoveredTilesInChunk.size >= tilesPerChunk - 1) {
         playerData.partiallyDiscoveredChunks.delete(chunkId);
         playerData.fullyDiscoveredChunks.add(chunkId);
     } else {
@@ -78,7 +82,7 @@ export function discoverTile(
     }
 }
 
-export function hasDiscovered(
+export function hasDiscoveredTile(
     component: WorldDiscoveryComponent,
     playerId: string,
     position: Point,
@@ -93,7 +97,10 @@ export function hasDiscovered(
     const discoveredTiles = playerData.partiallyDiscoveredChunks.get(chunkId);
     if (!discoveredTiles) return false;
 
-    const tileId = makeNumberId(position.x, position.y);
+    // Convert to local coordinates within the chunk (0-7)
+    const localX = ((position.x % ChunkSize) + ChunkSize) % ChunkSize;
+    const localY = ((position.y % ChunkSize) + ChunkSize) % ChunkSize;
+    const tileId = makeNumberId(localX, localY);
     return discoveredTiles.has(tileId);
 }
 

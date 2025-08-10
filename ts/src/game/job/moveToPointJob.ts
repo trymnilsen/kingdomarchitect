@@ -64,6 +64,7 @@ export const moveToJobHandler: JobHandler<MoveToJob> = (entity, job) => {
     if (!!nextPoint) {
         const weight = getWeightAtPoint(nextPoint, root);
         //TODO: when extracting, provide this as a function?
+        console.log("MoveToJob - next point weight: ", weight);
         if (weight >= 30) {
             //Setting to undefined will finish the job down the line
             nextPoint = undefined;
@@ -72,21 +73,19 @@ export const moveToJobHandler: JobHandler<MoveToJob> = (entity, job) => {
 
     if (!nextPoint) {
         //We got here there is no option to keep moving
+        console.log("NextPoint not defined, completing job");
         completeJob(entity);
         return;
     }
 
     console.log("MoveToJob", entity, nextPoint);
-    entity.worldPosition = nextPoint;
     const visibility = entity.getEcsComponent(VisibilityComponentId);
     if (visibility) {
-        const points = offsetPatternWithPoint(
-            entity.worldPosition,
-            visibility.pattern,
-        );
+        const points = offsetPatternWithPoint(nextPoint, visibility.pattern);
 
         setDiscoveryForPlayer(entity.getRootEntity(), "player", points);
     }
+    entity.worldPosition = nextPoint;
 
     //If we happen to be at the end now, we dont need to wait for next
     //tick to finish

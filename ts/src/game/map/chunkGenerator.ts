@@ -18,15 +18,17 @@ import { generateTaint } from "./biome/taint.js";
 import { ChunkSize, type TileChunk } from "./chunk.js";
 import type { Volume } from "./volume.js";
 
-/*
 //TODO: should return a structure describing the unlock for the action
-export function generateChunk(rootEntity: Entity, chunkPoint: Point) {
+export function generateChunk(
+    rootEntity: Entity,
+    chunkPoint: Point,
+): Required<TileChunk> {
     const tiles = rootEntity.requireEcsComponent(TileComponentId);
     // Find available volumes with available space
     const adjacentVolumes = mapNotNullDistinct(
         adjacentPoints(chunkPoint),
         (item) => getChunk(tiles, item)?.volume,
-    ).filter((volume) => volume.size < volume.maxSize);
+    ).filter((volume) => volume.chunks.length < volume.maxSize);
     const createNewVolume = Math.random() > 0.8;
 
     let chunk: Required<TileChunk> | undefined = undefined;
@@ -47,7 +49,6 @@ export function generateChunk(rootEntity: Entity, chunkPoint: Point) {
         ] as const);
         const volume: Volume = {
             maxSize: maxSize,
-            size: 1,
             type: volumeType,
             id: generateId("volume"),
             chunks: [{ x: chunkPoint.x, y: chunkPoint.y }],
@@ -67,11 +68,12 @@ export function generateChunk(rootEntity: Entity, chunkPoint: Point) {
                 (volume) =>
                     volume.maxSize +
                     Math.floor(
-                        ((volume.maxSize - volume.size) / volume.maxSize) * 32,
+                        ((volume.maxSize - volume.chunks.length) /
+                            volume.maxSize) *
+                            32,
                     ),
             ),
         );
-        chosenVolume.size += 1;
         chosenVolume.chunks.push({ x: chunkPoint.x, y: chunkPoint.y });
         chunk = {
             chunkX: chunkPoint.x,
@@ -82,6 +84,7 @@ export function generateChunk(rootEntity: Entity, chunkPoint: Point) {
 
     //rootEntity.dispatchAction(makeSetTilesAction(chunk));
     generateChunkEntities(chunk, rootEntity);
+    return chunk;
 }
 
 function generateChunkEntities(chunk: Required<TileChunk>, rootEntity: Entity) {
@@ -115,4 +118,3 @@ function generateChunkEntities(chunk: Required<TileChunk>, rootEntity: Entity) {
             break;
     }
 }
-*/

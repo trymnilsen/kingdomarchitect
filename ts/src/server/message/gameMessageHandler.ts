@@ -13,6 +13,7 @@ import {
 } from "./gameMessage.js";
 
 export function handleGameMessage(root: Entity, message: GameMessage) {
+    console.log("Handle Game Message", message);
     switch (message.type) {
         case AddEntityGameMessageType:
             addEntityHandler(root, message);
