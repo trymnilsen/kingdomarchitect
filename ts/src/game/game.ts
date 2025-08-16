@@ -19,6 +19,7 @@ import { pathfindingSystem } from "./system/pathfindingSystem.js";
 import { renderSystem } from "./system/renderSystem.js";
 import { createVisibilityMapComponent } from "./component/visibilityMapComponent.js";
 import { handleGameMessage } from "../server/message/gameMessageHandler.js";
+import { animationSystem } from "./system/animationSystem.js";
 
 export class Game {
     private renderer: Renderer;
@@ -92,9 +93,10 @@ export class Game {
     }
 
     private addSystems() {
-        this.ecsWorld.addSystem(renderSystem);
         this.ecsWorld.addSystem(chunkMapSystem);
         this.ecsWorld.addSystem(pathfindingSystem);
+        this.ecsWorld.addSystem(animationSystem);
+        this.ecsWorld.addSystem(renderSystem);
         //this.ecsWorld.addSystem(worldGenerationSystem);
     }
 

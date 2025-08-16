@@ -348,22 +348,24 @@ export class Entity {
      * The world position is calculated based on the parent position and this
      * entity's local position
      */
-    updateTransform() {
+    private updateTransform() {
+        const oldPosition = this._worldPosition;
+        let newPosition = this._localPosition;
         if (this.parent) {
             // If there is a parent, add its world position to the
             // local position, to get this entitys new world position
-            this._worldPosition = addPoint(
+            newPosition = addPoint(
                 this.parent.worldPosition,
                 this._localPosition,
             );
-        } else {
-            // If there is no parent update the world position to this
-            this._worldPosition = this._localPosition;
         }
+
+        this._worldPosition = newPosition;
         // Bubble up position change
         this.bubbleEvent({
             id: "transform",
             source: this,
+            oldPosition,
         });
         // Update children
         for (let i = 0; i < this._children.length; i++) {

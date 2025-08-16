@@ -50,7 +50,7 @@ export class GameServer {
         );
     }
 
-    onCommand(command: GameCommand) {
-        this.world.runCommand(command);
+    onMessage(message: GameMessage) {
+        this.world.runGameMessage(message);
     }
 }

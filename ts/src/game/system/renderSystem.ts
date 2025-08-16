@@ -27,6 +27,10 @@ import {
 import type { Entity } from "../entity/entity.js";
 import { offsetPatternWithPoint } from "../../common/pattern.js";
 import { VisibilityComponentId } from "../component/visibilityComponent.js";
+import {
+    AnimationComponentId,
+    type AnimationComponent,
+} from "../component/animationComponent.js";
 
 export const renderSystem: EcsSystem = {
     onRender,
@@ -77,7 +81,15 @@ function onRender(
         const position = sortedSprites[i][0].worldPosition;
         const visibility = isVisible(visibilityMap, position.x, position.y);
         if (visibility || window.debugChunks) {
-            drawSprite(sprite, position, renderScope, drawMode);
+            const animationComponent =
+                sortedSprites[i][0].getEcsComponent(AnimationComponentId);
+            drawSprite(
+                sprite,
+                animationComponent,
+                position,
+                renderScope,
+                drawMode,
+            );
         }
     }
 
@@ -132,6 +144,7 @@ function drawHealthbar(
 
 function drawSprite(
     spriteComponent: SpriteComponent,
+    animationComponent: AnimationComponent | null,
     position: Point,
     renderContext: RenderScope,
     _drawMode: DrawMode,
@@ -166,19 +179,6 @@ function drawSprite(
             spriteComponent.tint.frames -= 1;
         }
     }*/
-
-    /*
-    let spriteConfig: SpriteProviderConfig | null = null;
-    let frame = 0;
-    const component = spriteComponent.entity.getComponent(SpriteStateMachine);
-    if (component) {
-        spriteConfig = component.updateSpriteConfiguration(
-            renderContext.drawTick,
-            drawMode,
-        );
-        frame = spriteConfig.frame;
-    }*/
-
     const screenPosition =
         renderContext.camera.tileSpaceToScreenSpace(position);
     const offsetX = spriteComponent.offset?.x ?? 0;
@@ -190,6 +190,7 @@ function drawSprite(
         targetHeight: targetHeight,
         targetWidth: targetWidth,
         tint: spriteComponent.tint?.color,
+        frame: animationComponent?.currentAnimation?.frame ?? 0,
     });
 }
 

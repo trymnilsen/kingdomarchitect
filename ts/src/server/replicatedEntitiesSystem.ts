@@ -21,6 +21,7 @@ export function makeReplicatedEntitiesSystem(
                     type: "transform",
                     entity: event.source.id,
                     position: event.source.worldPosition,
+                    oldPosition: event.oldPosition,
                 });
             },
             child_added: (_root, event) => {

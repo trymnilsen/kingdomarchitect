@@ -1,3 +1,4 @@
+import type { Point } from "../../common/point.js";
 import type { Components } from "../component/component.js";
 import { Entity } from "./entity.js";
 
@@ -26,6 +27,7 @@ export type EntityEventType = {
 export type EntityTransformEvent = {
     id: "transform";
     source: Entity;
+    oldPosition: Point;
 };
 
 export type EntityChildrenUpdatedEvent = {

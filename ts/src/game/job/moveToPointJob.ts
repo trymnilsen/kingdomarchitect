@@ -10,6 +10,11 @@ import { completeJob, type Job, type JobHandler } from "./job.js";
 import { VisibilityComponentId } from "../component/visibilityComponent.js";
 import { offsetPatternWithPoint } from "../../common/pattern.js";
 import { setDiscoveryForPlayer } from "../system/worldGenerationSystem.js";
+import type { Entity } from "../entity/entity.js";
+import {
+    DirectionComponentId,
+    updateDirectionComponent,
+} from "../component/directionComponent.js";
 
 export interface MoveToJob extends Job {
     position: Point;
@@ -79,12 +84,11 @@ export const moveToJobHandler: JobHandler<MoveToJob> = (entity, job) => {
     }
 
     console.log("MoveToJob", entity, nextPoint);
-    const visibility = entity.getEcsComponent(VisibilityComponentId);
-    if (visibility) {
-        const points = offsetPatternWithPoint(nextPoint, visibility.pattern);
+    discoverAfterMovement(entity, nextPoint);
+    entity.updateComponent(DirectionComponentId, (component) => {
+        updateDirectionComponent(component, entity.worldPosition, nextPoint);
+    });
 
-        setDiscoveryForPlayer(entity.getRootEntity(), "player", points);
-    }
     entity.worldPosition = nextPoint;
 
     //If we happen to be at the end now, we dont need to wait for next
@@ -93,3 +97,12 @@ export const moveToJobHandler: JobHandler<MoveToJob> = (entity, job) => {
         completeJob(entity);
     }
 };
+
+function discoverAfterMovement(entity: Entity, nextPoint: Point) {
+    const visibility = entity.getEcsComponent(VisibilityComponentId);
+    if (visibility) {
+        const points = offsetPatternWithPoint(nextPoint, visibility.pattern);
+
+        setDiscoveryForPlayer(entity.getRootEntity(), "player", points);
+    }
+}

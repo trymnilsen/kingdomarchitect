@@ -326,6 +326,35 @@ export function getDirection(a: Point, b: Point): Direction | null {
     return direction;
 }
 
+export type Adjacency = "right" | "left" | "above" | "below" | "not-adjacent";
+/**
+ * Checks if a point `p2` is orthogonally adjacent (not diagonally) to `p1`.
+ * A point will only be considered adjacent if its next to, if there is a
+ * point in between it is not adjacent
+ * Assumes a standard Cartesian coordinate system where the positive y-axis points upwards.
+ *
+ * @param p1 The reference point.
+ * @param p2 The point to check against p1.
+ * @returns The adjacency relationship of p2 relative to p1.
+ */
+export function checkAdjacency(p1: Point, p2: Point): Direction | null {
+    const dx = p2.x - p1.x; // Difference in x
+    const dy = p2.y - p1.y; // Difference in y
+
+    // Check for horizontal adjacency (y is the same, x differs by 1)
+    if (dy === 0 && Math.abs(dx) === 1) {
+        return dx === 1 ? Direction.Right : Direction.Left;
+    }
+
+    // Check for vertical adjacency (x is the same, y differs by 1)
+    if (dx === 0 && Math.abs(dy) === 1) {
+        return dy === 1 ? Direction.Up : Direction.Down;
+    }
+
+    // Otherwise, they are not adjacent
+    return null;
+}
+
 export function getSizeOfPoints(points: Point[]): Point {
     let lowestX = Number.MAX_SAFE_INTEGER;
     let lowestY = Number.MAX_SAFE_INTEGER;

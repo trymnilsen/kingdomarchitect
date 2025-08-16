@@ -42,6 +42,7 @@ export type ComponentDeltaGameMessage = {
 export type TransformGameMessage = {
     type: typeof TransformGameMessageType;
     entity: string;
+    oldPosition: Point;
     position: Point;
 };
 

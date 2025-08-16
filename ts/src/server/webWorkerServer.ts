@@ -9,7 +9,5 @@ const gameServer = new GameServer((message) => {
 onmessage = (message) => {
     console.log("[webWorkerServer] recieved message", message);
     const commandMessage = message.data as GameMessage;
-    if (commandMessage.type == "command") {
-        gameServer.onCommand(commandMessage.command);
-    }
+    gameServer.onMessage(commandMessage);
 };

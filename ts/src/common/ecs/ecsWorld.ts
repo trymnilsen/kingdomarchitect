@@ -7,13 +7,14 @@ import {
 import { DrawMode } from "../../rendering/drawMode.js";
 import { RenderScope } from "../../rendering/renderScope.js";
 import type { GameCommand } from "../../server/message/gameCommand.js";
+import type { GameMessage } from "../../server/message/gameMessage.js";
 import {
     EcsEntityEventFunction,
     EcsInitFunction,
     EcsRenderFunction,
     EcsSystem,
     EcsUpdateFunction,
-    type EcsCommandFunction,
+    type EcsGameMessageFunction,
 } from "./ecsSystem.js";
 
 type EcsEntityEventHandlersMap = {
@@ -35,7 +36,7 @@ export class EcsWorld {
         transform: [],
     };
     private rootEntity: Entity;
-    private commandSystems: { [id: string]: EcsCommandFunction[] } = {};
+    private gameMessageSystems: EcsGameMessageFunction[] = [];
 
     public get root(): Entity {
         return this.rootEntity;
@@ -61,14 +62,8 @@ export class EcsWorld {
             this.initSystems.push(system.onInit);
         }
 
-        if (!!system.onCommand) {
-            for (const [key, value] of Object.entries(system.onCommand)) {
-                if (!(key in this.commandSystems)) {
-                    this.commandSystems[key] = [];
-                }
-
-                this.commandSystems[key].push(value);
-            }
+        if (!!system.onGameMessage) {
+            this.gameMessageSystems.push(system.onGameMessage);
         }
 
         const entityEventsFromSystem = system.onEntityEvent;
@@ -106,12 +101,10 @@ export class EcsWorld {
         }
     }
 
-    runCommand(command: GameCommand) {
-        const callbacks = this.commandSystems[command.id];
-        if (callbacks) {
-            for (const callback of callbacks) {
-                callback(this.rootEntity, command);
-            }
+    runGameMessage(message: GameMessage) {
+        for (let i = 0; i < this.gameMessageSystems.length; i++) {
+            const system = this.gameMessageSystems[i];
+            system(this.root, message);
         }
     }
 

@@ -1,5 +1,7 @@
+import type { AnimationComponent } from "./animationComponent.js";
 import type { BuildingComponent } from "./buildingComponent.js";
 import type { ChunkMapComponent } from "./chunkMapComponent.js";
+import { DirectionComponent } from "./directionComponent.js";
 import type { EffectEmitterComponent } from "./effectEmitterComponent.js";
 import type { EquipmentComponent } from "./equipmentComponent.js";
 import type { HealthComponent } from "./healthComponent.js";
@@ -16,25 +18,27 @@ import type { VisibilityMapComponent } from "./visibilityMapComponent.js";
 import type { WorldDiscoveryComponent } from "./worldDiscoveryComponent.js";
 
 export type Components =
-    | JobRunnerComponent
-    | SpriteComponent
-    | TileComponent
-    | InventoryComponent
-    | ResourceComponent
-    | ChunkMapComponent
-    | PlayerUnitComponent
-    | JobQueueComponent
-    | BuildingComponent
-    | HealthComponent
-    | EquipmentComponent
-    | WorldDiscoveryComponent
-    | VisibilityMapComponent
-    | VisibilityComponent
-    | EffectEmitterComponent
-    | PathfindingGraphComponent;
+  | JobRunnerComponent
+  | SpriteComponent
+  | TileComponent
+  | InventoryComponent
+  | ResourceComponent
+  | ChunkMapComponent
+  | PlayerUnitComponent
+  | JobQueueComponent
+  | BuildingComponent
+  | HealthComponent
+  | EquipmentComponent
+  | WorldDiscoveryComponent
+  | VisibilityMapComponent
+  | VisibilityComponent
+  | EffectEmitterComponent
+  | AnimationComponent
+  | PathfindingGraphComponent
+  | DirectionComponent;
 
 export interface BaseComponent {
-    id: string;
+  id: string;
 }
 
 export type ComponentID = Components["id"];
