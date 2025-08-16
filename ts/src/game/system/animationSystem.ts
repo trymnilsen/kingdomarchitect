@@ -60,6 +60,7 @@ function onGameMessage(root: Entity, message: GameMessage) {
 
         animatable.currentAnimation.frame = 0;
         animatable.currentAnimation.state = nextStateKey;
+        animatable.currentAnimation.clip = animationClip;
     }
 
     if (message.type == "effect") {
@@ -70,9 +71,8 @@ function onGameMessage(root: Entity, message: GameMessage) {
 /**
  * Update the animation logic for a single entity for the current frame.
  * It advances the frame counter or transitions to a new state if the current animation has finished.
- * @param {Entity} entity The entity being animated.
- * @param {AnimationComponent} animatable The AnimationComponent instance for the entity.
- * @returns {void}
+ * @param entity The entity being animated.
+ * @param animatable The AnimationComponent instance for the entity.
  */
 function updateAnimatable(
     entity: Entity,
@@ -88,22 +88,28 @@ function updateAnimatable(
 
     const nextFrame = currentAnimation.frame + 1;
 
-    if (nextFrame < animationClip.frames.length) {
+    if (nextFrame < animationClip.sprite.defintion.frames) {
         currentAnimation.frame = nextFrame;
     } else {
-        handleAnimationEnd(animatable, currentAnimationState, animationClip);
+        handleAnimationEnd(
+            entity,
+            animatable,
+            currentAnimationState,
+            animationClip,
+        );
     }
 }
 
 /**
  * Handles the logic when an animation clip finishes playing.
  * It will either loop the animation or find and transition to a new state.
- * @param {AnimationComponent} animatable The entity's AnimationComponent.
- * @param {AnimationState} currentAnimationState The state object of the animation that just finished.
- * @param {AnimationClip} animationClip The clip data of the animation that just finished.
- * @returns {void}
+ * @param entity the entity to animate
+ * @param animatable The entity's AnimationComponent.
+ * @param currentAnimationState The state object of the animation that just finished.
+ * @param animationClip The clip data of the animation that just finished.
  */
 function handleAnimationEnd(
+    entity: Entity,
     animatable: AnimationComponent,
     currentAnimationState: AnimationState,
     animationClip: AnimationClip,
@@ -120,6 +126,11 @@ function handleAnimationEnd(
 
         animatable.currentAnimation.frame = 0;
         animatable.currentAnimation.state = nextStateKey;
+        animatable.currentAnimation.clip = getAnimationClip(
+            animatable,
+            nextStateKey,
+            entity,
+        );
     }
 }
 

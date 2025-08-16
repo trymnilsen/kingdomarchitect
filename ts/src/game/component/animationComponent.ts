@@ -7,6 +7,7 @@ import type {
 type CurrentAnimation = {
     state: string;
     frame: number;
+    clip: AnimationClip;
 };
 
 export type AnimationComponent = {
@@ -21,6 +22,7 @@ export function createDirectionComponent(
     const initialState: CurrentAnimation = {
         state: animationGraph.initialState,
         frame: 0,
+        clip: Object.values(animationGraph.animationSet)[0]!,
     };
     return {
         id: AnimationComponentId,
