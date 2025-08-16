@@ -1,5 +1,4 @@
 import type { AnimationGraph } from "../../rendering/animation/animationGraph.js";
-import { sprites2 } from "../sprite.js";
 
 type KnightAnimationStates = {
     Idle: {
@@ -33,29 +32,29 @@ type KnightAnimationStates = {
 export const nobleKnightAnimationGraph: AnimationGraph = {
     animationSet: {
         // --- Idle Animations ---
-        idle_down: { type: "loop", sprite: sprites2.knight_idle_down },
-        idle_up: { type: "loop", sprite: sprites2.knight_idle_up },
-        idle_left: { type: "loop", sprite: sprites2.knight_idle_left },
-        idle_right: { type: "loop", sprite: sprites2.knight_idle_right },
+        idle_down: { type: "loop", frames: [0] },
+        idle_up: { type: "loop", frames: [8] },
+        idle_left: { type: "loop", frames: [16] },
+        idle_right: { type: "loop", frames: [24] },
 
         // --- Walk Animations ---
         walk_down: {
             type: "loop",
-            sprite: sprites2.knight,
+            frames: [0, 1, 2, 3],
         },
         walk_up: {
             type: "loop",
-            sprite: sprites2.knight_up,
+            frames: [8, 9, 10, 11],
         },
         walk_left: {
             type: "loop",
-            sprite: sprites2.knight_left,
+            frames: [16, 17, 18, 19],
         },
         walk_right: {
             type: "loop",
-            sprite: sprites2.knight_right,
+            frames: [24, 25, 26, 27],
         },
-        /*
+
         // --- Attack Animations ---
         attack_down: {
             type: "single",
@@ -73,7 +72,6 @@ export const nobleKnightAnimationGraph: AnimationGraph = {
             type: "single",
             frames: [56, 57, 58],
         },
-*/
     },
     initialState: "Idle",
     globalTransitions: [

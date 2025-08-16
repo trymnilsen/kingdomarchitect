@@ -1,4 +1,3 @@
-import type { Sprite2 } from "../../asset/sprite.js";
 import { nameof } from "../../common/nameof.js";
 
 // Define the valid values for the {direction} placeholder
@@ -17,7 +16,7 @@ export type AnimationTemplate = `${AnimationPrefix}_{direction}`;
 
 // Defines a single animation clip
 export type AnimationClip = {
-    sprite: Sprite2;
+    frames: number[];
     type: "loop" | "single";
 };
 
