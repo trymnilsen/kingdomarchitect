@@ -83,12 +83,13 @@ function onRender(
         if (visibility || window.debugChunks) {
             const animationComponent =
                 sortedSprites[i][0].getEcsComponent(AnimationComponentId);
+
             drawSprite(
                 sprite,
-                animationComponent,
                 position,
                 renderScope,
                 drawMode,
+                animationComponent?.currentAnimation.frame ?? 0,
             );
         }
     }
@@ -144,10 +145,10 @@ function drawHealthbar(
 
 function drawSprite(
     spriteComponent: SpriteComponent,
-    animationComponent: AnimationComponent | null,
     position: Point,
     renderContext: RenderScope,
     _drawMode: DrawMode,
+    frame: number,
 ) {
     const scale = 2;
 
@@ -190,7 +191,7 @@ function drawSprite(
         targetHeight: targetHeight,
         targetWidth: targetWidth,
         tint: spriteComponent.tint?.color,
-        frame: animationComponent?.currentAnimation?.frame ?? 0,
+        frame: frame,
     });
 }
 
