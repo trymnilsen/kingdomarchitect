@@ -74,8 +74,14 @@ export class Entity {
      */
     set position(position: Point) {
         if (!pointEquals(this._localPosition, position)) {
+            const oldPosition = this._worldPosition;
             this._localPosition = position;
             this.updateTransform();
+            this.bubbleEvent({
+                id: "transform",
+                source: this,
+                oldPosition,
+            });
         }
     }
 
@@ -93,6 +99,7 @@ export class Entity {
      */
     set worldPosition(position: Point) {
         if (!pointEquals(this._worldPosition, position)) {
+            const oldPosition = this._worldPosition;
             this._worldPosition = position;
             if (this.parent) {
                 this._localPosition = subtractPoint(
@@ -103,6 +110,12 @@ export class Entity {
                 this._localPosition = position;
             }
             this.updateTransform();
+            // Bubble up position change
+            this.bubbleEvent({
+                id: "transform",
+                source: this,
+                oldPosition,
+            });
         }
     }
 
@@ -349,7 +362,6 @@ export class Entity {
      * entity's local position
      */
     private updateTransform() {
-        const oldPosition = this._worldPosition;
         let newPosition = this._localPosition;
         if (this.parent) {
             // If there is a parent, add its world position to the
@@ -361,12 +373,6 @@ export class Entity {
         }
 
         this._worldPosition = newPosition;
-        // Bubble up position change
-        this.bubbleEvent({
-            id: "transform",
-            source: this,
-            oldPosition,
-        });
         // Update children
         for (let i = 0; i < this._children.length; i++) {
             this._children[i].updateTransform();

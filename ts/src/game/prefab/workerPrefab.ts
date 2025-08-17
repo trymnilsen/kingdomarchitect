@@ -10,6 +10,9 @@ import { createPlayerUnitComponent } from "../component/playerUnitComponent.js";
 import { createSpriteComponent } from "../component/spriteComponent.js";
 import { Entity } from "../entity/entity.js";
 import { createVisibilityComponent } from "../component/visibilityComponent.js";
+import { createAnimationComponent } from "../component/animationComponent.js";
+import { nobleKnightAnimationGraph } from "../../asset/animation/knight.animation.js";
+import { createDirectionComponent } from "../component/directionComponent.js";
 
 export function workerPrefab(): Entity {
     const entity = new Entity(generateId("worker"));
@@ -20,5 +23,7 @@ export function workerPrefab(): Entity {
     entity.setEcsComponent(createEquipmentComponent());
     entity.setEcsComponent(createInventoryComponent(defaultInventoryItems()));
     entity.setEcsComponent(createVisibilityComponent());
+    entity.setEcsComponent(createAnimationComponent(nobleKnightAnimationGraph));
+    entity.setEcsComponent(createDirectionComponent());
     return entity;
 }

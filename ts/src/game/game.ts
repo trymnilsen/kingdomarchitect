@@ -43,6 +43,7 @@ export class Game {
         this.gameServer = new WebworkerServerConnection();
         this.gameServer.onMessage.listen((message) => {
             handleGameMessage(this.ecsWorld.root, message);
+            this.ecsWorld.runGameMessage(message);
         });
         this.assetLoader = new AssetLoader();
         this.camera = new Camera({

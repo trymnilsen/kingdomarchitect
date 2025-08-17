@@ -9,7 +9,7 @@ export type AnimationComponent = {
     currentAnimation: string;
 };
 
-export function createDirectionComponent(
+export function createAnimationComponent(
     animationGraph: AnimationGraph,
 ): AnimationComponent {
     return {
