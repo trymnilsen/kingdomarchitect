@@ -84,13 +84,7 @@ function onRender(
             const animationComponent =
                 sortedSprites[i][0].getEcsComponent(AnimationComponentId);
 
-            drawSprite(
-                sprite,
-                position,
-                renderScope,
-                drawMode,
-                animationComponent?.currentAnimation.frame ?? 0,
-            );
+            drawSprite(sprite, position, renderScope, drawMode);
         }
     }
 
@@ -148,7 +142,6 @@ function drawSprite(
     position: Point,
     renderContext: RenderScope,
     _drawMode: DrawMode,
-    frame: number,
 ) {
     const scale = 2;
 
@@ -158,15 +151,13 @@ function drawSprite(
     if (targetWidth) {
         targetWidth = targetWidth * scale;
     } else {
-        targetWidth =
-            renderContext.measureSprite(spriteComponent.sprite).width * scale;
+        targetWidth = spriteComponent.sprite.defintion.w * scale;
     }
 
     if (targetHeight) {
         targetHeight = targetHeight * scale;
     } else {
-        targetHeight =
-            renderContext.measureSprite(spriteComponent.sprite).height * scale;
+        targetHeight = spriteComponent.sprite.defintion.h * scale;
     }
 
     /*
@@ -191,7 +182,7 @@ function drawSprite(
         targetHeight: targetHeight,
         targetWidth: targetWidth,
         tint: spriteComponent.tint?.color,
-        frame: frame,
+        frame: spriteComponent.frame,
     });
 }
 

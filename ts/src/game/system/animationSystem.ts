@@ -1,9 +1,10 @@
+import type { Sprite2 } from "../../asset/sprite.js";
 import { Direction } from "../../common/direction.js";
 import type { EcsSystem } from "../../common/ecs/ecsSystem.js";
 import { checkAdjacency } from "../../common/point.js";
 import {
     isEventTransition,
-    type AnimationClip,
+    type AnimationGraph,
     type AnimationState,
     type AnimationTemplate,
     type ValidAnimationKey,
@@ -19,6 +20,10 @@ import {
     type AnimationComponent,
 } from "../component/animationComponent.js";
 import { DirectionComponentId } from "../component/directionComponent.js";
+import {
+    SpriteComponentId,
+    type SpriteComponent,
+} from "../component/spriteComponent.js";
 import type { Entity } from "../entity/entity.js";
 
 export const animationSystem: EcsSystem = {
@@ -47,19 +52,12 @@ function onGameMessage(root: Entity, message: GameMessage) {
 
         const nextStateKey = animatable.animationGraph.globalTransitions.find(
             (transition) =>
-                isEventTransition(transition) && transition.event == "movement",
+                isEventTransition(transition) && transition.event == "MOVEMENT",
         )?.target;
 
         if (!nextStateKey) return;
 
-        const animationClip = getAnimationClip(
-            animatable,
-            nextStateKey,
-            entity,
-        );
-
-        animatable.currentAnimation.frame = 0;
-        animatable.currentAnimation.state = nextStateKey;
+        updateAnimation(entity, animatable, nextStateKey);
     }
 
     if (message.type == "effect") {
@@ -70,57 +68,57 @@ function onGameMessage(root: Entity, message: GameMessage) {
 /**
  * Update the animation logic for a single entity for the current frame.
  * It advances the frame counter or transitions to a new state if the current animation has finished.
- * @param {Entity} entity The entity being animated.
- * @param {AnimationComponent} animatable The AnimationComponent instance for the entity.
- * @returns {void}
+ * @param entity The entity being animated.
+ * @param animatable The AnimationComponent instance for the entity.
  */
 function updateAnimatable(
     entity: Entity,
     animatable: AnimationComponent,
 ): void {
     const { currentAnimation, animationGraph } = animatable;
-    const currentAnimationState = animationGraph.states[currentAnimation.state];
-    const animationClip = getAnimationClip(
-        animatable,
-        currentAnimation.state,
-        entity,
-    );
+    const spriteComponent = entity.requireEcsComponent(SpriteComponentId);
+    const sprite = spriteComponent.sprite;
+    const nextFrame = spriteComponent.frame + 1;
 
-    const nextFrame = currentAnimation.frame + 1;
-
-    if (nextFrame < animationClip.frames.length) {
-        currentAnimation.frame = nextFrame;
+    if (nextFrame < sprite.defintion.frames) {
+        spriteComponent.frame = nextFrame;
     } else {
-        handleAnimationEnd(animatable, currentAnimationState, animationClip);
+        // The animation has finished, decide what to do next.
+        const currentAnimationState = animationGraph.states[currentAnimation];
+        let nextStateKey: string;
+
+        if (currentAnimationState.type === "loop") {
+            // For looping animations, the next state is the same state.
+            nextStateKey = currentAnimation;
+        } else {
+            // For non-looping animations, find the next state.
+            const endTransition = currentAnimationState.transitions?.find(
+                (t) => isEventTransition(t) && t.event === "animation_end",
+            );
+            nextStateKey = endTransition
+                ? endTransition.target
+                : animationGraph.initialState;
+        }
+
+        // Transition to the next animation state.
+        updateAnimation(entity, animatable, nextStateKey);
     }
 }
 
-/**
- * Handles the logic when an animation clip finishes playing.
- * It will either loop the animation or find and transition to a new state.
- * @param {AnimationComponent} animatable The entity's AnimationComponent.
- * @param {AnimationState} currentAnimationState The state object of the animation that just finished.
- * @param {AnimationClip} animationClip The clip data of the animation that just finished.
- * @returns {void}
- */
-function handleAnimationEnd(
+function updateAnimation(
+    entity: Entity,
     animatable: AnimationComponent,
-    currentAnimationState: AnimationState,
-    animationClip: AnimationClip,
-): void {
-    const { currentAnimation } = animatable;
-
-    if (animationClip.type === "loop") {
-        currentAnimation.frame = 0;
-    } else {
-        const nextStateKey = findNextStateKeyOnEnd(
-            animatable,
-            currentAnimationState,
-        );
-
-        animatable.currentAnimation.frame = 0;
-        animatable.currentAnimation.state = nextStateKey;
-    }
+    nextStateKey: string,
+) {
+    animatable.currentAnimation = nextStateKey;
+    const spriteComponent = entity.updateComponent(
+        SpriteComponentId,
+        (component) => {
+            const sprite = getSpriteForState(animatable, nextStateKey, entity);
+            component.sprite = sprite;
+            component.frame = 0;
+        },
+    );
 }
 
 /**
@@ -151,20 +149,19 @@ function resolvePlaceholders(
 }
 
 /**
- * A utility to resolve a state name into a concrete AnimationClip.
+ * A utility to resolve a state name into a concrete sprite.
  * It centralizes the logic for looking up the state, resolving placeholders in the template,
- * and validating that the final clip exists.
- * @param {AnimationComponent} animatable The AnimationComponent containing the animation graph.
- * @param {string} stateName The key of the state to resolve (e.g., "walking").
- * @param {Entity} entity The entity, required for resolving placeholders like `{direction}`.
- * @returns {AnimationClip} The resolved and validated animation clip.
- * @throws {Error} Throws an error if the state key is invalid or the resolved clip name doesn't exist.
+ * and validating that the final sprite exists.
+ * @param animatable The AnimationComponent containing the animation graph.
+ * @param stateName The key of the state to resolve (e.g., "walking").
+ * @param entity The entity, required for resolving placeholders like `{direction}`.
+ * @throws Throws an error if the state key is invalid or the resolved sprite name doesn't exist.
  */
-function getAnimationClip(
+function getSpriteForState(
     animatable: AnimationComponent,
     stateName: string,
     entity: Entity,
-): AnimationClip {
+): Sprite2 {
     const { animationGraph } = animatable;
 
     const animationState = animationGraph.states[stateName];
@@ -173,38 +170,14 @@ function getAnimationClip(
     }
 
     const animationTemplate = animationState.animation;
-    const resolvedClipName = resolvePlaceholders(animationTemplate, entity);
-    const animationClip = animationGraph.animationSet[resolvedClipName];
+    const resolvedSpriteName = resolvePlaceholders(animationTemplate, entity);
+    const sprite = animationGraph.animationSet[resolvedSpriteName];
 
-    if (!animationClip) {
+    if (!sprite) {
         throw new Error(
-            `Animation state "${stateName}" resolved to "${resolvedClipName}", which is not a valid clip.`,
+            `Animation state "${stateName}" resolved to "${resolvedSpriteName}", which is not a valid sprite.`,
         );
     }
 
-    return animationClip;
-}
-
-/**
- * Finds the key of the next animation state after a non-looping animation concludes.
- * It looks for an "animation_end" transition, otherwise defaults to the graph's initial state.
- * @param {AnimationComponent} animatable The AnimationComponent containing the animation graph.
- * @param {AnimationState} currentAnimationState The state object of the animation that just finished.
- * @returns {string} The key of the next animation state to transition to.
- */
-function findNextStateKeyOnEnd(
-    animatable: AnimationComponent,
-    currentAnimationState: AnimationState,
-): string {
-    const { animationGraph } = animatable;
-
-    const endTransition = currentAnimationState.transitions?.find(
-        (t) => isEventTransition(t) && t.event === "animation_end",
-    );
-
-    if (endTransition) {
-        return endTransition.target;
-    }
-
-    return animationGraph.initialState;
+    return sprite;
 }

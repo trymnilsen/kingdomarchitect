@@ -1,3 +1,4 @@
+import type { Sprite2 } from "../../asset/sprite.js";
 import { nameof } from "../../common/nameof.js";
 
 // Define the valid values for the {direction} placeholder
@@ -13,12 +14,6 @@ export type ValidAnimationKey = `${AnimationPrefix}_${Direction}`;
 export type AnimationTemplate = `${AnimationPrefix}_{direction}`;
 
 // --- Main Data Structures ---
-
-// Defines a single animation clip
-export type AnimationClip = {
-    frames: number[];
-    type: "loop" | "single";
-};
 
 type AnimationEventTransition = {
     event: string;
@@ -41,6 +36,7 @@ export function isEventTransition(
 }
 
 export type AnimationState = {
+    type: "loop" | "single";
     animation: AnimationTemplate;
     transitions?: AnimationTransition[];
 };
@@ -48,7 +44,7 @@ export type AnimationState = {
 export type AnimationStateMap = Record<string, AnimationState>;
 
 export type AnimationGraph<T extends AnimationStateMap = AnimationStateMap> = {
-    animationSet: Partial<Record<string, AnimationClip>>;
+    animationSet: Partial<Record<string, Sprite2>>;
     initialState: keyof T;
     globalTransitions: AnimationTransition[];
     states: Record<string, AnimationState>;

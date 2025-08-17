@@ -34,23 +34,10 @@ export function damageTint(): SpriteTint {
 export type SpriteComponent = {
     id: typeof SpriteComponentId;
     sprite: Sprite2;
+    frame: number;
     offset?: Point;
     size?: Point;
     tint?: SpriteTint;
-};
-
-export type AnimatedSprite = {
-    sprite: LoopingAnimation | SingleAnimation;
-};
-
-export type LoopingAnimation = {
-    currentFrame: number;
-    sprite: Sprite2;
-};
-
-export type SingleAnimation = {
-    currentFrame: number;
-    sprite: Sprite2;
 };
 
 /**
@@ -69,6 +56,7 @@ export function createSpriteComponent(
 ): SpriteComponent {
     return {
         id: SpriteComponentId,
+        frame: 0,
         sprite,
         offset,
         size,
