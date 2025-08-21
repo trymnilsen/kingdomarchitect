@@ -41,7 +41,7 @@ function onRender(
     renderScope: RenderScope,
     drawMode: DrawMode,
 ) {
-    const renderStart = performance.now();
+    //const renderStart = performance.now();
     const viewport = renderScope.camera.tileSpaceViewPort;
     //TODO: If i make a map/set structure with both string and instance keys
     //i can add a first method to it to avoid getting values
@@ -100,11 +100,11 @@ function onRender(
         drawHealthbar(renderScope, entity, healthComponent);
     }
 
-    const renderEnd = performance.now();
+    /*const renderEnd = performance.now();
     performance.measure("render duration", {
         start: renderStart,
         end: renderEnd,
-    });
+    });*/
 }
 
 function drawHealthbar(

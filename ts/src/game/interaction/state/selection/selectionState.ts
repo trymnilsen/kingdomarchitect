@@ -66,6 +66,11 @@ export class SelectionState extends InteractionState {
             text: item.text,
             onClick: item.onClick,
             icon: item.icon,
+            children: item.children?.map((child) => ({
+                text: child.text,
+                icon: child.icon,
+                onClick: child.onClick,
+            })),
         }));
 
         // Create content that shows selection info

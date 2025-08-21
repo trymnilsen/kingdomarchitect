@@ -192,7 +192,7 @@ export const uiScaffold = createComponent<ScaffoldProps>(
         const leftSize = measureButtons(leftButtons);
         const rightSize = measureButtons(rightButtons);
 
-        //Both fit, lay them out normally
+        // Check if both button groups can fit horizontally without overlap or cramping
         const width = leftSize.totalWidth + rightSize.totalWidth;
         const height = Math.max(leftSize.maxHeight, rightSize.maxHeight);
         // Add spacing between left and right groups if both exist
@@ -291,7 +291,8 @@ export const uiScaffold = createComponent<ScaffoldProps>(
                         : right[expandedMenu.expandedButtonIndex];
 
                     if (parentButtonData) {
-                        // Layout children vertically above the parent button (for horizontal main menu)
+                        // Stack children upward to avoid blocking main button row
+                        // This keeps the primary interface accessible while showing options
                         let childY = parentButtonData.offset.y;
                         childButtons.forEach((childButton, childIndex) => {
                             const childSize = childSizes[childIndex];

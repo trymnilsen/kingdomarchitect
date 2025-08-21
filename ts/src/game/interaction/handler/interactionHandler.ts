@@ -248,7 +248,7 @@ export class InteractionHandler {
 
     onDraw(renderScope: RenderScope) {
         //const start = performance.now();
-        performance.mark("InteractionStateDraw");
+        //performance.mark("InteractionStateDraw");
         if (this.history.state.isModal) {
             renderScope.drawScreenSpaceRectangle({
                 x: 0,
@@ -262,12 +262,12 @@ export class InteractionHandler {
         this.history.state.onDraw(renderScope);
         this.uiRenderer.renderComponent(this.history.state.getView());
 
-        performance.mark("InteractionStateDrawEnd");
-        performance.measure(
+        //performance.mark("InteractionStateDrawEnd");
+        /*performance.measure(
             "UI Drawing",
             "InteractionStateDraw",
             "InteractionStateDrawEnd",
-        );
+        );*/
         //console.log("Interaction state draw", performance.now() - start);
     }
 }

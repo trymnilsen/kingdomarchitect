@@ -20,6 +20,7 @@ import { ninePatchBackground } from "../../../../../ui/uiBackground.js";
 import { fillUiSize, wrapUiSize } from "../../../../../ui/uiSize.js";
 import type { InventoryComponent } from "../../../../component/inventoryComponent.js";
 import { inventoryGridItem } from "./inventoryGridItem.js";
+import { uiScaffold } from "../../../view/uiScaffold.js";
 
 export type InventoryViewProps = {
     inventory: InventoryComponent;
@@ -86,10 +87,19 @@ export const inventoryView = createComponent<InventoryViewProps>(
 
         // Create details view
         const detailsView = createDetailsView(items[selectedIndex]);
-
-        return uiBookLayout({
-            leftPage: gridView,
-            rightPage: detailsView,
+        return uiScaffold({
+            content: uiBookLayout({
+                leftPage: gridView,
+                rightPage: detailsView,
+            }),
+            leftButtons: [
+                {
+                    text: "equip",
+                },
+                {
+                    text: "drop",
+                },
+            ],
         });
     },
     { displayName: "InventoryView" },
