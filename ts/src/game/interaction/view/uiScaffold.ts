@@ -91,7 +91,7 @@ enum MenuState {
 
 type ExpandedMenuState = {
     expandedButtonIndex: number | null;
-    expandedGroup: "left" | "right" | null;
+    expandedGroup: "left" | "right" | "collapsed" | null;
 };
 
 type MeasuredButtons = {
@@ -337,29 +337,168 @@ export const uiScaffold = createComponent<ScaffoldProps>(
                 size: { width: constraints.width, height: constraints.height },
             };
         } else {
-            // Not enough space for buttons, just show content if available
+            // Not enough space for buttons, collapse the left buttons into an expanding menu
+            let children: PlacedChild[] = [];
+
+            // Create collapsed "Actions" menu from left buttons if they exist
+            const hasLeftButtons =
+                props.leftButtons && props.leftButtons.length > 0;
+            let collapsedMenuButton: ComponentDescriptor | null = null;
+
+            if (hasLeftButtons) {
+                collapsedMenuButton = uiMenuButton({
+                    text: "Actions",
+                    hasChildren: true,
+                    onExpand: () => {
+                        if (
+                            expandedMenu.expandedButtonIndex === 0 &&
+                            expandedMenu.expandedGroup === "collapsed"
+                        ) {
+                            // Collapse if already expanded
+                            setExpandedMenu({
+                                expandedButtonIndex: null,
+                                expandedGroup: null,
+                            });
+                        } else {
+                            // Expand this menu
+                            setExpandedMenu({
+                                expandedButtonIndex: 0,
+                                expandedGroup: "collapsed",
+                            });
+                        }
+                    },
+                });
+            }
+
+            // Measure individual button groups for proper alignment
+            let collapsedMenuSize: UISize | null = null;
+            if (collapsedMenuButton) {
+                collapsedMenuSize = measureDescriptor(
+                    "collapsed-menu",
+                    collapsedMenuButton,
+                    constraints,
+                );
+            }
+            const rightSize = measureButtons(rightButtons);
+
+            // Position collapsed menu button on the left (if it exists)
+            if (collapsedMenuButton && collapsedMenuSize) {
+                const y = constraints.height - collapsedMenuSize.height;
+                children.push({
+                    offset: { x: 0, y },
+                    size: collapsedMenuSize,
+                    ...collapsedMenuButton,
+                });
+            }
+
+            // Position right buttons aligned to the right
+            if (rightButtons.length > 0) {
+                let rightButtonX = constraints.width - rightSize.totalWidth;
+                rightButtons.forEach((button, index) => {
+                    const buttonSize = rightSize.sizes[index];
+                    const y = constraints.height - buttonSize.height;
+                    const x = rightButtonX;
+                    rightButtonX += buttonSize.width;
+
+                    // Add spacing between buttons (but not after the last one)
+                    if (index < rightButtons.length - 1) {
+                        rightButtonX += spacing;
+                    }
+
+                    children.push({
+                        offset: { x, y },
+                        size: buttonSize,
+                        ...button,
+                    });
+                });
+            } // Handle expanded collapsed menu
+            if (
+                expandedMenu.expandedButtonIndex === 0 &&
+                expandedMenu.expandedGroup === "collapsed" &&
+                props.leftButtons
+            ) {
+                // Create child menu buttons from the original left buttons
+                const childButtons = props.leftButtons.map((leftButton) =>
+                    uiMenuButton({
+                        text: leftButton.text,
+                        onClick: leftButton.onClick
+                            ? () => {
+                                  // Close the expanded menu first
+                                  setExpandedMenu({
+                                      expandedButtonIndex: null,
+                                      expandedGroup: null,
+                                  });
+                                  // Then execute the action
+                                  leftButton.onClick?.();
+                              }
+                            : undefined,
+                        icon: leftButton.icon,
+                        hasChildren: false,
+                    }),
+                );
+
+                // Measure child buttons
+                const childSizes = childButtons.map((childButton, childIndex) =>
+                    measureDescriptor(
+                        `collapsed-child-${childIndex}`,
+                        childButton,
+                        constraints,
+                    ),
+                );
+
+                // Find the collapsed menu button position (first button)
+                const parentButtonData = children[0];
+
+                if (parentButtonData) {
+                    // Stack children upward from the parent button
+                    let childY = parentButtonData.offset.y;
+                    childButtons.forEach((childButton, childIndex) => {
+                        const childSize = childSizes[childIndex];
+                        childY -= childSize.height + spacing;
+
+                        children.push({
+                            offset: {
+                                x: parentButtonData.offset.x,
+                                y: Math.max(0, childY), // Ensure it doesn't go above screen
+                            },
+                            size: childSize,
+                            ...childButton,
+                        });
+                    });
+                }
+            }
+
+            // Add content if provided - should fill the space above the buttons
             if (props.content) {
+                // Calculate the maximum height of the button bar
+                const buttonBarHeight = Math.max(
+                    collapsedMenuSize?.height || 0,
+                    rightSize.maxHeight,
+                );
+                const contentHeight =
+                    constraints.height - buttonBarHeight - spacing;
+                const contentConstraints = {
+                    width: constraints.width,
+                    height: Math.max(0, contentHeight),
+                };
+
                 const contentSize = measureDescriptor(
                     "content",
                     props.content,
-                    constraints,
+                    contentConstraints,
                 );
 
-                return {
-                    children: [
-                        {
-                            offset: { x: 0, y: 0 },
-                            size: contentSize,
-                            ...props.content,
-                        },
-                    ],
-                    size: {
-                        width: constraints.width,
-                        height: constraints.height,
-                    },
-                };
+                children.push({
+                    offset: { x: 0, y: 0 },
+                    size: contentSize,
+                    ...props.content,
+                });
             }
-            return { children: [], size: zeroSize() };
+
+            return {
+                children: children,
+                size: { width: constraints.width, height: constraints.height },
+            };
         }
     },
 );
