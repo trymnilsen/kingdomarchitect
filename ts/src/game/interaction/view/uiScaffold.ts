@@ -291,10 +291,10 @@ export const uiScaffold = createComponent<ScaffoldProps>(
                         : right[expandedMenu.expandedButtonIndex];
 
                     if (parentButtonData) {
-                        // Find the widest child button for alignment
-                        const maxChildWidth = Math.max(
-                            ...childSizes.map((size) => size.width),
-                        );
+                        // Calculate the center position of the parent button
+                        const parentCenterX =
+                            parentButtonData.offset.x +
+                            parentButtonData.size.width / 2;
 
                         // Stack children upward to avoid blocking main button row
                         // This keeps the primary interface accessible while showing options
@@ -303,16 +303,13 @@ export const uiScaffold = createComponent<ScaffoldProps>(
                             const childSize = childSizes[childIndex];
                             childY -= childSize.height + spacing;
 
-                            // Calculate offset to center-align the icon boxes (since buttons are centered layouts)
-                            // Instead of right-aligning, we center-align the buttons so their icon boxes line up
-                            const alignmentOffset =
-                                (maxChildWidth - childSize.width) / 2;
+                            // Align child button center with parent button center
+                            // Since all buttons have centered icon boxes, centering the buttons will align the icons
+                            const childX = parentCenterX - childSize.width / 2;
 
                             children.push({
                                 offset: {
-                                    x:
-                                        parentButtonData.offset.x +
-                                        alignmentOffset,
+                                    x: childX,
                                     y: Math.max(0, childY), // Ensure it doesn't go above screen
                                 },
                                 size: childSize,
@@ -462,10 +459,10 @@ export const uiScaffold = createComponent<ScaffoldProps>(
                 const parentButtonData = children[0];
 
                 if (parentButtonData) {
-                    // Find the widest child button for alignment
-                    const maxChildWidth = Math.max(
-                        ...childSizes.map((size) => size.width),
-                    );
+                    // Calculate the center position of the parent button
+                    const parentCenterX =
+                        parentButtonData.offset.x +
+                        parentButtonData.size.width / 2;
 
                     // Stack children upward from the parent button
                     let childY = parentButtonData.offset.y;
@@ -473,14 +470,13 @@ export const uiScaffold = createComponent<ScaffoldProps>(
                         const childSize = childSizes[childIndex];
                         childY -= childSize.height + spacing;
 
-                        // Calculate offset to center-align the icon boxes (since buttons are centered layouts)
-                        // Instead of right-aligning, we center-align the buttons so their icon boxes line up
-                        const alignmentOffset =
-                            (maxChildWidth - childSize.width) / 2;
+                        // Align child button center with parent button center
+                        // Since all buttons have centered icon boxes, centering the buttons will align the icons
+                        const childX = parentCenterX - childSize.width / 2;
 
                         children.push({
                             offset: {
-                                x: parentButtonData.offset.x + alignmentOffset,
+                                x: childX,
                                 y: Math.max(0, childY), // Ensure it doesn't go above screen
                             },
                             size: childSize,
