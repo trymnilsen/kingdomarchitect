@@ -291,6 +291,11 @@ export const uiScaffold = createComponent<ScaffoldProps>(
                         : right[expandedMenu.expandedButtonIndex];
 
                     if (parentButtonData) {
+                        // Find the widest child button for alignment
+                        const maxChildWidth = Math.max(
+                            ...childSizes.map((size) => size.width),
+                        );
+
                         // Stack children upward to avoid blocking main button row
                         // This keeps the primary interface accessible while showing options
                         let childY = parentButtonData.offset.y;
@@ -298,9 +303,16 @@ export const uiScaffold = createComponent<ScaffoldProps>(
                             const childSize = childSizes[childIndex];
                             childY -= childSize.height + spacing;
 
+                            // Calculate offset to center-align the icon boxes (since buttons are centered layouts)
+                            // Instead of right-aligning, we center-align the buttons so their icon boxes line up
+                            const alignmentOffset =
+                                (maxChildWidth - childSize.width) / 2;
+
                             children.push({
                                 offset: {
-                                    x: parentButtonData.offset.x,
+                                    x:
+                                        parentButtonData.offset.x +
+                                        alignmentOffset,
                                     y: Math.max(0, childY), // Ensure it doesn't go above screen
                                 },
                                 size: childSize,
@@ -450,15 +462,25 @@ export const uiScaffold = createComponent<ScaffoldProps>(
                 const parentButtonData = children[0];
 
                 if (parentButtonData) {
+                    // Find the widest child button for alignment
+                    const maxChildWidth = Math.max(
+                        ...childSizes.map((size) => size.width),
+                    );
+
                     // Stack children upward from the parent button
                     let childY = parentButtonData.offset.y;
                     childButtons.forEach((childButton, childIndex) => {
                         const childSize = childSizes[childIndex];
                         childY -= childSize.height + spacing;
 
+                        // Calculate offset to center-align the icon boxes (since buttons are centered layouts)
+                        // Instead of right-aligning, we center-align the buttons so their icon boxes line up
+                        const alignmentOffset =
+                            (maxChildWidth - childSize.width) / 2;
+
                         children.push({
                             offset: {
-                                x: parentButtonData.offset.x,
+                                x: parentButtonData.offset.x + alignmentOffset,
                                 y: Math.max(0, childY), // Ensure it doesn't go above screen
                             },
                             size: childSize,
