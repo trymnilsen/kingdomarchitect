@@ -7,9 +7,20 @@ import {
 import {
     QueueJobCommandId,
     type QueueJobCommand,
-} from "../../server/message/queueJobCommand.js";
+} from "../../server/message/command/queueJobCommand.js";
 import { JobQueueComponentId } from "../component/jobQueueComponent.js";
 import type { Entity } from "../entity/entity.js";
+import {
+    EquipItemCommandId,
+    type EquipItemCommand,
+} from "../../server/message/command/equipItemCommand.js";
+import {
+    addInventoryItem,
+    getInventoryItem,
+    InventoryComponentId,
+    takeInventoryItem,
+} from "../component/inventoryComponent.js";
+import { EquipmentComponentId } from "../component/equipmentComponent.js";
 
 export const commandSystem: EcsSystem = {
     onGameMessage,
@@ -17,14 +28,65 @@ export const commandSystem: EcsSystem = {
 
 function onGameMessage(root: Entity, message: GameMessage) {
     if (message.type != CommandGameMessageType) return;
-
-    if (message.command.id == QueueJobCommandId) {
-        queueJob(root, message.command);
+    console.log("[CommandSystem] command: ", message.command);
+    switch (message.command.id) {
+        case QueueJobCommandId:
+            queueJob(root, message.command as QueueJobCommand);
+            break;
+        case EquipItemCommandId:
+            equipItem(root, message.command as EquipItemCommand);
+            break;
     }
 }
 
-function queueJob(root: Entity, command: GameCommand) {
-    console.log("[CommandSystem] queue job", command);
+function queueJob(root: Entity, command: QueueJobCommand) {
     const jobQueue = root.requireEcsComponent(JobQueueComponentId);
-    jobQueue.jobs.push((command as QueueJobCommand).job);
+    jobQueue.jobs.push(command.job);
+}
+
+function equipItem(root: Entity, command: EquipItemCommand) {
+    const entity = root.findEntity(command.entity);
+    if (!entity) {
+        console.error("Unable to equip, entity not found");
+        return;
+    }
+
+    const inventory = entity.getEcsComponent(InventoryComponentId);
+    const equipment = entity.getEcsComponent(EquipmentComponentId);
+    if (!inventory) {
+        console.error("Unable to equip, inventory component not found");
+        return;
+    }
+    if (!equipment) {
+        console.error("Unable to equip, equipment component not found");
+        return;
+    }
+
+    const slotExists = command.slot in equipment.slots;
+    if (!slotExists) {
+        console.error(`No equipment slot for ${command.slot} on ${entity.id}`);
+        return;
+    }
+    // An item id can either be defined meaning equip or null meaning unequip
+    const itemId = command.itemId;
+    if (itemId) {
+        const withdrawnItem = takeInventoryItem(inventory, itemId, 1);
+        if (!withdrawnItem) {
+            console.error("Not enough items to take item from inventory");
+            return;
+        }
+
+        equipment.slots[command.slot] = withdrawnItem.item;
+    } else {
+        const itemAtSlot = equipment.slots[command.slot];
+        if (!itemAtSlot) {
+            //Cannot unequit an item in a slot with no item
+            return;
+        }
+
+        addInventoryItem(inventory, itemAtSlot, 1);
+        equipment.slots[command.slot] = null;
+    }
+    entity.invalidateComponent(InventoryComponentId);
+    entity.invalidateComponent(EquipmentComponentId);
 }

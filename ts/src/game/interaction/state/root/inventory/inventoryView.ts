@@ -26,8 +26,8 @@ export type InventoryViewProps = {
     inventory: InventoryComponent;
     onItemSelected?: (index: number) => void;
     selectedItemIndex?: number;
-    onEquip?: (item: InventoryItem) => void;
-    onDrop?: (item: InventoryItem) => void;
+    onEquip?: (item: InventoryItemQuantity) => void;
+    onDrop?: (item: InventoryItemQuantity) => void;
     onCancel?: () => void;
 };
 
@@ -86,7 +86,8 @@ export const inventoryView = createComponent<InventoryViewProps>(
         });
 
         // Create details view
-        const detailsView = createDetailsView(items[selectedIndex]);
+        const selectedItem = items[selectedIndex];
+        const detailsView = createDetailsView(selectedItem);
         return uiScaffold({
             content: uiBookLayout({
                 leftPage: gridView,
@@ -95,9 +96,17 @@ export const inventoryView = createComponent<InventoryViewProps>(
             leftButtons: [
                 {
                     text: "equip",
+                    onClick: () => {
+                        if (!props.onEquip) return;
+                        props.onEquip(selectedItem);
+                    },
                 },
                 {
                     text: "drop",
+                    onClick: () => {
+                        if (!props.onDrop) return;
+                        props.onDrop(selectedItem);
+                    },
                 },
             ],
         });

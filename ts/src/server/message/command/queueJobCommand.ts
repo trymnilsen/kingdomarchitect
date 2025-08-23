@@ -1,5 +1,5 @@
-import type { Job, Jobs } from "../../game/job/job.js";
-import type { GameCommand } from "./gameCommand.js";
+import type { Job, Jobs } from "../../../game/job/job.js";
+import type { GameCommand } from "../gameCommand.js";
 
 export type QueueJobCommand = {
     id: typeof QueueJobCommandId;

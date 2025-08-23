@@ -10,7 +10,7 @@ import { Entity } from "../../../../entity/entity.js";
 import { MoveToJob } from "../../../../job/moveToPointJob.js";
 import { InteractionState } from "../../../handler/interactionState.js";
 import { uiScaffold } from "../../../view/uiScaffold.js";
-import { QueueJobCommand } from "../../../../../server/message/queueJobCommand.js";
+import { QueueJobCommand } from "../../../../../server/message/command/queueJobCommand.js";
 
 export class ActorMovementState extends InteractionState {
     private selectedPoint: Point | null = null;

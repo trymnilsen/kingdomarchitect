@@ -18,6 +18,7 @@ import {
     ActorSelectionProvider,
     emptySelection,
 } from "./actorSelectionProvider.js";
+import { EquipItemCommand } from "../../../../../../server/message/command/equipItemCommand.js";
 
 export class WorkerSelectionProvider implements ActorSelectionProvider {
     provideButtons(
@@ -56,19 +57,30 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
         equipmentComponent: EquipmentComponent,
     ): UIActionbarItem[] {
         const items: UIActionbarItem[] = [];
-        const mainItem = equipmentComponent.offhandItem;
+        this.addMainEquipmentActions(
+            equipmentComponent,
+            items,
+            stateContext,
+            selectedEntity,
+        );
 
-        items.push({
-            text: "Main",
-            icon: sprites2.empty_sprite,
-            children: this.getEmptyMainEquipmentAction(
-                stateContext,
-                selectedEntity,
-                equipmentComponent,
-            ),
-        });
+        this.addOtherEquipmentActions(
+            equipmentComponent,
+            items,
+            stateContext,
+            selectedEntity,
+        );
 
-        const otherItem = equipmentComponent.offhandItem;
+        return items;
+    }
+
+    private addOtherEquipmentActions(
+        equipmentComponent: EquipmentComponent,
+        items: UIActionbarItem[],
+        stateContext: StateContext,
+        selectedEntity: Entity,
+    ) {
+        const otherItem = equipmentComponent.slots.other;
 
         items.push({
             text: "Other",
@@ -79,8 +91,49 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
                 equipmentComponent,
             ),
         });
+    }
 
-        return items;
+    addMainEquipmentActions(
+        equipmentComponent: EquipmentComponent,
+        items: UIActionbarItem[],
+        stateContext: StateContext,
+        selectedEntity: Entity,
+    ) {
+        const mainItem = equipmentComponent.slots.main;
+        if (!!mainItem) {
+            items.push({
+                text: "Main",
+                icon: mainItem.asset,
+                children: [
+                    {
+                        text: "Unequip",
+                        onClick: () => {
+                            stateContext.commandDispatcher(
+                                EquipItemCommand(null, selectedEntity, "main"),
+                            );
+                        },
+                        icon: sprites2.empty_sprite,
+                    },
+                ],
+            });
+        } else {
+            const mainIcon = sprites2.empty_sprite;
+            items.push({
+                text: "Main",
+                icon: mainIcon,
+                children: [
+                    {
+                        text: "Equip",
+                        onClick: () => {
+                            stateContext.stateChanger.push(
+                                new InventoryState(selectedEntity),
+                            );
+                        },
+                        icon: sprites2.empty_sprite,
+                    },
+                ],
+            });
+        }
     }
 
     private getPrimaryActions(
@@ -100,13 +153,8 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
                 text: "Stash",
                 icon: sprites2.empty_sprite,
                 onClick: () => {
-                    const inventory =
-                        selectedEntity.requireEcsComponent(
-                            InventoryComponentId,
-                        );
-
                     stateContext.stateChanger.push(
-                        new InventoryState(inventory),
+                        new InventoryState(selectedEntity),
                     );
                 },
             },
@@ -129,29 +177,6 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
         return items;
     }
 
-    private getEmptyMainEquipmentAction(
-        stateContext: StateContext,
-        selectedEntity: Entity,
-        _equipmentComponent: EquipmentComponent,
-    ): UIActionbarItem[] {
-        return [
-            {
-                text: "Equip",
-                onClick: () => {
-                    const inventory =
-                        selectedEntity.requireEcsComponent(
-                            InventoryComponentId,
-                        );
-
-                    stateContext.stateChanger.push(
-                        new InventoryState(inventory),
-                    );
-                },
-                icon: sprites2.empty_sprite,
-            },
-        ];
-    }
-
     private getEmptyOtherEquipmentAction(
         stateContext: StateContext,
         selectedEntity: Entity,
@@ -161,13 +186,8 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
             {
                 text: "Equip",
                 onClick: () => {
-                    const inventory =
-                        selectedEntity.requireEcsComponent(
-                            InventoryComponentId,
-                        );
-
                     stateContext.stateChanger.push(
-                        new InventoryState(inventory),
+                        new InventoryState(selectedEntity),
                     );
                 },
                 icon: sprites2.empty_sprite,

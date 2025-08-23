@@ -2,15 +2,19 @@ import type { InventoryItem } from "../../data/inventory/inventoryItem.js";
 
 export type EquipmentComponent = {
     id: typeof EquipmentComponentId;
-    mainItem?: InventoryItem;
-    offhandItem?: InventoryItem;
+    slots: {
+        main: InventoryItem | null;
+        other: InventoryItem | null;
+    };
 };
 
 export function createEquipmentComponent(): EquipmentComponent {
     return {
         id: EquipmentComponentId,
-        mainItem: undefined,
-        offhandItem: undefined,
+        slots: {
+            main: null,
+            other: null,
+        },
     };
 }
 

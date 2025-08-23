@@ -1,3 +1,5 @@
+import { removeItem } from "../../common/array.js";
+import type { InventoryItem } from "../../data/inventory/inventoryItem.js";
 import type { InventoryItemQuantity } from "../../data/inventory/inventoryItemQuantity.js";
 import { hammerItem, swordItem } from "../../data/inventory/items/equipment.js";
 import {
@@ -28,6 +30,59 @@ export function createInventoryComponent(
 }
 
 export const InventoryComponentId = "Inventory";
+
+export function addInventoryItem(
+    inventory: InventoryComponent,
+    item: InventoryItem,
+    amount: number,
+) {
+    const existingStack = inventory.items.find(
+        (stack) => stack.item.id == item.id,
+    );
+
+    if (existingStack) {
+        existingStack.amount += amount;
+    } else {
+        inventory.items.push({
+            item,
+            amount,
+        });
+    }
+}
+
+export function getInventoryItem(
+    inventory: InventoryComponent,
+    id: string,
+): InventoryItemQuantity | undefined {
+    const item = inventory.items.find((item) => item.item.id == id);
+    return item;
+}
+
+/**
+ * Takes an item out of the inventory, removing it and returning it
+ * @param inventory the inventory to withdraw the item from
+ * @param id the id of the item
+ * @param amount amount of the item
+ * @returns either the item or null if the withdrawal could not be performed
+ */
+export function takeInventoryItem(
+    inventory: InventoryComponent,
+    id: string,
+    amount: number,
+): InventoryItemQuantity | null {
+    const item = getInventoryItem(inventory, id);
+    if (!item) return null;
+    if (item.amount < amount) return null;
+
+    item.amount -= amount;
+    if (item.amount <= 0) {
+        removeItem(inventory.items, item);
+    }
+    return {
+        item: item.item,
+        amount,
+    };
+}
 
 export function defaultInventoryItems(): InventoryItemQuantity[] {
     return [

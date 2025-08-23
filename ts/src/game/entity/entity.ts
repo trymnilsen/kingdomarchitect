@@ -300,6 +300,10 @@ export class Entity {
         return component;
     }
 
+    hasComponent<ID extends ComponentID>(componentId: ID): boolean {
+        return this._ecsComponents.has(componentId);
+    }
+
     queryComponents<ID extends ComponentID>(
         componentId: ID,
     ): ReadonlyMap<Entity, Extract<Components, { id: ID }>> {

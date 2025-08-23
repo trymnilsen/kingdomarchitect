@@ -1,13 +1,21 @@
 import { InventoryItem } from "../../../../../data/inventory/inventoryItem.js";
 import { Sprite2, sprites2 } from "../../../../../asset/sprite.js";
 import { ComponentDescriptor } from "../../../../../ui/declarative/ui.js";
-import type { InventoryComponent } from "../../../../component/inventoryComponent.js";
+import {
+    InventoryComponentId,
+    type InventoryComponent,
+} from "../../../../component/inventoryComponent.js";
 import { InteractionState } from "../../../handler/interactionState.js";
 import { AlertMessageState } from "../../common/alertMessageState.js";
 import { inventoryView } from "./inventoryView.js";
+import type { Entity } from "../../../../entity/entity.js";
+import type { InventoryItemQuantity } from "../../../../../data/inventory/inventoryItemQuantity.js";
+import { EquipItemCommand } from "../../../../../server/message/command/equipItemCommand.js";
 
 export class InventoryState extends InteractionState {
     private _selectedItemIndex = 0;
+    private _inventoryComponent: InventoryComponent;
+    private _entity: Entity;
 
     override get isModal(): boolean {
         return true;
@@ -19,15 +27,15 @@ export class InventoryState extends InteractionState {
 
     override getView(): ComponentDescriptor | null {
         return inventoryView({
-            inventory: this.forInventory,
+            inventory: this._inventoryComponent,
             selectedItemIndex: this._selectedItemIndex,
             onItemSelected: (index: number) => {
                 this._selectedItemIndex = index;
             },
-            onEquip: (item: InventoryItem) => {
+            onEquip: (item: InventoryItemQuantity) => {
                 this.onEquip(item);
             },
-            onDrop: (_item: InventoryItem) => {
+            onDrop: (_item: InventoryItemQuantity) => {
                 this.context.stateChanger.push(
                     new AlertMessageState("Ops", "not implemented"),
                 );
@@ -38,33 +46,28 @@ export class InventoryState extends InteractionState {
         });
     }
 
-    //TODO: Add parameters for filtering and button providers for selected item
-    constructor(private forInventory: InventoryComponent) {
+    constructor(entity: Entity) {
         super();
+        const inventory = entity.getEcsComponent(InventoryComponentId);
+        if (!inventory) {
+            throw new Error(
+                "InventoryState requires a inventory component on provided entity",
+            );
+        }
+
+        this._entity = entity;
+        this._inventoryComponent = inventory;
     }
 
     override onActive(): void {
         // No imperative UI setup needed anymore
     }
 
-    private onEquip(_item: InventoryItem) {
-        //TODO: Reimplement onEquip with new equipment component
-        /*
-        const equipmentComponent =
-            this.forInventory.entity.getComponent(EquipmentComponent);
-
-        if (!equipmentComponent) {
-            this.context.stateChanger.push(
-                new AlertMessageState("Uh oh", "Not available"),
-            );
-            return;
-        }
-
-        const removeResult = this.forInventory.removeInventoryItem(item.id, 1);
-        if (removeResult) {
-            equipmentComponent.mainItem.setItem(item);
-            this.context.stateChanger.pop();
-        }*/
+    private onEquip(item: InventoryItemQuantity) {
+        this.context.commandDispatcher(
+            EquipItemCommand(item.item, this._entity, "main"),
+        );
+        this.context.stateChanger.pop();
     }
 }
 
