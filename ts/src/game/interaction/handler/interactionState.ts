@@ -23,6 +23,7 @@ export abstract class InteractionState {
     private _context: StateContext | undefined;
     private _cachedFocusGroups: FocusGroup[] = [];
     private _currentFocusGroupIndex = 0;
+    public stateId?: number; // Unique identifier assigned by InteractionHandler
 
     /**
      * Get the name of this interaction state

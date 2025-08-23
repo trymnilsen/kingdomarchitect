@@ -111,7 +111,10 @@ type ScaffoldProps = {
 export const uiScaffold = createComponent<ScaffoldProps>(
     ({ constraints, measureDescriptor, withState, withEffect, props }) => {
         withEffect(() => {
-            console.log("mounted");
+            console.log("Mounted ui scaffold");
+            return () => {
+                console.log("Disposed ui scaffold");
+            };
         });
         const [_menuState, _setMenuState] = withState(MenuState.closed);
         const [expandedMenu, setExpandedMenu] = withState<ExpandedMenuState>({

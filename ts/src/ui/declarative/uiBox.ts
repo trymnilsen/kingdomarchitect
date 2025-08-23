@@ -14,6 +14,7 @@ type UiBoxProps = {
     background?: UIBackground;
     width: number;
     height: number;
+    key?: string | number;
 };
 
 export const uiBox = createComponent<UiBoxProps>(

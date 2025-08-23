@@ -7,6 +7,8 @@ import { SelectedEntityItem } from "../selection/selectedEntityItem.js";
 import { SelectedTileItem } from "../selection/selectedTileItem.js";
 import { SelectedWorldItem } from "../selection/selectedWorldItem.js";
 import type { UiRenderer } from "../../../ui/declarative/ui.js";
+import { uiBox } from "../../../ui/declarative/uiBox.js";
+import { fillUiSize } from "../../../ui/uiSize.js";
 import { Camera } from "../../../rendering/camera.js";
 import { RenderScope } from "../../../rendering/renderScope.js";
 import {
@@ -32,6 +34,7 @@ export class InteractionHandler {
     private history: InteractionStateHistory;
     private stateContext: StateContext;
     private uiRenderer: UiRenderer;
+    private stateInstanceCounter = 0;
     constructor(
         world: Entity,
         camera: Camera,
@@ -242,6 +245,14 @@ export class InteractionHandler {
         this.interactionStateChanger.apply(this.history);
     }
 
+    private getStateInstanceId(): number {
+        const state = this.history.state;
+        if (state.stateId === undefined) {
+            state.stateId = ++this.stateInstanceCounter;
+        }
+        return state.stateId;
+    }
+
     onUpdate(tick: number) {
         this.history.state.onUpdate(tick);
     }
@@ -260,7 +271,20 @@ export class InteractionHandler {
         }
 
         this.history.state.onDraw(renderScope);
-        this.uiRenderer.renderComponent(this.history.state.getView());
+
+        // Wrap the state's view in a keyed container to ensure proper reconciliation
+        // Each interaction state gets a unique key so components don't persist across state transitions
+        const stateView = this.history.state.getView();
+        const wrappedView = stateView
+            ? uiBox({
+                  width: fillUiSize,
+                  height: fillUiSize,
+                  child: stateView,
+                  key: `state-${this.history.state.constructor.name}-${this.getStateInstanceId()}`,
+              })
+            : null;
+
+        this.uiRenderer.renderComponent(wrappedView);
 
         //performance.mark("InteractionStateDrawEnd");
         /*performance.measure(

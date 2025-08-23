@@ -174,11 +174,22 @@ export class UiRenderer {
     constructor(private renderScope: RenderScope) {}
 
     public renderComponent(topLevelDescriptor: ComponentDescriptor | null) {
+        const newDescriptor =
+            topLevelDescriptor ??
+            uiBox({ width: fillUiSize, height: fillUiSize });
+
+        const oldTree = this.currentTree;
         this.currentTree = this._updateOrCreateNode(
             this.currentTree ?? undefined,
-            topLevelDescriptor ??
-                uiBox({ width: fillUiSize, height: fillUiSize }),
+            newDescriptor,
         );
+
+        // If we created a new root node (different key or type), clean up the old tree
+        if (oldTree && oldTree !== this.currentTree) {
+            console.log("Root node changed, cleaning up old tree");
+            this._cleanupNode(oldTree);
+        }
+
         if (this.currentTree) {
             this._executeNode(this.currentTree, this.renderScope.size, false);
             this._performDraw(this.currentTree, zeroPoint());
@@ -375,7 +386,14 @@ export class UiRenderer {
         oldNode: UiNode | undefined,
         descriptor: ComponentDescriptor,
     ): UiNode {
-        if (oldNode && oldNode.descriptor.type === descriptor.type) {
+        const nodeType = descriptor.type?.name || descriptor.type || "unknown";
+        const nodeKey = descriptor.key || "no-key";
+
+        if (
+            oldNode &&
+            oldNode.descriptor.type === descriptor.type &&
+            oldNode.descriptor.key === descriptor.key
+        ) {
             oldNode.descriptor = descriptor;
             return oldNode;
         }
@@ -459,6 +477,9 @@ export class UiRenderer {
     private _cleanupNode(node: UiNode) {
         // Run cleanup functions for all effects before removing the node.
         const nodeHooks = this.hooks.get(node);
+        const nodeType =
+            node.descriptor.type?.name || node.descriptor.type || "unknown";
+        const nodeKey = node.descriptor.key || "no-key";
         if (nodeHooks) {
             for (const effect of nodeHooks.effects) {
                 effect.cleanup?.();

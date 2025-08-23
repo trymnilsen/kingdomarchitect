@@ -177,7 +177,6 @@ export class Game {
     private render(drawMode: DrawMode) {
         this.renderer.clearScreen();
         this.ecsWorld.runRender(this.renderer.context, drawMode);
-
         this.interactionHandler.onDraw(this.renderer.context);
         this.renderer.renderDeferred();
     }
