@@ -1,0 +1,15 @@
+*Frame size* 
+
+- 32x32px: For all the animations.
+
+
+*Frame Duration*
+
+- 100ms: Attack, Die, Dmg
+
+- 200ms: Idle, Walk
+
+
+NOTE: 
+- Due to its small size, this creature only has 2 directions: Right and Left. 
+- You can use these 2 directions indistinctly for Front and Back movement too.
