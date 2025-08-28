@@ -21,6 +21,10 @@ import {
     takeInventoryItem,
 } from "../component/inventoryComponent.js";
 import { EquipmentComponentId } from "../component/equipmentComponent.js";
+import {
+    BuildCommandId,
+    type BuildCommand,
+} from "../../server/message/command/buildCommand.js";
 
 export const commandSystem: EcsSystem = {
     onGameMessage,
@@ -36,7 +40,16 @@ function onGameMessage(root: Entity, message: GameMessage) {
         case EquipItemCommandId:
             equipItem(root, message.command as EquipItemCommand);
             break;
+        case BuildCommandId:
+            buildBuilding(root, message.command as BuildCommand);
     }
+}
+
+function buildBuilding(root: Entity, command: BuildCommand) {
+    //Check if we have enough to build
+    //Add entities for each
+    //make a job for each point
+    //queue the jobs
 }
 
 function queueJob(root: Entity, command: QueueJobCommand) {

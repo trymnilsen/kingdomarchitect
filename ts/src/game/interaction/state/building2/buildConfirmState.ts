@@ -19,6 +19,7 @@ import { buildingApplicabilityList } from "./buildingApplicabilityList.js";
 import { BuildMode } from "./mode/buildMode.js";
 import { LineBuildMode } from "./mode/lineBuildMode.js";
 import { SingleBuildMode } from "./mode/singleBuildMode.js";
+import { BuildCommand } from "../../../../server/message/command/buildCommand.js";
 
 export class BuildConfirmState extends InteractionState {
     private blinkScaffold = true;
@@ -120,13 +121,9 @@ export class BuildConfirmState extends InteractionState {
         const removeResult = true;
 
         if (removeResult) {
-            for (const selection of selections) {
-                /*
-                this.context.root.dispatchAction(
-                    makeBuildBuildingAction(this.building, selection),
-                );*/
-            }
-
+            this.context.commandDispatcher(
+                BuildCommand(this.building, selections),
+            );
             this.context.stateChanger.clear();
         } else {
             this.context.stateChanger.push(

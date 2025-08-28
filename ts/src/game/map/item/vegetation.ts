@@ -8,18 +8,24 @@ import { Entity } from "../../entity/entity.js";
 import { resourcePrefab } from "../../prefab/resourcePrefab.js";
 import { ChunkSize, getChunkBounds } from "../chunk.js";
 
-export function spawnTree(
+/**
+ * Generates random spawn points within a chunk, avoiding existing entities
+ */
+export function generateSpawnPoints(
     amount: number,
     chunk: Point,
     chunkMap: ChunkMapComponent,
-): Entity[] {
+): Point[] {
     if (!chunkMap) {
         throw new Error("No chunk map component found");
     }
-    const entities: Entity[] = [];
+
+    const spawnPoints: Point[] = [];
     const chunkBounds = getChunkBounds(chunk);
     const items = getEntitiesInChunkMapWithin(chunkMap, chunkBounds);
     const skipPoints = new Set<number>();
+
+    // Mark existing entity positions as occupied
     for (let i = 0; i < items.length; i++) {
         const item = items[i];
         const encodedPosition = encodePosition(
@@ -42,17 +48,16 @@ export function spawnTree(
                 continue;
             }
 
-            const tree = resourcePrefab(treeResource);
-            tree.worldPosition = {
+            const worldPosition: Point = {
                 x: chunkBounds.x1 + x,
                 y: chunkBounds.y1 + y,
             };
 
-            entities.push(tree);
+            spawnPoints.push(worldPosition);
             skipPoints.add(encodedPoint);
             break;
         }
     }
 
-    return entities;
+    return spawnPoints;
 }

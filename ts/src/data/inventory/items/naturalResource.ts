@@ -7,9 +7,9 @@ export const treeResource = {
 } as const;
 
 export const stoneResource = {
-    asset: sprites2.tree_1,
-    id: "tree1",
-    name: "Tree",
+    asset: sprites2.stone,
+    id: "stone1",
+    name: "Stone",
 } as const;
 
 export type NaturalResource = typeof treeResource | typeof stoneResource;

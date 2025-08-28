@@ -1,14 +1,17 @@
 import { randomColor } from "../../common/color.js";
 import { generateId } from "../../common/idGenerator.js";
 import type { Point } from "../../common/point.js";
-import { treeResource } from "../../data/inventory/items/naturalResource.js";
+import {
+    stoneResource,
+    treeResource,
+} from "../../data/inventory/items/naturalResource.js";
 import { ChunkMapComponentId } from "../component/chunkMapComponent.js";
 import { EffectEmitterComponentId } from "../component/effectEmitterComponent.js";
 import { setChunk, TileComponentId } from "../component/tileComponent.js";
 import { Entity } from "../entity/entity.js";
 import { resourcePrefab } from "../prefab/resourcePrefab.js";
 import { workerPrefab } from "../prefab/workerPrefab.js";
-import { spawnTree } from "./item/vegetation.js";
+import { generateSpawnPoints } from "./item/vegetation.js";
 
 export function addInitialPlayerChunk(rootEntity: Entity): Point {
     const chunkEntity = new Entity("chunk");
@@ -40,10 +43,17 @@ export function addInitialPlayerChunk(rootEntity: Entity): Point {
         .getRootEntity()
         .requireEcsComponent(ChunkMapComponentId);
 
-    const trees = spawnTree(16, { x: 0, y: 0 }, chunkMap);
+    const trees = generateSpawnPoints(16, { x: 0, y: 0 }, chunkMap);
     for (const tree of trees) {
-        chunkEntity.addChild(tree);
+        const treeEntity = resourcePrefab(treeResource);
+        treeEntity.worldPosition = tree;
+        chunkEntity.addChild(treeEntity);
     }
+
+    const firstStone = generateSpawnPoints(1, { x: 0, y: 0 }, chunkMap);
+    const firstStoneEntity = resourcePrefab(stoneResource);
+    firstStoneEntity.worldPosition = firstStone[0];
+    chunkEntity.addChild(firstStoneEntity);
     return firstWorkerPosition;
     /*
     const firstWorker = workerPrefab(generateId("worker"));

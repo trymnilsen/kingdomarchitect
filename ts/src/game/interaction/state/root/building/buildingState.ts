@@ -94,7 +94,6 @@ const buildingDetailsView = createComponent<{
     return uiBox({
         width: fillUiSize,
         height: fillUiSize,
-        background: colorBackground("red"),
         padding: 8,
         child: uiColumn({
             width: fillUiSize,
@@ -125,6 +124,7 @@ const buildingDetailsView = createComponent<{
                     textStyle: bookTextStyle,
                 }),
                 uiSpace({ width: 1, height: fillUiSize }),
+                /*
                 uiButton({
                     width: fillUiSize,
                     height: wrapUiSize,
@@ -139,7 +139,7 @@ const buildingDetailsView = createComponent<{
                         content: "Build",
                         textStyle: bookTitleStyle,
                     }),
-                }),
+                }),*/
             ],
         }),
     });

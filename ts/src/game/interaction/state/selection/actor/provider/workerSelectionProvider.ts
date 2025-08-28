@@ -142,7 +142,7 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
     ): UIActionbarItem[] {
         const items: UIActionbarItem[] = [
             {
-                text: "Move",
+                text: "Interact",
                 onClick: () => {
                     stateContext.stateChanger.push(
                         new ActorMovementState(selectedEntity),
@@ -150,7 +150,7 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
                 },
             },
             {
-                text: "Stash",
+                text: "Ledger",
                 icon: sprites2.empty_sprite,
                 onClick: () => {
                     stateContext.stateChanger.push(
@@ -159,18 +159,12 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
                 },
             },
             {
-                text: "Skills",
+                text: "Mode",
                 onClick: () => {
                     stateContext.stateChanger.push(
                         new AlertMessageState("Skills", "no skills"),
                     );
                 },
-            },
-            {
-                text: "Stats",
-            },
-            {
-                text: "Close",
             },
         ];
 
