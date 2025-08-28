@@ -25,6 +25,9 @@ import {
     BuildCommandId,
     type BuildCommand,
 } from "../../server/message/command/buildCommand.js";
+import { buildingPrefab } from "../prefab/buildingPrefab.js";
+import { getBuildingById } from "../../data/building/buildings.js";
+import { BuildBuildingJob } from "../job/buildBuildingJob.js";
 
 export const commandSystem: EcsSystem = {
     onGameMessage,
@@ -48,8 +51,24 @@ function onGameMessage(root: Entity, message: GameMessage) {
 function buildBuilding(root: Entity, command: BuildCommand) {
     //Check if we have enough to build
     //Add entities for each
-    //make a job for each point
-    //queue the jobs
+    const points = Array.isArray(command.position)
+        ? command.position
+        : [command.position];
+    const building = getBuildingById(command.buildingId);
+    if (!building) {
+        console.error(`Building not found ${command.buildingId}`);
+        return;
+    }
+
+    for (const point of points) {
+        const buildingEntity = buildingPrefab(building, true);
+        buildingEntity.worldPosition = point;
+        root.addChild(buildingEntity);
+        const job = BuildBuildingJob(buildingEntity);
+        root.updateComponent(JobQueueComponentId, (component) => {
+            component.jobs.push(job);
+        });
+    }
 }
 
 function queueJob(root: Entity, command: QueueJobCommand) {

@@ -2,12 +2,20 @@ import { isPointAdjacentTo } from "../../common/point.js";
 import { BuildingComponentId } from "../component/buildingComponent.js";
 import { heal, HealthComponentId } from "../component/healthComponent.js";
 import { SpriteComponentId } from "../component/spriteComponent.js";
+import type { Entity } from "../entity/entity.js";
 import { completeJob, type Job, type JobHandler } from "./job.js";
 import { doMovement, MovementResult } from "./movementHelper.js";
 
 export interface BuildBuildingJob extends Job {
     id: typeof BuildBuildingJobId;
     entityId: string;
+}
+
+export function BuildBuildingJob(entity: Entity): BuildBuildingJob {
+    return {
+        id: BuildBuildingJobId,
+        entityId: entity.id,
+    };
 }
 
 export const BuildBuildingJobId = "buildBuildingJob";
