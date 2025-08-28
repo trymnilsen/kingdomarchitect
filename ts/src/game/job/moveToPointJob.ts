@@ -15,6 +15,7 @@ import {
     DirectionComponentId,
     updateDirectionComponent,
 } from "../component/directionComponent.js";
+import { discoverAfterMovement } from "./movementHelper.js";
 
 export interface MoveToJob extends Job {
     position: Point;
@@ -97,12 +98,3 @@ export const moveToJobHandler: JobHandler<MoveToJob> = (entity, job) => {
         completeJob(entity);
     }
 };
-
-function discoverAfterMovement(entity: Entity, nextPoint: Point) {
-    const visibility = entity.getEcsComponent(VisibilityComponentId);
-    if (visibility) {
-        const points = offsetPatternWithPoint(nextPoint, visibility.pattern);
-
-        setDiscoveryForPlayer(entity.getRootEntity(), "player", points);
-    }
-}
