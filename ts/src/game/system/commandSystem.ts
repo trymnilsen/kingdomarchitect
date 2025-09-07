@@ -1,5 +1,4 @@
 import type { EcsSystem } from "../../common/ecs/ecsSystem.js";
-import type { GameCommand } from "../../server/message/gameCommand.js";
 import {
     CommandGameMessageType,
     type GameMessage,
@@ -16,7 +15,6 @@ import {
 } from "../../server/message/command/equipItemCommand.js";
 import {
     addInventoryItem,
-    getInventoryItem,
     InventoryComponentId,
     takeInventoryItem,
 } from "../component/inventoryComponent.js";
@@ -28,6 +26,11 @@ import {
 import { buildingPrefab } from "../prefab/buildingPrefab.js";
 import { getBuildingById } from "../../data/building/buildings.js";
 import { BuildBuildingJob } from "../job/buildBuildingJob.js";
+import {
+    AttackCommandId,
+    type AttackCommand,
+} from "../../server/message/command/attackTargetCommand.js";
+import { AttackJob } from "../job/attackJob.js";
 
 export const commandSystem: EcsSystem = {
     onGameMessage,
@@ -45,7 +48,18 @@ function onGameMessage(root: Entity, message: GameMessage) {
             break;
         case BuildCommandId:
             buildBuilding(root, message.command as BuildCommand);
+            break;
+        case AttackCommandId:
+            attackTarget(root, message.command as AttackCommand);
+            break;
     }
+}
+
+function attackTarget(root: Entity, command: AttackCommand) {
+    const job = AttackJob(command.attacker, command.target);
+    root.updateComponent(JobQueueComponentId, (component) => {
+        component.jobs.push(job);
+    });
 }
 
 function buildBuilding(root: Entity, command: BuildCommand) {

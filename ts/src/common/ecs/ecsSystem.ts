@@ -8,6 +8,7 @@ import type { GameMessage } from "../../server/message/gameMessage.js";
 
 export type EcsRenderFunction = (
     root: Entity,
+    renderTick: number,
     renderScope: RenderScope,
     drawMode: DrawMode,
 ) => void;

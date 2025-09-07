@@ -1,25 +1,22 @@
-import { Point } from "../../../../../common/point.js";
+import { adjacentPoints, Point } from "../../../../../common/point.js";
+import { stoneResource } from "../../../../../data/inventory/items/naturalResource.js";
+import { ResourceComponentId } from "../../../../component/resourceComponent.js";
 import { Entity } from "../../../../entity/entity.js";
+import { queryEntity } from "../../../../map/query/queryEntity.js";
 import { BuildingApplicability } from "../buildingApplicability.js";
 
 export const quaryApplicability: BuildingApplicability = (
-    _point: Point,
-    _world: Entity,
+    point: Point,
+    world: Entity,
 ) => {
-    //TODO: Reimplement me
-    return {
-        isApplicable: false,
-        reason: "Needs to be next to stone",
-    };
-    /*
     const points = adjacentPoints(point);
     const hasAdjacent = points.some((adjacentPoint) => {
-        const entities = world
-            .requireComponent(SpatialChunkMapComponent)
-            .getEntitiesAt(adjacentPoint.x, adjacentPoint.y);
+        const entities = queryEntity(world, adjacentPoint);
 
         const entityContainsStone = entities.some(
-            (entity) => !!entity.getComponent(StoneComponent),
+            (entity) =>
+                entity.getEcsComponent(ResourceComponentId)?.resource?.id ===
+                stoneResource.id,
         );
 
         return entityContainsStone;
@@ -34,5 +31,5 @@ export const quaryApplicability: BuildingApplicability = (
             isApplicable: false,
             reason: "Needs to be next to stone",
         };
-    }*/
+    }
 };

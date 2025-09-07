@@ -38,5 +38,6 @@
     "typescript.tsdk": "node_modules/typescript/lib",
     "intellicodeApiExamples.python.enabled": false,
     "intellicodeApiExamples.typescript.enabled": false,
-    "oxc.configPath": "oxlintrc.json"
+    "oxc.configPath": "oxlintrc.json",
+    "oxc.enable": true
 }

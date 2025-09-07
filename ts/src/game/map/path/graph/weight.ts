@@ -1,11 +1,9 @@
 import type { Point } from "../../../../common/point.js";
-import {
-    ChunkMapComponentId,
-    getEntitiesAt,
-} from "../../../component/chunkMapComponent.js";
+import { ChunkMapComponentId } from "../../../component/chunkMapComponent.js";
 import { ResourceComponentId } from "../../../component/resourceComponent.js";
 import { getTile, TileComponentId } from "../../../component/tileComponent.js";
 import type { Entity } from "../../../entity/entity.js";
+import { queryEntity } from "../../query/queryEntity.js";
 
 export function getWeightAtPoint(point: Point, rootEntity: Entity): number {
     let weight = 25;
@@ -20,8 +18,7 @@ export function getWeightAtPoint(point: Point, rootEntity: Entity): number {
         weight = 2;
     }
 
-    const chunkMap = rootEntity.requireEcsComponent(ChunkMapComponentId);
-    const entities = getEntitiesAt(chunkMap, point.x, point.y);
+    const entities = queryEntity(rootEntity, point);
 
     if (entities.length > 0) {
         let entityWeight = 0;

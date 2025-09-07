@@ -115,10 +115,14 @@ export class EcsWorld {
         }
     }
 
-    runRender(renderScope: RenderScope, drawMode: DrawMode) {
+    runRender(
+        renderScope: RenderScope,
+        renderTick: number,
+        drawMode: DrawMode,
+    ) {
         for (let i = 0; i < this.renderSystems.length; i++) {
             const system = this.renderSystems[i];
-            system(this.root, renderScope, drawMode);
+            system(this.root, renderTick, renderScope, drawMode);
         }
     }
 

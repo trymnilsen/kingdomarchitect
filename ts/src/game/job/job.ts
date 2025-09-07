@@ -1,5 +1,6 @@
 import { JobRunnerComponentId } from "../component/jobRunnerComponent.js";
 import type { Entity } from "../entity/entity.js";
+import type { AttackJob } from "./attackJob.js";
 import type { BuildBuildingJob } from "./buildBuildingJob.js";
 import type { MoveToJob } from "./moveToPointJob.js";
 
@@ -7,9 +8,13 @@ export interface Job {
     id: JobId;
 }
 
-export type Jobs = MoveToJob | BuildBuildingJob;
+export type Jobs = MoveToJob | BuildBuildingJob | AttackJob;
 export type JobId = Jobs["id"];
-export type JobHandler<T extends Job> = (entity: Entity, job: T) => void;
+export type JobHandler<T extends Job> = (
+    root: Entity,
+    entity: Entity,
+    job: T,
+) => void;
 
 export function completeJob(entity: Entity) {
     const runner = entity.requireEcsComponent(JobRunnerComponentId);

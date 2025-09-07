@@ -12,7 +12,7 @@ export function buildingPrefab(
     startScaffolded: boolean = false,
 ): Entity {
     const entity = new Entity(generateId("building"));
-    entity.setEcsComponent(createBuildingComponent(building));
+    entity.setEcsComponent(createBuildingComponent(building, startScaffolded));
     entity.setEcsComponent(createHealthComponent(10, 100));
     entity.setEcsComponent(createVisibilityComponent());
     entity.setEcsComponent(

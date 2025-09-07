@@ -7,7 +7,6 @@ export type Building = {
     name: string;
     id: string;
     scale: 1 | 2 | 4;
-    adjacencySprite?: (adjacentBuildings: Adjacency) => Sprite2;
     resources?: { [key in InventoryItemIds]?: number };
 };
 

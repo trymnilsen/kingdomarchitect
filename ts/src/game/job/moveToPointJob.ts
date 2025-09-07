@@ -33,24 +33,23 @@ export function MoveToJob(position: Point): MoveToJob {
 
 export const MoveToJobId = "moveToJob";
 
-export const moveToJobHandler: JobHandler<MoveToJob> = (entity, job) => {
+export const moveToJobHandler: JobHandler<MoveToJob> = (root, runner, job) => {
     //Sanity check for if we are on top of the position
-    if (pointEquals(job.position, entity.worldPosition)) {
-        completeJob(entity);
+    if (pointEquals(job.position, runner.worldPosition)) {
+        completeJob(runner);
     }
 
     let nextPoint = job.path.shift();
-    const root = entity.getRootEntity();
 
     if (!nextPoint) {
         //Check if we are adjacent to the final point
-        if (isPointAdjacentTo(job.position, entity.worldPosition)) {
+        if (isPointAdjacentTo(job.position, runner.worldPosition)) {
             nextPoint = job.position;
         } else {
             //No path but not at the position, we should generate a path
             const pathResult = queryPath(
                 root,
-                entity.worldPosition,
+                runner.worldPosition,
                 job.position,
             );
 
@@ -60,7 +59,7 @@ export const moveToJobHandler: JobHandler<MoveToJob> = (entity, job) => {
             ) {
                 job.path = pathResult.path;
                 //Send a invalidate event so that the component will be in sync
-                entity.invalidateComponent(JobRunnerComponentId);
+                runner.invalidateComponent(JobRunnerComponentId);
                 nextPoint = job.path.shift();
             }
         }
@@ -80,21 +79,21 @@ export const moveToJobHandler: JobHandler<MoveToJob> = (entity, job) => {
     if (!nextPoint) {
         //We got here there is no option to keep moving
         console.log("NextPoint not defined, completing job");
-        completeJob(entity);
+        completeJob(runner);
         return;
     }
 
-    console.log("MoveToJob", entity, nextPoint);
-    discoverAfterMovement(entity, nextPoint);
-    entity.updateComponent(DirectionComponentId, (component) => {
-        updateDirectionComponent(component, entity.worldPosition, nextPoint);
+    console.log("MoveToJob", runner, nextPoint);
+    discoverAfterMovement(runner, nextPoint);
+    runner.updateComponent(DirectionComponentId, (component) => {
+        updateDirectionComponent(component, runner.worldPosition, nextPoint);
     });
 
-    entity.worldPosition = nextPoint;
+    runner.worldPosition = nextPoint;
 
     //If we happen to be at the end now, we dont need to wait for next
     //tick to finish
-    if (pointEquals(entity.worldPosition, job.position)) {
-        completeJob(entity);
+    if (pointEquals(runner.worldPosition, job.position)) {
+        completeJob(runner);
     }
 };

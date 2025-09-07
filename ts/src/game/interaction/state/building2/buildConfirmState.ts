@@ -6,10 +6,7 @@ import { sprites2 } from "../../../../asset/sprite.js";
 import { GroundTile, TileSize } from "../../../map/tile.js";
 import type { ComponentDescriptor } from "../../../../ui/declarative/ui.js";
 import { RenderScope } from "../../../../rendering/renderScope.js";
-import {
-    ChunkMapComponentId,
-    getEntitiesAt,
-} from "../../../component/chunkMapComponent.js";
+import { ChunkMapComponentId } from "../../../component/chunkMapComponent.js";
 import { getTile, TileComponentId } from "../../../component/tileComponent.js";
 import { InteractionState } from "../../handler/interactionState.js";
 import { uiScaffold } from "../../view/uiScaffold.js";
@@ -20,6 +17,7 @@ import { BuildMode } from "./mode/buildMode.js";
 import { LineBuildMode } from "./mode/lineBuildMode.js";
 import { SingleBuildMode } from "./mode/singleBuildMode.js";
 import { BuildCommand } from "../../../../server/message/command/buildCommand.js";
+import { queryEntity } from "../../../map/query/queryEntity.js";
 
 export class BuildConfirmState extends InteractionState {
     private blinkScaffold = true;
@@ -211,12 +209,10 @@ export class BuildConfirmState extends InteractionState {
 
     private isTileAvailable(tilePosition: Point): BuildingApplicabilityResult {
         const rootEntity = this.context.root;
-        const chunkMap = rootEntity.requireEcsComponent(ChunkMapComponentId);
-        const entitiesAt = getEntitiesAt(
-            chunkMap,
-            tilePosition.x,
-            tilePosition.y,
-        );
+        const entitiesAt = queryEntity(rootEntity, {
+            x: tilePosition.x,
+            y: tilePosition.y,
+        });
 
         if (entitiesAt.length > 0) {
             return {

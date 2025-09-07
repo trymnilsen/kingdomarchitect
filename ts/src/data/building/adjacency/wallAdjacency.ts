@@ -17,6 +17,8 @@ export function wallAdjacency(adjacency: Adjacency): Sprite2 {
             return sprites2.stone_wood_walls_lur;
         case Adjacency.LeftUpper:
             return sprites2.stone_wood_walls_lu;
+        case Adjacency.LeftUpperBottom:
+            return sprites2.stone_wood_walls_lub;
         case Adjacency.LeftBottom:
             return sprites2.stone_wood_walls_lb;
         case Adjacency.LeftRightBottom:

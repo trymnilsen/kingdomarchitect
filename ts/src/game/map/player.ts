@@ -10,6 +10,7 @@ import { EffectEmitterComponentId } from "../component/effectEmitterComponent.js
 import { setChunk, TileComponentId } from "../component/tileComponent.js";
 import { Entity } from "../entity/entity.js";
 import { resourcePrefab } from "../prefab/resourcePrefab.js";
+import { trainingDummyPrefab } from "../prefab/trainingDummyPrefab.js";
 import { workerPrefab } from "../prefab/workerPrefab.js";
 import { generateSpawnPoints } from "./item/vegetation.js";
 
@@ -22,10 +23,14 @@ export function addInitialPlayerChunk(rootEntity: Entity): Point {
     const firstWorker = workerPrefab();
     const firstTree = resourcePrefab(treeResource);
     const firstWorkerPosition = { x: 0 + randomOffsetX, y: 1 + randomOffsetY };
+    const trainingDummy = trainingDummyPrefab();
+    trainingDummy.position = { x: randomOffsetX, y: randomOffsetY };
     firstTree.position = { x: 2 + randomOffsetX, y: 2 + randomOffsetY };
     firstWorker.position = firstWorkerPosition;
     chunkEntity.addChild(firstWorker);
     chunkEntity.addChild(firstTree);
+    chunkEntity.addChild(trainingDummy);
+
     rootEntity.updateComponent(TileComponentId, (component) => {
         setChunk(component, {
             chunkX: 0,
@@ -53,6 +58,7 @@ export function addInitialPlayerChunk(rootEntity: Entity): Point {
     const firstStone = generateSpawnPoints(1, { x: 0, y: 0 }, chunkMap);
     const firstStoneEntity = resourcePrefab(stoneResource);
     firstStoneEntity.worldPosition = firstStone[0];
+
     chunkEntity.addChild(firstStoneEntity);
     return firstWorkerPosition;
     /*

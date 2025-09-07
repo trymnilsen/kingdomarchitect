@@ -38,6 +38,7 @@ export function isEventTransition(
 export type AnimationState = {
     type: "loop" | "single";
     animation: AnimationTemplate;
+    speed?: number;
     transitions?: AnimationTransition[];
 };
 

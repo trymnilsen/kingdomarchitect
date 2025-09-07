@@ -12,6 +12,7 @@
       "noImplicitThis": true,
       "noPropertyAccessFromIndexSignature": true,
       "noUnusedLocals": false,
+      "noEmit": true,
       "noUnusedParameters": true,
       "outDir": "./build",
       "removeComments": true,

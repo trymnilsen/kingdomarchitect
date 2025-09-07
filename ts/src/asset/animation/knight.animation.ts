@@ -24,6 +24,7 @@ export const nobleKnightAnimationGraph: AnimationGraph = {
     ],
     states: {
         Idle: {
+            speed: 8,
             type: "loop",
             animation: "idle_{direction}",
         },

@@ -12,8 +12,7 @@ import { fillUiSize } from "../../../ui/uiSize.js";
 import { Camera } from "../../../rendering/camera.js";
 import { RenderScope } from "../../../rendering/renderScope.js";
 import {
-    ChunkMapComponentId,
-    getEntitiesAt,
+    ChunkMapComponentId
 } from "../../component/chunkMapComponent.js";
 import { getTile, TileComponentId } from "../../component/tileComponent.js";
 import { Entity } from "../../entity/entity.js";
@@ -22,6 +21,7 @@ import { CommitableInteractionStateChanger } from "./interactionStateChanger.js"
 import { InteractionStateHistory } from "./interactionStateHistory.js";
 import { StateContext } from "./stateContext.js";
 import type { GameCommand } from "../../../server/message/gameCommand.js";
+import { queryEntity } from "../../map/query/queryEntity.js";
 
 /**
  * The interactionHandler recieves input taps and forward them to the currently
@@ -183,21 +183,11 @@ export class InteractionHandler {
                     console.log(
                         "Tap not handled by state, checking for selection",
                     );
-                    /*
-                    const selectionState = pickSelectionState(
-                        tile,
-                        this.stateContext,
-                    );*/
-                    const chunkMap =
-                        this.stateContext.root.requireEcsComponent(
-                            ChunkMapComponentId,
-                        );
 
-                    const entitiesAt = getEntitiesAt(
-                        chunkMap,
-                        tile.tileX,
-                        tile.tileY,
-                    );
+                    const entitiesAt = queryEntity(this.stateContext.root, {
+                        x: tile.tileX,
+                        y: tile.tileY,
+                    });
 
                     let selection: SelectedWorldItem;
                     if (entitiesAt.length > 0) {

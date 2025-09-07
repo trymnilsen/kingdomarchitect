@@ -31,12 +31,17 @@ export const animationSystem: EcsSystem = {
     onGameMessage,
 };
 
-function onRender(root: Entity, _renderScope: RenderScope, drawMode: DrawMode) {
+function onRender(
+    root: Entity,
+    renderTick: number,
+    _renderScope: RenderScope,
+    drawMode: DrawMode,
+) {
     if (drawMode === DrawMode.Gesture) return;
 
     const animatables = root.queryComponents(AnimationComponentId);
     for (const [entity, animatable] of animatables) {
-        updateAnimatable(entity, animatable);
+        updateAnimatable(entity, renderTick, animatable);
     }
 }
 
@@ -73,18 +78,24 @@ function onGameMessage(root: Entity, message: GameMessage) {
  */
 function updateAnimatable(
     entity: Entity,
+    renderTick: number,
     animatable: AnimationComponent,
 ): void {
     const { currentAnimation, animationGraph } = animatable;
     const spriteComponent = entity.requireEcsComponent(SpriteComponentId);
     const sprite = spriteComponent.sprite;
-    const nextFrame = spriteComponent.frame + 1;
+
+    const currentAnimationState = animationGraph.states[currentAnimation];
+    const speed = currentAnimationState.speed ?? 1;
+    let nextFrame = spriteComponent.frame;
+    if (renderTick % speed === 0) {
+        nextFrame = spriteComponent.frame + 1;
+    }
 
     if (nextFrame < sprite.defintion.frames) {
         spriteComponent.frame = nextFrame;
     } else {
         // The animation has finished, decide what to do next.
-        const currentAnimationState = animationGraph.states[currentAnimation];
         let nextStateKey: string;
 
         if (currentAnimationState.type === "loop") {

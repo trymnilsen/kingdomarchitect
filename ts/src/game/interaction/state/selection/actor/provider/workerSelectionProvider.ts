@@ -19,6 +19,7 @@ import {
     emptySelection,
 } from "./actorSelectionProvider.js";
 import { EquipItemCommand } from "../../../../../../server/message/command/equipItemCommand.js";
+import { AttackSelectionState } from "../../../attack/attackSelectionState.js";
 
 export class WorkerSelectionProvider implements ActorSelectionProvider {
     provideButtons(
@@ -110,6 +111,15 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
                         onClick: () => {
                             stateContext.commandDispatcher(
                                 EquipItemCommand(null, selectedEntity, "main"),
+                            );
+                        },
+                        icon: sprites2.empty_sprite,
+                    },
+                    {
+                        text: "Attack",
+                        onClick: () => {
+                            stateContext.stateChanger.push(
+                                new AttackSelectionState(selectedEntity),
                             );
                         },
                         icon: sprites2.empty_sprite,

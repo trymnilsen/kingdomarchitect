@@ -6,6 +6,7 @@ import {
 } from "../component/jobQueueComponent.js";
 import { JobRunnerComponentId } from "../component/jobRunnerComponent.js";
 import { Entity } from "../entity/entity.js";
+import { attackHandler } from "../job/attackJob.js";
 import { buildBuildingHandler } from "../job/buildBuildingJob.js";
 import type { Job, JobHandler, JobId, Jobs } from "../job/job.js";
 import { moveToJobHandler } from "../job/moveToPointJob.js";
@@ -47,15 +48,20 @@ function updateJobs(root: Entity, _gameTime: number) {
             continue;
         }
         console.log("Updating job", currentJob.id);
-        handler(entity, currentJob);
+        handler(root, entity, currentJob);
     }
 }
 
 type JobMap = {
-    [K in JobId]: (entity: Entity, job: Extract<Jobs, { id: K }>) => void;
+    [K in JobId]: (
+        root: Entity,
+        runner: Entity,
+        job: Extract<Jobs, { id: K }>,
+    ) => void;
 };
 
 const jobMap: JobMap = {
     moveToJob: moveToJobHandler,
     buildBuildingJob: buildBuildingHandler,
+    attackJob: attackHandler,
 } as const;
