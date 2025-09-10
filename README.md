@@ -1,10 +1,14 @@
 # 🏰 Kingdom Architect
-> Medieval simulation and city builder game for the browser. Built in typescript with a custom ECS and scenegraph, it's own declarative UI framework, a goal oriented action planner (GOAP) for npc behaviour and a 2D canvas renderer with typesafe asset references via codegen.
-
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/trymnilsen/kingdomarchitect/main.yml)
 [![Written in TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg)](https://www.typescriptlang.org/)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-f8bc45.svg)](https://github.com/prettier/prettier)
 
+Medieval simulation and city builder game for the browser. Built in typescript, featuring:
+  - 🗺️ A custom ECS and scenegraph
+  - 📐 It's own declarative UI framework
+  - 🧠 A goal oriented action planner (GOAP) for npc behaviour
+  - 🎨 A 2D canvas renderer with typesafe asset references via codegen.
+  - 📡 Single and multiplayer architecture over websockets
 
 ![Screenshot of the game](doc/screenshot/screenshot.gif)
 
