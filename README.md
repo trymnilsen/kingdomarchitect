@@ -131,34 +131,16 @@ Every second a timer invokes two code paths for most of the game components. An 
 The update function should only be invoked once per timer tick, but the draw method can be called multiple. Be wary of putting
 logic depending on a timed update in the draw code path as it will be invoked potentially more than one time per tick when input events happen or other actions are perfomed. Panning the gameworld is a good example of when the draw method of the different classes are invoked, this method is executed on each drag event from the browser.
 
-#### Entity component system
-A entity component system is in the works where all items in the world are tied to an entity with some amount of componets on it handle updates and draw actions. Some exceptions exists like tiles where all tiles belong to the same entity with a component that is responsible for drawing and handling all the tiles. All new game world items and data will be stored in components on entities. If you create new components or jobs, remember to run the [Typelistgen tooling](#typelistgen)
-
 #### A state system for the HUD/GUI
 Items that are not directly connected to the game world, like menus and screens are considered `InteractionStates` these are screens that can be navigated to and from in a stack. States can draw custom actions and handle events as well as setting up complex views using the custom UI system
 
-### Folder Structure
-| Folder name | Function                                                      |
-|-------------|---------------------------------------------------------------|
-| asset       | code related to load and lookup of assets can be found here.  |
-| common      | generic code that can be used across the whole application    |
-| data        | defintions and lists for the items/buildings in game          |
-| game        | the game logic, both hud and world code                       |
-| input       | code related to recieveing input from the browser             |
-| path        | pathfinding and graphing code                                 |
-| persistence | logic for saving and loading state                            |
-| rendering   | code related to drawing pixels on the game canvas             |
-| ui          | a custom ui system for setting up GUI elements and screens    |
-
 ### Tooling
 #### Transpiling and bundling
-Typescript and rollup is used for transpiling, typechecking and bundling the code.
+Typescript and rolldown is used for transpiling, typechecking and bundling the code.
 This is performed with the `build` npm task.
 
 ### Testing
-Note: The test suite uses the node test runner and requires node >=20.
-
-Some tests already exists for the game, these are made with the built in node test runner. Note that files are not automatically built when tests are run. These needs to be built independently (however the `npm test` script includes the tsc step before the tests are run). Some files are currently just scaffold and some contain actuall test code. Tests can be run with `npm  test`.
+Some tests already exists for the game, these are made for vitest. Some files are currently just scaffold and some contain actuall test code. Tests can be run with `npm test`.
 
 ### Custom tooling
 #### Spritepacking
