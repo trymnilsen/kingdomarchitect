@@ -6,7 +6,6 @@ import {
     treeResource,
 } from "../../data/inventory/items/naturalResource.js";
 import { ChunkMapComponentId } from "../component/chunkMapComponent.js";
-import { EffectEmitterComponentId } from "../component/effectEmitterComponent.js";
 import { setChunk, TileComponentId } from "../component/tileComponent.js";
 import { Entity } from "../entity/entity.js";
 import { resourcePrefab } from "../prefab/resourcePrefab.js";
@@ -36,8 +35,9 @@ export function addInitialPlayerChunk(rootEntity: Entity): Point {
             chunkX: 0,
             chunkY: 0,
             volume: {
+                isStartBiome: true,
                 id: generateId("volume"),
-                maxSize: Math.floor(Math.random() * 4) + 2,
+                maxSize: 4,
                 type: "forrest",
                 chunks: [{ x: 0, y: 0 }],
                 debugColor: randomColor(),

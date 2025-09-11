@@ -84,7 +84,7 @@ export function getEntitiesInChunkMapWithin(
     return entities;
 }
 
-function getEntitiesInChunk(
+export function getEntitiesInChunk(
     chunkMap: ChunkMapComponent,
     chunkPosition: Point,
 ): Entity[] {

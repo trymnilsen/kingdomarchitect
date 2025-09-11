@@ -1,6 +1,5 @@
 import { type Point } from "../../common/point.js";
 import { type Sprite2 } from "../../asset/sprite.js";
-import type { AnimationGraph } from "../../rendering/animation/animationGraph.js";
 
 /**
  * Defines a currently applied tint to a sprite

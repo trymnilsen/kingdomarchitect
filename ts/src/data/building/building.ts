@@ -1,5 +1,4 @@
 import { Sprite2, emptySprite } from "../../asset/sprite.js";
-import { Adjacency } from "../../common/adjacency.js";
 import { InventoryItemIds } from "../inventory/inventoryItems.js";
 
 export type Building = {

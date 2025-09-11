@@ -1,7 +1,4 @@
-import {
-    diamondPattern,
-    generateDiamondPattern,
-} from "../../common/pattern.js";
+import { generateDiamondPattern } from "../../common/pattern.js";
 import type { Point } from "../../common/point.js";
 
 export type VisibilityComponent = {

@@ -1,15 +1,14 @@
 import type { Bounds } from "../../common/bounds.js";
+import { EcsSystem } from "../../common/ecs/ecsSystem.js";
+import { offsetPatternWithPoint } from "../../common/pattern.js";
 import {
     encodePosition,
     makeNumberId,
     type Point,
 } from "../../common/point.js";
-import { EcsSystem } from "../../common/ecs/ecsSystem.js";
-import { biomes } from "../map/biome.js";
-import { ChunkDimension, ChunkSize } from "../map/chunk.js";
-import { TileSize } from "../map/tile.js";
 import { DrawMode } from "../../rendering/drawMode.js";
 import type { RenderScope } from "../../rendering/renderScope.js";
+import { AnimationComponentId } from "../component/animationComponent.js";
 import {
     HealthComponentId,
     type HealthComponent,
@@ -19,18 +18,16 @@ import {
     SpriteComponentId,
 } from "../component/spriteComponent.js";
 import { TileComponent, TileComponentId } from "../component/tileComponent.js";
+import { VisibilityComponentId } from "../component/visibilityComponent.js";
 import {
     hasDiscovered,
     isVisible,
     VisibilityMapComponentId,
 } from "../component/visibilityMapComponent.js";
 import type { Entity } from "../entity/entity.js";
-import { offsetPatternWithPoint } from "../../common/pattern.js";
-import { VisibilityComponentId } from "../component/visibilityComponent.js";
-import {
-    AnimationComponentId,
-    type AnimationComponent,
-} from "../component/animationComponent.js";
+import { biomes } from "../map/biome.js";
+import { ChunkDimension, ChunkSize } from "../map/chunk.js";
+import { TileSize } from "../map/tile.js";
 
 export const renderSystem: EcsSystem = {
     onRender,
@@ -296,7 +293,7 @@ function drawTiles(
                 font: "arial",
             });
             renderContext.drawText({
-                text: `maxSize: ${chunk.volume.maxSize}`,
+                text: `maxSize:   ${chunk.volume.maxSize}`,
                 x: screenPosition.x + 16,
                 y: screenPosition.y + 16 + 40,
                 color: "black",
@@ -304,7 +301,7 @@ function drawTiles(
                 font: "arial",
             });
             renderContext.drawText({
-                text: `size: ${chunk.volume.chunks.length}`,
+                text: `size:   ${chunk.volume.chunks.length}`,
                 x: screenPosition.x + 16,
                 y: screenPosition.y + 16 + 60,
                 color: "black",

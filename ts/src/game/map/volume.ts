@@ -7,4 +7,5 @@ export type Volume = {
     type: BiomeType;
     debugColor: string;
     id: string;
+    isStartBiome?: boolean;
 };

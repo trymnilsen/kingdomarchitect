@@ -1,21 +1,11 @@
 import type { EcsSystem } from "../../common/ecs/ecsSystem.js";
-import { addInitialPlayerChunk } from "../map/player.js";
-import type { Entity } from "../entity/entity.js";
-import { EffectEmitterComponentId } from "../component/effectEmitterComponent.js";
 import {
-    discoverTile,
-    hasDiscoveredTile,
-    hasDiscoveredChunkByChunkPosition,
-    hasDiscoveredChunkByTilePosition,
-    WorldDiscoveryComponentId,
-    type WorldDiscoveryComponent,
-} from "../component/worldDiscoveryComponent.js";
-import {
-    diamondPattern,
     generateDiamondPattern,
     offsetPatternWithPoint,
 } from "../../common/pattern.js";
+import { pointEquals, type Point } from "../../common/point.js";
 import type { DiscoverTileEffect } from "../../server/message/effect/discoverTileEffect.js";
+import { EffectEmitterComponentId } from "../component/effectEmitterComponent.js";
 import {
     getChunk,
     hasChunk,
@@ -23,11 +13,18 @@ import {
     TileComponentId,
     type TileComponent,
 } from "../component/tileComponent.js";
-import { pointEquals, type Point } from "../../common/point.js";
+import {
+    discoverTile,
+    hasDiscoveredChunkByChunkPosition,
+    hasDiscoveredTile,
+    WorldDiscoveryComponentId,
+    type WorldDiscoveryComponent,
+} from "../component/worldDiscoveryComponent.js";
+import type { Entity } from "../entity/entity.js";
 import { getChunkPosition } from "../map/chunk.js";
-import { getTileId } from "../map/tile.js";
-import type { Volume } from "../map/volume.js";
 import { generateChunk } from "../map/chunkGenerator.js";
+import { addInitialPlayerChunk } from "../map/player.js";
+import type { Volume } from "../map/volume.js";
 
 export const worldGenerationSystem: EcsSystem = {
     onInit,

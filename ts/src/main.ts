@@ -2,7 +2,7 @@ import { Game } from "./game/game.js";
 
 const canvasElementId = "gameCanvas";
 console.log("Booting!");
-
+window.debugChunks = true;
 async function bootstrap() {
     console.log("Bootstrapping!");
     try {

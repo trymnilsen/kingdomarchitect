@@ -8,6 +8,7 @@ import type { HealthComponent } from "./healthComponent.js";
 import type { InventoryComponent } from "./inventoryComponent.js";
 import type { JobQueueComponent } from "./jobQueueComponent.js";
 import type { JobRunnerComponent } from "./jobRunnerComponent.js";
+import type { KingdomComponent } from "./kingdomComponent.js";
 import type { PathfindingGraphComponent } from "./pathfindingGraphComponent.js";
 import type { PlayerUnitComponent } from "./playerUnitComponent.js";
 import type { ResourceComponent } from "./resourceComponent.js";
@@ -18,27 +19,28 @@ import type { VisibilityMapComponent } from "./visibilityMapComponent.js";
 import type { WorldDiscoveryComponent } from "./worldDiscoveryComponent.js";
 
 export type Components =
-  | JobRunnerComponent
-  | SpriteComponent
-  | TileComponent
-  | InventoryComponent
-  | ResourceComponent
-  | ChunkMapComponent
-  | PlayerUnitComponent
-  | JobQueueComponent
-  | BuildingComponent
-  | HealthComponent
-  | EquipmentComponent
-  | WorldDiscoveryComponent
-  | VisibilityMapComponent
-  | VisibilityComponent
-  | EffectEmitterComponent
-  | AnimationComponent
-  | PathfindingGraphComponent
-  | DirectionComponent;
+    | JobRunnerComponent
+    | SpriteComponent
+    | TileComponent
+    | InventoryComponent
+    | ResourceComponent
+    | ChunkMapComponent
+    | PlayerUnitComponent
+    | JobQueueComponent
+    | BuildingComponent
+    | HealthComponent
+    | EquipmentComponent
+    | WorldDiscoveryComponent
+    | VisibilityMapComponent
+    | VisibilityComponent
+    | EffectEmitterComponent
+    | AnimationComponent
+    | PathfindingGraphComponent
+    | KingdomComponent
+    | DirectionComponent;
 
 export interface BaseComponent {
-  id: string;
+    id: string;
 }
 
 export type ComponentID = Components["id"];
