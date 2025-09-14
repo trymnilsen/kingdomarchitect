@@ -16,6 +16,9 @@ export function generateSpawnPoints(
     chunk: Point,
     chunkMap: ChunkMapComponent,
 ): Point[] {
+    if (amount === 0) {
+        return [];
+    }
     if (!chunkMap) {
         throw new Error("No chunk map component found");
     }

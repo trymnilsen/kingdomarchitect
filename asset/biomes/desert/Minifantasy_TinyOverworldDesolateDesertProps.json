@@ -1,0 +1,16 @@
+{
+    "desert_berries": {
+        "x": 12,
+        "y": 12,
+        "w": 4,
+        "h": 4,
+        "frames": 1
+    },
+    "desert_berries_none": {
+        "x": 28,
+        "y": 4,
+        "w": 4,
+        "h": 4,
+        "frames": 1
+    }
+}

@@ -14,23 +14,24 @@ const assetPath = path.join(process.cwd(), "asset");
 run();
 
 async function run() {
-    const files = await fs.readdir(assetPath);
-    const assetFiles = files.filter((filename) => filename.endsWith(".png"));
-    const definitionFiles = files.filter((filename) =>
-        filename.endsWith(".json"),
-    );
+    // Recursively collect .png and .json files, ignoring files/folders starting with _
+    const { pngFiles, jsonFiles } = await collectAssetFiles(assetPath);
 
-    if (definitionFiles.length > 0) {
+    if (jsonFiles.length > 0) {
         await fs.mkdir(path.join("build", "sprites"), { recursive: true });
     }
 
     //Keep track of all sprites that we should attempt to pack in the end
     const secondPassSpriteDefinitions: PackableSprite[] = [];
-    for (const definitionFile of definitionFiles) {
+    for (const definitionFile of jsonFiles) {
         //Get the path of the related png for this definition file
-        const defintionPath = path.join(assetPath, definitionFile);
-        const sourceFile = definitionFile.replace(".json", "") + ".png";
-        const sourceFilePath = path.join(assetPath, sourceFile);
+        const defintionPath = definitionFile;
+        const sourceFile =
+            path.basename(definitionFile).replace(".json", "") + ".png";
+        const sourceFilePath = path.join(
+            path.dirname(definitionFile),
+            sourceFile,
+        );
         //Create a sprite sheet of just the defined sprites, this will remove
         //any parts of the original spritesheet that is not used
         const createdSprites = await createSpriteSheet(
@@ -50,7 +51,7 @@ async function run() {
 
             // Remove the inital spritesheet file and add the newly created
             // spritesheet
-            removeItem(assetFiles, sourceFile);
+            removeItem(pngFiles, sourceFilePath);
         } else {
             console.error(`Failed creating spritesheet: ${definitionFile}`);
         }
@@ -58,15 +59,14 @@ async function run() {
 
     // generate sprite definitions of all the standalone png files
     // these are considered to be a single frame
-    for (const assetFile of assetFiles) {
-        const assetPath = path.join(process.cwd(), "asset", assetFile);
-        const png = readPng(assetPath);
-        const spriteName = assetFile.replace(".png", "");
+    for (const assetFile of pngFiles) {
+        const png = readPng(assetFile);
+        const spriteName = path.basename(assetFile).replace(".png", "");
         const width = png.width;
         const height = png.height;
 
         secondPassSpriteDefinitions.push({
-            filename: assetPath,
+            filename: assetFile,
             spriteName: spriteName,
             definition: {
                 x: 0,
@@ -79,6 +79,35 @@ async function run() {
     }
 
     await packSprites(secondPassSpriteDefinitions);
+}
+
+/**
+ * Recursively collects .png and .json files from a directory, ignoring files and folders starting with '_'.
+ */
+async function collectAssetFiles(
+    dir: string,
+): Promise<{ pngFiles: string[]; jsonFiles: string[] }> {
+    const pngFiles: string[] = [];
+    const jsonFiles: string[] = [];
+
+    async function walk(currentDir: string) {
+        const entries = await fs.readdir(currentDir, { withFileTypes: true });
+        for (const entry of entries) {
+            if (entry.name.startsWith("_")) continue;
+            const fullPath = path.join(currentDir, entry.name);
+            if (entry.isDirectory()) {
+                await walk(fullPath);
+            } else if (entry.isFile()) {
+                if (entry.name.endsWith(".png")) {
+                    pngFiles.push(fullPath);
+                } else if (entry.name.endsWith(".json")) {
+                    jsonFiles.push(fullPath);
+                }
+            }
+        }
+    }
+    await walk(dir);
+    return { pngFiles, jsonFiles };
 }
 
 async function packSprites(sprites: PackableSprite[]) {

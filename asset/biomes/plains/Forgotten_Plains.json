@@ -1,0 +1,72 @@
+{
+    "plainsFlower": {
+        "x": 432,
+        "y": 32,
+        "w": 8,
+        "h": 8,
+        "frames": 1
+    },
+    "plainsFlower2": {
+        "x": 432,
+        "y": 8,
+        "w": 8,
+        "h": 16,
+        "frames": 1
+    },
+    "plainsFlower3": {
+        "x": 441,
+        "y": 11,
+        "w": 7,
+        "h": 12,
+        "frames": 1
+    },
+    "plainsFlower4": {
+        "x": 448,
+        "y": 16,
+        "w": 8,
+        "h": 7,
+        "frames": 1
+    },
+    "plainShrub": {
+        "x": 16,
+        "y": 33,
+        "w": 8,
+        "h": 7,
+        "frames": 1
+    },
+    "snowy_flower": {
+        "x": 160,
+        "y": 89,
+        "w": 6,
+        "h": 5,
+        "frames": 1
+    },
+    "snowy_flower2": {
+        "x": 120,
+        "y": 11,
+        "w": 8,
+        "h": 12,
+        "frames": 1
+    },
+    "snowy_flower3": {
+        "x": 128,
+        "y": 13,
+        "w": 8,
+        "h": 10,
+        "frames": 1
+    },
+    "snowy_shrub": {
+        "x": 120,
+        "y": 32,
+        "w": 8,
+        "h": 8,
+        "frames": 1
+    },
+    "flower": {
+        "x": 466,
+        "y": 72,
+        "w": 5,
+        "h": 7,
+        "frames": 1
+    }
+}

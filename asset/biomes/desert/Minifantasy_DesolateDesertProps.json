@@ -1,0 +1,37 @@
+{
+    "animalSkeleton": {
+        "x": 24,
+        "y": 10,
+        "w": 16,
+        "h": 6,
+        "frames": 1
+    },
+    "desertCactus": {
+        "x": 72,
+        "y": 8,
+        "w": 8,
+        "h": 8,
+        "frames": 1
+    },
+    "desertCactus2": {
+        "x": 72,
+        "y": 16,
+        "w": 8,
+        "h": 8,
+        "frames": 1
+    },
+    "desertCactus3": {
+        "x": 72,
+        "y": 24,
+        "w": 8,
+        "h": 8,
+        "frames": 1
+    },
+    "desertCactusFlower": {
+        "x": 128,
+        "y": 8,
+        "w": 8,
+        "h": 8,
+        "frames": 1
+    }
+}

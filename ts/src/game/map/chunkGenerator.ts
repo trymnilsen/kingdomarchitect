@@ -117,7 +117,7 @@ function generateChunkEntities(chunk: Required<TileChunk>, rootEntity: Entity) {
         (entity) => entity.hasComponent(KingdomComponentId),
     );
     rootEntity.addChild(chunkEntity);
-    
+
     if (settlements.length === 0 && !chunk.volume.isStartBiome) {
         placeSettlement(chunk, chunkEntity);
     }

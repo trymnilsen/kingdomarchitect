@@ -58,7 +58,6 @@ export function addInitialPlayerChunk(rootEntity: Entity): Point {
     const firstStone = generateSpawnPoints(1, { x: 0, y: 0 }, chunkMap);
     const firstStoneEntity = resourcePrefab(stoneResource);
     firstStoneEntity.worldPosition = firstStone[0];
-
     chunkEntity.addChild(firstStoneEntity);
     return firstWorkerPosition;
     /*

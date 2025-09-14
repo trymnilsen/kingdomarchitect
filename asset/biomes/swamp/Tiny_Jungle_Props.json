@@ -1,0 +1,51 @@
+{
+    "swamp_tree": {
+        "x": 5,
+        "y": 2,
+        "w": 11,
+        "h": 11,
+        "frames": 1
+    },
+    "swamp_tree2": {
+        "x": 25,
+        "y": 2,
+        "w": 11,
+        "h": 11,
+        "frames": 1
+    },
+    "swamp_tree3": {
+        "x": 71,
+        "y": 32,
+        "w": 9,
+        "h": 8,
+        "frames": 1
+    },
+    "swamp_tree4": {
+        "x": 72,
+        "y": 18,
+        "w": 7,
+        "h": 6,
+        "frames": 1
+    },
+    "swamp_tree5": {
+        "x": 90,
+        "y": 32,
+        "w": 13,
+        "h": 16,
+        "frames": 1
+    },
+    "swamp_shrub": {
+        "x": 60,
+        "y": 3,
+        "w": 8,
+        "h": 5,
+        "frames": 1
+    },
+    "swamp_flower": {
+        "x": 61,
+        "y": 18,
+        "w": 6,
+        "h": 6,
+        "frames": 1
+    }
+}

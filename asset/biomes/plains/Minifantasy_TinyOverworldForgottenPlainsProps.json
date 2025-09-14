@@ -1,0 +1,16 @@
+{
+    "plainsRuins": {
+        "x": 20,
+        "y": 13,
+        "w": 8,
+        "h": 8,
+        "frames": 1
+    },
+    "plainsRuins2": {
+        "x": 32,
+        "y": 13,
+        "w": 8,
+        "h": 8,
+        "frames": 1
+    }
+}
