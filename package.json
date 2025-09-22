@@ -32,7 +32,7 @@
         "oxlint": "^1.14.0",
         "pngjs": "^7.0.0",
         "prettier": "^3.5.3",
-        "rolldown": "^1.0.0-beta.35",
+        "rolldown": "^1.0.0-beta.39",
         "typescript": "^5.9.2",
         "vitest": "^3.2.4"
     }
