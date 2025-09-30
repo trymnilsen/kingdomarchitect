@@ -7,7 +7,6 @@ import { addPoint, zeroPoint, type Point } from "../../common/point.js";
 import type { RenderScope } from "../../rendering/renderScope.js";
 import type { TextStyle } from "../../rendering/text/textStyle.js";
 import { fillUiSize, zeroSize } from "../uiSize.js";
-import { uiBox } from "./uiBox.js";
 
 export type UISize = { width: number; height: number };
 export type Rectangle = { x: number; y: number; width: number; height: number };
@@ -174,11 +173,17 @@ export class UiRenderer {
     constructor(private renderScope: RenderScope) {}
 
     public renderComponent(topLevelDescriptor: ComponentDescriptor | null) {
-        const newDescriptor =
-            topLevelDescriptor ??
-            uiBox({ width: fillUiSize, height: fillUiSize });
+        const newDescriptor = topLevelDescriptor;
 
         const oldTree = this.currentTree;
+        if (newDescriptor === null) {
+            if (oldTree) {
+                this._cleanupNode(oldTree);
+            }
+
+            return;
+        }
+
         this.currentTree = this._updateOrCreateNode(
             this.currentTree ?? undefined,
             newDescriptor,
