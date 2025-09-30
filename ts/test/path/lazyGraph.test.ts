@@ -1,4 +1,5 @@
-import { describe, it, expect } from "vitest";
+import { describe, it } from "node:test";
+import assert from "node:assert";
 import { LazyGraph } from "../../src/game/map/path/graph/lazyGraph.js";
 
 describe("LazyGraph", () => {
@@ -12,16 +13,16 @@ describe("LazyGraph", () => {
         const firstNode = lazyGraph.nodeAt(2, 2);
         const secondNode = lazyGraph.nodeAt(4, 5);
         const thirdNode = lazyGraph.nodeAt(2, 2);
-        expect(times).toBe(2);
-        expect(firstNode?.x).toBe(2);
-        expect(firstNode?.y).toBe(2);
-        expect(secondNode?.x).toBe(4);
-        expect(secondNode?.y).toBe(5);
-        expect(thirdNode).toStrictEqual(firstNode);
+        assert.strictEqual(times, 2);
+        assert.strictEqual(firstNode?.x, 2);
+        assert.strictEqual(firstNode?.y, 2);
+        assert.strictEqual(secondNode?.x, 4);
+        assert.strictEqual(secondNode?.y, 5);
+        assert.deepStrictEqual(thirdNode, firstNode);
     });
 
     it("Gets null if attempting to get node not in graph", () => {
-        expect(2).toBe(2);
+        assert.strictEqual(2, 2);
     });
 
     it("Can invalidate point in graph", () => {
@@ -34,21 +35,22 @@ describe("LazyGraph", () => {
         const firstNode = lazyGraph.nodeAt(2, 2);
         lazyGraph.invalidatePoint({ x: 2, y: 2 });
         const secondNode = lazyGraph.nodeAt(2, 2);
-        expect(secondNode !== firstNode).toBeTruthy();
-        expect(secondNode?.x).toBe(2);
-        expect(secondNode?.y).toBe(2);
-        expect(times).toBe(2);
+        assert.ok(secondNode !== firstNode);
+
+        assert.strictEqual(secondNode?.x, 2);
+        assert.strictEqual(secondNode?.y, 2);
+        assert.strictEqual(times, 2);
     });
 
     it("Can mark node as dirty", () => {
-        expect(2).toBe(2);
+        assert.strictEqual(2, 2);
     });
 
     it("Can clean nodes", () => {
-        expect(2).toBe(2);
+        assert.strictEqual(2, 2);
     });
 
     it("Can get neighbor of graph node", () => {
-        expect(2).toBe(2);
+        assert.strictEqual(2, 2);
     });
 });

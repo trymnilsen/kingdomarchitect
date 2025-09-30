@@ -1,7 +1,0 @@
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "rules": {
-    "no-extra-boolean-cast": "allow",
-    "no-this-alias": "allow"
-  }
-}
