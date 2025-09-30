@@ -1,23 +1,15 @@
 import { Bounds, boundsCenter } from "../../../../common/bounds.js";
 import { Direction } from "../../../../common/direction.js";
 import { shiftPoint } from "../../../../common/point.js";
-import { bowItem } from "../../../../data/inventory/items/equipment.js";
-import {
-    bagOfGlitter,
-    blueBook,
-    woodResourceItem,
-} from "../../../../data/inventory/items/resources.js";
-import { GroundTile, TileSize } from "../../../map/tile.js";
+import { Camera } from "../../../../rendering/camera.js";
 import type { ComponentDescriptor } from "../../../../ui/declarative/ui.js";
 import { FocusGroup } from "../../../../ui/focus/focusGroup.js";
-import { Camera } from "../../../../rendering/camera.js";
-import { createInventoryComponent } from "../../../component/inventoryComponent.js";
 import { Entity } from "../../../entity/entity.js";
+import { GroundTile, TileSize } from "../../../map/tile.js";
 import { InteractionState } from "../../handler/interactionState.js";
 import { uiScaffold } from "../../view/uiScaffold.js";
 import { AlertMessageState } from "../common/alertMessageState.js";
 import { MenuState } from "../menu/menuState.js";
-import { InventoryState } from "./inventory/inventoryState.js";
 
 export class RootState extends InteractionState {
     override getFocusGroups(): FocusGroup[] {
@@ -42,17 +34,6 @@ export class RootState extends InteractionState {
                         this.context.stateChanger.push(
                             new AlertMessageState(
                                 "Quest",
-                                "Not implemented yet",
-                            ),
-                        );
-                    },
-                },
-                {
-                    text: "Scroll",
-                    onClick: () => {
-                        this.context.stateChanger.push(
-                            new AlertMessageState(
-                                "Scroll",
                                 "Not implemented yet",
                             ),
                         );

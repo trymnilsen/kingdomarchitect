@@ -33,5 +33,19 @@
         "w": 8,
         "h": 8,
         "frames": 1
+    },
+    "desertCactusFlower2": {
+        "x": 88,
+        "y": 23,
+        "w": 8,
+        "h": 9,
+        "frames": 1
+    },
+    "desertCactusFlowerWo": {
+        "x": 88,
+        "y": 7,
+        "w": 8,
+        "h": 9,
+        "frames": 1
     }
 }

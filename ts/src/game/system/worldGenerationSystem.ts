@@ -39,7 +39,7 @@ function onInit(root: Entity) {
     const start = addInitialPlayerChunk(root);
     //Discover the tiles for the player, we should make this more dynamic
     const worldDiscovery = root.getEcsComponent(WorldDiscoveryComponentId);
-    const pattern = offsetPatternWithPoint(start, generateDiamondPattern(5));
+    const pattern = offsetPatternWithPoint(start, generateDiamondPattern(16));
     setDiscoveryForPlayer(root, "player", pattern);
 }
 

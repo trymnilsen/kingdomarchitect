@@ -111,14 +111,18 @@ function generateChunkEntities(chunk: Required<TileChunk>, rootEntity: Entity) {
     };
     //TODO: Check for existing settlement
     //TODO: query for settlement component and checking if within chunk might be more efficient
+    //TODO: For dev we only make one settlement globally
+    /*
     const settlements = queryEntitiesWithinVolume(
         rootEntity,
         chunk.volume,
         (entity) => entity.hasComponent(KingdomComponentId),
-    );
+    );*/
+    const settlements = rootEntity.queryComponents(KingdomComponentId);
+
     rootEntity.addChild(chunkEntity);
 
-    if (settlements.length === 0 && !chunk.volume.isStartBiome) {
+    if (settlements.size === 0 && !chunk.volume.isStartBiome) {
         placeSettlement(chunk, chunkEntity);
     }
 

@@ -37,7 +37,7 @@ export function addInitialPlayerChunk(rootEntity: Entity): Point {
             volume: {
                 isStartBiome: true,
                 id: generateId("volume"),
-                maxSize: 4,
+                maxSize: 2,
                 type: "forrest",
                 chunks: [{ x: 0, y: 0 }],
                 debugColor: randomColor(),
