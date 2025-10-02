@@ -8,6 +8,7 @@ import { JobRunnerComponentId } from "../component/jobRunnerComponent.js";
 import { Entity } from "../entity/entity.js";
 import { attackHandler } from "../job/attackJob.js";
 import { buildBuildingHandler } from "../job/buildBuildingJob.js";
+import { chopTreeHandler } from "../job/chopTreeJob.js";
 import type { Job, JobHandler, JobId, Jobs } from "../job/job.js";
 import { moveToJobHandler } from "../job/moveToPointJob.js";
 
@@ -64,4 +65,5 @@ const jobMap: JobMap = {
     moveToJob: moveToJobHandler,
     buildBuildingJob: buildBuildingHandler,
     attackJob: attackHandler,
+    chopTreeJob: chopTreeHandler,
 } as const;

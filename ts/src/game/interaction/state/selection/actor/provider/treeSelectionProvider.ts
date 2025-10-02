@@ -1,3 +1,4 @@
+import { SelectedEntityItem } from "../../../../selection/selectedEntityItem.js";
 import { SelectedWorldItem } from "../../../../selection/selectedWorldItem.js";
 import { StateContext } from "../../../../handler/stateContext.js";
 import { ButtonCollection } from "../../../../view/buttonCollection.js";
@@ -5,27 +6,32 @@ import {
     ActorSelectionProvider,
     emptySelection,
 } from "./actorSelectionProvider.js";
+import { ResourceComponentId } from "../../../../../component/resourceComponent.js";
+import { sprites2 } from "../../../../../../asset/sprite.js";
+import { ChopTreeJob } from "../../../../../job/chopTreeJob.js";
+import { QueueJobCommand } from "../../../../../../server/message/command/queueJobCommand.js";
 
 export class TreeSelectionProvider implements ActorSelectionProvider {
     provideButtons(
-        _stateContext: StateContext,
-        _selection: SelectedWorldItem,
+        stateContext: StateContext,
+        selection: SelectedWorldItem,
     ): ButtonCollection {
-        /*
-        TODO: Reimplement selection of resources
         if (selection instanceof SelectedEntityItem) {
             const selectedEntity = selection.entity;
-            const treeComponent = selectedEntity.getComponent(TreeComponent);
-            if (!!treeComponent) {
+            const resourceComponent =
+                selectedEntity.getEcsComponent(ResourceComponentId);
+            if (!!resourceComponent) {
                 return {
                     left: [
                         {
                             text: "Chop",
                             icon: sprites2.empty_sprite,
                             onClick: () => {
-                                stateContext.stateChanger.replace(
-                                    new ChopJobState(selectedEntity),
+                                const job = ChopTreeJob(selectedEntity);
+                                stateContext.commandDispatcher(
+                                    QueueJobCommand(job),
                                 );
+                                stateContext.stateChanger.pop(null);
                             },
                         },
                     ],
@@ -36,7 +42,6 @@ export class TreeSelectionProvider implements ActorSelectionProvider {
             }
         } else {
             return emptySelection;
-        }*/
-        return emptySelection;
+        }
     }
 }
