@@ -46,15 +46,17 @@ export function generateSpawnPoints(
             const index = (start + i) % totalCells;
             const x = index % ChunkSize;
             const y = Math.floor(index / ChunkSize);
-            const encodedPoint = encodePosition(x, y);
-            if (skipPoints.has(encodedPoint)) {
-                continue;
-            }
-
             const worldPosition: Point = {
                 x: chunkBounds.x1 + x,
                 y: chunkBounds.y1 + y,
             };
+            const encodedPoint = encodePosition(
+                worldPosition.x,
+                worldPosition.y,
+            );
+            if (skipPoints.has(encodedPoint)) {
+                continue;
+            }
 
             spawnPoints.push(worldPosition);
             skipPoints.add(encodedPoint);
