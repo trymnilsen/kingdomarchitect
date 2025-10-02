@@ -16,57 +16,9 @@ import {
 } from "../../../src/game/component/jobRunnerComponent.js";
 import { treeResource } from "../../../src/data/inventory/items/naturalResource.js";
 import type { Point } from "../../../src/common/point.js";
-
-/**
- * Test harness for job testing. Sets up a minimal world with a root entity,
- * a runner (worker), and a target entity.
- */
-class JobTestHarness {
-    root: Entity;
-    runner: Entity;
-    target: Entity;
-
-    constructor(
-        runnerPosition: Point = { x: 0, y: 0 },
-        targetPosition: Point = { x: 1, y: 0 },
-    ) {
-        // Create root entity
-        this.root = new Entity("root");
-
-        // Create runner entity (worker)
-        this.runner = new Entity("runner");
-        this.runner.worldPosition = runnerPosition;
-        this.runner.setEcsComponent(createJobRunnerComponent());
-        this.root.addChild(this.runner);
-
-        // Create target entity (tree)
-        this.target = new Entity("target");
-        this.target.worldPosition = targetPosition;
-        this.root.addChild(this.target);
-    }
-
-    /**
-     * Execute the job handler once
-     */
-    executeJob(job: ChopTreeJob) {
-        chopTreeHandler(this.root, this.runner, job);
-    }
-
-    /**
-     * Get the current job assigned to the runner
-     */
-    getCurrentJob(): ChopTreeJob | null {
-        const jobRunner = this.runner.getEcsComponent(JobRunnerComponentId);
-        return jobRunner?.currentJob as ChopTreeJob | null;
-    }
-
-    /**
-     * Check if the runner has completed the job
-     */
-    isJobCompleted(): boolean {
-        return this.getCurrentJob() === null;
-    }
-}
+import { PathfindingGraphComponentId } from "../../../src/game/component/pathfindingGraphComponent.js";
+import { PathCache } from "../../../src/game/map/path/pathCache.js";
+import { createEmptyGraph } from "../../path/testGraph.js";
 
 describe("ChopTreeJob", () => {
     describe("Job Creation", () => {
@@ -217,5 +169,161 @@ describe("ChopTreeJob", () => {
         // Note: When runner and tree are at the exact same position,
         // checkAdjacency returns null (not adjacent), so the job will
         // attempt to move, which requires pathfinding setup not in these tests.
+    });
+
+    describe("Movement to Target", () => {
+        it("moves runner one step closer to tree when not adjacent", () => {
+            const harness = new JobTestHarness(
+                { x: 0, y: 0 },
+                { x: 3, y: 0 }, // 3 tiles away
+                { enablePathfinding: true },
+            );
+
+            harness.target.setEcsComponent(
+                createResourceComponent(treeResource),
+            );
+            harness.target.setEcsComponent(createHealthComponent(100, 100));
+
+            const job = ChopTreeJob(harness.target);
+            harness.runner.setEcsComponent({
+                id: JobRunnerComponentId,
+                currentJob: job,
+            });
+
+            const initialPosition = { ...harness.runner.worldPosition };
+
+            harness.executeJob(job);
+
+            // Runner should have moved one step closer
+            assert.notDeepStrictEqual(
+                harness.runner.worldPosition,
+                initialPosition,
+                "Runner should have moved",
+            );
+            assert.strictEqual(
+                harness.runner.worldPosition.x,
+                1,
+                "Runner should have moved to x=1",
+            );
+            assert.strictEqual(
+                harness.runner.worldPosition.y,
+                0,
+                "Runner should stay at y=0",
+            );
+
+            // Tree should not be damaged yet
+            const health = harness.target.getEcsComponent(HealthComponentId);
+            assert.strictEqual(
+                health?.currentHp,
+                100,
+                "Tree should not be damaged while not adjacent",
+            );
+        });
+
+        it("moves runner multiple steps until adjacent, then damages tree", () => {
+            const harness = new JobTestHarness(
+                { x: 0, y: 0 },
+                { x: 3, y: 0 }, // 3 tiles away
+                { enablePathfinding: true },
+            );
+
+            harness.target.setEcsComponent(
+                createResourceComponent(treeResource),
+            );
+            harness.target.setEcsComponent(createHealthComponent(100, 100));
+
+            const job = ChopTreeJob(harness.target);
+            harness.runner.setEcsComponent({
+                id: JobRunnerComponentId,
+                currentJob: job,
+            });
+
+            // Execute job 3 times to get adjacent (move from x=0 to x=1, then x=2)
+            harness.executeJob(job); // Move to x=1
+            assert.strictEqual(harness.runner.worldPosition.x, 1);
+
+            harness.executeJob(job); // Move to x=2
+            assert.strictEqual(harness.runner.worldPosition.x, 2);
+
+            // Now adjacent, should damage the tree
+            harness.executeJob(job);
+            const health = harness.target.getEcsComponent(HealthComponentId);
+            assert.strictEqual(
+                health?.currentHp,
+                90,
+                "Tree should be damaged after runner becomes adjacent",
+            );
+        });
+
+        it("moves runner vertically to reach tree", () => {
+            const harness = new JobTestHarness(
+                { x: 0, y: 0 },
+                { x: 0, y: 3 }, // 3 tiles away vertically
+                { enablePathfinding: true },
+            );
+
+            harness.target.setEcsComponent(
+                createResourceComponent(treeResource),
+            );
+            harness.target.setEcsComponent(createHealthComponent(100, 100));
+
+            const job = ChopTreeJob(harness.target);
+            harness.runner.setEcsComponent({
+                id: JobRunnerComponentId,
+                currentJob: job,
+            });
+
+            harness.executeJob(job);
+
+            // Runner should have moved one step closer vertically
+            assert.strictEqual(
+                harness.runner.worldPosition.x,
+                0,
+                "Runner should stay at x=0",
+            );
+            assert.strictEqual(
+                harness.runner.worldPosition.y,
+                1,
+                "Runner should have moved to y=1",
+            );
+        });
+
+        it("completes job after reaching and destroying tree", () => {
+            const harness = new JobTestHarness(
+                { x: 0, y: 0 },
+                { x: 2, y: 0 }, // 2 tiles away
+                { enablePathfinding: true },
+            );
+
+            harness.target.setEcsComponent(
+                createResourceComponent(treeResource),
+            );
+            harness.target.setEcsComponent(createHealthComponent(10, 100)); // Low health
+
+            const job = ChopTreeJob(harness.target);
+            harness.runner.setEcsComponent({
+                id: JobRunnerComponentId,
+                currentJob: job,
+            });
+
+            // Move adjacent (2 steps)
+            harness.executeJob(job); // x=0 -> x=1
+            harness.executeJob(job); // x=1 (already adjacent at x=1 to target at x=2)
+
+            // Now chop and complete
+            harness.executeJob(job);
+
+            const health = harness.target.getEcsComponent(HealthComponentId);
+            assert.strictEqual(
+                health?.currentHp,
+                0,
+                "Tree should be destroyed",
+            );
+            assert.strictEqual(
+                harness.isJobCompleted(),
+                true,
+                "Job should be completed",
+            );
+        });
     });
 });
