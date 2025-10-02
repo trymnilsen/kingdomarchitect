@@ -1,24 +1,16 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
 import { Entity } from "../../../src/game/entity/entity.js";
-import {
-    ChopTreeJob,
-    chopTreeHandler,
-} from "../../../src/game/job/chopTreeJob.js";
+import { ChopTreeJob } from "../../../src/game/job/chopTreeJob.js";
 import { createResourceComponent } from "../../../src/game/component/resourceComponent.js";
 import {
     createHealthComponent,
     HealthComponentId,
 } from "../../../src/game/component/healthComponent.js";
-import {
-    createJobRunnerComponent,
-    JobRunnerComponentId,
-} from "../../../src/game/component/jobRunnerComponent.js";
+import { JobRunnerComponentId } from "../../../src/game/component/jobRunnerComponent.js";
 import { treeResource } from "../../../src/data/inventory/items/naturalResource.js";
 import type { Point } from "../../../src/common/point.js";
-import { PathfindingGraphComponentId } from "../../../src/game/component/pathfindingGraphComponent.js";
-import { PathCache } from "../../../src/game/map/path/pathCache.js";
-import { createEmptyGraph } from "../../path/testGraph.js";
+import { JobTestHarness } from "./jobTestHarness.js";
 
 describe("ChopTreeJob", () => {
     describe("Job Creation", () => {

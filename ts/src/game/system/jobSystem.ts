@@ -6,11 +6,8 @@ import {
 } from "../component/jobQueueComponent.js";
 import { JobRunnerComponentId } from "../component/jobRunnerComponent.js";
 import { Entity } from "../entity/entity.js";
-import { attackHandler } from "../job/attackJob.js";
-import { buildBuildingHandler } from "../job/buildBuildingJob.js";
-import { chopTreeHandler } from "../job/chopTreeJob.js";
-import type { Job, JobHandler, JobId, Jobs } from "../job/job.js";
-import { moveToJobHandler } from "../job/moveToPointJob.js";
+import type { Job, JobHandler } from "../job/job.js";
+import { jobHandlers } from "../job/jobHandlers.js";
 
 export const JobSystem: EcsSystem = {
     onInit: onInit,
@@ -44,7 +41,7 @@ function updateJobs(root: Entity, _gameTime: number) {
             continue;
         }
 
-        const handler = jobMap[currentJob.id] as JobHandler<Job>;
+        const handler = jobHandlers[currentJob.id] as JobHandler<Job>;
         if (!handler) {
             continue;
         }
@@ -52,18 +49,3 @@ function updateJobs(root: Entity, _gameTime: number) {
         handler(root, entity, currentJob);
     }
 }
-
-type JobMap = {
-    [K in JobId]: (
-        root: Entity,
-        runner: Entity,
-        job: Extract<Jobs, { id: K }>,
-    ) => void;
-};
-
-const jobMap: JobMap = {
-    moveToJob: moveToJobHandler,
-    buildBuildingJob: buildBuildingHandler,
-    attackJob: attackHandler,
-    chopTreeJob: chopTreeHandler,
-} as const;

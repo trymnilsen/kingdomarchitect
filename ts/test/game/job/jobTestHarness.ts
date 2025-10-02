@@ -5,18 +5,19 @@ import {
 } from "../../../src/game/component/jobRunnerComponent.js";
 import { PathfindingGraphComponentId } from "../../../src/game/component/pathfindingGraphComponent.js";
 import { Entity } from "../../../src/game/entity/entity.js";
-import {
-    chopTreeHandler,
-    type ChopTreeJob,
-} from "../../../src/game/job/chopTreeJob.js";
+import type { Job } from "../../../src/game/job/job.js";
+import { getJobHandler } from "../../../src/game/job/jobHandlers.js";
 import { PathCache } from "../../../src/game/map/path/pathCache.js";
 import { createEmptyGraph } from "../../path/testGraph.js";
 
 /**
  * Test harness for job testing. Sets up a minimal world with a root entity,
  * a runner (worker), and a target entity.
+ *
+ * This harness is generic and can be used to test any job type.
+ * It automatically looks up the appropriate job handler from the job registry.
  */
-class JobTestHarness {
+export class JobTestHarness<T extends Job = Job> {
     root: Entity;
     runner: Entity;
     target: Entity;
@@ -54,18 +55,24 @@ class JobTestHarness {
     }
 
     /**
-     * Execute the job handler once
+     * Execute the job once using the handler from the job registry
+     * @param job The job to execute
      */
-    executeJob(job: ChopTreeJob) {
-        chopTreeHandler(this.root, this.runner, job);
+    executeJob(job: T) {
+        const handler = getJobHandler(job.id);
+        if (!handler) {
+            throw new Error(`No handler found for job type: ${job.id}`);
+        }
+        // Type assertion is safe here as the job registry ensures handler matches job type
+        handler(this.root, this.runner, job as any);
     }
 
     /**
      * Get the current job assigned to the runner
      */
-    getCurrentJob(): ChopTreeJob | null {
+    getCurrentJob(): T | null {
         const jobRunner = this.runner.getEcsComponent(JobRunnerComponentId);
-        return jobRunner?.currentJob as ChopTreeJob | null;
+        return jobRunner?.currentJob as T | null;
     }
 
     /**
