@@ -1,3 +1,4 @@
+import type { ActiveEffectsComponent } from "./activeEffectsComponent.js";
 import type { AnimationComponent } from "./animationComponent.js";
 import type { BuildingComponent } from "./buildingComponent.js";
 import type { ChunkMapComponent } from "./chunkMapComponent.js";
@@ -37,7 +38,8 @@ export type Components =
     | AnimationComponent
     | PathfindingGraphComponent
     | KingdomComponent
-    | DirectionComponent;
+    | DirectionComponent
+    | ActiveEffectsComponent;
 
 export interface BaseComponent {
     id: string;

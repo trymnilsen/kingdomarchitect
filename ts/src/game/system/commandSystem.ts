@@ -31,6 +31,17 @@ import {
     type AttackCommand,
 } from "../../server/message/command/attackTargetCommand.js";
 import { AttackJob } from "../job/attackJob.js";
+import {
+    ConsumeItemCommandId,
+    type ConsumeItemCommand,
+} from "../../server/message/command/consumeItemCommand.js";
+import {
+    ActiveEffectsComponentId,
+    addEffect,
+    createActiveEffectsComponent,
+} from "../component/activeEffectsComponent.js";
+import { itemEffectFactoryList } from "../../data/inventory/itemEffectFactoryList.js";
+import { inventoryItemsMap } from "../../data/inventory/inventoryItems.js";
 
 export const commandSystem: EcsSystem = {
     onGameMessage,
@@ -51,6 +62,9 @@ function onGameMessage(root: Entity, message: GameMessage) {
             break;
         case AttackCommandId:
             attackTarget(root, message.command as AttackCommand);
+            break;
+        case ConsumeItemCommandId:
+            consumeItem(root, message.command as ConsumeItemCommand);
             break;
     }
 }
@@ -135,4 +149,66 @@ function equipItem(root: Entity, command: EquipItemCommand) {
     }
     entity.invalidateComponent(InventoryComponentId);
     entity.invalidateComponent(EquipmentComponentId);
+}
+
+function consumeItem(root: Entity, command: ConsumeItemCommand) {
+    const entity = root.findEntity(command.entity);
+    if (!entity) {
+        console.error("Unable to consume, entity not found");
+        return;
+    }
+
+    const equipment = entity.getEcsComponent(EquipmentComponentId);
+    if (!equipment) {
+        console.error("Unable to consume, equipment component not found");
+        return;
+    }
+
+    const inventory = entity.getEcsComponent(InventoryComponentId);
+    if (!inventory) {
+        console.error("Unable to consume, inventory component not found");
+        return;
+    }
+
+    // Get the item from the specified slot
+    const item = equipment.slots[command.slot];
+    if (!item) {
+        console.error(`No item equipped in slot: ${command.slot}`);
+        return;
+    }
+
+    // Check if we have an effect factory for this item
+    const effectFactory = itemEffectFactoryList[item.id];
+    if (!effectFactory) {
+        console.error(`No effect factory for item: ${item.id}`);
+        return;
+    }
+
+    // Try to take the item from inventory (for stack management)
+    const withdrawnItem = takeInventoryItem(inventory, item.id, 1);
+    if (!withdrawnItem) {
+        console.error("Not enough items in inventory");
+        return;
+    }
+
+    // Remove the item from the equipment slot
+    equipment.slots[command.slot] = null;
+
+    // Create the effect from the item
+    const effect = effectFactory(item);
+
+    // Get or create the active effects component
+    let activeEffects = entity.getEcsComponent(ActiveEffectsComponentId);
+    if (!activeEffects) {
+        activeEffects = createActiveEffectsComponent();
+        entity.setEcsComponent(activeEffects);
+    }
+
+    // Add the effect to the entity
+    addEffect(activeEffects, effect);
+
+    // Notify changes
+    entity.invalidateComponent(InventoryComponentId);
+    entity.invalidateComponent(EquipmentComponentId);
+    entity.invalidateComponent(ActiveEffectsComponentId);
 }

@@ -6,6 +6,10 @@ export type HealEffectData = {
 
 export const healEffectId = "healingEffect";
 export type HealEffect = Effect<HealEffectData>;
+
+/**
+ * Creates an immediate healing effect
+ */
 export function createHealEffect(amount: number): HealEffect {
     return {
         data: {
@@ -14,6 +18,25 @@ export function createHealEffect(amount: number): HealEffect {
         id: healEffectId,
         name: "Healing",
         sprite: "health_potion",
-        time: 60,
+        timing: { type: "immediate" },
+    };
+}
+
+/**
+ * Creates a healing effect that applies over time
+ */
+export function createHealOverTimeEffect(
+    amount: number,
+    ticks: number,
+    interval: number = 1,
+): HealEffect {
+    return {
+        data: {
+            amount: amount,
+        },
+        id: healEffectId,
+        name: "Regeneration",
+        sprite: "health_potion",
+        timing: { type: "periodic", ticks, interval },
     };
 }

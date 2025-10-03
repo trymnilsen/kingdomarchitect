@@ -54,7 +54,7 @@ A declarative UI for making UI's. Features non global hooks, state reconciliatio
 
 **Example:**
 
-````
+```typescript
 const healthbar = createComponent<{ initialHealth: number }>(
     ({ props, withState, withEffect }) => {
         withEffect(() => {
@@ -84,7 +84,7 @@ const healthbar = createComponent<{ initialHealth: number }>(
         })
     },
 );
-````
+```
 
 ### Entity component system
 

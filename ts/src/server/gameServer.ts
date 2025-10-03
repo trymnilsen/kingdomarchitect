@@ -10,6 +10,7 @@ import type { GameCommand } from "./message/gameCommand.js";
 import { createEffectEmitterComponent } from "../game/component/effectEmitterComponent.js";
 import type { GameMessage } from "./message/gameMessage.js";
 import { commandSystem } from "../game/system/commandSystem.js";
+import { effectSystem } from "../game/system/effectSystem.js";
 
 export class GameServer {
     private world: EcsWorld;
@@ -43,6 +44,7 @@ export class GameServer {
         this.world.addSystem(worldGenerationSystem);
         this.world.addSystem(JobSystem);
         this.world.addSystem(commandSystem);
+        this.world.addSystem(effectSystem);
         this.world.addSystem(
             makeReplicatedEntitiesSystem((message) => {
                 this.postMessage(message);

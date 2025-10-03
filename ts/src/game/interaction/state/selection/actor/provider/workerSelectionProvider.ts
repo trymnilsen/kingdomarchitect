@@ -20,6 +20,8 @@ import {
 } from "./actorSelectionProvider.js";
 import { EquipItemCommand } from "../../../../../../server/message/command/equipItemCommand.js";
 import { AttackSelectionState } from "../../../attack/attackSelectionState.js";
+import { ItemTag } from "../../../../../../data/inventory/inventoryItem.js";
+import { ConsumeItemCommand } from "../../../../../../server/message/command/consumeItemCommand.js";
 
 export class WorkerSelectionProvider implements ActorSelectionProvider {
     provideButtons(
@@ -83,15 +85,54 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
     ) {
         const otherItem = equipmentComponent.slots.other;
 
-        items.push({
-            text: "Other",
-            icon: sprites2.empty_sprite,
-            children: this.getEmptyOtherEquipmentAction(
-                stateContext,
-                selectedEntity,
-                equipmentComponent,
-            ),
-        });
+        if (otherItem) {
+            const isConsumable = otherItem.tag?.includes(ItemTag.Consumable);
+            const children: UIActionbarItem[] = [
+                {
+                    text: "Unequip",
+                    onClick: () => {
+                        stateContext.commandDispatcher(
+                            EquipItemCommand(null, selectedEntity, "other"),
+                        );
+                    },
+                    icon: sprites2.empty_sprite,
+                },
+            ];
+
+            if (isConsumable) {
+                children.push({
+                    text: "Consume",
+                    onClick: () => {
+                        stateContext.commandDispatcher(
+                            ConsumeItemCommand("other", selectedEntity),
+                        );
+                    },
+                    icon: sprites2.empty_sprite,
+                });
+            }
+
+            items.push({
+                text: "Other",
+                icon: otherItem.asset,
+                children,
+            });
+        } else {
+            items.push({
+                text: "Other",
+                icon: sprites2.empty_sprite,
+                children: [
+                    {
+                        text: "Equip",
+                        onClick: () => {
+                            stateContext.stateChanger.push(
+                                new InventoryState(selectedEntity),
+                            );
+                        },
+                        icon: sprites2.empty_sprite,
+                    },
+                ],
+            });
+        }
     }
 
     addMainEquipmentActions(
@@ -102,29 +143,45 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
     ) {
         const mainItem = equipmentComponent.slots.main;
         if (!!mainItem) {
+            const isConsumable = mainItem.tag?.includes(ItemTag.Consumable);
+            const children: UIActionbarItem[] = [
+                {
+                    text: "Unequip",
+                    onClick: () => {
+                        stateContext.commandDispatcher(
+                            EquipItemCommand(null, selectedEntity, "main"),
+                        );
+                    },
+                    icon: sprites2.empty_sprite,
+                },
+            ];
+
+            if (isConsumable) {
+                children.push({
+                    text: "Consume",
+                    onClick: () => {
+                        stateContext.commandDispatcher(
+                            ConsumeItemCommand("main", selectedEntity),
+                        );
+                    },
+                    icon: sprites2.empty_sprite,
+                });
+            } else {
+                children.push({
+                    text: "Attack",
+                    onClick: () => {
+                        stateContext.stateChanger.push(
+                            new AttackSelectionState(selectedEntity),
+                        );
+                    },
+                    icon: sprites2.empty_sprite,
+                });
+            }
+
             items.push({
                 text: "Main",
                 icon: mainItem.asset,
-                children: [
-                    {
-                        text: "Unequip",
-                        onClick: () => {
-                            stateContext.commandDispatcher(
-                                EquipItemCommand(null, selectedEntity, "main"),
-                            );
-                        },
-                        icon: sprites2.empty_sprite,
-                    },
-                    {
-                        text: "Attack",
-                        onClick: () => {
-                            stateContext.stateChanger.push(
-                                new AttackSelectionState(selectedEntity),
-                            );
-                        },
-                        icon: sprites2.empty_sprite,
-                    },
-                ],
+                children,
             });
         } else {
             const mainIcon = sprites2.empty_sprite;
@@ -179,23 +236,5 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
         ];
 
         return items;
-    }
-
-    private getEmptyOtherEquipmentAction(
-        stateContext: StateContext,
-        selectedEntity: Entity,
-        _equipmentComponent: EquipmentComponent,
-    ): UIActionbarItem[] {
-        return [
-            {
-                text: "Equip",
-                onClick: () => {
-                    stateContext.stateChanger.push(
-                        new InventoryState(selectedEntity),
-                    );
-                },
-                icon: sprites2.empty_sprite,
-            },
-        ];
     }
 }
