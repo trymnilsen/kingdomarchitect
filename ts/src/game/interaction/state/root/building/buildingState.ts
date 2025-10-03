@@ -248,7 +248,7 @@ export class BuildingState extends InteractionState {
 
         return uiScaffold({
             content: scaffoldContent,
-            rightButtons: [
+            leftButtons: [
                 {
                     text: "Build",
                     icon: sprites2.empty_sprite,

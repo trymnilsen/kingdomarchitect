@@ -50,3 +50,34 @@ export type AnimationGraph<T extends AnimationStateMap = AnimationStateMap> = {
     globalTransitions: AnimationTransition[];
     states: Record<string, AnimationState>;
 };
+
+/**
+ * Creates a simple looping animation graph for sprites that don't need
+ * state transitions. Useful for environmental animations like fires,
+ * water, or other ambient effects.
+ *
+ * @param sprite The sprite to loop through its frames
+ * @param speed Number of ticks between frame changes (default: 8)
+ * @returns An AnimationGraph with a single looping state
+ */
+export function loopAnimation(
+    sprite: Sprite2,
+    speed: number = 8,
+): AnimationGraph {
+    const animationKey = `loop_${sprite.id}`;
+
+    return {
+        animationSet: {
+            [animationKey]: sprite,
+        },
+        initialState: "Loop",
+        globalTransitions: [],
+        states: {
+            Loop: {
+                type: "loop",
+                animation: animationKey as AnimationTemplate,
+                speed,
+            },
+        },
+    };
+}

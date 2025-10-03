@@ -31,7 +31,7 @@ export const swampTree2Resource = {
 } as const;
 
 export const swampFlowerResource = {
-    asset: sprites2.swamp_flower,
+    asset: sprites2.swamp_flower_duo,
     id: "swampFlower",
     name: "Swamp Flower",
 } as const;
