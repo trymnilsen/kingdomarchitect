@@ -6,6 +6,7 @@ import type { GameCommand } from "./gameCommand.js";
 
 export type GameMessage =
     | AddEntityGameMessage
+    | RemoveEntityGameMessage
     | SetComponentGameMessage
     | ComponentDeltaGameMessage
     | TransformGameMessage
@@ -13,6 +14,7 @@ export type GameMessage =
     | CommandGameMessage;
 
 export const AddEntityGameMessageType = "addEntity";
+export const RemoveEntityGameMessageType = "removeEntity";
 export const SetComponentGameMessageType = "setComponent";
 export const ComponentDeltaGameMessageType = "componentDelta";
 export const TransformGameMessageType = "transform";
@@ -27,6 +29,11 @@ export type AddEntityGameMessage = {
         parent?: string;
     };
     components: readonly Components[];
+};
+
+export type RemoveEntityGameMessage = {
+    type: typeof RemoveEntityGameMessageType;
+    entity: string;
 };
 
 export type SetComponentGameMessage = {

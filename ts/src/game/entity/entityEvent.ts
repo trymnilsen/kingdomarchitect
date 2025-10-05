@@ -32,7 +32,13 @@ export type EntityTransformEvent = {
 
 export type EntityChildrenUpdatedEvent = {
     id: "child_added" | "child_removed";
+    /**
+     * The entity that had a child added or removed
+     */
     source: Entity;
+    /**
+     * The entity that was added or removed
+     */
     target: Entity;
 };
 

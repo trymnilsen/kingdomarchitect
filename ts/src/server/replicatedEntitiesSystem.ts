@@ -38,6 +38,16 @@ export function makeReplicatedEntitiesSystem(
                     components: event.target.components,
                 });
             },
+            child_removed: (_root, event) => {
+                if (event.target.isGameRoot) {
+                    return;
+                }
+
+                postMessage({
+                    type: "removeEntity",
+                    entity: event.target.id,
+                });
+            },
         },
     };
 }

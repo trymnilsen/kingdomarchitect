@@ -3,11 +3,13 @@ import { effectHandler } from "./effect/effectHandler.js";
 import {
     AddEntityGameMessageType,
     EffectGameMessageType,
+    RemoveEntityGameMessageType,
     SetComponentGameMessageType,
     TransformGameMessageType,
     type AddEntityGameMessage,
     type EffectGameMessage,
     type GameMessage,
+    type RemoveEntityGameMessage,
     type SetComponentGameMessage,
     type TransformGameMessage,
 } from "./gameMessage.js";
@@ -17,6 +19,9 @@ export function handleGameMessage(root: Entity, message: GameMessage) {
     switch (message.type) {
         case AddEntityGameMessageType:
             addEntityHandler(root, message);
+            break;
+        case RemoveEntityGameMessageType:
+            removeEntityHandler(root, message);
             break;
         case SetComponentGameMessageType:
             setComponentHandler(root, message);
@@ -46,6 +51,13 @@ function addEntityHandler(root: Entity, message: AddEntityGameMessage) {
     newEntity.worldPosition = message.entity.position;
     for (const component of message.components) {
         newEntity.setEcsComponent(component);
+    }
+}
+
+function removeEntityHandler(root: Entity, message: RemoveEntityGameMessage) {
+    const entity = root.findEntity(message.entity);
+    if (entity) {
+        entity.remove();
     }
 }
 
