@@ -7,6 +7,11 @@ import {
     createHealthComponent,
     HealthComponentId,
 } from "../../../src/game/component/healthComponent.js";
+import {
+    createInventoryComponent,
+    getInventoryItem,
+    InventoryComponentId,
+} from "../../../src/game/component/inventoryComponent.js";
 import { JobRunnerComponentId } from "../../../src/game/component/jobRunnerComponent.js";
 import { treeResource } from "../../../src/data/inventory/items/naturalResource.js";
 import type { Point } from "../../../src/common/point.js";
@@ -97,6 +102,49 @@ describe("ChopTreeJob", () => {
                 harness.isJobCompleted(),
                 true,
                 "Job should be completed",
+            );
+        });
+
+        it("removes tree and adds wood to inventory when chopped", () => {
+            const harness = new JobTestHarness(
+                { x: 0, y: 0 },
+                { x: 1, y: 0 }, // Adjacent position to avoid movement
+            );
+
+            harness.target.setEcsComponent(
+                createResourceComponent(treeResource),
+            );
+            // Set the health to be destroyed in one hit
+            harness.target.setEcsComponent(createHealthComponent(10, 100));
+
+            // Setup the runner with an empty inventory
+            harness.runner.setEcsComponent(createInventoryComponent());
+
+            const job = ChopTreeJob(harness.target);
+            harness.runner.setEcsComponent({
+                id: JobRunnerComponentId,
+                currentJob: job,
+            });
+
+            const targetId = harness.target.id;
+
+            harness.executeJob(job);
+
+            assert.strictEqual(
+                harness.root.findEntity(targetId),
+                null,
+                "Tree entity should be removed from the world",
+            );
+
+            const inventory =
+                harness.runner.requireEcsComponent(InventoryComponentId);
+
+            const woodStack = getInventoryItem(inventory, "wood");
+            assert.ok(woodStack, "A stack of wood should be in the inventory");
+            assert.strictEqual(
+                woodStack.amount,
+                4,
+                "The amount of wood should be 4",
             );
         });
     });
