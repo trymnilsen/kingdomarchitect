@@ -13,11 +13,13 @@ import { createVisibilityComponent } from "../component/visibilityComponent.js";
 import { createAnimationComponent } from "../component/animationComponent.js";
 import { nobleKnightAnimationGraph } from "../../asset/animation/knight.animation.js";
 import { createDirectionComponent } from "../component/directionComponent.js";
+import { createHealthComponent } from "../component/healthComponent.js";
 
 export function workerPrefab(): Entity {
     const entity = new Entity(generateId("worker"));
     const spriteComponent = createSpriteComponent(sprites2.knight);
     entity.setEcsComponent(spriteComponent);
+    entity.setEcsComponent(createHealthComponent(50, 100));
     entity.setEcsComponent(createPlayerUnitComponent());
     entity.setEcsComponent(createJobRunnerComponent());
     entity.setEcsComponent(createEquipmentComponent());

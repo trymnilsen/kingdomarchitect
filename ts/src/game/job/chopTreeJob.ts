@@ -4,6 +4,12 @@ import { damage, HealthComponentId } from "../component/healthComponent.js";
 import type { Entity } from "../entity/entity.js";
 import { completeJob, type Job, type JobHandler } from "./job.js";
 import { doMovement, MovementResult } from "./movementHelper.js";
+import {
+    addInventoryItem,
+    InventoryComponentId,
+} from "../component/inventoryComponent.js";
+import { treeResource } from "../../data/inventory/items/naturalResource.js";
+import { woodResourceItem } from "../../data/inventory/items/resources.js";
 
 export interface ChopTreeJob extends Job {
     id: typeof ChopTreeJobId;
@@ -61,6 +67,10 @@ export const chopTreeHandler: JobHandler<ChopTreeJob> = (root, runner, job) => {
         // If tree is destroyed, complete the job
         if (healthComponent.currentHp <= 0) {
             completeJob(runner);
+            treeEntity.remove();
+            runner.updateComponent(InventoryComponentId, (inventory) => {
+                addInventoryItem(inventory, woodResourceItem, 4);
+            });
         }
     }
 };

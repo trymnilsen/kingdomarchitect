@@ -75,10 +75,7 @@ function processEffects(
         effectsComponent.effects.splice(effectsToRemove[i], 1);
     }
 
-    // Notify if effects changed
-    if (effectsToRemove.length > 0) {
-        entity.invalidateComponent(ActiveEffectsComponentId);
-    }
+    entity.invalidateComponent(ActiveEffectsComponentId);
 }
 
 function applyEffect(entity: Entity, effect: Effect): void {
