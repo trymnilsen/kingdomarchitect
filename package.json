@@ -25,7 +25,7 @@
         "url": "https://github.com/trymnilsen/kingdomarchitect/issues"
     },
     "dependencies": {
-        "@types/node": "^24.3.1",
+        "@types/node": "^24.7.0",
         "@types/pngjs": "^6.0.5",
         "@typescript/native-preview": "^7.0.0-dev.20251003.1",
         "maxrects-packer": "^2.7.3",
