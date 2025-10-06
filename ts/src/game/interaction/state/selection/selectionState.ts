@@ -22,10 +22,11 @@ import {
     uiColumn,
     uiRow,
     CrossAxisAlignment,
+    MainAxisAlignment,
 } from "../../../../ui/declarative/uiSequence.js";
 import { uiText } from "../../../../ui/declarative/uiText.js";
 import { uiImage } from "../../../../ui/declarative/uiImage.js";
-import { wrapUiSize } from "../../../../ui/uiSize.js";
+import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize.js";
 import { NinePatchBackground } from "../../../../ui/uiBackground.js";
 import {
     titleTextStyle,
@@ -143,43 +144,51 @@ export class SelectionState extends InteractionState {
     private createSelectionInfoPanel(
         selectionInfo: SelectionInfo,
     ): ComponentDescriptor {
-        return uiBox({
-            width: wrapUiSize,
-            height: wrapUiSize,
-            padding: 8,
-            background: new NinePatchBackground(
-                sprites2.stone_slate_background,
-                allSides(8),
-                1.0,
-            ),
-            child: uiRow({
-                width: wrapUiSize,
-                height: wrapUiSize,
-                gap: 8,
-                crossAxisAlignment: CrossAxisAlignment.Center,
-                children: [
-                    uiImage({
-                        sprite: selectionInfo.icon,
-                        width: 32,
-                        height: 32,
-                    }),
-                    uiColumn({
+        return uiColumn({
+            height: fillUiSize,
+            width: fillUiSize,
+            crossAxisAlignment: CrossAxisAlignment.Start,
+            mainAxisAlignment: MainAxisAlignment.End,
+            children: [
+                uiBox({
+                    width: wrapUiSize,
+                    height: wrapUiSize,
+                    padding: 8,
+                    background: new NinePatchBackground(
+                        sprites2.stone_slate_background,
+                        allSides(8),
+                        1.0,
+                    ),
+                    child: uiRow({
                         width: wrapUiSize,
                         height: wrapUiSize,
-                        crossAxisAlignment: CrossAxisAlignment.Start,
+                        gap: 8,
+                        crossAxisAlignment: CrossAxisAlignment.Center,
                         children: [
-                            uiText({
-                                content: selectionInfo.title,
-                                textStyle: titleTextStyle,
+                            uiImage({
+                                sprite: selectionInfo.icon,
+                                width: 32,
+                                height: 32,
                             }),
-                            uiText({
-                                content: selectionInfo.subtitle,
-                                textStyle: subTitleTextStyle,
+                            uiColumn({
+                                width: wrapUiSize,
+                                height: wrapUiSize,
+                                crossAxisAlignment: CrossAxisAlignment.Start,
+                                children: [
+                                    uiText({
+                                        content: selectionInfo.title,
+                                        textStyle: titleTextStyle,
+                                    }),
+                                    uiText({
+                                        content: selectionInfo.subtitle,
+                                        textStyle: subTitleTextStyle,
+                                    }),
+                                ],
                             }),
                         ],
                     }),
-                ],
-            }),
+                }),
+            ],
         });
     }
 
