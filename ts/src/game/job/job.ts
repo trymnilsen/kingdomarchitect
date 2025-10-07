@@ -23,3 +23,16 @@ export function completeJob(entity: Entity) {
     runner.currentJob = null;
     entity.invalidateComponent(JobRunnerComponentId);
 }
+
+export function isTargetOfJob(job: Jobs, entity: Entity): boolean {
+    switch (job.id) {
+        case "attackJob":
+            return job.target == entity.id;
+        case "buildBuildingJob":
+            return job.entityId == entity.id;
+        case "chopTreeJob":
+            return job.entityId == entity.id;
+        case "moveToJob":
+            return false;
+    }
+}

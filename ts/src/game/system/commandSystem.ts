@@ -102,6 +102,7 @@ function buildBuilding(root: Entity, command: BuildCommand) {
 function queueJob(root: Entity, command: QueueJobCommand) {
     const jobQueue = root.requireEcsComponent(JobQueueComponentId);
     jobQueue.jobs.push(command.job);
+    root.invalidateComponent(JobQueueComponentId);
 }
 
 function equipItem(root: Entity, command: EquipItemCommand) {

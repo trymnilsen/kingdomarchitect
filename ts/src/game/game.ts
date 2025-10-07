@@ -20,6 +20,7 @@ import { renderSystem } from "./system/renderSystem.js";
 import { createVisibilityMapComponent } from "./component/visibilityMapComponent.js";
 import { handleGameMessage } from "../server/message/gameMessageHandler.js";
 import { animationSystem } from "./system/animationSystem.js";
+import { createJobQueueComponent } from "./component/jobQueueComponent.js";
 
 export class Game {
     private renderer: Renderer;
@@ -90,6 +91,7 @@ export class Game {
     }
 
     private addClientOnlyComponents() {
+        this.ecsWorld.root.setEcsComponent(createJobQueueComponent());
         this.ecsWorld.root.setEcsComponent(createVisibilityMapComponent());
     }
 

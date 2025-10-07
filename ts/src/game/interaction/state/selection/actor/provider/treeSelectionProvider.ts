@@ -10,6 +10,7 @@ import { ResourceComponentId } from "../../../../../component/resourceComponent.
 import { sprites2 } from "../../../../../../asset/sprite.js";
 import { ChopTreeJob } from "../../../../../job/chopTreeJob.js";
 import { QueueJobCommand } from "../../../../../../server/message/command/queueJobCommand.js";
+import { queryForJobsWithTarget } from "../../../../../job/query.js";
 
 export class TreeSelectionProvider implements ActorSelectionProvider {
     provideButtons(
@@ -21,22 +22,36 @@ export class TreeSelectionProvider implements ActorSelectionProvider {
             const resourceComponent =
                 selectedEntity.getEcsComponent(ResourceComponentId);
             if (!!resourceComponent) {
-                return {
-                    left: [
-                        {
-                            text: "Chop",
-                            icon: sprites2.empty_sprite,
-                            onClick: () => {
-                                const job = ChopTreeJob(selectedEntity);
-                                stateContext.commandDispatcher(
-                                    QueueJobCommand(job),
-                                );
-                                stateContext.stateChanger.pop(null);
+                const jobsOnTree = queryForJobsWithTarget(selectedEntity);
+                if (jobsOnTree.length > 0) {
+                    return {
+                        left: [
+                            {
+                                text: "Cancel Job",
+                                icon: sprites2.empty_sprite,
+                                onClick: () => {},
                             },
-                        },
-                    ],
-                    right: [],
-                };
+                        ],
+                        right: [],
+                    };
+                } else {
+                    return {
+                        left: [
+                            {
+                                text: "Chop",
+                                icon: sprites2.empty_sprite,
+                                onClick: () => {
+                                    const job = ChopTreeJob(selectedEntity);
+                                    stateContext.commandDispatcher(
+                                        QueueJobCommand(job),
+                                    );
+                                    //stateContext.stateChanger.pop(null);
+                                },
+                            },
+                        ],
+                        right: [],
+                    };
+                }
             } else {
                 return emptySelection;
             }

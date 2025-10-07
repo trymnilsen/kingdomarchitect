@@ -8,14 +8,13 @@
     "license": "Kingdom Architect Open License (KAOL-1.0)",
     "homepage": "https://github.com/trymnilsen/kingdomarchitect#readme",
     "scripts": {
-        "build": "tsgo && rollup -c",
-        "build:tsc": "tsgo --extendedDiagnostics",
+        "build": "tsc && rollup -c",
+        "build:tsc": "tsc",
         "serve": "node ts/tool/dev-server.ts",
-        "spritepack": "tsgo && node build/tool/spritepack/spritePack.js && npm run build",
-        "test": "tsgo && node --test --test-reporter=dot 'build/**/*.test.js'",
+        "spritepack": "tsc && node build/tool/spritepack/spritePack.js && npm run build",
+        "test": "tsc && node --test --test-reporter=dot 'build/**/*.test.js'",
         "format": "prettier ts/ --write",
-        "check-format": "prettier --check ts/**/*.ts",
-        "lint": "oxlint -c oxlintrc.json"
+        "check-format": "prettier --check ts/**/*.ts"
     },
     "repository": {
         "type": "git",
@@ -25,14 +24,13 @@
         "url": "https://github.com/trymnilsen/kingdomarchitect/issues"
     },
     "dependencies": {
-        "@types/node": "^24.3.1",
+        "@types/node": "^24.7.0",
         "@types/pngjs": "^6.0.5",
-        "@typescript/native-preview": "^7.0.0-dev.20251003.1",
         "maxrects-packer": "^2.7.3",
         "pngjs": "^7.0.0",
         "prettier": "^3.5.3",
-        "rollup": "^4.52.3",
+        "rollup": "^4.52.4",
         "rollup-plugin-sourcemaps2": "^0.5.4",
-        "typescript": "^5.9.2"
+        "typescript": "^5.9.3"
     }
 }

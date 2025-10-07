@@ -1,8 +1,8 @@
-import type { Job } from "../job/job.js";
+import type { Jobs } from "../job/job.js";
 
 export type JobRunnerComponent = {
     id: typeof JobRunnerComponentId;
-    currentJob: Job | null;
+    currentJob: Jobs | null;
 };
 
 export function createJobRunnerComponent(): JobRunnerComponent {
