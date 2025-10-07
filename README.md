@@ -9,7 +9,7 @@ Medieval simulation and city builder game for the browser. Built in typescript, 
   - 🧠 A goal oriented action planner (GOAP) for npc behaviour
   - 🎨 A 2D canvas renderer with typesafe asset references via codegen.
   - 📡 Single and multiplayer architecture over websockets
-  - 💾 Unified persistence for IndexedDB and SQLite with declarative migrations
+  - 💾 Unified persistence for IndexedDB (singleplayer) and SQLite (multiplayer) with declarative migrations
 
 ![Screenshot of the game](doc/screenshot/screenshot.gif)
 
