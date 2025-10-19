@@ -5,19 +5,20 @@ import { Entity } from "../entity/entity.js";
 
 export function interiorPrefab(id: string): Entity {
     const interiorEntity = new Entity(id);
+
+    for (const point of floors) {
+        const entity = new Entity(generateId("wall"));
+        entity.worldPosition = point;
+        entity.setEcsComponent(createSpriteComponent(sprites2.interior_floor));
+        interiorEntity.addChild(entity);
+    }
+
     for (const point of walls) {
         const entity = new Entity(generateId("wall"));
         entity.worldPosition = point;
         entity.setEcsComponent(
             createSpriteComponent(sprites2.interior_wood_wall_right_left),
         );
-        interiorEntity.addChild(entity);
-    }
-
-    for (const point of floors) {
-        const entity = new Entity(generateId("wall"));
-        entity.worldPosition = point;
-        entity.setEcsComponent(createSpriteComponent(sprites2.interior_floor));
         interiorEntity.addChild(entity);
     }
 
@@ -30,7 +31,7 @@ export function interiorPrefab(id: string): Entity {
 
     const tableEntity = new Entity(generateId("table"));
     tableEntity.worldPosition = { x: 2, y: 2 };
-    tableEntity.setEcsComponent(createSpriteComponent(sprites2.interior_door));
+    tableEntity.setEcsComponent(createSpriteComponent(sprites2.interior_table));
     interiorEntity.addChild(tableEntity);
 
     const doorEntity = new Entity(generateId("door"));

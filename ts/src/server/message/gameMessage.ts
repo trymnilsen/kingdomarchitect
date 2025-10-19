@@ -21,15 +21,17 @@ export const TransformGameMessageType = "transform";
 export const EffectGameMessageType = "effect";
 export const CommandGameMessageType = "command";
 
+export type ReplicatedEntityData = {
+    id: string;
+    position: Point;
+    parent?: string;
+    components: readonly Components[];
+    children?: ReplicatedEntityData[];
+};
+
 export type AddEntityGameMessage = {
     type: typeof AddEntityGameMessageType;
-    entity: {
-        id: string;
-        position: Point;
-        parent?: string;
-    };
-    components: readonly Components[];
-};
+} & ReplicatedEntityData;
 
 export type RemoveEntityGameMessage = {
     type: typeof RemoveEntityGameMessageType;

@@ -1,6 +1,10 @@
 import { EcsSystem } from "../common/ecs/ecsSystem.js";
 import { JobQueueComponentId } from "../game/component/jobQueueComponent.js";
-import type { GameMessage } from "./message/gameMessage.js";
+import { Entity } from "../game/entity/entity.js";
+import type {
+    GameMessage,
+    ReplicatedEntityData,
+} from "./message/gameMessage.js";
 
 export function makeReplicatedEntitiesSystem(
     postMessage: (message: GameMessage) => void,
@@ -32,14 +36,16 @@ export function makeReplicatedEntitiesSystem(
                 if (event.target.isGameRoot) {
                     return;
                 }
+
+                const children = buildChildrenData(event.target);
+
                 postMessage({
                     type: "addEntity",
-                    entity: {
-                        id: event.target.id,
-                        parent: event.target.parent?.id,
-                        position: event.target.worldPosition,
-                    },
+                    id: event.target.id,
+                    parent: event.target.parent?.id,
+                    position: event.target.worldPosition,
                     components: event.target.components,
+                    children: children.length > 0 ? children : undefined,
                 });
             },
             child_removed: (_root, event) => {
@@ -54,4 +60,30 @@ export function makeReplicatedEntitiesSystem(
             },
         },
     };
+}
+
+/**
+ * Recursively build the children data for an entity
+ */
+function buildChildrenData(entity: Entity): ReplicatedEntityData[] {
+    const children: ReplicatedEntityData[] = [];
+
+    for (const child of entity.children) {
+        const childData: ReplicatedEntityData = {
+            id: child.id,
+            parent: child.parent?.id,
+            position: child.worldPosition,
+            components: child.components,
+        };
+
+        // Recursively gather nested children
+        const nestedChildren = buildChildrenData(child);
+        if (nestedChildren.length > 0) {
+            childData.children = nestedChildren;
+        }
+
+        children.push(childData);
+    }
+
+    return children;
 }
