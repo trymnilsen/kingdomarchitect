@@ -47,6 +47,7 @@ import {
     LoadSpaceCommandId,
 } from "../../server/message/command/enterSpaceCommand.js";
 import { interiorPrefab } from "../prefab/interiorPrefab.js";
+import { overWorldId } from "../map/spaces.js";
 
 export const commandSystem: EcsSystem = {
     onGameMessage,
@@ -66,7 +67,11 @@ function onGameMessage(root: Entity, _scope: Entity, message: GameMessage) {
             equipItem(root, message.command as EquipItemCommand);
             break;
         case BuildCommandId:
-            buildBuilding(root, message.command as BuildCommand);
+            const overWorld = root.children.find(
+                (child) => child.id == overWorldId,
+            );
+            if (!overWorld) throw new Error("No overworld found, cannot build");
+            buildBuilding(overWorld, message.command as BuildCommand);
             break;
         case AttackCommandId:
             attackTarget(root, message.command as AttackCommand);
@@ -92,7 +97,7 @@ function attackTarget(root: Entity, command: AttackCommand) {
     });
 }
 
-function buildBuilding(root: Entity, command: BuildCommand) {
+function buildBuilding(overworld: Entity, command: BuildCommand) {
     //Check if we have enough to build
     //Add entities for each
     const points = Array.isArray(command.position)
@@ -107,11 +112,13 @@ function buildBuilding(root: Entity, command: BuildCommand) {
     for (const point of points) {
         const buildingEntity = buildingPrefab(building, true);
         buildingEntity.worldPosition = point;
-        root.addChild(buildingEntity);
+        overworld.addChild(buildingEntity);
         const job = BuildBuildingJob(buildingEntity);
-        root.updateComponent(JobQueueComponentId, (component) => {
-            component.jobs.push(job);
-        });
+        overworld
+            .getRootEntity()
+            .updateComponent(JobQueueComponentId, (component) => {
+                component.jobs.push(job);
+            });
     }
 }
 

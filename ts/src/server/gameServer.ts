@@ -11,6 +11,7 @@ import { createEffectEmitterComponent } from "../game/component/effectEmitterCom
 import type { GameMessage } from "./message/gameMessage.js";
 import { commandSystem } from "../game/system/commandSystem.js";
 import { effectSystem } from "../game/system/effectSystem.js";
+import { createTileComponent } from "../game/component/tileComponent.js";
 
 export class GameServer {
     private world: EcsWorld;
@@ -27,6 +28,7 @@ export class GameServer {
     }
 
     private addComponents() {
+        this.world.scopedRoot.setEcsComponent(createTileComponent());
         this.world.root.setEcsComponent(
             createEffectEmitterComponent((effect) => {
                 this.postMessage({
@@ -35,7 +37,7 @@ export class GameServer {
                 });
             }),
         );
-        this.world.root.setEcsComponent(createWorldDiscoveryComponent());
+        this.world.scopedRoot.setEcsComponent(createWorldDiscoveryComponent());
     }
 
     private addSystems() {

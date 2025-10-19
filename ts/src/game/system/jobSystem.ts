@@ -18,7 +18,7 @@ function onInit(root: Entity) {
     root.setEcsComponent(createJobQueueComponent());
 }
 
-function updateJobs(root: Entity, _scope: Entity, _gameTime: number) {
+function updateJobs(root: Entity, scope: Entity, _gameTime: number) {
     const queue = root.requireEcsComponent(JobQueueComponentId);
     const runners = root.queryComponents(JobRunnerComponentId);
     for (const [entity, component] of runners) {
@@ -28,6 +28,11 @@ function updateJobs(root: Entity, _scope: Entity, _gameTime: number) {
             const availableJobs = queue.jobs.filter((job) => job);
             const selectedJob = availableJobs.shift();
             if (!!selectedJob) {
+                console.log(
+                    "Assigning job to runner",
+                    selectedJob.id,
+                    entity.id,
+                );
                 //The shift only removes from the filtered list, we also need
                 //to remove if from the queue
                 removeItem(queue.jobs, selectedJob);
@@ -47,6 +52,6 @@ function updateJobs(root: Entity, _scope: Entity, _gameTime: number) {
             continue;
         }
         console.log("Updating job", currentJob.id);
-        handler(root, entity, currentJob);
+        handler(scope, entity, currentJob);
     }
 }

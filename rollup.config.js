@@ -7,6 +7,7 @@ export default [
         plugins: [sourcemaps()],
         output: {
             sourcemap: true,
+            sourceRoot: "game://",
             file: "public/dist/bundle.js",
             format: "esm",
         },
@@ -16,6 +17,7 @@ export default [
         plugins: [sourcemaps()],
         output: {
             sourcemap: true,
+            sourceRoot: "worker://",
             file: "public/dist/server/webWorkerServer.js",
             format: "esm",
         },

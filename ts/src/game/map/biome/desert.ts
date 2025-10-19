@@ -8,9 +8,8 @@ import type { TileChunk } from "../chunk.js";
 import { fixed, placeResource, random } from "./placeResource.js";
 
 export function generateDesert(chunk: TileChunk, chunkEntity: Entity) {
-    const chunkMap = chunkEntity
-        .getRootEntity()
-        .requireEcsComponent(ChunkMapComponentId);
+    const chunkMap =
+        chunkEntity.requireAncestorEcsComponent(ChunkMapComponentId);
 
     placeResource(fixed(16), cactusResource, chunk, chunkEntity, chunkMap);
     placeResource(

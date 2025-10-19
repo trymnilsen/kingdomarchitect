@@ -5,6 +5,7 @@ import {
 } from "../../common/pattern.js";
 import { pointEquals, type Point } from "../../common/point.js";
 import type { DiscoverTileEffect } from "../../server/message/effect/discoverTileEffect.js";
+import type { GameEffect } from "../../server/message/effect/gameEffect.js";
 import { EffectEmitterComponentId } from "../component/effectEmitterComponent.js";
 import {
     getChunk,
@@ -34,13 +35,15 @@ export const worldGenerationSystem: EcsSystem = {
  * Initializes the world generation system.
  * Adds the initial player chunk and discovers tiles around it.
  */
-function onInit(_root: Entity, scope: Entity) {
-    //TODO: Should send a set ChunkEvent
+function onInit(root: Entity, scope: Entity) {
     const start = addInitialPlayerChunk(scope);
     //Discover the tiles for the player, we should make this more dynamic
     const worldDiscovery = scope.getEcsComponent(WorldDiscoveryComponentId);
+    const effectEmitter = root.requireEcsComponent(
+        EffectEmitterComponentId,
+    ).emitter;
     const pattern = offsetPatternWithPoint(start, generateDiamondPattern(16));
-    setDiscoveryForPlayer(scope, "player", pattern);
+    setDiscoveryForPlayer(scope, effectEmitter, "player", pattern);
 }
 
 type ChunkToGenerate = {
@@ -55,13 +58,13 @@ type ChunkToGenerate = {
  * @param discoveredPoints An array of points that have been discovered.
  */
 export function setDiscoveryForPlayer(
-    root: Entity,
+    scope: Entity,
+    effectEmitter: (effect: GameEffect) => void,
     player: string,
     discoveredPoints: Point[],
 ) {
-    const effectEmitter = root.requireEcsComponent(EffectEmitterComponentId);
-    const tileComponent = root.requireEcsComponent(TileComponentId);
-    const worldDiscovery = root.requireEcsComponent(WorldDiscoveryComponentId);
+    const tileComponent = scope.requireEcsComponent(TileComponentId);
+    const worldDiscovery = scope.requireEcsComponent(WorldDiscoveryComponentId);
 
     const chunksToGenerate: ChunkToGenerate[] = [];
     const newPoints: { point: Point; volumeId: string }[] = [];
@@ -83,10 +86,10 @@ export function setDiscoveryForPlayer(
 
     for (const chunkToGenerate of chunksToGenerate) {
         const generatedChunk = generateChunk(
-            root,
+            scope,
             chunkToGenerate.chunkPosition,
         );
-        root.updateComponent(TileComponentId, (component) => {
+        scope.updateComponent(TileComponentId, (component) => {
             setChunk(component, generatedChunk);
         });
         //Check if the volume of the new chunk has been discovered by the
@@ -117,13 +120,13 @@ export function setDiscoveryForPlayer(
         volumes: newVolumesToDiscover,
     };
 
-    root.updateComponent(WorldDiscoveryComponentId, (component) => {
+    scope.updateComponent(WorldDiscoveryComponentId, (component) => {
         for (const point of discoveredPoints) {
             discoverTile(component, player, point);
         }
     });
 
-    effectEmitter.emitter(effect);
+    effectEmitter(effect);
 }
 
 /**

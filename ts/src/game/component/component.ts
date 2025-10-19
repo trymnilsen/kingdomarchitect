@@ -13,6 +13,7 @@ import type { KingdomComponent } from "./kingdomComponent.js";
 import type { PathfindingGraphComponent } from "./pathfindingGraphComponent.js";
 import type { PlayerUnitComponent } from "./playerUnitComponent.js";
 import type { ResourceComponent } from "./resourceComponent.js";
+import type { SpaceComponent } from "./spaceComponent.js";
 import type { SpriteComponent } from "./spriteComponent.js";
 import type { TileComponent } from "./tileComponent.js";
 import type { VisibilityComponent } from "./visibilityComponent.js";
@@ -39,7 +40,8 @@ export type Components =
     | PathfindingGraphComponent
     | KingdomComponent
     | DirectionComponent
-    | ActiveEffectsComponent;
+    | ActiveEffectsComponent
+    | SpaceComponent;
 
 export interface BaseComponent {
     id: string;

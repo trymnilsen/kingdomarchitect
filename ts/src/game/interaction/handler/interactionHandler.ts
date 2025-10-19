@@ -11,9 +11,7 @@ import { uiBox } from "../../../ui/declarative/uiBox.js";
 import { fillUiSize } from "../../../ui/uiSize.js";
 import { Camera } from "../../../rendering/camera.js";
 import { RenderScope } from "../../../rendering/renderScope.js";
-import {
-    ChunkMapComponentId
-} from "../../component/chunkMapComponent.js";
+import { ChunkMapComponentId } from "../../component/chunkMapComponent.js";
 import { getTile, TileComponentId } from "../../component/tileComponent.js";
 import { Entity } from "../../entity/entity.js";
 import { SelectionState } from "../state/selection/selectionState.js";
@@ -22,6 +20,7 @@ import { InteractionStateHistory } from "./interactionStateHistory.js";
 import { StateContext } from "./stateContext.js";
 import type { GameCommand } from "../../../server/message/gameCommand.js";
 import { queryEntity } from "../../map/query/queryEntity.js";
+import type { EcsWorld } from "../../../common/ecs/ecsWorld.js";
 
 /**
  * The interactionHandler recieves input taps and forward them to the currently
@@ -29,14 +28,14 @@ import { queryEntity } from "../../map/query/queryEntity.js";
  */
 export class InteractionHandler {
     private camera: Camera;
-    private world: Entity;
+    private world: EcsWorld;
     private interactionStateChanger: CommitableInteractionStateChanger;
     private history: InteractionStateHistory;
     private stateContext: StateContext;
     private uiRenderer: UiRenderer;
     private stateInstanceCounter = 0;
     constructor(
-        world: Entity,
+        ecsWorld: EcsWorld,
         camera: Camera,
         assets: AssetLoader,
         time: GameTime,
@@ -46,10 +45,11 @@ export class InteractionHandler {
     ) {
         this.uiRenderer = uiRenderer;
         this.interactionStateChanger = new CommitableInteractionStateChanger();
-        this.world = world;
         this.camera = camera;
+        this.world = ecsWorld;
         this.stateContext = {
-            root: this.world,
+            root: this.world.root,
+            world: this.world,
             assets: assets,
             stateChanger: this.interactionStateChanger,
             gameTime: time,
@@ -172,7 +172,7 @@ export class InteractionHandler {
 
             // Check if a tile was clicked at this position
             const tileComponent =
-                this.world.requireEcsComponent(TileComponentId);
+                this.world.scopedRoot.requireEcsComponent(TileComponentId);
 
             const tile = getTile(tileComponent, tilePosition);
 
@@ -184,10 +184,13 @@ export class InteractionHandler {
                         "Tap not handled by state, checking for selection",
                     );
 
-                    const entitiesAt = queryEntity(this.stateContext.root, {
-                        x: tile.tileX,
-                        y: tile.tileY,
-                    });
+                    const entitiesAt = queryEntity(
+                        this.stateContext.world.scopedRoot,
+                        {
+                            x: tile.tileX,
+                            y: tile.tileY,
+                        },
+                    );
 
                     let selection: SelectedWorldItem;
                     if (entitiesAt.length > 0) {

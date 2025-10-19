@@ -8,8 +8,8 @@ import { getChunk } from "../../component/tileComponent.js";
 import type { Entity } from "../../entity/entity.js";
 import type { Volume } from "../volume.js";
 
-export function queryEntity(root: Entity, point: Point): Entity[] {
-    const chunkmap = root.requireEcsComponent(ChunkMapComponentId);
+export function queryEntity(scope: Entity, point: Point): Entity[] {
+    const chunkmap = scope.requireEcsComponent(ChunkMapComponentId);
     return getEntitiesAt(chunkmap, point.x, point.y);
 }
 

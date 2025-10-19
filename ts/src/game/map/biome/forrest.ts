@@ -10,9 +10,8 @@ import { placeRocks } from "../item/rocks.js";
 import { fixed, placeResource, random } from "./placeResource.js";
 
 export function generateForrest(chunk: TileChunk, chunkEntity: Entity) {
-    const chunkMap = chunkEntity
-        .getRootEntity()
-        .requireEcsComponent(ChunkMapComponentId);
+    const chunkMap =
+        chunkEntity.requireAncestorEcsComponent(ChunkMapComponentId);
 
     placeResource(fixed(16), treeResource, chunk, chunkEntity, chunkMap);
     placeResource(random(3), stoneResource, chunk, chunkEntity, chunkMap);

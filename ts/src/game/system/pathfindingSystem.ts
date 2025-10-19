@@ -20,18 +20,18 @@ export const pathfindingSystem: EcsSystem = {
     },
 };
 
-function init(root: Entity) {
+function init(_root: Entity, scope: Entity) {
     const component: PathfindingGraphComponent = {
         id: PathfindingGraphComponentId,
         pathCache: new PathCache(),
-        graph: createLazyGraphFromRootNode(root),
+        graph: createLazyGraphFromRootNode(scope),
     };
 
-    root.setEcsComponent(component);
+    scope.setEcsComponent(component);
 }
 
-function onTransform(rootEntity: Entity, entityEvent: EntityTransformEvent) {
-    const graphComponent = rootEntity.requireEcsComponent(
+function onTransform(_rootEntity: Entity, entityEvent: EntityTransformEvent) {
+    const graphComponent = entityEvent.source.requireAncestorEcsComponent(
         PathfindingGraphComponentId,
     );
 
@@ -39,10 +39,10 @@ function onTransform(rootEntity: Entity, entityEvent: EntityTransformEvent) {
 }
 
 function onEntityAdded(
-    rootEntity: Entity,
+    _rootEntity: Entity,
     entityEvent: EntityChildrenUpdatedEvent,
 ) {
-    const graphComponent = rootEntity.requireEcsComponent(
+    const graphComponent = entityEvent.target.requireAncestorEcsComponent(
         PathfindingGraphComponentId,
     );
 
@@ -50,10 +50,10 @@ function onEntityAdded(
 }
 
 function onEntityRemoved(
-    rootEntity: Entity,
+    _rootEntity: Entity,
     entityEvent: EntityChildrenUpdatedEvent,
 ) {
-    const graphComponent = rootEntity.requireEcsComponent(
+    const graphComponent = entityEvent.target.requireAncestorEcsComponent(
         PathfindingGraphComponentId,
     );
     graphComponent.graph?.invalidatePoint(entityEvent.target.worldPosition);

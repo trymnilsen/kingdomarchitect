@@ -9,9 +9,8 @@ import type { TileChunk } from "../chunk.js";
 import { placeResource, fixed, random } from "./placeResource.js";
 
 export function generatePlains(chunk: TileChunk, chunkEntity: Entity) {
-    const chunkMap = chunkEntity
-        .getRootEntity()
-        .requireEcsComponent(ChunkMapComponentId);
+    const chunkMap =
+        chunkEntity.requireAncestorEcsComponent(ChunkMapComponentId);
 
     placeResource(fixed(16), grassResource, chunk, chunkEntity, chunkMap);
     placeResource(random(3), stoneResource, chunk, chunkEntity, chunkMap);

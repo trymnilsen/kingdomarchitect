@@ -27,6 +27,7 @@ import { EntityEvent } from "./entityEvent.js";
 export class Entity {
     private _isGameRoot = false;
     private _parent?: Entity;
+    private _tags: Set<string> | undefined;
     private _children: Entity[] = [];
     private _localPosition: Point = zeroPoint();
     private _worldPosition: Point = zeroPoint();
@@ -151,6 +152,10 @@ export class Entity {
     get components(): ReadonlyArray<Readonly<Components>> {
         return Array.from(this._ecsComponents.values());
     }
+
+    get tags(): ReadonlySet<string> {
+        return this._tags ?? emptySet;
+    }
     /**
      * Set if this entity is the root of the entity tree
      */
@@ -166,6 +171,26 @@ export class Entity {
         }
 
         this._isGameRoot = value;
+    }
+
+    addTag(tag: string) {
+        if (!this._tags) {
+            this._tags = new Set();
+        }
+
+        this._tags.add(tag);
+    }
+
+    removeTag(tag: string) {
+        if (!this._tags) {
+            return;
+        }
+
+        this._tags.delete(tag);
+    }
+
+    clearTags() {
+        this._tags?.clear();
     }
 
     /**
@@ -297,6 +322,52 @@ export class Entity {
         }
 
         return component;
+    }
+
+    getAncestorEcsComponent<ID extends ComponentID>(
+        componentId: ID,
+    ): Extract<Components, { id: ID }> | null {
+        let current: Entity | undefined = this;
+        while (current) {
+            const component = current.getEcsComponent(componentId);
+            if (component) {
+                return component;
+            }
+            current = current.parent;
+        }
+        return null;
+    }
+
+    requireAncestorEcsComponent<ID extends ComponentID>(
+        componentId: ID,
+    ): Extract<Components, { id: ID }> {
+        const component = this.getAncestorEcsComponent(componentId);
+        if (!component) {
+            throw new Error(`No ancestor component of type ${componentId}`);
+        }
+
+        return component;
+    }
+
+    getAncestorEntity<ID extends ComponentID>(componentId: ID): Entity | null {
+        let current: Entity | undefined = this;
+        while (current) {
+            const component = current.getEcsComponent(componentId);
+            if (component) {
+                return current;
+            }
+            current = current.parent;
+        }
+        return null;
+    }
+
+    requireAncestorEntity<ID extends ComponentID>(componentId: ID): Entity {
+        const entity = this.getAncestorEntity(componentId);
+        if (!entity) {
+            throw new Error(`No ancestor component of type ${componentId}`);
+        }
+
+        return entity;
     }
 
     hasComponent<ID extends ComponentID>(componentId: ID): boolean {
@@ -440,6 +511,8 @@ export function assertEntity(
         throw new Error("Entity has not been resolved from id");
     }
 }
+
+const emptySet = new Set<string>();
 
 /**
  * Makes it more readable that we are referring to a an Entity ID

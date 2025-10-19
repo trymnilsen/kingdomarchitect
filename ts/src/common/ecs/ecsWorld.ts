@@ -1,9 +1,10 @@
-import { createTileComponent } from "../../game/component/tileComponent.js";
+import { createSpaceComponent } from "../../game/component/spaceComponent.js";
 import { Entity } from "../../game/entity/entity.js";
 import {
     EntityEventType,
     type EntityEvent,
 } from "../../game/entity/entityEvent.js";
+import { overWorldId } from "../../game/map/spaces.js";
 import { DrawMode } from "../../rendering/drawMode.js";
 import { RenderScope } from "../../rendering/renderScope.js";
 import type { GameCommand } from "../../server/message/gameCommand.js";
@@ -49,11 +50,11 @@ export class EcsWorld {
 
     constructor() {
         this.rootEntity = new Entity("root");
-        const overworld = new Entity("overworld");
+        const overworld = new Entity(overWorldId);
+        overworld.setEcsComponent(createSpaceComponent());
         this.rootEntity.addChild(overworld);
         this.scopedEntity = overworld;
         this.rootEntity.toggleIsGameRoot(true);
-        this.rootEntity.setEcsComponent(createTileComponent());
         this.rootEntity.entityEvent = this.runEvent;
     }
 

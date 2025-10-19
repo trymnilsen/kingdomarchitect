@@ -1,11 +1,12 @@
 import { sprites2 } from "../../asset/sprite.js";
 import { generateId } from "../../common/idGenerator.js";
+import { createSpaceComponent } from "../component/spaceComponent.js";
 import { createSpriteComponent } from "../component/spriteComponent.js";
 import { Entity } from "../entity/entity.js";
 
 export function interiorPrefab(id: string): Entity {
     const interiorEntity = new Entity(id);
-
+    interiorEntity.setEcsComponent(createSpaceComponent());
     for (const point of floors) {
         const entity = new Entity(generateId("wall"));
         entity.worldPosition = point;

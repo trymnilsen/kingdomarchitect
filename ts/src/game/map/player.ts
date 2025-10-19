@@ -13,10 +13,10 @@ import { trainingDummyPrefab } from "../prefab/trainingDummyPrefab.js";
 import { workerPrefab } from "../prefab/workerPrefab.js";
 import { generateSpawnPoints } from "./item/vegetation.js";
 
-export function addInitialPlayerChunk(rootEntity: Entity): Point {
+export function addInitialPlayerChunk(scopedEntity: Entity): Point {
     const chunkEntity = new Entity("chunk");
-    rootEntity.addChild(chunkEntity);
-    const tiles = rootEntity.requireEcsComponent(TileComponentId);
+    scopedEntity.addChild(chunkEntity);
+    const tiles = scopedEntity.requireEcsComponent(TileComponentId);
     const randomOffsetX = Math.round(Math.random() * 3) + 1;
     const randomOffsetY = Math.round(Math.random() * 3) + 1;
     const firstWorker = workerPrefab();
@@ -30,7 +30,7 @@ export function addInitialPlayerChunk(rootEntity: Entity): Point {
     chunkEntity.addChild(firstTree);
     chunkEntity.addChild(trainingDummy);
 
-    rootEntity.updateComponent(TileComponentId, (component) => {
+    scopedEntity.updateComponent(TileComponentId, (component) => {
         setChunk(component, {
             chunkX: 0,
             chunkY: 0,
@@ -44,9 +44,7 @@ export function addInitialPlayerChunk(rootEntity: Entity): Point {
             },
         });
     });
-    const chunkMap = chunkEntity
-        .getRootEntity()
-        .requireEcsComponent(ChunkMapComponentId);
+    const chunkMap = scopedEntity.requireEcsComponent(ChunkMapComponentId);
 
     const trees = generateSpawnPoints(16, { x: 0, y: 0 }, chunkMap);
     for (const tree of trees) {

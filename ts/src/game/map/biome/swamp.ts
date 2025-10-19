@@ -9,9 +9,8 @@ import type { TileChunk } from "../chunk.js";
 import { fixed, placeResource, random } from "./placeResource.js";
 
 export function generateSwamp(chunk: TileChunk, chunkEntity: Entity) {
-    const chunkMap = chunkEntity
-        .getRootEntity()
-        .requireEcsComponent(ChunkMapComponentId);
+    const chunkMap =
+        chunkEntity.requireAncestorEcsComponent(ChunkMapComponentId);
 
     placeResource(fixed(8), swampTreeResource, chunk, chunkEntity, chunkMap);
     placeResource(fixed(8), swampTree2Resource, chunk, chunkEntity, chunkMap);

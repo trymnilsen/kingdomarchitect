@@ -8,6 +8,8 @@ import {
     DirectionComponentId,
     updateDirectionComponent,
 } from "../component/directionComponent.js";
+import { EffectEmitterComponentId } from "../component/effectEmitterComponent.js";
+import { SpaceComponentId } from "../component/spaceComponent.js";
 
 export enum MovementResult {
     Ok = "ok",
@@ -15,7 +17,7 @@ export enum MovementResult {
 }
 
 export function doMovement(entity: Entity, to: Point): MovementResult {
-    const root = entity.getRootEntity();
+    const root = entity.requireAncestorEntity(SpaceComponentId);
     const path = queryPath(root, entity.worldPosition, to);
     const nextPoint = path.path.shift();
     if (nextPoint) {
@@ -42,6 +44,12 @@ export function discoverAfterMovement(entity: Entity, nextPoint: Point) {
     if (visibility) {
         const points = offsetPatternWithPoint(nextPoint, visibility.pattern);
 
-        setDiscoveryForPlayer(entity.getRootEntity(), "player", points);
+        setDiscoveryForPlayer(
+            entity.requireAncestorEntity(SpaceComponentId),
+            entity.getRootEntity().requireEcsComponent(EffectEmitterComponentId)
+                .emitter,
+            "player",
+            points,
+        );
     }
 }

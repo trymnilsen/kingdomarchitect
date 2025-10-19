@@ -16,19 +16,19 @@ import {
     type DiscoverTileEffect,
 } from "./discoverTileEffect.js";
 
-export function effectHandler(root: Entity, message: EffectGameMessage) {
+export function effectHandler(scope: Entity, message: EffectGameMessage) {
     switch (message.effect.id) {
         case DiscoverTileEffectId:
-            discoverTileEffect(root, message.effect);
+            discoverTileEffect(scope, message.effect);
             break;
         default:
             break;
     }
 }
 
-function discoverTileEffect(root: Entity, effect: DiscoverTileEffect) {
-    const tileComponent = root.requireEcsComponent(TileComponentId);
-    const visibilityMapComponent = root.requireEcsComponent(
+function discoverTileEffect(scope: Entity, effect: DiscoverTileEffect) {
+    const tileComponent = scope.requireEcsComponent(TileComponentId);
+    const visibilityMapComponent = scope.requireEcsComponent(
         VisibilityMapComponentId,
     );
 

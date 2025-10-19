@@ -5,9 +5,9 @@ import { getTile, TileComponentId } from "../../../component/tileComponent.js";
 import type { Entity } from "../../../entity/entity.js";
 import { queryEntity } from "../../query/queryEntity.js";
 
-export function getWeightAtPoint(point: Point, rootEntity: Entity): number {
+export function getWeightAtPoint(point: Point, scope: Entity): number {
     let weight = 25;
-    const tileComponent = rootEntity.requireEcsComponent(TileComponentId);
+    const tileComponent = scope.requireEcsComponent(TileComponentId);
     const ground = getTile(tileComponent, {
         x: point.x,
         y: point.y,
@@ -18,7 +18,7 @@ export function getWeightAtPoint(point: Point, rootEntity: Entity): number {
         weight = 2;
     }
 
-    const entities = queryEntity(rootEntity, point);
+    const entities = queryEntity(scope, point);
 
     if (entities.length > 0) {
         let entityWeight = 0;

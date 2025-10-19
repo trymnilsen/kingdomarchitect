@@ -25,9 +25,10 @@ export const chunkMapSystem: EcsSystem = {
 /**
  * Run init actions
  * @param root the root entity of the system
+ * @param scope: the scoped entity
  */
-function init(root: Entity) {
-    root.setEcsComponent(createChunkMapComponent());
+function init(_root: Entity, scope: Entity) {
+    scope.setEcsComponent(createChunkMapComponent());
 }
 
 /**
@@ -35,8 +36,9 @@ function init(root: Entity) {
  * @param rootEntity the root entity of the system
  * @param entityEvent the event that occured
  */
-function onTransform(rootEntity: Entity, entityEvent: EntityTransformEvent) {
-    const chunkMap = rootEntity.requireEcsComponent(ChunkMapComponentId);
+function onTransform(_rootEntity: Entity, entityEvent: EntityTransformEvent) {
+    const chunkMap =
+        entityEvent.source.requireAncestorEcsComponent(ChunkMapComponentId);
     const currentChunkId = chunkMap.entityChunkMap.get(entityEvent.source.id);
     if (currentChunkId === undefined) {
         addToChunkmap(chunkMap, entityEvent.source);
@@ -64,10 +66,11 @@ function onTransform(rootEntity: Entity, entityEvent: EntityTransformEvent) {
  * @param entityEvent the event that happened
  */
 function onEntityAdded(
-    rootEntity: Entity,
+    _rootEntity: Entity,
     entityEvent: EntityChildrenUpdatedEvent,
 ) {
-    const chunkMap = rootEntity.requireEcsComponent(ChunkMapComponentId);
+    const chunkMap =
+        entityEvent.target.requireAncestorEcsComponent(ChunkMapComponentId);
     addToChunkmap(chunkMap, entityEvent.target);
 }
 
@@ -87,10 +90,11 @@ function addToChunkmap(chunkMap: ChunkMapComponent, entity: Entity) {
  * @param entityEvent the event that happened
  */
 function onEntityRemoved(
-    rootEntity: Entity,
+    _rootEntity: Entity,
     entityEvent: EntityChildrenUpdatedEvent,
 ) {
-    const chunkMap = rootEntity.requireEcsComponent(ChunkMapComponentId);
+    const chunkMap =
+        entityEvent.target.requireAncestorEcsComponent(ChunkMapComponentId);
     const chunkForEntity = chunkMap.entityChunkMap.get(entityEvent.target.id);
     if (chunkForEntity === undefined) {
         return;

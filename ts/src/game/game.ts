@@ -21,6 +21,7 @@ import { createVisibilityMapComponent } from "./component/visibilityMapComponent
 import { handleGameMessage } from "../server/message/gameMessageHandler.js";
 import { animationSystem } from "./system/animationSystem.js";
 import { createJobQueueComponent } from "./component/jobQueueComponent.js";
+import { createTileComponent } from "./component/tileComponent.js";
 
 export class Game {
     private renderer: Renderer;
@@ -43,7 +44,11 @@ export class Game {
 
         this.gameServer = new WebworkerServerConnection();
         this.gameServer.onMessage.listen((message) => {
-            handleGameMessage(this.ecsWorld.root, message);
+            handleGameMessage(
+                this.ecsWorld.root,
+                this.ecsWorld.scopedRoot,
+                message,
+            );
             this.ecsWorld.runGameMessage(message);
         });
         this.assetLoader = new AssetLoader();
@@ -72,7 +77,7 @@ export class Game {
 
         // UI states handling
         this.interactionHandler = new InteractionHandler(
-            this.ecsWorld.root,
+            this.ecsWorld,
             this.renderer.camera,
             this.assetLoader,
             this.gameTime,
@@ -92,7 +97,10 @@ export class Game {
 
     private addClientOnlyComponents() {
         this.ecsWorld.root.setEcsComponent(createJobQueueComponent());
-        this.ecsWorld.root.setEcsComponent(createVisibilityMapComponent());
+        this.ecsWorld.scopedRoot.setEcsComponent(createTileComponent());
+        this.ecsWorld.scopedRoot.setEcsComponent(
+            createVisibilityMapComponent(),
+        );
     }
 
     private addSystems() {
