@@ -34,13 +34,13 @@ export const worldGenerationSystem: EcsSystem = {
  * Initializes the world generation system.
  * Adds the initial player chunk and discovers tiles around it.
  */
-function onInit(root: Entity) {
+function onInit(_root: Entity, scope: Entity) {
     //TODO: Should send a set ChunkEvent
-    const start = addInitialPlayerChunk(root);
+    const start = addInitialPlayerChunk(scope);
     //Discover the tiles for the player, we should make this more dynamic
-    const worldDiscovery = root.getEcsComponent(WorldDiscoveryComponentId);
+    const worldDiscovery = scope.getEcsComponent(WorldDiscoveryComponentId);
     const pattern = offsetPatternWithPoint(start, generateDiamondPattern(16));
-    setDiscoveryForPlayer(root, "player", pattern);
+    setDiscoveryForPlayer(scope, "player", pattern);
 }
 
 type ChunkToGenerate = {

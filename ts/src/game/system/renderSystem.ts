@@ -23,6 +23,7 @@ import {
     hasDiscovered,
     isVisible,
     VisibilityMapComponentId,
+    type VisibilityMapComponent,
 } from "../component/visibilityMapComponent.js";
 import type { Entity } from "../entity/entity.js";
 import { biomes } from "../map/biome.js";
@@ -34,42 +35,46 @@ export const renderSystem: EcsSystem = {
 };
 
 function onRender(
-    rootEntity: Entity,
-    _scopeEntity: Entity,
+    _rootEntity: Entity,
+    scopeEntity: Entity,
     _renderTick: number,
     renderScope: RenderScope,
     drawMode: DrawMode,
 ) {
     //const renderStart = performance.now();
     const viewport = renderScope.camera.tileSpaceViewPort;
-    //TODO: If i make a map/set structure with both string and instance keys
-    //i can add a first method to it to avoid getting values
-    const tiles = rootEntity.requireEcsComponent(TileComponentId);
-    const visibilityMap = rootEntity.requireEcsComponent(
-        VisibilityMapComponentId,
-    );
-    visibilityMap.visibility.clear();
-    //TODO: this might be able to piggyback of sprites? Are there entities without sprites but with visibility?
-    const visibilityComponents = rootEntity.queryComponentsWithin(
-        viewport,
-        VisibilityComponentId,
-    );
-    for (const visibilityComponent of visibilityComponents) {
-        const visiblePoints = offsetPatternWithPoint(
-            visibilityComponent[0].worldPosition,
-            visibilityComponent[1].pattern,
+    const tiles = scopeEntity.getEcsComponent(TileComponentId);
+    const visibilityMap = scopeEntity.getEcsComponent(VisibilityMapComponentId);
+
+    if (visibilityMap) {
+        visibilityMap.visibility.clear();
+        //TODO: this might be able to piggyback of sprites? Are there entities without sprites but with visibility?
+        const visibilityComponents = scopeEntity.queryComponentsWithin(
+            viewport,
+            VisibilityComponentId,
         );
-        for (let i = 0; i < visiblePoints.length; i++) {
-            const numberId = makeNumberId(
-                visiblePoints[i].x,
-                visiblePoints[i].y,
+        for (const visibilityComponent of visibilityComponents) {
+            const visiblePoints = offsetPatternWithPoint(
+                visibilityComponent[0].worldPosition,
+                visibilityComponent[1].pattern,
             );
-            visibilityMap.visibility.add(numberId);
+            for (let i = 0; i < visiblePoints.length; i++) {
+                const numberId = makeNumberId(
+                    visiblePoints[i].x,
+                    visiblePoints[i].y,
+                );
+                visibilityMap.visibility.add(numberId);
+            }
         }
     }
 
-    drawTiles(tiles, renderScope, rootEntity);
-    const query = rootEntity.queryComponentsWithin(viewport, SpriteComponentId);
+    if (tiles && visibilityMap) {
+        drawTiles(tiles, renderScope, visibilityMap);
+    }
+    const query = scopeEntity.queryComponentsWithin(
+        viewport,
+        SpriteComponentId,
+    );
 
     const sortedSprites = Array.from(query.entries()).sort(
         (a, b) => a[0].worldPosition.y - b[0].worldPosition.y,
@@ -78,7 +83,9 @@ function onRender(
     for (let i = 0; i < sortedSprites.length; i++) {
         const sprite = sortedSprites[i][1];
         const position = sortedSprites[i][0].worldPosition;
-        const visibility = isVisible(visibilityMap, position.x, position.y);
+        const visibility = visibilityMap
+            ? isVisible(visibilityMap, position.x, position.y)
+            : true;
         if (visibility || window.debugChunks) {
             const animationComponent =
                 sortedSprites[i][0].getEcsComponent(AnimationComponentId);
@@ -87,7 +94,7 @@ function onRender(
         }
     }
 
-    const healthbars = rootEntity.queryComponentsWithin(
+    const healthbars = scopeEntity.queryComponentsWithin(
         viewport,
         HealthComponentId,
     );
@@ -205,9 +212,8 @@ function getVisibleChunks(bounds: Bounds): number[] {
 function drawTiles(
     tiles: TileComponent,
     renderContext: RenderScope,
-    rootEntity: Entity,
+    visibilityMap: VisibilityMapComponent,
 ) {
-    const visibility = rootEntity.requireEcsComponent(VisibilityMapComponentId);
     for (const [chunkId, chunk] of tiles.chunks) {
         if (!chunk.volume) {
             continue;
@@ -245,11 +251,11 @@ function drawTiles(
                 let visible = true;
 
                 if (!window.debugChunks) {
-                    if (!hasDiscovered(visibility, chunkNumberId, x, y)) {
+                    if (!hasDiscovered(visibilityMap, chunkNumberId, x, y)) {
                         continue;
                     }
 
-                    visible = isVisible(visibility, worldTileX, worldTileY);
+                    visible = isVisible(visibilityMap, worldTileX, worldTileY);
                 }
 
                 let color = biomes[chunk.volume.type].color;
