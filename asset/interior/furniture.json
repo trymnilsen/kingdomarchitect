@@ -1,0 +1,16 @@
+{
+    "interior_stool": {
+        "x": 80,
+        "y": 0,
+        "w": 16,
+        "h": 16,
+        "frames": 1
+    },
+    "interior_table": {
+        "x": 96,
+        "y": 0,
+        "w": 16,
+        "h": 16,
+        "frames": 1
+    }
+}

@@ -35,6 +35,7 @@ export const renderSystem: EcsSystem = {
 
 function onRender(
     rootEntity: Entity,
+    _scopeEntity: Entity,
     _renderTick: number,
     renderScope: RenderScope,
     drawMode: DrawMode,

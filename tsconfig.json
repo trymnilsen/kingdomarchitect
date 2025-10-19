@@ -22,6 +22,7 @@
       "strictFunctionTypes": true,
       "strictNullChecks": true,
       "strictPropertyInitialization": true,
+      "strictBindCallApply": true,
       "target": "ES2022",
     },
     "include": [

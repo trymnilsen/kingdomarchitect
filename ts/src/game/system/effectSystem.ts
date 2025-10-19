@@ -14,7 +14,7 @@ export const effectSystem: EcsSystem = {
     onUpdate: update,
 };
 
-function update(root: Entity, _deltaTime: number) {
+function update(root: Entity, _scope: Entity, _deltaTime: number) {
     const entitiesWithEffects = root.queryComponents(ActiveEffectsComponentId);
 
     for (const [entity, effectsComponent] of entitiesWithEffects) {

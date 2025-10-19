@@ -8,19 +8,24 @@ import type { GameMessage } from "../../server/message/gameMessage.js";
 
 export type EcsRenderFunction = (
     root: Entity,
+    scope: Entity,
     renderTick: number,
     renderScope: RenderScope,
     drawMode: DrawMode,
 ) => void;
 
-export type EcsUpdateFunction = (root: Entity, updateTime: number) => void;
+export type EcsUpdateFunction = (
+    root: Entity,
+    scope: Entity,
+    updateTime: number,
+) => void;
 
 export type EcsEntityEventFunction<T extends EntityEvent> = (
     root: Entity,
     event: T,
 ) => void;
 
-export type EcsInitFunction = (rootEntity: Entity) => void;
+export type EcsInitFunction = (rootEntity: Entity, scope: Entity) => void;
 
 export type EcsEntityEvents = Partial<{
     [k in EntityEvent["id"]]: EcsEntityEventFunction<EntityEventType[k]>;
@@ -28,6 +33,7 @@ export type EcsEntityEvents = Partial<{
 
 export type EcsGameMessageFunction = (
     rootEntity: Entity,
+    scope: Entity,
     gameMessage: GameMessage,
 ) => void;
 

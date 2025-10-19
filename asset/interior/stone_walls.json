@@ -1,0 +1,44 @@
+{
+    "interior_stone_wall_right_bottom": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16,
+        "frames": 1
+    },
+    "interior_stone_wall_top_bottom": {
+        "x": 0,
+        "y": 16,
+        "w": 16,
+        "h": 16,
+        "frames": 1
+    },
+    "interior_stone_wall_right_top": {
+        "x": 0,
+        "y": 32,
+        "w": 16,
+        "h": 16,
+        "frames": 1
+    },
+    "interior_stone_wall_right_left": {
+        "x": 16,
+        "y": 32,
+        "w": 16,
+        "h": 16,
+        "frames": 1
+    },
+    "interior_stone_wall_left_top": {
+        "x": 32,
+        "y": 32,
+        "w": 16,
+        "h": 16,
+        "frames": 1
+    },
+    "interior_stone_wall_left_bottom": {
+        "x": 32,
+        "y": 0,
+        "w": 16,
+        "h": 16,
+        "frames": 1
+    }
+}

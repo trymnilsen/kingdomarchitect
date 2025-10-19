@@ -36,17 +36,34 @@ export class EcsWorld {
         transform: [],
     };
     private rootEntity: Entity;
+    private scopedEntity: Entity;
     private gameMessageSystems: EcsGameMessageFunction[] = [];
 
     public get root(): Entity {
         return this.rootEntity;
     }
 
+    public get scopedRoot(): Entity {
+        return this.scopedEntity;
+    }
+
     constructor() {
         this.rootEntity = new Entity("root");
+        const overworld = new Entity("overworld");
+        this.rootEntity.addChild(overworld);
+        this.scopedEntity = overworld;
         this.rootEntity.toggleIsGameRoot(true);
         this.rootEntity.setEcsComponent(createTileComponent());
         this.rootEntity.entityEvent = this.runEvent;
+    }
+
+    rescope(entity: Entity) {
+        //Check that the given entity is part of the tree
+        if (entity.getRootEntity() !== this.rootEntity) {
+            throw new Error("Cannot rescope to an entity not in entity tree");
+        }
+
+        this.scopedEntity = entity;
     }
 
     addSystem(system: EcsSystem) {
@@ -104,14 +121,14 @@ export class EcsWorld {
     runGameMessage(message: GameMessage) {
         for (let i = 0; i < this.gameMessageSystems.length; i++) {
             const system = this.gameMessageSystems[i];
-            system(this.root, message);
+            system(this.root, this.scopedEntity, message);
         }
     }
 
     runInit() {
         for (let i = 0; i < this.initSystems.length; i++) {
             const system = this.initSystems[i];
-            system(this.root);
+            system(this.root, this.scopedEntity);
         }
     }
 
@@ -122,14 +139,20 @@ export class EcsWorld {
     ) {
         for (let i = 0; i < this.renderSystems.length; i++) {
             const system = this.renderSystems[i];
-            system(this.root, renderTick, renderScope, drawMode);
+            system(
+                this.root,
+                this.scopedEntity,
+                renderTick,
+                renderScope,
+                drawMode,
+            );
         }
     }
 
     runUpdate(gameTime: number) {
         for (let i = 0; i < this.updateSystems.length; i++) {
             const system = this.updateSystems[i];
-            system(this.root, gameTime);
+            system(this.root, this.scopedEntity, gameTime);
         }
     }
 

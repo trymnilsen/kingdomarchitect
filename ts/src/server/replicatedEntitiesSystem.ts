@@ -1,4 +1,5 @@
 import { EcsSystem } from "../common/ecs/ecsSystem.js";
+import { JobQueueComponentId } from "../game/component/jobQueueComponent.js";
 import type { GameMessage } from "./message/gameMessage.js";
 
 export function makeReplicatedEntitiesSystem(
@@ -7,7 +8,10 @@ export function makeReplicatedEntitiesSystem(
     return {
         onEntityEvent: {
             component_updated: (_root, event) => {
-                if (event.source.isGameRoot) {
+                if (
+                    event.source.isGameRoot &&
+                    event.item.id != JobQueueComponentId
+                ) {
                     return;
                 }
                 postMessage({

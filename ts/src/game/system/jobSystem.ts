@@ -18,7 +18,7 @@ function onInit(root: Entity) {
     root.setEcsComponent(createJobQueueComponent());
 }
 
-function updateJobs(root: Entity, _gameTime: number) {
+function updateJobs(root: Entity, _scope: Entity, _gameTime: number) {
     const queue = root.requireEcsComponent(JobQueueComponentId);
     const runners = root.queryComponents(JobRunnerComponentId);
     for (const [entity, component] of runners) {
@@ -33,6 +33,7 @@ function updateJobs(root: Entity, _gameTime: number) {
                 removeItem(queue.jobs, selectedJob);
                 component.currentJob = selectedJob;
                 currentJob = selectedJob;
+                root.invalidateComponent(JobQueueComponentId);
                 entity.invalidateComponent(JobRunnerComponentId);
             }
         }

@@ -42,15 +42,23 @@ import {
 } from "../component/activeEffectsComponent.js";
 import { itemEffectFactoryList } from "../../data/inventory/itemEffectFactoryList.js";
 import { inventoryItemsMap } from "../../data/inventory/inventoryItems.js";
+import {
+    LoadSpaceCommand,
+    LoadSpaceCommandId,
+} from "../../server/message/command/enterSpaceCommand.js";
+import { interiorPrefab } from "../prefab/interiorPrefab.js";
 
 export const commandSystem: EcsSystem = {
     onGameMessage,
 };
 
-function onGameMessage(root: Entity, message: GameMessage) {
+function onGameMessage(root: Entity, _scope: Entity, message: GameMessage) {
     if (message.type != CommandGameMessageType) return;
     console.log("[CommandSystem] command: ", message.command);
     switch (message.command.id) {
+        case LoadSpaceCommandId:
+            loadSpace(root, message.command as LoadSpaceCommand);
+            break;
         case QueueJobCommandId:
             queueJob(root, message.command as QueueJobCommand);
             break;
@@ -66,6 +74,14 @@ function onGameMessage(root: Entity, message: GameMessage) {
         case ConsumeItemCommandId:
             consumeItem(root, message.command as ConsumeItemCommand);
             break;
+    }
+}
+
+function loadSpace(root: Entity, command: LoadSpaceCommand) {
+    const spaceId = `interior_${command.entity}`;
+    if (!root.children.some((child) => child.id === spaceId)) {
+        const interior = interiorPrefab(spaceId);
+        root.addChild(interior);
     }
 }
 

@@ -33,6 +33,7 @@ import {
     subTitleTextStyle,
 } from "../../../../rendering/text/textStyle.js";
 import { uiScaffold } from "../../view/uiScaffold.js";
+import { BuildingSelectionProvider } from "./actor/provider/buildingSelectionProvider.js";
 
 export class SelectionState extends InteractionState {
     private providers: ActorSelectionProvider[] = [
@@ -42,6 +43,7 @@ export class SelectionState extends InteractionState {
         new CollectableProvider(),
         new BlacksmithSelectionProvider(),
         new AttackSelectionProvider(),
+        new BuildingSelectionProvider(),
     ];
 
     override get stateName(): string {

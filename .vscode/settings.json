@@ -22,7 +22,8 @@
         "build/**": true,
         "doc/**": true,
         "dist/**": true,
-        "public/dist/**": true
+        "public/dist/**": true,
+        "asset/**": true
     },
     "typescript.format.enable": true,
     "editor.formatOnSave": true,
@@ -39,5 +40,8 @@
     "intellicodeApiExamples.python.enabled": false,
     "intellicodeApiExamples.typescript.enabled": false,
     "oxc.configPath": "oxlintrc.json",
-    "oxc.enable": true
+    "oxc.enable": true,
+    "workbench.colorCustomizations": {
+        "list.inactiveSelectionForeground": "#f2c150" // Replace with your desired color
+    }
 }

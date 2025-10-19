@@ -60,6 +60,7 @@ function onTransform(rootEntity: Entity, entityEvent: EntityTransformEvent) {
 /**
  * Add an entity to the chunkmap if it is added to the scene
  * @param rootEntity the root of the system
+ * @param scopedEntity the entity that is the current scope of the ecs
  * @param entityEvent the event that happened
  */
 function onEntityAdded(
