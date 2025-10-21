@@ -43,20 +43,20 @@ export class Game {
     constructor(private domElementWrapperSelector: string) {
         this.ecsWorld = new EcsWorld();
         this.addClientOnlyComponents();
-
-        this.gameServer = new WebworkerServerConnection();
-        this.gameServer.onMessage.listen((message) => {
-            handleGameMessage(this.ecsWorld.root, message);
-            this.ecsWorld.runGameMessage(message);
-        });
-        this.assetLoader = new AssetLoader();
         this.camera = new Camera(
             {
                 x: window.innerWidth,
                 y: window.innerHeight,
             },
-            new Entity("scene"),
+            getOverworldEntity(this.ecsWorld.root),
         );
+
+        this.gameServer = new WebworkerServerConnection();
+        this.gameServer.onMessage.listen((message) => {
+            handleGameMessage(this.ecsWorld.root, this.camera, message);
+            this.ecsWorld.runGameMessage(message);
+        });
+        this.assetLoader = new AssetLoader();
 
         const canvasElement: HTMLCanvasElement | null = document.querySelector(
             `#${this.domElementWrapperSelector}`,

@@ -48,6 +48,11 @@ import {
 } from "../../server/message/command/enterSpaceCommand.js";
 import { interiorPrefab } from "../prefab/interiorPrefab.js";
 import { overWorldId } from "../map/scenes.js";
+import { EffectEmitterComponentId } from "../component/effectEmitterComponent.js";
+import { SetSceneEffectId } from "../../server/message/effect/setSceneEffect.js";
+import { createChunkMapComponent } from "../component/chunkMapComponent.js";
+import { createPathfindingGraphComponent } from "../component/pathfindingGraphComponent.js";
+import { createLazyGraphFromRootNode } from "../map/path/graph/generateGraph.js";
 
 export const commandSystem: EcsSystem = {
     onGameMessage,
@@ -88,6 +93,10 @@ function loadSpace(root: Entity, command: LoadSpaceCommand) {
         const interior = interiorPrefab(spaceId);
         root.addChild(interior);
     }
+    root.requireEcsComponent(EffectEmitterComponentId).emitter({
+        id: SetSceneEffectId,
+        entity: spaceId,
+    });
 }
 
 function attackTarget(root: Entity, command: AttackCommand) {

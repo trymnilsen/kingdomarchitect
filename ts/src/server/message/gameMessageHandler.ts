@@ -1,4 +1,5 @@
 import { Entity } from "../../game/entity/entity.js";
+import type { Camera } from "../../rendering/camera.js";
 import { effectHandler } from "./effect/effectHandler.js";
 import {
     AddEntityGameMessageType,
@@ -15,7 +16,11 @@ import {
     type TransformGameMessage,
 } from "./gameMessage.js";
 
-export function handleGameMessage(root: Entity, message: GameMessage) {
+export function handleGameMessage(
+    root: Entity,
+    camera: Camera,
+    message: GameMessage,
+) {
     console.log("[HandleGameMessage] message from server", message);
     switch (message.type) {
         case AddEntityGameMessageType:
@@ -31,7 +36,7 @@ export function handleGameMessage(root: Entity, message: GameMessage) {
             transformHandler(root, message);
             break;
         case EffectGameMessageType:
-            effectHandler(root, message);
+            effectHandler(root, camera, message);
             break;
         default:
             break;

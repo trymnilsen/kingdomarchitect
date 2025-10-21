@@ -54,6 +54,9 @@ export class Camera {
     get currentScene(): Entity {
         return this._currentScene;
     }
+    set currentScene(value: Entity) {
+        this._currentScene = value;
+    }
 
     constructor(windowSize: Point, initialScene: Entity) {
         this._windowSize = windowSize;

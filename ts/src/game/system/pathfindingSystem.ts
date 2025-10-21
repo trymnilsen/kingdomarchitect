@@ -2,6 +2,7 @@ import type { EcsSystem } from "../../common/ecs/ecsSystem.js";
 import { createLazyGraphFromRootNode } from "../map/path/graph/generateGraph.js";
 import { PathCache } from "../map/path/pathCache.js";
 import {
+    createPathfindingGraphComponent,
     PathfindingGraphComponent,
     PathfindingGraphComponentId,
 } from "../component/pathfindingGraphComponent.js";
@@ -23,13 +24,9 @@ export const pathfindingSystem: EcsSystem = {
 
 function init(root: Entity) {
     const overworld = getOverworldEntity(root);
-    const component: PathfindingGraphComponent = {
-        id: PathfindingGraphComponentId,
-        pathCache: new PathCache(),
-        graph: createLazyGraphFromRootNode(overworld),
-    };
-
-    overworld.setEcsComponent(component);
+    overworld.setEcsComponent(
+        createPathfindingGraphComponent(createLazyGraphFromRootNode(overworld)),
+    );
 }
 
 function onTransform(_rootEntity: Entity, entityEvent: EntityTransformEvent) {

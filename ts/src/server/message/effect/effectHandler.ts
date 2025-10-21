@@ -1,4 +1,6 @@
 import { makeNumberId, pointEquals } from "../../../common/point.js";
+import { createChunkMapComponent } from "../../../game/component/chunkMapComponent.js";
+import { createPathfindingGraphComponent } from "../../../game/component/pathfindingGraphComponent.js";
 import {
     setChunk,
     TileComponentId,
@@ -10,17 +12,36 @@ import {
     getChunkId,
     getChunkPosition,
 } from "../../../game/map/chunk.js";
+import { createLazyGraphFromRootNode } from "../../../game/map/path/graph/generateGraph.js";
 import { getOverworldEntity } from "../../../game/map/scenes.js";
+import type { Camera } from "../../../rendering/camera.js";
 import type { EffectGameMessage } from "../gameMessage.js";
 import {
     DiscoverTileEffectId,
     type DiscoverTileEffect,
 } from "./discoverTileEffect.js";
+import { SetSceneEffectId } from "./setSceneEffect.js";
 
-export function effectHandler(root: Entity, message: EffectGameMessage) {
+export function effectHandler(
+    root: Entity,
+    camera: Camera,
+    message: EffectGameMessage,
+) {
     switch (message.effect.id) {
         case DiscoverTileEffectId:
             discoverTileEffect(root, message.effect);
+            break;
+        case SetSceneEffectId:
+            const scene = root.findEntity(message.effect.entity);
+            if (scene) {
+                scene.setEcsComponent(createChunkMapComponent());
+                scene.setEcsComponent(
+                    createPathfindingGraphComponent(
+                        createLazyGraphFromRootNode(scene),
+                    ),
+                );
+                camera.currentScene = scene;
+            }
             break;
         default:
             break;
