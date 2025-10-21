@@ -47,13 +47,13 @@ import {
     LoadSpaceCommandId,
 } from "../../server/message/command/enterSpaceCommand.js";
 import { interiorPrefab } from "../prefab/interiorPrefab.js";
-import { overWorldId } from "../map/spaces.js";
+import { overWorldId } from "../map/scenes.js";
 
 export const commandSystem: EcsSystem = {
     onGameMessage,
 };
 
-function onGameMessage(root: Entity, _scope: Entity, message: GameMessage) {
+function onGameMessage(root: Entity, message: GameMessage) {
     if (message.type != CommandGameMessageType) return;
     console.log("[CommandSystem] command: ", message.command);
     switch (message.command.id) {

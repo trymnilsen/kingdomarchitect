@@ -25,6 +25,7 @@ import type { Entity } from "../entity/entity.js";
 import { getChunkPosition } from "../map/chunk.js";
 import { generateChunk } from "../map/chunkGenerator.js";
 import { addInitialPlayerChunk } from "../map/player.js";
+import { getOverworldEntity } from "../map/scenes.js";
 import type { Volume } from "../map/volume.js";
 
 export const worldGenerationSystem: EcsSystem = {
@@ -35,15 +36,16 @@ export const worldGenerationSystem: EcsSystem = {
  * Initializes the world generation system.
  * Adds the initial player chunk and discovers tiles around it.
  */
-function onInit(root: Entity, scope: Entity) {
-    const start = addInitialPlayerChunk(scope);
+function onInit(root: Entity) {
+    const overworld = getOverworldEntity(root);
+    const start = addInitialPlayerChunk(overworld);
     //Discover the tiles for the player, we should make this more dynamic
-    const worldDiscovery = scope.getEcsComponent(WorldDiscoveryComponentId);
+    const worldDiscovery = overworld.getEcsComponent(WorldDiscoveryComponentId);
     const effectEmitter = root.requireEcsComponent(
         EffectEmitterComponentId,
     ).emitter;
     const pattern = offsetPatternWithPoint(start, generateDiamondPattern(16));
-    setDiscoveryForPlayer(scope, effectEmitter, "player", pattern);
+    setDiscoveryForPlayer(overworld, effectEmitter, "player", pattern);
 }
 
 type ChunkToGenerate = {
@@ -58,13 +60,13 @@ type ChunkToGenerate = {
  * @param discoveredPoints An array of points that have been discovered.
  */
 export function setDiscoveryForPlayer(
-    scope: Entity,
+    scene: Entity,
     effectEmitter: (effect: GameEffect) => void,
     player: string,
     discoveredPoints: Point[],
 ) {
-    const tileComponent = scope.requireEcsComponent(TileComponentId);
-    const worldDiscovery = scope.requireEcsComponent(WorldDiscoveryComponentId);
+    const tileComponent = scene.requireEcsComponent(TileComponentId);
+    const worldDiscovery = scene.requireEcsComponent(WorldDiscoveryComponentId);
 
     const chunksToGenerate: ChunkToGenerate[] = [];
     const newPoints: { point: Point; volumeId: string }[] = [];
@@ -86,10 +88,10 @@ export function setDiscoveryForPlayer(
 
     for (const chunkToGenerate of chunksToGenerate) {
         const generatedChunk = generateChunk(
-            scope,
+            scene,
             chunkToGenerate.chunkPosition,
         );
-        scope.updateComponent(TileComponentId, (component) => {
+        scene.updateComponent(TileComponentId, (component) => {
             setChunk(component, generatedChunk);
         });
         //Check if the volume of the new chunk has been discovered by the
@@ -120,7 +122,7 @@ export function setDiscoveryForPlayer(
         volumes: newVolumesToDiscover,
     };
 
-    scope.updateComponent(WorldDiscoveryComponentId, (component) => {
+    scene.updateComponent(WorldDiscoveryComponentId, (component) => {
         for (const point of discoveredPoints) {
             discoverTile(component, player, point);
         }

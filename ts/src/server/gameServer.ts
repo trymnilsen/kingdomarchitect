@@ -12,6 +12,7 @@ import type { GameMessage } from "./message/gameMessage.js";
 import { commandSystem } from "../game/system/commandSystem.js";
 import { effectSystem } from "../game/system/effectSystem.js";
 import { createTileComponent } from "../game/component/tileComponent.js";
+import { getOverworldEntity } from "../game/map/scenes.js";
 
 export class GameServer {
     private world: EcsWorld;
@@ -28,7 +29,8 @@ export class GameServer {
     }
 
     private addComponents() {
-        this.world.scopedRoot.setEcsComponent(createTileComponent());
+        const overworld = getOverworldEntity(this.world.root);
+        overworld.setEcsComponent(createTileComponent());
         this.world.root.setEcsComponent(
             createEffectEmitterComponent((effect) => {
                 this.postMessage({
@@ -37,7 +39,7 @@ export class GameServer {
                 });
             }),
         );
-        this.world.scopedRoot.setEcsComponent(createWorldDiscoveryComponent());
+        overworld.setEcsComponent(createWorldDiscoveryComponent());
     }
 
     private addSystems() {

@@ -55,7 +55,7 @@ export class AttackSelectionState extends InteractionState {
 
         this.selectedPoint = toPoint;
         const entity = queryEntity(
-            this.context.world.scopedRoot,
+            this.context.camera.currentScene,
             toPoint,
         ).filter((item) => item.hasComponent(HealthComponentId));
         if (entity.length) {

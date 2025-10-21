@@ -36,20 +36,20 @@ export const renderSystem: EcsSystem = {
 
 function onRender(
     _rootEntity: Entity,
-    scopeEntity: Entity,
     _renderTick: number,
     renderScope: RenderScope,
     drawMode: DrawMode,
 ) {
     //const renderStart = performance.now();
     const viewport = renderScope.camera.tileSpaceViewPort;
-    const tiles = scopeEntity.getEcsComponent(TileComponentId);
-    const visibilityMap = scopeEntity.getEcsComponent(VisibilityMapComponentId);
+    const scene = renderScope.camera.currentScene;
+    const tiles = scene.getEcsComponent(TileComponentId);
+    const visibilityMap = scene.getEcsComponent(VisibilityMapComponentId);
 
     if (visibilityMap) {
         visibilityMap.visibility.clear();
         //TODO: this might be able to piggyback of sprites? Are there entities without sprites but with visibility?
-        const visibilityComponents = scopeEntity.queryComponentsWithin(
+        const visibilityComponents = scene.queryComponentsWithin(
             viewport,
             VisibilityComponentId,
         );
@@ -71,10 +71,7 @@ function onRender(
     if (tiles && visibilityMap) {
         drawTiles(tiles, renderScope, visibilityMap);
     }
-    const query = scopeEntity.queryComponentsWithin(
-        viewport,
-        SpriteComponentId,
-    );
+    const query = scene.queryComponentsWithin(viewport, SpriteComponentId);
 
     const sortedSprites = Array.from(query.entries()).sort(
         (a, b) => a[0].worldPosition.y - b[0].worldPosition.y,
@@ -94,10 +91,7 @@ function onRender(
         }
     }
 
-    const healthbars = scopeEntity.queryComponentsWithin(
-        viewport,
-        HealthComponentId,
-    );
+    const healthbars = scene.queryComponentsWithin(viewport, HealthComponentId);
 
     for (const [entity, healthComponent] of healthbars) {
         if (healthComponent.currentHp == healthComponent.maxHp) {

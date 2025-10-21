@@ -12,6 +12,7 @@ import type {
     EntityChildrenUpdatedEvent,
     EntityTransformEvent,
 } from "../entity/entityEvent.js";
+import { getOverworldEntity } from "../map/scenes.js";
 
 export const chunkMapSystem: EcsSystem = {
     onInit: init,
@@ -25,10 +26,9 @@ export const chunkMapSystem: EcsSystem = {
 /**
  * Run init actions
  * @param root the root entity of the system
- * @param scope: the scoped entity
  */
-function init(_root: Entity, scope: Entity) {
-    scope.setEcsComponent(createChunkMapComponent());
+function init(root: Entity) {
+    getOverworldEntity(root).setEcsComponent(createChunkMapComponent());
 }
 
 /**

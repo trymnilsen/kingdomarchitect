@@ -10,25 +10,27 @@ import {
     getChunkId,
     getChunkPosition,
 } from "../../../game/map/chunk.js";
+import { getOverworldEntity } from "../../../game/map/scenes.js";
 import type { EffectGameMessage } from "../gameMessage.js";
 import {
     DiscoverTileEffectId,
     type DiscoverTileEffect,
 } from "./discoverTileEffect.js";
 
-export function effectHandler(scope: Entity, message: EffectGameMessage) {
+export function effectHandler(root: Entity, message: EffectGameMessage) {
     switch (message.effect.id) {
         case DiscoverTileEffectId:
-            discoverTileEffect(scope, message.effect);
+            discoverTileEffect(root, message.effect);
             break;
         default:
             break;
     }
 }
 
-function discoverTileEffect(scope: Entity, effect: DiscoverTileEffect) {
-    const tileComponent = scope.requireEcsComponent(TileComponentId);
-    const visibilityMapComponent = scope.requireEcsComponent(
+function discoverTileEffect(root: Entity, effect: DiscoverTileEffect) {
+    const overworld = getOverworldEntity(root);
+    const tileComponent = overworld.requireEcsComponent(TileComponentId);
+    const visibilityMapComponent = overworld.requireEcsComponent(
         VisibilityMapComponentId,
     );
 

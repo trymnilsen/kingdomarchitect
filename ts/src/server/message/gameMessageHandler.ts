@@ -15,11 +15,7 @@ import {
     type TransformGameMessage,
 } from "./gameMessage.js";
 
-export function handleGameMessage(
-    root: Entity,
-    scope: Entity,
-    message: GameMessage,
-) {
+export function handleGameMessage(root: Entity, message: GameMessage) {
     console.log("[HandleGameMessage] message from server", message);
     switch (message.type) {
         case AddEntityGameMessageType:
@@ -35,7 +31,7 @@ export function handleGameMessage(
             transformHandler(root, message);
             break;
         case EffectGameMessageType:
-            effectHandler(scope, message);
+            effectHandler(root, message);
             break;
         default:
             break;

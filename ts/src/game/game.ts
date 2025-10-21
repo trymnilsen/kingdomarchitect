@@ -22,6 +22,8 @@ import { handleGameMessage } from "../server/message/gameMessageHandler.js";
 import { animationSystem } from "./system/animationSystem.js";
 import { createJobQueueComponent } from "./component/jobQueueComponent.js";
 import { createTileComponent } from "./component/tileComponent.js";
+import { Entity } from "./entity/entity.js";
+import { getOverworldEntity } from "./map/scenes.js";
 
 export class Game {
     private renderer: Renderer;
@@ -44,18 +46,17 @@ export class Game {
 
         this.gameServer = new WebworkerServerConnection();
         this.gameServer.onMessage.listen((message) => {
-            handleGameMessage(
-                this.ecsWorld.root,
-                this.ecsWorld.scopedRoot,
-                message,
-            );
+            handleGameMessage(this.ecsWorld.root, message);
             this.ecsWorld.runGameMessage(message);
         });
         this.assetLoader = new AssetLoader();
-        this.camera = new Camera({
-            x: window.innerWidth,
-            y: window.innerHeight,
-        });
+        this.camera = new Camera(
+            {
+                x: window.innerWidth,
+                y: window.innerHeight,
+            },
+            new Entity("scene"),
+        );
 
         const canvasElement: HTMLCanvasElement | null = document.querySelector(
             `#${this.domElementWrapperSelector}`,
@@ -97,10 +98,9 @@ export class Game {
 
     private addClientOnlyComponents() {
         this.ecsWorld.root.setEcsComponent(createJobQueueComponent());
-        this.ecsWorld.scopedRoot.setEcsComponent(createTileComponent());
-        this.ecsWorld.scopedRoot.setEcsComponent(
-            createVisibilityMapComponent(),
-        );
+        const overworld = getOverworldEntity(this.ecsWorld.root);
+        overworld.setEcsComponent(createTileComponent());
+        overworld.setEcsComponent(createVisibilityMapComponent());
     }
 
     private addSystems() {

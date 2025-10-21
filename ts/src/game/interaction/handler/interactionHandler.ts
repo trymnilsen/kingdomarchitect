@@ -172,7 +172,7 @@ export class InteractionHandler {
 
             // Check if a tile was clicked at this position
             const tileComponent =
-                this.world.scopedRoot.requireEcsComponent(TileComponentId);
+                this.camera.currentScene.requireEcsComponent(TileComponentId);
 
             const tile = getTile(tileComponent, tilePosition);
 
@@ -184,13 +184,10 @@ export class InteractionHandler {
                         "Tap not handled by state, checking for selection",
                     );
 
-                    const entitiesAt = queryEntity(
-                        this.stateContext.world.scopedRoot,
-                        {
-                            x: tile.tileX,
-                            y: tile.tileY,
-                        },
-                    );
+                    const entitiesAt = queryEntity(this.camera.currentScene, {
+                        x: tile.tileX,
+                        y: tile.tileY,
+                    });
 
                     let selection: SelectedWorldItem;
                     if (entitiesAt.length > 0) {

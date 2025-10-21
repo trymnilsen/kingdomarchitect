@@ -5,6 +5,7 @@ import {
     JobQueueComponentId,
 } from "../component/jobQueueComponent.js";
 import { JobRunnerComponentId } from "../component/jobRunnerComponent.js";
+import { SpaceComponentId } from "../component/spaceComponent.js";
 import { Entity } from "../entity/entity.js";
 import type { Job, JobHandler } from "../job/job.js";
 import { jobHandlers } from "../job/jobHandlers.js";
@@ -18,7 +19,7 @@ function onInit(root: Entity) {
     root.setEcsComponent(createJobQueueComponent());
 }
 
-function updateJobs(root: Entity, scope: Entity, _gameTime: number) {
+function updateJobs(root: Entity, _gameTime: number) {
     const queue = root.requireEcsComponent(JobQueueComponentId);
     const runners = root.queryComponents(JobRunnerComponentId);
     for (const [entity, component] of runners) {
@@ -52,6 +53,7 @@ function updateJobs(root: Entity, scope: Entity, _gameTime: number) {
             continue;
         }
         console.log("Updating job", currentJob.id);
-        handler(scope, entity, currentJob);
+        const scene = entity.requireAncestorEntity(SpaceComponentId);
+        handler(scene, entity, currentJob);
     }
 }

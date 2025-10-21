@@ -10,6 +10,7 @@ import type {
     EntityChildrenUpdatedEvent,
     EntityTransformEvent,
 } from "../entity/entityEvent.js";
+import { getOverworldEntity } from "../map/scenes.js";
 
 export const pathfindingSystem: EcsSystem = {
     onInit: init,
@@ -20,14 +21,15 @@ export const pathfindingSystem: EcsSystem = {
     },
 };
 
-function init(_root: Entity, scope: Entity) {
+function init(root: Entity) {
+    const overworld = getOverworldEntity(root);
     const component: PathfindingGraphComponent = {
         id: PathfindingGraphComponentId,
         pathCache: new PathCache(),
-        graph: createLazyGraphFromRootNode(scope),
+        graph: createLazyGraphFromRootNode(overworld),
     };
 
-    scope.setEcsComponent(component);
+    overworld.setEcsComponent(component);
 }
 
 function onTransform(_rootEntity: Entity, entityEvent: EntityTransformEvent) {

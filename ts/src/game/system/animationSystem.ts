@@ -33,7 +33,6 @@ export const animationSystem: EcsSystem = {
 
 function onRender(
     root: Entity,
-    _scope: Entity,
     renderTick: number,
     _renderScope: RenderScope,
     drawMode: DrawMode,
@@ -46,7 +45,7 @@ function onRender(
     }
 }
 
-function onGameMessage(root: Entity, _scope: Entity, message: GameMessage) {
+function onGameMessage(root: Entity, message: GameMessage) {
     //Check transforms for movement
     //Check effects
     if (message.type == "transform") {

@@ -5,22 +5,16 @@ import {
     Point,
     subtractPoint,
 } from "../common/point.js";
+import type { Entity } from "../game/entity/entity.js";
 import { TileSize } from "../game/map/tile.js";
 
 export class Camera {
     private _position: Point;
     private _halfWindowSize: Point;
     private _windowSize: Point;
+    private _currentScene: Entity;
     private _viewPortIsDirty: boolean = true;
     private _tilespaceViewport: Bounds = zeroBounds();
-    constructor(windowSize: Point) {
-        this._windowSize = windowSize;
-        this._position = { x: 0, y: 0 };
-        this._halfWindowSize = {
-            x: Math.floor(windowSize.x / 2),
-            y: Math.floor(windowSize.y / 2),
-        };
-    }
 
     get position(): Point {
         return this._position;
@@ -55,6 +49,20 @@ export class Camera {
 
     get windowSize(): Point {
         return this._windowSize;
+    }
+
+    get currentScene(): Entity {
+        return this._currentScene;
+    }
+
+    constructor(windowSize: Point, initialScene: Entity) {
+        this._windowSize = windowSize;
+        this._currentScene = initialScene;
+        this._position = { x: 0, y: 0 };
+        this._halfWindowSize = {
+            x: Math.floor(windowSize.x / 2),
+            y: Math.floor(windowSize.y / 2),
+        };
     }
 
     worldSpaceToTileSpace(worldSpace: Point): Point {

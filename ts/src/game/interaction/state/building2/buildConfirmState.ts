@@ -208,7 +208,7 @@ export class BuildConfirmState extends InteractionState {
     }
 
     private isTileAvailable(tilePosition: Point): BuildingApplicabilityResult {
-        const rootEntity = this.context.world.scopedRoot;
+        const rootEntity = this.context.camera.currentScene;
         const entitiesAt = queryEntity(rootEntity, {
             x: tilePosition.x,
             y: tilePosition.y,
@@ -237,7 +237,7 @@ export class BuildConfirmState extends InteractionState {
         if (buildingApplicabilityCheck) {
             const applicabilityResult = buildingApplicabilityCheck(
                 tilePosition,
-                this.context.world.scopedRoot,
+                this.context.camera.currentScene,
             );
 
             if (!applicabilityResult.isApplicable) {
