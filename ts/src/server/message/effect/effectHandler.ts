@@ -34,12 +34,6 @@ export function effectHandler(
         case SetSceneEffectId:
             const scene = root.findEntity(message.effect.entity);
             if (scene) {
-                scene.setEcsComponent(createChunkMapComponent());
-                scene.setEcsComponent(
-                    createPathfindingGraphComponent(
-                        createLazyGraphFromRootNode(scene),
-                    ),
-                );
                 camera.currentScene = scene;
             }
             break;

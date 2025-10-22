@@ -1,19 +1,29 @@
 import type { Graph } from "../map/path/graph/graph.js";
 import { PathCache } from "../map/path/pathCache.js";
 
-export type PathfindingGraphComponent = {
-    id: typeof PathfindingGraphComponentId;
+export type PathfindingGraphEntry = {
     graph: Graph;
     pathCache: PathCache;
 };
 
-export function createPathfindingGraphComponent(
-    graph: Graph,
-): PathfindingGraphComponent {
+export type PathfindingGraphComponent = {
+    id: typeof PathfindingGraphComponentId;
+    graphs: Map<string, PathfindingGraphEntry>;
+};
+
+export function createPathfindingGraphComponent(): PathfindingGraphComponent {
     return {
         id: PathfindingGraphComponentId,
+        graphs: new Map(),
+    };
+}
+
+export function createPathfindingGraphEntry(
+    graph: Graph,
+): PathfindingGraphEntry {
+    return {
+        graph,
         pathCache: new PathCache(),
-        graph: graph,
     };
 }
 
