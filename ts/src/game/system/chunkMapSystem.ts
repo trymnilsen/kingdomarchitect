@@ -31,7 +31,7 @@ export const chunkMapSystem: EcsSystem = {
  * @param root the root entity of the system
  */
 function init(root: Entity) {
-    getOverworldEntity(root).setEcsComponent(createChunkMapRegistryComponent());
+    root.setEcsComponent(createChunkMapRegistryComponent());
 }
 
 /**
@@ -51,17 +51,7 @@ function onTransform(_rootEntity: Entity, entityEvent: EntityTransformEvent) {
         return;
     }
 
-    const chunkMap = getChunkMap(registry, spaceEntity.id);
-    if (!chunkMap) {
-        // Create chunk map if it doesn't exist
-        console.log(
-            `[ChunkMapSystem] Creating new chunk map for space ${spaceEntity.id}`,
-        );
-        registry.chunkMaps.set(spaceEntity.id, createChunkMap());
-        const newMap = getChunkMap(registry, spaceEntity.id)!;
-        addToChunkmap(newMap, entityEvent.source);
-        return;
-    }
+    const chunkMap = getOrCreateChunkMap(registry, spaceEntity);
 
     const currentChunkId = chunkMap.entityChunkMap.get(entityEvent.source.id);
     if (currentChunkId === undefined) {
@@ -104,16 +94,7 @@ function onEntityAdded(
         return;
     }
 
-    let chunkMap = getChunkMap(registry, spaceEntity.id);
-    if (!chunkMap) {
-        // Create chunk map if it doesn't exist
-        console.log(
-            `[ChunkMapSystem] Creating new chunk map for space ${spaceEntity.id}`,
-        );
-        registry.chunkMaps.set(spaceEntity.id, createChunkMap());
-        chunkMap = getChunkMap(registry, spaceEntity.id)!;
-    }
-
+    const chunkMap = getOrCreateChunkMap(registry, spaceEntity);
     addToChunkmap(chunkMap, entityEvent.target);
 }
 
@@ -149,7 +130,7 @@ function onEntityRemoved(
 
     const chunkMap = getChunkMap(registry, spaceEntity.id);
     if (!chunkMap) {
-        console.warn(
+        console.debug(
             `[ChunkMapSystem] No chunk map found for space ${spaceEntity.id}, cannot remove entity`,
         );
         return;
@@ -167,6 +148,28 @@ function onEntityRemoved(
 
     chunk.delete(entityEvent.target);
     chunkMap.entityChunkMap.delete(entityEvent.target.id);
+}
+
+/**
+ * Gets or creates a chunk map for a space entity
+ * @param registry The chunk map registry
+ * @param spaceEntity The space entity to get/create a chunk map for
+ * @returns The chunk map for the space
+ */
+function getOrCreateChunkMap(
+    registry: ReturnType<typeof createChunkMapRegistryComponent>,
+    spaceEntity: Entity,
+): ChunkMap {
+    let chunkMap = getChunkMap(registry, spaceEntity.id);
+    if (!chunkMap) {
+        // Create chunk map if it doesn't exist
+        console.log(
+            `[ChunkMapSystem] Creating new chunk map for space ${spaceEntity.id}`,
+        );
+        chunkMap = createChunkMap();
+        registry.chunkMaps.set(spaceEntity.id, chunkMap);
+    }
+    return chunkMap;
 }
 
 function getOrCreateChunk(

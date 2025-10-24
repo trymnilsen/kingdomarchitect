@@ -1,18 +1,18 @@
 import type { EcsSystem } from "../../common/ecs/ecsSystem.js";
-import { createLazyGraphFromRootNode } from "../map/path/graph/generateGraph.js";
 import {
-    createPathfindingGraphRegistryComponent,
-    PathfindingGraphRegistryComponentId,
-    getPathfindingGraph,
     createPathfindingGraph,
+    createPathfindingGraphRegistryComponent,
+    getPathfindingGraph,
+    PathfindingGraphRegistryComponentId,
 } from "../component/pathfindingGraphRegistryComponent.js";
+import { SpaceComponentId } from "../component/spaceComponent.js";
 import type { Entity } from "../entity/entity.js";
 import type {
     EntityChildrenUpdatedEvent,
     EntityTransformEvent,
 } from "../entity/entityEvent.js";
+import { createLazyGraphFromRootNode } from "../map/path/graph/generateGraph.js";
 import { getOverworldEntity } from "../map/scenes.js";
-import { SpaceComponentId } from "../component/spaceComponent.js";
 
 export const pathfindingSystem: EcsSystem = {
     onInit: init,
@@ -31,7 +31,7 @@ function init(root: Entity) {
         createLazyGraphFromRootNode(overworld),
     );
     registry.graphs.set(overworld.id, overworldGraph);
-    overworld.setEcsComponent(registry);
+    root.setEcsComponent(registry);
 }
 
 function onTransform(_rootEntity: Entity, entityEvent: EntityTransformEvent) {
@@ -46,14 +46,7 @@ function onTransform(_rootEntity: Entity, entityEvent: EntityTransformEvent) {
         return;
     }
 
-    const pathfindingGraph = getPathfindingGraph(registry, spaceEntity.id);
-    if (!pathfindingGraph) {
-        console.warn(
-            `[PathfindingSystem] No pathfinding graph found for space ${spaceEntity.id}`,
-        );
-        return;
-    }
-
+    const pathfindingGraph = getOrCreatePathfindingGraph(registry, spaceEntity);
     pathfindingGraph.graph?.invalidatePoint(entityEvent.source.worldPosition);
 }
 
@@ -72,14 +65,7 @@ function onEntityAdded(
         return;
     }
 
-    const pathfindingGraph = getPathfindingGraph(registry, spaceEntity.id);
-    if (!pathfindingGraph) {
-        console.warn(
-            `[PathfindingSystem] No pathfinding graph found for space ${spaceEntity.id}`,
-        );
-        return;
-    }
-
+    const pathfindingGraph = getOrCreatePathfindingGraph(registry, spaceEntity);
     pathfindingGraph.graph?.invalidatePoint(entityEvent.target.worldPosition);
 }
 
@@ -98,13 +84,38 @@ function onEntityRemoved(
         return;
     }
 
+    // Don't create a graph for removal - just get if it exists
     const pathfindingGraph = getPathfindingGraph(registry, spaceEntity.id);
     if (!pathfindingGraph) {
-        console.warn(
-            `[PathfindingSystem] No pathfinding graph found for space ${spaceEntity.id}`,
+        // No graph exists, nothing to invalidate
+        console.debug(
+            `[PathfindingSystem] Entity ${entityEvent.target.id} has no graph, ignoring remove`,
         );
         return;
     }
 
     pathfindingGraph.graph?.invalidatePoint(entityEvent.target.worldPosition);
+}
+
+/**
+ * Gets or creates a pathfinding graph for a space entity
+ * @param registry The pathfinding graph registry
+ * @param spaceEntity The space entity to get/create a graph for
+ * @returns The pathfinding graph for the space
+ */
+function getOrCreatePathfindingGraph(
+    registry: ReturnType<typeof createPathfindingGraphRegistryComponent>,
+    spaceEntity: Entity,
+) {
+    let pathfindingGraph = getPathfindingGraph(registry, spaceEntity.id);
+    if (!pathfindingGraph) {
+        // Create pathfinding graph if it doesn't exist
+        console.log(
+            `[PathfindingSystem] Creating new pathfinding graph for space ${spaceEntity.id}`,
+        );
+        const graph = createLazyGraphFromRootNode(spaceEntity);
+        pathfindingGraph = createPathfindingGraph(graph);
+        registry.graphs.set(spaceEntity.id, pathfindingGraph);
+    }
+    return pathfindingGraph;
 }

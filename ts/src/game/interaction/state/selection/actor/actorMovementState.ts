@@ -11,6 +11,7 @@ import { MoveToJob } from "../../../../job/moveToPointJob.js";
 import { InteractionState } from "../../../handler/interactionState.js";
 import { uiScaffold } from "../../../view/uiScaffold.js";
 import { QueueJobCommand } from "../../../../../server/message/command/queueJobCommand.js";
+import { getPathfindingGraphForEntity } from "../../../../map/path/getPathfindingGraphForEntity.js";
 
 export class ActorMovementState extends InteractionState {
     private selectedPoint: Point | null = null;
@@ -52,8 +53,17 @@ export class ActorMovementState extends InteractionState {
         };
         this.selectedPoint = toPoint;
 
-        const path = queryPath(
+        // Get the pathfinding graph for the entity's space
+        const pathfindingGraph = getPathfindingGraphForEntity(
             this.context.root,
+            this.entity,
+        );
+        if (!pathfindingGraph) {
+            return false;
+        }
+
+        const path = queryPath(
+            pathfindingGraph,
             this.entity.worldPosition,
             toPoint,
         );

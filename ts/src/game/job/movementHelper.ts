@@ -10,6 +10,7 @@ import {
 } from "../component/directionComponent.js";
 import { EffectEmitterComponentId } from "../component/effectEmitterComponent.js";
 import { SpaceComponentId } from "../component/spaceComponent.js";
+import { getPathfindingGraphForEntity } from "../map/path/getPathfindingGraphForEntity.js";
 
 export enum MovementResult {
     Ok = "ok",
@@ -17,8 +18,15 @@ export enum MovementResult {
 }
 
 export function doMovement(entity: Entity, to: Point): MovementResult {
-    const root = entity.requireAncestorEntity(SpaceComponentId);
-    const path = queryPath(root, entity.worldPosition, to);
+    const root = entity.getRootEntity();
+
+    // Get the pathfinding graph for the entity's space
+    const pathfindingGraph = getPathfindingGraphForEntity(root, entity);
+    if (!pathfindingGraph) {
+        return MovementResult.Failure;
+    }
+
+    const path = queryPath(pathfindingGraph, entity.worldPosition, to);
     const nextPoint = path.path.shift();
     if (nextPoint) {
         discoverAfterMovement(entity, nextPoint);

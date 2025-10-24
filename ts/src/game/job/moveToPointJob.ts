@@ -16,6 +16,7 @@ import {
     updateDirectionComponent,
 } from "../component/directionComponent.js";
 import { discoverAfterMovement } from "./movementHelper.js";
+import { getPathfindingGraphForEntity } from "../map/path/getPathfindingGraphForEntity.js";
 
 export interface MoveToJob extends Job {
     position: Point;
@@ -47,8 +48,13 @@ export const moveToJobHandler: JobHandler<MoveToJob> = (root, runner, job) => {
             nextPoint = job.position;
         } else {
             //No path but not at the position, we should generate a path
+            const pathfindingGraph = getPathfindingGraphForEntity(root, runner);
+            if (!pathfindingGraph) {
+                return;
+            }
+
             const pathResult = queryPath(
-                root,
+                pathfindingGraph,
                 runner.worldPosition,
                 job.position,
             );

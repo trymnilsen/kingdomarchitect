@@ -1,43 +1,17 @@
 import { addPoint, pointEquals, type Point } from "../../../common/point.js";
-import {
-    PathfindingGraphRegistryComponentId,
-    getPathfindingGraph,
-} from "../../component/pathfindingGraphRegistryComponent.js";
-import { SpaceComponentId } from "../../component/spaceComponent.js";
+import type { PathfindingGraph } from "../../component/pathfindingGraphRegistryComponent.js";
 import type { Entity } from "../../entity/entity.js";
 import type { GraphNode } from "../path/graph/graph.js";
 import { aStarSearch, type SearchedNode } from "../path/search.js";
 
 export function queryPath(
-    rootEntity: Entity,
+    pathfindingGraph: PathfindingGraph,
     from: Point,
     to: Point,
 ): PathResult {
-    const registry = rootEntity.getEcsComponent(
-        PathfindingGraphRegistryComponentId,
-    );
-    if (!registry) {
-        throw new Error(
-            "A root component with a pathfinding graph registry is required",
-        );
-    }
-
-    // Get the space entity (assuming it's the rootEntity itself or find it)
-    const spaceEntity = rootEntity.getAncestorEntity(SpaceComponentId);
-    if (!spaceEntity) {
-        throw new Error("No space entity found for pathfinding");
-    }
-
-    const pathfindingGraph = getPathfindingGraph(registry, spaceEntity.id);
-    if (!pathfindingGraph) {
-        throw new Error(
-            `No pathfinding graph found for space ${spaceEntity.id}`,
-        );
-    }
-
     const graph = pathfindingGraph.graph;
     if (!graph) {
-        throw new Error("No graph set on pathfinding graph component");
+        throw new Error("No graph set on pathfinding graph");
     }
 
     const offsetPoint = {
