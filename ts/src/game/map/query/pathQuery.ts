@@ -1,5 +1,9 @@
 import { addPoint, pointEquals, type Point } from "../../../common/point.js";
-import { PathfindingGraphComponentId } from "../../component/pathfindingGraphRegistryComponent.js";
+import {
+    PathfindingGraphRegistryComponentId,
+    getPathfindingGraph,
+} from "../../component/pathfindingGraphRegistryComponent.js";
+import { SpaceComponentId } from "../../component/spaceComponent.js";
 import type { Entity } from "../../entity/entity.js";
 import type { GraphNode } from "../path/graph/graph.js";
 import { aStarSearch, type SearchedNode } from "../path/search.js";
@@ -9,16 +13,29 @@ export function queryPath(
     from: Point,
     to: Point,
 ): PathResult {
-    const graphComponent = rootEntity.getEcsComponent(
-        PathfindingGraphComponentId,
+    const registry = rootEntity.getEcsComponent(
+        PathfindingGraphRegistryComponentId,
     );
-    if (!graphComponent) {
+    if (!registry) {
         throw new Error(
-            "A root component with a pathfinding graph is required",
+            "A root component with a pathfinding graph registry is required",
         );
     }
 
-    const graph = graphComponent.graph;
+    // Get the space entity (assuming it's the rootEntity itself or find it)
+    const spaceEntity = rootEntity.getAncestorEntity(SpaceComponentId);
+    if (!spaceEntity) {
+        throw new Error("No space entity found for pathfinding");
+    }
+
+    const pathfindingGraph = getPathfindingGraph(registry, spaceEntity.id);
+    if (!pathfindingGraph) {
+        throw new Error(
+            `No pathfinding graph found for space ${spaceEntity.id}`,
+        );
+    }
+
+    const graph = pathfindingGraph.graph;
     if (!graph) {
         throw new Error("No graph set on pathfinding graph component");
     }

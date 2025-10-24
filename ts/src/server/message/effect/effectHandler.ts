@@ -1,6 +1,12 @@
 import { makeNumberId, pointEquals } from "../../../common/point.js";
-import { createChunkMapComponent } from "../../../game/component/chunkMapRegistryComponent.js";
-import { createPathfindingGraphComponent } from "../../../game/component/pathfindingGraphRegistryComponent.js";
+import {
+    createChunkMapRegistryComponent,
+    createChunkMap,
+} from "../../../game/component/chunkMapRegistryComponent.js";
+import {
+    createPathfindingGraphRegistryComponent,
+    createPathfindingGraph,
+} from "../../../game/component/pathfindingGraphRegistryComponent.js";
 import {
     setChunk,
     TileComponentId,

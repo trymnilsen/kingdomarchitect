@@ -3,11 +3,15 @@ import {
     createJobRunnerComponent,
     JobRunnerComponentId,
 } from "../../../src/game/component/jobRunnerComponent.js";
-import { PathfindingGraphComponentId } from "../../../src/game/component/pathfindingGraphRegistryComponent.js";
+import {
+    PathfindingGraphRegistryComponentId,
+    createPathfindingGraphRegistryComponent,
+    createPathfindingGraph,
+} from "../../../src/game/component/pathfindingGraphRegistryComponent.js";
+import { createSpaceComponent } from "../../../src/game/component/spaceComponent.js";
 import { Entity } from "../../../src/game/entity/entity.js";
 import type { Job } from "../../../src/game/job/job.js";
 import { getJobHandler } from "../../../src/game/job/jobHandlers.js";
-import { PathCache } from "../../../src/game/map/path/pathCache.js";
 import { createEmptyGraph } from "../../path/testGraph.js";
 
 /**
@@ -31,15 +35,15 @@ export class JobTestHarness<T extends Job = Job> {
 
         // Create root entity
         this.root = new Entity("root");
+        this.root.setEcsComponent(createSpaceComponent());
 
         // Optionally add pathfinding graph component for movement tests
         if (enablePathfinding) {
             const graph = createEmptyGraph(graphSize, graphSize);
-            this.root.setEcsComponent({
-                id: PathfindingGraphComponentId,
-                graph: graph,
-                pathCache: new PathCache(),
-            });
+            const registry = createPathfindingGraphRegistryComponent();
+            const pathfindingGraph = createPathfindingGraph(graph);
+            registry.graphs.set(this.root.id, pathfindingGraph);
+            this.root.setEcsComponent(registry);
         }
 
         // Create runner entity (worker)
