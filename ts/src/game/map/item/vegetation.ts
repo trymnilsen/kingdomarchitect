@@ -1,9 +1,9 @@
 import { encodePosition, Point } from "../../../common/point.js";
 import { treeResource } from "../../../data/inventory/items/naturalResource.js";
 import {
-    ChunkMapComponent,
+    ChunkMap,
     getEntitiesInChunkMapWithin,
-} from "../../component/chunkMapComponent.js";
+} from "../../component/chunkMapRegistryComponent.js";
 import { Entity } from "../../entity/entity.js";
 import { resourcePrefab } from "../../prefab/resourcePrefab.js";
 import { ChunkSize, getChunkBounds } from "../chunk.js";
@@ -14,13 +14,10 @@ import { ChunkSize, getChunkBounds } from "../chunk.js";
 export function generateSpawnPoints(
     amount: number,
     chunk: Point,
-    chunkMap: ChunkMapComponent,
+    chunkMap: ChunkMap,
 ): Point[] {
     if (amount === 0) {
         return [];
-    }
-    if (!chunkMap) {
-        throw new Error("No chunk map component found");
     }
 
     const spawnPoints: Point[] = [];

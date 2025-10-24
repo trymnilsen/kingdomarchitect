@@ -4,26 +4,26 @@ import { SparseSet } from "../../common/structure/sparseSet.js";
 import { ChunkSize } from "../map/chunk.js";
 import type { Entity } from "../entity/entity.js";
 
-export type ChunkMapEntry = {
+export type ChunkMap = {
     chunks: Map<number, SparseSet<Entity>>;
     entityChunkMap: Map<string, number>;
 };
 
-export type ChunkMapComponent = {
-    id: typeof ChunkMapComponentId;
-    chunkMaps: Map<string, ChunkMapEntry>; // Keyed by entity id (scene id)
+export type ChunkMapRegistryComponent = {
+    id: typeof ChunkMapRegistryComponentId;
+    chunkMaps: Map<string, ChunkMap>; // Keyed by entity id (scene id)
 };
 
-export const ChunkMapComponentId = "ChunkMap";
+export const ChunkMapRegistryComponentId = "ChunkMapRegistry";
 
-export function createChunkMapComponent(): ChunkMapComponent {
+export function createChunkMapRegistryComponent(): ChunkMapRegistryComponent {
     return {
-        id: ChunkMapComponentId,
+        id: ChunkMapRegistryComponentId,
         chunkMaps: new Map(),
     };
 }
 
-export function createChunkMapEntry(): ChunkMapEntry {
+export function createChunkMap(): ChunkMap {
     return {
         chunks: new Map(),
         entityChunkMap: new Map(),
@@ -31,27 +31,36 @@ export function createChunkMapEntry(): ChunkMapEntry {
 }
 
 /**
- * Gets all entities in the chunk at the given world position for a specific chunk map (scene/entity id)
- * @param chunkMap The ChunkMapComponent
- * @param mapId The id of the chunk map (scene/entity id)
- * @param x the x coordinate
- * @param y the y coordinate
+ * Gets a chunk map by id
+ * @param registry The ChunkMapRegistryComponent
+ * @param mapId The id of the chunk map. Id of entity with SpaceComponent on it
+ * @returns The ChunkMap or undefined if not found
+ */
+export function getChunkMap(
+    registry: ChunkMapRegistryComponent,
+    mapId: string,
+): ChunkMap | undefined {
+    return registry.chunkMaps.get(mapId);
+}
+
+/**
+ * Gets all entities in the chunk at the given world position
+ * @param chunkMap The ChunkMap to search in
+ * @param x the x coordinate in tilespace
+ * @param y the y coordinate in tilespace
  * @returns an array of entities within the chunk at the given position
  */
 export function getEntitiesAt(
-    chunkMap: ChunkMapComponent,
-    mapId: string,
+    chunkMap: ChunkMap,
     x: number,
     y: number,
 ): Entity[] {
-    const entry = chunkMap.chunkMaps.get(mapId);
-    if (!entry) return [];
     // Convert to chunk coordinates
     const chunkX = Math.floor(x / ChunkSize);
     const chunkY = Math.floor(y / ChunkSize);
     const chunkKey = encodePosition(chunkX, chunkY);
 
-    const chunk = entry.chunks.get(chunkKey);
+    const chunk = chunkMap.chunks.get(chunkKey);
     if (!chunk) {
         return [];
     }
@@ -70,12 +79,9 @@ export function getEntitiesAt(
 }
 
 export function getEntitiesInChunkMapWithin(
-    chunkMap: ChunkMapComponent,
-    mapId: string,
+    chunkMap: ChunkMap,
     bounds: Bounds,
 ): Entity[] {
-    const entry = chunkMap.chunkMaps.get(mapId);
-    if (!entry) return [];
     const startChunkX = Math.floor(bounds.x1 / ChunkSize);
     const startChunkY = Math.floor(bounds.y1 / ChunkSize);
     const endChunkX = Math.ceil(bounds.x2 / ChunkSize) + 1;
@@ -92,7 +98,7 @@ export function getEntitiesInChunkMapWithin(
         const chunkY = startChunkY + Math.floor(i / xChunks);
         const chunkKey = encodePosition(chunkX, chunkY);
 
-        const chunk = entry.chunks.get(chunkKey);
+        const chunk = chunkMap.chunks.get(chunkKey);
         if (!chunk || chunk.size === 0) continue;
 
         // Collect entities
@@ -103,14 +109,11 @@ export function getEntitiesInChunkMapWithin(
 }
 
 export function getEntitiesInChunk(
-    chunkMap: ChunkMapComponent,
-    mapId: string,
+    chunkMap: ChunkMap,
     chunkPosition: Point,
 ): Entity[] {
-    const entry = chunkMap.chunkMaps.get(mapId);
-    if (!entry) return [];
     const chunkKey = encodePosition(chunkPosition.x, chunkPosition.y);
-    const chunk = entry.chunks.get(chunkKey);
+    const chunk = chunkMap.chunks.get(chunkKey);
     if (!!chunk) {
         return chunk.dense;
     } else {

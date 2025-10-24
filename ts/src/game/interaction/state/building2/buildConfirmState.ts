@@ -6,7 +6,6 @@ import { sprites2 } from "../../../../asset/sprite.js";
 import { GroundTile, TileSize } from "../../../map/tile.js";
 import type { ComponentDescriptor } from "../../../../ui/declarative/ui.js";
 import { RenderScope } from "../../../../rendering/renderScope.js";
-import { ChunkMapComponentId } from "../../../component/chunkMapComponent.js";
 import { getTile, TileComponentId } from "../../../component/tileComponent.js";
 import { InteractionState } from "../../handler/interactionState.js";
 import { uiScaffold } from "../../view/uiScaffold.js";

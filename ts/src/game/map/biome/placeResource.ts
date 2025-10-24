@@ -1,9 +1,9 @@
 import type { TileChunk } from "../chunk.js";
 import type { Entity } from "../../entity/entity.js";
-import type { ChunkMapComponent } from "../../component/chunkMapComponent.js";
 import type { NaturalResource } from "../../../data/inventory/items/naturalResource.js";
 import { resourcePrefab } from "../../prefab/resourcePrefab.js";
 import { generateSpawnPoints } from "../item/vegetation.js";
+import type { ChunkMap } from "../../component/chunkMapRegistryComponent.js";
 
 export type CountFn = (max?: number) => number;
 
@@ -20,7 +20,7 @@ export function placeResource(
     resource: NaturalResource,
     chunk: TileChunk,
     chunkEntity: Entity,
-    chunkMap: ChunkMapComponent,
+    chunkMap: ChunkMap,
 ) {
     const count = countFn();
     const positions = generateSpawnPoints(

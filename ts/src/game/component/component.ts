@@ -1,7 +1,7 @@
 import type { ActiveEffectsComponent } from "./activeEffectsComponent.js";
 import type { AnimationComponent } from "./animationComponent.js";
 import type { BuildingComponent } from "./buildingComponent.js";
-import type { ChunkMapComponent } from "./chunkMapComponent.js";
+import type { ChunkMapRegistryComponent } from "./chunkMapRegistryComponent.js";
 import { DirectionComponent } from "./directionComponent.js";
 import type { EffectEmitterComponent } from "./effectEmitterComponent.js";
 import type { EquipmentComponent } from "./equipmentComponent.js";
@@ -10,7 +10,7 @@ import type { InventoryComponent } from "./inventoryComponent.js";
 import type { JobQueueComponent } from "./jobQueueComponent.js";
 import type { JobRunnerComponent } from "./jobRunnerComponent.js";
 import type { KingdomComponent } from "./kingdomComponent.js";
-import type { PathfindingGraphComponent } from "./pathfindingGraphComponent.js";
+import type { PathfindingGraphRegistryComponent } from "./pathfindingGraphRegistryComponent.js";
 import type { PlayerUnitComponent } from "./playerUnitComponent.js";
 import type { ResourceComponent } from "./resourceComponent.js";
 import type { SpaceComponent } from "./spaceComponent.js";
@@ -26,7 +26,7 @@ export type Components =
     | TileComponent
     | InventoryComponent
     | ResourceComponent
-    | ChunkMapComponent
+    | ChunkMapRegistryComponent
     | PlayerUnitComponent
     | JobQueueComponent
     | BuildingComponent
@@ -37,7 +37,7 @@ export type Components =
     | VisibilityComponent
     | EffectEmitterComponent
     | AnimationComponent
-    | PathfindingGraphComponent
+    | PathfindingGraphRegistryComponent
     | KingdomComponent
     | DirectionComponent
     | ActiveEffectsComponent

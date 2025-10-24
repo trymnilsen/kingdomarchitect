@@ -1,5 +1,5 @@
 import { addPoint, pointEquals, type Point } from "../../../common/point.js";
-import { PathfindingGraphComponentId } from "../../component/pathfindingGraphComponent.js";
+import { PathfindingGraphComponentId } from "../../component/pathfindingGraphRegistryComponent.js";
 import type { Entity } from "../../entity/entity.js";
 import type { GraphNode } from "../path/graph/graph.js";
 import { aStarSearch, type SearchedNode } from "../path/search.js";

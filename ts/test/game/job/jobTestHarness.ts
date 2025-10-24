@@ -3,7 +3,7 @@ import {
     createJobRunnerComponent,
     JobRunnerComponentId,
 } from "../../../src/game/component/jobRunnerComponent.js";
-import { PathfindingGraphComponentId } from "../../../src/game/component/pathfindingGraphComponent.js";
+import { PathfindingGraphComponentId } from "../../../src/game/component/pathfindingGraphRegistryComponent.js";
 import { Entity } from "../../../src/game/entity/entity.js";
 import type { Job } from "../../../src/game/job/job.js";
 import { getJobHandler } from "../../../src/game/job/jobHandlers.js";

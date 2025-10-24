@@ -11,7 +11,6 @@ import { uiBox } from "../../../ui/declarative/uiBox.js";
 import { fillUiSize } from "../../../ui/uiSize.js";
 import { Camera } from "../../../rendering/camera.js";
 import { RenderScope } from "../../../rendering/renderScope.js";
-import { ChunkMapComponentId } from "../../component/chunkMapComponent.js";
 import { getTile, TileComponentId } from "../../component/tileComponent.js";
 import { Entity } from "../../entity/entity.js";
 import { SelectionState } from "../state/selection/selectionState.js";

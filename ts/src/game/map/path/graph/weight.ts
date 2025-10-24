@@ -1,5 +1,4 @@
 import type { Point } from "../../../../common/point.js";
-import { ChunkMapComponentId } from "../../../component/chunkMapComponent.js";
 import { ResourceComponentId } from "../../../component/resourceComponent.js";
 import { getTile, TileComponentId } from "../../../component/tileComponent.js";
 import type { Entity } from "../../../entity/entity.js";

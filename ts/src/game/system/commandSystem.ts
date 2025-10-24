@@ -1,58 +1,54 @@
 import type { EcsSystem } from "../../common/ecs/ecsSystem.js";
-import {
-    CommandGameMessageType,
-    type GameMessage,
-} from "../../server/message/gameMessage.js";
-import {
-    QueueJobCommandId,
-    type QueueJobCommand,
-} from "../../server/message/command/queueJobCommand.js";
-import { JobQueueComponentId } from "../component/jobQueueComponent.js";
-import type { Entity } from "../entity/entity.js";
-import {
-    EquipItemCommandId,
-    type EquipItemCommand,
-} from "../../server/message/command/equipItemCommand.js";
-import {
-    addInventoryItem,
-    InventoryComponentId,
-    takeInventoryItem,
-} from "../component/inventoryComponent.js";
-import { EquipmentComponentId } from "../component/equipmentComponent.js";
-import {
-    BuildCommandId,
-    type BuildCommand,
-} from "../../server/message/command/buildCommand.js";
-import { buildingPrefab } from "../prefab/buildingPrefab.js";
 import { getBuildingById } from "../../data/building/buildings.js";
-import { BuildBuildingJob } from "../job/buildBuildingJob.js";
+import { itemEffectFactoryList } from "../../data/inventory/itemEffectFactoryList.js";
 import {
     AttackCommandId,
     type AttackCommand,
 } from "../../server/message/command/attackTargetCommand.js";
-import { AttackJob } from "../job/attackJob.js";
+import {
+    BuildCommandId,
+    type BuildCommand,
+} from "../../server/message/command/buildCommand.js";
 import {
     ConsumeItemCommandId,
     type ConsumeItemCommand,
 } from "../../server/message/command/consumeItemCommand.js";
 import {
+    LoadSpaceCommand,
+    LoadSpaceCommandId,
+} from "../../server/message/command/enterSpaceCommand.js";
+import {
+    EquipItemCommandId,
+    type EquipItemCommand,
+} from "../../server/message/command/equipItemCommand.js";
+import {
+    QueueJobCommandId,
+    type QueueJobCommand,
+} from "../../server/message/command/queueJobCommand.js";
+import { SetSceneEffectId } from "../../server/message/effect/setSceneEffect.js";
+import {
+    CommandGameMessageType,
+    type GameMessage,
+} from "../../server/message/gameMessage.js";
+import {
     ActiveEffectsComponentId,
     addEffect,
     createActiveEffectsComponent,
 } from "../component/activeEffectsComponent.js";
-import { itemEffectFactoryList } from "../../data/inventory/itemEffectFactoryList.js";
-import { inventoryItemsMap } from "../../data/inventory/inventoryItems.js";
-import {
-    LoadSpaceCommand,
-    LoadSpaceCommandId,
-} from "../../server/message/command/enterSpaceCommand.js";
-import { interiorPrefab } from "../prefab/interiorPrefab.js";
-import { overWorldId } from "../map/scenes.js";
 import { EffectEmitterComponentId } from "../component/effectEmitterComponent.js";
-import { SetSceneEffectId } from "../../server/message/effect/setSceneEffect.js";
-import { createChunkMapComponent } from "../component/chunkMapComponent.js";
-import { createPathfindingGraphComponent } from "../component/pathfindingGraphComponent.js";
-import { createLazyGraphFromRootNode } from "../map/path/graph/generateGraph.js";
+import { EquipmentComponentId } from "../component/equipmentComponent.js";
+import {
+    addInventoryItem,
+    InventoryComponentId,
+    takeInventoryItem,
+} from "../component/inventoryComponent.js";
+import { JobQueueComponentId } from "../component/jobQueueComponent.js";
+import type { Entity } from "../entity/entity.js";
+import { AttackJob } from "../job/attackJob.js";
+import { BuildBuildingJob } from "../job/buildBuildingJob.js";
+import { overWorldId } from "../map/scenes.js";
+import { buildingPrefab } from "../prefab/buildingPrefab.js";
+import { interiorPrefab } from "../prefab/interiorPrefab.js";
 
 export const commandSystem: EcsSystem = {
     onGameMessage,
