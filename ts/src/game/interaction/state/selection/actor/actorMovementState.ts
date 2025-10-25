@@ -101,50 +101,51 @@ export class ActorMovementState extends InteractionState {
             });
         }
 
-        for (const searchedNode of this.graph) {
-            const position = context.camera.tileSpaceToScreenSpace({
-                x: searchedNode.x,
-                y: searchedNode.y,
-            });
+        if (window.debugChunks) {
+            for (const searchedNode of this.graph) {
+                const position = context.camera.tileSpaceToScreenSpace({
+                    x: searchedNode.x,
+                    y: searchedNode.y,
+                });
 
-            const withinTheViewport =
-                position.x + 40 > 0 &&
-                position.y + 40 > 0 &&
-                position.x - 40 < context.width &&
-                position.y - 40 < context.height;
+                const withinTheViewport =
+                    position.x + 40 > 0 &&
+                    position.y + 40 > 0 &&
+                    position.x - 40 < context.width &&
+                    position.y - 40 < context.height;
 
-            if (!withinTheViewport) {
-                continue;
-            }
+                if (!withinTheViewport) {
+                    continue;
+                }
 
-            if (searchedNode.visited) {
-                context.drawScreenSpaceRectangle({
+                if (searchedNode.visited) {
+                    context.drawScreenSpaceRectangle({
+                        x: position.x,
+                        y: position.y,
+                        width: 4,
+                        height: 4,
+                        fill: "white",
+                    });
+                }
+                if (searchedNode.weight == 0) {
+                    context.drawScreenSpaceRectangle({
+                        x: position.x + 8,
+                        y: position.y,
+                        width: 4,
+                        height: 4,
+                        fill: "red",
+                    });
+                }
+
+                context.drawText({
+                    size: 12,
+                    font: "arial",
+                    color: "black",
                     x: position.x,
                     y: position.y,
-                    width: 4,
-                    height: 4,
-                    fill: "white",
+                    text: `w: ${searchedNode.weight}`,
                 });
-            }
-            if (searchedNode.weight == 0) {
-                context.drawScreenSpaceRectangle({
-                    x: position.x + 8,
-                    y: position.y,
-                    width: 4,
-                    height: 4,
-                    fill: "red",
-                });
-            }
-
-            context.drawText({
-                size: 12,
-                font: "arial",
-                color: "black",
-                x: position.x,
-                y: position.y,
-                text: `w: ${searchedNode.weight}`,
-            });
-            /*
+                /*
             context.drawText({
                 size: 12,
                 font: "arial",
@@ -161,6 +162,7 @@ export class ActorMovementState extends InteractionState {
                 y: position.y + 24,
                 text: `c: ${searchedNode.totalCost.toFixed(2)}`,
             });*/
+            }
         }
 
         super.onDraw(context);

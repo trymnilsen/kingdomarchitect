@@ -12,6 +12,7 @@ export interface Job {
 export type Jobs = MoveToJob | BuildBuildingJob | AttackJob | ChopTreeJob;
 export type JobId = Jobs["id"];
 export type JobHandler<T extends Job> = (
+    scene: Entity,
     root: Entity,
     entity: Entity,
     job: T,

@@ -28,6 +28,7 @@ import {
 import type { Entity } from "../entity/entity.js";
 import { biomes } from "../map/biome.js";
 import { ChunkDimension, ChunkSize } from "../map/chunk.js";
+import { getTileColorVariation } from "../map/deterministicTileColor.js";
 import { TileSize } from "../map/tile.js";
 
 export const renderSystem: EcsSystem = {
@@ -116,6 +117,7 @@ function drawHealthbar(
         entity.worldPosition,
     );
     const healthbarWidth = 28;
+    const healthbarYOffset = 20;
     const maxHp = healthComponent.maxHp > 0 ? healthComponent.maxHp : 1;
     const percentageWidth = Math.floor(
         (healthbarWidth - 4) * (healthComponent.currentHp / maxHp),
@@ -123,14 +125,14 @@ function drawHealthbar(
 
     renderContext.drawScreenSpaceRectangle({
         x: screenPosition.x + 3,
-        y: screenPosition.y + 24,
+        y: screenPosition.y + healthbarYOffset,
         width: healthbarWidth,
         height: 8,
         fill: "black",
     });
     renderContext.drawScreenSpaceRectangle({
         x: screenPosition.x + 5,
-        y: screenPosition.y + 2 + 24,
+        y: screenPosition.y + 2 + healthbarYOffset,
         width: percentageWidth,
         height: 4,
         fill: "green",
@@ -258,12 +260,19 @@ function drawTiles(
                     color = biomes[chunk.volume.type].tint;
                 }
 
+                const finalColor = getTileColorVariation(
+                    color,
+                    { x: chunk.chunkX, y: chunk.chunkY },
+                    { x, y },
+                    20,
+                );
+
                 renderContext.drawScreenSpaceRectangle({
                     x: screenTileX,
                     y: screenTileY,
-                    width: TileSize - 2,
-                    height: TileSize - 2,
-                    fill: color,
+                    width: TileSize,
+                    height: TileSize,
+                    fill: finalColor,
                 });
             }
         }

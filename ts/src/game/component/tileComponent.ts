@@ -21,13 +21,18 @@ export function createTileComponent(): TileComponent {
 export const TileComponentId = "Tile";
 
 /**
- * Set the given chunk on a tilecomponent
+ * Set the given chunk on a tilecomponent and register its volume
  * @param component the source component
  * @param chunk the chunk to set
  */
 export function setChunk(component: TileComponent, chunk: TileChunk) {
     const chunkId = getTileId(chunk.chunkX, chunk.chunkY);
     component.chunks.set(chunkId, chunk);
+
+    // Register the volume in the volume registry if the chunk has one
+    if (chunk.volume && !component.volume.has(chunk.volume.id)) {
+        component.volume.set(chunk.volume.id, chunk.volume);
+    }
 }
 
 /**

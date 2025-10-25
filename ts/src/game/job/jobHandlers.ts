@@ -9,11 +9,7 @@ import type { Entity } from "../entity/entity.js";
  * Type-safe map of job IDs to their handlers
  */
 export type JobHandlerMap = {
-    [K in JobId]: (
-        root: Entity,
-        runner: Entity,
-        job: Extract<Jobs, { id: K }>,
-    ) => void;
+    [K in JobId]: JobHandler<Extract<Jobs, { id: K }>>;
 };
 
 /**

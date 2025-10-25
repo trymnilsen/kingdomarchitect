@@ -68,7 +68,7 @@ export class JobTestHarness<T extends Job = Job> {
             throw new Error(`No handler found for job type: ${job.id}`);
         }
         // Type assertion is safe here as the job registry ensures handler matches job type
-        handler(this.root, this.runner, job as any);
+        handler(this.root, this.root, this.runner, job as any);
     }
 
     /**

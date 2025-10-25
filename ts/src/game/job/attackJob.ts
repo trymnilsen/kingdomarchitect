@@ -19,7 +19,12 @@ export function AttackJob(attacker: string, target: string): AttackJob {
 
 export const AttackJobId = "attackJob";
 
-export const attackHandler: JobHandler<AttackJob> = (root, runner, job) => {
+export const attackHandler: JobHandler<AttackJob> = (
+    _scene,
+    root,
+    runner,
+    job,
+) => {
     const targetEntity = root.findEntity(job.target);
 
     if (runner.id !== job.attacker) {

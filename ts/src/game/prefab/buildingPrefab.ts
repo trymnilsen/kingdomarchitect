@@ -18,7 +18,7 @@ export function buildingPrefab(
     entity.setEcsComponent(
         createSpriteComponent(
             startScaffolded ? sprites2.wooden_house_scaffold : building.icon,
-            { x: 3, y: 2 },
+            { x: 0, y: 0 },
         ),
     );
     return entity;

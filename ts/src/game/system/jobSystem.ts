@@ -54,6 +54,6 @@ function updateJobs(root: Entity, _gameTime: number) {
         }
         console.log("Updating job", currentJob.id);
         const scene = entity.requireAncestorEntity(SpaceComponentId);
-        handler(scene, entity, currentJob);
+        handler(scene, root, entity, currentJob);
     }
 }

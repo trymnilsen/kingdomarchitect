@@ -25,7 +25,12 @@ export function ChopTreeJob(entity: Entity): ChopTreeJob {
 
 export const ChopTreeJobId = "chopTreeJob";
 
-export const chopTreeHandler: JobHandler<ChopTreeJob> = (root, runner, job) => {
+export const chopTreeHandler: JobHandler<ChopTreeJob> = (
+    _scene,
+    root,
+    runner,
+    job,
+) => {
     const treeEntity = root.findEntity(job.entityId);
 
     if (!treeEntity) {

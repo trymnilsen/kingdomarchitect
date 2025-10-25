@@ -34,7 +34,12 @@ export function MoveToJob(position: Point): MoveToJob {
 
 export const MoveToJobId = "moveToJob";
 
-export const moveToJobHandler: JobHandler<MoveToJob> = (root, runner, job) => {
+export const moveToJobHandler: JobHandler<MoveToJob> = (
+    scene,
+    root,
+    runner,
+    job,
+) => {
     //Sanity check for if we are on top of the position
     if (pointEquals(job.position, runner.worldPosition)) {
         completeJob(runner);
@@ -73,7 +78,7 @@ export const moveToJobHandler: JobHandler<MoveToJob> = (root, runner, job) => {
 
     //Check if the next point is free
     if (!!nextPoint) {
-        const weight = getWeightAtPoint(nextPoint, root);
+        const weight = getWeightAtPoint(nextPoint, scene);
         //TODO: when extracting, provide this as a function?
         console.log("MoveToJob - next point weight: ", weight);
         if (weight >= 30) {
