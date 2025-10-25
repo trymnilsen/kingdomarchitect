@@ -115,7 +115,7 @@ function drawHealthbar(
     const screenPosition = renderContext.camera.tileSpaceToScreenSpace(
         entity.worldPosition,
     );
-    const healthbarWidth = 32;
+    const healthbarWidth = 28;
     const maxHp = healthComponent.maxHp > 0 ? healthComponent.maxHp : 1;
     const percentageWidth = Math.floor(
         (healthbarWidth - 4) * (healthComponent.currentHp / maxHp),
@@ -221,26 +221,27 @@ function drawTiles(
             renderContext.camera.tileSpaceToScreenSpace(chunkPosition);
 
         const withinTheViewport =
-            screenPosition.x + ChunkSize * 40 > 0 &&
-            screenPosition.y + ChunkSize * 40 > 0 &&
-            screenPosition.x - 40 < renderContext.width &&
-            screenPosition.y - 40 < renderContext.height;
+            screenPosition.x + ChunkSize * TileSize > 0 &&
+            screenPosition.y + ChunkSize * TileSize > 0 &&
+            screenPosition.x - TileSize < renderContext.width &&
+            screenPosition.y - TileSize < renderContext.height;
 
         if (!withinTheViewport) {
             continue;
         }
 
         for (let x = 0; x < ChunkSize; x++) {
-            const screenTileX = screenPosition.x + x * 40;
+            const screenTileX = screenPosition.x + x * TileSize;
             const worldTileX = chunkPosition.x + x;
             const xWithin =
-                screenTileX + 40 > 0 && screenTileX - 40 < renderContext.width;
+                screenTileX + TileSize > 0 &&
+                screenTileX - TileSize < renderContext.width;
             if (!xWithin) {
                 continue;
             }
 
             for (let y = 0; y < ChunkSize; y++) {
-                const screenTileY = screenPosition.y + y * 40;
+                const screenTileY = screenPosition.y + y * TileSize;
                 const worldTileY = chunkPosition.y + y;
                 let visible = true;
 
