@@ -171,43 +171,43 @@ export class InteractionHandler {
 
             // Check if a tile was clicked at this position
             const tileComponent =
-                this.camera.currentScene.requireEcsComponent(TileComponentId);
+                this.camera.currentScene.getEcsComponent(TileComponentId);
 
-            const tile = getTile(tileComponent, tilePosition);
+            const tile = tileComponent
+                ? getTile(tileComponent, tilePosition)
+                : null;
+            let worldTapHandled = false;
 
             if (tile) {
-                const tileTapHandled = currentState.onTileTap(tile);
+                worldTapHandled = currentState.onTileTap(tile);
+            }
 
-                if (!tileTapHandled) {
-                    console.log(
-                        "Tap not handled by state, checking for selection",
-                    );
+            if (!worldTapHandled) {
+                console.log("Tap not handled by state, checking for selection");
 
-                    const entitiesAt = queryEntity(this.camera.currentScene, {
-                        x: tile.tileX,
-                        y: tile.tileY,
-                    });
+                const entitiesAt = queryEntity(
+                    this.camera.currentScene,
+                    tilePosition,
+                );
 
-                    let selection: SelectedWorldItem;
-                    if (entitiesAt.length > 0) {
-                        const entity = entitiesAt[0];
-                        selection = new SelectedEntityItem(entity);
-                    } else {
-                        //There was not entity at this place but we can still do
-                        //a check against tiles. E.g for building
-                        selection = new SelectedTileItem(tile);
-                    }
+                let selection: SelectedWorldItem | null = null;
+                if (entitiesAt.length > 0) {
+                    const entity = entitiesAt[0];
+                    selection = new SelectedEntityItem(entity);
+                } else if (tile) {
+                    selection = new SelectedTileItem(tile);
+                }
 
+                if (selection) {
                     const selectionState = new SelectionState(selection);
                     if (this.history.size == 1) {
                         this.interactionStateChanger.push(selectionState);
                     } else {
                         this.interactionStateChanger.replace(selectionState);
                     }
+                } else {
+                    this.interactionStateChanger.clear();
                 }
-            } else {
-                // Tap was not handled and we did not tap a tile
-                this.interactionStateChanger.clear();
             }
         }
 

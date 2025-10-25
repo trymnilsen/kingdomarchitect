@@ -45,9 +45,12 @@ function onTransform(_rootEntity: Entity, entityEvent: EntityTransformEvent) {
     );
     const spaceEntity = entityEvent.source.getAncestorEntity(SpaceComponentId);
     if (!spaceEntity) {
-        console.warn(
-            `[ChunkMapSystem] Entity ${entityEvent.source.id} has no space ancestor, cannot update chunk map`,
-        );
+        //TODO: should probaby use a collider component or something instead
+        if (entityEvent.source.hasComponent(SpaceComponentId)) {
+            console.warn(
+                `[ChunkMapSystem] Entity ${entityEvent.source.id} has no space ancestor, cannot update chunk map`,
+            );
+        }
         return;
     }
 
@@ -88,9 +91,12 @@ function onEntityAdded(
     );
     const spaceEntity = entityEvent.target.getAncestorEntity(SpaceComponentId);
     if (!spaceEntity) {
-        console.warn(
-            `[ChunkMapSystem] Entity ${entityEvent.target.id} has no space ancestor, cannot add to chunk map`,
-        );
+        if (entityEvent.target.hasComponent(SpaceComponentId)) {
+            console.warn(
+                `[ChunkMapSystem] Entity ${entityEvent.target.id} has no space ancestor, cannot add to chunk map`,
+            );
+        }
+
         return;
     }
 
@@ -122,9 +128,11 @@ function onEntityRemoved(
     );
     const spaceEntity = entityEvent.target.getAncestorEntity(SpaceComponentId);
     if (!spaceEntity) {
-        console.warn(
-            `[ChunkMapSystem] Entity ${entityEvent.target.id} has no space ancestor, cannot remove from chunk map`,
-        );
+        if (entityEvent.target.hasComponent(SpaceComponentId)) {
+            console.warn(
+                `[ChunkMapSystem] Entity ${entityEvent.target.id} has no space ancestor, cannot remove from chunk map`,
+            );
+        }
         return;
     }
 
