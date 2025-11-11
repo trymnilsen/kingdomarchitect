@@ -7,7 +7,6 @@ import {
     type LayoutResult,
 } from "./ui.js";
 
-// --- Type Definitions and Enums (Unchanged) ---
 type AxisSizeSelector = (size: UISize) => number;
 type PositionFactory = (mainAxis: number, crossAxis: number) => Point;
 
@@ -24,7 +23,6 @@ export enum MainAxisAlignment {
     SpaceEvenly,
 }
 
-// --- Internal Props for the Generic Sequence ---
 type SequenceProps = {
     children: ComponentDescriptor[];
     width: number;
@@ -35,6 +33,12 @@ type SequenceProps = {
     getMainAxisSize: AxisSizeSelector;
     getCrossAxisSize: AxisSizeSelector;
     createPosition: PositionFactory;
+};
+
+type MeasuredChildren = {
+    descriptor: ComponentDescriptor;
+    mainAxisSize: number;
+    crossAxisSize: number;
 };
 
 const _uiSequence = createComponent<SequenceProps>(
@@ -53,30 +57,65 @@ const _uiSequence = createComponent<SequenceProps>(
 
         const childCount = children.length;
 
-        // =================================================================
-        // 1. MEASUREMENT PASS: Determine the intrinsic size of the content
-        // =================================================================
+        // 1. Measurement pass: determine intrinsic content size
         let mainAxisChildrenSize = 0; // Total size of children only
         let crossAxisMaxContentSize = 0;
 
-        const measuredChildren = children.map((child, index) => {
-            const slotId = child.key ?? index;
+        const measuredChildren: MeasuredChildren[] = [];
+        const fillSizeChildren: MeasuredChildren[] = [];
+
+        for (let i = 0; i < children.length; i++) {
+            const child = children[i];
+            // Determine if child wants to fillSize
+            const childProps = child.props;
+            const wantedMainSize = getMainAxisSize({
+                width: childProps?.width ?? wrapUiSize,
+                height: childProps?.height ?? wrapUiSize,
+            });
+            const isFillUiMainSize = wantedMainSize === fillUiSize;
+
+            const slotId = child.key ?? i;
             const childSize = measureDescriptor(slotId, child, constraints);
-            mainAxisChildrenSize += getMainAxisSize(childSize);
+            let mainAxisSize = getMainAxisSize(childSize);
+            if (isFillUiMainSize) {
+                mainAxisSize = fillUiSize;
+            } else {
+                mainAxisChildrenSize += mainAxisSize;
+            }
             const childCrossAxisSize = getCrossAxisSize(childSize);
             if (childCrossAxisSize > crossAxisMaxContentSize) {
                 crossAxisMaxContentSize = childCrossAxisSize;
             }
-            return {
+
+            const measuredChild = {
                 descriptor: child,
-                mainAxisSize: getMainAxisSize(childSize),
+                mainAxisSize: mainAxisSize,
                 crossAxisSize: childCrossAxisSize,
             };
-        });
 
-        // =================================================================
-        // 2. SIZING PASS: Determine the final size of the component itself
-        // =================================================================
+            measuredChildren.push(measuredChild);
+            if (isFillUiMainSize) {
+                fillSizeChildren.push(measuredChild);
+            }
+        }
+
+        if (fillSizeChildren.length > 0) {
+            const totalSize = getMainAxisSize(constraints);
+            //Divide remaining size
+            const perItemSize =
+                (totalSize - mainAxisChildrenSize) / fillSizeChildren.length;
+
+            //If one child has fill size, it will use the remaining and we will
+            //always use the max size
+            //TODO: we need to handle combined fill size on children and wrap
+            //on parent
+            mainAxisChildrenSize = totalSize;
+            for (const child of fillSizeChildren) {
+                child.mainAxisSize = perItemSize;
+            }
+        }
+
+        // 2. Sizing pass: calculate final component size
         const totalGapSize = childCount > 1 ? (childCount - 1) * gap : 0;
         const mainAxisContentSize = mainAxisChildrenSize + totalGapSize;
 
@@ -106,9 +145,7 @@ const _uiSequence = createComponent<SequenceProps>(
                 break;
         }
 
-        // =================================================================
-        // 3. PLACEMENT PASS: Align children within the final calculated size
-        // =================================================================
+        // 3. Placement pass: align children within calculated size
         const freeSpace = targetMainAxisSize - mainAxisContentSize;
         let alignmentSpacing = 0;
         let currentMainAxisOffset = 0;
@@ -198,9 +235,7 @@ export type UiRowAndColumnProps = {
     crossAxisAlignment?: CrossAxisAlignment;
 };
 
-// =================================================================
-// Public Factory Functions
-// =================================================================
+// Public factory functions
 export const uiRow = (props: UiRowAndColumnProps) =>
     _uiSequence({
         ...props,

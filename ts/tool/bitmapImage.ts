@@ -1,7 +1,7 @@
 import { PNG } from "pngjs";
 import { createWriteStream } from "fs";
-import { PixelColor } from "./spritepack/pixels.js";
-import { createPng } from "./spritepack/pngHelper.js";
+import { PixelColor } from "./util/pixels.js";
+import { createPng } from "./util/pngHelper.js";
 
 export class BitmapImage {
     private image: PNG;

@@ -35,6 +35,15 @@ export default [
         },
     },
     {
+        input: "build/src/characterbuilder/main.js",
+        plugins: [sourcemaps()],
+        output: {
+            sourcemap: true,
+            file: "public/dist/characterbuilder.js",
+            format: "esm",
+        },
+    },
+    {
         input: "build/src/server/webWorkerServer.js",
         plugins: [sourcemaps()],
         output: {

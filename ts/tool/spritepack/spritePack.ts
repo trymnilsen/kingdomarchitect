@@ -6,10 +6,11 @@ import * as path from "path";
 import { EOL } from "os";
 import { removeItem } from "../../src/common/array.js";
 import { BitmapImage } from "../bitmapImage.js";
-import { PixelColor } from "./pixels.js";
-import { getPixelColor, readPng } from "./pngHelper.js";
+import { PixelColor } from "../util/pixels.js";
+import { getPixelColor, readPng } from "../util/pngHelper.js";
+import { collectAssetFiles } from "../util/files.js";
 
-const assetPath = path.join(process.cwd(), "asset");
+const assetPath = path.join(process.cwd(), "asset", "sprite");
 
 run();
 
@@ -25,36 +26,11 @@ async function run() {
     const secondPassSpriteDefinitions: PackableSprite[] = [];
     for (const definitionFile of jsonFiles) {
         //Get the path of the related png for this definition file
-        const defintionPath = definitionFile;
-        const sourceFile =
-            path.basename(definitionFile).replace(".json", "") + ".png";
-        const sourceFilePath = path.join(
-            path.dirname(definitionFile),
-            sourceFile,
+        await processDefaultSpriteAsset(
+            definitionFile,
+            secondPassSpriteDefinitions,
+            pngFiles,
         );
-        //Create a sprite sheet of just the defined sprites, this will remove
-        //any parts of the original spritesheet that is not used
-        const createdSprites = await createSpriteSheet(
-            defintionPath,
-            sourceFilePath,
-        );
-        if (createdSprites) {
-            if (createdSprites.length == 0) {
-                console.error(
-                    `No sprites created for: ${sourceFilePath}`,
-                    createdSprites,
-                );
-            }
-            for (const sprite of createdSprites) {
-                secondPassSpriteDefinitions.push(sprite);
-            }
-
-            // Remove the inital spritesheet file and add the newly created
-            // spritesheet
-            removeItem(pngFiles, sourceFilePath);
-        } else {
-            console.error(`Failed creating spritesheet: ${definitionFile}`);
-        }
     }
 
     // generate sprite definitions of all the standalone png files
@@ -81,33 +57,38 @@ async function run() {
     await packSprites(secondPassSpriteDefinitions);
 }
 
-/**
- * Recursively collects .png and .json files from a directory, ignoring files and folders starting with '_'.
- */
-async function collectAssetFiles(
-    dir: string,
-): Promise<{ pngFiles: string[]; jsonFiles: string[] }> {
-    const pngFiles: string[] = [];
-    const jsonFiles: string[] = [];
-
-    async function walk(currentDir: string) {
-        const entries = await fs.readdir(currentDir, { withFileTypes: true });
-        for (const entry of entries) {
-            if (entry.name.startsWith("_")) continue;
-            const fullPath = path.join(currentDir, entry.name);
-            if (entry.isDirectory()) {
-                await walk(fullPath);
-            } else if (entry.isFile()) {
-                if (entry.name.endsWith(".png")) {
-                    pngFiles.push(fullPath);
-                } else if (entry.name.endsWith(".json")) {
-                    jsonFiles.push(fullPath);
-                }
-            }
+async function processDefaultSpriteAsset(
+    definitionFile: string,
+    secondPassSpriteDefinitions: PackableSprite[],
+    pngFiles: string[],
+) {
+    const defintionPath = definitionFile;
+    const sourceFile =
+        path.basename(definitionFile).replace(".json", "") + ".png";
+    const sourceFilePath = path.join(path.dirname(definitionFile), sourceFile);
+    //Create a sprite sheet of just the defined sprites, this will remove
+    //any parts of the original spritesheet that is not used
+    const createdSprites = await createSpriteSheet(
+        defintionPath,
+        sourceFilePath,
+    );
+    if (createdSprites) {
+        if (createdSprites.length == 0) {
+            console.error(
+                `No sprites created for: ${sourceFilePath}`,
+                createdSprites,
+            );
         }
+        for (const sprite of createdSprites) {
+            secondPassSpriteDefinitions.push(sprite);
+        }
+
+        // Remove the inital spritesheet file and add the newly created
+        // spritesheet
+        removeItem(pngFiles, sourceFilePath);
+    } else {
+        console.error(`Failed creating spritesheet: ${definitionFile}`);
     }
-    await walk(dir);
-    return { pngFiles, jsonFiles };
 }
 
 async function packSprites(sprites: PackableSprite[]) {

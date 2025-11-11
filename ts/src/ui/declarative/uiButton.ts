@@ -14,6 +14,7 @@ export type UiButtonProps = {
     pressedBackground?: UIBackground;
     padding?: number;
     onTap?: () => void;
+    key?: string | number;
 };
 
 export const uiButton = createComponent<UiButtonProps>(
@@ -35,6 +36,10 @@ export const uiButton = createComponent<UiButtonProps>(
             withGesture("tapDown", (_event) => {
                 console.log("down!");
                 setPressedState(true);
+                return true;
+            });
+            withGesture("tapUp", (_event) => {
+                setPressedState(false);
                 return true;
             });
             withGesture("tapCancel", (_event) => {

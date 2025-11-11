@@ -34,7 +34,7 @@ Tap the item you would like to select or activate
 - `Escape`: Go back, cancel or unselect
 - `E`: Activate the current selection or action
 - `1-9`: Activate the n'th actionbar button
-- `M`: Cycle between focus groups
+- `M`: Cycle between focus groups (e.g the action bar and selecting tiles in the world)
 - `J`: Activate the first secondary actionbar item
 - `K`: Activate the second secondary actionbar item
 
@@ -42,7 +42,7 @@ Tap the item you would like to select or activate
 Kingdom architects is intended to be a combined simulation and city building game around building your own kingdom and protecting it from hordes of evil monsters. Explore, build and complete quests. It is intended to be single or multi-player and playable both on mobile screens and desktop size clients. Your kingdom might last for decades or only seconds, who knows what the legends of your reign will be.
 
 ### Goals for the project
-- Make it fun.
+- Make it fun, both for playing and for developing.
 - Play both using the keyboard and mouse/touch.
 - Only depend on browser-apis, no extra libraries or third party frameworks.
 - Progress in some way should be able to be carried over into future kingdoms, rogue-lite style.
@@ -137,7 +137,7 @@ Items that are not directly connected to the game world, like menus and screens 
 
 ### Tooling
 #### Transpiling and bundling
-Typescript and rolldown is used for transpiling, typechecking and bundling the code.
+Typescript and rollup is used for transpiling, typechecking and bundling the code.
 This is performed with the `build` npm task.
 
 ### Testing
@@ -149,6 +149,14 @@ Some tests already exists for the game, these are made for the built in node tes
 - **Note:** typescript sources needs to be built before the task can run
 
 To optimize, remove unused parts of images and bundling them together into a spritebin the `spritepack` npm task can be used. If you update any of the images in `asset` you need to run this task to get the updated version to show up in game. The source for this can be found in `ts/tool/spritepack`.
+
+#### characterpacking
+- **Task:** `characterpack`
+- **Note:** typescript sources needs to be built before the task can run
+
+To enable building dynamic character sprites, for example a knight with pink pants or a wizard with a sword we use this
+task to parse custom colored spritesheets to derive positions of bodyparts during animation as well
+as masking for the different parts. 
 
 ## ❓ FAQ
 No questions so far
