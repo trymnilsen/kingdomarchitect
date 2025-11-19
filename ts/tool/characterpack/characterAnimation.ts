@@ -1,15 +1,10 @@
-import type { Rectangle } from "../../src/common/structure/rectangle.js";
-import type { PixelPosition } from "./colorRegion.js";
-
 /**
- * Represents a single frame's data for a specific body part
- * If the part is not present in this frame, boundingBox will be undefined
- * and pixels will be an empty array
+ * Represents a single frame's data for a specific body part.
+ * Each frame is a flat array of coordinates: [x1, y1, x2, y2, x3, y3, ...]
+ * If the part is not present in this frame, it will be an empty array.
+ * Bounding box can be calculated at runtime from the coordinates.
  */
-export interface PartFrame {
-    boundingBox?: Rectangle;
-    pixels: PixelPosition[];
-}
+export type PartFrame = number[];
 
 /**
  * Represents all frames for a specific body part within an animation

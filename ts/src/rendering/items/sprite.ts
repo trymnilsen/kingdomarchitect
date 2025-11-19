@@ -85,7 +85,7 @@ export function ninePatchImageRenderer(
     left: number,
     right: number,
     scale: number,
-    binAsset: HTMLImageElement,
+    binAsset: HTMLImageElement | ImageBitmap,
     context: CanvasContext,
 ) {
     x = Math.floor(x);

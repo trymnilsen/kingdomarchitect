@@ -1,5 +1,9 @@
-import { addPoint } from "../../common/point.js";
-import { calculateAlignment, uiAlignment } from "../uiAlignment.js";
+import { addPoint, type Point } from "../../common/point.js";
+import {
+    calculateAlignment,
+    uiAlignment,
+    type UiAlignment,
+} from "../uiAlignment.js";
 import type { UIBackground } from "../uiBackground.js";
 import { wrapUiSize } from "../uiSize.js";
 import {
@@ -15,6 +19,7 @@ type UiBoxProps = {
     width: number;
     height: number;
     key?: string | number;
+    alignment?: Point;
 };
 
 export const uiBox = createComponent<UiBoxProps>(
@@ -63,7 +68,7 @@ export const uiBox = createComponent<UiBoxProps>(
             const position = calculateAlignment(
                 constraintsWithPadding.width,
                 constraintsWithPadding.height,
-                uiAlignment.center,
+                props.alignment ?? uiAlignment.center,
                 childSize.width,
                 childSize.height,
             );

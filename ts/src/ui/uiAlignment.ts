@@ -13,6 +13,8 @@ export enum VerticalAlignment {
     Bottom,
 }
 
+export type UiAlignment = typeof uiAlignment;
+
 export const uiAlignment = {
     topLeft: { x: -1, y: -1 },
     topCenter: { x: 0, y: -1 },

@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "fs";
+import { existsSync, readFileSync, writeFileSync } from "fs";
 import * as path from "path";
 import * as util from "util";
 import { PNGWithMetadata } from "pngjs";
@@ -30,34 +30,14 @@ async function run() {
 
         const frames = processCharacterFile(defintionPath, sourceFilePath);
 
-        console.log(`\nProcessed ${sourceFilePath}:`);
-        for (const animation of frames) {
-            console.log(`\n  Animation: ${animation.animationName}`);
-            console.log(`  Parts: ${animation.parts.length}`);
+        const framesJson = JSON.stringify(frames, null, 2);
+        const generatedTypescript =
+            "export const characterPartFrames = " + framesJson + " as const;";
 
-            for (const part of animation.parts) {
-                console.log(
-                    `    - ${part.partName}: ${part.frames.length} frames`,
-                );
-                for (let i = 0; i < part.frames.length; i++) {
-                    const frame = part.frames[i];
-                    if (frame.boundingBox) {
-                        console.log(
-                            `      Frame ${i}: bbox(${frame.boundingBox.x},${frame.boundingBox.y},${frame.boundingBox.width}x${frame.boundingBox.height}) ${frame.pixels.length} pixels`,
-                        );
-                    } else {
-                        console.log(`      Frame ${i}: [empty]`);
-                    }
-                }
-            }
-        }
-
-        console.log(
-            util.inspect(frames, {
-                showHidden: false,
-                depth: null,
-                colors: true,
-            }),
+        // Write all frames
+        writeFileSync(
+            path.join(process.cwd(), "ts", "generated", "characterFrames.ts"),
+            generatedTypescript,
         );
     }
 }
@@ -125,10 +105,12 @@ function processCharacterFile(
             // Store frame data for each part that appears in this frame
             for (const region of colorRegions) {
                 const partFramesMap = partsMap.get(region.name)!;
-                partFramesMap.set(frameIndex, {
-                    boundingBox: region.boundingBox,
-                    pixels: region.pixels,
-                });
+                // Flatten pixels to [x1, y1, x2, y2, ...] format
+                const flatPixels: number[] = [];
+                for (const pixel of region.pixels) {
+                    flatPixels.push(pixel[0], pixel[1]);
+                }
+                partFramesMap.set(frameIndex, flatPixels);
             }
         }
 
@@ -143,9 +125,7 @@ function processCharacterFile(
                         frames.push(frameData);
                     } else {
                         // Empty frame - part not present
-                        frames.push({
-                            pixels: [],
-                        });
+                        frames.push([]);
                     }
                 }
 
@@ -232,18 +212,15 @@ function processSpriteFrame(
                 const pixelColor = getPixelColor(png, absoluteX, absoluteY);
 
                 if (colorsMatch(pixelColor, targetColor)) {
-                    pixels.push({
-                        x: x, // Relative to sprite
-                        y: y, // Relative to sprite
-                    });
+                    pixels.push([x, y]); // Tuple format: [x, y]
                 }
             }
         }
 
         // Calculate bounding box if pixels were found
         if (pixels.length > 0) {
-            const xs = pixels.map((p) => p.x);
-            const ys = pixels.map((p) => p.y);
+            const xs = pixels.map((p) => p[0]);
+            const ys = pixels.map((p) => p[1]);
 
             const minX = Math.min(...xs);
             const maxX = Math.max(...xs);

@@ -20,7 +20,7 @@ import { Bounds } from "../common/bounds.js";
 import { sprites } from "../../generated/sprites.js";
 import { CanvasContext } from "./canvasContext.js";
 import { SpriteCache } from "./spriteCache.js";
-import { Point } from "../common/point.js";
+import { Point, zeroPoint } from "../common/point.js";
 
 export type DrawFunction = (context: RenderScope) => void;
 
@@ -40,8 +40,6 @@ export class RenderScope implements UIRenderScope, UILayoutScope {
     private _assetLoader: AssetLoader;
     private _deferredRenderCalls: DrawFunction[] = [];
     private _size: UISize;
-    private _offscreenCanvas: OffscreenCanvas;
-    private _offscreenContext: CanvasContext;
 
     drawTick: number = 0;
     /**
@@ -79,7 +77,7 @@ export class RenderScope implements UIRenderScope, UILayoutScope {
     private textMeasureCache: Map<string, UISize> = new Map();
 
     constructor(
-        canvasContext: CanvasRenderingContext2D,
+        canvasContext: CanvasContext,
         camera: Camera,
         assetLoader: AssetLoader,
         spriteCache: SpriteCache,
@@ -91,12 +89,6 @@ export class RenderScope implements UIRenderScope, UILayoutScope {
         this._camera = camera;
         this._assetLoader = assetLoader;
         this._size = { width, height };
-        this._offscreenCanvas = new OffscreenCanvas(this.width, this.height);
-        const context = this._offscreenCanvas.getContext("2d");
-        if (!context) {
-            throw new Error("Unable to get offscreen canvas");
-        }
-        this._offscreenContext = context;
     }
 
     updateSize(width: number, height: number): void {
@@ -134,6 +126,28 @@ export class RenderScope implements UIRenderScope, UILayoutScope {
 
     getSprite(id: string): Sprite2 | undefined {
         return sprites[id] as Sprite2;
+    }
+
+    getOffscreenRenderScope(
+        width: number,
+        height: number,
+    ): OffscreenRenderScope {
+        const offscreenCanvas = new OffscreenCanvas(width, height);
+        const context = offscreenCanvas.getContext("2d");
+        if (!context) {
+            throw new Error("Cannot get 2d offscreen canvas");
+        }
+
+        context.imageSmoothingEnabled = false;
+        return new OffscreenRenderScope(
+            offscreenCanvas,
+            context,
+            new Camera(zeroPoint(), this.camera.currentScene),
+            this._assetLoader,
+            this.spriteCache,
+            width,
+            height,
+        );
     }
 
     /**
@@ -388,5 +402,25 @@ export class RenderScope implements UIRenderScope, UILayoutScope {
      */
     drawScreenspaceText(text: TextConfiguration): void {
         this.drawText(text);
+    }
+}
+
+export class OffscreenRenderScope extends RenderScope {
+    private canvas: OffscreenCanvas;
+    constructor(
+        canvas: OffscreenCanvas,
+        context: CanvasContext,
+        camera: Camera,
+        assetLoader: AssetLoader,
+        spriteCache: SpriteCache,
+        width: number,
+        height: number,
+    ) {
+        super(context, camera, assetLoader, spriteCache, width, height);
+        this.canvas = canvas;
+    }
+
+    getBitmap(): ImageBitmap {
+        return this.canvas.transferToImageBitmap();
     }
 }

@@ -99,8 +99,9 @@ export type ComponentContext<P extends {}> = {
     withState: <T>(
         state: T,
     ) => [T, (newValue: T | ((currentValue: T) => T)) => void];
-    withDraw: (draw: (scope: any, region: Rectangle) => void) => void;
+    withDraw: (draw: (scope: RenderScope, region: Rectangle) => void) => void;
     withEffect: (effect: () => (() => void) | void, deps?: any[]) => void;
+    withRemember: <T>(factory: () => T, deps?: any[]) => T;
     withGesture: (
         eventType: UIEventType,
         handler: GestureHandler,
@@ -147,6 +148,16 @@ export function createComponent<P extends {} = {}>(
     return componentType as ComponentType<P>;
 }
 
+export function sized(width: number, height: number) {
+    return {
+        children: [],
+        size: {
+            width,
+            height,
+        },
+    };
+}
+
 // ===================================================================
 // 4. THE UI RENDERER (Updated with all fixes)
 // ===================================================================
@@ -159,9 +170,15 @@ type StateHook<T = any> = {
     value: T;
 };
 
+type RememberHook<T = any> = {
+    deps?: any[];
+    value: T;
+};
+
 type NodeHooks = {
     effects: EffectHook[];
     states: StateHook[];
+    remembers: RememberHook[];
     draw?: (scope: any, region: Rectangle) => void;
     gestures?: GestureRegistration[];
 };
@@ -285,6 +302,7 @@ export class UiRenderer {
             const nodeHooks = this.hooks.get(node) ?? {
                 effects: [],
                 states: [],
+                remembers: [],
             };
             nodeHooks.gestures = [];
             this.hooks.set(node, nodeHooks);
@@ -521,6 +539,7 @@ export class UiRenderer {
                 const nodeHooks = this.hooks.get(node) ?? {
                     effects: [],
                     states: [],
+                    remembers: [],
                 };
                 if (!this.hooks.has(node)) {
                     this.hooks.set(node, nodeHooks);
@@ -551,6 +570,7 @@ export class UiRenderer {
                 const nodeHooks = this.hooks.get(node) ?? {
                     effects: [],
                     states: [],
+                    remembers: [],
                 };
                 nodeHooks.draw = drawFn;
                 this.hooks.set(node, nodeHooks);
@@ -560,6 +580,7 @@ export class UiRenderer {
                 const nodeHooks = this.hooks.get(node) ?? {
                     effects: [],
                     states: [],
+                    remembers: [],
                 };
                 if (!nodeHooks.gestures) {
                     nodeHooks.gestures = [];
@@ -578,6 +599,7 @@ export class UiRenderer {
                 const nodeHooks = this.hooks.get(node) ?? {
                     effects: [],
                     states: [],
+                    remembers: [],
                 };
                 if (!this.hooks.has(node)) {
                     this.hooks.set(node, nodeHooks);
@@ -599,6 +621,35 @@ export class UiRenderer {
                         cleanup: cleanup ?? undefined,
                     };
                 }
+            },
+            withRemember: <T>(factory: () => T, deps?: any[]): T => {
+                const currentHookIndex = hookIndex++;
+                const nodeHooks = this.hooks.get(node) ?? {
+                    effects: [],
+                    states: [],
+                    remembers: [],
+                };
+                if (!this.hooks.has(node)) {
+                    this.hooks.set(node, nodeHooks);
+                }
+
+                const oldRememberHook = nodeHooks.remembers[currentHookIndex];
+
+                if (
+                    !oldRememberHook ||
+                    !_depsAreEqual(oldRememberHook.deps, deps)
+                ) {
+                    // Recompute the value if dependencies changed
+                    const value = factory();
+                    nodeHooks.remembers[currentHookIndex] = {
+                        deps,
+                        value,
+                    };
+                    return value;
+                }
+
+                // Return the cached value
+                return oldRememberHook.value as T;
             },
             measureText: (text, style) => {
                 return this.renderScope.measureText(text, style);

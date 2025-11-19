@@ -1,7 +1,7 @@
 import { bins } from "../../../generated/sprites.js";
 
 export class AssetLoader {
-    private _assets: Record<string, HTMLImageElement> = {};
+    private _assets: Record<string, HTMLImageElement | ImageBitmap> = {};
     private _loaderPromise?: Promise<unknown>;
 
     public get loaderPromise(): Promise<unknown> | undefined {
@@ -19,7 +19,16 @@ export class AssetLoader {
         this._loaderPromise = Promise.all(loadPromises);
     }
 
-    getBinAsset(binName: string): HTMLImageElement {
+    /**
+     * Add a runtime-generated asset to the asset loader
+     * @param binName The name to store the asset under
+     * @param asset The image or bitmap to store
+     */
+    addGeneratedAsset(binName: string, asset: HTMLImageElement | ImageBitmap) {
+        this._assets[binName] = asset;
+    }
+
+    getBinAsset(binName: string): HTMLImageElement | ImageBitmap {
         const binAsset = this._assets[binName];
         if (!binAsset) {
             throw new Error(`Cannot find bin asset: ${binName}`);

@@ -1,13 +1,10 @@
-import type { Point } from "../../src/common/point.js";
 import type { Rectangle } from "../../src/common/structure/rectangle.js";
 
-export interface PixelPosition {
-    x: number;
-    y: number;
-}
+// Tuple representation: [x, y]
+export type PixelPosition = [number, number];
 
 export interface ColorRegion {
     name: string;
     boundingBox: Rectangle;
-    pixels: Point[];
+    pixels: PixelPosition[];
 }
