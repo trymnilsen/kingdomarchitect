@@ -98,6 +98,7 @@ export function createPreviewPanel(
     onModeChange: (mode: PreviewMode) => void,
     selectedColors: CharacterColors,
     selectedAnimation: string,
+    currentFrame: number,
 ) {
     return uiColumn({
         width: fillUiSize,
@@ -123,6 +124,7 @@ export function createPreviewPanel(
                     colors: selectedColors,
                     previewMode,
                     selectedAnimation,
+                    currentFrame,
                 }),
             }),
         ],
@@ -157,7 +159,13 @@ export function createLayerPanel() {
 export function createAnimationPanel(
     selectedAnimation: string,
     onAnimationSelect: (animation: string) => void,
+    previewMode: PreviewMode,
+    onPreviousFrame: () => void,
+    onNextFrame: () => void,
+    currentFrame: number,
+    frameCount: number,
 ) {
+    const isPlaybackEnabled = previewMode === "Single";
     return uiBox({
         width: LAYOUT.RIGHT_PANEL_WIDTH,
         height: fillUiSize,
@@ -172,13 +180,28 @@ export function createAnimationPanel(
                 }),
                 uiRow({
                     children: [
-                        createPrimaryButton("|<", () =>
-                            console.log("First frame"),
+                        createPrimaryButton(
+                            "<",
+                            onPreviousFrame,
+                            false,
+                            !isPlaybackEnabled,
                         ),
-                        createPrimaryButton(">", () => console.log("Play")),
-                        createPrimaryButton("||", () => console.log("Pause")),
-                        createPrimaryButton(">|", () =>
-                            console.log("Last frame"),
+                        uiBox({
+                            width: fillUiSize,
+                            height: wrapUiSize,
+                            padding: 0,
+                            child: uiText({
+                                content: isPlaybackEnabled
+                                    ? `${currentFrame + 1} / ${frameCount}`
+                                    : "-",
+                                textStyle: titleTextStyle,
+                            }),
+                        }),
+                        createPrimaryButton(
+                            ">",
+                            onNextFrame,
+                            false,
+                            !isPlaybackEnabled,
                         ),
                     ],
                 }),

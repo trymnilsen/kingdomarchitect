@@ -27,12 +27,50 @@ export const CharacterBuilderUI = createComponent(({ withState }) => {
     );
     const [selectedColors, setSelectedColors] = withState<CharacterColors>({});
     const [previewMode, setPreviewMode] = withState<PreviewMode>("Single");
+    const [currentFrame, setCurrentFrame] = withState<number>(0);
 
     const handleColorSelect = (color: string) => {
         const newColors = { ...selectedColors };
         newColors[selectedPart] = color;
         console.log("Color updated:", newColors);
         setSelectedColors(newColors);
+    };
+
+    // Get the current animation's frame count
+    const getCurrentFrameCount = (): number => {
+        const animation = characterPartFrames.find(
+            (f) => f.animationName === selectedAnimation,
+        );
+        return animation?.parts[0]?.frames.length || 0;
+    };
+
+    const handlePreviousFrame = () => {
+        if (previewMode === "Single") {
+            const frameCount = getCurrentFrameCount();
+            setCurrentFrame((prev) => {
+                if (prev === 0) {
+                    return frameCount - 1; // Loop to last frame
+                }
+                return prev - 1;
+            });
+        }
+    };
+
+    const handleNextFrame = () => {
+        if (previewMode === "Single") {
+            const frameCount = getCurrentFrameCount();
+            setCurrentFrame((prev) => {
+                if (prev >= frameCount - 1) {
+                    return 0; // Loop to first frame
+                }
+                return prev + 1;
+            });
+        }
+    };
+
+    const handleAnimationChange = (animation: string) => {
+        setSelectedAnimation(animation);
+        setCurrentFrame(0); // Reset frame when changing animation
     };
 
     return uiColumn({
@@ -55,11 +93,17 @@ export const CharacterBuilderUI = createComponent(({ withState }) => {
                         setPreviewMode,
                         selectedColors,
                         selectedAnimation,
+                        currentFrame,
                     ),
                     createLayerPanel(),
                     createAnimationPanel(
                         selectedAnimation,
-                        setSelectedAnimation,
+                        handleAnimationChange,
+                        previewMode,
+                        handlePreviousFrame,
+                        handleNextFrame,
+                        currentFrame,
+                        getCurrentFrameCount(),
                     ),
                 ],
             }),

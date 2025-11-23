@@ -7,6 +7,7 @@ export type CharacterPreviewProps = {
     colors: CharacterColors;
     previewMode: PreviewMode;
     selectedAnimation: string;
+    currentFrame?: number;
 };
 
 /**
@@ -36,8 +37,10 @@ export const CharacterPreview = createComponent<CharacterPreviewProps>(
             if (!selectedSprite) return;
 
             let displaySprite = selectedSprite;
+            let frameToDisplay = props.currentFrame ?? 0;
+
             if (props.previewMode === "Sheet") {
-                // Create a modified sprite for sheet view
+                // In sheet mode, show the entire sprite sheet
                 displaySprite = {
                     ...selectedSprite,
                     defintion: {
@@ -47,7 +50,12 @@ export const CharacterPreview = createComponent<CharacterPreviewProps>(
                         h: LAYOUT.SPRITE_GRID_SIZE,
                     },
                 };
+                frameToDisplay = 0; // Always show first frame in sheet mode
             }
+
+            console.log(
+                `Drawing frame ${frameToDisplay} of ${displaySprite.defintion.frames} frames (mode: ${props.previewMode})`,
+            );
 
             scope.drawScreenSpaceSprite({
                 x: region.x,
@@ -55,6 +63,7 @@ export const CharacterPreview = createComponent<CharacterPreviewProps>(
                 targetWidth: size,
                 targetHeight: size,
                 sprite: displaySprite,
+                frame: frameToDisplay,
             });
         });
 

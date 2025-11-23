@@ -53,22 +53,32 @@ export const createPrimaryButton = (
     name: string,
     onTap: () => void,
     selected?: boolean,
-) =>
-    uiButton({
+    disabled?: boolean,
+) => {
+    const isDisabled = disabled ?? false;
+    return uiButton({
         width: fillUiSize,
         height: wrapUiSize,
         background: boxBackground({
-            fill: selected
-                ? COLORS.PRIMARY_BUTTON_SELECTED
-                : COLORS.PRIMARY_BUTTON_DEFAULT,
-            stroke: selected
-                ? COLORS.PRIMARY_BUTTON_BORDER_SELECTED
-                : COLORS.PRIMARY_BUTTON_BORDER,
+            fill: isDisabled
+                ? COLORS.PRIMARY_BUTTON_DISABLED
+                : selected
+                  ? COLORS.PRIMARY_BUTTON_SELECTED
+                  : COLORS.PRIMARY_BUTTON_DEFAULT,
+            stroke: isDisabled
+                ? COLORS.PRIMARY_BUTTON_DISABLED_BORDER
+                : selected
+                  ? COLORS.PRIMARY_BUTTON_BORDER_SELECTED
+                  : COLORS.PRIMARY_BUTTON_BORDER,
             strokeWidth: 2,
         }),
         pressedBackground: boxBackground({
-            fill: COLORS.PRIMARY_BUTTON_PRESSED,
-            stroke: COLORS.PRIMARY_BUTTON_BORDER,
+            fill: isDisabled
+                ? COLORS.PRIMARY_BUTTON_DISABLED
+                : COLORS.PRIMARY_BUTTON_PRESSED,
+            stroke: isDisabled
+                ? COLORS.PRIMARY_BUTTON_DISABLED_BORDER
+                : COLORS.PRIMARY_BUTTON_BORDER,
             strokeWidth: 2,
         }),
         padding: 8,
@@ -76,8 +86,9 @@ export const createPrimaryButton = (
             content: name,
             textStyle: subTitleTextStyle,
         }),
-        onTap,
+        onTap: isDisabled ? () => {} : onTap,
     });
+};
 
 /**
  * Creates an animation selection button
