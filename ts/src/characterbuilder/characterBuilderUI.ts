@@ -29,7 +29,7 @@ export const CharacterBuilderUI = createComponent(({ withState }) => {
     const [previewMode, setPreviewMode] = withState<PreviewMode>("Single");
     const [currentFrame, setCurrentFrame] = withState<number>(0);
 
-    const handleColorSelect = (color: string) => {
+    const handleColorSelect = (color: string | undefined) => {
         const newColors = { ...selectedColors };
         newColors[selectedPart] = color;
         console.log("Color updated:", newColors);

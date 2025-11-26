@@ -1,4 +1,12 @@
 /**
+ * Character sprite dimensions
+ */
+export const CHARACTER_SPRITE = {
+    FRAME_WIDTH: 32,
+    FRAME_HEIGHT: 32,
+} as const;
+
+/**
  * Layout dimensions for the character builder UI
  */
 export const LAYOUT = {
@@ -6,7 +14,7 @@ export const LAYOUT = {
     LEFT_PANEL_WIDTH: 210,
     RIGHT_PANEL_WIDTH: 250,
     LAYER_BOX_SIZE: 100,
-    SPRITE_GRID_SIZE: 64,
+    SPRITE_GRID_SIZE: CHARACTER_SPRITE.FRAME_WIDTH * 4,
     COLOR_SWATCH_SIZE: 40,
 } as const;
 

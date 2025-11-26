@@ -16,7 +16,7 @@ export type CharacterPreviewProps = {
  */
 export const CharacterPreview = createComponent<CharacterPreviewProps>(
     ({ props, withDraw, constraints }) => {
-        // Calculate the largest size divisible by 64 that fits in the constraints
+        // Calculate the largest size divisible by the sprite grid size that fits in the constraints
         const maxWidth =
             Math.floor(constraints.width / LAYOUT.SPRITE_GRID_SIZE) *
             LAYOUT.SPRITE_GRID_SIZE;

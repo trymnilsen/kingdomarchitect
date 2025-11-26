@@ -48,7 +48,7 @@ export function createPartSelectionPanel(
     selectedPart: BodyPart,
     onPartSelect: (part: BodyPart) => void,
     selectedColors: CharacterColors,
-    onColorSelect: (color: string) => void,
+    onColorSelect: (color: string | undefined) => void,
 ) {
     return uiBox({
         width: LAYOUT.LEFT_PANEL_WIDTH,
@@ -67,10 +67,9 @@ export function createPartSelectionPanel(
                         onPartSelect(part),
                     ),
                 ),
-                uiBox({
-                    width: fillUiSize,
-                    height: 1,
-                    background: colorBackground(COLORS.DIVIDER),
+                uiText({
+                    content: "Color",
+                    textStyle: titleTextStyle,
                 }),
                 uiGrid({
                     gap: 8,

@@ -1,4 +1,5 @@
 import { Sprite2 } from "../../asset/sprite.js";
+import type { Point } from "../../common/point.js";
 
 export type InventoryItem = {
     readonly id: string;
@@ -7,6 +8,12 @@ export type InventoryItem = {
     readonly hint?: string;
     readonly tag?: readonly ItemTag[];
     readonly category?: ItemCategory;
+    readonly visual?: ItemVisual;
+};
+
+export type ItemVisual = {
+    sprite: Sprite2;
+    offset: Point;
 };
 
 export enum ItemTag {

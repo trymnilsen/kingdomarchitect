@@ -102,8 +102,8 @@ export const createAnimationButton = (
 };
 
 type GridItemProps = {
-    color: string;
-    onClick: (item: string) => void;
+    color?: string;
+    onClick: (item: string | undefined) => void;
 };
 
 /**
@@ -122,7 +122,7 @@ export const ColorGridItem = createComponent<GridItemProps>(
             background: boxBackground({
                 stroke: COLORS.PART_BUTTON_BORDER,
                 strokeWidth: 1,
-                fill: props.color,
+                fill: props.color ?? COLORS.BACKGROUND_BLACK,
             }),
         });
     },
@@ -133,9 +133,12 @@ export const ColorGridItem = createComponent<GridItemProps>(
  */
 export function createColorGridItems(
     colors: readonly string[],
-    onClick: (color: string) => void,
+    onClick: (color: string | undefined) => void,
 ): ComponentDescriptor[] {
-    return colors.map((color) => ColorGridItem({ color, onClick }));
+    return [
+        ColorGridItem({ color: undefined, onClick }),
+        ...colors.map((color) => ColorGridItem({ color, onClick })),
+    ];
 }
 
 /**
