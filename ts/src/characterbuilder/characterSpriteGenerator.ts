@@ -1,5 +1,8 @@
 import { characterPartFrames } from "../../generated/characterFrames.js";
-import type { RenderScope } from "../rendering/renderScope.js";
+import type {
+    RenderScope,
+    OffscreenRenderScope,
+} from "../rendering/renderScope.js";
 import type { Sprite2 } from "../asset/sprite.js";
 import type { CharacterColors } from "./colors.js";
 import type { Rectangle } from "../common/structure/rectangle.js";
@@ -214,36 +217,18 @@ const drawPartPixels = (
 };
 
 /**
- * Generate outline pixels for a complete frame (all parts combined)
+ * Generate outline pixels from a set of pixels
  * Outlines are drawn on top, left, and right sides, but not on the bottom
- * @param animation The animation containing all parts
- * @param frameIdx The frame index to generate outline for
+ * @param pixelSet Set of pixel coordinates as "x,y" strings
+ * @param maxY The maximum Y coordinate of all pixels
  * @param outlineColor The color of the outline
  * @returns Array of outline pixel coordinates with their color
  */
-const generateFrameOutlinePixels = (
-    animation: (typeof characterPartFrames)[number],
-    frameIdx: number,
+const generateOutlineFromPixels = (
+    pixelSet: Set<string>,
+    maxY: number,
     outlineColor: string = "#000000",
 ): Array<{ x: number; y: number; color: string }> => {
-    // Collect all pixels from all parts in this frame
-    const pixelSet = new Set<string>();
-    let maxY = -Infinity;
-
-    for (const part of animation.parts) {
-        const frameData = part.frames[frameIdx];
-        if (!frameData || frameData.length === 0) {
-            continue;
-        }
-
-        for (let i = 0; i < frameData.length; i += 2) {
-            const x = frameData[i];
-            const y = frameData[i + 1];
-            pixelSet.add(`${x},${y}`);
-            maxY = Math.max(maxY, y);
-        }
-    }
-
     const outlinePixels: Array<{ x: number; y: number; color: string }> = [];
     const outlineSet = new Set<string>();
 
@@ -292,26 +277,18 @@ const generateFrameOutlinePixels = (
 };
 
 /**
- * Draw outline pixels for an entire frame
+ * Draw outline pixels directly to the frame (no animation bounds adjustment needed)
  */
 const drawFrameOutline = (
     offscreenScope: RenderScope,
     outlinePixels: Array<{ x: number; y: number; color: string }>,
     frameBaseX: number,
     frameBaseY: number,
-    contentCenterX: number,
-    contentCenterY: number,
-    animationBounds: Rectangle,
 ) => {
     for (const pixel of outlinePixels) {
-        const adjustedX =
-            frameBaseX + contentCenterX + (pixel.x - animationBounds.x);
-        const adjustedY =
-            frameBaseY + contentCenterY + (pixel.y - animationBounds.y);
-
         offscreenScope.drawScreenSpaceRectangle({
-            x: adjustedX,
-            y: adjustedY,
+            x: frameBaseX + pixel.x,
+            y: frameBaseY + pixel.y,
             width: 1,
             height: 1,
             fill: pixel.color,
@@ -320,36 +297,10 @@ const drawFrameOutline = (
 };
 
 /**
- * Draw equipment on the head part (currently hardcoded to wizard hat)
- */
-const drawHeadEquipment = (
-    offscreenScope: RenderScope,
-    frameData: readonly number[],
-    frameBaseX: number,
-    frameBaseY: number,
-    contentCenterX: number,
-    contentCenterY: number,
-    animationBounds: Rectangle,
-) => {
-    const partBounds = getPartBounds(frameData);
-    const position = subtractPoint(partBounds, wizardHat.visual.offset);
-    const adjustedX =
-        frameBaseX + contentCenterX + (position.x - animationBounds.x);
-    const adjustedY =
-        frameBaseY + contentCenterY + (position.y - animationBounds.y);
-
-    offscreenScope.drawScreenSpaceSprite({
-        x: adjustedX,
-        y: adjustedY,
-        sprite: wizardHat.visual.sprite,
-    });
-};
-
-/**
  * Draw all frames of a single animation to the sprite sheet
  */
 const drawAnimation = (
-    offscreenScope: RenderScope,
+    offscreenScope: OffscreenRenderScope,
     animation: (typeof characterPartFrames)[number],
     animIdx: number,
     colors: CharacterColors,
@@ -371,19 +322,7 @@ const drawAnimation = (
         const frameBaseX = frameIdx * CHARACTER_FRAME_WIDTH;
         const frameBaseY = animIdx * CHARACTER_FRAME_HEIGHT;
 
-        // Generate outline for the entire frame first
-        const outlinePixels = generateFrameOutlinePixels(animation, frameIdx);
-        drawFrameOutline(
-            offscreenScope,
-            outlinePixels,
-            frameBaseX,
-            frameBaseY,
-            contentCenterX,
-            contentCenterY,
-            animationBounds,
-        );
-
-        // Draw all parts for this frame
+        // Step 1: Draw all character parts directly to the main canvas
         for (const part of animation.parts) {
             const frameData = part.frames[frameIdx];
             if (!frameData || frameData.length === 0) {
@@ -398,31 +337,62 @@ const drawAnimation = (
 
             const color = getPartColor(part.partName, colors);
 
-            // Draw the part's pixels
-            drawPartPixels(
-                offscreenScope,
-                frameData,
-                frameBaseX,
-                frameBaseY,
-                contentCenterX,
-                contentCenterY,
-                animationBounds,
-                color,
-            );
+            // Draw the part's pixels to main canvas
+            for (let i = 0; i < frameData.length; i += 2) {
+                const x = frameData[i];
+                const y = frameData[i + 1];
 
-            // Draw equipment for head parts
+                const adjustedX =
+                    frameBaseX + contentCenterX + (x - animationBounds.x);
+                const adjustedY =
+                    frameBaseY + contentCenterY + (y - animationBounds.y);
+
+                offscreenScope.drawScreenSpaceRectangle({
+                    x: adjustedX,
+                    y: adjustedY,
+                    width: 1,
+                    height: 1,
+                    fill: color,
+                });
+            }
+
+            // Step 2: Draw equipment for head parts
             if (part.partName === "Head") {
-                drawHeadEquipment(
-                    offscreenScope,
-                    frameData,
-                    frameBaseX,
-                    frameBaseY,
-                    contentCenterX,
-                    contentCenterY,
-                    animationBounds,
+                const partBounds = getPartBounds(frameData);
+                const position = subtractPoint(
+                    partBounds,
+                    wizardHat.visual.offset,
                 );
+                const adjustedX =
+                    frameBaseX +
+                    contentCenterX +
+                    (position.x - animationBounds.x);
+                const adjustedY =
+                    frameBaseY +
+                    contentCenterY +
+                    (position.y - animationBounds.y);
+
+                offscreenScope.drawScreenSpaceSprite({
+                    x: adjustedX,
+                    y: adjustedY,
+                    sprite: wizardHat.visual.sprite,
+                });
             }
         }
+
+        // Step 3: Extract pixels from the frame region in the main canvas
+        const { pixelSet, maxY } = offscreenScope.extractPixels(
+            frameBaseX,
+            frameBaseY,
+            CHARACTER_FRAME_WIDTH,
+            CHARACTER_FRAME_HEIGHT,
+        );
+
+        // Step 4: Generate outline from extracted pixels
+        const outlinePixels = generateOutlineFromPixels(pixelSet, maxY);
+
+        // Step 5: Draw outline on top of the frame
+        drawFrameOutline(offscreenScope, outlinePixels, frameBaseX, frameBaseY);
     }
 };
 

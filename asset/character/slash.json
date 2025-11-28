@@ -1,0 +1,22 @@
+{
+    "colors": {
+        "FF0000": "Head",
+        "FFFF00": "Chest",
+        "FF00FF": "Pants",
+        "0000FF": "LeftFoot",
+        "0064C8": "RightFoot",
+        "00B400": "LeftHand",
+        "00FF00": "RightHand",
+        "F0B200": "LeftEye",
+        "C8B200": "RightEye"
+    },
+    "width": 16,
+    "height": 16,
+    "offset": 8,
+    "animations": [
+        "walk_southeast",
+        "walk_southwest",
+        "walk_northeast",
+        "walk_northwest"
+    ]
+}

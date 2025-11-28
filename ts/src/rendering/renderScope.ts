@@ -407,6 +407,7 @@ export class RenderScope implements UIRenderScope, UILayoutScope {
 
 export class OffscreenRenderScope extends RenderScope {
     private canvas: OffscreenCanvas;
+    private context: CanvasContext;
     constructor(
         canvas: OffscreenCanvas,
         context: CanvasContext,
@@ -418,9 +419,47 @@ export class OffscreenRenderScope extends RenderScope {
     ) {
         super(context, camera, assetLoader, spriteCache, width, height);
         this.canvas = canvas;
+        this.context = context;
     }
 
     getBitmap(): ImageBitmap {
         return this.canvas.transferToImageBitmap();
+    }
+
+    /**
+     * Extract pixel data from the canvas for a specific region
+     * @param x The X position to start reading from
+     * @param y The Y position to start reading from
+     * @param width The width of the region to read
+     * @param height The height of the region to read
+     * @returns Set of pixel coordinates as "x,y" strings and the maximum Y value
+     */
+    extractPixels(
+        x: number,
+        y: number,
+        width: number,
+        height: number,
+    ): { pixelSet: Set<string>; maxY: number } {
+        const pixelSet = new Set<string>();
+        let maxY = -Infinity;
+
+        // Read pixel data from the canvas for the specified region
+        const imageData = this.context.getImageData(x, y, width, height);
+
+        // Iterate through the image data to find non-transparent pixels
+        for (let py = 0; py < height; py++) {
+            for (let px = 0; px < width; px++) {
+                const pixelIndex = (py * width + px) * 4;
+                const alpha = imageData.data[pixelIndex + 3];
+
+                // If pixel has any opacity, consider it part of the rendered content
+                if (alpha > 0) {
+                    pixelSet.add(`${px},${py}`);
+                    maxY = Math.max(maxY, py);
+                }
+            }
+        }
+
+        return { pixelSet, maxY };
     }
 }
