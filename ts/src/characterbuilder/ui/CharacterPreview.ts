@@ -26,7 +26,11 @@ export const CharacterPreview = createComponent<CharacterPreviewProps>(
         const size = Math.min(maxWidth, maxHeight);
 
         withDraw((scope, region) => {
-            const generatedSprites = buildSpriteSheet(scope, props.colors);
+            const generatedSprites = buildSpriteSheet(
+                (w, h) => scope.getOffscreenRenderScope(w, h),
+                props.colors,
+                scope.assetLoader,
+            );
 
             // Get the selected sprite or fall back to first available
             const selectedSprite =
@@ -52,10 +56,6 @@ export const CharacterPreview = createComponent<CharacterPreviewProps>(
                 };
                 frameToDisplay = 0; // Always show first frame in sheet mode
             }
-
-            console.log(
-                `Drawing frame ${frameToDisplay} of ${displaySprite.defintion.frames} frames (mode: ${props.previewMode})`,
-            );
 
             scope.drawScreenSpaceSprite({
                 x: region.x,

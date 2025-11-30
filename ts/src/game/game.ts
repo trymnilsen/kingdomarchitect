@@ -24,6 +24,7 @@ import { createJobQueueComponent } from "./component/jobQueueComponent.js";
 import { createTileComponent } from "./component/tileComponent.js";
 import { Entity } from "./entity/entity.js";
 import { getOverworldEntity } from "./map/scenes.js";
+import { createSpriteEquipmentSystem } from "./system/spriteEquipmentSystem.js";
 
 export class Game {
     private renderer: Renderer;
@@ -108,6 +109,16 @@ export class Game {
         this.ecsWorld.addSystem(pathfindingSystem);
         this.ecsWorld.addSystem(animationSystem);
         this.ecsWorld.addSystem(renderSystem);
+        this.ecsWorld.addSystem(
+            createSpriteEquipmentSystem(
+                (width, height) =>
+                    this.renderer.context.getOffscreenRenderScope(
+                        width,
+                        height,
+                    ),
+                this.assetLoader,
+            ),
+        );
         //this.ecsWorld.addSystem(worldGenerationSystem);
     }
 

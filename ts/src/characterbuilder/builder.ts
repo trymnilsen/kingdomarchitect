@@ -63,7 +63,7 @@ export class CharacterBuilder {
         console.log("Character builder assets loaded");
 
         // Start render loop
-        setInterval(() => this.onTick(), 200);
+        //setInterval(() => this.onTick(), 200);
         this.render();
     }
 
@@ -105,7 +105,7 @@ export class CharacterBuilder {
     private onTick = () => {
         this.drawTick += 1;
         this.renderer.context.drawTick = this.drawTick;
-        this.render();
+        //this.render();
     };
 
     private render() {

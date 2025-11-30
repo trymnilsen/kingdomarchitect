@@ -28,6 +28,15 @@ export class AssetLoader {
         this._assets[binName] = asset;
     }
 
+    /**
+     * Check if an asset exists in the loader
+     * @param binName The name of the asset to check
+     * @returns true if the asset exists
+     */
+    hasAsset(binName: string): boolean {
+        return binName in this._assets;
+    }
+
     getBinAsset(binName: string): HTMLImageElement | ImageBitmap {
         const binAsset = this._assets[binName];
         if (!binAsset) {

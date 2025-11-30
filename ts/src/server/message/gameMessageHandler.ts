@@ -52,36 +52,27 @@ function addEntityHandler(root: Entity, message: AddEntityGameMessage) {
         }
     }
 
-    const newEntity = new Entity(message.id);
-    parent.addChild(newEntity);
-    newEntity.worldPosition = message.position;
-    for (const component of message.components) {
-        newEntity.setEcsComponent(component);
-    }
-
-    // Recursively add children
-    if (message.children && message.children.length > 0) {
-        addChildren(newEntity, message.children);
-    }
+    createEntityWithChildren(parent, message);
 }
 
 /**
- * Recursively add children to an entity
+ * Creates an entity with its components and recursively creates all children
  */
-function addChildren(parent: Entity, children: ReplicatedEntityData[]) {
-    for (const childData of children) {
-        const childEntity = new Entity(childData.id);
-        parent.addChild(childEntity);
-        childEntity.worldPosition = childData.position;
+function createEntityWithChildren(parent: Entity, data: ReplicatedEntityData) {
+    const entity = new Entity(data.id);
 
-        // Add components to child
-        for (const component of childData.components) {
-            childEntity.setEcsComponent(component);
-        }
+    // Add components
+    for (const component of data.components) {
+        entity.setEcsComponent(component);
+    }
 
-        // Recursively add nested children
-        if (childData.children && childData.children.length > 0) {
-            addChildren(childEntity, childData.children);
+    entity.worldPosition = data.position;
+    parent.addChild(entity);
+
+    // Recursively add children
+    if (data.children && data.children.length > 0) {
+        for (const childData of data.children) {
+            createEntityWithChildren(entity, childData);
         }
     }
 }

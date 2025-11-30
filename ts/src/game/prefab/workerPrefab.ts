@@ -25,7 +25,7 @@ export function workerPrefab(): Entity {
     entity.setEcsComponent(createEquipmentComponent());
     entity.setEcsComponent(createInventoryComponent(defaultInventoryItems()));
     entity.setEcsComponent(createVisibilityComponent());
-    entity.setEcsComponent(createAnimationComponent(nobleKnightAnimationGraph));
+    //entity.setEcsComponent(createAnimationComponent(nobleKnightAnimationGraph));
     entity.setEcsComponent(createDirectionComponent());
     return entity;
 }

@@ -23,7 +23,6 @@ import { SpriteCache } from "./spriteCache.js";
 import { Point, zeroPoint } from "../common/point.js";
 
 export type DrawFunction = (context: RenderScope) => void;
-
 // renderer -> creates render context -> holds camera, canvas context for main and offscreen -> creates scope
 // scope for offscreen and scope for main. Scope is passed to draw function and entities ++
 // scope has reference to context for creating new scope on offscreen tint call. Scope holds ref to deferred calls
@@ -133,7 +132,9 @@ export class RenderScope implements UIRenderScope, UILayoutScope {
         height: number,
     ): OffscreenRenderScope {
         const offscreenCanvas = new OffscreenCanvas(width, height);
-        const context = offscreenCanvas.getContext("2d");
+        const context = offscreenCanvas.getContext("2d", {
+            willReadFrequently: true,
+        });
         if (!context) {
             throw new Error("Cannot get 2d offscreen canvas");
         }
@@ -405,6 +406,7 @@ export class RenderScope implements UIRenderScope, UILayoutScope {
     }
 }
 
+export type OffscreenCanvasFactory = RenderScope["getOffscreenRenderScope"];
 export class OffscreenRenderScope extends RenderScope {
     private canvas: OffscreenCanvas;
     private context: CanvasContext;
@@ -432,15 +434,15 @@ export class OffscreenRenderScope extends RenderScope {
      * @param y The Y position to start reading from
      * @param width The width of the region to read
      * @param height The height of the region to read
-     * @returns Set of pixel coordinates as "x,y" strings and the maximum Y value
+     * @returns Set of pixel coordinates as encoded numbers and the maximum Y value
      */
     extractPixels(
         x: number,
         y: number,
         width: number,
         height: number,
-    ): { pixelSet: Set<string>; maxY: number } {
-        const pixelSet = new Set<string>();
+    ): { pixelSet: Set<number>; maxY: number } {
+        const pixelSet = new Set<number>();
         let maxY = -Infinity;
 
         // Read pixel data from the canvas for the specified region
@@ -454,8 +456,8 @@ export class OffscreenRenderScope extends RenderScope {
 
                 // If pixel has any opacity, consider it part of the rendered content
                 if (alpha > 0) {
-                    pixelSet.add(`${px},${py}`);
-                    maxY = Math.max(maxY, py);
+                    pixelSet.add(((px & 0xffff) << 16) | (py & 0xffff));
+                    if (py > maxY) maxY = py;
                 }
             }
         }

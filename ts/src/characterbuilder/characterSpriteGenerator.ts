@@ -2,16 +2,25 @@ import { characterPartFrames } from "../../generated/characterFrames.js";
 import type {
     RenderScope,
     OffscreenRenderScope,
+    OffscreenCanvasFactory,
 } from "../rendering/renderScope.js";
 import type { Sprite2 } from "../asset/sprite.js";
+import type { AssetLoader } from "../asset/loader/assetLoader.js";
 import type { CharacterColors } from "./colors.js";
 import type { Rectangle } from "../common/structure/rectangle.js";
-import { subtractPoint } from "../common/point.js";
+import {
+    subtractPoint,
+    encodePosition,
+    decodePosition,
+} from "../common/point.js";
 import { wizardHat } from "../data/inventory/items/equipment.js";
-import { CHARACTER_SPRITE } from "./ui/characterBuilderConstants.js";
 
-const CHARACTER_FRAME_WIDTH = CHARACTER_SPRITE.FRAME_WIDTH;
-const CHARACTER_FRAME_HEIGHT = CHARACTER_SPRITE.FRAME_HEIGHT;
+/**
+ * Generate a deterministic bin name for a character based on its colors
+ */
+export function getCharacterBinName(colors: CharacterColors): string {
+    return `character-${colors.Chest ?? "default"}-${colors.Pants ?? "default"}-${colors.Feet ?? "default"}-${colors.Hands ?? "default"}`;
+}
 
 const defaultColor = "#FACBA6"; // Default skin color for other parts
 export type PartNames =
@@ -26,27 +35,25 @@ export type PartNames =
     | "RightEye";
 
 /**
- * Color mapping for different body parts
+ * Color mapping for different body parts - optimized with Map lookup
  */
 const getPartColor = (partName: PartNames, colors: CharacterColors): string => {
-    if (partName === "LeftEye" || partName === "RightEye") {
-        return "#000000"; // Eyes are black
-    } else if (partName === "Chest") {
-        return colors.Chest ?? defaultColor; // Chest uses custom color
-    } else if (partName === "Pants") {
-        if (colors.Pants) {
-            return colors.Pants;
-        } else if (colors.Chest) {
-            return colors.Chest;
-        } else {
+    switch (partName) {
+        case "LeftEye":
+        case "RightEye":
+            return "#000000";
+        case "Chest":
+            return colors.Chest ?? defaultColor;
+        case "Pants":
+            return colors.Pants ?? colors.Chest ?? defaultColor;
+        case "LeftFoot":
+        case "RightFoot":
+            return colors.Feet ?? defaultColor;
+        case "LeftHand":
+        case "RightHand":
+            return colors.Hands ?? defaultColor;
+        default:
             return defaultColor;
-        }
-    } else if (partName === "LeftFoot" || partName === "RightFoot") {
-        return colors.Feet ?? defaultColor;
-    } else if (partName === "LeftHand" || partName === "RightHand") {
-        return colors.Hands ?? defaultColor;
-    } else {
-        return defaultColor; // Default skin color for other parts
     }
 };
 
@@ -148,7 +155,15 @@ export type CharacterSprite = {
 };
 
 /**
- * Calculate the overall bounding box across all frames in an animation
+ * Snap a dimension to the smallest multiple of 16 that contains it
+ */
+const snapToMultipleOf16 = (value: number): number => {
+    return Math.ceil(value / 16) * 16;
+};
+
+/**
+ * Calculate the overall bounding box across all frames in an animation,
+ * including equipment and outline padding.
  * This ensures consistent positioning across all frames (e.g., for jump animations)
  */
 const getAnimationBounds = (
@@ -219,56 +234,54 @@ const drawPartPixels = (
 /**
  * Generate outline pixels from a set of pixels
  * Outlines are drawn on top, left, and right sides, but not on the bottom
- * @param pixelSet Set of pixel coordinates as "x,y" strings
+ * @param pixelSet Set of pixel coordinates as encoded numbers
  * @param maxY The maximum Y coordinate of all pixels
  * @param outlineColor The color of the outline
  * @returns Array of outline pixel coordinates with their color
  */
 const generateOutlineFromPixels = (
-    pixelSet: Set<string>,
+    pixelSet: Set<number>,
     maxY: number,
     outlineColor: string = "#000000",
 ): Array<{ x: number; y: number; color: string }> => {
     const outlinePixels: Array<{ x: number; y: number; color: string }> = [];
-    const outlineSet = new Set<string>();
+    const outlineSet = new Set<number>();
 
     // Check each pixel and add outline pixels around it
-    for (const pixelKey of pixelSet) {
-        const [xStr, yStr] = pixelKey.split(",");
-        const x = parseInt(xStr);
-        const y = parseInt(yStr);
+    for (const encodedPixel of pixelSet) {
+        const { x, y } = decodePosition(encodedPixel);
 
-        // Check only 4 cardinal directions (no diagonals)
-        const directions = [
-            { dx: 0, dy: -1 }, // top
-            { dx: -1, dy: 0 }, // left
-            { dx: 1, dy: 0 }, // right
-            { dx: 0, dy: 1 }, // bottom
-        ];
+        // Top (dy = -1)
+        let checkY = y - 1;
+        let encodedKey = encodePosition(x, checkY);
+        if (!pixelSet.has(encodedKey) && !outlineSet.has(encodedKey)) {
+            outlinePixels.push({ x, y: checkY, color: outlineColor });
+            outlineSet.add(encodedKey);
+        }
 
-        for (const { dx, dy } of directions) {
-            const checkX = x + dx;
-            const checkY = y + dy;
-            const key = `${checkX},${checkY}`;
+        // Left (dx = -1)
+        let checkX = x - 1;
+        encodedKey = encodePosition(checkX, y);
+        if (!pixelSet.has(encodedKey) && !outlineSet.has(encodedKey)) {
+            outlinePixels.push({ x: checkX, y, color: outlineColor });
+            outlineSet.add(encodedKey);
+        }
 
-            // Skip if this position already has a pixel
-            if (pixelSet.has(key)) {
-                continue;
-            }
+        // Right (dx = 1)
+        checkX = x + 1;
+        encodedKey = encodePosition(checkX, y);
+        if (!pixelSet.has(encodedKey) && !outlineSet.has(encodedKey)) {
+            outlinePixels.push({ x: checkX, y, color: outlineColor });
+            outlineSet.add(encodedKey);
+        }
 
-            // Skip bottom outline - don't add outline below pixels at the maximum Y
-            if (dy > 0 && y === maxY) {
-                continue;
-            }
-
-            // Add outline pixel
-            if (!outlineSet.has(key)) {
-                outlinePixels.push({
-                    x: checkX,
-                    y: checkY,
-                    color: outlineColor,
-                });
-                outlineSet.add(key);
+        // Bottom (dy = 1) - skip if at maxY
+        if (y !== maxY) {
+            checkY = y + 1;
+            encodedKey = encodePosition(x, checkY);
+            if (!pixelSet.has(encodedKey) && !outlineSet.has(encodedKey)) {
+                outlinePixels.push({ x, y: checkY, color: outlineColor });
+                outlineSet.add(encodedKey);
             }
         }
     }
@@ -399,14 +412,23 @@ const drawAnimation = (
 /**
  * Builds sprite sheets for a character with the given customization
  * Creates one sprite per animation, all on the same canvas with each animation on a new row
- * @param scope The render scope to use for drawing
+ * @param scopeFactory Factory for creating offscreen render scopes
  * @param colors The colors to use for different body parts
+ * @param assetLoader The asset loader to register generated sprites with
  * @returns An array of CharacterSprite objects
  */
 export function buildSpriteSheet(
-    scope: RenderScope,
+    scopeFactory: OffscreenCanvasFactory,
     colors: CharacterColors,
+    assetLoader: AssetLoader,
 ): CharacterSprite[] {
+    const binName = getCharacterBinName(colors);
+
+    // Check if sprites for these colors already exist
+    if (assetLoader.hasAsset(binName)) {
+        return buildSpritesForBin(binName);
+    }
+
     const sprites: CharacterSprite[] = [];
 
     const maxFramesPerAnimation = getMaxFramesPerAnimation();
@@ -419,6 +441,7 @@ export function buildSpriteSheet(
         canvasWidth,
         canvasHeight,
     );
+    const offscreenScope = scopeFactory(canvasWidth, canvasHeight);
 
     // Iterate through all animations and draw each on its own row
     for (let animIdx = 0; animIdx < characterPartFrames.length; animIdx++) {
@@ -443,8 +466,8 @@ export function buildSpriteSheet(
         // Create a Sprite2 object for this animation
         // The x,y position points to the first frame of this animation in the sprite sheet
         const sprite: Sprite2 = {
-            bin: "character-generated",
-            id: `character-${animationName}`,
+            bin: binName,
+            id: `${binName}-${animationName}`,
             defintion: {
                 frames: frameCount,
                 w: CHARACTER_FRAME_WIDTH,
@@ -459,7 +482,44 @@ export function buildSpriteSheet(
 
     // Get the generated bitmap and store it in the asset loader once
     const bitmap = offscreenScope.getBitmap();
-    scope.assetLoader.addGeneratedAsset("character-generated", bitmap);
+    assetLoader.addGeneratedAsset(binName, bitmap);
+
+    return sprites;
+}
+
+/**
+ * Build sprite references for an existing bin (used when sprites are already cached)
+ */
+function buildSpritesForBin(binName: string): CharacterSprite[] {
+    const sprites: CharacterSprite[] = [];
+    let currentY = 0;
+
+    for (let animIdx = 0; animIdx < characterPartFrames.length; animIdx++) {
+        const animation = characterPartFrames[animIdx];
+        const animationName = animation.animationName;
+        const frameCount = animation.parts[0]?.frames.length || 0;
+
+        // Calculate bounds and frame size for this animation
+        // bounds already includes equipment and outline padding
+        const bounds = getAnimationBounds(animation);
+        const frameWidth = snapToMultipleOf16(bounds.width);
+        const frameHeight = snapToMultipleOf16(bounds.height);
+
+        const sprite: Sprite2 = {
+            bin: binName,
+            id: `${binName}-${animationName}`,
+            defintion: {
+                frames: frameCount,
+                w: frameWidth,
+                h: frameHeight,
+                x: 0,
+                y: currentY,
+            },
+        };
+
+        sprites.push({ animationName, sprite });
+        currentY += frameHeight;
+    }
 
     return sprites;
 }
