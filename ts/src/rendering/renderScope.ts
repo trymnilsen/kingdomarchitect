@@ -434,15 +434,15 @@ export class OffscreenRenderScope extends RenderScope {
      * @param y The Y position to start reading from
      * @param width The width of the region to read
      * @param height The height of the region to read
-     * @returns Set of pixel coordinates as encoded numbers and the maximum Y value
+     * @returns Set of pixel coordinates as "x,y" strings and the maximum Y value
      */
     extractPixels(
         x: number,
         y: number,
         width: number,
         height: number,
-    ): { pixelSet: Set<number>; maxY: number } {
-        const pixelSet = new Set<number>();
+    ): { pixelSet: Set<string>; maxY: number } {
+        const pixelSet = new Set<string>();
         let maxY = -Infinity;
 
         // Read pixel data from the canvas for the specified region
@@ -456,8 +456,8 @@ export class OffscreenRenderScope extends RenderScope {
 
                 // If pixel has any opacity, consider it part of the rendered content
                 if (alpha > 0) {
-                    pixelSet.add(((px & 0xffff) << 16) | (py & 0xffff));
-                    if (py > maxY) maxY = py;
+                    pixelSet.add(`${px},${py}`);
+                    maxY = Math.max(maxY, py);
                 }
             }
         }
