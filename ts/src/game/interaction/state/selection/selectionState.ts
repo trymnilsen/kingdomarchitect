@@ -34,6 +34,11 @@ import {
 } from "../../../../rendering/text/textStyle.js";
 import { uiScaffold } from "../../view/uiScaffold.js";
 import { BuildingSelectionProvider } from "./actor/provider/buildingSelectionProvider.js";
+import type { Entity } from "../../../entity/entity.js";
+import {
+    HealthComponentId,
+    type HealthComponent,
+} from "../../../component/healthComponent.js";
 
 export class SelectionState extends InteractionState {
     private providers: ActorSelectionProvider[] = [
@@ -94,20 +99,28 @@ export class SelectionState extends InteractionState {
 
     override onDraw(context: RenderScope): void {
         super.onDraw(context);
-
+        const selection = this.selection;
         const cursorWorldPosition = context.camera.tileSpaceToScreenSpace(
-            this.selection.tilePosition,
+            selection.tilePosition,
         );
 
         context.drawNinePatchSprite({
             sprite: sprites2.cursor,
-            height: this.selection.selectionSize.x * TileSize,
-            width: this.selection.selectionSize.y * TileSize,
+            height: selection.selectionSize.x * TileSize,
+            width: selection.selectionSize.y * TileSize,
             scale: 1.0,
             sides: allSides(12.0),
             x: cursorWorldPosition.x,
             y: cursorWorldPosition.y,
         });
+
+        if (selection instanceof SelectedEntityItem) {
+            const healthComponent =
+                selection.entity.getEcsComponent(HealthComponentId);
+            if (healthComponent) {
+                drawHealthbar(context, selection.entity, healthComponent);
+            }
+        }
     }
 
     private getSelectionInfo(): SelectionInfo | null {
@@ -209,4 +222,35 @@ export class SelectionState extends InteractionState {
             right: rightItems,
         };
     }
+}
+
+function drawHealthbar(
+    renderContext: RenderScope,
+    entity: Entity,
+    healthComponent: HealthComponent,
+) {
+    const screenPosition = renderContext.camera.tileSpaceToScreenSpace(
+        entity.worldPosition,
+    );
+    const healthbarWidth = 28;
+    const healthbarYOffset = -8;
+    const maxHp = healthComponent.maxHp > 0 ? healthComponent.maxHp : 1;
+    const percentageWidth = Math.floor(
+        (healthbarWidth - 4) * (healthComponent.currentHp / maxHp),
+    );
+
+    renderContext.drawScreenSpaceRectangle({
+        x: screenPosition.x + 3,
+        y: screenPosition.y + healthbarYOffset,
+        width: healthbarWidth,
+        height: 8,
+        fill: "black",
+    });
+    renderContext.drawScreenSpaceRectangle({
+        x: screenPosition.x + 5,
+        y: screenPosition.y + 2 + healthbarYOffset,
+        width: percentageWidth,
+        height: 4,
+        fill: "green",
+    });
 }

@@ -1,5 +1,11 @@
-import { buildSpriteSheet } from "../../characterbuilder/characterSpriteGenerator.js";
-import type { CharacterColors } from "../../characterbuilder/colors.js";
+import {
+    buildSpriteSheet,
+    type SpriteDefinitionCache,
+} from "../../characterbuilder/characterSpriteGenerator.js";
+import {
+    getCharacterColors,
+    type CharacterColors,
+} from "../../characterbuilder/colors.js";
 import type { EcsSystem } from "../../common/ecs/ecsSystem.js";
 import type { AssetLoader } from "../../asset/loader/assetLoader.js";
 import type {
@@ -23,6 +29,7 @@ import type {
 export function createSpriteEquipmentSystem(
     createOffscreenCanvas: OffscreenCanvasFactory,
     assetLoader: AssetLoader,
+    spriteCache: SpriteDefinitionCache,
 ): EcsSystem {
     return {
         onEntityEvent: {
@@ -32,6 +39,7 @@ export function createSpriteEquipmentSystem(
                         event.source,
                         createOffscreenCanvas,
                         assetLoader,
+                        spriteCache,
                     );
                 }
             },
@@ -44,6 +52,7 @@ export function createSpriteEquipmentSystem(
                         event.target,
                         createOffscreenCanvas,
                         assetLoader,
+                        spriteCache,
                     );
                 }
             },
@@ -55,16 +64,20 @@ function updateEquipmentSprite(
     target: Entity,
     offscreenCanvasFactory: OffscreenCanvasFactory,
     assetLoader: AssetLoader,
+    spriteCache: SpriteDefinitionCache,
 ): void {
     const spriteComponent = target.getEcsComponent(SpriteComponentId);
     if (!spriteComponent) return;
-
-    const colors: CharacterColors = {};
+    const equipment = target.requireEcsComponent(EquipmentComponentId);
+    const colors = getCharacterColors(equipment);
     const sprite = buildSpriteSheet(
         offscreenCanvasFactory,
         colors,
         assetLoader,
+        spriteCache,
     );
     //Update the sprite
-    spriteComponent.sprite = sprite[0].sprite;
+    const animation = sprite[0];
+    spriteComponent.sprite = animation.sprite;
+    spriteComponent.offset = animation.offset;
 }

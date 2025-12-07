@@ -19,7 +19,7 @@ import { UIRenderScope } from "./uiRenderContext.js";
 import { Bounds } from "../common/bounds.js";
 import { sprites } from "../../generated/sprites.js";
 import { CanvasContext } from "./canvasContext.js";
-import { SpriteCache } from "./spriteCache.js";
+import { BitmapCache } from "./bitmapCache.js";
 import { Point, zeroPoint } from "../common/point.js";
 
 export type DrawFunction = (context: RenderScope) => void;
@@ -34,7 +34,7 @@ export type DrawFunction = (context: RenderScope) => void;
  */
 export class RenderScope implements UIRenderScope, UILayoutScope {
     private canvasContext: CanvasContext;
-    private spriteCache: SpriteCache;
+    private bitmapCache: BitmapCache;
     private _camera: Camera;
     private _assetLoader: AssetLoader;
     private _deferredRenderCalls: DrawFunction[] = [];
@@ -79,11 +79,11 @@ export class RenderScope implements UIRenderScope, UILayoutScope {
         canvasContext: CanvasContext,
         camera: Camera,
         assetLoader: AssetLoader,
-        spriteCache: SpriteCache,
+        spriteCache: BitmapCache,
         width: number,
         height: number,
     ) {
-        this.spriteCache = spriteCache;
+        this.bitmapCache = spriteCache;
         this.canvasContext = canvasContext;
         this._camera = camera;
         this._assetLoader = assetLoader;
@@ -145,7 +145,7 @@ export class RenderScope implements UIRenderScope, UILayoutScope {
             context,
             new Camera(zeroPoint(), this.camera.currentScene),
             this._assetLoader,
-            this.spriteCache,
+            this.bitmapCache,
             width,
             height,
         );
@@ -282,7 +282,7 @@ export class RenderScope implements UIRenderScope, UILayoutScope {
             // offscreen canvas. We can use compositing to change the color
             // and then save it as an image. This image will be used with the
             // sprite renderer method rather than the "raw" sprite
-            let cachedBitmap = this.spriteCache.getSprite(sprite);
+            let cachedBitmap = this.bitmapCache.getSprite(sprite);
             if (!cachedBitmap) {
                 const offscreenCanvas = new OffscreenCanvas(
                     targetWidth,
@@ -315,7 +315,7 @@ export class RenderScope implements UIRenderScope, UILayoutScope {
                 );
 
                 const bitmap = offscreenCanvas.transferToImageBitmap();
-                this.spriteCache.setSprite(bitmap, sprite);
+                this.bitmapCache.setSprite(bitmap, sprite);
                 cachedBitmap = bitmap;
             }
 
@@ -415,7 +415,7 @@ export class OffscreenRenderScope extends RenderScope {
         context: CanvasContext,
         camera: Camera,
         assetLoader: AssetLoader,
-        spriteCache: SpriteCache,
+        spriteCache: BitmapCache,
         width: number,
         height: number,
     ) {

@@ -2,7 +2,7 @@ import { rgbToHex } from "../common/color.js";
 import { AssetLoader } from "../asset/loader/assetLoader.js";
 import { Camera } from "./camera.js";
 import { RenderScope } from "./renderScope.js";
-import { SpriteCache } from "./spriteCache.js";
+import { BitmapCache } from "./bitmapCache.js";
 
 export class Renderer {
     private canvasContext: CanvasRenderingContext2D;
@@ -26,7 +26,7 @@ export class Renderer {
         if (!context) {
             throw Error("Unable to get 2d context from canvas");
         }
-        const spriteCache = new SpriteCache();
+        const spriteCache = new BitmapCache();
         this.currentCamera = camera;
         this.canvasContext = context;
         this.canvasContext.canvas.width = window.innerWidth;

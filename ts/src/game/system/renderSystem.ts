@@ -92,51 +92,11 @@ function onRender(
         }
     }
 
-    const healthbars = scene.queryComponentsWithin(viewport, HealthComponentId);
-
-    for (const [entity, healthComponent] of healthbars) {
-        if (healthComponent.currentHp == healthComponent.maxHp) {
-            continue;
-        }
-        drawHealthbar(renderScope, entity, healthComponent);
-    }
-
     /*const renderEnd = performance.now();
     performance.measure("render duration", {
         start: renderStart,
         end: renderEnd,
     });*/
-}
-
-function drawHealthbar(
-    renderContext: RenderScope,
-    entity: Entity,
-    healthComponent: HealthComponent,
-) {
-    const screenPosition = renderContext.camera.tileSpaceToScreenSpace(
-        entity.worldPosition,
-    );
-    const healthbarWidth = 28;
-    const healthbarYOffset = 20;
-    const maxHp = healthComponent.maxHp > 0 ? healthComponent.maxHp : 1;
-    const percentageWidth = Math.floor(
-        (healthbarWidth - 4) * (healthComponent.currentHp / maxHp),
-    );
-
-    renderContext.drawScreenSpaceRectangle({
-        x: screenPosition.x + 3,
-        y: screenPosition.y + healthbarYOffset,
-        width: healthbarWidth,
-        height: 8,
-        fill: "black",
-    });
-    renderContext.drawScreenSpaceRectangle({
-        x: screenPosition.x + 5,
-        y: screenPosition.y + 2 + healthbarYOffset,
-        width: percentageWidth,
-        height: 4,
-        fill: "green",
-    });
 }
 
 function drawSprite(

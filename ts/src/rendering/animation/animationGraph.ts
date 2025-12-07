@@ -8,7 +8,7 @@ export type AnimationPrefix = "idle" | "walk" | "attack" | "hit";
 // --- Generated Template Literal Types for Validation ---
 
 // Creates a type for all possible valid animation keys, e.g., "walk_down"
-export type ValidAnimationKey = `${AnimationPrefix}_${Direction}`;
+export type AnimationKey = `${AnimationPrefix}_${Direction}`;
 
 // Creates a type for all valid animation templates, e.g., "walk_{direction}"
 export type AnimationTemplate = `${AnimationPrefix}_{direction}`;
@@ -45,7 +45,6 @@ export type AnimationState = {
 export type AnimationStateMap = Record<string, AnimationState>;
 
 export type AnimationGraph<T extends AnimationStateMap = AnimationStateMap> = {
-    animationSet: Partial<Record<string, Sprite2>>;
     initialState: keyof T;
     globalTransitions: AnimationTransition[];
     states: Record<string, AnimationState>;
@@ -64,12 +63,9 @@ export function loopAnimation(
     sprite: Sprite2,
     speed: number = 8,
 ): AnimationGraph {
-    const animationKey = `loop_${sprite.id}`;
+    const animationKey = makeAnimationKey(sprite.bin, sprite.id);
 
     return {
-        animationSet: {
-            [animationKey]: sprite,
-        },
         initialState: "Loop",
         globalTransitions: [],
         states: {
@@ -80,4 +76,8 @@ export function loopAnimation(
             },
         },
     };
+}
+
+export function makeAnimationKey(bin: string, spriteId: string) {
+    return `${bin}_${spriteId}`;
 }

@@ -1,6 +1,6 @@
 import { SpriteConfiguration } from "./items/sprite.js";
 
-export class SpriteCache {
+export class BitmapCache {
     private entries: { [id: string]: ImageBitmap } = {};
     getSprite(sprite: SpriteConfiguration): ImageBitmap | null {
         const cacheKey = makeCacheKey(sprite);

@@ -7,10 +7,12 @@ import type {
 import type { Sprite2 } from "../asset/sprite.js";
 import type { CharacterColors } from "./colors.js";
 import type { Rectangle } from "../common/structure/rectangle.js";
-import { subtractPoint } from "../common/point.js";
+import { subtractPoint, type Point } from "../common/point.js";
 import { wizardHat } from "../data/inventory/items/equipment.js";
 import { CHARACTER_SPRITE } from "./ui/characterBuilderConstants.js";
 import type { AssetLoader } from "../asset/loader/assetLoader.js";
+import { getCharacterBinId } from "./characterBinId.js";
+import type { AnimationKey } from "../rendering/animation/animationGraph.js";
 
 const CHARACTER_FRAME_WIDTH = CHARACTER_SPRITE.FRAME_WIDTH;
 const CHARACTER_FRAME_HEIGHT = CHARACTER_SPRITE.FRAME_HEIGHT;
@@ -28,9 +30,105 @@ export type PartNames =
     | "RightEye";
 
 /**
+ * Builds sprite sheets for a character with the given customization
+ * Creates one sprite per animation, all on the same canvas with each animation on a new row
+ * @param scopeFactory Factory for creating offscreen render scopes
+ * @param colors The colors to use for different body parts
+ * @param assetLoader The asset loader to register generated sprites with
+ * @returns An array of CharacterSprite objects
+ */
+export function buildSpriteSheet(
+    scopeFactory: OffscreenCanvasFactory,
+    colors: CharacterColors,
+    assetLoader: AssetLoader,
+    spriteCache: SpriteDefinitionCache,
+): CharacterSprite[] {
+    const maxFramesPerAnimation = getMaxFramesPerAnimation();
+    const animationCount = characterPartFrames.length;
+    const binId = getCharacterBinId(colors);
+    if (assetLoader.hasAsset(binId) && spriteCache.has(binId)) {
+        return spriteCache.get(binId);
+    }
+    // Create a single canvas with each animation on a new row
+    const canvasWidth = CHARACTER_FRAME_WIDTH * maxFramesPerAnimation;
+    const canvasHeight = CHARACTER_FRAME_HEIGHT * animationCount;
+    const offscreenScope = scopeFactory(canvasWidth, canvasHeight);
+
+    // Iterate through all animations and draw each on its own row
+    for (let animIdx = 0; animIdx < characterPartFrames.length; animIdx++) {
+        const animation = characterPartFrames[animIdx];
+        const animationName = animation.animationName;
+
+        // Get the number of frames from the first part (all parts have same frame count)
+        const frameCount = animationFrameCount(animation);
+
+        // Calculate the overall bounds across all frames in this animation
+        const animationBounds = getAnimationBounds(animation);
+
+        // Draw all frames of this animation
+        drawAnimation(
+            offscreenScope,
+            animation,
+            animIdx,
+            colors,
+            animationBounds,
+        );
+
+        const sprite: Sprite2 = {
+            bin: binId,
+            id: `${animationName}`,
+            defintion: {
+                frames: animationFrameCount(animation),
+                w: CHARACTER_FRAME_WIDTH,
+                h: CHARACTER_FRAME_HEIGHT,
+                x: 0,
+                y: animIdx * CHARACTER_FRAME_HEIGHT,
+            },
+        };
+
+        const characterSprite = {
+            animationName: animationName,
+            sprite,
+            offset: { x: -16, y: -12 },
+        };
+
+        spriteCache.addAnimation(binId, animationName, characterSprite);
+    }
+
+    // Get the generated bitmap and store it in the asset loader once
+    const bitmap = offscreenScope.getBitmap();
+    assetLoader.addGeneratedAsset(binId, bitmap);
+
+    return spriteCache.get(binId);
+}
+
+export class SpriteDefinitionCache {
+    private cache = new Map<string, Map<AnimationKey, CharacterSprite>>();
+
+    has(binId: string) {
+        throw new Error("Method not implemented.");
+    }
+    addAnimation(
+        binId: string,
+        animationName: string,
+        characterSprites: CharacterSprite,
+    ) {
+        throw new Error("Method not implemented.");
+    }
+    get(binId: string): CharacterSprite[] {
+        throw new Error("Method not implemented.");
+    }
+    getSpriteFor(characterId: string, animationName: string) {
+        throw new Error("Method not implemented.");
+    }
+
+    addSprite(key: string) {}
+}
+
+/**
  * Color mapping for different body parts
  */
-const getPartColor = (partName: PartNames, colors: CharacterColors): string => {
+function getPartColor(partName: PartNames, colors: CharacterColors): string {
     switch (partName) {
         case "LeftEye":
         case "RightEye":
@@ -48,14 +146,14 @@ const getPartColor = (partName: PartNames, colors: CharacterColors): string => {
         default:
             return defaultColor;
     }
-};
+}
 
 /**
  * Calculate the bounding box of a body part based on its pixel coordinates
  * @param frameData Array of pixel coordinates [x1, y1, x2, y2, ...]
  * @returns Rectangle containing the bounds (x, y, width, height)
  */
-const getPartBounds = (frameData: readonly number[]): Rectangle => {
+function getPartBounds(frameData: readonly number[]): Rectangle {
     if (frameData.length === 0) {
         return { x: 0, y: 0, width: 0, height: 0 };
     }
@@ -82,21 +180,21 @@ const getPartBounds = (frameData: readonly number[]): Rectangle => {
         width: maxX - minX + 1,
         height: maxY - minY + 1,
     };
-};
+}
 
 /**
  * Calculate the maximum number of frames in any single animation
  */
-const getMaxFramesPerAnimation = (): number => {
+function getMaxFramesPerAnimation(): number {
     let maxFrames = 0;
     for (const animation of characterPartFrames) {
         if (animation.parts.length > 0) {
-            const frameCount = animation.parts[0].frames.length;
+            const frameCount = animationFrameCount(animation);
             maxFrames = Math.max(maxFrames, frameCount);
         }
     }
     return maxFrames;
-};
+}
 
 /**
  * Calculate the overall bounding box for all parts in a single frame
@@ -104,10 +202,10 @@ const getMaxFramesPerAnimation = (): number => {
  * @param frameIdx The frame index to calculate bounds for
  * @returns Rectangle containing the combined bounds of all parts
  */
-const getFrameBounds = (
+function getFrameBounds(
     animation: (typeof characterPartFrames)[number],
     frameIdx: number,
-): Rectangle => {
+): Rectangle {
     let minX = Infinity;
     let minY = Infinity;
     let maxX = -Infinity;
@@ -140,21 +238,22 @@ const getFrameBounds = (
         width: maxX - minX + 1,
         height: maxY - minY + 1,
     };
-};
+}
 
 export type CharacterSprite = {
     animationName: string;
     sprite: Sprite2;
+    offset: Point;
 };
 
 /**
  * Calculate the overall bounding box across all frames in an animation
  * This ensures consistent positioning across all frames (e.g., for jump animations)
  */
-const getAnimationBounds = (
+function getAnimationBounds(
     animation: (typeof characterPartFrames)[number],
-): Rectangle => {
-    const frameCount = animation.parts[0]?.frames.length || 0;
+): Rectangle {
+    const frameCount = animationFrameCount(animation);
 
     let animMinX = Infinity;
     let animMinY = Infinity;
@@ -183,12 +282,12 @@ const getAnimationBounds = (
         width: animMaxX - animMinX + 1,
         height: animMaxY - animMinY + 1,
     };
-};
+}
 
 /**
  * Draw a single part's pixels to the sprite sheet
  */
-const drawPartPixels = (
+function drawPartPixels(
     offscreenScope: RenderScope,
     frameData: readonly number[],
     frameBaseX: number,
@@ -197,7 +296,7 @@ const drawPartPixels = (
     contentCenterY: number,
     animationBounds: Rectangle,
     color: string,
-) => {
+) {
     for (let i = 0; i < frameData.length; i += 2) {
         const x = frameData[i];
         const y = frameData[i + 1];
@@ -214,7 +313,7 @@ const drawPartPixels = (
             fill: color,
         });
     }
-};
+}
 
 /**
  * Generate outline pixels from a set of pixels
@@ -224,11 +323,11 @@ const drawPartPixels = (
  * @param outlineColor The color of the outline
  * @returns Array of outline pixel coordinates with their color
  */
-const generateOutlineFromPixels = (
+function generateOutlineFromPixels(
     pixelSet: Set<string>,
     maxY: number,
     outlineColor: string = "#000000",
-): Array<{ x: number; y: number; color: string }> => {
+): Array<{ x: number; y: number; color: string }> {
     const outlinePixels: Array<{ x: number; y: number; color: string }> = [];
     const outlineSet = new Set<string>();
 
@@ -274,17 +373,17 @@ const generateOutlineFromPixels = (
     }
 
     return outlinePixels;
-};
+}
 
 /**
  * Draw outline pixels directly to the frame (no animation bounds adjustment needed)
  */
-const drawFrameOutline = (
+function drawFrameOutline(
     offscreenScope: RenderScope,
     outlinePixels: Array<{ x: number; y: number; color: string }>,
     frameBaseX: number,
     frameBaseY: number,
-) => {
+) {
     for (const pixel of outlinePixels) {
         offscreenScope.drawScreenSpaceRectangle({
             x: frameBaseX + pixel.x,
@@ -294,19 +393,19 @@ const drawFrameOutline = (
             fill: pixel.color,
         });
     }
-};
+}
 
 /**
  * Draw all frames of a single animation to the sprite sheet
  */
-const drawAnimation = (
+function drawAnimation(
     offscreenScope: OffscreenRenderScope,
     animation: (typeof characterPartFrames)[number],
     animIdx: number,
     colors: CharacterColors,
     animationBounds: Rectangle,
-): void => {
-    const frameCount = animation.parts[0]?.frames.length || 0;
+): void {
+    const frameCount = animationFrameCount(animation);
 
     // Calculate offset to center the animation content within the frame
     const contentCenterX = Math.floor(
@@ -394,71 +493,10 @@ const drawAnimation = (
         // Step 5: Draw outline on top of the frame
         drawFrameOutline(offscreenScope, outlinePixels, frameBaseX, frameBaseY);
     }
-};
+}
 
-/**
- * Builds sprite sheets for a character with the given customization
- * Creates one sprite per animation, all on the same canvas with each animation on a new row
- * @param scopeFactory Factory for creating offscreen render scopes
- * @param colors The colors to use for different body parts
- * @param assetLoader The asset loader to register generated sprites with
- * @returns An array of CharacterSprite objects
- */
-export function buildSpriteSheet(
-    scopeFactory: OffscreenCanvasFactory,
-    colors: CharacterColors,
-    assetLoader: AssetLoader,
-): CharacterSprite[] {
-    const sprites: CharacterSprite[] = [];
-
-    const maxFramesPerAnimation = getMaxFramesPerAnimation();
-    const animationCount = characterPartFrames.length;
-
-    // Create a single canvas with each animation on a new row
-    const canvasWidth = CHARACTER_FRAME_WIDTH * maxFramesPerAnimation;
-    const canvasHeight = CHARACTER_FRAME_HEIGHT * animationCount;
-    const offscreenScope = scopeFactory(canvasWidth, canvasHeight);
-
-    // Iterate through all animations and draw each on its own row
-    for (let animIdx = 0; animIdx < characterPartFrames.length; animIdx++) {
-        const animation = characterPartFrames[animIdx];
-        const animationName = animation.animationName;
-
-        // Get the number of frames from the first part (all parts have same frame count)
-        const frameCount = animation.parts[0]?.frames.length || 0;
-
-        // Calculate the overall bounds across all frames in this animation
-        const animationBounds = getAnimationBounds(animation);
-
-        // Draw all frames of this animation
-        drawAnimation(
-            offscreenScope,
-            animation,
-            animIdx,
-            colors,
-            animationBounds,
-        );
-
-        // Create a Sprite2 object for this animation
-        // The x,y position points to the first frame of this animation in the sprite sheet
-        const sprite: Sprite2 = {
-            bin: "character-generated",
-            id: `character-${animationName}`,
-            defintion: {
-                frames: frameCount,
-                w: CHARACTER_FRAME_WIDTH,
-                h: CHARACTER_FRAME_HEIGHT,
-                x: 0,
-                y: animIdx * CHARACTER_FRAME_HEIGHT,
-            },
-        };
-
-        sprites.push({ animationName, sprite });
-    }
-
-    // Get the generated bitmap and store it in the asset loader once
-    const bitmap = offscreenScope.getBitmap();
-    assetLoader.addGeneratedAsset("character-generated", bitmap);
-
-    return sprites;
+function animationFrameCount(
+    animation: (typeof characterPartFrames)[number],
+): number {
+    return animation.parts[0]?.frames.length ?? 0;
 }

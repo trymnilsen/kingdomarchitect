@@ -1,4 +1,8 @@
-import type { Sprite2 } from "../../asset/sprite.js";
+import type { AssetLoader } from "../../asset/loader/assetLoader.js";
+import { sprites2, type Sprite2 } from "../../asset/sprite.js";
+import { getCharacterBinId } from "../../characterbuilder/characterBinId.js";
+import type { SpriteDefinitionCache } from "../../characterbuilder/characterSpriteGenerator.js";
+import { getCharacterColors } from "../../characterbuilder/colors.js";
 import { Direction } from "../../common/direction.js";
 import type { EcsSystem } from "../../common/ecs/ecsSystem.js";
 import { checkAdjacency } from "../../common/point.js";
@@ -7,7 +11,7 @@ import {
     type AnimationGraph,
     type AnimationState,
     type AnimationTemplate,
-    type ValidAnimationKey,
+    type AnimationKey,
 } from "../../rendering/animation/animationGraph.js";
 import { DrawMode } from "../../rendering/drawMode.js";
 import type { RenderScope } from "../../rendering/renderScope.js";
@@ -20,6 +24,7 @@ import {
     type AnimationComponent,
 } from "../component/animationComponent.js";
 import { DirectionComponentId } from "../component/directionComponent.js";
+import { EquipmentComponentId } from "../component/equipmentComponent.js";
 import {
     SpriteComponentId,
     type SpriteComponent,
@@ -80,6 +85,7 @@ function updateAnimatable(
     entity: Entity,
     renderTick: number,
     animatable: AnimationComponent,
+    assetLoader: AssetLoader,
 ): void {
     const { currentAnimation, animationGraph } = animatable;
     const spriteComponent = entity.requireEcsComponent(SpriteComponentId);
@@ -112,7 +118,7 @@ function updateAnimatable(
         }
 
         // Transition to the next animation state.
-        updateAnimation(entity, animatable, nextStateKey);
+        updateAnimation(entity, animatable, nextStateKey, assetLoader);
     }
 }
 
@@ -120,12 +126,18 @@ function updateAnimation(
     entity: Entity,
     animatable: AnimationComponent,
     nextStateKey: string,
+    assetLoader: AssetLoader,
 ) {
     animatable.currentAnimation = nextStateKey;
     const spriteComponent = entity.updateComponent(
         SpriteComponentId,
         (component) => {
-            const sprite = getSpriteForState(animatable, nextStateKey, entity);
+            const sprite = getSpriteForState(
+                animatable,
+                nextStateKey,
+                entity,
+                assetLoader,
+            );
             component.sprite = sprite;
             component.frame = 0;
         },
@@ -142,7 +154,7 @@ function updateAnimation(
 function resolvePlaceholders(
     template: AnimationTemplate,
     entity: Entity,
-): ValidAnimationKey {
+): AnimationKey {
     // Start with the template string
     let resolvedString = template as string;
 
@@ -156,7 +168,7 @@ function resolvePlaceholders(
 
     // We cast back to ValidAnimationKey because our type system guarantees
     // that a valid template will resolve to a valid key.
-    return resolvedString as ValidAnimationKey;
+    return resolvedString as AnimationKey;
 }
 
 /**
@@ -172,6 +184,7 @@ function getSpriteForState(
     animatable: AnimationComponent,
     stateName: string,
     entity: Entity,
+    spriteCache: SpriteDefinitionCache,
 ): Sprite2 {
     const { animationGraph } = animatable;
 
@@ -181,14 +194,22 @@ function getSpriteForState(
     }
 
     const animationTemplate = animationState.animation;
-    const resolvedSpriteName = resolvePlaceholders(animationTemplate, entity);
-    const sprite = animationGraph.animationSet[resolvedSpriteName];
-
-    if (!sprite) {
+    const animationName = resolvePlaceholders(animationTemplate, entity);
+    if (animationName in sprites2) {
+        return sprites2[animationName];
+    } else if (entity.hasComponent(EquipmentComponentId)) {
+        const equipment = entity.requireEcsComponent(EquipmentComponentId);
+        const colors = getCharacterColors(equipment);
+        const characterId = getCharacterBinId(colors);
+        //Need some sort of map or cache to lookup sprites based on resolved
+        //name and the bin
+        //The asset cache only has a bin map so we still need some for sprites
+        //that have been generated?
+        const sprite = spriteCache.getSpriteFor(characterId, animationName);
+        return sprite;
+    } else {
         throw new Error(
-            `Animation state "${stateName}" resolved to "${resolvedSpriteName}", which is not a valid sprite.`,
+            `Animation state "${stateName}" resolved to "${animationName}", which is not a valid animation.`,
         );
     }
-
-    return sprite;
 }
