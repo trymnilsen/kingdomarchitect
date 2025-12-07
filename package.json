@@ -30,7 +30,7 @@
         "@types/pngjs": "^6.0.5",
         "maxrects-packer": "^2.7.3",
         "pngjs": "^7.0.0",
-        "prettier": "^3.5.3",
+        "prettier": "^3.7.4",
         "rollup": "^4.52.5",
         "rollup-plugin-sourcemaps2": "^0.5.4",
         "@typescript/native-preview": "^7.0.0-dev.20251203.1"
