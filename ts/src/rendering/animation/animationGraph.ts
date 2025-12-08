@@ -3,15 +3,18 @@ import { nameof } from "../../common/nameof.js";
 
 // Define the valid values for the {direction} placeholder
 export type Direction = "up" | "down" | "left" | "right";
+export type Ordinal = "southeast" | "southwest" | "northeast" | "northwest";
 export type AnimationPrefix = "idle" | "walk" | "attack" | "hit";
 
 // --- Generated Template Literal Types for Validation ---
 
 // Creates a type for all possible valid animation keys, e.g., "walk_down"
-export type AnimationKey = `${AnimationPrefix}_${Direction}`;
+export type AnimationKey = `${AnimationPrefix}_${Ordinal}`;
 
 // Creates a type for all valid animation templates, e.g., "walk_{direction}"
-export type AnimationTemplate = `${AnimationPrefix}_{direction}`;
+export type AnimationTemplate =
+    | `${AnimationPrefix}_{direction}`
+    | `${AnimationPrefix}_{ordinal}`;
 
 // --- Main Data Structures ---
 
@@ -63,7 +66,7 @@ export function loopAnimation(
     sprite: Sprite2,
     speed: number = 8,
 ): AnimationGraph {
-    const animationKey = makeAnimationKey(sprite.bin, sprite.id);
+    const animationKey = sprite.id;
 
     return {
         initialState: "Loop",
@@ -76,8 +79,4 @@ export function loopAnimation(
             },
         },
     };
-}
-
-export function makeAnimationKey(bin: string, spriteId: string) {
-    return `${bin}_${spriteId}`;
 }

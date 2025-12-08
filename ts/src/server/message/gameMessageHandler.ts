@@ -88,6 +88,7 @@ function setComponentHandler(root: Entity, message: SetComponentGameMessage) {
     const entity = root.findEntity(message.entity);
     if (entity) {
         entity.setEcsComponent(message.component);
+        entity.invalidateComponent(message.component.id);
     }
 }
 

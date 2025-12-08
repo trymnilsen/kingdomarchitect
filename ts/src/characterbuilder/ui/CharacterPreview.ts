@@ -1,5 +1,8 @@
 import { createComponent, sized } from "../../ui/declarative/ui.js";
-import { buildSpriteSheet } from "../characterSpriteGenerator.js";
+import {
+    buildSpriteSheet,
+    SpriteDefinitionCache,
+} from "../characterSpriteGenerator.js";
 import type { CharacterColors } from "../colors.js";
 import { LAYOUT, type PreviewMode } from "./characterBuilderConstants.js";
 
@@ -26,10 +29,12 @@ export const CharacterPreview = createComponent<CharacterPreviewProps>(
         const size = Math.min(maxWidth, maxHeight);
 
         withDraw((scope, region) => {
+            const spriteCache = new SpriteDefinitionCache();
             const generatedSprites = buildSpriteSheet(
                 (w, h) => scope.getOffscreenRenderScope(w, h),
                 props.colors,
                 scope.assetLoader,
+                spriteCache,
             );
 
             // Get the selected sprite or fall back to first available

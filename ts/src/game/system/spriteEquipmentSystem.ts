@@ -76,6 +76,7 @@ function updateEquipmentSprite(
         assetLoader,
         spriteCache,
     );
+    console.log("Update equipment sprite: ", colors);
     //Update the sprite
     const animation = sprite[0];
     spriteComponent.sprite = animation.sprite;

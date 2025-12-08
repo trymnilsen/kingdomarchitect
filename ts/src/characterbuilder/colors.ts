@@ -1,3 +1,4 @@
+import { ItemCategory } from "../data/inventory/inventoryItem.js";
 import type { EquipmentComponent } from "../game/component/equipmentComponent.js";
 
 export type CharacterColors = {
@@ -10,5 +11,12 @@ export type CharacterColors = {
 export function getCharacterColors(
     equipmentComponent: EquipmentComponent,
 ): CharacterColors {
-    throw new Error("TODO");
+    const mainHand = equipmentComponent.slots.main;
+    let chestColor = "#FACBA6";
+    if (mainHand?.category == ItemCategory.Melee) {
+        chestColor = "#424242";
+    }
+    return {
+        Chest: chestColor,
+    };
 }

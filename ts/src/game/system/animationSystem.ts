@@ -3,7 +3,7 @@ import { sprites2, type Sprite2 } from "../../asset/sprite.js";
 import { getCharacterBinId } from "../../characterbuilder/characterBinId.js";
 import type { SpriteDefinitionCache } from "../../characterbuilder/characterSpriteGenerator.js";
 import { getCharacterColors } from "../../characterbuilder/colors.js";
-import { Direction } from "../../common/direction.js";
+import { Direction, OrdinalDirection } from "../../common/direction.js";
 import type { EcsSystem } from "../../common/ecs/ecsSystem.js";
 import { checkAdjacency } from "../../common/point.js";
 import {
@@ -31,26 +31,37 @@ import {
 } from "../component/spriteComponent.js";
 import type { Entity } from "../entity/entity.js";
 
-export const animationSystem: EcsSystem = {
-    onRender,
-    onGameMessage,
-};
+export function createAnimationSystem(
+    spriteCache: SpriteDefinitionCache,
+): EcsSystem {
+    return {
+        onRender: (root, renderTick, renderScope, drawMode) =>
+            onRender(root, renderTick, renderScope, drawMode, spriteCache),
+        onGameMessage: (root, message) =>
+            onGameMessage(root, message, spriteCache),
+    };
+}
 
 function onRender(
     root: Entity,
     renderTick: number,
     _renderScope: RenderScope,
     drawMode: DrawMode,
+    spriteCache: SpriteDefinitionCache,
 ) {
     if (drawMode === DrawMode.Gesture) return;
 
     const animatables = root.queryComponents(AnimationComponentId);
     for (const [entity, animatable] of animatables) {
-        updateAnimatable(entity, renderTick, animatable);
+        updateAnimatable(entity, renderTick, animatable, spriteCache);
     }
 }
 
-function onGameMessage(root: Entity, message: GameMessage) {
+function onGameMessage(
+    root: Entity,
+    message: GameMessage,
+    spriteCache: SpriteDefinitionCache,
+) {
     //Check transforms for movement
     //Check effects
     if (message.type == "transform") {
@@ -67,7 +78,7 @@ function onGameMessage(root: Entity, message: GameMessage) {
 
         if (!nextStateKey) return;
 
-        updateAnimation(entity, animatable, nextStateKey);
+        updateAnimation(entity, animatable, nextStateKey, spriteCache);
     }
 
     if (message.type == "effect") {
@@ -85,7 +96,7 @@ function updateAnimatable(
     entity: Entity,
     renderTick: number,
     animatable: AnimationComponent,
-    assetLoader: AssetLoader,
+    spriteCache: SpriteDefinitionCache,
 ): void {
     const { currentAnimation, animationGraph } = animatable;
     const spriteComponent = entity.requireEcsComponent(SpriteComponentId);
@@ -118,7 +129,7 @@ function updateAnimatable(
         }
 
         // Transition to the next animation state.
-        updateAnimation(entity, animatable, nextStateKey, assetLoader);
+        updateAnimation(entity, animatable, nextStateKey, spriteCache);
     }
 }
 
@@ -126,7 +137,7 @@ function updateAnimation(
     entity: Entity,
     animatable: AnimationComponent,
     nextStateKey: string,
-    assetLoader: AssetLoader,
+    spriteCache: SpriteDefinitionCache,
 ) {
     animatable.currentAnimation = nextStateKey;
     const spriteComponent = entity.updateComponent(
@@ -136,7 +147,7 @@ function updateAnimation(
                 animatable,
                 nextStateKey,
                 entity,
-                assetLoader,
+                spriteCache,
             );
             component.sprite = sprite;
             component.frame = 0;
@@ -164,6 +175,13 @@ function resolvePlaceholders(
             entity.getEcsComponent(DirectionComponentId)?.direction ??
             Direction.Down;
         resolvedString = resolvedString.replace("{direction}", direction);
+    }
+
+    if (resolvedString.includes("{ordinal}")) {
+        const ordinal =
+            entity.getEcsComponent(DirectionComponentId)?.ordinal ??
+            OrdinalDirection.Northeast;
+        resolvedString = resolvedString.replace("{ordinal}", ordinal);
     }
 
     // We cast back to ValidAnimationKey because our type system guarantees

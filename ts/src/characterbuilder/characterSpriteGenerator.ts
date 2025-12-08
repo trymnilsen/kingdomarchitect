@@ -105,24 +105,46 @@ export function buildSpriteSheet(
 export class SpriteDefinitionCache {
     private cache = new Map<string, Map<AnimationKey, CharacterSprite>>();
 
-    has(binId: string) {
-        throw new Error("Method not implemented.");
+    has(binId: string): boolean {
+        return this.cache.has(binId);
     }
+
     addAnimation(
         binId: string,
         animationName: string,
-        characterSprites: CharacterSprite,
-    ) {
-        throw new Error("Method not implemented.");
-    }
-    get(binId: string): CharacterSprite[] {
-        throw new Error("Method not implemented.");
-    }
-    getSpriteFor(characterId: string, animationName: string) {
-        throw new Error("Method not implemented.");
+        characterSprite: CharacterSprite,
+    ): void {
+        let animationMap = this.cache.get(binId);
+        if (!animationMap) {
+            animationMap = new Map<AnimationKey, CharacterSprite>();
+            this.cache.set(binId, animationMap);
+        }
+        animationMap.set(animationName as AnimationKey, characterSprite);
     }
 
-    addSprite(key: string) {}
+    get(binId: string): CharacterSprite[] {
+        const animationMap = this.cache.get(binId);
+        if (!animationMap) {
+            return [];
+        }
+        return Array.from(animationMap.values());
+    }
+
+    getSpriteFor(characterId: string, animationName: string): Sprite2 {
+        const animationMap = this.cache.get(characterId);
+        if (!animationMap) {
+            throw new Error(
+                `No cached sprites found for character: ${characterId}`,
+            );
+        }
+        const characterSprite = animationMap.get(animationName as AnimationKey);
+        if (!characterSprite) {
+            throw new Error(
+                `No cached sprite found for character: ${characterId}, animation: ${animationName}`,
+            );
+        }
+        return characterSprite.sprite;
+    }
 }
 
 /**

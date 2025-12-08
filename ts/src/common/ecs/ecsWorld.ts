@@ -132,7 +132,11 @@ export class EcsWorld {
     ) {
         for (let i = 0; i < this.renderSystems.length; i++) {
             const system = this.renderSystems[i];
-            system(this.root, renderTick, renderScope, drawMode);
+            try {
+                system(this.root, renderTick, renderScope, drawMode);
+            } catch (err) {
+                console.error(err);
+            }
         }
     }
 

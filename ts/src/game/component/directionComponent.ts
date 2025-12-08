@@ -1,7 +1,8 @@
-import { Direction } from "../../common/direction.js";
+import { Direction, OrdinalDirection } from "../../common/direction.js";
 import {
     checkAdjacency,
     getDirection,
+    getOrdinalDirectionFromPoints,
     pointEquals,
     type Point,
 } from "../../common/point.js";
@@ -9,12 +10,14 @@ import {
 export type DirectionComponent = {
     id: typeof DirectionComponentId;
     direction: Direction;
+    ordinal: OrdinalDirection;
 };
 
 export function createDirectionComponent(): DirectionComponent {
     return {
         id: DirectionComponentId,
         direction: Direction.Down,
+        ordinal: OrdinalDirection.Southeast,
     };
 }
 
@@ -35,11 +38,17 @@ export function updateDirectionComponent(
     const adjacency = checkAdjacency(from, to);
     if (adjacency) {
         directionComponent.direction = adjacency;
+        directionComponent.ordinal = getOrdinalDirectionFromPoints(from, to);
         return;
     }
 
     //If we got a null from checkAdjacency the point is a bit further away
     //so we need to do a (a little bit) more expensive check
     const direction = getDirection(from, to);
-    directionComponent.direction = direction ?? Direction.Down;
+    if (direction) {
+        directionComponent.direction = direction;
+        directionComponent.ordinal = getOrdinalDirectionFromPoints(from, to);
+    } else {
+        directionComponent.direction = Direction.Down;
+    }
 }

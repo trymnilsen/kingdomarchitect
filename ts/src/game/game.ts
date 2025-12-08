@@ -19,12 +19,13 @@ import { pathfindingSystem } from "./system/pathfindingSystem.js";
 import { renderSystem } from "./system/renderSystem.js";
 import { createVisibilityMapComponent } from "./component/visibilityMapComponent.js";
 import { handleGameMessage } from "../server/message/gameMessageHandler.js";
-import { animationSystem } from "./system/animationSystem.js";
+import { createAnimationSystem } from "./system/animationSystem.js";
 import { createJobQueueComponent } from "./component/jobQueueComponent.js";
 import { createTileComponent } from "./component/tileComponent.js";
 import { Entity } from "./entity/entity.js";
 import { getOverworldEntity } from "./map/scenes.js";
 import { createSpriteEquipmentSystem } from "./system/spriteEquipmentSystem.js";
+import { SpriteDefinitionCache } from "../characterbuilder/characterSpriteGenerator.js";
 
 export class Game {
     private renderer: Renderer;
@@ -33,6 +34,7 @@ export class Game {
     private interactionHandler: InteractionHandler;
 
     private assetLoader: AssetLoader;
+    private spriteCache: SpriteDefinitionCache = new SpriteDefinitionCache();
     private drawTick = 0;
     private updateTick = 0;
     private camera: Camera;
@@ -107,7 +109,7 @@ export class Game {
     private addSystems() {
         this.ecsWorld.addSystem(chunkMapSystem);
         this.ecsWorld.addSystem(pathfindingSystem);
-        this.ecsWorld.addSystem(animationSystem);
+        this.ecsWorld.addSystem(createAnimationSystem(this.spriteCache));
         this.ecsWorld.addSystem(renderSystem);
         this.ecsWorld.addSystem(
             createSpriteEquipmentSystem(
@@ -117,6 +119,7 @@ export class Game {
                         height,
                     ),
                 this.assetLoader,
+                this.spriteCache,
             ),
         );
         //this.ecsWorld.addSystem(worldGenerationSystem);

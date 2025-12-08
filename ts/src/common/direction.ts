@@ -78,3 +78,49 @@ export const allDirections: Readonly<Direction[]> = [
     ...horizontalDirections,
     ...verticalDirections,
 ];
+
+export enum OrdinalDirection {
+    Northeast = "northeast",
+    Southeast = "southeast",
+    Southwest = "southwest",
+    Northwest = "northwest",
+}
+
+export function invertOrdinalDirection(direction: OrdinalDirection) {
+    switch (direction) {
+        case OrdinalDirection.Northeast:
+            return OrdinalDirection.Southwest;
+        case OrdinalDirection.Southwest:
+            return OrdinalDirection.Northeast;
+        case OrdinalDirection.Northwest:
+            return OrdinalDirection.Southeast;
+        case OrdinalDirection.Southeast:
+            return OrdinalDirection.Northwest;
+    }
+}
+
+export function getOrdinalDirection(
+    vertical: Direction.Up | Direction.Down,
+    horizontal: Direction.Left | Direction.Right,
+): OrdinalDirection {
+    if (vertical === Direction.Up) {
+        return horizontal === Direction.Right
+            ? OrdinalDirection.Northeast
+            : OrdinalDirection.Northwest;
+    } else {
+        return horizontal === Direction.Right
+            ? OrdinalDirection.Southeast
+            : OrdinalDirection.Southwest;
+    }
+}
+
+export function getRandomOrdinalDirection(): OrdinalDirection {
+    return randomEntry([...allOrdinalDirections]);
+}
+
+export const allOrdinalDirections: Readonly<OrdinalDirection[]> = [
+    OrdinalDirection.Northeast,
+    OrdinalDirection.Southeast,
+    OrdinalDirection.Southwest,
+    OrdinalDirection.Northwest,
+];

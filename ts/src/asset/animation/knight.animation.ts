@@ -27,15 +27,16 @@ export const nobleKnightAnimationGraph: AnimationGraph = {
         Idle: {
             speed: 8,
             type: "loop",
-            animation: "idle_{direction}",
+            animation: "walk_{ordinal}",
         },
         Walking: {
             type: "single",
-            animation: "walk_{direction}",
+            animation: "walk_{ordinal}",
         },
+        /*
         Attacking: {
             type: "single",
-            animation: "attack_{direction}",
-        },
+            animation: "attack_{ordinal}",
+        },*/
     },
 };

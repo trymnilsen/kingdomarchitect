@@ -1,4 +1,4 @@
-import { Direction } from "./direction.js";
+import { Direction, OrdinalDirection } from "./direction.js";
 
 /**
  * A point represents a pair of numbers used to represent a point in space
@@ -324,6 +324,23 @@ export function getDirection(a: Point, b: Point): Direction | null {
         direction = Direction.Down;
     }
     return direction;
+}
+
+export function getOrdinalDirectionFromPoints(
+    from: Point,
+    to: Point,
+): OrdinalDirection {
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+
+    const isNorth = dy < 0;
+    const isEast = dx > 0;
+
+    if (isNorth) {
+        return isEast ? OrdinalDirection.Northeast : OrdinalDirection.Northwest;
+    } else {
+        return isEast ? OrdinalDirection.Southeast : OrdinalDirection.Southwest;
+    }
 }
 
 export type Adjacency = "right" | "left" | "above" | "below" | "not-adjacent";
