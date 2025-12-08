@@ -8,13 +8,13 @@
     "license": "Kingdom Architect Open License (KAOL-1.0)",
     "homepage": "https://github.com/trymnilsen/kingdomarchitect#readme",
     "scripts": {
-        "build": "tsgo && rollup -c",
-        "build:tsgo": "tsgo",
+        "build": "tsc && rollup -c",
+        "build:tsgo": "tsc",
         "bundle": "rollup -c",
         "serve": "node ts/tool/dev-server.ts",
-        "spritepack": "tsgo && node build/tool/spritepack/spritePack.js && npm run build",
-        "characterpack": "tsgo && node build/tool/characterpack/characterPack.js && npm run build",
-        "test": "tsgo && node --test 'build/**/*.test.js'",
+        "spritepack": "tsc && node build/tool/spritepack/spritePack.js && npm run build",
+        "characterpack": "tsc && node build/tool/characterpack/characterPack.js && npm run build",
+        "test": "tsc && node --test 'build/**/*.test.js'",
         "format": "prettier ts/ --write",
         "check-format": "prettier --check ts/**/*.ts"
     },
@@ -33,6 +33,6 @@
         "prettier": "^3.5.3",
         "rollup": "^4.52.5",
         "rollup-plugin-sourcemaps2": "^0.5.4",
-        "@typescript/native-preview": "^7.0.0-dev.20251203.1"
+        "typescript": "^5.9.3"
     }
 }
