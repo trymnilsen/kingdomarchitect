@@ -6,6 +6,7 @@ import { DirectionComponent } from "./directionComponent.js";
 import type { EffectEmitterComponent } from "./effectEmitterComponent.js";
 import type { EquipmentComponent } from "./equipmentComponent.js";
 import type { HealthComponent } from "./healthComponent.js";
+import type { HousingComponent } from "./housingComponent.js";
 import type { InventoryComponent } from "./inventoryComponent.js";
 import type { JobQueueComponent } from "./jobQueueComponent.js";
 import type { JobRunnerComponent } from "./jobRunnerComponent.js";
@@ -41,6 +42,7 @@ export type Components =
     | KingdomComponent
     | DirectionComponent
     | ActiveEffectsComponent
+    | HousingComponent
     | SpaceComponent;
 
 export interface BaseComponent {

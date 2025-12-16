@@ -11,21 +11,21 @@ import {
 import { treeResource } from "../../data/inventory/items/naturalResource.js";
 import { woodResourceItem } from "../../data/inventory/items/resources.js";
 
-export interface ChopTreeJob extends Job {
-    id: typeof ChopTreeJobId;
+export interface CollectResourceJob extends Job {
+    id: typeof CollectResourceJobId;
     entityId: string;
 }
 
-export function ChopTreeJob(entity: Entity): ChopTreeJob {
+export function CollectResourceJob(entity: Entity): CollectResourceJob {
     return {
-        id: ChopTreeJobId,
+        id: CollectResourceJobId,
         entityId: entity.id,
     };
 }
 
-export const ChopTreeJobId = "chopTreeJob";
+export const CollectResourceJobId = "chopTreeJob";
 
-export const chopTreeHandler: JobHandler<ChopTreeJob> = (
+export const collectResourceHandler: JobHandler<CollectResourceJob> = (
     _scene,
     root,
     runner,

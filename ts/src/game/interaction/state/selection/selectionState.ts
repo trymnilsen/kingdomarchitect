@@ -13,7 +13,7 @@ import { AttackSelectionProvider } from "./actor/provider/attackSelectionProvide
 import { BlacksmithSelectionProvider } from "./actor/provider/blacksmithSelectionProvider.js";
 import { CollectableProvider } from "./actor/provider/collectableProvider.js";
 import { TileSelectionProvider } from "./actor/provider/tileSelectionProvider.js";
-import { TreeSelectionProvider } from "./actor/provider/treeSelectionProvider.js";
+import { ResourceSelectionProvider } from "./actor/provider/resourceSelectionProvider.js";
 import { WorkerSelectionProvider } from "./actor/provider/workerSelectionProvider.js";
 import type { SelectionInfo } from "./selectionInfo.js";
 import { ComponentDescriptor } from "../../../../ui/declarative/ui.js";
@@ -43,7 +43,7 @@ import {
 export class SelectionState extends InteractionState {
     private providers: ActorSelectionProvider[] = [
         new WorkerSelectionProvider(),
-        new TreeSelectionProvider(),
+        new ResourceSelectionProvider(),
         new TileSelectionProvider(),
         new CollectableProvider(),
         new BlacksmithSelectionProvider(),

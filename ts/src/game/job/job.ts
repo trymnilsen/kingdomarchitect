@@ -2,14 +2,25 @@ import { JobRunnerComponentId } from "../component/jobRunnerComponent.js";
 import type { Entity } from "../entity/entity.js";
 import type { AttackJob } from "./attackJob.js";
 import type { BuildBuildingJob } from "./buildBuildingJob.js";
-import type { ChopTreeJob } from "./chopTreeJob.js";
+import type { CollectResourceJob } from "./collectResourceJob.js";
 import type { MoveToJob } from "./moveToPointJob.js";
+
+export type JobConstraint = EntityJobConstraint;
+export interface EntityJobConstraint {
+    type: "entity";
+    id: string;
+}
 
 export interface Job {
     id: JobId;
+    constraint?: JobConstraint;
 }
 
-export type Jobs = MoveToJob | BuildBuildingJob | AttackJob | ChopTreeJob;
+export type Jobs =
+    | MoveToJob
+    | BuildBuildingJob
+    | AttackJob
+    | CollectResourceJob;
 export type JobId = Jobs["id"];
 export type JobHandler<T extends Job> = (
     scene: Entity,

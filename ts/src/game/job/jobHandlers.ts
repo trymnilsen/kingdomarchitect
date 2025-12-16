@@ -1,6 +1,6 @@
 import { attackHandler } from "./attackJob.js";
 import { buildBuildingHandler } from "./buildBuildingJob.js";
-import { chopTreeHandler } from "./chopTreeJob.js";
+import { collectResourceHandler } from "./collectResourceJob.js";
 import type { JobId, Jobs, JobHandler } from "./job.js";
 import { moveToJobHandler } from "./moveToPointJob.js";
 import type { Entity } from "../entity/entity.js";
@@ -21,7 +21,7 @@ export const jobHandlers: JobHandlerMap = {
     moveToJob: moveToJobHandler,
     buildBuildingJob: buildBuildingHandler,
     attackJob: attackHandler,
-    chopTreeJob: chopTreeHandler,
+    chopTreeJob: collectResourceHandler,
 } as const;
 
 /**

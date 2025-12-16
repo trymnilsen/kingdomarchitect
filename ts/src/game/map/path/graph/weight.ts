@@ -1,4 +1,6 @@
 import type { Point } from "../../../../common/point.js";
+import { BuildingComponentId } from "../../../component/buildingComponent.js";
+import { PlayerUnitComponentId } from "../../../component/playerUnitComponent.js";
 import { ResourceComponentId } from "../../../component/resourceComponent.js";
 import { getTile, TileComponentId } from "../../../component/tileComponent.js";
 import type { Entity } from "../../../entity/entity.js";
@@ -51,6 +53,17 @@ export function getWeightAtPoint(point: Point, scope: Entity): number {
                 entity.getEcsComponent(ResourceComponentId);
             if (!!resourceComponent) {
                 entityWeight = 30;
+            }
+
+            const buildingComponent =
+                entity.getEcsComponent(BuildingComponentId);
+
+            if (!!buildingComponent) {
+                entityWeight = 100;
+            }
+
+            if (entity.hasComponent(PlayerUnitComponentId)) {
+                entityWeight = 100;
             }
         }
 

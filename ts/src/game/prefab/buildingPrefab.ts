@@ -6,6 +6,8 @@ import { createHealthComponent } from "../component/healthComponent.js";
 import { createSpriteComponent } from "../component/spriteComponent.js";
 import { Entity } from "../entity/entity.js";
 import { createVisibilityComponent } from "../component/visibilityComponent.js";
+import { createHousingComponent } from "../component/housingComponent.js";
+import { woodenHouse } from "../../data/building/wood/house.js";
 
 export function buildingPrefab(
     building: Building,
@@ -13,8 +15,13 @@ export function buildingPrefab(
 ): Entity {
     const entity = new Entity(generateId("building"));
     entity.setEcsComponent(createBuildingComponent(building, startScaffolded));
-    entity.setEcsComponent(createHealthComponent(10, 100));
+    entity.setEcsComponent(
+        createHealthComponent(startScaffolded ? 10 : 100, 100),
+    );
     entity.setEcsComponent(createVisibilityComponent());
+    if (building.id == woodenHouse.id) {
+        entity.setEcsComponent(createHousingComponent());
+    }
     entity.setEcsComponent(
         createSpriteComponent(
             startScaffolded ? sprites2.wooden_house_scaffold : building.icon,

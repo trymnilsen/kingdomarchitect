@@ -13,6 +13,7 @@ import { commandSystem } from "../game/system/commandSystem.js";
 import { effectSystem } from "../game/system/effectSystem.js";
 import { createTileComponent } from "../game/component/tileComponent.js";
 import { getOverworldEntity } from "../game/map/scenes.js";
+import { housingSystem } from "../game/system/housingSystem.js";
 
 export class GameServer {
     private world: EcsWorld;
@@ -48,6 +49,7 @@ export class GameServer {
         this.world.addSystem(worldGenerationSystem);
         this.world.addSystem(JobSystem);
         this.world.addSystem(commandSystem);
+        this.world.addSystem(housingSystem);
         this.world.addSystem(effectSystem);
         this.world.addSystem(
             makeReplicatedEntitiesSystem((message) => {

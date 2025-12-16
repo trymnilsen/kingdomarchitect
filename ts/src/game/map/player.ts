@@ -1,6 +1,8 @@
 import { randomColor } from "../../common/color.js";
 import { generateId } from "../../common/idGenerator.js";
 import type { Point } from "../../common/point.js";
+import { farm } from "../../data/building/grow/grow.js";
+import { woodenHouse } from "../../data/building/wood/house.js";
 import {
     stoneResource,
     treeResource,
@@ -9,8 +11,10 @@ import {
     ChunkMapRegistryComponentId,
     getChunkMap,
 } from "../component/chunkMapRegistryComponent.js";
+import { HousingComponentId } from "../component/housingComponent.js";
 import { setChunk, TileComponentId } from "../component/tileComponent.js";
 import { Entity } from "../entity/entity.js";
+import { buildingPrefab } from "../prefab/buildingPrefab.js";
 import { resourcePrefab } from "../prefab/resourcePrefab.js";
 import { trainingDummyPrefab } from "../prefab/trainingDummyPrefab.js";
 import { workerPrefab } from "../prefab/workerPrefab.js";
@@ -23,15 +27,22 @@ export function addInitialPlayerChunk(scopedEntity: Entity): Point {
     const randomOffsetX = Math.round(Math.random() * 3) + 1;
     const randomOffsetY = Math.round(Math.random() * 3) + 1;
     const firstWorker = workerPrefab();
+    const firstFarm = buildingPrefab(farm, false);
     const firstTree = resourcePrefab(treeResource);
     const firstWorkerPosition = { x: 0 + randomOffsetX, y: 1 + randomOffsetY };
     const trainingDummy = trainingDummyPrefab();
+    const firstHouse = buildingPrefab(woodenHouse, false);
+    firstHouse.requireEcsComponent(HousingComponentId).tenant = firstWorker.id;
     trainingDummy.position = { x: randomOffsetX, y: randomOffsetY };
     firstTree.position = { x: 2 + randomOffsetX, y: 2 + randomOffsetY };
+    firstHouse.position = { x: 1 + randomOffsetX, y: randomOffsetY };
+    firstFarm.position = { x: 1 + randomOffsetX, y: 1 + randomOffsetY };
     firstWorker.position = firstWorkerPosition;
     chunkEntity.addChild(firstWorker);
     chunkEntity.addChild(firstTree);
     chunkEntity.addChild(trainingDummy);
+    chunkEntity.addChild(firstHouse);
+    chunkEntity.addChild(firstFarm);
 
     scopedEntity.updateComponent(TileComponentId, (component) => {
         setChunk(component, {

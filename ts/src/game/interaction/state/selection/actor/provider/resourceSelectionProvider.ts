@@ -8,11 +8,13 @@ import {
 } from "./actorSelectionProvider.js";
 import { ResourceComponentId } from "../../../../../component/resourceComponent.js";
 import { sprites2 } from "../../../../../../asset/sprite.js";
-import { ChopTreeJob } from "../../../../../job/chopTreeJob.js";
+import { CollectResourceJob } from "../../../../../job/collectResourceJob.js";
 import { QueueJobCommand } from "../../../../../../server/message/command/queueJobCommand.js";
 import { queryForJobsWithTarget } from "../../../../../job/query.js";
+import { ResourceCategory } from "../../../../../../data/inventory/items/naturalResource.js";
+import type { Entity } from "../../../../../entity/entity.js";
 
-export class TreeSelectionProvider implements ActorSelectionProvider {
+export class ResourceSelectionProvider implements ActorSelectionProvider {
     provideButtons(
         stateContext: StateContext,
         selection: SelectedWorldItem,
@@ -36,19 +38,11 @@ export class TreeSelectionProvider implements ActorSelectionProvider {
                     };
                 } else {
                     return {
-                        left: [
-                            {
-                                text: "Chop",
-                                icon: sprites2.empty_sprite,
-                                onClick: () => {
-                                    const job = ChopTreeJob(selectedEntity);
-                                    stateContext.commandDispatcher(
-                                        QueueJobCommand(job),
-                                    );
-                                    //stateContext.stateChanger.pop(null);
-                                },
-                            },
-                        ],
+                        left: getButtonsBasedOnCategory(
+                            resourceComponent.resource.category,
+                            stateContext,
+                            selectedEntity,
+                        ),
                         right: [],
                     };
                 }
@@ -58,5 +52,36 @@ export class TreeSelectionProvider implements ActorSelectionProvider {
         } else {
             return emptySelection;
         }
+    }
+}
+function getButtonsBasedOnCategory(
+    category: ResourceCategory | ResourceCategory[],
+    stateContext: StateContext,
+    selectedEntity: Entity,
+) {
+    category = Array.isArray(category) ? category : [category];
+    return category.map((category) => {
+        return {
+            text: getNameForCategory(category),
+            icon: sprites2.empty_sprite,
+            onClick: () => {
+                const job = CollectResourceJob(selectedEntity);
+                stateContext.commandDispatcher(QueueJobCommand(job));
+                //stateContext.stateChanger.pop(null);
+            },
+        };
+    });
+}
+
+function getNameForCategory(category: ResourceCategory): any {
+    switch (category) {
+        case ResourceCategory.Chop:
+            return "Chop";
+        case ResourceCategory.Cut:
+            return "Cut";
+        case ResourceCategory.Mine:
+            return "Mine";
+        case ResourceCategory.Pick:
+            return "Pick";
     }
 }

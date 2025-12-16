@@ -14,6 +14,10 @@ export function AttackJob(attacker: string, target: string): AttackJob {
         id: AttackJobId,
         target: target,
         attacker: attacker,
+        constraint: {
+            type: "entity",
+            id: attacker,
+        },
     };
 }
 

@@ -24,10 +24,14 @@ export interface MoveToJob extends Job {
     id: typeof MoveToJobId;
 }
 
-export function MoveToJob(position: Point): MoveToJob {
+export function MoveToJob(entity: Entity, position: Point): MoveToJob {
     return {
         id: MoveToJobId,
         path: [],
+        constraint: {
+            type: "entity",
+            id: entity.id,
+        },
         position,
     };
 }

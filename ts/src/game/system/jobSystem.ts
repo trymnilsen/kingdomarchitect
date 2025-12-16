@@ -7,7 +7,7 @@ import {
 import { JobRunnerComponentId } from "../component/jobRunnerComponent.js";
 import { SpaceComponentId } from "../component/spaceComponent.js";
 import { Entity } from "../entity/entity.js";
-import type { Job, JobHandler } from "../job/job.js";
+import type { Job, JobConstraint, JobHandler } from "../job/job.js";
 import { jobHandlers } from "../job/jobHandlers.js";
 
 export const JobSystem: EcsSystem = {
@@ -19,6 +19,19 @@ function onInit(root: Entity) {
     root.setEcsComponent(createJobQueueComponent());
 }
 
+function meetsConstraints(runner: Entity, job: Job): boolean {
+    if (!job.constraint) {
+        return true;
+    }
+
+    switch (job.constraint.type) {
+        case "entity":
+            return runner.id === job.constraint.id;
+        default:
+            return true;
+    }
+}
+
 function updateJobs(root: Entity, _gameTime: number) {
     const queue = root.requireEcsComponent(JobQueueComponentId);
     const runners = root.queryComponents(JobRunnerComponentId);
@@ -26,7 +39,9 @@ function updateJobs(root: Entity, _gameTime: number) {
         let currentJob = component.currentJob;
         //If there is no job, check if we can assign one
         if (!currentJob) {
-            const availableJobs = queue.jobs.filter((job) => job);
+            const availableJobs = queue.jobs.filter((job) =>
+                meetsConstraints(entity, job),
+            );
             const selectedJob = availableJobs.shift();
             if (!!selectedJob) {
                 console.log(

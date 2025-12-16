@@ -1,7 +1,7 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
 import { Entity } from "../../../src/game/entity/entity.js";
-import { ChopTreeJob } from "../../../src/game/job/chopTreeJob.js";
+import { CollectResourceJob } from "../../../src/game/job/collectResourceJob.js";
 import { createResourceComponent } from "../../../src/game/component/resourceComponent.js";
 import {
     createHealthComponent,
@@ -21,7 +21,7 @@ describe("ChopTreeJob", () => {
     describe("Job Creation", () => {
         it("creates a job with correct entity id", () => {
             const entity = new Entity("tree-1");
-            const job = ChopTreeJob(entity);
+            const job = CollectResourceJob(entity);
 
             assert.strictEqual(job.id, "chopTreeJob");
             assert.strictEqual(job.entityId, "tree-1");
@@ -31,7 +31,7 @@ describe("ChopTreeJob", () => {
     describe("Job Execution", () => {
         it("completes job when tree entity not found", () => {
             const harness = new JobTestHarness();
-            const job = ChopTreeJob(new Entity("nonexistent"));
+            const job = CollectResourceJob(new Entity("nonexistent"));
 
             harness.runner.setEcsComponent({
                 id: JobRunnerComponentId,
@@ -48,7 +48,7 @@ describe("ChopTreeJob", () => {
             // Target has no resource component
             harness.target.setEcsComponent(createHealthComponent(100, 100));
 
-            const job = ChopTreeJob(harness.target);
+            const job = CollectResourceJob(harness.target);
             harness.runner.setEcsComponent({
                 id: JobRunnerComponentId,
                 currentJob: job,
@@ -66,7 +66,7 @@ describe("ChopTreeJob", () => {
                 createResourceComponent(treeResource),
             );
 
-            const job = ChopTreeJob(harness.target);
+            const job = CollectResourceJob(harness.target);
             harness.runner.setEcsComponent({
                 id: JobRunnerComponentId,
                 currentJob: job,
@@ -88,7 +88,7 @@ describe("ChopTreeJob", () => {
             );
             harness.target.setEcsComponent(createHealthComponent(10, 100)); // Low health
 
-            const job = ChopTreeJob(harness.target);
+            const job = CollectResourceJob(harness.target);
             harness.runner.setEcsComponent({
                 id: JobRunnerComponentId,
                 currentJob: job,
@@ -120,7 +120,7 @@ describe("ChopTreeJob", () => {
             // Setup the runner with an empty inventory
             harness.runner.setEcsComponent(createInventoryComponent());
 
-            const job = ChopTreeJob(harness.target);
+            const job = CollectResourceJob(harness.target);
             harness.runner.setEcsComponent({
                 id: JobRunnerComponentId,
                 currentJob: job,
@@ -166,7 +166,7 @@ describe("ChopTreeJob", () => {
                 );
                 harness.target.setEcsComponent(createHealthComponent(100, 100));
 
-                const job = ChopTreeJob(harness.target);
+                const job = CollectResourceJob(harness.target);
                 harness.runner.setEcsComponent({
                     id: JobRunnerComponentId,
                     currentJob: job,
@@ -224,7 +224,7 @@ describe("ChopTreeJob", () => {
             );
             harness.target.setEcsComponent(createHealthComponent(100, 100));
 
-            const job = ChopTreeJob(harness.target);
+            const job = CollectResourceJob(harness.target);
             harness.runner.setEcsComponent({
                 id: JobRunnerComponentId,
                 currentJob: job,
@@ -272,7 +272,7 @@ describe("ChopTreeJob", () => {
             );
             harness.target.setEcsComponent(createHealthComponent(100, 100));
 
-            const job = ChopTreeJob(harness.target);
+            const job = CollectResourceJob(harness.target);
             harness.runner.setEcsComponent({
                 id: JobRunnerComponentId,
                 currentJob: job,
@@ -307,7 +307,7 @@ describe("ChopTreeJob", () => {
             );
             harness.target.setEcsComponent(createHealthComponent(100, 100));
 
-            const job = ChopTreeJob(harness.target);
+            const job = CollectResourceJob(harness.target);
             harness.runner.setEcsComponent({
                 id: JobRunnerComponentId,
                 currentJob: job,
@@ -340,7 +340,7 @@ describe("ChopTreeJob", () => {
             );
             harness.target.setEcsComponent(createHealthComponent(10, 100)); // Low health
 
-            const job = ChopTreeJob(harness.target);
+            const job = CollectResourceJob(harness.target);
             harness.runner.setEcsComponent({
                 id: JobRunnerComponentId,
                 currentJob: job,

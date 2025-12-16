@@ -9,7 +9,7 @@
     "homepage": "https://github.com/trymnilsen/kingdomarchitect#readme",
     "scripts": {
         "build": "tsc && rollup -c",
-        "build:tsgo": "tsc",
+        "build:tsc": "tsc",
         "bundle": "rollup -c",
         "serve": "node ts/tool/dev-server.ts",
         "spritepack": "tsc && node build/tool/spritepack/spritePack.js && npm run build",

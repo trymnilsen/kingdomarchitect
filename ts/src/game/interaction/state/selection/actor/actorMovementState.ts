@@ -175,7 +175,8 @@ export class ActorMovementState extends InteractionState {
         if (!this.selectedPoint) {
             return;
         }
-        const job = MoveToJob(this.selectedPoint);
+
+        const job = MoveToJob(this.entity, this.selectedPoint);
         this.context.commandDispatcher(QueueJobCommand(job));
     }
 }
