@@ -11,7 +11,10 @@ import { sprites2 } from "../../../../../../asset/sprite.js";
 import { CollectResourceJob } from "../../../../../job/collectResourceJob.js";
 import { QueueJobCommand } from "../../../../../../server/message/command/queueJobCommand.js";
 import { queryForJobsWithTarget } from "../../../../../job/query.js";
-import { ResourceCategory } from "../../../../../../data/inventory/items/naturalResource.js";
+import {
+    getResourceById,
+    ResourceHarvestMode,
+} from "../../../../../../data/inventory/items/naturalResource.js";
 import type { Entity } from "../../../../../entity/entity.js";
 
 export class ResourceSelectionProvider implements ActorSelectionProvider {
@@ -24,6 +27,15 @@ export class ResourceSelectionProvider implements ActorSelectionProvider {
             const resourceComponent =
                 selectedEntity.getEcsComponent(ResourceComponentId);
             if (!!resourceComponent) {
+                // Lookup resource definition
+                const resource = getResourceById(resourceComponent.resourceId);
+                if (!resource) {
+                    console.error(
+                        `No resource found for ID: ${resourceComponent.resourceId}`,
+                    );
+                    return emptySelection;
+                }
+
                 const jobsOnTree = queryForJobsWithTarget(selectedEntity);
                 if (jobsOnTree.length > 0) {
                     return {
@@ -38,8 +50,8 @@ export class ResourceSelectionProvider implements ActorSelectionProvider {
                     };
                 } else {
                     return {
-                        left: getButtonsBasedOnCategory(
-                            resourceComponent.resource.category,
+                        left: getButtonsBasedOnHarvestMode(
+                            resource.harvestMode,
                             stateContext,
                             selectedEntity,
                         ),
@@ -54,18 +66,18 @@ export class ResourceSelectionProvider implements ActorSelectionProvider {
         }
     }
 }
-function getButtonsBasedOnCategory(
-    category: ResourceCategory | ResourceCategory[],
+function getButtonsBasedOnHarvestMode(
+    mode: ResourceHarvestMode | readonly ResourceHarvestMode[],
     stateContext: StateContext,
     selectedEntity: Entity,
 ) {
-    category = Array.isArray(category) ? category : [category];
-    return category.map((category) => {
+    mode = Array.isArray(mode) ? mode : [mode];
+    return mode.map((harvestAction) => {
         return {
-            text: getNameForCategory(category),
+            text: getNameForHarvestMode(harvestAction),
             icon: sprites2.empty_sprite,
             onClick: () => {
-                const job = CollectResourceJob(selectedEntity);
+                const job = CollectResourceJob(selectedEntity, harvestAction);
                 stateContext.commandDispatcher(QueueJobCommand(job));
                 //stateContext.stateChanger.pop(null);
             },
@@ -73,15 +85,15 @@ function getButtonsBasedOnCategory(
     });
 }
 
-function getNameForCategory(category: ResourceCategory): any {
-    switch (category) {
-        case ResourceCategory.Chop:
+function getNameForHarvestMode(mode: ResourceHarvestMode): any {
+    switch (mode) {
+        case ResourceHarvestMode.Chop:
             return "Chop";
-        case ResourceCategory.Cut:
+        case ResourceHarvestMode.Cut:
             return "Cut";
-        case ResourceCategory.Mine:
+        case ResourceHarvestMode.Mine:
             return "Mine";
-        case ResourceCategory.Pick:
+        case ResourceHarvestMode.Pick:
             return "Pick";
     }
 }

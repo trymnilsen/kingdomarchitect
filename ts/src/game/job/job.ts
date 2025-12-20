@@ -27,6 +27,7 @@ export type JobHandler<T extends Job> = (
     root: Entity,
     entity: Entity,
     job: T,
+    tick: number,
 ) => void;
 
 export function completeJob(entity: Entity) {

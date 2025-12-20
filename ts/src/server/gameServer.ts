@@ -14,9 +14,11 @@ import { effectSystem } from "../game/system/effectSystem.js";
 import { createTileComponent } from "../game/component/tileComponent.js";
 import { getOverworldEntity } from "../game/map/scenes.js";
 import { housingSystem } from "../game/system/housingSystem.js";
+import { regrowSystem } from "../game/system/regrowSystem.js";
 
 export class GameServer {
     private world: EcsWorld;
+    private updateTick = 0;
 
     constructor(private postMessage: (message: GameMessage) => void) {
         this.world = new EcsWorld();
@@ -25,7 +27,8 @@ export class GameServer {
         console.log("Creating game server");
         this.world.runInit();
         setInterval(() => {
-            this.world.runUpdate(0);
+            this.updateTick += 1;
+            this.world.runUpdate(this.updateTick);
         }, 1000);
     }
 
@@ -51,6 +54,7 @@ export class GameServer {
         this.world.addSystem(commandSystem);
         this.world.addSystem(housingSystem);
         this.world.addSystem(effectSystem);
+        this.world.addSystem(regrowSystem);
         this.world.addSystem(
             makeReplicatedEntitiesSystem((message) => {
                 this.postMessage(message);

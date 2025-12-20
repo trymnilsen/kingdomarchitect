@@ -13,6 +13,7 @@ import type { JobRunnerComponent } from "./jobRunnerComponent.js";
 import type { KingdomComponent } from "./kingdomComponent.js";
 import type { PathfindingGraphRegistryComponent } from "./pathfindingGraphRegistryComponent.js";
 import type { PlayerUnitComponent } from "./playerUnitComponent.js";
+import type { RegrowComponent } from "./regrowComponent.js";
 import type { ResourceComponent } from "./resourceComponent.js";
 import type { SpaceComponent } from "./spaceComponent.js";
 import type { SpriteComponent } from "./spriteComponent.js";
@@ -27,6 +28,7 @@ export type Components =
     | TileComponent
     | InventoryComponent
     | ResourceComponent
+    | RegrowComponent
     | ChunkMapRegistryComponent
     | PlayerUnitComponent
     | JobQueueComponent
