@@ -10,6 +10,10 @@ import {
     type BuildCommand,
 } from "../../server/message/command/buildCommand.js";
 import {
+    CancelCraftingCommandId,
+    type CancelCraftingCommand,
+} from "../../server/message/command/cancelCraftingCommand.js";
+import {
     ConsumeItemCommandId,
     type ConsumeItemCommand,
 } from "../../server/message/command/consumeItemCommand.js";
@@ -25,6 +29,10 @@ import {
     QueueJobCommandId,
     type QueueJobCommand,
 } from "../../server/message/command/queueJobCommand.js";
+import {
+    StartCraftingCommandId,
+    type StartCraftingCommand,
+} from "../../server/message/command/startCraftingCommand.js";
 import { SetSceneEffectId } from "../../server/message/effect/setSceneEffect.js";
 import {
     CommandGameMessageType,
@@ -35,6 +43,11 @@ import {
     addEffect,
     createActiveEffectsComponent,
 } from "../component/activeEffectsComponent.js";
+import {
+    addCollectableItems,
+    CollectableComponentId,
+} from "../component/collectableComponent.js";
+import { CraftingComponentId } from "../component/craftingComponent.js";
 import { EffectEmitterComponentId } from "../component/effectEmitterComponent.js";
 import { EquipmentComponentId } from "../component/equipmentComponent.js";
 import {
@@ -49,12 +62,16 @@ import { BuildBuildingJob } from "../job/buildBuildingJob.js";
 import { overWorldId } from "../map/scenes.js";
 import { buildingPrefab } from "../prefab/buildingPrefab.js";
 import { interiorPrefab } from "../prefab/interiorPrefab.js";
+import type { GameTime } from "../gameTime.js";
 
-export const commandSystem: EcsSystem = {
-    onGameMessage,
-};
+export function createCommandSystem(gameTime: GameTime): EcsSystem {
+    return {
+        onGameMessage: (root, message) =>
+            onGameMessage(root, message, gameTime),
+    };
+}
 
-function onGameMessage(root: Entity, message: GameMessage) {
+function onGameMessage(root: Entity, message: GameMessage, gameTime: GameTime) {
     if (message.type != CommandGameMessageType) return;
     console.log("[CommandSystem] command: ", message.command);
     switch (message.command.id) {
@@ -79,6 +96,16 @@ function onGameMessage(root: Entity, message: GameMessage) {
             break;
         case ConsumeItemCommandId:
             consumeItem(root, message.command as ConsumeItemCommand);
+            break;
+        case StartCraftingCommandId:
+            startCrafting(
+                root,
+                message.command as StartCraftingCommand,
+                gameTime,
+            );
+            break;
+        case CancelCraftingCommandId:
+            cancelCrafting(root, message.command as CancelCraftingCommand);
             break;
     }
 }
@@ -240,4 +267,120 @@ function consumeItem(root: Entity, command: ConsumeItemCommand) {
     entity.invalidateComponent(InventoryComponentId);
     entity.invalidateComponent(EquipmentComponentId);
     entity.invalidateComponent(ActiveEffectsComponentId);
+}
+
+function startCrafting(
+    root: Entity,
+    command: StartCraftingCommand,
+    gameTime: GameTime,
+) {
+    const { entityId, recipeId } = command;
+    const entity = root.findEntity(entityId);
+
+    if (!entity) {
+        console.warn(`[StartCrafting] Entity ${entityId} not found`);
+        return;
+    }
+
+    const craftingComponent = entity.getEcsComponent(CraftingComponentId);
+
+    if (!craftingComponent) {
+        console.warn(
+            `[StartCrafting] Entity ${entityId} has no CraftingComponent`,
+        );
+        return;
+    }
+
+    // Find the recipe
+    const recipe = craftingComponent.recipes.find((r) => r.id === recipeId);
+    if (!recipe) {
+        console.warn(
+            `[StartCrafting] Recipe ${recipeId} not found in building`,
+        );
+        return;
+    }
+
+    // Check if already crafting
+    if (craftingComponent.activeCrafting) {
+        console.warn(`[StartCrafting] Entity ${entityId} is already crafting`);
+        return;
+    }
+
+    // Check inventory for required materials
+    const inventory = entity.getEcsComponent(InventoryComponentId);
+    if (!inventory) {
+        console.warn(`[StartCrafting] Entity ${entityId} has no inventory`);
+        return;
+    }
+
+    // Verify all inputs are available in the building's inventory
+    for (const input of recipe.inputs) {
+        const itemQuantity = inventory.items.find((i) => i.item === input.item);
+        if (!itemQuantity || itemQuantity.amount < input.amount) {
+            console.warn(
+                `[StartCrafting] Not enough ${input.item.name} (need ${input.amount}, have ${itemQuantity?.amount ?? 0})`,
+            );
+            return;
+        }
+    }
+
+    // Consume the materials from the building's inventory
+    for (const input of recipe.inputs) {
+        const itemIndex = inventory.items.findIndex(
+            (i) => i.item === input.item,
+        );
+        if (itemIndex !== -1) {
+            inventory.items[itemIndex].amount -= input.amount;
+            if (inventory.items[itemIndex].amount <= 0) {
+                inventory.items.splice(itemIndex, 1);
+            }
+        }
+    }
+
+    // Start crafting
+    craftingComponent.activeCrafting = {
+        recipe,
+        startTick: gameTime.tick,
+    };
+
+    // Notify changes
+    entity.invalidateComponent(InventoryComponentId);
+    entity.invalidateComponent(CraftingComponentId);
+
+    console.log(
+        `[StartCrafting] Started crafting ${recipe.id} at entity ${entityId}`,
+    );
+}
+
+function cancelCrafting(root: Entity, command: CancelCraftingCommand) {
+    const { entityId } = command;
+    const entity = root.findEntity(entityId);
+
+    if (!entity) {
+        console.warn(`[CancelCrafting] Entity ${entityId} not found`);
+        return;
+    }
+
+    const craftingComponent = entity.getEcsComponent(CraftingComponentId);
+
+    if (!craftingComponent) {
+        console.warn(
+            `[CancelCrafting] Entity ${entityId} has no CraftingComponent`,
+        );
+        return;
+    }
+
+    if (!craftingComponent.activeCrafting) {
+        console.warn(`[CancelCrafting] Entity ${entityId} is not crafting`);
+        return;
+    }
+
+    // Cancel the crafting - materials were already consumed and are lost
+    // This is the cost of canceling
+    craftingComponent.activeCrafting = null;
+    entity.invalidateComponent(CraftingComponentId);
+
+    console.log(
+        `[CancelCrafting] Cancelled crafting at entity ${entityId} (materials lost)`,
+    );
 }

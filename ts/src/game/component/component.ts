@@ -2,6 +2,8 @@ import type { ActiveEffectsComponent } from "./activeEffectsComponent.js";
 import type { AnimationComponent } from "./animationComponent.js";
 import type { BuildingComponent } from "./buildingComponent.js";
 import type { ChunkMapRegistryComponent } from "./chunkMapRegistryComponent.js";
+import type { CollectableComponent } from "./collectableComponent.js";
+import type { CraftingComponent } from "./craftingComponent.js";
 import { DirectionComponent } from "./directionComponent.js";
 import type { EffectEmitterComponent } from "./effectEmitterComponent.js";
 import type { EquipmentComponent } from "./equipmentComponent.js";
@@ -33,6 +35,8 @@ export type Components =
     | PlayerUnitComponent
     | JobQueueComponent
     | BuildingComponent
+    | CollectableComponent
+    | CraftingComponent
     | HealthComponent
     | EquipmentComponent
     | WorldDiscoveryComponent

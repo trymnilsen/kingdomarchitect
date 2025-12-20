@@ -1,5 +1,7 @@
 import { createWorldDiscoveryComponent } from "../game/component/worldDiscoveryComponent.js";
+import { GameTime } from "../game/gameTime.js";
 import { chunkMapSystem } from "../game/system/chunkMapSystem.js";
+import { craftingSystem } from "../game/system/craftingSystem.js";
 import { JobSystem } from "../game/system/jobSystem.js";
 import { pathfindingSystem } from "../game/system/pathfindingSystem.js";
 import { worldGenerationSystem } from "../game/system/worldGenerationSystem.js";
@@ -9,7 +11,7 @@ import { makeReplicatedEntitiesSystem } from "./replicatedEntitiesSystem.js";
 import type { GameCommand } from "./message/gameCommand.js";
 import { createEffectEmitterComponent } from "../game/component/effectEmitterComponent.js";
 import type { GameMessage } from "./message/gameMessage.js";
-import { commandSystem } from "../game/system/commandSystem.js";
+import { createCommandSystem } from "../game/system/commandSystem.js";
 import { effectSystem } from "../game/system/effectSystem.js";
 import { createTileComponent } from "../game/component/tileComponent.js";
 import { getOverworldEntity } from "../game/map/scenes.js";
@@ -19,6 +21,7 @@ import { regrowSystem } from "../game/system/regrowSystem.js";
 export class GameServer {
     private world: EcsWorld;
     private updateTick = 0;
+    private gameTime = new GameTime();
 
     constructor(private postMessage: (message: GameMessage) => void) {
         this.world = new EcsWorld();
@@ -28,6 +31,7 @@ export class GameServer {
         this.world.runInit();
         setInterval(() => {
             this.updateTick += 1;
+            this.gameTime.setTick(this.updateTick);
             this.world.runUpdate(this.updateTick);
         }, 1000);
     }
@@ -51,7 +55,8 @@ export class GameServer {
         this.world.addSystem(pathfindingSystem);
         this.world.addSystem(worldGenerationSystem);
         this.world.addSystem(JobSystem);
-        this.world.addSystem(commandSystem);
+        this.world.addSystem(createCommandSystem(this.gameTime));
+        this.world.addSystem(craftingSystem);
         this.world.addSystem(housingSystem);
         this.world.addSystem(effectSystem);
         this.world.addSystem(regrowSystem);
