@@ -38,18 +38,35 @@ export class EcsWorld {
     };
     private rootEntity: Entity;
     private gameMessageSystems: EcsGameMessageFunction[] = [];
+    private batchedEvents: EntityEvent[] | null = null;
 
     public get root(): Entity {
         return this.rootEntity;
     }
 
-    constructor() {
-        this.rootEntity = new Entity("root");
-        const overworld = new Entity(overWorldId);
-        overworld.setEcsComponent(createSpaceComponent());
-        this.rootEntity.addChild(overworld);
-        this.rootEntity.toggleIsGameRoot(true);
+    constructor(rootEntity?: Entity) {
+        if (rootEntity) {
+            this.rootEntity = rootEntity;
+            this.rootEntity.toggleIsGameRoot(true);
+        } else {
+            this.rootEntity = new Entity("root");
+            this.rootEntity.toggleIsGameRoot(true);
+        }
         this.rootEntity.entityEvent = this.runEvent;
+    }
+
+    async suspendEvents(fn: () => Promise<void>) {
+        this.batchedEvents = [];
+        try {
+            await fn();
+        } finally {
+            const events = this.batchedEvents;
+            this.batchedEvents = null;
+
+            for (const event of events) {
+                this.runEvent(event);
+            }
+        }
     }
 
     rescope(entity: Entity) {
@@ -148,10 +165,18 @@ export class EcsWorld {
     }
 
     runEvent = (event: EntityEvent) => {
+        if (this.batchedEvents != null) {
+            this.batchedEvents.push(event);
+            return;
+        }
         const events = this.entityEvents[event.id];
         for (let i = 0; i < events.length; i++) {
-            const listener = events[i];
-            listener(this.root, event);
+            try {
+                const listener = events[i];
+                listener(this.root, event);
+            } catch (err) {
+                console.error(err);
+            }
         }
     };
 }

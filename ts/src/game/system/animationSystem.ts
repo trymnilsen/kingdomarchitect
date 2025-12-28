@@ -82,7 +82,9 @@ function onGameMessage(
     }
 
     if (message.type == "effect") {
-        console.log("Effect game messages not supported yet");
+        console.log(
+            "Updating animations with effect game messages not supported yet",
+        );
     }
 }
 

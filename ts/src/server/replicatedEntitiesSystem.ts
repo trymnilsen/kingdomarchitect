@@ -1,5 +1,8 @@
 import { EcsSystem } from "../common/ecs/ecsSystem.js";
+import type { Components } from "../game/component/component.js";
 import { JobQueueComponentId } from "../game/component/jobQueueComponent.js";
+import { TileComponentId } from "../game/component/tileComponent.js";
+import { VisibilityMapComponentId } from "../game/component/visibilityMapComponent.js";
 import { Entity } from "../game/entity/entity.js";
 import type {
     GameMessage,
@@ -15,6 +18,13 @@ export function makeReplicatedEntitiesSystem(
                 if (
                     event.source.isGameRoot &&
                     event.item.id != JobQueueComponentId
+                ) {
+                    return;
+                }
+                // Don't replicate client-only components
+                if (
+                    event.item.id === TileComponentId ||
+                    event.item.id === VisibilityMapComponentId
                 ) {
                     return;
                 }
@@ -44,7 +54,9 @@ export function makeReplicatedEntitiesSystem(
                     id: event.target.id,
                     parent: event.target.parent?.id,
                     position: event.target.worldPosition,
-                    components: event.target.components,
+                    components: filterClientOnlyComponents(
+                        event.target.components,
+                    ),
                     children: children.length > 0 ? children : undefined,
                 });
             },
@@ -73,7 +85,7 @@ function buildChildrenData(entity: Entity): ReplicatedEntityData[] {
             id: child.id,
             parent: child.parent?.id,
             position: child.worldPosition,
-            components: child.components,
+            components: filterClientOnlyComponents(child.components),
         };
 
         // Recursively gather nested children
@@ -86,4 +98,17 @@ function buildChildrenData(entity: Entity): ReplicatedEntityData[] {
     }
 
     return children;
+}
+
+/**
+ * Filters out client-only components that should not be replicated
+ */
+function filterClientOnlyComponents(
+    components: readonly Components[],
+): Components[] {
+    return components.filter(
+        (component) =>
+            component.id !== TileComponentId &&
+            component.id !== VisibilityMapComponentId,
+    );
 }

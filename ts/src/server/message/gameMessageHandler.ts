@@ -44,6 +44,14 @@ export function handleGameMessage(
 }
 
 function addEntityHandler(root: Entity, message: AddEntityGameMessage) {
+    // Check if entity already exists (e.g., client created it locally)
+    const existingEntity = root.findEntity(message.id);
+    if (existingEntity) {
+        // Entity already exists - merge server data with existing entity
+        mergeEntityData(existingEntity, message);
+        return;
+    }
+
     let parent = root;
     if (message.parent) {
         const entityWithId = root.findEntity(message.parent);
@@ -53,6 +61,33 @@ function addEntityHandler(root: Entity, message: AddEntityGameMessage) {
     }
 
     createEntityWithChildren(parent, message);
+}
+
+/**
+ * Merges server data into an existing entity.
+ * Updates position and adds/updates server components while preserving client-only components.
+ */
+function mergeEntityData(entity: Entity, data: ReplicatedEntityData) {
+    // Update position from server
+    entity.worldPosition = data.position;
+
+    // Add/update components from server
+    // Client-only components (not in the message) are preserved
+    for (const component of data.components) {
+        entity.setEcsComponent(component);
+    }
+
+    // Handle children - merge existing, add new
+    if (data.children && data.children.length > 0) {
+        for (const childData of data.children) {
+            const existingChild = entity.findEntity(childData.id);
+            if (existingChild) {
+                mergeEntityData(existingChild, childData);
+            } else {
+                createEntityWithChildren(entity, childData);
+            }
+        }
+    }
 }
 
 /**
