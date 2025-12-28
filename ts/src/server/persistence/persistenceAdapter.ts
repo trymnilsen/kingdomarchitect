@@ -46,4 +46,6 @@ export interface PersistenceAdapter {
      * @param entityId The ID of the entity to delete
      */
     deleteEntity(entityId: string): Promise<void>;
+
+    clearGame(): Promise<void>;
 }

@@ -26,6 +26,7 @@ import {
     DiscoverTileEffectId,
     type DiscoverTileEffect,
 } from "./discoverTileEffect.js";
+import { ReloadGameEffectId } from "./reloadGameEffect.js";
 import { SetSceneEffectId } from "./setSceneEffect.js";
 
 export function effectHandler(
@@ -36,6 +37,9 @@ export function effectHandler(
     switch (message.effect.id) {
         case DiscoverTileEffectId:
             discoverTileEffect(root, message.effect);
+            break;
+        case ReloadGameEffectId:
+            window.location.reload();
             break;
         case SetSceneEffectId:
             const scene = root.findEntity(message.effect.entity);

@@ -9,6 +9,7 @@ import { uiBox } from "../../../../ui/declarative/uiBox.js";
 import { uiButton } from "../../../../ui/declarative/uiButton.js";
 import { uiColumn } from "../../../../ui/declarative/uiSequence.js";
 import { uiText } from "../../../../ui/declarative/uiText.js";
+import { NewGameCommand } from "../../../../server/message/command/newGameCommand.js";
 
 declare global {
     interface Window {
@@ -45,8 +46,7 @@ export class MenuState extends InteractionState {
                     gap: 16,
                     children: [
                         this.getButtonView("New game", () => {
-                            window.localStorage.clear();
-                            location.reload();
+                            this.context.commandDispatcher(NewGameCommand());
                         }),
                         this.getButtonView("Bindings", () => {}),
                         this.getButtonView("About", () => {}),

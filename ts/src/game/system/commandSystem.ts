@@ -26,6 +26,10 @@ import {
     type EquipItemCommand,
 } from "../../server/message/command/equipItemCommand.js";
 import {
+    NewGameCommandId,
+    type NewGameCommand,
+} from "../../server/message/command/newGameCommand.js";
+import {
     QueueJobCommandId,
     type QueueJobCommand,
 } from "../../server/message/command/queueJobCommand.js";
@@ -63,18 +67,38 @@ import { overWorldId } from "../map/scenes.js";
 import { buildingPrefab } from "../prefab/buildingPrefab.js";
 import { interiorPrefab } from "../prefab/interiorPrefab.js";
 import type { GameTime } from "../gameTime.js";
+import type { PersistenceManager } from "../../server/persistence/persistenceManager.js";
+import { ReloadGameEffectId } from "../../server/message/effect/reloadGameEffect.js";
 
-export function createCommandSystem(gameTime: GameTime): EcsSystem {
+export function createCommandSystem(
+    gameTime: GameTime,
+    persistenceManager: PersistenceManager,
+): EcsSystem {
     return {
         onGameMessage: (root, message) =>
-            onGameMessage(root, message, gameTime),
+            onGameMessage(root, message, gameTime, persistenceManager),
     };
 }
 
-function onGameMessage(root: Entity, message: GameMessage, gameTime: GameTime) {
+function onGameMessage(
+    root: Entity,
+    message: GameMessage,
+    gameTime: GameTime,
+    persistenceManager: PersistenceManager,
+) {
     if (message.type != CommandGameMessageType) return;
     console.log("[CommandSystem] command: ", message.command);
     switch (message.command.id) {
+        case NewGameCommandId:
+            persistenceManager
+                .clearGame()
+                .then(() => {
+                    root.requireEcsComponent(EffectEmitterComponentId).emitter({
+                        id: ReloadGameEffectId,
+                    });
+                })
+                .catch((err) => console.error(err));
+            break;
         case LoadSpaceCommandId:
             loadSpace(root, message.command as LoadSpaceCommand);
             break;

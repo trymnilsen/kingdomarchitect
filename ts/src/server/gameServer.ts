@@ -143,7 +143,9 @@ export class GameServer {
         this.world.addSystem(pathfindingSystem);
         this.world.addSystem(worldGenerationSystem);
         this.world.addSystem(JobSystem);
-        this.world.addSystem(createCommandSystem(this.gameTime));
+        this.world.addSystem(
+            createCommandSystem(this.gameTime, this.persistenceManager),
+        );
         this.world.addSystem(craftingSystem);
         this.world.addSystem(housingSystem);
         this.world.addSystem(effectSystem);

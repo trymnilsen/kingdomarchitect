@@ -210,4 +210,18 @@ export class IndexedDBAdapter implements PersistenceAdapter {
             this.db = null;
         }
     }
+
+    async clearGame(): Promise<void> {
+        return new Promise((resolve, reject) => {
+            this.close();
+            const deleteRequest = indexedDB.deleteDatabase(DB_NAME);
+            deleteRequest.onsuccess = () => {
+                resolve();
+            };
+
+            deleteRequest.onerror = (err) => {
+                reject(err);
+            };
+        });
+    }
 }

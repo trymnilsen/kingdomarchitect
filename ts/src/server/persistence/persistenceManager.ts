@@ -129,6 +129,17 @@ export class PersistenceManager {
     }
 
     /**
+     * Delete an entity from storage
+     */
+    deleteEntity(entityId: string): Promise<void> {
+        return this.adapter.deleteEntity(entityId);
+    }
+
+    clearGame(): Promise<void> {
+        return this.adapter.clearGame();
+    }
+
+    /**
      * Serialize an entity to a plain object suitable for storage
      */
     private serializeEntity(entity: Entity): SerializedEntity {
@@ -293,13 +304,6 @@ export class PersistenceManager {
         for (const child of entity.children) {
             this.collectSubtree(child, collection);
         }
-    }
-
-    /**
-     * Delete an entity from storage
-     */
-    async deleteEntity(entityId: string): Promise<void> {
-        return this.adapter.deleteEntity(entityId);
     }
 }
 
