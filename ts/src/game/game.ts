@@ -23,9 +23,10 @@ import { createAnimationSystem } from "./system/animationSystem.js";
 import { createJobQueueComponent } from "./component/jobQueueComponent.js";
 import { createTileComponent } from "./component/tileComponent.js";
 import { Entity } from "./entity/entity.js";
-import { getOverworldEntity } from "./map/scenes.js";
+import { getOverworldEntity, overWorldId } from "./map/scenes.js";
 import { createSpriteEquipmentSystem } from "./system/spriteEquipmentSystem.js";
 import { SpriteDefinitionCache } from "../characterbuilder/characterSpriteGenerator.js";
+import { createRootEntity } from "./rootFactory.js";
 
 export class Game {
     private renderer: Renderer;
@@ -44,7 +45,8 @@ export class Game {
     private gameServer: GameServerConnection;
 
     constructor(private domElementWrapperSelector: string) {
-        this.ecsWorld = new EcsWorld();
+        const root = createRootEntity();
+        this.ecsWorld = new EcsWorld(root);
         this.addClientOnlyComponents();
         this.camera = new Camera(
             {
@@ -99,9 +101,20 @@ export class Game {
         this.addSystems();
     }
 
+    /**
+     * Adds client-only components that are never replicated from the server.
+     * These components are preserved when the server sends entity updates via merging.
+     *
+     * Client-only components include:
+     * - JobQueue: Client-side job visualization/UI
+     * - Tile: Client-side tile rendering cache
+     * - VisibilityMap: Client-side fog-of-war rendering
+     */
     private addClientOnlyComponents() {
         this.ecsWorld.root.setEcsComponent(createJobQueueComponent());
-        const overworld = getOverworldEntity(this.ecsWorld.root);
+
+        const overworld = new Entity(overWorldId);
+        this.ecsWorld.root.addChild(overworld);
         overworld.setEcsComponent(createTileComponent());
         overworld.setEcsComponent(createVisibilityMapComponent());
     }

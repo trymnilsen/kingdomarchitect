@@ -452,11 +452,17 @@ export function isPoint(value: unknown): value is Point {
 }
 
 export function encodePosition(x: number, y: number): number {
-    return ((x & 0xffff) << 16) | (y & 0xffff);
+    // Convert to 16-bit signed representation
+    const x16 = x < 0 ? 0x10000 + x : x;
+    const y16 = y < 0 ? 0x10000 + y : y;
+    return (x16 << 16) | (y16 & 0xffff);
 }
 
 export function decodePosition(encoded: number): Point {
-    const x = (encoded >> 16) & 0xffff; // Extract the upper 16 bits and mask them to 16 bits
-    const y = encoded & 0xffff; // Extract the lower 16 bits
+    let x = (encoded >> 16) & 0xffff;
+    let y = encoded & 0xffff;
+    // Interpret as signed 16-bit
+    if (x >= 0x8000) x -= 0x10000;
+    if (y >= 0x8000) y -= 0x10000;
     return { x, y };
 }

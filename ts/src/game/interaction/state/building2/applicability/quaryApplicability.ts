@@ -15,7 +15,7 @@ export const quaryApplicability: BuildingApplicability = (
 
         const entityContainsStone = entities.some(
             (entity) =>
-                entity.getEcsComponent(ResourceComponentId)?.resource?.id ===
+                entity.getEcsComponent(ResourceComponentId)?.resourceId ===
                 stoneResource.id,
         );
 

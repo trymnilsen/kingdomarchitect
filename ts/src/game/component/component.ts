@@ -2,6 +2,8 @@ import type { ActiveEffectsComponent } from "./activeEffectsComponent.js";
 import type { AnimationComponent } from "./animationComponent.js";
 import type { BuildingComponent } from "./buildingComponent.js";
 import type { ChunkMapRegistryComponent } from "./chunkMapRegistryComponent.js";
+import type { CollectableComponent } from "./collectableComponent.js";
+import type { CraftingComponent } from "./craftingComponent.js";
 import { DirectionComponent } from "./directionComponent.js";
 import type { EffectEmitterComponent } from "./effectEmitterComponent.js";
 import type { EquipmentComponent } from "./equipmentComponent.js";
@@ -13,6 +15,7 @@ import type { JobRunnerComponent } from "./jobRunnerComponent.js";
 import type { KingdomComponent } from "./kingdomComponent.js";
 import type { PathfindingGraphRegistryComponent } from "./pathfindingGraphRegistryComponent.js";
 import type { PlayerUnitComponent } from "./playerUnitComponent.js";
+import type { RegrowComponent } from "./regrowComponent.js";
 import type { ResourceComponent } from "./resourceComponent.js";
 import type { SpaceComponent } from "./spaceComponent.js";
 import type { SpriteComponent } from "./spriteComponent.js";
@@ -27,10 +30,13 @@ export type Components =
     | TileComponent
     | InventoryComponent
     | ResourceComponent
+    | RegrowComponent
     | ChunkMapRegistryComponent
     | PlayerUnitComponent
     | JobQueueComponent
     | BuildingComponent
+    | CollectableComponent
+    | CraftingComponent
     | HealthComponent
     | EquipmentComponent
     | WorldDiscoveryComponent

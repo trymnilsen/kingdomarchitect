@@ -23,15 +23,8 @@ export const pathfindingSystem: EcsSystem = {
     },
 };
 
-function init(root: Entity) {
-    const overworld = getOverworldEntity(root);
-    const registry = createPathfindingGraphRegistryComponent();
-    // Create pathfinding graph for the overworld
-    const overworldGraph = createPathfindingGraph(
-        createLazyGraphFromRootNode(overworld),
-    );
-    registry.graphs.set(overworld.id, overworldGraph);
-    root.setEcsComponent(registry);
+function init(_root: Entity) {
+    // Registry already exists from root factory, nothing to do
 }
 
 function onTransform(_rootEntity: Entity, entityEvent: EntityTransformEvent) {

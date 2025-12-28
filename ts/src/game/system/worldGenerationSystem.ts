@@ -7,7 +7,9 @@ import { pointEquals, type Point } from "../../common/point.js";
 import type { DiscoverTileEffect } from "../../server/message/effect/discoverTileEffect.js";
 import type { GameEffect } from "../../server/message/effect/gameEffect.js";
 import { EffectEmitterComponentId } from "../component/effectEmitterComponent.js";
+import { createSpaceComponent } from "../component/spaceComponent.js";
 import {
+    createTileComponent,
     getChunk,
     hasChunk,
     setChunk,
@@ -15,17 +17,18 @@ import {
     type TileComponent,
 } from "../component/tileComponent.js";
 import {
+    createWorldDiscoveryComponent,
     discoverTile,
     hasDiscoveredChunkByChunkPosition,
     hasDiscoveredTile,
     WorldDiscoveryComponentId,
     type WorldDiscoveryComponent,
 } from "../component/worldDiscoveryComponent.js";
-import type { Entity } from "../entity/entity.js";
+import { Entity } from "../entity/entity.js";
 import { getChunkPosition } from "../map/chunk.js";
 import { generateChunk } from "../map/chunkGenerator.js";
 import { addInitialPlayerChunk } from "../map/player.js";
-import { getOverworldEntity } from "../map/scenes.js";
+import { getOverworldEntity, overWorldId } from "../map/scenes.js";
 import type { Volume } from "../map/volume.js";
 
 export const worldGenerationSystem: EcsSystem = {
@@ -34,18 +37,32 @@ export const worldGenerationSystem: EcsSystem = {
 
 /**
  * Initializes the world generation system.
- * Adds the initial player chunk and discovers tiles around it.
+ * Only generates initial world if no chunks exist (new game).
  */
 function onInit(root: Entity) {
-    const overworld = getOverworldEntity(root);
-    const start = addInitialPlayerChunk(overworld);
-    //Discover the tiles for the player, we should make this more dynamic
-    const worldDiscovery = overworld.getEcsComponent(WorldDiscoveryComponentId);
-    const effectEmitter = root.requireEcsComponent(
-        EffectEmitterComponentId,
-    ).emitter;
-    const pattern = offsetPatternWithPoint(start, generateDiamondPattern(16));
-    setDiscoveryForPlayer(overworld, effectEmitter, "player", pattern);
+    if (root.children.length == 0) {
+        const overworld = new Entity(overWorldId);
+        const tileComponent = createTileComponent();
+        overworld.setEcsComponent(createSpaceComponent());
+        overworld.setEcsComponent(createWorldDiscoveryComponent());
+        overworld.setEcsComponent(tileComponent);
+        root.addChild(overworld);
+
+        console.log("[WorldGeneration] Generating new world");
+        const start = addInitialPlayerChunk(overworld);
+        const effectEmitter = root.requireEcsComponent(
+            EffectEmitterComponentId,
+        ).emitter;
+        const pattern = offsetPatternWithPoint(
+            start,
+            generateDiamondPattern(16),
+        );
+        setDiscoveryForPlayer(overworld, effectEmitter, "player", pattern);
+    } else {
+        console.log(
+            "[WorldGeneration] World already exists, skipping generation",
+        );
+    }
 }
 
 type ChunkToGenerate = {

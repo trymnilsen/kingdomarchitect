@@ -2,6 +2,7 @@ import { JobRunnerComponentId } from "../component/jobRunnerComponent.js";
 import type { Entity } from "../entity/entity.js";
 import type { AttackJob } from "./attackJob.js";
 import type { BuildBuildingJob } from "./buildBuildingJob.js";
+import type { CollectItemJob } from "./collectItemJob.js";
 import type { CollectResourceJob } from "./collectResourceJob.js";
 import type { MoveToJob } from "./moveToPointJob.js";
 
@@ -20,6 +21,7 @@ export type Jobs =
     | MoveToJob
     | BuildBuildingJob
     | AttackJob
+    | CollectItemJob
     | CollectResourceJob;
 export type JobId = Jobs["id"];
 export type JobHandler<T extends Job> = (
@@ -27,6 +29,7 @@ export type JobHandler<T extends Job> = (
     root: Entity,
     entity: Entity,
     job: T,
+    tick: number,
 ) => void;
 
 export function completeJob(entity: Entity) {
@@ -43,6 +46,8 @@ export function isTargetOfJob(job: Jobs, entity: Entity): boolean {
         case "buildBuildingJob":
             return job.entityId == entity.id;
         case "chopTreeJob":
+            return job.entityId == entity.id;
+        case "collectItem":
             return job.entityId == entity.id;
         case "moveToJob":
             return false;

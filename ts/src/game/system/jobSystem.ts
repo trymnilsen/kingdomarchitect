@@ -32,7 +32,7 @@ function meetsConstraints(runner: Entity, job: Job): boolean {
     }
 }
 
-function updateJobs(root: Entity, _gameTime: number) {
+function updateJobs(root: Entity, gameTime: number) {
     const queue = root.requireEcsComponent(JobQueueComponentId);
     const runners = root.queryComponents(JobRunnerComponentId);
     for (const [entity, component] of runners) {
@@ -69,6 +69,6 @@ function updateJobs(root: Entity, _gameTime: number) {
         }
         console.log("Updating job", currentJob.id);
         const scene = entity.requireAncestorEntity(SpaceComponentId);
-        handler(scene, root, entity, currentJob);
+        handler(scene, root, entity, currentJob, gameTime);
     }
 }

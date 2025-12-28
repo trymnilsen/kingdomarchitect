@@ -16,6 +16,7 @@ import type {
 } from "../entity/entityEvent.js";
 import { getOverworldEntity } from "../map/scenes.js";
 import { SpaceComponentId } from "../component/spaceComponent.js";
+import { visitChildren } from "../entity/child/visit.js";
 
 export const chunkMapSystem: EcsSystem = {
     onInit: init,
@@ -28,10 +29,11 @@ export const chunkMapSystem: EcsSystem = {
 
 /**
  * Run init actions
+ * Chunk maps are populated on-demand via event handlers.
  * @param root the root entity of the system
  */
-function init(root: Entity) {
-    root.setEcsComponent(createChunkMapRegistryComponent());
+function init(_root: Entity) {
+    // Registry already exists from root factory, nothing to do
 }
 
 /**

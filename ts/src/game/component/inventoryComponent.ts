@@ -84,6 +84,22 @@ export function takeInventoryItem(
     };
 }
 
+/**
+ * Check if the inventory has at least the specified amount of an item
+ * @param inventory the inventory to check
+ * @param item the item to look for
+ * @param amount the minimum amount required
+ * @returns true if the inventory has enough of the item
+ */
+export function hasInventoryItems(
+    inventory: InventoryComponent,
+    item: InventoryItem,
+    amount: number,
+): boolean {
+    const itemQuantity = inventory.items.find((i) => i.item === item);
+    return itemQuantity !== undefined && itemQuantity.amount >= amount;
+}
+
 export function defaultInventoryItems(): InventoryItemQuantity[] {
     return [
         {

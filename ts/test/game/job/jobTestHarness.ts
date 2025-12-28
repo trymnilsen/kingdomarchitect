@@ -61,14 +61,15 @@ export class JobTestHarness<T extends Job = Job> {
     /**
      * Execute the job once using the handler from the job registry
      * @param job The job to execute
+     * @param tick The current game tick (defaults to 0)
      */
-    executeJob(job: T) {
+    executeJob(job: T, tick: number = 0) {
         const handler = getJobHandler(job.id);
         if (!handler) {
             throw new Error(`No handler found for job type: ${job.id}`);
         }
         // Type assertion is safe here as the job registry ensures handler matches job type
-        handler(this.root, this.root, this.runner, job as any);
+        handler(this.root, this.root, this.runner, job as any, tick);
     }
 
     /**

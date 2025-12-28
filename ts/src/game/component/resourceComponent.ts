@@ -1,16 +1,12 @@
-import type { NaturalResource } from "../../data/inventory/items/naturalResource.js";
-
 export type ResourceComponent = {
     id: typeof ResourceComponentId;
-    resource: NaturalResource;
+    resourceId: string;
 };
 
-export function createResourceComponent(
-    resource: NaturalResource,
-): ResourceComponent {
+export function createResourceComponent(resourceId: string): ResourceComponent {
     return {
         id: ResourceComponentId,
-        resource: resource,
+        resourceId,
     };
 }
 
