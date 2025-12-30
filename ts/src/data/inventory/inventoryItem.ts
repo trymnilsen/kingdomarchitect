@@ -1,4 +1,4 @@
-import { Sprite2 } from "../../asset/sprite.ts";
+import type { Sprite2 } from "../../asset/sprite.ts";
 import type { Point } from "../../common/point.ts";
 
 export type InventoryItem = {

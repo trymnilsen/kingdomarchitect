@@ -1,9 +1,9 @@
 import { describe, test } from "node:test";
 import assert from "node:assert";
 import {
+    type Rectangle,
     intersectRect,
     rect,
-    Rectangle,
     splitRectangle,
 } from "../../../src/common/structure/rectangle.ts";
 

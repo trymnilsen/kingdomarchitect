@@ -1,7 +1,7 @@
-import { encodePosition, Point } from "../../../common/point.ts";
+import { type Point, encodePosition } from "../../../common/point.ts";
 import { treeResource } from "../../../data/inventory/items/naturalResource.ts";
 import {
-    ChunkMap,
+    type ChunkMap,
     getEntitiesInChunkMapWithin,
 } from "../../component/chunkMapRegistryComponent.ts";
 import { Entity } from "../../entity/entity.ts";

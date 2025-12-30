@@ -2,8 +2,8 @@ import { removeItem } from "../../common/array.ts";
 import type { Bounds } from "../../common/bounds.ts";
 import { InvalidArgumentError } from "../../common/error/invalidArgumentError.ts";
 import {
+    type Point,
     addPoint,
-    Point,
     pointEquals,
     subtractPoint,
     zeroPoint,
@@ -16,7 +16,7 @@ import type {
 } from "../component/component.ts";
 import { visitChildren } from "./child/visit.ts";
 import { entityWithId } from "./child/withId.ts";
-import { EntityEvent } from "./entityEvent.ts";
+import type { EntityEvent } from "./entityEvent.ts";
 
 /**
  * Represents a node in the entity tree used to create a scenegraph for the

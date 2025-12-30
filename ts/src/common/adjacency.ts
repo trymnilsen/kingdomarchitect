@@ -17,7 +17,7 @@ export const Adjacency = {
     None: "none",
 } as const;
 
-export type Adjacency = typeof Adjacency[keyof typeof Adjacency];
+export type Adjacency = (typeof Adjacency)[keyof typeof Adjacency];
 
 /**
  * A more flexible adjacency structure that tracks each direction independently

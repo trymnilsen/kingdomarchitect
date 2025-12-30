@@ -1,4 +1,4 @@
-import { InventoryItem } from "./inventoryItem.ts";
+import type { InventoryItem } from "./inventoryItem.ts";
 import { equipmentItems } from "./items/equipment.ts";
 import { resources } from "./items/resources.ts";
 

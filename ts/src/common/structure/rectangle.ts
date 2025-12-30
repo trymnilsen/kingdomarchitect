@@ -1,5 +1,5 @@
 import type { UISize } from "../../ui/uiSize.ts";
-import { Bounds, sizeOfBounds } from "../bounds.ts";
+import { type Bounds, sizeOfBounds } from "../bounds.ts";
 import type { Point } from "../point.ts";
 
 export type Rectangle = Point & UISize;

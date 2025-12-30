@@ -1,4 +1,4 @@
-import { Sprite2, sprites2 } from "../../../asset/sprite.ts";
+import { type Sprite2, sprites2 } from "../../../asset/sprite.ts";
 import { Adjacency } from "../../../common/adjacency.ts";
 
 export function wallAdjacency(adjacency: Adjacency): Sprite2 {

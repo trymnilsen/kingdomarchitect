@@ -1,6 +1,6 @@
 import { Axis } from "./direction.ts";
-import { Point, addPoint, subtractPoint } from "./point.ts";
-import { NumberRange } from "./range.ts";
+import { type Point, addPoint, subtractPoint } from "./point.ts";
+import type { NumberRange } from "./range.ts";
 
 /**
  * Check if the given point is within the given rectangle represented by the

@@ -5,7 +5,7 @@ import {
 } from "../../common/array.ts";
 import { randomColor } from "../../common/color.ts";
 import { generateId } from "../../common/idGenerator.ts";
-import { adjacentPoints, Point } from "../../common/point.ts";
+import { type Point, adjacentPoints } from "../../common/point.ts";
 import { KingdomComponentId } from "../component/kingdomComponent.ts";
 import { getChunk, TileComponentId } from "../component/tileComponent.ts";
 import { Entity } from "../entity/entity.ts";
@@ -16,7 +16,7 @@ import { generatePlains } from "./biome/plains.ts";
 import { generateSnow } from "./biome/snow.ts";
 import { generateSwamp } from "./biome/swamp.ts";
 import { generateTaint } from "./biome/taint.ts";
-import { ChunkSize, type TileChunk } from "./chunk.ts";
+import { type TileChunk, ChunkSize } from "./chunk.ts";
 import { placeSettlement } from "./item/settlement.ts";
 import { queryEntitiesWithinVolume } from "./query/queryEntity.ts";
 import type { Volume } from "./volume.ts";

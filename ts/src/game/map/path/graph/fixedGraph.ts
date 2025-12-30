@@ -1,5 +1,5 @@
-import { Point } from "../../../../common/point.ts";
-import { Graph, GraphNode } from "./graph.ts";
+import type { Point } from "../../../../common/point.ts";
+import { type Graph, GraphNode } from "./graph.ts";
 
 export type WeightFunction = () => {
     offsetX: number;

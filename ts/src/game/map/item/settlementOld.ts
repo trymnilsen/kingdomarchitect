@@ -1,7 +1,7 @@
+import type { Point } from "../../../common/point.ts";
+import type { TileChunk } from "../chunk.ts";
 import { generateId } from "../../../common/idGenerator.ts";
-import { Point } from "../../../common/point.ts";
 import { Entity } from "../../entity/entity.ts";
-import { type TileChunk } from "../chunk.ts";
 
 export function placeSettlement(chunk: TileChunk, _chunkEntity: Entity) {
     if (!chunk.volume || chunk.volume.id === "volume1") {

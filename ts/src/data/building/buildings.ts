@@ -1,5 +1,5 @@
+import type { Building } from "./building.ts";
 import { wallAdjacency } from "./adjacency/wallAdjacency.ts";
-import { Building } from "./building.ts";
 import { foodBuildings } from "./food/food.ts";
 import { goldBuildings } from "./gold/gold.ts";
 import { stoneBuildings } from "./stone/stone.ts";

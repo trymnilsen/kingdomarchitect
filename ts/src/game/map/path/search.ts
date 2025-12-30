@@ -1,6 +1,6 @@
-import { Point, pointEquals } from "../../../common/point.ts";
+import { type Point, pointEquals } from "../../../common/point.ts";
 import { BinaryHeap } from "../../../common/structure/binaryHeap.ts";
-import { Graph, GraphNode } from "./graph/graph.ts";
+import { type Graph, GraphNode } from "./graph/graph.ts";
 import { manhattanDistance } from "./pathHeuristics.ts";
 
 export function aStarSearch(

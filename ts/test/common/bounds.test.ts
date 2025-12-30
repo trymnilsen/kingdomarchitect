@@ -1,8 +1,8 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
 import {
+    type Bounds,
     absBounds,
-    Bounds,
     boundsOverlap,
     getBoundsAxis,
     withinRectangle,

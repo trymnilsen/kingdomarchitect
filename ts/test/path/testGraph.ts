@@ -1,6 +1,6 @@
 import assert from "node:assert";
 import * as path from "path";
-import { Point, pointEquals, zeroPoint } from "../../src/common/point.ts";
+import { type Point, pointEquals, zeroPoint } from "../../src/common/point.ts";
 import { FixedGraph } from "../../src/game/map/path/graph/fixedGraph.ts";
 import { getPixelColor, readPng } from "../../tool/util/pngHelper.ts";
 

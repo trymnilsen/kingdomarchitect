@@ -1,7 +1,7 @@
 import { isPointAdjacentTo, type Point } from "../../common/point.ts";
 import { buildingAdjecency } from "../../data/building/buildings.ts";
 import {
-    AdjacencyMask,
+    type AdjacencyMask,
     adjacencyMaskToEnum,
     createAdjacencyMask,
 } from "../../common/adjacency.ts";

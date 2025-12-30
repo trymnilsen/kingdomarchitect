@@ -1,4 +1,4 @@
-import { Point } from "../../../common/point.ts";
+import type { Point } from "../../../common/point.ts";
 import { GraphNode } from "./graph/graph.ts";
 
 export function manhattanDistance(
