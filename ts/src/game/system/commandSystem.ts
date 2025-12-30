@@ -69,6 +69,13 @@ import { interiorPrefab } from "../prefab/interiorPrefab.js";
 import type { GameTime } from "../gameTime.js";
 import type { PersistenceManager } from "../../server/persistence/persistenceManager.js";
 import { ReloadGameEffectId } from "../../server/message/effect/reloadGameEffect.js";
+import {
+    ChangeOccupationCommandId,
+    type ChangeOccupationCommand,
+} from "../../server/message/command/changeOccupationCommand.js";
+import { OccupationComponentId } from "../component/occupationComponent.js";
+import { WorkplaceComponentId } from "../component/workplaceComponent.js";
+import { removeItem } from "../../common/array.js";
 
 export function createCommandSystem(
     gameTime: GameTime,
@@ -102,6 +109,9 @@ function onGameMessage(
         case LoadSpaceCommandId:
             loadSpace(root, message.command as LoadSpaceCommand);
             break;
+        case ChangeOccupationCommandId:
+            changeOccupation(root, message.command as ChangeOccupationCommand);
+            break;
         case QueueJobCommandId:
             queueJob(root, message.command as QueueJobCommand);
             break;
@@ -132,6 +142,39 @@ function onGameMessage(
             cancelCrafting(root, message.command as CancelCraftingCommand);
             break;
     }
+}
+
+function changeOccupation(root: Entity, command: ChangeOccupationCommand) {
+    const worker = root.findEntity(command.worker);
+    if (!worker) {
+        throw new Error(`Worker ${worker} not found`);
+    }
+
+    const workplace = root.findEntity(command.workplace);
+    if (!workplace) {
+        throw new Error(`workplace ${workplace} not found`);
+    }
+
+    const occupationComponent = worker.requireEcsComponent(
+        OccupationComponentId,
+    );
+
+    const workplaceComponent =
+        workplace.requireEcsComponent(WorkplaceComponentId);
+
+    switch (command.action) {
+        case "assign":
+            occupationComponent.workplace = workplace.id;
+            workplaceComponent.workers.push(worker.id);
+            break;
+        case "unassign":
+            occupationComponent.workplace = undefined;
+            removeItem(workplaceComponent.workers, worker.id);
+            break;
+    }
+
+    worker.invalidateComponent(OccupationComponentId);
+    workplace.invalidateComponent(WorkplaceComponentId);
 }
 
 function loadSpace(root: Entity, command: LoadSpaceCommand) {

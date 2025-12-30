@@ -14,6 +14,7 @@ import { createAnimationComponent } from "../component/animationComponent.js";
 import { nobleKnightAnimationGraph } from "../../asset/animation/knight.animation.js";
 import { createDirectionComponent } from "../component/directionComponent.js";
 import { createHealthComponent } from "../component/healthComponent.js";
+import { createOccupationComponent } from "../component/occupationComponent.js";
 
 export function workerPrefab(): Entity {
     const entity = new Entity(generateId("worker"));
@@ -27,5 +28,6 @@ export function workerPrefab(): Entity {
     entity.setEcsComponent(createVisibilityComponent());
     entity.setEcsComponent(createAnimationComponent(nobleKnightAnimationGraph));
     entity.setEcsComponent(createDirectionComponent());
+    entity.setEcsComponent(createOccupationComponent());
     return entity;
 }

@@ -12,12 +12,29 @@ import { InteractionState } from "../../../handler/interactionState.js";
 import { uiScaffold } from "../../../view/uiScaffold.js";
 import { QueueJobCommand } from "../../../../../server/message/command/queueJobCommand.js";
 import { getPathfindingGraphForEntity } from "../../../../map/path/getPathfindingGraphForEntity.js";
+import { queryEntity } from "../../../../map/query/queryEntity.js";
+import { SpaceComponentId } from "../../../../component/spaceComponent.js";
+import type { SelectedWorldItem } from "../../../selection/selectedWorldItem.js";
+import { SelectedEntityItem } from "../../../selection/selectedEntityItem.js";
+import { SelectedTileItem } from "../../../selection/selectedTileItem.js";
+import { CraftingComponentId } from "../../../../component/craftingComponent.js";
+import { WorkplaceComponentId } from "../../../../component/workplaceComponent.js";
+import { OccupationComponentId } from "../../../../component/occupationComponent.js";
+import { removeItem } from "../../../../../common/array.js";
+import { ChangeOccupationCommand } from "../../../../../server/message/command/changeOccupationCommand.js";
 
-export class ActorMovementState extends InteractionState {
+type ScaffoldButton = {
+    text: string;
+    onClick?: () => void;
+    icon?: import("../../../../../asset/sprite.js").Sprite2;
+    children?: ScaffoldButton[];
+};
+
+export class ActorContextActionState extends InteractionState {
     private selectedPoint: Point | null = null;
     private path: Point[] = [];
     private graph: SearchedNode[] = [];
-
+    private currentSelection: SelectedWorldItem | null = null;
     override get stateName(): string {
         return "Confirm movement";
     }
@@ -28,22 +45,72 @@ export class ActorMovementState extends InteractionState {
 
     override getView(): ComponentDescriptor | null {
         return uiScaffold({
-            leftButtons: [
-                {
-                    text: "Confirm",
-                    onClick: () => {
-                        this.scheduleMovement();
-                        this.context.stateChanger.pop(null);
-                    },
-                },
-                {
-                    text: "Cancel",
-                    onClick: () => {
-                        this.context.stateChanger.pop(null);
-                    },
-                },
-            ],
+            leftButtons: this.getButtons(),
         });
+    }
+
+    private getButtons(): ScaffoldButton[] {
+        const buttons: ScaffoldButton[] = [];
+
+        // Add action button based on selection type
+        if (this.currentSelection instanceof SelectedEntityItem) {
+            const entity = this.currentSelection.entity;
+            const workplaceComponent =
+                entity.getEcsComponent(WorkplaceComponentId);
+
+            if (workplaceComponent) {
+                const worksAtPlace = workplaceComponent.workers.some(
+                    (id) => id == this.entity.id,
+                );
+                if (!worksAtPlace) {
+                    buttons.push({
+                        text: "Assign",
+                        onClick: () => {
+                            this.context.commandDispatcher(
+                                ChangeOccupationCommand(
+                                    this.entity,
+                                    entity,
+                                    "assign",
+                                ),
+                            );
+                            this.context.stateChanger.pop();
+                        },
+                    });
+                } else {
+                    buttons.push({
+                        text: "Unassign",
+                        onClick: () => {
+                            this.context.commandDispatcher(
+                                ChangeOccupationCommand(
+                                    this.entity,
+                                    entity,
+                                    "unassign",
+                                ),
+                            );
+                            this.context.stateChanger.pop();
+                        },
+                    });
+                }
+            }
+        } else if (this.currentSelection instanceof SelectedTileItem) {
+            buttons.push({
+                text: "Move",
+                onClick: () => {
+                    this.scheduleMovement();
+                    this.context.stateChanger.pop(null);
+                },
+            });
+        }
+
+        // Always add cancel button
+        buttons.push({
+            text: "Cancel",
+            onClick: () => {
+                this.context.stateChanger.pop(null);
+            },
+        });
+
+        return buttons;
     }
 
     override onTileTap(tile: GroundTile): boolean {
@@ -52,26 +119,36 @@ export class ActorMovementState extends InteractionState {
             y: tile.tileY,
         };
         this.selectedPoint = toPoint;
-
-        // Get the pathfinding graph for the entity's space
-        const pathfindingGraph = getPathfindingGraphForEntity(
-            this.context.root,
-            this.entity,
-        );
-        if (!pathfindingGraph) {
-            return false;
-        }
-
-        const path = queryPath(
-            pathfindingGraph,
-            this.entity.worldPosition,
+        const atPoint = queryEntity(
+            this.entity.requireAncestorEntity(SpaceComponentId),
             toPoint,
         );
 
-        this.path = path.path;
-        this.graph = path.graph;
+        if (atPoint.length > 0) {
+            this.currentSelection = new SelectedEntityItem(atPoint[0]);
+            return true;
+        } else {
+            this.currentSelection = new SelectedTileItem(tile);
+            // Get the pathfinding graph for the entity's space
+            const pathfindingGraph = getPathfindingGraphForEntity(
+                this.context.root,
+                this.entity,
+            );
+            if (!pathfindingGraph) {
+                return false;
+            }
 
-        return true;
+            const path = queryPath(
+                pathfindingGraph,
+                this.entity.worldPosition,
+                toPoint,
+            );
+
+            this.path = path.path;
+            this.graph = path.graph;
+
+            return true;
+        }
     }
 
     override onDraw(context: RenderScope): void {

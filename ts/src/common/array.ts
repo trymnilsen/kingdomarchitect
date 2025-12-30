@@ -91,6 +91,21 @@ export function weightedRandomEntry<T>(items: T[], weights: number[]): T {
     return filteredItems[0];
 }
 
+/**
+ * Removes the first occurrence of an item from an array in-place.
+ *
+ * Mutates the original array by removing the item if found.
+ * Uses strict equality (===) for comparison via indexOf.
+ *
+ * @param array - The array to modify (mutated in-place)
+ * @param item - The item to remove
+ * @returns `true` if the item was found and removed, `false` if not found
+ *
+ * @example
+ * const items = [1, 2, 3, 2];
+ * removeItem(items, 2);  // returns true, items is now [1, 3, 2]
+ * removeItem(items, 99); // returns false, items unchanged
+ */
 export function removeItem<T>(array: T[], item: T): boolean {
     const indexOfItem = array.indexOf(item);
     if (indexOfItem >= 0) {

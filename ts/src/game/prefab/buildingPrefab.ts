@@ -12,6 +12,7 @@ import { createInventoryComponent } from "../component/inventoryComponent.js";
 import { woodenHouse } from "../../data/building/wood/house.js";
 import { blacksmith } from "../../data/building/stone/blacksmith.js";
 import { blacksmithRecipes } from "../../data/crafting/recipes/blacksmithRecipes.js";
+import { createWorkplaceComponent } from "../component/workplaceComponent.js";
 
 export function buildingPrefab(
     building: Building,
@@ -29,6 +30,7 @@ export function buildingPrefab(
     if (building.id == blacksmith.id) {
         entity.setEcsComponent(createCraftingComponent(blacksmithRecipes));
         entity.setEcsComponent(createInventoryComponent());
+        entity.setEcsComponent(createWorkplaceComponent());
     }
     entity.setEcsComponent(
         createSpriteComponent(

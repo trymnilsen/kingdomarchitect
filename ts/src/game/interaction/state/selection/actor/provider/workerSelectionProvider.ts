@@ -13,7 +13,7 @@ import { ButtonCollection } from "../../../../view/buttonCollection.js";
 import { UIActionbarItem } from "../../../../view/uiActionbar.js";
 import { AlertMessageState } from "../../../common/alertMessageState.js";
 import { InventoryState } from "../../../root/inventory/inventoryState.js";
-import { ActorMovementState } from "../actorMovementState.js";
+import { ActorContextActionState } from "../actorContextActionState.js";
 import {
     ActorSelectionProvider,
     emptySelection,
@@ -212,7 +212,7 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
                 text: "Interact",
                 onClick: () => {
                     stateContext.stateChanger.push(
-                        new ActorMovementState(selectedEntity),
+                        new ActorContextActionState(selectedEntity),
                     );
                 },
             },

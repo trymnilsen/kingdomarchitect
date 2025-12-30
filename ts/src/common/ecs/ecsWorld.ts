@@ -131,7 +131,11 @@ export class EcsWorld {
     runGameMessage(message: GameMessage) {
         for (let i = 0; i < this.gameMessageSystems.length; i++) {
             const system = this.gameMessageSystems[i];
-            system(this.root, message);
+            try {
+                system(this.root, message);
+            } catch (err) {
+                console.error(err);
+            }
         }
     }
 

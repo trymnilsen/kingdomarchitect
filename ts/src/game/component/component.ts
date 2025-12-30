@@ -13,6 +13,7 @@ import type { InventoryComponent } from "./inventoryComponent.js";
 import type { JobQueueComponent } from "./jobQueueComponent.js";
 import type { JobRunnerComponent } from "./jobRunnerComponent.js";
 import type { KingdomComponent } from "./kingdomComponent.js";
+import type { OppcupationComponent } from "./occupationComponent.js";
 import type { PathfindingGraphRegistryComponent } from "./pathfindingGraphRegistryComponent.js";
 import type { PlayerUnitComponent } from "./playerUnitComponent.js";
 import type { RegrowComponent } from "./regrowComponent.js";
@@ -22,6 +23,7 @@ import type { SpriteComponent } from "./spriteComponent.js";
 import type { TileComponent } from "./tileComponent.js";
 import type { VisibilityComponent } from "./visibilityComponent.js";
 import type { VisibilityMapComponent } from "./visibilityMapComponent.js";
+import type { WorkplaceComponent } from "./workplaceComponent.js";
 import type { WorldDiscoveryComponent } from "./worldDiscoveryComponent.js";
 
 export type Components =
@@ -49,6 +51,8 @@ export type Components =
     | DirectionComponent
     | ActiveEffectsComponent
     | HousingComponent
+    | OppcupationComponent
+    | WorkplaceComponent
     | SpaceComponent;
 
 export interface BaseComponent {
