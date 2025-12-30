@@ -5,7 +5,11 @@ import { RenderScope } from "../renderScope.js";
 export class SpriteAnimation {
     private currentFrame = 0;
     private position: Point = zeroPoint();
-    constructor(private spriteFrames: Sprite2[]) {}
+    private spriteFrames: Sprite2[];
+
+    constructor(spriteFrames: Sprite2[]) {
+        this.spriteFrames = spriteFrames;
+    }
 
     updatePosition(point: Point) {
         this.position = point;

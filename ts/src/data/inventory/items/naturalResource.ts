@@ -5,12 +5,14 @@ import {
     stoneResource as stoneInventoryItem,
 } from "./resources.js";
 
-export enum ResourceHarvestMode {
-    Chop,
-    Mine,
-    Cut,
-    Pick,
-}
+export const ResourceHarvestMode = {
+    Chop: 0,
+    Mine: 1,
+    Cut: 2,
+    Pick: 3,
+} as const;
+
+export type ResourceHarvestMode = typeof ResourceHarvestMode[keyof typeof ResourceHarvestMode];
 
 export type ResourceLifecycle =
     | { type: "Finite" } // removed permanently (trees)

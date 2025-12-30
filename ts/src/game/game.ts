@@ -43,8 +43,10 @@ export class Game {
     private ecsWorld: EcsWorld;
     private visibilityMap: RenderVisibilityMap = new RenderVisibilityMap();
     private gameServer: GameServerConnection;
+    private domElementWrapperSelector: string;
 
-    constructor(private domElementWrapperSelector: string) {
+    constructor(domElementWrapperSelector: string) {
+        this.domElementWrapperSelector = domElementWrapperSelector;
         const root = createRootEntity();
         this.ecsWorld = new EcsWorld(root);
         this.addClientOnlyComponents();

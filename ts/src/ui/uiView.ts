@@ -31,21 +31,23 @@ export type UIAction = {
     data: unknown;
 };
 
-export enum UIViewVisiblity {
+export const UIViewVisiblity = {
     /**
      * The view is visible and should do layout and drawing
      */
-    Visible,
+    Visible: 0,
     /**
      * The view is hidden and should not do layout or drawing
      */
-    Hidden,
+    Hidden: 1,
     /**
      * The view is considered invisible, but will still take up space.
      * Should do layout but not drawing
      */
-    Invisible,
-}
+    Invisible: 2,
+} as const;
+
+export type UIViewVisiblity = typeof UIViewVisiblity[keyof typeof UIViewVisiblity];
 
 /**
  * UIView is the base class for all UI elements, it supports basic functions

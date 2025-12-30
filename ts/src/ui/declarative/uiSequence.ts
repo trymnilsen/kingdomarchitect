@@ -10,18 +10,23 @@ import {
 type AxisSizeSelector = (size: UISize) => number;
 type PositionFactory = (mainAxis: number, crossAxis: number) => Point;
 
-export enum CrossAxisAlignment {
-    Start,
-    Center,
-    End,
-}
-export enum MainAxisAlignment {
-    Start,
-    Center,
-    End,
-    SpaceBetween,
-    SpaceEvenly,
-}
+export const CrossAxisAlignment = {
+    Start: 0,
+    Center: 1,
+    End: 2,
+} as const;
+
+export type CrossAxisAlignment = typeof CrossAxisAlignment[keyof typeof CrossAxisAlignment];
+
+export const MainAxisAlignment = {
+    Start: 0,
+    Center: 1,
+    End: 2,
+    SpaceBetween: 3,
+    SpaceEvenly: 4,
+} as const;
+
+export type MainAxisAlignment = typeof MainAxisAlignment[keyof typeof MainAxisAlignment];
 
 type SequenceProps = {
     children: ComponentDescriptor[];

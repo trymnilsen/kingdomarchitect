@@ -1,15 +1,17 @@
 import { Direction } from "../common/direction.js";
 
-export enum InputActionType {
-    LEFT_PRESS = "LEFT_PRESS",
-    RIGHT_PRESS = "RIGHT_PRESS",
-    UP_PRESS = "UP_PRESS",
-    DOWN_PRESS = "DOWN_PRESS",
-    ACTION_PRESS = "ACTION_PRESS",
-    BACK_PRESS = "BACK_PRESS",
-    MENU_PRESS = "MENU_PRESS",
-    NUMBER_PRESS = "NUMBER_PRESS",
-}
+export const InputActionType = {
+    LEFT_PRESS: "LEFT_PRESS",
+    RIGHT_PRESS: "RIGHT_PRESS",
+    UP_PRESS: "UP_PRESS",
+    DOWN_PRESS: "DOWN_PRESS",
+    ACTION_PRESS: "ACTION_PRESS",
+    BACK_PRESS: "BACK_PRESS",
+    MENU_PRESS: "MENU_PRESS",
+    NUMBER_PRESS: "NUMBER_PRESS",
+} as const;
+
+export type InputActionType = typeof InputActionType[keyof typeof InputActionType];
 
 export type InputAction = {
     isShifted: boolean;

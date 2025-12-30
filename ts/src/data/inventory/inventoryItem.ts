@@ -16,14 +16,18 @@ export type ItemVisual = {
     offset: Point;
 };
 
-export enum ItemTag {
-    SkillGear,
-    Consumable,
-}
+export const ItemTag = {
+    SkillGear: 0,
+    Consumable: 1,
+} as const;
 
-export enum ItemCategory {
-    Melee,
-    Magic,
-    Productivity,
-    Ranged,
-}
+export type ItemTag = typeof ItemTag[keyof typeof ItemTag];
+
+export const ItemCategory = {
+    Melee: 0,
+    Magic: 1,
+    Productivity: 2,
+    Ranged: 3,
+} as const;
+
+export type ItemCategory = typeof ItemCategory[keyof typeof ItemCategory];

@@ -35,12 +35,15 @@ export class ActorContextActionState extends InteractionState {
     private path: Point[] = [];
     private graph: SearchedNode[] = [];
     private currentSelection: SelectedWorldItem | null = null;
+    private entity: Entity;
+
     override get stateName(): string {
         return "Confirm movement";
     }
 
-    constructor(private entity: Entity) {
+    constructor(entity: Entity) {
         super();
+        this.entity = entity;
     }
 
     override getView(): ComponentDescriptor | null {

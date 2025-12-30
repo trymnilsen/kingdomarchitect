@@ -67,10 +67,13 @@ export class RootState extends InteractionState {
 
 class WorldFocusGroup implements FocusGroup {
     private currentFocus: GroundTile | null = null;
-    constructor(
-        private rootNode: Entity,
-        private camera: Camera,
-    ) {}
+    private rootNode: Entity;
+    private camera: Camera;
+
+    constructor(rootNode: Entity, camera: Camera) {
+        this.rootNode = rootNode;
+        this.camera = camera;
+    }
 
     onFocusActionInput(): boolean {
         return false;

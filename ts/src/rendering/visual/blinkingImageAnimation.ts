@@ -11,12 +11,15 @@ export class BlinkingImageAnimation {
      * The current frame number for this animation
      */
     private frame = 0;
+    private sprite: SpriteConfiguration;
 
     /**
      * Create a new BlinkingImageAnimation
      * @param image The configratuion to render for this animation
      */
-    constructor(private sprite: SpriteConfiguration) {}
+    constructor(sprite: SpriteConfiguration) {
+        this.sprite = sprite;
+    }
 
     /**
      * Update the position in the configuration with the newly provided point.

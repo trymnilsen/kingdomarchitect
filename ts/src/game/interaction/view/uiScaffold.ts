@@ -82,12 +82,14 @@ type ScaffoldButton = {
     children?: ScaffoldButton[];
 };
 
-enum MenuState {
-    closed,
-    left,
-    main,
-    other,
-}
+const MenuState = {
+    closed: 0,
+    left: 1,
+    main: 2,
+    other: 3,
+} as const;
+
+type MenuState = typeof MenuState[keyof typeof MenuState];
 
 type ExpandedMenuState = {
     expandedButtonIndex: number | null;

@@ -32,8 +32,10 @@ export class GameServer {
     private persistenceManager: PersistenceManager;
     private worldSeed: number;
     private gameLoopInterval?: ReturnType<typeof setInterval>;
+    private postMessage: (message: GameMessage) => void;
 
-    constructor(private postMessage: (message: GameMessage) => void) {
+    constructor(postMessage: (message: GameMessage) => void) {
+        this.postMessage = postMessage;
         const root = createRootEntity();
         this.world = new EcsWorld(root);
         this.worldSeed = Date.now();

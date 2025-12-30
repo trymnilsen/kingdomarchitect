@@ -12,10 +12,12 @@ import { EffectEmitterComponentId } from "../component/effectEmitterComponent.js
 import { SpaceComponentId } from "../component/spaceComponent.js";
 import { getPathfindingGraphForEntity } from "../map/path/getPathfindingGraphForEntity.js";
 
-export enum MovementResult {
-    Ok = "ok",
-    Failure = "failure",
-}
+export const MovementResult = {
+    Ok: "ok",
+    Failure: "failure",
+} as const;
+
+export type MovementResult = typeof MovementResult[keyof typeof MovementResult];
 
 export function doMovement(entity: Entity, to: Point): MovementResult {
     const root = entity.getRootEntity();

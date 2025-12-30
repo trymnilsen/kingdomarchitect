@@ -3,7 +3,12 @@ import { isTile, type GroundTile } from "../../map/tile.js";
 import { SelectedWorldItem } from "./selectedWorldItem.js";
 
 export class SelectedTileItem implements SelectedWorldItem {
-    constructor(public groundTile: GroundTile) {}
+    public groundTile: GroundTile;
+
+    constructor(groundTile: GroundTile) {
+        this.groundTile = groundTile;
+    }
+
     get tilePosition(): Point {
         return {
             x: this.groundTile.tileX,

@@ -1,11 +1,13 @@
 import { randomEntry } from "./array.js";
 
-export enum Direction {
-    Up = "up",
-    Down = "down",
-    Left = "left",
-    Right = "right",
-}
+export const Direction = {
+    Up: "up",
+    Down: "down",
+    Left: "left",
+    Right: "right",
+} as const;
+
+export type Direction = typeof Direction[keyof typeof Direction];
 
 export function invertDirection(direction: Direction) {
     switch (direction) {
@@ -61,10 +63,12 @@ export function getRandomAxis(): Axis {
     }
 }
 
-export enum Axis {
-    XAxis = "XAxis",
-    YAxis = "YAxis",
-}
+export const Axis = {
+    XAxis: "XAxis",
+    YAxis: "YAxis",
+} as const;
+
+export type Axis = typeof Axis[keyof typeof Axis];
 
 export const verticalDirections: Readonly<Direction[]> = [
     Direction.Up,
@@ -79,12 +83,14 @@ export const allDirections: Readonly<Direction[]> = [
     ...verticalDirections,
 ];
 
-export enum OrdinalDirection {
-    Northeast = "northeast",
-    Southeast = "southeast",
-    Southwest = "southwest",
-    Northwest = "northwest",
-}
+export const OrdinalDirection = {
+    Northeast: "northeast",
+    Southeast: "southeast",
+    Southwest: "southwest",
+    Northwest: "northwest",
+} as const;
+
+export type OrdinalDirection = typeof OrdinalDirection[keyof typeof OrdinalDirection];
 
 export function invertOrdinalDirection(direction: OrdinalDirection) {
     switch (direction) {
@@ -100,8 +106,8 @@ export function invertOrdinalDirection(direction: OrdinalDirection) {
 }
 
 export function getOrdinalDirection(
-    vertical: Direction.Up | Direction.Down,
-    horizontal: Direction.Left | Direction.Right,
+    vertical: typeof Direction.Up | typeof Direction.Down,
+    horizontal: typeof Direction.Left | typeof Direction.Right,
 ): OrdinalDirection {
     if (vertical === Direction.Up) {
         return horizontal === Direction.Right

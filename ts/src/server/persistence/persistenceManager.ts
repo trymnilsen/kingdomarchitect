@@ -17,7 +17,11 @@ type SerialisedComponent = JSONValue | null | undefined;
  * Supports entity-level saves, subtree saves, and efficient batched operations.
  */
 export class PersistenceManager {
-    constructor(private adapter: PersistenceAdapter) {}
+    private adapter: PersistenceAdapter;
+
+    constructor(adapter: PersistenceAdapter) {
+        this.adapter = adapter;
+    }
 
     /**
      * Check if a save exists

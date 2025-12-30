@@ -186,8 +186,11 @@ type NodeHooks = {
 export class UiRenderer {
     private currentTree: UiNode | null = null;
     private hooks: Map<UiNode, NodeHooks> = new Map();
+    private renderScope: RenderScope;
 
-    constructor(private renderScope: RenderScope) {}
+    constructor(renderScope: RenderScope) {
+        this.renderScope = renderScope;
+    }
 
     public renderComponent(topLevelDescriptor: ComponentDescriptor | null) {
         const newDescriptor = topLevelDescriptor;

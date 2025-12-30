@@ -18,15 +18,19 @@ export type UIBookLayoutTab = {
     isSelected: boolean;
 };
 
-export enum UIBookLayoutMode {
-    Single,
-    Dual,
-}
+export const UIBookLayoutMode = {
+    Single: 0,
+    Dual: 1,
+} as const;
 
-export enum UIBookLayoutPage {
-    Left,
-    Right,
-}
+export type UIBookLayoutMode = typeof UIBookLayoutMode[keyof typeof UIBookLayoutMode];
+
+export const UIBookLayoutPage = {
+    Left: 0,
+    Right: 1,
+} as const;
+
+export type UIBookLayoutPage = typeof UIBookLayoutPage[keyof typeof UIBookLayoutPage];
 
 type UiBookLayoutProps = {
     leftPage?: ComponentDescriptor;

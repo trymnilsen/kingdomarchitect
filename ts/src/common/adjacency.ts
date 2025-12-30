@@ -1,21 +1,23 @@
-export enum Adjacency {
-    Left = "left",
-    Right = "right",
-    Upper = "upper",
-    Bottom = "bottom",
-    LeftRight = "leftright",
-    LeftRightUpper = "leftrightupper",
-    LeftUpper = "leftupper",
-    LeftBottom = "leftbottom",
-    LeftUpperBottom = "leftupperbottom",
-    LeftRightBottom = "leftrightbottom",
-    LeftRightUpperBottom = "leftrightupperbottom",
-    RightUpper = "rightupper",
-    RightUpperBottom = "rightupperbottom",
-    RightBottom = "rightbottom",
-    UpperBottom = "upperbottom",
-    None = "none",
-}
+export const Adjacency = {
+    Left: "left",
+    Right: "right",
+    Upper: "upper",
+    Bottom: "bottom",
+    LeftRight: "leftright",
+    LeftRightUpper: "leftrightupper",
+    LeftUpper: "leftupper",
+    LeftBottom: "leftbottom",
+    LeftUpperBottom: "leftupperbottom",
+    LeftRightBottom: "leftrightbottom",
+    LeftRightUpperBottom: "leftrightupperbottom",
+    RightUpper: "rightupper",
+    RightUpperBottom: "rightupperbottom",
+    RightBottom: "rightbottom",
+    UpperBottom: "upperbottom",
+    None: "none",
+} as const;
+
+export type Adjacency = typeof Adjacency[keyof typeof Adjacency];
 
 /**
  * A more flexible adjacency structure that tracks each direction independently

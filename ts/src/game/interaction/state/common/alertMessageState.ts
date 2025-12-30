@@ -90,15 +90,17 @@ const alertMessage = createComponent<AlertMessageProps>(
 );
 
 export class AlertMessageState extends InteractionState {
+    private title: string;
+    private text: string;
+
     override get stateName(): string {
         return "Message";
     }
 
-    constructor(
-        private title: string,
-        private text: string,
-    ) {
+    constructor(title: string, text: string) {
         super();
+        this.title = title;
+        this.text = text;
     }
 
     override getView(): ComponentDescriptor | null {

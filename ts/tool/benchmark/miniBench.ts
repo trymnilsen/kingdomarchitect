@@ -90,11 +90,15 @@ function generateTable(data: TableData): void {
 
 export class MiniBench<T = unknown> {
     private tests: MiniBenchTest<T>[] = [];
-    constructor(
-        private name: string,
-        private samples: number = 1000,
-        private sampleStep: number | undefined = samples / 10,
-    ) {}
+    private name: string;
+    private samples: number;
+    private sampleStep: number | undefined;
+
+    constructor(name: string, samples: number = 1000, sampleStep: number | undefined = samples / 10) {
+        this.name = name;
+        this.samples = samples;
+        this.sampleStep = sampleStep;
+    }
 
     add(entry: MiniBenchTest<T>) {
         this.tests.push(entry);

@@ -34,8 +34,11 @@ export class Entity {
     private _entityEvents?: (event: EntityEvent) => void;
     private _ecsComponents = new Map<string, Components>();
     private _gameTime?: GameTime;
+    readonly id: EntityId;
 
-    constructor(readonly id: EntityId) {}
+    constructor(id: EntityId) {
+        this.id = id;
+    }
 
     /**
      * Returns the parent entity of this entity, can be null if this is the root

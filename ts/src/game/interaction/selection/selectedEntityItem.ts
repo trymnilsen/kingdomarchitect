@@ -3,7 +3,12 @@ import { Entity } from "../../entity/entity.js";
 import { SelectedWorldItem } from "./selectedWorldItem.js";
 
 export class SelectedEntityItem implements SelectedWorldItem {
-    constructor(readonly entity: Entity) {}
+    readonly entity: Entity;
+
+    constructor(entity: Entity) {
+        this.entity = entity;
+    }
+
     get tilePosition(): Point {
         return this.entity.worldPosition;
     }

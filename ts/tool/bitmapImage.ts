@@ -5,11 +5,12 @@ import { createPng } from "./util/pngHelper.js";
 
 export class BitmapImage {
     private image: PNG;
+    private width: number;
+    private height: number;
 
-    constructor(
-        private width: number,
-        private height: number,
-    ) {
+    constructor(width: number, height: number) {
+        this.width = width;
+        this.height = height;
         this.image = createPng(width, height);
     }
 

@@ -13,6 +13,7 @@ export class FixedGraph implements Graph {
     private dirtyNodes: GraphNode[] = [];
     private _offsetX = 0;
     private _offsetY = 0;
+    private weightFunction: WeightFunction;
 
     get offsetX(): number {
         return this._offsetX;
@@ -22,7 +23,8 @@ export class FixedGraph implements Graph {
         return this._offsetY;
     }
 
-    constructor(private weightFunction: WeightFunction) {
+    constructor(weightFunction: WeightFunction) {
+        this.weightFunction = weightFunction;
         this.generateGrid();
     }
 

@@ -14,6 +14,7 @@ type InteractionStateHistoryEntry = {
  */
 export class InteractionStateHistory {
     private history: InteractionStateHistoryEntry[] = [];
+    private context: StateContext;
 
     /**
      * Retrieve the currently active interaction state
@@ -26,7 +27,8 @@ export class InteractionStateHistory {
         return this.history.length;
     }
 
-    constructor(private context: StateContext) {
+    constructor(context: StateContext) {
+        this.context = context;
         const rootState = new RootState();
         rootState.context = context;
         rootState.onActive();

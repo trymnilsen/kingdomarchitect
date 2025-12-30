@@ -20,8 +20,10 @@ export class CharacterBuilder {
     private touchInput: TouchInput;
     private drawTick = 0;
     private dummyScene: Entity;
+    private canvasElementId: string;
 
-    constructor(private canvasElementId: string) {
+    constructor(canvasElementId: string) {
+        this.canvasElementId = canvasElementId;
         this.assetLoader = new AssetLoader();
         this.dummyScene = new Entity("characterBuilderScene");
         this.camera = new Camera(

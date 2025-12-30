@@ -6,9 +6,11 @@ export type InputEvent = {
     action: InputAction;
     inputType: InputType;
 };
-export enum InputType {
-    Keyboard,
-}
+export const InputType = {
+    Keyboard: 0,
+} as const;
+
+export type InputType = typeof InputType[keyof typeof InputType];
 export class Input {
     private _currentInputType: InputType;
     private events: Event<InputEvent>;

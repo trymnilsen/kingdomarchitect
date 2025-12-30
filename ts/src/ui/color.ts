@@ -4,7 +4,9 @@ export const stoneFill = "#858585";
 export const hiddenBookInkColor = "#B87A4B";
 export const redColor = "#FF0000";
 
-export enum UIThemeType {
-    Book,
-    Stone,
-}
+export const UIThemeType = {
+    Book: 0,
+    Stone: 1,
+} as const;
+
+export type UIThemeType = typeof UIThemeType[keyof typeof UIThemeType];

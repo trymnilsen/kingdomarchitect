@@ -50,13 +50,15 @@ export class SelectionState extends InteractionState {
         new AttackSelectionProvider(),
         new BuildingSelectionProvider(),
     ];
+    private selection: SelectedWorldItem;
 
     override get stateName(): string {
         return "Selection";
     }
 
-    constructor(private selection: SelectedWorldItem) {
+    constructor(selection: SelectedWorldItem) {
         super();
+        this.selection = selection;
     }
 
     override getView(): ComponentDescriptor | null {

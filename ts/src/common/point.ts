@@ -315,7 +315,7 @@ export function getDirection(a: Point, b: Point): Direction | null {
     // <- 180
     // v 90
     // (upper left) - 135
-    let direction = Direction.Up;
+    let direction: Direction = Direction.Up;
     if (angle < -135 || angle > 135) {
         direction = Direction.Left;
     } else if (angle > -45 && angle < 45) {

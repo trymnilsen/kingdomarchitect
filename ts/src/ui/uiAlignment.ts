@@ -1,17 +1,21 @@
 import { clamp } from "../common/number.js";
 import { Point } from "../common/point.js";
 
-export enum HorizontalAlignment {
-    Left,
-    Center,
-    Right,
-}
+export const HorizontalAlignment = {
+    Left: 0,
+    Center: 1,
+    Right: 2,
+} as const;
 
-export enum VerticalAlignment {
-    Top,
-    Center,
-    Bottom,
-}
+export type HorizontalAlignment = typeof HorizontalAlignment[keyof typeof HorizontalAlignment];
+
+export const VerticalAlignment = {
+    Top: 0,
+    Center: 1,
+    Bottom: 2,
+} as const;
+
+export type VerticalAlignment = typeof VerticalAlignment[keyof typeof VerticalAlignment];
 
 export type UiAlignment = typeof uiAlignment;
 

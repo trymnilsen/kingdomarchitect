@@ -17,6 +17,8 @@ import { AlertMessageState } from "../common/alertMessageState.js";
 export class AttackSelectionState extends InteractionState {
     private selectedPoint: Point | null = null;
     private selection: Entity | null = null;
+    private entity: Entity;
+
     override get stateName(): string {
         return "Select target";
     }
@@ -24,8 +26,9 @@ export class AttackSelectionState extends InteractionState {
     /**
      * @param entity The entity that performs the attack
      */
-    constructor(private entity: Entity) {
+    constructor(entity: Entity) {
         super();
+        this.entity = entity;
     }
 
     override getView(): ComponentDescriptor | null {

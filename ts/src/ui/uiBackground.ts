@@ -9,7 +9,12 @@ export type UIBackground = {
 };
 
 export class ColorBackground implements UIBackground {
-    constructor(private color: string) {}
+    private color: string;
+
+    constructor(color: string) {
+        this.color = color;
+    }
+
     draw(context: UIRenderScope, screenPosition: Point, size: UISize): void {
         context.drawScreenSpaceRectangle({
             x: screenPosition.x,
@@ -22,11 +27,16 @@ export class ColorBackground implements UIBackground {
 }
 
 export class NinePatchBackground implements UIBackground {
-    constructor(
-        private sprite: Sprite2,
-        private sides: Sides,
-        private scale: number,
-    ) {}
+    private sprite: Sprite2;
+    private sides: Sides;
+    private scale: number;
+
+    constructor(sprite: Sprite2, sides: Sides, scale: number) {
+        this.sprite = sprite;
+        this.sides = sides;
+        this.scale = scale;
+    }
+
     draw(context: UIRenderScope, screenPosition: Point, size: UISize): void {
         context.drawNinePatchSprite({
             x: screenPosition.x,
@@ -41,11 +51,15 @@ export class NinePatchBackground implements UIBackground {
 }
 
 export class BoxBackground implements UIBackground {
-    constructor(
-        private fill: string,
-        private stroke: string,
-        private strokeWidth: number,
-    ) {}
+    private fill: string;
+    private stroke: string;
+    private strokeWidth: number;
+
+    constructor(fill: string, stroke: string, strokeWidth: number) {
+        this.fill = fill;
+        this.stroke = stroke;
+        this.strokeWidth = strokeWidth;
+    }
 
     draw(context: UIRenderScope, screenPosition: Point, size: UISize): void {
         context.drawScreenSpaceRectangle({
@@ -61,7 +75,12 @@ export class BoxBackground implements UIBackground {
 }
 
 export class SpriteBackground implements UIBackground {
-    constructor(private sprite: Sprite2) {}
+    private sprite: Sprite2;
+
+    constructor(sprite: Sprite2) {
+        this.sprite = sprite;
+    }
+
     draw(context: UIRenderScope, screenPosition: Point): void {
         context.drawScreenSpaceSprite({
             sprite: this.sprite,

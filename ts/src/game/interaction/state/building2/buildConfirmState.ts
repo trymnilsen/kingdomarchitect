@@ -22,16 +22,17 @@ export class BuildConfirmState extends InteractionState {
     private blinkScaffold = true;
     private buildMode: BuildMode;
     private selection: SelectedTile[] = [];
+    private building: Building;
+    private cursorPosition: Point;
 
     override get stateName(): string {
         return "Confirm build";
     }
 
-    constructor(
-        private building: Building,
-        private cursorPosition: Point,
-    ) {
+    constructor(building: Building, cursorPosition: Point) {
         super();
+        this.building = building;
+        this.cursorPosition = cursorPosition;
         this.buildMode = new SingleBuildMode(cursorPosition);
     }
 

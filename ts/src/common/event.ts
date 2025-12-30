@@ -138,10 +138,12 @@ export class ForwardEvent<T> implements EventListener<T> {
     }
 }
 
-export enum LifecycleStatus {
-    Alive,
-    Stopped,
-}
+export const LifecycleStatus = {
+    Alive: 0,
+    Stopped: 1,
+} as const;
+
+export type LifecycleStatus = typeof LifecycleStatus[keyof typeof LifecycleStatus];
 
 export class Lifecycle implements EventListener<LifecycleStatus> {
     listen(): EventHandle {
@@ -234,7 +236,11 @@ export class TypedEvent<TBaseEvent extends object> {
  * Allows checking if the subscription is active and disposing the subscription
  */
 export class TypedEventHandle {
-    constructor(private disposeHandle: () => void) {}
+    private disposeHandle: () => void;
+
+    constructor(disposeHandle: () => void) {
+        this.disposeHandle = disposeHandle;
+    }
 
     dispose() {
         this.disposeHandle();

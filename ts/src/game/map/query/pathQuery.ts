@@ -75,11 +75,11 @@ export function queryPath(
 /**
  * Status of a path search result
  */
-export enum PathResultStatus {
+export const PathResultStatus = {
     /**
      * A complete path was found including the end point
      */
-    Complete = "complete",
+    Complete: "complete",
     /**
      * A complete path was found excluding the end point.
      * There might be multiple tiles between the end point of the search
@@ -87,18 +87,20 @@ export enum PathResultStatus {
      * tiles. In this case the final point in the path will be a tile adjacent
      * to the bounds of this entity
      */
-    Adjacent = "adjacent",
+    Adjacent: "adjacent",
     /**
      * A partial path was found to the end point. Use with caution as it is not
      * a complete path
      */
-    Partial = "partial",
+    Partial: "partial",
     /**
      * No path was found from start to end. For example if the start was inside
      * a impassable position
      */
-    None = "none",
-}
+    None: "none",
+} as const;
+
+export type PathResultStatus = typeof PathResultStatus[keyof typeof PathResultStatus];
 
 /**
  * The result of a path search, will include the potential path found and the
