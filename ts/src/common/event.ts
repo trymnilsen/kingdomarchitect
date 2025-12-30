@@ -1,4 +1,4 @@
-import { ConstructorFunction, getConstructorName } from "./constructor.js";
+import { ConstructorFunction, getConstructorName } from "./constructor.ts";
 
 /**
  * An event allows modeling updates to data.
@@ -143,7 +143,8 @@ export const LifecycleStatus = {
     Stopped: 1,
 } as const;
 
-export type LifecycleStatus = typeof LifecycleStatus[keyof typeof LifecycleStatus];
+export type LifecycleStatus =
+    (typeof LifecycleStatus)[keyof typeof LifecycleStatus];
 
 export class Lifecycle implements EventListener<LifecycleStatus> {
     listen(): EventHandle {

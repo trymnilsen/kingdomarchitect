@@ -1,26 +1,26 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
-import { Entity } from "../../../src/game/entity/entity.js";
-import { CollectResourceJob } from "../../../src/game/job/collectResourceJob.js";
-import { createResourceComponent } from "../../../src/game/component/resourceComponent.js";
+import { Entity } from "../../../src/game/entity/entity.ts";
+import { CollectResourceJob } from "../../../src/game/job/collectResourceJob.ts";
+import { createResourceComponent } from "../../../src/game/component/resourceComponent.ts";
 import {
     createRegrowComponent,
     RegrowComponentId,
-} from "../../../src/game/component/regrowComponent.js";
+} from "../../../src/game/component/regrowComponent.ts";
 import {
     createInventoryComponent,
     InventoryComponentId,
-} from "../../../src/game/component/inventoryComponent.js";
-import { JobRunnerComponentId } from "../../../src/game/component/jobRunnerComponent.js";
+} from "../../../src/game/component/inventoryComponent.ts";
+import { JobRunnerComponentId } from "../../../src/game/component/jobRunnerComponent.ts";
 import {
     berryBushResource,
     flowerResource,
     ResourceHarvestMode,
-} from "../../../src/data/inventory/items/naturalResource.js";
-import type { Point } from "../../../src/common/point.js";
-import { JobTestHarness } from "./jobTestHarness.js";
-import { createSpriteComponent } from "../../../src/game/component/spriteComponent.js";
-import { zeroPoint } from "../../../src/common/point.js";
+} from "../../../src/data/inventory/items/naturalResource.ts";
+import type { Point } from "../../../src/common/point.ts";
+import { JobTestHarness } from "./jobTestHarness.ts";
+import { createSpriteComponent } from "../../../src/game/component/spriteComponent.ts";
+import { zeroPoint } from "../../../src/common/point.ts";
 
 describe("PickHarvestJob", () => {
     describe("Job Creation", () => {

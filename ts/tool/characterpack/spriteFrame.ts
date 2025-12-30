@@ -1,4 +1,4 @@
-import type { ColorRegion } from "./colorRegion.js";
+import type { ColorRegion } from "./colorRegion.ts";
 
 export interface SpriteFrame {
     animationName: string;

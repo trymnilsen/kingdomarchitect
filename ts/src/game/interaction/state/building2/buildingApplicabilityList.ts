@@ -1,6 +1,6 @@
-import { quary } from "../../../../data/building/stone/quary.js";
-import { quaryApplicability } from "./applicability/quaryApplicability.js";
-import { BuildingApplicability } from "./buildingApplicability.js";
+import { quary } from "../../../../data/building/stone/quary.ts";
+import { quaryApplicability } from "./applicability/quaryApplicability.ts";
+import { BuildingApplicability } from "./buildingApplicability.ts";
 
 export const buildingApplicabilityList: {
     [id: string]: BuildingApplicability;

@@ -1,19 +1,19 @@
-import type { ComponentDescriptor } from "../../../../ui/declarative/ui.js";
-import type { Entity } from "../../../entity/entity.js";
-import { InteractionState } from "../../handler/interactionState.js";
+import type { ComponentDescriptor } from "../../../../ui/declarative/ui.ts";
+import type { Entity } from "../../../entity/entity.ts";
+import { InteractionState } from "../../handler/interactionState.ts";
 import {
     CraftingComponentId,
     type CraftingComponent,
-} from "../../../component/craftingComponent.js";
+} from "../../../component/craftingComponent.ts";
 import {
     CollectableComponentId,
     hasCollectableItems,
-} from "../../../component/collectableComponent.js";
-import { craftingView } from "./craftingView.js";
-import { StartCraftingCommand } from "../../../../server/message/command/startCraftingCommand.js";
-import { CancelCraftingCommand } from "../../../../server/message/command/cancelCraftingCommand.js";
-import { CollectItemJob } from "../../../job/collectItemJob.js";
-import { QueueJobCommand } from "../../../../server/message/command/queueJobCommand.js";
+} from "../../../component/collectableComponent.ts";
+import { craftingView } from "./craftingView.ts";
+import { StartCraftingCommand } from "../../../../server/message/command/startCraftingCommand.ts";
+import { CancelCraftingCommand } from "../../../../server/message/command/cancelCraftingCommand.ts";
+import { CollectItemJob } from "../../../job/collectItemJob.ts";
+import { QueueJobCommand } from "../../../../server/message/command/queueJobCommand.ts";
 
 export class CraftWithBuildingState extends InteractionState {
     private _selectedRecipeIndex = 0;

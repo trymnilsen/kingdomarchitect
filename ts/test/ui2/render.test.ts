@@ -1,11 +1,11 @@
 // oxlint-disable no-empty-file
 /*
 import { describe, expect, test } from "vitest";
-import { UiRenderer } from "../../src/module/ui/declarative/render.js";
+import { UiRenderer } from "../../src/module/ui/declarative/render.ts";
 import {
     createUiComponent,
     type ComponentDescriptor,
-} from "../../src/module/ui/declarative/component.js";
+} from "../../src/module/ui/declarative/component.ts";
 
 type ChildrenProp = {
     children: ComponentDescriptor[];

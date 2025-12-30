@@ -1,5 +1,5 @@
-import { Point } from "../../../../common/point.js";
-import { Graph, GraphNode } from "./graph.js";
+import { Point } from "../../../../common/point.ts";
+import { Graph, GraphNode } from "./graph.ts";
 
 export type LazyGraphNodeFunction = (point: Point) => number | null;
 

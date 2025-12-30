@@ -1,23 +1,24 @@
-import type { Point } from "../../common/point.js";
-import { PathResultStatus, queryPath } from "../map/query/pathQuery.js";
-import type { Entity } from "../entity/entity.js";
-import { VisibilityComponentId } from "../component/visibilityComponent.js";
-import { offsetPatternWithPoint } from "../../common/pattern.js";
-import { setDiscoveryForPlayer } from "../system/worldGenerationSystem.js";
+import type { Point } from "../../common/point.ts";
+import { PathResultStatus, queryPath } from "../map/query/pathQuery.ts";
+import type { Entity } from "../entity/entity.ts";
+import { VisibilityComponentId } from "../component/visibilityComponent.ts";
+import { offsetPatternWithPoint } from "../../common/pattern.ts";
+import { setDiscoveryForPlayer } from "../system/worldGenerationSystem.ts";
 import {
     DirectionComponentId,
     updateDirectionComponent,
-} from "../component/directionComponent.js";
-import { EffectEmitterComponentId } from "../component/effectEmitterComponent.js";
-import { SpaceComponentId } from "../component/spaceComponent.js";
-import { getPathfindingGraphForEntity } from "../map/path/getPathfindingGraphForEntity.js";
+} from "../component/directionComponent.ts";
+import { EffectEmitterComponentId } from "../component/effectEmitterComponent.ts";
+import { SpaceComponentId } from "../component/spaceComponent.ts";
+import { getPathfindingGraphForEntity } from "../map/path/getPathfindingGraphForEntity.ts";
 
 export const MovementResult = {
     Ok: "ok",
     Failure: "failure",
 } as const;
 
-export type MovementResult = typeof MovementResult[keyof typeof MovementResult];
+export type MovementResult =
+    (typeof MovementResult)[keyof typeof MovementResult];
 
 export function doMovement(entity: Entity, to: Point): MovementResult {
     const root = entity.getRootEntity();

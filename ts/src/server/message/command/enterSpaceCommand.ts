@@ -1,4 +1,4 @@
-import type { Entity } from "../../../game/entity/entity.js";
+import type { Entity } from "../../../game/entity/entity.ts";
 
 export type LoadSpaceCommand = {
     id: typeof LoadSpaceCommandId;

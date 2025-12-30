@@ -24,7 +24,8 @@
       "strictPropertyInitialization": true,
       "strictBindCallApply": true,
       "target": "ES2022",
-      "erasableSyntaxOnly": true
+      "erasableSyntaxOnly": true,
+      "rewriteRelativeImportExtensions": true
     },
     "include": [
       "ts/src/**/*.ts",

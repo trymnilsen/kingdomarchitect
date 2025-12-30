@@ -1,10 +1,10 @@
-import { JobRunnerComponentId } from "../component/jobRunnerComponent.js";
-import type { Entity } from "../entity/entity.js";
-import type { AttackJob } from "./attackJob.js";
-import type { BuildBuildingJob } from "./buildBuildingJob.js";
-import type { CollectItemJob } from "./collectItemJob.js";
-import type { CollectResourceJob } from "./collectResourceJob.js";
-import type { MoveToJob } from "./moveToPointJob.js";
+import { JobRunnerComponentId } from "../component/jobRunnerComponent.ts";
+import type { Entity } from "../entity/entity.ts";
+import type { AttackJob } from "./attackJob.ts";
+import type { BuildBuildingJob } from "./buildBuildingJob.ts";
+import type { CollectItemJob } from "./collectItemJob.ts";
+import type { CollectResourceJob } from "./collectResourceJob.ts";
+import type { MoveToJob } from "./moveToPointJob.ts";
 
 export type JobConstraint = EntityJobConstraint;
 export interface EntityJobConstraint {

@@ -1,5 +1,5 @@
-import { Entity } from "../entity.js";
-import { visitChildren } from "./visit.js";
+import { Entity } from "../entity.ts";
+import { visitChildren } from "./visit.ts";
 
 /**
  * Visit the entity and all its children and create an array with the

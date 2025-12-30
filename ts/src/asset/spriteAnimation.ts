@@ -1,4 +1,4 @@
-import { Sprite2 } from "./sprite.js";
+import { Sprite2 } from "./sprite.ts";
 
 export type SpriteAnimation = {
     frames: number;

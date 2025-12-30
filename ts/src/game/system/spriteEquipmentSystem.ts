@@ -1,30 +1,30 @@
 import {
     buildSpriteSheet,
     type SpriteDefinitionCache,
-} from "../../characterbuilder/characterSpriteGenerator.js";
+} from "../../characterbuilder/characterSpriteGenerator.ts";
 import {
     getCharacterColors,
     type CharacterColors,
-} from "../../characterbuilder/colors.js";
-import type { EcsSystem } from "../../common/ecs/ecsSystem.js";
-import type { AssetLoader } from "../../asset/loader/assetLoader.js";
+} from "../../characterbuilder/colors.ts";
+import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
+import type { AssetLoader } from "../../asset/loader/assetLoader.ts";
 import type {
     OffscreenCanvasFactory,
     RenderScope,
-} from "../../rendering/renderScope.js";
+} from "../../rendering/renderScope.ts";
 import {
     EquipmentComponentId,
     type EquipmentComponent,
-} from "../component/equipmentComponent.js";
+} from "../component/equipmentComponent.ts";
 import {
     SpriteComponentId,
     type SpriteComponent,
-} from "../component/spriteComponent.js";
-import type { Entity } from "../entity/entity.js";
+} from "../component/spriteComponent.ts";
+import type { Entity } from "../entity/entity.ts";
 import type {
     ComponentsUpdatedEvent,
     EntityChildrenUpdatedEvent,
-} from "../entity/entityEvent.js";
+} from "../entity/entityEvent.ts";
 
 export function createSpriteEquipmentSystem(
     createOffscreenCanvas: OffscreenCanvasFactory,

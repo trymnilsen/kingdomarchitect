@@ -1,5 +1,5 @@
-import type { Sprite2 } from "../../asset/sprite.js";
-import { createComponent } from "./ui.js";
+import type { Sprite2 } from "../../asset/sprite.ts";
+import { createComponent } from "./ui.ts";
 
 export type UiImageProps = {
     sprite: Sprite2;

@@ -1,15 +1,15 @@
-import { randomEntry, removeItem } from "../../common/array.js";
-import type { EcsSystem } from "../../common/ecs/ecsSystem.js";
-import { BuildingComponentId } from "../component/buildingComponent.js";
+import { randomEntry, removeItem } from "../../common/array.ts";
+import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
+import { BuildingComponentId } from "../component/buildingComponent.ts";
 import {
     HousingComponentId,
     type HousingComponent,
-} from "../component/housingComponent.js";
-import { PlayerUnitComponentId } from "../component/playerUnitComponent.js";
-import type { Entity } from "../entity/entity.js";
-import { findClosestAvailablePosition } from "../map/query/closestPositionQuery.js";
-import { getOverworldEntity } from "../map/scenes.js";
-import { workerPrefab } from "../prefab/workerPrefab.js";
+} from "../component/housingComponent.ts";
+import { PlayerUnitComponentId } from "../component/playerUnitComponent.ts";
+import type { Entity } from "../entity/entity.ts";
+import { findClosestAvailablePosition } from "../map/query/closestPositionQuery.ts";
+import { getOverworldEntity } from "../map/scenes.ts";
+import { workerPrefab } from "../prefab/workerPrefab.ts";
 
 export const housingSystem: EcsSystem = {
     onUpdate: update,

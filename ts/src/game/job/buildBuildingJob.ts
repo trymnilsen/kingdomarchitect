@@ -1,17 +1,17 @@
-import { isPointAdjacentTo, type Point } from "../../common/point.js";
-import { buildingAdjecency } from "../../data/building/buildings.js";
+import { isPointAdjacentTo, type Point } from "../../common/point.ts";
+import { buildingAdjecency } from "../../data/building/buildings.ts";
 import {
     AdjacencyMask,
     adjacencyMaskToEnum,
     createAdjacencyMask,
-} from "../../common/adjacency.js";
-import { queryAdjacentEntities } from "../map/query/queryEntity.js";
-import { BuildingComponentId } from "../component/buildingComponent.js";
-import { heal, HealthComponentId } from "../component/healthComponent.js";
-import { SpriteComponentId } from "../component/spriteComponent.js";
-import type { Entity } from "../entity/entity.js";
-import { completeJob, type Job, type JobHandler } from "./job.js";
-import { doMovement, MovementResult } from "./movementHelper.js";
+} from "../../common/adjacency.ts";
+import { queryAdjacentEntities } from "../map/query/queryEntity.ts";
+import { BuildingComponentId } from "../component/buildingComponent.ts";
+import { heal, HealthComponentId } from "../component/healthComponent.ts";
+import { SpriteComponentId } from "../component/spriteComponent.ts";
+import type { Entity } from "../entity/entity.ts";
+import { completeJob, type Job, type JobHandler } from "./job.ts";
+import { doMovement, MovementResult } from "./movementHelper.ts";
 
 export interface BuildBuildingJob extends Job {
     id: typeof BuildBuildingJobId;

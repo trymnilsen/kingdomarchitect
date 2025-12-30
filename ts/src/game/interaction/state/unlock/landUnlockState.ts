@@ -1,13 +1,13 @@
-import { withinRectangle } from "../../../../common/bounds.js";
-import { Direction } from "../../../../common/direction.js";
-import { encodePosition, Point, shiftPoint } from "../../../../common/point.js";
-import { allSides } from "../../../../common/sides.js";
-import { sprites2 } from "../../../../asset/sprite.js";
-import { ChunkDimension, ChunkSize } from "../../../map/chunk.js";
-import { TileSize } from "../../../map/tile.js";
-import { RenderScope } from "../../../../rendering/renderScope.js";
-import { hasChunk, TileComponentId } from "../../../component/tileComponent.js";
-import { InteractionState } from "../../handler/interactionState.js";
+import { withinRectangle } from "../../../../common/bounds.ts";
+import { Direction } from "../../../../common/direction.ts";
+import { encodePosition, Point, shiftPoint } from "../../../../common/point.ts";
+import { allSides } from "../../../../common/sides.ts";
+import { sprites2 } from "../../../../asset/sprite.ts";
+import { ChunkDimension, ChunkSize } from "../../../map/chunk.ts";
+import { TileSize } from "../../../map/tile.ts";
+import { RenderScope } from "../../../../rendering/renderScope.ts";
+import { hasChunk, TileComponentId } from "../../../component/tileComponent.ts";
+import { InteractionState } from "../../handler/interactionState.ts";
 
 export class LandUnlockState extends InteractionState {
     private unlockPoints: Point[] = [];

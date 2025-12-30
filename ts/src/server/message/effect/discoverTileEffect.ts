@@ -1,9 +1,9 @@
-import type { Volume } from "../../../game/map/volume.js";
-import { decodePosition } from "../../../common/point.js";
-import { TileComponentId } from "../../../game/component/tileComponent.js";
-import { WorldDiscoveryComponentId } from "../../../game/component/worldDiscoveryComponent.js";
-import type { Entity } from "../../../game/entity/entity.js";
-import { ChunkSize, getChunkId } from "../../../game/map/chunk.js";
+import type { Volume } from "../../../game/map/volume.ts";
+import { decodePosition } from "../../../common/point.ts";
+import { TileComponentId } from "../../../game/component/tileComponent.ts";
+import { WorldDiscoveryComponentId } from "../../../game/component/worldDiscoveryComponent.ts";
+import type { Entity } from "../../../game/entity/entity.ts";
+import { ChunkSize, getChunkId } from "../../../game/map/chunk.ts";
 
 export type DiscoverTileEffect = {
     id: typeof DiscoverTileEffectId;

@@ -1,5 +1,5 @@
-import { InputAction, InputActionType } from "./inputAction.js";
-import { Event, EventListener } from "../common/event.js";
+import { InputAction, InputActionType } from "./inputAction.ts";
+import { Event, EventListener } from "../common/event.ts";
 
 export type KeyboardMap = Record<string, InputActionType>;
 

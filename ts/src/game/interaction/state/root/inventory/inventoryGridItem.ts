@@ -1,10 +1,10 @@
-import { Sprite2, sprites2 } from "../../../../../asset/sprite.js";
-import { allSides } from "../../../../../common/sides.js";
-import { UIThemeType } from "../../../../../ui/color.js";
-import { ninePatchBackground } from "../../../../../ui/uiBackground.js";
-import { createComponent } from "../../../../../ui/declarative/ui.js";
-import { uiButton } from "../../../../../ui/declarative/uiButton.js";
-import { uiImage } from "../../../../../ui/declarative/uiImage.js";
+import { Sprite2, sprites2 } from "../../../../../asset/sprite.ts";
+import { allSides } from "../../../../../common/sides.ts";
+import { UIThemeType } from "../../../../../ui/color.ts";
+import { ninePatchBackground } from "../../../../../ui/uiBackground.ts";
+import { createComponent } from "../../../../../ui/declarative/ui.ts";
+import { uiButton } from "../../../../../ui/declarative/uiButton.ts";
+import { uiImage } from "../../../../../ui/declarative/uiImage.ts";
 
 export type InventoryGridItemProps = {
     sprite?: Sprite2;

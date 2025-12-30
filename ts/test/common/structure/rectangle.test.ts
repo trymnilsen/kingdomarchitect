@@ -5,7 +5,7 @@ import {
     rect,
     Rectangle,
     splitRectangle,
-} from "../../../src/common/structure/rectangle.js";
+} from "../../../src/common/structure/rectangle.ts";
 
 describe("rectangle2 tests", () => {
     test("B overlaps left edge of A", () => {

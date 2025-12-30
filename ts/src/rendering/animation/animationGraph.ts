@@ -1,5 +1,5 @@
-import type { Sprite2 } from "../../asset/sprite.js";
-import { nameof } from "../../common/nameof.js";
+import type { Sprite2 } from "../../asset/sprite.ts";
+import { nameof } from "../../common/nameof.ts";
 
 // Define the valid values for the {direction} placeholder
 export type Direction = "up" | "down" | "left" | "right";

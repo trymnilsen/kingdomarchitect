@@ -1,4 +1,4 @@
-import { bins } from "../../../generated/sprites.js";
+import { bins } from "../../../generated/sprites.ts";
 
 export class AssetLoader {
     private _assets: Record<string, HTMLImageElement | ImageBitmap> = {};

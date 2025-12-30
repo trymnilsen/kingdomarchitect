@@ -2,9 +2,9 @@ import {
     adjacentPoints,
     encodePosition,
     type Point,
-} from "../../../common/point.js";
-import type { Entity } from "../../entity/entity.js";
-import { getWeightAtPoint } from "../path/graph/weight.js";
+} from "../../../common/point.ts";
+import type { Entity } from "../../entity/entity.ts";
+import { getWeightAtPoint } from "../path/graph/weight.ts";
 
 /**
  * Finds the closest walkable position to an entity using breadth-first search

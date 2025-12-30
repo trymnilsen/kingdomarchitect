@@ -1,5 +1,5 @@
-import { manhattanDistance } from "../../common/point.js";
-import { FocusNode } from "./focusHelpers.js";
+import { manhattanDistance } from "../../common/point.ts";
+import { FocusNode } from "./focusHelpers.ts";
 
 export class FocusState {
     private _currentFocus: FocusNode | null = null;

@@ -1,7 +1,7 @@
-import { Bounds } from "../../common/bounds.js";
-import { Point } from "../../common/point.js";
-import { TileSize } from "./tile.js";
-import type { Volume } from "./volume.js";
+import { Bounds } from "../../common/bounds.ts";
+import { Point } from "../../common/point.ts";
+import { TileSize } from "./tile.ts";
+import type { Volume } from "./volume.ts";
 
 export const ChunkSize = 8;
 export const ChunkDimension = ChunkSize * TileSize;

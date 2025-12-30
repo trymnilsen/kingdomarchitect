@@ -1,8 +1,8 @@
-import { SkillTree } from "./skill.js";
-import { meleeSkills } from "./melee.js";
-import { magicSkills } from "./magic.js";
-import { productivitySkills } from "./productivity.js";
-import { rangedSkills } from "./ranged.js";
+import { SkillTree } from "./skill.ts";
+import { meleeSkills } from "./melee.ts";
+import { magicSkills } from "./magic.ts";
+import { productivitySkills } from "./productivity.ts";
+import { rangedSkills } from "./ranged.ts";
 
 type SkillsObject = {
     magic: SkillTree;

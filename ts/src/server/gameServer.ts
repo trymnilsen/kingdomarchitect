@@ -1,29 +1,29 @@
-import { createWorldDiscoveryComponent } from "../game/component/worldDiscoveryComponent.js";
-import { GameTime } from "../game/gameTime.js";
-import { chunkMapSystem } from "../game/system/chunkMapSystem.js";
-import { craftingSystem } from "../game/system/craftingSystem.js";
-import { JobSystem } from "../game/system/jobSystem.js";
-import { pathfindingSystem } from "../game/system/pathfindingSystem.js";
-import { worldGenerationSystem } from "../game/system/worldGenerationSystem.js";
-import { EcsWorld } from "../common/ecs/ecsWorld.js";
-import { createRootEntity } from "../game/rootFactory.js";
+import { createWorldDiscoveryComponent } from "../game/component/worldDiscoveryComponent.ts";
+import { GameTime } from "../game/gameTime.ts";
+import { chunkMapSystem } from "../game/system/chunkMapSystem.ts";
+import { craftingSystem } from "../game/system/craftingSystem.ts";
+import { JobSystem } from "../game/system/jobSystem.ts";
+import { pathfindingSystem } from "../game/system/pathfindingSystem.ts";
+import { worldGenerationSystem } from "../game/system/worldGenerationSystem.ts";
+import { EcsWorld } from "../common/ecs/ecsWorld.ts";
+import { createRootEntity } from "../game/rootFactory.ts";
 
-import { makeReplicatedEntitiesSystem } from "./replicatedEntitiesSystem.js";
-import type { GameCommand } from "./message/gameCommand.js";
+import { makeReplicatedEntitiesSystem } from "./replicatedEntitiesSystem.ts";
+import type { GameCommand } from "./message/gameCommand.ts";
 import {
     createEffectEmitterComponent,
     EffectEmitterComponentId,
-} from "../game/component/effectEmitterComponent.js";
-import type { GameMessage } from "./message/gameMessage.js";
-import { createCommandSystem } from "../game/system/commandSystem.js";
-import { effectSystem } from "../game/system/effectSystem.js";
-import { getOverworldEntity } from "../game/map/scenes.js";
-import { housingSystem } from "../game/system/housingSystem.js";
-import { regrowSystem } from "../game/system/regrowSystem.js";
-import { PersistenceManager } from "./persistence/persistenceManager.js";
-import { IndexedDBAdapter } from "./persistence/indexedDBAdapter.js";
-import type { Entity } from "../game/entity/entity.js";
-import { buildDiscoveryEffectForPlayer } from "./message/effect/discoverTileEffect.js";
+} from "../game/component/effectEmitterComponent.ts";
+import type { GameMessage } from "./message/gameMessage.ts";
+import { createCommandSystem } from "../game/system/commandSystem.ts";
+import { effectSystem } from "../game/system/effectSystem.ts";
+import { getOverworldEntity } from "../game/map/scenes.ts";
+import { housingSystem } from "../game/system/housingSystem.ts";
+import { regrowSystem } from "../game/system/regrowSystem.ts";
+import { PersistenceManager } from "./persistence/persistenceManager.ts";
+import { IndexedDBAdapter } from "./persistence/indexedDBAdapter.ts";
+import type { Entity } from "../game/entity/entity.ts";
+import { buildDiscoveryEffectForPlayer } from "./message/effect/discoverTileEffect.ts";
 
 export class GameServer {
     private world: EcsWorld;

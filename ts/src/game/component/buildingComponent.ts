@@ -1,5 +1,5 @@
-import type { Adjacency } from "../../common/adjacency.js";
-import type { Building } from "../../data/building/building.js";
+import type { Adjacency } from "../../common/adjacency.ts";
+import type { Building } from "../../data/building/building.ts";
 
 export type BuildingComponent = {
     id: typeof BuildingComponentId;

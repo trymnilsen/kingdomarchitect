@@ -1,6 +1,6 @@
-import { angelStatue } from "./angelstatue.js";
-import { church } from "./church.js";
-import { enchanter } from "./enchanter.js";
-import { road } from "./road.js";
+import { angelStatue } from "./angelstatue.ts";
+import { church } from "./church.ts";
+import { enchanter } from "./enchanter.ts";
+import { road } from "./road.ts";
 
 export const goldBuildings = [enchanter, angelStatue, church, road];

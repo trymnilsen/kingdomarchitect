@@ -1,25 +1,25 @@
-import { Point } from "../../../common/point.js";
-import { GameTime } from "../../../common/time.js";
-import { AssetLoader } from "../../../asset/loader/assetLoader.js";
-import { InputAction, InputActionType } from "../../../input/inputAction.js";
-import { OnTapEndEvent } from "../../../input/touchInput.js";
-import { SelectedEntityItem } from "../selection/selectedEntityItem.js";
-import { SelectedTileItem } from "../selection/selectedTileItem.js";
-import { SelectedWorldItem } from "../selection/selectedWorldItem.js";
-import type { UiRenderer } from "../../../ui/declarative/ui.js";
-import { uiBox } from "../../../ui/declarative/uiBox.js";
-import { fillUiSize } from "../../../ui/uiSize.js";
-import { Camera } from "../../../rendering/camera.js";
-import { RenderScope } from "../../../rendering/renderScope.js";
-import { getTile, TileComponentId } from "../../component/tileComponent.js";
-import { Entity } from "../../entity/entity.js";
-import { SelectionState } from "../state/selection/selectionState.js";
-import { CommitableInteractionStateChanger } from "./interactionStateChanger.js";
-import { InteractionStateHistory } from "./interactionStateHistory.js";
-import { StateContext } from "./stateContext.js";
-import type { GameCommand } from "../../../server/message/gameCommand.js";
-import { queryEntity } from "../../map/query/queryEntity.js";
-import type { EcsWorld } from "../../../common/ecs/ecsWorld.js";
+import { Point } from "../../../common/point.ts";
+import { GameTime } from "../../../common/time.ts";
+import { AssetLoader } from "../../../asset/loader/assetLoader.ts";
+import { InputAction, InputActionType } from "../../../input/inputAction.ts";
+import { OnTapEndEvent } from "../../../input/touchInput.ts";
+import { SelectedEntityItem } from "../selection/selectedEntityItem.ts";
+import { SelectedTileItem } from "../selection/selectedTileItem.ts";
+import { SelectedWorldItem } from "../selection/selectedWorldItem.ts";
+import type { UiRenderer } from "../../../ui/declarative/ui.ts";
+import { uiBox } from "../../../ui/declarative/uiBox.ts";
+import { fillUiSize } from "../../../ui/uiSize.ts";
+import { Camera } from "../../../rendering/camera.ts";
+import { RenderScope } from "../../../rendering/renderScope.ts";
+import { getTile, TileComponentId } from "../../component/tileComponent.ts";
+import { Entity } from "../../entity/entity.ts";
+import { SelectionState } from "../state/selection/selectionState.ts";
+import { CommitableInteractionStateChanger } from "./interactionStateChanger.ts";
+import { InteractionStateHistory } from "./interactionStateHistory.ts";
+import { StateContext } from "./stateContext.ts";
+import type { GameCommand } from "../../../server/message/gameCommand.ts";
+import { queryEntity } from "../../map/query/queryEntity.ts";
+import type { EcsWorld } from "../../../common/ecs/ecsWorld.ts";
 
 /**
  * The interactionHandler recieves input taps and forward them to the currently

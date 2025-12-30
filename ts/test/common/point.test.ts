@@ -15,7 +15,7 @@ import {
     pointEquals,
     subtractPoint,
     zeroPoint,
-} from "../../src/common/point.js";
+} from "../../src/common/point.ts";
 
 describe("Point", () => {
     it("zero point is not mutable", () => {

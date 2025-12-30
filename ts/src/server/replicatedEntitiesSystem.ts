@@ -1,13 +1,13 @@
-import { EcsSystem } from "../common/ecs/ecsSystem.js";
-import type { Components } from "../game/component/component.js";
-import { JobQueueComponentId } from "../game/component/jobQueueComponent.js";
-import { TileComponentId } from "../game/component/tileComponent.js";
-import { VisibilityMapComponentId } from "../game/component/visibilityMapComponent.js";
-import { Entity } from "../game/entity/entity.js";
+import { EcsSystem } from "../common/ecs/ecsSystem.ts";
+import type { Components } from "../game/component/component.ts";
+import { JobQueueComponentId } from "../game/component/jobQueueComponent.ts";
+import { TileComponentId } from "../game/component/tileComponent.ts";
+import { VisibilityMapComponentId } from "../game/component/visibilityMapComponent.ts";
+import { Entity } from "../game/entity/entity.ts";
 import type {
     GameMessage,
     ReplicatedEntityData,
-} from "./message/gameMessage.js";
+} from "./message/gameMessage.ts";
 
 export function makeReplicatedEntitiesSystem(
     postMessage: (message: GameMessage) => void,

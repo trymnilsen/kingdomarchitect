@@ -1,18 +1,18 @@
-import { characterPartFrames } from "../../generated/characterFrames.js";
+import { characterPartFrames } from "../../generated/characterFrames.ts";
 import type {
     RenderScope,
     OffscreenRenderScope,
     OffscreenCanvasFactory,
-} from "../rendering/renderScope.js";
-import type { Sprite2 } from "../asset/sprite.js";
-import type { CharacterColors } from "./colors.js";
-import type { Rectangle } from "../common/structure/rectangle.js";
-import { subtractPoint, type Point } from "../common/point.js";
-import { wizardHat } from "../data/inventory/items/equipment.js";
-import { CHARACTER_SPRITE } from "./ui/characterBuilderConstants.js";
-import type { AssetLoader } from "../asset/loader/assetLoader.js";
-import { getCharacterBinId } from "./characterBinId.js";
-import type { AnimationKey } from "../rendering/animation/animationGraph.js";
+} from "../rendering/renderScope.ts";
+import type { Sprite2 } from "../asset/sprite.ts";
+import type { CharacterColors } from "./colors.ts";
+import type { Rectangle } from "../common/structure/rectangle.ts";
+import { subtractPoint, type Point } from "../common/point.ts";
+import { wizardHat } from "../data/inventory/items/equipment.ts";
+import { CHARACTER_SPRITE } from "./ui/characterBuilderConstants.ts";
+import type { AssetLoader } from "../asset/loader/assetLoader.ts";
+import { getCharacterBinId } from "./characterBinId.ts";
+import type { AnimationKey } from "../rendering/animation/animationGraph.ts";
 
 const CHARACTER_FRAME_WIDTH = CHARACTER_SPRITE.FRAME_WIDTH;
 const CHARACTER_FRAME_HEIGHT = CHARACTER_SPRITE.FRAME_HEIGHT;

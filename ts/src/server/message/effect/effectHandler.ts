@@ -1,33 +1,33 @@
-import { makeNumberId, pointEquals } from "../../../common/point.js";
+import { makeNumberId, pointEquals } from "../../../common/point.ts";
 import {
     createChunkMapRegistryComponent,
     createChunkMap,
-} from "../../../game/component/chunkMapRegistryComponent.js";
+} from "../../../game/component/chunkMapRegistryComponent.ts";
 import {
     createPathfindingGraphRegistryComponent,
     createPathfindingGraph,
-} from "../../../game/component/pathfindingGraphRegistryComponent.js";
+} from "../../../game/component/pathfindingGraphRegistryComponent.ts";
 import {
     setChunk,
     TileComponentId,
-} from "../../../game/component/tileComponent.js";
-import { VisibilityMapComponentId } from "../../../game/component/visibilityMapComponent.js";
-import type { Entity } from "../../../game/entity/entity.js";
+} from "../../../game/component/tileComponent.ts";
+import { VisibilityMapComponentId } from "../../../game/component/visibilityMapComponent.ts";
+import type { Entity } from "../../../game/entity/entity.ts";
 import {
     ChunkSize,
     getChunkId,
     getChunkPosition,
-} from "../../../game/map/chunk.js";
-import { createLazyGraphFromRootNode } from "../../../game/map/path/graph/generateGraph.js";
-import { getOverworldEntity } from "../../../game/map/scenes.js";
-import type { Camera } from "../../../rendering/camera.js";
-import type { EffectGameMessage } from "../gameMessage.js";
+} from "../../../game/map/chunk.ts";
+import { createLazyGraphFromRootNode } from "../../../game/map/path/graph/generateGraph.ts";
+import { getOverworldEntity } from "../../../game/map/scenes.ts";
+import type { Camera } from "../../../rendering/camera.ts";
+import type { EffectGameMessage } from "../gameMessage.ts";
 import {
     DiscoverTileEffectId,
     type DiscoverTileEffect,
-} from "./discoverTileEffect.js";
-import { ReloadGameEffectId } from "./reloadGameEffect.js";
-import { SetSceneEffectId } from "./setSceneEffect.js";
+} from "./discoverTileEffect.ts";
+import { ReloadGameEffectId } from "./reloadGameEffect.ts";
+import { SetSceneEffectId } from "./setSceneEffect.ts";
 
 export function effectHandler(
     root: Entity,

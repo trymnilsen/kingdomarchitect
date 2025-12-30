@@ -1,4 +1,4 @@
-import { sprites2 } from "../../../asset/sprite.js";
+import { sprites2 } from "../../../asset/sprite.ts";
 
 export const road = {
     id: "road",

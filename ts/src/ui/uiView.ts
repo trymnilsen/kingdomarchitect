@@ -4,27 +4,27 @@ import {
     boundsEquals,
     boundsOverlap,
     withinRectangle,
-} from "../common/bounds.js";
-import { Direction } from "../common/direction.js";
-import { Event, EventListener } from "../common/event.js";
-import { addPoint, Point, zeroPoint } from "../common/point.js";
-import { UIRenderScope } from "../rendering/uiRenderContext.js";
+} from "../common/bounds.ts";
+import { Direction } from "../common/direction.ts";
+import { Event, EventListener } from "../common/event.ts";
+import { addPoint, Point, zeroPoint } from "../common/point.ts";
+import { UIRenderScope } from "../rendering/uiRenderContext.ts";
 import {
     tapStartType,
     tapType,
     tapUpType,
     UIEvent,
     UITapEvent,
-} from "./event/uiEvent.js";
-import { FocusGroup } from "./focus/focusGroup.js";
+} from "./event/uiEvent.ts";
+import { FocusGroup } from "./focus/focusGroup.ts";
 import {
     FocusNode,
     getClosestFocusableNode,
     getFocusableNodes,
-} from "./focus/focusHelpers.js";
-import { FocusState } from "./focus/focusState.js";
-import { UILayoutScope } from "./uiLayoutContext.js";
-import { fillUiSize, UISize, zeroSize } from "./uiSize.js";
+} from "./focus/focusHelpers.ts";
+import { FocusState } from "./focus/focusState.ts";
+import { UILayoutScope } from "./uiLayoutContext.ts";
+import { fillUiSize, UISize, zeroSize } from "./uiSize.ts";
 
 export type UIAction = {
     type: string;
@@ -47,7 +47,8 @@ export const UIViewVisiblity = {
     Invisible: 2,
 } as const;
 
-export type UIViewVisiblity = typeof UIViewVisiblity[keyof typeof UIViewVisiblity];
+export type UIViewVisiblity =
+    (typeof UIViewVisiblity)[keyof typeof UIViewVisiblity];
 
 /**
  * UIView is the base class for all UI elements, it supports basic functions

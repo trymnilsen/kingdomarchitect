@@ -1,11 +1,11 @@
-import { sprites2 } from "../../../../asset/sprite.js";
-import { GroundTile } from "../../../map/tile.js";
-import { RenderScope } from "../../../../rendering/renderScope.js";
-import { Entity } from "../../../entity/entity.js";
-import { InteractionState } from "../../handler/interactionState.js";
-import { SelectionMode } from "../../selection/selectionMode.js";
-import { SingleSelectionMode } from "../../selection/singleSelectionMode.js";
-import { AlertMessageState } from "../common/alertMessageState.js";
+import { sprites2 } from "../../../../asset/sprite.ts";
+import { GroundTile } from "../../../map/tile.ts";
+import { RenderScope } from "../../../../rendering/renderScope.ts";
+import { Entity } from "../../../entity/entity.ts";
+import { InteractionState } from "../../handler/interactionState.ts";
+import { SelectionMode } from "../../selection/selectionMode.ts";
+import { SingleSelectionMode } from "../../selection/singleSelectionMode.ts";
+import { AlertMessageState } from "../common/alertMessageState.ts";
 
 export class ChopJobState extends InteractionState {
     private chopMode: SelectionMode;

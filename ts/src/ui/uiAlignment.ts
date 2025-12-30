@@ -1,5 +1,5 @@
-import { clamp } from "../common/number.js";
-import { Point } from "../common/point.js";
+import { clamp } from "../common/number.ts";
+import { Point } from "../common/point.ts";
 
 export const HorizontalAlignment = {
     Left: 0,
@@ -7,7 +7,8 @@ export const HorizontalAlignment = {
     Right: 2,
 } as const;
 
-export type HorizontalAlignment = typeof HorizontalAlignment[keyof typeof HorizontalAlignment];
+export type HorizontalAlignment =
+    (typeof HorizontalAlignment)[keyof typeof HorizontalAlignment];
 
 export const VerticalAlignment = {
     Top: 0,
@@ -15,7 +16,8 @@ export const VerticalAlignment = {
     Bottom: 2,
 } as const;
 
-export type VerticalAlignment = typeof VerticalAlignment[keyof typeof VerticalAlignment];
+export type VerticalAlignment =
+    (typeof VerticalAlignment)[keyof typeof VerticalAlignment];
 
 export type UiAlignment = typeof uiAlignment;
 

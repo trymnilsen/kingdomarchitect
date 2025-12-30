@@ -2,21 +2,21 @@ import {
     isPointAdjacentTo,
     pointEquals,
     type Point,
-} from "../../common/point.js";
-import { getWeightAtPoint } from "../map/path/graph/weight.js";
-import { PathResultStatus, queryPath } from "../map/query/pathQuery.js";
-import { JobRunnerComponentId } from "../component/jobRunnerComponent.js";
-import { completeJob, type Job, type JobHandler } from "./job.js";
-import { VisibilityComponentId } from "../component/visibilityComponent.js";
-import { offsetPatternWithPoint } from "../../common/pattern.js";
-import { setDiscoveryForPlayer } from "../system/worldGenerationSystem.js";
-import type { Entity } from "../entity/entity.js";
+} from "../../common/point.ts";
+import { getWeightAtPoint } from "../map/path/graph/weight.ts";
+import { PathResultStatus, queryPath } from "../map/query/pathQuery.ts";
+import { JobRunnerComponentId } from "../component/jobRunnerComponent.ts";
+import { completeJob, type Job, type JobHandler } from "./job.ts";
+import { VisibilityComponentId } from "../component/visibilityComponent.ts";
+import { offsetPatternWithPoint } from "../../common/pattern.ts";
+import { setDiscoveryForPlayer } from "../system/worldGenerationSystem.ts";
+import type { Entity } from "../entity/entity.ts";
 import {
     DirectionComponentId,
     updateDirectionComponent,
-} from "../component/directionComponent.js";
-import { discoverAfterMovement } from "./movementHelper.js";
-import { getPathfindingGraphForEntity } from "../map/path/getPathfindingGraphForEntity.js";
+} from "../component/directionComponent.ts";
+import { discoverAfterMovement } from "./movementHelper.ts";
+import { getPathfindingGraphForEntity } from "../map/path/getPathfindingGraphForEntity.ts";
 
 export interface MoveToJob extends Job {
     position: Point;

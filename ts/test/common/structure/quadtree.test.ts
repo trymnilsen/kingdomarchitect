@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
-import { QuadTree } from "../../../src/common/structure/quadtree.js";
+import { QuadTree } from "../../../src/common/structure/quadtree.ts";
 
 // Define helper functions for testing
 function createSampleTree(): QuadTree {

@@ -1,6 +1,6 @@
-import { Point } from "../../../common/point.js";
-import { isTile, type GroundTile } from "../../map/tile.js";
-import { SelectedWorldItem } from "./selectedWorldItem.js";
+import { Point } from "../../../common/point.ts";
+import { isTile, type GroundTile } from "../../map/tile.ts";
+import { SelectedWorldItem } from "./selectedWorldItem.ts";
 
 export class SelectedTileItem implements SelectedWorldItem {
     public groundTile: GroundTile;

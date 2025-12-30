@@ -1,4 +1,4 @@
-import { UIView } from "./uiView.js";
+import { UIView } from "./uiView.ts";
 
 /**
  * UIViewGroup is an extension of UIView that makes

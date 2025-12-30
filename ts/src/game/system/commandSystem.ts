@@ -1,81 +1,81 @@
-import type { EcsSystem } from "../../common/ecs/ecsSystem.js";
-import { getBuildingById } from "../../data/building/buildings.js";
-import { itemEffectFactoryList } from "../../data/inventory/itemEffectFactoryList.js";
+import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
+import { getBuildingById } from "../../data/building/buildings.ts";
+import { itemEffectFactoryList } from "../../data/inventory/itemEffectFactoryList.ts";
 import {
     AttackCommandId,
     type AttackCommand,
-} from "../../server/message/command/attackTargetCommand.js";
+} from "../../server/message/command/attackTargetCommand.ts";
 import {
     BuildCommandId,
     type BuildCommand,
-} from "../../server/message/command/buildCommand.js";
+} from "../../server/message/command/buildCommand.ts";
 import {
     CancelCraftingCommandId,
     type CancelCraftingCommand,
-} from "../../server/message/command/cancelCraftingCommand.js";
+} from "../../server/message/command/cancelCraftingCommand.ts";
 import {
     ConsumeItemCommandId,
     type ConsumeItemCommand,
-} from "../../server/message/command/consumeItemCommand.js";
+} from "../../server/message/command/consumeItemCommand.ts";
 import {
     LoadSpaceCommand,
     LoadSpaceCommandId,
-} from "../../server/message/command/enterSpaceCommand.js";
+} from "../../server/message/command/enterSpaceCommand.ts";
 import {
     EquipItemCommandId,
     type EquipItemCommand,
-} from "../../server/message/command/equipItemCommand.js";
+} from "../../server/message/command/equipItemCommand.ts";
 import {
     NewGameCommandId,
     type NewGameCommand,
-} from "../../server/message/command/newGameCommand.js";
+} from "../../server/message/command/newGameCommand.ts";
 import {
     QueueJobCommandId,
     type QueueJobCommand,
-} from "../../server/message/command/queueJobCommand.js";
+} from "../../server/message/command/queueJobCommand.ts";
 import {
     StartCraftingCommandId,
     type StartCraftingCommand,
-} from "../../server/message/command/startCraftingCommand.js";
-import { SetSceneEffectId } from "../../server/message/effect/setSceneEffect.js";
+} from "../../server/message/command/startCraftingCommand.ts";
+import { SetSceneEffectId } from "../../server/message/effect/setSceneEffect.ts";
 import {
     CommandGameMessageType,
     type GameMessage,
-} from "../../server/message/gameMessage.js";
+} from "../../server/message/gameMessage.ts";
 import {
     ActiveEffectsComponentId,
     addEffect,
     createActiveEffectsComponent,
-} from "../component/activeEffectsComponent.js";
+} from "../component/activeEffectsComponent.ts";
 import {
     addCollectableItems,
     CollectableComponentId,
-} from "../component/collectableComponent.js";
-import { CraftingComponentId } from "../component/craftingComponent.js";
-import { EffectEmitterComponentId } from "../component/effectEmitterComponent.js";
-import { EquipmentComponentId } from "../component/equipmentComponent.js";
+} from "../component/collectableComponent.ts";
+import { CraftingComponentId } from "../component/craftingComponent.ts";
+import { EffectEmitterComponentId } from "../component/effectEmitterComponent.ts";
+import { EquipmentComponentId } from "../component/equipmentComponent.ts";
 import {
     addInventoryItem,
     InventoryComponentId,
     takeInventoryItem,
-} from "../component/inventoryComponent.js";
-import { JobQueueComponentId } from "../component/jobQueueComponent.js";
-import type { Entity } from "../entity/entity.js";
-import { AttackJob } from "../job/attackJob.js";
-import { BuildBuildingJob } from "../job/buildBuildingJob.js";
-import { overWorldId } from "../map/scenes.js";
-import { buildingPrefab } from "../prefab/buildingPrefab.js";
-import { interiorPrefab } from "../prefab/interiorPrefab.js";
-import type { GameTime } from "../gameTime.js";
-import type { PersistenceManager } from "../../server/persistence/persistenceManager.js";
-import { ReloadGameEffectId } from "../../server/message/effect/reloadGameEffect.js";
+} from "../component/inventoryComponent.ts";
+import { JobQueueComponentId } from "../component/jobQueueComponent.ts";
+import type { Entity } from "../entity/entity.ts";
+import { AttackJob } from "../job/attackJob.ts";
+import { BuildBuildingJob } from "../job/buildBuildingJob.ts";
+import { overWorldId } from "../map/scenes.ts";
+import { buildingPrefab } from "../prefab/buildingPrefab.ts";
+import { interiorPrefab } from "../prefab/interiorPrefab.ts";
+import type { GameTime } from "../gameTime.ts";
+import type { PersistenceManager } from "../../server/persistence/persistenceManager.ts";
+import { ReloadGameEffectId } from "../../server/message/effect/reloadGameEffect.ts";
 import {
     ChangeOccupationCommandId,
     type ChangeOccupationCommand,
-} from "../../server/message/command/changeOccupationCommand.js";
-import { OccupationComponentId } from "../component/occupationComponent.js";
-import { WorkplaceComponentId } from "../component/workplaceComponent.js";
-import { removeItem } from "../../common/array.js";
+} from "../../server/message/command/changeOccupationCommand.ts";
+import { OccupationComponentId } from "../component/occupationComponent.ts";
+import { WorkplaceComponentId } from "../component/workplaceComponent.ts";
+import { removeItem } from "../../common/array.ts";
 
 export function createCommandSystem(
     gameTime: GameTime,

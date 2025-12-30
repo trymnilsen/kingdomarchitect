@@ -1,22 +1,22 @@
-import { encodePosition } from "../../common/point.js";
-import { SparseSet } from "../../common/structure/sparseSet.js";
-import type { EcsSystem } from "../../common/ecs/ecsSystem.js";
-import { ChunkSize } from "../map/chunk.js";
+import { encodePosition } from "../../common/point.ts";
+import { SparseSet } from "../../common/structure/sparseSet.ts";
+import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
+import { ChunkSize } from "../map/chunk.ts";
 import {
     ChunkMapRegistryComponentId,
     createChunkMapRegistryComponent,
     getChunkMap,
     type ChunkMap,
     createChunkMap,
-} from "../component/chunkMapRegistryComponent.js";
-import type { Entity } from "../entity/entity.js";
+} from "../component/chunkMapRegistryComponent.ts";
+import type { Entity } from "../entity/entity.ts";
 import type {
     EntityChildrenUpdatedEvent,
     EntityTransformEvent,
-} from "../entity/entityEvent.js";
-import { getOverworldEntity } from "../map/scenes.js";
-import { SpaceComponentId } from "../component/spaceComponent.js";
-import { visitChildren } from "../entity/child/visit.js";
+} from "../entity/entityEvent.ts";
+import { getOverworldEntity } from "../map/scenes.ts";
+import { SpaceComponentId } from "../component/spaceComponent.ts";
+import { visitChildren } from "../entity/child/visit.ts";
 
 export const chunkMapSystem: EcsSystem = {
     onInit: init,

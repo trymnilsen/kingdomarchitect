@@ -1,8 +1,8 @@
-import { rgbToHex } from "../common/color.js";
-import { AssetLoader } from "../asset/loader/assetLoader.js";
-import { Camera } from "./camera.js";
-import { RenderScope } from "./renderScope.js";
-import { BitmapCache } from "./bitmapCache.js";
+import { rgbToHex } from "../common/color.ts";
+import { AssetLoader } from "../asset/loader/assetLoader.ts";
+import { Camera } from "./camera.ts";
+import { RenderScope } from "./renderScope.ts";
+import { BitmapCache } from "./bitmapCache.ts";
 
 export class Renderer {
     private canvasContext: CanvasRenderingContext2D;

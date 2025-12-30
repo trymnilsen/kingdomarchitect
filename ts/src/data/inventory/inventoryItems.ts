@@ -1,6 +1,6 @@
-import { InventoryItem } from "./inventoryItem.js";
-import { equipmentItems } from "./items/equipment.js";
-import { resources } from "./items/resources.js";
+import { InventoryItem } from "./inventoryItem.ts";
+import { equipmentItems } from "./items/equipment.ts";
+import { resources } from "./items/resources.ts";
 
 export const inventoryItems = [...equipmentItems, ...resources] as const;
 

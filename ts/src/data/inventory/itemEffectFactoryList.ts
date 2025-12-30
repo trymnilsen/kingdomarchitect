@@ -1,6 +1,6 @@
-import { healthPotionFactory } from "./effectFactory/healthPotionFactory.js";
-import { EffectFactory } from "./itemEffectFactory.js";
-import { healthPotion } from "./items/resources.js";
+import { healthPotionFactory } from "./effectFactory/healthPotionFactory.ts";
+import { EffectFactory } from "./itemEffectFactory.ts";
+import { healthPotion } from "./items/resources.ts";
 
 export const itemEffectFactoryList: { [id: string]: EffectFactory } = {
     [healthPotion.id]: healthPotionFactory,

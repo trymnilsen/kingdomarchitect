@@ -1,5 +1,5 @@
-import type { Graph } from "../map/path/graph/graph.js";
-import { PathCache } from "../map/path/pathCache.js";
+import type { Graph } from "../map/path/graph/graph.ts";
+import { PathCache } from "../map/path/pathCache.ts";
 
 export type PathfindingGraph = {
     graph: Graph;

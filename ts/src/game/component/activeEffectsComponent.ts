@@ -1,4 +1,4 @@
-import type { Effect } from "../../data/effect/effect.js";
+import type { Effect } from "../../data/effect/effect.ts";
 
 export type ActiveEffect = {
     effect: Effect;

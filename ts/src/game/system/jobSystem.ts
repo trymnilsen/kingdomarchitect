@@ -1,14 +1,14 @@
-import { removeItem } from "../../common/array.js";
-import { EcsSystem } from "../../common/ecs/ecsSystem.js";
+import { removeItem } from "../../common/array.ts";
+import { EcsSystem } from "../../common/ecs/ecsSystem.ts";
 import {
     createJobQueueComponent,
     JobQueueComponentId,
-} from "../component/jobQueueComponent.js";
-import { JobRunnerComponentId } from "../component/jobRunnerComponent.js";
-import { SpaceComponentId } from "../component/spaceComponent.js";
-import { Entity } from "../entity/entity.js";
-import type { Job, JobConstraint, JobHandler } from "../job/job.js";
-import { jobHandlers } from "../job/jobHandlers.js";
+} from "../component/jobQueueComponent.ts";
+import { JobRunnerComponentId } from "../component/jobRunnerComponent.ts";
+import { SpaceComponentId } from "../component/spaceComponent.ts";
+import { Entity } from "../entity/entity.ts";
+import type { Job, JobConstraint, JobHandler } from "../job/job.ts";
+import { jobHandlers } from "../job/jobHandlers.ts";
 
 export const JobSystem: EcsSystem = {
     onInit: onInit,

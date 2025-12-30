@@ -1,7 +1,7 @@
-import { Sprite2 } from "../../src/asset/sprite.js";
-import { UILayoutScope } from "../../src/ui/uiLayoutContext.js";
-import { UISize } from "../../src/ui/uiSize.js";
-import { UIView } from "../../src/ui/uiView.js";
+import { Sprite2 } from "../../src/asset/sprite.ts";
+import { UILayoutScope } from "../../src/ui/uiLayoutContext.ts";
+import { UISize } from "../../src/ui/uiSize.ts";
+import { UIView } from "../../src/ui/uiView.ts";
 
 /**
  * A test layout context. Implementation should not be depended upon.

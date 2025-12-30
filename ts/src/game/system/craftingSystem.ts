@@ -1,13 +1,13 @@
-import type { EcsSystem } from "../../common/ecs/ecsSystem.js";
-import type { Entity } from "../entity/entity.js";
+import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
+import type { Entity } from "../entity/entity.ts";
 import {
     CraftingComponentId,
     completeCrafting,
-} from "../component/craftingComponent.js";
+} from "../component/craftingComponent.ts";
 import {
     CollectableComponentId,
     addCollectableItems,
-} from "../component/collectableComponent.js";
+} from "../component/collectableComponent.ts";
 
 export const craftingSystem = {
     onUpdate: update,

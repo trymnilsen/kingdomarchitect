@@ -1,16 +1,16 @@
-import { subTitleTextStyle } from "../../rendering/text/textStyle.js";
+import { subTitleTextStyle } from "../../rendering/text/textStyle.ts";
 import {
     createComponent,
     type ComponentDescriptor,
-} from "../../ui/declarative/ui.js";
-import { uiBox } from "../../ui/declarative/uiBox.js";
-import { uiButton } from "../../ui/declarative/uiButton.js";
-import { uiStack } from "../../ui/declarative/uiStack.js";
-import { uiText } from "../../ui/declarative/uiText.js";
-import { uiAlignment } from "../../ui/uiAlignment.js";
-import { boxBackground } from "../../ui/uiBackground.js";
-import { fillUiSize, wrapUiSize } from "../../ui/uiSize.js";
-import { COLORS, LAYOUT } from "./characterBuilderConstants.js";
+} from "../../ui/declarative/ui.ts";
+import { uiBox } from "../../ui/declarative/uiBox.ts";
+import { uiButton } from "../../ui/declarative/uiButton.ts";
+import { uiStack } from "../../ui/declarative/uiStack.ts";
+import { uiText } from "../../ui/declarative/uiText.ts";
+import { uiAlignment } from "../../ui/uiAlignment.ts";
+import { boxBackground } from "../../ui/uiBackground.ts";
+import { fillUiSize, wrapUiSize } from "../../ui/uiSize.ts";
+import { COLORS, LAYOUT } from "./characterBuilderConstants.ts";
 
 /**
  * Creates a part selection button with selected/unselected states

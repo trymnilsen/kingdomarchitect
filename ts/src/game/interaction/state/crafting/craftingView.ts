@@ -1,16 +1,16 @@
 import {
     createComponent,
     type ComponentDescriptor,
-} from "../../../../ui/declarative/ui.js";
-import type { CraftingRecipe } from "../../../../data/crafting/craftingRecipe.js";
-import { sprites2 } from "../../../../asset/sprite.js";
-import { uiScaffold } from "../../view/uiScaffold.js";
-import { uiBookLayout } from "../../../../ui/declarative/uiBookLayout.js";
-import { uiBox } from "../../../../ui/declarative/uiBox.js";
-import { uiColumn } from "../../../../ui/declarative/uiSequence.js";
-import { uiText } from "../../../../ui/declarative/uiText.js";
-import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize.js";
-import { bookInkColor } from "../../../../ui/color.js";
+} from "../../../../ui/declarative/ui.ts";
+import type { CraftingRecipe } from "../../../../data/crafting/craftingRecipe.ts";
+import { sprites2 } from "../../../../asset/sprite.ts";
+import { uiScaffold } from "../../view/uiScaffold.ts";
+import { uiBookLayout } from "../../../../ui/declarative/uiBookLayout.ts";
+import { uiBox } from "../../../../ui/declarative/uiBox.ts";
+import { uiColumn } from "../../../../ui/declarative/uiSequence.ts";
+import { uiText } from "../../../../ui/declarative/uiText.ts";
+import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize.ts";
+import { bookInkColor } from "../../../../ui/color.ts";
 
 export type CraftingViewProps = {
     recipes: readonly CraftingRecipe[];

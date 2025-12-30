@@ -1,6 +1,6 @@
-import type { UISize } from "../../ui/uiSize.js";
-import { Bounds, sizeOfBounds } from "../bounds.js";
-import type { Point } from "../point.js";
+import type { UISize } from "../../ui/uiSize.ts";
+import { Bounds, sizeOfBounds } from "../bounds.ts";
+import type { Point } from "../point.ts";
 
 export type Rectangle = Point & UISize;
 

@@ -1,5 +1,5 @@
-import type { InventoryItem } from "../inventory/inventoryItem.js";
-import type { Sprite2 } from "../../asset/sprite.js";
+import type { InventoryItem } from "../inventory/inventoryItem.ts";
+import type { Sprite2 } from "../../asset/sprite.ts";
 
 export type CraftingRecipeInput = {
     item: InventoryItem;

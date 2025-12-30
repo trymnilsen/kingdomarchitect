@@ -1,5 +1,5 @@
-import type { EquipmentComponent } from "../../../game/component/equipmentComponent.js";
-import type { Entity } from "../../../game/entity/entity.js";
+import type { EquipmentComponent } from "../../../game/component/equipmentComponent.ts";
+import type { Entity } from "../../../game/entity/entity.ts";
 
 type SlotType = keyof EquipmentComponent["slots"];
 

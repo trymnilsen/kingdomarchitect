@@ -1,5 +1,5 @@
-import { makeNumberId, type Point } from "../../common/point.js";
-import type { WorldDiscoveryData } from "./worldDiscoveryComponent.js";
+import { makeNumberId, type Point } from "../../common/point.ts";
+import type { WorldDiscoveryData } from "./worldDiscoveryComponent.ts";
 
 export type VisibilityMapComponent = {
     id: typeof VisibilityMapComponentId;

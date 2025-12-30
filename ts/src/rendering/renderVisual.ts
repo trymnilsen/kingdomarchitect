@@ -1,4 +1,4 @@
-import { RenderScope } from "./renderScope.js";
+import { RenderScope } from "./renderScope.ts";
 
 export type RenderVisual = {
     onDraw(context: RenderScope): void;

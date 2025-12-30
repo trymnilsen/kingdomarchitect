@@ -1,5 +1,5 @@
-import { Point } from "../../../../common/point.js";
-import { Entity } from "../../../entity/entity.js";
+import { Point } from "../../../../common/point.ts";
+import { Entity } from "../../../entity/entity.ts";
 
 export type BuildingApplicableSuccessResult = {
     isApplicable: true;

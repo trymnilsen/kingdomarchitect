@@ -1,18 +1,18 @@
-import type { EcsSystem } from "../../common/ecs/ecsSystem.js";
+import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
 import {
     createPathfindingGraph,
     createPathfindingGraphRegistryComponent,
     getPathfindingGraph,
     PathfindingGraphRegistryComponentId,
-} from "../component/pathfindingGraphRegistryComponent.js";
-import { SpaceComponentId } from "../component/spaceComponent.js";
-import type { Entity } from "../entity/entity.js";
+} from "../component/pathfindingGraphRegistryComponent.ts";
+import { SpaceComponentId } from "../component/spaceComponent.ts";
+import type { Entity } from "../entity/entity.ts";
 import type {
     EntityChildrenUpdatedEvent,
     EntityTransformEvent,
-} from "../entity/entityEvent.js";
-import { createLazyGraphFromRootNode } from "../map/path/graph/generateGraph.js";
-import { getOverworldEntity } from "../map/scenes.js";
+} from "../entity/entityEvent.ts";
+import { createLazyGraphFromRootNode } from "../map/path/graph/generateGraph.ts";
+import { getOverworldEntity } from "../map/scenes.ts";
 
 export const pathfindingSystem: EcsSystem = {
     onInit: init,

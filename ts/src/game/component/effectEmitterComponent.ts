@@ -1,4 +1,4 @@
-import type { GameEffect } from "../../server/message/effect/gameEffect.js";
+import type { GameEffect } from "../../server/message/effect/gameEffect.ts";
 
 export type EffectEmitterComponent = {
     id: typeof EffectEmitterComponentId;

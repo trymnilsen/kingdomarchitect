@@ -1,4 +1,4 @@
-import type { WorldGenActionsId } from "./worldGenId.js";
+import type { WorldGenActionsId } from "./worldGenId.ts";
 
 export type DiscoverTileAction = {
     id: [typeof WorldGenActionsId, typeof DiscoverTileActionId];

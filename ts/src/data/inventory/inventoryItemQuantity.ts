@@ -1,4 +1,4 @@
-import { InventoryItem } from "./inventoryItem.js";
+import { InventoryItem } from "./inventoryItem.ts";
 
 export type InventoryItemQuantity = {
     item: InventoryItem;

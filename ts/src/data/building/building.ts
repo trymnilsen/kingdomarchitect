@@ -1,5 +1,5 @@
-import { Sprite2, emptySprite } from "../../asset/sprite.js";
-import { InventoryItemIds } from "../inventory/inventoryItems.js";
+import { Sprite2, emptySprite } from "../../asset/sprite.ts";
+import { InventoryItemIds } from "../inventory/inventoryItems.ts";
 
 export type Building = {
     icon: Sprite2;

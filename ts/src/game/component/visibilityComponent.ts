@@ -1,5 +1,5 @@
-import { generateDiamondPattern } from "../../common/pattern.js";
-import type { Point } from "../../common/point.js";
+import { generateDiamondPattern } from "../../common/pattern.ts";
+import type { Point } from "../../common/point.ts";
 
 export type VisibilityComponent = {
     id: typeof VisibilityComponentId;

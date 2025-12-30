@@ -1,18 +1,18 @@
-import { Point } from "../../../common/point.js";
-import { allSides } from "../../../common/sides.js";
-import { sprites2 } from "../../../asset/sprite.js";
+import { Point } from "../../../common/point.ts";
+import { allSides } from "../../../common/sides.ts";
+import { sprites2 } from "../../../asset/sprite.ts";
 import {
     InputAction,
     InputActionType,
     getDirectionFromInputType,
-} from "../../../input/inputAction.js";
-import { GroundTile } from "../../map/tile.js";
-import type { ComponentDescriptor } from "../../../ui/declarative/ui.js";
-import { UIEvent } from "../../../ui/event/uiEvent.js";
-import { FocusGroup } from "../../../ui/focus/focusGroup.js";
-import { RenderScope } from "../../../rendering/renderScope.js";
-import { InteractionStateChanger } from "./interactionStateChanger.js";
-import { StateContext } from "./stateContext.js";
+} from "../../../input/inputAction.ts";
+import { GroundTile } from "../../map/tile.ts";
+import type { ComponentDescriptor } from "../../../ui/declarative/ui.ts";
+import { UIEvent } from "../../../ui/event/uiEvent.ts";
+import { FocusGroup } from "../../../ui/focus/focusGroup.ts";
+import { RenderScope } from "../../../rendering/renderScope.ts";
+import { InteractionStateChanger } from "./interactionStateChanger.ts";
+import { StateContext } from "./stateContext.ts";
 
 /**
  * Interaction is built up as a simple state machine. Each state can via the

@@ -1,26 +1,26 @@
-import { allSides } from "../../../../../common/sides.js";
-import { InventoryItem } from "../../../../../data/inventory/inventoryItem.js";
+import { allSides } from "../../../../../common/sides.ts";
+import { InventoryItem } from "../../../../../data/inventory/inventoryItem.ts";
 import {
     InventoryItemList,
     type InventoryItemQuantity,
-} from "../../../../../data/inventory/inventoryItemQuantity.js";
-import { sprites2 } from "../../../../../asset/sprite.js";
-import { UIThemeType, bookInkColor } from "../../../../../ui/color.js";
+} from "../../../../../data/inventory/inventoryItemQuantity.ts";
+import { sprites2 } from "../../../../../asset/sprite.ts";
+import { UIThemeType, bookInkColor } from "../../../../../ui/color.ts";
 import {
     createComponent,
     type ComponentDescriptor,
-} from "../../../../../ui/declarative/ui.js";
-import { uiBookLayout } from "../../../../../ui/declarative/uiBookLayout.js";
-import { uiBox } from "../../../../../ui/declarative/uiBox.js";
-import { uiGrid } from "../../../../../ui/declarative/uiGrid.js";
-import { uiImage } from "../../../../../ui/declarative/uiImage.js";
-import { uiColumn } from "../../../../../ui/declarative/uiSequence.js";
-import { uiText } from "../../../../../ui/declarative/uiText.js";
-import { ninePatchBackground } from "../../../../../ui/uiBackground.js";
-import { fillUiSize, wrapUiSize } from "../../../../../ui/uiSize.js";
-import type { InventoryComponent } from "../../../../component/inventoryComponent.js";
-import { inventoryGridItem } from "./inventoryGridItem.js";
-import { uiScaffold } from "../../../view/uiScaffold.js";
+} from "../../../../../ui/declarative/ui.ts";
+import { uiBookLayout } from "../../../../../ui/declarative/uiBookLayout.ts";
+import { uiBox } from "../../../../../ui/declarative/uiBox.ts";
+import { uiGrid } from "../../../../../ui/declarative/uiGrid.ts";
+import { uiImage } from "../../../../../ui/declarative/uiImage.ts";
+import { uiColumn } from "../../../../../ui/declarative/uiSequence.ts";
+import { uiText } from "../../../../../ui/declarative/uiText.ts";
+import { ninePatchBackground } from "../../../../../ui/uiBackground.ts";
+import { fillUiSize, wrapUiSize } from "../../../../../ui/uiSize.ts";
+import type { InventoryComponent } from "../../../../component/inventoryComponent.ts";
+import { inventoryGridItem } from "./inventoryGridItem.ts";
+import { uiScaffold } from "../../../view/uiScaffold.ts";
 
 export type InventoryViewProps = {
     inventory: InventoryComponent;

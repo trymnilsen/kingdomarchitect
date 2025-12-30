@@ -1,11 +1,11 @@
-import { Direction, OrdinalDirection } from "../../common/direction.js";
+import { Direction, OrdinalDirection } from "../../common/direction.ts";
 import {
     checkAdjacency,
     getDirection,
     getOrdinalDirectionFromPoints,
     pointEquals,
     type Point,
-} from "../../common/point.js";
+} from "../../common/point.ts";
 
 export type DirectionComponent = {
     id: typeof DirectionComponentId;

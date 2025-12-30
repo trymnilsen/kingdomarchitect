@@ -1,5 +1,5 @@
-import { Sprite2 } from "../../asset/sprite.js";
-import type { Point } from "../../common/point.js";
+import { Sprite2 } from "../../asset/sprite.ts";
+import type { Point } from "../../common/point.ts";
 
 export type InventoryItem = {
     readonly id: string;
@@ -21,7 +21,7 @@ export const ItemTag = {
     Consumable: 1,
 } as const;
 
-export type ItemTag = typeof ItemTag[keyof typeof ItemTag];
+export type ItemTag = (typeof ItemTag)[keyof typeof ItemTag];
 
 export const ItemCategory = {
     Melee: 0,
@@ -30,4 +30,4 @@ export const ItemCategory = {
     Ranged: 3,
 } as const;
 
-export type ItemCategory = typeof ItemCategory[keyof typeof ItemCategory];
+export type ItemCategory = (typeof ItemCategory)[keyof typeof ItemCategory];

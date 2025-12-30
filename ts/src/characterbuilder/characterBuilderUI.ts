@@ -1,19 +1,19 @@
-import { characterPartFrames } from "../../generated/characterFrames.js";
-import { createComponent } from "../ui/declarative/ui.js";
-import { uiColumn, uiRow } from "../ui/declarative/uiSequence.js";
-import { fillUiSize } from "../ui/uiSize.js";
-import type { CharacterColors } from "./colors.js";
+import { characterPartFrames } from "../../generated/characterFrames.ts";
+import { createComponent } from "../ui/declarative/ui.ts";
+import { uiColumn, uiRow } from "../ui/declarative/uiSequence.ts";
+import { fillUiSize } from "../ui/uiSize.ts";
+import type { CharacterColors } from "./colors.ts";
 import {
     createAnimationPanel,
     createHeaderBar,
     createLayerPanel,
     createPartSelectionPanel,
     createPreviewPanel,
-} from "./ui/CharacterBuilderPanels.js";
+} from "./ui/CharacterBuilderPanels.ts";
 import {
     type BodyPart,
     type PreviewMode,
-} from "./ui/characterBuilderConstants.js";
+} from "./ui/characterBuilderConstants.ts";
 
 /**
  * Main UI component for the character builder

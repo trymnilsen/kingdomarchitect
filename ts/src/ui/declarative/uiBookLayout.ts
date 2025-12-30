@@ -1,16 +1,16 @@
-import { addPoint } from "../../common/point.js";
-import { allSides } from "../../common/sides.js";
-import { Sprite2, sprites2 } from "../../asset/sprite.js";
-import { ninePatchBackground } from "../uiBackground.js";
-import { UISize } from "../uiSize.js";
-import { OpenBookUIBackground } from "../visual/bookBackground.js";
+import { addPoint } from "../../common/point.ts";
+import { allSides } from "../../common/sides.ts";
+import { Sprite2, sprites2 } from "../../asset/sprite.ts";
+import { ninePatchBackground } from "../uiBackground.ts";
+import { UISize } from "../uiSize.ts";
+import { OpenBookUIBackground } from "../visual/bookBackground.ts";
 import {
     createComponent,
     type ComponentDescriptor,
     type PlacedChild,
-} from "./ui.js";
-import { uiButton } from "./uiButton.js";
-import { uiImage } from "./uiImage.js";
+} from "./ui.ts";
+import { uiButton } from "./uiButton.ts";
+import { uiImage } from "./uiImage.ts";
 
 export type UIBookLayoutTab = {
     icon: Sprite2;
@@ -23,14 +23,16 @@ export const UIBookLayoutMode = {
     Dual: 1,
 } as const;
 
-export type UIBookLayoutMode = typeof UIBookLayoutMode[keyof typeof UIBookLayoutMode];
+export type UIBookLayoutMode =
+    (typeof UIBookLayoutMode)[keyof typeof UIBookLayoutMode];
 
 export const UIBookLayoutPage = {
     Left: 0,
     Right: 1,
 } as const;
 
-export type UIBookLayoutPage = typeof UIBookLayoutPage[keyof typeof UIBookLayoutPage];
+export type UIBookLayoutPage =
+    (typeof UIBookLayoutPage)[keyof typeof UIBookLayoutPage];
 
 type UiBookLayoutProps = {
     leftPage?: ComponentDescriptor;

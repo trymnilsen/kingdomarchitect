@@ -1,6 +1,6 @@
-import { RootState } from "../state/root/rootState.js";
-import { InteractionState } from "./interactionState.js";
-import { StateContext } from "./stateContext.js";
+import { RootState } from "../state/root/rootState.ts";
+import { InteractionState } from "./interactionState.ts";
+import { StateContext } from "./stateContext.ts";
 
 type InteractionStateHistoryEntry = {
     state: InteractionState;

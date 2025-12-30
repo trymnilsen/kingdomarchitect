@@ -1,6 +1,6 @@
-import type { Adjacency } from "../../common/adjacency.js";
-import type { Building } from "../../data/building/building.js";
-import type { Entity } from "../entity/entity.js";
+import type { Adjacency } from "../../common/adjacency.ts";
+import type { Building } from "../../data/building/building.ts";
+import type { Entity } from "../entity/entity.ts";
 
 export type HousingComponent = {
     id: typeof HousingComponentId;

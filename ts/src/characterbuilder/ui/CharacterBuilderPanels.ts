@@ -1,21 +1,21 @@
-import { characterPartFrames } from "../../../generated/characterFrames.js";
-import { titleTextStyle } from "../../rendering/text/textStyle.js";
-import { uiBox } from "../../ui/declarative/uiBox.js";
-import { uiGrid } from "../../ui/declarative/uiGrid.js";
-import { uiColumn, uiRow } from "../../ui/declarative/uiSequence.js";
-import { uiText } from "../../ui/declarative/uiText.js";
-import { uiAlignment } from "../../ui/uiAlignment.js";
-import { colorBackground } from "../../ui/uiBackground.js";
-import { fillUiSize, wrapUiSize } from "../../ui/uiSize.js";
-import type { CharacterColors } from "../colors.js";
-import { CharacterPreview } from "./CharacterPreview.js";
+import { characterPartFrames } from "../../../generated/characterFrames.ts";
+import { titleTextStyle } from "../../rendering/text/textStyle.ts";
+import { uiBox } from "../../ui/declarative/uiBox.ts";
+import { uiGrid } from "../../ui/declarative/uiGrid.ts";
+import { uiColumn, uiRow } from "../../ui/declarative/uiSequence.ts";
+import { uiText } from "../../ui/declarative/uiText.ts";
+import { uiAlignment } from "../../ui/uiAlignment.ts";
+import { colorBackground } from "../../ui/uiBackground.ts";
+import { fillUiSize, wrapUiSize } from "../../ui/uiSize.ts";
+import type { CharacterColors } from "../colors.ts";
+import { CharacterPreview } from "./CharacterPreview.ts";
 import {
     createAnimationButton,
     createColorGridItems,
     createPartButton,
     createPartLayerBox,
     createPrimaryButton,
-} from "./CharacterBuilderButtons.js";
+} from "./CharacterBuilderButtons.ts";
 import {
     BODY_PARTS,
     COLORS,
@@ -23,7 +23,7 @@ import {
     LAYOUT,
     type BodyPart,
     type PreviewMode,
-} from "./characterBuilderConstants.js";
+} from "./characterBuilderConstants.ts";
 
 /**
  * Creates the top header bar

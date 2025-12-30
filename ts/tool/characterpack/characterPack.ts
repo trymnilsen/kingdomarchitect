@@ -2,16 +2,16 @@ import { existsSync, readFileSync, writeFileSync } from "fs";
 import * as path from "path";
 import * as util from "util";
 import { PNGWithMetadata } from "pngjs";
-import { collectAssetFiles } from "../util/files.js";
-import { PixelColor } from "../util/pixels.js";
-import { getPixelColor, readPng } from "../util/pngHelper.js";
-import type { CharacterDefinition } from "./characterDefinition.js";
-import type { ColorRegion, PixelPosition } from "./colorRegion.js";
+import { collectAssetFiles } from "../util/files.ts";
+import { PixelColor } from "../util/pixels.ts";
+import { getPixelColor, readPng } from "../util/pngHelper.ts";
+import type { CharacterDefinition } from "./characterDefinition.ts";
+import type { ColorRegion, PixelPosition } from "./colorRegion.ts";
 import type {
     CharacterAnimation,
     AnimationPart,
     PartFrame,
-} from "./characterAnimation.js";
+} from "./characterAnimation.ts";
 
 const assetPath = path.join(process.cwd(), "asset", "character");
 run();

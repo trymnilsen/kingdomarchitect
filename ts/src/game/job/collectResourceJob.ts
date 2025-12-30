@@ -1,21 +1,21 @@
-import { checkAdjacency } from "../../common/point.js";
-import { ResourceComponentId } from "../component/resourceComponent.js";
+import { checkAdjacency } from "../../common/point.ts";
+import { ResourceComponentId } from "../component/resourceComponent.ts";
 import {
     createRegrowComponent,
     RegrowComponentId,
-} from "../component/regrowComponent.js";
-import { damage, HealthComponentId } from "../component/healthComponent.js";
-import type { Entity } from "../entity/entity.js";
-import { completeJob, type Job, type JobHandler } from "./job.js";
-import { doMovement, MovementResult } from "./movementHelper.js";
+} from "../component/regrowComponent.ts";
+import { damage, HealthComponentId } from "../component/healthComponent.ts";
+import type { Entity } from "../entity/entity.ts";
+import { completeJob, type Job, type JobHandler } from "./job.ts";
+import { doMovement, MovementResult } from "./movementHelper.ts";
 import {
     addInventoryItem,
     InventoryComponentId,
-} from "../component/inventoryComponent.js";
+} from "../component/inventoryComponent.ts";
 import {
     getResourceById,
     ResourceHarvestMode,
-} from "../../data/inventory/items/naturalResource.js";
+} from "../../data/inventory/items/naturalResource.ts";
 
 export interface CollectResourceJob extends Job {
     id: typeof CollectResourceJobId;

@@ -1,10 +1,10 @@
-import { AssetLoader } from "../../../asset/loader/assetLoader.js";
-import type { EcsWorld } from "../../../common/ecs/ecsWorld.js";
-import { GameTime } from "../../../common/time.js";
-import { Camera } from "../../../rendering/camera.js";
-import type { GameCommand } from "../../../server/message/gameCommand.js";
-import { Entity } from "../../entity/entity.js";
-import { InteractionStateChanger } from "./interactionStateChanger.js";
+import { AssetLoader } from "../../../asset/loader/assetLoader.ts";
+import type { EcsWorld } from "../../../common/ecs/ecsWorld.ts";
+import { GameTime } from "../../../common/time.ts";
+import { Camera } from "../../../rendering/camera.ts";
+import type { GameCommand } from "../../../server/message/gameCommand.ts";
+import { Entity } from "../../entity/entity.ts";
+import { InteractionStateChanger } from "./interactionStateChanger.ts";
 
 export type StateContext = {
     root: Entity;

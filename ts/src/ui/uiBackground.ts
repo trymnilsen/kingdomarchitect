@@ -1,8 +1,8 @@
-import { Sprite2 } from "../asset/sprite.js";
-import { Point } from "../common/point.js";
-import { allSides, Sides } from "../common/sides.js";
-import { UIRenderScope } from "../rendering/uiRenderContext.js";
-import { UISize } from "./uiSize.js";
+import { Sprite2 } from "../asset/sprite.ts";
+import { Point } from "../common/point.ts";
+import { allSides, Sides } from "../common/sides.ts";
+import { UIRenderScope } from "../rendering/uiRenderContext.ts";
+import { UISize } from "./uiSize.ts";
 
 export type UIBackground = {
     draw(context: UIRenderScope, screenPosition: Point, size: UISize): void;

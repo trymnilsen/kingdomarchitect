@@ -1,8 +1,8 @@
-import type { Bounds } from "../../common/bounds.js";
-import type { Point } from "../../common/point.js";
-import { ChunkSize, type TileChunk } from "../map/chunk.js";
-import { getTileId, type GroundTile } from "../map/tile.js";
-import type { Volume } from "../map/volume.js";
+import type { Bounds } from "../../common/bounds.ts";
+import type { Point } from "../../common/point.ts";
+import { ChunkSize, type TileChunk } from "../map/chunk.ts";
+import { getTileId, type GroundTile } from "../map/tile.ts";
+import type { Volume } from "../map/volume.ts";
 
 export type TileComponent = {
     id: typeof TileComponentId;

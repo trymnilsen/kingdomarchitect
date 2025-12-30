@@ -1,4 +1,4 @@
-import { Direction, OrdinalDirection } from "./direction.js";
+import { Direction, OrdinalDirection } from "./direction.ts";
 
 /**
  * A point represents a pair of numbers used to represent a point in space

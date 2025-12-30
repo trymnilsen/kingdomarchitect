@@ -1,5 +1,5 @@
-import type { SerializedEntity } from "./serializedEntity.js";
-import type { SerializedWorldMeta } from "./serializedWorldMeta.js";
+import type { SerializedEntity } from "./serializedEntity.ts";
+import type { SerializedWorldMeta } from "./serializedWorldMeta.ts";
 
 /**
  * Interface for persistence adapters that handle saving and loading game state.

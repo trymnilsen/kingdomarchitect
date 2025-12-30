@@ -4,11 +4,11 @@ import { PNG, PNGWithMetadata } from "pngjs";
 import { MaxRectsPacker } from "maxrects-packer";
 import * as path from "path";
 import { EOL } from "os";
-import { removeItem } from "../../src/common/array.js";
-import { BitmapImage } from "../bitmapImage.js";
-import { PixelColor } from "../util/pixels.js";
-import { getPixelColor, readPng } from "../util/pngHelper.js";
-import { collectAssetFiles } from "../util/files.js";
+import { removeItem } from "../../src/common/array.ts";
+import { BitmapImage } from "../bitmapImage.ts";
+import { PixelColor } from "../util/pixels.ts";
+import { getPixelColor, readPng } from "../util/pngHelper.ts";
+import { collectAssetFiles } from "../util/files.ts";
 
 const assetPath = path.join(process.cwd(), "asset", "sprite");
 

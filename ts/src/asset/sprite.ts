@@ -1,4 +1,4 @@
-import { sprites } from "../../generated/sprites.js";
+import { sprites } from "../../generated/sprites.ts";
 
 export type Sprite2Id = keyof typeof sprites2;
 export type Sprite2 = {

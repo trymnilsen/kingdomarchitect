@@ -1,9 +1,9 @@
-import type { EcsSystem } from "../../common/ecs/ecsSystem.js";
-import type { Entity } from "../entity/entity.js";
-import { ResourceComponentId } from "../component/resourceComponent.js";
-import { RegrowComponentId } from "../component/regrowComponent.js";
-import { getResourceById } from "../../data/inventory/items/naturalResource.js";
-import { SpriteComponentId } from "../component/spriteComponent.js";
+import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
+import type { Entity } from "../entity/entity.ts";
+import { ResourceComponentId } from "../component/resourceComponent.ts";
+import { RegrowComponentId } from "../component/regrowComponent.ts";
+import { getResourceById } from "../../data/inventory/items/naturalResource.ts";
+import { SpriteComponentId } from "../component/spriteComponent.ts";
 
 export const regrowSystem = {
     onUpdate: update,

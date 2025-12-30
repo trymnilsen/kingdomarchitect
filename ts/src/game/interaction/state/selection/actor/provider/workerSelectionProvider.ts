@@ -1,27 +1,27 @@
-import { sprites2 } from "../../../../../../asset/sprite.js";
-import { SelectedEntityItem } from "../../../../selection/selectedEntityItem.js";
-import { SelectedWorldItem } from "../../../../selection/selectedWorldItem.js";
+import { sprites2 } from "../../../../../../asset/sprite.ts";
+import { SelectedEntityItem } from "../../../../selection/selectedEntityItem.ts";
+import { SelectedWorldItem } from "../../../../selection/selectedWorldItem.ts";
 import {
     EquipmentComponentId,
     type EquipmentComponent,
-} from "../../../../../component/equipmentComponent.js";
-import { InventoryComponentId } from "../../../../../component/inventoryComponent.js";
-import { PlayerUnitComponentId } from "../../../../../component/playerUnitComponent.js";
-import { Entity } from "../../../../../entity/entity.js";
-import { StateContext } from "../../../../handler/stateContext.js";
-import { ButtonCollection } from "../../../../view/buttonCollection.js";
-import { UIActionbarItem } from "../../../../view/uiActionbar.js";
-import { AlertMessageState } from "../../../common/alertMessageState.js";
-import { InventoryState } from "../../../root/inventory/inventoryState.js";
-import { ActorContextActionState } from "../actorContextActionState.js";
+} from "../../../../../component/equipmentComponent.ts";
+import { InventoryComponentId } from "../../../../../component/inventoryComponent.ts";
+import { PlayerUnitComponentId } from "../../../../../component/playerUnitComponent.ts";
+import { Entity } from "../../../../../entity/entity.ts";
+import { StateContext } from "../../../../handler/stateContext.ts";
+import { ButtonCollection } from "../../../../view/buttonCollection.ts";
+import { UIActionbarItem } from "../../../../view/uiActionbar.ts";
+import { AlertMessageState } from "../../../common/alertMessageState.ts";
+import { InventoryState } from "../../../root/inventory/inventoryState.ts";
+import { ActorContextActionState } from "../actorContextActionState.ts";
 import {
     ActorSelectionProvider,
     emptySelection,
-} from "./actorSelectionProvider.js";
-import { EquipItemCommand } from "../../../../../../server/message/command/equipItemCommand.js";
-import { AttackSelectionState } from "../../../attack/attackSelectionState.js";
-import { ItemTag } from "../../../../../../data/inventory/inventoryItem.js";
-import { ConsumeItemCommand } from "../../../../../../server/message/command/consumeItemCommand.js";
+} from "./actorSelectionProvider.ts";
+import { EquipItemCommand } from "../../../../../../server/message/command/equipItemCommand.ts";
+import { AttackSelectionState } from "../../../attack/attackSelectionState.ts";
+import { ItemTag } from "../../../../../../data/inventory/inventoryItem.ts";
+import { ConsumeItemCommand } from "../../../../../../server/message/command/consumeItemCommand.ts";
 
 export class WorkerSelectionProvider implements ActorSelectionProvider {
     provideButtons(

@@ -1,35 +1,35 @@
-import type { AssetLoader } from "../../asset/loader/assetLoader.js";
-import { sprites2, type Sprite2 } from "../../asset/sprite.js";
-import { getCharacterBinId } from "../../characterbuilder/characterBinId.js";
-import type { SpriteDefinitionCache } from "../../characterbuilder/characterSpriteGenerator.js";
-import { getCharacterColors } from "../../characterbuilder/colors.js";
-import { Direction, OrdinalDirection } from "../../common/direction.js";
-import type { EcsSystem } from "../../common/ecs/ecsSystem.js";
-import { checkAdjacency } from "../../common/point.js";
+import type { AssetLoader } from "../../asset/loader/assetLoader.ts";
+import { sprites2, type Sprite2 } from "../../asset/sprite.ts";
+import { getCharacterBinId } from "../../characterbuilder/characterBinId.ts";
+import type { SpriteDefinitionCache } from "../../characterbuilder/characterSpriteGenerator.ts";
+import { getCharacterColors } from "../../characterbuilder/colors.ts";
+import { Direction, OrdinalDirection } from "../../common/direction.ts";
+import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
+import { checkAdjacency } from "../../common/point.ts";
 import {
     isEventTransition,
     type AnimationGraph,
     type AnimationState,
     type AnimationTemplate,
     type AnimationKey,
-} from "../../rendering/animation/animationGraph.js";
-import { DrawMode } from "../../rendering/drawMode.js";
-import type { RenderScope } from "../../rendering/renderScope.js";
+} from "../../rendering/animation/animationGraph.ts";
+import { DrawMode } from "../../rendering/drawMode.ts";
+import type { RenderScope } from "../../rendering/renderScope.ts";
 import type {
     GameMessage,
     TransformGameMessage,
-} from "../../server/message/gameMessage.js";
+} from "../../server/message/gameMessage.ts";
 import {
     AnimationComponentId,
     type AnimationComponent,
-} from "../component/animationComponent.js";
-import { DirectionComponentId } from "../component/directionComponent.js";
-import { EquipmentComponentId } from "../component/equipmentComponent.js";
+} from "../component/animationComponent.ts";
+import { DirectionComponentId } from "../component/directionComponent.ts";
+import { EquipmentComponentId } from "../component/equipmentComponent.ts";
 import {
     SpriteComponentId,
     type SpriteComponent,
-} from "../component/spriteComponent.js";
-import type { Entity } from "../entity/entity.js";
+} from "../component/spriteComponent.ts";
+import type { Entity } from "../entity/entity.ts";
 
 export function createAnimationSystem(
     spriteCache: SpriteDefinitionCache,

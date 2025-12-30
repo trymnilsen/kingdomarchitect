@@ -1,7 +1,7 @@
 import type {
     AnimationGraph,
     AnimationTemplate,
-} from "../../rendering/animation/animationGraph.js";
+} from "../../rendering/animation/animationGraph.ts";
 
 export type AnimationComponent = {
     id: typeof AnimationComponentId;

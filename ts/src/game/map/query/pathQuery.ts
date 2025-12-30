@@ -1,8 +1,8 @@
-import { addPoint, pointEquals, type Point } from "../../../common/point.js";
-import type { PathfindingGraph } from "../../component/pathfindingGraphRegistryComponent.js";
-import type { Entity } from "../../entity/entity.js";
-import type { GraphNode } from "../path/graph/graph.js";
-import { aStarSearch, type SearchedNode } from "../path/search.js";
+import { addPoint, pointEquals, type Point } from "../../../common/point.ts";
+import type { PathfindingGraph } from "../../component/pathfindingGraphRegistryComponent.ts";
+import type { Entity } from "../../entity/entity.ts";
+import type { GraphNode } from "../path/graph/graph.ts";
+import { aStarSearch, type SearchedNode } from "../path/search.ts";
 
 export function queryPath(
     pathfindingGraph: PathfindingGraph,
@@ -100,7 +100,8 @@ export const PathResultStatus = {
     None: "none",
 } as const;
 
-export type PathResultStatus = typeof PathResultStatus[keyof typeof PathResultStatus];
+export type PathResultStatus =
+    (typeof PathResultStatus)[keyof typeof PathResultStatus];
 
 /**
  * The result of a path search, will include the potential path found and the

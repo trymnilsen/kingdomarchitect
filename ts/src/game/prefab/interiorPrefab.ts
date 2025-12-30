@@ -1,8 +1,8 @@
-import { sprites2 } from "../../asset/sprite.js";
-import { generateId } from "../../common/idGenerator.js";
-import { createSpaceComponent } from "../component/spaceComponent.js";
-import { createSpriteComponent } from "../component/spriteComponent.js";
-import { Entity } from "../entity/entity.js";
+import { sprites2 } from "../../asset/sprite.ts";
+import { generateId } from "../../common/idGenerator.ts";
+import { createSpaceComponent } from "../component/spaceComponent.ts";
+import { createSpriteComponent } from "../component/spriteComponent.ts";
+import { Entity } from "../entity/entity.ts";
 
 export function interiorPrefab(id: string): Entity {
     const interiorEntity = new Entity(id);

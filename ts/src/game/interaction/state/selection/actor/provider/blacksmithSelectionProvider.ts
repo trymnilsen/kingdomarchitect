@@ -1,23 +1,23 @@
-import { SelectedWorldItem } from "../../../../selection/selectedWorldItem.js";
-import { StateContext } from "../../../../handler/stateContext.js";
-import { ButtonCollection } from "../../../../view/buttonCollection.js";
+import { SelectedWorldItem } from "../../../../selection/selectedWorldItem.ts";
+import { StateContext } from "../../../../handler/stateContext.ts";
+import { ButtonCollection } from "../../../../view/buttonCollection.ts";
 import {
     ActorSelectionProvider,
     emptySelection,
-} from "./actorSelectionProvider.js";
-import { SelectedEntityItem } from "../../../../selection/selectedEntityItem.js";
-import { BuildingComponentId } from "../../../../../component/buildingComponent.js";
-import { CraftingComponentId } from "../../../../../component/craftingComponent.js";
+} from "./actorSelectionProvider.ts";
+import { SelectedEntityItem } from "../../../../selection/selectedEntityItem.ts";
+import { BuildingComponentId } from "../../../../../component/buildingComponent.ts";
+import { CraftingComponentId } from "../../../../../component/craftingComponent.ts";
 import {
     CollectableComponentId,
     hasCollectableItems,
-} from "../../../../../component/collectableComponent.js";
-import { blacksmith } from "../../../../../../data/building/stone/blacksmith.js";
-import { sprites2 } from "../../../../../../asset/sprite.js";
-import { CraftWithBuildingState } from "../../../crafting/craftWithBuildingState.js";
-import { CollectItemJob } from "../../../../../job/collectItemJob.js";
-import { QueueJobCommand } from "../../../../../../server/message/command/queueJobCommand.js";
-import { CancelCraftingCommand } from "../../../../../../server/message/command/cancelCraftingCommand.js";
+} from "../../../../../component/collectableComponent.ts";
+import { blacksmith } from "../../../../../../data/building/stone/blacksmith.ts";
+import { sprites2 } from "../../../../../../asset/sprite.ts";
+import { CraftWithBuildingState } from "../../../crafting/craftWithBuildingState.ts";
+import { CollectItemJob } from "../../../../../job/collectItemJob.ts";
+import { QueueJobCommand } from "../../../../../../server/message/command/queueJobCommand.ts";
+import { CancelCraftingCommand } from "../../../../../../server/message/command/cancelCraftingCommand.ts";
 
 export class BlacksmithSelectionProvider implements ActorSelectionProvider {
     provideButtons(

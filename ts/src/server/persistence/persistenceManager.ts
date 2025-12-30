@@ -1,14 +1,14 @@
-import type { JSONValue } from "../../common/object.js";
-import { ChunkMapRegistryComponentId } from "../../game/component/chunkMapRegistryComponent.js";
+import type { JSONValue } from "../../common/object.ts";
+import { ChunkMapRegistryComponentId } from "../../game/component/chunkMapRegistryComponent.ts";
 import {
     ComponentID,
     type Components,
-} from "../../game/component/component.js";
-import { PathfindingGraphRegistryComponentId } from "../../game/component/pathfindingGraphRegistryComponent.js";
-import { Entity } from "../../game/entity/entity.js";
-import type { PersistenceAdapter } from "./persistenceAdapter.js";
-import type { SerializedEntity } from "./serializedEntity.js";
-import type { SerializedWorldMeta } from "./serializedWorldMeta.js";
+} from "../../game/component/component.ts";
+import { PathfindingGraphRegistryComponentId } from "../../game/component/pathfindingGraphRegistryComponent.ts";
+import { Entity } from "../../game/entity/entity.ts";
+import type { PersistenceAdapter } from "./persistenceAdapter.ts";
+import type { SerializedEntity } from "./serializedEntity.ts";
+import type { SerializedWorldMeta } from "./serializedWorldMeta.ts";
 
 type SerialisedComponent = JSONValue | null | undefined;
 

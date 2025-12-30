@@ -1,4 +1,4 @@
-import type { Sprite2 } from "../../../asset/sprite.js";
+import type { Sprite2 } from "../../../asset/sprite.ts";
 
 export type UIActionbarItem = {
     text: string;

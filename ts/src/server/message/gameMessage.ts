@@ -1,8 +1,8 @@
-import type { Point } from "../../common/point.js";
-import type { Components } from "../../game/component/component.js";
-import type { Entity } from "../../game/entity/entity.js";
-import type { GameEffect } from "./effect/gameEffect.js";
-import type { GameCommand } from "./gameCommand.js";
+import type { Point } from "../../common/point.ts";
+import type { Components } from "../../game/component/component.ts";
+import type { Entity } from "../../game/entity/entity.ts";
+import type { GameEffect } from "./effect/gameEffect.ts";
+import type { GameCommand } from "./gameCommand.ts";
 
 export type GameMessage =
     | AddEntityGameMessage

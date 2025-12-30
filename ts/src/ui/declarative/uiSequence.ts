@@ -1,11 +1,11 @@
-import { type Point } from "../../common/point.js";
-import { fillUiSize, wrapUiSize, type UISize } from "../uiSize.js";
+import { type Point } from "../../common/point.ts";
+import { fillUiSize, wrapUiSize, type UISize } from "../uiSize.ts";
 import {
     createComponent,
     PlacedChild,
     type ComponentDescriptor,
     type LayoutResult,
-} from "./ui.js";
+} from "./ui.ts";
 
 type AxisSizeSelector = (size: UISize) => number;
 type PositionFactory = (mainAxis: number, crossAxis: number) => Point;
@@ -16,7 +16,8 @@ export const CrossAxisAlignment = {
     End: 2,
 } as const;
 
-export type CrossAxisAlignment = typeof CrossAxisAlignment[keyof typeof CrossAxisAlignment];
+export type CrossAxisAlignment =
+    (typeof CrossAxisAlignment)[keyof typeof CrossAxisAlignment];
 
 export const MainAxisAlignment = {
     Start: 0,
@@ -26,7 +27,8 @@ export const MainAxisAlignment = {
     SpaceEvenly: 4,
 } as const;
 
-export type MainAxisAlignment = typeof MainAxisAlignment[keyof typeof MainAxisAlignment];
+export type MainAxisAlignment =
+    (typeof MainAxisAlignment)[keyof typeof MainAxisAlignment];
 
 type SequenceProps = {
     children: ComponentDescriptor[];

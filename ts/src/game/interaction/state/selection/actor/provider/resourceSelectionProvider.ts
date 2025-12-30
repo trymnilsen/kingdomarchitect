@@ -1,21 +1,21 @@
-import { SelectedEntityItem } from "../../../../selection/selectedEntityItem.js";
-import { SelectedWorldItem } from "../../../../selection/selectedWorldItem.js";
-import { StateContext } from "../../../../handler/stateContext.js";
-import { ButtonCollection } from "../../../../view/buttonCollection.js";
+import { SelectedEntityItem } from "../../../../selection/selectedEntityItem.ts";
+import { SelectedWorldItem } from "../../../../selection/selectedWorldItem.ts";
+import { StateContext } from "../../../../handler/stateContext.ts";
+import { ButtonCollection } from "../../../../view/buttonCollection.ts";
 import {
     ActorSelectionProvider,
     emptySelection,
-} from "./actorSelectionProvider.js";
-import { ResourceComponentId } from "../../../../../component/resourceComponent.js";
-import { sprites2 } from "../../../../../../asset/sprite.js";
-import { CollectResourceJob } from "../../../../../job/collectResourceJob.js";
-import { QueueJobCommand } from "../../../../../../server/message/command/queueJobCommand.js";
-import { queryForJobsWithTarget } from "../../../../../job/query.js";
+} from "./actorSelectionProvider.ts";
+import { ResourceComponentId } from "../../../../../component/resourceComponent.ts";
+import { sprites2 } from "../../../../../../asset/sprite.ts";
+import { CollectResourceJob } from "../../../../../job/collectResourceJob.ts";
+import { QueueJobCommand } from "../../../../../../server/message/command/queueJobCommand.ts";
+import { queryForJobsWithTarget } from "../../../../../job/query.ts";
 import {
     getResourceById,
     ResourceHarvestMode,
-} from "../../../../../../data/inventory/items/naturalResource.js";
-import type { Entity } from "../../../../../entity/entity.js";
+} from "../../../../../../data/inventory/items/naturalResource.ts";
+import type { Entity } from "../../../../../entity/entity.ts";
 
 export class ResourceSelectionProvider implements ActorSelectionProvider {
     provideButtons(

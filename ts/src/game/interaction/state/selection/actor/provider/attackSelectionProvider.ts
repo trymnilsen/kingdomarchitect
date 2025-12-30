@@ -1,10 +1,10 @@
-import { SelectedWorldItem } from "../../../../selection/selectedWorldItem.js";
-import { StateContext } from "../../../../handler/stateContext.js";
-import { ButtonCollection } from "../../../../view/buttonCollection.js";
+import { SelectedWorldItem } from "../../../../selection/selectedWorldItem.ts";
+import { StateContext } from "../../../../handler/stateContext.ts";
+import { ButtonCollection } from "../../../../view/buttonCollection.ts";
 import {
     ActorSelectionProvider,
     emptySelection,
-} from "./actorSelectionProvider.js";
+} from "./actorSelectionProvider.ts";
 
 export class AttackSelectionProvider implements ActorSelectionProvider {
     provideButtons(

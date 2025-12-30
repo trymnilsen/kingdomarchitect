@@ -1,4 +1,4 @@
-import { Entity } from "../../../src/game/entity/entity.js";
+import { Entity } from "../../../src/game/entity/entity.ts";
 
 export class WorldTestHelper {
     private _rootEntity: Entity;

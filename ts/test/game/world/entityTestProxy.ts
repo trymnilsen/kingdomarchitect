@@ -1,5 +1,5 @@
-import { isPointAdjacentTo, Point } from "../../../src/common/point.js";
-import { Entity } from "../../../src/game/entity/entity.js";
+import { isPointAdjacentTo, Point } from "../../../src/common/point.ts";
+import { Entity } from "../../../src/game/entity/entity.ts";
 
 export class EntityTestProxy {
     private _movement: CapturedMovement;

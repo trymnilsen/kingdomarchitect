@@ -1,10 +1,10 @@
-import { encodePosition, Point } from "../../../src/common/point.js";
-import { QuadTree } from "../../../src/common/structure/quadtree.js";
+import { encodePosition, Point } from "../../../src/common/point.ts";
+import { QuadTree } from "../../../src/common/structure/quadtree.ts";
 import {
     Rectangle,
     splitRectangle,
-} from "../../../src/common/structure/rectangle.js";
-import { logTable, MiniBench } from "../miniBench.js";
+} from "../../../src/common/structure/rectangle.ts";
+import { logTable, MiniBench } from "../miniBench.ts";
 
 const bench = new MiniBench("tileplacment", 1);
 

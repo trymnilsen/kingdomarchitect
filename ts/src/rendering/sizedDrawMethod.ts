@@ -1,5 +1,5 @@
-import { Point } from "../common/point.js";
-import { UIRenderScope } from "./uiRenderContext.js";
+import { Point } from "../common/point.ts";
+import { UIRenderScope } from "./uiRenderContext.ts";
 
 export interface SizedDrawMethod {
     draw(

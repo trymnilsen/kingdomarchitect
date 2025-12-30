@@ -1,4 +1,4 @@
-import { randomEntry } from "./array.js";
+import { randomEntry } from "./array.ts";
 
 export const Direction = {
     Up: "up",
@@ -7,7 +7,7 @@ export const Direction = {
     Right: "right",
 } as const;
 
-export type Direction = typeof Direction[keyof typeof Direction];
+export type Direction = (typeof Direction)[keyof typeof Direction];
 
 export function invertDirection(direction: Direction) {
     switch (direction) {
@@ -68,7 +68,7 @@ export const Axis = {
     YAxis: "YAxis",
 } as const;
 
-export type Axis = typeof Axis[keyof typeof Axis];
+export type Axis = (typeof Axis)[keyof typeof Axis];
 
 export const verticalDirections: Readonly<Direction[]> = [
     Direction.Up,
@@ -90,7 +90,8 @@ export const OrdinalDirection = {
     Northwest: "northwest",
 } as const;
 
-export type OrdinalDirection = typeof OrdinalDirection[keyof typeof OrdinalDirection];
+export type OrdinalDirection =
+    (typeof OrdinalDirection)[keyof typeof OrdinalDirection];
 
 export function invertOrdinalDirection(direction: OrdinalDirection) {
     switch (direction) {

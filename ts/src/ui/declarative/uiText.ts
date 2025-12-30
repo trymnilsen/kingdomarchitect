@@ -1,5 +1,5 @@
-import type { TextStyle } from "../../rendering/text/textStyle.js";
-import { createComponent } from "./ui.js";
+import type { TextStyle } from "../../rendering/text/textStyle.ts";
+import { createComponent } from "./ui.ts";
 
 export type UiTextProps = {
     content: string;

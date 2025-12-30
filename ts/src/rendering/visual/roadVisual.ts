@@ -1,7 +1,7 @@
-import { Point } from "../../common/point.js";
-import { TileSize } from "../../game/map/tile.js";
-import { RenderScope } from "../renderScope.js";
-import { RenderVisual } from "../renderVisual.js";
+import { Point } from "../../common/point.ts";
+import { TileSize } from "../../game/map/tile.ts";
+import { RenderScope } from "../renderScope.ts";
+import { RenderVisual } from "../renderVisual.ts";
 
 export class RoadVisual implements RenderVisual {
     private position: Point;

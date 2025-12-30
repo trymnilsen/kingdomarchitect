@@ -4,7 +4,7 @@ import {
     NumberRange,
     rangeDistance,
     rangeRandom,
-} from "../../src/common/range.js";
+} from "../../src/common/range.ts";
 
 describe("Range", () => {
     it("can pick random number in range", () => {

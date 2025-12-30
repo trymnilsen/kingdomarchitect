@@ -1,12 +1,12 @@
-import { Bounds, zeroBounds } from "../common/bounds.js";
+import { Bounds, zeroBounds } from "../common/bounds.ts";
 import {
     addPoint,
     multiplyPoint,
     Point,
     subtractPoint,
-} from "../common/point.js";
-import type { Entity } from "../game/entity/entity.js";
-import { TileSize } from "../game/map/tile.js";
+} from "../common/point.ts";
+import type { Entity } from "../game/entity/entity.ts";
+import { TileSize } from "../game/map/tile.ts";
 
 export class Camera {
     private _position: Point;

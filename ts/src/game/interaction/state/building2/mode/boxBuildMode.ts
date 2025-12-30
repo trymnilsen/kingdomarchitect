@@ -1,5 +1,5 @@
-import { Point } from "../../../../../common/point.js";
-import { BuildMode, BuildModeDescription } from "./buildMode.js";
+import { Point } from "../../../../../common/point.ts";
+import { BuildMode, BuildModeDescription } from "./buildMode.ts";
 
 export class BoxBuildMode implements BuildMode {
     get description(): BuildModeDescription {

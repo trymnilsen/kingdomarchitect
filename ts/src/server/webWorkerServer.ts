@@ -1,6 +1,6 @@
 // Started as a webworker from webworkerServerConnection.ts
-import { GameServer } from "./gameServer.js";
-import type { GameMessage } from "./message/gameMessage.js";
+import { GameServer } from "./gameServer.ts";
+import type { GameMessage } from "./message/gameMessage.ts";
 
 console.log("Booting webworker server");
 const gameServer = new GameServer((message) => {

@@ -1,8 +1,8 @@
-import { sprites2 } from "../../../../asset/sprite.js";
-import { Point } from "../../../../common/point.js";
-import { RenderScope } from "../../../../rendering/renderScope.js";
-import { biomes } from "../../../map/biome.js";
-import { InteractionState } from "../../handler/interactionState.js";
+import { sprites2 } from "../../../../asset/sprite.ts";
+import { Point } from "../../../../common/point.ts";
+import { RenderScope } from "../../../../rendering/renderScope.ts";
+import { biomes } from "../../../map/biome.ts";
+import { InteractionState } from "../../handler/interactionState.ts";
 
 export class ScrollInteractionState extends InteractionState {
     override onDraw(context: RenderScope): void {

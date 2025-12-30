@@ -1,5 +1,5 @@
-import { Bounds } from "../../common/bounds.js";
-import { Direction } from "../../common/direction.js";
+import { Bounds } from "../../common/bounds.ts";
+import { Direction } from "../../common/direction.ts";
 
 export type FocusGroup = {
     getFocusBounds(): Bounds | null;

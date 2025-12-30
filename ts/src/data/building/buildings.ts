@@ -1,10 +1,10 @@
-import { wallAdjacency } from "./adjacency/wallAdjacency.js";
-import { Building } from "./building.js";
-import { foodBuildings } from "./food/food.js";
-import { goldBuildings } from "./gold/gold.js";
-import { stoneBuildings } from "./stone/stone.js";
-import { stoneWall } from "./stone/wall.js";
-import { woodenBuildings } from "./wood/wood.js";
+import { wallAdjacency } from "./adjacency/wallAdjacency.ts";
+import { Building } from "./building.ts";
+import { foodBuildings } from "./food/food.ts";
+import { goldBuildings } from "./gold/gold.ts";
+import { stoneBuildings } from "./stone/stone.ts";
+import { stoneWall } from "./stone/wall.ts";
+import { woodenBuildings } from "./wood/wood.ts";
 
 export const buildings = [
     ...foodBuildings,

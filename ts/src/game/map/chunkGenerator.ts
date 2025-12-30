@@ -2,24 +2,24 @@ import {
     mapNotNullDistinct,
     randomEntry,
     weightedRandomEntry,
-} from "../../common/array.js";
-import { randomColor } from "../../common/color.js";
-import { generateId } from "../../common/idGenerator.js";
-import { adjacentPoints, Point } from "../../common/point.js";
-import { KingdomComponentId } from "../component/kingdomComponent.js";
-import { getChunk, TileComponentId } from "../component/tileComponent.js";
-import { Entity } from "../entity/entity.js";
-import { generateDesert } from "./biome/desert.js";
-import { generateForrest } from "./biome/forrest.js";
-import { generateMountains } from "./biome/mountains.js";
-import { generatePlains } from "./biome/plains.js";
-import { generateSnow } from "./biome/snow.js";
-import { generateSwamp } from "./biome/swamp.js";
-import { generateTaint } from "./biome/taint.js";
-import { ChunkSize, type TileChunk } from "./chunk.js";
-import { placeSettlement } from "./item/settlement.js";
-import { queryEntitiesWithinVolume } from "./query/queryEntity.js";
-import type { Volume } from "./volume.js";
+} from "../../common/array.ts";
+import { randomColor } from "../../common/color.ts";
+import { generateId } from "../../common/idGenerator.ts";
+import { adjacentPoints, Point } from "../../common/point.ts";
+import { KingdomComponentId } from "../component/kingdomComponent.ts";
+import { getChunk, TileComponentId } from "../component/tileComponent.ts";
+import { Entity } from "../entity/entity.ts";
+import { generateDesert } from "./biome/desert.ts";
+import { generateForrest } from "./biome/forrest.ts";
+import { generateMountains } from "./biome/mountains.ts";
+import { generatePlains } from "./biome/plains.ts";
+import { generateSnow } from "./biome/snow.ts";
+import { generateSwamp } from "./biome/swamp.ts";
+import { generateTaint } from "./biome/taint.ts";
+import { ChunkSize, type TileChunk } from "./chunk.ts";
+import { placeSettlement } from "./item/settlement.ts";
+import { queryEntitiesWithinVolume } from "./query/queryEntity.ts";
+import type { Volume } from "./volume.ts";
 
 //TODO: should return a structure describing the unlock for the action
 export function generateChunk(

@@ -1,15 +1,15 @@
-import type { Point } from "../../common/point.js";
+import type { Point } from "../../common/point.ts";
 import {
     calculateAlignment,
     uiAlignment,
     type UiAlignment,
-} from "../uiAlignment.js";
-import { wrapUiSize } from "../uiSize.js";
+} from "../uiAlignment.ts";
+import { wrapUiSize } from "../uiSize.ts";
 import {
     createComponent,
     type ComponentDescriptor,
     type PlacedChild,
-} from "./ui.js";
+} from "./ui.ts";
 
 type UiStackProps = {
     children: ComponentDescriptor[];

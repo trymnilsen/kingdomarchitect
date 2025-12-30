@@ -1,4 +1,4 @@
-import { Entity } from "../entity.js";
+import { Entity } from "../entity.ts";
 
 /**
  * Visit the entity and each of the children and nested

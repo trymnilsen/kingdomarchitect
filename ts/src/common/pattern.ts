@@ -1,4 +1,4 @@
-import { Point, addPoint } from "./point.js";
+import { Point, addPoint } from "./point.ts";
 
 export function offsetPatternWithPoint(
     point: Point,

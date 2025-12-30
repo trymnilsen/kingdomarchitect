@@ -1,15 +1,15 @@
-import { sprites2 } from "../../../asset/sprite.js";
+import { sprites2 } from "../../../asset/sprite.ts";
 import {
     swordItem,
     bowItem,
     wizardHat,
     hammerItem,
-} from "../../inventory/items/equipment.js";
+} from "../../inventory/items/equipment.ts";
 import {
     woodResourceItem,
     stoneResource,
-} from "../../inventory/items/resources.js";
-import type { CraftingRecipe } from "../craftingRecipe.js";
+} from "../../inventory/items/resources.ts";
+import type { CraftingRecipe } from "../craftingRecipe.ts";
 
 export const swordRecipe: CraftingRecipe = {
     id: "craft_sword",

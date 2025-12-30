@@ -1,6 +1,6 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
-import { Entity } from "../../../src/game/entity/entity.js";
+import { Entity } from "../../../src/game/entity/entity.ts";
 
 describe("Entity", () => {
     it("Add child entity", () => {

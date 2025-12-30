@@ -1,4 +1,4 @@
-import { createComponent } from "./ui.js";
+import { createComponent } from "./ui.ts";
 
 export type UiSpaceProps = {
     width?: number;

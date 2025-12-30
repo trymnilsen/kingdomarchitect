@@ -1,13 +1,13 @@
-import { sprites2 } from "../../../../../../asset/sprite.js";
-import { SelectedTileItem } from "../../../../selection/selectedTileItem.js";
-import { SelectedWorldItem } from "../../../../selection/selectedWorldItem.js";
-import { StateContext } from "../../../../handler/stateContext.js";
-import { ButtonCollection } from "../../../../view/buttonCollection.js";
-import { BuildingState } from "../../../root/building/buildingState.js";
+import { sprites2 } from "../../../../../../asset/sprite.ts";
+import { SelectedTileItem } from "../../../../selection/selectedTileItem.ts";
+import { SelectedWorldItem } from "../../../../selection/selectedWorldItem.ts";
+import { StateContext } from "../../../../handler/stateContext.ts";
+import { ButtonCollection } from "../../../../view/buttonCollection.ts";
+import { BuildingState } from "../../../root/building/buildingState.ts";
 import {
     ActorSelectionProvider,
     emptySelection,
-} from "./actorSelectionProvider.js";
+} from "./actorSelectionProvider.ts";
 
 export class TileSelectionProvider implements ActorSelectionProvider {
     provideButtons(

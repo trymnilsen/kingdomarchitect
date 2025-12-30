@@ -1,22 +1,22 @@
-import { removeItem } from "../../common/array.js";
-import type { Bounds } from "../../common/bounds.js";
-import { InvalidArgumentError } from "../../common/error/invalidArgumentError.js";
+import { removeItem } from "../../common/array.ts";
+import type { Bounds } from "../../common/bounds.ts";
+import { InvalidArgumentError } from "../../common/error/invalidArgumentError.ts";
 import {
     addPoint,
     Point,
     pointEquals,
     subtractPoint,
     zeroPoint,
-} from "../../common/point.js";
-import { GameTime } from "../../common/time.js";
+} from "../../common/point.ts";
+import { GameTime } from "../../common/time.ts";
 import type {
     BaseComponent,
     ComponentID,
     Components,
-} from "../component/component.js";
-import { visitChildren } from "./child/visit.js";
-import { entityWithId } from "./child/withId.js";
-import { EntityEvent } from "./entityEvent.js";
+} from "../component/component.ts";
+import { visitChildren } from "./child/visit.ts";
+import { entityWithId } from "./child/withId.ts";
+import { EntityEvent } from "./entityEvent.ts";
 
 /**
  * Represents a node in the entity tree used to create a scenegraph for the

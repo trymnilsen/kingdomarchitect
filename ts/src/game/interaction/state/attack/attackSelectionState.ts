@@ -1,18 +1,18 @@
-import { sprites2 } from "../../../../asset/sprite.js";
-import type { Point } from "../../../../common/point.js";
-import { allSides } from "../../../../common/sides.js";
-import type { RenderScope } from "../../../../rendering/renderScope.js";
-import { AttackCommand } from "../../../../server/message/command/attackTargetCommand.js";
-import type { ComponentDescriptor } from "../../../../ui/declarative/ui.js";
-import { HealthComponentId } from "../../../component/healthComponent.js";
-import type { Entity } from "../../../entity/entity.js";
-import type { SearchedNode } from "../../../map/path/search.js";
-import { queryPath } from "../../../map/query/pathQuery.js";
-import { queryEntity } from "../../../map/query/queryEntity.js";
-import { TileSize, type GroundTile } from "../../../map/tile.js";
+import { sprites2 } from "../../../../asset/sprite.ts";
+import type { Point } from "../../../../common/point.ts";
+import { allSides } from "../../../../common/sides.ts";
+import type { RenderScope } from "../../../../rendering/renderScope.ts";
+import { AttackCommand } from "../../../../server/message/command/attackTargetCommand.ts";
+import type { ComponentDescriptor } from "../../../../ui/declarative/ui.ts";
+import { HealthComponentId } from "../../../component/healthComponent.ts";
+import type { Entity } from "../../../entity/entity.ts";
+import type { SearchedNode } from "../../../map/path/search.ts";
+import { queryPath } from "../../../map/query/pathQuery.ts";
+import { queryEntity } from "../../../map/query/queryEntity.ts";
+import { TileSize, type GroundTile } from "../../../map/tile.ts";
 import { InteractionState } from "../../handler/interactionState";
-import { uiScaffold } from "../../view/uiScaffold.js";
-import { AlertMessageState } from "../common/alertMessageState.js";
+import { uiScaffold } from "../../view/uiScaffold.ts";
+import { AlertMessageState } from "../common/alertMessageState.ts";
 
 export class AttackSelectionState extends InteractionState {
     private selectedPoint: Point | null = null;

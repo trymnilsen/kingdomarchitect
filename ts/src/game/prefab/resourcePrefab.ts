@@ -1,11 +1,11 @@
-import { zeroPoint } from "../../common/point.js";
-import { generateId } from "../../common/idGenerator.js";
-import { type NaturalResource } from "../../data/inventory/items/naturalResource.js";
-import { createResourceComponent } from "../component/resourceComponent.js";
-import { createRegrowComponent } from "../component/regrowComponent.js";
-import { createSpriteComponent } from "../component/spriteComponent.js";
-import { Entity } from "../entity/entity.js";
-import { createHealthComponent } from "../component/healthComponent.js";
+import { zeroPoint } from "../../common/point.ts";
+import { generateId } from "../../common/idGenerator.ts";
+import { type NaturalResource } from "../../data/inventory/items/naturalResource.ts";
+import { createResourceComponent } from "../component/resourceComponent.ts";
+import { createRegrowComponent } from "../component/regrowComponent.ts";
+import { createSpriteComponent } from "../component/spriteComponent.ts";
+import { Entity } from "../entity/entity.ts";
+import { createHealthComponent } from "../component/healthComponent.ts";
 
 export function resourcePrefab(item: NaturalResource): Entity {
     const entity = new Entity(generateId("resource"));

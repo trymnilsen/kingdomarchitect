@@ -1,6 +1,6 @@
-import { Point } from "../../../common/point.js";
-import { Entity } from "../../entity/entity.js";
-import { SelectedWorldItem } from "./selectedWorldItem.js";
+import { Point } from "../../../common/point.ts";
+import { Entity } from "../../entity/entity.ts";
+import { SelectedWorldItem } from "./selectedWorldItem.ts";
 
 export class SelectedEntityItem implements SelectedWorldItem {
     readonly entity: Entity;

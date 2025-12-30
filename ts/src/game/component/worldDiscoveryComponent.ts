@@ -1,5 +1,5 @@
-import { makeNumberId, type Point } from "../../common/point.js";
-import { ChunkSize, getChunkPosition } from "../map/chunk.js";
+import { makeNumberId, type Point } from "../../common/point.ts";
+import { ChunkSize, getChunkPosition } from "../map/chunk.ts";
 
 export type WorldDiscoveryData = {
     readonly fullyDiscoveredChunks: Set<number>;

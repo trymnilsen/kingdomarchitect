@@ -1,6 +1,6 @@
-import { InputAction } from "./inputAction.js";
-import { Keyboard } from "./keyboard.js";
-import { Event, EventListener } from "../common/event.js";
+import { InputAction } from "./inputAction.ts";
+import { Keyboard } from "./keyboard.ts";
+import { Event, EventListener } from "../common/event.ts";
 
 export type InputEvent = {
     action: InputAction;
@@ -10,7 +10,7 @@ export const InputType = {
     Keyboard: 0,
 } as const;
 
-export type InputType = typeof InputType[keyof typeof InputType];
+export type InputType = (typeof InputType)[keyof typeof InputType];
 export class Input {
     private _currentInputType: InputType;
     private events: Event<InputEvent>;

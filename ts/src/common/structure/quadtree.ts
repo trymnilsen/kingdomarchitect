@@ -1,4 +1,4 @@
-import { SparseSet } from "./sparseSet.js";
+import { SparseSet } from "./sparseSet.ts";
 
 type Rectangle = { x: number; y: number; width: number; height: number };
 

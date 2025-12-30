@@ -1,6 +1,6 @@
-import type { Point } from "../../common/point.js";
-import type { Components } from "../component/component.js";
-import { Entity } from "./entity.js";
+import type { Point } from "../../common/point.ts";
+import type { Components } from "../component/component.ts";
+import { Entity } from "./entity.ts";
 
 export type EntityEvent =
     | EntityTransformEvent

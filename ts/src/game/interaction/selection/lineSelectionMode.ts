@@ -1,5 +1,5 @@
-import { Point, pointEquals } from "../../../common/point.js";
-import { SelectionMode, SelectionModeDescription } from "./selectionMode.js";
+import { Point, pointEquals } from "../../../common/point.ts";
+import { SelectionMode, SelectionModeDescription } from "./selectionMode.ts";
 
 export class LineSelectionMode implements SelectionMode {
     private from: Point;

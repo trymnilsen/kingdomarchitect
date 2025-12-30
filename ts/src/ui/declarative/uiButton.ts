@@ -1,10 +1,10 @@
-import type { UIBackground } from "../uiBackground.js";
-import { wrapUiSize, zeroSize, type UISize } from "../uiSize.js";
+import type { UIBackground } from "../uiBackground.ts";
+import { wrapUiSize, zeroSize, type UISize } from "../uiSize.ts";
 import {
     createComponent,
     type ComponentDescriptor,
     type PlacedChild,
-} from "./ui.js";
+} from "./ui.ts";
 
 export type UiButtonProps = {
     child?: ComponentDescriptor;

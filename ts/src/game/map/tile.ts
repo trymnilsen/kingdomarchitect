@@ -1,5 +1,5 @@
-import { nameof } from "../../common/nameof.js";
-import type { BiomeType } from "./biome.js";
+import { nameof } from "../../common/nameof.ts";
+import type { BiomeType } from "./biome.ts";
 
 export function getTileId(x: number, y: number) {
     return `x${x}y${y}`;

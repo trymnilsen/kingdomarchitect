@@ -1,8 +1,8 @@
-import { bowyer } from "./bowyer.js";
-import { carpenter } from "./carpenter.js";
-import { forrester } from "./forrester.js";
-import { woodenHouse } from "./house.js";
-import { stockPile, warehouse } from "./storage.js";
+import { bowyer } from "./bowyer.ts";
+import { carpenter } from "./carpenter.ts";
+import { forrester } from "./forrester.ts";
+import { woodenHouse } from "./house.ts";
+import { stockPile, warehouse } from "./storage.ts";
 
 export const woodenBuildings = [
     woodenHouse,

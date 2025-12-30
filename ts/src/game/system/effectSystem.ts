@@ -1,14 +1,14 @@
-import type { EcsSystem } from "../../common/ecs/ecsSystem.js";
-import type { Entity } from "../entity/entity.js";
+import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
+import type { Entity } from "../entity/entity.ts";
 import {
     ActiveEffectsComponentId,
     type ActiveEffectsComponent,
-} from "../component/activeEffectsComponent.js";
-import { HealthComponentId } from "../component/healthComponent.js";
-import { heal } from "../component/healthComponent.js";
-import { healEffectId } from "../../data/effect/health/healEffect.js";
-import type { HealEffectData } from "../../data/effect/health/healEffect.js";
-import type { Effect } from "../../data/effect/effect.js";
+} from "../component/activeEffectsComponent.ts";
+import { HealthComponentId } from "../component/healthComponent.ts";
+import { heal } from "../component/healthComponent.ts";
+import { healEffectId } from "../../data/effect/health/healEffect.ts";
+import type { HealEffectData } from "../../data/effect/health/healEffect.ts";
+import type { Effect } from "../../data/effect/effect.ts";
 
 export const effectSystem: EcsSystem = {
     onUpdate: update,

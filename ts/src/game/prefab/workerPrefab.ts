@@ -1,20 +1,20 @@
-import { generateId } from "../../common/idGenerator.js";
-import { sprites2 } from "../../asset/sprite.js";
-import { createEquipmentComponent } from "../component/equipmentComponent.js";
+import { generateId } from "../../common/idGenerator.ts";
+import { sprites2 } from "../../asset/sprite.ts";
+import { createEquipmentComponent } from "../component/equipmentComponent.ts";
 import {
     createInventoryComponent,
     defaultInventoryItems,
-} from "../component/inventoryComponent.js";
-import { createJobRunnerComponent } from "../component/jobRunnerComponent.js";
-import { createPlayerUnitComponent } from "../component/playerUnitComponent.js";
-import { createSpriteComponent } from "../component/spriteComponent.js";
-import { Entity } from "../entity/entity.js";
-import { createVisibilityComponent } from "../component/visibilityComponent.js";
-import { createAnimationComponent } from "../component/animationComponent.js";
-import { nobleKnightAnimationGraph } from "../../asset/animation/knight.animation.js";
-import { createDirectionComponent } from "../component/directionComponent.js";
-import { createHealthComponent } from "../component/healthComponent.js";
-import { createOccupationComponent } from "../component/occupationComponent.js";
+} from "../component/inventoryComponent.ts";
+import { createJobRunnerComponent } from "../component/jobRunnerComponent.ts";
+import { createPlayerUnitComponent } from "../component/playerUnitComponent.ts";
+import { createSpriteComponent } from "../component/spriteComponent.ts";
+import { Entity } from "../entity/entity.ts";
+import { createVisibilityComponent } from "../component/visibilityComponent.ts";
+import { createAnimationComponent } from "../component/animationComponent.ts";
+import { nobleKnightAnimationGraph } from "../../asset/animation/knight.animation.ts";
+import { createDirectionComponent } from "../component/directionComponent.ts";
+import { createHealthComponent } from "../component/healthComponent.ts";
+import { createOccupationComponent } from "../component/occupationComponent.ts";
 
 export function workerPrefab(): Entity {
     const entity = new Entity(generateId("worker"));

@@ -1,4 +1,4 @@
-import { CharacterBuilder } from "./builder.js";
+import { CharacterBuilder } from "./builder.ts";
 
 /**
  * Bootstrap function for the character builder application

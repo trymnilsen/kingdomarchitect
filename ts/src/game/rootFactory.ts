@@ -1,6 +1,6 @@
-import { Entity } from "./entity/entity.js";
-import { createChunkMapRegistryComponent } from "./component/chunkMapRegistryComponent.js";
-import { createPathfindingGraphRegistryComponent } from "./component/pathfindingGraphRegistryComponent.js";
+import { Entity } from "./entity/entity.ts";
+import { createChunkMapRegistryComponent } from "./component/chunkMapRegistryComponent.ts";
+import { createPathfindingGraphRegistryComponent } from "./component/pathfindingGraphRegistryComponent.ts";
 
 /**
  * Creates a root entity with all required registry components pre-initialized.

@@ -1,4 +1,4 @@
-import { Point } from "../../../../common/point.js";
+import { Point } from "../../../../common/point.ts";
 
 export type Graph = {
     nodeAt(x: number, y: number): GraphNode | null;

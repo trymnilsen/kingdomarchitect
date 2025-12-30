@@ -1,16 +1,16 @@
-import { addPoint, type Point } from "../../common/point.js";
+import { addPoint, type Point } from "../../common/point.ts";
 import {
     calculateAlignment,
     uiAlignment,
     type UiAlignment,
-} from "../uiAlignment.js";
-import type { UIBackground } from "../uiBackground.js";
-import { wrapUiSize } from "../uiSize.js";
+} from "../uiAlignment.ts";
+import type { UIBackground } from "../uiBackground.ts";
+import { wrapUiSize } from "../uiSize.ts";
 import {
     createComponent,
     type ComponentDescriptor,
     type PlacedChild,
-} from "./ui.js";
+} from "./ui.ts";
 
 type UiBoxProps = {
     child?: ComponentDescriptor;

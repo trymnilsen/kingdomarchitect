@@ -1,4 +1,4 @@
-import { Direction } from "../common/direction.js";
+import { Direction } from "../common/direction.ts";
 
 export const InputActionType = {
     LEFT_PRESS: "LEFT_PRESS",
@@ -11,7 +11,8 @@ export const InputActionType = {
     NUMBER_PRESS: "NUMBER_PRESS",
 } as const;
 
-export type InputActionType = typeof InputActionType[keyof typeof InputActionType];
+export type InputActionType =
+    (typeof InputActionType)[keyof typeof InputActionType];
 
 export type InputAction = {
     isShifted: boolean;

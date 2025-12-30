@@ -1,5 +1,5 @@
-import { JSONValue } from "../../common/object.js";
-import { Sprite2Id } from "../../asset/sprite.js";
+import { JSONValue } from "../../common/object.ts";
+import { Sprite2Id } from "../../asset/sprite.ts";
 
 export type EffectTiming =
     | { type: "immediate" }

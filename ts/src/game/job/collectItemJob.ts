@@ -1,15 +1,15 @@
-import { checkAdjacency } from "../../common/point.js";
-import type { Entity } from "../entity/entity.js";
-import { completeJob, type Job, type JobHandler } from "./job.js";
-import { doMovement, MovementResult } from "./movementHelper.js";
+import { checkAdjacency } from "../../common/point.ts";
+import type { Entity } from "../entity/entity.ts";
+import { completeJob, type Job, type JobHandler } from "./job.ts";
+import { doMovement, MovementResult } from "./movementHelper.ts";
 import {
     addInventoryItem,
     InventoryComponentId,
-} from "../component/inventoryComponent.js";
+} from "../component/inventoryComponent.ts";
 import {
     CollectableComponentId,
     collectAllItems,
-} from "../component/collectableComponent.js";
+} from "../component/collectableComponent.ts";
 
 export interface CollectItemJob extends Job {
     id: typeof CollectItemJobId;

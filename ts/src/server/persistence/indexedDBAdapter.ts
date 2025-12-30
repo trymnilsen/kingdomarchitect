@@ -1,6 +1,6 @@
-import type { PersistenceAdapter } from "./persistenceAdapter.js";
-import type { SerializedEntity } from "./serializedEntity.js";
-import type { SerializedWorldMeta } from "./serializedWorldMeta.js";
+import type { PersistenceAdapter } from "./persistenceAdapter.ts";
+import type { SerializedEntity } from "./serializedEntity.ts";
+import type { SerializedWorldMeta } from "./serializedWorldMeta.ts";
 
 const DB_NAME = "kingdom_architect";
 const DB_VERSION = 1;

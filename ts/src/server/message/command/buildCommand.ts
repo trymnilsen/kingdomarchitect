@@ -1,7 +1,7 @@
-import type { Point } from "../../../common/point.js";
-import type { Building } from "../../../data/building/building.js";
-import type { Job, Jobs } from "../../../game/job/job.js";
-import type { GameCommand } from "../gameCommand.js";
+import type { Point } from "../../../common/point.ts";
+import type { Building } from "../../../data/building/building.ts";
+import type { Job, Jobs } from "../../../game/job/job.ts";
+import type { GameCommand } from "../gameCommand.ts";
 
 export type BuildCommand = {
     id: typeof BuildCommandId;

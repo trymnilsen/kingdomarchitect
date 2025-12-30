@@ -1,5 +1,5 @@
-import { sprites2 } from "../../../asset/sprite.js";
-import { ItemCategory, ItemTag } from "./../inventoryItem.js";
+import { sprites2 } from "../../../asset/sprite.ts";
+import { ItemCategory, ItemTag } from "./../inventoryItem.ts";
 
 export const swordItem = {
     asset: sprites2.sword_skill,

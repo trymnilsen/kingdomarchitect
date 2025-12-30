@@ -1,7 +1,7 @@
-import { removeItem } from "../../common/array.js";
-import type { InventoryItem } from "../../data/inventory/inventoryItem.js";
-import type { InventoryItemQuantity } from "../../data/inventory/inventoryItemQuantity.js";
-import { hammerItem, swordItem } from "../../data/inventory/items/equipment.js";
+import { removeItem } from "../../common/array.ts";
+import type { InventoryItem } from "../../data/inventory/inventoryItem.ts";
+import type { InventoryItemQuantity } from "../../data/inventory/inventoryItemQuantity.ts";
+import { hammerItem, swordItem } from "../../data/inventory/items/equipment.ts";
 import {
     bagOfGlitter,
     blueBook,
@@ -13,7 +13,7 @@ import {
     stoneResource,
     wheatResourceItem,
     woodResourceItem,
-} from "../../data/inventory/items/resources.js";
+} from "../../data/inventory/items/resources.ts";
 
 export type InventoryComponent = {
     id: typeof InventoryComponentId;

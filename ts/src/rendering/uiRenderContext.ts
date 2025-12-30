@@ -1,11 +1,11 @@
-import { Sprite2 } from "../asset/sprite.js";
-import { Bounds } from "../common/bounds.js";
-import { RectangleConfiguration } from "./items/rectangle.js";
+import { Sprite2 } from "../asset/sprite.ts";
+import { Bounds } from "../common/bounds.ts";
+import { RectangleConfiguration } from "./items/rectangle.ts";
 import {
     NinePatchSpriteConfiguration,
     SpriteConfiguration,
-} from "./items/sprite.js";
-import { TextConfiguration } from "./items/text.js";
+} from "./items/sprite.ts";
+import { TextConfiguration } from "./items/text.ts";
 
 export type UIRenderScope = {
     drawScreenSpaceSprite(sprite: SpriteConfiguration): void;

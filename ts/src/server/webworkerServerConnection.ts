@@ -1,7 +1,7 @@
-import type { GameCommand } from "./message/gameCommand.js";
-import { Event } from "../common/event.js";
-import { GameServerConnection } from "./gameServerConnection.js";
-import type { CommandGameMessage, GameMessage } from "./message/gameMessage.js";
+import type { GameCommand } from "./message/gameCommand.ts";
+import { Event } from "../common/event.ts";
+import { GameServerConnection } from "./gameServerConnection.ts";
+import type { CommandGameMessage, GameMessage } from "./message/gameMessage.ts";
 
 export class WebworkerServerConnection implements GameServerConnection {
     private worker: Worker;

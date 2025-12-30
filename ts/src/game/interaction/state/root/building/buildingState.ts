@@ -1,29 +1,29 @@
-import { Sprite2, sprites2 } from "../../../../../asset/sprite.js";
-import { allSides } from "../../../../../common/sides.js";
-import { bookInkColor } from "../../../../../ui/color.js";
-import { InteractionState } from "../../../handler/interactionState.js";
-import { BuildConfirmState } from "../../building2/buildConfirmState.js";
-import { Building } from "../../../../../data/building/building.js";
-import { woodenBuildings } from "../../../../../data/building/wood/wood.js";
-import { stoneBuildings } from "../../../../../data/building/stone/stone.js";
-import { goldBuildings } from "../../../../../data/building/gold/gold.js";
-import { foodBuildings } from "../../../../../data/building/food/food.js";
-import { growBuildings } from "../../../../../data/building/grow/grow.js";
-import { Point } from "../../../../../common/point.js";
-import { createComponent } from "../../../../../ui/declarative/ui.js";
-import { uiBookLayout } from "../../../../../ui/declarative/uiBookLayout.js";
-import { uiScaffold } from "../../../view/uiScaffold.js";
-import { uiBox } from "../../../../../ui/declarative/uiBox.js";
-import { uiButton } from "../../../../../ui/declarative/uiButton.js";
-import { uiRow, uiColumn } from "../../../../../ui/declarative/uiSequence.js";
-import { uiImage } from "../../../../../ui/declarative/uiImage.js";
-import { uiSpace } from "../../../../../ui/declarative/uiSpace.js";
-import { uiText } from "../../../../../ui/declarative/uiText.js";
-import { fillUiSize, wrapUiSize } from "../../../../../ui/uiSize.js";
+import { Sprite2, sprites2 } from "../../../../../asset/sprite.ts";
+import { allSides } from "../../../../../common/sides.ts";
+import { bookInkColor } from "../../../../../ui/color.ts";
+import { InteractionState } from "../../../handler/interactionState.ts";
+import { BuildConfirmState } from "../../building2/buildConfirmState.ts";
+import { Building } from "../../../../../data/building/building.ts";
+import { woodenBuildings } from "../../../../../data/building/wood/wood.ts";
+import { stoneBuildings } from "../../../../../data/building/stone/stone.ts";
+import { goldBuildings } from "../../../../../data/building/gold/gold.ts";
+import { foodBuildings } from "../../../../../data/building/food/food.ts";
+import { growBuildings } from "../../../../../data/building/grow/grow.ts";
+import { Point } from "../../../../../common/point.ts";
+import { createComponent } from "../../../../../ui/declarative/ui.ts";
+import { uiBookLayout } from "../../../../../ui/declarative/uiBookLayout.ts";
+import { uiScaffold } from "../../../view/uiScaffold.ts";
+import { uiBox } from "../../../../../ui/declarative/uiBox.ts";
+import { uiButton } from "../../../../../ui/declarative/uiButton.ts";
+import { uiRow, uiColumn } from "../../../../../ui/declarative/uiSequence.ts";
+import { uiImage } from "../../../../../ui/declarative/uiImage.ts";
+import { uiSpace } from "../../../../../ui/declarative/uiSpace.ts";
+import { uiText } from "../../../../../ui/declarative/uiText.ts";
+import { fillUiSize, wrapUiSize } from "../../../../../ui/uiSize.ts";
 import {
     colorBackground,
     ninePatchBackground,
-} from "../../../../../ui/uiBackground.js";
+} from "../../../../../ui/uiBackground.ts";
 
 // Declarative UI building components
 const bookTextStyle = {

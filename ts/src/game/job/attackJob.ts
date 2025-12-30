@@ -1,7 +1,7 @@
-import { checkAdjacency } from "../../common/point.js";
-import { damage, HealthComponentId } from "../component/healthComponent.js";
-import { completeJob, type Job, type JobHandler } from "./job.js";
-import { doMovement, MovementResult } from "./movementHelper.js";
+import { checkAdjacency } from "../../common/point.ts";
+import { damage, HealthComponentId } from "../component/healthComponent.ts";
+import { completeJob, type Job, type JobHandler } from "./job.ts";
+import { doMovement, MovementResult } from "./movementHelper.ts";
 
 export interface AttackJob extends Job {
     id: typeof AttackJobId;

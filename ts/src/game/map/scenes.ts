@@ -1,4 +1,4 @@
-import type { Entity } from "../entity/entity.js";
+import type { Entity } from "../entity/entity.ts";
 
 export const overWorldId = "overworld";
 export function getOverworldEntity(root: Entity): Entity {

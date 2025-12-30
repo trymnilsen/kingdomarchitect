@@ -1,15 +1,15 @@
-import { Bounds, boundsCenter } from "../../../../common/bounds.js";
-import { Direction } from "../../../../common/direction.js";
-import { shiftPoint } from "../../../../common/point.js";
-import { Camera } from "../../../../rendering/camera.js";
-import type { ComponentDescriptor } from "../../../../ui/declarative/ui.js";
-import { FocusGroup } from "../../../../ui/focus/focusGroup.js";
-import { Entity } from "../../../entity/entity.js";
-import { GroundTile, TileSize } from "../../../map/tile.js";
-import { InteractionState } from "../../handler/interactionState.js";
-import { uiScaffold } from "../../view/uiScaffold.js";
-import { AlertMessageState } from "../common/alertMessageState.js";
-import { MenuState } from "../menu/menuState.js";
+import { Bounds, boundsCenter } from "../../../../common/bounds.ts";
+import { Direction } from "../../../../common/direction.ts";
+import { shiftPoint } from "../../../../common/point.ts";
+import { Camera } from "../../../../rendering/camera.ts";
+import type { ComponentDescriptor } from "../../../../ui/declarative/ui.ts";
+import { FocusGroup } from "../../../../ui/focus/focusGroup.ts";
+import { Entity } from "../../../entity/entity.ts";
+import { GroundTile, TileSize } from "../../../map/tile.ts";
+import { InteractionState } from "../../handler/interactionState.ts";
+import { uiScaffold } from "../../view/uiScaffold.ts";
+import { AlertMessageState } from "../common/alertMessageState.ts";
+import { MenuState } from "../menu/menuState.ts";
 
 export class RootState extends InteractionState {
     override getFocusGroups(): FocusGroup[] {

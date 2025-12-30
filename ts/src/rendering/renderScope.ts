@@ -1,26 +1,26 @@
-import { AssetLoader } from "../asset/loader/assetLoader.js";
-import { Sprite2 } from "../asset/sprite.js";
-import { UILayoutScope } from "../ui/uiLayoutContext.js";
-import { UISize } from "../ui/uiSize.js";
-import { Camera } from "./camera.js";
+import { AssetLoader } from "../asset/loader/assetLoader.ts";
+import { Sprite2 } from "../asset/sprite.ts";
+import { UILayoutScope } from "../ui/uiLayoutContext.ts";
+import { UISize } from "../ui/uiSize.ts";
+import { Camera } from "./camera.ts";
 import {
     NinePatchSpriteConfiguration,
     ninePatchImageRenderer as ninePatchSpriteRenderer,
     SpriteConfiguration,
     spriteRenderer,
-} from "./items/sprite.js";
+} from "./items/sprite.ts";
 import {
     RectangleConfiguration,
     rectangleRenderer,
-} from "./items/rectangle.js";
-import { TextConfiguration, textRenderer } from "./items/text.js";
-import { TextStyle } from "./text/textStyle.js";
-import { UIRenderScope } from "./uiRenderContext.js";
-import { Bounds } from "../common/bounds.js";
-import { sprites } from "../../generated/sprites.js";
-import { CanvasContext } from "./canvasContext.js";
-import { BitmapCache } from "./bitmapCache.js";
-import { Point, zeroPoint } from "../common/point.js";
+} from "./items/rectangle.ts";
+import { TextConfiguration, textRenderer } from "./items/text.ts";
+import { TextStyle } from "./text/textStyle.ts";
+import { UIRenderScope } from "./uiRenderContext.ts";
+import { Bounds } from "../common/bounds.ts";
+import { sprites } from "../../generated/sprites.ts";
+import { CanvasContext } from "./canvasContext.ts";
+import { BitmapCache } from "./bitmapCache.ts";
+import { Point, zeroPoint } from "../common/point.ts";
 
 export type DrawFunction = (context: RenderScope) => void;
 // renderer -> creates render context -> holds camera, canvas context for main and offscreen -> creates scope

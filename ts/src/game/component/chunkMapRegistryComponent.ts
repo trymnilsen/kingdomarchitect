@@ -1,8 +1,8 @@
-import type { Bounds } from "../../common/bounds.js";
-import { encodePosition, type Point } from "../../common/point.js";
-import { SparseSet } from "../../common/structure/sparseSet.js";
-import { ChunkSize } from "../map/chunk.js";
-import type { Entity } from "../entity/entity.js";
+import type { Bounds } from "../../common/bounds.ts";
+import { encodePosition, type Point } from "../../common/point.ts";
+import { SparseSet } from "../../common/structure/sparseSet.ts";
+import { ChunkSize } from "../map/chunk.ts";
+import type { Entity } from "../entity/entity.ts";
 
 export type ChunkMap = {
     chunks: Map<number, SparseSet<Entity>>;

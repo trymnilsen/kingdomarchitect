@@ -21,7 +21,7 @@ The module consists of:
 ### Initialization
 
 ```typescript
-import { PersistenceManager, IndexedDBAdapter } from "./persistence/index.js";
+import { PersistenceManager, IndexedDBAdapter } from "./persistence/index.ts";
 
 // Create adapter and initialize
 const adapter = new IndexedDBAdapter();

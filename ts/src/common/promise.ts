@@ -1,4 +1,4 @@
-import { Event } from "./event.js";
+import { Event } from "./event.ts";
 
 export class Completer<T> {
     private resolvedEvent: Event<T>;

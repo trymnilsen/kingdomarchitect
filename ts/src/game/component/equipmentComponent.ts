@@ -1,4 +1,4 @@
-import type { InventoryItem } from "../../data/inventory/inventoryItem.js";
+import type { InventoryItem } from "../../data/inventory/inventoryItem.ts";
 
 export type EquipmentComponent = {
     id: typeof EquipmentComponentId;

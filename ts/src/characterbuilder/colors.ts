@@ -1,5 +1,5 @@
-import { ItemCategory } from "../data/inventory/inventoryItem.js";
-import type { EquipmentComponent } from "../game/component/equipmentComponent.js";
+import { ItemCategory } from "../data/inventory/inventoryItem.ts";
+import type { EquipmentComponent } from "../game/component/equipmentComponent.ts";
 
 export type CharacterColors = {
     Chest?: string;

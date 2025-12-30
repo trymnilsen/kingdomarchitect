@@ -1,20 +1,20 @@
-import { allSides } from "../../../common/sides.js";
-import { sprites2 } from "../../../asset/sprite.js";
+import { allSides } from "../../../common/sides.ts";
+import { sprites2 } from "../../../asset/sprite.ts";
 import {
     createComponent,
     type ComponentDescriptor,
     type PlacedChild,
-} from "../../../ui/declarative/ui.js";
-import { uiBox } from "../../../ui/declarative/uiBox.js";
-import { uiImage } from "../../../ui/declarative/uiImage.js";
+} from "../../../ui/declarative/ui.ts";
+import { uiBox } from "../../../ui/declarative/uiBox.ts";
+import { uiImage } from "../../../ui/declarative/uiImage.ts";
 import {
     CrossAxisAlignment,
     uiColumn,
-} from "../../../ui/declarative/uiSequence.js";
-import { uiText } from "../../../ui/declarative/uiText.js";
-import { ninePatchBackground } from "../../../ui/uiBackground.js";
-import { wrapUiSize, zeroSize, type UISize } from "../../../ui/uiSize.js";
-import { actionbarTextStyle } from "../../../rendering/text/textStyle.js";
+} from "../../../ui/declarative/uiSequence.ts";
+import { uiText } from "../../../ui/declarative/uiText.ts";
+import { ninePatchBackground } from "../../../ui/uiBackground.ts";
+import { wrapUiSize, zeroSize, type UISize } from "../../../ui/uiSize.ts";
+import { actionbarTextStyle } from "../../../rendering/text/textStyle.ts";
 
 type UiButtonProps = {
     text: string;
@@ -89,7 +89,7 @@ const MenuState = {
     other: 3,
 } as const;
 
-type MenuState = typeof MenuState[keyof typeof MenuState];
+type MenuState = (typeof MenuState)[keyof typeof MenuState];
 
 type ExpandedMenuState = {
     expandedButtonIndex: number | null;

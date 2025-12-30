@@ -1,18 +1,18 @@
-import { generateId } from "../../common/idGenerator.js";
-import type { Building } from "../../data/building/building.js";
-import { sprites2 } from "../../asset/sprite.js";
-import { createBuildingComponent } from "../component/buildingComponent.js";
-import { createHealthComponent } from "../component/healthComponent.js";
-import { createSpriteComponent } from "../component/spriteComponent.js";
-import { Entity } from "../entity/entity.js";
-import { createVisibilityComponent } from "../component/visibilityComponent.js";
-import { createHousingComponent } from "../component/housingComponent.js";
-import { createCraftingComponent } from "../component/craftingComponent.js";
-import { createInventoryComponent } from "../component/inventoryComponent.js";
-import { woodenHouse } from "../../data/building/wood/house.js";
-import { blacksmith } from "../../data/building/stone/blacksmith.js";
-import { blacksmithRecipes } from "../../data/crafting/recipes/blacksmithRecipes.js";
-import { createWorkplaceComponent } from "../component/workplaceComponent.js";
+import { generateId } from "../../common/idGenerator.ts";
+import type { Building } from "../../data/building/building.ts";
+import { sprites2 } from "../../asset/sprite.ts";
+import { createBuildingComponent } from "../component/buildingComponent.ts";
+import { createHealthComponent } from "../component/healthComponent.ts";
+import { createSpriteComponent } from "../component/spriteComponent.ts";
+import { Entity } from "../entity/entity.ts";
+import { createVisibilityComponent } from "../component/visibilityComponent.ts";
+import { createHousingComponent } from "../component/housingComponent.ts";
+import { createCraftingComponent } from "../component/craftingComponent.ts";
+import { createInventoryComponent } from "../component/inventoryComponent.ts";
+import { woodenHouse } from "../../data/building/wood/house.ts";
+import { blacksmith } from "../../data/building/stone/blacksmith.ts";
+import { blacksmithRecipes } from "../../data/crafting/recipes/blacksmithRecipes.ts";
+import { createWorkplaceComponent } from "../component/workplaceComponent.ts";
 
 export function buildingPrefab(
     building: Building,

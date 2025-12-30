@@ -1,10 +1,10 @@
 import {
     createKingdomComponent,
     KingdomType,
-} from "../../component/kingdomComponent.js";
-import type { Entity } from "../../entity/entity.js";
-import { goblinFireplace, goblinPrefab } from "../../prefab/goblinPrefab.js";
-import type { TileChunk } from "../chunk.js";
+} from "../../component/kingdomComponent.ts";
+import type { Entity } from "../../entity/entity.ts";
+import { goblinFireplace, goblinPrefab } from "../../prefab/goblinPrefab.ts";
+import type { TileChunk } from "../chunk.ts";
 
 export function placeSettlement(_chunk: TileChunk, chunkEntity: Entity) {
     chunkEntity.setEcsComponent(createKingdomComponent(KingdomType.Goblin));

@@ -1,4 +1,4 @@
-import { Point } from "../../../common/point.js";
+import { Point } from "../../../common/point.ts";
 
 /**
  * Class wrapping items that can be selected. Different types of items

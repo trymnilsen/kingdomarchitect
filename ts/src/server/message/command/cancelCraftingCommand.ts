@@ -1,4 +1,4 @@
-import type { GameCommand } from "../gameCommand.js";
+import type { GameCommand } from "../gameCommand.ts";
 
 export type CancelCraftingCommand = {
     id: typeof CancelCraftingCommandId;

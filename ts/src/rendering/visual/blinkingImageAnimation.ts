@@ -1,6 +1,6 @@
-import { Point } from "../../common/point.js";
-import { SpriteConfiguration } from "../items/sprite.js";
-import { RenderScope } from "../renderScope.js";
+import { Point } from "../../common/point.ts";
+import { SpriteConfiguration } from "../items/sprite.ts";
+import { RenderScope } from "../renderScope.ts";
 
 /**
  * BlinkingImageAnimation is a helperclass for rendering images that

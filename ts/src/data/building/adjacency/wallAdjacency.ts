@@ -1,5 +1,5 @@
-import { Sprite2, sprites2 } from "../../../asset/sprite.js";
-import { Adjacency } from "../../../common/adjacency.js";
+import { Sprite2, sprites2 } from "../../../asset/sprite.ts";
+import { Adjacency } from "../../../common/adjacency.ts";
 
 export function wallAdjacency(adjacency: Adjacency): Sprite2 {
     switch (adjacency) {

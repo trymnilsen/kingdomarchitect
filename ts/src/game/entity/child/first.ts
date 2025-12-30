@@ -1,5 +1,5 @@
-import { Entity } from "../entity.js";
-import { visitChildren } from "./visit.js";
+import { Entity } from "../entity.ts";
+import { visitChildren } from "./visit.ts";
 
 /**
  * Find the first child on the entity, or the entity itself that satisfies the

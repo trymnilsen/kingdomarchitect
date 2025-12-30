@@ -1,9 +1,9 @@
-import { wrapUiSize, fillUiSize } from "../uiSize.js";
+import { wrapUiSize, fillUiSize } from "../uiSize.ts";
 import {
     createComponent,
     type ComponentDescriptor,
     type PlacedChild,
-} from "./ui.js";
+} from "./ui.ts";
 
 export type UiGridProps = {
     children: ComponentDescriptor[];

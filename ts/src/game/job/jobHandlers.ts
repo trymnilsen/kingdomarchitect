@@ -1,10 +1,10 @@
-import { attackHandler } from "./attackJob.js";
-import { buildBuildingHandler } from "./buildBuildingJob.js";
-import { collectItemHandler } from "./collectItemJob.js";
-import { collectResourceHandler } from "./collectResourceJob.js";
-import type { JobId, Jobs, JobHandler } from "./job.js";
-import { moveToJobHandler } from "./moveToPointJob.js";
-import type { Entity } from "../entity/entity.js";
+import { attackHandler } from "./attackJob.ts";
+import { buildBuildingHandler } from "./buildBuildingJob.ts";
+import { collectItemHandler } from "./collectItemJob.ts";
+import { collectResourceHandler } from "./collectResourceJob.ts";
+import type { JobId, Jobs, JobHandler } from "./job.ts";
+import { moveToJobHandler } from "./moveToPointJob.ts";
+import type { Entity } from "../entity/entity.ts";
 
 /**
  * Type-safe map of job IDs to their handlers

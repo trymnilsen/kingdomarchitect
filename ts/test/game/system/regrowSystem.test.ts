@@ -1,16 +1,16 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
-import { Entity } from "../../../src/game/entity/entity.js";
-import { createResourceComponent } from "../../../src/game/component/resourceComponent.js";
+import { Entity } from "../../../src/game/entity/entity.ts";
+import { createResourceComponent } from "../../../src/game/component/resourceComponent.ts";
 import {
     createRegrowComponent,
     RegrowComponentId,
-} from "../../../src/game/component/regrowComponent.js";
-import { berryBushResource } from "../../../src/data/inventory/items/naturalResource.js";
-import { regrowSystem } from "../../../src/game/system/regrowSystem.js";
-import { SpriteComponentId } from "../../../src/game/component/spriteComponent.js";
-import { createSpriteComponent } from "../../../src/game/component/spriteComponent.js";
-import { zeroPoint } from "../../../src/common/point.js";
+} from "../../../src/game/component/regrowComponent.ts";
+import { berryBushResource } from "../../../src/data/inventory/items/naturalResource.ts";
+import { regrowSystem } from "../../../src/game/system/regrowSystem.ts";
+import { SpriteComponentId } from "../../../src/game/component/spriteComponent.ts";
+import { createSpriteComponent } from "../../../src/game/component/spriteComponent.ts";
+import { zeroPoint } from "../../../src/common/point.ts";
 
 describe("RegrowSystem", () => {
     function createBerryBush(root: Entity): Entity {

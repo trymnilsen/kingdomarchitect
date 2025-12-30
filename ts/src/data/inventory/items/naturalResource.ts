@@ -1,9 +1,9 @@
-import { sprites2, type Sprite2 } from "../../../asset/sprite.js";
-import type { InventoryItem } from "../inventoryItem.js";
+import { sprites2, type Sprite2 } from "../../../asset/sprite.ts";
+import type { InventoryItem } from "../inventoryItem.ts";
 import {
     woodResourceItem,
     stoneResource as stoneInventoryItem,
-} from "./resources.js";
+} from "./resources.ts";
 
 export const ResourceHarvestMode = {
     Chop: 0,
@@ -12,7 +12,8 @@ export const ResourceHarvestMode = {
     Pick: 3,
 } as const;
 
-export type ResourceHarvestMode = typeof ResourceHarvestMode[keyof typeof ResourceHarvestMode];
+export type ResourceHarvestMode =
+    (typeof ResourceHarvestMode)[keyof typeof ResourceHarvestMode];
 
 export type ResourceLifecycle =
     | { type: "Finite" } // removed permanently (trees)

@@ -1,14 +1,14 @@
-import type { Point } from "../../../common/point.js";
+import type { Point } from "../../../common/point.ts";
 import {
     ChunkMapRegistryComponentId,
     getChunkMap,
     getEntitiesAt,
     getEntitiesInChunk,
-} from "../../component/chunkMapRegistryComponent.js";
-import { getChunk } from "../../component/tileComponent.js";
-import type { Entity } from "../../entity/entity.js";
-import { overWorldId } from "../scenes.js";
-import type { Volume } from "../volume.js";
+} from "../../component/chunkMapRegistryComponent.ts";
+import { getChunk } from "../../component/tileComponent.ts";
+import type { Entity } from "../../entity/entity.ts";
+import { overWorldId } from "../scenes.ts";
+import type { Volume } from "../volume.ts";
 
 export function queryEntity(scene: Entity, point: Point): Entity[] {
     const chunkMap = getChunkMap(

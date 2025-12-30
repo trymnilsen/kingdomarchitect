@@ -1,12 +1,12 @@
-import { encodePosition, Point } from "../../../common/point.js";
-import { treeResource } from "../../../data/inventory/items/naturalResource.js";
+import { encodePosition, Point } from "../../../common/point.ts";
+import { treeResource } from "../../../data/inventory/items/naturalResource.ts";
 import {
     ChunkMap,
     getEntitiesInChunkMapWithin,
-} from "../../component/chunkMapRegistryComponent.js";
-import { Entity } from "../../entity/entity.js";
-import { resourcePrefab } from "../../prefab/resourcePrefab.js";
-import { ChunkSize, getChunkBounds } from "../chunk.js";
+} from "../../component/chunkMapRegistryComponent.ts";
+import { Entity } from "../../entity/entity.ts";
+import { resourcePrefab } from "../../prefab/resourcePrefab.ts";
+import { ChunkSize, getChunkBounds } from "../chunk.ts";
 
 /**
  * Generates random spawn points within a chunk, avoiding existing entities

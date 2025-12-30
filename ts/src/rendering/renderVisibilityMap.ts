@@ -1,4 +1,4 @@
-import { makeNumberId } from "../common/point.js";
+import { makeNumberId } from "../common/point.ts";
 
 export class RenderVisibilityMap {
     private _useVisibility = false;

@@ -1,4 +1,4 @@
-import { logTable, MiniBench } from "../miniBench.js";
+import { logTable, MiniBench } from "../miniBench.ts";
 
 const bench = new MiniBench("ChunkId", 100000);
 

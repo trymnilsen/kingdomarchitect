@@ -1,7 +1,7 @@
-import { Sprite2 } from "../../asset/sprite.js";
-import { Sides } from "../../common/sides.js";
-import { CanvasContext } from "../canvasContext.js";
-import { RenderItemConfiguration } from "./renderItemConfiguration.js";
+import { Sprite2 } from "../../asset/sprite.ts";
+import { Sides } from "../../common/sides.ts";
+import { CanvasContext } from "../canvasContext.ts";
+import { RenderItemConfiguration } from "./renderItemConfiguration.ts";
 
 export type SpriteConfiguration = {
     sprite: Sprite2;

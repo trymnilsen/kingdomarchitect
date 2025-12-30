@@ -1,18 +1,18 @@
-import type { Point } from "../../../src/common/point.js";
+import type { Point } from "../../../src/common/point.ts";
 import {
     createJobRunnerComponent,
     JobRunnerComponentId,
-} from "../../../src/game/component/jobRunnerComponent.js";
+} from "../../../src/game/component/jobRunnerComponent.ts";
 import {
     PathfindingGraphRegistryComponentId,
     createPathfindingGraphRegistryComponent,
     createPathfindingGraph,
-} from "../../../src/game/component/pathfindingGraphRegistryComponent.js";
-import { createSpaceComponent } from "../../../src/game/component/spaceComponent.js";
-import { Entity } from "../../../src/game/entity/entity.js";
-import type { Job } from "../../../src/game/job/job.js";
-import { getJobHandler } from "../../../src/game/job/jobHandlers.js";
-import { createEmptyGraph } from "../../path/testGraph.js";
+} from "../../../src/game/component/pathfindingGraphRegistryComponent.ts";
+import { createSpaceComponent } from "../../../src/game/component/spaceComponent.ts";
+import { Entity } from "../../../src/game/entity/entity.ts";
+import type { Job } from "../../../src/game/job/job.ts";
+import { getJobHandler } from "../../../src/game/job/jobHandlers.ts";
+import { createEmptyGraph } from "../../path/testGraph.ts";
 
 /**
  * Test harness for job testing. Sets up a minimal world with a root entity,

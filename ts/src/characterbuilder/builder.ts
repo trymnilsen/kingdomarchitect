@@ -1,12 +1,12 @@
-import { AssetLoader } from "../asset/loader/assetLoader.js";
-import { Camera } from "../rendering/camera.js";
-import { Renderer } from "../rendering/renderer.js";
-import { Entity } from "../game/entity/entity.js";
-import { sprites2 } from "../asset/sprite.js";
-import { UiRenderer, type UIEvent } from "../ui/declarative/ui.js";
-import { TouchInput } from "../input/touchInput.js";
-import type { Point } from "../common/point.js";
-import { CharacterBuilderUI } from "./characterBuilderUI.js";
+import { AssetLoader } from "../asset/loader/assetLoader.ts";
+import { Camera } from "../rendering/camera.ts";
+import { Renderer } from "../rendering/renderer.ts";
+import { Entity } from "../game/entity/entity.ts";
+import { sprites2 } from "../asset/sprite.ts";
+import { UiRenderer, type UIEvent } from "../ui/declarative/ui.ts";
+import { TouchInput } from "../input/touchInput.ts";
+import type { Point } from "../common/point.ts";
+import { CharacterBuilderUI } from "./characterBuilderUI.ts";
 
 /**
  * Main CharacterBuilder class

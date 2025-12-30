@@ -1,16 +1,16 @@
-import { InventoryItem } from "../../../../../data/inventory/inventoryItem.js";
-import { Sprite2, sprites2 } from "../../../../../asset/sprite.js";
-import { ComponentDescriptor } from "../../../../../ui/declarative/ui.js";
+import { InventoryItem } from "../../../../../data/inventory/inventoryItem.ts";
+import { Sprite2, sprites2 } from "../../../../../asset/sprite.ts";
+import { ComponentDescriptor } from "../../../../../ui/declarative/ui.ts";
 import {
     InventoryComponentId,
     type InventoryComponent,
-} from "../../../../component/inventoryComponent.js";
-import { InteractionState } from "../../../handler/interactionState.js";
-import { AlertMessageState } from "../../common/alertMessageState.js";
-import { inventoryView } from "./inventoryView.js";
-import type { Entity } from "../../../../entity/entity.js";
-import type { InventoryItemQuantity } from "../../../../../data/inventory/inventoryItemQuantity.js";
-import { EquipItemCommand } from "../../../../../server/message/command/equipItemCommand.js";
+} from "../../../../component/inventoryComponent.ts";
+import { InteractionState } from "../../../handler/interactionState.ts";
+import { AlertMessageState } from "../../common/alertMessageState.ts";
+import { inventoryView } from "./inventoryView.ts";
+import type { Entity } from "../../../../entity/entity.ts";
+import type { InventoryItemQuantity } from "../../../../../data/inventory/inventoryItemQuantity.ts";
+import { EquipItemCommand } from "../../../../../server/message/command/equipItemCommand.ts";
 
 export class InventoryState extends InteractionState {
     private _selectedItemIndex = 0;

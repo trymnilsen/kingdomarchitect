@@ -1,7 +1,7 @@
-import { Point, pointEquals } from "../../../common/point.js";
-import { BinaryHeap } from "../../../common/structure/binaryHeap.js";
-import { Graph, GraphNode } from "./graph/graph.js";
-import { manhattanDistance } from "./pathHeuristics.js";
+import { Point, pointEquals } from "../../../common/point.ts";
+import { BinaryHeap } from "../../../common/structure/binaryHeap.ts";
+import { Graph, GraphNode } from "./graph/graph.ts";
+import { manhattanDistance } from "./pathHeuristics.ts";
 
 export function aStarSearch(
     from: Point,

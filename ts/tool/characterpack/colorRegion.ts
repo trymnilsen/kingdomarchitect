@@ -1,4 +1,4 @@
-import type { Rectangle } from "../../src/common/structure/rectangle.js";
+import type { Rectangle } from "../../src/common/structure/rectangle.ts";
 
 // Tuple representation: [x, y]
 export type PixelPosition = [number, number];

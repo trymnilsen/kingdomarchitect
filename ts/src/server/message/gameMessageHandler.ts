@@ -1,6 +1,6 @@
-import { Entity } from "../../game/entity/entity.js";
-import type { Camera } from "../../rendering/camera.js";
-import { effectHandler } from "./effect/effectHandler.js";
+import { Entity } from "../../game/entity/entity.ts";
+import type { Camera } from "../../rendering/camera.ts";
+import { effectHandler } from "./effect/effectHandler.ts";
 import {
     AddEntityGameMessageType,
     EffectGameMessageType,
@@ -14,7 +14,7 @@ import {
     type RemoveEntityGameMessage,
     type SetComponentGameMessage,
     type TransformGameMessage,
-} from "./gameMessage.js";
+} from "./gameMessage.ts";
 
 export function handleGameMessage(
     root: Entity,

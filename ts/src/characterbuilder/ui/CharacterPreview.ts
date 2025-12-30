@@ -1,10 +1,10 @@
-import { createComponent, sized } from "../../ui/declarative/ui.js";
+import { createComponent, sized } from "../../ui/declarative/ui.ts";
 import {
     buildSpriteSheet,
     SpriteDefinitionCache,
-} from "../characterSpriteGenerator.js";
-import type { CharacterColors } from "../colors.js";
-import { LAYOUT, type PreviewMode } from "./characterBuilderConstants.js";
+} from "../characterSpriteGenerator.ts";
+import type { CharacterColors } from "../colors.ts";
+import { LAYOUT, type PreviewMode } from "./characterBuilderConstants.ts";
 
 export type CharacterPreviewProps = {
     colors: CharacterColors;

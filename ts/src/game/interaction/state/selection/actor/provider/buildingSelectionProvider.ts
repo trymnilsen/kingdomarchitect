@@ -1,15 +1,15 @@
-import { SelectedWorldItem } from "../../../../selection/selectedWorldItem.js";
-import { StateContext } from "../../../../handler/stateContext.js";
-import { ButtonCollection } from "../../../../view/buttonCollection.js";
+import { SelectedWorldItem } from "../../../../selection/selectedWorldItem.ts";
+import { StateContext } from "../../../../handler/stateContext.ts";
+import { ButtonCollection } from "../../../../view/buttonCollection.ts";
 import {
     ActorSelectionProvider,
     emptySelection,
-} from "./actorSelectionProvider.js";
-import { SelectedEntityItem } from "../../../../selection/selectedEntityItem.js";
-import { BuildingComponentId } from "../../../../../component/buildingComponent.js";
-import { tavern } from "../../../../../../data/building/food/tavern.js";
-import { sprites2 } from "../../../../../../asset/sprite.js";
-import { LoadSpaceCommand } from "../../../../../../server/message/command/enterSpaceCommand.js";
+} from "./actorSelectionProvider.ts";
+import { SelectedEntityItem } from "../../../../selection/selectedEntityItem.ts";
+import { BuildingComponentId } from "../../../../../component/buildingComponent.ts";
+import { tavern } from "../../../../../../data/building/food/tavern.ts";
+import { sprites2 } from "../../../../../../asset/sprite.ts";
+import { LoadSpaceCommand } from "../../../../../../server/message/command/enterSpaceCommand.ts";
 
 export class BuildingSelectionProvider implements ActorSelectionProvider {
     provideButtons(

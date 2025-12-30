@@ -1,14 +1,14 @@
-import { createSpaceComponent } from "../../game/component/spaceComponent.js";
-import { Entity } from "../../game/entity/entity.js";
+import { createSpaceComponent } from "../../game/component/spaceComponent.ts";
+import { Entity } from "../../game/entity/entity.ts";
 import {
     EntityEventType,
     type EntityEvent,
-} from "../../game/entity/entityEvent.js";
-import { overWorldId } from "../../game/map/scenes.js";
-import { DrawMode } from "../../rendering/drawMode.js";
-import { RenderScope } from "../../rendering/renderScope.js";
-import type { GameCommand } from "../../server/message/gameCommand.js";
-import type { GameMessage } from "../../server/message/gameMessage.js";
+} from "../../game/entity/entityEvent.ts";
+import { overWorldId } from "../../game/map/scenes.ts";
+import { DrawMode } from "../../rendering/drawMode.ts";
+import { RenderScope } from "../../rendering/renderScope.ts";
+import type { GameCommand } from "../../server/message/gameCommand.ts";
+import type { GameMessage } from "../../server/message/gameMessage.ts";
 import {
     EcsEntityEventFunction,
     EcsInitFunction,
@@ -16,7 +16,7 @@ import {
     EcsSystem,
     EcsUpdateFunction,
     type EcsGameMessageFunction,
-} from "./ecsSystem.js";
+} from "./ecsSystem.ts";
 
 type EcsEntityEventHandlersMap = {
     // Iterate over each event ID 'K' which is a key in EntityEventMapDynamic

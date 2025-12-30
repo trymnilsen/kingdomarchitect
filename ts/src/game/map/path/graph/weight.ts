@@ -1,10 +1,10 @@
-import type { Point } from "../../../../common/point.js";
-import { BuildingComponentId } from "../../../component/buildingComponent.js";
-import { PlayerUnitComponentId } from "../../../component/playerUnitComponent.js";
-import { ResourceComponentId } from "../../../component/resourceComponent.js";
-import { getTile, TileComponentId } from "../../../component/tileComponent.js";
-import type { Entity } from "../../../entity/entity.js";
-import { queryEntity } from "../../query/queryEntity.js";
+import type { Point } from "../../../../common/point.ts";
+import { BuildingComponentId } from "../../../component/buildingComponent.ts";
+import { PlayerUnitComponentId } from "../../../component/playerUnitComponent.ts";
+import { ResourceComponentId } from "../../../component/resourceComponent.ts";
+import { getTile, TileComponentId } from "../../../component/tileComponent.ts";
+import type { Entity } from "../../../entity/entity.ts";
+import { queryEntity } from "../../query/queryEntity.ts";
 
 export function getWeightAtPoint(point: Point, scope: Entity): number {
     let weight = 25;

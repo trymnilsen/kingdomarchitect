@@ -1,44 +1,44 @@
-import { sprites2 } from "../../../../asset/sprite.js";
-import { allSides } from "../../../../common/sides.js";
-import { RenderScope } from "../../../../rendering/renderScope.js";
-import { TileSize } from "../../../map/tile.js";
-import { SelectedEntityItem } from "../../selection/selectedEntityItem.js";
-import { SelectedTileItem } from "../../selection/selectedTileItem.js";
-import { SelectedWorldItem } from "../../selection/selectedWorldItem.js";
-import { InteractionState } from "../../handler/interactionState.js";
-import { ButtonCollection } from "../../view/buttonCollection.js";
-import { UIActionbarItem } from "../../view/uiActionbar.js";
-import { ActorSelectionProvider } from "./actor/provider/actorSelectionProvider.js";
-import { AttackSelectionProvider } from "./actor/provider/attackSelectionProvider.js";
-import { BlacksmithSelectionProvider } from "./actor/provider/blacksmithSelectionProvider.js";
-import { CollectableProvider } from "./actor/provider/collectableProvider.js";
-import { TileSelectionProvider } from "./actor/provider/tileSelectionProvider.js";
-import { ResourceSelectionProvider } from "./actor/provider/resourceSelectionProvider.js";
-import { WorkerSelectionProvider } from "./actor/provider/workerSelectionProvider.js";
-import type { SelectionInfo } from "./selectionInfo.js";
-import { ComponentDescriptor } from "../../../../ui/declarative/ui.js";
-import { uiBox } from "../../../../ui/declarative/uiBox.js";
+import { sprites2 } from "../../../../asset/sprite.ts";
+import { allSides } from "../../../../common/sides.ts";
+import { RenderScope } from "../../../../rendering/renderScope.ts";
+import { TileSize } from "../../../map/tile.ts";
+import { SelectedEntityItem } from "../../selection/selectedEntityItem.ts";
+import { SelectedTileItem } from "../../selection/selectedTileItem.ts";
+import { SelectedWorldItem } from "../../selection/selectedWorldItem.ts";
+import { InteractionState } from "../../handler/interactionState.ts";
+import { ButtonCollection } from "../../view/buttonCollection.ts";
+import { UIActionbarItem } from "../../view/uiActionbar.ts";
+import { ActorSelectionProvider } from "./actor/provider/actorSelectionProvider.ts";
+import { AttackSelectionProvider } from "./actor/provider/attackSelectionProvider.ts";
+import { BlacksmithSelectionProvider } from "./actor/provider/blacksmithSelectionProvider.ts";
+import { CollectableProvider } from "./actor/provider/collectableProvider.ts";
+import { TileSelectionProvider } from "./actor/provider/tileSelectionProvider.ts";
+import { ResourceSelectionProvider } from "./actor/provider/resourceSelectionProvider.ts";
+import { WorkerSelectionProvider } from "./actor/provider/workerSelectionProvider.ts";
+import type { SelectionInfo } from "./selectionInfo.ts";
+import { ComponentDescriptor } from "../../../../ui/declarative/ui.ts";
+import { uiBox } from "../../../../ui/declarative/uiBox.ts";
 import {
     uiColumn,
     uiRow,
     CrossAxisAlignment,
     MainAxisAlignment,
-} from "../../../../ui/declarative/uiSequence.js";
-import { uiText } from "../../../../ui/declarative/uiText.js";
-import { uiImage } from "../../../../ui/declarative/uiImage.js";
-import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize.js";
-import { NinePatchBackground } from "../../../../ui/uiBackground.js";
+} from "../../../../ui/declarative/uiSequence.ts";
+import { uiText } from "../../../../ui/declarative/uiText.ts";
+import { uiImage } from "../../../../ui/declarative/uiImage.ts";
+import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize.ts";
+import { NinePatchBackground } from "../../../../ui/uiBackground.ts";
 import {
     titleTextStyle,
     subTitleTextStyle,
-} from "../../../../rendering/text/textStyle.js";
-import { uiScaffold } from "../../view/uiScaffold.js";
-import { BuildingSelectionProvider } from "./actor/provider/buildingSelectionProvider.js";
-import type { Entity } from "../../../entity/entity.js";
+} from "../../../../rendering/text/textStyle.ts";
+import { uiScaffold } from "../../view/uiScaffold.ts";
+import { BuildingSelectionProvider } from "./actor/provider/buildingSelectionProvider.ts";
+import type { Entity } from "../../../entity/entity.ts";
 import {
     HealthComponentId,
     type HealthComponent,
-} from "../../../component/healthComponent.js";
+} from "../../../component/healthComponent.ts";
 
 export class SelectionState extends InteractionState {
     private providers: ActorSelectionProvider[] = [

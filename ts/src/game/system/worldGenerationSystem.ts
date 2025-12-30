@@ -1,13 +1,13 @@
-import type { EcsSystem } from "../../common/ecs/ecsSystem.js";
+import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
 import {
     generateDiamondPattern,
     offsetPatternWithPoint,
-} from "../../common/pattern.js";
-import { pointEquals, type Point } from "../../common/point.js";
-import type { DiscoverTileEffect } from "../../server/message/effect/discoverTileEffect.js";
-import type { GameEffect } from "../../server/message/effect/gameEffect.js";
-import { EffectEmitterComponentId } from "../component/effectEmitterComponent.js";
-import { createSpaceComponent } from "../component/spaceComponent.js";
+} from "../../common/pattern.ts";
+import { pointEquals, type Point } from "../../common/point.ts";
+import type { DiscoverTileEffect } from "../../server/message/effect/discoverTileEffect.ts";
+import type { GameEffect } from "../../server/message/effect/gameEffect.ts";
+import { EffectEmitterComponentId } from "../component/effectEmitterComponent.ts";
+import { createSpaceComponent } from "../component/spaceComponent.ts";
 import {
     createTileComponent,
     getChunk,
@@ -15,7 +15,7 @@ import {
     setChunk,
     TileComponentId,
     type TileComponent,
-} from "../component/tileComponent.js";
+} from "../component/tileComponent.ts";
 import {
     createWorldDiscoveryComponent,
     discoverTile,
@@ -23,13 +23,13 @@ import {
     hasDiscoveredTile,
     WorldDiscoveryComponentId,
     type WorldDiscoveryComponent,
-} from "../component/worldDiscoveryComponent.js";
-import { Entity } from "../entity/entity.js";
-import { getChunkPosition } from "../map/chunk.js";
-import { generateChunk } from "../map/chunkGenerator.js";
-import { addInitialPlayerChunk } from "../map/player.js";
-import { getOverworldEntity, overWorldId } from "../map/scenes.js";
-import type { Volume } from "../map/volume.js";
+} from "../component/worldDiscoveryComponent.ts";
+import { Entity } from "../entity/entity.ts";
+import { getChunkPosition } from "../map/chunk.ts";
+import { generateChunk } from "../map/chunkGenerator.ts";
+import { addInitialPlayerChunk } from "../map/player.ts";
+import { getOverworldEntity, overWorldId } from "../map/scenes.ts";
+import type { Volume } from "../map/volume.ts";
 
 export const worldGenerationSystem: EcsSystem = {
     onInit,

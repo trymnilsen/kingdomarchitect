@@ -1,5 +1,5 @@
-import { sprites2 } from "../../asset/sprite.js";
-import { SkillTree } from "./skill.js";
+import { sprites2 } from "../../asset/sprite.ts";
+import { SkillTree } from "./skill.ts";
 
 export const magicSkills: SkillTree = [
     [

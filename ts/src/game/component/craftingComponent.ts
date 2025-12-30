@@ -1,4 +1,4 @@
-import type { CraftingRecipe } from "../../data/crafting/craftingRecipe.js";
+import type { CraftingRecipe } from "../../data/crafting/craftingRecipe.ts";
 
 export type CraftingComponent = {
     id: typeof CraftingComponentId;

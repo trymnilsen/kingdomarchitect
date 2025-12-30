@@ -1,7 +1,7 @@
-import { JobQueueComponentId } from "../component/jobQueueComponent.js";
-import { JobRunnerComponentId } from "../component/jobRunnerComponent.js";
-import type { Entity } from "../entity/entity.js";
-import { isTargetOfJob, type Jobs } from "./job.js";
+import { JobQueueComponentId } from "../component/jobQueueComponent.ts";
+import { JobRunnerComponentId } from "../component/jobRunnerComponent.ts";
+import type { Entity } from "../entity/entity.ts";
+import { isTargetOfJob, type Jobs } from "./job.ts";
 
 export function queryForJobsWithTarget(target: Entity): Jobs[] {
     const root = target.getRootEntity();

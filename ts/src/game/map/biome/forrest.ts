@@ -2,16 +2,16 @@ import {
     berryBushResource,
     stoneResource,
     treeResource,
-} from "../../../data/inventory/items/naturalResource.js";
+} from "../../../data/inventory/items/naturalResource.ts";
 import {
     getChunkMap,
     ChunkMapRegistryComponentId,
-} from "../../component/chunkMapRegistryComponent.js";
-import { Entity } from "../../entity/entity.js";
-import type { TileChunk } from "../chunk.js";
-import { placeRocks } from "../item/rocks.js";
-import { overWorldId } from "../scenes.js";
-import { fixed, placeResource, random } from "./placeResource.js";
+} from "../../component/chunkMapRegistryComponent.ts";
+import { Entity } from "../../entity/entity.ts";
+import type { TileChunk } from "../chunk.ts";
+import { placeRocks } from "../item/rocks.ts";
+import { overWorldId } from "../scenes.ts";
+import { fixed, placeResource, random } from "./placeResource.ts";
 
 export function generateForrest(chunk: TileChunk, chunkEntity: Entity) {
     const chunkMap = getChunkMap(

@@ -1,9 +1,9 @@
-import type { TileChunk } from "../chunk.js";
-import type { Entity } from "../../entity/entity.js";
-import type { NaturalResource } from "../../../data/inventory/items/naturalResource.js";
-import { resourcePrefab } from "../../prefab/resourcePrefab.js";
-import { generateSpawnPoints } from "../item/vegetation.js";
-import type { ChunkMap } from "../../component/chunkMapRegistryComponent.js";
+import type { TileChunk } from "../chunk.ts";
+import type { Entity } from "../../entity/entity.ts";
+import type { NaturalResource } from "../../../data/inventory/items/naturalResource.ts";
+import { resourcePrefab } from "../../prefab/resourcePrefab.ts";
+import { generateSpawnPoints } from "../item/vegetation.ts";
+import type { ChunkMap } from "../../component/chunkMapRegistryComponent.ts";
 
 export type CountFn = (max?: number) => number;
 

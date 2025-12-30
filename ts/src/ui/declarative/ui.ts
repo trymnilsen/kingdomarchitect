@@ -2,11 +2,11 @@
 // 1. UTILITIES & BASIC TYPES (Unchanged)
 // ===================================================================
 
-import { nameof } from "../../common/nameof.js";
-import { addPoint, zeroPoint, type Point } from "../../common/point.js";
-import type { RenderScope } from "../../rendering/renderScope.js";
-import type { TextStyle } from "../../rendering/text/textStyle.js";
-import { fillUiSize, zeroSize } from "../uiSize.js";
+import { nameof } from "../../common/nameof.ts";
+import { addPoint, zeroPoint, type Point } from "../../common/point.ts";
+import type { RenderScope } from "../../rendering/renderScope.ts";
+import type { TextStyle } from "../../rendering/text/textStyle.ts";
+import { fillUiSize, zeroSize } from "../uiSize.ts";
 
 export type UISize = { width: number; height: number };
 export type Rectangle = { x: number; y: number; width: number; height: number };

@@ -1,10 +1,10 @@
-import type { Entity } from "../../entity/entity.js";
+import type { Entity } from "../../entity/entity.ts";
 import {
     PathfindingGraphRegistryComponentId,
     getPathfindingGraph,
     type PathfindingGraph,
-} from "../../component/pathfindingGraphRegistryComponent.js";
-import { SpaceComponentId } from "../../component/spaceComponent.js";
+} from "../../component/pathfindingGraphRegistryComponent.ts";
+import { SpaceComponentId } from "../../component/spaceComponent.ts";
 
 /**
  * Gets the pathfinding graph for an entity's space from the root entity.

@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
-import { LazyGraph } from "../../src/game/map/path/graph/lazyGraph.js";
+import { LazyGraph } from "../../src/game/map/path/graph/lazyGraph.ts";
 
 describe("LazyGraph", () => {
     it("Can get node at", () => {

@@ -1,24 +1,24 @@
-import { randomColor } from "../../common/color.js";
-import { generateId } from "../../common/idGenerator.js";
-import type { Point } from "../../common/point.js";
-import { farm } from "../../data/building/grow/grow.js";
-import { woodenHouse } from "../../data/building/wood/house.js";
+import { randomColor } from "../../common/color.ts";
+import { generateId } from "../../common/idGenerator.ts";
+import type { Point } from "../../common/point.ts";
+import { farm } from "../../data/building/grow/grow.ts";
+import { woodenHouse } from "../../data/building/wood/house.ts";
 import {
     stoneResource,
     treeResource,
-} from "../../data/inventory/items/naturalResource.js";
+} from "../../data/inventory/items/naturalResource.ts";
 import {
     ChunkMapRegistryComponentId,
     getChunkMap,
-} from "../component/chunkMapRegistryComponent.js";
-import { HousingComponentId } from "../component/housingComponent.js";
-import { setChunk, TileComponentId } from "../component/tileComponent.js";
-import { Entity } from "../entity/entity.js";
-import { buildingPrefab } from "../prefab/buildingPrefab.js";
-import { resourcePrefab } from "../prefab/resourcePrefab.js";
-import { trainingDummyPrefab } from "../prefab/trainingDummyPrefab.js";
-import { workerPrefab } from "../prefab/workerPrefab.js";
-import { generateSpawnPoints } from "./item/vegetation.js";
+} from "../component/chunkMapRegistryComponent.ts";
+import { HousingComponentId } from "../component/housingComponent.ts";
+import { setChunk, TileComponentId } from "../component/tileComponent.ts";
+import { Entity } from "../entity/entity.ts";
+import { buildingPrefab } from "../prefab/buildingPrefab.ts";
+import { resourcePrefab } from "../prefab/resourcePrefab.ts";
+import { trainingDummyPrefab } from "../prefab/trainingDummyPrefab.ts";
+import { workerPrefab } from "../prefab/workerPrefab.ts";
+import { generateSpawnPoints } from "./item/vegetation.ts";
 
 export function addInitialPlayerChunk(scopedEntity: Entity): Point {
     const chunkEntity = new Entity("chunk");

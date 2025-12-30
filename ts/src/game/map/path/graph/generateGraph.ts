@@ -1,14 +1,14 @@
-import { absBounds } from "../../../../common/bounds.js";
-import { InvalidArgumentError } from "../../../../common/error/invalidArgumentError.js";
+import { absBounds } from "../../../../common/bounds.ts";
+import { InvalidArgumentError } from "../../../../common/error/invalidArgumentError.ts";
 import {
     getBoundsForTiles,
     TileComponentId,
-} from "../../../component/tileComponent.js";
-import type { Entity } from "../../../entity/entity.js";
-import { FixedGraph, WeightFunction } from "./fixedGraph.js";
-import type { Graph } from "./graph.js";
-import { LazyGraph } from "./lazyGraph.js";
-import { getWeightAtPoint } from "./weight.js";
+} from "../../../component/tileComponent.ts";
+import type { Entity } from "../../../entity/entity.ts";
+import { FixedGraph, WeightFunction } from "./fixedGraph.ts";
+import type { Graph } from "./graph.ts";
+import { LazyGraph } from "./lazyGraph.ts";
+import { getWeightAtPoint } from "./weight.ts";
 
 export function createGraphFromNodes(rootEntity: Entity): FixedGraph {
     const weightFunction: WeightFunction = () => {

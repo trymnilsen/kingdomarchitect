@@ -1,4 +1,4 @@
-import type { Jobs } from "../job/job.js";
+import type { Jobs } from "../job/job.ts";
 
 export type JobQueueComponent = {
     id: typeof JobQueueComponentId;

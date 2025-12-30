@@ -1,5 +1,5 @@
 import { PNGWithMetadata, PNG } from "pngjs";
-import { PixelColor } from "./pixels.js";
+import { PixelColor } from "./pixels.ts";
 import { readFileSync } from "fs";
 
 export function getPixelColor(

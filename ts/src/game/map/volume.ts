@@ -1,5 +1,5 @@
-import type { Point } from "../../common/point.js";
-import type { BiomeType } from "./biome.js";
+import type { Point } from "../../common/point.ts";
+import type { BiomeType } from "./biome.ts";
 
 export type Volume = {
     maxSize: number;

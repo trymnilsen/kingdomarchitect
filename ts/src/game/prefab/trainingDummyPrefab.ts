@@ -1,8 +1,8 @@
-import { sprites2 } from "../../asset/sprite.js";
-import { generateId } from "../../common/idGenerator.js";
-import { createHealthComponent } from "../component/healthComponent.js";
-import { createSpriteComponent } from "../component/spriteComponent.js";
-import { Entity } from "../entity/entity.js";
+import { sprites2 } from "../../asset/sprite.ts";
+import { generateId } from "../../common/idGenerator.ts";
+import { createHealthComponent } from "../component/healthComponent.ts";
+import { createSpriteComponent } from "../component/spriteComponent.ts";
+import { Entity } from "../entity/entity.ts";
 
 export function trainingDummyPrefab(): Entity {
     const entity = new Entity(generateId("dummy"));

@@ -1,35 +1,35 @@
-import type { Bounds } from "../../common/bounds.js";
-import { EcsSystem } from "../../common/ecs/ecsSystem.js";
-import { offsetPatternWithPoint } from "../../common/pattern.js";
+import type { Bounds } from "../../common/bounds.ts";
+import { EcsSystem } from "../../common/ecs/ecsSystem.ts";
+import { offsetPatternWithPoint } from "../../common/pattern.ts";
 import {
     encodePosition,
     makeNumberId,
     type Point,
-} from "../../common/point.js";
-import { DrawMode } from "../../rendering/drawMode.js";
-import type { RenderScope } from "../../rendering/renderScope.js";
-import { AnimationComponentId } from "../component/animationComponent.js";
+} from "../../common/point.ts";
+import { DrawMode } from "../../rendering/drawMode.ts";
+import type { RenderScope } from "../../rendering/renderScope.ts";
+import { AnimationComponentId } from "../component/animationComponent.ts";
 import {
     HealthComponentId,
     type HealthComponent,
-} from "../component/healthComponent.js";
+} from "../component/healthComponent.ts";
 import {
     SpriteComponent,
     SpriteComponentId,
-} from "../component/spriteComponent.js";
-import { TileComponent, TileComponentId } from "../component/tileComponent.js";
-import { VisibilityComponentId } from "../component/visibilityComponent.js";
+} from "../component/spriteComponent.ts";
+import { TileComponent, TileComponentId } from "../component/tileComponent.ts";
+import { VisibilityComponentId } from "../component/visibilityComponent.ts";
 import {
     hasDiscovered,
     isVisible,
     VisibilityMapComponentId,
     type VisibilityMapComponent,
-} from "../component/visibilityMapComponent.js";
-import type { Entity } from "../entity/entity.js";
-import { biomes } from "../map/biome.js";
-import { ChunkDimension, ChunkSize } from "../map/chunk.js";
-import { getTileColorVariation } from "../map/deterministicTileColor.js";
-import { TileSize } from "../map/tile.js";
+} from "../component/visibilityMapComponent.ts";
+import type { Entity } from "../entity/entity.ts";
+import { biomes } from "../map/biome.ts";
+import { ChunkDimension, ChunkSize } from "../map/chunk.ts";
+import { getTileColorVariation } from "../map/deterministicTileColor.ts";
+import { TileSize } from "../map/tile.ts";
 
 export const renderSystem: EcsSystem = {
     onRender,
