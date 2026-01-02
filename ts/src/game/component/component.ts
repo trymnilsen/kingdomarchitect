@@ -7,8 +7,10 @@ import type { CraftingComponent } from "./craftingComponent.ts";
 import { DirectionComponent } from "./directionComponent.ts";
 import type { EffectEmitterComponent } from "./effectEmitterComponent.ts";
 import type { EquipmentComponent } from "./equipmentComponent.ts";
+import type { GoapAgentComponent } from "./goapAgentComponent.ts";
 import type { HealthComponent } from "./healthComponent.ts";
 import type { HousingComponent } from "./housingComponent.ts";
+import type { HungerComponent } from "./hungerComponent.ts";
 import type { InventoryComponent } from "./inventoryComponent.ts";
 import type { JobQueueComponent } from "./jobQueueComponent.ts";
 import type { JobRunnerComponent } from "./jobRunnerComponent.ts";
@@ -53,7 +55,9 @@ export type Components =
     | HousingComponent
     | OppcupationComponent
     | WorkplaceComponent
-    | SpaceComponent;
+    | SpaceComponent
+    | GoapAgentComponent
+    | HungerComponent;
 
 export interface BaseComponent {
     id: string;

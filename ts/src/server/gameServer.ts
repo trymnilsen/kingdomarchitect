@@ -135,9 +135,10 @@ export class GameServer {
             seed: this.worldSeed,
         });
         const end = performance.now();
+        /*
         console.log(
             `Saved game at tick ${this.updateTick} in ${end - start} ms`,
-        );
+        );*/
     }
 
     private addSystems() {
