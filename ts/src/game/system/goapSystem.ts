@@ -4,7 +4,7 @@ import {
     type GoapAgentComponent,
 } from "../component/goapAgentComponent.ts";
 import type { Entity } from "../entity/entity.ts";
-import type { GoapContext } from "../goap/goapAction.ts";
+import { type GoapContext, createGoapContext } from "../goap/goapContext.ts";
 import type { GoapPlanner } from "../goap/goapPlanner.ts";
 
 /**
@@ -72,11 +72,7 @@ function shouldReplan(
     // Replan if current goal is no longer valid or is now satisfied
     const currentGoal = planner.getGoal(agent.currentPlan.goalId);
     if (currentGoal) {
-        const ctx: GoapContext = {
-            agentId: entityId,
-            root: root,
-            tick: tick,
-        };
+        const ctx = createGoapContext(entityId, root, tick);
         if (!currentGoal.isValid(ctx) || currentGoal.isSatisfied(ctx)) {
             return true;
         }
@@ -95,11 +91,7 @@ function replan(
     root: Entity,
     tick: number,
 ) {
-    const ctx: GoapContext = {
-        agentId: entity.id,
-        root: root,
-        tick: tick,
-    };
+    const ctx = createGoapContext(entity.id, root, tick);
 
     const plan = planner.plan(ctx);
 
@@ -163,11 +155,7 @@ function executeNextAction(
         return;
     }
 
-    const ctx: GoapContext = {
-        agentId: entity.id,
-        root: root,
-        tick: tick,
-    };
+    const ctx = createGoapContext(entity.id, root, tick);
 
     // Set action start time if this is the first update for this action
     if (agent.currentActionStartTick === 0) {

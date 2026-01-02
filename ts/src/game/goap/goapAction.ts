@@ -1,17 +1,6 @@
 import type { Entity } from "../entity/entity.ts";
-
-/**
- * Context provided to GOAP actions and goals for accessing the game state.
- * Contains the agent entity ID and the ECS root for querying components.
- */
-export type GoapContext = {
-    /** The entity ID of the agent performing the action */
-    agentId: string;
-    /** The root entity for querying components and game state */
-    root: Entity;
-    /** Current game tick (milliseconds) */
-    tick: number;
-};
+import type { GoapContext } from "./goapContext.ts";
+import type { GoapWorldState } from "./goapWorldState.ts";
 
 /**
  * Defines a GOAP action that can be planned and executed by an agent.
@@ -36,8 +25,30 @@ export interface GoapActionDefinition<TData = unknown> {
     /**
      * Check if preconditions are met for this action to be valid.
      * Used during planning to determine which actions are available.
+     * This checks against the actual game world.
      */
     preconditions: (ctx: GoapContext) => boolean;
+
+    /**
+     * Check if preconditions are met in a simulated world state.
+     * Used during A* search to determine which actions are available
+     * in hypothetical future states.
+     *
+     * @param state - The simulated world state to check against
+     * @param ctx - The planning context
+     */
+    preconditionsInState: (state: GoapWorldState, ctx: GoapContext) => boolean;
+
+    /**
+     * Get the effects this action would have on the world state.
+     * Effects represent the changes this action makes to the world.
+     * Used during A* search to simulate future states.
+     *
+     * @param state - The current world state
+     * @param ctx - The planning context
+     * @returns A map of state changes this action would make
+     */
+    getEffects: (state: GoapWorldState, ctx: GoapContext) => GoapWorldState;
 
     /**
      * Create execution data during planning.

@@ -1,4 +1,5 @@
-import type { GoapContext } from "./goapAction.ts";
+import type { GoapContext } from "./goapContext.ts";
+import type { GoapWorldState } from "./goapWorldState.ts";
 
 /**
  * Defines a GOAP goal that an agent can pursue.
@@ -20,19 +21,23 @@ export interface GoapGoalDefinition {
     /**
      * Check if this goal should be considered for planning.
      * Returns false if the goal doesn't apply in the current situation.
+     * This checks against the actual game world.
      */
     isValid: (ctx: GoapContext) => boolean;
 
     /**
-     * Check if this goal is already satisfied.
+     * Check if this goal is already satisfied in the actual game world.
      * Returns true if the desired end state is already achieved.
      * Agents won't plan for goals that are already satisfied.
      */
     isSatisfied: (ctx: GoapContext) => boolean;
 
     /**
-     * List of action IDs that can satisfy this goal.
-     * Used to filter which actions the planner considers.
+     * Check if this goal would be satisfied in a simulated world state.
+     * Used during A* search to determine when we've found a valid plan.
+     *
+     * @param state - The simulated world state to check against
+     * @param ctx - The planning context
      */
-    relevantActions: string[];
+    isSatisfiedInState: (state: GoapWorldState, ctx: GoapContext) => boolean;
 }
