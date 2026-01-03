@@ -1,5 +1,8 @@
-import type { GoapActionDefinition, GoapContext } from "./goapAction.ts";
+import type { GoapActionDefinition } from "./goapAction.ts";
+import type { GoapContext } from "./goapContext.ts";
 import type { GoapGoalDefinition } from "./goapGoal.ts";
+import { aStarSearch } from "./goapSearch.ts";
+import type { GoapWorldState } from "./goapWorldState.ts";
 
 /**
  * Execution data stored with each action in a plan.
@@ -24,17 +27,38 @@ export type GoapPlan = {
 
 /**
  * GOAP planner that selects goals and finds action sequences to achieve them.
- * Uses simple forward-chaining: pick highest priority unsatisfied goal,
- * then find the lowest cost action that has valid preconditions.
+ * Uses A* search to find optimal action sequences that satisfy goals.
  *
  * @template TAction - Union type of all action definitions this planner handles
  */
+/**
+ * Dynamic action generator function type.
+ * Generators create actions at planning time based on current context.
+ */
+export type DynamicActionGenerator<T extends GoapActionDefinition<any>> = (
+    ctx: GoapContext,
+) => T[];
+
 export class GoapPlanner<TAction extends GoapActionDefinition<any> = GoapActionDefinition<any>> {
     private goals: Map<string, GoapGoalDefinition> = new Map();
     private actions: Map<string, TAction> = new Map();
+    private dynamicActionGenerators: DynamicActionGenerator<TAction>[] = [];
+    private getWorldState: (ctx: GoapContext) => GoapWorldState;
+    private lastDynamicActions: Map<string, TAction> = new Map();
+
+    /**
+     * Create a GOAP planner with a world state extraction function.
+     * @param getWorldState - Function that extracts current world state from context
+     */
+    constructor(getWorldState: (ctx: GoapContext) => GoapWorldState) {
+        this.getWorldState = getWorldState;
+    }
 
     /**
      * Add a goal that agents can pursue.
+     * Goals are evaluated in priority order during planning.
+     * @param goal - The goal definition to register
+     * @returns This planner instance for method chaining
      */
     addGoal(goal: GoapGoalDefinition): this {
         this.goals.set(goal.id, goal);
@@ -43,6 +67,9 @@ export class GoapPlanner<TAction extends GoapActionDefinition<any> = GoapActionD
 
     /**
      * Add an action that agents can perform.
+     * Actions are available to all goals during A* search.
+     * @param action - The action definition to register
+     * @returns This planner instance for method chaining
      */
     addAction(action: TAction): this {
         this.actions.set(action.id, action);
@@ -50,50 +77,93 @@ export class GoapPlanner<TAction extends GoapActionDefinition<any> = GoapActionD
     }
 
     /**
-     * Get an action by ID.
+     * Add a dynamic action generator.
+     * Generators are called during planning to create context-specific actions.
+     * @param generator - Function that generates actions based on current context
+     * @returns This planner instance for method chaining
      */
-    getAction(id: string): TAction | undefined {
-        return this.actions.get(id);
+    addDynamicActionGenerator(generator: DynamicActionGenerator<TAction>): this {
+        this.dynamicActionGenerators.push(generator);
+        return this;
+    }
+
+    /**
+     * Get an action by ID.
+     * Checks both static actions and the last set of dynamically generated actions.
+     * @returns The action, or null if not found
+     */
+    getAction(id: string): TAction | null {
+        return this.actions.get(id) ?? this.lastDynamicActions.get(id) ?? null;
     }
 
     /**
      * Get a goal by ID.
+     * @returns The goal, or null if not found
      */
-    getGoal(id: string): GoapGoalDefinition | undefined {
-        return this.goals.get(id);
+    getGoal(id: string): GoapGoalDefinition | null {
+        return this.goals.get(id) ?? null;
     }
 
     /**
      * Plan actions to achieve the highest priority valid unsatisfied goal.
+     * Uses A* search to find the optimal sequence of actions.
      * Returns null if no valid plan can be found.
      */
     plan(ctx: GoapContext): GoapPlan | null {
+        // Generate all available actions (static + dynamic)
+        const availableActions = this.getAllAvailableActions(ctx);
+
+        // Validate that we have actions registered
+        if (availableActions.length === 0) {
+            console.warn("GOAP planner has no actions available");
+            return null;
+        }
+
         // Get all valid unsatisfied goals sorted by priority
         const goals = this.getAllValidGoals(ctx);
 
-        // Try each goal in priority order until we find one with a valid action
+        // Try each goal in priority order
+        // A* will find the lowest-cost action sequence for each goal
         for (const goal of goals) {
-            const action = this.selectAction(ctx, goal);
-            if (action) {
-                // Create execution data during planning
-                const executionData = action.createExecutionData(ctx);
-                const cost = action.getCost(ctx);
+            // Use A* search to find optimal action sequence
+            const plan = aStarSearch(
+                ctx,
+                goal,
+                availableActions,
+                this.getWorldState,
+                1000, // Max nodes to explore
+            );
 
-                return {
-                    goalId: goal.id,
-                    steps: [
-                        {
-                            actionId: action.id,
-                            executionData,
-                        },
-                    ],
-                    totalCost: cost,
-                };
+            if (plan) {
+                // Found a valid plan for this goal
+                return plan;
             }
         }
 
-        // No valid plan found
+        // No valid plan found for any goal
         return null;
+    }
+
+    /**
+     * Get all available actions by combining static actions with dynamically generated ones.
+     */
+    private getAllAvailableActions(ctx: GoapContext): TAction[] {
+        const actions: TAction[] = Array.from(this.actions.values());
+
+        // Clear previous dynamic actions
+        this.lastDynamicActions.clear();
+
+        // Generate dynamic actions
+        for (const generator of this.dynamicActionGenerators) {
+            const dynamicActions = generator(ctx);
+            for (const action of dynamicActions) {
+                // Store for later retrieval during execution
+                this.lastDynamicActions.set(action.id, action);
+            }
+            actions.push(...dynamicActions);
+        }
+
+        return actions;
     }
 
     /**
@@ -120,33 +190,4 @@ export class GoapPlanner<TAction extends GoapActionDefinition<any> = GoapActionD
         return validGoals;
     }
 
-    /**
-     * Select the lowest cost action with valid preconditions that's relevant to the goal.
-     */
-    private selectAction(
-        ctx: GoapContext,
-        goal: GoapGoalDefinition,
-    ): TAction | null {
-        let bestAction: TAction | null = null;
-        let lowestCost = Infinity;
-
-        for (const action of this.actions.values()) {
-            // Only consider actions that are relevant to this goal
-            if (!goal.relevantActions.includes(action.id)) {
-                continue;
-            }
-
-            if (!action.preconditions(ctx)) {
-                continue;
-            }
-
-            const cost = action.getCost(ctx);
-            if (cost < lowestCost) {
-                lowestCost = cost;
-                bestAction = action;
-            }
-        }
-
-        return bestAction;
-    }
 }

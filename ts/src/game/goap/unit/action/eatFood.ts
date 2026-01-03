@@ -9,6 +9,11 @@ import {
 import { entityWithId } from "../../../entity/child/withId.ts";
 import { ItemTag } from "../../../../data/inventory/inventoryItem.ts";
 import type { GoapActionDefinition } from "../../../goap/goapAction.ts";
+import {
+    createWorldState,
+    getState,
+    setState,
+} from "../../../goap/goapWorldState.ts";
 
 /**
  * Execution data for the eat food action.
@@ -27,39 +32,47 @@ export type EatFoodActionData = {
  */
 export const eatFoodAction: GoapActionDefinition<EatFoodActionData> = {
     id: "eat_food",
-    name: "Eat Food",
+    name: "Eating food",
 
     getCost: () => 5,
 
-    preconditions: (ctx) => {
-        const agent = entityWithId(ctx.root, ctx.agentId);
-        if (!agent) {
+    preconditions: (state, _ctx) => {
+        // Check preconditions against simulated world state
+        // This is used during A* search to determine if action is available
+
+        // Must have food in simulated state
+        const hasFood = getState(state, "hasFood") === "true";
+        if (!hasFood) {
             return false;
         }
 
-        const inventory = agent.getEcsComponent(InventoryComponentId);
-        if (!inventory) {
+        // Must be hungry enough (using simulated hunger value)
+        const hunger = parseInt(getState(state, "hunger") || "0");
+        if (hunger < 20) {
             return false;
         }
 
-        const hunger = agent.getEcsComponent(HungerComponentId);
-        if (!hunger) {
-            return false;
-        }
+        return true;
+    },
 
-        // Must be hungry enough to eat
-        if (hunger.hunger < 20) {
-            return false;
-        }
+    getEffects: (state) => {
+        // Define what changes this action makes to the world state
+        // This is used during A* search to simulate future states
 
-        // Must have consumable food in inventory
-        const hasFood = inventory.items.some(
-            (stack) =>
-                stack.item.tag?.includes(ItemTag.Consumable) &&
-                stack.amount > 0,
-        );
+        const effects = createWorldState();
 
-        return hasFood;
+        // Eating reduces hunger by a fixed amount
+        const currentHunger = parseInt(getState(state, "hunger") || "100");
+        const newHunger = Math.max(0, currentHunger - 40);
+        setState(effects, "hunger", newHunger);
+
+        // Eating consumes food (simplified - we assume we had food)
+        // In reality, we'd need to track specific food items and quantities
+        // For now, eating one food item means we might not have food anymore
+        // This is a simplification - a full implementation would track inventory better
+        setState(effects, "hasFood", "false");
+
+        return effects;
     },
 
     createExecutionData: (ctx) => {

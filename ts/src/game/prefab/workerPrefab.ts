@@ -15,6 +15,7 @@ import { nobleKnightAnimationGraph } from "../../asset/animation/knight.animatio
 import { createDirectionComponent } from "../component/directionComponent.ts";
 import { createHealthComponent } from "../component/healthComponent.ts";
 import { createOccupationComponent } from "../component/occupationComponent.ts";
+import { createGoapAgentComponent } from "../component/goapAgentComponent.ts";
 
 export function workerPrefab(): Entity {
     const entity = new Entity(generateId("worker"));
@@ -29,5 +30,6 @@ export function workerPrefab(): Entity {
     entity.setEcsComponent(createAnimationComponent(nobleKnightAnimationGraph));
     entity.setEcsComponent(createDirectionComponent());
     entity.setEcsComponent(createOccupationComponent());
+    entity.setEcsComponent(createGoapAgentComponent());
     return entity;
 }

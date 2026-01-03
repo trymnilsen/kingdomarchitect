@@ -33,6 +33,9 @@ export type GoapAgentComponent = {
 
     /** Reason for the last failure */
     failureReason?: string;
+
+    /** ID of the currently claimed job (if any) */
+    claimedJob?: string;
 };
 
 export const GoapAgentComponentId = "GoapAgent";

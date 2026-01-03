@@ -14,6 +14,7 @@ export interface EntityJobConstraint {
 
 export interface Job {
     id: JobId;
+    claimedBy?: string;
     constraint?: JobConstraint;
 }
 

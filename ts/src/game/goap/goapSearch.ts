@@ -7,7 +7,6 @@ import {
     applyEffects,
     cloneWorldState,
     type GoapWorldState,
-    worldStatesEqual,
 } from "./goapWorldState.ts";
 
 /**
@@ -78,21 +77,19 @@ function reconstructPlan(node: GoapSearchNode, goalId: string): GoapPlan {
 }
 
 /**
- * Check if a state exists in the closed set.
- * The closed set tracks world states we've already fully explored.
+ * Create a hash string from a world state for Set-based closed set.
+ * This gives us O(1) lookups instead of O(n) with array searching.
  *
- * We identify nodes by their world state, not by the specific sequence
- * of actions that led there. If two different action sequences lead to
- * the same world state, we only need to explore one of them.
- *
- * This is a key optimization: in a graph where multiple paths can reach
- * the same state, we only need to explore the cheapest path.
+ * The hash is a deterministic string representation of the state.
+ * Two states with the same key-value pairs produce the same hash.
  */
-function isInClosedSet(
-    closedSet: GoapWorldState[],
-    state: GoapWorldState,
-): boolean {
-    return closedSet.some((closedState) => worldStatesEqual(closedState, state));
+function stateHash(state: GoapWorldState): string {
+    // Sort entries to ensure deterministic ordering
+    // This is important because Map iteration order is insertion order
+    const sorted = Array.from(state.entries()).sort(([a], [b]) =>
+        a.localeCompare(b),
+    );
+    return JSON.stringify(sorted);
 }
 
 /**
@@ -157,10 +154,13 @@ export function aStarSearch(
     const openSet = new BinaryHeap<GoapSearchNode>((node) => node.f);
 
     // Closed set: world states we've already fully explored
-    // We store states (not nodes) because identity is based on state equality
-    const closedSet: GoapWorldState[] = [];
+    // Use Set with state hashes for O(1) lookup instead of O(n) array search
+    // With maxNodes=1000, this could save up to 500,000 comparisons
+    const closedSet = new Set<string>();
 
     // Start with the current world state
+    // Clone the initial state to prevent mutations during search from affecting
+    // the original state that might be read by action preconditions/effects
     const startNode = createStartNode(cloneWorldState(initialState));
     startNode.h = heuristic(startNode.state, goal);
     startNode.f = startNode.g + startNode.h;
@@ -177,18 +177,19 @@ export function aStarSearch(
         // Check if current state satisfies the goal
         // We use the goal's satisfaction check which operates on the actual world
         // plus the simulated state changes we've tracked
-        if (goal.isSatisfiedInState(currentNode.state, ctx)) {
+        if (goal.wouldBeSatisfiedBy(currentNode.state, ctx)) {
             // Found a solution! Reconstruct and return the plan
             return reconstructPlan(currentNode, goal.id);
         }
 
         // Mark this state as explored so we don't revisit it
-        closedSet.push(cloneWorldState(currentNode.state));
+        // Use hash for O(1) lookup in future iterations
+        closedSet.add(stateHash(currentNode.state));
 
         // Explore all possible actions from this state
         for (const action of actions) {
             // Check if action's preconditions are met in the current planned state
-            if (!action.preconditionsInState(currentNode.state, ctx)) {
+            if (!action.preconditions(currentNode.state, ctx)) {
                 continue; // Action not available in this state
             }
 
@@ -201,13 +202,23 @@ export function aStarSearch(
 
             // Skip if we've already fully explored this state
             // This prevents cycles and redundant exploration
-            if (isInClosedSet(closedSet, newState)) {
+            // O(1) lookup thanks to Set-based closed set
+            if (closedSet.has(stateHash(newState))) {
                 continue;
             }
 
             // Calculate the cost to reach this new state
             // g-score = cost to reach current node + cost of this action
             const actionCost = action.getCost(ctx);
+
+            // Validate cost is non-negative to prevent A* optimality issues
+            if (actionCost < 0) {
+                console.warn(
+                    `Action "${action.id}" returned negative cost: ${actionCost}. Skipping.`,
+                );
+                continue;
+            }
+
             const gScore = currentNode.g + actionCost;
 
             // Create execution data for this action
@@ -234,7 +245,7 @@ export function aStarSearch(
     // No plan found after exploring all reachable states
     if (nodesExplored >= maxNodes) {
         console.warn(
-            `GOAP planning hit node limit (${maxNodes}) for goal "${goal.id}"`,
+            `GOAP planning hit node limit (${maxNodes}) for goal "${goal.id}" (agent: ${ctx.agentId})`,
         );
     }
 

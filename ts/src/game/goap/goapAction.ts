@@ -23,13 +23,6 @@ export interface GoapActionDefinition<TData = unknown> {
     getCost: (ctx: GoapContext) => number;
 
     /**
-     * Check if preconditions are met for this action to be valid.
-     * Used during planning to determine which actions are available.
-     * This checks against the actual game world.
-     */
-    preconditions: (ctx: GoapContext) => boolean;
-
-    /**
      * Check if preconditions are met in a simulated world state.
      * Used during A* search to determine which actions are available
      * in hypothetical future states.
@@ -37,7 +30,7 @@ export interface GoapActionDefinition<TData = unknown> {
      * @param state - The simulated world state to check against
      * @param ctx - The planning context
      */
-    preconditionsInState: (state: GoapWorldState, ctx: GoapContext) => boolean;
+    preconditions: (state: GoapWorldState, ctx: GoapContext) => boolean;
 
     /**
      * Get the effects this action would have on the world state.

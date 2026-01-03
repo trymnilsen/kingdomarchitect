@@ -39,5 +39,5 @@ export interface GoapGoalDefinition {
      * @param state - The simulated world state to check against
      * @param ctx - The planning context
      */
-    isSatisfiedInState: (state: GoapWorldState, ctx: GoapContext) => boolean;
+    wouldBeSatisfiedBy: (state: GoapWorldState, ctx: GoapContext) => boolean;
 }
