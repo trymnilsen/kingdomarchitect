@@ -15,8 +15,12 @@ export interface GoapGoalDefinition {
     /**
      * Priority of this goal. Higher values = more important.
      * Used to select which goal to pursue when multiple goals are valid.
+     *
+     * This is a function that computes priority dynamically based on the current context,
+     * allowing goals to become more or less urgent based on the situation.
+     * For example, hunger becomes more urgent as hunger level increases.
      */
-    priority: number;
+    priority: (ctx: GoapContext) => number;
 
     /**
      * Check if this goal should be considered for planning.

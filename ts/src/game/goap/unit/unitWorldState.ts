@@ -48,7 +48,8 @@ export function getUnitWorldState(ctx: GoapContext): GoapWorldState {
         // Check if we have any consumable items (food)
         const hasFood = inventory.items.some(
             (stack) =>
-                stack.item.tag?.includes(ItemTag.Consumable) && stack.amount > 0,
+                stack.item.tag?.includes(ItemTag.Consumable) &&
+                stack.amount > 0,
         );
         setState(state, "hasFood", hasFood);
 
@@ -60,7 +61,11 @@ export function getUnitWorldState(ctx: GoapContext): GoapWorldState {
     const goapAgent = agent.getEcsComponent(GoapAgentComponentId);
     if (goapAgent && goapAgent.currentPlan?.goalId === "idle") {
         // If currently executing idle action, use the action start time
-        setState(state, "lastIdleTime", goapAgent.currentActionStartTick.toString());
+        setState(
+            state,
+            "lastIdleTime",
+            goapAgent.currentActionStartTick.toString(),
+        );
     } else {
         // Not currently idling, set to 0 (long time ago)
         setState(state, "lastIdleTime", "0");

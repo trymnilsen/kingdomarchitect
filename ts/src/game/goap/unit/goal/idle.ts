@@ -10,7 +10,7 @@ import { getState } from "../../../goap/goapWorldState.ts";
 export const idleGoal: GoapGoalDefinition = {
     id: "idle",
     name: "Idle",
-    priority: 1, // Lowest priority - only chosen when nothing else applies
+    priority: () => 1, // Lowest priority - only chosen when nothing else applies
 
     isValid: () => true, // Always valid as a fallback
 

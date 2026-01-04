@@ -37,7 +37,7 @@ describe("GoapPlanner", () => {
         const goal: GoapGoalDefinition = {
             id: "test-goal",
             name: "Test Goal",
-            priority: 10,
+            priority: () => 10,
             isValid: () => true,
             isSatisfied: () => false,
             wouldBeSatisfiedBy: () => false,
@@ -87,7 +87,7 @@ describe("GoapPlanner", () => {
         const lowPriorityGoal: GoapGoalDefinition = {
             id: "low",
             name: "Low Priority",
-            priority: 1,
+            priority: () => 1,
             isValid: () => true,
             isSatisfied: () => false,
             wouldBeSatisfiedBy: (state) => getState(state, "low") === "true",
@@ -96,7 +96,7 @@ describe("GoapPlanner", () => {
         const highPriorityGoal: GoapGoalDefinition = {
             id: "high",
             name: "High Priority",
-            priority: 10,
+            priority: () => 10,
             isValid: () => true,
             isSatisfied: () => false,
             wouldBeSatisfiedBy: (state) => getState(state, "high") === "true",
@@ -152,7 +152,7 @@ describe("GoapPlanner", () => {
         const invalidGoal: GoapGoalDefinition = {
             id: "invalid",
             name: "Invalid Goal",
-            priority: 100,
+            priority: () => 100,
             isValid: () => false, // Not valid
             isSatisfied: () => false,
             wouldBeSatisfiedBy: (state) =>
@@ -162,7 +162,7 @@ describe("GoapPlanner", () => {
         const validGoal: GoapGoalDefinition = {
             id: "valid",
             name: "Valid Goal",
-            priority: 1,
+            priority: () => 1,
             isValid: () => true,
             isSatisfied: () => false,
             wouldBeSatisfiedBy: (state) => getState(state, "valid") === "true",
@@ -202,7 +202,7 @@ describe("GoapPlanner", () => {
         const satisfiedGoal: GoapGoalDefinition = {
             id: "satisfied",
             name: "Satisfied Goal",
-            priority: 100,
+            priority: () => 100,
             isValid: () => true,
             isSatisfied: () => true, // Already satisfied
             wouldBeSatisfiedBy: (state) =>
@@ -212,7 +212,7 @@ describe("GoapPlanner", () => {
         const unsatisfiedGoal: GoapGoalDefinition = {
             id: "unsatisfied",
             name: "Unsatisfied Goal",
-            priority: 1,
+            priority: () => 1,
             isValid: () => true,
             isSatisfied: () => false,
             wouldBeSatisfiedBy: (state) =>
@@ -252,7 +252,7 @@ describe("GoapPlanner", () => {
         const invalidGoal: GoapGoalDefinition = {
             id: "invalid",
             name: "Invalid",
-            priority: 10,
+            priority: () => 10,
             isValid: () => false,
             isSatisfied: () => false,
             wouldBeSatisfiedBy: () => false,
@@ -271,7 +271,7 @@ describe("GoapPlanner", () => {
         const satisfiedGoal: GoapGoalDefinition = {
             id: "satisfied",
             name: "Satisfied",
-            priority: 10,
+            priority: () => 10,
             isValid: () => true,
             isSatisfied: () => true,
             wouldBeSatisfiedBy: () => true,
@@ -290,7 +290,7 @@ describe("GoapPlanner", () => {
         const goal: GoapGoalDefinition = {
             id: "impossible",
             name: "Impossible",
-            priority: 10,
+            priority: () => 10,
             isValid: () => true,
             isSatisfied: () => false,
             wouldBeSatisfiedBy: (state) =>
@@ -336,7 +336,7 @@ describe("GoapPlanner", () => {
         const goal: GoapGoalDefinition = {
             id: "goal",
             name: "Goal",
-            priority: 10,
+            priority: () => 10,
             isValid: () => true,
             isSatisfied: () => false,
             wouldBeSatisfiedBy: (state) => getState(state, "custom") === "true",
@@ -367,7 +367,7 @@ describe("GoapPlanner", () => {
         const goal: GoapGoalDefinition = {
             id: "goal",
             name: "Goal",
-            priority: 10,
+            priority: () => 10,
             isValid: () => true,
             isSatisfied: () => false,
             wouldBeSatisfiedBy: () => false,
@@ -408,7 +408,7 @@ describe("GoapPlanner", () => {
         const hysteresisGoal: GoapGoalDefinition = {
             id: "hysteresis",
             name: "Hysteresis Goal",
-            priority: 10,
+            priority: () => 10,
             isValid: (ctx) => {
                 // Goal becomes valid when value crosses upper threshold
                 const state = planner["getWorldState"](ctx);
@@ -463,7 +463,7 @@ describe("GoapPlanner", () => {
         const impossibleGoal: GoapGoalDefinition = {
             id: "impossible",
             name: "Impossible",
-            priority: 100,
+            priority: () => 100,
             isValid: () => true,
             isSatisfied: () => false,
             wouldBeSatisfiedBy: (state) =>
@@ -474,7 +474,7 @@ describe("GoapPlanner", () => {
         const achievableGoal: GoapGoalDefinition = {
             id: "achievable",
             name: "Achievable",
-            priority: 1,
+            priority: () => 1,
             isValid: () => true,
             isSatisfied: () => false,
             wouldBeSatisfiedBy: (state) =>

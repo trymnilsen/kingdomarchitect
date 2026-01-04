@@ -35,7 +35,7 @@ describe("GoapSearch (A* Algorithm)", () => {
         const goal: GoapGoalDefinition = {
             id: "test-goal",
             name: "Test Goal",
-            priority: 10,
+            priority: () => 10,
             isValid: () => true,
             isSatisfied: () => false,
             wouldBeSatisfiedBy: (state) => getState(state, "flag") === "true",
@@ -74,7 +74,7 @@ describe("GoapSearch (A* Algorithm)", () => {
         const goal: GoapGoalDefinition = {
             id: "reach-two",
             name: "Reach Two",
-            priority: 10,
+            priority: () => 10,
             isValid: () => true,
             isSatisfied: () => false,
             wouldBeSatisfiedBy: (state) => {
@@ -116,7 +116,7 @@ describe("GoapSearch (A* Algorithm)", () => {
         const goal: GoapGoalDefinition = {
             id: "goal",
             name: "Goal",
-            priority: 10,
+            priority: () => 10,
             isValid: () => true,
             isSatisfied: () => false,
             wouldBeSatisfiedBy: (state) => getState(state, "done") === "true",
@@ -176,7 +176,7 @@ describe("GoapSearch (A* Algorithm)", () => {
         const goal: GoapGoalDefinition = {
             id: "goal",
             name: "Goal",
-            priority: 10,
+            priority: () => 10,
             isValid: () => true,
             isSatisfied: () => false,
             wouldBeSatisfiedBy: (state) => getState(state, "goal") === "true",
@@ -235,7 +235,7 @@ describe("GoapSearch (A* Algorithm)", () => {
         const goal: GoapGoalDefinition = {
             id: "impossible",
             name: "Impossible",
-            priority: 10,
+            priority: () => 10,
             isValid: () => true,
             isSatisfied: () => false,
             wouldBeSatisfiedBy: (state) =>
@@ -270,7 +270,7 @@ describe("GoapSearch (A* Algorithm)", () => {
         const goal: GoapGoalDefinition = {
             id: "goal",
             name: "Goal",
-            priority: 10,
+            priority: () => 10,
             isValid: () => true,
             isSatisfied: () => false,
             wouldBeSatisfiedBy: (state) => getState(state, "goal") === "true",
@@ -307,7 +307,7 @@ describe("GoapSearch (A* Algorithm)", () => {
         const goal: GoapGoalDefinition = {
             id: "goal",
             name: "Goal",
-            priority: 10,
+            priority: () => 10,
             isValid: () => true,
             isSatisfied: () => false,
             wouldBeSatisfiedBy: (state) => getState(state, "done") === "true",
@@ -351,7 +351,7 @@ describe("GoapSearch (A* Algorithm)", () => {
         const goal: GoapGoalDefinition = {
             id: "goal",
             name: "Goal",
-            priority: 10,
+            priority: () => 10,
             isValid: () => true,
             isSatisfied: () => false,
             wouldBeSatisfiedBy: (state) => getState(state, "goal") === "true",
@@ -387,7 +387,7 @@ describe("GoapSearch (A* Algorithm)", () => {
         const goal: GoapGoalDefinition = {
             id: "goal",
             name: "Goal",
-            priority: 10,
+            priority: () => 10,
             isValid: () => true,
             isSatisfied: () => false,
             wouldBeSatisfiedBy: (state) => {
@@ -429,7 +429,7 @@ describe("GoapSearch (A* Algorithm)", () => {
         const goal: GoapGoalDefinition = {
             id: "goal",
             name: "Goal",
-            priority: 10,
+            priority: () => 10,
             isValid: () => true,
             isSatisfied: () => false,
             wouldBeSatisfiedBy: (state) => {
@@ -528,7 +528,7 @@ describe("GoapSearch (A* Algorithm)", () => {
         const goal: GoapGoalDefinition = {
             id: "goal",
             name: "Goal",
-            priority: 10,
+            priority: () => 10,
             isValid: () => true,
             isSatisfied: () => false,
             wouldBeSatisfiedBy: (state) =>

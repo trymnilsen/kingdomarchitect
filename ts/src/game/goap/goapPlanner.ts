@@ -39,7 +39,9 @@ export type DynamicActionGenerator<T extends GoapActionDefinition<any>> = (
     ctx: GoapContext,
 ) => T[];
 
-export class GoapPlanner<TAction extends GoapActionDefinition<any> = GoapActionDefinition<any>> {
+export class GoapPlanner<
+    TAction extends GoapActionDefinition<any> = GoapActionDefinition<any>,
+> {
     private goals: Map<string, GoapGoalDefinition> = new Map();
     private actions: Map<string, TAction> = new Map();
     private dynamicActionGenerators: DynamicActionGenerator<TAction>[] = [];
@@ -82,7 +84,9 @@ export class GoapPlanner<TAction extends GoapActionDefinition<any> = GoapActionD
      * @param generator - Function that generates actions based on current context
      * @returns This planner instance for method chaining
      */
-    addDynamicActionGenerator(generator: DynamicActionGenerator<TAction>): this {
+    addDynamicActionGenerator(
+        generator: DynamicActionGenerator<TAction>,
+    ): this {
         this.dynamicActionGenerators.push(generator);
         return this;
     }
@@ -185,9 +189,9 @@ export class GoapPlanner<TAction extends GoapActionDefinition<any> = GoapActionD
         }
 
         // Sort by priority (highest first)
-        validGoals.sort((a, b) => b.priority - a.priority);
+        // Call priority functions with context to get dynamic priorities
+        validGoals.sort((a, b) => b.priority(ctx) - a.priority(ctx));
 
         return validGoals;
     }
-
 }

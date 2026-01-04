@@ -11,7 +11,7 @@ import { getState } from "../../../goap/goapWorldState.ts";
 export const beProductiveGoal: GoapGoalDefinition = {
     id: "be_productive",
     name: "Work job",
-    priority: 20, // Higher than survival needs - workers prioritize their jobs
+    priority: () => 20, // Fixed priority - work is important but can be overridden by critical needs
 
     isValid: (ctx) => {
         // Goal is valid if there are any unclaimed jobs in the queue
