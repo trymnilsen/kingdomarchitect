@@ -69,6 +69,7 @@ function createAgentEntity(
 describe("beProductive system integration", () => {
     it("agent completes full workflow: work -> get hungry -> eat", () => {
         const root = createTestRoot();
+
         root.setEcsComponent(createJobQueueComponent());
         root.setEcsComponent(createPathfindingGraphRegistryComponent()); // Add pathfinding registry for movement
 
