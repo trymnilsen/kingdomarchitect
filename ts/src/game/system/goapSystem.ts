@@ -1,9 +1,11 @@
 import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
+import { isPointAdjacentTo, type Point } from "../../common/point.ts";
 import {
     GoapAgentComponentId,
     type GoapAgentComponent,
 } from "../component/goapAgentComponent.ts";
 import type { Entity } from "../entity/entity.ts";
+import type { GoapActionDefinition } from "../goap/goapAction.ts";
 import { type GoapContext, createGoapContext } from "../goap/goapContext.ts";
 import type { GoapPlanner } from "../goap/goapPlanner.ts";
 
@@ -33,7 +35,7 @@ function updateGoapAgents(root: Entity, planner: GoapPlanner, tick: number) {
 
         // Execute current action if we have a plan
         if (agent.currentPlan) {
-            executeNextAction(entity, agent, planner, root, tick);
+            executeCurrentAction(entity, agent, planner, root, tick);
         }
     }
 }
@@ -116,7 +118,7 @@ function replan(
 /**
  * Execute the next action in the current plan.
  */
-function executeNextAction(
+function executeCurrentAction(
     entity: Entity,
     agent: GoapAgentComponent,
     planner: GoapPlanner,
@@ -198,3 +200,8 @@ function executeNextAction(
 
     entity.invalidateComponent(GoapAgentComponentId);
 }
+
+function getActionTarget(
+    action: GoapActionDefinition<unknown>,
+    context: GoapContext,
+): Point | undefined {}

@@ -12,4 +12,10 @@ export function createJobQueueComponent(): JobQueueComponent {
     };
 }
 
+export function getJobById(jobQueue: JobQueueComponent, jobId: string): Jobs {
+    const jobIndex = parseInt(jobId);
+    const job = jobQueue.jobs[jobIndex];
+    return job;
+}
+
 export const JobQueueComponentId = "JobQueue";

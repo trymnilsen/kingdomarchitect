@@ -1,6 +1,9 @@
+import type { Point } from "../../common/point.ts";
 import type { Entity } from "../entity/entity.ts";
 import type { GoapContext } from "./goapContext.ts";
 import type { GoapWorldState } from "./goapWorldState.ts";
+
+export type GoapActionExecutionResult = "in_progress" | "complete";
 
 /**
  * Defines a GOAP action that can be planned and executed by an agent.
@@ -57,7 +60,7 @@ export interface GoapActionDefinition<TData = unknown> {
      *
      * @returns "in_progress" if action is still executing, "complete" when done
      */
-    execute: (data: TData, ctx: GoapContext) => "in_progress" | "complete";
+    execute: (data: TData, ctx: GoapContext) => GoapActionExecutionResult;
 
     /**
      * Optional delay in milliseconds to wait after action completes.

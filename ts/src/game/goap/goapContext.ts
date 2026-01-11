@@ -6,7 +6,7 @@ import type { Entity } from "../entity/entity.ts";
  */
 export type GoapContext = {
     /** The entity ID of the agent performing the action */
-    agentId: string;
+    agent: Entity;
     /** The root entity for querying components and game state */
     root: Entity;
     /** Current game tick (milliseconds) */
@@ -14,13 +14,13 @@ export type GoapContext = {
 };
 
 export function createGoapContext(
-    entityId: string,
+    agent: Entity,
     root: Entity,
     tick: number,
 ): GoapContext {
     return {
-        agentId: entityId,
-        root: root,
-        tick: tick,
+        agent,
+        root,
+        tick,
     };
 }

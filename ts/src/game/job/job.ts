@@ -1,3 +1,4 @@
+import type { Point } from "../../common/point.ts";
 import { JobRunnerComponentId } from "../component/jobRunnerComponent.ts";
 import type { Entity } from "../entity/entity.ts";
 import type { AttackJob } from "./attackJob.ts";
@@ -54,3 +55,5 @@ export function isTargetOfJob(job: Jobs, entity: Entity): boolean {
             return false;
     }
 }
+
+export function endPosition(job: Jobs): Point {}
