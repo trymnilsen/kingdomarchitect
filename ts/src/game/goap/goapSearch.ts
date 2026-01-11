@@ -109,10 +109,7 @@ function stateHash(state: GoapWorldState): string {
  * Future improvement: Goals could provide domain-specific heuristics
  * that estimate "distance" to goal satisfaction.
  */
-function heuristic(
-    _state: GoapWorldState,
-    _goal: GoapGoalDefinition,
-): number {
+function heuristic(_state: GoapWorldState, _goal: GoapGoalDefinition): number {
     // Return 0 to make A* behave like uniform-cost search
     // This guarantees optimal solutions at the cost of exploring more nodes
     return 0;
@@ -245,7 +242,7 @@ export function aStarSearch(
     // No plan found after exploring all reachable states
     if (nodesExplored >= maxNodes) {
         console.warn(
-            `GOAP planning hit node limit (${maxNodes}) for goal "${goal.id}" (agent: ${ctx.agentId})`,
+            `GOAP planning hit node limit (${maxNodes}) for goal "${goal.id}" (agent: ${ctx.agent.id})`,
         );
     }
 

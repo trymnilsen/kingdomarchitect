@@ -38,7 +38,7 @@ describe("BeProductive Goal", () => {
         const planner = createUnitPlanner();
         const goal = planner.getGoal("be_productive");
 
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         assert.strictEqual(goal?.isValid(ctx), true);
     });
 
@@ -48,7 +48,7 @@ describe("BeProductive Goal", () => {
 
         // Set agent as having claimed a job
         const goapAgent = agent.requireEcsComponent(GoapAgentComponentId);
-        goapAgent.claimedJob = "0";
+        goapAgent.claimedJob = 0;
 
         // Add job queue with claimed job
         const jobQueue = createJobQueueComponent();
@@ -63,7 +63,7 @@ describe("BeProductive Goal", () => {
         const planner = createUnitPlanner();
         const goal = planner.getGoal("be_productive");
 
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         assert.strictEqual(goal?.isValid(ctx), true);
     });
 
@@ -77,7 +77,7 @@ describe("BeProductive Goal", () => {
         const planner = createUnitPlanner();
         const goal = planner.getGoal("be_productive");
 
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         assert.strictEqual(goal?.isValid(ctx), false);
     });
 
@@ -98,7 +98,7 @@ describe("BeProductive Goal", () => {
         const planner = createUnitPlanner();
         const goal = planner.getGoal("be_productive");
 
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         assert.strictEqual(goal?.isValid(ctx), false);
     });
 
@@ -109,7 +109,7 @@ describe("BeProductive Goal", () => {
         const planner = createUnitPlanner();
         const goal = planner.getGoal("be_productive");
 
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
 
         // Goal is never satisfied - it's either valid (work to do) or invalid (no work)
         assert.strictEqual(goal?.isSatisfied(ctx), false);
@@ -122,7 +122,7 @@ describe("BeProductive Goal", () => {
         const planner = createUnitPlanner();
         const goal = planner.getGoal("be_productive");
 
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
 
         // State with claimed job - still have work to do
         const state = new Map<string, string>();
@@ -137,7 +137,7 @@ describe("BeProductive Goal", () => {
         const planner = createUnitPlanner();
         const goal = planner.getGoal("be_productive");
 
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
 
         // State with completed job marker
         const state = new Map<string, string>();
@@ -152,7 +152,7 @@ describe("BeProductive Goal", () => {
         const planner = createUnitPlanner();
         const goal = planner.getGoal("be_productive");
 
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
 
         // State with no claimed job - haven't started work yet
         const state = new Map<string, string>();

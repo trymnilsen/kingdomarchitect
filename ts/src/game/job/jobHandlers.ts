@@ -23,7 +23,7 @@ export const jobHandlers: JobHandlerMap = {
     buildBuildingJob: buildBuildingHandler,
     attackJob: attackHandler,
     collectItem: collectItemHandler,
-    chopTreeJob: collectResourceHandler,
+    collectResource: collectResourceHandler,
 } as const;
 
 /**

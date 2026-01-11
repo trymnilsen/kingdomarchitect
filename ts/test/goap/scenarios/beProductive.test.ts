@@ -166,7 +166,7 @@ describe("beProductive system integration", () => {
         goapAgent = agent.requireEcsComponent(GoapAgentComponentId);
 
         // Debug: Check what the planner sees
-        const ctx = { agentId: agent.id, root: root, tick };
+        const ctx = { agent: agent, root: root, tick };
         const stayFedGoal = planner.getGoal("stay_fed");
         if (stayFedGoal) {
             const isValid = stayFedGoal.isValid(ctx);

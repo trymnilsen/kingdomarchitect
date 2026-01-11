@@ -28,7 +28,7 @@ describe("PickHarvestJob", () => {
             const entity = new Entity("berry-1");
             const job = CollectResourceJob(entity, ResourceHarvestMode.Pick);
 
-            assert.strictEqual(job.id, "chopTreeJob");
+            assert.strictEqual(job.id, "collectResource");
             assert.strictEqual(job.entityId, "berry-1");
             assert.strictEqual(job.harvestAction, ResourceHarvestMode.Pick);
             assert.strictEqual(job.workProgress, 0);

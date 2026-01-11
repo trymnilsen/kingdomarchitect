@@ -19,7 +19,7 @@ describe("Idle Goal", () => {
         const planner = createUnitPlanner();
         const goal = planner.getGoal("idle");
 
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         assert.strictEqual(goal?.isValid(ctx), true);
     });
 
@@ -41,7 +41,7 @@ describe("Idle Goal", () => {
         const goal = planner.getGoal("idle");
 
         // Check at tick 3000 (2 seconds after start)
-        const ctx = { agentId: agent.id, root, tick: 3000 };
+        const ctx = { agent: agent, root, tick: 3000 };
         assert.strictEqual(goal?.isSatisfied(ctx), true);
     });
 
@@ -63,7 +63,7 @@ describe("Idle Goal", () => {
         const goal = planner.getGoal("idle");
 
         // Check at tick 7000 (6 seconds after start)
-        const ctx = { agentId: agent.id, root, tick: 7000 };
+        const ctx = { agent: agent, root, tick: 7000 };
         assert.strictEqual(goal?.isSatisfied(ctx), false);
     });
 
@@ -74,7 +74,7 @@ describe("Idle Goal", () => {
         const planner = createUnitPlanner();
         const goal = planner.getGoal("idle");
 
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         assert.strictEqual(goal?.isSatisfied(ctx), false);
     });
 });

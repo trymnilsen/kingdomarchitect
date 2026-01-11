@@ -16,7 +16,7 @@ describe("Eat Food Action", () => {
         const planner = createUnitPlanner();
         const action = planner.getAction("eat_food");
 
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         const state = getUnitWorldState(ctx);
         assert.strictEqual(action?.preconditions(state, ctx), false);
     });
@@ -28,7 +28,7 @@ describe("Eat Food Action", () => {
         const planner = createUnitPlanner();
         const action = planner.getAction("eat_food");
 
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         const state = getUnitWorldState(ctx);
         assert.strictEqual(action?.preconditions(state, ctx), false);
     });
@@ -40,7 +40,7 @@ describe("Eat Food Action", () => {
         const planner = createUnitPlanner();
         const action = planner.getAction("eat_food");
 
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         const state = getUnitWorldState(ctx);
         assert.strictEqual(action?.preconditions(state, ctx), true);
     });
@@ -53,7 +53,7 @@ describe("Eat Food Action", () => {
         const action = planner.getAction("eat_food");
         assert.ok(action, "eat_food action should exist");
 
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         const executionData = action.createExecutionData(ctx);
         (action.execute as any)(executionData, ctx);
 
@@ -69,7 +69,7 @@ describe("Eat Food Action", () => {
         const action = planner.getAction("eat_food");
         assert.ok(action, "eat_food action should exist");
 
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         const executionData = action.createExecutionData(ctx);
         (action.execute as any)(executionData, ctx);
 

@@ -17,21 +17,22 @@ export const idleGoal: GoapGoalDefinition = {
     isSatisfied: (ctx) => {
         // Check if we've idled recently in the real world
         // This matches the planning-time check in wouldBeSatisfiedBy
-        const agent = entityWithId(ctx.root, ctx.agentId);
-        if (!agent) {
+        if (!ctx.agent) {
             return false;
         }
 
-        const goapAgent = agent.getEcsComponent(GoapAgentComponentId);
+        const goapAgent = ctx.agent.getEcsComponent(GoapAgentComponentId);
         if (!goapAgent) {
             return false;
         }
 
         // If we're currently executing an idle action, check how long we've been doing it
-        const timeSinceActionStart = ctx.tick - goapAgent.currentActionStartTick;
+        const timeSinceActionStart =
+            ctx.tick - goapAgent.currentActionStartTick;
         const isCurrentlyIdle =
             goapAgent.currentPlan?.goalId === "idle" &&
-            goapAgent.currentStepIndex < (goapAgent.currentPlan?.steps.length || 0);
+            goapAgent.currentStepIndex <
+                (goapAgent.currentPlan?.steps.length || 0);
 
         if (isCurrentlyIdle) {
             // Still satisfied if we've been idling for less than 5 seconds

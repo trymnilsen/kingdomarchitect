@@ -18,7 +18,7 @@ describe("Stay Fed Goal", () => {
         const planner = createUnitPlanner();
         const goal = planner.getGoal("stay_fed");
 
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         assert.strictEqual(goal?.isValid(ctx), true);
     });
 
@@ -29,7 +29,7 @@ describe("Stay Fed Goal", () => {
         const planner = createUnitPlanner();
         const goal = planner.getGoal("stay_fed");
 
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         assert.strictEqual(goal?.isValid(ctx), false);
     });
 
@@ -40,7 +40,7 @@ describe("Stay Fed Goal", () => {
         const planner = createUnitPlanner();
         const goal = planner.getGoal("stay_fed");
 
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         assert.strictEqual(goal?.isSatisfied(ctx), true);
     });
 
@@ -51,7 +51,7 @@ describe("Stay Fed Goal", () => {
         const planner = createUnitPlanner();
         const goal = planner.getGoal("stay_fed");
 
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         assert.strictEqual(goal?.isSatisfied(ctx), false);
     });
 

@@ -22,7 +22,7 @@ describe("MineStoneJob", () => {
             const entity = new Entity("stone-1");
             const job = CollectResourceJob(entity, ResourceHarvestMode.Mine);
 
-            assert.strictEqual(job.id, "chopTreeJob");
+            assert.strictEqual(job.id, "collectResource");
             assert.strictEqual(job.entityId, "stone-1");
             assert.strictEqual(job.harvestAction, ResourceHarvestMode.Mine);
             assert.strictEqual(job.workProgress, 0);

@@ -76,12 +76,7 @@ export const eatFoodAction: GoapActionDefinition<EatFoodActionData> = {
     },
 
     createExecutionData: (ctx) => {
-        const agent = entityWithId(ctx.root, ctx.agentId);
-        if (!agent) {
-            throw new Error("Agent not found");
-        }
-
-        const inventory = agent.getEcsComponent(InventoryComponentId);
+        const inventory = ctx.agent.getEcsComponent(InventoryComponentId);
         if (!inventory) {
             throw new Error("No inventory component");
         }
@@ -103,20 +98,8 @@ export const eatFoodAction: GoapActionDefinition<EatFoodActionData> = {
     },
 
     execute: (data, ctx) => {
-        const agent = entityWithId(ctx.root, ctx.agentId);
-        if (!agent) {
-            throw new Error("Agent not found during execution");
-        }
-
-        const inventory = agent.getEcsComponent(InventoryComponentId);
-        if (!inventory) {
-            throw new Error("No inventory component during execution");
-        }
-
-        const hunger = agent.getEcsComponent(HungerComponentId);
-        if (!hunger) {
-            throw new Error("No hunger component during execution");
-        }
+        const inventory = ctx.agent.requireEcsComponent(InventoryComponentId);
+        const hunger = ctx.agent.requireEcsComponent(HungerComponentId);
 
         // Check if we already consumed the food by checking inventory
         const foodStack = inventory.items.find(
@@ -135,12 +118,12 @@ export const eatFoodAction: GoapActionDefinition<EatFoodActionData> = {
             decreaseHunger(hunger, data.amountToRestore);
 
             // Invalidate components to trigger replication
-            agent.invalidateComponent(InventoryComponentId);
-            agent.invalidateComponent(HungerComponentId);
+            ctx.agent.invalidateComponent(InventoryComponentId);
+            ctx.agent.invalidateComponent(HungerComponentId);
 
             // TODO: Trigger eating animation via animation system
             console.log(
-                `Agent ${ctx.agentId} ate ${data.foodName}. Hunger: ${hunger.hunger}`,
+                `Agent ${ctx.agent.id} ate ${data.foodName}. Hunger: ${hunger.hunger}`,
             );
         }
 

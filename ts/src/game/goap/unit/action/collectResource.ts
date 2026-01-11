@@ -8,14 +8,9 @@ import {
     addInventoryItem,
     InventoryComponentId,
 } from "../../../component/inventoryComponent.ts";
-import {
-    getJobById,
-    JobQueueComponentId,
-    type JobQueueComponent,
-} from "../../../component/jobQueueComponent.ts";
+import { JobQueueComponentId } from "../../../component/jobQueueComponent.ts";
 import { ResourceComponentId } from "../../../component/resourceComponent.ts";
 import { RegrowComponentId } from "../../../component/regrowComponent.ts";
-import { entityWithId } from "../../../entity/child/withId.ts";
 import {
     getResourceById,
     ResourceHarvestMode,
@@ -31,7 +26,7 @@ import type {
 import { createWorldState, getState, setState } from "../../goapWorldState.ts";
 import type { GoapContext } from "../../goapContext.ts";
 import { unclaimJob } from "../../goapJob.ts";
-import type { Jobs } from "../../../job/job.ts";
+import { doMovement, MovementResult } from "../../../job/movementHelper.ts";
 
 /**
  * Execution data for collecting a resource.
@@ -84,16 +79,19 @@ export const collectResourceAction: GoapActionDefinition<CollectResourceActionDa
             return effects;
         },
 
-        createExecutionData: () => {
-            // During planning, we don't know the actual claimed job yet.
-            // The execute method will read it from the agent when it runs.
+        createExecutionData: (ctx) => {
+            // Read the claimed job from the agent's state
+            const goapAgent =
+                ctx.agent.requireEcsComponent(GoapAgentComponentId);
+            const jobIndex = goapAgent.claimedJob ?? 0;
             return {
-                jobIndex: 0, // Placeholder
+                jobIndex,
             };
         },
 
         execute: (data, ctx) => {
             return movementExecutor(
+                data,
                 ctx,
                 jobPosition(data, ctx),
                 collectResourceExecutor,
@@ -103,20 +101,78 @@ export const collectResourceAction: GoapActionDefinition<CollectResourceActionDa
         postActionDelay: () => 1000, // 1 second between harvest actions
     };
 
+/**
+ * Creates a function that returns the position of the job's target entity.
+ * This abstracts away the logic of finding the claimed job and getting its target position.
+ * Returns null if the job or resource is invalid/missing.
+ */
 function jobPosition(
     data: CollectResourceActionData,
     ctx: GoapContext,
-): () => Point {
-    throw new Error("implement");
+): () => Point | null {
+    return () => {
+        const jobQueue = ctx.root.requireEcsComponent(JobQueueComponentId);
+        const job = jobQueue.jobs[data.jobIndex] as CollectResourceJob;
+        if (!job) {
+            return null;
+        }
+
+        if (!job.entityId) {
+            return null;
+        }
+
+        const resourceEntity = ctx.root.findEntity(job.entityId);
+        if (!resourceEntity) {
+            return null;
+        }
+        return resourceEntity.worldPosition;
+    };
 }
 
-//TODO move to a common place when finished
+/**
+ * Movement executor wrapper that handles adjacency checking and movement.
+ * If the agent is adjacent to the target, it calls through to the actual executor.
+ * Otherwise, it attempts to move closer to the target.
+ *
+ * If target position is null, skips movement and calls the executor directly.
+ * This allows the executor to handle the error with appropriate context.
+ */
 function movementExecutor<T>(
-    context: GoapContext,
-    target: () => Point,
+    data: T,
+    ctx: GoapContext,
+    target: () => Point | null,
     executor: (data: T, ctx: GoapContext) => GoapActionExecutionResult,
 ): GoapActionExecutionResult {
-    throw new Error("implement");
+    const targetPosition = target();
+
+    // If target position is null, skip movement and let executor handle the error
+    // This allows for better error messages with context about what went wrong
+    if (!targetPosition) {
+        return executor(data, ctx);
+    }
+
+    const agentPosition = ctx.agent.worldPosition;
+
+    // Check if we're adjacent to the target
+    if (checkAdjacency(targetPosition, agentPosition) === null) {
+        // Not adjacent, move towards the target
+        const movement = doMovement(ctx.agent, targetPosition);
+        if (movement === MovementResult.Failure) {
+            console.log(
+                `Failed to move to target at ${targetPosition.x},${targetPosition.y}`,
+            );
+            // Clear the claimed job since we can't reach it
+            const agentComponent =
+                ctx.agent.requireEcsComponent(GoapAgentComponentId);
+            agentComponent.claimedJob = undefined;
+            ctx.agent.invalidateComponent(GoapAgentComponentId);
+            return "complete";
+        }
+        return "in_progress";
+    }
+
+    // Adjacent to the target, execute the actual action
+    return executor(data, ctx);
 }
 
 function collectResourceExecutor(
@@ -152,6 +208,21 @@ function collectResourceExecutor(
         return "complete";
     }
 
+    // Verify adjacency - agent must be next to the resource to harvest it
+    const adjacentDirection = checkAdjacency(
+        resourceEntity.worldPosition,
+        ctx.agent.worldPosition,
+    );
+    if (adjacentDirection === null) {
+        console.error(
+            `Agent ${ctx.agent.id} attempted to harvest resource ${job.entityId} but is not adjacent`,
+        );
+        // This should not happen if movement executor is working correctly
+        // Clear the job and let the agent re-plan
+        unclaimJob(ctx.agent, jobIndex);
+        return "complete";
+    }
+
     // Get resource definition
     const resource = getResourceById(resourceComponent.resourceId);
     if (!resource) {
@@ -162,7 +233,7 @@ function collectResourceExecutor(
         return "complete";
     }
 
-    // Adjacent to the resource, perform harvest action
+    // Perform harvest action
     const workDuration = resource.workDuration ?? 1;
 
     // Initialize work progress if not set

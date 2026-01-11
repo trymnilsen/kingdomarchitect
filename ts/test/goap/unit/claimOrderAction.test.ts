@@ -15,11 +15,7 @@ import { GoapAgentComponentId } from "../../../src/game/component/goapAgentCompo
 import { BuildBuildingJob } from "../../../src/game/job/buildBuildingJob.ts";
 import { AttackJob } from "../../../src/game/job/attackJob.ts";
 
-function createTestAgentAtPosition(
-    root: Entity,
-    x: number,
-    y: number,
-): Entity {
+function createTestAgentAtPosition(root: Entity, x: number, y: number): Entity {
     const agent = new Entity("agent");
     agent.worldPosition = { x, y };
     agent.setEcsComponent(createGoapAgentComponent());
@@ -35,7 +31,7 @@ describe("ClaimOrder Action Generator", () => {
         // Add empty job queue
         root.setEcsComponent(createJobQueueComponent());
 
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         const actions = generateClaimOrderActions(ctx);
 
         assert.strictEqual(actions.length, 0);
@@ -69,7 +65,7 @@ describe("ClaimOrder Action Generator", () => {
         );
         root.setEcsComponent(jobQueue);
 
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         const actions = generateClaimOrderActions(ctx);
 
         assert.strictEqual(actions.length, 3);
@@ -101,7 +97,7 @@ describe("ClaimOrder Action Generator", () => {
         );
         root.setEcsComponent(jobQueue);
 
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         const actions = generateClaimOrderActions(ctx);
 
         assert.strictEqual(actions.length, 1);
@@ -127,7 +123,7 @@ describe("ClaimOrder Action Generator", () => {
         jobQueue.jobs.push(job);
         root.setEcsComponent(jobQueue);
 
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         const actions = generateClaimOrderActions(ctx);
 
         // Should generate no actions because job is constrained to other-agent
@@ -149,7 +145,7 @@ describe("ClaimOrder Action Generator", () => {
         jobQueue.jobs.push(job);
         root.setEcsComponent(jobQueue);
 
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         const actions = generateClaimOrderActions(ctx);
 
         // Should generate action because job is constrained to this agent
@@ -182,7 +178,7 @@ describe("ClaimOrder Action Generator", () => {
         );
         root.setEcsComponent(jobQueue);
 
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         const actions = generateClaimOrderActions(ctx);
 
         assert.strictEqual(actions.length, 2);
@@ -210,7 +206,7 @@ describe("ClaimOrder Action Generator", () => {
         );
         root.setEcsComponent(jobQueue);
 
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         const actions = generateClaimOrderActions(ctx);
 
         // Execute the claim action
@@ -221,7 +217,7 @@ describe("ClaimOrder Action Generator", () => {
         assert.strictEqual(result, "complete");
 
         const goapAgent = agent.getEcsComponent(GoapAgentComponentId);
-        assert.strictEqual(goapAgent?.claimedJob, "0");
+        assert.strictEqual(goapAgent?.claimedJob, 0);
     });
 
     it("claim action marks job as claimed", () => {
@@ -239,7 +235,7 @@ describe("ClaimOrder Action Generator", () => {
         );
         root.setEcsComponent(jobQueue);
 
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         const actions = generateClaimOrderActions(ctx);
 
         // Execute the claim action
@@ -266,7 +262,7 @@ describe("ClaimOrder Action Generator", () => {
         );
         root.setEcsComponent(jobQueue);
 
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         const actions = generateClaimOrderActions(ctx);
 
         const claimAction = actions[0];
@@ -299,7 +295,7 @@ describe("ClaimOrder Action Generator", () => {
         );
         root.setEcsComponent(jobQueue);
 
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         const actions = generateClaimOrderActions(ctx);
 
         const claimAction = actions[0];
@@ -323,11 +319,11 @@ describe("ClaimOrder Action Generator", () => {
         );
         root.setEcsComponent(jobQueue);
 
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         const actions = generateClaimOrderActions(ctx);
 
         assert.strictEqual(actions.length, 1);
-        assert.ok(actions[0].name.includes("chopTreeJob"));
+        assert.ok(actions[0].name.includes("collectResource"));
     });
 
     it("handles job types correctly - BuildBuilding", () => {
@@ -342,7 +338,7 @@ describe("ClaimOrder Action Generator", () => {
         jobQueue.jobs.push(BuildBuildingJob(building));
         root.setEcsComponent(jobQueue);
 
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         const actions = generateClaimOrderActions(ctx);
 
         assert.strictEqual(actions.length, 1);

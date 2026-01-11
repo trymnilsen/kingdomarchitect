@@ -36,7 +36,7 @@ export function CollectResourceJob(
     };
 }
 
-export const CollectResourceJobId = "chopTreeJob";
+export const CollectResourceJobId = "collectResource";
 
 export const collectResourceHandler: JobHandler<CollectResourceJob> = (
     _scene,

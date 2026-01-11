@@ -22,7 +22,7 @@ describe("GoapSearch (A* Algorithm)", () => {
         const root = new Entity("root");
         root.toggleIsGameRoot(true);
         return {
-            agentId: "test-agent",
+            agent: new Entity("test-agent"),
             root: root,
             tick: 1000,
         };
@@ -281,8 +281,7 @@ describe("GoapSearch (A* Algorithm)", () => {
             id: "impossible",
             name: "Impossible",
             getCost: () => 1,
-            preconditions: (state) =>
-                getState(state, "impossible") === "true",
+            preconditions: (state) => getState(state, "impossible") === "true",
             getEffects: () => {
                 const effects = createWorldState();
                 setState(effects, "goal", true);
@@ -294,7 +293,12 @@ describe("GoapSearch (A* Algorithm)", () => {
         };
 
         const getCurrentState = () => createWorldState();
-        const plan = aStarSearch(ctx, goal, [impossibleAction], getCurrentState);
+        const plan = aStarSearch(
+            ctx,
+            goal,
+            [impossibleAction],
+            getCurrentState,
+        );
 
         assert.strictEqual(plan, null);
     });
@@ -375,7 +379,13 @@ describe("GoapSearch (A* Algorithm)", () => {
         };
 
         const getCurrentState = () => createWorldState();
-        const plan = aStarSearch(ctx, goal, [toggleAction], getCurrentState, 100);
+        const plan = aStarSearch(
+            ctx,
+            goal,
+            [toggleAction],
+            getCurrentState,
+            100,
+        );
 
         // Should give up after exploring 100 nodes without finding solution
         assert.strictEqual(plan, null);
@@ -507,10 +517,12 @@ describe("GoapSearch (A* Algorithm)", () => {
         assert.strictEqual(plan!.totalCost, 4);
 
         // Count how many of each action
-        const incACount = plan!.steps.filter((s) => s.actionId === "inc-a")
-            .length;
-        const incBCount = plan!.steps.filter((s) => s.actionId === "inc-b")
-            .length;
+        const incACount = plan!.steps.filter(
+            (s) => s.actionId === "inc-a",
+        ).length;
+        const incBCount = plan!.steps.filter(
+            (s) => s.actionId === "inc-b",
+        ).length;
 
         assert.strictEqual(incACount, 2);
         assert.strictEqual(incBCount, 2);
@@ -531,8 +543,7 @@ describe("GoapSearch (A* Algorithm)", () => {
             priority: () => 10,
             isValid: () => true,
             isSatisfied: () => false,
-            wouldBeSatisfiedBy: (state) =>
-                getState(state, "final") === "true",
+            wouldBeSatisfiedBy: (state) => getState(state, "final") === "true",
         };
 
         // Path A: set flag1, then converge to final

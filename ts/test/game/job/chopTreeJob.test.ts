@@ -20,13 +20,13 @@ import {
 import type { Point } from "../../../src/common/point.ts";
 import { JobTestHarness } from "./jobTestHarness.ts";
 
-describe("ChopTreeJob", () => {
+describe("collectResource", () => {
     describe("Job Creation", () => {
         it("creates a job with correct entity id", () => {
             const entity = new Entity("tree-1");
             const job = CollectResourceJob(entity, ResourceHarvestMode.Chop);
 
-            assert.strictEqual(job.id, "chopTreeJob");
+            assert.strictEqual(job.id, "collectResource");
             assert.strictEqual(job.entityId, "tree-1");
             assert.strictEqual(job.harvestAction, ResourceHarvestMode.Chop);
             assert.strictEqual(job.workProgress, 0);

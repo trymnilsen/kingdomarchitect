@@ -1,7 +1,6 @@
 import { distance } from "../../../../common/point.ts";
 import { GoapAgentComponentId } from "../../../component/goapAgentComponent.ts";
 import { JobQueueComponentId } from "../../../component/jobQueueComponent.ts";
-import { entityWithId } from "../../../entity/child/withId.ts";
 import type { Jobs } from "../../../job/job.ts";
 import type { GoapActionDefinition } from "../../goapAction.ts";
 import type { GoapContext } from "../../goapContext.ts";
@@ -35,11 +34,6 @@ export function generateClaimOrderActions(
         return [];
     }
 
-    const agent = entityWithId(ctx.root, ctx.agentId);
-    if (!agent) {
-        return [];
-    }
-
     const actions: GoapActionDefinition<ClaimOrderActionData>[] = [];
 
     // Generate one action per unclaimed job
@@ -55,7 +49,7 @@ export function generateClaimOrderActions(
         if (
             job.constraint &&
             job.constraint.type === "entity" &&
-            job.constraint.id !== ctx.agentId
+            job.constraint.id !== ctx.agent.id
         ) {
             continue;
         }
@@ -68,7 +62,7 @@ export function generateClaimOrderActions(
 
         // Calculate cost: base cost + distance + queue position
         const baseCost = 10;
-        const distanceCost = distance(agent.worldPosition, targetPosition);
+        const distanceCost = distance(ctx.agent.worldPosition, targetPosition);
         const queuePositionCost = i; // Earlier jobs are cheaper
         const totalCost = baseCost + distanceCost + queuePositionCost;
 
@@ -87,7 +81,7 @@ function getJobTargetPosition(
     job: Jobs,
 ): { x: number; y: number } | null {
     switch (job.id) {
-        case "chopTreeJob":
+        case "collectResource":
         case "collectItem":
         case "buildBuildingJob": {
             const entity = ctx.root.findEntity(job.entityId);
@@ -139,12 +133,7 @@ function createClaimOrderAction(
         }),
 
         execute: (data, ctx) => {
-            const agent = entityWithId(ctx.root, ctx.agentId);
-            if (!agent) {
-                throw new Error("Agent not found during claim execution");
-            }
-
-            const goapAgent = agent.getEcsComponent(GoapAgentComponentId);
+            const goapAgent = ctx.agent.getEcsComponent(GoapAgentComponentId);
             if (!goapAgent) {
                 throw new Error(
                     "No GOAP agent component during claim execution",
@@ -174,15 +163,15 @@ function createClaimOrderAction(
             }
 
             // Claim the job
-            goapAgent.claimedJob = `${data.jobIndex}`;
-            currentJob.claimedBy = ctx.agentId;
+            goapAgent.claimedJob = data.jobIndex;
+            currentJob.claimedBy = ctx.agent.id;
 
             // Invalidate components
-            agent.invalidateComponent(GoapAgentComponentId);
+            ctx.agent.invalidateComponent(GoapAgentComponentId);
             scene.invalidateComponent(JobQueueComponentId);
 
             console.log(
-                `Agent ${ctx.agentId} claimed job ${data.jobIndex} (${data.job.id})`,
+                `Agent ${ctx.agent.id} claimed job ${data.jobIndex} (${data.job.id})`,
             );
 
             return "complete";

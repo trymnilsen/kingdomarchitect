@@ -47,7 +47,7 @@ export function isTargetOfJob(job: Jobs, entity: Entity): boolean {
             return job.target == entity.id;
         case "buildBuildingJob":
             return job.entityId == entity.id;
-        case "chopTreeJob":
+        case "collectResource":
             return job.entityId == entity.id;
         case "collectItem":
             return job.entityId == entity.id;
@@ -55,5 +55,3 @@ export function isTargetOfJob(job: Jobs, entity: Entity): boolean {
             return false;
     }
 }
-
-export function endPosition(job: Jobs): Point {}

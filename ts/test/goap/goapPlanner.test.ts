@@ -20,7 +20,7 @@ describe("GoapPlanner", () => {
         const root = new Entity("root");
         root.toggleIsGameRoot(true);
         return {
-            agentId: "test-agent",
+            agent: new Entity("test-agent"),
             root: root,
             tick: 1000,
         };

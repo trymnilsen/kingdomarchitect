@@ -22,11 +22,10 @@ export const stayFedGoal: GoapGoalDefinition = {
      * but will stop to eat when hunger becomes critical.
      */
     priority: (ctx) => {
-        const agent = entityWithId(ctx.root, ctx.agentId);
-        if (!agent) {
+        if (!ctx.agent) {
             return 0;
         }
-        const hunger = agent.getEcsComponent(HungerComponentId);
+        const hunger = ctx.agent.getEcsComponent(HungerComponentId);
         if (!hunger) {
             return 0;
         }
@@ -45,11 +44,10 @@ export const stayFedGoal: GoapGoalDefinition = {
     },
 
     isValid: (ctx) => {
-        const agent = entityWithId(ctx.root, ctx.agentId);
-        if (!agent) {
+        if (!ctx.agent) {
             return false;
         }
-        const hunger = agent.getEcsComponent(HungerComponentId);
+        const hunger = ctx.agent.getEcsComponent(HungerComponentId);
         if (!hunger) {
             return false;
         }
@@ -58,11 +56,10 @@ export const stayFedGoal: GoapGoalDefinition = {
     },
 
     isSatisfied: (ctx) => {
-        const agent = entityWithId(ctx.root, ctx.agentId);
-        if (!agent) {
+        if (!ctx.agent) {
             return true;
         }
-        const hunger = agent.getEcsComponent(HungerComponentId);
+        const hunger = ctx.agent.getEcsComponent(HungerComponentId);
         if (!hunger) {
             return true; // No hunger component = no need to eat
         }

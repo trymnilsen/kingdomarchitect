@@ -17,7 +17,7 @@ describe("Unit World State Extraction", () => {
         const root = createTestRoot();
         const agent = createTestAgent(root, 75, 0);
 
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         const state = getUnitWorldState(ctx);
 
         assert.strictEqual(getState(state, "hunger"), "75");
@@ -27,7 +27,7 @@ describe("Unit World State Extraction", () => {
         const root = createTestRoot();
         const agent = createTestAgent(root, 50, 3);
 
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         const state = getUnitWorldState(ctx);
 
         assert.strictEqual(getState(state, "hasFood"), "true");
@@ -37,7 +37,7 @@ describe("Unit World State Extraction", () => {
         const root = createTestRoot();
         const agent = createTestAgent(root, 50, 0);
 
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         const state = getUnitWorldState(ctx);
 
         assert.strictEqual(getState(state, "hasFood"), "false");
@@ -56,7 +56,7 @@ describe("Unit World State Extraction", () => {
         };
         goapAgent.currentActionStartTick = 5000;
 
-        const ctx = { agentId: agent.id, root, tick: 6000 };
+        const ctx = { agent: agent, root, tick: 6000 };
         const state = getUnitWorldState(ctx);
 
         assert.strictEqual(getState(state, "lastIdleTime"), "5000");
@@ -66,18 +66,9 @@ describe("Unit World State Extraction", () => {
         const root = createTestRoot();
         const agent = createTestAgent(root, 50, 2);
 
-        const ctx = { agentId: agent.id, root, tick: 1000 };
+        const ctx = { agent: agent, root, tick: 1000 };
         const state = getUnitWorldState(ctx);
 
         assert.strictEqual(getState(state, "lastIdleTime"), "0");
-    });
-
-    it("returns empty state when agent doesn't exist", () => {
-        const root = createTestRoot();
-
-        const ctx = { agentId: "missing-agent", root, tick: 0 };
-        const state = getUnitWorldState(ctx);
-
-        assert.strictEqual(state.size, 0);
     });
 });

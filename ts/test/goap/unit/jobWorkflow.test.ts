@@ -22,11 +22,7 @@ import {
 } from "../../../src/game/component/healthComponent.ts";
 import { createInventoryComponent } from "../../../src/game/component/inventoryComponent.ts";
 
-function createTestAgentAtPosition(
-    root: Entity,
-    x: number,
-    y: number,
-): Entity {
+function createTestAgentAtPosition(root: Entity, x: number, y: number): Entity {
     const agent = new Entity("agent");
     agent.worldPosition = { x, y };
     agent.setEcsComponent(createGoapAgentComponent());
@@ -63,7 +59,7 @@ describe("Job Workflow Integration", () => {
         root.setEcsComponent(jobQueue);
 
         const planner = createUnitPlanner();
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         const plan = planner.plan(ctx);
 
         assert.ok(plan !== null, "Should create a plan");
@@ -88,7 +84,7 @@ describe("Job Workflow Integration", () => {
         root.setEcsComponent(jobQueue);
 
         const planner = createUnitPlanner();
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         const plan = planner.plan(ctx);
 
         assert.ok(plan !== null, "Should create a plan");
@@ -116,7 +112,7 @@ describe("Job Workflow Integration", () => {
         root.setEcsComponent(jobQueue);
 
         const planner = createUnitPlanner();
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         const plan = planner.plan(ctx);
 
         assert.ok(plan !== null, "Should create a plan");
@@ -131,7 +127,7 @@ describe("Job Workflow Integration", () => {
 
         // Set agent as having claimed a job
         const goapAgent = agent.requireEcsComponent(GoapAgentComponentId);
-        goapAgent.claimedJob = "0";
+        goapAgent.claimedJob = 0;
 
         // Add job queue
         const jobQueue = createJobQueueComponent();
@@ -141,7 +137,7 @@ describe("Job Workflow Integration", () => {
         root.setEcsComponent(jobQueue);
 
         const planner = createUnitPlanner();
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         const plan = planner.plan(ctx);
 
         assert.ok(plan !== null, "Should create a plan");
@@ -162,7 +158,7 @@ describe("Job Workflow Integration", () => {
         root.setEcsComponent(jobQueue);
 
         const planner = createUnitPlanner();
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         const plan = planner.plan(ctx);
 
         assert.ok(plan !== null);
@@ -172,12 +168,15 @@ describe("Job Workflow Integration", () => {
         const claimAction = planner.getAction(claimStep.actionId);
         assert.ok(claimAction !== null);
 
-        const result = (claimAction.execute as any)(claimStep.executionData, ctx);
+        const result = (claimAction.execute as any)(
+            claimStep.executionData,
+            ctx,
+        );
 
         assert.strictEqual(result, "complete");
 
         const goapAgent = agent.getEcsComponent(GoapAgentComponentId);
-        assert.strictEqual(goapAgent?.claimedJob, "0");
+        assert.strictEqual(goapAgent?.claimedJob, 0);
 
         const job = jobQueue.jobs[0] as any;
         assert.strictEqual(job.claimedBy, agent.id);
@@ -196,7 +195,7 @@ describe("Job Workflow Integration", () => {
         root.setEcsComponent(jobQueue);
 
         const planner = createUnitPlanner();
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         const plan = planner.plan(ctx);
 
         assert.ok(plan !== null);
@@ -212,7 +211,7 @@ describe("Job Workflow Integration", () => {
         root.setEcsComponent(createJobQueueComponent());
 
         const planner = createUnitPlanner();
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         const plan = planner.plan(ctx);
 
         assert.ok(plan !== null);
@@ -233,7 +232,7 @@ describe("Job Workflow Integration", () => {
         root.setEcsComponent(jobQueue);
 
         const planner = createUnitPlanner();
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
 
         // First plan - should have one claim action
         const plan1 = planner.plan(ctx);
@@ -282,7 +281,7 @@ describe("Job Workflow Integration", () => {
         root.setEcsComponent(jobQueue);
 
         const planner = createUnitPlanner();
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         const plan = planner.plan(ctx);
 
         assert.ok(plan !== null);
@@ -307,7 +306,7 @@ describe("Job Workflow Integration", () => {
         root.setEcsComponent(jobQueue);
 
         const planner = createUnitPlanner();
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
 
         // Step 1: Plan
         const plan = planner.plan(ctx);
@@ -319,11 +318,14 @@ describe("Job Workflow Integration", () => {
         const claimAction = planner.getAction(claimStep.actionId);
         assert.ok(claimAction !== null);
 
-        const claimResult = (claimAction.execute as any)(claimStep.executionData, ctx);
+        const claimResult = (claimAction.execute as any)(
+            claimStep.executionData,
+            ctx,
+        );
         assert.strictEqual(claimResult, "complete");
 
         const goapAgent = agent.requireEcsComponent(GoapAgentComponentId);
-        assert.strictEqual(goapAgent.claimedJob, "0");
+        assert.strictEqual(goapAgent.claimedJob, 0);
 
         // Step 3: Execute collect action
         const collectStep = plan.steps[1];

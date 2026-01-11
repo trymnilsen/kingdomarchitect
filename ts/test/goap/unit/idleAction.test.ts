@@ -19,7 +19,7 @@ describe("Idle Action", () => {
         const planner = createUnitPlanner();
         const action = planner.getAction("idle");
 
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         const state = getUnitWorldState(ctx);
         assert.strictEqual(action?.preconditions(state, ctx), true);
     });
@@ -32,7 +32,7 @@ describe("Idle Action", () => {
         const action = planner.getAction("idle");
         assert.ok(action, "idle action should exist");
 
-        const ctx = { agentId: agent.id, root, tick: 0 };
+        const ctx = { agent: agent, root, tick: 0 };
         const executionData = action.createExecutionData(ctx);
         const result = (action.execute as any)(executionData, ctx);
 

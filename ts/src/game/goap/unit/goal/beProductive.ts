@@ -24,13 +24,8 @@ export const beProductiveGoal: GoapGoalDefinition = {
         }
 
         // Check if agent has a claimed job
-        const agent = entityWithId(ctx.root, ctx.agentId);
-        if (!agent) {
-            return false;
-        }
-
-        const goapAgent = agent.getEcsComponent(GoapAgentComponentId);
-        if (goapAgent?.claimedJob) {
+        const goapAgent = ctx.agent.getEcsComponent(GoapAgentComponentId);
+        if (goapAgent?.claimedJob !== undefined) {
             return true; // Valid if we have a claimed job to work on
         }
 
