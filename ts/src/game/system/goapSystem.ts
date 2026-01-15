@@ -4,6 +4,8 @@ import {
     GoapAgentComponentId,
     type GoapAgentComponent,
 } from "../component/goapAgentComponent.ts";
+import { HungerComponentId } from "../component/hungerComponent.ts";
+import { EnergyComponentId } from "../component/energyComponent.ts";
 import type { Entity } from "../entity/entity.ts";
 import type { GoapActionDefinition } from "../goap/goapAction.ts";
 import { type GoapContext, createGoapContext } from "../goap/goapContext.ts";
@@ -36,6 +38,18 @@ function updateGoapAgents(root: Entity, planner: GoapPlanner, tick: number) {
         // Execute current action if we have a plan
         if (agent.currentPlan) {
             executeCurrentAction(entity, agent, planner, root, tick);
+        } else {
+            // Agent has no plan - check if in cooldown
+            const timeSinceLastPlan = tick - agent.lastPlanTime;
+            if (
+                timeSinceLastPlan < agent.planningCooldown &&
+                tick % 10 === 0
+            ) {
+                // Log every 10 ticks to avoid spam
+                console.log(
+                    `[GOAP] Agent ${entity.id} idle (planning cooldown: ${agent.planningCooldown - timeSinceLastPlan} ticks remaining)`,
+                );
+            }
         }
     }
 }
@@ -58,16 +72,25 @@ function shouldReplan(
 
     // Replan if we have no plan
     if (!agent.currentPlan) {
+        console.log(
+            `[GOAP] Agent ${entity.id}: Replanning (reason: no current plan)`,
+        );
         return true;
     }
 
     // Replan if we've completed all steps
     if (agent.currentStepIndex >= agent.currentPlan.steps.length) {
+        console.log(
+            `[GOAP] Agent ${entity.id}: Replanning (reason: plan completed, goal was "${agent.currentPlan.goalId}")`,
+        );
         return true;
     }
 
     // Replan if last action failed
     if (agent.lastActionFailed) {
+        console.log(
+            `[GOAP] Agent ${entity.id}: Replanning (reason: action failed - ${agent.failureReason || "unknown error"})`,
+        );
         return true;
     }
 
@@ -75,7 +98,20 @@ function shouldReplan(
     const currentGoal = planner.getGoal(agent.currentPlan.goalId);
     if (currentGoal) {
         const ctx = createGoapContext(entity, root, tick);
-        if (!currentGoal.isValid(ctx) || currentGoal.isSatisfied(ctx)) {
+        const isValid = currentGoal.isValid(ctx);
+        const isSatisfied = currentGoal.isSatisfied(ctx);
+
+        if (!isValid) {
+            console.log(
+                `[GOAP] Agent ${entity.id}: Replanning (reason: goal "${agent.currentPlan.goalId}" no longer valid)`,
+            );
+            return true;
+        }
+
+        if (isSatisfied) {
+            console.log(
+                `[GOAP] Agent ${entity.id}: Replanning (reason: goal "${agent.currentPlan.goalId}" now satisfied)`,
+            );
             return true;
         }
     }
@@ -95,6 +131,20 @@ function replan(
 ) {
     const ctx = createGoapContext(entity, root, tick);
 
+    // Log current agent state before planning
+    const hunger = entity.getEcsComponent(HungerComponentId);
+    const energy = entity.getEcsComponent(EnergyComponentId);
+    const stateStr = [
+        hunger ? `hunger=${hunger.hunger.toFixed(1)}` : null,
+        energy ? `energy=${energy.energy.toFixed(1)}` : null,
+    ]
+        .filter(Boolean)
+        .join(", ");
+
+    console.log(
+        `[GOAP] Agent ${entity.id} planning at tick ${tick} (${stateStr})`,
+    );
+
     const plan = planner.plan(ctx);
 
     if (plan) {
@@ -102,13 +152,22 @@ function replan(
         agent.currentStepIndex = 0;
         agent.lastActionFailed = false;
         agent.failureReason = undefined;
+
+        // Log the plan with action names
+        const actionNames = plan.steps.map((step) => {
+            const action = planner.getAction(step.actionId);
+            return action?.name || step.actionId;
+        });
+
         console.log(
-            `Agent ${entity.id} planned for goal "${plan.goalId}" with ${plan.steps.length} steps`,
+            `[GOAP] Agent ${entity.id} → Goal: "${plan.goalId}" | Plan: [${actionNames.join(" → ")}] (cost: ${plan.totalCost})`,
         );
     } else {
         agent.currentPlan = null;
         agent.currentStepIndex = 0;
-        console.warn(`Agent ${entity.id} could not find a valid plan`);
+        console.warn(
+            `[GOAP] Agent ${entity.id} ✗ No valid plan found (${stateStr})`,
+        );
     }
 
     agent.lastPlanTime = tick;
@@ -160,8 +219,12 @@ function executeCurrentAction(
     const ctx = createGoapContext(entity, root, tick);
 
     // Set action start time if this is the first update for this action
-    if (agent.currentActionStartTick === 0) {
+    const isFirstExecution = agent.currentActionStartTick === 0;
+    if (isFirstExecution) {
         agent.currentActionStartTick = tick;
+        console.log(
+            `[GOAP] Agent ${entity.id} ▶ Starting action: "${actionDef.name}" (step ${agent.currentStepIndex + 1}/${agent.currentPlan.steps.length})`,
+        );
     }
 
     // Execute the action synchronously
@@ -170,6 +233,7 @@ function executeCurrentAction(
 
         if (result === "complete") {
             // Action completed successfully
+            const duration = tick - agent.currentActionStartTick;
             agent.lastActionFailed = false;
             agent.lastActionCompletedAt = tick;
             agent.currentActionStartTick = 0; // Reset for next action
@@ -183,7 +247,7 @@ function executeCurrentAction(
             }
 
             console.log(
-                `Agent ${entity.id} completed action "${actionDef.name}"`,
+                `[GOAP] Agent ${entity.id} ✓ Completed "${actionDef.name}" (took ${duration} ticks)`,
             );
         }
         // If result is "in_progress", action continues next update
@@ -193,8 +257,7 @@ function executeCurrentAction(
         agent.failureReason = error.message || "Unknown error";
         agent.currentActionStartTick = 0; // Reset on failure
         console.error(
-            `Agent ${entity.id} failed action "${actionDef.name}":`,
-            error,
+            `[GOAP] Agent ${entity.id} ✗ Failed action "${actionDef.name}": ${error.message || error}`,
         );
     }
 
