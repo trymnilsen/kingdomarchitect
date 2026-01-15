@@ -1,3 +1,10 @@
+import type { Entity } from "../entity/entity.ts";
+import { GoapAgentComponentId } from "./goapAgentComponent.ts";
+import {
+    requestReplan,
+    ReplanUrgency,
+} from "../system/goapReplanTrigger.ts";
+
 export type HealthComponent = {
     id: typeof HealthComponentId;
     currentHp: number;
@@ -49,6 +56,44 @@ export function damage(component: HealthComponent, amount: number): number {
     const damageAmount = Math.min(component.currentHp, roundedAmount);
     component.currentHp -= damageAmount;
     return damageAmount;
+}
+
+/**
+ * Apply damage to an entity and trigger urgent GOAP replan if entity has an agent.
+ * This is an example of how to integrate the urgency system with game events.
+ *
+ * @param entity The entity to damage
+ * @param amount The amount of damage
+ * @param tick Current simulation tick
+ * @returns The actual damage dealt
+ */
+export function damageEntity(
+    entity: Entity,
+    amount: number,
+    tick: number,
+): number {
+    const health = entity.getEcsComponent(HealthComponentId);
+    if (!health) {
+        return 0;
+    }
+
+    const damageDealt = damage(health, amount);
+    entity.invalidateComponent(HealthComponentId);
+
+    // If entity has GOAP agent, request urgent replan (combat requires immediate response)
+    if (damageDealt > 0) {
+        const goapAgent = entity.getEcsComponent(GoapAgentComponentId);
+        if (goapAgent) {
+            requestReplan(
+                goapAgent,
+                ReplanUrgency.Critical,
+                `took ${damageDealt} damage`,
+                tick,
+            );
+        }
+    }
+
+    return damageDealt;
 }
 
 export const HealthComponentId = "Health";

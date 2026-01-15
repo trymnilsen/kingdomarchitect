@@ -10,6 +10,7 @@ import type { Entity } from "../entity/entity.ts";
 import type { GoapActionDefinition } from "../goap/goapAction.ts";
 import { type GoapContext, createGoapContext } from "../goap/goapContext.ts";
 import type { GoapPlanner } from "../goap/goapPlanner.ts";
+import { calculateDynamicCooldown } from "./goapReplanTrigger.ts";
 
 /**
  * Creates a GOAP system that manages planning and execution for GOAP agents.
@@ -64,16 +65,46 @@ function shouldReplan(
     root: Entity,
     entity: Entity,
 ): boolean {
-    // Check cooldown
+    // Check for urgent replan request (bypasses cooldown)
+    if (agent.urgentReplanRequested) {
+        // Get current action name for better logging
+        const currentAction =
+            agent.currentPlan && agent.currentStepIndex < agent.currentPlan.steps.length
+                ? planner.getAction(agent.currentPlan.steps[agent.currentStepIndex].actionId)
+                : null;
+
+        if (currentAction) {
+            console.log(
+                `[GOAP] Agent ${entity.id}: Urgent replan (interrupting "${currentAction.name}") - ${agent.urgentReplanReason || "unknown"}`,
+            );
+        } else {
+            console.log(
+                `[GOAP] Agent ${entity.id}: Urgent replan - ${agent.urgentReplanReason || "unknown"}`,
+            );
+        }
+
+        // Clear urgent replan flags
+        agent.urgentReplanRequested = false;
+        agent.urgentReplanReason = undefined;
+
+        // Cancel current action state
+        agent.currentActionStartTick = 0;
+        agent.postActionDelay = 0;
+
+        return true;
+    }
+
+    // Check cooldown for non-urgent replans (performance optimization)
+    const effectiveCooldown = calculateDynamicCooldown(agent);
     const timeSinceLastPlan = tick - agent.lastPlanTime;
-    if (timeSinceLastPlan < agent.planningCooldown) {
+    if (timeSinceLastPlan < effectiveCooldown) {
         return false;
     }
 
-    // Replan if we have no plan
+    // Replan if we have no plan (agent is idle)
     if (!agent.currentPlan) {
         console.log(
-            `[GOAP] Agent ${entity.id}: Replanning (reason: no current plan)`,
+            `[GOAP] Agent ${entity.id}: Replanning (reason: no current plan - idle)`,
         );
         return true;
     }
@@ -165,8 +196,12 @@ function replan(
     } else {
         agent.currentPlan = null;
         agent.currentStepIndex = 0;
+
+        // Use longer cooldown for planning failures to avoid spam
+        agent.planningCooldown = 60;
+
         console.warn(
-            `[GOAP] Agent ${entity.id} ✗ No valid plan found (${stateStr})`,
+            `[GOAP] Agent ${entity.id} ✗ No valid plan found - idle (will retry in ${agent.planningCooldown} ticks) (${stateStr})`,
         );
     }
 

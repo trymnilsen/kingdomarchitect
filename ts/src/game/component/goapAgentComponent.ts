@@ -36,6 +36,12 @@ export type GoapAgentComponent = {
 
     /** index of the currently claimed job (if any) in the job queue */
     claimedJob?: number;
+
+    /** Flag to force urgent replan (bypasses cooldown) */
+    urgentReplanRequested: boolean;
+
+    /** Reason for urgent replan (for debugging) */
+    urgentReplanReason?: string;
 };
 
 export const GoapAgentComponentId = "GoapAgent";
@@ -51,8 +57,10 @@ export function createGoapAgentComponent(): GoapAgentComponent {
         currentActionStartTick: 0,
         lastActionCompletedAt: 0,
         postActionDelay: 0,
-        planningCooldown: 1000, // 1 second cooldown between replanning
+        planningCooldown: 30, // Default cooldown (dynamic system will override this)
         lastPlanTime: -Infinity, // Allow immediate planning on first update
         lastActionFailed: false,
+        urgentReplanRequested: false,
+        urgentReplanReason: undefined,
     };
 }
