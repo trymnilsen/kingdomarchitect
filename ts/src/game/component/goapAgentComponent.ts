@@ -22,7 +22,7 @@ export type GoapAgentComponent = {
     /** Post-action delay in milliseconds */
     postActionDelay: number;
 
-    /** Cooldown before replanning (milliseconds) */
+    /** Cooldown before replanning in ticks */
     planningCooldown: number;
 
     /** Timestamp of last planning attempt */
