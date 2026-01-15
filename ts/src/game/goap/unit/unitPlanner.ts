@@ -1,11 +1,13 @@
 import { GoapPlanner } from "../goapPlanner.ts";
 import { eatFoodAction } from "./action/eatFood.ts";
 import { idleAction } from "./action/idle.ts";
+import { sleepAction } from "./action/sleep.ts";
 import { generateClaimOrderActions } from "./action/claimOrder.ts";
 import { collectResourceAction } from "./action/collectResource.ts";
 import { beProductiveGoal } from "./goal/beProductive.ts";
 import { idleGoal } from "./goal/idle.ts";
 import { stayFedGoal } from "./goal/stayFed.ts";
+import { sleepGoal } from "./goal/sleep.ts";
 import { getUnitWorldState } from "./unitWorldState.ts";
 
 /**
@@ -15,6 +17,7 @@ import { getUnitWorldState } from "./unitWorldState.ts";
 export const unitActions = {
     eat_food: eatFoodAction,
     idle: idleAction,
+    sleep: sleepAction,
     collect_resource: collectResourceAction,
 } as const;
 
@@ -34,12 +37,14 @@ export function createUnitPlanner(): GoapPlanner<UnitAction> {
 
     // Add goals (sorted by priority for readability)
     planner.addGoal(beProductiveGoal); // Priority 20 (highest - work comes first)
-    planner.addGoal(stayFedGoal); // Priority 10 (survival need)
+    planner.addGoal(sleepGoal); // Priority 35 (critical when tired)
+    planner.addGoal(stayFedGoal); // Priority 10-40 (dynamic, survival need)
     planner.addGoal(idleGoal); // Priority 1 (fallback)
 
     // Add static actions
     planner.addAction(eatFoodAction);
     planner.addAction(idleAction);
+    planner.addAction(sleepAction);
     planner.addAction(collectResourceAction);
 
     // Add dynamic action generators

@@ -11,6 +11,7 @@ import type { GoapAgentComponent } from "./goapAgentComponent.ts";
 import type { HealthComponent } from "./healthComponent.ts";
 import type { HousingComponent } from "./housingComponent.ts";
 import type { HungerComponent } from "./hungerComponent.ts";
+import type { EnergyComponent } from "./energyComponent.ts";
 import type { InventoryComponent } from "./inventoryComponent.ts";
 import type { JobQueueComponent } from "./jobQueueComponent.ts";
 import type { JobRunnerComponent } from "./jobRunnerComponent.ts";
@@ -57,7 +58,8 @@ export type Components =
     | WorkplaceComponent
     | SpaceComponent
     | GoapAgentComponent
-    | HungerComponent;
+    | HungerComponent
+    | EnergyComponent;
 
 export interface BaseComponent {
     id: string;

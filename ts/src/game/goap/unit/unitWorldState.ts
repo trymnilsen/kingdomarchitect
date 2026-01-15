@@ -1,5 +1,6 @@
 import { GoapAgentComponentId } from "../../component/goapAgentComponent.ts";
 import { HungerComponentId } from "../../component/hungerComponent.ts";
+import { EnergyComponentId } from "../../component/energyComponent.ts";
 import { InventoryComponentId } from "../../component/inventoryComponent.ts";
 import { ItemTag } from "../../../data/inventory/inventoryItem.ts";
 import type { GoapContext } from "../goapContext.ts";
@@ -33,6 +34,12 @@ export function getUnitWorldState(ctx: GoapContext): GoapWorldState {
     const hunger = ctx.agent.getEcsComponent(HungerComponentId);
     if (hunger) {
         setState(state, "hunger", hunger.hunger);
+    }
+
+    // Extract energy state
+    const energy = ctx.agent.getEcsComponent(EnergyComponentId);
+    if (energy) {
+        setState(state, "energy", energy.energy);
     }
 
     // Extract inventory state

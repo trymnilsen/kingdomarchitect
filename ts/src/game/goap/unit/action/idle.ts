@@ -5,8 +5,10 @@ import { createWorldState, setState } from "../../../goap/goapWorldState.ts";
  * Execution data for the idle action.
  */
 export type IdleActionData = {
-    /** Duration to idle in milliseconds */
-    duration: number;
+    /** Tick when idling started */
+    startTick: number;
+    /** Duration to idle in ticks (simulation runs at 1 Hz) */
+    durationTicks: number;
 };
 
 /**
@@ -33,16 +35,22 @@ export const idleAction: GoapActionDefinition<IdleActionData> = {
         return effects;
     },
 
-    createExecutionData: () => ({
-        duration: 5000, // Idle for 5 seconds
+    createExecutionData: (ctx) => ({
+        startTick: ctx.tick,
+        durationTicks: 10, // Idle for 10 ticks (10 seconds)
     }),
 
-    execute: () => {
-        // Idle action has no state changes - just exists to provide a default behavior
-        // Animation system would handle playing idle animations based on agent state
-        // TODO: Get agent component to check elapsed time
-        // For now, complete immediately to maintain test compatibility
-        return "complete";
+    execute: (data, ctx) => {
+        // Check if enough time has elapsed
+        const elapsedTicks = ctx.tick - data.startTick;
+
+        if (elapsedTicks >= data.durationTicks) {
+            // Idle duration complete
+            return "complete";
+        }
+
+        // Still idling
+        return "in_progress";
     },
 
     postActionDelay: () => 3000, // 3 second pause after idling

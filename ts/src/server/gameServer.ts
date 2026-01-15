@@ -7,6 +7,10 @@ import { pathfindingSystem } from "../game/system/pathfindingSystem.ts";
 import { worldGenerationSystem } from "../game/system/worldGenerationSystem.ts";
 import { EcsWorld } from "../common/ecs/ecsWorld.ts";
 import { createRootEntity } from "../game/rootFactory.ts";
+import { createGoapSystem } from "../game/system/goapSystem.ts";
+import { createUnitPlanner } from "../game/goap/unit/unitPlanner.ts";
+import { hungerSystem } from "../game/system/hungerSystem.ts";
+import { energySystem } from "../game/system/energySystem.ts";
 
 import { makeReplicatedEntitiesSystem } from "./replicatedEntitiesSystem.ts";
 import type { GameCommand } from "./message/gameCommand.ts";
@@ -144,6 +148,10 @@ export class GameServer {
     private addSystems() {
         this.world.addSystem(chunkMapSystem);
         this.world.addSystem(pathfindingSystem);
+        const unitPlanner = createUnitPlanner();
+        this.world.addSystem(createGoapSystem(unitPlanner));
+        this.world.addSystem(hungerSystem);
+        this.world.addSystem(energySystem);
         this.world.addSystem(worldGenerationSystem);
         this.world.addSystem(JobSystem);
         this.world.addSystem(

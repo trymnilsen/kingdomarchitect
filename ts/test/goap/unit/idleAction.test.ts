@@ -24,7 +24,7 @@ describe("Idle Action", () => {
         assert.strictEqual(action?.preconditions(state, ctx), true);
     });
 
-    it("completes immediately", () => {
+    it("completes after duration", () => {
         const root = createTestRoot();
         const agent = createTestAgent(root, 10, 0);
 
@@ -34,8 +34,17 @@ describe("Idle Action", () => {
 
         const ctx = { agent: agent, root, tick: 0 };
         const executionData = action.createExecutionData(ctx);
-        const result = (action.execute as any)(executionData, ctx);
 
+        // First execution at tick 0 - should be in progress
+        let result = (action.execute as any)(executionData, ctx);
+        assert.strictEqual(result, "in_progress");
+
+        // Execute at tick 5 - still in progress (duration is 10 ticks)
+        result = (action.execute as any)(executionData, { ...ctx, tick: 5 });
+        assert.strictEqual(result, "in_progress");
+
+        // Execute at tick 10 - should complete
+        result = (action.execute as any)(executionData, { ...ctx, tick: 10 });
         assert.strictEqual(result, "complete");
     });
 });
