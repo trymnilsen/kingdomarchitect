@@ -3,9 +3,11 @@ import { eatFoodAction } from "./action/eatFood.ts";
 import { sleepAction } from "./action/sleep.ts";
 import { generateClaimOrderActions } from "./action/claimOrder.ts";
 import { collectResourceAction } from "./action/collectResource.ts";
+import { playerMoveCommandAction } from "./action/playerMoveCommand.ts";
 import { beProductiveGoal } from "./goal/beProductive.ts";
 import { stayFedGoal } from "./goal/stayFed.ts";
 import { sleepGoal } from "./goal/sleep.ts";
+import { followPlayerCommandGoal } from "./goal/followPlayerCommand.ts";
 import { getUnitWorldState } from "./unitWorldState.ts";
 
 /**
@@ -16,6 +18,7 @@ export const unitActions = {
     eat_food: eatFoodAction,
     sleep: sleepAction,
     collect_resource: collectResourceAction,
+    player_move_command: playerMoveCommandAction,
 } as const;
 
 /**
@@ -34,11 +37,13 @@ export function createUnitPlanner(): GoapPlanner<UnitAction> {
     const planner: GoapPlanner<UnitAction> = new GoapPlanner(getUnitWorldState);
 
     // Add goals (sorted by priority for readability)
-    planner.addGoal(beProductiveGoal); // Priority 20 (highest - work comes first)
+    planner.addGoal(followPlayerCommandGoal); // Priority 50 (highest - player commands override everything)
     planner.addGoal(sleepGoal); // Priority 35 (critical when tired)
+    planner.addGoal(beProductiveGoal); // Priority 20 (work comes first in normal operation)
     planner.addGoal(stayFedGoal); // Priority 10-40 (dynamic, survival need)
 
     // Add static actions
+    planner.addAction(playerMoveCommandAction);
     planner.addAction(eatFoodAction);
     planner.addAction(sleepAction);
     planner.addAction(collectResourceAction);

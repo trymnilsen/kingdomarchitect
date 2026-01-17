@@ -7,21 +7,18 @@ import { queryPath } from "../../../../map/query/pathQuery.ts";
 import { RenderScope } from "../../../../../rendering/renderScope.ts";
 import type { ComponentDescriptor } from "../../../../../ui/declarative/ui.ts";
 import { Entity } from "../../../../entity/entity.ts";
-import { MoveToJob } from "../../../../job/moveToPointJob.ts";
 import { InteractionState } from "../../../handler/interactionState.ts";
 import { uiScaffold } from "../../../view/uiScaffold.ts";
-import { QueueJobCommand } from "../../../../../server/message/command/queueJobCommand.ts";
 import { getPathfindingGraphForEntity } from "../../../../map/path/getPathfindingGraphForEntity.ts";
 import { queryEntity } from "../../../../map/query/queryEntity.ts";
 import { SpaceComponentId } from "../../../../component/spaceComponent.ts";
 import type { SelectedWorldItem } from "../../../selection/selectedWorldItem.ts";
 import { SelectedEntityItem } from "../../../selection/selectedEntityItem.ts";
 import { SelectedTileItem } from "../../../selection/selectedTileItem.ts";
-import { CraftingComponentId } from "../../../../component/craftingComponent.ts";
 import { WorkplaceComponentId } from "../../../../component/workplaceComponent.ts";
-import { OccupationComponentId } from "../../../../component/occupationComponent.ts";
-import { removeItem } from "../../../../../common/array.ts";
 import { ChangeOccupationCommand } from "../../../../../server/message/command/changeOccupationCommand.ts";
+import { GoapAgentComponentId } from "../../../../component/goapAgentComponent.ts";
+import { SetPlayerCommand } from "../../../../../server/message/command/setPlayerCommand.ts";
 
 type ScaffoldButton = {
     text: string;
@@ -249,14 +246,29 @@ export class ActorContextActionState extends InteractionState {
     }
 
     private scheduleMovement() {
-        //todo: send command via context to server
-        //discover tiles on server
-        //sender tiles back
         if (!this.selectedPoint) {
             return;
         }
 
-        const job = MoveToJob(this.entity, this.selectedPoint);
-        this.context.commandDispatcher(QueueJobCommand(job));
+        // Check if entity has GOAP agent component
+        const goapAgent = this.entity.getEcsComponent(GoapAgentComponentId);
+        if (!goapAgent) {
+            console.warn(
+                `Entity ${this.entity.id} does not have GOAP agent component`,
+            );
+            return;
+        }
+
+        // Dispatch command to server to set player command
+        const command = SetPlayerCommand(this.entity.id, {
+            action: "move",
+            targetPosition: this.selectedPoint,
+        });
+
+        this.context.commandDispatcher(command);
+
+        console.log(
+            `[Player Command] Move command dispatched for ${this.entity.id} → ${this.selectedPoint.x},${this.selectedPoint.y}`,
+        );
     }
 }

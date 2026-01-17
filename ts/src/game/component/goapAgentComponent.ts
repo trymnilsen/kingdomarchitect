@@ -1,4 +1,27 @@
+import type { Point } from "../../common/point.ts";
 import type { GoapPlan } from "../goap/goapPlanner.ts";
+
+/**
+ * Player command types that can be issued to GOAP agents.
+ * These override autonomous behavior with direct player control.
+ */
+export type PlayerCommand =
+    | {
+          action: "move";
+          targetPosition: Point;
+      }
+    | {
+          action: "attack";
+          targetEntityId: string;
+      }
+    | {
+          action: "pickup";
+          targetEntityId: string;
+      }
+    | {
+          action: "interact";
+          targetEntityId: string;
+      };
 
 /**
  * Component that stores GOAP planning and execution state for an agent.
@@ -42,6 +65,13 @@ export type GoapAgentComponent = {
 
     /** Reason for urgent replan (for debugging) */
     urgentReplanReason?: string;
+
+    /**
+     * Pending player command that overrides autonomous behavior.
+     * When set, the followPlayerCommand goal becomes valid with highest priority.
+     * Cleared when the command is completed.
+     */
+    playerCommand?: PlayerCommand;
 };
 
 export const GoapAgentComponentId = "GoapAgent";

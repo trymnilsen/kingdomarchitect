@@ -73,8 +73,14 @@ import {
     ChangeOccupationCommandId,
     type ChangeOccupationCommand,
 } from "../../server/message/command/changeOccupationCommand.ts";
+import {
+    SetPlayerCommandId,
+    type SetPlayerCommand,
+} from "../../server/message/command/setPlayerCommand.ts";
 import { OccupationComponentId } from "../component/occupationComponent.ts";
 import { WorkplaceComponentId } from "../component/workplaceComponent.ts";
+import { GoapAgentComponentId } from "../component/goapAgentComponent.ts";
+import { requestReplan, ReplanUrgency } from "./goapReplanTrigger.ts";
 import { removeItem } from "../../common/array.ts";
 
 export function createCommandSystem(
@@ -140,6 +146,9 @@ function onGameMessage(
             break;
         case CancelCraftingCommandId:
             cancelCrafting(root, message.command as CancelCraftingCommand);
+            break;
+        case SetPlayerCommandId:
+            setPlayerCommand(root, message.command as SetPlayerCommand, gameTime);
             break;
     }
 }
@@ -449,5 +458,41 @@ function cancelCrafting(root: Entity, command: CancelCraftingCommand) {
 
     console.log(
         `[CancelCrafting] Cancelled crafting at entity ${entityId} (materials lost)`,
+    );
+}
+
+function setPlayerCommand(
+    root: Entity,
+    command: SetPlayerCommand,
+    gameTime: GameTime,
+) {
+    const agent = root.findEntity(command.agentId);
+    if (!agent) {
+        console.warn(`[SetPlayerCommand] Agent ${command.agentId} not found`);
+        return;
+    }
+
+    const goapAgent = agent.getEcsComponent(GoapAgentComponentId);
+    if (!goapAgent) {
+        console.warn(
+            `[SetPlayerCommand] Agent ${command.agentId} has no GOAP agent component`,
+        );
+        return;
+    }
+
+    // Set the player command
+    goapAgent.playerCommand = command.command;
+    agent.invalidateComponent(GoapAgentComponentId);
+
+    // Trigger urgent replan to execute command immediately
+    requestReplan(
+        goapAgent,
+        ReplanUrgency.Critical,
+        `player commanded: ${command.command.action}`,
+        gameTime.tick,
+    );
+
+    console.log(
+        `[SetPlayerCommand] Command set for agent ${command.agentId}: ${command.command.action}`,
     );
 }

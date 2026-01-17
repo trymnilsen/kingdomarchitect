@@ -79,6 +79,12 @@ export function getUnitWorldState(ctx: GoapContext): GoapWorldState {
         setState(state, "claimedJob", goapAgent.claimedJob);
     }
 
+    // Extract player command state
+    // This is used by the followPlayerCommand goal to become valid/satisfied
+    if (goapAgent?.playerCommand) {
+        setState(state, "playerCommand", "pending");
+    }
+
     // Future state to add:
     // - Position (for movement-based planning)
     // - Current job
