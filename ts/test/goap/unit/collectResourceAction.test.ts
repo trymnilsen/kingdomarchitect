@@ -20,7 +20,10 @@ import {
     createHealthComponent,
     HealthComponentId,
 } from "../../../src/game/component/healthComponent.ts";
-import { createInventoryComponent } from "../../../src/game/component/inventoryComponent.ts";
+import {
+    createInventoryComponent,
+    InventoryComponentId,
+} from "../../../src/game/component/inventoryComponent.ts";
 
 function createTestAgentAtPosition(root: Entity, x: number, y: number): Entity {
     const agent = new Entity("agent");
@@ -303,5 +306,183 @@ describe("CollectResource Action", () => {
 
         assert.strictEqual(result, "complete");
         assert.strictEqual(goapAgent.claimedJob, undefined);
+    });
+
+    it("requires adjacency to collect", () => {
+        const root = createTestRoot();
+        const agent = createTestAgentAtPosition(root, 0, 0);
+
+        // Test all four adjacent positions
+        const adjacentPositions = [
+            { x: 1, y: 0 }, // Right
+            { x: -1, y: 0 }, // Left
+            { x: 0, y: 1 }, // Down
+            { x: 0, y: -1 }, // Up
+        ];
+
+        for (const pos of adjacentPositions) {
+            const resource = createResourceEntity(root, pos.x, pos.y, "tree1");
+
+            const goapAgent = agent.requireEcsComponent(GoapAgentComponentId);
+            goapAgent.claimedJob = 0;
+
+            const jobQueue = createJobQueueComponent();
+            jobQueue.jobs.push(
+                CollectResourceJob(resource, ResourceHarvestMode.Chop),
+            );
+            root.setEcsComponent(jobQueue);
+
+            const ctx = { agent: agent, root, tick: 0 };
+            const executionData =
+                collectResourceAction.createExecutionData(ctx);
+
+            const healthBefore =
+                resource.getEcsComponent(HealthComponentId)?.currentHp;
+
+            const result = collectResourceAction.execute(executionData, ctx);
+
+            const healthAfter =
+                resource.getEcsComponent(HealthComponentId)?.currentHp;
+
+            assert.strictEqual(
+                result,
+                "in_progress",
+                `Should work when adjacent at ${pos.x},${pos.y}`,
+            );
+            assert.ok(
+                healthAfter! < healthBefore!,
+                `Should damage resource when adjacent at ${pos.x},${pos.y}`,
+            );
+
+            // Clean up for next iteration
+            resource.remove();
+        }
+    });
+
+    it("progressively damages and destroys resource", () => {
+        const root = createTestRoot();
+        const agent = createTestAgentAtPosition(root, 0, 0);
+        const resource = createResourceEntity(root, 1, 0, "tree1");
+
+        // Set resource health to 25 (will take 3 hits of 10 damage)
+        const health = resource.requireEcsComponent(HealthComponentId);
+        health.currentHp = 25;
+
+        // Set agent as having claimed job
+        const goapAgent = agent.requireEcsComponent(GoapAgentComponentId);
+        goapAgent.claimedJob = 0;
+
+        // Add job queue
+        const jobQueue = createJobQueueComponent();
+        jobQueue.jobs.push(
+            CollectResourceJob(resource, ResourceHarvestMode.Chop),
+        );
+        root.setEcsComponent(jobQueue);
+
+        const ctx = { agent: agent, root, tick: 0 };
+        const executionData = collectResourceAction.createExecutionData(ctx);
+
+        // First hit: 25 -> 15
+        let result = collectResourceAction.execute(executionData, ctx);
+        assert.strictEqual(result, "in_progress");
+        assert.strictEqual(
+            resource.getEcsComponent(HealthComponentId)?.currentHp,
+            15,
+        );
+
+        // Second hit: 15 -> 5
+        result = collectResourceAction.execute(executionData, ctx);
+        assert.strictEqual(result, "in_progress");
+        assert.strictEqual(
+            resource.getEcsComponent(HealthComponentId)?.currentHp,
+            5,
+        );
+
+        // Third hit: 5 -> 0 (destroyed)
+        result = collectResourceAction.execute(executionData, ctx);
+        assert.strictEqual(result, "complete");
+        assert.strictEqual(goapAgent.claimedJob, undefined);
+        assert.strictEqual(jobQueue.jobs.length, 0);
+        // Resource should be removed from world
+        assert.strictEqual(root.findEntity(resource.id), null);
+    });
+
+    it("handles missing resource component gracefully", () => {
+        const root = createTestRoot();
+        const agent = createTestAgentAtPosition(root, 0, 0);
+        const entity = new Entity("not-a-resource");
+        entity.worldPosition = { x: 1, y: 0 };
+        root.addChild(entity);
+
+        // Set agent as having claimed job
+        const goapAgent = agent.requireEcsComponent(GoapAgentComponentId);
+        goapAgent.claimedJob = 0;
+
+        // Add job queue with job for entity without ResourceComponent
+        const jobQueue = createJobQueueComponent();
+        const job = CollectResourceJob(entity, ResourceHarvestMode.Chop);
+        jobQueue.jobs.push(job);
+        root.setEcsComponent(jobQueue);
+
+        const ctx = { agent: agent, root, tick: 0 };
+        const executionData = collectResourceAction.createExecutionData(ctx);
+
+        // Should complete gracefully
+        const result = collectResourceAction.execute(executionData, ctx);
+
+        assert.strictEqual(result, "complete");
+        assert.strictEqual(goapAgent.claimedJob, undefined);
+    });
+
+    it("adds resource yields to inventory when collected", () => {
+        const root = createTestRoot();
+        const agent = createTestAgentAtPosition(root, 0, 0);
+        const resource = createResourceEntity(root, 1, 0, "tree1");
+
+        // Set resource to low health so it completes in one hit
+        const health = resource.requireEcsComponent(HealthComponentId);
+        health.currentHp = 5;
+
+        // Set agent as having claimed job
+        const goapAgent = agent.requireEcsComponent(GoapAgentComponentId);
+        goapAgent.claimedJob = 0;
+
+        // Add job queue
+        const jobQueue = createJobQueueComponent();
+        jobQueue.jobs.push(
+            CollectResourceJob(resource, ResourceHarvestMode.Chop),
+        );
+        root.setEcsComponent(jobQueue);
+
+        const ctx = { agent: agent, root, tick: 0 };
+        const executionData = collectResourceAction.createExecutionData(ctx);
+
+        // Get initial inventory state
+        const inventoryBefore = agent.requireEcsComponent(
+            InventoryComponentId,
+        );
+        const initialWoodCount =
+            inventoryBefore.items.find((stack) => stack.item.id === "wood")
+                ?.amount || 0;
+
+        // Execute the collection (should complete and destroy resource)
+        const result = collectResourceAction.execute(executionData, ctx);
+
+        assert.strictEqual(result, "complete");
+        assert.strictEqual(goapAgent.claimedJob, undefined);
+
+        // Verify yields were added to inventory
+        const inventoryAfter = agent.requireEcsComponent(InventoryComponentId);
+        const woodStack = inventoryAfter.items.find(
+            (stack) => stack.item.id === "wood",
+        );
+
+        assert.ok(woodStack, "Wood should be added to inventory");
+        // tree1 yields 4 wood (from treeResource definition)
+        assert.strictEqual(
+            woodStack.amount,
+            initialWoodCount + 4,
+            "Should receive 4 wood from tree",
+        );
     });
 });
