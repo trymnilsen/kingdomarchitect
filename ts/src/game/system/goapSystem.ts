@@ -42,10 +42,7 @@ function updateGoapAgents(root: Entity, planner: GoapPlanner, tick: number) {
         } else {
             // Agent has no plan - check if in cooldown
             const timeSinceLastPlan = tick - agent.lastPlanTime;
-            if (
-                timeSinceLastPlan < agent.planningCooldown &&
-                tick % 10 === 0
-            ) {
+            if (timeSinceLastPlan < agent.planningCooldown && tick % 10 === 0) {
                 // Log every 10 ticks to avoid spam
                 console.log(
                     `[GOAP] Agent ${entity.id} idle (planning cooldown: ${agent.planningCooldown - timeSinceLastPlan} ticks remaining)`,
@@ -69,8 +66,11 @@ function shouldReplan(
     if (agent.urgentReplanRequested) {
         // Get current action name for better logging
         const currentAction =
-            agent.currentPlan && agent.currentStepIndex < agent.currentPlan.steps.length
-                ? planner.getAction(agent.currentPlan.steps[agent.currentStepIndex].actionId)
+            agent.currentPlan &&
+            agent.currentStepIndex < agent.currentPlan.steps.length
+                ? planner.getAction(
+                      agent.currentPlan.steps[agent.currentStepIndex].actionId,
+                  )
                 : null;
 
         if (currentAction) {
@@ -207,7 +207,7 @@ function replan(
         // Use longer cooldown for planning failures to avoid spam
         agent.planningCooldown = 60;
 
-        console.warn(
+        console.log(
             `[GOAP] Agent ${entity.id} ✗ No valid plan found - idle (will retry in ${agent.planningCooldown} ticks) (${stateStr})`,
         );
     }

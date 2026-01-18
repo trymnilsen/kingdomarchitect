@@ -12,6 +12,7 @@ export interface AttackJob extends Job {
 export function AttackJob(attacker: string, target: string): AttackJob {
     return {
         id: AttackJobId,
+        state: "pending",
         target: target,
         attacker: attacker,
         constraint: {

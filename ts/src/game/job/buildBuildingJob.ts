@@ -21,6 +21,7 @@ export interface BuildBuildingJob extends Job {
 export function BuildBuildingJob(entity: Entity): BuildBuildingJob {
     return {
         id: BuildBuildingJobId,
+        state: "pending",
         entityId: entity.id,
     };
 }

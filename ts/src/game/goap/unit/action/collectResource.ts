@@ -210,8 +210,8 @@ function collectResourceExecutor(
 
     // Verify adjacency - agent must be next to the resource to harvest it
     const adjacentDirection = checkAdjacency(
-        resourceEntity.worldPosition,
         ctx.agent.worldPosition,
+        resourceEntity.worldPosition,
     );
     if (adjacentDirection === null) {
         console.error(

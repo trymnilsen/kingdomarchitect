@@ -74,16 +74,16 @@ export function requestReplan(
  */
 function shouldBypassCooldown(
     urgency: ReplanUrgency,
-    timeSinceLastPlan: number,
-    cooldown: number,
-): boolean {
+    _timeSinceLastPlan: number,
+    _cooldown: number,
+): boolean {    
     switch (urgency) {
         case ReplanUrgency.Critical:
+        case ReplanUrgency.High:
             return true; // Always bypass
 
-        case ReplanUrgency.High:
-            // Bypass if we're at least halfway through cooldown
-            return timeSinceLastPlan >= cooldown * 0.5;
+        // Bypass if we're at least halfway through cooldown
+        // return timeSinceLastPlan >= cooldown * 0.5;
 
         case ReplanUrgency.Normal:
         case ReplanUrgency.Low:

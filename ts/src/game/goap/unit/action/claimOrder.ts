@@ -1,7 +1,7 @@
 import { distance } from "../../../../common/point.ts";
 import { GoapAgentComponentId } from "../../../component/goapAgentComponent.ts";
 import { JobQueueComponentId } from "../../../component/jobQueueComponent.ts";
-import type { Jobs } from "../../../job/job.ts";
+import { isJobClaimed, type Jobs } from "../../../job/job.ts";
 import type { GoapActionDefinition } from "../../goapAction.ts";
 import type { GoapContext } from "../../goapContext.ts";
 import { createWorldState, getState, setState } from "../../goapWorldState.ts";
@@ -41,7 +41,7 @@ export function generateClaimOrderActions(
         const job = jobQueue.jobs[i];
 
         // Skip if job is already claimed by someone
-        if (job.claimedBy) {
+        if (isJobClaimed(job)) {
             continue;
         }
 
@@ -165,6 +165,7 @@ function createClaimOrderAction(
             // Claim the job
             goapAgent.claimedJob = data.jobIndex;
             currentJob.claimedBy = ctx.agent.id;
+            currentJob.state = "claimed";
 
             // Invalidate components
             ctx.agent.invalidateComponent(GoapAgentComponentId);
@@ -177,6 +178,6 @@ function createClaimOrderAction(
             return "complete";
         },
 
-        postActionDelay: () => 500, // Brief pause after claiming
+        postActionDelay: () => 5, // Brief pause after claiming
     };
 }

@@ -33,6 +33,7 @@ import {
     QueueJobCommandId,
     type QueueJobCommand,
 } from "../../server/message/command/queueJobCommand.ts";
+import { notifyIdleWorkerForNewJob } from "./jobNotificationSystem.ts";
 import {
     StartCraftingCommandId,
     type StartCraftingCommand,
@@ -59,7 +60,10 @@ import {
     InventoryComponentId,
     takeInventoryItem,
 } from "../component/inventoryComponent.ts";
-import { JobQueueComponentId } from "../component/jobQueueComponent.ts";
+import {
+    JobQueueComponentId,
+    addJob,
+} from "../component/jobQueueComponent.ts";
 import type { Entity } from "../entity/entity.ts";
 import { AttackJob } from "../job/attackJob.ts";
 import { BuildBuildingJob } from "../job/buildBuildingJob.ts";
@@ -119,7 +123,7 @@ function onGameMessage(
             changeOccupation(root, message.command as ChangeOccupationCommand);
             break;
         case QueueJobCommandId:
-            queueJob(root, message.command as QueueJobCommand);
+            queueJob(root, message.command as QueueJobCommand, gameTime.tick);
             break;
         case EquipItemCommandId:
             equipItem(root, message.command as EquipItemCommand);
@@ -230,10 +234,13 @@ function buildBuilding(overworld: Entity, command: BuildCommand) {
     }
 }
 
-function queueJob(root: Entity, command: QueueJobCommand) {
+function queueJob(root: Entity, command: QueueJobCommand, tick: number) {
     const jobQueue = root.requireEcsComponent(JobQueueComponentId);
-    jobQueue.jobs.push(command.job);
+    addJob(jobQueue, command.job);
     root.invalidateComponent(JobQueueComponentId);
+
+    // Immediately notify idle workers about the new job
+    notifyIdleWorkerForNewJob(root, tick);
 }
 
 function equipItem(root: Entity, command: EquipItemCommand) {

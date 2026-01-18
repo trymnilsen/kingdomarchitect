@@ -7,10 +7,13 @@ const gameServer = new GameServer((message) => {
     self.postMessage(message);
 });
 
+let isInitialized = false;
+
 gameServer
     .init()
     .then(() => {
         console.log("Game server initialized");
+        isInitialized = true;
     })
     .catch((err) => {
         console.error("Failed to initialize game server:", err);
@@ -18,6 +21,12 @@ gameServer
 
 onmessage = (message) => {
     console.log("[webWorkerServer] recieved message", message);
+    if (!isInitialized) {
+        console.warn(
+            "Received message before initialization complete, ignoring",
+        );
+        return;
+    }
     const commandMessage = message.data as GameMessage;
     gameServer.onMessage(commandMessage);
 };

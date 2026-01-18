@@ -27,6 +27,7 @@ export interface MoveToJob extends Job {
 export function MoveToJob(entity: Entity, position: Point): MoveToJob {
     return {
         id: MoveToJobId,
+        state: "pending",
         path: [],
         constraint: {
             type: "entity",

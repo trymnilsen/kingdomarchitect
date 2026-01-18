@@ -2,7 +2,6 @@ import { createWorldDiscoveryComponent } from "../game/component/worldDiscoveryC
 import { GameTime } from "../game/gameTime.ts";
 import { chunkMapSystem } from "../game/system/chunkMapSystem.ts";
 import { craftingSystem } from "../game/system/craftingSystem.ts";
-import { JobSystem } from "../game/system/jobSystem.ts";
 import { pathfindingSystem } from "../game/system/pathfindingSystem.ts";
 import { worldGenerationSystem } from "../game/system/worldGenerationSystem.ts";
 import { EcsWorld } from "../common/ecs/ecsWorld.ts";
@@ -11,6 +10,7 @@ import { createGoapSystem } from "../game/system/goapSystem.ts";
 import { createUnitPlanner } from "../game/goap/unit/unitPlanner.ts";
 import { hungerSystem } from "../game/system/hungerSystem.ts";
 import { energySystem } from "../game/system/energySystem.ts";
+import { createJobNotificationSystem } from "../game/system/jobNotificationSystem.ts";
 
 import { makeReplicatedEntitiesSystem } from "./replicatedEntitiesSystem.ts";
 import type { GameCommand } from "./message/gameCommand.ts";
@@ -150,10 +150,10 @@ export class GameServer {
         this.world.addSystem(pathfindingSystem);
         const unitPlanner = createUnitPlanner();
         this.world.addSystem(createGoapSystem(unitPlanner));
+        this.world.addSystem(createJobNotificationSystem());
         this.world.addSystem(hungerSystem);
         this.world.addSystem(energySystem);
         this.world.addSystem(worldGenerationSystem);
-        this.world.addSystem(JobSystem);
         this.world.addSystem(
             createCommandSystem(this.gameTime, this.persistenceManager),
         );

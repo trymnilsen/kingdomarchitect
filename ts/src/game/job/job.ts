@@ -1,4 +1,3 @@
-import type { Point } from "../../common/point.ts";
 import { JobRunnerComponentId } from "../component/jobRunnerComponent.ts";
 import type { Entity } from "../entity/entity.ts";
 import type { AttackJob } from "./attackJob.ts";
@@ -13,8 +12,18 @@ export interface EntityJobConstraint {
     id: string;
 }
 
+/**
+ * Job lifecycle states for worker notification system.
+ *
+ * - pending: Job just added, workers need to be notified
+ * - queued: Workers have been notified, waiting to be claimed
+ * - claimed: A worker has claimed this job
+ */
+export type JobState = "pending" | "queued" | "claimed";
+
 export interface Job {
     id: JobId;
+    state: JobState;
     claimedBy?: string;
     constraint?: JobConstraint;
 }
@@ -54,4 +63,26 @@ export function isTargetOfJob(job: Jobs, entity: Entity): boolean {
         case "moveToJob":
             return false;
     }
+}
+
+/**
+ * Check if a job is claimed by any worker.
+ */
+export function isJobClaimed(job: Job): boolean {
+    return job.state === "claimed" || !!job.claimedBy;
+}
+
+/**
+ * Mark a job as claimed by a worker.
+ */
+export function claimJob(job: Job, workerId: string): void {
+    job.state = "claimed";
+    job.claimedBy = workerId;
+}
+
+/**
+ * Filter jobs by their state.
+ */
+export function getJobsByState(jobs: Jobs[], state: JobState): Jobs[] {
+    return jobs.filter((job) => job.state === state);
 }

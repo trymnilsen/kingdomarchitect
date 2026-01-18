@@ -1,6 +1,7 @@
 import { GoapAgentComponentId } from "../../../component/goapAgentComponent.ts";
 import { JobQueueComponentId } from "../../../component/jobQueueComponent.ts";
 import { entityWithId } from "../../../entity/child/withId.ts";
+import { isJobClaimed } from "../../../job/job.ts";
 import type { GoapGoalDefinition } from "../../../goap/goapGoal.ts";
 import { getState } from "../../../goap/goapWorldState.ts";
 
@@ -30,9 +31,7 @@ export const beProductiveGoal: GoapGoalDefinition = {
         }
 
         // Valid if there are unclaimed jobs available
-        const hasUnclaimedJobs = jobQueue.jobs.some(
-            (job) => !("claimedBy" in job) || !job.claimedBy,
-        );
+        const hasUnclaimedJobs = jobQueue.jobs.some((job) => !isJobClaimed(job));
         return hasUnclaimedJobs;
     },
 

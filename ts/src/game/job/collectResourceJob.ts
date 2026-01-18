@@ -30,6 +30,7 @@ export function CollectResourceJob(
 ): CollectResourceJob {
     return {
         id: CollectResourceJobId,
+        state: "pending",
         entityId: entity.id,
         harvestAction,
         workProgress: 0,

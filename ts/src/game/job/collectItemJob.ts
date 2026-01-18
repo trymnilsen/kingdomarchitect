@@ -20,6 +20,7 @@ export interface CollectItemJob extends Job {
 export function CollectItemJob(entity: Entity): CollectItemJob {
     return {
         id: CollectItemJobId,
+        state: "pending",
         entityId: entity.id,
     };
 }
