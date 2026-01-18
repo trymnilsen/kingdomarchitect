@@ -3,6 +3,7 @@ import { eatFoodAction } from "./action/eatFood.ts";
 import { sleepAction } from "./action/sleep.ts";
 import { generateClaimOrderActions } from "./action/claimOrder.ts";
 import { collectResourceAction } from "./action/collectResource.ts";
+import { buildBuildingAction } from "./action/buildBuilding.ts";
 import { playerMoveCommandAction } from "./action/playerMoveCommand.ts";
 import { beProductiveGoal } from "./goal/beProductive.ts";
 import { stayFedGoal } from "./goal/stayFed.ts";
@@ -18,6 +19,7 @@ export const unitActions = {
     eat_food: eatFoodAction,
     sleep: sleepAction,
     collect_resource: collectResourceAction,
+    build_building: buildBuildingAction,
     player_move_command: playerMoveCommandAction,
 } as const;
 
@@ -47,6 +49,7 @@ export function createUnitPlanner(): GoapPlanner<UnitAction> {
     planner.addAction(eatFoodAction);
     planner.addAction(sleepAction);
     planner.addAction(collectResourceAction);
+    planner.addAction(buildBuildingAction);
 
     // Add dynamic action generators
     planner.addDynamicActionGenerator(generateClaimOrderActions as any);
