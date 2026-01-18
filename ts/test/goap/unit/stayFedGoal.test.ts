@@ -55,11 +55,19 @@ describe("Stay Fed Goal", () => {
         assert.strictEqual(goal?.isSatisfied(ctx), false);
     });
 
-    it("has higher priority than idle", () => {
+    it("has higher priority than work", () => {
         const planner = createUnitPlanner();
         const stayFed = planner.getGoal("stay_fed");
-        const idle = planner.getGoal("idle");
+        const beProductive = planner.getGoal("be_productive");
 
-        assert.ok(stayFed!.priority > idle!.priority);
+        const root = createTestRoot();
+        const agent = createTestAgent(root, 95, 0); // Critical hunger
+        const ctx = { agent, root, tick: 0 };
+
+        // At critical hunger (95), stayFed should have higher priority than work
+        assert.ok(
+            stayFed!.priority(ctx) > beProductive!.priority(ctx),
+            "Critical hunger should override work",
+        );
     });
 });

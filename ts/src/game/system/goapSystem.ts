@@ -94,27 +94,34 @@ function shouldReplan(
         return true;
     }
 
-    // Check cooldown for non-urgent replans (performance optimization)
-    const effectiveCooldown = calculateDynamicCooldown(agent);
-    const timeSinceLastPlan = tick - agent.lastPlanTime;
-    if (timeSinceLastPlan < effectiveCooldown) {
-        return false;
-    }
-
     // Replan if we have no plan (agent is idle)
     if (!agent.currentPlan) {
+        // Check cooldown only when idle (not when plan is complete)
+        const effectiveCooldown = calculateDynamicCooldown(agent);
+        const timeSinceLastPlan = tick - agent.lastPlanTime;
+        if (timeSinceLastPlan < effectiveCooldown) {
+            return false;
+        }
+
         console.log(
             `[GOAP] Agent ${entity.id}: Replanning (reason: no current plan - idle)`,
         );
         return true;
     }
 
-    // Replan if we've completed all steps
+    // Replan if we've completed all steps (bypasses cooldown)
     if (agent.currentStepIndex >= agent.currentPlan.steps.length) {
         console.log(
             `[GOAP] Agent ${entity.id}: Replanning (reason: plan completed, goal was "${agent.currentPlan.goalId}")`,
         );
         return true;
+    }
+
+    // Check cooldown for other replan conditions (performance optimization)
+    const effectiveCooldown = calculateDynamicCooldown(agent);
+    const timeSinceLastPlan = tick - agent.lastPlanTime;
+    if (timeSinceLastPlan < effectiveCooldown) {
+        return false;
     }
 
     // Replan if last action failed
@@ -274,11 +281,17 @@ function executeCurrentAction(
             agent.currentActionStartTick = 0; // Reset for next action
 
             // Calculate post-action delay
-            if (actionDef.postActionDelay) {
-                agent.postActionDelay = actionDef.postActionDelay(
-                    step.executionData,
-                    ctx,
-                );
+            const delay = actionDef.postActionDelay
+                ? actionDef.postActionDelay(step.executionData, ctx)
+                : 0;
+
+            if (delay > 0) {
+                // Action has a delay before moving to next step
+                agent.postActionDelay = delay;
+            } else {
+                // No delay, move to next step immediately
+                agent.postActionDelay = 0;
+                agent.currentStepIndex++;
             }
 
             console.log(

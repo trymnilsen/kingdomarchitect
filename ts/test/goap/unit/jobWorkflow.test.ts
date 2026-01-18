@@ -203,7 +203,7 @@ describe("Job Workflow Integration", () => {
         assert.strictEqual(plan.goalId, "be_productive");
     });
 
-    it("falls back to idle when no jobs available", () => {
+    it("has no plan when no jobs available", () => {
         const root = createTestRoot();
         const agent = createTestAgentAtPosition(root, 0, 0);
 
@@ -214,9 +214,9 @@ describe("Job Workflow Integration", () => {
         const ctx = { agent: agent, root, tick: 0 };
         const plan = planner.plan(ctx);
 
-        assert.ok(plan !== null);
-        // Should fall back to idle goal
-        assert.strictEqual(plan.goalId, "idle");
+        // With no jobs and no urgent needs, agent should have no plan (will be idle)
+        // Design: agents don't need an explicit idle goal
+        assert.strictEqual(plan, null, "Agent should have no plan when idle");
     });
 
     it("dynamic actions are regenerated each planning cycle", () => {
