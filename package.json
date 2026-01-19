@@ -31,7 +31,7 @@
         "maxrects-packer": "^2.7.3",
         "pngjs": "^7.0.0",
         "prettier": "^3.5.3",
-        "rollup": "^4.52.5",
+        "rollup": "^4.55.2",
         "rollup-plugin-sourcemaps2": "^0.5.4",
         "typescript": "^5.9.3"
     }
