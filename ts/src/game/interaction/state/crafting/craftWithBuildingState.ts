@@ -10,9 +10,8 @@ import {
     hasCollectableItems,
 } from "../../../component/collectableComponent.ts";
 import { craftingView } from "./craftingView.ts";
-import { StartCraftingCommand } from "../../../../server/message/command/startCraftingCommand.ts";
-import { CancelCraftingCommand } from "../../../../server/message/command/cancelCraftingCommand.ts";
 import { CollectItemJob } from "../../../job/collectItemJob.ts";
+import { createCraftingJob } from "../../../job/craftingJob.ts";
 import { QueueJobCommand } from "../../../../server/message/command/queueJobCommand.ts";
 
 export class CraftWithBuildingState extends InteractionState {
@@ -36,7 +35,7 @@ export class CraftWithBuildingState extends InteractionState {
         return craftingView({
             recipes: this._craftingComponent.recipes,
             selectedRecipeIndex: this._selectedRecipeIndex,
-            isCrafting: this._craftingComponent.activeCrafting !== null,
+            isCrafting: false,
             hasCollectableItems:
                 collectableComponent !== null &&
                 hasCollectableItems(collectableComponent),
@@ -80,15 +79,13 @@ export class CraftWithBuildingState extends InteractionState {
             return;
         }
 
-        this.context.commandDispatcher(
-            StartCraftingCommand(this._buildingEntity.id, selectedRecipe.id),
-        );
+        const job = createCraftingJob(this._buildingEntity.id, selectedRecipe);
+        this.context.commandDispatcher(QueueJobCommand(job));
     }
 
     private onCancelCrafting() {
-        this.context.commandDispatcher(
-            CancelCraftingCommand(this._buildingEntity.id),
-        );
+        // Job cancellation would be handled through job queue UI if available
+        // For now, this is a no-op since jobs are managed through the job system
     }
 
     private onCollect() {

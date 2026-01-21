@@ -17,7 +17,7 @@ import { sprites2 } from "../../../../../../asset/sprite.ts";
 import { CraftWithBuildingState } from "../../../crafting/craftWithBuildingState.ts";
 import { CollectItemJob } from "../../../../../job/collectItemJob.ts";
 import { QueueJobCommand } from "../../../../../../server/message/command/queueJobCommand.ts";
-import { CancelCraftingCommand } from "../../../../../../server/message/command/cancelCraftingCommand.ts";
+import { InventoryState } from "../../../root/inventory/inventoryState.ts";
 
 export class BlacksmithSelectionProvider implements ActorSelectionProvider {
     provideButtons(
@@ -38,31 +38,22 @@ export class BlacksmithSelectionProvider implements ActorSelectionProvider {
                 const collectableComponent = selection.entity.getEcsComponent(
                     CollectableComponentId,
                 );
-                const isCrafting = craftingComponent.activeCrafting !== null;
                 const hasItems =
                     collectableComponent !== null &&
                     hasCollectableItems(collectableComponent);
 
+                const inventory = {
+                    text: "Ledger",
+                    icon: sprites2.empty_sprite,
+                    onClick: () => {
+                        stateContext.stateChanger.push(
+                            new InventoryState(selection.entity),
+                        );
+                    },
+                };
+
                 // Determine which button to show
-                if (isCrafting) {
-                    // Show Cancel button
-                    return {
-                        left: [
-                            {
-                                text: "Cancel",
-                                icon: sprites2.empty_sprite,
-                                onClick: () => {
-                                    stateContext.commandDispatcher(
-                                        CancelCraftingCommand(
-                                            selection.entity.id,
-                                        ),
-                                    );
-                                },
-                            },
-                        ],
-                        right: [],
-                    };
-                } else if (hasItems) {
+                if (hasItems) {
                     // Show Collect button
                     return {
                         left: [
@@ -78,6 +69,7 @@ export class BlacksmithSelectionProvider implements ActorSelectionProvider {
                                     );
                                 },
                             },
+                            inventory,
                         ],
                         right: [],
                     };
@@ -96,6 +88,7 @@ export class BlacksmithSelectionProvider implements ActorSelectionProvider {
                                     );
                                 },
                             },
+                            inventory,
                         ],
                         right: [],
                     };

@@ -1,12 +1,14 @@
 import type { Entity } from "../entity/entity.ts";
 import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
-import { GoapAgentComponentId } from "../component/goapAgentComponent.ts";
+import {
+    BehaviorAgentComponentId,
+    requestReplan as requestBehaviorReplan,
+} from "../behavior/components/BehaviorAgentComponent.ts";
 import {
     createJobQueueComponent,
     JobQueueComponentId,
 } from "../component/jobQueueComponent.ts";
-import { getJobsByState, isJobClaimed } from "../job/job.ts";
-import { requestReplan, ReplanUrgency } from "./goapReplanTrigger.ts";
+import { getJobsByState } from "../job/job.ts";
 
 /**
  * Job notification system - notifies idle workers about available jobs.
@@ -56,35 +58,29 @@ export function notifyIdleWorkerForNewJob(root: Entity, tick: number): void {
  * Uses a budget to avoid checking all workers on large maps.
  *
  * @param root - Root entity
- * @param tick - Current game tick
+ * @param _tick - Current game tick (unused, kept for API compatibility)
  * @param maxCheck - Maximum number of workers to check (budget)
  * @returns true if a worker was notified
  */
 function notifyIdleWorkerWithBudget(
     root: Entity,
-    tick: number,
+    _tick: number,
     maxCheck: number = 10,
 ): boolean {
-    const workers = root.queryComponents(GoapAgentComponentId);
+    const workers = root.queryComponents(BehaviorAgentComponentId);
 
     let checked = 0;
-    for (const [entity, agent] of workers) {
+    for (const [entity, _agent] of workers) {
         if (checked >= maxCheck) break; // Budget limit
         checked++;
 
-        // Only notify workers with no claimed job
-        if (!agent.claimedJob) {
-            requestReplan(
-                agent,
-                ReplanUrgency.High,
-                "job available in queue",
-                tick,
-            );
-            //If the replan makes the agent claim a job, return
-            if (!!agent.claimedJob) {
-                return true; // Notified one worker, done
-            }
-        }
+        // Request replan to make worker check for jobs
+        requestBehaviorReplan(entity);
+
+        // Note: We can't immediately check if job was claimed because
+        // replan happens on next tick. This is fine - the pending state
+        // ensures we'll process all pending jobs over the next few ticks.
+        return true; // Notified one worker, done
     }
 
     return false; // No idle worker found in budget

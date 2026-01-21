@@ -1,4 +1,4 @@
-import { SpriteConfiguration } from "./items/sprite.ts";
+import type { SpriteConfiguration } from "./items/sprite.ts";
 
 export class BitmapCache {
     private entries: { [id: string]: ImageBitmap } = {};

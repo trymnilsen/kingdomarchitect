@@ -1,5 +1,5 @@
-import { CanvasContext } from "../canvasContext.ts";
-import { RenderItemConfiguration } from "./renderItemConfiguration.ts";
+import type { CanvasContext } from "../canvasContext.ts";
+import type { RenderItemConfiguration } from "./renderItemConfiguration.ts";
 
 export type RectangleConfiguration = {
     width: number;

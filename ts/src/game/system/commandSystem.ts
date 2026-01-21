@@ -10,10 +10,6 @@ import {
     type BuildCommand,
 } from "../../server/message/command/buildCommand.ts";
 import {
-    CancelCraftingCommandId,
-    type CancelCraftingCommand,
-} from "../../server/message/command/cancelCraftingCommand.ts";
-import {
     ConsumeItemCommandId,
     type ConsumeItemCommand,
 } from "../../server/message/command/consumeItemCommand.ts";
@@ -34,10 +30,6 @@ import {
     type QueueJobCommand,
 } from "../../server/message/command/queueJobCommand.ts";
 import { notifyIdleWorkerForNewJob } from "./jobNotificationSystem.ts";
-import {
-    StartCraftingCommandId,
-    type StartCraftingCommand,
-} from "../../server/message/command/startCraftingCommand.ts";
 import { SetSceneEffectId } from "../../server/message/effect/setSceneEffect.ts";
 import {
     CommandGameMessageType,
@@ -52,7 +44,6 @@ import {
     addCollectableItems,
     CollectableComponentId,
 } from "../component/collectableComponent.ts";
-import { CraftingComponentId } from "../component/craftingComponent.ts";
 import { EffectEmitterComponentId } from "../component/effectEmitterComponent.ts";
 import { EquipmentComponentId } from "../component/equipmentComponent.ts";
 import {
@@ -83,9 +74,8 @@ import {
 } from "../../server/message/command/setPlayerCommand.ts";
 import { OccupationComponentId } from "../component/occupationComponent.ts";
 import { WorkplaceComponentId } from "../component/workplaceComponent.ts";
-import { GoapAgentComponentId } from "../component/goapAgentComponent.ts";
-import { requestReplan, ReplanUrgency } from "./goapReplanTrigger.ts";
 import { removeItem } from "../../common/array.ts";
+import { BehaviorAgentComponentId, requestReplan as requestBehaviorReplan } from "../behavior/components/BehaviorAgentComponent.ts";
 
 export function createCommandSystem(
     gameTime: GameTime,
@@ -140,16 +130,6 @@ function onGameMessage(
             break;
         case ConsumeItemCommandId:
             consumeItem(root, message.command as ConsumeItemCommand);
-            break;
-        case StartCraftingCommandId:
-            startCrafting(
-                root,
-                message.command as StartCraftingCommand,
-                gameTime,
-            );
-            break;
-        case CancelCraftingCommandId:
-            cancelCrafting(root, message.command as CancelCraftingCommand);
             break;
         case SetPlayerCommandId:
             setPlayerCommand(root, message.command as SetPlayerCommand, gameTime);
@@ -237,6 +217,7 @@ function buildBuilding(overworld: Entity, command: BuildCommand) {
 function queueJob(root: Entity, command: QueueJobCommand, tick: number) {
     const jobQueue = root.requireEcsComponent(JobQueueComponentId);
     addJob(jobQueue, command.job);
+
     root.invalidateComponent(JobQueueComponentId);
 
     // Immediately notify idle workers about the new job
@@ -352,126 +333,10 @@ function consumeItem(root: Entity, command: ConsumeItemCommand) {
     entity.invalidateComponent(ActiveEffectsComponentId);
 }
 
-function startCrafting(
-    root: Entity,
-    command: StartCraftingCommand,
-    gameTime: GameTime,
-) {
-    const { entityId, recipeId } = command;
-    const entity = root.findEntity(entityId);
-
-    if (!entity) {
-        console.warn(`[StartCrafting] Entity ${entityId} not found`);
-        return;
-    }
-
-    const craftingComponent = entity.getEcsComponent(CraftingComponentId);
-
-    if (!craftingComponent) {
-        console.warn(
-            `[StartCrafting] Entity ${entityId} has no CraftingComponent`,
-        );
-        return;
-    }
-
-    // Find the recipe
-    const recipe = craftingComponent.recipes.find((r) => r.id === recipeId);
-    if (!recipe) {
-        console.warn(
-            `[StartCrafting] Recipe ${recipeId} not found in building`,
-        );
-        return;
-    }
-
-    // Check if already crafting
-    if (craftingComponent.activeCrafting) {
-        console.warn(`[StartCrafting] Entity ${entityId} is already crafting`);
-        return;
-    }
-
-    // Check inventory for required materials
-    const inventory = entity.getEcsComponent(InventoryComponentId);
-    if (!inventory) {
-        console.warn(`[StartCrafting] Entity ${entityId} has no inventory`);
-        return;
-    }
-
-    // Verify all inputs are available in the building's inventory
-    for (const input of recipe.inputs) {
-        const itemQuantity = inventory.items.find((i) => i.item === input.item);
-        if (!itemQuantity || itemQuantity.amount < input.amount) {
-            console.warn(
-                `[StartCrafting] Not enough ${input.item.name} (need ${input.amount}, have ${itemQuantity?.amount ?? 0})`,
-            );
-            return;
-        }
-    }
-
-    // Consume the materials from the building's inventory
-    for (const input of recipe.inputs) {
-        const itemIndex = inventory.items.findIndex(
-            (i) => i.item === input.item,
-        );
-        if (itemIndex !== -1) {
-            inventory.items[itemIndex].amount -= input.amount;
-            if (inventory.items[itemIndex].amount <= 0) {
-                inventory.items.splice(itemIndex, 1);
-            }
-        }
-    }
-
-    // Start crafting
-    craftingComponent.activeCrafting = {
-        recipe,
-        startTick: gameTime.tick,
-    };
-
-    // Notify changes
-    entity.invalidateComponent(InventoryComponentId);
-    entity.invalidateComponent(CraftingComponentId);
-
-    console.log(
-        `[StartCrafting] Started crafting ${recipe.id} at entity ${entityId}`,
-    );
-}
-
-function cancelCrafting(root: Entity, command: CancelCraftingCommand) {
-    const { entityId } = command;
-    const entity = root.findEntity(entityId);
-
-    if (!entity) {
-        console.warn(`[CancelCrafting] Entity ${entityId} not found`);
-        return;
-    }
-
-    const craftingComponent = entity.getEcsComponent(CraftingComponentId);
-
-    if (!craftingComponent) {
-        console.warn(
-            `[CancelCrafting] Entity ${entityId} has no CraftingComponent`,
-        );
-        return;
-    }
-
-    if (!craftingComponent.activeCrafting) {
-        console.warn(`[CancelCrafting] Entity ${entityId} is not crafting`);
-        return;
-    }
-
-    // Cancel the crafting - materials were already consumed and are lost
-    // This is the cost of canceling
-    craftingComponent.activeCrafting = null;
-    entity.invalidateComponent(CraftingComponentId);
-
-    console.log(
-        `[CancelCrafting] Cancelled crafting at entity ${entityId} (materials lost)`,
-    );
-}
-
 function setPlayerCommand(
     root: Entity,
     command: SetPlayerCommand,
-    gameTime: GameTime,
+    _gameTime: GameTime,
 ) {
     const agent = root.findEntity(command.agentId);
     if (!agent) {
@@ -479,25 +344,20 @@ function setPlayerCommand(
         return;
     }
 
-    const goapAgent = agent.getEcsComponent(GoapAgentComponentId);
-    if (!goapAgent) {
+    const behaviorAgent = agent.getEcsComponent(BehaviorAgentComponentId);
+    if (!behaviorAgent) {
         console.warn(
-            `[SetPlayerCommand] Agent ${command.agentId} has no GOAP agent component`,
+            `[SetPlayerCommand] Agent ${command.agentId} has no BehaviorAgent component`,
         );
         return;
     }
 
-    // Set the player command
-    goapAgent.playerCommand = command.command;
-    agent.invalidateComponent(GoapAgentComponentId);
+    // Set the player command on the agent
+    behaviorAgent.playerCommand = command.command;
+    agent.invalidateComponent(BehaviorAgentComponentId);
 
-    // Trigger urgent replan to execute command immediately
-    requestReplan(
-        goapAgent,
-        ReplanUrgency.Critical,
-        `player commanded: ${command.command.action}`,
-        gameTime.tick,
-    );
+    // Trigger replan to execute command immediately
+    requestBehaviorReplan(agent);
 
     console.log(
         `[SetPlayerCommand] Command set for agent ${command.agentId}: ${command.command.action}`,

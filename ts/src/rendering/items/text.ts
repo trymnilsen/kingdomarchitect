@@ -23,8 +23,8 @@ export class TextVisual extends RenderNode {
 }
  */
 
-import { CanvasContext } from "../canvasContext.ts";
-import { RenderItemConfiguration } from "./renderItemConfiguration.ts";
+import type { CanvasContext } from "../canvasContext.ts";
+import type { RenderItemConfiguration } from "./renderItemConfiguration.ts";
 
 export type TextConfiguration = {
     text: string;

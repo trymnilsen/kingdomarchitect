@@ -4,6 +4,7 @@ import type { AttackJob } from "./attackJob.ts";
 import type { BuildBuildingJob } from "./buildBuildingJob.ts";
 import type { CollectItemJob } from "./collectItemJob.ts";
 import type { CollectResourceJob } from "./collectResourceJob.ts";
+import type { CraftingJob } from "./craftingJob.ts";
 import type { MoveToJob } from "./moveToPointJob.ts";
 
 export type JobConstraint = EntityJobConstraint;
@@ -33,7 +34,8 @@ export type Jobs =
     | BuildBuildingJob
     | AttackJob
     | CollectItemJob
-    | CollectResourceJob;
+    | CollectResourceJob
+    | CraftingJob;
 export type JobId = Jobs["id"];
 export type JobHandler<T extends Job> = (
     scene: Entity,
@@ -60,6 +62,8 @@ export function isTargetOfJob(job: Jobs, entity: Entity): boolean {
             return job.entityId == entity.id;
         case "collectItem":
             return job.entityId == entity.id;
+        case "craftingJob":
+            return job.targetBuilding == entity.id;
         case "moveToJob":
             return false;
     }

@@ -1,10 +1,11 @@
-import { Bounds, zeroBounds } from "../common/bounds.ts";
+import { zeroBounds } from "../common/bounds.ts";
+import type { Bounds } from "../common/bounds.ts";
 import {
     addPoint,
     multiplyPoint,
-    Point,
     subtractPoint,
 } from "../common/point.ts";
+import type { Point } from "../common/point.ts";
 import type { Entity } from "../game/entity/entity.ts";
 import { TileSize } from "../game/map/tile.ts";
 

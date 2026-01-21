@@ -20,7 +20,7 @@ export const swordRecipe: CraftingRecipe = {
         { item: stoneResource, amount: 10 },
     ],
     outputs: [{ item: swordItem, amount: 1 }],
-    duration: 100, // 100 ticks ~= 20 seconds at 5 ticks/second
+    duration: 5, // 5 seconds at 1 tick/second
 };
 
 export const bowRecipe: CraftingRecipe = {
@@ -29,7 +29,7 @@ export const bowRecipe: CraftingRecipe = {
     icon: sprites2.archer_skill,
     inputs: [{ item: woodResourceItem, amount: 15 }],
     outputs: [{ item: bowItem, amount: 1 }],
-    duration: 80,
+    duration: 4, // 4 seconds
 };
 
 export const wizardHatRecipe: CraftingRecipe = {
@@ -38,7 +38,7 @@ export const wizardHatRecipe: CraftingRecipe = {
     icon: sprites2.wizard_hat_skill,
     inputs: [{ item: woodResourceItem, amount: 10 }],
     outputs: [{ item: wizardHat, amount: 1 }],
-    duration: 120,
+    duration: 6, // 6 seconds - complex item
 };
 
 export const hammerRecipe: CraftingRecipe = {
@@ -50,7 +50,7 @@ export const hammerRecipe: CraftingRecipe = {
         { item: stoneResource, amount: 5 },
     ],
     outputs: [{ item: hammerItem, amount: 1 }],
-    duration: 60,
+    duration: 3, // 3 seconds - simple tool
 };
 
 export const blacksmithRecipes: readonly CraftingRecipe[] = [

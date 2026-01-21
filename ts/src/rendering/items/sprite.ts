@@ -1,7 +1,7 @@
-import { Sprite2 } from "../../asset/sprite.ts";
-import { Sides } from "../../common/sides.ts";
-import { CanvasContext } from "../canvasContext.ts";
-import { RenderItemConfiguration } from "./renderItemConfiguration.ts";
+import type { Sprite2 } from "../../asset/sprite.ts";
+import type { Sides } from "../../common/sides.ts";
+import type { CanvasContext } from "../canvasContext.ts";
+import type { RenderItemConfiguration } from "./renderItemConfiguration.ts";
 
 export type SpriteConfiguration = {
     sprite: Sprite2;

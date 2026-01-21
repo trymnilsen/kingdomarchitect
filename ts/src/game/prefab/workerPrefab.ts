@@ -15,9 +15,9 @@ import { nobleKnightAnimationGraph } from "../../asset/animation/knight.animatio
 import { createDirectionComponent } from "../component/directionComponent.ts";
 import { createHealthComponent } from "../component/healthComponent.ts";
 import { createOccupationComponent } from "../component/occupationComponent.ts";
-import { createGoapAgentComponent } from "../component/goapAgentComponent.ts";
 import { createHungerComponent } from "../component/hungerComponent.ts";
 import { createEnergyComponent } from "../component/energyComponent.ts";
+import { createBehaviorAgentComponent } from "../behavior/components/BehaviorAgentComponent.ts";
 
 export function workerPrefab(): Entity {
     const entity = new Entity(generateId("worker"));
@@ -32,7 +32,7 @@ export function workerPrefab(): Entity {
     entity.setEcsComponent(createAnimationComponent(nobleKnightAnimationGraph));
     entity.setEcsComponent(createDirectionComponent());
     entity.setEcsComponent(createOccupationComponent());
-    entity.setEcsComponent(createGoapAgentComponent());
+    entity.setEcsComponent(createBehaviorAgentComponent());
     entity.setEcsComponent(createHungerComponent(60, 0.1)); // 0.1 per tick = ~7 minutes to go from 0 to 100
     entity.setEcsComponent(createEnergyComponent(100, 0.15, 20)); // 0.15 per tick = ~11 minutes to deplete
     return entity;

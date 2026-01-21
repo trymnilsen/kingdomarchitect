@@ -1,16 +1,17 @@
 import { createWorldDiscoveryComponent } from "../game/component/worldDiscoveryComponent.ts";
 import { GameTime } from "../game/gameTime.ts";
 import { chunkMapSystem } from "../game/system/chunkMapSystem.ts";
-import { craftingSystem } from "../game/system/craftingSystem.ts";
 import { pathfindingSystem } from "../game/system/pathfindingSystem.ts";
 import { worldGenerationSystem } from "../game/system/worldGenerationSystem.ts";
 import { EcsWorld } from "../common/ecs/ecsWorld.ts";
 import { createRootEntity } from "../game/rootFactory.ts";
-import { createGoapSystem } from "../game/system/goapSystem.ts";
-import { createUnitPlanner } from "../game/goap/unit/unitPlanner.ts";
 import { hungerSystem } from "../game/system/hungerSystem.ts";
 import { energySystem } from "../game/system/energySystem.ts";
 import { createJobNotificationSystem } from "../game/system/jobNotificationSystem.ts";
+import { createBehaviorSystem } from "../game/behavior/systems/BehaviorSystem.ts";
+import { createPerformPlayerCommandBehavior } from "../game/behavior/behaviors/PerformPlayerCommandBehavior.ts";
+import { createSleepBehavior } from "../game/behavior/behaviors/SleepBehavior.ts";
+import { createPerformJobBehavior } from "../game/behavior/behaviors/PerformJobBehavior.ts";
 
 import { makeReplicatedEntitiesSystem } from "./replicatedEntitiesSystem.ts";
 import type { GameCommand } from "./message/gameCommand.ts";
@@ -148,8 +149,15 @@ export class GameServer {
     private addSystems() {
         this.world.addSystem(chunkMapSystem);
         this.world.addSystem(pathfindingSystem);
-        const unitPlanner = createUnitPlanner();
-        this.world.addSystem(createGoapSystem(unitPlanner));
+
+        // Create behaviors for the behavior system
+        const behaviors = [
+            createPerformPlayerCommandBehavior(), // Priority 90
+            createSleepBehavior(),                // Priority 60-80 (scales with tiredness)
+            createPerformJobBehavior(),           // Priority 50
+        ];
+        this.world.addSystem(createBehaviorSystem(behaviors));
+
         this.world.addSystem(createJobNotificationSystem());
         this.world.addSystem(hungerSystem);
         this.world.addSystem(energySystem);
@@ -157,7 +165,6 @@ export class GameServer {
         this.world.addSystem(
             createCommandSystem(this.gameTime, this.persistenceManager),
         );
-        this.world.addSystem(craftingSystem);
         this.world.addSystem(housingSystem);
         this.world.addSystem(effectSystem);
         this.world.addSystem(regrowSystem);
