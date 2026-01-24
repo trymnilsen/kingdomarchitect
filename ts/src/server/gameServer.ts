@@ -31,6 +31,7 @@ import { PersistenceManager } from "./persistence/persistenceManager.ts";
 import { IndexedDBAdapter } from "./persistence/indexedDBAdapter.ts";
 import type { Entity } from "../game/entity/entity.ts";
 import { buildDiscoveryEffectForPlayer } from "./message/effect/discoverTileEffect.ts";
+import { ToggleableCallback } from "../common/toggleableCallback.ts";
 
 export class GameServer {
     private world: EcsWorld;
@@ -39,16 +40,13 @@ export class GameServer {
     private persistenceManager: PersistenceManager;
     private worldSeed: number;
     private gameLoopInterval?: ReturnType<typeof setInterval>;
-    private postMessage: (message: GameMessage) => void;
+    private postMessage: ToggleableCallback<[GameMessage]>;
 
     constructor(postMessage: (message: GameMessage) => void) {
-        this.postMessage = postMessage;
+        this.postMessage = new ToggleableCallback(postMessage, false);
         const root = createRootEntity();
 
         this.world = new EcsWorld(root);
-        //We start of no emitting events and then enable this after the inital
-        //start
-        this.world.enableEvents = false;
 
         this.worldSeed = Date.now();
         const adapter = new IndexedDBAdapter();
@@ -61,7 +59,7 @@ export class GameServer {
 
         this.world.root.setEcsComponent(
             createEffectEmitterComponent((effect) => {
-                this.postMessage({
+                this.postMessage.invoke({
                     type: "effect",
                     effect,
                 });
@@ -77,8 +75,8 @@ export class GameServer {
         // Run init after loading (or if no save exists)
         // worldGenerationSystem will see loaded entities and skip generation
         this.world.runInit();
-        this.world.enableEvents = true;
-        this.postMessage(buildWorldStateMessage(this.world.root));
+        this.postMessage.enable();
+        this.postMessage.invoke(buildWorldStateMessage(this.world.root));
         this.gameLoopInterval = setInterval(() => {
             this.updateTick += 1;
             this.gameTime.setTick(this.updateTick);
@@ -178,8 +176,7 @@ export class GameServer {
         this.world.addSystem(regrowSystem);
         this.world.addSystem(
             makeReplicatedEntitiesSystem((message) => {
-                //console.log(`Sending replication message:`, message);
-                this.postMessage(message);
+                this.postMessage.invoke(message);
             }),
         );
     }

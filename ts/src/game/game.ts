@@ -109,7 +109,6 @@ export class Game {
      */
     private addClientOnlyComponents() {
         this.ecsWorld.root.setEcsComponent(createJobQueueComponent());
-        this.ecsWorld.root.setEcsComponent(createTileComponent());
         this.ecsWorld.root.setEcsComponent(createVisibilityMapComponent());
     }
 

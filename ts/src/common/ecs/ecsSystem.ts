@@ -1,5 +1,8 @@
 import type { Entity } from "../../game/entity/entity.ts";
-import type { EntityEvent, EntityEventType } from "../../game/entity/entityEvent.ts";
+import type {
+    EntityEvent,
+    EntityEventType,
+} from "../../game/entity/entityEvent.ts";
 import { DrawMode } from "../../rendering/drawMode.ts";
 import { RenderScope } from "../../rendering/renderScope.ts";
 import type { GameEffect } from "../../server/message/effect/gameEffect.ts";

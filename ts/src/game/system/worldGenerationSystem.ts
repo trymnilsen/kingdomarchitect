@@ -36,12 +36,12 @@ export const worldGenerationSystem: EcsSystem = {
 /**
  * Initializes the world generation system.
  * Only generates initial world if no chunks exist (new game).
- */
+ */ 
 function onInit(root: Entity) {
-    // Check if world components already exist
-    const hasTiles = root.hasComponent(TileComponentId);
-
-    if (!hasTiles) {
+    // Check if world already exist, this might be the case if we loaded
+    const tileComponent = root.requireEcsComponent(TileComponentId);
+    const hasWorld = tileComponent.chunks.size > 0;
+    if (!hasWorld) {
         const tileComponent = createTileComponent();
         root.setEcsComponent(createWorldDiscoveryComponent());
         root.setEcsComponent(tileComponent);

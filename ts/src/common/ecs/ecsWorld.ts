@@ -36,18 +36,9 @@ export class EcsWorld {
     };
     private rootEntity: Entity;
     private gameMessageSystems: EcsGameMessageFunction[] = [];
-    private _enableEvents: boolean = true;
 
     public get root(): Entity {
         return this.rootEntity;
-    }
-
-    public get enableEvents(): boolean {
-        return this._enableEvents;
-    }
-
-    public set enableEvents(value: boolean) {
-        this._enableEvents = value;
     }
 
     constructor(rootEntity?: Entity) {
@@ -161,10 +152,6 @@ export class EcsWorld {
     }
 
     runEvent = (event: EntityEvent) => {
-        if (!this._enableEvents) {
-            return;
-        }
-
         const events = this.entityEvents[event.id];
         for (let i = 0; i < events.length; i++) {
             try {
