@@ -1,5 +1,5 @@
 import { addPoint, pointEquals, type Point } from "../../../common/point.ts";
-import type { PathfindingGraph } from "../../component/pathfindingGraphRegistryComponent.ts";
+import type { PathfindingGraph } from "../../component/pathfindingGraphComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import type { GraphNode } from "../path/graph/graph.ts";
 import { aStarSearch, type SearchedNode } from "../path/search.ts";

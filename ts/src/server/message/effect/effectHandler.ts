@@ -1,13 +1,5 @@
 import { makeNumberId, pointEquals } from "../../../common/point.ts";
 import {
-    createChunkMapRegistryComponent,
-    createChunkMap,
-} from "../../../game/component/chunkMapRegistryComponent.ts";
-import {
-    createPathfindingGraphRegistryComponent,
-    createPathfindingGraph,
-} from "../../../game/component/pathfindingGraphRegistryComponent.ts";
-import {
     setChunk,
     TileComponentId,
 } from "../../../game/component/tileComponent.ts";
@@ -18,8 +10,6 @@ import {
     getChunkId,
     getChunkPosition,
 } from "../../../game/map/chunk.ts";
-import { createLazyGraphFromRootNode } from "../../../game/map/path/graph/generateGraph.ts";
-import { getOverworldEntity } from "../../../game/map/scenes.ts";
 import type { Camera } from "../../../rendering/camera.ts";
 import type { EffectGameMessage } from "../gameMessage.ts";
 import {
@@ -27,11 +17,10 @@ import {
     type DiscoverTileEffect,
 } from "./discoverTileEffect.ts";
 import { ReloadGameEffectId } from "./reloadGameEffect.ts";
-import { SetSceneEffectId } from "./setSceneEffect.ts";
 
 export function effectHandler(
     root: Entity,
-    camera: Camera,
+    _camera: Camera,
     message: EffectGameMessage,
 ) {
     switch (message.effect.id) {
@@ -41,21 +30,14 @@ export function effectHandler(
         case ReloadGameEffectId:
             window.location.reload();
             break;
-        case SetSceneEffectId:
-            const scene = root.findEntity(message.effect.entity);
-            if (scene) {
-                camera.currentScene = scene;
-            }
-            break;
         default:
             break;
     }
 }
 
 function discoverTileEffect(root: Entity, effect: DiscoverTileEffect) {
-    const overworld = getOverworldEntity(root);
-    const tileComponent = overworld.requireEcsComponent(TileComponentId);
-    const visibilityMapComponent = overworld.requireEcsComponent(
+    const tileComponent = root.requireEcsComponent(TileComponentId);
+    const visibilityMapComponent = root.requireEcsComponent(
         VisibilityMapComponentId,
     );
 

@@ -36,21 +36,20 @@ export const renderSystem: EcsSystem = {
 };
 
 function onRender(
-    _rootEntity: Entity,
+    rootEntity: Entity,
     _renderTick: number,
     renderScope: RenderScope,
     drawMode: DrawMode,
 ) {
     //const renderStart = performance.now();
     const viewport = renderScope.camera.tileSpaceViewPort;
-    const scene = renderScope.camera.currentScene;
-    const tiles = scene.getEcsComponent(TileComponentId);
-    const visibilityMap = scene.getEcsComponent(VisibilityMapComponentId);
+    const tiles = rootEntity.getEcsComponent(TileComponentId);
+    const visibilityMap = rootEntity.getEcsComponent(VisibilityMapComponentId);
 
     if (visibilityMap) {
         visibilityMap.visibility.clear();
         //TODO: this might be able to piggyback of sprites? Are there entities without sprites but with visibility?
-        const visibilityComponents = scene.queryComponentsWithin(
+        const visibilityComponents = rootEntity.queryComponentsWithin(
             viewport,
             VisibilityComponentId,
         );
@@ -72,7 +71,7 @@ function onRender(
     if (tiles && visibilityMap) {
         drawTiles(tiles, renderScope, visibilityMap);
     }
-    const query = scene.queryComponentsWithin(viewport, SpriteComponentId);
+    const query = rootEntity.queryComponentsWithin(viewport, SpriteComponentId);
 
     const sortedSprites = Array.from(query.entries()).sort(
         (a, b) => a[0].worldPosition.y - b[0].worldPosition.y,

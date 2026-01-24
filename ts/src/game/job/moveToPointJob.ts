@@ -40,7 +40,6 @@ export function MoveToJob(entity: Entity, position: Point): MoveToJob {
 export const MoveToJobId = "moveToJob";
 
 export const moveToJobHandler: JobHandler<MoveToJob> = (
-    scene,
     root,
     runner,
     job,
@@ -83,7 +82,7 @@ export const moveToJobHandler: JobHandler<MoveToJob> = (
 
     //Check if the next point is free
     if (!!nextPoint) {
-        const weight = getWeightAtPoint(nextPoint, scene);
+        const weight = getWeightAtPoint(nextPoint, root);
         //TODO: when extracting, provide this as a function?
         console.log("MoveToJob - next point weight: ", weight);
         if (weight >= 30) {

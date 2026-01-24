@@ -1,10 +1,8 @@
-import { createSpaceComponent } from "../../game/component/spaceComponent.ts";
 import { Entity } from "../../game/entity/entity.ts";
 import {
     EntityEventType,
     type EntityEvent,
 } from "../../game/entity/entityEvent.ts";
-import { overWorldId } from "../../game/map/scenes.ts";
 import { DrawMode } from "../../rendering/drawMode.ts";
 import { RenderScope } from "../../rendering/renderScope.ts";
 import type { GameCommand } from "../../server/message/gameCommand.ts";

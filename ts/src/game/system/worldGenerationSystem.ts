@@ -7,7 +7,6 @@ import { pointEquals, type Point } from "../../common/point.ts";
 import type { DiscoverTileEffect } from "../../server/message/effect/discoverTileEffect.ts";
 import type { GameEffect } from "../../server/message/effect/gameEffect.ts";
 import { EffectEmitterComponentId } from "../component/effectEmitterComponent.ts";
-import { createSpaceComponent } from "../component/spaceComponent.ts";
 import {
     createTileComponent,
     getChunk,
@@ -28,7 +27,6 @@ import { Entity } from "../entity/entity.ts";
 import { getChunkPosition } from "../map/chunk.ts";
 import { generateChunk } from "../map/chunkGenerator.ts";
 import { addInitialPlayerChunk } from "../map/player.ts";
-import { getOverworldEntity, overWorldId } from "../map/scenes.ts";
 import type { Volume } from "../map/volume.ts";
 
 export const worldGenerationSystem: EcsSystem = {
@@ -40,16 +38,16 @@ export const worldGenerationSystem: EcsSystem = {
  * Only generates initial world if no chunks exist (new game).
  */
 function onInit(root: Entity) {
-    if (root.children.length == 0) {
-        const overworld = new Entity(overWorldId);
+    // Check if world components already exist
+    const hasTiles = root.hasComponent(TileComponentId);
+
+    if (!hasTiles) {
         const tileComponent = createTileComponent();
-        overworld.setEcsComponent(createSpaceComponent());
-        overworld.setEcsComponent(createWorldDiscoveryComponent());
-        overworld.setEcsComponent(tileComponent);
-        root.addChild(overworld);
+        root.setEcsComponent(createWorldDiscoveryComponent());
+        root.setEcsComponent(tileComponent);
 
         console.log("[WorldGeneration] Generating new world");
-        const start = addInitialPlayerChunk(overworld);
+        const start = addInitialPlayerChunk(root);
         const effectEmitter = root.requireEcsComponent(
             EffectEmitterComponentId,
         ).emitter;
@@ -57,7 +55,7 @@ function onInit(root: Entity) {
             start,
             generateDiamondPattern(16),
         );
-        setDiscoveryForPlayer(overworld, effectEmitter, "player", pattern);
+        setDiscoveryForPlayer(root, effectEmitter, "player", pattern);
     } else {
         console.log(
             "[WorldGeneration] World already exists, skipping generation",
@@ -73,17 +71,18 @@ type ChunkToGenerate = {
 /**
  * Sets the discovery status for a player based on a list of discovered points.
  * @param root The root entity of the ECS system.
+ * @param effectEmitter Function to emit game effects
  * @param player The ID of the player.
  * @param discoveredPoints An array of points that have been discovered.
  */
 export function setDiscoveryForPlayer(
-    scene: Entity,
+    root: Entity,
     effectEmitter: (effect: GameEffect) => void,
     player: string,
     discoveredPoints: Point[],
 ) {
-    const tileComponent = scene.requireEcsComponent(TileComponentId);
-    const worldDiscovery = scene.requireEcsComponent(WorldDiscoveryComponentId);
+    const tileComponent = root.requireEcsComponent(TileComponentId);
+    const worldDiscovery = root.requireEcsComponent(WorldDiscoveryComponentId);
 
     const chunksToGenerate: ChunkToGenerate[] = [];
     const newPoints: { point: Point; volumeId: string }[] = [];
@@ -105,10 +104,10 @@ export function setDiscoveryForPlayer(
 
     for (const chunkToGenerate of chunksToGenerate) {
         const generatedChunk = generateChunk(
-            scene,
+            root,
             chunkToGenerate.chunkPosition,
         );
-        scene.updateComponent(TileComponentId, (component) => {
+        root.updateComponent(TileComponentId, (component) => {
             setChunk(component, generatedChunk);
         });
         //Check if the volume of the new chunk has been discovered by the
@@ -139,7 +138,7 @@ export function setDiscoveryForPlayer(
         volumes: newVolumesToDiscover,
     };
 
-    scene.updateComponent(WorldDiscoveryComponentId, (component) => {
+    root.updateComponent(WorldDiscoveryComponentId, (component) => {
         for (const point of discoveredPoints) {
             discoverTile(component, player, point);
         }

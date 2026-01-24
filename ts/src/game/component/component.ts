@@ -1,7 +1,7 @@
 import type { ActiveEffectsComponent } from "./activeEffectsComponent.ts";
 import type { AnimationComponent } from "./animationComponent.ts";
 import type { BuildingComponent } from "./buildingComponent.ts";
-import type { ChunkMapRegistryComponent } from "./chunkMapRegistryComponent.ts";
+import type { ChunkMapComponent } from "./chunkMapComponent.ts";
 import type { CollectableComponent } from "./collectableComponent.ts";
 import type { CraftingComponent } from "./craftingComponent.ts";
 import { DirectionComponent } from "./directionComponent.ts";
@@ -18,11 +18,10 @@ import type { JobQueueComponent } from "./jobQueueComponent.ts";
 import type { JobRunnerComponent } from "./jobRunnerComponent.ts";
 import type { KingdomComponent } from "./kingdomComponent.ts";
 import type { OppcupationComponent } from "./occupationComponent.ts";
-import type { PathfindingGraphRegistryComponent } from "./pathfindingGraphRegistryComponent.ts";
+import type { PathfindingGraphComponent } from "./pathfindingGraphComponent.ts";
 import type { PlayerUnitComponent } from "./playerUnitComponent.ts";
 import type { RegrowComponent } from "./regrowComponent.ts";
 import type { ResourceComponent } from "./resourceComponent.ts";
-import type { SpaceComponent } from "./spaceComponent.ts";
 import type { SpriteComponent } from "./spriteComponent.ts";
 import type { TileComponent } from "./tileComponent.ts";
 import type { VisibilityComponent } from "./visibilityComponent.ts";
@@ -37,7 +36,7 @@ export type Components =
     | InventoryComponent
     | ResourceComponent
     | RegrowComponent
-    | ChunkMapRegistryComponent
+    | ChunkMapComponent
     | PlayerUnitComponent
     | JobQueueComponent
     | BuildingComponent
@@ -50,14 +49,13 @@ export type Components =
     | VisibilityComponent
     | EffectEmitterComponent
     | AnimationComponent
-    | PathfindingGraphRegistryComponent
+    | PathfindingGraphComponent
     | KingdomComponent
     | DirectionComponent
     | ActiveEffectsComponent
     | HousingComponent
     | OppcupationComponent
     | WorkplaceComponent
-    | SpaceComponent
     | GoapAgentComponent
     | BehaviorAgentComponent
     | HungerComponent

@@ -1,26 +1,16 @@
 import type { Point } from "../../../common/point.ts";
 import {
-    ChunkMapRegistryComponentId,
-    getChunkMap,
+    ChunkMapComponentId,
     getEntitiesAt,
     getEntitiesInChunk,
-} from "../../component/chunkMapRegistryComponent.ts";
+} from "../../component/chunkMapComponent.ts";
 import { getChunk } from "../../component/tileComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
-import { overWorldId } from "../scenes.ts";
 import type { Volume } from "../volume.ts";
 
-export function queryEntity(scene: Entity, point: Point): Entity[] {
-    const chunkMap = getChunkMap(
-        scene.requireAncestorEcsComponent(ChunkMapRegistryComponentId),
-        scene.id,
-    );
-
-    if (!chunkMap) {
-        throw new Error("No chunk map found");
-    }
-
-    return getEntitiesAt(chunkMap, point.x, point.y);
+export function queryEntity(root: Entity, point: Point): Entity[] {
+    const chunkMapComponent = root.requireEcsComponent(ChunkMapComponentId);
+    return getEntitiesAt(chunkMapComponent.chunkMap, point.x, point.y);
 }
 
 /**
@@ -38,14 +28,8 @@ export function queryAdjacentEntities(
     up: Entity[];
     down: Entity[];
 } {
-    const chunkMap = getChunkMap(
-        root.requireEcsComponent(ChunkMapRegistryComponentId),
-        overWorldId, //Todo: should probably be dynamic
-    );
-
-    if (!chunkMap) {
-        throw new Error("No chunk map found");
-    }
+    const chunkMapComponent = root.requireEcsComponent(ChunkMapComponentId);
+    const chunkMap = chunkMapComponent.chunkMap;
 
     return {
         left: getEntitiesAt(chunkMap, point.x - 1, point.y),
@@ -60,14 +44,8 @@ export function queryEntitiesWithinVolume(
     volume: Volume,
     filter: (entity: Entity) => boolean,
 ): Entity[] {
-    const chunkMap = getChunkMap(
-        root.requireEcsComponent(ChunkMapRegistryComponentId),
-        overWorldId, //Todo: should probably be dynamic
-    );
-
-    if (!chunkMap) {
-        throw new Error("No chunk map found");
-    }
+    const chunkMapComponent = root.requireEcsComponent(ChunkMapComponentId);
+    const chunkMap = chunkMapComponent.chunkMap;
 
     const entities = volume.chunks
         .flatMap((chunkPoint) => getEntitiesInChunk(chunkMap, chunkPoint))

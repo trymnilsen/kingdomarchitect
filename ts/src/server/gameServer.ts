@@ -22,7 +22,6 @@ import {
 import type { GameMessage } from "./message/gameMessage.ts";
 import { createCommandSystem } from "../game/system/commandSystem.ts";
 import { effectSystem } from "../game/system/effectSystem.ts";
-import { getOverworldEntity } from "../game/map/scenes.ts";
 import { housingSystem } from "../game/system/housingSystem.ts";
 import { regrowSystem } from "../game/system/regrowSystem.ts";
 import { PersistenceManager } from "./persistence/persistenceManager.ts";
@@ -110,8 +109,7 @@ export class GameServer {
      * Only sends tiles that were actually discovered by the player.
      */
     private sendDiscoveryEffectForLoadedWorld(): void {
-        const overworld = getOverworldEntity(this.world.root);
-        const effect = buildDiscoveryEffectForPlayer(overworld, "player");
+        const effect = buildDiscoveryEffectForPlayer(this.world.root, "player");
 
         if (!effect) {
             return;
@@ -171,7 +169,7 @@ export class GameServer {
         this.world.addSystem(regrowSystem);
         this.world.addSystem(
             makeReplicatedEntitiesSystem((message) => {
-                console.log(`Sending replication message:`, message);
+                //console.log(`Sending replication message:`, message);
                 this.postMessage(message);
             }),
         );

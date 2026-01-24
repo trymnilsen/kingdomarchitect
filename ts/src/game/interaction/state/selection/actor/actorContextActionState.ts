@@ -11,7 +11,6 @@ import { InteractionState } from "../../../handler/interactionState.ts";
 import { uiScaffold } from "../../../view/uiScaffold.ts";
 import { getPathfindingGraphForEntity } from "../../../../map/path/getPathfindingGraphForEntity.ts";
 import { queryEntity } from "../../../../map/query/queryEntity.ts";
-import { SpaceComponentId } from "../../../../component/spaceComponent.ts";
 import type { SelectedWorldItem } from "../../../selection/selectedWorldItem.ts";
 import { SelectedEntityItem } from "../../../selection/selectedEntityItem.ts";
 import { SelectedTileItem } from "../../../selection/selectedTileItem.ts";
@@ -119,17 +118,14 @@ export class ActorContextActionState extends InteractionState {
             y: tile.tileY,
         };
         this.selectedPoint = toPoint;
-        const atPoint = queryEntity(
-            this.entity.requireAncestorEntity(SpaceComponentId),
-            toPoint,
-        );
+        const atPoint = queryEntity(this.context.root, toPoint);
 
         if (atPoint.length > 0) {
             this.currentSelection = new SelectedEntityItem(atPoint[0]);
             return true;
         } else {
             this.currentSelection = new SelectedTileItem(tile);
-            // Get the pathfinding graph for the entity's space
+            // Get the pathfinding graph
             const pathfindingGraph = getPathfindingGraphForEntity(
                 this.context.root,
                 this.entity,

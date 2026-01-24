@@ -25,7 +25,6 @@ export function AttackJob(attacker: string, target: string): AttackJob {
 export const AttackJobId = "attackJob";
 
 export const attackHandler: JobHandler<AttackJob> = (
-    _scene,
     root,
     runner,
     job,

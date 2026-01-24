@@ -27,8 +27,7 @@ export type ClaimOrderActionData = {
 export function generateClaimOrderActions(
     ctx: GoapContext,
 ): GoapActionDefinition<ClaimOrderActionData>[] {
-    const scene = ctx.root;
-    const jobQueue = scene.getEcsComponent(JobQueueComponentId);
+    const jobQueue = ctx.root.getEcsComponent(JobQueueComponentId);
 
     if (!jobQueue) {
         return [];
@@ -140,8 +139,7 @@ function createClaimOrderAction(
                 );
             }
 
-            const scene = ctx.root;
-            const jobQueue = scene.getEcsComponent(JobQueueComponentId);
+            const jobQueue = ctx.root.getEcsComponent(JobQueueComponentId);
             if (!jobQueue) {
                 throw new Error("No job queue component");
             }
@@ -169,7 +167,7 @@ function createClaimOrderAction(
 
             // Invalidate components
             ctx.agent.invalidateComponent(GoapAgentComponentId);
-            scene.invalidateComponent(JobQueueComponentId);
+            ctx.root.invalidateComponent(JobQueueComponentId);
 
             console.log(
                 `Agent ${ctx.agent.id} claimed job ${data.jobIndex} (${data.job.id})`,

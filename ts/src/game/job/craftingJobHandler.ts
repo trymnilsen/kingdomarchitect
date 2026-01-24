@@ -7,7 +7,6 @@ import { doMovement, MovementResult } from "./movementHelper.ts";
 import type { CraftingJob } from "./craftingJob.ts";
 
 export const craftingJobHandler: JobHandler<CraftingJob> = (
-    _scene,
     root,
     worker,
     job,

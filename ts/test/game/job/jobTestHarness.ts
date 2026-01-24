@@ -4,11 +4,9 @@ import {
     JobRunnerComponentId,
 } from "../../../src/game/component/jobRunnerComponent.ts";
 import {
-    PathfindingGraphRegistryComponentId,
-    createPathfindingGraphRegistryComponent,
-    createPathfindingGraph,
-} from "../../../src/game/component/pathfindingGraphRegistryComponent.ts";
-import { createSpaceComponent } from "../../../src/game/component/spaceComponent.ts";
+    PathfindingGraphComponentId,
+    createPathfindingGraphComponent,
+} from "../../../src/game/component/pathfindingGraphComponent.ts";
 import { Entity } from "../../../src/game/entity/entity.ts";
 import type { Job } from "../../../src/game/job/job.ts";
 import { getJobHandler } from "../../../src/game/job/jobHandlers.ts";
@@ -35,15 +33,12 @@ export class JobTestHarness<T extends Job = Job> {
 
         // Create root entity
         this.root = new Entity("root");
-        this.root.setEcsComponent(createSpaceComponent());
 
         // Optionally add pathfinding graph component for movement tests
         if (enablePathfinding) {
             const graph = createEmptyGraph(graphSize, graphSize);
-            const registry = createPathfindingGraphRegistryComponent();
-            const pathfindingGraph = createPathfindingGraph(graph);
-            registry.graphs.set(this.root.id, pathfindingGraph);
-            this.root.setEcsComponent(registry);
+            const pathfindingComponent = createPathfindingGraphComponent(graph);
+            this.root.setEcsComponent(pathfindingComponent);
         }
 
         // Create runner entity (worker)
@@ -69,7 +64,7 @@ export class JobTestHarness<T extends Job = Job> {
             throw new Error(`No handler found for job type: ${job.id}`);
         }
         // Type assertion is safe here as the job registry ensures handler matches job type
-        handler(this.root, this.root, this.runner, job as any, tick);
+        handler(this.root, this.runner, job as any, tick);
     }
 
     /**

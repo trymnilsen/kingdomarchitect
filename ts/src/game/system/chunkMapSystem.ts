@@ -3,20 +3,14 @@ import { SparseSet } from "../../common/structure/sparseSet.ts";
 import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
 import { ChunkSize } from "../map/chunk.ts";
 import {
-    ChunkMapRegistryComponentId,
-    createChunkMapRegistryComponent,
-    getChunkMap,
+    ChunkMapComponentId,
     type ChunkMap,
-    createChunkMap,
-} from "../component/chunkMapRegistryComponent.ts";
+} from "../component/chunkMapComponent.ts";
 import type { Entity } from "../entity/entity.ts";
 import type {
     EntityChildrenUpdatedEvent,
     EntityTransformEvent,
 } from "../entity/entityEvent.ts";
-import { getOverworldEntity } from "../map/scenes.ts";
-import { SpaceComponentId } from "../component/spaceComponent.ts";
-import { visitChildren } from "../entity/child/visit.ts";
 
 export const chunkMapSystem: EcsSystem = {
     onInit: init,
@@ -29,11 +23,11 @@ export const chunkMapSystem: EcsSystem = {
 
 /**
  * Run init actions
- * Chunk maps are populated on-demand via event handlers.
+ * Chunk map already exists from root factory, nothing to do.
  * @param root the root entity of the system
  */
 function init(_root: Entity) {
-    // Registry already exists from root factory, nothing to do
+    // ChunkMap already exists from root factory, nothing to do
 }
 
 /**
@@ -42,21 +36,10 @@ function init(_root: Entity) {
  * @param entityEvent the event that occured
  */
 function onTransform(_rootEntity: Entity, entityEvent: EntityTransformEvent) {
-    const registry = entityEvent.source.requireAncestorEcsComponent(
-        ChunkMapRegistryComponentId,
+    const chunkMapComponent = entityEvent.source.requireAncestorEcsComponent(
+        ChunkMapComponentId,
     );
-    const spaceEntity = entityEvent.source.getAncestorEntity(SpaceComponentId);
-    if (!spaceEntity) {
-        //TODO: should probaby use a collider component or something instead
-        if (entityEvent.source.hasComponent(SpaceComponentId)) {
-            console.warn(
-                `[ChunkMapSystem] Entity ${entityEvent.source.id} has no space ancestor, cannot update chunk map`,
-            );
-        }
-        return;
-    }
-
-    const chunkMap = getOrCreateChunkMap(registry, spaceEntity);
+    const chunkMap = chunkMapComponent.chunkMap;
 
     const currentChunkId = chunkMap.entityChunkMap.get(entityEvent.source.id);
     if (currentChunkId === undefined) {
@@ -79,30 +62,18 @@ function onTransform(_rootEntity: Entity, entityEvent: EntityTransformEvent) {
 }
 
 /**
- * Add an entity to the chunkmap if it is added to the scene
+ * Add an entity to the chunkmap when it is added
  * @param rootEntity the root of the system
- * @param scopedEntity the entity that is the current scope of the ecs
  * @param entityEvent the event that happened
  */
 function onEntityAdded(
     _rootEntity: Entity,
     entityEvent: EntityChildrenUpdatedEvent,
 ) {
-    const registry = entityEvent.target.requireAncestorEcsComponent(
-        ChunkMapRegistryComponentId,
+    const chunkMapComponent = entityEvent.target.requireAncestorEcsComponent(
+        ChunkMapComponentId,
     );
-    const spaceEntity = entityEvent.target.getAncestorEntity(SpaceComponentId);
-    if (!spaceEntity) {
-        if (entityEvent.target.hasComponent(SpaceComponentId)) {
-            console.warn(
-                `[ChunkMapSystem] Entity ${entityEvent.target.id} has no space ancestor, cannot add to chunk map`,
-            );
-        }
-
-        return;
-    }
-
-    const chunkMap = getOrCreateChunkMap(registry, spaceEntity);
+    const chunkMap = chunkMapComponent.chunkMap;
     addToChunkmap(chunkMap, entityEvent.target);
 }
 
@@ -117,7 +88,7 @@ function addToChunkmap(chunkMap: ChunkMap, entity: Entity) {
 }
 
 /**
- * Remove an entity from the chunkmap when removed from the scene
+ * Remove an entity from the chunkmap when removed
  * @param rootEntity the root of the system
  * @param entityEvent the event that happened
  */
@@ -125,26 +96,10 @@ function onEntityRemoved(
     _rootEntity: Entity,
     entityEvent: EntityChildrenUpdatedEvent,
 ) {
-    const registry = entityEvent.target.requireAncestorEcsComponent(
-        ChunkMapRegistryComponentId,
+    const chunkMapComponent = entityEvent.target.requireAncestorEcsComponent(
+        ChunkMapComponentId,
     );
-    const spaceEntity = entityEvent.target.getAncestorEntity(SpaceComponentId);
-    if (!spaceEntity) {
-        if (entityEvent.target.hasComponent(SpaceComponentId)) {
-            console.warn(
-                `[ChunkMapSystem] Entity ${entityEvent.target.id} has no space ancestor, cannot remove from chunk map`,
-            );
-        }
-        return;
-    }
-
-    const chunkMap = getChunkMap(registry, spaceEntity.id);
-    if (!chunkMap) {
-        console.debug(
-            `[ChunkMapSystem] No chunk map found for space ${spaceEntity.id}, cannot remove entity`,
-        );
-        return;
-    }
+    const chunkMap = chunkMapComponent.chunkMap;
 
     const chunkForEntity = chunkMap.entityChunkMap.get(entityEvent.target.id);
     if (chunkForEntity === undefined) {
@@ -158,28 +113,6 @@ function onEntityRemoved(
 
     chunk.delete(entityEvent.target);
     chunkMap.entityChunkMap.delete(entityEvent.target.id);
-}
-
-/**
- * Gets or creates a chunk map for a space entity
- * @param registry The chunk map registry
- * @param spaceEntity The space entity to get/create a chunk map for
- * @returns The chunk map for the space
- */
-function getOrCreateChunkMap(
-    registry: ReturnType<typeof createChunkMapRegistryComponent>,
-    spaceEntity: Entity,
-): ChunkMap {
-    let chunkMap = getChunkMap(registry, spaceEntity.id);
-    if (!chunkMap) {
-        // Create chunk map if it doesn't exist
-        console.log(
-            `[ChunkMapSystem] Creating new chunk map for space ${spaceEntity.id}`,
-        );
-        chunkMap = createChunkMap();
-        registry.chunkMaps.set(spaceEntity.id, chunkMap);
-    }
-    return chunkMap;
 }
 
 function getOrCreateChunk(

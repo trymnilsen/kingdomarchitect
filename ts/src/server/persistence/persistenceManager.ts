@@ -1,10 +1,10 @@
 import type { JSONValue } from "../../common/object.ts";
-import { ChunkMapRegistryComponentId } from "../../game/component/chunkMapRegistryComponent.ts";
+import { ChunkMapComponentId } from "../../game/component/chunkMapComponent.ts";
 import {
     ComponentID,
     type Components,
 } from "../../game/component/component.ts";
-import { PathfindingGraphRegistryComponentId } from "../../game/component/pathfindingGraphRegistryComponent.ts";
+import { PathfindingGraphComponentId } from "../../game/component/pathfindingGraphComponent.ts";
 import { Entity } from "../../game/entity/entity.ts";
 import type { PersistenceAdapter } from "./persistenceAdapter.ts";
 import type { SerializedEntity } from "./serializedEntity.ts";
@@ -313,6 +313,6 @@ export class PersistenceManager {
 
 // Runtime-only components that should not be persisted
 const runtimeOnlyComponents = new Set<ComponentID>([
-    ChunkMapRegistryComponentId,
-    PathfindingGraphRegistryComponentId,
+    ChunkMapComponentId,
+    PathfindingGraphComponentId,
 ]);

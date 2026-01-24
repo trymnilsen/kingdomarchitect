@@ -9,17 +9,17 @@ export type ChunkMap = {
     entityChunkMap: Map<string, number>;
 };
 
-export type ChunkMapRegistryComponent = {
-    id: typeof ChunkMapRegistryComponentId;
-    chunkMaps: Map<string, ChunkMap>; // Keyed by entity id (scene id)
+export type ChunkMapComponent = {
+    id: typeof ChunkMapComponentId;
+    chunkMap: ChunkMap;
 };
 
-export const ChunkMapRegistryComponentId = "ChunkMapRegistry";
+export const ChunkMapComponentId = "ChunkMap";
 
-export function createChunkMapRegistryComponent(): ChunkMapRegistryComponent {
+export function createChunkMapComponent(): ChunkMapComponent {
     return {
-        id: ChunkMapRegistryComponentId,
-        chunkMaps: new Map(),
+        id: ChunkMapComponentId,
+        chunkMap: createChunkMap(),
     };
 }
 
@@ -28,19 +28,6 @@ export function createChunkMap(): ChunkMap {
         chunks: new Map(),
         entityChunkMap: new Map(),
     };
-}
-
-/**
- * Gets a chunk map by id
- * @param registry The ChunkMapRegistryComponent
- * @param mapId The id of the chunk map. Id of entity with SpaceComponent on it
- * @returns The ChunkMap or undefined if not found
- */
-export function getChunkMap(
-    registry: ChunkMapRegistryComponent,
-    mapId: string,
-): ChunkMap | undefined {
-    return registry.chunkMaps.get(mapId);
 }
 
 /**

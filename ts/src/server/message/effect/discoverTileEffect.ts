@@ -17,16 +17,16 @@ export const DiscoverTileEffectId = "discoverTile";
  * Builds a discovery effect containing all tiles discovered by a player.
  * Reads from WorldDiscoveryComponent to determine which tiles to include.
  *
- * @param scene The scene entity (e.g., overworld) containing tile and discovery components
+ * @param root The root entity containing tile and discovery components
  * @param player The player ID to get discovered tiles for
  * @returns Complete discovery effect, or null if nothing discovered
  */
 export function buildDiscoveryEffectForPlayer(
-    scene: Entity,
+    root: Entity,
     player: string,
 ): DiscoverTileEffect | null {
-    const tileComponent = scene.getEcsComponent(TileComponentId);
-    const discoveryComponent = scene.getEcsComponent(WorldDiscoveryComponentId);
+    const tileComponent = root.getEcsComponent(TileComponentId);
+    const discoveryComponent = root.getEcsComponent(WorldDiscoveryComponentId);
 
     if (!tileComponent || !discoveryComponent) {
         return null;

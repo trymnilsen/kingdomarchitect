@@ -26,13 +26,10 @@ export class CharacterBuilder {
         this.canvasElementId = canvasElementId;
         this.assetLoader = new AssetLoader();
         this.dummyScene = new Entity("characterBuilderScene");
-        this.camera = new Camera(
-            {
-                x: window.innerWidth,
-                y: window.innerHeight,
-            },
-            this.dummyScene,
-        );
+        this.camera = new Camera({
+            x: window.innerWidth,
+            y: window.innerHeight,
+        });
         this.camera.position = {
             x: window.innerWidth / 2,
             y: window.innerHeight / 2,

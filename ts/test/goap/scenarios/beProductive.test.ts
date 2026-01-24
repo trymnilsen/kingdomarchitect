@@ -29,7 +29,8 @@ import {
     increaseHunger,
 } from "../../../src/game/component/hungerComponent.ts";
 import { healthPotion } from "../../../src/data/inventory/items/resources.ts";
-import { createPathfindingGraphRegistryComponent } from "../../../src/game/component/pathfindingGraphRegistryComponent.ts";
+import { createPathfindingGraphComponent } from "../../../src/game/component/pathfindingGraphComponent.ts";
+import { createEmptyGraph } from "../../path/testGraph.ts";
 
 /**
  * Helper to create a resource entity at a position
@@ -71,7 +72,8 @@ describe("beProductive system integration", () => {
         const root = createTestRoot();
 
         root.setEcsComponent(createJobQueueComponent());
-        root.setEcsComponent(createPathfindingGraphRegistryComponent()); // Add pathfinding registry for movement
+        const graph = createEmptyGraph(20, 20);
+        root.setEcsComponent(createPathfindingGraphComponent(graph)); // Add pathfinding component for movement
 
         const planner = createUnitPlanner();
         const goapSystem = createGoapSystem(planner);

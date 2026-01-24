@@ -14,7 +14,7 @@ import { getWeightAtPoint } from "../path/graph/weight.ts";
  * @returns The closest walkable position, or null if none found
  */
 export function findClosestAvailablePosition(
-    scene: Entity,
+    root: Entity,
     startPosition: Point,
     maxWeight: number = 5,
 ): Point | null {
@@ -33,7 +33,7 @@ export function findClosestAvailablePosition(
         visitedPositions.add(currentPosition);
 
         // Check if this position is walkable
-        const weight = getWeightAtPoint(currentPosition, scene);
+        const weight = getWeightAtPoint(currentPosition, root);
 
         if (weight === 0) {
             // Not a valid tile

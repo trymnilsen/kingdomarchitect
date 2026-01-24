@@ -28,7 +28,6 @@ export function CollectItemJob(entity: Entity): CollectItemJob {
 export const CollectItemJobId = "collectItem";
 
 export const collectItemHandler: JobHandler<CollectItemJob> = (
-    _scene,
     root,
     runner,
     job,

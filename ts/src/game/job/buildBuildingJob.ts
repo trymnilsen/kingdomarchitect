@@ -29,7 +29,6 @@ export function BuildBuildingJob(entity: Entity): BuildBuildingJob {
 export const BuildBuildingJobId = "buildBuildingJob";
 
 export const buildBuildingHandler: JobHandler<BuildBuildingJob> = (
-    _scene,
     root,
     runner,
     job,

@@ -1,49 +1,30 @@
 import type { Entity } from "../../entity/entity.ts";
 import {
-    PathfindingGraphRegistryComponentId,
-    getPathfindingGraph,
+    PathfindingGraphComponentId,
     type PathfindingGraph,
-} from "../../component/pathfindingGraphRegistryComponent.ts";
-import { SpaceComponentId } from "../../component/spaceComponent.ts";
+} from "../../component/pathfindingGraphComponent.ts";
 
 /**
- * Gets the pathfinding graph for an entity's space from the root entity.
- * This is a convenience function that handles the common pattern of:
- * 1. Getting the registry from root
- * 2. Finding the entity's space ancestor
- * 3. Looking up the graph for that space
+ * Gets the pathfinding graph for an entity from the root entity.
+ * This is a convenience function that retrieves the global pathfinding graph.
  *
- * @param root The root entity containing the PathfindingGraphRegistryComponent
- * @param entity The entity whose space's pathfinding graph to retrieve
+ * @param root The root entity containing the PathfindingGraphComponent
+ * @param _entity The entity (unused, kept for backwards compatibility)
  * @returns The PathfindingGraph or null if not found
  */
 export function getPathfindingGraphForEntity(
     root: Entity,
-    entity: Entity,
+    _entity: Entity,
 ): PathfindingGraph | null {
-    const registry = root.getEcsComponent(PathfindingGraphRegistryComponentId);
-    if (!registry) {
+    const pathfindingGraphComponent = root.getEcsComponent(
+        PathfindingGraphComponentId,
+    );
+    if (!pathfindingGraphComponent) {
         console.error(
-            "[PathfindingGraph] No pathfinding graph registry found on root entity",
+            "[PathfindingGraph] No pathfinding graph component found on root entity",
         );
         return null;
     }
 
-    const spaceEntity = entity.getAncestorEntity(SpaceComponentId);
-    if (!spaceEntity) {
-        console.error(
-            `[PathfindingGraph] Entity ${entity.id} has no space ancestor`,
-        );
-        return null;
-    }
-
-    const pathfindingGraph = getPathfindingGraph(registry, spaceEntity.id);
-    if (!pathfindingGraph) {
-        console.error(
-            `[PathfindingGraph] No pathfinding graph found for space ${spaceEntity.id}`,
-        );
-        return null;
-    }
-
-    return pathfindingGraph;
+    return pathfindingGraphComponent.pathfindingGraph;
 }

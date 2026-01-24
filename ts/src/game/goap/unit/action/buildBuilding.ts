@@ -56,8 +56,7 @@ export const buildBuildingAction: GoapActionDefinition<BuildBuildingActionData> 
             }
 
             // Verify the job is a BuildBuildingJob
-            const scene = ctx.root;
-            const jobQueue = scene.getEcsComponent(JobQueueComponentId);
+            const jobQueue = ctx.root.getEcsComponent(JobQueueComponentId);
             if (!jobQueue) {
                 return false;
             }

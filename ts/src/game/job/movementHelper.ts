@@ -9,7 +9,6 @@ import {
     updateDirectionComponent,
 } from "../component/directionComponent.ts";
 import { EffectEmitterComponentId } from "../component/effectEmitterComponent.ts";
-import { SpaceComponentId } from "../component/spaceComponent.ts";
 import { getPathfindingGraphForEntity } from "../map/path/getPathfindingGraphForEntity.ts";
 
 export const MovementResult = {
@@ -54,11 +53,11 @@ export function discoverAfterMovement(entity: Entity, nextPoint: Point) {
     const visibility = entity.getEcsComponent(VisibilityComponentId);
     if (visibility) {
         const points = offsetPatternWithPoint(nextPoint, visibility.pattern);
+        const root = entity.getRootEntity();
 
         setDiscoveryForPlayer(
-            entity.requireAncestorEntity(SpaceComponentId),
-            entity.getRootEntity().requireEcsComponent(EffectEmitterComponentId)
-                .emitter,
+            root,
+            root.requireEcsComponent(EffectEmitterComponentId).emitter,
             "player",
             points,
         );

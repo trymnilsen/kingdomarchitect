@@ -3,7 +3,7 @@ import type { Entity } from "../../entity/entity.ts";
 import type { NaturalResource } from "../../../data/inventory/items/naturalResource.ts";
 import { resourcePrefab } from "../../prefab/resourcePrefab.ts";
 import { generateSpawnPoints } from "../item/vegetation.ts";
-import type { ChunkMap } from "../../component/chunkMapRegistryComponent.ts";
+import type { ChunkMap } from "../../component/chunkMapComponent.ts";
 
 export type CountFn = (max?: number) => number;
 

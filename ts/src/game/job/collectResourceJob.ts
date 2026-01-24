@@ -40,7 +40,6 @@ export function CollectResourceJob(
 export const CollectResourceJobId = "collectResource";
 
 export const collectResourceHandler: JobHandler<CollectResourceJob> = (
-    _scene,
     root,
     runner,
     job,

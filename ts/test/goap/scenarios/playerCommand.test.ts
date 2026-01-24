@@ -18,7 +18,8 @@ import {
 } from "../../../src/game/component/hungerComponent.ts";
 import { healthPotion } from "../../../src/data/inventory/items/resources.ts";
 import { createJobQueueComponent } from "../../../src/game/component/jobQueueComponent.ts";
-import { createPathfindingGraphRegistryComponent } from "../../../src/game/component/pathfindingGraphRegistryComponent.ts";
+import { createPathfindingGraphComponent } from "../../../src/game/component/pathfindingGraphComponent.ts";
+import { createEmptyGraph } from "../../path/testGraph.ts";
 
 /**
  * Helper to create a worker agent with full setup
@@ -47,7 +48,8 @@ describe("Player Command Scenario Tests", () => {
     it("player move command creates valid plan", () => {
         const root = createTestRoot();
         root.setEcsComponent(createJobQueueComponent());
-        root.setEcsComponent(createPathfindingGraphRegistryComponent());
+        const graph = createEmptyGraph(20, 20);
+        root.setEcsComponent(createPathfindingGraphComponent(graph));
 
         // Create worker at origin
         const worker = createWorkerAgent(root, 0, 0);
@@ -87,7 +89,8 @@ describe("Player Command Scenario Tests", () => {
     it("player command has higher priority than hunger", () => {
         const root = createTestRoot();
         root.setEcsComponent(createJobQueueComponent());
-        root.setEcsComponent(createPathfindingGraphRegistryComponent());
+        const graph = createEmptyGraph(20, 20);
+        root.setEcsComponent(createPathfindingGraphComponent(graph));
 
         // Create worker with critical hunger and food
         const worker = createWorkerAgent(root, 0, 0);
@@ -122,7 +125,8 @@ describe("Player Command Scenario Tests", () => {
     it("agent returns to autonomous behavior after command completes", () => {
         const root = createTestRoot();
         root.setEcsComponent(createJobQueueComponent());
-        root.setEcsComponent(createPathfindingGraphRegistryComponent());
+        const graph = createEmptyGraph(20, 20);
+        root.setEcsComponent(createPathfindingGraphComponent(graph));
 
         // Create worker at destination (will complete immediately)
         const worker = createWorkerAgent(root, 5, 5);
@@ -176,7 +180,8 @@ describe("Player Command Scenario Tests", () => {
     it("multiple sequential player commands execute in order", () => {
         const root = createTestRoot();
         root.setEcsComponent(createJobQueueComponent());
-        root.setEcsComponent(createPathfindingGraphRegistryComponent());
+        const graph = createEmptyGraph(20, 20);
+        root.setEcsComponent(createPathfindingGraphComponent(graph));
 
         const worker = createWorkerAgent(root, 0, 0);
         const planner = createUnitPlanner();
@@ -220,7 +225,8 @@ describe("Player Command Scenario Tests", () => {
     it("clears command when destination unreachable", () => {
         const root = createTestRoot();
         root.setEcsComponent(createJobQueueComponent());
-        root.setEcsComponent(createPathfindingGraphRegistryComponent());
+        const graph = createEmptyGraph(20, 20);
+        root.setEcsComponent(createPathfindingGraphComponent(graph));
 
         const worker = createWorkerAgent(root, 0, 0);
 

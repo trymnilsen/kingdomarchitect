@@ -14,7 +14,7 @@ export function unclaimJob(agent: Entity, jobIndex: number) {
     const root = agent.getRootEntity();
     const jobQueue = root.getEcsComponent(JobQueueComponentId);
     if (!jobQueue) {
-        console.warn("Scene has no job queue component");
+        console.warn("Root has no job queue component");
         return;
     }
 

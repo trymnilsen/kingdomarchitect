@@ -57,10 +57,9 @@ export class AttackSelectionState extends InteractionState {
         };
 
         this.selectedPoint = toPoint;
-        const entity = queryEntity(
-            this.context.camera.currentScene,
-            toPoint,
-        ).filter((item) => item.hasComponent(HealthComponentId));
+        const entity = queryEntity(this.context.root, toPoint).filter((item) =>
+            item.hasComponent(HealthComponentId),
+        );
         if (entity.length) {
             this.selection = entity[0];
         } else {

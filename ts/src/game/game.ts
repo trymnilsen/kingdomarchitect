@@ -22,8 +22,6 @@ import { handleGameMessage } from "../server/message/gameMessageHandler.ts";
 import { createAnimationSystem } from "./system/animationSystem.ts";
 import { createJobQueueComponent } from "./component/jobQueueComponent.ts";
 import { createTileComponent } from "./component/tileComponent.ts";
-import { Entity } from "./entity/entity.ts";
-import { getOverworldEntity, overWorldId } from "./map/scenes.ts";
 import { createSpriteEquipmentSystem } from "./system/spriteEquipmentSystem.ts";
 import { SpriteDefinitionCache } from "../characterbuilder/characterSpriteGenerator.ts";
 import { createRootEntity } from "./rootFactory.ts";
@@ -50,13 +48,10 @@ export class Game {
         const root = createRootEntity();
         this.ecsWorld = new EcsWorld(root);
         this.addClientOnlyComponents();
-        this.camera = new Camera(
-            {
-                x: window.innerWidth,
-                y: window.innerHeight,
-            },
-            getOverworldEntity(this.ecsWorld.root),
-        );
+        this.camera = new Camera({
+            x: window.innerWidth,
+            y: window.innerHeight,
+        });
 
         this.gameServer = new WebworkerServerConnection();
         this.gameServer.onMessage.listen((message) => {
@@ -114,11 +109,8 @@ export class Game {
      */
     private addClientOnlyComponents() {
         this.ecsWorld.root.setEcsComponent(createJobQueueComponent());
-
-        const overworld = new Entity(overWorldId);
-        this.ecsWorld.root.addChild(overworld);
-        overworld.setEcsComponent(createTileComponent());
-        overworld.setEcsComponent(createVisibilityMapComponent());
+        this.ecsWorld.root.setEcsComponent(createTileComponent());
+        this.ecsWorld.root.setEcsComponent(createVisibilityMapComponent());
     }
 
     private addSystems() {

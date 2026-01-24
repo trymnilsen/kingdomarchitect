@@ -14,10 +14,6 @@ import {
     type ConsumeItemCommand,
 } from "../../server/message/command/consumeItemCommand.ts";
 import {
-    LoadSpaceCommand,
-    LoadSpaceCommandId,
-} from "../../server/message/command/enterSpaceCommand.ts";
-import {
     EquipItemCommandId,
     type EquipItemCommand,
 } from "../../server/message/command/equipItemCommand.ts";
@@ -30,7 +26,6 @@ import {
     type QueueJobCommand,
 } from "../../server/message/command/queueJobCommand.ts";
 import { notifyIdleWorkerForNewJob } from "./jobNotificationSystem.ts";
-import { SetSceneEffectId } from "../../server/message/effect/setSceneEffect.ts";
 import {
     CommandGameMessageType,
     type GameMessage,
@@ -58,9 +53,7 @@ import {
 import type { Entity } from "../entity/entity.ts";
 import { AttackJob } from "../job/attackJob.ts";
 import { BuildBuildingJob } from "../job/buildBuildingJob.ts";
-import { overWorldId } from "../map/scenes.ts";
 import { buildingPrefab } from "../prefab/buildingPrefab.ts";
-import { interiorPrefab } from "../prefab/interiorPrefab.ts";
 import type { GameTime } from "../gameTime.ts";
 import type { PersistenceManager } from "../../server/persistence/persistenceManager.ts";
 import { ReloadGameEffectId } from "../../server/message/effect/reloadGameEffect.ts";
@@ -106,9 +99,6 @@ function onGameMessage(
                 })
                 .catch((err) => console.error(err));
             break;
-        case LoadSpaceCommandId:
-            loadSpace(root, message.command as LoadSpaceCommand);
-            break;
         case ChangeOccupationCommandId:
             changeOccupation(root, message.command as ChangeOccupationCommand);
             break;
@@ -119,11 +109,7 @@ function onGameMessage(
             equipItem(root, message.command as EquipItemCommand);
             break;
         case BuildCommandId:
-            const overWorld = root.children.find(
-                (child) => child.id == overWorldId,
-            );
-            if (!overWorld) throw new Error("No overworld found, cannot build");
-            buildBuilding(overWorld, message.command as BuildCommand);
+            buildBuilding(root, message.command as BuildCommand);
             break;
         case AttackCommandId:
             attackTarget(root, message.command as AttackCommand);
@@ -170,17 +156,6 @@ function changeOccupation(root: Entity, command: ChangeOccupationCommand) {
     workplace.invalidateComponent(WorkplaceComponentId);
 }
 
-function loadSpace(root: Entity, command: LoadSpaceCommand) {
-    const spaceId = `interior_${command.entity}`;
-    if (!root.children.some((child) => child.id === spaceId)) {
-        const interior = interiorPrefab(spaceId);
-        root.addChild(interior);
-    }
-    root.requireEcsComponent(EffectEmitterComponentId).emitter({
-        id: SetSceneEffectId,
-        entity: spaceId,
-    });
-}
 
 function attackTarget(root: Entity, command: AttackCommand) {
     const job = AttackJob(command.attacker, command.target);
@@ -189,7 +164,7 @@ function attackTarget(root: Entity, command: AttackCommand) {
     });
 }
 
-function buildBuilding(overworld: Entity, command: BuildCommand) {
+function buildBuilding(root: Entity, command: BuildCommand) {
     //Check if we have enough to build
     //Add entities for each
     const points = Array.isArray(command.position)
@@ -204,13 +179,11 @@ function buildBuilding(overworld: Entity, command: BuildCommand) {
     for (const point of points) {
         const buildingEntity = buildingPrefab(building, true);
         buildingEntity.worldPosition = point;
-        overworld.addChild(buildingEntity);
+        root.addChild(buildingEntity);
         const job = BuildBuildingJob(buildingEntity);
-        overworld
-            .getRootEntity()
-            .updateComponent(JobQueueComponentId, (component) => {
-                component.jobs.push(job);
-            });
+        root.updateComponent(JobQueueComponentId, (component) => {
+            component.jobs.push(job);
+        });
     }
 }
 

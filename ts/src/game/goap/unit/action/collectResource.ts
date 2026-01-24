@@ -56,8 +56,7 @@ export const collectResourceAction: GoapActionDefinition<CollectResourceActionDa
             }
 
             // Verify the job is a CollectResourceJob
-            const scene = ctx.root;
-            const jobQueue = scene.getEcsComponent(JobQueueComponentId);
+            const jobQueue = ctx.root.getEcsComponent(JobQueueComponentId);
             if (!jobQueue) {
                 return false;
             }

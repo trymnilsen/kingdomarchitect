@@ -6,14 +6,12 @@ import {
     subtractPoint,
 } from "../common/point.ts";
 import type { Point } from "../common/point.ts";
-import type { Entity } from "../game/entity/entity.ts";
 import { TileSize } from "../game/map/tile.ts";
 
 export class Camera {
     private _position: Point;
     private _halfWindowSize: Point;
     private _windowSize: Point;
-    private _currentScene: Entity;
     private _viewPortIsDirty: boolean = true;
     private _tilespaceViewport: Bounds = zeroBounds();
 
@@ -52,16 +50,8 @@ export class Camera {
         return this._windowSize;
     }
 
-    get currentScene(): Entity {
-        return this._currentScene;
-    }
-    set currentScene(value: Entity) {
-        this._currentScene = value;
-    }
-
-    constructor(windowSize: Point, initialScene: Entity) {
+    constructor(windowSize: Point) {
         this._windowSize = windowSize;
-        this._currentScene = initialScene;
         this._position = { x: 0, y: 0 };
         this._halfWindowSize = {
             x: Math.floor(windowSize.x / 2),

@@ -17,8 +17,7 @@ export const beProductiveGoal: GoapGoalDefinition = {
     isValid: (ctx) => {
         // Goal is valid if there are any unclaimed jobs in the queue
         // or if the agent has already claimed a job
-        const scene = ctx.root;
-        const jobQueue = scene.getEcsComponent(JobQueueComponentId);
+        const jobQueue = ctx.root.getEcsComponent(JobQueueComponentId);
 
         if (!jobQueue) {
             return false;

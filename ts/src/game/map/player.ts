@@ -7,10 +7,7 @@ import {
     stoneResource,
     treeResource,
 } from "../../data/inventory/items/naturalResource.ts";
-import {
-    ChunkMapRegistryComponentId,
-    getChunkMap,
-} from "../component/chunkMapRegistryComponent.ts";
+import { ChunkMapComponentId } from "../component/chunkMapComponent.ts";
 import { HousingComponentId } from "../component/housingComponent.ts";
 import { setChunk, TileComponentId } from "../component/tileComponent.ts";
 import { Entity } from "../entity/entity.ts";
@@ -58,16 +55,10 @@ export function addInitialPlayerChunk(scopedEntity: Entity): Point {
             },
         });
     });
-    const chunkMap = getChunkMap(
-        chunkEntity
-            .getRootEntity()
-            .requireEcsComponent(ChunkMapRegistryComponentId),
-        scopedEntity.id,
-    );
-
-    if (!chunkMap) {
-        throw new Error("No chunk map found");
-    }
+    const chunkMapComponent = chunkEntity
+        .getRootEntity()
+        .requireEcsComponent(ChunkMapComponentId);
+    const chunkMap = chunkMapComponent.chunkMap;
 
     const trees = generateSpawnPoints(16, { x: 0, y: 0 }, chunkMap);
     for (const tree of trees) {

@@ -209,10 +209,8 @@ function executeExecuteJobAction(entity: Entity, tick: number): ActionStatus {
         return "failed";
     }
 
-    const scene = root; // Jobs typically operate in the root/scene context
-
     try {
-        handler(scene, root, entity, job, tick);
+        handler(root, entity, job, tick);
     } catch (error) {
         console.error(
             `[ExecuteJobAction] Error executing job ${job.id}:`,

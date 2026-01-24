@@ -8,7 +8,6 @@ import {
 import { PlayerUnitComponentId } from "../component/playerUnitComponent.ts";
 import type { Entity } from "../entity/entity.ts";
 import { findClosestAvailablePosition } from "../map/query/closestPositionQuery.ts";
-import { getOverworldEntity } from "../map/scenes.ts";
 import { workerPrefab } from "../prefab/workerPrefab.ts";
 
 export const housingSystem: EcsSystem = {
@@ -81,10 +80,9 @@ function update(root: Entity, _deltaTime: number) {
         const houseEntry = randomEntry(availableHouses);
         const [houseEntity, housingComponent] = houseEntry;
         removeItem(availableHouses, houseEntry);
-        const overworld = getOverworldEntity(root);
         const worker = workerPrefab();
         const spawnPosition = findClosestAvailablePosition(
-            overworld,
+            root,
             houseEntity.worldPosition,
         );
 
@@ -92,7 +90,7 @@ function update(root: Entity, _deltaTime: number) {
             worker.worldPosition = spawnPosition;
             housingComponent.tenant = worker.id;
             houseEntity.invalidateComponent(HousingComponentId);
-            overworld.addChild(worker);
+            root.addChild(worker);
         }
     }
 }

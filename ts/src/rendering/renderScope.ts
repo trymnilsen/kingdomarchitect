@@ -143,7 +143,7 @@ export class RenderScope implements UIRenderScope, UILayoutScope {
         return new OffscreenRenderScope(
             offscreenCanvas,
             context,
-            new Camera(zeroPoint(), this.camera.currentScene),
+            new Camera(zeroPoint()),
             this._assetLoader,
             this.bitmapCache,
             width,

@@ -3,7 +3,7 @@ import { treeResource } from "../../../data/inventory/items/naturalResource.ts";
 import {
     type ChunkMap,
     getEntitiesInChunkMapWithin,
-} from "../../component/chunkMapRegistryComponent.ts";
+} from "../../component/chunkMapComponent.ts";
 import { Entity } from "../../entity/entity.ts";
 import { resourcePrefab } from "../../prefab/resourcePrefab.ts";
 import { ChunkSize, getChunkBounds } from "../chunk.ts";
