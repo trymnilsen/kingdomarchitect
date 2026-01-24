@@ -118,7 +118,7 @@ export class PersistenceManager {
                     parentEntity.addChild(entity);
                 } else {
                     // Parent not found in saved entities, attach to root
-                    console.warn(
+                    console.log(
                         `Parent ${serializedEntity.parentId} not found for entity ${entity.id}, attaching to root`,
                     );
                     root.addChild(entity);

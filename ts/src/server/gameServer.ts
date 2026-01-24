@@ -95,10 +95,13 @@ export class GameServer {
 
         // Suspend events during load to prevent systems from reacting
         // before runtime components are initialized
-        await this.world.suspendEvents(async () => {
-            await this.persistenceManager.load(this.world.root);
-        });
-
+        console.log("[loadGame] Start load");
+        //await this.world.suspendEvents(async () => {
+        console.log("[loadGame] Loading");
+        await this.persistenceManager.load(this.world.root);
+        console.log("[loadGame] Load complete");
+        // });
+        console.log("[loadGame] Finished load");
         // After loading, send discovery effect for all loaded tiles
         this.sendDiscoveryEffectForLoadedWorld();
     }
@@ -153,8 +156,8 @@ export class GameServer {
         // Create behaviors for the behavior system
         const behaviors = [
             createPerformPlayerCommandBehavior(), // Priority 90
-            createSleepBehavior(),                // Priority 60-80 (scales with tiredness)
-            createPerformJobBehavior(),           // Priority 50
+            createSleepBehavior(), // Priority 60-80 (scales with tiredness)
+            createPerformJobBehavior(), // Priority 50
         ];
         this.world.addSystem(createBehaviorSystem(behaviors));
 
@@ -170,6 +173,7 @@ export class GameServer {
         this.world.addSystem(regrowSystem);
         this.world.addSystem(
             makeReplicatedEntitiesSystem((message) => {
+                console.log(`Sending replication message:`, message);
                 this.postMessage(message);
             }),
         );

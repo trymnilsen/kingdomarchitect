@@ -64,6 +64,7 @@ export class EcsWorld {
             this.batchedEvents = null;
 
             for (const event of events) {
+                console.log("[EcsWorld] Replaying event", event);
                 this.runEvent(event);
             }
         }
@@ -170,6 +171,7 @@ export class EcsWorld {
 
     runEvent = (event: EntityEvent) => {
         if (this.batchedEvents != null) {
+            console.log("[EcsWorld] Batching event", event);
             this.batchedEvents.push(event);
             return;
         }

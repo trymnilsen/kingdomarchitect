@@ -59,7 +59,12 @@ export function getWeightAtPoint(point: Point, scope: Entity): number {
                 entity.getEcsComponent(BuildingComponentId);
 
             if (!!buildingComponent) {
-                entityWeight = 100;
+                // Roads have weight 1 to prioritize pathfinding through them
+                if (buildingComponent.building.id === "road") {
+                    entityWeight = 1;
+                } else {
+                    entityWeight = 100;
+                }
             }
 
             if (entity.hasComponent(PlayerUnitComponentId)) {
