@@ -1,8 +1,8 @@
 import type { JSONValue } from "../../common/object.ts";
 import { ChunkMapComponentId } from "../../game/component/chunkMapComponent.ts";
-import {
+import type {
     ComponentID,
-    type Components,
+    Components,
 } from "../../game/component/component.ts";
 import { PathfindingGraphComponentId } from "../../game/component/pathfindingGraphComponent.ts";
 import { TileComponentId } from "../../game/component/tileComponent.ts";

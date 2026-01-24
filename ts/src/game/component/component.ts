@@ -4,7 +4,7 @@ import type { BuildingComponent } from "./buildingComponent.ts";
 import type { ChunkMapComponent } from "./chunkMapComponent.ts";
 import type { CollectableComponent } from "./collectableComponent.ts";
 import type { CraftingComponent } from "./craftingComponent.ts";
-import { DirectionComponent } from "./directionComponent.ts";
+import type { DirectionComponent } from "./directionComponent.ts";
 import type { EffectEmitterComponent } from "./effectEmitterComponent.ts";
 import type { EquipmentComponent } from "./equipmentComponent.ts";
 import type { GoapAgentComponent } from "./goapAgentComponent.ts";

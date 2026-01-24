@@ -21,7 +21,7 @@ import { createBehaviorAgentComponent } from "../behavior/components/BehaviorAge
 
 export function workerPrefab(): Entity {
     const entity = new Entity(generateId("worker"));
-    const spriteComponent = createSpriteComponent(sprites2.knight);
+    const spriteComponent = createSpriteComponent(sprites2.empty_sprite);
     entity.setEcsComponent(spriteComponent);
     entity.setEcsComponent(createHealthComponent(50, 100));
     entity.setEcsComponent(createPlayerUnitComponent());
