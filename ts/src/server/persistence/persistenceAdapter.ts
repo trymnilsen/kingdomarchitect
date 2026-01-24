@@ -47,5 +47,18 @@ export interface PersistenceAdapter {
      */
     deleteEntity(entityId: string): Promise<void>;
 
+    /**
+     * Save root entity components (world-level data like tiles and discovery)
+     * Separate from entity tree to allow different storage strategies
+     * @param components Serialized root components keyed by component ID
+     */
+    saveRootComponents(components: Record<string, any>): Promise<void>;
+
+    /**
+     * Load root entity components
+     * @returns The saved root components or null if none exist
+     */
+    loadRootComponents(): Promise<Record<string, any> | null>;
+
     clearGame(): Promise<void>;
 }

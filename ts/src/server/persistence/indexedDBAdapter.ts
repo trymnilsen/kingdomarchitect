@@ -3,10 +3,12 @@ import type { SerializedEntity } from "./serializedEntity.ts";
 import type { SerializedWorldMeta } from "./serializedWorldMeta.ts";
 
 const DB_NAME = "kingdom_architect";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const ENTITY_STORE = "entities";
 const META_STORE = "meta";
+const ROOT_COMPONENTS_STORE = "root_components";
 const META_KEY = "world_meta";
+const ROOT_COMPONENTS_KEY = "components";
 
 /**
  * IndexedDB implementation of the PersistenceAdapter.
@@ -52,6 +54,11 @@ export class IndexedDBAdapter implements PersistenceAdapter {
                 // Create meta store if it doesn't exist
                 if (!db.objectStoreNames.contains(META_STORE)) {
                     db.createObjectStore(META_STORE);
+                }
+
+                // Create root components store if it doesn't exist
+                if (!db.objectStoreNames.contains(ROOT_COMPONENTS_STORE)) {
+                    db.createObjectStore(ROOT_COMPONENTS_STORE);
                 }
             };
         });
@@ -209,6 +216,48 @@ export class IndexedDBAdapter implements PersistenceAdapter {
             this.db.close();
             this.db = null;
         }
+    }
+
+    async saveRootComponents(components: Record<string, any>): Promise<void> {
+        const db = await this.ensureDb();
+
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction(
+                [ROOT_COMPONENTS_STORE],
+                "readwrite",
+            );
+            const store = transaction.objectStore(ROOT_COMPONENTS_STORE);
+            const request = store.put(components, ROOT_COMPONENTS_KEY);
+
+            request.onsuccess = () => {
+                resolve();
+            };
+
+            request.onerror = () => {
+                reject(new Error("Failed to save root components"));
+            };
+        });
+    }
+
+    async loadRootComponents(): Promise<Record<string, any> | null> {
+        const db = await this.ensureDb();
+
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction(
+                [ROOT_COMPONENTS_STORE],
+                "readonly",
+            );
+            const store = transaction.objectStore(ROOT_COMPONENTS_STORE);
+            const request = store.get(ROOT_COMPONENTS_KEY);
+
+            request.onsuccess = () => {
+                resolve(request.result || null);
+            };
+
+            request.onerror = () => {
+                reject(new Error("Failed to load root components"));
+            };
+        });
     }
 
     async clearGame(): Promise<void> {

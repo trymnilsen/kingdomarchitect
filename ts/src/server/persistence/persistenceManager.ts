@@ -5,6 +5,8 @@ import {
     type Components,
 } from "../../game/component/component.ts";
 import { PathfindingGraphComponentId } from "../../game/component/pathfindingGraphComponent.ts";
+import { TileComponentId } from "../../game/component/tileComponent.ts";
+import { WorldDiscoveryComponentId } from "../../game/component/worldDiscoveryComponent.ts";
 import { Entity, RootEntityId } from "../../game/entity/entity.ts";
 import type { PersistenceAdapter } from "./persistenceAdapter.ts";
 import type { SerializedEntity } from "./serializedEntity.ts";
@@ -57,7 +59,7 @@ export class PersistenceManager {
     }
 
     /**
-     * Save the entire world (all children of root).
+     * Save the entire world (all children of root and root components).
      * Uses batched saving for performance.
      * @param root The root entity of the world
      */
@@ -68,7 +70,17 @@ export class PersistenceManager {
             this.collectSubtree(child, entitiesToSave);
         }
 
+        // Extract root components we want to persist
+        const rootComponents: Record<string, any> = {};
+        for (const component of root.components) {
+            if (persistableRootComponents.has(component.id)) {
+                rootComponents[component.id] =
+                    this.serializeComponent(component);
+            }
+        }
+
         await this.adapter.saveEntities(entitiesToSave);
+        await this.adapter.saveRootComponents(rootComponents);
     }
 
     /**
@@ -82,8 +94,18 @@ export class PersistenceManager {
             return false;
         }
 
+        // Load root components first
+        const rootComponents = await this.adapter.loadRootComponents();
+        if (rootComponents) {
+            for (const componentId in rootComponents) {
+                const component =
+                    this.deserializeComponent(rootComponents[componentId]);
+                root.setEcsComponent(component);
+            }
+        }
+
         const entities = await this.adapter.loadEntities();
-        if (entities.length === 0) {
+        if (entities.length === 0 && !rootComponents) {
             return false;
         }
 
@@ -317,4 +339,10 @@ export class PersistenceManager {
 const runtimeOnlyComponents = new Set<ComponentID>([
     ChunkMapComponentId,
     PathfindingGraphComponentId,
+]);
+
+// Root-level components that should be persisted separately from entity tree
+const persistableRootComponents = new Set<ComponentID>([
+    TileComponentId,
+    WorldDiscoveryComponentId,
 ]);
