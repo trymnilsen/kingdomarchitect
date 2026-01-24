@@ -96,11 +96,9 @@ export class GameServer {
         // Suspend events during load to prevent systems from reacting
         // before runtime components are initialized
         console.log("[loadGame] Start load");
-        //await this.world.suspendEvents(async () => {
         console.log("[loadGame] Loading");
         await this.persistenceManager.load(this.world.root);
         console.log("[loadGame] Load complete");
-        // });
         console.log("[loadGame] Finished load");
         // After loading, send discovery effect for all loaded tiles
         this.sendDiscoveryEffectForLoadedWorld();

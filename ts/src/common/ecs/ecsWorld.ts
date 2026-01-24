@@ -38,7 +38,6 @@ export class EcsWorld {
     };
     private rootEntity: Entity;
     private gameMessageSystems: EcsGameMessageFunction[] = [];
-    private batchedEvents: EntityEvent[] | null = null;
 
     public get root(): Entity {
         return this.rootEntity;
@@ -53,21 +52,6 @@ export class EcsWorld {
             this.rootEntity.toggleIsGameRoot(true);
         }
         this.rootEntity.entityEvent = this.runEvent;
-    }
-
-    async suspendEvents(fn: () => Promise<void>) {
-        this.batchedEvents = [];
-        try {
-            await fn();
-        } finally {
-            const events = this.batchedEvents;
-            this.batchedEvents = null;
-
-            for (const event of events) {
-                console.log("[EcsWorld] Replaying event", event);
-                this.runEvent(event);
-            }
-        }
     }
 
     rescope(entity: Entity) {
@@ -170,11 +154,6 @@ export class EcsWorld {
     }
 
     runEvent = (event: EntityEvent) => {
-        if (this.batchedEvents != null) {
-            console.log("[EcsWorld] Batching event", event);
-            this.batchedEvents.push(event);
-            return;
-        }
         const events = this.entityEvents[event.id];
         for (let i = 0; i < events.length; i++) {
             try {
