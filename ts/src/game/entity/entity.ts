@@ -517,6 +517,7 @@ export function assertEntity(
 
 const emptySet = new Set<string>();
 
+export const RootEntityId = "root";
 /**
  * Makes it more readable that we are referring to a an Entity ID
  */

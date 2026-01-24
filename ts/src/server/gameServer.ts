@@ -13,7 +13,10 @@ import { createPerformPlayerCommandBehavior } from "../game/behavior/behaviors/P
 import { createSleepBehavior } from "../game/behavior/behaviors/SleepBehavior.ts";
 import { createPerformJobBehavior } from "../game/behavior/behaviors/PerformJobBehavior.ts";
 
-import { makeReplicatedEntitiesSystem } from "./replicatedEntitiesSystem.ts";
+import {
+    buildWorldStateMessage,
+    makeReplicatedEntitiesSystem,
+} from "./replicatedEntitiesSystem.ts";
 import type { GameCommand } from "./message/gameCommand.ts";
 import {
     createEffectEmitterComponent,
@@ -41,7 +44,12 @@ export class GameServer {
     constructor(postMessage: (message: GameMessage) => void) {
         this.postMessage = postMessage;
         const root = createRootEntity();
+
         this.world = new EcsWorld(root);
+        //We start of no emitting events and then enable this after the inital
+        //start
+        this.world.enableEvents = false;
+
         this.worldSeed = Date.now();
         const adapter = new IndexedDBAdapter();
         this.persistenceManager = new PersistenceManager(adapter);
@@ -69,7 +77,8 @@ export class GameServer {
         // Run init after loading (or if no save exists)
         // worldGenerationSystem will see loaded entities and skip generation
         this.world.runInit();
-
+        this.world.enableEvents = true;
+        this.postMessage(buildWorldStateMessage(this.world.root));
         this.gameLoopInterval = setInterval(() => {
             this.updateTick += 1;
             this.gameTime.setTick(this.updateTick);

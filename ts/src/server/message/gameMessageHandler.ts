@@ -14,6 +14,7 @@ import {
     type RemoveEntityGameMessage,
     type SetComponentGameMessage,
     type TransformGameMessage,
+    WorldStateMessageType,
 } from "./gameMessage.ts";
 
 export function handleGameMessage(
@@ -23,6 +24,9 @@ export function handleGameMessage(
 ) {
     console.log("[HandleGameMessage] message from server", message);
     switch (message.type) {
+        case WorldStateMessageType:
+            updateWorldState(root, message);
+            break;
         case AddEntityGameMessageType:
             addEntityHandler(root, message);
             break;

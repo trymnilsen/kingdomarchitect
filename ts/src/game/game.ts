@@ -129,7 +129,6 @@ export class Game {
                 this.spriteCache,
             ),
         );
-        //this.ecsWorld.addSystem(worldGenerationSystem);
     }
 
     async bootstrap(): Promise<void> {

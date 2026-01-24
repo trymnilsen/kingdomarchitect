@@ -1,4 +1,4 @@
-import { Entity } from "./entity/entity.ts";
+import { Entity, RootEntityId } from "./entity/entity.ts";
 import { createChunkMapComponent } from "./component/chunkMapComponent.ts";
 import { createPathfindingGraphComponent } from "./component/pathfindingGraphComponent.ts";
 import { createLazyGraphFromRootNode } from "./map/path/graph/generateGraph.ts";
@@ -10,7 +10,7 @@ import { createLazyGraphFromRootNode } from "./map/path/graph/generateGraph.ts";
  * Use this factory in both client and server to ensure consistent setup.
  */
 export function createRootEntity(): Entity {
-    const root = new Entity("root");
+    const root = new Entity(RootEntityId);
     root.toggleIsGameRoot(true);
 
     // Set up chunk map and pathfinding graph components that must exist before any entity events

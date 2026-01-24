@@ -4,9 +4,12 @@ import { JobQueueComponentId } from "../game/component/jobQueueComponent.ts";
 import { TileComponentId } from "../game/component/tileComponent.ts";
 import { VisibilityMapComponentId } from "../game/component/visibilityMapComponent.ts";
 import { Entity } from "../game/entity/entity.ts";
-import type {
-    GameMessage,
-    ReplicatedEntityData,
+import type { Volume } from "../game/map/volume.ts";
+import {
+    WorldStateMessageType,
+    type GameMessage,
+    type ReplicatedEntityData,
+    type WorldStateGameMessage,
 } from "./message/gameMessage.ts";
 
 export function makeReplicatedEntitiesSystem(
@@ -71,6 +74,44 @@ export function makeReplicatedEntitiesSystem(
                 });
             },
         },
+    };
+}
+
+export function buildWorldStateMessage(
+    rootEntity: Entity,
+): WorldStateGameMessage {
+    // Build replicated data for all root children
+    const rootChildren = buildChildrenData(rootEntity);
+
+    // Extract chunks and volumes from the TileComponent
+    const tileComponent = rootEntity.requireEcsComponent(TileComponentId);
+
+    const chunks: WorldStateGameMessage["chunks"] = [];
+    const volumes: Volume[] = [];
+
+    // Collect all chunks with their volume references
+    for (const [_id, chunk] of tileComponent.chunks) {
+        if (!chunk.volume) {
+            continue;
+        }
+
+        chunks.push({
+            x: chunk.chunkX,
+            y: chunk.chunkY,
+            volume: chunk.volume.id,
+        });
+    }
+
+    // Collect all unique volumes
+    for (const [_id, volume] of tileComponent.volume) {
+        volumes.push(volume);
+    }
+
+    return {
+        type: WorldStateMessageType,
+        rootChildren,
+        chunks,
+        volumes,
     };
 }
 

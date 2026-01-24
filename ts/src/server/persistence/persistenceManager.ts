@@ -5,7 +5,7 @@ import {
     type Components,
 } from "../../game/component/component.ts";
 import { PathfindingGraphComponentId } from "../../game/component/pathfindingGraphComponent.ts";
-import { Entity } from "../../game/entity/entity.ts";
+import { Entity, RootEntityId } from "../../game/entity/entity.ts";
 import type { PersistenceAdapter } from "./persistenceAdapter.ts";
 import type { SerializedEntity } from "./serializedEntity.ts";
 import type { SerializedWorldMeta } from "./serializedWorldMeta.ts";
@@ -117,10 +117,12 @@ export class PersistenceManager {
                 if (parentEntity) {
                     parentEntity.addChild(entity);
                 } else {
-                    // Parent not found in saved entities, attach to root
-                    console.log(
-                        `Parent ${serializedEntity.parentId} not found for entity ${entity.id}, attaching to root`,
-                    );
+                    if (serializedEntity.parentId !== RootEntityId) {
+                        // Parent not found in saved entities, attach to root
+                        console.warn(
+                            `Parent ${serializedEntity.parentId} not found for entity ${entity.id}, attaching to root`,
+                        );
+                    }
                     root.addChild(entity);
                 }
             } else {
