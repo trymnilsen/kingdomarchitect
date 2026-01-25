@@ -1,10 +1,9 @@
 import type { Point } from "../../common/point.ts";
 import type { Components } from "../../game/component/component.ts";
-import type { Entity } from "../../game/entity/entity.ts";
-import type { TileChunk } from "../../game/map/chunk.ts";
 import type { Volume } from "../../game/map/volume.ts";
 import type { GameEffect } from "./effect/gameEffect.ts";
 import type { GameCommand } from "./gameCommand.ts";
+import type { DiscoveredTileData } from "./playerDiscoveryData.ts";
 
 export type GameMessage =
     | WorldStateGameMessage
@@ -42,7 +41,8 @@ export type WorldStateGameMessage = {
     // The entities added to the root node, will visit children as well
     // so we should only add the first level
     rootChildren: ReplicatedEntityData[];
-    chunks: { x: number; y: number; volume: string }[];
+    // Tiles discovered by the player, includes volume reference
+    discoveredTiles: DiscoveredTileData[];
     volumes: Volume[];
 };
 

@@ -207,11 +207,25 @@ function drawTiles(
                 let visible = true;
 
                 if (!window.debugChunks) {
-                    if (!hasDiscovered(visibilityMap, chunkNumberId, x, y)) {
+                    const discovered = hasDiscovered(
+                        visibilityMap,
+                        chunkNumberId,
+                        x,
+                        y,
+                    );
+                    const currentlyVisible = isVisible(
+                        visibilityMap,
+                        worldTileX,
+                        worldTileY,
+                    );
+
+                    // Render tiles that are either discovered previously OR
+                    // are currently visible to the player. If neither, skip.
+                    if (!discovered && !currentlyVisible) {
                         continue;
                     }
 
-                    visible = isVisible(visibilityMap, worldTileX, worldTileY);
+                    visible = currentlyVisible;
                 }
 
                 let color = biomes[chunk.volume.type].color;

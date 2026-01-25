@@ -3,14 +3,15 @@ import type { Components } from "../game/component/component.ts";
 import { JobQueueComponentId } from "../game/component/jobQueueComponent.ts";
 import { TileComponentId } from "../game/component/tileComponent.ts";
 import { VisibilityMapComponentId } from "../game/component/visibilityMapComponent.ts";
+import { WorldDiscoveryComponentId } from "../game/component/worldDiscoveryComponent.ts";
 import { Entity } from "../game/entity/entity.ts";
-import type { Volume } from "../game/map/volume.ts";
 import {
     WorldStateMessageType,
     type GameMessage,
     type ReplicatedEntityData,
     type WorldStateGameMessage,
 } from "./message/gameMessage.ts";
+import { getPlayerDiscoveryData } from "./message/playerDiscoveryData.ts";
 
 export function makeReplicatedEntitiesSystem(
     postMessage: (message: GameMessage) => void,
@@ -79,39 +80,26 @@ export function makeReplicatedEntitiesSystem(
 
 export function buildWorldStateMessage(
     rootEntity: Entity,
+    player: string,
 ): WorldStateGameMessage {
     // Build replicated data for all root children
     const rootChildren = buildChildrenData(rootEntity);
 
-    // Extract chunks and volumes from the TileComponent
+    // Extract discovered tiles for this player
     const tileComponent = rootEntity.requireEcsComponent(TileComponentId);
+    const discoveryComponent = rootEntity.requireEcsComponent(
+        WorldDiscoveryComponentId,
+    );
 
-    const chunks: WorldStateGameMessage["chunks"] = [];
-    const volumes: Volume[] = [];
-
-    // Collect all chunks with their volume references
-    for (const [_id, chunk] of tileComponent.chunks) {
-        if (!chunk.volume) {
-            continue;
-        }
-
-        chunks.push({
-            x: chunk.chunkX,
-            y: chunk.chunkY,
-            volume: chunk.volume.id,
-        });
-    }
-
-    // Collect all unique volumes
-    for (const [_id, volume] of tileComponent.volume) {
-        volumes.push(volume);
-    }
+    const playerDiscovery = discoveryComponent.discoveriesByUser.get(player);
+    const discoveryData =
+        playerDiscovery && getPlayerDiscoveryData(tileComponent, playerDiscovery);
 
     return {
         type: WorldStateMessageType,
         rootChildren,
-        chunks,
-        volumes,
+        discoveredTiles: discoveryData?.tiles ?? [],
+        volumes: discoveryData?.volumes ?? [],
     };
 }
 

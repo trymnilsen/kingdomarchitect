@@ -19,12 +19,15 @@ function init(_root: Entity) {
     // PathfindingGraph already exists from root factory, nothing to do
 }
 
-function onTransform(_rootEntity: Entity, entityEvent: EntityTransformEvent) {
-    const pathfindingGraphComponent =
-        entityEvent.source.requireAncestorEcsComponent(
-            PathfindingGraphComponentId,
-        );
-    pathfindingGraphComponent.pathfindingGraph.graph?.invalidatePoint(
+function onTransform(rootEntity: Entity, entityEvent: EntityTransformEvent) {
+    const pathfindingGraphComponent = rootEntity.requireEcsComponent(
+        PathfindingGraphComponentId,
+    );
+
+    pathfindingGraphComponent.pathfindingGraph.graph.invalidatePoint(
+        entityEvent.oldPosition,
+    );
+    pathfindingGraphComponent.pathfindingGraph.graph.invalidatePoint(
         entityEvent.source.worldPosition,
     );
 }
@@ -37,7 +40,7 @@ function onEntityAdded(
         entityEvent.target.requireAncestorEcsComponent(
             PathfindingGraphComponentId,
         );
-    pathfindingGraphComponent.pathfindingGraph.graph?.invalidatePoint(
+    pathfindingGraphComponent.pathfindingGraph.graph.invalidatePoint(
         entityEvent.target.worldPosition,
     );
 }
@@ -56,7 +59,7 @@ function onEntityRemoved(
         return;
     }
 
-    pathfindingGraphComponent.pathfindingGraph.graph?.invalidatePoint(
+    pathfindingGraphComponent.pathfindingGraph.graph.invalidatePoint(
         entityEvent.target.worldPosition,
     );
 }

@@ -76,7 +76,7 @@ export class GameServer {
         // worldGenerationSystem will see loaded entities and skip generation
         this.world.runInit();
         this.postMessage.enable();
-        this.postMessage.invoke(buildWorldStateMessage(this.world.root));
+        this.postMessage.invoke(buildWorldStateMessage(this.world.root, "player"));
         this.gameLoopInterval = setInterval(() => {
             this.updateTick += 1;
             this.gameTime.setTick(this.updateTick);

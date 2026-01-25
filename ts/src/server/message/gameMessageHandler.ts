@@ -4,7 +4,11 @@ import {
     createTileComponent,
     TileComponentId,
 } from "../../game/component/tileComponent.ts";
-import { getTileId } from "../../game/map/tile.ts";
+import {
+    createVisibilityMapComponent,
+    VisibilityMapComponentId,
+} from "../../game/component/visibilityMapComponent.ts";
+import { applyDiscoveredTiles } from "./applyDiscoveredTiles.ts";
 import { effectHandler } from "./effect/effectHandler.ts";
 import {
     AddEntityGameMessageType,
@@ -145,7 +149,7 @@ function transformHandler(root: Entity, message: TransformGameMessage) {
 
 /**
  * Handles the initial world state message from the server.
- * This populates the entire world including entities, chunks, and volumes.
+ * This populates the entire world including entities, discovered tiles, and volumes.
  */
 function updateWorldState(root: Entity, message: WorldStateGameMessage) {
     // Create or get the TileComponent on the root
@@ -155,25 +159,20 @@ function updateWorldState(root: Entity, message: WorldStateGameMessage) {
         root.setEcsComponent(tileComponent);
     }
 
-    // Build a volume lookup map
-    const volumeMap = new Map<string, (typeof message.volumes)[0]>();
-    for (const volume of message.volumes) {
-        volumeMap.set(volume.id, volume);
-        // Register the volume in the tile component
-        tileComponent.volume.set(volume.id, volume);
+    // Create or get the VisibilityMapComponent on the root
+    let visibilityMapComponent = root.getEcsComponent(VisibilityMapComponentId);
+    if (!visibilityMapComponent) {
+        visibilityMapComponent = createVisibilityMapComponent();
+        root.setEcsComponent(visibilityMapComponent);
     }
 
-    // Populate chunks with their volume references
-    for (const chunkData of message.chunks) {
-        const volume = volumeMap.get(chunkData.volume);
-        const chunkId = getTileId(chunkData.x, chunkData.y);
-
-        tileComponent.chunks.set(chunkId, {
-            chunkX: chunkData.x,
-            chunkY: chunkData.y,
-            volume: volume,
-        });
-    }
+    // Apply discovered tiles and volumes
+    applyDiscoveredTiles(
+        tileComponent,
+        visibilityMapComponent,
+        message.discoveredTiles,
+        message.volumes,
+    );
 
     // Create all root children entities recursively
     for (const childData of message.rootChildren) {
