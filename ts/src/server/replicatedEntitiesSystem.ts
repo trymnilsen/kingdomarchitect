@@ -1,4 +1,4 @@
-import { EcsSystem } from "../common/ecs/ecsSystem.ts";
+import type { EcsSystem } from "../common/ecs/ecsSystem.ts";
 import type { Components } from "../game/component/component.ts";
 import { JobQueueComponentId } from "../game/component/jobQueueComponent.ts";
 import { TileComponentId } from "../game/component/tileComponent.ts";

@@ -46,10 +46,7 @@ import {
     InventoryComponentId,
     takeInventoryItem,
 } from "../component/inventoryComponent.ts";
-import {
-    JobQueueComponentId,
-    addJob,
-} from "../component/jobQueueComponent.ts";
+import { JobQueueComponentId, addJob } from "../component/jobQueueComponent.ts";
 import type { Entity } from "../entity/entity.ts";
 import { AttackJob } from "../job/attackJob.ts";
 import { BuildBuildingJob } from "../job/buildBuildingJob.ts";
@@ -68,7 +65,10 @@ import {
 import { OccupationComponentId } from "../component/occupationComponent.ts";
 import { WorkplaceComponentId } from "../component/workplaceComponent.ts";
 import { removeItem } from "../../common/array.ts";
-import { BehaviorAgentComponentId, requestReplan as requestBehaviorReplan } from "../behavior/components/BehaviorAgentComponent.ts";
+import {
+    BehaviorAgentComponentId,
+    requestReplan as requestBehaviorReplan,
+} from "../behavior/components/BehaviorAgentComponent.ts";
 
 export function createCommandSystem(
     gameTime: GameTime,
@@ -118,7 +118,11 @@ function onGameMessage(
             consumeItem(root, message.command as ConsumeItemCommand);
             break;
         case SetPlayerCommandId:
-            setPlayerCommand(root, message.command as SetPlayerCommand, gameTime);
+            setPlayerCommand(
+                root,
+                message.command as SetPlayerCommand,
+                gameTime,
+            );
             break;
     }
 }
@@ -155,7 +159,6 @@ function changeOccupation(root: Entity, command: ChangeOccupationCommand) {
     worker.invalidateComponent(OccupationComponentId);
     workplace.invalidateComponent(WorkplaceComponentId);
 }
-
 
 function attackTarget(root: Entity, command: AttackCommand) {
     const job = AttackJob(command.attacker, command.target);

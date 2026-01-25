@@ -1,4 +1,4 @@
-import { Effect } from "../effect/effect.ts";
-import { InventoryItem } from "./inventoryItem.ts";
+import type { Effect } from "../effect/effect.ts";
+import type { InventoryItem } from "./inventoryItem.ts";
 
 export type EffectFactory = (item: InventoryItem) => Effect;

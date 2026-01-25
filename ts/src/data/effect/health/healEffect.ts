@@ -1,4 +1,4 @@
-import { Effect } from "../effect.ts";
+import type { Effect } from "../effect.ts";
 
 export type HealEffectData = {
     amount: number;
