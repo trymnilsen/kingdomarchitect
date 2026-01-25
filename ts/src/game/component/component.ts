@@ -7,7 +7,6 @@ import type { CraftingComponent } from "./craftingComponent.ts";
 import type { DirectionComponent } from "./directionComponent.ts";
 import type { EffectEmitterComponent } from "./effectEmitterComponent.ts";
 import type { EquipmentComponent } from "./equipmentComponent.ts";
-import type { GoapAgentComponent } from "./goapAgentComponent.ts";
 import type { BehaviorAgentComponent } from "../behavior/components/BehaviorAgentComponent.ts";
 import type { HealthComponent } from "./healthComponent.ts";
 import type { HousingComponent } from "./housingComponent.ts";
@@ -56,7 +55,6 @@ export type Components =
     | HousingComponent
     | OppcupationComponent
     | WorkplaceComponent
-    | GoapAgentComponent
     | BehaviorAgentComponent
     | HungerComponent
     | EnergyComponent;

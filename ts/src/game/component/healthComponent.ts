@@ -1,9 +1,4 @@
 import type { Entity } from "../entity/entity.ts";
-import { GoapAgentComponentId } from "./goapAgentComponent.ts";
-import {
-    requestReplan,
-    ReplanUrgency,
-} from "../system/goapReplanTrigger.ts";
 
 export type HealthComponent = {
     id: typeof HealthComponentId;
@@ -70,7 +65,7 @@ export function damage(component: HealthComponent, amount: number): number {
 export function damageEntity(
     entity: Entity,
     amount: number,
-    tick: number,
+    _tick: number,
 ): number {
     const health = entity.getEcsComponent(HealthComponentId);
     if (!health) {
@@ -80,17 +75,9 @@ export function damageEntity(
     const damageDealt = damage(health, amount);
     entity.invalidateComponent(HealthComponentId);
 
-    // If entity has GOAP agent, request urgent replan (combat requires immediate response)
+    // If entity has behavior agent, request urgent replan (combat requires immediate response)
     if (damageDealt > 0) {
-        const goapAgent = entity.getEcsComponent(GoapAgentComponentId);
-        if (goapAgent) {
-            requestReplan(
-                goapAgent,
-                ReplanUrgency.Critical,
-                `took ${damageDealt} damage`,
-                tick,
-            );
-        }
+        // TODO
     }
 
     return damageDealt;
