@@ -64,6 +64,20 @@ import {
 } from "../../../src/game/component/effectEmitterComponent.ts";
 import { CollectItemJob } from "../../../src/game/job/collectItemJob.ts";
 import { swordItem } from "../../../src/data/inventory/items/equipment.ts";
+import {
+    UpdateWorkerRoleCommandId,
+    type UpdateWorkerRoleCommand,
+} from "../../../src/server/message/command/updateWorkerRoleCommand.ts";
+import {
+    UpdateWorkerStanceCommandId,
+    type UpdateWorkerStanceCommand,
+} from "../../../src/server/message/command/updateWorkerStanceCommand.ts";
+import {
+    createRoleComponent,
+    RoleComponentId,
+    WorkerRole,
+    WorkerStance,
+} from "../../../src/game/component/worker/roleComponent.ts";
 
 function createTestGameTime(): GameTime {
     return new GameTime();
@@ -745,6 +759,223 @@ describe("commandSystem", () => {
             const updatedJobQueue = root.getEcsComponent(JobQueueComponentId);
             assert.ok(updatedJobQueue);
             assert.strictEqual(updatedJobQueue.jobs.length, 0);
+        });
+    });
+
+    describe("UpdateWorkerRoleCommand", () => {
+        it("updates worker role", () => {
+            const root = new Entity("root");
+            const gameTime = createTestGameTime();
+            const persistenceManager = createTestPersistenceManager();
+
+            const worker = new Entity("worker1");
+            const roleComponent = createRoleComponent();
+            worker.setEcsComponent(roleComponent);
+            root.addChild(worker);
+
+            const system = createCommandSystem(gameTime, persistenceManager);
+
+            const message: CommandGameMessage = {
+                type: CommandGameMessageType,
+                command: {
+                    id: UpdateWorkerRoleCommandId,
+                    worker: "worker1",
+                    role: WorkerRole.Guard,
+                } as UpdateWorkerRoleCommand,
+            };
+
+            system.onGameMessage?.(root, message);
+
+            const updatedRole = worker.getEcsComponent(RoleComponentId);
+            assert.ok(updatedRole);
+            assert.strictEqual(updatedRole.role, WorkerRole.Guard);
+        });
+
+        it("handles missing worker gracefully", () => {
+            const root = new Entity("root");
+            const gameTime = createTestGameTime();
+            const persistenceManager = createTestPersistenceManager();
+
+            const system = createCommandSystem(gameTime, persistenceManager);
+
+            const message: CommandGameMessage = {
+                type: CommandGameMessageType,
+                command: {
+                    id: UpdateWorkerRoleCommandId,
+                    worker: "nonexistent",
+                    role: WorkerRole.Guard,
+                } as UpdateWorkerRoleCommand,
+            };
+
+            // Should not throw
+            system.onGameMessage?.(root, message);
+        });
+
+        it("handles missing role component gracefully", () => {
+            const root = new Entity("root");
+            const gameTime = createTestGameTime();
+            const persistenceManager = createTestPersistenceManager();
+
+            const worker = new Entity("worker1");
+            // No role component
+            root.addChild(worker);
+
+            const system = createCommandSystem(gameTime, persistenceManager);
+
+            const message: CommandGameMessage = {
+                type: CommandGameMessageType,
+                command: {
+                    id: UpdateWorkerRoleCommandId,
+                    worker: "worker1",
+                    role: WorkerRole.Guard,
+                } as UpdateWorkerRoleCommand,
+            };
+
+            // Should not throw
+            system.onGameMessage?.(root, message);
+        });
+
+        it("updates to all role types correctly", () => {
+            const root = new Entity("root");
+            const gameTime = createTestGameTime();
+            const persistenceManager = createTestPersistenceManager();
+
+            const worker = new Entity("worker1");
+            const roleComponent = createRoleComponent();
+            worker.setEcsComponent(roleComponent);
+            root.addChild(worker);
+
+            const system = createCommandSystem(gameTime, persistenceManager);
+
+            const roles = [
+                WorkerRole.Worker,
+                WorkerRole.Explorer,
+                WorkerRole.Guard,
+                WorkerRole.Devotee,
+                WorkerRole.Spy,
+                WorkerRole.Envoy,
+                WorkerRole.Trader,
+            ];
+
+            for (const role of roles) {
+                const message: CommandGameMessage = {
+                    type: CommandGameMessageType,
+                    command: {
+                        id: UpdateWorkerRoleCommandId,
+                        worker: "worker1",
+                        role,
+                    } as UpdateWorkerRoleCommand,
+                };
+
+                system.onGameMessage?.(root, message);
+
+                const updatedRole = worker.getEcsComponent(RoleComponentId);
+                assert.ok(updatedRole);
+                assert.strictEqual(updatedRole.role, role);
+            }
+        });
+    });
+
+    describe("UpdateWorkerStanceCommand", () => {
+        it("updates worker stance to aggressive", () => {
+            const root = new Entity("root");
+            const gameTime = createTestGameTime();
+            const persistenceManager = createTestPersistenceManager();
+
+            const worker = new Entity("worker1");
+            const roleComponent = createRoleComponent();
+            worker.setEcsComponent(roleComponent);
+            root.addChild(worker);
+
+            const system = createCommandSystem(gameTime, persistenceManager);
+
+            const message: CommandGameMessage = {
+                type: CommandGameMessageType,
+                command: {
+                    id: UpdateWorkerStanceCommandId,
+                    worker: "worker1",
+                    stance: WorkerStance.Aggressive,
+                } as UpdateWorkerStanceCommand,
+            };
+
+            system.onGameMessage?.(root, message);
+
+            const updatedRole = worker.getEcsComponent(RoleComponentId);
+            assert.ok(updatedRole);
+            assert.strictEqual(updatedRole.stance, WorkerStance.Aggressive);
+        });
+
+        it("updates worker stance to defensive", () => {
+            const root = new Entity("root");
+            const gameTime = createTestGameTime();
+            const persistenceManager = createTestPersistenceManager();
+
+            const worker = new Entity("worker1");
+            const roleComponent = createRoleComponent();
+            roleComponent.stance = WorkerStance.Aggressive; // Start with aggressive
+            worker.setEcsComponent(roleComponent);
+            root.addChild(worker);
+
+            const system = createCommandSystem(gameTime, persistenceManager);
+
+            const message: CommandGameMessage = {
+                type: CommandGameMessageType,
+                command: {
+                    id: UpdateWorkerStanceCommandId,
+                    worker: "worker1",
+                    stance: WorkerStance.Defensive,
+                } as UpdateWorkerStanceCommand,
+            };
+
+            system.onGameMessage?.(root, message);
+
+            const updatedRole = worker.getEcsComponent(RoleComponentId);
+            assert.ok(updatedRole);
+            assert.strictEqual(updatedRole.stance, WorkerStance.Defensive);
+        });
+
+        it("handles missing worker gracefully", () => {
+            const root = new Entity("root");
+            const gameTime = createTestGameTime();
+            const persistenceManager = createTestPersistenceManager();
+
+            const system = createCommandSystem(gameTime, persistenceManager);
+
+            const message: CommandGameMessage = {
+                type: CommandGameMessageType,
+                command: {
+                    id: UpdateWorkerStanceCommandId,
+                    worker: "nonexistent",
+                    stance: WorkerStance.Aggressive,
+                } as UpdateWorkerStanceCommand,
+            };
+
+            // Should not throw
+            system.onGameMessage?.(root, message);
+        });
+
+        it("handles missing role component gracefully", () => {
+            const root = new Entity("root");
+            const gameTime = createTestGameTime();
+            const persistenceManager = createTestPersistenceManager();
+
+            const worker = new Entity("worker1");
+            // No role component
+            root.addChild(worker);
+
+            const system = createCommandSystem(gameTime, persistenceManager);
+
+            const message: CommandGameMessage = {
+                type: CommandGameMessageType,
+                command: {
+                    id: UpdateWorkerStanceCommandId,
+                    worker: "worker1",
+                    stance: WorkerStance.Aggressive,
+                } as UpdateWorkerStanceCommand,
+            };
+
+            // Should not throw
+            system.onGameMessage?.(root, message);
         });
     });
 });

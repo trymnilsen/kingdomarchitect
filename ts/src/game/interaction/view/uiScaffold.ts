@@ -92,8 +92,8 @@ const MenuState = {
 type MenuState = (typeof MenuState)[keyof typeof MenuState];
 
 type ExpandedMenuState = {
-    expandedButtonIndex: number | null;
     expandedGroup: "left" | "right" | null;
+    expandedPath: number[]; // [] = closed, [n] = button n expanded, [n, m] = button n's child m expanded
 };
 
 type MeasuredButtons = {
@@ -120,8 +120,8 @@ export const uiScaffold = createComponent<ScaffoldProps>(
         });
         const [_menuState, _setMenuState] = withState(MenuState.closed);
         const [expandedMenu, setExpandedMenu] = withState<ExpandedMenuState>({
-            expandedButtonIndex: null,
             expandedGroup: null,
+            expandedPath: [],
         });
 
         // Helper function to create button handlers
@@ -136,19 +136,19 @@ export const uiScaffold = createComponent<ScaffoldProps>(
                     hasChildren: true,
                     onExpand: () => {
                         if (
-                            expandedMenu.expandedButtonIndex === index &&
+                            expandedMenu.expandedPath[0] === index &&
                             expandedMenu.expandedGroup === group
                         ) {
                             // Collapse if already expanded
                             setExpandedMenu({
-                                expandedButtonIndex: null,
                                 expandedGroup: null,
+                                expandedPath: [],
                             });
                         } else {
                             // Expand this menu
                             setExpandedMenu({
-                                expandedButtonIndex: index,
                                 expandedGroup: group,
+                                expandedPath: [index],
                             });
                         }
                     },
@@ -199,26 +199,47 @@ export const uiScaffold = createComponent<ScaffoldProps>(
             sourceButtons: ScaffoldButton[],
             parentButtonData: PlacedChild,
             keyPrefix: string,
+            isCompactMode: boolean = false,
         ) => {
             // Create child menu buttons
-            const childButtons = sourceButtons.map((sourceButton) =>
-                uiMenuButton({
+            const childButtons = sourceButtons.map((sourceButton, btnIndex) => {
+                const hasNestedChildren =
+                    sourceButton.children && sourceButton.children.length > 0;
+
+                return uiMenuButton({
                     text: sourceButton.text,
                     onClick: sourceButton.onClick
                         ? () => {
                               // Close the expanded menu first
                               setExpandedMenu({
-                                  expandedButtonIndex: null,
                                   expandedGroup: null,
+                                  expandedPath: [],
                               });
                               // Then execute the action
                               sourceButton.onClick?.();
                           }
                         : undefined,
                     icon: sourceButton.icon,
-                    hasChildren: false,
-                }),
-            );
+                    hasChildren: hasNestedChildren,
+                    onExpand: hasNestedChildren
+                        ? () => {
+                              if (expandedMenu.expandedPath[1] === btnIndex) {
+                                  // Collapse nested menu if already expanded
+                                  setExpandedMenu({
+                                      expandedGroup: expandedMenu.expandedGroup,
+                                      expandedPath: [expandedMenu.expandedPath[0]],
+                                  });
+                              } else {
+                                  // Expand this nested menu
+                                  setExpandedMenu({
+                                      expandedGroup: expandedMenu.expandedGroup,
+                                      expandedPath: [expandedMenu.expandedPath[0], btnIndex],
+                                  });
+                              }
+                          }
+                        : undefined,
+                });
+            });
 
             // Measure child buttons
             const childSizes = childButtons.map((childButton, childIndex) =>
@@ -245,14 +266,58 @@ export const uiScaffold = createComponent<ScaffoldProps>(
                 // Since all buttons have centered icon boxes, centering the buttons will align the icons
                 const childX = parentCenterX - childSize.width / 2;
 
-                childrenToAdd.push({
+                const placedChild: PlacedChild = {
                     offset: {
                         x: childX,
                         y: Math.max(0, childY), // Ensure it doesn't go above screen
                     },
                     size: childSize,
                     ...childButton,
-                });
+                };
+
+                childrenToAdd.push(placedChild);
+
+                // If this button has nested children and is expanded, render them horizontally
+                if (
+                    isCompactMode &&
+                    expandedMenu.expandedPath[1] === childIndex &&
+                    sourceButtons[childIndex].children
+                ) {
+                    const nestedChildren = sourceButtons[childIndex].children!;
+                    let nestedX = childX + childSize.width + spacing;
+                    const nestedY = Math.max(0, childY);
+
+                    nestedChildren.forEach((nestedButton, nestedIndex) => {
+                        const nestedMenuButton = uiMenuButton({
+                            text: nestedButton.text,
+                            onClick: nestedButton.onClick
+                                ? () => {
+                                      setExpandedMenu({
+                                          expandedGroup: null,
+                                          expandedPath: [],
+                                      });
+                                      nestedButton.onClick?.();
+                                  }
+                                : undefined,
+                            icon: nestedButton.icon,
+                            hasChildren: false,
+                        });
+
+                        const nestedSize = measureDescriptor(
+                            `${keyPrefix}-${childIndex}-nested-${nestedIndex}`,
+                            nestedMenuButton,
+                            constraints,
+                        );
+
+                        childrenToAdd.push({
+                            offset: { x: nestedX, y: nestedY },
+                            size: nestedSize,
+                            ...nestedMenuButton,
+                        });
+
+                        nestedX += nestedSize.width + spacing;
+                    });
+                }
             });
 
             return childrenToAdd;
@@ -313,27 +378,27 @@ export const uiScaffold = createComponent<ScaffoldProps>(
 
             // Handle expanded child menus
             if (
-                expandedMenu.expandedButtonIndex !== null &&
+                expandedMenu.expandedPath.length > 0 &&
                 expandedMenu.expandedGroup !== null
             ) {
+                const expandedButtonIndex = expandedMenu.expandedPath[0];
                 const isLeftGroup = expandedMenu.expandedGroup === "left";
                 const sourceButtons = isLeftGroup
                     ? props.leftButtons || []
                     : props.rightButtons || [];
-                const sourceButton =
-                    sourceButtons[expandedMenu.expandedButtonIndex];
+                const sourceButton = sourceButtons[expandedButtonIndex];
 
                 if (sourceButton?.children) {
                     // Find the parent button position
                     const parentButtonData = isLeftGroup
-                        ? left[expandedMenu.expandedButtonIndex]
-                        : right[expandedMenu.expandedButtonIndex];
+                        ? left[expandedButtonIndex]
+                        : right[expandedButtonIndex];
 
                     if (parentButtonData) {
                         const expandedChildren = renderExpandedMenu(
                             sourceButton.children,
                             parentButtonData,
-                            `child-${expandedMenu.expandedButtonIndex}`,
+                            `child-${expandedButtonIndex}`,
                         );
                         children.push(...expandedChildren);
                     }
@@ -380,19 +445,19 @@ export const uiScaffold = createComponent<ScaffoldProps>(
                     hasChildren: true,
                     onExpand: () => {
                         if (
-                            expandedMenu.expandedButtonIndex === 0 &&
+                            expandedMenu.expandedPath[0] === 0 &&
                             expandedMenu.expandedGroup === "left"
                         ) {
                             // Collapse if already expanded
                             setExpandedMenu({
-                                expandedButtonIndex: null,
                                 expandedGroup: null,
+                                expandedPath: [],
                             });
                         } else {
                             // Expand this menu
                             setExpandedMenu({
-                                expandedButtonIndex: 0,
                                 expandedGroup: "left",
+                                expandedPath: [0],
                             });
                         }
                     },
@@ -442,16 +507,17 @@ export const uiScaffold = createComponent<ScaffoldProps>(
                 });
             } // Handle expanded menus in compact mode
             if (
-                expandedMenu.expandedButtonIndex !== null &&
+                expandedMenu.expandedPath.length > 0 &&
                 expandedMenu.expandedGroup !== null
             ) {
+                const expandedButtonIndex = expandedMenu.expandedPath[0];
                 let sourceButtons: ScaffoldButton[] = [];
                 let parentButtonData: PlacedChild | undefined;
                 let keyPrefix = "";
 
                 if (
                     expandedMenu.expandedGroup === "left" &&
-                    expandedMenu.expandedButtonIndex === 0 &&
+                    expandedButtonIndex === 0 &&
                     props.leftButtons
                 ) {
                     // Handle expanded Actions menu (collapsed left buttons)
@@ -464,7 +530,7 @@ export const uiScaffold = createComponent<ScaffoldProps>(
                 ) {
                     // Handle expanded right button menus
                     const sourceButton =
-                        props.rightButtons[expandedMenu.expandedButtonIndex];
+                        props.rightButtons[expandedButtonIndex];
                     if (sourceButton?.children) {
                         sourceButtons = sourceButton.children;
                         // Find the right button that was expanded
@@ -473,10 +539,9 @@ export const uiScaffold = createComponent<ScaffoldProps>(
                             : 0;
                         parentButtonData =
                             children[
-                                rightButtonStartIndex +
-                                    expandedMenu.expandedButtonIndex
+                                rightButtonStartIndex + expandedButtonIndex
                             ];
-                        keyPrefix = `right-child-${expandedMenu.expandedButtonIndex}`;
+                        keyPrefix = `right-child-${expandedButtonIndex}`;
                     }
                 }
 
@@ -485,6 +550,7 @@ export const uiScaffold = createComponent<ScaffoldProps>(
                         sourceButtons,
                         parentButtonData,
                         keyPrefix,
+                        true, // isCompactMode - enables horizontal nested menus
                     );
                     children.push(...expandedChildren);
                 }

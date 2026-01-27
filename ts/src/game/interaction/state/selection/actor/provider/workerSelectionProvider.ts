@@ -22,6 +22,12 @@ import { EquipItemCommand } from "../../../../../../server/message/command/equip
 import { AttackSelectionState } from "../../../attack/attackSelectionState.ts";
 import { ItemTag } from "../../../../../../data/inventory/inventoryItem.ts";
 import { ConsumeItemCommand } from "../../../../../../server/message/command/consumeItemCommand.ts";
+import { RoleSelectionState } from "../../../role/roleSelectionState.ts";
+import {
+    RoleComponentId,
+    WorkerStance,
+} from "../../../../../component/worker/roleComponent.ts";
+import { UpdateWorkerStanceCommand } from "../../../../../../server/message/command/updateWorkerStanceCommand.ts";
 
 export class WorkerSelectionProvider implements ActorSelectionProvider {
     provideButtons(
@@ -207,6 +213,9 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
         stateContext: StateContext,
         selectedEntity: Entity,
     ): UIActionbarItem[] {
+        const roleComponent = selectedEntity.getEcsComponent(RoleComponentId);
+        const currentStance = roleComponent?.stance ?? WorkerStance.Defensive;
+
         const items: UIActionbarItem[] = [
             {
                 text: "Interact",
@@ -226,12 +235,43 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
                 },
             },
             {
-                text: "Mode",
+                text: "Role",
+                icon: sprites2.empty_sprite,
                 onClick: () => {
                     stateContext.stateChanger.push(
-                        new AlertMessageState("Skills", "no skills"),
+                        new RoleSelectionState(selectedEntity),
                     );
                 },
+            },
+            {
+                text: "Stance",
+                icon: sprites2.empty_sprite,
+                children: [
+                    {
+                        text: "Aggressive",
+                        icon: sprites2.empty_sprite,
+                        onClick: () => {
+                            stateContext.commandDispatcher(
+                                UpdateWorkerStanceCommand(
+                                    selectedEntity,
+                                    WorkerStance.Aggressive,
+                                ),
+                            );
+                        },
+                    },
+                    {
+                        text: "Defensive",
+                        icon: sprites2.empty_sprite,
+                        onClick: () => {
+                            stateContext.commandDispatcher(
+                                UpdateWorkerStanceCommand(
+                                    selectedEntity,
+                                    WorkerStance.Defensive,
+                                ),
+                            );
+                        },
+                    },
+                ],
             },
         ];
 

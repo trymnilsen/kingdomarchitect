@@ -69,6 +69,15 @@ import {
     BehaviorAgentComponentId,
     requestReplan as requestBehaviorReplan,
 } from "../behavior/components/BehaviorAgentComponent.ts";
+import {
+    UpdateWorkerRoleCommandId,
+    type UpdateWorkerRoleCommand,
+} from "../../server/message/command/updateWorkerRoleCommand.ts";
+import {
+    UpdateWorkerStanceCommandId,
+    type UpdateWorkerStanceCommand,
+} from "../../server/message/command/updateWorkerStanceCommand.ts";
+import { RoleComponentId } from "../component/worker/roleComponent.ts";
 
 export function createCommandSystem(
     gameTime: GameTime,
@@ -122,6 +131,15 @@ function onGameMessage(
                 root,
                 message.command as SetPlayerCommand,
                 gameTime,
+            );
+            break;
+        case UpdateWorkerRoleCommandId:
+            updateWorkerRole(root, message.command as UpdateWorkerRoleCommand);
+            break;
+        case UpdateWorkerStanceCommandId:
+            updateWorkerStance(
+                root,
+                message.command as UpdateWorkerStanceCommand,
             );
             break;
     }
@@ -338,4 +356,44 @@ function setPlayerCommand(
     console.log(
         `[SetPlayerCommand] Command set for agent ${command.agentId}: ${command.command.action}`,
     );
+}
+
+function updateWorkerRole(root: Entity, command: UpdateWorkerRoleCommand) {
+    const worker = root.findEntity(command.worker);
+    if (!worker) {
+        console.warn(`[UpdateWorkerRole] Worker ${command.worker} not found`);
+        return;
+    }
+
+    const roleComponent = worker.getEcsComponent(RoleComponentId);
+    if (!roleComponent) {
+        console.warn(
+            `[UpdateWorkerRole] Worker ${command.worker} has no role component`,
+        );
+        return;
+    }
+
+    roleComponent.role = command.role;
+    worker.invalidateComponent(RoleComponentId);
+}
+
+function updateWorkerStance(root: Entity, command: UpdateWorkerStanceCommand) {
+    const worker = root.findEntity(command.worker);
+    if (!worker) {
+        console.warn(
+            `[UpdateWorkerStance] Worker ${command.worker} not found`,
+        );
+        return;
+    }
+
+    const roleComponent = worker.getEcsComponent(RoleComponentId);
+    if (!roleComponent) {
+        console.warn(
+            `[UpdateWorkerStance] Worker ${command.worker} has no role component`,
+        );
+        return;
+    }
+
+    roleComponent.stance = command.stance;
+    worker.invalidateComponent(RoleComponentId);
 }
