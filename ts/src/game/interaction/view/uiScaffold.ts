@@ -227,13 +227,18 @@ export const uiScaffold = createComponent<ScaffoldProps>(
                                   // Collapse nested menu if already expanded
                                   setExpandedMenu({
                                       expandedGroup: expandedMenu.expandedGroup,
-                                      expandedPath: [expandedMenu.expandedPath[0]],
+                                      expandedPath: [
+                                          expandedMenu.expandedPath[0],
+                                      ],
                                   });
                               } else {
                                   // Expand this nested menu
                                   setExpandedMenu({
                                       expandedGroup: expandedMenu.expandedGroup,
-                                      expandedPath: [expandedMenu.expandedPath[0], btnIndex],
+                                      expandedPath: [
+                                          expandedMenu.expandedPath[0],
+                                          btnIndex,
+                                      ],
                                   });
                               }
                           }

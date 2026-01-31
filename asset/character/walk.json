@@ -18,5 +18,21 @@
         "walk_southwest",
         "walk_northeast",
         "walk_northwest"
+    ],
+    "anchors": [
+        {
+            "id": "LeftHand",
+            "layer": {
+                "front": "00FF00",
+                "back": "00B400"
+            }
+        },
+        {
+            "id": "LeftHand",
+            "layer": {
+                "front": "00FF00",
+                "back": "00B400"
+            }
+        }
     ]
 }
