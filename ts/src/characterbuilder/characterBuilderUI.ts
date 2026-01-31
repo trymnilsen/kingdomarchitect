@@ -11,6 +11,7 @@ import {
     createPreviewPanel,
 } from "./ui/CharacterBuilderPanels.ts";
 import {
+    EQUIPMENT_OPTIONS,
     type BodyPart,
     type PreviewMode,
 } from "./ui/characterBuilderConstants.ts";
@@ -28,12 +29,34 @@ export const CharacterBuilderUI = createComponent(({ withState }) => {
     const [selectedColors, setSelectedColors] = withState<CharacterColors>({});
     const [previewMode, setPreviewMode] = withState<PreviewMode>("Single");
     const [currentFrame, setCurrentFrame] = withState<number>(0);
+    const [selectedAnchor, setSelectedAnchor] = withState<string | null>(null);
+
+    const handlePartSelect = (part: BodyPart) => {
+        setSelectedPart(part);
+        if (part !== "Equipment") {
+            setSelectedAnchor(null);
+        }
+    };
 
     const handleColorSelect = (color: string | undefined) => {
         const newColors = { ...selectedColors };
         newColors[selectedPart] = color;
         console.log("Color updated:", newColors);
         setSelectedColors(newColors);
+    };
+
+    const handleEquipmentSelect = (anchorId: string, equipmentId: string) => {
+        const existing = selectedColors.Equipment ?? [];
+        const filtered = existing.filter((e) => e.anchor !== anchorId);
+        const option = EQUIPMENT_OPTIONS.find((o) => o.id === equipmentId);
+        if (option && option.sprite && option.offset) {
+            filtered.push({
+                sprite: option.sprite,
+                offsetInSpriteForAnchorPoint: option.offset,
+                anchor: anchorId,
+            });
+        }
+        setSelectedColors({ ...selectedColors, Equipment: filtered });
     };
 
     // Get the current animation's frame count
@@ -84,9 +107,12 @@ export const CharacterBuilderUI = createComponent(({ withState }) => {
                 children: [
                     createPartSelectionPanel(
                         selectedPart,
-                        setSelectedPart,
+                        handlePartSelect,
                         selectedColors,
                         handleColorSelect,
+                        selectedAnchor,
+                        setSelectedAnchor,
+                        handleEquipmentSelect,
                     ),
                     createPreviewPanel(
                         previewMode,

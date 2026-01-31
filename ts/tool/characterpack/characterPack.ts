@@ -5,11 +5,16 @@ import { PNGWithMetadata } from "pngjs";
 import { collectAssetFiles } from "../util/files.ts";
 import { PixelColor } from "../util/pixels.ts";
 import { getPixelColor, readPng } from "../util/pngHelper.ts";
-import type { CharacterDefinition } from "./characterDefinition.ts";
+import type {
+    CharacterDefinition,
+    AnchorDefinition,
+} from "./characterDefinition.ts";
 import type { ColorRegion, PixelPosition } from "./colorRegion.ts";
 import type {
     CharacterAnimation,
     AnimationPart,
+    AnimationAnchor,
+    AnchorFrame,
     PartFrame,
 } from "./characterAnimation.ts";
 
@@ -136,9 +141,45 @@ function processCharacterFile(
             },
         );
 
+        // Process anchors from the bottom half of the sprite sheet
+        const anchors: AnimationAnchor[] = [];
+        if (definition.anchors && definition.anchors.length > 0) {
+            const anchorYBase = getAnchorYBase(definition);
+            for (const anchorDef of definition.anchors) {
+                const anchorFrames: AnchorFrame[] = [];
+                for (let frameIndex = 0; frameIndex < maxFrames; frameIndex++) {
+                    const frameX = getFrameX(
+                        frameIndex,
+                        definition.width,
+                        definition.offset,
+                    );
+                    const anchorY = anchorYBase + getAnimationY(
+                        i,
+                        definition.height,
+                        definition.offset,
+                    );
+
+                    const frame = findAnchorInFrame(
+                        pngImage,
+                        frameX,
+                        anchorY,
+                        definition.width,
+                        definition.height,
+                        anchorDef,
+                    );
+                    anchorFrames.push(frame);
+                }
+                anchors.push({
+                    anchorId: anchorDef.id,
+                    frames: anchorFrames,
+                });
+            }
+        }
+
         animations.push({
             animationName: animationName,
             parts: parts,
+            anchors: anchors,
         });
     }
 
@@ -178,6 +219,49 @@ function hexToPixelColor(hex: string): PixelColor {
  */
 function colorsMatch(a: PixelColor, b: PixelColor): boolean {
     return a.red === b.red && a.green === b.green && a.blue === b.blue;
+}
+
+/**
+ * Calculates the Y offset where anchor marker data begins in the sprite sheet.
+ * Anchors are stored below all animation rows, using the same layout.
+ */
+function getAnchorYBase(definition: CharacterDefinition): number {
+    const rowHeight = definition.offset + definition.height + definition.offset;
+    return definition.animations.length * rowHeight;
+}
+
+/**
+ * Searches a single frame region for an anchor marker pixel.
+ * Returns [x, y, z] where z=1 is front and z=0 is back,
+ * or an empty array if the anchor is not found.
+ */
+function findAnchorInFrame(
+    png: PNGWithMetadata,
+    startX: number,
+    startY: number,
+    width: number,
+    height: number,
+    anchor: AnchorDefinition,
+): AnchorFrame {
+    const frontColor = hexToPixelColor(anchor.layer.front);
+    const backColor = hexToPixelColor(anchor.layer.back);
+
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            const absoluteX = startX + x;
+            const absoluteY = startY + y;
+            const pixelColor = getPixelColor(png, absoluteX, absoluteY);
+
+            if (colorsMatch(pixelColor, frontColor)) {
+                return [x, y, 1];
+            }
+            if (colorsMatch(pixelColor, backColor)) {
+                return [x, y, 0];
+            }
+        }
+    }
+
+    return [];
 }
 
 /**

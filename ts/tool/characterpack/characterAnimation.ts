@@ -15,9 +15,25 @@ export interface AnimationPart {
 }
 
 /**
+ * Represents a single anchor point for one frame.
+ * Format: [x, y, z] where z=1 means in front, z=0 means behind/occluded.
+ * Empty array means the anchor is not present in this frame.
+ */
+export type AnchorFrame = number[];
+
+/**
+ * Represents all frames for a specific anchor within an animation
+ */
+export interface AnimationAnchor {
+    anchorId: string;
+    frames: AnchorFrame[];
+}
+
+/**
  * Represents a complete animation with all its parts
  */
 export interface CharacterAnimation {
     animationName: string;
     parts: AnimationPart[];
+    anchors: AnimationAnchor[];
 }

@@ -28,7 +28,7 @@
             }
         },
         {
-            "id": "LeftHand",
+            "id": "RightHand",
             "layer": {
                 "front": "00FF00",
                 "back": "00B400"

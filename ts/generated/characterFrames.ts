@@ -281,6 +281,58 @@ export const characterPartFrames = [
           ]
         ]
       }
+    ],
+    "anchors": [
+      {
+        "anchorId": "LeftHand",
+        "frames": [
+          [
+            9,
+            9,
+            1
+          ],
+          [
+            8,
+            7,
+            0
+          ],
+          [
+            9,
+            9,
+            1
+          ],
+          [
+            8,
+            7,
+            1
+          ]
+        ]
+      },
+      {
+        "anchorId": "RightHand",
+        "frames": [
+          [
+            9,
+            9,
+            1
+          ],
+          [
+            8,
+            7,
+            0
+          ],
+          [
+            9,
+            9,
+            1
+          ],
+          [
+            8,
+            7,
+            1
+          ]
+        ]
+      }
     ]
   },
   {
@@ -565,6 +617,58 @@ export const characterPartFrames = [
           ]
         ]
       }
+    ],
+    "anchors": [
+      {
+        "anchorId": "LeftHand",
+        "frames": [
+          [
+            6,
+            9,
+            1
+          ],
+          [
+            7,
+            7,
+            0
+          ],
+          [
+            6,
+            9,
+            1
+          ],
+          [
+            7,
+            7,
+            1
+          ]
+        ]
+      },
+      {
+        "anchorId": "RightHand",
+        "frames": [
+          [
+            6,
+            9,
+            1
+          ],
+          [
+            7,
+            7,
+            0
+          ],
+          [
+            6,
+            9,
+            1
+          ],
+          [
+            7,
+            7,
+            1
+          ]
+        ]
+      }
     ]
   },
   {
@@ -839,6 +943,58 @@ export const characterPartFrames = [
           []
         ]
       }
+    ],
+    "anchors": [
+      {
+        "anchorId": "LeftHand",
+        "frames": [
+          [
+            5,
+            9,
+            0
+          ],
+          [
+            6,
+            7,
+            0
+          ],
+          [
+            5,
+            9,
+            0
+          ],
+          [
+            6,
+            8,
+            1
+          ]
+        ]
+      },
+      {
+        "anchorId": "RightHand",
+        "frames": [
+          [
+            5,
+            9,
+            0
+          ],
+          [
+            6,
+            7,
+            0
+          ],
+          [
+            5,
+            9,
+            0
+          ],
+          [
+            6,
+            8,
+            1
+          ]
+        ]
+      }
     ]
   },
   {
@@ -1111,6 +1267,58 @@ export const characterPartFrames = [
           [],
           [],
           []
+        ]
+      }
+    ],
+    "anchors": [
+      {
+        "anchorId": "LeftHand",
+        "frames": [
+          [
+            10,
+            9,
+            0
+          ],
+          [
+            9,
+            7,
+            0
+          ],
+          [
+            10,
+            9,
+            0
+          ],
+          [
+            9,
+            8,
+            1
+          ]
+        ]
+      },
+      {
+        "anchorId": "RightHand",
+        "frames": [
+          [
+            10,
+            9,
+            0
+          ],
+          [
+            9,
+            7,
+            0
+          ],
+          [
+            10,
+            9,
+            0
+          ],
+          [
+            9,
+            8,
+            1
+          ]
         ]
       }
     ]

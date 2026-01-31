@@ -1,5 +1,6 @@
 import { characterPartFrames } from "../../../generated/characterFrames.ts";
 import { titleTextStyle } from "../../rendering/text/textStyle.ts";
+import type { ComponentDescriptor } from "../../ui/declarative/ui.ts";
 import { uiBox } from "../../ui/declarative/uiBox.ts";
 import { uiGrid } from "../../ui/declarative/uiGrid.ts";
 import { uiColumn, uiRow } from "../../ui/declarative/uiSequence.ts";
@@ -17,8 +18,10 @@ import {
     createPrimaryButton,
 } from "./CharacterBuilderButtons.ts";
 import {
+    AVAILABLE_ANCHORS,
     BODY_PARTS,
     COLORS,
+    EQUIPMENT_OPTIONS,
     FANTASY_GEAR_COLORS,
     LAYOUT,
     type BodyPart,
@@ -49,6 +52,9 @@ export function createPartSelectionPanel(
     onPartSelect: (part: BodyPart) => void,
     selectedColors: CharacterColors,
     onColorSelect: (color: string | undefined) => void,
+    selectedAnchor: string | null,
+    onAnchorSelect: (anchor: string | null) => void,
+    onEquipmentSelect: (anchorId: string, equipmentId: string) => void,
 ) {
     return uiBox({
         width: LAYOUT.LEFT_PANEL_WIDTH,
@@ -67,26 +73,75 @@ export function createPartSelectionPanel(
                         onPartSelect(part),
                     ),
                 ),
-                uiText({
-                    content: "Color",
-                    textStyle: titleTextStyle,
-                }),
-                uiGrid({
-                    gap: 8,
-                    width: fillUiSize,
-                    height: wrapUiSize,
-                    children: createColorGridItems(
-                        FANTASY_GEAR_COLORS,
-                        (color) => {
-                            const newColor = { ...selectedColors };
-                            newColor[selectedPart] = color;
-                            onColorSelect(color);
-                        },
-                    ),
-                }),
+                ...createCustomizationSection(
+                    selectedPart,
+                    selectedColors,
+                    onColorSelect,
+                    selectedAnchor,
+                    onAnchorSelect,
+                    onEquipmentSelect,
+                ),
             ],
         }),
     });
+}
+
+function createCustomizationSection(
+    selectedPart: BodyPart,
+    selectedColors: CharacterColors,
+    onColorSelect: (color: string | undefined) => void,
+    selectedAnchor: string | null,
+    onAnchorSelect: (anchor: string | null) => void,
+    onEquipmentSelect: (anchorId: string, equipmentId: string) => void,
+): ComponentDescriptor[] {
+    if (selectedPart !== "Equipment") {
+        return [
+            uiText({
+                content: "Color",
+                textStyle: titleTextStyle,
+            }),
+            uiGrid({
+                gap: 8,
+                width: fillUiSize,
+                height: wrapUiSize,
+                children: createColorGridItems(
+                    FANTASY_GEAR_COLORS,
+                    (color) => {
+                        const newColor = { ...selectedColors };
+                        newColor[selectedPart] = color;
+                        onColorSelect(color);
+                    },
+                ),
+            }),
+        ];
+    }
+
+    if (selectedAnchor === null) {
+        return [
+            uiText({
+                content: "Anchor",
+                textStyle: titleTextStyle,
+            }),
+            ...AVAILABLE_ANCHORS.map((anchor) =>
+                createPartButton(anchor, false, () =>
+                    onAnchorSelect(anchor),
+                ),
+            ),
+        ];
+    }
+
+    return [
+        uiText({
+            content: selectedAnchor,
+            textStyle: titleTextStyle,
+        }),
+        createPartButton("< Back", false, () => onAnchorSelect(null)),
+        ...EQUIPMENT_OPTIONS.map((option) =>
+            createPartButton(option.name, false, () =>
+                onEquipmentSelect(selectedAnchor, option.id),
+            ),
+        ),
+    ];
 }
 
 /**

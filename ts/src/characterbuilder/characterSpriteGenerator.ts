@@ -418,6 +418,59 @@ function drawFrameOutline(
 }
 
 /**
+ * Draw equipment sprites at anchor positions for a given z-layer.
+ * @param targetZ 0 for behind the character, 1 for in front
+ */
+function drawEquipmentAtAnchors(
+    offscreenScope: OffscreenRenderScope,
+    animation: (typeof characterPartFrames)[number],
+    frameIdx: number,
+    equipment: NonNullable<CharacterColors["Equipment"]>,
+    frameBaseX: number,
+    frameBaseY: number,
+    contentCenterX: number,
+    contentCenterY: number,
+    animationBounds: Rectangle,
+    targetZ: number,
+): void {
+    for (const equip of equipment) {
+        const anchor = animation.anchors.find(
+            (a) => a.anchorId === equip.anchor,
+        );
+        if (!anchor) {
+            continue;
+        }
+
+        const anchorFrame = anchor.frames[frameIdx];
+        if (!anchorFrame || anchorFrame.length < 3) {
+            continue;
+        }
+
+        const [anchorX, anchorY, z] = anchorFrame;
+        if (z !== targetZ) {
+            continue;
+        }
+
+        const drawX =
+            frameBaseX +
+            contentCenterX +
+            (anchorX - animationBounds.x) -
+            equip.offsetInSpriteForAnchorPoint.x;
+        const drawY =
+            frameBaseY +
+            contentCenterY +
+            (anchorY - animationBounds.y) -
+            equip.offsetInSpriteForAnchorPoint.y;
+
+        offscreenScope.drawScreenSpaceSprite({
+            x: drawX,
+            y: drawY,
+            sprite: equip.sprite,
+        });
+    }
+}
+
+/**
  * Draw all frames of a single animation to the sprite sheet
  */
 function drawAnimation(
@@ -443,7 +496,23 @@ function drawAnimation(
         const frameBaseX = frameIdx * CHARACTER_FRAME_WIDTH;
         const frameBaseY = animIdx * CHARACTER_FRAME_HEIGHT;
 
-        // Step 1: Draw all character parts directly to the main canvas
+        // Step 1: Draw back-layer equipment (behind the character)
+        if (colors.Equipment && colors.Equipment.length > 0) {
+            drawEquipmentAtAnchors(
+                offscreenScope,
+                animation,
+                frameIdx,
+                colors.Equipment,
+                frameBaseX,
+                frameBaseY,
+                contentCenterX,
+                contentCenterY,
+                animationBounds,
+                0,
+            );
+        }
+
+        // Step 2: Draw all character parts directly to the main canvas
         for (const part of animation.parts) {
             const frameData = part.frames[frameIdx];
             if (!frameData || frameData.length === 0) {
@@ -477,7 +546,7 @@ function drawAnimation(
                 });
             }
 
-            // Step 2: Draw equipment for head parts
+            // Step 3: Draw equipment for head parts
             if (part.partName === "Head") {
                 const partBounds = getPartBounds(frameData);
                 const position = subtractPoint(
@@ -501,7 +570,23 @@ function drawAnimation(
             }
         }
 
-        // Step 3: Extract pixels from the frame region in the main canvas
+        // Step 4: Draw front-layer equipment (in front of the character)
+        if (colors.Equipment && colors.Equipment.length > 0) {
+            drawEquipmentAtAnchors(
+                offscreenScope,
+                animation,
+                frameIdx,
+                colors.Equipment,
+                frameBaseX,
+                frameBaseY,
+                contentCenterX,
+                contentCenterY,
+                animationBounds,
+                1,
+            );
+        }
+
+        // Step 5: Extract pixels from the frame region in the main canvas
         const { pixelSet, maxY } = offscreenScope.extractPixels(
             frameBaseX,
             frameBaseY,
@@ -509,10 +594,10 @@ function drawAnimation(
             CHARACTER_FRAME_HEIGHT,
         );
 
-        // Step 4: Generate outline from extracted pixels
+        // Step 6: Generate outline from extracted pixels
         const outlinePixels = generateOutlineFromPixels(pixelSet, maxY);
 
-        // Step 5: Draw outline on top of the frame
+        // Step 7: Draw outline on top of the frame
         drawFrameOutline(offscreenScope, outlinePixels, frameBaseX, frameBaseY);
     }
 }

@@ -1,3 +1,8 @@
+import { characterPartFrames } from "../../../generated/characterFrames.ts";
+import { sprites2 } from "../../asset/sprite.ts";
+import type { Sprite2 } from "../../asset/sprite.ts";
+import type { Point } from "../../common/point.ts";
+
 /**
  * Character sprite dimensions
  */
@@ -82,3 +87,26 @@ export const FANTASY_GEAR_COLORS = [
 
 export type BodyPart = (typeof BODY_PARTS)[number];
 export type PreviewMode = "Sheet" | "Single";
+
+export type EquipmentOption = {
+    id: string;
+    name: string;
+    sprite?: Sprite2;
+    offset?: Point;
+};
+
+export const EQUIPMENT_OPTIONS: EquipmentOption[] = [
+    { id: "none", name: "None" },
+    {
+        id: "sword",
+        name: "Sword",
+        sprite: sprites2.character_sword,
+        offset: { x: 4, y: 8 },
+    },
+];
+
+/**
+ * Available anchor points derived from the first animation's anchor data
+ */
+export const AVAILABLE_ANCHORS: string[] =
+    characterPartFrames[0]?.anchors.map((a) => a.anchorId) ?? [];
