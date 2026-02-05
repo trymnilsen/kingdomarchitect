@@ -46,7 +46,7 @@ export const moveToJobHandler: JobHandler<MoveToJob> = (
 ) => {
     //Sanity check for if we are on top of the position
     if (pointEquals(job.position, runner.worldPosition)) {
-        completeJob(runner);
+        completeJob(runner, root);
     }
 
     let nextPoint = job.path.shift();
@@ -94,7 +94,7 @@ export const moveToJobHandler: JobHandler<MoveToJob> = (
     if (!nextPoint) {
         //We got here there is no option to keep moving
         console.log("NextPoint not defined, completing job");
-        completeJob(runner);
+        completeJob(runner, root);
         return;
     }
 
@@ -109,6 +109,6 @@ export const moveToJobHandler: JobHandler<MoveToJob> = (
     //If we happen to be at the end now, we dont need to wait for next
     //tick to finish
     if (pointEquals(runner.worldPosition, job.position)) {
-        completeJob(runner);
+        completeJob(runner, root);
     }
 };

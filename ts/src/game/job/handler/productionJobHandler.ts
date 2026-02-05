@@ -28,7 +28,7 @@ export const productionJobHandler: JobHandler<ProductionJob> = (
         console.warn(
             `[ProductionJob] Unable to find building entity ${job.targetBuilding}`,
         );
-        completeJob(worker);
+        completeJob(worker, root);
         return;
     }
 
@@ -37,7 +37,7 @@ export const productionJobHandler: JobHandler<ProductionJob> = (
         console.warn(
             `[ProductionJob] Building ${job.targetBuilding} has no ProductionComponent`,
         );
-        completeJob(worker);
+        completeJob(worker, root);
         return;
     }
 
@@ -46,7 +46,7 @@ export const productionJobHandler: JobHandler<ProductionJob> = (
         console.warn(
             `[ProductionJob] Unknown production definition: ${productionComp.productionId}`,
         );
-        completeJob(worker);
+        completeJob(worker, root);
         return;
     }
 
@@ -59,7 +59,7 @@ export const productionJobHandler: JobHandler<ProductionJob> = (
             console.warn(
                 `[ProductionJob] Worker failed to reach building ${job.targetBuilding}`,
             );
-            completeJob(worker);
+            completeJob(worker, root);
         }
         return;
     }
@@ -113,6 +113,6 @@ export const productionJobHandler: JobHandler<ProductionJob> = (
             }
         }
 
-        completeJob(worker);
+        completeJob(worker, root);
     }
 };

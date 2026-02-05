@@ -37,12 +37,12 @@ export const attackHandler: JobHandler<AttackJob> = (
             runner.id,
             job.attacker,
         );
-        completeJob(runner);
+        completeJob(runner, root);
         return;
     }
     if (!targetEntity) {
         console.error("Target not a valid entity");
-        completeJob(runner);
+        completeJob(runner, root);
         return;
     }
 
@@ -53,13 +53,13 @@ export const attackHandler: JobHandler<AttackJob> = (
         const movement = doMovement(runner, targetEntity.worldPosition);
         if (movement == MovementResult.Failure) {
             console.log("Failed to move");
-            completeJob(runner);
+            completeJob(runner, root);
         }
     } else {
         const healthComponent = targetEntity.getEcsComponent(HealthComponentId);
         if (!healthComponent) {
             console.log("target had no health component");
-            completeJob(runner);
+            completeJob(runner, root);
             return;
         }
 
@@ -67,7 +67,7 @@ export const attackHandler: JobHandler<AttackJob> = (
         targetEntity.invalidateComponent(HealthComponentId);
 
         if (healthComponent.currentHp === 0) {
-            completeJob(runner);
+            completeJob(runner, root);
         }
     }
 };

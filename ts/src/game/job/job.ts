@@ -1,4 +1,5 @@
 import { JobRunnerComponentId } from "../component/jobRunnerComponent.ts";
+import { JobQueueComponentId } from "../component/jobQueueComponent.ts";
 import type { Entity } from "../entity/entity.ts";
 import type { AttackJob } from "./attackJob.ts";
 import type { BuildBuildingJob } from "./buildBuildingJob.ts";
@@ -46,9 +47,23 @@ export type JobHandler<T extends Job> = (
     tick: number,
 ) => void;
 
-export function completeJob(entity: Entity) {
+export function completeJob(entity: Entity, root?: Entity) {
     const runner = entity.requireEcsComponent(JobRunnerComponentId);
-    console.log("Completing job", runner.currentJob);
+    const job = runner.currentJob;
+    console.log("Completing job", job);
+
+    // Remove job from global queue if root is provided
+    if (root && job) {
+        const jobQueue = root.getEcsComponent(JobQueueComponentId);
+        if (jobQueue) {
+            const index = jobQueue.jobs.indexOf(job);
+            if (index !== -1) {
+                jobQueue.jobs.splice(index, 1);
+                root.invalidateComponent(JobQueueComponentId);
+            }
+        }
+    }
+
     runner.currentJob = null;
     entity.invalidateComponent(JobRunnerComponentId);
 }

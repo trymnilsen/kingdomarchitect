@@ -382,7 +382,7 @@ function doConstruction(
 
     if (healthComponent.currentHp >= healthComponent.maxHp) {
         finishConstruction(root, buildingEntity, buildingComponent);
-        completeJob(runner);
+        completeJob(runner, root);
     }
 }
 

@@ -185,7 +185,8 @@ function getJobTargetPosition(
             const entity = root.findEntity(job.entityId);
             return entity?.worldPosition ?? null;
         }
-        case "craftingJob": {
+        case "craftingJob":
+        case "productionJob": {
             const entity = root.findEntity(job.targetBuilding);
             return entity?.worldPosition ?? null;
         }

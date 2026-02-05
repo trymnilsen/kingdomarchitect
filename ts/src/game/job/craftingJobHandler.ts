@@ -15,7 +15,7 @@ export const craftingJobHandler: JobHandler<CraftingJob> = (
 
     if (!buildingEntity) {
         console.warn(`Unable to find building entity ${job.targetBuilding}`);
-        completeJob(worker);
+        completeJob(worker, root);
         return;
     }
 
@@ -25,7 +25,7 @@ export const craftingJobHandler: JobHandler<CraftingJob> = (
         const movement = doMovement(worker, buildingEntity.worldPosition);
         if (movement === MovementResult.Failure) {
             console.warn(`Worker failed to reach building ${job.targetBuilding}`);
-            completeJob(worker);
+            completeJob(worker, root);
         }
         return;
     }
@@ -34,14 +34,14 @@ export const craftingJobHandler: JobHandler<CraftingJob> = (
     const workerInventory = worker.getEcsComponent(InventoryComponentId);
     if (!workerInventory) {
         console.warn(`Worker ${worker.id} has no inventory component`);
-        completeJob(worker);
+        completeJob(worker, root);
         return;
     }
 
     const buildingInventory = buildingEntity.getEcsComponent(InventoryComponentId);
     if (!buildingInventory) {
         console.warn(`Building ${buildingEntity.id} has no inventory component`);
-        completeJob(worker);
+        completeJob(worker, root);
         return;
     }
 
@@ -57,7 +57,7 @@ export const craftingJobHandler: JobHandler<CraftingJob> = (
                     `Worker ${worker.id} missing materials for recipe ${job.recipe.id}: ` +
                     `needs ${input.amount}x ${input.item.id}, has ${item?.amount ?? 0}`
                 );
-                completeJob(worker);
+                completeJob(worker, root);
                 return;
             }
         }
@@ -73,7 +73,7 @@ export const craftingJobHandler: JobHandler<CraftingJob> = (
                 console.error(
                     `Failed to consume ${input.amount}x ${input.item.id} from worker ${worker.id}`
                 );
-                completeJob(worker);
+                completeJob(worker, root);
                 return;
             }
         }
@@ -97,6 +97,6 @@ export const craftingJobHandler: JobHandler<CraftingJob> = (
         }
 
         buildingEntity.invalidateComponent(InventoryComponentId);
-        completeJob(worker);
+        completeJob(worker, root);
     }
 };

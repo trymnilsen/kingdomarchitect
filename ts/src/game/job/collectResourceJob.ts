@@ -49,7 +49,7 @@ export const collectResourceHandler: JobHandler<CollectResourceJob> = (
 
     if (!resourceEntity) {
         console.error(`Unable to find resource entity with id ${job.entityId}`);
-        completeJob(runner);
+        completeJob(runner, root);
         return;
     }
 
@@ -57,7 +57,7 @@ export const collectResourceHandler: JobHandler<CollectResourceJob> = (
         resourceEntity.getEcsComponent(ResourceComponentId);
     if (!resourceComponent) {
         console.error(`No resource component on entity ${job.entityId}`);
-        completeJob(runner);
+        completeJob(runner, root);
         return;
     }
 
@@ -67,7 +67,7 @@ export const collectResourceHandler: JobHandler<CollectResourceJob> = (
         console.error(
             `No resource definition found for ${resourceComponent.resourceId}`,
         );
-        completeJob(runner);
+        completeJob(runner, root);
         return;
     }
 
@@ -80,7 +80,7 @@ export const collectResourceHandler: JobHandler<CollectResourceJob> = (
         const movement = doMovement(runner, resourceEntity.worldPosition);
         if (movement == MovementResult.Failure) {
             console.log("Failed to move to resource");
-            completeJob(runner);
+            completeJob(runner, root);
         }
     } else {
         // Adjacent to the resource, perform harvest action
@@ -100,7 +100,7 @@ export const collectResourceHandler: JobHandler<CollectResourceJob> = (
                 resourceEntity.getEcsComponent(HealthComponentId);
             if (!healthComponent) {
                 console.log("Resource had no health component for chopping");
-                completeJob(runner);
+                completeJob(runner, root);
                 return;
             }
 
@@ -110,7 +110,7 @@ export const collectResourceHandler: JobHandler<CollectResourceJob> = (
 
             // If resource is destroyed, complete the job
             if (healthComponent.currentHp <= 0) {
-                completeJob(runner);
+                completeJob(runner, root);
                 resourceEntity.remove();
                 // Chop yields are handled by health/tree-specific logic
                 // For now, keeping existing wood reward for trees
@@ -148,15 +148,15 @@ export const collectResourceHandler: JobHandler<CollectResourceJob> = (
                 if (lifecycle.type === "Finite") {
                     // Finite resources are removed permanently
                     resourceEntity.remove();
-                    completeJob(runner);
+                    completeJob(runner, root);
                 } else if (lifecycle.type === "Infinite") {
                     // Infinite nodes remain, just reset work progress for next batch
                     job.workProgress = 0;
-                    completeJob(runner);
+                    completeJob(runner, root);
                 } else if (lifecycle.type === "Remove") {
                     // Remove the entity permanently
                     resourceEntity.remove();
-                    completeJob(runner);
+                    completeJob(runner, root);
                 } else if (lifecycle.type === "Regrow") {
                     // Mark as harvested - regrow system will handle restoration
                     const regrowComponent =
@@ -165,7 +165,7 @@ export const collectResourceHandler: JobHandler<CollectResourceJob> = (
                         regrowComponent.harvestedAtTick = tick;
                         resourceEntity.invalidateComponent(RegrowComponentId);
                     }
-                    completeJob(runner);
+                    completeJob(runner, root);
                 }
             }
         }

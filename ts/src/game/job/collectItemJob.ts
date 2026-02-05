@@ -39,7 +39,7 @@ export const collectItemHandler: JobHandler<CollectItemJob> = (
         console.error(
             `Unable to find entity with id ${job.entityId} for item collection`,
         );
-        completeJob(runner);
+        completeJob(runner, root);
         return;
     }
 
@@ -48,14 +48,14 @@ export const collectItemHandler: JobHandler<CollectItemJob> = (
     );
     if (!collectableComponent) {
         console.error(`No collectable component on entity ${job.entityId}`);
-        completeJob(runner);
+        completeJob(runner, root);
         return;
     }
 
     // Check if there are items to collect
     if (collectableComponent.items.length === 0) {
         console.log("No items to collect");
-        completeJob(runner);
+        completeJob(runner, root);
         return;
     }
 
@@ -68,7 +68,7 @@ export const collectItemHandler: JobHandler<CollectItemJob> = (
         const movement = doMovement(runner, targetEntity.worldPosition);
         if (movement === MovementResult.Failure) {
             console.log("Failed to move to target for item collection");
-            completeJob(runner);
+            completeJob(runner, root);
         }
     } else {
         // Adjacent to the target, collect all items
@@ -89,6 +89,6 @@ export const collectItemHandler: JobHandler<CollectItemJob> = (
         targetEntity.invalidateComponent(CollectableComponentId);
 
         // Complete the job
-        completeJob(runner);
+        completeJob(runner, root);
     }
 };
