@@ -3,14 +3,21 @@ import { allSides } from "../../../../../common/sides.ts";
 import { bookInkColor } from "../../../../../ui/color.ts";
 import { InteractionState } from "../../../handler/interactionState.ts";
 import { BuildConfirmState } from "../../building2/buildConfirmState.ts";
-import { Building } from "../../../../../data/building/building.ts";
+import {
+    Building,
+    specialRequirementNames,
+    type SpecialRequirement,
+} from "../../../../../data/building/building.ts";
 import { woodenBuildings } from "../../../../../data/building/wood/wood.ts";
 import { stoneBuildings } from "../../../../../data/building/stone/stone.ts";
 import { goldBuildings } from "../../../../../data/building/gold/gold.ts";
 import { foodBuildings } from "../../../../../data/building/food/food.ts";
 import { growBuildings } from "../../../../../data/building/grow/grow.ts";
 import { Point } from "../../../../../common/point.ts";
-import { createComponent } from "../../../../../ui/declarative/ui.ts";
+import {
+    createComponent,
+    type ComponentDescriptor,
+} from "../../../../../ui/declarative/ui.ts";
 import { uiBookLayout } from "../../../../../ui/declarative/uiBookLayout.ts";
 import { uiScaffold } from "../../../view/uiScaffold.ts";
 import { uiBox } from "../../../../../ui/declarative/uiBox.ts";
@@ -24,6 +31,10 @@ import {
     colorBackground,
     ninePatchBackground,
 } from "../../../../../ui/uiBackground.ts";
+import {
+    inventoryItemsMap,
+    type InventoryItemIds,
+} from "../../../../../data/inventory/inventoryItems.ts";
 
 // Declarative UI building components
 const bookTextStyle = {
@@ -85,11 +96,72 @@ const buildingListItem = createComponent<{
     });
 });
 
+function getBuildingRequirementsChildren(
+    building: Building,
+): ComponentDescriptor[] {
+    const children: ComponentDescriptor[] = [];
+    const requirements = building.requirements;
+
+    if (!requirements) {
+        children.push(
+            uiText({
+                content: "No requirements",
+                textStyle: bookTextStyle,
+            }),
+        );
+        return children;
+    }
+
+    if (requirements.materials) {
+        children.push(
+            uiText({
+                content: "Materials:",
+                textStyle: bookTextStyle,
+            }),
+        );
+
+        for (const [itemId, amount] of Object.entries(requirements.materials)) {
+            if (amount === undefined || amount <= 0) continue;
+            const item = inventoryItemsMap[itemId as InventoryItemIds];
+            const itemName = item?.name ?? itemId;
+            children.push(
+                uiText({
+                    content: `  ${amount}x ${itemName}`,
+                    textStyle: bookTextStyle,
+                }),
+            );
+        }
+    }
+
+    if (requirements.special && requirements.special.length > 0) {
+        children.push(uiSpace({ width: 1, height: 4 }));
+        children.push(
+            uiText({
+                content: "Special:",
+                textStyle: bookTextStyle,
+            }),
+        );
+
+        for (const req of requirements.special) {
+            const reqName = specialRequirementNames[req];
+            children.push(
+                uiText({
+                    content: `  ${reqName}`,
+                    textStyle: bookTextStyle,
+                }),
+            );
+        }
+    }
+
+    return children;
+}
+
 const buildingDetailsView = createComponent<{
     building: Building;
     onBuild: () => void;
 }>(({ props }) => {
     const scale = props.building.scale * 2;
+    const requirementsChildren = getBuildingRequirementsChildren(props.building);
 
     return uiBox({
         width: fillUiSize,
@@ -101,7 +173,7 @@ const buildingDetailsView = createComponent<{
             children: [
                 uiBox({
                     width: fillUiSize,
-                    height: 180,
+                    height: 140,
                     background: ninePatchBackground({
                         sprite: sprites2.book_grid_item,
                         sides: allSides(8),
@@ -119,27 +191,8 @@ const buildingDetailsView = createComponent<{
                     textStyle: bookTitleStyle,
                 }),
                 uiSpace({ width: 1, height: 8 }),
-                uiText({
-                    content: "Wood: 10",
-                    textStyle: bookTextStyle,
-                }),
+                ...requirementsChildren,
                 uiSpace({ width: 1, height: fillUiSize }),
-                /*
-                uiButton({
-                    width: fillUiSize,
-                    height: wrapUiSize,
-                    padding: 8,
-                    background: ninePatchBackground({
-                        sprite: sprites2.book_grid_item,
-                        sides: allSides(6),
-                        scale: 1,
-                    }),
-                    onTap: () => props.onBuild(),
-                    child: uiText({
-                        content: "Build",
-                        textStyle: bookTitleStyle,
-                    }),
-                }),*/
             ],
         }),
     });

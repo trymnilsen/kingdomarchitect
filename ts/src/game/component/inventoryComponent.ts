@@ -1,5 +1,8 @@
 import { removeItem } from "../../common/array.ts";
-import type { InventoryItem } from "../../data/inventory/inventoryItem.ts";
+import {
+    type InventoryItem,
+    ItemRarity,
+} from "../../data/inventory/inventoryItem.ts";
 import type { InventoryItemQuantity } from "../../data/inventory/inventoryItemQuantity.ts";
 import { hammerItem, swordItem } from "../../data/inventory/items/equipment.ts";
 import {
@@ -36,8 +39,11 @@ export function addInventoryItem(
     item: InventoryItem,
     amount: number,
 ) {
+    const itemRarity = item.rarity ?? ItemRarity.Common;
     const existingStack = inventory.items.find(
-        (stack) => stack.item.id == item.id,
+        (stack) =>
+            stack.item.id == item.id &&
+            (stack.item.rarity ?? ItemRarity.Common) === itemRarity,
     );
 
     if (existingStack) {
@@ -53,35 +59,68 @@ export function addInventoryItem(
 export function getInventoryItem(
     inventory: InventoryComponent,
     id: string,
+    rarity?: ItemRarity,
 ): InventoryItemQuantity | undefined {
-    const item = inventory.items.find((item) => item.item.id == id);
+    const item = inventory.items.find((stack) => {
+        if (stack.item.id !== id) return false;
+        if (rarity !== undefined) {
+            return (stack.item.rarity ?? ItemRarity.Common) === rarity;
+        }
+        return true;
+    });
     return item;
 }
 
 /**
- * Takes an item out of the inventory, removing it and returning it
+ * Takes items out of the inventory, removing them and returning what was taken.
+ * When no rarity is specified, may pull from multiple stacks of different rarities.
  * @param inventory the inventory to withdraw the item from
  * @param id the id of the item
  * @param amount amount of the item
- * @returns either the item or null if the withdrawal could not be performed
+ * @param rarity optional rarity to match (if not specified, takes from any rarity)
+ * @returns array of taken items, or null if the full amount couldn't be fulfilled
  */
 export function takeInventoryItem(
     inventory: InventoryComponent,
     id: string,
     amount: number,
-): InventoryItemQuantity | null {
-    const item = getInventoryItem(inventory, id);
-    if (!item) return null;
-    if (item.amount < amount) return null;
+    rarity?: ItemRarity,
+): InventoryItemQuantity[] | null {
+    // Find all matching stacks
+    const matchingStacks = inventory.items.filter((stack) => {
+        if (stack.item.id !== id) return false;
+        if (rarity !== undefined) {
+            return (stack.item.rarity ?? ItemRarity.Common) === rarity;
+        }
+        return true;
+    });
 
-    item.amount -= amount;
-    if (item.amount <= 0) {
-        removeItem(inventory.items, item);
+    // Check if we have enough total
+    const total = matchingStacks.reduce((sum, stack) => sum + stack.amount, 0);
+    if (total < amount) return null;
+
+    // Take from stacks until we have enough
+    const taken: InventoryItemQuantity[] = [];
+    let remaining = amount;
+
+    for (const stack of matchingStacks) {
+        if (remaining <= 0) break;
+
+        const takeFromStack = Math.min(stack.amount, remaining);
+        stack.amount -= takeFromStack;
+        remaining -= takeFromStack;
+
+        taken.push({
+            item: stack.item,
+            amount: takeFromStack,
+        });
+
+        if (stack.amount <= 0) {
+            removeItem(inventory.items, stack);
+        }
     }
-    return {
-        item: item.item,
-        amount,
-    };
+
+    return taken;
 }
 
 /**
@@ -89,15 +128,25 @@ export function takeInventoryItem(
  * @param inventory the inventory to check
  * @param item the item to look for
  * @param amount the minimum amount required
+ * @param rarity optional rarity to match (if not specified, sums across all rarities)
  * @returns true if the inventory has enough of the item
  */
 export function hasInventoryItems(
     inventory: InventoryComponent,
     item: InventoryItem,
     amount: number,
+    rarity?: ItemRarity,
 ): boolean {
-    const itemQuantity = inventory.items.find((i) => i.item === item);
-    return itemQuantity !== undefined && itemQuantity.amount >= amount;
+    let total = 0;
+    for (const stack of inventory.items) {
+        if (stack.item.id !== item.id) continue;
+        if (rarity !== undefined) {
+            if ((stack.item.rarity ?? ItemRarity.Common) !== rarity) continue;
+        }
+        total += stack.amount;
+        if (total >= amount) return true;
+    }
+    return false;
 }
 
 export function defaultInventoryItems(): InventoryItemQuantity[] {

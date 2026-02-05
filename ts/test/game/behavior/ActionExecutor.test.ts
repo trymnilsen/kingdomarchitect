@@ -12,6 +12,14 @@ import { getBehaviorAgent } from "../../../src/game/behavior/components/Behavior
 import { EnergyComponentId } from "../../../src/game/component/energyComponent.ts";
 import { JobRunnerComponentId } from "../../../src/game/component/jobRunnerComponent.ts";
 import { Entity } from "../../../src/game/entity/entity.ts";
+import {
+    createInventoryComponent,
+    InventoryComponentId,
+} from "../../../src/game/component/inventoryComponent.ts";
+import { createEquipmentComponent } from "../../../src/game/component/equipmentComponent.ts";
+import { createStockpileComponent } from "../../../src/game/component/stockpileComponent.ts";
+import { woodResourceItem } from "../../../src/data/inventory/items/resources.ts";
+import { swordItem } from "../../../src/data/inventory/items/equipment.ts";
 
 describe("ActionExecutor", () => {
     describe("wait action", () => {
@@ -248,6 +256,156 @@ describe("ActionExecutor", () => {
             const status = executeAction(action, entity, 0);
 
             assert.strictEqual(status, "failed");
+        });
+    });
+
+    describe("depositToStockpile action", () => {
+        function createStockpileEntity(id: string): Entity {
+            const stockpile = new Entity(id);
+            stockpile.setEcsComponent(createStockpileComponent());
+            stockpile.setEcsComponent(createInventoryComponent());
+            return stockpile;
+        }
+
+        function createWorkerWithItems(
+            id: string,
+            items: { item: typeof woodResourceItem | typeof swordItem; amount: number }[],
+        ): Entity {
+            const worker = createBehaviorTestEntity(id);
+            const inventory = createInventoryComponent();
+            inventory.items = items.map((i) => ({ item: i.item, amount: i.amount }));
+            worker.setEcsComponent(inventory);
+            worker.setEcsComponent(createEquipmentComponent());
+            return worker;
+        }
+
+        it("transfers items from worker to stockpile", () => {
+            const root = new Entity("root");
+            const stockpile = createStockpileEntity("stockpile");
+            const worker = createWorkerWithItems("worker", [
+                { item: woodResourceItem, amount: 10 },
+            ]);
+            root.addChild(stockpile);
+            root.addChild(worker);
+
+            const action = {
+                type: "depositToStockpile" as const,
+                stockpileId: "stockpile",
+            };
+
+            const status = executeAction(action, worker, 0);
+
+            assert.strictEqual(status, "complete");
+
+            const workerInventory = worker.getEcsComponent(InventoryComponentId);
+            assert.strictEqual(workerInventory!.items.length, 0);
+
+            const stockpileInventory =
+                stockpile.getEcsComponent(InventoryComponentId);
+            assert.strictEqual(stockpileInventory!.items.length, 1);
+            assert.strictEqual(stockpileInventory!.items[0].item.id, woodResourceItem.id);
+            assert.strictEqual(stockpileInventory!.items[0].amount, 10);
+        });
+
+        it("does not transfer equipped items", () => {
+            const root = new Entity("root");
+            const stockpile = createStockpileEntity("stockpile");
+            const worker = createWorkerWithItems("worker", [
+                { item: swordItem, amount: 1 },
+                { item: woodResourceItem, amount: 5 },
+            ]);
+            const equipment = worker.getEcsComponent("equipment")!;
+            equipment.slots.main = swordItem;
+            root.addChild(stockpile);
+            root.addChild(worker);
+
+            const action = {
+                type: "depositToStockpile" as const,
+                stockpileId: "stockpile",
+            };
+
+            const status = executeAction(action, worker, 0);
+
+            assert.strictEqual(status, "complete");
+
+            const workerInventory = worker.getEcsComponent(InventoryComponentId);
+            assert.strictEqual(workerInventory!.items.length, 1);
+            assert.strictEqual(workerInventory!.items[0].item.id, swordItem.id);
+
+            const stockpileInventory =
+                stockpile.getEcsComponent(InventoryComponentId);
+            assert.strictEqual(stockpileInventory!.items.length, 1);
+            assert.strictEqual(stockpileInventory!.items[0].item.id, woodResourceItem.id);
+        });
+
+        it("fails when stockpile not found", () => {
+            const root = new Entity("root");
+            const worker = createWorkerWithItems("worker", [
+                { item: woodResourceItem, amount: 10 },
+            ]);
+            root.addChild(worker);
+
+            const action = {
+                type: "depositToStockpile" as const,
+                stockpileId: "nonexistent",
+            };
+
+            const status = executeAction(action, worker, 0);
+
+            assert.strictEqual(status, "failed");
+        });
+
+        it("fails when entity is not a valid stockpile", () => {
+            const root = new Entity("root");
+            const notAStockpile = new Entity("not-stockpile");
+            const worker = createWorkerWithItems("worker", [
+                { item: woodResourceItem, amount: 10 },
+            ]);
+            root.addChild(notAStockpile);
+            root.addChild(worker);
+
+            const action = {
+                type: "depositToStockpile" as const,
+                stockpileId: "not-stockpile",
+            };
+
+            const status = executeAction(action, worker, 0);
+
+            assert.strictEqual(status, "failed");
+        });
+
+        it("returns complete when worker has no inventory", () => {
+            const root = new Entity("root");
+            const stockpile = createStockpileEntity("stockpile");
+            const worker = createBehaviorTestEntity("worker");
+            root.addChild(stockpile);
+            root.addChild(worker);
+
+            const action = {
+                type: "depositToStockpile" as const,
+                stockpileId: "stockpile",
+            };
+
+            const status = executeAction(action, worker, 0);
+
+            assert.strictEqual(status, "complete");
+        });
+
+        it("returns complete when worker inventory is empty", () => {
+            const root = new Entity("root");
+            const stockpile = createStockpileEntity("stockpile");
+            const worker = createWorkerWithItems("worker", []);
+            root.addChild(stockpile);
+            root.addChild(worker);
+
+            const action = {
+                type: "depositToStockpile" as const,
+                stockpileId: "stockpile",
+            };
+
+            const status = executeAction(action, worker, 0);
+
+            assert.strictEqual(status, "complete");
         });
     });
 

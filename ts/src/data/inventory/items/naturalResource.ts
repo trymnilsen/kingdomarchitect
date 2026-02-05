@@ -43,7 +43,7 @@ export const treeResource = {
     name: "Tree",
     harvestMode: ResourceHarvestMode.Chop,
     lifecycle: { type: "Finite" },
-    yields: [{ item: woodResourceItem, amount: 4 }],
+    yields: [{ item: woodResourceItem, amount: 10 }],
     workDuration: 1,
 } as const;
 
@@ -53,7 +53,7 @@ export const pineResource = {
     name: "Pine Tree",
     harvestMode: ResourceHarvestMode.Chop,
     lifecycle: { type: "Finite" },
-    yields: [{ item: woodResourceItem, amount: 4 }],
+    yields: [{ item: woodResourceItem, amount: 12 }],
     workDuration: 1,
 } as const;
 
@@ -63,7 +63,7 @@ export const snowTreeResource = {
     name: "Pine Tree",
     harvestMode: ResourceHarvestMode.Chop,
     lifecycle: { type: "Finite" },
-    yields: [{ item: woodResourceItem, amount: 4 }],
+    yields: [{ item: woodResourceItem, amount: 12 }],
     workDuration: 1,
 } as const;
 
@@ -73,7 +73,7 @@ export const swampTreeResource = {
     name: "Swamp Tree",
     harvestMode: ResourceHarvestMode.Chop,
     lifecycle: { type: "Finite" },
-    yields: [{ item: woodResourceItem, amount: 4 }],
+    yields: [{ item: woodResourceItem, amount: 8 }],
     workDuration: 1,
 } as const;
 
@@ -83,7 +83,7 @@ export const swampTree2Resource = {
     name: "Swamp tree",
     harvestMode: ResourceHarvestMode.Chop,
     lifecycle: { type: "Finite" },
-    yields: [{ item: woodResourceItem, amount: 4 }],
+    yields: [{ item: woodResourceItem, amount: 8 }],
     workDuration: 1,
 } as const;
 

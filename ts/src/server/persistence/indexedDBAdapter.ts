@@ -208,6 +208,24 @@ export class IndexedDBAdapter implements PersistenceAdapter {
         });
     }
 
+    async clearEntities(): Promise<void> {
+        const db = await this.ensureDb();
+
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction([ENTITY_STORE], "readwrite");
+            const store = transaction.objectStore(ENTITY_STORE);
+            const request = store.clear();
+
+            request.onsuccess = () => {
+                resolve();
+            };
+
+            request.onerror = () => {
+                reject(new Error("Failed to clear entities"));
+            };
+        });
+    }
+
     /**
      * Close the database connection
      */

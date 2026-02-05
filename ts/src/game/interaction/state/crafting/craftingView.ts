@@ -7,10 +7,26 @@ import { sprites2 } from "../../../../asset/sprite.ts";
 import { uiScaffold } from "../../view/uiScaffold.ts";
 import { uiBookLayout } from "../../../../ui/declarative/uiBookLayout.ts";
 import { uiBox } from "../../../../ui/declarative/uiBox.ts";
-import { uiColumn } from "../../../../ui/declarative/uiSequence.ts";
+import { uiColumn, uiRow } from "../../../../ui/declarative/uiSequence.ts";
 import { uiText } from "../../../../ui/declarative/uiText.ts";
+import { uiButton } from "../../../../ui/declarative/uiButton.ts";
+import { uiImage } from "../../../../ui/declarative/uiImage.ts";
 import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize.ts";
 import { bookInkColor } from "../../../../ui/color.ts";
+import { ninePatchBackground } from "../../../../ui/uiBackground.ts";
+import { allSides } from "../../../../common/sides.ts";
+
+const bookTextStyle = {
+    color: bookInkColor,
+    font: "Silkscreen",
+    size: 16,
+};
+
+const bookSubtitleStyle = {
+    color: bookInkColor,
+    font: "Silkscreen",
+    size: 12,
+};
 
 export type CraftingViewProps = {
     recipes: readonly CraftingRecipe[];
@@ -22,6 +38,60 @@ export type CraftingViewProps = {
     onCollect: () => void;
     onCancel: () => void;
 };
+
+type RecipeListItemProps = {
+    recipe: CraftingRecipe;
+    isSelected: boolean;
+    onTap: () => void;
+};
+
+const recipeListItem = createComponent<RecipeListItemProps>(({ props }) => {
+    const backgroundSprite = props.isSelected
+        ? sprites2.book_grid_item_focused
+        : sprites2.book_grid_item;
+
+    const inputSummary = props.recipe.inputs
+        .map((input) => `${input.amount}x ${input.item.name}`)
+        .join(", ");
+
+    return uiButton({
+        width: fillUiSize,
+        height: wrapUiSize,
+        padding: 8,
+        background: ninePatchBackground({
+            sprite: backgroundSprite,
+            sides: allSides(8),
+            scale: 1,
+        }),
+        onTap: props.onTap,
+        child: uiRow({
+            width: fillUiSize,
+            height: wrapUiSize,
+            gap: 8,
+            children: [
+                uiImage({
+                    sprite: props.recipe.icon,
+                    width: 32,
+                    height: 32,
+                }),
+                uiColumn({
+                    width: wrapUiSize,
+                    height: wrapUiSize,
+                    children: [
+                        uiText({
+                            content: props.recipe.name,
+                            textStyle: bookTextStyle,
+                        }),
+                        uiText({
+                            content: inputSummary,
+                            textStyle: bookSubtitleStyle,
+                        }),
+                    ],
+                }),
+            ],
+        }),
+    });
+});
 
 export const craftingView = createComponent<CraftingViewProps>(
     ({ props, withState }) => {
@@ -37,13 +107,12 @@ export const craftingView = createComponent<CraftingViewProps>(
         const recipeListItems: ComponentDescriptor[] = props.recipes.map(
             (recipe, i) => {
                 const isSelected = i === selectedIndex;
-                const prefix = isSelected ? "> " : "  ";
-                return uiText({
-                    content: `${prefix}${recipe.name}`,
-                    textStyle: {
-                        color: bookInkColor,
-                        font: "Silkscreen",
-                        size: 16,
+                return recipeListItem({
+                    recipe,
+                    isSelected,
+                    onTap: () => {
+                        setSelectedIndex(i);
+                        props.onRecipeSelected(i);
                     },
                 });
             },
@@ -52,7 +121,7 @@ export const craftingView = createComponent<CraftingViewProps>(
         const leftPage = uiBox({
             width: fillUiSize,
             height: fillUiSize,
-            padding: 16,
+            padding: 8,
             child: uiColumn({
                 width: fillUiSize,
                 height: fillUiSize,

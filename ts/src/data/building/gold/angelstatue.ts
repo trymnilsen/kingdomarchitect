@@ -1,8 +1,20 @@
 import { sprites2 } from "../../../asset/sprite.ts";
+import { SpecialRequirement, type Building } from "../building.ts";
+import {
+    goldCoins,
+    stoneResource,
+} from "../../inventory/items/resources.ts";
 
-export const angelStatue = {
+export const angelStatue: Building = {
     id: "angelstatue",
     icon: sprites2.building_statue,
     name: "Angel statue",
     scale: 2,
-} as const;
+    requirements: {
+        materials: {
+            [stoneResource.id]: 50,
+            [goldCoins.id]: 20,
+        },
+        special: [SpecialRequirement.SkilledCarving],
+    },
+};

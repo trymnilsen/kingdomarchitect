@@ -9,6 +9,7 @@ export type InventoryItem = {
     readonly tag?: readonly ItemTag[];
     readonly category?: ItemCategory;
     readonly visual?: ItemVisual;
+    readonly rarity?: ItemRarity;
 };
 
 export type ItemVisual = {
@@ -31,3 +32,13 @@ export const ItemCategory = {
 } as const;
 
 export type ItemCategory = (typeof ItemCategory)[keyof typeof ItemCategory];
+
+export const ItemRarity = {
+    Common: 0,
+    Uncommon: 1,
+    Rare: 2,
+    Epic: 3,
+    Legendary: 4,
+} as const;
+
+export type ItemRarity = (typeof ItemRarity)[keyof typeof ItemRarity];

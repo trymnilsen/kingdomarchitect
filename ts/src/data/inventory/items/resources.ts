@@ -1,22 +1,25 @@
 import { sprites2 } from "../../../asset/sprite.ts";
-import { ItemTag } from "./../inventoryItem.ts";
+import { ItemRarity, ItemTag } from "./../inventoryItem.ts";
 
 export const woodResourceItem = {
     asset: sprites2.wood_resource,
     id: "wood",
     name: "Block of wood",
+    rarity: ItemRarity.Common,
 } as const;
 
 export const wheatResourceItem = {
     asset: sprites2.farm_4,
     id: "wheat",
     name: "Wheat",
+    rarity: ItemRarity.Common,
 } as const;
 
 export const stoneResource = {
     asset: sprites2.stone_resource,
     id: "stone",
     name: "Stone",
+    rarity: ItemRarity.Common,
 } as const;
 
 export const bagOfGlitter = {

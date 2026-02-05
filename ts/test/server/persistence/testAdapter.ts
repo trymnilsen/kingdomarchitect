@@ -46,6 +46,10 @@ export class TestAdapter implements PersistenceAdapter {
         this.entities = this.entities.filter((e) => e.id !== entityId);
     }
 
+    async clearEntities(): Promise<void> {
+        this.entities = [];
+    }
+
     async saveRootComponents(components: Record<string, any>): Promise<void> {
         this.rootComponents = components;
     }

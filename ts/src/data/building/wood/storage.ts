@@ -1,15 +1,32 @@
 import { sprites2 } from "../../../asset/sprite.ts";
+import type { Building } from "../building.ts";
+import {
+    ironBarsItem,
+    planksItem,
+} from "../../inventory/items/processedMaterials.ts";
+import {
+    stoneResource,
+    woodResourceItem,
+} from "../../inventory/items/resources.ts";
 
-export const stockPile = {
+export const stockPile: Building = {
     id: "stockpile",
     icon: sprites2.stockpile,
     name: "Stockpile",
     scale: 2,
-} as const;
+};
 
-export const warehouse = {
+export const warehouse: Building = {
     id: "warehouse",
     icon: sprites2.warehouse,
     name: "Warehouse",
     scale: 2,
-} as const;
+    requirements: {
+        materials: {
+            [woodResourceItem.id]: 40,
+            [stoneResource.id]: 10,
+            [planksItem.id]: 20,
+            [ironBarsItem.id]: 5,
+        },
+    },
+};

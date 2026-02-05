@@ -12,14 +12,13 @@ import {
     CollectableComponentId,
     hasCollectableItems,
 } from "../../../../../component/collectableComponent.ts";
-import { blacksmith } from "../../../../../../data/building/stone/blacksmith.ts";
 import { sprites2 } from "../../../../../../asset/sprite.ts";
 import { CraftWithBuildingState } from "../../../crafting/craftWithBuildingState.ts";
 import { CollectItemJob } from "../../../../../job/collectItemJob.ts";
 import { QueueJobCommand } from "../../../../../../server/message/command/queueJobCommand.ts";
 import { InventoryState } from "../../../root/inventory/inventoryState.ts";
 
-export class BlacksmithSelectionProvider implements ActorSelectionProvider {
+export class CraftingBuildingSelectionProvider implements ActorSelectionProvider {
     provideButtons(
         stateContext: StateContext,
         selection: SelectedWorldItem,
@@ -30,11 +29,7 @@ export class BlacksmithSelectionProvider implements ActorSelectionProvider {
             const craftingComponent =
                 selection.entity.getEcsComponent(CraftingComponentId);
 
-            if (
-                buildingComponent &&
-                buildingComponent.building.id === blacksmith.id &&
-                craftingComponent
-            ) {
+            if (buildingComponent && craftingComponent) {
                 const collectableComponent = selection.entity.getEcsComponent(
                     CollectableComponentId,
                 );

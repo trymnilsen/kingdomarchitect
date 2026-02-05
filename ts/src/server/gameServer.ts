@@ -12,6 +12,7 @@ import { createBehaviorSystem } from "../game/behavior/systems/BehaviorSystem.ts
 import { createPerformPlayerCommandBehavior } from "../game/behavior/behaviors/PerformPlayerCommandBehavior.ts";
 import { createSleepBehavior } from "../game/behavior/behaviors/SleepBehavior.ts";
 import { createPerformJobBehavior } from "../game/behavior/behaviors/PerformJobBehavior.ts";
+import { createHaulBehavior } from "../game/behavior/behaviors/HaulBehavior.ts";
 
 import {
     buildWorldStateMessage,
@@ -161,6 +162,7 @@ export class GameServer {
             createPerformPlayerCommandBehavior(), // Priority 90
             createSleepBehavior(), // Priority 60-80 (scales with tiredness)
             createPerformJobBehavior(), // Priority 50
+            createHaulBehavior(), // Priority 25 (idle task)
         ];
         this.world.addSystem(createBehaviorSystem(behaviors));
 

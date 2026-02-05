@@ -79,8 +79,11 @@ export class PersistenceManager {
             }
         }
 
+        // Clear existing entities to remove any that were deleted from the world
+        await this.adapter.clearEntities();
         await this.adapter.saveEntities(entitiesToSave);
         await this.adapter.saveRootComponents(rootComponents);
+        //console.log("[Persistence Manager] Save world");
     }
 
     /**
@@ -98,8 +101,9 @@ export class PersistenceManager {
         const rootComponents = await this.adapter.loadRootComponents();
         if (rootComponents) {
             for (const componentId in rootComponents) {
-                const component =
-                    this.deserializeComponent(rootComponents[componentId]);
+                const component = this.deserializeComponent(
+                    rootComponents[componentId],
+                );
                 root.setEcsComponent(component);
             }
         }

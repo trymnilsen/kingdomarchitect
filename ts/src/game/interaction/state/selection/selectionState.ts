@@ -10,7 +10,7 @@ import { ButtonCollection } from "../../view/buttonCollection.ts";
 import { UIActionbarItem } from "../../view/uiActionbar.ts";
 import { ActorSelectionProvider } from "./actor/provider/actorSelectionProvider.ts";
 import { AttackSelectionProvider } from "./actor/provider/attackSelectionProvider.ts";
-import { BlacksmithSelectionProvider } from "./actor/provider/blacksmithSelectionProvider.ts";
+import { CraftingBuildingSelectionProvider } from "./actor/provider/craftingBuildingSelectionProvider.ts";
 import { CollectableProvider } from "./actor/provider/collectableProvider.ts";
 import { TileSelectionProvider } from "./actor/provider/tileSelectionProvider.ts";
 import { ResourceSelectionProvider } from "./actor/provider/resourceSelectionProvider.ts";
@@ -34,6 +34,7 @@ import {
 } from "../../../../rendering/text/textStyle.ts";
 import { uiScaffold } from "../../view/uiScaffold.ts";
 import { BuildingSelectionProvider } from "./actor/provider/buildingSelectionProvider.ts";
+import { ProductionBuildingSelectionProvider } from "./actor/provider/productionBuildingSelectionProvider.ts";
 import type { Entity } from "../../../entity/entity.ts";
 import {
     HealthComponentId,
@@ -46,7 +47,8 @@ export class SelectionState extends InteractionState {
         new ResourceSelectionProvider(),
         new TileSelectionProvider(),
         new CollectableProvider(),
-        new BlacksmithSelectionProvider(),
+        new CraftingBuildingSelectionProvider(),
+        new ProductionBuildingSelectionProvider(),
         new AttackSelectionProvider(),
         new BuildingSelectionProvider(),
     ];

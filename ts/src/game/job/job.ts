@@ -6,6 +6,7 @@ import type { CollectItemJob } from "./collectItemJob.ts";
 import type { CollectResourceJob } from "./collectResourceJob.ts";
 import type { CraftingJob } from "./craftingJob.ts";
 import type { MoveToJob } from "./moveToPointJob.ts";
+import type { ProductionJob } from "./productionJob.ts";
 
 export type JobConstraint = EntityJobConstraint;
 export interface EntityJobConstraint {
@@ -35,7 +36,8 @@ export type Jobs =
     | AttackJob
     | CollectItemJob
     | CollectResourceJob
-    | CraftingJob;
+    | CraftingJob
+    | ProductionJob;
 export type JobId = Jobs["id"];
 export type JobHandler<T extends Job> = (
     root: Entity,
@@ -51,6 +53,26 @@ export function completeJob(entity: Entity) {
     entity.invalidateComponent(JobRunnerComponentId);
 }
 
+/**
+ * Suspend a job and return it to the queue.
+ * Used when a job cannot proceed (e.g., missing materials).
+ * The worker will release the job and trigger re-planning.
+ */
+export function suspendJob(entity: Entity, reason: string): void {
+    const runner = entity.requireEcsComponent(JobRunnerComponentId);
+    const job = runner.currentJob;
+
+    if (job) {
+        console.log(`[JOB] Suspending job ${job.id}: ${reason}`);
+        // Reset job state so it can be claimed again
+        job.state = "queued";
+        job.claimedBy = undefined;
+    }
+
+    runner.currentJob = null;
+    entity.invalidateComponent(JobRunnerComponentId);
+}
+
 export function isTargetOfJob(job: Jobs, entity: Entity): boolean {
     switch (job.id) {
         case "attackJob":
@@ -62,6 +84,8 @@ export function isTargetOfJob(job: Jobs, entity: Entity): boolean {
         case "collectItem":
             return job.entityId == entity.id;
         case "craftingJob":
+            return job.targetBuilding == entity.id;
+        case "productionJob":
             return job.targetBuilding == entity.id;
         case "moveToJob":
             return false;

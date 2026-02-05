@@ -244,13 +244,13 @@ function equipItem(root: Entity, command: EquipItemCommand) {
     // An item id can either be defined meaning equip or null meaning unequip
     const itemId = command.itemId;
     if (itemId) {
-        const withdrawnItem = takeInventoryItem(inventory, itemId, 1);
-        if (!withdrawnItem) {
+        const withdrawnItems = takeInventoryItem(inventory, itemId, 1);
+        if (!withdrawnItems || withdrawnItems.length === 0) {
             console.error("Not enough items to take item from inventory");
             return;
         }
 
-        equipment.slots[command.slot] = withdrawnItem.item;
+        equipment.slots[command.slot] = withdrawnItems[0].item;
     } else {
         const itemAtSlot = equipment.slots[command.slot];
         if (!itemAtSlot) {

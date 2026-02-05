@@ -5,6 +5,7 @@ import { collectResourceHandler } from "./collectResourceJob.ts";
 import { craftingJobHandler } from "./craftingJobHandler.ts";
 import type { JobId, Jobs, JobHandler } from "./job.ts";
 import { moveToJobHandler } from "./moveToPointJob.ts";
+import { productionJobHandler } from "./handler/productionJobHandler.ts";
 import type { Entity } from "../entity/entity.ts";
 
 /**
@@ -26,6 +27,7 @@ export const jobHandlers: JobHandlerMap = {
     collectItem: collectItemHandler,
     collectResource: collectResourceHandler,
     craftingJob: craftingJobHandler,
+    productionJob: productionJobHandler,
 } as const;
 
 /**

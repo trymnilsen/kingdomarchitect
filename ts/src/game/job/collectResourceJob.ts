@@ -117,10 +117,11 @@ export const collectResourceHandler: JobHandler<CollectResourceJob> = (
                 runner.updateComponent(InventoryComponentId, (inventory) => {
                     // Grant yields if defined
                     for (const yieldItem of resource.yields) {
+                        const addedResource = structuredClone(yieldItem);
                         addInventoryItem(
                             inventory,
-                            yieldItem.item,
-                            yieldItem.amount,
+                            addedResource.item,
+                            addedResource.amount,
                         );
                     }
                 });
@@ -132,10 +133,12 @@ export const collectResourceHandler: JobHandler<CollectResourceJob> = (
                 runner.updateComponent(InventoryComponentId, (inventory) => {
                     // Grant yields
                     for (const yieldItem of resource.yields) {
+                        const addedResource = structuredClone(yieldItem);
+
                         addInventoryItem(
                             inventory,
-                            yieldItem.item,
-                            yieldItem.amount,
+                            addedResource.item,
+                            addedResource.amount,
                         );
                     }
                 });

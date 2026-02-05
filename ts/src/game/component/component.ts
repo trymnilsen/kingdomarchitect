@@ -28,6 +28,8 @@ import type { VisibilityMapComponent } from "./visibilityMapComponent.ts";
 import type { WorkplaceComponent } from "./workplaceComponent.ts";
 import type { WorldDiscoveryComponent } from "./worldDiscoveryComponent.ts";
 import type { RoleComponent } from "./worker/roleComponent.ts";
+import type { StockpileComponent } from "./stockpileComponent.ts";
+import type { ProductionComponent } from "./productionComponent.ts";
 
 export type Components =
     | JobRunnerComponent
@@ -59,7 +61,9 @@ export type Components =
     | BehaviorAgentComponent
     | HungerComponent
     | EnergyComponent
-    | RoleComponent;
+    | RoleComponent
+    | StockpileComponent
+    | ProductionComponent;
 
 export interface BaseComponent {
     id: string;

@@ -163,8 +163,8 @@ describe("collectResource", () => {
             assert.ok(woodStack, "A stack of wood should be in the inventory");
             assert.strictEqual(
                 woodStack.amount,
-                4,
-                "The amount of wood should be 4",
+                10,
+                "The amount of wood should be 10",
             );
         });
     });

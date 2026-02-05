@@ -13,7 +13,8 @@ export type BehaviorActionData =
     | { type: "playerMove"; target: Point }
     | { type: "claimJob"; jobIndex: number }
     | { type: "executeJob" }
-    | { type: "sleep" };
+    | { type: "sleep" }
+    | { type: "depositToStockpile"; stockpileId: string };
 
 /**
  * Action executor function type - takes action data, entity, and tick, returns status.

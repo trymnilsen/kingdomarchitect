@@ -1,8 +1,30 @@
 import { sprites2 } from "../../../asset/sprite.ts";
+import { SpecialRequirement, type Building } from "../building.ts";
+import {
+    joineryItem,
+    stoneBarsItem,
+    timberFramesItem,
+} from "../../inventory/items/processedMaterials.ts";
+import {
+    goldCoins,
+    stoneResource,
+    woodResourceItem,
+} from "../../inventory/items/resources.ts";
 
-export const church = {
+export const church: Building = {
     id: "church",
     icon: sprites2.building_chapel,
     name: "Church",
     scale: 2,
-} as const;
+    requirements: {
+        materials: {
+            [woodResourceItem.id]: 30,
+            [stoneResource.id]: 100,
+            [goldCoins.id]: 25,
+            [timberFramesItem.id]: 20,
+            [joineryItem.id]: 15,
+            [stoneBarsItem.id]: 5,
+        },
+        special: [SpecialRequirement.DevoteeLabor],
+    },
+};

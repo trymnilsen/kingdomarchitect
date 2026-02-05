@@ -1,8 +1,25 @@
 import { sprites2 } from "../../../asset/sprite.ts";
+import type { Building } from "../building.ts";
+import {
+    clayBricksItem,
+    timberFramesItem,
+} from "../../inventory/items/processedMaterials.ts";
+import {
+    stoneResource,
+    woodResourceItem,
+} from "../../inventory/items/resources.ts";
 
-export const baker = {
+export const baker: Building = {
     id: "baker",
     icon: sprites2.building_baker,
     name: "Baker",
     scale: 2,
-} as const;
+    requirements: {
+        materials: {
+            [woodResourceItem.id]: 20,
+            [stoneResource.id]: 15,
+            [timberFramesItem.id]: 5,
+            [clayBricksItem.id]: 10,
+        },
+    },
+};

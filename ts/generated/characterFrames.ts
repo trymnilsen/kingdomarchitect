@@ -287,7 +287,7 @@ export const characterPartFrames = [
         "anchorId": "LeftHand",
         "frames": [
           [
-            9,
+            10,
             9,
             1
           ],
@@ -297,7 +297,7 @@ export const characterPartFrames = [
             0
           ],
           [
-            9,
+            10,
             9,
             1
           ],
@@ -312,7 +312,7 @@ export const characterPartFrames = [
         "anchorId": "RightHand",
         "frames": [
           [
-            9,
+            10,
             9,
             1
           ],
@@ -322,7 +322,7 @@ export const characterPartFrames = [
             0
           ],
           [
-            9,
+            10,
             9,
             1
           ],

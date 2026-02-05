@@ -48,6 +48,12 @@ export interface PersistenceAdapter {
     deleteEntity(entityId: string): Promise<void>;
 
     /**
+     * Clear all entities from storage.
+     * Used before a full world save to remove stale entities.
+     */
+    clearEntities(): Promise<void>;
+
+    /**
      * Save root entity components (world-level data like tiles and discovery)
      * Separate from entity tree to allow different storage strategies
      * @param components Serialized root components keyed by component ID

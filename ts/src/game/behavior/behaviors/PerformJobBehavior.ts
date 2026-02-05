@@ -7,6 +7,10 @@ import { isJobClaimed } from "../../job/job.ts";
 import type { Jobs } from "../../job/job.ts";
 import type { BehaviorActionData } from "../actions/Action.ts";
 import type { Behavior } from "./Behavior.ts";
+import {
+    canExecuteBuildJob,
+    type BuildBuildingJob,
+} from "../../job/buildBuildingJob.ts";
 
 /**
  * PerformJobBehavior handles job execution for worker entities.
@@ -18,9 +22,7 @@ export function createPerformJobBehavior(): Behavior {
         name: "performJob",
 
         isValid(entity: Entity): boolean {
-            const runner = entity.getEcsComponent(
-                JobRunnerComponentId,
-            );
+            const runner = entity.getEcsComponent(JobRunnerComponentId);
             if (!runner) {
                 return false;
             }
@@ -32,9 +34,7 @@ export function createPerformJobBehavior(): Behavior {
 
             // Valid if there are unclaimed jobs in the queue
             const root = entity.getRootEntity();
-            const jobQueue = root.getEcsComponent(
-                JobQueueComponentId,
-            );
+            const jobQueue = root.getEcsComponent(JobQueueComponentId);
 
             if (!jobQueue) {
                 return false;
@@ -67,9 +67,7 @@ export function createPerformJobBehavior(): Behavior {
         },
 
         expand(entity: Entity): BehaviorActionData[] {
-            const runner = entity.getEcsComponent(
-                JobRunnerComponentId,
-            );
+            const runner = entity.getEcsComponent(JobRunnerComponentId);
 
             if (!runner) {
                 return [];
@@ -82,9 +80,7 @@ export function createPerformJobBehavior(): Behavior {
 
             // Otherwise, find the best job to claim
             const root = entity.getRootEntity();
-            const jobQueue = root.getEcsComponent(
-                JobQueueComponentId,
-            );
+            const jobQueue = root.getEcsComponent(JobQueueComponentId);
 
             if (!jobQueue) {
                 return [];
@@ -131,6 +127,11 @@ function findBestJob(entity: Entity, jobQueue: JobQueueComponent): number {
             continue;
         }
 
+        // Check job-specific validity (e.g., materials available for build jobs)
+        if (!canExecuteJob(root, job, entity)) {
+            continue;
+        }
+
         // Get the target position for this job
         const targetPosition = getJobTargetPosition(root, job);
         if (!targetPosition) {
@@ -150,6 +151,24 @@ function findBestJob(entity: Entity, jobQueue: JobQueueComponent): number {
     }
 
     return bestJobIndex;
+}
+
+/**
+ * Check if a job can be executed by a worker.
+ * Returns false if the job has prerequisites that aren't met.
+ */
+function canExecuteJob(root: Entity, job: Jobs, workerEntity: Entity): boolean {
+    switch (job.id) {
+        case "buildBuildingJob":
+            return canExecuteBuildJob(
+                root,
+                job as BuildBuildingJob,
+                workerEntity,
+            );
+        default:
+            // Other jobs have no special prerequisites
+            return true;
+    }
 }
 
 /**
