@@ -1,4 +1,4 @@
-import { sprites2 } from "../../../../../../asset/sprite.ts";
+import { spriteRefs } from "../../../../../../asset/sprite.ts";
 import { SelectedTileItem } from "../../../../selection/selectedTileItem.ts";
 import { SelectedWorldItem } from "../../../../selection/selectedWorldItem.ts";
 import { StateContext } from "../../../../handler/stateContext.ts";
@@ -20,7 +20,7 @@ export class TileSelectionProvider implements ActorSelectionProvider {
                 left: [
                     {
                         text: "Build",
-                        icon: sprites2.empty_sprite,
+                        icon: spriteRefs.empty_sprite,
                         onClick: () => {
                             stateContext.stateChanger.replace(
                                 new BuildingState(selection.tilePosition),

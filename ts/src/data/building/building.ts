@@ -1,4 +1,4 @@
-import { type Sprite2, emptySprite } from "../../asset/sprite.ts";
+import { type SpriteRef, emptySpriteRef } from "../../asset/sprite.ts";
 import type { InventoryItemIds } from "../inventory/inventoryItems.ts";
 
 export const SpecialRequirement = {
@@ -24,7 +24,7 @@ export type BuildingRequirements = {
 };
 
 export type Building = {
-    icon: Sprite2;
+    icon: SpriteRef;
     name: string;
     id: string;
     scale: 1 | 2 | 4;
@@ -33,7 +33,7 @@ export type Building = {
 
 export const nullBuildingId = "nullBuilding";
 export const nullBuilding: Building = {
-    icon: emptySprite,
+    icon: emptySpriteRef,
     name: nullBuildingId,
     id: nullBuildingId,
     scale: 1,

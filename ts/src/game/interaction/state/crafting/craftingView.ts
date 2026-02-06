@@ -3,7 +3,7 @@ import {
     type ComponentDescriptor,
 } from "../../../../ui/declarative/ui.ts";
 import type { CraftingRecipe } from "../../../../data/crafting/craftingRecipe.ts";
-import { sprites2 } from "../../../../asset/sprite.ts";
+import { spriteRefs } from "../../../../asset/sprite.ts";
 import { uiScaffold } from "../../view/uiScaffold.ts";
 import { uiBookLayout } from "../../../../ui/declarative/uiBookLayout.ts";
 import { uiBox } from "../../../../ui/declarative/uiBox.ts";
@@ -47,8 +47,8 @@ type RecipeListItemProps = {
 
 const recipeListItem = createComponent<RecipeListItemProps>(({ props }) => {
     const backgroundSprite = props.isSelected
-        ? sprites2.book_grid_item_focused
-        : sprites2.book_grid_item;
+        ? spriteRefs.book_grid_item_focused
+        : spriteRefs.book_grid_item;
 
     const inputSummary = props.recipe.inputs
         .map((input) => `${input.amount}x ${input.item.name}`)

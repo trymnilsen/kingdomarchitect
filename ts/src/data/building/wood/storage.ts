@@ -1,4 +1,4 @@
-import { sprites2 } from "../../../asset/sprite.ts";
+import { spriteRefs } from "../../../asset/sprite.ts";
 import type { Building } from "../building.ts";
 import {
     ironBarsItem,
@@ -11,14 +11,14 @@ import {
 
 export const stockPile: Building = {
     id: "stockpile",
-    icon: sprites2.stockpile,
+    icon: spriteRefs.stockpile,
     name: "Stockpile",
     scale: 2,
 };
 
 export const warehouse: Building = {
     id: "warehouse",
-    icon: sprites2.warehouse,
+    icon: spriteRefs.warehouse,
     name: "Warehouse",
     scale: 2,
     requirements: {

@@ -1,4 +1,4 @@
-import { sprites2 } from "../../../asset/sprite.ts";
+import { spriteRefs } from "../../../asset/sprite.ts";
 import type { Building } from "../building.ts";
 import {
     joineryItem,
@@ -12,7 +12,7 @@ import {
 
 export const gate: Building = {
     id: "gate",
-    icon: sprites2.gate_horizontal_preview,
+    icon: spriteRefs.gate_horizontal_preview,
     name: "Gate",
     scale: 4,
     requirements: {

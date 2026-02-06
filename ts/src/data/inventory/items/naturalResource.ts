@@ -1,4 +1,4 @@
-import { sprites2, type Sprite2 } from "../../../asset/sprite.ts";
+import { spriteRefs, type SpriteRef } from "../../../asset/sprite.ts";
 import type { InventoryItem } from "../inventoryItem.ts";
 import {
     woodResourceItem,
@@ -18,7 +18,7 @@ export type ResourceHarvestMode =
 export type ResourceLifecycle =
     | { type: "Finite" } // removed permanently (trees)
     | { type: "Infinite" } // infinite nodes that reset after harvest (stone)
-    | { type: "Regrow"; time: number; sprite?: Sprite2 } // renewable nodes (berries, grass)
+    | { type: "Regrow"; time: number; sprite?: SpriteRef } // renewable nodes (berries, grass)
     | { type: "Remove" }; // removed once (flowers, mushrooms)
 
 export type ResourceYield = {
@@ -27,7 +27,7 @@ export type ResourceYield = {
 };
 
 type Resource = {
-    asset: Sprite2;
+    asset: SpriteRef;
     id: string;
     name: string;
     harvestMode: ResourceHarvestMode | readonly ResourceHarvestMode[];
@@ -38,7 +38,7 @@ type Resource = {
 };
 
 export const treeResource = {
-    asset: sprites2.tree_1,
+    asset: spriteRefs.tree_1,
     id: "tree1",
     name: "Tree",
     harvestMode: ResourceHarvestMode.Chop,
@@ -48,7 +48,7 @@ export const treeResource = {
 } as const;
 
 export const pineResource = {
-    asset: sprites2.pine_tree,
+    asset: spriteRefs.pine_tree,
     id: "pineTree",
     name: "Pine Tree",
     harvestMode: ResourceHarvestMode.Chop,
@@ -58,7 +58,7 @@ export const pineResource = {
 } as const;
 
 export const snowTreeResource = {
-    asset: sprites2.pine_tree_winter,
+    asset: spriteRefs.pine_tree_winter,
     id: "pineTreeSnow",
     name: "Pine Tree",
     harvestMode: ResourceHarvestMode.Chop,
@@ -68,7 +68,7 @@ export const snowTreeResource = {
 } as const;
 
 export const swampTreeResource = {
-    asset: sprites2.swamp_tree5,
+    asset: spriteRefs.swamp_tree5,
     id: "swampTree1",
     name: "Swamp Tree",
     harvestMode: ResourceHarvestMode.Chop,
@@ -78,7 +78,7 @@ export const swampTreeResource = {
 } as const;
 
 export const swampTree2Resource = {
-    asset: sprites2.swamp_tree7,
+    asset: spriteRefs.swamp_tree7,
     id: "swampTree2",
     name: "Swamp tree",
     harvestMode: ResourceHarvestMode.Chop,
@@ -88,7 +88,7 @@ export const swampTree2Resource = {
 } as const;
 
 export const swampFlowerResource = {
-    asset: sprites2.swamp_flower_duo,
+    asset: spriteRefs.swamp_flower_duo,
     id: "swampFlower",
     name: "Swamp Flower",
     harvestMode: ResourceHarvestMode.Pick,
@@ -98,21 +98,21 @@ export const swampFlowerResource = {
 } as const;
 
 export const grassResource = {
-    asset: sprites2.nature_grass_leaves,
+    asset: spriteRefs.nature_grass_leaves,
     id: "grass",
     name: "Grass leaves",
     harvestMode: ResourceHarvestMode.Cut,
     lifecycle: {
         type: "Regrow",
         time: 100,
-        sprite: sprites2.nature_grass_leaves,
+        sprite: spriteRefs.nature_grass_leaves,
     },
     yields: [], // Define actual grass yield later
     workDuration: 1,
 } as const;
 
 export const cactusResource = {
-    asset: sprites2.desertCactus,
+    asset: spriteRefs.desertCactus,
     id: "cactus1",
     name: "Cactus",
     harvestMode: ResourceHarvestMode.Chop,
@@ -122,7 +122,7 @@ export const cactusResource = {
 } as const;
 
 export const cactusFlowerResource = {
-    asset: sprites2.desertCactusFlower2,
+    asset: spriteRefs.desertCactusFlower2,
     id: "cactusFlower",
     name: "Cactus Flower",
     harvestMode: ResourceHarvestMode.Pick,
@@ -132,7 +132,7 @@ export const cactusFlowerResource = {
 } as const;
 
 export const mushroomResource = {
-    asset: sprites2.nature_mushroom2,
+    asset: spriteRefs.nature_mushroom2,
     id: "mushroom2",
     name: "Mushroom",
     harvestMode: ResourceHarvestMode.Pick,
@@ -142,21 +142,21 @@ export const mushroomResource = {
 } as const;
 
 export const berryBushResource = {
-    asset: sprites2.nature_berrybush,
+    asset: spriteRefs.nature_berrybush,
     id: "berrybush",
     name: "Berry Bush",
     harvestMode: [ResourceHarvestMode.Pick, ResourceHarvestMode.Cut],
     lifecycle: {
         type: "Regrow",
         time: 200,
-        sprite: sprites2.nature_berrybush_wo,
+        sprite: spriteRefs.nature_berrybush_wo,
     },
     yields: [], // Define actual berry yield later
     workDuration: 1,
 } as const;
 
 export const flowerResource = {
-    asset: sprites2.plainsFlower,
+    asset: spriteRefs.plainsFlower,
     id: "plainsFlower",
     name: "Flower",
     harvestMode: ResourceHarvestMode.Pick,
@@ -166,7 +166,7 @@ export const flowerResource = {
 } as const;
 
 export const snowFlowerResource = {
-    asset: sprites2.snowFlower,
+    asset: spriteRefs.snowFlower,
     id: "snowFlower",
     name: "Flower",
     harvestMode: ResourceHarvestMode.Pick,
@@ -176,7 +176,7 @@ export const snowFlowerResource = {
 } as const;
 
 export const stoneResource = {
-    asset: sprites2.stone,
+    asset: spriteRefs.stone,
     id: "stone1",
     name: "Stone",
     harvestMode: ResourceHarvestMode.Mine,

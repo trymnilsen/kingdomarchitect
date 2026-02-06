@@ -9,7 +9,7 @@ import { SelectedEntityItem } from "../../../../selection/selectedEntityItem.ts"
 import { BuildingComponentId } from "../../../../../component/buildingComponent.ts";
 import { ProductionComponentId } from "../../../../../component/productionComponent.ts";
 import { JobQueueComponentId } from "../../../../../component/jobQueueComponent.ts";
-import { sprites2 } from "../../../../../../asset/sprite.ts";
+import { spriteRefs } from "../../../../../../asset/sprite.ts";
 import { QueueJobCommand } from "../../../../../../server/message/command/queueJobCommand.ts";
 import {
     createProductionJob,
@@ -58,7 +58,7 @@ export class ProductionBuildingSelectionProvider
                 const leftButtons: UIActionbarItem[] = [
                     {
                         text: actionText,
-                        icon: sprites2.empty_sprite,
+                        icon: spriteRefs.empty_sprite,
                         onClick: () => {
                             const job = createProductionJob(
                                 selection.entity.id,
@@ -73,7 +73,7 @@ export class ProductionBuildingSelectionProvider
                 if (queuedCount > 0) {
                     leftButtons.push({
                         text: "Clear Queue",
-                        icon: sprites2.empty_sprite,
+                        icon: spriteRefs.empty_sprite,
                         onClick: () => {
                             const jq = root.getEcsComponent(JobQueueComponentId);
                             if (jq) {

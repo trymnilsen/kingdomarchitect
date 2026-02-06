@@ -1,39 +1,39 @@
-import { type Sprite2, sprites2 } from "../../../asset/sprite.ts";
+import { type SpriteRef, spriteRefs } from "../../../asset/sprite.ts";
 import { Adjacency } from "../../../common/adjacency.ts";
 
-export function wallAdjacency(adjacency: Adjacency): Sprite2 {
+export function wallAdjacency(adjacency: Adjacency): SpriteRef {
     switch (adjacency) {
         case Adjacency.Left:
-            return sprites2.stone_wood_walls_left;
+            return spriteRefs.stone_wood_walls_left;
         case Adjacency.Right:
-            return sprites2.stone_wood_walls_right;
+            return spriteRefs.stone_wood_walls_right;
         case Adjacency.Upper:
-            return sprites2.stone_wood_walls_up;
+            return spriteRefs.stone_wood_walls_up;
         case Adjacency.Bottom:
-            return sprites2.stone_wood_walls_bottom;
+            return spriteRefs.stone_wood_walls_bottom;
         case Adjacency.LeftRight:
-            return sprites2.stone_wood_walls_horizontal;
+            return spriteRefs.stone_wood_walls_horizontal;
         case Adjacency.LeftRightUpper:
-            return sprites2.stone_wood_walls_lur;
+            return spriteRefs.stone_wood_walls_lur;
         case Adjacency.LeftUpper:
-            return sprites2.stone_wood_walls_lu;
+            return spriteRefs.stone_wood_walls_lu;
         case Adjacency.LeftUpperBottom:
-            return sprites2.stone_wood_walls_lub;
+            return spriteRefs.stone_wood_walls_lub;
         case Adjacency.LeftBottom:
-            return sprites2.stone_wood_walls_lb;
+            return spriteRefs.stone_wood_walls_lb;
         case Adjacency.LeftRightBottom:
-            return sprites2.stone_wood_walls_lbr;
+            return spriteRefs.stone_wood_walls_lbr;
         case Adjacency.LeftRightUpperBottom:
-            return sprites2.stone_wood_walls_lurb;
+            return spriteRefs.stone_wood_walls_lurb;
         case Adjacency.RightUpper:
-            return sprites2.stone_wood_walls_ur;
+            return spriteRefs.stone_wood_walls_ur;
         case Adjacency.RightUpperBottom:
-            return sprites2.stone_wood_walls_ubr;
+            return spriteRefs.stone_wood_walls_ubr;
         case Adjacency.RightBottom:
-            return sprites2.stone_wood_walls_br;
+            return spriteRefs.stone_wood_walls_br;
         case Adjacency.UpperBottom:
-            return sprites2.stone_wood_walls_vertical;
+            return spriteRefs.stone_wood_walls_vertical;
         default:
-            return sprites2.stone_wood_walls;
+            return spriteRefs.stone_wood_walls;
     }
 }

@@ -7,7 +7,7 @@ import {
     emptySelection,
 } from "./actorSelectionProvider.ts";
 import { ResourceComponentId } from "../../../../../component/resourceComponent.ts";
-import { sprites2 } from "../../../../../../asset/sprite.ts";
+import { spriteRefs } from "../../../../../../asset/sprite.ts";
 import { CollectResourceJob } from "../../../../../job/collectResourceJob.ts";
 import { QueueJobCommand } from "../../../../../../server/message/command/queueJobCommand.ts";
 import { queryForJobsWithTarget } from "../../../../../job/query.ts";
@@ -42,7 +42,7 @@ export class ResourceSelectionProvider implements ActorSelectionProvider {
                         left: [
                             {
                                 text: "Cancel Job",
-                                icon: sprites2.empty_sprite,
+                                icon: spriteRefs.empty_sprite,
                                 onClick: () => {},
                             },
                         ],
@@ -75,7 +75,7 @@ function getButtonsBasedOnHarvestMode(
     return mode.map((harvestAction) => {
         return {
             text: getNameForHarvestMode(harvestAction),
-            icon: sprites2.empty_sprite,
+            icon: spriteRefs.empty_sprite,
             onClick: () => {
                 const job = CollectResourceJob(selectedEntity, harvestAction);
                 stateContext.commandDispatcher(QueueJobCommand(job));

@@ -187,11 +187,41 @@ async function packSprites(sprites: PackableSprite[]) {
         );
     }
 
+    // Generate spriteRefs - pre-created SpriteRef objects for direct use
+    const spriteRefs: { [name: string]: { bin: string; spriteId: string } } = {};
+    for (const [name, sprite] of Object.entries(packedSprites)) {
+        spriteRefs[name] = {
+            bin: sprite.bin,
+            spriteId: sprite.id,
+        };
+    }
+
+    // Generate compact sprite definitions as arrays: [w, h, x, y] or [w, h, x, y, frames]
+    // This significantly reduces file size compared to full objects
+    const spriteDefinitions: { [name: string]: number[] } = {};
+    for (const [name, sprite] of Object.entries(packedSprites)) {
+        const def = sprite.defintion;
+        if (def.frames && def.frames > 1) {
+            spriteDefinitions[name] = [def.w, def.h, def.x, def.y, def.frames];
+        } else {
+            spriteDefinitions[name] = [def.w, def.h, def.x, def.y];
+        }
+    }
+
     const binNamesJson = JSON.stringify(binNames, null, 2);
-    const spritesJson = JSON.stringify(packedSprites, null, 2);
+    const spriteRefsJson = JSON.stringify(spriteRefs, null, 2);
+
+    // Format spriteDefinitions with one entry per line for readability
+    const spriteDefinitionEntries = Object.entries(spriteDefinitions)
+        .map(([name, arr]) => `    "${name}": ${JSON.stringify(arr)}`)
+        .join("," + EOL);
+    const spriteDefinitionsFormatted = "{" + EOL + spriteDefinitionEntries + EOL + "}";
+
     const generatedTypescript = [
+        "// Sprite definition arrays: [w, h, x, y] or [w, h, x, y, frames]",
+        "export const spriteDefinitions: Record<string, number[]> = " + spriteDefinitionsFormatted + ";",
         "export const bins = " + binNamesJson + ";",
-        "export const sprites = " + spritesJson + ";",
+        "export const spriteRefs = " + spriteRefsJson + ";",
     ].join(EOL);
 
     // Write all sprites to json

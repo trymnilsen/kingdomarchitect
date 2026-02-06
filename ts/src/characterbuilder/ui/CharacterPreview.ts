@@ -3,6 +3,8 @@ import {
     buildSpriteSheet,
     SpriteDefinitionCache,
 } from "../characterSpriteGenerator.ts";
+import { spriteRegistry } from "../../asset/spriteRegistry.ts";
+import { SPRITE_X, SPRITE_Y } from "../../asset/sprite.ts";
 import type { CharacterColors } from "../colors.ts";
 import { LAYOUT, type PreviewMode } from "./characterBuilderConstants.ts";
 
@@ -49,16 +51,22 @@ export const CharacterPreview = createComponent<CharacterPreviewProps>(
             let frameToDisplay = props.currentFrame ?? 0;
 
             if (props.previewMode === "Sheet") {
-                // In sheet mode, show the entire sprite sheet
-                displaySprite = {
-                    ...selectedSprite,
-                    defintion: {
-                        ...selectedSprite.defintion,
-                        frames: 1,
-                        w: LAYOUT.SPRITE_GRID_SIZE,
-                        h: LAYOUT.SPRITE_GRID_SIZE,
-                    },
+                // In sheet mode, show the entire sprite sheet as a single frame
+                // Create a temporary sprite ref for the sheet view
+                const sheetSpriteRef = {
+                    bin: selectedSprite.bin,
+                    spriteId: `${selectedSprite.spriteId}_sheet`,
                 };
+                const resolvedSprite = spriteRegistry.resolve(selectedSprite);
+                if (resolvedSprite) {
+                    spriteRegistry.registerSprite(sheetSpriteRef, [
+                        LAYOUT.SPRITE_GRID_SIZE,
+                        LAYOUT.SPRITE_GRID_SIZE,
+                        resolvedSprite[SPRITE_X],
+                        resolvedSprite[SPRITE_Y],
+                    ]);
+                    displaySprite = sheetSpriteRef;
+                }
                 frameToDisplay = 0; // Always show first frame in sheet mode
             }
 

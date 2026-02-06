@@ -1,5 +1,5 @@
 import { allSides } from "../../../../common/sides.ts";
-import { sprites2 } from "../../../../asset/sprite.ts";
+import { spriteRefs } from "../../../../asset/sprite.ts";
 import { bookInkColor } from "../../../../ui/color.ts";
 import { ninePatchBackground } from "../../../../ui/uiBackground.ts";
 import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize.ts";
@@ -38,7 +38,7 @@ export class MenuState extends InteractionState {
                 background: ninePatchBackground({
                     scale: 2,
                     sides: allSides(12),
-                    sprite: sprites2.stone_slate_background_2x,
+                    sprite: spriteRefs.stone_slate_background_2x,
                 }),
                 child: uiColumn({
                     width: fillUiSize,
@@ -68,7 +68,7 @@ export class MenuState extends InteractionState {
             onTap: callback,
             padding: 16,
             background: ninePatchBackground({
-                sprite: sprites2.stone_slate_border,
+                sprite: spriteRefs.stone_slate_border,
                 sides: allSides(6),
                 scale: 4,
             }),

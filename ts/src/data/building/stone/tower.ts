@@ -1,4 +1,4 @@
-import { sprites2 } from "../../../asset/sprite.ts";
+import { spriteRefs } from "../../../asset/sprite.ts";
 import type { Building } from "../building.ts";
 import {
     stoneBarsItem,
@@ -11,7 +11,7 @@ import {
 
 export const stoneTower: Building = {
     id: "stonetower",
-    icon: sprites2.building_tower,
+    icon: spriteRefs.building_tower,
     name: "Stone tower",
     scale: 2,
     requirements: {

@@ -1,4 +1,4 @@
-import { sprites2 } from "../../../asset/sprite.ts";
+import { spriteRefs } from "../../../asset/sprite.ts";
 import type { Building } from "../building.ts";
 import {
     joineryItem,
@@ -13,7 +13,7 @@ import {
 
 export const tavern: Building = {
     id: "tavern",
-    icon: sprites2.building_tavern,
+    icon: spriteRefs.building_tavern,
     name: "Tavern",
     scale: 2,
     requirements: {

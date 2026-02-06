@@ -1,4 +1,4 @@
-import { Sprite2 } from "../../asset/sprite.ts";
+import type { SpriteRef } from "../../asset/sprite.ts";
 
 export const SkillCategory = {
     Melee: 0,
@@ -10,7 +10,7 @@ export const SkillCategory = {
 export type SkillCategory = (typeof SkillCategory)[keyof typeof SkillCategory];
 
 export type Skill = {
-    asset: Sprite2;
+    asset: SpriteRef;
     name: string;
 };
 

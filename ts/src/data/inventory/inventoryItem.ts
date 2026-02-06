@@ -1,10 +1,10 @@
-import type { Sprite2 } from "../../asset/sprite.ts";
+import type { SpriteRef } from "../../asset/sprite.ts";
 import type { Point } from "../../common/point.ts";
 
 export type InventoryItem = {
     readonly id: string;
     readonly name: string;
-    readonly asset: Sprite2;
+    readonly asset: SpriteRef;
     readonly hint?: string;
     readonly tag?: readonly ItemTag[];
     readonly category?: ItemCategory;
@@ -13,7 +13,7 @@ export type InventoryItem = {
 };
 
 export type ItemVisual = {
-    sprite: Sprite2;
+    sprite: SpriteRef;
     offset: Point;
 };
 

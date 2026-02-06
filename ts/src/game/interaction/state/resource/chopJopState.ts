@@ -1,4 +1,4 @@
-import { sprites2 } from "../../../../asset/sprite.ts";
+import { spriteRefs } from "../../../../asset/sprite.ts";
 import { GroundTile } from "../../../map/tile.ts";
 import { RenderScope } from "../../../../rendering/renderScope.ts";
 import { Entity } from "../../../entity/entity.ts";
@@ -26,18 +26,18 @@ export class ChopJobState extends InteractionState {
             [
                 {
                     text: "Confirm",
-                    icon: sprites2.empty_sprite,
+                    icon: spriteRefs.empty_sprite,
                     onClick: () => {
                         this.scheduleChop();
                     },
                 },
                 {
                     text: "Single",
-                    icon: sprites2.empty_sprite,
+                    icon: spriteRefs.empty_sprite,
                     children: [
                         {
                             text: "Single",
-                            icon: sprites2.empty_sprite,
+                            icon: spriteRefs.empty_sprite,
                             onClick: () => {
                                 this.chopMode = new SingleSelectionMode(
                                     this.chopMode.cursorSelection(),
@@ -46,7 +46,7 @@ export class ChopJobState extends InteractionState {
                         },
                         {
                             text: "Line",
-                            icon: sprites2.empty_sprite,
+                            icon: spriteRefs.empty_sprite,
                             onClick: () => {
                                 this.chopMode = new LineSelectionMode(
                                     this.chopMode.cursorSelection(),
@@ -55,7 +55,7 @@ export class ChopJobState extends InteractionState {
                         },
                         {
                             text: "Box",
-                            icon: sprites2.empty_sprite,
+                            icon: spriteRefs.empty_sprite,
                             onClick: () => {
                                 this.chopMode = new BoxSelectionMode(
                                     this.chopMode.cursorSelection(),
@@ -66,7 +66,7 @@ export class ChopJobState extends InteractionState {
                 },
                 {
                     text: "Cancel",
-                    icon: sprites2.empty_sprite,
+                    icon: spriteRefs.empty_sprite,
                     onClick: () => {
                         this.context.stateChanger.pop(null);
                     },
@@ -97,7 +97,7 @@ export class ChopJobState extends InteractionState {
             });
 
             context.drawSprite({
-                sprite: sprites2.cursor,
+                sprite: spriteRefs.cursor,
                 x: cursorWorldPosition.x + 2,
                 y: cursorWorldPosition.y + 2,
             });

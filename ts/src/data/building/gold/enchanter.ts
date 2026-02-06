@@ -1,4 +1,4 @@
-import { sprites2 } from "../../../asset/sprite.ts";
+import { spriteRefs } from "../../../asset/sprite.ts";
 import { SpecialRequirement, type Building } from "../building.ts";
 import {
     ironBarsItem,
@@ -12,7 +12,7 @@ import {
 
 export const enchanter: Building = {
     id: "enchanter",
-    icon: sprites2.building_enchanter,
+    icon: spriteRefs.building_enchanter,
     name: "Enchanter",
     scale: 2,
     requirements: {

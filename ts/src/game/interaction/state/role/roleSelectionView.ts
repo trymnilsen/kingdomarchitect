@@ -1,5 +1,5 @@
 import { allSides } from "../../../../common/sides.ts";
-import { sprites2 } from "../../../../asset/sprite.ts";
+import { spriteRefs } from "../../../../asset/sprite.ts";
 import { bookInkColor } from "../../../../ui/color.ts";
 import {
     createComponent,
@@ -55,8 +55,8 @@ type RoleListItemProps = {
 
 const roleListItem = createComponent<RoleListItemProps>(({ props }) => {
     const backgroundSprite = props.isSelected
-        ? sprites2.book_grid_item_focused
-        : sprites2.book_grid_item;
+        ? spriteRefs.book_grid_item_focused
+        : spriteRefs.book_grid_item;
 
     return uiButton({
         width: fillUiSize,
@@ -142,7 +142,7 @@ function createDetailsView(selectedRoleIndex: number): ComponentDescriptor {
                     width: fillUiSize,
                     height: 100,
                     background: ninePatchBackground({
-                        sprite: sprites2.book_grid_item,
+                        sprite: spriteRefs.book_grid_item,
                         sides: allSides(8),
                         scale: 1,
                     }),
@@ -194,7 +194,7 @@ export const roleSelectionView = createComponent<RoleSelectionViewProps>(
             leftButtons: [
                 {
                     text: "Assign",
-                    icon: sprites2.empty_sprite,
+                    icon: spriteRefs.empty_sprite,
                     onClick: () => {
                         const selectedRole = roleDefinitions[selectedIndex];
                         props.onAssign(selectedRole.role);
@@ -202,7 +202,7 @@ export const roleSelectionView = createComponent<RoleSelectionViewProps>(
                 },
                 {
                     text: "Cancel",
-                    icon: sprites2.empty_sprite,
+                    icon: spriteRefs.empty_sprite,
                     onClick: () => props.onCancel(),
                 },
             ],

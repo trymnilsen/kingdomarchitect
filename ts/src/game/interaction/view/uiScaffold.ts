@@ -1,5 +1,5 @@
 import { allSides } from "../../../common/sides.ts";
-import { sprites2 } from "../../../asset/sprite.ts";
+import { spriteRefs, type SpriteRef } from "../../../asset/sprite.ts";
 import {
     createComponent,
     type ComponentDescriptor,
@@ -20,7 +20,7 @@ type UiButtonProps = {
     text: string;
     onClick?: () => void;
     onExpand?: () => void;
-    icon?: import("../../../asset/sprite.js").Sprite2;
+    icon?: SpriteRef;
     hasChildren?: boolean;
 };
 
@@ -46,7 +46,7 @@ const uiMenuButton = createComponent<UiButtonProps>(
                     width: 56,
                     height: 56,
                     background: ninePatchBackground({
-                        sprite: sprites2.stone_slate_background_2x,
+                        sprite: spriteRefs.stone_slate_background_2x,
                         sides: allSides(8),
                     }),
                     child: props.icon
@@ -66,7 +66,7 @@ const uiMenuButton = createComponent<UiButtonProps>(
                         content: props.text,
                     }),
                     background: ninePatchBackground({
-                        sprite: sprites2.book_border,
+                        sprite: spriteRefs.book_border,
                         sides: allSides(8),
                     }),
                 }),
@@ -78,7 +78,7 @@ const uiMenuButton = createComponent<UiButtonProps>(
 type ScaffoldButton = {
     text: string;
     onClick?: () => void;
-    icon?: import("../../../asset/sprite.js").Sprite2;
+    icon?: SpriteRef;
     children?: ScaffoldButton[];
 };
 

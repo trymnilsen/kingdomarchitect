@@ -1,5 +1,5 @@
 import { generateId } from "../../common/idGenerator.ts";
-import { sprites2 } from "../../asset/sprite.ts";
+import { spriteRefs } from "../../asset/sprite.ts";
 import { createEquipmentComponent } from "../component/equipmentComponent.ts";
 import {
     createInventoryComponent,
@@ -22,7 +22,7 @@ import { createRoleComponent } from "../component/worker/roleComponent.ts";
 
 export function workerPrefab(): Entity {
     const entity = new Entity(generateId("worker"));
-    const spriteComponent = createSpriteComponent(sprites2.empty_sprite);
+    const spriteComponent = createSpriteComponent(spriteRefs.empty_sprite);
     entity.setEcsComponent(spriteComponent);
     entity.setEcsComponent(createHealthComponent(50, 100));
     entity.setEcsComponent(createPlayerUnitComponent());

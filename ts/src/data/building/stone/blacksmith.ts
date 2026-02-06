@@ -1,4 +1,4 @@
-import { sprites2 } from "../../../asset/sprite.ts";
+import { spriteRefs } from "../../../asset/sprite.ts";
 import type { Building } from "../building.ts";
 import { planksItem } from "../../inventory/items/processedMaterials.ts";
 import {
@@ -8,7 +8,7 @@ import {
 
 export const blacksmith: Building = {
     id: "blacksmith",
-    icon: sprites2.building_blacksmith,
+    icon: spriteRefs.building_blacksmith,
     name: "Blacksmith",
     scale: 2,
     requirements: {

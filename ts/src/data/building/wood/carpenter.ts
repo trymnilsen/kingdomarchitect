@@ -1,10 +1,10 @@
-import { sprites2 } from "../../../asset/sprite.ts";
+import { spriteRefs } from "../../../asset/sprite.ts";
 import type { Building } from "../building.ts";
 import { woodResourceItem } from "../../inventory/items/resources.ts";
 
 export const carpenter: Building = {
     id: "carpenter",
-    icon: sprites2.carpenter,
+    icon: spriteRefs.carpenter,
     name: "Carpenter",
     scale: 2,
     requirements: {

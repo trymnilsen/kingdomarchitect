@@ -2,7 +2,7 @@ import { withinRectangle } from "../../../../common/bounds.ts";
 import { Direction } from "../../../../common/direction.ts";
 import { encodePosition, Point, shiftPoint } from "../../../../common/point.ts";
 import { allSides } from "../../../../common/sides.ts";
-import { sprites2 } from "../../../../asset/sprite.ts";
+import { spriteRefs } from "../../../../asset/sprite.ts";
 import { ChunkDimension, ChunkSize } from "../../../map/chunk.ts";
 import { TileSize } from "../../../map/tile.ts";
 import { RenderScope } from "../../../../rendering/renderScope.ts";
@@ -29,14 +29,14 @@ export class LandUnlockState extends InteractionState {
             [
                 {
                     text: "Unlock",
-                    icon: sprites2.empty_sprite,
+                    icon: spriteRefs.empty_sprite,
                     onClick: () => {
                         this.unlockSelected();
                     },
                 },
                 {
                     text: "Cancel",
-                    icon: sprites2.empty_sprite,
+                    icon: spriteRefs.empty_sprite,
                     onClick: () => {
                         this.context.stateChanger.pop(null);
                     },
@@ -162,7 +162,7 @@ export class LandUnlockState extends InteractionState {
         }
         if (this.cursor) {
             context.drawNinePatchSprite({
-                sprite: sprites2.cursor,
+                sprite: spriteRefs.cursor,
                 height: ChunkDimension,
                 width: ChunkDimension,
                 scale: 1.0,

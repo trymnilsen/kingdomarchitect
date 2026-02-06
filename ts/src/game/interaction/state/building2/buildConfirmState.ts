@@ -2,7 +2,7 @@ import { findMapped } from "../../../../common/array.ts";
 import { Point } from "../../../../common/point.ts";
 import { allSides } from "../../../../common/sides.ts";
 import { Building } from "../../../../data/building/building.ts";
-import { sprites2 } from "../../../../asset/sprite.ts";
+import { spriteRefs } from "../../../../asset/sprite.ts";
 import { GroundTile, TileSize } from "../../../map/tile.ts";
 import type { ComponentDescriptor } from "../../../../ui/declarative/ui.ts";
 import { RenderScope } from "../../../../rendering/renderScope.ts";
@@ -193,8 +193,8 @@ export class BuildConfirmState extends InteractionState {
 
             context.drawNinePatchSprite({
                 sprite: selection.isAvailable
-                    ? sprites2.cursor
-                    : sprites2.cursor_red,
+                    ? spriteRefs.cursor
+                    : spriteRefs.cursor_red,
                 height: cursorHeight,
                 width: cursorWidth,
                 scale: 1.0,

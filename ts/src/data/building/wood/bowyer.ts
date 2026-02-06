@@ -1,11 +1,11 @@
-import { sprites2 } from "../../../asset/sprite.ts";
+import { spriteRefs } from "../../../asset/sprite.ts";
 import type { Building } from "../building.ts";
 import { planksItem } from "../../inventory/items/processedMaterials.ts";
 import { woodResourceItem } from "../../inventory/items/resources.ts";
 
 export const bowyer: Building = {
     id: "bowyer",
-    icon: sprites2.building_bowyer,
+    icon: spriteRefs.building_bowyer,
     name: "Bowyer",
     scale: 2,
     requirements: {

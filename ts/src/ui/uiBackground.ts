@@ -1,4 +1,4 @@
-import { Sprite2 } from "../asset/sprite.ts";
+import type { SpriteRef } from "../asset/sprite.ts";
 import { Point } from "../common/point.ts";
 import { allSides, Sides } from "../common/sides.ts";
 import { UIRenderScope } from "../rendering/uiRenderContext.ts";
@@ -27,11 +27,11 @@ export class ColorBackground implements UIBackground {
 }
 
 export class NinePatchBackground implements UIBackground {
-    private sprite: Sprite2;
+    private sprite: SpriteRef;
     private sides: Sides;
     private scale: number;
 
-    constructor(sprite: Sprite2, sides: Sides, scale: number) {
+    constructor(sprite: SpriteRef, sides: Sides, scale: number) {
         this.sprite = sprite;
         this.sides = sides;
         this.scale = scale;
@@ -75,9 +75,9 @@ export class BoxBackground implements UIBackground {
 }
 
 export class SpriteBackground implements UIBackground {
-    private sprite: Sprite2;
+    private sprite: SpriteRef;
 
-    constructor(sprite: Sprite2) {
+    constructor(sprite: SpriteRef) {
         this.sprite = sprite;
     }
 
@@ -95,7 +95,7 @@ export function colorBackground(color: string): UIBackground {
 }
 
 export type NinePatchBackgroundProperties = {
-    sprite: Sprite2;
+    sprite: SpriteRef;
     sides?: Sides;
     scale?: number;
 };

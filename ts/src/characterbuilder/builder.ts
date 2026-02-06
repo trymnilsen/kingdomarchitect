@@ -2,7 +2,7 @@ import { AssetLoader } from "../asset/loader/assetLoader.ts";
 import { Camera } from "../rendering/camera.ts";
 import { Renderer } from "../rendering/renderer.ts";
 import { Entity } from "../game/entity/entity.ts";
-import { sprites2 } from "../asset/sprite.ts";
+import { spriteRefs } from "../asset/sprite.ts";
 import { UiRenderer, type UIEvent } from "../ui/declarative/ui.ts";
 import { TouchInput } from "../input/touchInput.ts";
 import type { Point } from "../common/point.ts";

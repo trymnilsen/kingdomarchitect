@@ -1,8 +1,8 @@
-import { sprites2 } from "../../../asset/sprite.ts";
+import { spriteRefs } from "../../../asset/sprite.ts";
 
 export const road = {
     id: "road",
-    icon: sprites2.times,
+    icon: spriteRefs.times,
     name: "Road",
     scale: 1,
 } as const;

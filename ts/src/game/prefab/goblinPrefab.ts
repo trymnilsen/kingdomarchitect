@@ -1,4 +1,4 @@
-import { sprites2 } from "../../asset/sprite.ts";
+import { spriteRefs } from "../../asset/sprite.ts";
 import { generateId } from "../../common/idGenerator.ts";
 import { loopAnimation } from "../../rendering/animation/animationGraph.ts";
 import { createAnimationComponent } from "../component/animationComponent.ts";
@@ -8,7 +8,7 @@ import { Entity } from "../entity/entity.ts";
 
 export function goblinPrefab(): Entity {
     const entity = new Entity(generateId("goblin"));
-    entity.setEcsComponent(createSpriteComponent(sprites2.goblin));
+    entity.setEcsComponent(createSpriteComponent(spriteRefs.goblin));
     entity.setEcsComponent(createHealthComponent(10, 10));
     return entity;
 }
@@ -16,8 +16,8 @@ export function goblinPrefab(): Entity {
 export function goblinFireplace(): Entity {
     const entity = new Entity(generateId("goblinFireplace"));
 
-    const loopingAnimation = loopAnimation(sprites2.stone_brazier, 4);
+    const loopingAnimation = loopAnimation(spriteRefs.stone_brazier, 4);
     entity.setEcsComponent(createAnimationComponent(loopingAnimation));
-    entity.setEcsComponent(createSpriteComponent(sprites2.stone_brazier));
+    entity.setEcsComponent(createSpriteComponent(spriteRefs.stone_brazier));
     return entity;
 }

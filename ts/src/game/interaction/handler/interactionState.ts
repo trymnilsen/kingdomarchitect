@@ -1,6 +1,6 @@
 import { Point } from "../../../common/point.ts";
 import { allSides } from "../../../common/sides.ts";
-import { sprites2 } from "../../../asset/sprite.ts";
+import { spriteRefs } from "../../../asset/sprite.ts";
 import {
     InputAction,
     InputActionType,
@@ -221,7 +221,7 @@ export abstract class InteractionState {
 
             const sizeVariation = 2 - (this._context.gameTime.tick % 2) * 4;
             context.drawNinePatchSprite({
-                sprite: sprites2.cursor,
+                sprite: spriteRefs.cursor,
                 height: height + sizeVariation,
                 width: width + sizeVariation,
                 scale: 1.0,

@@ -1,4 +1,5 @@
-import { Sprite2, sprites2 } from "../../../../../asset/sprite.ts";
+import { spriteRefs, type SpriteRef, SPRITE_W, SPRITE_H } from "../../../../../asset/sprite.ts";
+import { spriteRegistry } from "../../../../../asset/spriteRegistry.ts";
 import { allSides } from "../../../../../common/sides.ts";
 import { bookInkColor } from "../../../../../ui/color.ts";
 import { InteractionState } from "../../../handler/interactionState.ts";
@@ -50,7 +51,7 @@ const bookTitleStyle = {
 };
 
 type BuildingListEntry = {
-    sprite: Sprite2;
+    sprite: SpriteRef;
     name: string;
 };
 
@@ -68,12 +69,12 @@ const buildingListItem = createComponent<{
         height: wrapUiSize,
         padding: 12,
         background: ninePatchBackground({
-            sprite: sprites2.book_grid_item,
+            sprite: spriteRefs.book_grid_item,
             sides: allSides(8),
             scale: 1,
         }),
         pressedBackground: ninePatchBackground({
-            sprite: sprites2.book_grid_item_focused,
+            sprite: spriteRefs.book_grid_item_focused,
             sides: allSides(8),
             scale: 1,
         }),
@@ -175,14 +176,14 @@ const buildingDetailsView = createComponent<{
                     width: fillUiSize,
                     height: 140,
                     background: ninePatchBackground({
-                        sprite: sprites2.book_grid_item,
+                        sprite: spriteRefs.book_grid_item,
                         sides: allSides(8),
                         scale: 1,
                     }),
                     child: uiImage({
                         sprite: props.building.icon,
-                        width: props.building.icon.defintion.w * scale,
-                        height: props.building.icon.defintion.h * scale,
+                        width: (spriteRegistry.resolve(props.building.icon)?.[SPRITE_W] ?? 16) * scale,
+                        height: (spriteRegistry.resolve(props.building.icon)?.[SPRITE_H] ?? 16) * scale,
                     }),
                 }),
                 uiSpace({ width: 1, height: 8 }),
@@ -247,27 +248,27 @@ const buildingBookLayout = createComponent<{
         rightPage: detailsView,
         tabs: [
             {
-                icon: sprites2.wood_resource,
+                icon: spriteRefs.wood_resource,
                 isSelected: props.selectedTab === 0,
                 onTap: () => props.onTabSelect(0),
             },
             {
-                icon: sprites2.stone,
+                icon: spriteRefs.stone,
                 isSelected: props.selectedTab === 1,
                 onTap: () => props.onTabSelect(1),
             },
             {
-                icon: sprites2.gold_coins,
+                icon: spriteRefs.gold_coins,
                 isSelected: props.selectedTab === 2,
                 onTap: () => props.onTabSelect(2),
             },
             {
-                icon: sprites2.resource_corn,
+                icon: spriteRefs.resource_corn,
                 isSelected: props.selectedTab === 3,
                 onTap: () => props.onTabSelect(3),
             },
             {
-                icon: sprites2.building_mill,
+                icon: spriteRefs.building_mill,
                 isSelected: props.selectedTab === 4,
                 onTap: () => props.onTabSelect(4),
             },
@@ -304,12 +305,12 @@ export class BuildingState extends InteractionState {
             leftButtons: [
                 {
                     text: "Build",
-                    icon: sprites2.empty_sprite,
+                    icon: spriteRefs.empty_sprite,
                     onClick: () => this.buildSelected(),
                 },
                 {
                     text: "Cancel",
-                    icon: sprites2.empty_sprite,
+                    icon: spriteRefs.empty_sprite,
                     onClick: () => this.context.stateChanger.pop(undefined),
                 },
             ],

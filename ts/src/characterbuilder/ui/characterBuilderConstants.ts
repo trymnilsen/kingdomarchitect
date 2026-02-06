@@ -1,6 +1,5 @@
 import { characterPartFrames } from "../../../generated/characterFrames.ts";
-import { sprites2 } from "../../asset/sprite.ts";
-import type { Sprite2 } from "../../asset/sprite.ts";
+import { spriteRefs, type SpriteRef } from "../../asset/sprite.ts";
 import type { Point } from "../../common/point.ts";
 
 /**
@@ -91,7 +90,7 @@ export type PreviewMode = "Sheet" | "Single";
 export type EquipmentOption = {
     id: string;
     name: string;
-    sprite?: Sprite2;
+    sprite?: SpriteRef;
     offset?: Point;
 };
 
@@ -100,7 +99,7 @@ export const EQUIPMENT_OPTIONS: EquipmentOption[] = [
     {
         id: "sword",
         name: "Sword",
-        sprite: sprites2.character_sword,
+        sprite: spriteRefs.character_sword,
         offset: { x: 4, y: 8 },
     },
 ];

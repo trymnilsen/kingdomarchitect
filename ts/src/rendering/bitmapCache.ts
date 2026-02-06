@@ -13,7 +13,7 @@ export class BitmapCache {
 }
 
 function makeCacheKey(sprite: SpriteConfiguration): string {
-    let key = sprite.sprite.id;
+    let key = sprite.sprite.spriteId;
     if (sprite.frame) {
         key += ":" + sprite.frame;
     }

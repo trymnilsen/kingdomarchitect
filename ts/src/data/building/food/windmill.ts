@@ -1,4 +1,4 @@
-import { sprites2 } from "../../../asset/sprite.ts";
+import { spriteRefs } from "../../../asset/sprite.ts";
 import type { Building } from "../building.ts";
 import {
     gearsItem,
@@ -12,7 +12,7 @@ import {
 
 export const windmill: Building = {
     id: "windmill",
-    icon: sprites2.building_mill,
+    icon: spriteRefs.building_mill,
     name: "Windmill",
     scale: 2,
     requirements: {

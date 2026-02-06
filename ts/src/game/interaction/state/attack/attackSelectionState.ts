@@ -1,4 +1,4 @@
-import { sprites2 } from "../../../../asset/sprite.ts";
+import { spriteRefs } from "../../../../asset/sprite.ts";
 import type { Point } from "../../../../common/point.ts";
 import { allSides } from "../../../../common/sides.ts";
 import type { RenderScope } from "../../../../rendering/renderScope.ts";
@@ -76,7 +76,7 @@ export class AttackSelectionState extends InteractionState {
             );
 
             context.drawNinePatchSprite({
-                sprite: this.selection ? sprites2.cursor : sprites2.cursor_red,
+                sprite: this.selection ? spriteRefs.cursor : spriteRefs.cursor_red,
                 height: TileSize,
                 width: TileSize,
                 scale: 1.0,

@@ -1,4 +1,4 @@
-import { Sprite2, sprites2 } from "../../../../../asset/sprite.ts";
+import { spriteRefs, type SpriteRef } from "../../../../../asset/sprite.ts";
 import { allSides } from "../../../../../common/sides.ts";
 import { UIThemeType } from "../../../../../ui/color.ts";
 import { ninePatchBackground } from "../../../../../ui/uiBackground.ts";
@@ -7,7 +7,7 @@ import { uiButton } from "../../../../../ui/declarative/uiButton.ts";
 import { uiImage } from "../../../../../ui/declarative/uiImage.ts";
 
 export type InventoryGridItemProps = {
-    sprite?: Sprite2;
+    sprite?: SpriteRef;
     isSelected: boolean;
     theme: UIThemeType;
     onTap?: () => void;
@@ -17,25 +17,25 @@ export type InventoryGridItemProps = {
 
 export const inventoryGridItem = createComponent<InventoryGridItemProps>(
     ({ props }) => {
-        const getBackgroundSprite = (theme: UIThemeType): Sprite2 => {
+        const getBackgroundSprite = (theme: UIThemeType): SpriteRef => {
             switch (theme) {
                 case UIThemeType.Book:
-                    return sprites2.book_grid_item;
+                    return spriteRefs.book_grid_item;
                 case UIThemeType.Stone:
-                    return sprites2.book_grid_item_gray;
+                    return spriteRefs.book_grid_item_gray;
                 default:
-                    return sprites2.book_grid_item;
+                    return spriteRefs.book_grid_item;
             }
         };
 
-        const getFocusedBackgroundSprite = (theme: UIThemeType): Sprite2 => {
+        const getFocusedBackgroundSprite = (theme: UIThemeType): SpriteRef => {
             switch (theme) {
                 case UIThemeType.Book:
-                    return sprites2.book_grid_item_focused;
+                    return spriteRefs.book_grid_item_focused;
                 case UIThemeType.Stone:
-                    return sprites2.book_grid_item_gray_focused;
+                    return spriteRefs.book_grid_item_gray_focused;
                 default:
-                    return sprites2.book_grid_item_focused;
+                    return spriteRefs.book_grid_item_focused;
             }
         };
 

@@ -1,8 +1,8 @@
-import { sprites2 } from "../../../asset/sprite.ts";
+import { spriteRefs } from "../../../asset/sprite.ts";
 import { ItemCategory, ItemTag } from "./../inventoryItem.ts";
 
 export const swordItem = {
-    asset: sprites2.sword_skill,
+    asset: spriteRefs.sword_skill,
     id: "sword",
     name: "Sword",
     tag: [ItemTag.SkillGear],
@@ -10,7 +10,7 @@ export const swordItem = {
 } as const;
 
 export const bowItem = {
-    asset: sprites2.archer_skill,
+    asset: spriteRefs.archer_skill,
     id: "bow",
     name: "Bow",
     tag: [ItemTag.SkillGear],
@@ -18,19 +18,19 @@ export const bowItem = {
 } as const;
 
 export const wizardHat = {
-    asset: sprites2.wizard_hat_skill,
+    asset: spriteRefs.wizard_hat_skill,
     id: "hat",
     name: "Wizard Hat",
     tag: [ItemTag.SkillGear],
     category: ItemCategory.Magic,
     visual: {
-        sprite: sprites2.wizard_hat,
+        sprite: spriteRefs.wizard_hat,
         offset: { x: 6, y: 10 },
     },
 } as const;
 
 export const hammerItem = {
-    asset: sprites2.worker_skill,
+    asset: spriteRefs.worker_skill,
     id: "hammer",
     name: "Hammer",
     tag: [ItemTag.SkillGear],

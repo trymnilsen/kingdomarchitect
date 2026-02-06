@@ -1,6 +1,6 @@
 import { addPoint } from "../../common/point.ts";
 import { allSides } from "../../common/sides.ts";
-import { Sprite2, sprites2 } from "../../asset/sprite.ts";
+import { spriteRefs, type SpriteRef } from "../../asset/sprite.ts";
 import { ninePatchBackground } from "../uiBackground.ts";
 import { UISize } from "../uiSize.ts";
 import { OpenBookUIBackground } from "../visual/bookBackground.ts";
@@ -13,7 +13,7 @@ import { uiButton } from "./uiButton.ts";
 import { uiImage } from "./uiImage.ts";
 
 export type UIBookLayoutTab = {
-    icon: Sprite2;
+    icon: SpriteRef;
     onTap: (index: number) => void;
     isSelected: boolean;
 };
@@ -210,7 +210,7 @@ function createTabsComponent(tabs: UIBookLayoutTab[]): ComponentDescriptor {
                     height: 32,
                 }),
                 background: ninePatchBackground({
-                    sprite: sprites2.book_tab,
+                    sprite: spriteRefs.book_tab,
                     scale: 1,
                     sides: allSides(8),
                 }),

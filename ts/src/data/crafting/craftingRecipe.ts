@@ -1,5 +1,5 @@
 import type { InventoryItem } from "../inventory/inventoryItem.ts";
-import type { Sprite2 } from "../../asset/sprite.ts";
+import type { SpriteRef } from "../../asset/sprite.ts";
 
 export type CraftingRecipeInput = {
     item: InventoryItem;
@@ -14,7 +14,7 @@ export type CraftingRecipeOutput = {
 export type CraftingRecipe = {
     id: string;
     name: string;
-    icon: Sprite2;
+    icon: SpriteRef;
     inputs: readonly CraftingRecipeInput[];
     outputs: readonly CraftingRecipeOutput[];
     /** Duration in ticks to complete crafting */

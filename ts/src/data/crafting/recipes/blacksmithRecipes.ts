@@ -1,4 +1,4 @@
-import { sprites2 } from "../../../asset/sprite.ts";
+import { spriteRefs } from "../../../asset/sprite.ts";
 import {
     swordItem,
     bowItem,
@@ -14,7 +14,7 @@ import type { CraftingRecipe } from "../craftingRecipe.ts";
 export const swordRecipe: CraftingRecipe = {
     id: "craft_sword",
     name: "Sword",
-    icon: sprites2.sword_skill,
+    icon: spriteRefs.sword_skill,
     inputs: [
         { item: woodResourceItem, amount: 5 },
         { item: stoneResource, amount: 10 },
@@ -26,7 +26,7 @@ export const swordRecipe: CraftingRecipe = {
 export const bowRecipe: CraftingRecipe = {
     id: "craft_bow",
     name: "Bow",
-    icon: sprites2.archer_skill,
+    icon: spriteRefs.archer_skill,
     inputs: [{ item: woodResourceItem, amount: 15 }],
     outputs: [{ item: bowItem, amount: 1 }],
     duration: 4, // 4 seconds
@@ -35,7 +35,7 @@ export const bowRecipe: CraftingRecipe = {
 export const wizardHatRecipe: CraftingRecipe = {
     id: "craft_wizard_hat",
     name: "Wizard Hat",
-    icon: sprites2.wizard_hat_skill,
+    icon: spriteRefs.wizard_hat_skill,
     inputs: [{ item: woodResourceItem, amount: 10 }],
     outputs: [{ item: wizardHat, amount: 1 }],
     duration: 6, // 6 seconds - complex item
@@ -44,7 +44,7 @@ export const wizardHatRecipe: CraftingRecipe = {
 export const hammerRecipe: CraftingRecipe = {
     id: "craft_hammer",
     name: "Hammer",
-    icon: sprites2.worker_skill,
+    icon: spriteRefs.worker_skill,
     inputs: [
         { item: woodResourceItem, amount: 8 },
         { item: stoneResource, amount: 5 },

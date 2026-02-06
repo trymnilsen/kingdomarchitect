@@ -4,7 +4,8 @@ import type {
     OffscreenRenderScope,
     OffscreenCanvasFactory,
 } from "../rendering/renderScope.ts";
-import type { Sprite2 } from "../asset/sprite.ts";
+import type { SpriteDefinition, SpriteRef } from "../asset/sprite.ts";
+import { spriteRegistry } from "../asset/spriteRegistry.ts";
 import type { CharacterColors } from "./colors.ts";
 import type { Rectangle } from "../common/structure/rectangle.ts";
 import { subtractPoint, type Point } from "../common/point.ts";
@@ -74,21 +75,25 @@ export function buildSpriteSheet(
             animationBounds,
         );
 
-        const sprite: Sprite2 = {
+        const spriteRef: SpriteRef = {
             bin: binId,
-            id: `${animationName}`,
-            defintion: {
-                frames: animationFrameCount(animation),
-                w: CHARACTER_FRAME_WIDTH,
-                h: CHARACTER_FRAME_HEIGHT,
-                x: 0,
-                y: animIdx * CHARACTER_FRAME_HEIGHT,
-            },
+            spriteId: `${animationName}`,
         };
 
-        const characterSprite = {
+        const definition: SpriteDefinition = [
+            CHARACTER_FRAME_WIDTH,
+            CHARACTER_FRAME_HEIGHT,
+            0,
+            animIdx * CHARACTER_FRAME_HEIGHT,
+            animationFrameCount(animation),
+        ];
+
+        // Register the sprite definition with the global registry
+        spriteRegistry.registerSprite(spriteRef, definition);
+
+        const characterSprite: CharacterSprite = {
             animationName: animationName,
-            sprite,
+            sprite: spriteRef,
             offset: { x: -16, y: -12 },
         };
 
@@ -130,7 +135,7 @@ export class SpriteDefinitionCache {
         return Array.from(animationMap.values());
     }
 
-    getSpriteFor(characterId: string, animationName: string): Sprite2 {
+    getSpriteFor(characterId: string, animationName: string): SpriteRef {
         const animationMap = this.cache.get(characterId);
         if (!animationMap) {
             throw new Error(
@@ -264,7 +269,7 @@ function getFrameBounds(
 
 export type CharacterSprite = {
     animationName: string;
-    sprite: Sprite2;
+    sprite: SpriteRef;
     offset: Point;
 };
 
@@ -562,11 +567,14 @@ function drawAnimation(
                     contentCenterY +
                     (position.y - animationBounds.y);
 
-                offscreenScope.drawScreenSpaceSprite({
-                    x: adjustedX,
-                    y: adjustedY,
-                    sprite: wizardHat.visual.sprite,
-                });
+                const hatSprite = spriteRegistry.resolve(wizardHat.visual.sprite);
+                if (hatSprite) {
+                    offscreenScope.drawScreenSpaceSprite({
+                        x: adjustedX,
+                        y: adjustedY,
+                        sprite: wizardHat.visual.sprite,
+                    });
+                }
             }
         }
 

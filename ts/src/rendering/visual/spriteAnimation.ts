@@ -1,13 +1,13 @@
-import { Sprite2 } from "../../asset/sprite.ts";
+import type { SpriteRef } from "../../asset/sprite.ts";
 import { addPoint, Point, zeroPoint } from "../../common/point.ts";
 import { RenderScope } from "../renderScope.ts";
 
 export class SpriteAnimation {
     private currentFrame = 0;
     private position: Point = zeroPoint();
-    private spriteFrames: Sprite2[];
+    private spriteFrames: SpriteRef[];
 
-    constructor(spriteFrames: Sprite2[]) {
+    constructor(spriteFrames: SpriteRef[]) {
         this.spriteFrames = spriteFrames;
     }
 

@@ -1,5 +1,6 @@
 import type { AssetLoader } from "../../asset/loader/assetLoader.ts";
-import { sprites2, type Sprite2 } from "../../asset/sprite.ts";
+import { spriteRefs, type SpriteRef, SPRITE_FRAMES } from "../../asset/sprite.ts";
+import { spriteRegistry } from "../../asset/spriteRegistry.ts";
 import { getCharacterBinId } from "../../characterbuilder/characterBinId.ts";
 import type { SpriteDefinitionCache } from "../../characterbuilder/characterSpriteGenerator.ts";
 import { getCharacterColors } from "../../characterbuilder/colors.ts";
@@ -102,7 +103,10 @@ function updateAnimatable(
 ): void {
     const { currentAnimation, animationGraph } = animatable;
     const spriteComponent = entity.requireEcsComponent(SpriteComponentId);
-    const sprite = spriteComponent.sprite;
+    const sprite = spriteRegistry.resolve(spriteComponent.sprite);
+    if (!sprite) {
+        return;
+    }
 
     const currentAnimationState = animationGraph.states[currentAnimation];
     const speed = currentAnimationState.speed ?? 1;
@@ -111,7 +115,7 @@ function updateAnimatable(
         nextFrame = spriteComponent.frame + 1;
     }
 
-    if (nextFrame < sprite.defintion.frames) {
+    if (nextFrame < (sprite[SPRITE_FRAMES] ?? 1)) {
         spriteComponent.frame = nextFrame;
     } else {
         // The animation has finished, decide what to do next.
@@ -205,7 +209,7 @@ function getSpriteForState(
     stateName: string,
     entity: Entity,
     spriteCache: SpriteDefinitionCache,
-): Sprite2 {
+): SpriteRef {
     const { animationGraph } = animatable;
 
     const animationState = animationGraph.states[stateName];
@@ -215,16 +219,13 @@ function getSpriteForState(
 
     const animationTemplate = animationState.animation;
     const animationName = resolvePlaceholders(animationTemplate, entity);
-    if (animationName in sprites2) {
-        return sprites2[animationName];
+    if (animationName in spriteRefs) {
+        return spriteRefs[animationName as keyof typeof spriteRefs];
     } else if (entity.hasComponent(EquipmentComponentId)) {
         const equipment = entity.requireEcsComponent(EquipmentComponentId);
         const colors = getCharacterColors(equipment);
         const characterId = getCharacterBinId(colors);
-        //Need some sort of map or cache to lookup sprites based on resolved
-        //name and the bin
-        //The asset cache only has a bin map so we still need some for sprites
-        //that have been generated?
+        // Get the SpriteRef from the cache (sprites are registered with spriteRegistry)
         const sprite = spriteCache.getSpriteFor(characterId, animationName);
         return sprite;
     } else {

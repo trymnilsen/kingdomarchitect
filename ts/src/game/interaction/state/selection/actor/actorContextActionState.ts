@@ -1,6 +1,6 @@
 import { Point } from "../../../../../common/point.ts";
 import { allSides } from "../../../../../common/sides.ts";
-import { sprites2 } from "../../../../../asset/sprite.ts";
+import { spriteRefs } from "../../../../../asset/sprite.ts";
 import { GroundTile, TileSize } from "../../../../map/tile.ts";
 import { SearchedNode } from "../../../../map/path/search.ts";
 import { queryPath } from "../../../../map/query/pathQuery.ts";
@@ -22,7 +22,7 @@ import { SetPlayerCommand } from "../../../../../server/message/command/setPlaye
 type ScaffoldButton = {
     text: string;
     onClick?: () => void;
-    icon?: import("../../../../../asset/sprite.js").Sprite2;
+    icon?: import("../../../../../asset/sprite.js").SpriteRef;
     children?: ScaffoldButton[];
 };
 
@@ -164,7 +164,7 @@ export class ActorContextActionState extends InteractionState {
             );
 
             context.drawNinePatchSprite({
-                sprite: sprites2.cursor,
+                sprite: spriteRefs.cursor,
                 height: TileSize,
                 width: TileSize,
                 scale: 1.0,

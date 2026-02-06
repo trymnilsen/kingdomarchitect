@@ -18,6 +18,8 @@ import {
     SpriteComponentId,
 } from "../component/spriteComponent.ts";
 import { TileComponent, TileComponentId } from "../component/tileComponent.ts";
+import { spriteRegistry } from "../../asset/spriteRegistry.ts";
+import { SPRITE_W, SPRITE_H } from "../../asset/sprite.ts";
 import { VisibilityComponentId } from "../component/visibilityComponent.ts";
 import {
     hasDiscovered,
@@ -104,6 +106,11 @@ function drawSprite(
     renderContext: RenderScope,
     _drawMode: DrawMode,
 ) {
+    const sprite = spriteRegistry.resolve(spriteComponent.sprite);
+    if (!sprite) {
+        return;
+    }
+
     const scale = 2;
 
     let targetWidth = spriteComponent.size?.x;
@@ -112,13 +119,13 @@ function drawSprite(
     if (targetWidth) {
         targetWidth = targetWidth * scale;
     } else {
-        targetWidth = spriteComponent.sprite.defintion.w * scale;
+        targetWidth = sprite[SPRITE_W] * scale;
     }
 
     if (targetHeight) {
         targetHeight = targetHeight * scale;
     } else {
-        targetHeight = spriteComponent.sprite.defintion.h * scale;
+        targetHeight = sprite[SPRITE_H] * scale;
     }
 
     /*

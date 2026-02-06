@@ -1,4 +1,3 @@
-import { sprites } from "../../../generated/sprites.ts";
 import type { AnimationGraph } from "../../rendering/animation/animationGraph.ts";
 
 export const nobleKnightAnimationGraph: AnimationGraph = {

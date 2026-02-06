@@ -1,5 +1,5 @@
 import { type Point } from "../../common/point.ts";
-import { type Sprite2 } from "../../asset/sprite.ts";
+import type { SpriteRef } from "../../asset/sprite.ts";
 
 /**
  * Defines a currently applied tint to a sprite
@@ -32,7 +32,11 @@ export function damageTint(): SpriteTint {
 
 export type SpriteComponent = {
     id: typeof SpriteComponentId;
-    sprite: Sprite2;
+    /**
+     * Reference to the sprite to render. Use the SpriteRegistry to resolve
+     * this to a SpriteDefinition at render time.
+     */
+    sprite: SpriteRef;
     frame: number;
     offset?: Point;
     size?: Point;
@@ -41,14 +45,14 @@ export type SpriteComponent = {
 
 /**
  * Creates a new sprite component
- * @param sprite the sprite to use
+ * @param sprite the sprite reference
  * @param offset an optional offset
  * @param size an optional size
  * @param tint an optional tint
  * @returns the constructed SpriteComponent
  */
 export function createSpriteComponent(
-    sprite: Sprite2,
+    sprite: SpriteRef,
     offset?: Point,
     size?: Point,
     tint?: SpriteTint,

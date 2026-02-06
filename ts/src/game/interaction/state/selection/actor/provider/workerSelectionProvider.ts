@@ -1,4 +1,4 @@
-import { sprites2 } from "../../../../../../asset/sprite.ts";
+import { spriteRefs } from "../../../../../../asset/sprite.ts";
 import { SelectedEntityItem } from "../../../../selection/selectedEntityItem.ts";
 import { SelectedWorldItem } from "../../../../selection/selectedWorldItem.ts";
 import {
@@ -101,7 +101,7 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
                             EquipItemCommand(null, selectedEntity, "other"),
                         );
                     },
-                    icon: sprites2.empty_sprite,
+                    icon: spriteRefs.empty_sprite,
                 },
             ];
 
@@ -113,7 +113,7 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
                             ConsumeItemCommand("other", selectedEntity),
                         );
                     },
-                    icon: sprites2.empty_sprite,
+                    icon: spriteRefs.empty_sprite,
                 });
             }
 
@@ -125,7 +125,7 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
         } else {
             items.push({
                 text: "Other",
-                icon: sprites2.empty_sprite,
+                icon: spriteRefs.empty_sprite,
                 children: [
                     {
                         text: "Equip",
@@ -134,7 +134,7 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
                                 new InventoryState(selectedEntity),
                             );
                         },
-                        icon: sprites2.empty_sprite,
+                        icon: spriteRefs.empty_sprite,
                     },
                 ],
             });
@@ -158,7 +158,7 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
                             EquipItemCommand(null, selectedEntity, "main"),
                         );
                     },
-                    icon: sprites2.empty_sprite,
+                    icon: spriteRefs.empty_sprite,
                 },
             ];
 
@@ -170,7 +170,7 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
                             ConsumeItemCommand("main", selectedEntity),
                         );
                     },
-                    icon: sprites2.empty_sprite,
+                    icon: spriteRefs.empty_sprite,
                 });
             } else {
                 children.push({
@@ -180,7 +180,7 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
                             new AttackSelectionState(selectedEntity),
                         );
                     },
-                    icon: sprites2.empty_sprite,
+                    icon: spriteRefs.empty_sprite,
                 });
             }
 
@@ -190,7 +190,7 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
                 children,
             });
         } else {
-            const mainIcon = sprites2.empty_sprite;
+            const mainIcon = spriteRefs.empty_sprite;
             items.push({
                 text: "Main",
                 icon: mainIcon,
@@ -202,7 +202,7 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
                                 new InventoryState(selectedEntity),
                             );
                         },
-                        icon: sprites2.empty_sprite,
+                        icon: spriteRefs.empty_sprite,
                     },
                 ],
             });
@@ -227,7 +227,7 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
             },
             {
                 text: "Ledger",
-                icon: sprites2.empty_sprite,
+                icon: spriteRefs.empty_sprite,
                 onClick: () => {
                     stateContext.stateChanger.push(
                         new InventoryState(selectedEntity),
@@ -236,7 +236,7 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
             },
             {
                 text: "Role",
-                icon: sprites2.empty_sprite,
+                icon: spriteRefs.empty_sprite,
                 onClick: () => {
                     stateContext.stateChanger.push(
                         new RoleSelectionState(selectedEntity),
@@ -245,11 +245,11 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
             },
             {
                 text: "Stance",
-                icon: sprites2.empty_sprite,
+                icon: spriteRefs.empty_sprite,
                 children: [
                     {
                         text: "Aggressive",
-                        icon: sprites2.empty_sprite,
+                        icon: spriteRefs.empty_sprite,
                         onClick: () => {
                             stateContext.commandDispatcher(
                                 UpdateWorkerStanceCommand(
@@ -261,7 +261,7 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
                     },
                     {
                         text: "Defensive",
-                        icon: sprites2.empty_sprite,
+                        icon: spriteRefs.empty_sprite,
                         onClick: () => {
                             stateContext.commandDispatcher(
                                 UpdateWorkerStanceCommand(

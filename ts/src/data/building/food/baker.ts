@@ -1,4 +1,4 @@
-import { sprites2 } from "../../../asset/sprite.ts";
+import { spriteRefs } from "../../../asset/sprite.ts";
 import type { Building } from "../building.ts";
 import {
     clayBricksItem,
@@ -11,7 +11,7 @@ import {
 
 export const baker: Building = {
     id: "baker",
-    icon: sprites2.building_baker,
+    icon: spriteRefs.building_baker,
     name: "Baker",
     scale: 2,
     requirements: {

@@ -1,4 +1,4 @@
-import { sprites2 } from "../../../../asset/sprite.ts";
+import { spriteRefs } from "../../../../asset/sprite.ts";
 import { Point } from "../../../../common/point.ts";
 import { RenderScope } from "../../../../rendering/renderScope.ts";
 import { biomes } from "../../../map/biome.ts";
@@ -32,14 +32,14 @@ function drawCard(context: RenderScope, origin: Point) {
         y: origin.y + 3,
     });
     context.drawScreenSpaceSprite({
-        sprite: sprites2.paladin,
+        sprite: spriteRefs.paladin,
         x: origin.x + 16,
         y: origin.y - 4,
         targetWidth: 64,
         targetHeight: 64,
     });
     context.drawScreenSpaceSprite({
-        sprite: sprites2.card,
+        sprite: spriteRefs.card,
         x: origin.x,
         y: origin.y,
         targetHeight: 96,

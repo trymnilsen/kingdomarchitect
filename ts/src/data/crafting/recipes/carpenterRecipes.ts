@@ -1,4 +1,4 @@
-import { sprites2 } from "../../../asset/sprite.ts";
+import { spriteRefs } from "../../../asset/sprite.ts";
 import {
     planksItem,
     timberFramesItem,
@@ -10,7 +10,7 @@ import type { CraftingRecipe } from "../craftingRecipe.ts";
 export const planksRecipe: CraftingRecipe = {
     id: "craft_planks",
     name: "Planks",
-    icon: sprites2.wood_resource,
+    icon: spriteRefs.wood_resource,
     inputs: [{ item: woodResourceItem, amount: 4 }],
     outputs: [{ item: planksItem, amount: 2 }],
     duration: 3,
@@ -19,7 +19,7 @@ export const planksRecipe: CraftingRecipe = {
 export const timberFramesRecipe: CraftingRecipe = {
     id: "craft_timber_frames",
     name: "Timber Frames",
-    icon: sprites2.wood_resource,
+    icon: spriteRefs.wood_resource,
     inputs: [{ item: planksItem, amount: 4 }],
     outputs: [{ item: timberFramesItem, amount: 1 }],
     duration: 5,
@@ -28,7 +28,7 @@ export const timberFramesRecipe: CraftingRecipe = {
 export const joineryRecipe: CraftingRecipe = {
     id: "craft_joinery",
     name: "Joinery",
-    icon: sprites2.wood_resource,
+    icon: spriteRefs.wood_resource,
     inputs: [{ item: planksItem, amount: 2 }],
     outputs: [{ item: joineryItem, amount: 1 }],
     duration: 4,

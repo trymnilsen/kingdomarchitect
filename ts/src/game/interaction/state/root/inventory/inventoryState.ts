@@ -1,5 +1,5 @@
 import { InventoryItem } from "../../../../../data/inventory/inventoryItem.ts";
-import { Sprite2, sprites2 } from "../../../../../asset/sprite.ts";
+import { type SpriteRef, spriteRefs } from "../../../../../asset/sprite.ts";
 import { ComponentDescriptor } from "../../../../../ui/declarative/ui.ts";
 import {
     InventoryComponentId,
@@ -71,16 +71,16 @@ export class InventoryState extends InteractionState {
     }
 }
 
-export function getAssetImage(index: number): Sprite2 | null {
+export function getAssetImage(index: number): SpriteRef | null {
     switch (index) {
         case 0:
-            return sprites2.wood_resource;
+            return spriteRefs.wood_resource;
         case 1:
-            return sprites2.bag_of_glitter;
+            return spriteRefs.bag_of_glitter;
         case 2:
-            return sprites2.gem_resource;
+            return spriteRefs.gem_resource;
         case 3:
-            return sprites2.stone_resource;
+            return spriteRefs.stone_resource;
         default:
             return null;
     }

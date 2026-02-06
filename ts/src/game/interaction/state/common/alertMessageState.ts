@@ -1,5 +1,5 @@
 import { allSides } from "../../../../common/sides.ts";
-import { sprites2 } from "../../../../asset/sprite.ts";
+import { spriteRefs } from "../../../../asset/sprite.ts";
 import { bookInkColor } from "../../../../ui/color.ts";
 import {
     createComponent,
@@ -32,7 +32,7 @@ const alertMessage = createComponent<AlertMessageProps>(
                 width: 300,
                 height: wrapUiSize,
                 background: ninePatchBackground({
-                    sprite: sprites2.stone_slate_background,
+                    sprite: spriteRefs.stone_slate_background,
                     sides: allSides(16),
                     scale: 4,
                 }),
@@ -67,7 +67,7 @@ const alertMessage = createComponent<AlertMessageProps>(
                             height: wrapUiSize,
                             padding: 16,
                             background: ninePatchBackground({
-                                sprite: sprites2.stone_slate_border,
+                                sprite: spriteRefs.stone_slate_border,
                                 sides: allSides(6),
                                 scale: 4,
                             }),

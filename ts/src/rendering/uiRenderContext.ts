@@ -1,4 +1,4 @@
-import type { Sprite2 } from "../asset/sprite.ts";
+import type { SpriteDefinition } from "../asset/sprite.ts";
 import type { Bounds } from "../common/bounds.ts";
 import type { RectangleConfiguration } from "./items/rectangle.ts";
 import type {
@@ -24,5 +24,5 @@ export type UIRenderScope = {
         color: string,
         width: number,
     ): void;
-    getSprite(id: string): Sprite2 | undefined;
+    getSprite(id: string): SpriteDefinition | undefined;
 };

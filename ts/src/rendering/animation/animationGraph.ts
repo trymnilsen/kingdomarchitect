@@ -1,4 +1,4 @@
-import type { Sprite2 } from "../../asset/sprite.ts";
+import type { SpriteRef } from "../../asset/sprite.ts";
 import { nameof } from "../../common/nameof.ts";
 
 // Define the valid values for the {direction} placeholder
@@ -63,10 +63,10 @@ export type AnimationGraph<T extends AnimationStateMap = AnimationStateMap> = {
  * @returns An AnimationGraph with a single looping state
  */
 export function loopAnimation(
-    sprite: Sprite2,
+    sprite: SpriteRef,
     speed: number = 8,
 ): AnimationGraph {
-    const animationKey = sprite.id;
+    const animationKey = sprite.spriteId;
 
     return {
         initialState: "Loop",

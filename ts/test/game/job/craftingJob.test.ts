@@ -17,7 +17,7 @@ import { swordItem } from "../../../src/data/inventory/items/equipment.ts";
 import type { Point } from "../../../src/common/point.ts";
 import { JobTestHarness } from "./jobTestHarness.ts";
 import type { CraftingRecipe } from "../../../src/data/crafting/craftingRecipe.ts";
-import { sprites2 } from "../../../src/asset/sprite.ts";
+import { spriteRefs } from "../../../src/asset/sprite.ts";
 
 describe("craftingJob", () => {
     // Helper to create a simple test recipe
@@ -28,7 +28,7 @@ describe("craftingJob", () => {
         return {
             id,
             name: "Test Recipe",
-            icon: sprites2.sword_skill,
+            icon: spriteRefs.sword_skill,
             inputs: [
                 { item: woodResourceItem, amount: 5 },
                 { item: stoneResource, amount: 3 },

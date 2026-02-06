@@ -4,7 +4,7 @@ import {
     InventoryItemList,
     type InventoryItemQuantity,
 } from "../../../../../data/inventory/inventoryItemQuantity.ts";
-import { sprites2 } from "../../../../../asset/sprite.ts";
+import { spriteRefs } from "../../../../../asset/sprite.ts";
 import { UIThemeType, bookInkColor } from "../../../../../ui/color.ts";
 import {
     createComponent,
@@ -63,7 +63,7 @@ export const inventoryView = createComponent<InventoryViewProps>(
                         width: 40, // Match the grid itemSize
                         height: 40,
                         background: ninePatchBackground({
-                            sprite: sprites2.book_grid_item,
+                            sprite: spriteRefs.book_grid_item,
                             sides: allSides(8),
                             scale: 1,
                         }),
@@ -138,7 +138,7 @@ function createDetailsView(
             height: 180,
             width: fillUiSize,
             background: ninePatchBackground({
-                sprite: sprites2.book_grid_item,
+                sprite: spriteRefs.book_grid_item,
                 sides: allSides(8),
                 scale: 1,
             }),

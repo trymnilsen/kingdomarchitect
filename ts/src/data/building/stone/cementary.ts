@@ -1,4 +1,4 @@
-import { sprites2 } from "../../../asset/sprite.ts";
+import { spriteRefs } from "../../../asset/sprite.ts";
 import { SpecialRequirement, type Building } from "../building.ts";
 import {
     stoneResource,
@@ -7,7 +7,7 @@ import {
 
 export const cementary: Building = {
     id: "cementary",
-    icon: sprites2.building_tombstone,
+    icon: spriteRefs.building_tombstone,
     name: "Cemetery",
     scale: 2,
     requirements: {

@@ -1,4 +1,4 @@
-import { Sprite2 } from "../../src/asset/sprite.ts";
+import { SpriteDefinition, SPRITE_W, SPRITE_H } from "../../src/asset/sprite.ts";
 import { UILayoutScope } from "../../src/ui/uiLayoutContext.ts";
 import { UISize } from "../../src/ui/uiSize.ts";
 import { UIView } from "../../src/ui/uiView.ts";
@@ -10,10 +10,10 @@ export class LayoutContextStub implements UILayoutScope {
     measureText(): UISize {
         return { width: 0, height: 0 };
     }
-    measureSprite(sprite: Sprite2): UISize {
+    measureSprite(sprite: SpriteDefinition): UISize {
         return {
-            width: sprite.defintion.w,
-            height: sprite.defintion.h,
+            width: sprite[SPRITE_W],
+            height: sprite[SPRITE_H],
         };
     }
 }

@@ -1,4 +1,4 @@
-import { sprites2 } from "../../../../asset/sprite.ts";
+import { spriteRefs } from "../../../../asset/sprite.ts";
 import { allSides } from "../../../../common/sides.ts";
 import { RenderScope } from "../../../../rendering/renderScope.ts";
 import { TileSize } from "../../../map/tile.ts";
@@ -114,7 +114,7 @@ export class SelectionState extends InteractionState {
         );
 
         context.drawNinePatchSprite({
-            sprite: sprites2.cursor,
+            sprite: spriteRefs.cursor,
             height: selection.selectionSize.x * TileSize,
             width: selection.selectionSize.y * TileSize,
             scale: 1.0,
@@ -139,7 +139,7 @@ export class SelectionState extends InteractionState {
                 return {
                     title: type,
                     subtitle: "Tile",
-                    icon: sprites2.blue_book,
+                    icon: spriteRefs.blue_book,
                 };
             } else {
                 return null;
@@ -156,7 +156,7 @@ export class SelectionState extends InteractionState {
 
             return selectionComponent.getSelectionInfo();*/
             return {
-                icon: sprites2.archer_skill,
+                icon: spriteRefs.archer_skill,
                 subtitle: "selected",
                 title: "Entity",
             };
@@ -179,7 +179,7 @@ export class SelectionState extends InteractionState {
                     height: wrapUiSize,
                     padding: 8,
                     background: new NinePatchBackground(
-                        sprites2.stone_slate_background,
+                        spriteRefs.stone_slate_background,
                         allSides(8),
                         1.0,
                     ),

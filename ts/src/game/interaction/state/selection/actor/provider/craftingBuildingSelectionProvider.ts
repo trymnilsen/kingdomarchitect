@@ -12,7 +12,7 @@ import {
     CollectableComponentId,
     hasCollectableItems,
 } from "../../../../../component/collectableComponent.ts";
-import { sprites2 } from "../../../../../../asset/sprite.ts";
+import { spriteRefs } from "../../../../../../asset/sprite.ts";
 import { CraftWithBuildingState } from "../../../crafting/craftWithBuildingState.ts";
 import { CollectItemJob } from "../../../../../job/collectItemJob.ts";
 import { QueueJobCommand } from "../../../../../../server/message/command/queueJobCommand.ts";
@@ -39,7 +39,7 @@ export class CraftingBuildingSelectionProvider implements ActorSelectionProvider
 
                 const inventory = {
                     text: "Ledger",
-                    icon: sprites2.empty_sprite,
+                    icon: spriteRefs.empty_sprite,
                     onClick: () => {
                         stateContext.stateChanger.push(
                             new InventoryState(selection.entity),
@@ -54,7 +54,7 @@ export class CraftingBuildingSelectionProvider implements ActorSelectionProvider
                         left: [
                             {
                                 text: "Collect",
-                                icon: sprites2.empty_sprite,
+                                icon: spriteRefs.empty_sprite,
                                 onClick: () => {
                                     const job = CollectItemJob(
                                         selection.entity,
@@ -74,7 +74,7 @@ export class CraftingBuildingSelectionProvider implements ActorSelectionProvider
                         left: [
                             {
                                 text: "Craft",
-                                icon: sprites2.empty_sprite,
+                                icon: spriteRefs.empty_sprite,
                                 onClick: () => {
                                     stateContext.stateChanger.replace(
                                         new CraftWithBuildingState(

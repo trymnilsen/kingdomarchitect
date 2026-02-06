@@ -66,7 +66,8 @@ function update(root: Entity, currentTick: number): void {
                     entity.getEcsComponent(SpriteComponentId);
                 if (
                     spriteComponent &&
-                    spriteComponent.sprite.id !== resource.lifecycle.sprite.id
+                    spriteComponent.sprite.spriteId !==
+                        resource.lifecycle.sprite.spriteId
                 ) {
                     spriteComponent.sprite = resource.lifecycle.sprite;
                     entity.invalidateComponent(SpriteComponentId);

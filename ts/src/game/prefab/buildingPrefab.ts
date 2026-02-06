@@ -1,6 +1,6 @@
 import { generateId } from "../../common/idGenerator.ts";
 import type { Building } from "../../data/building/building.ts";
-import { sprites2 } from "../../asset/sprite.ts";
+import { spriteRefs } from "../../asset/sprite.ts";
 import { createBuildingComponent } from "../component/buildingComponent.ts";
 import { createHealthComponent } from "../component/healthComponent.ts";
 import { createSpriteComponent } from "../component/spriteComponent.ts";
@@ -60,7 +60,7 @@ export function buildingPrefab(
     }
     entity.setEcsComponent(
         createSpriteComponent(
-            startScaffolded ? sprites2.wooden_house_scaffold : building.icon,
+            startScaffolded ? spriteRefs.wooden_house_scaffold : building.icon,
             { x: 0, y: 0 },
         ),
     );

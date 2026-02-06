@@ -1,8 +1,8 @@
-import { sprites2 } from "../../../asset/sprite.ts";
+import { spriteRefs } from "../../../asset/sprite.ts";
 import { ItemRarity } from "../inventoryItem.ts";
 
 export const planksItem = {
-    asset: sprites2.wood_resource,
+    asset: spriteRefs.wood_resource,
     id: "planks",
     name: "Planks",
     hint: "Processed wooden planks",
@@ -10,7 +10,7 @@ export const planksItem = {
 } as const;
 
 export const timberFramesItem = {
-    asset: sprites2.wood_resource,
+    asset: spriteRefs.wood_resource,
     id: "timberframes",
     name: "Timber Frames",
     hint: "Structural wooden frames",
@@ -18,7 +18,7 @@ export const timberFramesItem = {
 } as const;
 
 export const joineryItem = {
-    asset: sprites2.wood_resource,
+    asset: spriteRefs.wood_resource,
     id: "joinery",
     name: "Joinery",
     hint: "Fine woodwork components",
@@ -26,7 +26,7 @@ export const joineryItem = {
 } as const;
 
 export const ironBarsItem = {
-    asset: sprites2.stone_resource,
+    asset: spriteRefs.stone_resource,
     id: "ironbars",
     name: "Iron Bars",
     hint: "Smelted iron bars",
@@ -34,7 +34,7 @@ export const ironBarsItem = {
 } as const;
 
 export const stoneBarsItem = {
-    asset: sprites2.stone_resource,
+    asset: spriteRefs.stone_resource,
     id: "stonebars",
     name: "Stone Bars",
     hint: "Cut and dressed stone",
@@ -42,7 +42,7 @@ export const stoneBarsItem = {
 } as const;
 
 export const gearsItem = {
-    asset: sprites2.stone_resource,
+    asset: spriteRefs.stone_resource,
     id: "gears",
     name: "Gears",
     hint: "Metal gears for machinery",
@@ -50,7 +50,7 @@ export const gearsItem = {
 } as const;
 
 export const clayBricksItem = {
-    asset: sprites2.stone_resource,
+    asset: spriteRefs.stone_resource,
     id: "claybricks",
     name: "Clay Bricks",
     hint: "Fired clay bricks",

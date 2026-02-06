@@ -1,5 +1,12 @@
 import { AssetLoader } from "../asset/loader/assetLoader.ts";
-import type { Sprite2 } from "../asset/sprite.ts";
+import {
+    type SpriteDefinition,
+    SPRITE_W,
+    SPRITE_H,
+    SPRITE_X,
+    SPRITE_Y,
+} from "../asset/sprite.ts";
+import { spriteRegistry } from "../asset/spriteRegistry.ts";
 import type { UILayoutScope } from "../ui/uiLayoutContext.ts";
 import type { UISize } from "../ui/uiSize.ts";
 import { Camera } from "./camera.ts";
@@ -17,7 +24,7 @@ import { type TextConfiguration, textRenderer } from "./items/text.ts";
 import type { TextStyle } from "./text/textStyle.ts";
 import type { UIRenderScope } from "./uiRenderContext.ts";
 import type { Bounds } from "../common/bounds.ts";
-import { sprites } from "../../generated/sprites.ts";
+import { spriteRefs } from "../../generated/sprites.ts";
 import type { CanvasContext } from "./canvasContext.ts";
 import { BitmapCache } from "./bitmapCache.ts";
 import { type Point, zeroPoint } from "../common/point.ts";
@@ -123,8 +130,10 @@ export class RenderScope implements UIRenderScope, UILayoutScope {
         this.canvasContext.stroke();
     }
 
-    getSprite(id: string): Sprite2 | undefined {
-        return sprites[id] as Sprite2;
+    getSprite(id: string): SpriteDefinition | undefined {
+        const ref = spriteRefs[id as keyof typeof spriteRefs];
+        if (!ref) return undefined;
+        return spriteRegistry.resolve(ref);
     }
 
     getOffscreenRenderScope(
@@ -153,16 +162,13 @@ export class RenderScope implements UIRenderScope, UILayoutScope {
 
     /**
      * Measures the size of the sprite
-     * @param sprite the sprite to measure
+     * @param sprite the sprite definition to measure
      * @returns the width and height as a UISize
      */
-    measureSprite(sprite: Sprite2): UISize {
-        const width = sprite.defintion.w;
-        const height = sprite.defintion.h;
-
+    measureSprite(sprite: SpriteDefinition): UISize {
         return {
-            width,
-            height,
+            width: sprite[SPRITE_W],
+            height: sprite[SPRITE_H],
         };
     }
 
@@ -259,13 +265,16 @@ export class RenderScope implements UIRenderScope, UILayoutScope {
 
     /**
      * Draw a sprite on the canvas using coordinates in screenspace with a
-     * given scale
+     * given scale. SpriteRefs are resolved via the SpriteRegistry.
      * @param sprite the sprite to draw
      */
     drawScreenSpaceSprite(sprite: SpriteConfiguration) {
-        const spriteBounds = sprite.sprite.defintion;
-        let targetWidth = spriteBounds.w;
-        let targetHeight = spriteBounds.h;
+        const spriteDef = spriteRegistry.resolve(sprite.sprite);
+        if (!spriteDef) {
+            return;
+        }
+        let targetWidth = spriteDef[SPRITE_W];
+        let targetHeight = spriteDef[SPRITE_H];
         let frame = 0;
         if (sprite.targetWidth) {
             targetWidth = sprite.targetWidth;
@@ -303,10 +312,10 @@ export class RenderScope implements UIRenderScope, UILayoutScope {
                 spriteRenderer(
                     0,
                     0,
-                    spriteBounds.x,
-                    spriteBounds.y,
-                    spriteBounds.w,
-                    spriteBounds.h,
+                    spriteDef[SPRITE_X],
+                    spriteDef[SPRITE_Y],
+                    spriteDef[SPRITE_W],
+                    spriteDef[SPRITE_H],
                     targetWidth,
                     targetHeight,
                     frame,
@@ -336,10 +345,10 @@ export class RenderScope implements UIRenderScope, UILayoutScope {
             spriteRenderer(
                 sprite.x,
                 sprite.y,
-                spriteBounds.x,
-                spriteBounds.y,
-                spriteBounds.w,
-                spriteBounds.h,
+                spriteDef[SPRITE_X],
+                spriteDef[SPRITE_Y],
+                spriteDef[SPRITE_W],
+                spriteDef[SPRITE_H],
                 targetWidth,
                 targetHeight,
                 frame,
@@ -353,18 +362,21 @@ export class RenderScope implements UIRenderScope, UILayoutScope {
      * Draws a scalable version of an image know as a nine patch or nice slice.
      * This is a bit expensive as it needs to draw 9 images to represent a
      * perceived single image so use it sparringly. Coordinates are provided in
-     * screenspace.
+     * screenspace. SpriteRefs are resolved via the SpriteRegistry.
      * @param ninePatch the configuration of the image to draw
      */
     drawNinePatchSprite(ninePatch: NinePatchSpriteConfiguration) {
-        const spriteDefintion = ninePatch.sprite.defintion;
+        const spriteDef = spriteRegistry.resolve(ninePatch.sprite);
+        if (!spriteDef) {
+            return;
+        }
         ninePatchSpriteRenderer(
             ninePatch.x,
             ninePatch.y,
-            spriteDefintion.x,
-            spriteDefintion.y,
-            spriteDefintion.w,
-            spriteDefintion.h,
+            spriteDef[SPRITE_X],
+            spriteDef[SPRITE_Y],
+            spriteDef[SPRITE_W],
+            spriteDef[SPRITE_H],
             ninePatch.width,
             ninePatch.height,
             ninePatch.sides.top,

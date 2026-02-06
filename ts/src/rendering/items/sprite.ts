@@ -1,10 +1,10 @@
-import type { Sprite2 } from "../../asset/sprite.ts";
+import type { SpriteRef } from "../../asset/sprite.ts";
 import type { Sides } from "../../common/sides.ts";
 import type { CanvasContext } from "../canvasContext.ts";
 import type { RenderItemConfiguration } from "./renderItemConfiguration.ts";
 
 export type SpriteConfiguration = {
-    sprite: Sprite2;
+    sprite: SpriteRef;
     frame?: number;
     targetWidth?: number;
     targetHeight?: number;
@@ -12,7 +12,7 @@ export type SpriteConfiguration = {
 } & RenderItemConfiguration;
 
 export type NinePatchSpriteConfiguration = {
-    sprite: Sprite2;
+    sprite: SpriteRef;
     sides: Sides;
     width: number;
     height: number;
