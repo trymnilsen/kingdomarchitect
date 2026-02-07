@@ -40,6 +40,13 @@ import {
     HealthComponentId,
     type HealthComponent,
 } from "../../../component/healthComponent.ts";
+import { SpriteComponentId } from "../../../component/spriteComponent.ts";
+import { BuildingComponentId } from "../../../component/buildingComponent.ts";
+import { ResourceComponentId } from "../../../component/resourceComponent.ts";
+import { getResourceById } from "../../../../data/inventory/items/naturalResource.ts";
+import { RoleComponentId } from "../../../component/worker/roleComponent.ts";
+import { getRoleDefinition } from "../../../../data/role/roleDefinitions.ts";
+import { bins } from "../../../../../generated/sprites.ts";
 
 export class SelectionState extends InteractionState {
     private providers: ActorSelectionProvider[] = [
@@ -155,10 +162,42 @@ export class SelectionState extends InteractionState {
             }
 
             return selectionComponent.getSelectionInfo();*/
+            let icon = spriteRefs.empty_sprite;
+            const spriteComponent =
+                this.selection.entity.getEcsComponent(SpriteComponentId);
+            if (spriteComponent) {
+                icon = spriteComponent.sprite;
+            }
+
+            let name = "Entity";
+            const buildingComponent =
+                this.selection.entity.getEcsComponent(BuildingComponentId);
+            if (buildingComponent) {
+                name = buildingComponent.building.name;
+            }
+
+            const resourceComponent =
+                this.selection.entity.getEcsComponent(ResourceComponentId);
+
+            if (resourceComponent) {
+                const resource = getResourceById(resourceComponent.resourceId);
+                if (resource) {
+                    name = resource.name;
+                }
+            }
+
+            const roleComponent =
+                this.selection.entity.getEcsComponent(RoleComponentId);
+
+            if (roleComponent) {
+                const roleDefinition = getRoleDefinition(roleComponent.role);
+                name = roleDefinition.name;
+            }
+
             return {
-                icon: spriteRefs.archer_skill,
+                icon: icon,
                 subtitle: "selected",
-                title: "Entity",
+                title: name,
             };
         } else {
             return null;
@@ -192,7 +231,13 @@ export class SelectionState extends InteractionState {
                             uiImage({
                                 sprite: selectionInfo.icon,
                                 width: 32,
-                                height: 32,
+                                height: 40,
+                                fillMode: "contain",
+                                scale: bins.some(
+                                    (it) => it.name == selectionInfo.icon.bin,
+                                )
+                                    ? 1
+                                    : 2,
                             }),
                             uiColumn({
                                 width: wrapUiSize,

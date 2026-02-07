@@ -1,5 +1,5 @@
 import { clamp } from "../common/number.ts";
-import { Point } from "../common/point.ts";
+import type { Point } from "../common/point.ts";
 
 export const HorizontalAlignment = {
     Left: 0,

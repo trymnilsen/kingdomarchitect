@@ -17,8 +17,20 @@ export type TextDrawCall = {
     color: string;
 };
 
+export type SpriteDrawCall = {
+    spriteId: string;
+    bin: string;
+    x: number;
+    y: number;
+    targetWidth: number;
+    targetHeight: number;
+    clipped: boolean;
+    clipBounds?: { x1: number; y1: number; x2: number; y2: number };
+};
+
 export type DrawCapture = {
     textCalls: TextDrawCall[];
+    spriteCalls: SpriteDrawCall[];
 };
 
 export type TestContextResult<P extends {}> = {
@@ -56,6 +68,7 @@ export function createTestComponentContext<P extends {}>(
 ): TestContextResult<P> {
     const drawCapture: DrawCapture = {
         textCalls: [],
+        spriteCalls: [],
     };
 
     let capturedDrawFn: ((scope: RenderScope, region: Rectangle) => void) | null =
@@ -98,7 +111,10 @@ export function createTestComponentContext<P extends {}>(
  * Creates a minimal mock RenderScope that captures draw calls.
  */
 function createMockRenderScope(drawCapture: DrawCapture): Partial<RenderScope> {
-    return {
+    let currentClip: { x1: number; y1: number; x2: number; y2: number } | null =
+        null;
+
+    const scope: Partial<RenderScope> = {
         drawScreenspaceText: (config: {
             text: string;
             x: number;
@@ -116,7 +132,35 @@ function createMockRenderScope(drawCapture: DrawCapture): Partial<RenderScope> {
                 color: config.color,
             });
         },
+        drawScreenSpaceSprite: (config: {
+            sprite: { bin: string; spriteId: string };
+            x: number;
+            y: number;
+            targetWidth?: number;
+            targetHeight?: number;
+        }) => {
+            drawCapture.spriteCalls.push({
+                spriteId: config.sprite.spriteId,
+                bin: config.sprite.bin,
+                x: config.x,
+                y: config.y,
+                targetWidth: config.targetWidth ?? 0,
+                targetHeight: config.targetHeight ?? 0,
+                clipped: currentClip !== null,
+                clipBounds: currentClip ?? undefined,
+            });
+        },
+        drawWithClip: (
+            bounds: { x1: number; y1: number; x2: number; y2: number },
+            fn: (scope: RenderScope) => void,
+        ) => {
+            currentClip = bounds;
+            fn(scope as RenderScope);
+            currentClip = null;
+        },
     };
+
+    return scope;
 }
 
 /**
