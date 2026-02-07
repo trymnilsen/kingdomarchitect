@@ -49,6 +49,12 @@ export type ComponentsUpdatedEvent = {
         | typeof componentUpdatedId;
     source: Entity;
     item: Components;
+    /**
+     * The previous value of the component before the update.
+     * Only present for component_updated events when using updateComponent().
+     * Used for computing delta updates.
+     */
+    oldValue?: Components;
 };
 
 /**

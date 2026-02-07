@@ -5,6 +5,7 @@ import { TileComponentId } from "../game/component/tileComponent.ts";
 import { VisibilityMapComponentId } from "../game/component/visibilityMapComponent.ts";
 import { WorldDiscoveryComponentId } from "../game/component/worldDiscoveryComponent.ts";
 import { Entity } from "../game/entity/entity.ts";
+import { diffComponent, isDeltaSmaller } from "./delta/diffComponent.ts";
 import {
     WorldStateMessageType,
     type GameMessage,
@@ -32,6 +33,26 @@ export function makeReplicatedEntitiesSystem(
                 ) {
                     return;
                 }
+
+                // Try to compute and send a delta if we have a snapshot
+                if (event.oldValue) {
+                    const snapshot = event.oldValue;
+                    const operations = diffComponent(snapshot, event.item);
+                    if (
+                        operations.length > 0 &&
+                        isDeltaSmaller(operations, event.item)
+                    ) {
+                        postMessage({
+                            type: "componentDelta",
+                            entityId: event.source.id,
+                            componentId: event.item.id,
+                            operations,
+                        });
+                        return;
+                    }
+                }
+
+                // Fallback to full component
                 postMessage({
                     type: "setComponent",
                     component: event.item,

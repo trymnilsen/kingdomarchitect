@@ -1,0 +1,431 @@
+import type { Components } from "../../game/component/component.ts";
+import type {
+    DeltaOperation,
+    PropertyPath,
+} from "./deltaTypes.ts";
+
+/**
+ * Compare two component values and produce the operations needed
+ * to transform the old value into the new value.
+ */
+export function diffComponent(
+    oldComponent: Components,
+    newComponent: Components,
+): DeltaOperation[] {
+    const operations: DeltaOperation[] = [];
+    diffValue(oldComponent, newComponent, [], operations);
+    return operations;
+}
+
+/**
+ * Recursively diff two values and append operations to the list.
+ */
+function diffValue(
+    oldVal: unknown,
+    newVal: unknown,
+    path: PropertyPath,
+    operations: DeltaOperation[],
+): void {
+    // Same reference = no change
+    if (oldVal === newVal) {
+        return;
+    }
+
+    // Handle null/undefined transitions
+    if (oldVal == null || newVal == null) {
+        operations.push({ op: "set", path, value: newVal });
+        return;
+    }
+
+    // Handle Map
+    if (oldVal instanceof Map && newVal instanceof Map) {
+        diffMap(oldVal, newVal, path, operations);
+        return;
+    }
+
+    // Handle Set
+    if (oldVal instanceof Set && newVal instanceof Set) {
+        diffSet(oldVal, newVal, path, operations);
+        return;
+    }
+
+    // Handle Array
+    if (Array.isArray(oldVal) && Array.isArray(newVal)) {
+        diffArray(oldVal, newVal, path, operations);
+        return;
+    }
+
+    // Handle Object
+    if (
+        typeof oldVal === "object" &&
+        typeof newVal === "object" &&
+        !Array.isArray(oldVal) &&
+        !Array.isArray(newVal)
+    ) {
+        diffObject(
+            oldVal as Record<string, unknown>,
+            newVal as Record<string, unknown>,
+            path,
+            operations,
+        );
+        return;
+    }
+
+    // Primitives that differ
+    operations.push({ op: "set", path, value: newVal });
+}
+
+/**
+ * Diff two plain objects.
+ */
+function diffObject(
+    oldObj: Record<string, unknown>,
+    newObj: Record<string, unknown>,
+    path: PropertyPath,
+    operations: DeltaOperation[],
+): void {
+    const oldKeys = new Set(Object.keys(oldObj));
+    const newKeys = new Set(Object.keys(newObj));
+
+    // Check for deleted keys
+    for (const key of oldKeys) {
+        if (!newKeys.has(key)) {
+            operations.push({ op: "delete", path: [...path, key] });
+        }
+    }
+
+    // Check for added or changed keys
+    for (const key of newKeys) {
+        const childPath = [...path, key];
+        if (!oldKeys.has(key)) {
+            // New key
+            operations.push({ op: "set", path: childPath, value: newObj[key] });
+        } else {
+            // Existing key - recursively diff
+            diffValue(oldObj[key], newObj[key], childPath, operations);
+        }
+    }
+}
+
+/**
+ * Diff two arrays using simple index-based comparison.
+ * Detects appends as a special case.
+ */
+function diffArray(
+    oldArr: unknown[],
+    newArr: unknown[],
+    path: PropertyPath,
+    operations: DeltaOperation[],
+): void {
+    const oldLen = oldArr.length;
+    const newLen = newArr.length;
+
+    // Check for pure append: new array starts with all of old array
+    if (newLen > oldLen) {
+        let isAppend = true;
+        for (let i = 0; i < oldLen; i++) {
+            if (!deepEquals(oldArr[i], newArr[i])) {
+                isAppend = false;
+                break;
+            }
+        }
+        if (isAppend) {
+            operations.push({
+                op: "array_push",
+                path,
+                values: newArr.slice(oldLen),
+            });
+            return;
+        }
+    }
+
+    // Index-by-index comparison
+    const maxLen = Math.max(oldLen, newLen);
+    let changeCount = 0;
+
+    // Count changes first to decide if we should fall back
+    for (let i = 0; i < maxLen; i++) {
+        if (i >= oldLen || i >= newLen || !deepEquals(oldArr[i], newArr[i])) {
+            changeCount++;
+        }
+    }
+
+    // If more than 50% changed, just replace the whole array
+    if (changeCount > maxLen * 0.5) {
+        operations.push({ op: "set", path, value: newArr });
+        return;
+    }
+
+    // Generate individual operations
+    for (let i = 0; i < maxLen; i++) {
+        const childPath = [...path, i];
+
+        if (i >= oldLen) {
+            // New element at end
+            operations.push({ op: "set", path: childPath, value: newArr[i] });
+        } else if (i >= newLen) {
+            // Array truncated - emit splice to remove trailing elements
+            operations.push({
+                op: "array_splice",
+                path,
+                index: newLen,
+                deleteCount: oldLen - newLen,
+            });
+            break; // Only need one splice for truncation
+        } else if (!deepEquals(oldArr[i], newArr[i])) {
+            // Element changed - recursively diff if both are objects
+            if (
+                typeof oldArr[i] === "object" &&
+                oldArr[i] !== null &&
+                typeof newArr[i] === "object" &&
+                newArr[i] !== null &&
+                !Array.isArray(oldArr[i]) &&
+                !Array.isArray(newArr[i])
+            ) {
+                diffValue(oldArr[i], newArr[i], childPath, operations);
+            } else {
+                operations.push({ op: "set", path: childPath, value: newArr[i] });
+            }
+        }
+    }
+}
+
+/**
+ * Diff two Maps.
+ */
+function diffMap(
+    oldMap: Map<unknown, unknown>,
+    newMap: Map<unknown, unknown>,
+    path: PropertyPath,
+    operations: DeltaOperation[],
+): void {
+    // Check for deleted keys
+    for (const key of oldMap.keys()) {
+        if (!newMap.has(key)) {
+            operations.push({
+                op: "map_delete",
+                path,
+                key: key as string | number,
+            });
+        }
+    }
+
+    // Check for added or changed keys
+    for (const [key, newValue] of newMap) {
+        if (!oldMap.has(key)) {
+            // New key
+            operations.push({
+                op: "map_set",
+                path,
+                key: key as string | number,
+                value: newValue,
+            });
+        } else {
+            const oldValue = oldMap.get(key);
+            if (!deepEquals(oldValue, newValue)) {
+                // Changed value - for simplicity, just replace the whole value
+                // Could recursively diff if needed in the future
+                operations.push({
+                    op: "map_set",
+                    path,
+                    key: key as string | number,
+                    value: newValue,
+                });
+            }
+        }
+    }
+}
+
+/**
+ * Diff two Sets.
+ */
+function diffSet(
+    oldSet: Set<unknown>,
+    newSet: Set<unknown>,
+    path: PropertyPath,
+    operations: DeltaOperation[],
+): void {
+    // For Sets, we need to use deep equality for object members
+    // This is expensive, so for now we use reference equality
+    // which works for primitives and assumes objects in sets are stable
+
+    // Check for removed values
+    for (const value of oldSet) {
+        if (!setHas(newSet, value)) {
+            operations.push({ op: "set_delete", path, value });
+        }
+    }
+
+    // Check for added values
+    for (const value of newSet) {
+        if (!setHas(oldSet, value)) {
+            operations.push({ op: "set_add", path, value });
+        }
+    }
+}
+
+/**
+ * Check if a Set contains a value using deep equality.
+ */
+function setHas(set: Set<unknown>, value: unknown): boolean {
+    for (const item of set) {
+        if (deepEquals(item, value)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * Deep equality check for comparing values.
+ */
+export function deepEquals(a: unknown, b: unknown): boolean {
+    if (a === b) {
+        return true;
+    }
+
+    if (a == null || b == null) {
+        return a === b;
+    }
+
+    if (typeof a !== typeof b) {
+        return false;
+    }
+
+    if (typeof a !== "object") {
+        return a === b;
+    }
+
+    // Handle Map
+    if (a instanceof Map && b instanceof Map) {
+        if (a.size !== b.size) {
+            return false;
+        }
+        for (const [key, value] of a) {
+            if (!b.has(key) || !deepEquals(value, b.get(key))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // Handle Set
+    if (a instanceof Set && b instanceof Set) {
+        if (a.size !== b.size) {
+            return false;
+        }
+        for (const value of a) {
+            if (!setHas(b, value)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // Handle Array
+    if (Array.isArray(a) && Array.isArray(b)) {
+        if (a.length !== b.length) {
+            return false;
+        }
+        for (let i = 0; i < a.length; i++) {
+            if (!deepEquals(a[i], b[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // Handle Object
+    if (Array.isArray(a) || Array.isArray(b)) {
+        return false;
+    }
+
+    const aObj = a as Record<string, unknown>;
+    const bObj = b as Record<string, unknown>;
+    const aKeys = Object.keys(aObj);
+    const bKeys = Object.keys(bObj);
+
+    if (aKeys.length !== bKeys.length) {
+        return false;
+    }
+
+    for (const key of aKeys) {
+        if (!Object.prototype.hasOwnProperty.call(bObj, key)) {
+            return false;
+        }
+        if (!deepEquals(aObj[key], bObj[key])) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+/**
+ * Estimate the serialized size of a value (rough approximation).
+ * Used to decide whether a delta is smaller than the full component.
+ */
+export function estimateSize(value: unknown): number {
+    if (value == null) {
+        return 4; // "null"
+    }
+
+    if (typeof value === "boolean") {
+        return value ? 4 : 5; // "true" or "false"
+    }
+
+    if (typeof value === "number") {
+        return String(value).length;
+    }
+
+    if (typeof value === "string") {
+        return value.length + 2; // quotes
+    }
+
+    if (value instanceof Map) {
+        let size = 20; // overhead for __type marker
+        for (const [k, v] of value) {
+            size += estimateSize(k) + estimateSize(v) + 2;
+        }
+        return size;
+    }
+
+    if (value instanceof Set) {
+        let size = 20; // overhead for __type marker
+        for (const v of value) {
+            size += estimateSize(v) + 1;
+        }
+        return size;
+    }
+
+    if (Array.isArray(value)) {
+        let size = 2; // []
+        for (const item of value) {
+            size += estimateSize(item) + 1;
+        }
+        return size;
+    }
+
+    if (typeof value === "object") {
+        let size = 2; // {}
+        for (const [k, v] of Object.entries(value)) {
+            size += k.length + 3 + estimateSize(v) + 1;
+        }
+        return size;
+    }
+
+    return 10; // fallback
+}
+
+/**
+ * Check if the delta operations are smaller than the full component.
+ */
+export function isDeltaSmaller(
+    operations: DeltaOperation[],
+    fullComponent: Components,
+): boolean {
+    const deltaSize = estimateSize(operations);
+    const fullSize = estimateSize(fullComponent);
+    // Use delta if it's less than 80% of the full size
+    return deltaSize < fullSize * 0.8;
+}
