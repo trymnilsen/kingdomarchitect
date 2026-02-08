@@ -567,7 +567,9 @@ function drawAnimation(
                     contentCenterY +
                     (position.y - animationBounds.y);
 
-                const hatSprite = spriteRegistry.resolve(wizardHat.visual.sprite);
+                const hatSprite = spriteRegistry.resolve(
+                    wizardHat.visual.sprite,
+                );
                 if (hatSprite) {
                     offscreenScope.drawScreenSpaceSprite({
                         x: adjustedX,

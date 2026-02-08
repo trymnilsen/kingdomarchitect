@@ -13,7 +13,7 @@ export type SetPlayerCommand = {
 };
 
 /**
- * Create a command to set a player command on a GOAP agent.
+ * Create a command to set a player command on agent.
  * This will trigger urgent replan and execute the command with highest priority.
  *
  * @param agentId - The ID of the entity to command

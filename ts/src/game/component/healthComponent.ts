@@ -54,7 +54,7 @@ export function damage(component: HealthComponent, amount: number): number {
 }
 
 /**
- * Apply damage to an entity and trigger urgent GOAP replan if entity has an agent.
+ * Apply damage to an entity and trigger urgent replan if entity has an agent.
  * This is an example of how to integrate the urgency system with game events.
  *
  * @param entity The entity to damage
