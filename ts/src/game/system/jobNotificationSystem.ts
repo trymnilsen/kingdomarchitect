@@ -3,7 +3,7 @@ import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
 import {
     BehaviorAgentComponentId,
     requestReplan as requestBehaviorReplan,
-} from "../behavior/components/BehaviorAgentComponent.ts";
+} from "../component/BehaviorAgentComponent.ts";
 import {
     createJobQueueComponent,
     JobQueueComponentId,

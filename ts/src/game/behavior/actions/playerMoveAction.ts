@@ -1,7 +1,7 @@
 import { pointEquals } from "../../../common/point.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { doMovement, MovementResult } from "../../job/movementHelper.ts";
-import { getBehaviorAgent } from "../components/BehaviorAgentComponent.ts";
+import { getBehaviorAgent } from "../../component/BehaviorAgentComponent.ts";
 import type { ActionStatus, BehaviorActionData } from "./Action.ts";
 
 /**

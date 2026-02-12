@@ -16,7 +16,7 @@ import { SelectedEntityItem } from "../../../selection/selectedEntityItem.ts";
 import { SelectedTileItem } from "../../../selection/selectedTileItem.ts";
 import { WorkplaceComponentId } from "../../../../component/workplaceComponent.ts";
 import { ChangeOccupationCommand } from "../../../../../server/message/command/changeOccupationCommand.ts";
-import { BehaviorAgentComponentId } from "../../../../behavior/components/BehaviorAgentComponent.ts";
+import { BehaviorAgentComponentId } from "../../../../component/BehaviorAgentComponent.ts";
 import { SetPlayerCommand } from "../../../../../server/message/command/setPlayerCommand.ts";
 
 type ScaffoldButton = {
@@ -247,7 +247,9 @@ export class ActorContextActionState extends InteractionState {
         }
 
         // Check if entity has Behavior agent component
-        const behaviorAgent = this.entity.getEcsComponent(BehaviorAgentComponentId);
+        const behaviorAgent = this.entity.getEcsComponent(
+            BehaviorAgentComponentId,
+        );
         if (!behaviorAgent) {
             console.warn(
                 `Entity ${this.entity.id} does not have Behavior agent component`,

@@ -68,7 +68,7 @@ import { removeItem } from "../../common/array.ts";
 import {
     BehaviorAgentComponentId,
     requestReplan as requestBehaviorReplan,
-} from "../behavior/components/BehaviorAgentComponent.ts";
+} from "../component/BehaviorAgentComponent.ts";
 import {
     UpdateWorkerRoleCommandId,
     type UpdateWorkerRoleCommand,
@@ -380,9 +380,7 @@ function updateWorkerRole(root: Entity, command: UpdateWorkerRoleCommand) {
 function updateWorkerStance(root: Entity, command: UpdateWorkerStanceCommand) {
     const worker = root.findEntity(command.worker);
     if (!worker) {
-        console.warn(
-            `[UpdateWorkerStance] Worker ${command.worker} not found`,
-        );
+        console.warn(`[UpdateWorkerStance] Worker ${command.worker} not found`);
         return;
     }
 

@@ -1,5 +1,5 @@
 import { Entity } from "../../../src/game/entity/entity.ts";
-import { createBehaviorAgentComponent } from "../../../src/game/behavior/components/BehaviorAgentComponent.ts";
+import { createBehaviorAgentComponent } from "../../../src/game/component/BehaviorAgentComponent.ts";
 import { createEnergyComponent } from "../../../src/game/component/energyComponent.ts";
 import {
     createJobRunnerComponent,
@@ -55,9 +55,7 @@ export function createEntityWithEnergy(
 /**
  * Create a test entity with job runner component.
  */
-export function createEntityWithJobRunner(
-    id: string = "test-entity",
-): Entity {
+export function createEntityWithJobRunner(id: string = "test-entity"): Entity {
     const entity = createBehaviorTestEntity(id);
     entity.setEcsComponent(createJobRunnerComponent());
     return entity;

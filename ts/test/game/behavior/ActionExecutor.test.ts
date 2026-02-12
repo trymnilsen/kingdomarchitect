@@ -8,7 +8,7 @@ import {
     createRootWithJobQueue,
     createTestJob,
 } from "./behaviorTestHelpers.ts";
-import { getBehaviorAgent } from "../../../src/game/behavior/components/BehaviorAgentComponent.ts";
+import { getBehaviorAgent } from "../../../src/game/component/BehaviorAgentComponent.ts";
 import { EnergyComponentId } from "../../../src/game/component/energyComponent.ts";
 import { JobRunnerComponentId } from "../../../src/game/component/jobRunnerComponent.ts";
 import { Entity } from "../../../src/game/entity/entity.ts";
@@ -54,7 +54,10 @@ describe("ActionExecutor", () => {
     describe("moveTo action", () => {
         it("returns complete when already at target position", () => {
             const entity = createBehaviorTestEntity("test", 10, 10);
-            const action = { type: "moveTo" as const, target: { x: 10, y: 10 } };
+            const action = {
+                type: "moveTo" as const,
+                target: { x: 10, y: 10 },
+            };
 
             const status = executeAction(action, entity, 0);
 
@@ -269,11 +272,17 @@ describe("ActionExecutor", () => {
 
         function createWorkerWithItems(
             id: string,
-            items: { item: typeof woodResourceItem | typeof swordItem; amount: number }[],
+            items: {
+                item: typeof woodResourceItem | typeof swordItem;
+                amount: number;
+            }[],
         ): Entity {
             const worker = createBehaviorTestEntity(id);
             const inventory = createInventoryComponent();
-            inventory.items = items.map((i) => ({ item: i.item, amount: i.amount }));
+            inventory.items = items.map((i) => ({
+                item: i.item,
+                amount: i.amount,
+            }));
             worker.setEcsComponent(inventory);
             worker.setEcsComponent(createEquipmentComponent());
             return worker;
@@ -297,13 +306,17 @@ describe("ActionExecutor", () => {
 
             assert.strictEqual(status, "complete");
 
-            const workerInventory = worker.getEcsComponent(InventoryComponentId);
+            const workerInventory =
+                worker.getEcsComponent(InventoryComponentId);
             assert.strictEqual(workerInventory!.items.length, 0);
 
             const stockpileInventory =
                 stockpile.getEcsComponent(InventoryComponentId);
             assert.strictEqual(stockpileInventory!.items.length, 1);
-            assert.strictEqual(stockpileInventory!.items[0].item.id, woodResourceItem.id);
+            assert.strictEqual(
+                stockpileInventory!.items[0].item.id,
+                woodResourceItem.id,
+            );
             assert.strictEqual(stockpileInventory!.items[0].amount, 10);
         });
 
@@ -328,14 +341,18 @@ describe("ActionExecutor", () => {
 
             assert.strictEqual(status, "complete");
 
-            const workerInventory = worker.getEcsComponent(InventoryComponentId);
+            const workerInventory =
+                worker.getEcsComponent(InventoryComponentId);
             assert.strictEqual(workerInventory!.items.length, 1);
             assert.strictEqual(workerInventory!.items[0].item.id, swordItem.id);
 
             const stockpileInventory =
                 stockpile.getEcsComponent(InventoryComponentId);
             assert.strictEqual(stockpileInventory!.items.length, 1);
-            assert.strictEqual(stockpileInventory!.items[0].item.id, woodResourceItem.id);
+            assert.strictEqual(
+                stockpileInventory!.items[0].item.id,
+                woodResourceItem.id,
+            );
         });
 
         it("fails when stockpile not found", () => {

@@ -57,7 +57,7 @@ import {
 import {
     createBehaviorAgentComponent,
     BehaviorAgentComponentId,
-} from "../../../src/game/behavior/components/BehaviorAgentComponent.ts";
+} from "../../../src/game/component/BehaviorAgentComponent.ts";
 import {
     createEffectEmitterComponent,
     EffectEmitterComponentId,
@@ -174,11 +174,13 @@ describe("commandSystem", () => {
 
             system.onGameMessage?.(root, message);
 
-            const updatedEquipment = entity.getEcsComponent(EquipmentComponentId);
+            const updatedEquipment =
+                entity.getEcsComponent(EquipmentComponentId);
             assert.ok(updatedEquipment);
             assert.strictEqual(updatedEquipment.slots.main?.id, swordItem.id);
 
-            const updatedInventory = entity.getEcsComponent(InventoryComponentId);
+            const updatedInventory =
+                entity.getEcsComponent(InventoryComponentId);
             assert.ok(updatedInventory);
             assert.strictEqual(updatedInventory.items.length, 0);
         });
@@ -211,11 +213,13 @@ describe("commandSystem", () => {
 
             system.onGameMessage?.(root, message);
 
-            const updatedEquipment = entity.getEcsComponent(EquipmentComponentId);
+            const updatedEquipment =
+                entity.getEcsComponent(EquipmentComponentId);
             assert.ok(updatedEquipment);
             assert.strictEqual(updatedEquipment.slots.main, null);
 
-            const updatedInventory = entity.getEcsComponent(InventoryComponentId);
+            const updatedInventory =
+                entity.getEcsComponent(InventoryComponentId);
             assert.ok(updatedInventory);
             assert.strictEqual(updatedInventory.items.length, 1);
             assert.strictEqual(updatedInventory.items[0].item.id, swordItem.id);
@@ -324,7 +328,8 @@ describe("commandSystem", () => {
             system.onGameMessage?.(root, message);
 
             // Equipment should remain empty
-            const updatedEquipment = entity.getEcsComponent(EquipmentComponentId);
+            const updatedEquipment =
+                entity.getEcsComponent(EquipmentComponentId);
             assert.ok(updatedEquipment);
             assert.strictEqual(updatedEquipment.slots.main, null);
         });
@@ -510,11 +515,14 @@ describe("commandSystem", () => {
 
             system.onGameMessage?.(root, message);
 
-            const updatedOccupation = worker.getEcsComponent(OccupationComponentId);
+            const updatedOccupation = worker.getEcsComponent(
+                OccupationComponentId,
+            );
             assert.ok(updatedOccupation);
             assert.strictEqual(updatedOccupation.workplace, "workplace1");
 
-            const updatedWorkplace = workplace.getEcsComponent(WorkplaceComponentId);
+            const updatedWorkplace =
+                workplace.getEcsComponent(WorkplaceComponentId);
             assert.ok(updatedWorkplace);
             assert.ok(updatedWorkplace.workers.includes("worker1"));
         });
@@ -550,11 +558,14 @@ describe("commandSystem", () => {
 
             system.onGameMessage?.(root, message);
 
-            const updatedOccupation = worker.getEcsComponent(OccupationComponentId);
+            const updatedOccupation = worker.getEcsComponent(
+                OccupationComponentId,
+            );
             assert.ok(updatedOccupation);
             assert.strictEqual(updatedOccupation.workplace, undefined);
 
-            const updatedWorkplace = workplace.getEcsComponent(WorkplaceComponentId);
+            const updatedWorkplace =
+                workplace.getEcsComponent(WorkplaceComponentId);
             assert.ok(updatedWorkplace);
             assert.ok(!updatedWorkplace.workers.includes("worker1"));
         });
@@ -641,7 +652,9 @@ describe("commandSystem", () => {
 
             system.onGameMessage?.(root, message);
 
-            const updatedAgent = agent.getEcsComponent(BehaviorAgentComponentId);
+            const updatedAgent = agent.getEcsComponent(
+                BehaviorAgentComponentId,
+            );
             assert.ok(updatedAgent);
             assert.ok(updatedAgent.playerCommand);
             assert.strictEqual(updatedAgent.playerCommand.action, "move");
@@ -678,7 +691,9 @@ describe("commandSystem", () => {
 
             system.onGameMessage?.(root, message);
 
-            const updatedAgent = agent.getEcsComponent(BehaviorAgentComponentId);
+            const updatedAgent = agent.getEcsComponent(
+                BehaviorAgentComponentId,
+            );
             assert.ok(updatedAgent);
             assert.strictEqual(updatedAgent.shouldReplan, true);
         });

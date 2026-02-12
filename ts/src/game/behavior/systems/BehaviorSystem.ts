@@ -3,7 +3,7 @@ import { Entity } from "../../entity/entity.ts";
 import {
     type BehaviorAgentComponent,
     BehaviorAgentComponentId,
-} from "../components/BehaviorAgentComponent.ts";
+} from "../../component/BehaviorAgentComponent.ts";
 import type { Behavior } from "../behaviors/Behavior.ts";
 import { JobRunnerComponentId } from "../../component/jobRunnerComponent.ts";
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";

@@ -17,7 +17,7 @@ import { createHealthComponent } from "../component/healthComponent.ts";
 import { createOccupationComponent } from "../component/occupationComponent.ts";
 import { createHungerComponent } from "../component/hungerComponent.ts";
 import { createEnergyComponent } from "../component/energyComponent.ts";
-import { createBehaviorAgentComponent } from "../behavior/components/BehaviorAgentComponent.ts";
+import { createBehaviorAgentComponent } from "../component/BehaviorAgentComponent.ts";
 import { createRoleComponent } from "../component/worker/roleComponent.ts";
 
 export function workerPrefab(): Entity {

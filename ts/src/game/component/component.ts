@@ -7,7 +7,7 @@ import type { CraftingComponent } from "./craftingComponent.ts";
 import type { DirectionComponent } from "./directionComponent.ts";
 import type { EffectEmitterComponent } from "./effectEmitterComponent.ts";
 import type { EquipmentComponent } from "./equipmentComponent.ts";
-import type { BehaviorAgentComponent } from "../behavior/components/BehaviorAgentComponent.ts";
+import type { BehaviorAgentComponent } from "./BehaviorAgentComponent.ts";
 import type { HealthComponent } from "./healthComponent.ts";
 import type { HousingComponent } from "./housingComponent.ts";
 import type { HungerComponent } from "./hungerComponent.ts";

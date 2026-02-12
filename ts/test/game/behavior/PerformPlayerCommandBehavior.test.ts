@@ -5,7 +5,7 @@ import {
     createBehaviorTestEntity,
     createTestEntity,
 } from "./behaviorTestHelpers.ts";
-import { getBehaviorAgent } from "../../../src/game/behavior/components/BehaviorAgentComponent.ts";
+import { getBehaviorAgent } from "../../../src/game/component/BehaviorAgentComponent.ts";
 
 describe("PerformPlayerCommandBehavior", () => {
     describe("isValid", () => {

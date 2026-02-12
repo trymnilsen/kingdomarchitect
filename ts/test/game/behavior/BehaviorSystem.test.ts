@@ -12,7 +12,7 @@ import {
 import {
     getBehaviorAgent,
     requestReplan,
-} from "../../../src/game/behavior/components/BehaviorAgentComponent.ts";
+} from "../../../src/game/component/BehaviorAgentComponent.ts";
 import { Entity } from "../../../src/game/entity/entity.ts";
 import { JobRunnerComponentId } from "../../../src/game/component/jobRunnerComponent.ts";
 

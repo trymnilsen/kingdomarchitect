@@ -1,6 +1,6 @@
-import type { Point } from "../../../common/point.ts";
-import type { Entity } from "../../entity/entity.ts";
-import type { BehaviorActionData } from "../actions/Action.ts";
+import type { Point } from "../../common/point.ts";
+import type { Entity } from "../entity/entity.ts";
+import type { BehaviorActionData } from "../behavior/actions/Action.ts";
 
 export const BehaviorAgentComponentId = "behavioragent";
 

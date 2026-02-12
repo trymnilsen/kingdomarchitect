@@ -4,7 +4,7 @@ import {
     createBehaviorAgentComponent,
     getBehaviorAgent,
     requestReplan,
-} from "../../../src/game/behavior/components/BehaviorAgentComponent.ts";
+} from "../../../src/game/component/BehaviorAgentComponent.ts";
 import { createTestEntity } from "./behaviorTestHelpers.ts";
 
 describe("BehaviorAgentComponent", () => {
@@ -81,10 +81,7 @@ describe("BehaviorAgentComponent", () => {
             };
 
             assert.strictEqual(agent.playerCommand.action, "attack");
-            assert.strictEqual(
-                agent.playerCommand.targetEntityId,
-                "enemy-1",
-            );
+            assert.strictEqual(agent.playerCommand.targetEntityId, "enemy-1");
         });
 
         it("can set pickup command", () => {
@@ -106,10 +103,7 @@ describe("BehaviorAgentComponent", () => {
             };
 
             assert.strictEqual(agent.playerCommand.action, "interact");
-            assert.strictEqual(
-                agent.playerCommand.targetEntityId,
-                "door-1",
-            );
+            assert.strictEqual(agent.playerCommand.targetEntityId, "door-1");
         });
     });
 });

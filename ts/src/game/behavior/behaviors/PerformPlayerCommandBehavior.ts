@@ -1,6 +1,6 @@
 import { Entity } from "../../entity/entity.ts";
 import type { BehaviorActionData } from "../actions/Action.ts";
-import { getBehaviorAgent } from "../components/BehaviorAgentComponent.ts";
+import { getBehaviorAgent } from "../../component/BehaviorAgentComponent.ts";
 import type { Behavior } from "./Behavior.ts";
 
 /**
@@ -33,7 +33,9 @@ export function createPerformPlayerCommandBehavior(): Behavior {
 
             switch (command.action) {
                 case "move":
-                    return [{ type: "playerMove", target: command.targetPosition }];
+                    return [
+                        { type: "playerMove", target: command.targetPosition },
+                    ];
 
                 case "attack":
                     // TODO: Implement attack action when combat system is available
