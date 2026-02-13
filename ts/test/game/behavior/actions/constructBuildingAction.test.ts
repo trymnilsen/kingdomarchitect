@@ -10,8 +10,11 @@ import {
     BuildingComponentId,
 } from "../../../../src/game/component/buildingComponent.ts";
 import { createInventoryComponent } from "../../../../src/game/component/inventoryComponent.ts";
+import { SpriteComponentId, createSpriteComponent } from "../../../../src/game/component/spriteComponent.ts";
 import { executeConstructBuildingAction } from "../../../../src/game/behavior/actions/constructBuildingAction.ts";
 import { woodenHouse } from "../../../../src/data/building/wood/house.ts";
+import { InvalidationTracker } from "../behaviorTestHelpers.ts";
+import { spriteRefs } from "../../../../src/asset/sprite.ts";
 
 function createTestScene(): {
     root: Entity;
@@ -147,6 +150,73 @@ describe("constructBuildingAction", () => {
 
         assert.throws(() => {
             executeConstructBuildingAction(action, worker);
+        });
+    });
+
+    describe("component invalidation", () => {
+        it("invalidates HealthComponent when healing", () => {
+            const { root, worker } = createTestScene();
+            const tracker = new InvalidationTracker();
+            tracker.attach(root);
+
+            const action = {
+                type: "constructBuilding" as const,
+                entityId: "building",
+            };
+
+            executeConstructBuildingAction(action, worker);
+
+            assert.strictEqual(
+                tracker.wasInvalidated("building", HealthComponentId),
+                true,
+                "HealthComponent should be invalidated when healing",
+            );
+        });
+
+        it("invalidates BuildingComponent when construction completes", () => {
+            const { root, worker, building } = createTestScene();
+            building.setEcsComponent(createSpriteComponent(spriteRefs.wooden_house_scaffold));
+            const tracker = new InvalidationTracker();
+            tracker.attach(root);
+
+            const healthComponent = building.getEcsComponent(HealthComponentId)!;
+            healthComponent.currentHp = 95;
+
+            const action = {
+                type: "constructBuilding" as const,
+                entityId: "building",
+            };
+
+            executeConstructBuildingAction(action, worker);
+
+            assert.strictEqual(
+                tracker.wasInvalidated("building", BuildingComponentId),
+                true,
+                "BuildingComponent should be invalidated when construction completes",
+            );
+        });
+
+        it("invalidates SpriteComponent when construction completes", () => {
+            const { root, worker, building } = createTestScene();
+            building.setEcsComponent(createSpriteComponent(spriteRefs.wooden_house_scaffold));
+            const tracker = new InvalidationTracker();
+            tracker.attach(root);
+
+            const healthComponent = building.getEcsComponent(HealthComponentId)!;
+            healthComponent.currentHp = 95;
+
+            const action = {
+                type: "constructBuilding" as const,
+                entityId: "building",
+            };
+
+            executeConstructBuildingAction(action, worker);
+
+            assert.strictEqual(
+                tracker.wasInvalidated("building", SpriteComponentId),
+                true,
+                "SpriteComponent should be invalidated when construction completes",
+            );
         });
     });
 });

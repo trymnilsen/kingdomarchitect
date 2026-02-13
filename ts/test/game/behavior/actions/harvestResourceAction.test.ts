@@ -12,11 +12,11 @@ import {
 } from "../../../../src/game/component/inventoryComponent.ts";
 import {
     createResourceComponent,
-    ResourceComponentId,
 } from "../../../../src/game/component/resourceComponent.ts";
 import { executeHarvestResourceAction } from "../../../../src/game/behavior/actions/harvestResourceAction.ts";
 import { ResourceHarvestMode } from "../../../../src/data/inventory/items/naturalResource.ts";
 import type { BehaviorActionData } from "../../../../src/game/behavior/actions/Action.ts";
+import { InvalidationTracker } from "../behaviorTestHelpers.ts";
 
 type HarvestResourceAction = Extract<BehaviorActionData, { type: "harvestResource" }>;
 
@@ -226,6 +226,74 @@ describe("harvestResourceAction", () => {
             assert.throws(() => {
                 executeHarvestResourceAction(action, worker, 0);
             });
+        });
+    });
+
+    describe("component invalidation", () => {
+        it("invalidates HealthComponent when chopping", () => {
+            const { root, worker, resource } = createTestScene();
+            const tracker = new InvalidationTracker();
+            tracker.attach(root);
+
+            const action = {
+                type: "harvestResource" as const,
+                entityId: "resource",
+                harvestAction: ResourceHarvestMode.Chop,
+            };
+
+            executeHarvestResourceAction(action, worker, 0);
+
+            assert.strictEqual(
+                tracker.wasInvalidated("resource", HealthComponentId),
+                true,
+                "HealthComponent should be invalidated when chopping",
+            );
+        });
+
+        it("invalidates InventoryComponent when harvest completes", () => {
+            const { root, worker, resource } = createTestScene();
+            const tracker = new InvalidationTracker();
+            tracker.attach(root);
+
+            const healthComponent = resource.getEcsComponent(HealthComponentId)!;
+            healthComponent.currentHp = 5;
+
+            const action = {
+                type: "harvestResource" as const,
+                entityId: "resource",
+                harvestAction: ResourceHarvestMode.Chop,
+            };
+
+            executeHarvestResourceAction(action, worker, 0);
+
+            assert.strictEqual(
+                tracker.wasInvalidated("worker", InventoryComponentId),
+                true,
+                "InventoryComponent should be invalidated when yields are granted",
+            );
+        });
+
+        it("invalidates InventoryComponent when work-based harvest completes", () => {
+            const { root, worker, resource } = createTestScene();
+            const tracker = new InvalidationTracker();
+            tracker.attach(root);
+
+            resource.setEcsComponent(createResourceComponent("stone1"));
+
+            const action = {
+                type: "harvestResource" as const,
+                entityId: "resource",
+                harvestAction: ResourceHarvestMode.Mine,
+                workProgress: 2,
+            };
+
+            executeHarvestResourceAction(action, worker, 0);
+
+            assert.strictEqual(
+                tracker.wasInvalidated("worker", InventoryComponentId),
+                true,
+                "InventoryComponent should be invalidated when work-based harvest completes",
+            );
         });
     });
 });

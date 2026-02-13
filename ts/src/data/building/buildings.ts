@@ -5,12 +5,14 @@ import { goldBuildings } from "./gold/gold.ts";
 import { stoneBuildings } from "./stone/stone.ts";
 import { stoneWall } from "./stone/wall.ts";
 import { woodenBuildings } from "./wood/wood.ts";
+import { goblinBuildings } from "./goblin/goblin.ts";
 
 export const buildings = [
     ...foodBuildings,
     ...goldBuildings,
     ...stoneBuildings,
     ...woodenBuildings,
+    ...goblinBuildings,
 ] as const satisfies Building[];
 
 export type BuildingIds = (typeof buildings)[number]["id"];

@@ -19,6 +19,9 @@ import { carpenterRecipes } from "../../data/crafting/recipes/carpenterRecipes.t
 import { createStockpileComponent } from "../component/stockpileComponent.ts";
 import { forrester } from "../../data/building/wood/forrester.ts";
 import { createProductionComponent } from "../component/productionComponent.ts";
+import { goblinCampfire } from "../../data/building/goblin/goblinCampfire.ts";
+import { goblinHut } from "../../data/building/goblin/goblinHut.ts";
+import { createFireSourceComponent } from "../component/fireSourceComponent.ts";
 
 export function buildingPrefab(
     building: Building,
@@ -53,6 +56,14 @@ export function buildingPrefab(
         entity.setEcsComponent(
             createProductionComponent("forrester_production"),
         );
+    }
+    // Goblin campfire provides warmth
+    if (building.id == goblinCampfire.id) {
+        entity.setEcsComponent(createFireSourceComponent(15, 2, 1));
+    }
+    // Goblin hut provides housing for goblins
+    if (building.id == goblinHut.id) {
+        entity.setEcsComponent(createHousingComponent());
     }
     // Scaffolded buildings get inventory for storing construction materials
     if (startScaffolded && building.requirements?.materials) {

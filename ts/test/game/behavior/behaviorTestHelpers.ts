@@ -6,6 +6,65 @@ import {
 } from "../../../src/game/component/jobQueueComponent.ts";
 import type { Jobs } from "../../../src/game/job/job.ts";
 import { ResourceHarvestMode } from "../../../src/data/inventory/items/naturalResource.ts";
+import type { ComponentID } from "../../../src/game/component/component.ts";
+import type { EntityEvent } from "../../../src/game/entity/entityEvent.ts";
+
+/**
+ * Tracker for component invalidations during tests.
+ * Attach to a root entity to capture all component_updated events.
+ */
+export class InvalidationTracker {
+    private invalidatedComponents: Map<string, Set<ComponentID>> = new Map();
+
+    /**
+     * Attach this tracker to an entity to capture invalidation events.
+     * Events bubble up, so attaching to root captures all child invalidations.
+     */
+    attach(entity: Entity): void {
+        entity.entityEvent = (event: EntityEvent) => {
+            if (event.id === "component_updated") {
+                const entityId = event.source.id;
+                if (!this.invalidatedComponents.has(entityId)) {
+                    this.invalidatedComponents.set(entityId, new Set());
+                }
+                this.invalidatedComponents.get(entityId)!.add(event.item.id);
+            }
+        };
+    }
+
+    /**
+     * Check if a component was invalidated on a specific entity.
+     */
+    wasInvalidated(entityId: string, componentId: ComponentID): boolean {
+        return this.invalidatedComponents.get(entityId)?.has(componentId) ?? false;
+    }
+
+    /**
+     * Check if a component was invalidated on any entity.
+     */
+    wasInvalidatedOnAny(componentId: ComponentID): boolean {
+        for (const components of this.invalidatedComponents.values()) {
+            if (components.has(componentId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Get all component IDs that were invalidated on an entity.
+     */
+    getInvalidated(entityId: string): ComponentID[] {
+        return Array.from(this.invalidatedComponents.get(entityId) ?? []);
+    }
+
+    /**
+     * Clear all tracked invalidations.
+     */
+    clear(): void {
+        this.invalidatedComponents.clear();
+    }
+}
 
 /**
  * Create a minimal test entity with required components for behavior testing.

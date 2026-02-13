@@ -13,6 +13,11 @@ import { createPerformPlayerCommandBehavior } from "../game/behavior/behaviors/P
 import { createSleepBehavior } from "../game/behavior/behaviors/SleepBehavior.ts";
 import { createPerformJobBehavior } from "../game/behavior/behaviors/PerformJobBehavior.ts";
 import { createHaulBehavior } from "../game/behavior/behaviors/HaulBehavior.ts";
+import { createKeepWarmBehavior } from "../game/behavior/behaviors/goblin/keepWarmBehavior.ts";
+import { createBuildStockpileBehavior } from "../game/behavior/behaviors/goblin/BuildStockpileBehavior.ts";
+import { createExpandCampBehavior } from "../game/behavior/behaviors/goblin/expandCampBehavior.ts";
+import { warmthSystem } from "../game/system/warmthSystem.ts";
+import { goblinSpawnSystem } from "../game/system/goblinSpawnSystem.ts";
 
 import {
     buildWorldStateMessage,
@@ -161,7 +166,10 @@ export class GameServer {
         const behaviors = [
             createPerformPlayerCommandBehavior(), // Priority 90
             createSleepBehavior(), // Priority 60-80 (scales with tiredness)
+            createKeepWarmBehavior(), // Priority 60-95 (scales with coldness)
             createPerformJobBehavior(), // Priority 50
+            createBuildStockpileBehavior(), // Priority 50 (goblin infrastructure)
+            createExpandCampBehavior(), // Priority 40 (goblin expansion)
             createHaulBehavior(), // Priority 25 (idle task)
         ];
         this.world.addSystem(createBehaviorSystem(behaviors));
@@ -169,6 +177,8 @@ export class GameServer {
         this.world.addSystem(createJobNotificationSystem());
         this.world.addSystem(hungerSystem);
         this.world.addSystem(energySystem);
+        this.world.addSystem(warmthSystem);
+        this.world.addSystem(goblinSpawnSystem);
         this.world.addSystem(worldGenerationSystem);
         this.world.addSystem(
             createCommandSystem(this.gameTime, this.persistenceManager),

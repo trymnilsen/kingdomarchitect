@@ -29,6 +29,10 @@ import type { WorldDiscoveryComponent } from "./worldDiscoveryComponent.ts";
 import type { RoleComponent } from "./worker/roleComponent.ts";
 import type { StockpileComponent } from "./stockpileComponent.ts";
 import type { ProductionComponent } from "./productionComponent.ts";
+import type { WarmthComponent } from "./warmthComponent.ts";
+import type { GoblinCampComponent } from "./goblinCampComponent.ts";
+import type { GoblinUnitComponent } from "./goblinUnitComponent.ts";
+import type { FireSourceComponent } from "./fireSourceComponent.ts";
 
 export type Components =
     | SpriteComponent
@@ -61,7 +65,11 @@ export type Components =
     | EnergyComponent
     | RoleComponent
     | StockpileComponent
-    | ProductionComponent;
+    | ProductionComponent
+    | WarmthComponent
+    | GoblinCampComponent
+    | GoblinUnitComponent
+    | FireSourceComponent;
 
 export interface BaseComponent {
     id: string;

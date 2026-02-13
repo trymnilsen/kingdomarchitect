@@ -17,6 +17,7 @@ import { executeOperateFacilityAction } from "./operateFacilityAction.ts";
 import { executeCraftItemAction } from "./craftItemAction.ts";
 import { executeCollectItemsAction } from "./collectItemsAction.ts";
 import { executeAttackTargetAction } from "./attackTargetAction.ts";
+import { executeWarmByFireAction } from "./warmByFireAction.ts";
 
 /**
  * Main action executor that dispatches to specific action handlers based on action type.
@@ -53,6 +54,8 @@ export const executeAction: BehaviorActionExecutor = (
             return executeCollectItemsAction(action, entity);
         case "attackTarget":
             return executeAttackTargetAction(action, entity);
+        case "warmByFire":
+            return executeWarmByFireAction(action, entity);
         default:
             console.warn(
                 `[ActionExecutor] Unknown action type: ${(action as any).type}`,
