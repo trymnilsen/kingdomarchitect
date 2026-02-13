@@ -16,8 +16,6 @@ describe("ProductionJob", () => {
 
             assert.strictEqual(job.id, ProductionJobId);
             assert.strictEqual(job.targetBuilding, "forrester-1");
-            assert.strictEqual(job.progress, 0);
-            assert.strictEqual(job.state, "pending");
         });
     });
 
@@ -64,7 +62,7 @@ describe("ProductionJob", () => {
     });
 
     describe("clearProductionJobsForBuilding", () => {
-        it("removes pending jobs for specific building", () => {
+        it("removes unclaimed jobs for specific building", () => {
             const jobQueue = createJobQueueComponent();
 
             addJob(jobQueue, createProductionJob("building-1"));
@@ -91,7 +89,6 @@ describe("ProductionJob", () => {
 
             const job1 = createProductionJob("building-1");
             const job2 = createProductionJob("building-1");
-            job2.state = "claimed";
             job2.claimedBy = "worker-1";
 
             addJob(jobQueue, job1);
@@ -100,7 +97,7 @@ describe("ProductionJob", () => {
             clearProductionJobsForBuilding(jobQueue, "building-1");
 
             assert.strictEqual(jobQueue.jobs.length, 1);
-            assert.strictEqual(jobQueue.jobs[0].state, "claimed");
+            assert.strictEqual(jobQueue.jobs[0].claimedBy, "worker-1");
         });
 
         it("does nothing for non-existent building", () => {

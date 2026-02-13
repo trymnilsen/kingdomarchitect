@@ -116,33 +116,6 @@ describe("commandSystem", () => {
             assert.strictEqual(updatedJobQueue.jobs[0].id, "collectItem");
         });
 
-        it("sets job state to pending", () => {
-            const root = new Entity("root");
-            const gameTime = createTestGameTime();
-            const persistenceManager = createTestPersistenceManager();
-
-            const jobQueue = createJobQueueComponent();
-            root.setEcsComponent(jobQueue);
-
-            const system = createCommandSystem(gameTime, persistenceManager);
-
-            const job = CollectItemJob(new Entity("target"));
-            job.state = "claimed"; // Set to non-pending state
-
-            const message: CommandGameMessage = {
-                type: CommandGameMessageType,
-                command: {
-                    id: QueueJobCommandId,
-                    job,
-                } as QueueJobCommand,
-            };
-
-            system.onGameMessage?.(root, message);
-
-            const updatedJobQueue = root.getEcsComponent(JobQueueComponentId);
-            assert.ok(updatedJobQueue);
-            assert.strictEqual(updatedJobQueue.jobs[0].state, "pending");
-        });
     });
 
     describe("EquipItemCommand", () => {

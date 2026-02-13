@@ -20,10 +20,8 @@ export function getJobById(jobQueue: JobQueueComponent, jobId: string): Jobs {
 
 /**
  * Add a new job to the queue.
- * Job will automatically start in "pending" state for worker notification.
  */
 export function addJob(jobQueue: JobQueueComponent, job: Jobs): void {
-    job.state = "pending"; // Enforce correct initial state
     jobQueue.jobs.push(job);
 }
 

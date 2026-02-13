@@ -8,16 +8,12 @@ import {
     createJobQueueComponent,
     JobQueueComponentId,
 } from "../component/jobQueueComponent.ts";
-import { getJobsByState } from "../job/job.ts";
 
 /**
  * Job notification system - notifies idle workers about available jobs.
  *
- * This system uses a two-phase approach:
- * 1. Immediate notification when jobs are added (via notifyIdleWorkerForNewJob)
- * 2. Periodic checking for unclaimed jobs (safety net)
- *
- * Uses budget-limited search to scale efficiently with large worker counts.
+ * Periodically checks for unclaimed jobs and requests workers to replan,
+ * allowing them to pick up available work.
  */
 export function createJobNotificationSystem(): EcsSystem {
     return {
@@ -31,15 +27,13 @@ export function createJobNotificationSystem(): EcsSystem {
             const jobQueue = root.getEcsComponent(JobQueueComponentId);
             if (!jobQueue) return;
 
-            // Process pending jobs (newly added)
-            const pendingJobs = getJobsByState(jobQueue.jobs, "pending");
-            for (const job of pendingJobs) {
-                notifyIdleWorkerWithBudget(root, tick, 10);
-                job.state = "queued"; // Mark as notified
-            }
+            // Check if there are any unclaimed jobs
+            const hasUnclaimedJobs = jobQueue.jobs.some(
+                (job) => job.claimedBy === undefined,
+            );
 
-            if (pendingJobs.length > 0) {
-                root.invalidateComponent(JobQueueComponentId);
+            if (hasUnclaimedJobs) {
+                notifyIdleWorkerWithBudget(root, tick, 10);
             }
         },
     };
@@ -78,8 +72,8 @@ function notifyIdleWorkerWithBudget(
         requestBehaviorReplan(entity);
 
         // Note: We can't immediately check if job was claimed because
-        // replan happens on next tick. This is fine - the pending state
-        // ensures we'll process all pending jobs over the next few ticks.
+        // replan happens on next tick. This is fine - workers will claim
+        // jobs during their next behavior evaluation.
         return true; // Notified one worker, done
     }
 

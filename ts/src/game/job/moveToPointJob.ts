@@ -1,34 +1,15 @@
-import {
-    isPointAdjacentTo,
-    pointEquals,
-    type Point,
-} from "../../common/point.ts";
-import { getWeightAtPoint } from "../map/path/graph/weight.ts";
-import { PathResultStatus, queryPath } from "../map/query/pathQuery.ts";
-import { JobRunnerComponentId } from "../component/jobRunnerComponent.ts";
-import { completeJob, type Job, type JobHandler } from "./job.ts";
-import { VisibilityComponentId } from "../component/visibilityComponent.ts";
-import { offsetPatternWithPoint } from "../../common/pattern.ts";
-import { setDiscoveryForPlayer } from "../system/worldGenerationSystem.ts";
+import { type Point } from "../../common/point.ts";
+import type { Job } from "./job.ts";
 import type { Entity } from "../entity/entity.ts";
-import {
-    DirectionComponentId,
-    updateDirectionComponent,
-} from "../component/directionComponent.ts";
-import { discoverAfterMovement } from "./movementHelper.ts";
-import { getPathfindingGraphForEntity } from "../map/path/getPathfindingGraphForEntity.ts";
 
 export interface MoveToJob extends Job {
     position: Point;
-    path: Point[];
     id: typeof MoveToJobId;
 }
 
 export function MoveToJob(entity: Entity, position: Point): MoveToJob {
     return {
         id: MoveToJobId,
-        state: "pending",
-        path: [],
         constraint: {
             type: "entity",
             id: entity.id,
@@ -38,77 +19,3 @@ export function MoveToJob(entity: Entity, position: Point): MoveToJob {
 }
 
 export const MoveToJobId = "moveToJob";
-
-export const moveToJobHandler: JobHandler<MoveToJob> = (
-    root,
-    runner,
-    job,
-) => {
-    //Sanity check for if we are on top of the position
-    if (pointEquals(job.position, runner.worldPosition)) {
-        completeJob(runner, root);
-    }
-
-    let nextPoint = job.path.shift();
-
-    if (!nextPoint) {
-        //Check if we are adjacent to the final point
-        if (isPointAdjacentTo(job.position, runner.worldPosition)) {
-            nextPoint = job.position;
-        } else {
-            //No path but not at the position, we should generate a path
-            const pathfindingGraph = getPathfindingGraphForEntity(root, runner);
-            if (!pathfindingGraph) {
-                return;
-            }
-
-            const pathResult = queryPath(
-                pathfindingGraph,
-                runner.worldPosition,
-                job.position,
-            );
-
-            if (
-                pathResult.status == PathResultStatus.Complete &&
-                pathResult.path.length > 0
-            ) {
-                job.path = pathResult.path;
-                //Send a invalidate event so that the component will be in sync
-                runner.invalidateComponent(JobRunnerComponentId);
-                nextPoint = job.path.shift();
-            }
-        }
-    }
-
-    //Check if the next point is free
-    if (!!nextPoint) {
-        const weight = getWeightAtPoint(nextPoint, root);
-        //TODO: when extracting, provide this as a function?
-        console.log("MoveToJob - next point weight: ", weight);
-        if (weight >= 30) {
-            //Setting to undefined will finish the job down the line
-            nextPoint = undefined;
-        }
-    }
-
-    if (!nextPoint) {
-        //We got here there is no option to keep moving
-        console.log("NextPoint not defined, completing job");
-        completeJob(runner, root);
-        return;
-    }
-
-    console.log("MoveToJob", runner, nextPoint);
-    discoverAfterMovement(runner, nextPoint);
-    runner.updateComponent(DirectionComponentId, (component) => {
-        updateDirectionComponent(component, runner.worldPosition, nextPoint);
-    });
-
-    runner.worldPosition = nextPoint;
-
-    //If we happen to be at the end now, we dont need to wait for next
-    //tick to finish
-    if (pointEquals(runner.worldPosition, job.position)) {
-        completeJob(runner, root);
-    }
-};

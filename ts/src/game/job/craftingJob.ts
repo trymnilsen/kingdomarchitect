@@ -7,8 +7,6 @@ export interface CraftingJob extends Job {
     targetBuilding: string;
     /** The recipe being crafted */
     recipe: CraftingRecipe;
-    /** Progress counter (ticks spent crafting) */
-    progress: number;
 }
 
 export function createCraftingJob(
@@ -17,10 +15,8 @@ export function createCraftingJob(
 ): CraftingJob {
     return {
         id: CraftingJobId,
-        state: "pending",
         targetBuilding: buildingId,
         recipe,
-        progress: 0,
     };
 }
 

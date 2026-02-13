@@ -1,7 +1,4 @@
-import { checkAdjacency } from "../../common/point.ts";
-import { damage, HealthComponentId } from "../component/healthComponent.ts";
-import { completeJob, type Job, type JobHandler } from "./job.ts";
-import { doMovement, MovementResult } from "./movementHelper.ts";
+import type { Job } from "./job.ts";
 
 export interface AttackJob extends Job {
     id: typeof AttackJobId;
@@ -12,7 +9,6 @@ export interface AttackJob extends Job {
 export function AttackJob(attacker: string, target: string): AttackJob {
     return {
         id: AttackJobId,
-        state: "pending",
         target: target,
         attacker: attacker,
         constraint: {
@@ -23,51 +19,3 @@ export function AttackJob(attacker: string, target: string): AttackJob {
 }
 
 export const AttackJobId = "attackJob";
-
-export const attackHandler: JobHandler<AttackJob> = (
-    root,
-    runner,
-    job,
-) => {
-    const targetEntity = root.findEntity(job.target);
-
-    if (runner.id !== job.attacker) {
-        console.error(
-            "Attacker and runner id not matching",
-            runner.id,
-            job.attacker,
-        );
-        completeJob(runner, root);
-        return;
-    }
-    if (!targetEntity) {
-        console.error("Target not a valid entity");
-        completeJob(runner, root);
-        return;
-    }
-
-    if (
-        checkAdjacency(targetEntity.worldPosition, runner.worldPosition) ===
-        null
-    ) {
-        const movement = doMovement(runner, targetEntity.worldPosition);
-        if (movement == MovementResult.Failure) {
-            console.log("Failed to move");
-            completeJob(runner, root);
-        }
-    } else {
-        const healthComponent = targetEntity.getEcsComponent(HealthComponentId);
-        if (!healthComponent) {
-            console.log("target had no health component");
-            completeJob(runner, root);
-            return;
-        }
-
-        damage(healthComponent, 1);
-        targetEntity.invalidateComponent(HealthComponentId);
-
-        if (healthComponent.currentHp === 0) {
-            completeJob(runner, root);
-        }
-    }
-};

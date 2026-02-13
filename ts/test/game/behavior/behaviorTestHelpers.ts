@@ -2,12 +2,7 @@ import { Entity } from "../../../src/game/entity/entity.ts";
 import { createBehaviorAgentComponent } from "../../../src/game/component/BehaviorAgentComponent.ts";
 import { createEnergyComponent } from "../../../src/game/component/energyComponent.ts";
 import {
-    createJobRunnerComponent,
-    JobRunnerComponentId,
-} from "../../../src/game/component/jobRunnerComponent.ts";
-import {
     createJobQueueComponent,
-    JobQueueComponentId,
 } from "../../../src/game/component/jobQueueComponent.ts";
 import type { Jobs } from "../../../src/game/job/job.ts";
 import { ResourceHarvestMode } from "../../../src/data/inventory/items/naturalResource.ts";
@@ -53,15 +48,6 @@ export function createEntityWithEnergy(
 }
 
 /**
- * Create a test entity with job runner component.
- */
-export function createEntityWithJobRunner(id: string = "test-entity"): Entity {
-    const entity = createBehaviorTestEntity(id);
-    entity.setEcsComponent(createJobRunnerComponent());
-    return entity;
-}
-
-/**
  * Create a test root entity with job queue.
  */
 export function createRootWithJobQueue(jobs: Jobs[] = []): Entity {
@@ -80,7 +66,7 @@ export function createTestScene(): {
     worker: Entity;
 } {
     const root = createRootWithJobQueue();
-    const worker = createEntityWithJobRunner("worker");
+    const worker = createBehaviorTestEntity("worker");
     root.addChild(worker);
     return { root, worker };
 }
@@ -95,8 +81,6 @@ export function createTestJob(
     return {
         id,
         entityId,
-        state: "queued",
         harvestAction: ResourceHarvestMode.Pick,
-        workProgress: 0,
     };
 }

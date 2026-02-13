@@ -3,9 +3,7 @@ import { spriteRefs } from "../../asset/sprite.ts";
 import { createEquipmentComponent } from "../component/equipmentComponent.ts";
 import {
     createInventoryComponent,
-    defaultInventoryItems,
 } from "../component/inventoryComponent.ts";
-import { createJobRunnerComponent } from "../component/jobRunnerComponent.ts";
 import { createPlayerUnitComponent } from "../component/playerUnitComponent.ts";
 import { createSpriteComponent } from "../component/spriteComponent.ts";
 import { Entity } from "../entity/entity.ts";
@@ -26,7 +24,6 @@ export function workerPrefab(): Entity {
     entity.setEcsComponent(spriteComponent);
     entity.setEcsComponent(createHealthComponent(50, 100));
     entity.setEcsComponent(createPlayerUnitComponent());
-    entity.setEcsComponent(createJobRunnerComponent());
     entity.setEcsComponent(createEquipmentComponent());
     entity.setEcsComponent(createInventoryComponent());
     entity.setEcsComponent(createVisibilityComponent());

@@ -1,4 +1,4 @@
-import { distance, isPointAdjacentTo, type Point } from "../../common/point.ts";
+import { distance, type Point } from "../../common/point.ts";
 import { buildingAdjecency } from "../../data/building/buildings.ts";
 import type { BuildingRequirements } from "../../data/building/building.ts";
 import {
@@ -11,18 +11,14 @@ import {
     BuildingComponentId,
     type BuildingComponent,
 } from "../component/buildingComponent.ts";
-import { heal, HealthComponentId } from "../component/healthComponent.ts";
 import { SpriteComponentId } from "../component/spriteComponent.ts";
 import {
-    addInventoryItem,
     getInventoryItem,
     InventoryComponentId,
-    takeInventoryItem,
     type InventoryComponent,
 } from "../component/inventoryComponent.ts";
 import type { Entity } from "../entity/entity.ts";
-import { completeJob, suspendJob, type Job, type JobHandler } from "./job.ts";
-import { doMovement, MovementResult } from "./movementHelper.ts";
+import type { Job } from "./job.ts";
 import {
     findStockpiles,
     canBuildingBeConstructed,
@@ -40,7 +36,6 @@ export interface BuildBuildingJob extends Job {
 export function BuildBuildingJob(entity: Entity): BuildBuildingJob {
     return {
         id: BuildBuildingJobId,
-        state: "pending",
         entityId: entity.id,
     };
 }
@@ -70,111 +65,9 @@ export function canExecuteBuildJob(
 
 export const BuildBuildingJobId = "buildBuildingJob";
 
-export const buildBuildingHandler: JobHandler<BuildBuildingJob> = (
-    root,
-    runner,
-    job,
-) => {
-    const buildingEntity = root.findEntity(job.entityId);
-    const buildingComponent =
-        buildingEntity?.getEcsComponent(BuildingComponentId);
+export type RemainingMaterials = Record<string, number>;
 
-    if (!buildingEntity) {
-        throw new Error(`Unable to find entity with entityId ${job.entityId}`);
-    }
-
-    if (!buildingComponent) {
-        throw new Error(`No building component on entity ${job.entityId}`);
-    }
-
-    const requirements = buildingComponent.building.requirements;
-    const workerInventory = runner.requireEcsComponent(InventoryComponentId);
-    const buildingInventory =
-        buildingEntity.requireEcsComponent(InventoryComponentId);
-    const isAdjacentToBuilding = isPointAdjacentTo(
-        buildingEntity.worldPosition,
-        runner.worldPosition,
-    );
-
-    // Calculate what materials are still needed at the building
-    const remainingMaterials = getRemainingMaterials(
-        buildingInventory,
-        requirements,
-    );
-    const buildingReady = Object.keys(remainingMaterials).length === 0;
-    const workerHasMaterials = workerHasAnyMaterials(
-        workerInventory,
-        remainingMaterials,
-    );
-
-    // Case 1: Building has all materials, ready to construct
-    if (isAdjacentToBuilding && buildingReady) {
-        doConstruction(root, runner, buildingEntity, buildingComponent);
-        return;
-    }
-
-    // Case 2: Worker has materials to deposit
-    if (isAdjacentToBuilding && workerHasMaterials) {
-        depositMaterials(runner, buildingEntity, remainingMaterials);
-        return;
-    }
-
-    // Case 3: Worker has materials, move to building to deposit
-    if (workerHasMaterials) {
-        moveToBuilding(runner, buildingEntity);
-        return;
-    }
-
-    // Case 4: Need to gather materials from stockpiles
-    const materialCheck = checkMaterialsAvailability(
-        root,
-        runner,
-        remainingMaterials,
-    );
-
-    if (!materialCheck.allAvailable) {
-        console.log(
-            `[BUILD] Missing materials for ${buildingComponent.building.name}: ${materialCheck.missing.join(", ")}`,
-        );
-        suspendJob(
-            runner,
-            `Missing materials for ${buildingComponent.building.name}`,
-        );
-        return;
-    }
-
-    // Find nearest stockpile with materials we need
-    const stockpileEntity = findNearestStockpileWithMaterials(
-        root,
-        runner,
-        materialCheck.toFetch,
-    );
-
-    if (!stockpileEntity) {
-        suspendJob(runner, "Cannot find stockpile with required materials");
-        return;
-    }
-    const isAdjacentToStockpile = isPointAdjacentTo(
-        stockpileEntity.worldPosition,
-        runner.worldPosition,
-    );
-
-    // Case 5: Adjacent to stockpile, take materials
-    if (isAdjacentToStockpile) {
-        takeMaterialsFromStockpile(runner, stockpileEntity, remainingMaterials);
-        return;
-    }
-
-    // Case 6: Move to stockpile
-    const movement = doMovement(runner, stockpileEntity.worldPosition);
-    if (movement === MovementResult.Failure) {
-        suspendJob(runner, "Cannot reach stockpile");
-    }
-};
-
-type RemainingMaterials = Record<string, number>;
-
-function getRemainingMaterials(
+export function getRemainingMaterials(
     buildingInventory: InventoryComponent,
     requirements: BuildingRequirements | undefined,
 ): RemainingMaterials {
@@ -195,7 +88,7 @@ function getRemainingMaterials(
     return remaining;
 }
 
-function workerHasAnyMaterials(
+export function workerHasAnyMaterials(
     workerInventory: InventoryComponent,
     remainingMaterials: RemainingMaterials,
 ): boolean {
@@ -206,13 +99,13 @@ function workerHasAnyMaterials(
     return false;
 }
 
-type MaterialAvailability = {
+export type MaterialAvailability = {
     allAvailable: boolean;
     missing: string[];
     toFetch: Array<{ itemId: string; amount: number }>;
 };
 
-function checkMaterialsAvailability(
+export function checkMaterialsAvailability(
     root: Entity,
     worker: Entity,
     remainingMaterials: RemainingMaterials,
@@ -256,7 +149,7 @@ function checkMaterialsAvailability(
     };
 }
 
-function findNearestStockpileWithMaterials(
+export function findNearestStockpileWithMaterials(
     root: Entity,
     worker: Entity,
     toFetch: Array<{ itemId: string; amount: number }>,
@@ -294,99 +187,7 @@ function findNearestStockpileWithMaterials(
     return stockpilesWithMaterials[0].entity;
 }
 
-function depositMaterials(
-    runner: Entity,
-    buildingEntity: Entity,
-    remainingMaterials: RemainingMaterials,
-): void {
-    const workerInventory = runner.requireEcsComponent(InventoryComponentId);
-    const buildingInventory =
-        buildingEntity.requireEcsComponent(InventoryComponentId);
-
-    for (const [itemId, amountNeeded] of Object.entries(remainingMaterials)) {
-        const taken = takeInventoryItem(workerInventory, itemId, amountNeeded);
-        if (taken && taken.length > 0) {
-            for (const takenItem of taken) {
-                addInventoryItem(
-                    buildingInventory,
-                    takenItem.item,
-                    takenItem.amount,
-                );
-            }
-        }
-    }
-
-    runner.invalidateComponent(InventoryComponentId);
-    buildingEntity.invalidateComponent(InventoryComponentId);
-}
-
-function takeMaterialsFromStockpile(
-    runner: Entity,
-    stockpileEntity: Entity,
-    requirements: BuildingRequirements,
-): void {
-    if (!requirements.materials) return;
-
-    const stockpileInventory =
-        stockpileEntity.requireEcsComponent(InventoryComponentId);
-    const workerInventory = runner.requireEcsComponent(InventoryComponentId);
-
-    let tookSomething = false;
-    for (const [itemId, amountNeeded] of Object.entries(
-        requirements.materials,
-    )) {
-        if (!amountNeeded || amountNeeded <= 0) continue;
-
-        const workerItem = getInventoryItem(workerInventory, itemId);
-        const workerAmount = workerItem?.amount ?? 0;
-        const stillNeed = amountNeeded - workerAmount;
-
-        if (stillNeed <= 0) continue;
-
-        const taken = takeInventoryItem(stockpileInventory, itemId, stillNeed);
-        if (taken && taken.length > 0) {
-            for (const takenItem of taken) {
-                addInventoryItem(
-                    workerInventory,
-                    takenItem.item,
-                    takenItem.amount,
-                );
-            }
-            tookSomething = true;
-        }
-    }
-
-    if (tookSomething) {
-        stockpileEntity.invalidateComponent(InventoryComponentId);
-        runner.invalidateComponent(InventoryComponentId);
-    }
-}
-
-function moveToBuilding(runner: Entity, buildingEntity: Entity): void {
-    const movement = doMovement(runner, buildingEntity.worldPosition);
-    if (movement === MovementResult.Failure) {
-        suspendJob(runner, "Cannot reach building");
-    }
-}
-
-function doConstruction(
-    root: Entity,
-    runner: Entity,
-    buildingEntity: Entity,
-    buildingComponent: BuildingComponent,
-): void {
-    const healthComponent =
-        buildingEntity.requireEcsComponent(HealthComponentId);
-    heal(healthComponent, 10);
-    buildingEntity.invalidateComponent(HealthComponentId);
-
-    if (healthComponent.currentHp >= healthComponent.maxHp) {
-        finishConstruction(root, buildingEntity, buildingComponent);
-        completeJob(runner, root);
-    }
-}
-
-function finishConstruction(
+export function finishConstruction(
     root: Entity,
     buildingEntity: Entity,
     buildingComponent: BuildingComponent,

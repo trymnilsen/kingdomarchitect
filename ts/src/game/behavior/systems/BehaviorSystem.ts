@@ -5,7 +5,6 @@ import {
     BehaviorAgentComponentId,
 } from "../../component/BehaviorAgentComponent.ts";
 import type { Behavior } from "../behaviors/Behavior.ts";
-import { JobRunnerComponentId } from "../../component/jobRunnerComponent.ts";
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import { executeAction } from "../actions/ActionExecutor.ts";
 
@@ -82,29 +81,21 @@ function updateBehaviorAgent(
  * This is called when an action fails to ensure jobs aren't left in a claimed state.
  */
 function unclaimCurrentJob(entity: Entity): void {
-    const runner = entity.getEcsComponent(JobRunnerComponentId);
-    if (!runner || !runner.currentJob) {
+    const root = entity.getRootEntity();
+    const jobQueue = root.getEcsComponent(JobQueueComponentId);
+    if (!jobQueue) {
         return;
     }
 
-    const job = runner.currentJob;
-    const root = entity.getRootEntity();
-    const jobQueue = root.getEcsComponent(JobQueueComponentId);
-
-    // Clear the job from the runner
-    runner.currentJob = null;
-    entity.invalidateComponent(JobRunnerComponentId);
-
-    // Find and unclaim the job in the queue
-    if (jobQueue) {
-        const queuedJob = jobQueue.jobs.find((j) => j === job);
-        if (queuedJob) {
-            queuedJob.state = "queued";
-            queuedJob.claimedBy = undefined;
+    // Find any job claimed by this entity and unclaim it
+    for (const job of jobQueue.jobs) {
+        if (job.claimedBy === entity.id) {
+            job.claimedBy = undefined;
             root.invalidateComponent(JobQueueComponentId);
             console.log(
                 `[BehaviorSystem] Unclaimed job ${job.id} for entity ${entity.id}`,
             );
+            break;
         }
     }
 }

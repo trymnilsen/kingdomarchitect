@@ -7,10 +7,16 @@ import type {
 import { executeWaitAction } from "./waitAction.ts";
 import { executeMoveToAction } from "./moveToAction.ts";
 import { executePlayerMoveAction } from "./playerMoveAction.ts";
-import { executeClaimJobAction } from "./claimJobAction.ts";
-import { executeExecuteJobAction } from "./executeJobAction.ts";
 import { executeSleepAction } from "./sleepAction.ts";
 import { executeDepositToStockpileAction } from "./depositToStockpileAction.ts";
+import { executeHarvestResourceAction } from "./harvestResourceAction.ts";
+import { executeConstructBuildingAction } from "./constructBuildingAction.ts";
+import { executeTakeFromInventoryAction } from "./takeFromInventoryAction.ts";
+import { executeDepositToInventoryAction } from "./depositToInventoryAction.ts";
+import { executeOperateFacilityAction } from "./operateFacilityAction.ts";
+import { executeCraftItemAction } from "./craftItemAction.ts";
+import { executeCollectItemsAction } from "./collectItemsAction.ts";
+import { executeAttackTargetAction } from "./attackTargetAction.ts";
 
 /**
  * Main action executor that dispatches to specific action handlers based on action type.
@@ -27,14 +33,26 @@ export const executeAction: BehaviorActionExecutor = (
             return executeMoveToAction(action, entity);
         case "playerMove":
             return executePlayerMoveAction(action, entity);
-        case "claimJob":
-            return executeClaimJobAction(action, entity);
-        case "executeJob":
-            return executeExecuteJobAction(entity, tick);
         case "sleep":
             return executeSleepAction(entity);
         case "depositToStockpile":
             return executeDepositToStockpileAction(action, entity);
+        case "harvestResource":
+            return executeHarvestResourceAction(action, entity, tick);
+        case "constructBuilding":
+            return executeConstructBuildingAction(action, entity);
+        case "takeFromInventory":
+            return executeTakeFromInventoryAction(action, entity);
+        case "depositToInventory":
+            return executeDepositToInventoryAction(action, entity);
+        case "operateFacility":
+            return executeOperateFacilityAction(action, entity);
+        case "craftItem":
+            return executeCraftItemAction(action, entity);
+        case "collectItems":
+            return executeCollectItemsAction(action, entity);
+        case "attackTarget":
+            return executeAttackTargetAction(action, entity);
         default:
             console.warn(
                 `[ActionExecutor] Unknown action type: ${(action as any).type}`,

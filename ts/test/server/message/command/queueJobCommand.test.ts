@@ -39,12 +39,12 @@ describe("QueueJobCommand", () => {
         assert.strictEqual(attackCommand.job.id, "attackJob");
     });
 
-    it("preserves job state", () => {
+    it("preserves job claimedBy", () => {
         const job = CollectItemJob(new Entity("target"));
-        job.state = "claimed";
+        job.claimedBy = "worker-1";
 
         const command = QueueJobCommand(job);
 
-        assert.strictEqual(command.job.state, "claimed");
+        assert.strictEqual(command.job.claimedBy, "worker-1");
     });
 });

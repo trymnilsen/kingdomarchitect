@@ -1,4 +1,3 @@
-import { generateId } from "../../common/idGenerator.ts";
 import type { JobQueueComponent } from "../component/jobQueueComponent.ts";
 import type { Job } from "./job.ts";
 
@@ -6,16 +5,12 @@ export interface ProductionJob extends Job {
     id: typeof ProductionJobId;
     /** The production building entity */
     targetBuilding: string;
-    /** Progress counter (ticks spent working) */
-    progress: number;
 }
 
 export function createProductionJob(targetBuilding: string): ProductionJob {
     return {
         id: ProductionJobId,
-        state: "pending",
         targetBuilding,
-        progress: 0,
     };
 }
 
@@ -35,7 +30,7 @@ export function getProductionJobCountForBuilding(
 }
 
 /**
- * Clear pending production jobs for a building (keeps claimed jobs)
+ * Clear unclaimed production jobs for a building (keeps claimed jobs)
  */
 export function clearProductionJobsForBuilding(
     jobQueue: JobQueueComponent,
@@ -46,7 +41,7 @@ export function clearProductionJobsForBuilding(
             !(
                 job.id === ProductionJobId &&
                 job.targetBuilding === buildingId &&
-                job.state !== "claimed"
+                job.claimedBy === undefined
             ),
     );
 }

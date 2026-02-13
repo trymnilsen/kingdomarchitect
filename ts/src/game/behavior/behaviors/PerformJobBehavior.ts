@@ -1,9 +1,7 @@
 import { distance } from "../../../common/point.ts";
-import { Entity } from "../../entity/entity.ts";
-import { JobRunnerComponentId } from "../../component/jobRunnerComponent.ts";
+import type { Entity } from "../../entity/entity.ts";
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import type { JobQueueComponent } from "../../component/jobQueueComponent.ts";
-import { isJobClaimed } from "../../job/job.ts";
 import type { Jobs } from "../../job/job.ts";
 import type { BehaviorActionData } from "../actions/Action.ts";
 import type { Behavior } from "./Behavior.ts";
@@ -11,10 +9,12 @@ import {
     canExecuteBuildJob,
     type BuildBuildingJob,
 } from "../../job/buildBuildingJob.ts";
+import { findJobClaimedBy, claimJobInQueue } from "../../job/jobLifecycle.ts";
+import { planJob } from "../../job/planner/jobPlanner.ts";
 
 /**
  * PerformJobBehavior handles job execution for worker entities.
- * If the entity has a current job, it executes it.
+ * If the entity has a claimed job, it plans and executes it.
  * Otherwise, it finds and claims the best available job from the queue.
  */
 export function createPerformJobBehavior(): Behavior {
@@ -22,17 +22,6 @@ export function createPerformJobBehavior(): Behavior {
         name: "performJob",
 
         isValid(entity: Entity): boolean {
-            const runner = entity.getEcsComponent(JobRunnerComponentId);
-            if (!runner) {
-                return false;
-            }
-
-            // Valid if we have a current job
-            if (runner.currentJob) {
-                return true;
-            }
-
-            // Valid if there are unclaimed jobs in the queue
             const root = entity.getRootEntity();
             const jobQueue = root.getEcsComponent(JobQueueComponentId);
 
@@ -40,25 +29,16 @@ export function createPerformJobBehavior(): Behavior {
                 return false;
             }
 
-            // Check if there are any unclaimed jobs
-            const unclaimedJobs = jobQueue.jobs.filter((job) => {
-                if (isJobClaimed(job)) {
-                    return false;
-                }
-
-                // Skip jobs with entity constraints that don't match
-                if (
-                    job.constraint &&
-                    job.constraint.type === "entity" &&
-                    job.constraint.id !== entity.id
-                ) {
-                    return false;
-                }
-
+            // Valid if has claimed job
+            const hasClaimedJob = jobQueue.jobs.some(
+                (job) => job.claimedBy === entity.id,
+            );
+            if (hasClaimedJob) {
                 return true;
-            });
+            }
 
-            return unclaimedJobs.length > 0;
+            // Valid if there are unclaimed jobs we can take
+            return hasAvailableJobs(entity, jobQueue);
         },
 
         utility(_entity: Entity): number {
@@ -67,18 +47,6 @@ export function createPerformJobBehavior(): Behavior {
         },
 
         expand(entity: Entity): BehaviorActionData[] {
-            const runner = entity.getEcsComponent(JobRunnerComponentId);
-
-            if (!runner) {
-                return [];
-            }
-
-            // If we already have a job, just execute it
-            if (runner.currentJob) {
-                return [{ type: "executeJob" }];
-            }
-
-            // Otherwise, find the best job to claim
             const root = entity.getRootEntity();
             const jobQueue = root.getEcsComponent(JobQueueComponentId);
 
@@ -86,19 +54,53 @@ export function createPerformJobBehavior(): Behavior {
                 return [];
             }
 
-            const bestJobIndex = findBestJob(entity, jobQueue);
+            // Find job claimed by this entity
+            const claimedJob = findJobClaimedBy(root, entity.id);
+            if (claimedJob) {
+                return planJob(root, entity, claimedJob);
+            }
 
+            // No claimed job, try to claim a new one
+            const bestJobIndex = findBestJob(entity, jobQueue);
             if (bestJobIndex === -1) {
                 return [];
             }
 
-            // Claim the job, then execute it
-            return [
-                { type: "claimJob", jobIndex: bestJobIndex },
-                { type: "executeJob" },
-            ];
+            const job = jobQueue.jobs[bestJobIndex];
+            claimJobInQueue(job, entity.id, root);
+
+            // Delegate to planner
+            return planJob(root, entity, job);
         },
     };
+}
+
+/**
+ * Check if there are available jobs for this entity.
+ */
+function hasAvailableJobs(
+    entity: Entity,
+    jobQueue: JobQueueComponent,
+): boolean {
+    for (const job of jobQueue.jobs) {
+        // Skip claimed jobs
+        if (job.claimedBy !== undefined) {
+            continue;
+        }
+
+        // Skip jobs with entity constraints that don't match
+        if (
+            job.constraint &&
+            job.constraint.type === "entity" &&
+            job.constraint.id !== entity.id
+        ) {
+            continue;
+        }
+
+        return true;
+    }
+
+    return false;
 }
 
 /**
@@ -114,7 +116,7 @@ function findBestJob(entity: Entity, jobQueue: JobQueueComponent): number {
         const job = jobQueue.jobs[i];
 
         // Skip claimed jobs
-        if (isJobClaimed(job)) {
+        if (job.claimedBy !== undefined) {
             continue;
         }
 

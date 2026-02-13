@@ -14,7 +14,6 @@ import type { HungerComponent } from "./hungerComponent.ts";
 import type { EnergyComponent } from "./energyComponent.ts";
 import type { InventoryComponent } from "./inventoryComponent.ts";
 import type { JobQueueComponent } from "./jobQueueComponent.ts";
-import type { JobRunnerComponent } from "./jobRunnerComponent.ts";
 import type { KingdomComponent } from "./kingdomComponent.ts";
 import type { OppcupationComponent } from "./occupationComponent.ts";
 import type { PathfindingGraphComponent } from "./pathfindingGraphComponent.ts";
@@ -32,7 +31,6 @@ import type { StockpileComponent } from "./stockpileComponent.ts";
 import type { ProductionComponent } from "./productionComponent.ts";
 
 export type Components =
-    | JobRunnerComponent
     | SpriteComponent
     | TileComponent
     | InventoryComponent
