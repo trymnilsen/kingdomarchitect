@@ -114,7 +114,7 @@ describe("constructBuildingAction", () => {
         assert.strictEqual(result, "failed");
     });
 
-    it("fails if building has no BuildingComponent", () => {
+    it("throws if building has no BuildingComponent", () => {
         const { root, worker } = createTestScene();
         const noBuildingComp = new Entity("noBuildingComp");
         noBuildingComp.worldPosition = { x: 1, y: 0 };
@@ -126,12 +126,12 @@ describe("constructBuildingAction", () => {
             entityId: "noBuildingComp",
         };
 
-        const result = executeConstructBuildingAction(action, worker);
-
-        assert.strictEqual(result, "failed");
+        assert.throws(() => {
+            executeConstructBuildingAction(action, worker);
+        });
     });
 
-    it("fails if building has no HealthComponent", () => {
+    it("throws if building has no HealthComponent", () => {
         const { root, worker } = createTestScene();
         const noHealthComp = new Entity("noHealthComp");
         noHealthComp.worldPosition = { x: 1, y: 0 };
@@ -145,8 +145,8 @@ describe("constructBuildingAction", () => {
             entityId: "noHealthComp",
         };
 
-        const result = executeConstructBuildingAction(action, worker);
-
-        assert.strictEqual(result, "failed");
+        assert.throws(() => {
+            executeConstructBuildingAction(action, worker);
+        });
     });
 });

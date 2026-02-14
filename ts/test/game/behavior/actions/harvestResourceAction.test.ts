@@ -193,7 +193,7 @@ describe("harvestResourceAction", () => {
             assert.strictEqual(result, "failed");
         });
 
-        it("fails if worker has no inventory", () => {
+        it("throws if worker has no inventory", () => {
             const { root, resource } = createTestScene();
             const workerNoInv = new Entity("workerNoInv");
             workerNoInv.worldPosition = { x: 0, y: 0 };
@@ -205,12 +205,12 @@ describe("harvestResourceAction", () => {
                 harvestAction: ResourceHarvestMode.Chop,
             };
 
-            const result = executeHarvestResourceAction(action, workerNoInv, 0);
-
-            assert.strictEqual(result, "failed");
+            assert.throws(() => {
+                executeHarvestResourceAction(action, workerNoInv, 0);
+            });
         });
 
-        it("fails if chop mode resource has no HealthComponent", () => {
+        it("throws if chop mode resource has no HealthComponent", () => {
             const { root, worker } = createTestScene();
             const noHealth = new Entity("noHealth");
             noHealth.worldPosition = { x: 1, y: 0 };
@@ -223,9 +223,9 @@ describe("harvestResourceAction", () => {
                 harvestAction: ResourceHarvestMode.Chop,
             };
 
-            const result = executeHarvestResourceAction(action, worker, 0);
-
-            assert.strictEqual(result, "failed");
+            assert.throws(() => {
+                executeHarvestResourceAction(action, worker, 0);
+            });
         });
     });
 });

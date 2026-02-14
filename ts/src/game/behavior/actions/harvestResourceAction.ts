@@ -7,12 +7,20 @@ import { damage, HealthComponentId } from "../../component/healthComponent.ts";
 import {
     addInventoryItem,
     InventoryComponentId,
+    type InventoryComponent,
 } from "../../component/inventoryComponent.ts";
 import { RegrowComponentId } from "../../component/regrowComponent.ts";
 import { ResourceComponentId } from "../../component/resourceComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { findJobClaimedBy, completeJobFromQueue } from "../../job/jobLifecycle.ts";
-import type { ActionStatus, BehaviorActionData } from "./Action.ts";
+import {
+    ActionComplete,
+    ActionFailed,
+    ActionRunning,
+    type ActionStatus,
+    type BehaviorActionData,
+} from "./Action.ts";
+import type { NaturalResource } from "../../../data/inventory/items/naturalResource.ts";
 
 /**
  * Harvest a resource entity.
@@ -32,20 +40,21 @@ export function executeHarvestResourceAction(
         console.warn(
             `[HarvestResource] Resource entity ${action.entityId} not found`,
         );
-        return "failed";
+        return ActionFailed;
     }
 
     if (!isPointAdjacentTo(resourceEntity.worldPosition, entity.worldPosition)) {
         console.warn(`[HarvestResource] Worker not adjacent to resource`);
-        return "failed";
+        return ActionFailed;
     }
 
-    const resourceComponent = resourceEntity.getEcsComponent(ResourceComponentId);
+    const resourceComponent =
+        resourceEntity.getEcsComponent(ResourceComponentId);
     if (!resourceComponent) {
         console.warn(
             `[HarvestResource] Entity ${action.entityId} has no ResourceComponent`,
         );
-        return "failed";
+        return ActionFailed;
     }
 
     const resource = getResourceById(resourceComponent.resourceId);
@@ -53,14 +62,10 @@ export function executeHarvestResourceAction(
         console.warn(
             `[HarvestResource] Unknown resource: ${resourceComponent.resourceId}`,
         );
-        return "failed";
+        return ActionFailed;
     }
 
-    const workerInventory = entity.getEcsComponent(InventoryComponentId);
-    if (!workerInventory) {
-        console.warn(`[HarvestResource] Worker has no inventory`);
-        return "failed";
-    }
+    const workerInventory = entity.requireEcsComponent(InventoryComponentId);
 
     if (action.harvestAction === ResourceHarvestMode.Chop) {
         return executeChopHarvest(
@@ -87,16 +92,11 @@ function executeChopHarvest(
     root: Entity,
     worker: Entity,
     resourceEntity: Entity,
-    resource: ReturnType<typeof getResourceById>,
-    workerInventory: ReturnType<typeof worker.getEcsComponent<typeof InventoryComponentId>>,
+    resource: NaturalResource,
+    workerInventory: InventoryComponent,
 ): ActionStatus {
-    if (!resource || !workerInventory) return "failed";
-
-    const healthComponent = resourceEntity.getEcsComponent(HealthComponentId);
-    if (!healthComponent) {
-        console.warn(`[HarvestResource] Resource has no HealthComponent for chopping`);
-        return "failed";
-    }
+    const healthComponent =
+        resourceEntity.requireEcsComponent(HealthComponentId);
 
     damage(healthComponent, 10);
     resourceEntity.invalidateComponent(HealthComponentId);
@@ -117,23 +117,21 @@ function executeChopHarvest(
         if (job) {
             completeJobFromQueue(root, job);
         }
-        return "complete";
+        return ActionComplete;
     }
 
-    return "running";
+    return ActionRunning;
 }
 
 function executeWorkHarvest(
     root: Entity,
     worker: Entity,
     resourceEntity: Entity,
-    resource: ReturnType<typeof getResourceById>,
-    workerInventory: ReturnType<typeof worker.getEcsComponent<typeof InventoryComponentId>>,
+    resource: NaturalResource,
+    workerInventory: InventoryComponent,
     action: Extract<BehaviorActionData, { type: "harvestResource" }>,
     tick: number,
 ): ActionStatus {
-    if (!resource || !workerInventory) return "failed";
-
     const workDuration = resource.workDuration ?? 1;
 
     if (action.workProgress === undefined) {
@@ -157,19 +155,17 @@ function executeWorkHarvest(
         if (job) {
             completeJobFromQueue(root, job);
         }
-        return "complete";
+        return ActionComplete;
     }
 
-    return "running";
+    return ActionRunning;
 }
 
 function applyResourceLifecycle(
     resourceEntity: Entity,
-    resource: ReturnType<typeof getResourceById>,
+    resource: NaturalResource,
     tick: number,
 ): void {
-    if (!resource) return;
-
     const lifecycle = resource.lifecycle;
     if (lifecycle.type === "Finite" || lifecycle.type === "Remove") {
         resourceEntity.remove();

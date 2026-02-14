@@ -2,7 +2,13 @@ import { isPointAdjacentTo } from "../../../common/point.ts";
 import { damage, HealthComponentId } from "../../component/healthComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { findJobClaimedBy, completeJobFromQueue } from "../../job/jobLifecycle.ts";
-import type { ActionStatus, BehaviorActionData } from "./Action.ts";
+import {
+    ActionComplete,
+    ActionFailed,
+    ActionRunning,
+    type ActionStatus,
+    type BehaviorActionData,
+} from "./Action.ts";
 
 /**
  * Attack a target entity by dealing damage.
@@ -20,12 +26,12 @@ export function executeAttackTargetAction(
         console.warn(
             `[AttackTarget] Target entity ${action.targetId} not found`,
         );
-        return "failed";
+        return ActionFailed;
     }
 
     if (!isPointAdjacentTo(targetEntity.worldPosition, entity.worldPosition)) {
         console.warn(`[AttackTarget] Worker not adjacent to target`);
-        return "failed";
+        return ActionFailed;
     }
 
     const healthComponent = targetEntity.getEcsComponent(HealthComponentId);
@@ -33,7 +39,7 @@ export function executeAttackTargetAction(
         console.warn(
             `[AttackTarget] Target ${action.targetId} has no HealthComponent`,
         );
-        return "failed";
+        return ActionFailed;
     }
 
     damage(healthComponent, 1);
@@ -44,8 +50,8 @@ export function executeAttackTargetAction(
         if (job) {
             completeJobFromQueue(root, job);
         }
-        return "complete";
+        return ActionComplete;
     }
 
-    return "running";
+    return ActionRunning;
 }

@@ -1,12 +1,16 @@
 import { isPointAdjacentTo } from "../../../common/point.ts";
-import {
-    BuildingComponentId,
-} from "../../component/buildingComponent.ts";
+import { BuildingComponentId } from "../../component/buildingComponent.ts";
 import { heal, HealthComponentId } from "../../component/healthComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { finishConstruction } from "../../job/buildBuildingJob.ts";
 import { findJobClaimedBy, completeJobFromQueue } from "../../job/jobLifecycle.ts";
-import type { ActionStatus, BehaviorActionData } from "./Action.ts";
+import {
+    ActionComplete,
+    ActionFailed,
+    ActionRunning,
+    type ActionStatus,
+    type BehaviorActionData,
+} from "./Action.ts";
 
 /**
  * Construct a scaffolded building by healing its HealthComponent.
@@ -24,29 +28,18 @@ export function executeConstructBuildingAction(
         console.warn(
             `[ConstructBuilding] Building ${action.entityId} not found`,
         );
-        return "failed";
+        return ActionFailed;
     }
 
     if (!isPointAdjacentTo(buildingEntity.worldPosition, entity.worldPosition)) {
         console.warn(`[ConstructBuilding] Worker not adjacent to building`);
-        return "failed";
+        return ActionFailed;
     }
 
-    const buildingComponent = buildingEntity.getEcsComponent(BuildingComponentId);
-    if (!buildingComponent) {
-        console.warn(
-            `[ConstructBuilding] Entity ${action.entityId} has no BuildingComponent`,
-        );
-        return "failed";
-    }
-
-    const healthComponent = buildingEntity.getEcsComponent(HealthComponentId);
-    if (!healthComponent) {
-        console.warn(
-            `[ConstructBuilding] Building ${action.entityId} has no HealthComponent`,
-        );
-        return "failed";
-    }
+    const buildingComponent =
+        buildingEntity.requireEcsComponent(BuildingComponentId);
+    const healthComponent =
+        buildingEntity.requireEcsComponent(HealthComponentId);
 
     heal(healthComponent, 10);
     buildingEntity.invalidateComponent(HealthComponentId);
@@ -57,8 +50,8 @@ export function executeConstructBuildingAction(
         if (job) {
             completeJobFromQueue(root, job);
         }
-        return "complete";
+        return ActionComplete;
     }
 
-    return "running";
+    return ActionRunning;
 }

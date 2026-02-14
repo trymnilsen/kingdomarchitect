@@ -118,7 +118,7 @@ describe("collectItemsAction", () => {
         assert.strictEqual(result, "failed");
     });
 
-    it("fails if worker has no inventory", () => {
+    it("throws if worker has no inventory", () => {
         const { root, chest } = createTestScene();
         const workerNoInv = new Entity("workerNoInv");
         workerNoInv.worldPosition = { x: 0, y: 0 };
@@ -132,8 +132,8 @@ describe("collectItemsAction", () => {
             entityId: "chest",
         };
 
-        const result = executeCollectItemsAction(action, workerNoInv);
-
-        assert.strictEqual(result, "failed");
+        assert.throws(() => {
+            executeCollectItemsAction(action, workerNoInv);
+        });
     });
 });

@@ -6,6 +6,24 @@ import type { CraftingRecipe } from "../../../data/crafting/craftingRecipe.ts";
 export type ActionStatus = "complete" | "running" | "failed";
 
 /**
+ * Action completed successfully. The action will be removed from the queue
+ * and the next action (if any) will be executed on the following tick.
+ */
+export const ActionComplete: ActionStatus = "complete";
+
+/**
+ * Action is still in progress. The action remains in the queue and will
+ * be executed again on the next tick.
+ */
+export const ActionRunning: ActionStatus = "running";
+
+/**
+ * Action failed and cannot continue. The entire action queue will be cleared,
+ * any claimed jobs will be released, and the behavior agent will replan.
+ */
+export const ActionFailed: ActionStatus = "failed";
+
+/**
  * Item transfer specification for inventory actions
  */
 export type ItemTransfer = {

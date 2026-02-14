@@ -6,7 +6,13 @@ import {
 } from "../../component/inventoryComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { findJobClaimedBy, completeJobFromQueue } from "../../job/jobLifecycle.ts";
-import type { ActionStatus, BehaviorActionData } from "./Action.ts";
+import {
+    ActionComplete,
+    ActionFailed,
+    ActionRunning,
+    type ActionStatus,
+    type BehaviorActionData,
+} from "./Action.ts";
 
 /**
  * Craft an item at a building.
@@ -23,28 +29,18 @@ export function executeCraftItemAction(
     const buildingEntity = root.findEntity(action.buildingId);
 
     if (!buildingEntity) {
-        console.warn(
-            `[CraftItem] Building ${action.buildingId} not found`,
-        );
-        return "failed";
+        console.warn(`[CraftItem] Building ${action.buildingId} not found`);
+        return ActionFailed;
     }
 
     if (!isPointAdjacentTo(buildingEntity.worldPosition, entity.worldPosition)) {
         console.warn(`[CraftItem] Worker not adjacent to building`);
-        return "failed";
+        return ActionFailed;
     }
 
-    const workerInventory = entity.getEcsComponent(InventoryComponentId);
-    if (!workerInventory) {
-        console.warn(`[CraftItem] Worker has no inventory`);
-        return "failed";
-    }
-
-    const buildingInventory = buildingEntity.getEcsComponent(InventoryComponentId);
-    if (!buildingInventory) {
-        console.warn(`[CraftItem] Building has no inventory`);
-        return "failed";
-    }
+    const workerInventory = entity.requireEcsComponent(InventoryComponentId);
+    const buildingInventory =
+        buildingEntity.requireEcsComponent(InventoryComponentId);
 
     const recipe = action.recipe;
 
@@ -57,7 +53,7 @@ export function executeCraftItemAction(
                 console.warn(
                     `[CraftItem] Worker missing materials: needs ${input.amount}x ${input.item.id}, has ${item?.amount ?? 0}`,
                 );
-                return "failed";
+                return ActionFailed;
             }
         }
 
@@ -71,7 +67,7 @@ export function executeCraftItemAction(
                 console.warn(
                     `[CraftItem] Failed to consume ${input.amount}x ${input.item.id}`,
                 );
-                return "failed";
+                return ActionFailed;
             }
         }
 
@@ -94,8 +90,8 @@ export function executeCraftItemAction(
         if (job) {
             completeJobFromQueue(root, job);
         }
-        return "complete";
+        return ActionComplete;
     }
 
-    return "running";
+    return ActionRunning;
 }

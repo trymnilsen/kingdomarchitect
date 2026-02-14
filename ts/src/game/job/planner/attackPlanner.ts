@@ -5,7 +5,9 @@ import { failJobFromQueue } from "../jobLifecycle.ts";
 
 /**
  * Plan actions for attacking a target.
- * Returns: [moveTo target, attackTarget]
+ *
+ * @example
+ * // Typical return: [moveTo(target), attackTarget(target)]
  */
 export function planAttack(
     root: Entity,

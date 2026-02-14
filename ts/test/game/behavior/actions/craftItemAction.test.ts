@@ -177,7 +177,7 @@ describe("craftItemAction", () => {
         assert.strictEqual(result, "failed");
     });
 
-    it("fails if worker has no inventory", () => {
+    it("throws if worker has no inventory", () => {
         const { root, building } = createTestScene();
         const workerNoInv = new Entity("workerNoInv");
         workerNoInv.worldPosition = { x: 0, y: 0 };
@@ -189,12 +189,12 @@ describe("craftItemAction", () => {
             recipe: planksRecipe,
         };
 
-        const result = executeCraftItemAction(action, workerNoInv);
-
-        assert.strictEqual(result, "failed");
+        assert.throws(() => {
+            executeCraftItemAction(action, workerNoInv);
+        });
     });
 
-    it("fails if building has no inventory", () => {
+    it("throws if building has no inventory", () => {
         const { root, worker } = createTestScene();
         const buildingNoInv = new Entity("buildingNoInv");
         buildingNoInv.worldPosition = { x: 1, y: 0 };
@@ -209,8 +209,8 @@ describe("craftItemAction", () => {
             recipe: planksRecipe,
         };
 
-        const result = executeCraftItemAction(action, worker);
-
-        assert.strictEqual(result, "failed");
+        assert.throws(() => {
+            executeCraftItemAction(action, worker);
+        });
     });
 });

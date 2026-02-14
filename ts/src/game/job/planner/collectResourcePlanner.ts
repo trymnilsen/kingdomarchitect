@@ -5,7 +5,9 @@ import { failJobFromQueue } from "../jobLifecycle.ts";
 
 /**
  * Plan actions for collecting a resource.
- * Returns: [moveTo resource, harvestResource]
+ *
+ * @example
+ * // Typical return: [moveTo(resource), harvestResource(resource)]
  */
 export function planCollectResource(
     root: Entity,

@@ -8,7 +8,12 @@ import {
     InventoryComponentId,
 } from "../../component/inventoryComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
-import type { ActionStatus, BehaviorActionData } from "./Action.ts";
+import {
+    ActionComplete,
+    ActionFailed,
+    type ActionStatus,
+    type BehaviorActionData,
+} from "./Action.ts";
 
 /**
  * Collect all items from an entity with a CollectableComponent.
@@ -25,12 +30,12 @@ export function executeCollectItemsAction(
         console.warn(
             `[CollectItems] Target entity ${action.entityId} not found`,
         );
-        return "failed";
+        return ActionFailed;
     }
 
     if (!isPointAdjacentTo(targetEntity.worldPosition, entity.worldPosition)) {
         console.warn(`[CollectItems] Worker not adjacent to target`);
-        return "failed";
+        return ActionFailed;
     }
 
     const collectableComponent = targetEntity.getEcsComponent(
@@ -40,18 +45,14 @@ export function executeCollectItemsAction(
         console.warn(
             `[CollectItems] Target ${action.entityId} has no CollectableComponent`,
         );
-        return "failed";
+        return ActionFailed;
     }
 
     if (collectableComponent.items.length === 0) {
-        return "complete";
+        return ActionComplete;
     }
 
-    const workerInventory = entity.getEcsComponent(InventoryComponentId);
-    if (!workerInventory) {
-        console.warn(`[CollectItems] Worker has no inventory`);
-        return "failed";
-    }
+    const workerInventory = entity.requireEcsComponent(InventoryComponentId);
 
     const items = collectAllItems(collectableComponent);
     for (const itemQuantity of items) {
@@ -61,5 +62,5 @@ export function executeCollectItemsAction(
     entity.invalidateComponent(InventoryComponentId);
     targetEntity.invalidateComponent(CollectableComponentId);
 
-    return "complete";
+    return ActionComplete;
 }

@@ -5,7 +5,9 @@ import { failJobFromQueue } from "../jobLifecycle.ts";
 
 /**
  * Plan actions for operating a production facility.
- * Returns: [moveTo building, operateFacility]
+ *
+ * @example
+ * // Typical return: [moveTo(building), operateFacility(building)]
  */
 export function planProduction(
     root: Entity,

@@ -19,11 +19,11 @@ import { suspendJobInQueue } from "../jobLifecycle.ts";
 /**
  * Plans actions for building construction.
  *
- * State evaluation order:
- * 1. Building has all materials → [moveTo building, constructBuilding]
- * 2. Worker has needed materials → [moveTo building, depositToInventory]
- * 3. Materials in stockpile → [moveTo stockpile, takeFromInventory]
- * 4. No materials → suspend job, return []
+ * Evaluates the current state and returns actions up to the next decision point:
+ * 1. Building has all materials: [moveTo(building), constructBuilding(building)]
+ * 2. Worker has needed materials: [moveTo(building), depositToInventory(materials)]
+ * 3. Materials in stockpile: [moveTo(stockpile), takeFromInventory(materials)]
+ * 4. No materials available: suspends job and returns []
  */
 export function planBuildBuilding(
     root: Entity,

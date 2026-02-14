@@ -5,7 +5,9 @@ import { failJobFromQueue } from "../jobLifecycle.ts";
 
 /**
  * Plan actions for collecting items from an entity with CollectableComponent.
- * Returns: [moveTo entity, collectItems]
+ *
+ * @example
+ * // Typical return: [moveTo(entity), collectItems(entity)]
  */
 export function planCollectItem(
     root: Entity,

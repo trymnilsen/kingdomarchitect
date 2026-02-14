@@ -5,7 +5,12 @@ import {
     takeInventoryItem,
 } from "../../component/inventoryComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
-import type { ActionStatus, BehaviorActionData } from "./Action.ts";
+import {
+    ActionComplete,
+    ActionFailed,
+    type ActionStatus,
+    type BehaviorActionData,
+} from "./Action.ts";
 
 /**
  * Deposit specific items from worker's inventory to a target entity's inventory.
@@ -22,27 +27,17 @@ export function executeDepositToInventoryAction(
         console.warn(
             `[DepositToInventory] Target entity ${action.targetEntityId} not found`,
         );
-        return "failed";
+        return ActionFailed;
     }
 
     if (!isPointAdjacentTo(targetEntity.worldPosition, entity.worldPosition)) {
         console.warn(`[DepositToInventory] Worker not adjacent to target`);
-        return "failed";
+        return ActionFailed;
     }
 
-    const targetInventory = targetEntity.getEcsComponent(InventoryComponentId);
-    if (!targetInventory) {
-        console.warn(
-            `[DepositToInventory] Target ${action.targetEntityId} has no inventory`,
-        );
-        return "failed";
-    }
-
-    const workerInventory = entity.getEcsComponent(InventoryComponentId);
-    if (!workerInventory) {
-        console.warn(`[DepositToInventory] Worker has no inventory`);
-        return "failed";
-    }
+    const targetInventory =
+        targetEntity.requireEcsComponent(InventoryComponentId);
+    const workerInventory = entity.requireEcsComponent(InventoryComponentId);
 
     let depositedSomething = false;
     for (const transfer of action.items) {
@@ -68,5 +63,5 @@ export function executeDepositToInventoryAction(
         targetEntity.invalidateComponent(InventoryComponentId);
     }
 
-    return "complete";
+    return ActionComplete;
 }

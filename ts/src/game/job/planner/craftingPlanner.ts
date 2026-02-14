@@ -6,9 +6,10 @@ import { failJobFromQueue } from "../jobLifecycle.ts";
 
 /**
  * Plan actions for crafting an item.
- * States:
- * - Worker has inputs → [moveTo building, craftItem]
- * - Need inputs from building → [moveTo building, takeFromInventory, craftItem]
+ *
+ * Evaluates the current state and returns actions up to the next decision point:
+ * - Worker has all inputs: [moveTo(building), craftItem(recipe)]
+ * - Worker needs inputs from building: [moveTo(building), takeFromInventory(inputs), craftItem(recipe)]
  */
 export function planCrafting(
     root: Entity,

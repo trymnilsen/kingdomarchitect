@@ -11,7 +11,13 @@ import type { Entity } from "../../entity/entity.ts";
 import { findRandomSpawnInDiamond } from "../../map/item/placement.ts";
 import { resourcePrefab } from "../../prefab/resourcePrefab.ts";
 import { findJobClaimedBy, completeJobFromQueue } from "../../job/jobLifecycle.ts";
-import type { ActionStatus, BehaviorActionData } from "./Action.ts";
+import {
+    ActionComplete,
+    ActionFailed,
+    ActionRunning,
+    type ActionStatus,
+    type BehaviorActionData,
+} from "./Action.ts";
 
 const FORRESTER_RADIUS = 5;
 
@@ -31,20 +37,21 @@ export function executeOperateFacilityAction(
         console.warn(
             `[OperateFacility] Building ${action.buildingId} not found`,
         );
-        return "failed";
+        return ActionFailed;
     }
 
     if (!isPointAdjacentTo(buildingEntity.worldPosition, entity.worldPosition)) {
         console.warn(`[OperateFacility] Worker not adjacent to building`);
-        return "failed";
+        return ActionFailed;
     }
 
-    const productionComp = buildingEntity.getEcsComponent(ProductionComponentId);
+    const productionComp =
+        buildingEntity.getEcsComponent(ProductionComponentId);
     if (!productionComp) {
         console.warn(
             `[OperateFacility] Building ${action.buildingId} has no ProductionComponent`,
         );
-        return "failed";
+        return ActionFailed;
     }
 
     const definition = getProductionDefinition(productionComp.productionId);
@@ -52,7 +59,7 @@ export function executeOperateFacilityAction(
         console.warn(
             `[OperateFacility] Unknown production: ${productionComp.productionId}`,
         );
-        return "failed";
+        return ActionFailed;
     }
 
     if (action.progress === undefined) {
@@ -64,11 +71,10 @@ export function executeOperateFacilityAction(
         const yieldDef = definition.yield;
 
         if (yieldDef.type === "item") {
-            const workerInventory = entity.getEcsComponent(InventoryComponentId);
-            if (workerInventory) {
-                addInventoryItem(workerInventory, yieldDef.item, yieldDef.amount);
-                entity.invalidateComponent(InventoryComponentId);
-            }
+            const workerInventory =
+                entity.requireEcsComponent(InventoryComponentId);
+            addInventoryItem(workerInventory, yieldDef.item, yieldDef.amount);
+            entity.invalidateComponent(InventoryComponentId);
         } else if (yieldDef.type === "entity") {
             const chunkMapComp = root.getEcsComponent(ChunkMapComponentId);
             if (chunkMapComp) {
@@ -93,8 +99,8 @@ export function executeOperateFacilityAction(
         if (job) {
             completeJobFromQueue(root, job);
         }
-        return "complete";
+        return ActionComplete;
     }
 
-    return "running";
+    return ActionRunning;
 }

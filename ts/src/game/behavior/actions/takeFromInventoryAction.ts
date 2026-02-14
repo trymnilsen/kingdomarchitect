@@ -5,7 +5,12 @@ import {
     takeInventoryItem,
 } from "../../component/inventoryComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
-import type { ActionStatus, BehaviorActionData } from "./Action.ts";
+import {
+    ActionComplete,
+    ActionFailed,
+    type ActionStatus,
+    type BehaviorActionData,
+} from "./Action.ts";
 
 /**
  * Take specific items from a source entity's inventory and add to worker's inventory.
@@ -22,27 +27,17 @@ export function executeTakeFromInventoryAction(
         console.warn(
             `[TakeFromInventory] Source entity ${action.sourceEntityId} not found`,
         );
-        return "failed";
+        return ActionFailed;
     }
 
     if (!isPointAdjacentTo(sourceEntity.worldPosition, entity.worldPosition)) {
         console.warn(`[TakeFromInventory] Worker not adjacent to source`);
-        return "failed";
+        return ActionFailed;
     }
 
-    const sourceInventory = sourceEntity.getEcsComponent(InventoryComponentId);
-    if (!sourceInventory) {
-        console.warn(
-            `[TakeFromInventory] Source ${action.sourceEntityId} has no inventory`,
-        );
-        return "failed";
-    }
-
-    const workerInventory = entity.getEcsComponent(InventoryComponentId);
-    if (!workerInventory) {
-        console.warn(`[TakeFromInventory] Worker has no inventory`);
-        return "failed";
-    }
+    const sourceInventory =
+        sourceEntity.requireEcsComponent(InventoryComponentId);
+    const workerInventory = entity.requireEcsComponent(InventoryComponentId);
 
     let tookSomething = false;
     for (const transfer of action.items) {
@@ -68,5 +63,5 @@ export function executeTakeFromInventoryAction(
         entity.invalidateComponent(InventoryComponentId);
     }
 
-    return "complete";
+    return ActionComplete;
 }
