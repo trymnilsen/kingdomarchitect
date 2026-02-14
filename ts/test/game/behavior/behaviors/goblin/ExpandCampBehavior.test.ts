@@ -136,7 +136,7 @@ describe("ExpandCampBehavior", () => {
             assert.strictEqual(valid, false);
         });
 
-        it("returns false when scaffolded hut exists", () => {
+        it("returns true when scaffolded hut exists (goblin should continue building it)", () => {
             const behavior = createExpandCampBehavior();
             const root = new Entity("root");
             const camp = createTestCamp("camp-1", 5);
@@ -144,7 +144,7 @@ describe("ExpandCampBehavior", () => {
             const goblin1 = createTestGoblin("camp-1");
             const goblin2 = new Entity("goblin-2");
             goblin2.setEcsComponent(createGoblinUnitComponent("camp-1"));
-            const hut = createTestHut(true); // Scaffolded hut
+            const hut = createTestHut(true); // Scaffolded hut in progress
 
             camp.addChild(fire);
             camp.addChild(goblin1);
@@ -154,7 +154,7 @@ describe("ExpandCampBehavior", () => {
 
             const valid = behavior.isValid(goblin1);
 
-            assert.strictEqual(valid, false);
+            assert.strictEqual(valid, true);
         });
 
         it("returns true when fire active, population < max, and all huts occupied", () => {

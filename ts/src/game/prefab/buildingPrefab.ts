@@ -21,7 +21,13 @@ import { forrester } from "../../data/building/wood/forrester.ts";
 import { createProductionComponent } from "../component/productionComponent.ts";
 import { goblinCampfire } from "../../data/building/goblin/goblinCampfire.ts";
 import { goblinHut } from "../../data/building/goblin/goblinHut.ts";
-import { createFireSourceComponent } from "../component/fireSourceComponent.ts";
+import { createFireSourceComponent, FireSourceComponentId } from "../component/fireSourceComponent.ts";
+import { HousingComponentId } from "../component/housingComponent.ts";
+import { CraftingComponentId } from "../component/craftingComponent.ts";
+import { WorkplaceComponentId } from "../component/workplaceComponent.ts";
+import { StockpileComponentId } from "../component/stockpileComponent.ts";
+import { ProductionComponentId } from "../component/productionComponent.ts";
+import { InventoryComponentId } from "../component/inventoryComponent.ts";
 
 export function buildingPrefab(
     building: Building,
@@ -62,30 +68,42 @@ export function applyFunctionalComponents(
 ): void {
     if (building.id == woodenHouse.id) {
         entity.setEcsComponent(createHousingComponent());
+        entity.invalidateComponent(HousingComponentId);
     }
     if (building.id == blacksmith.id) {
         entity.setEcsComponent(createCraftingComponent(blacksmithRecipes));
         entity.setEcsComponent(createInventoryComponent());
         entity.setEcsComponent(createWorkplaceComponent());
+        entity.invalidateComponent(CraftingComponentId);
+        entity.invalidateComponent(InventoryComponentId);
+        entity.invalidateComponent(WorkplaceComponentId);
     }
     if (building.id == carpenter.id) {
         entity.setEcsComponent(createCraftingComponent(carpenterRecipes));
         entity.setEcsComponent(createInventoryComponent());
         entity.setEcsComponent(createWorkplaceComponent());
+        entity.invalidateComponent(CraftingComponentId);
+        entity.invalidateComponent(InventoryComponentId);
+        entity.invalidateComponent(WorkplaceComponentId);
     }
     if (building.id == stockPile.id) {
         entity.setEcsComponent(createInventoryComponent());
         entity.setEcsComponent(createStockpileComponent());
+        entity.invalidateComponent(InventoryComponentId);
+        entity.invalidateComponent(StockpileComponentId);
     }
     if (building.id == forrester.id) {
         entity.setEcsComponent(
             createProductionComponent("forrester_production"),
         );
+        entity.invalidateComponent(ProductionComponentId);
     }
     if (building.id == goblinCampfire.id) {
         entity.setEcsComponent(createFireSourceComponent(15, 2, 1));
+        entity.invalidateComponent(FireSourceComponentId);
     }
     if (building.id == goblinHut.id) {
         entity.setEcsComponent(createHousingComponent());
+        entity.invalidateComponent(HousingComponentId);
     }
 }

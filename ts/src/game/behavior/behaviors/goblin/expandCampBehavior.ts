@@ -46,10 +46,10 @@ export function createExpandCampBehavior(): Behavior {
                 return false;
             }
 
-            // Check if all huts are occupied (need more huts)
-            // Also returns true if there's a hut under construction
-            const availableOrPendingHut = findAvailableOrPendingHut(campEntity);
-            return availableOrPendingHut === null;
+            // Valid when there is no completed unoccupied hut.
+            // A scaffold in progress counts as needing more work, not as satisfied.
+            const completedAvailableHut = findCompletedAvailableHut(campEntity);
+            return completedAvailableHut === null;
         },
 
         utility(_entity: Entity): number {
@@ -99,19 +99,13 @@ function getCampPopulation(root: Entity, campEntityId: string): number {
     return count;
 }
 
-function findAvailableOrPendingHut(campEntity: Entity): Entity | null {
+function findCompletedAvailableHut(campEntity: Entity): Entity | null {
     for (const child of campEntity.children) {
         const building = child.getEcsComponent(BuildingComponentId);
-        if (!building || building.building.id !== goblinHut.id) {
+        if (!building || building.building.id !== goblinHut.id || building.scaffolded) {
             continue;
         }
 
-        // If scaffolded, there's already a hut being built
-        if (building.scaffolded) {
-            return child;
-        }
-
-        // Check for available housing (completed hut with no tenant)
         const housing = child.getEcsComponent(HousingComponentId);
         if (housing && !housing.tenant) {
             return child;

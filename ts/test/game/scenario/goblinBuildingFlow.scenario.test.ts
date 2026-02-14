@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 import { createBehaviorSystem } from "../../../src/game/behavior/systems/BehaviorSystem.ts";
 import { warmthSystem } from "../../../src/game/system/warmthSystem.ts";
 import { createKeepWarmBehavior } from "../../../src/game/behavior/behaviors/goblin/keepWarmBehavior.ts";
+import { createExpandCampBehavior } from "../../../src/game/behavior/behaviors/goblin/expandCampBehavior.ts";
 import { createGoblinCampComponent } from "../../../src/game/component/goblinCampComponent.ts";
 import { createGoblinUnitComponent } from "../../../src/game/component/goblinUnitComponent.ts";
 import {
@@ -17,6 +18,8 @@ import { createResourceComponent } from "../../../src/game/component/resourceCom
 import { BuildingComponentId } from "../../../src/game/component/buildingComponent.ts";
 import { FireSourceComponentId } from "../../../src/game/component/fireSourceComponent.ts";
 import { goblinCampfire } from "../../../src/data/building/goblin/goblinCampfire.ts";
+import { goblinHut } from "../../../src/data/building/goblin/goblinHut.ts";
+import { HousingComponentId } from "../../../src/game/component/housingComponent.ts";
 import {
     createTileComponent,
     setChunk,
@@ -25,6 +28,7 @@ import { createChunkMapComponent } from "../../../src/game/component/chunkMapCom
 import { createPathfindingGraphComponent } from "../../../src/game/component/pathfindingGraphComponent.ts";
 import { createLazyGraphFromRootNode } from "../../../src/game/map/path/graph/generateGraph.ts";
 import { buildingPrefab } from "../../../src/game/prefab/buildingPrefab.ts";
+import { isPointAdjacentTo } from "../../../src/common/point.ts";
 import { chunkMapSystem } from "../../../src/game/system/chunkMapSystem.ts";
 import { EcsWorld } from "../../../src/common/ecs/ecsWorld.ts";
 import { Entity } from "../../../src/game/entity/entity.ts";
@@ -93,7 +97,11 @@ function createTree(root: Entity, id: string, position: Point): Entity {
     return tree;
 }
 
-function runSystems(root: Entity, ticks: number, behaviorSystem = createBehaviorSystem([createKeepWarmBehavior()])): void {
+function runSystems(
+    root: Entity,
+    ticks: number,
+    behaviorSystem = createBehaviorSystem([createKeepWarmBehavior()]),
+): void {
     for (let tick = 1; tick <= ticks; tick++) {
         behaviorSystem.onUpdate!(root, tick);
         warmthSystem.onUpdate!(root, tick);
@@ -103,7 +111,10 @@ function runSystems(root: Entity, ticks: number, behaviorSystem = createBehavior
 function findBuiltCampfire(camp: Entity): Entity | null {
     for (const child of camp.children) {
         const building = child.getEcsComponent(BuildingComponentId);
-        if (building?.building.id === goblinCampfire.id && !building.scaffolded) {
+        if (
+            building?.building.id === goblinCampfire.id &&
+            !building.scaffolded
+        ) {
             return child;
         }
     }
@@ -117,7 +128,10 @@ describe("Goblin Building Flow", () => {
          * Goblin and camp are at (12, 8). Tree is immediately adjacent at (13, 8).
          * Full flow: harvest → deposit → construct → warm at fire.
          */
-        const { root } = createWorld({ min: { x: 4, y: 2 }, max: { x: 20, y: 16 } });
+        const { root } = createWorld({
+            min: { x: 4, y: 2 },
+            max: { x: 20, y: 16 },
+        });
 
         const camp = createCamp(root, "goblinCamp1", { x: 12, y: 8 });
         const goblin = createGoblin(camp, { x: 12, y: 8 });
@@ -137,6 +151,10 @@ describe("Goblin Building Flow", () => {
             warmth.warmth >= COLD_THRESHOLD,
             `Goblin should be warm after building campfire (warmth: ${warmth.warmth})`,
         );
+        assert.ok(
+            isPointAdjacentTo(goblin.worldPosition, campfire.worldPosition),
+            `Goblin should be adjacent to fire, not on top of it (goblin: ${JSON.stringify(goblin.worldPosition)}, fire: ${JSON.stringify(campfire.worldPosition)})`,
+        );
     });
 
     it("cold goblin travels to distant tree, builds campfire, and warms up", () => {
@@ -144,7 +162,10 @@ describe("Goblin Building Flow", () => {
          * Scenario: Tree is 7 tiles from camp. Goblin must travel there to harvest.
          * Verifies mid-simulation movement before asserting full completion.
          */
-        const { root } = createWorld({ min: { x: 4, y: 2 }, max: { x: 24, y: 16 } });
+        const { root } = createWorld({
+            min: { x: 4, y: 2 },
+            max: { x: 24, y: 16 },
+        });
 
         const camp = createCamp(root, "goblinCamp1", { x: 12, y: 8 });
         const goblin = createGoblin(camp, { x: 12, y: 8 });
@@ -170,7 +191,10 @@ describe("Goblin Building Flow", () => {
         }
 
         const campfire = findBuiltCampfire(camp);
-        assert.ok(campfire, "Campfire should be fully constructed after traveling to gather wood");
+        assert.ok(
+            campfire,
+            "Campfire should be fully constructed after traveling to gather wood",
+        );
         assert.ok(
             campfire.getEcsComponent(FireSourceComponentId),
             "Completed campfire should have a FireSourceComponent",
@@ -181,6 +205,56 @@ describe("Goblin Building Flow", () => {
             warmth.warmth >= COLD_THRESHOLD,
             `Goblin should be warm after completing the full build flow (warmth: ${warmth.warmth})`,
         );
+        assert.ok(
+            isPointAdjacentTo(goblin.worldPosition, campfire.worldPosition),
+            `Goblin should be adjacent to fire, not on top of it (goblin: ${JSON.stringify(goblin.worldPosition)}, fire: ${JSON.stringify(campfire.worldPosition)})`,
+        );
+    });
+
+    it("goblin builds campfire then hut once warm", () => {
+        /**
+         * Scenario: Goblin starts cold with no fire and no hut in camp.
+         * Three trees are placed adjacent to camp (campfire needs 10 wood, hut needs 15).
+         * Full flow: keepWarm triggers → harvest → deposit → build campfire → warm up →
+         *            expandCamp triggers → harvest more → deposit → build hut.
+         */
+        const { root } = createWorld({
+            min: { x: 4, y: 2 },
+            max: { x: 24, y: 16 },
+        });
+
+        const camp = createCamp(root, "goblinCamp1", { x: 12, y: 8 });
+        const goblin = createGoblin(camp, { x: 12, y: 8 });
+        // Three trees: campfire costs 10 wood (1 tree), hut costs 15 wood (2 trees)
+        createTree(root, "tree1", { x: 13, y: 8 });
+        createTree(root, "tree2", { x: 14, y: 8 });
+        createTree(root, "tree3", { x: 15, y: 8 });
+
+        const behaviorSystem = createBehaviorSystem([
+            createKeepWarmBehavior(),
+            createExpandCampBehavior(),
+        ]);
+
+        runSystems(root, 200, behaviorSystem);
+
+        const campfire = findBuiltCampfire(camp);
+        assert.ok(campfire, "Campfire should be fully constructed first");
+
+        const hut = camp.children.find((child) => {
+            const b = child.getEcsComponent(BuildingComponentId);
+            return b?.building.id === goblinHut.id && !b.scaffolded;
+        });
+        assert.ok(hut, "Goblin hut should be fully constructed");
+        assert.ok(
+            hut!.getEcsComponent(HousingComponentId),
+            "Completed hut should have a HousingComponent",
+        );
+
+        const warmth = goblin.getEcsComponent(WarmthComponentId)!;
+        assert.ok(
+            warmth.warmth >= COLD_THRESHOLD,
+            `Goblin should be warm after building both structures (warmth: ${warmth.warmth})`,
+        );
     });
 
     it("cold goblin moves to existing fire and warms up without building", () => {
@@ -189,7 +263,10 @@ describe("Goblin Building Flow", () => {
          * Goblin starts 4 tiles away and must move to warm up.
          * No scaffold should ever be placed since the fire already exists.
          */
-        const { root } = createWorld({ min: { x: 4, y: 2 }, max: { x: 22, y: 16 } });
+        const { root } = createWorld({
+            min: { x: 4, y: 2 },
+            max: { x: 22, y: 16 },
+        });
 
         const camp = createCamp(root, "goblinCamp1", { x: 12, y: 8 });
         const goblin = createGoblin(camp, { x: 16, y: 8 });
