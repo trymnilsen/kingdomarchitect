@@ -175,7 +175,7 @@ describe("HaulBehavior", () => {
             const worker = createWorkerWithInventory("worker", [
                 { item: woodResourceItem, amount: 10 },
             ]);
-            worker.worldPosition = { x: 0, y: 0 };
+            worker.worldPosition = { x: 10, y: 8 };
             const farStockpile = createStockpileEntity("far-stockpile", 100, 100);
             const nearStockpile = createStockpileEntity("near-stockpile", 2, 2);
             root.addChild(worker);

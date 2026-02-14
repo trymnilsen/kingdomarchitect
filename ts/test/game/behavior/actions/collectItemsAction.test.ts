@@ -22,8 +22,8 @@ function createTestScene(): { root: Entity; worker: Entity; chest: Entity } {
     const worker = new Entity("worker");
     const chest = new Entity("chest");
 
-    worker.worldPosition = { x: 0, y: 0 };
-    chest.worldPosition = { x: 1, y: 0 }; // Adjacent
+    worker.worldPosition = { x: 10, y: 8 };
+    chest.worldPosition = { x: 11, y: 8 }; // Adjacent
 
     worker.setEcsComponent(createInventoryComponent());
     chest.setEcsComponent(createCollectableComponent());
@@ -105,7 +105,7 @@ describe("collectItemsAction", () => {
     it("fails if target has no CollectableComponent", () => {
         const { root, worker } = createTestScene();
         const building = new Entity("building");
-        building.worldPosition = { x: 1, y: 0 };
+        building.worldPosition = { x: 11, y: 8 };
         root.addChild(building);
 
         const action = {
@@ -121,7 +121,7 @@ describe("collectItemsAction", () => {
     it("throws if worker has no inventory", () => {
         const { root, chest } = createTestScene();
         const workerNoInv = new Entity("workerNoInv");
-        workerNoInv.worldPosition = { x: 0, y: 0 };
+        workerNoInv.worldPosition = { x: 10, y: 8 };
         root.addChild(workerNoInv);
 
         const collectableComponent = chest.getEcsComponent(CollectableComponentId)!;

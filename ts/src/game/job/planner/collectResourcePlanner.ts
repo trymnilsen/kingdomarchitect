@@ -22,7 +22,11 @@ export function planCollectResource(
     }
 
     return [
-        { type: "moveTo", target: resourceEntity.worldPosition },
+        {
+            type: "moveTo",
+            target: resourceEntity.worldPosition,
+            stopAdjacent: "cardinal",
+        },
         {
             type: "harvestResource",
             entityId: job.entityId,

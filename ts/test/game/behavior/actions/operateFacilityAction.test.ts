@@ -24,8 +24,8 @@ function createTestScene(): {
     const worker = new Entity("worker");
     const building = new Entity("building");
 
-    worker.worldPosition = { x: 0, y: 0 };
-    building.worldPosition = { x: 1, y: 0 }; // Adjacent
+    worker.worldPosition = { x: 10, y: 8 };
+    building.worldPosition = { x: 11, y: 8 }; // Adjacent
 
     worker.setEcsComponent(createInventoryComponent());
     building.setEcsComponent(createProductionComponent("quarry_production"));
@@ -100,7 +100,7 @@ describe("operateFacilityAction", () => {
 
     it("fails if worker not adjacent to building", () => {
         const { worker, building } = createTestScene();
-        building.worldPosition = { x: 10, y: 10 }; // Not adjacent
+        building.worldPosition = { x: 25, y: 25 }; // Not adjacent
 
         const action = {
             type: "operateFacility" as const,
@@ -115,7 +115,7 @@ describe("operateFacilityAction", () => {
     it("fails if building has no ProductionComponent", () => {
         const { root, worker } = createTestScene();
         const noProduction = new Entity("noProduction");
-        noProduction.worldPosition = { x: 1, y: 0 };
+        noProduction.worldPosition = { x: 11, y: 8 };
         root.addChild(noProduction);
 
         const action = {
@@ -131,7 +131,7 @@ describe("operateFacilityAction", () => {
     it("fails if production definition not found", () => {
         const { root, worker } = createTestScene();
         const unknownProduction = new Entity("unknownProduction");
-        unknownProduction.worldPosition = { x: 1, y: 0 };
+        unknownProduction.worldPosition = { x: 11, y: 8 };
         unknownProduction.setEcsComponent(
             createProductionComponent("unknown_production"),
         );

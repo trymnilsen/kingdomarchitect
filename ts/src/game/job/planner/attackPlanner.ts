@@ -22,7 +22,11 @@ export function planAttack(
     }
 
     return [
-        { type: "moveTo", target: targetEntity.worldPosition },
+        {
+            type: "moveTo",
+            target: targetEntity.worldPosition,
+            stopAdjacent: "cardinal",
+        },
         { type: "attackTarget", targetId: job.target },
     ];
 }

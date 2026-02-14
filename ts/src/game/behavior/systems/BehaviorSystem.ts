@@ -35,6 +35,14 @@ function updateBehaviorAgent(
 ): void {
     // Check if we need to replan
     if (shouldReplan(agent)) {
+        const reason = agent.shouldReplan
+            ? "explicit"
+            : !agent.currentBehaviorName
+              ? "no behavior"
+              : "empty queue";
+        console.log(
+            `[BehaviorSystem] Entity ${entity.id} replanning (reason: ${reason})`,
+        );
         replan(entity, agent, behaviors);
         agent.shouldReplan = false;
     }
@@ -55,6 +63,9 @@ function updateBehaviorAgent(
         }
 
         if (status === "complete") {
+            console.log(
+                `[BehaviorSystem] Entity ${entity.id} completed action "${action.type}"`,
+            );
             // Remove completed action and continue
             agent.actionQueue.shift();
         } else if (status === "failed") {
@@ -137,6 +148,11 @@ function replan(
 
     if (validBehaviors.length === 0) {
         // No valid behaviors - enter idle state
+        if (agent.currentBehaviorName !== null) {
+            console.log(
+                `[BehaviorSystem] Entity ${entity.id} entering idle (no valid behaviors)`,
+            );
+        }
         agent.currentBehaviorName = null;
         agent.actionQueue = [];
         return;
@@ -177,6 +193,9 @@ function replan(
         );
     } else if (agent.actionQueue.length === 0 && currentBehavior) {
         // Current behavior is still best, but queue is empty - re-expand
+        console.log(
+            `[BehaviorSystem] Entity ${entity.id} re-expanding behavior "${currentBehavior.name}"`,
+        );
         agent.actionQueue = currentBehavior.expand(entity);
     }
 }

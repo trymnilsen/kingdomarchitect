@@ -7,11 +7,12 @@ import type { Entity } from "../../entity/entity.ts";
 import { getWeightAtPoint } from "../path/graph/weight.ts";
 
 /**
- * Finds the closest walkable position to an entity using breadth-first search
+ * Finds the closest walkable position using breadth-first search.
+ * Both input and output positions are in world coordinates.
  * @param root The root entity containing the map data
- * @param startPosition The starting position to search from
+ * @param startPosition The world position to search from
  * @param maxWeight The maximum weight considered walkable (default: 5)
- * @returns The closest walkable position, or null if none found
+ * @returns The closest walkable world position, or null if none found
  */
 export function findClosestAvailablePosition(
     root: Entity,
@@ -19,7 +20,7 @@ export function findClosestAvailablePosition(
     maxWeight: number = 5,
 ): Point | null {
     const positionsToVisit: Point[] = [startPosition];
-    const visitedPositions = new Set<Point>();
+    const visitedPositions = new Set<number>();
 
     while (positionsToVisit.length > 0) {
         const currentPosition = positionsToVisit.shift();
@@ -27,10 +28,11 @@ export function findClosestAvailablePosition(
             return null;
         }
 
-        if (visitedPositions.has(currentPosition)) {
+        const positionKey = encodePosition(currentPosition.x, currentPosition.y);
+        if (visitedPositions.has(positionKey)) {
             continue;
         }
-        visitedPositions.add(currentPosition);
+        visitedPositions.add(positionKey);
 
         // Check if this position is walkable
         const weight = getWeightAtPoint(currentPosition, root);

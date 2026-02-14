@@ -1,6 +1,7 @@
 import { distance, type Point } from "../../common/point.ts";
 import { buildingAdjecency } from "../../data/building/buildings.ts";
 import type { BuildingRequirements } from "../../data/building/building.ts";
+import { applyFunctionalComponents } from "../prefab/buildingPrefab.ts";
 import {
     type AdjacencyMask,
     adjacencyMaskToEnum,
@@ -204,6 +205,8 @@ export function finishConstruction(
     console.log(
         `[BUILD] ${buildingComponent.building.name} completed with ${getRarityName(quality)} quality`,
     );
+
+    applyFunctionalComponents(buildingEntity, buildingComponent.building);
 
     if (spriteComponent) {
         const adjacency = buildingAdjecency[buildingComponent.building.id];
