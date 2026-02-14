@@ -22,7 +22,11 @@ export function planCollectItem(
     }
 
     return [
-        { type: "moveTo", target: targetEntity.worldPosition },
+        {
+            type: "moveTo",
+            target: targetEntity.worldPosition,
+            stopAdjacent: "cardinal",
+        },
         { type: "collectItems", entityId: job.entityId },
     ];
 }

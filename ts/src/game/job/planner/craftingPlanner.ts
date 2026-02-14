@@ -36,7 +36,11 @@ export function planCrafting(
 
     if (workerHasAllInputs) {
         return [
-            { type: "moveTo", target: buildingEntity.worldPosition },
+            {
+                type: "moveTo",
+                target: buildingEntity.worldPosition,
+                stopAdjacent: "cardinal",
+            },
             {
                 type: "craftItem",
                 buildingId: job.targetBuilding,
@@ -74,8 +78,16 @@ export function planCrafting(
     }
 
     return [
-        { type: "moveTo", target: buildingEntity.worldPosition },
-        { type: "takeFromInventory", sourceEntityId: job.targetBuilding, items: itemsToTake },
+        {
+            type: "moveTo",
+            target: buildingEntity.worldPosition,
+            stopAdjacent: "cardinal",
+        },
+        {
+            type: "takeFromInventory",
+            sourceEntityId: job.targetBuilding,
+            items: itemsToTake,
+        },
         {
             type: "craftItem",
             buildingId: job.targetBuilding,

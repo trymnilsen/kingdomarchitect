@@ -37,7 +37,7 @@ export type ItemTransfer = {
  */
 export type BehaviorActionData =
     | { type: "wait"; until: number }
-    | { type: "moveTo"; target: Point }
+    | { type: "moveTo"; target: Point; stopAdjacent?: "cardinal" | "diagonal" }
     | { type: "playerMove"; target: Point }
     | { type: "sleep" }
     | { type: "depositToStockpile"; stockpileId: string }

@@ -130,7 +130,11 @@ function planConstructExistingBuilding(
     // State 1: Building ready to construct (all materials deposited)
     if (Object.keys(remainingMaterials).length === 0) {
         return [
-            { type: "moveTo", target: buildingEntity.worldPosition },
+            {
+                type: "moveTo",
+                target: buildingEntity.worldPosition,
+                stopAdjacent: "cardinal",
+            },
             { type: "constructBuilding", entityId: buildingEntity.id },
         ];
     }
@@ -146,7 +150,11 @@ function planConstructExistingBuilding(
         );
 
         return [
-            { type: "moveTo", target: buildingEntity.worldPosition },
+            {
+                type: "moveTo",
+                target: buildingEntity.worldPosition,
+                stopAdjacent: "cardinal",
+            },
             {
                 type: "depositToInventory",
                 targetEntityId: buildingEntity.id,
@@ -167,7 +175,11 @@ function planConstructExistingBuilding(
         );
         if (itemsToTake.length > 0) {
             return [
-                { type: "moveTo", target: stockpileWithMaterials.worldPosition },
+                {
+                    type: "moveTo",
+                    target: stockpileWithMaterials.worldPosition,
+                    stopAdjacent: "cardinal",
+                },
                 {
                     type: "takeFromInventory",
                     sourceEntityId: stockpileWithMaterials.id,
@@ -267,7 +279,11 @@ function planGatherMaterials(
         const nearestTree = findNearestChoppableResource(root, goblin);
         if (nearestTree) {
             return [
-                { type: "moveTo", target: nearestTree.worldPosition },
+                {
+                    type: "moveTo",
+                    target: nearestTree.worldPosition,
+                    stopAdjacent: "cardinal",
+                },
                 {
                     type: "harvestResource",
                     entityId: nearestTree.id,

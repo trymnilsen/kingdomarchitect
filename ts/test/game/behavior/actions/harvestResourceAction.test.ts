@@ -176,6 +176,23 @@ describe("harvestResourceAction", () => {
             assert.strictEqual(result, "failed");
         });
 
+        it("fails if worker is at same position as resource (not adjacent)", () => {
+            const { worker, resource } = createTestScene();
+            // Worker and resource at exact same position - a point is NOT adjacent to itself
+            worker.worldPosition = { x: 5, y: 5 };
+            resource.worldPosition = { x: 5, y: 5 };
+
+            const action = {
+                type: "harvestResource" as const,
+                entityId: "resource",
+                harvestAction: ResourceHarvestMode.Chop,
+            };
+
+            const result = executeHarvestResourceAction(action, worker, 0);
+
+            assert.strictEqual(result, "failed");
+        });
+
         it("fails if resource has no ResourceComponent", () => {
             const { root, worker } = createTestScene();
             const noResource = new Entity("noResource");

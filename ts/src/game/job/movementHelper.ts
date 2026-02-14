@@ -41,7 +41,13 @@ export function doMovement(entity: Entity, to: Point): MovementResult {
         });
     }
 
-    if (path.status == PathResultStatus.Complete && !!nextPoint) {
+    // Accept both Complete and Partial paths - Partial paths allow moving
+    // towards blocked destinations (e.g., resources, buildings)
+    const isValidPath =
+        path.status === PathResultStatus.Complete ||
+        path.status === PathResultStatus.Partial;
+
+    if (isValidPath && !!nextPoint) {
         entity.worldPosition = nextPoint;
         return MovementResult.Ok;
     } else {

@@ -22,7 +22,11 @@ export function planProduction(
     }
 
     return [
-        { type: "moveTo", target: buildingEntity.worldPosition },
+        {
+            type: "moveTo",
+            target: buildingEntity.worldPosition,
+            stopAdjacent: "cardinal",
+        },
         { type: "operateFacility", buildingId: job.targetBuilding },
     ];
 }
