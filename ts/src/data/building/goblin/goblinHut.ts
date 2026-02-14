@@ -4,7 +4,7 @@ import { woodResourceItem } from "../../inventory/items/resources.ts";
 
 export const goblinHut: Building = {
     id: "goblinHut",
-    icon: spriteRefs.wooden_house,
+    icon: spriteRefs.goblin_house,
     name: "Goblin Hut",
     scale: 2,
     requirements: {

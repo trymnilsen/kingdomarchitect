@@ -9,6 +9,7 @@ import { PlayerUnitComponentId } from "../component/playerUnitComponent.ts";
 import type { Entity } from "../entity/entity.ts";
 import { findClosestAvailablePosition } from "../map/query/closestPositionQuery.ts";
 import { workerPrefab } from "../prefab/workerPrefab.ts";
+import { woodenHouse } from "../../data/building/wood/house.ts";
 
 export const housingSystem: EcsSystem = {
     onUpdate: update,
@@ -24,6 +25,11 @@ function update(root: Entity, _deltaTime: number) {
     // Process all houses
     for (const [entity, housingComponent] of houses) {
         const buildingComponent = entity.getEcsComponent(BuildingComponentId);
+
+        // Only consider player-owned housing (wooden houses), not goblin huts
+        if (buildingComponent?.building.id !== woodenHouse.id) {
+            continue;
+        }
 
         // Skip scaffolded buildings
         if (buildingComponent?.scaffolded) {
