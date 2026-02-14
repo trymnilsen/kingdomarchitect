@@ -12,6 +12,11 @@ import type {
     EntityTransformEvent,
 } from "../entity/entityEvent.ts";
 
+/**
+ * System responsible for maintaining a spatial index (ChunkMap) of all entities.
+ * It ensures that entities—including those nested deep within hierarchies (like Goblins
+ * inside a Camp)—are indexed by their world position for fast spatial queries.
+ */
 export const chunkMapSystem: EcsSystem = {
     onInit: init,
     onEntityEvent: {
@@ -22,109 +27,123 @@ export const chunkMapSystem: EcsSystem = {
 };
 
 /**
- * Run init actions
- * Chunk map already exists from root factory, nothing to do.
- * @param root the root entity of the system
+ * @param _root The root entity of the ECS world.
  */
 function init(_root: Entity) {
-    // ChunkMap already exists from root factory, nothing to do
+    // Initialized via root factory
 }
 
 /**
- * Update the position of an entity in the chunkmap on each transform event
- * @param rootEntity the root entity of the system
- * @param entityEvent the event that occured
+ * Updates the spatial index when an entity moves.
+ * * If a parent moves, this recursively updates all children since their
+ * world positions are relative to the parent and will have changed.
+ * @param rootEntity The world root containing the ChunkMapComponent.
+ * @param entityEvent The transform event details.
  */
-function onTransform(_rootEntity: Entity, entityEvent: EntityTransformEvent) {
-    const chunkMapComponent = entityEvent.source.requireAncestorEcsComponent(
-        ChunkMapComponentId,
-    );
-    const chunkMap = chunkMapComponent.chunkMap;
-
-    const currentChunkId = chunkMap.entityChunkMap.get(entityEvent.source.id);
-    if (currentChunkId === undefined) {
-        addToChunkmap(chunkMap, entityEvent.source);
-        return;
-    }
-
-    const chunkX = Math.floor(entityEvent.source.worldPosition.x / ChunkSize);
-    const chunkY = Math.floor(entityEvent.source.worldPosition.y / ChunkSize);
-    const newChunkKey = encodePosition(chunkX, chunkY);
-    if (currentChunkId === newChunkKey) {
-        return;
-    }
-    const currentChunk = getOrCreateChunk(chunkMap, currentChunkId);
-    currentChunk.delete(entityEvent.source);
-
-    chunkMap.entityChunkMap.set(entityEvent.source.id, newChunkKey);
-    const newChunk = getOrCreateChunk(chunkMap, newChunkKey);
-    newChunk.add(entityEvent.source);
+function onTransform(rootEntity: Entity, entityEvent: EntityTransformEvent) {
+    const chunkMap =
+        rootEntity.requireEcsComponent(ChunkMapComponentId).chunkMap;
+    updateEntityHierarchyInMap(chunkMap, entityEvent.source);
 }
 
 /**
- * Add an entity to the chunkmap when it is added
- * @param rootEntity the root of the system
- * @param entityEvent the event that happened
+ * Recursively checks and updates chunk assignments for an entity branch.
+ */
+function updateEntityHierarchyInMap(chunkMap: ChunkMap, entity: Entity) {
+    const currentChunkKey = chunkMap.entityChunkMap.get(entity.id);
+    const chunkX = Math.floor(entity.worldPosition.x / ChunkSize);
+    const chunkY = Math.floor(entity.worldPosition.y / ChunkSize);
+    const newChunkKey = encodePosition(chunkX, chunkY);
+
+    // Boundary check optimization: only modify the map if the entity moved to a new chunk
+    if (currentChunkKey !== newChunkKey) {
+        if (currentChunkKey !== undefined) {
+            chunkMap.chunks.get(currentChunkKey)?.delete(entity);
+        }
+
+        chunkMap.entityChunkMap.set(entity.id, newChunkKey);
+        getOrCreateChunk(chunkMap, newChunkKey).add(entity);
+    }
+
+    for (const child of entity.children) {
+        updateEntityHierarchyInMap(chunkMap, child);
+    }
+}
+
+/**
+ * Indexes an entity and its entire subtree when added to the world.
+ * This ensures that if a parent (e.g., a building) is added with pre-existing
+ * children (e.g., workers), every child is correctly registered in the spatial map.
  */
 function onEntityAdded(
-    _rootEntity: Entity,
+    rootEntity: Entity,
     entityEvent: EntityChildrenUpdatedEvent,
 ) {
-    const chunkMapComponent = entityEvent.target.requireAncestorEcsComponent(
-        ChunkMapComponentId,
-    );
-    const chunkMap = chunkMapComponent.chunkMap;
+    const chunkMap =
+        rootEntity.requireEcsComponent(ChunkMapComponentId).chunkMap;
     addToChunkmap(chunkMap, entityEvent.target);
 }
 
+/**
+ * Adds an entity to the chunkmap, potentially doing it for all its children too
+ */
 function addToChunkmap(chunkMap: ChunkMap, entity: Entity) {
-    // Convert to chunk coordinates
     const chunkX = Math.floor(entity.worldPosition.x / ChunkSize);
     const chunkY = Math.floor(entity.worldPosition.y / ChunkSize);
     const chunkKey = encodePosition(chunkX, chunkY);
-    const chunk = getOrCreateChunk(chunkMap, chunkKey);
+
     chunkMap.entityChunkMap.set(entity.id, chunkKey);
-    chunk.add(entity);
+    getOrCreateChunk(chunkMap, chunkKey).add(entity);
+
+    for (const child of entity.children) {
+        addToChunkmap(chunkMap, child);
+    }
 }
 
 /**
- * Remove an entity from the chunkmap when removed
- * @param rootEntity the root of the system
- * @param entityEvent the event that happened
+ * Removes an entity and its entire subtree from the spatial index.
+ * Prevents "ghost" entities by ensuring that when a parent is removed,
+ * no dangling references to its children remain in the ChunkMap.
  */
 function onEntityRemoved(
-    _rootEntity: Entity,
+    rootEntity: Entity,
     entityEvent: EntityChildrenUpdatedEvent,
 ) {
-    const chunkMapComponent = entityEvent.target.requireAncestorEcsComponent(
-        ChunkMapComponentId,
-    );
-    const chunkMap = chunkMapComponent.chunkMap;
-
-    const chunkForEntity = chunkMap.entityChunkMap.get(entityEvent.target.id);
-    if (chunkForEntity === undefined) {
-        return;
-    }
-
-    const chunk = chunkMap.chunks.get(chunkForEntity);
-    if (chunk === undefined) {
-        return;
-    }
-
-    chunk.delete(entityEvent.target);
-    chunkMap.entityChunkMap.delete(entityEvent.target.id);
+    const chunkMap =
+        rootEntity.requireEcsComponent(ChunkMapComponentId).chunkMap;
+    removeFromChunkmap(chunkMap, entityEvent.target);
 }
 
+/**
+ * Removes an entity from the chunkmap, potentially also doing it for children
+ */
+function removeFromChunkmap(chunkMap: ChunkMap, entity: Entity) {
+    const chunkKey = chunkMap.entityChunkMap.get(entity.id);
+    if (chunkKey !== undefined) {
+        chunkMap.chunks.get(chunkKey)?.delete(entity);
+        chunkMap.entityChunkMap.delete(entity.id);
+    }
+
+    for (const child of entity.children) {
+        removeFromChunkmap(chunkMap, child);
+    }
+}
+
+/**
+ * Retrieves an existing chunk or initializes a new SparseSet for the given key.
+ * @param chunkMap The current spatial map.
+ * @param chunkKey The encoded XY position of the chunk.
+ * @returns A SparseSet of entities for that chunk.
+ */
 function getOrCreateChunk(
     chunkMap: ChunkMap,
     chunkKey: number,
 ): SparseSet<Entity> {
     const chunk = chunkMap.chunks.get(chunkKey);
-    if (!!chunk) {
+    if (chunk) {
         return chunk;
-    } else {
-        const set = new SparseSet<Entity>();
-        chunkMap.chunks.set(chunkKey, set);
-        return set;
     }
+    const set = new SparseSet<Entity>();
+    chunkMap.chunks.set(chunkKey, set);
+    return set;
 }

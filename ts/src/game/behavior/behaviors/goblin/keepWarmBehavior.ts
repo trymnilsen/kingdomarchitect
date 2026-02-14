@@ -31,7 +31,7 @@ export function createKeepWarmBehavior(): Behavior {
             }
 
             // Valid when cold (warmth < 70)
-            return warmth.warmth < 70;
+            return warmth.warmth < 50;
         },
 
         utility(entity: Entity): number {
@@ -40,13 +40,12 @@ export function createKeepWarmBehavior(): Behavior {
                 return 0;
             }
 
-            if (warmth.warmth >= 70) {
+            if (warmth.warmth >= 50) {
                 return 0;
             }
 
             // Scale from 60 (warmth=70) to 95 (warmth=10)
-            // utility = 60 + (70 - warmth) * 0.58
-            const coldness = 70 - warmth.warmth;
+            const coldness = 50 - warmth.warmth;
             return Math.min(95, 60 + coldness * 0.58);
         },
 
@@ -63,10 +62,16 @@ export function createKeepWarmBehavior(): Behavior {
                 return [];
             }
 
+            const warmth = entity.getEcsComponent(WarmthComponentId);
+            const warmthValue = warmth?.warmth ?? 0;
+
             // Check if fire exists in camp
             const nearestFire = findNearestFireSource(campEntity);
 
             if (nearestFire) {
+                console.log(
+                    `[KeepWarm] Entity ${entity.id} going to warm at fire ${nearestFire.id} (warmth: ${warmthValue})`,
+                );
                 // Go warm up at fire
                 return [
                     { type: "moveTo", target: nearestFire.worldPosition },
@@ -74,6 +79,9 @@ export function createKeepWarmBehavior(): Behavior {
                 ];
             }
 
+            console.log(
+                `[KeepWarm] Entity ${entity.id} no fire found, planning to build campfire (warmth: ${warmthValue})`,
+            );
             // No fire - need to build one
             return planGoblinBuild(root, entity, campEntity, goblinCampfire);
         },

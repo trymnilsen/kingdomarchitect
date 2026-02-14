@@ -29,8 +29,8 @@ function createTestScene(): {
     const worker = new Entity("worker");
     const resource = new Entity("resource");
 
-    worker.worldPosition = { x: 0, y: 0 };
-    resource.worldPosition = { x: 1, y: 0 }; // Adjacent
+    worker.worldPosition = { x: 10, y: 8 };
+    resource.worldPosition = { x: 11, y: 8 }; // Adjacent
 
     worker.setEcsComponent(createInventoryComponent());
     resource.setEcsComponent(createResourceComponent("tree1"));
@@ -163,7 +163,7 @@ describe("harvestResourceAction", () => {
 
         it("fails if worker not adjacent to resource", () => {
             const { worker, resource } = createTestScene();
-            resource.worldPosition = { x: 10, y: 10 };
+            resource.worldPosition = { x: 25, y: 25 };
 
             const action = {
                 type: "harvestResource" as const,
@@ -196,7 +196,7 @@ describe("harvestResourceAction", () => {
         it("fails if resource has no ResourceComponent", () => {
             const { root, worker } = createTestScene();
             const noResource = new Entity("noResource");
-            noResource.worldPosition = { x: 1, y: 0 };
+            noResource.worldPosition = { x: 11, y: 8 };
             root.addChild(noResource);
 
             const action = {
@@ -213,7 +213,7 @@ describe("harvestResourceAction", () => {
         it("throws if worker has no inventory", () => {
             const { root, resource } = createTestScene();
             const workerNoInv = new Entity("workerNoInv");
-            workerNoInv.worldPosition = { x: 0, y: 0 };
+            workerNoInv.worldPosition = { x: 10, y: 8 };
             root.addChild(workerNoInv);
 
             const action = {
@@ -230,7 +230,7 @@ describe("harvestResourceAction", () => {
         it("throws if chop mode resource has no HealthComponent", () => {
             const { root, worker } = createTestScene();
             const noHealth = new Entity("noHealth");
-            noHealth.worldPosition = { x: 1, y: 0 };
+            noHealth.worldPosition = { x: 11, y: 8 };
             noHealth.setEcsComponent(createResourceComponent("tree1"));
             root.addChild(noHealth);
 

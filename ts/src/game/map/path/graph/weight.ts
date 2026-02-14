@@ -1,5 +1,6 @@
 import type { Point } from "../../../../common/point.ts";
 import { BuildingComponentId } from "../../../component/buildingComponent.ts";
+import { GoblinUnitComponentId } from "../../../component/goblinUnitComponent.ts";
 import { PlayerUnitComponentId } from "../../../component/playerUnitComponent.ts";
 import { ResourceComponentId } from "../../../component/resourceComponent.ts";
 import { getTile, TileComponentId } from "../../../component/tileComponent.ts";
@@ -68,6 +69,10 @@ export function getWeightAtPoint(point: Point, scope: Entity): number {
             }
 
             if (entity.hasComponent(PlayerUnitComponentId)) {
+                entityWeight = 100;
+            }
+
+            if (entity.hasComponent(GoblinUnitComponentId)) {
                 entityWeight = 100;
             }
         }

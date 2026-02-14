@@ -21,7 +21,7 @@ export function goblinPrefab(campEntityId?: string): Entity {
     entity.setEcsComponent(createHealthComponent(10, 10));
     entity.setEcsComponent(createBehaviorAgentComponent());
     entity.setEcsComponent(createInventoryComponent());
-    entity.setEcsComponent(createWarmthComponent(80, 1.0)); // Start warm, decay 1/tick
+    entity.setEcsComponent(createWarmthComponent(55, 1.0)); // Start warm, decay 1/tick
 
     if (campEntityId) {
         entity.setEcsComponent(createGoblinUnitComponent(campEntityId));

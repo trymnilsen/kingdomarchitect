@@ -6,6 +6,8 @@ import {
     decreaseWarmth,
     isWarm,
     isCold,
+    COLD_THRESHOLD,
+    DEFAULT_WARMTH,
 } from "../../../src/game/component/warmthComponent.ts";
 
 describe("WarmthComponent", () => {
@@ -13,7 +15,7 @@ describe("WarmthComponent", () => {
         it("creates component with default values", () => {
             const component = createWarmthComponent();
             assert.strictEqual(component.id, "Warmth");
-            assert.strictEqual(component.warmth, 80);
+            assert.strictEqual(component.warmth, DEFAULT_WARMTH);
             assert.strictEqual(component.decayRate, 1.0);
         });
 
@@ -53,35 +55,35 @@ describe("WarmthComponent", () => {
     });
 
     describe("isWarm", () => {
-        it("returns true when warmth >= 70", () => {
-            const component = createWarmthComponent(70);
+        it("returns true when warmth is at the cold threshold", () => {
+            const component = createWarmthComponent(COLD_THRESHOLD);
             assert.strictEqual(isWarm(component), true);
         });
 
-        it("returns true when warmth > 70", () => {
-            const component = createWarmthComponent(80);
+        it("returns true when warmth is above the cold threshold", () => {
+            const component = createWarmthComponent(COLD_THRESHOLD + 10);
             assert.strictEqual(isWarm(component), true);
         });
 
-        it("returns false when warmth < 70", () => {
-            const component = createWarmthComponent(69);
+        it("returns false when warmth is below the cold threshold", () => {
+            const component = createWarmthComponent(COLD_THRESHOLD - 1);
             assert.strictEqual(isWarm(component), false);
         });
     });
 
     describe("isCold", () => {
-        it("returns true when warmth < 70", () => {
-            const component = createWarmthComponent(69);
+        it("returns true when warmth is below the cold threshold", () => {
+            const component = createWarmthComponent(COLD_THRESHOLD - 1);
             assert.strictEqual(isCold(component), true);
         });
 
-        it("returns false when warmth >= 70", () => {
-            const component = createWarmthComponent(70);
+        it("returns false when warmth is at the cold threshold", () => {
+            const component = createWarmthComponent(COLD_THRESHOLD);
             assert.strictEqual(isCold(component), false);
         });
 
-        it("returns false when warmth > 70", () => {
-            const component = createWarmthComponent(80);
+        it("returns false when warmth is above the cold threshold", () => {
+            const component = createWarmthComponent(COLD_THRESHOLD + 10);
             assert.strictEqual(isCold(component), false);
         });
     });

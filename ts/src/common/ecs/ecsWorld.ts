@@ -1,6 +1,6 @@
 import { Entity } from "../../game/entity/entity.ts";
 import {
-    EntityEventType,
+    type EntityEventType,
     type EntityEvent,
 } from "../../game/entity/entityEvent.ts";
 import { DrawMode } from "../../rendering/drawMode.ts";
@@ -8,11 +8,11 @@ import { RenderScope } from "../../rendering/renderScope.ts";
 import type { GameCommand } from "../../server/message/gameCommand.ts";
 import type { GameMessage } from "../../server/message/gameMessage.ts";
 import {
-    EcsEntityEventFunction,
-    EcsInitFunction,
-    EcsRenderFunction,
-    EcsSystem,
-    EcsUpdateFunction,
+    type EcsEntityEventFunction,
+    type EcsInitFunction,
+    type EcsRenderFunction,
+    type EcsSystem,
+    type EcsUpdateFunction,
     type EcsGameMessageFunction,
 } from "./ecsSystem.ts";
 

@@ -14,12 +14,14 @@ export type WarmthComponent = {
 };
 
 export const WarmthComponentId = "Warmth";
+export const COLD_THRESHOLD = 50;
+export const DEFAULT_WARMTH = 55;
 
 /**
  * Create a new warmth component with default values.
  */
 export function createWarmthComponent(
-    initialWarmth: number = 80,
+    initialWarmth: number = DEFAULT_WARMTH,
     decayRate: number = 1.0,
 ): WarmthComponent {
     return {
@@ -52,15 +54,15 @@ export function decreaseWarmth(
 }
 
 /**
- * Check if entity is warm (warmth >= 70).
+ * Check if entity is warm (warmth >= 50).
  */
 export function isWarm(component: WarmthComponent): boolean {
-    return component.warmth >= 70;
+    return component.warmth >= COLD_THRESHOLD;
 }
 
 /**
- * Check if entity is cold (warmth < 70).
+ * Check if entity is cold (warmth < threshold).
  */
 export function isCold(component: WarmthComponent): boolean {
-    return component.warmth < 70;
+    return component.warmth < COLD_THRESHOLD;
 }

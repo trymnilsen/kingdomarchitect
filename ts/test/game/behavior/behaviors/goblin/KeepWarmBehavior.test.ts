@@ -2,7 +2,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert";
 import { createKeepWarmBehavior } from "../../../../../src/game/behavior/behaviors/goblin/keepWarmBehavior.ts";
 import { Entity } from "../../../../../src/game/entity/entity.ts";
-import { createWarmthComponent } from "../../../../../src/game/component/warmthComponent.ts";
+import { createWarmthComponent, COLD_THRESHOLD } from "../../../../../src/game/component/warmthComponent.ts";
 import { createGoblinUnitComponent } from "../../../../../src/game/component/goblinUnitComponent.ts";
 import { createGoblinCampComponent } from "../../../../../src/game/component/goblinCampComponent.ts";
 import { createFireSourceComponent } from "../../../../../src/game/component/fireSourceComponent.ts";
@@ -32,18 +32,18 @@ function createTestFireSource(active: boolean = true): Entity {
 
 describe("KeepWarmBehavior", () => {
     describe("isValid", () => {
-        it("returns true when warmth is below 70", () => {
+        it("returns true when warmth is below the cold threshold", () => {
             const behavior = createKeepWarmBehavior();
-            const goblin = createTestGoblin(69);
+            const goblin = createTestGoblin(COLD_THRESHOLD - 1);
 
             const valid = behavior.isValid(goblin);
 
             assert.strictEqual(valid, true);
         });
 
-        it("returns false when warmth is 70 or above", () => {
+        it("returns false when warmth is at or above the cold threshold", () => {
             const behavior = createKeepWarmBehavior();
-            const goblin = createTestGoblin(70);
+            const goblin = createTestGoblin(COLD_THRESHOLD);
 
             const valid = behavior.isValid(goblin);
 
@@ -72,18 +72,18 @@ describe("KeepWarmBehavior", () => {
     });
 
     describe("utility", () => {
-        it("returns 0 when warmth is 70 or above", () => {
+        it("returns 0 when warmth is at or above the cold threshold", () => {
             const behavior = createKeepWarmBehavior();
-            const goblin = createTestGoblin(70);
+            const goblin = createTestGoblin(COLD_THRESHOLD);
 
             const utility = behavior.utility(goblin);
 
             assert.strictEqual(utility, 0);
         });
 
-        it("returns approximately 60 when warmth is just below 70", () => {
+        it("returns approximately 60 when warmth is just below the cold threshold", () => {
             const behavior = createKeepWarmBehavior();
-            const goblin = createTestGoblin(69);
+            const goblin = createTestGoblin(COLD_THRESHOLD - 1);
 
             const utility = behavior.utility(goblin);
 

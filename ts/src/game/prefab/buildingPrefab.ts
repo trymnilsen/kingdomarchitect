@@ -33,6 +33,33 @@ export function buildingPrefab(
         createHealthComponent(startScaffolded ? 10 : 100, 100),
     );
     entity.setEcsComponent(createVisibilityComponent());
+
+    if (startScaffolded) {
+        // Scaffolded buildings only get an inventory to hold construction materials
+        if (building.requirements?.materials) {
+            entity.setEcsComponent(createInventoryComponent());
+        }
+    } else {
+        applyFunctionalComponents(entity, building);
+    }
+
+    entity.setEcsComponent(
+        createSpriteComponent(
+            startScaffolded ? spriteRefs.wooden_house_scaffold : building.icon,
+            { x: 0, y: 0 },
+        ),
+    );
+    return entity;
+}
+
+/**
+ * Attaches the functional ECS components for a completed building.
+ * Called both when creating a non-scaffolded building and when construction finishes.
+ */
+export function applyFunctionalComponents(
+    entity: Entity,
+    building: Building,
+): void {
     if (building.id == woodenHouse.id) {
         entity.setEcsComponent(createHousingComponent());
     }
@@ -46,34 +73,19 @@ export function buildingPrefab(
         entity.setEcsComponent(createInventoryComponent());
         entity.setEcsComponent(createWorkplaceComponent());
     }
-    // Stockpiles get inventory for storing settlement resources
     if (building.id == stockPile.id) {
         entity.setEcsComponent(createInventoryComponent());
         entity.setEcsComponent(createStockpileComponent());
     }
-    // Forrester is a production building that spawns trees
     if (building.id == forrester.id) {
         entity.setEcsComponent(
             createProductionComponent("forrester_production"),
         );
     }
-    // Goblin campfire provides warmth
     if (building.id == goblinCampfire.id) {
         entity.setEcsComponent(createFireSourceComponent(15, 2, 1));
     }
-    // Goblin hut provides housing for goblins
     if (building.id == goblinHut.id) {
         entity.setEcsComponent(createHousingComponent());
     }
-    // Scaffolded buildings get inventory for storing construction materials
-    if (startScaffolded && building.requirements?.materials) {
-        entity.setEcsComponent(createInventoryComponent());
-    }
-    entity.setEcsComponent(
-        createSpriteComponent(
-            startScaffolded ? spriteRefs.wooden_house_scaffold : building.icon,
-            { x: 0, y: 0 },
-        ),
-    );
-    return entity;
 }

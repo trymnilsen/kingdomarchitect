@@ -8,6 +8,8 @@ import {
 } from "../component/warmthComponent.ts";
 import { FireSourceComponentId } from "../component/fireSourceComponent.ts";
 
+export const WARMTH_DECAY_TICK_INTERVAL = 10;
+
 /**
  * Check if two points are within 1 tile of each other (8-directional adjacency).
  * Uses chebyshev distance (max of abs differences).
@@ -24,7 +26,7 @@ function isWithinOneTile(a: Point, b: Point): boolean {
  * - Entities adjacent to active fire sources (8 tiles) receive passive warmth
  */
 export const warmthSystem: EcsSystem = {
-    onUpdate: (root: Entity, _tick: number) => {
+    onUpdate: (root: Entity, tick: number) => {
         const entitiesWithWarmth = root.queryComponents(WarmthComponentId);
         const fireSources = root.queryComponents(FireSourceComponentId);
 
@@ -44,8 +46,11 @@ export const warmthSystem: EcsSystem = {
         }
 
         for (const [entity, warmthComponent] of entitiesWithWarmth) {
+            const currentWarmth = warmthComponent.warmth;
             // Apply decay
-            decreaseWarmth(warmthComponent, warmthComponent.decayRate);
+            if (tick % WARMTH_DECAY_TICK_INTERVAL == 0) {
+                decreaseWarmth(warmthComponent, warmthComponent.decayRate);
+            }
 
             // Check for passive warming from adjacent fires (8 tiles)
             for (const fire of activeFirePositions) {
@@ -54,8 +59,25 @@ export const warmthSystem: EcsSystem = {
                     break; // Only one fire bonus per tick
                 }
             }
+            if (warmthComponent.warmth !== currentWarmth) {
+                entity.invalidateComponent(WarmthComponentId);
 
-            entity.invalidateComponent(WarmthComponentId);
+                // Log threshold crossings between warm and cold states
+                const coldThreshold = 50;
+                const wasCold = currentWarmth < coldThreshold;
+                const isColdNow = warmthComponent.warmth < coldThreshold;
+                if (wasCold !== isColdNow) {
+                    if (isColdNow) {
+                        console.log(
+                            `[WarmthSystem] Entity ${entity.id} became cold (warmth: ${currentWarmth.toFixed(1)} -> ${warmthComponent.warmth.toFixed(1)})`,
+                        );
+                    } else {
+                        console.log(
+                            `[WarmthSystem] Entity ${entity.id} warmed up (warmth: ${currentWarmth.toFixed(1)} -> ${warmthComponent.warmth.toFixed(1)})`,
+                        );
+                    }
+                }
+            }
         }
     },
 };

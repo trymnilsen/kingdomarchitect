@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
-import { warmthSystem } from "../../../src/game/system/warmthSystem.ts";
+import { warmthSystem, WARMTH_DECAY_TICK_INTERVAL } from "../../../src/game/system/warmthSystem.ts";
 import { Entity } from "../../../src/game/entity/entity.ts";
 import { createWarmthComponent, WarmthComponentId } from "../../../src/game/component/warmthComponent.ts";
 import { createFireSourceComponent } from "../../../src/game/component/fireSourceComponent.ts";
@@ -41,7 +41,7 @@ describe("warmthSystem", () => {
             const entity = createTestEntityWithWarmth("entity-1", 80, 1);
             root.addChild(entity);
 
-            warmthSystem.onUpdate!(root, 1);
+            warmthSystem.onUpdate!(root, WARMTH_DECAY_TICK_INTERVAL);
 
             const warmth = entity.getEcsComponent("Warmth");
             assert.ok(warmth);
@@ -53,7 +53,7 @@ describe("warmthSystem", () => {
             const entity = createTestEntityWithWarmth("entity-1", 80, 3);
             root.addChild(entity);
 
-            warmthSystem.onUpdate!(root, 1);
+            warmthSystem.onUpdate!(root, WARMTH_DECAY_TICK_INTERVAL);
 
             const warmth = entity.getEcsComponent("Warmth");
             assert.ok(warmth);
@@ -65,7 +65,7 @@ describe("warmthSystem", () => {
             const entity = createTestEntityWithWarmth("entity-1", 2, 5);
             root.addChild(entity);
 
-            warmthSystem.onUpdate!(root, 1);
+            warmthSystem.onUpdate!(root, WARMTH_DECAY_TICK_INTERVAL);
 
             const warmth = entity.getEcsComponent("Warmth");
             assert.ok(warmth);
@@ -82,7 +82,7 @@ describe("warmthSystem", () => {
             root.addChild(entity);
             root.addChild(fire);
 
-            warmthSystem.onUpdate!(root, 1);
+            warmthSystem.onUpdate!(root, WARMTH_DECAY_TICK_INTERVAL);
 
             const warmth = entity.getEcsComponent("Warmth");
             assert.ok(warmth);
@@ -98,7 +98,7 @@ describe("warmthSystem", () => {
             root.addChild(entity);
             root.addChild(fire);
 
-            warmthSystem.onUpdate!(root, 1);
+            warmthSystem.onUpdate!(root, WARMTH_DECAY_TICK_INTERVAL);
 
             const warmth = entity.getEcsComponent("Warmth");
             assert.ok(warmth);
@@ -114,7 +114,7 @@ describe("warmthSystem", () => {
             root.addChild(entity);
             root.addChild(fire);
 
-            warmthSystem.onUpdate!(root, 1);
+            warmthSystem.onUpdate!(root, WARMTH_DECAY_TICK_INTERVAL);
 
             const warmth = entity.getEcsComponent("Warmth");
             assert.ok(warmth);
@@ -130,7 +130,7 @@ describe("warmthSystem", () => {
             root.addChild(entity);
             root.addChild(fire);
 
-            warmthSystem.onUpdate!(root, 1);
+            warmthSystem.onUpdate!(root, WARMTH_DECAY_TICK_INTERVAL);
 
             const warmth = entity.getEcsComponent("Warmth");
             assert.ok(warmth);
@@ -148,7 +148,7 @@ describe("warmthSystem", () => {
             root.addChild(fire1);
             root.addChild(fire2);
 
-            warmthSystem.onUpdate!(root, 1);
+            warmthSystem.onUpdate!(root, WARMTH_DECAY_TICK_INTERVAL);
 
             const warmth = entity.getEcsComponent("Warmth");
             assert.ok(warmth);
@@ -164,7 +164,7 @@ describe("warmthSystem", () => {
             root.addChild(entity);
             root.addChild(fire);
 
-            warmthSystem.onUpdate!(root, 1);
+            warmthSystem.onUpdate!(root, WARMTH_DECAY_TICK_INTERVAL);
 
             const warmth = entity.getEcsComponent("Warmth");
             assert.ok(warmth);
@@ -182,7 +182,7 @@ describe("warmthSystem", () => {
             root.addChild(entity1);
             root.addChild(entity2);
 
-            warmthSystem.onUpdate!(root, 1);
+            warmthSystem.onUpdate!(root, WARMTH_DECAY_TICK_INTERVAL);
 
             const warmth1 = entity1.getEcsComponent("Warmth");
             const warmth2 = entity2.getEcsComponent("Warmth");
@@ -203,7 +203,7 @@ describe("warmthSystem", () => {
             const entity = createTestEntityWithWarmth("entity-1", 80, 1);
             root.addChild(entity);
 
-            warmthSystem.onUpdate!(root, 1);
+            warmthSystem.onUpdate!(root, WARMTH_DECAY_TICK_INTERVAL);
 
             assert.strictEqual(
                 tracker.wasInvalidated("entity-1", WarmthComponentId),
@@ -222,7 +222,7 @@ describe("warmthSystem", () => {
             root.addChild(entity);
             root.addChild(fire);
 
-            warmthSystem.onUpdate!(root, 1);
+            warmthSystem.onUpdate!(root, WARMTH_DECAY_TICK_INTERVAL);
 
             assert.strictEqual(
                 tracker.wasInvalidated("entity-1", WarmthComponentId),
@@ -241,7 +241,7 @@ describe("warmthSystem", () => {
             root.addChild(entity1);
             root.addChild(entity2);
 
-            warmthSystem.onUpdate!(root, 1);
+            warmthSystem.onUpdate!(root, WARMTH_DECAY_TICK_INTERVAL);
 
             assert.strictEqual(
                 tracker.wasInvalidated("entity-1", WarmthComponentId),

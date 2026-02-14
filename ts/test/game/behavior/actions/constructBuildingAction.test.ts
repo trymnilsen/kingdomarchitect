@@ -25,8 +25,8 @@ function createTestScene(): {
     const worker = new Entity("worker");
     const building = new Entity("building");
 
-    worker.worldPosition = { x: 0, y: 0 };
-    building.worldPosition = { x: 1, y: 0 }; // Adjacent
+    worker.worldPosition = { x: 10, y: 8 };
+    building.worldPosition = { x: 11, y: 8 }; // Adjacent
 
     building.setEcsComponent(createBuildingComponent(woodenHouse, true));
     building.setEcsComponent(createHealthComponent(10, 100));
@@ -105,7 +105,7 @@ describe("constructBuildingAction", () => {
 
     it("fails if worker not adjacent to building", () => {
         const { worker, building } = createTestScene();
-        building.worldPosition = { x: 10, y: 10 }; // Not adjacent
+        building.worldPosition = { x: 25, y: 25 }; // Not adjacent
 
         const action = {
             type: "constructBuilding" as const,
@@ -120,7 +120,7 @@ describe("constructBuildingAction", () => {
     it("throws if building has no BuildingComponent", () => {
         const { root, worker } = createTestScene();
         const noBuildingComp = new Entity("noBuildingComp");
-        noBuildingComp.worldPosition = { x: 1, y: 0 };
+        noBuildingComp.worldPosition = { x: 11, y: 8 };
         noBuildingComp.setEcsComponent(createHealthComponent(10, 100));
         root.addChild(noBuildingComp);
 
@@ -137,7 +137,7 @@ describe("constructBuildingAction", () => {
     it("throws if building has no HealthComponent", () => {
         const { root, worker } = createTestScene();
         const noHealthComp = new Entity("noHealthComp");
-        noHealthComp.worldPosition = { x: 1, y: 0 };
+        noHealthComp.worldPosition = { x: 11, y: 8 };
         noHealthComp.setEcsComponent(
             createBuildingComponent(woodenHouse, true),
         );

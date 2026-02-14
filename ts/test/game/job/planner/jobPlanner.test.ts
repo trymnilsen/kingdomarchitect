@@ -15,7 +15,7 @@ function createTestScene(): { root: Entity; worker: Entity } {
     const root = new Entity("root");
     const worker = new Entity("worker");
 
-    worker.worldPosition = { x: 0, y: 0 };
+    worker.worldPosition = { x: 10, y: 8 };
     worker.setEcsComponent(createInventoryComponent());
 
     root.setEcsComponent(createJobQueueComponent());
@@ -28,7 +28,7 @@ describe("jobPlanner", () => {
     it("dispatches collectResource jobs to collectResourcePlanner", () => {
         const { root, worker } = createTestScene();
         const resource = new Entity("resource");
-        resource.worldPosition = { x: 5, y: 5 };
+        resource.worldPosition = { x: 15, y: 13 };
         root.addChild(resource);
 
         const job = CollectResourceJob(resource, ResourceHarvestMode.Chop);
@@ -42,7 +42,7 @@ describe("jobPlanner", () => {
     it("dispatches productionJob jobs to productionPlanner", () => {
         const { root, worker } = createTestScene();
         const building = new Entity("building");
-        building.worldPosition = { x: 5, y: 5 };
+        building.worldPosition = { x: 15, y: 13 };
         root.addChild(building);
 
         const job = createProductionJob("building");
@@ -56,7 +56,7 @@ describe("jobPlanner", () => {
     it("dispatches collectItem jobs to collectItemPlanner", () => {
         const { root, worker } = createTestScene();
         const chest = new Entity("chest");
-        chest.worldPosition = { x: 5, y: 5 };
+        chest.worldPosition = { x: 15, y: 13 };
         root.addChild(chest);
 
         const job = CollectItemJob(chest);
@@ -70,7 +70,7 @@ describe("jobPlanner", () => {
     it("dispatches attackJob jobs to attackPlanner", () => {
         const { root, worker } = createTestScene();
         const target = new Entity("target");
-        target.worldPosition = { x: 5, y: 5 };
+        target.worldPosition = { x: 15, y: 13 };
         root.addChild(target);
 
         const job = AttackJob("worker", "target");

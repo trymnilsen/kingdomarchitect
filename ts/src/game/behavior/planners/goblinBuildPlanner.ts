@@ -86,11 +86,8 @@ function planPlaceBuildingSite(
 
     // Create scaffolded building entity
     const buildingEntity = buildingPrefab(building, true);
-    buildingEntity.position = {
-        x: buildPosition.x - campEntity.worldPosition.x,
-        y: buildPosition.y - campEntity.worldPosition.y,
-    };
     campEntity.addChild(buildingEntity);
+    buildingEntity.worldPosition = buildPosition;
 
     console.log(
         `[GoblinBuildPlanner] Placed scaffolded ${building.name} at ${buildPosition.x}, ${buildPosition.y}`,
@@ -129,6 +126,9 @@ function planConstructExistingBuilding(
 
     // State 1: Building ready to construct (all materials deposited)
     if (Object.keys(remainingMaterials).length === 0) {
+        console.log(
+            `[GoblinBuildPlanner] Goblin ${goblin.id} state=construct building ${buildingEntity.id}`,
+        );
         return [
             {
                 type: "moveTo",
@@ -149,6 +149,10 @@ function planConstructExistingBuilding(
             ([itemId, amount]) => ({ itemId, amount }),
         );
 
+        console.log(
+            `[GoblinBuildPlanner] Goblin ${goblin.id} state=deposit materials to building ${buildingEntity.id}:`,
+            materialsGoblinHas,
+        );
         return [
             {
                 type: "moveTo",
@@ -174,6 +178,10 @@ function planConstructExistingBuilding(
             remainingMaterials,
         );
         if (itemsToTake.length > 0) {
+            console.log(
+                `[GoblinBuildPlanner] Goblin ${goblin.id} state=fetch from stockpile ${stockpileWithMaterials.id}:`,
+                itemsToTake,
+            );
             return [
                 {
                     type: "moveTo",
@@ -190,6 +198,10 @@ function planConstructExistingBuilding(
     }
 
     // State 4: Gather materials from environment
+    console.log(
+        `[GoblinBuildPlanner] Goblin ${goblin.id} state=gather materials from environment:`,
+        remainingMaterials,
+    );
     return planGatherMaterials(root, goblin, remainingMaterials);
 }
 

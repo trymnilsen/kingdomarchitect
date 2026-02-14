@@ -9,9 +9,11 @@ window.debugChunks = true;
 async function bootstrap() {
     console.log("Bootstrapping!");
 
-    const params = new URLSearchParams(window.location.search);
-    if (params.has("clearGame")) {
-        console.log("clearGame parameter detected, clearing saved game state...");
+    const params = new URLSearchParams(window.location.search.toLowerCase());
+    if (params.has("cleargame")) {
+        console.log(
+            "clearGame parameter detected, clearing saved game state...",
+        );
         await clearGameDatabase();
     }
 

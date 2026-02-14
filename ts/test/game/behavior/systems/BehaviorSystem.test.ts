@@ -36,7 +36,7 @@ function createTestScene(): { root: Entity; worker: Entity } {
     const root = new Entity("root");
     const worker = new Entity("worker");
 
-    worker.worldPosition = { x: 0, y: 0 };
+    worker.worldPosition = { x: 10, y: 8 };
     worker.setEcsComponent(createBehaviorAgentComponent());
 
     root.setEcsComponent(createJobQueueComponent());

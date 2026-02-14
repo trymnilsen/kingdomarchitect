@@ -71,8 +71,8 @@ export class InvalidationTracker {
  */
 export function createTestEntity(
     id: string = "test-entity",
-    x: number = 0,
-    y: number = 0,
+    x: number = 10,
+    y: number = 8,
 ): Entity {
     const entity = new Entity(id);
     entity.worldPosition = { x, y };
@@ -84,8 +84,8 @@ export function createTestEntity(
  */
 export function createBehaviorTestEntity(
     id: string = "test-entity",
-    x: number = 0,
-    y: number = 0,
+    x: number = 10,
+    y: number = 8,
 ): Entity {
     const entity = createTestEntity(id, x, y);
     entity.setEcsComponent(createBehaviorAgentComponent());

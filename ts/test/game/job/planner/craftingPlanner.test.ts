@@ -16,8 +16,8 @@ function createTestScene(): { root: Entity; worker: Entity; building: Entity } {
     const worker = new Entity("worker");
     const building = new Entity("building");
 
-    worker.worldPosition = { x: 0, y: 0 };
-    building.worldPosition = { x: 5, y: 5 };
+    worker.worldPosition = { x: 10, y: 8 };
+    building.worldPosition = { x: 15, y: 13 };
 
     worker.setEcsComponent(createInventoryComponent());
     building.setEcsComponent(createInventoryComponent());
@@ -113,7 +113,7 @@ describe("craftingPlanner", () => {
         it("returns empty array if worker has no inventory", () => {
             const { root, building } = createTestScene();
             const workerNoInv = new Entity("workerNoInv");
-            workerNoInv.worldPosition = { x: 0, y: 0 };
+            workerNoInv.worldPosition = { x: 10, y: 8 };
             root.addChild(workerNoInv);
 
             const job = createCraftingJob("building", planksRecipe);
