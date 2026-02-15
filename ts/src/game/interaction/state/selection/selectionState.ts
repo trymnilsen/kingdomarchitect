@@ -47,6 +47,8 @@ import { getResourceById } from "../../../../data/inventory/items/naturalResourc
 import { RoleComponentId } from "../../../component/worker/roleComponent.ts";
 import { getRoleDefinition } from "../../../../data/role/roleDefinitions.ts";
 import { bins } from "../../../../../generated/sprites.ts";
+import { BehaviorAgentComponentId } from "../../../component/BehaviorAgentComponent.ts";
+import { GoblinUnitComponentId } from "../../../component/goblinUnitComponent.ts";
 
 export class SelectionState extends InteractionState {
     private providers: ActorSelectionProvider[] = [
@@ -194,9 +196,25 @@ export class SelectionState extends InteractionState {
                 name = roleDefinition.name;
             }
 
+            if (this.selection.entity.hasComponent(GoblinUnitComponentId)) {
+                name = "Goblin";
+            }
+
+
+            const behaviorAgent =
+                this.selection.entity.getEcsComponent(BehaviorAgentComponentId);
+            let subtitle = "selected";
+            if (behaviorAgent) {
+                const behaviorName = behaviorAgent.currentBehaviorName ?? "idle";
+                const actionType = behaviorAgent.actionQueue[0]?.type;
+                subtitle = actionType
+                    ? `${behaviorName} - ${actionType}`
+                    : behaviorName;
+            }
+
             return {
                 icon: icon,
-                subtitle: "selected",
+                subtitle,
                 title: name,
             };
         } else {

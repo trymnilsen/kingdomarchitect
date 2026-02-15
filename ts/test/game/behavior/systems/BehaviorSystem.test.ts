@@ -57,6 +57,7 @@ describe("BehaviorSystem", () => {
                 { type: "wait", until: 100 },
             ];
             agent.currentBehaviorName = "test";
+            agent.shouldReplan = false;
 
             const system = createBehaviorSystem([]);
             system.onUpdate!(root, 1);
@@ -77,6 +78,7 @@ describe("BehaviorSystem", () => {
                 { type: "wait", until: 0 },
             ];
             agent.currentBehaviorName = "test";
+            agent.shouldReplan = false;
 
             const system = createBehaviorSystem([]);
 
@@ -96,6 +98,7 @@ describe("BehaviorSystem", () => {
             // Queue a wait action that hasn't completed yet
             agent.actionQueue = [{ type: "wait", until: 100 }];
             agent.currentBehaviorName = "test";
+            agent.shouldReplan = false;
 
             const system = createBehaviorSystem([]);
             system.onUpdate!(root, 1);
@@ -116,6 +119,7 @@ describe("BehaviorSystem", () => {
                 { type: "wait", until: 100 },
             ];
             agent.currentBehaviorName = "test";
+            agent.shouldReplan = false;
 
             const system = createBehaviorSystem([]);
             system.onUpdate!(root, 1);
@@ -132,6 +136,7 @@ describe("BehaviorSystem", () => {
                 { type: "collectItems", entityId: "nonexistent" },
             ];
             agent.currentBehaviorName = "testBehavior";
+            agent.shouldReplan = false;
 
             const system = createBehaviorSystem([]);
             system.onUpdate!(root, 1);
@@ -139,7 +144,7 @@ describe("BehaviorSystem", () => {
             assert.strictEqual(agent.currentBehaviorName, null);
         });
 
-        it("sets shouldReplan on failure", () => {
+        it("triggers replan on failure", () => {
             const { root, worker } = createTestScene();
             const agent = worker.getEcsComponent(BehaviorAgentComponentId)!;
 
@@ -152,7 +157,8 @@ describe("BehaviorSystem", () => {
             const system = createBehaviorSystem([]);
             system.onUpdate!(root, 1);
 
-            assert.strictEqual(agent.shouldReplan, true);
+            // Failure causes immediate replan same-tick; with no behaviors, currentBehaviorName is cleared
+            assert.strictEqual(agent.currentBehaviorName, null);
         });
 
         it("unclaims job on action failure", () => {
@@ -169,6 +175,7 @@ describe("BehaviorSystem", () => {
                 { type: "collectItems", entityId: "nonexistent" },
             ];
             agent.currentBehaviorName = "test";
+            agent.shouldReplan = false;
 
             const system = createBehaviorSystem([]);
             system.onUpdate!(root, 1);
@@ -215,22 +222,6 @@ describe("BehaviorSystem", () => {
 
             assert.strictEqual(agent.currentBehaviorName, "testBehavior");
             assert.strictEqual(agent.actionQueue.length, 1);
-        });
-
-        it("replans when no current behavior", () => {
-            const { root, worker } = createTestScene();
-            const agent = worker.getEcsComponent(BehaviorAgentComponentId)!;
-
-            const behavior = createMockBehavior("newBehavior", {
-                actions: [{ type: "wait", until: 100 }],
-            });
-
-            agent.currentBehaviorName = null;
-
-            const system = createBehaviorSystem([behavior]);
-            system.onUpdate!(root, 1);
-
-            assert.strictEqual(agent.currentBehaviorName, "newBehavior");
         });
 
         it("replans after queue empties from completed actions", () => {
@@ -353,6 +344,7 @@ describe("BehaviorSystem", () => {
             // Set current behavior with actions in queue
             agent.currentBehaviorName = "current";
             agent.actionQueue = [{ type: "wait", until: 100 }];
+            agent.shouldReplan = false;
 
             const system = createBehaviorSystem([currentBehavior, slightlyBetter]);
             system.onUpdate!(root, 1);
@@ -424,6 +416,7 @@ describe("BehaviorSystem", () => {
                 { type: "harvestResource", entityId: "nonexistent", harvestAction: 0 },
             ];
             agent.currentBehaviorName = "test";
+            agent.shouldReplan = false;
 
             const system = createBehaviorSystem([]);
 

@@ -9,6 +9,20 @@ import { createBuildingComponent } from "../../../src/game/component/buildingCom
 import { createHousingComponent, HousingComponentId } from "../../../src/game/component/housingComponent.ts";
 import { goblinHut } from "../../../src/data/building/goblin/goblinHut.ts";
 import { InvalidationTracker } from "../behavior/behaviorTestHelpers.ts";
+import { createTileComponent, setChunk } from "../../../src/game/component/tileComponent.ts";
+import { createChunkMapComponent } from "../../../src/game/component/chunkMapComponent.ts";
+
+/**
+ * Adds TileComponent and ChunkMapComponent to root so that
+ * findClosestAvailablePosition can resolve weight queries during spawning.
+ * Registers chunk (0,0) which covers world positions (0-7, 0-7).
+ */
+function setupWorldComponents(root: Entity): void {
+    const tileComponent = createTileComponent();
+    setChunk(tileComponent, { chunkX: 0, chunkY: 0 });
+    root.setEcsComponent(tileComponent);
+    root.setEcsComponent(createChunkMapComponent());
+}
 
 function createTestCamp(id: string = "camp-1", maxPopulation: number = 5): Entity {
     const camp = new Entity(id);
@@ -151,6 +165,7 @@ describe("goblinSpawnSystem", () => {
     describe("spawning behavior", () => {
         it("spawns goblin when all conditions met", () => {
             const root = new Entity("root");
+            setupWorldComponents(root);
             const camp = createTestCamp("camp-1", 5);
             const fire = createTestFire(true);
             const hut = createTestHut(false, null);
@@ -169,6 +184,7 @@ describe("goblinSpawnSystem", () => {
 
         it("assigns housing to spawned goblin", () => {
             const root = new Entity("root");
+            setupWorldComponents(root);
             const camp = createTestCamp("camp-1", 5);
             const fire = createTestFire(true);
             const hut = createTestHut(false, null);
@@ -186,6 +202,7 @@ describe("goblinSpawnSystem", () => {
 
         it("spawns only one goblin per tick per hut", () => {
             const root = new Entity("root");
+            setupWorldComponents(root);
             const camp = createTestCamp("camp-1", 5);
             const fire = createTestFire(true);
             const hut = createTestHut(false, null);
@@ -206,6 +223,7 @@ describe("goblinSpawnSystem", () => {
 
         it("spawns multiple goblins when multiple huts available", () => {
             const root = new Entity("root");
+            setupWorldComponents(root);
             const camp = createTestCamp("camp-1", 5);
             const fire = createTestFire(true);
             const hut1 = new Entity("hut-1");
@@ -234,6 +252,7 @@ describe("goblinSpawnSystem", () => {
     describe("multiple camps", () => {
         it("processes each camp independently", () => {
             const root = new Entity("root");
+            setupWorldComponents(root);
             const camp1 = createTestCamp("camp-1", 5);
             const fire1 = new Entity("fire-1");
             const fire1Component = createFireSourceComponent(15, 2, 1);
@@ -272,6 +291,7 @@ describe("goblinSpawnSystem", () => {
     describe("component invalidation", () => {
         it("invalidates HousingComponent when goblin spawns", () => {
             const root = new Entity("root");
+            setupWorldComponents(root);
             const tracker = new InvalidationTracker();
             tracker.attach(root);
 

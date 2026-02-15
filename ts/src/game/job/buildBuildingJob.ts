@@ -196,9 +196,10 @@ export function finishConstruction(
     const spriteComponent = buildingEntity.getEcsComponent(SpriteComponentId);
     buildingComponent.scaffolded = false;
 
-    // Calculate building quality from deposited materials
+    // Calculate building quality from deposited materials.
+    // Buildings with no material requirements have no scaffold inventory.
     const buildingInventory =
-        buildingEntity.requireEcsComponent(InventoryComponentId);
+        buildingEntity.getEcsComponent(InventoryComponentId) ?? null;
     const quality = calculateBuildingQuality(buildingInventory);
     buildingComponent.quality = quality;
 

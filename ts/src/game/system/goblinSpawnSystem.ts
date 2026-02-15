@@ -13,6 +13,7 @@ import { FireSourceComponentId } from "../component/fireSourceComponent.ts";
 import { BuildingComponentId } from "../component/buildingComponent.ts";
 import { goblinHut } from "../../data/building/goblin/goblinHut.ts";
 import { goblinPrefab } from "../prefab/goblinPrefab.ts";
+import { findClosestAvailablePosition } from "../map/query/closestPositionQuery.ts";
 
 /**
  * System that spawns goblins when camp has available housing.
@@ -66,9 +67,6 @@ function processGoblinCamp(
     const newGoblin = goblinPrefab();
     newGoblin.setEcsComponent(createGoblinUnitComponent(campEntity.id));
 
-    // Position goblin at the hut
-    newGoblin.position = { ...availableHut.position };
-
     // Assign housing
     const housing = availableHut.getEcsComponent(HousingComponentId);
     if (housing) {
@@ -76,7 +74,16 @@ function processGoblinCamp(
         availableHut.invalidateComponent(HousingComponentId);
     }
 
+    const spawnPosition = findClosestAvailablePosition(
+        root,
+        availableHut.worldPosition,
+    );
+    if (!spawnPosition) {
+        return;
+    }
+
     campEntity.addChild(newGoblin);
+    newGoblin.worldPosition = spawnPosition;
 
     console.log(
         `[GoblinSpawnSystem] Spawned goblin ${newGoblin.id} at camp ${campEntity.id}`,

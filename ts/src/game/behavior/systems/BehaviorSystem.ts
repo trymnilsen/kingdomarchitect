@@ -33,20 +33,6 @@ function updateBehaviorAgent(
     behaviors: Behavior[],
     tick: number,
 ): void {
-    // Check if we need to replan
-    if (shouldReplan(agent)) {
-        const reason = agent.shouldReplan
-            ? "explicit"
-            : !agent.currentBehaviorName
-              ? "no behavior"
-              : "empty queue";
-        console.log(
-            `[BehaviorSystem] Entity ${entity.id} replanning (reason: ${reason})`,
-        );
-        replan(entity, agent, behaviors);
-        agent.shouldReplan = false;
-    }
-
     // Execute the current action in the queue
     if (agent.actionQueue.length > 0) {
         const action = agent.actionQueue[0];
@@ -66,25 +52,30 @@ function updateBehaviorAgent(
             console.log(
                 `[BehaviorSystem] Entity ${entity.id} completed action "${action.type}"`,
             );
-            // Remove completed action and continue
             agent.actionQueue.shift();
+            // When the last action finishes, replan to find next work
+            if (agent.actionQueue.length === 0) {
+                agent.shouldReplan = true;
+            }
         } else if (status === "failed") {
-            // Action failed, clean up any claimed jobs and replan
             console.warn(
                 `[BehaviorSystem] Action failed for entity ${entity.id}, cleaning up and replanning`,
             );
             unclaimCurrentJob(entity);
             agent.actionQueue = [];
-            agent.currentBehaviorName = null;
             agent.shouldReplan = true;
         }
         // status === "running" - keep action in queue, it will run again next tick
     }
 
-    // If action queue is empty, select a new behavior
-    if (agent.actionQueue.length === 0) {
+    // Replan after action execution so same-tick completion triggers same-tick replan
+    if (agent.shouldReplan) {
+        console.log(`[BehaviorSystem] Entity ${entity.id} replanning`);
         replan(entity, agent, behaviors);
+        agent.shouldReplan = false;
     }
+
+    entity.invalidateComponent(BehaviorAgentComponentId);
 }
 
 /**
@@ -111,27 +102,6 @@ function unclaimCurrentJob(entity: Entity): void {
     }
 }
 
-/**
- * Determine if the agent should replan.
- */
-function shouldReplan(agent: BehaviorAgentComponent): boolean {
-    // Replan if explicitly requested
-    if (agent.shouldReplan) {
-        return true;
-    }
-
-    // Replan if no current behavior
-    if (!agent.currentBehaviorName) {
-        return true;
-    }
-
-    // Replan if action queue is empty
-    if (agent.actionQueue.length === 0) {
-        return true;
-    }
-
-    return false;
-}
 
 /**
  * Select and activate a new behavior for the agent.
@@ -147,12 +117,6 @@ function replan(
     );
 
     if (validBehaviors.length === 0) {
-        // No valid behaviors - enter idle state
-        if (agent.currentBehaviorName !== null) {
-            console.log(
-                `[BehaviorSystem] Entity ${entity.id} entering idle (no valid behaviors)`,
-            );
-        }
         agent.currentBehaviorName = null;
         agent.actionQueue = [];
         return;
@@ -186,16 +150,19 @@ function replan(
     ) {
         // Switch to the new behavior
         agent.currentBehaviorName = bestBehavior.behavior.name;
-        agent.actionQueue = bestBehavior.behavior.expand(entity);
-
+        const newActions = bestBehavior.behavior.expand(entity);
+        agent.actionQueue = newActions;
         console.log(
             `[BehaviorSystem] Entity ${entity.id} selected behavior ${bestBehavior.behavior.name} with utility ${bestBehavior.utility}`,
+            newActions,
         );
     } else if (agent.actionQueue.length === 0 && currentBehavior) {
         // Current behavior is still best, but queue is empty - re-expand
+        const newActions = currentBehavior.expand(entity);
+        agent.actionQueue = newActions;
         console.log(
             `[BehaviorSystem] Entity ${entity.id} re-expanding behavior "${currentBehavior.name}"`,
+            newActions,
         );
-        agent.actionQueue = currentBehavior.expand(entity);
     }
 }

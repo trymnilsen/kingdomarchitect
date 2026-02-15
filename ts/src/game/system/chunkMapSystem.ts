@@ -6,11 +6,20 @@ import {
     ChunkMapComponentId,
     type ChunkMap,
 } from "../component/chunkMapComponent.ts";
+import { SpriteComponentId } from "../component/spriteComponent.ts";
 import type { Entity } from "../entity/entity.ts";
 import type {
     EntityChildrenUpdatedEvent,
     EntityTransformEvent,
 } from "../entity/entityEvent.ts";
+
+/**
+ * Only entities with a sprite have a physical presence in the world
+ * and should be spatially indexed.
+ */
+function hasSpatialPresence(entity: Entity): boolean {
+    return entity.hasComponent(SpriteComponentId);
+}
 
 /**
  * System responsible for maintaining a spatial index (ChunkMap) of all entities.
@@ -50,19 +59,21 @@ function onTransform(rootEntity: Entity, entityEvent: EntityTransformEvent) {
  * Recursively checks and updates chunk assignments for an entity branch.
  */
 function updateEntityHierarchyInMap(chunkMap: ChunkMap, entity: Entity) {
-    const currentChunkKey = chunkMap.entityChunkMap.get(entity.id);
-    const chunkX = Math.floor(entity.worldPosition.x / ChunkSize);
-    const chunkY = Math.floor(entity.worldPosition.y / ChunkSize);
-    const newChunkKey = encodePosition(chunkX, chunkY);
+    if (hasSpatialPresence(entity)) {
+        const currentChunkKey = chunkMap.entityChunkMap.get(entity.id);
+        const chunkX = Math.floor(entity.worldPosition.x / ChunkSize);
+        const chunkY = Math.floor(entity.worldPosition.y / ChunkSize);
+        const newChunkKey = encodePosition(chunkX, chunkY);
 
-    // Boundary check optimization: only modify the map if the entity moved to a new chunk
-    if (currentChunkKey !== newChunkKey) {
-        if (currentChunkKey !== undefined) {
-            chunkMap.chunks.get(currentChunkKey)?.delete(entity);
+        // Boundary check optimization: only modify the map if the entity moved to a new chunk
+        if (currentChunkKey !== newChunkKey) {
+            if (currentChunkKey !== undefined) {
+                chunkMap.chunks.get(currentChunkKey)?.delete(entity);
+            }
+
+            chunkMap.entityChunkMap.set(entity.id, newChunkKey);
+            getOrCreateChunk(chunkMap, newChunkKey).add(entity);
         }
-
-        chunkMap.entityChunkMap.set(entity.id, newChunkKey);
-        getOrCreateChunk(chunkMap, newChunkKey).add(entity);
     }
 
     for (const child of entity.children) {
@@ -88,12 +99,14 @@ function onEntityAdded(
  * Adds an entity to the chunkmap, potentially doing it for all its children too
  */
 function addToChunkmap(chunkMap: ChunkMap, entity: Entity) {
-    const chunkX = Math.floor(entity.worldPosition.x / ChunkSize);
-    const chunkY = Math.floor(entity.worldPosition.y / ChunkSize);
-    const chunkKey = encodePosition(chunkX, chunkY);
+    if (hasSpatialPresence(entity)) {
+        const chunkX = Math.floor(entity.worldPosition.x / ChunkSize);
+        const chunkY = Math.floor(entity.worldPosition.y / ChunkSize);
+        const chunkKey = encodePosition(chunkX, chunkY);
 
-    chunkMap.entityChunkMap.set(entity.id, chunkKey);
-    getOrCreateChunk(chunkMap, chunkKey).add(entity);
+        chunkMap.entityChunkMap.set(entity.id, chunkKey);
+        getOrCreateChunk(chunkMap, chunkKey).add(entity);
+    }
 
     for (const child of entity.children) {
         addToChunkmap(chunkMap, child);
@@ -118,10 +131,12 @@ function onEntityRemoved(
  * Removes an entity from the chunkmap, potentially also doing it for children
  */
 function removeFromChunkmap(chunkMap: ChunkMap, entity: Entity) {
-    const chunkKey = chunkMap.entityChunkMap.get(entity.id);
-    if (chunkKey !== undefined) {
-        chunkMap.chunks.get(chunkKey)?.delete(entity);
-        chunkMap.entityChunkMap.delete(entity.id);
+    if (hasSpatialPresence(entity)) {
+        const chunkKey = chunkMap.entityChunkMap.get(entity.id);
+        if (chunkKey !== undefined) {
+            chunkMap.chunks.get(chunkKey)?.delete(entity);
+            chunkMap.entityChunkMap.delete(entity.id);
+        }
     }
 
     for (const child of entity.children) {

@@ -1,4 +1,4 @@
-import { isPointAdjacentTo } from "../../../common/point.ts";
+import { isPointAdjacentTo, pointEquals } from "../../../common/point.ts";
 import {
     addInventoryItem,
     InventoryComponentId,
@@ -30,7 +30,10 @@ export function executeDepositToInventoryAction(
         return ActionFailed;
     }
 
-    if (!isPointAdjacentTo(targetEntity.worldPosition, entity.worldPosition)) {
+    if (
+        !isPointAdjacentTo(targetEntity.worldPosition, entity.worldPosition) &&
+        !pointEquals(targetEntity.worldPosition, entity.worldPosition)
+    ) {
         console.warn(`[DepositToInventory] Worker not adjacent to target`);
         return ActionFailed;
     }

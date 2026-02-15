@@ -39,7 +39,7 @@ export function createBehaviorAgentComponent(): BehaviorAgentComponent {
         id: BehaviorAgentComponentId,
         currentBehaviorName: null,
         actionQueue: [],
-        shouldReplan: false,
+        shouldReplan: true,
     };
 }
 

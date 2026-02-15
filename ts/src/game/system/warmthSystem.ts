@@ -7,6 +7,7 @@ import {
     increaseWarmth,
 } from "../component/warmthComponent.ts";
 import { FireSourceComponentId } from "../component/fireSourceComponent.ts";
+import { requestReplan } from "../component/BehaviorAgentComponent.ts";
 
 export const WARMTH_DECAY_TICK_INTERVAL = 10;
 
@@ -76,6 +77,8 @@ export const warmthSystem: EcsSystem = {
                             `[WarmthSystem] Entity ${entity.id} warmed up (warmth: ${currentWarmth.toFixed(1)} -> ${warmthComponent.warmth.toFixed(1)})`,
                         );
                     }
+                    // Warmth state changed - wake behavior agent to re-evaluate
+                    requestReplan(entity);
                 }
             }
         }

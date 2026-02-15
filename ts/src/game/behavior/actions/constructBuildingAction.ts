@@ -1,4 +1,4 @@
-import { isPointAdjacentTo } from "../../../common/point.ts";
+import { isPointAdjacentTo, pointEquals } from "../../../common/point.ts";
 import { BuildingComponentId } from "../../component/buildingComponent.ts";
 import { heal, HealthComponentId } from "../../component/healthComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
@@ -31,7 +31,10 @@ export function executeConstructBuildingAction(
         return ActionFailed;
     }
 
-    if (!isPointAdjacentTo(buildingEntity.worldPosition, entity.worldPosition)) {
+    if (
+        !isPointAdjacentTo(buildingEntity.worldPosition, entity.worldPosition) &&
+        !pointEquals(buildingEntity.worldPosition, entity.worldPosition)
+    ) {
         console.warn(`[ConstructBuilding] Worker not adjacent to building`);
         return ActionFailed;
     }
