@@ -6,6 +6,7 @@ import { StockpileComponentId } from "../../../component/stockpileComponent.ts";
 import { BuildingComponentId } from "../../../component/buildingComponent.ts";
 import { planGoblinBuild } from "../../planners/goblinBuildPlanner.ts";
 import { stockPile } from "../../../../data/building/wood/storage.ts";
+import { firstChildWhere } from "../../../entity/child/first.ts";
 
 /**
  * BuildStockpileBehavior - builds a stockpile when camp has multiple goblins.
@@ -29,7 +30,10 @@ export function createBuildStockpileBehavior(): Behavior {
             }
 
             // Check population > 1
-            const campPopulation = getCampPopulation(root, goblinUnit.campEntityId);
+            const campPopulation = getCampPopulation(
+                root,
+                goblinUnit.campEntityId,
+            );
             if (campPopulation <= 1) {
                 return false;
             }
@@ -73,16 +77,19 @@ function getCampPopulation(root: Entity, campEntityId: string): number {
 }
 
 function campHasStockpile(campEntity: Entity): boolean {
-    for (const child of campEntity.children) {
+    const stockPileEntity = firstChildWhere(campEntity, (entity) => {
         // Check for completed stockpile
-        if (child.hasComponent(StockpileComponentId)) {
+        if (entity.hasComponent(StockpileComponentId)) {
             return true;
         }
         // Check for scaffolded stockpile
-        const building = child.getEcsComponent(BuildingComponentId);
+        const building = entity.getEcsComponent(BuildingComponentId);
         if (building?.building.id === stockPile.id) {
             return true;
         }
-    }
-    return false;
+
+        return false;
+    });
+
+    return !!stockPileEntity;
 }

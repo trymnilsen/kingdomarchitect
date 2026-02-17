@@ -33,6 +33,12 @@ function updateBehaviorAgent(
     behaviors: Behavior[],
     tick: number,
 ): void {
+    if (agent.shouldReplan) {
+        console.log(`[BehaviorSystem] Entity ${entity.id} replanning`);
+        replan(entity, agent, behaviors);
+        agent.shouldReplan = false;
+    }
+
     // Execute the current action in the queue
     if (agent.actionQueue.length > 0) {
         const action = agent.actionQueue[0];
@@ -54,7 +60,11 @@ function updateBehaviorAgent(
             );
             agent.actionQueue.shift();
             // When the last action finishes, replan to find next work
+            // check if the behavior is finished?
             if (agent.actionQueue.length === 0) {
+                console.log(
+                    `[BehaviorSystem] Entity ${entity.id} actionQueue empty"`,
+                );
                 agent.shouldReplan = true;
             }
         } else if (status === "failed") {
@@ -62,20 +72,13 @@ function updateBehaviorAgent(
                 `[BehaviorSystem] Action failed for entity ${entity.id}, cleaning up and replanning`,
             );
             unclaimCurrentJob(entity);
+            agent.currentBehaviorName = null;
             agent.actionQueue = [];
             agent.shouldReplan = true;
         }
+        entity.invalidateComponent(BehaviorAgentComponentId);
         // status === "running" - keep action in queue, it will run again next tick
     }
-
-    // Replan after action execution so same-tick completion triggers same-tick replan
-    if (agent.shouldReplan) {
-        console.log(`[BehaviorSystem] Entity ${entity.id} replanning`);
-        replan(entity, agent, behaviors);
-        agent.shouldReplan = false;
-    }
-
-    entity.invalidateComponent(BehaviorAgentComponentId);
 }
 
 /**
@@ -102,7 +105,6 @@ function unclaimCurrentJob(entity: Entity): void {
     }
 }
 
-
 /**
  * Select and activate a new behavior for the agent.
  */
@@ -122,47 +124,33 @@ function replan(
         return;
     }
 
+    const currentBehavior = agent.currentBehaviorName
+        ? behaviors.find((b) => b.name === agent.currentBehaviorName)
+        : null;
+
+    const REPLAN_THRESHOLD = 5; // Only switch if new behavior is 5+ utility higher
     // Calculate utilities for all valid behaviors
-    const behaviorUtilities = validBehaviors.map((behavior) => ({
-        behavior,
-        utility: behavior.utility(entity),
-    }));
+    const behaviorUtilities = validBehaviors.map((behavior) => {
+        let utility = behavior.utility(entity);
+        if (behavior.name == currentBehavior?.name) {
+            utility = utility + REPLAN_THRESHOLD;
+        }
+        return {
+            behavior,
+            utility,
+        };
+    });
 
     // Sort by utility (highest first)
     behaviorUtilities.sort((a, b) => b.utility - a.utility);
 
     const bestBehavior = behaviorUtilities[0];
 
-    // Check if we should switch behaviors
-    // Add a small threshold to prevent thrashing
-    const currentBehavior = agent.currentBehaviorName
-        ? behaviors.find((b) => b.name === agent.currentBehaviorName)
-        : null;
-    const currentUtility = currentBehavior
-        ? currentBehavior.utility(entity)
-        : 0;
-
-    const REPLAN_THRESHOLD = 5; // Only switch if new behavior is 5+ utility higher
-
-    if (
-        !agent.currentBehaviorName ||
-        bestBehavior.utility > currentUtility + REPLAN_THRESHOLD
-    ) {
-        // Switch to the new behavior
-        agent.currentBehaviorName = bestBehavior.behavior.name;
-        const newActions = bestBehavior.behavior.expand(entity);
-        agent.actionQueue = newActions;
-        console.log(
-            `[BehaviorSystem] Entity ${entity.id} selected behavior ${bestBehavior.behavior.name} with utility ${bestBehavior.utility}`,
-            newActions,
-        );
-    } else if (agent.actionQueue.length === 0 && currentBehavior) {
-        // Current behavior is still best, but queue is empty - re-expand
-        const newActions = currentBehavior.expand(entity);
-        agent.actionQueue = newActions;
-        console.log(
-            `[BehaviorSystem] Entity ${entity.id} re-expanding behavior "${currentBehavior.name}"`,
-            newActions,
-        );
-    }
+    agent.currentBehaviorName = bestBehavior.behavior.name;
+    const newActions = bestBehavior.behavior.expand(entity);
+    agent.actionQueue = newActions;
+    console.log(
+        `[BehaviorSystem] Entity ${entity.id} selected behavior ${bestBehavior.behavior.name} with utility ${bestBehavior.utility}`,
+        newActions,
+    );
 }
