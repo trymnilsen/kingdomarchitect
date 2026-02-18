@@ -59,7 +59,7 @@ describe("BehaviorSystem", () => {
             agent.currentBehaviorName = "test";
             agent.shouldReplan = false;
 
-            const system = createBehaviorSystem([]);
+            const system = createBehaviorSystem(() => []);
             system.onUpdate!(root, 1);
 
             // First wait action should complete and be removed
@@ -80,7 +80,7 @@ describe("BehaviorSystem", () => {
             agent.currentBehaviorName = "test";
             agent.shouldReplan = false;
 
-            const system = createBehaviorSystem([]);
+            const system = createBehaviorSystem(() => []);
 
             // First tick: first action completes
             system.onUpdate!(root, 1);
@@ -100,7 +100,7 @@ describe("BehaviorSystem", () => {
             agent.currentBehaviorName = "test";
             agent.shouldReplan = false;
 
-            const system = createBehaviorSystem([]);
+            const system = createBehaviorSystem(() => []);
             system.onUpdate!(root, 1);
 
             // Action should still be in queue (running)
@@ -121,7 +121,7 @@ describe("BehaviorSystem", () => {
             agent.currentBehaviorName = "test";
             agent.shouldReplan = false;
 
-            const system = createBehaviorSystem([]);
+            const system = createBehaviorSystem(() => []);
             system.onUpdate!(root, 1);
 
             // Queue should be cleared
@@ -138,7 +138,7 @@ describe("BehaviorSystem", () => {
             agent.currentBehaviorName = "testBehavior";
             agent.shouldReplan = false;
 
-            const system = createBehaviorSystem([]);
+            const system = createBehaviorSystem(() => []);
             system.onUpdate!(root, 1);
 
             assert.strictEqual(agent.currentBehaviorName, null);
@@ -154,7 +154,7 @@ describe("BehaviorSystem", () => {
             agent.currentBehaviorName = "test";
             agent.shouldReplan = false;
 
-            const system = createBehaviorSystem([]);
+            const system = createBehaviorSystem(() => []);
             system.onUpdate!(root, 1);
 
             // Failure causes immediate replan same-tick; with no behaviors, currentBehaviorName is cleared
@@ -177,7 +177,7 @@ describe("BehaviorSystem", () => {
             agent.currentBehaviorName = "test";
             agent.shouldReplan = false;
 
-            const system = createBehaviorSystem([]);
+            const system = createBehaviorSystem(() => []);
             system.onUpdate!(root, 1);
 
             // Job should be unclaimed
@@ -198,7 +198,7 @@ describe("BehaviorSystem", () => {
             agent.shouldReplan = true;
             agent.currentBehaviorName = null;
 
-            const system = createBehaviorSystem([behavior]);
+            const system = createBehaviorSystem(() => [behavior]);
             system.onUpdate!(root, 1);
 
             assert.strictEqual(agent.currentBehaviorName, "newBehavior");
@@ -217,7 +217,7 @@ describe("BehaviorSystem", () => {
             agent.actionQueue = [];
             agent.currentBehaviorName = null;
 
-            const system = createBehaviorSystem([behavior]);
+            const system = createBehaviorSystem(() => [behavior]);
             system.onUpdate!(root, 1);
 
             assert.strictEqual(agent.currentBehaviorName, "testBehavior");
@@ -236,7 +236,7 @@ describe("BehaviorSystem", () => {
             agent.actionQueue = [{ type: "wait", until: 0 }];
             agent.currentBehaviorName = "continueBehavior";
 
-            const system = createBehaviorSystem([behavior]);
+            const system = createBehaviorSystem(() => [behavior]);
             system.onUpdate!(root, 1);
 
             // After action completes, queue empties, should re-expand behavior
@@ -263,7 +263,7 @@ describe("BehaviorSystem", () => {
                 actions: [{ type: "wait", until: 100 }],
             });
 
-            const system = createBehaviorSystem([
+            const system = createBehaviorSystem(() => [
                 lowBehavior,
                 highBehavior,
                 medBehavior,
@@ -288,7 +288,7 @@ describe("BehaviorSystem", () => {
                 actions: [{ type: "wait", until: 100 }],
             });
 
-            const system = createBehaviorSystem([invalidBehavior, validBehavior]);
+            const system = createBehaviorSystem(() => [invalidBehavior, validBehavior]);
             system.onUpdate!(root, 1);
 
             assert.strictEqual(agent.currentBehaviorName, "valid");
@@ -302,7 +302,7 @@ describe("BehaviorSystem", () => {
                 isValid: false,
             });
 
-            const system = createBehaviorSystem([invalidBehavior]);
+            const system = createBehaviorSystem(() => [invalidBehavior]);
             system.onUpdate!(root, 1);
 
             assert.strictEqual(agent.currentBehaviorName, null);
@@ -320,7 +320,7 @@ describe("BehaviorSystem", () => {
                 ],
             });
 
-            const system = createBehaviorSystem([behavior]);
+            const system = createBehaviorSystem(() => [behavior]);
             system.onUpdate!(root, 1);
 
             assert.strictEqual(agent.actionQueue.length, 2);
@@ -346,7 +346,7 @@ describe("BehaviorSystem", () => {
             agent.actionQueue = [{ type: "wait", until: 100 }];
             agent.shouldReplan = false;
 
-            const system = createBehaviorSystem([currentBehavior, slightlyBetter]);
+            const system = createBehaviorSystem(() => [currentBehavior, slightlyBetter]);
             system.onUpdate!(root, 1);
 
             // Should stay with current behavior
@@ -371,7 +371,7 @@ describe("BehaviorSystem", () => {
             agent.actionQueue = [];
             agent.shouldReplan = true;
 
-            const system = createBehaviorSystem([currentBehavior, muchBetter]);
+            const system = createBehaviorSystem(() => [currentBehavior, muchBetter]);
             system.onUpdate!(root, 1);
 
             // Should switch to better behavior
@@ -393,7 +393,7 @@ describe("BehaviorSystem", () => {
                 actions: [{ type: "wait", until: 100 }],
             });
 
-            const system = createBehaviorSystem([behavior]);
+            const system = createBehaviorSystem(() => [behavior]);
             system.onUpdate!(root, 1);
 
             const agent1 = root.findEntity("worker")!.getEcsComponent(BehaviorAgentComponentId)!;
@@ -418,7 +418,7 @@ describe("BehaviorSystem", () => {
             agent.currentBehaviorName = "test";
             agent.shouldReplan = false;
 
-            const system = createBehaviorSystem([]);
+            const system = createBehaviorSystem(() => []);
 
             // Should not throw, should handle gracefully
             assert.doesNotThrow(() => {

@@ -9,16 +9,23 @@ import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import { executeAction } from "../actions/ActionExecutor.ts";
 
 /**
+ * Resolves which behaviors are applicable for a given entity.
+ * This determines what behaviors an entity *could ever* run,
+ * distinct from isValid which checks if they're appropriate right now.
+ */
+export type BehaviorResolver = (entity: Entity) => Behavior[];
+
+/**
  * BehaviorSystem manages behavior selection and execution for entities with BehaviorAgent components.
  * It evaluates behaviors, selects the highest utility behavior, and executes actions from the queue.
  */
-export function createBehaviorSystem(behaviors: Behavior[]): EcsSystem {
+export function createBehaviorSystem(resolver: BehaviorResolver): EcsSystem {
     return {
         onUpdate: (root, tick) => {
             const agents = root.queryComponents(BehaviorAgentComponentId);
 
             for (const [entity, agent] of agents) {
-                updateBehaviorAgent(entity, agent, behaviors, tick);
+                updateBehaviorAgent(entity, agent, resolver, tick);
             }
         },
     };
@@ -30,12 +37,12 @@ export function createBehaviorSystem(behaviors: Behavior[]): EcsSystem {
 function updateBehaviorAgent(
     entity: Entity,
     agent: BehaviorAgentComponent,
-    behaviors: Behavior[],
+    resolver: BehaviorResolver,
     tick: number,
 ): void {
     if (agent.shouldReplan) {
         console.log(`[BehaviorSystem] Entity ${entity.id} replanning`);
-        replan(entity, agent, behaviors);
+        replan(entity, agent, resolver);
         agent.shouldReplan = false;
     }
 
@@ -86,8 +93,12 @@ function updateBehaviorAgent(
  * This is called when an action fails to ensure jobs aren't left in a claimed state.
  */
 function unclaimCurrentJob(entity: Entity): void {
-    const root = entity.getRootEntity();
-    const jobQueue = root.getEcsComponent(JobQueueComponentId);
+    const queueEntity = entity.getAncestorEntity(JobQueueComponentId);
+    if (!queueEntity) {
+        return;
+    }
+
+    const jobQueue = queueEntity.getEcsComponent(JobQueueComponentId);
     if (!jobQueue) {
         return;
     }
@@ -96,7 +107,7 @@ function unclaimCurrentJob(entity: Entity): void {
     for (const job of jobQueue.jobs) {
         if (job.claimedBy === entity.id) {
             job.claimedBy = undefined;
-            root.invalidateComponent(JobQueueComponentId);
+            queueEntity.invalidateComponent(JobQueueComponentId);
             console.log(
                 `[BehaviorSystem] Unclaimed job ${job.id} for entity ${entity.id}`,
             );
@@ -111,8 +122,11 @@ function unclaimCurrentJob(entity: Entity): void {
 function replan(
     entity: Entity,
     agent: BehaviorAgentComponent,
-    behaviors: Behavior[],
+    resolver: BehaviorResolver,
 ): void {
+    // Resolve applicable behaviors for this entity type
+    const behaviors = resolver(entity);
+
     // Find all valid behaviors
     const validBehaviors = behaviors.filter((behavior) =>
         behavior.isValid(entity),
@@ -144,6 +158,10 @@ function replan(
     // Sort by utility (highest first)
     behaviorUtilities.sort((a, b) => b.utility - a.utility);
 
+    console.log(
+        `[BehaviorSystem] Entity ${entity.id} sorted behaviors:`,
+        JSON.stringify(behaviorUtilities),
+    );
     const bestBehavior = behaviorUtilities[0];
 
     agent.currentBehaviorName = bestBehavior.behavior.name;
@@ -151,6 +169,6 @@ function replan(
     agent.actionQueue = newActions;
     console.log(
         `[BehaviorSystem] Entity ${entity.id} selected behavior ${bestBehavior.behavior.name} with utility ${bestBehavior.utility}`,
-        newActions,
+        JSON.stringify(newActions),
     );
 }

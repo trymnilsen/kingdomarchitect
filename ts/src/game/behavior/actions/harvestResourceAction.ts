@@ -12,6 +12,7 @@ import {
 import { RegrowComponentId } from "../../component/regrowComponent.ts";
 import { ResourceComponentId } from "../../component/resourceComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
+import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import { findJobClaimedBy, completeJobFromQueue } from "../../job/jobLifecycle.ts";
 import {
     ActionComplete,
@@ -69,7 +70,6 @@ export function executeHarvestResourceAction(
 
     if (action.harvestAction === ResourceHarvestMode.Chop) {
         return executeChopHarvest(
-            root,
             entity,
             resourceEntity,
             resource,
@@ -77,7 +77,6 @@ export function executeHarvestResourceAction(
         );
     } else {
         return executeWorkHarvest(
-            root,
             entity,
             resourceEntity,
             resource,
@@ -89,7 +88,6 @@ export function executeHarvestResourceAction(
 }
 
 function executeChopHarvest(
-    root: Entity,
     worker: Entity,
     resourceEntity: Entity,
     resource: NaturalResource,
@@ -113,9 +111,12 @@ function executeChopHarvest(
 
         resourceEntity.remove();
 
-        const job = findJobClaimedBy(root, worker.id);
-        if (job) {
-            completeJobFromQueue(root, job);
+        const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
+        if (queueEntity) {
+            const job = findJobClaimedBy(queueEntity, worker.id);
+            if (job && job.id === "collectResource") {
+                completeJobFromQueue(queueEntity, job);
+            }
         }
         return ActionComplete;
     }
@@ -124,7 +125,6 @@ function executeChopHarvest(
 }
 
 function executeWorkHarvest(
-    root: Entity,
     worker: Entity,
     resourceEntity: Entity,
     resource: NaturalResource,
@@ -151,9 +151,12 @@ function executeWorkHarvest(
 
         applyResourceLifecycle(resourceEntity, resource, tick);
 
-        const job = findJobClaimedBy(root, worker.id);
-        if (job) {
-            completeJobFromQueue(root, job);
+        const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
+        if (queueEntity) {
+            const job = findJobClaimedBy(queueEntity, worker.id);
+            if (job && job.id === "collectResource") {
+                completeJobFromQueue(queueEntity, job);
+            }
         }
         return ActionComplete;
     }

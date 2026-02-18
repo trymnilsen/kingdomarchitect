@@ -10,6 +10,7 @@ import { ProductionComponentId } from "../../component/productionComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { findRandomSpawnInDiamond } from "../../map/item/placement.ts";
 import { resourcePrefab } from "../../prefab/resourcePrefab.ts";
+import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import { findJobClaimedBy, completeJobFromQueue } from "../../job/jobLifecycle.ts";
 import {
     ActionComplete,
@@ -95,9 +96,12 @@ export function executeOperateFacilityAction(
             }
         }
 
-        const job = findJobClaimedBy(root, entity.id);
-        if (job) {
-            completeJobFromQueue(root, job);
+        const queueEntity = entity.getAncestorEntity(JobQueueComponentId);
+        if (queueEntity) {
+            const job = findJobClaimedBy(queueEntity, entity.id);
+            if (job) {
+                completeJobFromQueue(queueEntity, job);
+            }
         }
         return ActionComplete;
     }

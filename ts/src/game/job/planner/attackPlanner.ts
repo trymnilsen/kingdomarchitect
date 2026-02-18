@@ -1,5 +1,6 @@
 import type { Entity } from "../../entity/entity.ts";
 import type { BehaviorActionData } from "../../behavior/actions/Action.ts";
+import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import type { AttackJob } from "../attackJob.ts";
 import { failJobFromQueue } from "../jobLifecycle.ts";
 
@@ -11,13 +12,16 @@ import { failJobFromQueue } from "../jobLifecycle.ts";
  */
 export function planAttack(
     root: Entity,
-    _worker: Entity,
+    worker: Entity,
     job: AttackJob,
 ): BehaviorActionData[] {
     const targetEntity = root.findEntity(job.target);
 
     if (!targetEntity) {
-        failJobFromQueue(root, job);
+        const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
+        if (queueEntity) {
+            failJobFromQueue(queueEntity, job);
+        }
         return [];
     }
 

@@ -1,6 +1,7 @@
 import { isPointAdjacentTo, pointEquals } from "../../../common/point.ts";
 import { BuildingComponentId } from "../../component/buildingComponent.ts";
 import { heal, HealthComponentId } from "../../component/healthComponent.ts";
+import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { finishConstruction } from "../../job/buildBuildingJob.ts";
 import { findJobClaimedBy, completeJobFromQueue } from "../../job/jobLifecycle.ts";
@@ -49,9 +50,12 @@ export function executeConstructBuildingAction(
 
     if (healthComponent.currentHp >= healthComponent.maxHp) {
         finishConstruction(root, buildingEntity, buildingComponent);
-        const job = findJobClaimedBy(root, entity.id);
-        if (job) {
-            completeJobFromQueue(root, job);
+        const queueEntity = entity.getAncestorEntity(JobQueueComponentId);
+        if (queueEntity) {
+            const job = findJobClaimedBy(queueEntity, entity.id);
+            if (job) {
+                completeJobFromQueue(queueEntity, job);
+            }
         }
         return ActionComplete;
     }

@@ -32,7 +32,7 @@ describe("jobPlanner", () => {
         root.addChild(resource);
 
         const job = CollectResourceJob(resource, ResourceHarvestMode.Chop);
-        const actions = planJob(root, worker, job);
+        const actions = planJob(root, worker, job, () => []);
 
         assert.strictEqual(actions.length, 2);
         assert.strictEqual(actions[0].type, "moveTo");
@@ -46,7 +46,7 @@ describe("jobPlanner", () => {
         root.addChild(building);
 
         const job = createProductionJob("building");
-        const actions = planJob(root, worker, job);
+        const actions = planJob(root, worker, job, () => []);
 
         assert.strictEqual(actions.length, 2);
         assert.strictEqual(actions[0].type, "moveTo");
@@ -60,7 +60,7 @@ describe("jobPlanner", () => {
         root.addChild(chest);
 
         const job = CollectItemJob(chest);
-        const actions = planJob(root, worker, job);
+        const actions = planJob(root, worker, job, () => []);
 
         assert.strictEqual(actions.length, 2);
         assert.strictEqual(actions[0].type, "moveTo");
@@ -74,7 +74,7 @@ describe("jobPlanner", () => {
         root.addChild(target);
 
         const job = AttackJob("worker", "target");
-        const actions = planJob(root, worker, job);
+        const actions = planJob(root, worker, job, () => []);
 
         assert.strictEqual(actions.length, 2);
         assert.strictEqual(actions[0].type, "moveTo");
@@ -85,7 +85,7 @@ describe("jobPlanner", () => {
         const { root, worker } = createTestScene();
 
         const job = MoveToJob(worker, { x: 10, y: 15 });
-        const actions = planJob(root, worker, job);
+        const actions = planJob(root, worker, job, () => []);
 
         assert.strictEqual(actions.length, 1);
         assert.strictEqual(actions[0].type, "moveTo");
@@ -98,7 +98,7 @@ describe("jobPlanner", () => {
         const { root, worker } = createTestScene();
 
         const unknownJob = { id: "unknownJob" } as any;
-        const actions = planJob(root, worker, unknownJob);
+        const actions = planJob(root, worker, unknownJob, () => []);
 
         assert.strictEqual(actions.length, 0);
     });

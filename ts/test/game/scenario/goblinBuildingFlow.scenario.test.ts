@@ -1,10 +1,12 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
 import { createBehaviorSystem } from "../../../src/game/behavior/systems/BehaviorSystem.ts";
+import { createBehaviorResolver } from "../../../src/game/behavior/behaviorResolver.ts";
 import { warmthSystem } from "../../../src/game/system/warmthSystem.ts";
+import { goblinCampSystem } from "../../../src/game/system/goblinCampSystem.ts";
 import { createKeepWarmBehavior } from "../../../src/game/behavior/behaviors/goblin/keepWarmBehavior.ts";
-import { createExpandCampBehavior } from "../../../src/game/behavior/behaviors/goblin/expandCampBehavior.ts";
 import { createGoblinCampComponent } from "../../../src/game/component/goblinCampComponent.ts";
+import { createJobQueueComponent } from "../../../src/game/component/jobQueueComponent.ts";
 import { createGoblinUnitComponent } from "../../../src/game/component/goblinUnitComponent.ts";
 import {
     createWarmthComponent,
@@ -70,6 +72,7 @@ function createWorld(bounds: { min: Point; max: Point }): {
 function createCamp(root: Entity, id: string, position: Point): Entity {
     const camp = new Entity(id);
     camp.setEcsComponent(createGoblinCampComponent(5));
+    camp.setEcsComponent(createJobQueueComponent());
     root.addChild(camp);
     camp.worldPosition = position;
     return camp;
@@ -100,10 +103,11 @@ function createTree(root: Entity, id: string, position: Point): Entity {
 function runSystems(
     root: Entity,
     ticks: number,
-    behaviorSystem = createBehaviorSystem([createKeepWarmBehavior()]),
+    behaviorSystem = createBehaviorSystem(() => [createKeepWarmBehavior()]),
 ): void {
     for (let tick = 1; tick <= ticks; tick++) {
         behaviorSystem.onUpdate!(root, tick);
+        goblinCampSystem.onUpdate!(root, tick);
         warmthSystem.onUpdate!(root, tick);
     }
 }
@@ -173,7 +177,7 @@ describe("Goblin Building Flow", () => {
         const goblin = createGoblin(camp, { x: 12, y: 8 });
         createTree(root, "tree1", { x: 19, y: 8 });
 
-        const behaviorSystem = createBehaviorSystem([createKeepWarmBehavior()]);
+        const behaviorSystem = createBehaviorSystem(() => [createKeepWarmBehavior()]);
 
         // Run enough ticks for goblin to begin moving toward the tree but not yet finish
         for (let tick = 1; tick <= 8; tick++) {
@@ -232,12 +236,9 @@ describe("Goblin Building Flow", () => {
         createTree(root, "tree2", { x: 14, y: 8 });
         createTree(root, "tree3", { x: 15, y: 8 });
 
-        const behaviorSystem = createBehaviorSystem([
-            createKeepWarmBehavior(),
-            createExpandCampBehavior(),
-        ]);
+        const behaviorSystem = createBehaviorSystem(createBehaviorResolver());
 
-        runSystems(root, 200, behaviorSystem);
+        runSystems(root, 400, behaviorSystem);
 
         const campfire = findBuiltCampfire(camp);
         assert.ok(campfire, "Campfire should be fully constructed first");
@@ -285,14 +286,14 @@ describe("Goblin Building Flow", () => {
             `Goblin should warm up at the existing fire (warmth: ${warmth.warmth})`,
         );
 
-        const scaffoldedBuildings = camp.children.filter((child) => {
+        const campfireScaffolds = camp.children.filter((child) => {
             const b = child.getEcsComponent(BuildingComponentId);
-            return b?.scaffolded;
+            return b?.scaffolded && b.building.id === goblinCampfire.id;
         });
         assert.strictEqual(
-            scaffoldedBuildings.length,
+            campfireScaffolds.length,
             0,
-            "No scaffold should be placed when fire already exists",
+            "keepWarm should not place a campfire scaffold when a campfire already exists",
         );
     });
 });

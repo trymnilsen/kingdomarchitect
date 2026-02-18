@@ -179,7 +179,7 @@ export class SelectionState extends InteractionState {
             const buildingComponent =
                 this._selection.entity.getEcsComponent(BuildingComponentId);
             if (buildingComponent) {
-                name = buildingComponent.building.name;
+                name = `${this._selection.entity.id} - ${buildingComponent.building.name}`;
             }
 
             const resourceComponent =
@@ -188,7 +188,7 @@ export class SelectionState extends InteractionState {
             if (resourceComponent) {
                 const resource = getResourceById(resourceComponent.resourceId);
                 if (resource) {
-                    name = resource.name;
+                    name = `${this._selection.entity.id} - ${resource.name}`;
                 }
             }
 
@@ -201,15 +201,16 @@ export class SelectionState extends InteractionState {
             }
 
             if (this._selection.entity.hasComponent(GoblinUnitComponentId)) {
-                name = "Goblin";
+                name = `${this._selection.entity.id}`;
             }
 
-
-            const behaviorAgent =
-                this._selection.entity.getEcsComponent(BehaviorAgentComponentId);
+            const behaviorAgent = this._selection.entity.getEcsComponent(
+                BehaviorAgentComponentId,
+            );
             let subtitle = "selected";
             if (behaviorAgent) {
-                const behaviorName = behaviorAgent.currentBehaviorName ?? "idle";
+                const behaviorName =
+                    behaviorAgent.currentBehaviorName ?? "idle";
                 const actionType = behaviorAgent.actionQueue[0]?.type;
                 subtitle = actionType
                     ? `${behaviorName} - ${actionType}`

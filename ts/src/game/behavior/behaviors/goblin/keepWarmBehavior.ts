@@ -10,13 +10,17 @@ import { goblinCampfire } from "../../../../data/building/goblin/goblinCampfire.
 
 /**
  * KeepWarmBehavior - highest priority goblin survival behavior.
- * Activates when warmth < 70.
+ * Activates when warmth drops below 50. Builds a campfire directly
+ * (not via jobs) when no fire exists — survival can't wait for the
+ * camp director to issue a job.
  *
  * Utility scaling:
- * - warmth 70: utility = 60 (threshold)
- * - warmth 50: utility = 72
- * - warmth 30: utility = 83
- * - warmth 10: utility = 95 (near critical)
+ * - warmth 50: utility = 60 (threshold)
+ * - warmth 30: utility = 72
+ * - warmth 10: utility = 95 (critical)
+ *
+ * Applicability is guaranteed by the BehaviorResolver — only goblins
+ * receive this behavior, so no GoblinUnitComponent guard is needed in isValid.
  */
 export function createKeepWarmBehavior(): Behavior {
     return {
@@ -24,14 +28,7 @@ export function createKeepWarmBehavior(): Behavior {
 
         isValid(entity: Entity): boolean {
             const warmth = entity.getEcsComponent(WarmthComponentId);
-            const goblinUnit = entity.getEcsComponent(GoblinUnitComponentId);
-
-            if (!warmth || !goblinUnit) {
-                return false;
-            }
-
-            // Valid when cold (warmth < 70)
-            return warmth.warmth < 50;
+            return !!warmth && warmth.warmth < 50;
         },
 
         utility(entity: Entity): number {

@@ -1,5 +1,6 @@
 import { isPointAdjacentTo } from "../../../common/point.ts";
 import { damage, HealthComponentId } from "../../component/healthComponent.ts";
+import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { findJobClaimedBy, completeJobFromQueue } from "../../job/jobLifecycle.ts";
 import {
@@ -46,9 +47,12 @@ export function executeAttackTargetAction(
     targetEntity.invalidateComponent(HealthComponentId);
 
     if (healthComponent.currentHp <= 0) {
-        const job = findJobClaimedBy(root, entity.id);
-        if (job) {
-            completeJobFromQueue(root, job);
+        const queueEntity = entity.getAncestorEntity(JobQueueComponentId);
+        if (queueEntity) {
+            const job = findJobClaimedBy(queueEntity, entity.id);
+            if (job) {
+                completeJobFromQueue(queueEntity, job);
+            }
         }
         return ActionComplete;
     }

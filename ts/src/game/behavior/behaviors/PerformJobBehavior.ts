@@ -11,19 +11,37 @@ import {
 } from "../../job/buildBuildingJob.ts";
 import { findJobClaimedBy, claimJobInQueue } from "../../job/jobLifecycle.ts";
 import { planJob } from "../../job/planner/jobPlanner.ts";
+import type { BuildJobPlanner } from "../../job/planner/jobPlanner.ts";
+
+type BuildJobValidator = (
+    root: Entity,
+    job: BuildBuildingJob,
+    worker: Entity,
+) => boolean;
 
 /**
- * PerformJobBehavior handles job execution for worker entities.
- * If the entity has a claimed job, it plans and executes it.
- * Otherwise, it finds and claims the best available job from the queue.
+ * PerformJobBehavior handles job execution for entities.
+ * Uses ancestor traversal to find the nearest JobQueueComponent in the
+ * entity hierarchy — player workers find the root queue, goblins find
+ * their camp's queue.
+ *
+ * @param buildPlanner Injected planner for build jobs. Player workers
+ *   use planBuildBuilding (stockpile-only), goblins use planGoblinBuildJob
+ *   (gather from environment).
+ * @param buildJobValidator Pre-check for build jobs. Defaults to
+ *   canExecuteBuildJob (stockpile check). Pass `() => true` for goblins
+ *   that gather from the environment.
  */
-export function createPerformJobBehavior(): Behavior {
+export function createPerformJobBehavior(
+    buildPlanner: BuildJobPlanner,
+    buildJobValidator: BuildJobValidator = canExecuteBuildJob,
+): Behavior {
     return {
         name: "performJob",
 
         isValid(entity: Entity): boolean {
-            const root = entity.getRootEntity();
-            const jobQueue = root.getEcsComponent(JobQueueComponentId);
+            const jobQueue =
+                entity.getAncestorEcsComponent(JobQueueComponentId);
 
             if (!jobQueue) {
                 return false;
@@ -42,35 +60,66 @@ export function createPerformJobBehavior(): Behavior {
         },
 
         utility(_entity: Entity): number {
-            // Medium priority (50) - normal work priority
             return 50;
         },
 
         expand(entity: Entity): BehaviorActionData[] {
             const root = entity.getRootEntity();
-            const jobQueue = root.getEcsComponent(JobQueueComponentId);
+            const queueEntity = entity.getAncestorEntity(JobQueueComponentId);
+
+            if (!queueEntity) {
+                return [];
+            }
+
+            const jobQueue = queueEntity.getEcsComponent(JobQueueComponentId);
 
             if (!jobQueue) {
+                console.info(
+                    `[PerformJobBehavior] entity ${entity.id} had no job queue`,
+                );
                 return [];
             }
 
             // Find job claimed by this entity
-            const claimedJob = findJobClaimedBy(root, entity.id);
+            const claimedJob = findJobClaimedBy(queueEntity, entity.id);
             if (claimedJob) {
-                return planJob(root, entity, claimedJob);
+                console.info(
+                    `[PerformJobBehavior] entity ${entity.id} had claimed job ${claimedJob.id}`,
+                    JSON.stringify(claimedJob),
+                );
+                const actions = planJob(root, entity, claimedJob, buildPlanner);
+                console.info(
+                    `[PerformJobBehavior] entity ${entity.id} planned actions`,
+                    JSON.stringify(actions),
+                );
+                return actions;
             }
 
             // No claimed job, try to claim a new one
-            const bestJobIndex = findBestJob(entity, jobQueue);
+            const bestJobIndex = findBestJob(
+                entity,
+                jobQueue,
+                buildJobValidator,
+            );
             if (bestJobIndex === -1) {
+                console.info(
+                    `[PerformJobBehavior] entity ${entity.id} had no possible jobs, returning []`,
+                );
                 return [];
             }
 
             const job = jobQueue.jobs[bestJobIndex];
-            claimJobInQueue(job, entity.id, root);
-
-            // Delegate to planner
-            return planJob(root, entity, job);
+            console.info(
+                `[PerformJobBehavior] entity ${entity.id} claiming job`,
+                JSON.stringify(job),
+            );
+            claimJobInQueue(job, entity.id, queueEntity);
+            const actions = planJob(root, entity, job, buildPlanner);
+            console.info(
+                `[PerformJobBehavior] entity ${entity.id} planned actions`,
+                JSON.stringify(actions),
+            );
+            return actions;
         },
     };
 }
@@ -83,12 +132,10 @@ function hasAvailableJobs(
     jobQueue: JobQueueComponent,
 ): boolean {
     for (const job of jobQueue.jobs) {
-        // Skip claimed jobs
         if (job.claimedBy !== undefined) {
             continue;
         }
 
-        // Skip jobs with entity constraints that don't match
         if (
             job.constraint &&
             job.constraint.type === "entity" &&
@@ -107,7 +154,11 @@ function hasAvailableJobs(
  * Find the best job for an entity based on distance and queue position.
  * Returns the index of the best job, or -1 if no suitable job found.
  */
-function findBestJob(entity: Entity, jobQueue: JobQueueComponent): number {
+function findBestJob(
+    entity: Entity,
+    jobQueue: JobQueueComponent,
+    buildJobValidator: BuildJobValidator,
+): number {
     const root = entity.getRootEntity();
     let bestJobIndex = -1;
     let bestCost = Infinity;
@@ -115,12 +166,10 @@ function findBestJob(entity: Entity, jobQueue: JobQueueComponent): number {
     for (let i = 0; i < jobQueue.jobs.length; i++) {
         const job = jobQueue.jobs[i];
 
-        // Skip claimed jobs
         if (job.claimedBy !== undefined) {
             continue;
         }
 
-        // Skip jobs with entity constraints that don't match
         if (
             job.constraint &&
             job.constraint.type === "entity" &&
@@ -129,18 +178,15 @@ function findBestJob(entity: Entity, jobQueue: JobQueueComponent): number {
             continue;
         }
 
-        // Check job-specific validity (e.g., materials available for build jobs)
-        if (!canExecuteJob(root, job, entity)) {
+        if (!canExecuteJob(root, job, entity, buildJobValidator)) {
             continue;
         }
 
-        // Get the target position for this job
         const targetPosition = getJobTargetPosition(root, job);
         if (!targetPosition) {
             continue;
         }
 
-        // Calculate cost: base + distance + queue position
         const baseCost = 10;
         const distanceCost = distance(entity.worldPosition, targetPosition);
         const queuePositionCost = i;
@@ -159,16 +205,20 @@ function findBestJob(entity: Entity, jobQueue: JobQueueComponent): number {
  * Check if a job can be executed by a worker.
  * Returns false if the job has prerequisites that aren't met.
  */
-function canExecuteJob(root: Entity, job: Jobs, workerEntity: Entity): boolean {
+function canExecuteJob(
+    root: Entity,
+    job: Jobs,
+    workerEntity: Entity,
+    buildJobValidator: BuildJobValidator,
+): boolean {
     switch (job.id) {
         case "buildBuildingJob":
-            return canExecuteBuildJob(
+            return buildJobValidator(
                 root,
                 job as BuildBuildingJob,
                 workerEntity,
             );
         default:
-            // Other jobs have no special prerequisites
             return true;
     }
 }
