@@ -49,7 +49,7 @@ describe("collectItemsAction", () => {
 
         const result = executeCollectItemsAction(action, worker);
 
-        assert.strictEqual(result, "complete");
+        assert.strictEqual(result.kind, "complete");
 
         const workerInventory = worker.getEcsComponent(InventoryComponentId)!;
         assert.strictEqual(getInventoryItem(workerInventory, "wood")?.amount, 5);
@@ -69,7 +69,7 @@ describe("collectItemsAction", () => {
 
         const result = executeCollectItemsAction(action, worker);
 
-        assert.strictEqual(result, "complete");
+        assert.strictEqual(result.kind, "complete");
     });
 
     it("fails if target entity not found", () => {
@@ -82,7 +82,7 @@ describe("collectItemsAction", () => {
 
         const result = executeCollectItemsAction(action, worker);
 
-        assert.strictEqual(result, "failed");
+        assert.strictEqual(result.kind, "failed");
     });
 
     it("fails if worker not adjacent to target", () => {
@@ -99,7 +99,7 @@ describe("collectItemsAction", () => {
 
         const result = executeCollectItemsAction(action, worker);
 
-        assert.strictEqual(result, "failed");
+        assert.strictEqual(result.kind, "failed");
     });
 
     it("fails if target has no CollectableComponent", () => {
@@ -115,7 +115,7 @@ describe("collectItemsAction", () => {
 
         const result = executeCollectItemsAction(action, worker);
 
-        assert.strictEqual(result, "failed");
+        assert.strictEqual(result.kind, "failed");
     });
 
     it("throws if worker has no inventory", () => {

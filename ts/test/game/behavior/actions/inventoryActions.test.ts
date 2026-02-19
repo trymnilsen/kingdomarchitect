@@ -47,7 +47,7 @@ describe("takeFromInventoryAction", () => {
 
         const result = executeTakeFromInventoryAction(action, worker);
 
-        assert.strictEqual(result, "complete");
+        assert.strictEqual(result.kind, "complete");
 
         const workerInventory = worker.getEcsComponent(InventoryComponentId)!;
         const workerWood = getInventoryItem(workerInventory, "wood");
@@ -75,7 +75,7 @@ describe("takeFromInventoryAction", () => {
 
         const result = executeTakeFromInventoryAction(action, worker);
 
-        assert.strictEqual(result, "complete");
+        assert.strictEqual(result.kind, "complete");
 
         const workerInventory = worker.getEcsComponent(InventoryComponentId)!;
         assert.strictEqual(getInventoryItem(workerInventory, "wood")?.amount, 3);
@@ -93,7 +93,7 @@ describe("takeFromInventoryAction", () => {
 
         const result = executeTakeFromInventoryAction(action, worker);
 
-        assert.strictEqual(result, "failed");
+        assert.strictEqual(result.kind, "failed");
     });
 
     it("fails if worker not adjacent to source", () => {
@@ -111,7 +111,7 @@ describe("takeFromInventoryAction", () => {
 
         const result = executeTakeFromInventoryAction(action, worker);
 
-        assert.strictEqual(result, "failed");
+        assert.strictEqual(result.kind, "failed");
     });
 
     it("completes even if source has no items to take", () => {
@@ -125,7 +125,7 @@ describe("takeFromInventoryAction", () => {
 
         const result = executeTakeFromInventoryAction(action, worker);
 
-        assert.strictEqual(result, "complete");
+        assert.strictEqual(result.kind, "complete");
     });
 });
 
@@ -145,7 +145,7 @@ describe("depositToInventoryAction", () => {
 
         const result = executeDepositToInventoryAction(action, worker);
 
-        assert.strictEqual(result, "complete");
+        assert.strictEqual(result.kind, "complete");
 
         const workerWood = getInventoryItem(workerInventory, "wood");
         assert.strictEqual(workerWood?.amount, 5);
@@ -173,7 +173,7 @@ describe("depositToInventoryAction", () => {
 
         const result = executeDepositToInventoryAction(action, worker);
 
-        assert.strictEqual(result, "complete");
+        assert.strictEqual(result.kind, "complete");
 
         const stockpileInventory = stockpile.getEcsComponent(InventoryComponentId)!;
         assert.strictEqual(getInventoryItem(stockpileInventory, "wood")?.amount, 3);
@@ -194,7 +194,7 @@ describe("depositToInventoryAction", () => {
 
         const result = executeDepositToInventoryAction(action, worker);
 
-        assert.strictEqual(result, "failed");
+        assert.strictEqual(result.kind, "failed");
     });
 
     it("fails if worker not adjacent to target", () => {
@@ -212,6 +212,6 @@ describe("depositToInventoryAction", () => {
 
         const result = executeDepositToInventoryAction(action, worker);
 
-        assert.strictEqual(result, "failed");
+        assert.strictEqual(result.kind, "failed");
     });
 });

@@ -55,7 +55,7 @@ describe("harvestResourceAction", () => {
 
             const result = executeHarvestResourceAction(action, worker, 0);
 
-            assert.strictEqual(result, "running");
+            assert.strictEqual(result.kind, "running");
 
             const healthComponent =
                 resource.getEcsComponent(HealthComponentId)!;
@@ -77,7 +77,7 @@ describe("harvestResourceAction", () => {
 
             const result = executeHarvestResourceAction(action, worker, 0);
 
-            assert.strictEqual(result, "complete");
+            assert.strictEqual(result.kind, "complete");
 
             const workerInventory =
                 worker.getEcsComponent(InventoryComponentId)!;
@@ -119,7 +119,7 @@ describe("harvestResourceAction", () => {
 
             const result = executeHarvestResourceAction(action, worker, 0);
 
-            assert.strictEqual(result, "running");
+            assert.strictEqual(result.kind, "running");
             assert.strictEqual(action.workProgress, 1);
         });
 
@@ -136,7 +136,7 @@ describe("harvestResourceAction", () => {
 
             const result = executeHarvestResourceAction(action, worker, 0);
 
-            assert.strictEqual(result, "complete");
+            assert.strictEqual(result.kind, "complete");
 
             const workerInventory =
                 worker.getEcsComponent(InventoryComponentId)!;
@@ -158,7 +158,7 @@ describe("harvestResourceAction", () => {
 
             const result = executeHarvestResourceAction(action, worker, 0);
 
-            assert.strictEqual(result, "failed");
+            assert.strictEqual(result.kind, "failed");
         });
 
         it("fails if worker not adjacent to resource", () => {
@@ -173,7 +173,7 @@ describe("harvestResourceAction", () => {
 
             const result = executeHarvestResourceAction(action, worker, 0);
 
-            assert.strictEqual(result, "failed");
+            assert.strictEqual(result.kind, "failed");
         });
 
         it("fails if worker is at same position as resource (not adjacent)", () => {
@@ -190,7 +190,7 @@ describe("harvestResourceAction", () => {
 
             const result = executeHarvestResourceAction(action, worker, 0);
 
-            assert.strictEqual(result, "failed");
+            assert.strictEqual(result.kind, "failed");
         });
 
         it("fails if resource has no ResourceComponent", () => {
@@ -207,7 +207,7 @@ describe("harvestResourceAction", () => {
 
             const result = executeHarvestResourceAction(action, worker, 0);
 
-            assert.strictEqual(result, "failed");
+            assert.strictEqual(result.kind, "failed");
         });
 
         it("throws if worker has no inventory", () => {

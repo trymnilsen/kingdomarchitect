@@ -7,8 +7,7 @@ import {
 import type { Entity } from "../../entity/entity.ts";
 import {
     ActionComplete,
-    ActionFailed,
-    type ActionStatus,
+    type ActionResult,
     type BehaviorActionData,
 } from "./Action.ts";
 
@@ -19,7 +18,7 @@ import {
 export function executeDepositToInventoryAction(
     action: Extract<BehaviorActionData, { type: "depositToInventory" }>,
     entity: Entity,
-): ActionStatus {
+): ActionResult {
     const root = entity.getRootEntity();
     const targetEntity = root.findEntity(action.targetEntityId);
 
@@ -27,7 +26,7 @@ export function executeDepositToInventoryAction(
         console.warn(
             `[DepositToInventory] Target entity ${action.targetEntityId} not found`,
         );
-        return ActionFailed;
+        return { kind: "failed", cause: { type: "targetGone", entityId: action.targetEntityId } };
     }
 
     if (
@@ -35,7 +34,7 @@ export function executeDepositToInventoryAction(
         !pointEquals(targetEntity.worldPosition, entity.worldPosition)
     ) {
         console.warn(`[DepositToInventory] Worker not adjacent to target`);
-        return ActionFailed;
+        return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 
     const targetInventory =

@@ -5,7 +5,7 @@ import {
 } from "../../component/warmthComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import type { Point } from "../../../common/point.ts";
-import type { ActionStatus, BehaviorActionData } from "./Action.ts";
+import { ActionComplete, ActionRunning, type ActionResult, type BehaviorActionData } from "./Action.ts";
 
 /**
  * Check if two points are within 1 tile of each other (8-directional adjacency).
@@ -24,14 +24,14 @@ function isWithinOneTile(a: Point, b: Point): boolean {
 export function executeWarmByFireAction(
     action: Extract<BehaviorActionData, { type: "warmByFire" }>,
     entity: Entity,
-): ActionStatus {
+): ActionResult {
     const warmth = entity.getEcsComponent(WarmthComponentId);
 
     if (!warmth) {
         console.warn(
             `[WarmByFireAction] Entity ${entity.id} has no warmth component`,
         );
-        return "failed";
+        return { kind: "failed", cause: { type: "unknown" } };
     }
 
     const root = entity.getRootEntity();
@@ -41,7 +41,7 @@ export function executeWarmByFireAction(
         console.warn(
             `[WarmByFireAction] Fire entity ${action.fireEntityId} not found`,
         );
-        return "failed";
+        return { kind: "failed", cause: { type: "targetGone", entityId: action.fireEntityId } };
     }
 
     const fireSource = fireEntity.getEcsComponent(FireSourceComponentId);
@@ -50,18 +50,18 @@ export function executeWarmByFireAction(
         console.warn(
             `[WarmByFireAction] Entity ${action.fireEntityId} has no FireSourceComponent`,
         );
-        return "failed";
+        return { kind: "failed", cause: { type: "unknown" } };
     }
 
     if (!fireSource.isActive) {
         console.warn(`[WarmByFireAction] Fire is not active`);
-        return "failed";
+        return { kind: "failed", cause: { type: "targetGone", entityId: action.fireEntityId } };
     }
 
     // Check adjacency (must be within 1 tile, including diagonals)
     if (!isWithinOneTile(entity.worldPosition, fireEntity.worldPosition)) {
         console.warn(`[WarmByFireAction] Entity not adjacent to fire`);
-        return "failed";
+        return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 
     // Apply active warming rate
@@ -71,8 +71,8 @@ export function executeWarmByFireAction(
     // Complete when fully warm
     if (warmth.warmth >= 100) {
         console.log(`[WarmByFireAction] Entity ${entity.id} is fully warm`);
-        return "complete";
+        return ActionComplete;
     }
 
-    return "running";
+    return ActionRunning;
 }

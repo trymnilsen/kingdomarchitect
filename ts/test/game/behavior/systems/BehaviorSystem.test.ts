@@ -57,7 +57,7 @@ describe("BehaviorSystem", () => {
                 { type: "wait", until: 100 },
             ];
             agent.currentBehaviorName = "test";
-            agent.shouldReplan = false;
+            agent.pendingReplan = undefined;
 
             const system = createBehaviorSystem(() => []);
             system.onUpdate!(root, 1);
@@ -78,7 +78,7 @@ describe("BehaviorSystem", () => {
                 { type: "wait", until: 0 },
             ];
             agent.currentBehaviorName = "test";
-            agent.shouldReplan = false;
+            agent.pendingReplan = undefined;
 
             const system = createBehaviorSystem(() => []);
 
@@ -98,7 +98,7 @@ describe("BehaviorSystem", () => {
             // Queue a wait action that hasn't completed yet
             agent.actionQueue = [{ type: "wait", until: 100 }];
             agent.currentBehaviorName = "test";
-            agent.shouldReplan = false;
+            agent.pendingReplan = undefined;
 
             const system = createBehaviorSystem(() => []);
             system.onUpdate!(root, 1);
@@ -119,7 +119,7 @@ describe("BehaviorSystem", () => {
                 { type: "wait", until: 100 },
             ];
             agent.currentBehaviorName = "test";
-            agent.shouldReplan = false;
+            agent.pendingReplan = undefined;
 
             const system = createBehaviorSystem(() => []);
             system.onUpdate!(root, 1);
@@ -136,7 +136,7 @@ describe("BehaviorSystem", () => {
                 { type: "collectItems", entityId: "nonexistent" },
             ];
             agent.currentBehaviorName = "testBehavior";
-            agent.shouldReplan = false;
+            agent.pendingReplan = undefined;
 
             const system = createBehaviorSystem(() => []);
             system.onUpdate!(root, 1);
@@ -152,7 +152,7 @@ describe("BehaviorSystem", () => {
                 { type: "collectItems", entityId: "nonexistent" },
             ];
             agent.currentBehaviorName = "test";
-            agent.shouldReplan = false;
+            agent.pendingReplan = undefined;
 
             const system = createBehaviorSystem(() => []);
             system.onUpdate!(root, 1);
@@ -175,7 +175,7 @@ describe("BehaviorSystem", () => {
                 { type: "collectItems", entityId: "nonexistent" },
             ];
             agent.currentBehaviorName = "test";
-            agent.shouldReplan = false;
+            agent.pendingReplan = undefined;
 
             const system = createBehaviorSystem(() => []);
             system.onUpdate!(root, 1);
@@ -195,14 +195,14 @@ describe("BehaviorSystem", () => {
                 actions: [{ type: "wait", until: 100 }],
             });
 
-            agent.shouldReplan = true;
+            agent.pendingReplan = { kind: "replan" };
             agent.currentBehaviorName = null;
 
             const system = createBehaviorSystem(() => [behavior]);
             system.onUpdate!(root, 1);
 
             assert.strictEqual(agent.currentBehaviorName, "newBehavior");
-            assert.strictEqual(agent.shouldReplan, false);
+            assert.strictEqual(agent.pendingReplan, undefined);
         });
 
         it("replans when action queue is empty", () => {
@@ -344,7 +344,7 @@ describe("BehaviorSystem", () => {
             // Set current behavior with actions in queue
             agent.currentBehaviorName = "current";
             agent.actionQueue = [{ type: "wait", until: 100 }];
-            agent.shouldReplan = false;
+            agent.pendingReplan = undefined;
 
             const system = createBehaviorSystem(() => [currentBehavior, slightlyBetter]);
             system.onUpdate!(root, 1);
@@ -369,7 +369,7 @@ describe("BehaviorSystem", () => {
             // Set current behavior
             agent.currentBehaviorName = "current";
             agent.actionQueue = [];
-            agent.shouldReplan = true;
+            agent.pendingReplan = { kind: "replan" };
 
             const system = createBehaviorSystem(() => [currentBehavior, muchBetter]);
             system.onUpdate!(root, 1);
@@ -416,7 +416,7 @@ describe("BehaviorSystem", () => {
                 { type: "harvestResource", entityId: "nonexistent", harvestAction: 0 },
             ];
             agent.currentBehaviorName = "test";
-            agent.shouldReplan = false;
+            agent.pendingReplan = undefined;
 
             const system = createBehaviorSystem(() => []);
 

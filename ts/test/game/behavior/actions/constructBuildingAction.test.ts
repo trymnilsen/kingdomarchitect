@@ -49,7 +49,7 @@ describe("constructBuildingAction", () => {
 
         const result = executeConstructBuildingAction(action, worker);
 
-        assert.strictEqual(result, "running");
+        assert.strictEqual(result.kind, "running");
 
         const healthComponent = building.getEcsComponent(HealthComponentId)!;
         assert.strictEqual(healthComponent.currentHp, 20);
@@ -68,7 +68,7 @@ describe("constructBuildingAction", () => {
 
         const result = executeConstructBuildingAction(action, worker);
 
-        assert.strictEqual(result, "complete");
+        assert.strictEqual(result.kind, "complete");
         assert.strictEqual(healthComponent.currentHp, 100);
     });
 
@@ -100,7 +100,7 @@ describe("constructBuildingAction", () => {
 
         const result = executeConstructBuildingAction(action, worker);
 
-        assert.strictEqual(result, "failed");
+        assert.strictEqual(result.kind, "failed");
     });
 
     it("fails if worker not adjacent to building", () => {
@@ -114,7 +114,7 @@ describe("constructBuildingAction", () => {
 
         const result = executeConstructBuildingAction(action, worker);
 
-        assert.strictEqual(result, "failed");
+        assert.strictEqual(result.kind, "failed");
     });
 
     it("throws if building has no BuildingComponent", () => {

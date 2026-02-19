@@ -47,7 +47,7 @@ describe("operateFacilityAction", () => {
 
         const result = executeOperateFacilityAction(action, worker);
 
-        assert.strictEqual(result, "running");
+        assert.strictEqual(result.kind, "running");
         assert.strictEqual(action.progress, 1);
     });
 
@@ -77,7 +77,7 @@ describe("operateFacilityAction", () => {
 
         const result = executeOperateFacilityAction(action, worker);
 
-        assert.strictEqual(result, "complete");
+        assert.strictEqual(result.kind, "complete");
 
         const workerInventory = worker.getEcsComponent(InventoryComponentId)!;
         const stone = getInventoryItem(workerInventory, "stone");
@@ -95,7 +95,7 @@ describe("operateFacilityAction", () => {
 
         const result = executeOperateFacilityAction(action, worker);
 
-        assert.strictEqual(result, "failed");
+        assert.strictEqual(result.kind, "failed");
     });
 
     it("fails if worker not adjacent to building", () => {
@@ -109,7 +109,7 @@ describe("operateFacilityAction", () => {
 
         const result = executeOperateFacilityAction(action, worker);
 
-        assert.strictEqual(result, "failed");
+        assert.strictEqual(result.kind, "failed");
     });
 
     it("fails if building has no ProductionComponent", () => {
@@ -125,7 +125,7 @@ describe("operateFacilityAction", () => {
 
         const result = executeOperateFacilityAction(action, worker);
 
-        assert.strictEqual(result, "failed");
+        assert.strictEqual(result.kind, "failed");
     });
 
     it("fails if production definition not found", () => {
@@ -144,6 +144,6 @@ describe("operateFacilityAction", () => {
 
         const result = executeOperateFacilityAction(action, worker);
 
-        assert.strictEqual(result, "failed");
+        assert.strictEqual(result.kind, "failed");
     });
 });

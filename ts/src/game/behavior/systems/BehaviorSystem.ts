@@ -40,51 +40,52 @@ function updateBehaviorAgent(
     resolver: BehaviorResolver,
     tick: number,
 ): void {
-    if (agent.shouldReplan) {
+    if (agent.pendingReplan !== undefined) {
         console.log(`[BehaviorSystem] Entity ${entity.id} replanning`);
         replan(entity, agent, resolver);
-        agent.shouldReplan = false;
     }
 
     // Execute the current action in the queue
     if (agent.actionQueue.length > 0) {
         const action = agent.actionQueue[0];
-        let status: "complete" | "running" | "failed";
 
+        let result: ReturnType<typeof executeAction>;
         try {
-            status = executeAction(action, entity, tick);
+            result = executeAction(action, entity, tick);
         } catch (error) {
             console.error(
                 `[BehaviorSystem] Action threw exception for entity ${entity.id}:`,
                 error,
             );
-            status = "failed";
+            result = { kind: "failed", cause: { type: "unknown" } };
         }
 
-        if (status === "complete") {
+        if (result.kind === "complete") {
             console.log(
                 `[BehaviorSystem] Entity ${entity.id} completed action "${action.type}"`,
             );
             agent.actionQueue.shift();
-            // When the last action finishes, replan to find next work
-            // check if the behavior is finished?
             if (agent.actionQueue.length === 0) {
                 console.log(
                     `[BehaviorSystem] Entity ${entity.id} actionQueue empty"`,
                 );
-                agent.shouldReplan = true;
+                agent.pendingReplan = { kind: "replan" };
             }
-        } else if (status === "failed") {
+        } else if (result.kind === "failed") {
             console.warn(
                 `[BehaviorSystem] Action failed for entity ${entity.id}, cleaning up and replanning`,
             );
             unclaimCurrentJob(entity);
             agent.currentBehaviorName = null;
             agent.actionQueue = [];
-            agent.shouldReplan = true;
+            agent.pendingReplan = {
+                kind: "replanAfterFailure",
+                failure: { actionType: action.type, cause: result.cause },
+                since: tick,
+            };
         }
         entity.invalidateComponent(BehaviorAgentComponentId);
-        // status === "running" - keep action in queue, it will run again next tick
+        // result.kind === "running" — keep action in queue, it will run again next tick
     }
 }
 
@@ -118,6 +119,8 @@ function unclaimCurrentJob(entity: Entity): void {
 
 /**
  * Select and activate a new behavior for the agent.
+ * pendingReplan is cleared after expand() so behaviors can read failure context
+ * from the component inside their expand() implementation.
  */
 function replan(
     entity: Entity,
@@ -135,6 +138,7 @@ function replan(
     if (validBehaviors.length === 0) {
         agent.currentBehaviorName = null;
         agent.actionQueue = [];
+        agent.pendingReplan = undefined;
         return;
     }
 
@@ -165,8 +169,12 @@ function replan(
     const bestBehavior = behaviorUtilities[0];
 
     agent.currentBehaviorName = bestBehavior.behavior.name;
+    // pendingReplan is still set here so behaviors can read failure context
+    // from the component inside expand()
     const newActions = bestBehavior.behavior.expand(entity);
     agent.actionQueue = newActions;
+    // Clear after expand so the failure context is consumed
+    agent.pendingReplan = undefined;
     console.log(
         `[BehaviorSystem] Entity ${entity.id} selected behavior ${bestBehavior.behavior.name} with utility ${bestBehavior.utility}`,
         JSON.stringify(newActions),

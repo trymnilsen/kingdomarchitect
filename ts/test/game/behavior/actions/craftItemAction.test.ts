@@ -107,7 +107,7 @@ describe("craftItemAction", () => {
 
         const result = executeCraftItemAction(action, worker);
 
-        assert.strictEqual(result, "complete");
+        assert.strictEqual(result.kind, "complete");
 
         const buildingInventory =
             building.getEcsComponent(InventoryComponentId)!;
@@ -128,7 +128,7 @@ describe("craftItemAction", () => {
 
         const result = executeCraftItemAction(action, worker);
 
-        assert.strictEqual(result, "failed");
+        assert.strictEqual(result.kind, "failed");
     });
 
     it("fails if worker has insufficient materials", () => {
@@ -145,7 +145,7 @@ describe("craftItemAction", () => {
 
         const result = executeCraftItemAction(action, worker);
 
-        assert.strictEqual(result, "failed");
+        assert.strictEqual(result.kind, "failed");
     });
 
     it("fails if building entity not found", () => {
@@ -159,7 +159,7 @@ describe("craftItemAction", () => {
 
         const result = executeCraftItemAction(action, worker);
 
-        assert.strictEqual(result, "failed");
+        assert.strictEqual(result.kind, "failed");
     });
 
     it("fails if worker not adjacent to building", () => {
@@ -174,7 +174,7 @@ describe("craftItemAction", () => {
 
         const result = executeCraftItemAction(action, worker);
 
-        assert.strictEqual(result, "failed");
+        assert.strictEqual(result.kind, "failed");
     });
 
     it("throws if worker has no inventory", () => {

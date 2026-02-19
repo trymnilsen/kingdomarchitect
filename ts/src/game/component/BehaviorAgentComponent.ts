@@ -1,6 +1,6 @@
 import type { Point } from "../../common/point.ts";
 import type { Entity } from "../entity/entity.ts";
-import type { BehaviorActionData } from "../behavior/actions/Action.ts";
+import type { ActionFailure, BehaviorActionData } from "../behavior/actions/Action.ts";
 
 export const BehaviorAgentComponentId = "behavioragent";
 
@@ -26,11 +26,22 @@ export type PlayerCommand =
           targetEntityId: string;
       };
 
+/**
+ * Signals that a behavior agent needs to replan on the next tick.
+ * The replanAfterFailure variant carries context about what went wrong
+ * so that expand() can branch its action plan accordingly.
+ * Having failure context and the replan signal in one field makes it
+ * impossible to set one without the other.
+ */
+export type PendingReplan =
+    | { kind: "replan" }
+    | { kind: "replanAfterFailure"; failure: ActionFailure; since: number };
+
 export interface BehaviorAgentComponent {
     id: typeof BehaviorAgentComponentId;
     currentBehaviorName: string | null;
     actionQueue: BehaviorActionData[];
-    shouldReplan: boolean;
+    pendingReplan?: PendingReplan;
     playerCommand?: PlayerCommand;
 }
 
@@ -39,7 +50,7 @@ export function createBehaviorAgentComponent(): BehaviorAgentComponent {
         id: BehaviorAgentComponentId,
         currentBehaviorName: null,
         actionQueue: [],
-        shouldReplan: true,
+        pendingReplan: { kind: "replan" },
     };
 }
 
@@ -52,6 +63,6 @@ export function getBehaviorAgent(
 export function requestReplan(entity: Entity): void {
     const agent = getBehaviorAgent(entity);
     if (agent) {
-        agent.shouldReplan = true;
+        agent.pendingReplan = { kind: "replan" };
     }
 }

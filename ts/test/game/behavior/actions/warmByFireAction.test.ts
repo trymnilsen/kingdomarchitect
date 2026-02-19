@@ -38,7 +38,7 @@ describe("warmByFireAction", () => {
             const warmth = goblin.getEcsComponent("Warmth");
             assert.ok(warmth);
             assert.strictEqual((warmth as any).warmth, 65); // 50 + 15 (activeWarmthRate)
-            assert.strictEqual(status, "running");
+            assert.strictEqual(status.kind, "running");
         });
 
         it("returns complete when warmth reaches 100", () => {
@@ -55,7 +55,7 @@ describe("warmByFireAction", () => {
             const warmth = goblin.getEcsComponent("Warmth");
             assert.ok(warmth);
             assert.strictEqual((warmth as any).warmth, 100); // Clamped to 100
-            assert.strictEqual(status, "complete");
+            assert.strictEqual(status.kind, "complete");
         });
 
         it("returns failed when fire entity not found", () => {
@@ -66,7 +66,7 @@ describe("warmByFireAction", () => {
             const action = { type: "warmByFire" as const, fireEntityId: "nonexistent" };
             const status = executeWarmByFireAction(action, goblin);
 
-            assert.strictEqual(status, "failed");
+            assert.strictEqual(status.kind, "failed");
         });
 
         it("returns failed when fire is not active", () => {
@@ -80,7 +80,7 @@ describe("warmByFireAction", () => {
             const action = { type: "warmByFire" as const, fireEntityId: fire.id };
             const status = executeWarmByFireAction(action, goblin);
 
-            assert.strictEqual(status, "failed");
+            assert.strictEqual(status.kind, "failed");
         });
 
         it("returns failed when not adjacent to fire", () => {
@@ -94,7 +94,7 @@ describe("warmByFireAction", () => {
             const action = { type: "warmByFire" as const, fireEntityId: fire.id };
             const status = executeWarmByFireAction(action, goblin);
 
-            assert.strictEqual(status, "failed");
+            assert.strictEqual(status.kind, "failed");
         });
 
         it("returns failed when goblin has no warmth component", () => {
@@ -108,7 +108,7 @@ describe("warmByFireAction", () => {
             const action = { type: "warmByFire" as const, fireEntityId: fire.id };
             const status = executeWarmByFireAction(action, goblin);
 
-            assert.strictEqual(status, "failed");
+            assert.strictEqual(status.kind, "failed");
         });
 
         it("works with diagonal adjacency", () => {
@@ -122,7 +122,7 @@ describe("warmByFireAction", () => {
             const action = { type: "warmByFire" as const, fireEntityId: fire.id };
             const status = executeWarmByFireAction(action, goblin);
 
-            assert.strictEqual(status, "running");
+            assert.strictEqual(status.kind, "running");
         });
     });
 

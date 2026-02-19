@@ -2,7 +2,7 @@ import { pointEquals } from "../../../common/point.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { doMovement, MovementResult } from "../../job/movementHelper.ts";
 import { getBehaviorAgent } from "../../component/BehaviorAgentComponent.ts";
-import type { ActionStatus, BehaviorActionData } from "./Action.ts";
+import { ActionComplete, ActionRunning, type ActionResult, type BehaviorActionData } from "./Action.ts";
 
 /**
  * Move to a target position for a player command.
@@ -11,7 +11,7 @@ import type { ActionStatus, BehaviorActionData } from "./Action.ts";
 export function executePlayerMoveAction(
     action: Extract<BehaviorActionData, { type: "playerMove" }>,
     entity: Entity,
-): ActionStatus {
+): ActionResult {
     if (pointEquals(entity.worldPosition, action.target)) {
         const agent = getBehaviorAgent(entity);
         if (agent) {
@@ -21,7 +21,7 @@ export function executePlayerMoveAction(
         console.log(
             `[PlayerMoveAction] Entity ${entity.id} reached target at ${action.target.x},${action.target.y}`,
         );
-        return "complete";
+        return ActionComplete;
     }
 
     const result = doMovement(entity, action.target);
@@ -35,7 +35,7 @@ export function executePlayerMoveAction(
             agent.playerCommand = undefined;
             entity.invalidateComponent("behavioragent");
         }
-        return "failed";
+        return { kind: "failed", cause: { type: "pathBlocked", target: action.target } };
     }
 
     if (pointEquals(entity.worldPosition, action.target)) {
@@ -47,8 +47,8 @@ export function executePlayerMoveAction(
         console.log(
             `[PlayerMoveAction] Entity ${entity.id} reached target at ${action.target.x},${action.target.y}`,
         );
-        return "complete";
+        return ActionComplete;
     }
 
-    return "running";
+    return ActionRunning;
 }

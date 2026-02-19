@@ -1,6 +1,6 @@
 import type { Entity } from "../../entity/entity.ts";
 import type {
-    ActionStatus,
+    ActionResult,
     BehaviorActionData,
     BehaviorActionExecutor,
 } from "./Action.ts";
@@ -26,7 +26,7 @@ export const executeAction: BehaviorActionExecutor = (
     action: BehaviorActionData,
     entity: Entity,
     tick: number,
-): ActionStatus => {
+): ActionResult => {
     switch (action.type) {
         case "wait":
             return executeWaitAction(action, entity, tick);
@@ -60,6 +60,6 @@ export const executeAction: BehaviorActionExecutor = (
             console.warn(
                 `[ActionExecutor] Unknown action type: ${(action as any).type}`,
             );
-            return "failed";
+            return { kind: "failed", cause: { type: "unknown" } };
     }
 };

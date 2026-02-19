@@ -14,9 +14,8 @@ import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import { findJobClaimedBy, completeJobFromQueue } from "../../job/jobLifecycle.ts";
 import {
     ActionComplete,
-    ActionFailed,
     ActionRunning,
-    type ActionStatus,
+    type ActionResult,
     type BehaviorActionData,
 } from "./Action.ts";
 
@@ -30,7 +29,7 @@ const FORRESTER_RADIUS = 5;
 export function executeOperateFacilityAction(
     action: Extract<BehaviorActionData, { type: "operateFacility" }>,
     entity: Entity,
-): ActionStatus {
+): ActionResult {
     const root = entity.getRootEntity();
     const buildingEntity = root.findEntity(action.buildingId);
 
@@ -38,12 +37,12 @@ export function executeOperateFacilityAction(
         console.warn(
             `[OperateFacility] Building ${action.buildingId} not found`,
         );
-        return ActionFailed;
+        return { kind: "failed", cause: { type: "targetGone", entityId: action.buildingId } };
     }
 
     if (!isPointAdjacentTo(buildingEntity.worldPosition, entity.worldPosition)) {
         console.warn(`[OperateFacility] Worker not adjacent to building`);
-        return ActionFailed;
+        return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 
     const productionComp =
@@ -52,7 +51,7 @@ export function executeOperateFacilityAction(
         console.warn(
             `[OperateFacility] Building ${action.buildingId} has no ProductionComponent`,
         );
-        return ActionFailed;
+        return { kind: "failed", cause: { type: "unknown" } };
     }
 
     const definition = getProductionDefinition(productionComp.productionId);
@@ -60,7 +59,7 @@ export function executeOperateFacilityAction(
         console.warn(
             `[OperateFacility] Unknown production: ${productionComp.productionId}`,
         );
-        return ActionFailed;
+        return { kind: "failed", cause: { type: "unknown" } };
     }
 
     if (action.progress === undefined) {

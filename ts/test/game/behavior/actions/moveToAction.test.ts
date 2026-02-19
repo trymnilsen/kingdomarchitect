@@ -21,7 +21,7 @@ describe("moveToAction", () => {
 
             const result = executeMoveToAction(action, entity);
 
-            assert.strictEqual(result, "complete");
+            assert.strictEqual(result.kind, "complete");
         });
 
         it("completes when already adjacent with stopAdjacent: cardinal", () => {
@@ -38,7 +38,7 @@ describe("moveToAction", () => {
 
             const result = executeMoveToAction(action, entity);
 
-            assert.strictEqual(result, "complete");
+            assert.strictEqual(result.kind, "complete");
         });
 
         it("completes when already at target with stopAdjacent: cardinal", () => {
@@ -55,7 +55,7 @@ describe("moveToAction", () => {
 
             const result = executeMoveToAction(action, entity);
 
-            assert.strictEqual(result, "complete");
+            assert.strictEqual(result.kind, "complete");
         });
 
         it("completes when diagonally adjacent with stopAdjacent: diagonal", () => {
@@ -72,7 +72,7 @@ describe("moveToAction", () => {
 
             const result = executeMoveToAction(action, entity);
 
-            assert.strictEqual(result, "complete");
+            assert.strictEqual(result.kind, "complete");
         });
 
         it("does not complete when diagonally adjacent with stopAdjacent: cardinal", () => {
@@ -91,7 +91,7 @@ describe("moveToAction", () => {
 
             // Without pathfinding graph, movement will fail
             // The key assertion is that it doesn't complete just because diagonal
-            assert.notStrictEqual(result, "complete");
+            assert.notStrictEqual(result.kind, "complete");
         });
 
         it("does not complete when adjacent without stopAdjacent set", () => {
@@ -109,7 +109,7 @@ describe("moveToAction", () => {
 
             // Without pathfinding graph, movement will fail
             // The key assertion is that it doesn't complete just because adjacent
-            assert.notStrictEqual(result, "complete");
+            assert.notStrictEqual(result.kind, "complete");
         });
 
         it("completes for all four cardinal directions", () => {
@@ -135,7 +135,7 @@ describe("moveToAction", () => {
                 const result = executeMoveToAction(action, entity);
 
                 assert.strictEqual(
-                    result,
+                    result.kind,
                     "complete",
                     `Should complete when adjacent at ${target.x}, ${target.y}`,
                 );
@@ -169,7 +169,7 @@ describe("moveToAction", () => {
                 const result = executeMoveToAction(action, entity);
 
                 assert.strictEqual(
-                    result,
+                    result.kind,
                     "complete",
                     `Should complete when diagonally adjacent at ${target.x}, ${target.y}`,
                 );

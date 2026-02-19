@@ -7,9 +7,8 @@ import { finishConstruction } from "../../job/buildBuildingJob.ts";
 import { findJobClaimedBy, completeJobFromQueue } from "../../job/jobLifecycle.ts";
 import {
     ActionComplete,
-    ActionFailed,
     ActionRunning,
-    type ActionStatus,
+    type ActionResult,
     type BehaviorActionData,
 } from "./Action.ts";
 
@@ -21,7 +20,7 @@ import {
 export function executeConstructBuildingAction(
     action: Extract<BehaviorActionData, { type: "constructBuilding" }>,
     entity: Entity,
-): ActionStatus {
+): ActionResult {
     const root = entity.getRootEntity();
     const buildingEntity = root.findEntity(action.entityId);
 
@@ -29,7 +28,7 @@ export function executeConstructBuildingAction(
         console.warn(
             `[ConstructBuilding] Building ${action.entityId} not found`,
         );
-        return ActionFailed;
+        return { kind: "failed", cause: { type: "targetGone", entityId: action.entityId } };
     }
 
     if (
@@ -37,7 +36,7 @@ export function executeConstructBuildingAction(
         !pointEquals(buildingEntity.worldPosition, entity.worldPosition)
     ) {
         console.warn(`[ConstructBuilding] Worker not adjacent to building`);
-        return ActionFailed;
+        return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 
     const buildingComponent =

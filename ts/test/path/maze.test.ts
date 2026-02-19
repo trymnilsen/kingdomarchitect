@@ -17,8 +17,10 @@ describe("Maze", () => {
             graph.start,
             graph.stop,
             fixedGraph,
-            true,
-            (node) => node.weight,
+            {
+                allowAdjacentStop: true,
+                weightModifier: (node) => node.weight,
+            },
         );
 
         verifyPath(pathResult.path, graph);

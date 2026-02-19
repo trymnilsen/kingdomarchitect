@@ -6,7 +6,7 @@ import {
 import type { Entity } from "../../entity/entity.ts";
 import { doMovement, MovementResult } from "../../job/movementHelper.ts";
 import { blockBuildingsModifier } from "../../map/query/pathQuery.ts";
-import type { ActionStatus, BehaviorActionData } from "./Action.ts";
+import { ActionComplete, ActionRunning, type ActionResult, type BehaviorActionData } from "./Action.ts";
 
 /**
  * Check if two points are diagonally adjacent (including cardinal directions).
@@ -45,10 +45,10 @@ function hasArrived(
 export function executeMoveToAction(
     action: Extract<BehaviorActionData, { type: "moveTo" }>,
     entity: Entity,
-): ActionStatus {
+): ActionResult {
     // Check if already arrived (at target or adjacent if allowed)
     if (hasArrived(entity.worldPosition, action.target, action.stopAdjacent)) {
-        return "complete";
+        return ActionComplete;
     }
 
     const result = doMovement(entity, action.target, {
@@ -62,15 +62,15 @@ export function executeMoveToAction(
             action.stopAdjacent &&
             hasArrived(entity.worldPosition, action.target, action.stopAdjacent)
         ) {
-            return "complete";
+            return ActionComplete;
         }
-        return "failed";
+        return { kind: "failed", cause: { type: "pathBlocked", target: action.target } };
     }
 
     // Check if arrived after movement
     if (hasArrived(entity.worldPosition, action.target, action.stopAdjacent)) {
-        return "complete";
+        return ActionComplete;
     }
 
-    return "running";
+    return ActionRunning;
 }

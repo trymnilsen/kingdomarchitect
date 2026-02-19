@@ -34,7 +34,7 @@ describe("attackTargetAction", () => {
 
         const result = executeAttackTargetAction(action, worker);
 
-        assert.strictEqual(result, "running");
+        assert.strictEqual(result.kind, "running");
 
         const healthComponent = target.getEcsComponent(HealthComponentId)!;
         assert.strictEqual(healthComponent.currentHp, 9);
@@ -53,7 +53,7 @@ describe("attackTargetAction", () => {
 
         const result = executeAttackTargetAction(action, worker);
 
-        assert.strictEqual(result, "complete");
+        assert.strictEqual(result.kind, "complete");
         assert.strictEqual(healthComponent.currentHp, 0);
     });
 
@@ -67,7 +67,7 @@ describe("attackTargetAction", () => {
 
         const result = executeAttackTargetAction(action, worker);
 
-        assert.strictEqual(result, "failed");
+        assert.strictEqual(result.kind, "failed");
     });
 
     it("fails if worker not adjacent to target", () => {
@@ -81,7 +81,7 @@ describe("attackTargetAction", () => {
 
         const result = executeAttackTargetAction(action, worker);
 
-        assert.strictEqual(result, "failed");
+        assert.strictEqual(result.kind, "failed");
     });
 
     it("fails if target has no HealthComponent", () => {
@@ -97,7 +97,7 @@ describe("attackTargetAction", () => {
 
         const result = executeAttackTargetAction(action, worker);
 
-        assert.strictEqual(result, "failed");
+        assert.strictEqual(result.kind, "failed");
     });
 
     it("continues running while target has hp remaining", () => {
@@ -110,10 +110,10 @@ describe("attackTargetAction", () => {
 
         // Execute multiple times
         let result = executeAttackTargetAction(action, worker);
-        assert.strictEqual(result, "running");
+        assert.strictEqual(result.kind, "running");
 
         result = executeAttackTargetAction(action, worker);
-        assert.strictEqual(result, "running");
+        assert.strictEqual(result.kind, "running");
 
         const healthComponent = target.getEcsComponent(HealthComponentId)!;
         assert.strictEqual(healthComponent.currentHp, 8);
