@@ -1,15 +1,27 @@
-import { type Point, pointEquals } from "../../../common/point.ts";
+import {
+    isPointAdjacentTo,
+    type Point,
+    pointEquals,
+} from "../../../common/point.ts";
 import { BinaryHeap } from "../../../common/structure/binaryHeap.ts";
 import { type Graph, GraphNode } from "./graph/graph.ts";
 import { manhattanDistance } from "./pathHeuristics.ts";
+
+export type SearchOptions = {
+    weightModifier?: (graphNode: GraphNode) => number;
+    allowPartialPaths?: boolean;
+    allowAdjacentStop?: boolean;
+};
+
+const defaultWeightFunction = (node: GraphNode) => node.weight;
 
 export function aStarSearch(
     from: Point,
     to: Point,
     graph: Graph,
-    _allowPartialPaths: boolean,
-    weightModifier: (graphNode: GraphNode) => number,
+    options?: SearchOptions,
 ): SearchResult {
+    const weightModifier = options?.weightModifier ?? defaultWeightFunction;
     const start = graph.nodeAt(from.x, from.y);
     const end = graph.nodeAt(to.x, to.y);
     if (!start) {
@@ -48,7 +60,10 @@ export function aStarSearch(
         var currentNode = openHeap.pop();
 
         // End case -- result has been found, return the traced path.
-        if (currentNode === end) {
+        if (
+            currentNode === end ||
+            (options?.allowAdjacentStop && isPointAdjacentTo(currentNode, end))
+        ) {
             const path = pathTo(currentNode);
             return {
                 path: path,

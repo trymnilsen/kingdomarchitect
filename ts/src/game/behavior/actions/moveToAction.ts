@@ -5,6 +5,7 @@ import {
 } from "../../../common/point.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { doMovement, MovementResult } from "../../job/movementHelper.ts";
+import { blockBuildingsModifier } from "../../map/query/pathQuery.ts";
 import type { ActionStatus, BehaviorActionData } from "./Action.ts";
 
 /**
@@ -50,7 +51,10 @@ export function executeMoveToAction(
         return "complete";
     }
 
-    const result = doMovement(entity, action.target);
+    const result = doMovement(entity, action.target, {
+        allowAdjacentStop: !!action.stopAdjacent,
+        weightModifier: blockBuildingsModifier,
+    });
 
     if (result === MovementResult.Failure) {
         // If movement failed but we're adjacent and that's acceptable, complete

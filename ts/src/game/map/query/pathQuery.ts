@@ -4,10 +4,16 @@ import type { Entity } from "../../entity/entity.ts";
 import type { GraphNode } from "../path/graph/graph.ts";
 import { aStarSearch, type SearchedNode } from "../path/search.ts";
 
+export type QueryPathOptions = {
+    weightModifier?: (node: GraphNode) => number;
+    allowAdjacentStop?: boolean;
+};
+
 export function queryPath(
     pathfindingGraph: PathfindingGraph,
     from: Point,
     to: Point,
+    options?: QueryPathOptions,
 ): PathResult {
     const graph = pathfindingGraph.graph;
     if (!graph) {
@@ -27,16 +33,13 @@ export function queryPath(
         y: offsetPoint.y,
     });
 
-    const weightModifier = defaultWeightModifier;
+    const weightModifier = options?.weightModifier ?? defaultWeightModifier;
 
     // Perform the search
-    const result = aStarSearch(
-        offsetFrom,
-        offsetTo,
-        graph,
-        true,
+    const result = aStarSearch(offsetFrom, offsetTo, graph, {
         weightModifier,
-    );
+        allowAdjacentStop: options?.allowAdjacentStop,
+    });
 
     // The path results are returned in a absolute space, so we convert them
     // back before doing any further work on it
@@ -115,6 +118,6 @@ export type PathResult = {
 };
 
 const defaultWeightModifier = (node: GraphNode) => node.weight;
-const blockBuildingsModifier = (node: GraphNode) => {
+export const blockBuildingsModifier = (node: GraphNode) => {
     return node.weight >= 20 ? 0 : node.weight;
 };
