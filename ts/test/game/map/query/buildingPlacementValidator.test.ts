@@ -6,6 +6,7 @@ import {
     ChunkMapComponentId,
     createChunkMapComponent,
 } from "../../../../src/game/component/chunkMapComponent.ts";
+import { createBehaviorAgentComponent } from "../../../../src/game/component/BehaviorAgentComponent.ts";
 import { createBuildingComponent } from "../../../../src/game/component/buildingComponent.ts";
 import {
     createTileComponent,
@@ -64,6 +65,28 @@ function addBuilding(root: Entity, pos: Point): Entity {
     chunkMap.chunks.get(chunkKey)!.add(building);
 
     return building;
+}
+
+/**
+ * Registers an agent entity in root's chunk map at the given world position.
+ */
+function addAgent(root: Entity, pos: Point): Entity {
+    const agent = new Entity(`agent-${pos.x}-${pos.y}`);
+    agent.setEcsComponent(createBehaviorAgentComponent());
+    agent.worldPosition = pos;
+
+    const chunkMapComponent = root.requireEcsComponent(ChunkMapComponentId);
+    const chunkMap = chunkMapComponent.chunkMap;
+    const chunkX = Math.floor(pos.x / ChunkSize);
+    const chunkY = Math.floor(pos.y / ChunkSize);
+    const chunkKey = encodePosition(chunkX, chunkY);
+
+    if (!chunkMap.chunks.has(chunkKey)) {
+        chunkMap.chunks.set(chunkKey, new SparseSet<Entity>());
+    }
+    chunkMap.chunks.get(chunkKey)!.add(agent);
+
+    return agent;
 }
 
 describe("createBuildingPlacementValidator", () => {
@@ -181,6 +204,61 @@ describe("createBuildingPlacementValidator", () => {
             const validator = createBuildingPlacementValidator(world);
 
             assert.strictEqual(validator({ x: 4, y: 4 }), true);
+        });
+    });
+
+    describe("protecting adjacent agents", () => {
+        it("rejects a candidate that would be the last free exit of an adjacent agent", () => {
+            // Agent A sits at (6,5).
+            // Its three other cardinal exits are blocked by buildings:
+            //   (5,5) → building, (7,5) → building, (6,4) → building.
+            // Only (6,6) — the candidate — remains free for A.
+            // Placing here would trap A.
+            const world = createWorld([
+                { x: 6, y: 6 },
+                { x: 6, y: 5 },
+                { x: 5, y: 5 },
+                { x: 7, y: 5 },
+                { x: 6, y: 4 },
+                { x: 6, y: 7 },
+            ]);
+            addAgent(world, { x: 6, y: 5 }); // A
+            addBuilding(world, { x: 5, y: 5 });
+            addBuilding(world, { x: 7, y: 5 });
+            addBuilding(world, { x: 6, y: 4 });
+            const validator = createBuildingPlacementValidator(world);
+
+            assert.strictEqual(validator({ x: 6, y: 6 }), false);
+        });
+
+        it("accepts a candidate next to an agent that still has other free exits", () => {
+            // Agent A at (6,5). Only (5,5) is blocked; (7,5) and (6,4) remain free.
+            const world = createWorld([
+                { x: 6, y: 6 },
+                { x: 6, y: 5 },
+                { x: 5, y: 5 },
+                { x: 7, y: 5 },
+                { x: 6, y: 4 },
+            ]);
+            addAgent(world, { x: 6, y: 5 }); // A
+            addBuilding(world, { x: 5, y: 5 });
+            // (7,5) and (6,4) are free ground — A still has two exits
+            const validator = createBuildingPlacementValidator(world);
+
+            assert.strictEqual(validator({ x: 6, y: 6 }), true);
+        });
+
+        it("accepts placement when there are no adjacent agents", () => {
+            const world = createWorld([
+                { x: 6, y: 6 },
+                { x: 5, y: 6 },
+                { x: 7, y: 6 },
+                { x: 6, y: 5 },
+                { x: 6, y: 7 },
+            ]);
+            const validator = createBuildingPlacementValidator(world);
+
+            assert.strictEqual(validator({ x: 6, y: 6 }), true);
         });
     });
 

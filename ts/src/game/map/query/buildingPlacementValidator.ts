@@ -1,4 +1,5 @@
 import { adjacentPoints, type Point } from "../../../common/point.ts";
+import { BehaviorAgentComponentId } from "../../component/BehaviorAgentComponent.ts";
 import { BuildingComponentId } from "../../component/buildingComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { getWeightAtPoint } from "../path/graph/weight.ts";
@@ -44,6 +45,9 @@ function hasWalkableCardinalNeighbour(
  * 3. Every existing adjacent building still has at least one free cardinal
  *    neighbour after the candidate tile is treated as occupied (so we don't
  *    block an existing building in).
+ * 4. Every adjacent agent (entity with BehaviorAgentComponent) still has at
+ *    least one free cardinal neighbour after placement (so we don't trap
+ *    a unit).
  */
 export function createBuildingPlacementValidator(
     root: Entity,
@@ -76,6 +80,29 @@ export function createBuildingPlacementValidator(
 
             // Simulate the candidate being occupied: does this neighbour
             // building still have at least one other free cardinal exit?
+            if (
+                !hasWalkableCardinalNeighbour(
+                    neighbour,
+                    root,
+                    maxWeight,
+                    candidate,
+                )
+            ) {
+                return false;
+            }
+        }
+
+        // Check that placing here doesn't trap any adjacent agent.
+        for (const neighbour of adjacentPoints(candidate)) {
+            const entitiesAtNeighbour = queryEntity(root, neighbour);
+            const hasAgent = entitiesAtNeighbour.some((e) =>
+                e.hasComponent(BehaviorAgentComponentId),
+            );
+
+            if (!hasAgent) {
+                continue;
+            }
+
             if (
                 !hasWalkableCardinalNeighbour(
                     neighbour,
