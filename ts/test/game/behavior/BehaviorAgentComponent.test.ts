@@ -15,7 +15,7 @@ describe("BehaviorAgentComponent", () => {
             assert.strictEqual(component.id, "behavioragent");
             assert.strictEqual(component.currentBehaviorName, null);
             assert.strictEqual(component.actionQueue.length, 0);
-            assert.strictEqual(component.shouldReplan, false);
+            assert.deepStrictEqual(component.pendingReplan, { kind: "replan" });
             assert.strictEqual(component.playerCommand, undefined);
         });
     });
@@ -41,14 +41,14 @@ describe("BehaviorAgentComponent", () => {
     });
 
     describe("requestReplan", () => {
-        it("sets shouldReplan to true on entity with agent", () => {
+        it("sets pendingReplan on entity with agent", () => {
             const entity = createTestEntity();
             const agent = createBehaviorAgentComponent();
             entity.setEcsComponent(agent);
 
             requestReplan(entity);
 
-            assert.strictEqual(agent.shouldReplan, true);
+            assert.deepStrictEqual(agent.pendingReplan, { kind: "replan" });
         });
 
         it("does nothing on entity without agent", () => {

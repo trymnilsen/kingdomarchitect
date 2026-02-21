@@ -1,5 +1,5 @@
 import type { Point } from "../../common/point.ts";
-import { PathResultStatus, queryPath } from "../map/query/pathQuery.ts";
+import { PathResultStatus, queryPath, type QueryPathOptions } from "../map/query/pathQuery.ts";
 import type { Entity } from "../entity/entity.ts";
 import { VisibilityComponentId } from "../component/visibilityComponent.ts";
 import { offsetPatternWithPoint } from "../../common/pattern.ts";
@@ -19,7 +19,11 @@ export const MovementResult = {
 export type MovementResult =
     (typeof MovementResult)[keyof typeof MovementResult];
 
-export function doMovement(entity: Entity, to: Point): MovementResult {
+export function doMovement(
+    entity: Entity,
+    to: Point,
+    options?: QueryPathOptions,
+): MovementResult {
     const root = entity.getRootEntity();
 
     // Get the pathfinding graph for the entity's space
@@ -28,7 +32,7 @@ export function doMovement(entity: Entity, to: Point): MovementResult {
         return MovementResult.Failure;
     }
 
-    const path = queryPath(pathfindingGraph, entity.worldPosition, to);
+    const path = queryPath(pathfindingGraph, entity.worldPosition, to, options);
     const nextPoint = path.path.shift();
     if (nextPoint) {
         discoverAfterMovement(entity, nextPoint);
@@ -41,7 +45,13 @@ export function doMovement(entity: Entity, to: Point): MovementResult {
         });
     }
 
-    if (path.status == PathResultStatus.Complete && !!nextPoint) {
+    // Accept both Complete and Partial paths - Partial paths allow moving
+    // towards blocked destinations (e.g., resources, buildings)
+    const isValidPath =
+        path.status === PathResultStatus.Complete ||
+        path.status === PathResultStatus.Partial;
+
+    if (isValidPath && !!nextPoint) {
         entity.worldPosition = nextPoint;
         return MovementResult.Ok;
     } else {

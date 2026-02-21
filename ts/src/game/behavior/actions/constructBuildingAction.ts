@@ -1,14 +1,14 @@
-import { isPointAdjacentTo } from "../../../common/point.ts";
+import { isPointAdjacentTo, pointEquals } from "../../../common/point.ts";
 import { BuildingComponentId } from "../../component/buildingComponent.ts";
 import { heal, HealthComponentId } from "../../component/healthComponent.ts";
+import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { finishConstruction } from "../../job/buildBuildingJob.ts";
 import { findJobClaimedBy, completeJobFromQueue } from "../../job/jobLifecycle.ts";
 import {
     ActionComplete,
-    ActionFailed,
     ActionRunning,
-    type ActionStatus,
+    type ActionResult,
     type BehaviorActionData,
 } from "./Action.ts";
 
@@ -20,7 +20,7 @@ import {
 export function executeConstructBuildingAction(
     action: Extract<BehaviorActionData, { type: "constructBuilding" }>,
     entity: Entity,
-): ActionStatus {
+): ActionResult {
     const root = entity.getRootEntity();
     const buildingEntity = root.findEntity(action.entityId);
 
@@ -28,12 +28,15 @@ export function executeConstructBuildingAction(
         console.warn(
             `[ConstructBuilding] Building ${action.entityId} not found`,
         );
-        return ActionFailed;
+        return { kind: "failed", cause: { type: "targetGone", entityId: action.entityId } };
     }
 
-    if (!isPointAdjacentTo(buildingEntity.worldPosition, entity.worldPosition)) {
+    if (
+        !isPointAdjacentTo(buildingEntity.worldPosition, entity.worldPosition) &&
+        !pointEquals(buildingEntity.worldPosition, entity.worldPosition)
+    ) {
         console.warn(`[ConstructBuilding] Worker not adjacent to building`);
-        return ActionFailed;
+        return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 
     const buildingComponent =
@@ -46,9 +49,12 @@ export function executeConstructBuildingAction(
 
     if (healthComponent.currentHp >= healthComponent.maxHp) {
         finishConstruction(root, buildingEntity, buildingComponent);
-        const job = findJobClaimedBy(root, entity.id);
-        if (job) {
-            completeJobFromQueue(root, job);
+        const queueEntity = entity.getAncestorEntity(JobQueueComponentId);
+        if (queueEntity) {
+            const job = findJobClaimedBy(queueEntity, entity.id);
+            if (job) {
+                completeJobFromQueue(queueEntity, job);
+            }
         }
         return ActionComplete;
     }

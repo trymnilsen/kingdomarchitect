@@ -9,10 +9,9 @@ import { hungerSystem } from "../game/system/hungerSystem.ts";
 import { energySystem } from "../game/system/energySystem.ts";
 import { createJobNotificationSystem } from "../game/system/jobNotificationSystem.ts";
 import { createBehaviorSystem } from "../game/behavior/systems/BehaviorSystem.ts";
-import { createPerformPlayerCommandBehavior } from "../game/behavior/behaviors/PerformPlayerCommandBehavior.ts";
-import { createSleepBehavior } from "../game/behavior/behaviors/SleepBehavior.ts";
-import { createPerformJobBehavior } from "../game/behavior/behaviors/PerformJobBehavior.ts";
-import { createHaulBehavior } from "../game/behavior/behaviors/HaulBehavior.ts";
+import { createBehaviorResolver } from "../game/behavior/behaviorResolver.ts";
+import { warmthSystem } from "../game/system/warmthSystem.ts";
+import { goblinCampSystem } from "../game/system/goblinCampSystem.ts";
 
 import {
     buildWorldStateMessage,
@@ -156,19 +155,12 @@ export class GameServer {
     private addSystems() {
         this.world.addSystem(chunkMapSystem);
         this.world.addSystem(pathfindingSystem);
-
-        // Create behaviors for the behavior system
-        const behaviors = [
-            createPerformPlayerCommandBehavior(), // Priority 90
-            createSleepBehavior(), // Priority 60-80 (scales with tiredness)
-            createPerformJobBehavior(), // Priority 50
-            createHaulBehavior(), // Priority 25 (idle task)
-        ];
-        this.world.addSystem(createBehaviorSystem(behaviors));
-
+        this.world.addSystem(createBehaviorSystem(createBehaviorResolver()));
         this.world.addSystem(createJobNotificationSystem());
         this.world.addSystem(hungerSystem);
         this.world.addSystem(energySystem);
+        this.world.addSystem(warmthSystem);
+        this.world.addSystem(goblinCampSystem);
         this.world.addSystem(worldGenerationSystem);
         this.world.addSystem(
             createCommandSystem(this.gameTime, this.persistenceManager),

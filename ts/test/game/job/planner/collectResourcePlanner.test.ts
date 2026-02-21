@@ -11,8 +11,8 @@ function createTestScene(): { root: Entity; worker: Entity; resource: Entity } {
     const worker = new Entity("worker");
     const resource = new Entity("resource");
 
-    worker.worldPosition = { x: 0, y: 0 };
-    resource.worldPosition = { x: 5, y: 5 };
+    worker.worldPosition = { x: 10, y: 8 };
+    resource.worldPosition = { x: 15, y: 13 };
 
     root.setEcsComponent(createJobQueueComponent());
     root.addChild(worker);
@@ -40,9 +40,31 @@ describe("collectResourcePlanner", () => {
         const job = CollectResourceJob(resource, ResourceHarvestMode.Chop);
         const actions = planCollectResource(root, worker, job);
 
-        const moveAction = actions[0] as { type: "moveTo"; target: { x: number; y: number } };
+        const moveAction = actions[0] as {
+            type: "moveTo";
+            target: { x: number; y: number };
+            stopAdjacent?: string;
+        };
         assert.strictEqual(moveAction.target.x, 10);
         assert.strictEqual(moveAction.target.y, 15);
+    });
+
+    it("sets stopAdjacent to cardinal for moveTo action", () => {
+        const { root, worker, resource } = createTestScene();
+
+        const job = CollectResourceJob(resource, ResourceHarvestMode.Chop);
+        const actions = planCollectResource(root, worker, job);
+
+        const moveAction = actions[0] as {
+            type: "moveTo";
+            target: { x: number; y: number };
+            stopAdjacent?: string;
+        };
+        assert.strictEqual(
+            moveAction.stopAdjacent,
+            "cardinal",
+            "moveTo should have stopAdjacent: cardinal for resource harvesting",
+        );
     });
 
     it("sets correct entityId and harvestAction for harvestResource action", () => {

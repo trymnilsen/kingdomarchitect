@@ -14,7 +14,15 @@ import {
     checkMaterialsAvailability,
     findNearestStockpileWithMaterials,
 } from "../buildBuildingJob.ts";
+import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import { suspendJobInQueue } from "../jobLifecycle.ts";
+
+function suspendJob(worker: Entity, job: BuildBuildingJob): void {
+    const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
+    if (queueEntity) {
+        suspendJobInQueue(queueEntity, job);
+    }
+}
 
 /**
  * Plans actions for building construction.
@@ -65,7 +73,11 @@ export function planBuildBuilding(
     // State 1: Building has all materials - go construct
     if (buildingReady) {
         return [
-            { type: "moveTo", target: buildingEntity.worldPosition },
+            {
+                type: "moveTo",
+                target: buildingEntity.worldPosition,
+                stopAdjacent: "cardinal",
+            },
             { type: "constructBuilding", entityId: job.entityId },
         ];
     }
@@ -89,8 +101,16 @@ export function planBuildBuilding(
         }
 
         return [
-            { type: "moveTo", target: buildingEntity.worldPosition },
-            { type: "depositToInventory", targetEntityId: job.entityId, items: itemsToDeposit },
+            {
+                type: "moveTo",
+                target: buildingEntity.worldPosition,
+                stopAdjacent: "cardinal",
+            },
+            {
+                type: "depositToInventory",
+                targetEntityId: job.entityId,
+                items: itemsToDeposit,
+            },
         ];
     }
 
@@ -105,7 +125,7 @@ export function planBuildBuilding(
         console.log(
             `[BuildBuildingPlanner] Missing materials for ${buildingComponent.building.name}: ${materialCheck.missing.join(", ")}`,
         );
-        suspendJobInQueue(root, job);
+        suspendJob(worker, job);
         return [];
     }
 
@@ -119,14 +139,14 @@ export function planBuildBuilding(
         console.log(
             `[BuildBuildingPlanner] Cannot find stockpile with required materials`,
         );
-        suspendJobInQueue(root, job);
+        suspendJob(worker, job);
         return [];
     }
 
     // Build list of items to take from stockpile
     const stockpileInventory = stockpileEntity.getEcsComponent(InventoryComponentId);
     if (!stockpileInventory) {
-        suspendJobInQueue(root, job);
+        suspendJob(worker, job);
         return [];
     }
 
@@ -140,12 +160,20 @@ export function planBuildBuilding(
     }
 
     if (itemsToTake.length === 0) {
-        suspendJobInQueue(root, job);
+        suspendJob(worker, job);
         return [];
     }
 
     return [
-        { type: "moveTo", target: stockpileEntity.worldPosition },
-        { type: "takeFromInventory", sourceEntityId: stockpileEntity.id, items: itemsToTake },
+        {
+            type: "moveTo",
+            target: stockpileEntity.worldPosition,
+            stopAdjacent: "cardinal",
+        },
+        {
+            type: "takeFromInventory",
+            sourceEntityId: stockpileEntity.id,
+            items: itemsToTake,
+        },
     ];
 }

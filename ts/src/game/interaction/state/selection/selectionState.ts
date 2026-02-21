@@ -47,6 +47,8 @@ import { getResourceById } from "../../../../data/inventory/items/naturalResourc
 import { RoleComponentId } from "../../../component/worker/roleComponent.ts";
 import { getRoleDefinition } from "../../../../data/role/roleDefinitions.ts";
 import { bins } from "../../../../../generated/sprites.ts";
+import { BehaviorAgentComponentId } from "../../../component/BehaviorAgentComponent.ts";
+import { GoblinUnitComponentId } from "../../../component/goblinUnitComponent.ts";
 
 export class SelectionState extends InteractionState {
     private providers: ActorSelectionProvider[] = [
@@ -59,7 +61,11 @@ export class SelectionState extends InteractionState {
         new AttackSelectionProvider(),
         new BuildingSelectionProvider(),
     ];
-    private selection: SelectedWorldItem;
+    private _selection: SelectedWorldItem;
+
+    get selection(): SelectedWorldItem {
+        return this._selection;
+    }
 
     override get stateName(): string {
         return "Selection";
@@ -67,7 +73,7 @@ export class SelectionState extends InteractionState {
 
     constructor(selection: SelectedWorldItem) {
         super();
-        this.selection = selection;
+        this._selection = selection;
     }
 
     override getView(): ComponentDescriptor | null {
@@ -115,7 +121,7 @@ export class SelectionState extends InteractionState {
 
     override onDraw(context: RenderScope): void {
         super.onDraw(context);
-        const selection = this.selection;
+        const selection = this._selection;
         const cursorWorldPosition = context.camera.tileSpaceToScreenSpace(
             selection.tilePosition,
         );
@@ -140,8 +146,8 @@ export class SelectionState extends InteractionState {
     }
 
     private getSelectionInfo(): SelectionInfo | null {
-        if (this.selection instanceof SelectedTileItem) {
-            const type = this.selection.groundTile.type;
+        if (this._selection instanceof SelectedTileItem) {
+            const type = this._selection.groundTile.type;
             if (!!type) {
                 return {
                     title: type,
@@ -151,9 +157,9 @@ export class SelectionState extends InteractionState {
             } else {
                 return null;
             }
-        } else if (this.selection instanceof SelectedEntityItem) {
+        } else if (this._selection instanceof SelectedEntityItem) {
             /*
-            const selectionComponent = this.selection.entity.getComponent(
+            const selectionComponent = this._selection.entity.getComponent(
                 SelectionInfoComponent,
             );
 
@@ -164,39 +170,56 @@ export class SelectionState extends InteractionState {
             return selectionComponent.getSelectionInfo();*/
             let icon = spriteRefs.empty_sprite;
             const spriteComponent =
-                this.selection.entity.getEcsComponent(SpriteComponentId);
+                this._selection.entity.getEcsComponent(SpriteComponentId);
             if (spriteComponent) {
                 icon = spriteComponent.sprite;
             }
 
             let name = "Entity";
             const buildingComponent =
-                this.selection.entity.getEcsComponent(BuildingComponentId);
+                this._selection.entity.getEcsComponent(BuildingComponentId);
             if (buildingComponent) {
-                name = buildingComponent.building.name;
+                name = `${this._selection.entity.id} - ${buildingComponent.building.name}`;
             }
 
             const resourceComponent =
-                this.selection.entity.getEcsComponent(ResourceComponentId);
+                this._selection.entity.getEcsComponent(ResourceComponentId);
 
             if (resourceComponent) {
                 const resource = getResourceById(resourceComponent.resourceId);
                 if (resource) {
-                    name = resource.name;
+                    name = `${this._selection.entity.id} - ${resource.name}`;
                 }
             }
 
             const roleComponent =
-                this.selection.entity.getEcsComponent(RoleComponentId);
+                this._selection.entity.getEcsComponent(RoleComponentId);
 
             if (roleComponent) {
                 const roleDefinition = getRoleDefinition(roleComponent.role);
                 name = roleDefinition.name;
             }
 
+            if (this._selection.entity.hasComponent(GoblinUnitComponentId)) {
+                name = `${this._selection.entity.id}`;
+            }
+
+            const behaviorAgent = this._selection.entity.getEcsComponent(
+                BehaviorAgentComponentId,
+            );
+            let subtitle = "selected";
+            if (behaviorAgent) {
+                const behaviorName =
+                    behaviorAgent.currentBehaviorName ?? "idle";
+                const actionType = behaviorAgent.actionQueue[0]?.type;
+                subtitle = actionType
+                    ? `${behaviorName} - ${actionType}`
+                    : behaviorName;
+            }
+
             return {
                 icon: icon,
-                subtitle: "selected",
+                subtitle,
                 title: name,
             };
         } else {
@@ -266,7 +289,7 @@ export class SelectionState extends InteractionState {
         const rightItems: UIActionbarItem[] = [];
 
         for (const provider of this.providers) {
-            const item = provider.provideButtons(this.context, this.selection);
+            const item = provider.provideButtons(this.context, this._selection);
             leftItems.push(...item.left);
             rightItems.push(...item.right);
         }

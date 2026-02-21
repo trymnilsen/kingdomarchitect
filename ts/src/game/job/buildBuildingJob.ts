@@ -1,6 +1,7 @@
 import { distance, type Point } from "../../common/point.ts";
 import { buildingAdjecency } from "../../data/building/buildings.ts";
 import type { BuildingRequirements } from "../../data/building/building.ts";
+import { applyFunctionalComponents } from "../prefab/buildingPrefab.ts";
 import {
     type AdjacencyMask,
     adjacencyMaskToEnum,
@@ -195,15 +196,18 @@ export function finishConstruction(
     const spriteComponent = buildingEntity.getEcsComponent(SpriteComponentId);
     buildingComponent.scaffolded = false;
 
-    // Calculate building quality from deposited materials
+    // Calculate building quality from deposited materials.
+    // Buildings with no material requirements have no scaffold inventory.
     const buildingInventory =
-        buildingEntity.requireEcsComponent(InventoryComponentId);
+        buildingEntity.getEcsComponent(InventoryComponentId) ?? null;
     const quality = calculateBuildingQuality(buildingInventory);
     buildingComponent.quality = quality;
 
     console.log(
         `[BUILD] ${buildingComponent.building.name} completed with ${getRarityName(quality)} quality`,
     );
+
+    applyFunctionalComponents(buildingEntity, buildingComponent.building);
 
     if (spriteComponent) {
         const adjacency = buildingAdjecency[buildingComponent.building.id];

@@ -1,5 +1,6 @@
 import type { Point } from "../../../../common/point.ts";
 import { BuildingComponentId } from "../../../component/buildingComponent.ts";
+import { GoblinUnitComponentId } from "../../../component/goblinUnitComponent.ts";
 import { PlayerUnitComponentId } from "../../../component/playerUnitComponent.ts";
 import { ResourceComponentId } from "../../../component/resourceComponent.ts";
 import { getTile, TileComponentId } from "../../../component/tileComponent.ts";
@@ -24,51 +25,26 @@ export function getWeightAtPoint(point: Point, scope: Entity): number {
     if (entities.length > 0) {
         let entityWeight = 0;
         for (const entity of entities) {
-            /*
-            const weightComponent = entity.getComponent(WeightComponent);
-            if (!!weightComponent) {
-                entityWeight = weightComponent.weight;
-                continue;
-            }
-
-            const buildingComponent = entity.getComponent(BuildingComponent);
-
-            if (buildingComponent) {
-                entityWeight = 100;
-            }
-
-            const workerComponent = entity.getComponent(
-                WorkerBehaviorComponent,
-            );
-
-            if (workerComponent) {
-                entityWeight = 20;
-            }
-
-            const treeComponent = entity.getComponent(TreeComponent);
-            if (treeComponent) {
-                entityWeight = 30;
-            }*/
             const resourceComponent =
                 entity.getEcsComponent(ResourceComponentId);
-            if (!!resourceComponent) {
-                entityWeight = 30;
+            if (resourceComponent) {
+                entityWeight = Math.max(entityWeight, 30);
             }
 
             const buildingComponent =
                 entity.getEcsComponent(BuildingComponentId);
-
-            if (!!buildingComponent) {
+            if (buildingComponent) {
                 // Roads have weight 1 to prioritize pathfinding through them
-                if (buildingComponent.building.id === "road") {
-                    entityWeight = 1;
-                } else {
-                    entityWeight = 100;
-                }
+                const w = buildingComponent.building.id === "road" ? 1 : 100;
+                entityWeight = Math.max(entityWeight, w);
             }
 
             if (entity.hasComponent(PlayerUnitComponentId)) {
-                entityWeight = 100;
+                entityWeight = Math.max(entityWeight, 100);
+            }
+
+            if (entity.hasComponent(GoblinUnitComponentId)) {
+                entityWeight = Math.max(entityWeight, 50);
             }
         }
 

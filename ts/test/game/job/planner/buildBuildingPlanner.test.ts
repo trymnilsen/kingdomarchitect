@@ -24,9 +24,9 @@ function createTestScene(): {
     const building = new Entity("building");
     const stockpile = new Entity("stockpile");
 
-    worker.worldPosition = { x: 0, y: 0 };
-    building.worldPosition = { x: 5, y: 5 };
-    stockpile.worldPosition = { x: 10, y: 0 };
+    worker.worldPosition = { x: 10, y: 8 };
+    building.worldPosition = { x: 15, y: 13 };
+    stockpile.worldPosition = { x: 20, y: 8 };
 
     worker.setEcsComponent(createInventoryComponent());
     building.setEcsComponent(createBuildingComponent(woodenHouse, true));
@@ -161,8 +161,8 @@ describe("buildBuildingPlanner", () => {
             const actions = planBuildBuilding(root, worker, job);
 
             const moveAction = actions[0] as { type: "moveTo"; target: { x: number; y: number } };
-            assert.strictEqual(moveAction.target.x, 10);
-            assert.strictEqual(moveAction.target.y, 0);
+            assert.strictEqual(moveAction.target.x, 20);
+            assert.strictEqual(moveAction.target.y, 8);
         });
     });
 
@@ -208,7 +208,7 @@ describe("buildBuildingPlanner", () => {
         it("returns empty array if worker has no inventory", () => {
             const { root, building } = createTestScene();
             const workerNoInv = new Entity("workerNoInv");
-            workerNoInv.worldPosition = { x: 0, y: 0 };
+            workerNoInv.worldPosition = { x: 10, y: 8 };
             root.addChild(workerNoInv);
 
             const job = BuildBuildingJob(building);

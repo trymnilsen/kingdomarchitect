@@ -5,7 +5,7 @@ import {
     TileComponentId,
 } from "../../../component/tileComponent.ts";
 import type { Entity } from "../../../entity/entity.ts";
-import { FixedGraph, WeightFunction } from "./fixedGraph.ts";
+import { FixedGraph, type WeightFunction } from "./fixedGraph.ts";
 import type { Graph } from "./graph.ts";
 import { LazyGraph } from "./lazyGraph.ts";
 import { getWeightAtPoint } from "./weight.ts";

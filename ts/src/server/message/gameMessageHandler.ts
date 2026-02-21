@@ -31,7 +31,7 @@ export function handleGameMessage(
     camera: Camera,
     message: GameMessage,
 ) {
-    console.log("[HandleGameMessage] message from server", message);
+    console.debug("[HandleGameMessage] message from server", message);
     switch (message.type) {
         case WorldStateMessageType:
             updateWorldState(root, message);

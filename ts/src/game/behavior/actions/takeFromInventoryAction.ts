@@ -7,8 +7,7 @@ import {
 import type { Entity } from "../../entity/entity.ts";
 import {
     ActionComplete,
-    ActionFailed,
-    type ActionStatus,
+    type ActionResult,
     type BehaviorActionData,
 } from "./Action.ts";
 
@@ -19,7 +18,7 @@ import {
 export function executeTakeFromInventoryAction(
     action: Extract<BehaviorActionData, { type: "takeFromInventory" }>,
     entity: Entity,
-): ActionStatus {
+): ActionResult {
     const root = entity.getRootEntity();
     const sourceEntity = root.findEntity(action.sourceEntityId);
 
@@ -27,12 +26,12 @@ export function executeTakeFromInventoryAction(
         console.warn(
             `[TakeFromInventory] Source entity ${action.sourceEntityId} not found`,
         );
-        return ActionFailed;
+        return { kind: "failed", cause: { type: "targetGone", entityId: action.sourceEntityId } };
     }
 
     if (!isPointAdjacentTo(sourceEntity.worldPosition, entity.worldPosition)) {
         console.warn(`[TakeFromInventory] Worker not adjacent to source`);
-        return ActionFailed;
+        return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 
     const sourceInventory =

@@ -59,7 +59,7 @@ describe("PerformPlayerCommandBehavior", () => {
     });
 
     describe("expand", () => {
-        it("expands move command to playerMove action", () => {
+        it("expands move command to moveTo + clearPlayerCommand actions", () => {
             const behavior = createPerformPlayerCommandBehavior();
             const entity = createBehaviorTestEntity();
             const agent = getBehaviorAgent(entity);
@@ -70,11 +70,12 @@ describe("PerformPlayerCommandBehavior", () => {
 
             const actions = behavior.expand(entity);
 
-            assert.strictEqual(actions.length, 1);
-            assert.strictEqual(actions[0].type, "playerMove");
-            if (actions[0].type === "playerMove") {
+            assert.strictEqual(actions.length, 2);
+            assert.strictEqual(actions[0].type, "moveTo");
+            if (actions[0].type === "moveTo") {
                 assert.deepStrictEqual(actions[0].target, { x: 5, y: 7 });
             }
+            assert.strictEqual(actions[1].type, "clearPlayerCommand");
         });
 
         it("returns empty array and clears command for attack", () => {

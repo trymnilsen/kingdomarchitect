@@ -7,19 +7,39 @@ import type { Entity } from "../../entity/entity.ts";
 import { getWeightAtPoint } from "../path/graph/weight.ts";
 
 /**
- * Finds the closest walkable position to an entity using breadth-first search
+ * A function that returns true if a candidate position is valid for placement.
+ */
+export type PositionValidator = (point: Point) => boolean;
+
+/**
+ * Creates the default walkability validator using weight thresholds.
+ * A position is valid when its weight is non-zero and below maxWeight.
+ */
+export function createWalkableValidator(
+    root: Entity,
+    maxWeight: number = 5,
+): PositionValidator {
+    return (point: Point) => {
+        const weight = getWeightAtPoint(point, root);
+        return weight !== 0 && weight < maxWeight;
+    };
+}
+
+/**
+ * Finds the closest position passing the validator using breadth-first search.
+ * Both input and output positions are in world coordinates.
  * @param root The root entity containing the map data
- * @param startPosition The starting position to search from
- * @param maxWeight The maximum weight considered walkable (default: 5)
- * @returns The closest walkable position, or null if none found
+ * @param startPosition The world position to search from
+ * @param validator Predicate that returns true when a candidate is acceptable
+ * @returns The closest valid world position, or null if none found
  */
 export function findClosestAvailablePosition(
     root: Entity,
     startPosition: Point,
-    maxWeight: number = 5,
+    validator: PositionValidator = createWalkableValidator(root),
 ): Point | null {
     const positionsToVisit: Point[] = [startPosition];
-    const visitedPositions = new Set<Point>();
+    const visitedPositions = new Set<number>();
 
     while (positionsToVisit.length > 0) {
         const currentPosition = positionsToVisit.shift();
@@ -27,21 +47,16 @@ export function findClosestAvailablePosition(
             return null;
         }
 
-        if (visitedPositions.has(currentPosition)) {
+        const positionKey = encodePosition(
+            currentPosition.x,
+            currentPosition.y,
+        );
+        if (visitedPositions.has(positionKey)) {
             continue;
         }
-        visitedPositions.add(currentPosition);
+        visitedPositions.add(positionKey);
 
-        // Check if this position is walkable
-        const weight = getWeightAtPoint(currentPosition, root);
-
-        if (weight === 0) {
-            // Not a valid tile
-            continue;
-        }
-
-        if (weight < maxWeight) {
-            // Found a walkable position
+        if (validator(currentPosition)) {
             return currentPosition;
         }
 

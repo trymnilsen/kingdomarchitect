@@ -1,6 +1,7 @@
 import type { Entity } from "../../entity/entity.ts";
 import type { BehaviorActionData } from "../../behavior/actions/Action.ts";
 import { InventoryComponentId, getInventoryItem } from "../../component/inventoryComponent.ts";
+import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import type { CraftingJob } from "../craftingJob.ts";
 import { failJobFromQueue } from "../jobLifecycle.ts";
 
@@ -19,13 +20,19 @@ export function planCrafting(
     const buildingEntity = root.findEntity(job.targetBuilding);
 
     if (!buildingEntity) {
-        failJobFromQueue(root, job);
+        const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
+        if (queueEntity) {
+            failJobFromQueue(queueEntity, job);
+        }
         return [];
     }
 
     const workerInventory = worker.getEcsComponent(InventoryComponentId);
     if (!workerInventory) {
-        failJobFromQueue(root, job);
+        const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
+        if (queueEntity) {
+            failJobFromQueue(queueEntity, job);
+        }
         return [];
     }
 
@@ -36,7 +43,11 @@ export function planCrafting(
 
     if (workerHasAllInputs) {
         return [
-            { type: "moveTo", target: buildingEntity.worldPosition },
+            {
+                type: "moveTo",
+                target: buildingEntity.worldPosition,
+                stopAdjacent: "cardinal",
+            },
             {
                 type: "craftItem",
                 buildingId: job.targetBuilding,
@@ -47,7 +58,10 @@ export function planCrafting(
 
     const buildingInventory = buildingEntity.getEcsComponent(InventoryComponentId);
     if (!buildingInventory) {
-        failJobFromQueue(root, job);
+        const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
+        if (queueEntity) {
+            failJobFromQueue(queueEntity, job);
+        }
         return [];
     }
 
@@ -69,13 +83,24 @@ export function planCrafting(
     }
 
     if (itemsToTake.length === 0) {
-        failJobFromQueue(root, job);
+        const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
+        if (queueEntity) {
+            failJobFromQueue(queueEntity, job);
+        }
         return [];
     }
 
     return [
-        { type: "moveTo", target: buildingEntity.worldPosition },
-        { type: "takeFromInventory", sourceEntityId: job.targetBuilding, items: itemsToTake },
+        {
+            type: "moveTo",
+            target: buildingEntity.worldPosition,
+            stopAdjacent: "cardinal",
+        },
+        {
+            type: "takeFromInventory",
+            sourceEntityId: job.targetBuilding,
+            items: itemsToTake,
+        },
         {
             type: "craftItem",
             buildingId: job.targetBuilding,
