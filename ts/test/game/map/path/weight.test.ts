@@ -118,13 +118,13 @@ describe("getWeightAtPoint", () => {
     });
 
     describe("units", () => {
-        it("returns 100 for a goblin unit", () => {
+        it("returns 50 for a goblin unit", () => {
             const root = createWorld();
             const goblin = new Entity("goblin");
             goblin.setEcsComponent(createGoblinUnitComponent("camp-1"));
             placeAt(root, goblin);
 
-            assert.strictEqual(getWeightAtPoint(TEST_POS, root), 100);
+            assert.strictEqual(getWeightAtPoint(TEST_POS, root), 50);
         });
 
         it("returns 100 for a player unit", () => {
@@ -174,7 +174,8 @@ describe("getWeightAtPoint", () => {
             resource.setEcsComponent(createResourceComponent("tree1"));
             placeAt(root, resource);
 
-            assert.strictEqual(getWeightAtPoint(TEST_POS, root), 100);
+            // Goblin weight is 50, resource is 30 — goblin wins
+            assert.strictEqual(getWeightAtPoint(TEST_POS, root), 50);
         });
     });
 });

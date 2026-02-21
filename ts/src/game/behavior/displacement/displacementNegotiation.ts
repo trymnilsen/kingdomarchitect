@@ -27,6 +27,11 @@ import {
 } from "./displacementCost.ts";
 import type { DisplacementMove, DisplacementTransaction } from "./displacementTransaction.ts";
 
+export type NegotiationResult =
+    | { kind: "success"; transaction: DisplacementTransaction }
+    | { kind: "refused" }
+    | { kind: "noChain" };
+
 /**
  * Maximum number of entities in a displacement chain, not counting the requester.
  * Deep chains impose compounding social cost and are rarely affordable in practice
@@ -49,7 +54,7 @@ export function negotiateDisplacement(
     requesterPriority: number,
     root: Entity,
     currentTick: number,
-): DisplacementTransaction | null {
+): NegotiationResult {
     console.log(
         `[Displacement] ${requester.id} negotiating tile (${targetTile.x},${targetTile.y}), priority=${requesterPriority}`,
     );
@@ -61,7 +66,7 @@ export function negotiateDisplacement(
         console.log(
             `[Displacement] ${requester.id} no displaceable entity at (${targetTile.x},${targetTile.y}), skipping`,
         );
-        return null;
+        return { kind: "noChain" };
     }
 
     const blockerResistance = getDisplacementResistance(blocker, currentTick);
@@ -69,7 +74,7 @@ export function negotiateDisplacement(
         console.log(
             `[Displacement] ${requester.id} blocker=${blocker.id} resistance=${blockerResistance} exceeds priority=${requesterPriority}, refusing`,
         );
-        return null;
+        return { kind: "refused" };
     }
 
     console.log(
@@ -97,13 +102,13 @@ export function negotiateDisplacement(
         console.log(
             `[Displacement] ${requester.id} no viable chain found for (${targetTile.x},${targetTile.y})`,
         );
-        return null;
+        return { kind: "noChain" };
     }
 
     console.log(
         `[Displacement] ${requester.id} found ${result.isCycle ? "cycle" : "chain"} of ${result.moves.length} moves, totalResistance=${result.totalResistance}`,
     );
-    return { moves: result.moves, isCycle: result.isCycle };
+    return { kind: "success", transaction: { moves: result.moves, isCycle: result.isCycle } };
 }
 
 interface ChainResult {

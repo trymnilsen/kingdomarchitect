@@ -17,6 +17,7 @@ import { ResourceComponentId } from "../../component/resourceComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { discoverAfterMovement } from "../../job/movementHelper.ts";
 import { getPathfindingGraphForEntity } from "../../map/path/getPathfindingGraphForEntity.ts";
+import type { GraphNode } from "../../map/path/graph/graph.ts";
 import { queryEntity } from "../../map/query/queryEntity.ts";
 import {
     PathResultStatus,
@@ -31,6 +32,13 @@ import {
     type ActionResult,
     type BehaviorActionData,
 } from "./Action.ts";
+
+/**
+ * Maximum number of times we replan within a single tick after proving a tile
+ * impassable via failed displacement. In practice this terminates in 1–2 iterations;
+ * the cap guards against bugs in the blocked-tile accumulation.
+ */
+const MAX_REPLAN_ATTEMPTS = 10;
 
 /**
  * Check if two points are diagonally adjacent (including cardinal directions).
@@ -84,18 +92,39 @@ function applyRequesterStep(
 }
 
 /**
+ * Returns a weight modifier that treats tiles in `blocked` as impassable (weight 0).
+ * GraphNode coordinates are in graph space (world + offset), so we subtract the
+ * graph offset to convert back to world coordinates before checking the set.
+ */
+function blockedTilesWeightModifier(
+    blocked: Set<string>,
+    offsetX: number,
+    offsetY: number,
+): (node: GraphNode) => number {
+    return (node) => {
+        const key = `${node.x - offsetX},${node.y - offsetY}`;
+        return blocked.has(key) ? 0 : node.weight;
+    };
+}
+
+/**
  * Move to a target position, negotiating displacement with blocking entities when needed.
  *
  * This function owns the full movement pipeline:
  *   pathfinding → occupancy check → displacement negotiation → position assignment
+ *
+ * When displacement negotiation fails (refused or no viable chain), the blocking tile
+ * is proven impassable for this tick and added to a local set. The path is immediately
+ * replanned with those tiles treated as walls, so the entity routes around them rather
+ * than retrying the same blocked path on the next tick.
  *
  * Displacement uses the entity's currentBehaviorUtility as its negotiation priority.
  * A higher-priority entity can displace idle or low-priority entities that block its path.
  *
  * Returns:
  *   "complete" — arrived at target (or adjacent, if stopAdjacent is set)
- *   "running"  — still en route, or blocked by an entity that might move next tick
- *   "failed"   — path is permanently blocked (building, resource, no graph)
+ *   "running"  — still en route, or waiting for blockers to clear
+ *   "failed"   — path is permanently blocked (building, resource, no graph, no path)
  */
 export function executeMoveToAction(
     action: Extract<BehaviorActionData, { type: "moveTo" }>,
@@ -116,59 +145,107 @@ export function executeMoveToAction(
         return { kind: "failed", cause: { type: "pathBlocked", target: action.target } };
     }
 
-    const pathOptions: QueryPathOptions = { allowAdjacentStop: !!action.stopAdjacent };
-    const path = queryPath(pathfindingGraph, entity.worldPosition, action.target, pathOptions);
+    const { offsetX, offsetY } = pathfindingGraph.graph;
+    const locallyBlocked = new Set<string>();
 
-    const isValidPath =
-        path.status === PathResultStatus.Complete ||
-        path.status === PathResultStatus.Partial;
-    const nextPoint = path.path[0];
+    for (let attempt = 0; attempt <= MAX_REPLAN_ATTEMPTS; attempt++) {
+        const pathOptions: QueryPathOptions = {
+            allowAdjacentStop: !!action.stopAdjacent,
+            weightModifier:
+                locallyBlocked.size > 0
+                    ? blockedTilesWeightModifier(locallyBlocked, offsetX, offsetY)
+                    : undefined,
+        };
 
-    if (!isValidPath || !nextPoint) {
-        if (action.stopAdjacent && hasArrived(entity.worldPosition, action.target, action.stopAdjacent)) {
-            console.log(
-                `[MoveTo] ${entity.id} arrived at (${entity.worldPosition.x},${entity.worldPosition.y}) via stopAdjacent fallback`,
-            );
-            return ActionComplete;
+        const path = queryPath(
+            pathfindingGraph,
+            entity.worldPosition,
+            action.target,
+            pathOptions,
+        );
+
+        const isValidPath =
+            path.status === PathResultStatus.Complete ||
+            path.status === PathResultStatus.Partial;
+        const nextPoint = path.path[0];
+
+        if (!isValidPath || !nextPoint) {
+            if (
+                action.stopAdjacent &&
+                hasArrived(entity.worldPosition, action.target, action.stopAdjacent)
+            ) {
+                console.log(
+                    `[MoveTo] ${entity.id} arrived at (${entity.worldPosition.x},${entity.worldPosition.y}) via stopAdjacent fallback`,
+                );
+                return ActionComplete;
+            }
+
+            if (locallyBlocked.size === 0) {
+                // No path at all — genuinely blocked by terrain or structures.
+                console.log(
+                    `[MoveTo] ${entity.id} no path to (${action.target.x},${action.target.y}), status=${path.status}`,
+                );
+                return { kind: "failed", cause: { type: "pathBlocked", target: action.target } };
+            } else {
+                // All routes go through tiles we proved impassable this tick.
+                // The blockers may move next tick, so wait rather than hard-fail.
+                console.log(
+                    `[MoveTo] ${entity.id} no path around blocked tiles, waiting`,
+                );
+                return ActionRunning;
+            }
         }
-        console.log(
-            `[MoveTo] ${entity.id} no path to (${action.target.x},${action.target.y}), status=${path.status}`,
+
+        const occupants = queryEntity(root, nextPoint);
+
+        // Buildings and resources are impassable — displacement doesn't apply to them.
+        const hasStructure = occupants.some(
+            (o) =>
+                o.hasComponent(BuildingComponentId) || o.hasComponent(ResourceComponentId),
         );
-        return { kind: "failed", cause: { type: "pathBlocked", target: action.target } };
-    }
-
-    const occupants = queryEntity(root, nextPoint);
-
-    // Buildings and resources are impassable — displacement doesn't apply to them.
-    const hasStructure = occupants.some(
-        (o) =>
-            o.hasComponent(BuildingComponentId) || o.hasComponent(ResourceComponentId),
-    );
-    if (hasStructure) {
-        if (action.stopAdjacent && hasArrived(entity.worldPosition, action.target, action.stopAdjacent)) {
+        if (hasStructure) {
+            if (
+                action.stopAdjacent &&
+                hasArrived(entity.worldPosition, action.target, action.stopAdjacent)
+            ) {
+                console.log(
+                    `[MoveTo] ${entity.id} arrived at (${entity.worldPosition.x},${entity.worldPosition.y}) via stopAdjacent fallback`,
+                );
+                return ActionComplete;
+            }
             console.log(
-                `[MoveTo] ${entity.id} arrived at (${entity.worldPosition.x},${entity.worldPosition.y}) via stopAdjacent fallback`,
+                `[MoveTo] ${entity.id} path blocked by structure at (${nextPoint.x},${nextPoint.y})`,
             );
-            return ActionComplete;
+            return { kind: "failed", cause: { type: "pathBlocked", target: action.target } };
         }
-        console.log(
-            `[MoveTo] ${entity.id} path blocked by structure at (${nextPoint.x},${nextPoint.y})`,
-        );
-        return { kind: "failed", cause: { type: "pathBlocked", target: action.target } };
-    }
 
-    // Entities with behavior agents can be asked to step aside.
-    const displaceable = occupants.filter((o) => o.hasComponent(BehaviorAgentComponentId));
-    if (displaceable.length > 0) {
-        const agent = getBehaviorAgent(entity);
-        const priority = agent?.currentBehaviorUtility ?? 0;
-        const blockerIds = displaceable.map((o) => o.id).join(", ");
-        console.log(
-            `[MoveTo] ${entity.id} next tile (${nextPoint.x},${nextPoint.y}) blocked by [${blockerIds}], priority=${priority}, attempting displacement`,
-        );
-        const transaction = negotiateDisplacement(entity, nextPoint, priority, root, tick);
-        if (transaction) {
-            const committed = commitDisplacementTransaction(transaction, root, tick, entity.id);
+        // Entities with behavior agents can be asked to step aside.
+        const displaceable = occupants.filter((o) => o.hasComponent(BehaviorAgentComponentId));
+        if (displaceable.length > 0) {
+            const agent = getBehaviorAgent(entity);
+            const priority = agent?.currentBehaviorUtility ?? 0;
+            const blockerIds = displaceable.map((o) => o.id).join(", ");
+            console.log(
+                `[MoveTo] ${entity.id} next tile (${nextPoint.x},${nextPoint.y}) blocked by [${blockerIds}], priority=${priority}, attempting displacement`,
+            );
+
+            const result = negotiateDisplacement(entity, nextPoint, priority, root, tick);
+
+            if (result.kind === "refused" || result.kind === "noChain") {
+                // Proven impassable for this tick — block tile and replan immediately.
+                console.log(
+                    `[MoveTo] ${entity.id} displacement ${result.kind} at (${nextPoint.x},${nextPoint.y}), replanning`,
+                );
+                locallyBlocked.add(`${nextPoint.x},${nextPoint.y}`);
+                continue;
+            }
+
+            const committed = commitDisplacementTransaction(
+                result.transaction,
+                root,
+                tick,
+                entity.id,
+            );
             if (committed) {
                 // Cycle: the transaction already repositioned all entities atomically,
                 // including this entity. Check arrival based on the new position.
@@ -179,7 +256,7 @@ export function executeMoveToAction(
                     return ActionComplete;
                 }
                 // Non-cycle: the chain moved displaced entities; the target tile is now free.
-                if (!transaction.isCycle) {
+                if (!result.transaction.isCycle) {
                     applyRequesterStep(entity, entity.worldPosition, nextPoint, tick);
                     console.log(
                         `[MoveTo] ${entity.id} displaced chain, stepped to (${entity.worldPosition.x},${entity.worldPosition.y})`,
@@ -190,21 +267,25 @@ export function executeMoveToAction(
                 }
                 return ActionRunning;
             }
+
+            // Stale transaction: the world changed between negotiation and commit.
+            // This is a timing issue, not proof of impassability — don't block the tile.
             console.log(`[MoveTo] ${entity.id} displacement transaction stale, waiting`);
-        } else {
-            console.log(`[MoveTo] ${entity.id} displacement negotiation failed, waiting`);
+            return ActionRunning;
         }
-        // Displacement failed or stale — the blocker may move next tick, so keep trying.
+
+        // Tile is free — step into it.
+        applyRequesterStep(entity, entity.worldPosition, nextPoint, tick);
+        console.log(
+            `[MoveTo] ${entity.id} stepped to (${entity.worldPosition.x},${entity.worldPosition.y})`,
+        );
+        if (hasArrived(entity.worldPosition, action.target, action.stopAdjacent)) {
+            return ActionComplete;
+        }
         return ActionRunning;
     }
 
-    // Tile is free — step into it.
-    applyRequesterStep(entity, entity.worldPosition, nextPoint, tick);
-    console.log(
-        `[MoveTo] ${entity.id} stepped to (${entity.worldPosition.x},${entity.worldPosition.y})`,
-    );
-    if (hasArrived(entity.worldPosition, action.target, action.stopAdjacent)) {
-        return ActionComplete;
-    }
+    // Safety cap: should not be reached in practice.
+    console.warn(`[MoveTo] ${entity.id} exceeded max replan attempts, waiting`);
     return ActionRunning;
 }
