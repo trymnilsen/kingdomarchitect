@@ -187,6 +187,10 @@ function findBestJob(
             continue;
         }
 
+        // Cost combines distance and queue position so workers prefer nearby jobs
+        // but still respect rough priority order (earlier jobs score lower queue cost).
+        // baseCost provides a floor so a job at distance 0 doesn't get an unfair
+        // advantage purely from its index relative to other close-by jobs.
         const baseCost = 10;
         const distanceCost = distance(entity.worldPosition, targetPosition);
         const queuePositionCost = i;

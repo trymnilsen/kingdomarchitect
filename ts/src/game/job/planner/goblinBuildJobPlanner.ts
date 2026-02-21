@@ -18,12 +18,20 @@ import { GoblinUnitComponentId } from "../../component/goblinUnitComponent.ts";
  * Goblin-specific build job planner. Unlike the player-worker planner,
  * goblins gather materials from the environment when stockpiles are empty.
  *
- * Scaffolding placement is NOT handled here — the GoblinCampSystem does that.
- * This planner only handles the construction workflow:
+ * This planner handles job-assigned builds (from the camp job queue).
+ * For survival-triggered builds (e.g. building a campfire when cold),
+ * see goblinBuildPlanner.ts — that one also places scaffolding.
+ *
+ * Scaffolding placement is NOT handled here — the GoblinCampSystem does that
+ * when it posts a build job to the camp queue. By the time this planner runs,
+ * the scaffolded entity already exists in the world.
+ *
+ * Construction workflow:
  * 1. Building has all materials → moveTo + construct
  * 2. Goblin has materials → moveTo + deposit
  * 3. Camp stockpile has materials → moveTo + take
  * 4. Need to gather → find nearest tree → moveTo + harvest
+ *    (only wood gathering is implemented; other materials stall silently)
  */
 export function planGoblinBuildJob(
     root: Entity,
@@ -217,6 +225,10 @@ function getItemsToTakeFromStockpile(
     return items;
 }
 
+// Tree resource IDs that can be chopped for wood.
+// This list is duplicated from goblinBuildPlanner. There's no centralized
+// "is choppable" flag on ResourceComponent yet — if adding a new tree type,
+// update both planners until that's consolidated.
 const choppableResourceIds = [
     "tree1",
     "pineTree",

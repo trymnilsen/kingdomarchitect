@@ -17,15 +17,22 @@ import { createBuildingPlacementValidator } from "../../map/query/buildingPlacem
 import { woodResourceItem } from "../../../data/inventory/items/resources.ts";
 
 /**
- * Plans building construction for goblins.
- * Unlike player workers, goblins gather materials themselves.
+ * Plans building construction for goblins triggered by survival behaviors,
+ * not the job system. This is used by keepWarmBehavior when a goblin needs
+ * a campfire and there isn't one — survival can't wait for the camp director
+ * to issue a build job.
+ *
+ * Unlike goblinBuildJobPlanner (which handles job-assigned builds), this
+ * planner both places the scaffolding AND plans the construction workflow.
+ * The scaffolding is placed immediately inside expand() so the planner can
+ * return a concrete action sequence pointing at the new entity.
  *
  * State evaluation order:
- * 1. Building site exists with all materials -> construct
- * 2. Building site exists, goblin has materials -> deposit
- * 3. Building site exists, stockpile has materials -> fetch from stockpile
- * 4. Building site exists, need materials -> gather from environment
- * 5. No building site -> place scaffolding
+ * 1. No building site → place scaffolding, then fall through to state 2+
+ * 2. Building site exists with all materials → construct
+ * 3. Building site exists, goblin has materials → deposit
+ * 4. Building site exists, stockpile has materials → fetch from stockpile
+ * 5. Need materials → gather from environment (currently: wood only)
  */
 export function planGoblinBuild(
     root: Entity,
@@ -289,7 +296,9 @@ function planGatherMaterials(
     goblin: Entity,
     remainingMaterials: Record<string, number>,
 ): BehaviorActionData[] {
-    // For wood, find nearest choppable tree
+    // Currently only wood gathering is implemented. If a building needs stone,
+    // metal, or other materials, this will silently return [] and the goblin
+    // will stall. Extend this function as new material types are introduced.
     if (remainingMaterials[woodResourceItem.id]) {
         const nearestTree = findNearestChoppableResource(root, goblin);
         if (nearestTree) {
@@ -317,7 +326,10 @@ function findNearestChoppableResource(root: Entity, goblin: Entity): Entity | nu
     let nearest: Entity | null = null;
     let nearestDist = Infinity;
 
-    // Tree resource IDs that can be chopped
+    // Tree resource IDs that can be chopped.
+    // This list is duplicated from goblinBuildJobPlanner. There's no centralized
+    // "is choppable" flag on ResourceComponent yet — if adding a new tree type,
+    // update both planners until that's consolidated.
     const choppableResourceIds = [
         "tree1",
         "pineTree",

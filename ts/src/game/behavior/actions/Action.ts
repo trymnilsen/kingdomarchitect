@@ -3,6 +3,12 @@ import type { Point } from "../../../common/point.ts";
 import type { ResourceHarvestMode } from "../../../data/inventory/items/naturalResource.ts";
 import type { CraftingRecipe } from "../../../data/crafting/craftingRecipe.ts";
 
+/**
+ * Failure causes carry enough context for behaviors to branch intelligently
+ * when a replan is triggered. For example, keepWarmBehavior can see that
+ * the path to fire was blocked and try a different fire, or fall back to
+ * building a new one. Without cause, every failure would look the same.
+ */
 export type FailureCause =
     | { type: "pathBlocked"; target: Point }
     | { type: "targetGone"; entityId: string }
@@ -43,6 +49,16 @@ export type ItemTransfer = {
 /**
  * Action data types - these are serializable plain objects that can be stored in components.
  * Each action type has its own data structure with the information needed to execute it.
+ *
+ * Multi-tick actions (harvest, operateFacility, craftItem) carry mutable progress fields.
+ * Progress is stored on the action data itself rather than in a separate component so
+ * that: (a) the action is self-contained and fully serializable, and (b) if the entity
+ * replans mid-action, the abandoned progress is discarded automatically with the queue.
+ *
+ * The `stopAdjacent` option on moveTo lets behaviors place the entity next to a target
+ * without standing on it — necessary for actions like constructBuilding or harvestResource
+ * that require adjacency. "cardinal" stops one step away on N/S/E/W; "diagonal" includes
+ * corners (used for warmByFire which checks Chebyshev distance).
  */
 export type BehaviorActionData =
     | { type: "wait"; until: number }
@@ -55,6 +71,13 @@ export type BehaviorActionData =
     | { type: "takeFromInventory"; sourceEntityId: string; items: ItemTransfer[] }
     | { type: "depositToInventory"; targetEntityId: string; items: ItemTransfer[] }
     | { type: "operateFacility"; buildingId: string; progress?: number }
+    /**
+     * craftItem is two-phase to avoid consuming inputs and then losing them to a replan.
+     * On the first tick, inputs are taken from the worker and inputsConsumed is set to true.
+     * Subsequent ticks track progress toward completion without touching inventory again.
+     * If the entity replans before completion, the consumed inputs are lost — intentional,
+     * as partial crafting is treated as a failed attempt.
+     */
     | { type: "craftItem"; buildingId: string; recipe: CraftingRecipe; progress?: number; inputsConsumed?: boolean }
     | { type: "collectItems"; entityId: string }
     | { type: "attackTarget"; targetId: string }

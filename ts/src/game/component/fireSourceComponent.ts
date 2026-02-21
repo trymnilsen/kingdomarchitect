@@ -1,6 +1,15 @@
 /**
  * Component for entities that provide warmth (campfires, braziers).
  * Fires warm entities in adjacent tiles (8 surrounding tiles only).
+ *
+ * There are two warmth rates because warming is intentionally an active choice:
+ *   - activeWarmthRate: applied when a goblin executes the warmByFire action
+ *     (i.e. it deliberately sat down to warm up — rapid recovery, ~15/tick)
+ *   - passiveWarmthRate: applied by WarmthDecaySystem to entities that happen
+ *     to be standing next to fire while doing something else (slow, ~2/tick)
+ *
+ * This separation means a goblin working near a fire stays comfortable longer
+ * without replanning, but a cold goblin that commits to warming recovers quickly.
  */
 export type FireSourceComponent = {
     id: typeof FireSourceComponentId;

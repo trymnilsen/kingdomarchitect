@@ -1,7 +1,12 @@
 /**
- * Component that tracks warmth for entities.
+ * Component that tracks warmth for entities (currently goblins only).
  * Warmth ranges from 0 (freezing) to 100 (fully warm).
- * Goblins become cold when warmth drops below 70.
+ *
+ * Warmth decays by decayRate every simulation tick (1 Hz). At the default rate
+ * of 1.0/tick a goblin starting at 55 warmth will hit the cold threshold in
+ * roughly 5 ticks, giving it a short window before keepWarmBehavior kicks in.
+ * Fire warms at activeWarmthRate (default 15/tick), so recovery is fast relative
+ * to decay — goblins spend most of their time working, not warming.
  */
 export type WarmthComponent = {
     id: typeof WarmthComponentId;
@@ -15,6 +20,9 @@ export type WarmthComponent = {
 
 export const WarmthComponentId = "Warmth";
 export const COLD_THRESHOLD = 50;
+// DEFAULT_WARMTH starts slightly above COLD_THRESHOLD so a newly spawned goblin
+// has a few ticks to orient itself before keepWarmBehavior activates. If it
+// started at exactly 50 it would immediately divert to warming rather than work.
 export const DEFAULT_WARMTH = 55;
 
 /**

@@ -18,6 +18,14 @@ export type BehaviorResolver = (entity: Entity) => Behavior[];
 /**
  * BehaviorSystem manages behavior selection and execution for entities with BehaviorAgent components.
  * It evaluates behaviors, selects the highest utility behavior, and executes actions from the queue.
+ *
+ * Per-tick order for each agent:
+ *   1. Replan if pendingReplan is set (includes first-tick initialization)
+ *   2. Execute the first action in the queue
+ *
+ * Replanning happens before action execution so that a freshly spawned entity
+ * picks its first behavior and begins executing it in the same tick it was created,
+ * rather than sitting idle for one tick.
  */
 export function createBehaviorSystem(resolver: BehaviorResolver): EcsSystem {
     return {
@@ -92,6 +100,10 @@ function updateBehaviorAgent(
 /**
  * Unclaim the current job if the entity has one.
  * This is called when an action fails to ensure jobs aren't left in a claimed state.
+ *
+ * Uses ancestor traversal rather than a direct component lookup because entities
+ * don't own their job queue — it lives on their parent (worker → root, goblin → camp).
+ * The loop breaks after the first match because an entity can only claim one job at a time.
  */
 function unclaimCurrentJob(entity: Entity): void {
     const queueEntity = entity.getAncestorEntity(JobQueueComponentId);
@@ -146,7 +158,11 @@ function replan(
         ? behaviors.find((b) => b.name === agent.currentBehaviorName)
         : null;
 
-    const REPLAN_THRESHOLD = 5; // Only switch if new behavior is 5+ utility higher
+    // Hysteresis: give the current behavior a bonus to prevent "thrashing" —
+    // rapidly switching back and forth between two behaviors with similar utilities.
+    // For example, a goblin at warmth=51 (just above threshold) after warming up
+    // shouldn't oscillate between keepWarm and performJob every replan.
+    const REPLAN_THRESHOLD = 5; // Only switch if a new behavior is 5+ utility higher
     // Calculate utilities for all valid behaviors
     const behaviorUtilities = validBehaviors.map((behavior) => {
         let utility = behavior.utility(entity);

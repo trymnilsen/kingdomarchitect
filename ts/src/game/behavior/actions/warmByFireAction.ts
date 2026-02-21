@@ -9,7 +9,9 @@ import { ActionComplete, ActionRunning, type ActionResult, type BehaviorActionDa
 
 /**
  * Check if two points are within 1 tile of each other (8-directional adjacency).
- * Uses chebyshev distance (max of abs differences).
+ * Uses Chebyshev distance (max of abs differences) rather than Manhattan so that
+ * diagonal neighbors count — a goblin standing diagonally next to a campfire
+ * should still be able to warm up.
  */
 function isWithinOneTile(a: Point, b: Point): boolean {
     const dx = Math.abs(a.x - b.x);
@@ -68,7 +70,10 @@ export function executeWarmByFireAction(
     increaseWarmth(warmth, fireSource.activeWarmthRate);
     entity.invalidateComponent(WarmthComponentId);
 
-    // Complete when fully warm
+    // Complete at 100 (fully warm), not at COLD_THRESHOLD (50).
+    // If we stopped at 50 the goblin would immediately be eligible for keepWarm
+    // again on the very next tick and thrash between warming and working.
+    // Warming to full gives it a long buffer before the next keepWarm activation.
     if (warmth.warmth >= 100) {
         console.log(`[WarmByFireAction] Entity ${entity.id} is fully warm`);
         return ActionComplete;
