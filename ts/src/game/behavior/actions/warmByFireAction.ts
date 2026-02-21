@@ -5,7 +5,12 @@ import {
 } from "../../component/warmthComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import type { Point } from "../../../common/point.ts";
-import { ActionComplete, ActionRunning, type ActionResult, type BehaviorActionData } from "./Action.ts";
+import {
+    ActionComplete,
+    ActionRunning,
+    type ActionResult,
+    type BehaviorActionData,
+} from "./Action.ts";
 
 /**
  * Check if two points are within 1 tile of each other (8-directional adjacency).
@@ -43,7 +48,10 @@ export function executeWarmByFireAction(
         console.warn(
             `[WarmByFireAction] Fire entity ${action.fireEntityId} not found`,
         );
-        return { kind: "failed", cause: { type: "targetGone", entityId: action.fireEntityId } };
+        return {
+            kind: "failed",
+            cause: { type: "targetGone", entityId: action.fireEntityId },
+        };
     }
 
     const fireSource = fireEntity.getEcsComponent(FireSourceComponentId);
@@ -57,7 +65,10 @@ export function executeWarmByFireAction(
 
     if (!fireSource.isActive) {
         console.warn(`[WarmByFireAction] Fire is not active`);
-        return { kind: "failed", cause: { type: "targetGone", entityId: action.fireEntityId } };
+        return {
+            kind: "failed",
+            cause: { type: "targetGone", entityId: action.fireEntityId },
+        };
     }
 
     // Check adjacency (must be within 1 tile, including diagonals)
@@ -74,7 +85,7 @@ export function executeWarmByFireAction(
     // If we stopped at 50 the goblin would immediately be eligible for keepWarm
     // again on the very next tick and thrash between warming and working.
     // Warming to full gives it a long buffer before the next keepWarm activation.
-    if (warmth.warmth >= 100) {
+    if (warmth.warmth >= 90) {
         console.log(`[WarmByFireAction] Entity ${entity.id} is fully warm`);
         return ActionComplete;
     }
