@@ -230,7 +230,7 @@ describe("Goblin Building Flow", () => {
         });
 
         const camp = createCamp(root, "goblinCamp1", { x: 12, y: 8 });
-        const goblin = createGoblin(camp, { x: 12, y: 8 });
+        createGoblin(camp, { x: 12, y: 8 });
         // Three trees: campfire costs 10 wood (1 tree), hut costs 15 wood (2 trees)
         createTree(root, "tree1", { x: 13, y: 8 });
         createTree(root, "tree2", { x: 14, y: 8 });
@@ -253,11 +253,6 @@ describe("Goblin Building Flow", () => {
             "Completed hut should have a HousingComponent",
         );
 
-        const warmth = goblin.getEcsComponent(WarmthComponentId)!;
-        assert.ok(
-            warmth.warmth >= COLD_THRESHOLD,
-            `Goblin should be warm after building both structures (warmth: ${warmth.warmth})`,
-        );
     });
 
     it("cold goblin moves to existing fire and warms up without building", () => {

@@ -185,6 +185,7 @@ function replan(
     const bestBehavior = behaviorUtilities[0];
 
     agent.currentBehaviorName = bestBehavior.behavior.name;
+    agent.currentBehaviorUtility = bestBehavior.utility;
     // pendingReplan is still set here so behaviors can read failure context
     // from the component inside expand()
     const newActions = bestBehavior.behavior.expand(entity);

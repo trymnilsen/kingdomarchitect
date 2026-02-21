@@ -44,7 +44,7 @@ export function getWeightAtPoint(point: Point, scope: Entity): number {
             }
 
             if (entity.hasComponent(GoblinUnitComponentId)) {
-                entityWeight = Math.max(entityWeight, 100);
+                entityWeight = Math.max(entityWeight, 50);
             }
         }
 

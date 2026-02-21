@@ -19,7 +19,7 @@ describe("moveToAction", () => {
                 target: { x: 5, y: 5 },
             };
 
-            const result = executeMoveToAction(action, entity);
+            const result = executeMoveToAction(action, entity, 1);
 
             assert.strictEqual(result.kind, "complete");
         });
@@ -36,7 +36,7 @@ describe("moveToAction", () => {
                 stopAdjacent: "cardinal",
             };
 
-            const result = executeMoveToAction(action, entity);
+            const result = executeMoveToAction(action, entity, 1);
 
             assert.strictEqual(result.kind, "complete");
         });
@@ -53,7 +53,7 @@ describe("moveToAction", () => {
                 stopAdjacent: "cardinal",
             };
 
-            const result = executeMoveToAction(action, entity);
+            const result = executeMoveToAction(action, entity, 1);
 
             assert.strictEqual(result.kind, "complete");
         });
@@ -70,7 +70,7 @@ describe("moveToAction", () => {
                 stopAdjacent: "diagonal",
             };
 
-            const result = executeMoveToAction(action, entity);
+            const result = executeMoveToAction(action, entity, 1);
 
             assert.strictEqual(result.kind, "complete");
         });
@@ -87,7 +87,7 @@ describe("moveToAction", () => {
                 stopAdjacent: "cardinal",
             };
 
-            const result = executeMoveToAction(action, entity);
+            const result = executeMoveToAction(action, entity, 1);
 
             // Without pathfinding graph, movement will fail
             // The key assertion is that it doesn't complete just because diagonal
@@ -105,7 +105,7 @@ describe("moveToAction", () => {
                 target: { x: 6, y: 5 }, // Adjacent but no stopAdjacent
             };
 
-            const result = executeMoveToAction(action, entity);
+            const result = executeMoveToAction(action, entity, 1);
 
             // Without pathfinding graph, movement will fail
             // The key assertion is that it doesn't complete just because adjacent
@@ -132,7 +132,7 @@ describe("moveToAction", () => {
                     stopAdjacent: "cardinal",
                 };
 
-                const result = executeMoveToAction(action, entity);
+                const result = executeMoveToAction(action, entity, 1);
 
                 assert.strictEqual(
                     result.kind,
@@ -166,7 +166,7 @@ describe("moveToAction", () => {
                     stopAdjacent: "diagonal",
                 };
 
-                const result = executeMoveToAction(action, entity);
+                const result = executeMoveToAction(action, entity, 1);
 
                 assert.strictEqual(
                     result.kind,

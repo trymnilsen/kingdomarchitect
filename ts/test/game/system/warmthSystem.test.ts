@@ -90,10 +90,10 @@ describe("warmthSystem", () => {
             assert.strictEqual((warmth as any).warmth, 54);
         });
 
-        it("works with diagonal adjacency", () => {
+        it("does not warm with diagonal adjacency", () => {
             const root = new Entity("root");
             const entity = createTestEntityWithWarmth("entity-1", 50, 1, 0, 0);
-            const fire = createTestFire("fire-1", true, 5, 1, 1); // Diagonal
+            const fire = createTestFire("fire-1", true, 5, 1, 1); // Diagonal, not cardinal
 
             root.addChild(entity);
             root.addChild(fire);
@@ -102,8 +102,8 @@ describe("warmthSystem", () => {
 
             const warmth = entity.getEcsComponent("Warmth");
             assert.ok(warmth);
-            // 50 - 1 (decay) + 5 (passive) = 54
-            assert.strictEqual((warmth as any).warmth, 54);
+            // 50 - 1 (decay) = 49, no passive warming from diagonal
+            assert.strictEqual((warmth as any).warmth, 49);
         });
 
         it("does not warm when fire is not adjacent", () => {

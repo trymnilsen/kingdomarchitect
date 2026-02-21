@@ -12,19 +12,19 @@ import { requestReplan } from "../component/BehaviorAgentComponent.ts";
 export const WARMTH_DECAY_TICK_INTERVAL = 10;
 
 /**
- * Check if two points are within 1 tile of each other (8-directional adjacency).
- * Uses chebyshev distance (max of abs differences).
+ * Check if two points are within 1 tile of each other (cardinal adjacency only).
+ * Uses Manhattan distance, so diagonals do not count.
  */
-function isWithinOneTile(a: Point, b: Point): boolean {
+function isCardinallyAdjacent(a: Point, b: Point): boolean {
     const dx = Math.abs(a.x - b.x);
     const dy = Math.abs(a.y - b.y);
-    return Math.max(dx, dy) <= 1;
+    return dx + dy <= 1;
 }
 
 /**
  * System that handles warmth decay and passive fire warming.
  * - Decreases warmth for all entities with WarmthComponent by decayRate per tick
- * - Entities adjacent to active fire sources (8 tiles) receive passive warmth
+ * - Entities cardinally adjacent to active fire sources receive passive warmth
  */
 export const warmthSystem: EcsSystem = {
     onUpdate: (root: Entity, tick: number) => {
@@ -53,9 +53,9 @@ export const warmthSystem: EcsSystem = {
                 decreaseWarmth(warmthComponent, warmthComponent.decayRate);
             }
 
-            // Check for passive warming from adjacent fires (8 tiles)
+            // Check for passive warming from cardinally adjacent fires
             for (const fire of activeFirePositions) {
-                if (isWithinOneTile(entity.worldPosition, fire.position)) {
+                if (isCardinallyAdjacent(entity.worldPosition, fire.position)) {
                     increaseWarmth(warmthComponent, fire.passiveRate);
                     break; // Only one fire bonus per tick
                 }

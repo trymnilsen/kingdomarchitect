@@ -63,7 +63,7 @@ export type ItemTransfer = {
 export type BehaviorActionData =
     | { type: "wait"; until: number }
     | { type: "moveTo"; target: Point; stopAdjacent?: "cardinal" | "diagonal" }
-    | { type: "playerMove"; target: Point }
+    | { type: "clearPlayerCommand" }
     | { type: "sleep" }
     | { type: "depositToStockpile"; stockpileId: string }
     | { type: "harvestResource"; entityId: string; harvestAction: ResourceHarvestMode; workProgress?: number }

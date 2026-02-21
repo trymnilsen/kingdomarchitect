@@ -6,7 +6,7 @@ import type {
 } from "./Action.ts";
 import { executeWaitAction } from "./waitAction.ts";
 import { executeMoveToAction } from "./moveToAction.ts";
-import { executePlayerMoveAction } from "./playerMoveAction.ts";
+import { executeClearPlayerCommandAction } from "./clearPlayerCommandAction.ts";
 import { executeSleepAction } from "./sleepAction.ts";
 import { executeDepositToStockpileAction } from "./depositToStockpileAction.ts";
 import { executeHarvestResourceAction } from "./harvestResourceAction.ts";
@@ -31,9 +31,9 @@ export const executeAction: BehaviorActionExecutor = (
         case "wait":
             return executeWaitAction(action, entity, tick);
         case "moveTo":
-            return executeMoveToAction(action, entity);
-        case "playerMove":
-            return executePlayerMoveAction(action, entity);
+            return executeMoveToAction(action, entity, tick);
+        case "clearPlayerCommand":
+            return executeClearPlayerCommandAction(entity);
         case "sleep":
             return executeSleepAction(entity);
         case "depositToStockpile":

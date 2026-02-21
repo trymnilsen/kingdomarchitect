@@ -40,6 +40,12 @@ export type PendingReplan =
 export interface BehaviorAgentComponent {
     id: typeof BehaviorAgentComponentId;
     currentBehaviorName: string | null;
+    /**
+     * The utility score of the currently-running behavior, set during replan.
+     * Used by the displacement system to determine how much resistance this entity
+     * offers when another entity wants to displace it.
+     */
+    currentBehaviorUtility: number;
     actionQueue: BehaviorActionData[];
     pendingReplan?: PendingReplan;
     playerCommand?: PlayerCommand;
@@ -49,6 +55,7 @@ export function createBehaviorAgentComponent(): BehaviorAgentComponent {
     return {
         id: BehaviorAgentComponentId,
         currentBehaviorName: null,
+        currentBehaviorUtility: 0,
         actionQueue: [],
         pendingReplan: { kind: "replan" },
     };

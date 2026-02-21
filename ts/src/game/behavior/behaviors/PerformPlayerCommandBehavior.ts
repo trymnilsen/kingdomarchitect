@@ -34,7 +34,8 @@ export function createPerformPlayerCommandBehavior(): Behavior {
             switch (command.action) {
                 case "move":
                     return [
-                        { type: "playerMove", target: command.targetPosition },
+                        { type: "moveTo", target: command.targetPosition },
+                        { type: "clearPlayerCommand" },
                     ];
 
                 case "attack":
