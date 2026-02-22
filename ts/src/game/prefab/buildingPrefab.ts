@@ -19,6 +19,15 @@ import { carpenterRecipes } from "../../data/crafting/recipes/carpenterRecipes.t
 import { createStockpileComponent } from "../component/stockpileComponent.ts";
 import { forrester } from "../../data/building/wood/forrester.ts";
 import { createProductionComponent } from "../component/productionComponent.ts";
+import { goblinCampfire } from "../../data/building/goblin/goblinCampfire.ts";
+import { goblinHut } from "../../data/building/goblin/goblinHut.ts";
+import { createFireSourceComponent, FireSourceComponentId } from "../component/fireSourceComponent.ts";
+import { HousingComponentId } from "../component/housingComponent.ts";
+import { CraftingComponentId } from "../component/craftingComponent.ts";
+import { WorkplaceComponentId } from "../component/workplaceComponent.ts";
+import { StockpileComponentId } from "../component/stockpileComponent.ts";
+import { ProductionComponentId } from "../component/productionComponent.ts";
+import { InventoryComponentId } from "../component/inventoryComponent.ts";
 
 export function buildingPrefab(
     building: Building,
@@ -30,34 +39,16 @@ export function buildingPrefab(
         createHealthComponent(startScaffolded ? 10 : 100, 100),
     );
     entity.setEcsComponent(createVisibilityComponent());
-    if (building.id == woodenHouse.id) {
-        entity.setEcsComponent(createHousingComponent());
+
+    if (startScaffolded) {
+        // Scaffolded buildings only get an inventory to hold construction materials
+        if (building.requirements?.materials) {
+            entity.setEcsComponent(createInventoryComponent());
+        }
+    } else {
+        applyFunctionalComponents(entity, building);
     }
-    if (building.id == blacksmith.id) {
-        entity.setEcsComponent(createCraftingComponent(blacksmithRecipes));
-        entity.setEcsComponent(createInventoryComponent());
-        entity.setEcsComponent(createWorkplaceComponent());
-    }
-    if (building.id == carpenter.id) {
-        entity.setEcsComponent(createCraftingComponent(carpenterRecipes));
-        entity.setEcsComponent(createInventoryComponent());
-        entity.setEcsComponent(createWorkplaceComponent());
-    }
-    // Stockpiles get inventory for storing settlement resources
-    if (building.id == stockPile.id) {
-        entity.setEcsComponent(createInventoryComponent());
-        entity.setEcsComponent(createStockpileComponent());
-    }
-    // Forrester is a production building that spawns trees
-    if (building.id == forrester.id) {
-        entity.setEcsComponent(
-            createProductionComponent("forrester_production"),
-        );
-    }
-    // Scaffolded buildings get inventory for storing construction materials
-    if (startScaffolded && building.requirements?.materials) {
-        entity.setEcsComponent(createInventoryComponent());
-    }
+
     entity.setEcsComponent(
         createSpriteComponent(
             startScaffolded ? spriteRefs.wooden_house_scaffold : building.icon,
@@ -65,4 +56,54 @@ export function buildingPrefab(
         ),
     );
     return entity;
+}
+
+/**
+ * Attaches the functional ECS components for a completed building.
+ * Called both when creating a non-scaffolded building and when construction finishes.
+ */
+export function applyFunctionalComponents(
+    entity: Entity,
+    building: Building,
+): void {
+    if (building.id == woodenHouse.id) {
+        entity.setEcsComponent(createHousingComponent());
+        entity.invalidateComponent(HousingComponentId);
+    }
+    if (building.id == blacksmith.id) {
+        entity.setEcsComponent(createCraftingComponent(blacksmithRecipes));
+        entity.setEcsComponent(createInventoryComponent());
+        entity.setEcsComponent(createWorkplaceComponent());
+        entity.invalidateComponent(CraftingComponentId);
+        entity.invalidateComponent(InventoryComponentId);
+        entity.invalidateComponent(WorkplaceComponentId);
+    }
+    if (building.id == carpenter.id) {
+        entity.setEcsComponent(createCraftingComponent(carpenterRecipes));
+        entity.setEcsComponent(createInventoryComponent());
+        entity.setEcsComponent(createWorkplaceComponent());
+        entity.invalidateComponent(CraftingComponentId);
+        entity.invalidateComponent(InventoryComponentId);
+        entity.invalidateComponent(WorkplaceComponentId);
+    }
+    if (building.id == stockPile.id) {
+        entity.setEcsComponent(createInventoryComponent());
+        entity.setEcsComponent(createStockpileComponent());
+        entity.invalidateComponent(InventoryComponentId);
+        entity.invalidateComponent(StockpileComponentId);
+    }
+    if (building.id == forrester.id) {
+        entity.setEcsComponent(
+            createProductionComponent("forrester_production"),
+        );
+        entity.invalidateComponent(ProductionComponentId);
+    }
+    if (building.id == goblinCampfire.id) {
+        entity.setEcsComponent(createFireSourceComponent(15, 2, 1));
+        entity.invalidateComponent(FireSourceComponentId);
+    }
+    if (building.id == goblinHut.id) {
+        entity.setEcsComponent(createHousingComponent());
+        entity.invalidateComponent(HousingComponentId);
+    }
 }

@@ -1,12 +1,12 @@
 import type { Entity } from "../../entity/entity.ts";
 import type {
-    ActionStatus,
+    ActionResult,
     BehaviorActionData,
     BehaviorActionExecutor,
 } from "./Action.ts";
 import { executeWaitAction } from "./waitAction.ts";
 import { executeMoveToAction } from "./moveToAction.ts";
-import { executePlayerMoveAction } from "./playerMoveAction.ts";
+import { executeClearPlayerCommandAction } from "./clearPlayerCommandAction.ts";
 import { executeSleepAction } from "./sleepAction.ts";
 import { executeDepositToStockpileAction } from "./depositToStockpileAction.ts";
 import { executeHarvestResourceAction } from "./harvestResourceAction.ts";
@@ -17,6 +17,7 @@ import { executeOperateFacilityAction } from "./operateFacilityAction.ts";
 import { executeCraftItemAction } from "./craftItemAction.ts";
 import { executeCollectItemsAction } from "./collectItemsAction.ts";
 import { executeAttackTargetAction } from "./attackTargetAction.ts";
+import { executeWarmByFireAction } from "./warmByFireAction.ts";
 
 /**
  * Main action executor that dispatches to specific action handlers based on action type.
@@ -25,14 +26,14 @@ export const executeAction: BehaviorActionExecutor = (
     action: BehaviorActionData,
     entity: Entity,
     tick: number,
-): ActionStatus => {
+): ActionResult => {
     switch (action.type) {
         case "wait":
             return executeWaitAction(action, entity, tick);
         case "moveTo":
-            return executeMoveToAction(action, entity);
-        case "playerMove":
-            return executePlayerMoveAction(action, entity);
+            return executeMoveToAction(action, entity, tick);
+        case "clearPlayerCommand":
+            return executeClearPlayerCommandAction(entity);
         case "sleep":
             return executeSleepAction(entity);
         case "depositToStockpile":
@@ -53,10 +54,12 @@ export const executeAction: BehaviorActionExecutor = (
             return executeCollectItemsAction(action, entity);
         case "attackTarget":
             return executeAttackTargetAction(action, entity);
+        case "warmByFire":
+            return executeWarmByFireAction(action, entity);
         default:
             console.warn(
                 `[ActionExecutor] Unknown action type: ${(action as any).type}`,
             );
-            return "failed";
+            return { kind: "failed", cause: { type: "unknown" } };
     }
 };

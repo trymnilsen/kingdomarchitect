@@ -276,24 +276,8 @@ export function adjacentPoints(point: Point, includeDiagonal = false): Point[] {
  * @returns true if the point is adjacent
  */
 export function isPointAdjacentTo(pointA: Point, pointB: Point): boolean {
-    if (pointEquals(adjacentPoint(pointA, Direction.Left), pointB)) {
-        return true;
-    }
-
-    if (pointEquals(adjacentPoint(pointA, Direction.Up), pointB)) {
-        return true;
-    }
-
-    if (pointEquals(adjacentPoint(pointA, Direction.Down), pointB)) {
-        return true;
-    }
-
-    if (pointEquals(adjacentPoint(pointA, Direction.Right), pointB)) {
-        return true;
-    }
-
-    // None of the adjacent directions matched point B
-    return false;
+    const adjacency = checkAdjacency(pointA, pointB);
+    return !!adjacency;
 }
 
 /**

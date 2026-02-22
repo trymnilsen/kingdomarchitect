@@ -12,8 +12,8 @@ function createTestScene(): { root: Entity; worker: Entity; target: Entity } {
     const worker = new Entity("worker");
     const target = new Entity("target");
 
-    worker.worldPosition = { x: 0, y: 0 };
-    target.worldPosition = { x: 1, y: 0 }; // Adjacent
+    worker.worldPosition = { x: 10, y: 8 };
+    target.worldPosition = { x: 11, y: 8 }; // Adjacent
 
     target.setEcsComponent(createHealthComponent(10, 10));
 
@@ -34,7 +34,7 @@ describe("attackTargetAction", () => {
 
         const result = executeAttackTargetAction(action, worker);
 
-        assert.strictEqual(result, "running");
+        assert.strictEqual(result.kind, "running");
 
         const healthComponent = target.getEcsComponent(HealthComponentId)!;
         assert.strictEqual(healthComponent.currentHp, 9);
@@ -53,7 +53,7 @@ describe("attackTargetAction", () => {
 
         const result = executeAttackTargetAction(action, worker);
 
-        assert.strictEqual(result, "complete");
+        assert.strictEqual(result.kind, "complete");
         assert.strictEqual(healthComponent.currentHp, 0);
     });
 
@@ -67,12 +67,12 @@ describe("attackTargetAction", () => {
 
         const result = executeAttackTargetAction(action, worker);
 
-        assert.strictEqual(result, "failed");
+        assert.strictEqual(result.kind, "failed");
     });
 
     it("fails if worker not adjacent to target", () => {
         const { worker, target } = createTestScene();
-        target.worldPosition = { x: 10, y: 10 }; // Not adjacent
+        target.worldPosition = { x: 25, y: 25 }; // Not adjacent
 
         const action = {
             type: "attackTarget" as const,
@@ -81,13 +81,13 @@ describe("attackTargetAction", () => {
 
         const result = executeAttackTargetAction(action, worker);
 
-        assert.strictEqual(result, "failed");
+        assert.strictEqual(result.kind, "failed");
     });
 
     it("fails if target has no HealthComponent", () => {
         const { root, worker } = createTestScene();
         const noHealthTarget = new Entity("noHealthTarget");
-        noHealthTarget.worldPosition = { x: 1, y: 0 };
+        noHealthTarget.worldPosition = { x: 11, y: 8 };
         root.addChild(noHealthTarget);
 
         const action = {
@@ -97,7 +97,7 @@ describe("attackTargetAction", () => {
 
         const result = executeAttackTargetAction(action, worker);
 
-        assert.strictEqual(result, "failed");
+        assert.strictEqual(result.kind, "failed");
     });
 
     it("continues running while target has hp remaining", () => {
@@ -110,10 +110,10 @@ describe("attackTargetAction", () => {
 
         // Execute multiple times
         let result = executeAttackTargetAction(action, worker);
-        assert.strictEqual(result, "running");
+        assert.strictEqual(result.kind, "running");
 
         result = executeAttackTargetAction(action, worker);
-        assert.strictEqual(result, "running");
+        assert.strictEqual(result.kind, "running");
 
         const healthComponent = target.getEcsComponent(HealthComponentId)!;
         assert.strictEqual(healthComponent.currentHp, 8);

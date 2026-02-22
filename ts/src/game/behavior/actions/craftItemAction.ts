@@ -4,13 +4,13 @@ import {
     InventoryComponentId,
     takeInventoryItem,
 } from "../../component/inventoryComponent.ts";
+import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { findJobClaimedBy, completeJobFromQueue } from "../../job/jobLifecycle.ts";
 import {
     ActionComplete,
-    ActionFailed,
     ActionRunning,
-    type ActionStatus,
+    type ActionResult,
     type BehaviorActionData,
 } from "./Action.ts";
 
@@ -24,18 +24,18 @@ import {
 export function executeCraftItemAction(
     action: Extract<BehaviorActionData, { type: "craftItem" }>,
     entity: Entity,
-): ActionStatus {
+): ActionResult {
     const root = entity.getRootEntity();
     const buildingEntity = root.findEntity(action.buildingId);
 
     if (!buildingEntity) {
         console.warn(`[CraftItem] Building ${action.buildingId} not found`);
-        return ActionFailed;
+        return { kind: "failed", cause: { type: "targetGone", entityId: action.buildingId } };
     }
 
     if (!isPointAdjacentTo(buildingEntity.worldPosition, entity.worldPosition)) {
         console.warn(`[CraftItem] Worker not adjacent to building`);
-        return ActionFailed;
+        return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 
     const workerInventory = entity.requireEcsComponent(InventoryComponentId);
@@ -53,7 +53,7 @@ export function executeCraftItemAction(
                 console.warn(
                     `[CraftItem] Worker missing materials: needs ${input.amount}x ${input.item.id}, has ${item?.amount ?? 0}`,
                 );
-                return ActionFailed;
+                return { kind: "failed", cause: { type: "noResources" } };
             }
         }
 
@@ -67,7 +67,7 @@ export function executeCraftItemAction(
                 console.warn(
                     `[CraftItem] Failed to consume ${input.amount}x ${input.item.id}`,
                 );
-                return ActionFailed;
+                return { kind: "failed", cause: { type: "noResources" } };
             }
         }
 
@@ -86,9 +86,12 @@ export function executeCraftItemAction(
         }
         buildingEntity.invalidateComponent(InventoryComponentId);
 
-        const job = findJobClaimedBy(root, entity.id);
-        if (job) {
-            completeJobFromQueue(root, job);
+        const queueEntity = entity.getAncestorEntity(JobQueueComponentId);
+        if (queueEntity) {
+            const job = findJobClaimedBy(queueEntity, entity.id);
+            if (job) {
+                completeJobFromQueue(queueEntity, job);
+            }
         }
         return ActionComplete;
     }

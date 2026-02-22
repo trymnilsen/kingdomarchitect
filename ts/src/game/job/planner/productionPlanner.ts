@@ -1,5 +1,6 @@
 import type { Entity } from "../../entity/entity.ts";
 import type { BehaviorActionData } from "../../behavior/actions/Action.ts";
+import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import type { ProductionJob } from "../productionJob.ts";
 import { failJobFromQueue } from "../jobLifecycle.ts";
 
@@ -11,18 +12,25 @@ import { failJobFromQueue } from "../jobLifecycle.ts";
  */
 export function planProduction(
     root: Entity,
-    _worker: Entity,
+    worker: Entity,
     job: ProductionJob,
 ): BehaviorActionData[] {
     const buildingEntity = root.findEntity(job.targetBuilding);
 
     if (!buildingEntity) {
-        failJobFromQueue(root, job);
+        const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
+        if (queueEntity) {
+            failJobFromQueue(queueEntity, job);
+        }
         return [];
     }
 
     return [
-        { type: "moveTo", target: buildingEntity.worldPosition },
+        {
+            type: "moveTo",
+            target: buildingEntity.worldPosition,
+            stopAdjacent: "cardinal",
+        },
         { type: "operateFacility", buildingId: job.targetBuilding },
     ];
 }

@@ -10,8 +10,7 @@ import {
 import type { Entity } from "../../entity/entity.ts";
 import {
     ActionComplete,
-    ActionFailed,
-    type ActionStatus,
+    type ActionResult,
     type BehaviorActionData,
 } from "./Action.ts";
 
@@ -22,7 +21,7 @@ import {
 export function executeCollectItemsAction(
     action: Extract<BehaviorActionData, { type: "collectItems" }>,
     entity: Entity,
-): ActionStatus {
+): ActionResult {
     const root = entity.getRootEntity();
     const targetEntity = root.findEntity(action.entityId);
 
@@ -30,12 +29,12 @@ export function executeCollectItemsAction(
         console.warn(
             `[CollectItems] Target entity ${action.entityId} not found`,
         );
-        return ActionFailed;
+        return { kind: "failed", cause: { type: "targetGone", entityId: action.entityId } };
     }
 
     if (!isPointAdjacentTo(targetEntity.worldPosition, entity.worldPosition)) {
         console.warn(`[CollectItems] Worker not adjacent to target`);
-        return ActionFailed;
+        return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 
     const collectableComponent = targetEntity.getEcsComponent(
@@ -45,7 +44,7 @@ export function executeCollectItemsAction(
         console.warn(
             `[CollectItems] Target ${action.entityId} has no CollectableComponent`,
         );
-        return ActionFailed;
+        return { kind: "failed", cause: { type: "unknown" } };
     }
 
     if (collectableComponent.items.length === 0) {

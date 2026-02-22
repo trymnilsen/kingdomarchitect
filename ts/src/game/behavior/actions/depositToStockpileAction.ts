@@ -5,7 +5,7 @@ import {
 } from "../../component/inventoryComponent.ts";
 import { StockpileComponentId } from "../../component/stockpileComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
-import type { ActionStatus, BehaviorActionData } from "./Action.ts";
+import { ActionComplete, type ActionResult, type BehaviorActionData } from "./Action.ts";
 
 /**
  * Deposit non-equipped inventory items to a stockpile.
@@ -13,7 +13,7 @@ import type { ActionStatus, BehaviorActionData } from "./Action.ts";
 export function executeDepositToStockpileAction(
     action: Extract<BehaviorActionData, { type: "depositToStockpile" }>,
     entity: Entity,
-): ActionStatus {
+): ActionResult {
     const root = entity.getRootEntity();
     const stockpile = root.findEntity(action.stockpileId);
 
@@ -21,7 +21,7 @@ export function executeDepositToStockpileAction(
         console.warn(
             `[DepositAction] Stockpile ${action.stockpileId} not found`,
         );
-        return "failed";
+        return { kind: "failed", cause: { type: "targetGone", entityId: action.stockpileId } };
     }
 
     // Verify the stockpile has the required components
@@ -32,13 +32,13 @@ export function executeDepositToStockpileAction(
         console.warn(
             `[DepositAction] Entity ${action.stockpileId} is not a valid stockpile`,
         );
-        return "failed";
+        return { kind: "failed", cause: { type: "unknown" } };
     }
 
     const workerInventory = entity.getEcsComponent(InventoryComponentId);
     if (!workerInventory || workerInventory.items.length === 0) {
         // Nothing to deposit
-        return "complete";
+        return ActionComplete;
     }
 
     // Get equipped item IDs to exclude from deposit
@@ -78,5 +78,5 @@ export function executeDepositToStockpileAction(
         );
     }
 
-    return "complete";
+    return ActionComplete;
 }

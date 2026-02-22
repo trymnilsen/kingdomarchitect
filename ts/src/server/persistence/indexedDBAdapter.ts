@@ -2,7 +2,7 @@ import type { PersistenceAdapter } from "./persistenceAdapter.ts";
 import type { SerializedEntity } from "./serializedEntity.ts";
 import type { SerializedWorldMeta } from "./serializedWorldMeta.ts";
 
-const DB_NAME = "kingdom_architect";
+export const DB_NAME = "kingdom_architect";
 const DB_VERSION = 2;
 const ENTITY_STORE = "entities";
 const META_STORE = "meta";
@@ -279,16 +279,22 @@ export class IndexedDBAdapter implements PersistenceAdapter {
     }
 
     async clearGame(): Promise<void> {
-        return new Promise((resolve, reject) => {
-            this.close();
-            const deleteRequest = indexedDB.deleteDatabase(DB_NAME);
-            deleteRequest.onsuccess = () => {
-                resolve();
-            };
-
-            deleteRequest.onerror = (err) => {
-                reject(err);
-            };
-        });
+        this.close();
+        return clearGameDatabase();
     }
+}
+
+/**
+ * Deletes the entire game database. Can be called without an adapter instance.
+ */
+export function clearGameDatabase(): Promise<void> {
+    return new Promise((resolve, reject) => {
+        const deleteRequest = indexedDB.deleteDatabase(DB_NAME);
+        deleteRequest.onsuccess = () => {
+            resolve();
+        };
+        deleteRequest.onerror = (err) => {
+            reject(err);
+        };
+    });
 }

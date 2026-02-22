@@ -10,8 +10,8 @@ function createTestScene(): { root: Entity; worker: Entity; chest: Entity } {
     const worker = new Entity("worker");
     const chest = new Entity("chest");
 
-    worker.worldPosition = { x: 0, y: 0 };
-    chest.worldPosition = { x: 5, y: 5 };
+    worker.worldPosition = { x: 10, y: 8 };
+    chest.worldPosition = { x: 15, y: 13 };
 
     root.setEcsComponent(createJobQueueComponent());
     root.addChild(worker);

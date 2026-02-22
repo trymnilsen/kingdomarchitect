@@ -17,6 +17,7 @@ import { createHungerComponent } from "../component/hungerComponent.ts";
 import { createEnergyComponent } from "../component/energyComponent.ts";
 import { createBehaviorAgentComponent } from "../component/BehaviorAgentComponent.ts";
 import { createRoleComponent } from "../component/worker/roleComponent.ts";
+import { createMovementStaminaComponent } from "../component/movementStaminaComponent.ts";
 
 export function workerPrefab(): Entity {
     const entity = new Entity(generateId("worker"));
@@ -34,5 +35,6 @@ export function workerPrefab(): Entity {
     entity.setEcsComponent(createRoleComponent());
     entity.setEcsComponent(createHungerComponent(60, 0.1)); // 0.1 per tick = ~7 minutes to go from 0 to 100
     entity.setEcsComponent(createEnergyComponent(100, 0.15, 20)); // 0.15 per tick = ~11 minutes to deplete
+    entity.setEcsComponent(createMovementStaminaComponent());
     return entity;
 }

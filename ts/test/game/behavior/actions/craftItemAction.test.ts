@@ -23,8 +23,8 @@ function createTestScene(): {
     const worker = new Entity("worker");
     const building = new Entity("building");
 
-    worker.worldPosition = { x: 0, y: 0 };
-    building.worldPosition = { x: 1, y: 0 }; // Adjacent
+    worker.worldPosition = { x: 10, y: 8 };
+    building.worldPosition = { x: 11, y: 8 }; // Adjacent
 
     worker.setEcsComponent(createInventoryComponent());
     building.setEcsComponent(createInventoryComponent());
@@ -107,7 +107,7 @@ describe("craftItemAction", () => {
 
         const result = executeCraftItemAction(action, worker);
 
-        assert.strictEqual(result, "complete");
+        assert.strictEqual(result.kind, "complete");
 
         const buildingInventory =
             building.getEcsComponent(InventoryComponentId)!;
@@ -128,7 +128,7 @@ describe("craftItemAction", () => {
 
         const result = executeCraftItemAction(action, worker);
 
-        assert.strictEqual(result, "failed");
+        assert.strictEqual(result.kind, "failed");
     });
 
     it("fails if worker has insufficient materials", () => {
@@ -145,7 +145,7 @@ describe("craftItemAction", () => {
 
         const result = executeCraftItemAction(action, worker);
 
-        assert.strictEqual(result, "failed");
+        assert.strictEqual(result.kind, "failed");
     });
 
     it("fails if building entity not found", () => {
@@ -159,12 +159,12 @@ describe("craftItemAction", () => {
 
         const result = executeCraftItemAction(action, worker);
 
-        assert.strictEqual(result, "failed");
+        assert.strictEqual(result.kind, "failed");
     });
 
     it("fails if worker not adjacent to building", () => {
         const { worker, building } = createTestScene();
-        building.worldPosition = { x: 10, y: 10 }; // Not adjacent
+        building.worldPosition = { x: 25, y: 25 }; // Not adjacent
 
         const action = {
             type: "craftItem" as const,
@@ -174,13 +174,13 @@ describe("craftItemAction", () => {
 
         const result = executeCraftItemAction(action, worker);
 
-        assert.strictEqual(result, "failed");
+        assert.strictEqual(result.kind, "failed");
     });
 
     it("throws if worker has no inventory", () => {
         const { root, building } = createTestScene();
         const workerNoInv = new Entity("workerNoInv");
-        workerNoInv.worldPosition = { x: 0, y: 0 };
+        workerNoInv.worldPosition = { x: 10, y: 8 };
         root.addChild(workerNoInv);
 
         const action = {
@@ -197,7 +197,7 @@ describe("craftItemAction", () => {
     it("throws if building has no inventory", () => {
         const { root, worker } = createTestScene();
         const buildingNoInv = new Entity("buildingNoInv");
-        buildingNoInv.worldPosition = { x: 1, y: 0 };
+        buildingNoInv.worldPosition = { x: 11, y: 8 };
         root.addChild(buildingNoInv);
 
         const workerInventory = worker.getEcsComponent(InventoryComponentId)!;

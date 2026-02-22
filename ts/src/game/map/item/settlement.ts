@@ -3,17 +3,21 @@ import {
     KingdomType,
 } from "../../component/kingdomComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
-import { goblinFireplace, goblinPrefab } from "../../prefab/goblinPrefab.ts";
+import { goblinCampPrefab } from "../../prefab/goblinCampPrefab.ts";
 import type { TileChunk } from "../chunk.ts";
 
+/**
+ * Places a goblin settlement in a chunk.
+ * Creates a camp entity with an initial goblin.
+ * The goblin must build their own fire and other structures.
+ */
 export function placeSettlement(_chunk: TileChunk, chunkEntity: Entity) {
     chunkEntity.setEcsComponent(createKingdomComponent(KingdomType.Goblin));
-    const goblinEntity = goblinPrefab();
-    const goblinFireplaceEntity = goblinFireplace();
 
-    chunkEntity.addChild(goblinEntity);
-    chunkEntity.addChild(goblinFireplaceEntity);
+    const { camp } = goblinCampPrefab();
 
-    goblinFireplaceEntity.position = { x: 4, y: 3 };
-    goblinEntity.position = { x: 3, y: 3 };
+    chunkEntity.addChild(camp);
+
+    // Position camp in chunk
+    camp.position = { x: 4, y: 3 };
 }

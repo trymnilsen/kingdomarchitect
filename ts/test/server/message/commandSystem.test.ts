@@ -644,7 +644,7 @@ describe("commandSystem", () => {
 
             const agent = new Entity("agent1");
             const behaviorAgent = createBehaviorAgentComponent();
-            behaviorAgent.shouldReplan = false;
+            behaviorAgent.pendingReplan = undefined;
             agent.setEcsComponent(behaviorAgent);
             root.addChild(agent);
 
@@ -668,7 +668,7 @@ describe("commandSystem", () => {
                 BehaviorAgentComponentId,
             );
             assert.ok(updatedAgent);
-            assert.strictEqual(updatedAgent.shouldReplan, true);
+            assert.deepStrictEqual(updatedAgent.pendingReplan, { kind: "replan" });
         });
 
         it("handles missing agent gracefully", () => {

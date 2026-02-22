@@ -1,5 +1,6 @@
 import type { Entity } from "../../entity/entity.ts";
 import type { BehaviorActionData } from "../../behavior/actions/Action.ts";
+import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import type { CollectItemJob } from "../collectItemJob.ts";
 import { failJobFromQueue } from "../jobLifecycle.ts";
 
@@ -11,18 +12,25 @@ import { failJobFromQueue } from "../jobLifecycle.ts";
  */
 export function planCollectItem(
     root: Entity,
-    _worker: Entity,
+    worker: Entity,
     job: CollectItemJob,
 ): BehaviorActionData[] {
     const targetEntity = root.findEntity(job.entityId);
 
     if (!targetEntity) {
-        failJobFromQueue(root, job);
+        const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
+        if (queueEntity) {
+            failJobFromQueue(queueEntity, job);
+        }
         return [];
     }
 
     return [
-        { type: "moveTo", target: targetEntity.worldPosition },
+        {
+            type: "moveTo",
+            target: targetEntity.worldPosition,
+            stopAdjacent: "cardinal",
+        },
         { type: "collectItems", entityId: job.entityId },
     ];
 }

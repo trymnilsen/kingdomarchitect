@@ -7,9 +7,9 @@ import type { InventoryComponent } from "../component/inventoryComponent.ts";
  * with probabilistic rounding.
  */
 export function calculateBuildingQuality(
-    buildingInventory: InventoryComponent,
+    buildingInventory: InventoryComponent | null,
 ): ItemRarity {
-    if (buildingInventory.items.length === 0) {
+    if (!buildingInventory || buildingInventory.items.length === 0) {
         return ItemRarity.Common;
     }
 

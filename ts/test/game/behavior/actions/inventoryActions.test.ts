@@ -19,8 +19,8 @@ function createTestScene(): { root: Entity; worker: Entity; stockpile: Entity } 
     const worker = new Entity("worker");
     const stockpile = new Entity("stockpile");
 
-    worker.worldPosition = { x: 0, y: 0 };
-    stockpile.worldPosition = { x: 1, y: 0 }; // Adjacent
+    worker.worldPosition = { x: 10, y: 8 };
+    stockpile.worldPosition = { x: 11, y: 8 }; // Adjacent
 
     worker.setEcsComponent(createInventoryComponent());
     stockpile.setEcsComponent(createInventoryComponent());
@@ -47,7 +47,7 @@ describe("takeFromInventoryAction", () => {
 
         const result = executeTakeFromInventoryAction(action, worker);
 
-        assert.strictEqual(result, "complete");
+        assert.strictEqual(result.kind, "complete");
 
         const workerInventory = worker.getEcsComponent(InventoryComponentId)!;
         const workerWood = getInventoryItem(workerInventory, "wood");
@@ -75,7 +75,7 @@ describe("takeFromInventoryAction", () => {
 
         const result = executeTakeFromInventoryAction(action, worker);
 
-        assert.strictEqual(result, "complete");
+        assert.strictEqual(result.kind, "complete");
 
         const workerInventory = worker.getEcsComponent(InventoryComponentId)!;
         assert.strictEqual(getInventoryItem(workerInventory, "wood")?.amount, 3);
@@ -93,12 +93,12 @@ describe("takeFromInventoryAction", () => {
 
         const result = executeTakeFromInventoryAction(action, worker);
 
-        assert.strictEqual(result, "failed");
+        assert.strictEqual(result.kind, "failed");
     });
 
     it("fails if worker not adjacent to source", () => {
         const { worker, stockpile } = createTestScene();
-        stockpile.worldPosition = { x: 10, y: 10 }; // Not adjacent
+        stockpile.worldPosition = { x: 25, y: 25 }; // Not adjacent
 
         const stockpileInventory = stockpile.getEcsComponent(InventoryComponentId)!;
         addInventoryItem(stockpileInventory, woodResourceItem, 10);
@@ -111,7 +111,7 @@ describe("takeFromInventoryAction", () => {
 
         const result = executeTakeFromInventoryAction(action, worker);
 
-        assert.strictEqual(result, "failed");
+        assert.strictEqual(result.kind, "failed");
     });
 
     it("completes even if source has no items to take", () => {
@@ -125,7 +125,7 @@ describe("takeFromInventoryAction", () => {
 
         const result = executeTakeFromInventoryAction(action, worker);
 
-        assert.strictEqual(result, "complete");
+        assert.strictEqual(result.kind, "complete");
     });
 });
 
@@ -145,7 +145,7 @@ describe("depositToInventoryAction", () => {
 
         const result = executeDepositToInventoryAction(action, worker);
 
-        assert.strictEqual(result, "complete");
+        assert.strictEqual(result.kind, "complete");
 
         const workerWood = getInventoryItem(workerInventory, "wood");
         assert.strictEqual(workerWood?.amount, 5);
@@ -173,7 +173,7 @@ describe("depositToInventoryAction", () => {
 
         const result = executeDepositToInventoryAction(action, worker);
 
-        assert.strictEqual(result, "complete");
+        assert.strictEqual(result.kind, "complete");
 
         const stockpileInventory = stockpile.getEcsComponent(InventoryComponentId)!;
         assert.strictEqual(getInventoryItem(stockpileInventory, "wood")?.amount, 3);
@@ -194,12 +194,12 @@ describe("depositToInventoryAction", () => {
 
         const result = executeDepositToInventoryAction(action, worker);
 
-        assert.strictEqual(result, "failed");
+        assert.strictEqual(result.kind, "failed");
     });
 
     it("fails if worker not adjacent to target", () => {
         const { worker, stockpile } = createTestScene();
-        stockpile.worldPosition = { x: 10, y: 10 }; // Not adjacent
+        stockpile.worldPosition = { x: 25, y: 25 }; // Not adjacent
 
         const workerInventory = worker.getEcsComponent(InventoryComponentId)!;
         addInventoryItem(workerInventory, woodResourceItem, 10);
@@ -212,6 +212,6 @@ describe("depositToInventoryAction", () => {
 
         const result = executeDepositToInventoryAction(action, worker);
 
-        assert.strictEqual(result, "failed");
+        assert.strictEqual(result.kind, "failed");
     });
 });

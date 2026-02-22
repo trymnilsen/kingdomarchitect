@@ -187,12 +187,42 @@ export class InteractionHandler {
 
                 const entitiesAt = queryEntity(this.world.root, tilePosition);
 
+                const candidates: SelectedWorldItem[] = [
+                    ...entitiesAt.map((e) => new SelectedEntityItem(e)),
+                    ...(tile ? [new SelectedTileItem(tile)] : []),
+                ];
+
                 let selection: SelectedWorldItem | null = null;
-                if (entitiesAt.length > 0) {
-                    const entity = entitiesAt[0];
-                    selection = new SelectedEntityItem(entity);
-                } else if (tile) {
-                    selection = new SelectedTileItem(tile);
+                if (candidates.length > 0) {
+                    const activeSelectionState =
+                        currentState instanceof SelectionState
+                            ? currentState
+                            : null;
+
+                    const currentTilePos =
+                        activeSelectionState?.selection.tilePosition;
+                    const isSameTile =
+                        currentTilePos !== undefined &&
+                        currentTilePos.x === tilePosition.x &&
+                        currentTilePos.y === tilePosition.y;
+
+                    if (isSameTile && activeSelectionState) {
+                        const current = activeSelectionState.selection;
+                        let currentIndex: number;
+                        if (current instanceof SelectedEntityItem) {
+                            currentIndex = entitiesAt.indexOf(current.entity);
+                        } else {
+                            // Tile selection is at the end of the candidate list
+                            currentIndex = entitiesAt.length;
+                        }
+                        const nextIndex =
+                            currentIndex >= 0
+                                ? (currentIndex + 1) % candidates.length
+                                : 0;
+                        selection = candidates[nextIndex];
+                    } else {
+                        selection = candidates[0];
+                    }
                 }
 
                 if (selection) {
