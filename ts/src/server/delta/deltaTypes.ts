@@ -1,3 +1,20 @@
+/**
+ * Delta operations for component replication.
+ *
+ * Instead of sending full component snapshots on every change, the server
+ * diffs the old and new component state and sends only the operations needed
+ * to transform the client's copy. This matters for large components (e.g.
+ * inventories, job queues) where a single field change would otherwise
+ * retransmit the entire object.
+ *
+ * The operation set mirrors JS's native mutation capabilities: property
+ * set/delete for objects, push/splice for arrays, and get/set/delete for
+ * Map and Set. This keeps applyDelta simple — each operation maps directly
+ * to a single JS mutation call.
+ *
+ * See diffComponent.ts for the diff side and applyDelta.ts for the apply side.
+ */
+
 import type { ComponentID } from "../../game/component/component.ts";
 
 /**

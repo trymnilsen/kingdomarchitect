@@ -408,4 +408,15 @@ describe("isDeltaSmaller", () => {
         const component = { id: "test", x: 1 } as unknown as Components;
         assert.strictEqual(isDeltaSmaller(ops, component), false);
     });
+
+    it("returns false for small components regardless of delta size", () => {
+        // Even a tiny delta should not be used for a small component
+        const ops = [{ op: "set" as const, path: ["direction"], value: "down" }];
+        const component = {
+            id: "Direction",
+            direction: "down",
+            ordinal: "southeast",
+        } as unknown as Components;
+        assert.strictEqual(isDeltaSmaller(ops, component), false);
+    });
 });

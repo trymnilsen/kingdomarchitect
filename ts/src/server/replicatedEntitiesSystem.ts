@@ -14,19 +14,37 @@ import {
 } from "./message/gameMessage.ts";
 import { getPlayerDiscoveryData } from "./message/playerDiscoveryData.ts";
 
+/**
+ * Server-side system that listens for entity tree mutations and forwards
+ * them to the client via postMessage. This is the bridge between the
+ * simulation (which mutates entities freely) and the client (which needs
+ * to mirror that state).
+ *
+ * For component updates, it attempts to send a delta (only the changed
+ * fields) instead of the full component. The old value comes from
+ * Entity.updateComponent which snapshots the component via structuredClone
+ * before the mutation callback runs. If no snapshot is available (e.g.
+ * setEcsComponent was called directly), it falls back to sending the full
+ * component.
+ */
 export function makeReplicatedEntitiesSystem(
     postMessage: (message: GameMessage) => void,
 ): EcsSystem {
     return {
         onEntityEvent: {
             component_updated: (_root, event) => {
+                // The game root holds world-level components (tiles,
+                // discovery, visibility). Only the job queue needs
+                // replication — the rest are managed separately via
+                // WorldStateGameMessage or are client-only.
                 if (
                     event.source.isGameRoot &&
                     event.item.id != JobQueueComponentId
                 ) {
                     return;
                 }
-                // Don't replicate client-only components
+                // Tiles and visibility maps are client-only components
+                // synthesized from discovery data, not replicated per-tick
                 if (
                     event.item.id === TileComponentId ||
                     event.item.id === VisibilityMapComponentId
@@ -34,7 +52,8 @@ export function makeReplicatedEntitiesSystem(
                     return;
                 }
 
-                // Try to compute and send a delta if we have a snapshot
+                // oldValue is the pre-mutation snapshot from updateComponent.
+                // When present, we can diff against it to send only changes.
                 if (event.oldValue) {
                     const snapshot = event.oldValue;
                     const operations = diffComponents(snapshot, event.item);

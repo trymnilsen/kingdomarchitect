@@ -2,7 +2,14 @@ import type { Components } from "../../game/component/component.ts";
 import type { DeltaOperation, PropertyPath } from "./deltaTypes.ts";
 
 /**
- * Apply a list of delta operations to a component, mutating it in place.
+ * Apply delta operations to a component, mutating it in place. This runs
+ * on the client after receiving a ComponentDeltaGameMessage from the server.
+ * Operations are applied in order — the server's diffComponents guarantees
+ * that applying them sequentially to the old state produces the new state.
+ *
+ * Mutations are done in-place rather than producing a new object because
+ * components are stored by reference in the entity's component array.
+ * Creating a new object would require re-registering it with the entity.
  */
 export function applyDelta(
     component: Components,
@@ -52,8 +59,11 @@ function applyOperation(component: Components, op: DeltaOperation): void {
 }
 
 /**
- * Navigate to the parent of a path and return [parent, lastKey].
- * For an empty path, returns [component, undefined].
+ * Walk the path up to (but not including) the last segment, returning
+ * the parent container and the final key. This split is needed because
+ * mutations like set/delete operate on the parent: parent[key] = value.
+ * If we navigated all the way to the leaf, we'd have the value but no
+ * way to mutate it in its parent container.
  */
 function navigateToParent(
     component: Components,

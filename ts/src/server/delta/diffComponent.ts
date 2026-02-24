@@ -5,8 +5,16 @@ import type {
 } from "./deltaTypes.ts";
 
 /**
- * Compare two component values and produce the operations needed
- * to transform the old value into the new value.
+ * Compare the previous snapshot of a component to its current state and
+ * produce the minimal set of DeltaOperations needed to transform one into
+ * the other. The caller (replicatedEntitiesSystem) decides whether the
+ * resulting delta is actually worth sending vs just sending the full
+ * component — see isDeltaSmaller.
+ *
+ * The diff walks the object tree recursively. It relies on both values
+ * being plain serializable data (the same shapes that persistence uses),
+ * so it only needs to handle: primitives, plain objects, arrays, Maps,
+ * and Sets. Class instances or functions will not appear in components.
  */
 export function diffComponents(
     oldComponent: Components,
@@ -26,7 +34,9 @@ function diffValue(
     path: PropertyPath,
     operations: DeltaOperation[],
 ): void {
-    // Same reference = no change
+    // Reference equality short-circuit. structuredClone in updateComponent
+    // creates a deep copy, so identical references only happen for unchanged
+    // subtrees that weren't cloned (e.g. frozen constants shared across ticks)
     if (oldVal === newVal) {
         return;
     }
@@ -108,8 +118,16 @@ function diffObject(
 }
 
 /**
- * Diff two arrays using simple index-based comparison.
- * Detects appends as a special case.
+ * Diff two arrays using index-based comparison. This intentionally avoids
+ * LCS/edit-distance algorithms — they're O(n*m) and components rarely have
+ * arrays where elements shift position. The common mutations are:
+ *   1. Append (e.g. new job added to queue) → detected as array_push
+ *   2. Truncate (e.g. items consumed) → detected as array_splice
+ *   3. In-place update (e.g. quantity changed) → per-index set or recursive diff
+ *
+ * When more than 50% of elements differ, we bail out and send the whole
+ * array as a single set operation, since at that point the delta overhead
+ * exceeds the savings.
  */
 function diffArray(
     oldArr: unknown[],
@@ -191,7 +209,10 @@ function diffArray(
 }
 
 /**
- * Diff two Maps.
+ * Diff two Maps. Map values are compared with deepEquals but not
+ * recursively diffed — if a value changed, the entire new value is sent
+ * via map_set. This keeps the operation set simple; recursive map-value
+ * diffing can be added later if Map values become large enough to warrant it.
  */
 function diffMap(
     oldMap: Map<unknown, unknown>,
@@ -261,7 +282,10 @@ function diffSet(
 }
 
 /**
- * Check if a Set contains a value using deep equality.
+ * Check if a Set contains a value using deep equality. Native Set.has uses
+ * reference equality which would miss structuredClone'd objects that are
+ * equal by value. This is O(n) per call, making diffSet O(n*m), but
+ * component Sets are typically small (tags, flags) so this is acceptable.
  */
 function setHas(set: Set<unknown>, value: unknown): boolean {
     for (const item of set) {
@@ -358,8 +382,11 @@ export function deepEquals(a: unknown, b: unknown): boolean {
 }
 
 /**
- * Estimate the serialized size of a value (rough approximation).
- * Used to decide whether a delta is smaller than the full component.
+ * Rough approximation of JSON-serialized byte size. This doesn't need to
+ * be exact — it's only used to compare delta size vs full component size
+ * to decide which to send. The estimates mirror JSON.stringify output
+ * lengths. Maps and Sets include overhead for the {__type, __data} wrapper
+ * that the persistence serializer uses on the wire.
  */
 export function estimateSize(value: unknown): number {
     if (value == null) {
@@ -414,9 +441,12 @@ export function estimateSize(value: unknown): number {
 }
 
 /**
- * Estimate the wire size of a set of delta operations by summing
- * payload values plus a fixed per-operation overhead for metadata
- * (op type, path, key fields).
+ * Estimate the wire cost of a delta by summing only the payload values
+ * (what's in `value`, `values`, `insert`) plus a fixed overhead per
+ * operation for the structural fields (op, path, key, index, etc).
+ * The 30-byte overhead is a rough average across operation types —
+ * a set op with path ["items", 0] serializes to ~25 bytes of structure,
+ * a splice with index+deleteCount is ~35 bytes.
  */
 function estimateOperationsSize(operations: DeltaOperation[]): number {
     const perOpOverhead = 30;
@@ -447,14 +477,26 @@ function estimateOperationsSize(operations: DeltaOperation[]): number {
 }
 
 /**
- * Check if the delta operations are smaller than the full component.
+ * Decide whether to send a delta or the full component. A delta is only
+ * worth it when the component is large enough that the per-operation
+ * overhead is outweighed by not sending unchanged fields. Small components
+ * (like DirectionComponent at ~60 bytes) are always cheaper to send whole
+ * because the delta message envelope (type, entityId, componentId,
+ * operations array) adds overhead that a setComponent message doesn't have.
+ *
+ * The 128-byte floor and 0.8 ratio are tuned empirically — components
+ * below 128 bytes are never worth diffing, and above that we require the
+ * delta to be at least 20% smaller to justify the added complexity on
+ * the receiving end.
  */
 export function isDeltaSmaller(
     operations: DeltaOperation[],
     fullComponent: Components,
 ): boolean {
-    const deltaSize = estimateOperationsSize(operations);
     const fullSize = estimateSize(fullComponent);
-    // Use delta if it's less than 80% of the full size
+    if (fullSize < 128) {
+        return false;
+    }
+    const deltaSize = estimateOperationsSize(operations);
     return deltaSize < fullSize * 0.8;
 }
