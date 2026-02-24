@@ -6,25 +6,30 @@ import type { DeltaOperation } from "../../../src/server/delta/deltaTypes.ts";
 
 describe("applyDelta", () => {
     describe("set operation", () => {
-        it("sets a primitive value", () => {
-            const component = { id: "test", value: 5 } as unknown as Components;
+        it("sets a primitive value without affecting siblings", () => {
+            const component = { id: "test", value: 5, other: "untouched" } as unknown as Components;
             const ops: DeltaOperation[] = [
                 { op: "set", path: ["value"], value: 10 },
             ];
             applyDelta(component, ops);
             assert.strictEqual((component as any).value, 10);
+            assert.strictEqual((component as any).id, "test");
+            assert.strictEqual((component as any).other, "untouched");
         });
 
-        it("sets a nested value", () => {
+        it("sets a nested value without affecting siblings", () => {
             const component = {
                 id: "test",
                 nested: { a: 1, b: 2 },
+                sibling: 42,
             } as unknown as Components;
             const ops: DeltaOperation[] = [
                 { op: "set", path: ["nested", "b"], value: 99 },
             ];
             applyDelta(component, ops);
             assert.strictEqual((component as any).nested.b, 99);
+            assert.strictEqual((component as any).nested.a, 1);
+            assert.strictEqual((component as any).sibling, 42);
         });
 
         it("sets a deeply nested value", () => {
@@ -68,12 +73,14 @@ describe("applyDelta", () => {
     });
 
     describe("delete operation", () => {
-        it("deletes a property", () => {
-            const component = { id: "test", toDelete: 42 } as unknown as Components;
+        it("deletes a property without affecting siblings", () => {
+            const component = { id: "test", toDelete: 42, keep: "yes" } as unknown as Components;
             const ops: DeltaOperation[] = [{ op: "delete", path: ["toDelete"] }];
             applyDelta(component, ops);
             assert.strictEqual((component as any).toDelete, undefined);
             assert.strictEqual("toDelete" in component, false);
+            assert.strictEqual((component as any).id, "test");
+            assert.strictEqual((component as any).keep, "yes");
         });
 
         it("deletes a nested property", () => {

@@ -8,7 +8,7 @@ import type {
  * Compare two component values and produce the operations needed
  * to transform the old value into the new value.
  */
-export function diffComponent(
+export function diffComponents(
     oldComponent: Components,
     newComponent: Components,
 ): DeltaOperation[] {
@@ -245,10 +245,6 @@ function diffSet(
     path: PropertyPath,
     operations: DeltaOperation[],
 ): void {
-    // For Sets, we need to use deep equality for object members
-    // This is expensive, so for now we use reference equality
-    // which works for primitives and assumes objects in sets are stable
-
     // Check for removed values
     for (const value of oldSet) {
         if (!setHas(newSet, value)) {
@@ -418,13 +414,46 @@ export function estimateSize(value: unknown): number {
 }
 
 /**
+ * Estimate the wire size of a set of delta operations by summing
+ * payload values plus a fixed per-operation overhead for metadata
+ * (op type, path, key fields).
+ */
+function estimateOperationsSize(operations: DeltaOperation[]): number {
+    const perOpOverhead = 30;
+    let size = 2; // [] wrapper
+    for (const op of operations) {
+        size += perOpOverhead;
+        switch (op.op) {
+            case "set":
+                size += estimateSize(op.value);
+                break;
+            case "array_push":
+                size += estimateSize(op.values);
+                break;
+            case "array_splice":
+                if (op.insert) {
+                    size += estimateSize(op.insert);
+                }
+                break;
+            case "map_set":
+                size += estimateSize(op.value);
+                break;
+            case "set_add":
+                size += estimateSize(op.value);
+                break;
+        }
+    }
+    return size;
+}
+
+/**
  * Check if the delta operations are smaller than the full component.
  */
 export function isDeltaSmaller(
     operations: DeltaOperation[],
     fullComponent: Components,
 ): boolean {
-    const deltaSize = estimateSize(operations);
+    const deltaSize = estimateOperationsSize(operations);
     const fullSize = estimateSize(fullComponent);
     // Use delta if it's less than 80% of the full size
     return deltaSize < fullSize * 0.8;

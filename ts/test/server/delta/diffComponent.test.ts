@@ -1,25 +1,25 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
 import {
-    diffComponent,
+    diffComponents,
     deepEquals,
     isDeltaSmaller,
 } from "../../../src/server/delta/diffComponent.ts";
 import type { Components } from "../../../src/game/component/component.ts";
 
-describe("diffComponent", () => {
+describe("diffComponents", () => {
     describe("primitive changes", () => {
         it("detects no change when values are equal", () => {
             const old = { id: "test", value: 5 } as unknown as Components;
             const updated = { id: "test", value: 5 } as unknown as Components;
-            const ops = diffComponent(old, updated);
+            const ops = diffComponents(old, updated);
             assert.strictEqual(ops.length, 0);
         });
 
         it("detects primitive value change", () => {
             const old = { id: "test", value: 5 } as unknown as Components;
             const updated = { id: "test", value: 10 } as unknown as Components;
-            const ops = diffComponent(old, updated);
+            const ops = diffComponents(old, updated);
             assert.strictEqual(ops.length, 1);
             assert.deepStrictEqual(ops[0], {
                 op: "set",
@@ -31,7 +31,7 @@ describe("diffComponent", () => {
         it("detects string value change", () => {
             const old = { id: "test", name: "Alice" } as unknown as Components;
             const updated = { id: "test", name: "Bob" } as unknown as Components;
-            const ops = diffComponent(old, updated);
+            const ops = diffComponents(old, updated);
             assert.strictEqual(ops.length, 1);
             assert.deepStrictEqual(ops[0], {
                 op: "set",
@@ -43,7 +43,7 @@ describe("diffComponent", () => {
         it("detects added property", () => {
             const old = { id: "test" } as unknown as Components;
             const updated = { id: "test", newField: 42 } as unknown as Components;
-            const ops = diffComponent(old, updated);
+            const ops = diffComponents(old, updated);
             assert.strictEqual(ops.length, 1);
             assert.deepStrictEqual(ops[0], {
                 op: "set",
@@ -55,7 +55,7 @@ describe("diffComponent", () => {
         it("detects deleted property", () => {
             const old = { id: "test", oldField: 42 } as unknown as Components;
             const updated = { id: "test" } as unknown as Components;
-            const ops = diffComponent(old, updated);
+            const ops = diffComponents(old, updated);
             assert.strictEqual(ops.length, 1);
             assert.deepStrictEqual(ops[0], {
                 op: "delete",
@@ -74,7 +74,7 @@ describe("diffComponent", () => {
                 id: "test",
                 nested: { a: 1, b: 3 },
             } as unknown as Components;
-            const ops = diffComponent(old, updated);
+            const ops = diffComponents(old, updated);
             assert.strictEqual(ops.length, 1);
             assert.deepStrictEqual(ops[0], {
                 op: "set",
@@ -92,7 +92,7 @@ describe("diffComponent", () => {
                 id: "test",
                 a: { b: { c: { d: 2 } } },
             } as unknown as Components;
-            const ops = diffComponent(old, updated);
+            const ops = diffComponents(old, updated);
             assert.strictEqual(ops.length, 1);
             assert.deepStrictEqual(ops[0], {
                 op: "set",
@@ -106,7 +106,7 @@ describe("diffComponent", () => {
         it("detects array append", () => {
             const old = { id: "test", items: [1, 2, 3] } as unknown as Components;
             const updated = { id: "test", items: [1, 2, 3, 4, 5] } as unknown as Components;
-            const ops = diffComponent(old, updated);
+            const ops = diffComponents(old, updated);
             assert.strictEqual(ops.length, 1);
             assert.deepStrictEqual(ops[0], {
                 op: "array_push",
@@ -118,7 +118,7 @@ describe("diffComponent", () => {
         it("detects array element change", () => {
             const old = { id: "test", items: [1, 2, 3] } as unknown as Components;
             const updated = { id: "test", items: [1, 99, 3] } as unknown as Components;
-            const ops = diffComponent(old, updated);
+            const ops = diffComponents(old, updated);
             assert.strictEqual(ops.length, 1);
             assert.deepStrictEqual(ops[0], {
                 op: "set",
@@ -130,7 +130,7 @@ describe("diffComponent", () => {
         it("detects array truncation", () => {
             const old = { id: "test", items: [1, 2, 3, 4, 5] } as unknown as Components;
             const updated = { id: "test", items: [1, 2, 3] } as unknown as Components;
-            const ops = diffComponent(old, updated);
+            const ops = diffComponents(old, updated);
             assert.strictEqual(ops.length, 1);
             assert.deepStrictEqual(ops[0], {
                 op: "array_splice",
@@ -143,7 +143,7 @@ describe("diffComponent", () => {
         it("falls back to full replacement for many changes", () => {
             const old = { id: "test", items: [1, 2, 3, 4] } as unknown as Components;
             const updated = { id: "test", items: [5, 6, 7, 8] } as unknown as Components;
-            const ops = diffComponent(old, updated);
+            const ops = diffComponents(old, updated);
             // Should fall back to set since all elements changed
             assert.strictEqual(ops.length, 1);
             assert.strictEqual(ops[0].op, "set");
@@ -159,7 +159,7 @@ describe("diffComponent", () => {
                 id: "test",
                 items: [{ qty: 5 }, { qty: 15 }],
             } as unknown as Components;
-            const ops = diffComponent(old, updated);
+            const ops = diffComponents(old, updated);
             assert.strictEqual(ops.length, 1);
             assert.deepStrictEqual(ops[0], {
                 op: "set",
@@ -182,7 +182,7 @@ describe("diffComponent", () => {
                     ["b", 2],
                 ]),
             } as unknown as Components;
-            const ops = diffComponent(old, updated);
+            const ops = diffComponents(old, updated);
             assert.strictEqual(ops.length, 1);
             assert.deepStrictEqual(ops[0], {
                 op: "map_set",
@@ -204,7 +204,7 @@ describe("diffComponent", () => {
                 id: "test",
                 data: new Map([["a", 1]]),
             } as unknown as Components;
-            const ops = diffComponent(old, updated);
+            const ops = diffComponents(old, updated);
             assert.strictEqual(ops.length, 1);
             assert.deepStrictEqual(ops[0], {
                 op: "map_delete",
@@ -222,7 +222,7 @@ describe("diffComponent", () => {
                 id: "test",
                 data: new Map([["a", 99]]),
             } as unknown as Components;
-            const ops = diffComponent(old, updated);
+            const ops = diffComponents(old, updated);
             assert.strictEqual(ops.length, 1);
             assert.deepStrictEqual(ops[0], {
                 op: "map_set",
@@ -243,7 +243,7 @@ describe("diffComponent", () => {
                 id: "test",
                 tags: new Set(["a", "b", "c"]),
             } as unknown as Components;
-            const ops = diffComponent(old, updated);
+            const ops = diffComponents(old, updated);
             assert.strictEqual(ops.length, 1);
             assert.deepStrictEqual(ops[0], {
                 op: "set_add",
@@ -261,7 +261,7 @@ describe("diffComponent", () => {
                 id: "test",
                 tags: new Set(["a", "c"]),
             } as unknown as Components;
-            const ops = diffComponent(old, updated);
+            const ops = diffComponents(old, updated);
             assert.strictEqual(ops.length, 1);
             assert.deepStrictEqual(ops[0], {
                 op: "set_delete",
@@ -337,6 +337,43 @@ describe("deepEquals", () => {
             deepEquals(new Set([1, 2]), new Set([1, 2, 3])),
             false,
         );
+    });
+});
+
+describe("diffComponents array threshold boundary", () => {
+    it("does not fall back to full replacement at exactly 50% changes", () => {
+        // 2 out of 4 elements changed = 50%, threshold is > 50% so no fallback
+        const old = {
+            id: "test",
+            items: [1, 2, 3, 4],
+        } as unknown as Components;
+        const updated = {
+            id: "test",
+            items: [99, 2, 88, 4],
+        } as unknown as Components;
+        const ops = diffComponents(old, updated);
+        // Should produce per-element set ops, not a single full replacement
+        assert.strictEqual(ops.length, 2);
+        assert.strictEqual(ops[0].op, "set");
+        assert.deepStrictEqual(ops[0].path, ["items", 0]);
+        assert.strictEqual(ops[1].op, "set");
+        assert.deepStrictEqual(ops[1].path, ["items", 2]);
+    });
+
+    it("falls back to full replacement when over 50% changed", () => {
+        // 3 out of 4 elements changed = 75%, should fall back
+        const old = {
+            id: "test",
+            items: [1, 2, 3, 4],
+        } as unknown as Components;
+        const updated = {
+            id: "test",
+            items: [99, 88, 77, 4],
+        } as unknown as Components;
+        const ops = diffComponents(old, updated);
+        assert.strictEqual(ops.length, 1);
+        assert.strictEqual(ops[0].op, "set");
+        assert.deepStrictEqual(ops[0].path, ["items"]);
     });
 });
 

@@ -120,8 +120,9 @@ function createEntityWithChildren(parent: Entity, data: ReplicatedEntityData) {
         entity.setEcsComponent(component);
     }
 
-    entity.worldPosition = data.position;
+    // addChild first so worldPosition setter can convert to local space
     parent.addChild(entity);
+    entity.worldPosition = data.position;
 
     // Recursively add children
     if (data.children && data.children.length > 0) {

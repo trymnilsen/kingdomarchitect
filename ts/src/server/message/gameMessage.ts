@@ -27,6 +27,7 @@ export const CommandGameMessageType = "command";
 
 export type ReplicatedEntityData = {
     id: string;
+    /** World-space position of the entity */
     position: Point;
     parent?: string;
     components: readonly Components[];
