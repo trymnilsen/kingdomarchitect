@@ -10,13 +10,16 @@ import {
 } from "../../game/component/visibilityMapComponent.ts";
 import { applyDiscoveredTiles } from "./applyDiscoveredTiles.ts";
 import { effectHandler } from "./effect/effectHandler.ts";
+import { applyDelta } from "../delta/applyDelta.ts";
 import {
     AddEntityGameMessageType,
+    ComponentDeltaGameMessageType,
     EffectGameMessageType,
     RemoveEntityGameMessageType,
     SetComponentGameMessageType,
     TransformGameMessageType,
     type AddEntityGameMessage,
+    type ComponentDeltaGameMessage,
     type ReplicatedEntityData,
     type GameMessage,
     type RemoveEntityGameMessage,
@@ -44,6 +47,9 @@ export function handleGameMessage(
             break;
         case SetComponentGameMessageType:
             setComponentHandler(root, message);
+            break;
+        case ComponentDeltaGameMessageType:
+            componentDeltaHandler(root, message);
             break;
         case TransformGameMessageType:
             transformHandler(root, message);
@@ -114,8 +120,9 @@ function createEntityWithChildren(parent: Entity, data: ReplicatedEntityData) {
         entity.setEcsComponent(component);
     }
 
-    entity.worldPosition = data.position;
+    // addChild first so worldPosition setter can convert to local space
     parent.addChild(entity);
+    entity.worldPosition = data.position;
 
     // Recursively add children
     if (data.children && data.children.length > 0) {
@@ -138,6 +145,20 @@ function setComponentHandler(root: Entity, message: SetComponentGameMessage) {
         entity.setEcsComponent(message.component);
         entity.invalidateComponent(message.component.id);
     }
+}
+
+function componentDeltaHandler(root: Entity, message: ComponentDeltaGameMessage) {
+    const entity = root.findEntity(message.entityId);
+    if (!entity) {
+        return;
+    }
+
+    const component = entity.getEcsComponent(message.componentId);
+    if (!component) {
+        return;
+    }
+
+    applyDelta(component, message.operations);
 }
 
 function transformHandler(root: Entity, message: TransformGameMessage) {

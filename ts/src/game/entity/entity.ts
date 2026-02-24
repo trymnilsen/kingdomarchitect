@@ -411,14 +411,16 @@ export class Entity {
      * Invalidate a component signaling that it has changed
      * Will emit an entity event that can be listened to
      * @param componentId the component that changed
+     * @param oldValue optional previous value for delta computation
      */
-    invalidateComponent(componentId: ComponentID) {
+    invalidateComponent(componentId: ComponentID, oldValue?: Components) {
         const component = this.getEcsComponent(componentId);
         if (!!component) {
             this.bubbleEvent({
                 id: "component_updated",
                 item: component,
                 source: this,
+                oldValue,
             });
         }
     }
@@ -429,8 +431,10 @@ export class Entity {
     ) {
         const component = this.getEcsComponent(componentId);
         if (component) {
+            // Capture snapshot before mutation for delta computation
+            const snapshot = structuredClone(component);
             updater(component);
-            this.invalidateComponent(componentId);
+            this.invalidateComponent(componentId, snapshot);
         }
     }
     /**
