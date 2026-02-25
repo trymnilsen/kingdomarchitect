@@ -20,8 +20,12 @@ import { createBuildingComponent } from "../../../src/game/component/buildingCom
 import { nullBuilding } from "../../../src/data/building/building.ts";
 import { createBehaviorSystem } from "../../../src/game/behavior/systems/BehaviorSystem.ts";
 import { createPerformPlayerCommandBehavior } from "../../../src/game/behavior/behaviors/PerformPlayerCommandBehavior.ts";
+import { executeMoveToAction } from "../../../src/game/behavior/actions/moveToAction.ts";
+import type { BehaviorActionData } from "../../../src/game/behavior/actions/Action.ts";
 import type { SpriteRef } from "../../../src/asset/sprite.ts";
 import type { Point } from "../../../src/common/point.ts";
+
+type MoveToAction = Extract<BehaviorActionData, { type: "moveTo" }>;
 
 const testSprite: SpriteRef = { bin: "test", spriteId: "test" };
 
@@ -171,6 +175,113 @@ describe("Displacement Scenario", () => {
             agentB.worldPosition,
             { x: 10, y: 8 },
             `Agent B should have been displaced to A's former position (10,8), is at ${JSON.stringify(agentB.worldPosition)}`,
+        );
+    });
+
+    it("mover does not oscillate when direct path is blocked by equal-priority entity", () => {
+        /**
+         * Mover at (11,8) wants to reach (15,8). Blocker at (12,8) has the same
+         * utility (50), so displacement always fails — priority (50) is not strictly
+         * greater than resistance (50).
+         *
+         * Without path caching the mover would replan on every tick. After stepping
+         * off the direct route (e.g. to (11,9)), A* may route back through (12,8)
+         * again (the tile has no goblin-weight penalty since the blocker carries only
+         * BehaviorAgentComponent), causing the entity to oscillate between positions
+         * rather than committing to the around path.
+         *
+         * With path caching the entity commits to the around route on the first tick
+         * and follows it to completion without reconsidering, guaranteeing no position
+         * is visited twice and the target is reached.
+         */
+        const { root } = createWorld();
+
+        const mover = createAgent("mover", root, { x: 11, y: 8 });
+        const moverAgent = getBehaviorAgent(mover)!;
+        moverAgent.currentBehaviorUtility = 50;
+
+        const blocker = createAgent("blocker", root, { x: 12, y: 8 });
+        const blockerAgent = getBehaviorAgent(blocker)!;
+        blockerAgent.currentBehaviorUtility = 50;
+
+        const action: MoveToAction = { type: "moveTo", target: { x: 15, y: 8 } };
+
+        const visitedPositions = new Set<string>();
+        visitedPositions.add(`${mover.worldPosition.x},${mover.worldPosition.y}`);
+
+        let finalResult = { kind: "running" };
+        for (let tick = 1; tick <= 15; tick++) {
+            finalResult = executeMoveToAction(action, mover, tick);
+            const pos = `${mover.worldPosition.x},${mover.worldPosition.y}`;
+            assert.ok(
+                !visitedPositions.has(pos),
+                `Mover revisited position (${pos}) on tick ${tick} — oscillation detected`,
+            );
+            visitedPositions.add(pos);
+            if (finalResult.kind === "complete") break;
+        }
+
+        assert.deepStrictEqual(
+            mover.worldPosition,
+            { x: 15, y: 8 },
+            `Mover should reach (15,8) but is at ${JSON.stringify(mover.worldPosition)}`,
+        );
+    });
+
+    it("path is cached after displacement fails and consumed step-by-step without replanning", () => {
+        /**
+         * Directly verifies the path-caching mechanism. After displacement fails on
+         * the first tick, action.cachedPath must be populated with the around route.
+         * On each subsequent tick the cached path is consumed by one step (length
+         * decreases by exactly 1) rather than being discarded and recalculated, which
+         * would happen if the entity were replanning every tick.
+         */
+        const { root } = createWorld();
+
+        const mover = createAgent("mover", root, { x: 11, y: 8 });
+        const moverAgent = getBehaviorAgent(mover)!;
+        moverAgent.currentBehaviorUtility = 50;
+
+        const blocker = createAgent("blocker", root, { x: 12, y: 8 });
+        const blockerAgent = getBehaviorAgent(blocker)!;
+        blockerAgent.currentBehaviorUtility = 50;
+
+        const action: MoveToAction = { type: "moveTo", target: { x: 15, y: 8 } };
+
+        // Tick 1: displacement fails at (12,8), path is replanned around the blocker,
+        // and the entity takes the first step of the around route.
+        executeMoveToAction(action, mover, 1);
+
+        assert.ok(
+            action.cachedPath !== undefined && action.cachedPath.length > 0,
+            "cachedPath should be set after displacement fails and replan finds an around route",
+        );
+        assert.notDeepStrictEqual(
+            mover.worldPosition,
+            { x: 11, y: 8 },
+            "Mover should have stepped away from its start position on tick 1",
+        );
+
+        // Snapshot the path remaining after tick 1.
+        const pathAfterTick1 = [...action.cachedPath!];
+
+        // Tick 2: the next tile in the cached path is free — the entity should step
+        // there by consuming cachedPath[0], leaving the tail unchanged.
+        executeMoveToAction(action, mover, 2);
+
+        assert.ok(
+            action.cachedPath !== undefined,
+            "cachedPath should still exist after tick 2",
+        );
+        assert.strictEqual(
+            action.cachedPath!.length,
+            pathAfterTick1.length - 1,
+            "cachedPath should be exactly one step shorter after tick 2 (step consumed, not replanned)",
+        );
+        assert.deepStrictEqual(
+            action.cachedPath,
+            pathAfterTick1.slice(1),
+            "Remaining cached path should be the tail of the path from tick 1 — no replanning occurred",
         );
     });
 

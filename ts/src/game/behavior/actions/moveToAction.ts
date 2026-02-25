@@ -34,7 +34,7 @@ import {
 } from "./Action.ts";
 
 /**
- * Maximum number of times we replan within a single tick after proving a tile
+ * Maximum number of immediate replans within a single tick after proving a tile
  * impassable via failed displacement. In practice this terminates in 1–2 iterations;
  * the cap guards against bugs in the blocked-tile accumulation.
  */
@@ -108,15 +108,48 @@ function blockedTilesWeightModifier(
 }
 
 /**
+ * Plan a path from `from` to `target`, treating any tiles in `locallyBlocked` as
+ * impassable. Returns the path array or null if no path exists.
+ */
+function planPath(
+    pathfindingGraph: ReturnType<typeof getPathfindingGraphForEntity>,
+    from: Point,
+    target: Point,
+    stopAdjacent: "cardinal" | "diagonal" | undefined,
+    locallyBlocked: Set<string>,
+): Point[] | null {
+    if (!pathfindingGraph) return null;
+
+    const { offsetX, offsetY } = pathfindingGraph.graph;
+    const pathOptions: QueryPathOptions = {
+        allowAdjacentStop: !!stopAdjacent,
+        weightModifier:
+            locallyBlocked.size > 0
+                ? blockedTilesWeightModifier(locallyBlocked, offsetX, offsetY)
+                : undefined,
+    };
+
+    const result = queryPath(pathfindingGraph, from, target, pathOptions);
+
+    const isValid =
+        result.status === PathResultStatus.Complete ||
+        result.status === PathResultStatus.Partial;
+
+    return isValid && result.path.length > 0 ? result.path : null;
+}
+
+/**
  * Move to a target position, negotiating displacement with blocking entities when needed.
  *
  * This function owns the full movement pipeline:
  *   pathfinding → occupancy check → displacement negotiation → position assignment
  *
- * When displacement negotiation fails (refused or no viable chain), the blocking tile
- * is proven impassable for this tick and added to a local set. The path is immediately
- * replanned with those tiles treated as walls, so the entity routes around them rather
- * than retrying the same blocked path on the next tick.
+ * A path is computed once and cached on the action data. Subsequent ticks follow the
+ * cached path without re-running A*, committing the entity to the planned route. The
+ * cache is only cleared when the next tile proves impassable (displacement refused or
+ * no viable chain), at which point a local replan is performed immediately with that
+ * tile treated as a wall. This prevents oscillation — without caching, A* would
+ * rediscover the same blocked route on every tick and the entity would cycle in place.
  *
  * Displacement uses the entity's currentBehaviorUtility as its negotiation priority.
  * A higher-priority entity can displace idle or low-priority entities that block its path.
@@ -145,69 +178,59 @@ export function executeMoveToAction(
         return { kind: "failed", cause: { type: "pathBlocked", target: action.target } };
     }
 
-    const { offsetX, offsetY } = pathfindingGraph.graph;
-    const locallyBlocked = new Set<string>();
-
-    for (let attempt = 0; attempt <= MAX_REPLAN_ATTEMPTS; attempt++) {
-        const pathOptions: QueryPathOptions = {
-            allowAdjacentStop: !!action.stopAdjacent,
-            weightModifier:
-                locallyBlocked.size > 0
-                    ? blockedTilesWeightModifier(locallyBlocked, offsetX, offsetY)
-                    : undefined,
-        };
-
-        const path = queryPath(
+    // Compute a path if we don't have one cached. The cache persists across ticks so
+    // the entity commits to a route rather than reconsidering on every tick.
+    if (!action.cachedPath || action.cachedPath.length === 0) {
+        const path = planPath(
             pathfindingGraph,
             entity.worldPosition,
             action.target,
-            pathOptions,
+            action.stopAdjacent,
+            new Set(),
         );
-
-        const isValidPath =
-            path.status === PathResultStatus.Complete ||
-            path.status === PathResultStatus.Partial;
-        const nextPoint = path.path[0];
-
-        if (!isValidPath || !nextPoint) {
-            if (
-                action.stopAdjacent &&
-                hasArrived(entity.worldPosition, action.target, action.stopAdjacent)
-            ) {
+        if (!path) {
+            if (hasArrived(entity.worldPosition, action.target, action.stopAdjacent)) {
                 console.log(
                     `[MoveTo] ${entity.id} arrived at (${entity.worldPosition.x},${entity.worldPosition.y}) via stopAdjacent fallback`,
                 );
                 return ActionComplete;
             }
+            console.log(
+                `[MoveTo] ${entity.id} no path to (${action.target.x},${action.target.y}), failing`,
+            );
+            return { kind: "failed", cause: { type: "pathBlocked", target: action.target } };
+        }
+        action.cachedPath = path;
+    }
 
-            if (locallyBlocked.size === 0) {
-                // No path at all — genuinely blocked by terrain or structures.
-                console.log(
-                    `[MoveTo] ${entity.id} no path to (${action.target.x},${action.target.y}), status=${path.status}`,
-                );
-                return { kind: "failed", cause: { type: "pathBlocked", target: action.target } };
-            } else {
-                // All routes go through tiles we proved impassable this tick.
-                // The blockers may move next tick, so wait rather than hard-fail.
-                console.log(
-                    `[MoveTo] ${entity.id} no path around blocked tiles, waiting`,
-                );
-                return ActionRunning;
-            }
+    // The locallyBlocked set accumulates tiles proven impassable within this tick.
+    // It is used only for immediate within-tick replanning and is discarded afterward.
+    const locallyBlocked = new Set<string>();
+
+    for (let attempt = 0; attempt <= MAX_REPLAN_ATTEMPTS; attempt++) {
+        const nextPoint = action.cachedPath[0];
+        if (!nextPoint) {
+            // Path exhausted without arriving — should not happen in normal flow.
+            action.cachedPath = undefined;
+            return ActionRunning;
+        }
+
+        if (hasArrived(entity.worldPosition, action.target, action.stopAdjacent)) {
+            console.log(
+                `[MoveTo] ${entity.id} arrived at (${entity.worldPosition.x},${entity.worldPosition.y})`,
+            );
+            return ActionComplete;
         }
 
         const occupants = queryEntity(root, nextPoint);
 
-        // Buildings and resources are impassable — displacement doesn't apply to them.
+        // Buildings and resources are impassable — displacement doesn't apply.
         const hasStructure = occupants.some(
             (o) =>
                 o.hasComponent(BuildingComponentId) || o.hasComponent(ResourceComponentId),
         );
         if (hasStructure) {
-            if (
-                action.stopAdjacent &&
-                hasArrived(entity.worldPosition, action.target, action.stopAdjacent)
-            ) {
+            if (hasArrived(entity.worldPosition, action.target, action.stopAdjacent)) {
                 console.log(
                     `[MoveTo] ${entity.id} arrived at (${entity.worldPosition.x},${entity.worldPosition.y}) via stopAdjacent fallback`,
                 );
@@ -216,6 +239,7 @@ export function executeMoveToAction(
             console.log(
                 `[MoveTo] ${entity.id} path blocked by structure at (${nextPoint.x},${nextPoint.y})`,
             );
+            action.cachedPath = undefined;
             return { kind: "failed", cause: { type: "pathBlocked", target: action.target } };
         }
 
@@ -232,11 +256,30 @@ export function executeMoveToAction(
             const result = negotiateDisplacement(entity, nextPoint, priority, root, tick);
 
             if (result.kind === "refused" || result.kind === "noChain") {
-                // Proven impassable for this tick — block tile and replan immediately.
+                // This tile is proven impassable for this tick. Clear the stale cached
+                // path and replan immediately with this tile blocked.
                 console.log(
                     `[MoveTo] ${entity.id} displacement ${result.kind} at (${nextPoint.x},${nextPoint.y}), replanning`,
                 );
                 locallyBlocked.add(`${nextPoint.x},${nextPoint.y}`);
+                action.cachedPath = undefined;
+
+                const newPath = planPath(
+                    pathfindingGraph,
+                    entity.worldPosition,
+                    action.target,
+                    action.stopAdjacent,
+                    locallyBlocked,
+                );
+
+                if (!newPath) {
+                    // No path around the blocked tiles. Wait — the blockers may move next tick.
+                    // Leave cachedPath undefined so we plan fresh on the next tick.
+                    console.log(`[MoveTo] ${entity.id} no path around blocked tiles, waiting`);
+                    return ActionRunning;
+                }
+
+                action.cachedPath = newPath;
                 continue;
             }
 
@@ -247,17 +290,17 @@ export function executeMoveToAction(
                 entity.id,
             );
             if (committed) {
-                // Cycle: the transaction already repositioned all entities atomically,
-                // including this entity. Check arrival based on the new position.
+                // Cycle: the transaction repositioned all entities atomically including us.
                 if (hasArrived(entity.worldPosition, action.target, action.stopAdjacent)) {
                     console.log(
                         `[MoveTo] ${entity.id} displacement cycle committed, arrived at (${entity.worldPosition.x},${entity.worldPosition.y})`,
                     );
                     return ActionComplete;
                 }
-                // Non-cycle: the chain moved displaced entities; the target tile is now free.
+                // Non-cycle: chain cleared the target tile, step into it.
                 if (!result.transaction.isCycle) {
                     applyRequesterStep(entity, entity.worldPosition, nextPoint, tick);
+                    action.cachedPath = action.cachedPath.slice(1);
                     console.log(
                         `[MoveTo] ${entity.id} displaced chain, stepped to (${entity.worldPosition.x},${entity.worldPosition.y})`,
                     );
@@ -268,14 +311,15 @@ export function executeMoveToAction(
                 return ActionRunning;
             }
 
-            // Stale transaction: the world changed between negotiation and commit.
-            // This is a timing issue, not proof of impassability — don't block the tile.
+            // Stale transaction: world changed between negotiation and commit.
+            // Keep the cached path — this is a timing issue, not proof of impassability.
             console.log(`[MoveTo] ${entity.id} displacement transaction stale, waiting`);
             return ActionRunning;
         }
 
         // Tile is free — step into it.
         applyRequesterStep(entity, entity.worldPosition, nextPoint, tick);
+        action.cachedPath = action.cachedPath.slice(1);
         console.log(
             `[MoveTo] ${entity.id} stepped to (${entity.worldPosition.x},${entity.worldPosition.y})`,
         );
@@ -285,7 +329,8 @@ export function executeMoveToAction(
         return ActionRunning;
     }
 
-    // Safety cap: should not be reached in practice.
+    // Safety cap: exceeded max replan attempts within one tick.
     console.warn(`[MoveTo] ${entity.id} exceeded max replan attempts, waiting`);
+    action.cachedPath = undefined;
     return ActionRunning;
 }
