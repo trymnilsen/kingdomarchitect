@@ -1,5 +1,6 @@
 import { Game } from "./game/game.ts";
 import { clearGameDatabase } from "./server/persistence/indexedDBAdapter.ts";
+import { WebworkerServerConnection } from "./server/webworkerServerConnection.ts";
 
 const canvasElementId = "gameCanvas";
 
@@ -18,7 +19,8 @@ async function bootstrap() {
     }
 
     try {
-        const game = new Game(canvasElementId);
+        const serverConnection = new WebworkerServerConnection();
+        const game = new Game(canvasElementId, serverConnection);
         await game.bootstrap();
     } catch (e) {
         console.error("Failed to bootstrap game: ", e);

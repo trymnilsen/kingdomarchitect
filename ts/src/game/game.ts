@@ -11,8 +11,7 @@ import { Camera } from "../rendering/camera.ts";
 import { DrawMode } from "../rendering/drawMode.ts";
 import { Renderer } from "../rendering/renderer.ts";
 import { RenderVisibilityMap } from "../rendering/renderVisibilityMap.ts";
-import { GameServerConnection } from "../server/gameServerConnection.ts";
-import { WebworkerServerConnection } from "../server/webworkerServerConnection.ts";
+import type { GameServerConnection } from "../server/gameServerConnection.ts";
 import { InteractionHandler } from "./interaction/handler/interactionHandler.ts";
 import { chunkMapSystem } from "./system/chunkMapSystem.ts";
 import { pathfindingSystem } from "./system/pathfindingSystem.ts";
@@ -43,7 +42,10 @@ export class Game {
     private gameServer: GameServerConnection;
     private domElementWrapperSelector: string;
 
-    constructor(domElementWrapperSelector: string) {
+    constructor(
+        domElementWrapperSelector: string,
+        serverConnection: GameServerConnection,
+    ) {
         this.domElementWrapperSelector = domElementWrapperSelector;
         const root = createRootEntity();
         this.ecsWorld = new EcsWorld(root);
@@ -53,7 +55,7 @@ export class Game {
             y: window.innerHeight,
         });
 
-        this.gameServer = new WebworkerServerConnection();
+        this.gameServer = serverConnection;
         this.gameServer.onMessage.listen((message) => {
             handleGameMessage(this.ecsWorld.root, this.camera, message);
             this.ecsWorld.runGameMessage(message);

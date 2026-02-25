@@ -1,14 +1,21 @@
 import type { PersistenceAdapter } from "./persistenceAdapter.ts";
 import type { SerializedEntity } from "./serializedEntity.ts";
 import type { SerializedWorldMeta } from "./serializedWorldMeta.ts";
+import { gameMigrations } from "./migration.ts";
+import { applyIndexedDBMigrations } from "./indexedDBMigrationCompiler.ts";
 
 export const DB_NAME = "kingdom_architect";
-const DB_VERSION = 2;
 const ENTITY_STORE = "entities";
 const META_STORE = "meta";
 const ROOT_COMPONENTS_STORE = "root_components";
 const META_KEY = "world_meta";
 const ROOT_COMPONENTS_KEY = "components";
+
+/**
+ * The IndexedDB version is derived from the highest migration version.
+ * Bumping a migration version automatically triggers onupgradeneeded.
+ */
+const DB_VERSION = Math.max(...gameMigrations.map((m) => m.version));
 
 /**
  * IndexedDB implementation of the PersistenceAdapter.
@@ -39,27 +46,13 @@ export class IndexedDBAdapter implements PersistenceAdapter {
 
             request.onupgradeneeded = (event) => {
                 const db = (event.target as IDBOpenDBRequest).result;
-
-                // Create entities store if it doesn't exist
-                if (!db.objectStoreNames.contains(ENTITY_STORE)) {
-                    const entityStore = db.createObjectStore(ENTITY_STORE, {
-                        keyPath: "id",
-                    });
-                    // Create index on parentId for efficient child queries
-                    entityStore.createIndex("parentId", "parentId", {
-                        unique: false,
-                    });
-                }
-
-                // Create meta store if it doesn't exist
-                if (!db.objectStoreNames.contains(META_STORE)) {
-                    db.createObjectStore(META_STORE);
-                }
-
-                // Create root components store if it doesn't exist
-                if (!db.objectStoreNames.contains(ROOT_COMPONENTS_STORE)) {
-                    db.createObjectStore(ROOT_COMPONENTS_STORE);
-                }
+                const tx = (event.target as IDBOpenDBRequest).transaction!;
+                applyIndexedDBMigrations(
+                    db,
+                    tx,
+                    event.oldVersion,
+                    gameMigrations,
+                );
             };
         });
     }
