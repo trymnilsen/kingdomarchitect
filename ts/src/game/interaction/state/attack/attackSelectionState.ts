@@ -76,7 +76,9 @@ export class AttackSelectionState extends InteractionState {
             );
 
             context.drawNinePatchSprite({
-                sprite: this.selection ? spriteRefs.cursor : spriteRefs.cursor_red,
+                sprite: this.selection
+                    ? spriteRefs.cursor
+                    : spriteRefs.cursor_red,
                 height: TileSize,
                 width: TileSize,
                 scale: 1.0,

@@ -71,8 +71,9 @@ export function createTestComponentContext<P extends {}>(
         spriteCalls: [],
     };
 
-    let capturedDrawFn: ((scope: RenderScope, region: Rectangle) => void) | null =
-        null;
+    let capturedDrawFn:
+        | ((scope: RenderScope, region: Rectangle) => void)
+        | null = null;
 
     const measureText = (text: string, _style: TextStyle): UISize => ({
         width: text.length * measureConfig.charWidth,
@@ -86,7 +87,9 @@ export function createTestComponentContext<P extends {}>(
         measureDescriptor: (_slotId, _descriptor, _measureConstraints) => {
             return { width: 0, height: 0 };
         },
-        withState: <T>(initial: T): [T, (newValue: T | ((current: T) => T)) => void] => {
+        withState: <T>(
+            initial: T,
+        ): [T, (newValue: T | ((current: T) => T)) => void] => {
             return [initial, () => {}];
         },
         withDraw: (fn) => {
@@ -178,11 +181,8 @@ export function renderComponent<P extends {}>(
     executeDrawCalls: (region: Rectangle) => void;
 } {
     const descriptor = component(props);
-    const { context, drawCapture, executeDrawCalls } = createTestComponentContext(
-        props,
-        constraints,
-        measureConfig,
-    );
+    const { context, drawCapture, executeDrawCalls } =
+        createTestComponentContext(props, constraints, measureConfig);
 
     const result = descriptor.renderFn(context);
 

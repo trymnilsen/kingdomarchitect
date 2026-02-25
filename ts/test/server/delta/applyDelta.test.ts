@@ -7,7 +7,11 @@ import type { DeltaOperation } from "../../../src/server/delta/deltaTypes.ts";
 describe("applyDelta", () => {
     describe("set operation", () => {
         it("sets a primitive value without affecting siblings", () => {
-            const component = { id: "test", value: 5, other: "untouched" } as unknown as Components;
+            const component = {
+                id: "test",
+                value: 5,
+                other: "untouched",
+            } as unknown as Components;
             const ops: DeltaOperation[] = [
                 { op: "set", path: ["value"], value: 10 },
             ];
@@ -54,7 +58,10 @@ describe("applyDelta", () => {
         });
 
         it("sets an array element", () => {
-            const component = { id: "test", items: [1, 2, 3] } as unknown as Components;
+            const component = {
+                id: "test",
+                items: [1, 2, 3],
+            } as unknown as Components;
             const ops: DeltaOperation[] = [
                 { op: "set", path: ["items", 1], value: 99 },
             ];
@@ -63,7 +70,10 @@ describe("applyDelta", () => {
         });
 
         it("replaces entire array", () => {
-            const component = { id: "test", items: [1, 2, 3] } as unknown as Components;
+            const component = {
+                id: "test",
+                items: [1, 2, 3],
+            } as unknown as Components;
             const ops: DeltaOperation[] = [
                 { op: "set", path: ["items"], value: [4, 5, 6] },
             ];
@@ -74,8 +84,14 @@ describe("applyDelta", () => {
 
     describe("delete operation", () => {
         it("deletes a property without affecting siblings", () => {
-            const component = { id: "test", toDelete: 42, keep: "yes" } as unknown as Components;
-            const ops: DeltaOperation[] = [{ op: "delete", path: ["toDelete"] }];
+            const component = {
+                id: "test",
+                toDelete: 42,
+                keep: "yes",
+            } as unknown as Components;
+            const ops: DeltaOperation[] = [
+                { op: "delete", path: ["toDelete"] },
+            ];
             applyDelta(component, ops);
             assert.strictEqual((component as any).toDelete, undefined);
             assert.strictEqual("toDelete" in component, false);
@@ -98,7 +114,10 @@ describe("applyDelta", () => {
 
     describe("array_push operation", () => {
         it("pushes single value", () => {
-            const component = { id: "test", items: [1, 2] } as unknown as Components;
+            const component = {
+                id: "test",
+                items: [1, 2],
+            } as unknown as Components;
             const ops: DeltaOperation[] = [
                 { op: "array_push", path: ["items"], values: [3] },
             ];
@@ -107,7 +126,10 @@ describe("applyDelta", () => {
         });
 
         it("pushes multiple values", () => {
-            const component = { id: "test", items: [1] } as unknown as Components;
+            const component = {
+                id: "test",
+                items: [1],
+            } as unknown as Components;
             const ops: DeltaOperation[] = [
                 { op: "array_push", path: ["items"], values: [2, 3, 4] },
             ];
@@ -130,25 +152,44 @@ describe("applyDelta", () => {
 
     describe("array_splice operation", () => {
         it("removes elements from end", () => {
-            const component = { id: "test", items: [1, 2, 3, 4, 5] } as unknown as Components;
+            const component = {
+                id: "test",
+                items: [1, 2, 3, 4, 5],
+            } as unknown as Components;
             const ops: DeltaOperation[] = [
-                { op: "array_splice", path: ["items"], index: 3, deleteCount: 2 },
+                {
+                    op: "array_splice",
+                    path: ["items"],
+                    index: 3,
+                    deleteCount: 2,
+                },
             ];
             applyDelta(component, ops);
             assert.deepStrictEqual((component as any).items, [1, 2, 3]);
         });
 
         it("removes element from middle", () => {
-            const component = { id: "test", items: [1, 2, 3, 4] } as unknown as Components;
+            const component = {
+                id: "test",
+                items: [1, 2, 3, 4],
+            } as unknown as Components;
             const ops: DeltaOperation[] = [
-                { op: "array_splice", path: ["items"], index: 1, deleteCount: 1 },
+                {
+                    op: "array_splice",
+                    path: ["items"],
+                    index: 1,
+                    deleteCount: 1,
+                },
             ];
             applyDelta(component, ops);
             assert.deepStrictEqual((component as any).items, [1, 3, 4]);
         });
 
         it("inserts elements", () => {
-            const component = { id: "test", items: [1, 4] } as unknown as Components;
+            const component = {
+                id: "test",
+                items: [1, 4],
+            } as unknown as Components;
             const ops: DeltaOperation[] = [
                 {
                     op: "array_splice",
@@ -163,7 +204,10 @@ describe("applyDelta", () => {
         });
 
         it("replaces elements", () => {
-            const component = { id: "test", items: [1, 2, 3, 4] } as unknown as Components;
+            const component = {
+                id: "test",
+                items: [1, 2, 3, 4],
+            } as unknown as Components;
             const ops: DeltaOperation[] = [
                 {
                     op: "array_splice",

@@ -13,7 +13,10 @@ import {
 import { executeOperateFacilityAction } from "../../../../src/game/behavior/actions/operateFacilityAction.ts";
 import type { BehaviorActionData } from "../../../../src/game/behavior/actions/Action.ts";
 
-type OperateFacilityAction = Extract<BehaviorActionData, { type: "operateFacility" }>;
+type OperateFacilityAction = Extract<
+    BehaviorActionData,
+    { type: "operateFacility" }
+>;
 
 function createTestScene(): {
     root: Entity;

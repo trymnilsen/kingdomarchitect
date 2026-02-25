@@ -1,6 +1,9 @@
 import { distance, type Point } from "../../common/point.ts";
 import type { BuildingRequirements } from "../../data/building/building.ts";
-import type { InventoryItem, ItemRarity } from "../../data/inventory/inventoryItem.ts";
+import type {
+    InventoryItem,
+    ItemRarity,
+} from "../../data/inventory/inventoryItem.ts";
 import { inventoryItemsMap } from "../../data/inventory/inventoryItems.ts";
 import {
     getInventoryItem,
@@ -107,7 +110,9 @@ export function findStockpilesWithItem(
 
     // Sort by distance from the given position
     sources.sort(
-        (a, b) => distance(fromPosition, a.position) - distance(fromPosition, b.position),
+        (a, b) =>
+            distance(fromPosition, a.position) -
+            distance(fromPosition, b.position),
     );
 
     return sources;
@@ -133,12 +138,15 @@ export function checkMaterialsForBuilding(
         };
     }
 
-    for (const [itemId, amountNeeded] of Object.entries(requirements.materials)) {
+    for (const [itemId, amountNeeded] of Object.entries(
+        requirements.materials,
+    )) {
         if (amountNeeded === undefined || amountNeeded <= 0) {
             continue;
         }
 
-        const item = inventoryItemsMap[itemId as keyof typeof inventoryItemsMap];
+        const item =
+            inventoryItemsMap[itemId as keyof typeof inventoryItemsMap];
         if (!item) {
             console.warn(`Unknown item ID in building requirements: ${itemId}`);
             continue;
@@ -176,7 +184,8 @@ export function checkMaterialsForBuilding(
 
     const missingMaterials = materialRequirements.filter(
         (req) =>
-            req.amountInWorkerInventory + req.amountInStockpiles < req.amountNeeded,
+            req.amountInWorkerInventory + req.amountInStockpiles <
+            req.amountNeeded,
     );
 
     const materialsToFetch = materialRequirements.filter(
@@ -223,7 +232,9 @@ export function logMissingMaterials(
         return;
     }
 
-    console.log(`[BUILD] Cannot construct ${buildingName} - missing materials:`);
+    console.log(
+        `[BUILD] Cannot construct ${buildingName} - missing materials:`,
+    );
     for (const req of missingMaterials) {
         const totalAvailable =
             req.amountInWorkerInventory + req.amountInStockpiles;
@@ -281,7 +292,9 @@ export function workerHasAllMaterials(
         return false;
     }
 
-    for (const [itemId, amountNeeded] of Object.entries(requirements.materials)) {
+    for (const [itemId, amountNeeded] of Object.entries(
+        requirements.materials,
+    )) {
         if (amountNeeded === undefined || amountNeeded <= 0) {
             continue;
         }

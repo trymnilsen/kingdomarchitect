@@ -68,8 +68,7 @@ export async function serveStaticFile(
     try {
         const fileContent = await fs.readFile(normalizedPath);
         const extname = path.extname(normalizedPath).toLowerCase();
-        const contentType =
-            contentTypes[extname] || "application/octet-stream";
+        const contentType = contentTypes[extname] || "application/octet-stream";
 
         res.writeHead(200, {
             "Content-Type": contentType,

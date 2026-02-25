@@ -188,7 +188,8 @@ async function packSprites(sprites: PackableSprite[]) {
     }
 
     // Generate spriteRefs - pre-created SpriteRef objects for direct use
-    const spriteRefs: { [name: string]: { bin: string; spriteId: string } } = {};
+    const spriteRefs: { [name: string]: { bin: string; spriteId: string } } =
+        {};
     for (const [name, sprite] of Object.entries(packedSprites)) {
         spriteRefs[name] = {
             bin: sprite.bin,
@@ -215,11 +216,14 @@ async function packSprites(sprites: PackableSprite[]) {
     const spriteDefinitionEntries = Object.entries(spriteDefinitions)
         .map(([name, arr]) => `    "${name}": ${JSON.stringify(arr)}`)
         .join("," + EOL);
-    const spriteDefinitionsFormatted = "{" + EOL + spriteDefinitionEntries + EOL + "}";
+    const spriteDefinitionsFormatted =
+        "{" + EOL + spriteDefinitionEntries + EOL + "}";
 
     const generatedTypescript = [
         "// Sprite definition arrays: [w, h, x, y] or [w, h, x, y, frames]",
-        "export const spriteDefinitions: Record<string, number[]> = " + spriteDefinitionsFormatted + ";",
+        "export const spriteDefinitions: Record<string, number[]> = " +
+            spriteDefinitionsFormatted +
+            ";",
         "export const bins = " + binNamesJson + ";",
         "export const spriteRefs = " + spriteRefsJson + ";",
     ].join(EOL);

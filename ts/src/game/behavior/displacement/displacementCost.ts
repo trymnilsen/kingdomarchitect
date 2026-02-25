@@ -48,9 +48,7 @@ export function getDisplacementResistance(
         return Infinity;
     }
 
-    const pressure = stamina
-        ? getMovementPressure(stamina, currentTick)
-        : 0;
+    const pressure = stamina ? getMovementPressure(stamina, currentTick) : 0;
 
     return agent.currentBehaviorUtility + pressure * PRESSURE_WEIGHT;
 }

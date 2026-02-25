@@ -39,7 +39,10 @@ describe("attackPlanner", () => {
         const job = AttackJob("worker", "target");
         const actions = planAttack(root, worker, job);
 
-        const moveAction = actions[0] as { type: "moveTo"; target: { x: number; y: number } };
+        const moveAction = actions[0] as {
+            type: "moveTo";
+            target: { x: number; y: number };
+        };
         assert.strictEqual(moveAction.target.x, 10);
         assert.strictEqual(moveAction.target.y, 15);
     });
@@ -50,7 +53,10 @@ describe("attackPlanner", () => {
         const job = AttackJob("worker", "target");
         const actions = planAttack(root, worker, job);
 
-        const attackAction = actions[1] as { type: "attackTarget"; targetId: string };
+        const attackAction = actions[1] as {
+            type: "attackTarget";
+            targetId: string;
+        };
         assert.strictEqual(attackAction.targetId, "target");
     });
 

@@ -1,5 +1,9 @@
 import type { AssetLoader } from "../../asset/loader/assetLoader.ts";
-import { spriteRefs, type SpriteRef, SPRITE_FRAMES } from "../../asset/sprite.ts";
+import {
+    spriteRefs,
+    type SpriteRef,
+    SPRITE_FRAMES,
+} from "../../asset/sprite.ts";
 import { spriteRegistry } from "../../asset/spriteRegistry.ts";
 import { getCharacterBinId } from "../../characterbuilder/characterBinId.ts";
 import type { SpriteDefinitionCache } from "../../characterbuilder/characterSpriteGenerator.ts";

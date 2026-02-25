@@ -1,5 +1,8 @@
 import type { Point } from "../../common/point.ts";
-import type { ComponentID, Components } from "../../game/component/component.ts";
+import type {
+    ComponentID,
+    Components,
+} from "../../game/component/component.ts";
 import type { Volume } from "../../game/map/volume.ts";
 import type { DeltaOperation } from "../delta/deltaTypes.ts";
 import type { GameEffect } from "./effect/gameEffect.ts";

@@ -68,19 +68,31 @@ export function startMultiplayerServer(
     // Create and init game server (no initial player — players join via WebSocket)
     const gameServer = new GameServer(messageRouter, adapter);
     let gameServerReady = false;
-    gameServer.init().then(() => {
-        gameServerReady = true;
-        console.log("Game server initialized");
-    }).catch((err) => {
-        console.error("Failed to initialize game server:", err);
-        process.exit(1);
-    });
+    gameServer
+        .init()
+        .then(() => {
+            gameServerReady = true;
+            console.log("Game server initialized");
+        })
+        .catch((err) => {
+            console.error("Failed to initialize game server:", err);
+            process.exit(1);
+        });
 
     // Create HTTP server
     const server = http.createServer(async (req, res) => {
         try {
             // Auth routes
-            if (await handleAuthRoute(req, res, db, config.auth, authRateLimiter, challengeStore)) {
+            if (
+                await handleAuthRoute(
+                    req,
+                    res,
+                    db,
+                    config.auth,
+                    authRateLimiter,
+                    challengeStore,
+                )
+            ) {
                 return;
             }
 
@@ -205,4 +217,3 @@ export function startMultiplayerServer(
 
     return server;
 }
-

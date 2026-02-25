@@ -1,6 +1,10 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
-import { isPointAdjacentTo, pointEquals, type Point } from "../../src/common/point.ts";
+import {
+    isPointAdjacentTo,
+    pointEquals,
+    type Point,
+} from "../../src/common/point.ts";
 import { FixedGraph } from "../../src/game/map/path/graph/fixedGraph.ts";
 import { aStarSearch } from "../../src/game/map/path/search.ts";
 import { createEmptyGraph } from "./testGraph.ts";

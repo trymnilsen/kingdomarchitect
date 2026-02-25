@@ -1,7 +1,8 @@
-import type { BehaviorActionData, ItemTransfer } from "../../behavior/actions/Action.ts";
-import {
-    BuildingComponentId,
-} from "../../component/buildingComponent.ts";
+import type {
+    BehaviorActionData,
+    ItemTransfer,
+} from "../../behavior/actions/Action.ts";
+import { BuildingComponentId } from "../../component/buildingComponent.ts";
 import {
     getInventoryItem,
     InventoryComponentId,
@@ -46,7 +47,8 @@ export function planBuildBuilding(
         return [];
     }
 
-    const buildingComponent = buildingEntity.getEcsComponent(BuildingComponentId);
+    const buildingComponent =
+        buildingEntity.getEcsComponent(BuildingComponentId);
     if (!buildingComponent) {
         console.warn(
             `[BuildBuildingPlanner] Building ${job.entityId} has no BuildingComponent`,
@@ -60,14 +62,18 @@ export function planBuildBuilding(
         return [];
     }
 
-    const buildingInventory = buildingEntity.getEcsComponent(InventoryComponentId);
+    const buildingInventory =
+        buildingEntity.getEcsComponent(InventoryComponentId);
     if (!buildingInventory) {
         console.warn(`[BuildBuildingPlanner] Building has no inventory`);
         return [];
     }
 
     const requirements = buildingComponent.building.requirements;
-    const remainingMaterials = getRemainingMaterials(buildingInventory, requirements);
+    const remainingMaterials = getRemainingMaterials(
+        buildingInventory,
+        requirements,
+    );
     const buildingReady = Object.keys(remainingMaterials).length === 0;
 
     // State 1: Building has all materials - go construct
@@ -91,7 +97,9 @@ export function planBuildBuilding(
     // State 2: Worker has materials - go deposit them
     if (workerHasMaterials) {
         const itemsToDeposit: ItemTransfer[] = [];
-        for (const [itemId, amountNeeded] of Object.entries(remainingMaterials)) {
+        for (const [itemId, amountNeeded] of Object.entries(
+            remainingMaterials,
+        )) {
             const workerItem = getInventoryItem(workerInventory, itemId);
             if (workerItem && workerItem.amount > 0) {
                 // Deposit up to what's needed
@@ -144,7 +152,8 @@ export function planBuildBuilding(
     }
 
     // Build list of items to take from stockpile
-    const stockpileInventory = stockpileEntity.getEcsComponent(InventoryComponentId);
+    const stockpileInventory =
+        stockpileEntity.getEcsComponent(InventoryComponentId);
     if (!stockpileInventory) {
         suspendJob(worker, job);
         return [];

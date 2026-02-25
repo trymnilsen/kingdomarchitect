@@ -19,9 +19,7 @@ import {
 import { getProductionDefinition } from "../../../../../../data/production/productionDefinition.ts";
 import type { UIActionbarItem } from "../../../../view/uiActionbar.ts";
 
-export class ProductionBuildingSelectionProvider
-    implements ActorSelectionProvider
-{
+export class ProductionBuildingSelectionProvider implements ActorSelectionProvider {
     provideButtons(
         stateContext: StateContext,
         selection: SelectedWorldItem,
@@ -75,7 +73,8 @@ export class ProductionBuildingSelectionProvider
                         text: "Clear Queue",
                         icon: spriteRefs.empty_sprite,
                         onClick: () => {
-                            const jq = root.getEcsComponent(JobQueueComponentId);
+                            const jq =
+                                root.getEcsComponent(JobQueueComponentId);
                             if (jq) {
                                 clearProductionJobsForBuilding(
                                     jq,

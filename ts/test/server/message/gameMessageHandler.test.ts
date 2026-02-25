@@ -397,10 +397,7 @@ describe("gameMessageHandler", () => {
 
             assert.strictEqual(parent.children.length, 0);
             assert.ok(!root.findEntity("child"));
-            assert.ok(
-                root.findEntity("parent"),
-                "Parent should still exist",
-            );
+            assert.ok(root.findEntity("parent"), "Parent should still exist");
         });
     });
 

@@ -4,7 +4,10 @@ import { heal, HealthComponentId } from "../../component/healthComponent.ts";
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { finishConstruction } from "../../job/buildBuildingJob.ts";
-import { findJobClaimedBy, completeJobFromQueue } from "../../job/jobLifecycle.ts";
+import {
+    findJobClaimedBy,
+    completeJobFromQueue,
+} from "../../job/jobLifecycle.ts";
 import {
     ActionComplete,
     ActionRunning,
@@ -28,11 +31,17 @@ export function executeConstructBuildingAction(
         console.warn(
             `[ConstructBuilding] Building ${action.entityId} not found`,
         );
-        return { kind: "failed", cause: { type: "targetGone", entityId: action.entityId } };
+        return {
+            kind: "failed",
+            cause: { type: "targetGone", entityId: action.entityId },
+        };
     }
 
     if (
-        !isPointAdjacentTo(buildingEntity.worldPosition, entity.worldPosition) &&
+        !isPointAdjacentTo(
+            buildingEntity.worldPosition,
+            entity.worldPosition,
+        ) &&
         !pointEquals(buildingEntity.worldPosition, entity.worldPosition)
     ) {
         console.warn(`[ConstructBuilding] Worker not adjacent to building`);

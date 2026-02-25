@@ -150,7 +150,9 @@ describe("playerDiscoveryData", () => {
 
             const playerDiscovery: WorldDiscoveryData = {
                 fullyDiscoveredChunks: new Set(),
-                partiallyDiscoveredChunks: new Map([[chunkId, discoveredTiles]]),
+                partiallyDiscoveredChunks: new Map([
+                    [chunkId, discoveredTiles],
+                ]),
             };
 
             const result = getPlayerDiscoveryData(
@@ -320,7 +322,9 @@ describe("playerDiscoveryData", () => {
 
             const playerDiscovery: WorldDiscoveryData = {
                 fullyDiscoveredChunks: new Set([chunk0Id]),
-                partiallyDiscoveredChunks: new Map([[chunk1Id, discoveredTiles]]),
+                partiallyDiscoveredChunks: new Map([
+                    [chunk1Id, discoveredTiles],
+                ]),
             };
 
             const result = getPlayerDiscoveryData(

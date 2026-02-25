@@ -1,6 +1,9 @@
 import type { Entity } from "../../entity/entity.ts";
 import type { BehaviorActionData } from "../../behavior/actions/Action.ts";
-import { InventoryComponentId, getInventoryItem } from "../../component/inventoryComponent.ts";
+import {
+    InventoryComponentId,
+    getInventoryItem,
+} from "../../component/inventoryComponent.ts";
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import type { CraftingJob } from "../craftingJob.ts";
 import { failJobFromQueue } from "../jobLifecycle.ts";
@@ -56,7 +59,8 @@ export function planCrafting(
         ];
     }
 
-    const buildingInventory = buildingEntity.getEcsComponent(InventoryComponentId);
+    const buildingInventory =
+        buildingEntity.getEcsComponent(InventoryComponentId);
     if (!buildingInventory) {
         const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
         if (queueEntity) {
@@ -72,7 +76,10 @@ export function planCrafting(
         const needed = input.amount - workerAmount;
 
         if (needed > 0) {
-            const buildingItem = getInventoryItem(buildingInventory, input.item.id);
+            const buildingItem = getInventoryItem(
+                buildingInventory,
+                input.item.id,
+            );
             const available = buildingItem?.amount ?? 0;
             const toTake = Math.min(needed, available);
 

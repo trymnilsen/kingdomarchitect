@@ -10,9 +10,7 @@ import {
     createVisibilityMapComponent,
     VisibilityMapComponentId,
 } from "../../../src/game/component/visibilityMapComponent.ts";
-import {
-    createWorldDiscoveryComponent,
-} from "../../../src/game/component/worldDiscoveryComponent.ts";
+import { createWorldDiscoveryComponent } from "../../../src/game/component/worldDiscoveryComponent.ts";
 import {
     createHealthComponent,
     HealthComponentId,

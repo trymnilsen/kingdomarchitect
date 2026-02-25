@@ -57,7 +57,6 @@ export function planGoblinBuild(
     );
 }
 
-
 function findExistingBuildingSite(
     campEntity: Entity,
     buildingId: string,
@@ -120,7 +119,8 @@ function planConstructExistingBuilding(
     buildingEntity: Entity,
     building: Building,
 ): BehaviorActionData[] {
-    const buildingInventory = buildingEntity.getEcsComponent(InventoryComponentId);
+    const buildingInventory =
+        buildingEntity.getEcsComponent(InventoryComponentId);
     const goblinInventory = goblin.getEcsComponent(InventoryComponentId);
 
     if (!goblinInventory) {
@@ -155,9 +155,9 @@ function planConstructExistingBuilding(
         remainingMaterials,
     );
     if (Object.keys(materialsGoblinHas).length > 0) {
-        const itemsToDeposit: ItemTransfer[] = Object.entries(materialsGoblinHas).map(
-            ([itemId, amount]) => ({ itemId, amount }),
-        );
+        const itemsToDeposit: ItemTransfer[] = Object.entries(
+            materialsGoblinHas,
+        ).map(([itemId, amount]) => ({ itemId, amount }));
 
         console.log(
             `[GoblinBuildPlanner] Goblin ${goblin.id} state=deposit materials to building ${buildingEntity.id}:`,
@@ -321,7 +321,10 @@ function planGatherMaterials(
     return [];
 }
 
-function findNearestChoppableResource(root: Entity, goblin: Entity): Entity | null {
+function findNearestChoppableResource(
+    root: Entity,
+    goblin: Entity,
+): Entity | null {
     const resources = root.queryComponents(ResourceComponentId);
     let nearest: Entity | null = null;
     let nearestDist = Infinity;

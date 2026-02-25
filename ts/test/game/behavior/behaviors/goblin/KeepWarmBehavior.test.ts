@@ -2,13 +2,19 @@ import { describe, it } from "node:test";
 import assert from "node:assert";
 import { createKeepWarmBehavior } from "../../../../../src/game/behavior/behaviors/goblin/keepWarmBehavior.ts";
 import { Entity } from "../../../../../src/game/entity/entity.ts";
-import { createWarmthComponent, COLD_THRESHOLD } from "../../../../../src/game/component/warmthComponent.ts";
+import {
+    createWarmthComponent,
+    COLD_THRESHOLD,
+} from "../../../../../src/game/component/warmthComponent.ts";
 import { createGoblinUnitComponent } from "../../../../../src/game/component/goblinUnitComponent.ts";
 import { createGoblinCampComponent } from "../../../../../src/game/component/goblinCampComponent.ts";
 import { createFireSourceComponent } from "../../../../../src/game/component/fireSourceComponent.ts";
 import { createBehaviorAgentComponent } from "../../../../../src/game/component/BehaviorAgentComponent.ts";
 
-function createTestGoblin(warmth: number = 80, campEntityId: string = "camp-1"): Entity {
+function createTestGoblin(
+    warmth: number = 80,
+    campEntityId: string = "camp-1",
+): Entity {
     const entity = new Entity("goblin-1");
     entity.setEcsComponent(createWarmthComponent(warmth));
     entity.setEcsComponent(createGoblinUnitComponent(campEntityId));

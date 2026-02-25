@@ -38,7 +38,12 @@ export function wrapTextToLines(
             if (currentLine) {
                 lines.push(currentLine);
             }
-            currentLine = fitWordToWidth(word, maxWidth, textStyle, measureText);
+            currentLine = fitWordToWidth(
+                word,
+                maxWidth,
+                textStyle,
+                measureText,
+            );
         }
     }
 

@@ -30,7 +30,10 @@ describe("diffComponents", () => {
 
         it("detects string value change", () => {
             const old = { id: "test", name: "Alice" } as unknown as Components;
-            const updated = { id: "test", name: "Bob" } as unknown as Components;
+            const updated = {
+                id: "test",
+                name: "Bob",
+            } as unknown as Components;
             const ops = diffComponents(old, updated);
             assert.strictEqual(ops.length, 1);
             assert.deepStrictEqual(ops[0], {
@@ -42,7 +45,10 @@ describe("diffComponents", () => {
 
         it("detects added property", () => {
             const old = { id: "test" } as unknown as Components;
-            const updated = { id: "test", newField: 42 } as unknown as Components;
+            const updated = {
+                id: "test",
+                newField: 42,
+            } as unknown as Components;
             const ops = diffComponents(old, updated);
             assert.strictEqual(ops.length, 1);
             assert.deepStrictEqual(ops[0], {
@@ -104,8 +110,14 @@ describe("diffComponents", () => {
 
     describe("array changes", () => {
         it("detects array append", () => {
-            const old = { id: "test", items: [1, 2, 3] } as unknown as Components;
-            const updated = { id: "test", items: [1, 2, 3, 4, 5] } as unknown as Components;
+            const old = {
+                id: "test",
+                items: [1, 2, 3],
+            } as unknown as Components;
+            const updated = {
+                id: "test",
+                items: [1, 2, 3, 4, 5],
+            } as unknown as Components;
             const ops = diffComponents(old, updated);
             assert.strictEqual(ops.length, 1);
             assert.deepStrictEqual(ops[0], {
@@ -116,8 +128,14 @@ describe("diffComponents", () => {
         });
 
         it("detects array element change", () => {
-            const old = { id: "test", items: [1, 2, 3] } as unknown as Components;
-            const updated = { id: "test", items: [1, 99, 3] } as unknown as Components;
+            const old = {
+                id: "test",
+                items: [1, 2, 3],
+            } as unknown as Components;
+            const updated = {
+                id: "test",
+                items: [1, 99, 3],
+            } as unknown as Components;
             const ops = diffComponents(old, updated);
             assert.strictEqual(ops.length, 1);
             assert.deepStrictEqual(ops[0], {
@@ -128,8 +146,14 @@ describe("diffComponents", () => {
         });
 
         it("detects array truncation", () => {
-            const old = { id: "test", items: [1, 2, 3, 4, 5] } as unknown as Components;
-            const updated = { id: "test", items: [1, 2, 3] } as unknown as Components;
+            const old = {
+                id: "test",
+                items: [1, 2, 3, 4, 5],
+            } as unknown as Components;
+            const updated = {
+                id: "test",
+                items: [1, 2, 3],
+            } as unknown as Components;
             const ops = diffComponents(old, updated);
             assert.strictEqual(ops.length, 1);
             assert.deepStrictEqual(ops[0], {
@@ -141,8 +165,14 @@ describe("diffComponents", () => {
         });
 
         it("falls back to full replacement for many changes", () => {
-            const old = { id: "test", items: [1, 2, 3, 4] } as unknown as Components;
-            const updated = { id: "test", items: [5, 6, 7, 8] } as unknown as Components;
+            const old = {
+                id: "test",
+                items: [1, 2, 3, 4],
+            } as unknown as Components;
+            const updated = {
+                id: "test",
+                items: [5, 6, 7, 8],
+            } as unknown as Components;
             const ops = diffComponents(old, updated);
             // Should fall back to set since all elements changed
             assert.strictEqual(ops.length, 1);
@@ -384,9 +414,24 @@ describe("isDeltaSmaller", () => {
         const component = {
             id: "test",
             items: [
-                { id: 1, name: "item1", quantity: 10, description: "first item" },
-                { id: 2, name: "item2", quantity: 20, description: "second item" },
-                { id: 3, name: "item3", quantity: 30, description: "third item" },
+                {
+                    id: 1,
+                    name: "item1",
+                    quantity: 10,
+                    description: "first item",
+                },
+                {
+                    id: 2,
+                    name: "item2",
+                    quantity: 20,
+                    description: "second item",
+                },
+                {
+                    id: 3,
+                    name: "item3",
+                    quantity: 30,
+                    description: "third item",
+                },
             ],
             metadata: {
                 created: "2024-01-01",
@@ -411,7 +456,9 @@ describe("isDeltaSmaller", () => {
 
     it("returns false for small components regardless of delta size", () => {
         // Even a tiny delta should not be used for a small component
-        const ops = [{ op: "set" as const, path: ["direction"], value: "down" }];
+        const ops = [
+            { op: "set" as const, path: ["direction"], value: "down" },
+        ];
         const component = {
             id: "Direction",
             direction: "down",

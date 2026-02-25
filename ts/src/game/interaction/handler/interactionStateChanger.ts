@@ -9,9 +9,7 @@ export type InteractionStateChanger = {
     hasOperations: boolean;
 };
 
-export class CommitableInteractionStateChanger
-    implements InteractionStateChanger
-{
+export class CommitableInteractionStateChanger implements InteractionStateChanger {
     private operations: StateOperation[] = [];
 
     get hasOperations(): boolean {

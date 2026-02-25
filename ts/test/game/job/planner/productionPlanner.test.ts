@@ -39,7 +39,10 @@ describe("productionPlanner", () => {
         const job = createProductionJob("building");
         const actions = planProduction(root, worker, job);
 
-        const moveAction = actions[0] as { type: "moveTo"; target: { x: number; y: number } };
+        const moveAction = actions[0] as {
+            type: "moveTo";
+            target: { x: number; y: number };
+        };
         assert.strictEqual(moveAction.target.x, 10);
         assert.strictEqual(moveAction.target.y, 15);
     });
@@ -50,7 +53,10 @@ describe("productionPlanner", () => {
         const job = createProductionJob("building");
         const actions = planProduction(root, worker, job);
 
-        const operateAction = actions[1] as { type: "operateFacility"; buildingId: string };
+        const operateAction = actions[1] as {
+            type: "operateFacility";
+            buildingId: string;
+        };
         assert.strictEqual(operateAction.buildingId, "building");
     });
 

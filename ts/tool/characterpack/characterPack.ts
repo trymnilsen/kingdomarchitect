@@ -153,11 +153,9 @@ function processCharacterFile(
                         definition.width,
                         definition.offset,
                     );
-                    const anchorY = anchorYBase + getAnimationY(
-                        i,
-                        definition.height,
-                        definition.offset,
-                    );
+                    const anchorY =
+                        anchorYBase +
+                        getAnimationY(i, definition.height, definition.offset);
 
                     const frame = findAnchorInFrame(
                         pngImage,

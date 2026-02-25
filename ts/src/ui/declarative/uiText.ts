@@ -42,7 +42,12 @@ export const uiText = createComponent<UiTextProps>(
         );
 
         const lineHeight = measureLineHeight(props.textStyle, measureText);
-        const measuredSize = measureWrappedText(lines, lineHeight, measureText, props.textStyle);
+        const measuredSize = measureWrappedText(
+            lines,
+            lineHeight,
+            measureText,
+            props.textStyle,
+        );
 
         const visibleLines = calculateVisibleLines(
             lines,
@@ -79,7 +84,10 @@ export const uiText = createComponent<UiTextProps>(
     },
 );
 
-function resolveAvailableWidth(requestedWidth: number, constraints: UISize): number {
+function resolveAvailableWidth(
+    requestedWidth: number,
+    constraints: UISize,
+): number {
     if (requestedWidth === fillUiSize) {
         return constraints.width;
     }
@@ -89,7 +97,10 @@ function resolveAvailableWidth(requestedWidth: number, constraints: UISize): num
     return requestedWidth;
 }
 
-function resolveAvailableHeight(requestedHeight: number, constraints: UISize): number {
+function resolveAvailableHeight(
+    requestedHeight: number,
+    constraints: UISize,
+): number {
     if (requestedHeight === fillUiSize) {
         return constraints.height;
     }

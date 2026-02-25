@@ -1,8 +1,5 @@
 import type { Components } from "../../game/component/component.ts";
-import type {
-    DeltaOperation,
-    PropertyPath,
-} from "./deltaTypes.ts";
+import type { DeltaOperation, PropertyPath } from "./deltaTypes.ts";
 
 /**
  * Compare the previous snapshot of a component to its current state and
@@ -202,7 +199,11 @@ function diffArray(
             ) {
                 diffValue(oldArr[i], newArr[i], childPath, operations);
             } else {
-                operations.push({ op: "set", path: childPath, value: newArr[i] });
+                operations.push({
+                    op: "set",
+                    path: childPath,
+                    value: newArr[i],
+                });
             }
         }
     }

@@ -1,9 +1,6 @@
 import { spriteRefs } from "../../../asset/sprite.ts";
 import { SpecialRequirement, type Building } from "../building.ts";
-import {
-    goldCoins,
-    stoneResource,
-} from "../../inventory/items/resources.ts";
+import { goldCoins, stoneResource } from "../../inventory/items/resources.ts";
 
 export const angelStatue: Building = {
     id: "angelstatue",

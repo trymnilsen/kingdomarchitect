@@ -131,7 +131,11 @@ describe("placement", () => {
 
             const result = findRandomSpawnInDiamond(center, radius, chunkMap);
 
-            assert.strictEqual(result, null, "Should return null when all occupied");
+            assert.strictEqual(
+                result,
+                null,
+                "Should return null when all occupied",
+            );
         });
 
         it("avoids occupied positions", () => {

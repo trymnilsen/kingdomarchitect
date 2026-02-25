@@ -2,7 +2,10 @@ import { isPointAdjacentTo } from "../../../common/point.ts";
 import { damage, HealthComponentId } from "../../component/healthComponent.ts";
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
-import { findJobClaimedBy, completeJobFromQueue } from "../../job/jobLifecycle.ts";
+import {
+    findJobClaimedBy,
+    completeJobFromQueue,
+} from "../../job/jobLifecycle.ts";
 import {
     ActionComplete,
     ActionRunning,
@@ -26,7 +29,10 @@ export function executeAttackTargetAction(
         console.warn(
             `[AttackTarget] Target entity ${action.targetId} not found`,
         );
-        return { kind: "failed", cause: { type: "targetGone", entityId: action.targetId } };
+        return {
+            kind: "failed",
+            cause: { type: "targetGone", entityId: action.targetId },
+        };
     }
 
     if (!isPointAdjacentTo(targetEntity.worldPosition, entity.worldPosition)) {

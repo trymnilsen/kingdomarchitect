@@ -73,9 +73,16 @@ describe("collectResourcePlanner", () => {
         const job = CollectResourceJob(resource, ResourceHarvestMode.Mine);
         const actions = planCollectResource(root, worker, job);
 
-        const harvestAction = actions[1] as { type: "harvestResource"; entityId: string; harvestAction: number };
+        const harvestAction = actions[1] as {
+            type: "harvestResource";
+            entityId: string;
+            harvestAction: number;
+        };
         assert.strictEqual(harvestAction.entityId, "resource");
-        assert.strictEqual(harvestAction.harvestAction, ResourceHarvestMode.Mine);
+        assert.strictEqual(
+            harvestAction.harvestAction,
+            ResourceHarvestMode.Mine,
+        );
     });
 
     it("returns empty array and fails job if resource not found", () => {

@@ -29,7 +29,10 @@ export function executeCollectItemsAction(
         console.warn(
             `[CollectItems] Target entity ${action.entityId} not found`,
         );
-        return { kind: "failed", cause: { type: "targetGone", entityId: action.entityId } };
+        return {
+            kind: "failed",
+            cause: { type: "targetGone", entityId: action.entityId },
+        };
     }
 
     if (!isPointAdjacentTo(targetEntity.worldPosition, entity.worldPosition)) {
@@ -55,7 +58,11 @@ export function executeCollectItemsAction(
 
     const items = collectAllItems(collectableComponent);
     for (const itemQuantity of items) {
-        addInventoryItem(workerInventory, itemQuantity.item, itemQuantity.amount);
+        addInventoryItem(
+            workerInventory,
+            itemQuantity.item,
+            itemQuantity.amount,
+        );
     }
 
     entity.invalidateComponent(InventoryComponentId);

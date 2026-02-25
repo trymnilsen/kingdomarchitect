@@ -32,10 +32,10 @@ describe("SetPlayerCommand", () => {
         });
 
         assert.strictEqual(command.command.action, "move");
-        assert.deepStrictEqual(
-            (command.command as any).targetPosition,
-            { x: 100, y: 200 },
-        );
+        assert.deepStrictEqual((command.command as any).targetPosition, {
+            x: 100,
+            y: 200,
+        });
     });
 
     it("stores attack command", () => {

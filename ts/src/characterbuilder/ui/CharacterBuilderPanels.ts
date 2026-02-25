@@ -104,14 +104,11 @@ function createCustomizationSection(
                 gap: 8,
                 width: fillUiSize,
                 height: wrapUiSize,
-                children: createColorGridItems(
-                    FANTASY_GEAR_COLORS,
-                    (color) => {
-                        const newColor = { ...selectedColors };
-                        newColor[selectedPart] = color;
-                        onColorSelect(color);
-                    },
-                ),
+                children: createColorGridItems(FANTASY_GEAR_COLORS, (color) => {
+                    const newColor = { ...selectedColors };
+                    newColor[selectedPart] = color;
+                    onColorSelect(color);
+                }),
             }),
         ];
     }
@@ -123,9 +120,7 @@ function createCustomizationSection(
                 textStyle: titleTextStyle,
             }),
             ...AVAILABLE_ANCHORS.map((anchor) =>
-                createPartButton(anchor, false, () =>
-                    onAnchorSelect(anchor),
-                ),
+                createPartButton(anchor, false, () => onAnchorSelect(anchor)),
             ),
         ];
     }

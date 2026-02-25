@@ -13,15 +13,10 @@ describe("Maze", () => {
                 weights: graph.graph,
             };
         });
-        const pathResult = aStarSearch(
-            graph.start,
-            graph.stop,
-            fixedGraph,
-            {
-                allowAdjacentStop: true,
-                weightModifier: (node) => node.weight,
-            },
-        );
+        const pathResult = aStarSearch(graph.start, graph.stop, fixedGraph, {
+            allowAdjacentStop: true,
+            weightModifier: (node) => node.weight,
+        });
 
         verifyPath(pathResult.path, graph);
     });

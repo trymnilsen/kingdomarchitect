@@ -49,12 +49,7 @@ export const goblinCampSystem: EcsSystem = {
             const jobQueue = campEntity.getEcsComponent(JobQueueComponentId);
 
             if (jobQueue) {
-                processInfrastructure(
-                    root,
-                    campEntity,
-                    jobQueue,
-                    population,
-                );
+                processInfrastructure(root, campEntity, jobQueue, population);
                 processExpansion(
                     root,
                     campEntity,

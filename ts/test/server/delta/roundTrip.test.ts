@@ -34,17 +34,11 @@ describe("diff -> apply round-trip", () => {
     });
 
     it("handles added property", () => {
-        assertRoundTrip(
-            { id: "test", a: 7 },
-            { id: "test", a: 7, b: 42 },
-        );
+        assertRoundTrip({ id: "test", a: 7 }, { id: "test", a: 7, b: 42 });
     });
 
     it("handles deleted property", () => {
-        assertRoundTrip(
-            { id: "test", a: 7, b: 42 },
-            { id: "test", a: 7 },
-        );
+        assertRoundTrip({ id: "test", a: 7, b: 42 }, { id: "test", a: 7 });
     });
 
     it("handles nested object change", () => {
@@ -91,15 +85,39 @@ describe("diff -> apply round-trip", () => {
 
     it("handles nested objects within arrays", () => {
         assertRoundTrip(
-            { id: "test", slots: [{ qty: 5, name: "wood" }, { qty: 10, name: "stone" }] },
-            { id: "test", slots: [{ qty: 5, name: "wood" }, { qty: 3, name: "stone" }] },
+            {
+                id: "test",
+                slots: [
+                    { qty: 5, name: "wood" },
+                    { qty: 10, name: "stone" },
+                ],
+            },
+            {
+                id: "test",
+                slots: [
+                    { qty: 5, name: "wood" },
+                    { qty: 3, name: "stone" },
+                ],
+            },
         );
     });
 
     it("handles Map key addition and deletion", () => {
         assertRoundTrip(
-            { id: "test", data: new Map([["a", 1], ["b", 2]]) },
-            { id: "test", data: new Map([["a", 1], ["c", 3]]) },
+            {
+                id: "test",
+                data: new Map([
+                    ["a", 1],
+                    ["b", 2],
+                ]),
+            },
+            {
+                id: "test",
+                data: new Map([
+                    ["a", 1],
+                    ["c", 3],
+                ]),
+            },
         );
     });
 
@@ -123,17 +141,29 @@ describe("diff -> apply round-trip", () => {
                 id: "test",
                 hp: 100,
                 pos: { x: 12, y: 8 },
-                inventory: [{ item: "sword", qty: 1 }, { item: "shield", qty: 1 }],
+                inventory: [
+                    { item: "sword", qty: 1 },
+                    { item: "shield", qty: 1 },
+                ],
                 flags: new Set(["visible", "active"]),
-                stats: new Map([["str", 10], ["dex", 8]]),
+                stats: new Map([
+                    ["str", 10],
+                    ["dex", 8],
+                ]),
             },
             {
                 id: "test",
                 hp: 75,
                 pos: { x: 12, y: 14 },
-                inventory: [{ item: "sword", qty: 1 }, { item: "shield", qty: 2 }],
+                inventory: [
+                    { item: "sword", qty: 1 },
+                    { item: "shield", qty: 2 },
+                ],
                 flags: new Set(["visible", "dormant"]),
-                stats: new Map([["str", 10], ["dex", 12]]),
+                stats: new Map([
+                    ["str", 10],
+                    ["dex", 12],
+                ]),
             },
         );
     });
@@ -153,8 +183,16 @@ describe("diff -> apply round-trip", () => {
     });
 
     it("produces no operations when components are identical", () => {
-        const old = { id: "test", val: 7, nested: { a: 1 } } as unknown as Components;
-        const updated = { id: "test", val: 7, nested: { a: 1 } } as unknown as Components;
+        const old = {
+            id: "test",
+            val: 7,
+            nested: { a: 1 },
+        } as unknown as Components;
+        const updated = {
+            id: "test",
+            val: 7,
+            nested: { a: 1 },
+        } as unknown as Components;
         const ops = diffComponents(old, updated);
         assert.strictEqual(ops.length, 0);
     });

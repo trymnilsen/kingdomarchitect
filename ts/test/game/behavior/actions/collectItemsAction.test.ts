@@ -38,9 +38,17 @@ describe("collectItemsAction", () => {
     it("collects all items from collectable component", () => {
         const { worker, chest } = createTestScene();
 
-        const collectableComponent = chest.getEcsComponent(CollectableComponentId)!;
-        addCollectableItem(collectableComponent, { item: woodResourceItem, amount: 5 });
-        addCollectableItem(collectableComponent, { item: stoneResource, amount: 3 });
+        const collectableComponent = chest.getEcsComponent(
+            CollectableComponentId,
+        )!;
+        addCollectableItem(collectableComponent, {
+            item: woodResourceItem,
+            amount: 5,
+        });
+        addCollectableItem(collectableComponent, {
+            item: stoneResource,
+            amount: 3,
+        });
 
         const action = {
             type: "collectItems" as const,
@@ -52,8 +60,14 @@ describe("collectItemsAction", () => {
         assert.strictEqual(result.kind, "complete");
 
         const workerInventory = worker.getEcsComponent(InventoryComponentId)!;
-        assert.strictEqual(getInventoryItem(workerInventory, "wood")?.amount, 5);
-        assert.strictEqual(getInventoryItem(workerInventory, "stone")?.amount, 3);
+        assert.strictEqual(
+            getInventoryItem(workerInventory, "wood")?.amount,
+            5,
+        );
+        assert.strictEqual(
+            getInventoryItem(workerInventory, "stone")?.amount,
+            3,
+        );
 
         // Collectable should be empty
         assert.strictEqual(collectableComponent.items.length, 0);
@@ -89,8 +103,13 @@ describe("collectItemsAction", () => {
         const { worker, chest } = createTestScene();
         chest.worldPosition = { x: 10, y: 10 }; // Not adjacent
 
-        const collectableComponent = chest.getEcsComponent(CollectableComponentId)!;
-        addCollectableItem(collectableComponent, { item: woodResourceItem, amount: 5 });
+        const collectableComponent = chest.getEcsComponent(
+            CollectableComponentId,
+        )!;
+        addCollectableItem(collectableComponent, {
+            item: woodResourceItem,
+            amount: 5,
+        });
 
         const action = {
             type: "collectItems" as const,
@@ -124,8 +143,13 @@ describe("collectItemsAction", () => {
         workerNoInv.worldPosition = { x: 10, y: 8 };
         root.addChild(workerNoInv);
 
-        const collectableComponent = chest.getEcsComponent(CollectableComponentId)!;
-        addCollectableItem(collectableComponent, { item: woodResourceItem, amount: 5 });
+        const collectableComponent = chest.getEcsComponent(
+            CollectableComponentId,
+        )!;
+        addCollectableItem(collectableComponent, {
+            item: woodResourceItem,
+            amount: 5,
+        });
 
         const action = {
             type: "collectItems" as const,

@@ -48,8 +48,14 @@ export function createHaulBehavior(): Behavior {
 
             // Find nearest stockpile
             const nearest = stockpiles.reduce((best, current) => {
-                const bestDist = distance(entity.worldPosition, best.worldPosition);
-                const currentDist = distance(entity.worldPosition, current.worldPosition);
+                const bestDist = distance(
+                    entity.worldPosition,
+                    best.worldPosition,
+                );
+                const currentDist = distance(
+                    entity.worldPosition,
+                    current.worldPosition,
+                );
                 return currentDist < bestDist ? current : best;
             });
 

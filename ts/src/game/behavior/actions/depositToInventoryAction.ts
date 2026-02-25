@@ -26,7 +26,10 @@ export function executeDepositToInventoryAction(
         console.warn(
             `[DepositToInventory] Target entity ${action.targetEntityId} not found`,
         );
-        return { kind: "failed", cause: { type: "targetGone", entityId: action.targetEntityId } };
+        return {
+            kind: "failed",
+            cause: { type: "targetGone", entityId: action.targetEntityId },
+        };
     }
 
     if (

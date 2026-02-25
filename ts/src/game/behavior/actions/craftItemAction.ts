@@ -6,7 +6,10 @@ import {
 } from "../../component/inventoryComponent.ts";
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
-import { findJobClaimedBy, completeJobFromQueue } from "../../job/jobLifecycle.ts";
+import {
+    findJobClaimedBy,
+    completeJobFromQueue,
+} from "../../job/jobLifecycle.ts";
 import {
     ActionComplete,
     ActionRunning,
@@ -30,10 +33,15 @@ export function executeCraftItemAction(
 
     if (!buildingEntity) {
         console.warn(`[CraftItem] Building ${action.buildingId} not found`);
-        return { kind: "failed", cause: { type: "targetGone", entityId: action.buildingId } };
+        return {
+            kind: "failed",
+            cause: { type: "targetGone", entityId: action.buildingId },
+        };
     }
 
-    if (!isPointAdjacentTo(buildingEntity.worldPosition, entity.worldPosition)) {
+    if (
+        !isPointAdjacentTo(buildingEntity.worldPosition, entity.worldPosition)
+    ) {
         console.warn(`[CraftItem] Worker not adjacent to building`);
         return { kind: "failed", cause: { type: "notAdjacent" } };
     }

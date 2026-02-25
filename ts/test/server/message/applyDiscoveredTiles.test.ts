@@ -38,21 +38,13 @@ describe("applyDiscoveredTiles", () => {
                 { x: 8, y: 0, volume: "vol2" },
             ];
 
-            applyDiscoveredTiles(
-                tileComponent,
-                visibilityMapComponent,
-                tiles,
-                [volume1, volume2],
-            );
+            applyDiscoveredTiles(tileComponent, visibilityMapComponent, tiles, [
+                volume1,
+                volume2,
+            ]);
 
-            assert.ok(
-                tileComponent.volume.has("vol1"),
-                "Should register vol1",
-            );
-            assert.ok(
-                tileComponent.volume.has("vol2"),
-                "Should register vol2",
-            );
+            assert.ok(tileComponent.volume.has("vol1"), "Should register vol1");
+            assert.ok(tileComponent.volume.has("vol2"), "Should register vol2");
             assert.strictEqual(
                 tileComponent.volume.get("vol1"),
                 volume1,
@@ -68,7 +60,9 @@ describe("applyDiscoveredTiles", () => {
 
             const volume = createTestVolume("vol1");
 
-            const tiles: DiscoveredTileData[] = [{ x: 5, y: 3, volume: "vol1" }];
+            const tiles: DiscoveredTileData[] = [
+                { x: 5, y: 3, volume: "vol1" },
+            ];
 
             assert.strictEqual(
                 tileComponent.chunks.size,
@@ -118,7 +112,9 @@ describe("applyDiscoveredTiles", () => {
 
             const volume = createTestVolume("vol1");
 
-            const tiles: DiscoveredTileData[] = [{ x: 5, y: 3, volume: "vol1" }];
+            const tiles: DiscoveredTileData[] = [
+                { x: 5, y: 3, volume: "vol1" },
+            ];
 
             applyDiscoveredTiles(tileComponent, visibilityMapComponent, tiles, [
                 volume,
@@ -165,12 +161,11 @@ describe("applyDiscoveredTiles", () => {
                 chunkY: 0,
                 volume: volume,
             };
-            tileComponent.chunks.set(
-                getChunkId({ x: 0, y: 0 }),
-                existingChunk,
-            );
+            tileComponent.chunks.set(getChunkId({ x: 0, y: 0 }), existingChunk);
 
-            const tiles: DiscoveredTileData[] = [{ x: 3, y: 3, volume: "vol1" }];
+            const tiles: DiscoveredTileData[] = [
+                { x: 3, y: 3, volume: "vol1" },
+            ];
 
             applyDiscoveredTiles(tileComponent, visibilityMapComponent, tiles, [
                 volume,
@@ -211,7 +206,10 @@ describe("applyDiscoveredTiles", () => {
                     chunkId,
                 );
 
-            assert.ok(partiallyDiscovered, "Should have partial discovery data");
+            assert.ok(
+                partiallyDiscovered,
+                "Should have partial discovery data",
+            );
             assert.ok(
                 partiallyDiscovered.has(makeNumberId(0, 0)),
                 "Should track tile at (0,0)",
@@ -370,7 +368,12 @@ describe("applyDiscoveredTiles", () => {
             ];
 
             // Should not throw
-            applyDiscoveredTiles(tileComponent, visibilityMapComponent, tiles, []);
+            applyDiscoveredTiles(
+                tileComponent,
+                visibilityMapComponent,
+                tiles,
+                [],
+            );
 
             // Chunk should not be created
             assert.strictEqual(tileComponent.chunks.size, 0);

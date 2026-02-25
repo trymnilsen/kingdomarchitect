@@ -71,7 +71,11 @@ export function createKeepWarmBehavior(): Behavior {
                 );
                 // Go warm up at fire
                 return [
-                    { type: "moveTo", target: nearestFire.worldPosition, stopAdjacent: "cardinal" },
+                    {
+                        type: "moveTo",
+                        target: nearestFire.worldPosition,
+                        stopAdjacent: "cardinal",
+                    },
                     { type: "warmByFire", fireEntityId: nearestFire.id },
                 ];
             }

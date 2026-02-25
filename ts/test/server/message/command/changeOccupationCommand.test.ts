@@ -49,8 +49,16 @@ describe("ChangeOccupationCommand", () => {
         const worker = new Entity("worker1");
         const workplace = new Entity("farm1");
 
-        const assignCommand = ChangeOccupationCommand(worker, workplace, "assign");
-        const unassignCommand = ChangeOccupationCommand(worker, workplace, "unassign");
+        const assignCommand = ChangeOccupationCommand(
+            worker,
+            workplace,
+            "assign",
+        );
+        const unassignCommand = ChangeOccupationCommand(
+            worker,
+            workplace,
+            "unassign",
+        );
 
         assert.strictEqual(assignCommand.action, "assign");
         assert.strictEqual(unassignCommand.action, "unassign");

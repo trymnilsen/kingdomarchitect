@@ -1,8 +1,14 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
-import { warmthSystem, WARMTH_DECAY_TICK_INTERVAL } from "../../../src/game/system/warmthSystem.ts";
+import {
+    warmthSystem,
+    WARMTH_DECAY_TICK_INTERVAL,
+} from "../../../src/game/system/warmthSystem.ts";
 import { Entity } from "../../../src/game/entity/entity.ts";
-import { createWarmthComponent, WarmthComponentId } from "../../../src/game/component/warmthComponent.ts";
+import {
+    createWarmthComponent,
+    WarmthComponentId,
+} from "../../../src/game/component/warmthComponent.ts";
 import { createFireSourceComponent } from "../../../src/game/component/fireSourceComponent.ts";
 import { InvalidationTracker } from "../behavior/behaviorTestHelpers.ts";
 

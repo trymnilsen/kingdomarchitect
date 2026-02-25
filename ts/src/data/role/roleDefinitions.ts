@@ -70,5 +70,7 @@ export const roleDefinitions: RoleDefinition[] = [
 ];
 
 export function getRoleDefinition(role: WorkerRole): RoleDefinition {
-    return roleDefinitions.find((def) => def.role === role) ?? roleDefinitions[0];
+    return (
+        roleDefinitions.find((def) => def.role === role) ?? roleDefinitions[0]
+    );
 }

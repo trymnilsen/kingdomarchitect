@@ -13,7 +13,10 @@ import { RegrowComponentId } from "../../component/regrowComponent.ts";
 import { ResourceComponentId } from "../../component/resourceComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
-import { findJobClaimedBy, completeJobFromQueue } from "../../job/jobLifecycle.ts";
+import {
+    findJobClaimedBy,
+    completeJobFromQueue,
+} from "../../job/jobLifecycle.ts";
 import {
     ActionComplete,
     ActionRunning,
@@ -40,10 +43,15 @@ export function executeHarvestResourceAction(
         console.warn(
             `[HarvestResource] Resource entity ${action.entityId} not found`,
         );
-        return { kind: "failed", cause: { type: "targetGone", entityId: action.entityId } };
+        return {
+            kind: "failed",
+            cause: { type: "targetGone", entityId: action.entityId },
+        };
     }
 
-    if (!isPointAdjacentTo(resourceEntity.worldPosition, entity.worldPosition)) {
+    if (
+        !isPointAdjacentTo(resourceEntity.worldPosition, entity.worldPosition)
+    ) {
         console.warn(`[HarvestResource] Worker not adjacent to resource`);
         return { kind: "failed", cause: { type: "notAdjacent" } };
     }
@@ -172,7 +180,8 @@ function applyResourceLifecycle(
     if (lifecycle.type === "Finite" || lifecycle.type === "Remove") {
         resourceEntity.remove();
     } else if (lifecycle.type === "Regrow") {
-        const regrowComponent = resourceEntity.getEcsComponent(RegrowComponentId);
+        const regrowComponent =
+            resourceEntity.getEcsComponent(RegrowComponentId);
         if (regrowComponent) {
             regrowComponent.harvestedAtTick = tick;
             resourceEntity.invalidateComponent(RegrowComponentId);

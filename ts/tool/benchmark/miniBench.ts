@@ -94,7 +94,11 @@ export class MiniBench<T = unknown> {
     private samples: number;
     private sampleStep: number | undefined;
 
-    constructor(name: string, samples: number = 1000, sampleStep: number | undefined = samples / 10) {
+    constructor(
+        name: string,
+        samples: number = 1000,
+        sampleStep: number | undefined = samples / 10,
+    ) {
         this.name = name;
         this.samples = samples;
         this.sampleStep = sampleStep;

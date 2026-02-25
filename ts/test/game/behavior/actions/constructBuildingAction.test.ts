@@ -10,7 +10,10 @@ import {
     BuildingComponentId,
 } from "../../../../src/game/component/buildingComponent.ts";
 import { createInventoryComponent } from "../../../../src/game/component/inventoryComponent.ts";
-import { SpriteComponentId, createSpriteComponent } from "../../../../src/game/component/spriteComponent.ts";
+import {
+    SpriteComponentId,
+    createSpriteComponent,
+} from "../../../../src/game/component/spriteComponent.ts";
 import { executeConstructBuildingAction } from "../../../../src/game/behavior/actions/constructBuildingAction.ts";
 import { woodenHouse } from "../../../../src/data/building/wood/house.ts";
 import { InvalidationTracker } from "../behaviorTestHelpers.ts";
@@ -175,11 +178,14 @@ describe("constructBuildingAction", () => {
 
         it("invalidates BuildingComponent when construction completes", () => {
             const { root, worker, building } = createTestScene();
-            building.setEcsComponent(createSpriteComponent(spriteRefs.wooden_house_scaffold));
+            building.setEcsComponent(
+                createSpriteComponent(spriteRefs.wooden_house_scaffold),
+            );
             const tracker = new InvalidationTracker();
             tracker.attach(root);
 
-            const healthComponent = building.getEcsComponent(HealthComponentId)!;
+            const healthComponent =
+                building.getEcsComponent(HealthComponentId)!;
             healthComponent.currentHp = 95;
 
             const action = {
@@ -198,11 +204,14 @@ describe("constructBuildingAction", () => {
 
         it("invalidates SpriteComponent when construction completes", () => {
             const { root, worker, building } = createTestScene();
-            building.setEcsComponent(createSpriteComponent(spriteRefs.wooden_house_scaffold));
+            building.setEcsComponent(
+                createSpriteComponent(spriteRefs.wooden_house_scaffold),
+            );
             const tracker = new InvalidationTracker();
             tracker.attach(root);
 
-            const healthComponent = building.getEcsComponent(HealthComponentId)!;
+            const healthComponent =
+                building.getEcsComponent(HealthComponentId)!;
             healthComponent.currentHp = 95;
 
             const action = {

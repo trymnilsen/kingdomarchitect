@@ -10,7 +10,10 @@ import { WorkerStance } from "../../../../src/game/component/worker/roleComponen
 describe("UpdateWorkerStanceCommand", () => {
     it("creates command with correct id", () => {
         const worker = new Entity("worker1");
-        const command = UpdateWorkerStanceCommand(worker, WorkerStance.Aggressive);
+        const command = UpdateWorkerStanceCommand(
+            worker,
+            WorkerStance.Aggressive,
+        );
 
         assert.strictEqual(command.id, UpdateWorkerStanceCommandId);
         assert.strictEqual(command.id, "updateWorkerStance");
@@ -18,21 +21,30 @@ describe("UpdateWorkerStanceCommand", () => {
 
     it("uses entity id from worker", () => {
         const worker = new Entity("villager1");
-        const command = UpdateWorkerStanceCommand(worker, WorkerStance.Defensive);
+        const command = UpdateWorkerStanceCommand(
+            worker,
+            WorkerStance.Defensive,
+        );
 
         assert.strictEqual(command.worker, "villager1");
     });
 
     it("stores aggressive stance value", () => {
         const worker = new Entity("worker");
-        const command = UpdateWorkerStanceCommand(worker, WorkerStance.Aggressive);
+        const command = UpdateWorkerStanceCommand(
+            worker,
+            WorkerStance.Aggressive,
+        );
 
         assert.strictEqual(command.stance, WorkerStance.Aggressive);
     });
 
     it("stores defensive stance value", () => {
         const worker = new Entity("worker");
-        const command = UpdateWorkerStanceCommand(worker, WorkerStance.Defensive);
+        const command = UpdateWorkerStanceCommand(
+            worker,
+            WorkerStance.Defensive,
+        );
 
         assert.strictEqual(command.stance, WorkerStance.Defensive);
     });

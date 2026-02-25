@@ -38,7 +38,8 @@ describe("movementStaminaComponent", () => {
             const component = createMovementStaminaComponent();
             recordMove(component, 5);
             recordMove(component, 20);
-            const last = component.recentMoveTicks[component.recentMoveTicks.length - 1];
+            const last =
+                component.recentMoveTicks[component.recentMoveTicks.length - 1];
             assert.strictEqual(last, 20);
         });
     });
@@ -105,9 +106,9 @@ describe("movementStaminaComponent", () => {
 
         it("counts only entries within the window, ignores older ones", () => {
             const component = createMovementStaminaComponent();
-            recordMove(component, 5);   // outside window [11,20]
-            recordMove(component, 15);  // inside
-            recordMove(component, 18);  // inside
+            recordMove(component, 5); // outside window [11,20]
+            recordMove(component, 15); // inside
+            recordMove(component, 18); // inside
             // 2 inside / 5 capacity = 0.4
             assert.strictEqual(getMovementPressure(component, 20, 10), 0.4);
         });

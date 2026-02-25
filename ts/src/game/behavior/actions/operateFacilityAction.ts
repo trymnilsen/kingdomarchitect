@@ -11,7 +11,10 @@ import type { Entity } from "../../entity/entity.ts";
 import { findRandomSpawnInDiamond } from "../../map/item/placement.ts";
 import { resourcePrefab } from "../../prefab/resourcePrefab.ts";
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
-import { findJobClaimedBy, completeJobFromQueue } from "../../job/jobLifecycle.ts";
+import {
+    findJobClaimedBy,
+    completeJobFromQueue,
+} from "../../job/jobLifecycle.ts";
 import {
     ActionComplete,
     ActionRunning,
@@ -37,16 +40,22 @@ export function executeOperateFacilityAction(
         console.warn(
             `[OperateFacility] Building ${action.buildingId} not found`,
         );
-        return { kind: "failed", cause: { type: "targetGone", entityId: action.buildingId } };
+        return {
+            kind: "failed",
+            cause: { type: "targetGone", entityId: action.buildingId },
+        };
     }
 
-    if (!isPointAdjacentTo(buildingEntity.worldPosition, entity.worldPosition)) {
+    if (
+        !isPointAdjacentTo(buildingEntity.worldPosition, entity.worldPosition)
+    ) {
         console.warn(`[OperateFacility] Worker not adjacent to building`);
         return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 
-    const productionComp =
-        buildingEntity.getEcsComponent(ProductionComponentId);
+    const productionComp = buildingEntity.getEcsComponent(
+        ProductionComponentId,
+    );
     if (!productionComp) {
         console.warn(
             `[OperateFacility] Building ${action.buildingId} has no ProductionComponent`,

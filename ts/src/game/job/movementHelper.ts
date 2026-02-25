@@ -1,5 +1,9 @@
 import type { Point } from "../../common/point.ts";
-import { PathResultStatus, queryPath, type QueryPathOptions } from "../map/query/pathQuery.ts";
+import {
+    PathResultStatus,
+    queryPath,
+    type QueryPathOptions,
+} from "../map/query/pathQuery.ts";
 import type { Entity } from "../entity/entity.ts";
 import { VisibilityComponentId } from "../component/visibilityComponent.ts";
 import { offsetPatternWithPoint } from "../../common/pattern.ts";

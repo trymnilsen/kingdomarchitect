@@ -54,7 +54,10 @@ describe("craftingPlanner", () => {
             const job = createCraftingJob("building", planksRecipe);
             const actions = planCrafting(root, worker, job);
 
-            const craftAction = actions[1] as { type: "craftItem"; recipe: typeof planksRecipe };
+            const craftAction = actions[1] as {
+                type: "craftItem";
+                recipe: typeof planksRecipe;
+            };
             assert.strictEqual(craftAction.recipe.id, planksRecipe.id);
         });
     });
@@ -91,10 +94,10 @@ describe("craftingPlanner", () => {
 
             const takeAction = actions[1] as {
                 type: "takeFromInventory";
-                items: Array<{ itemId: string; amount: number }>
+                items: Array<{ itemId: string; amount: number }>;
             };
 
-            const woodItem = takeAction.items.find(i => i.itemId === "wood");
+            const woodItem = takeAction.items.find((i) => i.itemId === "wood");
             assert.ok(woodItem);
             assert.strictEqual(woodItem.amount, 3); // 4 needed - 1 has = 3 to take
         });

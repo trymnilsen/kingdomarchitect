@@ -226,10 +226,9 @@ export async function verifyAuthentication(
     }
 
     // Update counter to prevent replay attacks
-    db.prepare("UPDATE credentials SET counter = ? WHERE credential_id = ?").run(
-        verification.authenticationInfo.newCounter,
-        response.id,
-    );
+    db.prepare(
+        "UPDATE credentials SET counter = ? WHERE credential_id = ?",
+    ).run(verification.authenticationInfo.newCounter, response.id);
 
     return true;
 }

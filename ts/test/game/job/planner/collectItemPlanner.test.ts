@@ -39,7 +39,10 @@ describe("collectItemPlanner", () => {
         const job = CollectItemJob(chest);
         const actions = planCollectItem(root, worker, job);
 
-        const moveAction = actions[0] as { type: "moveTo"; target: { x: number; y: number } };
+        const moveAction = actions[0] as {
+            type: "moveTo";
+            target: { x: number; y: number };
+        };
         assert.strictEqual(moveAction.target.x, 10);
         assert.strictEqual(moveAction.target.y, 15);
     });
@@ -50,7 +53,10 @@ describe("collectItemPlanner", () => {
         const job = CollectItemJob(chest);
         const actions = planCollectItem(root, worker, job);
 
-        const collectAction = actions[1] as { type: "collectItems"; entityId: string };
+        const collectAction = actions[1] as {
+            type: "collectItems";
+            entityId: string;
+        };
         assert.strictEqual(collectAction.entityId, "chest");
     });
 

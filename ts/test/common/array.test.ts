@@ -16,7 +16,10 @@ describe("weightedRandomEntry", () => {
         // Test with a single item
         const singleItem = ["only"];
         const singleWeight = [1];
-        assert.strictEqual(weightedRandomEntry(singleItem, singleWeight), "only");
+        assert.strictEqual(
+            weightedRandomEntry(singleItem, singleWeight),
+            "only",
+        );
 
         // Test that higher weight increases probability
         // With weights [100, 1], we should almost always get the first item

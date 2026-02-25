@@ -288,7 +288,10 @@ describe("BehaviorSystem", () => {
                 actions: [{ type: "wait", until: 100 }],
             });
 
-            const system = createBehaviorSystem(() => [invalidBehavior, validBehavior]);
+            const system = createBehaviorSystem(() => [
+                invalidBehavior,
+                validBehavior,
+            ]);
             system.onUpdate!(root, 1);
 
             assert.strictEqual(agent.currentBehaviorName, "valid");
@@ -346,7 +349,10 @@ describe("BehaviorSystem", () => {
             agent.actionQueue = [{ type: "wait", until: 100 }];
             agent.pendingReplan = undefined;
 
-            const system = createBehaviorSystem(() => [currentBehavior, slightlyBetter]);
+            const system = createBehaviorSystem(() => [
+                currentBehavior,
+                slightlyBetter,
+            ]);
             system.onUpdate!(root, 1);
 
             // Should stay with current behavior
@@ -371,7 +377,10 @@ describe("BehaviorSystem", () => {
             agent.actionQueue = [];
             agent.pendingReplan = { kind: "replan" };
 
-            const system = createBehaviorSystem(() => [currentBehavior, muchBetter]);
+            const system = createBehaviorSystem(() => [
+                currentBehavior,
+                muchBetter,
+            ]);
             system.onUpdate!(root, 1);
 
             // Should switch to better behavior
@@ -396,7 +405,9 @@ describe("BehaviorSystem", () => {
             const system = createBehaviorSystem(() => [behavior]);
             system.onUpdate!(root, 1);
 
-            const agent1 = root.findEntity("worker")!.getEcsComponent(BehaviorAgentComponentId)!;
+            const agent1 = root
+                .findEntity("worker")!
+                .getEcsComponent(BehaviorAgentComponentId)!;
             const agent2 = worker2.getEcsComponent(BehaviorAgentComponentId)!;
 
             assert.strictEqual(agent1.currentBehaviorName, "shared");
@@ -413,7 +424,11 @@ describe("BehaviorSystem", () => {
             // and the action executor may throw in some error conditions
             // Using a more predictable failure case: harvestResource with no worker inventory
             agent.actionQueue = [
-                { type: "harvestResource", entityId: "nonexistent", harvestAction: 0 },
+                {
+                    type: "harvestResource",
+                    entityId: "nonexistent",
+                    harvestAction: 0,
+                },
             ];
             agent.currentBehaviorName = "test";
             agent.pendingReplan = undefined;

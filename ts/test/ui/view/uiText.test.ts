@@ -16,7 +16,10 @@ import { fillUiSize } from "../../../src/ui/uiSize.ts";
 
 const testStyle = createTestTextStyle();
 
-function createFixedMeasureText(charWidth: number, lineHeight: number): MeasureTextFn {
+function createFixedMeasureText(
+    charWidth: number,
+    lineHeight: number,
+): MeasureTextFn {
     return (text: string) => ({
         width: text.length * charWidth,
         height: lineHeight,
@@ -30,7 +33,12 @@ describe("UiText", () => {
             const text = "Hello";
             const maxWidth = 100;
 
-            const lines = wrapTextToLines(text, maxWidth, testStyle, measureText);
+            const lines = wrapTextToLines(
+                text,
+                maxWidth,
+                testStyle,
+                measureText,
+            );
 
             assert.deepStrictEqual(lines, ["Hello"]);
         });
@@ -40,7 +48,12 @@ describe("UiText", () => {
             const text = "Hello World";
             const maxWidth = 50;
 
-            const lines = wrapTextToLines(text, maxWidth, testStyle, measureText);
+            const lines = wrapTextToLines(
+                text,
+                maxWidth,
+                testStyle,
+                measureText,
+            );
 
             assert.deepStrictEqual(lines, ["Hello", "World"]);
         });
@@ -50,7 +63,12 @@ describe("UiText", () => {
             const text = "The quick brown fox jumps";
             const maxWidth = 80;
 
-            const lines = wrapTextToLines(text, maxWidth, testStyle, measureText);
+            const lines = wrapTextToLines(
+                text,
+                maxWidth,
+                testStyle,
+                measureText,
+            );
 
             assert.strictEqual(lines.length, 3);
             assert.strictEqual(lines[0], "The quick");
@@ -63,7 +81,12 @@ describe("UiText", () => {
             const text = "Hello World";
 
             const linesZero = wrapTextToLines(text, 0, testStyle, measureText);
-            const linesNegative = wrapTextToLines(text, -10, testStyle, measureText);
+            const linesNegative = wrapTextToLines(
+                text,
+                -10,
+                testStyle,
+                measureText,
+            );
 
             assert.deepStrictEqual(linesZero, ["Hello World"]);
             assert.deepStrictEqual(linesNegative, ["Hello World"]);
@@ -74,7 +97,12 @@ describe("UiText", () => {
             const text = "Supercalifragilistic";
             const maxWidth = 50;
 
-            const lines = wrapTextToLines(text, maxWidth, testStyle, measureText);
+            const lines = wrapTextToLines(
+                text,
+                maxWidth,
+                testStyle,
+                measureText,
+            );
 
             assert.strictEqual(lines.length, 1);
             assert.strictEqual(lines[0], "Supercalifragilistic");
@@ -95,7 +123,12 @@ describe("UiText", () => {
             const lineHeight = 16;
             const availableHeight = 32;
 
-            const visible = calculateVisibleLines(lines, lineHeight, availableHeight, "overflow");
+            const visible = calculateVisibleLines(
+                lines,
+                lineHeight,
+                availableHeight,
+                "overflow",
+            );
 
             assert.deepStrictEqual(visible, lines);
         });
@@ -105,7 +138,12 @@ describe("UiText", () => {
             const lineHeight = 16;
             const availableHeight = 32;
 
-            const visible = calculateVisibleLines(lines, lineHeight, availableHeight, "truncate");
+            const visible = calculateVisibleLines(
+                lines,
+                lineHeight,
+                availableHeight,
+                "truncate",
+            );
 
             assert.strictEqual(visible.length, 2);
             assert.strictEqual(visible[0], "Line 1");
@@ -117,7 +155,12 @@ describe("UiText", () => {
             const lineHeight = 20;
             const availableHeight = 25;
 
-            const visible = calculateVisibleLines(lines, lineHeight, availableHeight, "truncate");
+            const visible = calculateVisibleLines(
+                lines,
+                lineHeight,
+                availableHeight,
+                "truncate",
+            );
 
             assert.strictEqual(visible.length, 1);
             assert.strictEqual(visible[0], "First…");
@@ -128,7 +171,12 @@ describe("UiText", () => {
             const lineHeight = 16;
             const availableHeight = 100;
 
-            const visible = calculateVisibleLines(lines, lineHeight, availableHeight, "truncate");
+            const visible = calculateVisibleLines(
+                lines,
+                lineHeight,
+                availableHeight,
+                "truncate",
+            );
 
             assert.deepStrictEqual(visible, ["Line 1", "Line 2"]);
         });
@@ -138,7 +186,12 @@ describe("UiText", () => {
             const lineHeight = 50;
             const availableHeight = 10;
 
-            const visible = calculateVisibleLines(lines, lineHeight, availableHeight, "truncate");
+            const visible = calculateVisibleLines(
+                lines,
+                lineHeight,
+                availableHeight,
+                "truncate",
+            );
 
             assert.strictEqual(visible.length, 1);
         });

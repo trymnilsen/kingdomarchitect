@@ -10,14 +10,15 @@ export const HorizontalSide = {
     Right: 1,
 } as const;
 
-export type HorizontalSide = typeof HorizontalSide[keyof typeof HorizontalSide];
+export type HorizontalSide =
+    (typeof HorizontalSide)[keyof typeof HorizontalSide];
 
 export const VerticalSide = {
     Up: 0,
     Down: 1,
 } as const;
 
-export type VerticalSide = typeof VerticalSide[keyof typeof VerticalSide];
+export type VerticalSide = (typeof VerticalSide)[keyof typeof VerticalSide];
 
 export function allSides(size: number): Sides {
     return {

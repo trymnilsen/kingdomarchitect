@@ -5,7 +5,10 @@ import {
     EquipItemCommand,
     EquipItemCommandId,
 } from "../../../../src/server/message/command/equipItemCommand.ts";
-import { swordItem, hammerItem } from "../../../../src/data/inventory/items/equipment.ts";
+import {
+    swordItem,
+    hammerItem,
+} from "../../../../src/data/inventory/items/equipment.ts";
 
 describe("EquipItemCommand", () => {
     it("creates command with correct id", () => {

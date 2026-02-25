@@ -1,4 +1,9 @@
-import { spriteRefs, type SpriteRef, SPRITE_W, SPRITE_H } from "../../../../../asset/sprite.ts";
+import {
+    spriteRefs,
+    type SpriteRef,
+    SPRITE_W,
+    SPRITE_H,
+} from "../../../../../asset/sprite.ts";
 import { spriteRegistry } from "../../../../../asset/spriteRegistry.ts";
 import { allSides } from "../../../../../common/sides.ts";
 import { bookInkColor } from "../../../../../ui/color.ts";
@@ -162,7 +167,9 @@ const buildingDetailsView = createComponent<{
     onBuild: () => void;
 }>(({ props }) => {
     const scale = props.building.scale * 2;
-    const requirementsChildren = getBuildingRequirementsChildren(props.building);
+    const requirementsChildren = getBuildingRequirementsChildren(
+        props.building,
+    );
 
     return uiBox({
         width: fillUiSize,
@@ -182,8 +189,14 @@ const buildingDetailsView = createComponent<{
                     }),
                     child: uiImage({
                         sprite: props.building.icon,
-                        width: (spriteRegistry.resolve(props.building.icon)?.[SPRITE_W] ?? 16) * scale,
-                        height: (spriteRegistry.resolve(props.building.icon)?.[SPRITE_H] ?? 16) * scale,
+                        width:
+                            (spriteRegistry.resolve(props.building.icon)?.[
+                                SPRITE_W
+                            ] ?? 16) * scale,
+                        height:
+                            (spriteRegistry.resolve(props.building.icon)?.[
+                                SPRITE_H
+                            ] ?? 16) * scale,
                     }),
                 }),
                 uiSpace({ width: 1, height: 8 }),

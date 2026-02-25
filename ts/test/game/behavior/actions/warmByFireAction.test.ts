@@ -2,18 +2,29 @@ import { describe, it } from "node:test";
 import assert from "node:assert";
 import { executeWarmByFireAction } from "../../../../src/game/behavior/actions/warmByFireAction.ts";
 import { Entity } from "../../../../src/game/entity/entity.ts";
-import { createWarmthComponent, WarmthComponentId } from "../../../../src/game/component/warmthComponent.ts";
+import {
+    createWarmthComponent,
+    WarmthComponentId,
+} from "../../../../src/game/component/warmthComponent.ts";
 import { createFireSourceComponent } from "../../../../src/game/component/fireSourceComponent.ts";
 import { InvalidationTracker } from "../behaviorTestHelpers.ts";
 
-function createTestGoblin(warmth: number = 50, x: number = 0, y: number = 0): Entity {
+function createTestGoblin(
+    warmth: number = 50,
+    x: number = 0,
+    y: number = 0,
+): Entity {
     const entity = new Entity("goblin-1");
     entity.setEcsComponent(createWarmthComponent(warmth));
     entity.position = { x, y };
     return entity;
 }
 
-function createTestFire(active: boolean = true, x: number = 0, y: number = 0): Entity {
+function createTestFire(
+    active: boolean = true,
+    x: number = 0,
+    y: number = 0,
+): Entity {
     const fire = new Entity("fire-1");
     const fireComponent = createFireSourceComponent(15, 2, 1);
     fireComponent.isActive = active;
@@ -32,7 +43,10 @@ describe("warmByFireAction", () => {
             root.addChild(goblin);
             root.addChild(fire);
 
-            const action = { type: "warmByFire" as const, fireEntityId: fire.id };
+            const action = {
+                type: "warmByFire" as const,
+                fireEntityId: fire.id,
+            };
             const status = executeWarmByFireAction(action, goblin);
 
             const warmth = goblin.getEcsComponent("Warmth");
@@ -49,7 +63,10 @@ describe("warmByFireAction", () => {
             root.addChild(goblin);
             root.addChild(fire);
 
-            const action = { type: "warmByFire" as const, fireEntityId: fire.id };
+            const action = {
+                type: "warmByFire" as const,
+                fireEntityId: fire.id,
+            };
             const status = executeWarmByFireAction(action, goblin);
 
             const warmth = goblin.getEcsComponent("Warmth");
@@ -63,7 +80,10 @@ describe("warmByFireAction", () => {
             const goblin = createTestGoblin(50, 0, 0);
             root.addChild(goblin);
 
-            const action = { type: "warmByFire" as const, fireEntityId: "nonexistent" };
+            const action = {
+                type: "warmByFire" as const,
+                fireEntityId: "nonexistent",
+            };
             const status = executeWarmByFireAction(action, goblin);
 
             assert.strictEqual(status.kind, "failed");
@@ -77,7 +97,10 @@ describe("warmByFireAction", () => {
             root.addChild(goblin);
             root.addChild(fire);
 
-            const action = { type: "warmByFire" as const, fireEntityId: fire.id };
+            const action = {
+                type: "warmByFire" as const,
+                fireEntityId: fire.id,
+            };
             const status = executeWarmByFireAction(action, goblin);
 
             assert.strictEqual(status.kind, "failed");
@@ -91,7 +114,10 @@ describe("warmByFireAction", () => {
             root.addChild(goblin);
             root.addChild(fire);
 
-            const action = { type: "warmByFire" as const, fireEntityId: fire.id };
+            const action = {
+                type: "warmByFire" as const,
+                fireEntityId: fire.id,
+            };
             const status = executeWarmByFireAction(action, goblin);
 
             assert.strictEqual(status.kind, "failed");
@@ -105,7 +131,10 @@ describe("warmByFireAction", () => {
             root.addChild(goblin);
             root.addChild(fire);
 
-            const action = { type: "warmByFire" as const, fireEntityId: fire.id };
+            const action = {
+                type: "warmByFire" as const,
+                fireEntityId: fire.id,
+            };
             const status = executeWarmByFireAction(action, goblin);
 
             assert.strictEqual(status.kind, "failed");
@@ -119,7 +148,10 @@ describe("warmByFireAction", () => {
             root.addChild(goblin);
             root.addChild(fire);
 
-            const action = { type: "warmByFire" as const, fireEntityId: fire.id };
+            const action = {
+                type: "warmByFire" as const,
+                fireEntityId: fire.id,
+            };
             const status = executeWarmByFireAction(action, goblin);
 
             assert.strictEqual(status.kind, "running");
@@ -137,7 +169,10 @@ describe("warmByFireAction", () => {
             root.addChild(goblin);
             root.addChild(fire);
 
-            const action = { type: "warmByFire" as const, fireEntityId: fire.id };
+            const action = {
+                type: "warmByFire" as const,
+                fireEntityId: fire.id,
+            };
             executeWarmByFireAction(action, goblin);
 
             assert.strictEqual(
@@ -157,7 +192,10 @@ describe("warmByFireAction", () => {
             root.addChild(goblin);
             root.addChild(fire);
 
-            const action = { type: "warmByFire" as const, fireEntityId: fire.id };
+            const action = {
+                type: "warmByFire" as const,
+                fireEntityId: fire.id,
+            };
             executeWarmByFireAction(action, goblin);
 
             assert.strictEqual(

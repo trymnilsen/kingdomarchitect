@@ -26,7 +26,10 @@ export function executeTakeFromInventoryAction(
         console.warn(
             `[TakeFromInventory] Source entity ${action.sourceEntityId} not found`,
         );
-        return { kind: "failed", cause: { type: "targetGone", entityId: action.sourceEntityId } };
+        return {
+            kind: "failed",
+            cause: { type: "targetGone", entityId: action.sourceEntityId },
+        };
     }
 
     if (!isPointAdjacentTo(sourceEntity.worldPosition, entity.worldPosition)) {

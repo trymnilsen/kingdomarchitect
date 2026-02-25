@@ -10,15 +10,16 @@ import {
     getInventoryItem,
     InventoryComponentId,
 } from "../../../../src/game/component/inventoryComponent.ts";
-import {
-    createResourceComponent,
-} from "../../../../src/game/component/resourceComponent.ts";
+import { createResourceComponent } from "../../../../src/game/component/resourceComponent.ts";
 import { executeHarvestResourceAction } from "../../../../src/game/behavior/actions/harvestResourceAction.ts";
 import { ResourceHarvestMode } from "../../../../src/data/inventory/items/naturalResource.ts";
 import type { BehaviorActionData } from "../../../../src/game/behavior/actions/Action.ts";
 import { InvalidationTracker } from "../behaviorTestHelpers.ts";
 
-type HarvestResourceAction = Extract<BehaviorActionData, { type: "harvestResource" }>;
+type HarvestResourceAction = Extract<
+    BehaviorActionData,
+    { type: "harvestResource" }
+>;
 
 function createTestScene(): {
     root: Entity;
@@ -272,7 +273,8 @@ describe("harvestResourceAction", () => {
             const tracker = new InvalidationTracker();
             tracker.attach(root);
 
-            const healthComponent = resource.getEcsComponent(HealthComponentId)!;
+            const healthComponent =
+                resource.getEcsComponent(HealthComponentId)!;
             healthComponent.currentHp = 5;
 
             const action = {

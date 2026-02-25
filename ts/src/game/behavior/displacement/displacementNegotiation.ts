@@ -25,7 +25,10 @@ import {
     getDisplacementResistance,
     scoreCandidateTile,
 } from "./displacementCost.ts";
-import type { DisplacementMove, DisplacementTransaction } from "./displacementTransaction.ts";
+import type {
+    DisplacementMove,
+    DisplacementTransaction,
+} from "./displacementTransaction.ts";
 
 export type NegotiationResult =
     | { kind: "success"; transaction: DisplacementTransaction }
@@ -60,7 +63,9 @@ export function negotiateDisplacement(
     );
 
     const occupants = queryEntity(root, targetTile);
-    const blocker = occupants.find((o) => o.hasComponent(BehaviorAgentComponentId));
+    const blocker = occupants.find((o) =>
+        o.hasComponent(BehaviorAgentComponentId),
+    );
     if (!blocker) {
         // No displaceable entity at target — building, resource, or empty
         console.log(
@@ -108,7 +113,10 @@ export function negotiateDisplacement(
     console.log(
         `[Displacement] ${requester.id} found ${result.isCycle ? "cycle" : "chain"} of ${result.moves.length} moves, totalResistance=${result.totalResistance}`,
     );
-    return { kind: "success", transaction: { moves: result.moves, isCycle: result.isCycle } };
+    return {
+        kind: "success",
+        transaction: { moves: result.moves, isCycle: result.isCycle },
+    };
 }
 
 interface ChainResult {
@@ -137,7 +145,10 @@ function findBestChain(
     // Sort candidates by score descending so free tiles (score=100) are tried first.
     // Cardinal order (left, right, up, down) is the tiebreak for determinism.
     const candidates = adjacentPoints(fromTile)
-        .map((tile) => ({ tile, score: scoreCandidateTile(tile, root, currentTick) }))
+        .map((tile) => ({
+            tile,
+            score: scoreCandidateTile(tile, root, currentTick),
+        }))
         .filter((c) => c.score > -Infinity)
         .sort((a, b) => b.score - a.score);
 
@@ -191,7 +202,10 @@ function findBestChain(
             // Record as a candidate — keep checking for free tiles (better) or
             // cheaper cycles. A free tile always scores 100 vs cycle's lower score,
             // so this will only win if no free tile is reachable.
-            if (!bestResult || result.totalResistance < bestResult.totalResistance) {
+            if (
+                !bestResult ||
+                result.totalResistance < bestResult.totalResistance
+            ) {
                 bestResult = result;
             }
             continue;
@@ -215,7 +229,10 @@ function findBestChain(
         }
 
         // Check if requester can afford to displace this next entity too.
-        const nextResistance = getDisplacementResistance(nextEntity, currentTick);
+        const nextResistance = getDisplacementResistance(
+            nextEntity,
+            currentTick,
+        );
         if (!canAffordDisplacement(requesterPriority, nextResistance)) {
             console.log(
                 `[Displacement] ${entity.id} next entity ${nextEntity.id} resistance=${nextResistance} > priority=${requesterPriority}, pruning`,
@@ -251,7 +268,10 @@ function findBestChain(
                 isCycle: subResult.isCycle,
                 totalResistance: subResult.totalResistance,
             };
-            if (!bestResult || chainResult.totalResistance < bestResult.totalResistance) {
+            if (
+                !bestResult ||
+                chainResult.totalResistance < bestResult.totalResistance
+            ) {
                 bestResult = chainResult;
             }
         }

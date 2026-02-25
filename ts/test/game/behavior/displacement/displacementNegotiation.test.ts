@@ -17,9 +17,7 @@ import {
     recordMove,
 } from "../../../../src/game/component/movementStaminaComponent.ts";
 import { createSpriteComponent } from "../../../../src/game/component/spriteComponent.ts";
-import {
-    createBuildingComponent,
-} from "../../../../src/game/component/buildingComponent.ts";
+import { createBuildingComponent } from "../../../../src/game/component/buildingComponent.ts";
 import { nullBuilding } from "../../../../src/data/building/building.ts";
 import { negotiateDisplacement } from "../../../../src/game/behavior/displacement/displacementNegotiation.ts";
 import type { SpriteRef } from "../../../../src/asset/sprite.ts";
@@ -89,7 +87,13 @@ describe("displacementNegotiation", () => {
             // Building at target — no BehaviorAgentComponent
             createWall("wall", root, 11, 8);
 
-            const result = negotiateDisplacement(requester, { x: 11, y: 8 }, 100, root, 1);
+            const result = negotiateDisplacement(
+                requester,
+                { x: 11, y: 8 },
+                100,
+                root,
+                1,
+            );
 
             assert.strictEqual(result.kind, "noChain");
         });
@@ -100,7 +104,13 @@ describe("displacementNegotiation", () => {
             // Blocker utility = 20, so resistance = 20. Requester priority = 5 < 20.
             createAgent("blocker", 20, root, 11, 8);
 
-            const result = negotiateDisplacement(requester, { x: 11, y: 8 }, 5, root, 1);
+            const result = negotiateDisplacement(
+                requester,
+                { x: 11, y: 8 },
+                5,
+                root,
+                1,
+            );
 
             assert.strictEqual(result.kind, "refused");
         });
@@ -113,7 +123,13 @@ describe("displacementNegotiation", () => {
             // Record a move at the current tick — makes hasMovedThisTick return true
             recordMove(stamina, 5);
 
-            const result = negotiateDisplacement(requester, { x: 11, y: 8 }, 100, root, 5);
+            const result = negotiateDisplacement(
+                requester,
+                { x: 11, y: 8 },
+                100,
+                root,
+                5,
+            );
 
             assert.strictEqual(result.kind, "refused");
         });
@@ -126,13 +142,22 @@ describe("displacementNegotiation", () => {
             const requester = createAgent("requester", 100, root, 10, 8);
             createAgent("blocker", 5, root, 11, 8);
 
-            const result = negotiateDisplacement(requester, { x: 11, y: 8 }, 100, root, 1);
+            const result = negotiateDisplacement(
+                requester,
+                { x: 11, y: 8 },
+                100,
+                root,
+                1,
+            );
 
             assert.ok(result.kind === "success", "Should return a transaction");
             assert.strictEqual(result.transaction.isCycle, false);
             assert.strictEqual(result.transaction.moves.length, 1);
             assert.strictEqual(result.transaction.moves[0].entityId, "blocker");
-            assert.deepStrictEqual(result.transaction.moves[0].from, { x: 11, y: 8 });
+            assert.deepStrictEqual(result.transaction.moves[0].from, {
+                x: 11,
+                y: 8,
+            });
         });
 
         it("returns a 2-move cycle transaction when blocker can only swap with requester", () => {
@@ -146,14 +171,27 @@ describe("displacementNegotiation", () => {
             createWall("wall-south", root, 11, 9);
             // B's only valid candidate is (10,8) = requester → cycle
 
-            const result = negotiateDisplacement(requester, { x: 11, y: 8 }, 100, root, 1);
+            const result = negotiateDisplacement(
+                requester,
+                { x: 11, y: 8 },
+                100,
+                root,
+                1,
+            );
 
-            assert.ok(result.kind === "success", "Should return a cycle transaction");
+            assert.ok(
+                result.kind === "success",
+                "Should return a cycle transaction",
+            );
             assert.strictEqual(result.transaction.isCycle, true);
             assert.strictEqual(result.transaction.moves.length, 2);
 
-            const blockerMove = result.transaction.moves.find((m) => m.entityId === "blocker");
-            const requesterMove = result.transaction.moves.find((m) => m.entityId === "requester");
+            const blockerMove = result.transaction.moves.find(
+                (m) => m.entityId === "blocker",
+            );
+            const requesterMove = result.transaction.moves.find(
+                (m) => m.entityId === "requester",
+            );
             assert.ok(blockerMove, "Should include blocker move");
             assert.ok(requesterMove, "Should include requester move");
             assert.deepStrictEqual(blockerMove!.from, { x: 11, y: 8 });
@@ -178,18 +216,42 @@ describe("displacementNegotiation", () => {
             // C's south (12,9) is free — that's where C will move
             // C's west (11,8) is B (visited in chain) — skipped
 
-            const result = negotiateDisplacement(requester, { x: 11, y: 8 }, 100, root, 1);
+            const result = negotiateDisplacement(
+                requester,
+                { x: 11, y: 8 },
+                100,
+                root,
+                1,
+            );
 
-            assert.ok(result.kind === "success", "Should return a 2-move chain");
+            assert.ok(
+                result.kind === "success",
+                "Should return a 2-move chain",
+            );
             assert.strictEqual(result.transaction.isCycle, false);
             assert.strictEqual(result.transaction.moves.length, 2);
 
-            assert.strictEqual(result.transaction.moves[0].entityId, "blocker-b");
-            assert.deepStrictEqual(result.transaction.moves[0].from, { x: 11, y: 8 });
-            assert.deepStrictEqual(result.transaction.moves[0].to, { x: 12, y: 8 });
+            assert.strictEqual(
+                result.transaction.moves[0].entityId,
+                "blocker-b",
+            );
+            assert.deepStrictEqual(result.transaction.moves[0].from, {
+                x: 11,
+                y: 8,
+            });
+            assert.deepStrictEqual(result.transaction.moves[0].to, {
+                x: 12,
+                y: 8,
+            });
 
-            assert.strictEqual(result.transaction.moves[1].entityId, "blocker-c");
-            assert.deepStrictEqual(result.transaction.moves[1].from, { x: 12, y: 8 });
+            assert.strictEqual(
+                result.transaction.moves[1].entityId,
+                "blocker-c",
+            );
+            assert.deepStrictEqual(result.transaction.moves[1].from, {
+                x: 12,
+                y: 8,
+            });
         });
 
         it("prefers a free tile over a cycle when both are available", () => {
@@ -201,10 +263,20 @@ describe("displacementNegotiation", () => {
             createAgent("blocker", 5, root, 11, 8);
             // (12,8) and (11,9) are both free — B will pick one immediately
 
-            const result = negotiateDisplacement(requester, { x: 11, y: 8 }, 100, root, 1);
+            const result = negotiateDisplacement(
+                requester,
+                { x: 11, y: 8 },
+                100,
+                root,
+                1,
+            );
 
             assert.ok(result.kind === "success");
-            assert.strictEqual(result.transaction.isCycle, false, "Free tile should be preferred over cycle");
+            assert.strictEqual(
+                result.transaction.isCycle,
+                false,
+                "Free tile should be preferred over cycle",
+            );
         });
 
         it("returns null when the chain exceeds max depth without finding a free tile", () => {
@@ -229,9 +301,19 @@ describe("displacementNegotiation", () => {
             createWall("wall-f-s", root, 15, 9);
             // North of each is automatically a wall (y=7, outside chunk)
 
-            const result = negotiateDisplacement(requester, { x: 11, y: 8 }, 100, root, 1);
+            const result = negotiateDisplacement(
+                requester,
+                { x: 11, y: 8 },
+                100,
+                root,
+                1,
+            );
 
-            assert.strictEqual(result.kind, "noChain", "Chain exceeding max depth should return noChain");
+            assert.strictEqual(
+                result.kind,
+                "noChain",
+                "Chain exceeding max depth should return noChain",
+            );
         });
     });
 });

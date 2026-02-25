@@ -24,7 +24,9 @@ export class TestAdapter implements PersistenceAdapter {
     }
 
     async saveEntity(entity: SerializedEntity): Promise<void> {
-        const existingIndex = this.entities.findIndex((e) => e.id === entity.id);
+        const existingIndex = this.entities.findIndex(
+            (e) => e.id === entity.id,
+        );
         if (existingIndex >= 0) {
             this.entities[existingIndex] = entity;
         } else {

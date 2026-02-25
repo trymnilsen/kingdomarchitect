@@ -14,7 +14,11 @@ import {
     stoneResource,
 } from "../../../../src/data/inventory/items/resources.ts";
 
-function createTestScene(): { root: Entity; worker: Entity; stockpile: Entity } {
+function createTestScene(): {
+    root: Entity;
+    worker: Entity;
+    stockpile: Entity;
+} {
     const root = new Entity("root");
     const worker = new Entity("worker");
     const stockpile = new Entity("stockpile");
@@ -36,7 +40,8 @@ describe("takeFromInventoryAction", () => {
         const { worker, stockpile } = createTestScene();
 
         // Add items to stockpile
-        const stockpileInventory = stockpile.getEcsComponent(InventoryComponentId)!;
+        const stockpileInventory =
+            stockpile.getEcsComponent(InventoryComponentId)!;
         addInventoryItem(stockpileInventory, woodResourceItem, 10);
 
         const action = {
@@ -60,7 +65,8 @@ describe("takeFromInventoryAction", () => {
     it("transfers multiple item types", () => {
         const { worker, stockpile } = createTestScene();
 
-        const stockpileInventory = stockpile.getEcsComponent(InventoryComponentId)!;
+        const stockpileInventory =
+            stockpile.getEcsComponent(InventoryComponentId)!;
         addInventoryItem(stockpileInventory, woodResourceItem, 10);
         addInventoryItem(stockpileInventory, stoneResource, 8);
 
@@ -78,8 +84,14 @@ describe("takeFromInventoryAction", () => {
         assert.strictEqual(result.kind, "complete");
 
         const workerInventory = worker.getEcsComponent(InventoryComponentId)!;
-        assert.strictEqual(getInventoryItem(workerInventory, "wood")?.amount, 3);
-        assert.strictEqual(getInventoryItem(workerInventory, "stone")?.amount, 4);
+        assert.strictEqual(
+            getInventoryItem(workerInventory, "wood")?.amount,
+            3,
+        );
+        assert.strictEqual(
+            getInventoryItem(workerInventory, "stone")?.amount,
+            4,
+        );
     });
 
     it("fails if source entity not found", () => {
@@ -100,7 +112,8 @@ describe("takeFromInventoryAction", () => {
         const { worker, stockpile } = createTestScene();
         stockpile.worldPosition = { x: 25, y: 25 }; // Not adjacent
 
-        const stockpileInventory = stockpile.getEcsComponent(InventoryComponentId)!;
+        const stockpileInventory =
+            stockpile.getEcsComponent(InventoryComponentId)!;
         addInventoryItem(stockpileInventory, woodResourceItem, 10);
 
         const action = {
@@ -150,7 +163,8 @@ describe("depositToInventoryAction", () => {
         const workerWood = getInventoryItem(workerInventory, "wood");
         assert.strictEqual(workerWood?.amount, 5);
 
-        const stockpileInventory = stockpile.getEcsComponent(InventoryComponentId)!;
+        const stockpileInventory =
+            stockpile.getEcsComponent(InventoryComponentId)!;
         const stockpileWood = getInventoryItem(stockpileInventory, "wood");
         assert.strictEqual(stockpileWood?.amount, 5);
     });
@@ -175,9 +189,16 @@ describe("depositToInventoryAction", () => {
 
         assert.strictEqual(result.kind, "complete");
 
-        const stockpileInventory = stockpile.getEcsComponent(InventoryComponentId)!;
-        assert.strictEqual(getInventoryItem(stockpileInventory, "wood")?.amount, 3);
-        assert.strictEqual(getInventoryItem(stockpileInventory, "stone")?.amount, 4);
+        const stockpileInventory =
+            stockpile.getEcsComponent(InventoryComponentId)!;
+        assert.strictEqual(
+            getInventoryItem(stockpileInventory, "wood")?.amount,
+            3,
+        );
+        assert.strictEqual(
+            getInventoryItem(stockpileInventory, "stone")?.amount,
+            4,
+        );
     });
 
     it("fails if target entity not found", () => {

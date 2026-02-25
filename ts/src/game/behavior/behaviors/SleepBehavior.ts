@@ -12,9 +12,7 @@ export function createSleepBehavior(): Behavior {
         name: "sleep",
 
         isValid(entity: Entity): boolean {
-            const energy = entity.getEcsComponent(
-                EnergyComponentId,
-            );
+            const energy = entity.getEcsComponent(EnergyComponentId);
             if (!energy) {
                 return false;
             }
@@ -24,9 +22,7 @@ export function createSleepBehavior(): Behavior {
         },
 
         utility(entity: Entity): number {
-            const energy = entity.getEcsComponent(
-                EnergyComponentId,
-            );
+            const energy = entity.getEcsComponent(EnergyComponentId);
             if (!energy) {
                 return 0;
             }

@@ -177,7 +177,9 @@ describe("Goblin Building Flow", () => {
         const goblin = createGoblin(camp, { x: 12, y: 8 });
         createTree(root, "tree1", { x: 19, y: 8 });
 
-        const behaviorSystem = createBehaviorSystem(() => [createKeepWarmBehavior()]);
+        const behaviorSystem = createBehaviorSystem(() => [
+            createKeepWarmBehavior(),
+        ]);
 
         // Run enough ticks for goblin to begin moving toward the tree but not yet finish
         for (let tick = 1; tick <= 8; tick++) {
@@ -252,7 +254,6 @@ describe("Goblin Building Flow", () => {
             hut!.getEcsComponent(HousingComponentId),
             "Completed hut should have a HousingComponent",
         );
-
     });
 
     it("cold goblin moves to existing fire and warms up without building", () => {

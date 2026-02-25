@@ -3,4 +3,4 @@ export const DrawMode = {
     Gesture: 1,
 } as const;
 
-export type DrawMode = typeof DrawMode[keyof typeof DrawMode];
+export type DrawMode = (typeof DrawMode)[keyof typeof DrawMode];

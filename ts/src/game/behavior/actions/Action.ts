@@ -62,14 +62,32 @@ export type ItemTransfer = {
  */
 export type BehaviorActionData =
     | { type: "wait"; until: number }
-    | { type: "moveTo"; target: Point; stopAdjacent?: "cardinal" | "diagonal"; cachedPath?: Point[] }
+    | {
+          type: "moveTo";
+          target: Point;
+          stopAdjacent?: "cardinal" | "diagonal";
+          cachedPath?: Point[];
+      }
     | { type: "clearPlayerCommand" }
     | { type: "sleep" }
     | { type: "depositToStockpile"; stockpileId: string }
-    | { type: "harvestResource"; entityId: string; harvestAction: ResourceHarvestMode; workProgress?: number }
+    | {
+          type: "harvestResource";
+          entityId: string;
+          harvestAction: ResourceHarvestMode;
+          workProgress?: number;
+      }
     | { type: "constructBuilding"; entityId: string }
-    | { type: "takeFromInventory"; sourceEntityId: string; items: ItemTransfer[] }
-    | { type: "depositToInventory"; targetEntityId: string; items: ItemTransfer[] }
+    | {
+          type: "takeFromInventory";
+          sourceEntityId: string;
+          items: ItemTransfer[];
+      }
+    | {
+          type: "depositToInventory";
+          targetEntityId: string;
+          items: ItemTransfer[];
+      }
     | { type: "operateFacility"; buildingId: string; progress?: number }
     /**
      * craftItem is two-phase to avoid consuming inputs and then losing them to a replan.
@@ -78,7 +96,13 @@ export type BehaviorActionData =
      * If the entity replans before completion, the consumed inputs are lost — intentional,
      * as partial crafting is treated as a failed attempt.
      */
-    | { type: "craftItem"; buildingId: string; recipe: CraftingRecipe; progress?: number; inputsConsumed?: boolean }
+    | {
+          type: "craftItem";
+          buildingId: string;
+          recipe: CraftingRecipe;
+          progress?: number;
+          inputsConsumed?: boolean;
+      }
     | { type: "collectItems"; entityId: string }
     | { type: "attackTarget"; targetId: string }
     | { type: "warmByFire"; fireEntityId: string };

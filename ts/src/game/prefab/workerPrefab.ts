@@ -1,9 +1,7 @@
 import { generateId } from "../../common/idGenerator.ts";
 import { spriteRefs } from "../../asset/sprite.ts";
 import { createEquipmentComponent } from "../component/equipmentComponent.ts";
-import {
-    createInventoryComponent,
-} from "../component/inventoryComponent.ts";
+import { createInventoryComponent } from "../component/inventoryComponent.ts";
 import { createPlayerUnitComponent } from "../component/playerUnitComponent.ts";
 import { createSpriteComponent } from "../component/spriteComponent.ts";
 import { Entity } from "../entity/entity.ts";

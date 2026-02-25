@@ -117,10 +117,7 @@ export class GameServer {
             buildWorldStateMessage(this.world.root, playerId),
         );
 
-        const effect = buildDiscoveryEffectForPlayer(
-            this.world.root,
-            playerId,
-        );
+        const effect = buildDiscoveryEffectForPlayer(this.world.root, playerId);
         if (effect) {
             this.messageRouter.sendTo(playerId, {
                 type: "effect",

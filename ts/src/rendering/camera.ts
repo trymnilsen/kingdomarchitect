@@ -1,10 +1,6 @@
 import { zeroBounds } from "../common/bounds.ts";
 import type { Bounds } from "../common/bounds.ts";
-import {
-    addPoint,
-    multiplyPoint,
-    subtractPoint,
-} from "../common/point.ts";
+import { addPoint, multiplyPoint, subtractPoint } from "../common/point.ts";
 import type { Point } from "../common/point.ts";
 import { TileSize } from "../game/map/tile.ts";
 

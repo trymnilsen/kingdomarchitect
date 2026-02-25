@@ -1,9 +1,7 @@
 import { Entity } from "../../../src/game/entity/entity.ts";
 import { createBehaviorAgentComponent } from "../../../src/game/component/BehaviorAgentComponent.ts";
 import { createEnergyComponent } from "../../../src/game/component/energyComponent.ts";
-import {
-    createJobQueueComponent,
-} from "../../../src/game/component/jobQueueComponent.ts";
+import { createJobQueueComponent } from "../../../src/game/component/jobQueueComponent.ts";
 import type { Jobs } from "../../../src/game/job/job.ts";
 import { ResourceHarvestMode } from "../../../src/data/inventory/items/naturalResource.ts";
 import type { ComponentID } from "../../../src/game/component/component.ts";
@@ -36,7 +34,9 @@ export class InvalidationTracker {
      * Check if a component was invalidated on a specific entity.
      */
     wasInvalidated(entityId: string, componentId: ComponentID): boolean {
-        return this.invalidatedComponents.get(entityId)?.has(componentId) ?? false;
+        return (
+            this.invalidatedComponents.get(entityId)?.has(componentId) ?? false
+        );
     }
 
     /**

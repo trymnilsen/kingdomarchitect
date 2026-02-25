@@ -55,11 +55,7 @@ function createWorld(): { root: Entity; ecsWorld: EcsWorld } {
  * Create an agent that can be displaced or issue player commands.
  * Requires SpriteComponent so it registers in the chunk map.
  */
-function createAgent(
-    id: string,
-    root: Entity,
-    position: Point,
-): Entity {
+function createAgent(id: string, root: Entity, position: Point): Entity {
     const entity = new Entity(id);
     entity.setEcsComponent(createSpriteComponent(testSprite));
     entity.setEcsComponent(createBehaviorAgentComponent());
@@ -204,10 +200,15 @@ describe("Displacement Scenario", () => {
         const blockerAgent = getBehaviorAgent(blocker)!;
         blockerAgent.currentBehaviorUtility = 50;
 
-        const action: MoveToAction = { type: "moveTo", target: { x: 15, y: 8 } };
+        const action: MoveToAction = {
+            type: "moveTo",
+            target: { x: 15, y: 8 },
+        };
 
         const visitedPositions = new Set<string>();
-        visitedPositions.add(`${mover.worldPosition.x},${mover.worldPosition.y}`);
+        visitedPositions.add(
+            `${mover.worldPosition.x},${mover.worldPosition.y}`,
+        );
 
         let finalResult = { kind: "running" };
         for (let tick = 1; tick <= 15; tick++) {
@@ -246,7 +247,10 @@ describe("Displacement Scenario", () => {
         const blockerAgent = getBehaviorAgent(blocker)!;
         blockerAgent.currentBehaviorUtility = 50;
 
-        const action: MoveToAction = { type: "moveTo", target: { x: 15, y: 8 } };
+        const action: MoveToAction = {
+            type: "moveTo",
+            target: { x: 15, y: 8 },
+        };
 
         // Tick 1: displacement fails at (12,8), path is replanned around the blocker,
         // and the entity takes the first step of the around route.

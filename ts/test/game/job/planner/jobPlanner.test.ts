@@ -89,7 +89,10 @@ describe("jobPlanner", () => {
 
         assert.strictEqual(actions.length, 1);
         assert.strictEqual(actions[0].type, "moveTo");
-        const moveAction = actions[0] as { type: "moveTo"; target: { x: number; y: number } };
+        const moveAction = actions[0] as {
+            type: "moveTo";
+            target: { x: number; y: number };
+        };
         assert.strictEqual(moveAction.target.x, 10);
         assert.strictEqual(moveAction.target.y, 15);
     });

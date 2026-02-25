@@ -69,7 +69,10 @@ describe("buildBuildingPlanner", () => {
             const job = BuildBuildingJob(building);
             const actions = planBuildBuilding(root, worker, job);
 
-            const constructAction = actions[1] as { type: "constructBuilding"; entityId: string };
+            const constructAction = actions[1] as {
+                type: "constructBuilding";
+                entityId: string;
+            };
             assert.strictEqual(constructAction.entityId, "building");
         });
     });
@@ -105,7 +108,9 @@ describe("buildBuildingPlanner", () => {
                 items: Array<{ itemId: string; amount: number }>;
             };
 
-            const woodDeposit = depositAction.items.find((i) => i.itemId === "wood");
+            const woodDeposit = depositAction.items.find(
+                (i) => i.itemId === "wood",
+            );
             assert.ok(woodDeposit);
             assert.strictEqual(woodDeposit.amount, 20);
         });
@@ -129,7 +134,9 @@ describe("buildBuildingPlanner", () => {
                 items: Array<{ itemId: string; amount: number }>;
             };
 
-            const woodDeposit = depositAction.items.find((i) => i.itemId === "wood");
+            const woodDeposit = depositAction.items.find(
+                (i) => i.itemId === "wood",
+            );
             assert.ok(woodDeposit);
             assert.strictEqual(woodDeposit.amount, 5); // Only need 5 more
         });
@@ -160,7 +167,10 @@ describe("buildBuildingPlanner", () => {
             const job = BuildBuildingJob({ id: "building" } as Entity);
             const actions = planBuildBuilding(root, worker, job);
 
-            const moveAction = actions[0] as { type: "moveTo"; target: { x: number; y: number } };
+            const moveAction = actions[0] as {
+                type: "moveTo";
+                target: { x: number; y: number };
+            };
             assert.strictEqual(moveAction.target.x, 20);
             assert.strictEqual(moveAction.target.y, 8);
         });
@@ -221,7 +231,9 @@ describe("buildBuildingPlanner", () => {
             const { root, worker } = createTestScene();
             const buildingNoInv = new Entity("buildingNoInv");
             buildingNoInv.worldPosition = { x: 5, y: 5 };
-            buildingNoInv.setEcsComponent(createBuildingComponent(woodenHouse, true));
+            buildingNoInv.setEcsComponent(
+                createBuildingComponent(woodenHouse, true),
+            );
             root.addChild(buildingNoInv);
 
             const job = BuildBuildingJob(buildingNoInv);

@@ -6,10 +6,16 @@ import { createGoblinCampComponent } from "../../../src/game/component/goblinCam
 import { createGoblinUnitComponent } from "../../../src/game/component/goblinUnitComponent.ts";
 import { createFireSourceComponent } from "../../../src/game/component/fireSourceComponent.ts";
 import { createBuildingComponent } from "../../../src/game/component/buildingComponent.ts";
-import { createHousingComponent, HousingComponentId } from "../../../src/game/component/housingComponent.ts";
+import {
+    createHousingComponent,
+    HousingComponentId,
+} from "../../../src/game/component/housingComponent.ts";
 import { goblinHut } from "../../../src/data/building/goblin/goblinHut.ts";
 import { InvalidationTracker } from "../behavior/behaviorTestHelpers.ts";
-import { createTileComponent, setChunk } from "../../../src/game/component/tileComponent.ts";
+import {
+    createTileComponent,
+    setChunk,
+} from "../../../src/game/component/tileComponent.ts";
 import { createChunkMapComponent } from "../../../src/game/component/chunkMapComponent.ts";
 
 /**
@@ -24,13 +30,19 @@ function setupWorldComponents(root: Entity): void {
     root.setEcsComponent(createChunkMapComponent());
 }
 
-function createTestCamp(id: string = "camp-1", maxPopulation: number = 5): Entity {
+function createTestCamp(
+    id: string = "camp-1",
+    maxPopulation: number = 5,
+): Entity {
     const camp = new Entity(id);
     camp.setEcsComponent(createGoblinCampComponent(maxPopulation));
     return camp;
 }
 
-function createTestGoblin(campEntityId: string, id: string = "goblin-1"): Entity {
+function createTestGoblin(
+    campEntityId: string,
+    id: string = "goblin-1",
+): Entity {
     const goblin = new Entity(id);
     goblin.setEcsComponent(createGoblinUnitComponent(campEntityId));
     return goblin;
@@ -44,7 +56,10 @@ function createTestFire(active: boolean = true): Entity {
     return fire;
 }
 
-function createTestHut(scaffolded: boolean = false, tenant: Entity | null = null): Entity {
+function createTestHut(
+    scaffolded: boolean = false,
+    tenant: Entity | null = null,
+): Entity {
     const hut = new Entity("hut-1");
     hut.setEcsComponent(createBuildingComponent(goblinHut, scaffolded));
     if (!scaffolded) {
@@ -127,7 +142,10 @@ describe("goblinSpawnSystem", () => {
             const root = new Entity("root");
             const camp = createTestCamp("camp-1", 5);
             const fire = createTestFire(true);
-            const existingGoblin = createTestGoblin("camp-1", "existing-goblin");
+            const existingGoblin = createTestGoblin(
+                "camp-1",
+                "existing-goblin",
+            );
             const hut = createTestHut(false, existingGoblin); // Occupied
 
             camp.addChild(fire);
@@ -339,7 +357,10 @@ describe("goblinSpawnSystem", () => {
 
             const camp = createTestCamp("camp-1", 1);
             const fire = createTestFire(true);
-            const existingGoblin = createTestGoblin("camp-1", "existing-goblin");
+            const existingGoblin = createTestGoblin(
+                "camp-1",
+                "existing-goblin",
+            );
             const hut = createTestHut(false, existingGoblin);
 
             camp.addChild(fire);

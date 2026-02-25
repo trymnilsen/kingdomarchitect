@@ -21,7 +21,10 @@ import { forrester } from "../../data/building/wood/forrester.ts";
 import { createProductionComponent } from "../component/productionComponent.ts";
 import { goblinCampfire } from "../../data/building/goblin/goblinCampfire.ts";
 import { goblinHut } from "../../data/building/goblin/goblinHut.ts";
-import { createFireSourceComponent, FireSourceComponentId } from "../component/fireSourceComponent.ts";
+import {
+    createFireSourceComponent,
+    FireSourceComponentId,
+} from "../component/fireSourceComponent.ts";
 import { HousingComponentId } from "../component/housingComponent.ts";
 import { CraftingComponentId } from "../component/craftingComponent.ts";
 import { WorkplaceComponentId } from "../component/workplaceComponent.ts";

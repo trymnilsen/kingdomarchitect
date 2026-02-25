@@ -4,7 +4,10 @@ import {
     BuildCommand,
     BuildCommandId,
 } from "../../../../src/server/message/command/buildCommand.ts";
-import { nullBuilding, type Building } from "../../../../src/data/building/building.ts";
+import {
+    nullBuilding,
+    type Building,
+} from "../../../../src/data/building/building.ts";
 
 function createTestBuilding(id: string): Building {
     return {

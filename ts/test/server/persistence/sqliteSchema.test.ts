@@ -26,7 +26,10 @@ describe("SQLite Schema Migrations", () => {
             .all() as Array<{ name: string }>;
 
         const tableNames = tables.map((t) => t.name);
-        assert.ok(tableNames.includes("entities"), "entities table should exist");
+        assert.ok(
+            tableNames.includes("entities"),
+            "entities table should exist",
+        );
         assert.ok(tableNames.includes("meta"), "meta table should exist");
         assert.ok(
             tableNames.includes("root_components"),
@@ -79,7 +82,9 @@ describe("SQLite Schema Migrations", () => {
                     {
                         type: "createStore",
                         name: "t2",
-                        columns: [{ name: "id", type: "text", primaryKey: true }],
+                        columns: [
+                            { name: "id", type: "text", primaryKey: true },
+                        ],
                     },
                 ],
             },
@@ -104,7 +109,9 @@ describe("SQLite Schema Migrations", () => {
                     {
                         type: "createStore",
                         name: "t3",
-                        columns: [{ name: "id", type: "text", primaryKey: true }],
+                        columns: [
+                            { name: "id", type: "text", primaryKey: true },
+                        ],
                     },
                 ],
             },
@@ -138,9 +145,7 @@ describe("SQLite Schema Migrations", () => {
                 {
                     type: "createStore",
                     name: "t1",
-                    columns: [
-                        { name: "id", type: "text", primaryKey: true },
-                    ],
+                    columns: [{ name: "id", type: "text", primaryKey: true }],
                 },
             ],
         };
@@ -223,11 +228,15 @@ describe("SQLite Schema Migrations", () => {
         applySQLiteMigrations(db, migrations);
 
         // Insert a row using the new column
-        db.prepare(
-            "INSERT INTO items (id, name, weight) VALUES (?, ?, ?)",
-        ).run("sword", "Iron Sword", 3.5);
+        db.prepare("INSERT INTO items (id, name, weight) VALUES (?, ?, ?)").run(
+            "sword",
+            "Iron Sword",
+            3.5,
+        );
 
-        const row = db.prepare("SELECT * FROM items WHERE id = ?").get("sword") as {
+        const row = db
+            .prepare("SELECT * FROM items WHERE id = ?")
+            .get("sword") as {
             id: string;
             name: string;
             weight: number;

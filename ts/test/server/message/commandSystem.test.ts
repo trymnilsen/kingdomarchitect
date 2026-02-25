@@ -115,7 +115,6 @@ describe("commandSystem", () => {
             assert.strictEqual(updatedJobQueue.jobs.length, 1);
             assert.strictEqual(updatedJobQueue.jobs[0].id, "collectItem");
         });
-
     });
 
     describe("EquipItemCommand", () => {
@@ -668,7 +667,9 @@ describe("commandSystem", () => {
                 BehaviorAgentComponentId,
             );
             assert.ok(updatedAgent);
-            assert.deepStrictEqual(updatedAgent.pendingReplan, { kind: "replan" });
+            assert.deepStrictEqual(updatedAgent.pendingReplan, {
+                kind: "replan",
+            });
         });
 
         it("handles missing agent gracefully", () => {

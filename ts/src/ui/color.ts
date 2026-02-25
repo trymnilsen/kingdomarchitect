@@ -9,4 +9,4 @@ export const UIThemeType = {
     Stone: 1,
 } as const;
 
-export type UIThemeType = typeof UIThemeType[keyof typeof UIThemeType];
+export type UIThemeType = (typeof UIThemeType)[keyof typeof UIThemeType];

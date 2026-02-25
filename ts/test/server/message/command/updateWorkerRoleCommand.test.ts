@@ -45,7 +45,10 @@ describe("UpdateWorkerRoleCommand", () => {
         const worker = new Entity("worker");
 
         const workerCmd = UpdateWorkerRoleCommand(worker, WorkerRole.Worker);
-        const explorerCmd = UpdateWorkerRoleCommand(worker, WorkerRole.Explorer);
+        const explorerCmd = UpdateWorkerRoleCommand(
+            worker,
+            WorkerRole.Explorer,
+        );
         const guardCmd = UpdateWorkerRoleCommand(worker, WorkerRole.Guard);
         const devoteeCmd = UpdateWorkerRoleCommand(worker, WorkerRole.Devotee);
         const spyCmd = UpdateWorkerRoleCommand(worker, WorkerRole.Spy);

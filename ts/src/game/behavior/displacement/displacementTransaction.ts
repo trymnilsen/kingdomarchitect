@@ -98,7 +98,9 @@ function resolveTransaction(
     for (const move of transaction.moves) {
         const entity = root.findEntity(move.entityId);
         if (!entity) {
-            console.warn(`[DisplacementTx] entity ${move.entityId} not found, aborting`);
+            console.warn(
+                `[DisplacementTx] entity ${move.entityId} not found, aborting`,
+            );
             return null;
         }
         if (
@@ -135,7 +137,13 @@ function commitChain(
 ): void {
     for (let i = moves.length - 1; i >= 0; i--) {
         const { entity, from, to } = moves[i];
-        applyEntityMove(entity, from, to, currentTick, entity.id !== requesterEntityId);
+        applyEntityMove(
+            entity,
+            from,
+            to,
+            currentTick,
+            entity.id !== requesterEntityId,
+        );
     }
 }
 
@@ -152,7 +160,13 @@ function commitCycle(
     requesterEntityId: string,
 ): void {
     for (const { entity, from, to } of moves) {
-        applyEntityMove(entity, from, to, currentTick, entity.id !== requesterEntityId);
+        applyEntityMove(
+            entity,
+            from,
+            to,
+            currentTick,
+            entity.id !== requesterEntityId,
+        );
     }
 }
 

@@ -4,7 +4,11 @@ import {
     type TileComponent,
 } from "../../game/component/tileComponent.ts";
 import type { VisibilityMapComponent } from "../../game/component/visibilityMapComponent.ts";
-import { ChunkSize, getChunkId, getChunkPosition } from "../../game/map/chunk.ts";
+import {
+    ChunkSize,
+    getChunkId,
+    getChunkPosition,
+} from "../../game/map/chunk.ts";
 import type { Volume } from "../../game/map/volume.ts";
 import type { DiscoveredTileData } from "./playerDiscoveryData.ts";
 

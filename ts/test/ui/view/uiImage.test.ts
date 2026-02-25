@@ -505,5 +505,4 @@ describe("UiImage", () => {
             assert.strictEqual(call.targetHeight, 32);
         });
     });
-
 });

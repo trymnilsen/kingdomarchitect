@@ -9,7 +9,11 @@ import { createStockpileComponent } from "../../../src/game/component/stockpileC
 import { woodResourceItem } from "../../../src/data/inventory/items/resources.ts";
 import { swordItem } from "../../../src/data/inventory/items/equipment.ts";
 
-function createStockpileEntity(id: string, x: number = 5, y: number = 5): Entity {
+function createStockpileEntity(
+    id: string,
+    x: number = 5,
+    y: number = 5,
+): Entity {
     const stockpile = new Entity(id);
     stockpile.worldPosition = { x, y };
     stockpile.setEcsComponent(createStockpileComponent());
@@ -19,7 +23,10 @@ function createStockpileEntity(id: string, x: number = 5, y: number = 5): Entity
 
 function createWorkerWithInventory(
     id: string,
-    items: { item: typeof woodResourceItem | typeof swordItem; amount: number }[] = [],
+    items: {
+        item: typeof woodResourceItem | typeof swordItem;
+        amount: number;
+    }[] = [],
 ): Entity {
     const worker = createBehaviorTestEntity(id, 0, 0);
     const inventory = createInventoryComponent();
@@ -176,7 +183,11 @@ describe("HaulBehavior", () => {
                 { item: woodResourceItem, amount: 10 },
             ]);
             worker.worldPosition = { x: 10, y: 8 };
-            const farStockpile = createStockpileEntity("far-stockpile", 100, 100);
+            const farStockpile = createStockpileEntity(
+                "far-stockpile",
+                100,
+                100,
+            );
             const nearStockpile = createStockpileEntity("near-stockpile", 2, 2);
             root.addChild(worker);
             root.addChild(farStockpile);
@@ -185,7 +196,10 @@ describe("HaulBehavior", () => {
             const actions = behavior.expand(worker);
 
             assert.strictEqual(actions.length, 2);
-            assert.strictEqual((actions[1] as any).stockpileId, "near-stockpile");
+            assert.strictEqual(
+                (actions[1] as any).stockpileId,
+                "near-stockpile",
+            );
         });
     });
 

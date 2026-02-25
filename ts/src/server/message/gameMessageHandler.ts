@@ -147,7 +147,10 @@ function setComponentHandler(root: Entity, message: SetComponentGameMessage) {
     }
 }
 
-function componentDeltaHandler(root: Entity, message: ComponentDeltaGameMessage) {
+function componentDeltaHandler(
+    root: Entity,
+    message: ComponentDeltaGameMessage,
+) {
     const entity = root.findEntity(message.entityId);
     if (!entity) {
         return;

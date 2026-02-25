@@ -133,7 +133,8 @@ export function buildWorldStateMessage(
 
     const playerDiscovery = discoveryComponent.discoveriesByUser.get(player);
     const discoveryData =
-        playerDiscovery && getPlayerDiscoveryData(tileComponent, playerDiscovery);
+        playerDiscovery &&
+        getPlayerDiscoveryData(tileComponent, playerDiscovery);
 
     return {
         type: WorldStateMessageType,

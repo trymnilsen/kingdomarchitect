@@ -79,7 +79,9 @@ describe("getWeightAtPoint", () => {
         it("returns 100 for a goblin hut", () => {
             const root = createWorld();
             const hutEntity = new Entity("hut");
-            hutEntity.setEcsComponent(createBuildingComponent(goblinHut, false));
+            hutEntity.setEcsComponent(
+                createBuildingComponent(goblinHut, false),
+            );
             placeAt(root, hutEntity);
 
             assert.strictEqual(getWeightAtPoint(TEST_POS, root), 100);

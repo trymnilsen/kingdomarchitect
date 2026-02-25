@@ -5,7 +5,11 @@ import {
 } from "../../component/inventoryComponent.ts";
 import { StockpileComponentId } from "../../component/stockpileComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
-import { ActionComplete, type ActionResult, type BehaviorActionData } from "./Action.ts";
+import {
+    ActionComplete,
+    type ActionResult,
+    type BehaviorActionData,
+} from "./Action.ts";
 
 /**
  * Deposit non-equipped inventory items to a stockpile.
@@ -21,7 +25,10 @@ export function executeDepositToStockpileAction(
         console.warn(
             `[DepositAction] Stockpile ${action.stockpileId} not found`,
         );
-        return { kind: "failed", cause: { type: "targetGone", entityId: action.stockpileId } };
+        return {
+            kind: "failed",
+            cause: { type: "targetGone", entityId: action.stockpileId },
+        };
     }
 
     // Verify the stockpile has the required components

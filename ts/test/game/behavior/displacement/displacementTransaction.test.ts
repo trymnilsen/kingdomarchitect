@@ -45,12 +45,7 @@ function createTestWorld(): { root: Entity } {
  * Create an agent entity with stamina tracking so commit can record moves.
  * worldPosition is set AFTER addChild.
  */
-function createAgent(
-    id: string,
-    root: Entity,
-    x: number,
-    y: number,
-): Entity {
+function createAgent(id: string, root: Entity, x: number, y: number): Entity {
     const entity = new Entity(id);
     entity.setEcsComponent(createSpriteComponent(testSprite));
     entity.setEcsComponent(createBehaviorAgentComponent());
@@ -67,11 +62,22 @@ describe("displacementTransaction", () => {
             const b = createAgent("b", root, 11, 8);
 
             const tx: DisplacementTransaction = {
-                moves: [{ entityId: "b", from: { x: 11, y: 8 }, to: { x: 12, y: 8 } }],
+                moves: [
+                    {
+                        entityId: "b",
+                        from: { x: 11, y: 8 },
+                        to: { x: 12, y: 8 },
+                    },
+                ],
                 isCycle: false,
             };
 
-            const committed = commitDisplacementTransaction(tx, root, 1, "requester");
+            const committed = commitDisplacementTransaction(
+                tx,
+                root,
+                1,
+                "requester",
+            );
 
             assert.strictEqual(committed, true);
             assert.deepStrictEqual(b.worldPosition, { x: 12, y: 8 });
@@ -84,11 +90,22 @@ describe("displacementTransaction", () => {
             b.worldPosition = { x: 13, y: 8 };
 
             const tx: DisplacementTransaction = {
-                moves: [{ entityId: "b", from: { x: 11, y: 8 }, to: { x: 12, y: 8 } }],
+                moves: [
+                    {
+                        entityId: "b",
+                        from: { x: 11, y: 8 },
+                        to: { x: 12, y: 8 },
+                    },
+                ],
                 isCycle: false,
             };
 
-            const committed = commitDisplacementTransaction(tx, root, 1, "requester");
+            const committed = commitDisplacementTransaction(
+                tx,
+                root,
+                1,
+                "requester",
+            );
 
             assert.strictEqual(committed, false);
         });
@@ -100,11 +117,22 @@ describe("displacementTransaction", () => {
             recordMove(stamina, 5); // entity moved at tick 5
 
             const tx: DisplacementTransaction = {
-                moves: [{ entityId: "b", from: { x: 11, y: 8 }, to: { x: 12, y: 8 } }],
+                moves: [
+                    {
+                        entityId: "b",
+                        from: { x: 11, y: 8 },
+                        to: { x: 12, y: 8 },
+                    },
+                ],
                 isCycle: false,
             };
 
-            const committed = commitDisplacementTransaction(tx, root, 5, "requester");
+            const committed = commitDisplacementTransaction(
+                tx,
+                root,
+                5,
+                "requester",
+            );
 
             assert.strictEqual(committed, false);
             // Entity should not have moved
@@ -115,11 +143,22 @@ describe("displacementTransaction", () => {
             const { root } = createTestWorld();
 
             const tx: DisplacementTransaction = {
-                moves: [{ entityId: "ghost", from: { x: 11, y: 8 }, to: { x: 12, y: 8 } }],
+                moves: [
+                    {
+                        entityId: "ghost",
+                        from: { x: 11, y: 8 },
+                        to: { x: 12, y: 8 },
+                    },
+                ],
                 isCycle: false,
             };
 
-            const committed = commitDisplacementTransaction(tx, root, 1, "requester");
+            const committed = commitDisplacementTransaction(
+                tx,
+                root,
+                1,
+                "requester",
+            );
 
             assert.strictEqual(committed, false);
         });
@@ -138,13 +177,26 @@ describe("displacementTransaction", () => {
 
             const tx: DisplacementTransaction = {
                 moves: [
-                    { entityId: "b", from: { x: 11, y: 8 }, to: { x: 12, y: 8 } },
-                    { entityId: "c", from: { x: 12, y: 8 }, to: { x: 13, y: 8 } },
+                    {
+                        entityId: "b",
+                        from: { x: 11, y: 8 },
+                        to: { x: 12, y: 8 },
+                    },
+                    {
+                        entityId: "c",
+                        from: { x: 12, y: 8 },
+                        to: { x: 13, y: 8 },
+                    },
                 ],
                 isCycle: false,
             };
 
-            const committed = commitDisplacementTransaction(tx, root, 1, "requester");
+            const committed = commitDisplacementTransaction(
+                tx,
+                root,
+                1,
+                "requester",
+            );
 
             assert.strictEqual(committed, true);
             assert.deepStrictEqual(b.worldPosition, { x: 12, y: 8 });
@@ -158,8 +210,16 @@ describe("displacementTransaction", () => {
 
             const tx: DisplacementTransaction = {
                 moves: [
-                    { entityId: "b", from: { x: 11, y: 8 }, to: { x: 10, y: 8 } },
-                    { entityId: "a", from: { x: 10, y: 8 }, to: { x: 11, y: 8 } },
+                    {
+                        entityId: "b",
+                        from: { x: 11, y: 8 },
+                        to: { x: 10, y: 8 },
+                    },
+                    {
+                        entityId: "a",
+                        from: { x: 10, y: 8 },
+                        to: { x: 11, y: 8 },
+                    },
                 ],
                 isCycle: true,
             };
@@ -177,7 +237,13 @@ describe("displacementTransaction", () => {
             const b = createAgent("b", root, 11, 8);
 
             const tx: DisplacementTransaction = {
-                moves: [{ entityId: "b", from: { x: 11, y: 8 }, to: { x: 12, y: 8 } }],
+                moves: [
+                    {
+                        entityId: "b",
+                        from: { x: 11, y: 8 },
+                        to: { x: 12, y: 8 },
+                    },
+                ],
                 isCycle: false,
             };
 
@@ -200,7 +266,11 @@ describe("displacementTransaction", () => {
 
             const tx: DisplacementTransaction = {
                 moves: [
-                    { entityId: "displaced", from: { x: 11, y: 8 }, to: { x: 12, y: 8 } },
+                    {
+                        entityId: "displaced",
+                        from: { x: 11, y: 8 },
+                        to: { x: 12, y: 8 },
+                    },
                 ],
                 isCycle: false,
             };
@@ -229,11 +299,22 @@ describe("displacementTransaction", () => {
             entity.worldPosition = { x: 11, y: 8 };
 
             const tx: DisplacementTransaction = {
-                moves: [{ entityId: "no-stamina", from: { x: 11, y: 8 }, to: { x: 12, y: 8 } }],
+                moves: [
+                    {
+                        entityId: "no-stamina",
+                        from: { x: 11, y: 8 },
+                        to: { x: 12, y: 8 },
+                    },
+                ],
                 isCycle: false,
             };
 
-            const committed = commitDisplacementTransaction(tx, root, 1, "requester");
+            const committed = commitDisplacementTransaction(
+                tx,
+                root,
+                1,
+                "requester",
+            );
 
             assert.strictEqual(committed, true);
             assert.deepStrictEqual(entity.worldPosition, { x: 12, y: 8 });

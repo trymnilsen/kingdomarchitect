@@ -29,7 +29,7 @@ export function addJob(jobQueue: JobQueueComponent, job: Jobs): void {
  * Remove a job from the queue by ID.
  */
 export function removeJob(jobQueue: JobQueueComponent, jobId: string): void {
-    const index = jobQueue.jobs.findIndex(j => j.id === jobId);
+    const index = jobQueue.jobs.findIndex((j) => j.id === jobId);
     if (index !== -1) {
         jobQueue.jobs.splice(index, 1);
     }

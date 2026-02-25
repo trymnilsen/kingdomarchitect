@@ -51,7 +51,10 @@ function roundRarityProbabilistically(averageRarity: number): ItemRarity {
 
     // If it's a whole number, return it directly
     if (lowerRarity === upperRarity) {
-        return Math.max(minRarity, Math.min(maxRarity, lowerRarity)) as ItemRarity;
+        return Math.max(
+            minRarity,
+            Math.min(maxRarity, lowerRarity),
+        ) as ItemRarity;
     }
 
     // Probabilistic rounding
