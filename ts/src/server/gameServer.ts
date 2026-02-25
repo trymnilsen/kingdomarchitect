@@ -18,20 +18,18 @@ import {
     makeReplicatedEntitiesSystem,
 } from "./replicatedEntitiesSystem.ts";
 import type { GameCommand } from "./message/gameCommand.ts";
-import {
-    createEffectEmitterComponent,
-    EffectEmitterComponentId,
-} from "../game/component/effectEmitterComponent.ts";
+import { createEffectEmitterComponent } from "../game/component/effectEmitterComponent.ts";
 import type { GameMessage } from "./message/gameMessage.ts";
 import { createCommandSystem } from "../game/system/commandSystem.ts";
 import { effectSystem } from "../game/system/effectSystem.ts";
 import { housingSystem } from "../game/system/housingSystem.ts";
 import { regrowSystem } from "../game/system/regrowSystem.ts";
 import { PersistenceManager } from "./persistence/persistenceManager.ts";
-import { IndexedDBAdapter } from "./persistence/indexedDBAdapter.ts";
+import type { PersistenceAdapter } from "./persistence/persistenceAdapter.ts";
 import type { Entity } from "../game/entity/entity.ts";
 import { buildDiscoveryEffectForPlayer } from "./message/effect/discoverTileEffect.ts";
 import { ToggleableCallback } from "../common/toggleableCallback.ts";
+import type { MessageRouter } from "./messageRouter.ts";
 
 export class GameServer {
     private world: EcsWorld;
@@ -40,26 +38,33 @@ export class GameServer {
     private persistenceManager: PersistenceManager;
     private worldSeed: number;
     private gameLoopInterval?: ReturnType<typeof setInterval>;
-    private postMessage: ToggleableCallback<[GameMessage]>;
+    private broadcastCallback: ToggleableCallback<[GameMessage]>;
+    private messageRouter: MessageRouter;
+    private onPlayerConnectedCallback?: (playerId: string) => void;
 
-    constructor(postMessage: (message: GameMessage) => void) {
-        this.postMessage = new ToggleableCallback(postMessage, false);
+    constructor(
+        messageRouter: MessageRouter,
+        adapter: PersistenceAdapter,
+        onPlayerConnected?: (playerId: string) => void,
+    ) {
+        this.messageRouter = messageRouter;
+        this.onPlayerConnectedCallback = onPlayerConnected;
+        this.broadcastCallback = new ToggleableCallback(
+            (message: GameMessage) => messageRouter.broadcast(message),
+            false,
+        );
         const root = createRootEntity();
 
         this.world = new EcsWorld(root);
 
         this.worldSeed = Date.now();
-        const adapter = new IndexedDBAdapter();
         this.persistenceManager = new PersistenceManager(adapter);
     }
 
-    async init(): Promise<void> {
-        const adapter = this.persistenceManager["adapter"] as IndexedDBAdapter;
-        await adapter.init();
-
+    async init(initialPlayerId?: string): Promise<void> {
         this.world.root.setEcsComponent(
             createEffectEmitterComponent((effect) => {
-                this.postMessage.invoke({
+                this.broadcastCallback.invoke({
                     type: "effect",
                     effect,
                 });
@@ -75,8 +80,12 @@ export class GameServer {
         // Run init after loading (or if no save exists)
         // worldGenerationSystem will see loaded entities and skip generation
         this.world.runInit();
-        this.postMessage.enable();
-        this.postMessage.invoke(buildWorldStateMessage(this.world.root, "player"));
+        this.broadcastCallback.enable();
+
+        if (initialPlayerId) {
+            this.handlePlayerConnected(initialPlayerId);
+        }
+
         this.gameLoopInterval = setInterval(() => {
             this.updateTick += 1;
             this.gameTime.setTick(this.updateTick);
@@ -86,6 +95,38 @@ export class GameServer {
                 this.autoSave();
             }
         }, 1000);
+    }
+
+    /**
+     * Handles a player connecting: sends them the full world state and
+     * discovery data. Invokes the onPlayerConnected callback if set.
+     */
+    handlePlayerConnected(playerId: string): void {
+        if (this.onPlayerConnectedCallback) {
+            this.onPlayerConnectedCallback(playerId);
+        }
+        this.sendWorldStateTo(playerId);
+    }
+
+    /**
+     * Sends the full world state and discovery data to a specific player.
+     */
+    private sendWorldStateTo(playerId: string): void {
+        this.messageRouter.sendTo(
+            playerId,
+            buildWorldStateMessage(this.world.root, playerId),
+        );
+
+        const effect = buildDiscoveryEffectForPlayer(
+            this.world.root,
+            playerId,
+        );
+        if (effect) {
+            this.messageRouter.sendTo(playerId, {
+                type: "effect",
+                effect,
+            });
+        }
     }
 
     private async loadGame(): Promise<void> {
@@ -99,34 +140,9 @@ export class GameServer {
             );
         }
 
-        // Suspend events during load to prevent systems from reacting
-        // before runtime components are initialized
-        console.log("[loadGame] Start load");
-        console.log("[loadGame] Loading");
+        console.log("[loadGame] Loading...");
         await this.persistenceManager.load(this.world.root);
         console.log("[loadGame] Load complete");
-        console.log("[loadGame] Finished load");
-        // After loading, send discovery effect for all loaded tiles
-        this.sendDiscoveryEffectForLoadedWorld();
-    }
-
-    /**
-     * Sends a discovery effect containing all tiles and volumes from the loaded world.
-     * This ensures the client receives tile data after a game is loaded.
-     * Only sends tiles that were actually discovered by the player.
-     */
-    private sendDiscoveryEffectForLoadedWorld(): void {
-        const effect = buildDiscoveryEffectForPlayer(this.world.root, "player");
-
-        if (!effect) {
-            return;
-        }
-
-        // Send discovery effect
-        const effectEmitter = this.world.root.requireEcsComponent(
-            EffectEmitterComponentId,
-        );
-        effectEmitter.emitter(effect);
     }
 
     private async autoSave(): Promise<void> {
@@ -138,18 +154,12 @@ export class GameServer {
     }
 
     async saveGame(): Promise<void> {
-        const start = performance.now();
         await this.persistenceManager.saveWorld(this.world.root);
         await this.persistenceManager.saveMeta({
             version: 1,
             tick: this.updateTick,
             seed: this.worldSeed,
         });
-        const end = performance.now();
-        /*
-        console.log(
-            `Saved game at tick ${this.updateTick} in ${end - start} ms`,
-        );*/
     }
 
     private addSystems() {
@@ -170,12 +180,12 @@ export class GameServer {
         this.world.addSystem(regrowSystem);
         this.world.addSystem(
             makeReplicatedEntitiesSystem((message) => {
-                this.postMessage.invoke(message);
+                this.broadcastCallback.invoke(message);
             }),
         );
     }
 
-    onMessage(message: GameMessage) {
+    onMessage(message: GameMessage, _playerId?: string) {
         this.world.runGameMessage(message);
     }
 }

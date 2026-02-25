@@ -1,16 +1,22 @@
 // Started as a webworker from webworkerServerConnection.ts
 import { GameServer } from "./gameServer.ts";
 import type { GameMessage } from "./message/gameMessage.ts";
+import { IndexedDBAdapter } from "./persistence/indexedDBAdapter.ts";
+import { createSinglePlayerMessageRouter } from "./singlePlayerMessageRouter.ts";
 
 console.log("Booting webworker server");
-const gameServer = new GameServer((message) => {
+
+const adapter = new IndexedDBAdapter();
+const router = createSinglePlayerMessageRouter((message) => {
     self.postMessage(message);
 });
+const gameServer = new GameServer(router, adapter);
 
 let isInitialized = false;
 
-gameServer
+adapter
     .init()
+    .then(() => gameServer.init("player"))
     .then(() => {
         console.log("Game server initialized");
         isInitialized = true;
