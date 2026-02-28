@@ -1,3 +1,4 @@
+import { createLogger } from "../common/logging/logger.ts";
 import { createWorldDiscoveryComponent } from "../game/component/worldDiscoveryComponent.ts";
 import { GameTime } from "../game/gameTime.ts";
 import { chunkMapSystem } from "../game/system/chunkMapSystem.ts";
@@ -30,6 +31,8 @@ import type { Entity } from "../game/entity/entity.ts";
 import { buildDiscoveryEffectForPlayer } from "./message/effect/discoverTileEffect.ts";
 import { ToggleableCallback } from "../common/toggleableCallback.ts";
 import type { MessageRouter } from "./messageRouter.ts";
+
+const log = createLogger("persistence");
 
 export class GameServer {
     private world: EcsWorld;
@@ -89,6 +92,7 @@ export class GameServer {
         this.gameLoopInterval = setInterval(() => {
             this.updateTick += 1;
             this.gameTime.setTick(this.updateTick);
+            (globalThis as Record<string, unknown>)["currentTick"] = this.updateTick;
             this.world.runUpdate(this.updateTick);
 
             if (this.updateTick % 10 === 0) {
@@ -132,21 +136,19 @@ export class GameServer {
             this.worldSeed = meta.seed;
             this.updateTick = meta.tick;
             this.gameTime.setTick(meta.tick);
-            console.log(
-                `Loading save from tick ${meta.tick} with seed ${meta.seed}`,
-            );
+            log.info("Loading save", { tick: meta.tick, seed: meta.seed });
         }
 
-        console.log("[loadGame] Loading...");
+        log.info("Loading world");
         await this.persistenceManager.load(this.world.root);
-        console.log("[loadGame] Load complete");
+        log.info("Load complete");
     }
 
     private async autoSave(): Promise<void> {
         try {
             await this.saveGame();
         } catch (err) {
-            console.error("Auto-save failed:", err);
+            log.error("Auto-save failed", { err });
         }
     }
 

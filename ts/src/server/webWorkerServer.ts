@@ -1,10 +1,14 @@
 // Started as a webworker from webworkerServerConnection.ts
+import { createRootLogger, createLogger } from "../common/logging/logger.ts";
 import { GameServer } from "./gameServer.ts";
 import type { GameMessage } from "./message/gameMessage.ts";
 import { IndexedDBAdapter } from "./persistence/indexedDBAdapter.ts";
 import { createSinglePlayerMessageRouter } from "./singlePlayerMessageRouter.ts";
 
-console.log("Booting webworker server");
+createRootLogger();
+const log = createLogger("server");
+
+log.info("Booting webworker server");
 
 const adapter = new IndexedDBAdapter();
 const router = createSinglePlayerMessageRouter((message) => {
@@ -18,19 +22,17 @@ adapter
     .init()
     .then(() => gameServer.init("player"))
     .then(() => {
-        console.log("Game server initialized");
+        log.info("Game server initialized");
         isInitialized = true;
     })
     .catch((err) => {
-        console.error("Failed to initialize game server:", err);
+        log.error("Failed to initialize game server", { err });
     });
 
 onmessage = (message) => {
-    console.log("[webWorkerServer] recieved message", message);
+    log.debug("Received message");
     if (!isInitialized) {
-        console.warn(
-            "Received message before initialization complete, ignoring",
-        );
+        log.warn("Message before initialization, ignoring");
         return;
     }
     const commandMessage = message.data as GameMessage;

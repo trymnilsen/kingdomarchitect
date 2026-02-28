@@ -1,6 +1,9 @@
+import { createRootLogger } from "./common/logging/logger.ts";
 import { Game } from "./game/game.ts";
 import { clearGameDatabase } from "./server/persistence/indexedDBAdapter.ts";
 import { WebworkerServerConnection } from "./server/webworkerServerConnection.ts";
+
+createRootLogger();
 
 const canvasElementId = "gameCanvas";
 
