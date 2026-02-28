@@ -9,6 +9,7 @@ import { SelectedEntityItem } from "../../../../selection/selectedEntityItem.ts"
 import { BuildingComponentId } from "../../../../../component/buildingComponent.ts";
 import { ProductionComponentId } from "../../../../../component/productionComponent.ts";
 import { JobQueueComponentId } from "../../../../../component/jobQueueComponent.ts";
+import { getSettlementEntity } from "../../../../../entity/settlementQueries.ts";
 import { spriteRefs } from "../../../../../../asset/sprite.ts";
 import { QueueJobCommand } from "../../../../../../server/message/command/queueJobCommand.ts";
 import {
@@ -39,8 +40,9 @@ export class ProductionBuildingSelectionProvider implements ActorSelectionProvid
                     return emptySelection;
                 }
 
-                const root = stateContext.root;
-                const jobQueue = root.getEcsComponent(JobQueueComponentId);
+                const settlement = getSettlementEntity(selection.entity);
+                const jobQueue =
+                    settlement.getEcsComponent(JobQueueComponentId);
                 const queuedCount = jobQueue
                     ? getProductionJobCountForBuilding(
                           jobQueue,
@@ -74,13 +76,15 @@ export class ProductionBuildingSelectionProvider implements ActorSelectionProvid
                         icon: spriteRefs.empty_sprite,
                         onClick: () => {
                             const jq =
-                                root.getEcsComponent(JobQueueComponentId);
+                                settlement.getEcsComponent(JobQueueComponentId);
                             if (jq) {
                                 clearProductionJobsForBuilding(
                                     jq,
                                     selection.entity.id,
                                 );
-                                root.invalidateComponent(JobQueueComponentId);
+                                settlement.invalidateComponent(
+                                    JobQueueComponentId,
+                                );
                             }
                         },
                     });

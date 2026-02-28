@@ -12,6 +12,7 @@ import { HousingComponentId } from "../component/housingComponent.ts";
 import { setChunk, TileComponentId } from "../component/tileComponent.ts";
 import { Entity } from "../entity/entity.ts";
 import { buildingPrefab } from "../prefab/buildingPrefab.ts";
+import { playerKingdomPrefab } from "../prefab/playerKingdomPrefab.ts";
 import { resourcePrefab } from "../prefab/resourcePrefab.ts";
 import { trainingDummyPrefab } from "../prefab/trainingDummyPrefab.ts";
 import { workerPrefab } from "../prefab/workerPrefab.ts";
@@ -20,26 +21,39 @@ import { generateSpawnPoints } from "./item/vegetation.ts";
 export function addInitialPlayerChunk(scopedEntity: Entity): Point {
     const chunkEntity = new Entity("chunk");
     scopedEntity.addChild(chunkEntity);
-    const tiles = scopedEntity.requireEcsComponent(TileComponentId);
     const randomOffsetX = Math.round(Math.random() * 3) + 1;
     const randomOffsetY = Math.round(Math.random() * 3) + 1;
+    const firstWorkerPosition = { x: 0 + randomOffsetX, y: 1 + randomOffsetY };
+
+    // Player kingdom entity groups all player buildings and workers,
+    // establishing the boundary for job and stockpile scoping.
+    const playerKingdom = playerKingdomPrefab();
+    chunkEntity.addChild(playerKingdom);
+    playerKingdom.position = { x: 0, y: 0 };
+
     const firstWorker = workerPrefab();
     const firstFarm = buildingPrefab(farm, false);
     const firstTree = resourcePrefab(treeResource);
-    const firstWorkerPosition = { x: 0 + randomOffsetX, y: 1 + randomOffsetY };
     const trainingDummy = trainingDummyPrefab();
     const firstHouse = buildingPrefab(woodenHouse, false);
     firstHouse.requireEcsComponent(HousingComponentId).tenant = firstWorker.id;
-    trainingDummy.position = { x: randomOffsetX, y: randomOffsetY };
-    firstTree.position = { x: 2 + randomOffsetX, y: 2 + randomOffsetY };
-    firstHouse.position = { x: 1 + randomOffsetX, y: randomOffsetY };
-    firstFarm.position = { x: 1 + randomOffsetX, y: 1 + randomOffsetY };
-    firstWorker.position = firstWorkerPosition;
-    chunkEntity.addChild(firstWorker);
+
+    // World resources stay on the chunk entity
     chunkEntity.addChild(firstTree);
-    chunkEntity.addChild(trainingDummy);
-    chunkEntity.addChild(firstHouse);
-    chunkEntity.addChild(firstFarm);
+    firstTree.worldPosition = { x: 2 + randomOffsetX, y: 2 + randomOffsetY };
+
+    // Player units and buildings go under the kingdom entity
+    playerKingdom.addChild(firstWorker);
+    firstWorker.worldPosition = firstWorkerPosition;
+
+    playerKingdom.addChild(trainingDummy);
+    trainingDummy.worldPosition = { x: randomOffsetX, y: randomOffsetY };
+
+    playerKingdom.addChild(firstHouse);
+    firstHouse.worldPosition = { x: 1 + randomOffsetX, y: randomOffsetY };
+
+    playerKingdom.addChild(firstFarm);
+    firstFarm.worldPosition = { x: 1 + randomOffsetX, y: 1 + randomOffsetY };
 
     scopedEntity.updateComponent(TileComponentId, (component) => {
         setChunk(component, {

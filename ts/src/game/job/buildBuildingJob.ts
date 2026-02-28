@@ -28,6 +28,7 @@ import {
     calculateBuildingQuality,
     getRarityName,
 } from "../building/buildingQuality.ts";
+import { getSettlementEntity } from "../entity/settlementQueries.ts";
 import { createLogger } from "../../common/logging/logger.ts";
 
 const log = createLogger("job");
@@ -45,7 +46,7 @@ export function BuildBuildingJob(entity: Entity): BuildBuildingJob {
 }
 
 /**
- * Check if a build job can be executed (materials exist in settlement)
+ * Check if a build job can be executed (materials exist in the building's settlement)
  */
 export function canExecuteBuildJob(
     root: Entity,
@@ -64,7 +65,8 @@ export function canExecuteBuildJob(
     }
 
     const requirements = buildingComponent.building.requirements;
-    return canBuildingBeConstructed(root, workerEntity, requirements);
+    const settlement = getSettlementEntity(buildingEntity);
+    return canBuildingBeConstructed(settlement, workerEntity, requirements);
 }
 
 export const BuildBuildingJobId = "buildBuildingJob";
@@ -110,12 +112,12 @@ export type MaterialAvailability = {
 };
 
 export function checkMaterialsAvailability(
-    root: Entity,
+    settlement: Entity,
     worker: Entity,
     remainingMaterials: RemainingMaterials,
 ): MaterialAvailability {
     const workerInventory = worker.requireEcsComponent(InventoryComponentId);
-    const stockpiles = findStockpiles(root);
+    const stockpiles = findStockpiles(settlement);
     const missing: string[] = [];
     const toFetch: Array<{ itemId: string; amount: number }> = [];
 
@@ -154,13 +156,13 @@ export function checkMaterialsAvailability(
 }
 
 export function findNearestStockpileWithMaterials(
-    root: Entity,
+    settlement: Entity,
     worker: Entity,
     toFetch: Array<{ itemId: string; amount: number }>,
 ): Entity | null {
     if (toFetch.length === 0) return null;
 
-    const stockpiles = findStockpiles(root);
+    const stockpiles = findStockpiles(settlement);
     const itemIds = new Set(toFetch.map((m) => m.itemId));
 
     // Find stockpiles that have any of the needed materials

@@ -35,6 +35,7 @@ import {
 import { uiScaffold } from "../../view/uiScaffold.ts";
 import { BuildingSelectionProvider } from "./actor/provider/buildingSelectionProvider.ts";
 import { ProductionBuildingSelectionProvider } from "./actor/provider/productionBuildingSelectionProvider.ts";
+import { StockpileSelectionProvider } from "./actor/provider/stockpileSelectionProvider.ts";
 import type { Entity } from "../../../entity/entity.ts";
 import {
     HealthComponentId,
@@ -58,6 +59,7 @@ export class SelectionState extends InteractionState {
         new CollectableProvider(),
         new CraftingBuildingSelectionProvider(),
         new ProductionBuildingSelectionProvider(),
+        new StockpileSelectionProvider(),
         new AttackSelectionProvider(),
         new BuildingSelectionProvider(),
     ];

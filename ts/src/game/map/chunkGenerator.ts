@@ -7,7 +7,7 @@ import { createLogger } from "../../common/logging/logger.ts";
 import { randomColor } from "../../common/color.ts";
 import { generateId } from "../../common/idGenerator.ts";
 import { type Point, adjacentPoints } from "../../common/point.ts";
-import { KingdomComponentId } from "../component/kingdomComponent.ts";
+import { GoblinCampComponentId } from "../component/goblinCampComponent.ts";
 import { getChunk, TileComponentId } from "../component/tileComponent.ts";
 import { Entity } from "../entity/entity.ts";
 import { generateDesert } from "./biome/desert.ts";
@@ -112,20 +112,14 @@ function generateChunkEntities(chunk: Required<TileChunk>, rootEntity: Entity) {
         x: chunk.chunkX * ChunkSize,
         y: chunk.chunkY * ChunkSize,
     };
-    //TODO: Check for existing settlement
-    //TODO: query for settlement component and checking if within chunk might be more efficient
-    //TODO: For dev we only make one settlement globally
-    /*
-    const settlements = queryEntitiesWithinVolume(
-        rootEntity,
-        chunk.volume,
-        (entity) => entity.hasComponent(KingdomComponentId),
-    );*/
-    const settlements = rootEntity.queryComponents(KingdomComponentId);
+    // Only place one goblin camp globally (for now).
+    // Query for GoblinCampComponent specifically — other kingdom entities
+    // (e.g. the player kingdom) should not prevent a goblin camp from spawning.
+    const goblinCamps = rootEntity.queryComponents(GoblinCampComponentId);
 
     rootEntity.addChild(chunkEntity);
 
-    if (settlements.size === 0 && !chunk.volume.isStartBiome) {
+    if (goblinCamps.size === 0 && !chunk.volume.isStartBiome) {
         placeSettlement(chunk, chunkEntity);
     }
 

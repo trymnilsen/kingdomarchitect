@@ -2,6 +2,7 @@ import { distance } from "../../../common/point.ts";
 import { findStockpiles } from "../../building/materialQuery.ts";
 import { EquipmentComponentId } from "../../component/equipmentComponent.ts";
 import { InventoryComponentId } from "../../component/inventoryComponent.ts";
+import { getSettlementEntity } from "../../entity/settlementQueries.ts";
 import type { Entity } from "../../entity/entity.ts";
 import type { BehaviorActionData } from "../actions/Action.ts";
 import type { Behavior } from "./Behavior.ts";
@@ -27,9 +28,9 @@ export function createHaulBehavior(): Behavior {
                 return false;
             }
 
-            // Must have at least one stockpile to deposit to
-            const root = entity.getRootEntity();
-            const stockpiles = findStockpiles(root);
+            // Must have at least one stockpile in this settlement to deposit to
+            const settlement = getSettlementEntity(entity);
+            const stockpiles = findStockpiles(settlement);
             return stockpiles.length > 0;
         },
 
@@ -39,8 +40,8 @@ export function createHaulBehavior(): Behavior {
         },
 
         expand(entity: Entity): BehaviorActionData[] {
-            const root = entity.getRootEntity();
-            const stockpiles = findStockpiles(root);
+            const settlement = getSettlementEntity(entity);
+            const stockpiles = findStockpiles(settlement);
 
             if (stockpiles.length === 0) {
                 return [];
@@ -60,7 +61,11 @@ export function createHaulBehavior(): Behavior {
             });
 
             return [
-                { type: "moveTo", target: nearest.worldPosition },
+                {
+                    type: "moveTo",
+                    target: nearest.worldPosition,
+                    stopAdjacent: "cardinal",
+                },
                 { type: "depositToStockpile", stockpileId: nearest.id },
             ];
         },

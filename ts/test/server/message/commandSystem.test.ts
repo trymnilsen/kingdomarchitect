@@ -78,6 +78,7 @@ import {
     WorkerRole,
     WorkerStance,
 } from "../../../src/game/component/worker/roleComponent.ts";
+import { playerKingdomPrefab } from "../../../src/game/prefab/playerKingdomPrefab.ts";
 
 function createTestGameTime(): GameTime {
     return new GameTime();
@@ -87,15 +88,23 @@ function createTestPersistenceManager(): PersistenceManager {
     return new PersistenceManager(new TestAdapter());
 }
 
+/**
+ * Creates a root entity with a player kingdom entity already set up,
+ * matching the runtime structure expected by commandSystem.
+ */
+function createRootWithKingdom(): { root: Entity; playerKingdom: Entity } {
+    const root = new Entity("root");
+    const playerKingdom = playerKingdomPrefab();
+    root.addChild(playerKingdom);
+    return { root, playerKingdom };
+}
+
 describe("commandSystem", () => {
     describe("QueueJobCommand", () => {
         it("adds job to JobQueueComponent", () => {
-            const root = new Entity("root");
+            const { root, playerKingdom } = createRootWithKingdom();
             const gameTime = createTestGameTime();
             const persistenceManager = createTestPersistenceManager();
-
-            const jobQueue = createJobQueueComponent();
-            root.setEcsComponent(jobQueue);
 
             const system = createCommandSystem(gameTime, persistenceManager);
 
@@ -110,7 +119,8 @@ describe("commandSystem", () => {
 
             system.onGameMessage?.(root, message);
 
-            const updatedJobQueue = root.getEcsComponent(JobQueueComponentId);
+            const updatedJobQueue =
+                playerKingdom.getEcsComponent(JobQueueComponentId);
             assert.ok(updatedJobQueue);
             assert.strictEqual(updatedJobQueue.jobs.length, 1);
             assert.strictEqual(updatedJobQueue.jobs[0].id, "collectItem");
@@ -309,12 +319,9 @@ describe("commandSystem", () => {
 
     describe("AttackCommand", () => {
         it("creates AttackJob in job queue", () => {
-            const root = new Entity("root");
+            const { root, playerKingdom } = createRootWithKingdom();
             const gameTime = createTestGameTime();
             const persistenceManager = createTestPersistenceManager();
-
-            const jobQueue = createJobQueueComponent();
-            root.setEcsComponent(jobQueue);
 
             const system = createCommandSystem(gameTime, persistenceManager);
 
@@ -329,19 +336,17 @@ describe("commandSystem", () => {
 
             system.onGameMessage?.(root, message);
 
-            const updatedJobQueue = root.getEcsComponent(JobQueueComponentId);
+            const updatedJobQueue =
+                playerKingdom.getEcsComponent(JobQueueComponentId);
             assert.ok(updatedJobQueue);
             assert.strictEqual(updatedJobQueue.jobs.length, 1);
             assert.strictEqual(updatedJobQueue.jobs[0].id, "attackJob");
         });
 
         it("sets attacker and target on AttackJob", () => {
-            const root = new Entity("root");
+            const { root, playerKingdom } = createRootWithKingdom();
             const gameTime = createTestGameTime();
             const persistenceManager = createTestPersistenceManager();
-
-            const jobQueue = createJobQueueComponent();
-            root.setEcsComponent(jobQueue);
 
             const system = createCommandSystem(gameTime, persistenceManager);
 
@@ -356,7 +361,8 @@ describe("commandSystem", () => {
 
             system.onGameMessage?.(root, message);
 
-            const updatedJobQueue = root.getEcsComponent(JobQueueComponentId);
+            const updatedJobQueue =
+                playerKingdom.getEcsComponent(JobQueueComponentId);
             assert.ok(updatedJobQueue);
             const job = updatedJobQueue.jobs[0];
             assert.strictEqual((job as any).attacker, "warrior1");
@@ -366,12 +372,9 @@ describe("commandSystem", () => {
 
     describe("BuildCommand", () => {
         it("creates building entity at position", () => {
-            const root = new Entity("root");
+            const { root, playerKingdom } = createRootWithKingdom();
             const gameTime = createTestGameTime();
             const persistenceManager = createTestPersistenceManager();
-
-            const jobQueue = createJobQueueComponent();
-            root.setEcsComponent(jobQueue);
 
             const system = createCommandSystem(gameTime, persistenceManager);
 
@@ -386,23 +389,21 @@ describe("commandSystem", () => {
 
             system.onGameMessage?.(root, message);
 
-            // Should create at least one child entity
-            assert.ok(root.children.length >= 1);
+            // Building is created under the player kingdom entity
+            assert.ok(playerKingdom.children.length >= 1);
 
-            // Should create a BuildBuildingJob
-            const updatedJobQueue = root.getEcsComponent(JobQueueComponentId);
+            // Should create a BuildBuildingJob in the player kingdom's queue
+            const updatedJobQueue =
+                playerKingdom.getEcsComponent(JobQueueComponentId);
             assert.ok(updatedJobQueue);
             assert.strictEqual(updatedJobQueue.jobs.length, 1);
             assert.strictEqual(updatedJobQueue.jobs[0].id, "buildBuildingJob");
         });
 
         it("creates multiple building entities for array of positions", () => {
-            const root = new Entity("root");
+            const { root, playerKingdom } = createRootWithKingdom();
             const gameTime = createTestGameTime();
             const persistenceManager = createTestPersistenceManager();
-
-            const jobQueue = createJobQueueComponent();
-            root.setEcsComponent(jobQueue);
 
             const system = createCommandSystem(gameTime, persistenceManager);
 
@@ -421,22 +422,20 @@ describe("commandSystem", () => {
 
             system.onGameMessage?.(root, message);
 
-            // Should create 3 building entities
-            assert.strictEqual(root.children.length, 3);
+            // 3 building entities should be under the player kingdom
+            assert.strictEqual(playerKingdom.children.length, 3);
 
-            // Should create 3 BuildBuildingJobs
-            const updatedJobQueue = root.getEcsComponent(JobQueueComponentId);
+            // Should create 3 BuildBuildingJobs in the player kingdom's queue
+            const updatedJobQueue =
+                playerKingdom.getEcsComponent(JobQueueComponentId);
             assert.ok(updatedJobQueue);
             assert.strictEqual(updatedJobQueue.jobs.length, 3);
         });
 
         it("handles invalid building ID gracefully", () => {
-            const root = new Entity("root");
+            const { root, playerKingdom } = createRootWithKingdom();
             const gameTime = createTestGameTime();
             const persistenceManager = createTestPersistenceManager();
-
-            const jobQueue = createJobQueueComponent();
-            root.setEcsComponent(jobQueue);
 
             const system = createCommandSystem(gameTime, persistenceManager);
 
@@ -452,8 +451,8 @@ describe("commandSystem", () => {
             // Should not throw
             system.onGameMessage?.(root, message);
 
-            // Should not create any entities
-            assert.strictEqual(root.children.length, 0);
+            // Should not create any child entities on the player kingdom
+            assert.strictEqual(playerKingdom.children.length, 0);
         });
     });
 

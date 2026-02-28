@@ -17,6 +17,7 @@ import {
 } from "../buildBuildingJob.ts";
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import { suspendJobInQueue } from "../jobLifecycle.ts";
+import { getSettlementEntity } from "../../entity/settlementQueries.ts";
 import { createLogger } from "../../../common/logging/logger.ts";
 
 const log = createLogger("job");
@@ -63,12 +64,30 @@ export function planBuildBuilding(
 
     const buildingInventory =
         buildingEntity.getEcsComponent(InventoryComponentId);
+    const requirements = buildingComponent.building.requirements;
+
+    // Buildings with no material requirements are not given a scaffold inventory
+    // (there is nothing to deposit into them). Treat the absence of an inventory
+    // as "nothing remaining" so the worker proceeds straight to construction.
+    // If a building somehow has requirements but no inventory, that is a prefab
+    // bug — log and bail rather than silently doing the wrong thing.
     if (!buildingInventory) {
-        log.warn("Building has no inventory");
-        return [];
+        if (requirements?.materials) {
+            log.warn("Building has requirements but no inventory", {
+                entityId: job.entityId,
+            });
+            return [];
+        }
+        return [
+            {
+                type: "moveTo",
+                target: buildingEntity.worldPosition,
+                stopAdjacent: "cardinal",
+            },
+            { type: "constructBuilding", entityId: job.entityId },
+        ];
     }
 
-    const requirements = buildingComponent.building.requirements;
     const remainingMaterials = getRemainingMaterials(
         buildingInventory,
         requirements,
@@ -122,8 +141,9 @@ export function planBuildBuilding(
     }
 
     // State 3: Need to fetch materials from stockpile
+    const settlement = getSettlementEntity(buildingEntity);
     const materialCheck = checkMaterialsAvailability(
-        root,
+        settlement,
         worker,
         remainingMaterials,
     );
@@ -138,7 +158,7 @@ export function planBuildBuilding(
     }
 
     const stockpileEntity = findNearestStockpileWithMaterials(
-        root,
+        settlement,
         worker,
         materialCheck.toFetch,
     );

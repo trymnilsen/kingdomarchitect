@@ -7,6 +7,7 @@ import {
 } from "../component/housingComponent.ts";
 import { PlayerUnitComponentId } from "../component/playerUnitComponent.ts";
 import type { Entity } from "../entity/entity.ts";
+import { getSettlementEntity } from "../entity/settlementQueries.ts";
 import { findClosestAvailablePosition } from "../map/query/closestPositionQuery.ts";
 import { workerPrefab } from "../prefab/workerPrefab.ts";
 import { woodenHouse } from "../../data/building/wood/house.ts";
@@ -93,10 +94,11 @@ function update(root: Entity, _deltaTime: number) {
         );
 
         if (spawnPosition) {
-            worker.worldPosition = spawnPosition;
             housingComponent.tenant = worker.id;
             houseEntity.invalidateComponent(HousingComponentId);
-            root.addChild(worker);
+            const settlement = getSettlementEntity(houseEntity);
+            settlement.addChild(worker);
+            worker.worldPosition = spawnPosition;
         }
     }
 }

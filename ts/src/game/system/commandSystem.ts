@@ -26,7 +26,10 @@ import {
     QueueJobCommandId,
     type QueueJobCommand,
 } from "../../server/message/command/queueJobCommand.ts";
-import { notifyIdleWorkerForNewJob } from "./jobNotificationSystem.ts";
+import {
+    notifyIdleWorkerForNewJob,
+    findPlayerKingdom,
+} from "./jobNotificationSystem.ts";
 import {
     CommandGameMessageType,
     type GameMessage,
@@ -182,15 +185,18 @@ function changeOccupation(root: Entity, command: ChangeOccupationCommand) {
 }
 
 function attackTarget(root: Entity, command: AttackCommand) {
+    const playerKingdom = findPlayerKingdom(root);
+    if (!playerKingdom) {
+        log.error("Player kingdom not found for attack job");
+        return;
+    }
     const job = AttackJob(command.attacker, command.target);
-    root.updateComponent(JobQueueComponentId, (component) => {
+    playerKingdom.updateComponent(JobQueueComponentId, (component) => {
         component.jobs.push(job);
     });
 }
 
 function buildBuilding(root: Entity, command: BuildCommand) {
-    //Check if we have enough to build
-    //Add entities for each
     const points = Array.isArray(command.position)
         ? command.position
         : [command.position];
@@ -200,25 +206,36 @@ function buildBuilding(root: Entity, command: BuildCommand) {
         return;
     }
 
+    const playerKingdom = findPlayerKingdom(root);
+    if (!playerKingdom) {
+        log.error("Player kingdom not found, cannot place building");
+        return;
+    }
+
     for (const point of points) {
         const buildingEntity = buildingPrefab(building, true);
+        playerKingdom.addChild(buildingEntity);
         buildingEntity.worldPosition = point;
-        root.addChild(buildingEntity);
         const job = BuildBuildingJob(buildingEntity);
-        root.updateComponent(JobQueueComponentId, (component) => {
+        playerKingdom.updateComponent(JobQueueComponentId, (component) => {
             component.jobs.push(job);
         });
     }
 }
 
 function queueJob(root: Entity, command: QueueJobCommand, tick: number) {
-    const jobQueue = root.requireEcsComponent(JobQueueComponentId);
+    const playerKingdom = findPlayerKingdom(root);
+    if (!playerKingdom) {
+        log.error("Player kingdom not found for job queue");
+        return;
+    }
+    const jobQueue = playerKingdom.requireEcsComponent(JobQueueComponentId);
     addJob(jobQueue, command.job);
 
-    root.invalidateComponent(JobQueueComponentId);
+    playerKingdom.invalidateComponent(JobQueueComponentId);
 
     // Immediately notify idle workers about the new job
-    notifyIdleWorkerForNewJob(root, tick);
+    notifyIdleWorkerForNewJob(playerKingdom, tick);
 }
 
 function equipItem(root: Entity, command: EquipItemCommand) {

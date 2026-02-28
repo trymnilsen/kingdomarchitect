@@ -1,6 +1,5 @@
 import type { EcsSystem } from "../common/ecs/ecsSystem.ts";
 import type { Components } from "../game/component/component.ts";
-import { JobQueueComponentId } from "../game/component/jobQueueComponent.ts";
 import { TileComponentId } from "../game/component/tileComponent.ts";
 import { VisibilityMapComponentId } from "../game/component/visibilityMapComponent.ts";
 import { WorldDiscoveryComponentId } from "../game/component/worldDiscoveryComponent.ts";
@@ -34,13 +33,10 @@ export function makeReplicatedEntitiesSystem(
         onEntityEvent: {
             component_updated: (_root, event) => {
                 // The game root holds world-level components (tiles,
-                // discovery, visibility). Only the job queue needs
-                // replication — the rest are managed separately via
-                // WorldStateGameMessage or are client-only.
-                if (
-                    event.source.isGameRoot &&
-                    event.item.id != JobQueueComponentId
-                ) {
+                // discovery, visibility). These are managed separately via
+                // WorldStateGameMessage or are client-only — none need
+                // per-component delta replication.
+                if (event.source.isGameRoot) {
                     return;
                 }
                 // Tiles and visibility maps are client-only components
