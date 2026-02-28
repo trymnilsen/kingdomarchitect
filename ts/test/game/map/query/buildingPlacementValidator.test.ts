@@ -262,6 +262,132 @@ describe("createBuildingPlacementValidator", () => {
         });
     });
 
+    describe("sole-access tile conflicts between working buildings", () => {
+        it("rejects placement when two adjacent buildings would share their only free tile", () => {
+            // Two buildings (B1, B2) are both adjacent to the candidate.
+            // After placement their only remaining free exit is the same tile T.
+            // Two workers cannot stand on the same tile, so this is invalid.
+            //
+            //   [bl] [B1] [bl]
+            //   [T ] [  ] [B2] [bl]
+            //        [bl]
+            //
+            // Candidate at (5,4). B1 at (4,4), B2 at (5,3). T at (4,3).
+            // Blockers seal all exits except T for each building.
+            const world = createWorld([
+                { x: 5, y: 4 }, // candidate
+                { x: 4, y: 4 }, // B1
+                { x: 5, y: 3 }, // B2
+                { x: 4, y: 3 }, // T (shared sole tile)
+            ]);
+            addBuilding(world, { x: 4, y: 4 }); // B1
+            addBuilding(world, { x: 5, y: 3 }); // B2
+            addBuilding(world, { x: 3, y: 4 }); // blocks B1's west exit
+            addBuilding(world, { x: 4, y: 5 }); // blocks B1's south exit
+            addBuilding(world, { x: 6, y: 3 }); // blocks B2's east exit
+            addBuilding(world, { x: 5, y: 2 }); // blocks B2's north exit
+            const validator = createBuildingPlacementValidator(world);
+
+            // After placing at (5,4): B1 sole exit = (4,3), B2 sole exit = (4,3) → conflict
+            assert.strictEqual(validator({ x: 5, y: 4 }), false);
+        });
+
+        it("rejects placement when an affected building gains the same sole tile as a non-adjacent building", () => {
+            // B1 is adjacent to candidate; after placement its only free exit
+            // becomes T=(4,3). B2 is not adjacent to candidate but is already
+            // constrained to sole tile T=(4,3). The placement creates a conflict.
+            //
+            //   [bl] [B2] [bl]
+            //   [bl] [T ] [bl]   <- T is the only exit for both buildings
+            //   [bl] [B1] [  ]
+            //        [ C]        <- candidate
+            //
+            // Candidate at (5,4), B1 at (4,4), B2 at (4,2), T at (4,3).
+            const world = createWorld([
+                { x: 5, y: 4 }, // candidate
+                { x: 4, y: 4 }, // B1
+                { x: 4, y: 3 }, // T
+                { x: 4, y: 2 }, // B2
+            ]);
+            addBuilding(world, { x: 4, y: 4 }); // B1
+            addBuilding(world, { x: 3, y: 4 }); // blocks B1's west exit
+            addBuilding(world, { x: 4, y: 5 }); // blocks B1's south exit
+            addBuilding(world, { x: 4, y: 2 }); // B2
+            addBuilding(world, { x: 3, y: 2 }); // blocks B2's west exit
+            addBuilding(world, { x: 5, y: 2 }); // blocks B2's east exit
+            addBuilding(world, { x: 4, y: 1 }); // blocks B2's north exit
+            const validator = createBuildingPlacementValidator(world);
+
+            // After placing candidate: B1 sole exit = T, B2 already has sole exit = T → conflict
+            assert.strictEqual(validator({ x: 5, y: 4 }), false);
+        });
+
+        it("rejects placement when the new building's sole tile is already depended on by another building", () => {
+            // The candidate is surrounded on three sides by buildings, so the new
+            // building would have exactly one free tile T=(6,4). An existing
+            // building B at (6,5) is also constrained to sole tile T. Conflict.
+            //
+            //   [bl] [  ] [bl]
+            //   [bl] [C ] [T ] [bl]
+            //        [bl] [B ]
+            //             [bl]
+            //
+            // Candidate at (5,4). T=(6,4). B at (6,5).
+            const world = createWorld([
+                { x: 5, y: 4 }, // candidate
+                { x: 6, y: 4 }, // T (sole exit for new building and for B)
+                { x: 6, y: 5 }, // B
+            ]);
+            addBuilding(world, { x: 4, y: 4 }); // blocks candidate's west exit
+            addBuilding(world, { x: 5, y: 3 }); // blocks candidate's north exit
+            addBuilding(world, { x: 5, y: 5 }); // blocks candidate's south exit (also B's west exit)
+            addBuilding(world, { x: 6, y: 5 }); // B
+            addBuilding(world, { x: 7, y: 5 }); // blocks B's east exit
+            addBuilding(world, { x: 6, y: 6 }); // blocks B's south exit
+            const validator = createBuildingPlacementValidator(world);
+
+            // New building sole exit = T, B's sole exit = T → conflict
+            assert.strictEqual(validator({ x: 5, y: 4 }), false);
+        });
+
+        it("accepts placement when two buildings share a tile but each retains multiple free exits", () => {
+            // B1 and B2 both have T=(4,3) as one of their exits, but each also
+            // has other free exits after placement. No sole-access conflict.
+            //
+            // Candidate at (5,4), B1 at (4,4), B2 at (5,3).
+            // After placing candidate: B1 exits = (3,4),(4,3),(4,5); B2 exits = (4,3),(6,3),(5,2).
+            const world = createWorld([
+                { x: 5, y: 4 }, // candidate
+                { x: 4, y: 4 }, // B1
+                { x: 5, y: 3 }, // B2
+            ]);
+            addBuilding(world, { x: 4, y: 4 }); // B1
+            addBuilding(world, { x: 5, y: 3 }); // B2
+            const validator = createBuildingPlacementValidator(world);
+
+            assert.strictEqual(validator({ x: 5, y: 4 }), true);
+        });
+
+        it("accepts placement when only one building is constrained to a sole tile and no other building shares it", () => {
+            // After placement B1 is constrained to sole tile T=(4,3), but no
+            // other building is adjacent to T, so there is no conflict.
+            //
+            // Candidate at (5,4), B1 at (4,4). Blockers seal B1's other exits.
+            const world = createWorld([
+                { x: 5, y: 4 }, // candidate
+                { x: 4, y: 4 }, // B1
+                { x: 4, y: 3 }, // T
+            ]);
+            addBuilding(world, { x: 4, y: 4 }); // B1
+            addBuilding(world, { x: 3, y: 4 }); // blocks B1's west exit
+            addBuilding(world, { x: 4, y: 5 }); // blocks B1's south exit
+            const validator = createBuildingPlacementValidator(world);
+
+            // B1 sole exit = T=(4,3). No other building has T as its sole exit → no conflict.
+            assert.strictEqual(validator({ x: 5, y: 4 }), true);
+        });
+    });
+
     describe("findClosestAvailablePosition integration", () => {
         it("skips a position that would block an adjacent building and finds the next valid one", () => {
             // Layout (y increases downward):

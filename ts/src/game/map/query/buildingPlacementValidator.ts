@@ -36,6 +36,37 @@ function hasWalkableCardinalNeighbour(
 }
 
 /**
+ * Returns the list of walkable (weight > 0 and < maxWeight) cardinal
+ * neighbours of `point`, treating `excludePoint` as occupied (impassable).
+ */
+function getFreeCardinalNeighbours(
+    point: Point,
+    root: Entity,
+    maxWeight: number,
+    excludePoint?: Point,
+): Point[] {
+    const free: Point[] = [];
+    for (const neighbour of adjacentPoints(point)) {
+        if (
+            excludePoint &&
+            neighbour.x === excludePoint.x &&
+            neighbour.y === excludePoint.y
+        ) {
+            continue;
+        }
+        const weight = getWeightAtPoint(neighbour, root);
+        if (weight !== 0 && weight < maxWeight) {
+            free.push(neighbour);
+        }
+    }
+    return free;
+}
+
+function pointKey(p: Point): string {
+    return `${p.x},${p.y}`;
+}
+
+/**
  * Creates a validator for placing a building at a candidate position.
  * A candidate passes when:
  * 1. The candidate tile itself is walkable (would be occupied by the new
@@ -48,6 +79,10 @@ function hasWalkableCardinalNeighbour(
  * 4. Every adjacent agent (entity with BehaviorAgentComponent) still has at
  *    least one free cardinal neighbour after placement (so we don't trap
  *    a unit).
+ * 5. No two buildings share the same single free cardinal tile after
+ *    placement. Working buildings require a unit to stand adjacent; two units
+ *    cannot occupy the same tile, so two buildings cannot share a sole
+ *    access tile.
  */
 export function createBuildingPlacementValidator(
     root: Entity,
@@ -112,6 +147,99 @@ export function createBuildingPlacementValidator(
                 )
             ) {
                 return false;
+            }
+        }
+
+        // Check that no two buildings end up sharing the same single free
+        // cardinal tile after placement (sole-access conflict).
+        //
+        // Placing `candidate` can only shrink the free-tile sets of buildings
+        // adjacent to it. We check:
+        //   a) The new building itself — if it has exactly one free neighbour,
+        //      no other building may also depend on that tile.
+        //   b) Each adjacent existing building — if it is now constrained to
+        //      a single free tile, no other building (affected or not) may
+        //      depend on the same tile.
+        //
+        // Non-affected buildings (not adjacent to `candidate`) have unchanged
+        // free-tile sets; if any already relies on the same sole tile, the
+        // placement creates the conflict.
+        const soleAccessClaimed = new Set<string>();
+        const adjacentBuildingKeys = new Set<string>();
+        const soleTilesToScan: Point[] = [];
+
+        const newBuildingFree = getFreeCardinalNeighbours(
+            candidate,
+            root,
+            maxWeight,
+        );
+        if (newBuildingFree.length === 1) {
+            soleAccessClaimed.add(pointKey(newBuildingFree[0]));
+            soleTilesToScan.push(newBuildingFree[0]);
+        }
+
+        for (const neighbour of adjacentPoints(candidate)) {
+            const entitiesAtNeighbour = queryEntity(root, neighbour);
+            if (
+                !entitiesAtNeighbour.some((e) =>
+                    e.hasComponent(BuildingComponentId),
+                )
+            ) {
+                continue;
+            }
+
+            adjacentBuildingKeys.add(pointKey(neighbour));
+
+            const freeNeighbours = getFreeCardinalNeighbours(
+                neighbour,
+                root,
+                maxWeight,
+                candidate,
+            );
+
+            if (freeNeighbours.length === 1) {
+                const tileKey = pointKey(freeNeighbours[0]);
+                if (soleAccessClaimed.has(tileKey)) {
+                    return false;
+                }
+                soleAccessClaimed.add(tileKey);
+                soleTilesToScan.push(freeNeighbours[0]);
+            }
+        }
+
+        // For each sole-access tile of an affected building, scan non-affected
+        // buildings adjacent to it. A non-affected building's free-tile set is
+        // unchanged; if it already depends on the same sole tile, the placement
+        // introduces a conflict that did not exist before.
+        for (const soleTile of soleTilesToScan) {
+            for (const adj of adjacentPoints(soleTile)) {
+                const adjKey = pointKey(adj);
+                if (adjKey === pointKey(candidate)) {
+                    continue;
+                }
+                if (adjacentBuildingKeys.has(adjKey)) {
+                    continue;
+                }
+
+                const entities = queryEntity(root, adj);
+                if (
+                    !entities.some((e) => e.hasComponent(BuildingComponentId))
+                ) {
+                    continue;
+                }
+
+                const freeNeighbours = getFreeCardinalNeighbours(
+                    adj,
+                    root,
+                    maxWeight,
+                );
+                if (
+                    freeNeighbours.length === 1 &&
+                    freeNeighbours[0].x === soleTile.x &&
+                    freeNeighbours[0].y === soleTile.y
+                ) {
+                    return false;
+                }
             }
         }
 
