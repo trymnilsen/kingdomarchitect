@@ -1,7 +1,10 @@
+import { createLogger } from "../common/logging/logger.ts";
 import type { GameCommand } from "./message/gameCommand.ts";
 import { Event } from "../common/event.ts";
 import { GameServerConnection } from "./gameServerConnection.ts";
 import type { CommandGameMessage, GameMessage } from "./message/gameMessage.ts";
+
+const log = createLogger("server");
 
 /**
  * Client-side WebSocket connection to a multiplayer server.
@@ -33,7 +36,7 @@ export class WebSocketServerConnection implements GameServerConnection {
         if (this.socket.readyState === WebSocket.OPEN) {
             this.socket.send(JSON.stringify(message));
         } else {
-            console.warn("WebSocket not open, command dropped");
+            log.warn("WebSocket not open, command dropped");
         }
     }
 
@@ -45,17 +48,17 @@ export class WebSocketServerConnection implements GameServerConnection {
                 const message = JSON.parse(event.data) as GameMessage;
                 this._onMessageEvent.publish(message);
             } catch (err) {
-                console.error("Failed to parse server message:", err);
+                log.error("Failed to parse server message", { error: err });
             }
         };
 
         socket.onclose = () => {
-            console.log("WebSocket closed, attempting reconnect...");
+            log.info("WebSocket closed, attempting reconnect...");
             this.scheduleReconnect();
         };
 
         socket.onerror = (error) => {
-            console.error("WebSocket error:", error);
+            log.error("WebSocket error", { error });
         };
 
         return socket;
@@ -69,7 +72,7 @@ export class WebSocketServerConnection implements GameServerConnection {
         }
         this.reconnectTimer = setTimeout(() => {
             this.reconnectTimer = undefined;
-            console.log("Reconnecting...");
+            log.info("Reconnecting...");
             this.socket = this.connect();
         }, 3000);
     }

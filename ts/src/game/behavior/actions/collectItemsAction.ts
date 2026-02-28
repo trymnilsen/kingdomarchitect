@@ -1,8 +1,11 @@
 import { isPointAdjacentTo } from "../../../common/point.ts";
+import { createLogger } from "../../../common/logging/logger.ts";
 import {
     CollectableComponentId,
     collectAllItems,
 } from "../../component/collectableComponent.ts";
+
+const log = createLogger("behavior");
 import {
     addInventoryItem,
     InventoryComponentId,
@@ -26,8 +29,8 @@ export function executeCollectItemsAction(
     const targetEntity = root.findEntity(action.entityId);
 
     if (!targetEntity) {
-        console.warn(
-            `[CollectItems] Target entity ${action.entityId} not found`,
+        log.warn(
+            `Target entity ${action.entityId} not found`,
         );
         return {
             kind: "failed",
@@ -36,7 +39,7 @@ export function executeCollectItemsAction(
     }
 
     if (!isPointAdjacentTo(targetEntity.worldPosition, entity.worldPosition)) {
-        console.warn(`[CollectItems] Worker not adjacent to target`);
+        log.warn(`Worker not adjacent to target`);
         return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 
@@ -44,8 +47,8 @@ export function executeCollectItemsAction(
         CollectableComponentId,
     );
     if (!collectableComponent) {
-        console.warn(
-            `[CollectItems] Target ${action.entityId} has no CollectableComponent`,
+        log.warn(
+            `Target ${action.entityId} has no CollectableComponent`,
         );
         return { kind: "failed", cause: { type: "unknown" } };
     }

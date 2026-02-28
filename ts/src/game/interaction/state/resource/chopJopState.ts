@@ -6,6 +6,9 @@ import { InteractionState } from "../../handler/interactionState.ts";
 import { SelectionMode } from "../../selection/selectionMode.ts";
 import { SingleSelectionMode } from "../../selection/singleSelectionMode.ts";
 import { AlertMessageState } from "../common/alertMessageState.ts";
+import { createLogger } from "../../../../common/logging/logger.ts";
+
+const log = createLogger("interaction");
 
 export class ChopJobState extends InteractionState {
     private chopMode: SelectionMode;
@@ -107,7 +110,7 @@ export class ChopJobState extends InteractionState {
     }
 
     private scheduleChop() {
-        console.log("Schedule chop tree job");
+        log.info("Schedule chop tree job");
         let hadTreeInSelection = false;
         for (const point of this.chopMode.getSelection()) {
             //TODO: Reimplement chop, maybe a "collect resource" state?

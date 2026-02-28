@@ -1,4 +1,5 @@
 import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
+import { createLogger } from "../../common/logging/logger.ts";
 import { getBuildingById } from "../../data/building/buildings.ts";
 import { itemEffectFactoryList } from "../../data/inventory/itemEffectFactoryList.ts";
 import {
@@ -79,6 +80,8 @@ import {
 } from "../../server/message/command/updateWorkerStanceCommand.ts";
 import { RoleComponentId } from "../component/worker/roleComponent.ts";
 
+const log = createLogger("command");
+
 export function createCommandSystem(
     gameTime: GameTime,
     persistenceManager: PersistenceManager,
@@ -96,7 +99,7 @@ function onGameMessage(
     persistenceManager: PersistenceManager,
 ) {
     if (message.type != CommandGameMessageType) return;
-    console.log("[CommandSystem] command: ", message.command);
+    log.info("command", { command: message.command });
     switch (message.command.id) {
         case NewGameCommandId:
             persistenceManager
@@ -106,7 +109,7 @@ function onGameMessage(
                         id: ReloadGameEffectId,
                     });
                 })
-                .catch((err) => console.error(err));
+                .catch((err) => log.error("Failed to clear game", { err }));
             break;
         case ChangeOccupationCommandId:
             changeOccupation(root, message.command as ChangeOccupationCommand);
@@ -193,7 +196,7 @@ function buildBuilding(root: Entity, command: BuildCommand) {
         : [command.position];
     const building = getBuildingById(command.buildingId);
     if (!building) {
-        console.error(`Building not found ${command.buildingId}`);
+        log.error("Building not found", { buildingId: command.buildingId });
         return;
     }
 
@@ -221,24 +224,27 @@ function queueJob(root: Entity, command: QueueJobCommand, tick: number) {
 function equipItem(root: Entity, command: EquipItemCommand) {
     const entity = root.findEntity(command.entity);
     if (!entity) {
-        console.error("Unable to equip, entity not found");
+        log.error("Unable to equip, entity not found");
         return;
     }
 
     const inventory = entity.getEcsComponent(InventoryComponentId);
     const equipment = entity.getEcsComponent(EquipmentComponentId);
     if (!inventory) {
-        console.error("Unable to equip, inventory component not found");
+        log.error("Unable to equip, inventory component not found");
         return;
     }
     if (!equipment) {
-        console.error("Unable to equip, equipment component not found");
+        log.error("Unable to equip, equipment component not found");
         return;
     }
 
     const slotExists = command.slot in equipment.slots;
     if (!slotExists) {
-        console.error(`No equipment slot for ${command.slot} on ${entity.id}`);
+        log.error("No equipment slot on entity", {
+            slot: command.slot,
+            entityId: entity.id,
+        });
         return;
     }
     // An item id can either be defined meaning equip or null meaning unequip
@@ -246,7 +252,7 @@ function equipItem(root: Entity, command: EquipItemCommand) {
     if (itemId) {
         const withdrawnItems = takeInventoryItem(inventory, itemId, 1);
         if (!withdrawnItems || withdrawnItems.length === 0) {
-            console.error("Not enough items to take item from inventory");
+            log.error("Not enough items to take item from inventory");
             return;
         }
 
@@ -268,40 +274,40 @@ function equipItem(root: Entity, command: EquipItemCommand) {
 function consumeItem(root: Entity, command: ConsumeItemCommand) {
     const entity = root.findEntity(command.entity);
     if (!entity) {
-        console.error("Unable to consume, entity not found");
+        log.error("Unable to consume, entity not found");
         return;
     }
 
     const equipment = entity.getEcsComponent(EquipmentComponentId);
     if (!equipment) {
-        console.error("Unable to consume, equipment component not found");
+        log.error("Unable to consume, equipment component not found");
         return;
     }
 
     const inventory = entity.getEcsComponent(InventoryComponentId);
     if (!inventory) {
-        console.error("Unable to consume, inventory component not found");
+        log.error("Unable to consume, inventory component not found");
         return;
     }
 
     // Get the item from the specified slot
     const item = equipment.slots[command.slot];
     if (!item) {
-        console.error(`No item equipped in slot: ${command.slot}`);
+        log.error("No item equipped in slot", { slot: command.slot });
         return;
     }
 
     // Check if we have an effect factory for this item
     const effectFactory = itemEffectFactoryList[item.id];
     if (!effectFactory) {
-        console.error(`No effect factory for item: ${item.id}`);
+        log.error("No effect factory for item", { itemId: item.id });
         return;
     }
 
     // Try to take the item from inventory (for stack management)
     const withdrawnItem = takeInventoryItem(inventory, item.id, 1);
     if (!withdrawnItem) {
-        console.error("Not enough items in inventory");
+        log.error("Not enough items in inventory");
         return;
     }
 
@@ -334,15 +340,17 @@ function setPlayerCommand(
 ) {
     const agent = root.findEntity(command.agentId);
     if (!agent) {
-        console.warn(`[SetPlayerCommand] Agent ${command.agentId} not found`);
+        log.warn("Agent not found for SetPlayerCommand", {
+            agentId: command.agentId,
+        });
         return;
     }
 
     const behaviorAgent = agent.getEcsComponent(BehaviorAgentComponentId);
     if (!behaviorAgent) {
-        console.warn(
-            `[SetPlayerCommand] Agent ${command.agentId} has no BehaviorAgent component`,
-        );
+        log.warn("Agent has no BehaviorAgent component", {
+            agentId: command.agentId,
+        });
         return;
     }
 
@@ -353,23 +361,24 @@ function setPlayerCommand(
     // Trigger replan to execute command immediately
     requestBehaviorReplan(agent);
 
-    console.log(
-        `[SetPlayerCommand] Command set for agent ${command.agentId}: ${command.command.action}`,
-    );
+    log.info("Command set for agent", {
+        agentId: command.agentId,
+        action: command.command.action,
+    });
 }
 
 function updateWorkerRole(root: Entity, command: UpdateWorkerRoleCommand) {
     const worker = root.findEntity(command.worker);
     if (!worker) {
-        console.warn(`[UpdateWorkerRole] Worker ${command.worker} not found`);
+        log.warn("Worker not found for UpdateWorkerRole", {
+            worker: command.worker,
+        });
         return;
     }
 
     const roleComponent = worker.getEcsComponent(RoleComponentId);
     if (!roleComponent) {
-        console.warn(
-            `[UpdateWorkerRole] Worker ${command.worker} has no role component`,
-        );
+        log.warn("Worker has no role component", { worker: command.worker });
         return;
     }
 
@@ -380,15 +389,17 @@ function updateWorkerRole(root: Entity, command: UpdateWorkerRoleCommand) {
 function updateWorkerStance(root: Entity, command: UpdateWorkerStanceCommand) {
     const worker = root.findEntity(command.worker);
     if (!worker) {
-        console.warn(`[UpdateWorkerStance] Worker ${command.worker} not found`);
+        log.warn("Worker not found for UpdateWorkerStance", {
+            worker: command.worker,
+        });
         return;
     }
 
     const roleComponent = worker.getEcsComponent(RoleComponentId);
     if (!roleComponent) {
-        console.warn(
-            `[UpdateWorkerStance] Worker ${command.worker} has no role component`,
-        );
+        log.warn("Worker has no role component for UpdateWorkerStance", {
+            worker: command.worker,
+        });
         return;
     }
 

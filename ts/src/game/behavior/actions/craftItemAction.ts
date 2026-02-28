@@ -1,9 +1,12 @@
 import { isPointAdjacentTo } from "../../../common/point.ts";
+import { createLogger } from "../../../common/logging/logger.ts";
 import {
     addInventoryItem,
     InventoryComponentId,
     takeInventoryItem,
 } from "../../component/inventoryComponent.ts";
+
+const log = createLogger("behavior");
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import {
@@ -32,7 +35,7 @@ export function executeCraftItemAction(
     const buildingEntity = root.findEntity(action.buildingId);
 
     if (!buildingEntity) {
-        console.warn(`[CraftItem] Building ${action.buildingId} not found`);
+        log.warn(`Building ${action.buildingId} not found`);
         return {
             kind: "failed",
             cause: { type: "targetGone", entityId: action.buildingId },
@@ -42,7 +45,7 @@ export function executeCraftItemAction(
     if (
         !isPointAdjacentTo(buildingEntity.worldPosition, entity.worldPosition)
     ) {
-        console.warn(`[CraftItem] Worker not adjacent to building`);
+        log.warn(`Worker not adjacent to building`);
         return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 
@@ -58,8 +61,8 @@ export function executeCraftItemAction(
                 (stack) => stack.item.id === input.item.id,
             );
             if (!item || item.amount < input.amount) {
-                console.warn(
-                    `[CraftItem] Worker missing materials: needs ${input.amount}x ${input.item.id}, has ${item?.amount ?? 0}`,
+                log.warn(
+                    `Worker missing materials: needs ${input.amount}x ${input.item.id}, has ${item?.amount ?? 0}`,
                 );
                 return { kind: "failed", cause: { type: "noResources" } };
             }
@@ -72,8 +75,8 @@ export function executeCraftItemAction(
                 input.amount,
             );
             if (!taken) {
-                console.warn(
-                    `[CraftItem] Failed to consume ${input.amount}x ${input.item.id}`,
+                log.warn(
+                    `Failed to consume ${input.amount}x ${input.item.id}`,
                 );
                 return { kind: "failed", cause: { type: "noResources" } };
             }

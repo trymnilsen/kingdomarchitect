@@ -1,23 +1,23 @@
-import { createRootLogger } from "./common/logging/logger.ts";
+import { createRootLogger, createLogger } from "./common/logging/logger.ts";
 import { Game } from "./game/game.ts";
 import { clearGameDatabase } from "./server/persistence/indexedDBAdapter.ts";
 import { WebworkerServerConnection } from "./server/webworkerServerConnection.ts";
 
 createRootLogger();
 
+const log = createLogger("client");
+
 const canvasElementId = "gameCanvas";
 
-console.log("Booting!");
+log.info("Booting!");
 window.debugChunks = true;
 
 async function bootstrap() {
-    console.log("Bootstrapping!");
+    log.info("Bootstrapping!");
 
     const params = new URLSearchParams(window.location.search.toLowerCase());
     if (params.has("cleargame")) {
-        console.log(
-            "clearGame parameter detected, clearing saved game state...",
-        );
+        log.info("clearGame parameter detected, clearing saved game state...");
         await clearGameDatabase();
     }
 
@@ -26,7 +26,7 @@ async function bootstrap() {
         const game = new Game(canvasElementId, serverConnection);
         await game.bootstrap();
     } catch (e) {
-        console.error("Failed to bootstrap game: ", e);
+        log.error("Failed to bootstrap game", { error: e });
     }
 }
 
@@ -34,7 +34,7 @@ document.addEventListener(
     "DOMContentLoaded",
     () => {
         bootstrap().catch((err) => {
-            console.error("Failed to run bootstrap", err);
+            log.error("Failed to run bootstrap", { error: err });
         });
     },
     false,

@@ -1,4 +1,7 @@
 import type { Point } from "../../../../common/point.ts";
+import { createLogger } from "../../../../common/logging/logger.ts";
+
+const log = createLogger("pathfinding");
 
 export type Graph = {
     nodeAt(x: number, y: number): GraphNode | null;
@@ -48,11 +51,7 @@ export class GraphNode {
 
     constructor(x: number, y: number, weight: number) {
         if (weight < 0 || (weight > 0 && weight < 1)) {
-            console.warn(`Invalid weight for node`, {
-                x,
-                y,
-                weight,
-            });
+            log.warn("Invalid weight for node", { x, y, weight });
             weight = 0;
         }
 

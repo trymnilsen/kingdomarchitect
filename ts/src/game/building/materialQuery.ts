@@ -12,6 +12,9 @@ import {
 } from "../component/inventoryComponent.ts";
 import { StockpileComponentId } from "../component/stockpileComponent.ts";
 import type { Entity } from "../entity/entity.ts";
+import { createLogger } from "../../common/logging/logger.ts";
+
+const log = createLogger("building");
 
 export type MaterialSource = {
     entity: Entity;
@@ -148,7 +151,7 @@ export function checkMaterialsForBuilding(
         const item =
             inventoryItemsMap[itemId as keyof typeof inventoryItemsMap];
         if (!item) {
-            console.warn(`Unknown item ID in building requirements: ${itemId}`);
+            log.warn("Unknown item ID in building requirements", { itemId });
             continue;
         }
 
@@ -232,16 +235,19 @@ export function logMissingMaterials(
         return;
     }
 
-    console.log(
-        `[BUILD] Cannot construct ${buildingName} - missing materials:`,
-    );
+    log.info("Cannot construct building - missing materials", {
+        building: buildingName,
+    });
     for (const req of missingMaterials) {
         const totalAvailable =
             req.amountInWorkerInventory + req.amountInStockpiles;
         const deficit = req.amountNeeded - totalAvailable;
-        console.log(
-            `  - ${req.item.name}: need ${req.amountNeeded}, have ${totalAvailable} (missing ${deficit})`,
-        );
+        log.info("Missing material", {
+            item: req.item.name,
+            needed: req.amountNeeded,
+            available: totalAvailable,
+            deficit,
+        });
     }
 }
 

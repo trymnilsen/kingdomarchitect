@@ -15,6 +15,9 @@ import { uiText } from "../../../ui/declarative/uiText.ts";
 import { ninePatchBackground } from "../../../ui/uiBackground.ts";
 import { wrapUiSize, zeroSize, type UISize } from "../../../ui/uiSize.ts";
 import { actionbarTextStyle } from "../../../rendering/text/textStyle.ts";
+import { createLogger } from "../../../common/logging/logger.ts";
+
+const log = createLogger("ui");
 
 type UiButtonProps = {
     text: string;
@@ -28,7 +31,7 @@ const uiMenuButton = createComponent<UiButtonProps>(
     ({ props, withGesture }) => {
         if (props.onClick || props.onExpand) {
             withGesture("tap", (_event) => {
-                console.log(`Menu button tapped: ${props.text}`);
+                log.info("Menu button tapped", { text: props.text });
                 if (props.hasChildren && props.onExpand) {
                     props.onExpand();
                 } else if (props.onClick) {
@@ -113,9 +116,9 @@ type ScaffoldProps = {
 export const uiScaffold = createComponent<ScaffoldProps>(
     ({ constraints, measureDescriptor, withState, withEffect, props }) => {
         withEffect(() => {
-            console.log("Mounted ui scaffold");
+            log.info("Mounted ui scaffold");
             return () => {
-                console.log("Disposed ui scaffold");
+                log.info("Disposed ui scaffold");
             };
         });
         const [_menuState, _setMenuState] = withState(MenuState.closed);

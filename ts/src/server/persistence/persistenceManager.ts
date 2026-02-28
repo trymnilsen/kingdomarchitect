@@ -1,4 +1,7 @@
+import { createLogger } from "../../common/logging/logger.ts";
 import type { JSONValue } from "../../common/object.ts";
+
+const log = createLogger("persistence");
 import { ChunkMapComponentId } from "../../game/component/chunkMapComponent.ts";
 import type {
     ComponentID,
@@ -145,8 +148,12 @@ export class PersistenceManager {
                 } else {
                     if (serializedEntity.parentId !== RootEntityId) {
                         // Parent not found in saved entities, attach to root
-                        console.warn(
-                            `Parent ${serializedEntity.parentId} not found for entity ${entity.id}, attaching to root`,
+                        log.warn(
+                            "Parent not found for entity, attaching to root",
+                            {
+                                parentId: serializedEntity.parentId,
+                                entityId: entity.id,
+                            },
                         );
                     }
                     root.addChild(entity);

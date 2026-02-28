@@ -4,6 +4,9 @@ import type {
     BehaviorActionData,
     BehaviorActionExecutor,
 } from "./Action.ts";
+import { createLogger } from "../../../common/logging/logger.ts";
+
+const log = createLogger("behavior");
 import { executeWaitAction } from "./waitAction.ts";
 import { executeMoveToAction } from "./moveToAction.ts";
 import { executeClearPlayerCommandAction } from "./clearPlayerCommandAction.ts";
@@ -57,8 +60,8 @@ export const executeAction: BehaviorActionExecutor = (
         case "warmByFire":
             return executeWarmByFireAction(action, entity);
         default:
-            console.warn(
-                `[ActionExecutor] Unknown action type: ${(action as any).type}`,
+            log.warn(
+                `Unknown action type: ${(action as any).type}`,
             );
             return { kind: "failed", cause: { type: "unknown" } };
     }

@@ -1,4 +1,5 @@
 import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
+import { createLogger } from "../../common/logging/logger.ts";
 import type { Entity } from "../entity/entity.ts";
 import type { Point } from "../../common/point.ts";
 import {
@@ -8,6 +9,8 @@ import {
 } from "../component/warmthComponent.ts";
 import { FireSourceComponentId } from "../component/fireSourceComponent.ts";
 import { requestReplan } from "../component/BehaviorAgentComponent.ts";
+
+const log = createLogger("warmth");
 
 export const WARMTH_DECAY_TICK_INTERVAL = 10;
 
@@ -69,13 +72,17 @@ export const warmthSystem: EcsSystem = {
                 const isColdNow = warmthComponent.warmth < coldThreshold;
                 if (wasCold !== isColdNow) {
                     if (isColdNow) {
-                        console.log(
-                            `[WarmthSystem] Entity ${entity.id} became cold (warmth: ${currentWarmth.toFixed(1)} -> ${warmthComponent.warmth.toFixed(1)})`,
-                        );
+                        log.info("Entity became cold", {
+                            entityId: entity.id,
+                            from: currentWarmth.toFixed(1),
+                            to: warmthComponent.warmth.toFixed(1),
+                        });
                     } else {
-                        console.log(
-                            `[WarmthSystem] Entity ${entity.id} warmed up (warmth: ${currentWarmth.toFixed(1)} -> ${warmthComponent.warmth.toFixed(1)})`,
-                        );
+                        log.info("Entity warmed up", {
+                            entityId: entity.id,
+                            from: currentWarmth.toFixed(1),
+                            to: warmthComponent.warmth.toFixed(1),
+                        });
                     }
                     // Warmth state changed - wake behavior agent to re-evaluate
                     requestReplan(entity);

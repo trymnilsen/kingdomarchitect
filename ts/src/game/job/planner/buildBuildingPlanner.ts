@@ -17,6 +17,9 @@ import {
 } from "../buildBuildingJob.ts";
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import { suspendJobInQueue } from "../jobLifecycle.ts";
+import { createLogger } from "../../../common/logging/logger.ts";
+
+const log = createLogger("job");
 
 function suspendJob(worker: Entity, job: BuildBuildingJob): void {
     const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
@@ -41,31 +44,27 @@ export function planBuildBuilding(
 ): BehaviorActionData[] {
     const buildingEntity = root.findEntity(job.entityId);
     if (!buildingEntity) {
-        console.warn(
-            `[BuildBuildingPlanner] Building entity ${job.entityId} not found`,
-        );
+        log.warn("Building entity not found", { entityId: job.entityId });
         return [];
     }
 
     const buildingComponent =
         buildingEntity.getEcsComponent(BuildingComponentId);
     if (!buildingComponent) {
-        console.warn(
-            `[BuildBuildingPlanner] Building ${job.entityId} has no BuildingComponent`,
-        );
+        log.warn("Building has no BuildingComponent", { entityId: job.entityId });
         return [];
     }
 
     const workerInventory = worker.getEcsComponent(InventoryComponentId);
     if (!workerInventory) {
-        console.warn(`[BuildBuildingPlanner] Worker has no inventory`);
+        log.warn("Worker has no inventory");
         return [];
     }
 
     const buildingInventory =
         buildingEntity.getEcsComponent(InventoryComponentId);
     if (!buildingInventory) {
-        console.warn(`[BuildBuildingPlanner] Building has no inventory`);
+        log.warn("Building has no inventory");
         return [];
     }
 
@@ -130,9 +129,10 @@ export function planBuildBuilding(
     );
 
     if (!materialCheck.allAvailable) {
-        console.log(
-            `[BuildBuildingPlanner] Missing materials for ${buildingComponent.building.name}: ${materialCheck.missing.join(", ")}`,
-        );
+        log.info("Missing materials for building", {
+            building: buildingComponent.building.name,
+            missing: materialCheck.missing.join(", "),
+        });
         suspendJob(worker, job);
         return [];
     }
@@ -144,9 +144,7 @@ export function planBuildBuilding(
     );
 
     if (!stockpileEntity) {
-        console.log(
-            `[BuildBuildingPlanner] Cannot find stockpile with required materials`,
-        );
+        log.info("Cannot find stockpile with required materials");
         suspendJob(worker, job);
         return [];
     }

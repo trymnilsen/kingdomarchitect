@@ -29,6 +29,9 @@ import type {
     DisplacementMove,
     DisplacementTransaction,
 } from "./displacementTransaction.ts";
+import { createLogger } from "../../../common/logging/logger.ts";
+
+const log = createLogger("behavior");
 
 export type NegotiationResult =
     | { kind: "success"; transaction: DisplacementTransaction }
@@ -58,8 +61,8 @@ export function negotiateDisplacement(
     root: Entity,
     currentTick: number,
 ): NegotiationResult {
-    console.log(
-        `[Displacement] ${requester.id} negotiating tile (${targetTile.x},${targetTile.y}), priority=${requesterPriority}`,
+    log.info(
+        `${requester.id} negotiating tile (${targetTile.x},${targetTile.y}), priority=${requesterPriority}`,
     );
 
     const occupants = queryEntity(root, targetTile);
@@ -68,22 +71,22 @@ export function negotiateDisplacement(
     );
     if (!blocker) {
         // No displaceable entity at target — building, resource, or empty
-        console.log(
-            `[Displacement] ${requester.id} no displaceable entity at (${targetTile.x},${targetTile.y}), skipping`,
+        log.info(
+            `${requester.id} no displaceable entity at (${targetTile.x},${targetTile.y}), skipping`,
         );
         return { kind: "noChain" };
     }
 
     const blockerResistance = getDisplacementResistance(blocker, currentTick);
     if (!canAffordDisplacement(requesterPriority, blockerResistance)) {
-        console.log(
-            `[Displacement] ${requester.id} blocker=${blocker.id} resistance=${blockerResistance} exceeds priority=${requesterPriority}, refusing`,
+        log.info(
+            `${requester.id} blocker=${blocker.id} resistance=${blockerResistance} exceeds priority=${requesterPriority}, refusing`,
         );
         return { kind: "refused" };
     }
 
-    console.log(
-        `[Displacement] ${requester.id} blocker=${blocker.id} willing (resistance=${blockerResistance}), searching chain`,
+    log.info(
+        `${requester.id} blocker=${blocker.id} willing (resistance=${blockerResistance}), searching chain`,
     );
 
     // visitedIds starts with the requester and the blocker so we detect both
@@ -104,14 +107,14 @@ export function negotiateDisplacement(
     );
 
     if (!result) {
-        console.log(
-            `[Displacement] ${requester.id} no viable chain found for (${targetTile.x},${targetTile.y})`,
+        log.info(
+            `${requester.id} no viable chain found for (${targetTile.x},${targetTile.y})`,
         );
         return { kind: "noChain" };
     }
 
-    console.log(
-        `[Displacement] ${requester.id} found ${result.isCycle ? "cycle" : "chain"} of ${result.moves.length} moves, totalResistance=${result.totalResistance}`,
+    log.info(
+        `${requester.id} found ${result.isCycle ? "cycle" : "chain"} of ${result.moves.length} moves, totalResistance=${result.totalResistance}`,
     );
     return {
         kind: "success",
@@ -166,8 +169,8 @@ function findBestChain(
             // occupied tile (50 - resistance). Since candidates are sorted descending,
             // a free tile always appears first. No chain outcome can be better, so
             // return immediately without evaluating the remaining candidates.
-            console.log(
-                `[Displacement] ${entity.id} can step to free tile (${tile.x},${tile.y}), terminating chain`,
+            log.info(
+                `${entity.id} can step to free tile (${tile.x},${tile.y}), terminating chain`,
             );
             return {
                 moves: [{ entityId: entity.id, from: fromTile, to: tile }],
@@ -184,8 +187,8 @@ function findBestChain(
         // through other entities can't reach the requester because they're already
         // in visitedIds and would have been pruned as back-edges above.
         if (nextEntity.id === requester.id) {
-            console.log(
-                `[Displacement] ${entity.id} cycle back to requester via (${tile.x},${tile.y}), recording as candidate`,
+            log.info(
+                `${entity.id} cycle back to requester via (${tile.x},${tile.y}), recording as candidate`,
             );
             const result: ChainResult = {
                 moves: [
@@ -214,16 +217,16 @@ function findBestChain(
         // Back-edge to a different entity already in the chain (not the requester) —
         // this would create an unresolvable loop, prune the branch.
         if (visitedIds.has(nextEntity.id)) {
-            console.log(
-                `[Displacement] ${entity.id} tile (${tile.x},${tile.y}) occupied by already-visited ${nextEntity.id}, pruning`,
+            log.info(
+                `${entity.id} tile (${tile.x},${tile.y}) occupied by already-visited ${nextEntity.id}, pruning`,
             );
             continue;
         }
 
         // At max depth with an occupied tile — can't extend the chain further.
         if (depth >= MAX_CHAIN_DEPTH) {
-            console.log(
-                `[Displacement] ${entity.id} max chain depth reached at (${tile.x},${tile.y}), pruning`,
+            log.info(
+                `${entity.id} max chain depth reached at (${tile.x},${tile.y}), pruning`,
             );
             continue;
         }
@@ -234,16 +237,16 @@ function findBestChain(
             currentTick,
         );
         if (!canAffordDisplacement(requesterPriority, nextResistance)) {
-            console.log(
-                `[Displacement] ${entity.id} next entity ${nextEntity.id} resistance=${nextResistance} > priority=${requesterPriority}, pruning`,
+            log.info(
+                `${entity.id} next entity ${nextEntity.id} resistance=${nextResistance} > priority=${requesterPriority}, pruning`,
             );
             continue;
         }
 
         // Extend the chain: find where nextEntity can go.
         // Copy visitedIds to avoid mutating the set across branches.
-        console.log(
-            `[Displacement] ${entity.id} extending chain through ${nextEntity.id} at (${tile.x},${tile.y})`,
+        log.info(
+            `${entity.id} extending chain through ${nextEntity.id} at (${tile.x},${tile.y})`,
         );
         const newVisited = new Set([...visitedIds, nextEntity.id]);
         const subResult = findBestChain(

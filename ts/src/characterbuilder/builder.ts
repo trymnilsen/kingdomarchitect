@@ -1,3 +1,4 @@
+import { createLogger } from "../common/logging/logger.ts";
 import { AssetLoader } from "../asset/loader/assetLoader.ts";
 import { Camera } from "../rendering/camera.ts";
 import { Renderer } from "../rendering/renderer.ts";
@@ -7,6 +8,8 @@ import { UiRenderer, type UIEvent } from "../ui/declarative/ui.ts";
 import { TouchInput } from "../input/touchInput.ts";
 import type { Point } from "../common/point.ts";
 import { CharacterBuilderUI } from "./characterBuilderUI.ts";
+
+const log = createLogger("characterbuilder");
 
 /**
  * Main CharacterBuilder class
@@ -55,11 +58,11 @@ export class CharacterBuilder {
     }
 
     async bootstrap(): Promise<void> {
-        console.log("Character builder bootstrapping");
+        log.info("Character builder bootstrapping");
         this.assetLoader.load();
 
         await this.assetLoader.loaderPromise;
-        console.log("Character builder assets loaded");
+        log.info("Character builder assets loaded");
 
         // Start render loop
         //setInterval(() => this.onTick(), 200);

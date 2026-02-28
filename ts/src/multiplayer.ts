@@ -1,5 +1,10 @@
+import { createRootLogger, createLogger } from "./common/logging/logger.ts";
 import { Game } from "./game/game.ts";
 import { WebSocketServerConnection } from "./server/websocketServerConnection.ts";
+
+createRootLogger();
+
+const log = createLogger("client");
 
 const canvasElementId = "gameCanvas";
 
@@ -16,7 +21,7 @@ document.addEventListener(
     "DOMContentLoaded",
     () => {
         bootstrap().catch((err) => {
-            console.error("Failed to run bootstrap", err);
+            log.error("Failed to run bootstrap", { error: err });
         });
     },
     false,

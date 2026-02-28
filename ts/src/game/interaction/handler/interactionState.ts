@@ -13,6 +13,9 @@ import { FocusGroup } from "../../../ui/focus/focusGroup.ts";
 import { RenderScope } from "../../../rendering/renderScope.ts";
 import { InteractionStateChanger } from "./interactionStateChanger.ts";
 import { StateContext } from "./stateContext.ts";
+import { createLogger } from "../../../common/logging/logger.ts";
+
+const log = createLogger("interaction");
 
 /**
  * Interaction is built up as a simple state machine. Each state can via the
@@ -94,10 +97,7 @@ export abstract class InteractionState {
     dispatchUIEvent(event: UIEvent): boolean {
         // Old imperative UI system - commented out as we move to declarative UI
         // The declarative UI system handles events directly in InteractionHandler
-        console.log(
-            "UI Event received in InteractionState (deprecated): ",
-            event,
-        );
+        log.info("UI Event received in InteractionState (deprecated)", { event });
         return false;
     }
 

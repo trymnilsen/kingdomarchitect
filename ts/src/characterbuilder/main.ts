@@ -1,4 +1,11 @@
+import {
+    createLogger,
+    createRootLogger,
+} from "../common/logging/logger.ts";
 import { CharacterBuilder } from "./builder.ts";
+
+createRootLogger();
+const log = createLogger("characterbuilder");
 
 /**
  * Bootstrap function for the character builder application
@@ -8,7 +15,7 @@ async function bootstrap() {
         const characterBuilder = new CharacterBuilder("gameCanvas");
         await characterBuilder.bootstrap();
     } catch (e) {
-        console.error("Failed to bootstrap character builder: ", e);
+        log.error("Failed to bootstrap character builder", { error: e });
     }
 }
 
@@ -17,7 +24,7 @@ document.addEventListener(
     "DOMContentLoaded",
     () => {
         bootstrap().catch((err) => {
-            console.error("Failed to run bootstrap", err);
+            log.error("Failed to run bootstrap", { error: err });
         });
     },
     false,

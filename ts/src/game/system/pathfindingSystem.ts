@@ -1,10 +1,13 @@
 import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
+import { createLogger } from "../../common/logging/logger.ts";
 import { PathfindingGraphComponentId } from "../component/pathfindingGraphComponent.ts";
 import type { Entity } from "../entity/entity.ts";
 import type {
     EntityChildrenUpdatedEvent,
     EntityTransformEvent,
 } from "../entity/entityEvent.ts";
+
+const log = createLogger("pathfinding");
 
 export const pathfindingSystem: EcsSystem = {
     onInit: init,
@@ -53,9 +56,9 @@ function onEntityRemoved(
         entityEvent.target.getAncestorEcsComponent(PathfindingGraphComponentId);
     if (!pathfindingGraphComponent) {
         // No graph exists, nothing to invalidate
-        console.debug(
-            `[PathfindingSystem] Entity ${entityEvent.target.id} has no graph, ignoring remove`,
-        );
+        log.debug("Entity has no graph, ignoring remove", {
+            entityId: entityEvent.target.id,
+        });
         return;
     }
 

@@ -1,6 +1,9 @@
 import { RootState } from "../state/root/rootState.ts";
 import { InteractionState } from "./interactionState.ts";
 import { StateContext } from "./stateContext.ts";
+import { createLogger } from "../../../common/logging/logger.ts";
+
+const log = createLogger("interaction");
 
 type InteractionStateHistoryEntry = {
     state: InteractionState;
@@ -41,7 +44,7 @@ export class InteractionStateHistory {
      * @param state The new state to push and set as active
      */
     push(state: InteractionState, onPop?: (value: unknown) => void) {
-        console.log("Pushing state: ", state.constructor.name);
+        log.info("Pushing state", { state: state.constructor.name });
         this.history[this.history.length - 1].state.onInactive();
         // Create a pop completer that can we awaited to wait for a result
         // This enables awaiting this function and resume with a value
@@ -63,7 +66,7 @@ export class InteractionStateHistory {
         if (this.history.length == 1) {
             throw Error("Cannot replace root state");
         }
-        console.log("replacing state: ", state.constructor.name);
+        log.info("Replacing state", { state: state.constructor.name });
         // Pop the current state. Both to remove and to get a reference to it
         const replacedState = this.history.pop();
         // Set it to inactive
@@ -82,7 +85,7 @@ export class InteractionStateHistory {
         if (this.history.length == 1) {
             throw Error("Cannot pop root state");
         }
-        console.log("popping state");
+        log.info("Popping state");
         const poppedState = this.history.pop();
         poppedState?.state.onInactive();
         this.history[this.history.length - 1].state.onActive();

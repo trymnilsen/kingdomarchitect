@@ -1,5 +1,8 @@
 import { isPointAdjacentTo, pointEquals } from "../../../common/point.ts";
+import { createLogger } from "../../../common/logging/logger.ts";
 import { BuildingComponentId } from "../../component/buildingComponent.ts";
+
+const log = createLogger("behavior");
 import { heal, HealthComponentId } from "../../component/healthComponent.ts";
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
@@ -28,8 +31,8 @@ export function executeConstructBuildingAction(
     const buildingEntity = root.findEntity(action.entityId);
 
     if (!buildingEntity) {
-        console.warn(
-            `[ConstructBuilding] Building ${action.entityId} not found`,
+        log.warn(
+            `Building ${action.entityId} not found`,
         );
         return {
             kind: "failed",
@@ -44,7 +47,7 @@ export function executeConstructBuildingAction(
         ) &&
         !pointEquals(buildingEntity.worldPosition, entity.worldPosition)
     ) {
-        console.warn(`[ConstructBuilding] Worker not adjacent to building`);
+        log.warn(`Worker not adjacent to building`);
         return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 

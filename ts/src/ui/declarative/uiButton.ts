@@ -1,3 +1,4 @@
+import { createLogger } from "../../common/logging/logger.ts";
 import type { UIBackground } from "../uiBackground.ts";
 import { wrapUiSize, zeroSize, type UISize } from "../uiSize.ts";
 import {
@@ -5,6 +6,8 @@ import {
     type ComponentDescriptor,
     type PlacedChild,
 } from "./ui.ts";
+
+const log = createLogger("ui");
 
 export type UiButtonProps = {
     child?: ComponentDescriptor;
@@ -34,7 +37,7 @@ export const uiButton = createComponent<UiButtonProps>(
                 return true; // Event was handled
             });
             withGesture("tapDown", (_event) => {
-                console.log("down!");
+                log.debug("down!");
                 setPressedState(true);
                 return true;
             });

@@ -41,6 +41,9 @@ import {
     inventoryItemsMap,
     type InventoryItemIds,
 } from "../../../../../data/inventory/inventoryItems.ts";
+import { createLogger } from "../../../../../common/logging/logger.ts";
+
+const log = createLogger("interaction");
 
 // Declarative UI building components
 const bookTextStyle = {
@@ -338,7 +341,7 @@ export class BuildingState extends InteractionState {
     }
 
     private buildSelected() {
-        console.log("Build selected: ", this._selectedBuilding);
+        log.info("Build selected", { building: this._selectedBuilding });
         this.context.stateChanger.replace(
             new BuildConfirmState(
                 this._selectedBuilding,

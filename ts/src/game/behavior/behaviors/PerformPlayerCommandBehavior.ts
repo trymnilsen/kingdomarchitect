@@ -2,6 +2,9 @@ import { Entity } from "../../entity/entity.ts";
 import type { BehaviorActionData } from "../actions/Action.ts";
 import { getBehaviorAgent } from "../../component/BehaviorAgentComponent.ts";
 import type { Behavior } from "./Behavior.ts";
+import { createLogger } from "../../../common/logging/logger.ts";
+
+const log = createLogger("behavior");
 
 /**
  * PerformPlayerCommandBehavior executes player-issued commands with high priority.
@@ -40,8 +43,8 @@ export function createPerformPlayerCommandBehavior(): Behavior {
 
                 case "attack":
                     // TODO: Implement attack action when combat system is available
-                    console.warn(
-                        `[Behavior] Attack command not yet implemented for entity ${entity.id}`,
+                    log.warn(
+                        `Attack command not yet implemented for entity ${entity.id}`,
                     );
                     agent.playerCommand = undefined;
                     entity.invalidateComponent("behavioragent");
@@ -49,8 +52,8 @@ export function createPerformPlayerCommandBehavior(): Behavior {
 
                 case "pickup":
                     // TODO: Implement pickup action when inventory interaction is available
-                    console.warn(
-                        `[Behavior] Pickup command not yet implemented for entity ${entity.id}`,
+                    log.warn(
+                        `Pickup command not yet implemented for entity ${entity.id}`,
                     );
                     agent.playerCommand = undefined;
                     entity.invalidateComponent("behavioragent");
@@ -58,16 +61,16 @@ export function createPerformPlayerCommandBehavior(): Behavior {
 
                 case "interact":
                     // TODO: Implement interact action when interaction system is available
-                    console.warn(
-                        `[Behavior] Interact command not yet implemented for entity ${entity.id}`,
+                    log.warn(
+                        `Interact command not yet implemented for entity ${entity.id}`,
                     );
                     agent.playerCommand = undefined;
                     entity.invalidateComponent("behavioragent");
                     return [];
 
                 default:
-                    console.warn(
-                        `[Behavior] Unknown player command action: ${(command as any).action}`,
+                    log.warn(
+                        `Unknown player command action: ${(command as any).action}`,
                     );
                     agent.playerCommand = undefined;
                     entity.invalidateComponent("behavioragent");

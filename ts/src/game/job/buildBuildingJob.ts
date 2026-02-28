@@ -28,6 +28,9 @@ import {
     calculateBuildingQuality,
     getRarityName,
 } from "../building/buildingQuality.ts";
+import { createLogger } from "../../common/logging/logger.ts";
+
+const log = createLogger("job");
 
 export interface BuildBuildingJob extends Job {
     id: typeof BuildBuildingJobId;
@@ -203,9 +206,10 @@ export function finishConstruction(
     const quality = calculateBuildingQuality(buildingInventory);
     buildingComponent.quality = quality;
 
-    console.log(
-        `[BUILD] ${buildingComponent.building.name} completed with ${getRarityName(quality)} quality`,
-    );
+    log.info("Building completed", {
+        building: buildingComponent.building.name,
+        quality: getRarityName(quality),
+    });
 
     applyFunctionalComponents(buildingEntity, buildingComponent.building);
 

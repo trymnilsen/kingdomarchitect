@@ -7,6 +7,9 @@ import { FireSourceComponentId } from "../../../component/fireSourceComponent.ts
 import { BuildingComponentId } from "../../../component/buildingComponent.ts";
 import { planGoblinBuild } from "../../planners/goblinBuildPlanner.ts";
 import { goblinCampfire } from "../../../../data/building/goblin/goblinCampfire.ts";
+import { createLogger } from "../../../../common/logging/logger.ts";
+
+const log = createLogger("behavior");
 
 /**
  * KeepWarmBehavior - highest priority goblin survival behavior.
@@ -66,8 +69,8 @@ export function createKeepWarmBehavior(): Behavior {
             const nearestFire = findNearestFireSource(campEntity);
 
             if (nearestFire) {
-                console.log(
-                    `[KeepWarm] Entity ${entity.id} going to warm at fire ${nearestFire.id} (warmth: ${warmthValue})`,
+                log.info(
+                    `Entity ${entity.id} going to warm at fire ${nearestFire.id} (warmth: ${warmthValue})`,
                 );
                 // Go warm up at fire
                 return [
@@ -80,8 +83,8 @@ export function createKeepWarmBehavior(): Behavior {
                 ];
             }
 
-            console.log(
-                `[KeepWarm] Entity ${entity.id} no fire found, planning to build campfire (warmth: ${warmthValue})`,
+            log.info(
+                `Entity ${entity.id} no fire found, planning to build campfire (warmth: ${warmthValue})`,
             );
             // No fire - need to build one
             return planGoblinBuild(root, entity, campEntity, goblinCampfire);

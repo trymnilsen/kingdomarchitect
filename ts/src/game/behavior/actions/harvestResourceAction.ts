@@ -1,8 +1,11 @@
 import { isPointAdjacentTo } from "../../../common/point.ts";
+import { createLogger } from "../../../common/logging/logger.ts";
 import {
     getResourceById,
     ResourceHarvestMode,
 } from "../../../data/inventory/items/naturalResource.ts";
+
+const log = createLogger("behavior");
 import { damage, HealthComponentId } from "../../component/healthComponent.ts";
 import {
     addInventoryItem,
@@ -40,8 +43,8 @@ export function executeHarvestResourceAction(
     const resourceEntity = root.findEntity(action.entityId);
 
     if (!resourceEntity) {
-        console.warn(
-            `[HarvestResource] Resource entity ${action.entityId} not found`,
+        log.warn(
+            `Resource entity ${action.entityId} not found`,
         );
         return {
             kind: "failed",
@@ -52,23 +55,23 @@ export function executeHarvestResourceAction(
     if (
         !isPointAdjacentTo(resourceEntity.worldPosition, entity.worldPosition)
     ) {
-        console.warn(`[HarvestResource] Worker not adjacent to resource`);
+        log.warn(`Worker not adjacent to resource`);
         return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 
     const resourceComponent =
         resourceEntity.getEcsComponent(ResourceComponentId);
     if (!resourceComponent) {
-        console.warn(
-            `[HarvestResource] Entity ${action.entityId} has no ResourceComponent`,
+        log.warn(
+            `Entity ${action.entityId} has no ResourceComponent`,
         );
         return { kind: "failed", cause: { type: "unknown" } };
     }
 
     const resource = getResourceById(resourceComponent.resourceId);
     if (!resource) {
-        console.warn(
-            `[HarvestResource] Unknown resource: ${resourceComponent.resourceId}`,
+        log.warn(
+            `Unknown resource: ${resourceComponent.resourceId}`,
         );
         return { kind: "failed", cause: { type: "unknown" } };
     }

@@ -1,3 +1,4 @@
+import { createLogger } from "../common/logging/logger.ts";
 import { characterPartFrames } from "../../generated/characterFrames.ts";
 import { createComponent } from "../ui/declarative/ui.ts";
 import { uiColumn, uiRow } from "../ui/declarative/uiSequence.ts";
@@ -15,6 +16,8 @@ import {
     type BodyPart,
     type PreviewMode,
 } from "./ui/characterBuilderConstants.ts";
+
+const log = createLogger("characterbuilder");
 
 /**
  * Main UI component for the character builder
@@ -41,7 +44,7 @@ export const CharacterBuilderUI = createComponent(({ withState }) => {
     const handleColorSelect = (color: string | undefined) => {
         const newColors = { ...selectedColors };
         newColors[selectedPart] = color;
-        console.log("Color updated:", newColors);
+        log.info("Color updated", { newColors });
         setSelectedColors(newColors);
     };
 

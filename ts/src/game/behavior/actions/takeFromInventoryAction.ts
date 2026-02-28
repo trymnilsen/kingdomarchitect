@@ -10,6 +10,9 @@ import {
     type ActionResult,
     type BehaviorActionData,
 } from "./Action.ts";
+import { createLogger } from "../../../common/logging/logger.ts";
+
+const log = createLogger("behavior");
 
 /**
  * Take specific items from a source entity's inventory and add to worker's inventory.
@@ -23,8 +26,8 @@ export function executeTakeFromInventoryAction(
     const sourceEntity = root.findEntity(action.sourceEntityId);
 
     if (!sourceEntity) {
-        console.warn(
-            `[TakeFromInventory] Source entity ${action.sourceEntityId} not found`,
+        log.warn(
+            `Source entity ${action.sourceEntityId} not found`,
         );
         return {
             kind: "failed",
@@ -33,7 +36,7 @@ export function executeTakeFromInventoryAction(
     }
 
     if (!isPointAdjacentTo(sourceEntity.worldPosition, entity.worldPosition)) {
-        console.warn(`[TakeFromInventory] Worker not adjacent to source`);
+        log.warn(`Worker not adjacent to source`);
         return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 

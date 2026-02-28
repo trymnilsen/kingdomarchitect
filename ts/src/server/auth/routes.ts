@@ -1,5 +1,8 @@
+import { createLogger } from "../../common/logging/logger.ts";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { DatabaseSync } from "node:sqlite";
+
+const log = createLogger("server");
 import type {
     RegistrationResponseJSON,
     AuthenticationResponseJSON,
@@ -149,7 +152,7 @@ export async function handleAuthRoute(
             sendError(res, 400, "Invalid JSON");
             return true;
         }
-        console.error("Auth route error:", err);
+        log.error("Auth route error", { error: err });
         sendError(res, 500, "Internal Server Error");
         return true;
     }

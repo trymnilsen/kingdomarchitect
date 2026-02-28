@@ -1,5 +1,8 @@
 import { isPointAdjacentTo } from "../../../common/point.ts";
+import { createLogger } from "../../../common/logging/logger.ts";
 import { damage, HealthComponentId } from "../../component/healthComponent.ts";
+
+const log = createLogger("behavior");
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import {
@@ -26,8 +29,8 @@ export function executeAttackTargetAction(
     const targetEntity = root.findEntity(action.targetId);
 
     if (!targetEntity) {
-        console.warn(
-            `[AttackTarget] Target entity ${action.targetId} not found`,
+        log.warn(
+            `Target entity ${action.targetId} not found`,
         );
         return {
             kind: "failed",
@@ -36,14 +39,14 @@ export function executeAttackTargetAction(
     }
 
     if (!isPointAdjacentTo(targetEntity.worldPosition, entity.worldPosition)) {
-        console.warn(`[AttackTarget] Worker not adjacent to target`);
+        log.warn(`Worker not adjacent to target`);
         return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 
     const healthComponent = targetEntity.getEcsComponent(HealthComponentId);
     if (!healthComponent) {
-        console.warn(
-            `[AttackTarget] Target ${action.targetId} has no HealthComponent`,
+        log.warn(
+            `Target ${action.targetId} has no HealthComponent`,
         );
         return { kind: "failed", cause: { type: "unknown" } };
     }

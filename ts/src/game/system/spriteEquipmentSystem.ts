@@ -2,6 +2,7 @@ import {
     buildSpriteSheet,
     type SpriteDefinitionCache,
 } from "../../characterbuilder/characterSpriteGenerator.ts";
+import { createLogger } from "../../common/logging/logger.ts";
 import {
     getCharacterColors,
     type CharacterColors,
@@ -25,6 +26,8 @@ import type {
     ComponentsUpdatedEvent,
     EntityChildrenUpdatedEvent,
 } from "../entity/entityEvent.ts";
+
+const log = createLogger("equipment");
 
 export function createSpriteEquipmentSystem(
     createOffscreenCanvas: OffscreenCanvasFactory,
@@ -76,7 +79,7 @@ function updateEquipmentSprite(
         assetLoader,
         spriteCache,
     );
-    console.log("Update equipment sprite: ", colors);
+    log.info("Update equipment sprite", { colors });
     //Update the sprite
     const animation = sprite[0];
     spriteComponent.sprite = animation.sprite;

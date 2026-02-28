@@ -11,6 +11,9 @@ import {
     type ActionResult,
     type BehaviorActionData,
 } from "./Action.ts";
+import { createLogger } from "../../../common/logging/logger.ts";
+
+const log = createLogger("behavior");
 
 /**
  * Check if two points are within 1 tile of each other (8-directional adjacency).
@@ -35,8 +38,8 @@ export function executeWarmByFireAction(
     const warmth = entity.getEcsComponent(WarmthComponentId);
 
     if (!warmth) {
-        console.warn(
-            `[WarmByFireAction] Entity ${entity.id} has no warmth component`,
+        log.warn(
+            `Entity ${entity.id} has no warmth component`,
         );
         return { kind: "failed", cause: { type: "unknown" } };
     }
@@ -45,8 +48,8 @@ export function executeWarmByFireAction(
     const fireEntity = root.findEntity(action.fireEntityId);
 
     if (!fireEntity) {
-        console.warn(
-            `[WarmByFireAction] Fire entity ${action.fireEntityId} not found`,
+        log.warn(
+            `Fire entity ${action.fireEntityId} not found`,
         );
         return {
             kind: "failed",
@@ -57,14 +60,14 @@ export function executeWarmByFireAction(
     const fireSource = fireEntity.getEcsComponent(FireSourceComponentId);
 
     if (!fireSource) {
-        console.warn(
-            `[WarmByFireAction] Entity ${action.fireEntityId} has no FireSourceComponent`,
+        log.warn(
+            `Entity ${action.fireEntityId} has no FireSourceComponent`,
         );
         return { kind: "failed", cause: { type: "unknown" } };
     }
 
     if (!fireSource.isActive) {
-        console.warn(`[WarmByFireAction] Fire is not active`);
+        log.warn(`Fire is not active`);
         return {
             kind: "failed",
             cause: { type: "targetGone", entityId: action.fireEntityId },
@@ -73,7 +76,7 @@ export function executeWarmByFireAction(
 
     // Check adjacency (must be within 1 tile, including diagonals)
     if (!isWithinOneTile(entity.worldPosition, fireEntity.worldPosition)) {
-        console.warn(`[WarmByFireAction] Entity not adjacent to fire`);
+        log.warn(`Entity not adjacent to fire`);
         return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 
@@ -86,7 +89,7 @@ export function executeWarmByFireAction(
     // again on the very next tick and thrash between warming and working.
     // Warming to full gives it a long buffer before the next keepWarm activation.
     if (warmth.warmth >= 90) {
-        console.log(`[WarmByFireAction] Entity ${entity.id} is fully warm`);
+        log.info(`Entity ${entity.id} is fully warm`);
         return ActionComplete;
     }
 

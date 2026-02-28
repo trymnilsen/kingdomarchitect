@@ -1,9 +1,12 @@
 import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
+import { createLogger } from "../../common/logging/logger.ts";
 import type { Entity } from "../entity/entity.ts";
 import { ResourceComponentId } from "../component/resourceComponent.ts";
 import { RegrowComponentId } from "../component/regrowComponent.ts";
 import { getResourceById } from "../../data/inventory/items/naturalResource.ts";
 import { SpriteComponentId } from "../component/spriteComponent.ts";
+
+const log = createLogger("regrow");
 
 export const regrowSystem = {
     onUpdate: update,
@@ -33,16 +36,16 @@ function update(root: Entity, currentTick: number): void {
         }
         const resource = getResourceById(regrowComponent.resourceId);
         if (!resource) {
-            console.error(
-                `Resource not found for regrow: ${regrowComponent.resourceId}`,
-            );
+            log.error("Resource not found for regrow", {
+                resourceId: regrowComponent.resourceId,
+            });
             continue;
         }
 
         if (resource.lifecycle.type !== "Regrow") {
-            console.error(
-                `Resource ${regrowComponent.resourceId} does not have Regrow lifecycle`,
-            );
+            log.error("Resource does not have Regrow lifecycle", {
+                resourceId: regrowComponent.resourceId,
+            });
             continue;
         }
 

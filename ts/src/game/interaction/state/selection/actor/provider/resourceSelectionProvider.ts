@@ -16,6 +16,9 @@ import {
     ResourceHarvestMode,
 } from "../../../../../../data/inventory/items/naturalResource.ts";
 import type { Entity } from "../../../../../entity/entity.ts";
+import { createLogger } from "../../../../../../common/logging/logger.ts";
+
+const log = createLogger("interaction");
 
 export class ResourceSelectionProvider implements ActorSelectionProvider {
     provideButtons(
@@ -30,9 +33,9 @@ export class ResourceSelectionProvider implements ActorSelectionProvider {
                 // Lookup resource definition
                 const resource = getResourceById(resourceComponent.resourceId);
                 if (!resource) {
-                    console.error(
-                        `No resource found for ID: ${resourceComponent.resourceId}`,
-                    );
+                    log.error("No resource found for ID", {
+                        resourceId: resourceComponent.resourceId,
+                    });
                     return emptySelection;
                 }
 

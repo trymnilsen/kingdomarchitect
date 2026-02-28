@@ -1,4 +1,7 @@
+import { createLogger } from "../../common/logging/logger.ts";
 import { bins } from "../../../generated/sprites.ts";
+
+const log = createLogger("asset");
 
 export class AssetLoader {
     private _assets: Record<string, HTMLImageElement | ImageBitmap> = {};
@@ -58,13 +61,13 @@ export class AssetLoader {
     private async loadAsset(name: string, filename: string) {
         const domImage = document.getElementById(`bin-${name}`);
         if (domImage && domImage instanceof HTMLImageElement) {
-            console.log(`Image ${name} existed as dom image waiting for load`);
+            log.info(`Image ${name} existed as dom image waiting for load`);
             if (!domImage.complete) {
                 await this.promisifyExistingImage(domImage);
             }
             this._assets[name] = domImage;
         } else {
-            console.log(`Image ${name} was not found in dom, creating`);
+            log.info(`Image ${name} was not found in dom, creating`);
             const imageElement = await this.fetchAsset(filename);
             this._assets[name] = imageElement;
         }
@@ -88,11 +91,11 @@ export class AssetLoader {
     ): Promise<HTMLImageElement> {
         return new Promise((resolve, reject) => {
             image.addEventListener("load", () => {
-                console.log("Image loaded");
+                log.info("Image loaded");
                 resolve(image);
             });
             image.addEventListener("error", () => {
-                console.log("Error loading image");
+                log.info("Error loading image");
                 reject();
             });
         });

@@ -1,5 +1,8 @@
+import { createLogger } from "../common/logging/logger.ts";
 import { InputAction, InputActionType } from "./inputAction.ts";
 import { Event, EventListener } from "../common/event.ts";
+
+const log = createLogger("input");
 
 export type KeyboardMap = Record<string, InputActionType>;
 
@@ -38,14 +41,13 @@ export function getKeyboardMap(): KeyboardMap {
         try {
             return JSON.parse(userMap) as KeyboardMap;
         } catch (err) {
-            console.error("Failed to parse user keyboard map", err);
+            log.error("Failed to parse user keyboard map", { error: err });
             return DefaultKeyboardMap;
         }
     }
-    console.debug(
-        "No keyboardmap defined, returning default",
-        DefaultKeyboardMap,
-    );
+    log.debug("No keyboardmap defined, returning default", {
+        map: DefaultKeyboardMap,
+    });
     return DefaultKeyboardMap;
 }
 

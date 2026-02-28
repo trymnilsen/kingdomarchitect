@@ -1,4 +1,7 @@
+import { createLogger } from "../../common/logging/logger.ts";
 import { makeNumberId, pointEquals } from "../../common/point.ts";
+
+const log = createLogger("server");
 import {
     setChunk,
     type TileComponent,
@@ -37,7 +40,7 @@ export function applyDiscoveredTiles(
     for (const tile of tiles) {
         const volume = tileComponent.volume.get(tile.volume);
         if (!volume) {
-            console.warn(`No volume found for tile ${tile.x},${tile.y}`);
+            log.warn("No volume found for tile", { x: tile.x, y: tile.y });
             continue;
         }
 

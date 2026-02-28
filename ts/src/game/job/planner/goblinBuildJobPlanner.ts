@@ -16,6 +16,9 @@ import { woodResourceItem } from "../../../data/inventory/items/resources.ts";
 import type { Entity } from "../../entity/entity.ts";
 import type { BuildBuildingJob } from "../buildBuildingJob.ts";
 import { GoblinUnitComponentId } from "../../component/goblinUnitComponent.ts";
+import { createLogger } from "../../../common/logging/logger.ts";
+
+const log = createLogger("job");
 
 /**
  * Goblin-specific build job planner. Unlike the player-worker planner,
@@ -43,24 +46,20 @@ export function planGoblinBuildJob(
 ): BehaviorActionData[] {
     const buildingEntity = root.findEntity(job.entityId);
     if (!buildingEntity) {
-        console.warn(
-            `[GoblinBuildJobPlanner] Building entity ${job.entityId} not found`,
-        );
+        log.warn("Building entity not found", { entityId: job.entityId });
         return [];
     }
 
     const buildingComponent =
         buildingEntity.getEcsComponent(BuildingComponentId);
     if (!buildingComponent) {
-        console.warn(
-            `[GoblinBuildJobPlanner] Building ${job.entityId} has no BuildingComponent`,
-        );
+        log.warn("Building has no BuildingComponent", { entityId: job.entityId });
         return [];
     }
 
     const workerInventory = worker.getEcsComponent(InventoryComponentId);
     if (!workerInventory) {
-        console.warn(`[GoblinBuildJobPlanner] Goblin has no inventory`);
+        log.warn("Goblin has no inventory");
         return [];
     }
 
@@ -264,7 +263,7 @@ function planGatherMaterials(
         }
     }
 
-    console.warn(`[GoblinBuildJobPlanner] No resources found to gather`);
+    log.warn("No resources found to gather");
     return [];
 }
 

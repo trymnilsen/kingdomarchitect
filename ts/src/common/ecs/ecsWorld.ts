@@ -1,3 +1,4 @@
+import { createLogger } from "../logging/logger.ts";
 import { Entity } from "../../game/entity/entity.ts";
 import {
     type EntityEventType,
@@ -15,6 +16,8 @@ import {
     type EcsUpdateFunction,
     type EcsGameMessageFunction,
 } from "./ecsSystem.ts";
+
+const log = createLogger("ecs");
 
 type EcsEntityEventHandlersMap = {
     // Iterate over each event ID 'K' which is a key in EntityEventMapDynamic
@@ -117,7 +120,7 @@ export class EcsWorld {
             try {
                 system(this.root, message);
             } catch (err) {
-                console.error(err);
+                log.error("Game message system error", { error: err });
             }
         }
     }
@@ -139,7 +142,7 @@ export class EcsWorld {
             try {
                 system(this.root, renderTick, renderScope, drawMode);
             } catch (err) {
-                console.error(err);
+                log.error("Render system error", { error: err });
             }
         }
     }
@@ -158,7 +161,7 @@ export class EcsWorld {
                 const listener = events[i];
                 listener(this.root, event);
             } catch (err) {
-                console.error(err);
+                log.error("Entity event handler error", { error: err });
             }
         }
     };

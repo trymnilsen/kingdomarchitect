@@ -1,4 +1,5 @@
 import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
+import { createLogger } from "../../common/logging/logger.ts";
 import type { Entity } from "../entity/entity.ts";
 import {
     GoblinCampComponentId,
@@ -29,6 +30,8 @@ import { createBuildingPlacementValidator } from "../map/query/buildingPlacement
 import { BuildBuildingJob } from "../job/buildBuildingJob.ts";
 import type { Building } from "../../data/building/building.ts";
 import { firstChildWhere } from "../entity/child/first.ts";
+
+const log = createLogger("goblin");
 
 /**
  * GoblinCampSystem handles all camp-level decisions:
@@ -175,9 +178,10 @@ function processSpawning(
     campEntity.addChild(newGoblin);
     newGoblin.worldPosition = spawnPosition;
 
-    console.log(
-        `[GoblinCampSystem] Spawned goblin ${newGoblin.id} at camp ${campEntity.id}`,
-    );
+    log.info("Spawned goblin at camp", {
+        goblinId: newGoblin.id,
+        campId: campEntity.id,
+    });
 }
 
 /**
@@ -197,9 +201,9 @@ function placeScaffoldingAndQueueJob(
     );
 
     if (!buildPosition) {
-        console.warn(
-            `[GoblinCampSystem] No available position for ${building.name} near camp`,
-        );
+        log.warn("No available position for building near camp", {
+            building: building.name,
+        });
         return;
     }
 
@@ -211,9 +215,11 @@ function placeScaffoldingAndQueueJob(
     jobQueue.jobs.push(job);
     campEntity.invalidateComponent(JobQueueComponentId);
 
-    console.log(
-        `[GoblinCampSystem] Placed scaffolded ${building.name} at ${buildPosition.x}, ${buildPosition.y} and queued build job`,
-    );
+    log.info("Placed scaffolded building and queued build job", {
+        building: building.name,
+        x: buildPosition.x,
+        y: buildPosition.y,
+    });
 
     notifyIdleGoblin(campEntity);
 }

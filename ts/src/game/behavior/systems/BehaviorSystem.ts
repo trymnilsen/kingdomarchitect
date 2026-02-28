@@ -7,6 +7,9 @@ import {
 import type { Behavior } from "../behaviors/Behavior.ts";
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import { executeAction } from "../actions/ActionExecutor.ts";
+import { createLogger } from "../../../common/logging/logger.ts";
+
+const log = createLogger("behavior");
 
 /**
  * Resolves which behaviors are applicable for a given entity.
@@ -49,7 +52,7 @@ function updateBehaviorAgent(
     tick: number,
 ): void {
     if (agent.pendingReplan !== undefined) {
-        console.log(`[BehaviorSystem] Entity ${entity.id} replanning`);
+        log.info(`Entity ${entity.id} replanning`);
         replan(entity, agent, resolver);
     }
 
@@ -61,27 +64,27 @@ function updateBehaviorAgent(
         try {
             result = executeAction(action, entity, tick);
         } catch (error) {
-            console.error(
-                `[BehaviorSystem] Action threw exception for entity ${entity.id}:`,
-                error,
+            log.error(
+                `Action threw exception for entity ${entity.id}`,
+                { error },
             );
             result = { kind: "failed", cause: { type: "unknown" } };
         }
 
         if (result.kind === "complete") {
-            console.log(
-                `[BehaviorSystem] Entity ${entity.id} completed action "${action.type}"`,
+            log.info(
+                `Entity ${entity.id} completed action "${action.type}"`,
             );
             agent.actionQueue.shift();
             if (agent.actionQueue.length === 0) {
-                console.log(
-                    `[BehaviorSystem] Entity ${entity.id} actionQueue empty"`,
+                log.info(
+                    `Entity ${entity.id} actionQueue empty`,
                 );
                 agent.pendingReplan = { kind: "replan" };
             }
         } else if (result.kind === "failed") {
-            console.warn(
-                `[BehaviorSystem] Action failed for entity ${entity.id}, cleaning up and replanning`,
+            log.warn(
+                `Action failed for entity ${entity.id}, cleaning up and replanning`,
             );
             unclaimCurrentJob(entity);
             agent.currentBehaviorName = null;
@@ -121,8 +124,8 @@ function unclaimCurrentJob(entity: Entity): void {
         if (job.claimedBy === entity.id) {
             job.claimedBy = undefined;
             queueEntity.invalidateComponent(JobQueueComponentId);
-            console.log(
-                `[BehaviorSystem] Unclaimed job ${job.id} for entity ${entity.id}`,
+            log.info(
+                `Unclaimed job ${job.id} for entity ${entity.id}`,
             );
             break;
         }
@@ -178,9 +181,9 @@ function replan(
     // Sort by utility (highest first)
     behaviorUtilities.sort((a, b) => b.utility - a.utility);
 
-    console.log(
-        `[BehaviorSystem] Entity ${entity.id} sorted behaviors:`,
-        JSON.stringify(behaviorUtilities),
+    log.info(
+        `Entity ${entity.id} sorted behaviors`,
+        { behaviors: JSON.stringify(behaviorUtilities) },
     );
     const bestBehavior = behaviorUtilities[0];
 
@@ -192,8 +195,8 @@ function replan(
     agent.actionQueue = newActions;
     // Clear after expand so the failure context is consumed
     agent.pendingReplan = undefined;
-    console.log(
-        `[BehaviorSystem] Entity ${entity.id} selected behavior ${bestBehavior.behavior.name} with utility ${bestBehavior.utility}`,
-        JSON.stringify(newActions),
+    log.info(
+        `Entity ${entity.id} selected behavior ${bestBehavior.behavior.name} with utility ${bestBehavior.utility}`,
+        { actions: JSON.stringify(newActions) },
     );
 }

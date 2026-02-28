@@ -14,6 +14,9 @@ import {
 } from "../../component/movementStaminaComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { discoverAfterMovement } from "../../job/movementHelper.ts";
+import { createLogger } from "../../../common/logging/logger.ts";
+
+const log = createLogger("behavior");
 
 export type DisplacementMove = {
     entityId: string;
@@ -60,8 +63,8 @@ export function commitDisplacementTransaction(
     currentTick: number,
     requesterEntityId: string,
 ): boolean {
-    console.log(
-        `[DisplacementTx] committing ${transaction.isCycle ? "cycle" : "chain"} of ${transaction.moves.length} moves at tick=${currentTick}`,
+    log.info(
+        `Committing ${transaction.isCycle ? "cycle" : "chain"} of ${transaction.moves.length} moves at tick=${currentTick}`,
     );
 
     // Resolve entities and validate in one pass. If anything is stale or missing
@@ -71,8 +74,8 @@ export function commitDisplacementTransaction(
         return false;
     }
 
-    console.log(
-        `[DisplacementTx] resolved ${resolved.length} entities, applying as ${transaction.isCycle ? "cycle" : "chain"}`,
+    log.info(
+        `Resolved ${resolved.length} entities, applying as ${transaction.isCycle ? "cycle" : "chain"}`,
     );
 
     if (transaction.isCycle) {
@@ -98,8 +101,8 @@ function resolveTransaction(
     for (const move of transaction.moves) {
         const entity = root.findEntity(move.entityId);
         if (!entity) {
-            console.warn(
-                `[DisplacementTx] entity ${move.entityId} not found, aborting`,
+            log.warn(
+                `Entity ${move.entityId} not found, aborting`,
             );
             return null;
         }
@@ -107,15 +110,15 @@ function resolveTransaction(
             entity.worldPosition.x !== move.from.x ||
             entity.worldPosition.y !== move.from.y
         ) {
-            console.warn(
-                `[DisplacementTx] entity ${move.entityId} stale: expected (${move.from.x},${move.from.y}) but at (${entity.worldPosition.x},${entity.worldPosition.y}), aborting`,
+            log.warn(
+                `Entity ${move.entityId} stale: expected (${move.from.x},${move.from.y}) but at (${entity.worldPosition.x},${entity.worldPosition.y}), aborting`,
             );
             return null;
         }
         const stamina = entity.getEcsComponent(MovementStaminaComponentId);
         if (stamina && hasMovedThisTick(stamina, currentTick)) {
-            console.warn(
-                `[DisplacementTx] entity ${move.entityId} already moved at tick=${currentTick}, aborting`,
+            log.warn(
+                `Entity ${move.entityId} already moved at tick=${currentTick}, aborting`,
             );
             return null;
         }
@@ -191,8 +194,8 @@ function applyEntityMove(
         entity.invalidateComponent(MovementStaminaComponentId);
     }
 
-    console.log(
-        `[DisplacementTx] moved ${entity.id} from (${from.x},${from.y}) to (${to.x},${to.y})${triggerReplan ? " (replan scheduled)" : ""}`,
+    log.info(
+        `Moved ${entity.id} from (${from.x},${from.y}) to (${to.x},${to.y})${triggerReplan ? " (replan scheduled)" : ""}`,
     );
 
     if (triggerReplan) {

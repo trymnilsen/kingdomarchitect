@@ -1,4 +1,5 @@
 import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
+import { createLogger } from "../../common/logging/logger.ts";
 import type { Entity } from "../entity/entity.ts";
 import {
     ActiveEffectsComponentId,
@@ -9,6 +10,8 @@ import { heal } from "../component/healthComponent.ts";
 import { healEffectId } from "../../data/effect/health/healEffect.ts";
 import type { HealEffectData } from "../../data/effect/health/healEffect.ts";
 import type { Effect } from "../../data/effect/effect.ts";
+
+const log = createLogger("effect");
 
 export const effectSystem: EcsSystem = {
     onUpdate: update,
@@ -91,6 +94,6 @@ function applyEffect(entity: Entity, effect: Effect): void {
         }
         // Add more effect types here as needed
         default:
-            console.warn(`Unknown effect type: ${effect.id}`);
+            log.warn("Unknown effect type", { effectId: effect.id });
     }
 }

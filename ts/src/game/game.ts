@@ -1,5 +1,8 @@
+import { createLogger } from "../common/logging/logger.ts";
 import { invert, multiplyPoint, Point } from "../common/point.ts";
 import { AssetLoader } from "../asset/loader/assetLoader.ts";
+
+const log = createLogger("game");
 
 import { GameTime } from "../common/time.ts";
 import { EcsWorld } from "../common/ecs/ecsWorld.ts";
@@ -133,7 +136,7 @@ export class Game {
     }
 
     async bootstrap(): Promise<void> {
-        console.log("bootstrap");
+        log.info("bootstrap");
         this.assetLoader.load();
         this.ecsWorld.runInit();
         //Set the camera position
@@ -141,7 +144,7 @@ export class Game {
         this.renderer.camera.position = newPosition;
 
         await this.assetLoader.loaderPromise;
-        console.log("Finished loading");
+        log.info("Finished loading");
         this.setupInputListeners();
         setInterval(this.onTick, 200);
         this.render(DrawMode.Gesture);

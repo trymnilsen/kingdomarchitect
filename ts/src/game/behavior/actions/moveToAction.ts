@@ -1,5 +1,8 @@
 import type { Point } from "../../../common/point.ts";
 import { isPointAdjacentTo, pointEquals } from "../../../common/point.ts";
+import { createLogger } from "../../../common/logging/logger.ts";
+
+const log = createLogger("behavior");
 import {
     BehaviorAgentComponentId,
     getBehaviorAgent,
@@ -165,8 +168,8 @@ export function executeMoveToAction(
     tick: number,
 ): ActionResult {
     if (hasArrived(entity.worldPosition, action.target, action.stopAdjacent)) {
-        console.log(
-            `[MoveTo] ${entity.id} arrived at (${entity.worldPosition.x},${entity.worldPosition.y})`,
+        log.info(
+            `${entity.id} arrived at (${entity.worldPosition.x},${entity.worldPosition.y})`,
         );
         return ActionComplete;
     }
@@ -174,7 +177,7 @@ export function executeMoveToAction(
     const root = entity.getRootEntity();
     const pathfindingGraph = getPathfindingGraphForEntity(root, entity);
     if (!pathfindingGraph) {
-        console.warn(`[MoveTo] ${entity.id} no pathfinding graph, failing`);
+        log.warn(`${entity.id} no pathfinding graph, failing`);
         return {
             kind: "failed",
             cause: { type: "pathBlocked", target: action.target },
@@ -199,13 +202,13 @@ export function executeMoveToAction(
                     action.stopAdjacent,
                 )
             ) {
-                console.log(
-                    `[MoveTo] ${entity.id} arrived at (${entity.worldPosition.x},${entity.worldPosition.y}) via stopAdjacent fallback`,
+                log.info(
+                    `${entity.id} arrived at (${entity.worldPosition.x},${entity.worldPosition.y}) via stopAdjacent fallback`,
                 );
                 return ActionComplete;
             }
-            console.log(
-                `[MoveTo] ${entity.id} no path to (${action.target.x},${action.target.y}), failing`,
+            log.info(
+                `${entity.id} no path to (${action.target.x},${action.target.y}), failing`,
             );
             return {
                 kind: "failed",
@@ -230,8 +233,8 @@ export function executeMoveToAction(
         if (
             hasArrived(entity.worldPosition, action.target, action.stopAdjacent)
         ) {
-            console.log(
-                `[MoveTo] ${entity.id} arrived at (${entity.worldPosition.x},${entity.worldPosition.y})`,
+            log.info(
+                `${entity.id} arrived at (${entity.worldPosition.x},${entity.worldPosition.y})`,
             );
             return ActionComplete;
         }
@@ -252,13 +255,13 @@ export function executeMoveToAction(
                     action.stopAdjacent,
                 )
             ) {
-                console.log(
-                    `[MoveTo] ${entity.id} arrived at (${entity.worldPosition.x},${entity.worldPosition.y}) via stopAdjacent fallback`,
+                log.info(
+                    `${entity.id} arrived at (${entity.worldPosition.x},${entity.worldPosition.y}) via stopAdjacent fallback`,
                 );
                 return ActionComplete;
             }
-            console.log(
-                `[MoveTo] ${entity.id} path blocked by structure at (${nextPoint.x},${nextPoint.y})`,
+            log.info(
+                `${entity.id} path blocked by structure at (${nextPoint.x},${nextPoint.y})`,
             );
             action.cachedPath = undefined;
             return {
@@ -275,8 +278,8 @@ export function executeMoveToAction(
             const agent = getBehaviorAgent(entity);
             const priority = agent?.currentBehaviorUtility ?? 0;
             const blockerIds = displaceable.map((o) => o.id).join(", ");
-            console.log(
-                `[MoveTo] ${entity.id} next tile (${nextPoint.x},${nextPoint.y}) blocked by [${blockerIds}], priority=${priority}, attempting displacement`,
+            log.info(
+                `${entity.id} next tile (${nextPoint.x},${nextPoint.y}) blocked by [${blockerIds}], priority=${priority}, attempting displacement`,
             );
 
             const result = negotiateDisplacement(
@@ -290,8 +293,8 @@ export function executeMoveToAction(
             if (result.kind === "refused" || result.kind === "noChain") {
                 // This tile is proven impassable for this tick. Clear the stale cached
                 // path and replan immediately with this tile blocked.
-                console.log(
-                    `[MoveTo] ${entity.id} displacement ${result.kind} at (${nextPoint.x},${nextPoint.y}), replanning`,
+                log.info(
+                    `${entity.id} displacement ${result.kind} at (${nextPoint.x},${nextPoint.y}), replanning`,
                 );
                 locallyBlocked.add(`${nextPoint.x},${nextPoint.y}`);
                 action.cachedPath = undefined;
@@ -307,8 +310,8 @@ export function executeMoveToAction(
                 if (!newPath) {
                     // No path around the blocked tiles. Wait — the blockers may move next tick.
                     // Leave cachedPath undefined so we plan fresh on the next tick.
-                    console.log(
-                        `[MoveTo] ${entity.id} no path around blocked tiles, waiting`,
+                    log.info(
+                        `${entity.id} no path around blocked tiles, waiting`,
                     );
                     return ActionRunning;
                 }
@@ -332,8 +335,8 @@ export function executeMoveToAction(
                         action.stopAdjacent,
                     )
                 ) {
-                    console.log(
-                        `[MoveTo] ${entity.id} displacement cycle committed, arrived at (${entity.worldPosition.x},${entity.worldPosition.y})`,
+                    log.info(
+                        `${entity.id} displacement cycle committed, arrived at (${entity.worldPosition.x},${entity.worldPosition.y})`,
                     );
                     return ActionComplete;
                 }
@@ -346,8 +349,8 @@ export function executeMoveToAction(
                         tick,
                     );
                     action.cachedPath = action.cachedPath.slice(1);
-                    console.log(
-                        `[MoveTo] ${entity.id} displaced chain, stepped to (${entity.worldPosition.x},${entity.worldPosition.y})`,
+                    log.info(
+                        `${entity.id} displaced chain, stepped to (${entity.worldPosition.x},${entity.worldPosition.y})`,
                     );
                     if (
                         hasArrived(
@@ -364,8 +367,8 @@ export function executeMoveToAction(
 
             // Stale transaction: world changed between negotiation and commit.
             // Keep the cached path — this is a timing issue, not proof of impassability.
-            console.log(
-                `[MoveTo] ${entity.id} displacement transaction stale, waiting`,
+            log.info(
+                `${entity.id} displacement transaction stale, waiting`,
             );
             return ActionRunning;
         }
@@ -373,8 +376,8 @@ export function executeMoveToAction(
         // Tile is free — step into it.
         applyRequesterStep(entity, entity.worldPosition, nextPoint, tick);
         action.cachedPath = action.cachedPath.slice(1);
-        console.log(
-            `[MoveTo] ${entity.id} stepped to (${entity.worldPosition.x},${entity.worldPosition.y})`,
+        log.info(
+            `${entity.id} stepped to (${entity.worldPosition.x},${entity.worldPosition.y})`,
         );
         if (
             hasArrived(entity.worldPosition, action.target, action.stopAdjacent)
@@ -385,7 +388,7 @@ export function executeMoveToAction(
     }
 
     // Safety cap: exceeded max replan attempts within one tick.
-    console.warn(`[MoveTo] ${entity.id} exceeded max replan attempts, waiting`);
+    log.warn(`${entity.id} exceeded max replan attempts, waiting`);
     action.cachedPath = undefined;
     return ActionRunning;
 }

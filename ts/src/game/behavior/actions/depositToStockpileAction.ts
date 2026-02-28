@@ -10,6 +10,9 @@ import {
     type ActionResult,
     type BehaviorActionData,
 } from "./Action.ts";
+import { createLogger } from "../../../common/logging/logger.ts";
+
+const log = createLogger("behavior");
 
 /**
  * Deposit non-equipped inventory items to a stockpile.
@@ -22,8 +25,8 @@ export function executeDepositToStockpileAction(
     const stockpile = root.findEntity(action.stockpileId);
 
     if (!stockpile) {
-        console.warn(
-            `[DepositAction] Stockpile ${action.stockpileId} not found`,
+        log.warn(
+            `Stockpile ${action.stockpileId} not found`,
         );
         return {
             kind: "failed",
@@ -36,8 +39,8 @@ export function executeDepositToStockpileAction(
     const stockpileInventory = stockpile.getEcsComponent(InventoryComponentId);
 
     if (!stockpileMarker || !stockpileInventory) {
-        console.warn(
-            `[DepositAction] Entity ${action.stockpileId} is not a valid stockpile`,
+        log.warn(
+            `Entity ${action.stockpileId} is not a valid stockpile`,
         );
         return { kind: "failed", cause: { type: "unknown" } };
     }
@@ -80,8 +83,8 @@ export function executeDepositToStockpileAction(
     if (itemsToRemove.length > 0) {
         entity.invalidateComponent(InventoryComponentId);
         stockpile.invalidateComponent(InventoryComponentId);
-        console.log(
-            `[DepositAction] Entity ${entity.id} deposited ${itemsToRemove.length} item stacks to stockpile`,
+        log.info(
+            `Entity ${entity.id} deposited ${itemsToRemove.length} item stacks to stockpile`,
         );
     }
 

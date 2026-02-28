@@ -1,6 +1,9 @@
 import type { Entity } from "../../entity/entity.ts";
 import type { BehaviorActionData, ItemTransfer } from "../actions/Action.ts";
 import type { Building } from "../../../data/building/building.ts";
+import { createLogger } from "../../../common/logging/logger.ts";
+
+const log = createLogger("behavior");
 import {
     InventoryComponentId,
     getInventoryItem,
@@ -87,8 +90,8 @@ function planPlaceBuildingSite(
     );
 
     if (!buildPosition) {
-        console.warn(
-            `[GoblinBuildPlanner] No available position for building near camp`,
+        log.warn(
+            `No available position for building near camp`,
         );
         return [];
     }
@@ -98,8 +101,8 @@ function planPlaceBuildingSite(
     campEntity.addChild(buildingEntity);
     buildingEntity.worldPosition = buildPosition;
 
-    console.log(
-        `[GoblinBuildPlanner] Placed scaffolded ${building.name} at ${buildPosition.x}, ${buildPosition.y}`,
+    log.info(
+        `Placed scaffolded ${building.name} at ${buildPosition.x}, ${buildPosition.y}`,
     );
 
     // Now plan to construct it
@@ -124,7 +127,7 @@ function planConstructExistingBuilding(
     const goblinInventory = goblin.getEcsComponent(InventoryComponentId);
 
     if (!goblinInventory) {
-        console.warn(`[GoblinBuildPlanner] Goblin has no inventory`);
+        log.warn(`Goblin has no inventory`);
         return [];
     }
 
@@ -136,8 +139,8 @@ function planConstructExistingBuilding(
 
     // State 1: Building ready to construct (all materials deposited)
     if (Object.keys(remainingMaterials).length === 0) {
-        console.log(
-            `[GoblinBuildPlanner] Goblin ${goblin.id} state=construct building ${buildingEntity.id}`,
+        log.info(
+            `Goblin ${goblin.id} state=construct building ${buildingEntity.id}`,
         );
         return [
             {
@@ -159,9 +162,9 @@ function planConstructExistingBuilding(
             materialsGoblinHas,
         ).map(([itemId, amount]) => ({ itemId, amount }));
 
-        console.log(
-            `[GoblinBuildPlanner] Goblin ${goblin.id} state=deposit materials to building ${buildingEntity.id}:`,
-            materialsGoblinHas,
+        log.info(
+            `Goblin ${goblin.id} state=deposit materials to building ${buildingEntity.id}`,
+            { materials: materialsGoblinHas },
         );
         return [
             {
@@ -188,9 +191,9 @@ function planConstructExistingBuilding(
             remainingMaterials,
         );
         if (itemsToTake.length > 0) {
-            console.log(
-                `[GoblinBuildPlanner] Goblin ${goblin.id} state=fetch from stockpile ${stockpileWithMaterials.id}:`,
-                itemsToTake,
+            log.info(
+                `Goblin ${goblin.id} state=fetch from stockpile ${stockpileWithMaterials.id}`,
+                { items: itemsToTake },
             );
             return [
                 {
@@ -208,9 +211,9 @@ function planConstructExistingBuilding(
     }
 
     // State 4: Gather materials from environment
-    console.log(
-        `[GoblinBuildPlanner] Goblin ${goblin.id} state=gather materials from environment:`,
-        remainingMaterials,
+    log.info(
+        `Goblin ${goblin.id} state=gather materials from environment`,
+        { materials: remainingMaterials },
     );
     return planGatherMaterials(root, goblin, remainingMaterials);
 }
@@ -317,7 +320,7 @@ function planGatherMaterials(
         }
     }
 
-    console.warn(`[GoblinBuildPlanner] No resources found to gather`);
+    log.warn(`No resources found to gather`);
     return [];
 }
 

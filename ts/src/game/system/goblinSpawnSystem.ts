@@ -1,4 +1,5 @@
 import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
+import { createLogger } from "../../common/logging/logger.ts";
 import type { Entity } from "../entity/entity.ts";
 import {
     GoblinCampComponentId,
@@ -14,6 +15,8 @@ import { BuildingComponentId } from "../component/buildingComponent.ts";
 import { goblinHut } from "../../data/building/goblin/goblinHut.ts";
 import { goblinPrefab } from "../prefab/goblinPrefab.ts";
 import { findClosestAvailablePosition } from "../map/query/closestPositionQuery.ts";
+
+const log = createLogger("goblin");
 
 /**
  * System that spawns goblins when camp has available housing.
@@ -85,9 +88,10 @@ function processGoblinCamp(
     campEntity.addChild(newGoblin);
     newGoblin.worldPosition = spawnPosition;
 
-    console.log(
-        `[GoblinSpawnSystem] Spawned goblin ${newGoblin.id} at camp ${campEntity.id}`,
-    );
+    log.info("Spawned goblin at camp", {
+        goblinId: newGoblin.id,
+        campId: campEntity.id,
+    });
 }
 
 function checkCampHasActiveFire(campEntity: Entity): boolean {

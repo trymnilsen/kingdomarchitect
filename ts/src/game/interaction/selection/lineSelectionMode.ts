@@ -1,5 +1,8 @@
 import { Point, pointEquals } from "../../../common/point.ts";
 import { SelectionMode, SelectionModeDescription } from "./selectionMode.ts";
+import { createLogger } from "../../../common/logging/logger.ts";
+
+const log = createLogger("interaction");
 
 export class LineSelectionMode implements SelectionMode {
     private from: Point;
@@ -28,7 +31,7 @@ export class LineSelectionMode implements SelectionMode {
         const xRange = point.x - this.from.x;
         const yRange = point.y - this.from.y;
         const positions: Point[] = [];
-        console.log("SetSelection", this.from, point, xRange, yRange);
+        log.info("SetSelection", { from: this.from, point, xRange, yRange });
         // 1 is subtracted from the range to avoid pushing a duplicate
         // position where the horizontal line (made here) and the
         // vertical lines meet

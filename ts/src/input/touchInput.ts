@@ -1,4 +1,7 @@
+import { createLogger } from "../common/logging/logger.ts";
 import { distance, Point, subtractPoint } from "../common/point.ts";
+
+const log = createLogger("input");
 
 export type OnPanEvent = {
     movement: Point;
@@ -177,7 +180,7 @@ export class TouchInput {
                 });
             }
         } catch (err) {
-            console.error("Failed ending tap", err);
+            log.error("Failed ending tap", { error: err });
         } finally {
             this.tapHandled = false;
             this.isDragging = false;

@@ -1,4 +1,7 @@
+import { createLogger } from "./logging/logger.ts";
 import { ConstructorFunction, getConstructorName } from "./constructor.ts";
+
+const log = createLogger("event");
 
 /**
  * An event allows modeling updates to data.
@@ -31,9 +34,9 @@ export class Event<T = object> implements EventListener<T> {
             try {
                 listener(data);
             } catch (err) {
-                console.error(
+                log.error(
                     `Failed to run event listener #${idx} ${listener.name}`,
-                    err,
+                    { error: err },
                 );
             }
         });
@@ -210,7 +213,7 @@ export class TypedEvent<TBaseEvent extends object> {
                 try {
                     subscription.handler(data);
                 } catch (err) {
-                    console.error("Failed running event subscriber", err);
+                    log.error("Failed running event subscriber", { error: err });
                 }
             }
         }

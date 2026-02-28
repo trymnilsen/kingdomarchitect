@@ -1,3 +1,7 @@
+import { createLogger } from "../../common/logging/logger.ts";
+
+const log = createLogger("map");
+
 /**
  * Defines the structure for an RGB color.
  */
@@ -104,7 +108,7 @@ export function getTileColorVariation(
 ): string {
     const rgb = hexToRgb(baseHex);
     if (!rgb) {
-        console.warn(`Invalid baseHex color provided: ${baseHex}`);
+        log.warn("Invalid baseHex color provided", { baseHex });
         return baseHex; // Return the original invalid string
     }
 

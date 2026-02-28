@@ -313,6 +313,76 @@ describe("tail", () => {
     });
 });
 
+describe("showNext", () => {
+    it("prints the next n entries then stops", () => {
+        const log = createRootLogger();
+        log.mute();
+        log.showNext(3);
+
+        const { calls } = withConsoleSpy(() => {
+            log.info("t", "1");
+            log.info("t", "2");
+            log.info("t", "3");
+            log.info("t", "4"); // should not be printed
+            log.info("t", "5"); // should not be printed
+        });
+        const logCalls = calls.filter((c) => c.method === "log");
+        assert.strictEqual(logCalls.length, 3);
+    });
+
+    it("only counts entries that match the filter toward n", () => {
+        const log = createRootLogger();
+        log.mute();
+        log.showNext(2, { tag: "behavior" });
+
+        const { calls } = withConsoleSpy(() => {
+            log.info("hunger", "ignored");
+            log.info("behavior", "match 1");
+            log.info("hunger", "ignored");
+            log.info("behavior", "match 2");
+            log.info("behavior", "should not appear"); // showNext expired
+        });
+        const logCalls = calls.filter((c) => c.method === "log");
+        assert.strictEqual(logCalls.length, 2);
+        assert.ok((logCalls[0].args[0] as string).includes("match 1"));
+        assert.ok((logCalls[1].args[0] as string).includes("match 2"));
+    });
+
+    it("entries not printed by showNext are still in the buffer", () => {
+        const log = createRootLogger();
+        log.mute();
+        log.showNext(1);
+
+        withConsoleSpy(() => {
+            log.info("t", "printed");
+            log.info("t", "buffered but not printed");
+        });
+
+        const { calls } = withConsoleSpy(() => {
+            log.replay();
+        });
+        const logCalls = calls.filter((c) => c.method === "log");
+        assert.strictEqual(logCalls.length, 2);
+    });
+
+    it("suspends the regular live filter while active, then restores it", () => {
+        const log = createRootLogger();
+        log.show("active");
+        log.showNext(1, { tag: "special" });
+
+        const { calls } = withConsoleSpy(() => {
+            log.info("active", "suppressed while showNext is live"); // showNext is the filter now
+            log.info("special", "shown by showNext"); // showNext fires (count → 0)
+            log.info("other", "blocked by regular filter"); // regular filter resumes
+            log.info("active", "passes regular filter again"); // regular filter passes
+        });
+        const logCalls = calls.filter((c) => c.method === "log");
+        assert.strictEqual(logCalls.length, 2);
+        assert.ok((logCalls[0].args[0] as string).includes("shown by showNext"));
+        assert.ok((logCalls[1].args[0] as string).includes("passes regular filter again"));
+    });
+});
+
 describe("createLogger (tagged)", () => {
     it("writes entries with the pre-bound tag, no tag arg needed", () => {
         createRootLogger();

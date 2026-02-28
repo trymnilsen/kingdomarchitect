@@ -14,6 +14,11 @@ import { validateSession, parseCookies } from "./auth/session.ts";
 import { createRateLimiter } from "./http/rateLimit.ts";
 import { serveStaticFile } from "./http/staticFiles.ts";
 import type { GameMessage } from "./message/gameMessage.ts";
+import { createRootLogger, createLogger } from "../common/logging/logger.ts";
+
+createRootLogger();
+
+const log = createLogger("server");
 
 export type MultiplayerServerConfig = {
     port: number;
@@ -72,10 +77,10 @@ export function startMultiplayerServer(
         .init()
         .then(() => {
             gameServerReady = true;
-            console.log("Game server initialized");
+            log.info("Game server initialized");
         })
         .catch((err) => {
-            console.error("Failed to initialize game server:", err);
+            log.error("Failed to initialize game server", { error: err });
             process.exit(1);
         });
 
@@ -104,7 +109,7 @@ export function startMultiplayerServer(
             res.writeHead(404, { "Content-Type": "text/plain" });
             res.end("Not Found");
         } catch (err) {
-            console.error("HTTP request error:", err);
+            log.error("HTTP request error", { error: err });
             res.writeHead(500, { "Content-Type": "text/plain" });
             res.end("Internal Server Error");
         }
@@ -159,7 +164,7 @@ export function startMultiplayerServer(
 
         wss.handleUpgrade(req, socket, head, (ws: WebSocket) => {
             connectionManager.addConnection(authenticatedPlayerId, ws);
-            console.log(`Player connected: ${authenticatedPlayerId}`);
+            log.info("Player connected", { playerId: authenticatedPlayerId });
 
             gameServer.handlePlayerConnected(authenticatedPlayerId);
 
@@ -168,23 +173,25 @@ export function startMultiplayerServer(
                     const message = JSON.parse(data.toString()) as GameMessage;
                     gameServer.onMessage(message, authenticatedPlayerId);
                 } catch (err) {
-                    console.error(
-                        `Invalid message from ${authenticatedPlayerId}:`,
-                        err,
-                    );
+                    log.error("Invalid message from player", {
+                        playerId: authenticatedPlayerId,
+                        error: err,
+                    });
                 }
             });
 
             ws.on("close", () => {
-                console.log(`Player disconnected: ${authenticatedPlayerId}`);
+                log.info("Player disconnected", {
+                    playerId: authenticatedPlayerId,
+                });
             });
         });
     });
 
     server.listen(config.port, "0.0.0.0", () => {
-        console.log(`Multiplayer server running on port ${config.port}`);
+        log.info("Multiplayer server running", { port: config.port });
         if (config.devAuth) {
-            console.log(
+            log.info(
                 "DEV_AUTH enabled — connect with ?player=name to skip authentication",
             );
         }
@@ -192,12 +199,12 @@ export function startMultiplayerServer(
 
     // Graceful shutdown
     const shutdown = async () => {
-        console.log("Shutting down...");
+        log.info("Shutting down...");
         try {
             await gameServer.saveGame();
-            console.log("Game saved");
+            log.info("Game saved");
         } catch (err) {
-            console.error("Failed to save game during shutdown:", err);
+            log.error("Failed to save game during shutdown", { error: err });
         }
 
         // Close all WebSocket connections
@@ -207,7 +214,7 @@ export function startMultiplayerServer(
 
         server.close(() => {
             db.close();
-            console.log("Server shut down");
+            log.info("Server shut down");
             process.exit(0);
         });
     };

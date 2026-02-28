@@ -1,7 +1,10 @@
 import type { Point } from "../../../common/point.ts";
 import type { TileChunk } from "../chunk.ts";
 import { generateId } from "../../../common/idGenerator.ts";
+import { createLogger } from "../../../common/logging/logger.ts";
 import { Entity } from "../../entity/entity.ts";
+
+const log = createLogger("map");
 
 export function placeSettlement(chunk: TileChunk, _chunkEntity: Entity) {
     if (!chunk.volume || chunk.volume.id === "volume1") {
@@ -10,10 +13,12 @@ export function placeSettlement(chunk: TileChunk, _chunkEntity: Entity) {
     //Decide if no settlement, orcs or humans
     const procValue = Math.random();
     if (procValue < 0.5) {
-        console.log(`placeSettlement - Proc ${procValue} less than 0.5`);
+        log.info("placeSettlement - Proc less than 0.5, skipping", {
+            procValue,
+        });
         return;
     }
-    console.log(`placeSettlement - Proc ${procValue} > 0.5, adding settlement`);
+    log.info("placeSettlement - Adding settlement", { procValue });
 
     /*
     const chunkMapComponent = chunkEntity.getAncestorComponent(

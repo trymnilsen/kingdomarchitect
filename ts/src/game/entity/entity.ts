@@ -17,6 +17,9 @@ import type {
 import { visitChildren } from "./child/visit.ts";
 import { entityWithId } from "./child/withId.ts";
 import type { EntityEvent } from "./entityEvent.ts";
+import { createLogger } from "../../common/logging/logger.ts";
+
+const log = createLogger("entity");
 
 /**
  * Represents a node in the entity tree used to create a scenegraph for the
@@ -501,7 +504,7 @@ export class Entity {
             try {
                 this._entityEvents(event);
             } catch (e) {
-                console.error(`Failed to bubble event: ${event.id}`, e, event);
+                log.error("Failed to bubble event", { eventId: event.id, error: e, event });
             }
         }
         this._parent?.bubbleEvent(event);

@@ -4,8 +4,11 @@ import {
     pointEquals,
 } from "../../../common/point.ts";
 import { BinaryHeap } from "../../../common/structure/binaryHeap.ts";
+import { createLogger } from "../../../common/logging/logger.ts";
 import { type Graph, GraphNode } from "./graph/graph.ts";
 import { manhattanDistance } from "./pathHeuristics.ts";
+
+const log = createLogger("pathfinding");
 
 export type SearchOptions = {
     weightModifier?: (graphNode: GraphNode) => number;
@@ -25,7 +28,7 @@ export function aStarSearch(
     const start = graph.nodeAt(from.x, from.y);
     const end = graph.nodeAt(to.x, to.y);
     if (!start) {
-        console.warn("From point not in graph", from);
+        log.warn("From point not in graph", { from });
         return {
             graph: [],
             path: [],
@@ -33,7 +36,7 @@ export function aStarSearch(
     }
 
     if (!end) {
-        console.warn("To point not in graph", to);
+        log.warn("To point not in graph", { to });
         return {
             graph: [],
             path: [],

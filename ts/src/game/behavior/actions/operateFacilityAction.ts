@@ -1,5 +1,8 @@
 import { isPointAdjacentTo } from "../../../common/point.ts";
+import { createLogger } from "../../../common/logging/logger.ts";
 import { getProductionDefinition } from "../../../data/production/productionDefinition.ts";
+
+const log = createLogger("behavior");
 import { getResourceById } from "../../../data/inventory/items/naturalResource.ts";
 import { ChunkMapComponentId } from "../../component/chunkMapComponent.ts";
 import {
@@ -37,8 +40,8 @@ export function executeOperateFacilityAction(
     const buildingEntity = root.findEntity(action.buildingId);
 
     if (!buildingEntity) {
-        console.warn(
-            `[OperateFacility] Building ${action.buildingId} not found`,
+        log.warn(
+            `Building ${action.buildingId} not found`,
         );
         return {
             kind: "failed",
@@ -49,7 +52,7 @@ export function executeOperateFacilityAction(
     if (
         !isPointAdjacentTo(buildingEntity.worldPosition, entity.worldPosition)
     ) {
-        console.warn(`[OperateFacility] Worker not adjacent to building`);
+        log.warn(`Worker not adjacent to building`);
         return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 
@@ -57,16 +60,16 @@ export function executeOperateFacilityAction(
         ProductionComponentId,
     );
     if (!productionComp) {
-        console.warn(
-            `[OperateFacility] Building ${action.buildingId} has no ProductionComponent`,
+        log.warn(
+            `Building ${action.buildingId} has no ProductionComponent`,
         );
         return { kind: "failed", cause: { type: "unknown" } };
     }
 
     const definition = getProductionDefinition(productionComp.productionId);
     if (!definition) {
-        console.warn(
-            `[OperateFacility] Unknown production: ${productionComp.productionId}`,
+        log.warn(
+            `Unknown production: ${productionComp.productionId}`,
         );
         return { kind: "failed", cause: { type: "unknown" } };
     }

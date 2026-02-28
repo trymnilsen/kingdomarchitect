@@ -1,4 +1,5 @@
 import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
+import { createLogger } from "../../common/logging/logger.ts";
 import {
     generateDiamondPattern,
     offsetPatternWithPoint,
@@ -29,6 +30,8 @@ import { generateChunk } from "../map/chunkGenerator.ts";
 import { addInitialPlayerChunk } from "../map/player.ts";
 import type { Volume } from "../map/volume.ts";
 
+const log = createLogger("worldgen");
+
 export const worldGenerationSystem: EcsSystem = {
     onInit,
 };
@@ -46,7 +49,7 @@ function onInit(root: Entity) {
         root.setEcsComponent(createWorldDiscoveryComponent());
         root.setEcsComponent(tileComponent);
 
-        console.log("[WorldGeneration] Generating new world");
+        log.info("Generating new world");
         const start = addInitialPlayerChunk(root);
         const effectEmitter = root.requireEcsComponent(
             EffectEmitterComponentId,
@@ -57,9 +60,7 @@ function onInit(root: Entity) {
         );
         setDiscoveryForPlayer(root, effectEmitter, "player", pattern);
     } else {
-        console.log(
-            "[WorldGeneration] World already exists, skipping generation",
-        );
+        log.info("World already exists, skipping generation");
     }
 }
 

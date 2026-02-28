@@ -1,3 +1,4 @@
+import { createLogger } from "../common/logging/logger.ts";
 import {
     Bounds,
     boundsCenter,
@@ -25,6 +26,8 @@ import {
 import { FocusState } from "./focus/focusState.ts";
 import { UILayoutScope } from "./uiLayoutContext.ts";
 import { fillUiSize, UISize, zeroSize } from "./uiSize.ts";
+
+const log = createLogger("ui");
 
 export type UIAction = {
     type: string;
@@ -450,7 +453,7 @@ export abstract class UIView implements FocusGroup, FocusNode {
                 return tapResult;
             }
         } else {
-            console.warn("Encountered unknown UITapEvent type", event);
+            log.warn("Encountered unknown UITapEvent type", { event });
         }
 
         return false;

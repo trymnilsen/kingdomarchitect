@@ -7,6 +7,9 @@ import { planCollectItem } from "./collectItemPlanner.ts";
 import { planCollectResource } from "./collectResourcePlanner.ts";
 import { planCrafting } from "./craftingPlanner.ts";
 import { planProduction } from "./productionPlanner.ts";
+import { createLogger } from "../../../common/logging/logger.ts";
+
+const log = createLogger("job");
 
 /**
  * Function signature for planning build jobs. Injected to allow different
@@ -46,7 +49,7 @@ export function planJob(
         case "moveToJob":
             return [{ type: "moveTo", target: job.position }];
         default:
-            console.warn(`[JobPlanner] Unknown job type: ${(job as Jobs).id}`);
+            log.warn("Unknown job type", { jobId: (job as Jobs).id });
             return [];
     }
 }

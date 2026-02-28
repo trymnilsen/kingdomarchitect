@@ -1,8 +1,11 @@
 import type { Entity } from "../../entity/entity.ts";
+import { createLogger } from "../../../common/logging/logger.ts";
 import {
     PathfindingGraphComponentId,
     type PathfindingGraph,
 } from "../../component/pathfindingGraphComponent.ts";
+
+const log = createLogger("pathfinding");
 
 /**
  * Gets the pathfinding graph for an entity from the root entity.
@@ -20,9 +23,7 @@ export function getPathfindingGraphForEntity(
         PathfindingGraphComponentId,
     );
     if (!pathfindingGraphComponent) {
-        console.error(
-            "[PathfindingGraph] No pathfinding graph component found on root entity",
-        );
+        log.error("No pathfinding graph component found on root entity");
         return null;
     }
 

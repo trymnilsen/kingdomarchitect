@@ -10,6 +10,9 @@ import {
     type ActionResult,
     type BehaviorActionData,
 } from "./Action.ts";
+import { createLogger } from "../../../common/logging/logger.ts";
+
+const log = createLogger("behavior");
 
 /**
  * Deposit specific items from worker's inventory to a target entity's inventory.
@@ -23,8 +26,8 @@ export function executeDepositToInventoryAction(
     const targetEntity = root.findEntity(action.targetEntityId);
 
     if (!targetEntity) {
-        console.warn(
-            `[DepositToInventory] Target entity ${action.targetEntityId} not found`,
+        log.warn(
+            `Target entity ${action.targetEntityId} not found`,
         );
         return {
             kind: "failed",
@@ -36,7 +39,7 @@ export function executeDepositToInventoryAction(
         !isPointAdjacentTo(targetEntity.worldPosition, entity.worldPosition) &&
         !pointEquals(targetEntity.worldPosition, entity.worldPosition)
     ) {
-        console.warn(`[DepositToInventory] Worker not adjacent to target`);
+        log.warn(`Worker not adjacent to target`);
         return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 

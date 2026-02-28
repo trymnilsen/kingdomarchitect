@@ -1,5 +1,8 @@
 import { Point, pointEquals } from "../../../common/point.ts";
 import { SelectionMode, SelectionModeDescription } from "./selectionMode.ts";
+import { createLogger } from "../../../common/logging/logger.ts";
+
+const log = createLogger("interaction");
 
 export class BoxSelectionMode implements SelectionMode {
     private from: Point;
@@ -31,7 +34,7 @@ export class BoxSelectionMode implements SelectionMode {
         const startY = Math.min(point.y, this.from.y);
 
         const positions: Point[] = [];
-        console.log("SetSelection", this.from, point, xRange, yRange);
+        log.info("SetSelection", { from: this.from, point, xRange, yRange });
         for (let x = 0; x <= xRange; x++) {
             for (let y = 0; y <= yRange; y++) {
                 positions.push({

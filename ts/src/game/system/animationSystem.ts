@@ -4,6 +4,7 @@ import {
     type SpriteRef,
     SPRITE_FRAMES,
 } from "../../asset/sprite.ts";
+import { createLogger } from "../../common/logging/logger.ts";
 import { spriteRegistry } from "../../asset/spriteRegistry.ts";
 import { getCharacterBinId } from "../../characterbuilder/characterBinId.ts";
 import type { SpriteDefinitionCache } from "../../characterbuilder/characterSpriteGenerator.ts";
@@ -35,6 +36,8 @@ import {
     type SpriteComponent,
 } from "../component/spriteComponent.ts";
 import type { Entity } from "../entity/entity.ts";
+
+const log = createLogger("animation");
 
 export function createAnimationSystem(
     spriteCache: SpriteDefinitionCache,
@@ -87,7 +90,7 @@ function onGameMessage(
     }
 
     if (message.type == "effect") {
-        console.debug(
+        log.debug(
             "Updating animations with effect game messages not supported yet",
         );
     }
