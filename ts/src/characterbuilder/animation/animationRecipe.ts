@@ -35,7 +35,8 @@ export type TrackOperation =
           start: number;
           end: number;
           source: { sourceAnimation: string; sourceFrame: number };
-      };
+      }
+    | { type: "addPixels"; start: number; end: number; sourcePart: string };
 
 export type AnchorTrackOperation =
     | { type: "offset"; start: number; end: number; x: number; y: number }

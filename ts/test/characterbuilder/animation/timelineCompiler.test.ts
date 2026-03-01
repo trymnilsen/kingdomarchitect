@@ -309,6 +309,107 @@ describe("compileTimeline — recipe base composition", () => {
     });
 });
 
+describe("compileTimeline — addPixels operation", () => {
+    it("appends the named part's base pixels to the current part for covered frames", () => {
+        const sources = [makeSourceAnimation("source_walk", 1)];
+        // Add LeftHand pixels into Head for frame 1 only
+        const recipe = makeRecipe({
+            duration: 3,
+            tracks: {
+                Head: [{ type: "addPixels", start: 1, end: 2, sourcePart: "LeftHand" }],
+            },
+        });
+
+        const result = compileTimeline(recipe, sources);
+        const headFrames = result.parts.find((p) => p.partName === "Head")?.frames;
+
+        assert.ok(headFrames);
+        // Frame 0: base only
+        assert.deepStrictEqual(headFrames[0], [6, 4, 7, 4, 6, 5, 7, 5], "frame 0 unchanged");
+        // Frame 1: base + LeftHand base pixels [8, 8]
+        assert.deepStrictEqual(headFrames[1], [6, 4, 7, 4, 6, 5, 7, 5, 8, 8], "frame 1 has appended LeftHand pixels");
+        // Frame 2: back to base (addPixels only covers frame 1)
+        assert.deepStrictEqual(headFrames[2], [6, 4, 7, 4, 6, 5, 7, 5], "frame 2 unchanged");
+    });
+
+    it("does not affect frames outside the span", () => {
+        const sources = [makeSourceAnimation("source_walk", 1)];
+        const recipe = makeRecipe({
+            duration: 2,
+            tracks: {
+                Head: [{ type: "addPixels", start: 1, end: 2, sourcePart: "LeftHand" }],
+            },
+        });
+
+        const result = compileTimeline(recipe, sources);
+        const headFrames = result.parts.find((p) => p.partName === "Head")?.frames;
+
+        assert.ok(headFrames);
+        assert.deepStrictEqual(headFrames[0], [6, 4, 7, 4, 6, 5, 7, 5], "frame 0 outside span, unchanged");
+    });
+
+    it("is cumulative — two addPixels ops on the same frame both append", () => {
+        const sources = [makeSourceAnimation("source_walk", 1)];
+        const recipe = makeRecipe({
+            duration: 2,
+            tracks: {
+                Head: [
+                    { type: "addPixels", start: 1, end: 2, sourcePart: "LeftHand" },
+                    { type: "addPixels", start: 1, end: 2, sourcePart: "RightHand" },
+                ],
+            },
+        });
+
+        const result = compileTimeline(recipe, sources);
+        const headFrames = result.parts.find((p) => p.partName === "Head")?.frames;
+
+        assert.ok(headFrames);
+        // Frame 1: base + LeftHand [8,8] + RightHand [10,8]
+        assert.deepStrictEqual(
+            headFrames[1],
+            [6, 4, 7, 4, 6, 5, 7, 5, 8, 8, 10, 8],
+            "both source parts appended",
+        );
+    });
+
+    it("addPixels after hide appends only to the cleared result", () => {
+        const sources = [makeSourceAnimation("source_walk", 1)];
+        const recipe = makeRecipe({
+            duration: 2,
+            tracks: {
+                Head: [
+                    { type: "hide",      start: 1, end: 2 },
+                    { type: "addPixels", start: 1, end: 2, sourcePart: "LeftHand" },
+                ],
+            },
+        });
+
+        const result = compileTimeline(recipe, sources);
+        const headFrames = result.parts.find((p) => p.partName === "Head")?.frames;
+
+        assert.ok(headFrames);
+        // hide empties current, then addPixels appends LeftHand pixels [8,8]
+        assert.deepStrictEqual(headFrames[1], [8, 8], "hide then addPixels yields only added pixels");
+    });
+
+    it("referencing a non-existent source part yields an empty append", () => {
+        const sources = [makeSourceAnimation("source_walk", 1)];
+        const recipe = makeRecipe({
+            duration: 2,
+            tracks: {
+                Head: [{ type: "addPixels", start: 1, end: 2, sourcePart: "NonExistentPart" }],
+            },
+        });
+
+        const result = compileTimeline(recipe, sources);
+        const headFrames = result.parts.find((p) => p.partName === "Head")?.frames;
+
+        assert.ok(headFrames);
+        // Non-existent part → empty pixels appended → same as base
+        assert.deepStrictEqual(headFrames[1], [6, 4, 7, 4, 6, 5, 7, 5], "unknown part appends nothing");
+    });
+});
+
 describe("compileTimeline — error handling", () => {
     it("throws for an unknown source animation name", () => {
         const sources = [makeSourceAnimation("source_walk")];

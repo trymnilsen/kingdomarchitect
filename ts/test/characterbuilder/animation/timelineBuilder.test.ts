@@ -141,6 +141,31 @@ describe("timeline builder — part track operations", () => {
             },
         ]);
     });
+
+    it("addPixels(sourcePart) emits an addPixels op covering one frame by default", () => {
+        const recipe = timeline("test")
+            .basedOn("walk_se", 0)
+            .duration(10)
+            .part("Head", (t) => t.at(3).addPixels("LeftEye"))
+            .build();
+
+        assert.deepStrictEqual(recipe.tracks["Head"], [
+            { type: "addPixels", start: 3, end: 4, sourcePart: "LeftEye" },
+        ]);
+    });
+
+    it("two addPixels calls in a row produce two separate ops on the same span", () => {
+        const recipe = timeline("test")
+            .basedOn("walk_se", 0)
+            .duration(10)
+            .part("Head", (t) => t.at(3).addPixels("LeftEye").addPixels("RightEye"))
+            .build();
+
+        assert.deepStrictEqual(recipe.tracks["Head"], [
+            { type: "addPixels", start: 3, end: 4, sourcePart: "LeftEye" },
+            { type: "addPixels", start: 3, end: 4, sourcePart: "RightEye" },
+        ]);
+    });
 });
 
 describe("timeline builder — anchor track operations", () => {

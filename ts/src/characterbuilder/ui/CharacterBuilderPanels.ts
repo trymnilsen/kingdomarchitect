@@ -1,4 +1,3 @@
-import { characterPartFrames } from "../../../generated/characterFrames.ts";
 import { titleTextStyle } from "../../rendering/text/textStyle.ts";
 import type { ComponentDescriptor } from "../../ui/declarative/ui.ts";
 import { uiBox } from "../../ui/declarative/uiBox.ts";
@@ -213,6 +212,7 @@ export function createAnimationPanel(
     onNextFrame: () => void,
     currentFrame: number,
     frameCount: number,
+    animationNames: string[],
 ) {
     const isPlaybackEnabled = previewMode === "Single";
     return uiBox({
@@ -258,11 +258,11 @@ export function createAnimationPanel(
                     content: "Animations",
                     textStyle: titleTextStyle,
                 }),
-                ...characterPartFrames.map((frame) =>
+                ...animationNames.map((name) =>
                     createAnimationButton(
-                        frame.animationName,
-                        selectedAnimation === frame.animationName,
-                        () => onAnimationSelect(frame.animationName),
+                        name,
+                        selectedAnimation === name,
+                        () => onAnimationSelect(name),
                     ),
                 ),
             ],

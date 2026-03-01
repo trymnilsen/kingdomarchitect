@@ -116,7 +116,7 @@ function buildPartFrames(
 
         const frames: PartFrame[] = [];
         for (let f = 0; f < recipe.duration; f++) {
-            frames.push(applyTrackOps(partName, basePixels, ops, f, sourceAnimations));
+            frames.push(applyTrackOps(partName, basePixels, ops, f, sourceAnimations, baseFrame));
         }
 
         return { partName, frames };
@@ -152,6 +152,7 @@ function applyTrackOps(
     ops: TrackOperation[],
     frameIndex: number,
     sourceAnimations: CharacterAnimation[],
+    baseFrame: CharacterAnimation,
 ): PartFrame {
     let current: PartFrame = [...basePixels];
 
@@ -192,6 +193,14 @@ function applyTrackOps(
                     );
                 }
                 current = [...(sourcePart?.frames[targetFrame] ?? [])];
+                break;
+            }
+            case "addPixels": {
+                const sourcePart = baseFrame.parts.find(
+                    (p) => p.partName === op.sourcePart,
+                );
+                const sourcePixels = sourcePart?.frames[0] ?? [];
+                current = [...current, ...sourcePixels];
                 break;
             }
         }

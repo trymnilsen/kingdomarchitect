@@ -1,5 +1,7 @@
 import { createLogger } from "../common/logging/logger.ts";
 import { characterPartFrames } from "../../generated/characterFrames.ts";
+import { getAllAnimations } from "./animation/getAllAnimations.ts";
+import type { CharacterAnimation } from "./characterAnimation.ts";
 import { createComponent } from "../ui/declarative/ui.ts";
 import { uiColumn, uiRow } from "../ui/declarative/uiSequence.ts";
 import { fillUiSize } from "../ui/uiSize.ts";
@@ -19,6 +21,10 @@ import {
 
 const log = createLogger("characterbuilder");
 
+const allAnimations = getAllAnimations(
+    characterPartFrames as unknown as CharacterAnimation[],
+);
+
 /**
  * Main UI component for the character builder
  * Manages the layout and state for part selection, color customization,
@@ -27,7 +33,7 @@ const log = createLogger("characterbuilder");
 export const CharacterBuilderUI = createComponent(({ withState }) => {
     const [selectedPart, setSelectedPart] = withState<BodyPart>("Chest");
     const [selectedAnimation, setSelectedAnimation] = withState<string>(
-        characterPartFrames[0].animationName,
+        allAnimations[0].animationName,
     );
     const [selectedColors, setSelectedColors] = withState<CharacterColors>({});
     const [previewMode, setPreviewMode] = withState<PreviewMode>("Single");
@@ -64,10 +70,10 @@ export const CharacterBuilderUI = createComponent(({ withState }) => {
 
     // Get the current animation's frame count
     const getCurrentFrameCount = (): number => {
-        const animation = characterPartFrames.find(
-            (f) => f.animationName === selectedAnimation,
+        const animation = allAnimations.find(
+            (a) => a.animationName === selectedAnimation,
         );
-        return animation?.parts[0]?.frames.length || 0;
+        return animation?.parts[0]?.frames.length ?? 0;
     };
 
     const handlePreviousFrame = () => {
@@ -133,6 +139,7 @@ export const CharacterBuilderUI = createComponent(({ withState }) => {
                         handleNextFrame,
                         currentFrame,
                         getCurrentFrameCount(),
+                        allAnimations.map((a) => a.animationName),
                     ),
                 ],
             }),

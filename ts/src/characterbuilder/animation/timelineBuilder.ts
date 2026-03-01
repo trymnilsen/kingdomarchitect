@@ -35,6 +35,12 @@ export interface TrackBuilder {
     /** Replace pixels with the matching part's data from a different source frame. */
     replaceWith(animationName: string, frame: number): TrackBuilder;
     /**
+     * For the current span, append the base-frame pixels of the named part to this
+     * part's pixel data. Useful for filling eye-slot positions with skin color during
+     * blink frames so the head shows through instead of leaving the slot transparent.
+     */
+    addPixels(sourcePart: string): TrackBuilder;
+    /**
      * At build() time, copies all operations registered for the named part
      * into this track. The source part must be configured before build() is called.
      */
@@ -124,6 +130,17 @@ class TrackBuilderImpl implements TrackBuilder {
             start: this.cursor,
             end: this.end,
             source: { sourceAnimation: animationName, sourceFrame: frame },
+        });
+        this.end = this.cursor + 1;
+        return this;
+    }
+
+    addPixels(sourcePart: string): TrackBuilder {
+        this.ops.push({
+            type: "addPixels",
+            start: this.cursor,
+            end: this.end,
+            sourcePart,
         });
         this.end = this.cursor + 1;
         return this;

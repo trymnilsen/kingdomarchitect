@@ -11,6 +11,12 @@ const idleSoutheast = timeline("idle_southeast")
          .at(34).hide().at(35).show(),
     )
     .part("RightEye", (t) => t.copyFrom("LeftEye"))
+    .part("Head", (t) =>
+        t.at(8).addPixels("LeftEye").addPixels("RightEye")
+         .at(14).addPixels("LeftEye").addPixels("RightEye")
+         .at(28).addPixels("LeftEye").addPixels("RightEye")
+         .at(34).addPixels("LeftEye").addPixels("RightEye"),
+    )
     .at(20).mirror()
     .build();
 
