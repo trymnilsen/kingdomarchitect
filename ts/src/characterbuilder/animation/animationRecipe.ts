@@ -4,7 +4,11 @@ export type {
     AnchorFrame,
     AnimationAnchor,
     CharacterAnimation,
+    Facing,
+    FacingKeyframe,
 } from "../characterAnimation.ts";
+
+export { inferFacingFromName, getFacingAtFrame } from "../characterAnimation.ts";
 
 /**
  * Base sourced from a single frame of a named hand-painted animation.

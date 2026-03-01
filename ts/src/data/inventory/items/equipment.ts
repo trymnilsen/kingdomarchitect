@@ -23,10 +23,6 @@ export const wizardHat = {
     name: "Wizard Hat",
     tag: [ItemTag.SkillGear],
     category: ItemCategory.Magic,
-    visual: {
-        sprite: spriteRefs.wizard_hat,
-        offset: { x: 6, y: 10 },
-    },
 } as const;
 
 export const hammerItem = {

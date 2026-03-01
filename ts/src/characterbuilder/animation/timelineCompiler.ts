@@ -9,6 +9,11 @@ import type {
     TrackOperation,
 } from "./animationRecipe.ts";
 import {
+    type Facing,
+    type FacingKeyframe,
+    inferFacingFromName,
+} from "../characterAnimation.ts";
+import {
     computeXBounds,
     mirrorAnchorFrame,
     mirrorPartFrame,
@@ -44,7 +49,12 @@ export function compileTimeline(
         anchors: compiledAnchors,
     };
 
-    return applyMirrorTransform(intermediate, sortedToggles);
+    const withMirror = applyMirrorTransform(intermediate, sortedToggles);
+    const facing = buildFacingKeyframes(recipe.name, sortedToggles, recipe.duration);
+    if (facing.length > 0) {
+        withMirror.facing = facing;
+    }
+    return withMirror;
 }
 
 function resolveBase(
@@ -281,6 +291,39 @@ function applyMirrorTransform(
         parts: newParts,
         anchors: newAnchors,
     };
+}
+
+/**
+ * Builds the sparse facing keyframe list for a compiled animation.
+ * Starting facing is inferred from the animation name. A keyframe is emitted
+ * only when the computed facing changes from the previous frame — meaning frame 0
+ * is skipped when it matches the implied default.
+ */
+function buildFacingKeyframes(
+    animationName: string,
+    sortedToggles: number[],
+    frameCount: number,
+): FacingKeyframe[] {
+    if (sortedToggles.length === 0) return [];
+
+    const north = animationName.toLowerCase().includes("north");
+    const defaultFacing = inferFacingFromName(animationName);
+    const keyframes: FacingKeyframe[] = [];
+    let lastFacing = defaultFacing;
+
+    for (let f = 0; f < frameCount; f++) {
+        const mirrored = computeMirrorStateAtFrame(sortedToggles, f);
+        const facing: Facing = north
+            ? mirrored ? "nw" : "ne"
+            : mirrored ? "sw" : "se";
+
+        if (facing !== lastFacing) {
+            keyframes.push({ frame: f, facing });
+            lastFacing = facing;
+        }
+    }
+
+    return keyframes;
 }
 
 /**

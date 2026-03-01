@@ -5,14 +5,17 @@ import type {
 } from "../rendering/renderScope.ts";
 import type { SpriteDefinition, SpriteRef } from "../asset/sprite.ts";
 import { spriteRegistry } from "../asset/spriteRegistry.ts";
-import type { CharacterColors } from "./colors.ts";
+import type { CharacterColors, EquipmentSpriteVariant } from "./colors.ts";
 import type { Rectangle } from "../common/structure/rectangle.ts";
-import { subtractPoint, type Point } from "../common/point.ts";
-import { wizardHat } from "../data/inventory/items/equipment.ts";
+import type { Point } from "../common/point.ts";
 import { CHARACTER_SPRITE } from "./ui/characterBuilderConstants.ts";
 import type { AssetLoader } from "../asset/loader/assetLoader.ts";
 import { getCharacterBinId } from "./characterBinId.ts";
-import type { CharacterAnimation } from "./characterAnimation.ts";
+import {
+    getFacingAtFrame,
+    type CharacterAnimation,
+    type Facing,
+} from "./characterAnimation.ts";
 
 const CHARACTER_FRAME_WIDTH = CHARACTER_SPRITE.FRAME_WIDTH;
 const CHARACTER_FRAME_HEIGHT = CHARACTER_SPRITE.FRAME_HEIGHT;
@@ -426,7 +429,27 @@ function drawFrameOutline(
  * Draw equipment sprites at anchor positions for a given z-layer.
  * @param targetZ 0 for behind the character, 1 for in front
  */
-function drawEquipmentAtAnchors(
+function resolveEquipmentSprite(
+    variant: EquipmentSpriteVariant,
+    facing: Facing,
+): { sprite: SpriteRef; flipX: boolean } {
+    switch (variant.type) {
+        case "single":
+            return { sprite: variant.sprite, flipX: false };
+        case "mirrored":
+            return {
+                sprite: variant.east,
+                flipX: facing === "sw" || facing === "nw",
+            };
+        case "perFacing":
+            return {
+                sprite: variant.sprites[facing] ?? variant.fallback,
+                flipX: false,
+            };
+    }
+}
+
+function drawEquipment(
     offscreenScope: OffscreenRenderScope,
     animation: CharacterAnimation,
     frameIdx: number,
@@ -438,40 +461,60 @@ function drawEquipmentAtAnchors(
     animationBounds: Rectangle,
     targetZ: number,
 ): void {
+    const facing = getFacingAtFrame(animation, frameIdx);
+
     for (const equip of equipment) {
-        const anchor = animation.anchors.find(
-            (a) => a.anchorId === equip.anchor,
-        );
-        if (!anchor) {
-            continue;
+        let drawX: number;
+        let drawY: number;
+
+        if ("anchor" in equip) {
+            const anchor = animation.anchors.find(
+                (a) => a.anchorId === equip.anchor,
+            );
+            if (!anchor) continue;
+
+            const anchorFrame = anchor.frames[frameIdx];
+            if (!anchorFrame || anchorFrame.length < 3) continue;
+
+            const [anchorX, anchorY, z] = anchorFrame;
+            if (z !== targetZ) continue;
+
+            drawX =
+                frameBaseX +
+                contentCenterX +
+                (anchorX - animationBounds.x) -
+                equip.offsetInSpriteForAnchorPoint.x;
+            drawY =
+                frameBaseY +
+                contentCenterY +
+                (anchorY - animationBounds.y) -
+                equip.offsetInSpriteForAnchorPoint.y;
+        } else {
+            if ((equip.z ?? 1) !== targetZ) continue;
+
+            const part = animation.parts.find(
+                (p) => p.partName === equip.attachToPart,
+            );
+            const frameData = part?.frames[frameIdx] ?? [];
+            if (frameData.length === 0) continue;
+
+            const partBounds = getPartBounds(frameData);
+            drawX =
+                frameBaseX +
+                contentCenterX +
+                (partBounds.x - equip.offset.x - animationBounds.x);
+            drawY =
+                frameBaseY +
+                contentCenterY +
+                (partBounds.y - equip.offset.y - animationBounds.y);
         }
 
-        const anchorFrame = anchor.frames[frameIdx];
-        if (!anchorFrame || anchorFrame.length < 3) {
-            continue;
+        const { sprite, flipX } = resolveEquipmentSprite(equip.sprite, facing);
+        if (flipX) {
+            offscreenScope.drawScreenSpaceSpriteFlippedX({ x: drawX, y: drawY, sprite });
+        } else {
+            offscreenScope.drawScreenSpaceSprite({ x: drawX, y: drawY, sprite });
         }
-
-        const [anchorX, anchorY, z] = anchorFrame;
-        if (z !== targetZ) {
-            continue;
-        }
-
-        const drawX =
-            frameBaseX +
-            contentCenterX +
-            (anchorX - animationBounds.x) -
-            equip.offsetInSpriteForAnchorPoint.x;
-        const drawY =
-            frameBaseY +
-            contentCenterY +
-            (anchorY - animationBounds.y) -
-            equip.offsetInSpriteForAnchorPoint.y;
-
-        offscreenScope.drawScreenSpaceSprite({
-            x: drawX,
-            y: drawY,
-            sprite: equip.sprite,
-        });
     }
 }
 
@@ -503,7 +546,7 @@ function drawAnimation(
 
         // Step 1: Draw back-layer equipment (behind the character)
         if (colors.Equipment && colors.Equipment.length > 0) {
-            drawEquipmentAtAnchors(
+            drawEquipment(
                 offscreenScope,
                 animation,
                 frameIdx,
@@ -551,38 +594,11 @@ function drawAnimation(
                 });
             }
 
-            // Step 3: Draw equipment for head parts
-            if (part.partName === "Head") {
-                const partBounds = getPartBounds(frameData);
-                const position = subtractPoint(
-                    partBounds,
-                    wizardHat.visual.offset,
-                );
-                const adjustedX =
-                    frameBaseX +
-                    contentCenterX +
-                    (position.x - animationBounds.x);
-                const adjustedY =
-                    frameBaseY +
-                    contentCenterY +
-                    (position.y - animationBounds.y);
-
-                const hatSprite = spriteRegistry.resolve(
-                    wizardHat.visual.sprite,
-                );
-                if (hatSprite) {
-                    offscreenScope.drawScreenSpaceSprite({
-                        x: adjustedX,
-                        y: adjustedY,
-                        sprite: wizardHat.visual.sprite,
-                    });
-                }
-            }
         }
 
         // Step 4: Draw front-layer equipment (in front of the character)
         if (colors.Equipment && colors.Equipment.length > 0) {
-            drawEquipmentAtAnchors(
+            drawEquipment(
                 offscreenScope,
                 animation,
                 frameIdx,

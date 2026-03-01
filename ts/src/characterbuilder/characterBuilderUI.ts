@@ -18,6 +18,7 @@ import {
     type BodyPart,
     type PreviewMode,
 } from "./ui/characterBuilderConstants.ts";
+import { spriteRefs } from "../asset/sprite.ts";
 
 const log = createLogger("characterbuilder");
 
@@ -54,13 +55,32 @@ export const CharacterBuilderUI = createComponent(({ withState }) => {
         setSelectedColors(newColors);
     };
 
+    const handleHatSelect = (hatId: string) => {
+        const existing = (selectedColors.Equipment ?? []).filter(
+            (e) => !("attachToPart" in e && e.attachToPart === "Head"),
+        );
+        if (hatId !== "none") {
+            existing.push({
+                attachToPart: "Head",
+                offset: { x: 6, y: 10 },
+                sprite: { type: "single", sprite: spriteRefs.wizard_hat },
+            });
+        }
+        setSelectedColors({
+            ...selectedColors,
+            Equipment: existing.length > 0 ? existing : undefined,
+        });
+    };
+
     const handleEquipmentSelect = (anchorId: string, equipmentId: string) => {
         const existing = selectedColors.Equipment ?? [];
-        const filtered = existing.filter((e) => e.anchor !== anchorId);
+        const filtered = existing.filter(
+            (e) => "anchor" in e && e.anchor !== anchorId,
+        );
         const option = EQUIPMENT_OPTIONS.find((o) => o.id === equipmentId);
         if (option && option.sprite && option.offset) {
             filtered.push({
-                sprite: option.sprite,
+                sprite: { type: "single", sprite: option.sprite },
                 offsetInSpriteForAnchorPoint: option.offset,
                 anchor: anchorId,
             });
@@ -122,6 +142,7 @@ export const CharacterBuilderUI = createComponent(({ withState }) => {
                         selectedAnchor,
                         setSelectedAnchor,
                         handleEquipmentSelect,
+                        handleHatSelect,
                     ),
                     createPreviewPanel(
                         previewMode,

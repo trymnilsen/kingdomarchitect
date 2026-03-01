@@ -22,6 +22,7 @@ import {
     COLORS,
     EQUIPMENT_OPTIONS,
     FANTASY_GEAR_COLORS,
+    HAT_OPTIONS,
     LAYOUT,
     type BodyPart,
     type PreviewMode,
@@ -54,6 +55,7 @@ export function createPartSelectionPanel(
     selectedAnchor: string | null,
     onAnchorSelect: (anchor: string | null) => void,
     onEquipmentSelect: (anchorId: string, equipmentId: string) => void,
+    onHatSelect: (hatId: string) => void,
 ) {
     return uiBox({
         width: LAYOUT.LEFT_PANEL_WIDTH,
@@ -79,6 +81,7 @@ export function createPartSelectionPanel(
                     selectedAnchor,
                     onAnchorSelect,
                     onEquipmentSelect,
+                    onHatSelect,
                 ),
             ],
         }),
@@ -92,7 +95,26 @@ function createCustomizationSection(
     selectedAnchor: string | null,
     onAnchorSelect: (anchor: string | null) => void,
     onEquipmentSelect: (anchorId: string, equipmentId: string) => void,
+    onHatSelect: (hatId: string) => void,
 ): ComponentDescriptor[] {
+    if (selectedPart === "Hat") {
+        const activeHatId = selectedColors.Equipment?.some(
+            (e) => "attachToPart" in e && e.attachToPart === "Head",
+        )
+            ? "hat"
+            : "none";
+        return [
+            uiText({ content: "Hat", textStyle: titleTextStyle }),
+            ...HAT_OPTIONS.map((option) =>
+                createPartButton(
+                    option.name,
+                    option.id === activeHatId,
+                    () => onHatSelect(option.id),
+                ),
+            ),
+        ];
+    }
+
     if (selectedPart !== "Equipment") {
         return [
             uiText({
