@@ -7,6 +7,9 @@ import { spriteRegistry } from "../../asset/spriteRegistry.ts";
 import { SPRITE_X, SPRITE_Y } from "../../asset/sprite.ts";
 import type { CharacterColors } from "../colors.ts";
 import { LAYOUT, type PreviewMode } from "./characterBuilderConstants.ts";
+import { characterPartFrames } from "../../../generated/characterFrames.ts";
+import { getAllAnimations } from "../animation/getAllAnimations.ts";
+import type { CharacterAnimation } from "../characterAnimation.ts";
 
 export type CharacterPreviewProps = {
     colors: CharacterColors;
@@ -32,11 +35,15 @@ export const CharacterPreview = createComponent<CharacterPreviewProps>(
 
         withDraw((scope, region) => {
             const spriteCache = new SpriteDefinitionCache();
+            const animations = getAllAnimations(
+                characterPartFrames as unknown as CharacterAnimation[],
+            );
             const generatedSprites = buildSpriteSheet(
                 (w, h) => scope.getOffscreenRenderScope(w, h),
                 props.colors,
                 scope.assetLoader,
                 spriteCache,
+                animations,
             );
 
             // Get the selected sprite or fall back to first available
