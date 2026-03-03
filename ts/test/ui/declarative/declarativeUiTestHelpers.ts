@@ -48,6 +48,21 @@ export type TextMeasureConfig = {
     lineHeight: number;
 };
 
+/**
+ * Options for creating a test component context.
+ */
+export type TestContextOptions = {
+    measureConfig?: TextMeasureConfig;
+    /** Pre-seed withState return values by call order (index 0 = first call). */
+    initialStateValues?: unknown[];
+    /** Custom measureDescriptor — overrides the default {0,0} stub. */
+    measureDescriptorFn?: (
+        slotId: any,
+        descriptor: ComponentDescriptor,
+        constraints: UISize,
+    ) => UISize;
+};
+
 const defaultMeasureConfig: TextMeasureConfig = {
     charWidth: 8,
     lineHeight: 16,
@@ -59,13 +74,14 @@ const defaultMeasureConfig: TextMeasureConfig = {
  *
  * @param props - The props to pass to the component
  * @param constraints - The layout constraints (available width/height)
- * @param measureConfig - Optional config for text measurement dimensions
+ * @param options - Optional configuration for measurement and state seeding
  */
 export function createTestComponentContext<P extends {}>(
     props: P,
     constraints: UISize,
-    measureConfig: TextMeasureConfig = defaultMeasureConfig,
+    options: TestContextOptions = {},
 ): TestContextResult<P> {
+    const measureConfig = options.measureConfig ?? defaultMeasureConfig;
     const drawCapture: DrawCapture = {
         textCalls: [],
         spriteCalls: [],
@@ -80,17 +96,29 @@ export function createTestComponentContext<P extends {}>(
         height: measureConfig.lineHeight,
     });
 
+    let stateCallIndex = 0;
+
     const context: ComponentContext<P> = {
         props,
         constraints,
         measureText,
-        measureDescriptor: (_slotId, _descriptor, _measureConstraints) => {
+        measureDescriptor: (slotId, descriptor, measureConstraints) => {
+            if (options.measureDescriptorFn) {
+                return options.measureDescriptorFn(
+                    slotId,
+                    descriptor,
+                    measureConstraints,
+                );
+            }
             return { width: 0, height: 0 };
         },
         withState: <T>(
             initial: T,
         ): [T, (newValue: T | ((current: T) => T)) => void] => {
-            return [initial, () => {}];
+            const callIndex = stateCallIndex++;
+            const seeded = options.initialStateValues?.[callIndex];
+            const value = seeded !== undefined ? (seeded as T) : initial;
+            return [value, () => {}];
         },
         withDraw: (fn) => {
             capturedDrawFn = fn;
@@ -174,7 +202,7 @@ export function renderComponent<P extends {}>(
     component: (props: P) => ComponentDescriptor<P>,
     props: P,
     constraints: UISize,
-    measureConfig?: TextMeasureConfig,
+    options?: TestContextOptions,
 ): {
     result: LayoutResult | ComponentDescriptor;
     drawCapture: DrawCapture;
@@ -182,7 +210,7 @@ export function renderComponent<P extends {}>(
 } {
     const descriptor = component(props);
     const { context, drawCapture, executeDrawCalls } =
-        createTestComponentContext(props, constraints, measureConfig);
+        createTestComponentContext(props, constraints, options);
 
     const result = descriptor.renderFn(context);
 
@@ -202,6 +230,32 @@ export function isLayoutResult(
         "children" in value &&
         Array.isArray(value.children)
     );
+}
+
+/**
+ * Reads the children from a ComponentDescriptor (via props.children)
+ * or from a LayoutResult (via .children).
+ */
+export function getDescriptorChildren(
+    value: ComponentDescriptor | LayoutResult,
+): ComponentDescriptor[] {
+    if (isLayoutResult(value)) {
+        return value.children as ComponentDescriptor[];
+    }
+    const children = (value.props as any).children;
+    if (Array.isArray(children)) {
+        return children as ComponentDescriptor[];
+    }
+    return [];
+}
+
+/**
+ * Reads the content prop from a uiText-style descriptor.
+ */
+export function getDescriptorText(
+    descriptor: ComponentDescriptor,
+): string | undefined {
+    return (descriptor.props as any).content as string | undefined;
 }
 
 /**

@@ -81,11 +81,19 @@ export function planCrafting(
                 input.item.id,
             );
             const available = buildingItem?.amount ?? 0;
-            const toTake = Math.min(needed, available);
 
-            if (toTake > 0) {
-                itemsToTake.push({ itemId: input.item.id, amount: toTake });
+            if (available < needed) {
+                // Building can't cover the full shortfall. Fail the job rather
+                // than taking partial inputs — partial inputs would be lost when
+                // craftItem subsequently fails with noResources.
+                const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
+                if (queueEntity) {
+                    failJobFromQueue(queueEntity, job);
+                }
+                return [];
             }
+
+            itemsToTake.push({ itemId: input.item.id, amount: needed });
         }
     }
 

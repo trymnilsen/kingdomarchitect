@@ -36,6 +36,9 @@ import { uiScaffold } from "../../view/uiScaffold.ts";
 import { BuildingSelectionProvider } from "./actor/provider/buildingSelectionProvider.ts";
 import { ProductionBuildingSelectionProvider } from "./actor/provider/productionBuildingSelectionProvider.ts";
 import { StockpileSelectionProvider } from "./actor/provider/stockpileSelectionProvider.ts";
+import { getCraftingJobDisplayInfos } from "../../../job/craftingJobQuery.ts";
+import { craftingQueueStrip } from "../crafting/craftingQueueStrip.ts";
+import { uiAbsoluteLayer } from "../../../../ui/declarative/uiAbsoluteLayer.ts";
 import type { Entity } from "../../../entity/entity.ts";
 import {
     HealthComponentId,
@@ -105,16 +108,45 @@ export class SelectionState extends InteractionState {
             })),
         }));
 
-        // Create content that shows selection info
         const content = selectionInfo
             ? this.createSelectionInfoPanel(selectionInfo)
             : undefined;
 
-        return uiScaffold({
+        const scaffold = uiScaffold({
             leftButtons,
             rightButtons,
             content,
         });
+
+        if (this._selection instanceof SelectedEntityItem) {
+            const displayInfos = getCraftingJobDisplayInfos(
+                this._selection.entity,
+            );
+            if (displayInfos.length > 0) {
+                const tileScreenPos =
+                    this.context.camera.tileSpaceToScreenSpace(
+                        this._selection.tilePosition,
+                    );
+                const tileCenterX =
+                    tileScreenPos.x +
+                    (this._selection.selectionSize.x * TileSize) / 2;
+                return uiAbsoluteLayer({
+                    base: scaffold,
+                    overlays: [
+                        {
+                            anchorX: tileCenterX,
+                            anchorY: tileScreenPos.y - 6,
+                            child: craftingQueueStrip({
+                                displayInfos,
+                                maxVisible: 5,
+                            }),
+                        },
+                    ],
+                });
+            }
+        }
+
+        return scaffold;
     }
 
     override onUpdate(_tick: number): void {

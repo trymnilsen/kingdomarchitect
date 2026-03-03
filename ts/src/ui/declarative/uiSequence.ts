@@ -2,7 +2,7 @@ import { type Point } from "../../common/point.ts";
 import { fillUiSize, wrapUiSize, type UISize } from "../uiSize.ts";
 import {
     createComponent,
-    PlacedChild,
+    type PlacedChild,
     type ComponentDescriptor,
     type LayoutResult,
 } from "./ui.ts";

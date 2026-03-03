@@ -31,12 +31,13 @@ const bookSubtitleStyle = {
 export type CraftingViewProps = {
     recipes: readonly CraftingRecipe[];
     selectedRecipeIndex: number;
-    isCrafting: boolean;
     hasCollectableItems: boolean;
+    /** Count of all queued jobs (claimed + unclaimed) for the selected recipe. */
+    queuedCountForRecipe: number;
     onRecipeSelected: (index: number) => void;
     onCraft: () => void;
     onCollect: () => void;
-    onCancel: () => void;
+    onCancelOneJob: () => void;
 };
 
 type RecipeListItemProps = {
@@ -227,6 +228,12 @@ export const craftingView = createComponent<CraftingViewProps>(
                     },
                 }),
             );
+            rightPageChildren.push(
+                uiText({
+                    content: `Queued: ${props.queuedCountForRecipe}`,
+                    textStyle: bookSubtitleStyle,
+                }),
+            );
         } else {
             rightPageChildren.push(
                 uiText({
@@ -253,15 +260,15 @@ export const craftingView = createComponent<CraftingViewProps>(
         });
 
         // Determine button configuration
-        let actionButtonText = "craft";
-        let actionCallback = props.onCraft;
+        let leftButtons: { text: string; onClick: () => void }[];
 
-        if (props.isCrafting) {
-            actionButtonText = "cancel";
-            actionCallback = props.onCancel;
-        } else if (props.hasCollectableItems) {
-            actionButtonText = "collect";
-            actionCallback = props.onCollect;
+        if (props.hasCollectableItems) {
+            leftButtons = [{ text: "Collect", onClick: props.onCollect }];
+        } else {
+            leftButtons = [{ text: "+ Craft", onClick: props.onCraft }];
+            if (props.queuedCountForRecipe > 0) {
+                leftButtons.push({ text: "- Cancel", onClick: props.onCancelOneJob });
+            }
         }
 
         return uiScaffold({
@@ -269,12 +276,7 @@ export const craftingView = createComponent<CraftingViewProps>(
                 leftPage,
                 rightPage,
             }),
-            leftButtons: [
-                {
-                    text: actionButtonText,
-                    onClick: actionCallback,
-                },
-            ],
+            leftButtons,
         });
     },
     { displayName: "CraftingView" },

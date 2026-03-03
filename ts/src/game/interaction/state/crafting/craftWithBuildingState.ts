@@ -13,6 +13,10 @@ import { craftingView } from "./craftingView.ts";
 import { CollectItemJob } from "../../../job/collectItemJob.ts";
 import { createCraftingJob } from "../../../job/craftingJob.ts";
 import { QueueJobCommand } from "../../../../server/message/command/queueJobCommand.ts";
+import {
+    getCraftingJobsForBuilding,
+    cancelCraftingJob,
+} from "../../../job/craftingJobQuery.ts";
 
 export class CraftWithBuildingState extends InteractionState {
     private _selectedRecipeIndex = 0;
@@ -32,13 +36,20 @@ export class CraftWithBuildingState extends InteractionState {
             CollectableComponentId,
         );
 
+        const selectedRecipe =
+            this._craftingComponent.recipes[this._selectedRecipeIndex];
+        const allJobs = getCraftingJobsForBuilding(this._buildingEntity);
+        const queuedCountForRecipe = selectedRecipe
+            ? allJobs.filter((j) => j.recipe.id === selectedRecipe.id).length
+            : 0;
+
         return craftingView({
             recipes: this._craftingComponent.recipes,
             selectedRecipeIndex: this._selectedRecipeIndex,
-            isCrafting: false,
             hasCollectableItems:
                 collectableComponent !== null &&
                 hasCollectableItems(collectableComponent),
+            queuedCountForRecipe,
             onRecipeSelected: (index: number) => {
                 this._selectedRecipeIndex = index;
             },
@@ -48,8 +59,8 @@ export class CraftWithBuildingState extends InteractionState {
             onCollect: () => {
                 this.onCollect();
             },
-            onCancel: () => {
-                this.onCancelCrafting();
+            onCancelOneJob: () => {
+                this.onCancelOneJob();
             },
         });
     }
@@ -83,9 +94,17 @@ export class CraftWithBuildingState extends InteractionState {
         this.context.commandDispatcher(QueueJobCommand(job));
     }
 
-    private onCancelCrafting() {
-        // Job cancellation would be handled through job queue UI if available
-        // For now, this is a no-op since jobs are managed through the job system
+    private onCancelOneJob() {
+        const selectedRecipe =
+            this._craftingComponent.recipes[this._selectedRecipeIndex];
+        if (!selectedRecipe) {
+            return;
+        }
+        cancelCraftingJob(
+            this.context.root,
+            this._buildingEntity.id,
+            selectedRecipe.id,
+        );
     }
 
     private onCollect() {

@@ -47,18 +47,14 @@ export class CraftingBuildingSelectionProvider implements ActorSelectionProvider
                     },
                 };
 
-                // Determine which button to show
                 if (hasItems) {
-                    // Show Collect button
                     return {
                         left: [
                             {
                                 text: "Collect",
                                 icon: spriteRefs.empty_sprite,
                                 onClick: () => {
-                                    const job = CollectItemJob(
-                                        selection.entity,
-                                    );
+                                    const job = CollectItemJob(selection.entity);
                                     stateContext.commandDispatcher(
                                         QueueJobCommand(job),
                                     );
@@ -69,7 +65,6 @@ export class CraftingBuildingSelectionProvider implements ActorSelectionProvider
                         right: [],
                     };
                 } else {
-                    // Show Craft button
                     return {
                         left: [
                             {

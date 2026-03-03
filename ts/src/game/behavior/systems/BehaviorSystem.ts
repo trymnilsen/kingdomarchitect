@@ -8,6 +8,7 @@ import type { Behavior } from "../behaviors/Behavior.ts";
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import { executeAction } from "../actions/ActionExecutor.ts";
 import { createLogger } from "../../../common/logging/logger.ts";
+import type { BehaviorActionData } from "../actions/Action.ts";
 
 const log = createLogger("behavior");
 
@@ -142,6 +143,37 @@ function replan(
     agent: BehaviorAgentComponent,
     resolver: BehaviorResolver,
 ): void {
+    // Guard: if a craftItem action with inputs already consumed is in the queue,
+    // don't discard it. Inputs are no longer in the building or worker inventory,
+    // so a normal replan would cause planCrafting to permanently fail the job.
+    // Instead, rebuild the queue as [moveTo(building), craftItem] so the worker
+    // returns to the building and finishes the craft with progress preserved.
+    const inProgressCraftItem = agent.actionQueue.find(
+        (a): a is Extract<BehaviorActionData, { type: "craftItem" }> =>
+            a.type === "craftItem" &&
+            (a as Extract<BehaviorActionData, { type: "craftItem" }>)
+                .inputsConsumed === true,
+    );
+    if (inProgressCraftItem) {
+        const root = entity.getRootEntity();
+        const buildingEntity = root.findEntity(inProgressCraftItem.buildingId);
+        if (buildingEntity) {
+            log.info(
+                `Entity ${entity.id} displaced mid-craft — returning to building ${inProgressCraftItem.buildingId}`,
+            );
+            agent.actionQueue = [
+                {
+                    type: "moveTo",
+                    target: buildingEntity.worldPosition,
+                    stopAdjacent: "cardinal",
+                },
+                inProgressCraftItem,
+            ];
+            agent.pendingReplan = undefined;
+            return;
+        }
+    }
+
     // Resolve applicable behaviors for this entity type
     const behaviors = resolver(entity);
 
