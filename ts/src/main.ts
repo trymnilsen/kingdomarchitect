@@ -1,7 +1,7 @@
 import { createRootLogger, createLogger } from "./common/logging/logger.ts";
 import { Game } from "./game/game.ts";
 import { clearGameDatabase } from "./server/persistence/indexedDBAdapter.ts";
-import { WebworkerServerConnection } from "./server/webworkerServerConnection.ts";
+import { LocalServerConnection } from "./server/localServerConnection.ts";
 
 createRootLogger();
 
@@ -22,7 +22,7 @@ async function bootstrap() {
     }
 
     try {
-        const serverConnection = new WebworkerServerConnection();
+        const serverConnection = new LocalServerConnection();
         const game = new Game(canvasElementId, serverConnection);
         await game.bootstrap();
     } catch (e) {

@@ -27,6 +27,7 @@ import {
     queryPath,
     type QueryPathOptions,
 } from "../../map/query/pathQuery.ts";
+import { isImpassableResource } from "../../../data/inventory/items/naturalResource.ts";
 import { negotiateDisplacement } from "../displacement/displacementNegotiation.ts";
 import { commitDisplacementTransaction } from "../displacement/displacementTransaction.ts";
 import {
@@ -95,27 +96,54 @@ function applyRequesterStep(
 }
 
 /**
- * Returns a weight modifier that treats tiles in `blocked` as impassable (weight 0).
+ * Returns a weight modifier that makes structures (non-road buildings and large
+ * resources such as trees and stone) fully impassable, and optionally treats any
+ * tiles in `locallyBlocked` as impassable too. Passable resources (grass, flowers,
+ * mushrooms) and all entity tiles keep their original graph weight so that
+ * displacement negotiation still fires for entity-occupied tiles.
+ *
  * GraphNode coordinates are in graph space (world + offset), so we subtract the
- * graph offset to convert back to world coordinates before checking the set.
+ * graph offset to convert back to world coordinates before querying entities.
  */
-function blockedTilesWeightModifier(
-    blocked: Set<string>,
+function makePathModifier(
+    root: Entity,
     offsetX: number,
     offsetY: number,
+    locallyBlocked: Set<string>,
 ): (node: GraphNode) => number {
     return (node) => {
-        const key = `${node.x - offsetX},${node.y - offsetY}`;
-        return blocked.has(key) ? 0 : node.weight;
+        const wx = node.x - offsetX;
+        const wy = node.y - offsetY;
+
+        if (locallyBlocked.size > 0 && locallyBlocked.has(`${wx},${wy}`)) {
+            return 0;
+        }
+
+        const occupants = queryEntity(root, { x: wx, y: wy });
+        for (const occupant of occupants) {
+            if (occupant.hasComponent(BuildingComponentId)) {
+                const b = occupant.getEcsComponent(BuildingComponentId);
+                if (b && b.building.id !== "road") return 0;
+            }
+            if (occupant.hasComponent(ResourceComponentId)) {
+                const r = occupant.getEcsComponent(ResourceComponentId);
+                if (r && isImpassableResource(r.resourceId)) return 0;
+            }
+        }
+
+        return node.weight;
     };
 }
 
 /**
- * Plan a path from `from` to `target`, treating any tiles in `locallyBlocked` as
- * impassable. Returns the path array or null if no path exists.
+ * Plan a path from `from` to `target`. Buildings and large resources are always
+ * treated as impassable. Any tiles in `locallyBlocked` are also blocked — these
+ * accumulate within a tick when displacement negotiation fails for a tile.
+ * Returns the path array or null if no path exists.
  */
 function planPath(
     pathfindingGraph: ReturnType<typeof getPathfindingGraphForEntity>,
+    root: Entity,
     from: Point,
     target: Point,
     stopAdjacent: "cardinal" | "diagonal" | undefined,
@@ -126,10 +154,7 @@ function planPath(
     const { offsetX, offsetY } = pathfindingGraph.graph;
     const pathOptions: QueryPathOptions = {
         allowAdjacentStop: !!stopAdjacent,
-        weightModifier:
-            locallyBlocked.size > 0
-                ? blockedTilesWeightModifier(locallyBlocked, offsetX, offsetY)
-                : undefined,
+        weightModifier: makePathModifier(root, offsetX, offsetY, locallyBlocked),
     };
 
     const result = queryPath(pathfindingGraph, from, target, pathOptions);
@@ -189,6 +214,7 @@ export function executeMoveToAction(
     if (!action.cachedPath || action.cachedPath.length === 0) {
         const path = planPath(
             pathfindingGraph,
+            root,
             entity.worldPosition,
             action.target,
             action.stopAdjacent,
@@ -301,6 +327,7 @@ export function executeMoveToAction(
 
                 const newPath = planPath(
                     pathfindingGraph,
+                    root,
                     entity.worldPosition,
                     action.target,
                     action.stopAdjacent,

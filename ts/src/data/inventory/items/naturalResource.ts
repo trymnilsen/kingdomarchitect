@@ -227,3 +227,16 @@ export function getResourceById(id: string): NaturalResource | undefined {
 export function hasResource(id: string): boolean {
     return resourceRegistry.has(id);
 }
+
+/**
+ * Returns true if the resource blocks movement — trees, stone, cacti, and similar
+ * large objects. Lifecycle "Finite" (trees) and "Infinite" (stone) mark solid
+ * obstacles. Regrowable and removable resources (grass, flowers, mushrooms) are
+ * treated as passable.
+ */
+export function isImpassableResource(resourceId: string): boolean {
+    const resource = getResourceById(resourceId);
+    if (!resource) return false;
+    const { type } = resource.lifecycle;
+    return type === "Finite" || type === "Infinite";
+}

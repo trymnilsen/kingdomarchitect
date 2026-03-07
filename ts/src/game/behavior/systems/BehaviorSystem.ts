@@ -88,8 +88,7 @@ function updateBehaviorAgent(
                 `Action failed for entity ${entity.id}, cleaning up and replanning`,
             );
             unclaimCurrentJob(entity);
-            agent.currentBehaviorName = null;
-            agent.actionQueue = [];
+            clearBehavior(agent);
             agent.pendingReplan = {
                 kind: "replanAfterFailure",
                 failure: { actionType: action.type, cause: result.cause },
@@ -99,6 +98,18 @@ function updateBehaviorAgent(
         entity.invalidateComponent(BehaviorAgentComponentId);
         // result.kind === "running" — keep action in queue, it will run again next tick
     }
+}
+
+/**
+ * Reset all active behavior state on an agent. Call this before setting
+ * pendingReplan so both idle-termination and failure paths share the same
+ * field clearing — including resetting currentBehaviorUtility to 0 so a
+ * newly-idle entity doesn't retain stale resistance from its last behavior.
+ */
+function clearBehavior(agent: BehaviorAgentComponent): void {
+    agent.currentBehaviorName = null;
+    agent.currentBehaviorUtility = 0;
+    agent.actionQueue = [];
 }
 
 /**
@@ -183,8 +194,7 @@ function replan(
     );
 
     if (validBehaviors.length === 0) {
-        agent.currentBehaviorName = null;
-        agent.actionQueue = [];
+        clearBehavior(agent);
         agent.pendingReplan = undefined;
         return;
     }

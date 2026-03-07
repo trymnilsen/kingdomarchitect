@@ -43,15 +43,4 @@ export default [
             format: "esm",
         },
     },
-    {
-        input: "build/src/server/webWorkerServer.js",
-        plugins: [sourcemaps()],
-        output: {
-            sourcemap: true,
-            file: "public/dist/server/webWorkerServer.js",
-            format: "esm",
-            // Use the factory function with a different prefix
-            sourcemapPathTransform: createSourcePathTransformer("worker:///"),
-        },
-    },
 ];
