@@ -18,6 +18,7 @@ import {
     EquipItemCommandId,
     type EquipItemCommand,
 } from "../../server/message/command/equipItemCommand.ts";
+import { markStatsDirty } from "../component/statsComponent.ts";
 import {
     NewGameCommandId,
     type NewGameCommand,
@@ -300,6 +301,7 @@ function equipItem(root: Entity, command: EquipItemCommand) {
     }
     entity.invalidateComponent(InventoryComponentId);
     entity.invalidateComponent(EquipmentComponentId);
+    markStatsDirty(entity);
 }
 
 function consumeItem(root: Entity, command: ConsumeItemCommand) {
@@ -356,7 +358,7 @@ function consumeItem(root: Entity, command: ConsumeItemCommand) {
     }
 
     // Add the effect to the entity
-    addEffect(activeEffects, effect);
+    addEffect(activeEffects, effect, entity.id);
 
     // Notify changes
     entity.invalidateComponent(InventoryComponentId);

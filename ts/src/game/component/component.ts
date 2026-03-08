@@ -35,6 +35,7 @@ import type { GoblinUnitComponent } from "./goblinUnitComponent.ts";
 import type { FireSourceComponent } from "./fireSourceComponent.ts";
 import type { MovementStaminaComponent } from "./movementStaminaComponent.ts";
 import type { PlayerKingdomComponent } from "./playerKingdomComponent.ts";
+import type { StatsComponent } from "./statsComponent.ts";
 
 export type Components =
     | SpriteComponent
@@ -73,7 +74,8 @@ export type Components =
     | GoblinUnitComponent
     | FireSourceComponent
     | MovementStaminaComponent
-    | PlayerKingdomComponent;
+    | PlayerKingdomComponent
+    | StatsComponent;
 
 export interface BaseComponent {
     id: string;

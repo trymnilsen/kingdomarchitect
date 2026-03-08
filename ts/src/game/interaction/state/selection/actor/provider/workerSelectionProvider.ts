@@ -28,6 +28,7 @@ import {
     WorkerStance,
 } from "../../../../../component/worker/roleComponent.ts";
 import { UpdateWorkerStanceCommand } from "../../../../../../server/message/command/updateWorkerStanceCommand.ts";
+import { StatsViewState } from "../../../stats/statsViewState.ts";
 
 export class WorkerSelectionProvider implements ActorSelectionProvider {
     provideButtons(
@@ -240,6 +241,15 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
                 onClick: () => {
                     stateContext.stateChanger.push(
                         new RoleSelectionState(selectedEntity),
+                    );
+                },
+            },
+            {
+                text: "Stats",
+                icon: spriteRefs.empty_sprite,
+                onClick: () => {
+                    stateContext.stateChanger.push(
+                        new StatsViewState(selectedEntity),
                     );
                 },
             },

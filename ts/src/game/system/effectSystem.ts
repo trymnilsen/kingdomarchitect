@@ -3,31 +3,32 @@ import { createLogger } from "../../common/logging/logger.ts";
 import type { Entity } from "../entity/entity.ts";
 import {
     ActiveEffectsComponentId,
+    type ActiveEffect,
     type ActiveEffectsComponent,
 } from "../component/activeEffectsComponent.ts";
-import { HealthComponentId } from "../component/healthComponent.ts";
-import { heal } from "../component/healthComponent.ts";
-import { healEffectId } from "../../data/effect/health/healEffect.ts";
-import type { HealEffectData } from "../../data/effect/health/healEffect.ts";
-import type { Effect } from "../../data/effect/effect.ts";
+import type { EffectExecutor } from "../../data/effect/effectExecutorRegistry.ts";
+import { StatsComponentId, markStatsDirty } from "../component/statsComponent.ts";
 
 const log = createLogger("effect");
 
-export const effectSystem: EcsSystem = {
-    onUpdate: update,
-};
-
-function update(root: Entity, _deltaTime: number) {
-    const entitiesWithEffects = root.queryComponents(ActiveEffectsComponentId);
-
-    for (const [entity, effectsComponent] of entitiesWithEffects) {
-        processEffects(entity, effectsComponent);
-    }
+export function createEffectSystem(
+    executors: ReadonlyMap<string, EffectExecutor>,
+): EcsSystem {
+    return {
+        onUpdate: (root: Entity, tick: number) => {
+            const entitiesWithEffects = root.queryComponents(ActiveEffectsComponentId);
+            for (const [entity, effectsComponent] of entitiesWithEffects) {
+                processEffects(entity, effectsComponent, tick, executors);
+            }
+        },
+    };
 }
 
 function processEffects(
     entity: Entity,
     effectsComponent: ActiveEffectsComponent,
+    tick: number,
+    executors: ReadonlyMap<string, EffectExecutor>,
 ) {
     const effectsToRemove: number[] = [];
 
@@ -37,22 +38,19 @@ function processEffects(
 
         switch (effect.timing.type) {
             case "immediate": {
-                // Apply immediately and mark for removal
-                applyEffect(entity, effect);
+                runExecutor(entity, activeEffect, tick, executors);
                 effectsToRemove.push(i);
                 break;
             }
             case "delayed": {
-                // Decrement ticks and apply when ready
                 activeEffect.remainingTicks--;
                 if (activeEffect.remainingTicks <= 0) {
-                    applyEffect(entity, effect);
+                    runExecutor(entity, activeEffect, tick, executors);
                     effectsToRemove.push(i);
                 }
                 break;
             }
             case "periodic": {
-                // Apply every interval ticks
                 activeEffect.ticksSinceLastApplication++;
                 activeEffect.remainingTicks--;
 
@@ -60,11 +58,10 @@ function processEffects(
                     activeEffect.ticksSinceLastApplication >=
                     effect.timing.interval
                 ) {
-                    applyEffect(entity, effect);
+                    runExecutor(entity, activeEffect, tick, executors);
                     activeEffect.ticksSinceLastApplication = 0;
                 }
 
-                // Remove when duration is over
                 if (activeEffect.remainingTicks <= 0) {
                     effectsToRemove.push(i);
                 }
@@ -73,27 +70,36 @@ function processEffects(
         }
     }
 
-    // Remove expired effects (in reverse order to maintain indices)
+    // Remove expired effects (reverse order to preserve indices)
     for (let i = effectsToRemove.length - 1; i >= 0; i--) {
         effectsComponent.effects.splice(effectsToRemove[i], 1);
     }
 
     entity.invalidateComponent(ActiveEffectsComponentId);
+
+    // If any remaining effects carry stat modifiers, ensure stats are recomputed
+    if (entity.hasComponent(StatsComponentId)) {
+        const hasModifiers = effectsComponent.effects.some(
+            (e) => Object.keys(e.modifiers).length > 0,
+        );
+        if (hasModifiers) {
+            markStatsDirty(entity);
+        }
+    }
 }
 
-function applyEffect(entity: Entity, effect: Effect): void {
-    switch (effect.id) {
-        case healEffectId: {
-            const healthComponent = entity.getEcsComponent(HealthComponentId);
-            if (healthComponent) {
-                const data = effect.data as HealEffectData;
-                heal(healthComponent, data.amount);
-                entity.invalidateComponent(HealthComponentId);
-            }
-            break;
-        }
-        // Add more effect types here as needed
-        default:
-            log.warn("Unknown effect type", { effectId: effect.id });
+function runExecutor(
+    entity: Entity,
+    activeEffect: ActiveEffect,
+    tick: number,
+    executors: ReadonlyMap<string, EffectExecutor>,
+): void {
+    const executor = executors.get(activeEffect.effect.id);
+    if (executor) {
+        executor.execute(entity, activeEffect, tick);
+    } else {
+        log.warn("No executor registered for effect", {
+            effectId: activeEffect.effect.id,
+        });
     }
 }

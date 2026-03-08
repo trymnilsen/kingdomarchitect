@@ -1,4 +1,9 @@
 import type { Effect } from "../effect.ts";
+import type { EffectExecutor } from "../effectExecutorRegistry.ts";
+import {
+    heal,
+    HealthComponentId,
+} from "../../../game/component/healthComponent.ts";
 
 export type HealEffectData = {
     amount: number;
@@ -6,6 +11,18 @@ export type HealEffectData = {
 
 export const healEffectId = "healingEffect";
 export type HealEffect = Effect<HealEffectData>;
+
+export const healEffectExecutor: EffectExecutor = {
+    effectId: healEffectId,
+    execute: (entity, activeEffect) => {
+        const healthComponent = entity.getEcsComponent(HealthComponentId);
+        if (healthComponent) {
+            const data = activeEffect.effect.data as HealEffectData;
+            heal(healthComponent, data.amount);
+            entity.invalidateComponent(HealthComponentId);
+        }
+    },
+};
 
 /**
  * Creates an immediate healing effect

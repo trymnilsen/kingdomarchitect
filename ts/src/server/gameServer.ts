@@ -22,7 +22,8 @@ import type { GameCommand } from "./message/gameCommand.ts";
 import { createEffectEmitterComponent } from "../game/component/effectEmitterComponent.ts";
 import type { GameMessage } from "./message/gameMessage.ts";
 import { createCommandSystem } from "../game/system/commandSystem.ts";
-import { effectSystem } from "../game/system/effectSystem.ts";
+import { createEffectSystem } from "../game/system/effectSystem.ts";
+import { createEffectExecutorMap } from "../data/effect/effectExecutorRegistry.ts";
 import { housingSystem } from "../game/system/housingSystem.ts";
 import { regrowSystem } from "../game/system/regrowSystem.ts";
 import { PersistenceManager } from "./persistence/persistenceManager.ts";
@@ -175,7 +176,7 @@ export class GameServer {
             createCommandSystem(this.gameTime, this.persistenceManager),
         );
         this.world.addSystem(housingSystem);
-        this.world.addSystem(effectSystem);
+        this.world.addSystem(createEffectSystem(createEffectExecutorMap()));
         this.world.addSystem(regrowSystem);
         this.world.addSystem(
             makeReplicatedEntitiesSystem((message) => {
