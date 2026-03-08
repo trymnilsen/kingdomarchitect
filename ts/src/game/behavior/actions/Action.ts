@@ -3,6 +3,9 @@ import type { Point } from "../../../common/point.ts";
 import type { ResourceHarvestMode } from "../../../data/inventory/items/naturalResource.ts";
 import type { CraftingRecipe } from "../../../data/crafting/craftingRecipe.ts";
 
+/** Quality of sleep determines restore rates and duration. */
+export type SleepQuality = "house" | "bedrollFire" | "bedrollAlone" | "collapse";
+
 /**
  * Failure causes carry enough context for behaviors to branch intelligently
  * when a replan is triggered. For example, keepWarmBehavior can see that
@@ -69,7 +72,14 @@ export type BehaviorActionData =
           cachedPath?: Point[];
       }
     | { type: "clearPlayerCommand" }
-    | { type: "sleep" }
+    | {
+          type: "sleep";
+          quality: SleepQuality;
+          /** Total ticks to sleep (baseDuration * sleepMultiplier) */
+          duration: number;
+          /** Ticks elapsed so far, incremented each tick */
+          ticksSlept: number;
+      }
     | { type: "depositToStockpile"; stockpileId: string }
     | {
           type: "harvestResource";

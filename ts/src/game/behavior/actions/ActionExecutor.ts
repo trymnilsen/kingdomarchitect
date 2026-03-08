@@ -39,7 +39,7 @@ export const executeAction: BehaviorActionExecutor = (
         case "clearPlayerCommand":
             return executeClearPlayerCommandAction(entity);
         case "sleep":
-            return executeSleepAction(entity);
+            return executeSleepAction(action, entity);
         case "depositToStockpile":
             return executeDepositToStockpileAction(action, entity);
         case "harvestResource":

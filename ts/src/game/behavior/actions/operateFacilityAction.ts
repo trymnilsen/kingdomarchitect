@@ -1,6 +1,7 @@
 import { isPointAdjacentTo } from "../../../common/point.ts";
 import { createLogger } from "../../../common/logging/logger.ts";
 import { getProductionDefinition } from "../../../data/production/productionDefinition.ts";
+import { spendEntityEnergy } from "../../component/energyComponent.ts";
 
 const log = createLogger("behavior");
 import { getResourceById } from "../../../data/inventory/items/naturalResource.ts";
@@ -78,6 +79,7 @@ export function executeOperateFacilityAction(
         action.progress = 0;
     }
     action.progress++;
+    spendEntityEnergy(entity, 2);
 
     if (action.progress >= definition.duration) {
         const yieldDef = definition.yield;

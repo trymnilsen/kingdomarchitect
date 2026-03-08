@@ -40,19 +40,27 @@ import { stockPile } from "../../../src/data/building/wood/storage.ts";
 import type { EcsSystem } from "../../../src/common/ecs/ecsSystem.ts";
 import type { Point } from "../../../src/common/point.ts";
 import type { InventoryItemQuantity } from "../../../src/data/inventory/inventoryItemQuantity.ts";
+import {
+    createHousingComponent,
+} from "../../../src/game/component/housingComponent.ts";
+import {
+    createFireSourceComponent,
+} from "../../../src/game/component/fireSourceComponent.ts";
 
 /**
- * Full-stack scenario test harness for logistics and crafting flows.
- * Creates a world with tiles, pathfinding, job queue, and runs the real
- * behavior system so tests exercise actual behavior selection and action execution.
+ * Full-stack scenario test harness for logistics, crafting, and behavior flows.
+ * Creates a world with tiles, pathfinding, job queue, and runs a real system
+ * pipeline so tests exercise actual behavior selection and action execution.
+ *
+ * Pass extraSystems to add additional systems (e.g. effectSystem) to the pipeline.
+ * Systems run in registration order: chunkMap → behavior → extraSystems.
  */
 export class ScenarioHarness {
     root: Entity;
     ecsWorld: EcsWorld;
-    private behaviorSystem: EcsSystem;
-    private currentTick: number = 0;
+    currentTick: number = 0;
 
-    constructor() {
+    constructor(extraSystems: EcsSystem[] = []) {
         this.ecsWorld = new EcsWorld();
         this.ecsWorld.addSystem(chunkMapSystem);
         this.root = this.ecsWorld.root;
@@ -77,13 +85,19 @@ export class ScenarioHarness {
         this.root.setEcsComponent(createEffectEmitterComponent(() => {}));
         this.root.setEcsComponent(createWorldDiscoveryComponent());
 
-        this.behaviorSystem = createBehaviorSystem(createBehaviorResolver());
+        this.ecsWorld.addSystem(createBehaviorSystem(createBehaviorResolver()));
+
+        for (const system of extraSystems) {
+            this.ecsWorld.addSystem(system);
+        }
+
+        this.ecsWorld.runInit();
     }
 
     /** Advance simulation by one tick */
     tick(): void {
         this.currentTick++;
-        this.behaviorSystem.onUpdate!(this.root, this.currentTick);
+        this.ecsWorld.runUpdate(this.currentTick);
     }
 
     /** Advance simulation by N ticks */
@@ -94,16 +108,18 @@ export class ScenarioHarness {
     }
 
     /**
-     * Tick until predicate returns true, or throw after maxTicks.
-     * Returns number of ticks elapsed.
+     * Tick until predicate returns true or maxTicks is reached.
+     * Returns the number of ticks elapsed. Does NOT throw if maxTicks is reached —
+     * let the calling test assert on the return value or world state.
      */
-    tickUntil(predicate: () => boolean, maxTicks: number = 100): number {
+    tickUntil(
+        predicate: (root: Entity, tick: number) => boolean,
+        maxTicks: number = 100,
+    ): number {
         let elapsed = 0;
-        while (!predicate()) {
+        while (!predicate(this.root, this.currentTick)) {
             if (elapsed >= maxTicks) {
-                throw new Error(
-                    `tickUntil: predicate did not become true after ${maxTicks} ticks`,
-                );
+                return elapsed;
             }
             this.tick();
             elapsed++;
@@ -144,6 +160,36 @@ export class ScenarioHarness {
         building: Building,
     ): Entity {
         const entity = buildingPrefab(building, false, id);
+        this.root.addChild(entity);
+        entity.worldPosition = position;
+        return entity;
+    }
+
+    /**
+     * Add a building entity. Pass `{ housing: true }` to also add a HousingComponent,
+     * and `{ tenant: entity }` to assign a tenant.
+     */
+    placeBuilding(
+        id: string,
+        position: Point,
+        options?: { housing?: boolean; tenant?: Entity; building?: Building },
+    ): Entity {
+        const buildingDef = options?.building ?? stockPile;
+        const entity = buildingPrefab(buildingDef, false, id);
+        this.root.addChild(entity);
+        entity.worldPosition = position;
+        if (options?.housing) {
+            entity.setEcsComponent(createHousingComponent(options.tenant ?? null));
+        }
+        return entity;
+    }
+
+    /**
+     * Add a campfire entity at the given position.
+     */
+    placeCampfire(id: string, position: Point): Entity {
+        const entity = new Entity(id);
+        entity.setEcsComponent(createFireSourceComponent());
         this.root.addChild(entity);
         entity.worldPosition = position;
         return entity;

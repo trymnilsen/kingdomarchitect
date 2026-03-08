@@ -1,6 +1,7 @@
 import type { ActiveEffect } from "../../game/component/activeEffectsComponent.ts";
 import type { Entity } from "../../game/entity/entity.ts";
 import { healEffectExecutor } from "./health/healEffect.ts";
+import { exhaustionEffectExecutor } from "./exhaustion/exhaustionEffect.ts";
 
 export type EffectExecutor = {
     effectId: string;
@@ -8,6 +9,9 @@ export type EffectExecutor = {
 };
 
 export function createEffectExecutorMap(): ReadonlyMap<string, EffectExecutor> {
-    const executors: EffectExecutor[] = [healEffectExecutor];
+    const executors: EffectExecutor[] = [
+        healEffectExecutor,
+        exhaustionEffectExecutor,
+    ];
     return new Map(executors.map((e) => [e.effectId, e]));
 }

@@ -17,6 +17,7 @@ import {
     recordMove,
 } from "../../component/movementStaminaComponent.ts";
 import { ResourceComponentId } from "../../component/resourceComponent.ts";
+import { spendEntityEnergy } from "../../component/energyComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { discoverAfterMovement } from "../../job/movementHelper.ts";
 import { getPathfindingGraphForEntity } from "../../map/path/getPathfindingGraphForEntity.ts";
@@ -93,6 +94,7 @@ function applyRequesterStep(
         recordMove(stamina, tick);
         entity.invalidateComponent(MovementStaminaComponentId);
     }
+    spendEntityEnergy(entity, 1);
 }
 
 /**

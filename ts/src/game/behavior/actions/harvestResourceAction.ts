@@ -4,6 +4,7 @@ import {
     getResourceById,
     ResourceHarvestMode,
 } from "../../../data/inventory/items/naturalResource.ts";
+import { spendEntityEnergy } from "../../component/energyComponent.ts";
 
 const log = createLogger("behavior");
 import { damage, HealthComponentId } from "../../component/healthComponent.ts";
@@ -108,6 +109,7 @@ function executeChopHarvest(
 
     damage(healthComponent, 10);
     resourceEntity.invalidateComponent(HealthComponentId);
+    spendEntityEnergy(worker, 2);
 
     if (healthComponent.currentHp <= 0) {
         for (const yieldItem of resource.yields) {
@@ -148,6 +150,7 @@ function executeWorkHarvest(
         action.workProgress = 0;
     }
     action.workProgress++;
+    spendEntityEnergy(worker, 2);
 
     if (action.workProgress >= workDuration) {
         for (const yieldItem of resource.yields) {

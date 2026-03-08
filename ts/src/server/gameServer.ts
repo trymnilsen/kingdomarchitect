@@ -7,7 +7,6 @@ import { worldGenerationSystem } from "../game/system/worldGenerationSystem.ts";
 import { EcsWorld } from "../common/ecs/ecsWorld.ts";
 import { createRootEntity } from "../game/rootFactory.ts";
 import { hungerSystem } from "../game/system/hungerSystem.ts";
-import { energySystem } from "../game/system/energySystem.ts";
 import { createJobNotificationSystem } from "../game/system/jobNotificationSystem.ts";
 import { createBehaviorSystem } from "../game/behavior/systems/BehaviorSystem.ts";
 import { createBehaviorResolver } from "../game/behavior/behaviorResolver.ts";
@@ -165,10 +164,11 @@ export class GameServer {
     private addSystems() {
         this.world.addSystem(chunkMapSystem);
         this.world.addSystem(pathfindingSystem);
+        // Effect system runs before behavior so stat modifiers are current when behaviors evaluate
+        this.world.addSystem(createEffectSystem(createEffectExecutorMap()));
         this.world.addSystem(createBehaviorSystem(createBehaviorResolver()));
         this.world.addSystem(createJobNotificationSystem());
         this.world.addSystem(hungerSystem);
-        this.world.addSystem(energySystem);
         this.world.addSystem(warmthSystem);
         this.world.addSystem(goblinCampSystem);
         this.world.addSystem(worldGenerationSystem);
@@ -176,7 +176,6 @@ export class GameServer {
             createCommandSystem(this.gameTime, this.persistenceManager),
         );
         this.world.addSystem(housingSystem);
-        this.world.addSystem(createEffectSystem(createEffectExecutorMap()));
         this.world.addSystem(regrowSystem);
         this.world.addSystem(
             makeReplicatedEntitiesSystem((message) => {

@@ -67,6 +67,12 @@ function processEffects(
                 }
                 break;
             }
+            case "persistent": {
+                // Persistent effects run every tick and are never auto-removed.
+                // They must be explicitly removed via removeEffectsBySource.
+                runExecutor(entity, activeEffect, tick, executors);
+                break;
+            }
         }
     }
 

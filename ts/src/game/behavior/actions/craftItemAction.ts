@@ -5,6 +5,7 @@ import {
     InventoryComponentId,
     takeInventoryItem,
 } from "../../component/inventoryComponent.ts";
+import { spendEntityEnergy } from "../../component/energyComponent.ts";
 
 const log = createLogger("behavior");
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
@@ -91,6 +92,7 @@ export function executeCraftItemAction(
         action.progress = 0;
     }
     action.progress++;
+    spendEntityEnergy(entity, 2);
 
     if (action.progress >= recipe.duration) {
         for (const output of recipe.outputs) {

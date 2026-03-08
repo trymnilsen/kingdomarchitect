@@ -5,6 +5,7 @@ import {
     createEntityWithEnergy,
     createBehaviorTestEntity,
 } from "./behaviorTestHelpers.ts";
+import { EnergyComponentId } from "../../../src/game/component/energyComponent.ts";
 
 describe("SleepBehavior", () => {
     describe("isValid", () => {
@@ -17,13 +18,24 @@ describe("SleepBehavior", () => {
             assert.strictEqual(valid, true);
         });
 
-        it("returns false when energy is 30 or above", () => {
+        it("returns false when energy is 30 or above and no exhaustion", () => {
             const behavior = createSleepBehavior();
             const entity = createEntityWithEnergy("test", 30);
 
             const valid = behavior.isValid(entity);
 
             assert.strictEqual(valid, false);
+        });
+
+        it("returns true when exhaustionLevel > 0 even with energy >= 30", () => {
+            const behavior = createSleepBehavior();
+            const entity = createEntityWithEnergy("test", 50);
+            const energy = entity.requireEcsComponent(EnergyComponentId);
+            energy.exhaustionLevel = 1;
+
+            const valid = behavior.isValid(entity);
+
+            assert.strictEqual(valid, true);
         });
 
         it("returns false when entity has no energy component", () => {
@@ -37,7 +49,7 @@ describe("SleepBehavior", () => {
     });
 
     describe("utility", () => {
-        it("returns 0 when energy is 30 or above", () => {
+        it("returns 0 when energy is 30 or above and no exhaustion", () => {
             const behavior = createSleepBehavior();
             const entity = createEntityWithEnergy("test", 30);
 
@@ -46,13 +58,24 @@ describe("SleepBehavior", () => {
             assert.strictEqual(utility, 0);
         });
 
-        it("returns 60 when energy is exactly 29", () => {
+        it("returns ~56 when energy is exactly 29 (base formula)", () => {
             const behavior = createSleepBehavior();
             const entity = createEntityWithEnergy("test", 29);
 
             const utility = behavior.utility(entity);
 
-            assert.ok(utility >= 60 && utility < 61);
+            // base = 55 + (30-29)*0.67 = 55.67
+            assert.ok(utility >= 55 && utility < 57, `expected ~56, got ${utility}`);
+        });
+
+        it("returns ~75 when energy is 0 and no exhaustion", () => {
+            const behavior = createSleepBehavior();
+            const entity = createEntityWithEnergy("test", 0);
+
+            const utility = behavior.utility(entity);
+
+            // base = 55 + 30*0.67 = 75.1
+            assert.ok(utility >= 74 && utility <= 76, `expected ~75, got ${utility}`);
         });
 
         it("returns higher utility for lower energy", () => {
@@ -66,13 +89,15 @@ describe("SleepBehavior", () => {
             assert.ok(utility10 > utility20);
         });
 
-        it("returns approximately 80 when energy is 0", () => {
+        it("utility at exhaustion level 3 is greater than at level 1 for same energy", () => {
             const behavior = createSleepBehavior();
-            const entity = createEntityWithEnergy("test", 0);
+            const entity1 = createEntityWithEnergy("test", 20);
+            const entity3 = createEntityWithEnergy("test", 20);
 
-            const utility = behavior.utility(entity);
+            entity1.requireEcsComponent(EnergyComponentId).exhaustionLevel = 1;
+            entity3.requireEcsComponent(EnergyComponentId).exhaustionLevel = 3;
 
-            assert.ok(utility >= 79 && utility <= 81);
+            assert.ok(behavior.utility(entity3) > behavior.utility(entity1));
         });
 
         it("returns 0 when entity has no energy component", () => {
@@ -86,7 +111,7 @@ describe("SleepBehavior", () => {
     });
 
     describe("expand", () => {
-        it("returns sleep action", () => {
+        it("returns sleep action with quality and duration", () => {
             const behavior = createSleepBehavior();
             const entity = createEntityWithEnergy("test", 10);
 
@@ -94,6 +119,24 @@ describe("SleepBehavior", () => {
 
             assert.strictEqual(actions.length, 1);
             assert.strictEqual(actions[0].type, "sleep");
+            if (actions[0].type === "sleep") {
+                assert.ok(actions[0].duration > 0);
+                assert.strictEqual(actions[0].ticksSlept, 0);
+            }
+        });
+
+        it("returns collapse action at exhaustion level 4", () => {
+            const behavior = createSleepBehavior();
+            const entity = createEntityWithEnergy("test", 0);
+            entity.requireEcsComponent(EnergyComponentId).exhaustionLevel = 4;
+
+            const actions = behavior.expand(entity);
+
+            assert.strictEqual(actions.length, 1);
+            assert.strictEqual(actions[0].type, "sleep");
+            if (actions[0].type === "sleep") {
+                assert.strictEqual(actions[0].quality, "collapse");
+            }
         });
     });
 

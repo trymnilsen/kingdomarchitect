@@ -34,7 +34,9 @@ export function addEffect(
             ? 0
             : effect.timing.type === "delayed"
               ? effect.timing.ticks
-              : effect.timing.ticks;
+              : effect.timing.type === "periodic"
+                ? effect.timing.ticks
+                : 0; // persistent: no countdown
 
     component.effects.push({
         effect,
@@ -66,3 +68,32 @@ export function removeEffectsBySource(
 }
 
 export const ActiveEffectsComponentId = "activeEffects";
+
+/**
+ * Add an effect to an entity's ActiveEffectsComponent.
+ * No-ops if the entity has no ActiveEffectsComponent.
+ */
+export function addEffectToEntity(
+    entity: Entity,
+    effect: Effect,
+    source: string,
+): void {
+    const component = entity.getEcsComponent(ActiveEffectsComponentId);
+    if (!component) return;
+    addEffect(component, effect, source);
+    entity.invalidateComponent(ActiveEffectsComponentId);
+}
+
+/**
+ * Remove all effects from a source on an entity.
+ * No-ops if the entity has no ActiveEffectsComponent.
+ */
+export function removeEntityEffectsBySource(
+    entity: Entity,
+    source: string,
+): void {
+    const component = entity.getEcsComponent(ActiveEffectsComponentId);
+    if (!component) return;
+    removeEffectsBySource(entity, component, source);
+    entity.invalidateComponent(ActiveEffectsComponentId);
+}
