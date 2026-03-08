@@ -129,7 +129,21 @@ describe("HaulBehavior", () => {
     });
 
     describe("utility", () => {
-        it("returns 25 (low priority)", () => {
+        it("returns low utility (~5-8) with 1 item in inventory", () => {
+            const behavior = createHaulBehavior();
+            const root = new Entity("root");
+            const worker = createWorkerWithInventory("worker", [
+                { item: woodResourceItem, amount: 1 },
+            ]);
+            root.addChild(worker);
+
+            const utility = behavior.utility(worker);
+
+            assert.ok(utility >= 5, `Expected utility >= 5, got ${utility}`);
+            assert.ok(utility <= 10, `Expected utility <= 10, got ${utility}`);
+        });
+
+        it("returns medium utility (~35-40) with 10 items in inventory", () => {
             const behavior = createHaulBehavior();
             const root = new Entity("root");
             const worker = createWorkerWithInventory("worker", [
@@ -139,7 +153,40 @@ describe("HaulBehavior", () => {
 
             const utility = behavior.utility(worker);
 
-            assert.strictEqual(utility, 25);
+            assert.ok(utility >= 30, `Expected utility >= 30, got ${utility}`);
+            assert.ok(utility <= 45, `Expected utility <= 45, got ${utility}`);
+        });
+
+        it("returns high utility (~70) with 20+ items in inventory", () => {
+            const behavior = createHaulBehavior();
+            const root = new Entity("root");
+            const worker = createWorkerWithInventory("worker", [
+                { item: woodResourceItem, amount: 20 },
+            ]);
+            root.addChild(worker);
+
+            const utility = behavior.utility(worker);
+
+            assert.ok(utility >= 65, `Expected utility >= 65, got ${utility}`);
+            assert.ok(utility <= 70, `Expected utility <= 70, got ${utility}`);
+        });
+
+        it("does not count equipped items toward fullness", () => {
+            const behavior = createHaulBehavior();
+            const root = new Entity("root");
+            // Worker has sword equipped (1 item) + 1 wood unequipped
+            const worker = createWorkerWithInventory("worker", [
+                { item: swordItem, amount: 1 },
+                { item: woodResourceItem, amount: 1 },
+            ]);
+            const equipment = worker.getEcsComponent("equipment")!;
+            equipment.slots.main = swordItem;
+            root.addChild(worker);
+
+            const utility = behavior.utility(worker);
+
+            // Only 1 wood counts (not sword), so utility should be low (~5-10)
+            assert.ok(utility <= 10, `Expected low utility, got ${utility}`);
         });
     });
 

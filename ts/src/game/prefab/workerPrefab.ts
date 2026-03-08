@@ -17,8 +17,8 @@ import { createBehaviorAgentComponent } from "../component/BehaviorAgentComponen
 import { createRoleComponent } from "../component/worker/roleComponent.ts";
 import { createMovementStaminaComponent } from "../component/movementStaminaComponent.ts";
 
-export function workerPrefab(): Entity {
-    const entity = new Entity(generateId("worker"));
+export function workerPrefab(id?: string): Entity {
+    const entity = new Entity(id ?? generateId("worker"));
     const spriteComponent = createSpriteComponent(spriteRefs.empty_sprite);
     entity.setEcsComponent(spriteComponent);
     entity.setEcsComponent(createHealthComponent(50, 100));

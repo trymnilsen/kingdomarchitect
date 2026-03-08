@@ -24,7 +24,7 @@ import {
  * Craft an item at a building.
  * - First tick: Consume inputs from worker inventory
  * - Progress stored on action.progress
- * - On completion: Add outputs to building inventory
+ * - On completion: Add outputs to worker inventory
  * Assumes worker is already adjacent to building (moveTo should have run first).
  */
 export function executeCraftItemAction(
@@ -50,11 +50,12 @@ export function executeCraftItemAction(
     }
 
     const workerInventory = entity.requireEcsComponent(InventoryComponentId);
-    const buildingInventory =
-        buildingEntity.requireEcsComponent(InventoryComponentId);
+    // Building inventory kept as structural validator; future input staging may use it.
+    buildingEntity.requireEcsComponent(InventoryComponentId);
 
     const recipe = action.recipe;
 
+    // TODO: check inventory capacity before claiming craft jobs
     if (!action.inputsConsumed) {
         for (const input of recipe.inputs) {
             const item = workerInventory.items.find(
@@ -93,9 +94,9 @@ export function executeCraftItemAction(
 
     if (action.progress >= recipe.duration) {
         for (const output of recipe.outputs) {
-            addInventoryItem(buildingInventory, output.item, output.amount);
+            addInventoryItem(workerInventory, output.item, output.amount);
         }
-        buildingEntity.invalidateComponent(InventoryComponentId);
+        entity.invalidateComponent(InventoryComponentId);
 
         const queueEntity = entity.getAncestorEntity(JobQueueComponentId);
         if (queueEntity) {

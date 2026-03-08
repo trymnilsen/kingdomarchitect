@@ -7,6 +7,7 @@ import { createSleepBehavior } from "./behaviors/SleepBehavior.ts";
 import { createKeepWarmBehavior } from "./behaviors/goblin/keepWarmBehavior.ts";
 import { createPerformJobBehavior } from "./behaviors/PerformJobBehavior.ts";
 import { createHaulBehavior } from "./behaviors/HaulBehavior.ts";
+import { createRestockBehavior } from "./behaviors/RestockBehavior.ts";
 import { planBuildBuilding } from "../job/planner/buildBuildingPlanner.ts";
 import { planGoblinBuildJob } from "../job/planner/goblinBuildJobPlanner.ts";
 
@@ -41,6 +42,7 @@ export function createBehaviorResolver(): BehaviorResolver {
         createSleepBehavior(),
         createPerformJobBehavior(planBuildBuilding),
         createHaulBehavior(),
+        createRestockBehavior(),
     ];
 
     const goblinBehaviors: Behavior[] = [

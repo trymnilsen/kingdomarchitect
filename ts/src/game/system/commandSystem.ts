@@ -82,6 +82,14 @@ import {
     type UpdateWorkerStanceCommand,
 } from "../../server/message/command/updateWorkerStanceCommand.ts";
 import { RoleComponentId } from "../component/worker/roleComponent.ts";
+import {
+    SetPreferredAmountCommandId,
+    type SetPreferredAmountCommand,
+} from "../../server/message/command/setPreferredAmountCommand.ts";
+import {
+    setPreferredAmount,
+    StockpileComponentId,
+} from "../component/stockpileComponent.ts";
 
 const log = createLogger("command");
 
@@ -146,6 +154,12 @@ function onGameMessage(
             updateWorkerStance(
                 root,
                 message.command as UpdateWorkerStanceCommand,
+            );
+            break;
+        case SetPreferredAmountCommandId:
+            handleSetPreferredAmount(
+                root,
+                message.command as SetPreferredAmountCommand,
             );
             break;
     }
@@ -422,4 +436,28 @@ function updateWorkerStance(root: Entity, command: UpdateWorkerStanceCommand) {
 
     roleComponent.stance = command.stance;
     worker.invalidateComponent(RoleComponentId);
+}
+
+function handleSetPreferredAmount(
+    root: Entity,
+    command: SetPreferredAmountCommand,
+) {
+    const stockpile = root.findEntity(command.stockpileEntityId);
+    if (!stockpile) {
+        log.warn("Stockpile not found for SetPreferredAmount", {
+            entityId: command.stockpileEntityId,
+        });
+        return;
+    }
+
+    const stockpileComponent = stockpile.getEcsComponent(StockpileComponentId);
+    if (!stockpileComponent) {
+        log.warn("Entity is not a stockpile", {
+            entityId: command.stockpileEntityId,
+        });
+        return;
+    }
+
+    setPreferredAmount(stockpileComponent, command.itemId, command.amount);
+    stockpile.invalidateComponent(StockpileComponentId);
 }

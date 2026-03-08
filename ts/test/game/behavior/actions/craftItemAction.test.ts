@@ -93,8 +93,8 @@ describe("craftItemAction", () => {
         assert.strictEqual(action.progress, 1);
     });
 
-    it("completes and outputs to building when progress reaches duration", () => {
-        const { worker, building } = createTestScene();
+    it("completes and outputs to worker inventory when progress reaches duration", () => {
+        const { worker } = createTestScene();
 
         // planksRecipe has duration: 3
         const action = {
@@ -109,9 +109,8 @@ describe("craftItemAction", () => {
 
         assert.strictEqual(result.kind, "complete");
 
-        const buildingInventory =
-            building.getEcsComponent(InventoryComponentId)!;
-        const planks = getInventoryItem(buildingInventory, "planks");
+        const workerInventory = worker.getEcsComponent(InventoryComponentId)!;
+        const planks = getInventoryItem(workerInventory, "planks");
         assert.ok(planks);
         assert.strictEqual(planks.amount, 2);
     });

@@ -35,8 +35,9 @@ import { InventoryComponentId } from "../component/inventoryComponent.ts";
 export function buildingPrefab(
     building: Building,
     startScaffolded: boolean = false,
+    id?: string,
 ): Entity {
-    const entity = new Entity(generateId("building"));
+    const entity = new Entity(id ?? generateId("building"));
     entity.setEcsComponent(createBuildingComponent(building, startScaffolded));
     entity.setEcsComponent(
         createHealthComponent(startScaffolded ? 10 : 100, 100),
@@ -92,8 +93,10 @@ export function applyFunctionalComponents(
     if (building.id == stockPile.id) {
         entity.setEcsComponent(createInventoryComponent());
         entity.setEcsComponent(createStockpileComponent());
+        entity.setEcsComponent(createWorkplaceComponent());
         entity.invalidateComponent(InventoryComponentId);
         entity.invalidateComponent(StockpileComponentId);
+        entity.invalidateComponent(WorkplaceComponentId);
     }
     if (building.id == forrester.id) {
         entity.setEcsComponent(

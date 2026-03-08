@@ -1,4 +1,5 @@
 import { distance } from "../../../common/point.ts";
+import { lerp } from "../../../common/number.ts";
 import { findStockpiles } from "../../building/materialQuery.ts";
 import { EquipmentComponentId } from "../../component/equipmentComponent.ts";
 import { InventoryComponentId } from "../../component/inventoryComponent.ts";
@@ -8,8 +9,16 @@ import type { BehaviorActionData } from "../actions/Action.ts";
 import type { Behavior } from "./Behavior.ts";
 
 /**
+ * Soft inventory cap used for utility scaling.
+ * The inventory system doesn't enforce this limit; it's used here and
+ * in RestockBehavior to reason about how "full" a worker is.
+ */
+export const WORKER_INVENTORY_CAPACITY = 20;
+
+/**
  * HaulBehavior causes workers to deposit non-equipped inventory items to stockpiles.
- * This is a low-priority behavior that runs when the worker has nothing else to do.
+ * Utility scales with inventory pressure: near-empty bags are low priority,
+ * a full bag competes with normal work.
  */
 export function createHaulBehavior(): Behavior {
     return {
@@ -23,8 +32,8 @@ export function createHaulBehavior(): Behavior {
             }
 
             // Check if there are any non-equipped items to haul
-            const haulableItems = getHaulableItems(entity);
-            if (haulableItems.length === 0) {
+            const count = getHaulableItemCount(entity);
+            if (count === 0) {
                 return false;
             }
 
@@ -34,9 +43,12 @@ export function createHaulBehavior(): Behavior {
             return stockpiles.length > 0;
         },
 
-        utility(_entity: Entity): number {
-            // Low priority (25) - below normal work (50), above idle
-            return 25;
+        utility(entity: Entity): number {
+            const count = getHaulableItemCount(entity);
+            const fullness = count / WORKER_INVENTORY_CAPACITY;
+            // At 1 item (~5% full): utility ≈ 8 (below idle behaviors)
+            // At capacity (100% full): utility = 70 (competing with work)
+            return lerp(5, 70, fullness);
         },
 
         expand(entity: Entity): BehaviorActionData[] {
@@ -73,13 +85,13 @@ export function createHaulBehavior(): Behavior {
 }
 
 /**
- * Get inventory items that are not currently equipped.
- * These are the items that can be hauled to a stockpile.
+ * Get the total count of inventory items that are not currently equipped.
+ * These are the items that would be hauled to a stockpile.
  */
-function getHaulableItems(entity: Entity): string[] {
+export function getHaulableItemCount(entity: Entity): number {
     const inventory = entity.getEcsComponent(InventoryComponentId);
     if (!inventory) {
-        return [];
+        return 0;
     }
 
     const equipment = entity.getEcsComponent(EquipmentComponentId);
@@ -94,8 +106,8 @@ function getHaulableItems(entity: Entity): string[] {
         }
     }
 
-    // Return item IDs that are not equipped
     return inventory.items
         .filter((stack) => !equippedItemIds.has(stack.item.id))
-        .map((stack) => stack.item.id);
+        .reduce((sum, stack) => sum + stack.amount, 0);
 }
+

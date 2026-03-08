@@ -105,7 +105,13 @@ export type BehaviorActionData =
       }
     | { type: "collectItems"; entityId: string }
     | { type: "attackTarget"; targetId: string }
-    | { type: "warmByFire"; fireEntityId: string };
+    | { type: "warmByFire"; fireEntityId: string }
+    | {
+          type: "withdrawFromStockpile";
+          stockpileId: string;
+          itemId: string;
+          amount: number;
+      };
 
 /**
  * Action executor function type - takes action data, entity, and tick, returns result.

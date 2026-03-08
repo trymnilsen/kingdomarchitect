@@ -10,7 +10,12 @@ import {
     InventoryComponentId,
     type InventoryComponent,
 } from "../component/inventoryComponent.ts";
-import { StockpileComponentId } from "../component/stockpileComponent.ts";
+import {
+    getStockpileDeficit,
+    getStockpileSurplus,
+    StockpileComponentId,
+    type StockpileComponent,
+} from "../component/stockpileComponent.ts";
 import type { Entity } from "../entity/entity.ts";
 import { createLogger } from "../../common/logging/logger.ts";
 
@@ -42,9 +47,9 @@ export type MaterialCheckResult = {
 /**
  * Find all stockpile buildings in the settlement that have inventory components
  */
-export function findStockpiles(root: Entity): Entity[] {
+export function findStockpiles(settlement: Entity): Entity[] {
     const stockpiles: Entity[] = [];
-    const stockpileComponents = root.queryComponents(StockpileComponentId);
+    const stockpileComponents = settlement.queryComponents(StockpileComponentId);
 
     for (const [entity] of stockpileComponents) {
         if (entity.getEcsComponent(InventoryComponentId)) {
@@ -281,6 +286,87 @@ export function findNearestStockpileForMaterials(
     );
 
     return allSources[0];
+}
+
+export type StockpileDeficit = {
+    stockpile: Entity;
+    itemId: string;
+    deficit: number;
+    preferred: number;
+};
+
+/**
+ * Find all stockpile deficits across the settlement.
+ * A deficit exists when a stockpile's current amount is below its preferred amount.
+ *
+ * Future consideration: material queries for construction could eventually respect
+ * preferred amounts (e.g. a stockpile with preferred 10 and current 12 only shows 2
+ * as "available" for build tasks). Not implemented here — preferred amounts are
+ * currently logistics hints only, not reservations.
+ */
+export function findStockpileDeficits(settlement: Entity): StockpileDeficit[] {
+    const deficits: StockpileDeficit[] = [];
+    const stockpileComponents = settlement.queryComponents(StockpileComponentId);
+
+    for (const [entity, stockpile] of stockpileComponents) {
+        const inventory = entity.getEcsComponent(InventoryComponentId);
+        if (!inventory) {
+            continue;
+        }
+        for (const preferred of (stockpile as StockpileComponent).preferredAmounts) {
+            const deficit = getStockpileDeficit(
+                stockpile as StockpileComponent,
+                inventory,
+                preferred.itemId,
+            );
+            if (deficit > 0) {
+                deficits.push({
+                    stockpile: entity,
+                    itemId: preferred.itemId,
+                    deficit,
+                    preferred: preferred.amount,
+                });
+            }
+        }
+    }
+
+    return deficits;
+}
+
+export type StockpileSurplus = {
+    stockpile: Entity;
+    itemId: string;
+    surplus: number;
+};
+
+/**
+ * Find all stockpiles that have surplus of a specific item.
+ * A stockpile has surplus when it holds more than its preferred amount,
+ * or any amount at all if no preference is set for that item.
+ */
+export function findStockpileSurplus(
+    settlement: Entity,
+    itemId: string,
+): StockpileSurplus[] {
+    const results: StockpileSurplus[] = [];
+    const stockpileComponents = settlement.queryComponents(StockpileComponentId);
+
+    for (const [entity, stockpile] of stockpileComponents) {
+        const inventory = entity.getEcsComponent(InventoryComponentId);
+        if (!inventory) {
+            continue;
+        }
+        const surplus = getStockpileSurplus(
+            stockpile as StockpileComponent,
+            inventory,
+            itemId,
+        );
+        if (surplus > 0) {
+            results.push({ stockpile: entity, itemId, surplus });
+        }
+    }
+
+    return results;
 }
 
 /**
