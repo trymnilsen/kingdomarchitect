@@ -16,7 +16,7 @@ import type {
     AnimationAnchor,
     AnchorFrame,
     PartFrame,
-} from "./characterAnimation.ts";
+} from "../../src/characterbuilder/characterAnimation.ts";
 
 const assetPath = path.join(process.cwd(), "asset", "character");
 run();

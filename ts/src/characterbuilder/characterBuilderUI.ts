@@ -1,5 +1,7 @@
 import { createLogger } from "../common/logging/logger.ts";
 import { characterPartFrames } from "../../generated/characterFrames.ts";
+import { getAllAnimations } from "./animation/getAllAnimations.ts";
+import type { CharacterAnimation } from "./characterAnimation.ts";
 import { createComponent } from "../ui/declarative/ui.ts";
 import { uiColumn, uiRow } from "../ui/declarative/uiSequence.ts";
 import { fillUiSize } from "../ui/uiSize.ts";
@@ -16,8 +18,13 @@ import {
     type BodyPart,
     type PreviewMode,
 } from "./ui/characterBuilderConstants.ts";
+import { spriteRefs } from "../asset/sprite.ts";
 
 const log = createLogger("characterbuilder");
+
+const allAnimations = getAllAnimations(
+    characterPartFrames as unknown as CharacterAnimation[],
+);
 
 /**
  * Main UI component for the character builder
@@ -27,7 +34,7 @@ const log = createLogger("characterbuilder");
 export const CharacterBuilderUI = createComponent(({ withState }) => {
     const [selectedPart, setSelectedPart] = withState<BodyPart>("Chest");
     const [selectedAnimation, setSelectedAnimation] = withState<string>(
-        characterPartFrames[0].animationName,
+        allAnimations[0].animationName,
     );
     const [selectedColors, setSelectedColors] = withState<CharacterColors>({});
     const [previewMode, setPreviewMode] = withState<PreviewMode>("Single");
@@ -48,13 +55,32 @@ export const CharacterBuilderUI = createComponent(({ withState }) => {
         setSelectedColors(newColors);
     };
 
+    const handleHatSelect = (hatId: string) => {
+        const existing = (selectedColors.Equipment ?? []).filter(
+            (e) => !("attachToPart" in e && e.attachToPart === "Head"),
+        );
+        if (hatId !== "none") {
+            existing.push({
+                attachToPart: "Head",
+                offset: { x: 6, y: 10 },
+                sprite: { type: "single", sprite: spriteRefs.wizard_hat },
+            });
+        }
+        setSelectedColors({
+            ...selectedColors,
+            Equipment: existing.length > 0 ? existing : undefined,
+        });
+    };
+
     const handleEquipmentSelect = (anchorId: string, equipmentId: string) => {
         const existing = selectedColors.Equipment ?? [];
-        const filtered = existing.filter((e) => e.anchor !== anchorId);
+        const filtered = existing.filter(
+            (e) => "anchor" in e && e.anchor !== anchorId,
+        );
         const option = EQUIPMENT_OPTIONS.find((o) => o.id === equipmentId);
         if (option && option.sprite && option.offset) {
             filtered.push({
-                sprite: option.sprite,
+                sprite: { type: "single", sprite: option.sprite },
                 offsetInSpriteForAnchorPoint: option.offset,
                 anchor: anchorId,
             });
@@ -64,10 +90,10 @@ export const CharacterBuilderUI = createComponent(({ withState }) => {
 
     // Get the current animation's frame count
     const getCurrentFrameCount = (): number => {
-        const animation = characterPartFrames.find(
-            (f) => f.animationName === selectedAnimation,
+        const animation = allAnimations.find(
+            (a) => a.animationName === selectedAnimation,
         );
-        return animation?.parts[0]?.frames.length || 0;
+        return animation?.parts[0]?.frames.length ?? 0;
     };
 
     const handlePreviousFrame = () => {
@@ -116,6 +142,7 @@ export const CharacterBuilderUI = createComponent(({ withState }) => {
                         selectedAnchor,
                         setSelectedAnchor,
                         handleEquipmentSelect,
+                        handleHatSelect,
                     ),
                     createPreviewPanel(
                         previewMode,
@@ -133,6 +160,7 @@ export const CharacterBuilderUI = createComponent(({ withState }) => {
                         handleNextFrame,
                         currentFrame,
                         getCurrentFrameCount(),
+                        allAnimations.map((a) => a.animationName),
                     ),
                 ],
             }),

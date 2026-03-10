@@ -2,6 +2,9 @@ import {
     buildSpriteSheet,
     type SpriteDefinitionCache,
 } from "../../characterbuilder/characterSpriteGenerator.ts";
+import { characterPartFrames } from "../../../generated/characterFrames.ts";
+import { getAllAnimations } from "../../characterbuilder/animation/getAllAnimations.ts";
+import type { CharacterAnimation } from "../../characterbuilder/characterAnimation.ts";
 import { createLogger } from "../../common/logging/logger.ts";
 import {
     getCharacterColors,
@@ -73,11 +76,15 @@ function updateEquipmentSprite(
     if (!spriteComponent) return;
     const equipment = target.requireEcsComponent(EquipmentComponentId);
     const colors = getCharacterColors(equipment);
+    const animations = getAllAnimations(
+        characterPartFrames as unknown as CharacterAnimation[],
+    );
     const sprite = buildSpriteSheet(
         offscreenCanvasFactory,
         colors,
         assetLoader,
         spriteCache,
+        animations,
     );
     log.info("Update equipment sprite", { colors });
     //Update the sprite

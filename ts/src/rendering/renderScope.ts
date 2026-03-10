@@ -362,6 +362,22 @@ export class RenderScope implements UIRenderScope, UILayoutScope {
     }
 
     /**
+     * Draws a sprite flipped horizontally around its center.
+     * Applies a canvas transform so the sprite appears at the same position
+     * as it would with drawScreenSpaceSprite, but mirrored left-to-right.
+     */
+    drawScreenSpaceSpriteFlippedX(sprite: SpriteConfiguration): void {
+        const spriteDef = spriteRegistry.resolve(sprite.sprite);
+        if (!spriteDef) return;
+        const width = sprite.targetWidth ?? spriteDef[SPRITE_W];
+        this.canvasContext.save();
+        this.canvasContext.translate(sprite.x * 2 + width, 0);
+        this.canvasContext.scale(-1, 1);
+        this.drawScreenSpaceSprite(sprite);
+        this.canvasContext.restore();
+    }
+
+    /**
      * Draws a scalable version of an image know as a nine patch or nice slice.
      * This is a bit expensive as it needs to draw 9 images to represent a
      * perceived single image so use it sparringly. Coordinates are provided in

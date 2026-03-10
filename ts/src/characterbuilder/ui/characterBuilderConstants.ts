@@ -104,6 +104,16 @@ export const EQUIPMENT_OPTIONS: EquipmentOption[] = [
     },
 ];
 
+export type HatOption = {
+    id: string;
+    name: string;
+};
+
+export const HAT_OPTIONS: HatOption[] = [
+    { id: "none", name: "None" },
+    { id: "hat", name: "Wizard Hat" },
+];
+
 /**
  * Available anchor points derived from the first animation's anchor data
  */
