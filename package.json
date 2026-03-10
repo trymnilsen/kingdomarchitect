@@ -27,7 +27,7 @@
     },
     "dependencies": {
         "@simplewebauthn/server": "^13.2.3",
-        "@types/node": "^24.9.1",
+        "@types/node": "^25.4.0",
         "@types/pngjs": "^6.0.5",
         "maxrects-packer": "^2.7.3",
         "pngjs": "^7.0.0",
