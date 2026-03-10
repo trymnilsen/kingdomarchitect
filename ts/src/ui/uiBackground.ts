@@ -1,8 +1,8 @@
 import type { SpriteRef } from "../asset/sprite.ts";
-import { Point } from "../common/point.ts";
-import { allSides, Sides } from "../common/sides.ts";
-import { UIRenderScope } from "../rendering/uiRenderContext.ts";
-import { UISize } from "./uiSize.ts";
+import { type Point } from "../common/point.ts";
+import { allSides, type Sides } from "../common/sides.ts";
+import { type UIRenderScope } from "../rendering/uiRenderContext.ts";
+import { type UISize } from "./uiSize.ts";
 
 export type UIBackground = {
     draw(context: UIRenderScope, screenPosition: Point, size: UISize): void;

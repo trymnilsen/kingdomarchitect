@@ -1,6 +1,9 @@
 import type { InventoryItemQuantity } from "../../../../../data/inventory/inventoryItemQuantity.ts";
 import { createComponent } from "../../../../../ui/declarative/ui.ts";
-import { uiBookLayout } from "../../../../../ui/declarative/uiBookLayout.ts";
+import {
+    UIBookLayoutPage,
+    uiBookLayout,
+} from "../../../../../ui/declarative/uiBookLayout.ts";
 import type { InventoryComponent } from "../../../../component/inventoryComponent.ts";
 import { inventoryGridPage } from "../../../view/inventoryGridPage.ts";
 import { itemDetailsPage } from "../../../view/itemDetailsPage.ts";
@@ -20,6 +23,7 @@ export const inventoryView = createComponent<InventoryViewProps>(
         const [selectedIndex, setSelectedIndex] = withState(
             props.selectedItemIndex ?? 0,
         );
+        const [currentPage, setCurrentPage] = withState<UIBookLayoutPage>(UIBookLayoutPage.Left);
         const selectedItem = props.inventory.items[selectedIndex];
 
         return uiScaffold({
@@ -29,10 +33,15 @@ export const inventoryView = createComponent<InventoryViewProps>(
                     selectedIndex,
                     onSelect: (i) => {
                         setSelectedIndex(i);
+                        setCurrentPage(UIBookLayoutPage.Right);
                         props.onItemSelected?.(i);
                     },
                 }),
                 rightPage: itemDetailsPage({ item: selectedItem }),
+                currentPage,
+                onPageChange: (page) => {
+                    setCurrentPage(page);
+                },
             }),
             leftButtons: [
                 {

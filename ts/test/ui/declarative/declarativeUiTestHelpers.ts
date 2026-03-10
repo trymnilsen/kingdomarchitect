@@ -28,9 +28,15 @@ export type SpriteDrawCall = {
     clipBounds?: { x1: number; y1: number; x2: number; y2: number };
 };
 
+export type GestureCapture = {
+    eventType: string;
+    handler: Function;
+};
+
 export type DrawCapture = {
     textCalls: TextDrawCall[];
     spriteCalls: SpriteDrawCall[];
+    gestures: GestureCapture[];
 };
 
 export type TestContextResult<P extends {}> = {
@@ -85,6 +91,7 @@ export function createTestComponentContext<P extends {}>(
     const drawCapture: DrawCapture = {
         textCalls: [],
         spriteCalls: [],
+        gestures: [],
     };
 
     let capturedDrawFn:
@@ -125,7 +132,9 @@ export function createTestComponentContext<P extends {}>(
         },
         withEffect: () => {},
         withRemember: <T>(factory: () => T) => factory(),
-        withGesture: () => {},
+        withGesture: (eventType, handler, _hitTest) => {
+            drawCapture.gestures.push({ eventType, handler });
+        },
     };
 
     const executeDrawCalls = (region: Rectangle) => {

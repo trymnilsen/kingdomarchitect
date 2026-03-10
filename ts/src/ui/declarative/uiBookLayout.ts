@@ -2,7 +2,8 @@ import { addPoint } from "../../common/point.ts";
 import { allSides } from "../../common/sides.ts";
 import { spriteRefs, type SpriteRef } from "../../asset/sprite.ts";
 import { ninePatchBackground } from "../uiBackground.ts";
-import { UISize } from "../uiSize.ts";
+import { type UISize, wrapUiSize } from "../uiSize.ts";
+import { bookInkColor } from "../color.ts";
 import { OpenBookUIBackground } from "../visual/bookBackground.ts";
 import {
     createComponent,
@@ -11,6 +12,7 @@ import {
 } from "./ui.ts";
 import { uiButton } from "./uiButton.ts";
 import { uiImage } from "./uiImage.ts";
+import { uiText } from "./uiText.ts";
 
 export type UIBookLayoutTab = {
     icon: SpriteRef;
@@ -39,6 +41,7 @@ type UiBookLayoutProps = {
     rightPage?: ComponentDescriptor;
     tabs?: UIBookLayoutTab[];
     currentPage?: UIBookLayoutPage;
+    onPageChange?: (page: UIBookLayoutPage) => void;
 };
 
 const pageWidth = 300;
@@ -129,18 +132,55 @@ export const uiBookLayout = createComponent<UiBookLayoutProps>(
             );
 
             bookBackground.draw(scope, backgroundPosition, {
-                width: bookWidth,
+                width: mode === UIBookLayoutMode.Single ? bookSize.width : bookWidth,
                 height: pageHeight,
             });
         });
 
         const children: PlacedChild[] = [];
+
+        // Back button: only in single mode on the right page when a page-change handler is provided
+        if (
+            mode === UIBookLayoutMode.Single &&
+            currentPage === UIBookLayoutPage.Right &&
+            props.onPageChange
+        ) {
+            const backButton = uiButton({
+                width: wrapUiSize,
+                height: wrapUiSize,
+                padding: 8,
+                background: ninePatchBackground({
+                    sprite: spriteRefs.book_border,
+                    sides: allSides(8),
+                    scale: 1,
+                }),
+                child: uiText({
+                    content: "Back",
+                    textStyle: { color: bookInkColor, font: "Silkscreen", size: 14 },
+                }),
+                onTap: () => props.onPageChange!(UIBookLayoutPage.Left),
+            });
+
+            const backButtonSize = measureDescriptor("backButton", backButton, {
+                width: pageWidth,
+                height: 100,
+            });
+
+            children.push({
+                ...backButton,
+                size: backButtonSize,
+                offset: {
+                    x: centerX + horizontalPadding,
+                    y: centerY + verticalPadding - backButtonSize.height - 8,
+                },
+            });
+        }
         // Add left page with proper margins
         if (props.leftPage) {
             children.push({
                 ...props.leftPage,
                 offset: {
-                    x: centerX + horizontalPadding + 28, // 16px page margin
+                    x: centerX + horizontalPadding + bookOffset + 28,
                     y: centerY + verticalPadding + 16,
                 },
                 size: leftPageSize,
