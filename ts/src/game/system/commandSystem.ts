@@ -44,7 +44,7 @@ import {
     addCollectableItems,
     CollectableComponentId,
 } from "../component/collectableComponent.ts";
-import { EffectEmitterComponentId } from "../component/effectEmitterComponent.ts";
+import { MessageEmitterComponentId } from "../component/messageEmitterComponent.ts";
 import { EquipmentComponentId } from "../component/equipmentComponent.ts";
 import {
     addInventoryItem,
@@ -58,7 +58,7 @@ import { BuildBuildingJob } from "../job/buildBuildingJob.ts";
 import { buildingPrefab } from "../prefab/buildingPrefab.ts";
 import type { GameTime } from "../gameTime.ts";
 import type { PersistenceManager } from "../../server/persistence/persistenceManager.ts";
-import { ReloadGameEffectId } from "../../server/message/effect/reloadGameEffect.ts";
+import { ReloadGameMessageType } from "../../server/message/gameMessage.ts";
 import {
     ChangeOccupationCommandId,
     type ChangeOccupationCommand,
@@ -117,8 +117,8 @@ function onGameMessage(
             persistenceManager
                 .clearGame()
                 .then(() => {
-                    root.requireEcsComponent(EffectEmitterComponentId).emitter({
-                        id: ReloadGameEffectId,
+                    root.requireEcsComponent(MessageEmitterComponentId).emitter({
+                        type: ReloadGameMessageType,
                     });
                 })
                 .catch((err) => log.error("Failed to clear game", { err }));

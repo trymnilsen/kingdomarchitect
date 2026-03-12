@@ -5,7 +5,7 @@ import type { ChunkMapComponent } from "./chunkMapComponent.ts";
 import type { CollectableComponent } from "./collectableComponent.ts";
 import type { CraftingComponent } from "./craftingComponent.ts";
 import type { DirectionComponent } from "./directionComponent.ts";
-import type { EffectEmitterComponent } from "./effectEmitterComponent.ts";
+import type { MessageEmitterComponent } from "./messageEmitterComponent.ts";
 import type { EquipmentComponent } from "./equipmentComponent.ts";
 import type { BehaviorAgentComponent } from "./BehaviorAgentComponent.ts";
 import type { HealthComponent } from "./healthComponent.ts";
@@ -54,7 +54,7 @@ export type Components =
     | WorldDiscoveryComponent
     | VisibilityMapComponent
     | VisibilityComponent
-    | EffectEmitterComponent
+    | MessageEmitterComponent
     | AnimationComponent
     | PathfindingGraphComponent
     | KingdomComponent

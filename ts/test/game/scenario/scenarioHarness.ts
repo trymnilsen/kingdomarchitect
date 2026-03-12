@@ -25,8 +25,8 @@ import {
     addJob,
 } from "../../../src/game/component/jobQueueComponent.ts";
 import {
-    createEffectEmitterComponent,
-} from "../../../src/game/component/effectEmitterComponent.ts";
+    createMessageEmitterComponent,
+} from "../../../src/game/component/messageEmitterComponent.ts";
 import {
     createWorldDiscoveryComponent,
 } from "../../../src/game/component/worldDiscoveryComponent.ts";
@@ -82,7 +82,7 @@ export class ScenarioHarness {
 
         this.root.setEcsComponent(createJobQueueComponent());
         // Required by discoverAfterMovement when entities have VisibilityComponent
-        this.root.setEcsComponent(createEffectEmitterComponent(() => {}));
+        this.root.setEcsComponent(createMessageEmitterComponent(() => {}));
         this.root.setEcsComponent(createWorldDiscoveryComponent());
 
         this.ecsWorld.addSystem(createBehaviorSystem(createBehaviorResolver()));

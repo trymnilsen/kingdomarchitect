@@ -12,7 +12,7 @@ import {
     DirectionComponentId,
     updateDirectionComponent,
 } from "../component/directionComponent.ts";
-import { EffectEmitterComponentId } from "../component/effectEmitterComponent.ts";
+import { MessageEmitterComponentId } from "../component/messageEmitterComponent.ts";
 import { getPathfindingGraphForEntity } from "../map/path/getPathfindingGraphForEntity.ts";
 
 export const MovementResult = {
@@ -71,7 +71,7 @@ export function discoverAfterMovement(entity: Entity, nextPoint: Point) {
 
         setDiscoveryForPlayer(
             root,
-            root.requireEcsComponent(EffectEmitterComponentId).emitter,
+            root.requireEcsComponent(MessageEmitterComponentId).emitter,
             "player",
             points,
         );

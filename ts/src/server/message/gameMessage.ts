@@ -5,7 +5,6 @@ import type {
 } from "../../game/component/component.ts";
 import type { Volume } from "../../game/map/volume.ts";
 import type { DeltaOperation } from "../delta/deltaTypes.ts";
-import type { GameEffect } from "./effect/gameEffect.ts";
 import type { GameCommand } from "./gameCommand.ts";
 import type { DiscoveredTileData } from "./playerDiscoveryData.ts";
 
@@ -16,7 +15,8 @@ export type GameMessage =
     | SetComponentGameMessage
     | ComponentDeltaGameMessage
     | TransformGameMessage
-    | EffectGameMessage
+    | DiscoverTileGameMessage
+    | ReloadGameMessage
     | CommandGameMessage;
 
 export const WorldStateMessageType = "worldState";
@@ -25,7 +25,8 @@ export const RemoveEntityGameMessageType = "removeEntity";
 export const SetComponentGameMessageType = "setComponent";
 export const ComponentDeltaGameMessageType = "componentDelta";
 export const TransformGameMessageType = "transform";
-export const EffectGameMessageType = "effect";
+export const DiscoverTileGameMessageType = "discoverTile";
+export const ReloadGameMessageType = "reloadGame";
 export const CommandGameMessageType = "command";
 
 export type ReplicatedEntityData = {
@@ -80,9 +81,14 @@ export type TransformGameMessage = {
     position: Point;
 };
 
-export type EffectGameMessage = {
-    type: typeof EffectGameMessageType;
-    effect: GameEffect;
+export type DiscoverTileGameMessage = {
+    type: typeof DiscoverTileGameMessageType;
+    tiles: DiscoveredTileData[];
+    volumes?: Volume[];
+};
+
+export type ReloadGameMessage = {
+    type: typeof ReloadGameMessageType;
 };
 
 export type CommandGameMessage = {

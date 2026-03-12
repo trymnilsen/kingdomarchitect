@@ -5,9 +5,11 @@ import {
     offsetPatternWithPoint,
 } from "../../common/pattern.ts";
 import { pointEquals, type Point } from "../../common/point.ts";
-import type { DiscoverTileEffect } from "../../server/message/effect/discoverTileEffect.ts";
-import type { GameEffect } from "../../server/message/effect/gameEffect.ts";
-import { EffectEmitterComponentId } from "../component/effectEmitterComponent.ts";
+import {
+    DiscoverTileGameMessageType,
+    type GameMessage,
+} from "../../server/message/gameMessage.ts";
+import { MessageEmitterComponentId } from "../component/messageEmitterComponent.ts";
 import {
     createTileComponent,
     getChunk,
@@ -51,14 +53,14 @@ function onInit(root: Entity) {
 
         log.info("Generating new world");
         const start = addInitialPlayerChunk(root);
-        const effectEmitter = root.requireEcsComponent(
-            EffectEmitterComponentId,
+        const messageEmitter = root.requireEcsComponent(
+            MessageEmitterComponentId,
         ).emitter;
         const pattern = offsetPatternWithPoint(
             start,
             generateDiamondPattern(16),
         );
-        setDiscoveryForPlayer(root, effectEmitter, "player", pattern);
+        setDiscoveryForPlayer(root, messageEmitter, "player", pattern);
     } else {
         log.info("World already exists, skipping generation");
     }
@@ -78,7 +80,7 @@ type ChunkToGenerate = {
  */
 export function setDiscoveryForPlayer(
     root: Entity,
-    effectEmitter: (effect: GameEffect) => void,
+    messageEmitter: (message: GameMessage) => void,
     player: string,
     discoveredPoints: Point[],
 ) {
@@ -131,21 +133,19 @@ export function setDiscoveryForPlayer(
         }
     }
 
-    const effect: DiscoverTileEffect = {
-        id: "discoverTile",
-        tiles: newPoints.map((point) => {
-            return { ...point.point, volume: point.volumeId };
-        }),
-        volumes: newVolumesToDiscover,
-    };
-
     root.updateComponent(WorldDiscoveryComponentId, (component) => {
         for (const point of discoveredPoints) {
             discoverTile(component, player, point);
         }
     });
 
-    effectEmitter(effect);
+    messageEmitter({
+        type: DiscoverTileGameMessageType,
+        tiles: newPoints.map((point) => {
+            return { ...point.point, volume: point.volumeId };
+        }),
+        volumes: newVolumesToDiscover,
+    });
 }
 
 /**

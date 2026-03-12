@@ -18,8 +18,12 @@ import {
     makeReplicatedEntitiesSystem,
 } from "./replicatedEntitiesSystem.ts";
 import type { GameCommand } from "./message/gameCommand.ts";
-import { createEffectEmitterComponent } from "../game/component/effectEmitterComponent.ts";
-import type { GameMessage } from "./message/gameMessage.ts";
+import { createMessageEmitterComponent } from "../game/component/messageEmitterComponent.ts";
+import {
+    DiscoverTileGameMessageType,
+    type DiscoverTileGameMessage,
+    type GameMessage,
+} from "./message/gameMessage.ts";
 import { createCommandSystem } from "../game/system/commandSystem.ts";
 import { createEffectSystem } from "../game/system/effectSystem.ts";
 import { createEffectExecutorMap } from "../data/effect/effectExecutorRegistry.ts";
@@ -28,7 +32,9 @@ import { regrowSystem } from "../game/system/regrowSystem.ts";
 import { PersistenceManager } from "./persistence/persistenceManager.ts";
 import type { PersistenceAdapter } from "./persistence/persistenceAdapter.ts";
 import type { Entity } from "../game/entity/entity.ts";
-import { buildDiscoveryEffectForPlayer } from "./message/effect/discoverTileEffect.ts";
+import { TileComponentId } from "../game/component/tileComponent.ts";
+import { WorldDiscoveryComponentId } from "../game/component/worldDiscoveryComponent.ts";
+import { getPlayerDiscoveryData } from "./message/playerDiscoveryData.ts";
 import { ToggleableCallback } from "../common/toggleableCallback.ts";
 import type { MessageRouter } from "./messageRouter.ts";
 
@@ -66,11 +72,8 @@ export class GameServer {
 
     async init(initialPlayerId?: string): Promise<void> {
         this.world.root.setEcsComponent(
-            createEffectEmitterComponent((effect) => {
-                this.broadcastCallback.invoke({
-                    type: "effect",
-                    effect,
-                });
+            createMessageEmitterComponent((message) => {
+                this.broadcastCallback.invoke(message);
             }),
         );
         this.addSystems();
@@ -121,13 +124,40 @@ export class GameServer {
             buildWorldStateMessage(this.world.root, playerId),
         );
 
-        const effect = buildDiscoveryEffectForPlayer(this.world.root, playerId);
-        if (effect) {
-            this.messageRouter.sendTo(playerId, {
-                type: "effect",
-                effect,
-            });
+        const message = this.buildDiscoverTileMessage(playerId);
+        if (message) {
+            this.messageRouter.sendTo(playerId, message);
         }
+    }
+
+    private buildDiscoverTileMessage(
+        playerId: string,
+    ): DiscoverTileGameMessage | null {
+        const tileComponent = this.world.root.getEcsComponent(TileComponentId);
+        const discoveryComponent = this.world.root.getEcsComponent(
+            WorldDiscoveryComponentId,
+        );
+
+        if (!tileComponent || !discoveryComponent) {
+            return null;
+        }
+
+        const playerDiscovery =
+            discoveryComponent.discoveriesByUser.get(playerId);
+        if (!playerDiscovery) {
+            return null;
+        }
+
+        const data = getPlayerDiscoveryData(tileComponent, playerDiscovery);
+        if (!data) {
+            return null;
+        }
+
+        return {
+            type: DiscoverTileGameMessageType,
+            tiles: data.tiles,
+            volumes: data.volumes,
+        };
     }
 
     private async loadGame(): Promise<void> {

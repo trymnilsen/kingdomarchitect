@@ -12,17 +12,18 @@ import {
     VisibilityMapComponentId,
 } from "../../game/component/visibilityMapComponent.ts";
 import { applyDiscoveredTiles } from "./applyDiscoveredTiles.ts";
-import { effectHandler } from "./effect/effectHandler.ts";
 import { applyDelta } from "../delta/applyDelta.ts";
 import {
     AddEntityGameMessageType,
     ComponentDeltaGameMessageType,
-    EffectGameMessageType,
+    DiscoverTileGameMessageType,
+    ReloadGameMessageType,
     RemoveEntityGameMessageType,
     SetComponentGameMessageType,
     TransformGameMessageType,
     type AddEntityGameMessage,
     type ComponentDeltaGameMessage,
+    type DiscoverTileGameMessage,
     type ReplicatedEntityData,
     type GameMessage,
     type RemoveEntityGameMessage,
@@ -34,7 +35,7 @@ import {
 
 export function handleGameMessage(
     root: Entity,
-    camera: Camera,
+    _camera: Camera,
     message: GameMessage,
 ) {
     log.debug("Message from server", { message });
@@ -57,8 +58,11 @@ export function handleGameMessage(
         case TransformGameMessageType:
             transformHandler(root, message);
             break;
-        case EffectGameMessageType:
-            effectHandler(root, camera, message);
+        case DiscoverTileGameMessageType:
+            discoverTileHandler(root, message);
+            break;
+        case ReloadGameMessageType:
+            window.location.reload();
             break;
         default:
             break;
@@ -172,6 +176,20 @@ function transformHandler(root: Entity, message: TransformGameMessage) {
     if (entity) {
         entity.worldPosition = message.position;
     }
+}
+
+function discoverTileHandler(root: Entity, message: DiscoverTileGameMessage) {
+    const tileComponent = root.requireEcsComponent(TileComponentId);
+    const visibilityMapComponent = root.requireEcsComponent(
+        VisibilityMapComponentId,
+    );
+
+    applyDiscoveredTiles(
+        tileComponent,
+        visibilityMapComponent,
+        message.tiles,
+        message.volumes ?? [],
+    );
 }
 
 /**

@@ -5,7 +5,6 @@ import type {
 } from "../../game/entity/entityEvent.ts";
 import { DrawMode } from "../../rendering/drawMode.ts";
 import { RenderScope } from "../../rendering/renderScope.ts";
-import type { GameEffect } from "../../server/message/effect/gameEffect.ts";
 import type { GameCommand } from "../../server/message/gameCommand.ts";
 import type { GameMessage } from "../../server/message/gameMessage.ts";
 

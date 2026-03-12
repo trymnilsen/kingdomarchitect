@@ -58,10 +58,7 @@ import {
     createBehaviorAgentComponent,
     BehaviorAgentComponentId,
 } from "../../../src/game/component/BehaviorAgentComponent.ts";
-import {
-    createEffectEmitterComponent,
-    EffectEmitterComponentId,
-} from "../../../src/game/component/effectEmitterComponent.ts";
+
 import { CollectItemJob } from "../../../src/game/job/collectItemJob.ts";
 import { swordItem } from "../../../src/data/inventory/items/equipment.ts";
 import {
