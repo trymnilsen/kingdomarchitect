@@ -8,7 +8,7 @@ import type { Behavior } from "../behaviors/Behavior.ts";
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import { executeAction } from "../actions/ActionExecutor.ts";
 import { createLogger } from "../../../common/logging/logger.ts";
-import type { BehaviorActionData } from "../actions/Action.ts";
+import type { BehaviorActionData } from "../actions/ActionData.ts";
 
 const log = createLogger("behavior");
 

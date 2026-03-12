@@ -8,8 +8,12 @@ import type { Entity } from "../../entity/entity.ts";
 import {
     ActionComplete,
     type ActionResult,
-    type BehaviorActionData,
 } from "./Action.ts";
+
+export type DepositToStockpileActionData = {
+    type: "depositToStockpile";
+    stockpileId: string;
+};
 import { createLogger } from "../../../common/logging/logger.ts";
 
 const log = createLogger("behavior");
@@ -18,7 +22,7 @@ const log = createLogger("behavior");
  * Deposit non-equipped inventory items to a stockpile.
  */
 export function executeDepositToStockpileAction(
-    action: Extract<BehaviorActionData, { type: "depositToStockpile" }>,
+    action: DepositToStockpileActionData,
     entity: Entity,
 ): ActionResult {
     const root = entity.getRootEntity();

@@ -9,7 +9,8 @@ import {
 import { getPathfindingGraphForEntity } from "../../map/path/getPathfindingGraphForEntity.ts";
 import { InventoryComponentId } from "../../component/inventoryComponent.ts";
 import { BuildingComponentId } from "../../component/buildingComponent.ts";
-import type { BehaviorActionData, SleepQuality } from "../actions/Action.ts";
+import type { SleepQuality } from "../actions/Action.ts";
+import type { BehaviorActionData } from "../actions/ActionData.ts";
 import type { Behavior } from "./Behavior.ts";
 import {
     sleepParamsByQuality,

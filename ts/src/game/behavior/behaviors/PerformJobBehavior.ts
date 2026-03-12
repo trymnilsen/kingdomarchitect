@@ -3,7 +3,7 @@ import type { Entity } from "../../entity/entity.ts";
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import type { JobQueueComponent } from "../../component/jobQueueComponent.ts";
 import type { Jobs } from "../../job/job.ts";
-import type { BehaviorActionData } from "../actions/Action.ts";
+import type { BehaviorActionData } from "../actions/ActionData.ts";
 import type { Behavior } from "./Behavior.ts";
 import {
     canExecuteBuildJob,

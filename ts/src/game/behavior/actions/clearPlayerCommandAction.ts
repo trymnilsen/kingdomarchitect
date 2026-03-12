@@ -5,6 +5,8 @@ import {
 } from "../../component/BehaviorAgentComponent.ts";
 import { ActionComplete, type ActionResult } from "./Action.ts";
 
+export type ClearPlayerCommandActionData = { type: "clearPlayerCommand" };
+
 /**
  * Clears the player command on the behavior agent after the associated movement
  * action has completed. This is always queued after a moveTo action produced by

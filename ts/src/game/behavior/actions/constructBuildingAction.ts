@@ -15,8 +15,12 @@ import {
     ActionComplete,
     ActionRunning,
     type ActionResult,
-    type BehaviorActionData,
 } from "./Action.ts";
+
+export type ConstructBuildingActionData = {
+    type: "constructBuilding";
+    entityId: string;
+};
 
 /**
  * Construct a scaffolded building by healing its HealthComponent.
@@ -24,7 +28,7 @@ import {
  * Assumes worker is already adjacent to building (moveTo should have run first).
  */
 export function executeConstructBuildingAction(
-    action: Extract<BehaviorActionData, { type: "constructBuilding" }>,
+    action: ConstructBuildingActionData,
     entity: Entity,
 ): ActionResult {
     const root = entity.getRootEntity();

@@ -35,8 +35,20 @@ import {
     ActionComplete,
     ActionRunning,
     type ActionResult,
-    type BehaviorActionData,
 } from "./Action.ts";
+
+/**
+ * The `stopAdjacent` option lets behaviors place the entity next to a target
+ * without standing on it — necessary for actions like constructBuilding or harvestResource
+ * that require adjacency. "cardinal" stops one step away on N/S/E/W; "diagonal" includes
+ * corners (used for warmByFire which checks Chebyshev distance).
+ */
+export type MoveToActionData = {
+    type: "moveTo";
+    target: Point;
+    stopAdjacent?: "cardinal" | "diagonal";
+    cachedPath?: Point[];
+};
 
 /**
  * Maximum number of immediate replans within a single tick after proving a tile
@@ -190,7 +202,7 @@ function planPath(
  *   "failed"   — path is permanently blocked (building, resource, no graph, no path)
  */
 export function executeMoveToAction(
-    action: Extract<BehaviorActionData, { type: "moveTo" }>,
+    action: MoveToActionData,
     entity: Entity,
     tick: number,
 ): ActionResult {

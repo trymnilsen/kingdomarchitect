@@ -25,8 +25,14 @@ import {
     ActionComplete,
     ActionRunning,
     type ActionResult,
-    type BehaviorActionData,
 } from "./Action.ts";
+
+export type HarvestResourceActionData = {
+    type: "harvestResource";
+    entityId: string;
+    harvestAction: ResourceHarvestMode;
+    workProgress?: number;
+};
 import type { NaturalResource } from "../../../data/inventory/items/naturalResource.ts";
 
 /**
@@ -36,7 +42,7 @@ import type { NaturalResource } from "../../../data/inventory/items/naturalResou
  * Assumes worker is already adjacent to resource (moveTo should have run first).
  */
 export function executeHarvestResourceAction(
-    action: Extract<BehaviorActionData, { type: "harvestResource" }>,
+    action: HarvestResourceActionData,
     entity: Entity,
     tick: number,
 ): ActionResult {
@@ -141,7 +147,7 @@ function executeWorkHarvest(
     resourceEntity: Entity,
     resource: NaturalResource,
     workerInventory: InventoryComponent,
-    action: Extract<BehaviorActionData, { type: "harvestResource" }>,
+    action: HarvestResourceActionData,
     tick: number,
 ): ActionResult {
     const workDuration = resource.workDuration ?? 1;

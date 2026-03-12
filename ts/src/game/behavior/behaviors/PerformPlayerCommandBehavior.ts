@@ -1,5 +1,5 @@
 import { Entity } from "../../entity/entity.ts";
-import type { BehaviorActionData } from "../actions/Action.ts";
+import type { BehaviorActionData } from "../actions/ActionData.ts";
 import { getBehaviorAgent } from "../../component/BehaviorAgentComponent.ts";
 import type { Behavior } from "./Behavior.ts";
 import { createLogger } from "../../../common/logging/logger.ts";

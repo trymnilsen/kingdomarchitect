@@ -1,9 +1,9 @@
 import type { Entity } from "../../entity/entity.ts";
+import type { ActionResult } from "./Action.ts";
 import type {
-    ActionResult,
     BehaviorActionData,
     BehaviorActionExecutor,
-} from "./Action.ts";
+} from "./ActionData.ts";
 import { createLogger } from "../../../common/logging/logger.ts";
 
 const log = createLogger("behavior");

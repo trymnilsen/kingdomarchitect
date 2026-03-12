@@ -1,5 +1,5 @@
 import type { Entity } from "../../../entity/entity.ts";
-import type { BehaviorActionData } from "../../actions/Action.ts";
+import type { BehaviorActionData } from "../../actions/ActionData.ts";
 import type { Behavior } from "../Behavior.ts";
 import { WarmthComponentId } from "../../../component/warmthComponent.ts";
 import { GoblinUnitComponentId } from "../../../component/goblinUnitComponent.ts";

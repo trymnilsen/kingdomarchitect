@@ -10,7 +10,7 @@ import {
 import { createStockpileComponent } from "../../../../src/game/component/stockpileComponent.ts";
 import { executeWithdrawFromStockpileAction } from "../../../../src/game/behavior/actions/withdrawFromStockpileAction.ts";
 import { woodResourceItem } from "../../../../src/data/inventory/items/resources.ts";
-import type { BehaviorActionData } from "../../../../src/game/behavior/actions/Action.ts";
+import type { BehaviorActionData } from "../../../../src/game/behavior/actions/ActionData.ts";
 
 type WithdrawAction = Extract<
     BehaviorActionData,

@@ -13,8 +13,9 @@ import {
     ActionComplete,
     ActionRunning,
     type ActionResult,
-    type BehaviorActionData,
 } from "./Action.ts";
+
+export type AttackTargetActionData = { type: "attackTarget"; targetId: string };
 
 /**
  * Attack a target entity by dealing damage.
@@ -22,7 +23,7 @@ import {
  * Assumes worker is already adjacent to target (moveTo should have run first).
  */
 export function executeAttackTargetAction(
-    action: Extract<BehaviorActionData, { type: "attackTarget" }>,
+    action: AttackTargetActionData,
     entity: Entity,
 ): ActionResult {
     const root = entity.getRootEntity();

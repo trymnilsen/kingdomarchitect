@@ -10,7 +10,7 @@ import {
 import { executeCraftItemAction } from "../../../../src/game/behavior/actions/craftItemAction.ts";
 import { planksRecipe } from "../../../../src/data/crafting/recipes/carpenterRecipes.ts";
 import { woodResourceItem } from "../../../../src/data/inventory/items/resources.ts";
-import type { BehaviorActionData } from "../../../../src/game/behavior/actions/Action.ts";
+import type { BehaviorActionData } from "../../../../src/game/behavior/actions/ActionData.ts";
 
 type CraftItemAction = Extract<BehaviorActionData, { type: "craftItem" }>;
 

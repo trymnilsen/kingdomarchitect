@@ -23,8 +23,13 @@ import {
     ActionComplete,
     ActionRunning,
     type ActionResult,
-    type BehaviorActionData,
 } from "./Action.ts";
+
+export type OperateFacilityActionData = {
+    type: "operateFacility";
+    buildingId: string;
+    progress?: number;
+};
 
 const FORRESTER_RADIUS = 5;
 
@@ -34,7 +39,7 @@ const FORRESTER_RADIUS = 5;
  * Assumes worker is already adjacent to building (moveTo should have run first).
  */
 export function executeOperateFacilityAction(
-    action: Extract<BehaviorActionData, { type: "operateFacility" }>,
+    action: OperateFacilityActionData,
     entity: Entity,
 ): ActionResult {
     const root = entity.getRootEntity();

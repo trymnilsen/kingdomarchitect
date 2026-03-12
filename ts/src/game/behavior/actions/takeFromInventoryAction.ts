@@ -8,8 +8,14 @@ import type { Entity } from "../../entity/entity.ts";
 import {
     ActionComplete,
     type ActionResult,
-    type BehaviorActionData,
+    type ItemTransfer,
 } from "./Action.ts";
+
+export type TakeFromInventoryActionData = {
+    type: "takeFromInventory";
+    sourceEntityId: string;
+    items: ItemTransfer[];
+};
 import { createLogger } from "../../../common/logging/logger.ts";
 
 const log = createLogger("behavior");
@@ -19,7 +25,7 @@ const log = createLogger("behavior");
  * Assumes worker is already adjacent to source (moveTo should have run first).
  */
 export function executeTakeFromInventoryAction(
-    action: Extract<BehaviorActionData, { type: "takeFromInventory" }>,
+    action: TakeFromInventoryActionData,
     entity: Entity,
 ): ActionResult {
     const root = entity.getRootEntity();

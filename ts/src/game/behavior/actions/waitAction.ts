@@ -3,14 +3,15 @@ import {
     ActionComplete,
     ActionRunning,
     type ActionResult,
-    type BehaviorActionData,
 } from "./Action.ts";
+
+export type WaitActionData = { type: "wait"; until: number };
 
 /**
  * Wait until a specific tick time.
  */
 export function executeWaitAction(
-    action: Extract<BehaviorActionData, { type: "wait" }>,
+    action: WaitActionData,
     _entity: Entity,
     tick: number,
 ): ActionResult {

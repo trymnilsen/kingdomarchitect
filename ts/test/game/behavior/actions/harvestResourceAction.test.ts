@@ -13,7 +13,7 @@ import {
 import { createResourceComponent } from "../../../../src/game/component/resourceComponent.ts";
 import { executeHarvestResourceAction } from "../../../../src/game/behavior/actions/harvestResourceAction.ts";
 import { ResourceHarvestMode } from "../../../../src/data/inventory/items/naturalResource.ts";
-import type { BehaviorActionData } from "../../../../src/game/behavior/actions/Action.ts";
+import type { BehaviorActionData } from "../../../../src/game/behavior/actions/ActionData.ts";
 import { InvalidationTracker } from "../behaviorTestHelpers.ts";
 
 type HarvestResourceAction = Extract<

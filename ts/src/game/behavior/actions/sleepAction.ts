@@ -7,9 +7,17 @@ import {
     ActionComplete,
     ActionRunning,
     type ActionResult,
-    type BehaviorActionData,
     type SleepQuality,
 } from "./Action.ts";
+
+export type SleepActionData = {
+    type: "sleep";
+    quality: SleepQuality;
+    /** Total ticks to sleep (baseDuration * sleepMultiplier) */
+    duration: number;
+    /** Ticks elapsed so far, incremented each tick */
+    ticksSlept: number;
+};
 import { getBehaviorAgent } from "../../component/BehaviorAgentComponent.ts";
 
 type SleepParams = {
@@ -69,7 +77,7 @@ export function computeSleepDuration(
  * Collapse-quality sleep suppresses replanning until complete.
  */
 export function executeSleepAction(
-    action: Extract<BehaviorActionData, { type: "sleep" }>,
+    action: SleepActionData,
     entity: Entity,
 ): ActionResult {
     action.ticksSlept++;

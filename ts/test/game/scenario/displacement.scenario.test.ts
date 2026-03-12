@@ -21,7 +21,7 @@ import { nullBuilding } from "../../../src/data/building/building.ts";
 import { createBehaviorSystem } from "../../../src/game/behavior/systems/BehaviorSystem.ts";
 import { createPerformPlayerCommandBehavior } from "../../../src/game/behavior/behaviors/PerformPlayerCommandBehavior.ts";
 import { executeMoveToAction } from "../../../src/game/behavior/actions/moveToAction.ts";
-import type { BehaviorActionData } from "../../../src/game/behavior/actions/Action.ts";
+import type { BehaviorActionData } from "../../../src/game/behavior/actions/ActionData.ts";
 import type { SpriteRef } from "../../../src/asset/sprite.ts";
 import type { Point } from "../../../src/common/point.ts";
 

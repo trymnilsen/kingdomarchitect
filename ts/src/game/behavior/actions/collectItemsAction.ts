@@ -14,15 +14,16 @@ import type { Entity } from "../../entity/entity.ts";
 import {
     ActionComplete,
     type ActionResult,
-    type BehaviorActionData,
 } from "./Action.ts";
+
+export type CollectItemsActionData = { type: "collectItems"; entityId: string };
 
 /**
  * Collect all items from an entity with a CollectableComponent.
  * Assumes worker is already adjacent to target (moveTo should have run first).
  */
 export function executeCollectItemsAction(
-    action: Extract<BehaviorActionData, { type: "collectItems" }>,
+    action: CollectItemsActionData,
     entity: Entity,
 ): ActionResult {
     const root = entity.getRootEntity();

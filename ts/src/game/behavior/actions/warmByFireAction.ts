@@ -9,8 +9,9 @@ import {
     ActionComplete,
     ActionRunning,
     type ActionResult,
-    type BehaviorActionData,
 } from "./Action.ts";
+
+export type WarmByFireActionData = { type: "warmByFire"; fireEntityId: string };
 import { createLogger } from "../../../common/logging/logger.ts";
 
 const log = createLogger("behavior");
@@ -32,7 +33,7 @@ function isWithinOneTile(a: Point, b: Point): boolean {
  * Returns complete when warmth reaches 100.
  */
 export function executeWarmByFireAction(
-    action: Extract<BehaviorActionData, { type: "warmByFire" }>,
+    action: WarmByFireActionData,
     entity: Entity,
 ): ActionResult {
     const warmth = entity.getEcsComponent(WarmthComponentId);

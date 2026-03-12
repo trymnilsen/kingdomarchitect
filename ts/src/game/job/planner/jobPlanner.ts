@@ -1,4 +1,4 @@
-import type { BehaviorActionData } from "../../behavior/actions/Action.ts";
+import type { BehaviorActionData } from "../../behavior/actions/ActionData.ts";
 import type { Entity } from "../../entity/entity.ts";
 import type { BuildBuildingJob } from "../buildBuildingJob.ts";
 import type { Jobs } from "../job.ts";

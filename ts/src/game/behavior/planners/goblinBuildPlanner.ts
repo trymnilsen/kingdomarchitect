@@ -1,5 +1,6 @@
 import type { Entity } from "../../entity/entity.ts";
-import type { BehaviorActionData, ItemTransfer } from "../actions/Action.ts";
+import type { ItemTransfer } from "../actions/Action.ts";
+import type { BehaviorActionData } from "../actions/ActionData.ts";
 import type { Building } from "../../../data/building/building.ts";
 import { createLogger } from "../../../common/logging/logger.ts";
 

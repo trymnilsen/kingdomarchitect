@@ -1,5 +1,5 @@
 import type { Entity } from "../../entity/entity.ts";
-import type { BehaviorActionData } from "../../behavior/actions/Action.ts";
+import type { BehaviorActionData } from "../../behavior/actions/ActionData.ts";
 import {
     InventoryComponentId,
     getInventoryItem,

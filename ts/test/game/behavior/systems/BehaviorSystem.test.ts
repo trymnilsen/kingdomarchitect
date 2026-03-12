@@ -11,7 +11,7 @@ import {
 } from "../../../../src/game/component/jobQueueComponent.ts";
 import { createBehaviorSystem } from "../../../../src/game/behavior/systems/BehaviorSystem.ts";
 import type { Behavior } from "../../../../src/game/behavior/behaviors/Behavior.ts";
-import type { BehaviorActionData } from "../../../../src/game/behavior/actions/Action.ts";
+import type { BehaviorActionData } from "../../../../src/game/behavior/actions/ActionData.ts";
 
 /**
  * Create a mock behavior for testing

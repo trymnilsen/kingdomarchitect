@@ -11,7 +11,7 @@ import {
     ProductionComponentId,
 } from "../../../../src/game/component/productionComponent.ts";
 import { executeOperateFacilityAction } from "../../../../src/game/behavior/actions/operateFacilityAction.ts";
-import type { BehaviorActionData } from "../../../../src/game/behavior/actions/Action.ts";
+import type { BehaviorActionData } from "../../../../src/game/behavior/actions/ActionData.ts";
 
 type OperateFacilityAction = Extract<
     BehaviorActionData,

@@ -2,7 +2,7 @@ import assert from "node:assert";
 import { describe, it } from "node:test";
 import { Entity } from "../../../../src/game/entity/entity.ts";
 import { executeMoveToAction } from "../../../../src/game/behavior/actions/moveToAction.ts";
-import type { BehaviorActionData } from "../../../../src/game/behavior/actions/Action.ts";
+import type { BehaviorActionData } from "../../../../src/game/behavior/actions/ActionData.ts";
 
 type MoveToAction = Extract<BehaviorActionData, { type: "moveTo" }>;
 

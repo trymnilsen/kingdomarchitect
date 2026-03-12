@@ -1,5 +1,5 @@
 import type { Entity } from "../../entity/entity.ts";
-import type { BehaviorActionData } from "../actions/Action.ts";
+import type { BehaviorActionData } from "../actions/ActionData.ts";
 
 /**
  * A behavior represents a high-level goal or intention for an entity.

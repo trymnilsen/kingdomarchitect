@@ -1,5 +1,5 @@
 import type { Entity } from "../../entity/entity.ts";
-import type { BehaviorActionData } from "../../behavior/actions/Action.ts";
+import type { BehaviorActionData } from "../../behavior/actions/ActionData.ts";
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import type { AttackJob } from "../attackJob.ts";
 import { failJobFromQueue } from "../jobLifecycle.ts";

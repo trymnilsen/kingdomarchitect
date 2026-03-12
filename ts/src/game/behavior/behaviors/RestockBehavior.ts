@@ -6,7 +6,7 @@ import {
 import { InventoryComponentId } from "../../component/inventoryComponent.ts";
 import { getSettlementEntity } from "../../entity/settlementQueries.ts";
 import type { Entity } from "../../entity/entity.ts";
-import type { BehaviorActionData } from "../actions/Action.ts";
+import type { BehaviorActionData } from "../actions/ActionData.ts";
 import type { Behavior } from "./Behavior.ts";
 import { WORKER_INVENTORY_CAPACITY } from "./HaulBehavior.ts";
 import type { StockpileDeficit, StockpileSurplus } from "../../building/materialQuery.ts";

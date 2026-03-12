@@ -6,7 +6,14 @@ import {
 } from "../../component/inventoryComponent.ts";
 import { StockpileComponentId } from "../../component/stockpileComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
-import { ActionComplete, type ActionResult, type BehaviorActionData } from "./Action.ts";
+import { ActionComplete, type ActionResult } from "./Action.ts";
+
+export type WithdrawFromStockpileActionData = {
+    type: "withdrawFromStockpile";
+    stockpileId: string;
+    itemId: string;
+    amount: number;
+};
 
 const log = createLogger("behavior");
 
@@ -15,7 +22,7 @@ const log = createLogger("behavior");
  * Used by the restock behavior to move items between stockpiles.
  */
 export function executeWithdrawFromStockpileAction(
-    action: Extract<BehaviorActionData, { type: "withdrawFromStockpile" }>,
+    action: WithdrawFromStockpileActionData,
     entity: Entity,
 ): ActionResult {
     const root = entity.getRootEntity();

@@ -1,9 +1,7 @@
 import type { Point } from "../../common/point.ts";
 import type { Entity } from "../entity/entity.ts";
-import type {
-    ActionFailure,
-    BehaviorActionData,
-} from "../behavior/actions/Action.ts";
+import type { ActionFailure } from "../behavior/actions/Action.ts";
+import type { BehaviorActionData } from "../behavior/actions/ActionData.ts";
 
 export const BehaviorAgentComponentId = "behavioragent";
 

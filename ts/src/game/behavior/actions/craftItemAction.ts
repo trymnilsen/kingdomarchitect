@@ -18,8 +18,23 @@ import {
     ActionComplete,
     ActionRunning,
     type ActionResult,
-    type BehaviorActionData,
 } from "./Action.ts";
+import type { CraftingRecipe } from "../../../data/crafting/craftingRecipe.ts";
+
+/**
+ * Two-phase to avoid consuming inputs and then losing them to a replan.
+ * On the first tick, inputs are taken from the worker and inputsConsumed is set to true.
+ * Subsequent ticks track progress toward completion without touching inventory again.
+ * If the entity replans before completion, the consumed inputs are lost — intentional,
+ * as partial crafting is treated as a failed attempt.
+ */
+export type CraftItemActionData = {
+    type: "craftItem";
+    buildingId: string;
+    recipe: CraftingRecipe;
+    progress?: number;
+    inputsConsumed?: boolean;
+};
 
 /**
  * Craft an item at a building.
@@ -29,7 +44,7 @@ import {
  * Assumes worker is already adjacent to building (moveTo should have run first).
  */
 export function executeCraftItemAction(
-    action: Extract<BehaviorActionData, { type: "craftItem" }>,
+    action: CraftItemActionData,
     entity: Entity,
 ): ActionResult {
     const root = entity.getRootEntity();
