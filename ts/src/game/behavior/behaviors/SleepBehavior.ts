@@ -12,10 +12,7 @@ import { BuildingComponentId } from "../../component/buildingComponent.ts";
 import type { SleepQuality } from "../actions/Action.ts";
 import type { BehaviorActionData } from "../actions/ActionData.ts";
 import type { Behavior } from "./Behavior.ts";
-import {
-    sleepParamsByQuality,
-    computeSleepDuration,
-} from "../actions/sleepAction.ts";
+import { sleepParamsByQuality } from "../actions/sleepAction.ts";
 import type { Point } from "../../../common/point.ts";
 
 const CAMPFIRE_SEARCH_RADIUS = 20;
@@ -69,9 +66,20 @@ export function createSleepBehavior(): Behavior {
                     entity,
                     houseEntity.worldPosition,
                 );
-                const target = adjacentTile ?? houseEntity.worldPosition;
+                if (adjacentTile) {
+                    // Walk directly to the pre-computed adjacent tile — no stopAdjacent,
+                    // otherwise the entity stops one tile short of it.
+                    return [
+                        { type: "moveTo", target: adjacentTile },
+                        makeSleepAction("house", entity),
+                    ];
+                }
                 return [
-                    { type: "moveTo", target, stopAdjacent: "cardinal" },
+                    {
+                        type: "moveTo",
+                        target: houseEntity.worldPosition,
+                        stopAdjacent: "cardinal",
+                    },
                     makeSleepAction("house", entity),
                 ];
             }
@@ -106,11 +114,15 @@ function makeSleepAction(
     quality: SleepQuality,
     entity: Entity,
 ): BehaviorActionData {
+    const params = sleepParamsByQuality[quality];
+    const energy = entity.getEcsComponent(EnergyComponentId);
+    const maxEnergy = energy?.maxEnergy ?? 100;
+    const sleepMultiplier = energy?.sleepMultiplier ?? 1.0;
     return {
         type: "sleep",
         quality,
-        duration: computeSleepDuration(quality, entity),
-        ticksSlept: 0,
+        energyPerTick: params.energyPerTick / sleepMultiplier,
+        energyTarget: Math.floor(maxEnergy * params.energyRestoreFraction),
     };
 }
 

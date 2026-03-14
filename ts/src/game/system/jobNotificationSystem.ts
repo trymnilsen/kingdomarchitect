@@ -79,16 +79,17 @@ function notifyIdleWorkerWithBudget(
     const workers = settlement.queryComponents(BehaviorAgentComponentId);
 
     let checked = 0;
-    for (const [entity, _agent] of workers) {
+    for (const [entity, agent] of workers) {
         if (checked >= maxCheck) break; // Budget limit
         checked++;
 
-        // Request replan to make worker check for jobs
-        requestBehaviorReplan(entity);
+        // Only notify workers that are not actively executing something.
+        // Workers mid-sleep, mid-move, or otherwise busy will replan on their
+        // own when their action queue empties — interrupting them would reset
+        // in-progress actions like sleep from the beginning.
+        if (agent.actionQueue.length > 0) continue;
 
-        // Note: We can't immediately check if job was claimed because
-        // replan happens on next tick. This is fine - workers will claim
-        // jobs during their next behavior evaluation.
+        requestBehaviorReplan(entity);
         return true; // Notified one worker, done
     }
 

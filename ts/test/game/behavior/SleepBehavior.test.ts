@@ -111,7 +111,7 @@ describe("SleepBehavior", () => {
     });
 
     describe("expand", () => {
-        it("returns sleep action with quality and duration", () => {
+        it("returns sleep action with energyPerTick and energyTarget", () => {
             const behavior = createSleepBehavior();
             const entity = createEntityWithEnergy("test", 10);
 
@@ -120,8 +120,8 @@ describe("SleepBehavior", () => {
             assert.strictEqual(actions.length, 1);
             assert.strictEqual(actions[0].type, "sleep");
             if (actions[0].type === "sleep") {
-                assert.ok(actions[0].duration > 0);
-                assert.strictEqual(actions[0].ticksSlept, 0);
+                assert.ok(actions[0].energyPerTick > 0);
+                assert.ok(actions[0].energyTarget > 0);
             }
         });
 

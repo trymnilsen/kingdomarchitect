@@ -13,7 +13,7 @@ import type { Behavior } from "./Behavior.ts";
  * The inventory system doesn't enforce this limit; it's used here and
  * in RestockBehavior to reason about how "full" a worker is.
  */
-export const WORKER_INVENTORY_CAPACITY = 20;
+export const WORKER_INVENTORY_CAPACITY = 500;
 
 /**
  * HaulBehavior causes workers to deposit non-equipped inventory items to stockpiles.
@@ -110,4 +110,3 @@ export function getHaulableItemCount(entity: Entity): number {
         .filter((stack) => !equippedItemIds.has(stack.item.id))
         .reduce((sum, stack) => sum + stack.amount, 0);
 }
-

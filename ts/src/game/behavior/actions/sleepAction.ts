@@ -9,20 +9,20 @@ import {
     type ActionResult,
     type SleepQuality,
 } from "./Action.ts";
+import { getBehaviorAgent } from "../../component/BehaviorAgentComponent.ts";
 
 export type SleepActionData = {
     type: "sleep";
     quality: SleepQuality;
-    /** Total ticks to sleep (baseDuration * sleepMultiplier) */
-    duration: number;
-    /** Ticks elapsed so far, incremented each tick */
-    ticksSlept: number;
+    /** Energy restored per tick */
+    energyPerTick: number;
+    /** Energy value to reach before completing */
+    energyTarget: number;
 };
-import { getBehaviorAgent } from "../../component/BehaviorAgentComponent.ts";
 
 type SleepParams = {
-    /** Base duration in ticks before species multiplier */
-    baseDuration: number;
+    /** Energy restored per tick (at sleepMultiplier 1.0) */
+    energyPerTick: number;
     /** Energy restored to (fraction of maxEnergy, 0-1) */
     energyRestoreFraction: number;
     /** Exhaustion level cleared to */
@@ -33,25 +33,25 @@ type SleepParams = {
 
 export const sleepParamsByQuality: Record<SleepQuality, SleepParams> = {
     house: {
-        baseDuration: 40,
+        energyPerTick: 10,
         energyRestoreFraction: 1.0,
         clearsExhaustionTo: 0,
         canBeWoken: true,
     },
     bedrollFire: {
-        baseDuration: 55,
+        energyPerTick: 8,
         energyRestoreFraction: 0.8,
         clearsExhaustionTo: 0,
         canBeWoken: true,
     },
     bedrollAlone: {
-        baseDuration: 70,
+        energyPerTick: 6,
         energyRestoreFraction: 0.6,
         clearsExhaustionTo: 1,
         canBeWoken: true,
     },
     collapse: {
-        baseDuration: 100,
+        energyPerTick: 2,
         energyRestoreFraction: 0.3,
         clearsExhaustionTo: 2,
         canBeWoken: false,
@@ -59,40 +59,28 @@ export const sleepParamsByQuality: Record<SleepQuality, SleepParams> = {
 };
 
 /**
- * Calculate total sleep duration for a given quality and entity.
- * Applies the entity's sleepMultiplier to the base duration.
- */
-export function computeSleepDuration(
-    quality: SleepQuality,
-    entity: Entity,
-): number {
-    const energy = entity.getEcsComponent(EnergyComponentId);
-    const multiplier = energy?.sleepMultiplier ?? 1.0;
-    return Math.ceil(sleepParamsByQuality[quality].baseDuration * multiplier);
-}
-
-/**
- * Execute one tick of the sleep action. Increments ticksSlept and completes
- * when enough ticks have elapsed, restoring energy and clearing exhaustion.
- * Collapse-quality sleep suppresses replanning until complete.
+ * Execute one tick of the sleep action. Increments the entity's energy by
+ * energyPerTick each tick and completes once energy reaches energyTarget.
+ * Exhaustion is cleared on completion. Collapse-quality sleep suppresses
+ * replanning until complete.
  */
 export function executeSleepAction(
     action: SleepActionData,
     entity: Entity,
 ): ActionResult {
-    action.ticksSlept++;
+    const energy = entity.getEcsComponent(EnergyComponentId);
+    if (energy) {
+        energy.energy = Math.min(
+            action.energyTarget,
+            energy.energy + action.energyPerTick,
+        );
+        entity.invalidateComponent(EnergyComponentId);
 
-    if (action.ticksSlept >= action.duration) {
-        const energy = entity.getEcsComponent(EnergyComponentId);
-        if (energy) {
+        if (energy.energy >= action.energyTarget) {
             const params = sleepParamsByQuality[action.quality];
-            energy.energy = Math.floor(
-                energy.maxEnergy * params.energyRestoreFraction,
-            );
-            entity.invalidateComponent(EnergyComponentId);
             clearEntityExhaustion(entity, params.clearsExhaustionTo);
+            return ActionComplete;
         }
-        return ActionComplete;
     }
 
     // Unconscious sleepers cannot be woken by danger

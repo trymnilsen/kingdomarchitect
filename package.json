@@ -29,6 +29,7 @@
         "@simplewebauthn/server": "^13.2.3",
         "@types/node": "^25.4.0",
         "@types/pngjs": "^6.0.5",
+        "@types/ws": "^8.18.1",
         "maxrects-packer": "^2.7.3",
         "pngjs": "^7.0.0",
         "prettier": "^3.5.3",
@@ -37,7 +38,5 @@
         "typescript": "^5.9.3",
         "ws": "^8.19.0"
     },
-    "devDependencies": {
-        "@types/ws": "^8.18.1"
-    }
+    "devDependencies": {}
 }

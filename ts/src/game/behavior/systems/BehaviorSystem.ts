@@ -94,6 +94,13 @@ function updateBehaviorAgent(
                 failure: { actionType: action.type, cause: result.cause },
                 since: tick,
             };
+        } else if (result.kind === "subaction") {
+            log.info(
+                `Entity ${entity.id} action "${action.type}" suspended, inserting ${result.actions.length} subactions`,
+            );
+            // Suspend the current action by inserting subactions before it.
+            // When the subactions complete the suspended action will resume.
+            agent.actionQueue.splice(0, 0, ...result.actions);
         }
         entity.invalidateComponent(BehaviorAgentComponentId);
         // result.kind === "running" — keep action in queue, it will run again next tick

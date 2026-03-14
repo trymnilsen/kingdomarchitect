@@ -1,4 +1,5 @@
 import type { Point } from "../../../common/point.ts";
+import type { BehaviorActionData } from "./ActionData.ts";
 
 /** Quality of sleep determines restore rates and duration. */
 export type SleepQuality = "house" | "bedrollFire" | "bedrollAlone" | "collapse";
@@ -24,7 +25,8 @@ export type ActionFailure = {
 export type ActionResult =
     | { kind: "complete" }
     | { kind: "running" }
-    | { kind: "failed"; cause: FailureCause };
+    | { kind: "failed"; cause: FailureCause }
+    | { kind: "subaction"; actions: BehaviorActionData[] };
 
 /**
  * Action completed successfully. The action will be removed from the queue

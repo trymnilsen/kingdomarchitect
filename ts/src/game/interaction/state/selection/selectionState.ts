@@ -44,6 +44,10 @@ import {
     HealthComponentId,
     type HealthComponent,
 } from "../../../component/healthComponent.ts";
+import {
+    EnergyComponentId,
+    type EnergyComponent,
+} from "../../../component/energyComponent.ts";
 import { SpriteComponentId } from "../../../component/spriteComponent.ts";
 import { BuildingComponentId } from "../../../component/buildingComponent.ts";
 import { ResourceComponentId } from "../../../component/resourceComponent.ts";
@@ -173,8 +177,19 @@ export class SelectionState extends InteractionState {
         if (selection instanceof SelectedEntityItem) {
             const healthComponent =
                 selection.entity.getEcsComponent(HealthComponentId);
+            const energyComponent =
+                selection.entity.getEcsComponent(EnergyComponentId);
             if (healthComponent) {
-                drawHealthbar(context, selection.entity, healthComponent);
+                const healthbarYOffset = energyComponent ? -18 : -8;
+                drawHealthbar(
+                    context,
+                    selection.entity,
+                    healthComponent,
+                    healthbarYOffset,
+                );
+            }
+            if (energyComponent) {
+                drawEnergyBar(context, selection.entity, energyComponent);
             }
         }
     }
@@ -339,12 +354,12 @@ function drawHealthbar(
     renderContext: RenderScope,
     entity: Entity,
     healthComponent: HealthComponent,
+    healthbarYOffset: number,
 ) {
     const screenPosition = renderContext.camera.tileSpaceToScreenSpace(
         entity.worldPosition,
     );
     const healthbarWidth = 28;
-    const healthbarYOffset = -8;
     const maxHp = healthComponent.maxHp > 0 ? healthComponent.maxHp : 1;
     const percentageWidth = Math.floor(
         (healthbarWidth - 4) * (healthComponent.currentHp / maxHp),
@@ -363,5 +378,36 @@ function drawHealthbar(
         width: percentageWidth,
         height: 4,
         fill: "green",
+    });
+}
+
+function drawEnergyBar(
+    renderContext: RenderScope,
+    entity: Entity,
+    energyComponent: EnergyComponent,
+) {
+    const screenPosition = renderContext.camera.tileSpaceToScreenSpace(
+        entity.worldPosition,
+    );
+    const barWidth = 28;
+    const barYOffset = -8;
+    const maxEnergy = energyComponent.maxEnergy > 0 ? energyComponent.maxEnergy : 1;
+    const percentageWidth = Math.floor(
+        (barWidth - 4) * (energyComponent.energy / maxEnergy),
+    );
+
+    renderContext.drawScreenSpaceRectangle({
+        x: screenPosition.x + 3,
+        y: screenPosition.y + barYOffset,
+        width: barWidth,
+        height: 8,
+        fill: "black",
+    });
+    renderContext.drawScreenSpaceRectangle({
+        x: screenPosition.x + 5,
+        y: screenPosition.y + 2 + barYOffset,
+        width: percentageWidth,
+        height: 4,
+        fill: "#4488ff",
     });
 }
