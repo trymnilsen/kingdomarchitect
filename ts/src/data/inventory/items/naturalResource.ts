@@ -43,7 +43,7 @@ export const treeResource = {
     name: "Tree",
     harvestMode: ResourceHarvestMode.Chop,
     lifecycle: { type: "Finite" },
-    yields: [{ item: woodResourceItem, amount: 10 }],
+    yields: [{ item: woodResourceItem, amount: 100 }],
     workDuration: 1,
 } as const;
 
@@ -53,7 +53,7 @@ export const pineResource = {
     name: "Pine Tree",
     harvestMode: ResourceHarvestMode.Chop,
     lifecycle: { type: "Finite" },
-    yields: [{ item: woodResourceItem, amount: 12 }],
+    yields: [{ item: woodResourceItem, amount: 100 }],
     workDuration: 1,
 } as const;
 
