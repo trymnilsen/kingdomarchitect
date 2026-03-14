@@ -181,7 +181,7 @@ export const stoneResource = {
     name: "Stone",
     harvestMode: ResourceHarvestMode.Mine,
     lifecycle: { type: "Infinite" },
-    yields: [{ item: stoneInventoryItem, amount: 2 }],
+    yields: [{ item: stoneInventoryItem, amount: 10 }],
     workDuration: 3, // Mining takes longer
 } as const;
 
