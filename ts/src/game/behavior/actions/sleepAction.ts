@@ -83,13 +83,5 @@ export function executeSleepAction(
         }
     }
 
-    // Unconscious sleepers cannot be woken by danger
-    if (!sleepParamsByQuality[action.quality].canBeWoken) {
-        const agent = getBehaviorAgent(entity);
-        if (agent && agent.pendingReplan) {
-            agent.pendingReplan = undefined;
-        }
-    }
-
     return ActionRunning;
 }
