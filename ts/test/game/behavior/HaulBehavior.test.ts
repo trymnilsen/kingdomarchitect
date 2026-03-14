@@ -1,6 +1,9 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
-import { createHaulBehavior } from "../../../src/game/behavior/behaviors/HaulBehavior.ts";
+import {
+    createHaulBehavior,
+    WORKER_INVENTORY_CAPACITY,
+} from "../../../src/game/behavior/behaviors/HaulBehavior.ts";
 import { createBehaviorTestEntity } from "./behaviorTestHelpers.ts";
 import { Entity } from "../../../src/game/entity/entity.ts";
 import { createInventoryComponent } from "../../../src/game/component/inventoryComponent.ts";
@@ -143,11 +146,11 @@ describe("HaulBehavior", () => {
             assert.ok(utility <= 10, `Expected utility <= 10, got ${utility}`);
         });
 
-        it("returns medium utility (~35-40) with 10 items in inventory", () => {
+        it("returns medium utility (~35-40) with half-capacity items in inventory", () => {
             const behavior = createHaulBehavior();
             const root = new Entity("root");
             const worker = createWorkerWithInventory("worker", [
-                { item: woodResourceItem, amount: 10 },
+                { item: woodResourceItem, amount: Math.floor(WORKER_INVENTORY_CAPACITY / 2) },
             ]);
             root.addChild(worker);
 
@@ -157,11 +160,11 @@ describe("HaulBehavior", () => {
             assert.ok(utility <= 45, `Expected utility <= 45, got ${utility}`);
         });
 
-        it("returns high utility (~70) with 20+ items in inventory", () => {
+        it("returns high utility (~70) with full-capacity items in inventory", () => {
             const behavior = createHaulBehavior();
             const root = new Entity("root");
             const worker = createWorkerWithInventory("worker", [
-                { item: woodResourceItem, amount: 20 },
+                { item: woodResourceItem, amount: WORKER_INVENTORY_CAPACITY },
             ]);
             root.addChild(worker);
 

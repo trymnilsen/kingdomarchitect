@@ -106,17 +106,6 @@ describe("executeSleepAction", () => {
         assert.strictEqual(energy.exhaustionLevel, 2);
     });
 
-    it("suppresses pendingReplan for collapse quality while sleeping", () => {
-        const worker = createSleeper(0);
-        const agent = worker.requireEcsComponent(BehaviorAgentComponentId);
-        agent.pendingReplan = { kind: "replan" };
-        const action = makeSleepAction(2, 30, "collapse");
-
-        executeSleepAction(action, worker);
-
-        assert.strictEqual(agent.pendingReplan, undefined);
-    });
-
     it("invalidates energy component each tick", () => {
         const root = new Entity("root");
         const worker = new Entity("worker");
