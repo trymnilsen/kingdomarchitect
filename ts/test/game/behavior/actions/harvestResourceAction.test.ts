@@ -12,7 +12,11 @@ import {
 } from "../../../../src/game/component/inventoryComponent.ts";
 import { createResourceComponent } from "../../../../src/game/component/resourceComponent.ts";
 import { executeHarvestResourceAction } from "../../../../src/game/behavior/actions/harvestResourceAction.ts";
-import { ResourceHarvestMode } from "../../../../src/data/inventory/items/naturalResource.ts";
+import {
+    ResourceHarvestMode,
+    stoneResource,
+    treeResource,
+} from "../../../../src/data/inventory/items/naturalResource.ts";
 import type { BehaviorActionData } from "../../../../src/game/behavior/actions/ActionData.ts";
 import { InvalidationTracker } from "../behaviorTestHelpers.ts";
 
@@ -84,7 +88,7 @@ describe("harvestResourceAction", () => {
                 worker.getEcsComponent(InventoryComponentId)!;
             const wood = getInventoryItem(workerInventory, "wood");
             assert.ok(wood);
-            assert.strictEqual(wood.amount, 10);
+            assert.strictEqual(wood.amount, treeResource.yields[0].amount);
         });
 
         it("removes resource entity on completion", () => {
@@ -143,7 +147,7 @@ describe("harvestResourceAction", () => {
                 worker.getEcsComponent(InventoryComponentId)!;
             const stone = getInventoryItem(workerInventory, "stone");
             assert.ok(stone);
-            assert.strictEqual(stone.amount, 2);
+            assert.strictEqual(stone.amount, stoneResource.yields[0].amount);
         });
     });
 
