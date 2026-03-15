@@ -17,6 +17,7 @@ import { SelectionState } from "../state/selection/selectionState.ts";
 import { CommitableInteractionStateChanger } from "./interactionStateChanger.ts";
 import { InteractionStateHistory } from "./interactionStateHistory.ts";
 import { StateContext } from "./stateContext.ts";
+import type { GameSaveCapability } from "../../../server/gameServerConnection.ts";
 import type { GameCommand } from "../../../server/message/gameCommand.ts";
 import { queryEntity } from "../../map/query/queryEntity.ts";
 import type { EcsWorld } from "../../../common/ecs/ecsWorld.ts";
@@ -44,6 +45,7 @@ export class InteractionHandler {
         uiRenderer: UiRenderer,
         command: (command: GameCommand) => void,
         _visibilityChange: () => void,
+        gameSaveCapability?: GameSaveCapability,
     ) {
         this.uiRenderer = uiRenderer;
         this.interactionStateChanger = new CommitableInteractionStateChanger();
@@ -57,6 +59,7 @@ export class InteractionHandler {
             gameTime: time,
             camera: camera,
             commandDispatcher: command,
+            gameSaveCapability: gameSaveCapability,
         };
         this.history = new InteractionStateHistory(this.stateContext);
     }

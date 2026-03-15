@@ -3,6 +3,7 @@ import { DatabaseSync } from "node:sqlite";
 import { WebSocketServer } from "ws";
 import type { WebSocket } from "ws";
 import { GameServer } from "./gameServer.ts";
+import { PersistenceManager } from "./persistence/persistenceManager.ts";
 import { SQLiteAdapter } from "./persistence/sqliteAdapter.ts";
 import { gameMigrations, authMigrations } from "./persistence/migration.ts";
 import { applySQLiteMigrations } from "./persistence/sqliteMigrationCompiler.ts";
@@ -63,6 +64,7 @@ export function startMultiplayerServer(
 
     // Create persistence adapter
     const adapter = new SQLiteAdapter(db);
+    const persistenceManager = new PersistenceManager(adapter);
 
     // Create connection manager, message router, and rate limiter
     const connectionManager = new ConnectionManager();
@@ -71,7 +73,7 @@ export function startMultiplayerServer(
     const challengeStore = new ChallengeStore();
 
     // Create and init game server (no initial player — players join via WebSocket)
-    const gameServer = new GameServer(messageRouter, adapter);
+    const gameServer = new GameServer(messageRouter, persistenceManager);
     let gameServerReady = false;
     gameServer
         .init()

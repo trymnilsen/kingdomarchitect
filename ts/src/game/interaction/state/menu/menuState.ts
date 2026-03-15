@@ -33,7 +33,7 @@ export class MenuState extends InteractionState {
             padding: 16,
             child: uiBox({
                 width: 300,
-                height: 400,
+                height: wrapUiSize,
                 padding: 16,
                 background: ninePatchBackground({
                     scale: 2,
@@ -48,6 +48,16 @@ export class MenuState extends InteractionState {
                         this.getButtonView("New game", () => {
                             this.context.commandDispatcher(NewGameCommand());
                         }),
+                        ...(this.context.gameSaveCapability
+                            ? [
+                                  this.getButtonView("Save game", () => {
+                                      this.context.gameSaveCapability!.save();
+                                  }),
+                                  this.getButtonView("Load game", () => {
+                                      this.context.gameSaveCapability!.load();
+                                  }),
+                              ]
+                            : []),
                         this.getButtonView("Bindings", () => {}),
                         this.getButtonView("About", () => {}),
                         this.getButtonView("DebugChunks", () => {

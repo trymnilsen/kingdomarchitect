@@ -12,6 +12,7 @@ import { TileComponentId } from "../../game/component/tileComponent.ts";
 import { WorldDiscoveryComponentId } from "../../game/component/worldDiscoveryComponent.ts";
 import { Entity, RootEntityId } from "../../game/entity/entity.ts";
 import type { PersistenceAdapter } from "./persistenceAdapter.ts";
+import type { SaveFileData } from "./saveFileData.ts";
 import type { SerializedEntity } from "./serializedEntity.ts";
 import type { SerializedWorldMeta } from "./serializedWorldMeta.ts";
 
@@ -176,6 +177,40 @@ export class PersistenceManager {
 
     clearGame(): Promise<void> {
         return this.adapter.clearGame();
+    }
+
+    /**
+     * Export the entire world to a portable save file object.
+     * Does not write to the adapter — the caller owns the data.
+     */
+    exportWorld(root: Entity, meta: SerializedWorldMeta): SaveFileData {
+        const entities: SerializedEntity[] = [];
+        for (const child of root.children) {
+            this.collectSubtree(child, entities);
+        }
+
+        const rootComponents: Record<string, unknown> = {};
+        for (const component of root.components) {
+            if (persistableRootComponents.has(component.id)) {
+                rootComponents[component.id] =
+                    this.serializeComponent(component);
+            }
+        }
+
+        return { meta, entities, rootComponents };
+    }
+
+    /**
+     * Import a save file by writing it to the adapter.
+     * The caller is responsible for reloading the game world afterwards.
+     */
+    async importSave(data: SaveFileData): Promise<void> {
+        await this.adapter.clearGame();
+        await this.adapter.saveMeta(data.meta);
+        await this.adapter.saveEntities(data.entities);
+        await this.adapter.saveRootComponents(
+            data.rootComponents as Record<string, any>,
+        );
     }
 
     /**

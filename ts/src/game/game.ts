@@ -98,6 +98,7 @@ export class Game {
                     !this.visibilityMap.useVisibility;
                 this.render(DrawMode.Gesture);
             },
+            serverConnection.gameSaveCapability,
         );
 
         this.addSystems();

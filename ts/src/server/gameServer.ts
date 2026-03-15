@@ -30,8 +30,8 @@ import { createEffectExecutorMap } from "../data/effect/effectExecutorRegistry.t
 import { housingSystem } from "../game/system/housingSystem.ts";
 import { regrowSystem } from "../game/system/regrowSystem.ts";
 import { PersistenceManager } from "./persistence/persistenceManager.ts";
-import type { PersistenceAdapter } from "./persistence/persistenceAdapter.ts";
 import type { Entity } from "../game/entity/entity.ts";
+import type { SerializedWorldMeta } from "./persistence/serializedWorldMeta.ts";
 import { TileComponentId } from "../game/component/tileComponent.ts";
 import { WorldDiscoveryComponentId } from "../game/component/worldDiscoveryComponent.ts";
 import { getPlayerDiscoveryData } from "./message/playerDiscoveryData.ts";
@@ -53,7 +53,7 @@ export class GameServer {
 
     constructor(
         messageRouter: MessageRouter,
-        adapter: PersistenceAdapter,
+        persistenceManager: PersistenceManager,
         onPlayerConnected?: (playerId: string) => void,
     ) {
         this.messageRouter = messageRouter;
@@ -67,7 +67,7 @@ export class GameServer {
         this.world = new EcsWorld(root);
 
         this.worldSeed = Date.now();
-        this.persistenceManager = new PersistenceManager(adapter);
+        this.persistenceManager = persistenceManager;
     }
 
     async init(initialPlayerId?: string): Promise<void> {
@@ -189,6 +189,14 @@ export class GameServer {
             tick: this.updateTick,
             seed: this.worldSeed,
         });
+    }
+
+    get worldRoot(): Entity {
+        return this.world.root;
+    }
+
+    get worldMeta(): SerializedWorldMeta {
+        return { version: 1, tick: this.updateTick, seed: this.worldSeed };
     }
 
     private addSystems() {
