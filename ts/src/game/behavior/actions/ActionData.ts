@@ -10,6 +10,7 @@ import type { ConstructBuildingActionData } from "./constructBuildingAction.ts";
 import type { TakeFromInventoryActionData } from "./takeFromInventoryAction.ts";
 import type { DepositToInventoryActionData } from "./depositToInventoryAction.ts";
 import type { OperateFacilityActionData } from "./operateFacilityAction.ts";
+import type { PlantTreeActionData } from "./plantTreeAction.ts";
 import type { CraftItemActionData } from "./craftItemAction.ts";
 import type { CollectItemsActionData } from "./collectItemsAction.ts";
 import type { AttackTargetActionData } from "./attackTargetAction.ts";
@@ -40,7 +41,8 @@ export type BehaviorActionData =
     | CollectItemsActionData
     | AttackTargetActionData
     | WarmByFireActionData
-    | WithdrawFromStockpileActionData;
+    | WithdrawFromStockpileActionData
+    | PlantTreeActionData;
 
 /**
  * Action executor function type - takes action data, entity, and tick, returns result.

@@ -4,16 +4,12 @@ import { getProductionDefinition } from "../../../data/production/productionDefi
 import { spendEntityEnergy } from "../../component/energyComponent.ts";
 
 const log = createLogger("behavior");
-import { getResourceById } from "../../../data/inventory/items/naturalResource.ts";
-import { ChunkMapComponentId } from "../../component/chunkMapComponent.ts";
 import {
     addInventoryItem,
     InventoryComponentId,
 } from "../../component/inventoryComponent.ts";
 import { ProductionComponentId } from "../../component/productionComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
-import { findRandomSpawnInDiamond } from "../../map/item/placement.ts";
-import { resourcePrefab } from "../../prefab/resourcePrefab.ts";
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import {
     findJobClaimedBy,
@@ -31,10 +27,8 @@ export type OperateFacilityActionData = {
     progress?: number;
 };
 
-const FORRESTER_RADIUS = 5;
-
 /**
- * Operate a production facility (e.g., quarry, forrester).
+ * Operate an extract production facility (e.g., quarry).
  * Progress is stored on action.progress since no component tracks work duration.
  * Assumes worker is already adjacent to building (moveTo should have run first).
  */
@@ -80,6 +74,13 @@ export function executeOperateFacilityAction(
         return { kind: "failed", cause: { type: "unknown" } };
     }
 
+    if (definition.kind !== "extract") {
+        log.warn(
+            `operateFacility called on non-extract building: ${productionComp.productionId}`,
+        );
+        return { kind: "failed", cause: { type: "unknown" } };
+    }
+
     if (action.progress === undefined) {
         action.progress = 0;
     }
@@ -87,32 +88,14 @@ export function executeOperateFacilityAction(
     spendEntityEnergy(entity, 2);
 
     if (action.progress >= definition.duration) {
-        const yieldDef = definition.yield;
-
-        if (yieldDef.type === "item") {
-            const workerInventory =
-                entity.requireEcsComponent(InventoryComponentId);
-            addInventoryItem(workerInventory, yieldDef.item, yieldDef.amount);
-            entity.invalidateComponent(InventoryComponentId);
-        } else if (yieldDef.type === "entity") {
-            const chunkMapComp = root.getEcsComponent(ChunkMapComponentId);
-            if (chunkMapComp) {
-                const spawnPosition = findRandomSpawnInDiamond(
-                    buildingEntity.worldPosition,
-                    FORRESTER_RADIUS,
-                    chunkMapComp.chunkMap,
-                );
-
-                if (spawnPosition) {
-                    const resource = getResourceById(yieldDef.resourceId);
-                    if (resource) {
-                        const spawnedEntity = resourcePrefab(resource);
-                        spawnedEntity.worldPosition = spawnPosition;
-                        root.addChild(spawnedEntity);
-                    }
-                }
-            }
-        }
+        const workerInventory =
+            entity.requireEcsComponent(InventoryComponentId);
+        addInventoryItem(
+            workerInventory,
+            definition.yield.item,
+            definition.yield.amount,
+        );
+        entity.invalidateComponent(InventoryComponentId);
 
         const queueEntity = entity.getAncestorEntity(JobQueueComponentId);
         if (queueEntity) {

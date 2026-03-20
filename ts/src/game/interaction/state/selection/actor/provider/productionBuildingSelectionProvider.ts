@@ -9,6 +9,7 @@ import { SelectedEntityItem } from "../../../../selection/selectedEntityItem.ts"
 import { BuildingComponentId } from "../../../../../component/buildingComponent.ts";
 import { ProductionComponentId } from "../../../../../component/productionComponent.ts";
 import { JobQueueComponentId } from "../../../../../component/jobQueueComponent.ts";
+import { ResourceComponentId } from "../../../../../component/resourceComponent.ts";
 import { getSettlementEntity } from "../../../../../entity/settlementQueries.ts";
 import { spriteRefs } from "../../../../../../asset/sprite.ts";
 import { QueueJobCommand } from "../../../../../../server/message/command/queueJobCommand.ts";
@@ -18,6 +19,8 @@ import {
     clearProductionJobsForBuilding,
 } from "../../../../../job/productionJob.ts";
 import { getProductionDefinition } from "../../../../../../data/production/productionDefinition.ts";
+import { getDiamondPoints } from "../../../../../map/item/placement.ts";
+import { queryEntity } from "../../../../../map/query/queryEntity.ts";
 import type { UIActionbarItem } from "../../../../view/uiActionbar.ts";
 
 export class ProductionBuildingSelectionProvider implements ActorSelectionProvider {
@@ -50,10 +53,29 @@ export class ProductionBuildingSelectionProvider implements ActorSelectionProvid
                       )
                     : 0;
 
-                const actionText =
+                let actionText =
                     queuedCount > 0
                         ? `${definition.actionName} (${queuedCount})`
                         : definition.actionName;
+
+                if (definition.kind === "zone") {
+                    const zonePoints = getDiamondPoints(
+                        selection.entity.worldPosition,
+                        definition.zoneRadius,
+                    );
+                    const treeCount = zonePoints.filter((p) => {
+                        const entities = queryEntity(stateContext.root, p);
+                        return entities.some(
+                            (e) =>
+                                e.getEcsComponent(ResourceComponentId)
+                                    ?.resourceId === definition.plantResourceId,
+                        );
+                    }).length;
+                    const capacity = Math.floor(
+                        zonePoints.length * definition.maxTreeFraction,
+                    );
+                    actionText += ` • ${treeCount}/${capacity} trees`;
+                }
 
                 const leftButtons: UIActionbarItem[] = [
                     {

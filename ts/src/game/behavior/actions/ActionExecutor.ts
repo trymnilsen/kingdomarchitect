@@ -22,6 +22,7 @@ import { executeCollectItemsAction } from "./collectItemsAction.ts";
 import { executeAttackTargetAction } from "./attackTargetAction.ts";
 import { executeWarmByFireAction } from "./warmByFireAction.ts";
 import { executeWithdrawFromStockpileAction } from "./withdrawFromStockpileAction.ts";
+import { executePlantTreeAction } from "./plantTreeAction.ts";
 
 /**
  * Main action executor that dispatches to specific action handlers based on action type.
@@ -62,6 +63,8 @@ export const executeAction: BehaviorActionExecutor = (
             return executeWarmByFireAction(action, entity);
         case "withdrawFromStockpile":
             return executeWithdrawFromStockpileAction(action, entity);
+        case "plantTree":
+            return executePlantTreeAction(action, entity);
         default:
             log.warn(
                 `Unknown action type: ${(action as any).type}`,

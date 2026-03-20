@@ -112,9 +112,9 @@ function generateChunkEntities(chunk: Required<TileChunk>, rootEntity: Entity) {
         x: chunk.chunkX * ChunkSize,
         y: chunk.chunkY * ChunkSize,
     };
-    // Only place one goblin camp globally (for now).
-    // Query for GoblinCampComponent specifically — other kingdom entities
-    // (e.g. the player kingdom) should not prevent a goblin camp from spawning.
+    // TODO: Replace with kingdom spawn evaluation
+    // evaluateKingdomSpawn should run once per volume on the first chunk discovered
+    // in that volume. For now, keep the existing single goblin camp placement.
     const goblinCamps = rootEntity.queryComponents(GoblinCampComponentId);
 
     rootEntity.addChild(chunkEntity);

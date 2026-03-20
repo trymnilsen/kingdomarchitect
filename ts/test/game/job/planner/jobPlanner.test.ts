@@ -10,6 +10,7 @@ import { MoveToJob } from "../../../../src/game/job/moveToPointJob.ts";
 import { ResourceHarvestMode } from "../../../../src/data/inventory/items/naturalResource.ts";
 import { createJobQueueComponent } from "../../../../src/game/component/jobQueueComponent.ts";
 import { createInventoryComponent } from "../../../../src/game/component/inventoryComponent.ts";
+import { createProductionComponent } from "../../../../src/game/component/productionComponent.ts";
 
 function createTestScene(): { root: Entity; worker: Entity } {
     const root = new Entity("root");
@@ -43,6 +44,7 @@ describe("jobPlanner", () => {
         const { root, worker } = createTestScene();
         const building = new Entity("building");
         building.worldPosition = { x: 15, y: 13 };
+        building.setEcsComponent(createProductionComponent("quarry_production", 4));
         root.addChild(building);
 
         const job = createProductionJob("building");

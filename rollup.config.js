@@ -43,4 +43,13 @@ export default [
             format: "esm",
         },
     },
+    {
+        input: "build/src/citypreview/main.js",
+        plugins: [sourcemaps()],
+        output: {
+            sourcemap: true,
+            file: "public/dist/citypreview.js",
+            format: "esm",
+        },
+    },
 ];

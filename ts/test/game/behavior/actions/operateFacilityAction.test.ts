@@ -27,14 +27,14 @@ function createTestScene(): {
     const worker = new Entity("worker");
     const building = new Entity("building");
 
+    root.addChild(worker);
+    root.addChild(building);
+
     worker.worldPosition = { x: 10, y: 8 };
     building.worldPosition = { x: 11, y: 8 }; // Adjacent
 
     worker.setEcsComponent(createInventoryComponent());
-    building.setEcsComponent(createProductionComponent("quarry_production"));
-
-    root.addChild(worker);
-    root.addChild(building);
+    building.setEcsComponent(createProductionComponent("quarry_production", 4));
 
     return { root, worker, building };
 }
@@ -118,8 +118,8 @@ describe("operateFacilityAction", () => {
     it("fails if building has no ProductionComponent", () => {
         const { root, worker } = createTestScene();
         const noProduction = new Entity("noProduction");
-        noProduction.worldPosition = { x: 11, y: 8 };
         root.addChild(noProduction);
+        noProduction.worldPosition = { x: 11, y: 8 };
 
         const action = {
             type: "operateFacility" as const,
@@ -134,11 +134,11 @@ describe("operateFacilityAction", () => {
     it("fails if production definition not found", () => {
         const { root, worker } = createTestScene();
         const unknownProduction = new Entity("unknownProduction");
+        root.addChild(unknownProduction);
         unknownProduction.worldPosition = { x: 11, y: 8 };
         unknownProduction.setEcsComponent(
-            createProductionComponent("unknown_production"),
+            createProductionComponent("unknown_production", 4),
         );
-        root.addChild(unknownProduction);
 
         const action = {
             type: "operateFacility" as const,
