@@ -17,6 +17,8 @@ import { ninePatchBackground } from "../../../../ui/uiBackground.ts";
 import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize.ts";
 import type { ActiveEffectsComponent } from "../../../component/activeEffectsComponent.ts";
 import { ActiveEffectsComponentId } from "../../../component/activeEffectsComponent.ts";
+import type { HungerComponent } from "../../../component/hungerComponent.ts";
+import { HungerComponentId } from "../../../component/hungerComponent.ts";
 import type { Entity } from "../../../entity/entity.ts";
 import { getStatBreakdown, getStats } from "../../../stat/getStats.ts";
 import type { StatType } from "../../../stat/statType.ts";
@@ -89,6 +91,7 @@ export const statsView = createComponent<StatsViewProps>(
                     }),
                 ),
                 uiSpace({ width: 0, height: 8 }),
+                ...buildHungerSection(props.entity),
                 ...buildEffectsList(props.entity),
             ],
         });
@@ -111,6 +114,56 @@ export const statsView = createComponent<StatsViewProps>(
     },
     { displayName: "StatsView" },
 );
+
+function buildHungerSection(entity: Entity) {
+    const hungerComponent = entity.getEcsComponent(
+        HungerComponentId,
+    ) as HungerComponent | null;
+
+    if (!hungerComponent) {
+        return [];
+    }
+
+    const hunger = Math.round(hungerComponent.hunger);
+    const hungerLabel =
+        hunger >= 80 ? "Starving" : hunger >= 40 ? "Hungry" : "Sated";
+
+    return [
+        uiText({
+            content: "Needs",
+            textStyle: subTitleTextStyle,
+            width: wrapUiSize,
+            height: wrapUiSize,
+        }),
+        uiSpace({ width: 0, height: 4 }),
+        uiRow({
+            width: fillUiSize,
+            height: wrapUiSize,
+            mainAxisAlignment: MainAxisAlignment.SpaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.Center,
+            children: [
+                uiText({
+                    content: "Hunger",
+                    textStyle: defaultTextStyle,
+                    width: wrapUiSize,
+                    height: wrapUiSize,
+                }),
+                uiText({
+                    content: `${hunger} (${hungerLabel})`,
+                    textStyle:
+                        hunger >= 80
+                            ? subTitleTextStyle
+                            : hunger >= 40
+                              ? defaultTextStyle
+                              : graySubTitleTextStyle,
+                    width: wrapUiSize,
+                    height: wrapUiSize,
+                }),
+            ],
+        }),
+        uiSpace({ width: 0, height: 8 }),
+    ];
+}
 
 function buildEffectsList(entity: Entity) {
     const effectsComponent = entity.getEcsComponent(
