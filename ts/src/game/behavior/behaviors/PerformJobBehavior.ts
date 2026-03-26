@@ -246,6 +246,11 @@ function getJobTargetPosition(
             const entity = root.findEntity(job.targetBuilding);
             return entity?.worldPosition ?? null;
         }
+        case "farmPlantJob":
+        case "farmHarvestJob": {
+            const entity = root.findEntity(job.targetBuilding);
+            return entity?.worldPosition ?? null;
+        }
         case "attackJob": {
             const entity = root.findEntity(job.target);
             return entity?.worldPosition ?? null;
