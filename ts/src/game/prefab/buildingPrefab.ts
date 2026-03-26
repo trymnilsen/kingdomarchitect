@@ -26,6 +26,13 @@ import {
     createFireSourceComponent,
     FireSourceComponentId,
 } from "../component/fireSourceComponent.ts";
+import { farm } from "../../data/building/grow/grow.ts";
+import {
+    createFarmComponent,
+    FarmComponentId,
+} from "../component/farmComponent.ts";
+import { baker } from "../../data/building/food/baker.ts";
+import { bakerRecipes } from "../../data/crafting/recipes/bakerRecipes.ts";
 import { HousingComponentId } from "../component/housingComponent.ts";
 import { CraftingComponentId } from "../component/craftingComponent.ts";
 import { WorkplaceComponentId } from "../component/workplaceComponent.ts";
@@ -118,5 +125,17 @@ export function applyFunctionalComponents(
     if (building.id == goblinHut.id) {
         entity.setEcsComponent(createHousingComponent());
         entity.invalidateComponent(HousingComponentId);
+    }
+    if (building.id == farm.id) {
+        entity.setEcsComponent(createFarmComponent());
+        entity.invalidateComponent(FarmComponentId);
+    }
+    if (building.id == baker.id) {
+        entity.setEcsComponent(createCraftingComponent(bakerRecipes));
+        entity.setEcsComponent(createInventoryComponent());
+        entity.setEcsComponent(createWorkplaceComponent());
+        entity.invalidateComponent(CraftingComponentId);
+        entity.invalidateComponent(InventoryComponentId);
+        entity.invalidateComponent(WorkplaceComponentId);
     }
 }

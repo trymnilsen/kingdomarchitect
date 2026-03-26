@@ -16,6 +16,10 @@ import type { CollectItemsActionData } from "./collectItemsAction.ts";
 import type { AttackTargetActionData } from "./attackTargetAction.ts";
 import type { WarmByFireActionData } from "./warmByFireAction.ts";
 import type { WithdrawFromStockpileActionData } from "./withdrawFromStockpileAction.ts";
+import type { PlantCropActionData } from "./plantCropAction.ts";
+import type { HarvestCropActionData } from "./harvestCropAction.ts";
+import type { EatFromInventoryActionData } from "./eatFromInventoryAction.ts";
+import type { StealFoodActionData } from "./stealFoodAction.ts";
 
 /**
  * Action data types - these are serializable plain objects that can be stored in components.
@@ -42,7 +46,11 @@ export type BehaviorActionData =
     | AttackTargetActionData
     | WarmByFireActionData
     | WithdrawFromStockpileActionData
-    | PlantTreeActionData;
+    | PlantTreeActionData
+    | PlantCropActionData
+    | HarvestCropActionData
+    | EatFromInventoryActionData
+    | StealFoodActionData;
 
 /**
  * Action executor function type - takes action data, entity, and tick, returns result.

@@ -36,6 +36,8 @@ import type { FireSourceComponent } from "./fireSourceComponent.ts";
 import type { MovementStaminaComponent } from "./movementStaminaComponent.ts";
 import type { PlayerKingdomComponent } from "./playerKingdomComponent.ts";
 import type { StatsComponent } from "./statsComponent.ts";
+import type { FarmComponent } from "./farmComponent.ts";
+import type { DesiredInventoryComponent } from "./desiredInventoryComponent.ts";
 
 export type Components =
     | SpriteComponent
@@ -75,7 +77,9 @@ export type Components =
     | FireSourceComponent
     | MovementStaminaComponent
     | PlayerKingdomComponent
-    | StatsComponent;
+    | StatsComponent
+    | FarmComponent
+    | DesiredInventoryComponent;
 
 export interface BaseComponent {
     id: string;

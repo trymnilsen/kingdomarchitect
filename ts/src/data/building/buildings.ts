@@ -2,6 +2,7 @@ import type { Building } from "./building.ts";
 import { wallAdjacency } from "./adjacency/wallAdjacency.ts";
 import { foodBuildings } from "./food/food.ts";
 import { goldBuildings } from "./gold/gold.ts";
+import { growBuildings } from "./grow/grow.ts";
 import { stoneBuildings } from "./stone/stone.ts";
 import { stoneWall } from "./stone/wall.ts";
 import { woodenBuildings } from "./wood/wood.ts";
@@ -10,6 +11,7 @@ import { goblinBuildings } from "./goblin/goblin.ts";
 export const buildings = [
     ...foodBuildings,
     ...goldBuildings,
+    ...growBuildings,
     ...stoneBuildings,
     ...woodenBuildings,
     ...goblinBuildings,

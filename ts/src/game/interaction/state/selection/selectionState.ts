@@ -36,6 +36,8 @@ import { uiScaffold } from "../../view/uiScaffold.ts";
 import { BuildingSelectionProvider } from "./actor/provider/buildingSelectionProvider.ts";
 import { ProductionBuildingSelectionProvider } from "./actor/provider/productionBuildingSelectionProvider.ts";
 import { StockpileSelectionProvider } from "./actor/provider/stockpileSelectionProvider.ts";
+import { FarmBuildingSelectionProvider } from "./actor/provider/farmBuildingSelectionProvider.ts";
+import { FarmComponentId, FarmState } from "../../../component/farmComponent.ts";
 import { getCraftingJobDisplayInfos } from "../../../job/craftingJobQuery.ts";
 import { craftingQueueStrip } from "../crafting/craftingQueueStrip.ts";
 import { uiAbsoluteLayer } from "../../../../ui/declarative/uiAbsoluteLayer.ts";
@@ -68,6 +70,7 @@ export class SelectionState extends InteractionState {
         new ProductionBuildingSelectionProvider(),
         new StockpileSelectionProvider(),
         new AttackSelectionProvider(),
+        new FarmBuildingSelectionProvider(),
         new BuildingSelectionProvider(),
     ];
     private _selection: SelectedWorldItem;
@@ -251,6 +254,27 @@ export class SelectionState extends InteractionState {
 
             if (this._selection.entity.hasComponent(GoblinUnitComponentId)) {
                 name = `${this._selection.entity.id}`;
+            }
+
+            const farmComponent =
+                this._selection.entity.getEcsComponent(FarmComponentId);
+            if (farmComponent) {
+                let farmSubtitle: string;
+                if (farmComponent.state === FarmState.Empty) {
+                    farmSubtitle = "empty";
+                } else if (farmComponent.state === FarmState.Growing) {
+                    const progress = farmComponent.growthDuration > 0
+                        ? Math.floor(
+                              ((this.context.gameTime.tick - farmComponent.plantedAtTick) /
+                                  farmComponent.growthDuration) *
+                                  100,
+                          )
+                        : 100;
+                    farmSubtitle = `growing (${Math.min(progress, 99)}%)`;
+                } else {
+                    farmSubtitle = `${farmComponent.cropItemId} ready`;
+                }
+                return { icon, subtitle: farmSubtitle, title: name };
             }
 
             const behaviorAgent = this._selection.entity.getEcsComponent(

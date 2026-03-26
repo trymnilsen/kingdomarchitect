@@ -11,6 +11,7 @@ import { getSettlementEntity } from "../entity/settlementQueries.ts";
 import { findClosestAvailablePosition } from "../map/query/closestPositionQuery.ts";
 import { workerPrefab } from "../prefab/workerPrefab.ts";
 import { woodenHouse } from "../../data/building/wood/house.ts";
+import { KingdomComponentId } from "../component/kingdomComponent.ts";
 
 export const housingSystem: EcsSystem = {
     onUpdate: update,
@@ -87,7 +88,10 @@ function update(root: Entity, _deltaTime: number) {
         const houseEntry = randomEntry(availableHouses);
         const [houseEntity, housingComponent] = houseEntry;
         removeItem(availableHouses, houseEntry);
-        const worker = workerPrefab();
+        const settlement = getSettlementEntity(houseEntity);
+        const kingdomComp = settlement.getEcsComponent(KingdomComponentId);
+        const defaults = kingdomComp?.defaultDesiredInventory ?? [];
+        const worker = workerPrefab(undefined, defaults);
         const spawnPosition = findClosestAvailablePosition(
             root,
             houseEntity.worldPosition,
@@ -96,7 +100,6 @@ function update(root: Entity, _deltaTime: number) {
         if (spawnPosition) {
             housingComponent.tenant = worker.id;
             houseEntity.invalidateComponent(HousingComponentId);
-            const settlement = getSettlementEntity(houseEntity);
             settlement.addChild(worker);
             worker.worldPosition = spawnPosition;
         }

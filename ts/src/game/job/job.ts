@@ -6,6 +6,8 @@ import type { CollectResourceJob } from "./collectResourceJob.ts";
 import type { CraftingJob } from "./craftingJob.ts";
 import type { MoveToJob } from "./moveToPointJob.ts";
 import type { ProductionJob } from "./productionJob.ts";
+import type { FarmPlantJob } from "./farmPlantJob.ts";
+import type { FarmHarvestJob } from "./farmHarvestJob.ts";
 
 export type JobConstraint = EntityJobConstraint;
 export interface EntityJobConstraint {
@@ -26,7 +28,9 @@ export type Jobs =
     | CollectItemJob
     | CollectResourceJob
     | CraftingJob
-    | ProductionJob;
+    | ProductionJob
+    | FarmPlantJob
+    | FarmHarvestJob;
 export type JobId = Jobs["id"];
 
 export function isTargetOfJob(job: Jobs, entity: Entity): boolean {
@@ -42,6 +46,10 @@ export function isTargetOfJob(job: Jobs, entity: Entity): boolean {
         case "craftingJob":
             return job.targetBuilding == entity.id;
         case "productionJob":
+            return job.targetBuilding == entity.id;
+        case "farmPlantJob":
+            return job.targetBuilding == entity.id;
+        case "farmHarvestJob":
             return job.targetBuilding == entity.id;
         case "moveToJob":
             return false;

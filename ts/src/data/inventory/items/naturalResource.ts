@@ -3,6 +3,8 @@ import type { InventoryItem } from "../inventoryItem.ts";
 import {
     woodResourceItem,
     stoneResource as stoneInventoryItem,
+    berryItem,
+    mushroomFoodItem,
 } from "./resources.ts";
 
 export const ResourceHarvestMode = {
@@ -93,7 +95,7 @@ export const swampFlowerResource = {
     name: "Swamp Flower",
     harvestMode: ResourceHarvestMode.Pick,
     lifecycle: { type: "Remove" },
-    yields: [], // Define actual flower yield later
+    yields: [{ item: berryItem, amount: 1 }],
     workDuration: 1,
 } as const;
 
@@ -127,7 +129,7 @@ export const cactusFlowerResource = {
     name: "Cactus Flower",
     harvestMode: ResourceHarvestMode.Pick,
     lifecycle: { type: "Remove" },
-    yields: [], // Define actual flower yield later
+    yields: [{ item: berryItem, amount: 1 }],
     workDuration: 1,
 } as const;
 
@@ -137,7 +139,7 @@ export const mushroomResource = {
     name: "Mushroom",
     harvestMode: ResourceHarvestMode.Pick,
     lifecycle: { type: "Remove" },
-    yields: [], // Define actual mushroom yield later
+    yields: [{ item: mushroomFoodItem, amount: 1 }],
     workDuration: 1,
 } as const;
 
@@ -151,7 +153,7 @@ export const berryBushResource = {
         time: 200,
         sprite: spriteRefs.nature_berrybush_wo,
     },
-    yields: [], // Define actual berry yield later
+    yields: [{ item: berryItem, amount: 2 }],
     workDuration: 1,
 } as const;
 
@@ -161,7 +163,7 @@ export const flowerResource = {
     name: "Flower",
     harvestMode: ResourceHarvestMode.Pick,
     lifecycle: { type: "Remove" },
-    yields: [], // Define actual flower yield later
+    yields: [{ item: berryItem, amount: 1 }],
     workDuration: 1,
 } as const;
 

@@ -91,6 +91,11 @@ import {
     setPreferredAmount,
     StockpileComponentId,
 } from "../component/stockpileComponent.ts";
+import {
+    UpdateDesiredInventoryCommandId,
+    type UpdateDesiredInventoryCommand,
+} from "../../server/message/command/updateDesiredInventoryCommand.ts";
+import { DesiredInventoryComponentId } from "../component/desiredInventoryComponent.ts";
 
 const log = createLogger("command");
 
@@ -161,6 +166,12 @@ function onGameMessage(
             handleSetPreferredAmount(
                 root,
                 message.command as SetPreferredAmountCommand,
+            );
+            break;
+        case UpdateDesiredInventoryCommandId:
+            handleUpdateDesiredInventory(
+                root,
+                message.command as UpdateDesiredInventoryCommand,
             );
             break;
     }
@@ -462,4 +473,28 @@ function handleSetPreferredAmount(
 
     setPreferredAmount(stockpileComponent, command.itemId, command.amount);
     stockpile.invalidateComponent(StockpileComponentId);
+}
+
+function handleUpdateDesiredInventory(
+    root: Entity,
+    command: UpdateDesiredInventoryCommand,
+) {
+    const entity = root.findEntity(command.entityId);
+    if (!entity) {
+        log.warn("Entity not found for UpdateDesiredInventory", {
+            entityId: command.entityId,
+        });
+        return;
+    }
+
+    const desiredInventory = entity.getEcsComponent(DesiredInventoryComponentId);
+    if (!desiredInventory) {
+        log.warn("Entity has no DesiredInventoryComponent", {
+            entityId: command.entityId,
+        });
+        return;
+    }
+
+    desiredInventory.items = command.items;
+    entity.invalidateComponent(DesiredInventoryComponentId);
 }

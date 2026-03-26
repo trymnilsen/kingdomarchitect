@@ -7,6 +7,8 @@ import { planCollectItem } from "./collectItemPlanner.ts";
 import { planCollectResource } from "./collectResourcePlanner.ts";
 import { planCrafting } from "./craftingPlanner.ts";
 import { planProduction } from "./productionPlanner.ts";
+import { planFarmPlant } from "./farmPlantJobPlanner.ts";
+import { planFarmHarvest } from "./farmHarvestJobPlanner.ts";
 import { createLogger } from "../../../common/logging/logger.ts";
 
 const log = createLogger("job");
@@ -46,6 +48,10 @@ export function planJob(
             return planAttack(root, worker, job);
         case "buildBuildingJob":
             return buildPlanner(root, worker, job);
+        case "farmPlantJob":
+            return planFarmPlant(root, worker, job);
+        case "farmHarvestJob":
+            return planFarmHarvest(root, worker, job);
         case "moveToJob":
             return [{ type: "moveTo", target: job.position }];
         default:

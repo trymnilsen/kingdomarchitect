@@ -29,6 +29,7 @@ import { createEffectSystem } from "../game/system/effectSystem.ts";
 import { createEffectExecutorMap } from "../data/effect/effectExecutorRegistry.ts";
 import { housingSystem } from "../game/system/housingSystem.ts";
 import { regrowSystem } from "../game/system/regrowSystem.ts";
+import { farmGrowthSystem } from "../game/system/farmGrowthSystem.ts";
 import { PersistenceManager } from "./persistence/persistenceManager.ts";
 import type { Entity } from "../game/entity/entity.ts";
 import type { SerializedWorldMeta } from "./persistence/serializedWorldMeta.ts";
@@ -215,6 +216,7 @@ export class GameServer {
         );
         this.world.addSystem(housingSystem);
         this.world.addSystem(regrowSystem);
+        this.world.addSystem(farmGrowthSystem);
         this.world.addSystem(
             makeReplicatedEntitiesSystem((message) => {
                 this.broadcastCallback.invoke(message);

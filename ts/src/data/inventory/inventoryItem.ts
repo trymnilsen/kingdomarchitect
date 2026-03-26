@@ -22,6 +22,7 @@ export type ItemVisual = {
 export const ItemTag = {
     SkillGear: 0,
     Consumable: 1,
+    Food: 2,
 } as const;
 
 export type ItemTag = (typeof ItemTag)[keyof typeof ItemTag];

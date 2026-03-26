@@ -9,6 +9,7 @@ import {
 } from "../../data/inventory/items/naturalResource.ts";
 import { ChunkMapComponentId } from "../component/chunkMapComponent.ts";
 import { HousingComponentId } from "../component/housingComponent.ts";
+import { KingdomComponentId } from "../component/kingdomComponent.ts";
 import { setChunk, TileComponentId } from "../component/tileComponent.ts";
 import { Entity } from "../entity/entity.ts";
 import { buildingPrefab } from "../prefab/buildingPrefab.ts";
@@ -31,7 +32,9 @@ export function addInitialPlayerChunk(scopedEntity: Entity): Point {
     chunkEntity.addChild(playerKingdom);
     playerKingdom.position = { x: 0, y: 0 };
 
-    const firstWorker = workerPrefab();
+    const kingdomDefaults =
+        playerKingdom.requireEcsComponent(KingdomComponentId).defaultDesiredInventory;
+    const firstWorker = workerPrefab(undefined, kingdomDefaults);
     const firstFarm = buildingPrefab(farm, false);
     const firstTree = resourcePrefab(treeResource);
     const trainingDummy = trainingDummyPrefab();

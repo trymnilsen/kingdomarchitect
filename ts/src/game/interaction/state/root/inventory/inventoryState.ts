@@ -1,16 +1,20 @@
-import { InventoryItem } from "../../../../../data/inventory/inventoryItem.ts";
 import { type SpriteRef, spriteRefs } from "../../../../../asset/sprite.ts";
 import { ComponentDescriptor } from "../../../../../ui/declarative/ui.ts";
 import {
     InventoryComponentId,
     type InventoryComponent,
 } from "../../../../component/inventoryComponent.ts";
+import {
+    DesiredInventoryComponentId,
+} from "../../../../component/desiredInventoryComponent.ts";
 import { InteractionState } from "../../../handler/interactionState.ts";
 import { AlertMessageState } from "../../common/alertMessageState.ts";
 import { inventoryView } from "./inventoryView.ts";
 import type { Entity } from "../../../../entity/entity.ts";
 import type { InventoryItemQuantity } from "../../../../../data/inventory/inventoryItemQuantity.ts";
 import { EquipItemCommand } from "../../../../../server/message/command/equipItemCommand.ts";
+import { UpdateDesiredInventoryCommand } from "../../../../../server/message/command/updateDesiredInventoryCommand.ts";
+import type { DesiredInventoryEntry } from "../../../../component/desiredInventoryComponent.ts";
 
 export class InventoryState extends InteractionState {
     private _selectedItemIndex = 0;
@@ -26,6 +30,10 @@ export class InventoryState extends InteractionState {
     }
 
     override getView(): ComponentDescriptor | null {
+        const desiredInventory = this._entity.getEcsComponent(
+            DesiredInventoryComponentId,
+        );
+
         return inventoryView({
             inventory: this._inventoryComponent,
             selectedItemIndex: this._selectedItemIndex,
@@ -42,6 +50,12 @@ export class InventoryState extends InteractionState {
             },
             onCancel: () => {
                 this.context.stateChanger.pop(null);
+            },
+            desiredInventory: desiredInventory ?? undefined,
+            onUpdateDesiredInventory: (items: DesiredInventoryEntry[]) => {
+                this.context.commandDispatcher(
+                    UpdateDesiredInventoryCommand(this._entity.id, items),
+                );
             },
         });
     }

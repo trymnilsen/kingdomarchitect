@@ -18,8 +18,12 @@ import { createActiveEffectsComponent } from "../component/activeEffectsComponen
 import { createRoleComponent } from "../component/worker/roleComponent.ts";
 import { createMovementStaminaComponent } from "../component/movementStaminaComponent.ts";
 import { createStatsComponent } from "../component/statsComponent.ts";
+import {
+    createDesiredInventoryComponent,
+    type DesiredInventoryEntry,
+} from "../component/desiredInventoryComponent.ts";
 
-export function workerPrefab(id?: string): Entity {
+export function workerPrefab(id?: string, defaultDesiredInventory?: DesiredInventoryEntry[]): Entity {
     const entity = new Entity(id ?? generateId("worker"));
     const spriteComponent = createSpriteComponent(spriteRefs.empty_sprite);
     entity.setEcsComponent(spriteComponent);
@@ -33,10 +37,11 @@ export function workerPrefab(id?: string): Entity {
     entity.setEcsComponent(createOccupationComponent());
     entity.setEcsComponent(createBehaviorAgentComponent());
     entity.setEcsComponent(createRoleComponent());
-    entity.setEcsComponent(createHungerComponent(60, 0.1)); // 0.1 per tick = ~7 minutes to go from 0 to 100
+    entity.setEcsComponent(createHungerComponent(0, 0.1)); // 0.1 per tick = ~7 minutes to go from 0 to 100
     entity.setEcsComponent(createEnergyComponent(100));
     entity.setEcsComponent(createActiveEffectsComponent());
     entity.setEcsComponent(createMovementStaminaComponent());
     entity.setEcsComponent(createStatsComponent());
+    entity.setEcsComponent(createDesiredInventoryComponent(defaultDesiredInventory ?? []));
     return entity;
 }

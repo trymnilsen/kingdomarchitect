@@ -13,6 +13,31 @@ export const wheatResourceItem = {
     id: "wheat",
     name: "Wheat",
     rarity: ItemRarity.Common,
+    tag: [ItemTag.Food],
+} as const;
+
+export const breadItem = {
+    asset: spriteRefs.farm_4,
+    id: "bread",
+    name: "Bread",
+    rarity: ItemRarity.Common,
+    tag: [ItemTag.Food],
+} as const;
+
+export const berryItem = {
+    asset: spriteRefs.farm_4,
+    id: "berry",
+    name: "Berry",
+    rarity: ItemRarity.Common,
+    tag: [ItemTag.Food],
+} as const;
+
+export const mushroomFoodItem = {
+    asset: spriteRefs.farm_4,
+    id: "mushroom_food",
+    name: "Mushroom",
+    rarity: ItemRarity.Common,
+    tag: [ItemTag.Food],
 } as const;
 
 export const stoneResource = {
@@ -77,4 +102,7 @@ export const resources = [
     stoneResource,
     wheatResourceItem,
     woodResourceItem,
+    breadItem,
+    berryItem,
+    mushroomFoodItem,
 ] as const;
