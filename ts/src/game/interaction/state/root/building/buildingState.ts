@@ -41,7 +41,9 @@ import {
     inventoryItemsMap,
     type InventoryItemIds,
 } from "../../../../../data/inventory/inventoryItems.ts";
+import type { InventoryItem } from "../../../../../data/inventory/inventoryItem.ts";
 import { createLogger } from "../../../../../common/logging/logger.ts";
+import { ItemSourceState } from "../../itemsource/itemSourceState.ts";
 
 const log = createLogger("interaction");
 
@@ -105,74 +107,111 @@ const buildingListItem = createComponent<{
     });
 });
 
-function getBuildingRequirementsChildren(
-    building: Building,
-): ComponentDescriptor[] {
-    const children: ComponentDescriptor[] = [];
-    const requirements = building.requirements;
-
-    if (!requirements) {
-        children.push(
+const requirementMaterialRow = createComponent<{
+    item: InventoryItem;
+    amount: number;
+    onItemTap?: (item: InventoryItem) => void;
+}>(({ props }) => {
+    const row = uiRow({
+        width: fillUiSize,
+        height: wrapUiSize,
+        children: [
+            uiImage({ sprite: props.item.asset, width: 16, height: 16 }),
+            uiSpace({ width: 4, height: 1 }),
             uiText({
+                content: `${props.amount}x ${props.item.name}`,
+                textStyle: bookTextStyle,
+            }),
+        ],
+    });
+
+    if (props.onItemTap) {
+        const onTap = props.onItemTap;
+        const item = props.item;
+        return uiButton({
+            width: fillUiSize,
+            height: wrapUiSize,
+            onTap: () => onTap(item),
+            child: row,
+        });
+    }
+
+    return row;
+});
+
+const buildingRequirementsView = createComponent<{
+    building: Building;
+    onItemTap?: (item: InventoryItem) => void;
+}>(({ props }) => {
+        const requirements = props.building.requirements;
+
+        if (!requirements) {
+            return uiText({
                 content: "No requirements",
                 textStyle: bookTextStyle,
-            }),
-        );
-        return children;
-    }
+            });
+        }
 
-    if (requirements.materials) {
-        children.push(
-            uiText({
-                content: "Materials:",
-                textStyle: bookTextStyle,
-            }),
-        );
+        const children: ComponentDescriptor[] = [];
 
-        for (const [itemId, amount] of Object.entries(requirements.materials)) {
-            if (amount === undefined || amount <= 0) continue;
-            const item = inventoryItemsMap[itemId as InventoryItemIds];
-            const itemName = item?.name ?? itemId;
+        if (requirements.materials) {
             children.push(
                 uiText({
-                    content: `  ${amount}x ${itemName}`,
+                    content: "Materials:",
                     textStyle: bookTextStyle,
                 }),
             );
+
+            for (const [itemId, amount] of Object.entries(
+                requirements.materials,
+            )) {
+                if (amount === undefined || amount <= 0) continue;
+                const item = inventoryItemsMap[itemId as InventoryItemIds];
+                if (!item) continue;
+                children.push(
+                    requirementMaterialRow({
+                        item,
+                        amount,
+                        onItemTap: props.onItemTap,
+                    }),
+                );
+            }
         }
-    }
 
-    if (requirements.special && requirements.special.length > 0) {
-        children.push(uiSpace({ width: 1, height: 4 }));
-        children.push(
-            uiText({
-                content: "Special:",
-                textStyle: bookTextStyle,
-            }),
-        );
-
-        for (const req of requirements.special) {
-            const reqName = specialRequirementNames[req];
+        if (requirements.special && requirements.special.length > 0) {
+            children.push(uiSpace({ width: 1, height: 4 }));
             children.push(
                 uiText({
-                    content: `  ${reqName}`,
+                    content: "Special:",
                     textStyle: bookTextStyle,
                 }),
             );
-        }
-    }
 
-    return children;
-}
+            for (const req of requirements.special) {
+                const reqName = specialRequirementNames[req];
+                children.push(
+                    uiText({
+                        content: `  ${reqName}`,
+                        textStyle: bookTextStyle,
+                    }),
+                );
+            }
+        }
+
+        return uiColumn({
+            width: fillUiSize,
+            height: wrapUiSize,
+            children,
+        });
+    },
+);
 
 const buildingDetailsView = createComponent<{
     building: Building;
     onBuild: () => void;
+    onItemTap?: (item: InventoryItem) => void;
 }>(({ props }) => {
     const scale = props.building.scale * 2;
-    const requirementsChildren = getBuildingRequirementsChildren(
-        props.building,
-    );
 
     return uiBox({
         width: fillUiSize,
@@ -208,7 +247,10 @@ const buildingDetailsView = createComponent<{
                     textStyle: bookTitleStyle,
                 }),
                 uiSpace({ width: 1, height: 8 }),
-                ...requirementsChildren,
+                buildingRequirementsView({
+                    building: props.building,
+                    onItemTap: props.onItemTap,
+                }),
                 uiSpace({ width: 1, height: fillUiSize }),
             ],
         }),
@@ -248,6 +290,7 @@ const buildingBookLayout = createComponent<{
     onBuild: () => void;
     onTabSelect: (index: number) => void;
     selectedTab: number;
+    onItemTap?: (item: InventoryItem) => void;
 }>(({ props }) => {
     const masterView = buildingMasterView({
         buildings: props.activeBuildings,
@@ -257,6 +300,7 @@ const buildingBookLayout = createComponent<{
     const detailsView = buildingDetailsView({
         building: props.selectedBuilding,
         onBuild: props.onBuild,
+        onItemTap: props.onItemTap,
     });
 
     return uiBookLayout({
@@ -314,6 +358,9 @@ export class BuildingState extends InteractionState {
             onBuild: () => this.buildSelected(),
             onTabSelect: (index: number) => this.tabSelected(index),
             selectedTab: this._selectedTab,
+            onItemTap: (item) => {
+                this.context.stateChanger.push(new ItemSourceState(item));
+            },
         });
 
         return uiScaffold({

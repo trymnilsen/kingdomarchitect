@@ -5,5 +5,12 @@
         "w": 16,
         "h": 16,
         "frames": 1
+    },
+    "building_workshop": {
+        "x": 32,
+        "y": 32,
+        "w": 16,
+        "h": 16,
+        "frames": 1
     }
 }
