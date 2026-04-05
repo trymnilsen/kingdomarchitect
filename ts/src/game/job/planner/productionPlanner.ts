@@ -29,7 +29,9 @@ export function planProduction(
         return [];
     }
 
-    const productionComp = buildingEntity.getEcsComponent(ProductionComponentId);
+    const productionComp = buildingEntity.getEcsComponent(
+        ProductionComponentId,
+    );
     if (!productionComp) {
         const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
         if (queueEntity) {
@@ -86,6 +88,7 @@ export function planProduction(
         {
             type: "moveTo",
             target: emptySpot,
+            stopAdjacent: "cardinal",
         },
         {
             type: "plantTree",

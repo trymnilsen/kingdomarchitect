@@ -11,7 +11,6 @@ import {
 import type { BiomeType } from "../game/map/biome.ts";
 import type { CityPreviewState } from "./cityPreviewState.ts";
 import { createBiomeSelector } from "./ui/biomeSelector.ts";
-import { createBuildLog } from "./ui/buildLog.ts";
 import { createStateDisplay } from "./ui/stateDisplay.ts";
 import { createTickControlBar } from "./ui/tickControlBar.ts";
 import { COLORS, LAYOUT } from "./ui/cityPreviewConstants.ts";
@@ -65,12 +64,6 @@ export class CityPreviewUI {
                         panelWidth,
                     ),
                     createStateDisplay(this.state, panelWidth),
-                    uiText({
-                        content: "Log",
-                        textStyle: subTitleTextStyle,
-                        width: panelWidth,
-                    }),
-                    createBuildLog(this.state.log, panelWidth),
                 ],
             }),
         });

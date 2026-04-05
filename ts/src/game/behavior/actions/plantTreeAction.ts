@@ -11,11 +11,7 @@ import {
     findJobClaimedBy,
     completeJobFromQueue,
 } from "../../job/jobLifecycle.ts";
-import {
-    ActionComplete,
-    ActionRunning,
-    type ActionResult,
-} from "./Action.ts";
+import { ActionComplete, ActionRunning, type ActionResult } from "./Action.ts";
 
 const log = createLogger("behavior");
 
@@ -46,7 +42,9 @@ export function executePlantTreeAction(
         };
     }
 
-    const productionComp = buildingEntity.getEcsComponent(ProductionComponentId);
+    const productionComp = buildingEntity.getEcsComponent(
+        ProductionComponentId,
+    );
     if (!productionComp) {
         log.warn(`Building ${action.buildingId} has no ProductionComponent`);
         return { kind: "failed", cause: { type: "unknown" } };
