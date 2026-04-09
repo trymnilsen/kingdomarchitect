@@ -35,7 +35,7 @@ export const quarryProduction: ProductionDefinition = {
     yield: { type: "item", item: stoneInventoryItem, amount: 10 },
 };
 
-export const forresterProduction: ProductionDefinition = {
+export const forresterProduction: Extract<ProductionDefinition, { kind: "zone" }> = {
     kind: "zone",
     id: "forrester_production",
     actionName: "Plant Tree",

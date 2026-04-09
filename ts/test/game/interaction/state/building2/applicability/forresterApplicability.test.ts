@@ -10,6 +10,7 @@ import { SparseSet } from "../../../../../../src/common/structure/sparseSet.ts";
 import { encodePosition } from "../../../../../../src/common/point.ts";
 import { ChunkSize } from "../../../../../../src/game/map/chunk.ts";
 import { forresterApplicability } from "../../../../../../src/game/interaction/state/building2/applicability/forresterApplicability.ts";
+import { forresterProduction } from "../../../../../../src/data/production/productionDefinition.ts";
 
 /**
  * Register an entity into the chunk map at its current worldPosition
@@ -46,9 +47,12 @@ describe("forresterApplicability", () => {
     it("returns not applicable when another forrester is within zone radius", () => {
         const world = createWorld();
 
-        // Place an existing forrester 3 tiles away (within radius 4)
+        // Place an existing forrester 1 tile away (within zone radius)
         const existingForrester = new Entity("existingForrester");
-        existingForrester.worldPosition = { x: 13, y: 10 };
+        existingForrester.worldPosition = {
+            x: 10 + forresterProduction.zoneRadius - 1,
+            y: 10,
+        };
         existingForrester.setEcsComponent(
             createProductionComponent("forrester_production", 4),
         );
@@ -68,9 +72,12 @@ describe("forresterApplicability", () => {
     it("returns applicable when existing forrester is beyond zone radius", () => {
         const world = createWorld();
 
-        // Place an existing forrester 6 tiles away (beyond radius 4)
+        // Place an existing forrester 2 tiles beyond zone radius
         const existingForrester = new Entity("existingForrester");
-        existingForrester.worldPosition = { x: 16, y: 10 };
+        existingForrester.worldPosition = {
+            x: 10 + forresterProduction.zoneRadius + 2,
+            y: 10,
+        };
         existingForrester.setEcsComponent(
             createProductionComponent("forrester_production", 4),
         );
@@ -84,9 +91,12 @@ describe("forresterApplicability", () => {
     it("returns not applicable when another forrester is exactly at zone radius", () => {
         const world = createWorld();
 
-        // Manhattan distance of exactly 4 from {x:10, y:10} → {x:14, y:10}
+        // Manhattan distance of exactly zoneRadius from {x:10, y:10}
         const existingForrester = new Entity("existingForrester");
-        existingForrester.worldPosition = { x: 14, y: 10 };
+        existingForrester.worldPosition = {
+            x: 10 + forresterProduction.zoneRadius,
+            y: 10,
+        };
         existingForrester.setEcsComponent(
             createProductionComponent("forrester_production", 4),
         );
