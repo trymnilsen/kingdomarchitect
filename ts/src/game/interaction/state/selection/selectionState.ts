@@ -53,6 +53,9 @@ import {
 import { SpriteComponentId } from "../../../component/spriteComponent.ts";
 import { BuildingComponentId } from "../../../component/buildingComponent.ts";
 import { ResourceComponentId } from "../../../component/resourceComponent.ts";
+import { ProductionComponentId } from "../../../component/productionComponent.ts";
+import { getProductionDefinition } from "../../../../data/production/productionDefinition.ts";
+import { getDiamondPoints } from "../../../map/item/placement.ts";
 import { getResourceById } from "../../../../data/inventory/items/naturalResource.ts";
 import { RoleComponentId } from "../../../component/worker/roleComponent.ts";
 import { getRoleDefinition } from "../../../../data/role/roleDefinitions.ts";
@@ -178,6 +181,30 @@ export class SelectionState extends InteractionState {
         });
 
         if (selection instanceof SelectedEntityItem) {
+            const productionComp = selection.entity.getEcsComponent(
+                ProductionComponentId,
+            );
+            if (productionComp) {
+                const definition = getProductionDefinition(
+                    productionComp.productionId,
+                );
+                if (definition?.kind === "zone") {
+                    const zonePoints = getDiamondPoints(
+                        selection.entity.worldPosition,
+                        definition.zoneRadius,
+                    );
+                    for (const zonePoint of zonePoints) {
+                        context.drawRectangle({
+                            x: zonePoint.x * TileSize + 14,
+                            y: zonePoint.y * TileSize + 14,
+                            width: 8,
+                            height: 8,
+                            fill: "lightgreen",
+                        });
+                    }
+                }
+            }
+
             const healthComponent =
                 selection.entity.getEcsComponent(HealthComponentId);
             const energyComponent =

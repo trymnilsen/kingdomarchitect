@@ -15,6 +15,9 @@ export const gate: Building = {
     icon: spriteRefs.gate_horizontal_preview,
     name: "Gate",
     scale: 4,
+    // The gate sprite already has transparent rows at the bottom that create natural breathing
+    // room between the art and the container border. No additional offset needed.
+    previewOffset: 0,
     requirements: {
         materials: {
             [woodResourceItem.id]: 25,

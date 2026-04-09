@@ -28,6 +28,17 @@ export type Building = {
     name: string;
     id: string;
     scale: 1 | 2 | 4;
+    /**
+     * Overrides the auto-computed preview scale in the building selection UI.
+     * When not set, the preview scales the sprite to ~160px height for the pop-up book effect.
+     */
+    previewScale?: number;
+    /**
+     * Pixels of transparent gap to add below the sprite artwork in the preview panel.
+     * Lifts the sprite upward so it doesn't press against the bottom border of the preview box,
+     * matching the visual breathing room that buildings with transparent bottom pixels get naturally.
+     */
+    previewOffset?: number;
     requirements?: BuildingRequirements;
 };
 

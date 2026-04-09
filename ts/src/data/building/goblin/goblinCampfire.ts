@@ -7,6 +7,8 @@ export const goblinCampfire: Building = {
     icon: spriteRefs.stone_brazier,
     name: "Goblin Campfire",
     scale: 1,
+    previewScale: 2,
+    previewOffset: 0,
     requirements: {
         materials: {
             [woodResourceItem.id]: 10,

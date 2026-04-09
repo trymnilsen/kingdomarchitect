@@ -1,7 +1,5 @@
 import type { InventoryItem } from "../inventory/inventoryItem.ts";
-import {
-    stoneResource as stoneInventoryItem,
-} from "../inventory/items/resources.ts";
+import { stoneResource as stoneInventoryItem } from "../inventory/items/resources.ts";
 import type { NaturalResource } from "../inventory/items/naturalResource.ts";
 
 export type ProductionYield = {
@@ -42,7 +40,7 @@ export const forresterProduction: ProductionDefinition = {
     id: "forrester_production",
     actionName: "Plant Tree",
     plantResourceId: "tree1",
-    zoneRadius: 4,
+    zoneRadius: 2,
     plantDuration: 3,
     maxTreeFraction: 0.8,
     minTreeFraction: 0.4,

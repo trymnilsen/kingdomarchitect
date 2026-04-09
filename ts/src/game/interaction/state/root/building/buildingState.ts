@@ -211,7 +211,13 @@ const buildingDetailsView = createComponent<{
     onBuild: () => void;
     onItemTap?: (item: InventoryItem) => void;
 }>(({ props }) => {
-    const scale = props.building.scale * 2;
+    const spriteDef = spriteRegistry.resolve(props.building.icon);
+    const spriteW = spriteDef?.[SPRITE_W] ?? 16;
+    const spriteH = spriteDef?.[SPRITE_H] ?? 16;
+    const scale = props.building.previewScale ?? Math.ceil(160 / spriteH);
+    // Default gap between sprite art and the bottom border of the preview box.
+    // Buildings whose sprites have transparent bottom rows (e.g. gate) should set previewOffset: 0.
+    const previewOffset = props.building.previewOffset ?? 16;
 
     return uiBox({
         width: fillUiSize,
@@ -229,16 +235,20 @@ const buildingDetailsView = createComponent<{
                         sides: allSides(8),
                         scale: 1,
                     }),
-                    child: uiImage({
-                        sprite: props.building.icon,
-                        width:
-                            (spriteRegistry.resolve(props.building.icon)?.[
-                                SPRITE_W
-                            ] ?? 16) * scale,
-                        height:
-                            (spriteRegistry.resolve(props.building.icon)?.[
-                                SPRITE_H
-                            ] ?? 16) * scale,
+                    child: uiColumn({
+                        width: wrapUiSize,
+                        height: wrapUiSize,
+                        children: [
+                            uiImage({
+                                sprite: props.building.icon,
+                                width: spriteW * scale,
+                                height: spriteH * scale,
+                            }),
+                            uiSpace({
+                                width: 1,
+                                height: previewOffset,
+                            }),
+                        ],
                     }),
                 }),
                 uiSpace({ width: 1, height: 8 }),

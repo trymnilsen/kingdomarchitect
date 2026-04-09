@@ -5,4 +5,6 @@ export const road = {
     icon: spriteRefs.empty_sprite,
     name: "Road",
     scale: 4,
+    previewScale: 4,
+    previewOffset: 0,
 } as const;

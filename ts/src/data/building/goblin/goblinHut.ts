@@ -7,6 +7,8 @@ export const goblinHut: Building = {
     icon: spriteRefs.goblin_house,
     name: "Goblin Hut",
     scale: 2,
+    previewScale: 4,
+    previewOffset: 0,
     requirements: {
         materials: {
             [woodResourceItem.id]: 15,
