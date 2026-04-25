@@ -1,11 +1,13 @@
 import type { Point } from "../../common/point.ts";
 import type { Components } from "../component/component.ts";
 import { Entity } from "./entity.ts";
+import type { EntityGameEvent } from "./event/entityGameEvent.ts";
 
 export type EntityEvent =
     | EntityTransformEvent
     | EntityChildrenUpdatedEvent
-    | ComponentsUpdatedEvent;
+    | ComponentsUpdatedEvent
+    | EntityGameEvent;
 
 export type EntityEventId = EntityEvent["id"];
 

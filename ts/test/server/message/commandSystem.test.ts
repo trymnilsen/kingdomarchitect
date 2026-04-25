@@ -18,10 +18,6 @@ import {
     type EquipItemCommand,
 } from "../../../src/server/message/command/equipItemCommand.ts";
 import {
-    AttackCommandId,
-    type AttackCommand,
-} from "../../../src/server/message/command/attackTargetCommand.ts";
-import {
     BuildCommandId,
     type BuildCommand,
 } from "../../../src/server/message/command/buildCommand.ts";
@@ -311,59 +307,6 @@ describe("commandSystem", () => {
                 entity.getEcsComponent(EquipmentComponentId);
             assert.ok(updatedEquipment);
             assert.strictEqual(updatedEquipment.slots.main, null);
-        });
-    });
-
-    describe("AttackCommand", () => {
-        it("creates AttackJob in job queue", () => {
-            const { root, playerKingdom } = createRootWithKingdom();
-            const gameTime = createTestGameTime();
-            const persistenceManager = createTestPersistenceManager();
-
-            const system = createCommandSystem(gameTime, persistenceManager);
-
-            const message: CommandGameMessage = {
-                type: CommandGameMessageType,
-                command: {
-                    id: AttackCommandId,
-                    attacker: "attacker1",
-                    target: "target1",
-                } as AttackCommand,
-            };
-
-            system.onGameMessage?.(root, message);
-
-            const updatedJobQueue =
-                playerKingdom.getEcsComponent(JobQueueComponentId);
-            assert.ok(updatedJobQueue);
-            assert.strictEqual(updatedJobQueue.jobs.length, 1);
-            assert.strictEqual(updatedJobQueue.jobs[0].id, "attackJob");
-        });
-
-        it("sets attacker and target on AttackJob", () => {
-            const { root, playerKingdom } = createRootWithKingdom();
-            const gameTime = createTestGameTime();
-            const persistenceManager = createTestPersistenceManager();
-
-            const system = createCommandSystem(gameTime, persistenceManager);
-
-            const message: CommandGameMessage = {
-                type: CommandGameMessageType,
-                command: {
-                    id: AttackCommandId,
-                    attacker: "warrior1",
-                    target: "goblin1",
-                } as AttackCommand,
-            };
-
-            system.onGameMessage?.(root, message);
-
-            const updatedJobQueue =
-                playerKingdom.getEcsComponent(JobQueueComponentId);
-            assert.ok(updatedJobQueue);
-            const job = updatedJobQueue.jobs[0];
-            assert.strictEqual((job as any).attacker, "warrior1");
-            assert.strictEqual((job as any).target, "goblin1");
         });
     });
 

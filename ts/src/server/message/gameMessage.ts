@@ -17,8 +17,21 @@ export type GameMessage =
     | TransformGameMessage
     | DiscoverTileGameMessage
     | ReloadGameMessage
-    | CommandGameMessage;
+    | CommandGameMessage
+    | EventGameMessage;
 
+export type AttackGameEventMessage = {
+    attacker: string;
+    target: string;
+};
+
+export type EventGameMessage = {
+    type: typeof EventGameMessageType;
+    event: AttackGameEventMessage;
+};
+
+export const EventGameMessageType = "event";
+export const CueGameMessageType = "cue";
 export const WorldStateMessageType = "worldState";
 export const AddEntityGameMessageType = "addEntity";
 export const RemoveEntityGameMessageType = "removeEntity";

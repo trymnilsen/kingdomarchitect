@@ -36,6 +36,7 @@ export class EcsWorld {
         component_removed: [],
         component_updated: [],
         transform: [],
+        game: [],
     };
     private rootEntity: Entity;
     private gameMessageSystems: EcsGameMessageFunction[] = [];

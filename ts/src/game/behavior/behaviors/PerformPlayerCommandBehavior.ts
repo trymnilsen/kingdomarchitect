@@ -41,14 +41,24 @@ export function createPerformPlayerCommandBehavior(): Behavior {
                         { type: "clearPlayerCommand" },
                     ];
 
-                case "attack":
-                    // TODO: Implement attack action when combat system is available
-                    log.warn(
-                        `Attack command not yet implemented for entity ${entity.id}`,
-                    );
-                    agent.playerCommand = undefined;
-                    entity.invalidateComponent("behavioragent");
-                    return [];
+                case "attack": {
+                    const root = entity.getRootEntity();
+                    const target = root.findEntity(command.targetEntityId);
+                    if (!target) {
+                        agent.playerCommand = undefined;
+                        entity.invalidateComponent("behavioragent");
+                        return [];
+                    }
+                    return [
+                        {
+                            type: "moveTo",
+                            target: target.worldPosition,
+                            stopAdjacent: "cardinal",
+                        },
+                        { type: "attackTarget", targetId: command.targetEntityId },
+                        { type: "clearPlayerCommand" },
+                    ];
+                }
 
                 case "pickup":
                     // TODO: Implement pickup action when inventory interaction is available

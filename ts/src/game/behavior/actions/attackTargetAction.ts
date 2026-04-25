@@ -3,17 +3,13 @@ import { createLogger } from "../../../common/logging/logger.ts";
 import { damage, HealthComponentId } from "../../component/healthComponent.ts";
 
 const log = createLogger("behavior");
-import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
+import { ActionComplete, ActionRunning, type ActionResult } from "./Action.ts";
 import {
-    findJobClaimedBy,
-    completeJobFromQueue,
-} from "../../job/jobLifecycle.ts";
-import {
-    ActionComplete,
-    ActionRunning,
-    type ActionResult,
-} from "./Action.ts";
+    addThreat,
+    ThreatMapComponentId,
+} from "../../component/threatMapComponent.ts";
+import type { AttackGameEventMessage } from "../../../server/message/gameMessage.ts";
 
 export type AttackTargetActionData = { type: "attackTarget"; targetId: string };
 
@@ -25,14 +21,13 @@ export type AttackTargetActionData = { type: "attackTarget"; targetId: string };
 export function executeAttackTargetAction(
     action: AttackTargetActionData,
     entity: Entity,
+    tick: number,
 ): ActionResult {
     const root = entity.getRootEntity();
     const targetEntity = root.findEntity(action.targetId);
 
     if (!targetEntity) {
-        log.warn(
-            `Target entity ${action.targetId} not found`,
-        );
+        log.warn(`Target entity ${action.targetId} not found`);
         return {
             kind: "failed",
             cause: { type: "targetGone", entityId: action.targetId },
@@ -46,23 +41,26 @@ export function executeAttackTargetAction(
 
     const healthComponent = targetEntity.getEcsComponent(HealthComponentId);
     if (!healthComponent) {
-        log.warn(
-            `Target ${action.targetId} has no HealthComponent`,
-        );
+        log.warn(`Target ${action.targetId} has no HealthComponent`);
         return { kind: "failed", cause: { type: "unknown" } };
     }
-
-    damage(healthComponent, 1);
+    const damageAmount = 1;
+    damage(healthComponent, damageAmount);
+    //TODO: add to threat map
+    const threatmap = targetEntity.getEcsComponent(ThreatMapComponentId);
+    if (threatmap) {
+        addThreat(threatmap, entity.id, damageAmount, tick);
+    }
+    //TODO: trigger replan
+    //TODO: Make engage in combat behavior, dependent on threat existing
+    //TODO: in expand of engage: lazy update threat, select target
     targetEntity.invalidateComponent(HealthComponentId);
+    // eventDispatch({
+    //     attacker: entity.id,
+    //     target: action.targetId,
+    // });
 
     if (healthComponent.currentHp <= 0) {
-        const queueEntity = entity.getAncestorEntity(JobQueueComponentId);
-        if (queueEntity) {
-            const job = findJobClaimedBy(queueEntity, entity.id);
-            if (job) {
-                completeJobFromQueue(queueEntity, job);
-            }
-        }
         return ActionComplete;
     }
 

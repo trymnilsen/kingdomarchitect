@@ -22,15 +22,27 @@ import {
     createDesiredInventoryComponent,
     type DesiredInventoryEntry,
 } from "../component/desiredInventoryComponent.ts";
+import { swordItem } from "../../data/inventory/items/equipment.ts";
+import { createThreatMapComponent } from "../component/threatMapComponent.ts";
 
-export function workerPrefab(id?: string, defaultDesiredInventory?: DesiredInventoryEntry[]): Entity {
+export function workerPrefab(
+    id?: string,
+    defaultDesiredInventory?: DesiredInventoryEntry[],
+): Entity {
     const entity = new Entity(id ?? generateId("worker"));
     const spriteComponent = createSpriteComponent(spriteRefs.empty_sprite);
     entity.setEcsComponent(spriteComponent);
     entity.setEcsComponent(createHealthComponent(50, 100));
     entity.setEcsComponent(createPlayerUnitComponent());
     entity.setEcsComponent(createEquipmentComponent());
-    entity.setEcsComponent(createInventoryComponent());
+    entity.setEcsComponent(
+        createInventoryComponent([
+            {
+                amount: 1,
+                item: swordItem,
+            },
+        ]),
+    );
     entity.setEcsComponent(createVisibilityComponent());
     entity.setEcsComponent(createAnimationComponent(nobleKnightAnimationGraph));
     entity.setEcsComponent(createDirectionComponent());
@@ -42,6 +54,9 @@ export function workerPrefab(id?: string, defaultDesiredInventory?: DesiredInven
     entity.setEcsComponent(createActiveEffectsComponent());
     entity.setEcsComponent(createMovementStaminaComponent());
     entity.setEcsComponent(createStatsComponent());
-    entity.setEcsComponent(createDesiredInventoryComponent(defaultDesiredInventory ?? []));
+    entity.setEcsComponent(createThreatMapComponent());
+    entity.setEcsComponent(
+        createDesiredInventoryComponent(defaultDesiredInventory ?? []),
+    );
     return entity;
 }

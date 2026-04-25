@@ -11,6 +11,7 @@ import { createWarmthComponent } from "../component/warmthComponent.ts";
 import { createGoblinUnitComponent } from "../component/goblinUnitComponent.ts";
 import { createFireSourceComponent } from "../component/fireSourceComponent.ts";
 import { Entity } from "../entity/entity.ts";
+import { createThreatMapComponent } from "../component/threatMapComponent.ts";
 
 /**
  * Creates a goblin entity with all necessary components for autonomous behavior.
@@ -24,6 +25,7 @@ export function goblinPrefab(campEntityId?: string): Entity {
     entity.setEcsComponent(createInventoryComponent());
     entity.setEcsComponent(createWarmthComponent(55, 1.0)); // Start warm, decay 1/tick
     entity.setEcsComponent(createMovementStaminaComponent());
+    entity.setEcsComponent(createThreatMapComponent());
 
     if (campEntityId) {
         entity.setEcsComponent(createGoblinUnitComponent(campEntityId));

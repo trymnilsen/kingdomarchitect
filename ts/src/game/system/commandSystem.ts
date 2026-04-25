@@ -3,10 +3,6 @@ import { createLogger } from "../../common/logging/logger.ts";
 import { getBuildingById } from "../../data/building/buildings.ts";
 import { itemEffectFactoryList } from "../../data/inventory/itemEffectFactoryList.ts";
 import {
-    AttackCommandId,
-    type AttackCommand,
-} from "../../server/message/command/attackTargetCommand.ts";
-import {
     BuildCommandId,
     type BuildCommand,
 } from "../../server/message/command/buildCommand.ts";
@@ -53,7 +49,6 @@ import {
 } from "../component/inventoryComponent.ts";
 import { JobQueueComponentId, addJob } from "../component/jobQueueComponent.ts";
 import type { Entity } from "../entity/entity.ts";
-import { AttackJob } from "../job/attackJob.ts";
 import { BuildBuildingJob } from "../job/buildBuildingJob.ts";
 import { buildingPrefab } from "../prefab/buildingPrefab.ts";
 import type { GameTime } from "../gameTime.ts";
@@ -140,9 +135,6 @@ function onGameMessage(
         case BuildCommandId:
             buildBuilding(root, message.command as BuildCommand);
             break;
-        case AttackCommandId:
-            attackTarget(root, message.command as AttackCommand);
-            break;
         case ConsumeItemCommandId:
             consumeItem(root, message.command as ConsumeItemCommand);
             break;
@@ -208,18 +200,6 @@ function changeOccupation(root: Entity, command: ChangeOccupationCommand) {
 
     worker.invalidateComponent(OccupationComponentId);
     workplace.invalidateComponent(WorkplaceComponentId);
-}
-
-function attackTarget(root: Entity, command: AttackCommand) {
-    const playerKingdom = findPlayerKingdom(root);
-    if (!playerKingdom) {
-        log.error("Player kingdom not found for attack job");
-        return;
-    }
-    const job = AttackJob(command.attacker, command.target);
-    playerKingdom.updateComponent(JobQueueComponentId, (component) => {
-        component.jobs.push(job);
-    });
 }
 
 function buildBuilding(root: Entity, command: BuildCommand) {

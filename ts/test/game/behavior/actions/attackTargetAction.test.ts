@@ -32,7 +32,7 @@ describe("attackTargetAction", () => {
             targetId: "target",
         };
 
-        const result = executeAttackTargetAction(action, worker);
+        const result = executeAttackTargetAction(action, worker, 1);
 
         assert.strictEqual(result.kind, "running");
 
@@ -51,7 +51,7 @@ describe("attackTargetAction", () => {
             targetId: "target",
         };
 
-        const result = executeAttackTargetAction(action, worker);
+        const result = executeAttackTargetAction(action, worker, 1);
 
         assert.strictEqual(result.kind, "complete");
         assert.strictEqual(healthComponent.currentHp, 0);
@@ -65,7 +65,7 @@ describe("attackTargetAction", () => {
             targetId: "nonexistent",
         };
 
-        const result = executeAttackTargetAction(action, worker);
+        const result = executeAttackTargetAction(action, worker, 1);
 
         assert.strictEqual(result.kind, "failed");
     });
@@ -79,7 +79,7 @@ describe("attackTargetAction", () => {
             targetId: "target",
         };
 
-        const result = executeAttackTargetAction(action, worker);
+        const result = executeAttackTargetAction(action, worker, 1);
 
         assert.strictEqual(result.kind, "failed");
     });
@@ -95,7 +95,7 @@ describe("attackTargetAction", () => {
             targetId: "noHealthTarget",
         };
 
-        const result = executeAttackTargetAction(action, worker);
+        const result = executeAttackTargetAction(action, worker, 1);
 
         assert.strictEqual(result.kind, "failed");
     });
@@ -109,10 +109,10 @@ describe("attackTargetAction", () => {
         };
 
         // Execute multiple times
-        let result = executeAttackTargetAction(action, worker);
+        let result = executeAttackTargetAction(action, worker, 1);
         assert.strictEqual(result.kind, "running");
 
-        result = executeAttackTargetAction(action, worker);
+        result = executeAttackTargetAction(action, worker, 2);
         assert.strictEqual(result.kind, "running");
 
         const healthComponent = target.getEcsComponent(HealthComponentId)!;

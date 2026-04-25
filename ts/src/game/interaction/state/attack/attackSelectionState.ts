@@ -2,7 +2,7 @@ import { spriteRefs } from "../../../../asset/sprite.ts";
 import type { Point } from "../../../../common/point.ts";
 import { allSides } from "../../../../common/sides.ts";
 import type { RenderScope } from "../../../../rendering/renderScope.ts";
-import { AttackCommand } from "../../../../server/message/command/attackTargetCommand.ts";
+import { SetPlayerCommand } from "../../../../server/message/command/setPlayerCommand.ts";
 import type { ComponentDescriptor } from "../../../../ui/declarative/ui.ts";
 import { HealthComponentId } from "../../../component/healthComponent.ts";
 import type { Entity } from "../../../entity/entity.ts";
@@ -94,7 +94,10 @@ export class AttackSelectionState extends InteractionState {
     private attack() {
         if (this.selection) {
             this.context.commandDispatcher(
-                AttackCommand(this.selection, this.entity),
+                SetPlayerCommand(this.entity.id, {
+                    action: "attack",
+                    targetEntityId: this.selection.id,
+                }),
             );
             this.context.stateChanger.clear();
         } else {

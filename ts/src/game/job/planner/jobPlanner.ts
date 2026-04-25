@@ -2,7 +2,6 @@ import type { BehaviorActionData } from "../../behavior/actions/ActionData.ts";
 import type { Entity } from "../../entity/entity.ts";
 import type { BuildBuildingJob } from "../buildBuildingJob.ts";
 import type { Jobs } from "../job.ts";
-import { planAttack } from "./attackPlanner.ts";
 import { planCollectItem } from "./collectItemPlanner.ts";
 import { planCollectResource } from "./collectResourcePlanner.ts";
 import { planCrafting } from "./craftingPlanner.ts";
@@ -44,8 +43,6 @@ export function planJob(
             return planCrafting(root, worker, job);
         case "collectItem":
             return planCollectItem(root, worker, job);
-        case "attackJob":
-            return planAttack(root, worker, job);
         case "buildBuildingJob":
             return buildPlanner(root, worker, job);
         case "farmPlantJob":

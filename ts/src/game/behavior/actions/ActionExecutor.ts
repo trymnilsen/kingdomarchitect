@@ -62,7 +62,7 @@ export const executeAction: BehaviorActionExecutor = (
         case "collectItems":
             return executeCollectItemsAction(action, entity);
         case "attackTarget":
-            return executeAttackTargetAction(action, entity);
+            return executeAttackTargetAction(action, entity, tick);
         case "warmByFire":
             return executeWarmByFireAction(action, entity);
         case "withdrawFromStockpile":

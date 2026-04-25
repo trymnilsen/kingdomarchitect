@@ -38,6 +38,7 @@ import type { PlayerKingdomComponent } from "./playerKingdomComponent.ts";
 import type { StatsComponent } from "./statsComponent.ts";
 import type { FarmComponent } from "./farmComponent.ts";
 import type { DesiredInventoryComponent } from "./desiredInventoryComponent.ts";
+import type { ThreatMapComponent } from "./threatMapComponent.ts";
 
 export type Components =
     | SpriteComponent
@@ -79,6 +80,7 @@ export type Components =
     | PlayerKingdomComponent
     | StatsComponent
     | FarmComponent
+    | ThreatMapComponent
     | DesiredInventoryComponent;
 
 export interface BaseComponent {

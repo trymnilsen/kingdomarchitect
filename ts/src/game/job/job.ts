@@ -1,5 +1,4 @@
 import type { Entity } from "../entity/entity.ts";
-import type { AttackJob } from "./attackJob.ts";
 import type { BuildBuildingJob } from "./buildBuildingJob.ts";
 import type { CollectItemJob } from "./collectItemJob.ts";
 import type { CollectResourceJob } from "./collectResourceJob.ts";
@@ -24,7 +23,6 @@ export interface Job {
 export type Jobs =
     | MoveToJob
     | BuildBuildingJob
-    | AttackJob
     | CollectItemJob
     | CollectResourceJob
     | CraftingJob
@@ -35,8 +33,6 @@ export type JobId = Jobs["id"];
 
 export function isTargetOfJob(job: Jobs, entity: Entity): boolean {
     switch (job.id) {
-        case "attackJob":
-            return job.target == entity.id;
         case "buildBuildingJob":
             return job.entityId == entity.id;
         case "collectResource":

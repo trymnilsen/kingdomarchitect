@@ -6,7 +6,7 @@ import {
     QueueJobCommandId,
 } from "../../../../src/server/message/command/queueJobCommand.ts";
 import { CollectItemJob } from "../../../../src/game/job/collectItemJob.ts";
-import { AttackJob } from "../../../../src/game/job/attackJob.ts";
+import { MoveToJob } from "../../../../src/game/job/moveToPointJob.ts";
 
 describe("QueueJobCommand", () => {
     it("creates command with correct id", () => {
@@ -30,13 +30,13 @@ describe("QueueJobCommand", () => {
 
     it("works with different job types", () => {
         const collectJob = CollectItemJob(new Entity("chest"));
-        const attackJob = AttackJob("warrior1", "goblin1");
+        const moveJob = MoveToJob(new Entity("worker"), { x: 5, y: 7 });
 
         const collectCommand = QueueJobCommand(collectJob);
-        const attackCommand = QueueJobCommand(attackJob);
+        const moveCommand = QueueJobCommand(moveJob);
 
         assert.strictEqual(collectCommand.job.id, "collectItem");
-        assert.strictEqual(attackCommand.job.id, "attackJob");
+        assert.strictEqual(moveCommand.job.id, "moveToJob");
     });
 
     it("preserves job claimedBy", () => {

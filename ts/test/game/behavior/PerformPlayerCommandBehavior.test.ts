@@ -1,11 +1,22 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
+import { Entity } from "../../../src/game/entity/entity.ts";
 import { createPerformPlayerCommandBehavior } from "../../../src/game/behavior/behaviors/PerformPlayerCommandBehavior.ts";
 import {
     createBehaviorTestEntity,
     createTestEntity,
 } from "./behaviorTestHelpers.ts";
 import { getBehaviorAgent } from "../../../src/game/component/BehaviorAgentComponent.ts";
+
+function createAttackScene(): { root: Entity; attacker: Entity; target: Entity } {
+    const root = new Entity("root");
+    const attacker = createBehaviorTestEntity("attacker", 10, 8);
+    const target = new Entity("target");
+    target.worldPosition = { x: 15, y: 12 };
+    root.addChild(attacker);
+    root.addChild(target);
+    return { root, attacker, target };
+}
 
 describe("PerformPlayerCommandBehavior", () => {
     describe("isValid", () => {
@@ -78,16 +89,40 @@ describe("PerformPlayerCommandBehavior", () => {
             assert.strictEqual(actions[1].type, "clearPlayerCommand");
         });
 
-        it("returns empty array and clears command for attack", () => {
+        it("expands attack command to moveTo + attackTarget + clearPlayerCommand", () => {
             const behavior = createPerformPlayerCommandBehavior();
-            const entity = createBehaviorTestEntity();
-            const agent = getBehaviorAgent(entity);
+            const { attacker, target } = createAttackScene();
+            const agent = getBehaviorAgent(attacker);
             agent!.playerCommand = {
                 action: "attack",
-                targetEntityId: "enemy-1",
+                targetEntityId: target.id,
             };
 
-            const actions = behavior.expand(entity);
+            const actions = behavior.expand(attacker);
+
+            assert.strictEqual(actions.length, 3);
+            assert.strictEqual(actions[0].type, "moveTo");
+            if (actions[0].type === "moveTo") {
+                assert.deepStrictEqual(actions[0].target, { x: 15, y: 12 });
+                assert.strictEqual(actions[0].stopAdjacent, "cardinal");
+            }
+            assert.strictEqual(actions[1].type, "attackTarget");
+            if (actions[1].type === "attackTarget") {
+                assert.strictEqual(actions[1].targetId, target.id);
+            }
+            assert.strictEqual(actions[2].type, "clearPlayerCommand");
+        });
+
+        it("clears attack command and returns empty array when target not found", () => {
+            const behavior = createPerformPlayerCommandBehavior();
+            const { attacker } = createAttackScene();
+            const agent = getBehaviorAgent(attacker);
+            agent!.playerCommand = {
+                action: "attack",
+                targetEntityId: "nonexistent",
+            };
+
+            const actions = behavior.expand(attacker);
 
             assert.strictEqual(actions.length, 0);
             assert.strictEqual(agent!.playerCommand, undefined);
