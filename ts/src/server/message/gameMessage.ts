@@ -20,14 +20,11 @@ export type GameMessage =
     | CommandGameMessage
     | EventGameMessage;
 
-export type AttackGameEventMessage = {
-    attacker: string;
-    target: string;
-};
-
 export type EventGameMessage = {
     type: typeof EventGameMessageType;
-    event: AttackGameEventMessage;
+    sourceEntityId: string;
+    eventType: string;
+    payload: unknown;
 };
 
 export const EventGameMessageType = "event";

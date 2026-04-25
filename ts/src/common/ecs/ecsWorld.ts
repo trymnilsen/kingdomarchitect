@@ -112,6 +112,11 @@ export class EcsWorld {
                     entityEventsFromSystem.transform as EcsEntityEventFunction<EntityEvent>,
                 );
             }
+            if (entityEventsFromSystem.game) {
+                this.entityEvents.game.push(
+                    entityEventsFromSystem.game as EcsEntityEventFunction<EntityEvent>,
+                );
+            }
         }
     }
 

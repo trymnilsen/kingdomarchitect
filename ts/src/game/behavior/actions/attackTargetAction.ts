@@ -9,7 +9,7 @@ import {
     addThreat,
     ThreatMapComponentId,
 } from "../../component/threatMapComponent.ts";
-import type { AttackGameEventMessage } from "../../../server/message/gameMessage.ts";
+import { createAttackGameEvent } from "../../entity/event/attackGameEventData.ts";
 
 export type AttackTargetActionData = { type: "attackTarget"; targetId: string };
 
@@ -55,10 +55,9 @@ export function executeAttackTargetAction(
     //TODO: Make engage in combat behavior, dependent on threat existing
     //TODO: in expand of engage: lazy update threat, select target
     targetEntity.invalidateComponent(HealthComponentId);
-    // eventDispatch({
-    //     attacker: entity.id,
-    //     target: action.targetId,
-    // });
+    entity.bubbleEvent(
+        createAttackGameEvent(entity, entity.id, action.targetId),
+    );
 
     if (healthComponent.currentHp <= 0) {
         return ActionComplete;

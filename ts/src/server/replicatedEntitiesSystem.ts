@@ -6,6 +6,7 @@ import { WorldDiscoveryComponentId } from "../game/component/worldDiscoveryCompo
 import { Entity } from "../game/entity/entity.ts";
 import { diffComponents, isDeltaSmaller } from "./delta/diffComponent.ts";
 import {
+    EventGameMessageType,
     WorldStateMessageType,
     type GameMessage,
     type ReplicatedEntityData,
@@ -108,6 +109,14 @@ export function makeReplicatedEntitiesSystem(
                 postMessage({
                     type: "removeEntity",
                     entity: event.target.id,
+                });
+            },
+            game: (_root, event) => {
+                postMessage({
+                    type: EventGameMessageType,
+                    sourceEntityId: event.source.id,
+                    eventType: event.data.type,
+                    payload: event.data.payload,
                 });
             },
         },
