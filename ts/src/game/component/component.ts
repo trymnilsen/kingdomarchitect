@@ -39,6 +39,7 @@ import type { StatsComponent } from "./statsComponent.ts";
 import type { FarmComponent } from "./farmComponent.ts";
 import type { DesiredInventoryComponent } from "./desiredInventoryComponent.ts";
 import type { ThreatMapComponent } from "./threatMapComponent.ts";
+import type { DespawnTimerComponent } from "./despawnTimerComponent.ts";
 
 export type Components =
     | SpriteComponent
@@ -81,6 +82,7 @@ export type Components =
     | StatsComponent
     | FarmComponent
     | ThreatMapComponent
+    | DespawnTimerComponent
     | DesiredInventoryComponent;
 
 export interface BaseComponent {

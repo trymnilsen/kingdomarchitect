@@ -1,15 +1,10 @@
 import { distance } from "../../../common/point.ts";
-import { findStockpilesWithItem } from "../../building/materialQuery.ts";
-import {
-    InventoryComponentId,
-    type InventoryComponent,
-} from "../../component/inventoryComponent.ts";
+import { InventoryComponentId } from "../../component/inventoryComponent.ts";
 import { HungerComponentId } from "../../component/hungerComponent.ts";
-import { DesiredInventoryComponentId, getInventoryDeficit } from "../../component/desiredInventoryComponent.ts";
 import { ResourceComponentId } from "../../component/resourceComponent.ts";
 import { StockpileComponentId } from "../../component/stockpileComponent.ts";
 import { getSettlementEntity } from "../../entity/settlementQueries.ts";
-import { findFoodInInventory, isFood, getInventoryItemById } from "../../../data/inventory/inventoryItemHelpers.ts";
+import { findFoodInInventory } from "../../../data/inventory/inventoryItemHelpers.ts";
 import { FORAGEABLE_RESOURCE_IDS } from "./forageableResources.ts";
 import { ResourceHarvestMode } from "../../../data/inventory/items/naturalResource.ts";
 import type { Entity } from "../../entity/entity.ts";
@@ -52,9 +47,9 @@ export function createEatBehavior(): Behavior {
                 }
             }
 
-            // Stage 2: restock from stockpile
+            // Stage 2: take from any stockpile that has food
             const settlement = getSettlementEntity(entity);
-            const stage2Actions = tryStockpileStage(entity, settlement, inventory);
+            const stage2Actions = tryStockpileStage(entity, settlement);
             if (stage2Actions) return stage2Actions;
 
             // Stage 3: forage from world resource
@@ -73,65 +68,51 @@ export function createEatBehavior(): Behavior {
     };
 }
 
+/**
+ * Pick the nearest stockpile that holds any food and plan a fetch.
+ *
+ * The worker's DesiredInventoryComponent is intentionally ignored here — that
+ * component expresses what the worker likes to *carry*, and is consumed by the
+ * refill behavior. A hungry worker should eat whatever food is reachable, not
+ * skip past a stockpile because it doesn't hold their preferred carry item.
+ */
 function tryStockpileStage(
     entity: Entity,
     settlement: Entity,
-    inventory: InventoryComponent | null,
 ): BehaviorActionData[] | null {
-    const desired = entity.getEcsComponent(DesiredInventoryComponentId);
+    const stockpiles = settlement.queryComponents(StockpileComponentId);
 
-    let foodItemId: string | null = null;
-    let deficitAmount = 1;
+    let nearestEntity: Entity | null = null;
+    let nearestItemId: string | null = null;
+    let nearestDist = Infinity;
 
-    if (desired && inventory) {
-        const deficit = getInventoryDeficit(desired, inventory);
-        const foodDeficit = deficit.find((entry) => {
-            const item = getInventoryItemById(entry.itemId);
-            return item && isFood(item);
-        });
-        if (foodDeficit) {
-            foodItemId = foodDeficit.itemId;
-            deficitAmount = foodDeficit.amount;
+    for (const [stockpileEntity] of stockpiles) {
+        const stockpileInv = stockpileEntity.getEcsComponent(InventoryComponentId);
+        if (!stockpileInv) continue;
+        const foodStack = findFoodInInventory(stockpileInv);
+        if (!foodStack) continue;
+
+        const d = distance(entity.worldPosition, stockpileEntity.worldPosition);
+        if (d < nearestDist) {
+            nearestDist = d;
+            nearestEntity = stockpileEntity;
+            nearestItemId = foodStack.item.id;
         }
     }
 
-    if (!foodItemId) {
-        // Fallback: any food item in any stockpile
-        const allStockpiles = settlement.queryComponents(StockpileComponentId);
-        for (const [stockpileEntity] of allStockpiles) {
-            const stockpileInv = stockpileEntity.getEcsComponent(InventoryComponentId);
-            if (!stockpileInv) continue;
-            const foodStack = findFoodInInventory(stockpileInv);
-            if (foodStack) {
-                foodItemId = foodStack.item.id;
-                break;
-            }
-        }
-    }
-
-    if (!foodItemId) return null;
-
-    const sources = findStockpilesWithItem(
-        settlement,
-        foodItemId,
-        entity.worldPosition,
-    );
-    if (sources.length === 0) return null;
-
-    const nearest = sources[0];
-    const amount = Math.min(deficitAmount, nearest.availableAmount);
+    if (!nearestEntity || !nearestItemId) return null;
 
     return [
         {
             type: "moveTo",
-            target: nearest.position,
+            target: nearestEntity.worldPosition,
             stopAdjacent: "cardinal",
         },
         {
             type: "withdrawFromStockpile",
-            stockpileId: nearest.entity.id,
-            itemId: foodItemId,
-            amount,
+            stockpileId: nearestEntity.id,
+            itemId: nearestItemId,
+            amount: 1,
         },
         { type: "eatFromInventory" },
     ];

@@ -85,7 +85,6 @@ function onGameMessage(
 
         updateAnimation(entity, animatable, nextStateKey, spriteCache);
     }
-
 }
 
 /**

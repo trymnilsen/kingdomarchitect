@@ -21,8 +21,10 @@ import { createPlayerKingdomComponent } from "../../../src/game/component/player
 import {
     breadItem,
     berryItem,
+    wheatResourceItem,
     woodResourceItem,
 } from "../../../src/data/inventory/items/resources.ts";
+import { createDesiredInventoryComponent } from "../../../src/game/component/desiredInventoryComponent.ts";
 
 function createSettlement(id = "settlement"): Entity {
     const settlement = new Entity(id);
@@ -220,6 +222,37 @@ describe("eatBehavior", () => {
 
             const actions = behavior.expand(thief);
             assert.strictEqual(actions.length, 0, "should not steal when hunger < 80");
+        });
+
+        it("uses stockpile food the worker doesn't have a desired entry for", () => {
+            // Regression: previously, a worker with desired=[bread] would lock the
+            // stockpile lookup to bread and bail to forage when only wheat was stocked.
+            const behavior = createEatBehavior();
+            const settlement = createSettlement();
+            const worker = createWorker(settlement, 60);
+            worker.setEcsComponent(
+                createDesiredInventoryComponent([
+                    { itemId: breadItem.id, amount: 2 },
+                ]),
+            );
+
+            const stockpile = new Entity("stockpile");
+            settlement.addChild(stockpile);
+            stockpile.worldPosition = { x: 15, y: 8 };
+            stockpile.setEcsComponent(createStockpileComponent());
+            const inv = createInventoryComponent();
+            addInventoryItem(inv, wheatResourceItem, 5);
+            stockpile.setEcsComponent(inv);
+
+            const actions = behavior.expand(worker);
+            assert.strictEqual(actions.length, 3);
+            assert.strictEqual(actions[0].type, "moveTo");
+            assert.strictEqual(actions[1].type, "withdrawFromStockpile");
+            assert.strictEqual(
+                (actions[1] as { itemId: string }).itemId,
+                wheatResourceItem.id,
+            );
+            assert.strictEqual(actions[2].type, "eatFromInventory");
         });
 
         it("returns empty when no food source exists", () => {
