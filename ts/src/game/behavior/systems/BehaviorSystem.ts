@@ -13,6 +13,31 @@ import type { BehaviorActionData } from "../actions/ActionData.ts";
 const log = createLogger("behavior");
 
 /**
+ * Reconciles a freshly expanded action queue against the currently running
+ * one. When the head action is shape-equal across both queues we keep the
+ * running reference so any in-progress state on it (e.g. a moveTo's
+ * cachedPath) survives the replan; only the tail is replaced. If the heads
+ * differ — or either queue is empty — we adopt the new queue wholesale.
+ *
+ * The shape compare uses JSON.stringify rather than reference equality
+ * because expand() builds fresh objects each call. A literal-shape compare
+ * is enough for current ECS action data — none of the action types embed
+ * circular references or non-serializable values.
+ */
+export function reconcileQueue(
+    current: BehaviorActionData[],
+    next: BehaviorActionData[],
+): BehaviorActionData[] {
+    if (current.length === 0 || next.length === 0) {
+        return next;
+    }
+    if (JSON.stringify(current[0]) !== JSON.stringify(next[0])) {
+        return next;
+    }
+    return [current[0], ...next.slice(1)];
+}
+
+/**
  * Resolves which behaviors are applicable for a given entity.
  * This determines what behaviors an entity *could ever* run,
  * distinct from isValid which checks if they're appropriate right now.
@@ -236,12 +261,23 @@ function replan(
     );
     const bestBehavior = behaviorUtilities[0];
 
+    const sameBehavior = currentBehavior?.name === bestBehavior.behavior.name;
     agent.currentBehaviorName = bestBehavior.behavior.name;
     agent.currentBehaviorUtility = bestBehavior.utility;
     // pendingReplan is still set here so behaviors can read failure context
     // from the component inside expand()
     const newActions = bestBehavior.behavior.expand(entity);
-    agent.actionQueue = newActions;
+    if (sameBehavior) {
+        agent.actionQueue = reconcileQueue(agent.actionQueue, newActions);
+        log.info(
+            `Entity ${entity.id} reconciled queue for behavior ${bestBehavior.behavior.name}`,
+        );
+    } else {
+        agent.actionQueue = newActions;
+        log.info(
+            `Entity ${entity.id} replaced queue (behavior ${currentBehavior?.name ?? "none"} → ${bestBehavior.behavior.name})`,
+        );
+    }
     // Clear after expand so the failure context is consumed
     agent.pendingReplan = undefined;
     log.info(

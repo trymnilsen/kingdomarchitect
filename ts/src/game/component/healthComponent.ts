@@ -1,4 +1,6 @@
 import type { Entity } from "../entity/entity.ts";
+import { createDeathGameEvent } from "../entity/event/deathGameEventData.ts";
+import { ImmortalComponentId } from "./immortalComponent.ts";
 
 export type HealthComponent = {
     id: typeof HealthComponentId;
@@ -54,8 +56,11 @@ export function damage(component: HealthComponent, amount: number): number {
 }
 
 /**
- * Apply damage to an entity and trigger urgent replan if entity has an agent.
- * This is an example of how to integrate the urgency system with game events.
+ * Apply damage to an entity. When the hit drops the entity to 0 hp, a
+ * death event is bubbled and the entity is removed from its parent —
+ * unless it has an ImmortalComponent, in which case it stays at 0 hp.
+ * Bubbling happens before removal so the event can still travel up the
+ * parent chain.
  *
  * @param entity The entity to damage
  * @param amount The amount of damage
@@ -73,11 +78,17 @@ export function damageEntity(
     }
 
     const damageDealt = damage(health, amount);
+    if (damageDealt <= 0) {
+        return 0;
+    }
     entity.invalidateComponent(HealthComponentId);
 
-    // If entity has behavior agent, request urgent replan (combat requires immediate response)
-    if (damageDealt > 0) {
-        // TODO
+    if (
+        health.currentHp <= 0 &&
+        !entity.getEcsComponent(ImmortalComponentId)
+    ) {
+        entity.bubbleEvent(createDeathGameEvent(entity, entity.id));
+        entity.remove();
     }
 
     return damageDealt;

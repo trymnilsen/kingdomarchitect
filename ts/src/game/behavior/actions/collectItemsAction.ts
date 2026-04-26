@@ -4,6 +4,7 @@ import {
     CollectableComponentId,
     collectAllItems,
 } from "../../component/collectableComponent.ts";
+import { BuildingComponentId } from "../../component/buildingComponent.ts";
 
 const log = createLogger("behavior");
 import {
@@ -71,6 +72,10 @@ export function executeCollectItemsAction(
 
     entity.invalidateComponent(InventoryComponentId);
     targetEntity.invalidateComponent(CollectableComponentId);
+
+    if (!targetEntity.hasComponent(BuildingComponentId)) {
+        targetEntity.remove();
+    }
 
     return ActionComplete;
 }

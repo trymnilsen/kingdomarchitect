@@ -29,4 +29,24 @@ export function addThreat(
     }
 }
 
+/**
+ * Returns the entity id with the highest accumulated threat amount, or
+ * undefined if the threat map is empty. Strict `>` means earlier-inserted
+ * entries win ties — callers depend on that for deterministic top-before /
+ * top-after comparisons in attackTargetAction.
+ */
+export function getTopThreat(
+    component: ThreatMapComponent,
+): string | undefined {
+    let topId: string | undefined;
+    let topAmount = 0;
+    for (const [id, entry] of Object.entries(component.threat)) {
+        if (entry.amount > topAmount) {
+            topAmount = entry.amount;
+            topId = id;
+        }
+    }
+    return topId;
+}
+
 export const ThreatMapComponentId = "threatMap";

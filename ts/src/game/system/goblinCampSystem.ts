@@ -5,10 +5,7 @@ import {
     GoblinCampComponentId,
     type GoblinCampComponent,
 } from "../component/goblinCampComponent.ts";
-import {
-    GoblinUnitComponentId,
-    createGoblinUnitComponent,
-} from "../component/goblinUnitComponent.ts";
+import { GoblinUnitComponentId } from "../component/goblinUnitComponent.ts";
 import { HousingComponentId } from "../component/housingComponent.ts";
 import { FireSourceComponentId } from "../component/fireSourceComponent.ts";
 import { BuildingComponentId } from "../component/buildingComponent.ts";
@@ -30,6 +27,7 @@ import { createBuildingPlacementValidator } from "../map/query/buildingPlacement
 import { BuildBuildingJob } from "../job/buildBuildingJob.ts";
 import type { Building } from "../../data/building/building.ts";
 import { firstChildWhere } from "../entity/child/first.ts";
+import { goblinCampfire } from "../../data/building/goblin/goblinCampfire.ts";
 
 const log = createLogger("goblin");
 
@@ -63,13 +61,8 @@ export const goblinCampSystem: EcsSystem = {
                 );
             }
 
-            processSpawning(
-                root,
-                campEntity,
-                campComponent,
-                population,
-                hasActiveFire,
-            );
+            processSpawning(root, campEntity, campComponent, population, hasActiveFire);
+            processCampRemoval(campEntity, population, hasActiveFire);
         }
     },
 };
@@ -118,7 +111,7 @@ function processExpansion(
     }
 
     // Don't expand if there's a completed unoccupied hut
-    if (findAvailableGoblinHut(campEntity)) {
+    if (findAvailableGoblinHut(root, campEntity)) {
         return;
     }
 
@@ -137,6 +130,13 @@ function processExpansion(
 /**
  * Spawn goblins when camp has available housing, active fire,
  * and is below max population.
+ *
+ * Path A (campfire fallback): population is 0 and fire is active →
+ * spawn one goblin near the fire with no housing assignment.
+ * This is the safety valve that lets a camp recover after all goblins die.
+ *
+ * Path B (house spawn): fire is active and an unoccupied (or stale-tenanted)
+ * hut exists → spawn a goblin and assign it to the hut.
  */
 function processSpawning(
     root: Entity,
@@ -145,21 +145,41 @@ function processSpawning(
     population: number,
     hasActiveFire: boolean,
 ): void {
-    if (population >= campComponent.maxPopulation) {
-        return;
-    }
-
     if (!hasActiveFire) {
         return;
     }
 
-    const availableHut = findAvailableGoblinHut(campEntity);
+    if (population === 0) {
+        const campfire = findActiveCampfire(campEntity);
+        const spawnPosition = findClosestAvailablePosition(
+            root,
+            campfire ? campfire.worldPosition : campEntity.worldPosition,
+        );
+        if (!spawnPosition) {
+            return;
+        }
+
+        const newGoblin = goblinPrefab(campEntity.id);
+        campEntity.addChild(newGoblin);
+        newGoblin.worldPosition = spawnPosition;
+
+        log.info("Spawned first goblin at campfire", {
+            goblinId: newGoblin.id,
+            campId: campEntity.id,
+        });
+        return;
+    }
+
+    if (population >= campComponent.maxPopulation) {
+        return;
+    }
+
+    const availableHut = findAvailableGoblinHut(root, campEntity);
     if (!availableHut) {
         return;
     }
 
-    const newGoblin = goblinPrefab();
-    newGoblin.setEcsComponent(createGoblinUnitComponent(campEntity.id));
+    const newGoblin = goblinPrefab(campEntity.id);
 
     const housing = availableHut.getEcsComponent(HousingComponentId);
     if (housing) {
@@ -180,6 +200,31 @@ function processSpawning(
 
     log.info("Spawned goblin at camp", {
         goblinId: newGoblin.id,
+        campId: campEntity.id,
+    });
+}
+
+/**
+ * Remove the GoblinCampComponent when the camp is fully cleared:
+ * no goblins, no campfire, and no huts that could spawn more goblins.
+ * The entity itself is kept so its children (terrain, leftover buildings)
+ * remain in the world.
+ */
+function processCampRemoval(
+    campEntity: Entity,
+    population: number,
+    hasActiveFire: boolean,
+): void {
+    if (population > 0 || hasActiveFire) {
+        return;
+    }
+
+    if (campHasAnyGoblinHut(campEntity)) {
+        return;
+    }
+
+    campEntity.removeEcsComponent(GoblinCampComponentId);
+    log.info("Goblin camp cleared, removing camp component", {
         campId: campEntity.id,
     });
 }
@@ -257,7 +302,7 @@ function campHasActiveFire(campEntity: Entity): boolean {
     return false;
 }
 
-function findAvailableGoblinHut(campEntity: Entity): Entity | null {
+function findAvailableGoblinHut(root: Entity, campEntity: Entity): Entity | null {
     for (const child of campEntity.children) {
         const building = child.getEcsComponent(BuildingComponentId);
         if (
@@ -268,11 +313,45 @@ function findAvailableGoblinHut(campEntity: Entity): Entity | null {
             continue;
         }
         const housing = child.getEcsComponent(HousingComponentId);
-        if (housing && !housing.tenant) {
+        if (!housing) {
+            continue;
+        }
+
+        if (!housing.tenant) {
+            return child;
+        }
+
+        // Tenant was killed — clear the stale reference and reuse the hut
+        if (!root.findEntity(housing.tenant)) {
+            housing.tenant = null;
+            child.invalidateComponent(HousingComponentId);
             return child;
         }
     }
     return null;
+}
+
+function findActiveCampfire(campEntity: Entity): Entity | null {
+    for (const child of campEntity.children) {
+        const building = child.getEcsComponent(BuildingComponentId);
+        if (building?.building.id === goblinCampfire.id && !building.scaffolded) {
+            const fireSource = child.getEcsComponent(FireSourceComponentId);
+            if (fireSource?.isActive) {
+                return child;
+            }
+        }
+    }
+    return null;
+}
+
+function campHasAnyGoblinHut(campEntity: Entity): boolean {
+    for (const child of campEntity.children) {
+        const building = child.getEcsComponent(BuildingComponentId);
+        if (building?.building.id === goblinHut.id) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function hasScaffoldedBuilding(

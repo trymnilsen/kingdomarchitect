@@ -1,14 +1,19 @@
 import { isPointAdjacentTo } from "../../../common/point.ts";
 import { createLogger } from "../../../common/logging/logger.ts";
-import { damage, HealthComponentId } from "../../component/healthComponent.ts";
+import {
+    damageEntity,
+    HealthComponentId,
+} from "../../component/healthComponent.ts";
 
 const log = createLogger("behavior");
 import type { Entity } from "../../entity/entity.ts";
 import { ActionComplete, ActionRunning, type ActionResult } from "./Action.ts";
 import {
     addThreat,
+    getTopThreat,
     ThreatMapComponentId,
 } from "../../component/threatMapComponent.ts";
+import { requestReplan } from "../../component/BehaviorAgentComponent.ts";
 import { createAttackGameEvent } from "../../entity/event/attackGameEventData.ts";
 
 export type AttackTargetActionData = { type: "attackTarget"; targetId: string };
@@ -45,19 +50,20 @@ export function executeAttackTargetAction(
         return { kind: "failed", cause: { type: "unknown" } };
     }
     const damageAmount = 1;
-    damage(healthComponent, damageAmount);
-    //TODO: add to threat map
     const threatmap = targetEntity.getEcsComponent(ThreatMapComponentId);
     if (threatmap) {
+        const topBefore = getTopThreat(threatmap);
         addThreat(threatmap, entity.id, damageAmount, tick);
+        const topAfter = getTopThreat(threatmap);
+        if (topBefore !== topAfter) {
+            requestReplan(targetEntity);
+        }
     }
-    //TODO: trigger replan
-    //TODO: Make engage in combat behavior, dependent on threat existing
-    //TODO: in expand of engage: lazy update threat, select target
-    targetEntity.invalidateComponent(HealthComponentId);
     entity.bubbleEvent(
         createAttackGameEvent(entity, entity.id, action.targetId),
     );
+
+    damageEntity(targetEntity, damageAmount, tick);
 
     if (healthComponent.currentHp <= 0) {
         return ActionComplete;

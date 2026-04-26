@@ -12,6 +12,7 @@ import { createBehaviorSystem } from "../game/behavior/systems/BehaviorSystem.ts
 import { createBehaviorResolver } from "../game/behavior/behaviorResolver.ts";
 import { warmthSystem } from "../game/system/warmthSystem.ts";
 import { goblinCampSystem } from "../game/system/goblinCampSystem.ts";
+import { lootDropSystem } from "../game/system/lootDropSystem.ts";
 
 import {
     buildWorldStateMessage,
@@ -210,6 +211,7 @@ export class GameServer {
         this.world.addSystem(hungerSystem);
         this.world.addSystem(warmthSystem);
         this.world.addSystem(goblinCampSystem);
+        this.world.addSystem(lootDropSystem);
         this.world.addSystem(worldGenerationSystem);
         this.world.addSystem(
             createCommandSystem(this.gameTime, this.persistenceManager),

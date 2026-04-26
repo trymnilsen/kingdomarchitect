@@ -3,33 +3,31 @@ import { Entity } from "../entity/entity.ts";
 import { createGoblinCampComponent } from "../component/goblinCampComponent.ts";
 import { createJobQueueComponent } from "../component/jobQueueComponent.ts";
 import { goblinPrefab } from "./goblinPrefab.ts";
+import { buildingPrefab } from "./buildingPrefab.ts";
+import { goblinCampfire } from "../../data/building/goblin/goblinCampfire.ts";
 
 /**
- * Creates a goblin camp entity with an initial goblin.
- * The camp entity acts as a parent/container for all camp buildings and goblins.
+ * Creates a goblin camp entity with an initial campfire and goblin.
+ * The campfire is the permanent anchor of the camp — as long as it stands,
+ * goblins will be attracted back even if all are killed.
  *
  * Camp entity structure:
  * - Camp (GoblinCampComponent, JobQueueComponent)
+ *   - Campfire (pre-built FireSourceComponent)
  *   - Initial Goblin (GoblinUnitComponent linked to camp)
- *
- * The camp has its own JobQueueComponent so goblins find it via ancestor
- * traversal when looking for jobs to perform.
- *
- * Note: NO fire or stockpile - the goblin must build these from scratch.
  */
 export function goblinCampPrefab(): { camp: Entity; goblin: Entity } {
     const camp = new Entity(generateId("goblinCamp"));
     camp.setEcsComponent(createGoblinCampComponent(5));
     camp.setEcsComponent(createJobQueueComponent());
 
-    // Create initial goblin linked to this camp
+    const campfire = buildingPrefab(goblinCampfire, false);
+    camp.addChild(campfire);
+    campfire.position = { x: 0, y: 0 };
+
     const goblin = goblinPrefab(camp.id);
-
-    // Add goblin as child of camp
     camp.addChild(goblin);
-
-    // Position goblin at camp center
-    goblin.position = { x: 0, y: 0 };
+    goblin.position = { x: 1, y: 0 };
 
     return { camp, goblin };
 }

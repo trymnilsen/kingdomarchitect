@@ -308,6 +308,10 @@ export class Entity {
         this._ecsComponents.set(ecsComponent.id, ecsComponent);
     }
 
+    removeEcsComponent(componentId: ComponentID) {
+        this._ecsComponents.delete(componentId);
+    }
+
     getEcsComponent<ID extends ComponentID>(
         componentId: ID,
     ): Extract<Components, { id: ID }> | null {

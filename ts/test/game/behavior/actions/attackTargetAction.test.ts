@@ -15,6 +15,9 @@ import {
     createBehaviorAgentComponent,
 } from "../../../../src/game/component/BehaviorAgentComponent.ts";
 import { executeAttackTargetAction } from "../../../../src/game/behavior/actions/attackTargetAction.ts";
+import { createImmortalComponent } from "../../../../src/game/component/immortalComponent.ts";
+import { DeathGameEventType } from "../../../../src/game/entity/event/deathGameEventData.ts";
+import type { EntityEvent } from "../../../../src/game/entity/entityEvent.ts";
 
 function createTestScene(): { root: Entity; worker: Entity; target: Entity } {
     const root = new Entity("root");
@@ -141,6 +144,85 @@ describe("attackTargetAction", () => {
 
         const healthComponent = target.getEcsComponent(HealthComponentId)!;
         assert.strictEqual(healthComponent.currentHp, 8);
+    });
+
+    describe("on lethal hit", () => {
+        it("removes the target from its parent when hp reaches 0", () => {
+            const { root, worker, target } = createTestScene();
+            target.getEcsComponent(HealthComponentId)!.currentHp = 1;
+
+            executeAttackTargetAction(
+                { type: "attackTarget", targetId: "target" },
+                worker,
+                1,
+            );
+
+            assert.strictEqual(root.findEntity("target"), null);
+        });
+
+        it("leaves an Immortal target in place at 0 hp", () => {
+            const { root, worker, target } = createTestScene();
+            target.setEcsComponent(createImmortalComponent());
+            const healthComponent = target.getEcsComponent(HealthComponentId)!;
+            healthComponent.currentHp = 1;
+
+            executeAttackTargetAction(
+                { type: "attackTarget", targetId: "target" },
+                worker,
+                1,
+            );
+
+            assert.strictEqual(healthComponent.currentHp, 0);
+            assert.strictEqual(root.findEntity("target"), target);
+        });
+
+        it("bubbles a death event up the parent chain", () => {
+            const { root, worker, target } = createTestScene();
+            const healthComponent = target.getEcsComponent(HealthComponentId)!;
+            healthComponent.currentHp = 1;
+
+            const events: EntityEvent[] = [];
+            root.entityEvent = (event) => events.push(event);
+
+            executeAttackTargetAction(
+                { type: "attackTarget", targetId: "target" },
+                worker,
+                1,
+            );
+
+            const death = events.find(
+                (e) =>
+                    e.id === "game" && e.data.type === DeathGameEventType,
+            );
+            assert.ok(death, "expected a death event to bubble to root");
+            assert.strictEqual(
+                (death as { data: { payload: { entityId: string } } }).data
+                    .payload.entityId,
+                "target",
+            );
+        });
+
+        it("does not bubble a death event for an Immortal target", () => {
+            const { root, worker, target } = createTestScene();
+            target.setEcsComponent(createImmortalComponent());
+            const healthComponent = target.getEcsComponent(HealthComponentId)!;
+            healthComponent.currentHp = 1;
+
+            const events: EntityEvent[] = [];
+            root.entityEvent = (event) => events.push(event);
+
+            executeAttackTargetAction(
+                { type: "attackTarget", targetId: "target" },
+                worker,
+                1,
+            );
+
+            const death = events.find(
+                (e) =>
+                    e.id === "game" && e.data.type === DeathGameEventType,
+            );
+            assert.strictEqual(death, undefined);
+        });
     });
 
     describe("replan trigger from threat", () => {

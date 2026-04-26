@@ -32,7 +32,7 @@ export function workerPrefab(
     const entity = new Entity(id ?? generateId("worker"));
     const spriteComponent = createSpriteComponent(spriteRefs.empty_sprite);
     entity.setEcsComponent(spriteComponent);
-    entity.setEcsComponent(createHealthComponent(50, 100));
+    entity.setEcsComponent(createHealthComponent(150, 200));
     entity.setEcsComponent(createPlayerUnitComponent());
     entity.setEcsComponent(createEquipmentComponent());
     entity.setEcsComponent(

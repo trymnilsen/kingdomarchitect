@@ -40,6 +40,7 @@ import type { FarmComponent } from "./farmComponent.ts";
 import type { DesiredInventoryComponent } from "./desiredInventoryComponent.ts";
 import type { ThreatMapComponent } from "./threatMapComponent.ts";
 import type { DespawnTimerComponent } from "./despawnTimerComponent.ts";
+import type { ImmortalComponent } from "./immortalComponent.ts";
 
 export type Components =
     | SpriteComponent
@@ -83,7 +84,8 @@ export type Components =
     | FarmComponent
     | ThreatMapComponent
     | DespawnTimerComponent
-    | DesiredInventoryComponent;
+    | DesiredInventoryComponent
+    | ImmortalComponent;
 
 export interface BaseComponent {
     id: string;
