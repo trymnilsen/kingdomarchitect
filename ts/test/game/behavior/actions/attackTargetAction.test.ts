@@ -5,6 +5,15 @@ import {
     createHealthComponent,
     HealthComponentId,
 } from "../../../../src/game/component/healthComponent.ts";
+import {
+    addThreat,
+    createThreatMapComponent,
+    ThreatMapComponentId,
+} from "../../../../src/game/component/threatMapComponent.ts";
+import {
+    BehaviorAgentComponentId,
+    createBehaviorAgentComponent,
+} from "../../../../src/game/component/BehaviorAgentComponent.ts";
 import { executeAttackTargetAction } from "../../../../src/game/behavior/actions/attackTargetAction.ts";
 
 function createTestScene(): { root: Entity; worker: Entity; target: Entity } {
@@ -21,6 +30,21 @@ function createTestScene(): { root: Entity; worker: Entity; target: Entity } {
     root.addChild(target);
 
     return { root, worker, target };
+}
+
+function createCombatScene(): {
+    root: Entity;
+    worker: Entity;
+    target: Entity;
+} {
+    const scene = createTestScene();
+    scene.target.setEcsComponent(createThreatMapComponent());
+    scene.target.setEcsComponent(createBehaviorAgentComponent());
+    const agent = scene.target.getEcsComponent(BehaviorAgentComponentId)!;
+    // The default factory seeds pendingReplan; clear it so we can observe
+    // whether the action under test sets it.
+    agent.pendingReplan = undefined;
+    return scene;
 }
 
 describe("attackTargetAction", () => {
@@ -117,5 +141,71 @@ describe("attackTargetAction", () => {
 
         const healthComponent = target.getEcsComponent(HealthComponentId)!;
         assert.strictEqual(healthComponent.currentHp, 8);
+    });
+
+    describe("replan trigger from threat", () => {
+        it("triggers replan on the victim when a new attacker becomes top threat", () => {
+            const { worker, target } = createCombatScene();
+            const action = {
+                type: "attackTarget" as const,
+                targetId: "target",
+            };
+
+            executeAttackTargetAction(action, worker, 1);
+
+            const agent = target.getEcsComponent(BehaviorAgentComponentId)!;
+            assert.ok(
+                agent.pendingReplan,
+                "victim should replan when first attacker becomes top threat",
+            );
+        });
+
+        it("does not re-trigger replan when the same attacker stays top threat", () => {
+            const { worker, target } = createCombatScene();
+            const threat = target.getEcsComponent(ThreatMapComponentId)!;
+            // Worker is the established top threat from a prior fight tick.
+            addThreat(threat, "worker", 5, 0);
+
+            const agent = target.getEcsComponent(BehaviorAgentComponentId)!;
+            agent.pendingReplan = undefined;
+
+            const action = {
+                type: "attackTarget" as const,
+                targetId: "target",
+            };
+            executeAttackTargetAction(action, worker, 1);
+
+            assert.strictEqual(
+                agent.pendingReplan,
+                undefined,
+                "victim should not replan when the top threat is unchanged",
+            );
+        });
+
+        it("triggers replan when a second attacker overtakes the previous top", () => {
+            const { worker, target } = createCombatScene();
+            const threat = target.getEcsComponent(ThreatMapComponentId)!;
+            // Pre-seed: G2 is the established top with amount 2; worker is
+            // also at 2 but loses ties (insertion order + strict `>`).
+            // After one attack from worker, worker accumulates more and
+            // overtakes G2. This couples to attackTargetAction's damage > 0,
+            // which is a fair invariant — a no-op attack would be a bug.
+            addThreat(threat, "G2", 2, 0);
+            addThreat(threat, "worker", 2, 0);
+
+            const agent = target.getEcsComponent(BehaviorAgentComponentId)!;
+            agent.pendingReplan = undefined;
+
+            const action = {
+                type: "attackTarget" as const,
+                targetId: "target",
+            };
+            executeAttackTargetAction(action, worker, 1);
+
+            assert.ok(
+                agent.pendingReplan,
+                "victim should replan when a new attacker overtakes the top",
+            );
+        });
     });
 });
