@@ -41,6 +41,11 @@ export type SpriteComponent = {
     offset?: Point;
     size?: Point;
     tint?: SpriteTint;
+    /**
+     * Secondary sort key used when two entities share the same Y position.
+     * Higher depth renders on top. Defaults to 0.
+     */
+    depth?: number;
 };
 
 /**
@@ -56,6 +61,7 @@ export function createSpriteComponent(
     offset?: Point,
     size?: Point,
     tint?: SpriteTint,
+    depth?: number,
 ): SpriteComponent {
     return {
         id: SpriteComponentId,
@@ -64,6 +70,7 @@ export function createSpriteComponent(
         offset,
         size,
         tint,
+        depth,
     };
 }
 

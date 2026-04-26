@@ -25,7 +25,8 @@ import { createAnimationSystem } from "./system/animationSystem.ts";
 import { createJobQueueComponent } from "./component/jobQueueComponent.ts";
 import { createTileComponent } from "./component/tileComponent.ts";
 import { createSpriteEquipmentSystem } from "./system/spriteEquipmentSystem.ts";
-import { attackEventLogSystem } from "./system/attackEventLogSystem.ts";
+import { createAttackVfxSystem } from "./system/attackVfxSystem.ts";
+import { despawnTimerSystem } from "./system/despawnTimerSystem.ts";
 import { SpriteDefinitionCache } from "../characterbuilder/characterSpriteGenerator.ts";
 import { createRootEntity } from "./rootFactory.ts";
 
@@ -135,7 +136,8 @@ export class Game {
                 this.spriteCache,
             ),
         );
-        this.ecsWorld.addSystem(attackEventLogSystem);
+        this.ecsWorld.addSystem(createAttackVfxSystem(this.gameTime));
+        this.ecsWorld.addSystem(despawnTimerSystem);
     }
 
     async bootstrap(): Promise<void> {

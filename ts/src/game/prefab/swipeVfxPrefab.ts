@@ -1,13 +1,21 @@
-import { spriteRefs } from "../../../generated/sprites.js";
-import { generateId } from "../../common/idGenerator.js";
-import { spriteRenderer } from "../../rendering/items/sprite.js";
-import { createDespawnTimerComponent } from "../component/despawnTimerComponent.js";
-import { createSpriteComponent } from "../component/spriteComponent.js";
-import { Entity } from "../entity/entity.js";
+import { spriteRefs } from "../../../generated/sprites.ts";
+import { generateId } from "../../common/idGenerator.ts";
+import { zeroPoint } from "../../common/point.js";
+import { createDespawnTimerComponent } from "../component/despawnTimerComponent.ts";
+import { createSpriteComponent } from "../component/spriteComponent.ts";
+import { Entity } from "../entity/entity.ts";
 
 export function swipeVfxPrefab(now: number): Entity {
     const entity = new Entity(generateId("swipeVfx"));
-    entity.setEcsComponent(createDespawnTimerComponent(now, 5));
-    entity.setEcsComponent(createSpriteComponent(spriteRefs.swipe_effect));
+    entity.setEcsComponent(createDespawnTimerComponent(now, 1));
+    entity.setEcsComponent(
+        createSpriteComponent(
+            spriteRefs.swipe_effect,
+            zeroPoint(),
+            { x: 16, y: 16 },
+            undefined,
+            1,
+        ),
+    );
     return entity;
 }

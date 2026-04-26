@@ -75,9 +75,11 @@ function onRender(
     }
     const query = rootEntity.queryComponentsWithin(viewport, SpriteComponentId);
 
-    const sortedSprites = Array.from(query.entries()).sort(
-        (a, b) => a[0].worldPosition.y - b[0].worldPosition.y,
-    );
+    const sortedSprites = Array.from(query.entries()).sort((a, b) => {
+        const yDiff = a[0].worldPosition.y - b[0].worldPosition.y;
+        if (yDiff !== 0) return yDiff;
+        return (a[1].depth ?? 0) - (b[1].depth ?? 0);
+    });
 
     for (let i = 0; i < sortedSprites.length; i++) {
         const sprite = sortedSprites[i][1];
