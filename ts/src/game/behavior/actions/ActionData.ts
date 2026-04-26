@@ -20,6 +20,7 @@ import type { PlantCropActionData } from "./plantCropAction.ts";
 import type { HarvestCropActionData } from "./harvestCropAction.ts";
 import type { EatFromInventoryActionData } from "./eatFromInventoryAction.ts";
 import type { StealFoodActionData } from "./stealFoodAction.ts";
+import type { WorkWindmillActionData } from "./workWindmillAction.ts";
 
 /**
  * Action data types - these are serializable plain objects that can be stored in components.
@@ -50,7 +51,8 @@ export type BehaviorActionData =
     | PlantCropActionData
     | HarvestCropActionData
     | EatFromInventoryActionData
-    | StealFoodActionData;
+    | StealFoodActionData
+    | WorkWindmillActionData;
 
 /**
  * Action executor function type - takes action data, entity, and tick, returns result.

@@ -8,6 +8,7 @@ import { planCrafting } from "./craftingPlanner.ts";
 import { planProduction } from "./productionPlanner.ts";
 import { planFarmPlant } from "./farmPlantJobPlanner.ts";
 import { planFarmHarvest } from "./farmHarvestJobPlanner.ts";
+import { planWindmill } from "./windmillPlanner.ts";
 import { createLogger } from "../../../common/logging/logger.ts";
 
 const log = createLogger("job");
@@ -49,6 +50,8 @@ export function planJob(
             return planFarmPlant(root, worker, job);
         case "farmHarvestJob":
             return planFarmHarvest(root, worker, job);
+        case "windmillJob":
+            return planWindmill(root, worker, job);
         case "moveToJob":
             return [{ type: "moveTo", target: job.position }];
         default:

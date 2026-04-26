@@ -37,6 +37,7 @@ import { BuildingSelectionProvider } from "./actor/provider/buildingSelectionPro
 import { ProductionBuildingSelectionProvider } from "./actor/provider/productionBuildingSelectionProvider.ts";
 import { StockpileSelectionProvider } from "./actor/provider/stockpileSelectionProvider.ts";
 import { FarmBuildingSelectionProvider } from "./actor/provider/farmBuildingSelectionProvider.ts";
+import { WindmillSelectionProvider } from "./actor/provider/windmillSelectionProvider.ts";
 import { FarmComponentId, FarmState } from "../../../component/farmComponent.ts";
 import { getCraftingJobDisplayInfos } from "../../../job/craftingJobQuery.ts";
 import { craftingQueueStrip } from "../crafting/craftingQueueStrip.ts";
@@ -74,6 +75,7 @@ export class SelectionState extends InteractionState {
         new StockpileSelectionProvider(),
         new AttackSelectionProvider(),
         new FarmBuildingSelectionProvider(),
+        new WindmillSelectionProvider(),
         new BuildingSelectionProvider(),
     ];
     private _selection: SelectedWorldItem;

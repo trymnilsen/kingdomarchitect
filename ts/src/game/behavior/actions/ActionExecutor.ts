@@ -27,6 +27,7 @@ import { executePlantCropAction } from "./plantCropAction.ts";
 import { executeHarvestCropAction } from "./harvestCropAction.ts";
 import { executeEatFromInventoryAction } from "./eatFromInventoryAction.ts";
 import { executeStealFoodAction } from "./stealFoodAction.ts";
+import { executeWorkWindmillAction } from "./workWindmillAction.ts";
 
 /**
  * Main action executor that dispatches to specific action handlers based on action type.
@@ -77,6 +78,8 @@ export const executeAction: BehaviorActionExecutor = (
             return executeEatFromInventoryAction(action, entity);
         case "stealFood":
             return executeStealFoodAction(action, entity);
+        case "workWindmill":
+            return executeWorkWindmillAction(action, entity, tick);
         default:
             log.warn(
                 `Unknown action type: ${(action as any).type}`,

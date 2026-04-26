@@ -19,7 +19,7 @@ export const windmill: Building = {
         materials: {
             [woodResourceItem.id]: 40,
             [stoneResource.id]: 60,
-            [goldCoins.id]: 15,
+            [goldCoins.id]: 2,
             [timberFramesItem.id]: 20,
             [gearsItem.id]: 5,
         },
