@@ -1,5 +1,10 @@
 import type { Entity } from "../entity/entity.ts";
-import type { BuildBuildingJob } from "./buildBuildingJob.ts";
+import {
+    checkMaterialsAvailability,
+    getRemainingMaterials,
+    type BuildBuildingJob,
+    type RemainingMaterials,
+} from "./buildBuildingJob.ts";
 import type { CollectItemJob } from "./collectItemJob.ts";
 import type { CollectResourceJob } from "./collectResourceJob.ts";
 import type { CraftingJob } from "./craftingJob.ts";
@@ -8,6 +13,8 @@ import type { ProductionJob } from "./productionJob.ts";
 import type { FarmPlantJob } from "./farmPlantJob.ts";
 import type { FarmHarvestJob } from "./farmHarvestJob.ts";
 import type { WindmillJob } from "./windmillJob.ts";
+import { BuildingComponentId } from "../component/buildingComponent.ts";
+import { getSettlementEntity } from "../entity/settlementQueries.ts";
 
 export type JobConstraint = EntityJobConstraint;
 export interface EntityJobConstraint {
@@ -54,6 +61,46 @@ export function isTargetOfJob(job: Jobs, entity: Entity): boolean {
         case "moveToJob":
             return false;
     }
+}
+
+/**
+ * Check if the job is in a valid state. Some jobs might be queued, but not in a valid state where they can run.
+ * An example is a build job where the requirements is not met
+ * @param job the job to run
+ * @param entity the entity that wants to run the job
+ */
+export function isJobValid(job: Jobs, entity: Entity): boolean {
+    switch (job.id) {
+        case "buildBuildingJob":
+            return isBuildJobValid(job, entity);
+        default:
+            return true;
+    }
+}
+
+function isBuildJobValid(job: BuildBuildingJob, entity: Entity): boolean {
+    const building = entity.getRootEntity().findEntity(job.entityId);
+    if (!building) {
+        throw new Error(
+            `Build building job has invalid entity: ${job.entityId}`,
+        );
+    }
+
+    const requirements =
+        building.requireEcsComponent(BuildingComponentId).building.requirements;
+
+    if (!requirements) {
+        return true;
+    }
+
+    const settlement = getSettlementEntity(entity);
+    const availableMaterials = checkMaterialsAvailability(
+        settlement,
+        entity,
+        requirements.materials as RemainingMaterials,
+    );
+
+    return availableMaterials.allAvailable;
 }
 
 /**

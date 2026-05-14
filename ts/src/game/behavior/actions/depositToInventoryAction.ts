@@ -2,28 +2,36 @@ import { isPointAdjacentTo, pointEquals } from "../../../common/point.ts";
 import {
     addInventoryItem,
     InventoryComponentId,
-    takeInventoryItem,
 } from "../../component/inventoryComponent.ts";
-import type { Entity } from "../../entity/entity.ts";
 import {
-    ActionComplete,
-    type ActionResult,
-    type ItemTransfer,
-} from "./Action.ts";
+    clearHeldItem,
+    HeldItemComponentId,
+    isHeldEmpty,
+} from "../../component/heldItemComponent.ts";
+import type { Entity } from "../../entity/entity.ts";
+import { ActionComplete, type ActionResult } from "./Action.ts";
+import { createLogger } from "../../../common/logging/logger.ts";
 
+/**
+ * Deposit the worker's held item into a target entity's inventory.
+ * Held is single-item-id, so a deposit transfers exactly the held stack
+ * and clears held. Optional `itemId` enforces that the worker is carrying
+ * the item the planner expected — fails if mismatched.
+ */
 export type DepositToInventoryActionData = {
     type: "depositToInventory";
     targetEntityId: string;
-    items: ItemTransfer[];
+    /**
+     * Optional sanity check: if set, the action fails when held holds a
+     * different item id. Planners that fetched-then-deposit should set
+     * this so a stale held value can't silently corrupt a building's input
+     * buffer.
+     */
+    itemId?: string;
 };
-import { createLogger } from "../../../common/logging/logger.ts";
 
 const log = createLogger("behavior");
 
-/**
- * Deposit specific items from worker's inventory to a target entity's inventory.
- * Assumes worker is already adjacent to target (moveTo should have run first).
- */
 export function executeDepositToInventoryAction(
     action: DepositToInventoryActionData,
     entity: Entity,
@@ -32,9 +40,7 @@ export function executeDepositToInventoryAction(
     const targetEntity = root.findEntity(action.targetEntityId);
 
     if (!targetEntity) {
-        log.warn(
-            `Target entity ${action.targetEntityId} not found`,
-        );
+        log.warn(`Target entity ${action.targetEntityId} not found`);
         return {
             kind: "failed",
             cause: { type: "targetGone", entityId: action.targetEntityId },
@@ -51,31 +57,23 @@ export function executeDepositToInventoryAction(
 
     const targetInventory =
         targetEntity.requireEcsComponent(InventoryComponentId);
-    const workerInventory = entity.requireEcsComponent(InventoryComponentId);
+    const held = entity.getEcsComponent(HeldItemComponentId);
+    if (!held || isHeldEmpty(held)) {
+        return ActionComplete;
+    }
 
-    let depositedSomething = false;
-    for (const transfer of action.items) {
-        const taken = takeInventoryItem(
-            workerInventory,
-            transfer.itemId,
-            transfer.amount,
+    if (action.itemId !== undefined && held.item!.id !== action.itemId) {
+        log.warn(
+            `Deposit expected ${action.itemId} but held has ${held.item!.id}`,
         );
-        if (taken && taken.length > 0) {
-            for (const takenItem of taken) {
-                addInventoryItem(
-                    targetInventory,
-                    takenItem.item,
-                    takenItem.amount,
-                );
-            }
-            depositedSomething = true;
-        }
+        return { kind: "failed", cause: { type: "unknown" } };
     }
 
-    if (depositedSomething) {
-        entity.invalidateComponent(InventoryComponentId);
-        targetEntity.invalidateComponent(InventoryComponentId);
-    }
+    addInventoryItem(targetInventory, held.item!, held.amount);
+    clearHeldItem(held);
+
+    entity.invalidateComponent(HeldItemComponentId);
+    targetEntity.invalidateComponent(InventoryComponentId);
 
     return ActionComplete;
 }

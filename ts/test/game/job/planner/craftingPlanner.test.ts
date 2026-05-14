@@ -8,34 +8,50 @@ import {
     createInventoryComponent,
     addInventoryItem,
 } from "../../../../src/game/component/inventoryComponent.ts";
+import {
+    createHeldItemComponent,
+    HeldItemComponentId,
+} from "../../../../src/game/component/heldItemComponent.ts";
+import { createStockpileComponent } from "../../../../src/game/component/stockpileComponent.ts";
 import { planksRecipe } from "../../../../src/data/crafting/recipes/carpenterRecipes.ts";
 import { woodResourceItem } from "../../../../src/data/inventory/items/resources.ts";
 
-function createTestScene(): { root: Entity; worker: Entity; building: Entity } {
+function createTestScene(): {
+    root: Entity;
+    worker: Entity;
+    building: Entity;
+    stockpile: Entity;
+} {
     const root = new Entity("root");
     const worker = new Entity("worker");
     const building = new Entity("building");
+    const stockpile = new Entity("stockpile");
 
     worker.worldPosition = { x: 10, y: 8 };
     building.worldPosition = { x: 15, y: 13 };
+    stockpile.worldPosition = { x: 20, y: 8 };
 
-    worker.setEcsComponent(createInventoryComponent());
+    worker.setEcsComponent(createHeldItemComponent());
     building.setEcsComponent(createInventoryComponent());
+
+    stockpile.setEcsComponent(createStockpileComponent());
+    stockpile.setEcsComponent(createInventoryComponent());
 
     root.setEcsComponent(createJobQueueComponent());
     root.addChild(worker);
     root.addChild(building);
+    root.addChild(stockpile);
 
-    return { root, worker, building };
+    return { root, worker, building, stockpile };
 }
 
 describe("craftingPlanner", () => {
-    describe("worker has all inputs", () => {
+    describe("building has all inputs", () => {
         it("returns moveTo and craftItem actions", () => {
             const { root, worker, building } = createTestScene();
 
-            const workerInventory = worker.getEcsComponent("Inventory")!;
-            addInventoryItem(workerInventory, woodResourceItem, 10);
+            const buildingInventory = building.getEcsComponent("Inventory")!;
+            addInventoryItem(buildingInventory, woodResourceItem, 10);
 
             const job = createCraftingJob("building", planksRecipe);
             const actions = planCrafting(root, worker, job);
@@ -44,94 +60,53 @@ describe("craftingPlanner", () => {
             assert.strictEqual(actions[0].type, "moveTo");
             assert.strictEqual(actions[1].type, "craftItem");
         });
+    });
 
-        it("sets correct recipe in craftItem action", () => {
-            const { root, worker } = createTestScene();
-
-            const workerInventory = worker.getEcsComponent("Inventory")!;
-            addInventoryItem(workerInventory, woodResourceItem, 10);
+    describe("worker held already has a needed input", () => {
+        it("returns moveTo + depositToInventory", () => {
+            const { root, worker, building } = createTestScene();
+            const held = worker.requireEcsComponent(HeldItemComponentId);
+            held.item = woodResourceItem;
+            held.amount = 4;
 
             const job = createCraftingJob("building", planksRecipe);
             const actions = planCrafting(root, worker, job);
 
-            const craftAction = actions[1] as {
-                type: "craftItem";
-                recipe: typeof planksRecipe;
-            };
-            assert.strictEqual(craftAction.recipe.id, planksRecipe.id);
+            assert.strictEqual(actions[0].type, "moveTo");
+            assert.strictEqual(actions[1].type, "depositToInventory");
         });
     });
 
-    describe("worker needs inputs from building", () => {
-        it("returns moveTo, takeFromInventory, and craftItem actions", () => {
-            const { root, worker, building } = createTestScene();
+    describe("inputs available in stockpile", () => {
+        it("returns withdraw + deposit trip when held empty", () => {
+            const { root, worker, stockpile } = createTestScene();
 
-            // Worker has no materials, building has them
-            const buildingInventory = building.getEcsComponent("Inventory")!;
-            addInventoryItem(buildingInventory, woodResourceItem, 10);
+            const stockpileInventory = stockpile.getEcsComponent("Inventory")!;
+            addInventoryItem(stockpileInventory, woodResourceItem, 10);
 
             const job = createCraftingJob("building", planksRecipe);
             const actions = planCrafting(root, worker, job);
 
-            assert.strictEqual(actions.length, 3);
+            assert.strictEqual(actions.length, 4);
             assert.strictEqual(actions[0].type, "moveTo");
-            assert.strictEqual(actions[1].type, "takeFromInventory");
-            assert.strictEqual(actions[2].type, "craftItem");
-        });
-
-        it("calculates correct items to take", () => {
-            const { root, worker, building } = createTestScene();
-
-            // Worker has 1 wood, needs 4 total (planksRecipe needs 4 wood)
-            const workerInventory = worker.getEcsComponent("Inventory")!;
-            addInventoryItem(workerInventory, woodResourceItem, 1);
-
-            const buildingInventory = building.getEcsComponent("Inventory")!;
-            addInventoryItem(buildingInventory, woodResourceItem, 10);
-
-            const job = createCraftingJob("building", planksRecipe);
-            const actions = planCrafting(root, worker, job);
-
-            const takeAction = actions[1] as {
-                type: "takeFromInventory";
-                items: Array<{ itemId: string; amount: number }>;
-            };
-
-            const woodItem = takeAction.items.find((i) => i.itemId === "wood");
-            assert.ok(woodItem);
-            assert.strictEqual(woodItem.amount, 3); // 4 needed - 1 has = 3 to take
+            assert.strictEqual(actions[1].type, "withdrawFromStockpile");
+            assert.strictEqual(actions[2].type, "moveTo");
+            assert.strictEqual(actions[3].type, "depositToInventory");
         });
     });
 
     describe("error cases", () => {
         it("returns empty array if building not found", () => {
             const { root, worker } = createTestScene();
-
             const job = createCraftingJob("nonexistent", planksRecipe);
             const actions = planCrafting(root, worker, job);
-
             assert.strictEqual(actions.length, 0);
         });
 
-        it("returns empty array if worker has no inventory", () => {
-            const { root, building } = createTestScene();
-            const workerNoInv = new Entity("workerNoInv");
-            workerNoInv.worldPosition = { x: 10, y: 8 };
-            root.addChild(workerNoInv);
-
-            const job = createCraftingJob("building", planksRecipe);
-            const actions = planCrafting(root, workerNoInv, job);
-
-            assert.strictEqual(actions.length, 0);
-        });
-
-        it("returns empty array if no materials available anywhere", () => {
+        it("returns empty array when no source has materials", () => {
             const { root, worker } = createTestScene();
-
-            // Neither worker nor building has materials
             const job = createCraftingJob("building", planksRecipe);
             const actions = planCrafting(root, worker, job);
-
             assert.strictEqual(actions.length, 0);
         });
 
@@ -141,10 +116,8 @@ describe("craftingPlanner", () => {
             buildingNoInv.worldPosition = { x: 5, y: 5 };
             root.addChild(buildingNoInv);
 
-            // Worker doesn't have materials, so planner will try to get from building
             const job = createCraftingJob("buildingNoInv", planksRecipe);
             const actions = planCrafting(root, worker, job);
-
             assert.strictEqual(actions.length, 0);
         });
     });

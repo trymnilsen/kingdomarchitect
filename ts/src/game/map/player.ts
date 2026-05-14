@@ -3,12 +3,18 @@ import { generateId } from "../../common/idGenerator.ts";
 import type { Point } from "../../common/point.ts";
 import { farm } from "../../data/building/grow/grow.ts";
 import { woodenHouse } from "../../data/building/wood/house.ts";
+import { stockPile } from "../../data/building/wood/storage.ts";
 import {
     stoneResource,
     treeResource,
 } from "../../data/inventory/items/naturalResource.ts";
+import { swordItem } from "../../data/inventory/items/equipment.ts";
 import { ChunkMapComponentId } from "../component/chunkMapComponent.ts";
 import { HousingComponentId } from "../component/housingComponent.ts";
+import {
+    addInventoryItem,
+    InventoryComponentId,
+} from "../component/inventoryComponent.ts";
 import { KingdomComponentId } from "../component/kingdomComponent.ts";
 import { setChunk, TileComponentId } from "../component/tileComponent.ts";
 import { Entity } from "../entity/entity.ts";
@@ -32,14 +38,20 @@ export function addInitialPlayerChunk(scopedEntity: Entity): Point {
     chunkEntity.addChild(playerKingdom);
     playerKingdom.position = { x: 0, y: 0 };
 
-    const kingdomDefaults =
-        playerKingdom.requireEcsComponent(KingdomComponentId).defaultDesiredInventory;
-    const firstWorker = workerPrefab(undefined, kingdomDefaults);
+    const firstWorker = workerPrefab();
     const firstFarm = buildingPrefab(farm, false);
     const firstTree = resourcePrefab(treeResource);
     const trainingDummy = trainingDummyPrefab();
     const firstHouse = buildingPrefab(woodenHouse, false);
     firstHouse.requireEcsComponent(HousingComponentId).tenant = firstWorker.id;
+
+    // Stocked with a sword so the new equip-from-stockpile flow has
+    // something to grab in a fresh game.
+    const startingStockpile = buildingPrefab(stockPile, false);
+    const stockpileInventory = startingStockpile.requireEcsComponent(
+        InventoryComponentId,
+    );
+    addInventoryItem(stockpileInventory, swordItem, 1);
 
     // World resources stay on the chunk entity
     chunkEntity.addChild(firstTree);
@@ -57,6 +69,12 @@ export function addInitialPlayerChunk(scopedEntity: Entity): Point {
 
     playerKingdom.addChild(firstFarm);
     firstFarm.worldPosition = { x: 1 + randomOffsetX, y: 1 + randomOffsetY };
+
+    playerKingdom.addChild(startingStockpile);
+    startingStockpile.worldPosition = {
+        x: 2 + randomOffsetX,
+        y: randomOffsetY,
+    };
 
     scopedEntity.updateComponent(TileComponentId, (component) => {
         setChunk(component, {

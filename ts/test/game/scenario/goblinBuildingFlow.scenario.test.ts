@@ -14,7 +14,7 @@ import {
     WarmthComponentId,
 } from "../../../src/game/component/warmthComponent.ts";
 import { createBehaviorAgentComponent } from "../../../src/game/component/BehaviorAgentComponent.ts";
-import { createInventoryComponent } from "../../../src/game/component/inventoryComponent.ts";
+import { createHeldItemComponent } from "../../../src/game/component/heldItemComponent.ts";
 import { createHealthComponent } from "../../../src/game/component/healthComponent.ts";
 import { createResourceComponent } from "../../../src/game/component/resourceComponent.ts";
 import { BuildingComponentId } from "../../../src/game/component/buildingComponent.ts";
@@ -83,7 +83,7 @@ function createGoblin(camp: Entity, position: Point): Entity {
     goblin.setEcsComponent(createGoblinUnitComponent(camp.id));
     goblin.setEcsComponent(createWarmthComponent(COLD_THRESHOLD - 1, 1.0));
     goblin.setEcsComponent(createBehaviorAgentComponent());
-    goblin.setEcsComponent(createInventoryComponent());
+    goblin.setEcsComponent(createHeldItemComponent());
     goblin.setEcsComponent(createHealthComponent(10, 10));
     camp.addChild(goblin);
     goblin.worldPosition = position;

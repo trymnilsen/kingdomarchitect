@@ -42,18 +42,52 @@ const levelRank: Record<LogLevel, number> = {
     error: 3,
 };
 
-function callConsole(level: LogLevel, prefix: string, data?: unknown): void {
-    if (data !== undefined) {
-        if (level === "debug") console.debug(prefix, data);
-        else if (level === "info") console.log(prefix, data);
-        else if (level === "warn") console.warn(prefix, data);
-        else console.error(prefix, data);
-    } else {
-        if (level === "debug") console.debug(prefix);
-        else if (level === "info") console.log(prefix);
-        else if (level === "warn") console.warn(prefix);
-        else console.error(prefix);
+function pickConsoleFn(level: LogLevel): (...args: unknown[]) => void {
+    if (level === "debug") return console.debug;
+    if (level === "info") return console.log;
+    if (level === "warn") return console.warn;
+    return console.error;
+}
+
+/**
+ * Pulls an Error out of the data payload so we can pass it as a top-level
+ * console argument. Browsers only render clickable, sourcemapped stack traces
+ * when an Error instance is a direct console argument — wrapping it inside an
+ * object (e.g. `{ error: err }`) reduces the stack to a plain string property.
+ */
+function extractError(data: unknown): Error | undefined {
+    if (data instanceof Error) {
+        return data;
     }
+    if (typeof data === "object" && data !== null) {
+        const obj = data as Record<string, unknown>;
+        if (obj["error"] instanceof Error) return obj["error"];
+        if (obj["err"] instanceof Error) return obj["err"];
+        if (obj["cause"] instanceof Error) return obj["cause"];
+    }
+    return undefined;
+}
+
+function callConsole(level: LogLevel, prefix: string, data?: unknown): void {
+    const consoleFn = pickConsoleFn(level);
+    const error = extractError(data);
+
+    if (error !== undefined && error === data) {
+        consoleFn(prefix, error);
+        return;
+    }
+
+    if (error !== undefined) {
+        consoleFn(prefix, data, error);
+        return;
+    }
+
+    if (data !== undefined) {
+        consoleFn(prefix, data);
+        return;
+    }
+
+    consoleFn(prefix);
 }
 
 function formatPrefix(entry: LogEntry): string {

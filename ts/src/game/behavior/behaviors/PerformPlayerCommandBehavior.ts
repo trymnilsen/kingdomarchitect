@@ -1,8 +1,15 @@
 import { Entity } from "../../entity/entity.ts";
 import type { BehaviorActionData } from "../actions/ActionData.ts";
 import { getBehaviorAgent } from "../../component/BehaviorAgentComponent.ts";
+import {
+    HeldItemComponentId,
+    isHeldEmpty,
+} from "../../component/heldItemComponent.ts";
 import type { Behavior } from "./Behavior.ts";
 import { createLogger } from "../../../common/logging/logger.ts";
+import { findFreeAdjacentTile } from "../dropItem.ts";
+import { planEquipCommand } from "../planners/equipCommandPlanner.ts";
+import { planEquipFromHeld } from "../planners/equipFromHeldPlanner.ts";
 
 const log = createLogger("behavior");
 
@@ -60,14 +67,81 @@ export function createPerformPlayerCommandBehavior(): Behavior {
                     ];
                 }
 
-                case "pickup":
-                    // TODO: Implement pickup action when inventory interaction is available
-                    log.warn(
-                        `Pickup command not yet implemented for entity ${entity.id}`,
+                case "pickup": {
+                    const root = entity.getRootEntity();
+                    const target = root.findEntity(command.targetEntityId);
+                    if (!target) {
+                        agent.playerCommand = undefined;
+                        entity.invalidateComponent("behavioragent");
+                        return [];
+                    }
+                    return [
+                        {
+                            type: "moveTo",
+                            target: target.worldPosition,
+                            stopAdjacent: "cardinal",
+                        },
+                        {
+                            type: "pickupFromGround",
+                            pileEntityId: command.targetEntityId,
+                        },
+                        { type: "clearPlayerCommand" },
+                    ];
+                }
+
+                case "drop": {
+                    const held = entity.getEcsComponent(HeldItemComponentId);
+                    if (!held || isHeldEmpty(held)) {
+                        agent.playerCommand = undefined;
+                        entity.invalidateComponent("behavioragent");
+                        return [];
+                    }
+                    const root = entity.getRootEntity();
+                    const adjacent = findFreeAdjacentTile(
+                        root,
+                        entity.worldPosition,
+                        held.item!,
                     );
-                    agent.playerCommand = undefined;
-                    entity.invalidateComponent("behavioragent");
-                    return [];
+                    if (!adjacent) {
+                        log.warn(
+                            `Drop failed for ${entity.id}: no free adjacent tile`,
+                        );
+                        agent.playerCommand = undefined;
+                        entity.invalidateComponent("behavioragent");
+                        return [];
+                    }
+                    return [
+                        { type: "moveTo", target: adjacent },
+                        { type: "dropHeld", destination: adjacent },
+                        { type: "clearPlayerCommand" },
+                    ];
+                }
+
+                case "equip": {
+                    const root = entity.getRootEntity();
+                    const plan = planEquipCommand(root, entity, {
+                        sourceEntityId: command.sourceEntityId,
+                        itemId: command.itemId,
+                        slot: command.slot,
+                    });
+                    if (plan.length === 0) {
+                        agent.playerCommand = undefined;
+                        entity.invalidateComponent("behavioragent");
+                        return [];
+                    }
+                    return plan;
+                }
+
+                case "equipFromHeld": {
+                    const held = entity.getEcsComponent(HeldItemComponentId);
+                    if (!held || isHeldEmpty(held)) {
+                        agent.playerCommand = undefined;
+                        entity.invalidateComponent("behavioragent");
+                        return [];
+                    }
+                    const root = entity.getRootEntity();
+                    return planEquipFromHeld(root, entity, command.slot);
+                }
 
                 case "interact":
                     // TODO: Implement interact action when interaction system is available

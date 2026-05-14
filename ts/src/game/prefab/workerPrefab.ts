@@ -1,7 +1,7 @@
 import { generateId } from "../../common/idGenerator.ts";
 import { spriteRefs } from "../../asset/sprite.ts";
 import { createEquipmentComponent } from "../component/equipmentComponent.ts";
-import { createInventoryComponent } from "../component/inventoryComponent.ts";
+import { createHeldItemComponent } from "../component/heldItemComponent.ts";
 import { createPlayerUnitComponent } from "../component/playerUnitComponent.ts";
 import { createSpriteComponent } from "../component/spriteComponent.ts";
 import { Entity } from "../entity/entity.ts";
@@ -18,45 +18,27 @@ import { createActiveEffectsComponent } from "../component/activeEffectsComponen
 import { createRoleComponent } from "../component/worker/roleComponent.ts";
 import { createMovementStaminaComponent } from "../component/movementStaminaComponent.ts";
 import { createStatsComponent } from "../component/statsComponent.ts";
-import {
-    createDesiredInventoryComponent,
-    type DesiredInventoryEntry,
-} from "../component/desiredInventoryComponent.ts";
-import { swordItem } from "../../data/inventory/items/equipment.ts";
 import { createThreatMapComponent } from "../component/threatMapComponent.ts";
 
-export function workerPrefab(
-    id?: string,
-    defaultDesiredInventory?: DesiredInventoryEntry[],
-): Entity {
+export function workerPrefab(id?: string): Entity {
     const entity = new Entity(id ?? generateId("worker"));
     const spriteComponent = createSpriteComponent(spriteRefs.empty_sprite);
     entity.setEcsComponent(spriteComponent);
     entity.setEcsComponent(createHealthComponent(150, 200));
     entity.setEcsComponent(createPlayerUnitComponent());
     entity.setEcsComponent(createEquipmentComponent());
-    entity.setEcsComponent(
-        createInventoryComponent([
-            {
-                amount: 1,
-                item: swordItem,
-            },
-        ]),
-    );
+    entity.setEcsComponent(createHeldItemComponent());
     entity.setEcsComponent(createVisibilityComponent());
     entity.setEcsComponent(createAnimationComponent(nobleKnightAnimationGraph));
     entity.setEcsComponent(createDirectionComponent());
     entity.setEcsComponent(createOccupationComponent());
     entity.setEcsComponent(createBehaviorAgentComponent());
     entity.setEcsComponent(createRoleComponent());
-    entity.setEcsComponent(createHungerComponent(0, 0.1)); // 0.1 per tick = ~7 minutes to go from 0 to 100
+    entity.setEcsComponent(createHungerComponent(0, 0.1));
     entity.setEcsComponent(createEnergyComponent(100));
     entity.setEcsComponent(createActiveEffectsComponent());
     entity.setEcsComponent(createMovementStaminaComponent());
     entity.setEcsComponent(createStatsComponent());
     entity.setEcsComponent(createThreatMapComponent());
-    entity.setEcsComponent(
-        createDesiredInventoryComponent(defaultDesiredInventory ?? []),
-    );
     return entity;
 }

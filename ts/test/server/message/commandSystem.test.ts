@@ -121,18 +121,14 @@ describe("commandSystem", () => {
     });
 
     describe("EquipItemCommand", () => {
-        it("equips item from inventory to slot", () => {
+        it("routes equip into the worker's player command", () => {
             const root = new Entity("root");
             const gameTime = createTestGameTime();
             const persistenceManager = createTestPersistenceManager();
 
             const entity = new Entity("entity1");
-            const inventory = createInventoryComponent();
-            addInventoryItem(inventory, swordItem, 1);
-            entity.setEcsComponent(inventory);
-
-            const equipment = createEquipmentComponent();
-            entity.setEcsComponent(equipment);
+            entity.setEcsComponent(createEquipmentComponent());
+            entity.setEcsComponent(createBehaviorAgentComponent());
             root.addChild(entity);
 
             const system = createCommandSystem(gameTime, persistenceManager);
@@ -141,66 +137,26 @@ describe("commandSystem", () => {
                 type: CommandGameMessageType,
                 command: {
                     id: EquipItemCommandId,
+                    entity: "entity1",
+                    sourceEntityId: "stockpile-1",
                     itemId: swordItem.id,
-                    slot: "main",
-                    entity: "entity1",
+                    slot: "primary",
                 } as EquipItemCommand,
             };
 
             system.onGameMessage?.(root, message);
 
-            const updatedEquipment =
-                entity.getEcsComponent(EquipmentComponentId);
-            assert.ok(updatedEquipment);
-            assert.strictEqual(updatedEquipment.slots.main?.id, swordItem.id);
-
-            const updatedInventory =
-                entity.getEcsComponent(InventoryComponentId);
-            assert.ok(updatedInventory);
-            assert.strictEqual(updatedInventory.items.length, 0);
+            const agent = entity.getEcsComponent(BehaviorAgentComponentId);
+            assert.ok(agent);
+            assert.deepStrictEqual(agent.playerCommand, {
+                action: "equip",
+                sourceEntityId: "stockpile-1",
+                itemId: swordItem.id,
+                slot: "primary",
+            });
         });
 
-        it("unequips item from slot to inventory", () => {
-            const root = new Entity("root");
-            const gameTime = createTestGameTime();
-            const persistenceManager = createTestPersistenceManager();
-
-            const entity = new Entity("entity1");
-            const inventory = createInventoryComponent();
-            entity.setEcsComponent(inventory);
-
-            const equipment = createEquipmentComponent();
-            equipment.slots.main = swordItem;
-            entity.setEcsComponent(equipment);
-            root.addChild(entity);
-
-            const system = createCommandSystem(gameTime, persistenceManager);
-
-            const message: CommandGameMessage = {
-                type: CommandGameMessageType,
-                command: {
-                    id: EquipItemCommandId,
-                    itemId: null,
-                    slot: "main",
-                    entity: "entity1",
-                } as EquipItemCommand,
-            };
-
-            system.onGameMessage?.(root, message);
-
-            const updatedEquipment =
-                entity.getEcsComponent(EquipmentComponentId);
-            assert.ok(updatedEquipment);
-            assert.strictEqual(updatedEquipment.slots.main, null);
-
-            const updatedInventory =
-                entity.getEcsComponent(InventoryComponentId);
-            assert.ok(updatedInventory);
-            assert.strictEqual(updatedInventory.items.length, 1);
-            assert.strictEqual(updatedInventory.items[0].item.id, swordItem.id);
-        });
-
-        it("handles missing entity gracefully", () => {
+        it("does nothing when entity is missing", () => {
             const root = new Entity("root");
             const gameTime = createTestGameTime();
             const persistenceManager = createTestPersistenceManager();
@@ -211,102 +167,15 @@ describe("commandSystem", () => {
                 type: CommandGameMessageType,
                 command: {
                     id: EquipItemCommandId,
-                    itemId: swordItem.id,
-                    slot: "main",
                     entity: "nonexistent",
-                } as EquipItemCommand,
-            };
-
-            // Should not throw
-            system.onGameMessage?.(root, message);
-        });
-
-        it("handles missing inventory component gracefully", () => {
-            const root = new Entity("root");
-            const gameTime = createTestGameTime();
-            const persistenceManager = createTestPersistenceManager();
-
-            const entity = new Entity("entity1");
-            const equipment = createEquipmentComponent();
-            entity.setEcsComponent(equipment);
-            root.addChild(entity);
-
-            const system = createCommandSystem(gameTime, persistenceManager);
-
-            const message: CommandGameMessage = {
-                type: CommandGameMessageType,
-                command: {
-                    id: EquipItemCommandId,
+                    sourceEntityId: "stockpile-1",
                     itemId: swordItem.id,
-                    slot: "main",
-                    entity: "entity1",
+                    slot: "primary",
                 } as EquipItemCommand,
             };
 
             // Should not throw
             system.onGameMessage?.(root, message);
-        });
-
-        it("handles missing equipment component gracefully", () => {
-            const root = new Entity("root");
-            const gameTime = createTestGameTime();
-            const persistenceManager = createTestPersistenceManager();
-
-            const entity = new Entity("entity1");
-            const inventory = createInventoryComponent();
-            addInventoryItem(inventory, swordItem, 1);
-            entity.setEcsComponent(inventory);
-            root.addChild(entity);
-
-            const system = createCommandSystem(gameTime, persistenceManager);
-
-            const message: CommandGameMessage = {
-                type: CommandGameMessageType,
-                command: {
-                    id: EquipItemCommandId,
-                    itemId: swordItem.id,
-                    slot: "main",
-                    entity: "entity1",
-                } as EquipItemCommand,
-            };
-
-            // Should not throw
-            system.onGameMessage?.(root, message);
-        });
-
-        it("handles insufficient item quantity gracefully", () => {
-            const root = new Entity("root");
-            const gameTime = createTestGameTime();
-            const persistenceManager = createTestPersistenceManager();
-
-            const entity = new Entity("entity1");
-            const inventory = createInventoryComponent(); // Empty inventory
-            entity.setEcsComponent(inventory);
-
-            const equipment = createEquipmentComponent();
-            entity.setEcsComponent(equipment);
-            root.addChild(entity);
-
-            const system = createCommandSystem(gameTime, persistenceManager);
-
-            const message: CommandGameMessage = {
-                type: CommandGameMessageType,
-                command: {
-                    id: EquipItemCommandId,
-                    itemId: swordItem.id,
-                    slot: "main",
-                    entity: "entity1",
-                } as EquipItemCommand,
-            };
-
-            // Should not throw
-            system.onGameMessage?.(root, message);
-
-            // Equipment should remain empty
-            const updatedEquipment =
-                entity.getEcsComponent(EquipmentComponentId);
-            assert.ok(updatedEquipment);
-            assert.strictEqual(updatedEquipment.slots.main, null);
         });
     });
 

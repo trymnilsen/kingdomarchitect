@@ -1,25 +1,29 @@
-import { EquipmentComponentId } from "../../component/equipmentComponent.ts";
 import {
     addInventoryItem,
     InventoryComponentId,
 } from "../../component/inventoryComponent.ts";
+import {
+    clearHeldItem,
+    HeldItemComponentId,
+    isHeldEmpty,
+} from "../../component/heldItemComponent.ts";
 import { StockpileComponentId } from "../../component/stockpileComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import {
     ActionComplete,
     type ActionResult,
 } from "./Action.ts";
+import { createLogger } from "../../../common/logging/logger.ts";
+
+const log = createLogger("behavior");
 
 export type DepositToStockpileActionData = {
     type: "depositToStockpile";
     stockpileId: string;
 };
-import { createLogger } from "../../../common/logging/logger.ts";
-
-const log = createLogger("behavior");
 
 /**
- * Deposit non-equipped inventory items to a stockpile.
+ * Deposit the worker's held item into a stockpile and clear held.
  */
 export function executeDepositToStockpileAction(
     action: DepositToStockpileActionData,
@@ -29,68 +33,34 @@ export function executeDepositToStockpileAction(
     const stockpile = root.findEntity(action.stockpileId);
 
     if (!stockpile) {
-        log.warn(
-            `Stockpile ${action.stockpileId} not found`,
-        );
+        log.warn(`Stockpile ${action.stockpileId} not found`);
         return {
             kind: "failed",
             cause: { type: "targetGone", entityId: action.stockpileId },
         };
     }
 
-    // Verify the stockpile has the required components
     const stockpileMarker = stockpile.getEcsComponent(StockpileComponentId);
     const stockpileInventory = stockpile.getEcsComponent(InventoryComponentId);
 
     if (!stockpileMarker || !stockpileInventory) {
-        log.warn(
-            `Entity ${action.stockpileId} is not a valid stockpile`,
-        );
+        log.warn(`Entity ${action.stockpileId} is not a valid stockpile`);
         return { kind: "failed", cause: { type: "unknown" } };
     }
 
-    const workerInventory = entity.getEcsComponent(InventoryComponentId);
-    if (!workerInventory || workerInventory.items.length === 0) {
-        // Nothing to deposit
+    const held = entity.getEcsComponent(HeldItemComponentId);
+    if (!held || isHeldEmpty(held)) {
         return ActionComplete;
     }
 
-    // Get equipped item IDs to exclude from deposit
-    const equipment = entity.getEcsComponent(EquipmentComponentId);
-    const equippedItemIds = new Set<string>();
+    addInventoryItem(stockpileInventory, held.item!, held.amount);
+    clearHeldItem(held);
 
-    if (equipment) {
-        if (equipment.slots.main) {
-            equippedItemIds.add(equipment.slots.main.id);
-        }
-        if (equipment.slots.other) {
-            equippedItemIds.add(equipment.slots.other.id);
-        }
-    }
-
-    // Transfer non-equipped items to stockpile
-    const itemsToRemove: number[] = [];
-
-    for (let i = 0; i < workerInventory.items.length; i++) {
-        const stack = workerInventory.items[i];
-        if (!equippedItemIds.has(stack.item.id)) {
-            addInventoryItem(stockpileInventory, stack.item, stack.amount);
-            itemsToRemove.push(i);
-        }
-    }
-
-    // Remove transferred items from worker inventory (in reverse order to preserve indices)
-    for (let i = itemsToRemove.length - 1; i >= 0; i--) {
-        workerInventory.items.splice(itemsToRemove[i], 1);
-    }
-
-    if (itemsToRemove.length > 0) {
-        entity.invalidateComponent(InventoryComponentId);
-        stockpile.invalidateComponent(InventoryComponentId);
-        log.info(
-            `Entity ${entity.id} deposited ${itemsToRemove.length} item stacks to stockpile`,
-        );
-    }
+    entity.invalidateComponent(HeldItemComponentId);
+    stockpile.invalidateComponent(InventoryComponentId);
+    log.info(
+        `Entity ${entity.id} deposited held into stockpile ${action.stockpileId}`,
+    );
 
     return ActionComplete;
 }

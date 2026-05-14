@@ -6,10 +6,9 @@ import {
     HealthComponentId,
 } from "../../../../src/game/component/healthComponent.ts";
 import {
-    createInventoryComponent,
-    getInventoryItem,
-    InventoryComponentId,
-} from "../../../../src/game/component/inventoryComponent.ts";
+    createHeldItemComponent,
+    HeldItemComponentId,
+} from "../../../../src/game/component/heldItemComponent.ts";
 import { createResourceComponent } from "../../../../src/game/component/resourceComponent.ts";
 import { executeHarvestResourceAction } from "../../../../src/game/behavior/actions/harvestResourceAction.ts";
 import {
@@ -37,7 +36,7 @@ function createTestScene(): {
     worker.worldPosition = { x: 10, y: 8 };
     resource.worldPosition = { x: 11, y: 8 }; // Adjacent
 
-    worker.setEcsComponent(createInventoryComponent());
+    worker.setEcsComponent(createHeldItemComponent());
     resource.setEcsComponent(createResourceComponent("tree1"));
     resource.setEcsComponent(createHealthComponent(30, 30));
 
@@ -84,11 +83,9 @@ describe("harvestResourceAction", () => {
 
             assert.strictEqual(result.kind, "complete");
 
-            const workerInventory =
-                worker.getEcsComponent(InventoryComponentId)!;
-            const wood = getInventoryItem(workerInventory, "wood");
-            assert.ok(wood);
-            assert.strictEqual(wood.amount, treeResource.yields[0].amount);
+            const held = worker.getEcsComponent(HeldItemComponentId)!;
+            assert.strictEqual(held.item?.id, "wood");
+            assert.strictEqual(held.amount, treeResource.yields[0].amount);
         });
 
         it("removes resource entity on completion", () => {
@@ -143,11 +140,9 @@ describe("harvestResourceAction", () => {
 
             assert.strictEqual(result.kind, "complete");
 
-            const workerInventory =
-                worker.getEcsComponent(InventoryComponentId)!;
-            const stone = getInventoryItem(workerInventory, "stone");
-            assert.ok(stone);
-            assert.strictEqual(stone.amount, stoneResource.yields[0].amount);
+            const held = worker.getEcsComponent(HeldItemComponentId)!;
+            assert.strictEqual(held.item?.id, "stone");
+            assert.strictEqual(held.amount, stoneResource.yields[0].amount);
         });
     });
 
@@ -215,11 +210,11 @@ describe("harvestResourceAction", () => {
             assert.strictEqual(result.kind, "failed");
         });
 
-        it("throws if worker has no inventory", () => {
+        it("throws if worker has no held component", () => {
             const { root, resource } = createTestScene();
-            const workerNoInv = new Entity("workerNoInv");
-            workerNoInv.worldPosition = { x: 10, y: 8 };
-            root.addChild(workerNoInv);
+            const workerNoHeld = new Entity("workerNoHeld");
+            workerNoHeld.worldPosition = { x: 10, y: 8 };
+            root.addChild(workerNoHeld);
 
             const action = {
                 type: "harvestResource" as const,
@@ -228,7 +223,7 @@ describe("harvestResourceAction", () => {
             };
 
             assert.throws(() => {
-                executeHarvestResourceAction(action, workerNoInv, 0);
+                executeHarvestResourceAction(action, workerNoHeld, 0);
             });
         });
 
@@ -290,7 +285,7 @@ describe("harvestResourceAction", () => {
             executeHarvestResourceAction(action, worker, 0);
 
             assert.strictEqual(
-                tracker.wasInvalidated("worker", InventoryComponentId),
+                tracker.wasInvalidated("worker", HeldItemComponentId),
                 true,
                 "InventoryComponent should be invalidated when yields are granted",
             );
@@ -313,7 +308,7 @@ describe("harvestResourceAction", () => {
             executeHarvestResourceAction(action, worker, 0);
 
             assert.strictEqual(
-                tracker.wasInvalidated("worker", InventoryComponentId),
+                tracker.wasInvalidated("worker", HeldItemComponentId),
                 true,
                 "InventoryComponent should be invalidated when work-based harvest completes",
             );

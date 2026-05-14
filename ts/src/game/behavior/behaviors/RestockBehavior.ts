@@ -3,12 +3,14 @@ import {
     findStockpileDeficits,
     findStockpileSurplus,
 } from "../../building/materialQuery.ts";
-import { InventoryComponentId } from "../../component/inventoryComponent.ts";
+import {
+    HeldItemComponentId,
+    isHeldEmpty,
+} from "../../component/heldItemComponent.ts";
 import { getSettlementEntity } from "../../entity/settlementQueries.ts";
 import type { Entity } from "../../entity/entity.ts";
 import type { BehaviorActionData } from "../actions/ActionData.ts";
 import type { Behavior } from "./Behavior.ts";
-import { WORKER_INVENTORY_CAPACITY } from "./HaulBehavior.ts";
 import type { StockpileDeficit, StockpileSurplus } from "../../building/materialQuery.ts";
 
 /**
@@ -24,7 +26,9 @@ export function createRestockBehavior(): Behavior {
         name: "restock",
 
         isValid(entity: Entity): boolean {
-            if (!entity.getEcsComponent(InventoryComponentId)) {
+            const held = entity.getEcsComponent(HeldItemComponentId);
+            if (!held || !isHeldEmpty(held)) {
+                // Restock is an idle-loop trip; only fires when held is free.
                 return false;
             }
 
@@ -110,11 +114,7 @@ export function createRestockBehavior(): Behavior {
                 return [];
             }
 
-            const amount = Math.min(
-                bestSource.surplus,
-                bestDeficit.deficit,
-                WORKER_INVENTORY_CAPACITY,
-            );
+            const amount = Math.min(bestSource.surplus, bestDeficit.deficit);
 
             return [
                 {

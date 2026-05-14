@@ -1,10 +1,14 @@
 import { isPointAdjacentTo } from "../../../common/point.ts";
 import { createLogger } from "../../../common/logging/logger.ts";
 import {
-    addInventoryItem,
     InventoryComponentId,
     takeInventoryItem,
 } from "../../component/inventoryComponent.ts";
+import {
+    addToHeldItem,
+    HeldItemComponentId,
+    isHeldEmpty,
+} from "../../component/heldItemComponent.ts";
 import { spendEntityEnergy } from "../../component/energyComponent.ts";
 
 const log = createLogger("behavior");
@@ -23,10 +27,11 @@ import type { CraftingRecipe } from "../../../data/crafting/craftingRecipe.ts";
 
 /**
  * Two-phase to avoid consuming inputs and then losing them to a replan.
- * On the first tick, inputs are taken from the worker and inputsConsumed is set to true.
- * Subsequent ticks track progress toward completion without touching inventory again.
- * If the entity replans before completion, the consumed inputs are lost — intentional,
- * as partial crafting is treated as a failed attempt.
+ * On the first tick, inputs are taken from the building's input buffer
+ * and inputsConsumed is set to true. Subsequent ticks track progress
+ * toward completion without touching inventories. If the entity replans
+ * before completion, the consumed inputs are lost — intentional, as
+ * partial crafting is treated as a failed attempt.
  */
 export type CraftItemActionData = {
     type: "craftItem";
@@ -38,10 +43,13 @@ export type CraftItemActionData = {
 
 /**
  * Craft an item at a building.
- * - First tick: Consume inputs from worker inventory
- * - Progress stored on action.progress
- * - On completion: Add outputs to worker inventory
- * Assumes worker is already adjacent to building (moveTo should have run first).
+ * - First tick: consume inputs from the building's inventory.
+ * - Progress stored on action.progress.
+ * - On completion: deposit outputs into the worker's held slot.
+ *
+ * The planner is responsible for ensuring held is either empty or holds
+ * the same item id as the recipe's output before this action runs; if
+ * held holds an incompatible item the action fails.
  */
 export function executeCraftItemAction(
     action: CraftItemActionData,
@@ -65,21 +73,21 @@ export function executeCraftItemAction(
         return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 
-    const workerInventory = entity.requireEcsComponent(InventoryComponentId);
-    // Building inventory kept as structural validator; future input staging may use it.
-    buildingEntity.requireEcsComponent(InventoryComponentId);
+    const buildingInventory = buildingEntity.requireEcsComponent(
+        InventoryComponentId,
+    );
+    const held = entity.requireEcsComponent(HeldItemComponentId);
 
     const recipe = action.recipe;
 
-    // TODO: check inventory capacity before claiming craft jobs
     if (!action.inputsConsumed) {
         for (const input of recipe.inputs) {
-            const item = workerInventory.items.find(
-                (stack) => stack.item.id === input.item.id,
+            const stack = buildingInventory.items.find(
+                (s) => s.item.id === input.item.id,
             );
-            if (!item || item.amount < input.amount) {
+            if (!stack || stack.amount < input.amount) {
                 log.warn(
-                    `Worker missing materials: needs ${input.amount}x ${input.item.id}, has ${item?.amount ?? 0}`,
+                    `Building ${action.buildingId} missing materials: needs ${input.amount}x ${input.item.id}, has ${stack?.amount ?? 0}`,
                 );
                 return { kind: "failed", cause: { type: "noResources" } };
             }
@@ -87,7 +95,7 @@ export function executeCraftItemAction(
 
         for (const input of recipe.inputs) {
             const taken = takeInventoryItem(
-                workerInventory,
+                buildingInventory,
                 input.item.id,
                 input.amount,
             );
@@ -99,7 +107,7 @@ export function executeCraftItemAction(
             }
         }
 
-        entity.invalidateComponent(InventoryComponentId);
+        buildingEntity.invalidateComponent(InventoryComponentId);
         action.inputsConsumed = true;
     }
 
@@ -111,9 +119,18 @@ export function executeCraftItemAction(
 
     if (action.progress >= recipe.duration) {
         for (const output of recipe.outputs) {
-            addInventoryItem(workerInventory, output.item, output.amount);
+            if (
+                !isHeldEmpty(held) &&
+                held.item!.id !== output.item.id
+            ) {
+                log.warn(
+                    `Cannot deposit craft output: held has ${held.item!.id}, output is ${output.item.id}`,
+                );
+                return { kind: "failed", cause: { type: "unknown" } };
+            }
+            addToHeldItem(held, output.item, output.amount);
         }
-        entity.invalidateComponent(InventoryComponentId);
+        entity.invalidateComponent(HeldItemComponentId);
 
         const queueEntity = entity.getAncestorEntity(JobQueueComponentId);
         if (queueEntity) {

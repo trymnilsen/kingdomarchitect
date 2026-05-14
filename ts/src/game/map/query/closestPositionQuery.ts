@@ -31,12 +31,17 @@ export function createWalkableValidator(
  * @param root The root entity containing the map data
  * @param startPosition The world position to search from
  * @param validator Predicate that returns true when a candidate is acceptable
+ * @param maxRadius Optional Manhattan-distance bound. When set, the BFS
+ *  refuses to expand candidates whose Manhattan distance from
+ *  startPosition exceeds the radius and returns null if no valid spot
+ *  exists within that range. When omitted the search is unbounded.
  * @returns The closest valid world position, or null if none found
  */
 export function findClosestAvailablePosition(
     root: Entity,
     startPosition: Point,
     validator: PositionValidator = createWalkableValidator(root),
+    maxRadius?: number,
 ): Point | null {
     const positionsToVisit: Point[] = [startPosition];
     const visitedPositions = new Set<number>();
@@ -56,11 +61,19 @@ export function findClosestAvailablePosition(
         }
         visitedPositions.add(positionKey);
 
+        if (maxRadius !== undefined) {
+            const distance =
+                Math.abs(currentPosition.x - startPosition.x) +
+                Math.abs(currentPosition.y - startPosition.y);
+            if (distance > maxRadius) {
+                continue;
+            }
+        }
+
         if (validator(currentPosition)) {
             return currentPosition;
         }
 
-        // Add adjacent positions to search
         const adjacent = adjacentPoints(currentPosition);
         positionsToVisit.push(...adjacent);
     }

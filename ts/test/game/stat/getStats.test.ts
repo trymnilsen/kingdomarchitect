@@ -91,7 +91,7 @@ describe("getStats", () => {
             asset: emptySpriteRef,
             statModifiers: { wit: { flat: 2 } },
         };
-        equipment.slots.main = item;
+        equipment.slots.primary = item;
 
         const stats = getStats(entity);
         assert.strictEqual(stats.wit, 7); // 5 base + 2 flat

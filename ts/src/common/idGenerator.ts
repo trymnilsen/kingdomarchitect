@@ -9,3 +9,15 @@ export function generateId(tag: string): string {
     const newId = ++ids[tag];
     return `${tag}${newId}`;
 }
+
+export function getIdCounters(): IdCounterMap {
+    return { ...ids };
+}
+
+export function setIdCounters(state: IdCounterMap): void {
+    ids = { ...state };
+}
+
+export function resetIdCounters(): void {
+    ids = {};
+}

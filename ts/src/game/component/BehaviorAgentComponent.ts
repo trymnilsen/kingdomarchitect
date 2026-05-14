@@ -25,6 +25,19 @@ export type PlayerCommand =
     | {
           action: "interact";
           targetEntityId: string;
+      }
+    | {
+          action: "drop";
+      }
+    | {
+          action: "equip";
+          sourceEntityId: string;
+          itemId: string;
+          slot: "primary" | "secondary";
+      }
+    | {
+          action: "equipFromHeld";
+          slot: "primary" | "secondary";
       };
 
 /**

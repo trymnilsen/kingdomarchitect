@@ -1,4 +1,3 @@
-import type { ItemTransfer } from "../../behavior/actions/Action.ts";
 import type { BehaviorActionData } from "../../behavior/actions/ActionData.ts";
 import { BuildingComponentId } from "../../component/buildingComponent.ts";
 import {
@@ -6,6 +5,10 @@ import {
     InventoryComponentId,
     type InventoryComponent,
 } from "../../component/inventoryComponent.ts";
+import {
+    HeldItemComponentId,
+    isHeldEmpty,
+} from "../../component/heldItemComponent.ts";
 import { StockpileComponentId } from "../../component/stockpileComponent.ts";
 import { ResourceComponentId } from "../../component/resourceComponent.ts";
 import { ResourceHarvestMode } from "../../../data/inventory/items/naturalResource.ts";
@@ -14,28 +17,15 @@ import { woodResourceItem } from "../../../data/inventory/items/resources.ts";
 import type { Entity } from "../../entity/entity.ts";
 import type { BuildBuildingJob } from "../buildBuildingJob.ts";
 import { GoblinUnitComponentId } from "../../component/goblinUnitComponent.ts";
+import { findDropPosition } from "../../behavior/dropItem.ts";
 import { createLogger } from "../../../common/logging/logger.ts";
 
 const log = createLogger("job");
 
 /**
- * Goblin-specific build job planner. Unlike the player-worker planner,
- * goblins gather materials from the environment when stockpiles are empty.
- *
- * This planner handles job-assigned builds (from the camp job queue).
- * For survival-triggered builds (e.g. building a campfire when cold),
- * see goblinBuildPlanner.ts — that one also places scaffolding.
- *
- * Scaffolding placement is NOT handled here — the GoblinCampSystem does that
- * when it posts a build job to the camp queue. By the time this planner runs,
- * the scaffolded entity already exists in the world.
- *
- * Construction workflow:
- * 1. Building has all materials → moveTo + construct
- * 2. Goblin has materials → moveTo + deposit
- * 3. Camp stockpile has materials → moveTo + take
- * 4. Need to gather → find nearest tree → moveTo + harvest
- *    (only wood gathering is implemented; other materials stall silently)
+ * Goblin-specific build job planner under the held-item model.
+ * Goblins haul one material at a time from camp stockpiles or from the
+ * environment.
  */
 export function planGoblinBuildJob(
     root: Entity,
@@ -55,9 +45,9 @@ export function planGoblinBuildJob(
         return [];
     }
 
-    const workerInventory = worker.getEcsComponent(InventoryComponentId);
-    if (!workerInventory) {
-        log.warn("Goblin has no inventory");
+    const workerHeld = worker.getEcsComponent(HeldItemComponentId);
+    if (!workerHeld) {
+        log.warn("Goblin has no held component");
         return [];
     }
 
@@ -68,9 +58,8 @@ export function planGoblinBuildJob(
         buildingComponent.building.requirements?.materials ?? {};
     const remainingMaterials = buildingInventory
         ? getRemainingMaterials(buildingInventory, requirements)
-        : requirements;
+        : { ...requirements };
 
-    // State 1: Building ready to construct (all materials deposited)
     if (Object.keys(remainingMaterials).length === 0) {
         return [
             {
@@ -82,16 +71,10 @@ export function planGoblinBuildJob(
         ];
     }
 
-    // State 2: Goblin has needed materials
-    const materialsGoblinHas = getMaterialsWorkerHas(
-        workerInventory,
-        remainingMaterials,
-    );
-    if (Object.keys(materialsGoblinHas).length > 0) {
-        const itemsToDeposit: ItemTransfer[] = Object.entries(
-            materialsGoblinHas,
-        ).map(([itemId, amount]) => ({ itemId, amount }));
-
+    if (
+        !isHeldEmpty(workerHeld) &&
+        remainingMaterials[workerHeld.item!.id] !== undefined
+    ) {
         return [
             {
                 type: "moveTo",
@@ -101,12 +84,24 @@ export function planGoblinBuildJob(
             {
                 type: "depositToInventory",
                 targetEntityId: buildingEntity.id,
-                items: itemsToDeposit,
+                itemId: workerHeld.item!.id,
             },
         ];
     }
 
-    // State 3: Check camp stockpile for materials
+    if (!isHeldEmpty(workerHeld)) {
+        const dropPos = findDropPosition(
+            root,
+            worker.worldPosition,
+            workerHeld.item!,
+        );
+        if (!dropPos) return [];
+        return [
+            { type: "moveTo", target: dropPos },
+            { type: "dropHeld", destination: dropPos },
+        ];
+    }
+
     const campEntity = findCampEntity(worker, root);
     if (campEntity) {
         const stockpileWithMaterials = findCampStockpileWithMaterials(
@@ -114,36 +109,49 @@ export function planGoblinBuildJob(
             remainingMaterials,
         );
         if (stockpileWithMaterials) {
-            const itemsToTake = getItemsToTakeFromStockpile(
-                stockpileWithMaterials,
-                remainingMaterials,
+            const inventory = stockpileWithMaterials.requireEcsComponent(
+                InventoryComponentId,
             );
-            if (itemsToTake.length > 0) {
-                return [
-                    {
-                        type: "moveTo",
-                        target: stockpileWithMaterials.worldPosition,
-                        stopAdjacent: "cardinal",
-                    },
-                    {
-                        type: "takeFromInventory",
-                        sourceEntityId: stockpileWithMaterials.id,
-                        items: itemsToTake,
-                    },
-                ];
+            for (const [itemId, amountNeeded] of Object.entries(
+                remainingMaterials,
+            )) {
+                const item = getInventoryItem(inventory, itemId);
+                if (item && item.amount > 0) {
+                    const fetch = Math.min(item.amount, amountNeeded);
+                    return [
+                        {
+                            type: "moveTo",
+                            target: stockpileWithMaterials.worldPosition,
+                            stopAdjacent: "cardinal",
+                        },
+                        {
+                            type: "withdrawFromStockpile",
+                            stockpileId: stockpileWithMaterials.id,
+                            itemId,
+                            amount: fetch,
+                        },
+                        {
+                            type: "moveTo",
+                            target: buildingEntity.worldPosition,
+                            stopAdjacent: "cardinal",
+                        },
+                        {
+                            type: "depositToInventory",
+                            targetEntityId: buildingEntity.id,
+                            itemId,
+                        },
+                    ];
+                }
             }
         }
     }
 
-    // State 4: Gather materials from environment
     return planGatherMaterials(root, worker, remainingMaterials);
 }
 
 function findCampEntity(worker: Entity, root: Entity): Entity | null {
     const goblinUnit = worker.getEcsComponent(GoblinUnitComponentId);
-    if (!goblinUnit) {
-        return null;
-    }
+    if (!goblinUnit) return null;
     return root.findEntity(goblinUnit.campEntityId);
 }
 
@@ -163,72 +171,24 @@ function getRemainingMaterials(
     return remaining;
 }
 
-function getMaterialsWorkerHas(
-    workerInventory: InventoryComponent,
-    remainingMaterials: Record<string, number>,
-): Record<string, number> {
-    const has: Record<string, number> = {};
-    for (const [itemId, amountNeeded] of Object.entries(remainingMaterials)) {
-        const item = getInventoryItem(workerInventory, itemId);
-        if (item && item.amount > 0) {
-            has[itemId] = Math.min(item.amount, amountNeeded);
-        }
-    }
-    return has;
-}
-
 function findCampStockpileWithMaterials(
     campEntity: Entity,
     remainingMaterials: Record<string, number>,
 ): Entity | null {
     for (const child of campEntity.children) {
-        if (!child.hasComponent(StockpileComponentId)) {
-            continue;
-        }
+        if (!child.hasComponent(StockpileComponentId)) continue;
         const building = child.getEcsComponent(BuildingComponentId);
-        if (building?.scaffolded) {
-            continue;
-        }
+        if (building?.scaffolded) continue;
         const inventory = child.getEcsComponent(InventoryComponentId);
-        if (!inventory) {
-            continue;
-        }
+        if (!inventory) continue;
         for (const itemId of Object.keys(remainingMaterials)) {
             const item = getInventoryItem(inventory, itemId);
-            if (item && item.amount > 0) {
-                return child;
-            }
+            if (item && item.amount > 0) return child;
         }
     }
     return null;
 }
 
-function getItemsToTakeFromStockpile(
-    stockpile: Entity,
-    remainingMaterials: Record<string, number>,
-): ItemTransfer[] {
-    const inventory = stockpile.getEcsComponent(InventoryComponentId);
-    if (!inventory) {
-        return [];
-    }
-
-    const items: ItemTransfer[] = [];
-    for (const [itemId, amountNeeded] of Object.entries(remainingMaterials)) {
-        const item = getInventoryItem(inventory, itemId);
-        if (item && item.amount > 0) {
-            items.push({
-                itemId,
-                amount: Math.min(item.amount, amountNeeded),
-            });
-        }
-    }
-    return items;
-}
-
-// Tree resource IDs that can be chopped for wood.
-// This list is duplicated from goblinBuildPlanner. There's no centralized
-// "is choppable" flag on ResourceComponent yet — if adding a new tree type,
-// update both planners until that's consolidated.
 const choppableResourceIds = [
     "tree1",
     "pineTree",
@@ -260,7 +220,6 @@ function planGatherMaterials(
             ];
         }
     }
-
     log.warn("No resources found to gather");
     return [];
 }

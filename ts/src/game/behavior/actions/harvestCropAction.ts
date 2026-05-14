@@ -1,9 +1,6 @@
 import { isPointAdjacentTo } from "../../../common/point.ts";
 import { createLogger } from "../../../common/logging/logger.ts";
-import {
-    FarmComponentId,
-    FarmState,
-} from "../../component/farmComponent.ts";
+import { FarmComponentId, FarmState } from "../../component/farmComponent.ts";
 import {
     addInventoryItem,
     InventoryComponentId,
@@ -16,6 +13,11 @@ import {
     findJobClaimedBy,
 } from "../../job/jobLifecycle.ts";
 import { ActionComplete, type ActionResult } from "./Action.ts";
+import {
+    addToHeldItem,
+    canAddToHeld,
+    HeldItemComponentId,
+} from "../../component/heldItemComponent.ts";
 
 export type HarvestCropActionData = {
     type: "harvestCrop";
@@ -39,7 +41,9 @@ export function executeHarvestCropAction(
         };
     }
 
-    if (!isPointAdjacentTo(buildingEntity.worldPosition, entity.worldPosition)) {
+    if (
+        !isPointAdjacentTo(buildingEntity.worldPosition, entity.worldPosition)
+    ) {
         return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 
@@ -66,10 +70,10 @@ export function executeHarvestCropAction(
         log.warn(`Unknown crop item id: ${farm.cropItemId}`);
         return { kind: "failed", cause: { type: "unknown" } };
     }
-
-    const workerInventory = entity.requireEcsComponent(InventoryComponentId);
-    addInventoryItem(workerInventory, cropItem, farm.cropYieldAmount);
-    entity.invalidateComponent(InventoryComponentId);
+    const heldItemComponent = entity.requireEcsComponent(HeldItemComponentId);
+    const canAdd = canAddToHeld(heldItemComponent, cropItem);
+    addToHeldItem(heldItemComponent, cropItem, farm.cropYieldAmount);
+    entity.invalidateComponent(HeldItemComponentId);
 
     farm.state = FarmState.Empty;
     farm.plantedAtTick = 0;

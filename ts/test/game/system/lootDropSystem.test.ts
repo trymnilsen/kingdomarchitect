@@ -2,6 +2,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert";
 import { EcsWorld } from "../../../src/common/ecs/ecsWorld.ts";
 import { Entity } from "../../../src/game/entity/entity.ts";
+import { createMinimalWorld } from "../testWorld.ts";
 import { createGoblinUnitComponent } from "../../../src/game/component/goblinUnitComponent.ts";
 import {
     createHealthComponent,
@@ -17,8 +18,7 @@ import { lootDropSystem } from "../../../src/game/system/lootDropSystem.ts";
 
 describe("lootDropSystem", () => {
     it("spawns a collectable entity when a goblin is killed", () => {
-        const root = new Entity("root");
-        const world = new EcsWorld(root);
+        const { root, world } = createMinimalWorld();
         world.addSystem(lootDropSystem);
 
         const settlement = new Entity("settlement");
@@ -45,8 +45,7 @@ describe("lootDropSystem", () => {
     });
 
     it("does not spawn loot when a non-goblin entity dies", () => {
-        const root = new Entity("root");
-        const world = new EcsWorld(root);
+        const { root, world } = createMinimalWorld();
         world.addSystem(lootDropSystem);
 
         const unit = new Entity("unit-1");

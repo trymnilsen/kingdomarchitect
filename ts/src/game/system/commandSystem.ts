@@ -14,6 +14,19 @@ import {
     EquipItemCommandId,
     type EquipItemCommand,
 } from "../../server/message/command/equipItemCommand.ts";
+import {
+    DropHeldCommandId,
+    type DropHeldCommand,
+} from "../../server/message/command/dropHeldCommand.ts";
+import {
+    UnequipItemCommandId,
+    type UnequipItemCommand,
+} from "../../server/message/command/unequipItemCommand.ts";
+import {
+    EquipFromHeldCommandId,
+    type EquipFromHeldCommand,
+} from "../../server/message/command/equipFromHeldCommand.ts";
+import { HeldItemComponentId } from "../component/heldItemComponent.ts";
 import { markStatsDirty } from "../component/statsComponent.ts";
 import {
     NewGameCommandId,
@@ -86,11 +99,6 @@ import {
     setPreferredAmount,
     StockpileComponentId,
 } from "../component/stockpileComponent.ts";
-import {
-    UpdateDesiredInventoryCommandId,
-    type UpdateDesiredInventoryCommand,
-} from "../../server/message/command/updateDesiredInventoryCommand.ts";
-import { DesiredInventoryComponentId } from "../component/desiredInventoryComponent.ts";
 
 const log = createLogger("command");
 
@@ -132,6 +140,15 @@ function onGameMessage(
         case EquipItemCommandId:
             equipItem(root, message.command as EquipItemCommand);
             break;
+        case DropHeldCommandId:
+            dropHeld(root, message.command as DropHeldCommand);
+            break;
+        case UnequipItemCommandId:
+            unequipItem(root, message.command as UnequipItemCommand);
+            break;
+        case EquipFromHeldCommandId:
+            equipFromHeld(root, message.command as EquipFromHeldCommand);
+            break;
         case BuildCommandId:
             buildBuilding(root, message.command as BuildCommand);
             break;
@@ -158,12 +175,6 @@ function onGameMessage(
             handleSetPreferredAmount(
                 root,
                 message.command as SetPreferredAmountCommand,
-            );
-            break;
-        case UpdateDesiredInventoryCommandId:
-            handleUpdateDesiredInventory(
-                root,
-                message.command as UpdateDesiredInventoryCommand,
             );
             break;
     }
@@ -251,48 +262,113 @@ function equipItem(root: Entity, command: EquipItemCommand) {
         return;
     }
 
-    const inventory = entity.getEcsComponent(InventoryComponentId);
     const equipment = entity.getEcsComponent(EquipmentComponentId);
-    if (!inventory) {
-        log.error("Unable to equip, inventory component not found");
-        return;
-    }
     if (!equipment) {
         log.error("Unable to equip, equipment component not found");
         return;
     }
 
-    const slotExists = command.slot in equipment.slots;
-    if (!slotExists) {
+    if (!(command.slot in equipment.slots)) {
         log.error("No equipment slot on entity", {
             slot: command.slot,
             entityId: entity.id,
         });
         return;
     }
-    // An item id can either be defined meaning equip or null meaning unequip
-    const itemId = command.itemId;
-    if (itemId) {
-        const withdrawnItems = takeInventoryItem(inventory, itemId, 1);
-        if (!withdrawnItems || withdrawnItems.length === 0) {
-            log.error("Not enough items to take item from inventory");
-            return;
-        }
 
-        equipment.slots[command.slot] = withdrawnItems[0].item;
-    } else {
-        const itemAtSlot = equipment.slots[command.slot];
-        if (!itemAtSlot) {
-            //Cannot unequit an item in a slot with no item
-            return;
-        }
-
-        addInventoryItem(inventory, itemAtSlot, 1);
-        equipment.slots[command.slot] = null;
+    const agent = entity.getEcsComponent(BehaviorAgentComponentId);
+    if (!agent) {
+        log.warn("Equip: entity has no behavior agent", {
+            entity: command.entity,
+        });
+        return;
     }
-    entity.invalidateComponent(InventoryComponentId);
+
+    agent.playerCommand = {
+        action: "equip",
+        sourceEntityId: command.sourceEntityId,
+        itemId: command.itemId,
+        slot: command.slot,
+    };
+    entity.invalidateComponent(BehaviorAgentComponentId);
+    requestBehaviorReplan(entity);
+}
+
+function unequipItem(root: Entity, command: UnequipItemCommand) {
+    const entity = root.findEntity(command.entity);
+    if (!entity) {
+        log.error("Unable to unequip, entity not found");
+        return;
+    }
+
+    const equipment = entity.getEcsComponent(EquipmentComponentId);
+    const held = entity.getEcsComponent(HeldItemComponentId);
+    if (!equipment || !held) {
+        log.error("Unable to unequip, missing equipment or held component");
+        return;
+    }
+
+    const slotItem = equipment.slots[command.slot];
+    if (!slotItem) {
+        return;
+    }
+
+    if (held.item !== null && held.amount > 0) {
+        log.warn("Unequip failed: held is occupied", {
+            entity: command.entity,
+            slot: command.slot,
+        });
+        return;
+    }
+
+    held.item = slotItem;
+    held.amount = 1;
+    equipment.slots[command.slot] = null;
+
+    entity.invalidateComponent(HeldItemComponentId);
     entity.invalidateComponent(EquipmentComponentId);
     markStatsDirty(entity);
+}
+
+function equipFromHeld(root: Entity, command: EquipFromHeldCommand) {
+    const entity = root.findEntity(command.entity);
+    if (!entity) {
+        log.error("Unable to equipFromHeld, entity not found");
+        return;
+    }
+    const equipment = entity.getEcsComponent(EquipmentComponentId);
+    if (!equipment) return;
+    if (!(command.slot in equipment.slots)) return;
+
+    const agent = entity.getEcsComponent(BehaviorAgentComponentId);
+    if (!agent) return;
+
+    agent.playerCommand = {
+        action: "equipFromHeld",
+        slot: command.slot,
+    };
+    entity.invalidateComponent(BehaviorAgentComponentId);
+    requestBehaviorReplan(entity);
+}
+
+function dropHeld(root: Entity, command: DropHeldCommand) {
+    const entity = root.findEntity(command.entity);
+    if (!entity) {
+        log.warn("DropHeld: entity not found", { entity: command.entity });
+        return;
+    }
+
+    const agent = entity.getEcsComponent(BehaviorAgentComponentId);
+    if (!agent) {
+        log.warn("DropHeld: entity has no behavior agent", {
+            entity: command.entity,
+        });
+        return;
+    }
+
+    agent.playerCommand = { action: "drop" };
+    entity.invalidateComponent(BehaviorAgentComponentId);
+    requestBehaviorReplan(entity);
 }
 
 function consumeItem(root: Entity, command: ConsumeItemCommand) {
@@ -455,26 +531,3 @@ function handleSetPreferredAmount(
     stockpile.invalidateComponent(StockpileComponentId);
 }
 
-function handleUpdateDesiredInventory(
-    root: Entity,
-    command: UpdateDesiredInventoryCommand,
-) {
-    const entity = root.findEntity(command.entityId);
-    if (!entity) {
-        log.warn("Entity not found for UpdateDesiredInventory", {
-            entityId: command.entityId,
-        });
-        return;
-    }
-
-    const desiredInventory = entity.getEcsComponent(DesiredInventoryComponentId);
-    if (!desiredInventory) {
-        log.warn("Entity has no DesiredInventoryComponent", {
-            entityId: command.entityId,
-        });
-        return;
-    }
-
-    desiredInventory.items = command.items;
-    entity.invalidateComponent(DesiredInventoryComponentId);
-}

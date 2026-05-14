@@ -3,8 +3,8 @@ import type { InventoryItem } from "../../data/inventory/inventoryItem.ts";
 export type EquipmentComponent = {
     id: typeof EquipmentComponentId;
     slots: {
-        main: InventoryItem | null;
-        other: InventoryItem | null;
+        primary: InventoryItem | null;
+        secondary: InventoryItem | null;
     };
 };
 
@@ -12,8 +12,8 @@ export function createEquipmentComponent(): EquipmentComponent {
     return {
         id: EquipmentComponentId,
         slots: {
-            main: null,
-            other: null,
+            primary: null,
+            secondary: null,
         },
     };
 }

@@ -1,9 +1,9 @@
 import { createLogger } from "../../../common/logging/logger.ts";
-import { findFoodInInventory } from "../../../data/inventory/inventoryItemHelpers.ts";
+import { ItemTag } from "../../../data/inventory/inventoryItem.ts";
 import {
-    InventoryComponentId,
-    takeInventoryItem,
-} from "../../component/inventoryComponent.ts";
+    HeldItemComponentId,
+    isHeldEmpty,
+} from "../../component/heldItemComponent.ts";
 import {
     decreaseHunger,
     HungerComponentId,
@@ -11,30 +11,31 @@ import {
 import type { Entity } from "../../entity/entity.ts";
 import { ActionComplete, type ActionResult } from "./Action.ts";
 
-export type EatFromInventoryActionData = {
-    type: "eatFromInventory";
+export type EatFromHeldActionData = {
+    type: "eatFromHeld";
 };
 
 const HUNGER_REDUCTION = 30;
-
 const log = createLogger("behavior");
 
-export function executeEatFromInventoryAction(
-    _action: EatFromInventoryActionData,
+export function executeEatFromHeldAction(
+    _action: EatFromHeldActionData,
     entity: Entity,
 ): ActionResult {
-    const inventory = entity.getEcsComponent(InventoryComponentId);
-    if (!inventory) {
+    const held = entity.getEcsComponent(HeldItemComponentId);
+    if (!held || isHeldEmpty(held)) {
+        return { kind: "failed", cause: { type: "noResources" } };
+    }
+    if (!held.item!.tag?.includes(ItemTag.Food)) {
         return { kind: "failed", cause: { type: "noResources" } };
     }
 
-    const foodStack = findFoodInInventory(inventory);
-    if (!foodStack) {
-        return { kind: "failed", cause: { type: "noResources" } };
+    held.amount -= 1;
+    if (held.amount <= 0) {
+        held.item = null;
+        held.amount = 0;
     }
-
-    takeInventoryItem(inventory, foodStack.item.id, 1);
-    entity.invalidateComponent(InventoryComponentId);
+    entity.invalidateComponent(HeldItemComponentId);
 
     const hungerComp = entity.getEcsComponent(HungerComponentId);
     if (hungerComp) {

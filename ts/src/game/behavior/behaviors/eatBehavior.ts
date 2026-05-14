@@ -1,5 +1,13 @@
 import { distance } from "../../../common/point.ts";
+import { ItemTag } from "../../../data/inventory/inventoryItem.ts";
 import { InventoryComponentId } from "../../component/inventoryComponent.ts";
+import { CollectableComponentId } from "../../component/collectableComponent.ts";
+import { GroundItemComponentId } from "../../component/groundItemComponent.ts";
+import { EquipmentComponentId } from "../../component/equipmentComponent.ts";
+import {
+    HeldItemComponentId,
+    isHeldEmpty,
+} from "../../component/heldItemComponent.ts";
 import { HungerComponentId } from "../../component/hungerComponent.ts";
 import { ResourceComponentId } from "../../component/resourceComponent.ts";
 import { StockpileComponentId } from "../../component/stockpileComponent.ts";
@@ -10,6 +18,7 @@ import { ResourceHarvestMode } from "../../../data/inventory/items/naturalResour
 import type { Entity } from "../../entity/entity.ts";
 import type { BehaviorActionData } from "../actions/ActionData.ts";
 import type { Behavior } from "./Behavior.ts";
+import { findStockpiles } from "../../building/materialQuery.ts";
 
 export const HUNGER_THRESHOLD = 40;
 export const STEAL_THRESHOLD = 80;
@@ -37,45 +46,79 @@ export function createEatBehavior(): Behavior {
             const hunger = entity.getEcsComponent(HungerComponentId);
             if (!hunger) return [];
 
-            const inventory = entity.getEcsComponent(InventoryComponentId);
+            // Stage 1: eat from equipment slot
+            const equipmentSlot = findEquippedFoodSlot(entity);
+            if (equipmentSlot) {
+                return [{ type: "eatFromEquipment", slot: equipmentSlot }];
+            }
 
-            // Stage 1: eat from inventory
-            if (inventory) {
-                const foodStack = findFoodInInventory(inventory);
-                if (foodStack) {
-                    return [{ type: "eatFromInventory" }];
+            // Stage 2: eat from held
+            const held = entity.getEcsComponent(HeldItemComponentId);
+            if (
+                held &&
+                !isHeldEmpty(held) &&
+                held.item!.tag?.includes(ItemTag.Food)
+            ) {
+                return [{ type: "eatFromHeld" }];
+            }
+
+            const actions: BehaviorActionData[] = [];
+            const settlement = getSettlementEntity(entity);
+
+            // Stage 3: Drop any held items
+            if (held && !isHeldEmpty(held)) {
+                actions.push({
+                    type: "dropHeld",
+                });
+            }
+
+            // Stage 4: walk to stockpile food
+            const stockpileActions = tryStockpileStage(entity, settlement);
+
+            if (stockpileActions) {
+                actions.push(...stockpileActions);
+                return actions;
+            }
+
+            // Stage 5: walk to ground pile food
+            const groundPileActions = tryGroundPileStage(entity);
+            if (groundPileActions) {
+                actions.push(...groundPileActions);
+                return actions;
+            }
+
+            // Stage 6: forage from world resource
+            const forageActions = tryForageStage(entity);
+            if (forageActions) {
+                actions.push(...forageActions);
+                return actions;
+            }
+
+            // Stage 7: steal at critical hunger
+            if (hunger.hunger >= STEAL_THRESHOLD) {
+                const stealActions = tryStealStage(entity);
+                if (stealActions) {
+                    actions.push(...stealActions);
+                    return actions;
                 }
             }
 
-            // Stage 2: take from any stockpile that has food
-            const settlement = getSettlementEntity(entity);
-            const stage2Actions = tryStockpileStage(entity, settlement);
-            if (stage2Actions) return stage2Actions;
-
-            // Stage 3: forage from world resource
-            const forageActions = tryForageStage(entity);
-            if (forageActions) return forageActions;
-
-            // Stage 4: steal (only at critical hunger)
-            if (hunger.hunger >= STEAL_THRESHOLD) {
-                const stealActions = tryStealStage(entity);
-                if (stealActions) return stealActions;
-            }
-
-            // Stage 5: nothing viable
+            // Stage 8: nothing viable
             return [];
         },
     };
 }
 
-/**
- * Pick the nearest stockpile that holds any food and plan a fetch.
- *
- * The worker's DesiredInventoryComponent is intentionally ignored here — that
- * component expresses what the worker likes to *carry*, and is consumed by the
- * refill behavior. A hungry worker should eat whatever food is reachable, not
- * skip past a stockpile because it doesn't hold their preferred carry item.
- */
+function findEquippedFoodSlot(entity: Entity): "primary" | "secondary" | null {
+    const equipment = entity.getEcsComponent(EquipmentComponentId);
+    if (!equipment) return null;
+    if (equipment.slots.primary?.tag?.includes(ItemTag.Food)) return "primary";
+    if (equipment.slots.secondary?.tag?.includes(ItemTag.Food)) {
+        return "secondary";
+    }
+    return null;
+}
+
 function tryStockpileStage(
     entity: Entity,
     settlement: Entity,
@@ -87,7 +130,8 @@ function tryStockpileStage(
     let nearestDist = Infinity;
 
     for (const [stockpileEntity] of stockpiles) {
-        const stockpileInv = stockpileEntity.getEcsComponent(InventoryComponentId);
+        const stockpileInv =
+            stockpileEntity.getEcsComponent(InventoryComponentId);
         if (!stockpileInv) continue;
         const foodStack = findFoodInInventory(stockpileInv);
         if (!foodStack) continue;
@@ -114,7 +158,38 @@ function tryStockpileStage(
             itemId: nearestItemId,
             amount: 1,
         },
-        { type: "eatFromInventory" },
+        { type: "eatFromHeld" },
+    ];
+}
+
+function tryGroundPileStage(entity: Entity): BehaviorActionData[] | null {
+    const root = entity.getRootEntity();
+    const piles = root.queryComponents(GroundItemComponentId);
+
+    let nearest: Entity | null = null;
+    let nearestDist = Infinity;
+    for (const [pile] of piles) {
+        const collectable = pile.getEcsComponent(CollectableComponentId);
+        if (!collectable) continue;
+        const hasFood = collectable.items.some((stack) =>
+            stack.item.tag?.includes(ItemTag.Food),
+        );
+        if (!hasFood) continue;
+        const d = distance(entity.worldPosition, pile.worldPosition);
+        if (d < nearestDist) {
+            nearestDist = d;
+            nearest = pile;
+        }
+    }
+    if (!nearest) return null;
+    return [
+        {
+            type: "moveTo",
+            target: nearest.worldPosition,
+            stopAdjacent: "cardinal",
+        },
+        { type: "pickupFromGround", pileEntityId: nearest.id },
+        { type: "eatFromHeld" },
     ];
 }
 
@@ -149,7 +224,7 @@ function tryForageStage(entity: Entity): BehaviorActionData[] | null {
             entityId: nearestResource.id,
             harvestAction: ResourceHarvestMode.Pick,
         },
-        { type: "eatFromInventory" },
+        { type: "eatFromHeld" },
     ];
 }
 
@@ -166,7 +241,8 @@ function tryStealStage(entity: Entity): BehaviorActionData[] | null {
         const d = distance(entity.worldPosition, candidate.worldPosition);
         if (d > STEAL_SEARCH_RADIUS) continue;
 
-        const candidateInventory = candidate.getEcsComponent(InventoryComponentId);
+        const candidateInventory =
+            candidate.getEcsComponent(InventoryComponentId);
         if (!candidateInventory) continue;
 
         const foodStack = findFoodInInventory(candidateInventory);
@@ -190,6 +266,6 @@ function tryStealStage(entity: Entity): BehaviorActionData[] | null {
             type: "stealFood",
             targetEntityId: bestTarget.id,
         },
-        { type: "eatFromInventory" },
+        { type: "eatFromHeld" },
     ];
 }

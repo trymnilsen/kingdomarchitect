@@ -2,7 +2,7 @@ import { distance } from "../../../common/point.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import type { JobQueueComponent } from "../../component/jobQueueComponent.ts";
-import type { Jobs } from "../../job/job.ts";
+import { isJobValid, type Jobs } from "../../job/job.ts";
 import type { BehaviorActionData } from "../actions/ActionData.ts";
 import type { Behavior } from "./Behavior.ts";
 import {
@@ -12,6 +12,13 @@ import {
 import { findJobClaimedBy, claimJobInQueue } from "../../job/jobLifecycle.ts";
 import { planJob } from "../../job/planner/jobPlanner.ts";
 import type { BuildJobPlanner } from "../../job/planner/jobPlanner.ts";
+import type { CollectResourceJob } from "../../job/collectResourceJob.ts";
+import { ResourceComponentId } from "../../component/resourceComponent.ts";
+import {
+    HeldItemComponentId,
+    isHeldEmpty,
+} from "../../component/heldItemComponent.ts";
+import { getResourceById } from "../../../data/inventory/items/naturalResource.ts";
 
 type BuildJobValidator = (
     root: Entity,
@@ -56,7 +63,7 @@ export function createPerformJobBehavior(
             }
 
             // Valid if there are unclaimed jobs we can take
-            return hasAvailableJobs(entity, jobQueue);
+            return hasAvailableJobs(entity, jobQueue, buildJobValidator);
         },
 
         utility(_entity: Entity): number {
@@ -125,12 +132,18 @@ export function createPerformJobBehavior(
 }
 
 /**
- * Check if there are available jobs for this entity.
+ * Check if there are available jobs for this entity. The buildJobValidator
+ * mirrors the one used by findBestJob so isValid() and findBestJob() agree
+ * on whether a build job can be executed by this worker — goblins that
+ * gather from the environment pass `() => true` to bypass the stockpile
+ * pre-check that player workers rely on.
  */
 function hasAvailableJobs(
     entity: Entity,
     jobQueue: JobQueueComponent,
+    buildJobValidator: BuildJobValidator,
 ): boolean {
+    const root = entity.getRootEntity();
     for (const job of jobQueue.jobs) {
         if (job.claimedBy !== undefined) {
             continue;
@@ -141,6 +154,14 @@ function hasAvailableJobs(
             job.constraint.type === "entity" &&
             job.constraint.id !== entity.id
         ) {
+            continue;
+        }
+
+        if (job.id === "buildBuildingJob") {
+            if (!buildJobValidator(root, job as BuildBuildingJob, entity)) {
+                continue;
+            }
+        } else if (!isJobValid(job, entity)) {
             continue;
         }
 
@@ -222,9 +243,43 @@ function canExecuteJob(
                 job as BuildBuildingJob,
                 workerEntity,
             );
+        case "collectResource":
+            return canHeldAcceptResourceYield(
+                root,
+                job as CollectResourceJob,
+                workerEntity,
+            );
         default:
             return true;
     }
+}
+
+/**
+ * Reject collect-resource jobs when the worker is already carrying
+ * something incompatible with the resource's yield. Without this guard
+ * the worker would walk to the tree, swing for several ticks, then fail
+ * at the deposit step with full progress wasted.
+ */
+function canHeldAcceptResourceYield(
+    root: Entity,
+    job: CollectResourceJob,
+    worker: Entity,
+): boolean {
+    const held = worker.getEcsComponent(HeldItemComponentId);
+    if (!held || isHeldEmpty(held)) return true;
+
+    const resourceEntity = root.findEntity(job.entityId);
+    if (!resourceEntity) return false;
+
+    const resourceComponent =
+        resourceEntity.getEcsComponent(ResourceComponentId);
+    if (!resourceComponent) return false;
+
+    const resource = getResourceById(resourceComponent.resourceId);
+    if (!resource) return false;
+
+    const heldId = held.item!.id;
+    return resource.yields.every((y) => y.item.id === heldId);
 }
 
 /**
@@ -247,6 +302,7 @@ function getJobTargetPosition(
             return entity?.worldPosition ?? null;
         }
         case "farmPlantJob":
+        case "windmillJob":
         case "farmHarvestJob": {
             const entity = root.findEntity(job.targetBuilding);
             return entity?.worldPosition ?? null;

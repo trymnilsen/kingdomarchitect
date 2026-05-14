@@ -10,7 +10,7 @@ describe("ConsumeItemCommand", () => {
     it("creates command with correct id", () => {
         const entity = new Entity("player");
 
-        const command = ConsumeItemCommand("main", entity);
+        const command = ConsumeItemCommand("primary", entity);
 
         assert.strictEqual(command.id, ConsumeItemCommandId);
         assert.strictEqual(command.id, "consumeItem");
@@ -19,17 +19,17 @@ describe("ConsumeItemCommand", () => {
     it("stores slot type", () => {
         const entity = new Entity("player");
 
-        const mainCommand = ConsumeItemCommand("main", entity);
-        const otherCommand = ConsumeItemCommand("other", entity);
+        const primaryCommand = ConsumeItemCommand("primary", entity);
+        const secondaryCommand = ConsumeItemCommand("secondary", entity);
 
-        assert.strictEqual(mainCommand.slot, "main");
-        assert.strictEqual(otherCommand.slot, "other");
+        assert.strictEqual(primaryCommand.slot, "primary");
+        assert.strictEqual(secondaryCommand.slot, "secondary");
     });
 
     it("uses entity id from entity object", () => {
         const entity = new Entity("warrior1");
 
-        const command = ConsumeItemCommand("main", entity);
+        const command = ConsumeItemCommand("primary", entity);
 
         assert.strictEqual(command.entity, "warrior1");
     });
@@ -38,8 +38,8 @@ describe("ConsumeItemCommand", () => {
         const entity1 = new Entity("player1");
         const entity2 = new Entity("player2");
 
-        const command1 = ConsumeItemCommand("main", entity1);
-        const command2 = ConsumeItemCommand("main", entity2);
+        const command1 = ConsumeItemCommand("primary", entity1);
+        const command2 = ConsumeItemCommand("primary", entity2);
 
         assert.strictEqual(command1.entity, "player1");
         assert.strictEqual(command2.entity, "player2");

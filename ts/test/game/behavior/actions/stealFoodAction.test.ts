@@ -6,6 +6,10 @@ import {
     addInventoryItem,
     InventoryComponentId,
 } from "../../../../src/game/component/inventoryComponent.ts";
+import {
+    createHeldItemComponent,
+    HeldItemComponentId,
+} from "../../../../src/game/component/heldItemComponent.ts";
 import { executeStealFoodAction } from "../../../../src/game/behavior/actions/stealFoodAction.ts";
 import { breadItem } from "../../../../src/data/inventory/items/resources.ts";
 
@@ -20,7 +24,7 @@ function createTestScene(): { root: Entity; thief: Entity; target: Entity } {
     thief.worldPosition = { x: 12, y: 8 };
     target.worldPosition = { x: 13, y: 8 }; // Adjacent
 
-    thief.setEcsComponent(createInventoryComponent());
+    thief.setEcsComponent(createHeldItemComponent());
 
     const targetInventory = createInventoryComponent();
     addInventoryItem(targetInventory, breadItem, 3);
@@ -38,10 +42,9 @@ describe("stealFoodAction", () => {
 
         assert.strictEqual(result.kind, "complete");
 
-        const thiefInventory = thief.getEcsComponent(InventoryComponentId)!;
-        const stolenStack = thiefInventory.items.find((s) => s.item.id === breadItem.id);
-        assert.ok(stolenStack);
-        assert.strictEqual(stolenStack.amount, 1);
+        const thiefHeld = thief.getEcsComponent(HeldItemComponentId)!;
+        assert.strictEqual(thiefHeld.item?.id, breadItem.id);
+        assert.strictEqual(thiefHeld.amount, 1);
 
         const targetInventory = target.getEcsComponent(InventoryComponentId)!;
         const remainingStack = targetInventory.items.find((s) => s.item.id === breadItem.id);

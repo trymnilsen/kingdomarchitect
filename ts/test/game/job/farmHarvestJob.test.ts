@@ -11,9 +11,10 @@ import { planFarmHarvest } from "../../../src/game/job/planner/farmHarvestJobPla
 import { createFarmHarvestJob } from "../../../src/game/job/farmHarvestJob.ts";
 import { executeHarvestCropAction } from "../../../src/game/behavior/actions/harvestCropAction.ts";
 import {
-    createInventoryComponent,
-    InventoryComponentId,
-} from "../../../src/game/component/inventoryComponent.ts";
+    createHeldItemComponent,
+    HeldItemComponentId,
+    isHeldEmpty,
+} from "../../../src/game/component/heldItemComponent.ts";
 
 function createTestScene(): { root: Entity; worker: Entity; farm: Entity } {
     const root = new Entity("root");
@@ -33,7 +34,7 @@ function createTestScene(): { root: Entity; worker: Entity; farm: Entity } {
     farmComp.cropYieldAmount = 4;
     farm.setEcsComponent(farmComp);
 
-    worker.setEcsComponent(createInventoryComponent());
+    worker.setEcsComponent(createHeldItemComponent());
 
     return { root, worker, farm };
 }
@@ -94,17 +95,17 @@ describe("farmHarvestJobPlanner", () => {
 });
 
 describe("harvestCropAction", () => {
-    it("adds cropYieldAmount of crop item to worker inventory", () => {
+    it("adds cropYieldAmount of crop item to worker held slot", () => {
         const { worker } = createTestScene();
         const action = { type: "harvestCrop" as const, buildingId: "farm" };
 
         const result = executeHarvestCropAction(action, worker);
 
         assert.strictEqual(result.kind, "complete");
-        const inventory = worker.getEcsComponent(InventoryComponentId)!;
-        const wheatStack = inventory.items.find((s) => s.item.id === "wheat");
-        assert.ok(wheatStack, "wheat should be in worker inventory");
-        assert.strictEqual(wheatStack.amount, 4);
+        const held = worker.getEcsComponent(HeldItemComponentId)!;
+        assert.ok(held.item, "worker should be holding the crop");
+        assert.strictEqual(held.item.id, "wheat");
+        assert.strictEqual(held.amount, 4);
     });
 
     it("transitions farm from Ready to Empty", () => {
@@ -139,8 +140,8 @@ describe("harvestCropAction", () => {
         assert.strictEqual(result.kind, "complete");
         assert.strictEqual(farmComp.state, FarmState.Growing);
 
-        const inventory = worker.getEcsComponent(InventoryComponentId)!;
-        assert.strictEqual(inventory.items.length, 0, "no items should be added when farm is not Ready");
+        const held = worker.getEcsComponent(HeldItemComponentId)!;
+        assert.ok(isHeldEmpty(held), "held should remain empty when farm is not Ready");
     });
 
     it("fails when farm building is not found", () => {

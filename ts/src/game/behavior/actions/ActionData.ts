@@ -18,9 +18,14 @@ import type { WarmByFireActionData } from "./warmByFireAction.ts";
 import type { WithdrawFromStockpileActionData } from "./withdrawFromStockpileAction.ts";
 import type { PlantCropActionData } from "./plantCropAction.ts";
 import type { HarvestCropActionData } from "./harvestCropAction.ts";
-import type { EatFromInventoryActionData } from "./eatFromInventoryAction.ts";
+import type { EatFromHeldActionData } from "./eatFromHeldAction.ts";
+import type { EatFromEquipmentActionData } from "./eatFromEquipmentAction.ts";
 import type { StealFoodActionData } from "./stealFoodAction.ts";
 import type { WorkWindmillActionData } from "./workWindmillAction.ts";
+import type { DropHeldActionData } from "./dropHeldAction.ts";
+import type { PickupFromGroundActionData } from "./pickupFromGroundAction.ts";
+import type { EquipFromHeldActionData } from "./equipFromHeldAction.ts";
+import type { DropFromSlotActionData } from "./dropFromSlotAction.ts";
 
 /**
  * Action data types - these are serializable plain objects that can be stored in components.
@@ -50,9 +55,14 @@ export type BehaviorActionData =
     | PlantTreeActionData
     | PlantCropActionData
     | HarvestCropActionData
-    | EatFromInventoryActionData
+    | EatFromHeldActionData
+    | EatFromEquipmentActionData
     | StealFoodActionData
-    | WorkWindmillActionData;
+    | WorkWindmillActionData
+    | DropHeldActionData
+    | PickupFromGroundActionData
+    | EquipFromHeldActionData
+    | DropFromSlotActionData;
 
 /**
  * Action executor function type - takes action data, entity, and tick, returns result.

@@ -5,10 +5,18 @@ import { Entity } from "../entity/entity.ts";
 import { generateId } from "../../common/idGenerator.ts";
 import { createAnimationComponent } from "../component/animationComponent.ts";
 import { createCollectableComponent } from "../component/collectableComponent.ts";
+import { createGroundItemComponent } from "../component/groundItemComponent.ts";
 import { createSpriteComponent } from "../component/spriteComponent.ts";
 import { loopAnimation } from "../../rendering/animation/animationGraph.ts";
 import { zeroPoint } from "../../common/point.ts";
 
+/**
+ * Canonical prefab for any item that exists loose in the world — drops from
+ * the held-item system, loot from deaths, and any future drop scenarios all
+ * use this prefab. Adds a GroundItemComponent marker so behaviours and
+ * queries can identify world-loose item piles distinctly from other
+ * collectables (chests, etc.).
+ */
 export function collectableItemPrefab(
     item: InventoryItem,
     quantity: number,
@@ -20,6 +28,7 @@ export function collectableItemPrefab(
     entity.setEcsComponent(
         createCollectableComponent([{ item, amount: quantity }]),
     );
+    entity.setEcsComponent(createGroundItemComponent());
 
     const frames = spriteDefinitions[item.asset.spriteId]?.[SPRITE_FRAMES] ?? 1;
     if (frames > 1) {

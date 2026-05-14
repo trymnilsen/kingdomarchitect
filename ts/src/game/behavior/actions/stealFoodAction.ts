@@ -2,10 +2,14 @@ import { createLogger } from "../../../common/logging/logger.ts";
 import { isPointAdjacentTo } from "../../../common/point.ts";
 import { findFoodInInventory } from "../../../data/inventory/inventoryItemHelpers.ts";
 import {
-    addInventoryItem,
     InventoryComponentId,
     takeInventoryItem,
 } from "../../component/inventoryComponent.ts";
+import {
+    addToHeldItem,
+    HeldItemComponentId,
+    isHeldEmpty,
+} from "../../component/heldItemComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { ActionComplete, type ActionResult } from "./Action.ts";
 
@@ -44,12 +48,16 @@ export function executeStealFoodAction(
         return { kind: "failed", cause: { type: "noResources" } };
     }
 
+    const selfHeld = entity.requireEcsComponent(HeldItemComponentId);
+    if (!isHeldEmpty(selfHeld) && selfHeld.item!.id !== foodStack.item.id) {
+        return { kind: "failed", cause: { type: "unknown" } };
+    }
+
     takeInventoryItem(targetInventory, foodStack.item.id, 1);
     target.invalidateComponent(InventoryComponentId);
 
-    const selfInventory = entity.requireEcsComponent(InventoryComponentId);
-    addInventoryItem(selfInventory, foodStack.item, 1);
-    entity.invalidateComponent(InventoryComponentId);
+    addToHeldItem(selfHeld, foodStack.item, 1);
+    entity.invalidateComponent(HeldItemComponentId);
 
     log.info(
         `[StealAction] Entity ${entity.id} stole food from ${action.targetEntityId}`,

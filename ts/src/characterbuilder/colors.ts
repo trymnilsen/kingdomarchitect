@@ -34,14 +34,14 @@ export type CharacterColors = {
 export function getCharacterColors(
     equipmentComponent: EquipmentComponent,
 ): CharacterColors {
-    const mainHand = equipmentComponent.slots.main;
+    const primaryHand = equipmentComponent.slots.primary;
     let chestColor = "#FACBA6";
-    if (mainHand?.category == ItemCategory.Melee) {
+    if (primaryHand?.category == ItemCategory.Melee) {
         chestColor = "#424242";
     }
 
     const equipment: Array<AnchorEquipment | PartBoundsEquipment> = [];
-    for (const slot of [equipmentComponent.slots.main, equipmentComponent.slots.other]) {
+    for (const slot of [equipmentComponent.slots.primary, equipmentComponent.slots.secondary]) {
         if (slot?.id === wizardHat.id) {
             equipment.push({
                 attachToPart: "Head",

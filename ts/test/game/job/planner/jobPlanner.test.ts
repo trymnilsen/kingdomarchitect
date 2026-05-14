@@ -10,6 +10,15 @@ import { ResourceHarvestMode } from "../../../../src/data/inventory/items/natura
 import { createJobQueueComponent } from "../../../../src/game/component/jobQueueComponent.ts";
 import { createInventoryComponent } from "../../../../src/game/component/inventoryComponent.ts";
 import { createProductionComponent } from "../../../../src/game/component/productionComponent.ts";
+import {
+    createHeldItemComponent,
+    setHeldItem,
+} from "../../../../src/game/component/heldItemComponent.ts";
+import {
+    createStockpileComponent,
+    setPreferredAmount,
+} from "../../../../src/game/component/stockpileComponent.ts";
+import { wheatResourceItem } from "../../../../src/data/inventory/items/resources.ts";
 
 function createTestScene(): { root: Entity; worker: Entity } {
     const root = new Entity("root");
@@ -91,5 +100,83 @@ describe("jobPlanner", () => {
         const actions = planJob(root, worker, unknownJob, () => []);
 
         assert.strictEqual(actions.length, 0);
+    });
+
+    it("prepends dropHeld when worker holds something and no stockpile accepts it", () => {
+        const { root, worker } = createTestScene();
+        const held = createHeldItemComponent();
+        setHeldItem(held, wheatResourceItem, 3);
+        worker.setEcsComponent(held);
+
+        const resource = new Entity("resource");
+        resource.worldPosition = { x: 15, y: 13 };
+        root.addChild(resource);
+
+        const job = CollectResourceJob(resource, ResourceHarvestMode.Chop);
+        const actions = planJob(root, worker, job, () => []);
+
+        assert.strictEqual(actions.length, 3);
+        assert.strictEqual(actions[0].type, "dropHeld");
+        assert.strictEqual(actions[1].type, "moveTo");
+        assert.strictEqual(actions[2].type, "harvestResource");
+    });
+
+    it("prepends moveTo+depositToStockpile when worker holds an item and an accepting stockpile exists", () => {
+        const { root, worker } = createTestScene();
+        const held = createHeldItemComponent();
+        setHeldItem(held, wheatResourceItem, 3);
+        worker.setEcsComponent(held);
+
+        const stockpile = new Entity("stockpile");
+        stockpile.worldPosition = { x: 12, y: 9 };
+        const stockpileComp = createStockpileComponent();
+        setPreferredAmount(stockpileComp, wheatResourceItem.id, 50);
+        stockpile.setEcsComponent(stockpileComp);
+        stockpile.setEcsComponent(createInventoryComponent());
+        root.addChild(stockpile);
+
+        const resource = new Entity("resource");
+        resource.worldPosition = { x: 20, y: 13 };
+        root.addChild(resource);
+
+        const job = CollectResourceJob(resource, ResourceHarvestMode.Chop);
+        const actions = planJob(root, worker, job, () => []);
+
+        assert.strictEqual(actions.length, 4);
+        assert.strictEqual(actions[0].type, "moveTo");
+        assert.strictEqual(actions[1].type, "depositToStockpile");
+        assert.strictEqual(actions[2].type, "moveTo");
+        assert.strictEqual(actions[3].type, "harvestResource");
+        const deposit = actions[1] as { type: "depositToStockpile"; stockpileId: string };
+        assert.strictEqual(deposit.stockpileId, "stockpile");
+    });
+
+    it("does not prepend deposit when worker held is empty", () => {
+        const { root, worker } = createTestScene();
+        worker.setEcsComponent(createHeldItemComponent());
+
+        const resource = new Entity("resource");
+        resource.worldPosition = { x: 15, y: 13 };
+        root.addChild(resource);
+
+        const job = CollectResourceJob(resource, ResourceHarvestMode.Chop);
+        const actions = planJob(root, worker, job, () => []);
+
+        assert.strictEqual(actions.length, 2);
+        assert.strictEqual(actions[0].type, "moveTo");
+        assert.strictEqual(actions[1].type, "harvestResource");
+    });
+
+    it("does not prepend deposit for non-held-writing jobs", () => {
+        const { root, worker } = createTestScene();
+        const held = createHeldItemComponent();
+        setHeldItem(held, wheatResourceItem, 3);
+        worker.setEcsComponent(held);
+
+        const job = MoveToJob(worker, { x: 10, y: 15 });
+        const actions = planJob(root, worker, job, () => []);
+
+        assert.strictEqual(actions.length, 1);
+        assert.strictEqual(actions[0].type, "moveTo");
     });
 });

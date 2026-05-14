@@ -1,11 +1,12 @@
 import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
 import { goldCoins } from "../../data/inventory/items/resources.ts";
+import { dropItemAtPosition, findDropPosition } from "../behavior/dropItem.ts";
+import {
+    HeldItemComponentId,
+    isHeldEmpty,
+} from "../component/heldItemComponent.ts";
 import { GoblinUnitComponentId } from "../component/goblinUnitComponent.ts";
-import { addJob, JobQueueComponentId } from "../component/jobQueueComponent.ts";
 import { DeathGameEventType } from "../entity/event/deathGameEventData.ts";
-import { CollectItemJob } from "../job/collectItemJob.ts";
-import { collectableItemPrefab } from "../prefab/collectableItemPrefab.ts";
-import { findPlayerKingdom } from "./jobNotificationSystem.ts";
 
 export const lootDropSystem: EcsSystem = {
     onEntityEvent: {
@@ -14,9 +15,16 @@ export const lootDropSystem: EcsSystem = {
             if (!event.source.getEcsComponent(GoblinUnitComponentId)) return;
 
             const deathPosition = event.source.worldPosition;
-            const loot = collectableItemPrefab(goldCoins, 1);
-            root.addChild(loot);
-            loot.worldPosition = deathPosition;
+
+            dropItemAtPosition(root, deathPosition, goldCoins, 1);
+
+            const held = event.source.getEcsComponent(HeldItemComponentId);
+            if (held && !isHeldEmpty(held)) {
+                const heldDrop =
+                    findDropPosition(root, deathPosition, held.item!) ??
+                    deathPosition;
+                dropItemAtPosition(root, heldDrop, held.item!, held.amount);
+            }
         },
     },
 };

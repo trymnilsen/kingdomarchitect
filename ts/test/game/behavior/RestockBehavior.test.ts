@@ -8,6 +8,7 @@ import {
     addInventoryItem,
     InventoryComponentId,
 } from "../../../src/game/component/inventoryComponent.ts";
+import { createHeldItemComponent } from "../../../src/game/component/heldItemComponent.ts";
 import {
     createStockpileComponent,
     setPreferredAmount,
@@ -43,7 +44,7 @@ describe("RestockBehavior", () => {
             const behavior = createRestockBehavior();
             const root = new Entity("root");
             const worker = createBehaviorTestEntity("worker");
-            worker.setEcsComponent(createInventoryComponent());
+            worker.setEcsComponent(createHeldItemComponent());
 
             // Stockpile with surplus but no preference = no deficit
             const stockpile = createStockpileEntity("stockpile");
@@ -60,7 +61,7 @@ describe("RestockBehavior", () => {
             const behavior = createRestockBehavior();
             const root = new Entity("root");
             const worker = createBehaviorTestEntity("worker");
-            worker.setEcsComponent(createInventoryComponent());
+            worker.setEcsComponent(createHeldItemComponent());
 
             // Stockpile B wants 10 wood but has 0 — deficit exists, no surplus
             const stockpileB = createStockpileWithPreference(
@@ -80,7 +81,7 @@ describe("RestockBehavior", () => {
             const behavior = createRestockBehavior();
             const root = new Entity("root");
             const worker = createBehaviorTestEntity("worker");
-            worker.setEcsComponent(createInventoryComponent());
+            worker.setEcsComponent(createHeldItemComponent());
 
             // Stockpile A: 20 wood, no preference — all surplus
             const stockpileA = createStockpileEntity("stockpile-a");
@@ -141,7 +142,7 @@ describe("RestockBehavior", () => {
             const behavior = createRestockBehavior();
             const root = new Entity("root");
             const worker = createBehaviorTestEntity("worker", 12, 8);
-            worker.setEcsComponent(createInventoryComponent());
+            worker.setEcsComponent(createHeldItemComponent());
 
             const stockpileA = createStockpileEntity("stockpile-a");
             const invA = stockpileA.getEcsComponent(InventoryComponentId)!;
@@ -180,11 +181,11 @@ describe("RestockBehavior", () => {
             assert.strictEqual(deposit.stockpileId, "stockpile-b");
         });
 
-        it("withdraws correct amount (min of surplus, deficit, capacity)", () => {
+        it("withdraws correct amount (min of surplus and deficit)", () => {
             const behavior = createRestockBehavior();
             const root = new Entity("root");
             const worker = createBehaviorTestEntity("worker", 12, 8);
-            worker.setEcsComponent(createInventoryComponent());
+            worker.setEcsComponent(createHeldItemComponent());
 
             // Source has 5 surplus (no preference)
             const stockpileA = createStockpileEntity("stockpile-a");
@@ -209,7 +210,7 @@ describe("RestockBehavior", () => {
                 { type: "withdrawFromStockpile" }
             >;
 
-            // min(surplus=5, deficit=10, capacity=20) = 5
+            // min(surplus=5, deficit=10) = 5
             assert.strictEqual(withdraw.amount, 5);
         });
 
@@ -217,7 +218,7 @@ describe("RestockBehavior", () => {
             const behavior = createRestockBehavior();
             const root = new Entity("root");
             const worker = createBehaviorTestEntity("worker", 10, 8);
-            worker.setEcsComponent(createInventoryComponent());
+            worker.setEcsComponent(createHeldItemComponent());
 
             // Source of wood
             const source = createStockpileEntity("source");

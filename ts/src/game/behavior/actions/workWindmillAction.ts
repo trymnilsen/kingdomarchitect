@@ -5,9 +5,10 @@ import {
     FarmState,
 } from "../../component/farmComponent.ts";
 import {
-    addInventoryItem,
-    InventoryComponentId,
-} from "../../component/inventoryComponent.ts";
+    addToHeldItem,
+    canAddToHeld,
+    HeldItemComponentId,
+} from "../../component/heldItemComponent.ts";
 import { ChunkMapComponentId, getEntitiesAt } from "../../component/chunkMapComponent.ts";
 import { getInventoryItemById } from "../../../data/inventory/inventoryItemHelpers.ts";
 import type { Entity } from "../../entity/entity.ts";
@@ -38,11 +39,12 @@ const ADJACENT_OFFSETS: ReadonlyArray<{ dx: number; dy: number }> = [
 
 /**
  * Work a windmill: each tick scan the 8 adjacent tiles for farms,
- * plant any that are Empty, and once nothing is Growing harvest all Ready
- * farms into the worker's inventory and complete the job.
+ * plant any that are Empty, and once nothing is Growing harvest Ready farms
+ * into the worker's held slot and complete the job.
  *
- * One job represents one full plant + harvest pass. Farms that were already
- * Growing or Ready when the action began are rolled into the same pass.
+ * Held is single-slot, so this pass harvests one crop type only — whatever the
+ * worker already holds, or the first Ready farm's crop if held is empty.
+ * Farms with mismatched crops stay Ready for a later pass.
  */
 export function executeWorkWindmillAction(
     action: WorkWindmillActionData,
@@ -110,7 +112,7 @@ export function executeWorkWindmillAction(
         return ActionRunning;
     }
 
-    const workerInventory = entity.requireEcsComponent(InventoryComponentId);
+    const heldItemComponent = entity.requireEcsComponent(HeldItemComponentId);
     let harvestedAny = false;
     for (const farmEntity of adjacentFarms) {
         const farm = farmEntity.getEcsComponent(FarmComponentId);
@@ -122,7 +124,11 @@ export function executeWorkWindmillAction(
             continue;
         }
 
-        addInventoryItem(workerInventory, cropItem, farm.cropYieldAmount);
+        if (!canAddToHeld(heldItemComponent, cropItem)) {
+            continue;
+        }
+
+        addToHeldItem(heldItemComponent, cropItem, farm.cropYieldAmount);
         farm.state = FarmState.Empty;
         farm.plantedAtTick = 0;
         farmEntity.invalidateComponent(FarmComponentId);
@@ -130,7 +136,7 @@ export function executeWorkWindmillAction(
     }
 
     if (harvestedAny) {
-        entity.invalidateComponent(InventoryComponentId);
+        entity.invalidateComponent(HeldItemComponentId);
     }
 
     const queueEntity = entity.getAncestorEntity(JobQueueComponentId);

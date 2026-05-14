@@ -1,6 +1,14 @@
-import type { ItemTransfer } from "../../behavior/actions/Action.ts";
+import { distance } from "../../../common/point.ts";
 import type { BehaviorActionData } from "../../behavior/actions/ActionData.ts";
 import { BuildingComponentId } from "../../component/buildingComponent.ts";
+import {
+    CollectableComponentId,
+} from "../../component/collectableComponent.ts";
+import { GroundItemComponentId } from "../../component/groundItemComponent.ts";
+import {
+    HeldItemComponentId,
+    isHeldEmpty,
+} from "../../component/heldItemComponent.ts";
 import {
     getInventoryItem,
     InventoryComponentId,
@@ -16,6 +24,7 @@ import {
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import { suspendJobInQueue } from "../jobLifecycle.ts";
 import { getSettlementEntity } from "../../entity/settlementQueries.ts";
+import { findDropPosition } from "../../behavior/dropItem.ts";
 import { createLogger } from "../../../common/logging/logger.ts";
 
 const log = createLogger("job");
@@ -28,13 +37,15 @@ function suspendJob(worker: Entity, job: BuildBuildingJob): void {
 }
 
 /**
- * Plans actions for building construction.
+ * Plan actions for building construction under the held-item model.
  *
- * Evaluates the current state and returns actions up to the next decision point:
- * 1. Building has all materials: [moveTo(building), constructBuilding(building)]
- * 2. Worker has needed materials: [moveTo(building), depositToInventory(materials)]
- * 3. Materials in stockpile: [moveTo(stockpile), takeFromInventory(materials)]
- * 4. No materials available: suspends job and returns []
+ * State machine (one trip per planner call):
+ * 1. Building has all materials → moveTo + constructBuilding.
+ * 2. Worker held already matches a needed material → moveTo + deposit.
+ * 3. A stockpile has a needed material → moveTo + withdraw.
+ * 4. A ground pile has a needed material → moveTo + pickup.
+ * 5. Held has something the building doesn't need → drop it first.
+ * 6. Nothing fetchable → suspend.
  */
 export function planBuildBuilding(
     root: Entity,
@@ -54,9 +65,9 @@ export function planBuildBuilding(
         return [];
     }
 
-    const workerInventory = worker.getEcsComponent(InventoryComponentId);
-    if (!workerInventory) {
-        log.warn("Worker has no inventory");
+    const workerHeld = worker.getEcsComponent(HeldItemComponentId);
+    if (!workerHeld) {
+        log.warn("Worker has no HeldItem component");
         return [];
     }
 
@@ -64,11 +75,6 @@ export function planBuildBuilding(
         buildingEntity.getEcsComponent(InventoryComponentId);
     const requirements = buildingComponent.building.requirements;
 
-    // Buildings with no material requirements are not given a scaffold inventory
-    // (there is nothing to deposit into them). Treat the absence of an inventory
-    // as "nothing remaining" so the worker proceeds straight to construction.
-    // If a building somehow has requirements but no inventory, that is a prefab
-    // bug — log and bail rather than silently doing the wrong thing.
     if (!buildingInventory) {
         if (requirements?.materials) {
             log.warn("Building has requirements but no inventory", {
@@ -92,7 +98,6 @@ export function planBuildBuilding(
     );
     const buildingReady = Object.keys(remainingMaterials).length === 0;
 
-    // State 1: Building has all materials - go construct
     if (buildingReady) {
         return [
             {
@@ -104,26 +109,8 @@ export function planBuildBuilding(
         ];
     }
 
-    // Check if worker has any of the needed materials
-    const workerHasMaterials = workerHasAnyMaterials(
-        workerInventory,
-        remainingMaterials,
-    );
-
-    // State 2: Worker has materials - go deposit them
-    if (workerHasMaterials) {
-        const itemsToDeposit: ItemTransfer[] = [];
-        for (const [itemId, amountNeeded] of Object.entries(
-            remainingMaterials,
-        )) {
-            const workerItem = getInventoryItem(workerInventory, itemId);
-            if (workerItem && workerItem.amount > 0) {
-                // Deposit up to what's needed
-                const depositAmount = Math.min(workerItem.amount, amountNeeded);
-                itemsToDeposit.push({ itemId, amount: depositAmount });
-            }
-        }
-
+    if (workerHasAnyMaterials(workerHeld, remainingMaterials)) {
+        const itemId = workerHeld.item!.id;
         return [
             {
                 type: "moveTo",
@@ -133,12 +120,27 @@ export function planBuildBuilding(
             {
                 type: "depositToInventory",
                 targetEntityId: job.entityId,
-                items: itemsToDeposit,
+                itemId,
             },
         ];
     }
 
-    // State 3: Need to fetch materials from stockpile
+    if (!isHeldEmpty(workerHeld)) {
+        const dropPos = findDropPosition(
+            root,
+            worker.worldPosition,
+            workerHeld.item!,
+        );
+        if (!dropPos) {
+            suspendJob(worker, job);
+            return [];
+        }
+        return [
+            { type: "moveTo", target: dropPos },
+            { type: "dropHeld", destination: dropPos },
+        ];
+    }
+
     const settlement = getSettlementEntity(buildingEntity);
     const materialCheck = checkMaterialsAvailability(
         settlement,
@@ -147,6 +149,35 @@ export function planBuildBuilding(
     );
 
     if (!materialCheck.allAvailable) {
+        // Stockpiles can't fully cover the deficit. See if a ground pile can.
+        const itemIds = Object.keys(remainingMaterials);
+        for (const itemId of itemIds) {
+            const pile = findNearestGroundPileWithItem(
+                root,
+                worker.worldPosition,
+                itemId,
+            );
+            if (pile) {
+                return [
+                    {
+                        type: "moveTo",
+                        target: pile.worldPosition,
+                        stopAdjacent: "cardinal",
+                    },
+                    { type: "pickupFromGround", pileEntityId: pile.id },
+                    {
+                        type: "moveTo",
+                        target: buildingEntity.worldPosition,
+                        stopAdjacent: "cardinal",
+                    },
+                    {
+                        type: "depositToInventory",
+                        targetEntityId: job.entityId,
+                        itemId,
+                    },
+                ];
+            }
+        }
         log.info("Missing materials for building", {
             building: buildingComponent.building.name,
             missing: materialCheck.missing.join(", "),
@@ -162,12 +193,10 @@ export function planBuildBuilding(
     );
 
     if (!stockpileEntity) {
-        log.info("Cannot find stockpile with required materials");
         suspendJob(worker, job);
         return [];
     }
 
-    // Build list of items to take from stockpile
     const stockpileInventory =
         stockpileEntity.getEcsComponent(InventoryComponentId);
     if (!stockpileInventory) {
@@ -175,16 +204,20 @@ export function planBuildBuilding(
         return [];
     }
 
-    const itemsToTake: ItemTransfer[] = [];
+    // Pick the first item from toFetch that this stockpile actually carries
+    // and fetch a single trip's worth.
+    let chosenItemId: string | undefined;
+    let chosenAmount = 0;
     for (const { itemId, amount } of materialCheck.toFetch) {
         const stockpileItem = getInventoryItem(stockpileInventory, itemId);
         if (stockpileItem && stockpileItem.amount > 0) {
-            const takeAmount = Math.min(stockpileItem.amount, amount);
-            itemsToTake.push({ itemId, amount: takeAmount });
+            chosenItemId = itemId;
+            chosenAmount = Math.min(stockpileItem.amount, amount);
+            break;
         }
     }
 
-    if (itemsToTake.length === 0) {
+    if (!chosenItemId) {
         suspendJob(worker, job);
         return [];
     }
@@ -196,9 +229,44 @@ export function planBuildBuilding(
             stopAdjacent: "cardinal",
         },
         {
-            type: "takeFromInventory",
-            sourceEntityId: stockpileEntity.id,
-            items: itemsToTake,
+            type: "withdrawFromStockpile",
+            stockpileId: stockpileEntity.id,
+            itemId: chosenItemId,
+            amount: chosenAmount,
+        },
+        {
+            type: "moveTo",
+            target: buildingEntity.worldPosition,
+            stopAdjacent: "cardinal",
+        },
+        {
+            type: "depositToInventory",
+            targetEntityId: job.entityId,
+            itemId: chosenItemId,
         },
     ];
+}
+
+function findNearestGroundPileWithItem(
+    root: Entity,
+    from: import("../../../common/point.ts").Point,
+    itemId: string,
+): Entity | null {
+    const candidates = root.queryComponents(GroundItemComponentId);
+    let best: Entity | null = null;
+    let bestDistance = Infinity;
+    for (const [entity] of candidates) {
+        const collectable = entity.getEcsComponent(CollectableComponentId);
+        if (!collectable) continue;
+        const matches = collectable.items.some(
+            (stack) => stack.item.id === itemId && stack.amount > 0,
+        );
+        if (!matches) continue;
+        const d = distance(from, entity.worldPosition);
+        if (d < bestDistance) {
+            bestDistance = d;
+            best = entity;
+        }
+    }
+    return best;
 }

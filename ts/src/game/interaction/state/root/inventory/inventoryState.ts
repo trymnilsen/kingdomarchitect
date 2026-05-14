@@ -4,17 +4,13 @@ import {
     InventoryComponentId,
     type InventoryComponent,
 } from "../../../../component/inventoryComponent.ts";
-import {
-    DesiredInventoryComponentId,
-} from "../../../../component/desiredInventoryComponent.ts";
 import { InteractionState } from "../../../handler/interactionState.ts";
 import { AlertMessageState } from "../../common/alertMessageState.ts";
 import { inventoryView } from "./inventoryView.ts";
 import type { Entity } from "../../../../entity/entity.ts";
 import type { InventoryItemQuantity } from "../../../../../data/inventory/inventoryItemQuantity.ts";
-import { EquipItemCommand } from "../../../../../server/message/command/equipItemCommand.ts";
-import { UpdateDesiredInventoryCommand } from "../../../../../server/message/command/updateDesiredInventoryCommand.ts";
-import type { DesiredInventoryEntry } from "../../../../component/desiredInventoryComponent.ts";
+import { ItemTag } from "../../../../../data/inventory/inventoryItem.ts";
+import { EquipSlotSelectionState } from "../../equip/equipSlotSelectionState.ts";
 
 export class InventoryState extends InteractionState {
     private _selectedItemIndex = 0;
@@ -30,10 +26,6 @@ export class InventoryState extends InteractionState {
     }
 
     override getView(): ComponentDescriptor | null {
-        const desiredInventory = this._entity.getEcsComponent(
-            DesiredInventoryComponentId,
-        );
-
         return inventoryView({
             inventory: this._inventoryComponent,
             selectedItemIndex: this._selectedItemIndex,
@@ -41,7 +33,15 @@ export class InventoryState extends InteractionState {
                 this._selectedItemIndex = index;
             },
             onEquip: (item: InventoryItemQuantity) => {
-                this.onEquip(item);
+                if (!item.item.tag?.includes(ItemTag.SkillGear)) {
+                    return;
+                }
+                this.context.stateChanger.replace(
+                    new EquipSlotSelectionState(
+                        this._entity.id,
+                        item.item.id,
+                    ),
+                );
             },
             onDrop: (_item: InventoryItemQuantity) => {
                 this.context.stateChanger.push(
@@ -50,12 +50,6 @@ export class InventoryState extends InteractionState {
             },
             onCancel: () => {
                 this.context.stateChanger.pop(null);
-            },
-            desiredInventory: desiredInventory ?? undefined,
-            onUpdateDesiredInventory: (items: DesiredInventoryEntry[]) => {
-                this.context.commandDispatcher(
-                    UpdateDesiredInventoryCommand(this._entity.id, items),
-                );
             },
         });
     }
@@ -75,13 +69,6 @@ export class InventoryState extends InteractionState {
 
     override onActive(): void {
         // No imperative UI setup needed anymore
-    }
-
-    private onEquip(item: InventoryItemQuantity) {
-        this.context.commandDispatcher(
-            EquipItemCommand(item.item, this._entity, "main"),
-        );
-        this.context.stateChanger.pop();
     }
 }
 

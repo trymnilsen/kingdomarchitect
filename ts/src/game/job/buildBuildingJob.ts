@@ -18,6 +18,10 @@ import {
     InventoryComponentId,
     type InventoryComponent,
 } from "../component/inventoryComponent.ts";
+import {
+    isHeldEmpty,
+    type HeldItemComponent,
+} from "../component/heldItemComponent.ts";
 import type { Entity } from "../entity/entity.ts";
 import type { Job } from "./job.ts";
 import {
@@ -95,14 +99,11 @@ export function getRemainingMaterials(
 }
 
 export function workerHasAnyMaterials(
-    workerInventory: InventoryComponent,
+    workerHeld: HeldItemComponent,
     remainingMaterials: RemainingMaterials,
 ): boolean {
-    for (const itemId of Object.keys(remainingMaterials)) {
-        const item = getInventoryItem(workerInventory, itemId);
-        if (item && item.amount > 0) return true;
-    }
-    return false;
+    if (isHeldEmpty(workerHeld)) return false;
+    return remainingMaterials[workerHeld.item!.id] !== undefined;
 }
 
 export type MaterialAvailability = {
@@ -113,22 +114,16 @@ export type MaterialAvailability = {
 
 export function checkMaterialsAvailability(
     settlement: Entity,
-    worker: Entity,
+    _worker: Entity,
     remainingMaterials: RemainingMaterials,
 ): MaterialAvailability {
-    const workerInventory = worker.requireEcsComponent(InventoryComponentId);
     const stockpiles = findStockpiles(settlement);
     const missing: string[] = [];
     const toFetch: Array<{ itemId: string; amount: number }> = [];
 
     for (const [itemId, amountNeeded] of Object.entries(remainingMaterials)) {
-        const workerItem = getInventoryItem(workerInventory, itemId);
-        const workerAmount = workerItem?.amount ?? 0;
-        const stillNeeded = amountNeeded - workerAmount;
+        if (amountNeeded <= 0) continue;
 
-        if (stillNeeded <= 0) continue;
-
-        // Check stockpiles for this material
         let availableInStockpiles = 0;
         for (const stockpile of stockpiles) {
             const inventory = stockpile.getEcsComponent(InventoryComponentId);
@@ -138,8 +133,8 @@ export function checkMaterialsAvailability(
             }
         }
 
-        if (availableInStockpiles >= stillNeeded) {
-            toFetch.push({ itemId, amount: stillNeeded });
+        if (availableInStockpiles >= amountNeeded) {
+            toFetch.push({ itemId, amount: amountNeeded });
         } else if (availableInStockpiles > 0) {
             toFetch.push({ itemId, amount: availableInStockpiles });
             missing.push(itemId);

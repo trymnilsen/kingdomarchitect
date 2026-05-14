@@ -3,10 +3,14 @@ import { describe, it } from "node:test";
 import { Entity } from "../../../../src/game/entity/entity.ts";
 import {
     createInventoryComponent,
-    getInventoryItem,
     addInventoryItem,
+    getInventoryItem,
     InventoryComponentId,
 } from "../../../../src/game/component/inventoryComponent.ts";
+import {
+    createHeldItemComponent,
+    HeldItemComponentId,
+} from "../../../../src/game/component/heldItemComponent.ts";
 import { executeCraftItemAction } from "../../../../src/game/behavior/actions/craftItemAction.ts";
 import { planksRecipe } from "../../../../src/data/crafting/recipes/carpenterRecipes.ts";
 import { woodResourceItem } from "../../../../src/data/inventory/items/resources.ts";
@@ -24,9 +28,9 @@ function createTestScene(): {
     const building = new Entity("building");
 
     worker.worldPosition = { x: 10, y: 8 };
-    building.worldPosition = { x: 11, y: 8 }; // Adjacent
+    building.worldPosition = { x: 11, y: 8 };
 
-    worker.setEcsComponent(createInventoryComponent());
+    worker.setEcsComponent(createHeldItemComponent());
     building.setEcsComponent(createInventoryComponent());
 
     root.addChild(worker);
@@ -36,11 +40,12 @@ function createTestScene(): {
 }
 
 describe("craftItemAction", () => {
-    it("consumes inputs on first tick", () => {
-        const { worker } = createTestScene();
+    it("consumes inputs from the building on first tick", () => {
+        const { worker, building } = createTestScene();
 
-        const workerInventory = worker.getEcsComponent(InventoryComponentId)!;
-        addInventoryItem(workerInventory, woodResourceItem, 10);
+        const buildingInventory =
+            building.getEcsComponent(InventoryComponentId)!;
+        addInventoryItem(buildingInventory, woodResourceItem, 10);
 
         const action: CraftItemAction = {
             type: "craftItem",
@@ -52,15 +57,16 @@ describe("craftItemAction", () => {
 
         assert.strictEqual(action.inputsConsumed, true);
 
-        const wood = getInventoryItem(workerInventory, "wood");
+        const wood = getInventoryItem(buildingInventory, "wood");
         assert.strictEqual(wood?.amount, 6); // 10 - 4 consumed
     });
 
     it("does not consume inputs again on subsequent ticks", () => {
-        const { worker } = createTestScene();
+        const { worker, building } = createTestScene();
 
-        const workerInventory = worker.getEcsComponent(InventoryComponentId)!;
-        addInventoryItem(workerInventory, woodResourceItem, 10);
+        const buildingInventory =
+            building.getEcsComponent(InventoryComponentId)!;
+        addInventoryItem(buildingInventory, woodResourceItem, 10);
 
         const action = {
             type: "craftItem" as const,
@@ -72,15 +78,16 @@ describe("craftItemAction", () => {
 
         executeCraftItemAction(action, worker);
 
-        const wood = getInventoryItem(workerInventory, "wood");
-        assert.strictEqual(wood?.amount, 10); // Unchanged
+        const wood = getInventoryItem(buildingInventory, "wood");
+        assert.strictEqual(wood?.amount, 10);
     });
 
     it("tracks progress on action object", () => {
-        const { worker } = createTestScene();
+        const { worker, building } = createTestScene();
 
-        const workerInventory = worker.getEcsComponent(InventoryComponentId)!;
-        addInventoryItem(workerInventory, woodResourceItem, 10);
+        const buildingInventory =
+            building.getEcsComponent(InventoryComponentId)!;
+        addInventoryItem(buildingInventory, woodResourceItem, 10);
 
         const action: CraftItemAction = {
             type: "craftItem",
@@ -89,14 +96,12 @@ describe("craftItemAction", () => {
         };
 
         executeCraftItemAction(action, worker);
-
         assert.strictEqual(action.progress, 1);
     });
 
-    it("completes and outputs to worker inventory when progress reaches duration", () => {
+    it("completes and outputs to held when progress reaches duration", () => {
         const { worker } = createTestScene();
 
-        // planksRecipe has duration: 3
         const action = {
             type: "craftItem" as const,
             buildingId: "building",
@@ -106,19 +111,16 @@ describe("craftItemAction", () => {
         };
 
         const result = executeCraftItemAction(action, worker);
-
         assert.strictEqual(result.kind, "complete");
 
-        const workerInventory = worker.getEcsComponent(InventoryComponentId)!;
-        const planks = getInventoryItem(workerInventory, "planks");
-        assert.ok(planks);
-        assert.strictEqual(planks.amount, 2);
+        const held = worker.getEcsComponent(HeldItemComponentId)!;
+        assert.strictEqual(held.item?.id, "planks");
+        assert.strictEqual(held.amount, 2);
     });
 
-    it("fails if worker lacks required materials", () => {
+    it("fails if the building lacks required materials", () => {
         const { worker } = createTestScene();
 
-        // Worker has no wood
         const action = {
             type: "craftItem" as const,
             buildingId: "building",
@@ -126,15 +128,15 @@ describe("craftItemAction", () => {
         };
 
         const result = executeCraftItemAction(action, worker);
-
         assert.strictEqual(result.kind, "failed");
     });
 
-    it("fails if worker has insufficient materials", () => {
-        const { worker } = createTestScene();
+    it("fails if the building has insufficient materials", () => {
+        const { worker, building } = createTestScene();
 
-        const workerInventory = worker.getEcsComponent(InventoryComponentId)!;
-        addInventoryItem(workerInventory, woodResourceItem, 2); // Need 4
+        const buildingInventory =
+            building.getEcsComponent(InventoryComponentId)!;
+        addInventoryItem(buildingInventory, woodResourceItem, 2);
 
         const action = {
             type: "craftItem" as const,
@@ -143,7 +145,6 @@ describe("craftItemAction", () => {
         };
 
         const result = executeCraftItemAction(action, worker);
-
         assert.strictEqual(result.kind, "failed");
     });
 
@@ -157,13 +158,12 @@ describe("craftItemAction", () => {
         };
 
         const result = executeCraftItemAction(action, worker);
-
         assert.strictEqual(result.kind, "failed");
     });
 
     it("fails if worker not adjacent to building", () => {
         const { worker, building } = createTestScene();
-        building.worldPosition = { x: 25, y: 25 }; // Not adjacent
+        building.worldPosition = { x: 25, y: 25 };
 
         const action = {
             type: "craftItem" as const,
@@ -172,44 +172,6 @@ describe("craftItemAction", () => {
         };
 
         const result = executeCraftItemAction(action, worker);
-
         assert.strictEqual(result.kind, "failed");
-    });
-
-    it("throws if worker has no inventory", () => {
-        const { root, building } = createTestScene();
-        const workerNoInv = new Entity("workerNoInv");
-        workerNoInv.worldPosition = { x: 10, y: 8 };
-        root.addChild(workerNoInv);
-
-        const action = {
-            type: "craftItem" as const,
-            buildingId: "building",
-            recipe: planksRecipe,
-        };
-
-        assert.throws(() => {
-            executeCraftItemAction(action, workerNoInv);
-        });
-    });
-
-    it("throws if building has no inventory", () => {
-        const { root, worker } = createTestScene();
-        const buildingNoInv = new Entity("buildingNoInv");
-        buildingNoInv.worldPosition = { x: 11, y: 8 };
-        root.addChild(buildingNoInv);
-
-        const workerInventory = worker.getEcsComponent(InventoryComponentId)!;
-        addInventoryItem(workerInventory, woodResourceItem, 10);
-
-        const action = {
-            type: "craftItem" as const,
-            buildingId: "buildingNoInv",
-            recipe: planksRecipe,
-        };
-
-        assert.throws(() => {
-            executeCraftItemAction(action, worker);
-        });
     });
 });

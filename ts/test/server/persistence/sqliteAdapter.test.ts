@@ -45,7 +45,7 @@ describe("SQLiteAdapter", () => {
         });
 
         it("returns true after saving meta", async () => {
-            await adapter.saveMeta({ version: 1, tick: 42, seed: 123 });
+            await adapter.saveMeta({ version: 1, tick: 42, seed: 123, idCounters: {} });
             assert.strictEqual(await adapter.hasSave(), true);
         });
     });
@@ -56,6 +56,7 @@ describe("SQLiteAdapter", () => {
                 version: 1,
                 tick: 100,
                 seed: 42,
+                idCounters: { worker: 3, chunk: 7 },
             };
             await adapter.saveMeta(meta);
             const loaded = await adapter.loadMeta();
@@ -68,13 +69,14 @@ describe("SQLiteAdapter", () => {
         });
 
         it("overwrites existing meta", async () => {
-            await adapter.saveMeta({ version: 1, tick: 10, seed: 1 });
-            await adapter.saveMeta({ version: 1, tick: 20, seed: 2 });
+            await adapter.saveMeta({ version: 1, tick: 10, seed: 1, idCounters: {} });
+            await adapter.saveMeta({ version: 1, tick: 20, seed: 2, idCounters: {} });
             const loaded = await adapter.loadMeta();
             assert.deepStrictEqual(loaded, {
                 version: 1,
                 tick: 20,
                 seed: 2,
+                idCounters: {},
             });
         });
     });
@@ -178,7 +180,7 @@ describe("SQLiteAdapter", () => {
 
     describe("clearGame", () => {
         it("clears all data", async () => {
-            await adapter.saveMeta({ version: 1, tick: 10, seed: 1 });
+            await adapter.saveMeta({ version: 1, tick: 10, seed: 1, idCounters: {} });
             await adapter.saveEntity(makeEntity("e1", null, 5, 10));
             await adapter.saveRootComponents({ test: { id: "test" } });
 

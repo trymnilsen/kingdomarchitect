@@ -8,6 +8,10 @@ import {
     createInventoryComponent,
     addInventoryItem,
 } from "../../../../src/game/component/inventoryComponent.ts";
+import {
+    createHeldItemComponent,
+    HeldItemComponentId,
+} from "../../../../src/game/component/heldItemComponent.ts";
 import { createBuildingComponent } from "../../../../src/game/component/buildingComponent.ts";
 import { createStockpileComponent } from "../../../../src/game/component/stockpileComponent.ts";
 import { woodenHouse } from "../../../../src/data/building/wood/house.ts";
@@ -28,7 +32,7 @@ function createTestScene(): {
     building.worldPosition = { x: 15, y: 13 };
     stockpile.worldPosition = { x: 20, y: 8 };
 
-    worker.setEcsComponent(createInventoryComponent());
+    worker.setEcsComponent(createHeldItemComponent());
     building.setEcsComponent(createBuildingComponent(woodenHouse, true));
     building.setEcsComponent(createInventoryComponent());
 
@@ -48,7 +52,6 @@ describe("buildBuildingPlanner", () => {
         it("returns moveTo and constructBuilding actions", () => {
             const { root, worker, building } = createTestScene();
 
-            // Give building all required materials (20 wood for woodenHouse)
             const buildingInventory = building.getEcsComponent("Inventory")!;
             addInventoryItem(buildingInventory, woodResourceItem, 20);
 
@@ -59,31 +62,15 @@ describe("buildBuildingPlanner", () => {
             assert.strictEqual(actions[0].type, "moveTo");
             assert.strictEqual(actions[1].type, "constructBuilding");
         });
-
-        it("sets correct entityId for constructBuilding action", () => {
-            const { root, worker, building } = createTestScene();
-
-            const buildingInventory = building.getEcsComponent("Inventory")!;
-            addInventoryItem(buildingInventory, woodResourceItem, 20);
-
-            const job = BuildBuildingJob(building);
-            const actions = planBuildBuilding(root, worker, job);
-
-            const constructAction = actions[1] as {
-                type: "constructBuilding";
-                entityId: string;
-            };
-            assert.strictEqual(constructAction.entityId, "building");
-        });
     });
 
-    describe("State 2: Worker has needed materials", () => {
-        it("returns moveTo and depositToInventory actions", () => {
+    describe("State 2: Worker held matches a needed material", () => {
+        it("returns moveTo + depositToInventory carrying held's item id", () => {
             const { root, worker, building } = createTestScene();
 
-            // Worker has materials, building needs them
-            const workerInventory = worker.getEcsComponent("Inventory")!;
-            addInventoryItem(workerInventory, woodResourceItem, 20);
+            const held = worker.requireEcsComponent(HeldItemComponentId);
+            held.item = woodResourceItem;
+            held.amount = 7;
 
             const job = BuildBuildingJob(building);
             const actions = planBuildBuilding(root, worker, job);
@@ -91,74 +78,35 @@ describe("buildBuildingPlanner", () => {
             assert.strictEqual(actions.length, 2);
             assert.strictEqual(actions[0].type, "moveTo");
             assert.strictEqual(actions[1].type, "depositToInventory");
-        });
-
-        it("deposits correct amount of materials", () => {
-            const { root, worker, building } = createTestScene();
-
-            // Worker has 25 wood, building needs 20
-            const workerInventory = worker.getEcsComponent("Inventory")!;
-            addInventoryItem(workerInventory, woodResourceItem, 25);
-
-            const job = BuildBuildingJob(building);
-            const actions = planBuildBuilding(root, worker, job);
 
             const depositAction = actions[1] as {
                 type: "depositToInventory";
-                items: Array<{ itemId: string; amount: number }>;
+                targetEntityId: string;
+                itemId?: string;
             };
-
-            const woodDeposit = depositAction.items.find(
-                (i) => i.itemId === "wood",
-            );
-            assert.ok(woodDeposit);
-            assert.strictEqual(woodDeposit.amount, 20);
-        });
-
-        it("deposits only what is still needed", () => {
-            const { root, worker, building } = createTestScene();
-
-            // Building already has 15 wood, needs 20 total
-            const buildingInventory = building.getEcsComponent("Inventory")!;
-            addInventoryItem(buildingInventory, woodResourceItem, 15);
-
-            // Worker has 10 wood
-            const workerInventory = worker.getEcsComponent("Inventory")!;
-            addInventoryItem(workerInventory, woodResourceItem, 10);
-
-            const job = BuildBuildingJob(building);
-            const actions = planBuildBuilding(root, worker, job);
-
-            const depositAction = actions[1] as {
-                type: "depositToInventory";
-                items: Array<{ itemId: string; amount: number }>;
-            };
-
-            const woodDeposit = depositAction.items.find(
-                (i) => i.itemId === "wood",
-            );
-            assert.ok(woodDeposit);
-            assert.strictEqual(woodDeposit.amount, 5); // Only need 5 more
+            assert.strictEqual(depositAction.itemId, "wood");
+            assert.strictEqual(depositAction.targetEntityId, "building");
         });
     });
 
-    describe("State 3: Need to fetch from stockpile", () => {
-        it("returns moveTo and takeFromInventory actions", () => {
+    describe("State 3: Need to fetch from stockpile (held empty)", () => {
+        it("returns moveTo + withdrawFromStockpile + moveTo + deposit", () => {
             const { root, worker, stockpile } = createTestScene();
 
-            // Stockpile has materials
             const stockpileInventory = stockpile.getEcsComponent("Inventory")!;
             addInventoryItem(stockpileInventory, woodResourceItem, 30);
 
             const job = BuildBuildingJob({ id: "building" } as Entity);
             const actions = planBuildBuilding(root, worker, job);
 
-            assert.strictEqual(actions.length, 2);
+            assert.strictEqual(actions.length, 4);
             assert.strictEqual(actions[0].type, "moveTo");
-            assert.strictEqual(actions[1].type, "takeFromInventory");
+            assert.strictEqual(actions[1].type, "withdrawFromStockpile");
+            assert.strictEqual(actions[2].type, "moveTo");
+            assert.strictEqual(actions[3].type, "depositToInventory");
         });
 
-        it("moves to stockpile position", () => {
+        it("withdraw moves to the stockpile position", () => {
             const { root, worker, stockpile } = createTestScene();
 
             const stockpileInventory = stockpile.getEcsComponent("Inventory")!;
@@ -176,18 +124,6 @@ describe("buildBuildingPlanner", () => {
         });
     });
 
-    describe("State 4: No materials available", () => {
-        it("returns empty array when no materials in stockpiles", () => {
-            const { root, worker } = createTestScene();
-
-            // No materials anywhere
-            const job = BuildBuildingJob({ id: "building" } as Entity);
-            const actions = planBuildBuilding(root, worker, job);
-
-            assert.strictEqual(actions.length, 0);
-        });
-    });
-
     describe("error cases", () => {
         it("returns empty array if building not found", () => {
             const { root, worker } = createTestScene();
@@ -198,7 +134,6 @@ describe("buildBuildingPlanner", () => {
             };
 
             const actions = planBuildBuilding(root, worker, job);
-
             assert.strictEqual(actions.length, 0);
         });
 
@@ -211,34 +146,17 @@ describe("buildBuildingPlanner", () => {
 
             const job = BuildBuildingJob(noBuildingComp);
             const actions = planBuildBuilding(root, worker, job);
-
             assert.strictEqual(actions.length, 0);
         });
 
-        it("returns empty array if worker has no inventory", () => {
+        it("returns empty array if worker has no held component", () => {
             const { root, building } = createTestScene();
-            const workerNoInv = new Entity("workerNoInv");
-            workerNoInv.worldPosition = { x: 10, y: 8 };
-            root.addChild(workerNoInv);
+            const workerNoHeld = new Entity("workerNoHeld");
+            workerNoHeld.worldPosition = { x: 10, y: 8 };
+            root.addChild(workerNoHeld);
 
             const job = BuildBuildingJob(building);
-            const actions = planBuildBuilding(root, workerNoInv, job);
-
-            assert.strictEqual(actions.length, 0);
-        });
-
-        it("returns empty array if building has no inventory", () => {
-            const { root, worker } = createTestScene();
-            const buildingNoInv = new Entity("buildingNoInv");
-            buildingNoInv.worldPosition = { x: 5, y: 5 };
-            buildingNoInv.setEcsComponent(
-                createBuildingComponent(woodenHouse, true),
-            );
-            root.addChild(buildingNoInv);
-
-            const job = BuildBuildingJob(buildingNoInv);
-            const actions = planBuildBuilding(root, worker, job);
-
+            const actions = planBuildBuilding(root, workerNoHeld, job);
             assert.strictEqual(actions.length, 0);
         });
     });

@@ -1,10 +1,16 @@
 import type { BehaviorActionData } from "../../behavior/actions/ActionData.ts";
+import {
+    HeldItemComponentId,
+    isHeldEmpty,
+} from "../../component/heldItemComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import type { BuildBuildingJob } from "../buildBuildingJob.ts";
 import type { Jobs } from "../job.ts";
+import { jobsRequiringEmptyHeld } from "../jobsRequiringEmptyHeld.ts";
 import { planCollectItem } from "./collectItemPlanner.ts";
 import { planCollectResource } from "./collectResourcePlanner.ts";
 import { planCrafting } from "./craftingPlanner.ts";
+import { planDepositHeld } from "./planDepositHeld.ts";
 import { planProduction } from "./productionPlanner.ts";
 import { planFarmPlant } from "./farmPlantJobPlanner.ts";
 import { planFarmHarvest } from "./farmHarvestJobPlanner.ts";
@@ -30,6 +36,27 @@ export type BuildJobPlanner = (
  * @param buildPlanner Injected planner for build jobs
  */
 export function planJob(
+    root: Entity,
+    worker: Entity,
+    job: Jobs,
+    buildPlanner: BuildJobPlanner,
+): BehaviorActionData[] {
+    const actions = dispatchByJobId(root, worker, job, buildPlanner);
+    if (actions.length === 0) {
+        return actions;
+    }
+
+    if (jobsRequiringEmptyHeld.has(job.id)) {
+        const held = worker.getEcsComponent(HeldItemComponentId);
+        if (held && !isHeldEmpty(held)) {
+            return [...planDepositHeld(worker), ...actions];
+        }
+    }
+
+    return actions;
+}
+
+function dispatchByJobId(
     root: Entity,
     worker: Entity,
     job: Jobs,

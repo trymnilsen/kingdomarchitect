@@ -89,9 +89,7 @@ function update(root: Entity, _deltaTime: number) {
         const [houseEntity, housingComponent] = houseEntry;
         removeItem(availableHouses, houseEntry);
         const settlement = getSettlementEntity(houseEntity);
-        const kingdomComp = settlement.getEcsComponent(KingdomComponentId);
-        const defaults = kingdomComp?.defaultDesiredInventory ?? [];
-        const worker = workerPrefab(undefined, defaults);
+        const worker = workerPrefab();
         const spawnPosition = findClosestAvailablePosition(
             root,
             houseEntity.worldPosition,

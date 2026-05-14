@@ -14,57 +14,52 @@ describe("EquipItemCommand", () => {
     it("creates command with correct id", () => {
         const entity = new Entity("player");
 
-        const command = EquipItemCommand(swordItem, entity, "main");
+        const command = EquipItemCommand(
+            entity,
+            "stockpile-1",
+            swordItem.id,
+            "primary",
+        );
 
         assert.strictEqual(command.id, EquipItemCommandId);
         assert.strictEqual(command.id, "equipItem");
     });
 
-    it("uses item id from item object", () => {
-        const entity = new Entity("player");
-
-        const command = EquipItemCommand(swordItem, entity, "main");
-
-        assert.strictEqual(command.itemId, swordItem.id);
-    });
-
-    it("uses entity id from entity object", () => {
+    it("captures source, item, slot and entity", () => {
         const entity = new Entity("warrior1");
 
-        const command = EquipItemCommand(swordItem, entity, "main");
+        const command = EquipItemCommand(
+            entity,
+            "stockpile-7",
+            swordItem.id,
+            "primary",
+        );
 
         assert.strictEqual(command.entity, "warrior1");
+        assert.strictEqual(command.sourceEntityId, "stockpile-7");
+        assert.strictEqual(command.itemId, swordItem.id);
+        assert.strictEqual(command.slot, "primary");
     });
 
-    it("stores slot type", () => {
+    it("supports both primary and secondary slots", () => {
         const entity = new Entity("player");
 
-        const mainCommand = EquipItemCommand(swordItem, entity, "main");
-        const otherCommand = EquipItemCommand(hammerItem, entity, "other");
+        const primaryCommand = EquipItemCommand(
+            entity,
+            "stockpile",
+            swordItem.id,
+            "primary",
+        );
+        const secondaryCommand = EquipItemCommand(
+            entity,
+            "stockpile",
+            hammerItem.id,
+            "secondary",
+        );
 
-        assert.strictEqual(mainCommand.slot, "main");
-        assert.strictEqual(otherCommand.slot, "other");
-    });
-
-    it("handles null item for unequip", () => {
-        const entity = new Entity("player");
-
-        const command = EquipItemCommand(null, entity, "main");
-
-        assert.strictEqual(command.itemId, null);
-        assert.strictEqual(command.slot, "main");
-        assert.strictEqual(command.entity, "player");
-    });
-
-    it("creates separate commands for different slots", () => {
-        const entity = new Entity("player");
-
-        const command1 = EquipItemCommand(swordItem, entity, "main");
-        const command2 = EquipItemCommand(hammerItem, entity, "other");
-
-        assert.strictEqual(command1.slot, "main");
-        assert.strictEqual(command2.slot, "other");
-        assert.strictEqual(command1.itemId, swordItem.id);
-        assert.strictEqual(command2.itemId, hammerItem.id);
+        assert.strictEqual(primaryCommand.slot, "primary");
+        assert.strictEqual(secondaryCommand.slot, "secondary");
+        assert.strictEqual(primaryCommand.itemId, swordItem.id);
+        assert.strictEqual(secondaryCommand.itemId, hammerItem.id);
     });
 });

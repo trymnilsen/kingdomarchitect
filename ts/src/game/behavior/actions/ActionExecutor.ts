@@ -25,9 +25,14 @@ import { executeWithdrawFromStockpileAction } from "./withdrawFromStockpileActio
 import { executePlantTreeAction } from "./plantTreeAction.ts";
 import { executePlantCropAction } from "./plantCropAction.ts";
 import { executeHarvestCropAction } from "./harvestCropAction.ts";
-import { executeEatFromInventoryAction } from "./eatFromInventoryAction.ts";
+import { executeEatFromHeldAction } from "./eatFromHeldAction.ts";
+import { executeEatFromEquipmentAction } from "./eatFromEquipmentAction.ts";
 import { executeStealFoodAction } from "./stealFoodAction.ts";
 import { executeWorkWindmillAction } from "./workWindmillAction.ts";
+import { executeDropHeldAction } from "./dropHeldAction.ts";
+import { executePickupFromGroundAction } from "./pickupFromGroundAction.ts";
+import { executeEquipFromHeldAction } from "./equipFromHeldAction.ts";
+import { executeDropFromSlotAction } from "./dropFromSlotAction.ts";
 
 /**
  * Main action executor that dispatches to specific action handlers based on action type.
@@ -74,12 +79,22 @@ export const executeAction: BehaviorActionExecutor = (
             return executePlantCropAction(action, entity, tick);
         case "harvestCrop":
             return executeHarvestCropAction(action, entity);
-        case "eatFromInventory":
-            return executeEatFromInventoryAction(action, entity);
+        case "eatFromHeld":
+            return executeEatFromHeldAction(action, entity);
+        case "eatFromEquipment":
+            return executeEatFromEquipmentAction(action, entity);
         case "stealFood":
             return executeStealFoodAction(action, entity);
         case "workWindmill":
             return executeWorkWindmillAction(action, entity, tick);
+        case "dropHeld":
+            return executeDropHeldAction(action, entity);
+        case "pickupFromGround":
+            return executePickupFromGroundAction(action, entity);
+        case "equipFromHeld":
+            return executeEquipFromHeldAction(action, entity);
+        case "dropFromSlot":
+            return executeDropFromSlotAction(action, entity);
         default:
             log.warn(
                 `Unknown action type: ${(action as any).type}`,

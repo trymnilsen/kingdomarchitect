@@ -15,6 +15,7 @@ import {
     addInventoryItem,
     InventoryComponentId,
 } from "../../../src/game/component/inventoryComponent.ts";
+import { HeldItemComponentId } from "../../../src/game/component/heldItemComponent.ts";
 import {
     StockpileComponentId,
 } from "../../../src/game/component/stockpileComponent.ts";
@@ -212,5 +213,12 @@ export class ScenarioHarness {
         const inventory = entity.getEcsComponent(InventoryComponentId);
         if (!inventory) return 0;
         return getInventoryItem(inventory, itemId)?.amount ?? 0;
+    }
+
+    /** Get the count of an item in an entity's held slot. */
+    getHeldAmount(entity: Entity, itemId: string): number {
+        const held = entity.getEcsComponent(HeldItemComponentId);
+        if (!held || !held.item || held.item.id !== itemId) return 0;
+        return held.amount;
     }
 }

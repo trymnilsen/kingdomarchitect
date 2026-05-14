@@ -9,10 +9,11 @@ import { spendEntityEnergy } from "../../component/energyComponent.ts";
 const log = createLogger("behavior");
 import { damage, HealthComponentId } from "../../component/healthComponent.ts";
 import {
-    addInventoryItem,
-    InventoryComponentId,
-    type InventoryComponent,
-} from "../../component/inventoryComponent.ts";
+    addToHeldItem,
+    HeldItemComponentId,
+    isHeldEmpty,
+    type HeldItemComponent,
+} from "../../component/heldItemComponent.ts";
 import { RegrowComponentId } from "../../component/regrowComponent.ts";
 import { ResourceComponentId } from "../../component/resourceComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
@@ -36,10 +37,11 @@ export type HarvestResourceActionData = {
 import type { NaturalResource } from "../../../data/inventory/items/naturalResource.ts";
 
 /**
- * Harvest a resource entity.
- * - Chop mode: Progress derived from target's HealthComponent
- * - Other modes: Progress stored on action.workProgress
- * Assumes worker is already adjacent to resource (moveTo should have run first).
+ * Harvest a resource entity and deposit yields into the worker's held
+ * slot. Held is single-item-id, so a resource that yields a different
+ * item id than what's already held will fail when the harvest completes.
+ * Callers should ensure held is empty or matches the yield before
+ * starting a harvest.
  */
 export function executeHarvestResourceAction(
     action: HarvestResourceActionData,
@@ -50,9 +52,7 @@ export function executeHarvestResourceAction(
     const resourceEntity = root.findEntity(action.entityId);
 
     if (!resourceEntity) {
-        log.warn(
-            `Resource entity ${action.entityId} not found`,
-        );
+        log.warn(`Resource entity ${action.entityId} not found`);
         return {
             kind: "failed",
             cause: { type: "targetGone", entityId: action.entityId },
@@ -69,46 +69,78 @@ export function executeHarvestResourceAction(
     const resourceComponent =
         resourceEntity.getEcsComponent(ResourceComponentId);
     if (!resourceComponent) {
-        log.warn(
-            `Entity ${action.entityId} has no ResourceComponent`,
-        );
+        log.warn(`Entity ${action.entityId} has no ResourceComponent`);
         return { kind: "failed", cause: { type: "unknown" } };
     }
 
     const resource = getResourceById(resourceComponent.resourceId);
     if (!resource) {
-        log.warn(
-            `Unknown resource: ${resourceComponent.resourceId}`,
-        );
+        log.warn(`Unknown resource: ${resourceComponent.resourceId}`);
         return { kind: "failed", cause: { type: "unknown" } };
     }
 
-    const workerInventory = entity.requireEcsComponent(InventoryComponentId);
+    const held = entity.requireEcsComponent(HeldItemComponentId);
 
     if (action.harvestAction === ResourceHarvestMode.Chop) {
-        return executeChopHarvest(
-            entity,
-            resourceEntity,
-            resource,
-            workerInventory,
-        );
+        return executeChopHarvest(entity, resourceEntity, resource, held);
     } else {
         return executeWorkHarvest(
             entity,
             resourceEntity,
             resource,
-            workerInventory,
+            held,
             action,
             tick,
         );
     }
 }
 
+function depositYields(
+    worker: Entity,
+    resource: NaturalResource,
+    held: HeldItemComponent,
+): ActionResult | null {
+    if (!isHeldEmpty(held)) {
+        const heldId = held.item!.id;
+        const allMatch = resource.yields.every(
+            (y) => y.item.id === heldId,
+        );
+        if (!allMatch) {
+            log.warn(
+                `Cannot deposit harvest yields: held has ${heldId}, yields are ${resource.yields.map((y) => y.item.id).join(",")}`,
+            );
+            return { kind: "failed", cause: { type: "unknown" } };
+        }
+    } else {
+        const firstYieldId = resource.yields[0]?.item.id;
+        if (firstYieldId) {
+            const allMatch = resource.yields.every(
+                (y) => y.item.id === firstYieldId,
+            );
+            if (!allMatch) {
+                log.warn(
+                    `Resource ${resource.id} has multiple yield item ids; cannot fit in held slot`,
+                );
+                return { kind: "failed", cause: { type: "unknown" } };
+            }
+        }
+    }
+    for (const yieldItem of resource.yields) {
+        addToHeldItem(
+            held,
+            structuredClone(yieldItem.item),
+            yieldItem.amount,
+        );
+    }
+    worker.invalidateComponent(HeldItemComponentId);
+    return null;
+}
+
 function executeChopHarvest(
     worker: Entity,
     resourceEntity: Entity,
     resource: NaturalResource,
-    workerInventory: InventoryComponent,
+    held: HeldItemComponent,
 ): ActionResult {
     const healthComponent =
         resourceEntity.requireEcsComponent(HealthComponentId);
@@ -118,14 +150,8 @@ function executeChopHarvest(
     spendEntityEnergy(worker, 2);
 
     if (healthComponent.currentHp <= 0) {
-        for (const yieldItem of resource.yields) {
-            addInventoryItem(
-                workerInventory,
-                structuredClone(yieldItem.item),
-                yieldItem.amount,
-            );
-        }
-        worker.invalidateComponent(InventoryComponentId);
+        const failure = depositYields(worker, resource, held);
+        if (failure) return failure;
 
         resourceEntity.remove();
 
@@ -146,7 +172,7 @@ function executeWorkHarvest(
     worker: Entity,
     resourceEntity: Entity,
     resource: NaturalResource,
-    workerInventory: InventoryComponent,
+    held: HeldItemComponent,
     action: HarvestResourceActionData,
     tick: number,
 ): ActionResult {
@@ -159,14 +185,8 @@ function executeWorkHarvest(
     spendEntityEnergy(worker, 2);
 
     if (action.workProgress >= workDuration) {
-        for (const yieldItem of resource.yields) {
-            addInventoryItem(
-                workerInventory,
-                structuredClone(yieldItem.item),
-                yieldItem.amount,
-            );
-        }
-        worker.invalidateComponent(InventoryComponentId);
+        const failure = depositYields(worker, resource, held);
+        if (failure) return failure;
 
         applyResourceLifecycle(resourceEntity, resource, tick);
 

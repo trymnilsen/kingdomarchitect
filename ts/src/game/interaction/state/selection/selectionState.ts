@@ -38,7 +38,10 @@ import { ProductionBuildingSelectionProvider } from "./actor/provider/production
 import { StockpileSelectionProvider } from "./actor/provider/stockpileSelectionProvider.ts";
 import { FarmBuildingSelectionProvider } from "./actor/provider/farmBuildingSelectionProvider.ts";
 import { WindmillSelectionProvider } from "./actor/provider/windmillSelectionProvider.ts";
-import { FarmComponentId, FarmState } from "../../../component/farmComponent.ts";
+import {
+    FarmComponentId,
+    FarmState,
+} from "../../../component/farmComponent.ts";
 import { getCraftingJobDisplayInfos } from "../../../job/craftingJobQuery.ts";
 import { craftingQueueStrip } from "../crafting/craftingQueueStrip.ts";
 import { uiAbsoluteLayer } from "../../../../ui/declarative/uiAbsoluteLayer.ts";
@@ -63,6 +66,10 @@ import { getRoleDefinition } from "../../../../data/role/roleDefinitions.ts";
 import { bins } from "../../../../../generated/sprites.ts";
 import { BehaviorAgentComponentId } from "../../../component/BehaviorAgentComponent.ts";
 import { GoblinUnitComponentId } from "../../../component/goblinUnitComponent.ts";
+import {
+    CollectableComponentId,
+    hasCollectableItems,
+} from "../../../component/collectableComponent.ts";
 
 export class SelectionState extends InteractionState {
     private providers: ActorSelectionProvider[] = [
@@ -256,6 +263,21 @@ export class SelectionState extends InteractionState {
                 icon = spriteComponent.sprite;
             }
 
+            const collectableComponent = this._selection.entity.getEcsComponent(
+                CollectableComponentId,
+            );
+            if (
+                collectableComponent &&
+                hasCollectableItems(collectableComponent)
+            ) {
+                const firstItem = collectableComponent.items[0].item;
+                return {
+                    icon: firstItem.asset,
+                    title: firstItem.name,
+                    subtitle: "Collectable",
+                };
+            }
+
             let name = "Entity";
             const buildingComponent =
                 this._selection.entity.getEcsComponent(BuildingComponentId);
@@ -292,13 +314,15 @@ export class SelectionState extends InteractionState {
                 if (farmComponent.state === FarmState.Empty) {
                     farmSubtitle = "empty";
                 } else if (farmComponent.state === FarmState.Growing) {
-                    const progress = farmComponent.growthDuration > 0
-                        ? Math.floor(
-                              ((this.context.gameTime.tick - farmComponent.plantedAtTick) /
-                                  farmComponent.growthDuration) *
-                                  100,
-                          )
-                        : 100;
+                    const progress =
+                        farmComponent.growthDuration > 0
+                            ? Math.floor(
+                                  ((this.context.gameTime.tick -
+                                      farmComponent.plantedAtTick) /
+                                      farmComponent.growthDuration) *
+                                      100,
+                              )
+                            : 100;
                     farmSubtitle = `growing (${Math.min(progress, 99)}%)`;
                 } else {
                     farmSubtitle = `${farmComponent.cropItemId} ready`;
@@ -444,7 +468,8 @@ function drawEnergyBar(
     );
     const barWidth = 28;
     const barYOffset = -8;
-    const maxEnergy = energyComponent.maxEnergy > 0 ? energyComponent.maxEnergy : 1;
+    const maxEnergy =
+        energyComponent.maxEnergy > 0 ? energyComponent.maxEnergy : 1;
     const percentageWidth = Math.floor(
         (barWidth - 4) * (energyComponent.energy / maxEnergy),
     );

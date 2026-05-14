@@ -63,7 +63,7 @@ describe("PersistenceManager", () => {
             saveRoot.addChild(child);
 
             await manager.saveWorld(saveRoot);
-            await manager.saveMeta({ version: 1, tick: 0, seed: 12345 });
+            await manager.saveMeta({ version: 1, tick: 0, seed: 12345, idCounters: {} });
 
             const loadRoot = new Entity("root");
             const loaded = await manager.load(loadRoot);
@@ -133,7 +133,7 @@ describe("PersistenceManager", () => {
             child1.addChild(grandchild);
 
             await manager.saveWorld(saveRoot);
-            await manager.saveMeta({ version: 1, tick: 0, seed: 12345 });
+            await manager.saveMeta({ version: 1, tick: 0, seed: 12345, idCounters: {} });
 
             const loadRoot = new Entity("root");
             const loaded = await manager.load(loadRoot);
@@ -188,7 +188,7 @@ describe("PersistenceManager", () => {
             saveRoot.addChild(entity);
 
             await manager.saveWorld(saveRoot);
-            await manager.saveMeta({ version: 1, tick: 0, seed: 12345 });
+            await manager.saveMeta({ version: 1, tick: 0, seed: 12345, idCounters: {} });
 
             const loadRoot = new Entity("root");
             await manager.load(loadRoot);
@@ -228,7 +228,7 @@ describe("PersistenceManager", () => {
             saveRoot.setEcsComponent(tileComponent);
 
             await manager.saveWorld(saveRoot);
-            await manager.saveMeta({ version: 1, tick: 0, seed: 12345 });
+            await manager.saveMeta({ version: 1, tick: 0, seed: 12345, idCounters: {} });
 
             const loadRoot = new Entity("root");
             const loaded = await manager.load(loadRoot);
@@ -254,7 +254,7 @@ describe("PersistenceManager", () => {
             saveRoot.addChild(child);
 
             await manager.saveWorld(saveRoot);
-            await manager.saveMeta({ version: 1, tick: 0, seed: 12345 });
+            await manager.saveMeta({ version: 1, tick: 0, seed: 12345, idCounters: {} });
 
             const loadRoot = new Entity("root");
             const loaded = await manager.load(loadRoot);
@@ -287,7 +287,7 @@ describe("PersistenceManager", () => {
             saveRoot.addChild(entity);
 
             await manager.saveWorld(saveRoot);
-            await manager.saveMeta({ version: 1, tick: 0, seed: 12345 });
+            await manager.saveMeta({ version: 1, tick: 0, seed: 12345, idCounters: {} });
 
             const loadRoot = new Entity("root");
             await manager.load(loadRoot);

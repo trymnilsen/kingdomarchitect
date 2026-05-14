@@ -10,6 +10,10 @@ import {
 import { executeTakeFromInventoryAction } from "../../../../src/game/behavior/actions/takeFromInventoryAction.ts";
 import { executeDepositToInventoryAction } from "../../../../src/game/behavior/actions/depositToInventoryAction.ts";
 import {
+    createHeldItemComponent,
+    HeldItemComponentId,
+} from "../../../../src/game/component/heldItemComponent.ts";
+import {
     woodResourceItem,
     stoneResource,
 } from "../../../../src/data/inventory/items/resources.ts";
@@ -143,96 +147,99 @@ describe("takeFromInventoryAction", () => {
 });
 
 describe("depositToInventoryAction", () => {
-    it("transfers items from worker to target inventory", () => {
-        const { worker, stockpile } = createTestScene();
+    function createHeldScene(): {
+        root: Entity;
+        worker: Entity;
+        stockpile: Entity;
+    } {
+        const root = new Entity("root");
+        const worker = new Entity("worker");
+        const stockpile = new Entity("stockpile");
 
-        // Add items to worker
-        const workerInventory = worker.getEcsComponent(InventoryComponentId)!;
-        addInventoryItem(workerInventory, woodResourceItem, 10);
+        worker.worldPosition = { x: 10, y: 8 };
+        stockpile.worldPosition = { x: 11, y: 8 };
 
-        const action = {
-            type: "depositToInventory" as const,
-            targetEntityId: "stockpile",
-            items: [{ itemId: "wood", amount: 5 }],
-        };
+        worker.setEcsComponent(createHeldItemComponent());
+        stockpile.setEcsComponent(createInventoryComponent());
 
-        const result = executeDepositToInventoryAction(action, worker);
+        root.addChild(worker);
+        root.addChild(stockpile);
+        return { root, worker, stockpile };
+    }
 
-        assert.strictEqual(result.kind, "complete");
+    it("transfers held item into target inventory and clears held", () => {
+        const { worker, stockpile } = createHeldScene();
 
-        const workerWood = getInventoryItem(workerInventory, "wood");
-        assert.strictEqual(workerWood?.amount, 5);
-
-        const stockpileInventory =
-            stockpile.getEcsComponent(InventoryComponentId)!;
-        const stockpileWood = getInventoryItem(stockpileInventory, "wood");
-        assert.strictEqual(stockpileWood?.amount, 5);
-    });
-
-    it("transfers multiple item types", () => {
-        const { worker, stockpile } = createTestScene();
-
-        const workerInventory = worker.getEcsComponent(InventoryComponentId)!;
-        addInventoryItem(workerInventory, woodResourceItem, 10);
-        addInventoryItem(workerInventory, stoneResource, 8);
+        const held = worker.requireEcsComponent(HeldItemComponentId);
+        held.item = woodResourceItem;
+        held.amount = 5;
 
         const action = {
             type: "depositToInventory" as const,
             targetEntityId: "stockpile",
-            items: [
-                { itemId: "wood", amount: 3 },
-                { itemId: "stone", amount: 4 },
-            ],
         };
 
         const result = executeDepositToInventoryAction(action, worker);
-
         assert.strictEqual(result.kind, "complete");
+
+        assert.strictEqual(held.item, null);
+        assert.strictEqual(held.amount, 0);
 
         const stockpileInventory =
             stockpile.getEcsComponent(InventoryComponentId)!;
         assert.strictEqual(
             getInventoryItem(stockpileInventory, "wood")?.amount,
-            3,
-        );
-        assert.strictEqual(
-            getInventoryItem(stockpileInventory, "stone")?.amount,
-            4,
+            5,
         );
     });
 
-    it("fails if target entity not found", () => {
-        const { worker } = createTestScene();
-
-        const workerInventory = worker.getEcsComponent(InventoryComponentId)!;
-        addInventoryItem(workerInventory, woodResourceItem, 10);
-
-        const action = {
-            type: "depositToInventory" as const,
-            targetEntityId: "nonexistent",
-            items: [{ itemId: "wood", amount: 5 }],
-        };
-
-        const result = executeDepositToInventoryAction(action, worker);
-
-        assert.strictEqual(result.kind, "failed");
-    });
-
-    it("fails if worker not adjacent to target", () => {
-        const { worker, stockpile } = createTestScene();
-        stockpile.worldPosition = { x: 25, y: 25 }; // Not adjacent
-
-        const workerInventory = worker.getEcsComponent(InventoryComponentId)!;
-        addInventoryItem(workerInventory, woodResourceItem, 10);
+    it("fails when itemId mismatches held", () => {
+        const { worker } = createHeldScene();
+        const held = worker.requireEcsComponent(HeldItemComponentId);
+        held.item = woodResourceItem;
+        held.amount = 5;
 
         const action = {
             type: "depositToInventory" as const,
             targetEntityId: "stockpile",
-            items: [{ itemId: "wood", amount: 5 }],
+            itemId: "stone",
         };
 
         const result = executeDepositToInventoryAction(action, worker);
+        assert.strictEqual(result.kind, "failed");
+        assert.strictEqual(held.item?.id, "wood");
+    });
 
+    it("fails if target entity not found", () => {
+        const { worker } = createHeldScene();
+
+        const held = worker.requireEcsComponent(HeldItemComponentId);
+        held.item = woodResourceItem;
+        held.amount = 5;
+
+        const action = {
+            type: "depositToInventory" as const,
+            targetEntityId: "nonexistent",
+        };
+
+        const result = executeDepositToInventoryAction(action, worker);
+        assert.strictEqual(result.kind, "failed");
+    });
+
+    it("fails if worker not adjacent to target", () => {
+        const { worker, stockpile } = createHeldScene();
+        stockpile.worldPosition = { x: 25, y: 25 };
+
+        const held = worker.requireEcsComponent(HeldItemComponentId);
+        held.item = woodResourceItem;
+        held.amount = 5;
+
+        const action = {
+            type: "depositToInventory" as const,
+            targetEntityId: "stockpile",
+        };
+
+        const result = executeDepositToInventoryAction(action, worker);
         assert.strictEqual(result.kind, "failed");
     });
 });

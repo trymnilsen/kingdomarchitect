@@ -1,5 +1,4 @@
 import type { Entity } from "../../entity/entity.ts";
-import type { ItemTransfer } from "../actions/Action.ts";
 import type { BehaviorActionData } from "../actions/ActionData.ts";
 import type { Building } from "../../../data/building/building.ts";
 import { createLogger } from "../../../common/logging/logger.ts";
@@ -10,6 +9,11 @@ import {
     getInventoryItem,
     type InventoryComponent,
 } from "../../component/inventoryComponent.ts";
+import {
+    HeldItemComponentId,
+    isHeldEmpty,
+    type HeldItemComponent,
+} from "../../component/heldItemComponent.ts";
 import { BuildingComponentId } from "../../component/buildingComponent.ts";
 import { StockpileComponentId } from "../../component/stockpileComponent.ts";
 import { ResourceComponentId } from "../../component/resourceComponent.ts";
@@ -19,24 +23,12 @@ import { buildingPrefab } from "../../prefab/buildingPrefab.ts";
 import { findClosestAvailablePosition } from "../../map/query/closestPositionQuery.ts";
 import { createBuildingPlacementValidator } from "../../map/query/buildingPlacementValidator.ts";
 import { woodResourceItem } from "../../../data/inventory/items/resources.ts";
+import { findDropPosition } from "../dropItem.ts";
 
 /**
  * Plans building construction for goblins triggered by survival behaviors,
- * not the job system. This is used by keepWarmBehavior when a goblin needs
- * a campfire and there isn't one — survival can't wait for the camp director
- * to issue a build job.
- *
- * Unlike goblinBuildJobPlanner (which handles job-assigned builds), this
- * planner both places the scaffolding AND plans the construction workflow.
- * The scaffolding is placed immediately inside expand() so the planner can
- * return a concrete action sequence pointing at the new entity.
- *
- * State evaluation order:
- * 1. No building site → place scaffolding, then fall through to state 2+
- * 2. Building site exists with all materials → construct
- * 3. Building site exists, goblin has materials → deposit
- * 4. Building site exists, stockpile has materials → fetch from stockpile
- * 5. Need materials → gather from environment (currently: wood only)
+ * not the job system. Uses the held-item model: one material per trip,
+ * staged into the building's inventory.
  */
 export function planGoblinBuild(
     root: Entity,
@@ -44,14 +36,10 @@ export function planGoblinBuild(
     campEntity: Entity,
     building: Building,
 ): BehaviorActionData[] {
-    // Find existing scaffolded building of this type
     const existingSite = findExistingBuildingSite(campEntity, building.id);
-
     if (!existingSite) {
-        // Need to place new building site
         return planPlaceBuildingSite(root, goblin, campEntity, building);
     }
-
     return planConstructExistingBuilding(
         root,
         goblin,
@@ -83,7 +71,6 @@ function planPlaceBuildingSite(
     campEntity: Entity,
     building: Building,
 ): BehaviorActionData[] {
-    // Find position near camp for new building
     const buildPosition = findClosestAvailablePosition(
         root,
         campEntity.worldPosition,
@@ -91,13 +78,10 @@ function planPlaceBuildingSite(
     );
 
     if (!buildPosition) {
-        log.warn(
-            `No available position for building near camp`,
-        );
+        log.warn(`No available position for building near camp`);
         return [];
     }
 
-    // Create scaffolded building entity
     const buildingEntity = buildingPrefab(building, true);
     campEntity.addChild(buildingEntity);
     buildingEntity.worldPosition = buildPosition;
@@ -106,7 +90,6 @@ function planPlaceBuildingSite(
         `Placed scaffolded ${building.name} at ${buildPosition.x}, ${buildPosition.y}`,
     );
 
-    // Now plan to construct it
     return planConstructExistingBuilding(
         root,
         goblin,
@@ -125,24 +108,19 @@ function planConstructExistingBuilding(
 ): BehaviorActionData[] {
     const buildingInventory =
         buildingEntity.getEcsComponent(InventoryComponentId);
-    const goblinInventory = goblin.getEcsComponent(InventoryComponentId);
+    const goblinHeld = goblin.getEcsComponent(HeldItemComponentId);
 
-    if (!goblinInventory) {
-        log.warn(`Goblin has no inventory`);
+    if (!goblinHeld) {
+        log.warn(`Goblin has no held component`);
         return [];
     }
 
-    // Buildings without requirements can be constructed immediately
     const requirements = building.requirements?.materials ?? {};
     const remainingMaterials = buildingInventory
         ? getRemainingMaterials(buildingInventory, requirements)
-        : requirements;
+        : { ...requirements };
 
-    // State 1: Building ready to construct (all materials deposited)
     if (Object.keys(remainingMaterials).length === 0) {
-        log.info(
-            `Goblin ${goblin.id} state=construct building ${buildingEntity.id}`,
-        );
         return [
             {
                 type: "moveTo",
@@ -153,20 +131,10 @@ function planConstructExistingBuilding(
         ];
     }
 
-    // State 2: Goblin has needed materials
-    const materialsGoblinHas = getMaterialsGoblinHas(
-        goblinInventory,
-        remainingMaterials,
-    );
-    if (Object.keys(materialsGoblinHas).length > 0) {
-        const itemsToDeposit: ItemTransfer[] = Object.entries(
-            materialsGoblinHas,
-        ).map(([itemId, amount]) => ({ itemId, amount }));
-
-        log.info(
-            `Goblin ${goblin.id} state=deposit materials to building ${buildingEntity.id}`,
-            { materials: materialsGoblinHas },
-        );
+    if (
+        !isHeldEmpty(goblinHeld) &&
+        remainingMaterials[goblinHeld.item!.id] !== undefined
+    ) {
         return [
             {
                 type: "moveTo",
@@ -176,46 +144,66 @@ function planConstructExistingBuilding(
             {
                 type: "depositToInventory",
                 targetEntityId: buildingEntity.id,
-                items: itemsToDeposit,
+                itemId: goblinHeld.item!.id,
             },
         ];
     }
 
-    // State 3: Check stockpile for materials
+    if (!isHeldEmpty(goblinHeld)) {
+        // Held has something the building doesn't need — drop it before fetching.
+        const dropPos = findDropPosition(
+            root,
+            goblin.worldPosition,
+            goblinHeld.item!,
+        );
+        if (!dropPos) return [];
+        return [
+            { type: "moveTo", target: dropPos },
+            { type: "dropHeld", destination: dropPos },
+        ];
+    }
+
     const stockpileWithMaterials = findCampStockpileWithMaterials(
         campEntity,
         remainingMaterials,
     );
     if (stockpileWithMaterials) {
-        const itemsToTake = getItemsToTakeFromStockpile(
-            stockpileWithMaterials,
-            remainingMaterials,
+        const inventory = stockpileWithMaterials.requireEcsComponent(
+            InventoryComponentId,
         );
-        if (itemsToTake.length > 0) {
-            log.info(
-                `Goblin ${goblin.id} state=fetch from stockpile ${stockpileWithMaterials.id}`,
-                { items: itemsToTake },
-            );
-            return [
-                {
-                    type: "moveTo",
-                    target: stockpileWithMaterials.worldPosition,
-                    stopAdjacent: "cardinal",
-                },
-                {
-                    type: "takeFromInventory",
-                    sourceEntityId: stockpileWithMaterials.id,
-                    items: itemsToTake,
-                },
-            ];
+        for (const [itemId, amountNeeded] of Object.entries(
+            remainingMaterials,
+        )) {
+            const item = getInventoryItem(inventory, itemId);
+            if (item && item.amount > 0) {
+                const fetch = Math.min(item.amount, amountNeeded);
+                return [
+                    {
+                        type: "moveTo",
+                        target: stockpileWithMaterials.worldPosition,
+                        stopAdjacent: "cardinal",
+                    },
+                    {
+                        type: "withdrawFromStockpile",
+                        stockpileId: stockpileWithMaterials.id,
+                        itemId,
+                        amount: fetch,
+                    },
+                    {
+                        type: "moveTo",
+                        target: buildingEntity.worldPosition,
+                        stopAdjacent: "cardinal",
+                    },
+                    {
+                        type: "depositToInventory",
+                        targetEntityId: buildingEntity.id,
+                        itemId,
+                    },
+                ];
+            }
         }
     }
 
-    // State 4: Gather materials from environment
-    log.info(
-        `Goblin ${goblin.id} state=gather materials from environment`,
-        { materials: remainingMaterials },
-    );
     return planGatherMaterials(root, goblin, remainingMaterials);
 }
 
@@ -235,64 +223,22 @@ function getRemainingMaterials(
     return remaining;
 }
 
-function getMaterialsGoblinHas(
-    goblinInventory: InventoryComponent,
-    remainingMaterials: Record<string, number>,
-): Record<string, number> {
-    const has: Record<string, number> = {};
-    for (const [itemId, amountNeeded] of Object.entries(remainingMaterials)) {
-        const item = getInventoryItem(goblinInventory, itemId);
-        if (item && item.amount > 0) {
-            has[itemId] = Math.min(item.amount, amountNeeded);
-        }
-    }
-    return has;
-}
-
 function findCampStockpileWithMaterials(
     campEntity: Entity,
     remainingMaterials: Record<string, number>,
 ): Entity | null {
     for (const child of campEntity.children) {
-        if (!child.hasComponent(StockpileComponentId)) {
-            continue;
-        }
+        if (!child.hasComponent(StockpileComponentId)) continue;
         const building = child.getEcsComponent(BuildingComponentId);
-        // Skip scaffolded stockpiles
-        if (building?.scaffolded) {
-            continue;
-        }
+        if (building?.scaffolded) continue;
         const inventory = child.getEcsComponent(InventoryComponentId);
-        if (!inventory) {
-            continue;
-        }
+        if (!inventory) continue;
         for (const itemId of Object.keys(remainingMaterials)) {
             const item = getInventoryItem(inventory, itemId);
-            if (item && item.amount > 0) {
-                return child;
-            }
+            if (item && item.amount > 0) return child;
         }
     }
     return null;
-}
-
-function getItemsToTakeFromStockpile(
-    stockpile: Entity,
-    remainingMaterials: Record<string, number>,
-): ItemTransfer[] {
-    const inventory = stockpile.getEcsComponent(InventoryComponentId);
-    if (!inventory) {
-        return [];
-    }
-
-    const items: ItemTransfer[] = [];
-    for (const [itemId, amountNeeded] of Object.entries(remainingMaterials)) {
-        const item = getInventoryItem(inventory, itemId);
-        if (item && item.amount > 0) {
-            items.push({ itemId, amount: Math.min(item.amount, amountNeeded) });
-        }
-    }
-    return items;
 }
 
 function planGatherMaterials(
@@ -300,9 +246,6 @@ function planGatherMaterials(
     goblin: Entity,
     remainingMaterials: Record<string, number>,
 ): BehaviorActionData[] {
-    // Currently only wood gathering is implemented. If a building needs stone,
-    // metal, or other materials, this will silently return [] and the goblin
-    // will stall. Extend this function as new material types are introduced.
     if (remainingMaterials[woodResourceItem.id]) {
         const nearestTree = findNearestChoppableResource(root, goblin);
         if (nearestTree) {
@@ -320,7 +263,6 @@ function planGatherMaterials(
             ];
         }
     }
-
     log.warn(`No resources found to gather`);
     return [];
 }
@@ -333,10 +275,6 @@ function findNearestChoppableResource(
     let nearest: Entity | null = null;
     let nearestDist = Infinity;
 
-    // Tree resource IDs that can be chopped.
-    // This list is duplicated from goblinBuildJobPlanner. There's no centralized
-    // "is choppable" flag on ResourceComponent yet — if adding a new tree type,
-    // update both planners until that's consolidated.
     const choppableResourceIds = [
         "tree1",
         "pineTree",

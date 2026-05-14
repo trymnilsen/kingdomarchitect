@@ -37,10 +37,11 @@ import type { MovementStaminaComponent } from "./movementStaminaComponent.ts";
 import type { PlayerKingdomComponent } from "./playerKingdomComponent.ts";
 import type { StatsComponent } from "./statsComponent.ts";
 import type { FarmComponent } from "./farmComponent.ts";
-import type { DesiredInventoryComponent } from "./desiredInventoryComponent.ts";
 import type { ThreatMapComponent } from "./threatMapComponent.ts";
 import type { DespawnTimerComponent } from "./despawnTimerComponent.ts";
 import type { ImmortalComponent } from "./immortalComponent.ts";
+import type { HeldItemComponent } from "./heldItemComponent.ts";
+import type { GroundItemComponent } from "./groundItemComponent.ts";
 
 export type Components =
     | SpriteComponent
@@ -84,8 +85,9 @@ export type Components =
     | FarmComponent
     | ThreatMapComponent
     | DespawnTimerComponent
-    | DesiredInventoryComponent
-    | ImmortalComponent;
+    | ImmortalComponent
+    | HeldItemComponent
+    | GroundItemComponent;
 
 export interface BaseComponent {
     id: string;

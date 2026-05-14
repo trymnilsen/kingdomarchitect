@@ -6,7 +6,7 @@ import { createHealthComponent } from "../component/healthComponent.ts";
 import { createSpriteComponent } from "../component/spriteComponent.ts";
 import { createBehaviorAgentComponent } from "../component/BehaviorAgentComponent.ts";
 import { createMovementStaminaComponent } from "../component/movementStaminaComponent.ts";
-import { createInventoryComponent } from "../component/inventoryComponent.ts";
+import { createHeldItemComponent } from "../component/heldItemComponent.ts";
 import { createWarmthComponent } from "../component/warmthComponent.ts";
 import { createGoblinUnitComponent } from "../component/goblinUnitComponent.ts";
 import { createFireSourceComponent } from "../component/fireSourceComponent.ts";
@@ -22,7 +22,7 @@ export function goblinPrefab(campEntityId?: string): Entity {
     entity.setEcsComponent(createSpriteComponent(spriteRefs.goblin));
     entity.setEcsComponent(createHealthComponent(10, 10));
     entity.setEcsComponent(createBehaviorAgentComponent());
-    entity.setEcsComponent(createInventoryComponent());
+    entity.setEcsComponent(createHeldItemComponent());
     entity.setEcsComponent(createWarmthComponent(55, 1.0)); // Start warm, decay 1/tick
     entity.setEcsComponent(createMovementStaminaComponent());
     entity.setEcsComponent(createThreatMapComponent());

@@ -39,6 +39,11 @@ import { WorldDiscoveryComponentId } from "../game/component/worldDiscoveryCompo
 import { getPlayerDiscoveryData } from "./message/playerDiscoveryData.ts";
 import { ToggleableCallback } from "../common/toggleableCallback.ts";
 import type { MessageRouter } from "./messageRouter.ts";
+import {
+    getIdCounters,
+    resetIdCounters,
+    setIdCounters,
+} from "../common/idGenerator.ts";
 
 const log = createLogger("persistence");
 
@@ -70,6 +75,7 @@ export class GameServer {
 
         this.worldSeed = Date.now();
         this.persistenceManager = persistenceManager;
+        resetIdCounters();
     }
 
     async init(initialPlayerId?: string): Promise<void> {
@@ -168,6 +174,7 @@ export class GameServer {
             this.worldSeed = meta.seed;
             this.updateTick = meta.tick;
             this.gameTime.setTick(meta.tick);
+            setIdCounters(meta.idCounters);
             log.info("Loading save", { tick: meta.tick, seed: meta.seed });
         }
 
@@ -190,6 +197,7 @@ export class GameServer {
             version: 1,
             tick: this.updateTick,
             seed: this.worldSeed,
+            idCounters: getIdCounters(),
         });
     }
 
@@ -198,7 +206,12 @@ export class GameServer {
     }
 
     get worldMeta(): SerializedWorldMeta {
-        return { version: 1, tick: this.updateTick, seed: this.worldSeed };
+        return {
+            version: 1,
+            tick: this.updateTick,
+            seed: this.worldSeed,
+            idCounters: getIdCounters(),
+        };
     }
 
     private addSystems() {
