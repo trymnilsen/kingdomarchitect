@@ -10,6 +10,7 @@ import {
     type BuildBuildingJob,
 } from "../../job/buildBuildingJob.ts";
 import { findJobClaimedBy, claimJobInQueue } from "../../job/jobLifecycle.ts";
+import { CraftingJobId, type CraftingJob } from "../../job/craftingJob.ts";
 import { planJob } from "../../job/planner/jobPlanner.ts";
 import type { BuildJobPlanner } from "../../job/planner/jobPlanner.ts";
 import type { CollectResourceJob } from "../../job/collectResourceJob.ts";
@@ -161,6 +162,10 @@ function hasAvailableJobs(
             if (!buildJobValidator(root, job as BuildBuildingJob, entity)) {
                 continue;
             }
+        } else if (job.id === CraftingJobId) {
+            if (!canExecuteCraftingJob(jobQueue, job as CraftingJob)) {
+                continue;
+            }
         } else if (!isJobValid(job, entity)) {
             continue;
         }
@@ -199,7 +204,7 @@ function findBestJob(
             continue;
         }
 
-        if (!canExecuteJob(root, job, entity, buildJobValidator)) {
+        if (!canExecuteJob(root, job, entity, buildJobValidator, jobQueue)) {
             continue;
         }
 
@@ -235,6 +240,7 @@ function canExecuteJob(
     job: Jobs,
     workerEntity: Entity,
     buildJobValidator: BuildJobValidator,
+    jobQueue: JobQueueComponent,
 ): boolean {
     switch (job.id) {
         case "buildBuildingJob":
@@ -249,6 +255,8 @@ function canExecuteJob(
                 job as CollectResourceJob,
                 workerEntity,
             );
+        case "craftingJob":
+            return canExecuteCraftingJob(jobQueue, job as CraftingJob);
         default:
             return true;
     }
@@ -280,6 +288,22 @@ function canHeldAcceptResourceYield(
 
     const heldId = held.item!.id;
     return resource.yields.every((y) => y.item.id === heldId);
+}
+
+/**
+ * Reject crafting jobs when another worker has already claimed a crafting job
+ * at the same building. Only one worker can use a crafting station at a time.
+ */
+function canExecuteCraftingJob(
+    jobQueue: JobQueueComponent,
+    job: CraftingJob,
+): boolean {
+    return !jobQueue.jobs.some(
+        (j) =>
+            j.claimedBy !== undefined &&
+            j.id === CraftingJobId &&
+            (j as CraftingJob).targetBuilding === job.targetBuilding,
+    );
 }
 
 /**
