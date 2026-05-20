@@ -33,6 +33,7 @@ import {
 } from "../../../../../component/worker/roleComponent.ts";
 import { UpdateWorkerStanceCommand } from "../../../../../../server/message/command/updateWorkerStanceCommand.ts";
 import { StatsViewState } from "../../../stats/statsViewState.ts";
+import { SetPlayerCommand } from "../../../../../../server/message/command/setPlayerCommand.ts";
 
 export class WorkerSelectionProvider implements ActorSelectionProvider {
     provideButtons(
@@ -126,6 +127,17 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
             text: label,
             icon: item.asset,
             children: [
+                {
+                    text: "Deposit",
+                    icon: spriteRefs.empty_sprite,
+                    onClick: () => {
+                        stateContext.commandDispatcher(
+                            SetPlayerCommand(selectedEntity.id, {
+                                action: "deposit",
+                            }),
+                        );
+                    },
+                },
                 {
                     text: "Drop",
                     icon: spriteRefs.empty_sprite,

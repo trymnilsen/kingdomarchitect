@@ -10,6 +10,7 @@ import { createLogger } from "../../../common/logging/logger.ts";
 import { findFreeAdjacentTile } from "../dropItem.ts";
 import { planEquipCommand } from "../planners/equipCommandPlanner.ts";
 import { planEquipFromHeld } from "../planners/equipFromHeldPlanner.ts";
+import { planDepositHeld } from "../../job/planner/planDepositHeld.ts";
 
 const log = createLogger("behavior");
 
@@ -113,6 +114,19 @@ export function createPerformPlayerCommandBehavior(): Behavior {
                     return [
                         { type: "moveTo", target: adjacent },
                         { type: "dropHeld", destination: adjacent },
+                        { type: "clearPlayerCommand" },
+                    ];
+                }
+
+                case "deposit": {
+                    const held = entity.getEcsComponent(HeldItemComponentId);
+                    if (!held || isHeldEmpty(held)) {
+                        agent.playerCommand = undefined;
+                        entity.invalidateComponent("behavioragent");
+                        return [];
+                    }
+                    return [
+                        ...planDepositHeld(entity),
                         { type: "clearPlayerCommand" },
                     ];
                 }

@@ -30,6 +30,9 @@ export type PlayerCommand =
           action: "drop";
       }
     | {
+          action: "deposit";
+      }
+    | {
           action: "equip";
           sourceEntityId: string;
           itemId: string;
@@ -54,6 +57,8 @@ export type PendingReplan =
 export interface BehaviorAgentComponent {
     id: typeof BehaviorAgentComponentId;
     currentBehaviorName: string | null;
+    /** Human-readable name of the job currently being executed, set by PerformJobBehavior. */
+    currentJobName: string | null;
     /**
      * The utility score of the currently-running behavior, set during replan.
      * Used by the displacement system to determine how much resistance this entity
@@ -69,6 +74,7 @@ export function createBehaviorAgentComponent(): BehaviorAgentComponent {
     return {
         id: BehaviorAgentComponentId,
         currentBehaviorName: null,
+        currentJobName: null,
         currentBehaviorUtility: 0,
         actionQueue: [],
         pendingReplan: { kind: "replan" },

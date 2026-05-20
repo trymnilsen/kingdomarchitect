@@ -20,6 +20,10 @@ import {
     isHeldEmpty,
 } from "../../component/heldItemComponent.ts";
 import { getResourceById } from "../../../data/inventory/items/naturalResource.ts";
+import {
+    BehaviorAgentComponentId,
+} from "../../component/BehaviorAgentComponent.ts";
+import { getJobDisplayName } from "../../job/jobDisplayName.ts";
 
 type BuildJobValidator = (
     root: Entity,
@@ -95,6 +99,10 @@ export function createPerformJobBehavior(
                     `[PerformJobBehavior] entity ${entity.id} had claimed job ${claimedJob.id}`,
                     JSON.stringify(claimedJob),
                 );
+                const agent = entity.getEcsComponent(BehaviorAgentComponentId);
+                if (agent) {
+                    agent.currentJobName = getJobDisplayName(root, claimedJob);
+                }
                 const actions = planJob(root, entity, claimedJob, buildPlanner);
                 console.info(
                     `[PerformJobBehavior] entity ${entity.id} planned actions`,
@@ -122,6 +130,10 @@ export function createPerformJobBehavior(
                 JSON.stringify(job),
             );
             claimJobInQueue(job, entity.id, queueEntity);
+            const agent = entity.getEcsComponent(BehaviorAgentComponentId);
+            if (agent) {
+                agent.currentJobName = getJobDisplayName(root, job);
+            }
             const actions = planJob(root, entity, job, buildPlanner);
             console.info(
                 `[PerformJobBehavior] entity ${entity.id} planned actions`,

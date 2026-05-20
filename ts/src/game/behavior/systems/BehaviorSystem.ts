@@ -140,6 +140,7 @@ function updateBehaviorAgent(
  */
 function clearBehavior(agent: BehaviorAgentComponent): void {
     agent.currentBehaviorName = null;
+    agent.currentJobName = null;
     agent.currentBehaviorUtility = 0;
     agent.actionQueue = [];
 }
