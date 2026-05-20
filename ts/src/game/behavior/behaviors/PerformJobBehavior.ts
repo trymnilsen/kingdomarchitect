@@ -11,6 +11,8 @@ import {
 } from "../../job/buildBuildingJob.ts";
 import { findJobClaimedBy, claimJobInQueue } from "../../job/jobLifecycle.ts";
 import { CraftingJobId, type CraftingJob } from "../../job/craftingJob.ts";
+import { WindmillJobId, type WindmillJob } from "../../job/windmillJob.ts";
+import { ProductionJobId, type ProductionJob } from "../../job/productionJob.ts";
 import { planJob } from "../../job/planner/jobPlanner.ts";
 import type { BuildJobPlanner } from "../../job/planner/jobPlanner.ts";
 import type { CollectResourceJob } from "../../job/collectResourceJob.ts";
@@ -178,6 +180,14 @@ function hasAvailableJobs(
             if (!canExecuteCraftingJob(jobQueue, job as CraftingJob)) {
                 continue;
             }
+        } else if (job.id === WindmillJobId) {
+            if (!canExecuteWindmillJob(jobQueue, job as WindmillJob)) {
+                continue;
+            }
+        } else if (job.id === ProductionJobId) {
+            if (!canExecuteProductionJob(jobQueue, job as ProductionJob)) {
+                continue;
+            }
         } else if (!isJobValid(job, entity)) {
             continue;
         }
@@ -269,6 +279,10 @@ function canExecuteJob(
             );
         case "craftingJob":
             return canExecuteCraftingJob(jobQueue, job as CraftingJob);
+        case "windmillJob":
+            return canExecuteWindmillJob(jobQueue, job as WindmillJob);
+        case "productionJob":
+            return canExecuteProductionJob(jobQueue, job as ProductionJob);
         default:
             return true;
     }
@@ -315,6 +329,38 @@ function canExecuteCraftingJob(
             j.claimedBy !== undefined &&
             j.id === CraftingJobId &&
             (j as CraftingJob).targetBuilding === job.targetBuilding,
+    );
+}
+
+/**
+ * Reject windmill jobs when another worker has already claimed a windmill job
+ * at the same building. Only one worker can operate a windmill at a time.
+ */
+function canExecuteWindmillJob(
+    jobQueue: JobQueueComponent,
+    job: WindmillJob,
+): boolean {
+    return !jobQueue.jobs.some(
+        (j) =>
+            j.claimedBy !== undefined &&
+            j.id === WindmillJobId &&
+            (j as WindmillJob).targetBuilding === job.targetBuilding,
+    );
+}
+
+/**
+ * Reject production jobs when another worker has already claimed a production job
+ * at the same building. Only one worker can operate a production facility at a time.
+ */
+function canExecuteProductionJob(
+    jobQueue: JobQueueComponent,
+    job: ProductionJob,
+): boolean {
+    return !jobQueue.jobs.some(
+        (j) =>
+            j.claimedBy !== undefined &&
+            j.id === ProductionJobId &&
+            (j as ProductionJob).targetBuilding === job.targetBuilding,
     );
 }
 
