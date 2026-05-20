@@ -44,4 +44,71 @@ describe("reconcileQueue", () => {
 
         assert.deepStrictEqual(result, next);
     });
+
+    it("adopts the new queue when current is empty", () => {
+        const a: BehaviorActionData = { type: "wait", until: 100 };
+        const b: BehaviorActionData = { type: "wait", until: 200 };
+
+        const result = reconcileQueue([], [a, b]);
+
+        assert.deepStrictEqual(result, [a, b]);
+    });
+
+    it("returns empty when next is empty", () => {
+        const a: BehaviorActionData = { type: "wait", until: 100 };
+        const b: BehaviorActionData = { type: "wait", until: 200 };
+
+        const result = reconcileQueue([a, b], []);
+
+        assert.deepStrictEqual(result, []);
+    });
+
+    it("returns empty when both are empty", () => {
+        const result = reconcileQueue([], []);
+
+        assert.deepStrictEqual(result, []);
+    });
+
+    it("preserves the head with no tail for matching single-element queues", () => {
+        const headA: BehaviorActionData = { type: "wait", until: 100 };
+        const headAClone: BehaviorActionData = { type: "wait", until: 100 };
+
+        const result = reconcileQueue([headA], [headAClone]);
+
+        assert.strictEqual(result.length, 1);
+        assert.strictEqual(
+            result[0],
+            headA,
+            "head must be the running reference, not the clone",
+        );
+    });
+
+    it("returns the new head for differing single-element queues", () => {
+        const headA: BehaviorActionData = { type: "wait", until: 100 };
+        const headB: BehaviorActionData = { type: "wait", until: 200 };
+
+        const result = reconcileQueue([headA], [headB]);
+
+        assert.strictEqual(result.length, 1);
+        assert.strictEqual(result[0], headB);
+    });
+
+    it("keeps the running head while taking a longer tail from next", () => {
+        const headA: BehaviorActionData = { type: "wait", until: 100 };
+        const tailB: BehaviorActionData = { type: "wait", until: 200 };
+        const headAClone: BehaviorActionData = { type: "wait", until: 100 };
+        const tailC: BehaviorActionData = { type: "wait", until: 300 };
+        const tailD: BehaviorActionData = { type: "wait", until: 400 };
+
+        const result = reconcileQueue([headA, tailB], [headAClone, tailC, tailD]);
+
+        assert.strictEqual(result.length, 3);
+        assert.strictEqual(
+            result[0],
+            headA,
+            "head must be the running reference from current",
+        );
+        assert.strictEqual(result[1], tailC);
+        assert.strictEqual(result[2], tailD);
+    });
 });

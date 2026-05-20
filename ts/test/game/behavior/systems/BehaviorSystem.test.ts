@@ -388,6 +388,69 @@ describe("BehaviorSystem", () => {
         });
     });
 
+    describe("reconciliation on replan", () => {
+        it("preserves the running head reference when the same behavior is re-selected", () => {
+            const { root, worker } = createTestScene();
+            const agent = worker.getEcsComponent(BehaviorAgentComponentId)!;
+
+            const headAction: BehaviorActionData = { type: "wait", until: 100 };
+            agent.actionQueue = [headAction, { type: "wait", until: 200 }];
+            agent.currentBehaviorName = "myBehavior";
+            agent.pendingReplan = { kind: "replan" };
+
+            // Same head shape, different tail — reconcile should keep the
+            // running head object and swap in the new tail.
+            const behavior = createMockBehavior("myBehavior", {
+                utility: 50,
+                actions: [
+                    { type: "wait", until: 100 },
+                    { type: "wait", until: 999 },
+                ],
+            });
+
+            const system = createBehaviorSystem(() => [behavior]);
+            system.onUpdate!(root, 1);
+
+            assert.strictEqual(agent.currentBehaviorName, "myBehavior");
+            assert.strictEqual(
+                agent.actionQueue[0],
+                headAction,
+                "head must be the running reference preserved by reconcile",
+            );
+            assert.strictEqual((agent.actionQueue[1] as any).until, 999);
+        });
+
+        it("fully replaces the queue when a different behavior is selected", () => {
+            const { root, worker } = createTestScene();
+            const agent = worker.getEcsComponent(BehaviorAgentComponentId)!;
+
+            const headAction: BehaviorActionData = { type: "wait", until: 100 };
+            agent.actionQueue = [headAction];
+            agent.currentBehaviorName = "behaviorA";
+            agent.pendingReplan = { kind: "replan" };
+
+            const behaviorA = createMockBehavior("behaviorA", {
+                utility: 40,
+                actions: [{ type: "wait", until: 100 }],
+            });
+            const behaviorB = createMockBehavior("behaviorB", {
+                utility: 60,
+                actions: [{ type: "wait", until: 999 }],
+            });
+
+            const system = createBehaviorSystem(() => [behaviorA, behaviorB]);
+            system.onUpdate!(root, 1);
+
+            assert.strictEqual(agent.currentBehaviorName, "behaviorB");
+            assert.notStrictEqual(
+                agent.actionQueue[0],
+                headAction,
+                "queue should be replaced, not reconciled",
+            );
+            assert.strictEqual((agent.actionQueue[0] as any).until, 999);
+        });
+    });
+
     describe("multiple agents", () => {
         it("updates all agents with behavior components", () => {
             const { root } = createTestScene();
