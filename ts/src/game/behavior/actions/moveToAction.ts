@@ -22,6 +22,7 @@ import type { Entity } from "../../entity/entity.ts";
 import { discoverAfterMovement } from "../../job/movementHelper.ts";
 import { getPathfindingGraphForEntity } from "../../map/path/getPathfindingGraphForEntity.ts";
 import type { GraphNode } from "../../map/path/graph/graph.ts";
+import { isTileAvailable } from "../../map/path/graph/weight.ts";
 import { queryEntity } from "../../map/query/queryEntity.ts";
 import {
     PathResultStatus,
@@ -293,18 +294,7 @@ function makePathModifier(
             return 0;
         }
 
-        const occupants = queryEntity(root, { x: wx, y: wy });
-        for (const occupant of occupants) {
-            if (occupant.hasComponent(BuildingComponentId)) {
-                const b = occupant.getEcsComponent(BuildingComponentId);
-                if (b && b.building.id !== "road") return 0;
-            }
-
-            // if (occupant.hasComponent(ResourceComponentId)) {
-            //     const r = occupant.getEcsComponent(ResourceComponentId);
-            //     if (r && isImpassableResource(r.resourceId)) return 0;
-            // }
-        }
+        if (!isTileAvailable({ x: wx, y: wy }, root)) return 0;
 
         return node.weight;
     };

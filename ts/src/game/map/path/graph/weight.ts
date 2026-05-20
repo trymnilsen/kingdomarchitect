@@ -7,6 +7,23 @@ import { getTile, TileComponentId } from "../../../component/tileComponent.ts";
 import type { Entity } from "../../../entity/entity.ts";
 import { queryEntity } from "../../query/queryEntity.ts";
 
+/**
+ * Returns true if a tile can be entered during movement — i.e. the tile exists
+ * and is not occupied by a solid structure. Mirrors the rules applied by the
+ * movement weight modifier so that behaviour planning and pathfinding agree.
+ */
+export function isTileAvailable(point: Point, root: Entity): boolean {
+    if (getWeightAtPoint(point, root) === 0) return false;
+
+    const entities = queryEntity(root, point);
+    for (const entity of entities) {
+        const building = entity.getEcsComponent(BuildingComponentId);
+        if (building && building.building.id !== "road") return false;
+    }
+
+    return true;
+}
+
 export function getWeightAtPoint(point: Point, scope: Entity): number {
     let weight = 25;
     const tileComponent = scope.requireEcsComponent(TileComponentId);

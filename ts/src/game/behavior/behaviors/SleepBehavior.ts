@@ -6,9 +6,9 @@ import {
     ChunkMapComponentId,
     getEntitiesInChunkMapWithin,
 } from "../../component/chunkMapComponent.ts";
-import { getPathfindingGraphForEntity } from "../../map/path/getPathfindingGraphForEntity.ts";
 import { InventoryComponentId } from "../../component/inventoryComponent.ts";
 import { BuildingComponentId } from "../../component/buildingComponent.ts";
+import { isTileAvailable } from "../../map/path/graph/weight.ts";
 import type { SleepQuality } from "../actions/Action.ts";
 import type { BehaviorActionData } from "../actions/ActionData.ts";
 import type { Behavior } from "./Behavior.ts";
@@ -175,13 +175,9 @@ function findNearbyCampfire(
 
 function findAdjacentWalkable(
     root: Entity,
-    entity: Entity,
+    _entity: Entity,
     target: Point,
 ): Point | null {
-    const pathfindingGraph = getPathfindingGraphForEntity(root, entity);
-    if (!pathfindingGraph) return null;
-
-    const { graph } = pathfindingGraph;
     const cardinalOffsets: Point[] = [
         { x: 0, y: -1 },
         { x: 1, y: 0 },
@@ -191,8 +187,7 @@ function findAdjacentWalkable(
 
     for (const offset of cardinalOffsets) {
         const candidate = { x: target.x + offset.x, y: target.y + offset.y };
-        const node = graph.nodeAt(candidate.x, candidate.y);
-        if (node && !node.isWall) {
+        if (isTileAvailable(candidate, root)) {
             return candidate;
         }
     }
