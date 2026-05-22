@@ -5,12 +5,18 @@ import { PlayerUnitComponentId } from "../../../component/playerUnitComponent.ts
 import { ResourceComponentId } from "../../../component/resourceComponent.ts";
 import { getTile, TileComponentId } from "../../../component/tileComponent.ts";
 import type { Entity } from "../../../entity/entity.ts";
+import { isPermanentObstacle } from "../../../../data/inventory/items/naturalResource.ts";
 import { queryEntity } from "../../query/queryEntity.ts";
 
 /**
  * Returns true if a tile can be entered during movement — i.e. the tile exists
  * and is not occupied by a solid structure. Mirrors the rules applied by the
  * movement weight modifier so that behaviour planning and pathfinding agree.
+ *
+ * Clearable obstacles (trees) remain "available": pathfinding may route through
+ * them and the mover chops them down on arrival. Permanent obstacles (stone and
+ * other infinite nodes) are treated as walls — they are never destroyed to make
+ * way, so a path must route around them.
  */
 export function isTileAvailable(point: Point, root: Entity): boolean {
     if (getWeightAtPoint(point, root) === 0) return false;
@@ -19,6 +25,9 @@ export function isTileAvailable(point: Point, root: Entity): boolean {
     for (const entity of entities) {
         const building = entity.getEcsComponent(BuildingComponentId);
         if (building && building.building.id !== "road") return false;
+
+        const resource = entity.getEcsComponent(ResourceComponentId);
+        if (resource && isPermanentObstacle(resource.resourceId)) return false;
     }
 
     return true;

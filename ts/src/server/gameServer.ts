@@ -57,6 +57,7 @@ export class GameServer {
     private broadcastCallback: ToggleableCallback<[GameMessage]>;
     private messageRouter: MessageRouter;
     private onPlayerConnectedCallback?: (playerId: string) => void;
+    private isSaving = false;
 
     constructor(
         messageRouter: MessageRouter,
@@ -184,10 +185,16 @@ export class GameServer {
     }
 
     private async autoSave(): Promise<void> {
+        if (this.isSaving) {
+            return;
+        }
+        this.isSaving = true;
         try {
             await this.saveGame();
         } catch (err) {
             log.error("Auto-save failed", { err });
+        } finally {
+            this.isSaving = false;
         }
     }
 

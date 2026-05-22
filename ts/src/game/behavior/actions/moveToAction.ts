@@ -30,9 +30,8 @@ import {
     type QueryPathOptions,
 } from "../../map/query/pathQuery.ts";
 import {
-    getResourceById,
+    isClearableObstacle,
     isImpassableResource,
-    ResourceHarvestMode,
 } from "../../../data/inventory/items/naturalResource.ts";
 import { negotiateDisplacement } from "../displacement/displacementNegotiation.ts";
 import { commitDisplacementTransaction } from "../displacement/displacementTransaction.ts";
@@ -144,31 +143,34 @@ export function executeMoveToAction(
                 resourceComponent &&
                 isImpassableResource(resourceComponent.resourceId)
             ) {
-                const naturalResource = getResourceById(
-                    resourceComponent.resourceId,
-                );
-                if (naturalResource) {
-                    const harvestMode = Array.isArray(
-                        naturalResource.harvestMode,
-                    )
-                        ? naturalResource.harvestMode[0]
-                        : naturalResource.harvestMode;
-                    // Clear stale cached path — it was planned through this tile
-                    // before the resource appeared. After harvesting, a fresh path
-                    // will be computed.
-                    action.cachedPath = undefined;
-
+                if (!isClearableObstacle(resourceComponent.resourceId)) {
+                    // Permanent obstacles (stone) are walls in the pathfinding
+                    // graph, so a path should never step onto one. Reaching here
+                    // means the graph and the obstacle rules disagree — fail
+                    // loudly rather than destroy an infinite node.
+                    log.error(
+                        `${entity.id} path routed onto permanent obstacle ${resource.id} at (${nextPoint.x},${nextPoint.y})`,
+                    );
                     return {
-                        kind: "subaction",
-                        actions: [
-                            {
-                                type: "harvestResource",
-                                entityId: resource.id,
-                                harvestAction: harvestMode,
-                            },
-                        ],
+                        kind: "failed",
+                        cause: { type: "pathBlocked", target: action.target },
                     };
                 }
+
+                // Clear stale cached path — it was planned through this tile
+                // before the resource was found blocking. After the obstacle is
+                // cleared a fresh path will be computed.
+                action.cachedPath = undefined;
+
+                return {
+                    kind: "subaction",
+                    actions: [
+                        {
+                            type: "clearObstacle",
+                            entityId: resource.id,
+                        },
+                    ],
+                };
             }
         }
 

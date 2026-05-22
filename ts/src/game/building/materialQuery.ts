@@ -84,6 +84,57 @@ export function getTotalItemInStockpiles(
     return total;
 }
 
+export type ConstructionMaterialProgress = {
+    item: InventoryItem;
+    provided: number;
+    required: number;
+};
+
+/**
+ * Compute, for a scaffolded building, how much of each required material has
+ * already been delivered to the building versus how much it still requires.
+ * The numerator is clamped to the requirement so it never reads e.g. "9/8".
+ * @param buildingInventory the building's own inventory of delivered materials
+ *  (undefined for buildings with no material requirements)
+ * @param requirements the building's construction requirements
+ */
+export function getConstructionMaterialProgress(
+    buildingInventory: InventoryComponent | undefined | null,
+    requirements: BuildingRequirements | undefined,
+): ConstructionMaterialProgress[] {
+    const progress: ConstructionMaterialProgress[] = [];
+    if (!requirements?.materials) {
+        return progress;
+    }
+
+    for (const [itemId, amountNeeded] of Object.entries(
+        requirements.materials,
+    )) {
+        if (amountNeeded === undefined || amountNeeded <= 0) {
+            continue;
+        }
+
+        const item =
+            inventoryItemsMap[itemId as keyof typeof inventoryItemsMap];
+        if (!item) {
+            log.warn("Unknown item ID in building requirements", { itemId });
+            continue;
+        }
+
+        const deliveredAmount = buildingInventory
+            ? (getInventoryItem(buildingInventory, itemId)?.amount ?? 0)
+            : 0;
+
+        progress.push({
+            item,
+            provided: Math.min(deliveredAmount, amountNeeded),
+            required: amountNeeded,
+        });
+    }
+
+    return progress;
+}
+
 /**
  * Find all stockpiles that have a specific item, sorted by distance from a point
  */

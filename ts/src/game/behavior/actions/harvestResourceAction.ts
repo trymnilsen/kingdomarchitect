@@ -17,6 +17,7 @@ import {
 import { RegrowComponentId } from "../../component/regrowComponent.ts";
 import { ResourceComponentId } from "../../component/resourceComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
+import { findAcceptingStockpile } from "../../entity/findAcceptingStockpile.ts";
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import {
     findJobClaimedBy,
@@ -37,11 +38,11 @@ export type HarvestResourceActionData = {
 import type { NaturalResource } from "../../../data/inventory/items/naturalResource.ts";
 
 /**
- * Harvest a resource entity and deposit yields into the worker's held
- * slot. Held is single-item-id, so a resource that yields a different
- * item id than what's already held will fail when the harvest completes.
- * Callers should ensure held is empty or matches the yield before
- * starting a harvest.
+ * Harvest a resource entity and deposit yields into the worker's held slot.
+ * Held is single-item-id, so a resource that yields a different item id than
+ * what's already held cannot be collected directly. Rather than fail, the
+ * worker frees its hand first (see {@link freeHandSubaction}) and then resumes
+ * the harvest into an empty slot.
  */
 export function executeHarvestResourceAction(
     action: HarvestResourceActionData,
@@ -81,6 +82,13 @@ export function executeHarvestResourceAction(
 
     const held = entity.requireEcsComponent(HeldItemComponentId);
 
+    // Precondition: the held slot must be empty or already hold the yield item.
+    // If it holds something else, free the hand before harvesting rather than
+    // failing — otherwise the worker can never collect this resource.
+    if (heldBlocksYield(held, resource)) {
+        return freeHandSubaction(entity, resourceEntity, held);
+    }
+
     if (action.harvestAction === ResourceHarvestMode.Chop) {
         return executeChopHarvest(entity, resourceEntity, resource, held);
     } else {
@@ -95,45 +103,84 @@ export function executeHarvestResourceAction(
     }
 }
 
+/**
+ * True when the held slot holds an item that does not match the resource's
+ * yield — i.e. collecting would require mixing two item ids in one slot.
+ */
+function heldBlocksYield(
+    held: HeldItemComponent,
+    resource: NaturalResource,
+): boolean {
+    if (isHeldEmpty(held)) return false;
+    const heldId = held.item!.id;
+    return resource.yields.some((y) => y.item.id !== heldId);
+}
+
+/**
+ * Emit a subaction chain that empties the worker's hand so the suspended
+ * harvest can resume. Prefers depositing into an accepting stockpile (walking
+ * there and back), and falls back to dropping the held item where the worker
+ * stands when no stockpile will take it.
+ */
+function freeHandSubaction(
+    worker: Entity,
+    resourceEntity: Entity,
+    held: HeldItemComponent,
+): ActionResult {
+    const stockpile = findAcceptingStockpile(worker, held.item!.id);
+    if (stockpile) {
+        return {
+            kind: "subaction",
+            actions: [
+                {
+                    type: "moveTo",
+                    target: stockpile.worldPosition,
+                    stopAdjacent: "cardinal",
+                },
+                {
+                    type: "depositToStockpile",
+                    stockpileId: stockpile.id,
+                },
+                {
+                    type: "moveTo",
+                    target: resourceEntity.worldPosition,
+                    stopAdjacent: "cardinal",
+                },
+            ],
+        };
+    }
+
+    return {
+        kind: "subaction",
+        actions: [{ type: "dropHeld" }],
+    };
+}
+
+/**
+ * Deposit the resource's yields into the worker's held slot. The caller
+ * guarantees held is empty or already holds the yield item (see
+ * {@link heldBlocksYield}), so the only remaining guard is the data-level case
+ * of a resource defining multiple distinct yield item ids, which cannot share
+ * one held slot.
+ */
 function depositYields(
     worker: Entity,
     resource: NaturalResource,
     held: HeldItemComponent,
-): ActionResult | null {
-    if (!isHeldEmpty(held)) {
-        const heldId = held.item!.id;
-        const allMatch = resource.yields.every(
-            (y) => y.item.id === heldId,
+): void {
+    const firstYieldId = resource.yields[0]?.item.id;
+    const uniform = resource.yields.every((y) => y.item.id === firstYieldId);
+    if (!uniform) {
+        log.warn(
+            `Resource ${resource.id} has multiple yield item ids; cannot fit in held slot`,
         );
-        if (!allMatch) {
-            log.warn(
-                `Cannot deposit harvest yields: held has ${heldId}, yields are ${resource.yields.map((y) => y.item.id).join(",")}`,
-            );
-            return { kind: "failed", cause: { type: "unknown" } };
-        }
-    } else {
-        const firstYieldId = resource.yields[0]?.item.id;
-        if (firstYieldId) {
-            const allMatch = resource.yields.every(
-                (y) => y.item.id === firstYieldId,
-            );
-            if (!allMatch) {
-                log.warn(
-                    `Resource ${resource.id} has multiple yield item ids; cannot fit in held slot`,
-                );
-                return { kind: "failed", cause: { type: "unknown" } };
-            }
-        }
+        return;
     }
+
     for (const yieldItem of resource.yields) {
-        addToHeldItem(
-            held,
-            structuredClone(yieldItem.item),
-            yieldItem.amount,
-        );
+        addToHeldItem(held, structuredClone(yieldItem.item), yieldItem.amount);
     }
     worker.invalidateComponent(HeldItemComponentId);
-    return null;
 }
 
 function executeChopHarvest(
@@ -150,9 +197,7 @@ function executeChopHarvest(
     spendEntityEnergy(worker, 2);
 
     if (healthComponent.currentHp <= 0) {
-        const failure = depositYields(worker, resource, held);
-        if (failure) return failure;
-
+        depositYields(worker, resource, held);
         resourceEntity.remove();
 
         const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
@@ -185,8 +230,7 @@ function executeWorkHarvest(
     spendEntityEnergy(worker, 2);
 
     if (action.workProgress >= workDuration) {
-        const failure = depositYields(worker, resource, held);
-        if (failure) return failure;
+        depositYields(worker, resource, held);
 
         applyResourceLifecycle(resourceEntity, resource, tick);
 

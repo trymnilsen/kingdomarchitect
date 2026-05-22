@@ -2,10 +2,9 @@ import assert from "node:assert";
 import { describe, it } from "node:test";
 import { Entity } from "../../../../src/game/entity/entity.ts";
 import {
-    createInventoryComponent,
-    getInventoryItem,
-    InventoryComponentId,
-} from "../../../../src/game/component/inventoryComponent.ts";
+    createHeldItemComponent,
+    HeldItemComponentId,
+} from "../../../../src/game/component/heldItemComponent.ts";
 import {
     createProductionComponent,
     ProductionComponentId,
@@ -33,7 +32,7 @@ function createTestScene(): {
     worker.worldPosition = { x: 10, y: 8 };
     building.worldPosition = { x: 11, y: 8 }; // Adjacent
 
-    worker.setEcsComponent(createInventoryComponent());
+    worker.setEcsComponent(createHeldItemComponent());
     building.setEcsComponent(createProductionComponent("quarry_production", 4));
 
     return { root, worker, building };
@@ -82,10 +81,30 @@ describe("operateFacilityAction", () => {
 
         assert.strictEqual(result.kind, "complete");
 
-        const workerInventory = worker.getEcsComponent(InventoryComponentId)!;
-        const stone = getInventoryItem(workerInventory, "stone");
-        assert.ok(stone);
-        assert.strictEqual(stone.amount, 10);
+        const held = worker.getEcsComponent(HeldItemComponentId)!;
+        assert.strictEqual(held.item?.id, "stone");
+        assert.strictEqual(held.amount, 10);
+    });
+
+    it("frees the hand instead of failing when held blocks the yield", () => {
+        const { worker } = createTestScene();
+
+        const held = worker.getEcsComponent(HeldItemComponentId)!;
+        held.item = { id: "wood", name: "Wood", asset: { bin: "0", spriteId: "wood_resource" } };
+        held.amount = 3;
+
+        // No stockpile in the scene, so the worker should drop the held item.
+        const action = {
+            type: "operateFacility" as const,
+            buildingId: "building",
+            progress: 5,
+        };
+
+        const result = executeOperateFacilityAction(action, worker);
+
+        assert.strictEqual(result.kind, "subaction");
+        // Progress must not advance while the hand is being freed.
+        assert.strictEqual(action.progress, 5);
     });
 
     it("fails if building entity not found", () => {

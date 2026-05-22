@@ -6,6 +6,7 @@ import type { ClearPlayerCommandActionData } from "./clearPlayerCommandAction.ts
 import type { SleepActionData } from "./sleepAction.ts";
 import type { DepositToStockpileActionData } from "./depositToStockpileAction.ts";
 import type { HarvestResourceActionData } from "./harvestResourceAction.ts";
+import type { ClearObstacleActionData } from "./clearObstacleAction.ts";
 import type { ConstructBuildingActionData } from "./constructBuildingAction.ts";
 import type { TakeFromInventoryActionData } from "./takeFromInventoryAction.ts";
 import type { DepositToInventoryActionData } from "./depositToInventoryAction.ts";
@@ -43,6 +44,7 @@ export type BehaviorActionData =
     | SleepActionData
     | DepositToStockpileActionData
     | HarvestResourceActionData
+    | ClearObstacleActionData
     | ConstructBuildingActionData
     | TakeFromInventoryActionData
     | DepositToInventoryActionData

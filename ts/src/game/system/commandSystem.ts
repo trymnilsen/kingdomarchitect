@@ -99,6 +99,11 @@ import {
     setPreferredAmount,
     StockpileComponentId,
 } from "../component/stockpileComponent.ts";
+import {
+    ClearBuildingJobsCommandId,
+    type ClearBuildingJobsCommand,
+} from "../../server/message/command/clearBuildingJobsCommand.ts";
+import { isTargetOfJob } from "../job/job.ts";
 
 const log = createLogger("command");
 
@@ -175,6 +180,12 @@ function onGameMessage(
             handleSetPreferredAmount(
                 root,
                 message.command as SetPreferredAmountCommand,
+            );
+            break;
+        case ClearBuildingJobsCommandId:
+            clearBuildingJobs(
+                root,
+                message.command as ClearBuildingJobsCommand,
             );
             break;
     }
@@ -529,5 +540,32 @@ function handleSetPreferredAmount(
 
     setPreferredAmount(stockpileComponent, command.itemId, command.amount);
     stockpile.invalidateComponent(StockpileComponentId);
+}
+
+function clearBuildingJobs(root: Entity, command: ClearBuildingJobsCommand) {
+    const playerKingdom = findPlayerKingdom(root);
+    if (!playerKingdom) {
+        log.warn("Player kingdom not found for ClearBuildingJobs");
+        return;
+    }
+
+    const building = root.findEntity(command.buildingId);
+    if (!building) {
+        log.warn("Building not found for ClearBuildingJobs", {
+            buildingId: command.buildingId,
+        });
+        return;
+    }
+
+    const jobQueue = playerKingdom.requireEcsComponent(JobQueueComponentId);
+    jobQueue.jobs = jobQueue.jobs.filter(
+        (job) =>
+            !(
+                job.id === command.jobTypeId &&
+                job.claimedBy === undefined &&
+                isTargetOfJob(job, building)
+            ),
+    );
+    playerKingdom.invalidateComponent(JobQueueComponentId);
 }
 

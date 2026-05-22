@@ -25,6 +25,7 @@ async function bootstrap() {
         const serverConnection = new LocalServerConnection();
         const game = new Game(canvasElementId, serverConnection);
         await game.bootstrap();
+    
     } catch (e) {
         log.error("Failed to bootstrap game", { error: e });
     }

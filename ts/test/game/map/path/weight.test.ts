@@ -15,7 +15,10 @@ import {
 } from "../../../../src/game/component/tileComponent.ts";
 import { Entity } from "../../../../src/game/entity/entity.ts";
 import { ChunkSize } from "../../../../src/game/map/chunk.ts";
-import { getWeightAtPoint } from "../../../../src/game/map/path/graph/weight.ts";
+import {
+    getWeightAtPoint,
+    isTileAvailable,
+} from "../../../../src/game/map/path/graph/weight.ts";
 import { goblinHut } from "../../../../src/data/building/goblin/goblinHut.ts";
 import { goblinCampfire } from "../../../../src/data/building/goblin/goblinCampfire.ts";
 import { road } from "../../../../src/data/building/stone/road.ts";
@@ -147,6 +150,31 @@ describe("getWeightAtPoint", () => {
             placeAt(root, tree);
 
             assert.strictEqual(getWeightAtPoint(TEST_POS, root), 30);
+        });
+    });
+
+    describe("isTileAvailable", () => {
+        it("treats a clearable obstacle (tree) as available", () => {
+            const root = createWorld();
+            const tree = new Entity("tree");
+            tree.setEcsComponent(createResourceComponent("tree1"));
+            placeAt(root, tree);
+
+            assert.strictEqual(isTileAvailable(TEST_POS, root), true);
+        });
+
+        it("treats a permanent obstacle (stone) as unavailable", () => {
+            const root = createWorld();
+            const stone = new Entity("stone");
+            stone.setEcsComponent(createResourceComponent("stone1"));
+            placeAt(root, stone);
+
+            assert.strictEqual(isTileAvailable(TEST_POS, root), false);
+        });
+
+        it("treats a tile with no ground as unavailable", () => {
+            const root = createWorld();
+            assert.strictEqual(isTileAvailable({ x: 25, y: 25 }, root), false);
         });
     });
 

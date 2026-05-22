@@ -56,6 +56,12 @@ import {
 } from "../../../component/energyComponent.ts";
 import { SpriteComponentId } from "../../../component/spriteComponent.ts";
 import { BuildingComponentId } from "../../../component/buildingComponent.ts";
+import { InventoryComponentId } from "../../../component/inventoryComponent.ts";
+import {
+    getConstructionMaterialProgress,
+    type ConstructionMaterialProgress,
+} from "../../../building/materialQuery.ts";
+import { constructionMaterialsView } from "./constructionMaterialsView.ts";
 import { ResourceComponentId } from "../../../component/resourceComponent.ts";
 import { ProductionComponentId } from "../../../component/productionComponent.ts";
 import { getProductionDefinition } from "../../../../data/production/productionDefinition.ts";
@@ -279,10 +285,21 @@ export class SelectionState extends InteractionState {
             }
 
             let name = "Entity";
+            let materials: ConstructionMaterialProgress[] | undefined;
             const buildingComponent =
                 this._selection.entity.getEcsComponent(BuildingComponentId);
             if (buildingComponent) {
                 name = `${this._selection.entity.id} - ${buildingComponent.building.name}`;
+                if (buildingComponent.scaffolded) {
+                    const inventory =
+                        this._selection.entity.getEcsComponent(
+                            InventoryComponentId,
+                        );
+                    materials = getConstructionMaterialProgress(
+                        inventory,
+                        buildingComponent.building.requirements,
+                    );
+                }
             }
 
             const resourceComponent =
@@ -348,10 +365,15 @@ export class SelectionState extends InteractionState {
                 }
             }
 
+            if (buildingComponent?.scaffolded) {
+                subtitle = "Under construction";
+            }
+
             return {
                 icon: icon,
                 subtitle,
                 title: name,
+                materials,
             };
         } else {
             return null;
@@ -376,38 +398,57 @@ export class SelectionState extends InteractionState {
                         allSides(8),
                         1.0,
                     ),
-                    child: uiRow({
+                    child: uiColumn({
                         width: wrapUiSize,
                         height: wrapUiSize,
                         gap: 8,
-                        crossAxisAlignment: CrossAxisAlignment.Center,
+                        crossAxisAlignment: CrossAxisAlignment.Start,
                         children: [
-                            uiImage({
-                                sprite: selectionInfo.icon,
-                                width: 32,
-                                height: 40,
-                                fillMode: "contain",
-                                scale: bins.some(
-                                    (it) => it.name == selectionInfo.icon.bin,
-                                )
-                                    ? 1
-                                    : 2,
-                            }),
-                            uiColumn({
+                            uiRow({
                                 width: wrapUiSize,
                                 height: wrapUiSize,
-                                crossAxisAlignment: CrossAxisAlignment.Start,
+                                gap: 8,
+                                crossAxisAlignment: CrossAxisAlignment.Center,
                                 children: [
-                                    uiText({
-                                        content: selectionInfo.title,
-                                        textStyle: titleTextStyle,
+                                    uiImage({
+                                        sprite: selectionInfo.icon,
+                                        width: 32,
+                                        height: 40,
+                                        fillMode: "contain",
+                                        scale: bins.some(
+                                            (it) =>
+                                                it.name ==
+                                                selectionInfo.icon.bin,
+                                        )
+                                            ? 1
+                                            : 2,
                                     }),
-                                    uiText({
-                                        content: selectionInfo.subtitle,
-                                        textStyle: subTitleTextStyle,
+                                    uiColumn({
+                                        width: wrapUiSize,
+                                        height: wrapUiSize,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.Start,
+                                        children: [
+                                            uiText({
+                                                content: selectionInfo.title,
+                                                textStyle: titleTextStyle,
+                                            }),
+                                            uiText({
+                                                content: selectionInfo.subtitle,
+                                                textStyle: subTitleTextStyle,
+                                            }),
+                                        ],
                                     }),
                                 ],
                             }),
+                            ...(selectionInfo.materials &&
+                            selectionInfo.materials.length > 0
+                                ? [
+                                      constructionMaterialsView({
+                                          materials: selectionInfo.materials,
+                                      }),
+                                  ]
+                                : []),
                         ],
                     }),
                 }),

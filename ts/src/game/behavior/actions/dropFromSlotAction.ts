@@ -4,7 +4,7 @@ import { pointEquals } from "../../../common/point.ts";
 import { EquipmentComponentId } from "../../component/equipmentComponent.ts";
 import { markStatsDirty } from "../../component/statsComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
-import { dropItemAtPosition } from "../dropItem.ts";
+import { dropItemAtPosition, DropMode } from "../dropItem.ts";
 import { ActionComplete, type ActionResult } from "./Action.ts";
 
 /**
@@ -45,7 +45,7 @@ export function executeDropFromSlotAction(
     }
 
     const root = entity.getRootEntity();
-    dropItemAtPosition(root, action.destination, slotItem, 1);
+    dropItemAtPosition(root, action.destination, slotItem, 1, DropMode.Nearest);
     equipment.slots[action.slot] = null;
 
     entity.invalidateComponent(EquipmentComponentId);

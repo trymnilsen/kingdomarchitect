@@ -23,6 +23,8 @@ const DB_VERSION = Math.max(...gameMigrations.map((m) => m.version));
  */
 export class IndexedDBAdapter implements PersistenceAdapter {
     private db: IDBDatabase | null = null;
+    private inFlightOperation: Promise<unknown> | null = null;
+    private closing = false;
 
     /**
      * Initialize the IndexedDB connection
@@ -41,6 +43,9 @@ export class IndexedDBAdapter implements PersistenceAdapter {
 
             request.onsuccess = () => {
                 this.db = request.result;
+                this.db.onversionchange = () => {
+                    this.close();
+                };
                 resolve();
             };
 
@@ -57,10 +62,10 @@ export class IndexedDBAdapter implements PersistenceAdapter {
         });
     }
 
-    /**
-     * Ensure the database is initialized
-     */
     private async ensureDb(): Promise<IDBDatabase> {
+        if (this.closing) {
+            throw new Error("Database connection is closing");
+        }
         if (!this.db) {
             await this.init();
         }
@@ -68,6 +73,16 @@ export class IndexedDBAdapter implements PersistenceAdapter {
             throw new Error("Database not initialized");
         }
         return this.db;
+    }
+
+    private track<T>(work: Promise<T>): Promise<T> {
+        this.inFlightOperation = work;
+        work.finally(() => {
+            if (this.inFlightOperation === work) {
+                this.inFlightOperation = null;
+            }
+        });
+        return work;
     }
 
     async hasSave(): Promise<boolean> {
@@ -78,37 +93,41 @@ export class IndexedDBAdapter implements PersistenceAdapter {
     async loadMeta(): Promise<SerializedWorldMeta | null> {
         const db = await this.ensureDb();
 
-        return new Promise((resolve, reject) => {
-            const transaction = db.transaction([META_STORE], "readonly");
-            const store = transaction.objectStore(META_STORE);
-            const request = store.get(META_KEY);
+        return this.track(
+            new Promise((resolve, reject) => {
+                const transaction = db.transaction([META_STORE], "readonly");
+                const store = transaction.objectStore(META_STORE);
+                const request = store.get(META_KEY);
 
-            request.onsuccess = () => {
-                resolve(request.result || null);
-            };
+                request.onsuccess = () => {
+                    resolve(request.result || null);
+                };
 
-            request.onerror = () => {
-                reject(new Error("Failed to load metadata"));
-            };
-        });
+                request.onerror = () => {
+                    reject(new Error("Failed to load metadata"));
+                };
+            }),
+        );
     }
 
     async saveMeta(meta: SerializedWorldMeta): Promise<void> {
         const db = await this.ensureDb();
 
-        return new Promise((resolve, reject) => {
-            const transaction = db.transaction([META_STORE], "readwrite");
-            const store = transaction.objectStore(META_STORE);
-            const request = store.put(meta, META_KEY);
+        return this.track(
+            new Promise((resolve, reject) => {
+                const transaction = db.transaction([META_STORE], "readwrite");
+                const store = transaction.objectStore(META_STORE);
+                const request = store.put(meta, META_KEY);
 
-            request.onsuccess = () => {
-                resolve();
-            };
+                request.onsuccess = () => {
+                    resolve();
+                };
 
-            request.onerror = () => {
-                reject(new Error("Failed to save metadata"));
-            };
-        });
+                request.onerror = () => {
+                    reject(new Error("Failed to save metadata"));
+                };
+            }),
+        );
     }
 
     async saveEntity(entity: SerializedEntity): Promise<void> {
@@ -123,156 +142,173 @@ export class IndexedDBAdapter implements PersistenceAdapter {
 
         const db = await this.ensureDb();
 
-        return new Promise((resolve, reject) => {
-            // Use a single transaction for all writes
-            const transaction = db.transaction([ENTITY_STORE], "readwrite");
-            const store = transaction.objectStore(ENTITY_STORE);
+        return this.track(
+            new Promise((resolve, reject) => {
+                // Use a single transaction for all writes
+                const transaction = db.transaction([ENTITY_STORE], "readwrite");
+                const store = transaction.objectStore(ENTITY_STORE);
 
-            let completedCount = 0;
-            let hasError = false;
+                let completedCount = 0;
+                let hasError = false;
 
-            for (const entity of entities) {
-                const request = store.put(entity);
+                for (const entity of entities) {
+                    const request = store.put(entity);
 
-                request.onsuccess = () => {
-                    completedCount++;
-                    if (completedCount === entities.length && !hasError) {
+                    request.onsuccess = () => {
+                        completedCount++;
+                        if (completedCount === entities.length && !hasError) {
+                            resolve();
+                        }
+                    };
+
+                    request.onerror = () => {
+                        if (!hasError) {
+                            hasError = true;
+                            reject(
+                                new Error(`Failed to save entity ${entity.id}`),
+                            );
+                        }
+                    };
+                }
+
+                // Handle transaction completion
+                transaction.oncomplete = () => {
+                    if (!hasError && completedCount === entities.length) {
                         resolve();
                     }
                 };
 
-                request.onerror = () => {
+                transaction.onerror = () => {
                     if (!hasError) {
                         hasError = true;
-                        reject(new Error(`Failed to save entity ${entity.id}`));
+                        reject(new Error("Transaction failed"));
                     }
                 };
-            }
-
-            // Handle transaction completion
-            transaction.oncomplete = () => {
-                if (!hasError && completedCount === entities.length) {
-                    resolve();
-                }
-            };
-
-            transaction.onerror = () => {
-                if (!hasError) {
-                    hasError = true;
-                    reject(new Error("Transaction failed"));
-                }
-            };
-        });
+            }),
+        );
     }
 
     async loadEntities(): Promise<SerializedEntity[]> {
         const db = await this.ensureDb();
 
-        return new Promise((resolve, reject) => {
-            const transaction = db.transaction([ENTITY_STORE], "readonly");
-            const store = transaction.objectStore(ENTITY_STORE);
-            const request = store.getAll();
+        return this.track(
+            new Promise((resolve, reject) => {
+                const transaction = db.transaction([ENTITY_STORE], "readonly");
+                const store = transaction.objectStore(ENTITY_STORE);
+                const request = store.getAll();
 
-            request.onsuccess = () => {
-                resolve(request.result || []);
-            };
+                request.onsuccess = () => {
+                    resolve(request.result || []);
+                };
 
-            request.onerror = () => {
-                reject(new Error("Failed to load entities"));
-            };
-        });
+                request.onerror = () => {
+                    reject(new Error("Failed to load entities"));
+                };
+            }),
+        );
     }
 
     async deleteEntity(entityId: string): Promise<void> {
         const db = await this.ensureDb();
 
-        return new Promise((resolve, reject) => {
-            const transaction = db.transaction([ENTITY_STORE], "readwrite");
-            const store = transaction.objectStore(ENTITY_STORE);
-            const request = store.delete(entityId);
+        return this.track(
+            new Promise((resolve, reject) => {
+                const transaction = db.transaction([ENTITY_STORE], "readwrite");
+                const store = transaction.objectStore(ENTITY_STORE);
+                const request = store.delete(entityId);
 
-            request.onsuccess = () => {
-                resolve();
-            };
+                request.onsuccess = () => {
+                    resolve();
+                };
 
-            request.onerror = () => {
-                reject(new Error(`Failed to delete entity ${entityId}`));
-            };
-        });
+                request.onerror = () => {
+                    reject(new Error(`Failed to delete entity ${entityId}`));
+                };
+            }),
+        );
     }
 
     async clearEntities(): Promise<void> {
         const db = await this.ensureDb();
 
-        return new Promise((resolve, reject) => {
-            const transaction = db.transaction([ENTITY_STORE], "readwrite");
-            const store = transaction.objectStore(ENTITY_STORE);
-            const request = store.clear();
+        return this.track(
+            new Promise((resolve, reject) => {
+                const transaction = db.transaction([ENTITY_STORE], "readwrite");
+                const store = transaction.objectStore(ENTITY_STORE);
+                const request = store.clear();
 
-            request.onsuccess = () => {
-                resolve();
-            };
+                request.onsuccess = () => {
+                    resolve();
+                };
 
-            request.onerror = () => {
-                reject(new Error("Failed to clear entities"));
-            };
-        });
+                request.onerror = () => {
+                    reject(new Error("Failed to clear entities"));
+                };
+            }),
+        );
     }
 
-    /**
-     * Close the database connection
-     */
-    close(): void {
-        if (this.db) {
-            this.db.close();
-            this.db = null;
+    async close(): Promise<void> {
+        if (!this.db) {
+            return;
         }
+        this.closing = true;
+        if (this.inFlightOperation) {
+            await Promise.allSettled([this.inFlightOperation]);
+        }
+        this.db.close();
+        this.db = null;
+        this.closing = false;
     }
 
     async saveRootComponents(components: Record<string, any>): Promise<void> {
         const db = await this.ensureDb();
 
-        return new Promise((resolve, reject) => {
-            const transaction = db.transaction(
-                [ROOT_COMPONENTS_STORE],
-                "readwrite",
-            );
-            const store = transaction.objectStore(ROOT_COMPONENTS_STORE);
-            const request = store.put(components, ROOT_COMPONENTS_KEY);
+        return this.track(
+            new Promise((resolve, reject) => {
+                const transaction = db.transaction(
+                    [ROOT_COMPONENTS_STORE],
+                    "readwrite",
+                );
+                const store = transaction.objectStore(ROOT_COMPONENTS_STORE);
+                const request = store.put(components, ROOT_COMPONENTS_KEY);
 
-            request.onsuccess = () => {
-                resolve();
-            };
+                request.onsuccess = () => {
+                    resolve();
+                };
 
-            request.onerror = () => {
-                reject(new Error("Failed to save root components"));
-            };
-        });
+                request.onerror = () => {
+                    reject(new Error("Failed to save root components"));
+                };
+            }),
+        );
     }
 
     async loadRootComponents(): Promise<Record<string, any> | null> {
         const db = await this.ensureDb();
 
-        return new Promise((resolve, reject) => {
-            const transaction = db.transaction(
-                [ROOT_COMPONENTS_STORE],
-                "readonly",
-            );
-            const store = transaction.objectStore(ROOT_COMPONENTS_STORE);
-            const request = store.get(ROOT_COMPONENTS_KEY);
+        return this.track(
+            new Promise((resolve, reject) => {
+                const transaction = db.transaction(
+                    [ROOT_COMPONENTS_STORE],
+                    "readonly",
+                );
+                const store = transaction.objectStore(ROOT_COMPONENTS_STORE);
+                const request = store.get(ROOT_COMPONENTS_KEY);
 
-            request.onsuccess = () => {
-                resolve(request.result || null);
-            };
+                request.onsuccess = () => {
+                    resolve(request.result || null);
+                };
 
-            request.onerror = () => {
-                reject(new Error("Failed to load root components"));
-            };
-        });
+                request.onerror = () => {
+                    reject(new Error("Failed to load root components"));
+                };
+            }),
+        );
     }
 
     async clearGame(): Promise<void> {
-        this.close();
+        await this.close();
         return clearGameDatabase();
     }
 }

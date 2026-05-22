@@ -16,6 +16,13 @@ import {
     stoneResource,
     treeResource,
 } from "../../../../src/data/inventory/items/naturalResource.ts";
+import { stoneResource as stoneItem } from "../../../../src/data/inventory/items/resources.ts";
+import { createPlayerKingdomComponent } from "../../../../src/game/component/playerKingdomComponent.ts";
+import {
+    createStockpileComponent,
+    setPreferredAmount,
+} from "../../../../src/game/component/stockpileComponent.ts";
+import { createInventoryComponent } from "../../../../src/game/component/inventoryComponent.ts";
 import type { BehaviorActionData } from "../../../../src/game/behavior/actions/ActionData.ts";
 import { InvalidationTracker } from "../behaviorTestHelpers.ts";
 
@@ -104,6 +111,110 @@ describe("harvestResourceAction", () => {
             executeHarvestResourceAction(action, worker, 0);
 
             assert.strictEqual(root.findEntity("resource"), null);
+        });
+    });
+
+    describe("Incompatible held item", () => {
+        function createSettlementScene(): {
+            settlement: Entity;
+            worker: Entity;
+            resource: Entity;
+        } {
+            const settlement = new Entity("settlement");
+            settlement.setEcsComponent(createPlayerKingdomComponent());
+
+            const worker = new Entity("worker");
+            worker.worldPosition = { x: 10, y: 8 };
+            const held = createHeldItemComponent();
+            held.item = stoneItem; // tree yields wood — stone is incompatible
+            held.amount = 4;
+            worker.setEcsComponent(held);
+            settlement.addChild(worker);
+
+            const resource = new Entity("resource");
+            resource.worldPosition = { x: 11, y: 8 }; // adjacent
+            resource.setEcsComponent(createResourceComponent("tree1"));
+            resource.setEcsComponent(createHealthComponent(30, 30));
+            settlement.addChild(resource);
+
+            return { settlement, worker, resource };
+        }
+
+        function addStockpile(settlement: Entity): Entity {
+            const stockpile = new Entity("stockpile");
+            const stockpileComp = createStockpileComponent();
+            setPreferredAmount(stockpileComp, "stone", 50);
+            stockpile.setEcsComponent(stockpileComp);
+            stockpile.setEcsComponent(createInventoryComponent());
+            settlement.addChild(stockpile);
+            stockpile.worldPosition = { x: 14, y: 8 };
+            return stockpile;
+        }
+
+        it("deposits at an accepting stockpile then returns to the resource", () => {
+            const { settlement, worker } = createSettlementScene();
+            const stockpile = addStockpile(settlement);
+
+            const action = {
+                type: "harvestResource" as const,
+                entityId: "resource",
+                harvestAction: ResourceHarvestMode.Chop,
+            };
+
+            const result = executeHarvestResourceAction(action, worker, 0);
+
+            assert.strictEqual(result.kind, "subaction");
+            assert.deepStrictEqual(
+                (result as { actions: BehaviorActionData[] }).actions,
+                [
+                    {
+                        type: "moveTo",
+                        target: stockpile.worldPosition,
+                        stopAdjacent: "cardinal",
+                    },
+                    { type: "depositToStockpile", stockpileId: "stockpile" },
+                    {
+                        type: "moveTo",
+                        target: { x: 11, y: 8 },
+                        stopAdjacent: "cardinal",
+                    },
+                ],
+            );
+        });
+
+        it("drops the held item in place when no stockpile accepts it", () => {
+            const { worker } = createSettlementScene();
+            // No stockpile added — nowhere to deposit the stone.
+
+            const action = {
+                type: "harvestResource" as const,
+                entityId: "resource",
+                harvestAction: ResourceHarvestMode.Chop,
+            };
+
+            const result = executeHarvestResourceAction(action, worker, 0);
+
+            assert.strictEqual(result.kind, "subaction");
+            assert.deepStrictEqual(
+                (result as { actions: BehaviorActionData[] }).actions,
+                [{ type: "dropHeld" }],
+            );
+        });
+
+        it("does not damage the resource while the hand is full", () => {
+            const { settlement, worker, resource } = createSettlementScene();
+            addStockpile(settlement);
+
+            const action = {
+                type: "harvestResource" as const,
+                entityId: "resource",
+                harvestAction: ResourceHarvestMode.Chop,
+            };
+
+            executeHarvestResourceAction(action, worker, 0);
+
+            const health = resource.getEcsComponent(HealthComponentId)!;
+            assert.strictEqual(health.currentHp, 30);
         });
     });
 

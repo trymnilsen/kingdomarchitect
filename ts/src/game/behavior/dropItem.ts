@@ -111,20 +111,64 @@ export function findFreeAdjacentTile(
 }
 
 /**
+ * Controls what happens when the target tile is occupied.
+ *
+ * - `Exact`: place at the given position unconditionally. Caller is responsible
+ *   for ensuring the tile is valid.
+ * - `Nearest`: search outward from the given position and place at the closest
+ *   valid tile. Returns `false` if none found within DROP_SEARCH_RADIUS.
+ * - `Fail`: return `false` immediately if the tile is blocked.
+ */
+export const DropMode = {
+    Exact: "exact",
+    Nearest: "nearest",
+    Fail: "fail",
+} as const;
+
+export type DropMode = (typeof DropMode)[keyof typeof DropMode];
+
+/**
  * Place `amount` of `item` at `position` in the world. If a ground pile
- * with the same item id exists at that position, merge into it. Otherwise
- * spawn a new ground pile entity via collectableItemPrefab. Caller is
- * responsible for ensuring `position` is a valid drop tile.
+ * with the same item id exists at the resolved position, merge into it.
+ * Otherwise spawn a new ground pile entity via collectableItemPrefab.
+ *
+ * The `mode` parameter controls what happens when the target tile is occupied:
+ * - `"exact"` (default): drop unconditionally — caller is responsible for tile validity.
+ * - `"nearest"`: search outward for the closest valid tile; returns `false` if none found.
+ * - `"fail"`: return `false` immediately if the tile is blocked.
+ *
+ * Returns `true` when the item was placed, `false` when placement was skipped.
  */
 export function dropItemAtPosition(
     root: Entity,
     position: Point,
     item: InventoryItem,
     amount: number,
-): void {
-    if (amount <= 0) return;
+    mode: DropMode = DropMode.Exact,
+): boolean {
+    if (amount <= 0) return true;
 
-    const existingPile = findGroundPileAt(root, position, item.id);
+    let dropPos = position;
+
+    if (mode === DropMode.Nearest) {
+        const found = findDropPosition(root, position, item);
+        if (!found) {
+            log.warn(
+                `No valid drop position found near (${position.x},${position.y}) for ${item.id}`,
+            );
+            return false;
+        }
+        dropPos = found;
+    } else if (mode === DropMode.Fail) {
+        if (tileBlocksDrop(root, position, item)) {
+            log.warn(
+                `Drop position (${position.x},${position.y}) is blocked for ${item.id}`,
+            );
+            return false;
+        }
+    }
+
+    const existingPile = findGroundPileAt(root, dropPos, item.id);
     if (existingPile) {
         const collectable = existingPile.requireEcsComponent(
             CollectableComponentId,
@@ -132,17 +176,18 @@ export function dropItemAtPosition(
         addCollectableItem(collectable, { item, amount });
         existingPile.invalidateComponent(CollectableComponentId);
         log.info(
-            `Merged ${amount}x ${item.id} into pile ${existingPile.id} at (${position.x},${position.y})`,
+            `Merged ${amount}x ${item.id} into pile ${existingPile.id} at (${dropPos.x},${dropPos.y})`,
         );
-        return;
+        return true;
     }
 
     const pile = collectableItemPrefab(item, amount);
     root.addChild(pile);
-    pile.worldPosition = position;
+    pile.worldPosition = dropPos;
     log.info(
-        `Spawned new pile ${pile.id} (${amount}x ${item.id}) at (${position.x},${position.y})`,
+        `Spawned new pile ${pile.id} (${amount}x ${item.id}) at (${dropPos.x},${dropPos.y})`,
     );
+    return true;
 }
 
 export function isSamePoint(a: Point, b: Point): boolean {

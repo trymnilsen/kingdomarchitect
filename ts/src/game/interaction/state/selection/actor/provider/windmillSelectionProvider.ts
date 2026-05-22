@@ -11,10 +11,11 @@ import { JobQueueComponentId } from "../../../../../component/jobQueueComponent.
 import { getSettlementEntity } from "../../../../../entity/settlementQueries.ts";
 import { spriteRefs } from "../../../../../../asset/sprite.ts";
 import { QueueJobCommand } from "../../../../../../server/message/command/queueJobCommand.ts";
+import { ClearBuildingJobsCommand } from "../../../../../../server/message/command/clearBuildingJobsCommand.ts";
 import {
     createWindmillJob,
     getWindmillJobCountForBuilding,
-    clearWindmillJobsForBuilding,
+    WindmillJobId,
 } from "../../../../../job/windmillJob.ts";
 import { windmill } from "../../../../../../data/building/food/windmill.ts";
 import type { UIActionbarItem } from "../../../../view/uiActionbar.ts";
@@ -63,12 +64,12 @@ export class WindmillSelectionProvider implements ActorSelectionProvider {
                 text: "Clear Queue",
                 icon: spriteRefs.empty_sprite,
                 onClick: () => {
-                    const jq =
-                        settlement.getEcsComponent(JobQueueComponentId);
-                    if (jq) {
-                        clearWindmillJobsForBuilding(jq, selection.entity.id);
-                        settlement.invalidateComponent(JobQueueComponentId);
-                    }
+                    stateContext.commandDispatcher(
+                        ClearBuildingJobsCommand(
+                            WindmillJobId,
+                            selection.entity.id,
+                        ),
+                    );
                 },
             });
         }

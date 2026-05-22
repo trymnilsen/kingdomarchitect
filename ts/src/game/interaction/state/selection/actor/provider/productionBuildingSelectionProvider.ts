@@ -12,10 +12,11 @@ import { JobQueueComponentId } from "../../../../../component/jobQueueComponent.
 import { getSettlementEntity } from "../../../../../entity/settlementQueries.ts";
 import { spriteRefs } from "../../../../../../asset/sprite.ts";
 import { QueueJobCommand } from "../../../../../../server/message/command/queueJobCommand.ts";
+import { ClearBuildingJobsCommand } from "../../../../../../server/message/command/clearBuildingJobsCommand.ts";
 import {
     createProductionJob,
     getProductionJobCountForBuilding,
-    clearProductionJobsForBuilding,
+    ProductionJobId,
 } from "../../../../../job/productionJob.ts";
 import { getProductionDefinition } from "../../../../../../data/production/productionDefinition.ts";
 import type { UIActionbarItem } from "../../../../view/uiActionbar.ts";
@@ -75,17 +76,12 @@ export class ProductionBuildingSelectionProvider implements ActorSelectionProvid
                         text: "Clear Queue",
                         icon: spriteRefs.empty_sprite,
                         onClick: () => {
-                            const jq =
-                                settlement.getEcsComponent(JobQueueComponentId);
-                            if (jq) {
-                                clearProductionJobsForBuilding(
-                                    jq,
+                            stateContext.commandDispatcher(
+                                ClearBuildingJobsCommand(
+                                    ProductionJobId,
                                     selection.entity.id,
-                                );
-                                settlement.invalidateComponent(
-                                    JobQueueComponentId,
-                                );
-                            }
+                                ),
+                            );
                         },
                     });
                 }

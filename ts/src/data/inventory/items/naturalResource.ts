@@ -242,3 +242,23 @@ export function isImpassableResource(resourceId: string): boolean {
     const { type } = resource.lifecycle;
     return type === "Finite" || type === "Infinite";
 }
+
+/**
+ * A clearable obstacle is an impassable resource that is removed from the world
+ * when destroyed — i.e. "Finite" nodes like trees. A worker may chop through one
+ * to clear a path, after which the tile is permanently passable.
+ */
+export function isClearableObstacle(resourceId: string): boolean {
+    if (!isImpassableResource(resourceId)) return false;
+    const resource = getResourceById(resourceId)!;
+    return resource.lifecycle.type === "Finite";
+}
+
+/**
+ * A permanent obstacle is an impassable resource that is never removed by
+ * clearing — i.e. "Infinite" nodes like stone. Pathfinding must route around
+ * these; a worker only ever approaches them to mine, never to pass through.
+ */
+export function isPermanentObstacle(resourceId: string): boolean {
+    return isImpassableResource(resourceId) && !isClearableObstacle(resourceId);
+}
