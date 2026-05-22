@@ -3,9 +3,7 @@ import {
     StatsComponentId,
     type StatsComponent,
 } from "../component/statsComponent.ts";
-import {
-    ActiveEffectsComponentId,
-} from "../component/activeEffectsComponent.ts";
+import { ActiveEffectsComponentId } from "../component/activeEffectsComponent.ts";
 import { EquipmentComponentId } from "../component/equipmentComponent.ts";
 import type {
     StatType,

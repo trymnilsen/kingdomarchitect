@@ -4,9 +4,7 @@ import { EcsWorld } from "../../../src/common/ecs/ecsWorld.ts";
 import { Entity } from "../../../src/game/entity/entity.ts";
 import { createMinimalWorld } from "../testWorld.ts";
 import { createGoblinUnitComponent } from "../../../src/game/component/goblinUnitComponent.ts";
-import {
-    createHealthComponent,
-} from "../../../src/game/component/healthComponent.ts";
+import { createHealthComponent } from "../../../src/game/component/healthComponent.ts";
 import { damageEntity } from "../../../src/game/component/healthComponent.ts";
 import { createJobQueueComponent } from "../../../src/game/component/jobQueueComponent.ts";
 import { createPlayerKingdomComponent } from "../../../src/game/component/playerKingdomComponent.ts";
@@ -35,7 +33,10 @@ describe("lootDropSystem", () => {
         damageEntity(goblin, 100, 1);
 
         const collectables = root.queryComponents(CollectableComponentId);
-        assert.ok(collectables.size > 0, "a collectable entity should exist after goblin death");
+        assert.ok(
+            collectables.size > 0,
+            "a collectable entity should exist after goblin death",
+        );
 
         const [[, collectableComponent]] = collectables;
         assert.ok(
@@ -56,6 +57,10 @@ describe("lootDropSystem", () => {
         damageEntity(unit, 100, 1);
 
         const collectables = root.queryComponents(CollectableComponentId);
-        assert.strictEqual(collectables.size, 0, "no collectable should spawn for a non-goblin death");
+        assert.strictEqual(
+            collectables.size,
+            0,
+            "no collectable should spawn for a non-goblin death",
+        );
     });
 });

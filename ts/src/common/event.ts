@@ -213,7 +213,9 @@ export class TypedEvent<TBaseEvent extends object> {
                 try {
                     subscription.handler(data);
                 } catch (err) {
-                    log.error("Failed running event subscriber", { error: err });
+                    log.error("Failed running event subscriber", {
+                        error: err,
+                    });
                 }
             }
         }

@@ -149,8 +149,6 @@ export function hasInventoryItems(
     return false;
 }
 
-
-
 export function defaultInventoryItems(): InventoryItemQuantity[] {
     return [
         {

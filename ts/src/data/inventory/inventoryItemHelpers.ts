@@ -8,7 +8,9 @@ export function isFood(item: InventoryItem): boolean {
 }
 
 export function getInventoryItemById(id: string): InventoryItem | undefined {
-    return (resources as readonly InventoryItem[]).find((item) => item.id === id);
+    return (resources as readonly InventoryItem[]).find(
+        (item) => item.id === id,
+    );
 }
 
 export function findFoodInInventory(

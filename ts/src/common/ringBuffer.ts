@@ -33,8 +33,7 @@ export function readEntries<T>(buffer: RingBuffer<T>): T[] {
 
     // When the buffer is full, the oldest entry is at writeHead.
     // When not full, entries start at index 0.
-    const startIndex =
-        buffer.total >= buffer.capacity ? buffer.writeHead : 0;
+    const startIndex = buffer.total >= buffer.capacity ? buffer.writeHead : 0;
 
     for (let i = 0; i < size; i++) {
         const index = (startIndex + i) % buffer.capacity;

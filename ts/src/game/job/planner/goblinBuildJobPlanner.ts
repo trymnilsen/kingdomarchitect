@@ -41,7 +41,9 @@ export function planGoblinBuildJob(
     const buildingComponent =
         buildingEntity.getEcsComponent(BuildingComponentId);
     if (!buildingComponent) {
-        log.warn("Building has no BuildingComponent", { entityId: job.entityId });
+        log.warn("Building has no BuildingComponent", {
+            entityId: job.entityId,
+        });
         return [];
     }
 
@@ -109,9 +111,10 @@ export function planGoblinBuildJob(
             remainingMaterials,
         );
         if (stockpileWithMaterials) {
-            const inventory = stockpileWithMaterials.requireEcsComponent(
-                InventoryComponentId,
-            );
+            const inventory =
+                stockpileWithMaterials.requireEcsComponent(
+                    InventoryComponentId,
+                );
             for (const [itemId, amountNeeded] of Object.entries(
                 remainingMaterials,
             )) {

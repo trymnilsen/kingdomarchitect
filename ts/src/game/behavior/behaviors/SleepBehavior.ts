@@ -43,7 +43,8 @@ export function createSleepBehavior(): Behavior {
             }
 
             // Exhaustion boost pushes priority higher as condition worsens
-            const exhaustionBoost = [0, 10, 20, 40, 48][energy.exhaustionLevel] ?? 48;
+            const exhaustionBoost =
+                [0, 10, 20, 40, 48][energy.exhaustionLevel] ?? 48;
             return Math.min(98, base + exhaustionBoost);
         },
 
@@ -88,7 +89,11 @@ export function createSleepBehavior(): Behavior {
             const hasBedroll = entityHasBedroll(entity);
             if (hasBedroll) {
                 // Look for a nearby campfire
-                const campfire = findNearbyCampfire(root, entity, CAMPFIRE_SEARCH_RADIUS);
+                const campfire = findNearbyCampfire(
+                    root,
+                    entity,
+                    CAMPFIRE_SEARCH_RADIUS,
+                );
                 if (campfire) {
                     const adjacentTile = findAdjacentWalkable(
                         root,

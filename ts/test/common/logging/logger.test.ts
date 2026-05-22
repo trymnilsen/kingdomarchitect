@@ -17,10 +17,12 @@ function withConsoleSpy(fn: () => void): {
     const origGroup = console.groupCollapsed;
     const origGroupEnd = console.groupEnd;
 
-    console.debug = (...args: unknown[]) => calls.push({ method: "debug", args });
+    console.debug = (...args: unknown[]) =>
+        calls.push({ method: "debug", args });
     console.log = (...args: unknown[]) => calls.push({ method: "log", args });
     console.warn = (...args: unknown[]) => calls.push({ method: "warn", args });
-    console.error = (...args: unknown[]) => calls.push({ method: "error", args });
+    console.error = (...args: unknown[]) =>
+        calls.push({ method: "error", args });
     console.groupCollapsed = (...args: unknown[]) =>
         calls.push({ method: "groupCollapsed", args });
     console.groupEnd = () => calls.push({ method: "groupEnd", args: [] });
@@ -378,8 +380,14 @@ describe("showNext", () => {
         });
         const logCalls = calls.filter((c) => c.method === "log");
         assert.strictEqual(logCalls.length, 2);
-        assert.ok((logCalls[0].args[0] as string).includes("shown by showNext"));
-        assert.ok((logCalls[1].args[0] as string).includes("passes regular filter again"));
+        assert.ok(
+            (logCalls[0].args[0] as string).includes("shown by showNext"),
+        );
+        assert.ok(
+            (logCalls[1].args[0] as string).includes(
+                "passes regular filter again",
+            ),
+        );
     });
 });
 
@@ -415,7 +423,9 @@ describe("createLogger (tagged)", () => {
     it("tagged logger entries are visible in replay", () => {
         createRootLogger();
         const log = createLogger("persistence");
-        const rootLog = (globalThis as Record<string, unknown>)["log"] as ReturnType<typeof createRootLogger>;
+        const rootLog = (globalThis as Record<string, unknown>)[
+            "log"
+        ] as ReturnType<typeof createRootLogger>;
         rootLog.mute();
 
         log.info("save complete");

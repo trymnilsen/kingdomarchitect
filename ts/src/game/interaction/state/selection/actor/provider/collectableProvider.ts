@@ -51,8 +51,8 @@ export class CollectableProvider implements ActorSelectionProvider {
             GroundItemComponentId,
         );
         if (isGroundPile) {
-            const equipStack = collectable.items.find(
-                (stack) => stack.item.tag?.includes(ItemTag.SkillGear),
+            const equipStack = collectable.items.find((stack) =>
+                stack.item.tag?.includes(ItemTag.SkillGear),
             );
             if (equipStack) {
                 const sourceId = selection.entity.id;

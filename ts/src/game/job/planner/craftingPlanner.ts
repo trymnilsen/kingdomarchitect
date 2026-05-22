@@ -9,9 +9,7 @@ import {
     HeldItemComponentId,
     isHeldEmpty,
 } from "../../component/heldItemComponent.ts";
-import {
-    CollectableComponentId,
-} from "../../component/collectableComponent.ts";
+import { CollectableComponentId } from "../../component/collectableComponent.ts";
 import { GroundItemComponentId } from "../../component/groundItemComponent.ts";
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import type { CraftingJob } from "../craftingJob.ts";
@@ -77,7 +75,11 @@ export function planCrafting(
         .map((input) => {
             const stack = getInventoryItem(buildingInventory, input.item.id);
             const have = stack?.amount ?? 0;
-            return { itemId: input.item.id, item: input.item, deficit: input.amount - have };
+            return {
+                itemId: input.item.id,
+                item: input.item,
+                deficit: input.amount - have,
+            };
         })
         .filter((entry) => entry.deficit > 0);
 
@@ -106,7 +108,11 @@ export function planCrafting(
             ];
         }
         // Held has something the building doesn't need — drop it before fetching.
-        const dropPos = findDropPosition(root, worker.worldPosition, held.item!);
+        const dropPos = findDropPosition(
+            root,
+            worker.worldPosition,
+            held.item!,
+        );
         if (!dropPos) {
             throw new Error(
                 `craftingPlanner: cannot find drop position for held item ` +
@@ -129,10 +135,7 @@ export function planCrafting(
         );
         if (stockpileSources.length > 0) {
             const nearest = stockpileSources[0];
-            const fetchAmount = Math.min(
-                nearest.availableAmount,
-                need.deficit,
-            );
+            const fetchAmount = Math.min(nearest.availableAmount, need.deficit);
             return [
                 {
                     type: "moveTo",

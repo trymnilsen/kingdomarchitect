@@ -54,7 +54,9 @@ export class CraftingBuildingSelectionProvider implements ActorSelectionProvider
                                 text: "Collect",
                                 icon: spriteRefs.empty_sprite,
                                 onClick: () => {
-                                    const job = CollectItemJob(selection.entity);
+                                    const job = CollectItemJob(
+                                        selection.entity,
+                                    );
                                     stateContext.commandDispatcher(
                                         QueueJobCommand(job),
                                     );

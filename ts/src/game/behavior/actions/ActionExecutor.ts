@@ -99,9 +99,7 @@ export const executeAction: BehaviorActionExecutor = (
         case "dropFromSlot":
             return executeDropFromSlotAction(action, entity);
         default:
-            log.warn(
-                `Unknown action type: ${(action as any).type}`,
-            );
+            log.warn(`Unknown action type: ${(action as any).type}`);
             return { kind: "failed", cause: { type: "unknown" } };
     }
 };

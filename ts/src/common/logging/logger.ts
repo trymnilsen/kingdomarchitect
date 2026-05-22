@@ -238,9 +238,7 @@ export function createRootLogger(capacity = 8192): Logger {
                     : readEntries(buffer);
 
             if (filter !== undefined) {
-                candidates = candidates.filter((e) =>
-                    matchesFilter(e, filter),
-                );
+                candidates = candidates.filter((e) => matchesFilter(e, filter));
             }
 
             const label = buildReplayLabel(filter, candidates.length);

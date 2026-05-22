@@ -144,7 +144,10 @@ describe("influenceScan", () => {
 
         h.placeKingdom({ x: 3, y: 8 }, KingdomType.Npc);
 
-        const influenceAfterGap = computeInfluenceAtChunk(h.root, { x: 7, y: 8 });
+        const influenceAfterGap = computeInfluenceAtChunk(h.root, {
+            x: 7,
+            y: 8,
+        });
 
         assert.strictEqual(
             influenceAfterGap,

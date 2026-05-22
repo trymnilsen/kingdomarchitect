@@ -119,7 +119,8 @@ export function evaluateKingdomSpawn(
     );
     const influenceWeight = Math.max(
         0,
-        1.0 - totalInfluence / KingdomSpawnConfig.influence.suppressionThreshold,
+        1.0 -
+            totalInfluence / KingdomSpawnConfig.influence.suppressionThreshold,
     );
 
     const spawnScore =

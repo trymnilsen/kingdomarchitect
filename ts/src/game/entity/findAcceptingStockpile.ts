@@ -35,10 +35,7 @@ export function findAcceptingStockpile(
             (p) => p.itemId === itemId && p.amount > 0,
         );
         if (!accepts) continue;
-        const d = distance(
-            entity.worldPosition,
-            stockpileEntity.worldPosition,
-        );
+        const d = distance(entity.worldPosition, stockpileEntity.worldPosition);
         if (d < bestDistance) {
             bestDistance = d;
             best = stockpileEntity;

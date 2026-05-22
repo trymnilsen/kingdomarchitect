@@ -63,7 +63,10 @@ export function createPerformPlayerCommandBehavior(): Behavior {
                             target: target.worldPosition,
                             stopAdjacent: "cardinal",
                         },
-                        { type: "attackTarget", targetId: command.targetEntityId },
+                        {
+                            type: "attackTarget",
+                            targetId: command.targetEntityId,
+                        },
                         { type: "clearPlayerCommand" },
                     ];
                 }

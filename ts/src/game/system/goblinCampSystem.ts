@@ -61,7 +61,13 @@ export const goblinCampSystem: EcsSystem = {
                 );
             }
 
-            processSpawning(root, campEntity, campComponent, population, hasActiveFire);
+            processSpawning(
+                root,
+                campEntity,
+                campComponent,
+                population,
+                hasActiveFire,
+            );
             processCampRemoval(campEntity, population, hasActiveFire);
         }
     },
@@ -302,7 +308,10 @@ function campHasActiveFire(campEntity: Entity): boolean {
     return false;
 }
 
-function findAvailableGoblinHut(root: Entity, campEntity: Entity): Entity | null {
+function findAvailableGoblinHut(
+    root: Entity,
+    campEntity: Entity,
+): Entity | null {
     for (const child of campEntity.children) {
         const building = child.getEcsComponent(BuildingComponentId);
         if (
@@ -334,7 +343,10 @@ function findAvailableGoblinHut(root: Entity, campEntity: Entity): Entity | null
 function findActiveCampfire(campEntity: Entity): Entity | null {
     for (const child of campEntity.children) {
         const building = child.getEcsComponent(BuildingComponentId);
-        if (building?.building.id === goblinCampfire.id && !building.scaffolded) {
+        if (
+            building?.building.id === goblinCampfire.id &&
+            !building.scaffolded
+        ) {
             const fireSource = child.getEcsComponent(FireSourceComponentId);
             if (fireSource?.isActive) {
                 return child;

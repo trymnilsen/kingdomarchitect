@@ -5,11 +5,7 @@ import {
 } from "../../component/warmthComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import type { Point } from "../../../common/point.ts";
-import {
-    ActionComplete,
-    ActionRunning,
-    type ActionResult,
-} from "./Action.ts";
+import { ActionComplete, ActionRunning, type ActionResult } from "./Action.ts";
 
 export type WarmByFireActionData = { type: "warmByFire"; fireEntityId: string };
 import { createLogger } from "../../../common/logging/logger.ts";
@@ -39,9 +35,7 @@ export function executeWarmByFireAction(
     const warmth = entity.getEcsComponent(WarmthComponentId);
 
     if (!warmth) {
-        log.warn(
-            `Entity ${entity.id} has no warmth component`,
-        );
+        log.warn(`Entity ${entity.id} has no warmth component`);
         return { kind: "failed", cause: { type: "unknown" } };
     }
 
@@ -49,9 +43,7 @@ export function executeWarmByFireAction(
     const fireEntity = root.findEntity(action.fireEntityId);
 
     if (!fireEntity) {
-        log.warn(
-            `Fire entity ${action.fireEntityId} not found`,
-        );
+        log.warn(`Fire entity ${action.fireEntityId} not found`);
         return {
             kind: "failed",
             cause: { type: "targetGone", entityId: action.fireEntityId },
@@ -61,9 +53,7 @@ export function executeWarmByFireAction(
     const fireSource = fireEntity.getEcsComponent(FireSourceComponentId);
 
     if (!fireSource) {
-        log.warn(
-            `Entity ${action.fireEntityId} has no FireSourceComponent`,
-        );
+        log.warn(`Entity ${action.fireEntityId} has no FireSourceComponent`);
         return { kind: "failed", cause: { type: "unknown" } };
     }
 

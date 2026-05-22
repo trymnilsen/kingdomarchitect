@@ -1,4 +1,7 @@
-import { getInventoryItem, type InventoryComponent } from "./inventoryComponent.ts";
+import {
+    getInventoryItem,
+    type InventoryComponent,
+} from "./inventoryComponent.ts";
 
 export type PreferredAmount = {
     itemId: string;

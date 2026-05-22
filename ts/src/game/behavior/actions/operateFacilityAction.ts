@@ -21,11 +21,7 @@ import {
     findJobClaimedBy,
     completeJobFromQueue,
 } from "../../job/jobLifecycle.ts";
-import {
-    ActionComplete,
-    ActionRunning,
-    type ActionResult,
-} from "./Action.ts";
+import { ActionComplete, ActionRunning, type ActionResult } from "./Action.ts";
 
 export type OperateFacilityActionData = {
     type: "operateFacility";
@@ -46,9 +42,7 @@ export function executeOperateFacilityAction(
     const buildingEntity = root.findEntity(action.buildingId);
 
     if (!buildingEntity) {
-        log.warn(
-            `Building ${action.buildingId} not found`,
-        );
+        log.warn(`Building ${action.buildingId} not found`);
         return {
             kind: "failed",
             cause: { type: "targetGone", entityId: action.buildingId },
@@ -66,17 +60,13 @@ export function executeOperateFacilityAction(
         ProductionComponentId,
     );
     if (!productionComp) {
-        log.warn(
-            `Building ${action.buildingId} has no ProductionComponent`,
-        );
+        log.warn(`Building ${action.buildingId} has no ProductionComponent`);
         return { kind: "failed", cause: { type: "unknown" } };
     }
 
     const definition = getProductionDefinition(productionComp.productionId);
     if (!definition) {
-        log.warn(
-            `Unknown production: ${productionComp.productionId}`,
-        );
+        log.warn(`Unknown production: ${productionComp.productionId}`);
         return { kind: "failed", cause: { type: "unknown" } };
     }
 

@@ -65,7 +65,10 @@ describe("SleepBehavior", () => {
             const utility = behavior.utility(entity);
 
             // base = 55 + (30-29)*0.67 = 55.67
-            assert.ok(utility >= 55 && utility < 57, `expected ~56, got ${utility}`);
+            assert.ok(
+                utility >= 55 && utility < 57,
+                `expected ~56, got ${utility}`,
+            );
         });
 
         it("returns ~75 when energy is 0 and no exhaustion", () => {
@@ -75,7 +78,10 @@ describe("SleepBehavior", () => {
             const utility = behavior.utility(entity);
 
             // base = 55 + 30*0.67 = 75.1
-            assert.ok(utility >= 74 && utility <= 76, `expected ~75, got ${utility}`);
+            assert.ok(
+                utility >= 74 && utility <= 76,
+                `expected ~75, got ${utility}`,
+            );
         });
 
         it("returns higher utility for lower energy", () => {

@@ -39,9 +39,7 @@ export function executeEquipFromHeldAction(
     }
 
     if (held.amount !== 1) {
-        log.warn(
-            `equipFromHeld requires held amount of 1, got ${held.amount}`,
-        );
+        log.warn(`equipFromHeld requires held amount of 1, got ${held.amount}`);
         return { kind: "failed", cause: { type: "unknown" } };
     }
 

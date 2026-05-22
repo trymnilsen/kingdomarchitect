@@ -240,11 +240,7 @@ function createItemRow(
                 uiButton({
                     width: 28,
                     height: 28,
-                    onTap: () =>
-                        props.onAmountChange(
-                            item.id,
-                            -1,
-                        ),
+                    onTap: () => props.onAmountChange(item.id, -1),
                     child: uiText({
                         content: "-",
                         textStyle: {
@@ -271,11 +267,7 @@ function createItemRow(
                 uiButton({
                     width: 28,
                     height: 28,
-                    onTap: () =>
-                        props.onAmountChange(
-                            item.id,
-                            1,
-                        ),
+                    onTap: () => props.onAmountChange(item.id, 1),
                     child: uiText({
                         content: "+",
                         textStyle: {

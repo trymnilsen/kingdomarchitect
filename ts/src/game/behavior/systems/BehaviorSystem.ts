@@ -90,22 +90,17 @@ function updateBehaviorAgent(
         try {
             result = executeAction(action, entity, tick);
         } catch (error) {
-            log.error(
-                `Action threw exception for entity ${entity.id}`,
-                { error },
-            );
+            log.error(`Action threw exception for entity ${entity.id}`, {
+                error,
+            });
             result = { kind: "failed", cause: { type: "unknown" } };
         }
 
         if (result.kind === "complete") {
-            log.info(
-                `Entity ${entity.id} completed action "${action.type}"`,
-            );
+            log.info(`Entity ${entity.id} completed action "${action.type}"`);
             agent.actionQueue.shift();
             if (agent.actionQueue.length === 0) {
-                log.info(
-                    `Entity ${entity.id} actionQueue empty`,
-                );
+                log.info(`Entity ${entity.id} actionQueue empty`);
                 agent.pendingReplan = { kind: "replan" };
             }
         } else if (result.kind === "failed") {
@@ -169,9 +164,7 @@ function unclaimCurrentJob(entity: Entity): void {
         if (job.claimedBy === entity.id) {
             job.claimedBy = undefined;
             queueEntity.invalidateComponent(JobQueueComponentId);
-            log.info(
-                `Unclaimed job ${job.id} for entity ${entity.id}`,
-            );
+            log.info(`Unclaimed job ${job.id} for entity ${entity.id}`);
             break;
         }
     }
@@ -256,10 +249,9 @@ function replan(
     // Sort by utility (highest first)
     behaviorUtilities.sort((a, b) => b.utility - a.utility);
 
-    log.info(
-        `Entity ${entity.id} sorted behaviors`,
-        { behaviors: JSON.stringify(behaviorUtilities) },
-    );
+    log.info(`Entity ${entity.id} sorted behaviors`, {
+        behaviors: JSON.stringify(behaviorUtilities),
+    });
     const bestBehavior = behaviorUtilities[0];
 
     const sameBehavior = currentBehavior?.name === bestBehavior.behavior.name;

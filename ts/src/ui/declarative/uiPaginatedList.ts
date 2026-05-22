@@ -66,10 +66,14 @@ export const uiPaginatedList = createComponent<UiPaginatedListProps>(
         if (props.items.length > 0) {
             // Determine if footer will be needed. We first try without footer.
             // If items don't fit in one page we need the footer, reducing space.
-            const firstItemSize = measureDescriptor("first-item", props.items[0], {
-                width: resolvedWidth,
-                height: resolvedHeight,
-            });
+            const firstItemSize = measureDescriptor(
+                "first-item",
+                props.items[0],
+                {
+                    width: resolvedWidth,
+                    height: resolvedHeight,
+                },
+            );
 
             const itemHeight = firstItemSize.height;
 

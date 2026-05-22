@@ -36,7 +36,7 @@ export const KingdomSpawnConfig = {
         strength: {
             [0]: 25.0, // KingdomType.Player
             [1]: 10.0, // KingdomType.Npc
-            [2]: 3.0,  // KingdomType.Goblin
+            [2]: 3.0, // KingdomType.Goblin
         } as const,
         /** Fraction of influence lost per volume boundary crossing (0–1) */
         decayRate: 0.35,

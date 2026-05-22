@@ -5,9 +5,7 @@ import {
     createTileComponent,
     setChunk,
 } from "../game/component/tileComponent.ts";
-import {
-    createVisibilityMapComponent,
-} from "../game/component/visibilityMapComponent.ts";
+import { createVisibilityMapComponent } from "../game/component/visibilityMapComponent.ts";
 import { type TileChunk } from "../game/map/chunk.ts";
 import type { BiomeType } from "../game/map/biome.ts";
 import type { Volume } from "../game/map/volume.ts";

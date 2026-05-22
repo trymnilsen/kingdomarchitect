@@ -47,14 +47,19 @@ describe("stealFoodAction", () => {
         assert.strictEqual(thiefHeld.amount, 1);
 
         const targetInventory = target.getEcsComponent(InventoryComponentId)!;
-        const remainingStack = targetInventory.items.find((s) => s.item.id === breadItem.id);
+        const remainingStack = targetInventory.items.find(
+            (s) => s.item.id === breadItem.id,
+        );
         assert.ok(remainingStack);
         assert.strictEqual(remainingStack.amount, 2);
     });
 
     it("returns failed when target entity does not exist", () => {
         const { thief } = createTestScene();
-        const action = { type: "stealFood" as const, targetEntityId: "nonexistent" };
+        const action = {
+            type: "stealFood" as const,
+            targetEntityId: "nonexistent",
+        };
 
         const result = executeStealFoodAction(action, thief);
 
@@ -68,7 +73,10 @@ describe("stealFoodAction", () => {
         emptyTarget.setEcsComponent(createInventoryComponent());
         root.addChild(emptyTarget);
 
-        const action = { type: "stealFood" as const, targetEntityId: "emptyTarget" };
+        const action = {
+            type: "stealFood" as const,
+            targetEntityId: "emptyTarget",
+        };
         const result = executeStealFoodAction(action, thief);
 
         assert.strictEqual(result.kind, "failed");

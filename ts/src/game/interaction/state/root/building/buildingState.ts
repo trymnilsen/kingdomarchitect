@@ -143,68 +143,65 @@ const buildingRequirementsView = createComponent<{
     building: Building;
     onItemTap?: (item: InventoryItem) => void;
 }>(({ props }) => {
-        const requirements = props.building.requirements;
+    const requirements = props.building.requirements;
 
-        if (!requirements) {
-            return uiText({
-                content: "No requirements",
-                textStyle: bookTextStyle,
-            });
-        }
-
-        const children: ComponentDescriptor[] = [];
-
-        if (requirements.materials) {
-            children.push(
-                uiText({
-                    content: "Materials:",
-                    textStyle: bookTextStyle,
-                }),
-            );
-
-            for (const [itemId, amount] of Object.entries(
-                requirements.materials,
-            )) {
-                if (amount === undefined || amount <= 0) continue;
-                const item = inventoryItemsMap[itemId as InventoryItemIds];
-                if (!item) continue;
-                children.push(
-                    requirementMaterialRow({
-                        item,
-                        amount,
-                        onItemTap: props.onItemTap,
-                    }),
-                );
-            }
-        }
-
-        if (requirements.special && requirements.special.length > 0) {
-            children.push(uiSpace({ width: 1, height: 4 }));
-            children.push(
-                uiText({
-                    content: "Special:",
-                    textStyle: bookTextStyle,
-                }),
-            );
-
-            for (const req of requirements.special) {
-                const reqName = specialRequirementNames[req];
-                children.push(
-                    uiText({
-                        content: `  ${reqName}`,
-                        textStyle: bookTextStyle,
-                    }),
-                );
-            }
-        }
-
-        return uiColumn({
-            width: fillUiSize,
-            height: wrapUiSize,
-            children,
+    if (!requirements) {
+        return uiText({
+            content: "No requirements",
+            textStyle: bookTextStyle,
         });
-    },
-);
+    }
+
+    const children: ComponentDescriptor[] = [];
+
+    if (requirements.materials) {
+        children.push(
+            uiText({
+                content: "Materials:",
+                textStyle: bookTextStyle,
+            }),
+        );
+
+        for (const [itemId, amount] of Object.entries(requirements.materials)) {
+            if (amount === undefined || amount <= 0) continue;
+            const item = inventoryItemsMap[itemId as InventoryItemIds];
+            if (!item) continue;
+            children.push(
+                requirementMaterialRow({
+                    item,
+                    amount,
+                    onItemTap: props.onItemTap,
+                }),
+            );
+        }
+    }
+
+    if (requirements.special && requirements.special.length > 0) {
+        children.push(uiSpace({ width: 1, height: 4 }));
+        children.push(
+            uiText({
+                content: "Special:",
+                textStyle: bookTextStyle,
+            }),
+        );
+
+        for (const req of requirements.special) {
+            const reqName = specialRequirementNames[req];
+            children.push(
+                uiText({
+                    content: `  ${reqName}`,
+                    textStyle: bookTextStyle,
+                }),
+            );
+        }
+    }
+
+    return uiColumn({
+        width: fillUiSize,
+        height: wrapUiSize,
+        children,
+    });
+});
 
 const buildingDetailsView = createComponent<{
     building: Building;

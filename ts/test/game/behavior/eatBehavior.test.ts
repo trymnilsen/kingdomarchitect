@@ -18,9 +18,7 @@ import {
     createEquipmentComponent,
     EquipmentComponentId,
 } from "../../../src/game/component/equipmentComponent.ts";
-import {
-    createHungerComponent,
-} from "../../../src/game/component/hungerComponent.ts";
+import { createHungerComponent } from "../../../src/game/component/hungerComponent.ts";
 import { createStockpileComponent } from "../../../src/game/component/stockpileComponent.ts";
 import { createResourceComponent } from "../../../src/game/component/resourceComponent.ts";
 import { createPlayerKingdomComponent } from "../../../src/game/component/playerKingdomComponent.ts";
@@ -45,7 +43,11 @@ function createWorker(settlement: Entity, hunger = 60): Entity {
     return worker;
 }
 
-function createStockpileWithFood(id: string, parent: Entity, amount = 5): Entity {
+function createStockpileWithFood(
+    id: string,
+    parent: Entity,
+    amount = 5,
+): Entity {
     const stockpile = new Entity(id);
     parent.addChild(stockpile);
     stockpile.worldPosition = { x: 15, y: 8 };

@@ -132,7 +132,10 @@ export const uiBookLayout = createComponent<UiBookLayoutProps>(
             );
 
             bookBackground.draw(scope, backgroundPosition, {
-                width: mode === UIBookLayoutMode.Single ? bookSize.width : bookWidth,
+                width:
+                    mode === UIBookLayoutMode.Single
+                        ? bookSize.width
+                        : bookWidth,
                 height: pageHeight,
             });
         });
@@ -156,7 +159,11 @@ export const uiBookLayout = createComponent<UiBookLayoutProps>(
                 }),
                 child: uiText({
                     content: "Back",
-                    textStyle: { color: bookInkColor, font: "Silkscreen", size: 14 },
+                    textStyle: {
+                        color: bookInkColor,
+                        font: "Silkscreen",
+                        size: 14,
+                    },
                 }),
                 onTap: () => props.onPageChange!(UIBookLayoutPage.Left),
             });

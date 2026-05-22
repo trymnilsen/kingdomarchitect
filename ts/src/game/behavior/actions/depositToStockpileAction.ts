@@ -9,10 +9,7 @@ import {
 } from "../../component/heldItemComponent.ts";
 import { StockpileComponentId } from "../../component/stockpileComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
-import {
-    ActionComplete,
-    type ActionResult,
-} from "./Action.ts";
+import { ActionComplete, type ActionResult } from "./Action.ts";
 import { createLogger } from "../../../common/logging/logger.ts";
 
 const log = createLogger("behavior");

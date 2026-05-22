@@ -54,9 +54,7 @@ describe("DepositHeldBehavior", () => {
         const behavior = createDepositHeldBehavior();
         const settlement = createSettlement();
         const worker = createWorker(settlement);
-        createStockpile(settlement, "sp", [
-            { itemId: "wood", amount: 10 },
-        ]);
+        createStockpile(settlement, "sp", [{ itemId: "wood", amount: 10 }]);
 
         assert.strictEqual(behavior.isValid(worker), false);
     });
@@ -68,9 +66,7 @@ describe("DepositHeldBehavior", () => {
         const held = worker.requireEcsComponent(HeldItemComponentId);
         held.item = woodResourceItem;
         held.amount = 3;
-        createStockpile(settlement, "sp", [
-            { itemId: "wood", amount: 10 },
-        ]);
+        createStockpile(settlement, "sp", [{ itemId: "wood", amount: 10 }]);
 
         assert.strictEqual(behavior.isValid(worker), true);
     });

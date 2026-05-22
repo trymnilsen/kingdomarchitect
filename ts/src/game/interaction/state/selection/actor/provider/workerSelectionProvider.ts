@@ -48,9 +48,8 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
                 PlayerUnitComponentId,
             );
 
-            const heldComponent = selectedEntity.getEcsComponent(
-                HeldItemComponentId,
-            );
+            const heldComponent =
+                selectedEntity.getEcsComponent(HeldItemComponentId);
 
             if (!!playerUnit && !!equipmentComponent) {
                 return {
@@ -119,9 +118,10 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
         }
 
         const item = heldComponent.item!;
-        const label = heldComponent.amount > 1
-            ? `${item.name} ×${heldComponent.amount}`
-            : item.name;
+        const label =
+            heldComponent.amount > 1
+                ? `${item.name} ×${heldComponent.amount}`
+                : item.name;
 
         items.push({
             text: label,
@@ -178,7 +178,9 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
         const secondaryItem = equipmentComponent.slots.secondary;
 
         if (secondaryItem) {
-            const isConsumable = secondaryItem.tag?.includes(ItemTag.Consumable);
+            const isConsumable = secondaryItem.tag?.includes(
+                ItemTag.Consumable,
+            );
             const children: UIActionbarItem[] = [
                 {
                     text: "Unequip",

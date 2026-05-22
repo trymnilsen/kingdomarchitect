@@ -191,8 +191,7 @@ describe("attackTargetAction", () => {
             );
 
             const death = events.find(
-                (e) =>
-                    e.id === "game" && e.data.type === DeathGameEventType,
+                (e) => e.id === "game" && e.data.type === DeathGameEventType,
             );
             assert.ok(death, "expected a death event to bubble to root");
             assert.strictEqual(
@@ -218,8 +217,7 @@ describe("attackTargetAction", () => {
             );
 
             const death = events.find(
-                (e) =>
-                    e.id === "game" && e.data.type === DeathGameEventType,
+                (e) => e.id === "game" && e.data.type === DeathGameEventType,
             );
             assert.strictEqual(death, undefined);
         });

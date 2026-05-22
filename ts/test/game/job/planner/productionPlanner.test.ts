@@ -5,9 +5,7 @@ import { planProduction } from "../../../../src/game/job/planner/productionPlann
 import { createProductionJob } from "../../../../src/game/job/productionJob.ts";
 import { createJobQueueComponent } from "../../../../src/game/component/jobQueueComponent.ts";
 import { createProductionComponent } from "../../../../src/game/component/productionComponent.ts";
-import {
-    createChunkMapComponent,
-} from "../../../../src/game/component/chunkMapComponent.ts";
+import { createChunkMapComponent } from "../../../../src/game/component/chunkMapComponent.ts";
 
 function createExtractScene(): {
     root: Entity;

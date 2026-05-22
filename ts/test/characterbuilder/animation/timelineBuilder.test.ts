@@ -129,7 +129,9 @@ describe("timeline builder — part track operations", () => {
         const recipe = timeline("test")
             .basedOn("walk_se", 0)
             .duration(8)
-            .part("RightHand", (t) => t.at(0).until(8).replaceWith("attack_se", 2))
+            .part("RightHand", (t) =>
+                t.at(0).until(8).replaceWith("attack_se", 2),
+            )
             .build();
 
         assert.deepStrictEqual(recipe.tracks["RightHand"], [
@@ -158,7 +160,9 @@ describe("timeline builder — part track operations", () => {
         const recipe = timeline("test")
             .basedOn("walk_se", 0)
             .duration(10)
-            .part("Head", (t) => t.at(3).addPixels("LeftEye").addPixels("RightEye"))
+            .part("Head", (t) =>
+                t.at(3).addPixels("LeftEye").addPixels("RightEye"),
+            )
             .build();
 
         assert.deepStrictEqual(recipe.tracks["Head"], [
@@ -203,7 +207,10 @@ describe("timeline builder — copyFrom", () => {
             .part("RightEye", (t) => t.copyFrom("LeftEye"))
             .build();
 
-        assert.deepStrictEqual(recipe.tracks["RightEye"], recipe.tracks["LeftEye"]);
+        assert.deepStrictEqual(
+            recipe.tracks["RightEye"],
+            recipe.tracks["LeftEye"],
+        );
     });
 
     it("throws at build() when copyFrom references an unconfigured part", () => {

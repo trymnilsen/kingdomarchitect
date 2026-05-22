@@ -67,7 +67,15 @@ describe("FarmGrowthSystem", () => {
         // At tick 110: farm1 has 60 ticks (ready), farm2 has 10 ticks (still growing)
         farmGrowthSystem.onUpdate!(root, 110);
 
-        assert.strictEqual(comp1.state, FarmState.Ready, "farm1 should be Ready");
-        assert.strictEqual(comp2.state, FarmState.Growing, "farm2 should still be Growing");
+        assert.strictEqual(
+            comp1.state,
+            FarmState.Ready,
+            "farm1 should be Ready",
+        );
+        assert.strictEqual(
+            comp2.state,
+            FarmState.Growing,
+            "farm2 should still be Growing",
+        );
     });
 });

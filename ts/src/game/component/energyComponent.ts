@@ -23,7 +23,9 @@ export type EnergyComponent = {
 
 export const EnergyComponentId = "Energy";
 
-export function createEnergyComponent(maxEnergy: number = 100): EnergyComponent {
+export function createEnergyComponent(
+    maxEnergy: number = 100,
+): EnergyComponent {
     return {
         id: EnergyComponentId,
         energy: maxEnergy,

@@ -8,7 +8,11 @@ import { wizardHat } from "../data/inventory/items/equipment.ts";
 export type EquipmentSpriteVariant =
     | { type: "single"; sprite: SpriteRef }
     | { type: "mirrored"; east: SpriteRef }
-    | { type: "perFacing"; sprites: Partial<Record<Facing, SpriteRef>>; fallback: SpriteRef };
+    | {
+          type: "perFacing";
+          sprites: Partial<Record<Facing, SpriteRef>>;
+          fallback: SpriteRef;
+      };
 
 type AnchorEquipment = {
     anchor: string;
@@ -41,7 +45,10 @@ export function getCharacterColors(
     }
 
     const equipment: Array<AnchorEquipment | PartBoundsEquipment> = [];
-    for (const slot of [equipmentComponent.slots.primary, equipmentComponent.slots.secondary]) {
+    for (const slot of [
+        equipmentComponent.slots.primary,
+        equipmentComponent.slots.secondary,
+    ]) {
         if (slot?.id === wizardHat.id) {
             equipment.push({
                 attachToPart: "Head",

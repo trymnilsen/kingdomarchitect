@@ -45,8 +45,7 @@ export class WindmillSelectionProvider implements ActorSelectionProvider {
             ? getWindmillJobCountForBuilding(jobQueue, selection.entity.id)
             : 0;
 
-        const actionText =
-            queuedCount > 0 ? `Farm (${queuedCount})` : "Farm";
+        const actionText = queuedCount > 0 ? `Farm (${queuedCount})` : "Farm";
 
         const leftButtons: UIActionbarItem[] = [
             {

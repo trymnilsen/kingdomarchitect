@@ -48,9 +48,8 @@ export function addInitialPlayerChunk(scopedEntity: Entity): Point {
     // Stocked with a sword so the new equip-from-stockpile flow has
     // something to grab in a fresh game.
     const startingStockpile = buildingPrefab(stockPile, false);
-    const stockpileInventory = startingStockpile.requireEcsComponent(
-        InventoryComponentId,
-    );
+    const stockpileInventory =
+        startingStockpile.requireEcsComponent(InventoryComponentId);
     addInventoryItem(stockpileInventory, swordItem, 1);
 
     // World resources stay on the chunk entity

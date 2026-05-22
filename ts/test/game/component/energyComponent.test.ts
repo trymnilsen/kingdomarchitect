@@ -10,9 +10,15 @@ import {
     EnergyComponentId,
 } from "../../../src/game/component/energyComponent.ts";
 import { Entity } from "../../../src/game/entity/entity.ts";
-import { createActiveEffectsComponent, ActiveEffectsComponentId } from "../../../src/game/component/activeEffectsComponent.ts";
+import {
+    createActiveEffectsComponent,
+    ActiveEffectsComponentId,
+} from "../../../src/game/component/activeEffectsComponent.ts";
 
-function makeEntityWithEnergy(energy: number = 100, maxEnergy: number = 100): Entity {
+function makeEntityWithEnergy(
+    energy: number = 100,
+    maxEnergy: number = 100,
+): Entity {
     const entity = new Entity("test-energy");
     entity.worldPosition = { x: 5, y: 5 };
     const comp = createEnergyComponent(maxEnergy);
@@ -132,7 +138,9 @@ describe("EnergyComponent", () => {
             // Spend more than we have — will trigger overspend → debt → level up
             spendEntityEnergy(entity, 5);
 
-            const effectsComp = entity.requireEcsComponent(ActiveEffectsComponentId);
+            const effectsComp = entity.requireEcsComponent(
+                ActiveEffectsComponentId,
+            );
             const hasExhaustionEffect = effectsComp.effects.some(
                 (e) => e.effect.id === "exhaustion",
             );
@@ -145,9 +153,17 @@ describe("EnergyComponent", () => {
             const comp = entity.requireEcsComponent(EnergyComponentId);
             comp.exhaustionLevel = 2;
             // Manually add effect to simulate pre-existing state
-            const effectsComp = entity.requireEcsComponent(ActiveEffectsComponentId);
+            const effectsComp = entity.requireEcsComponent(
+                ActiveEffectsComponentId,
+            );
             effectsComp.effects.push({
-                effect: { id: "exhaustion", timing: { type: "persistent" }, data: {}, name: "Exhaustion", sprite: "empty_sprite" },
+                effect: {
+                    id: "exhaustion",
+                    timing: { type: "persistent" },
+                    data: {},
+                    name: "Exhaustion",
+                    sprite: "empty_sprite",
+                },
                 source: "exhaustion",
                 modifiers: {},
                 state: {},
@@ -157,7 +173,11 @@ describe("EnergyComponent", () => {
 
             spendEntityEnergy(entity, 1); // debt, but level stays >= 1 so no new effect
 
-            assert.strictEqual(effectsComp.effects.length, 1, "should not duplicate effect");
+            assert.strictEqual(
+                effectsComp.effects.length,
+                1,
+                "should not duplicate effect",
+            );
         });
 
         it("no-ops if entity has no EnergyComponent", () => {
@@ -172,9 +192,17 @@ describe("EnergyComponent", () => {
             const entity = makeEntityWithEnergy(50);
             const comp = entity.requireEcsComponent(EnergyComponentId);
             comp.exhaustionLevel = 1;
-            const effectsComp = entity.requireEcsComponent(ActiveEffectsComponentId);
+            const effectsComp = entity.requireEcsComponent(
+                ActiveEffectsComponentId,
+            );
             effectsComp.effects.push({
-                effect: { id: "exhaustion", timing: { type: "persistent" }, data: {}, name: "Exhaustion", sprite: "empty_sprite" },
+                effect: {
+                    id: "exhaustion",
+                    timing: { type: "persistent" },
+                    data: {},
+                    name: "Exhaustion",
+                    sprite: "empty_sprite",
+                },
                 source: "exhaustion",
                 modifiers: {},
                 state: {},
@@ -185,16 +213,28 @@ describe("EnergyComponent", () => {
             clearEntityExhaustion(entity, 0);
 
             assert.strictEqual(comp.exhaustionLevel, 0);
-            assert.strictEqual(effectsComp.effects.length, 0, "exhaustion effect should be removed");
+            assert.strictEqual(
+                effectsComp.effects.length,
+                0,
+                "exhaustion effect should be removed",
+            );
         });
 
         it("keeps exhaustion effect when level stays above 0", () => {
             const entity = makeEntityWithEnergy(50);
             const comp = entity.requireEcsComponent(EnergyComponentId);
             comp.exhaustionLevel = 3;
-            const effectsComp = entity.requireEcsComponent(ActiveEffectsComponentId);
+            const effectsComp = entity.requireEcsComponent(
+                ActiveEffectsComponentId,
+            );
             effectsComp.effects.push({
-                effect: { id: "exhaustion", timing: { type: "persistent" }, data: {}, name: "Exhaustion", sprite: "empty_sprite" },
+                effect: {
+                    id: "exhaustion",
+                    timing: { type: "persistent" },
+                    data: {},
+                    name: "Exhaustion",
+                    sprite: "empty_sprite",
+                },
                 source: "exhaustion",
                 modifiers: {},
                 state: {},
@@ -205,7 +245,11 @@ describe("EnergyComponent", () => {
             clearEntityExhaustion(entity, 1);
 
             assert.strictEqual(comp.exhaustionLevel, 1);
-            assert.strictEqual(effectsComp.effects.length, 1, "exhaustion effect should remain");
+            assert.strictEqual(
+                effectsComp.effects.length,
+                1,
+                "exhaustion effect should remain",
+            );
         });
     });
 });

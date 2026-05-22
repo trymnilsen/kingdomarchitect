@@ -27,9 +27,8 @@ describe("craftAndHaul scenario tests", () => {
         );
         harness.addWorker("worker", { x: 10, y: 8 });
 
-        const buildingInventory = building.requireEcsComponent(
-            InventoryComponentId,
-        );
+        const buildingInventory =
+            building.requireEcsComponent(InventoryComponentId);
         addInventoryItem(buildingInventory, woodResourceItem, 4);
 
         harness.queueJob(createCraftingJob(building.id, planksRecipe));
@@ -64,10 +63,7 @@ describe("craftAndHaul scenario tests", () => {
          */
         const harness = new ScenarioHarness();
 
-        const stockpileA = harness.addStockpile(
-            "stockpile-a",
-            { x: 10, y: 8 },
-        );
+        const stockpileA = harness.addStockpile("stockpile-a", { x: 10, y: 8 });
         const stockpileB = harness.addStockpile(
             "stockpile-b",
             { x: 15, y: 8 },

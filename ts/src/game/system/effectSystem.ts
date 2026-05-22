@@ -7,7 +7,10 @@ import {
     type ActiveEffectsComponent,
 } from "../component/activeEffectsComponent.ts";
 import type { EffectExecutor } from "../../data/effect/effectExecutorRegistry.ts";
-import { StatsComponentId, markStatsDirty } from "../component/statsComponent.ts";
+import {
+    StatsComponentId,
+    markStatsDirty,
+} from "../component/statsComponent.ts";
 
 const log = createLogger("effect");
 
@@ -16,7 +19,9 @@ export function createEffectSystem(
 ): EcsSystem {
     return {
         onUpdate: (root: Entity, tick: number) => {
-            const entitiesWithEffects = root.queryComponents(ActiveEffectsComponentId);
+            const entitiesWithEffects = root.queryComponents(
+                ActiveEffectsComponentId,
+            );
             for (const [entity, effectsComponent] of entitiesWithEffects) {
                 processEffects(entity, effectsComponent, tick, executors);
             }

@@ -23,11 +23,7 @@ import {
     findJobClaimedBy,
     completeJobFromQueue,
 } from "../../job/jobLifecycle.ts";
-import {
-    ActionComplete,
-    ActionRunning,
-    type ActionResult,
-} from "./Action.ts";
+import { ActionComplete, ActionRunning, type ActionResult } from "./Action.ts";
 
 export type HarvestResourceActionData = {
     type: "harvestResource";

@@ -1,5 +1,8 @@
 import { spriteRefs } from "../../../asset/sprite.ts";
-import { wheatResourceItem, breadItem } from "../../inventory/items/resources.ts";
+import {
+    wheatResourceItem,
+    breadItem,
+} from "../../inventory/items/resources.ts";
 import type { CraftingRecipe } from "../craftingRecipe.ts";
 
 export const breadRecipe: CraftingRecipe = {

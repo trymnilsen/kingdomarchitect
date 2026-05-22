@@ -8,7 +8,9 @@ import {
 } from "../../../src/characterbuilder/animation/timelineMirror.ts";
 import type { CharacterAnimation } from "../../../src/characterbuilder/characterAnimation.ts";
 
-function makeAnimation(parts: { partName: string; frames: number[][] }[]): CharacterAnimation {
+function makeAnimation(
+    parts: { partName: string; frames: number[][] }[],
+): CharacterAnimation {
     return {
         animationName: "test",
         parts: parts.map((p) => ({ partName: p.partName, frames: p.frames })),
@@ -28,22 +30,30 @@ describe("computeXBounds", () => {
     it("spans all parts and frames", () => {
         const animation = makeAnimation([
             { partName: "Head", frames: [[7, 4, 8, 4]] },
-            { partName: "Chest", frames: [[6, 8, 9, 8], [5, 9, 10, 9]] },
+            {
+                partName: "Chest",
+                frames: [
+                    [6, 8, 9, 8],
+                    [5, 9, 10, 9],
+                ],
+            },
         ]);
         const bounds = computeXBounds(animation);
         assert.deepStrictEqual(bounds, { minX: 5, maxX: 10 });
     });
 
     it("returns {0,0} for animation with no pixels", () => {
-        const animation = makeAnimation([
-            { partName: "Head", frames: [[]] },
-        ]);
+        const animation = makeAnimation([{ partName: "Head", frames: [[]] }]);
         const bounds = computeXBounds(animation);
         assert.deepStrictEqual(bounds, { minX: 0, maxX: 0 });
     });
 
     it("returns {0,0} for animation with no parts", () => {
-        const bounds = computeXBounds({ animationName: "empty", parts: [], anchors: [] });
+        const bounds = computeXBounds({
+            animationName: "empty",
+            parts: [],
+            anchors: [],
+        });
         assert.deepStrictEqual(bounds, { minX: 0, maxX: 0 });
     });
 });

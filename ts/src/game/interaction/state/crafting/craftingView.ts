@@ -267,7 +267,10 @@ export const craftingView = createComponent<CraftingViewProps>(
         } else {
             leftButtons = [{ text: "+ Craft", onClick: props.onCraft }];
             if (props.queuedCountForRecipe > 0) {
-                leftButtons.push({ text: "- Cancel", onClick: props.onCancelOneJob });
+                leftButtons.push({
+                    text: "- Cancel",
+                    onClick: props.onCancelOneJob,
+                });
             }
         }
 

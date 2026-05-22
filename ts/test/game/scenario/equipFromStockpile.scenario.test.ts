@@ -5,21 +5,15 @@ import {
     addInventoryItem,
     InventoryComponentId,
 } from "../../../src/game/component/inventoryComponent.ts";
-import {
-    EquipmentComponentId,
-} from "../../../src/game/component/equipmentComponent.ts";
-import {
-    HeldItemComponentId,
-} from "../../../src/game/component/heldItemComponent.ts";
+import { EquipmentComponentId } from "../../../src/game/component/equipmentComponent.ts";
+import { HeldItemComponentId } from "../../../src/game/component/heldItemComponent.ts";
 import { BehaviorAgentComponentId } from "../../../src/game/component/BehaviorAgentComponent.ts";
 import {
     swordItem,
     hammerItem,
 } from "../../../src/data/inventory/items/equipment.ts";
 import { woodResourceItem } from "../../../src/data/inventory/items/resources.ts";
-import {
-    CollectableComponentId,
-} from "../../../src/game/component/collectableComponent.ts";
+import { CollectableComponentId } from "../../../src/game/component/collectableComponent.ts";
 import { GroundItemComponentId } from "../../../src/game/component/groundItemComponent.ts";
 import type { Entity } from "../../../src/game/entity/entity.ts";
 
@@ -48,10 +42,7 @@ function findGroundPiles(root: Entity): Entity[] {
     return piles;
 }
 
-function findGroundPileWithItem(
-    root: Entity,
-    itemId: string,
-): Entity | null {
+function findGroundPileWithItem(root: Entity, itemId: string): Entity | null {
     for (const pile of findGroundPiles(root)) {
         const collectable = pile.getEcsComponent(CollectableComponentId);
         if (!collectable) continue;
@@ -68,9 +59,8 @@ describe("equip from stockpile scenario", () => {
         const worker = harness.addWorker("worker", { x: 10, y: 8 });
         const stockpile = harness.addStockpile("stockpile", { x: 14, y: 8 });
 
-        const stockpileInv = stockpile.requireEcsComponent(
-            InventoryComponentId,
-        );
+        const stockpileInv =
+            stockpile.requireEcsComponent(InventoryComponentId);
         addInventoryItem(stockpileInv, swordItem, 1);
 
         // Sanity: worker's primary slot starts empty.
@@ -86,9 +76,7 @@ describe("equip from stockpile scenario", () => {
             return e?.slots.primary?.id === swordItem.id;
         }, 60);
 
-        const finalEquipment = worker.requireEcsComponent(
-            EquipmentComponentId,
-        );
+        const finalEquipment = worker.requireEcsComponent(EquipmentComponentId);
         assert.strictEqual(
             finalEquipment.slots.primary?.id,
             swordItem.id,
@@ -112,9 +100,8 @@ describe("equip with displacement scenario", () => {
         const worker = harness.addWorker("worker", { x: 10, y: 8 });
         const stockpile = harness.addStockpile("stockpile", { x: 14, y: 8 });
 
-        const stockpileInv = stockpile.requireEcsComponent(
-            InventoryComponentId,
-        );
+        const stockpileInv =
+            stockpile.requireEcsComponent(InventoryComponentId);
         addInventoryItem(stockpileInv, swordItem, 1);
 
         // Pre-state: worker holding wood, hammer in primary slot.
@@ -155,10 +142,7 @@ describe("equip with displacement scenario", () => {
         );
 
         const hammerPile = findGroundPileWithItem(harness.root, hammerItem.id);
-        assert.ok(
-            hammerPile,
-            "Displaced hammer should exist as a ground pile",
-        );
+        assert.ok(hammerPile, "Displaced hammer should exist as a ground pile");
         const hammerCollectable = hammerPile.requireEcsComponent(
             CollectableComponentId,
         );

@@ -32,9 +32,7 @@ export function executeTakeFromInventoryAction(
     const sourceEntity = root.findEntity(action.sourceEntityId);
 
     if (!sourceEntity) {
-        log.warn(
-            `Source entity ${action.sourceEntityId} not found`,
-        );
+        log.warn(`Source entity ${action.sourceEntityId} not found`);
         return {
             kind: "failed",
             cause: { type: "targetGone", entityId: action.sourceEntityId },

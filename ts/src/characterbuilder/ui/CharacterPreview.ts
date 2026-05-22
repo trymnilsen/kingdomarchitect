@@ -5,7 +5,11 @@ import {
 } from "../characterSpriteGenerator.ts";
 import { spriteRegistry } from "../../asset/spriteRegistry.ts";
 import type { CharacterColors } from "../colors.ts";
-import { CHARACTER_SPRITE, LAYOUT, type PreviewMode } from "./characterBuilderConstants.ts";
+import {
+    CHARACTER_SPRITE,
+    LAYOUT,
+    type PreviewMode,
+} from "./characterBuilderConstants.ts";
 import { characterPartFrames } from "../../../generated/characterFrames.ts";
 import { getAllAnimations } from "../animation/getAllAnimations.ts";
 import type { CharacterAnimation } from "../characterAnimation.ts";
@@ -243,12 +247,7 @@ export const CharacterPreview = createComponent<CharacterPreviewProps>(
                             false,
                             !canPanLeft,
                         ),
-                        createPrimaryButton(
-                            "↑",
-                            handlePanUp,
-                            false,
-                            !canPanUp,
-                        ),
+                        createPrimaryButton("↑", handlePanUp, false, !canPanUp),
                         createPrimaryButton(
                             "↓",
                             handlePanDown,

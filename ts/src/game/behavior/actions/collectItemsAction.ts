@@ -74,7 +74,10 @@ export function executeCollectItemsAction(
         acceptedItemId = collectableComponent.items[0].item.id;
     }
 
-    const transferred: { item: typeof collectableComponent.items[number]["item"]; amount: number }[] = [];
+    const transferred: {
+        item: (typeof collectableComponent.items)[number]["item"];
+        amount: number;
+    }[] = [];
     for (const stack of collectableComponent.items) {
         if (stack.item.id !== acceptedItemId) continue;
         addToHeldItem(held, stack.item, stack.amount);

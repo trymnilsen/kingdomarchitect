@@ -7,7 +7,10 @@ import {
 } from "./actorSelectionProvider.ts";
 import { SelectedEntityItem } from "../../../../selection/selectedEntityItem.ts";
 import { BuildingComponentId } from "../../../../../component/buildingComponent.ts";
-import { FarmComponentId, FarmState } from "../../../../../component/farmComponent.ts";
+import {
+    FarmComponentId,
+    FarmState,
+} from "../../../../../component/farmComponent.ts";
 import { spriteRefs } from "../../../../../../asset/sprite.ts";
 import { createFarmPlantJob } from "../../../../../job/farmPlantJob.ts";
 import { createFarmHarvestJob } from "../../../../../job/farmHarvestJob.ts";
@@ -22,7 +25,8 @@ export class FarmBuildingSelectionProvider implements ActorSelectionProvider {
             return emptySelection;
         }
 
-        const buildingComponent = selection.entity.getEcsComponent(BuildingComponentId);
+        const buildingComponent =
+            selection.entity.getEcsComponent(BuildingComponentId);
         const farmComponent = selection.entity.getEcsComponent(FarmComponentId);
 
         if (!buildingComponent || !farmComponent) {
@@ -37,7 +41,9 @@ export class FarmBuildingSelectionProvider implements ActorSelectionProvider {
                         icon: spriteRefs.empty_sprite,
                         onClick: () => {
                             const job = createFarmPlantJob(selection.entity.id);
-                            stateContext.commandDispatcher(QueueJobCommand(job));
+                            stateContext.commandDispatcher(
+                                QueueJobCommand(job),
+                            );
                         },
                     },
                 ],
@@ -59,8 +65,12 @@ export class FarmBuildingSelectionProvider implements ActorSelectionProvider {
                         text: "Harvest",
                         icon: spriteRefs.empty_sprite,
                         onClick: () => {
-                            const job = createFarmHarvestJob(selection.entity.id);
-                            stateContext.commandDispatcher(QueueJobCommand(job));
+                            const job = createFarmHarvestJob(
+                                selection.entity.id,
+                            );
+                            stateContext.commandDispatcher(
+                                QueueJobCommand(job),
+                            );
                         },
                     },
                 ],

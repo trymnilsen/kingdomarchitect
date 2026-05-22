@@ -37,10 +37,7 @@ export class InventoryState extends InteractionState {
                     return;
                 }
                 this.context.stateChanger.replace(
-                    new EquipSlotSelectionState(
-                        this._entity.id,
-                        item.item.id,
-                    ),
+                    new EquipSlotSelectionState(this._entity.id, item.item.id),
                 );
             },
             onDrop: (_item: InventoryItemQuantity) => {

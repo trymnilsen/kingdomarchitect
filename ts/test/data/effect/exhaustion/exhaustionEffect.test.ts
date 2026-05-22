@@ -132,7 +132,11 @@ describe("exhaustionEffect", () => {
                 const health = entity.requireEcsComponent(HealthComponentId);
 
                 for (let i = 0; i < 20; i++) {
-                    exhaustionEffectExecutor.execute(entity, activeEffect, i + 1);
+                    exhaustionEffectExecutor.execute(
+                        entity,
+                        activeEffect,
+                        i + 1,
+                    );
                 }
 
                 assert.strictEqual(
@@ -154,7 +158,9 @@ describe("exhaustionEffect", () => {
             exhaustionEffectExecutor.execute(entity, activeEffect, 1);
 
             // Add the effect to the entity's ActiveEffectsComponent
-            const effectsComp = entity.requireEcsComponent(ActiveEffectsComponentId);
+            const effectsComp = entity.requireEcsComponent(
+                ActiveEffectsComponentId,
+            );
             effectsComp.effects.push(activeEffect);
 
             const resolved = getStats(entity);

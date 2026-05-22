@@ -2,11 +2,17 @@ import { describe, it } from "node:test";
 import assert from "node:assert";
 import { goblinCampSystem } from "../../../src/game/system/goblinCampSystem.ts";
 import { Entity } from "../../../src/game/entity/entity.ts";
-import { createGoblinCampComponent, GoblinCampComponentId } from "../../../src/game/component/goblinCampComponent.ts";
+import {
+    createGoblinCampComponent,
+    GoblinCampComponentId,
+} from "../../../src/game/component/goblinCampComponent.ts";
 import { createGoblinUnitComponent } from "../../../src/game/component/goblinUnitComponent.ts";
 import { createFireSourceComponent } from "../../../src/game/component/fireSourceComponent.ts";
 import { createBuildingComponent } from "../../../src/game/component/buildingComponent.ts";
-import { createHousingComponent, HousingComponentId } from "../../../src/game/component/housingComponent.ts";
+import {
+    createHousingComponent,
+    HousingComponentId,
+} from "../../../src/game/component/housingComponent.ts";
 import { createJobQueueComponent } from "../../../src/game/component/jobQueueComponent.ts";
 import { goblinHut } from "../../../src/data/building/goblin/goblinHut.ts";
 import { goblinCampfire } from "../../../src/data/building/goblin/goblinCampfire.ts";
@@ -23,20 +29,29 @@ function setupWorldComponents(root: Entity): void {
     root.setEcsComponent(createChunkMapComponent());
 }
 
-function createTestCamp(id: string = "camp-1", maxPopulation: number = 5): Entity {
+function createTestCamp(
+    id: string = "camp-1",
+    maxPopulation: number = 5,
+): Entity {
     const camp = new Entity(id);
     camp.setEcsComponent(createGoblinCampComponent(maxPopulation));
     camp.setEcsComponent(createJobQueueComponent());
     return camp;
 }
 
-function createTestGoblin(campEntityId: string, id: string = "goblin-1"): Entity {
+function createTestGoblin(
+    campEntityId: string,
+    id: string = "goblin-1",
+): Entity {
     const goblin = new Entity(id);
     goblin.setEcsComponent(createGoblinUnitComponent(campEntityId));
     return goblin;
 }
 
-function createTestCampfire(id: string = "fire-1", active: boolean = true): Entity {
+function createTestCampfire(
+    id: string = "fire-1",
+    active: boolean = true,
+): Entity {
     const fire = new Entity(id);
     const buildingComponent = createBuildingComponent(goblinCampfire, false);
     fire.setEcsComponent(buildingComponent);
@@ -47,7 +62,11 @@ function createTestCampfire(id: string = "fire-1", active: boolean = true): Enti
     return fire;
 }
 
-function createTestHut(id: string = "hut-1", scaffolded: boolean = false, tenant: Entity | null = null): Entity {
+function createTestHut(
+    id: string = "hut-1",
+    scaffolded: boolean = false,
+    tenant: Entity | null = null,
+): Entity {
     const hut = new Entity(id);
     hut.setEcsComponent(createBuildingComponent(goblinHut, scaffolded));
     if (!scaffolded) {
@@ -116,7 +135,11 @@ describe("goblinCampSystem spawning", () => {
             goblinCampSystem.onUpdate!(root, 1);
 
             const housing = hut.getEcsComponent(HousingComponentId);
-            assert.strictEqual(housing?.tenant, null, "hut should remain unoccupied after campfire fallback spawn");
+            assert.strictEqual(
+                housing?.tenant,
+                null,
+                "hut should remain unoccupied after campfire fallback spawn",
+            );
         });
 
         it("does not spawn when campfire is inactive", () => {
@@ -173,7 +196,10 @@ describe("goblinCampSystem spawning", () => {
             goblinCampSystem.onUpdate!(root, 1);
 
             const housing = hut.getEcsComponent(HousingComponentId);
-            assert.ok(housing?.tenant !== null, "spawned goblin should be assigned to hut");
+            assert.ok(
+                housing?.tenant !== null,
+                "spawned goblin should be assigned to hut",
+            );
         });
 
         it("does not spawn when no available hut", () => {
@@ -255,8 +281,16 @@ describe("goblinCampSystem spawning", () => {
             goblinCampSystem.onUpdate!(root, 1);
 
             const updatedHousing = hut.getEcsComponent(HousingComponentId);
-            assert.notStrictEqual(updatedHousing?.tenant, "dead-goblin-id", "stale tenant should be cleared");
-            assert.strictEqual(countGoblinsInCamp(root, "camp-1"), 2, "new goblin should spawn into freed hut");
+            assert.notStrictEqual(
+                updatedHousing?.tenant,
+                "dead-goblin-id",
+                "stale tenant should be cleared",
+            );
+            assert.strictEqual(
+                countGoblinsInCamp(root, "camp-1"),
+                2,
+                "new goblin should spawn into freed hut",
+            );
         });
     });
 });
@@ -269,7 +303,10 @@ describe("goblinCampSystem camp removal", () => {
 
         assert.ok(camp.hasComponent(GoblinCampComponentId));
         goblinCampSystem.onUpdate!(root, 1);
-        assert.ok(!camp.hasComponent(GoblinCampComponentId), "camp component should be removed when fully cleared");
+        assert.ok(
+            !camp.hasComponent(GoblinCampComponentId),
+            "camp component should be removed when fully cleared",
+        );
     });
 
     it("does not remove camp when goblins are still alive", () => {
@@ -282,7 +319,10 @@ describe("goblinCampSystem camp removal", () => {
 
         goblinCampSystem.onUpdate!(root, 1);
 
-        assert.ok(camp.hasComponent(GoblinCampComponentId), "camp should persist while goblins live");
+        assert.ok(
+            camp.hasComponent(GoblinCampComponentId),
+            "camp should persist while goblins live",
+        );
     });
 
     it("does not remove camp when campfire is still active", () => {
@@ -297,7 +337,10 @@ describe("goblinCampSystem camp removal", () => {
 
         // The campfire is active so the camp should be preserved (spawning also fires, keeping pop > 0)
         goblinCampSystem.onUpdate!(root, 1);
-        assert.ok(camp.hasComponent(GoblinCampComponentId), "camp should persist while campfire is active");
+        assert.ok(
+            camp.hasComponent(GoblinCampComponentId),
+            "camp should persist while campfire is active",
+        );
     });
 
     it("does not remove camp when a hut still exists", () => {
@@ -310,7 +353,10 @@ describe("goblinCampSystem camp removal", () => {
 
         goblinCampSystem.onUpdate!(root, 1);
 
-        assert.ok(camp.hasComponent(GoblinCampComponentId), "camp should persist while huts remain");
+        assert.ok(
+            camp.hasComponent(GoblinCampComponentId),
+            "camp should persist while huts remain",
+        );
     });
 
     it("keeps the entity in the world after component removal", () => {
@@ -321,6 +367,9 @@ describe("goblinCampSystem camp removal", () => {
         goblinCampSystem.onUpdate!(root, 1);
 
         assert.ok(!camp.hasComponent(GoblinCampComponentId));
-        assert.ok(camp.parent !== undefined, "camp entity should still be attached to root");
+        assert.ok(
+            camp.parent !== undefined,
+            "camp entity should still be attached to root",
+        );
     });
 });

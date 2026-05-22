@@ -1,15 +1,15 @@
 import { isPointAdjacentTo } from "../../../common/point.ts";
 import { createLogger } from "../../../common/logging/logger.ts";
-import {
-    FarmComponentId,
-    FarmState,
-} from "../../component/farmComponent.ts";
+import { FarmComponentId, FarmState } from "../../component/farmComponent.ts";
 import {
     addToHeldItem,
     canAddToHeld,
     HeldItemComponentId,
 } from "../../component/heldItemComponent.ts";
-import { ChunkMapComponentId, getEntitiesAt } from "../../component/chunkMapComponent.ts";
+import {
+    ChunkMapComponentId,
+    getEntitiesAt,
+} from "../../component/chunkMapComponent.ts";
 import { getInventoryItemById } from "../../../data/inventory/inventoryItemHelpers.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";

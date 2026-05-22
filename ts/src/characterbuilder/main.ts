@@ -1,7 +1,4 @@
-import {
-    createLogger,
-    createRootLogger,
-} from "../common/logging/logger.ts";
+import { createLogger, createRootLogger } from "../common/logging/logger.ts";
 import { CharacterBuilder } from "./builder.ts";
 
 createRootLogger();

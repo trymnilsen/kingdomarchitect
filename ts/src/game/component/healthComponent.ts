@@ -83,10 +83,7 @@ export function damageEntity(
     }
     entity.invalidateComponent(HealthComponentId);
 
-    if (
-        health.currentHp <= 0 &&
-        !entity.getEcsComponent(ImmortalComponentId)
-    ) {
+    if (health.currentHp <= 0 && !entity.getEcsComponent(ImmortalComponentId)) {
         entity.bubbleEvent(createDeathGameEvent(entity, entity.id));
         entity.remove();
     }

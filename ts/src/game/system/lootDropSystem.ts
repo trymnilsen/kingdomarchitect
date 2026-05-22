@@ -16,11 +16,23 @@ export const lootDropSystem: EcsSystem = {
 
             const deathPosition = event.source.worldPosition;
 
-            dropItemAtPosition(root, deathPosition, goldCoins, 1, DropMode.Nearest);
+            dropItemAtPosition(
+                root,
+                deathPosition,
+                goldCoins,
+                1,
+                DropMode.Nearest,
+            );
 
             const held = event.source.getEcsComponent(HeldItemComponentId);
             if (held && !isHeldEmpty(held)) {
-                dropItemAtPosition(root, deathPosition, held.item!, held.amount, DropMode.Nearest);
+                dropItemAtPosition(
+                    root,
+                    deathPosition,
+                    held.item!,
+                    held.amount,
+                    DropMode.Nearest,
+                );
             }
         },
     },

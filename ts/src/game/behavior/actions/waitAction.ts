@@ -1,9 +1,5 @@
 import type { Entity } from "../../entity/entity.ts";
-import {
-    ActionComplete,
-    ActionRunning,
-    type ActionResult,
-} from "./Action.ts";
+import { ActionComplete, ActionRunning, type ActionResult } from "./Action.ts";
 
 export type WaitActionData = { type: "wait"; until: number };
 

@@ -19,11 +19,15 @@ function makeSourceAnimation(name: string, frameCount = 1): CharacterAnimation {
         parts: [
             {
                 partName: "Head",
-                frames: Array.from({ length: frameCount }, () => [...headPixels]),
+                frames: Array.from({ length: frameCount }, () => [
+                    ...headPixels,
+                ]),
             },
             {
                 partName: "LeftHand",
-                frames: Array.from({ length: frameCount }, () => [...leftHandPixels]),
+                frames: Array.from({ length: frameCount }, () => [
+                    ...leftHandPixels,
+                ]),
             },
             {
                 partName: "RightHand",
@@ -62,7 +66,9 @@ describe("compileTimeline — base frame replication", () => {
         assert.strictEqual(result.parts[0].frames.length, 3);
 
         // All three frames should be identical copies of the base
-        const headFrames = result.parts.find((p) => p.partName === "Head")?.frames;
+        const headFrames = result.parts.find(
+            (p) => p.partName === "Head",
+        )?.frames;
         assert.ok(headFrames, "Head part should exist");
         assert.deepStrictEqual(headFrames[0], [6, 4, 7, 4, 6, 5, 7, 5]);
         assert.deepStrictEqual(headFrames[1], [6, 4, 7, 4, 6, 5, 7, 5]);
@@ -81,12 +87,22 @@ describe("compileTimeline — track operations", () => {
         });
 
         const result = compileTimeline(recipe, sources);
-        const headFrames = result.parts.find((p) => p.partName === "Head")?.frames;
+        const headFrames = result.parts.find(
+            (p) => p.partName === "Head",
+        )?.frames;
 
         assert.ok(headFrames);
-        assert.deepStrictEqual(headFrames[0], [6, 4, 7, 4, 6, 5, 7, 5], "frame 0 should be base");
+        assert.deepStrictEqual(
+            headFrames[0],
+            [6, 4, 7, 4, 6, 5, 7, 5],
+            "frame 0 should be base",
+        );
         assert.deepStrictEqual(headFrames[1], [], "frame 1 should be hidden");
-        assert.deepStrictEqual(headFrames[2], [6, 4, 7, 4, 6, 5, 7, 5], "frame 2 should restore");
+        assert.deepStrictEqual(
+            headFrames[2],
+            [6, 4, 7, 4, 6, 5, 7, 5],
+            "frame 2 should restore",
+        );
     });
 
     it("show operation after hide restores base pixels", () => {
@@ -102,11 +118,17 @@ describe("compileTimeline — track operations", () => {
         });
 
         const result = compileTimeline(recipe, sources);
-        const headFrames = result.parts.find((p) => p.partName === "Head")?.frames;
+        const headFrames = result.parts.find(
+            (p) => p.partName === "Head",
+        )?.frames;
 
         assert.ok(headFrames);
         assert.deepStrictEqual(headFrames[0], [], "frame 0 should be hidden");
-        assert.deepStrictEqual(headFrames[1], [6, 4, 7, 4, 6, 5, 7, 5], "frame 1 show wins");
+        assert.deepStrictEqual(
+            headFrames[1],
+            [6, 4, 7, 4, 6, 5, 7, 5],
+            "frame 1 show wins",
+        );
     });
 
     it("offset shifts all pixel coordinates by x and y", () => {
@@ -119,11 +141,21 @@ describe("compileTimeline — track operations", () => {
         });
 
         const result = compileTimeline(recipe, sources);
-        const headFrames = result.parts.find((p) => p.partName === "Head")?.frames;
+        const headFrames = result.parts.find(
+            (p) => p.partName === "Head",
+        )?.frames;
 
         assert.ok(headFrames);
-        assert.deepStrictEqual(headFrames[0], [6, 4, 7, 4, 6, 5, 7, 5], "frame 0 unchanged");
-        assert.deepStrictEqual(headFrames[1], [8, 5, 9, 5, 8, 6, 9, 6], "frame 1 shifted +2x +1y");
+        assert.deepStrictEqual(
+            headFrames[0],
+            [6, 4, 7, 4, 6, 5, 7, 5],
+            "frame 0 unchanged",
+        );
+        assert.deepStrictEqual(
+            headFrames[1],
+            [8, 5, 9, 5, 8, 6, 9, 6],
+            "frame 1 shifted +2x +1y",
+        );
     });
 
     it("replace substitutes the named part's data from the source", () => {
@@ -140,16 +172,33 @@ describe("compileTimeline — track operations", () => {
         const recipe = makeRecipe({
             duration: 2,
             tracks: {
-                Head: [{ type: "replace", start: 1, end: 2, source: { sourceAnimation: "alt_anim", sourceFrame: 0 } }],
+                Head: [
+                    {
+                        type: "replace",
+                        start: 1,
+                        end: 2,
+                        source: { sourceAnimation: "alt_anim", sourceFrame: 0 },
+                    },
+                ],
             },
         });
 
         const result = compileTimeline(recipe, [walkSource, altSource]);
-        const headFrames = result.parts.find((p) => p.partName === "Head")?.frames;
+        const headFrames = result.parts.find(
+            (p) => p.partName === "Head",
+        )?.frames;
 
         assert.ok(headFrames);
-        assert.deepStrictEqual(headFrames[0], [6, 4, 7, 4, 6, 5, 7, 5], "frame 0 is base");
-        assert.deepStrictEqual(headFrames[1], [12, 6, 13, 6], "frame 1 is replaced");
+        assert.deepStrictEqual(
+            headFrames[0],
+            [6, 4, 7, 4, 6, 5, 7, 5],
+            "frame 0 is base",
+        );
+        assert.deepStrictEqual(
+            headFrames[1],
+            [12, 6, 13, 6],
+            "frame 1 is replaced",
+        );
     });
 });
 
@@ -174,17 +223,25 @@ describe("compileTimeline — mirroring", () => {
 
         // Name swap: original LeftHand becomes "RightHand", original RightHand becomes "LeftHand"
         const partNames = result.parts.map((p) => p.partName).sort();
-        assert.deepStrictEqual(partNames.sort(), ["Head", "LeftHand", "RightHand"]);
+        assert.deepStrictEqual(partNames.sort(), [
+            "Head",
+            "LeftHand",
+            "RightHand",
+        ]);
 
         // "RightHand" slot now holds original LeftHand data (mirrored)
         // Original LeftHand was at x=8; mirror: 16-8=8 (stays same, symmetric)
-        const rightHandPart = result.parts.find((p) => p.partName === "RightHand");
+        const rightHandPart = result.parts.find(
+            (p) => p.partName === "RightHand",
+        );
         assert.ok(rightHandPart, "RightHand should exist (was LeftHand)");
         assert.deepStrictEqual(rightHandPart.frames[0], [8, 8]);
 
         // "LeftHand" slot now holds original RightHand data (mirrored)
         // Original RightHand was at x=10; mirror: 16-10=6
-        const leftHandPart = result.parts.find((p) => p.partName === "LeftHand");
+        const leftHandPart = result.parts.find(
+            (p) => p.partName === "LeftHand",
+        );
         assert.ok(leftHandPart, "LeftHand should exist (was RightHand)");
         assert.deepStrictEqual(leftHandPart.frames[0], [6, 8]);
 
@@ -194,7 +251,9 @@ describe("compileTimeline — mirroring", () => {
         assert.deepStrictEqual(headPart.frames[0], [10, 4, 9, 4, 10, 5, 9, 5]);
 
         // Anchor: LeftHand anchor gets renamed to RightHand, x=9 → 16-9=7
-        const rightHandAnchor = result.anchors.find((a) => a.anchorId === "RightHand");
+        const rightHandAnchor = result.anchors.find(
+            (a) => a.anchorId === "RightHand",
+        );
         assert.ok(rightHandAnchor, "anchor should be renamed to RightHand");
         assert.deepStrictEqual(rightHandAnchor.frames[0], [7, 7, 1]);
     });
@@ -220,8 +279,12 @@ describe("compileTimeline — mirroring", () => {
         // The key test: frames 0-1 should have unmirrored data (original LeftHand coords)
         // and frames 2-3 should have mirrored data
         // Since all frames share the same part name post-transform, we check coordinate values
-        const leftHandPart = result.parts.find((p) => p.partName === "LeftHand");
-        const rightHandPart = result.parts.find((p) => p.partName === "RightHand");
+        const leftHandPart = result.parts.find(
+            (p) => p.partName === "LeftHand",
+        );
+        const rightHandPart = result.parts.find(
+            (p) => p.partName === "RightHand",
+        );
 
         // In unmirrored frames: LeftHand exists with original coords [8, 8]
         // In mirrored frames: LeftHand maps to RightHand (name-swapped)
@@ -263,8 +326,16 @@ describe("compileTimeline — anchor operations", () => {
         const result = compileTimeline(recipe, sources);
         const anchor = result.anchors.find((a) => a.anchorId === "LeftHand");
         assert.ok(anchor);
-        assert.deepStrictEqual(anchor.frames[0], [9, 7, 1], "frame 0 unchanged");
-        assert.deepStrictEqual(anchor.frames[1], [10, 6, 1], "frame 1 offset, z preserved");
+        assert.deepStrictEqual(
+            anchor.frames[0],
+            [9, 7, 1],
+            "frame 0 unchanged",
+        );
+        assert.deepStrictEqual(
+            anchor.frames[1],
+            [10, 6, 1],
+            "frame 1 offset, z preserved",
+        );
     });
 
     it("anchor hide empties the anchor frame", () => {
@@ -300,12 +371,22 @@ describe("compileTimeline — recipe base composition", () => {
         };
 
         const result = compileTimeline(outerRecipe, sources);
-        const headFrames = result.parts.find((p) => p.partName === "Head")?.frames;
+        const headFrames = result.parts.find(
+            (p) => p.partName === "Head",
+        )?.frames;
 
         assert.ok(headFrames);
         assert.strictEqual(headFrames.length, 2);
-        assert.deepStrictEqual(headFrames[0], [6, 4, 7, 4, 6, 5, 7, 5], "frame 0: base from inner");
-        assert.deepStrictEqual(headFrames[1], [], "frame 1: hidden by outer track");
+        assert.deepStrictEqual(
+            headFrames[0],
+            [6, 4, 7, 4, 6, 5, 7, 5],
+            "frame 0: base from inner",
+        );
+        assert.deepStrictEqual(
+            headFrames[1],
+            [],
+            "frame 1: hidden by outer track",
+        );
     });
 });
 
@@ -316,20 +397,41 @@ describe("compileTimeline — addPixels operation", () => {
         const recipe = makeRecipe({
             duration: 3,
             tracks: {
-                Head: [{ type: "addPixels", start: 1, end: 2, sourcePart: "LeftHand" }],
+                Head: [
+                    {
+                        type: "addPixels",
+                        start: 1,
+                        end: 2,
+                        sourcePart: "LeftHand",
+                    },
+                ],
             },
         });
 
         const result = compileTimeline(recipe, sources);
-        const headFrames = result.parts.find((p) => p.partName === "Head")?.frames;
+        const headFrames = result.parts.find(
+            (p) => p.partName === "Head",
+        )?.frames;
 
         assert.ok(headFrames);
         // Frame 0: base only
-        assert.deepStrictEqual(headFrames[0], [6, 4, 7, 4, 6, 5, 7, 5], "frame 0 unchanged");
+        assert.deepStrictEqual(
+            headFrames[0],
+            [6, 4, 7, 4, 6, 5, 7, 5],
+            "frame 0 unchanged",
+        );
         // Frame 1: base + LeftHand base pixels [8, 8]
-        assert.deepStrictEqual(headFrames[1], [6, 4, 7, 4, 6, 5, 7, 5, 8, 8], "frame 1 has appended LeftHand pixels");
+        assert.deepStrictEqual(
+            headFrames[1],
+            [6, 4, 7, 4, 6, 5, 7, 5, 8, 8],
+            "frame 1 has appended LeftHand pixels",
+        );
         // Frame 2: back to base (addPixels only covers frame 1)
-        assert.deepStrictEqual(headFrames[2], [6, 4, 7, 4, 6, 5, 7, 5], "frame 2 unchanged");
+        assert.deepStrictEqual(
+            headFrames[2],
+            [6, 4, 7, 4, 6, 5, 7, 5],
+            "frame 2 unchanged",
+        );
     });
 
     it("does not affect frames outside the span", () => {
@@ -337,15 +439,28 @@ describe("compileTimeline — addPixels operation", () => {
         const recipe = makeRecipe({
             duration: 2,
             tracks: {
-                Head: [{ type: "addPixels", start: 1, end: 2, sourcePart: "LeftHand" }],
+                Head: [
+                    {
+                        type: "addPixels",
+                        start: 1,
+                        end: 2,
+                        sourcePart: "LeftHand",
+                    },
+                ],
             },
         });
 
         const result = compileTimeline(recipe, sources);
-        const headFrames = result.parts.find((p) => p.partName === "Head")?.frames;
+        const headFrames = result.parts.find(
+            (p) => p.partName === "Head",
+        )?.frames;
 
         assert.ok(headFrames);
-        assert.deepStrictEqual(headFrames[0], [6, 4, 7, 4, 6, 5, 7, 5], "frame 0 outside span, unchanged");
+        assert.deepStrictEqual(
+            headFrames[0],
+            [6, 4, 7, 4, 6, 5, 7, 5],
+            "frame 0 outside span, unchanged",
+        );
     });
 
     it("is cumulative — two addPixels ops on the same frame both append", () => {
@@ -354,14 +469,26 @@ describe("compileTimeline — addPixels operation", () => {
             duration: 2,
             tracks: {
                 Head: [
-                    { type: "addPixels", start: 1, end: 2, sourcePart: "LeftHand" },
-                    { type: "addPixels", start: 1, end: 2, sourcePart: "RightHand" },
+                    {
+                        type: "addPixels",
+                        start: 1,
+                        end: 2,
+                        sourcePart: "LeftHand",
+                    },
+                    {
+                        type: "addPixels",
+                        start: 1,
+                        end: 2,
+                        sourcePart: "RightHand",
+                    },
                 ],
             },
         });
 
         const result = compileTimeline(recipe, sources);
-        const headFrames = result.parts.find((p) => p.partName === "Head")?.frames;
+        const headFrames = result.parts.find(
+            (p) => p.partName === "Head",
+        )?.frames;
 
         assert.ok(headFrames);
         // Frame 1: base + LeftHand [8,8] + RightHand [10,8]
@@ -378,18 +505,29 @@ describe("compileTimeline — addPixels operation", () => {
             duration: 2,
             tracks: {
                 Head: [
-                    { type: "hide",      start: 1, end: 2 },
-                    { type: "addPixels", start: 1, end: 2, sourcePart: "LeftHand" },
+                    { type: "hide", start: 1, end: 2 },
+                    {
+                        type: "addPixels",
+                        start: 1,
+                        end: 2,
+                        sourcePart: "LeftHand",
+                    },
                 ],
             },
         });
 
         const result = compileTimeline(recipe, sources);
-        const headFrames = result.parts.find((p) => p.partName === "Head")?.frames;
+        const headFrames = result.parts.find(
+            (p) => p.partName === "Head",
+        )?.frames;
 
         assert.ok(headFrames);
         // hide empties current, then addPixels appends LeftHand pixels [8,8]
-        assert.deepStrictEqual(headFrames[1], [8, 8], "hide then addPixels yields only added pixels");
+        assert.deepStrictEqual(
+            headFrames[1],
+            [8, 8],
+            "hide then addPixels yields only added pixels",
+        );
     });
 
     it("referencing a non-existent source part yields an empty append", () => {
@@ -397,16 +535,29 @@ describe("compileTimeline — addPixels operation", () => {
         const recipe = makeRecipe({
             duration: 2,
             tracks: {
-                Head: [{ type: "addPixels", start: 1, end: 2, sourcePart: "NonExistentPart" }],
+                Head: [
+                    {
+                        type: "addPixels",
+                        start: 1,
+                        end: 2,
+                        sourcePart: "NonExistentPart",
+                    },
+                ],
             },
         });
 
         const result = compileTimeline(recipe, sources);
-        const headFrames = result.parts.find((p) => p.partName === "Head")?.frames;
+        const headFrames = result.parts.find(
+            (p) => p.partName === "Head",
+        )?.frames;
 
         assert.ok(headFrames);
         // Non-existent part → empty pixels appended → same as base
-        assert.deepStrictEqual(headFrames[1], [6, 4, 7, 4, 6, 5, 7, 5], "unknown part appends nothing");
+        assert.deepStrictEqual(
+            headFrames[1],
+            [6, 4, 7, 4, 6, 5, 7, 5],
+            "unknown part appends nothing",
+        );
     });
 });
 
@@ -414,7 +565,11 @@ describe("compileTimeline — error handling", () => {
     it("throws for an unknown source animation name", () => {
         const sources = [makeSourceAnimation("source_walk")];
         const recipe = makeRecipe({
-            base: { type: "frame", sourceAnimation: "nonexistent", sourceFrame: 0 },
+            base: {
+                type: "frame",
+                sourceAnimation: "nonexistent",
+                sourceFrame: 0,
+            },
         });
 
         assert.throws(
@@ -429,7 +584,11 @@ describe("compileTimeline — error handling", () => {
     it("throws for an out-of-bounds frame index", () => {
         const sources = [makeSourceAnimation("source_walk", 2)];
         const recipe = makeRecipe({
-            base: { type: "frame", sourceAnimation: "source_walk", sourceFrame: 99 },
+            base: {
+                type: "frame",
+                sourceAnimation: "source_walk",
+                sourceFrame: 99,
+            },
         });
 
         assert.throws(

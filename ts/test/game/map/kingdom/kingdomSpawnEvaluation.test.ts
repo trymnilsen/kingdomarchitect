@@ -108,7 +108,13 @@ describe("evaluateKingdomSpawn", () => {
             const h = new KingdomSpawnTestHarness();
             h.buildChunkGrid(3, 3, 8, 8);
             const volume = makePlains(h);
-            return evaluateKingdomSpawn(h.root, volume, candidate, tick, alwaysFail);
+            return evaluateKingdomSpawn(
+                h.root,
+                volume,
+                candidate,
+                tick,
+                alwaysFail,
+            );
         });
 
         for (let i = 1; i < results.length; i++) {
@@ -244,7 +250,13 @@ describe("evaluateKingdomSpawn", () => {
             const h = new KingdomSpawnTestHarness();
             h.addChunk(candidate.x, candidate.y);
             const volume = makePlains(h, 16);
-            return evaluateKingdomSpawn(h.root, volume, candidate, tick, () => 0.001);
+            return evaluateKingdomSpawn(
+                h.root,
+                volume,
+                candidate,
+                tick,
+                () => 0.001,
+            );
         };
 
         const early = spawn(100);

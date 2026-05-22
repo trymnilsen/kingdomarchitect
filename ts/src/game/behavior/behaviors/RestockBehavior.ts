@@ -11,7 +11,10 @@ import { getSettlementEntity } from "../../entity/settlementQueries.ts";
 import type { Entity } from "../../entity/entity.ts";
 import type { BehaviorActionData } from "../actions/ActionData.ts";
 import type { Behavior } from "./Behavior.ts";
-import type { StockpileDeficit, StockpileSurplus } from "../../building/materialQuery.ts";
+import type {
+    StockpileDeficit,
+    StockpileSurplus,
+} from "../../building/materialQuery.ts";
 
 /**
  * RestockBehavior moves items between stockpiles to satisfy preferred amounts.
@@ -88,8 +91,14 @@ export function createRestockBehavior(): Behavior {
 
                 // Proximity tie-break: distance to the source stockpile
                 const nearestSource = validSources.reduce((best, s) => {
-                    return distance(entity.worldPosition, s.stockpile.worldPosition) <
-                        distance(entity.worldPosition, best.stockpile.worldPosition)
+                    return distance(
+                        entity.worldPosition,
+                        s.stockpile.worldPosition,
+                    ) <
+                        distance(
+                            entity.worldPosition,
+                            best.stockpile.worldPosition,
+                        )
                         ? s
                         : best;
                 });

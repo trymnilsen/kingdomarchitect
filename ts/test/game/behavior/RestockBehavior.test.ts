@@ -168,14 +168,14 @@ describe("RestockBehavior", () => {
             assert.strictEqual(actions[3].type, "depositToStockpile");
 
             const withdraw = actions[1] as Extract<
-                typeof actions[1],
+                (typeof actions)[1],
                 { type: "withdrawFromStockpile" }
             >;
             assert.strictEqual(withdraw.stockpileId, "stockpile-a");
             assert.strictEqual(withdraw.itemId, "wood");
 
             const deposit = actions[3] as Extract<
-                typeof actions[3],
+                (typeof actions)[3],
                 { type: "depositToStockpile" }
             >;
             assert.strictEqual(deposit.stockpileId, "stockpile-b");
@@ -206,7 +206,7 @@ describe("RestockBehavior", () => {
 
             const actions = behavior.expand(worker);
             const withdraw = actions[1] as Extract<
-                typeof actions[1],
+                (typeof actions)[1],
                 { type: "withdrawFromStockpile" }
             >;
 
@@ -249,7 +249,7 @@ describe("RestockBehavior", () => {
 
             const actions = behavior.expand(worker);
             const deposit = actions[3] as Extract<
-                typeof actions[3],
+                (typeof actions)[3],
                 { type: "depositToStockpile" }
             >;
 

@@ -8,7 +8,11 @@ import {
 } from "./behaviorTestHelpers.ts";
 import { getBehaviorAgent } from "../../../src/game/component/BehaviorAgentComponent.ts";
 
-function createAttackScene(): { root: Entity; attacker: Entity; target: Entity } {
+function createAttackScene(): {
+    root: Entity;
+    attacker: Entity;
+    target: Entity;
+} {
     const root = new Entity("root");
     const attacker = createBehaviorTestEntity("attacker", 10, 8);
     const target = new Entity("target");

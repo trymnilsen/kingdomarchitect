@@ -1,8 +1,5 @@
 import { adjacentPoints, type Point } from "../../../common/point.ts";
-import {
-    hasChunk,
-    TileComponentId,
-} from "../../component/tileComponent.ts";
+import { hasChunk, TileComponentId } from "../../component/tileComponent.ts";
 import { Entity } from "../../entity/entity.ts";
 import { getTileId } from "../tile.ts";
 import { KingdomSpawnConfig } from "./kingdomSpawnConfig.ts";
@@ -38,9 +35,7 @@ export function checkSpatialFeasibility(
 
     // The candidate itself is a registered chunk (the kingdom would sit there),
     // so mark it visited without counting it as available space.
-    visited.add(
-        getTileId(candidateChunkPosition.x, candidateChunkPosition.y),
-    );
+    visited.add(getTileId(candidateChunkPosition.x, candidateChunkPosition.y));
 
     for (const neighbor of adjacentPoints(candidateChunkPosition)) {
         const neighborTileId = getTileId(neighbor.x, neighbor.y);

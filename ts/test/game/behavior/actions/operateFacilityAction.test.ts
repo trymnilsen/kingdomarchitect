@@ -90,7 +90,11 @@ describe("operateFacilityAction", () => {
         const { worker } = createTestScene();
 
         const held = worker.getEcsComponent(HeldItemComponentId)!;
-        held.item = { id: "wood", name: "Wood", asset: { bin: "0", spriteId: "wood_resource" } };
+        held.item = {
+            id: "wood",
+            name: "Wood",
+            asset: { bin: "0", spriteId: "wood_resource" },
+        };
         held.amount = 3;
 
         // No stockpile in the scene, so the worker should drop the held item.

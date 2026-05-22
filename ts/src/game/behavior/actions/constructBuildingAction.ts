@@ -11,11 +11,7 @@ import {
     findJobClaimedBy,
     completeJobFromQueue,
 } from "../../job/jobLifecycle.ts";
-import {
-    ActionComplete,
-    ActionRunning,
-    type ActionResult,
-} from "./Action.ts";
+import { ActionComplete, ActionRunning, type ActionResult } from "./Action.ts";
 
 export type ConstructBuildingActionData = {
     type: "constructBuilding";
@@ -35,9 +31,7 @@ export function executeConstructBuildingAction(
     const buildingEntity = root.findEntity(action.entityId);
 
     if (!buildingEntity) {
-        log.warn(
-            `Building ${action.entityId} not found`,
-        );
+        log.warn(`Building ${action.entityId} not found`);
         return {
             kind: "failed",
             cause: { type: "targetGone", entityId: action.entityId },

@@ -97,7 +97,9 @@ export abstract class InteractionState {
     dispatchUIEvent(event: UIEvent): boolean {
         // Old imperative UI system - commented out as we move to declarative UI
         // The declarative UI system handles events directly in InteractionHandler
-        log.info("UI Event received in InteractionState (deprecated)", { event });
+        log.info("UI Event received in InteractionState (deprecated)", {
+            event,
+        });
         return false;
     }
 

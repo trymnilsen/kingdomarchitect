@@ -8,7 +8,6 @@ import { getStats, getStatBreakdown } from "../../../src/game/stat/getStats.ts";
 import type { InventoryItem } from "../../../src/data/inventory/inventoryItem.ts";
 import { emptySpriteRef } from "../../../src/asset/sprite.ts";
 
-
 function makeEntity(): Entity {
     const entity = new Entity("test-entity-12");
     entity.setEcsComponent(createStatsComponent());

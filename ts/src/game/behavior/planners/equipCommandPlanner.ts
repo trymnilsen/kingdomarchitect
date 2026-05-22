@@ -39,9 +39,7 @@ export function planEquipCommand(
 
     const sourceItem = inventoryItemsMap[command.itemId];
     if (!sourceItem) {
-        throw new Error(
-            `planEquipCommand: unknown itemId '${command.itemId}'`,
-        );
+        throw new Error(`planEquipCommand: unknown itemId '${command.itemId}'`);
     }
 
     const actions: BehaviorActionData[] = [];

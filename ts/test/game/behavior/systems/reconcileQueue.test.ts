@@ -33,12 +33,8 @@ describe("reconcileQueue", () => {
     });
 
     it("returns the new queue when heads differ", () => {
-        const current: BehaviorActionData[] = [
-            { type: "wait", until: 100 },
-        ];
-        const next: BehaviorActionData[] = [
-            { type: "wait", until: 999 },
-        ];
+        const current: BehaviorActionData[] = [{ type: "wait", until: 100 }];
+        const next: BehaviorActionData[] = [{ type: "wait", until: 999 }];
 
         const result = reconcileQueue(current, next);
 
@@ -100,7 +96,10 @@ describe("reconcileQueue", () => {
         const tailC: BehaviorActionData = { type: "wait", until: 300 };
         const tailD: BehaviorActionData = { type: "wait", until: 400 };
 
-        const result = reconcileQueue([headA, tailB], [headAClone, tailC, tailD]);
+        const result = reconcileQueue(
+            [headA, tailB],
+            [headAClone, tailC, tailD],
+        );
 
         assert.strictEqual(result.length, 3);
         assert.strictEqual(

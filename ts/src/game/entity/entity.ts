@@ -508,7 +508,11 @@ export class Entity {
             try {
                 this._entityEvents(event);
             } catch (e) {
-                log.error("Failed to bubble event", { eventId: event.id, error: e, event });
+                log.error("Failed to bubble event", {
+                    eventId: event.id,
+                    error: e,
+                    event,
+                });
             }
         }
         this._parent?.bubbleEvent(event);

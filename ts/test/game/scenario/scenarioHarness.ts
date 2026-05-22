@@ -5,9 +5,7 @@ import {
     setChunk,
 } from "../../../src/game/component/tileComponent.ts";
 import { createChunkMapComponent } from "../../../src/game/component/chunkMapComponent.ts";
-import {
-    createPathfindingGraphComponent,
-} from "../../../src/game/component/pathfindingGraphComponent.ts";
+import { createPathfindingGraphComponent } from "../../../src/game/component/pathfindingGraphComponent.ts";
 import { createLazyGraphFromRootNode } from "../../../src/game/map/path/graph/generateGraph.ts";
 import { Entity } from "../../../src/game/entity/entity.ts";
 import {
@@ -16,21 +14,15 @@ import {
     InventoryComponentId,
 } from "../../../src/game/component/inventoryComponent.ts";
 import { HeldItemComponentId } from "../../../src/game/component/heldItemComponent.ts";
-import {
-    StockpileComponentId,
-} from "../../../src/game/component/stockpileComponent.ts";
+import { StockpileComponentId } from "../../../src/game/component/stockpileComponent.ts";
 import type { PreferredAmount } from "../../../src/game/component/stockpileComponent.ts";
 import { setPreferredAmount } from "../../../src/game/component/stockpileComponent.ts";
 import {
     createJobQueueComponent,
     addJob,
 } from "../../../src/game/component/jobQueueComponent.ts";
-import {
-    createMessageEmitterComponent,
-} from "../../../src/game/component/messageEmitterComponent.ts";
-import {
-    createWorldDiscoveryComponent,
-} from "../../../src/game/component/worldDiscoveryComponent.ts";
+import { createMessageEmitterComponent } from "../../../src/game/component/messageEmitterComponent.ts";
+import { createWorldDiscoveryComponent } from "../../../src/game/component/worldDiscoveryComponent.ts";
 import { createBehaviorSystem } from "../../../src/game/behavior/systems/BehaviorSystem.ts";
 import { createBehaviorResolver } from "../../../src/game/behavior/behaviorResolver.ts";
 import type { Jobs } from "../../../src/game/job/job.ts";
@@ -41,12 +33,8 @@ import { stockPile } from "../../../src/data/building/wood/storage.ts";
 import type { EcsSystem } from "../../../src/common/ecs/ecsSystem.ts";
 import type { Point } from "../../../src/common/point.ts";
 import type { InventoryItemQuantity } from "../../../src/data/inventory/inventoryItemQuantity.ts";
-import {
-    createHousingComponent,
-} from "../../../src/game/component/housingComponent.ts";
-import {
-    createFireSourceComponent,
-} from "../../../src/game/component/fireSourceComponent.ts";
+import { createHousingComponent } from "../../../src/game/component/housingComponent.ts";
+import { createFireSourceComponent } from "../../../src/game/component/fireSourceComponent.ts";
 
 /**
  * Full-stack scenario test harness for logistics, crafting, and behavior flows.
@@ -144,7 +132,8 @@ export class ScenarioHarness {
     ): Entity {
         const stockpile = buildingPrefab(stockPile, false, id);
         if (preferredAmounts.length > 0) {
-            const stockpileComp = stockpile.getEcsComponent(StockpileComponentId)!;
+            const stockpileComp =
+                stockpile.getEcsComponent(StockpileComponentId)!;
             for (const { itemId, amount } of preferredAmounts) {
                 setPreferredAmount(stockpileComp, itemId, amount);
             }
@@ -180,7 +169,9 @@ export class ScenarioHarness {
         this.root.addChild(entity);
         entity.worldPosition = position;
         if (options?.housing) {
-            entity.setEcsComponent(createHousingComponent(options.tenant ?? null));
+            entity.setEcsComponent(
+                createHousingComponent(options.tenant ?? null),
+            );
         }
         return entity;
     }

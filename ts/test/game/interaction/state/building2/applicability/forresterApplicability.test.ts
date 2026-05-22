@@ -113,7 +113,9 @@ describe("forresterApplicability", () => {
         // A quarry within radius should not block placement
         const quarry = new Entity("quarry");
         quarry.worldPosition = { x: 12, y: 10 };
-        quarry.setEcsComponent(createProductionComponent("quarry_production", 4));
+        quarry.setEcsComponent(
+            createProductionComponent("quarry_production", 4),
+        );
         registerInChunkMap(world, quarry);
 
         const result = forresterApplicability({ x: 10, y: 10 }, world);

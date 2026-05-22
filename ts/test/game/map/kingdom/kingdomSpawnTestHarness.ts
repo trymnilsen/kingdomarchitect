@@ -90,9 +90,8 @@ export class KingdomSpawnTestHarness {
     }
 
     getVolumeAtChunk(chunkX: number, chunkY: number): Volume | undefined {
-        return this._tileComponent.chunks.get(
-            getTileId(chunkX, chunkY),
-        )?.volume;
+        return this._tileComponent.chunks.get(getTileId(chunkX, chunkY))
+            ?.volume;
     }
 
     buildChunkGrid(

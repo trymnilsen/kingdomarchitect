@@ -168,9 +168,8 @@ function planConstructExistingBuilding(
         remainingMaterials,
     );
     if (stockpileWithMaterials) {
-        const inventory = stockpileWithMaterials.requireEcsComponent(
-            InventoryComponentId,
-        );
+        const inventory =
+            stockpileWithMaterials.requireEcsComponent(InventoryComponentId);
         for (const [itemId, amountNeeded] of Object.entries(
             remainingMaterials,
         )) {

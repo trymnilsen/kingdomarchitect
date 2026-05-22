@@ -130,9 +130,11 @@ function onGameMessage(
             persistenceManager
                 .clearGame()
                 .then(() => {
-                    root.requireEcsComponent(MessageEmitterComponentId).emitter({
-                        type: ReloadGameMessageType,
-                    });
+                    root.requireEcsComponent(MessageEmitterComponentId).emitter(
+                        {
+                            type: ReloadGameMessageType,
+                        },
+                    );
                 })
                 .catch((err) => log.error("Failed to clear game", { err }));
             break;
@@ -568,4 +570,3 @@ function clearBuildingJobs(root: Entity, command: ClearBuildingJobsCommand) {
     );
     playerKingdom.invalidateComponent(JobQueueComponentId);
 }
-

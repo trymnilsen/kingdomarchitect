@@ -57,7 +57,11 @@ describe("farmHarvestJobPlanner", () => {
         const job = createFarmHarvestJob("farm");
         const actions = planFarmHarvest(root, worker, job);
 
-        const moveAction = actions[0] as { type: "moveTo"; target: { x: number; y: number }; stopAdjacent?: string };
+        const moveAction = actions[0] as {
+            type: "moveTo";
+            target: { x: number; y: number };
+            stopAdjacent?: string;
+        };
         assert.strictEqual(moveAction.target.x, 20);
         assert.strictEqual(moveAction.target.y, 15);
     });
@@ -67,7 +71,10 @@ describe("farmHarvestJobPlanner", () => {
         const job = createFarmHarvestJob("farm");
         const actions = planFarmHarvest(root, worker, job);
 
-        const moveAction = actions[0] as { type: "moveTo"; stopAdjacent?: string };
+        const moveAction = actions[0] as {
+            type: "moveTo";
+            stopAdjacent?: string;
+        };
         assert.strictEqual(moveAction.stopAdjacent, "cardinal");
     });
 
@@ -76,7 +83,10 @@ describe("farmHarvestJobPlanner", () => {
         const job = createFarmHarvestJob("farm");
         const actions = planFarmHarvest(root, worker, job);
 
-        const harvestAction = actions[1] as { type: "harvestCrop"; buildingId: string };
+        const harvestAction = actions[1] as {
+            type: "harvestCrop";
+            buildingId: string;
+        };
         assert.strictEqual(harvestAction.buildingId, "farm");
     });
 
@@ -141,12 +151,18 @@ describe("harvestCropAction", () => {
         assert.strictEqual(farmComp.state, FarmState.Growing);
 
         const held = worker.getEcsComponent(HeldItemComponentId)!;
-        assert.ok(isHeldEmpty(held), "held should remain empty when farm is not Ready");
+        assert.ok(
+            isHeldEmpty(held),
+            "held should remain empty when farm is not Ready",
+        );
     });
 
     it("fails when farm building is not found", () => {
         const { worker } = createTestScene();
-        const action = { type: "harvestCrop" as const, buildingId: "nonexistent" };
+        const action = {
+            type: "harvestCrop" as const,
+            buildingId: "nonexistent",
+        };
 
         const result = executeHarvestCropAction(action, worker);
 

@@ -48,7 +48,11 @@ describe("farmPlantJobPlanner", () => {
         const job = createFarmPlantJob("farm");
         const actions = planFarmPlant(root, worker, job);
 
-        const moveAction = actions[0] as { type: "moveTo"; target: { x: number; y: number }; stopAdjacent?: string };
+        const moveAction = actions[0] as {
+            type: "moveTo";
+            target: { x: number; y: number };
+            stopAdjacent?: string;
+        };
         assert.strictEqual(moveAction.target.x, 20);
         assert.strictEqual(moveAction.target.y, 15);
     });
@@ -58,7 +62,10 @@ describe("farmPlantJobPlanner", () => {
         const job = createFarmPlantJob("farm");
         const actions = planFarmPlant(root, worker, job);
 
-        const moveAction = actions[0] as { type: "moveTo"; stopAdjacent?: string };
+        const moveAction = actions[0] as {
+            type: "moveTo";
+            stopAdjacent?: string;
+        };
         assert.strictEqual(moveAction.stopAdjacent, "cardinal");
     });
 
@@ -67,7 +74,10 @@ describe("farmPlantJobPlanner", () => {
         const job = createFarmPlantJob("farm");
         const actions = planFarmPlant(root, worker, job);
 
-        const plantAction = actions[1] as { type: "plantCrop"; buildingId: string };
+        const plantAction = actions[1] as {
+            type: "plantCrop";
+            buildingId: string;
+        };
         assert.strictEqual(plantAction.buildingId, "farm");
     });
 
@@ -97,7 +107,11 @@ describe("plantCropAction", () => {
 
     it("increments workProgress on each tick", () => {
         const { worker } = createTestScene();
-        const action = { type: "plantCrop" as const, buildingId: "farm", workProgress: 0 };
+        const action = {
+            type: "plantCrop" as const,
+            buildingId: "farm",
+            workProgress: 0,
+        };
 
         executePlantCropAction(action, worker, 10);
 
@@ -106,7 +120,11 @@ describe("plantCropAction", () => {
 
     it("transitions farm from Empty to Growing after 3 ticks", () => {
         const { worker, farm } = createTestScene();
-        const action = { type: "plantCrop" as const, buildingId: "farm", workProgress: 2 };
+        const action = {
+            type: "plantCrop" as const,
+            buildingId: "farm",
+            workProgress: 2,
+        };
 
         const result = executePlantCropAction(action, worker, 100);
 
@@ -117,7 +135,11 @@ describe("plantCropAction", () => {
 
     it("sets plantedAtTick to current tick on completion", () => {
         const { worker, farm } = createTestScene();
-        const action = { type: "plantCrop" as const, buildingId: "farm", workProgress: 2 };
+        const action = {
+            type: "plantCrop" as const,
+            buildingId: "farm",
+            workProgress: 2,
+        };
 
         executePlantCropAction(action, worker, 42);
 
@@ -139,7 +161,10 @@ describe("plantCropAction", () => {
 
     it("fails when farm building is not found", () => {
         const { worker } = createTestScene();
-        const action = { type: "plantCrop" as const, buildingId: "nonexistent" };
+        const action = {
+            type: "plantCrop" as const,
+            buildingId: "nonexistent",
+        };
 
         const result = executePlantCropAction(action, worker, 10);
 

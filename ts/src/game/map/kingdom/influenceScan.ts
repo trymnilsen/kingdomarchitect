@@ -1,8 +1,5 @@
 import { adjacentPoints, type Point } from "../../../common/point.ts";
-import {
-    getChunk,
-    TileComponentId,
-} from "../../component/tileComponent.ts";
+import { getChunk, TileComponentId } from "../../component/tileComponent.ts";
 import { KingdomComponentId } from "../../component/kingdomComponent.ts";
 import { Entity } from "../../entity/entity.ts";
 import { ChunkSize } from "../chunk.ts";

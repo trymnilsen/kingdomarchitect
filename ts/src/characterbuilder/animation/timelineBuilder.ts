@@ -67,7 +67,10 @@ export interface TimelineBuilder {
      */
     at(t: number): TimelineBuilder;
     /** Define operations on a specific body part's track. */
-    part(partName: string, configure: (track: TrackBuilder) => void): TimelineBuilder;
+    part(
+        partName: string,
+        configure: (track: TrackBuilder) => void,
+    ): TimelineBuilder;
     /** Define operations on a specific anchor's track. */
     anchor(
         anchorId: string,
@@ -119,7 +122,13 @@ class TrackBuilderImpl implements TrackBuilder {
     }
 
     offset(x: number, y: number): TrackBuilder {
-        this.ops.push({ type: "offset", start: this.cursor, end: this.end, x, y });
+        this.ops.push({
+            type: "offset",
+            start: this.cursor,
+            end: this.end,
+            x,
+            y,
+        });
         this.end = this.cursor + 1;
         return this;
     }
@@ -169,7 +178,13 @@ class AnchorTrackBuilderImpl implements AnchorTrackBuilder {
     }
 
     offset(x: number, y: number): AnchorTrackBuilder {
-        this.ops.push({ type: "offset", start: this.cursor, end: this.end, x, y });
+        this.ops.push({
+            type: "offset",
+            start: this.cursor,
+            end: this.end,
+            x,
+            y,
+        });
         this.end = this.cursor + 1;
         return this;
     }
@@ -194,7 +209,10 @@ class TimelineBuilderImpl implements TimelineBuilder {
         this.name = name;
     }
 
-    basedOn(animationNameOrRecipe: string | AnimationRecipe, frame?: number): TimelineBuilder {
+    basedOn(
+        animationNameOrRecipe: string | AnimationRecipe,
+        frame?: number,
+    ): TimelineBuilder {
         if (typeof animationNameOrRecipe === "string") {
             this.base = {
                 type: "frame",
@@ -213,7 +231,9 @@ class TimelineBuilderImpl implements TimelineBuilder {
                 builder.ops.push(...ops);
                 this.trackBuilders.set(partName, builder);
             }
-            for (const [anchorId, ops] of Object.entries(parentRecipe.anchorTracks)) {
+            for (const [anchorId, ops] of Object.entries(
+                parentRecipe.anchorTracks,
+            )) {
                 const builder = new AnchorTrackBuilderImpl();
                 builder.ops.push(...ops);
                 this.anchorBuilders.set(anchorId, builder);
@@ -232,7 +252,10 @@ class TimelineBuilderImpl implements TimelineBuilder {
         return this;
     }
 
-    part(partName: string, configure: (track: TrackBuilder) => void): TimelineBuilder {
+    part(
+        partName: string,
+        configure: (track: TrackBuilder) => void,
+    ): TimelineBuilder {
         let builder = this.trackBuilders.get(partName);
         if (!builder) {
             builder = new TrackBuilderImpl();
@@ -242,7 +265,10 @@ class TimelineBuilderImpl implements TimelineBuilder {
         return this;
     }
 
-    anchor(anchorId: string, configure: (track: AnchorTrackBuilder) => void): TimelineBuilder {
+    anchor(
+        anchorId: string,
+        configure: (track: AnchorTrackBuilder) => void,
+    ): TimelineBuilder {
         let builder = this.anchorBuilders.get(anchorId);
         if (!builder) {
             builder = new AnchorTrackBuilderImpl();
@@ -275,7 +301,9 @@ class TimelineBuilderImpl implements TimelineBuilder {
         const tracks: Record<string, TrackOperation[]> = {};
         for (const [partName, builder] of this.trackBuilders) {
             if (builder.copyFromPart !== null) {
-                const sourceBuilder = this.trackBuilders.get(builder.copyFromPart);
+                const sourceBuilder = this.trackBuilders.get(
+                    builder.copyFromPart,
+                );
                 if (!sourceBuilder) {
                     throw new Error(
                         `Timeline "${this.name}": copyFrom("${builder.copyFromPart}") references a part that was not configured`,

@@ -49,7 +49,8 @@ export type MaterialCheckResult = {
  */
 export function findStockpiles(settlement: Entity): Entity[] {
     const stockpiles: Entity[] = [];
-    const stockpileComponents = settlement.queryComponents(StockpileComponentId);
+    const stockpileComponents =
+        settlement.queryComponents(StockpileComponentId);
 
     for (const [entity] of stockpileComponents) {
         if (entity.getEcsComponent(InventoryComponentId)) {
@@ -357,14 +358,16 @@ export type StockpileDeficit = {
  */
 export function findStockpileDeficits(settlement: Entity): StockpileDeficit[] {
     const deficits: StockpileDeficit[] = [];
-    const stockpileComponents = settlement.queryComponents(StockpileComponentId);
+    const stockpileComponents =
+        settlement.queryComponents(StockpileComponentId);
 
     for (const [entity, stockpile] of stockpileComponents) {
         const inventory = entity.getEcsComponent(InventoryComponentId);
         if (!inventory) {
             continue;
         }
-        for (const preferred of (stockpile as StockpileComponent).preferredAmounts) {
+        for (const preferred of (stockpile as StockpileComponent)
+            .preferredAmounts) {
             const deficit = getStockpileDeficit(
                 stockpile as StockpileComponent,
                 inventory,
@@ -400,7 +403,8 @@ export function findStockpileSurplus(
     itemId: string,
 ): StockpileSurplus[] {
     const results: StockpileSurplus[] = [];
-    const stockpileComponents = settlement.queryComponents(StockpileComponentId);
+    const stockpileComponents =
+        settlement.queryComponents(StockpileComponentId);
 
     for (const [entity, stockpile] of stockpileComponents) {
         const inventory = entity.getEcsComponent(InventoryComponentId);

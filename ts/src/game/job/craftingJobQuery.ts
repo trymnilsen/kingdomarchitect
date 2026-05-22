@@ -46,10 +46,7 @@ export function getCraftingJobsForBuilding(
  * For unclaimed jobs returns 0. For claimed jobs, looks up the worker's
  * current craftItem action to read progress from BehaviorAgentComponent.
  */
-export function getCraftingJobProgress(
-    root: Entity,
-    job: CraftingJob,
-): number {
+export function getCraftingJobProgress(root: Entity, job: CraftingJob): number {
     if (!job.claimedBy) {
         return 0;
     }

@@ -12,7 +12,10 @@ import {
 import { findJobClaimedBy, claimJobInQueue } from "../../job/jobLifecycle.ts";
 import { CraftingJobId, type CraftingJob } from "../../job/craftingJob.ts";
 import { WindmillJobId, type WindmillJob } from "../../job/windmillJob.ts";
-import { ProductionJobId, type ProductionJob } from "../../job/productionJob.ts";
+import {
+    ProductionJobId,
+    type ProductionJob,
+} from "../../job/productionJob.ts";
 import { planJob } from "../../job/planner/jobPlanner.ts";
 import type { BuildJobPlanner } from "../../job/planner/jobPlanner.ts";
 import type { CollectResourceJob } from "../../job/collectResourceJob.ts";
@@ -22,9 +25,7 @@ import {
     isHeldEmpty,
 } from "../../component/heldItemComponent.ts";
 import { getResourceById } from "../../../data/inventory/items/naturalResource.ts";
-import {
-    BehaviorAgentComponentId,
-} from "../../component/BehaviorAgentComponent.ts";
+import { BehaviorAgentComponentId } from "../../component/BehaviorAgentComponent.ts";
 import { getJobDisplayName } from "../../job/jobDisplayName.ts";
 
 type BuildJobValidator = (

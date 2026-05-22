@@ -19,11 +19,17 @@ const VERTICAL_PADDING = 32;
 const DUAL_MIN_WIDTH = PAGE_WIDTH * 2 + HORIZONTAL_PADDING * 2; // 688
 
 function makeLeftPage() {
-    return uiText({ content: "Left", textStyle: { font: "TestFont", size: 12, color: "#000" } });
+    return uiText({
+        content: "Left",
+        textStyle: { font: "TestFont", size: 12, color: "#000" },
+    });
 }
 
 function makeRightPage() {
-    return uiText({ content: "Right", textStyle: { font: "TestFont", size: 12, color: "#000" } });
+    return uiText({
+        content: "Right",
+        textStyle: { font: "TestFont", size: 12, color: "#000" },
+    });
 }
 
 describe("UiBookLayout", () => {
@@ -37,13 +43,24 @@ describe("UiBookLayout", () => {
         assert.ok(isLayoutResult(result), "expected a LayoutResult");
         // Both pages should be present
         assert.strictEqual(result.children.length, 2);
-        const [left, right] = result.children as Array<{ offset: { x: number; y: number } }>;
-        assert.ok(left.offset.x < right.offset.x, "left page x should be less than right page x");
+        const [left, right] = result.children as Array<{
+            offset: { x: number; y: number };
+        }>;
+        assert.ok(
+            left.offset.x < right.offset.x,
+            "left page x should be less than right page x",
+        );
     });
 
     it("will remove old left page if updated", () => {
-        const page1 = uiText({ content: "Page1", textStyle: { font: "TestFont", size: 12, color: "#000" } });
-        const page2 = uiText({ content: "Page2", textStyle: { font: "TestFont", size: 12, color: "#000" } });
+        const page1 = uiText({
+            content: "Page1",
+            textStyle: { font: "TestFont", size: 12, color: "#000" },
+        });
+        const page2 = uiText({
+            content: "Page2",
+            textStyle: { font: "TestFont", size: 12, color: "#000" },
+        });
 
         const { result: result1 } = renderComponent(
             uiBookLayout,
@@ -64,8 +81,14 @@ describe("UiBookLayout", () => {
     });
 
     it("will remove old right page if updated", () => {
-        const page1 = uiText({ content: "Right1", textStyle: { font: "TestFont", size: 12, color: "#000" } });
-        const page2 = uiText({ content: "Right2", textStyle: { font: "TestFont", size: 12, color: "#000" } });
+        const page1 = uiText({
+            content: "Right1",
+            textStyle: { font: "TestFont", size: 12, color: "#000" },
+        });
+        const page2 = uiText({
+            content: "Right2",
+            textStyle: { font: "TestFont", size: 12, color: "#000" },
+        });
 
         const { result: result1 } = renderComponent(
             uiBookLayout,
@@ -98,11 +121,17 @@ describe("UiBookLayout", () => {
         assert.ok(isLayoutResult(result));
         // In dual mode: two page children, no back button above the book
         assert.strictEqual(result.children.length, 2);
-        const bookTopY = Math.max(0, (600 - (PAGE_HEIGHT + VERTICAL_PADDING * 2)) / 2) + VERTICAL_PADDING;
-        const allAbove = (result.children as Array<{ offset: { y: number } }>).filter(
-            (c) => c.offset.y < bookTopY,
+        const bookTopY =
+            Math.max(0, (600 - (PAGE_HEIGHT + VERTICAL_PADDING * 2)) / 2) +
+            VERTICAL_PADDING;
+        const allAbove = (
+            result.children as Array<{ offset: { y: number } }>
+        ).filter((c) => c.offset.y < bookTopY);
+        assert.strictEqual(
+            allAbove.length,
+            0,
+            "no child should be above the book in dual mode",
         );
-        assert.strictEqual(allAbove.length, 0, "no child should be above the book in dual mode");
     });
 
     it("will use single page mode if there is not enough space", () => {
@@ -116,10 +145,15 @@ describe("UiBookLayout", () => {
         assert.ok(isLayoutResult(result));
         // Both pages are still in the children (single mode doesn't hide the off-screen page)
         assert.strictEqual(result.children.length, 2);
-        const [left, right] = result.children as Array<{ offset: { x: number; y: number } }>;
+        const [left, right] = result.children as Array<{
+            offset: { x: number; y: number };
+        }>;
         // In single mode (left page shown), left page offset.x should be smaller and within view,
         // right page is shifted off screen to the right
-        assert.ok(right.offset.x > left.offset.x, "right page should be further right than left");
+        assert.ok(
+            right.offset.x > left.offset.x,
+            "right page should be further right than left",
+        );
     });
 
     it("will switch page if right page is set and mode is single page", () => {
@@ -141,8 +175,12 @@ describe("UiBookLayout", () => {
         // right page offset.x = centerX + pageWidth + horizontalPadding + bookOffset + 16
         //                      = centerX + horizontalPadding + 16
         // This should be within the visible area (positive and near horizontalPadding)
-        const centerX = Math.max(0, (narrowWidth - (PAGE_WIDTH + HORIZONTAL_PADDING * 2)) / 2);
-        const expectedRightX = centerX + PAGE_WIDTH + HORIZONTAL_PADDING + (-PAGE_WIDTH) + 16;
+        const centerX = Math.max(
+            0,
+            (narrowWidth - (PAGE_WIDTH + HORIZONTAL_PADDING * 2)) / 2,
+        );
+        const expectedRightX =
+            centerX + PAGE_WIDTH + HORIZONTAL_PADDING + -PAGE_WIDTH + 16;
         const rightChild = result.children[1] as any;
         assert.strictEqual(rightChild.offset.x, expectedRightX);
     });
@@ -173,13 +211,20 @@ describe("UiBookLayout", () => {
         // Back button + left + right pages = 3 children
         assert.strictEqual(result.children.length, 3);
 
-        const centerY = Math.max(0, (600 - (PAGE_HEIGHT + VERTICAL_PADDING * 2)) / 2);
+        const centerY = Math.max(
+            0,
+            (600 - (PAGE_HEIGHT + VERTICAL_PADDING * 2)) / 2,
+        );
         const bookTopY = centerY + VERTICAL_PADDING;
 
         // Back button should be positioned above the book top
         const children = result.children as Array<{ offset: { y: number } }>;
         const aboveBook = children.filter((c) => c.offset.y < bookTopY);
-        assert.strictEqual(aboveBook.length, 1, "exactly one child (back button) should be above the book");
+        assert.strictEqual(
+            aboveBook.length,
+            1,
+            "exactly one child (back button) should be above the book",
+        );
     });
 
     it("does not show back button in dual-page mode", () => {
@@ -220,7 +265,11 @@ describe("UiBookLayout", () => {
         );
 
         assert.ok(isLayoutResult(result));
-        assert.strictEqual(result.children.length, 2, "no back button when on left page");
+        assert.strictEqual(
+            result.children.length,
+            2,
+            "no back button when on left page",
+        );
     });
 
     it("will show tabs if added", () => {
@@ -270,9 +319,19 @@ describe("UiBookLayout", () => {
         const tabContext = {
             props: {},
             constraints: { width: 100, height: 300 },
-            measureText: (_text: string, _style: any) => ({ width: 0, height: 0 }),
-            measureDescriptor: (_slotId: any, _descriptor: any, _constraints: any) => ({ width: 0, height: 0 }),
-            withState: <T>(initial: T): [T, (v: T) => void] => [initial, () => {}],
+            measureText: (_text: string, _style: any) => ({
+                width: 0,
+                height: 0,
+            }),
+            measureDescriptor: (
+                _slotId: any,
+                _descriptor: any,
+                _constraints: any,
+            ) => ({ width: 0, height: 0 }),
+            withState: <T>(initial: T): [T, (v: T) => void] => [
+                initial,
+                () => {},
+            ],
             withDraw: (_fn: any) => {},
             withEffect: (_fn: any) => {},
             withRemember: <T>(factory: () => T) => factory(),
@@ -283,9 +342,16 @@ describe("UiBookLayout", () => {
         assert.ok(tabLayout !== null, "tab descriptor should render");
         // Verify the tab onTap wiring: the inner button's onTap should call our spy
         // The tab child has children (one per tab)
-        if (tabLayout && typeof tabLayout === "object" && "children" in tabLayout) {
+        if (
+            tabLayout &&
+            typeof tabLayout === "object" &&
+            "children" in tabLayout
+        ) {
             const tabButtons = (tabLayout as any).children;
-            assert.ok(tabButtons.length > 0, "tab layout should have button children");
+            assert.ok(
+                tabButtons.length > 0,
+                "tab layout should have button children",
+            );
         }
     });
 

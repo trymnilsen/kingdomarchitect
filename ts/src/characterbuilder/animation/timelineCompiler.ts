@@ -50,7 +50,11 @@ export function compileTimeline(
     };
 
     const withMirror = applyMirrorTransform(intermediate, sortedToggles);
-    const facing = buildFacingKeyframes(recipe.name, sortedToggles, recipe.duration);
+    const facing = buildFacingKeyframes(
+        recipe.name,
+        sortedToggles,
+        recipe.duration,
+    );
     if (facing.length > 0) {
         withMirror.facing = facing;
     }
@@ -62,7 +66,10 @@ function resolveBase(
     sourceAnimations: CharacterAnimation[],
 ): CharacterAnimation {
     if (recipe.base.type === "frame") {
-        return findSourceAnimation(recipe.base.sourceAnimation, sourceAnimations);
+        return findSourceAnimation(
+            recipe.base.sourceAnimation,
+            sourceAnimations,
+        );
     }
     return compileTimeline(recipe.base.recipe, sourceAnimations);
 }
@@ -126,7 +133,16 @@ function buildPartFrames(
 
         const frames: PartFrame[] = [];
         for (let f = 0; f < recipe.duration; f++) {
-            frames.push(applyTrackOps(partName, basePixels, ops, f, sourceAnimations, baseFrame));
+            frames.push(
+                applyTrackOps(
+                    partName,
+                    basePixels,
+                    ops,
+                    f,
+                    sourceAnimations,
+                    baseFrame,
+                ),
+            );
         }
 
         return { partName, frames };
@@ -143,7 +159,9 @@ function buildAnchorFrames(
     ]);
 
     return Array.from(allAnchorIds).map((anchorId) => {
-        const baseAnchor = baseFrame.anchors.find((a) => a.anchorId === anchorId);
+        const baseAnchor = baseFrame.anchors.find(
+            (a) => a.anchorId === anchorId,
+        );
         const baseAnchorFrame = baseAnchor?.frames[0] ?? [];
         const ops = recipe.anchorTracks[anchorId] ?? [];
 
@@ -237,7 +255,11 @@ function applyAnchorOps(
                 break;
             case "offset":
                 if (current.length >= 3) {
-                    current = [current[0] + op.x, current[1] + op.y, current[2]];
+                    current = [
+                        current[0] + op.x,
+                        current[1] + op.y,
+                        current[2],
+                    ];
                 }
                 break;
         }
@@ -314,8 +336,12 @@ function buildFacingKeyframes(
     for (let f = 0; f < frameCount; f++) {
         const mirrored = computeMirrorStateAtFrame(sortedToggles, f);
         const facing: Facing = north
-            ? mirrored ? "nw" : "ne"
-            : mirrored ? "sw" : "se";
+            ? mirrored
+                ? "nw"
+                : "ne"
+            : mirrored
+              ? "sw"
+              : "se";
 
         if (facing !== lastFacing) {
             keyframes.push({ frame: f, facing });

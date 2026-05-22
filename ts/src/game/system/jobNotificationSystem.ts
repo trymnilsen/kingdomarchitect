@@ -33,8 +33,7 @@ export function createJobNotificationSystem(): EcsSystem {
             const playerKingdom = findPlayerKingdom(root);
             if (!playerKingdom) return;
 
-            const jobQueue =
-                playerKingdom.getEcsComponent(JobQueueComponentId);
+            const jobQueue = playerKingdom.getEcsComponent(JobQueueComponentId);
             if (!jobQueue) return;
 
             // Check if there are any unclaimed jobs

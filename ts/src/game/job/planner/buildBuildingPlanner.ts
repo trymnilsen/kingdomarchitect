@@ -1,9 +1,7 @@
 import { distance } from "../../../common/point.ts";
 import type { BehaviorActionData } from "../../behavior/actions/ActionData.ts";
 import { BuildingComponentId } from "../../component/buildingComponent.ts";
-import {
-    CollectableComponentId,
-} from "../../component/collectableComponent.ts";
+import { CollectableComponentId } from "../../component/collectableComponent.ts";
 import { GroundItemComponentId } from "../../component/groundItemComponent.ts";
 import {
     HeldItemComponentId,
@@ -61,7 +59,9 @@ export function planBuildBuilding(
     const buildingComponent =
         buildingEntity.getEcsComponent(BuildingComponentId);
     if (!buildingComponent) {
-        log.warn("Building has no BuildingComponent", { entityId: job.entityId });
+        log.warn("Building has no BuildingComponent", {
+            entityId: job.entityId,
+        });
         return [];
     }
 

@@ -1,7 +1,5 @@
 import type { Entity } from "../entity/entity.ts";
-import {
-    BuildingComponentId,
-} from "../component/buildingComponent.ts";
+import { BuildingComponentId } from "../component/buildingComponent.ts";
 import { ResourceComponentId } from "../component/resourceComponent.ts";
 import { ProductionComponentId } from "../component/productionComponent.ts";
 import { getResourceById } from "../../data/inventory/items/naturalResource.ts";
@@ -24,8 +22,11 @@ export function getJobDisplayName(root: Entity, job: Jobs): string | null {
             if (!buildingEntity) {
                 return "Build building";
             }
-            const buildingComp = buildingEntity.getEcsComponent(BuildingComponentId);
-            return buildingComp ? `Build ${buildingComp.building.name}` : "Build building";
+            const buildingComp =
+                buildingEntity.getEcsComponent(BuildingComponentId);
+            return buildingComp
+                ? `Build ${buildingComp.building.name}`
+                : "Build building";
         }
         case "collectResource": {
             const collectJob = job as CollectResourceJob;
@@ -33,7 +34,8 @@ export function getJobDisplayName(root: Entity, job: Jobs): string | null {
             if (!resourceEntity) {
                 return "Collect resource";
             }
-            const resourceComp = resourceEntity.getEcsComponent(ResourceComponentId);
+            const resourceComp =
+                resourceEntity.getEcsComponent(ResourceComponentId);
             if (!resourceComp) {
                 return "Collect resource";
             }

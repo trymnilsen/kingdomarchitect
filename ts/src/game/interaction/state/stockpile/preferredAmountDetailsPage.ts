@@ -50,9 +50,7 @@ export const preferredAmountDetailsPage =
             }
 
             const item =
-                inventoryItemsMap[
-                    props.selectedItemId as InventoryItemIds
-                ];
+                inventoryItemsMap[props.selectedItemId as InventoryItemIds];
             if (!item) {
                 return uiBox({ width: fillUiSize, height: fillUiSize });
             }
@@ -111,8 +109,7 @@ export const preferredAmountDetailsPage =
                     uiButton({
                         width: fillUiSize,
                         height: 32,
-                        onTap: () =>
-                            props.onClear(props.selectedItemId!),
+                        onTap: () => props.onClear(props.selectedItemId!),
                         child: uiText({
                             content: "Clear",
                             textStyle: {

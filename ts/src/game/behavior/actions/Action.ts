@@ -2,7 +2,11 @@ import type { Point } from "../../../common/point.ts";
 import type { BehaviorActionData } from "./ActionData.ts";
 
 /** Quality of sleep determines restore rates and duration. */
-export type SleepQuality = "house" | "bedrollFire" | "bedrollAlone" | "collapse";
+export type SleepQuality =
+    | "house"
+    | "bedrollFire"
+    | "bedrollAlone"
+    | "collapse";
 
 /**
  * Failure causes carry enough context for behaviors to branch intelligently

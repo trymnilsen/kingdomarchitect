@@ -1,6 +1,10 @@
 import { spriteRefs } from "../../../../asset/sprite.ts";
 import { allSides } from "../../../../common/sides.ts";
-import { defaultTextStyle, graySubTitleTextStyle, subTitleTextStyle } from "../../../../rendering/text/textStyle.ts";
+import {
+    defaultTextStyle,
+    graySubTitleTextStyle,
+    subTitleTextStyle,
+} from "../../../../rendering/text/textStyle.ts";
 import { createComponent } from "../../../../ui/declarative/ui.ts";
 import { uiBookLayout } from "../../../../ui/declarative/uiBookLayout.ts";
 import { uiBox } from "../../../../ui/declarative/uiBox.ts";
@@ -255,7 +259,9 @@ function buildRightPage(props: StatsViewProps) {
                     parts.push(`×${(1 + contributor.percent).toFixed(2)}`);
                 }
                 const valueText =
-                    parts.length > 0 ? parts.join(" ") : String(contributor.flat ?? 0);
+                    parts.length > 0
+                        ? parts.join(" ")
+                        : String(contributor.flat ?? 0);
 
                 return uiRow({
                     width: fillUiSize,

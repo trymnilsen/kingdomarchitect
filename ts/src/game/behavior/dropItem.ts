@@ -1,11 +1,10 @@
-import {
-    adjacentPoints,
-    pointEquals,
-    type Point,
-} from "../../common/point.ts";
+import { adjacentPoints, pointEquals, type Point } from "../../common/point.ts";
 import { createLogger } from "../../common/logging/logger.ts";
 import type { InventoryItem } from "../../data/inventory/inventoryItem.ts";
-import { addCollectableItem, CollectableComponentId } from "../component/collectableComponent.ts";
+import {
+    addCollectableItem,
+    CollectableComponentId,
+} from "../component/collectableComponent.ts";
 import { GroundItemComponentId } from "../component/groundItemComponent.ts";
 import { ResourceComponentId } from "../component/resourceComponent.ts";
 import { BuildingComponentId } from "../component/buildingComponent.ts";

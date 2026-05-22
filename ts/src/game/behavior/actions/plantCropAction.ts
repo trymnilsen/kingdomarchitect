@@ -1,9 +1,6 @@
 import { isPointAdjacentTo } from "../../../common/point.ts";
 import { createLogger } from "../../../common/logging/logger.ts";
-import {
-    FarmComponentId,
-    FarmState,
-} from "../../component/farmComponent.ts";
+import { FarmComponentId, FarmState } from "../../component/farmComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import {
@@ -38,7 +35,9 @@ export function executePlantCropAction(
         };
     }
 
-    if (!isPointAdjacentTo(buildingEntity.worldPosition, entity.worldPosition)) {
+    if (
+        !isPointAdjacentTo(buildingEntity.worldPosition, entity.worldPosition)
+    ) {
         return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 

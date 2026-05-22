@@ -18,11 +18,7 @@ import {
     findJobClaimedBy,
     completeJobFromQueue,
 } from "../../job/jobLifecycle.ts";
-import {
-    ActionComplete,
-    ActionRunning,
-    type ActionResult,
-} from "./Action.ts";
+import { ActionComplete, ActionRunning, type ActionResult } from "./Action.ts";
 import type { CraftingRecipe } from "../../../data/crafting/craftingRecipe.ts";
 
 /**
@@ -73,9 +69,8 @@ export function executeCraftItemAction(
         return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 
-    const buildingInventory = buildingEntity.requireEcsComponent(
-        InventoryComponentId,
-    );
+    const buildingInventory =
+        buildingEntity.requireEcsComponent(InventoryComponentId);
     const held = entity.requireEcsComponent(HeldItemComponentId);
 
     const recipe = action.recipe;
@@ -100,9 +95,7 @@ export function executeCraftItemAction(
                 input.amount,
             );
             if (!taken) {
-                log.warn(
-                    `Failed to consume ${input.amount}x ${input.item.id}`,
-                );
+                log.warn(`Failed to consume ${input.amount}x ${input.item.id}`);
                 return { kind: "failed", cause: { type: "noResources" } };
             }
         }
@@ -119,10 +112,7 @@ export function executeCraftItemAction(
 
     if (action.progress >= recipe.duration) {
         for (const output of recipe.outputs) {
-            if (
-                !isHeldEmpty(held) &&
-                held.item!.id !== output.item.id
-            ) {
+            if (!isHeldEmpty(held) && held.item!.id !== output.item.id) {
                 log.warn(
                     `Cannot deposit craft output: held has ${held.item!.id}, output is ${output.item.id}`,
                 );

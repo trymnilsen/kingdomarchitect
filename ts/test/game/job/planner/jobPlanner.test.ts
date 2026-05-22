@@ -52,7 +52,9 @@ describe("jobPlanner", () => {
         const { root, worker } = createTestScene();
         const building = new Entity("building");
         building.worldPosition = { x: 15, y: 13 };
-        building.setEcsComponent(createProductionComponent("quarry_production", 4));
+        building.setEcsComponent(
+            createProductionComponent("quarry_production", 4),
+        );
         root.addChild(building);
 
         const job = createProductionJob("building");
@@ -147,7 +149,10 @@ describe("jobPlanner", () => {
         assert.strictEqual(actions[1].type, "depositToStockpile");
         assert.strictEqual(actions[2].type, "moveTo");
         assert.strictEqual(actions[3].type, "harvestResource");
-        const deposit = actions[1] as { type: "depositToStockpile"; stockpileId: string };
+        const deposit = actions[1] as {
+            type: "depositToStockpile";
+            stockpileId: string;
+        };
         assert.strictEqual(deposit.stockpileId, "stockpile");
     });
 

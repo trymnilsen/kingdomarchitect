@@ -101,9 +101,7 @@ function resolveTransaction(
     for (const move of transaction.moves) {
         const entity = root.findEntity(move.entityId);
         if (!entity) {
-            log.warn(
-                `Entity ${move.entityId} not found, aborting`,
-            );
+            log.warn(`Entity ${move.entityId} not found, aborting`);
             return null;
         }
         if (

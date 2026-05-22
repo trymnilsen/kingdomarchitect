@@ -280,9 +280,7 @@ export type CharacterSprite = {
  * Calculate the overall bounding box across all frames in an animation
  * This ensures consistent positioning across all frames (e.g., for jump animations)
  */
-function getAnimationBounds(
-    animation: CharacterAnimation,
-): Rectangle {
+function getAnimationBounds(animation: CharacterAnimation): Rectangle {
     const frameCount = animationFrameCount(animation);
 
     let animMinX = Infinity;
@@ -511,9 +509,17 @@ function drawEquipment(
 
         const { sprite, flipX } = resolveEquipmentSprite(equip.sprite, facing);
         if (flipX) {
-            offscreenScope.drawScreenSpaceSpriteFlippedX({ x: drawX, y: drawY, sprite });
+            offscreenScope.drawScreenSpaceSpriteFlippedX({
+                x: drawX,
+                y: drawY,
+                sprite,
+            });
         } else {
-            offscreenScope.drawScreenSpaceSprite({ x: drawX, y: drawY, sprite });
+            offscreenScope.drawScreenSpaceSprite({
+                x: drawX,
+                y: drawY,
+                sprite,
+            });
         }
     }
 }
@@ -593,7 +599,6 @@ function drawAnimation(
                     fill: color,
                 });
             }
-
         }
 
         // Step 4: Draw front-layer equipment (in front of the character)

@@ -106,10 +106,8 @@ function createCustomizationSection(
         return [
             uiText({ content: "Hat", textStyle: titleTextStyle }),
             ...HAT_OPTIONS.map((option) =>
-                createPartButton(
-                    option.name,
-                    option.id === activeHatId,
-                    () => onHatSelect(option.id),
+                createPartButton(option.name, option.id === activeHatId, () =>
+                    onHatSelect(option.id),
                 ),
             ),
         ];

@@ -30,7 +30,10 @@ describe("eatFromHeldAction", () => {
         held.item = breadItem;
         held.amount = 1;
 
-        const result = executeEatFromHeldAction({ type: "eatFromHeld" }, entity);
+        const result = executeEatFromHeldAction(
+            { type: "eatFromHeld" },
+            entity,
+        );
         assert.strictEqual(result.kind, "complete");
 
         const hunger = entity.getEcsComponent(HungerComponentId)!;
@@ -54,7 +57,10 @@ describe("eatFromHeldAction", () => {
 
     it("returns failed when held is empty", () => {
         const entity = createTestEntity();
-        const result = executeEatFromHeldAction({ type: "eatFromHeld" }, entity);
+        const result = executeEatFromHeldAction(
+            { type: "eatFromHeld" },
+            entity,
+        );
         assert.strictEqual(result.kind, "failed");
     });
 
@@ -64,7 +70,10 @@ describe("eatFromHeldAction", () => {
         held.item = woodResourceItem;
         held.amount = 5;
 
-        const result = executeEatFromHeldAction({ type: "eatFromHeld" }, entity);
+        const result = executeEatFromHeldAction(
+            { type: "eatFromHeld" },
+            entity,
+        );
         assert.strictEqual(result.kind, "failed");
         assert.strictEqual(held.amount, 5, "wood should be untouched");
     });
