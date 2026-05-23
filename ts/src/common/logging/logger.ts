@@ -1,9 +1,5 @@
-import { createRingBuffer, writeEntry } from "../ringBuffer.ts";
+import { createRingBuffer, readEntries, writeEntry } from "../ringBuffer.ts";
 import type { LogEntry, LogLevel } from "./logEntry.ts";
-
-export type LogWriter = {
-    write(entry: LogEntry): void;
-};
 
 function pickConsoleFn(level: LogLevel): (...args: unknown[]) => void {
     if (level === "debug") return console.debug;
@@ -31,7 +27,7 @@ function extractError(data: unknown): Error | undefined {
     return undefined;
 }
 
-export class ConsoleWriter implements LogWriter {
+export class ConsoleWriter {
     write(entry: LogEntry): void {
         const consoleFn = pickConsoleFn(entry.level);
         const error = extractError(entry.data);
@@ -55,31 +51,37 @@ export class ConsoleWriter implements LogWriter {
     }
 }
 
-export class BufferWriter implements LogWriter {
+export class BufferWriter {
     private buffer = createRingBuffer<LogEntry>(8192);
 
     write(entry: LogEntry): void {
         writeEntry(this.buffer, entry);
     }
+
+    readEntries(): LogEntry[] {
+        return readEntries(this.buffer);
+    }
 }
 
 export class Logger {
-    private writers: LogWriter[] = [];
+    private consoleWriter: ConsoleWriter | undefined;
+    private bufferWriter: BufferWriter | undefined;
     private seq = 0;
 
-    addWriter(writer: LogWriter): void {
-        this.writers.push(writer);
+    setConsoleWriter(writer: ConsoleWriter | undefined): void {
+        this.consoleWriter = writer;
     }
 
-    removeWriter(writer: LogWriter): void {
-        const index = this.writers.indexOf(writer);
-        if (index !== -1) {
-            this.writers.splice(index, 1);
-        }
+    setLogBufferWriter(writer: BufferWriter | undefined): void {
+        this.bufferWriter = writer;
     }
 
-    clearWriters(): void {
-        this.writers = [];
+    /**
+     * Returns all entries currently in the rolling log buffer, or undefined
+     * if no buffer writer has been configured.
+     */
+    getLogBuffer(): LogEntry[] | undefined {
+        return this.bufferWriter?.readEntries();
     }
 
     debug(message: string, data?: unknown): void {
@@ -99,7 +101,7 @@ export class Logger {
     }
 
     private write(level: LogLevel, message: string, data?: unknown): void {
-        if (this.writers.length === 0) return;
+        if (!this.consoleWriter && !this.bufferWriter) return;
         const entry: LogEntry = {
             seq: this.seq++,
             timestamp: Date.now(),
@@ -107,9 +109,8 @@ export class Logger {
             message,
             data,
         };
-        for (const writer of this.writers) {
-            writer.write(entry);
-        }
+        this.consoleWriter?.write(entry);
+        this.bufferWriter?.write(entry);
     }
 }
 
@@ -120,6 +121,6 @@ export const log = new Logger();
  * writer. Call once at application startup.
  */
 export function setupLogger(): void {
-    log.addWriter(new ConsoleWriter());
-    log.addWriter(new BufferWriter());
+    log.setConsoleWriter(new ConsoleWriter());
+    log.setLogBufferWriter(new BufferWriter());
 }

@@ -34,6 +34,7 @@ export class LocalServerConnection implements GameServerConnection {
                 this.gameServer.worldRoot,
                 this.gameServer.worldMeta,
             );
+            data.logs = log.getLogBuffer();
             const json = JSON.stringify(data, null, 2);
             const blob = new Blob([json], { type: "application/json" });
             const url = URL.createObjectURL(blob);

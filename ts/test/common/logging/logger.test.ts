@@ -35,7 +35,8 @@ function withConsoleSpy(fn: () => void): {
 }
 
 afterEach(() => {
-    log.clearWriters();
+    log.setConsoleWriter(undefined);
+    log.setLogBufferWriter(undefined);
 });
 
 describe("Logger — no writers by default", () => {
@@ -49,7 +50,7 @@ describe("Logger — no writers by default", () => {
 
 describe("ConsoleWriter", () => {
     it("prints the message to console when added", () => {
-        log.addWriter(new ConsoleWriter());
+        log.setConsoleWriter(new ConsoleWriter());
         const { calls } = withConsoleSpy(() => {
             log.info("Hunger increased");
         });
@@ -58,7 +59,7 @@ describe("ConsoleWriter", () => {
     });
 
     it("passes data as a separate console argument", () => {
-        log.addWriter(new ConsoleWriter());
+        log.setConsoleWriter(new ConsoleWriter());
         const data = { entityId: "worker_1" };
         const { calls } = withConsoleSpy(() => {
             log.info("message", data);
@@ -68,7 +69,7 @@ describe("ConsoleWriter", () => {
     });
 
     it("routes each level to the correct console method", () => {
-        log.addWriter(new ConsoleWriter());
+        log.setConsoleWriter(new ConsoleWriter());
         const { calls } = withConsoleSpy(() => {
             log.debug("d");
             log.info("i");
@@ -82,7 +83,7 @@ describe("ConsoleWriter", () => {
     });
 
     it("extracts Error from data and passes it as a top-level arg", () => {
-        log.addWriter(new ConsoleWriter());
+        log.setConsoleWriter(new ConsoleWriter());
         const err = new Error("boom");
         const { calls } = withConsoleSpy(() => {
             log.error("something failed", { error: err });
@@ -90,10 +91,9 @@ describe("ConsoleWriter", () => {
         assert.ok(calls[0].args.includes(err));
     });
 
-    it("stops producing output after removeWriter", () => {
-        const writer = new ConsoleWriter();
-        log.addWriter(writer);
-        log.removeWriter(writer);
+    it("produces no output after setConsoleWriter(undefined)", () => {
+        log.setConsoleWriter(new ConsoleWriter());
+        log.setConsoleWriter(undefined);
         const { calls } = withConsoleSpy(() => {
             log.info("should be silent");
         });
@@ -103,26 +103,25 @@ describe("ConsoleWriter", () => {
 
 describe("BufferWriter", () => {
     it("does not write to console", () => {
-        log.addWriter(new BufferWriter());
+        log.setLogBufferWriter(new BufferWriter());
         const { calls } = withConsoleSpy(() => {
             log.info("buffered only");
         });
         assert.strictEqual(calls.length, 0);
     });
-});
 
-describe("createLogger (backward-compat shim)", () => {
-    it("returns the singleton logger", () => {
-        assert.strictEqual(log, log);
+    it("getLogBuffer returns entries written to the buffer", () => {
+        log.setLogBufferWriter(new BufferWriter());
+        log.info("first");
+        log.warn("second");
+        const entries = log.getLogBuffer();
+        assert.ok(entries !== undefined);
+        assert.strictEqual(entries.length, 2);
+        assert.strictEqual(entries[0].message, "first");
+        assert.strictEqual(entries[1].message, "second");
     });
 
-    it("writes through to active writers", () => {
-        log.addWriter(new ConsoleWriter());
-
-        const { calls } = withConsoleSpy(() => {
-            log.info("via shim");
-        });
-        assert.strictEqual(calls.length, 1);
-        assert.ok((calls[0].args[0] as string).includes("via shim"));
+    it("getLogBuffer returns undefined when no buffer writer is set", () => {
+        assert.strictEqual(log.getLogBuffer(), undefined);
     });
 });

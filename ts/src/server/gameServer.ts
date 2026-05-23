@@ -102,8 +102,6 @@ export class GameServer {
         this.gameLoopInterval = setInterval(() => {
             this.updateTick += 1;
             this.gameTime.setTick(this.updateTick);
-            (globalThis as Record<string, unknown>)["currentTick"] =
-                this.updateTick;
             this.world.runUpdate(this.updateTick);
 
             if (this.updateTick % 10 === 0) {
