@@ -1,8 +1,6 @@
 import { InteractionState } from "./interactionState.ts";
 import { InteractionStateHistory } from "./interactionStateHistory.ts";
-import { createLogger } from "../../../common/logging/logger.ts";
-
-const log = createLogger("interaction");
+import { log } from "../../../common/logging/logger.ts";
 
 export type InteractionStateChanger = {
     push(state: InteractionState, onPop?: (result: unknown) => void): void;
@@ -63,7 +61,7 @@ export class CommitableInteractionStateChanger implements InteractionStateChange
 
     apply(history: InteractionStateHistory) {
         for (const operation of this.operations) {
-            log.info("Handling interactionStateOperation", { operation });
+            log.debug("Handling interactionStateOperation", { operation });
             switch (operation.type) {
                 case "push":
                     history.push(operation.newState, operation.onPushCallback);

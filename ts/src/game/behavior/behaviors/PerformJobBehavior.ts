@@ -1,8 +1,9 @@
 import { distance } from "../../../common/point.ts";
+import { log } from "../../../common/logging/logger.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import type { JobQueueComponent } from "../../component/jobQueueComponent.ts";
-import { isJobValid, type Jobs } from "../../job/job.ts";
+import type { Jobs } from "../../job/job.ts";
 import type { BehaviorActionData } from "../actions/ActionData.ts";
 import type { Behavior } from "./Behavior.ts";
 import {
@@ -89,7 +90,7 @@ export function createPerformJobBehavior(
             const jobQueue = queueEntity.getEcsComponent(JobQueueComponentId);
 
             if (!jobQueue) {
-                console.info(
+                log.debug(
                     `[PerformJobBehavior] entity ${entity.id} had no job queue`,
                 );
                 return [];
@@ -98,18 +99,18 @@ export function createPerformJobBehavior(
             // Find job claimed by this entity
             const claimedJob = findJobClaimedBy(queueEntity, entity.id);
             if (claimedJob) {
-                console.info(
+                log.debug(
                     `[PerformJobBehavior] entity ${entity.id} had claimed job ${claimedJob.id}`,
-                    JSON.stringify(claimedJob),
+                    claimedJob,
                 );
                 const agent = entity.getEcsComponent(BehaviorAgentComponentId);
                 if (agent) {
                     agent.currentJobName = getJobDisplayName(root, claimedJob);
                 }
                 const actions = planJob(root, entity, claimedJob, buildPlanner);
-                console.info(
+                log.info(
                     `[PerformJobBehavior] entity ${entity.id} planned actions`,
-                    JSON.stringify(actions),
+                    actions,
                 );
                 return actions;
             }
@@ -121,16 +122,16 @@ export function createPerformJobBehavior(
                 buildJobValidator,
             );
             if (bestJobIndex === -1) {
-                console.info(
+                log.debug(
                     `[PerformJobBehavior] entity ${entity.id} had no possible jobs, returning []`,
                 );
                 return [];
             }
 
             const job = jobQueue.jobs[bestJobIndex];
-            console.info(
+            log.debug(
                 `[PerformJobBehavior] entity ${entity.id} claiming job`,
-                JSON.stringify(job),
+                job,
             );
             claimJobInQueue(job, entity.id, queueEntity);
             const agent = entity.getEcsComponent(BehaviorAgentComponentId);
@@ -138,9 +139,9 @@ export function createPerformJobBehavior(
                 agent.currentJobName = getJobDisplayName(root, job);
             }
             const actions = planJob(root, entity, job, buildPlanner);
-            console.info(
+            log.info(
                 `[PerformJobBehavior] entity ${entity.id} planned actions`,
-                JSON.stringify(actions),
+                actions,
             );
             return actions;
         },
@@ -148,11 +149,47 @@ export function createPerformJobBehavior(
 }
 
 /**
- * Check if there are available jobs for this entity. The buildJobValidator
- * mirrors the one used by findBestJob so isValid() and findBestJob() agree
- * on whether a build job can be executed by this worker — goblins that
- * gather from the environment pass `() => true` to bypass the stockpile
- * pre-check that player workers rely on.
+ * Single source of truth for "can this worker take this job right now". Used by
+ * both isValid() (via hasAvailableJobs) and expand() (via findBestJob) so the two
+ * can never disagree. A disagreement would let a worker select performJob and then
+ * produce no actions, stranding it on a behavior it can't act on (and displaying a
+ * stale/empty activity label).
+ *
+ * The target-position check comes first so a stale job — one whose target entity
+ * was removed but the job is still queued — is rejected before reaching a
+ * type-specific validator that assumes the target exists.
+ *
+ * buildJobValidator is injected because goblins gather from the environment and
+ * pass `() => true` to bypass the stockpile pre-check player workers rely on.
+ */
+function canTakeJob(
+    root: Entity,
+    entity: Entity,
+    job: Jobs,
+    jobQueue: JobQueueComponent,
+    buildJobValidator: BuildJobValidator,
+): boolean {
+    if (job.claimedBy !== undefined) {
+        return false;
+    }
+
+    if (
+        job.constraint &&
+        job.constraint.type === "entity" &&
+        job.constraint.id !== entity.id
+    ) {
+        return false;
+    }
+
+    if (getJobTargetPosition(root, job) === null) {
+        return false;
+    }
+
+    return canExecuteJob(root, job, entity, buildJobValidator, jobQueue);
+}
+
+/**
+ * Check if there is any job this worker can take right now.
  */
 function hasAvailableJobs(
     entity: Entity,
@@ -160,43 +197,9 @@ function hasAvailableJobs(
     buildJobValidator: BuildJobValidator,
 ): boolean {
     const root = entity.getRootEntity();
-    for (const job of jobQueue.jobs) {
-        if (job.claimedBy !== undefined) {
-            continue;
-        }
-
-        if (
-            job.constraint &&
-            job.constraint.type === "entity" &&
-            job.constraint.id !== entity.id
-        ) {
-            continue;
-        }
-
-        if (job.id === "buildBuildingJob") {
-            if (!buildJobValidator(root, job as BuildBuildingJob, entity)) {
-                continue;
-            }
-        } else if (job.id === CraftingJobId) {
-            if (!canExecuteCraftingJob(jobQueue, job as CraftingJob)) {
-                continue;
-            }
-        } else if (job.id === WindmillJobId) {
-            if (!canExecuteWindmillJob(jobQueue, job as WindmillJob)) {
-                continue;
-            }
-        } else if (job.id === ProductionJobId) {
-            if (!canExecuteProductionJob(jobQueue, job as ProductionJob)) {
-                continue;
-            }
-        } else if (!isJobValid(job, entity)) {
-            continue;
-        }
-
-        return true;
-    }
-
-    return false;
+    return jobQueue.jobs.some((job) =>
+        canTakeJob(root, entity, job, jobQueue, buildJobValidator),
+    );
 }
 
 /**
@@ -215,19 +218,7 @@ function findBestJob(
     for (let i = 0; i < jobQueue.jobs.length; i++) {
         const job = jobQueue.jobs[i];
 
-        if (job.claimedBy !== undefined) {
-            continue;
-        }
-
-        if (
-            job.constraint &&
-            job.constraint.type === "entity" &&
-            job.constraint.id !== entity.id
-        ) {
-            continue;
-        }
-
-        if (!canExecuteJob(root, job, entity, buildJobValidator, jobQueue)) {
+        if (!canTakeJob(root, entity, job, jobQueue, buildJobValidator)) {
             continue;
         }
 

@@ -10,7 +10,7 @@ import {
 } from "../../component/heldItemComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { ActionComplete, type ActionResult } from "./Action.ts";
-import { createLogger } from "../../../common/logging/logger.ts";
+import { log } from "../../../common/logging/logger.ts";
 
 /**
  * Deposit the worker's held item into a target entity's inventory.
@@ -29,8 +29,6 @@ export type DepositToInventoryActionData = {
      */
     itemId?: string;
 };
-
-const log = createLogger("behavior");
 
 export function executeDepositToInventoryAction(
     action: DepositToInventoryActionData,

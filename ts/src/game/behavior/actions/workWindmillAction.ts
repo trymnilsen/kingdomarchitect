@@ -1,5 +1,5 @@
 import { isPointAdjacentTo } from "../../../common/point.ts";
-import { createLogger } from "../../../common/logging/logger.ts";
+import { log } from "../../../common/logging/logger.ts";
 import { FarmComponentId, FarmState } from "../../component/farmComponent.ts";
 import {
     addToHeldItem,
@@ -23,8 +23,6 @@ export type WorkWindmillActionData = {
     type: "workWindmill";
     windmillId: string;
 };
-
-const log = createLogger("behavior");
 
 const ADJACENT_OFFSETS: ReadonlyArray<{ dx: number; dy: number }> = [
     { dx: -1, dy: -1 },

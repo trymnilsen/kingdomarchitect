@@ -6,13 +6,11 @@ import {
     isHeldEmpty,
 } from "../../component/heldItemComponent.ts";
 import type { Behavior } from "./Behavior.ts";
-import { createLogger } from "../../../common/logging/logger.ts";
+import { log } from "../../../common/logging/logger.ts";
 import { findFreeAdjacentTile } from "../dropItem.ts";
 import { planEquipCommand } from "../planners/equipCommandPlanner.ts";
 import { planEquipFromHeld } from "../planners/equipFromHeldPlanner.ts";
 import { planDepositHeld } from "../../job/planner/planDepositHeld.ts";
-
-const log = createLogger("behavior");
 
 /**
  * PerformPlayerCommandBehavior executes player-issued commands with high priority.

@@ -1,8 +1,6 @@
 import { Point, pointEquals } from "../../../common/point.ts";
 import { SelectionMode, SelectionModeDescription } from "./selectionMode.ts";
-import { createLogger } from "../../../common/logging/logger.ts";
-
-const log = createLogger("interaction");
+import { log } from "../../../common/logging/logger.ts";
 
 export class LineSelectionMode implements SelectionMode {
     private from: Point;

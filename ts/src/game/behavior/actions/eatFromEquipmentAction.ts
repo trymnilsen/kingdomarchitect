@@ -1,4 +1,4 @@
-import { createLogger } from "../../../common/logging/logger.ts";
+import { log } from "../../../common/logging/logger.ts";
 import { ItemTag } from "../../../data/inventory/inventoryItem.ts";
 import { EquipmentComponentId } from "../../component/equipmentComponent.ts";
 import {
@@ -15,7 +15,6 @@ export type EatFromEquipmentActionData = {
 };
 
 const HUNGER_REDUCTION = 30;
-const log = createLogger("behavior");
 
 /**
  * Eat a food item out of an equipment slot. Equipment slots are single-

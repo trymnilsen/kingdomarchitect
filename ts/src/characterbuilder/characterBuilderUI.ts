@@ -1,4 +1,4 @@
-import { createLogger } from "../common/logging/logger.ts";
+import { log } from "../common/logging/logger.ts";
 import { characterPartFrames } from "../../generated/characterFrames.ts";
 import { getAllAnimations } from "./animation/getAllAnimations.ts";
 import type { CharacterAnimation } from "./characterAnimation.ts";
@@ -19,8 +19,6 @@ import {
     type PreviewMode,
 } from "./ui/characterBuilderConstants.ts";
 import { spriteRefs } from "../asset/sprite.ts";
-
-const log = createLogger("characterbuilder");
 
 const allAnimations = getAllAnimations(
     characterPartFrames as unknown as CharacterAnimation[],

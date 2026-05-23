@@ -1,5 +1,5 @@
 import { isPointAdjacentTo } from "../../../common/point.ts";
-import { createLogger } from "../../../common/logging/logger.ts";
+import { log } from "../../../common/logging/logger.ts";
 import { FarmComponentId, FarmState } from "../../component/farmComponent.ts";
 import {
     addInventoryItem,
@@ -23,8 +23,6 @@ export type HarvestCropActionData = {
     type: "harvestCrop";
     buildingId: string;
 };
-
-const log = createLogger("behavior");
 
 export function executeHarvestCropAction(
     action: HarvestCropActionData,

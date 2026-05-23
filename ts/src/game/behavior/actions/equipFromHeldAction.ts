@@ -1,4 +1,4 @@
-import { createLogger } from "../../../common/logging/logger.ts";
+import { log } from "../../../common/logging/logger.ts";
 import { EquipmentComponentId } from "../../component/equipmentComponent.ts";
 import {
     clearHeldItem,
@@ -18,8 +18,6 @@ export type EquipFromHeldActionData = {
     type: "equipFromHeld";
     slot: "primary" | "secondary";
 };
-
-const log = createLogger("behavior");
 
 export function executeEquipFromHeldAction(
     action: EquipFromHeldActionData,

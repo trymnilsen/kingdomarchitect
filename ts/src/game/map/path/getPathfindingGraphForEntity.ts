@@ -1,11 +1,9 @@
 import type { Entity } from "../../entity/entity.ts";
-import { createLogger } from "../../../common/logging/logger.ts";
+import { log } from "../../../common/logging/logger.ts";
 import {
     PathfindingGraphComponentId,
     type PathfindingGraph,
 } from "../../component/pathfindingGraphComponent.ts";
-
-const log = createLogger("pathfinding");
 
 /**
  * Gets the pathfinding graph for an entity from the root entity.

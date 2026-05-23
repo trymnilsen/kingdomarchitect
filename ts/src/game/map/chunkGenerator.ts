@@ -3,7 +3,7 @@ import {
     randomEntry,
     weightedRandomEntry,
 } from "../../common/array.ts";
-import { createLogger } from "../../common/logging/logger.ts";
+import { log } from "../../common/logging/logger.ts";
 import { randomColor } from "../../common/color.ts";
 import { generateId } from "../../common/idGenerator.ts";
 import { type Point, adjacentPoints } from "../../common/point.ts";
@@ -21,8 +21,6 @@ import { type TileChunk, ChunkSize } from "./chunk.ts";
 import { placeSettlement } from "./item/settlement.ts";
 import { queryEntitiesWithinVolume } from "./query/queryEntity.ts";
 import type { Volume } from "./volume.ts";
-
-const log = createLogger("worldgen");
 
 //TODO: should return a structure describing the unlock for the action
 export function generateChunk(

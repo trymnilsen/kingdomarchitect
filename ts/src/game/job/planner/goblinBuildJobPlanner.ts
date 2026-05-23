@@ -18,9 +18,7 @@ import type { Entity } from "../../entity/entity.ts";
 import type { BuildBuildingJob } from "../buildBuildingJob.ts";
 import { GoblinUnitComponentId } from "../../component/goblinUnitComponent.ts";
 import { findDropPosition } from "../../behavior/dropItem.ts";
-import { createLogger } from "../../../common/logging/logger.ts";
-
-const log = createLogger("job");
+import { log } from "../../../common/logging/logger.ts";
 
 /**
  * Goblin-specific build job planner under the held-item model.

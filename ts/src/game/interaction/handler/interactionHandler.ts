@@ -21,9 +21,7 @@ import type { GameSaveCapability } from "../../../server/gameServerConnection.ts
 import type { GameCommand } from "../../../server/message/gameCommand.ts";
 import { queryEntity } from "../../map/query/queryEntity.ts";
 import type { EcsWorld } from "../../../common/ecs/ecsWorld.ts";
-import { createLogger } from "../../../common/logging/logger.ts";
-
-const log = createLogger("interaction");
+import { log } from "../../../common/logging/logger.ts";
 
 /**
  * The interactionHandler recieves input taps and forward them to the currently
@@ -109,7 +107,7 @@ export class InteractionHandler {
             if (currentState.isModal) {
                 // if the tap was not handled and the current route is a modal
                 // route we pop the state
-                log.info("Tap was not handled by modal route, popping");
+                log.debug("Tap was not handled by modal route, popping");
                 this.history.pop();
                 // Return to stop handling the tap more
                 return;
@@ -132,7 +130,7 @@ export class InteractionHandler {
             }
 
             if (!worldTapHandled) {
-                log.info("Tap not handled by state, checking for selection");
+                log.debug("Tap not handled by state, checking for selection");
 
                 const entitiesAt = queryEntity(this.world.root, tilePosition);
 

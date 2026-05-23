@@ -4,11 +4,9 @@ import {
     pointEquals,
 } from "../../../common/point.ts";
 import { BinaryHeap } from "../../../common/structure/binaryHeap.ts";
-import { createLogger } from "../../../common/logging/logger.ts";
+import { log } from "../../../common/logging/logger.ts";
 import { type Graph, GraphNode } from "./graph/graph.ts";
 import { manhattanDistance } from "./pathHeuristics.ts";
-
-const log = createLogger("pathfinding");
 
 export type SearchOptions = {
     weightModifier?: (graphNode: GraphNode) => number;

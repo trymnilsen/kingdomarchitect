@@ -1,4 +1,4 @@
-import { createLogger } from "../common/logging/logger.ts";
+import { log } from "../common/logging/logger.ts";
 import { AssetLoader } from "../asset/loader/assetLoader.ts";
 import {
     type SpriteDefinition,
@@ -29,8 +29,6 @@ import { spriteRefs } from "../../generated/sprites.ts";
 import type { CanvasContext } from "./canvasContext.ts";
 import { BitmapCache } from "./bitmapCache.ts";
 import { type Point, zeroPoint } from "../common/point.ts";
-
-const log = createLogger("rendering");
 
 export type DrawFunction = (context: RenderScope) => void;
 // renderer -> creates render context -> holds camera, canvas context for main and offscreen -> creates scope

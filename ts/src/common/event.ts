@@ -1,7 +1,5 @@
-import { createLogger } from "./logging/logger.ts";
+import { log } from "./logging/logger.ts";
 import { ConstructorFunction, getConstructorName } from "./constructor.ts";
-
-const log = createLogger("event");
 
 /**
  * An event allows modeling updates to data.

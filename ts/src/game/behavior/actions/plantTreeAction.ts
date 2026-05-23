@@ -1,4 +1,4 @@
-import { createLogger } from "../../../common/logging/logger.ts";
+import { log } from "../../../common/logging/logger.ts";
 import type { Point } from "../../../common/point.ts";
 import { getProductionDefinition } from "../../../data/production/productionDefinition.ts";
 import { getResourceById } from "../../../data/inventory/items/naturalResource.ts";
@@ -12,8 +12,6 @@ import {
     completeJobFromQueue,
 } from "../../job/jobLifecycle.ts";
 import { ActionComplete, ActionRunning, type ActionResult } from "./Action.ts";
-
-const log = createLogger("behavior");
 
 export type PlantTreeActionData = {
     type: "plantTree";

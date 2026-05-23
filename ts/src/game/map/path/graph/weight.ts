@@ -7,6 +7,10 @@ import { getTile, TileComponentId } from "../../../component/tileComponent.ts";
 import type { Entity } from "../../../entity/entity.ts";
 import { isPermanentObstacle } from "../../../../data/inventory/items/naturalResource.ts";
 import { queryEntity } from "../../query/queryEntity.ts";
+import {
+    TraversalComponentId,
+    TRAVERSAL_IMPASSABLE_THRESHOLD,
+} from "../../../component/traversalComponent.ts";
 
 /**
  * Returns true if a tile can be entered during movement — i.e. the tile exists
@@ -24,7 +28,15 @@ export function isTileAvailable(point: Point, root: Entity): boolean {
     const entities = queryEntity(root, point);
     for (const entity of entities) {
         const building = entity.getEcsComponent(BuildingComponentId);
-        if (building && building.building.id !== "road") return false;
+        if (building && building.building.id !== "road") {
+            const traversal = entity.getEcsComponent(TraversalComponentId);
+            if (
+                !traversal ||
+                traversal.weight >= TRAVERSAL_IMPASSABLE_THRESHOLD
+            ) {
+                return false;
+            }
+        }
 
         const resource = entity.getEcsComponent(ResourceComponentId);
         if (resource && isPermanentObstacle(resource.resourceId)) return false;
@@ -60,9 +72,15 @@ export function getWeightAtPoint(point: Point, scope: Entity): number {
             const buildingComponent =
                 entity.getEcsComponent(BuildingComponentId);
             if (buildingComponent) {
-                // Roads have weight 1 to prioritize pathfinding through them
-                const w = buildingComponent.building.id === "road" ? 1 : 100;
-                entityWeight = Math.max(entityWeight, w);
+                const traversal = entity.getEcsComponent(TraversalComponentId);
+                if (traversal) {
+                    entityWeight = Math.max(entityWeight, traversal.weight);
+                } else {
+                    // Roads have weight 1 to prioritize pathfinding through them
+                    const w =
+                        buildingComponent.building.id === "road" ? 1 : 100;
+                    entityWeight = Math.max(entityWeight, w);
+                }
             }
 
             if (entity.hasComponent(PlayerUnitComponentId)) {

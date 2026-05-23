@@ -1,7 +1,6 @@
-import { createLogger } from "../../common/logging/logger.ts";
+import { log } from "../../common/logging/logger.ts";
 import type { JSONValue } from "../../common/object.ts";
 
-const log = createLogger("persistence");
 import { ChunkMapComponentId } from "../../game/component/chunkMapComponent.ts";
 import type {
     ComponentID,

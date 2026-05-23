@@ -1,4 +1,4 @@
-import { createLogger } from "../common/logging/logger.ts";
+import { log } from "../common/logging/logger.ts";
 import {
     Bounds,
     boundsCenter,
@@ -26,8 +26,6 @@ import {
 import { FocusState } from "./focus/focusState.ts";
 import { UILayoutScope } from "./uiLayoutContext.ts";
 import { fillUiSize, UISize, zeroSize } from "./uiSize.ts";
-
-const log = createLogger("ui");
 
 export type UIAction = {
     type: string;

@@ -1,13 +1,11 @@
 import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
-import { createLogger } from "../../common/logging/logger.ts";
+import { log } from "../../common/logging/logger.ts";
 import { PathfindingGraphComponentId } from "../component/pathfindingGraphComponent.ts";
 import type { Entity } from "../entity/entity.ts";
 import type {
     EntityChildrenUpdatedEvent,
     EntityTransformEvent,
 } from "../entity/entityEvent.ts";
-
-const log = createLogger("pathfinding");
 
 export const pathfindingSystem: EcsSystem = {
     onInit: init,

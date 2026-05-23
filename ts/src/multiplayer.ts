@@ -1,10 +1,8 @@
-import { createRootLogger, createLogger } from "./common/logging/logger.ts";
+import { setupLogger, log } from "./common/logging/logger.ts";
 import { Game } from "./game/game.ts";
 import { WebSocketServerConnection } from "./server/websocketServerConnection.ts";
 
-createRootLogger();
-
-const log = createLogger("client");
+setupLogger();
 
 const canvasElementId = "gameCanvas";
 

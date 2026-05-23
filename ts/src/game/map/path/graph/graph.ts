@@ -1,7 +1,5 @@
 import type { Point } from "../../../../common/point.ts";
-import { createLogger } from "../../../../common/logging/logger.ts";
-
-const log = createLogger("pathfinding");
+import { log } from "../../../../common/logging/logger.ts";
 
 export type Graph = {
     nodeAt(x: number, y: number): GraphNode | null;

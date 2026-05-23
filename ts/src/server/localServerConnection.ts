@@ -1,4 +1,4 @@
-import { createLogger } from "../common/logging/logger.ts";
+import { log } from "../common/logging/logger.ts";
 import { Event } from "../common/event.ts";
 import { GameServer } from "./gameServer.ts";
 import type { GameCommand } from "./message/gameCommand.ts";
@@ -11,8 +11,6 @@ import { IndexedDBAdapter } from "./persistence/indexedDBAdapter.ts";
 import { PersistenceManager } from "./persistence/persistenceManager.ts";
 import type { SaveFileData } from "./persistence/saveFileData.ts";
 import { createSinglePlayerMessageRouter } from "./singlePlayerMessageRouter.ts";
-
-const log = createLogger("server");
 
 /**
  * Runs the game server in the same thread as the client, enabling

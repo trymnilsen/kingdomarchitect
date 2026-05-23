@@ -1,4 +1,4 @@
-import { createLogger } from "../logging/logger.ts";
+import { log } from "../logging/logger.ts";
 import { Entity } from "../../game/entity/entity.ts";
 import {
     type EntityEventType,
@@ -16,8 +16,6 @@ import {
     type EcsUpdateFunction,
     type EcsGameMessageFunction,
 } from "./ecsSystem.ts";
-
-const log = createLogger("ecs");
 
 type EcsEntityEventHandlersMap = {
     // Iterate over each event ID 'K' which is a key in EntityEventMapDynamic

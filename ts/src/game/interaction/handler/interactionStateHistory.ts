@@ -1,9 +1,7 @@
 import { RootState } from "../state/root/rootState.ts";
 import { InteractionState } from "./interactionState.ts";
 import { StateContext } from "./stateContext.ts";
-import { createLogger } from "../../../common/logging/logger.ts";
-
-const log = createLogger("interaction");
+import { log } from "../../../common/logging/logger.ts";
 
 type InteractionStateHistoryEntry = {
     state: InteractionState;

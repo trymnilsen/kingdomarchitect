@@ -1,5 +1,5 @@
 import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
-import { createLogger } from "../../common/logging/logger.ts";
+import { log } from "../../common/logging/logger.ts";
 import type { Entity } from "../entity/entity.ts";
 import {
     GoblinCampComponentId,
@@ -28,8 +28,6 @@ import { BuildBuildingJob } from "../job/buildBuildingJob.ts";
 import type { Building } from "../../data/building/building.ts";
 import { firstChildWhere } from "../entity/child/first.ts";
 import { goblinCampfire } from "../../data/building/goblin/goblinCampfire.ts";
-
-const log = createLogger("goblin");
 
 /**
  * GoblinCampSystem handles all camp-level decisions:

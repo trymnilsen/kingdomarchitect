@@ -1,8 +1,7 @@
 import type { Point } from "../../../common/point.ts";
 import { isPointAdjacentTo, pointEquals } from "../../../common/point.ts";
-import { createLogger } from "../../../common/logging/logger.ts";
+import { log } from "../../../common/logging/logger.ts";
 
-const log = createLogger("behavior");
 import {
     BehaviorAgentComponentId,
     getBehaviorAgent,
@@ -406,7 +405,7 @@ function resolveDisplacedTile(
     const agent = getBehaviorAgent(entity);
     const priority = agent?.currentBehaviorUtility ?? 0;
     const blockerIds = displaceable.map((o) => o.id).join(", ");
-    log.info(
+    log.debug(
         `${entity.id} next tile (${nextPoint.x},${nextPoint.y}) blocked by [${blockerIds}], priority=${priority}, attempting displacement`,
     );
 
@@ -421,7 +420,7 @@ function resolveDisplacedTile(
     if (result.kind === "refused" || result.kind === "noChain") {
         // This tile is proven impassable for this tick. Clear the stale cached
         // path and replan immediately with this tile blocked.
-        log.info(
+        log.debug(
             `${entity.id} displacement ${result.kind} at (${nextPoint.x},${nextPoint.y}), replanning`,
         );
         locallyBlocked.add(`${nextPoint.x},${nextPoint.y}`);
@@ -439,7 +438,7 @@ function resolveDisplacedTile(
         if (!newPath) {
             // No path around the blocked tiles. Wait — the blockers may move next tick.
             // Leave cachedPath undefined so we plan fresh on the next tick.
-            log.info(`${entity.id} no path around blocked tiles, waiting`);
+            log.debug(`${entity.id} no path around blocked tiles, waiting`);
             return { kind: "result", value: ActionRunning };
         }
 
@@ -468,7 +467,7 @@ function resolveDisplacedTile(
         if (!result.transaction.isCycle) {
             applyRequesterStep(entity, entity.worldPosition, nextPoint, tick);
             action.cachedPath = action.cachedPath!.slice(1);
-            log.info(
+            log.debug(
                 `${entity.id} displaced chain, stepped to (${entity.worldPosition.x},${entity.worldPosition.y})`,
             );
             if (
@@ -486,6 +485,6 @@ function resolveDisplacedTile(
 
     // Stale transaction: world changed between negotiation and commit.
     // Keep the cached path — this is a timing issue, not proof of impassability.
-    log.info(`${entity.id} displacement transaction stale, waiting`);
+    log.debug(`${entity.id} displacement transaction stale, waiting`);
     return { kind: "result", value: ActionRunning };
 }

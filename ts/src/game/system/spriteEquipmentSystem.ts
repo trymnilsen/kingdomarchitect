@@ -5,7 +5,7 @@ import {
 import { characterPartFrames } from "../../../generated/characterFrames.ts";
 import { getAllAnimations } from "../../characterbuilder/animation/getAllAnimations.ts";
 import type { CharacterAnimation } from "../../characterbuilder/characterAnimation.ts";
-import { createLogger } from "../../common/logging/logger.ts";
+import { log } from "../../common/logging/logger.ts";
 import {
     getCharacterColors,
     type CharacterColors,
@@ -29,8 +29,6 @@ import type {
     ComponentsUpdatedEvent,
     EntityChildrenUpdatedEvent,
 } from "../entity/entityEvent.ts";
-
-const log = createLogger("equipment");
 
 export function createSpriteEquipmentSystem(
     createOffscreenCanvas: OffscreenCanvasFactory,

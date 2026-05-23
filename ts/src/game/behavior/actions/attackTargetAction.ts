@@ -1,11 +1,10 @@
 import { isPointAdjacentTo } from "../../../common/point.ts";
-import { createLogger } from "../../../common/logging/logger.ts";
+import { log } from "../../../common/logging/logger.ts";
 import {
     damageEntity,
     HealthComponentId,
 } from "../../component/healthComponent.ts";
 
-const log = createLogger("behavior");
 import type { Entity } from "../../entity/entity.ts";
 import { ActionComplete, ActionRunning, type ActionResult } from "./Action.ts";
 import {

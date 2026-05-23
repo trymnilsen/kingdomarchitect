@@ -18,9 +18,7 @@ import { WorkplaceComponentId } from "../../../../component/workplaceComponent.t
 import { ChangeOccupationCommand } from "../../../../../server/message/command/changeOccupationCommand.ts";
 import { BehaviorAgentComponentId } from "../../../../component/BehaviorAgentComponent.ts";
 import { SetPlayerCommand } from "../../../../../server/message/command/setPlayerCommand.ts";
-import { createLogger } from "../../../../../common/logging/logger.ts";
-
-const log = createLogger("interaction");
+import { log } from "../../../../../common/logging/logger.ts";
 
 type ScaffoldButton = {
     text: string;

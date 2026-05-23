@@ -1,5 +1,5 @@
 import { isPointAdjacentTo } from "../../../common/point.ts";
-import { createLogger } from "../../../common/logging/logger.ts";
+import { log } from "../../../common/logging/logger.ts";
 import {
     getResourceById,
     isClearableObstacle,
@@ -10,8 +10,6 @@ import { ResourceComponentId } from "../../component/resourceComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { dropItemAtPosition, DropMode } from "../dropItem.ts";
 import { ActionComplete, ActionRunning, type ActionResult } from "./Action.ts";
-
-const log = createLogger("behavior");
 
 /**
  * Remove a resource that is blocking a path. Unlike harvestResource this never

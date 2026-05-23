@@ -16,9 +16,7 @@ export type TakeFromInventoryActionData = {
     sourceEntityId: string;
     items: ItemTransfer[];
 };
-import { createLogger } from "../../../common/logging/logger.ts";
-
-const log = createLogger("behavior");
+import { log } from "../../../common/logging/logger.ts";
 
 /**
  * Take specific items from a source entity's inventory and add to worker's inventory.

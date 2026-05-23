@@ -1,4 +1,4 @@
-import { createLogger } from "../../../common/logging/logger.ts";
+import { log } from "../../../common/logging/logger.ts";
 import { isPointAdjacentTo } from "../../../common/point.ts";
 import { findFoodInInventory } from "../../../data/inventory/inventoryItemHelpers.ts";
 import {
@@ -17,8 +17,6 @@ export type StealFoodActionData = {
     type: "stealFood";
     targetEntityId: string;
 };
-
-const log = createLogger("behavior");
 
 export function executeStealFoodAction(
     action: StealFoodActionData,

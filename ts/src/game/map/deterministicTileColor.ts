@@ -1,6 +1,4 @@
-import { createLogger } from "../../common/logging/logger.ts";
-
-const log = createLogger("map");
+import { log } from "../../common/logging/logger.ts";
 
 /**
  * Defines the structure for an RGB color.

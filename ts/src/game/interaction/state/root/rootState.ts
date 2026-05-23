@@ -10,9 +10,7 @@ import { InteractionState } from "../../handler/interactionState.ts";
 import { uiScaffold } from "../../view/uiScaffold.ts";
 import { AlertMessageState } from "../common/alertMessageState.ts";
 import { MenuState } from "../menu/menuState.ts";
-import { createLogger } from "../../../../common/logging/logger.ts";
-
-const log = createLogger("interaction");
+import { log } from "../../../../common/logging/logger.ts";
 
 export class RootState extends InteractionState {
     override getFocusGroups(): FocusGroup[] {
@@ -63,7 +61,7 @@ export class RootState extends InteractionState {
     }
 
     override onTileTap(tile: GroundTile): boolean {
-        log.info("RootState tap", { tile });
+        log.debug("RootState tap", { tile });
         return false;
     }
 }

@@ -1,8 +1,7 @@
 import { isPointAdjacentTo, pointEquals } from "../../../common/point.ts";
-import { createLogger } from "../../../common/logging/logger.ts";
+import { log } from "../../../common/logging/logger.ts";
 import { BuildingComponentId } from "../../component/buildingComponent.ts";
 
-const log = createLogger("behavior");
 import { heal, HealthComponentId } from "../../component/healthComponent.ts";
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import type { Entity } from "../../entity/entity.ts";

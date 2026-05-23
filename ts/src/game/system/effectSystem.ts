@@ -1,5 +1,5 @@
 import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
-import { createLogger } from "../../common/logging/logger.ts";
+import { log } from "../../common/logging/logger.ts";
 import type { Entity } from "../entity/entity.ts";
 import {
     ActiveEffectsComponentId,
@@ -11,8 +11,6 @@ import {
     StatsComponentId,
     markStatsDirty,
 } from "../component/statsComponent.ts";
-
-const log = createLogger("effect");
 
 export function createEffectSystem(
     executors: ReadonlyMap<string, EffectExecutor>,

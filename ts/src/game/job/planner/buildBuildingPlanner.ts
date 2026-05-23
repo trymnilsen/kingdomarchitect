@@ -23,9 +23,7 @@ import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import { suspendJobInQueue } from "../jobLifecycle.ts";
 import { getSettlementEntity } from "../../entity/settlementQueries.ts";
 import { findDropPosition } from "../../behavior/dropItem.ts";
-import { createLogger } from "../../../common/logging/logger.ts";
-
-const log = createLogger("job");
+import { log } from "../../../common/logging/logger.ts";
 
 function suspendJob(worker: Entity, job: BuildBuildingJob): void {
     const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
@@ -178,7 +176,7 @@ export function planBuildBuilding(
                 ];
             }
         }
-        log.info("Missing materials for building", {
+        log.debug("Missing materials for building", {
             building: buildingComponent.building.name,
             missing: materialCheck.missing.join(", "),
         });

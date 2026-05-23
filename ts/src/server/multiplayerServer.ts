@@ -15,11 +15,9 @@ import { validateSession, parseCookies } from "./auth/session.ts";
 import { createRateLimiter } from "./http/rateLimit.ts";
 import { serveStaticFile } from "./http/staticFiles.ts";
 import type { GameMessage } from "./message/gameMessage.ts";
-import { createRootLogger, createLogger } from "../common/logging/logger.ts";
+import { setupLogger, log } from "../common/logging/logger.ts";
 
-createRootLogger();
-
-const log = createLogger("server");
+setupLogger();
 
 export type MultiplayerServerConfig = {
     port: number;

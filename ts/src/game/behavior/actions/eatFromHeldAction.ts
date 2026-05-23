@@ -1,4 +1,4 @@
-import { createLogger } from "../../../common/logging/logger.ts";
+import { log } from "../../../common/logging/logger.ts";
 import { ItemTag } from "../../../data/inventory/inventoryItem.ts";
 import {
     HeldItemComponentId,
@@ -16,7 +16,6 @@ export type EatFromHeldActionData = {
 };
 
 const HUNGER_REDUCTION = 30;
-const log = createLogger("behavior");
 
 export function executeEatFromHeldAction(
     _action: EatFromHeldActionData,

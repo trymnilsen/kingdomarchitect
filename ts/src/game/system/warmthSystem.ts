@@ -1,5 +1,5 @@
 import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
-import { createLogger } from "../../common/logging/logger.ts";
+import { log } from "../../common/logging/logger.ts";
 import type { Entity } from "../entity/entity.ts";
 import type { Point } from "../../common/point.ts";
 import {
@@ -9,8 +9,6 @@ import {
 } from "../component/warmthComponent.ts";
 import { FireSourceComponentId } from "../component/fireSourceComponent.ts";
 import { requestReplan } from "../component/BehaviorAgentComponent.ts";
-
-const log = createLogger("warmth");
 
 export const WARMTH_DECAY_TICK_INTERVAL = 10;
 

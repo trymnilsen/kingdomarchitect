@@ -7,10 +7,8 @@ import {
 import type { Behavior } from "../behaviors/Behavior.ts";
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import { executeAction } from "../actions/ActionExecutor.ts";
-import { createLogger } from "../../../common/logging/logger.ts";
+import { log } from "../../../common/logging/logger.ts";
 import type { BehaviorActionData } from "../actions/ActionData.ts";
-
-const log = createLogger("behavior");
 
 /**
  * Reconciles a freshly expanded action queue against the currently running
@@ -78,7 +76,7 @@ function updateBehaviorAgent(
     tick: number,
 ): void {
     if (agent.pendingReplan !== undefined) {
-        log.info(`Entity ${entity.id} replanning`);
+        log.debug(`Entity ${entity.id} replanning`);
         replan(entity, agent, resolver);
     }
 
@@ -100,7 +98,7 @@ function updateBehaviorAgent(
             log.info(`Entity ${entity.id} completed action "${action.type}"`);
             agent.actionQueue.shift();
             if (agent.actionQueue.length === 0) {
-                log.info(`Entity ${entity.id} actionQueue empty`);
+                log.debug(`Entity ${entity.id} actionQueue empty`);
                 agent.pendingReplan = { kind: "replan" };
             }
         } else if (result.kind === "failed") {
@@ -249,23 +247,37 @@ function replan(
     // Sort by utility (highest first)
     behaviorUtilities.sort((a, b) => b.utility - a.utility);
 
-    log.info(`Entity ${entity.id} sorted behaviors`, {
+    log.debug(`Entity ${entity.id} sorted behaviors`, {
         behaviors: JSON.stringify(behaviorUtilities),
     });
     const bestBehavior = behaviorUtilities[0];
 
     const sameBehavior = currentBehavior?.name === bestBehavior.behavior.name;
-    agent.currentBehaviorName = bestBehavior.behavior.name;
-    agent.currentBehaviorUtility = bestBehavior.utility;
     if (!sameBehavior) {
         agent.currentJobName = null;
     }
     // pendingReplan is still set here so behaviors can read failure context
     // from the component inside expand()
     const newActions = bestBehavior.behavior.expand(entity);
+
+    // Behavior produced no actions — nothing to run this round. Treat the worker as
+    // idle: clear all behavior/display state so it never shows a behavior name (e.g.
+    // "performJob") with no job or action context. This also empties the action queue
+    // (a stale queue would otherwise execute next tick against work that is gone).
+    if (newActions.length === 0) {
+        clearBehavior(agent);
+        agent.pendingReplan = undefined;
+        log.info(
+            `Entity ${entity.id} behavior ${bestBehavior.behavior.name} expanded to empty — idle`,
+        );
+        return;
+    }
+
+    agent.currentBehaviorName = bestBehavior.behavior.name;
+    agent.currentBehaviorUtility = bestBehavior.utility;
     if (sameBehavior) {
         agent.actionQueue = reconcileQueue(agent.actionQueue, newActions);
-        log.info(
+        log.debug(
             `Entity ${entity.id} reconciled queue for behavior ${bestBehavior.behavior.name}`,
         );
     } else {

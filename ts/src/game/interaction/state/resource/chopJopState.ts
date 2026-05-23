@@ -6,9 +6,7 @@ import { InteractionState } from "../../handler/interactionState.ts";
 import { SelectionMode } from "../../selection/selectionMode.ts";
 import { SingleSelectionMode } from "../../selection/singleSelectionMode.ts";
 import { AlertMessageState } from "../common/alertMessageState.ts";
-import { createLogger } from "../../../../common/logging/logger.ts";
-
-const log = createLogger("interaction");
+import { log } from "../../../../common/logging/logger.ts";
 
 export class ChopJobState extends InteractionState {
     private chopMode: SelectionMode;

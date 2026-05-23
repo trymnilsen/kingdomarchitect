@@ -1,4 +1,4 @@
-import { createLogger } from "../../../common/logging/logger.ts";
+import { log } from "../../../common/logging/logger.ts";
 import { isPointAdjacentTo } from "../../../common/point.ts";
 import {
     CollectableComponentId,
@@ -28,8 +28,6 @@ export type PickupFromGroundActionData = {
     type: "pickupFromGround";
     pileEntityId: string;
 };
-
-const log = createLogger("behavior");
 
 export function executePickupFromGroundAction(
     action: PickupFromGroundActionData,

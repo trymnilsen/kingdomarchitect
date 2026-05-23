@@ -1,8 +1,7 @@
-import { createLogger, createRootLogger } from "../common/logging/logger.ts";
+import { setupLogger, log } from "../common/logging/logger.ts";
 import { CharacterBuilder } from "./builder.ts";
 
-createRootLogger();
-const log = createLogger("characterbuilder");
+setupLogger();
 
 /**
  * Bootstrap function for the character builder application

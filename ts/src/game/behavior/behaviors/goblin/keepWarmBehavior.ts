@@ -7,9 +7,7 @@ import { FireSourceComponentId } from "../../../component/fireSourceComponent.ts
 import { BuildingComponentId } from "../../../component/buildingComponent.ts";
 import { planGoblinBuild } from "../../planners/goblinBuildPlanner.ts";
 import { goblinCampfire } from "../../../../data/building/goblin/goblinCampfire.ts";
-import { createLogger } from "../../../../common/logging/logger.ts";
-
-const log = createLogger("behavior");
+import { log } from "../../../../common/logging/logger.ts";
 
 /**
  * KeepWarmBehavior - highest priority goblin survival behavior.

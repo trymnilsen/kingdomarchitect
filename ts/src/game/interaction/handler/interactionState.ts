@@ -13,9 +13,7 @@ import { FocusGroup } from "../../../ui/focus/focusGroup.ts";
 import { RenderScope } from "../../../rendering/renderScope.ts";
 import { InteractionStateChanger } from "./interactionStateChanger.ts";
 import { StateContext } from "./stateContext.ts";
-import { createLogger } from "../../../common/logging/logger.ts";
-
-const log = createLogger("interaction");
+import { log } from "../../../common/logging/logger.ts";
 
 /**
  * Interaction is built up as a simple state machine. Each state can via the

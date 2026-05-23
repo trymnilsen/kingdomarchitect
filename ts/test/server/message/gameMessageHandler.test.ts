@@ -41,7 +41,6 @@ describe("gameMessageHandler", () => {
     describe("WorldStateGameMessage", () => {
         it("creates TileComponent if missing", () => {
             const root = new Entity("root");
-            const camera = createTestCamera();
 
             const message: WorldStateGameMessage = {
                 type: WorldStateMessageType,
@@ -55,7 +54,7 @@ describe("gameMessageHandler", () => {
                 "Should not have TileComponent initially",
             );
 
-            handleGameMessage(root, camera, message);
+            handleGameMessage(root, message);
 
             assert.ok(
                 root.getEcsComponent(TileComponentId),
@@ -65,7 +64,6 @@ describe("gameMessageHandler", () => {
 
         it("creates VisibilityMapComponent if missing", () => {
             const root = new Entity("root");
-            const camera = createTestCamera();
 
             const message: WorldStateGameMessage = {
                 type: WorldStateMessageType,
@@ -79,7 +77,7 @@ describe("gameMessageHandler", () => {
                 "Should not have VisibilityMapComponent initially",
             );
 
-            handleGameMessage(root, camera, message);
+            handleGameMessage(root, message);
 
             assert.ok(
                 root.getEcsComponent(VisibilityMapComponentId),
@@ -89,7 +87,6 @@ describe("gameMessageHandler", () => {
 
         it("applies discovered tiles and volumes", () => {
             const root = new Entity("root");
-            const camera = createTestCamera();
 
             const volume = createTestVolume("vol1");
 
@@ -103,7 +100,7 @@ describe("gameMessageHandler", () => {
                 volumes: [volume],
             };
 
-            handleGameMessage(root, camera, message);
+            handleGameMessage(root, message);
 
             const tileComponent = root.getEcsComponent(TileComponentId);
             assert.ok(tileComponent);
@@ -120,7 +117,6 @@ describe("gameMessageHandler", () => {
 
         it("creates entities from rootChildren", () => {
             const root = new Entity("root");
-            const camera = createTestCamera();
 
             const message: WorldStateGameMessage = {
                 type: WorldStateMessageType,
@@ -140,7 +136,7 @@ describe("gameMessageHandler", () => {
                 volumes: [],
             };
 
-            handleGameMessage(root, camera, message);
+            handleGameMessage(root, message);
 
             assert.strictEqual(root.children.length, 2);
 
@@ -155,7 +151,6 @@ describe("gameMessageHandler", () => {
 
         it("creates entity hierarchy with nested children", () => {
             const root = new Entity("root");
-            const camera = createTestCamera();
 
             const message: WorldStateGameMessage = {
                 type: WorldStateMessageType,
@@ -184,7 +179,7 @@ describe("gameMessageHandler", () => {
                 volumes: [],
             };
 
-            handleGameMessage(root, camera, message);
+            handleGameMessage(root, message);
 
             const parent = root.findEntity("parent");
             const child = root.findEntity("child");
@@ -202,7 +197,6 @@ describe("gameMessageHandler", () => {
 
         it("adds components to created entities", () => {
             const root = new Entity("root");
-            const camera = createTestCamera();
 
             const healthComponent = createHealthComponent(50, 100);
 
@@ -219,7 +213,7 @@ describe("gameMessageHandler", () => {
                 volumes: [],
             };
 
-            handleGameMessage(root, camera, message);
+            handleGameMessage(root, message);
 
             const entity = root.findEntity("entity1");
             assert.ok(entity);
@@ -234,7 +228,6 @@ describe("gameMessageHandler", () => {
     describe("AddEntityGameMessage", () => {
         it("creates entity with specified ID", () => {
             const root = new Entity("root");
-            const camera = createTestCamera();
 
             const message: AddEntityGameMessage = {
                 type: AddEntityGameMessageType,
@@ -243,7 +236,7 @@ describe("gameMessageHandler", () => {
                 components: [],
             };
 
-            handleGameMessage(root, camera, message);
+            handleGameMessage(root, message);
 
             const entity = root.findEntity("newEntity");
             assert.ok(entity, "Should create entity");
@@ -252,7 +245,6 @@ describe("gameMessageHandler", () => {
 
         it("creates entity as child of specified parent", () => {
             const root = new Entity("root");
-            const camera = createTestCamera();
 
             const parent = new Entity("parent");
             root.addChild(parent);
@@ -265,7 +257,7 @@ describe("gameMessageHandler", () => {
                 components: [],
             };
 
-            handleGameMessage(root, camera, message);
+            handleGameMessage(root, message);
 
             const child = root.findEntity("child");
             assert.ok(child);
@@ -275,7 +267,6 @@ describe("gameMessageHandler", () => {
 
         it("creates entity hierarchy with children", () => {
             const root = new Entity("root");
-            const camera = createTestCamera();
 
             const message: AddEntityGameMessage = {
                 type: AddEntityGameMessageType,
@@ -296,7 +287,7 @@ describe("gameMessageHandler", () => {
                 ],
             };
 
-            handleGameMessage(root, camera, message);
+            handleGameMessage(root, message);
 
             const parent = root.findEntity("parent");
             assert.ok(parent);
@@ -310,7 +301,6 @@ describe("gameMessageHandler", () => {
 
         it("merges server data when entity already exists", () => {
             const root = new Entity("root");
-            const camera = createTestCamera();
 
             // Client creates entity first
             const existingEntity = new Entity("entity1");
@@ -327,7 +317,7 @@ describe("gameMessageHandler", () => {
                 components: [serverComponent],
             };
 
-            handleGameMessage(root, camera, message);
+            handleGameMessage(root, message);
 
             // Should not create duplicate
             assert.strictEqual(root.children.length, 1);
@@ -348,7 +338,6 @@ describe("gameMessageHandler", () => {
     describe("RemoveEntityGameMessage", () => {
         it("removes entity from tree", () => {
             const root = new Entity("root");
-            const camera = createTestCamera();
 
             const entity = new Entity("toRemove");
             root.addChild(entity);
@@ -360,7 +349,7 @@ describe("gameMessageHandler", () => {
                 entity: "toRemove",
             };
 
-            handleGameMessage(root, camera, message);
+            handleGameMessage(root, message);
 
             assert.strictEqual(root.children.length, 0);
             assert.ok(!root.findEntity("toRemove"));
@@ -368,7 +357,6 @@ describe("gameMessageHandler", () => {
 
         it("handles removal of non-existent entity gracefully", () => {
             const root = new Entity("root");
-            const camera = createTestCamera();
 
             const message: RemoveEntityGameMessage = {
                 type: RemoveEntityGameMessageType,
@@ -376,12 +364,11 @@ describe("gameMessageHandler", () => {
             };
 
             // Should not throw
-            handleGameMessage(root, camera, message);
+            handleGameMessage(root, message);
         });
 
         it("removes entity from nested hierarchy", () => {
             const root = new Entity("root");
-            const camera = createTestCamera();
 
             const parent = new Entity("parent");
             const child = new Entity("child");
@@ -393,7 +380,7 @@ describe("gameMessageHandler", () => {
                 entity: "child",
             };
 
-            handleGameMessage(root, camera, message);
+            handleGameMessage(root, message);
 
             assert.strictEqual(parent.children.length, 0);
             assert.ok(!root.findEntity("child"));
@@ -404,7 +391,6 @@ describe("gameMessageHandler", () => {
     describe("SetComponentGameMessage", () => {
         it("updates component on entity", () => {
             const root = new Entity("root");
-            const camera = createTestCamera();
 
             const entity = new Entity("entity1");
             entity.setEcsComponent(createHealthComponent(50, 100));
@@ -416,7 +402,7 @@ describe("gameMessageHandler", () => {
                 component: createHealthComponent(75, 100),
             };
 
-            handleGameMessage(root, camera, message);
+            handleGameMessage(root, message);
 
             const component = entity.getEcsComponent(HealthComponentId);
             assert.ok(component);
@@ -425,7 +411,6 @@ describe("gameMessageHandler", () => {
 
         it("handles set component on non-existent entity gracefully", () => {
             const root = new Entity("root");
-            const camera = createTestCamera();
 
             const message: SetComponentGameMessage = {
                 type: SetComponentGameMessageType,
@@ -434,12 +419,11 @@ describe("gameMessageHandler", () => {
             };
 
             // Should not throw
-            handleGameMessage(root, camera, message);
+            handleGameMessage(root, message);
         });
 
         it("adds new component if not present", () => {
             const root = new Entity("root");
-            const camera = createTestCamera();
 
             const entity = new Entity("entity1");
             root.addChild(entity);
@@ -450,7 +434,7 @@ describe("gameMessageHandler", () => {
                 component: createHealthComponent(42, 100),
             };
 
-            handleGameMessage(root, camera, message);
+            handleGameMessage(root, message);
 
             const component = entity.getEcsComponent(HealthComponentId);
             assert.ok(component);
@@ -461,7 +445,6 @@ describe("gameMessageHandler", () => {
     describe("TransformGameMessage", () => {
         it("updates entity position", () => {
             const root = new Entity("root");
-            const camera = createTestCamera();
 
             const entity = new Entity("entity1");
             entity.worldPosition = { x: 0, y: 0 };
@@ -474,14 +457,13 @@ describe("gameMessageHandler", () => {
                 oldPosition: { x: 0, y: 0 },
             };
 
-            handleGameMessage(root, camera, message);
+            handleGameMessage(root, message);
 
             assert.deepStrictEqual(entity.worldPosition, { x: 500, y: 300 });
         });
 
         it("handles transform on non-existent entity gracefully", () => {
             const root = new Entity("root");
-            const camera = createTestCamera();
 
             const message: TransformGameMessage = {
                 type: TransformGameMessageType,
@@ -491,12 +473,11 @@ describe("gameMessageHandler", () => {
             };
 
             // Should not throw
-            handleGameMessage(root, camera, message);
+            handleGameMessage(root, message);
         });
 
         it("updates nested entity position", () => {
             const root = new Entity("root");
-            const camera = createTestCamera();
 
             const parent = new Entity("parent");
             const child = new Entity("child");
@@ -510,7 +491,7 @@ describe("gameMessageHandler", () => {
                 oldPosition: { x: 0, y: 0 },
             };
 
-            handleGameMessage(root, camera, message);
+            handleGameMessage(root, message);
 
             assert.deepStrictEqual(child.worldPosition, { x: 200, y: 150 });
         });

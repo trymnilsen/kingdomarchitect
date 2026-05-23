@@ -4,9 +4,8 @@ import type {
     BehaviorActionData,
     BehaviorActionExecutor,
 } from "./ActionData.ts";
-import { createLogger } from "../../../common/logging/logger.ts";
+import { log } from "../../../common/logging/logger.ts";
 
-const log = createLogger("behavior");
 import { executeWaitAction } from "./waitAction.ts";
 import { executeMoveToAction } from "./moveToAction.ts";
 import { executeClearPlayerCommandAction } from "./clearPlayerCommandAction.ts";

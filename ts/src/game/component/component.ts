@@ -42,6 +42,7 @@ import type { DespawnTimerComponent } from "./despawnTimerComponent.ts";
 import type { ImmortalComponent } from "./immortalComponent.ts";
 import type { HeldItemComponent } from "./heldItemComponent.ts";
 import type { GroundItemComponent } from "./groundItemComponent.ts";
+import type { TraversalComponent } from "./traversalComponent.ts";
 
 export type Components =
     | SpriteComponent
@@ -87,7 +88,8 @@ export type Components =
     | DespawnTimerComponent
     | ImmortalComponent
     | HeldItemComponent
-    | GroundItemComponent;
+    | GroundItemComponent
+    | TraversalComponent;
 
 export interface BaseComponent {
     id: string;

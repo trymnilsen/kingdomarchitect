@@ -1,7 +1,6 @@
-import { createLogger } from "../../common/logging/logger.ts";
+import { log } from "../../common/logging/logger.ts";
 import { makeNumberId, pointEquals } from "../../common/point.ts";
 
-const log = createLogger("server");
 import {
     setChunk,
     type TileComponent,

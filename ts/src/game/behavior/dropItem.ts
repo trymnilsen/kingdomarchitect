@@ -1,5 +1,5 @@
 import { adjacentPoints, pointEquals, type Point } from "../../common/point.ts";
-import { createLogger } from "../../common/logging/logger.ts";
+import { log } from "../../common/logging/logger.ts";
 import type { InventoryItem } from "../../data/inventory/inventoryItem.ts";
 import {
     addCollectableItem,
@@ -13,8 +13,6 @@ import { findClosestAvailablePosition } from "../map/query/closestPositionQuery.
 import { queryEntity } from "../map/query/queryEntity.ts";
 import { getWeightAtPoint } from "../map/path/graph/weight.ts";
 import { collectableItemPrefab } from "../prefab/collectableItemPrefab.ts";
-
-const log = createLogger("dropItem");
 
 /**
  * Maximum Manhattan radius the drop search will scan from the worker's

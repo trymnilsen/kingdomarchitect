@@ -1,5 +1,5 @@
 import { isPointAdjacentTo } from "../../../common/point.ts";
-import { createLogger } from "../../../common/logging/logger.ts";
+import { log } from "../../../common/logging/logger.ts";
 import {
     CollectableComponentId,
     removeCollectableItems,
@@ -11,7 +11,6 @@ import {
     completeJobFromQueue,
 } from "../../job/jobLifecycle.ts";
 
-const log = createLogger("behavior");
 import {
     addToHeldItem,
     HeldItemComponentId,

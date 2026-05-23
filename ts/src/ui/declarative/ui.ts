@@ -1,4 +1,4 @@
-import { createLogger } from "../../common/logging/logger.ts";
+import { log } from "../../common/logging/logger.ts";
 import { nameof } from "../../common/nameof.ts";
 import { addPoint, zeroPoint, type Point } from "../../common/point.ts";
 import type { RenderScope } from "../../rendering/renderScope.ts";
@@ -6,8 +6,6 @@ import type { TextStyle } from "../../rendering/text/textStyle.ts";
 import { fillUiSize, zeroSize } from "../uiSize.ts";
 import { pointerChainAt } from "./pointerChain.ts";
 import { PointerTracker, type PointerFlags } from "./pointerTracker.ts";
-
-const log = createLogger("ui");
 
 export type UISize = { width: number; height: number };
 export type Rectangle = { x: number; y: number; width: number; height: number };
@@ -195,7 +193,7 @@ export class UiRenderer {
 
         // If we created a new root node (different key or type), clean up the old tree
         if (oldTree && oldTree !== this.currentTree) {
-            log.info("Root node changed, cleaning up old tree");
+            log.debug("Root node changed, cleaning up old tree");
             this._cleanupNode(oldTree);
         }
 

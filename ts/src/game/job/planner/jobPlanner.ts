@@ -15,9 +15,7 @@ import { planProduction } from "./productionPlanner.ts";
 import { planFarmPlant } from "./farmPlantJobPlanner.ts";
 import { planFarmHarvest } from "./farmHarvestJobPlanner.ts";
 import { planWindmill } from "./windmillPlanner.ts";
-import { createLogger } from "../../../common/logging/logger.ts";
-
-const log = createLogger("job");
+import { log } from "../../../common/logging/logger.ts";
 
 /**
  * Function signature for planning build jobs. Injected to allow different

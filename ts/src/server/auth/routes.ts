@@ -1,8 +1,7 @@
-import { createLogger } from "../../common/logging/logger.ts";
+import { log } from "../../common/logging/logger.ts";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { DatabaseSync } from "node:sqlite";
 
-const log = createLogger("server");
 import type {
     RegistrationResponseJSON,
     AuthenticationResponseJSON,

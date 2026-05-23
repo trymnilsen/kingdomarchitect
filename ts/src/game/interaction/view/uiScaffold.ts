@@ -15,9 +15,7 @@ import { uiText } from "../../../ui/declarative/uiText.ts";
 import { ninePatchBackground } from "../../../ui/uiBackground.ts";
 import { wrapUiSize, zeroSize, type UISize } from "../../../ui/uiSize.ts";
 import { actionbarTextStyle } from "../../../rendering/text/textStyle.ts";
-import { createLogger } from "../../../common/logging/logger.ts";
-
-const log = createLogger("ui");
+import { log } from "../../../common/logging/logger.ts";
 
 type UiButtonProps = {
     text: string;
@@ -31,7 +29,7 @@ const uiMenuButton = createComponent<UiButtonProps>(
     ({ props, withPointerTap }) => {
         if (props.onClick || props.onExpand) {
             withPointerTap(() => {
-                log.info("Menu button tapped", { text: props.text });
+                log.debug("Menu button tapped", { text: props.text });
                 if (props.hasChildren && props.onExpand) {
                     props.onExpand();
                 } else if (props.onClick) {

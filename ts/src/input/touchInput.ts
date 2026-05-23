@@ -1,7 +1,5 @@
-import { createLogger } from "../common/logging/logger.ts";
+import { log } from "../common/logging/logger.ts";
 import { distance, Point, subtractPoint } from "../common/point.ts";
-
-const log = createLogger("input");
 
 export type OnPanEvent = {
     movement: Point;

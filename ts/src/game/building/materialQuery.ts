@@ -17,9 +17,7 @@ import {
     type StockpileComponent,
 } from "../component/stockpileComponent.ts";
 import type { Entity } from "../entity/entity.ts";
-import { createLogger } from "../../common/logging/logger.ts";
-
-const log = createLogger("building");
+import { log } from "../../common/logging/logger.ts";
 
 export type MaterialSource = {
     entity: Entity;
@@ -292,14 +290,14 @@ export function logMissingMaterials(
         return;
     }
 
-    log.info("Cannot construct building - missing materials", {
+    log.debug("Cannot construct building - missing materials", {
         building: buildingName,
     });
     for (const req of missingMaterials) {
         const totalAvailable =
             req.amountInWorkerInventory + req.amountInStockpiles;
         const deficit = req.amountNeeded - totalAvailable;
-        log.info("Missing material", {
+        log.debug("Missing material", {
             item: req.item.name,
             needed: req.amountNeeded,
             available: totalAvailable,

@@ -1,5 +1,5 @@
 import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
-import { createLogger } from "../../common/logging/logger.ts";
+import { log } from "../../common/logging/logger.ts";
 import { getBuildingById } from "../../data/building/buildings.ts";
 import { itemEffectFactoryList } from "../../data/inventory/itemEffectFactoryList.ts";
 import {
@@ -104,8 +104,6 @@ import {
     type ClearBuildingJobsCommand,
 } from "../../server/message/command/clearBuildingJobsCommand.ts";
 import { isTargetOfJob } from "../job/job.ts";
-
-const log = createLogger("command");
 
 export function createCommandSystem(
     gameTime: GameTime,

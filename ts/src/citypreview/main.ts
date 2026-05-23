@@ -1,8 +1,7 @@
-import { createLogger, createRootLogger } from "../common/logging/logger.ts";
+import { setupLogger, log } from "../common/logging/logger.ts";
 import { CityPreview } from "./cityPreview.ts";
 
-createRootLogger();
-const log = createLogger("citypreview");
+setupLogger();
 
 async function bootstrap() {
     try {

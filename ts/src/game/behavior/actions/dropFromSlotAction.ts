@@ -1,4 +1,4 @@
-import { createLogger } from "../../../common/logging/logger.ts";
+import { log } from "../../../common/logging/logger.ts";
 import type { Point } from "../../../common/point.ts";
 import { pointEquals } from "../../../common/point.ts";
 import { EquipmentComponentId } from "../../component/equipmentComponent.ts";
@@ -18,8 +18,6 @@ export type DropFromSlotActionData = {
     slot: "primary" | "secondary";
     destination: Point;
 };
-
-const log = createLogger("behavior");
 
 export function executeDropFromSlotAction(
     action: DropFromSlotActionData,

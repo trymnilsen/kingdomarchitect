@@ -1,4 +1,4 @@
-import { createLogger } from "../../common/logging/logger.ts";
+import { log } from "../../common/logging/logger.ts";
 import { subTitleTextStyle } from "../../rendering/text/textStyle.ts";
 import {
     createComponent,
@@ -12,8 +12,6 @@ import { uiAlignment } from "../../ui/uiAlignment.ts";
 import { boxBackground } from "../../ui/uiBackground.ts";
 import { fillUiSize, wrapUiSize } from "../../ui/uiSize.ts";
 import { COLORS, LAYOUT } from "./characterBuilderConstants.ts";
-
-const log = createLogger("characterbuilder");
 
 /**
  * Creates a part selection button with selected/unselected states
@@ -179,7 +177,7 @@ export const createPartLayerBox = (onRemove?: () => void) =>
                         if (onRemove) {
                             onRemove();
                         } else {
-                            log.info("Remove layer clicked");
+                            log.debug("Remove layer clicked");
                         }
                     },
                 }),

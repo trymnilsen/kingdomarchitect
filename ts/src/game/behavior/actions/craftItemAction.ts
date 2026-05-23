@@ -1,5 +1,5 @@
 import { isPointAdjacentTo } from "../../../common/point.ts";
-import { createLogger } from "../../../common/logging/logger.ts";
+import { log } from "../../../common/logging/logger.ts";
 import {
     InventoryComponentId,
     takeInventoryItem,
@@ -11,7 +11,6 @@ import {
 } from "../../component/heldItemComponent.ts";
 import { spendEntityEnergy } from "../../component/energyComponent.ts";
 
-const log = createLogger("behavior");
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import {

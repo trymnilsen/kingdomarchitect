@@ -1,8 +1,6 @@
-import { createLogger } from "../common/logging/logger.ts";
+import { log } from "../common/logging/logger.ts";
 import { invert, multiplyPoint, Point } from "../common/point.ts";
 import { AssetLoader } from "../asset/loader/assetLoader.ts";
-
-const log = createLogger("game");
 
 import { GameTime } from "../common/time.ts";
 import { EcsWorld } from "../common/ecs/ecsWorld.ts";
@@ -62,7 +60,7 @@ export class Game {
 
         this.gameServer = serverConnection;
         this.gameServer.onMessage.listen((message) => {
-            handleGameMessage(this.ecsWorld.root, this.camera, message);
+            handleGameMessage(this.ecsWorld.root, message);
             this.ecsWorld.runGameMessage(message);
         });
         this.assetLoader = new AssetLoader();

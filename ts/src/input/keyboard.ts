@@ -1,8 +1,6 @@
-import { createLogger } from "../common/logging/logger.ts";
+import { log } from "../common/logging/logger.ts";
 import { InputAction, InputActionType } from "./inputAction.ts";
 import { Event, EventListener } from "../common/event.ts";
-
-const log = createLogger("input");
 
 export type KeyboardMap = Record<string, InputActionType>;
 

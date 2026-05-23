@@ -42,10 +42,8 @@ import {
     type InventoryItemIds,
 } from "../../../../../data/inventory/inventoryItems.ts";
 import type { InventoryItem } from "../../../../../data/inventory/inventoryItem.ts";
-import { createLogger } from "../../../../../common/logging/logger.ts";
+import { log } from "../../../../../common/logging/logger.ts";
 import { ItemSourceState } from "../../itemsource/itemSourceState.ts";
-
-const log = createLogger("interaction");
 
 // Declarative UI building components
 const bookTextStyle = {

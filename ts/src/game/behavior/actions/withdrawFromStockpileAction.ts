@@ -1,4 +1,4 @@
-import { createLogger } from "../../../common/logging/logger.ts";
+import { log } from "../../../common/logging/logger.ts";
 import {
     InventoryComponentId,
     takeInventoryItem,
@@ -18,8 +18,6 @@ export type WithdrawFromStockpileActionData = {
     itemId: string;
     amount: number;
 };
-
-const log = createLogger("behavior");
 
 /**
  * Withdraw a single item type from a stockpile into the worker's held

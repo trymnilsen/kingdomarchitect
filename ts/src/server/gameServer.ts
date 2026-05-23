@@ -1,4 +1,4 @@
-import { createLogger } from "../common/logging/logger.ts";
+import { log } from "../common/logging/logger.ts";
 import { createWorldDiscoveryComponent } from "../game/component/worldDiscoveryComponent.ts";
 import { GameTime } from "../game/gameTime.ts";
 import { chunkMapSystem } from "../game/system/chunkMapSystem.ts";
@@ -44,8 +44,6 @@ import {
     resetIdCounters,
     setIdCounters,
 } from "../common/idGenerator.ts";
-
-const log = createLogger("persistence");
 
 export class GameServer {
     private world: EcsWorld;

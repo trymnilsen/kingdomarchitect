@@ -33,9 +33,7 @@ import {
     getRarityName,
 } from "../building/buildingQuality.ts";
 import { getSettlementEntity } from "../entity/settlementQueries.ts";
-import { createLogger } from "../../common/logging/logger.ts";
-
-const log = createLogger("job");
+import { log } from "../../common/logging/logger.ts";
 
 export interface BuildBuildingJob extends Job {
     id: typeof BuildBuildingJobId;

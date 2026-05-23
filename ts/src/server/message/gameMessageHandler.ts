@@ -1,8 +1,7 @@
-import { createLogger } from "../../common/logging/logger.ts";
+import { log } from "../../common/logging/logger.ts";
 import { Entity } from "../../game/entity/entity.ts";
 import type { Camera } from "../../rendering/camera.ts";
 
-const log = createLogger("server");
 import {
     createTileComponent,
     TileComponentId,
@@ -33,11 +32,7 @@ import {
     WorldStateMessageType,
 } from "./gameMessage.ts";
 
-export function handleGameMessage(
-    root: Entity,
-    _camera: Camera,
-    message: GameMessage,
-) {
+export function handleGameMessage(root: Entity, message: GameMessage) {
     log.debug("Message from server", { message });
     switch (message.type) {
         case WorldStateMessageType:

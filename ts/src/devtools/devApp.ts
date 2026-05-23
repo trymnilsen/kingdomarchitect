@@ -1,4 +1,4 @@
-import { createLogger } from "../common/logging/logger.ts";
+import { log } from "../common/logging/logger.ts";
 import { AssetLoader } from "../asset/loader/assetLoader.ts";
 import { Camera } from "../rendering/camera.ts";
 import { Renderer } from "../rendering/renderer.ts";
@@ -9,8 +9,6 @@ import { DrawMode } from "../rendering/drawMode.ts";
 import { renderSystem } from "../game/system/renderSystem.ts";
 import type { ComponentDescriptor } from "../ui/declarative/ui.ts";
 import type { Point } from "../common/point.ts";
-
-const log = createLogger("devapp");
 
 /**
  * Base class for development and preview applications.

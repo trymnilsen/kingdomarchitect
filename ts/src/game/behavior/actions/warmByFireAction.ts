@@ -8,9 +8,7 @@ import type { Point } from "../../../common/point.ts";
 import { ActionComplete, ActionRunning, type ActionResult } from "./Action.ts";
 
 export type WarmByFireActionData = { type: "warmByFire"; fireEntityId: string };
-import { createLogger } from "../../../common/logging/logger.ts";
-
-const log = createLogger("behavior");
+import { log } from "../../../common/logging/logger.ts";
 
 /**
  * Check if two points are within 1 tile of each other (8-directional adjacency).

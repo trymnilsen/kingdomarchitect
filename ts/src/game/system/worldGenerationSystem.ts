@@ -1,5 +1,5 @@
 import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
-import { createLogger } from "../../common/logging/logger.ts";
+import { log } from "../../common/logging/logger.ts";
 import {
     generateDiamondPattern,
     offsetPatternWithPoint,
@@ -31,8 +31,6 @@ import { getChunkPosition } from "../map/chunk.ts";
 import { generateChunk } from "../map/chunkGenerator.ts";
 import { addInitialPlayerChunk } from "../map/player.ts";
 import type { Volume } from "../map/volume.ts";
-
-const log = createLogger("worldgen");
 
 export const worldGenerationSystem: EcsSystem = {
     onInit,

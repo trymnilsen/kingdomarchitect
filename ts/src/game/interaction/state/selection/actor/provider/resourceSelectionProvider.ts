@@ -16,9 +16,7 @@ import {
     ResourceHarvestMode,
 } from "../../../../../../data/inventory/items/naturalResource.ts";
 import type { Entity } from "../../../../../entity/entity.ts";
-import { createLogger } from "../../../../../../common/logging/logger.ts";
-
-const log = createLogger("interaction");
+import { log } from "../../../../../../common/logging/logger.ts";
 
 export class ResourceSelectionProvider implements ActorSelectionProvider {
     provideButtons(

@@ -31,6 +31,10 @@ import {
     createFarmComponent,
     FarmComponentId,
 } from "../component/farmComponent.ts";
+import {
+    createTraversalComponent,
+    TraversalComponentId,
+} from "../component/traversalComponent.ts";
 import { baker } from "../../data/building/food/baker.ts";
 import { bakerRecipes } from "../../data/crafting/recipes/bakerRecipes.ts";
 import { HousingComponentId } from "../component/housingComponent.ts";
@@ -129,6 +133,8 @@ export function applyFunctionalComponents(
     if (building.id == farm.id) {
         entity.setEcsComponent(createFarmComponent());
         entity.invalidateComponent(FarmComponentId);
+        entity.setEcsComponent(createTraversalComponent(10));
+        entity.invalidateComponent(TraversalComponentId);
     }
     if (building.id == baker.id) {
         entity.setEcsComponent(createCraftingComponent(bakerRecipes));

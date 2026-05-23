@@ -1,12 +1,11 @@
 import { isPointAdjacentTo } from "../../../common/point.ts";
-import { createLogger } from "../../../common/logging/logger.ts";
+import { log } from "../../../common/logging/logger.ts";
 import {
     getResourceById,
     ResourceHarvestMode,
 } from "../../../data/inventory/items/naturalResource.ts";
 import { spendEntityEnergy } from "../../component/energyComponent.ts";
 
-const log = createLogger("behavior");
 import { damage, HealthComponentId } from "../../component/healthComponent.ts";
 import {
     addToHeldItem,

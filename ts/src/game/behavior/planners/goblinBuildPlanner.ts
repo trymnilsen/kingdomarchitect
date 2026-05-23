@@ -1,9 +1,8 @@
 import type { Entity } from "../../entity/entity.ts";
 import type { BehaviorActionData } from "../actions/ActionData.ts";
 import type { Building } from "../../../data/building/building.ts";
-import { createLogger } from "../../../common/logging/logger.ts";
+import { log } from "../../../common/logging/logger.ts";
 
-const log = createLogger("behavior");
 import {
     InventoryComponentId,
     getInventoryItem,

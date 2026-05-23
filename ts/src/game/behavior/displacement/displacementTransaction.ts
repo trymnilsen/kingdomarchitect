@@ -14,9 +14,7 @@ import {
 } from "../../component/movementStaminaComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { discoverAfterMovement } from "../../job/movementHelper.ts";
-import { createLogger } from "../../../common/logging/logger.ts";
-
-const log = createLogger("behavior");
+import { log } from "../../../common/logging/logger.ts";
 
 export type DisplacementMove = {
     entityId: string;
@@ -74,7 +72,7 @@ export function commitDisplacementTransaction(
         return false;
     }
 
-    log.info(
+    log.debug(
         `Resolved ${resolved.length} entities, applying as ${transaction.isCycle ? "cycle" : "chain"}`,
     );
 
@@ -192,7 +190,7 @@ function applyEntityMove(
         entity.invalidateComponent(MovementStaminaComponentId);
     }
 
-    log.info(
+    log.debug(
         `Moved ${entity.id} from (${from.x},${from.y}) to (${to.x},${to.y})${triggerReplan ? " (replan scheduled)" : ""}`,
     );
 

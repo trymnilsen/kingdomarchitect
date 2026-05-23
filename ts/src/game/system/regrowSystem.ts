@@ -1,12 +1,10 @@
 import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
-import { createLogger } from "../../common/logging/logger.ts";
+import { log } from "../../common/logging/logger.ts";
 import type { Entity } from "../entity/entity.ts";
 import { ResourceComponentId } from "../component/resourceComponent.ts";
 import { RegrowComponentId } from "../component/regrowComponent.ts";
 import { getResourceById } from "../../data/inventory/items/naturalResource.ts";
 import { SpriteComponentId } from "../component/spriteComponent.ts";
-
-const log = createLogger("regrow");
 
 export const regrowSystem = {
     onUpdate: update,

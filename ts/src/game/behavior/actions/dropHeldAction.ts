@@ -1,4 +1,4 @@
-import { createLogger } from "../../../common/logging/logger.ts";
+import { log } from "../../../common/logging/logger.ts";
 import type { Point } from "../../../common/point.ts";
 import { pointEquals } from "../../../common/point.ts";
 import {
@@ -23,8 +23,6 @@ export type DropHeldActionData = {
     type: "dropHeld";
     destination?: Point;
 };
-
-const log = createLogger("behavior");
 
 export function executeDropHeldAction(
     action: DropHeldActionData,
