@@ -28,16 +28,15 @@ type UiButtonProps = {
 };
 
 const uiMenuButton = createComponent<UiButtonProps>(
-    ({ props, withGesture }) => {
+    ({ props, withPointerTap }) => {
         if (props.onClick || props.onExpand) {
-            withGesture("tap", (_event) => {
+            withPointerTap(() => {
                 log.info("Menu button tapped", { text: props.text });
                 if (props.hasChildren && props.onExpand) {
                     props.onExpand();
                 } else if (props.onClick) {
                     props.onClick();
                 }
-                return true;
             });
         }
         return uiColumn({

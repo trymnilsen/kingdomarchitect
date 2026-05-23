@@ -65,30 +65,12 @@ export class InteractionHandler {
     }
 
     onTapDown(screenPoint: Point): boolean {
-        // Try to dispatch to the declarative UI system
-        const declarativeEvent = {
-            type: "tapDown" as const,
-            position: screenPoint,
-            timestamp: Date.now(),
-        };
-
-        const declarativeHandled =
-            this.uiRenderer.dispatchUIEvent(declarativeEvent);
+        // Press the declarative UI. Returns true when the press landed on an
+        // interactive component, i.e. the UI captured the pointer.
+        const declarativeHandled = this.uiRenderer.onPointerDown(screenPoint);
         if (declarativeHandled) {
             return true;
         }
-
-        // Old imperative system - commented out for future removal
-        // const state = this.history.state;
-        // const stateHandledTap = state.dispatchUIEvent({
-        //     type: "tapStart",
-        //     position: screenPoint,
-        // });
-        // if (!stateHandledTap && state.isModal) {
-        //     return true;
-        // } else {
-        //     return stateHandledTap;
-        // }
 
         const state = this.history.state;
         //If the tap was not handled but the state is a modal it is still
@@ -104,54 +86,15 @@ export class InteractionHandler {
     onTapUp(tapUpEvent: OnTapEndEvent): void {
         const screenPoint = tapUpEvent.position;
 
-        // Route events directly to declarative UI system
-        const declarativeUpEvent = {
-            type: "tapUp" as const,
-            position: screenPoint,
-            startPosition: tapUpEvent.startPosition,
-            timestamp: Date.now(),
-        };
-
-        const declarativeTapEvent = {
-            type: "tap" as const,
-            position: screenPoint,
-            startPosition: tapUpEvent.startPosition,
-            timestamp: Date.now(),
-        };
-
-        // Dispatch tapUp first
-        const declarativeUpHandled =
-            this.uiRenderer.dispatchUIEvent(declarativeUpEvent);
-
-        // Then dispatch tap event
-        let onTapResult = this.uiRenderer.dispatchUIEvent(declarativeTapEvent);
-
-        // Old imperative system - commented out for future removal
-        // if (!declarativeUpHandled && !onTapResult) {
-        //     const currentState = this.history.state;
-        //     currentState.dispatchUIEvent({
-        //         type: "tapUp",
-        //         position: screenPoint,
-        //         startPosition: tapUpEvent.startPosition,
-        //     });
-        //
-        //     onTapResult = currentState.dispatchUIEvent({
-        //         type: "tap",
-        //         position: screenPoint,
-        //         startPosition: tapUpEvent.startPosition,
-        //     });
-        //
-        //     const worldPosition = this.camera.screenToWorld(screenPoint);
-        //     if (!onTapResult) {
-        //         onTapResult = currentState.onTap(screenPoint, worldPosition);
-        //     }
-        // }
+        // Release the declarative UI press. This recognises a tap (firing the
+        // pressed-and-released component's handler) and clears the press.
+        let onTapResult = this.uiRenderer.onPointerUp(screenPoint);
 
         const worldPosition = this.camera.screenToWorld(screenPoint);
         const currentState = this.history.state;
 
         // If declarative UI didn't handle it, check if state can handle it
-        if (!declarativeUpHandled && !onTapResult) {
+        if (!onTapResult) {
             onTapResult = currentState.onTap(screenPoint, worldPosition);
         }
 
@@ -248,6 +191,9 @@ export class InteractionHandler {
     }
 
     onTapPan(movement: Point, position: Point, startPosition: Point): void {
+        // A drag is not a tap: cancel any in-progress UI press so a pressed
+        // component does not stay stuck while the pointer moves away.
+        this.uiRenderer.onPointerCancel();
         this.history.state.onTapPan(movement, position, startPosition);
     }
 

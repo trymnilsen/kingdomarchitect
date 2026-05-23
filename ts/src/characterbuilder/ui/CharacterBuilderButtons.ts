@@ -113,10 +113,9 @@ type GridItemProps = {
  * Grid item component for color selection
  */
 export const ColorGridItem = createComponent<GridItemProps>(
-    ({ props, withGesture }) => {
-        withGesture("tap", () => {
+    ({ props, withPointerTap }) => {
+        withPointerTap(() => {
             props.onClick(props.color);
-            return true;
         });
 
         return uiBox({

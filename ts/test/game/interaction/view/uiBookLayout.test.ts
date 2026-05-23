@@ -335,7 +335,8 @@ describe("UiBookLayout", () => {
             withDraw: (_fn: any) => {},
             withEffect: (_fn: any) => {},
             withRemember: <T>(factory: () => T) => factory(),
-            withGesture: (_eventType: any, _handler: any) => {},
+            withPointerState: () => ({ pressed: false, hovered: false }),
+            withPointerTap: (_handler: any) => {},
         };
 
         const tabLayout = tabChild.renderFn(tabContext);

@@ -68,10 +68,9 @@ type BuildingListEntry = {
 const buildingListItem = createComponent<{
     building: BuildingListEntry;
     onTap: () => void;
-}>(({ props, withGesture }) => {
-    withGesture("tap", () => {
+}>(({ props, withPointerTap }) => {
+    withPointerTap(() => {
         props.onTap();
-        return true;
     });
 
     return uiButton({

@@ -3,7 +3,7 @@ import { AssetLoader } from "../asset/loader/assetLoader.ts";
 import { Camera } from "../rendering/camera.ts";
 import { Renderer } from "../rendering/renderer.ts";
 import { Entity } from "../game/entity/entity.ts";
-import { UiRenderer, type UIEvent } from "../ui/declarative/ui.ts";
+import { UiRenderer } from "../ui/declarative/ui.ts";
 import { TouchInput } from "../input/touchInput.ts";
 import { DrawMode } from "../rendering/drawMode.ts";
 import { renderSystem } from "../game/system/renderSystem.ts";
@@ -106,33 +106,18 @@ export class DevApp {
 
     private setupInputListeners() {
         this.touchInput.onTapDown = (position: Point) => {
-            const uiEvent: UIEvent = {
-                type: "tapDown",
-                position,
-                timestamp: Date.now(),
-            };
-            const handled = this.uiRenderer.dispatchUIEvent(uiEvent);
+            const handled = this.uiRenderer.onPointerDown(position);
             this.render();
             return handled;
         };
 
         this.touchInput.onTapEnd = (tapEndEvent) => {
-            if (!tapEndEvent.wasDragging) {
-                const uiEvent: UIEvent = {
-                    type: "tap",
-                    position: tapEndEvent.position,
-                    startPosition: tapEndEvent.startPosition,
-                    timestamp: Date.now(),
-                };
-                this.uiRenderer.dispatchUIEvent(uiEvent);
+            if (tapEndEvent.wasDragging) {
+                // A drag is not a tap — drop the press without firing it.
+                this.uiRenderer.onPointerCancel();
+            } else {
+                this.uiRenderer.onPointerUp(tapEndEvent.position);
             }
-
-            const upEvent: UIEvent = {
-                type: "tapUp",
-                position: tapEndEvent.position,
-                timestamp: Date.now(),
-            };
-            this.uiRenderer.dispatchUIEvent(upEvent);
             this.render();
         };
     }

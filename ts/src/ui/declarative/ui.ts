@@ -8,32 +8,13 @@ import { addPoint, zeroPoint, type Point } from "../../common/point.ts";
 import type { RenderScope } from "../../rendering/renderScope.ts";
 import type { TextStyle } from "../../rendering/text/textStyle.ts";
 import { fillUiSize, zeroSize } from "../uiSize.ts";
+import { pointerChainAt } from "./pointerChain.ts";
+import { PointerTracker, type PointerFlags } from "./pointerTracker.ts";
 
 const log = createLogger("ui");
 
 export type UISize = { width: number; height: number };
 export type Rectangle = { x: number; y: number; width: number; height: number };
-
-// ===================================================================
-// GESTURE AND EVENT TYPES
-// ===================================================================
-
-export type UIEventType = "tap" | "tapDown" | "tapUp" | "tapCancel";
-
-export type UIEvent = {
-    type: UIEventType;
-    position: Point;
-    startPosition?: Point;
-    timestamp: number;
-};
-
-export type GestureHandler = (event: UIEvent) => boolean;
-
-export type GestureRegistration = {
-    eventType: UIEventType;
-    handler: GestureHandler;
-    hitTest?: (point: Point) => boolean;
-};
 
 const isLayoutResult = (
     value: LayoutResult | ComponentDescriptor,
@@ -105,11 +86,23 @@ export type ComponentContext<P extends {}> = {
     withDraw: (draw: (scope: RenderScope, region: Rectangle) => void) => void;
     withEffect: (effect: () => (() => void) | void, deps?: any[]) => void;
     withRemember: <T>(factory: () => T, deps?: any[]) => T;
-    withGesture: (
-        eventType: UIEventType,
-        handler: GestureHandler,
-        hitTest?: (point: Point) => boolean,
-    ) => void;
+    /**
+     * Read this component's live pointer-interaction flags ({@link PointerFlags}).
+     * Marks the component as an interactive hit-test target and returns whether
+     * it is currently pressed (and, in future, hovered). The value is derived
+     * from the renderer each render — there is no local state to keep in sync,
+     * so the component simply re-reads it on the render that follows any pointer
+     * event.
+     */
+    withPointerState: () => PointerFlags;
+    /**
+     * Register a tap action on this component. Marks the component as an
+     * interactive hit-test target; the handler fires when a press starts and
+     * ends on this same component. Pairs with {@link withPointerState} but is
+     * independent — a component may register a tap without reading state, or
+     * read state without registering a tap.
+     */
+    withPointerTap: (handler: () => void) => void;
 };
 
 type RenderFunction<P extends {}> = (
@@ -183,13 +176,17 @@ type NodeHooks = {
     states: StateHook[];
     remembers: RememberHook[];
     draw?: (scope: any, region: Rectangle) => void;
-    gestures?: GestureRegistration[];
+    /** True when this node opted into pointer tracking this render. */
+    interactive?: boolean;
+    /** Tap handler registered via withPointerTap this render, if any. */
+    onTap?: () => void;
 };
 
 export class UiRenderer {
     private currentTree: UiNode | null = null;
     private hooks: Map<UiNode, NodeHooks> = new Map();
     private renderScope: RenderScope;
+    private pointer = new PointerTracker();
 
     constructor(renderScope: RenderScope) {
         this.renderScope = renderScope;
@@ -225,73 +222,64 @@ export class UiRenderer {
     }
 
     /**
-     * Dispatch a UI event to the declarative UI tree
-     * Traverses the tree depth-first and checks for gesture handlers
-     * @param event The UI event to dispatch
-     * @returns true if the event was handled, false otherwise
+     * Begin a press at `point`. Records the interactive chain under the point as
+     * pressed, so every component along it reports `pressed` on the next render.
+     *
+     * @returns true if the press landed on an interactive component, i.e. the UI
+     *     captured the pointer. Callers use this to decide whether the press
+     *     should also be handled by non-UI systems (world taps, camera drag).
      */
-    public dispatchUIEvent(event: UIEvent): boolean {
+    public onPointerDown(point: Point): boolean {
+        const chain = this._interactiveChainAt(point);
+        this.pointer.setPressed(chain);
+        return chain.length > 0;
+    }
+
+    /**
+     * End a press at `point`. Recognises a tap — fires the `onTap` of the
+     * innermost component that was both pressed and released on (present in both
+     * the press chain and the chain under `point`) — then clears the press.
+     *
+     * @returns true if a tap handler fired.
+     */
+    public onPointerUp(point: Point): boolean {
+        const upChain = this._interactiveChainAt(point);
+
+        let handled = false;
+        // Innermost first: the deepest component that saw both down and up wins.
+        for (let i = upChain.length - 1; i >= 0; i--) {
+            const node = upChain[i];
+            const nodeHooks = this.hooks.get(node);
+            if (nodeHooks?.onTap && this.pointer.isPressed(node)) {
+                nodeHooks.onTap();
+                handled = true;
+                break;
+            }
+        }
+
+        this.pointer.clearPressed();
+        return handled;
+    }
+
+    /**
+     * Abandon the current press without firing a tap. Called when the gesture
+     * turns into a drag/pan, the pointer leaves, or the touch is cancelled —
+     * this is what prevents a component from being left stuck in the pressed
+     * state.
+     */
+    public onPointerCancel(): void {
+        this.pointer.clearPressed();
+    }
+
+    /** Hit-test the current tree for the interactive chain under `point`. */
+    private _interactiveChainAt(point: Point): UiNode[] {
         if (!this.currentTree) {
-            return false;
+            return [];
         }
-
-        return this._dispatchEventToNode(this.currentTree, event);
-    }
-
-    /**
-     * Recursively dispatch an event to a node and its children
-     * Children are checked first (depth-first) to allow deepest child to handle first
-     */
-    private _dispatchEventToNode(node: UiNode, event: UIEvent): boolean {
-        // First, try to dispatch to children (depth-first)
-        for (const child of node.children) {
-            if (this._dispatchEventToNode(child, event)) {
-                return true; // Event was handled by a child
-            }
-        }
-
-        // If no child handled it, check if this node has gesture handlers
-        const nodeHooks = this.hooks.get(node);
-        if (!nodeHooks?.gestures || !node.layout) {
-            return false;
-        }
-
-        const region = node.layout.region;
-
-        // Check if the event position is within this node's bounds
-        if (!this._isPointInRegion(event.position, region)) {
-            return false;
-        }
-
-        // Try each gesture handler for this event type
-        for (const gestureReg of nodeHooks.gestures) {
-            if (gestureReg.eventType !== event.type) {
-                continue; // Skip handlers for different event types
-            }
-
-            // Check custom hit test if provided
-            if (gestureReg.hitTest && !gestureReg.hitTest(event.position)) {
-                continue;
-            }
-
-            // Call the handler
-            if (gestureReg.handler(event)) {
-                return true; // Event was handled
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Check if a point is within a rectangular region
-     */
-    private _isPointInRegion(point: Point, region: Rectangle): boolean {
-        return (
-            point.x >= region.x &&
-            point.x <= region.x + region.width &&
-            point.y >= region.y &&
-            point.y <= region.y + region.height
+        return pointerChainAt(
+            this.currentTree,
+            point,
+            (node) => this.hooks.get(node)?.interactive === true,
         );
     }
 
@@ -303,14 +291,16 @@ export class UiRenderer {
         const activeMeasureSlots = new Set<any>();
         const copiedConstraints = { ...constraints };
 
-        // Clear gestures array for this node to avoid accumulating handlers
+        // Reset per-render interaction registration so it reflects only what
+        // this render declares (a component may register conditionally).
         if (!isMeasurePass) {
             const nodeHooks = this.hooks.get(node) ?? {
                 effects: [],
                 states: [],
                 remembers: [],
             };
-            nodeHooks.gestures = [];
+            nodeHooks.interactive = false;
+            nodeHooks.onTap = undefined;
             this.hooks.set(node, nodeHooks);
         }
 
@@ -526,6 +516,9 @@ export class UiRenderer {
             this._cleanupNode(child);
         }
 
+        // Drop any pointer relationship so an unmounting node can't linger
+        // pressed/hovered after it is gone.
+        this.pointer.forget(node);
         this.hooks.delete(node);
     }
 
@@ -581,21 +574,28 @@ export class UiRenderer {
                 nodeHooks.draw = drawFn;
                 this.hooks.set(node, nodeHooks);
             },
-            withGesture: (eventType, handler, hitTest) => {
+            withPointerState: () => {
+                if (isMeasurePass) {
+                    return { pressed: false, hovered: false };
+                }
+                const nodeHooks = this.hooks.get(node) ?? {
+                    effects: [],
+                    states: [],
+                    remembers: [],
+                };
+                nodeHooks.interactive = true;
+                this.hooks.set(node, nodeHooks);
+                return this.pointer.flagsFor(node);
+            },
+            withPointerTap: (handler) => {
                 if (isMeasurePass) return;
                 const nodeHooks = this.hooks.get(node) ?? {
                     effects: [],
                     states: [],
                     remembers: [],
                 };
-                if (!nodeHooks.gestures) {
-                    nodeHooks.gestures = [];
-                }
-                nodeHooks.gestures.push({
-                    eventType,
-                    handler,
-                    hitTest,
-                });
+                nodeHooks.interactive = true;
+                nodeHooks.onTap = handler;
                 this.hooks.set(node, nodeHooks);
             },
             withEffect: (effectFn, deps) => {

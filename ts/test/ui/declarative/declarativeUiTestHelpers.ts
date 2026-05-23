@@ -7,6 +7,7 @@ import type {
     UISize,
 } from "../../../src/ui/declarative/ui.ts";
 import type { RenderScope } from "../../../src/rendering/renderScope.ts";
+import type { PointerFlags } from "../../../src/ui/declarative/pointerTracker.ts";
 
 export type TextDrawCall = {
     text: string;
@@ -28,15 +29,11 @@ export type SpriteDrawCall = {
     clipBounds?: { x1: number; y1: number; x2: number; y2: number };
 };
 
-export type GestureCapture = {
-    eventType: string;
-    handler: Function;
-};
-
 export type DrawCapture = {
     textCalls: TextDrawCall[];
     spriteCalls: SpriteDrawCall[];
-    gestures: GestureCapture[];
+    /** Tap handlers registered via withPointerTap, in registration order. */
+    taps: (() => void)[];
 };
 
 export type TestContextResult<P extends {}> = {
@@ -61,6 +58,8 @@ export type TestContextOptions = {
     measureConfig?: TextMeasureConfig;
     /** Pre-seed withState return values by call order (index 0 = first call). */
     initialStateValues?: unknown[];
+    /** Flags returned by withPointerState (defaults to all false). */
+    pointerFlags?: PointerFlags;
     /** Custom measureDescriptor — overrides the default {0,0} stub. */
     measureDescriptorFn?: (
         slotId: any,
@@ -91,7 +90,7 @@ export function createTestComponentContext<P extends {}>(
     const drawCapture: DrawCapture = {
         textCalls: [],
         spriteCalls: [],
-        gestures: [],
+        taps: [],
     };
 
     let capturedDrawFn:
@@ -132,8 +131,10 @@ export function createTestComponentContext<P extends {}>(
         },
         withEffect: () => {},
         withRemember: <T>(factory: () => T) => factory(),
-        withGesture: (eventType, handler, _hitTest) => {
-            drawCapture.gestures.push({ eventType, handler });
+        withPointerState: () =>
+            options.pointerFlags ?? { pressed: false, hovered: false },
+        withPointerTap: (handler) => {
+            drawCapture.taps.push(handler);
         },
     };
 
