@@ -317,7 +317,7 @@ describe("UiBookLayout", () => {
 
         // The tab descriptor is a component; render it to get the button children
         const tabContext = {
-            props: {},
+            props: tabChild.props,
             constraints: { width: 100, height: 300 },
             measureText: (_text: string, _style: any) => ({
                 width: 0,
@@ -341,19 +341,19 @@ describe("UiBookLayout", () => {
 
         const tabLayout = tabChild.renderFn(tabContext);
         assert.ok(tabLayout !== null, "tab descriptor should render");
-        // Verify the tab onTap wiring: the inner button's onTap should call our spy
-        // The tab child has children (one per tab)
-        if (
+        assert.ok(
             tabLayout &&
-            typeof tabLayout === "object" &&
-            "children" in tabLayout
-        ) {
-            const tabButtons = (tabLayout as any).children;
-            assert.ok(
-                tabButtons.length > 0,
-                "tab layout should have button children",
-            );
-        }
+                typeof tabLayout === "object" &&
+                "children" in tabLayout,
+            "tab layout should be a layout result",
+        );
+
+        const tabButtons = (tabLayout as any).children;
+        assert.strictEqual(tabButtons.length, 1, "one button per tab");
+
+        // Running the button's onTap should report the tab's index.
+        tabButtons[0].props.onTap();
+        assert.strictEqual(tappedIndex, 0, "tapping tab 0 reports index 0");
     });
 
     it("when tab is focused, down-direction will focus next tab", () => {

@@ -100,7 +100,7 @@ export const uiBookLayout = createComponent<UiBookLayoutProps>(
         let tabsSize = { width: 0, height: 0 };
         let tabDescriptor: ComponentDescriptor | undefined;
         if (props.tabs && props.tabs.length > 0) {
-            tabDescriptor = createTabsComponent(props.tabs);
+            tabDescriptor = uiBookTabs({ tabs: props.tabs });
             tabsSize = measureDescriptor(
                 "tabs",
                 tabDescriptor,
@@ -234,13 +234,16 @@ export const uiBookLayout = createComponent<UiBookLayoutProps>(
     { displayName: "UiBookLayout" },
 );
 
-// Helper function to create tabs component
-function createTabsComponent(tabs: UIBookLayoutTab[]): ComponentDescriptor {
-    return createComponent<{}>(() => {
+// Tabs down the left edge of the book. Defined at module scope so its node
+// identity stays stable across renders. A component minted fresh each render
+// would be torn down and rebuilt every frame, which drops the press that tap
+// recognition needs to match a pointer down with its matching up.
+const uiBookTabs = createComponent<{ tabs: UIBookLayoutTab[] }>(
+    ({ props }) => {
         const tabChildren: PlacedChild[] = [];
         let yOffset = 0;
 
-        tabs.forEach((tab, index) => {
+        props.tabs.forEach((tab, index) => {
             const tabWidth = tab.isSelected ? 56 : 48;
             const tabHeight = 48;
 
@@ -282,5 +285,6 @@ function createTabsComponent(tabs: UIBookLayoutTab[]): ComponentDescriptor {
             size: { width: 64, height: yOffset },
             children: tabChildren,
         };
-    })();
-}
+    },
+    { displayName: "UiBookTabs" },
+);
