@@ -60,7 +60,7 @@ export type TestContextOptions = {
     initialStateValues?: unknown[];
     /** Flags returned by withPointerState (defaults to all false). */
     pointerFlags?: PointerFlags;
-    /** Custom measureDescriptor — overrides the default {0,0} stub. */
+    /** Custom measureDescriptor that overrides the default {0,0} stub. */
     measureDescriptorFn?: (
         slotId: any,
         descriptor: ComponentDescriptor,

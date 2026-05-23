@@ -8,9 +8,8 @@ import {
 import { uiButton } from "../../../src/ui/declarative/uiButton.ts";
 import { createPointerHarness } from "./pointerTestHarness.ts";
 
-// Places already-built children at explicit, non-origin offsets so each
-// button's hit region is known and deterministic (and never anchored at 0,0,
-// which would mask offset bugs).
+// Places already-built children at explicit offsets so each button's hit
+// region is known. The offsets stay off 0,0 so an offset bug can't hide.
 const placedRoot = createComponent<{ children: PlacedChild[] }>(({ props }) => ({
     size: { width: 200, height: 120 },
     children: props.children,

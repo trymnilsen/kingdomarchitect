@@ -1,7 +1,3 @@
-// ===================================================================
-// 1. UTILITIES & BASIC TYPES (Unchanged)
-// ===================================================================
-
 import { createLogger } from "../../common/logging/logger.ts";
 import { nameof } from "../../common/nameof.ts";
 import { addPoint, zeroPoint, type Point } from "../../common/point.ts";
@@ -26,7 +22,8 @@ const isLayoutResult = (
     );
 };
 
-// Helper to compare dependency arrays for effects.
+// Deps are equal when same length and every entry is ===. Used to decide
+// whether an effect or remember can be skipped this render.
 const _depsAreEqual = (a: any[] | undefined, b: any[] | undefined): boolean => {
     // If the identities are the same (e.g., both undefined), they are equal.
     if (a === b) {
@@ -47,10 +44,6 @@ const _depsAreEqual = (a: any[] | undefined, b: any[] | undefined): boolean => {
 
     return true;
 };
-
-// ===================================================================
-// 2. CORE TYPES & INTERFACES (Unchanged)
-// ===================================================================
 
 export type LayoutInfo = {
     offset: Point;
@@ -87,20 +80,18 @@ export type ComponentContext<P extends {}> = {
     withEffect: (effect: () => (() => void) | void, deps?: any[]) => void;
     withRemember: <T>(factory: () => T, deps?: any[]) => T;
     /**
-     * Read this component's live pointer-interaction flags ({@link PointerFlags}).
-     * Marks the component as an interactive hit-test target and returns whether
-     * it is currently pressed (and, in future, hovered). The value is derived
-     * from the renderer each render — there is no local state to keep in sync,
-     * so the component simply re-reads it on the render that follows any pointer
-     * event.
+     * Reads this component's pointer flags ({@link PointerFlags}) and marks it
+     * as an interactive hit-test target. Tells the component whether it is
+     * pressed, and later hovered. The flags come from the renderer fresh each
+     * render, so the component just reads them again on the render after a
+     * pointer event.
      */
     withPointerState: () => PointerFlags;
     /**
-     * Register a tap action on this component. Marks the component as an
-     * interactive hit-test target; the handler fires when a press starts and
-     * ends on this same component. Pairs with {@link withPointerState} but is
-     * independent — a component may register a tap without reading state, or
-     * read state without registering a tap.
+     * Registers a tap handler and marks this component as an interactive
+     * hit-test target. The handler runs when a press starts and ends on the
+     * same component. You can use this hook with or without
+     * {@link withPointerState}.
      */
     withPointerTap: (handler: () => void) => void;
 };
@@ -116,13 +107,9 @@ export type ComponentDescriptor<P extends {} = any> = {
     key?: string | number;
 };
 
-// ===================================================================
-// 3. THE UNIFIED COMPONENT FACTORY (Unchanged)
-// ===================================================================
-
 /**
- * This is the type of the function returned by createUiComponent.
- * It conditionally defines the props argument.
+ * Call signature for a component. A component with no props takes no arguments,
+ * so callers write myComponent() instead of myComponent({}).
  */
 export type ComponentType<P extends {}> = [keyof P] extends [never] // Checks if P has no keys (e.g., P is {} or an empty interface)
     ? () => ComponentDescriptor<P> // If P is empty, props are optional and must be an empty object
@@ -154,9 +141,6 @@ export function sized(width: number, height: number) {
     };
 }
 
-// ===================================================================
-// 4. THE UI RENDERER (Updated with all fixes)
-// ===================================================================
 type EffectHook = {
     deps?: any[];
     cleanup?: () => void;
@@ -222,28 +206,27 @@ export class UiRenderer {
     }
 
     /**
-     * Begin a press at `point`. Records the interactive chain under the point as
-     * pressed, so every component along it reports `pressed` on the next render.
+     * Begins a press at `point`. Records the interactive chain under the point
+     * so every component in it reads as pressed on the next render.
      *
-     * @returns true if the press landed on an interactive component, i.e. the UI
-     *     captured the pointer. Callers use this to decide whether the press
-     *     should also be handled by non-UI systems (world taps, camera drag).
+     * @returns true when the press landed on an interactive component. Callers
+     *     use this to decide whether something outside the UI should also handle
+     *     the press, like a world tap or a camera drag.
      */
     public onPointerDown(point: Point): boolean {
-        const chain = this._interactiveChainAt(point);
+        const chain = this.interactiveChainAt(point);
         this.pointer.setPressed(chain);
         return chain.length > 0;
     }
 
     /**
-     * End a press at `point`. Recognises a tap — fires the `onTap` of the
-     * innermost component that was both pressed and released on (present in both
-     * the press chain and the chain under `point`) — then clears the press.
+     * Ends a press at `point`. Runs the onTap of the innermost component that
+     * was pressed and released on, then clears the press.
      *
-     * @returns true if a tap handler fired.
+     * @returns true when a tap handler ran.
      */
     public onPointerUp(point: Point): boolean {
-        const upChain = this._interactiveChainAt(point);
+        const upChain = this.interactiveChainAt(point);
 
         let handled = false;
         // Innermost first: the deepest component that saw both down and up wins.
@@ -262,17 +245,16 @@ export class UiRenderer {
     }
 
     /**
-     * Abandon the current press without firing a tap. Called when the gesture
-     * turns into a drag/pan, the pointer leaves, or the touch is cancelled —
-     * this is what prevents a component from being left stuck in the pressed
-     * state.
+     * Drops the current press without running a tap. Called when the gesture
+     * turns into a drag, the pointer leaves, or the touch is cancelled. This is
+     * what stops a component from getting stuck looking pressed.
      */
     public onPointerCancel(): void {
         this.pointer.clearPressed();
     }
 
-    /** Hit-test the current tree for the interactive chain under `point`. */
-    private _interactiveChainAt(point: Point): UiNode[] {
+    /** Hit-tests the current tree for the interactive chain under `point`. */
+    private interactiveChainAt(point: Point): UiNode[] {
         if (!this.currentTree) {
             return [];
         }
@@ -291,8 +273,8 @@ export class UiRenderer {
         const activeMeasureSlots = new Set<any>();
         const copiedConstraints = { ...constraints };
 
-        // Reset per-render interaction registration so it reflects only what
-        // this render declares (a component may register conditionally).
+        // Clear the interaction registration each render so it only reflects
+        // what this render asks for. A component might register conditionally.
         if (!isMeasurePass) {
             const nodeHooks = this.hooks.get(node) ?? {
                 effects: [],
@@ -341,15 +323,9 @@ export class UiRenderer {
                 }
 
                 childNode.layout.offset = placedChild.offset;
-                // When a parent layout calculates a child's size during the
-                // measure pass, that size must be preserved. Previously, the
-                // calculated size on placedChild was discarded after a
-                // measureDescriptor call. This caused the child to be incorrectly
-                // re-measured during the layout pass based on its own properties
-                // (e.g., "fill parent") instead of the dimensions determined by
-                // its parent. The fix was to add a size property to placedChild.
-                // This size is now applied to the childNode during layout,
-                // ensuring custom dimensions from a parent layout are always respected.
+                // Apply the size the parent computed for this child. Without it
+                // the child would re-measure from its own props (like "fill
+                // parent") and ignore the size its parent chose.
                 this._executeNode(childNode, { ...placedChild.size }, false);
             }
 
@@ -516,8 +492,8 @@ export class UiRenderer {
             this._cleanupNode(child);
         }
 
-        // Drop any pointer relationship so an unmounting node can't linger
-        // pressed/hovered after it is gone.
+        // Forget the node so one that's going away doesn't stay in the pressed
+        // or hovered set.
         this.pointer.forget(node);
         this.hooks.delete(node);
     }
@@ -558,8 +534,8 @@ export class UiRenderer {
                             : newValue;
                     nodeHooks.states[currentHookIndex].value = updatedValue;
 
-                    // Trigger re-render by re-executing the component
-                    //this.renderComponent(this.currentTree?.descriptor ?? null);
+                    // Setting state does not trigger a re-render on its own. A
+                    // redraw happens because callers render after every input.
                 };
 
                 return [currentState, setState];

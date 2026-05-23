@@ -3,30 +3,26 @@ import { withinRectangle } from "../../common/structure/rectangle.ts";
 import type { UiNode } from "./ui.ts";
 
 /**
- * Returns the interactive ancestry chain under `point`, ordered outermost →
- * innermost. Only nodes for which `isInteractive` returns true are included, so
- * a non-interactive layout container between an interactive ancestor and the
- * pressed leaf is transparently skipped.
+ * Finds the interactive nodes under `point`, ordered from the outermost down to
+ * the deepest one. A node only counts when `isInteractive` returns true for it,
+ * so a plain layout container sitting between an interactive ancestor and the
+ * pressed leaf is left out.
  *
- * The chain is a *set of nodes*, not a single node, so a container and the
- * button nested inside it both end up in the result and can both reflect the
- * interaction (e.g. press/hover styling on the card and its button at once).
+ * The result is a chain so that nested interactive nodes can both react. A card
+ * and a button inside it can both show the interaction.
  *
- * Z-order falls out of pre-order capture: a node is recorded before its
- * children are visited, and later writes win, so a deeper node — or a
- * later-drawn (visually on top) sibling — overwrites an earlier candidate. The
- * final result is therefore the chain to the topmost, innermost interactive
- * node under the point.
+ * When regions overlap, ordering picks the winner. A node is recorded before
+ * its children, and earlier siblings before later ones, and the last hit
+ * recorded wins. That works out to the deepest node inside the last-drawn
+ * sibling, which is the one on top.
  *
- * No parent pointers are required: the descent's own `ancestors` stack carries
- * the ancestry, so this stays a pure read over the existing tree with nothing
- * to keep in sync.
+ * The walk needs no parent links. The ancestors stack built during the descent
+ * already holds the path, so this just reads the tree and stores nothing.
  *
  * @param root The tree root to search.
- * @param point The point to hit-test, in the same absolute space as
- *     `node.layout.region`.
- * @param isInteractive Predicate marking which nodes opted into pointer
- *     tracking (via `withPointerState` / `withPointerTap`).
+ * @param point The point to hit-test, in the same space as node.layout.region.
+ * @param isInteractive Tells which nodes opted into pointer tracking, via
+ *     withPointerState or withPointerTap.
  */
 export function pointerChainAt(
     root: UiNode,
@@ -44,9 +40,8 @@ export function pointerChainAt(
 
         const region = node.layout?.region;
         if (interactive && region && withinRectangle(point, region)) {
-            // Snapshot the path to this hit. Visiting order (node before its
-            // children, earlier siblings before later) means the last snapshot
-            // wins, which is the topmost innermost interactive node.
+            // Record the path to this hit. Later records overwrite earlier
+            // ones, so the final value is the node drawn on top.
             winner = [...ancestors];
         }
 

@@ -66,7 +66,7 @@ export class InteractionHandler {
 
     onTapDown(screenPoint: Point): boolean {
         // Press the declarative UI. Returns true when the press landed on an
-        // interactive component, i.e. the UI captured the pointer.
+        // interactive component, which means the UI captured the pointer.
         const declarativeHandled = this.uiRenderer.onPointerDown(screenPoint);
         if (declarativeHandled) {
             return true;
@@ -86,8 +86,8 @@ export class InteractionHandler {
     onTapUp(tapUpEvent: OnTapEndEvent): void {
         const screenPoint = tapUpEvent.position;
 
-        // Release the declarative UI press. This recognises a tap (firing the
-        // pressed-and-released component's handler) and clears the press.
+        // Release the declarative UI press. This runs the tap handler for the
+        // component that was pressed and released, then clears the press.
         let onTapResult = this.uiRenderer.onPointerUp(screenPoint);
 
         const worldPosition = this.camera.screenToWorld(screenPoint);
@@ -191,8 +191,8 @@ export class InteractionHandler {
     }
 
     onTapPan(movement: Point, position: Point, startPosition: Point): void {
-        // A drag is not a tap: cancel any in-progress UI press so a pressed
-        // component does not stay stuck while the pointer moves away.
+        // Cancel any in-progress UI press once the gesture becomes a drag, so a
+        // pressed component doesn't stay stuck as the pointer moves away.
         this.uiRenderer.onPointerCancel();
         this.history.state.onTapPan(movement, position, startPosition);
     }

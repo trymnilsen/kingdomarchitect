@@ -7,9 +7,9 @@ import type {
 } from "../../../src/ui/declarative/ui.ts";
 
 /**
- * Builds a bare UiNode with an absolute layout region. Regions use non-trivial
- * coordinates so the containment math is actually exercised (a region anchored
- * at the origin would hide offset mistakes).
+ * Builds a bare UiNode with an absolute layout region. The regions use
+ * non-trivial coordinates so the containment math actually runs. A region at
+ * the origin would hide offset mistakes.
  */
 function node(region: Rectangle, children: UiNode[] = []): UiNode {
     return {
@@ -41,7 +41,7 @@ describe("pointerChainAt", () => {
         ]);
         const interactive = new Set<UiNode>([behind, front]);
 
-        // x:25 lies inside both siblings' overlap; the later child wins.
+        // x:25 lies inside both siblings. The later child wins.
         const chain = pointerChainAt(root, { x: 25, y: 20 }, (n) =>
             interactive.has(n),
         );

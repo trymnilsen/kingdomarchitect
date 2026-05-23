@@ -6,10 +6,9 @@ import {
 } from "../../../src/ui/declarative/ui.ts";
 
 /**
- * A rectangle draw captured from the fake render scope. Backgrounds
- * (e.g. ColorBackground) draw via `drawScreenSpaceRectangle`, so the captured
- * `fill` tells a test which background a component rendered — the observable
- * proof of its pressed/normal state.
+ * A rectangle captured from the fake render scope. Backgrounds draw with
+ * drawScreenSpaceRectangle, so the captured fill tells a test which background
+ * a component drew. That is how a test sees pressed versus normal.
  */
 export type CapturedRect = {
     fill: string;
@@ -20,31 +19,29 @@ export type CapturedRect = {
 };
 
 /**
- * Drives a real `UiRenderer` headlessly so interaction can be tested end to end:
- * render a tree, send pointer events, re-render, and inspect what was drawn.
- *
- * Mirrors the real loop where every input is followed by a render — call
- * {@link PointerHarness.render} after a pointer event to observe the resulting
- * visual state, exactly as the game/devApp do.
+ * Drives a real UiRenderer with no canvas so interaction can be tested from end
+ * to end. Render a tree, send pointer events, render again, and check what was
+ * drawn. The real loop renders after every input, so call
+ * {@link PointerHarness.render} after a pointer event to see the new state.
  */
 export type PointerHarness = {
-    /** Render (or re-render) the tree. Clears the captured rects first. */
+    /** Render or re-render the tree. Clears the captured rects first. */
     render(descriptor: ComponentDescriptor | null): void;
     /** @returns whether the press landed on an interactive component. */
     pointerDown(point: Point): boolean;
-    /** @returns whether a tap handler fired. */
+    /** @returns whether a tap handler ran. */
     pointerUp(point: Point): boolean;
-    /** Abandon the current press (drag/cancel). */
+    /** Abandon the current press, as on a drag or cancel. */
     pointerCancel(): void;
     /** Rectangles drawn during the most recent render, in draw order. */
     rects: CapturedRect[];
 };
 
 /**
- * Builds a {@link PointerHarness} backed by a fake `RenderScope` that supplies
- * the canvas size, a deterministic text measurer (8px per char), and a
- * rectangle-capturing draw method — the only render-scope surface the renderer
- * and simple backgrounds touch.
+ * Builds a {@link PointerHarness} backed by a fake RenderScope. The fake gives
+ * the canvas size, a fixed text measurer at 8px per character, and a draw
+ * method that records rectangles. That covers everything the renderer and the
+ * simple backgrounds reach for.
  */
 export function createPointerHarness(
     width: number = 200,

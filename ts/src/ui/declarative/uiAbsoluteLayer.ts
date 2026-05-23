@@ -13,7 +13,7 @@ export type UiAbsoluteLayerOverlay = {
 };
 
 export type UiAbsoluteLayerProps = {
-    /** The base component — fills the full available space. */
+    /** Base component that fills the available space. */
     base: ComponentDescriptor;
     /** Zero or more overlays positioned at world-space anchor points. */
     overlays: UiAbsoluteLayerOverlay[];

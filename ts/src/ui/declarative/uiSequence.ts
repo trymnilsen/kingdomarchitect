@@ -232,7 +232,6 @@ const _uiSequence = createComponent<SequenceProps>(
     },
 );
 
-// --- Public Component Props ---
 export type UiRowAndColumnProps = {
     children: ComponentDescriptor[];
     width?: number;

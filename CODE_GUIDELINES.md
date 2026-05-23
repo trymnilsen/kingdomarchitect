@@ -64,3 +64,31 @@ Conventions and practices for this repository. Goals: clarity, maintainability, 
   export function closestPointOnLine(a: Point, b: Point, p: Point): Point {}
   ```
 - **Do not use separator comments** like `// ----- Section -----` or `// ===== Section =====`.
+
+### Writing good comments
+
+What a comment must contain:
+
+- **Make every comment earn its place.** If it only restates the signature in
+  English, delete it. `Returns the current flags for a node` on
+  `flagsFor(node): PointerFlags` adds nothing the types already say.
+- **Cover what, why, and when. Leave how to the code.** Explain what a symbol
+  represents, why it exists, and when a caller reaches for it. The mechanics are
+  already visible below the comment.
+- **Write down the decision and its reason.** The load-bearing line is the one
+  that stops a future reader from undoing a choice, like "read fresh each render
+  rather than stored, so it can't go stale."
+- **Prefer a concrete example over abstraction.** "A button uses the pressed
+  flag to draw itself pressed" lands faster than "components consume the flags."
+- **Comment the surprising parts.** Constraints, invariants, gotchas, and the
+  reason behind an odd construction. If deleting the comment loses nothing a
+  reader could not get at a glance, it should not be there.
+
+How a comment should read:
+
+- **Write like a person, not a model.** No em dashes. No semicolons stitching
+  two clauses into one sentence. No balanced-contrast cadence such as "it's a,
+  not b" or "X but Y". Use plain, direct sentences. Two thoughts means two
+  sentences.
+- **When trimming, cut words, not the reason.** A shorter comment should still
+  answer why the thing exists.

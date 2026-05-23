@@ -35,7 +35,7 @@ export type UiPaginatedListProps = {
      * Receives the global index into the full items array (not page-relative).
      */
     onItemTap?: (globalIndex: number) => void;
-    /** Currently selected global index. For reference only — parent pre-builds highlighted items. */
+    /** Currently selected global index, for reference only. The parent pre-builds the highlighted items. */
     selectedIndex?: number;
     width: number;
     height: number;
@@ -88,7 +88,7 @@ export const uiPaginatedList = createComponent<UiPaginatedListProps>(
             );
 
             if (pagesWithoutFooter > 1) {
-                // Need footer — recalculate with reduced height
+                // A footer is needed, so recalculate with the reduced height
                 const availableForItems = resolvedHeight - footerHeight - gap;
                 itemsPerPage = Math.max(
                     1,

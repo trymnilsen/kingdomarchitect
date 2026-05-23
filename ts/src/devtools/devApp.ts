@@ -113,7 +113,7 @@ export class DevApp {
 
         this.touchInput.onTapEnd = (tapEndEvent) => {
             if (tapEndEvent.wasDragging) {
-                // A drag is not a tap — drop the press without firing it.
+                // Drop the press without running a tap, since this was a drag.
                 this.uiRenderer.onPointerCancel();
             } else {
                 this.uiRenderer.onPointerUp(tapEndEvent.position);

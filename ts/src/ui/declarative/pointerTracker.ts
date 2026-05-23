@@ -1,79 +1,77 @@
 import type { UiNode } from "./ui.ts";
 
 /**
- * The pointer-interaction flags a component can read for itself via
- * `withPointerState()`. Each flag is true when this component instance is part
- * of the corresponding interaction chain.
- *
- * `hovered` is part of the model today but is not yet driven by any input — see
- * {@link PointerTracker.setHovered}.
+ * Pointer-interaction flags a component reads via `withPointerState()`. A flag
+ * is true when the component instance is part of that interaction chain. The
+ * hovered flag isn't wired to any input yet. See {@link PointerTracker.setHovered}.
  */
 export type PointerFlags = { pressed: boolean; hovered: boolean };
 
 /**
- * Owns which component instances are currently in a pointer relationship
- * (pressed now; hovered later). The `UiRenderer` composes one of these instead
- * of holding loose `pressedNode`/`hoveredNode` fields — keeping the bounded
- * "what is the pointer touching" concept in one place rather than smearing it
- * across the renderer.
+ * Stores which component instances are currently pressed, and later hovered.
+ * The UiRenderer composes one of these so the state lives in one place outside
+ * the renderer's own fields.
  *
- * State is stored as a *set of nodes*, not a single node, because one pointer
- * can be over a whole ancestry chain at once (a container and the button inside
- * it are both "pressed"). The chain is produced by the hit-test
- * (`pointerChainAt`) and handed in via {@link setPressed} / {@link setHovered}.
+ * The state is a set of nodes because a single pointer can sit over a whole
+ * ancestry chain at once. A container and the button inside it can both be
+ * pressed. The chain comes from the hit-test in pointerChainAt and gets passed
+ * to setPressed or setHovered.
  *
- * Adding a future relationship (focus, drag-over) is another Set + method pair
- * here — never a new field on the renderer.
+ * To add another relationship later, like focus or drag-over, add a set and a
+ * method for it here.
  */
 export class PointerTracker {
     private pressed = new Set<UiNode>();
     private hovered = new Set<UiNode>();
 
     /**
-     * Replace the pressed chain. Pass the full chain (outermost → innermost) so
-     * every node along it reports `pressed`; pass `[]` to clear.
+     * Replaces the pressed chain. Pass the whole chain from outermost to
+     * innermost so every node in it reads as pressed. Pass an empty array to
+     * clear it.
      */
     setPressed(chain: UiNode[]): void {
         this.pressed = new Set(chain);
     }
 
-    /** Clear the pressed chain (pointer up, cancel, or drag start). */
+    /** Clears the pressed chain. Called on pointer up, cancel, or drag start. */
     clearPressed(): void {
         this.pressed.clear();
     }
 
     /**
-     * Replace the hovered chain. Not yet called — hover has no input source
-     * until pointer-move is forwarded to the renderer. Present so the hover
-     * shape is proven and additive.
+     * Replaces the hovered chain. Nothing calls this yet. Hover will get an
+     * input source once pointer-move is forwarded to the renderer. It's here
+     * now to keep the hover shape in place.
      */
     setHovered(chain: UiNode[]): void {
         this.hovered = new Set(chain);
     }
 
-    /** Clear the hovered chain. */
+    /** Clears the hovered chain. */
     clearHovered(): void {
         this.hovered.clear();
     }
 
     /**
-     * Drop a node from every relationship. Called when a node unmounts so a
-     * pressed/hovered component that disappears mid-interaction cannot leave a
-     * stale reference behind (the invalidation that prevents stuck states).
+     * Removes a node from every relationship. The renderer calls this when a
+     * node unmounts so a component that disappears mid-press leaves nothing
+     * behind.
      */
     forget(node: UiNode): void {
         this.pressed.delete(node);
         this.hovered.delete(node);
     }
 
-    /** Whether a node is currently in the pressed chain. */
+    /** Whether a node is in the pressed chain. */
     isPressed(node: UiNode): boolean {
         return this.pressed.has(node);
     }
 
     /**
-     * The current interaction flags for a node, derived fresh from membership.
-     * Called once per interactive component per render.
+     * Answers "is the pointer on this node right now?" for one component,
+     * reached through withPointerState during render. A button uses the pressed
+     * flag to draw itself pressed. The answer is read from the chains each
+     * render rather than stored, so it can never go stale.
      */
     flagsFor(node: UiNode): PointerFlags {
         return {
