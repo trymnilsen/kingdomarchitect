@@ -1,10 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
 import { pointerChainAt } from "../../../src/ui/declarative/pointerChain.ts";
-import type {
-    Rectangle,
-    UiNode,
-} from "../../../src/ui/declarative/ui.ts";
+import type { Rectangle, UiNode } from "../../../src/ui/declarative/ui.ts";
 
 /**
  * Builds a bare UiNode with an absolute layout region. The regions use

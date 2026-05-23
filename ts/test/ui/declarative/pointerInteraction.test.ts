@@ -10,10 +10,12 @@ import { createPointerHarness } from "./pointerTestHarness.ts";
 
 // Places already-built children at explicit offsets so each button's hit
 // region is known. The offsets stay off 0,0 so an offset bug can't hide.
-const placedRoot = createComponent<{ children: PlacedChild[] }>(({ props }) => ({
-    size: { width: 200, height: 120 },
-    children: props.children,
-}));
+const placedRoot = createComponent<{ children: PlacedChild[] }>(
+    ({ props }) => ({
+        size: { width: 200, height: 120 },
+        children: props.children,
+    }),
+);
 
 const A_REGION = { x: 12, y: 10, width: 40, height: 30 };
 const B_REGION = { x: 80, y: 10, width: 40, height: 30 };
@@ -129,7 +131,10 @@ describe("pointer interaction (Scenario)", () => {
         harness.render(ui());
 
         const drawn = fills(harness.rects);
-        assert.ok(drawn.includes("a-pressed"), "pressed button shows pressed bg");
+        assert.ok(
+            drawn.includes("a-pressed"),
+            "pressed button shows pressed bg",
+        );
         assert.ok(drawn.includes("b-normal"), "sibling stays normal");
         assert.ok(!drawn.includes("a-normal"));
         assert.ok(!drawn.includes("b-pressed"));
