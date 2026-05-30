@@ -46,10 +46,17 @@ type BuildJobValidator = (
  * @param buildJobValidator Pre-check for build jobs. Defaults to
  *   canExecuteBuildJob (stockpile check). Pass `() => true` for goblins
  *   that gather from the environment.
+ * @param claimRequiresEmptyHand When true, a worker may not claim a new job
+ *   while carrying something — it must deposit its load (via DepositHeldBehavior)
+ *   first. This keeps workers from grabbing more work and panic-dropping their
+ *   load on the ground. Player workers opt in; goblins leave it off (default)
+ *   because they have no deposit behavior and would otherwise be stranded
+ *   holding gathered materials forever.
  */
 export function createPerformJobBehavior(
     buildPlanner: BuildJobPlanner,
     buildJobValidator: BuildJobValidator = canExecuteBuildJob,
+    claimRequiresEmptyHand: boolean = false,
 ): Behavior {
     return {
         name: "performJob",
@@ -71,7 +78,12 @@ export function createPerformJobBehavior(
             }
 
             // Valid if there are unclaimed jobs we can take
-            return hasAvailableJobs(entity, jobQueue, buildJobValidator);
+            return hasAvailableJobs(
+                entity,
+                jobQueue,
+                buildJobValidator,
+                claimRequiresEmptyHand,
+            );
         },
 
         utility(_entity: Entity): number {
@@ -115,6 +127,7 @@ export function createPerformJobBehavior(
                 entity,
                 jobQueue,
                 buildJobValidator,
+                claimRequiresEmptyHand,
             );
             if (bestJobIndex === -1) {
                 log.debug(
@@ -152,6 +165,13 @@ export function createPerformJobBehavior(
  *
  * buildJobValidator is injected because goblins gather from the environment and
  * pass `() => true` to bypass the stockpile pre-check player workers rely on.
+ *
+ * claimRequiresEmptyHand blocks claiming any new job while the worker is
+ * carrying something, so it deposits its load before taking more work rather
+ * than panic-dropping it. If the held item is one no stockpile accepts the
+ * worker idles holding it (DepositHeldBehavior is also invalid); that is
+ * acceptable — the eat behavior's deposit-or-drop clears the hand if it ever
+ * matters, and idling beats littering.
  */
 function canTakeJob(
     root: Entity,
@@ -159,9 +179,17 @@ function canTakeJob(
     job: Jobs,
     jobQueue: JobQueueComponent,
     buildJobValidator: BuildJobValidator,
+    claimRequiresEmptyHand: boolean,
 ): boolean {
     if (job.claimedBy !== undefined) {
         return false;
+    }
+
+    if (claimRequiresEmptyHand) {
+        const held = entity.getEcsComponent(HeldItemComponentId);
+        if (held && !isHeldEmpty(held)) {
+            return false;
+        }
     }
 
     if (
@@ -186,10 +214,18 @@ function hasAvailableJobs(
     entity: Entity,
     jobQueue: JobQueueComponent,
     buildJobValidator: BuildJobValidator,
+    claimRequiresEmptyHand: boolean,
 ): boolean {
     const root = entity.getRootEntity();
     return jobQueue.jobs.some((job) =>
-        canTakeJob(root, entity, job, jobQueue, buildJobValidator),
+        canTakeJob(
+            root,
+            entity,
+            job,
+            jobQueue,
+            buildJobValidator,
+            claimRequiresEmptyHand,
+        ),
     );
 }
 
@@ -201,6 +237,7 @@ function findBestJob(
     entity: Entity,
     jobQueue: JobQueueComponent,
     buildJobValidator: BuildJobValidator,
+    claimRequiresEmptyHand: boolean,
 ): number {
     const root = entity.getRootEntity();
     let bestJobIndex = -1;
@@ -209,7 +246,16 @@ function findBestJob(
     for (let i = 0; i < jobQueue.jobs.length; i++) {
         const job = jobQueue.jobs[i];
 
-        if (!canTakeJob(root, entity, job, jobQueue, buildJobValidator)) {
+        if (
+            !canTakeJob(
+                root,
+                entity,
+                job,
+                jobQueue,
+                buildJobValidator,
+                claimRequiresEmptyHand,
+            )
+        ) {
             continue;
         }
 

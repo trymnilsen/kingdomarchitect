@@ -6,7 +6,7 @@ import {
     BehaviorAgentComponentId,
     getBehaviorAgent,
 } from "../../component/BehaviorAgentComponent.ts";
-import { BuildingComponentId } from "../../component/buildingComponent.ts";
+import { isImpassableStructure } from "../../component/traversalComponent.ts";
 import {
     DirectionComponentId,
     updateDirectionComponent,
@@ -117,9 +117,7 @@ export function executeMoveToAction(
         }
 
         const occupants = queryEntity(root, nextPoint);
-        const hasStructure = occupants.some((o) =>
-            o.hasComponent(BuildingComponentId),
-        );
+        const hasStructure = occupants.some(isImpassableStructure);
 
         if (hasStructure) {
             log.info(

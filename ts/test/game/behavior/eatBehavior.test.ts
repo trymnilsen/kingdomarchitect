@@ -241,4 +241,63 @@ describe("eatBehavior", () => {
             assert.strictEqual(actions.length, 0);
         });
     });
+
+    describe("clearing a held non-food item before eating", () => {
+        it("deposits the held item at a stockpile before fetching food", () => {
+            const behavior = createEatBehavior();
+            const settlement = createSettlement();
+            const worker = createWorker(settlement, 60);
+            const held = worker.requireEcsComponent(HeldItemComponentId);
+            held.item = woodResourceItem;
+            held.amount = 4;
+            // Preference-less stockpile accepts the wood and also holds the food.
+            createStockpileWithFood("stockpile", settlement);
+
+            const actions = behavior.expand(worker);
+
+            assert.strictEqual(
+                actions[0].type,
+                "moveTo",
+                "first walk to the stockpile to drop the load",
+            );
+            assert.strictEqual(
+                actions[1].type,
+                "depositToStockpile",
+                "deposit the carried wood rather than dropping it",
+            );
+            assert.ok(
+                actions.some((a) => a.type === "eatFromHeld"),
+                "still proceeds to eat after depositing",
+            );
+        });
+
+        it("drops the held item only when no stockpile will accept it", () => {
+            const behavior = createEatBehavior();
+            const root = new Entity("root");
+            const worker = new Entity("worker");
+            root.addChild(worker);
+            worker.worldPosition = { x: 12, y: 8 };
+            worker.setEcsComponent(createHeldItemComponent());
+            worker.setEcsComponent(createEquipmentComponent());
+            worker.setEcsComponent(createHungerComponent(60, 0.1));
+            const held = worker.requireEcsComponent(HeldItemComponentId);
+            held.item = woodResourceItem;
+            held.amount = 4;
+
+            // A forageable food source but no stockpile anywhere.
+            const berry = new Entity("berryBush");
+            root.addChild(berry);
+            berry.worldPosition = { x: 14, y: 8 };
+            berry.setEcsComponent(createResourceComponent("berrybush"));
+
+            const actions = behavior.expand(worker);
+
+            assert.strictEqual(
+                actions[0].type,
+                "dropHeld",
+                "falls back to dropping when no stockpile accepts the item",
+            );
+            assert.ok(actions.some((a) => a.type === "eatFromHeld"));
+        });
+    });
 });

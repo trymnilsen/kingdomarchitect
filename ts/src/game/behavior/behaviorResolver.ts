@@ -12,6 +12,7 @@ import { createEatBehavior } from "./behaviors/eatBehavior.ts";
 import { createEngageInCombatBehavior } from "./behaviors/engageInCombatBehavior.ts";
 import { planBuildBuilding } from "../job/planner/buildBuildingPlanner.ts";
 import { planGoblinBuildJob } from "../job/planner/goblinBuildJobPlanner.ts";
+import { canExecuteBuildJob } from "../job/buildBuildingJob.ts";
 
 /**
  * Creates a BehaviorResolver that returns applicable behaviors
@@ -44,7 +45,7 @@ export function createBehaviorResolver(): BehaviorResolver {
         createEngageInCombatBehavior(),
         createSleepBehavior(),
         createEatBehavior(),
-        createPerformJobBehavior(planBuildBuilding),
+        createPerformJobBehavior(planBuildBuilding, canExecuteBuildJob, true),
         createDepositHeldBehavior(),
         createRestockBehavior(),
     ];

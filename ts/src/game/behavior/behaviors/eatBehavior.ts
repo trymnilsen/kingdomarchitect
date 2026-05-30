@@ -19,6 +19,7 @@ import type { Entity } from "../../entity/entity.ts";
 import type { BehaviorActionData } from "../actions/ActionData.ts";
 import type { Behavior } from "./Behavior.ts";
 import { findStockpiles } from "../../building/materialQuery.ts";
+import { planDepositHeld } from "../../job/planner/planDepositHeld.ts";
 
 export const HUNGER_THRESHOLD = 40;
 export const STEAL_THRESHOLD = 80;
@@ -65,11 +66,11 @@ export function createEatBehavior(): Behavior {
             const actions: BehaviorActionData[] = [];
             const settlement = getSettlementEntity(entity);
 
-            // Stage 3: Drop any held items
+            // Stage 3: Clear the held slot so acquired food can be eaten from
+            // hand. Prefer depositing the carried item at a stockpile and only
+            // drop it on the ground when none will take it (planDepositHeld).
             if (held && !isHeldEmpty(held)) {
-                actions.push({
-                    type: "dropHeld",
-                });
+                actions.push(...planDepositHeld(entity));
             }
 
             // Stage 4: walk to stockpile food

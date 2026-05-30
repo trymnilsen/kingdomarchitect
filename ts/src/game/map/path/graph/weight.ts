@@ -8,8 +8,8 @@ import type { Entity } from "../../../entity/entity.ts";
 import { isPermanentObstacle } from "../../../../data/inventory/items/naturalResource.ts";
 import { queryEntity } from "../../query/queryEntity.ts";
 import {
+    isImpassableStructure,
     TraversalComponentId,
-    TRAVERSAL_IMPASSABLE_THRESHOLD,
 } from "../../../component/traversalComponent.ts";
 
 /**
@@ -27,16 +27,7 @@ export function isTileAvailable(point: Point, root: Entity): boolean {
 
     const entities = queryEntity(root, point);
     for (const entity of entities) {
-        const building = entity.getEcsComponent(BuildingComponentId);
-        if (building && building.building.id !== "road") {
-            const traversal = entity.getEcsComponent(TraversalComponentId);
-            if (
-                !traversal ||
-                traversal.weight >= TRAVERSAL_IMPASSABLE_THRESHOLD
-            ) {
-                return false;
-            }
-        }
+        if (isImpassableStructure(entity)) return false;
 
         const resource = entity.getEcsComponent(ResourceComponentId);
         if (resource && isPermanentObstacle(resource.resourceId)) return false;

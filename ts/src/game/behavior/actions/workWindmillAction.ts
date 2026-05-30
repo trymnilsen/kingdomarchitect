@@ -24,6 +24,15 @@ export type WorkWindmillActionData = {
     windmillId: string;
 };
 
+/**
+ * Growth-speed multiplier applied to a farm while the windmill is actively
+ * operated. The baseline farmGrowthSystem advances a growing crop by one tick
+ * of progress each tick; the windmill credits the remaining (multiplier - 1)
+ * ticks per tick it tends the farm, so a value of 3 means adjacent crops grow
+ * at triple speed.
+ */
+const WINDMILL_GROWTH_MULTIPLIER = 3;
+
 const ADJACENT_OFFSETS: ReadonlyArray<{ dx: number; dy: number }> = [
     { dx: -1, dy: -1 },
     { dx: 0, dy: -1 },
@@ -37,8 +46,9 @@ const ADJACENT_OFFSETS: ReadonlyArray<{ dx: number; dy: number }> = [
 
 /**
  * Work a windmill: each tick scan the 8 adjacent tiles for farms,
- * plant any that are Empty, and once nothing is Growing harvest Ready farms
- * into the worker's held slot and complete the job.
+ * plant any that are Empty, accelerate the growth of any that are Growing
+ * (see WINDMILL_GROWTH_MULTIPLIER), and once nothing is Growing harvest Ready
+ * farms into the worker's held slot and complete the job.
  *
  * Held is single-slot, so this pass harvests one crop type only — whatever the
  * worker already holds, or the first Ready farm's crop if held is empty.
@@ -102,6 +112,11 @@ export function executeWorkWindmillAction(
             farmEntity.invalidateComponent(FarmComponentId);
             growingCount++;
         } else if (farm.state === FarmState.Growing) {
+            // Credit the extra growth the windmill provides this tick by moving
+            // the effective plant time backward, so elapsed growth advances
+            // faster than wall-clock while the windmill is tended.
+            farm.plantedAtTick -= WINDMILL_GROWTH_MULTIPLIER - 1;
+            farmEntity.invalidateComponent(FarmComponentId);
             growingCount++;
         }
     }

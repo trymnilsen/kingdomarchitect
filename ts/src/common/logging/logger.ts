@@ -1,5 +1,6 @@
 import { createRingBuffer, readEntries, writeEntry } from "../ringBuffer.ts";
 import type { LogEntry, LogLevel } from "./logEntry.ts";
+import { snapshotLogData } from "./logDataSnapshot.ts";
 
 function pickConsoleFn(level: LogLevel): (...args: unknown[]) => void {
     if (level === "debug") return console.debug;
@@ -55,7 +56,18 @@ export class BufferWriter {
     private buffer = createRingBuffer<LogEntry>(8192);
 
     write(entry: LogEntry): void {
-        writeEntry(this.buffer, entry);
+        if (entry.data === undefined) {
+            writeEntry(this.buffer, entry);
+            return;
+        }
+        // The buffer feeds the log history embedded in save files, so it must
+        // never retain live, circular game objects (e.g. entities). Snapshot the
+        // payload into a JSON-safe form before storing it.
+        const safeEntry: LogEntry = {
+            ...entry,
+            data: snapshotLogData(entry.data),
+        };
+        writeEntry(this.buffer, safeEntry);
     }
 
     readEntries(): LogEntry[] {

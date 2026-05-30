@@ -124,4 +124,40 @@ describe("BufferWriter", () => {
     it("getLogBuffer returns undefined when no buffer writer is set", () => {
         assert.strictEqual(log.getLogBuffer(), undefined);
     });
+
+    it("stores a JSON-safe snapshot of circular data payloads", () => {
+        log.setLogBufferWriter(new BufferWriter());
+
+        const parent: Record<string, unknown> = { id: "parent" };
+        const child: Record<string, unknown> = { id: "child", parent };
+        parent["children"] = [child];
+
+        log.warn("circular payload", parent);
+
+        const entries = log.getLogBuffer();
+        assert.ok(entries !== undefined);
+        // The whole buffer is what gets embedded in save files; it must survive
+        // serialization even though the logged object referenced itself.
+        assert.doesNotThrow(() => JSON.stringify(entries));
+
+        const data = entries[0].data as Record<string, unknown>;
+        assert.strictEqual(data["id"], "parent");
+        const snapshottedChild = (
+            data["children"] as Record<string, unknown>[]
+        )[0];
+        assert.strictEqual(snapshottedChild["id"], "child");
+        assert.strictEqual(snapshottedChild["parent"], "[Circular]");
+    });
+
+    it("snapshots the payload at log time so later mutation is not captured", () => {
+        log.setLogBufferWriter(new BufferWriter());
+
+        const payload = { count: 1 };
+        log.info("snapshot", payload);
+        payload.count = 99;
+
+        const entries = log.getLogBuffer();
+        assert.ok(entries !== undefined);
+        assert.strictEqual((entries[0].data as { count: number }).count, 1);
+    });
 });
