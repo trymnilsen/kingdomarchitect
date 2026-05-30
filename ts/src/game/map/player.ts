@@ -9,6 +9,12 @@ import {
     treeResource,
 } from "../../data/inventory/items/naturalResource.ts";
 import { swordItem } from "../../data/inventory/items/equipment.ts";
+import { planksItem, timberFramesItem } from "../../data/inventory/items/processedMaterials.ts";
+import {
+    goldCoins,
+    stoneResource as stoneInventoryItem,
+    woodResourceItem,
+} from "../../data/inventory/items/resources.ts";
 import { ChunkMapComponentId } from "../component/chunkMapComponent.ts";
 import { HousingComponentId } from "../component/housingComponent.ts";
 import {
@@ -51,6 +57,12 @@ export function addInitialPlayerChunk(scopedEntity: Entity): Point {
     const stockpileInventory =
         startingStockpile.requireEcsComponent(InventoryComponentId);
     addInventoryItem(stockpileInventory, swordItem, 1);
+    // Enough to build two windmills, two carpenters, and two blacksmiths
+    addInventoryItem(stockpileInventory, woodResourceItem, 220);
+    addInventoryItem(stockpileInventory, stoneInventoryItem, 180);
+    addInventoryItem(stockpileInventory, planksItem, 40);
+    addInventoryItem(stockpileInventory, timberFramesItem, 40);
+    addInventoryItem(stockpileInventory, goldCoins, 4);
 
     // World resources stay on the chunk entity
     chunkEntity.addChild(firstTree);

@@ -1,15 +1,18 @@
-import { addPoint } from "../../common/point.ts";
 import { allSides } from "../../common/sides.ts";
 import { spriteRefs, type SpriteRef } from "../../asset/sprite.ts";
 import { ninePatchBackground } from "../uiBackground.ts";
 import { type UISize, wrapUiSize } from "../uiSize.ts";
 import { bookInkColor } from "../color.ts";
-import { OpenBookUIBackground } from "../visual/bookBackground.ts";
+import {
+    OpenBookPage,
+    OpenBookUIBackground,
+} from "../visual/bookBackground.ts";
 import {
     createComponent,
     type ComponentDescriptor,
     type PlacedChild,
 } from "./ui.ts";
+import { uiBox } from "./uiBox.ts";
 import { uiButton } from "./uiButton.ts";
 import { uiImage } from "./uiImage.ts";
 import { uiText } from "./uiText.ts";
@@ -53,10 +56,9 @@ const bookSize: UISize = {
 };
 const horizontalPadding = 44;
 const verticalPadding = 32;
-const bookBackground = new OpenBookUIBackground();
 
 export const uiBookLayout = createComponent<UiBookLayoutProps>(
-    ({ props, withDraw, measureDescriptor, constraints }) => {
+    ({ props, measureDescriptor, constraints }) => {
         const currentPage = props.currentPage ?? UIBookLayoutPage.Left;
 
         // Determine layout mode based on available space
@@ -121,26 +123,38 @@ export const uiBookLayout = createComponent<UiBookLayoutProps>(
             (constraints.height - bookContainerHeight) / 2,
         );
 
-        // Draw the book background
-        withDraw((scope, region) => {
-            const backgroundPosition = addPoint(
-                {
-                    x: centerX + horizontalPadding + bookOffset,
-                    y: centerY + verticalPadding,
-                },
-                { x: region.x, y: region.y },
-            );
+        const children: PlacedChild[] = [];
 
-            bookBackground.draw(scope, backgroundPosition, {
-                width:
-                    mode === UIBookLayoutMode.Single
-                        ? bookSize.width
-                        : bookWidth,
-                height: pageHeight,
-            });
+        // The book panel is a real, bounded box so it occludes taps over just
+        // its own window (a click on the page does nothing) while a click on the
+        // surrounding scrim still falls through to dismiss the modal. In single
+        // mode only the visible page is drawn; in dual mode both halves are.
+        const isSingleMode = mode === UIBookLayoutMode.Single;
+        const bookWindowWidth = isSingleMode ? pageWidth : bookSize.width;
+        let backgroundPage: OpenBookPage;
+        if (isSingleMode) {
+            backgroundPage =
+                currentPage === UIBookLayoutPage.Right
+                    ? OpenBookPage.Right
+                    : OpenBookPage.Left;
+        } else {
+            backgroundPage = OpenBookPage.Both;
+        }
+
+        const bookBackgroundBox = uiBox({
+            width: bookWindowWidth,
+            height: pageHeight,
+            background: new OpenBookUIBackground(backgroundPage),
         });
 
-        const children: PlacedChild[] = [];
+        children.push({
+            ...bookBackgroundBox,
+            offset: {
+                x: centerX + horizontalPadding,
+                y: centerY + verticalPadding,
+            },
+            size: { width: bookWindowWidth, height: pageHeight },
+        });
 
         // Back button: only in single mode on the right page when a page-change handler is provided
         if (

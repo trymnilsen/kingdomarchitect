@@ -41,9 +41,9 @@ describe("UiBookLayout", () => {
         );
 
         assert.ok(isLayoutResult(result), "expected a LayoutResult");
-        // Both pages should be present
-        assert.strictEqual(result.children.length, 2);
-        const [left, right] = result.children as Array<{
+        // Book background box (index 0) followed by both pages
+        assert.strictEqual(result.children.length, 3);
+        const [, left, right] = result.children as Array<{
             offset: { x: number; y: number };
         }>;
         assert.ok(
@@ -75,8 +75,9 @@ describe("UiBookLayout", () => {
 
         assert.ok(isLayoutResult(result1));
         assert.ok(isLayoutResult(result2));
-        // The second render uses page2 — verify it's a different descriptor
-        const leftChild2 = result2.children[0] as any;
+        // The second render uses page2 — verify it's a different descriptor.
+        // Index 1 because the book background box occupies index 0.
+        const leftChild2 = result2.children[1] as any;
         assert.strictEqual(leftChild2.props.content, "Page2");
     });
 
@@ -103,7 +104,8 @@ describe("UiBookLayout", () => {
 
         assert.ok(isLayoutResult(result1));
         assert.ok(isLayoutResult(result2));
-        const rightChild2 = result2.children[0] as any;
+        // Index 1 because the book background box occupies index 0.
+        const rightChild2 = result2.children[1] as any;
         assert.strictEqual(rightChild2.props.content, "Right2");
     });
 
@@ -119,8 +121,8 @@ describe("UiBookLayout", () => {
         );
 
         assert.ok(isLayoutResult(result));
-        // In dual mode: two page children, no back button above the book
-        assert.strictEqual(result.children.length, 2);
+        // Book background box + two page children, no back button above the book
+        assert.strictEqual(result.children.length, 3);
         const bookTopY =
             Math.max(0, (600 - (PAGE_HEIGHT + VERTICAL_PADDING * 2)) / 2) +
             VERTICAL_PADDING;
@@ -143,9 +145,9 @@ describe("UiBookLayout", () => {
         );
 
         assert.ok(isLayoutResult(result));
-        // Both pages are still in the children (single mode doesn't hide the off-screen page)
-        assert.strictEqual(result.children.length, 2);
-        const [left, right] = result.children as Array<{
+        // Book background box + both pages (single mode doesn't hide the off-screen page)
+        assert.strictEqual(result.children.length, 3);
+        const [, left, right] = result.children as Array<{
             offset: { x: number; y: number };
         }>;
         // In single mode (left page shown), left page offset.x should be smaller and within view,
@@ -169,7 +171,8 @@ describe("UiBookLayout", () => {
         );
 
         assert.ok(isLayoutResult(result));
-        assert.strictEqual(result.children.length, 2);
+        // Book background box + left page + right page
+        assert.strictEqual(result.children.length, 3);
 
         // In single mode with right page, bookOffset = -pageWidth, so:
         // right page offset.x = centerX + pageWidth + horizontalPadding + bookOffset + 16
@@ -181,7 +184,8 @@ describe("UiBookLayout", () => {
         );
         const expectedRightX =
             centerX + PAGE_WIDTH + HORIZONTAL_PADDING + -PAGE_WIDTH + 16;
-        const rightChild = result.children[1] as any;
+        // Index 2: book background box (0), left page (1), right page (2).
+        const rightChild = result.children[2] as any;
         assert.strictEqual(rightChild.offset.x, expectedRightX);
     });
 
@@ -208,8 +212,8 @@ describe("UiBookLayout", () => {
         );
 
         assert.ok(isLayoutResult(result));
-        // Back button + left + right pages = 3 children
-        assert.strictEqual(result.children.length, 3);
+        // Book background box + back button + left + right pages = 4 children
+        assert.strictEqual(result.children.length, 4);
 
         const centerY = Math.max(
             0,
@@ -243,8 +247,8 @@ describe("UiBookLayout", () => {
         );
 
         assert.ok(isLayoutResult(result));
-        // Only two page children — no back button in dual mode
-        assert.strictEqual(result.children.length, 2);
+        // Book background box + two page children — no back button in dual mode
+        assert.strictEqual(result.children.length, 3);
     });
 
     it("does not show back button on left page in single mode", () => {
@@ -265,9 +269,10 @@ describe("UiBookLayout", () => {
         );
 
         assert.ok(isLayoutResult(result));
+        // Book background box + two page children, no back button on the left page
         assert.strictEqual(
             result.children.length,
-            2,
+            3,
             "no back button when on left page",
         );
     });

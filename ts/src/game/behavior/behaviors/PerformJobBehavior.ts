@@ -26,8 +26,7 @@ import {
     isHeldEmpty,
 } from "../../component/heldItemComponent.ts";
 import { getResourceById } from "../../../data/inventory/items/naturalResource.ts";
-import { BehaviorAgentComponentId } from "../../component/BehaviorAgentComponent.ts";
-import { getJobDisplayName } from "../../job/jobDisplayName.ts";
+import { getJobTargetPosition } from "../../job/jobQuery.ts";
 
 type BuildJobValidator = (
     root: Entity,
@@ -103,10 +102,6 @@ export function createPerformJobBehavior(
                     `[PerformJobBehavior] entity ${entity.id} had claimed job ${claimedJob.id}`,
                     claimedJob,
                 );
-                const agent = entity.getEcsComponent(BehaviorAgentComponentId);
-                if (agent) {
-                    agent.currentJobName = getJobDisplayName(root, claimedJob);
-                }
                 const actions = planJob(root, entity, claimedJob, buildPlanner);
                 log.info(
                     `[PerformJobBehavior] entity ${entity.id} planned actions`,
@@ -134,10 +129,6 @@ export function createPerformJobBehavior(
                 job,
             );
             claimJobInQueue(job, entity.id, queueEntity);
-            const agent = entity.getEcsComponent(BehaviorAgentComponentId);
-            if (agent) {
-                agent.currentJobName = getJobDisplayName(root, job);
-            }
             const actions = planJob(root, entity, job, buildPlanner);
             log.info(
                 `[PerformJobBehavior] entity ${entity.id} planned actions`,
@@ -354,37 +345,4 @@ function canExecuteProductionJob(
             j.id === ProductionJobId &&
             (j as ProductionJob).targetBuilding === job.targetBuilding,
     );
-}
-
-/**
- * Get the target position for a job (where the worker needs to go).
- */
-function getJobTargetPosition(
-    root: Entity,
-    job: Jobs,
-): { x: number; y: number } | null {
-    switch (job.id) {
-        case "collectResource":
-        case "collectItem":
-        case "buildBuildingJob": {
-            const entity = root.findEntity(job.entityId);
-            return entity?.worldPosition ?? null;
-        }
-        case "craftingJob":
-        case "productionJob": {
-            const entity = root.findEntity(job.targetBuilding);
-            return entity?.worldPosition ?? null;
-        }
-        case "farmPlantJob":
-        case "windmillJob":
-        case "farmHarvestJob": {
-            const entity = root.findEntity(job.targetBuilding);
-            return entity?.worldPosition ?? null;
-        }
-        case "moveToJob": {
-            return job.position;
-        }
-        default:
-            return null;
-    }
 }

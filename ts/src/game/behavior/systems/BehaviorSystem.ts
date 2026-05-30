@@ -133,7 +133,6 @@ function updateBehaviorAgent(
  */
 function clearBehavior(agent: BehaviorAgentComponent): void {
     agent.currentBehaviorName = null;
-    agent.currentJobName = null;
     agent.currentBehaviorUtility = 0;
     agent.actionQueue = [];
 }
@@ -253,9 +252,6 @@ function replan(
     const bestBehavior = behaviorUtilities[0];
 
     const sameBehavior = currentBehavior?.name === bestBehavior.behavior.name;
-    if (!sameBehavior) {
-        agent.currentJobName = null;
-    }
     // pendingReplan is still set here so behaviors can read failure context
     // from the component inside expand()
     const newActions = bestBehavior.behavior.expand(entity);

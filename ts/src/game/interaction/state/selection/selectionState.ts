@@ -1,7 +1,8 @@
 import { spriteRefs } from "../../../../asset/sprite.ts";
 import { allSides } from "../../../../common/sides.ts";
+import type { Point } from "../../../../common/point.ts";
 import { RenderScope } from "../../../../rendering/renderScope.ts";
-import { TileSize } from "../../../map/tile.ts";
+import { TileSize, HalfTileSize } from "../../../map/tile.ts";
 import { SelectedEntityItem } from "../../selection/selectedEntityItem.ts";
 import { SelectedTileItem } from "../../selection/selectedTileItem.ts";
 import { SelectedWorldItem } from "../../selection/selectedWorldItem.ts";
@@ -43,6 +44,12 @@ import {
     FarmState,
 } from "../../../component/farmComponent.ts";
 import { getCraftingJobDisplayInfos } from "../../../job/craftingJobQuery.ts";
+import {
+    getJobForWorker,
+    getJobsTargetingEntity,
+    getJobTargetPosition,
+} from "../../../job/jobQuery.ts";
+import { getJobDisplayName } from "../../../job/jobDisplayName.ts";
 import { craftingQueueStrip } from "../crafting/craftingQueueStrip.ts";
 import { uiAbsoluteLayer } from "../../../../ui/declarative/uiAbsoluteLayer.ts";
 import type { Entity } from "../../../entity/entity.ts";
@@ -196,6 +203,8 @@ export class SelectionState extends InteractionState {
         });
 
         if (selection instanceof SelectedEntityItem) {
+            drawJobLinks(context, selection);
+
             const productionComp = selection.entity.getEcsComponent(
                 ProductionComponentId,
             );
@@ -352,7 +361,13 @@ export class SelectionState extends InteractionState {
             );
             let subtitle = "selected";
             if (behaviorAgent) {
-                const jobName = behaviorAgent.currentJobName;
+                const claimedJob = getJobForWorker(this._selection.entity);
+                const jobName = claimedJob
+                    ? getJobDisplayName(
+                          this._selection.entity.getRootEntity(),
+                          claimedJob,
+                      )
+                    : null;
                 if (jobName) {
                     subtitle = jobName;
                 } else {
@@ -471,6 +486,86 @@ export class SelectionState extends InteractionState {
             right: rightItems,
         };
     }
+}
+
+const claimedLinkColor = "#5fbf5f";
+const unclaimedMarkerColor = "#ffb000";
+const jobLinkWidth = 2;
+
+/**
+ * Draw the job relationships for the selected entity, derived live from the job
+ * queue each frame. A worker shows a line to the job it is performing; an entity
+ * that is the target of work shows a line to whoever claimed it, or an amber box
+ * when the work is queued but unclaimed.
+ */
+function drawJobLinks(context: RenderScope, selection: SelectedEntityItem) {
+    const entity = selection.entity;
+    const root = entity.getRootEntity();
+
+    const workerJob = getJobForWorker(entity);
+    if (workerJob && workerJob.id !== "moveToJob") {
+        const targetPosition = getJobTargetPosition(root, workerJob);
+        if (targetPosition) {
+            drawDottedLink(
+                context,
+                entity.worldPosition,
+                targetPosition,
+                claimedLinkColor,
+            );
+        }
+    }
+
+    for (const job of getJobsTargetingEntity(entity)) {
+        if (job.claimedBy) {
+            const worker = root.findEntity(job.claimedBy);
+            if (worker) {
+                drawDottedLink(
+                    context,
+                    entity.worldPosition,
+                    worker.worldPosition,
+                    claimedLinkColor,
+                );
+            }
+        } else {
+            drawUnclaimedMarker(context, selection);
+        }
+    }
+}
+
+function drawDottedLink(
+    context: RenderScope,
+    from: Point,
+    to: Point,
+    color: string,
+) {
+    const fromScreen = context.camera.tileSpaceToScreenSpace(from);
+    const toScreen = context.camera.tileSpaceToScreenSpace(to);
+    context.drawDottedLine(
+        fromScreen.x + HalfTileSize,
+        fromScreen.y + HalfTileSize,
+        toScreen.x + HalfTileSize,
+        toScreen.y + HalfTileSize,
+        color,
+        jobLinkWidth,
+    );
+}
+
+function drawUnclaimedMarker(
+    context: RenderScope,
+    selection: SelectedEntityItem,
+) {
+    const topLeft = context.camera.tileSpaceToScreenSpace(
+        selection.tilePosition,
+    );
+    const x1 = topLeft.x;
+    const y1 = topLeft.y;
+    const x2 = topLeft.x + selection.selectionSize.x * TileSize;
+    const y2 = topLeft.y + selection.selectionSize.y * TileSize;
+
+    context.drawDottedLine(x1, y1, x2, y1, unclaimedMarkerColor, jobLinkWidth);
+    context.drawDottedLine(x2, y1, x2, y2, unclaimedMarkerColor, jobLinkWidth);
+    context.drawDottedLine(x2, y2, x1, y2, unclaimedMarkerColor, jobLinkWidth);
+    context.drawDottedLine(x1, y2, x1, y1, unclaimedMarkerColor, jobLinkWidth);
 }
 
 function drawHealthbar(

@@ -23,12 +23,21 @@ type UiBoxProps = {
 };
 
 export const uiBox = createComponent<UiBoxProps>(
-    ({ props, withDraw, measureDescriptor, constraints }) => {
+    ({ props, withDraw, measureDescriptor, constraints, withPointerState }) => {
         withDraw((scope, region) => {
             if (props.background) {
                 props.background.draw(scope, region, region);
             }
         });
+
+        // A box that paints a visible background is a solid surface, so it
+        // occludes pointer events: a tap landing on it stops here instead of
+        // falling through to whatever is behind it (such as a modal's dismiss
+        // scrim). It registers as interactive but installs no onTap, so it
+        // never steals a tap meant for an interactive ancestor like a button.
+        if (props.background) {
+            withPointerState();
+        }
         let size = constraints;
         if (props.width >= 0) {
             size.width = props.width;

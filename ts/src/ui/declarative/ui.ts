@@ -238,6 +238,20 @@ export class UiRenderer {
             }
         }
 
+        // Occlusion: even when no handler ran, a tap that landed on an
+        // interactive surface (a backgrounded box) is absorbed rather than
+        // passed through to whatever is behind it. This is checked only after
+        // the handler loop, so a solid surface never steals a tap from an
+        // interactive ancestor that does have an onTap.
+        if (!handled) {
+            for (const node of upChain) {
+                if (this.pointer.isPressed(node)) {
+                    handled = true;
+                    break;
+                }
+            }
+        }
+
         this.pointer.clearPressed();
         return handled;
     }
