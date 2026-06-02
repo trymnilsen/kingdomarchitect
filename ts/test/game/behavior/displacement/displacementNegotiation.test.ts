@@ -200,6 +200,74 @@ describe("displacementNegotiation", () => {
             assert.deepStrictEqual(requesterMove!.to, { x: 11, y: 8 });
         });
 
+        it("returns a free beneficial swap when blocker is heading into the requester's tile", () => {
+            const { root } = createTestWorld();
+            // Equal utility: dominance would refuse (5 > 5 is false). But the blocker
+            // is itself trying to step into the requester's tile (its cachedPath[0] is
+            // the requester's position), so it's a mutually-beneficial head-on swap.
+            const requester = createAgent("requester", 5, root, 10, 8);
+            const blocker = createAgent("blocker", 5, root, 11, 8);
+            getBehaviorAgent(blocker)!.actionQueue = [
+                {
+                    type: "moveTo",
+                    target: { x: 8, y: 8 },
+                    cachedPath: [{ x: 10, y: 8 }],
+                },
+            ];
+
+            const result = negotiateDisplacement(
+                requester,
+                { x: 11, y: 8 },
+                5,
+                root,
+                1,
+            );
+
+            assert.ok(
+                result.kind === "success",
+                "Should return a swap transaction even at equal utility",
+            );
+            assert.strictEqual(result.transaction.isCycle, true);
+            assert.strictEqual(result.transaction.beneficialSwap, true);
+            assert.strictEqual(result.transaction.moves.length, 2);
+
+            const blockerMove = result.transaction.moves.find(
+                (m) => m.entityId === "blocker",
+            );
+            const requesterMove = result.transaction.moves.find(
+                (m) => m.entityId === "requester",
+            );
+            assert.deepStrictEqual(blockerMove!.from, { x: 11, y: 8 });
+            assert.deepStrictEqual(blockerMove!.to, { x: 10, y: 8 });
+            assert.deepStrictEqual(requesterMove!.from, { x: 10, y: 8 });
+            assert.deepStrictEqual(requesterMove!.to, { x: 11, y: 8 });
+        });
+
+        it("does not treat a same-direction follower as a beneficial swap", () => {
+            const { root } = createTestWorld();
+            // Blocker is moving, but heading AWAY from the requester (its next step is
+            // east, not into the requester). Equal utility → no swap, dominance refuses.
+            const requester = createAgent("requester", 5, root, 10, 8);
+            const blocker = createAgent("blocker", 5, root, 11, 8);
+            getBehaviorAgent(blocker)!.actionQueue = [
+                {
+                    type: "moveTo",
+                    target: { x: 14, y: 8 },
+                    cachedPath: [{ x: 12, y: 8 }],
+                },
+            ];
+
+            const result = negotiateDisplacement(
+                requester,
+                { x: 11, y: 8 },
+                5,
+                root,
+                1,
+            );
+
+            assert.strictEqual(result.kind, "refused");
+        });
+
         it("returns a 2-move chain when blocker must displace a second entity", () => {
             const { root } = createTestWorld();
             // Requester at (8,8) — NOT adjacent to B — targeting (11,8).

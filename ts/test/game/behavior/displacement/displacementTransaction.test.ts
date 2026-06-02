@@ -20,6 +20,10 @@ import {
 } from "../../../../src/game/component/movementStaminaComponent.ts";
 import { createSpriteComponent } from "../../../../src/game/component/spriteComponent.ts";
 import {
+    createEnergyComponent,
+    EnergyComponentId,
+} from "../../../../src/game/component/energyComponent.ts";
+import {
     commitDisplacementTransaction,
     type DisplacementTransaction,
 } from "../../../../src/game/behavior/displacement/displacementTransaction.ts";
@@ -286,6 +290,74 @@ describe("displacementTransaction", () => {
                 undefined,
                 "Requester should NOT receive a replan (it manages its own moveTo action)",
             );
+        });
+
+        it("beneficial swap charges energy, advances cached paths, and does not replan", () => {
+            const { root } = createTestWorld();
+            const a = createAgent("a", root, 10, 8);
+            const b = createAgent("b", root, 11, 8);
+            a.setEcsComponent(createEnergyComponent(100));
+            b.setEcsComponent(createEnergyComponent(100));
+
+            // Each is heading into the other's tile — a head-on swap. Cached paths
+            // start with the tile each is about to step into.
+            const aAgent = getBehaviorAgent(a)!;
+            const bAgent = getBehaviorAgent(b)!;
+            aAgent.actionQueue = [
+                {
+                    type: "moveTo",
+                    target: { x: 15, y: 8 },
+                    cachedPath: [
+                        { x: 11, y: 8 },
+                        { x: 12, y: 8 },
+                    ],
+                },
+            ];
+            bAgent.actionQueue = [
+                {
+                    type: "moveTo",
+                    target: { x: 5, y: 8 },
+                    cachedPath: [
+                        { x: 10, y: 8 },
+                        { x: 9, y: 8 },
+                    ],
+                },
+            ];
+            aAgent.pendingReplan = undefined;
+            bAgent.pendingReplan = undefined;
+
+            const tx: DisplacementTransaction = {
+                moves: [
+                    { entityId: "b", from: { x: 11, y: 8 }, to: { x: 10, y: 8 } },
+                    { entityId: "a", from: { x: 10, y: 8 }, to: { x: 11, y: 8 } },
+                ],
+                isCycle: true,
+                beneficialSwap: true,
+            };
+
+            const committed = commitDisplacementTransaction(tx, root, 1, "a");
+
+            assert.strictEqual(committed, true);
+            assert.deepStrictEqual(a.worldPosition, { x: 11, y: 8 });
+            assert.deepStrictEqual(b.worldPosition, { x: 10, y: 8 });
+
+            // Both members paid for their own step.
+            assert.strictEqual(a.getEcsComponent(EnergyComponentId)!.energy, 99);
+            assert.strictEqual(b.getEcsComponent(EnergyComponentId)!.energy, 99);
+
+            // Each continues its route — consumed step sliced off, no replan.
+            assert.deepStrictEqual(aAgent.actionQueue[0], {
+                type: "moveTo",
+                target: { x: 15, y: 8 },
+                cachedPath: [{ x: 12, y: 8 }],
+            });
+            assert.deepStrictEqual(bAgent.actionQueue[0], {
+                type: "moveTo",
+                target: { x: 5, y: 8 },
+                cachedPath: [{ x: 9, y: 8 }],
+            });
+            assert.strictEqual(aAgent.pendingReplan, undefined);
+            assert.strictEqual(bAgent.pendingReplan, undefined);
         });
 
         it("does not record a move on an entity without MovementStaminaComponent", () => {

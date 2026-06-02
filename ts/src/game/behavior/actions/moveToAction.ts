@@ -13,6 +13,7 @@ import {
 } from "../../component/directionComponent.ts";
 import {
     MovementStaminaComponentId,
+    hasMovedThisTick,
     recordMove,
 } from "../../component/movementStaminaComponent.ts";
 import { ResourceComponentId } from "../../component/resourceComponent.ts";
@@ -80,6 +81,15 @@ export function executeMoveToAction(
             `${entity.id} arrived at (${entity.worldPosition.x},${entity.worldPosition.y})`,
         );
         return ActionComplete;
+    }
+
+    // One-move-per-tick gate. If this entity already moved this tick — e.g. it was
+    // advanced as part of a beneficial swap during another agent's turn — it must
+    // not step again. Wait; it continues along its route next tick. This keeps net
+    // speed at one tile per tick and the swap's energy cost from being doubled.
+    const stamina = entity.getEcsComponent(MovementStaminaComponentId);
+    if (stamina && hasMovedThisTick(stamina, tick)) {
+        return ActionRunning;
     }
 
     const root = entity.getRootEntity();

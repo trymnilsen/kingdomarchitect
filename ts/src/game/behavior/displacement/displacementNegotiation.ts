@@ -25,6 +25,7 @@ import {
     getDisplacementResistance,
     scoreCandidateTile,
 } from "./displacementCost.ts";
+import { deriveIntendedNextStep } from "./movementIntent.ts";
 import type {
     DisplacementMove,
     DisplacementTransaction,
@@ -73,6 +74,43 @@ export function negotiateDisplacement(
             `${requester.id} no displaceable entity at (${targetTile.x},${targetTile.y}), skipping`,
         );
         return { kind: "noChain" };
+    }
+
+    // Mutual-benefit pass: if the blocker is itself trying to step into the
+    // requester's current tile, swapping advances BOTH along their own paths. This
+    // costs neither party progress, so it bypasses the dominance/affordability
+    // check entirely — it works even at equal (or zero) utility. On a cardinal grid
+    // this is always a 2-entity swap. If the blocker has already moved this tick the
+    // transaction is still returned; the commit's staleness check turns it into a
+    // harmless "wait" without disturbing the requester's path.
+    const blockerNextStep = deriveIntendedNextStep(blocker);
+    if (
+        blockerNextStep &&
+        blockerNextStep.x === requester.worldPosition.x &&
+        blockerNextStep.y === requester.worldPosition.y
+    ) {
+        log.debug(
+            `${requester.id} mutual swap with ${blocker.id} (head-on pass at (${targetTile.x},${targetTile.y}))`,
+        );
+        return {
+            kind: "success",
+            transaction: {
+                isCycle: true,
+                beneficialSwap: true,
+                moves: [
+                    {
+                        entityId: blocker.id,
+                        from: targetTile,
+                        to: requester.worldPosition,
+                    },
+                    {
+                        entityId: requester.id,
+                        from: requester.worldPosition,
+                        to: targetTile,
+                    },
+                ],
+            },
+        };
     }
 
     const blockerResistance = getDisplacementResistance(blocker, currentTick);

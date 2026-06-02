@@ -3,6 +3,7 @@ import {
     BehaviorAgentComponentId,
     requestReplan,
 } from "../../component/BehaviorAgentComponent.ts";
+import { spendEntityEnergy } from "../../component/energyComponent.ts";
 import {
     DirectionComponentId,
     updateDirectionComponent,
@@ -30,6 +31,13 @@ export type DisplacementTransaction = {
      * "first" because every destination is occupied by another entity in the cycle.
      */
     isCycle: boolean;
+    /**
+     * True when this is a mutually-beneficial head-on swap: every member is stepping
+     * into a tile it already wanted, so each continues its own route (no replan) and
+     * pays its own movement energy. Distinguished from a forced cycle, where displaced
+     * members are shoved off-path (replan, no energy). Only meaningful when isCycle.
+     */
+    beneficialSwap?: boolean;
 };
 
 /**
@@ -77,7 +85,12 @@ export function commitDisplacementTransaction(
     );
 
     if (transaction.isCycle) {
-        commitCycle(resolved, currentTick, requesterEntityId);
+        commitCycle(
+            resolved,
+            currentTick,
+            requesterEntityId,
+            transaction.beneficialSwap === true,
+        );
     } else {
         commitChain(resolved, currentTick, requesterEntityId);
     }
@@ -142,6 +155,7 @@ function commitChain(
             to,
             currentTick,
             entity.id !== requesterEntityId,
+            false,
         );
     }
 }
@@ -157,16 +171,53 @@ function commitCycle(
     moves: ResolvedMove[],
     currentTick: number,
     requesterEntityId: string,
+    beneficialSwap: boolean,
 ): void {
     for (const { entity, from, to } of moves) {
-        applyEntityMove(
-            entity,
-            from,
-            to,
-            currentTick,
-            entity.id !== requesterEntityId,
-        );
+        if (beneficialSwap) {
+            // Mutually-beneficial swap: every member stepped into a tile it already
+            // wanted, so it continues its own route (no replan) and pays for its own
+            // step. Advance its cached path past the consumed step.
+            applyEntityMove(entity, from, to, currentTick, false, true);
+            advanceOrClearMoveCache(entity, to);
+        } else {
+            // Forced cycle: displaced members are shoved off-path — replan, no energy.
+            applyEntityMove(
+                entity,
+                from,
+                to,
+                currentTick,
+                entity.id !== requesterEntityId,
+                false,
+            );
+        }
     }
+}
+
+/**
+ * After a beneficial swap, drop the step the entity just consumed from its cached
+ * path so it keeps following the same `moveTo` next tick without a replan. If the
+ * cached head no longer matches (rare — a divergent committed route), clear the
+ * path so it is recomputed fresh next tick instead of stepping onto a stale tile.
+ */
+function advanceOrClearMoveCache(entity: Entity, to: Point): void {
+    const agent = entity.getEcsComponent(BehaviorAgentComponentId);
+    const action = agent?.actionQueue[0];
+    if (action?.type !== "moveTo") {
+        return;
+    }
+    const cached = action.cachedPath;
+    if (
+        cached &&
+        cached.length > 0 &&
+        cached[0].x === to.x &&
+        cached[0].y === to.y
+    ) {
+        action.cachedPath = cached.slice(1);
+    } else {
+        action.cachedPath = undefined;
+    }
+    entity.invalidateComponent(BehaviorAgentComponentId);
 }
 
 function applyEntityMove(
@@ -175,6 +226,7 @@ function applyEntityMove(
     to: Point,
     currentTick: number,
     triggerReplan: boolean,
+    spendEnergy: boolean,
 ): void {
     discoverAfterMovement(entity, to);
 
@@ -188,6 +240,10 @@ function applyEntityMove(
     if (stamina) {
         recordMove(stamina, currentTick);
         entity.invalidateComponent(MovementStaminaComponentId);
+    }
+
+    if (spendEnergy) {
+        spendEntityEnergy(entity, 1);
     }
 
     log.debug(

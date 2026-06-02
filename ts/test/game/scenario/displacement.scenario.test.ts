@@ -333,4 +333,134 @@ describe("Displacement Scenario", () => {
             "Player command should be cleared after arrival",
         );
     });
+
+    /**
+     * Seal y=8 into a true 1-wide corridor: y=7 is outside the chunk (natural wall)
+     * and we wall the entire y=9 row across the chunk width (x=8..31) so there is no
+     * way around — a refused worker cannot detour, making a swap the only resolution.
+     */
+    function sealCorridor(root: Entity) {
+        for (let x = 8; x <= 31; x++) {
+            createWall(`wall-${x}`, root, { x, y: 9 });
+        }
+    }
+
+    /** Assert no two entities occupy the same tile this tick. */
+    function assertNoOverlap(entities: Entity[], tick: number) {
+        const seen = new Set<string>();
+        for (const e of entities) {
+            const key = `${e.worldPosition.x},${e.worldPosition.y}`;
+            assert.ok(
+                !seen.has(key),
+                `Two entities share tile ${key} on tick ${tick}`,
+            );
+            seen.add(key);
+        }
+    }
+
+    function moveCommand(entity: Entity, target: Point) {
+        getBehaviorAgent(entity)!.playerCommand = {
+            action: "move",
+            targetPosition: target,
+        };
+    }
+
+    it("two equal-priority workers swap past each other in a 1-wide corridor", () => {
+        /**
+         * A at (10,8) wants (13,8); B at (13,8) wants (10,8). y=9 is walled, y=7 is
+         * outside the chunk — so the row is a 1-wide corridor with no way around.
+         * The only way both reach their targets is a head-on swap. With equal
+         * priority the old dominance gate would deadlock them forever.
+         */
+        const { root } = createWorld();
+        sealCorridor(root);
+
+        const a = createAgent("a", root, { x: 10, y: 8 });
+        const b = createAgent("b", root, { x: 13, y: 8 });
+        moveCommand(a, { x: 13, y: 8 });
+        moveCommand(b, { x: 10, y: 8 });
+
+        const behaviorSystem = createBehaviorSystem(() => [
+            createPerformPlayerCommandBehavior(),
+        ]);
+
+        let prevA = { ...a.worldPosition };
+        let prevB = { ...b.worldPosition };
+        for (let tick = 1; tick <= 12; tick++) {
+            behaviorSystem.onUpdate!(root, tick);
+            assertNoOverlap([a, b], tick);
+            // No worker advances more than one tile per tick.
+            const da =
+                Math.abs(a.worldPosition.x - prevA.x) +
+                Math.abs(a.worldPosition.y - prevA.y);
+            const db =
+                Math.abs(b.worldPosition.x - prevB.x) +
+                Math.abs(b.worldPosition.y - prevB.y);
+            assert.ok(da <= 1, `A moved ${da} tiles on tick ${tick}`);
+            assert.ok(db <= 1, `B moved ${db} tiles on tick ${tick}`);
+            prevA = { ...a.worldPosition };
+            prevB = { ...b.worldPosition };
+        }
+
+        assert.deepStrictEqual(a.worldPosition, { x: 13, y: 8 });
+        assert.deepStrictEqual(b.worldPosition, { x: 10, y: 8 });
+    });
+
+    it("one worker passes two oncoming workers in a 1-wide corridor", () => {
+        // Groups approach from a distance (as in real gameplay) so each worker has a
+        // committed cached path by the time the streams meet — the swap is detected
+        // from cachedPath[0]. (Starting workers already adjacent would not resolve
+        // until the deferred "in-transit is cheap to displace" resistance change.)
+        const { root } = createWorld();
+        sealCorridor(root);
+
+        const a = createAgent("a", root, { x: 9, y: 8 }); // heading right
+        const b = createAgent("b", root, { x: 13, y: 8 }); // heading left (leads)
+        const c = createAgent("c", root, { x: 14, y: 8 }); // heading left (follows b)
+        moveCommand(a, { x: 14, y: 8 });
+        moveCommand(b, { x: 8, y: 8 });
+        moveCommand(c, { x: 9, y: 8 });
+
+        const behaviorSystem = createBehaviorSystem(() => [
+            createPerformPlayerCommandBehavior(),
+        ]);
+
+        for (let tick = 1; tick <= 20; tick++) {
+            behaviorSystem.onUpdate!(root, tick);
+            assertNoOverlap([a, b, c], tick);
+        }
+
+        assert.deepStrictEqual(a.worldPosition, { x: 14, y: 8 });
+        assert.deepStrictEqual(b.worldPosition, { x: 8, y: 8 });
+        assert.deepStrictEqual(c.worldPosition, { x: 9, y: 8 });
+    });
+
+    it("two workers pass two oncoming workers in a 1-wide corridor", () => {
+        // Two groups approaching from a distance (see note above).
+        const { root } = createWorld();
+        sealCorridor(root);
+
+        const a = createAgent("a", root, { x: 9, y: 8 }); // heading right (follows b)
+        const b = createAgent("b", root, { x: 10, y: 8 }); // heading right (leads)
+        const c = createAgent("c", root, { x: 14, y: 8 }); // heading left (leads)
+        const d = createAgent("d", root, { x: 15, y: 8 }); // heading left (follows c)
+        moveCommand(a, { x: 15, y: 8 });
+        moveCommand(b, { x: 16, y: 8 });
+        moveCommand(c, { x: 8, y: 8 });
+        moveCommand(d, { x: 9, y: 8 });
+
+        const behaviorSystem = createBehaviorSystem(() => [
+            createPerformPlayerCommandBehavior(),
+        ]);
+
+        for (let tick = 1; tick <= 30; tick++) {
+            behaviorSystem.onUpdate!(root, tick);
+            assertNoOverlap([a, b, c, d], tick);
+        }
+
+        assert.deepStrictEqual(a.worldPosition, { x: 15, y: 8 });
+        assert.deepStrictEqual(b.worldPosition, { x: 16, y: 8 });
+        assert.deepStrictEqual(c.worldPosition, { x: 8, y: 8 });
+        assert.deepStrictEqual(d.worldPosition, { x: 9, y: 8 });
+    });
 });
