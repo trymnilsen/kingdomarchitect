@@ -57,6 +57,14 @@ export const clayBricksItem = {
     rarity: ItemRarity.Common,
 } as const;
 
+export const charcoalItem = {
+    asset: spriteRefs.stone_resource,
+    id: "charcoal",
+    name: "Charcoal",
+    hint: "Burnt wood for baking and smithing",
+    rarity: ItemRarity.Common,
+} as const;
+
 export const processedMaterials = [
     planksItem,
     timberFramesItem,
@@ -65,4 +73,5 @@ export const processedMaterials = [
     stoneBarsItem,
     gearsItem,
     clayBricksItem,
+    charcoalItem,
 ] as const;
