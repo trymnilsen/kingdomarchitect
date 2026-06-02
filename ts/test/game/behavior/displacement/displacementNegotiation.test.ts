@@ -61,6 +61,10 @@ function createAgent(
     entity.setEcsComponent(createMovementStaminaComponent());
     const agent = getBehaviorAgent(entity)!;
     agent.currentBehaviorUtility = utility;
+    // Default to "settled": a freshly-created agent carries pendingReplan, which would
+    // mark it transient (waited-for, not displaced). These unit tests model committed
+    // blockers, so clear it; the transient cases set it (or a moveTo) explicitly.
+    agent.pendingReplan = undefined;
     root.addChild(entity);
     entity.worldPosition = { x, y };
     return entity;
@@ -98,10 +102,10 @@ describe("displacementNegotiation", () => {
             assert.strictEqual(result.kind, "noChain");
         });
 
-        it("returns refused when blocker resistance exceeds requester priority", () => {
+        it("returns refused when a settled blocker's cost exceeds requester priority", () => {
             const { root } = createTestWorld();
             const requester = createAgent("requester", 5, root, 10, 8);
-            // Blocker utility = 20, so resistance = 20. Requester priority = 5 < 20.
+            // Settled blocker, utility 20 → displaceable cost 20. Priority 5 < 20.
             createAgent("blocker", 20, root, 11, 8);
 
             const result = negotiateDisplacement(
@@ -115,12 +119,14 @@ describe("displacementNegotiation", () => {
             assert.strictEqual(result.kind, "refused");
         });
 
-        it("returns refused when blocker has already moved this tick", () => {
+        it("waits when the blocker has already moved this tick (free next tick)", () => {
             const { root } = createTestWorld();
             const requester = createAgent("requester", 100, root, 10, 8);
             const blocker = createAgent("blocker", 0, root, 11, 8);
             const stamina = blocker.getEcsComponent("MovementStamina")!;
-            // Record a move at the current tick — makes hasMovedThisTick return true
+            // Record a move at the current tick — makes hasMovedThisTick return true, so
+            // the blocker is movedThisTick: it can't move again now but is free next tick,
+            // so the requester waits and retries rather than routing around it.
             recordMove(stamina, 5);
 
             const result = negotiateDisplacement(
@@ -131,7 +137,7 @@ describe("displacementNegotiation", () => {
                 5,
             );
 
-            assert.strictEqual(result.kind, "refused");
+            assert.strictEqual(result.kind, "wait");
         });
 
         it("returns a single-move non-cycle transaction when blocker has a free tile", () => {
@@ -200,6 +206,37 @@ describe("displacementNegotiation", () => {
             assert.deepStrictEqual(requesterMove!.to, { x: 11, y: 8 });
         });
 
+        it("cycles with a boxed-in blocker even when the requester is itself in transit", () => {
+            const { root } = createTestWorld();
+            // Same boxed-in cycle as above, but the requester is walking (a moveTo at its
+            // queue head). scoreCandidateTile rejects the requester's own tile as a push
+            // target (it's transient), so the cycle is found only via the explicit
+            // cycle-back terminator — this pins that path.
+            const requester = createAgent("requester", 100, root, 10, 8);
+            getBehaviorAgent(requester)!.actionQueue = [
+                { type: "moveTo", target: { x: 11, y: 8 } },
+            ];
+            createAgent("blocker", 5, root, 11, 8);
+            createWall("wall-east", root, 12, 8);
+            createWall("wall-south", root, 11, 9);
+
+            const result = negotiateDisplacement(
+                requester,
+                { x: 11, y: 8 },
+                100,
+                root,
+                1,
+            );
+
+            assert.ok(result.kind === "success", "should return a cycle");
+            assert.strictEqual(result.transaction.isCycle, true);
+            assert.strictEqual(result.transaction.moves.length, 2);
+            const blockerMove = result.transaction.moves.find(
+                (m) => m.entityId === "blocker",
+            );
+            assert.deepStrictEqual(blockerMove!.to, { x: 10, y: 8 });
+        });
+
         it("returns a free beneficial swap when blocker is heading into the requester's tile", () => {
             const { root } = createTestWorld();
             // Equal utility: dominance would refuse (5 > 5 is false). But the blocker
@@ -243,10 +280,13 @@ describe("displacementNegotiation", () => {
             assert.deepStrictEqual(requesterMove!.to, { x: 11, y: 8 });
         });
 
-        it("does not treat a same-direction follower as a beneficial swap", () => {
+        it("waits for a same-direction follower's blocker instead of shoving it", () => {
             const { root } = createTestWorld();
             // Blocker is moving, but heading AWAY from the requester (its next step is
-            // east, not into the requester). Equal utility → no swap, dominance refuses.
+            // east, not into the requester) — so it is NOT a head-on beneficial swap.
+            // It is in transit (transient), so rather than shove it off its route the
+            // requester waits for it to vacate. This is what keeps same-direction
+            // traffic queueing rather than the follower barging past the leader.
             const requester = createAgent("requester", 5, root, 10, 8);
             const blocker = createAgent("blocker", 5, root, 11, 8);
             getBehaviorAgent(blocker)!.actionQueue = [
@@ -265,7 +305,7 @@ describe("displacementNegotiation", () => {
                 1,
             );
 
-            assert.strictEqual(result.kind, "refused");
+            assert.strictEqual(result.kind, "wait");
         });
 
         it("returns a 2-move chain when blocker must displace a second entity", () => {

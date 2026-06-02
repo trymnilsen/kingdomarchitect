@@ -1,16 +1,15 @@
 /**
- * Displacement cost model — Phase 1 implementation.
+ * Displacement classification + scoring policy.
  *
- * The functions in this file are deliberately isolated so that Phase 2
- * (tickToken social currency) can replace `getDisplacementResistance` and
- * `canAffordDisplacement` without touching the negotiation engine.
+ * `classifyBlocker` is the single source of truth for "what is this blocking entity, and
+ * what may I do with it." The negotiation engine and the chain-candidate scorer both
+ * consume it, so the transient/persistent model is defined in exactly one place.
  */
 import type { Point } from "../../../common/point.ts";
 import { BuildingComponentId } from "../../component/buildingComponent.ts";
 import { BehaviorAgentComponentId } from "../../component/BehaviorAgentComponent.ts";
 import {
     MovementStaminaComponentId,
-    getMovementPressure,
     hasMovedThisTick,
 } from "../../component/movementStaminaComponent.ts";
 import { ResourceComponentId } from "../../component/resourceComponent.ts";
@@ -19,59 +18,82 @@ import type { Entity } from "../../entity/entity.ts";
 import { queryEntity } from "../../map/query/queryEntity.ts";
 
 /**
- * Weight applied to movement pressure when computing resistance.
- * A fully-pressured entity (pressure=1.0) gains this many extra resistance points.
- * At 30, an idle goblin (utility≈10) that has been displaced repeatedly still has
- * lower resistance than a working goblin (utility≈50).
+ * How a blocking entity may be dealt with. The model is transient vs persistent
+ * *occupancy* of a tile — is the blocker going to leave on its own, or not?
+ *
+ *   - `transient`     — the blocker will vacate the tile by itself. Either it's *walking*
+ *                       (a `moveTo` at its queue head, so it steps off next tick) or it's
+ *                       *undecided* (`pendingReplan` set — freshly spawned, or it just
+ *                       finished/failed an action and hasn't re-chosen yet). You never
+ *                       shove a transient occupant: you wait for it, or swap if you're
+ *                       head-on. Shoving a walker wastes the route progress it made;
+ *                       shoving an undecided worker pre-empts a choice it's one tick from
+ *                       making.
+ *   - `movedThisTick` — it already moved this tick (the hard one-move-per-tick gate), so
+ *                       it can't move again until next tick. Like a transient occupant
+ *                       it's free next tick → the requester waits and retries.
+ *   - `displaceable`  — it has *settled*: idle (no plan → `cost` 0, yields for free) or
+ *                       doing a stationary task (`cost` = its behaviour utility). It won't
+ *                       move unless pushed, so it is shoved only by a higher-priority
+ *                       requester.
+ *   - `immovable`     — not a behaviour agent at all (building / resource / inert). Cannot
+ *                       be displaced. Defensive: the real call paths only ever classify
+ *                       agent-bearing entities, but keeping it makes the function total.
  */
-const PRESSURE_WEIGHT = 30;
+export type BlockerClass =
+    | { kind: "transient" }
+    | { kind: "movedThisTick" }
+    | { kind: "displaceable"; cost: number }
+    | { kind: "immovable" };
 
 /**
- * Returns the effective resistance of an entity to being displaced.
- * Higher resistance means the entity is harder (more expensive) to move.
+ * Classify a blocking entity. See {@link BlockerClass} for what each kind means and why.
  *
- * Returns Infinity when the entity cannot be displaced at all:
- *   - No BehaviorAgentComponent (buildings, resources, inert objects)
- *   - Already moved this tick (hard one-move-per-tick gate)
+ * The `pendingReplan` half of `transient` is load-bearing: it's what lets two workers
+ * that become adjacent before either has a committed path resolve cleanly — the first
+ * waits instead of shoving, and the beneficial swap fires once the second plans the same
+ * tick. It relies on the behaviour system clearing `pendingReplan` when a worker settles
+ * (idle or mid-task); a settled worker must classify as `displaceable`, not `transient`.
  */
-export function getDisplacementResistance(
-    entity: Entity,
-    currentTick: number,
-): number {
+export function classifyBlocker(entity: Entity, currentTick: number): BlockerClass {
     const agent = entity.getEcsComponent(BehaviorAgentComponentId);
     if (!agent) {
-        return Infinity;
+        return { kind: "immovable" };
     }
 
     const stamina = entity.getEcsComponent(MovementStaminaComponentId);
     if (stamina && hasMovedThisTick(stamina, currentTick)) {
-        return Infinity;
+        return { kind: "movedThisTick" };
     }
 
-    const pressure = stamina ? getMovementPressure(stamina, currentTick) : 0;
+    if (
+        agent.actionQueue[0]?.type === "moveTo" ||
+        agent.pendingReplan !== undefined
+    ) {
+        return { kind: "transient" };
+    }
 
-    return agent.currentBehaviorUtility + pressure * PRESSURE_WEIGHT;
+    return { kind: "displaceable", cost: agent.currentBehaviorUtility };
 }
 
 /**
  * Returns true if the requester's priority is high enough to afford
- * displacing an entity with the given resistance.
- *
- * Phase 2 will replace this with a token-balance check.
+ * displacing a persistent blocker with the given cost.
  */
 export function canAffordDisplacement(
     requesterPriority: number,
-    resistance: number,
+    cost: number,
 ): boolean {
-    return requesterPriority > resistance;
+    return requesterPriority > cost;
 }
 
 /**
  * Returns a score for how desirable a tile is as a displacement destination
  * for an entity being displaced. Higher is better.
  *
- * Returns -Infinity for tiles the entity cannot move to at all
- * (walls, buildings, resources).
+ * Returns -Infinity for tiles the entity cannot move to at all: walls, buildings,
+ * resources, or a tile held by an occupant that isn't `displaceable` (a transient,
+ * already-moved, or immovable occupant is never a chain link — you don't shove it).
  */
 export function scoreCandidateTile(
     tile: Point,
@@ -108,12 +130,14 @@ export function scoreCandidateTile(
         return 100;
     }
 
-    // Tile has a displaceable entity — score by inverse of their resistance
-    // (cheaper to move them = better candidate for chain extension)
-    const resistance = getDisplacementResistance(displaceable[0], currentTick);
-    if (!isFinite(resistance)) {
+    // Tile has an entity — only a `displaceable` one is a valid chain link, scored by
+    // the inverse of its cost (cheaper to move = better). Transient/moved/immovable
+    // occupants drop the tile out (-Infinity); a future BlockerClass kind safely defaults
+    // to not-chainable here too.
+    const cls = classifyBlocker(displaceable[0], currentTick);
+    if (cls.kind !== "displaceable") {
         return -Infinity;
     }
-    // Map resistance (0–100+) to a medium score (0–50)
-    return Math.max(0, 50 - resistance);
+    // Map cost (0–100+) to a medium score (0–50)
+    return Math.max(0, 50 - cls.cost);
 }

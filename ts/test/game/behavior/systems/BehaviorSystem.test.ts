@@ -310,6 +310,11 @@ describe("BehaviorSystem", () => {
 
             assert.strictEqual(agent.currentBehaviorName, null);
             assert.strictEqual(agent.actionQueue.length, 0);
+            // Invariant relied on by displacement: a settled (idle) worker has
+            // pendingReplan cleared, so it classifies as displaceable rather than
+            // transient. If this ever regresses, settled workers would silently become
+            // un-shoveable (everyone would wait for them forever).
+            assert.strictEqual(agent.pendingReplan, undefined);
         });
 
         it("populates action queue from selected behavior", () => {

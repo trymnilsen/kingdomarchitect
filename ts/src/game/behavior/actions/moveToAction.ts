@@ -425,6 +425,18 @@ function resolveDisplacedTile(
         tick,
     );
 
+    if (result.kind === "wait") {
+        // The blocker is transient (walking, or about to (re)plan) — it will vacate on
+        // its own. Hold position and keep the cached path intact so we retry the same
+        // step next tick, rather than clearing it and replanning a detour. This is what
+        // makes a worker queue behind same-direction traffic and wait out a head-on
+        // partner that hasn't computed its path yet.
+        log.debug(
+            `${entity.id} waiting for transient blocker at (${nextPoint.x},${nextPoint.y})`,
+        );
+        return { kind: "result", value: ActionRunning };
+    }
+
     if (result.kind === "refused" || result.kind === "noChain") {
         // This tile is proven impassable for this tick. Clear the stale cached
         // path and replan immediately with this tile blocked.

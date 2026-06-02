@@ -2,7 +2,6 @@ import assert from "node:assert";
 import { describe, it } from "node:test";
 import {
     createMovementStaminaComponent,
-    getMovementPressure,
     hasMovedThisTick,
     recordMove,
 } from "../../../src/game/component/movementStaminaComponent.ts";
@@ -70,47 +69,4 @@ describe("movementStaminaComponent", () => {
         });
     });
 
-    describe("getMovementPressure", () => {
-        it("returns 0 when no moves recorded", () => {
-            const component = createMovementStaminaComponent();
-            assert.strictEqual(getMovementPressure(component, 20, 10), 0);
-        });
-
-        it("returns 0 when all moves are outside the window", () => {
-            const component = createMovementStaminaComponent();
-            recordMove(component, 1);
-            recordMove(component, 2);
-            // window is [currentTick - window, currentTick] = [11, 20]
-            assert.strictEqual(getMovementPressure(component, 20, 10), 0);
-        });
-
-        it("returns correct fractional value for partial fill", () => {
-            const component = createMovementStaminaComponent();
-            // capacity = 5; put 2 moves inside the window
-            recordMove(component, 15);
-            recordMove(component, 18);
-            // 2 / 5 = 0.4
-            const pressure = getMovementPressure(component, 20, 10);
-            assert.strictEqual(pressure, 0.4);
-        });
-
-        it("returns 1.0 when buffer is fully saturated within the window", () => {
-            const component = createMovementStaminaComponent();
-            recordMove(component, 16);
-            recordMove(component, 17);
-            recordMove(component, 18);
-            recordMove(component, 19);
-            recordMove(component, 20);
-            assert.strictEqual(getMovementPressure(component, 20, 10), 1.0);
-        });
-
-        it("counts only entries within the window, ignores older ones", () => {
-            const component = createMovementStaminaComponent();
-            recordMove(component, 5); // outside window [11,20]
-            recordMove(component, 15); // inside
-            recordMove(component, 18); // inside
-            // 2 inside / 5 capacity = 0.4
-            assert.strictEqual(getMovementPressure(component, 20, 10), 0.4);
-        });
-    });
 });

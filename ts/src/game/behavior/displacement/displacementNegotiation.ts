@@ -16,13 +16,13 @@
  * Cardinal direction traversal order (left, right, up, down) is fixed for
  * determinism — never random tiebreaks.
  */
-import { adjacentPoints, type Point } from "../../../common/point.ts";
+import { adjacentPoints, type Point, pointEquals } from "../../../common/point.ts";
 import { BehaviorAgentComponentId } from "../../component/BehaviorAgentComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { queryEntity } from "../../map/query/queryEntity.ts";
 import {
     canAffordDisplacement,
-    getDisplacementResistance,
+    classifyBlocker,
     scoreCandidateTile,
 } from "./displacementCost.ts";
 import { deriveIntendedNextStep } from "./movementIntent.ts";
@@ -35,7 +35,8 @@ import { log } from "../../../common/logging/logger.ts";
 export type NegotiationResult =
     | { kind: "success"; transaction: DisplacementTransaction }
     | { kind: "refused" }
-    | { kind: "noChain" };
+    | { kind: "noChain" }
+    | { kind: "wait" };
 
 /**
  * Maximum number of entities in a displacement chain, not counting the requester.
@@ -44,6 +45,14 @@ export type NegotiationResult =
  * keeping the DFS bounded.
  */
 const MAX_CHAIN_DEPTH = 3;
+
+/**
+ * Compile-time exhaustiveness guard: if a new `BlockerClass` kind is added and a switch
+ * below doesn't handle it, this line stops compiling until it's dealt with.
+ */
+function assertNever(value: never): never {
+    throw new Error(`Unhandled blocker class: ${JSON.stringify(value)}`);
+}
 
 /**
  * Attempt to negotiate a displacement transaction to clear `targetTile` for the requester.
@@ -120,16 +129,40 @@ export function negotiateDisplacement(
         };
     }
 
-    const blockerResistance = getDisplacementResistance(blocker, currentTick);
-    if (!canAffordDisplacement(requesterPriority, blockerResistance)) {
+    // The blocker isn't trading places with us. What we may do depends on what it is.
+    const cls = classifyBlocker(blocker, currentTick);
+    switch (cls.kind) {
+        case "transient":
+        case "movedThisTick":
+            // It will vacate on its own (walking / undecided) or already moved this tick
+            // and is free next tick — either way we don't shove it. Wait and retry next
+            // tick, holding the cached path. This keeps same-direction traffic queueing
+            // rather than barging, and lets a not-yet-planned head-on partner resolve via
+            // the swap above once it has computed its path.
+            log.debug(
+                `${requester.id} blocker=${blocker.id} is ${cls.kind}, waiting`,
+            );
+            return { kind: "wait" };
+        case "immovable":
+            // Not a behaviour agent — nothing to displace (defensive; the blocker was
+            // already found via BehaviorAgentComponentId, so this shouldn't be reached).
+            return { kind: "noChain" };
+        case "displaceable":
+            break;
+        default:
+            return assertNever(cls);
+    }
+
+    // Persistent blocker (idle or mid-task): displace it only if we out-rank its cost.
+    if (!canAffordDisplacement(requesterPriority, cls.cost)) {
         log.debug(
-            `${requester.id} blocker=${blocker.id} resistance=${blockerResistance} exceeds priority=${requesterPriority}, refusing`,
+            `${requester.id} blocker=${blocker.id} cost=${cls.cost} exceeds priority=${requesterPriority}, refusing`,
         );
         return { kind: "refused" };
     }
 
     log.debug(
-        `${requester.id} blocker=${blocker.id} willing (resistance=${blockerResistance}), searching chain`,
+        `${requester.id} blocker=${blocker.id} willing (cost=${cls.cost}), searching chain`,
     );
 
     // visitedIds starts with the requester and the blocker so we detect both
@@ -146,7 +179,7 @@ export function negotiateDisplacement(
         currentTick,
         visitedIds,
         0,
-        blockerResistance,
+        cls.cost,
     );
 
     if (!result) {
@@ -157,7 +190,7 @@ export function negotiateDisplacement(
     }
 
     log.debug(
-        `${requester.id} found ${result.isCycle ? "cycle" : "chain"} of ${result.moves.length} moves, totalResistance=${result.totalResistance}`,
+        `${requester.id} found ${result.isCycle ? "cycle" : "chain"} of ${result.moves.length} moves, totalCost=${result.totalCost}`,
     );
     return {
         kind: "success",
@@ -168,7 +201,7 @@ export function negotiateDisplacement(
 interface ChainResult {
     moves: DisplacementMove[];
     isCycle: boolean;
-    totalResistance: number;
+    totalCost: number;
 }
 
 /**
@@ -186,10 +219,48 @@ function findBestChain(
     currentTick: number,
     visitedIds: Set<string>,
     depth: number,
-    accumulatedResistance: number,
+    accumulatedCost: number,
 ): ChainResult | null {
-    // Sort candidates by score descending so free tiles (score=100) are tried first.
-    // Cardinal order (left, right, up, down) is the tiebreak for determinism.
+    // A displacement chain terminates in one of two ways:
+    //   1. at a free tile — everyone shifts over by one (preferred; handled in the loop)
+    //   2. at the requester's own tile — `entity` rotates into the spot the requester is
+    //      about to vacate, closing a swap/rotation cycle.
+    // The cycle terminator is built explicitly here, not scored as a candidate, because
+    // the requester is in transit so scoreCandidateTile (correctly) rejects its tile as a
+    // normal push target. It's checked at every depth: the cycle can close at the initial
+    // blocker (the 2-entity swap) or deeper, through a ring of pushed entities — in which
+    // case the recursion prepends the intermediate moves as it unwinds.
+    //
+    // It's recorded as a candidate result, not returned early: a free tile still wins
+    // (the loop returns on the first one), and among non-free results the cheapest wins.
+    let bestResult: ChainResult | null = null;
+    if (
+        adjacentPoints(fromTile).some((tile) =>
+            pointEquals(tile, requester.worldPosition),
+        )
+    ) {
+        bestResult = {
+            moves: [
+                {
+                    entityId: entity.id,
+                    from: fromTile,
+                    to: requester.worldPosition,
+                },
+                {
+                    entityId: requester.id,
+                    from: requester.worldPosition,
+                    to: initialTargetTile,
+                },
+            ],
+            isCycle: true,
+            totalCost: accumulatedCost,
+        };
+    }
+
+    // Other destinations, best score first (free tiles score 100). The requester's tile
+    // is handled above; scoreCandidateTile rejects it (along with any transient/immovable
+    // occupant), so it never appears here. Cardinal order (left, right, up, down) is the
+    // deterministic tiebreak.
     const candidates = adjacentPoints(fromTile)
         .map((tile) => ({
             tile,
@@ -197,8 +268,6 @@ function findBestChain(
         }))
         .filter((c) => c.score > -Infinity)
         .sort((a, b) => b.score - a.score);
-
-    let bestResult: ChainResult | null = null;
 
     for (const { tile } of candidates) {
         const occupants = queryEntity(root, tile);
@@ -218,47 +287,15 @@ function findBestChain(
             return {
                 moves: [{ entityId: entity.id, from: fromTile, to: tile }],
                 isCycle: false,
-                totalResistance: accumulatedResistance,
+                totalCost: accumulatedCost,
             };
         }
 
         const nextEntity = displaceable[0];
 
-        // Cycle detected: the candidate tile is occupied by the original requester.
-        // On a cardinal grid the only possible cycle back to the requester is a
-        // 2-entity swap (A is adjacent to B, B is adjacent to A). Longer cycles
-        // through other entities can't reach the requester because they're already
-        // in visitedIds and would have been pruned as back-edges above.
-        if (nextEntity.id === requester.id) {
-            log.debug(
-                `${entity.id} cycle back to requester via (${tile.x},${tile.y}), recording as candidate`,
-            );
-            const result: ChainResult = {
-                moves: [
-                    { entityId: entity.id, from: fromTile, to: tile },
-                    {
-                        entityId: requester.id,
-                        from: tile,
-                        to: initialTargetTile,
-                    },
-                ],
-                isCycle: true,
-                totalResistance: accumulatedResistance,
-            };
-            // Record as a candidate — keep checking for free tiles (better) or
-            // cheaper cycles. A free tile always scores 100 vs cycle's lower score,
-            // so this will only win if no free tile is reachable.
-            if (
-                !bestResult ||
-                result.totalResistance < bestResult.totalResistance
-            ) {
-                bestResult = result;
-            }
-            continue;
-        }
-
-        // Back-edge to a different entity already in the chain (not the requester) —
-        // this would create an unresolvable loop, prune the branch.
+        // Back-edge: the tile is held by an entity already in the chain — including the
+        // requester, whose cycle-back is the terminator handled above. Pushing into it
+        // would loop, so prune.
         if (visitedIds.has(nextEntity.id)) {
             log.debug(
                 `${entity.id} tile (${tile.x},${tile.y}) occupied by already-visited ${nextEntity.id}, pruning`,
@@ -274,14 +311,17 @@ function findBestChain(
             continue;
         }
 
-        // Check if requester can afford to displace this next entity too.
-        const nextResistance = getDisplacementResistance(
-            nextEntity,
-            currentTick,
-        );
-        if (!canAffordDisplacement(requesterPriority, nextResistance)) {
+        // Only a settled (displaceable) entity can extend the chain, and only if the
+        // requester out-ranks its cost. Transient/moved occupants were already dropped by
+        // scoreCandidateTile, so in practice nextEntity is displaceable — classify to be
+        // safe and to read its cost.
+        const nextCls = classifyBlocker(nextEntity, currentTick);
+        if (
+            nextCls.kind !== "displaceable" ||
+            !canAffordDisplacement(requesterPriority, nextCls.cost)
+        ) {
             log.debug(
-                `${entity.id} next entity ${nextEntity.id} resistance=${nextResistance} > priority=${requesterPriority}, pruning`,
+                `${entity.id} cannot displace ${nextEntity.id} (${nextCls.kind}), pruning`,
             );
             continue;
         }
@@ -302,7 +342,7 @@ function findBestChain(
             currentTick,
             newVisited,
             depth + 1,
-            accumulatedResistance + nextResistance,
+            accumulatedCost + nextCls.cost,
         );
 
         if (subResult) {
@@ -312,12 +352,9 @@ function findBestChain(
                     ...subResult.moves,
                 ],
                 isCycle: subResult.isCycle,
-                totalResistance: subResult.totalResistance,
+                totalCost: subResult.totalCost,
             };
-            if (
-                !bestResult ||
-                chainResult.totalResistance < bestResult.totalResistance
-            ) {
+            if (!bestResult || chainResult.totalCost < bestResult.totalCost) {
                 bestResult = chainResult;
             }
         }

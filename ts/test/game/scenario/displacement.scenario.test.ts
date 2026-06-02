@@ -60,6 +60,11 @@ function createAgent(id: string, root: Entity, position: Point): Entity {
     entity.setEcsComponent(createSpriteComponent(testSprite));
     entity.setEcsComponent(createBehaviorAgentComponent());
     entity.setEcsComponent(createMovementStaminaComponent());
+    // Start "settled": a fresh agent carries pendingReplan, which marks it transient
+    // (waited-for, not displaced). A plain placed agent is a settled obstacle until it
+    // is given something to do; moveCommand re-arms pendingReplan so commanded workers
+    // plan and move.
+    getBehaviorAgent(entity)!.pendingReplan = undefined;
     root.addChild(entity);
     entity.worldPosition = position;
     return entity;
@@ -93,10 +98,7 @@ describe("Displacement Scenario", () => {
         const agentB = createAgent("agent-b", root, { x: 12, y: 8 });
 
         const agentAComp = getBehaviorAgent(agentA)!;
-        agentAComp.playerCommand = {
-            action: "move",
-            targetPosition: { x: 12, y: 8 },
-        };
+        moveCommand(agentA, { x: 12, y: 8 });
 
         const behaviorSystem = createBehaviorSystem(() => [
             createPerformPlayerCommandBehavior(),
@@ -143,10 +145,7 @@ describe("Displacement Scenario", () => {
         createWall("wall-south", root, { x: 11, y: 9 });
 
         const agentAComp = getBehaviorAgent(agentA)!;
-        agentAComp.playerCommand = {
-            action: "move",
-            targetPosition: { x: 11, y: 8 },
-        };
+        moveCommand(agentA, { x: 11, y: 8 });
 
         const behaviorSystem = createBehaviorSystem(() => [
             createPerformPlayerCommandBehavior(),
@@ -289,6 +288,51 @@ describe("Displacement Scenario", () => {
         );
     });
 
+    it("waits for a transient (walking) blocker, keeping its path, then proceeds when it clears", () => {
+        const { root } = createWorld();
+
+        const mover = createAgent("mover", root, { x: 11, y: 8 });
+        getBehaviorAgent(mover)!.currentBehaviorUtility = 50;
+
+        // Blocker is in transit (a moveTo at its queue head) → transient → waited-for,
+        // never shoved off its route.
+        const blocker = createAgent("blocker", root, { x: 12, y: 8 });
+        getBehaviorAgent(blocker)!.actionQueue = [
+            { type: "moveTo", target: { x: 12, y: 11 } },
+        ];
+
+        const action: MoveToAction = { type: "moveTo", target: { x: 15, y: 8 } };
+
+        // Tick 1: next tile (12,8) holds a transient blocker → mover holds position and
+        // keeps its cached path aimed at the same tile (no replan, no detour).
+        executeMoveToAction(action, mover, 1);
+        assert.deepStrictEqual(
+            mover.worldPosition,
+            { x: 11, y: 8 },
+            "mover should wait in place for the walking blocker",
+        );
+        assert.ok(
+            action.cachedPath && action.cachedPath.length > 0,
+            "cached path is preserved while waiting",
+        );
+        assert.deepStrictEqual(
+            action.cachedPath![0],
+            { x: 12, y: 8 },
+            "still aimed at the same next tile",
+        );
+
+        // Blocker walks away.
+        blocker.worldPosition = { x: 12, y: 11 };
+
+        // Tick 2: the tile is now free → mover advances into it.
+        executeMoveToAction(action, mover, 2);
+        assert.deepStrictEqual(
+            mover.worldPosition,
+            { x: 12, y: 8 },
+            "mover advances once the blocker has cleared",
+        );
+    });
+
     it("displacement chain: A displaces B which displaces C to reach target", () => {
         /**
          * A at (11,8) wants to move to (12,8) — where B is.
@@ -309,10 +353,7 @@ describe("Displacement Scenario", () => {
         createAgent("agent-c", root, { x: 13, y: 8 });
 
         const agentAComp = getBehaviorAgent(agentA)!;
-        agentAComp.playerCommand = {
-            action: "move",
-            targetPosition: { x: 12, y: 8 },
-        };
+        moveCommand(agentA, { x: 12, y: 8 });
 
         const behaviorSystem = createBehaviorSystem(() => [
             createPerformPlayerCommandBehavior(),
@@ -359,10 +400,14 @@ describe("Displacement Scenario", () => {
     }
 
     function moveCommand(entity: Entity, target: Point) {
-        getBehaviorAgent(entity)!.playerCommand = {
+        const agent = getBehaviorAgent(entity)!;
+        agent.playerCommand = {
             action: "move",
             targetPosition: target,
         };
+        // Re-arm replanning so the commanded worker plans and starts moving (createAgent
+        // leaves agents settled).
+        agent.pendingReplan = { kind: "replan" };
     }
 
     it("two equal-priority workers swap past each other in a 1-wide corridor", () => {
@@ -404,6 +449,36 @@ describe("Displacement Scenario", () => {
 
         assert.deepStrictEqual(a.worldPosition, { x: 13, y: 8 });
         assert.deepStrictEqual(b.worldPosition, { x: 10, y: 8 });
+    });
+
+    it("two workers spawned face-to-face in a sealed corridor resolve", () => {
+        /**
+         * Planless / spawned-adjacent head-on: two workers become adjacent before either
+         * has a committed path. On tick 1 the first to act finds the other still
+         * undecided (pendingReplan set) → transient → it waits, keeping its computed
+         * path. The second then plans, sees the first's path heading into its tile, and
+         * the existing beneficial swap fires — both reach their goals the same tick.
+         */
+        const { root } = createWorld();
+        sealCorridor(root);
+
+        const a = createAgent("a", root, { x: 11, y: 8 });
+        const b = createAgent("b", root, { x: 12, y: 8 });
+        moveCommand(a, { x: 12, y: 8 });
+        moveCommand(b, { x: 11, y: 8 });
+
+        const behaviorSystem = createBehaviorSystem(() => [
+            createPerformPlayerCommandBehavior(),
+        ]);
+
+        for (let tick = 1; tick <= 6; tick++) {
+            behaviorSystem.onUpdate!(root, tick);
+            assertNoOverlap([a, b], tick);
+            if (a.worldPosition.x === 12 && b.worldPosition.x === 11) break;
+        }
+
+        assert.deepStrictEqual(a.worldPosition, { x: 12, y: 8 });
+        assert.deepStrictEqual(b.worldPosition, { x: 11, y: 8 });
     });
 
     it("one worker passes two oncoming workers in a 1-wide corridor", () => {
