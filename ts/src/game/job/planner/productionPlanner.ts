@@ -56,6 +56,7 @@ export function planProduction(
                 target: buildingEntity.worldPosition,
                 stopAdjacent: "cardinal",
             },
+            { type: "stepOnto", targetId: job.targetBuilding },
             { type: "operateFacility", buildingId: job.targetBuilding },
         ];
     }

@@ -36,7 +36,10 @@ describe("harvest-deposit scenario tests", () => {
 
         harness.queueJob(CollectResourceJob(tree, ResourceHarvestMode.Chop));
 
-        harness.tickUntil(() => harness.getItemCount(stockpile, "wood") > 0, 60);
+        harness.tickUntil(
+            () => harness.getItemCount(stockpile, "wood") > 0,
+            60,
+        );
 
         assert.ok(
             harness.getItemCount(stockpile, "wood") > 0,

@@ -281,6 +281,17 @@ export function isPointAdjacentTo(pointA: Point, pointB: Point): boolean {
 }
 
 /**
+ * Checks if pointB is cardinally adjacent to pointA OR occupies the same tile.
+ *
+ * Work actions (crafting, operating a facility, sleeping in a house) accept a
+ * worker that has mounted the target's tile via a stepOnto action as well as one
+ * standing beside it, so they share this check rather than a bare adjacency test.
+ */
+export function isAtOrAdjacent(pointA: Point, pointB: Point): boolean {
+    return pointEquals(pointA, pointB) || isPointAdjacentTo(pointA, pointB);
+}
+
+/**
  * Get the closest direction between the two points
  * @param a
  * @param b

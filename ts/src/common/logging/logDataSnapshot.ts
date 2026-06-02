@@ -21,7 +21,11 @@ export function snapshotLogData(value: unknown): unknown {
     return snapshot(value, new WeakSet<object>(), 0);
 }
 
-function snapshot(value: unknown, seen: WeakSet<object>, depth: number): unknown {
+function snapshot(
+    value: unknown,
+    seen: WeakSet<object>,
+    depth: number,
+): unknown {
     if (value === null || typeof value !== "object") {
         return snapshotPrimitive(value);
     }

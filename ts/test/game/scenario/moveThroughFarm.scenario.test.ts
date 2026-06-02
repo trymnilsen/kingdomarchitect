@@ -36,9 +36,13 @@ function sealColumnExcept(
 ): void {
     for (let y = yStart; y <= yEnd; y++) {
         if (y === gapY) continue;
-        harness.placeBuilding(`wall_${columnX}_${y}`, { x: columnX, y }, {
-            building: stockPile,
-        });
+        harness.placeBuilding(
+            `wall_${columnX}_${y}`,
+            { x: columnX, y },
+            {
+                building: stockPile,
+            },
+        );
     }
 }
 

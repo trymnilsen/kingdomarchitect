@@ -47,7 +47,7 @@ function createTestScene(): {
 
 describe("craftingPlanner", () => {
     describe("building has all inputs", () => {
-        it("returns moveTo and craftItem actions", () => {
+        it("returns moveTo, stepOnto and craftItem actions", () => {
             const { root, worker, building } = createTestScene();
 
             const buildingInventory = building.getEcsComponent("Inventory")!;
@@ -56,9 +56,10 @@ describe("craftingPlanner", () => {
             const job = createCraftingJob("building", planksRecipe);
             const actions = planCrafting(root, worker, job);
 
-            assert.strictEqual(actions.length, 2);
+            assert.strictEqual(actions.length, 3);
             assert.strictEqual(actions[0].type, "moveTo");
-            assert.strictEqual(actions[1].type, "craftItem");
+            assert.strictEqual(actions[1].type, "stepOnto");
+            assert.strictEqual(actions[2].type, "craftItem");
         });
     });
 

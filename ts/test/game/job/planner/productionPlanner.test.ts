@@ -53,15 +53,16 @@ function createZoneScene(): {
 }
 
 describe("productionPlanner - extract kind", () => {
-    it("returns moveTo and operateFacility actions", () => {
+    it("returns moveTo, stepOnto and operateFacility actions", () => {
         const { root, worker } = createExtractScene();
 
         const job = createProductionJob("building");
         const actions = planProduction(root, worker, job);
 
-        assert.strictEqual(actions.length, 2);
+        assert.strictEqual(actions.length, 3);
         assert.strictEqual(actions[0].type, "moveTo");
-        assert.strictEqual(actions[1].type, "operateFacility");
+        assert.strictEqual(actions[1].type, "stepOnto");
+        assert.strictEqual(actions[2].type, "operateFacility");
     });
 
     it("sets correct target position for moveTo action", () => {
@@ -98,7 +99,7 @@ describe("productionPlanner - extract kind", () => {
         const job = createProductionJob("building");
         const actions = planProduction(root, worker, job);
 
-        const operateAction = actions[1] as {
+        const operateAction = actions[2] as {
             type: "operateFacility";
             buildingId: string;
         };

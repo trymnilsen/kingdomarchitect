@@ -59,28 +59,18 @@ export function createSleepBehavior(): Behavior {
 
             const root = entity.getRootEntity();
 
-            // Check for assigned house
+            // Check for assigned house. The worker walks adjacent, then steps
+            // onto the house tile to sleep "inside" rather than blocking a tile
+            // beside it.
             const houseEntity = findAssignedHouse(root, entity.id);
             if (houseEntity) {
-                const adjacentTile = findAdjacentWalkable(
-                    root,
-                    entity,
-                    houseEntity.worldPosition,
-                );
-                if (adjacentTile) {
-                    // Walk directly to the pre-computed adjacent tile — no stopAdjacent,
-                    // otherwise the entity stops one tile short of it.
-                    return [
-                        { type: "moveTo", target: adjacentTile },
-                        makeSleepAction("house", entity),
-                    ];
-                }
                 return [
                     {
                         type: "moveTo",
                         target: houseEntity.worldPosition,
                         stopAdjacent: "cardinal",
                     },
+                    { type: "stepOnto", targetId: houseEntity.id },
                     makeSleepAction("house", entity),
                 ];
             }

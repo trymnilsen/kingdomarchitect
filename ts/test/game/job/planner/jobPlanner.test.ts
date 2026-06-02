@@ -60,9 +60,10 @@ describe("jobPlanner", () => {
         const job = createProductionJob("building");
         const actions = planJob(root, worker, job, () => []);
 
-        assert.strictEqual(actions.length, 2);
+        assert.strictEqual(actions.length, 3);
         assert.strictEqual(actions[0].type, "moveTo");
-        assert.strictEqual(actions[1].type, "operateFacility");
+        assert.strictEqual(actions[1].type, "stepOnto");
+        assert.strictEqual(actions[2].type, "operateFacility");
     });
 
     it("dispatches collectItem jobs to collectItemPlanner", () => {

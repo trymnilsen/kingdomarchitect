@@ -3,7 +3,10 @@ import { spriteRefs } from "../../asset/sprite.ts";
 import { createEquipmentComponent } from "../component/equipmentComponent.ts";
 import { createHeldItemComponent } from "../component/heldItemComponent.ts";
 import { createPlayerUnitComponent } from "../component/playerUnitComponent.ts";
-import { createSpriteComponent } from "../component/spriteComponent.ts";
+import {
+    createSpriteComponent,
+    UNIT_SPRITE_DEPTH,
+} from "../component/spriteComponent.ts";
 import { Entity } from "../entity/entity.ts";
 import { createVisibilityComponent } from "../component/visibilityComponent.ts";
 import { createAnimationComponent } from "../component/animationComponent.ts";
@@ -22,7 +25,13 @@ import { createThreatMapComponent } from "../component/threatMapComponent.ts";
 
 export function workerPrefab(id?: string): Entity {
     const entity = new Entity(id ?? generateId("worker"));
-    const spriteComponent = createSpriteComponent(spriteRefs.empty_sprite);
+    const spriteComponent = createSpriteComponent(
+        spriteRefs.empty_sprite,
+        undefined,
+        undefined,
+        undefined,
+        UNIT_SPRITE_DEPTH,
+    );
     entity.setEcsComponent(spriteComponent);
     entity.setEcsComponent(createHealthComponent(150, 200));
     entity.setEcsComponent(createPlayerUnitComponent());

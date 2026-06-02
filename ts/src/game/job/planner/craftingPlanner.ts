@@ -62,6 +62,7 @@ export function planCrafting(
                 target: buildingEntity.worldPosition,
                 stopAdjacent: "cardinal",
             },
+            { type: "stepOnto", targetId: job.targetBuilding },
             {
                 type: "craftItem",
                 buildingId: job.targetBuilding,

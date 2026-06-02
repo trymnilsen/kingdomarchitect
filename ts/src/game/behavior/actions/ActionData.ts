@@ -2,6 +2,7 @@ import type { Entity } from "../../entity/entity.ts";
 import type { ActionResult } from "./Action.ts";
 import type { WaitActionData } from "./waitAction.ts";
 import type { MoveToActionData } from "./moveToAction.ts";
+import type { StepOntoActionData } from "./stepOntoAction.ts";
 import type { ClearPlayerCommandActionData } from "./clearPlayerCommandAction.ts";
 import type { SleepActionData } from "./sleepAction.ts";
 import type { DepositToStockpileActionData } from "./depositToStockpileAction.ts";
@@ -40,6 +41,7 @@ import type { DropFromSlotActionData } from "./dropFromSlotAction.ts";
 export type BehaviorActionData =
     | WaitActionData
     | MoveToActionData
+    | StepOntoActionData
     | ClearPlayerCommandActionData
     | SleepActionData
     | DepositToStockpileActionData

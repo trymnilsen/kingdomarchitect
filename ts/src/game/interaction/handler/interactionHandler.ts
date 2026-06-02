@@ -20,6 +20,7 @@ import { StateContext } from "./stateContext.ts";
 import type { GameSaveCapability } from "../../../server/gameServerConnection.ts";
 import type { GameCommand } from "../../../server/message/gameCommand.ts";
 import { queryEntity } from "../../map/query/queryEntity.ts";
+import { entitiesFrontToBack } from "../../component/spriteComponent.ts";
 import type { EcsWorld } from "../../../common/ecs/ecsWorld.ts";
 import { log } from "../../../common/logging/logger.ts";
 
@@ -134,8 +135,12 @@ export class InteractionHandler {
 
                 const entitiesAt = queryEntity(this.world.root, tilePosition);
 
+                // Cycle entities in the order they are stacked on screen, top
+                // first, so the click order matches what the player sees.
+                const orderedEntities = entitiesFrontToBack(entitiesAt);
+
                 const candidates: SelectedWorldItem[] = [
-                    ...entitiesAt.map((e) => new SelectedEntityItem(e)),
+                    ...orderedEntities.map((e) => new SelectedEntityItem(e)),
                     ...(tile ? [new SelectedTileItem(tile)] : []),
                 ];
 
@@ -157,10 +162,12 @@ export class InteractionHandler {
                         const current = activeSelectionState.selection;
                         let currentIndex: number;
                         if (current instanceof SelectedEntityItem) {
-                            currentIndex = entitiesAt.indexOf(current.entity);
+                            currentIndex = orderedEntities.indexOf(
+                                current.entity,
+                            );
                         } else {
                             // Tile selection is at the end of the candidate list
-                            currentIndex = entitiesAt.length;
+                            currentIndex = orderedEntities.length;
                         }
                         const nextIndex =
                             currentIndex >= 0

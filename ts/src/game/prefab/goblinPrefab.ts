@@ -3,7 +3,10 @@ import { generateId } from "../../common/idGenerator.ts";
 import { loopAnimation } from "../../rendering/animation/animationGraph.ts";
 import { createAnimationComponent } from "../component/animationComponent.ts";
 import { createHealthComponent } from "../component/healthComponent.ts";
-import { createSpriteComponent } from "../component/spriteComponent.ts";
+import {
+    createSpriteComponent,
+    UNIT_SPRITE_DEPTH,
+} from "../component/spriteComponent.ts";
 import { createBehaviorAgentComponent } from "../component/BehaviorAgentComponent.ts";
 import { createMovementStaminaComponent } from "../component/movementStaminaComponent.ts";
 import { createHeldItemComponent } from "../component/heldItemComponent.ts";
@@ -19,7 +22,15 @@ import { createThreatMapComponent } from "../component/threatMapComponent.ts";
  */
 export function goblinPrefab(campEntityId?: string): Entity {
     const entity = new Entity(generateId("goblin"));
-    entity.setEcsComponent(createSpriteComponent(spriteRefs.goblin));
+    entity.setEcsComponent(
+        createSpriteComponent(
+            spriteRefs.goblin,
+            undefined,
+            undefined,
+            undefined,
+            UNIT_SPRITE_DEPTH,
+        ),
+    );
     entity.setEcsComponent(createHealthComponent(10, 10));
     entity.setEcsComponent(createBehaviorAgentComponent());
     entity.setEcsComponent(createHeldItemComponent());

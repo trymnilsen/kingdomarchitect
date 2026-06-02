@@ -6,8 +6,8 @@ import { failJobFromQueue } from "../jobLifecycle.ts";
 
 /**
  * Plan actions for working a windmill.
- * The worker walks adjacent to the windmill, then runs workWindmill which
- * handles planting and harvesting the surrounding farms in place.
+ * The worker walks adjacent to the windmill, steps onto its tile, then runs
+ * workWindmill which handles planting and harvesting the surrounding farms.
  */
 export function planWindmill(
     root: Entity,
@@ -30,6 +30,7 @@ export function planWindmill(
             target: buildingEntity.worldPosition,
             stopAdjacent: "cardinal",
         },
+        { type: "stepOnto", targetId: job.targetBuilding },
         {
             type: "workWindmill",
             windmillId: job.targetBuilding,

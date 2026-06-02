@@ -9,7 +9,10 @@ import {
     treeResource,
 } from "../../data/inventory/items/naturalResource.ts";
 import { swordItem } from "../../data/inventory/items/equipment.ts";
-import { planksItem, timberFramesItem } from "../../data/inventory/items/processedMaterials.ts";
+import {
+    planksItem,
+    timberFramesItem,
+} from "../../data/inventory/items/processedMaterials.ts";
 import {
     goldCoins,
     stoneResource as stoneInventoryItem,
