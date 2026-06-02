@@ -175,13 +175,21 @@ function commitCycle(
 ): void {
     for (const { entity, from, to } of moves) {
         if (beneficialSwap) {
-            // Mutually-beneficial swap: every member stepped into a tile it already
-            // wanted, so it continues its own route (no replan) and pays for its own
-            // step. Advance its cached path past the consumed step.
+            // Both members stepped into a tile they were already heading for, so
+            // each just keeps following its existing route. Two consequences:
+            //   - No replan. Replanning would re-evaluate behaviour and could make a
+            //     worker abandon its goal mid-corridor; there's no reason to, since
+            //     its destination hasn't changed. We advance its cached path instead.
+            //   - It pays energy (spendEnergy=true): a swap step is real travel, no
+            //     cheaper than a normal step. The one-move-per-tick guard in
+            //     moveToAction stops the same worker also stepping on its own turn,
+            //     so this is charged exactly once.
             applyEntityMove(entity, from, to, currentTick, false, true);
             advanceOrClearMoveCache(entity, to);
         } else {
-            // Forced cycle: displaced members are shoved off-path — replan, no energy.
+            // Forced cycle (the old "boxed-in blocker swaps with a higher-priority
+            // requester" case): the non-requester is shoved off its own path, so it
+            // must replan, and — unlike a willing traveller — is not charged energy.
             applyEntityMove(
                 entity,
                 from,
@@ -195,10 +203,13 @@ function commitCycle(
 }
 
 /**
- * After a beneficial swap, drop the step the entity just consumed from its cached
- * path so it keeps following the same `moveTo` next tick without a replan. If the
- * cached head no longer matches (rare — a divergent committed route), clear the
- * path so it is recomputed fresh next tick instead of stepping onto a stale tile.
+ * Keep a swapped entity on its existing `moveTo` instead of replanning. The tile it
+ * just moved into was the head of its cached path, so we drop that one step and the
+ * rest of the route stays valid for next tick. The else-branch (clear the path) is a
+ * safety net for the rare case where the head doesn't match — the entity then plans
+ * fresh next tick rather than walking a stale route. Avoiding a full replan here is
+ * what makes "continue your route" cheap and keeps a worker from re-deciding its
+ * goal every time it squeezes past someone.
  */
 function advanceOrClearMoveCache(entity: Entity, to: Point): void {
     const agent = entity.getEcsComponent(BehaviorAgentComponentId);
@@ -220,6 +231,13 @@ function advanceOrClearMoveCache(entity: Entity, to: Point): void {
     entity.invalidateComponent(BehaviorAgentComponentId);
 }
 
+/**
+ * Apply one entity's repositioning. The two flags differ by caller because the
+ * meaning of the move differs: a shoved entity (forced chain/cycle) replans and
+ * pays nothing, while a willing traveller (beneficial swap) keeps its plan and pays
+ * energy like any other step. `recordMove` always runs — it backs both the
+ * one-move-per-tick guard and the staleness check, regardless of move type.
+ */
 function applyEntityMove(
     entity: Entity,
     from: Point,

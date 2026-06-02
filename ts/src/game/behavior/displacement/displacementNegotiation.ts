@@ -76,13 +76,20 @@ export function negotiateDisplacement(
         return { kind: "noChain" };
     }
 
-    // Mutual-benefit pass: if the blocker is itself trying to step into the
-    // requester's current tile, swapping advances BOTH along their own paths. This
-    // costs neither party progress, so it bypasses the dominance/affordability
-    // check entirely — it works even at equal (or zero) utility. On a cardinal grid
-    // this is always a 2-entity swap. If the blocker has already moved this tick the
-    // transaction is still returned; the commit's staleness check turns it into a
-    // harmless "wait" without disturbing the requester's path.
+    // Mutual-benefit pass, checked BEFORE the dominance gate below on purpose.
+    // Displacement (shoving someone off their task) and passing (two travellers
+    // trading tiles) are different things that the old cost model lumped together:
+    // a head-on in a 1-wide corridor between two equally-important workers could
+    // never resolve, because neither could "out-rank" the other. But if the blocker
+    // is itself trying to step into the requester's tile, a swap advances BOTH along
+    // their own paths and costs neither any progress — so it's always allowed,
+    // regardless of utility (even zero). That's why it skips the affordability check.
+    //
+    // On a cardinal grid a reciprocal pass is always a 2-entity swap (a longer cycle
+    // can't reach back to the requester without revisiting a tile). If the blocker
+    // already moved this tick we still return the transaction; commit's staleness
+    // check (it re-validates positions/one-move-per-tick) turns it into a harmless
+    // "wait" that leaves the requester's cached path intact to retry next tick.
     const blockerNextStep = deriveIntendedNextStep(blocker);
     if (
         blockerNextStep &&
