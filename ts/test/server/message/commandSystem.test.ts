@@ -30,6 +30,7 @@ import {
     type SetPlayerCommand,
 } from "../../../src/server/message/command/setPlayerCommand.ts";
 import {
+    addJob,
     createJobQueueComponent,
     JobQueueComponentId,
 } from "../../../src/game/component/jobQueueComponent.ts";
@@ -56,6 +57,11 @@ import {
 } from "../../../src/game/component/BehaviorAgentComponent.ts";
 
 import { CollectItemJob } from "../../../src/game/job/collectItemJob.ts";
+import { isTargetOfJob } from "../../../src/game/job/job.ts";
+import {
+    PrioritiseJobCommandId,
+    type PrioritiseJobCommand,
+} from "../../../src/server/message/command/prioritiseJobCommand.ts";
 import { swordItem } from "../../../src/data/inventory/items/equipment.ts";
 import {
     UpdateWorkerRoleCommandId,
@@ -117,6 +123,116 @@ describe("commandSystem", () => {
             assert.ok(updatedJobQueue);
             assert.strictEqual(updatedJobQueue.jobs.length, 1);
             assert.strictEqual(updatedJobQueue.jobs[0].id, "collectItem");
+        });
+    });
+
+    describe("PrioritiseJobCommand", () => {
+        /**
+         * Seeds the player kingdom's queue with two collect jobs targeting two
+         * child entities, ordered so entityA's job is first and entityB's last.
+         */
+        function setupQueueWithTwoTargets(): {
+            root: Entity;
+            playerKingdom: Entity;
+            entityA: Entity;
+            entityB: Entity;
+            system: ReturnType<typeof createCommandSystem>;
+        } {
+            const { root, playerKingdom } = createRootWithKingdom();
+
+            const entityA = new Entity("entityA");
+            const entityB = new Entity("entityB");
+            playerKingdom.addChild(entityA);
+            playerKingdom.addChild(entityB);
+
+            const queue =
+                playerKingdom.requireEcsComponent(JobQueueComponentId);
+            addJob(queue, CollectItemJob(entityA));
+            addJob(queue, CollectItemJob(entityB));
+
+            const system = createCommandSystem(
+                createTestGameTime(),
+                createTestPersistenceManager(),
+            );
+
+            return { root, playerKingdom, entityA, entityB, system };
+        }
+
+        it("moves the target entity's job to the front of the queue", () => {
+            const { root, playerKingdom, entityA, entityB, system } =
+                setupQueueWithTwoTargets();
+
+            // Pre-state: entityA's job leads, entityB's trails.
+            const before =
+                playerKingdom.requireEcsComponent(JobQueueComponentId);
+            assert.ok(isTargetOfJob(before.jobs[0], entityA));
+            assert.ok(isTargetOfJob(before.jobs[1], entityB));
+
+            const message: CommandGameMessage = {
+                type: CommandGameMessageType,
+                command: {
+                    id: PrioritiseJobCommandId,
+                    entityId: "entityB",
+                } as PrioritiseJobCommand,
+            };
+
+            system.onGameMessage?.(root, message);
+
+            // entityB's job is now first; nothing was added or removed.
+            const after =
+                playerKingdom.requireEcsComponent(JobQueueComponentId);
+            assert.strictEqual(after.jobs.length, 2);
+            assert.ok(
+                isTargetOfJob(after.jobs[0], entityB),
+                "entityB's job should be at the front of the queue",
+            );
+            assert.ok(isTargetOfJob(after.jobs[1], entityA));
+        });
+
+        it("leaves the queue unchanged when no job targets the entity", () => {
+            const { root, playerKingdom, system } = setupQueueWithTwoTargets();
+
+            const entityC = new Entity("entityC");
+            playerKingdom.addChild(entityC);
+
+            const message: CommandGameMessage = {
+                type: CommandGameMessageType,
+                command: {
+                    id: PrioritiseJobCommandId,
+                    entityId: "entityC",
+                } as PrioritiseJobCommand,
+            };
+
+            system.onGameMessage?.(root, message);
+
+            const after =
+                playerKingdom.requireEcsComponent(JobQueueComponentId);
+            assert.strictEqual(after.jobs.length, 2);
+            assert.strictEqual(after.jobs[0].id, "collectItem");
+            assert.strictEqual(
+                (after.jobs[0] as CollectItemJob).entityId,
+                "entityA",
+            );
+        });
+
+        it("is a no-op when the target's job is already first", () => {
+            const { root, playerKingdom, entityA, system } =
+                setupQueueWithTwoTargets();
+
+            const message: CommandGameMessage = {
+                type: CommandGameMessageType,
+                command: {
+                    id: PrioritiseJobCommandId,
+                    entityId: "entityA",
+                } as PrioritiseJobCommand,
+            };
+
+            system.onGameMessage?.(root, message);
+
+            const after =
+                playerKingdom.requireEcsComponent(JobQueueComponentId);
+            assert.strictEqual(after.jobs.length, 2);
+            assert.ok(isTargetOfJob(after.jobs[0], entityA));
         });
     });
 

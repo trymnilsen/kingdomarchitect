@@ -60,7 +60,11 @@ import {
     InventoryComponentId,
     takeInventoryItem,
 } from "../component/inventoryComponent.ts";
-import { JobQueueComponentId, addJob } from "../component/jobQueueComponent.ts";
+import {
+    JobQueueComponentId,
+    addJob,
+    moveJobToFront,
+} from "../component/jobQueueComponent.ts";
 import type { Entity } from "../entity/entity.ts";
 import { BuildBuildingJob } from "../job/buildBuildingJob.ts";
 import { buildingPrefab } from "../prefab/buildingPrefab.ts";
@@ -107,6 +111,10 @@ import {
     DismantleBuildingCommandId,
     type DismantleBuildingCommand,
 } from "../../server/message/command/dismantleBuildingCommand.ts";
+import {
+    PrioritiseJobCommandId,
+    type PrioritiseJobCommand,
+} from "../../server/message/command/prioritiseJobCommand.ts";
 import { isTargetOfJob } from "../job/job.ts";
 import { BuildingComponentId } from "../component/buildingComponent.ts";
 import { HealthComponentId } from "../component/healthComponent.ts";
@@ -207,6 +215,9 @@ function onGameMessage(
                 message.command as DismantleBuildingCommand,
                 gameTime.tick,
             );
+            break;
+        case PrioritiseJobCommandId:
+            prioritiseJob(root, message.command as PrioritiseJobCommand);
             break;
     }
 }
@@ -650,4 +661,39 @@ function dismantleBuilding(
     addJob(jobQueue, createDismantleBuildingJob(building.id));
     playerKingdom.invalidateComponent(JobQueueComponentId);
     notifyIdleWorkerForNewJob(playerKingdom, tick);
+}
+
+function prioritiseJob(root: Entity, command: PrioritiseJobCommand) {
+    const playerKingdom = findPlayerKingdom(root);
+    if (!playerKingdom) {
+        log.error("Player kingdom not found, cannot prioritise job");
+        return;
+    }
+
+    const entity = root.findEntity(command.entityId);
+    if (!entity) {
+        log.warn("Entity not found for PrioritiseJob", {
+            entityId: command.entityId,
+        });
+        return;
+    }
+
+    // Only the player's own entities can have their work reprioritised.
+    if (getSettlementEntity(entity) !== playerKingdom) {
+        log.warn("Refusing to prioritise a job the player does not own", {
+            entityId: command.entityId,
+        });
+        return;
+    }
+
+    const jobQueue = playerKingdom.requireEcsComponent(JobQueueComponentId);
+
+    // Bump the first job that targets this entity to the front of the queue.
+    const job = jobQueue.jobs.find((job) => isTargetOfJob(job, entity));
+    if (!job) {
+        return;
+    }
+
+    moveJobToFront(jobQueue, job);
+    playerKingdom.invalidateComponent(JobQueueComponentId);
 }

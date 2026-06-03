@@ -26,6 +26,18 @@ export function addJob(jobQueue: JobQueueComponent, job: Jobs): void {
 }
 
 /**
+ * Move an existing job to the front of the queue so it is worked next.
+ * No-op if the job is not in the queue or is already at the front.
+ */
+export function moveJobToFront(jobQueue: JobQueueComponent, job: Jobs): void {
+    const index = jobQueue.jobs.indexOf(job);
+    if (index > 0) {
+        jobQueue.jobs.splice(index, 1);
+        jobQueue.jobs.unshift(job);
+    }
+}
+
+/**
  * Remove a job from the queue by ID.
  */
 export function removeJob(jobQueue: JobQueueComponent, jobId: string): void {
