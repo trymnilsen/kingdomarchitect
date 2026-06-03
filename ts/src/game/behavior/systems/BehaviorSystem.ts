@@ -99,6 +99,11 @@ function updateBehaviorAgent(
             agent.actionQueue.shift();
             if (agent.actionQueue.length === 0) {
                 log.debug(`Entity ${entity.id} actionQueue empty`);
+                // The plan finished normally. Clear the active/display state so the
+                // selection UI doesn't show this just-finished behavior against an
+                // empty queue until next tick's replan, but keep `hysteresis` so the
+                // behavior is still favored when we re-select.
+                concludeActivePlan(agent);
                 agent.pendingReplan = { kind: "replan" };
             }
         } else if (result.kind === "failed") {
@@ -126,15 +131,31 @@ function updateBehaviorAgent(
 }
 
 /**
- * Reset all active behavior state on an agent. Call this before setting
- * pendingReplan so both idle-termination and failure paths share the same
- * field clearing — including resetting currentBehaviorUtility to 0 so a
- * newly-idle entity doesn't retain stale resistance from its last behavior.
+ * Reset the active plan: the behavior that is currently executing and its queue.
+ * Clears currentBehaviorName (so the selection UI stops showing a behavior the
+ * instant its plan ends) and currentBehaviorUtility (so a newly-idle entity
+ * doesn't retain stale displacement resistance), and empties the queue. Crucially
+ * it leaves `hysteresis` intact, so a plan that ended normally is still favored on
+ * the next replan. Use this when a plan finishes; use clearBehavior when it ends
+ * abnormally.
  */
-function clearBehavior(agent: BehaviorAgentComponent): void {
+function concludeActivePlan(agent: BehaviorAgentComponent): void {
     agent.currentBehaviorName = null;
     agent.currentBehaviorUtility = 0;
     agent.actionQueue = [];
+}
+
+/**
+ * Reset all behavior state on an agent, including the hysteresis memory. This is
+ * concludeActivePlan plus forgetting which behavior to favor — so the next replan
+ * starts from a clean slate with no anti-thrashing bonus. Used on the abnormal
+ * termination paths (action failure, no valid behavior, behavior expanded to
+ * nothing), matching the pre-split behavior where clearing currentBehaviorName
+ * dropped the bonus on exactly those paths.
+ */
+function clearBehavior(agent: BehaviorAgentComponent): void {
+    concludeActivePlan(agent);
+    agent.hysteresis = null;
 }
 
 /**
@@ -222,19 +243,22 @@ function replan(
         return;
     }
 
-    const currentBehavior = agent.currentBehaviorName
-        ? behaviors.find((b) => b.name === agent.currentBehaviorName)
+    // The behavior to favor for hysteresis — the planner's last pick, which
+    // survives a plan completing (see concludeActivePlan), unlike currentBehaviorName.
+    const hysteresisName = agent.hysteresis?.behaviorName ?? null;
+    const hysteresisBehavior = hysteresisName
+        ? behaviors.find((b) => b.name === hysteresisName)
         : null;
 
-    // Hysteresis: give the current behavior a bonus to prevent "thrashing" —
-    // rapidly switching back and forth between two behaviors with similar utilities.
-    // For example, a goblin at warmth=51 (just above threshold) after warming up
-    // shouldn't oscillate between keepWarm and performJob every replan.
+    // Hysteresis: give the previously-selected behavior a bonus to prevent
+    // "thrashing" — rapidly switching back and forth between two behaviors with
+    // similar utilities. For example, a goblin at warmth=51 (just above threshold)
+    // after warming up shouldn't oscillate between keepWarm and performJob every replan.
     const REPLAN_THRESHOLD = 5; // Only switch if a new behavior is 5+ utility higher
     // Calculate utilities for all valid behaviors
     const behaviorUtilities = validBehaviors.map((behavior) => {
         let utility = behavior.utility(entity);
-        if (behavior.name == currentBehavior?.name) {
+        if (behavior.name == hysteresisBehavior?.name) {
             utility = utility + REPLAN_THRESHOLD;
         }
         return {
@@ -251,7 +275,8 @@ function replan(
     });
     const bestBehavior = behaviorUtilities[0];
 
-    const sameBehavior = currentBehavior?.name === bestBehavior.behavior.name;
+    const sameBehavior =
+        hysteresisBehavior?.name === bestBehavior.behavior.name;
     // pendingReplan is still set here so behaviors can read failure context
     // from the component inside expand()
     const newActions = bestBehavior.behavior.expand(entity);
@@ -271,6 +296,9 @@ function replan(
 
     agent.currentBehaviorName = bestBehavior.behavior.name;
     agent.currentBehaviorUtility = bestBehavior.utility;
+    // Remember this pick so the next replan can apply the hysteresis bonus, even
+    // if this plan completes and clears currentBehaviorName before then.
+    agent.hysteresis = { behaviorName: bestBehavior.behavior.name };
     if (sameBehavior) {
         agent.actionQueue = reconcileQueue(agent.actionQueue, newActions);
         log.debug(
@@ -279,7 +307,7 @@ function replan(
     } else {
         agent.actionQueue = newActions;
         log.info(
-            `Entity ${entity.id} replaced queue (behavior ${currentBehavior?.name ?? "none"} → ${bestBehavior.behavior.name})`,
+            `Entity ${entity.id} replaced queue (behavior ${hysteresisBehavior?.name ?? "none"} → ${bestBehavior.behavior.name})`,
         );
     }
     // Clear after expand so the failure context is consumed

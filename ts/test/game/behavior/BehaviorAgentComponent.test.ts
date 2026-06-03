@@ -15,6 +15,7 @@ describe("BehaviorAgentComponent", () => {
             assert.strictEqual(component.id, "behavioragent");
             assert.strictEqual(component.currentBehaviorName, null);
             assert.strictEqual(component.actionQueue.length, 0);
+            assert.strictEqual(component.hysteresis, null);
             assert.deepStrictEqual(component.pendingReplan, { kind: "replan" });
             assert.strictEqual(component.playerCommand, undefined);
         });

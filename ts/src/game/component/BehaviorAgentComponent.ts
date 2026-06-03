@@ -56,6 +56,13 @@ export type PendingReplan =
 
 export interface BehaviorAgentComponent {
     id: typeof BehaviorAgentComponentId;
+    /**
+     * The behavior whose actions are currently in actionQueue — i.e. what this
+     * agent is doing right now. null whenever there is no active plan (the queue
+     * is empty / the agent is idle). This is the single source of truth the
+     * selection UI reads, so it is cleared the moment a plan ends — see
+     * clearBehavior and concludeActivePlan in BehaviorSystem.
+     */
     currentBehaviorName: string | null;
     /**
      * The utility score of the currently-running behavior, set during replan.
@@ -64,6 +71,17 @@ export interface BehaviorAgentComponent {
      */
     currentBehaviorUtility: number;
     actionQueue: BehaviorActionData[];
+    /**
+     * Planner memory for replan hysteresis (anti-thrashing): the behavior that
+     * receives the REPLAN_THRESHOLD bonus on the next selection — normally
+     * whatever the planner last picked. Unlike currentBehaviorName, this survives
+     * a plan completing normally, so the just-finished behavior is still favored
+     * on the next replan; it is reset to null only when a plan ends abnormally
+     * (failure / no valid behavior), matching the pre-split behavior where those
+     * paths dropped the bonus. Never read by the UI. Wrapped in an object so the
+     * field name documents its purpose and it can carry more later if needed.
+     */
+    hysteresis: { behaviorName: string } | null;
     pendingReplan?: PendingReplan;
     playerCommand?: PlayerCommand;
 }
@@ -74,6 +92,7 @@ export function createBehaviorAgentComponent(): BehaviorAgentComponent {
         currentBehaviorName: null,
         currentBehaviorUtility: 0,
         actionQueue: [],
+        hysteresis: null,
         pendingReplan: { kind: "replan" },
     };
 }

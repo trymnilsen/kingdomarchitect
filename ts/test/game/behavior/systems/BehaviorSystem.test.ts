@@ -349,10 +349,11 @@ describe("BehaviorSystem", () => {
                 actions: [{ type: "wait", until: 200 }],
             });
 
-            // Set current behavior with actions in queue
-            agent.currentBehaviorName = "current";
-            agent.actionQueue = [{ type: "wait", until: 100 }];
-            agent.pendingReplan = undefined;
+            // Force a replan and mark "current" as the behavior to favor. With the
+            // +5 hysteresis bonus it scores 55 vs slightlyBetter's 52, so it holds.
+            agent.hysteresis = { behaviorName: "current" };
+            agent.actionQueue = [];
+            agent.pendingReplan = { kind: "replan" };
 
             const system = createBehaviorSystem(() => [
                 currentBehavior,
@@ -377,8 +378,9 @@ describe("BehaviorSystem", () => {
                 actions: [{ type: "wait", until: 200 }],
             });
 
-            // Set current behavior
-            agent.currentBehaviorName = "current";
+            // Favor "current" via hysteresis. Even with the +5 bonus it scores 55,
+            // below muchBetter's 60, so the planner should switch.
+            agent.hysteresis = { behaviorName: "current" };
             agent.actionQueue = [];
             agent.pendingReplan = { kind: "replan" };
 
@@ -391,6 +393,62 @@ describe("BehaviorSystem", () => {
             // Should switch to better behavior
             assert.strictEqual(agent.currentBehaviorName, "muchBetter");
         });
+
+        it("retains hysteresis when a plan completes, so the finished behavior is still favored", () => {
+            const { root, worker } = createTestScene();
+            const agent = worker.getEcsComponent(BehaviorAgentComponentId)!;
+
+            // "haul" is the running behavior; a slightly stronger "other" exists.
+            const haul = createMockBehavior("haul", {
+                utility: 50,
+                actions: [{ type: "wait", until: 200 }],
+            });
+            const other = createMockBehavior("other", {
+                utility: 53, // higher raw utility, but below haul's +5 bonus
+                actions: [{ type: "wait", until: 200 }],
+            });
+
+            // Running haul with a single action that completes immediately. No
+            // pending replan, so this tick just executes-and-completes the action.
+            agent.currentBehaviorName = "haul";
+            agent.hysteresis = { behaviorName: "haul" };
+            agent.actionQueue = [{ type: "wait", until: 0 }];
+            agent.pendingReplan = undefined;
+
+            const system = createBehaviorSystem(() => [haul, other]);
+
+            // Tick 1: action completes, queue empties. Display state is cleared
+            // (no stale behavior name), but the hysteresis memory survives.
+            system.onUpdate!(root, 1);
+            assert.strictEqual(agent.currentBehaviorName, null);
+            assert.strictEqual(agent.actionQueue.length, 0);
+            assert.deepStrictEqual(agent.hysteresis, { behaviorName: "haul" });
+
+            // Tick 2: replan runs. haul (50 + 5 bonus = 55) beats other (53),
+            // proving the bonus survived completion.
+            system.onUpdate!(root, 2);
+            assert.strictEqual(agent.currentBehaviorName, "haul");
+        });
+
+        it("clears hysteresis on failure, dropping the bonus", () => {
+            const { root, worker } = createTestScene();
+            const agent = worker.getEcsComponent(BehaviorAgentComponentId)!;
+
+            // An action that fails (collectItems on a nonexistent entity).
+            agent.actionQueue = [
+                { type: "collectItems", entityId: "nonexistent" },
+            ];
+            agent.currentBehaviorName = "test";
+            agent.hysteresis = { behaviorName: "test" };
+            agent.pendingReplan = undefined;
+
+            const system = createBehaviorSystem(() => []);
+            system.onUpdate!(root, 1);
+
+            // Abnormal termination forgets the favored behavior entirely.
+            assert.strictEqual(agent.hysteresis, null);
+            assert.strictEqual(agent.currentBehaviorName, null);
+        });
     });
 
     describe("reconciliation on replan", () => {
@@ -401,6 +459,8 @@ describe("BehaviorSystem", () => {
             const headAction: BehaviorActionData = { type: "wait", until: 100 };
             agent.actionQueue = [headAction, { type: "wait", until: 200 }];
             agent.currentBehaviorName = "myBehavior";
+            // myBehavior was the last selection (drives reconcile vs. replace).
+            agent.hysteresis = { behaviorName: "myBehavior" };
             agent.pendingReplan = { kind: "replan" };
 
             // Same head shape, different tail — reconcile should keep the
@@ -432,6 +492,8 @@ describe("BehaviorSystem", () => {
             const headAction: BehaviorActionData = { type: "wait", until: 100 };
             agent.actionQueue = [headAction];
             agent.currentBehaviorName = "behaviorA";
+            // behaviorA was the last selection; switching to behaviorB must replace.
+            agent.hysteresis = { behaviorName: "behaviorA" };
             agent.pendingReplan = { kind: "replan" };
 
             const behaviorA = createMockBehavior("behaviorA", {
