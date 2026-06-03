@@ -9,6 +9,7 @@ import type { CraftingJob } from "./craftingJob.ts";
 import type { CollectResourceJob } from "./collectResourceJob.ts";
 import type { BuildBuildingJob } from "./buildBuildingJob.ts";
 import type { ProductionJob } from "./productionJob.ts";
+import type { DismantleBuildingJob } from "./dismantleBuildingJob.ts";
 
 export function getJobDisplayName(root: Entity, job: Jobs): string | null {
     switch (job.id) {
@@ -56,6 +57,19 @@ export function getJobDisplayName(root: Entity, job: Jobs): string | null {
             }
             const definition = getProductionDefinition(prodComp.productionId);
             return definition ? definition.actionName : "Produce";
+        }
+        case "dismantleBuildingJob": {
+            const dismantleJob = job as DismantleBuildingJob;
+            const buildingEntity = root.findEntity(dismantleJob.entityId);
+            const buildingComp = buildingEntity?.getEcsComponent(
+                BuildingComponentId,
+            );
+            // Scaffolds being torn down read as "Cancel", completed as "Dismantle",
+            // matching the player-facing button label.
+            const verb = buildingComp?.scaffolded ? "Cancel" : "Dismantle";
+            return buildingComp
+                ? `${verb} ${buildingComp.building.name}`
+                : "Dismantle building";
         }
         case "farmPlantJob":
             return "Plant crop";

@@ -274,17 +274,16 @@ function updateSingleBuildingAdjacency(
     entity.invalidateComponent(SpriteComponentId);
 }
 
-function updateBuildingAdjacency(
+/**
+ * Re-skin every completed building of the same type cardinally adjacent to
+ * `position` so their adjacency masks reflect the current neighbourhood.
+ */
+function updateMatchingNeighbours(
     root: Entity,
-    targetEntity: Entity,
+    position: Point,
     buildingId: string,
 ): void {
-    updateSingleBuildingAdjacency(targetEntity, buildingId, root);
-
-    const adjacentEntities = queryAdjacentEntities(
-        root,
-        targetEntity.worldPosition,
-    );
+    const adjacentEntities = queryAdjacentEntities(root, position);
     const allAdjacent = [
         ...adjacentEntities.left,
         ...adjacentEntities.right,
@@ -298,4 +297,30 @@ function updateBuildingAdjacency(
             updateSingleBuildingAdjacency(entity, buildingId, root);
         }
     }
+}
+
+function updateBuildingAdjacency(
+    root: Entity,
+    targetEntity: Entity,
+    buildingId: string,
+): void {
+    updateSingleBuildingAdjacency(targetEntity, buildingId, root);
+    updateMatchingNeighbours(root, targetEntity.worldPosition, buildingId);
+}
+
+/**
+ * Recompute the adjacency sprites of buildings neighbouring a now-removed
+ * building tile. Call this AFTER the building entity has been removed (so the
+ * neighbours no longer see it) with the removed building's former position and
+ * id. No-op for buildings that don't use adjacency (e.g. non-walls).
+ */
+export function updateAdjacentBuildingsAfterRemoval(
+    root: Entity,
+    position: Point,
+    buildingId: string,
+): void {
+    if (!buildingAdjecency[buildingId]) {
+        return;
+    }
+    updateMatchingNeighbours(root, position, buildingId);
 }

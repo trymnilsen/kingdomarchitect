@@ -39,6 +39,7 @@ import { ProductionBuildingSelectionProvider } from "./actor/provider/production
 import { StockpileSelectionProvider } from "./actor/provider/stockpileSelectionProvider.ts";
 import { FarmBuildingSelectionProvider } from "./actor/provider/farmBuildingSelectionProvider.ts";
 import { WindmillSelectionProvider } from "./actor/provider/windmillSelectionProvider.ts";
+import { DismantleSelectionProvider } from "./actor/provider/dismantleSelectionProvider.ts";
 import {
     FarmComponentId,
     FarmState,
@@ -97,6 +98,7 @@ export class SelectionState extends InteractionState {
         new FarmBuildingSelectionProvider(),
         new WindmillSelectionProvider(),
         new BuildingSelectionProvider(),
+        new DismantleSelectionProvider(),
     ];
     private _selection: SelectedWorldItem;
 

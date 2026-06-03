@@ -13,6 +13,7 @@ import type { ProductionJob } from "./productionJob.ts";
 import type { FarmPlantJob } from "./farmPlantJob.ts";
 import type { FarmHarvestJob } from "./farmHarvestJob.ts";
 import type { WindmillJob } from "./windmillJob.ts";
+import type { DismantleBuildingJob } from "./dismantleBuildingJob.ts";
 import { BuildingComponentId } from "../component/buildingComponent.ts";
 import { getSettlementEntity } from "../entity/settlementQueries.ts";
 
@@ -37,7 +38,8 @@ export type Jobs =
     | ProductionJob
     | FarmPlantJob
     | FarmHarvestJob
-    | WindmillJob;
+    | WindmillJob
+    | DismantleBuildingJob;
 export type JobId = Jobs["id"];
 
 export function isTargetOfJob(job: Jobs, entity: Entity): boolean {
@@ -58,6 +60,8 @@ export function isTargetOfJob(job: Jobs, entity: Entity): boolean {
             return job.targetBuilding == entity.id;
         case "windmillJob":
             return job.targetBuilding == entity.id;
+        case "dismantleBuildingJob":
+            return job.entityId == entity.id;
         case "moveToJob":
             return false;
     }

@@ -54,7 +54,7 @@ export function buildingPrefab(
     const entity = new Entity(id ?? generateId("building"));
     entity.setEcsComponent(createBuildingComponent(building, startScaffolded));
     entity.setEcsComponent(
-        createHealthComponent(startScaffolded ? 10 : 100, 100),
+        createHealthComponent(startScaffolded ? 0 : 100, 100),
     );
     entity.setEcsComponent(createVisibilityComponent());
 

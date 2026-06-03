@@ -15,6 +15,7 @@ import { executeDepositToStockpileAction } from "./depositToStockpileAction.ts";
 import { executeHarvestResourceAction } from "./harvestResourceAction.ts";
 import { executeClearObstacleAction } from "./clearObstacleAction.ts";
 import { executeConstructBuildingAction } from "./constructBuildingAction.ts";
+import { executeDismantleBuildingAction } from "./dismantleBuildingAction.ts";
 import { executeTakeFromInventoryAction } from "./takeFromInventoryAction.ts";
 import { executeDepositToInventoryAction } from "./depositToInventoryAction.ts";
 import { executeOperateFacilityAction } from "./operateFacilityAction.ts";
@@ -62,6 +63,8 @@ export const executeAction: BehaviorActionExecutor = (
             return executeClearObstacleAction(action, entity);
         case "constructBuilding":
             return executeConstructBuildingAction(action, entity);
+        case "dismantleBuilding":
+            return executeDismantleBuildingAction(action, entity);
         case "takeFromInventory":
             return executeTakeFromInventoryAction(action, entity);
         case "depositToInventory":

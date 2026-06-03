@@ -9,6 +9,7 @@ import type { DepositToStockpileActionData } from "./depositToStockpileAction.ts
 import type { HarvestResourceActionData } from "./harvestResourceAction.ts";
 import type { ClearObstacleActionData } from "./clearObstacleAction.ts";
 import type { ConstructBuildingActionData } from "./constructBuildingAction.ts";
+import type { DismantleBuildingActionData } from "./dismantleBuildingAction.ts";
 import type { TakeFromInventoryActionData } from "./takeFromInventoryAction.ts";
 import type { DepositToInventoryActionData } from "./depositToInventoryAction.ts";
 import type { OperateFacilityActionData } from "./operateFacilityAction.ts";
@@ -48,6 +49,7 @@ export type BehaviorActionData =
     | HarvestResourceActionData
     | ClearObstacleActionData
     | ConstructBuildingActionData
+    | DismantleBuildingActionData
     | TakeFromInventoryActionData
     | DepositToInventoryActionData
     | OperateFacilityActionData

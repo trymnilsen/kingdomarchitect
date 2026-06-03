@@ -44,6 +44,10 @@ export function getJobTargetPosition(root: Entity, job: Jobs): Point | null {
             const entity = root.findEntity(job.entityId);
             return entity?.worldPosition ?? null;
         }
+        case "dismantleBuildingJob": {
+            const entity = root.findEntity(job.entityId);
+            return entity?.worldPosition ?? null;
+        }
         case "craftingJob":
         case "productionJob":
         case "farmPlantJob":

@@ -103,7 +103,20 @@ import {
     ClearBuildingJobsCommandId,
     type ClearBuildingJobsCommand,
 } from "../../server/message/command/clearBuildingJobsCommand.ts";
+import {
+    DismantleBuildingCommandId,
+    type DismantleBuildingCommand,
+} from "../../server/message/command/dismantleBuildingCommand.ts";
 import { isTargetOfJob } from "../job/job.ts";
+import { BuildingComponentId } from "../component/buildingComponent.ts";
+import { HealthComponentId } from "../component/healthComponent.ts";
+import {
+    cancelScaffold,
+    createDismantleBuildingJob,
+    hasDismantleJobForBuilding,
+    stopConstruction,
+} from "../job/dismantleBuildingJob.ts";
+import { getSettlementEntity } from "../entity/settlementQueries.ts";
 
 export function createCommandSystem(
     gameTime: GameTime,
@@ -186,6 +199,13 @@ function onGameMessage(
             clearBuildingJobs(
                 root,
                 message.command as ClearBuildingJobsCommand,
+            );
+            break;
+        case DismantleBuildingCommandId:
+            dismantleBuilding(
+                root,
+                message.command as DismantleBuildingCommand,
+                gameTime.tick,
             );
             break;
     }
@@ -567,4 +587,67 @@ function clearBuildingJobs(root: Entity, command: ClearBuildingJobsCommand) {
             ),
     );
     playerKingdom.invalidateComponent(JobQueueComponentId);
+}
+
+function dismantleBuilding(
+    root: Entity,
+    command: DismantleBuildingCommand,
+    tick: number,
+) {
+    const building = root.findEntity(command.buildingId);
+    if (!building) {
+        log.warn("Building not found for Dismantle", {
+            buildingId: command.buildingId,
+        });
+        return;
+    }
+
+    const buildingComponent = building.getEcsComponent(BuildingComponentId);
+    if (!buildingComponent) {
+        log.warn("Dismantle target is not a building", {
+            buildingId: command.buildingId,
+        });
+        return;
+    }
+
+    const playerKingdom = findPlayerKingdom(root);
+    if (!playerKingdom) {
+        log.error("Player kingdom not found, cannot dismantle");
+        return;
+    }
+
+    // Only player-owned buildings can be dismantled — never goblin/enemy ones.
+    if (getSettlementEntity(building) !== playerKingdom) {
+        log.warn("Refusing to dismantle a building the player does not own", {
+            buildingId: command.buildingId,
+        });
+        return;
+    }
+
+    const jobQueue = playerKingdom.requireEcsComponent(JobQueueComponentId);
+
+    // Idempotent: ignore repeat presses while a dismantle is already queued.
+    if (hasDismantleJobForBuilding(jobQueue, building.id)) {
+        return;
+    }
+
+    // Decide from the building's live state, not what the client rendered.
+    if (buildingComponent.scaffolded) {
+        // Stop the in-flight construction first so the builder can't keep
+        // healing the building while we tear it down.
+        stopConstruction(playerKingdom, building);
+
+        const health = building.getEcsComponent(HealthComponentId);
+        const hp = health?.currentHp ?? 0;
+        if (hp <= 0) {
+            // Untouched scaffold — nothing built yet, remove it instantly.
+            cancelScaffold(root, building);
+            return;
+        }
+    }
+
+    // Completed building, or a partially-built scaffold: a worker drains its HP.
+    addJob(jobQueue, createDismantleBuildingJob(building.id));
+    playerKingdom.invalidateComponent(JobQueueComponentId);
+    notifyIdleWorkerForNewJob(playerKingdom, tick);
 }

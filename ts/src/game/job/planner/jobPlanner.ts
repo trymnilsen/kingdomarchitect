@@ -15,6 +15,7 @@ import { planProduction } from "./productionPlanner.ts";
 import { planFarmPlant } from "./farmPlantJobPlanner.ts";
 import { planFarmHarvest } from "./farmHarvestJobPlanner.ts";
 import { planWindmill } from "./windmillPlanner.ts";
+import { planDismantleBuilding } from "./dismantleBuildingPlanner.ts";
 import { log } from "../../../common/logging/logger.ts";
 
 /**
@@ -77,6 +78,8 @@ function dispatchByJobId(
             return planFarmHarvest(root, worker, job);
         case "windmillJob":
             return planWindmill(root, worker, job);
+        case "dismantleBuildingJob":
+            return planDismantleBuilding(root, worker, job);
         case "moveToJob":
             return [{ type: "moveTo", target: job.position }];
         default:
