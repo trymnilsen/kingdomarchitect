@@ -5,6 +5,7 @@ import {
     type ProductionDefinition,
 } from "../../../data/production/productionDefinition.ts";
 import { spendEntityEnergy } from "../../component/energyComponent.ts";
+import { BuildingComponentId } from "../../component/buildingComponent.ts";
 
 import {
     addToHeldItem,
@@ -157,8 +158,16 @@ function freeHandSubaction(
         };
     }
 
+    const facilityName =
+        buildingEntity.getEcsComponent(BuildingComponentId)?.building.name ??
+        "a facility";
     return {
         kind: "subaction",
-        actions: [{ type: "dropHeld" }],
+        actions: [
+            {
+                type: "dropHeld",
+                reason: `Dropped ${held.item!.name} to free hands to operate ${facilityName}`,
+            },
+        ],
     };
 }

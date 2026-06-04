@@ -114,7 +114,11 @@ export function createPerformPlayerCommandBehavior(): Behavior {
                     }
                     return [
                         { type: "moveTo", target: adjacent },
-                        { type: "dropHeld", destination: adjacent },
+                        {
+                            type: "dropHeld",
+                            destination: adjacent,
+                            reason: `Player ordered drop of ${held.item!.name}`,
+                        },
                         { type: "clearPlayerCommand" },
                     ];
                 }

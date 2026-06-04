@@ -16,17 +16,21 @@ import { zeroPoint } from "../../common/point.ts";
  * use this prefab. Adds a GroundItemComponent marker so behaviours and
  * queries can identify world-loose item piles distinctly from other
  * collectables (chests, etc.).
+ *
+ * `reason` records why this pile was dropped and is stored on the collectable
+ * component for debugging (shown in the selection tile).
  */
 export function collectableItemPrefab(
     item: InventoryItem,
     quantity: number,
+    reason?: string,
 ): Entity {
     const entity = new Entity(generateId("collectable"));
     entity.setEcsComponent(
         createSpriteComponent(item.asset, zeroPoint(), { x: 16, y: 16 }),
     );
     entity.setEcsComponent(
-        createCollectableComponent([{ item, amount: quantity }]),
+        createCollectableComponent([{ item, amount: quantity }], reason),
     );
     entity.setEcsComponent(createGroundItemComponent());
 

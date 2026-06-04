@@ -294,7 +294,7 @@ export class SelectionState extends InteractionState {
                 return {
                     icon: firstItem.asset,
                     title: firstItem.name,
-                    subtitle: "Collectable",
+                    subtitle: collectableComponent.reason ?? "Collectable",
                 };
             }
 

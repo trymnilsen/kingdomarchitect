@@ -106,7 +106,7 @@ export type ConstructionMaterialProgress = {
 export function getConstructionMaterialProgress(
     buildingInventory: InventoryComponent | undefined | null,
     requirements: BuildingRequirements | undefined,
-    settlement: Entity | undefined,
+    settlement?: Entity | undefined,
 ): ConstructionMaterialProgress[] {
     const progress: ConstructionMaterialProgress[] = [];
     if (!requirements?.materials) {

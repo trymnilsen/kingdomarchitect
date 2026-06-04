@@ -197,7 +197,12 @@ describe("harvestResourceAction", () => {
             assert.strictEqual(result.kind, "subaction");
             assert.deepStrictEqual(
                 (result as { actions: BehaviorActionData[] }).actions,
-                [{ type: "dropHeld" }],
+                [
+                    {
+                        type: "dropHeld",
+                        reason: "Dropped Stone to free hands for harvesting Tree",
+                    },
+                ],
             );
         });
 

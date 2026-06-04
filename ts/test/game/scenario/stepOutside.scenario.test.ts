@@ -84,7 +84,7 @@ describe("step-outside scenario tests", () => {
         const liveTree = harness.root.findEntity("tree");
         const health = liveTree?.getEcsComponent(HealthComponentId);
         assert.ok(
-            health !== undefined && health.currentHp === health.maxHp,
+            !!health && health.currentHp === health.maxHp,
             "tree must be at full health when the worker steps off — it must not work from the rooftop",
         );
     });

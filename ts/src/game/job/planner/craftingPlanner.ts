@@ -122,7 +122,11 @@ export function planCrafting(
         }
         return [
             { type: "moveTo", target: dropPos },
-            { type: "dropHeld", destination: dropPos },
+            {
+                type: "dropHeld",
+                destination: dropPos,
+                reason: `Dropped ${held.item!.name} to fetch ingredients for crafting ${job.recipe.name}`,
+            },
         ];
     }
 
@@ -222,7 +226,11 @@ function ensureHeldAcceptsOutputs(
     }
     return [
         { type: "moveTo", target: dropPos },
-        { type: "dropHeld", destination: dropPos },
+        {
+            type: "dropHeld",
+            destination: dropPos,
+            reason: `Dropped ${held.item!.name} to free hands for ${job.recipe.name} output`,
+        },
     ];
 }
 

@@ -160,6 +160,10 @@ function scatterInventory(root: Entity, buildingEntity: Entity): void {
         return;
     }
 
+    const buildingName =
+        buildingEntity.getEcsComponent(BuildingComponentId)?.building.name ??
+        "building";
+
     for (const stack of [...inventory.items]) {
         if (stack.amount <= 0) {
             continue;
@@ -169,6 +173,7 @@ function scatterInventory(root: Entity, buildingEntity: Entity): void {
             buildingEntity.worldPosition,
             structuredClone(stack.item),
             stack.amount,
+            `${stack.item.name} scattered from dismantled ${buildingName}'s storage`,
             DropMode.Nearest,
         );
     }
@@ -205,6 +210,7 @@ function refundConstructionMaterials(
             position,
             structuredClone(item),
             refund,
+            `${item.name} refunded from dismantling ${buildingComponent.building.name}`,
             DropMode.Nearest,
         );
     }

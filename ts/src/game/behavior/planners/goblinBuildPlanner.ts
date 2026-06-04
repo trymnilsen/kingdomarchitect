@@ -158,7 +158,11 @@ function planConstructExistingBuilding(
         if (!dropPos) return [];
         return [
             { type: "moveTo", target: dropPos },
-            { type: "dropHeld", destination: dropPos },
+            {
+                type: "dropHeld",
+                destination: dropPos,
+                reason: `Dropped ${goblinHeld.item!.name} to make room for ${building.name} materials`,
+            },
         ];
     }
 

@@ -34,5 +34,10 @@ export function planDepositHeld(worker: Entity): BehaviorActionData[] {
         ];
     }
 
-    return [{ type: "dropHeld" }];
+    return [
+        {
+            type: "dropHeld",
+            reason: `Dropped ${held.item!.name} to free the held slot for the next job`,
+        },
+    ];
 }

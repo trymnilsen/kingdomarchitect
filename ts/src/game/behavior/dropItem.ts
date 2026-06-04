@@ -134,6 +134,10 @@ export type DropMode = (typeof DropMode)[keyof typeof DropMode];
  * - `"nearest"`: search outward for the closest valid tile; returns `false` if none found.
  * - `"fail"`: return `false` immediately if the tile is blocked.
  *
+ * `reason` is a human-readable explanation of why the item was dropped here. It
+ * is stored on the resulting pile's collectable component and shown in the
+ * selection tile to make drop-related behaviour easier to debug.
+ *
  * Returns `true` when the item was placed, `false` when placement was skipped.
  */
 export function dropItemAtPosition(
@@ -141,6 +145,7 @@ export function dropItemAtPosition(
     position: Point,
     item: InventoryItem,
     amount: number,
+    reason: string,
     mode: DropMode = DropMode.Exact,
 ): boolean {
     if (amount <= 0) return true;
@@ -171,6 +176,7 @@ export function dropItemAtPosition(
             CollectableComponentId,
         );
         addCollectableItem(collectable, { item, amount });
+        collectable.reason = reason;
         existingPile.invalidateComponent(CollectableComponentId);
         log.info(
             `Merged ${amount}x ${item.id} into pile ${existingPile.id} at (${dropPos.x},${dropPos.y})`,
@@ -178,7 +184,7 @@ export function dropItemAtPosition(
         return true;
     }
 
-    const pile = collectableItemPrefab(item, amount);
+    const pile = collectableItemPrefab(item, amount, reason);
     root.addChild(pile);
     pile.worldPosition = dropPos;
     log.info(

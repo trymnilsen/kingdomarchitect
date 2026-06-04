@@ -145,9 +145,19 @@ function freeHandSubaction(
         };
     }
 
+    const resourceName =
+        getResourceById(
+            resourceEntity.getEcsComponent(ResourceComponentId)?.resourceId ??
+                "",
+        )?.name ?? "a resource";
     return {
         kind: "subaction",
-        actions: [{ type: "dropHeld" }],
+        actions: [
+            {
+                type: "dropHeld",
+                reason: `Dropped ${held.item!.name} to free hands for harvesting ${resourceName}`,
+            },
+        ],
     };
 }
 

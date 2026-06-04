@@ -102,6 +102,7 @@ function scatterYields(root: Entity, resourceEntity: Entity): void {
             resourceEntity.worldPosition,
             structuredClone(yieldItem.item),
             yieldItem.amount,
+            `${yieldItem.item.name} yielded from clearing ${resource.name}`,
             DropMode.Nearest,
         );
     }

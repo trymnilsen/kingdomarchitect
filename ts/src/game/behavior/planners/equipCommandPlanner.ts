@@ -54,7 +54,11 @@ export function planEquipCommand(
             );
         }
         actions.push({ type: "moveTo", target: dropPos });
-        actions.push({ type: "dropHeld", destination: dropPos });
+        actions.push({
+            type: "dropHeld",
+            destination: dropPos,
+            reason: `Dropped ${held.item.name} to free hands for equipping ${sourceItem.name}`,
+        });
     }
 
     // 2. Evict target slot if occupied — drop directly from slot, never

@@ -98,7 +98,11 @@ export function planGoblinBuildJob(
         if (!dropPos) return [];
         return [
             { type: "moveTo", target: dropPos },
-            { type: "dropHeld", destination: dropPos },
+            {
+                type: "dropHeld",
+                destination: dropPos,
+                reason: `Dropped ${workerHeld.item!.name} to make room for ${buildingComponent.building.name} materials`,
+            },
         ];
     }
 

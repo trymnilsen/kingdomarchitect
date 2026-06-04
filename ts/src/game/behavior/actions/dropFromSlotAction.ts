@@ -43,7 +43,14 @@ export function executeDropFromSlotAction(
     }
 
     const root = entity.getRootEntity();
-    dropItemAtPosition(root, action.destination, slotItem, 1, DropMode.Nearest);
+    dropItemAtPosition(
+        root,
+        action.destination,
+        slotItem,
+        1,
+        `Evicted ${slotItem.name} from ${action.slot} slot to equip a different item`,
+        DropMode.Nearest,
+    );
     equipment.slots[action.slot] = null;
 
     entity.invalidateComponent(EquipmentComponentId);

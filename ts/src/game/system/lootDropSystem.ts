@@ -21,6 +21,7 @@ export const lootDropSystem: EcsSystem = {
                 deathPosition,
                 goldCoins,
                 1,
+                `Gold dropped as loot by slain goblin (${event.source.id})`,
                 DropMode.Nearest,
             );
 
@@ -31,6 +32,7 @@ export const lootDropSystem: EcsSystem = {
                     deathPosition,
                     held.item!,
                     held.amount,
+                    `${held.item!.name} dropped as loot by slain goblin (${event.source.id})`,
                     DropMode.Nearest,
                 );
             }

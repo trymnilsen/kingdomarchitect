@@ -4,14 +4,22 @@ export type CollectableComponent = {
     id: typeof CollectableComponentId;
     /** Items waiting to be collected from this entity */
     items: InventoryItemQuantity[];
+    /**
+     * Human-readable explanation of why these items were dropped here. Set when
+     * the pile is spawned and refreshed on merge to reflect the most recent
+     * drop. Purely a debugging aid — surfaced in the selection tile.
+     */
+    reason?: string;
 };
 
 export function createCollectableComponent(
     items: InventoryItemQuantity[] = [],
+    reason?: string,
 ): CollectableComponent {
     return {
         id: CollectableComponentId,
         items,
+        reason,
     };
 }
 

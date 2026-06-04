@@ -22,6 +22,12 @@ import { ActionComplete, type ActionResult } from "./Action.ts";
 export type DropHeldActionData = {
     type: "dropHeld";
     destination?: Point;
+    /**
+     * Human-readable explanation of why the held item is being dropped. Carried
+     * onto the resulting ground pile for debugging (shown in the selection
+     * tile). Falls back to a generic message if the emitting planner omits it.
+     */
+    reason?: string;
 };
 
 export function executeDropHeldAction(
@@ -48,7 +54,13 @@ export function executeDropHeldAction(
     const root = entity.getRootEntity();
     const item = held.item!;
     const amount = held.amount;
-    dropItemAtPosition(root, dropPos, item, amount);
+    dropItemAtPosition(
+        root,
+        dropPos,
+        item,
+        amount,
+        action.reason ?? `Dropped ${item.name}`,
+    );
     clearHeldItem(held);
     entity.invalidateComponent(HeldItemComponentId);
 
