@@ -86,20 +86,27 @@ export function getTotalItemInStockpiles(
 export type ConstructionMaterialProgress = {
     item: InventoryItem;
     provided: number;
+    inStock: number;
     required: number;
 };
 
 /**
  * Compute, for a scaffolded building, how much of each required material has
- * already been delivered to the building versus how much it still requires.
- * The numerator is clamped to the requirement so it never reads e.g. "9/8".
+ * already been delivered to the building, how much is sitting in the
+ * settlement's stockpiles, and how much it requires in total.
+ * The delivered amount is clamped to the requirement so it never reads e.g.
+ * "9/8"; the in-stock amount is the raw stockpile total (it may exceed the
+ * requirement, which is still useful information).
  * @param buildingInventory the building's own inventory of delivered materials
  *  (undefined for buildings with no material requirements)
  * @param requirements the building's construction requirements
+ * @param settlement the settlement to read stockpile totals from (in-stock
+ *  reads 0 when undefined)
  */
 export function getConstructionMaterialProgress(
     buildingInventory: InventoryComponent | undefined | null,
     requirements: BuildingRequirements | undefined,
+    settlement: Entity | undefined,
 ): ConstructionMaterialProgress[] {
     const progress: ConstructionMaterialProgress[] = [];
     if (!requirements?.materials) {
@@ -124,9 +131,14 @@ export function getConstructionMaterialProgress(
             ? (getInventoryItem(buildingInventory, itemId)?.amount ?? 0)
             : 0;
 
+        const inStock = settlement
+            ? getTotalItemInStockpiles(settlement, itemId)
+            : 0;
+
         progress.push({
             item,
             provided: Math.min(deliveredAmount, amountNeeded),
+            inStock,
             required: amountNeeded,
         });
     }

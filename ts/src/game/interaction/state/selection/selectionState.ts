@@ -71,6 +71,7 @@ import {
     type ConstructionMaterialProgress,
 } from "../../../building/materialQuery.ts";
 import { constructionMaterialsView } from "./constructionMaterialsView.ts";
+import { getSettlementEntity } from "../../../entity/settlementQueries.ts";
 import { ResourceComponentId } from "../../../component/resourceComponent.ts";
 import { ProductionComponentId } from "../../../component/productionComponent.ts";
 import { getProductionDefinition } from "../../../../data/production/productionDefinition.ts";
@@ -311,6 +312,7 @@ export class SelectionState extends InteractionState {
                     materials = getConstructionMaterialProgress(
                         inventory,
                         buildingComponent.building.requirements,
+                        getSettlementEntity(this._selection.entity),
                     );
                 }
             }

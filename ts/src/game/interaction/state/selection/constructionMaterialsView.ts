@@ -19,7 +19,10 @@ export const constructionMaterialsView = createComponent<{
         gap: 2,
         crossAxisAlignment: CrossAxisAlignment.Start,
         children: [
-            uiText({ content: "Materials:", textStyle: subTitleTextStyle }),
+            uiText({
+                content: "Materials (have/stock/need):",
+                textStyle: subTitleTextStyle,
+            }),
             ...props.materials.map((entry) =>
                 uiRow({
                     width: wrapUiSize,
@@ -33,7 +36,7 @@ export const constructionMaterialsView = createComponent<{
                             height: 16,
                         }),
                         uiText({
-                            content: `${entry.provided}/${entry.required} ${entry.item.name}`,
+                            content: `${entry.provided}/${entry.inStock}/${entry.required} ${entry.item.name}`,
                             textStyle: subTitleTextStyle,
                         }),
                     ],
