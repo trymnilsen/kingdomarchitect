@@ -10,6 +10,7 @@ import { createDepositHeldBehavior } from "./behaviors/DepositHeldBehavior.ts";
 import { createRestockBehavior } from "./behaviors/RestockBehavior.ts";
 import { createEatBehavior } from "./behaviors/eatBehavior.ts";
 import { createEngageInCombatBehavior } from "./behaviors/engageInCombatBehavior.ts";
+import { createStepOutsideBehavior } from "./behaviors/StepOutsideBehavior.ts";
 import { planBuildBuilding } from "../job/planner/buildBuildingPlanner.ts";
 import { planGoblinBuildJob } from "../job/planner/goblinBuildJobPlanner.ts";
 import { canExecuteBuildJob } from "../job/buildBuildingJob.ts";
@@ -41,6 +42,7 @@ import { canExecuteBuildJob } from "../job/buildBuildingJob.ts";
  */
 export function createBehaviorResolver(): BehaviorResolver {
     const workerBehaviors: Behavior[] = [
+        createStepOutsideBehavior(),
         createPerformPlayerCommandBehavior(),
         createEngageInCombatBehavior(),
         createSleepBehavior(),

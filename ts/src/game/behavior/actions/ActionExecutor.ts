@@ -9,6 +9,7 @@ import { log } from "../../../common/logging/logger.ts";
 import { executeWaitAction } from "./waitAction.ts";
 import { executeMoveToAction } from "./moveToAction.ts";
 import { executeStepOntoAction } from "./stepOntoAction.ts";
+import { executeStepOffAction } from "./stepOffAction.ts";
 import { executeClearPlayerCommandAction } from "./clearPlayerCommandAction.ts";
 import { executeSleepAction } from "./sleepAction.ts";
 import { executeDepositToStockpileAction } from "./depositToStockpileAction.ts";
@@ -51,6 +52,8 @@ export const executeAction: BehaviorActionExecutor = (
             return executeMoveToAction(action, entity, tick);
         case "stepOnto":
             return executeStepOntoAction(action, entity, tick);
+        case "stepOff":
+            return executeStepOffAction(action, entity, tick);
         case "clearPlayerCommand":
             return executeClearPlayerCommandAction(entity);
         case "sleep":

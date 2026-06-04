@@ -379,10 +379,14 @@ export class SelectionState extends InteractionState {
                 } else {
                     const behaviorName =
                         behaviorAgent.currentBehaviorName ?? "idle";
-                    const actionType = behaviorAgent.actionQueue[0]?.type;
-                    subtitle = actionType
-                        ? `${behaviorName} - ${actionType}`
-                        : behaviorName;
+                    if (behaviorName === "stepOutside") {
+                        subtitle = "stepping outside";
+                    } else {
+                        const actionType = behaviorAgent.actionQueue[0]?.type;
+                        subtitle = actionType
+                            ? `${behaviorName} - ${actionType}`
+                            : behaviorName;
+                    }
                 }
             }
 

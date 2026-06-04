@@ -6,7 +6,17 @@ import { ProductionComponentId } from "../../component/productionComponent.ts";
 import type { ProductionJob } from "../productionJob.ts";
 import { failJobFromQueue } from "../jobLifecycle.ts";
 import { getProductionDefinition } from "../../../data/production/productionDefinition.ts";
-import { findRandomSpawnInDiamond } from "../../map/item/placement.ts";
+import {
+    findRandomSpawnInDiamond,
+    getDiamondPoints,
+    getResourcesInDiamond,
+} from "../../map/item/placement.ts";
+import { ResourceHarvestMode } from "../../../data/inventory/items/naturalResource.ts";
+import {
+    HeldItemComponentId,
+    isHeldEmpty,
+} from "../../component/heldItemComponent.ts";
+import { planDepositHeld } from "./planDepositHeld.ts";
 
 /**
  * Plan actions for operating a production facility.
@@ -61,7 +71,8 @@ export function planProduction(
         ];
     }
 
-    // zone kind: find an empty spot in the zone to plant
+    // zone kind: the worker auto-decides plant-vs-chop from the current tree
+    // population. Plant up to a target count, then chop a random standing tree.
     const chunkMapComp = root.getEcsComponent(ChunkMapComponentId);
     if (!chunkMapComp) {
         const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
@@ -71,30 +82,71 @@ export function planProduction(
         return [];
     }
 
-    const emptySpot = findRandomSpawnInDiamond(
-        buildingEntity.worldPosition,
+    const center = buildingEntity.worldPosition;
+    // Plantable tiles = diamond tiles minus the center (building) tile.
+    const plantableTiles = getDiamondPoints(center, definition.zoneRadius).length - 1;
+    const target = Math.round(definition.maxTreeFraction * plantableTiles);
+    const floor = Math.floor(definition.minTreeFraction * plantableTiles);
+
+    const trees = getResourcesInDiamond(
+        center,
         definition.zoneRadius,
         chunkMapComp.chunkMap,
+        definition.plantResourceId,
     );
+    const treeCount = trees.length;
 
-    if (!emptySpot) {
-        const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
-        if (queueEntity) {
-            failJobFromQueue(queueEntity, job);
+    // Plant while the population is still climbing toward the target.
+    if (treeCount < target) {
+        const emptySpot = findRandomSpawnInDiamond(
+            center,
+            definition.zoneRadius,
+            chunkMapComp.chunkMap,
+        );
+        if (emptySpot) {
+            return [
+                {
+                    type: "moveTo",
+                    target: emptySpot,
+                    stopAdjacent: "cardinal",
+                },
+                {
+                    type: "plantTree",
+                    buildingId: job.targetBuilding,
+                    targetPosition: emptySpot,
+                },
+            ];
         }
-        return [];
     }
 
-    return [
-        {
-            type: "moveTo",
-            target: emptySpot,
-            stopAdjacent: "cardinal",
-        },
-        {
-            type: "plantTree",
-            buildingId: job.targetBuilding,
-            targetPosition: emptySpot,
-        },
-    ];
+    // At/above target (or no room to plant): chop a randomly-picked tree, as
+    // long as we're above the safety floor so we never clear a sparse forest.
+    if (treeCount >= floor && treeCount > 0) {
+        const tree = trees[Math.floor(Math.random() * trees.length)];
+        const chopActions: BehaviorActionData[] = [
+            {
+                type: "moveTo",
+                target: tree.worldPosition,
+                stopAdjacent: "cardinal",
+            },
+            {
+                type: "harvestResource",
+                entityId: tree.id,
+                harvestAction: ResourceHarvestMode.Chop,
+            },
+        ];
+        // Chopping deposits wood into the held slot, so free the hands first.
+        const held = worker.getEcsComponent(HeldItemComponentId);
+        if (held && !isHeldEmpty(held)) {
+            return [...planDepositHeld(worker), ...chopActions];
+        }
+        return chopActions;
+    }
+
+    // Nothing to do (can't plant, can't chop) — drop the order.
+    const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
+    if (queueEntity) {
+        failJobFromQueue(queueEntity, job);
+    }
+    return [];
 }

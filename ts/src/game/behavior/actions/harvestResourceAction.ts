@@ -198,7 +198,10 @@ function executeChopHarvest(
         const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
         if (queueEntity) {
             const job = findJobClaimedBy(queueEntity, worker.id);
-            if (job && job.id === "collectResource") {
+            if (
+                job &&
+                (job.id === "collectResource" || job.id === "productionJob")
+            ) {
                 completeJobFromQueue(queueEntity, job);
             }
         }
@@ -232,7 +235,10 @@ function executeWorkHarvest(
         const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
         if (queueEntity) {
             const job = findJobClaimedBy(queueEntity, worker.id);
-            if (job && job.id === "collectResource") {
+            if (
+                job &&
+                (job.id === "collectResource" || job.id === "productionJob")
+            ) {
                 completeJobFromQueue(queueEntity, job);
             }
         }

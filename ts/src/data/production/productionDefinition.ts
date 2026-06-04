@@ -41,10 +41,12 @@ export const forresterProduction: Extract<
 > = {
     kind: "zone",
     id: "forrester_production",
-    actionName: "Plant Tree",
+    actionName: "Tend Forest",
     plantResourceId: "tree1",
     zoneRadius: 2,
     plantDuration: 3,
+    // maxTreeFraction = target population (plant up to this), reached before any
+    // chopping starts. minTreeFraction = safety floor (never chop below this).
     maxTreeFraction: 0.8,
     minTreeFraction: 0.4,
 };
