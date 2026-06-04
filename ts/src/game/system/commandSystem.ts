@@ -678,17 +678,13 @@ function prioritiseJob(root: Entity, command: PrioritiseJobCommand) {
         return;
     }
 
-    // Only the player's own entities can have their work reprioritised.
-    if (getSettlementEntity(entity) !== playerKingdom) {
-        log.warn("Refusing to prioritise a job the player does not own", {
-            entityId: command.entityId,
-        });
-        return;
-    }
-
     const jobQueue = playerKingdom.requireEcsComponent(JobQueueComponentId);
 
     // Bump the first job that targets this entity to the front of the queue.
+    // Searching only the player kingdom's own queue is itself the ownership
+    // check: a job here is the player's work (resources sit on world chunks,
+    // not under the kingdom, so an ancestor-based check would wrongly reject
+    // chop/mine jobs). No match → nothing to do.
     const job = jobQueue.jobs.find((job) => isTargetOfJob(job, entity));
     if (!job) {
         return;
