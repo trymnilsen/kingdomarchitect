@@ -1,17 +1,13 @@
 import type { RenderScope } from "../../../rendering/renderScope.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { DayComponentId } from "../../component/dayComponent.ts";
-import {
-    BehaviorAgentComponentId,
-} from "../../component/BehaviorAgentComponent.ts";
+import { BehaviorAgentComponentId } from "../../component/BehaviorAgentComponent.ts";
 import { PlayerUnitComponentId } from "../../component/playerUnitComponent.ts";
+import { statusbarTextStyle } from "../../../rendering/text/textStyle.ts";
 
 const BAR_HEIGHT = 28;
 const PADDING_X = 12;
-const FONT = "Arial";
-const FONT_SIZE = 13;
-const BAR_FILL = "rgba(10, 10, 20, 0.65)";
-const TEXT_COLOR = "#e8e0cc";
+const BAR_FILL = "rgba(30, 30, 30, 1)";
 const IDLE_HIGHLIGHT = "#f0a040";
 
 /**
@@ -36,36 +32,35 @@ export function drawStatusBar(renderScope: RenderScope, root: Entity): void {
     renderScope.drawScreenspaceText({
         text: leftText,
         x: PADDING_X,
-        y: (BAR_HEIGHT - FONT_SIZE) / 2,
-        color: TEXT_COLOR,
-        font: FONT,
-        size: FONT_SIZE,
+        y: (BAR_HEIGHT - statusbarTextStyle.size) / 2,
+        color: statusbarTextStyle.color,
+        font: statusbarTextStyle.font,
+        size: statusbarTextStyle.size,
     });
 
     const { total, idle } = countPopulation(root);
     const populationText = `People: ${total}`;
     const idleText = idle > 0 ? `  (${idle} idle)` : "";
 
-    // Measure the main label so we can place the idle suffix in a different colour
     const rightBaseX = renderScope.width - PADDING_X - 160;
 
     renderScope.drawScreenspaceText({
         text: populationText,
         x: rightBaseX,
-        y: (BAR_HEIGHT - FONT_SIZE) / 2,
-        color: TEXT_COLOR,
-        font: FONT,
-        size: FONT_SIZE,
+        y: (BAR_HEIGHT - statusbarTextStyle.size) / 2,
+        color: statusbarTextStyle.color,
+        font: statusbarTextStyle.font,
+        size: statusbarTextStyle.size,
     });
 
     if (idleText) {
         renderScope.drawScreenspaceText({
             text: idleText,
             x: rightBaseX + 80,
-            y: (BAR_HEIGHT - FONT_SIZE) / 2,
+            y: (BAR_HEIGHT - statusbarTextStyle.size) / 2,
             color: IDLE_HIGHLIGHT,
-            font: FONT,
-            size: FONT_SIZE,
+            font: statusbarTextStyle.font,
+            size: statusbarTextStyle.size,
         });
     }
 }

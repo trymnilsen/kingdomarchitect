@@ -28,6 +28,12 @@ export const actionbarTextStyle: TextStyle = {
     size: 16,
 };
 
+export const statusbarTextStyle: TextStyle = {
+    color: "white",
+    font: "Silkscreen",
+    size: 16,
+};
+
 export const graySubTitleTextStyle: TextStyle = {
     color: "#363636",
     font: "Silkscreen",
