@@ -23,6 +23,7 @@ import { queryEntity } from "../../map/query/queryEntity.ts";
 import { entitiesFrontToBack } from "../../component/spriteComponent.ts";
 import type { EcsWorld } from "../../../common/ecs/ecsWorld.ts";
 import { log } from "../../../common/logging/logger.ts";
+import { drawStatusBar } from "../view/uiStatusBar.ts";
 
 /**
  * The interactionHandler recieves input taps and forward them to the currently
@@ -244,6 +245,8 @@ export class InteractionHandler {
         }
 
         this.history.state.onDraw(renderScope);
+
+        drawStatusBar(renderScope, this.world.root);
 
         // Wrap the state's view in a keyed container to ensure proper reconciliation
         // Each interaction state gets a unique key so components don't persist across state transitions

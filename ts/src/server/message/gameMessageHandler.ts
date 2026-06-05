@@ -214,6 +214,11 @@ function updateWorldState(root: Entity, message: WorldStateGameMessage) {
         message.volumes,
     );
 
+    // Apply replicated root components (e.g. DayComponent)
+    for (const comp of message.replicatedRootComponents) {
+        root.setEcsComponent(comp);
+    }
+
     // Create all root children entities recursively
     for (const childData of message.rootChildren) {
         createEntityWithChildren(root, childData);

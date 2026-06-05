@@ -9,6 +9,7 @@ import type {
 import { PathfindingGraphComponentId } from "../../game/component/pathfindingGraphComponent.ts";
 import { TileComponentId } from "../../game/component/tileComponent.ts";
 import { WorldDiscoveryComponentId } from "../../game/component/worldDiscoveryComponent.ts";
+import { DayComponentId } from "../../game/component/dayComponent.ts";
 import { Entity, RootEntityId } from "../../game/entity/entity.ts";
 import type { PersistenceAdapter } from "./persistenceAdapter.ts";
 import type { SaveFileData } from "./saveFileData.ts";
@@ -390,4 +391,5 @@ const runtimeOnlyComponents = new Set<ComponentID>([
 const persistableRootComponents = new Set<ComponentID>([
     TileComponentId,
     WorldDiscoveryComponentId,
+    DayComponentId,
 ]);

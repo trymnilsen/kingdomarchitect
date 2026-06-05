@@ -1,5 +1,6 @@
 import type { EcsSystem } from "../common/ecs/ecsSystem.ts";
-import type { Components } from "../game/component/component.ts";
+import type { ComponentID, Components } from "../game/component/component.ts";
+import { DayComponentId } from "../game/component/dayComponent.ts";
 import { TileComponentId } from "../game/component/tileComponent.ts";
 import { VisibilityMapComponentId } from "../game/component/visibilityMapComponent.ts";
 import { WorldDiscoveryComponentId } from "../game/component/worldDiscoveryComponent.ts";
@@ -33,11 +34,12 @@ export function makeReplicatedEntitiesSystem(
     return {
         onEntityEvent: {
             component_updated: (_root, event) => {
-                // The game root holds world-level components (tiles,
-                // discovery, visibility). These are managed separately via
-                // WorldStateGameMessage or are client-only — none need
-                // per-component delta replication.
-                if (event.source.isGameRoot) {
+                // Root components that are not in the replication allowlist are
+                // managed separately (tiles, discovery) or are client-only.
+                if (
+                    event.source.isGameRoot &&
+                    !replicatedRootComponents.has(event.item.id)
+                ) {
                     return;
                 }
                 // Tiles and visibility maps are client-only components
@@ -126,6 +128,7 @@ export function makeReplicatedEntitiesSystem(
 export function buildWorldStateMessage(
     rootEntity: Entity,
     player: string,
+    serverTick: number,
 ): WorldStateGameMessage {
     // Build replicated data for all root children
     const rootChildren = buildChildrenData(rootEntity);
@@ -141,11 +144,21 @@ export function buildWorldStateMessage(
         playerDiscovery &&
         getPlayerDiscoveryData(tileComponent, playerDiscovery);
 
+    const rootComponentSnapshot: Components[] = [];
+    for (const id of replicatedRootComponents) {
+        const comp = rootEntity.getEcsComponent(id);
+        if (comp) {
+            rootComponentSnapshot.push(comp);
+        }
+    }
+
     return {
         type: WorldStateMessageType,
         rootChildren,
         discoveredTiles: discoveryData?.tiles ?? [],
         volumes: discoveryData?.volumes ?? [],
+        serverTick,
+        replicatedRootComponents: rootComponentSnapshot,
     };
 }
 
@@ -187,3 +200,10 @@ function filterClientOnlyComponents(
             component.id !== VisibilityMapComponentId,
     );
 }
+
+/**
+ * Root components that should be replicated to clients.
+ * Add a ComponentID here to opt a root component into per-change replication
+ * and initial snapshot inclusion in WorldStateGameMessage.
+ */
+const replicatedRootComponents = new Set<ComponentID>([DayComponentId]);

@@ -31,6 +31,7 @@ import { createEffectExecutorMap } from "../data/effect/effectExecutorRegistry.t
 import { housingSystem } from "../game/system/housingSystem.ts";
 import { regrowSystem } from "../game/system/regrowSystem.ts";
 import { farmGrowthSystem } from "../game/system/farmGrowthSystem.ts";
+import { createPhaseTransitionSystem } from "../game/system/phaseTransitionSystem.ts";
 import { PersistenceManager } from "./persistence/persistenceManager.ts";
 import type { Entity } from "../game/entity/entity.ts";
 import type { SerializedWorldMeta } from "./persistence/serializedWorldMeta.ts";
@@ -127,7 +128,7 @@ export class GameServer {
     private sendWorldStateTo(playerId: string): void {
         this.messageRouter.sendTo(
             playerId,
-            buildWorldStateMessage(this.world.root, playerId),
+            buildWorldStateMessage(this.world.root, playerId, this.updateTick),
         );
 
         const message = this.buildDiscoverTileMessage(playerId);
@@ -230,6 +231,7 @@ export class GameServer {
         this.world.addSystem(goblinCampSystem);
         this.world.addSystem(lootDropSystem);
         this.world.addSystem(worldGenerationSystem);
+        this.world.addSystem(createPhaseTransitionSystem());
         this.world.addSystem(
             createCommandSystem(this.gameTime, this.persistenceManager),
         );

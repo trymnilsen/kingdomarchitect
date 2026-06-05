@@ -86,7 +86,7 @@ export class DevApp {
     protected onTick(): void {}
 
     protected render() {
-        this.renderer.clearScreen();
+        this.renderer.clearScreen("#001408");
 
         const scene = this.getScene();
         if (scene != null) {

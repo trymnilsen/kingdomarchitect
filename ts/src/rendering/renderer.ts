@@ -1,4 +1,3 @@
-import { rgbToHex } from "../common/color.ts";
 import { AssetLoader } from "../asset/loader/assetLoader.ts";
 import { Camera } from "./camera.ts";
 import { RenderScope } from "./renderScope.ts";
@@ -60,15 +59,14 @@ export class Renderer {
         this.renderContext.clearDeferredDrawFunctions();
     }
 
-    clearScreen() {
-        let clearColor = dayClearColor;
+    clearScreen(backgroundColor: string) {
         this.canvasContext.clearRect(
             0,
             0,
             window.innerWidth,
             window.innerHeight,
         );
-        this.canvasContext.fillStyle = clearColor;
+        this.canvasContext.fillStyle = backgroundColor;
         this.canvasContext.fillRect(
             0,
             0,
@@ -77,6 +75,3 @@ export class Renderer {
         );
     }
 }
-
-const dayClearColor = rgbToHex(0, 50, 20);
-const nightClearColor = rgbToHex(30, 0, 50);

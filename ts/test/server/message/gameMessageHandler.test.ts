@@ -47,6 +47,8 @@ describe("gameMessageHandler", () => {
                 rootChildren: [],
                 discoveredTiles: [],
                 volumes: [],
+                serverTick: 0,
+                replicatedRootComponents: [],
             };
 
             assert.ok(
@@ -70,6 +72,8 @@ describe("gameMessageHandler", () => {
                 rootChildren: [],
                 discoveredTiles: [],
                 volumes: [],
+                serverTick: 0,
+                replicatedRootComponents: [],
             };
 
             assert.ok(
@@ -98,6 +102,8 @@ describe("gameMessageHandler", () => {
                     { x: 1, y: 1, volume: "vol1" },
                 ],
                 volumes: [volume],
+                serverTick: 0,
+                replicatedRootComponents: [],
             };
 
             handleGameMessage(root, message);
@@ -134,6 +140,8 @@ describe("gameMessageHandler", () => {
                 ],
                 discoveredTiles: [],
                 volumes: [],
+                serverTick: 0,
+                replicatedRootComponents: [],
             };
 
             handleGameMessage(root, message);
@@ -177,6 +185,8 @@ describe("gameMessageHandler", () => {
                 ],
                 discoveredTiles: [],
                 volumes: [],
+                serverTick: 0,
+                replicatedRootComponents: [],
             };
 
             handleGameMessage(root, message);
@@ -211,6 +221,8 @@ describe("gameMessageHandler", () => {
                 ],
                 discoveredTiles: [],
                 volumes: [],
+                serverTick: 0,
+                replicatedRootComponents: [],
             };
 
             handleGameMessage(root, message);

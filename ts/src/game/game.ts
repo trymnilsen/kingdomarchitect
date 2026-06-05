@@ -27,6 +27,8 @@ import { createAttackVfxSystem } from "./system/attackVfxSystem.ts";
 import { despawnTimerSystem } from "./system/despawnTimerSystem.ts";
 import { SpriteDefinitionCache } from "../characterbuilder/characterSpriteGenerator.ts";
 import { createRootEntity } from "./rootFactory.ts";
+import { DayComponentId, phaseBackgroundColor } from "./component/dayComponent.ts";
+import { WorldStateMessageType } from "../server/message/gameMessage.ts";
 
 export class Game {
     private renderer: Renderer;
@@ -60,6 +62,10 @@ export class Game {
 
         this.gameServer = serverConnection;
         this.gameServer.onMessage.listen((message) => {
+            if (message.type === WorldStateMessageType) {
+                this.updateTick = message.serverTick;
+                this.gameTime.tick = message.serverTick;
+            }
             handleGameMessage(this.ecsWorld.root, message);
             this.ecsWorld.runGameMessage(message);
         });
@@ -212,7 +218,8 @@ export class Game {
     }
 
     private render(drawMode: DrawMode) {
-        this.renderer.clearScreen();
+        const day = this.ecsWorld.root.getEcsComponent(DayComponentId);
+        this.renderer.clearScreen(phaseBackgroundColor(day?.phase ?? "dawn"));
         this.ecsWorld.runRender(this.renderer.context, this.drawTick, drawMode);
         this.interactionHandler.onDraw(this.renderer.context);
         this.renderer.renderDeferred();

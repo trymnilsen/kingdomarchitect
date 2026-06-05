@@ -43,6 +43,7 @@ import type { ImmortalComponent } from "./immortalComponent.ts";
 import type { HeldItemComponent } from "./heldItemComponent.ts";
 import type { GroundItemComponent } from "./groundItemComponent.ts";
 import type { TraversalComponent } from "./traversalComponent.ts";
+import type { DayComponent } from "./dayComponent.ts";
 
 export type Components =
     | SpriteComponent
@@ -89,7 +90,8 @@ export type Components =
     | ImmortalComponent
     | HeldItemComponent
     | GroundItemComponent
-    | TraversalComponent;
+    | TraversalComponent
+    | DayComponent;
 
 export interface BaseComponent {
     id: string;

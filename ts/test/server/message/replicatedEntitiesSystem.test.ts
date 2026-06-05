@@ -42,7 +42,7 @@ describe("replicatedEntitiesSystem", () => {
             root.setEcsComponent(tileComponent);
             root.setEcsComponent(discoveryComponent);
 
-            const message = buildWorldStateMessage(root, "player1");
+            const message = buildWorldStateMessage(root, "player1", 0);
 
             assert.strictEqual(message.type, WorldStateMessageType);
         });
@@ -64,7 +64,7 @@ describe("replicatedEntitiesSystem", () => {
             root.addChild(child1);
             root.addChild(child2);
 
-            const message = buildWorldStateMessage(root, "player1");
+            const message = buildWorldStateMessage(root, "player1", 0);
 
             assert.strictEqual(message.rootChildren.length, 2);
 
@@ -96,7 +96,7 @@ describe("replicatedEntitiesSystem", () => {
             child.worldPosition = { x: 100, y: 200 };
             root.addChild(child);
 
-            const message = buildWorldStateMessage(root, "player1");
+            const message = buildWorldStateMessage(root, "player1", 0);
 
             assert.deepStrictEqual(message.rootChildren[0].position, {
                 x: 100,
@@ -118,7 +118,7 @@ describe("replicatedEntitiesSystem", () => {
             child.setEcsComponent(healthComponent);
             root.addChild(child);
 
-            const message = buildWorldStateMessage(root, "player1");
+            const message = buildWorldStateMessage(root, "player1", 0);
 
             assert.strictEqual(message.rootChildren[0].components.length, 1);
             const component = message.rootChildren[0].components[0];
@@ -139,7 +139,7 @@ describe("replicatedEntitiesSystem", () => {
             child.setEcsComponent(createHealthComponent(50, 100));
             root.addChild(child);
 
-            const message = buildWorldStateMessage(root, "player1");
+            const message = buildWorldStateMessage(root, "player1", 0);
 
             const childData = message.rootChildren[0];
             const hasClientOnlyComponent = childData.components.some(
@@ -168,7 +168,7 @@ describe("replicatedEntitiesSystem", () => {
             child.setEcsComponent(createHealthComponent(50, 100));
             root.addChild(child);
 
-            const message = buildWorldStateMessage(root, "player1");
+            const message = buildWorldStateMessage(root, "player1", 0);
 
             const childData = message.rootChildren[0];
             const hasClientOnlyComponent = childData.components.some(
@@ -206,7 +206,7 @@ describe("replicatedEntitiesSystem", () => {
                 partiallyDiscoveredChunks: new Map(),
             });
 
-            const message = buildWorldStateMessage(root, "player1");
+            const message = buildWorldStateMessage(root, "player1", 0);
 
             assert.strictEqual(
                 message.discoveredTiles.length,
@@ -246,7 +246,7 @@ describe("replicatedEntitiesSystem", () => {
                 ]),
             });
 
-            const message = buildWorldStateMessage(root, "player1");
+            const message = buildWorldStateMessage(root, "player1", 0);
 
             assert.strictEqual(message.discoveredTiles.length, 2);
             assert.strictEqual(message.volumes.length, 1);
@@ -272,7 +272,7 @@ describe("replicatedEntitiesSystem", () => {
 
             // No discovery data for player1
 
-            const message = buildWorldStateMessage(root, "player1");
+            const message = buildWorldStateMessage(root, "player1", 0);
 
             assert.strictEqual(message.discoveredTiles.length, 0);
             assert.strictEqual(message.volumes.length, 0);
@@ -293,7 +293,7 @@ describe("replicatedEntitiesSystem", () => {
                 partiallyDiscoveredChunks: new Map(),
             });
 
-            const message = buildWorldStateMessage(root, "player1");
+            const message = buildWorldStateMessage(root, "player1", 0);
 
             assert.strictEqual(message.discoveredTiles.length, 0);
             assert.strictEqual(message.volumes.length, 0);
@@ -337,8 +337,8 @@ describe("replicatedEntitiesSystem", () => {
                 partiallyDiscoveredChunks: new Map(),
             });
 
-            const messageForPlayer1 = buildWorldStateMessage(root, "player1");
-            const messageForPlayer2 = buildWorldStateMessage(root, "player2");
+            const messageForPlayer1 = buildWorldStateMessage(root, "player1", 0);
+            const messageForPlayer2 = buildWorldStateMessage(root, "player2", 0);
 
             // Player1 should only see tiles from chunk 0 (tiles 0-7 on x axis)
             assert.strictEqual(
@@ -372,7 +372,7 @@ describe("replicatedEntitiesSystem", () => {
             root.setEcsComponent(tileComponent);
             root.setEcsComponent(discoveryComponent);
 
-            const message = buildWorldStateMessage(root, "player1");
+            const message = buildWorldStateMessage(root, "player1", 0);
 
             assert.strictEqual(message.rootChildren.length, 0);
             assert.strictEqual(message.discoveredTiles.length, 0);
@@ -393,7 +393,7 @@ describe("replicatedEntitiesSystem", () => {
             parent.addChild(child);
             root.addChild(parent);
 
-            const message = buildWorldStateMessage(root, "player1");
+            const message = buildWorldStateMessage(root, "player1", 0);
 
             const parentData = message.rootChildren[0];
             assert.ok(parentData.children);

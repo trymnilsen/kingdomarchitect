@@ -60,6 +60,10 @@ export type WorldStateGameMessage = {
     // Tiles discovered by the player, includes volume reference
     discoveredTiles: DiscoveredTileData[];
     volumes: Volume[];
+    /** Server simulation tick at the time this snapshot was taken. Used by the client to sync its local tick. */
+    serverTick: number;
+    /** Snapshot of root-level components that are opted into replication (see replicatedRootComponents in replicatedEntitiesSystem). */
+    replicatedRootComponents: Components[];
 };
 
 export type AddEntityGameMessage = {
