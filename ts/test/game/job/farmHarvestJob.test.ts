@@ -7,6 +7,10 @@ import {
     FarmComponentId,
     FarmState,
 } from "../../../src/game/component/farmComponent.ts";
+import {
+    getCropDefinition,
+    type CropId,
+} from "../../../src/data/crop/cropDefinitions.ts";
 import { planFarmHarvest } from "../../../src/game/job/planner/farmHarvestJobPlanner.ts";
 import { createFarmHarvestJob } from "../../../src/game/job/farmHarvestJob.ts";
 import { executeHarvestCropAction } from "../../../src/game/behavior/actions/harvestCropAction.ts";
@@ -16,7 +20,11 @@ import {
     isHeldEmpty,
 } from "../../../src/game/component/heldItemComponent.ts";
 
-function createTestScene(): { root: Entity; worker: Entity; farm: Entity } {
+function createTestScene(cropId: CropId = "wheat"): {
+    root: Entity;
+    worker: Entity;
+    farm: Entity;
+} {
     const root = new Entity("root");
     const worker = new Entity("worker");
     const farm = new Entity("farm");
@@ -28,10 +36,8 @@ function createTestScene(): { root: Entity; worker: Entity; farm: Entity } {
     worker.worldPosition = { x: 12, y: 8 };
     farm.worldPosition = { x: 13, y: 8 }; // Adjacent to worker
 
-    const farmComp = createFarmComponent();
+    const farmComp = createFarmComponent(cropId);
     farmComp.state = FarmState.Ready;
-    farmComp.cropItemId = "wheat";
-    farmComp.cropYieldAmount = 4;
     farm.setEcsComponent(farmComp);
 
     worker.setEcsComponent(createHeldItemComponent());
@@ -116,6 +122,21 @@ describe("harvestCropAction", () => {
         assert.ok(held.item, "worker should be holding the crop");
         assert.strictEqual(held.item.id, "wheat");
         assert.strictEqual(held.amount, 4);
+    });
+
+    it("yields the configured crop's item and amount, not a hardcoded wheat", () => {
+        // Proves the harvest derives output from the farm's cropId via the crop
+        // registry rather than a value baked onto the component at creation.
+        const { worker } = createTestScene("flax");
+        const flax = getCropDefinition("flax");
+        const action = { type: "harvestCrop" as const, buildingId: "farm" };
+
+        const result = executeHarvestCropAction(action, worker);
+
+        assert.strictEqual(result.kind, "complete");
+        const held = worker.getEcsComponent(HeldItemComponentId)!;
+        assert.strictEqual(held.item?.id, flax.itemId);
+        assert.strictEqual(held.amount, flax.yieldAmount);
     });
 
     it("transitions farm from Ready to Empty", () => {

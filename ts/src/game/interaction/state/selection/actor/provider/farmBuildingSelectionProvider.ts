@@ -15,6 +15,7 @@ import { spriteRefs } from "../../../../../../asset/sprite.ts";
 import { createFarmPlantJob } from "../../../../../job/farmPlantJob.ts";
 import { createFarmHarvestJob } from "../../../../../job/farmHarvestJob.ts";
 import { QueueJobCommand } from "../../../../../../server/message/command/queueJobCommand.ts";
+import { CropSelectionState } from "../../../crop/cropSelectionState.ts";
 
 export class FarmBuildingSelectionProvider implements ActorSelectionProvider {
     provideButtons(
@@ -43,6 +44,17 @@ export class FarmBuildingSelectionProvider implements ActorSelectionProvider {
                             const job = createFarmPlantJob(selection.entity.id);
                             stateContext.commandDispatcher(
                                 QueueJobCommand(job),
+                            );
+                        },
+                    },
+                    {
+                        // Crop is only configurable while fallow: a planted crop
+                        // is committed until harvested.
+                        text: "Crop",
+                        icon: spriteRefs.empty_sprite,
+                        onClick: () => {
+                            stateContext.stateChanger.push(
+                                new CropSelectionState(selection.entity),
                             );
                         },
                     },

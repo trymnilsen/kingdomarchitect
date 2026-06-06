@@ -16,6 +16,22 @@ export const wheatResourceItem = {
     tag: [ItemTag.Food],
 } as const;
 
+export const flaxResourceItem = {
+    asset: spriteRefs.farm_4, // placeholder sprite
+    id: "flax",
+    name: "Flax",
+    hint: "Plant fiber, spun into cloth",
+    rarity: ItemRarity.Common,
+} as const;
+
+export const strawResourceItem = {
+    asset: spriteRefs.farm_4, // placeholder sprite
+    id: "straw",
+    name: "Straw",
+    hint: "Dry stalks, fuel for torches",
+    rarity: ItemRarity.Common,
+} as const;
+
 export const breadItem = {
     asset: spriteRefs.farm_4,
     id: "bread",
@@ -101,6 +117,8 @@ export const resources = [
     bagOfGlitter,
     stoneResource,
     wheatResourceItem,
+    flaxResourceItem,
+    strawResourceItem,
     woodResourceItem,
     breadItem,
     berryItem,

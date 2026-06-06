@@ -46,6 +46,7 @@ import {
     FarmComponentId,
     FarmState,
 } from "../../../component/farmComponent.ts";
+import { getCropDefinition } from "../../../../data/crop/cropDefinitions.ts";
 import { getCraftingJobDisplayInfos } from "../../../job/craftingJobQuery.ts";
 import {
     getJobForWorker,
@@ -353,22 +354,23 @@ export class SelectionState extends InteractionState {
             const farmComponent =
                 this._selection.entity.getEcsComponent(FarmComponentId);
             if (farmComponent) {
+                const cropDefinition = getCropDefinition(farmComponent.cropId);
                 let farmSubtitle: string;
                 if (farmComponent.state === FarmState.Empty) {
-                    farmSubtitle = "empty";
+                    farmSubtitle = `${cropDefinition.name} (empty)`;
                 } else if (farmComponent.state === FarmState.Growing) {
-                    const progress =
-                        farmComponent.growthDuration > 0
-                            ? Math.floor(
-                                  ((this.context.gameTime.tick -
-                                      farmComponent.plantedAtTick) /
-                                      farmComponent.growthDuration) *
-                                      100,
-                              )
-                            : 100;
+                    let progress = 100;
+                    if (cropDefinition.growthDuration > 0) {
+                        progress = Math.floor(
+                            ((this.context.gameTime.tick -
+                                farmComponent.plantedAtTick) /
+                                cropDefinition.growthDuration) *
+                                100,
+                        );
+                    }
                     farmSubtitle = `growing (${Math.min(progress, 99)}%)`;
                 } else {
-                    farmSubtitle = `${farmComponent.cropItemId} ready`;
+                    farmSubtitle = `${cropDefinition.name} ready`;
                 }
                 return { icon, subtitle: farmSubtitle, title: name };
             }

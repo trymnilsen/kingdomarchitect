@@ -78,6 +78,15 @@ import {
     WorkerStance,
 } from "../../../src/game/component/worker/roleComponent.ts";
 import { playerKingdomPrefab } from "../../../src/game/prefab/playerKingdomPrefab.ts";
+import {
+    SetFarmCropCommandId,
+    type SetFarmCropCommand,
+} from "../../../src/server/message/command/setFarmCropCommand.ts";
+import {
+    createFarmComponent,
+    FarmComponentId,
+    FarmState,
+} from "../../../src/game/component/farmComponent.ts";
 
 function createTestGameTime(): GameTime {
     return new GameTime();
@@ -885,6 +894,91 @@ describe("commandSystem", () => {
                     worker: "worker1",
                     stance: WorkerStance.Aggressive,
                 } as UpdateWorkerStanceCommand,
+            };
+
+            // Should not throw
+            system.onGameMessage?.(root, message);
+        });
+    });
+
+    describe("SetFarmCropCommand", () => {
+        it("changes the crop of a fallow farm", () => {
+            const root = new Entity("root");
+            const farm = new Entity("farm1");
+            farm.setEcsComponent(createFarmComponent("wheat"));
+            root.addChild(farm);
+
+            const system = createCommandSystem(
+                createTestGameTime(),
+                createTestPersistenceManager(),
+            );
+
+            const message: CommandGameMessage = {
+                type: CommandGameMessageType,
+                command: {
+                    id: SetFarmCropCommandId,
+                    building: "farm1",
+                    cropId: "flax",
+                } as SetFarmCropCommand,
+            };
+
+            system.onGameMessage?.(root, message);
+
+            const farmComponent = farm.getEcsComponent(FarmComponentId);
+            assert.ok(farmComponent);
+            assert.strictEqual(farmComponent.cropId, "flax");
+        });
+
+        it("ignores the change while the farm is Growing", () => {
+            // A planted crop is committed until harvested, so the crop must not
+            // change mid-grow (otherwise the yield would mismatch what was sown).
+            const root = new Entity("root");
+            const farm = new Entity("farm1");
+            const farmComponent = createFarmComponent("wheat");
+            farmComponent.state = FarmState.Growing;
+            farm.setEcsComponent(farmComponent);
+            root.addChild(farm);
+
+            const system = createCommandSystem(
+                createTestGameTime(),
+                createTestPersistenceManager(),
+            );
+
+            const message: CommandGameMessage = {
+                type: CommandGameMessageType,
+                command: {
+                    id: SetFarmCropCommandId,
+                    building: "farm1",
+                    cropId: "flax",
+                } as SetFarmCropCommand,
+            };
+
+            system.onGameMessage?.(root, message);
+
+            assert.strictEqual(
+                farm.getEcsComponent(FarmComponentId)?.cropId,
+                "wheat",
+            );
+        });
+
+        it("handles a missing farm component gracefully", () => {
+            const root = new Entity("root");
+            const building = new Entity("building1");
+            // No farm component
+            root.addChild(building);
+
+            const system = createCommandSystem(
+                createTestGameTime(),
+                createTestPersistenceManager(),
+            );
+
+            const message: CommandGameMessage = {
+                type: CommandGameMessageType,
+                command: {
+                    id: SetFarmCropCommandId,
+                    building: "building1",
+                    cropId: "flax",
+                } as SetFarmCropCommand,
             };
 
             // Should not throw

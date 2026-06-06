@@ -1,3 +1,5 @@
+import type { CropId } from "../../data/crop/cropDefinitions.ts";
+
 export const FarmState = {
     Empty: "empty",
     Growing: "growing",
@@ -11,23 +13,21 @@ export type FarmComponent = {
     state: FarmState;
     /** The game tick when the crop was planted */
     plantedAtTick: number;
-    /** Duration in ticks for the crop to fully grow */
-    growthDuration: number;
-    /** The item ID that will be yielded on harvest */
-    cropItemId: string;
-    /** Number of items yielded per harvest */
-    cropYieldAmount: number;
+    /**
+     * Which crop this farm grows. The only configurable piece of farm state;
+     * output item, yield, and growth duration are derived from this via
+     * getCropDefinition rather than stored, so balancing changes reach every farm.
+     */
+    cropId: CropId;
 };
 
 export const FarmComponentId = "Farm" as const;
 
-export function createFarmComponent(): FarmComponent {
+export function createFarmComponent(cropId: CropId = "wheat"): FarmComponent {
     return {
         id: FarmComponentId,
         state: FarmState.Empty,
         plantedAtTick: 0,
-        growthDuration: 60,
-        cropItemId: "wheat",
-        cropYieldAmount: 4,
+        cropId,
     };
 }

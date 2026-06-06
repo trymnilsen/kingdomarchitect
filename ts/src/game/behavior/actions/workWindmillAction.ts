@@ -11,6 +11,7 @@ import {
     getEntitiesAt,
 } from "../../component/chunkMapComponent.ts";
 import { getInventoryItemById } from "../../../data/inventory/inventoryItemHelpers.ts";
+import { getCropDefinition } from "../../../data/crop/cropDefinitions.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import {
@@ -129,9 +130,10 @@ export function executeWorkWindmillAction(
         const farm = farmEntity.getEcsComponent(FarmComponentId);
         if (!farm || farm.state !== FarmState.Ready) continue;
 
-        const cropItem = getInventoryItemById(farm.cropItemId);
+        const cropDefinition = getCropDefinition(farm.cropId);
+        const cropItem = getInventoryItemById(cropDefinition.itemId);
         if (!cropItem) {
-            log.warn(`Unknown crop item id: ${farm.cropItemId}`);
+            log.warn(`Unknown crop item id: ${cropDefinition.itemId}`);
             continue;
         }
 
@@ -139,7 +141,7 @@ export function executeWorkWindmillAction(
             continue;
         }
 
-        addToHeldItem(heldItemComponent, cropItem, farm.cropYieldAmount);
+        addToHeldItem(heldItemComponent, cropItem, cropDefinition.yieldAmount);
         farm.state = FarmState.Empty;
         farm.plantedAtTick = 0;
         farmEntity.invalidateComponent(FarmComponentId);
