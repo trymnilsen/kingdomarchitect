@@ -12,5 +12,5 @@ export const woodenBuildings = [
     bowyer,
     stockPile,
     warehouse,
-    brazier,
+    //brazier,
 ];

@@ -3,6 +3,7 @@ import { wallAdjacency } from "./adjacency/wallAdjacency.ts";
 import { foodBuildings } from "./food/food.ts";
 import { goldBuildings } from "./gold/gold.ts";
 import { growBuildings } from "./grow/grow.ts";
+import { lightBuildings } from "./light/light.ts";
 import { stoneBuildings } from "./stone/stone.ts";
 import { stoneWall } from "./stone/wall.ts";
 import { woodenBuildings } from "./wood/wood.ts";
@@ -12,6 +13,7 @@ export const buildings = [
     ...foodBuildings,
     ...goldBuildings,
     ...growBuildings,
+    ...lightBuildings,
     ...stoneBuildings,
     ...woodenBuildings,
     ...goblinBuildings,

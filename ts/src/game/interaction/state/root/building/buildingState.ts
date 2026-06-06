@@ -19,6 +19,7 @@ import { stoneBuildings } from "../../../../../data/building/stone/stone.ts";
 import { goldBuildings } from "../../../../../data/building/gold/gold.ts";
 import { foodBuildings } from "../../../../../data/building/food/food.ts";
 import { growBuildings } from "../../../../../data/building/grow/grow.ts";
+import { lightBuildings } from "../../../../../data/building/light/light.ts";
 import { Point } from "../../../../../common/point.ts";
 import {
     createComponent,
@@ -336,6 +337,11 @@ const buildingBookLayout = createComponent<{
                 isSelected: props.selectedTab === 4,
                 onTap: () => props.onTabSelect(4),
             },
+            {
+                icon: spriteRefs.torches,
+                isSelected: props.selectedTab === 5,
+                onTap: () => props.onTabSelect(5),
+            },
         ],
     });
 });
@@ -415,6 +421,9 @@ export class BuildingState extends InteractionState {
                 break;
             case 4:
                 this._activeBuildings = foodBuildings;
+                break;
+            case 5:
+                this._activeBuildings = lightBuildings;
                 break;
             default:
                 this._activeBuildings = woodenBuildings;
