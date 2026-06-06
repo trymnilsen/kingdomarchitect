@@ -338,7 +338,7 @@ const buildingBookLayout = createComponent<{
                 onTap: () => props.onTabSelect(4),
             },
             {
-                icon: spriteRefs.torches,
+                icon: spriteRefs.lamp_post,
                 isSelected: props.selectedTab === 5,
                 onTap: () => props.onTabSelect(5),
             },

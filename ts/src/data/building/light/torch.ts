@@ -17,7 +17,7 @@ export const torch: Building = {
     icon: spriteRefs.torches,
     name: "Torch",
     scale: 1,
-    previewScale: 2,
+    //previewScale: 2,
     previewOffset: 0,
     light: torchLightSource.id,
     requirements: {

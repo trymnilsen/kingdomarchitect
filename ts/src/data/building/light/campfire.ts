@@ -14,9 +14,9 @@ import {
 export const campfire: Building = {
     id: "campfire",
     icon: spriteRefs.stone_brazier,
-    name: "Campfire",
+    name: "Brazier",
     scale: 1,
-    previewScale: 2,
+    //previewScale: 2,
     previewOffset: 0,
     light: campfireLightSource.id,
     requirements: {
