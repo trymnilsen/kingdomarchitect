@@ -163,18 +163,18 @@ describe("plantTreeAction", () => {
         assert.strictEqual(result.kind, "failed");
     });
 
-    it("fails if production definition is not zone kind", () => {
+    it("fails if production definition is missing or not zone kind", () => {
         const { root, worker } = createTestScene();
-        const quarryBuilding = new Entity("quarryBuilding");
-        root.addChild(quarryBuilding);
-        quarryBuilding.worldPosition = { x: 20, y: 15 };
-        quarryBuilding.setEcsComponent(
-            createProductionComponent("quarry_production", 4),
+        const otherBuilding = new Entity("otherBuilding");
+        root.addChild(otherBuilding);
+        otherBuilding.worldPosition = { x: 20, y: 15 };
+        otherBuilding.setEcsComponent(
+            createProductionComponent("unknown_production", 4),
         );
 
         const action: PlantTreeAction = {
             type: "plantTree",
-            buildingId: "quarryBuilding",
+            buildingId: "otherBuilding",
             targetPosition: { x: 12, y: 8 },
         };
 

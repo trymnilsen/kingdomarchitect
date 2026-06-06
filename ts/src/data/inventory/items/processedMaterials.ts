@@ -26,7 +26,7 @@ export const joineryItem = {
 } as const;
 
 export const ironBarsItem = {
-    asset: spriteRefs.stone_resource,
+    asset: spriteRefs.iron_bars,
     id: "ironbars",
     name: "Iron Bars",
     hint: "Smelted iron bars",
@@ -58,7 +58,7 @@ export const clayBricksItem = {
 } as const;
 
 export const charcoalItem = {
-    asset: spriteRefs.stone_resource,
+    asset: spriteRefs.charcoal_resource,
     id: "charcoal",
     name: "Charcoal",
     hint: "Burnt wood for baking and smithing",

@@ -10,6 +10,7 @@ import { ResourceHarvestMode } from "../../../../src/data/inventory/items/natura
 import { createJobQueueComponent } from "../../../../src/game/component/jobQueueComponent.ts";
 import { createInventoryComponent } from "../../../../src/game/component/inventoryComponent.ts";
 import { createProductionComponent } from "../../../../src/game/component/productionComponent.ts";
+import { createChunkMapComponent } from "../../../../src/game/component/chunkMapComponent.ts";
 import {
     createHeldItemComponent,
     setHeldItem,
@@ -50,20 +51,20 @@ describe("jobPlanner", () => {
 
     it("dispatches productionJob jobs to productionPlanner", () => {
         const { root, worker } = createTestScene();
+        root.setEcsComponent(createChunkMapComponent());
         const building = new Entity("building");
         building.worldPosition = { x: 15, y: 13 };
         building.setEcsComponent(
-            createProductionComponent("quarry_production", 4),
+            createProductionComponent("forrester_production", 4),
         );
         root.addChild(building);
 
         const job = createProductionJob("building");
         const actions = planJob(root, worker, job, () => []);
 
-        assert.strictEqual(actions.length, 3);
+        assert.strictEqual(actions.length, 2);
         assert.strictEqual(actions[0].type, "moveTo");
-        assert.strictEqual(actions[1].type, "stepOnto");
-        assert.strictEqual(actions[2].type, "operateFacility");
+        assert.strictEqual(actions[1].type, "plantTree");
     });
 
     it("dispatches collectItem jobs to collectItemPlanner", () => {

@@ -1,44 +1,17 @@
-import type { InventoryItem } from "../inventory/inventoryItem.ts";
-import { stoneResource as stoneInventoryItem } from "../inventory/items/resources.ts";
 import type { NaturalResource } from "../inventory/items/naturalResource.ts";
 
-export type ProductionYield = {
-    type: "item";
-    item: InventoryItem;
-    amount: number;
+export type ProductionDefinition = {
+    kind: "zone";
+    id: string;
+    actionName: string;
+    plantResourceId: NaturalResource["id"];
+    zoneRadius: number;
+    plantDuration: number;
+    maxTreeFraction: number;
+    minTreeFraction: number;
 };
 
-export type ProductionDefinition =
-    | {
-          kind: "extract";
-          id: string;
-          actionName: string;
-          duration: number;
-          yield: ProductionYield;
-      }
-    | {
-          kind: "zone";
-          id: string;
-          actionName: string;
-          plantResourceId: NaturalResource["id"];
-          zoneRadius: number;
-          plantDuration: number;
-          maxTreeFraction: number;
-          minTreeFraction: number;
-      };
-
-export const quarryProduction: ProductionDefinition = {
-    kind: "extract",
-    id: "quarry_production",
-    actionName: "Mine Stone",
-    duration: 10,
-    yield: { type: "item", item: stoneInventoryItem, amount: 10 },
-};
-
-export const forresterProduction: Extract<
-    ProductionDefinition,
-    { kind: "zone" }
-> = {
+export const forresterProduction: ProductionDefinition = {
     kind: "zone",
     id: "forrester_production",
     actionName: "Tend Forest",
@@ -52,7 +25,6 @@ export const forresterProduction: Extract<
 };
 
 const productionDefinitions: Record<string, ProductionDefinition> = {
-    quarry_production: quarryProduction,
     forrester_production: forresterProduction,
 };
 

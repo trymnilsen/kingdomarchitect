@@ -5,8 +5,8 @@ import { blacksmithRecipes } from "../crafting/recipes/blacksmithRecipes.ts";
 import { bakerRecipes } from "../crafting/recipes/bakerRecipes.ts";
 import { tailorRecipes } from "../crafting/recipes/tailorRecipes.ts";
 import { workshopRecipes } from "../crafting/recipes/workshopRecipes.ts";
+import { quarryRecipes } from "../crafting/recipes/quarryRecipes.ts";
 import { NaturalResources } from "./items/naturalResource.ts";
-import { quarryProduction } from "../production/productionDefinition.ts";
 import { wheatResourceItem } from "./items/resources.ts";
 
 export type ItemSourceRecipe = {
@@ -47,6 +47,7 @@ const recipeBuildingSets: {
     { recipes: bakerRecipes, buildingName: "Baker" },
     { recipes: tailorRecipes, buildingName: "Tailor" },
     { recipes: workshopRecipes, buildingName: "Workshop" },
+    { recipes: quarryRecipes, buildingName: "Quarry" },
 ];
 
 /**
@@ -77,19 +78,6 @@ export function getItemSources(itemId: string): ItemSource[] {
                 });
             }
         }
-    }
-
-    // Extract-type production buildings
-    if (
-        quarryProduction.kind === "extract" &&
-        quarryProduction.yield.item.id === itemId
-    ) {
-        sources.push({
-            kind: "production",
-            productionName: quarryProduction.actionName,
-            buildingName: "Quarry",
-            amount: quarryProduction.yield.amount,
-        });
     }
 
     // Farm (hardcoded wheat production)

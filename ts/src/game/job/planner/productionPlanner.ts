@@ -21,8 +21,8 @@ import { planDepositHeld } from "./planDepositHeld.ts";
 /**
  * Plan actions for operating a production facility.
  *
- * extract kind (quarry): [moveTo(building), operateFacility(building)]
- * zone kind (forrester):  [moveTo(emptySpot), plantTree(emptySpot, building)]
+ * zone kind (forrester): the worker auto-decides plant-vs-chop from the current
+ * tree population — plant up to a target count, then chop a random standing tree.
  */
 export function planProduction(
     root: Entity,
@@ -59,20 +59,6 @@ export function planProduction(
         return [];
     }
 
-    if (definition.kind === "extract") {
-        return [
-            {
-                type: "moveTo",
-                target: buildingEntity.worldPosition,
-                stopAdjacent: "cardinal",
-            },
-            { type: "stepOnto", targetId: job.targetBuilding },
-            { type: "operateFacility", buildingId: job.targetBuilding },
-        ];
-    }
-
-    // zone kind: the worker auto-decides plant-vs-chop from the current tree
-    // population. Plant up to a target count, then chop a random standing tree.
     const chunkMapComp = root.getEcsComponent(ChunkMapComponentId);
     if (!chunkMapComp) {
         const queueEntity = worker.getAncestorEntity(JobQueueComponentId);

@@ -110,13 +110,13 @@ describe("forresterApplicability", () => {
     it("ignores non-forrester production buildings nearby", () => {
         const world = createWorld();
 
-        // A quarry within radius should not block placement
-        const quarry = new Entity("quarry");
-        quarry.worldPosition = { x: 12, y: 10 };
-        quarry.setEcsComponent(
-            createProductionComponent("quarry_production", 4),
+        // A different production building within radius should not block placement
+        const otherProduction = new Entity("otherProduction");
+        otherProduction.worldPosition = { x: 12, y: 10 };
+        otherProduction.setEcsComponent(
+            createProductionComponent("unknown_production", 4),
         );
-        registerInChunkMap(world, quarry);
+        registerInChunkMap(world, otherProduction);
 
         const result = forresterApplicability({ x: 10, y: 10 }, world);
 

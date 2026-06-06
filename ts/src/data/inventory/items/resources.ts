@@ -63,6 +63,14 @@ export const stoneResource = {
     rarity: ItemRarity.Common,
 } as const;
 
+export const ironOreItem = {
+    asset: spriteRefs.iron_ore_resource,
+    id: "ironore",
+    name: "Iron Ore",
+    hint: "Raw ore, smelted into iron bars",
+    rarity: ItemRarity.Common,
+} as const;
+
 export const bagOfGlitter = {
     asset: spriteRefs.bag_of_glitter,
     id: "bagofglitter",
@@ -116,6 +124,7 @@ export const resources = [
     gemResource,
     bagOfGlitter,
     stoneResource,
+    ironOreItem,
     wheatResourceItem,
     flaxResourceItem,
     strawResourceItem,

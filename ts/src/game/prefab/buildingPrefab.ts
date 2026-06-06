@@ -16,6 +16,7 @@ import { createWorkplaceComponent } from "../component/workplaceComponent.ts";
 import { stockPile } from "../../data/building/wood/storage.ts";
 import { carpenter } from "../../data/building/wood/carpenter.ts";
 import { carpenterRecipes } from "../../data/crafting/recipes/carpenterRecipes.ts";
+import { quarryRecipes } from "../../data/crafting/recipes/quarryRecipes.ts";
 import { createStockpileComponent } from "../component/stockpileComponent.ts";
 import { forrester } from "../../data/building/wood/forrester.ts";
 import { quary } from "../../data/building/stone/quary.ts";
@@ -135,10 +136,12 @@ export function applyFunctionalComponents(
         entity.invalidateComponent(ProductionComponentId);
     }
     if (building.id == quary.id) {
-        entity.setEcsComponent(
-            createProductionComponent("quarry_production", 4),
-        );
-        entity.invalidateComponent(ProductionComponentId);
+        entity.setEcsComponent(createCraftingComponent(quarryRecipes));
+        entity.setEcsComponent(createInventoryComponent());
+        entity.setEcsComponent(createWorkplaceComponent());
+        entity.invalidateComponent(CraftingComponentId);
+        entity.invalidateComponent(InventoryComponentId);
+        entity.invalidateComponent(WorkplaceComponentId);
     }
     if (building.id == goblinCampfire.id) {
         entity.setEcsComponent(createFireSourceComponent(15, 2, 1));

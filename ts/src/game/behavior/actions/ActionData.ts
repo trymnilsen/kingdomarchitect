@@ -13,7 +13,6 @@ import type { ConstructBuildingActionData } from "./constructBuildingAction.ts";
 import type { DismantleBuildingActionData } from "./dismantleBuildingAction.ts";
 import type { TakeFromInventoryActionData } from "./takeFromInventoryAction.ts";
 import type { DepositToInventoryActionData } from "./depositToInventoryAction.ts";
-import type { OperateFacilityActionData } from "./operateFacilityAction.ts";
 import type { PlantTreeActionData } from "./plantTreeAction.ts";
 import type { CraftItemActionData } from "./craftItemAction.ts";
 import type { CollectItemsActionData } from "./collectItemsAction.ts";
@@ -35,7 +34,7 @@ import type { DropFromSlotActionData } from "./dropFromSlotAction.ts";
  * Action data types - these are serializable plain objects that can be stored in components.
  * Each action type has its own data structure with the information needed to execute it.
  *
- * Multi-tick actions (harvest, operateFacility, craftItem) carry mutable progress fields.
+ * Multi-tick actions (harvest, craftItem) carry mutable progress fields.
  * Progress is stored on the action data itself rather than in a separate component so
  * that: (a) the action is self-contained and fully serializable, and (b) if the entity
  * replans mid-action, the abandoned progress is discarded automatically with the queue.
@@ -54,7 +53,6 @@ export type BehaviorActionData =
     | DismantleBuildingActionData
     | TakeFromInventoryActionData
     | DepositToInventoryActionData
-    | OperateFacilityActionData
     | CraftItemActionData
     | CollectItemsActionData
     | AttackTargetActionData

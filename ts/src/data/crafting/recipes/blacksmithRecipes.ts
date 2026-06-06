@@ -8,7 +8,12 @@ import {
 import {
     woodResourceItem,
     stoneResource,
+    ironOreItem,
 } from "../../inventory/items/resources.ts";
+import {
+    ironBarsItem,
+    charcoalItem,
+} from "../../inventory/items/processedMaterials.ts";
 import type { CraftingRecipe } from "../craftingRecipe.ts";
 
 export const swordRecipe: CraftingRecipe = {
@@ -53,9 +58,22 @@ export const hammerRecipe: CraftingRecipe = {
     duration: 3, // 3 seconds - simple tool
 };
 
+export const ironBarRecipe: CraftingRecipe = {
+    id: "smelt_iron_bar",
+    name: "Iron Bars",
+    icon: spriteRefs.iron_bars,
+    inputs: [
+        { item: ironOreItem, amount: 2 },
+        { item: charcoalItem, amount: 1 },
+    ],
+    outputs: [{ item: ironBarsItem, amount: 1 }],
+    duration: 5,
+};
+
 export const blacksmithRecipes: readonly CraftingRecipe[] = [
     swordRecipe,
     bowRecipe,
     wizardHatRecipe,
     hammerRecipe,
+    ironBarRecipe,
 ] as const;
