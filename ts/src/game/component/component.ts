@@ -44,6 +44,7 @@ import type { HeldItemComponent } from "./heldItemComponent.ts";
 import type { GroundItemComponent } from "./groundItemComponent.ts";
 import type { TraversalComponent } from "./traversalComponent.ts";
 import type { DayComponent } from "./dayComponent.ts";
+import type { LightSourceComponent } from "./lightSourceComponent.ts";
 
 export type Components =
     | SpriteComponent
@@ -91,7 +92,8 @@ export type Components =
     | HeldItemComponent
     | GroundItemComponent
     | TraversalComponent
-    | DayComponent;
+    | DayComponent
+    | LightSourceComponent;
 
 export interface BaseComponent {
     id: string;

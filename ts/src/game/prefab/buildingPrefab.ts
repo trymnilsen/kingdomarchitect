@@ -39,6 +39,11 @@ import { baker } from "../../data/building/food/baker.ts";
 import { bakerRecipes } from "../../data/crafting/recipes/bakerRecipes.ts";
 import { workshop } from "../../data/building/stone/workshop.ts";
 import { workshopRecipes } from "../../data/crafting/recipes/workshopRecipes.ts";
+import { buildingGlowLightSource } from "../../data/light/lightSourceDefinition.ts";
+import {
+    createLightSourceComponent,
+    LightSourceComponentId,
+} from "../component/lightSourceComponent.ts";
 import { HousingComponentId } from "../component/housingComponent.ts";
 import { CraftingComponentId } from "../component/craftingComponent.ts";
 import { WorkplaceComponentId } from "../component/workplaceComponent.ts";
@@ -84,6 +89,17 @@ export function applyFunctionalComponents(
     entity: Entity,
     building: Building,
 ): void {
+    // Every completed building emits light: its faint self-glow by default, a
+    // per-type override, or nothing when set to "none". Dedicated light sources
+    // (e.g. the brazier) flow through this same path by naming their profile.
+    // Because this runs only for non-scaffolded buildings, foundations never
+    // glow without any extra check.
+    const lightSourceId = building.light ?? buildingGlowLightSource.id;
+    if (lightSourceId !== "none") {
+        entity.setEcsComponent(createLightSourceComponent(lightSourceId));
+        entity.invalidateComponent(LightSourceComponentId);
+    }
+
     if (building.id == woodenHouse.id) {
         entity.setEcsComponent(createHousingComponent());
         entity.invalidateComponent(HousingComponentId);

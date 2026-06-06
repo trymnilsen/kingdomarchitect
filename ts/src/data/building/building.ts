@@ -39,6 +39,14 @@ export type Building = {
      * matching the visual breathing room that buildings with transparent bottom pixels get naturally.
      */
     previewOffset?: number;
+    /**
+     * Which light source profile this building emits, as a
+     * {@link LightSourceDefinition} id, or `"none"` to emit nothing (ruins,
+     * foundations). When omitted the building uses the default faint self-glow.
+     * A building that is itself a placed light source (e.g. a brazier) points
+     * this at its own profile so it flows through the same emission path.
+     */
+    light?: string;
     requirements?: BuildingRequirements;
 };
 

@@ -1,6 +1,7 @@
 import { spriteRefs } from "../../../../asset/sprite.ts";
 import { allSides } from "../../../../common/sides.ts";
 import type { Point } from "../../../../common/point.ts";
+import { offsetPatternWithPoint } from "../../../../common/pattern.ts";
 import { RenderScope } from "../../../../rendering/renderScope.ts";
 import { TileSize, HalfTileSize } from "../../../map/tile.ts";
 import { SelectedEntityItem } from "../../selection/selectedEntityItem.ts";
@@ -86,6 +87,10 @@ import {
     CollectableComponentId,
     hasCollectableItems,
 } from "../../../component/collectableComponent.ts";
+import { VisibilityComponentId } from "../../../component/visibilityComponent.ts";
+import { LightSourceComponentId } from "../../../component/lightSourceComponent.ts";
+import { getLightSourceDefinition } from "../../../../data/light/lightSourceDefinition.ts";
+import { illuminationBandAt } from "../../../light/illumination.ts";
 
 export class SelectionState extends InteractionState {
     private providers: ActorSelectionProvider[] = [
@@ -209,6 +214,8 @@ export class SelectionState extends InteractionState {
 
         if (selection instanceof SelectedEntityItem) {
             drawJobLinks(context, selection);
+            drawVisibilityRange(context, selection.entity);
+            drawLightEmission(context, selection.entity);
 
             const productionComp = selection.entity.getEcsComponent(
                 ProductionComponentId,
@@ -261,6 +268,10 @@ export class SelectionState extends InteractionState {
                     title: type,
                     subtitle: "Tile",
                     icon: spriteRefs.blue_book,
+                    light: illuminationBandAt(
+                        this.context.root,
+                        this._selection.tilePosition,
+                    ),
                 };
             } else {
                 return null;
@@ -474,6 +485,14 @@ export class SelectionState extends InteractionState {
                                       }),
                                   ]
                                 : []),
+                            ...(selectionInfo.light
+                                ? [
+                                      uiText({
+                                          content: `Light: ${selectionInfo.light}`,
+                                          textStyle: subTitleTextStyle,
+                                      }),
+                                  ]
+                                : []),
                         ],
                     }),
                 }),
@@ -538,6 +557,68 @@ function drawJobLinks(context: RenderScope, selection: SelectedEntityItem) {
             }
         } else {
             drawUnclaimedMarker(context, selection);
+        }
+    }
+}
+
+/**
+ * Draws the tiles a selected agent can currently reach with its sight pattern as
+ * small boxes, so vision reach can be eyeballed. Vision reach is a separate field
+ * from illumination — this only shows how far the agent sees, not how lit those
+ * tiles are.
+ */
+function drawVisibilityRange(context: RenderScope, entity: Entity) {
+    const visibility = entity.getEcsComponent(VisibilityComponentId);
+    if (!visibility) {
+        return;
+    }
+    const tiles = offsetPatternWithPoint(entity.worldPosition, visibility.pattern);
+    for (const tile of tiles) {
+        context.drawRectangle({
+            x: tile.x * TileSize + 8,
+            y: tile.y * TileSize + 8,
+            width: 6,
+            height: 6,
+            fill: "rgba(120, 170, 255, 0.5)",
+        });
+    }
+}
+
+/**
+ * Draws how a selected light source contributes to illumination: bright tiles in
+ * yellow, dim tiles in blue, using the same squared-radius bands the
+ * illumination field derives from.
+ */
+function drawLightEmission(context: RenderScope, entity: Entity) {
+    const lightSource = entity.getEcsComponent(LightSourceComponentId);
+    if (!lightSource) {
+        return;
+    }
+    const definition = getLightSourceDefinition(lightSource.sourceId);
+    if (!definition) {
+        return;
+    }
+    const origin = entity.worldPosition;
+    const brightSq = definition.brightRadius * definition.brightRadius;
+    const dimSq = definition.dimRadius * definition.dimRadius;
+    for (let dx = -definition.dimRadius; dx <= definition.dimRadius; dx++) {
+        for (let dy = -definition.dimRadius; dy <= definition.dimRadius; dy++) {
+            const distanceSq = dx * dx + dy * dy;
+            let fill: string;
+            if (definition.brightRadius > 0 && distanceSq <= brightSq) {
+                fill = "rgba(255, 221, 0, 0.4)";
+            } else if (definition.dimRadius > 0 && distanceSq <= dimSq) {
+                fill = "rgba(40, 90, 200, 0.4)";
+            } else {
+                continue;
+            }
+            context.drawRectangle({
+                x: (origin.x + dx) * TileSize + 22,
+                y: (origin.y + dy) * TileSize + 22,
+                width: 6,
+                height: 6,
+                fill,
+            });
         }
     }
 }

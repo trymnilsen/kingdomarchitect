@@ -33,6 +33,8 @@ import { biomes } from "../map/biome.ts";
 import { ChunkDimension, ChunkSize } from "../map/chunk.ts";
 import { getTileColorVariation } from "../map/deterministicTileColor.ts";
 import { TileSize } from "../map/tile.ts";
+import { illuminationBandAt } from "../light/illumination.ts";
+import type { LightBand } from "../light/lightBand.ts";
 
 export const renderSystem: EcsSystem = {
     onRender,
@@ -72,7 +74,7 @@ function onRender(
     }
 
     if (tiles && visibilityMap) {
-        drawTiles(tiles, renderScope, visibilityMap);
+        drawTiles(tiles, renderScope, visibilityMap, rootEntity);
     }
     const query = rootEntity.queryComponentsWithin(viewport, SpriteComponentId);
 
@@ -172,10 +174,54 @@ function getVisibleChunks(bounds: Bounds): number[] {
     return chunkKeys;
 }
 
+const illuminationBandOverlay: Record<
+    LightBand,
+    { fill: string; label: string }
+> = {
+    bright: { fill: "rgba(255, 221, 0, 0.28)", label: "B" },
+    dim: { fill: "rgba(40, 90, 200, 0.32)", label: "D" },
+    dark: { fill: "rgba(0, 0, 0, 0.5)", label: "X" },
+};
+
+/**
+ * Dev-only overlay that tints each tile by its illumination band so the whole
+ * field can be eyeballed at once before any real lighting render exists. This is
+ * a diagnostic, not player-facing rendering — Stage 3 owns the real bands. It
+ * intentionally re-derives the band per tile (no cached grid); the cost is
+ * accepted for a debug view.
+ */
+function drawIlluminationBand(
+    renderContext: RenderScope,
+    root: Entity,
+    worldTileX: number,
+    worldTileY: number,
+    screenTileX: number,
+    screenTileY: number,
+) {
+    const band = illuminationBandAt(root, { x: worldTileX, y: worldTileY });
+    const overlay = illuminationBandOverlay[band];
+    renderContext.drawScreenSpaceRectangle({
+        x: screenTileX,
+        y: screenTileY,
+        width: TileSize,
+        height: TileSize,
+        fill: overlay.fill,
+    });
+    renderContext.drawText({
+        text: overlay.label,
+        x: screenTileX + TileSize / 2 - 4,
+        y: screenTileY + TileSize / 2 - 7,
+        color: "white",
+        size: 12,
+        font: "arial",
+    });
+}
+
 function drawTiles(
     tiles: TileComponent,
     renderContext: RenderScope,
     visibilityMap: VisibilityMapComponent,
+    root: Entity,
 ) {
     for (const [chunkId, chunk] of tiles.chunks) {
         if (!chunk.volume) {
@@ -255,6 +301,17 @@ function drawTiles(
                     height: TileSize,
                     fill: finalColor,
                 });
+
+                if (window.debugChunks) {
+                    drawIlluminationBand(
+                        renderContext,
+                        root,
+                        worldTileX,
+                        worldTileY,
+                        screenTileX,
+                        screenTileY,
+                    );
+                }
             }
         }
 
