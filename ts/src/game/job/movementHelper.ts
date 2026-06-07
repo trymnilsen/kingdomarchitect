@@ -6,14 +6,12 @@ import {
 } from "../map/query/pathQuery.ts";
 import type { Entity } from "../entity/entity.ts";
 import { VisibilityComponentId } from "../component/visibilityComponent.ts";
-import { offsetPatternWithPoint } from "../../common/pattern.ts";
-import { setDiscoveryForPlayer } from "../system/worldGenerationSystem.ts";
 import {
     DirectionComponentId,
     updateDirectionComponent,
 } from "../component/directionComponent.ts";
-import { MessageEmitterComponentId } from "../component/messageEmitterComponent.ts";
 import { getPathfindingGraphForEntity } from "../map/path/getPathfindingGraphForEntity.ts";
+import { discoverFootprint } from "../map/discoverFootprint.ts";
 
 export const MovementResult = {
     Ok: "ok",
@@ -64,16 +62,10 @@ export function doMovement(
 }
 
 export function discoverAfterMovement(entity: Entity, nextPoint: Point) {
+    // Only viewers discover as they move; an entity with no vision reach reveals
+    // nothing by walking.
     const visibility = entity.getEcsComponent(VisibilityComponentId);
     if (visibility) {
-        const points = offsetPatternWithPoint(nextPoint, visibility.pattern);
-        const root = entity.getRootEntity();
-
-        setDiscoveryForPlayer(
-            root,
-            root.requireEcsComponent(MessageEmitterComponentId).emitter,
-            "player",
-            points,
-        );
+        discoverFootprint(entity.getRootEntity(), entity, nextPoint);
     }
 }

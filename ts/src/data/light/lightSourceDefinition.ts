@@ -75,6 +75,23 @@ export const buildingGlowLightSource: LightSourceDefinition = {
 };
 
 /**
+ * The faint light a worker carries by their own presence: a bright plus on their
+ * own tile and the four cardinal neighbours, then nothing. This is a placeholder
+ * so workers are not blind in the dark before equippable torches and lanterns
+ * exist; once a worker can hold a real light source, that source supersedes this.
+ * Because night sight is governed by light, this radius is what a worker sees in
+ * the dark — deliberately tighter than their daytime vision reach. It is an innate
+ * property, not a fire, so it has nothing to burn and cannot be put out.
+ */
+export const workerGlowLightSource: LightSourceDefinition = {
+    id: "workerGlow",
+    brightRadius: 1,
+    dimRadius: 1,
+    fuel: "none",
+    extinguishDifficulty: "destroy",
+};
+
+/**
  * A handheld torch: lights only its own tile and the cardinal neighbours, then
  * nothing. The cheapest, most disposable source — quick to light and quick to
  * snuff, so it carries no fuel and is trivially extinguished.
@@ -115,6 +132,7 @@ export const lampPostLightSource: LightSourceDefinition = {
 const lightSourceDefinitions: readonly LightSourceDefinition[] = [
     brazierLightSource,
     buildingGlowLightSource,
+    workerGlowLightSource,
     torchLightSource,
     campfireLightSource,
     lampPostLightSource,

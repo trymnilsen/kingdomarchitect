@@ -6,6 +6,7 @@ import { createHealthComponent } from "../component/healthComponent.ts";
 import { createSpriteComponent } from "../component/spriteComponent.ts";
 import { Entity } from "../entity/entity.ts";
 import { createVisibilityComponent } from "../component/visibilityComponent.ts";
+import { BUILDING_VISION_REACH } from "../vision/visionReach.ts";
 import { createHousingComponent } from "../component/housingComponent.ts";
 import { createCraftingComponent } from "../component/craftingComponent.ts";
 import { createInventoryComponent } from "../component/inventoryComponent.ts";
@@ -62,7 +63,7 @@ export function buildingPrefab(
     entity.setEcsComponent(
         createHealthComponent(startScaffolded ? 0 : 100, 100),
     );
-    entity.setEcsComponent(createVisibilityComponent());
+    entity.setEcsComponent(createVisibilityComponent(BUILDING_VISION_REACH));
 
     if (startScaffolded) {
         // Scaffolded buildings only get an inventory to hold construction materials

@@ -9,6 +9,12 @@ import {
 } from "../component/spriteComponent.ts";
 import { Entity } from "../entity/entity.ts";
 import { createVisibilityComponent } from "../component/visibilityComponent.ts";
+import { WORKER_VISION_REACH } from "../vision/visionReach.ts";
+import {
+    createLightSourceComponent,
+    LightSourceComponentId,
+} from "../component/lightSourceComponent.ts";
+import { workerGlowLightSource } from "../../data/light/lightSourceDefinition.ts";
 import { createAnimationComponent } from "../component/animationComponent.ts";
 import { nobleKnightAnimationGraph } from "../../asset/animation/knight.animation.ts";
 import { createDirectionComponent } from "../component/directionComponent.ts";
@@ -37,7 +43,12 @@ export function workerPrefab(id?: string): Entity {
     entity.setEcsComponent(createPlayerUnitComponent());
     entity.setEcsComponent(createEquipmentComponent());
     entity.setEcsComponent(createHeldItemComponent());
-    entity.setEcsComponent(createVisibilityComponent());
+    entity.setEcsComponent(createVisibilityComponent(WORKER_VISION_REACH));
+    // Workers carry a faint innate light so they are not blind in the dark until
+    // equippable torches and lanterns exist; the glow moves with them because the
+    // illumination field reads each emitter's live world position.
+    entity.setEcsComponent(createLightSourceComponent(workerGlowLightSource.id));
+    entity.invalidateComponent(LightSourceComponentId);
     entity.setEcsComponent(createAnimationComponent(nobleKnightAnimationGraph));
     entity.setEcsComponent(createDirectionComponent());
     entity.setEcsComponent(createOccupationComponent());

@@ -30,6 +30,48 @@ export const diamondPattern = [
 
 export const largeDiamondPattern: Point[] = generateDiamondPattern(5);
 
+/**
+ * Builds the diamond of tile offsets reachable within `radius` tiles (Manhattan),
+ * centred on the origin. This is the radius-first wrapper over
+ * {@link generateDiamondPattern}, which takes a diameter; expressing it as a
+ * radius keeps callers in the same units as vision-reach values.
+ *
+ * Kept as its own named function (no memoization) so that if pattern generation
+ * ever shows up in a profile it is a single, obvious line to optimise.
+ *
+ * @param radius the Manhattan reach in tiles (0 yields just the centre tile)
+ */
+export function diamondPatternForRadius(radius: number): Point[] {
+    return generateDiamondPattern(radius * 2 + 1);
+}
+
+/**
+ * Builds a filled disc of tile offsets within `radius` tiles by straight-line
+ * (Euclidean) distance, centred on the origin: every offset where
+ * `dx*dx + dy*dy <= radius*radius`.
+ *
+ * This is deliberately a disc, not a {@link generateDiamondPattern} diamond,
+ * because it is used to represent a light source's footprint and must equal the
+ * set of tiles that source illuminates. Illumination tests `distSq <= radiusSq`
+ * (see `bandFromEmitters`), so a disc of the same radius covers exactly the lit
+ * tiles — a Manhattan diamond would miss the lit tiles near the diagonals.
+ *
+ * @param radius the Euclidean reach in tiles (0 yields just the centre tile)
+ */
+export function generateDiscPattern(radius: number): Point[] {
+    const points: Point[] = [];
+    const bound = Math.floor(radius);
+    const radiusSq = radius * radius;
+    for (let y = -bound; y <= bound; y++) {
+        for (let x = -bound; x <= bound; x++) {
+            if (x * x + y * y <= radiusSq) {
+                points.push({ x, y });
+            }
+        }
+    }
+    return points;
+}
+
 export function generateDiamondPattern(size: number): Point[] {
     // Ensure size is an odd number for proper diamond shape
     if (size % 2 === 0) {

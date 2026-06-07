@@ -8,7 +8,6 @@ import {
 } from "../../common/point.ts";
 import { DrawMode } from "../../rendering/drawMode.ts";
 import type { RenderScope } from "../../rendering/renderScope.ts";
-import { AnimationComponentId } from "../component/animationComponent.ts";
 import {
     HealthComponentId,
     type HealthComponent,
@@ -24,17 +23,24 @@ import { SPRITE_W, SPRITE_H } from "../../asset/sprite.ts";
 import { VisibilityComponentId } from "../component/visibilityComponent.ts";
 import {
     hasDiscovered,
-    isVisible,
     VisibilityMapComponentId,
     type VisibilityMapComponent,
 } from "../component/visibilityMapComponent.ts";
+import { DayComponentId, type Phase } from "../component/dayComponent.ts";
 import type { Entity } from "../entity/entity.ts";
-import { biomes } from "../map/biome.ts";
+import { biomes, type BiomeType } from "../map/biome.ts";
+import { biomeDimColors } from "../map/biomeDimColor.ts";
 import { ChunkDimension, ChunkSize } from "../map/chunk.ts";
 import { getTileColorVariation } from "../map/deterministicTileColor.ts";
 import { TileSize } from "../map/tile.ts";
 import { illuminationBandAt } from "../light/illumination.ts";
+import {
+    collectLightEmitters,
+    type LightEmitter,
+} from "../light/lightEmitter.ts";
 import type { LightBand } from "../light/lightBand.ts";
+import { revealFootprintOffsets } from "../vision/revealFootprint.ts";
+import { perceivedBandAt } from "../vision/perceivedBand.ts";
 
 export const renderSystem: EcsSystem = {
     onRender,
@@ -59,9 +65,13 @@ function onRender(
             VisibilityComponentId,
         );
         for (const visibilityComponent of visibilityComponents) {
+            // An entity reveals where it can look and where it casts light, so the
+            // reach set carries that whole footprint (base sight union own light).
+            // perceivedBandAt then takes min(reach, illumination) over it.
+            const offsets = revealFootprintOffsets(visibilityComponent[0]);
             const visiblePoints = offsetPatternWithPoint(
                 visibilityComponent[0].worldPosition,
-                visibilityComponent[1].pattern,
+                offsets,
             );
             for (let i = 0; i < visiblePoints.length; i++) {
                 const numberId = makeNumberId(
@@ -73,8 +83,15 @@ function onRender(
         }
     }
 
+    // Gather the illumination inputs once per frame: the band of any tile is the
+    // same for every viewer, so re-querying emitters per tile would walk the whole
+    // entity tree hundreds of times a frame. This is derive-on-read, not a cache —
+    // both are rebuilt fresh every render.
+    const emitters = collectLightEmitters(rootEntity);
+    const phase = rootEntity.getEcsComponent(DayComponentId)?.phase ?? "dawn";
+
     if (tiles && visibilityMap) {
-        drawTiles(tiles, renderScope, visibilityMap, rootEntity);
+        drawTiles(tiles, renderScope, visibilityMap, emitters, phase, rootEntity);
     }
     const query = rootEntity.queryComponentsWithin(viewport, SpriteComponentId);
 
@@ -85,13 +102,20 @@ function onRender(
     for (let i = 0; i < sortedSprites.length; i++) {
         const sprite = sortedSprites[i][1];
         const position = sortedSprites[i][0].worldPosition;
-        const visibility = visibilityMap
-            ? isVisible(visibilityMap, position.x, position.y)
-            : true;
-        if (visibility || window.debugChunks) {
-            const animationComponent =
-                sortedSprites[i][0].getEcsComponent(AnimationComponentId);
-
+        // An entity is shown only where the player can actually see it: in reach
+        // and lit (bright or dim). On dark tiles it is hidden, even when an emitter
+        // is within sight range.
+        let band: LightBand = "bright";
+        if (visibilityMap) {
+            band = perceivedBandAt(
+                visibilityMap,
+                emitters,
+                phase,
+                position.x,
+                position.y,
+            );
+        }
+        if (band !== "dark" || window.debugChunks) {
             drawSprite(sprite, position, renderScope, drawMode);
         }
     }
@@ -217,10 +241,29 @@ function drawIlluminationBand(
     });
 }
 
+/**
+ * The tile fill for a perceived band: bright shows the biome's full daylight
+ * colour, dim shows the midpoint tint, and dark reuses the biome's existing dark
+ * tint — the same faded colour a discovered-but-unseen (fog-of-war) tile uses, so
+ * an unlit tile and a remembered tile read alike even though they mean different
+ * things.
+ */
+function tileFillForBand(biomeType: BiomeType, band: LightBand): string {
+    if (band === "bright") {
+        return biomes[biomeType].color;
+    }
+    if (band === "dim") {
+        return biomeDimColors[biomeType];
+    }
+    return biomes[biomeType].tint;
+}
+
 function drawTiles(
     tiles: TileComponent,
     renderContext: RenderScope,
     visibilityMap: VisibilityMapComponent,
+    emitters: readonly LightEmitter[],
+    phase: Phase,
     root: Entity,
 ) {
     for (const [chunkId, chunk] of tiles.chunks) {
@@ -258,7 +301,9 @@ function drawTiles(
             for (let y = 0; y < ChunkSize; y++) {
                 const screenTileY = screenPosition.y + y * TileSize;
                 const worldTileY = chunkPosition.y + y;
-                let visible = true;
+                // Debug mode reveals the whole map at full colour with the band
+                // overlay drawn on top, so it bypasses the perceived-band gate.
+                let band: LightBand = "bright";
 
                 if (!window.debugChunks) {
                     const discovered = hasDiscovered(
@@ -267,25 +312,23 @@ function drawTiles(
                         x,
                         y,
                     );
-                    const currentlyVisible = isVisible(
+                    band = perceivedBandAt(
                         visibilityMap,
+                        emitters,
+                        phase,
                         worldTileX,
                         worldTileY,
                     );
 
-                    // Render tiles that are either discovered previously OR
-                    // are currently visible to the player. If neither, skip.
-                    if (!discovered && !currentlyVisible) {
+                    // A dark tile the player has never discovered is neither seen
+                    // nor remembered, so it is not drawn at all. A discovered dark
+                    // tile still renders as fog (the dark tint via tileFillForBand).
+                    if (band === "dark" && !discovered) {
                         continue;
                     }
-
-                    visible = currentlyVisible;
                 }
 
-                let color = biomes[chunk.volume.type].color;
-                if (!visible) {
-                    color = biomes[chunk.volume.type].tint;
-                }
+                const color = tileFillForBand(chunk.volume.type, band);
 
                 const finalColor = getTileColorVariation(
                     color,

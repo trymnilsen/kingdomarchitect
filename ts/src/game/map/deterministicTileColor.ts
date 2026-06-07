@@ -1,13 +1,5 @@
 import { log } from "../../common/logging/logger.ts";
-
-/**
- * Defines the structure for an RGB color.
- */
-interface RgbColor {
-    r: number;
-    g: number;
-    b: number;
-}
+import { hexToRgb, rgbToHex, type RgbColor } from "../../common/color/hexColor.ts";
 
 /**
  * Defines a 2D position.
@@ -37,56 +29,6 @@ function prng(x: number, y: number, seed: number): number {
     const sin = Math.sin(dot) * 43758.5453;
     // Return the fractional part (fract())
     return sin - Math.floor(sin);
-}
-
-/**
- * Converts a hex color string (e.g., "#FF0000" or "#F00") to an RGB object.
- *
- * @param hex - The hex color string.
- * @returns An RgbColor object, or null if the hex is invalid.
- */
-function hexToRgb(hex: string): RgbColor | null {
-    // Expand shorthand form (e.g. "03F") to "0033FF"
-    const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-    hex = hex.replace(shorthandRegex, (_, r, g, b) => {
-        return r + r + g + g + b + b;
-    });
-
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result
-        ? {
-              r: parseInt(result[1], 16),
-              g: parseInt(result[2], 16),
-              b: parseInt(result[3], 16),
-          }
-        : null;
-}
-
-/**
- * Helper function to convert a single color component (0-255) to a two-digit hex string.
- * @param c - The color component value.
- * @returns A two-digit hex string.
- */
-function componentToHex(c: number): string {
-    // Clamp the value just in case
-    const clamped = Math.max(0, Math.min(255, Math.round(c)));
-    const hex = clamped.toString(16);
-    return hex.length === 1 ? "0" + hex : hex;
-}
-
-/**
- * Converts an RgbColor object to a hex color string.
- *
- * @param rgb - The RgbColor object.
- * @returns A hex color string (e.g., "#FF0000").
- */
-function rgbToHex(rgb: RgbColor): string {
-    return (
-        "#" +
-        componentToHex(rgb.r) +
-        componentToHex(rgb.g) +
-        componentToHex(rgb.b)
-    );
 }
 
 /**

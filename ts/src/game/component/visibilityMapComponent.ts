@@ -38,7 +38,14 @@ export function hasDiscovered(
     return partiallyDiscovered.has(makeNumberId(tileX, tileY));
 }
 
-export function isVisible(
+/**
+ * Whether a tile falls within some viewer's vision reach this frame — the maximum
+ * distance an emitter can see, before illumination is taken into account. This is
+ * only one of the two limits on what the player actually sees: a tile in reach can
+ * still be unseen if it is dark. The combined rule (the smaller of reach and the
+ * tile's light band) lives in the perceived-band derivation, not here.
+ */
+export function isInVisionReach(
     visibilityComponent: VisibilityMapComponent,
     x: number,
     y: number,

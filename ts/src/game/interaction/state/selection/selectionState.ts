@@ -2,6 +2,7 @@ import { spriteRefs } from "../../../../asset/sprite.ts";
 import { allSides } from "../../../../common/sides.ts";
 import type { Point } from "../../../../common/point.ts";
 import { offsetPatternWithPoint } from "../../../../common/pattern.ts";
+import { revealFootprintOffsets } from "../../../vision/revealFootprint.ts";
 import { RenderScope } from "../../../../rendering/renderScope.ts";
 import { TileSize, HalfTileSize } from "../../../map/tile.ts";
 import { SelectedEntityItem } from "../../selection/selectedEntityItem.ts";
@@ -564,18 +565,26 @@ function drawJobLinks(context: RenderScope, selection: SelectedEntityItem) {
 }
 
 /**
- * Draws the tiles a selected agent can currently reach with its sight pattern as
- * small boxes, so vision reach can be eyeballed. Vision reach is a separate field
- * from illumination — this only shows how far the agent sees, not how lit those
- * tiles are.
+ * Draws the tiles a selected agent can actually see right now as small boxes. An
+ * agent reveals its footprint — where it can look and where it casts light — but
+ * only the lit part of that footprint is visible, so this draws the footprint
+ * intersected with illumination: the whole footprint by day (globally bright), the
+ * lit subset by night. This matches what `perceivedBandAt` shows for those tiles.
  */
 function drawVisibilityRange(context: RenderScope, entity: Entity) {
     const visibility = entity.getEcsComponent(VisibilityComponentId);
     if (!visibility) {
         return;
     }
-    const tiles = offsetPatternWithPoint(entity.worldPosition, visibility.pattern);
+    const root = entity.getRootEntity();
+    const tiles = offsetPatternWithPoint(
+        entity.worldPosition,
+        revealFootprintOffsets(entity),
+    );
     for (const tile of tiles) {
+        if (illuminationBandAt(root, tile) === "dark") {
+            continue;
+        }
         context.drawRectangle({
             x: tile.x * TileSize + 8,
             y: tile.y * TileSize + 8,

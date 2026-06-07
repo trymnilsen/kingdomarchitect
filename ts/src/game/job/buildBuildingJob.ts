@@ -2,6 +2,7 @@ import { distance, type Point } from "../../common/point.ts";
 import { buildingAdjecency } from "../../data/building/buildings.ts";
 import type { BuildingRequirements } from "../../data/building/building.ts";
 import { applyFunctionalComponents } from "../prefab/buildingPrefab.ts";
+import { discoverFootprint } from "../map/discoverFootprint.ts";
 import {
     type AdjacencyMask,
     adjacencyMaskToEnum,
@@ -223,6 +224,13 @@ export function finishConstruction(
 
     buildingEntity.invalidateComponent(BuildingComponentId);
     buildingEntity.invalidateComponent(SpriteComponentId);
+
+    // The building now reveals its surroundings — its vision reach and, for a light
+    // source, the pool it lights. Discover that footprint so a lit area placed away
+    // from any worker becomes permanent map memory instead of reverting to black by
+    // day. applyFunctionalComponents above has already attached the light source, so
+    // its radius is readable here.
+    discoverFootprint(root, buildingEntity, buildingEntity.worldPosition);
 }
 
 function calculateAdjacencyMask(
