@@ -48,6 +48,15 @@ export type Building = {
      */
     light?: string;
     requirements?: BuildingRequirements;
+    /**
+     * How attractive this building is as a goblin raid objective. Higher values
+     * are razed first. Goblin raiders rank player buildings by this when forming
+     * a raid (see formGoblinRaid). Omitted → a base value (DEFAULT_RAID_VALUE) is
+     * used. Set to 0 for things that should never be a raid *objective* (walls,
+     * gates, roads); those are still broken through as obstacles by the siege
+     * path when they block the route, just never chosen as a target.
+     */
+    raidValue?: number;
 };
 
 export const nullBuildingId = "nullBuilding";

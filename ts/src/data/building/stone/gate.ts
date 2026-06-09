@@ -15,6 +15,8 @@ export const gate: Building = {
     icon: spriteRefs.gate_horizontal_preview,
     name: "Gate",
     scale: 4,
+    // Never a raid objective — broken through as an obstacle by the siege path.
+    raidValue: 0,
     // The gate sprite already has transparent rows at the bottom that create natural breathing
     // room between the art and the container border. No additional offset needed.
     previewOffset: 0,

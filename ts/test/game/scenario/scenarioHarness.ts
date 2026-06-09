@@ -30,6 +30,9 @@ import type { Building } from "../../../src/data/building/building.ts";
 import { workerPrefab } from "../../../src/game/prefab/workerPrefab.ts";
 import { buildingPrefab } from "../../../src/game/prefab/buildingPrefab.ts";
 import { stockPile } from "../../../src/data/building/wood/storage.ts";
+import { playerKingdomPrefab } from "../../../src/game/prefab/playerKingdomPrefab.ts";
+import { goblinCampPrefab } from "../../../src/game/prefab/goblinCampPrefab.ts";
+import { goblinPrefab } from "../../../src/game/prefab/goblinPrefab.ts";
 import type { EcsSystem } from "../../../src/common/ecs/ecsSystem.ts";
 import type { Point } from "../../../src/common/point.ts";
 import type { InventoryItemQuantity } from "../../../src/data/inventory/inventoryItemQuantity.ts";
@@ -185,6 +188,56 @@ export class ScenarioHarness {
         this.root.addChild(entity);
         entity.worldPosition = position;
         return entity;
+    }
+
+    /**
+     * Add a player kingdom entity using the real playerKingdomPrefab. Player
+     * buildings should be added as children of this entity (via addPlayerBuilding)
+     * so getSettlementEntity resolves their owner to the kingdom.
+     */
+    addPlayerKingdom(): Entity {
+        const kingdom = playerKingdomPrefab();
+        this.root.addChild(kingdom);
+        return kingdom;
+    }
+
+    /**
+     * Add a completed building owned by the given player kingdom, using the real
+     * buildingPrefab. Mirrors how commandSystem parents placed buildings to the
+     * kingdom.
+     */
+    addPlayerBuilding(
+        kingdom: Entity,
+        building: Building,
+        position: Point,
+        id?: string,
+    ): Entity {
+        const entity = buildingPrefab(building, false, id);
+        kingdom.addChild(entity);
+        entity.worldPosition = position;
+        return entity;
+    }
+
+    /**
+     * Add a goblin camp using the real goblinCampPrefab (which includes a
+     * campfire child and one initial goblin). Returns the camp and that goblin.
+     */
+    addGoblinCamp(position: Point): { camp: Entity; goblin: Entity } {
+        const { camp, goblin } = goblinCampPrefab();
+        this.root.addChild(camp);
+        camp.worldPosition = position;
+        return { camp, goblin };
+    }
+
+    /**
+     * Add an additional goblin to a camp using the real goblinPrefab. Used to
+     * fill a camp up to its maxPopulation.
+     */
+    addGoblinToCamp(camp: Entity, position: Point): Entity {
+        const goblin = goblinPrefab(camp.id);
+        camp.addChild(goblin);
+        goblin.worldPosition = position;
+        return goblin;
     }
 
     /** Queue a job on the global job queue */

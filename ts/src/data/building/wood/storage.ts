@@ -14,6 +14,7 @@ export const stockPile: Building = {
     icon: spriteRefs.stockpile,
     name: "Stockpile",
     scale: 2,
+    raidValue: 100,
 };
 
 export const warehouse: Building = {
@@ -21,6 +22,7 @@ export const warehouse: Building = {
     icon: spriteRefs.warehouse,
     name: "Warehouse",
     scale: 2,
+    raidValue: 100,
     requirements: {
         materials: {
             [woodResourceItem.id]: 40,

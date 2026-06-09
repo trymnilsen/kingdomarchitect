@@ -5,6 +5,7 @@ import { GoblinUnitComponentId } from "../component/goblinUnitComponent.ts";
 import { createPerformPlayerCommandBehavior } from "./behaviors/PerformPlayerCommandBehavior.ts";
 import { createSleepBehavior } from "./behaviors/SleepBehavior.ts";
 import { createKeepWarmBehavior } from "./behaviors/goblin/keepWarmBehavior.ts";
+import { createRaidBehavior } from "./behaviors/goblin/raidBehavior.ts";
 import { createPerformJobBehavior } from "./behaviors/PerformJobBehavior.ts";
 import { createDepositHeldBehavior } from "./behaviors/DepositHeldBehavior.ts";
 import { createRestockBehavior } from "./behaviors/RestockBehavior.ts";
@@ -54,6 +55,7 @@ export function createBehaviorResolver(): BehaviorResolver {
 
     const goblinBehaviors: Behavior[] = [
         createEngageInCombatBehavior(),
+        createRaidBehavior(),
         createKeepWarmBehavior(),
         createPerformJobBehavior(planGoblinBuildJob, () => true),
     ];

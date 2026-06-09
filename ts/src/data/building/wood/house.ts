@@ -7,6 +7,7 @@ export const woodenHouse: Building = {
     icon: spriteRefs.wooden_house,
     name: "Wooden House",
     scale: 4,
+    raidValue: 60,
     requirements: {
         materials: {
             [woodResourceItem.id]: 20,

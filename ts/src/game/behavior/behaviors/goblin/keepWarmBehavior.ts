@@ -3,6 +3,7 @@ import type { BehaviorActionData } from "../../actions/ActionData.ts";
 import type { Behavior } from "../Behavior.ts";
 import { WarmthComponentId } from "../../../component/warmthComponent.ts";
 import { GoblinUnitComponentId } from "../../../component/goblinUnitComponent.ts";
+import { RaidingComponentId } from "../../../component/raidingComponent.ts";
 import { FireSourceComponentId } from "../../../component/fireSourceComponent.ts";
 import { BuildingComponentId } from "../../../component/buildingComponent.ts";
 import { planGoblinBuild } from "../../planners/goblinBuildPlanner.ts";
@@ -28,11 +29,19 @@ export function createKeepWarmBehavior(): Behavior {
         name: "keepWarm",
 
         isValid(entity: Entity): boolean {
+            // A committed raider never goes home to warm up — it fights until
+            // it dies. Suppressing keepWarm here is what keeps the siege going.
+            if (entity.hasComponent(RaidingComponentId)) {
+                return false;
+            }
             const warmth = entity.getEcsComponent(WarmthComponentId);
             return !!warmth && warmth.warmth < 50;
         },
 
         utility(entity: Entity): number {
+            if (entity.hasComponent(RaidingComponentId)) {
+                return 0;
+            }
             const warmth = entity.getEcsComponent(WarmthComponentId);
             if (!warmth) {
                 return 0;

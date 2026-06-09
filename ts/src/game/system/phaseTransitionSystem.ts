@@ -4,6 +4,7 @@ import {
     createDayComponent,
     derivePhaseState,
 } from "../component/dayComponent.ts";
+import { formGoblinRaid } from "../raid/goblinRaid.ts";
 
 /**
  * Advances the day/night phase on each tick by comparing the tick-derived
@@ -24,7 +25,7 @@ export function createPhaseTransitionSystem(): EcsSystem {
 
             if (phaseChanged) {
                 if (derived.phase === "night") {
-                    // TODO: trigger night raid
+                    formGoblinRaid(root);
                 }
 
                 root.updateComponent(DayComponentId, (comp) => {

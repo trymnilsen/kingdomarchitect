@@ -51,6 +51,6 @@
     "oxc.configPath": "oxlintrc.json",
     "oxc.enable": true,
     "workbench.colorCustomizations": {
-        "list.inactiveSelectionForeground": "#f2c150" // Replace with your desired color
+        "list.inactiveSelectionForeground": "#f2c150"
     }
 }

@@ -14,6 +14,8 @@ import {
 } from "../../component/threatMapComponent.ts";
 import { requestReplan } from "../../component/BehaviorAgentComponent.ts";
 import { createAttackGameEvent } from "../../entity/event/attackGameEventData.ts";
+import { BuildingComponentId } from "../../component/buildingComponent.ts";
+import { STRUCTURE_DAMAGE, UNIT_DAMAGE } from "../../raid/raidConstants.ts";
 
 export type AttackTargetActionData = { type: "attackTarget"; targetId: string };
 
@@ -48,7 +50,12 @@ export function executeAttackTargetAction(
         log.warn(`Target ${action.targetId} has no HealthComponent`);
         return { kind: "failed", cause: { type: "unknown" } };
     }
-    const damageAmount = 1;
+    // Structures take more damage per hit than units so razing a building is a
+    // meaningful but not interminable siege. TODO: replace this flat split with
+    // a proper damage model (attacker stats, siege weapons, building armor).
+    const damageAmount = targetEntity.hasComponent(BuildingComponentId)
+        ? STRUCTURE_DAMAGE
+        : UNIT_DAMAGE;
     const threatmap = targetEntity.getEcsComponent(ThreatMapComponentId);
     if (threatmap) {
         const topBefore = getTopThreat(threatmap);
