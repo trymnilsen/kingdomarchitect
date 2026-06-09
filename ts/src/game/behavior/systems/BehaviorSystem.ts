@@ -11,31 +11,6 @@ import { log } from "../../../common/logging/logger.ts";
 import type { BehaviorActionData } from "../actions/ActionData.ts";
 
 /**
- * Reconciles a freshly expanded action queue against the currently running
- * one. When the head action is shape-equal across both queues we keep the
- * running reference so any in-progress state on it (e.g. a moveTo's
- * cachedPath) survives the replan; only the tail is replaced. If the heads
- * differ — or either queue is empty — we adopt the new queue wholesale.
- *
- * The shape compare uses JSON.stringify rather than reference equality
- * because expand() builds fresh objects each call. A literal-shape compare
- * is enough for current ECS action data — none of the action types embed
- * circular references or non-serializable values.
- */
-export function reconcileQueue(
-    current: BehaviorActionData[],
-    next: BehaviorActionData[],
-): BehaviorActionData[] {
-    if (current.length === 0 || next.length === 0) {
-        return next;
-    }
-    if (JSON.stringify(current[0]) !== JSON.stringify(next[0])) {
-        return next;
-    }
-    return [current[0], ...next.slice(1)];
-}
-
-/**
  * Resolves which behaviors are applicable for a given entity.
  * This determines what behaviors an entity *could ever* run,
  * distinct from isValid which checks if they're appropriate right now.
@@ -43,24 +18,57 @@ export function reconcileQueue(
 export type BehaviorResolver = (entity: Entity) => Behavior[];
 
 /**
- * BehaviorSystem manages behavior selection and execution for entities with BehaviorAgent components.
- * It evaluates behaviors, selects the highest utility behavior, and executes actions from the queue.
+ * Per-tick re-selection counters, logged periodically so the cost of behavior
+ * selection stays observable. Idle workers re-select every tick (that is what
+ * lets them recover from idle), so these are the numbers to watch if the system
+ * ever needs profiling — every (re-)selection routes through one call tree
+ * (selectBehavior), so timing onUpdate captures the full cost.
+ */
+interface BehaviorTickStats {
+    agentsProcessed: number;
+    selectionsRun: number;
+    expandsRun: number;
+}
+
+const BEHAVIOR_STATS_LOG_INTERVAL = 100;
+
+/**
+ * BehaviorSystem manages behavior selection and execution for entities with
+ * BehaviorAgent components. It selects the highest-utility valid behavior and
+ * executes actions from the queue.
  *
  * Per-tick order for each agent:
- *   1. Replan if pendingReplan is set (includes first-tick initialization)
- *   2. Execute the first action in the queue
+ *   1. (Re-)select a behavior when forced (pendingReplan set — first tick,
+ *      action failure, or an imperative interrupt such as taking damage) OR
+ *      whenever the action queue is empty.
+ *   2. Execute the first action in the queue.
  *
- * Replanning happens before action execution so that a freshly spawned entity
- * picks its first behavior and begins executing it in the same tick it was created,
- * rather than sitting idle for one tick.
+ * The empty-queue trigger is the heart of the design: a worker that just
+ * finished its plan, or that found nothing valid to do, re-selects on the next
+ * tick instead of freezing. Crucially this is gated on the queue being empty,
+ * NOT on pendingReplan — so an idle worker keeps pendingReplan === undefined and
+ * the displacement system still classifies it as displaceable, not transient.
+ *
+ * A busy worker (non-empty queue, no pending replan) is never re-selected
+ * mid-plan: it runs its current plan to completion. Needs (hunger, energy) only
+ * influence the next selection at a plan boundary; interrupting a running plan
+ * is reserved for explicit, imperative requestReplan calls.
  */
 export function createBehaviorSystem(resolver: BehaviorResolver): EcsSystem {
     return {
         onUpdate: (root, tick) => {
             const agents = root.queryComponents(BehaviorAgentComponentId);
 
+            const stats: BehaviorTickStats = {
+                agentsProcessed: 0,
+                selectionsRun: 0,
+                expandsRun: 0,
+            };
             for (const [entity, agent] of agents) {
-                updateBehaviorAgent(entity, agent, resolver, tick);
+                updateBehaviorAgent(entity, agent, resolver, tick, stats);
+            }
+            if (tick % BEHAVIOR_STATS_LOG_INTERVAL === 0) {
+                log.debug(`BehaviorSystem tick ${tick}`, { ...stats });
             }
         },
     };
@@ -74,10 +82,17 @@ function updateBehaviorAgent(
     agent: BehaviorAgentComponent,
     resolver: BehaviorResolver,
     tick: number,
+    stats: BehaviorTickStats,
 ): void {
-    if (agent.pendingReplan !== undefined) {
-        log.debug(`Entity ${entity.id} replanning`);
-        replan(entity, agent, resolver);
+    stats.agentsProcessed++;
+
+    // Re-select when forced (pendingReplan) or whenever idle (empty queue). The
+    // empty-queue branch is what un-sticks idle workers; it deliberately does
+    // NOT set pendingReplan, so an idle worker stays classified as displaceable.
+    if (agent.pendingReplan !== undefined || agent.actionQueue.length === 0) {
+        log.debug(`Entity ${entity.id} selecting behavior`);
+        stats.selectionsRun++;
+        selectBehavior(entity, agent, resolver, stats);
     }
 
     // Execute the current action in the queue
@@ -99,12 +114,14 @@ function updateBehaviorAgent(
             agent.actionQueue.shift();
             if (agent.actionQueue.length === 0) {
                 log.debug(`Entity ${entity.id} actionQueue empty`);
-                // The plan finished normally. Clear the active/display state so the
-                // selection UI doesn't show this just-finished behavior against an
-                // empty queue until next tick's replan, but keep `hysteresis` so the
-                // behavior is still favored when we re-select.
+                // The plan finished normally. Clear the active/display state so
+                // the selection UI doesn't show this just-finished behavior
+                // against an empty queue, but keep `hysteresis` so the behavior
+                // is still favored when we re-select. We deliberately do NOT set
+                // pendingReplan: the empty queue itself triggers re-selection on
+                // the next tick, and leaving pendingReplan undefined keeps this
+                // just-settled worker classified as displaceable (not transient).
                 concludeActivePlan(agent);
-                agent.pendingReplan = { kind: "replan" };
             }
         } else if (result.kind === "failed") {
             log.warn(
@@ -189,14 +206,16 @@ function unclaimCurrentJob(entity: Entity): void {
 }
 
 /**
- * Select and activate a new behavior for the agent.
- * pendingReplan is cleared after expand() so behaviors can read failure context
- * from the component inside their expand() implementation.
+ * Select and activate a behavior for the agent. Runs at a plan boundary (the
+ * action queue is empty) or on a forced replan (pendingReplan set). pendingReplan
+ * is cleared after expand() so behaviors can read failure context from the
+ * component inside their expand() implementation.
  */
-function replan(
+function selectBehavior(
     entity: Entity,
     agent: BehaviorAgentComponent,
     resolver: BehaviorResolver,
+    stats: BehaviorTickStats,
 ): void {
     // Guard: if a craftItem action with inputs already consumed is in the queue,
     // don't discard it. Inputs are no longer in the building or worker inventory,
@@ -275,10 +294,9 @@ function replan(
     });
     const bestBehavior = behaviorUtilities[0];
 
-    const sameBehavior =
-        hysteresisBehavior?.name === bestBehavior.behavior.name;
     // pendingReplan is still set here so behaviors can read failure context
     // from the component inside expand()
+    stats.expandsRun++;
     const newActions = bestBehavior.behavior.expand(entity);
 
     // Behavior produced no actions — nothing to run this round. Treat the worker as
@@ -296,20 +314,14 @@ function replan(
 
     agent.currentBehaviorName = bestBehavior.behavior.name;
     agent.currentBehaviorUtility = bestBehavior.utility;
-    // Remember this pick so the next replan can apply the hysteresis bonus, even
-    // if this plan completes and clears currentBehaviorName before then.
+    // Remember this pick so the next selection can apply the hysteresis bonus,
+    // even if this plan completes and clears currentBehaviorName before then.
     agent.hysteresis = { behaviorName: bestBehavior.behavior.name };
-    if (sameBehavior) {
-        agent.actionQueue = reconcileQueue(agent.actionQueue, newActions);
-        log.debug(
-            `Entity ${entity.id} reconciled queue for behavior ${bestBehavior.behavior.name}`,
-        );
-    } else {
-        agent.actionQueue = newActions;
-        log.info(
-            `Entity ${entity.id} replaced queue (behavior ${hysteresisBehavior?.name ?? "none"} → ${bestBehavior.behavior.name})`,
-        );
-    }
+    // Always adopt the freshly expanded plan. Selection only runs at a plan
+    // boundary (empty queue) or on a forced replan; in both cases a fresh plan
+    // is what we want — e.g. a displaced worker needs a new path, not the stale
+    // cachedPath from its previous moveTo. There is no running head to preserve.
+    agent.actionQueue = newActions;
     // Clear after expand so the failure context is consumed
     agent.pendingReplan = undefined;
     log.info(

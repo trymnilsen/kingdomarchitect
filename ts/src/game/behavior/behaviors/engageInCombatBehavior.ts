@@ -49,9 +49,8 @@ export function createEngageInCombatBehavior(): Behavior {
             }
 
             const actions: BehaviorActionData[] = [];
-            // Skip the moveTo when already adjacent so reconcileQueue can
-            // reuse the running attackTarget action across replans instead
-            // of resetting it every tick.
+            // Skip the moveTo when already adjacent so the attack starts this
+            // tick rather than routing through a no-op move.
             if (
                 !isPointAdjacentTo(entity.worldPosition, attacker.worldPosition)
             ) {

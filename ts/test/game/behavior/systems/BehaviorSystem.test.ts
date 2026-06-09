@@ -451,20 +451,20 @@ describe("BehaviorSystem", () => {
         });
     });
 
-    describe("reconciliation on replan", () => {
-        it("preserves the running head reference when the same behavior is re-selected", () => {
+    describe("queue replacement on selection", () => {
+        it("rebuilds the queue fresh when the same behavior is re-selected", () => {
             const { root, worker } = createTestScene();
             const agent = worker.getEcsComponent(BehaviorAgentComponentId)!;
 
             const headAction: BehaviorActionData = { type: "wait", until: 100 };
             agent.actionQueue = [headAction, { type: "wait", until: 200 }];
             agent.currentBehaviorName = "myBehavior";
-            // myBehavior was the last selection (drives reconcile vs. replace).
             agent.hysteresis = { behaviorName: "myBehavior" };
+            // Forced replan (e.g. the worker was displaced) while myBehavior is
+            // still the best choice. The queue is rebuilt from scratch — there
+            // is no head reuse; a forced replan wants a fresh plan/path.
             agent.pendingReplan = { kind: "replan" };
 
-            // Same head shape, different tail — reconcile should keep the
-            // running head object and swap in the new tail.
             const behavior = createMockBehavior("myBehavior", {
                 utility: 50,
                 actions: [
@@ -477,11 +477,12 @@ describe("BehaviorSystem", () => {
             system.onUpdate!(root, 1);
 
             assert.strictEqual(agent.currentBehaviorName, "myBehavior");
-            assert.strictEqual(
+            assert.notStrictEqual(
                 agent.actionQueue[0],
                 headAction,
-                "head must be the running reference preserved by reconcile",
+                "queue is rebuilt fresh on replan, not reconciled from the head",
             );
+            assert.strictEqual((agent.actionQueue[0] as any).until, 100);
             assert.strictEqual((agent.actionQueue[1] as any).until, 999);
         });
 
@@ -515,6 +516,78 @@ describe("BehaviorSystem", () => {
                 "queue should be replaced, not reconciled",
             );
             assert.strictEqual((agent.actionQueue[0] as any).until, 999);
+        });
+    });
+
+    describe("idle re-selection and busy commitment", () => {
+        it("re-selects an idle worker with an empty queue and no pending replan", () => {
+            // The core bug fix: an idle worker (no plan, pendingReplan cleared)
+            // re-selects on its own instead of freezing until an external poke.
+            const { root, worker } = createTestScene();
+            const agent = worker.getEcsComponent(BehaviorAgentComponentId)!;
+
+            agent.actionQueue = [];
+            agent.currentBehaviorName = null;
+            agent.pendingReplan = undefined;
+
+            const behavior = createMockBehavior("work", {
+                utility: 50,
+                actions: [{ type: "wait", until: 100 }],
+            });
+
+            const system = createBehaviorSystem(() => [behavior]);
+            system.onUpdate!(root, 1);
+
+            assert.strictEqual(agent.currentBehaviorName, "work");
+            assert.strictEqual(agent.actionQueue.length, 1);
+        });
+
+        it("does not re-select a busy worker mid-plan even when a better behavior exists", () => {
+            // A running plan is committed: a higher-utility behavior does not
+            // preempt it. Only an empty queue or a forced replan re-selects.
+            const { root, worker } = createTestScene();
+            const agent = worker.getEcsComponent(BehaviorAgentComponentId)!;
+
+            const running = createMockBehavior("running", {
+                utility: 50,
+                actions: [{ type: "wait", until: 999 }],
+            });
+            const better = createMockBehavior("better", {
+                utility: 90,
+                actions: [{ type: "wait", until: 1 }],
+            });
+
+            agent.actionQueue = [{ type: "wait", until: 999 }];
+            agent.currentBehaviorName = "running";
+            agent.hysteresis = { behaviorName: "running" };
+            agent.pendingReplan = undefined;
+
+            const system = createBehaviorSystem(() => [running, better]);
+            system.onUpdate!(root, 1);
+
+            assert.strictEqual(agent.currentBehaviorName, "running");
+            assert.strictEqual(agent.actionQueue.length, 1);
+            assert.strictEqual((agent.actionQueue[0] as any).until, 999);
+        });
+
+        it("does not set pendingReplan when a plan completes, keeping the worker displaceable", () => {
+            // Displacement invariant: a just-finished worker must classify as
+            // displaceable (pendingReplan undefined), not transient. Re-selection
+            // is driven by the now-empty queue, not by a pending replan.
+            const { root, worker } = createTestScene();
+            const agent = worker.getEcsComponent(BehaviorAgentComponentId)!;
+
+            agent.actionQueue = [{ type: "wait", until: 0 }];
+            agent.currentBehaviorName = "done";
+            agent.hysteresis = { behaviorName: "done" };
+            agent.pendingReplan = undefined;
+
+            const system = createBehaviorSystem(() => []);
+            system.onUpdate!(root, 1);
+
+            assert.strictEqual(agent.actionQueue.length, 0);
+            assert.strictEqual(agent.pendingReplan, undefined);
+            assert.strictEqual(agent.currentBehaviorName, null);
         });
     });
 

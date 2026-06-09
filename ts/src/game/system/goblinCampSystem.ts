@@ -14,10 +14,6 @@ import {
     JobQueueComponentId,
     type JobQueueComponent,
 } from "../component/jobQueueComponent.ts";
-import {
-    BehaviorAgentComponentId,
-    requestReplan,
-} from "../component/BehaviorAgentComponent.ts";
 import { goblinHut } from "../../data/building/goblin/goblinHut.ts";
 import { stockPile } from "../../data/building/wood/storage.ts";
 import { goblinPrefab } from "../prefab/goblinPrefab.ts";
@@ -270,16 +266,8 @@ function placeScaffoldingAndQueueJob(
         y: buildPosition.y,
     });
 
-    notifyIdleGoblin(campEntity);
-}
-
-function notifyIdleGoblin(campEntity: Entity): void {
-    for (const child of campEntity.children) {
-        if (child.hasComponent(BehaviorAgentComponentId)) {
-            requestReplan(child);
-            return;
-        }
-    }
+    // Idle goblins re-select every tick, so they pick up the newly queued
+    // build job on their own — no explicit notification needed.
 }
 
 function getCampPopulation(root: Entity, campEntityId: string): number {

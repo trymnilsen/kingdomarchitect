@@ -7,7 +7,6 @@ import { worldGenerationSystem } from "../game/system/worldGenerationSystem.ts";
 import { EcsWorld } from "../common/ecs/ecsWorld.ts";
 import { createRootEntity } from "../game/rootFactory.ts";
 import { hungerSystem } from "../game/system/hungerSystem.ts";
-import { createJobNotificationSystem } from "../game/system/jobNotificationSystem.ts";
 import { createBehaviorSystem } from "../game/behavior/systems/BehaviorSystem.ts";
 import { createBehaviorResolver } from "../game/behavior/behaviorResolver.ts";
 import { warmthSystem } from "../game/system/warmthSystem.ts";
@@ -226,7 +225,6 @@ export class GameServer {
         // Effect system runs before behavior so stat modifiers are current when behaviors evaluate
         this.world.addSystem(createEffectSystem(createEffectExecutorMap()));
         this.world.addSystem(createBehaviorSystem(createBehaviorResolver()));
-        this.world.addSystem(createJobNotificationSystem());
         this.world.addSystem(hungerSystem);
         this.world.addSystem(warmthSystem);
         this.world.addSystem(goblinCampSystem);

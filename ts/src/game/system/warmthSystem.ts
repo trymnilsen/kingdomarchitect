@@ -8,7 +8,6 @@ import {
     increaseWarmth,
 } from "../component/warmthComponent.ts";
 import { FireSourceComponentId } from "../component/fireSourceComponent.ts";
-import { requestReplan } from "../component/BehaviorAgentComponent.ts";
 
 export const WARMTH_DECAY_TICK_INTERVAL = 10;
 
@@ -82,8 +81,9 @@ export const warmthSystem: EcsSystem = {
                             to: warmthComponent.warmth.toFixed(1),
                         });
                     }
-                    // Warmth state changed - wake behavior agent to re-evaluate
-                    requestReplan(entity);
+                    // Warmth is a passive need: it does not interrupt a running
+                    // plan. A cold worker picks keepWarm at its next selection
+                    // (plan-end or idle re-check), like a hungry worker picks eat.
                 }
             }
         }

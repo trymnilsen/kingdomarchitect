@@ -36,10 +36,7 @@ import {
     QueueJobCommandId,
     type QueueJobCommand,
 } from "../../server/message/command/queueJobCommand.ts";
-import {
-    notifyIdleWorkerForNewJob,
-    findPlayerKingdom,
-} from "./jobNotificationSystem.ts";
+import { findPlayerKingdom } from "../component/playerKingdomComponent.ts";
 import {
     CommandGameMessageType,
     type GameMessage,
@@ -166,7 +163,7 @@ function onGameMessage(
             changeOccupation(root, message.command as ChangeOccupationCommand);
             break;
         case QueueJobCommandId:
-            queueJob(root, message.command as QueueJobCommand, gameTime.tick);
+            queueJob(root, message.command as QueueJobCommand);
             break;
         case EquipItemCommandId:
             equipItem(root, message.command as EquipItemCommand);
@@ -221,7 +218,6 @@ function onGameMessage(
             dismantleBuilding(
                 root,
                 message.command as DismantleBuildingCommand,
-                gameTime.tick,
             );
             break;
         case PrioritiseJobCommandId:
@@ -290,7 +286,7 @@ function buildBuilding(root: Entity, command: BuildCommand) {
     }
 }
 
-function queueJob(root: Entity, command: QueueJobCommand, tick: number) {
+function queueJob(root: Entity, command: QueueJobCommand) {
     const playerKingdom = findPlayerKingdom(root);
     if (!playerKingdom) {
         log.error("Player kingdom not found for job queue");
@@ -299,10 +295,9 @@ function queueJob(root: Entity, command: QueueJobCommand, tick: number) {
     const jobQueue = playerKingdom.requireEcsComponent(JobQueueComponentId);
     addJob(jobQueue, command.job);
 
+    // No explicit worker notification: idle workers re-select every tick, so
+    // they pick up the newly queued job on their own next tick.
     playerKingdom.invalidateComponent(JobQueueComponentId);
-
-    // Immediately notify idle workers about the new job
-    notifyIdleWorkerForNewJob(playerKingdom, tick);
 }
 
 function equipItem(root: Entity, command: EquipItemCommand) {
@@ -642,7 +637,6 @@ function clearBuildingJobs(root: Entity, command: ClearBuildingJobsCommand) {
 function dismantleBuilding(
     root: Entity,
     command: DismantleBuildingCommand,
-    tick: number,
 ) {
     const building = root.findEntity(command.buildingId);
     if (!building) {
@@ -699,7 +693,6 @@ function dismantleBuilding(
     // Completed building, or a partially-built scaffold: a worker drains its HP.
     addJob(jobQueue, createDismantleBuildingJob(building.id));
     playerKingdom.invalidateComponent(JobQueueComponentId);
-    notifyIdleWorkerForNewJob(playerKingdom, tick);
 }
 
 function prioritiseJob(root: Entity, command: PrioritiseJobCommand) {

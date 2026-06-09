@@ -7,7 +7,7 @@ import {
 } from "./actorSelectionProvider.ts";
 import { SelectedEntityItem } from "../../../../selection/selectedEntityItem.ts";
 import { JobQueueComponentId } from "../../../../../component/jobQueueComponent.ts";
-import { findPlayerKingdom } from "../../../../../system/jobNotificationSystem.ts";
+import { findPlayerKingdom } from "../../../../../component/playerKingdomComponent.ts";
 import { isTargetOfJob } from "../../../../../job/job.ts";
 import { spriteRefs } from "../../../../../../asset/sprite.ts";
 import { PrioritiseJobCommand } from "../../../../../../server/message/command/prioritiseJobCommand.ts";
