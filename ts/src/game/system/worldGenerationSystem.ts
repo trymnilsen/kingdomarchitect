@@ -1,10 +1,17 @@
+import { getRandomDirection } from "../../common/direction.ts";
 import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
 import { log } from "../../common/logging/logger.ts";
 import {
     generateDiamondPattern,
     offsetPatternWithPoint,
 } from "../../common/pattern.ts";
-import { pointEquals, type Point } from "../../common/point.ts";
+import {
+    adjacentPoint,
+    adjacentPoints,
+    multiplyPoint,
+    pointEquals,
+    type Point,
+} from "../../common/point.ts";
 import {
     DiscoverTileGameMessageType,
     type GameMessage,
@@ -28,7 +35,14 @@ import {
 } from "../component/worldDiscoveryComponent.ts";
 import { Entity } from "../entity/entity.ts";
 import { getChunkPosition } from "../map/chunk.ts";
-import { generateChunk } from "../map/chunkGenerator.ts";
+import {
+    generateChunk,
+    type GeneratedChunk,
+} from "../map/chunkGenerator.ts";
+import {
+    placeSettlement,
+    placeSettlementIfNoneExists,
+} from "../map/item/settlement.ts";
 import { addInitialPlayerChunk } from "../map/player.ts";
 import type { Volume } from "../map/volume.ts";
 
@@ -51,6 +65,7 @@ function onInit(root: Entity) {
 
         log.info("Generating new world");
         const start = addInitialPlayerChunk(root);
+        generateInitialChunks(root);
         const messageEmitter = root.requireEcsComponent(
             MessageEmitterComponentId,
         ).emitter;
@@ -68,6 +83,54 @@ type ChunkToGenerate = {
     chunkPosition: Point;
     discoveredPoints: Point[];
 };
+
+/**
+ * Generates the initial chunks of a new world: the 3x3 block of chunks around
+ * the player start chunk plus a goblin camp chunk two chunks away in a random
+ * cardinal direction, ten chunks in total. The chunk between the player and
+ * the camp acts as a path: it is cardinally adjacent to both, so the camp
+ * never sits diagonally off a corner of the start chunk.
+ *
+ * Generation order matters in two places: the path chunk goes first so it
+ * deterministically becomes the start biome's second (and final, maxSize 2)
+ * chunk, and the camp chunk goes last so its only generated neighbor holds
+ * the by-then-full start volume and it always receives a volume of its own.
+ * The remaining ring chunks carry no ordering guarantees — a corner chunk
+ * generated before any cardinal neighbor simply receives a volume of its
+ * own through the empty-adjacency branch in generateChunk.
+ */
+function generateInitialChunks(root: Entity) {
+    const origin = { x: 0, y: 0 };
+    const direction = getRandomDirection();
+    const pathChunkPosition = adjacentPoint(origin, direction);
+    const campChunkPosition = multiplyPoint(pathChunkPosition, 2);
+    const ringChunks = [
+        pathChunkPosition,
+        ...adjacentPoints(origin, true).filter(
+            (point) => !pointEquals(point, pathChunkPosition),
+        ),
+    ];
+
+    let campChunk: GeneratedChunk | undefined;
+    root.updateComponent(TileComponentId, (component) => {
+        for (const position of ringChunks) {
+            const generated = generateChunk(root, position);
+            setChunk(component, generated.chunk);
+        }
+        campChunk = generateChunk(root, campChunkPosition);
+        setChunk(component, campChunk.chunk);
+    });
+
+    if (!campChunk || campChunk.chunk.volume.isStartBiome) {
+        // Skipping placement is self-healing: placeSettlementIfNoneExists
+        // hosts the camp in the next discovered chunk instead.
+        log.error("Camp chunk missing or in start biome, skipping camp", {
+            campChunkPosition,
+        });
+        return;
+    }
+    placeSettlement(campChunk.chunk, campChunk.chunkEntity);
+}
 
 /**
  * Sets the discovery status for a player based on a list of discovered points.
@@ -104,18 +167,20 @@ export function setDiscoveryForPlayer(
     }
 
     for (const chunkToGenerate of chunksToGenerate) {
-        const generatedChunk = generateChunk(
-            root,
-            chunkToGenerate.chunkPosition,
-        );
+        const generated = generateChunk(root, chunkToGenerate.chunkPosition);
         root.updateComponent(TileComponentId, (component) => {
-            setChunk(component, generatedChunk);
+            setChunk(component, generated.chunk);
         });
+        placeSettlementIfNoneExists(
+            root,
+            generated.chunk,
+            generated.chunkEntity,
+        );
         //Check if the volume of the new chunk has been discovered by the
         //player already, it can either be completely new one or an expanded
         //volume from a chunk that the player has not discovered yet
         checkAndAddNewVolume(
-            generatedChunk.volume,
+            generated.chunk.volume,
             worldDiscovery,
             player,
             newVolumesToDiscover,
@@ -125,7 +190,7 @@ export function setDiscoveryForPlayer(
             if (!newPoints.find((item) => pointEquals(item.point, point))) {
                 newPoints.push({
                     point: point,
-                    volumeId: generatedChunk.volume.id,
+                    volumeId: generated.chunk.volume.id,
                 });
             }
         }

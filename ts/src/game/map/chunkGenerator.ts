@@ -7,7 +7,6 @@ import { log } from "../../common/logging/logger.ts";
 import { randomColor } from "../../common/color.ts";
 import { generateId } from "../../common/idGenerator.ts";
 import { type Point, adjacentPoints } from "../../common/point.ts";
-import { GoblinCampComponentId } from "../component/goblinCampComponent.ts";
 import { getChunk, TileComponentId } from "../component/tileComponent.ts";
 import { Entity } from "../entity/entity.ts";
 import { generateDesert } from "./biome/desert.ts";
@@ -18,15 +17,18 @@ import { generateSnow } from "./biome/snow.ts";
 import { generateSwamp } from "./biome/swamp.ts";
 import { generateTaint } from "./biome/taint.ts";
 import { type TileChunk, ChunkSize } from "./chunk.ts";
-import { placeSettlement } from "./item/settlement.ts";
-import { queryEntitiesWithinVolume } from "./query/queryEntity.ts";
 import type { Volume } from "./volume.ts";
+
+export type GeneratedChunk = {
+    chunk: Required<TileChunk>;
+    chunkEntity: Entity;
+};
 
 //TODO: should return a structure describing the unlock for the action
 export function generateChunk(
     rootEntity: Entity,
     chunkPoint: Point,
-): Required<TileChunk> {
+): GeneratedChunk {
     const tiles = rootEntity.requireEcsComponent(TileComponentId);
     // Find available volumes with available space
     const adjacentVolumes = mapNotNullDistinct(
@@ -100,26 +102,21 @@ export function generateChunk(
         };
     }
 
-    generateChunkEntities(chunk, rootEntity);
-    return chunk;
+    const chunkEntity = generateChunkEntities(chunk, rootEntity);
+    return { chunk, chunkEntity };
 }
 
-function generateChunkEntities(chunk: Required<TileChunk>, rootEntity: Entity) {
+function generateChunkEntities(
+    chunk: Required<TileChunk>,
+    rootEntity: Entity,
+): Entity {
     const chunkEntity = new Entity(generateId("chunk"));
     chunkEntity.worldPosition = {
         x: chunk.chunkX * ChunkSize,
         y: chunk.chunkY * ChunkSize,
     };
-    // TODO: Replace with kingdom spawn evaluation
-    // evaluateKingdomSpawn should run once per volume on the first chunk discovered
-    // in that volume. For now, keep the existing single goblin camp placement.
-    const goblinCamps = rootEntity.queryComponents(GoblinCampComponentId);
 
     rootEntity.addChild(chunkEntity);
-
-    if (goblinCamps.size === 0 && !chunk.volume.isStartBiome) {
-        placeSettlement(chunk, chunkEntity);
-    }
 
     switch (chunk.volume.type) {
         case "forrest":
@@ -144,4 +141,6 @@ function generateChunkEntities(chunk: Required<TileChunk>, rootEntity: Entity) {
             generateTaint(chunk, chunkEntity);
             break;
     }
+
+    return chunkEntity;
 }
