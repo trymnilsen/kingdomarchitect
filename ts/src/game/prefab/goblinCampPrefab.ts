@@ -1,6 +1,7 @@
 import { generateId } from "../../common/idGenerator.ts";
 import { Entity } from "../entity/entity.ts";
 import { createGoblinCampComponent } from "../component/goblinCampComponent.ts";
+import { GOBLIN_CAMP_MIN_SIZE } from "../raid/raidConstants.ts";
 import { createJobQueueComponent } from "../component/jobQueueComponent.ts";
 import { goblinPrefab } from "./goblinPrefab.ts";
 import { buildingPrefab } from "./buildingPrefab.ts";
@@ -18,7 +19,10 @@ import { goblinCampfire } from "../../data/building/goblin/goblinCampfire.ts";
  */
 export function goblinCampPrefab(): { camp: Entity; goblin: Entity } {
     const camp = new Entity(generateId("goblinCamp"));
-    camp.setEcsComponent(createGoblinCampComponent(5));
+    // Start at the minimum camp size — the camp's size is driven by the player
+    // kingdom's population and ratchets up from here, never below this floor
+    // (see goblinCampSystem.growCampCap).
+    camp.setEcsComponent(createGoblinCampComponent(GOBLIN_CAMP_MIN_SIZE));
     camp.setEcsComponent(createJobQueueComponent());
 
     const campfire = buildingPrefab(goblinCampfire, false);

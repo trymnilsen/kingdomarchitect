@@ -8,8 +8,13 @@ import { createPhaseTransitionSystem } from "../../../src/game/system/phaseTrans
 import { stockpileDestructionSystem } from "../../../src/game/system/stockpileDestructionSystem.ts";
 import { formGoblinRaid } from "../../../src/game/raid/goblinRaid.ts";
 import { createRaidBehavior } from "../../../src/game/behavior/behaviors/goblin/raidBehavior.ts";
-import { RaidingComponentId } from "../../../src/game/component/raidingComponent.ts";
+import {
+    RaidingComponentId,
+    createRaidingComponent,
+} from "../../../src/game/component/raidingComponent.ts";
 import { GoblinUnitComponentId } from "../../../src/game/component/goblinUnitComponent.ts";
+import { GoblinCampComponentId } from "../../../src/game/component/goblinCampComponent.ts";
+import { goblinCampSystem } from "../../../src/game/system/goblinCampSystem.ts";
 import {
     BehaviorAgentComponentId,
     requestReplan,
@@ -71,9 +76,10 @@ function setWarmth(goblin: Entity, value: number): void {
 }
 
 /**
- * Build a goblin camp at full population (maxPopulation = 5): the camp prefab's
- * initial goblin plus four more, clustered around the camp. Defender identity is
- * not controlled here — tests that care about it place goblins explicitly.
+ * Build a goblin camp of 5 goblins and arm it so the population-scaled raid
+ * trigger fires: the camp prefab's initial goblin plus four more, clustered
+ * around the camp. Defender identity is not controlled here — tests that care
+ * about it place goblins explicitly.
  */
 function fullCamp(
     harness: ScenarioHarness,
@@ -86,7 +92,24 @@ function fullCamp(
         { x: campPos.x - 1, y: campPos.y + 1 },
         { x: campPos.x + 1, y: campPos.y - 1 },
     ].map((p) => harness.addGoblinToCamp(camp, p));
+    armRaid(harness, camp);
     return { camp, goblins: [goblin, ...extra] };
+}
+
+/**
+ * Satisfy the population-scaled raid trigger for a camp built directly in a
+ * test: mark it "full" (maxPopulation = the goblins currently present) and give
+ * the world enough player workers to clear the valve (playerPop ≥ 2 × present).
+ * After this the only remaining gate is whether valid targets exist.
+ */
+function armRaid(harness: ScenarioHarness, camp: Entity): void {
+    const present = camp.children.filter(
+        (c) =>
+            c.hasComponent(GoblinUnitComponentId) &&
+            !c.hasComponent(RaidingComponentId),
+    ).length;
+    camp.getEcsComponent(GoblinCampComponentId)!.maxPopulation = present;
+    harness.addPlayerUnits(present * 2);
 }
 
 describe("goblin night raid scenario tests", () => {
@@ -110,6 +133,7 @@ describe("goblin night raid scenario tests", () => {
             harness.addGoblinToCamp(camp, p);
         }
 
+        armRaid(harness, camp);
         formGoblinRaid(harness.root);
 
         assert.strictEqual(raidersOf(camp).length, 4, "4 of 5 goblins raid");
@@ -139,6 +163,7 @@ describe("goblin night raid scenario tests", () => {
         harness.addGoblinToCamp(camp, { x: 16, y: 14 });
         harness.addGoblinToCamp(camp, { x: 17, y: 16 });
 
+        armRaid(harness, camp);
         formGoblinRaid(harness.root);
 
         const expectedDefender = [tieA, tieB].sort((a, b) =>
@@ -156,14 +181,18 @@ describe("goblin night raid scenario tests", () => {
         );
     });
 
-    it("does not raid below max population", () => {
+    it("does not raid until the camp has filled its houses (full gate)", () => {
         const harness = new ScenarioHarness();
         const kingdom = harness.addPlayerKingdom();
         harness.addPlayerBuilding(kingdom, stockPile, { x: 20, y: 14 });
 
-        // maxPopulation is 5; only 2 goblins present.
+        // A grown camp (maxPopulation 5) but only 2 goblins so far. Floor and
+        // valve are satisfied (plenty of workers); the only thing holding the
+        // raid back is that the camp has not filled its houses yet.
         const { camp } = harness.addGoblinCamp({ x: 12, y: 14 });
         harness.addGoblinToCamp(camp, { x: 11, y: 14 });
+        camp.getEcsComponent(GoblinCampComponentId)!.maxPopulation = 5;
+        harness.addPlayerUnits(10);
 
         formGoblinRaid(harness.root);
 
@@ -171,6 +200,118 @@ describe("goblin night raid scenario tests", () => {
             raidersOf(camp).length,
             0,
             "an under-strength camp does not raid",
+        );
+    });
+
+    it("does not raid below the size floor", () => {
+        const harness = new ScenarioHarness();
+        const kingdom = harness.addPlayerKingdom();
+        harness.addPlayerBuilding(kingdom, stockPile, { x: 20, y: 14 });
+
+        // Camp full at 2 goblins, but 2 < RAID_MIN_HOUSES (3): no raid even with
+        // plenty of workers. This is the early-game grace window.
+        const { camp } = harness.addGoblinCamp({ x: 12, y: 14 });
+        harness.addGoblinToCamp(camp, { x: 11, y: 14 });
+        camp.getEcsComponent(GoblinCampComponentId)!.maxPopulation = 2;
+        harness.addPlayerUnits(10);
+
+        formGoblinRaid(harness.root);
+
+        assert.strictEqual(
+            raidersOf(camp).length,
+            0,
+            "a camp below the size floor never raids",
+        );
+    });
+
+    it("holds off a small kingdom, then strikes once it grows (valve)", () => {
+        const harness = new ScenarioHarness();
+        const kingdom = harness.addPlayerKingdom();
+        harness.addPlayerBuilding(kingdom, stockPile, { x: 20, y: 14 });
+
+        // A full, above-floor camp of 5 goblins.
+        const { camp } = harness.addGoblinCamp({ x: 12, y: 14 });
+        for (const p of [
+            { x: 11, y: 14 },
+            { x: 13, y: 14 },
+            { x: 12, y: 13 },
+            { x: 12, y: 15 },
+        ]) {
+            harness.addGoblinToCamp(camp, p);
+        }
+        camp.getEcsComponent(GoblinCampComponentId)!.maxPopulation = 5;
+
+        // 6 workers: present (5) > 0.5 * 6 = 3 → the valve blocks the raid.
+        harness.addPlayerUnits(6);
+        formGoblinRaid(harness.root);
+        assert.strictEqual(
+            raidersOf(camp).length,
+            0,
+            "a kingdom too small for the warband is left to rebuild",
+        );
+
+        // Grow to 10 workers: present (5) ≤ 0.5 * 10 = 5 → the raid fires.
+        harness.addPlayerUnits(4);
+        formGoblinRaid(harness.root);
+        assert.strictEqual(
+            raidersOf(camp).length,
+            4,
+            "once the kingdom is large enough, the camp raids",
+        );
+    });
+
+    it("excludes goblins already out raiding from the trigger", () => {
+        const harness = new ScenarioHarness();
+        const kingdom = harness.addPlayerKingdom();
+        harness.addPlayerBuilding(kingdom, stockPile, { x: 20, y: 14 });
+
+        const { camp } = harness.addGoblinCamp({ x: 12, y: 14 });
+        for (const p of [
+            { x: 11, y: 14 },
+            { x: 13, y: 14 },
+            { x: 12, y: 13 },
+            { x: 12, y: 15 },
+        ]) {
+            harness.addGoblinToCamp(camp, p);
+        }
+        camp.getEcsComponent(GoblinCampComponentId)!.maxPopulation = 5;
+        harness.addPlayerUnits(10);
+
+        // Four goblins are already committed to a raid. Only one remains
+        // present, so the camp is no longer "full" and must not deploy again.
+        for (const g of goblinsOf(camp).slice(0, 4)) {
+            g.setEcsComponent(createRaidingComponent("target"));
+        }
+
+        formGoblinRaid(harness.root);
+
+        assert.strictEqual(
+            raidersOf(camp).length,
+            4,
+            "the four already-raiding goblins are unchanged; none added",
+        );
+    });
+
+    it("camp size tracks the player population, caps, and never shrinks", () => {
+        const harness = new ScenarioHarness([goblinCampSystem]);
+        const { camp } = harness.addGoblinCamp({ x: 12, y: 14 });
+        const campComp = camp.getEcsComponent(GoblinCampComponentId)!;
+
+        harness.addPlayerUnits(12); // round(0.5 * 12) = 6
+        harness.tick();
+        assert.strictEqual(campComp.maxPopulation, 6, "tracks 50% of player pop");
+
+        const big = harness.addPlayerUnits(40); // 52 total → 26, capped at 10
+        harness.tick();
+        assert.strictEqual(campComp.maxPopulation, 10, "capped at the house cap");
+
+        // Remove the surplus so the computed target falls back to 6.
+        for (const u of big) harness.root.removeChild(u);
+        harness.tick();
+        assert.strictEqual(
+            campComp.maxPopulation,
+            10,
+            "camp does not shrink when the player population falls",
         );
     });
 

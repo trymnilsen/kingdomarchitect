@@ -38,6 +38,7 @@ import type { Point } from "../../../src/common/point.ts";
 import type { InventoryItemQuantity } from "../../../src/data/inventory/inventoryItemQuantity.ts";
 import { createHousingComponent } from "../../../src/game/component/housingComponent.ts";
 import { createFireSourceComponent } from "../../../src/game/component/fireSourceComponent.ts";
+import { createPlayerUnitComponent } from "../../../src/game/component/playerUnitComponent.ts";
 
 /**
  * Full-stack scenario test harness for logistics, crafting, and behavior flows.
@@ -51,6 +52,7 @@ export class ScenarioHarness {
     root: Entity;
     ecsWorld: EcsWorld;
     currentTick: number = 0;
+    private playerUnitCounter = 0;
 
     constructor(extraSystems: EcsSystem[] = []) {
         this.ecsWorld = new EcsWorld();
@@ -117,6 +119,25 @@ export class ScenarioHarness {
             elapsed++;
         }
         return elapsed;
+    }
+
+    /**
+     * Add `count` bare player-unit markers (PlayerUnit component only, no
+     * behavior). Lets a test set the player population that drives goblin-camp
+     * scaling and the raid valve without spawning full, behavior-driven workers.
+     * Returns the created entities so a test can remove some to shrink the pop.
+     */
+    addPlayerUnits(count: number): Entity[] {
+        const units: Entity[] = [];
+        for (let i = 0; i < count; i++) {
+            const n = this.playerUnitCounter++;
+            const unit = new Entity(`player-unit-${n}`);
+            unit.worldPosition = { x: 8 + (n % 20), y: 8 };
+            unit.setEcsComponent(createPlayerUnitComponent());
+            this.root.addChild(unit);
+            units.push(unit);
+        }
+        return units;
     }
 
     /** Add a worker entity using the real workerPrefab */

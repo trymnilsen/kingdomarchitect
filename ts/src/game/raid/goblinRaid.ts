@@ -4,12 +4,23 @@ import type { Entity } from "../entity/entity.ts";
 import { getSettlementEntity } from "../entity/settlementQueries.ts";
 import { GoblinCampComponentId } from "../component/goblinCampComponent.ts";
 import { GoblinUnitComponentId } from "../component/goblinUnitComponent.ts";
-import { PlayerKingdomComponentId } from "../component/playerKingdomComponent.ts";
+import {
+    PlayerKingdomComponentId,
+    countPlayerWorkers,
+} from "../component/playerKingdomComponent.ts";
 import { BuildingComponentId } from "../component/buildingComponent.ts";
 import { FireSourceComponentId } from "../component/fireSourceComponent.ts";
-import { createRaidingComponent } from "../component/raidingComponent.ts";
+import {
+    createRaidingComponent,
+    RaidingComponentId,
+} from "../component/raidingComponent.ts";
 import { requestReplan } from "../component/BehaviorAgentComponent.ts";
-import { DEFAULT_RAID_VALUE, RAIDERS_PER_TARGET } from "./raidConstants.ts";
+import {
+    DEFAULT_RAID_VALUE,
+    RAIDERS_PER_TARGET,
+    RAID_MIN_HOUSES,
+    RAID_POPULATION_FACTOR,
+} from "./raidConstants.ts";
 
 /**
  * Forms goblin night raids. Called once at the night phase edge
@@ -28,16 +39,34 @@ import { DEFAULT_RAID_VALUE, RAIDERS_PER_TARGET } from "./raidConstants.ts";
  */
 export function formGoblinRaid(root: Entity): void {
     const targets = rankedPlayerBuildingTargets(root);
+    const playerPop = countPlayerWorkers(root);
 
     for (const [campEntity, camp] of root.queryComponents(
         GoblinCampComponentId,
     )) {
-        const goblins = campEntity.children.filter((child) =>
-            child.hasComponent(GoblinUnitComponentId),
+        // Goblins available to commit: present at the camp and not already on
+        // a raid (RaidingComponent persists until death — there is no retreat).
+        const present = campEntity.children.filter(
+            (child) =>
+                child.hasComponent(GoblinUnitComponentId) &&
+                !child.hasComponent(RaidingComponentId),
         );
 
-        // Only raid at full strength — this is the "grow then strike" pacing.
-        if (goblins.length < camp.maxPopulation) {
+        // Floor: a small camp never raids — early-game grace, and it keeps the
+        // raid party from degenerating to 0–1 goblins.
+        if (camp.maxPopulation < RAID_MIN_HOUSES) {
+            continue;
+        }
+        // Full: only strike once the camp has filled its houses ("grow then
+        // strike"). Regrowing to full after a one-way raid is the cooldown.
+        if (present.length < camp.maxPopulation) {
+            continue;
+        }
+        // Valve: only raid a kingdom large enough relative to the warband
+        // (present ≤ factor × playerPop, i.e. playerPop ≥ present / factor). A
+        // just-wiped kingdom falls below this and is left to rebuild rather
+        // than be snowballed by the camp it already grew.
+        if (present.length > RAID_POPULATION_FACTOR * playerPop) {
             continue;
         }
 
@@ -52,7 +81,7 @@ export function formGoblinRaid(root: Entity): void {
         // the choice is deterministic). It is left un-stamped: it falls through
         // to keepWarm (stays by the fire) and engageInCombat (defends the camp).
         const anchor = campfireAnchor(campEntity);
-        const sorted = [...goblins].sort((a, b) => {
+        const sorted = [...present].sort((a, b) => {
             const da = squaredDistance(a.worldPosition, anchor);
             const db = squaredDistance(b.worldPosition, anchor);
             if (da !== db) {
