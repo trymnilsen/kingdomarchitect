@@ -1,11 +1,16 @@
 import { findMapped } from "../../../../common/array.ts";
-import { Point } from "../../../../common/point.ts";
+import { makeNumberId, Point } from "../../../../common/point.ts";
 import { allSides } from "../../../../common/sides.ts";
 import { Building } from "../../../../data/building/building.ts";
 import { spriteRefs } from "../../../../asset/sprite.ts";
 import { GroundTile, TileSize } from "../../../map/tile.ts";
 import type { ComponentDescriptor } from "../../../../ui/declarative/ui.ts";
 import { RenderScope } from "../../../../rendering/renderScope.ts";
+import { getChunkPosition } from "../../../map/chunk.ts";
+import {
+    hasDiscoveredChunk,
+    VisibilityMapComponentId,
+} from "../../../component/visibilityMapComponent.ts";
 import { getTile, TileComponentId } from "../../../component/tileComponent.ts";
 import { InteractionState } from "../../handler/interactionState.ts";
 import { uiScaffold } from "../../view/uiScaffold.ts";
@@ -228,6 +233,25 @@ export class BuildConfirmState extends InteractionState {
             return {
                 isApplicable: false,
                 reason: "No land",
+            };
+        }
+
+        // Chunks exist client side before being discovered; building is only
+        // allowed on land the player has actually explored
+        const visibilityMap = rootEntity.getEcsComponent(
+            VisibilityMapComponentId,
+        );
+        const chunkPosition = getChunkPosition(tilePosition.x, tilePosition.y);
+        if (
+            visibilityMap &&
+            !hasDiscoveredChunk(
+                visibilityMap,
+                makeNumberId(chunkPosition.x, chunkPosition.y),
+            )
+        ) {
+            return {
+                isApplicable: false,
+                reason: "Not discovered",
             };
         }
 

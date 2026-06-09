@@ -45,6 +45,7 @@ describe("gameMessageHandler", () => {
             const message: WorldStateGameMessage = {
                 type: WorldStateMessageType,
                 rootChildren: [],
+                chunks: [],
                 discoveredTiles: [],
                 volumes: [],
                 serverTick: 0,
@@ -70,6 +71,7 @@ describe("gameMessageHandler", () => {
             const message: WorldStateGameMessage = {
                 type: WorldStateMessageType,
                 rootChildren: [],
+                chunks: [],
                 discoveredTiles: [],
                 volumes: [],
                 serverTick: 0,
@@ -97,6 +99,7 @@ describe("gameMessageHandler", () => {
             const message: WorldStateGameMessage = {
                 type: WorldStateMessageType,
                 rootChildren: [],
+                chunks: [],
                 discoveredTiles: [
                     { x: 0, y: 0, volume: "vol1" },
                     { x: 1, y: 1, volume: "vol1" },
@@ -138,6 +141,7 @@ describe("gameMessageHandler", () => {
                         components: [],
                     },
                 ],
+                chunks: [],
                 discoveredTiles: [],
                 volumes: [],
                 serverTick: 0,
@@ -183,6 +187,7 @@ describe("gameMessageHandler", () => {
                         ],
                     },
                 ],
+                chunks: [],
                 discoveredTiles: [],
                 volumes: [],
                 serverTick: 0,
@@ -219,6 +224,7 @@ describe("gameMessageHandler", () => {
                         components: [healthComponent],
                     },
                 ],
+                chunks: [],
                 discoveredTiles: [],
                 volumes: [],
                 serverTick: 0,

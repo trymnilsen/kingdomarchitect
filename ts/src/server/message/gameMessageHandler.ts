@@ -4,6 +4,7 @@ import type { Camera } from "../../rendering/camera.ts";
 
 import {
     createTileComponent,
+    setChunk,
     TileComponentId,
 } from "../../game/component/tileComponent.ts";
 import {
@@ -204,6 +205,27 @@ function updateWorldState(root: Entity, message: WorldStateGameMessage) {
     if (!visibilityMapComponent) {
         visibilityMapComponent = createVisibilityMapComponent();
         root.setEcsComponent(visibilityMapComponent);
+    }
+
+    // Register every generated chunk so ground data exists client side even
+    // for chunks where no tile is discovered yet. What the player actually
+    // sees of them is decided by the discovery data, not by chunk existence.
+    for (const volume of message.volumes) {
+        if (!tileComponent.volume.has(volume.id)) {
+            tileComponent.volume.set(volume.id, volume);
+        }
+    }
+    for (const chunkData of message.chunks) {
+        const volume = tileComponent.volume.get(chunkData.volume);
+        if (!volume) {
+            log.warn("No volume found for replicated chunk", { chunkData });
+            continue;
+        }
+        setChunk(tileComponent, {
+            chunkX: chunkData.chunkX,
+            chunkY: chunkData.chunkY,
+            volume,
+        });
     }
 
     // Apply discovered tiles and volumes

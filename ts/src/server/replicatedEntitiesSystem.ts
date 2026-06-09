@@ -10,6 +10,7 @@ import {
     EventGameMessageType,
     WorldStateMessageType,
     type GameMessage,
+    type ReplicatedChunkData,
     type ReplicatedEntityData,
     type WorldStateGameMessage,
 } from "./message/gameMessage.ts";
@@ -43,7 +44,8 @@ export function makeReplicatedEntitiesSystem(
                     return;
                 }
                 // Tiles and visibility maps are client-only components
-                // synthesized from discovery data, not replicated per-tick
+                // synthesized from the world state snapshot and discovery
+                // messages, not replicated per-tick
                 if (
                     event.item.id === TileComponentId ||
                     event.item.id === VisibilityMapComponentId
@@ -144,6 +146,21 @@ export function buildWorldStateMessage(
         playerDiscovery &&
         getPlayerDiscoveryData(tileComponent, playerDiscovery);
 
+    // All generated chunks are sent, not just discovered ones: entities are
+    // replicated regardless of discovery, so the client needs the ground they
+    // stand on as well. Discovery only decides what is rendered.
+    const chunks: ReplicatedChunkData[] = [];
+    for (const chunk of tileComponent.chunks.values()) {
+        if (!chunk.volume) {
+            continue;
+        }
+        chunks.push({
+            chunkX: chunk.chunkX,
+            chunkY: chunk.chunkY,
+            volume: chunk.volume.id,
+        });
+    }
+
     const rootComponentSnapshot: Components[] = [];
     for (const id of replicatedRootComponents) {
         const comp = rootEntity.getEcsComponent(id);
@@ -155,8 +172,9 @@ export function buildWorldStateMessage(
     return {
         type: WorldStateMessageType,
         rootChildren,
+        chunks,
         discoveredTiles: discoveryData?.tiles ?? [],
-        volumes: discoveryData?.volumes ?? [],
+        volumes: [...tileComponent.volume.values()],
         serverTick,
         replicatedRootComponents: rootComponentSnapshot,
     };

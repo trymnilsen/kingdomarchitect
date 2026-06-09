@@ -275,7 +275,10 @@ describe("replicatedEntitiesSystem", () => {
             const message = buildWorldStateMessage(root, "player1", 0);
 
             assert.strictEqual(message.discoveredTiles.length, 0);
-            assert.strictEqual(message.volumes.length, 0);
+            // Chunks and volumes are replicated regardless of discovery —
+            // entities are too, so the ground they stand on must exist
+            assert.strictEqual(message.volumes.length, 1);
+            assert.strictEqual(message.chunks.length, 1);
         });
 
         it("returns empty discoveredTiles for player with empty discovery", () => {

@@ -49,6 +49,16 @@ export type ReplicatedEntityData = {
 };
 
 /**
+ * A generated chunk and the id of the volume it belongs to, resolved against
+ * the `volumes` list of the message carrying it.
+ */
+export type ReplicatedChunkData = {
+    chunkX: number;
+    chunkY: number;
+    volume: string;
+};
+
+/**
  * Replicates a full snapshot of the world for the intial state when loading
  * or creating a fresh new game
  */
@@ -57,6 +67,10 @@ export type WorldStateGameMessage = {
     // The entities added to the root node, will visit children as well
     // so we should only add the first level
     rootChildren: ReplicatedEntityData[];
+    // All generated chunks. Ground data exists client side for these even
+    // when no tile in them has been discovered yet — entities are replicated
+    // regardless of discovery, so the ground they stand on must be too.
+    chunks: ReplicatedChunkData[];
     // Tiles discovered by the player, includes volume reference
     discoveredTiles: DiscoveredTileData[];
     volumes: Volume[];

@@ -1,12 +1,21 @@
 import { withinRectangle } from "../../../../common/bounds.ts";
 import { Direction } from "../../../../common/direction.ts";
-import { encodePosition, Point, shiftPoint } from "../../../../common/point.ts";
+import {
+    encodePosition,
+    makeNumberId,
+    Point,
+    shiftPoint,
+} from "../../../../common/point.ts";
 import { allSides } from "../../../../common/sides.ts";
 import { spriteRefs } from "../../../../asset/sprite.ts";
 import { ChunkDimension, ChunkSize } from "../../../map/chunk.ts";
 import { TileSize } from "../../../map/tile.ts";
 import { RenderScope } from "../../../../rendering/renderScope.ts";
 import { hasChunk, TileComponentId } from "../../../component/tileComponent.ts";
+import {
+    hasDiscoveredChunk,
+    VisibilityMapComponentId,
+} from "../../../component/visibilityMapComponent.ts";
 import { InteractionState } from "../../handler/interactionState.ts";
 
 export class LandUnlockState extends InteractionState {
@@ -90,6 +99,9 @@ export class LandUnlockState extends InteractionState {
     private setUnlockableChunks() {
         const tileComponent =
             this.context.root.requireEcsComponent(TileComponentId);
+        const visibilityMap = this.context.root.getEcsComponent(
+            VisibilityMapComponentId,
+        );
 
         const chunks = tileComponent.chunks;
         const unlockablePositions = new Set<number>();
@@ -109,6 +121,17 @@ export class LandUnlockState extends InteractionState {
         };
 
         for (const [key, chunk] of chunks) {
+            // Chunks can exist client side without being discovered; the
+            // unlock ring should only grow from land the player has explored
+            if (
+                visibilityMap &&
+                !hasDiscoveredChunk(
+                    visibilityMap,
+                    makeNumberId(chunk.chunkX, chunk.chunkY),
+                )
+            ) {
+                continue;
+            }
             const left = shiftPoint(
                 { x: chunk.chunkX, y: chunk.chunkY },
                 Direction.Left,

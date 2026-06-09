@@ -39,6 +39,25 @@ export function hasDiscovered(
 }
 
 /**
+ * Whether any tile of the chunk has been discovered by the player. Chunks can
+ * exist client side without being discovered (the server replicates all
+ * generated chunks), so player-facing checks should use this rather than
+ * chunk existence.
+ */
+export function hasDiscoveredChunk(
+    visibilityComponent: VisibilityMapComponent,
+    chunkId: number,
+): boolean {
+    if (visibilityComponent.discovered.fullyDiscoveredChunks.has(chunkId)) {
+        return true;
+    }
+
+    const partiallyDiscovered =
+        visibilityComponent.discovered.partiallyDiscoveredChunks.get(chunkId);
+    return !!partiallyDiscovered && partiallyDiscovered.size > 0;
+}
+
+/**
  * Whether a tile falls within some viewer's vision reach this frame — the maximum
  * distance an emitter can see, before illumination is taken into account. This is
  * only one of the two limits on what the player actually sees: a tile in reach can
