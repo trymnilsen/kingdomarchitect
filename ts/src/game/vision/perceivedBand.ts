@@ -14,8 +14,9 @@ import type { LightBand } from "../light/lightBand.ts";
  * binds.
  *
  *  - Out of reach → `dark`, however brightly the tile is lit.
- *  - In reach → exactly how lit the tile is (`bandFromEmitters`), which is `bright`
- *    everywhere by day and the local light band by night.
+ *  - In reach → exactly how lit the tile is (`bandFromEmitters`): `bright`
+ *    everywhere by day, at least `dim` during the dawn/dusk twilight ambient, and
+ *    the local light band by night.
  *
  * There is deliberately no day/night branch here. Reach already includes a source's
  * own light (see `revealFootprintOffsets`), so a light pool is always within its own

@@ -568,8 +568,9 @@ function drawJobLinks(context: RenderScope, selection: SelectedEntityItem) {
  * Draws the tiles a selected agent can actually see right now as small boxes. An
  * agent reveals its footprint — where it can look and where it casts light — but
  * only the lit part of that footprint is visible, so this draws the footprint
- * intersected with illumination: the whole footprint by day (globally bright), the
- * lit subset by night. This matches what `perceivedBandAt` shows for those tiles.
+ * intersected with illumination: the whole footprint by day and during the dim
+ * dawn/dusk ambient, the lit subset by night. This matches what `perceivedBandAt`
+ * shows for those tiles.
  */
 function drawVisibilityRange(context: RenderScope, entity: Entity) {
     const visibility = entity.getEcsComponent(VisibilityComponentId);

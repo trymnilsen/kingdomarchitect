@@ -5,16 +5,36 @@ import { type LightBand, brightestBand } from "./lightBand.ts";
 import { collectLightEmitters, type LightEmitter } from "./lightEmitter.ts";
 
 /**
+ * The free light the sky contributes to every tile during a phase: full daylight
+ * by day, a dim twilight at dawn and dusk, nothing at night. Placed sources can
+ * only raise a tile above this floor, never below it, so the cycle steps
+ * dark -> dim -> bright -> dim -> dark instead of snapping between extremes.
+ *
+ * @param phase the current day/night phase
+ */
+export function ambientBandForPhase(phase: Phase): LightBand {
+    switch (phase) {
+        case "day":
+            return "bright";
+        case "dawn":
+        case "dusk":
+            return "dim";
+        case "night":
+            return "dark";
+    }
+}
+
+/**
  * The band a tile is lit to by a known set of emitters during a known phase. This
  * is the core of the illumination field, split out so the render pass can gather
  * the emitters once per frame and evaluate every visible tile against that one
  * list instead of re-querying the entity tree per tile.
  *
- * Daytime is a free global light: the sun makes every tile bright, so the emitter
- * list is ignored and the result is always bright. Night (and dusk, until the
- * dusk gradient lands) removes that light and illumination collapses to the local
- * pools cast by placed sources. The day->night switch is hard for now; no
- * gradient.
+ * The phase sets an ambient floor (see {@link ambientBandForPhase}) and emitters
+ * can only raise a tile above it: by day the floor is already bright so sources
+ * are ignored, at dawn and dusk only a source's bright pool stands out against
+ * the dim field, and at night illumination collapses to the local pools cast by
+ * placed sources.
  *
  * @param emitters every light source in the world, already resolved
  * @param phase the current day/night phase
@@ -25,11 +45,12 @@ export function bandFromEmitters(
     phase: Phase,
     tilePosition: Point,
 ): LightBand {
-    if (phase === "dawn" || phase === "day") {
+    const ambient = ambientBandForPhase(phase);
+    if (ambient === "bright") {
         return "bright";
     }
 
-    let band: LightBand = "dark";
+    let band: LightBand = ambient;
     for (const emitter of emitters) {
         const dx = emitter.position.x - tilePosition.x;
         const dy = emitter.position.y - tilePosition.y;
@@ -64,11 +85,12 @@ export function bandFromEmitters(
  */
 export function illuminationBandAt(root: Entity, tilePosition: Point): LightBand {
     const day = root.getEcsComponent(DayComponentId);
-    const phase = day?.phase ?? "dawn";
+    // A world without a day component is fully visible, so default to day.
+    const phase = day?.phase ?? "day";
 
-    // During the day the band is bright regardless of emitters, so skip the query
-    // entirely; it is only ever needed at night.
-    if (phase === "dawn" || phase === "day") {
+    // A bright ambient cannot be raised by emitters, so skip the query entirely;
+    // it is only needed when the ambient is dim or dark.
+    if (ambientBandForPhase(phase) === "bright") {
         return "bright";
     }
 

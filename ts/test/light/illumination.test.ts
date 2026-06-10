@@ -32,15 +32,15 @@ function addSource(
 
 describe("illuminationBandAt", () => {
     it("lets phase decide whether placed sources matter", () => {
-        // Daylight is a free global light, so by day every tile is bright no
-        // matter the sources. At dusk and night that light is gone and tiles
-        // fall back to whatever the brazier reaches. With one fixed source, the
-        // near tile stays bright in every phase while the far tile only goes
-        // dark once the sun is down.
+        // Each phase contributes an ambient floor: full daylight by day, a dim
+        // twilight at dawn and dusk, nothing at night. With one fixed source,
+        // the near tile stays bright in every phase while the far tile falls
+        // back to that ambient, stepping dim -> bright -> dim -> dark across
+        // the cycle.
         const phaseExpectations: Array<{ phase: Phase; farBand: string }> = [
-            { phase: "dawn", farBand: "bright" },
+            { phase: "dawn", farBand: "dim" },
             { phase: "day", farBand: "bright" },
-            { phase: "dusk", farBand: "dark" },
+            { phase: "dusk", farBand: "dim" },
             { phase: "night", farBand: "dark" },
         ];
 
@@ -59,6 +59,19 @@ describe("illuminationBandAt", () => {
                 `far tile should be ${farBand} at ${phase}`,
             );
         }
+    });
+
+    it("keeps the twilight ambient as a floor that only bright pools exceed", () => {
+        const root = makeWorld("dusk");
+        addSource(root, "brazier", "brazier", { x: 12, y: 8 });
+
+        // The bright pool still stands out against the dim twilight field.
+        assert.strictEqual(illuminationBandAt(root, { x: 14, y: 8 }), "bright");
+
+        // A dim ring over a dim ambient stays dim — the two never sum to
+        // bright — and a tile out of every source's reach keeps the ambient.
+        assert.strictEqual(illuminationBandAt(root, { x: 15, y: 8 }), "dim");
+        assert.strictEqual(illuminationBandAt(root, { x: 17, y: 8 }), "dim");
     });
 
     it("bands a single brazier at night by squared distance", () => {
