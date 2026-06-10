@@ -150,6 +150,56 @@ describe("Entity", () => {
         });
     });
 
+    it("Add child to positioned parent preserves the child's world position", () => {
+        const parent = new Entity("1");
+        const child = new Entity("2");
+
+        parent.position = { x: 4, y: 4 };
+        child.worldPosition = { x: 7, y: 2 };
+        parent.addChild(child);
+
+        assert.deepStrictEqual(child.worldPosition, { x: 7, y: 2 });
+        assert.deepStrictEqual(child.position, { x: 3, y: -2 });
+    });
+
+    it("Add child does not change the parent's position", () => {
+        const parent = new Entity("1");
+        const child = new Entity("2");
+
+        parent.position = { x: 4, y: 4 };
+        parent.addChild(child);
+
+        assert.deepStrictEqual(parent.position, { x: 4, y: 4 });
+        assert.deepStrictEqual(parent.worldPosition, { x: 4, y: 4 });
+    });
+
+    it("Set local position after add places child relative to parent", () => {
+        const parent = new Entity("1");
+        const child = new Entity("2");
+
+        parent.position = { x: 4, y: 4 };
+        parent.addChild(child);
+        child.position = { x: 0, y: 0 };
+
+        assert.deepStrictEqual(child.worldPosition, { x: 4, y: 4 });
+    });
+
+    it("Add child updates the transforms of the child's subtree", () => {
+        const parent = new Entity("1");
+        const child = new Entity("2");
+        const grandchild = new Entity("3");
+
+        child.addChild(grandchild);
+        grandchild.position = { x: 1, y: 1 };
+        child.worldPosition = { x: 2, y: 2 };
+
+        parent.position = { x: 4, y: 4 };
+        parent.addChild(child);
+
+        assert.deepStrictEqual(child.worldPosition, { x: 2, y: 2 });
+        assert.deepStrictEqual(grandchild.worldPosition, { x: 3, y: 3 });
+    });
+
     it("Update local position with world position if entity has no parent", () => {
         const parent = new Entity("1");
 

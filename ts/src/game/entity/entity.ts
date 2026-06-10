@@ -217,20 +217,19 @@ export class Entity {
         } else {
             this._children.push(entity);
         }
-        //Update the world position of the entity
         entity.parent = this;
         entity.gameTime = this._gameTime;
-        // Update the transform of the entity (also bubbles a transform
-        // change adding the entity ot the chunk map if its not present)
-        // We want the world position to be the same, so we need to calculate
-        // a new local position. Setting the local position also trigges and
-        // update transform
-        const newLocal = subtractPoint(
+        // Keep the child's world position unchanged across the parenting:
+        // recompute its local position relative to this entity and update
+        // the transforms of its subtree so locals and worlds stay
+        // consistent. No transform event is bubbled — the world position
+        // did not change, and the child_added event below covers spatial
+        // indexing.
+        entity._localPosition = subtractPoint(
             entity.worldPosition,
             this.worldPosition,
         );
-        this._localPosition = newLocal;
-        //entity.updateTransform();
+        entity.updateTransform();
 
         // Bubble change
         this.bubbleEvent({
