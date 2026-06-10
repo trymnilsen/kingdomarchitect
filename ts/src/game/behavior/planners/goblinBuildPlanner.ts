@@ -20,7 +20,7 @@ import { ResourceHarvestMode } from "../../../data/inventory/items/naturalResour
 import { distance } from "../../../common/point.ts";
 import { buildingPrefab } from "../../prefab/buildingPrefab.ts";
 import { findClosestAvailablePosition } from "../../map/query/closestPositionQuery.ts";
-import { createBuildingPlacementValidator } from "../../map/query/buildingPlacementValidator.ts";
+import { createCampBuildingPlacementValidator } from "../../camp/campBuildingPlacement.ts";
 import { woodResourceItem } from "../../../data/inventory/items/resources.ts";
 import { findDropPosition } from "../dropItem.ts";
 
@@ -73,7 +73,7 @@ function planPlaceBuildingSite(
     const buildPosition = findClosestAvailablePosition(
         root,
         campEntity.worldPosition,
-        createBuildingPlacementValidator(root),
+        createCampBuildingPlacementValidator(root, campEntity, building),
     );
 
     if (!buildPosition) {

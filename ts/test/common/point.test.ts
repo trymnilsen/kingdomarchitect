@@ -5,6 +5,7 @@ import {
     adjacentPoints,
     changeX,
     changeY,
+    chebyshevDistance,
     closestPointOnLine,
     distance,
     dotProduct,
@@ -68,6 +69,16 @@ describe("Point", () => {
         const multipliedPoint = multiplyPoint(point, 2);
         assert.strictEqual(multipliedPoint.x, 6);
         assert.strictEqual(multipliedPoint.y, 4);
+    });
+
+    it("chebyshev distance counts diagonals same as cardinals", () => {
+        const center = { x: 4, y: 4 };
+        assert.strictEqual(chebyshevDistance(center, { x: 5, y: 4 }), 1);
+        assert.strictEqual(chebyshevDistance(center, { x: 5, y: 5 }), 1);
+        assert.strictEqual(chebyshevDistance(center, { x: 3, y: 3 }), 1);
+        assert.strictEqual(chebyshevDistance(center, { x: 6, y: 5 }), 2);
+        assert.strictEqual(chebyshevDistance(center, { x: 4, y: 4 }), 0);
+        assert.strictEqual(chebyshevDistance(center, { x: 1, y: 8 }), 4);
     });
 
     it("distance between points", () => {

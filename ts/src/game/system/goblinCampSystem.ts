@@ -26,7 +26,7 @@ import { stockPile } from "../../data/building/wood/storage.ts";
 import { goblinPrefab } from "../prefab/goblinPrefab.ts";
 import { buildingPrefab } from "../prefab/buildingPrefab.ts";
 import { findClosestAvailablePosition } from "../map/query/closestPositionQuery.ts";
-import { createBuildingPlacementValidator } from "../map/query/buildingPlacementValidator.ts";
+import { createCampBuildingPlacementValidator } from "../camp/campBuildingPlacement.ts";
 import { BuildBuildingJob } from "../job/buildBuildingJob.ts";
 import type { Building } from "../../data/building/building.ts";
 import { firstChildWhere } from "../entity/child/first.ts";
@@ -264,7 +264,9 @@ function processCampRemoval(
 
 /**
  * Place a scaffolded building near the camp and queue a BuildBuildingJob.
- * Notifies an idle goblin to pick up the job.
+ * The search starts at the camp anchor (the campfire tile) and the camp
+ * validator keeps the ring around campfires free, so buildings end up close
+ * to — but never crowding — the fire.
  */
 function placeScaffoldingAndQueueJob(
     root: Entity,
@@ -275,7 +277,7 @@ function placeScaffoldingAndQueueJob(
     const buildPosition = findClosestAvailablePosition(
         root,
         campEntity.worldPosition,
-        createBuildingPlacementValidator(root),
+        createCampBuildingPlacementValidator(root, campEntity, building),
     );
 
     if (!buildPosition) {

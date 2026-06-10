@@ -8,7 +8,11 @@ import {
 } from "../../../src/game/component/goblinCampComponent.ts";
 import { createGoblinUnitComponent } from "../../../src/game/component/goblinUnitComponent.ts";
 import { createFireSourceComponent } from "../../../src/game/component/fireSourceComponent.ts";
-import { createBuildingComponent } from "../../../src/game/component/buildingComponent.ts";
+import {
+    createBuildingComponent,
+    BuildingComponentId,
+} from "../../../src/game/component/buildingComponent.ts";
+import { chebyshevDistance } from "../../../src/common/point.ts";
 import {
     createHousingComponent,
     HousingComponentId,
@@ -292,6 +296,41 @@ describe("goblinCampSystem spawning", () => {
                 "new goblin should spawn into freed hut",
             );
         });
+    });
+});
+
+describe("goblinCampSystem expansion", () => {
+    it("places hut scaffolds outside the campfire clearance ring", () => {
+        const root = new Entity("root");
+        setupWorldComponents(root);
+        const camp = createTestCamp("camp-1", 5);
+        const campfire = createTestCampfire();
+        const existingGoblin = createTestGoblin("camp-1", "goblin-1");
+
+        camp.addChild(campfire);
+        camp.addChild(existingGoblin);
+        root.addChild(camp);
+        camp.position = { x: 4, y: 4 };
+        // Match the real camp prefab: the campfire sits on the camp anchor,
+        // which is also where the expansion search starts.
+        campfire.worldPosition = { x: 4, y: 4 };
+
+        goblinCampSystem.onUpdate!(root, 1);
+
+        const hutScaffold = camp.children.find((child) => {
+            const building = child.getEcsComponent(BuildingComponentId);
+            return building?.building.id === goblinHut.id;
+        });
+        assert.ok(hutScaffold, "expansion should place a hut scaffold");
+        assert.ok(
+            chebyshevDistance(
+                hutScaffold.worldPosition,
+                campfire.worldPosition,
+            ) > 1,
+            `hut should not crowd the campfire (hut: ${JSON.stringify(
+                hutScaffold.worldPosition,
+            )}, fire: ${JSON.stringify(campfire.worldPosition)})`,
+        );
     });
 });
 
