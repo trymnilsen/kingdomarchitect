@@ -83,6 +83,11 @@ export const goblinCampSystem: EcsSystem = {
  * shrinks on its own, so a camp the player provoked stays large even if the
  * player's numbers later fall. The existing expansion/spawning logic then
  * builds huts and goblins up to this cap.
+ *
+ * Math.floor (not round) is load-bearing: the raid valve in formGoblinRaid
+ * requires the warband ≤ RAID_POPULATION_FACTOR × playerPop un-rounded, and a
+ * camp only raids when full. Rounding up at odd populations would grow the cap
+ * past the valve and deadlock raids until the player gains another worker.
  */
 function growCampCap(
     campEntity: Entity,
@@ -90,7 +95,7 @@ function growCampCap(
     playerPop: number,
 ): void {
     const target = clamp(
-        Math.round(RAID_POPULATION_FACTOR * playerPop),
+        Math.floor(RAID_POPULATION_FACTOR * playerPop),
         GOBLIN_CAMP_MIN_SIZE,
         GOBLIN_HOUSE_CAP,
     );

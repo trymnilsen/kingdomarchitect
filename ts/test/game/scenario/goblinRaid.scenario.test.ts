@@ -297,7 +297,7 @@ describe("goblin night raid scenario tests", () => {
         const { camp } = harness.addGoblinCamp({ x: 12, y: 14 });
         const campComp = camp.getEcsComponent(GoblinCampComponentId)!;
 
-        harness.addPlayerUnits(12); // round(0.5 * 12) = 6
+        harness.addPlayerUnits(12); // floor(0.5 * 12) = 6
         harness.tick();
         assert.strictEqual(campComp.maxPopulation, 6, "tracks 50% of player pop");
 
@@ -312,6 +312,42 @@ describe("goblin night raid scenario tests", () => {
             campComp.maxPopulation,
             10,
             "camp does not shrink when the player population falls",
+        );
+    });
+
+    it("raids when full at the cap grown from an odd player population", () => {
+        // Pins the invariant between growCampCap and the raid valve: the cap
+        // must never exceed RAID_POPULATION_FACTOR × playerPop, or a full camp
+        // fails the valve and raids deadlock. Math.round(0.5 * 13) = 7 broke
+        // this (7 > 6.5); Math.floor keeps the camp raidable.
+        const harness = new ScenarioHarness([goblinCampSystem]);
+        const kingdom = harness.addPlayerKingdom();
+        harness.addPlayerBuilding(kingdom, stockPile, { x: 20, y: 14 });
+
+        const { camp } = harness.addGoblinCamp({ x: 12, y: 14 });
+        const campComp = camp.getEcsComponent(GoblinCampComponentId)!;
+
+        harness.addPlayerUnits(13);
+        harness.tick();
+        assert.strictEqual(
+            campComp.maxPopulation,
+            6,
+            "cap stays at or below the valve threshold (floor(0.5 * 13))",
+        );
+
+        // Fill the camp to its cap (the prefab spawned the first goblin).
+        let offset = 0;
+        while (goblinsOf(camp).length < campComp.maxPopulation) {
+            harness.addGoblinToCamp(camp, { x: 10 - offset, y: 14 });
+            offset++;
+        }
+
+        formGoblinRaid(harness.root);
+
+        assert.strictEqual(
+            raidersOf(camp).length,
+            campComp.maxPopulation - 1,
+            "a full camp grown at an odd player population raids",
         );
     });
 
