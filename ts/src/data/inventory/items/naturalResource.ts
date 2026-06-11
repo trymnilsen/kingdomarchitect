@@ -28,6 +28,15 @@ export type ResourceYield = {
     amount: number;
 };
 
+/**
+ * How a resource occupies its tile.
+ * - "blocking" (default): adds path weight and blocks building placement.
+ * - "decorative": adds no path weight, never blocks building placement, and is
+ *   removed when a building is placed on its tile. Must have a passable
+ *   lifecycle (Regrow/Remove), never Finite/Infinite.
+ */
+export type ResourceFootprint = "blocking" | "decorative";
+
 type Resource = {
     asset: SpriteRef;
     id: string;
@@ -37,6 +46,7 @@ type Resource = {
     yields: readonly ResourceYield[];
     /** Work duration in ticks for completing the harvest */
     workDuration?: number;
+    footprint?: ResourceFootprint;
 };
 
 export const treeResource = {
@@ -111,6 +121,7 @@ export const grassResource = {
     },
     yields: [], // Define actual grass yield later
     workDuration: 1,
+    footprint: "decorative",
 } as const;
 
 export const cactusResource = {
@@ -211,6 +222,16 @@ const resourceRegistry = new Map<string, NaturalResource>();
 
 // Initialize registry
 for (const resource of NaturalResources) {
+    const definition: Resource = resource;
+    if (
+        definition.footprint === "decorative" &&
+        (definition.lifecycle.type === "Finite" ||
+            definition.lifecycle.type === "Infinite")
+    ) {
+        throw new Error(
+            `Decorative resource "${definition.id}" must have a passable lifecycle (Regrow/Remove)`,
+        );
+    }
     resourceRegistry.set(resource.id, resource);
 }
 
@@ -261,4 +282,22 @@ export function isClearableObstacle(resourceId: string): boolean {
  */
 export function isPermanentObstacle(resourceId: string): boolean {
     return isImpassableResource(resourceId) && !isClearableObstacle(resourceId);
+}
+
+/**
+ * A decorative resource (grass and similar) adds no path weight, never blocks
+ * building placement, and is removed when a building is placed on its tile.
+ */
+export function isDecorativeResource(resourceId: string): boolean {
+    const resource: Resource | undefined = getResourceById(resourceId);
+    return resource?.footprint === "decorative";
+}
+
+const BLOCKING_RESOURCE_PATH_WEIGHT = 30;
+
+/** Extra path weight a resource adds to its tile. 0 = no contribution. */
+export function getResourcePathWeight(resourceId: string): number {
+    return isDecorativeResource(resourceId)
+        ? 0
+        : BLOCKING_RESOURCE_PATH_WEIGHT;
 }

@@ -11,6 +11,9 @@ import {
     KingdomType,
 } from "../../component/kingdomComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
+import { ResourceComponentId } from "../../component/resourceComponent.ts";
+import { isDecorativeResource } from "../../../data/inventory/items/naturalResource.ts";
+import { clearDecorativeResourcesAt } from "../../building/clearDecorativeResources.ts";
 import { goblinCampPrefab } from "../../prefab/goblinCampPrefab.ts";
 import { findClosestAvailablePosition } from "../query/closestPositionQuery.ts";
 import {
@@ -46,6 +49,13 @@ export function placeSettlement(chunk: TileChunk, chunkEntity: Entity) {
     const root = chunkEntity.getRootEntity();
     const chunkMap = root.requireEcsComponent(ChunkMapComponentId).chunkMap;
     const bounds = getChunkBounds({ x: chunk.chunkX, y: chunk.chunkY });
+    // Decorative resources (grass) don't claim a tile — they are cleared
+    // when the camp is placed on top of them.
+    const isTileFree = (tile: Point) =>
+        getEntitiesAt(chunkMap, tile.x, tile.y).every((occupant) => {
+            const resource = occupant.getEcsComponent(ResourceComponentId);
+            return resource && isDecorativeResource(resource.resourceId);
+        });
     const isFootprintFree = (anchor: Point) =>
         footprint.every((offset) => {
             const tile = addPoint(anchor, offset);
@@ -54,7 +64,7 @@ export function placeSettlement(chunk: TileChunk, chunkEntity: Entity) {
                 tile.x <= bounds.x2 &&
                 tile.y >= bounds.y1 &&
                 tile.y <= bounds.y2 &&
-                getEntitiesAt(chunkMap, tile.x, tile.y).length === 0
+                isTileFree(tile)
             );
         });
 
@@ -75,6 +85,10 @@ export function placeSettlement(chunk: TileChunk, chunkEntity: Entity) {
         clearTiles(chunkMap, preferredAnchor, footprint);
     }
     const campPosition = anchor ?? preferredAnchor;
+
+    for (const offset of footprint) {
+        clearDecorativeResourcesAt(root, addPoint(campPosition, offset));
+    }
 
     chunkEntity.addChild(camp);
     camp.position = {

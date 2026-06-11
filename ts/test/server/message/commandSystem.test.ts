@@ -1,6 +1,7 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
 import { Entity } from "../../../src/game/entity/entity.ts";
+import { createChunkMapComponent } from "../../../src/game/component/chunkMapComponent.ts";
 import { createCommandSystem } from "../../../src/game/system/commandSystem.ts";
 import { GameTime } from "../../../src/game/gameTime.ts";
 import { PersistenceManager } from "../../../src/server/persistence/persistenceManager.ts";
@@ -102,6 +103,7 @@ function createTestPersistenceManager(): PersistenceManager {
  */
 function createRootWithKingdom(): { root: Entity; playerKingdom: Entity } {
     const root = new Entity("root");
+    root.setEcsComponent(createChunkMapComponent());
     const playerKingdom = playerKingdomPrefab();
     root.addChild(playerKingdom);
     return { root, playerKingdom };

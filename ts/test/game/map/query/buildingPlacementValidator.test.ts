@@ -8,6 +8,7 @@ import {
 } from "../../../../src/game/component/chunkMapComponent.ts";
 import { createBehaviorAgentComponent } from "../../../../src/game/component/BehaviorAgentComponent.ts";
 import { createBuildingComponent } from "../../../../src/game/component/buildingComponent.ts";
+import { createResourceComponent } from "../../../../src/game/component/resourceComponent.ts";
 import {
     createTileComponent,
     setChunk,
@@ -68,6 +69,28 @@ function addBuilding(root: Entity, pos: Point): Entity {
 }
 
 /**
+ * Registers a resource entity in root's chunk map at the given world position.
+ */
+function addResource(root: Entity, pos: Point, resourceId: string): Entity {
+    const resource = new Entity(`resource-${pos.x}-${pos.y}`);
+    resource.setEcsComponent(createResourceComponent(resourceId));
+    resource.worldPosition = pos;
+
+    const chunkMapComponent = root.requireEcsComponent(ChunkMapComponentId);
+    const chunkMap = chunkMapComponent.chunkMap;
+    const chunkX = Math.floor(pos.x / ChunkSize);
+    const chunkY = Math.floor(pos.y / ChunkSize);
+    const chunkKey = encodePosition(chunkX, chunkY);
+
+    if (!chunkMap.chunks.has(chunkKey)) {
+        chunkMap.chunks.set(chunkKey, new SparseSet<Entity>());
+    }
+    chunkMap.chunks.get(chunkKey)!.add(resource);
+
+    return resource;
+}
+
+/**
  * Registers an agent entity in root's chunk map at the given world position.
  */
 function addAgent(root: Entity, pos: Point): Entity {
@@ -113,6 +136,34 @@ describe("createBuildingPlacementValidator", () => {
 
             assert.strictEqual(validator({ x: 4, y: 4 }), false);
         });
+
+        it("rejects a candidate occupied by a blocking resource (tree)", () => {
+            const world = createWorld([
+                { x: 4, y: 4 },
+                { x: 3, y: 4 },
+                { x: 5, y: 4 },
+                { x: 4, y: 3 },
+                { x: 4, y: 5 },
+            ]);
+            addResource(world, { x: 4, y: 4 }, "tree1");
+            const validator = createBuildingPlacementValidator(world);
+
+            assert.strictEqual(validator({ x: 4, y: 4 }), false);
+        });
+
+        it("accepts a candidate occupied by a decorative resource (grass)", () => {
+            const world = createWorld([
+                { x: 4, y: 4 },
+                { x: 3, y: 4 },
+                { x: 5, y: 4 },
+                { x: 4, y: 3 },
+                { x: 4, y: 5 },
+            ]);
+            addResource(world, { x: 4, y: 4 }, "grass");
+            const validator = createBuildingPlacementValidator(world);
+
+            assert.strictEqual(validator({ x: 4, y: 4 }), true);
+        });
     });
 
     describe("reachability of the new building", () => {
@@ -147,6 +198,25 @@ describe("createBuildingPlacementValidator", () => {
             addBuilding(world, { x: 5, y: 4 });
             addBuilding(world, { x: 4, y: 3 });
             // (4,5) deliberately left free
+            const validator = createBuildingPlacementValidator(world);
+
+            assert.strictEqual(validator({ x: 4, y: 4 }), true);
+        });
+
+        it("counts a grass-occupied neighbour as a walkable exit", () => {
+            // Three neighbours hold buildings; the last holds decorative grass,
+            // which doesn't block reachability.
+            const world = createWorld([
+                { x: 4, y: 4 },
+                { x: 3, y: 4 },
+                { x: 5, y: 4 },
+                { x: 4, y: 3 },
+                { x: 4, y: 5 },
+            ]);
+            addBuilding(world, { x: 3, y: 4 });
+            addBuilding(world, { x: 5, y: 4 });
+            addBuilding(world, { x: 4, y: 3 });
+            addResource(world, { x: 4, y: 5 }, "grass");
             const validator = createBuildingPlacementValidator(world);
 
             assert.strictEqual(validator({ x: 4, y: 4 }), true);

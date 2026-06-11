@@ -9,7 +9,10 @@ import {
 import { GoblinCampComponentId } from "../../../../src/game/component/goblinCampComponent.ts";
 import { Entity } from "../../../../src/game/entity/entity.ts";
 import { resourcePrefab } from "../../../../src/game/prefab/resourcePrefab.ts";
-import { treeResource } from "../../../../src/data/inventory/items/naturalResource.ts";
+import {
+    grassResource,
+    treeResource,
+} from "../../../../src/data/inventory/items/naturalResource.ts";
 import { createMinimalWorld } from "../../testWorld.ts";
 import {
     assertChunkMapMatchesTree,
@@ -58,6 +61,29 @@ describe("placeSettlement", () => {
         const camp = findCamp(root);
         assert.strictEqual(camp.parent, chunkEntity);
         assert.deepStrictEqual(camp.worldPosition, preferredAnchor);
+        assertTransformsConsistent(root);
+        assertChunkMapMatchesTree(root);
+    });
+
+    it("places the camp on decorative grass and removes it", () => {
+        const { root, chunkEntity } = createWorldWithChunk();
+        const grass = resourcePrefab(grassResource);
+        chunkEntity.addChild(grass);
+        grass.worldPosition = preferredAnchor;
+        const chunk = { chunkX: chunkPosition.x, chunkY: chunkPosition.y };
+
+        placeSettlement(chunk, chunkEntity);
+
+        const camp = findCamp(root);
+        assert.deepStrictEqual(
+            camp.worldPosition,
+            preferredAnchor,
+            "grass should not shift the camp off its preferred anchor",
+        );
+        assert.ok(
+            !chunkEntity.children.includes(grass),
+            "grass under the camp footprint should be removed",
+        );
         assertTransformsConsistent(root);
         assertChunkMapMatchesTree(root);
     });

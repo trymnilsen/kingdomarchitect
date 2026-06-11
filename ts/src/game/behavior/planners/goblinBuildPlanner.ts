@@ -21,6 +21,7 @@ import { distance } from "../../../common/point.ts";
 import { buildingPrefab } from "../../prefab/buildingPrefab.ts";
 import { findClosestAvailablePosition } from "../../map/query/closestPositionQuery.ts";
 import { createCampBuildingPlacementValidator } from "../../camp/campBuildingPlacement.ts";
+import { clearDecorativeResourcesAt } from "../../building/clearDecorativeResources.ts";
 import { woodResourceItem } from "../../../data/inventory/items/resources.ts";
 import { findDropPosition } from "../dropItem.ts";
 
@@ -81,6 +82,7 @@ function planPlaceBuildingSite(
         return [];
     }
 
+    clearDecorativeResourcesAt(root, buildPosition);
     const buildingEntity = buildingPrefab(building, true);
     campEntity.addChild(buildingEntity);
     buildingEntity.worldPosition = buildPosition;

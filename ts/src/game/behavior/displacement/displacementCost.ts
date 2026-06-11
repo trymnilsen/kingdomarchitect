@@ -13,6 +13,7 @@ import {
     hasMovedThisTick,
 } from "../../component/movementStaminaComponent.ts";
 import { ResourceComponentId } from "../../component/resourceComponent.ts";
+import { isDecorativeResource } from "../../../data/inventory/items/naturalResource.ts";
 import { TileComponentId, getTile } from "../../component/tileComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { queryEntity } from "../../map/query/queryEntity.ts";
@@ -117,7 +118,8 @@ export function scoreCandidateTile(
                 return -Infinity;
             }
         }
-        if (occupant.hasComponent(ResourceComponentId)) {
+        const resource = occupant.getEcsComponent(ResourceComponentId);
+        if (resource && !isDecorativeResource(resource.resourceId)) {
             return -Infinity;
         }
     }

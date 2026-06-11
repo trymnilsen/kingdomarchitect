@@ -37,6 +37,7 @@ import {
     type QueueJobCommand,
 } from "../../server/message/command/queueJobCommand.ts";
 import { findPlayerKingdom } from "../component/playerKingdomComponent.ts";
+import { clearDecorativeResourcesAt } from "../building/clearDecorativeResources.ts";
 import {
     CommandGameMessageType,
     type GameMessage,
@@ -276,6 +277,7 @@ function buildBuilding(root: Entity, command: BuildCommand) {
     }
 
     for (const point of points) {
+        clearDecorativeResourcesAt(root, point);
         const buildingEntity = buildingPrefab(building, true);
         playerKingdom.addChild(buildingEntity);
         buildingEntity.worldPosition = point;

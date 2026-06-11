@@ -5,7 +5,10 @@ import { PlayerUnitComponentId } from "../../../component/playerUnitComponent.ts
 import { ResourceComponentId } from "../../../component/resourceComponent.ts";
 import { getTile, TileComponentId } from "../../../component/tileComponent.ts";
 import type { Entity } from "../../../entity/entity.ts";
-import { isPermanentObstacle } from "../../../../data/inventory/items/naturalResource.ts";
+import {
+    getResourcePathWeight,
+    isPermanentObstacle,
+} from "../../../../data/inventory/items/naturalResource.ts";
 import { queryEntity } from "../../query/queryEntity.ts";
 import {
     isImpassableStructure,
@@ -57,7 +60,10 @@ export function getWeightAtPoint(point: Point, scope: Entity): number {
             const resourceComponent =
                 entity.getEcsComponent(ResourceComponentId);
             if (resourceComponent) {
-                entityWeight = Math.max(entityWeight, 30);
+                entityWeight = Math.max(
+                    entityWeight,
+                    getResourcePathWeight(resourceComponent.resourceId),
+                );
             }
 
             const buildingComponent =

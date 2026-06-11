@@ -22,6 +22,8 @@ import { LineBuildMode } from "./mode/lineBuildMode.ts";
 import { SingleBuildMode } from "./mode/singleBuildMode.ts";
 import { BuildCommand } from "../../../../server/message/command/buildCommand.ts";
 import { queryEntity } from "../../../map/query/queryEntity.ts";
+import { ResourceComponentId } from "../../../component/resourceComponent.ts";
+import { isDecorativeResource } from "../../../../data/inventory/items/naturalResource.ts";
 
 export class BuildConfirmState extends InteractionState {
     private blinkScaffold = true;
@@ -219,7 +221,11 @@ export class BuildConfirmState extends InteractionState {
             y: tilePosition.y,
         });
 
-        if (entitiesAt.length > 0) {
+        const blockingEntities = entitiesAt.filter((entity) => {
+            const resource = entity.getEcsComponent(ResourceComponentId);
+            return !(resource && isDecorativeResource(resource.resourceId));
+        });
+        if (blockingEntities.length > 0) {
             return {
                 isApplicable: false,
                 reason: "Spot taken",

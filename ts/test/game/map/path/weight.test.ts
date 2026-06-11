@@ -151,9 +151,27 @@ describe("getWeightAtPoint", () => {
 
             assert.strictEqual(getWeightAtPoint(TEST_POS, root), 30);
         });
+
+        it("returns the ground weight for a decorative resource (grass)", () => {
+            const root = createWorld();
+            const grass = new Entity("grass");
+            grass.setEcsComponent(createResourceComponent("grass"));
+            placeAt(root, grass);
+
+            assert.strictEqual(getWeightAtPoint(TEST_POS, root), 2);
+        });
     });
 
     describe("isTileAvailable", () => {
+        it("treats a decorative resource (grass) as available", () => {
+            const root = createWorld();
+            const grass = new Entity("grass");
+            grass.setEcsComponent(createResourceComponent("grass"));
+            placeAt(root, grass);
+
+            assert.strictEqual(isTileAvailable(TEST_POS, root), true);
+        });
+
         it("treats a clearable obstacle (tree) as available", () => {
             const root = createWorld();
             const tree = new Entity("tree");
@@ -205,6 +223,20 @@ describe("getWeightAtPoint", () => {
             placeAt(root, resource);
 
             // Goblin weight is 50, resource is 30 — goblin wins
+            assert.strictEqual(getWeightAtPoint(TEST_POS, root), 50);
+        });
+
+        it("returns the goblin weight when a goblin overlaps decorative grass", () => {
+            const root = createWorld();
+            const goblin = new Entity("goblin");
+            goblin.setEcsComponent(createGoblinUnitComponent("camp-1"));
+            placeAt(root, goblin);
+
+            const grass = new Entity("grass");
+            grass.setEcsComponent(createResourceComponent("grass"));
+            placeAt(root, grass);
+
+            // Grass contributes no weight, so the goblin's 50 applies
             assert.strictEqual(getWeightAtPoint(TEST_POS, root), 50);
         });
     });

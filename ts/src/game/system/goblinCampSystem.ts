@@ -27,6 +27,7 @@ import { goblinPrefab } from "../prefab/goblinPrefab.ts";
 import { buildingPrefab } from "../prefab/buildingPrefab.ts";
 import { findClosestAvailablePosition } from "../map/query/closestPositionQuery.ts";
 import { createCampBuildingPlacementValidator } from "../camp/campBuildingPlacement.ts";
+import { clearDecorativeResourcesAt } from "../building/clearDecorativeResources.ts";
 import { BuildBuildingJob } from "../job/buildBuildingJob.ts";
 import type { Building } from "../../data/building/building.ts";
 import { firstChildWhere } from "../entity/child/first.ts";
@@ -287,6 +288,7 @@ function placeScaffoldingAndQueueJob(
         return;
     }
 
+    clearDecorativeResourcesAt(root, buildPosition);
     const buildingEntity = buildingPrefab(building, true);
     campEntity.addChild(buildingEntity);
     buildingEntity.worldPosition = buildPosition;
