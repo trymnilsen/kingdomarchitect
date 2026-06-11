@@ -1,5 +1,8 @@
 import type { Entity } from "../entity/entity.ts";
-import { VisibilityComponentId } from "../component/visibilityComponent.ts";
+import {
+    VisibilityComponentId,
+    type MinimalPerception,
+} from "../component/visibilityComponent.ts";
 
 /**
  * How far a worker can see, in tiles, before illumination is considered. This is
@@ -8,6 +11,19 @@ import { VisibilityComponentId } from "../component/visibilityComponent.ts";
  * diamond pattern.
  */
 export const WORKER_VISION_REACH = 2;
+
+/**
+ * The sight a worker keeps in total darkness: their own tile and the four
+ * cardinal neighbours, perceived dimly. This replaces the old innate "worker
+ * glow" light source — the footprint is the same five tiles, but the worker no
+ * longer lights them; they merely perceive them. Dim rather than bright so the
+ * dark still reads as dark, and so an actual carried light (a torch lights the
+ * same plus *brightly*, and for everyone) stays a visible upgrade.
+ */
+export const WORKER_MINIMAL_PERCEPTION: MinimalPerception = {
+    radius: 1,
+    band: "dim",
+};
 
 /**
  * How far a building can see on its own, in tiles, before illumination is
@@ -50,4 +66,18 @@ export function visionReachRadius(entity: Entity): number {
         return 0;
     }
     return visibility.baseReach + visionReachModifiers(entity);
+}
+
+/**
+ * The minimal perception an entity has this moment, or undefined for an entity
+ * that perceives nothing without light. Derived on read like
+ * {@link visionReachRadius}; a future modifier (a trait sharpening night senses,
+ * an effect numbing them) lands here without touching call sites.
+ *
+ * @param entity the viewer to measure
+ */
+export function minimalPerceptionOf(
+    entity: Entity,
+): MinimalPerception | undefined {
+    return entity.getEcsComponent(VisibilityComponentId)?.minimalPerception;
 }

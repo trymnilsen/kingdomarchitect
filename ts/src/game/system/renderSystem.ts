@@ -39,7 +39,10 @@ import {
     type LightEmitter,
 } from "../light/lightEmitter.ts";
 import type { LightBand } from "../light/lightBand.ts";
-import { revealFootprintOffsets } from "../vision/revealFootprint.ts";
+import {
+    revealFootprintOffsets,
+    stampPerceptionFloor,
+} from "../vision/revealFootprint.ts";
 import { perceivedBandAt } from "../vision/perceivedBand.ts";
 
 export const renderSystem: EcsSystem = {
@@ -59,6 +62,7 @@ function onRender(
 
     if (visibilityMap) {
         visibilityMap.visibility.clear();
+        visibilityMap.perceptionFloor.clear();
         //TODO: this might be able to piggyback of sprites? Are there entities without sprites but with visibility?
         const visibilityComponents = rootEntity.queryComponentsWithin(
             viewport,
@@ -80,6 +84,12 @@ function onRender(
                 );
                 visibilityMap.visibility.add(numberId);
             }
+            // A viewer's minimal perception floors its immediate tiles above
+            // darkness without lighting them.
+            stampPerceptionFloor(
+                visibilityComponent[0],
+                visibilityMap.perceptionFloor,
+            );
         }
     }
 

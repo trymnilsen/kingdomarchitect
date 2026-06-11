@@ -9,12 +9,10 @@ import {
 } from "../component/spriteComponent.ts";
 import { Entity } from "../entity/entity.ts";
 import { createVisibilityComponent } from "../component/visibilityComponent.ts";
-import { WORKER_VISION_REACH } from "../vision/visionReach.ts";
 import {
-    createLightSourceComponent,
-    LightSourceComponentId,
-} from "../component/lightSourceComponent.ts";
-import { workerGlowLightSource } from "../../data/light/lightSourceDefinition.ts";
+    WORKER_MINIMAL_PERCEPTION,
+    WORKER_VISION_REACH,
+} from "../vision/visionReach.ts";
 import { createAnimationComponent } from "../component/animationComponent.ts";
 import { nobleKnightAnimationGraph } from "../../asset/animation/knight.animation.ts";
 import { createDirectionComponent } from "../component/directionComponent.ts";
@@ -43,12 +41,13 @@ export function workerPrefab(id?: string): Entity {
     entity.setEcsComponent(createPlayerUnitComponent());
     entity.setEcsComponent(createEquipmentComponent());
     entity.setEcsComponent(createHeldItemComponent());
-    entity.setEcsComponent(createVisibilityComponent(WORKER_VISION_REACH));
-    // Workers carry a faint innate light so they are not blind in the dark until
-    // equippable torches and lanterns exist; the glow moves with them because the
-    // illumination field reads each emitter's live world position.
-    entity.setEcsComponent(createLightSourceComponent(workerGlowLightSource.id));
-    entity.invalidateComponent(LightSourceComponentId);
+    // Workers see in the dark via minimal perception rather than by emitting
+    // light: their surroundings stay objectively dark, so the illumination field
+    // only ever reflects real sources (and a future carried torch is an upgrade,
+    // not a duplicate of an innate glow).
+    entity.setEcsComponent(
+        createVisibilityComponent(WORKER_VISION_REACH, WORKER_MINIMAL_PERCEPTION),
+    );
     entity.setEcsComponent(createAnimationComponent(nobleKnightAnimationGraph));
     entity.setEcsComponent(createDirectionComponent());
     entity.setEcsComponent(createOccupationComponent());

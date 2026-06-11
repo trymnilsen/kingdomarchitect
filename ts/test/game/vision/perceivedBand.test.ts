@@ -7,9 +7,9 @@ import { makeNumberId } from "../../../src/common/point.ts";
 
 /**
  * perceivedBandAt is the single rule the visibility model rests on:
- * min(reach, illumination). These cases pin each quadrant of that min, plus the
- * day-is-globally-bright behaviour, so the rule cannot silently regress to a
- * phase-switch again.
+ * min(reach, max(perceptionFloor, illumination)). These cases pin each quadrant
+ * of that rule, plus the day-is-globally-bright behaviour, so the rule cannot
+ * silently regress to a phase-switch again.
  */
 describe("perceivedBandAt", () => {
     // One emitter: bright out to radius 2 (distSq <= 4), dim out to radius 4
@@ -53,5 +53,31 @@ describe("perceivedBandAt", () => {
         // Same unlit tile as the night-dark case; daylight is a global bright.
         const map = reachOf([18, 8]);
         assert.strictEqual(perceivedBandAt(map, emitters, "day", 18, 8), "bright");
+    });
+
+    it("at night, an unlit tile with a dim perception floor reads dim", () => {
+        // (18,8) is beyond all light; a viewer's minimal perception floors it.
+        const map = reachOf([18, 8]);
+        map.perceptionFloor.set(makeNumberId(18, 8), "dim");
+        assert.strictEqual(perceivedBandAt(map, emitters, "night", 18, 8), "dim");
+    });
+
+    it("at night, real light wins over a dimmer perception floor", () => {
+        // (12,8) is brightly lit; the dim floor must not cap it down.
+        const map = reachOf([12, 8]);
+        map.perceptionFloor.set(makeNumberId(12, 8), "dim");
+        assert.strictEqual(
+            perceivedBandAt(map, emitters, "night", 12, 8),
+            "bright",
+        );
+    });
+
+    it("a perception floor outside reach reads dark — reach still binds", () => {
+        // Floor entry exists but the tile is not in the reach set. The reveal
+        // footprint normally guarantees floor ⊆ reach; this pins the rule's
+        // behaviour if that invariant is ever broken.
+        const map = reachOf([12, 8]);
+        map.perceptionFloor.set(makeNumberId(18, 8), "dim");
+        assert.strictEqual(perceivedBandAt(map, emitters, "night", 18, 8), "dark");
     });
 });

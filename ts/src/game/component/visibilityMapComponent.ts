@@ -1,9 +1,18 @@
 import { makeNumberId, type Point } from "../../common/point.ts";
+import type { LightBand } from "../light/lightBand.ts";
 import type { WorldDiscoveryData } from "./worldDiscoveryComponent.ts";
 
 export type VisibilityMapComponent = {
     id: typeof VisibilityMapComponentId;
     visibility: Set<number>;
+    /**
+     * The minimum band each tile is perceived at this frame regardless of
+     * illumination, from viewers' minimal perception (see
+     * {@link MinimalPerception}). Holds entries only for tiles some viewer
+     * grants a floor on; every other tile floors at `dark`. Rebuilt fresh each
+     * render alongside `visibility`, and like it never replicated.
+     */
+    perceptionFloor: Map<number, LightBand>;
     discovered: WorldDiscoveryData;
 };
 
@@ -11,6 +20,7 @@ export function createVisibilityMapComponent(): VisibilityMapComponent {
     return {
         id: VisibilityMapComponentId,
         visibility: new Set(),
+        perceptionFloor: new Map(),
         discovered: {
             fullyDiscoveredChunks: new Set(),
             partiallyDiscoveredChunks: new Map(),
@@ -70,6 +80,20 @@ export function isInVisionReach(
     y: number,
 ): boolean {
     return visibilityComponent.visibility.has(makeNumberId(x, y));
+}
+
+/**
+ * The minimum band a tile is perceived at this frame, before illumination is
+ * considered: the floor some viewer's minimal perception grants it, or `dark`
+ * where no viewer does. The perceived-band rule takes the brighter of this and
+ * the tile's actual illumination.
+ */
+export function perceptionFloorAt(
+    visibilityComponent: VisibilityMapComponent,
+    x: number,
+    y: number,
+): LightBand {
+    return visibilityComponent.perceptionFloor.get(makeNumberId(x, y)) ?? "dark";
 }
 
 export const VisibilityMapComponentId = "visibilityMap";

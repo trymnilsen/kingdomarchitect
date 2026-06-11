@@ -90,9 +90,16 @@ import {
     hasCollectableItems,
 } from "../../../component/collectableComponent.ts";
 import { VisibilityComponentId } from "../../../component/visibilityComponent.ts";
+import { VisibilityMapComponentId } from "../../../component/visibilityMapComponent.ts";
+import { DayComponentId } from "../../../component/dayComponent.ts";
 import { LightSourceComponentId } from "../../../component/lightSourceComponent.ts";
 import { getLightSourceDefinition } from "../../../../data/light/lightSourceDefinition.ts";
-import { illuminationBandAt } from "../../../light/illumination.ts";
+import {
+    bandFromEmitters,
+    illuminationBandAt,
+} from "../../../light/illumination.ts";
+import { collectLightEmitters } from "../../../light/lightEmitter.ts";
+import { perceivedBandAt } from "../../../vision/perceivedBand.ts";
 
 export class SelectionState extends InteractionState {
     private providers: ActorSelectionProvider[] = [
@@ -565,12 +572,13 @@ function drawJobLinks(context: RenderScope, selection: SelectedEntityItem) {
 }
 
 /**
- * Draws the tiles a selected agent can actually see right now as small boxes. An
- * agent reveals its footprint — where it can look and where it casts light — but
- * only the lit part of that footprint is visible, so this draws the footprint
- * intersected with illumination: the whole footprint by day and during the dim
- * dawn/dusk ambient, the lit subset by night. This matches what `perceivedBandAt`
- * shows for those tiles.
+ * Draws the tiles a selected agent can actually see right now as small boxes:
+ * its reveal footprint intersected with the perceived band, evaluated through
+ * the same `perceivedBandAt` rule the renderer uses, on the same frame-fresh
+ * visibility map (the render pass stamps it before interaction drawing runs).
+ * Sharing the rule rather than re-deriving it keeps the overlay from ever
+ * disagreeing with what is actually rendered — including floors granted by
+ * *other* nearby viewers. Emitters and phase are gathered once, not per tile.
  */
 function drawVisibilityRange(context: RenderScope, entity: Entity) {
     const visibility = entity.getEcsComponent(VisibilityComponentId);
@@ -578,12 +586,20 @@ function drawVisibilityRange(context: RenderScope, entity: Entity) {
         return;
     }
     const root = entity.getRootEntity();
+    const visibilityMap = root.getEcsComponent(VisibilityMapComponentId);
+    const emitters = collectLightEmitters(root);
+    const phase = root.getEcsComponent(DayComponentId)?.phase ?? "day";
     const tiles = offsetPatternWithPoint(
         entity.worldPosition,
         revealFootprintOffsets(entity),
     );
     for (const tile of tiles) {
-        if (illuminationBandAt(root, tile) === "dark") {
+        // A root without a visibility map (previews) has no reach or floor to
+        // bind on, so fall back to plain illumination.
+        const band = visibilityMap
+            ? perceivedBandAt(visibilityMap, emitters, phase, tile.x, tile.y)
+            : bandFromEmitters(emitters, phase, tile);
+        if (band === "dark") {
             continue;
         }
         context.drawRectangle({
