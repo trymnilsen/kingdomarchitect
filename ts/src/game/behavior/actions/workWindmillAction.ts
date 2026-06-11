@@ -1,6 +1,10 @@
 import { isAtOrAdjacent } from "../../../common/point.ts";
 import { log } from "../../../common/logging/logger.ts";
-import { FarmComponentId, FarmState } from "../../component/farmComponent.ts";
+import {
+    FarmComponentId,
+    FarmState,
+    type FarmComponent,
+} from "../../component/farmComponent.ts";
 import {
     addToHeldItem,
     canAddToHeld,
@@ -52,7 +56,11 @@ const ADJACENT_OFFSETS: ReadonlyArray<{ dx: number; dy: number }> = [
  * farms into the worker's held slot and complete the job.
  *
  * Held is single-slot, so this pass harvests one crop type only — whatever the
- * worker already holds, or the first Ready farm's crop if held is empty.
+ * worker already holds, or the crop of the longest-waiting Ready farm if held
+ * is empty. Ready farms are visited oldest plantedAtTick first; without that
+ * ordering a crop sitting earlier in the adjacency scan would claim the held
+ * slot every pass and starve the others, since replanting happens before
+ * harvesting and keeps every other crop perpetually Ready alongside it.
  * Farms with mismatched crops stay Ready for a later pass.
  */
 export function executeWorkWindmillAction(
@@ -126,10 +134,17 @@ export function executeWorkWindmillAction(
 
     const heldItemComponent = entity.requireEcsComponent(HeldItemComponentId);
     let harvestedAny = false;
+    const readyFarms: { entity: Entity; farm: FarmComponent }[] = [];
     for (const farmEntity of adjacentFarms) {
         const farm = farmEntity.getEcsComponent(FarmComponentId);
-        if (!farm || farm.state !== FarmState.Ready) continue;
+        if (farm && farm.state === FarmState.Ready) {
+            readyFarms.push({ entity: farmEntity, farm });
+        }
+    }
+    readyFarms.sort((a, b) => a.farm.plantedAtTick - b.farm.plantedAtTick);
 
+    for (const readyFarm of readyFarms) {
+        const farm = readyFarm.farm;
         const cropDefinition = getCropDefinition(farm.cropId);
         const cropItem = getInventoryItemById(cropDefinition.itemId);
         if (!cropItem) {
@@ -144,7 +159,7 @@ export function executeWorkWindmillAction(
         addToHeldItem(heldItemComponent, cropItem, cropDefinition.yieldAmount);
         farm.state = FarmState.Empty;
         farm.plantedAtTick = 0;
-        farmEntity.invalidateComponent(FarmComponentId);
+        readyFarm.entity.invalidateComponent(FarmComponentId);
         harvestedAny = true;
     }
 
