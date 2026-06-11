@@ -19,7 +19,7 @@ export const enchanter: Building = {
         materials: {
             [woodResourceItem.id]: 20,
             [stoneResource.id]: 40,
-            [goldCoins.id]: 30,
+            [goldCoins.id]: 2,
             [joineryItem.id]: 10,
             [ironBarsItem.id]: 3,
         },
