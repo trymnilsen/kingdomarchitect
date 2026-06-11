@@ -37,7 +37,7 @@ import {
     type QueueJobCommand,
 } from "../../server/message/command/queueJobCommand.ts";
 import { findPlayerKingdom } from "../component/playerKingdomComponent.ts";
-import { clearDecorativeResourcesAt } from "../building/clearDecorativeResources.ts";
+import { placeBuildingAt } from "../building/placeBuilding.ts";
 import {
     CommandGameMessageType,
     type GameMessage,
@@ -65,7 +65,6 @@ import {
 } from "../component/jobQueueComponent.ts";
 import type { Entity } from "../entity/entity.ts";
 import { BuildBuildingJob } from "../job/buildBuildingJob.ts";
-import { buildingPrefab } from "../prefab/buildingPrefab.ts";
 import type { GameTime } from "../gameTime.ts";
 import type { PersistenceManager } from "../../server/persistence/persistenceManager.ts";
 import { ReloadGameMessageType } from "../../server/message/gameMessage.ts";
@@ -277,10 +276,12 @@ function buildBuilding(root: Entity, command: BuildCommand) {
     }
 
     for (const point of points) {
-        clearDecorativeResourcesAt(root, point);
-        const buildingEntity = buildingPrefab(building, true);
-        playerKingdom.addChild(buildingEntity);
-        buildingEntity.worldPosition = point;
+        const buildingEntity = placeBuildingAt(
+            root,
+            playerKingdom,
+            building,
+            point,
+        );
         const job = BuildBuildingJob(buildingEntity);
         playerKingdom.updateComponent(JobQueueComponentId, (component) => {
             component.jobs.push(job);

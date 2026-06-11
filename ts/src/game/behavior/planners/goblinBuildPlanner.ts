@@ -18,10 +18,9 @@ import { StockpileComponentId } from "../../component/stockpileComponent.ts";
 import { ResourceComponentId } from "../../component/resourceComponent.ts";
 import { ResourceHarvestMode } from "../../../data/inventory/items/naturalResource.ts";
 import { distance } from "../../../common/point.ts";
-import { buildingPrefab } from "../../prefab/buildingPrefab.ts";
 import { findClosestAvailablePosition } from "../../map/query/closestPositionQuery.ts";
 import { createCampBuildingPlacementValidator } from "../../camp/campBuildingPlacement.ts";
-import { clearDecorativeResourcesAt } from "../../building/clearDecorativeResources.ts";
+import { placeBuildingAt } from "../../building/placeBuilding.ts";
 import { woodResourceItem } from "../../../data/inventory/items/resources.ts";
 import { findDropPosition } from "../dropItem.ts";
 
@@ -82,10 +81,12 @@ function planPlaceBuildingSite(
         return [];
     }
 
-    clearDecorativeResourcesAt(root, buildPosition);
-    const buildingEntity = buildingPrefab(building, true);
-    campEntity.addChild(buildingEntity);
-    buildingEntity.worldPosition = buildPosition;
+    const buildingEntity = placeBuildingAt(
+        root,
+        campEntity,
+        building,
+        buildPosition,
+    );
 
     log.info(
         `Placed scaffolded ${building.name} at ${buildPosition.x}, ${buildPosition.y}`,
