@@ -22,6 +22,7 @@ import type { WithdrawFromStockpileActionData } from "./withdrawFromStockpileAct
 import type { PlantCropActionData } from "./plantCropAction.ts";
 import type { HarvestCropActionData } from "./harvestCropAction.ts";
 import type { EatFromHeldActionData } from "./eatFromHeldAction.ts";
+import type { DrinkFromHeldActionData } from "./drinkFromHeldAction.ts";
 import type { EatFromEquipmentActionData } from "./eatFromEquipmentAction.ts";
 import type { StealFoodActionData } from "./stealFoodAction.ts";
 import type { WorkWindmillActionData } from "./workWindmillAction.ts";
@@ -62,6 +63,7 @@ export type BehaviorActionData =
     | PlantCropActionData
     | HarvestCropActionData
     | EatFromHeldActionData
+    | DrinkFromHeldActionData
     | EatFromEquipmentActionData
     | StealFoodActionData
     | WorkWindmillActionData

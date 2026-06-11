@@ -1,5 +1,5 @@
 import { spriteRefs } from "../../../asset/sprite.ts";
-import { SpecialRequirement, type Building } from "../building.ts";
+import type { Building } from "../building.ts";
 import {
     ironBarsItem,
     joineryItem,
@@ -23,6 +23,5 @@ export const enchanter: Building = {
             [joineryItem.id]: 10,
             [ironBarsItem.id]: 3,
         },
-        special: [SpecialRequirement.MagicalFocusItem],
     },
 };

@@ -96,6 +96,13 @@ export const healthPotion = {
     tag: [ItemTag.Consumable],
 } as const;
 
+export const greaterHealthPotion = {
+    asset: spriteRefs.health_potion,
+    id: "greaterhealthpotion",
+    name: "Greater Health Potion",
+    tag: [ItemTag.Consumable],
+} as const;
+
 export const manaPotion = {
     asset: spriteRefs.mana_potion,
     id: "manapotion",
@@ -120,6 +127,7 @@ export const resources = [
     blueBook,
     manaPotion,
     healthPotion,
+    greaterHealthPotion,
     goldCoins,
     gemResource,
     bagOfGlitter,

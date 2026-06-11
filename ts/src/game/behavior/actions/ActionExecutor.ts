@@ -28,6 +28,7 @@ import { executePlantTreeAction } from "./plantTreeAction.ts";
 import { executePlantCropAction } from "./plantCropAction.ts";
 import { executeHarvestCropAction } from "./harvestCropAction.ts";
 import { executeEatFromHeldAction } from "./eatFromHeldAction.ts";
+import { executeDrinkFromHeldAction } from "./drinkFromHeldAction.ts";
 import { executeEatFromEquipmentAction } from "./eatFromEquipmentAction.ts";
 import { executeStealFoodAction } from "./stealFoodAction.ts";
 import { executeWorkWindmillAction } from "./workWindmillAction.ts";
@@ -89,6 +90,8 @@ export const executeAction: BehaviorActionExecutor = (
             return executeHarvestCropAction(action, entity);
         case "eatFromHeld":
             return executeEatFromHeldAction(action, entity);
+        case "drinkFromHeld":
+            return executeDrinkFromHeldAction(action, entity);
         case "eatFromEquipment":
             return executeEatFromEquipmentAction(action, entity);
         case "stealFood":

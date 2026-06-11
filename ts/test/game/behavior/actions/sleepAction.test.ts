@@ -13,6 +13,10 @@ import {
     executeSleepAction,
     type SleepActionData,
 } from "../../../../src/game/behavior/actions/sleepAction.ts";
+import {
+    createHealthComponent,
+    HealthComponentId,
+} from "../../../../src/game/component/healthComponent.ts";
 
 function createSleeper(energy: number = 0, maxEnergy: number = 100): Entity {
     const root = new Entity("root");
@@ -127,6 +131,92 @@ describe("executeSleepAction", () => {
         };
 
         executeSleepAction(makeSleepAction(10, 100), worker);
+
+        assert.strictEqual(invalidated, true);
+    });
+});
+
+describe("executeSleepAction healing", () => {
+    function createWoundedSleeper(
+        currentHp: number,
+        maxHp: number = 200,
+    ): Entity {
+        const worker = createSleeper(20);
+        worker.setEcsComponent(createHealthComponent(currentHp, maxHp));
+        return worker;
+    }
+
+    it("house quality heals 4 hp per tick", () => {
+        const worker = createWoundedSleeper(100);
+        const action = makeSleepAction(10, 100, "house");
+
+        executeSleepAction(action, worker);
+
+        const health = worker.requireEcsComponent(HealthComponentId);
+        assert.strictEqual(health.currentHp, 104);
+    });
+
+    it("bedrollFire quality accumulates fractional heals to 5 hp over 2 ticks", () => {
+        const worker = createWoundedSleeper(100);
+        const action = makeSleepAction(8, 80, "bedrollFire");
+
+        executeSleepAction(action, worker);
+        const health = worker.requireEcsComponent(HealthComponentId);
+        assert.strictEqual(health.currentHp, 102);
+        assert.strictEqual(action.healAccumulator, 0.5);
+
+        executeSleepAction(action, worker);
+        assert.strictEqual(health.currentHp, 105);
+        assert.strictEqual(action.healAccumulator, 0);
+    });
+
+    it("collapse quality heals 1 hp over 2 ticks instead of rounding to zero", () => {
+        const worker = createWoundedSleeper(100);
+        const action = makeSleepAction(2, 30, "collapse");
+
+        executeSleepAction(action, worker);
+        const health = worker.requireEcsComponent(HealthComponentId);
+        assert.strictEqual(health.currentHp, 100);
+        assert.strictEqual(action.healAccumulator, 0.5);
+
+        executeSleepAction(action, worker);
+        assert.strictEqual(health.currentHp, 101);
+    });
+
+    it("does not heal past maxHp", () => {
+        const worker = createWoundedSleeper(199);
+        const action = makeSleepAction(10, 100, "house");
+
+        executeSleepAction(action, worker);
+
+        const health = worker.requireEcsComponent(HealthComponentId);
+        assert.strictEqual(health.currentHp, 200);
+    });
+
+    it("runs without a health component", () => {
+        const worker = createSleeper(20);
+        const action = makeSleepAction(10, 100, "house");
+
+        const result = executeSleepAction(action, worker);
+
+        assert.strictEqual(result.kind, "running");
+    });
+
+    it("invalidates the health component when whole hp lands", () => {
+        const worker = createWoundedSleeper(100);
+        const root = worker.getRootEntity();
+
+        let invalidated = false;
+        root.entityEvent = (event) => {
+            if (
+                event.id === "component_updated" &&
+                event.item.id === HealthComponentId
+            ) {
+                invalidated = true;
+            }
+        };
+
+        executeSleepAction(makeSleepAction(10, 100, "house"), worker);
 
         assert.strictEqual(invalidated, true);
     });

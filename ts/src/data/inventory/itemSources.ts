@@ -6,6 +6,7 @@ import { bakerRecipes } from "../crafting/recipes/bakerRecipes.ts";
 import { tailorRecipes } from "../crafting/recipes/tailorRecipes.ts";
 import { workshopRecipes } from "../crafting/recipes/workshopRecipes.ts";
 import { quarryRecipes } from "../crafting/recipes/quarryRecipes.ts";
+import { enchanterRecipes } from "../crafting/recipes/enchanterRecipes.ts";
 import { NaturalResources } from "./items/naturalResource.ts";
 import { wheatResourceItem } from "./items/resources.ts";
 
@@ -48,6 +49,7 @@ const recipeBuildingSets: {
     { recipes: tailorRecipes, buildingName: "Tailor" },
     { recipes: workshopRecipes, buildingName: "Workshop" },
     { recipes: quarryRecipes, buildingName: "Quarry" },
+    { recipes: enchanterRecipes, buildingName: "Enchanter" },
 ];
 
 /**

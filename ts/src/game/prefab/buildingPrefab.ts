@@ -41,6 +41,8 @@ import { baker } from "../../data/building/food/baker.ts";
 import { bakerRecipes } from "../../data/crafting/recipes/bakerRecipes.ts";
 import { workshop } from "../../data/building/stone/workshop.ts";
 import { workshopRecipes } from "../../data/crafting/recipes/workshopRecipes.ts";
+import { enchanter } from "../../data/building/gold/enchanter.ts";
+import { enchanterRecipes } from "../../data/crafting/recipes/enchanterRecipes.ts";
 import { buildingGlowLightSource } from "../../data/light/lightSourceDefinition.ts";
 import {
     createLightSourceComponent,
@@ -168,6 +170,14 @@ export function applyFunctionalComponents(
     }
     if (building.id == workshop.id) {
         entity.setEcsComponent(createCraftingComponent(workshopRecipes));
+        entity.setEcsComponent(createInventoryComponent());
+        entity.setEcsComponent(createWorkplaceComponent());
+        entity.invalidateComponent(CraftingComponentId);
+        entity.invalidateComponent(InventoryComponentId);
+        entity.invalidateComponent(WorkplaceComponentId);
+    }
+    if (building.id == enchanter.id) {
+        entity.setEcsComponent(createCraftingComponent(enchanterRecipes));
         entity.setEcsComponent(createInventoryComponent());
         entity.setEcsComponent(createWorkplaceComponent());
         entity.invalidateComponent(CraftingComponentId);

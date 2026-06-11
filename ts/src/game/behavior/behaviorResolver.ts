@@ -10,6 +10,7 @@ import { createPerformJobBehavior } from "./behaviors/PerformJobBehavior.ts";
 import { createDepositHeldBehavior } from "./behaviors/DepositHeldBehavior.ts";
 import { createRestockBehavior } from "./behaviors/RestockBehavior.ts";
 import { createEatBehavior } from "./behaviors/eatBehavior.ts";
+import { createDrinkPotionBehavior } from "./behaviors/drinkPotionBehavior.ts";
 import { createEngageInCombatBehavior } from "./behaviors/engageInCombatBehavior.ts";
 import { createStepOutsideBehavior } from "./behaviors/StepOutsideBehavior.ts";
 import { planBuildBuilding } from "../job/planner/buildBuildingPlanner.ts";
@@ -48,6 +49,7 @@ export function createBehaviorResolver(): BehaviorResolver {
         createEngageInCombatBehavior(),
         createSleepBehavior(),
         createEatBehavior(),
+        createDrinkPotionBehavior(),
         createPerformJobBehavior(planBuildBuilding, canExecuteBuildJob, true),
         createDepositHeldBehavior(),
         createRestockBehavior(),
