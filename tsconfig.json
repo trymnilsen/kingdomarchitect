@@ -25,6 +25,7 @@
       "strictBindCallApply": true,
       "target": "ES2022",
       "erasableSyntaxOnly": true,
+      "verbatimModuleSyntax": true,
       "rewriteRelativeImportExtensions": true
     },
     "include": [
