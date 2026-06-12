@@ -11,6 +11,7 @@ import { PlayerKingdomComponentId } from "../../../../../component/playerKingdom
 import { getSettlementEntity } from "../../../../../entity/settlementQueries.ts";
 import { spriteRefs } from "../../../../../../asset/sprite.ts";
 import { DismantleBuildingCommand } from "../../../../../../server/message/command/dismantleBuildingCommand.ts";
+import { ConfirmMessageState } from "../../../common/confirmMessageState.ts";
 
 /**
  * Adds a button to every building that lets the player remove it. Labelled
@@ -39,6 +40,11 @@ export class DismantleSelectionProvider implements ActorSelectionProvider {
         }
 
         const text = buildingComponent.scaffolded ? "Cancel" : "Dismantle";
+        const dispatchDismantle = () => {
+            stateContext.commandDispatcher(
+                DismantleBuildingCommand(selection.entity.id),
+            );
+        };
 
         return {
             left: [],
@@ -47,8 +53,23 @@ export class DismantleSelectionProvider implements ActorSelectionProvider {
                     text,
                     icon: spriteRefs.empty_sprite,
                     onClick: () => {
-                        stateContext.commandDispatcher(
-                            DismantleBuildingCommand(selection.entity.id),
+                        // Cancelling a scaffolded building is low-stakes,
+                        // only confirm dismantling a completed one.
+                        if (buildingComponent.scaffolded) {
+                            dispatchDismantle();
+                            return;
+                        }
+
+                        stateContext.stateChanger.push(
+                            new ConfirmMessageState(
+                                "Dismantle",
+                                "Dismantle this building?",
+                            ),
+                            (result) => {
+                                if (result === true) {
+                                    dispatchDismantle();
+                                }
+                            },
                         );
                     },
                 },
