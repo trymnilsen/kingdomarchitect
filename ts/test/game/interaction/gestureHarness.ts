@@ -92,7 +92,9 @@ export function createGestureHarness(): GestureHarness {
         handler.onDraw(scope);
     };
 
-    wireGameInput(touchInput, handler, camera, render);
+    // Headless: no animation frames, so pan renders synchronously like the
+    // discrete gestures — the harness asserts routing, not render coalescing.
+    wireGameInput(touchInput, handler, camera, render, render);
 
     // The push and state accessors reach into the handler's private history;
     // the handler exposes no public way to seed a specific state for a test.

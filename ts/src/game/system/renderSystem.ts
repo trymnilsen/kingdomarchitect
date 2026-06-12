@@ -44,10 +44,19 @@ import {
     stampPerceptionFloor,
 } from "../vision/revealFootprint.ts";
 import { perceivedBandAt } from "../vision/perceivedBand.ts";
+import { forEachComponentWithin } from "../component/chunkMapComponent.ts";
 
 export const renderSystem: EcsSystem = {
     onRender,
 };
+
+/**
+ * Reused across frames to gather the visible sprites for depth sorting without
+ * allocating a fresh array (and the chunk helper's intermediate array, and a
+ * result map) on every render. Render is never reentrant, so a single shared
+ * buffer is safe; it is cleared at the start of each gather.
+ */
+const visibleSpriteScratch: [Entity, SpriteComponent][] = [];
 
 function onRender(
     rootEntity: Entity,
@@ -64,33 +73,32 @@ function onRender(
         visibilityMap.visibility.clear();
         visibilityMap.perceptionFloor.clear();
         //TODO: this might be able to piggyback of sprites? Are there entities without sprites but with visibility?
-        const visibilityComponents = rootEntity.queryComponentsWithin(
+        forEachComponentWithin(
+            rootEntity,
             viewport,
             VisibilityComponentId,
-        );
-        for (const visibilityComponent of visibilityComponents) {
-            // An entity reveals where it can look and where it casts light, so the
-            // reach set carries that whole footprint (base sight union own light).
-            // perceivedBandAt then takes min(reach, illumination) over it.
-            const offsets = revealFootprintOffsets(visibilityComponent[0]);
-            const visiblePoints = offsetPatternWithPoint(
-                visibilityComponent[0].worldPosition,
-                offsets,
-            );
-            for (let i = 0; i < visiblePoints.length; i++) {
-                const numberId = makeNumberId(
-                    visiblePoints[i].x,
-                    visiblePoints[i].y,
+            (entity) => {
+                // An entity reveals where it can look and where it casts light,
+                // so the reach set carries that whole footprint (base sight union
+                // own light). perceivedBandAt then takes min(reach, illumination)
+                // over it.
+                const offsets = revealFootprintOffsets(entity);
+                const visiblePoints = offsetPatternWithPoint(
+                    entity.worldPosition,
+                    offsets,
                 );
-                visibilityMap.visibility.add(numberId);
-            }
-            // A viewer's minimal perception floors its immediate tiles above
-            // darkness without lighting them.
-            stampPerceptionFloor(
-                visibilityComponent[0],
-                visibilityMap.perceptionFloor,
-            );
-        }
+                for (let i = 0; i < visiblePoints.length; i++) {
+                    const numberId = makeNumberId(
+                        visiblePoints[i].x,
+                        visiblePoints[i].y,
+                    );
+                    visibilityMap.visibility.add(numberId);
+                }
+                // A viewer's minimal perception floors its immediate tiles above
+                // darkness without lighting them.
+                stampPerceptionFloor(entity, visibilityMap.perceptionFloor);
+            },
+        );
     }
 
     // Gather the illumination inputs once per frame: the band of any tile is the
@@ -103,15 +111,23 @@ function onRender(
     if (tiles && visibilityMap) {
         drawTiles(tiles, renderScope, visibilityMap, emitters, phase, rootEntity);
     }
-    const query = rootEntity.queryComponentsWithin(viewport, SpriteComponentId);
-
-    const sortedSprites = Array.from(query.entries()).sort(
-        compareSpriteStacking,
+    visibleSpriteScratch.length = 0;
+    forEachComponentWithin(
+        rootEntity,
+        viewport,
+        SpriteComponentId,
+        (entity, sprite) => {
+            visibleSpriteScratch.push([entity, sprite]);
+        },
     );
+    // compareSpriteStacking reads depth from the paired component, so the sort
+    // needs the [entity, sprite] pairs (not bare entities) and stays free of any
+    // getEcsComponent in the comparator.
+    visibleSpriteScratch.sort(compareSpriteStacking);
 
-    for (let i = 0; i < sortedSprites.length; i++) {
-        const sprite = sortedSprites[i][1];
-        const position = sortedSprites[i][0].worldPosition;
+    for (let i = 0; i < visibleSpriteScratch.length; i++) {
+        const sprite = visibleSpriteScratch[i][1];
+        const position = visibleSpriteScratch[i][0].worldPosition;
         // An entity is shown only where the player can actually see it: in reach
         // and lit (bright or dim). On dark tiles it is hidden, even when an emitter
         // is within sight range.

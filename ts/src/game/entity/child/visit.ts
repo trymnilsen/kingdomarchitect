@@ -11,21 +11,25 @@ export function visitChildren(
     entity: Entity,
     visitor: (entity: Entity) => boolean,
 ): void {
+    // Breadth-first queue with a moving head index rather than Array.shift().
+    // shift() reindexes the whole array on every dequeue, making a full walk
+    // O(n^2); advancing a head cursor keeps each dequeue O(1) while preserving
+    // the exact breadth-first visit order callers like firstChildWhere and
+    // entityWithId depend on.
     const searchEntities = [entity];
+    let head = 0;
 
-    while (searchEntities.length > 0) {
-        // Pick the first entity in the search list
-        const entity = searchEntities.shift();
-        if (!entity) {
-            return;
-        }
-        const shouldStopAfterVisit = visitor(entity);
+    while (head < searchEntities.length) {
+        const current = searchEntities[head];
+        head++;
+
+        const shouldStopAfterVisit = visitor(current);
         if (shouldStopAfterVisit) {
             break;
         }
 
         // Add the children of this entity to nodes to search
-        for (const child of entity.children) {
+        for (const child of current.children) {
             searchEntities.push(child);
         }
     }

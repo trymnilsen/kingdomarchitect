@@ -1,5 +1,4 @@
 import { removeItem } from "../../common/array.ts";
-import type { Bounds } from "../../common/bounds.ts";
 import { InvalidArgumentError } from "../../common/error/invalidArgumentError.ts";
 import {
     type Point,
@@ -34,6 +33,18 @@ export class Entity {
     private _worldPosition: Point = zeroPoint();
     private _entityEvents?: (event: EntityEvent) => void;
     private _ecsComponents = new Map<string, Components>();
+    /**
+     * Lazily-built cache of `queryComponents` results for this entity's subtree,
+     * keyed by component id. A miss runs the `visitChildren` walk once and stores
+     * the resulting map; subsequent identical queries return the same map without
+     * re-walking. Invalidated by {@link invalidateQueryCache} on the entity events
+     * this entity receives (only membership changes matter — see that method).
+     *
+     * Runtime-only: it is rebuilt from the live tree and is never serialized
+     * (persistence walks `_ecsComponents` and children, not this field). Only
+     * entities actually queried (in practice the root) ever allocate one.
+     */
+    private _queryCache?: Map<ComponentID, Map<Entity, Components>>;
     private _gameTime?: GameTime;
     readonly id: EntityId;
 
@@ -303,10 +314,29 @@ export class Entity {
 
     setEcsComponent(ecsComponent: Components & BaseComponent) {
         this._ecsComponents.set(ecsComponent.id, ecsComponent);
+        // component_added carries upsert semantics for the query cache: it is
+        // emitted on both a first add and a replace, and the cache does
+        // `map.set(source, item)` either way, which correctly overwrites a stale
+        // reference on replace. `updateComponent` never reaches here (it mutates
+        // in place), so it never changes a component's reference.
+        this.bubbleEvent({
+            id: "component_added",
+            source: this,
+            item: ecsComponent,
+        });
     }
 
     removeEcsComponent(componentId: ComponentID) {
+        const removed = this._ecsComponents.get(componentId);
+        if (!removed) {
+            return;
+        }
         this._ecsComponents.delete(componentId);
+        this.bubbleEvent({
+            id: "component_removed",
+            source: this,
+            item: removed,
+        });
     }
 
     getEcsComponent<ID extends ComponentID>(
@@ -384,31 +414,26 @@ export class Entity {
     queryComponents<ID extends ComponentID>(
         componentId: ID,
     ): ReadonlyMap<Entity, Extract<Components, { id: ID }>> {
-        //How do we avoid three (or two when old is removed) caches
-        const map = new Map<Entity, Extract<Components, { id: ID }>>();
+        let cached = this._queryCache?.get(componentId);
+        if (!cached) {
+            cached = new Map<Entity, Components>();
+            visitChildren(this, (child) => {
+                const matchingComponent = child.getEcsComponent(componentId);
+                if (matchingComponent) {
+                    cached!.set(child, matchingComponent);
+                }
+                return false;
+            });
+            (this._queryCache ??= new Map()).set(componentId, cached);
+        }
 
-        visitChildren(this, (child) => {
-            const matchingComponent = child.getEcsComponent(componentId);
-            if (matchingComponent) {
-                map.set(
-                    child,
-                    matchingComponent as Extract<Components, { id: ID }>,
-                );
-            }
-            return false;
-        });
-
-        return map;
-    }
-
-    queryComponentsWithin<ID extends ComponentID>(
-        _bounds: Bounds,
-        componentId: ID,
-    ): ReadonlyMap<Entity, Extract<Components, { id: ID }>> {
-        //TODO: Return only inside bounds based on the chunk map resource
-        //TODO: We should return a structure, like a sparse set or something
-        //that allows us to quickly iterate over them
-        return this.queryComponents(componentId);
+        // All entries under a given id key carry that component type; the cache
+        // stores the erased `Components` union and we narrow on the way out, the
+        // same cast the uncached walk used to do per entry.
+        return cached as unknown as ReadonlyMap<
+            Entity,
+            Extract<Components, { id: ID }>
+        >;
     }
 
     /**
@@ -465,42 +490,7 @@ export class Entity {
     }
 
     bubbleEvent(event: EntityEvent) {
-        /*
-        try {
-            if (!!this._componentsQueryCache2) {
-                switch (event.id) {
-                    case "child_added":
-                        this._componentsQueryCache2.addEntity(event.target);
-                        break;
-                    case "child_removed":
-                        this._componentsQueryCache2.removeEntity(event.target);
-                        break;
-                    case "component_added":
-                        this._componentsQueryCache2.addComponent(event.item);
-                        break;
-                    case "component_removed":
-                        this._componentsQueryCache2.removeComponent(event.item);
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            if (!!this._componentsQueryCache) {
-                if (event.id == "child_added" || event.id == "child_removed") {
-                    this._componentsQueryCache.clearAll();
-                } else if (
-                    event.id == "component_added" ||
-                    event.id == "component_removed"
-                ) {
-                    const constructorFn = Object.getPrototypeOf(event.item);
-                    this._componentsQueryCache.clearEntry(constructorFn);
-                }
-            }
-
-            this._entityEvents.publish(event);
-            this._parent?.bubbleEvent(event);
-        }*/
+        this.invalidateQueryCache(event);
         if (!!this._entityEvents) {
             try {
                 this._entityEvents(event);
@@ -513,6 +503,44 @@ export class Entity {
             }
         }
         this._parent?.bubbleEvent(event);
+    }
+
+    /**
+     * Keeps this entity's {@link _queryCache} consistent as events bubble past
+     * it. `bubbleEvent` runs on the source entity and then every ancestor, so an
+     * ancestor whose subtree changed deep below invalidates its own cache here.
+     *
+     * Only membership changes matter:
+     *  - `component_added` / `component_removed` upsert / delete the one
+     *    (entity → component) entry, leaving every other cached query intact.
+     *  - `child_added` / `child_removed` can change many component ids at once,
+     *    so the whole cache is dropped and rebuilt lazily.
+     *
+     * `component_updated` and `transform` are deliberately ignored:
+     * `updateComponent` mutates the component in place (same reference, same
+     * membership) so the cached map is still correct, and these two are the
+     * per-tick hot events — reacting to them would thrash the cache every frame
+     * for no benefit.
+     */
+    private invalidateQueryCache(event: EntityEvent) {
+        const cache = this._queryCache;
+        if (!cache) {
+            return;
+        }
+        switch (event.id) {
+            case "component_added":
+                cache.get(event.item.id)?.set(event.source, event.item);
+                break;
+            case "component_removed":
+                cache.get(event.item.id)?.delete(event.source);
+                break;
+            case "child_added":
+            case "child_removed":
+                cache.clear();
+                break;
+            default:
+                break;
+        }
     }
 }
 

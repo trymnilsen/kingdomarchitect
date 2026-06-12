@@ -47,6 +47,16 @@ export class Game {
     private visibilityMap: RenderVisibilityMap = new RenderVisibilityMap();
     private gameServer: GameServerConnection;
     private domElementWrapperSelector: string;
+    /**
+     * Handle of the animation frame scheduled to render the in-progress drag,
+     * or null when none is pending. Panning mutates the camera synchronously on
+     * every native move event but renders at most once per frame: the many move
+     * events that arrive between paints coalesce into a single render of the
+     * latest camera state. This is scoped to an active gesture — a frame is only
+     * ever requested in response to a move, and nothing reschedules once the
+     * finger stops — so it is not a persistent render loop.
+     */
+    private panRenderHandle: number | null = null;
 
     constructor(
         domElementWrapperSelector: string,
@@ -165,7 +175,11 @@ export class Game {
             this.touchInput,
             this.interactionHandler,
             this.renderer.camera,
-            () => this.render(DrawMode.Gesture),
+            // Discrete gestures (tap down/up/cancel) render immediately; panning
+            // coalesces its render onto the next animation frame so a burst of
+            // move events between paints draws once.
+            () => this.renderGesture(),
+            () => this.requestPanRender(),
         );
 
         this.input.onInput.listen((inputEvent) => {
@@ -192,6 +206,39 @@ export class Game {
 
     private onInput(inputEvent: InputEvent) {
         this.interactionHandler.onInput(inputEvent.action);
+        this.render(DrawMode.Gesture);
+    }
+
+    /**
+     * Schedule a single gesture render on the next animation frame. If one is
+     * already scheduled this is a no-op, so a burst of move events between
+     * paints collapses to one render of the latest (already-applied) camera.
+     */
+    private requestPanRender() {
+        if (this.panRenderHandle !== null) {
+            return;
+        }
+        this.panRenderHandle = requestAnimationFrame(() => {
+            this.panRenderHandle = null;
+            this.render(DrawMode.Gesture);
+        });
+    }
+
+    private cancelPanRender() {
+        if (this.panRenderHandle !== null) {
+            cancelAnimationFrame(this.panRenderHandle);
+            this.panRenderHandle = null;
+        }
+    }
+
+    /**
+     * Render a discrete gesture (tap down/up/cancel) right away. Any frame still
+     * queued for an in-progress drag is superseded by this paint, so it is
+     * cancelled to avoid a redundant draw on the next animation frame. The
+     * immediate render at the end of a gesture also lands the final position.
+     */
+    private renderGesture() {
+        this.cancelPanRender();
         this.render(DrawMode.Gesture);
     }
 
