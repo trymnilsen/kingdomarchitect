@@ -1,10 +1,10 @@
 import {
-    SpriteDefinition,
+    type SpriteDefinition,
     SPRITE_W,
     SPRITE_H,
 } from "../../src/asset/sprite.ts";
-import { UILayoutScope } from "../../src/ui/uiLayoutContext.ts";
-import { UISize } from "../../src/ui/uiSize.ts";
+import { type UILayoutScope } from "../../src/ui/uiLayoutContext.ts";
+import { type UISize } from "../../src/ui/uiSize.ts";
 import { UIView } from "../../src/ui/uiView.ts";
 
 /**

@@ -1,4 +1,4 @@
-import { isPointAdjacentTo, Point } from "../../../src/common/point.ts";
+import { isPointAdjacentTo, type Point } from "../../../src/common/point.ts";
 import { Entity } from "../../../src/game/entity/entity.ts";
 
 export class EntityTestProxy {

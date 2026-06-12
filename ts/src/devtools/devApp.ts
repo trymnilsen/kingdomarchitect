@@ -109,13 +109,20 @@ export class DevApp {
             return handled;
         };
 
+        this.touchInput.onPan = (_movement, position) => {
+            this.uiRenderer.onPointerMove(position);
+            this.render();
+        };
+
         this.touchInput.onTapEnd = (tapEndEvent) => {
-            if (tapEndEvent.wasDragging) {
-                // Drop the press without running a tap, since this was a drag.
-                this.uiRenderer.onPointerCancel();
-            } else {
-                this.uiRenderer.onPointerUp(tapEndEvent.position);
-            }
+            // A drag that releases back on the pressed component still taps,
+            // so the up always goes through onPointerUp.
+            this.uiRenderer.onPointerUp(tapEndEvent.position);
+            this.render();
+        };
+
+        this.touchInput.onTapCancel = () => {
+            this.uiRenderer.onPointerCancel();
             this.render();
         };
     }

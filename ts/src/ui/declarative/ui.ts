@@ -216,8 +216,9 @@ export class UiRenderer {
     }
 
     /**
-     * Begins a press at `point`. Records the interactive chain under the point
-     * so every component in it reads as pressed on the next render.
+     * Begins a press at `point`. The interactive chain under the point becomes
+     * the captured chain: it owns the gesture until release and every node in
+     * it reads as pressed on the next render.
      *
      * @returns true when the press landed on an interactive component. Callers
      *     use this to decide whether something outside the UI should also handle
@@ -225,56 +226,63 @@ export class UiRenderer {
      */
     public onPointerDown(point: Point): boolean {
         const chain = this.interactiveChainAt(point);
-        this.pointer.setPressed(chain);
+        this.pointer.beginCapture(chain);
         return chain.length > 0;
     }
 
     /**
+     * Tracks the pointer during a press. Captured components un-press as the
+     * pointer slides off them and re-press when it slides back, but stay
+     * eligible to tap on release the whole gesture. Does nothing without a
+     * capture in progress.
+     */
+    public onPointerMove(point: Point): void {
+        if (!this.pointer.hasCapture()) {
+            // Future home for hover: hit-test and setHovered here.
+            return;
+        }
+        this.pointer.moveCapture(this.interactiveChainAt(point));
+    }
+
+    /**
      * Ends a press at `point`. Runs the onTap of the innermost component that
-     * was pressed and released on, then clears the press.
+     * was captured on down and is under the release point, then ends the
+     * capture.
      *
-     * @returns true when a tap handler ran.
+     * @returns true when the UI owns this gesture — the press began on an
+     *     interactive component — whether or not a tap handler ran. A captured
+     *     gesture is absorbed entirely so a release that slid off the pressed
+     *     component never falls through to whatever is behind the UI.
      */
     public onPointerUp(point: Point): boolean {
         const upChain = this.interactiveChainAt(point);
 
-        let handled = false;
         // Innermost first: the deepest component that saw both down and up wins.
         for (let i = upChain.length - 1; i >= 0; i--) {
             const node = upChain[i];
             const nodeHooks = this.hooks.get(node);
-            if (nodeHooks?.onTap && this.pointer.isPressed(node)) {
+            if (nodeHooks?.onTap && this.pointer.isCaptured(node)) {
                 nodeHooks.onTap();
-                handled = true;
                 break;
             }
         }
 
-        // Occlusion: even when no handler ran, a tap that landed on an
-        // interactive surface (a backgrounded box) is absorbed rather than
-        // passed through to whatever is behind it. This is checked only after
-        // the handler loop, so a solid surface never steals a tap from an
-        // interactive ancestor that does have an onTap.
-        if (!handled) {
-            for (const node of upChain) {
-                if (this.pointer.isPressed(node)) {
-                    handled = true;
-                    break;
-                }
-            }
-        }
-
-        this.pointer.clearPressed();
+        // A gesture that began on an interactive surface (a button, but also a
+        // backgrounded box with no handler) belongs to the UI from down to up,
+        // so it is absorbed rather than passed through to whatever is behind
+        // it. This also holds when the captured subtree unmounted mid-press.
+        const handled = this.pointer.hasCapture();
+        this.pointer.endCapture();
         return handled;
     }
 
     /**
-     * Drops the current press without running a tap. Called when the gesture
-     * turns into a drag, the pointer leaves, or the touch is cancelled. This is
-     * what stops a component from getting stuck looking pressed.
+     * Drops the current press without running a tap. Reserved for genuine
+     * cancels: the touch is taken over by the system or the tree is torn down.
+     * A drag no longer cancels the press, it moves it, see onPointerMove.
      */
     public onPointerCancel(): void {
-        this.pointer.clearPressed();
+        this.pointer.endCapture();
     }
 
     /** Hit-tests the current tree for the interactive chain under `point`. */

@@ -1,5 +1,6 @@
 import { log } from "../common/logging/logger.ts";
-import { distance, Point, subtractPoint } from "../common/point.ts";
+import { distance, subtractPoint } from "../common/point.ts";
+import type { Point } from "../common/point.ts";
 
 export type OnPanEvent = {
     movement: Point;
@@ -35,6 +36,7 @@ export class TouchInput {
     onStartDrag: OnStartDragCallback | null = null;
     onTapEnd: OnTapCallback | null = null;
     onTapDown: OnTapDownCallback | null = null;
+    onTapCancel: (() => void) | null = null;
 
     constructor(canvasElement: HTMLCanvasElement) {
         canvasElement.addEventListener(
@@ -94,17 +96,6 @@ export class TouchInput {
             { passive: false },
         );
         canvasElement.addEventListener(
-            "mouseout",
-            (event) => {
-                event.preventDefault();
-                this.onTapEnded({
-                    x: event.clientX,
-                    y: event.clientY,
-                });
-            },
-            { passive: false },
-        );
-        canvasElement.addEventListener(
             "mouseup",
             (event) => {
                 event.preventDefault();
@@ -127,7 +118,7 @@ export class TouchInput {
             "touchcancel",
             (event) => {
                 event.preventDefault();
-                this.onTapEnded();
+                this.onTapCancelled();
             },
             { passive: false },
         );
@@ -162,6 +153,27 @@ export class TouchInput {
         this.previousMovePosition = position;
     }
 
+    private resetGesture() {
+        this.tapHandled = false;
+        this.isDragging = false;
+        this.onTapPosition = null;
+        this.previousMovePosition = null;
+    }
+
+    private onTapCancelled() {
+        try {
+            // The system took the touch over. Unlike an up this must never
+            // count as a tap, so it gets its own callback instead of onTapEnd.
+            if (this.onTapCancel && this.onTapPosition) {
+                this.onTapCancel();
+            }
+        } catch (err) {
+            log.error("Failed cancelling tap", { error: err });
+        } finally {
+            this.resetGesture();
+        }
+    }
+
     private onTapEnded(position: Point | null | undefined = undefined) {
         try {
             position = position ?? this.previousMovePosition;
@@ -180,10 +192,7 @@ export class TouchInput {
         } catch (err) {
             log.error("Failed ending tap", { error: err });
         } finally {
-            this.tapHandled = false;
-            this.isDragging = false;
-            this.onTapPosition = null;
-            this.previousMovePosition = null;
+            this.resetGesture();
         }
     }
 }

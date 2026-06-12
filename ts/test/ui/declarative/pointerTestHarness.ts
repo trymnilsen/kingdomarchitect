@@ -29,9 +29,11 @@ export type PointerHarness = {
     render(descriptor: ComponentDescriptor | null): void;
     /** @returns whether the press landed on an interactive component. */
     pointerDown(point: Point): boolean;
-    /** @returns whether a tap handler ran. */
+    /** Move the pointer during a press, as on a drag. */
+    pointerMove(point: Point): void;
+    /** @returns whether the UI owned the gesture, see UiRenderer.onPointerUp. */
     pointerUp(point: Point): boolean;
-    /** Abandon the current press, as on a drag or cancel. */
+    /** Abandon the current press, as on a system-cancelled touch. */
     pointerCancel(): void;
     /** Rectangles drawn during the most recent render, in draw order. */
     rects: CapturedRect[];
@@ -82,6 +84,7 @@ export function createPointerHarness(
             renderer.renderComponent(descriptor);
         },
         pointerDown: (point) => renderer.onPointerDown(point),
+        pointerMove: (point) => renderer.onPointerMove(point),
         pointerUp: (point) => renderer.onPointerUp(point),
         pointerCancel: () => renderer.onPointerCancel(),
         rects,

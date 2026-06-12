@@ -1,11 +1,11 @@
-import { Point } from "../../../common/point.ts";
+import { type Point } from "../../../common/point.ts";
 import { GameTime } from "../../../common/time.ts";
 import { AssetLoader } from "../../../asset/loader/assetLoader.ts";
-import { InputAction, InputActionType } from "../../../input/inputAction.ts";
-import { OnTapEndEvent } from "../../../input/touchInput.ts";
+import { type InputAction, InputActionType } from "../../../input/inputAction.ts";
+import { type OnTapEndEvent } from "../../../input/touchInput.ts";
 import { SelectedEntityItem } from "../selection/selectedEntityItem.ts";
 import { SelectedTileItem } from "../selection/selectedTileItem.ts";
-import { SelectedWorldItem } from "../selection/selectedWorldItem.ts";
+import { type SelectedWorldItem } from "../selection/selectedWorldItem.ts";
 import type {
     ComponentDescriptor,
     UiRenderer,
@@ -22,7 +22,7 @@ import { Entity } from "../../entity/entity.ts";
 import { SelectionState } from "../state/selection/selectionState.ts";
 import { CommitableInteractionStateChanger } from "./interactionStateChanger.ts";
 import { InteractionStateHistory } from "./interactionStateHistory.ts";
-import { StateContext } from "./stateContext.ts";
+import { type StateContext } from "./stateContext.ts";
 import type { GameSaveCapability } from "../../../server/gameServerConnection.ts";
 import type { GameCommand } from "../../../server/message/gameCommand.ts";
 import { queryEntity } from "../../map/query/queryEntity.ts";
@@ -205,10 +205,18 @@ export class InteractionHandler {
     }
 
     onTapPan(movement: Point, position: Point, startPosition: Point): void {
-        // Cancel any in-progress UI press once the gesture becomes a drag, so a
-        // pressed component doesn't stay stuck as the pointer moves away.
-        this.uiRenderer.onPointerCancel();
+        // Let the UI press track the pointer. A press that slides off its
+        // component un-presses, slides back re-presses, and a release inside
+        // the component still taps even though the gesture crossed the drag
+        // threshold.
+        this.uiRenderer.onPointerMove(position);
         this.history.state.onTapPan(movement, position, startPosition);
+    }
+
+    onTapCancel(): void {
+        // The system took the touch (incoming call, browser gesture). Drop the
+        // press without ever running a tap.
+        this.uiRenderer.onPointerCancel();
     }
 
     onInput(inputAction: InputAction) {

@@ -1,10 +1,10 @@
 import { log } from "../common/logging/logger.ts";
-import { invert, multiplyPoint, Point } from "../common/point.ts";
+import { multiplyPoint, type Point } from "../common/point.ts";
 import { AssetLoader } from "../asset/loader/assetLoader.ts";
 
 import { GameTime } from "../common/time.ts";
 import { EcsWorld } from "../common/ecs/ecsWorld.ts";
-import { Input, InputEvent } from "../input/input.ts";
+import { Input, type InputEvent } from "../input/input.ts";
 import { TouchInput } from "../input/touchInput.ts";
 import { TileSize } from "./map/tile.ts";
 import { UiRenderer } from "../ui/declarative/ui.ts";
@@ -14,6 +14,7 @@ import { Renderer } from "../rendering/renderer.ts";
 import { RenderVisibilityMap } from "../rendering/renderVisibilityMap.ts";
 import type { GameServerConnection } from "../server/gameServerConnection.ts";
 import { InteractionHandler } from "./interaction/handler/interactionHandler.ts";
+import { wireGameInput } from "./gameInput.ts";
 import { chunkMapSystem } from "./system/chunkMapSystem.ts";
 import { pathfindingSystem } from "./system/pathfindingSystem.ts";
 import { renderSystem } from "./system/renderSystem.ts";
@@ -160,35 +161,12 @@ export class Game {
     }
 
     private setupInputListeners() {
-        this.touchInput.onTapDown = (position: Point) => {
-            const tapResult = this.interactionHandler.onTapDown(position);
-            this.render(DrawMode.Gesture);
-            return tapResult;
-        };
-
-        this.touchInput.onPan = (
-            movement: Point,
-            position: Point,
-            startPosition: Point,
-            downTapHandled: boolean,
-        ) => {
-            if (downTapHandled) {
-                this.interactionHandler.onTapPan(
-                    movement,
-                    position,
-                    startPosition,
-                );
-            } else {
-                this.renderer.camera.translate(invert(movement));
-            }
-
-            this.render(DrawMode.Gesture);
-        };
-
-        this.touchInput.onTapEnd = (tapEndEvent) => {
-            this.interactionHandler.onTapUp(tapEndEvent);
-            this.render(DrawMode.Gesture);
-        };
+        wireGameInput(
+            this.touchInput,
+            this.interactionHandler,
+            this.renderer.camera,
+            () => this.render(DrawMode.Gesture),
+        );
 
         this.input.onInput.listen((inputEvent) => {
             this.onInput(inputEvent);
