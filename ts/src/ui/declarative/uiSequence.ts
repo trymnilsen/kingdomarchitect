@@ -239,6 +239,7 @@ export type UiRowAndColumnProps = {
     gap?: number;
     mainAxisAlignment?: MainAxisAlignment;
     crossAxisAlignment?: CrossAxisAlignment;
+    key?: string | number;
 };
 
 // Public factory functions

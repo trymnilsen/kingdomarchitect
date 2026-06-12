@@ -6,8 +6,14 @@ import { OnTapEndEvent } from "../../../input/touchInput.ts";
 import { SelectedEntityItem } from "../selection/selectedEntityItem.ts";
 import { SelectedTileItem } from "../selection/selectedTileItem.ts";
 import { SelectedWorldItem } from "../selection/selectedWorldItem.ts";
-import type { UiRenderer } from "../../../ui/declarative/ui.ts";
+import type {
+    ComponentDescriptor,
+    UiRenderer,
+} from "../../../ui/declarative/ui.ts";
 import { uiBox } from "../../../ui/declarative/uiBox.ts";
+import { uiColumn } from "../../../ui/declarative/uiSequence.ts";
+import { uiScrim } from "../../../ui/declarative/uiScrim.ts";
+import { uiStack } from "../../../ui/declarative/uiStack.ts";
 import { fillUiSize } from "../../../ui/uiSize.ts";
 import { Camera } from "../../../rendering/camera.ts";
 import { RenderScope } from "../../../rendering/renderScope.ts";
@@ -23,7 +29,9 @@ import { queryEntity } from "../../map/query/queryEntity.ts";
 import { entitiesFrontToBack } from "../../component/spriteComponent.ts";
 import type { EcsWorld } from "../../../common/ecs/ecsWorld.ts";
 import { log } from "../../../common/logging/logger.ts";
-import { drawStatusBar } from "../view/uiStatusBar.ts";
+import { uiStatusBar } from "../view/uiStatusBar.ts";
+
+const SCRIM_COLOR = "rgba(20, 20, 20, 0.8)";
 
 /**
  * The interactionHandler recieves input taps and forward them to the currently
@@ -231,36 +239,58 @@ export class InteractionHandler {
         this.history.state.onUpdate(tick);
     }
 
-    onDraw(renderScope: RenderScope) {
-        //const start = performance.now();
-        //performance.mark("InteractionStateDraw");
-        if (this.history.state.isModal) {
-            renderScope.drawScreenSpaceRectangle({
-                x: 0,
-                y: 0,
-                width: renderScope.width,
-                height: renderScope.height,
-                fill: "rgba(20, 20, 20, 0.8)",
-            });
-        }
+    /**
+     * Builds the root HUD tree: an optional modal scrim layered behind a
+     * column holding the status bar on top and the current state's view
+     * filling the remaining space beside it.
+     *
+     * The tree is rebuilt every frame, so scrim visibility and the current
+     * state's view follow the interaction state automatically. The scrim is
+     * tap-transparent on purpose: modal dismissal stays in onTapDown/onTapUp.
+     */
+    private buildHudView(): ComponentDescriptor {
+        const state = this.history.state;
 
-        this.history.state.onDraw(renderScope);
-
-        drawStatusBar(renderScope, this.world.root);
+        const hudChildren: ComponentDescriptor[] = [
+            uiStatusBar({ root: this.world.root, key: "statusbar" }),
+        ];
 
         // Wrap the state's view in a keyed container to ensure proper reconciliation
         // Each interaction state gets a unique key so components don't persist across state transitions
-        const stateView = this.history.state.getView();
-        const wrappedView = stateView
-            ? uiBox({
-                  width: fillUiSize,
-                  height: fillUiSize,
-                  child: stateView,
-                  key: `state-${this.history.state.constructor.name}-${this.getStateInstanceId()}`,
-              })
-            : null;
+        const stateView = state.getView();
+        if (stateView) {
+            hudChildren.push(
+                uiBox({
+                    width: fillUiSize,
+                    height: fillUiSize,
+                    child: stateView,
+                    key: `state-${state.constructor.name}-${this.getStateInstanceId()}`,
+                }),
+            );
+        }
 
-        this.uiRenderer.renderComponent(wrappedView);
+        const hudColumn = uiColumn({
+            key: "hud",
+            width: fillUiSize,
+            height: fillUiSize,
+            children: hudChildren,
+        });
+
+        return uiStack({
+            width: fillUiSize,
+            height: fillUiSize,
+            children: state.isModal
+                ? [uiScrim({ color: SCRIM_COLOR, key: "scrim" }), hudColumn]
+                : [hudColumn],
+        });
+    }
+
+    onDraw(renderScope: RenderScope) {
+        //const start = performance.now();
+        //performance.mark("InteractionStateDraw");
+        this.history.state.onDraw(renderScope);
+
+        this.uiRenderer.renderComponent(this.buildHudView());
 
         //performance.mark("InteractionStateDrawEnd");
         /*performance.measure(

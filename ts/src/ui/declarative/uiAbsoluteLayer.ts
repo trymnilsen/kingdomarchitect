@@ -46,9 +46,13 @@ export const uiAbsoluteLayer = createComponent<UiAbsoluteLayerProps>(
                 overlay.child,
                 constraints,
             );
+            // Anchors are absolute screen coordinates, so the overlay is
+            // placed absolutely. This keeps anchoring correct even when the
+            // layer itself is nested away from the screen origin.
             placedChildren.push({
                 ...overlay.child,
                 size: childSize,
+                absolute: true,
                 offset: {
                     x: overlay.anchorX - Math.floor(childSize.width / 2),
                     y: overlay.anchorY - childSize.height,

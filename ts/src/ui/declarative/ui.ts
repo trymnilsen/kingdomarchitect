@@ -46,6 +46,8 @@ const _depsAreEqual = (a: any[] | undefined, b: any[] | undefined): boolean => {
 export type LayoutInfo = {
     offset: Point;
     region: Rectangle;
+    /** When true, offset is an absolute screen position, not parent-relative. */
+    absolute?: boolean;
 };
 
 export type UiNode = {
@@ -55,7 +57,16 @@ export type UiNode = {
     measurementSlots?: Map<any, UiNode>;
 };
 
-export type PlacedChild = ComponentDescriptor & { offset: Point; size: UISize };
+export type PlacedChild = ComponentDescriptor & {
+    /**
+     * Position of the child. Parent-relative unless `absolute` is true, in
+     * which case it is an absolute screen position exempt from the parent
+     * offset accumulation (used for world-anchored overlays).
+     */
+    offset: Point;
+    size: UISize;
+    absolute?: boolean;
+};
 
 export type LayoutResult = {
     size: UISize;
@@ -183,6 +194,7 @@ export class UiRenderer {
                 this._cleanupNode(oldTree);
             }
 
+            this.currentTree = null;
             return;
         }
 
@@ -335,6 +347,7 @@ export class UiRenderer {
                 }
 
                 childNode.layout.offset = placedChild.offset;
+                childNode.layout.absolute = placedChild.absolute === true;
                 // Apply the size the parent computed for this child. Without it
                 // the child would re-measure from its own props (like "fill
                 // parent") and ignore the size its parent chose.
@@ -356,6 +369,13 @@ export class UiRenderer {
                 };
                 return { width: 0, height: 0 };
             }
+            // A delegate child draws at its parent's position. Reset any
+            // placement left over from a previous frame where a reconciled
+            // node of the same type was a positioned layout child.
+            if (delegateChild.layout) {
+                delegateChild.layout.offset = zeroPoint();
+                delegateChild.layout.absolute = false;
+            }
             const delegateSize = this._executeNode(
                 delegateChild,
                 copiedConstraints,
@@ -363,7 +383,7 @@ export class UiRenderer {
             );
 
             const width = delegateChild.descriptor.props.width;
-            const height = delegateChild.descriptor.props.heigt;
+            const height = delegateChild.descriptor.props.height;
 
             const size = {
                 width: delegateSize.width,
@@ -468,7 +488,9 @@ export class UiRenderer {
         if (!node.layout) {
             throw new Error("Cannot draw ui not layouted");
         }
-        const absolutePosition = addPoint(parentPosition, node.layout.offset);
+        const absolutePosition = node.layout.absolute
+            ? node.layout.offset
+            : addPoint(parentPosition, node.layout.offset);
         node.layout.region.x = absolutePosition.x;
         node.layout.region.y = absolutePosition.y;
 

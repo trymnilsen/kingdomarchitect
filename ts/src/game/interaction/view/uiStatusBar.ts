@@ -1,69 +1,83 @@
-import type { RenderScope } from "../../../rendering/renderScope.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { DayComponentId } from "../../component/dayComponent.ts";
 import { BehaviorAgentComponentId } from "../../component/BehaviorAgentComponent.ts";
 import { PlayerUnitComponentId } from "../../component/playerUnitComponent.ts";
 import { statusbarTextStyle } from "../../../rendering/text/textStyle.ts";
+import { createComponent } from "../../../ui/declarative/ui.ts";
+import { uiBox } from "../../../ui/declarative/uiBox.ts";
+import {
+    uiRow,
+    MainAxisAlignment,
+    CrossAxisAlignment,
+} from "../../../ui/declarative/uiSequence.ts";
+import { uiText } from "../../../ui/declarative/uiText.ts";
+import { colorBackground } from "../../../ui/uiBackground.ts";
+import { fillUiSize } from "../../../ui/uiSize.ts";
 
 const BAR_HEIGHT = 28;
 const PADDING_X = 12;
 const BAR_FILL = "rgba(30, 30, 30, 1)";
 const IDLE_HIGHLIGHT = "#f0a040";
 
+const idleTextStyle = { ...statusbarTextStyle, color: IDLE_HIGHLIGHT };
+
+type UiStatusBarProps = {
+    root: Entity;
+    key?: string | number;
+};
+
 /**
- * Draws the top HUD strip showing phase, current day, and population.
- * Reads DayComponent from the root and queries player units for population counts.
+ * The top HUD strip showing phase, current day, and population.
+ * Reads DayComponent from the root and queries player units for population
+ * counts on each render.
  */
-export function drawStatusBar(renderScope: RenderScope, root: Entity): void {
-    const day = root.getEcsComponent(DayComponentId);
+export const uiStatusBar = createComponent<UiStatusBarProps>(
+    ({ props }) => {
+        const day = props.root.getEcsComponent(DayComponentId);
+        const phaseLabel = day ? capitalise(day.phase) : "Dawn";
+        const dayLabel = day ? `Day ${day.currentDay}` : "Day 1";
 
-    renderScope.drawScreenSpaceRectangle({
-        x: 0,
-        y: 0,
-        width: renderScope.width,
-        height: BAR_HEIGHT,
-        fill: BAR_FILL,
-    });
+        const { total, idle } = countPopulation(props.root);
 
-    const phaseLabel = day ? capitalise(day.phase) : "Dawn";
-    const dayLabel = day ? `Day ${day.currentDay}` : "Day 1";
-    const leftText = `${phaseLabel}  ·  ${dayLabel}`;
+        const rightTexts = [
+            uiText({
+                content: `People: ${total}`,
+                textStyle: statusbarTextStyle,
+            }),
+        ];
+        if (idle > 0) {
+            rightTexts.push(
+                uiText({
+                    content: ` (${idle} idle)`,
+                    textStyle: idleTextStyle,
+                }),
+            );
+        }
 
-    renderScope.drawScreenspaceText({
-        text: leftText,
-        x: PADDING_X,
-        y: (BAR_HEIGHT - statusbarTextStyle.size) / 2,
-        color: statusbarTextStyle.color,
-        font: statusbarTextStyle.font,
-        size: statusbarTextStyle.size,
-    });
-
-    const { total, idle } = countPopulation(root);
-    const populationText = `People: ${total}`;
-    const idleText = idle > 0 ? `  (${idle} idle)` : "";
-
-    const rightBaseX = renderScope.width - PADDING_X - 160;
-
-    renderScope.drawScreenspaceText({
-        text: populationText,
-        x: rightBaseX,
-        y: (BAR_HEIGHT - statusbarTextStyle.size) / 2,
-        color: statusbarTextStyle.color,
-        font: statusbarTextStyle.font,
-        size: statusbarTextStyle.size,
-    });
-
-    if (idleText) {
-        renderScope.drawScreenspaceText({
-            text: idleText,
-            x: rightBaseX + 80,
-            y: (BAR_HEIGHT - statusbarTextStyle.size) / 2,
-            color: IDLE_HIGHLIGHT,
-            font: statusbarTextStyle.font,
-            size: statusbarTextStyle.size,
+        return uiBox({
+            width: fillUiSize,
+            height: BAR_HEIGHT,
+            background: colorBackground(BAR_FILL),
+            padding: PADDING_X,
+            child: uiRow({
+                width: fillUiSize,
+                mainAxisAlignment: MainAxisAlignment.SpaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.Center,
+                children: [
+                    uiText({
+                        content: `${phaseLabel}  ·  ${dayLabel}`,
+                        textStyle: statusbarTextStyle,
+                    }),
+                    uiRow({
+                        crossAxisAlignment: CrossAxisAlignment.Center,
+                        children: rightTexts,
+                    }),
+                ],
+            }),
         });
-    }
-}
+    },
+    { displayName: "UiStatusBar" },
+);
 
 function countPopulation(root: Entity): { total: number; idle: number } {
     const playerUnits = root.queryComponents(PlayerUnitComponentId);

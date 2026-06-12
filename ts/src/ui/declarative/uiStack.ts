@@ -9,6 +9,7 @@ import {
     createComponent,
     type ComponentDescriptor,
     type PlacedChild,
+    type UISize,
 } from "./ui.ts";
 
 type UiStackProps = {
@@ -30,6 +31,7 @@ export const uiStack = createComponent<UiStackProps>(
         }
 
         const placedChildren: PlacedChild[] = [];
+        const childSizes: UISize[] = [];
         let maxChildWidth = 0;
         let maxChildHeight = 0;
 
@@ -37,11 +39,12 @@ export const uiStack = createComponent<UiStackProps>(
         for (let i = 0; i < props.children.length; i++) {
             const childDescriptor = props.children[i];
             const childSize = measureDescriptor(
-                `child-${i}`,
+                childDescriptor.key ?? i,
                 childDescriptor,
                 constraints,
             );
 
+            childSizes.push(childSize);
             maxChildWidth = Math.max(maxChildWidth, childSize.width);
             maxChildHeight = Math.max(maxChildHeight, childSize.height);
         }
@@ -58,11 +61,7 @@ export const uiStack = createComponent<UiStackProps>(
         // Second pass: position all children with alignment
         for (let i = 0; i < props.children.length; i++) {
             const childDescriptor = props.children[i];
-            const childSize = measureDescriptor(
-                `child-${i}`,
-                childDescriptor,
-                constraints,
-            );
+            const childSize = childSizes[i];
 
             const position = calculateAlignment(
                 size.width,

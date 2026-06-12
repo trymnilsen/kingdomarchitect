@@ -42,11 +42,11 @@ describe("InteractionHandler", () => {
         assert.strictEqual(2, 2);
     });
 
-    it("on draw draws a scrim if modal", () => {
+    it("on draw includes a scrim in the hud view if modal", () => {
         assert.strictEqual(2, 2);
     });
 
-    it("on draw draws the current state", () => {
+    it("on draw renders the status bar and the current state view", () => {
         assert.strictEqual(2, 2);
     });
 });
