@@ -64,6 +64,7 @@ export function generateChunk(
             "swamp",
             "snow",
             "plains",
+            "mountains",
         ] as const);
         const newVolume: Volume = {
             maxSize: maxSize,
