@@ -1,18 +1,21 @@
-import { Point } from "../../../common/point.ts";
+import { type Point } from "../../../common/point.ts";
 import { allSides } from "../../../common/sides.ts";
 import { spriteRefs } from "../../../asset/sprite.ts";
 import {
-    InputAction,
+    type InputAction,
     InputActionType,
     getDirectionFromInputType,
 } from "../../../input/inputAction.ts";
-import { GroundTile } from "../../map/tile.ts";
+import { type GroundTile } from "../../map/tile.ts";
 import type { ComponentDescriptor } from "../../../ui/declarative/ui.ts";
-import { UIEvent } from "../../../ui/event/uiEvent.ts";
-import { FocusGroup } from "../../../ui/focus/focusGroup.ts";
+import { type UIEvent } from "../../../ui/event/uiEvent.ts";
+import { type FocusGroup } from "../../../ui/focus/focusGroup.ts";
 import { RenderScope } from "../../../rendering/renderScope.ts";
-import { InteractionStateChanger } from "./interactionStateChanger.ts";
-import { StateContext } from "./stateContext.ts";
+// Full `import type` statements: these two modules import back into this one
+// (changer -> history -> root state -> this), so the edges must vanish at
+// runtime or loading this module first hits the cycle before the class exists.
+import type { InteractionStateChanger } from "./interactionStateChanger.ts";
+import type { StateContext } from "./stateContext.ts";
 import { log } from "../../../common/logging/logger.ts";
 
 /**

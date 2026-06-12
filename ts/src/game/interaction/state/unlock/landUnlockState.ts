@@ -3,7 +3,7 @@ import { Direction } from "../../../../common/direction.ts";
 import {
     encodePosition,
     makeNumberId,
-    Point,
+    type Point,
     shiftPoint,
 } from "../../../../common/point.ts";
 import { allSides } from "../../../../common/sides.ts";

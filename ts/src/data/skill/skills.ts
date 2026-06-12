@@ -1,4 +1,4 @@
-import { SkillTree } from "./skill.ts";
+import { type SkillTree } from "./skill.ts";
 import { meleeSkills } from "./melee.ts";
 import { magicSkills } from "./magic.ts";
 import { productivitySkills } from "./productivity.ts";

@@ -1,5 +1,5 @@
-import { Point } from "../../common/point.ts";
-import { SpriteConfiguration } from "../items/sprite.ts";
+import { type Point } from "../../common/point.ts";
+import { type SpriteConfiguration } from "../items/sprite.ts";
 import { RenderScope } from "../renderScope.ts";
 
 /**

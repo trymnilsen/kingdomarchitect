@@ -1,5 +1,5 @@
-import { Point, manhattanPath } from "../../../../../common/point.ts";
-import { BuildMode, BuildModeDescription } from "./buildMode.ts";
+import { type Point, manhattanPath } from "../../../../../common/point.ts";
+import { type BuildMode, type BuildModeDescription } from "./buildMode.ts";
 
 export class LineBuildMode implements BuildMode {
     private from: Point;

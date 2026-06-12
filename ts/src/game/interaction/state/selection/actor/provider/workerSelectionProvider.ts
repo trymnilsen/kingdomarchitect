@@ -1,6 +1,6 @@
 import { spriteRefs } from "../../../../../../asset/sprite.ts";
 import { SelectedEntityItem } from "../../../../selection/selectedEntityItem.ts";
-import { SelectedWorldItem } from "../../../../selection/selectedWorldItem.ts";
+import { type SelectedWorldItem } from "../../../../selection/selectedWorldItem.ts";
 import {
     EquipmentComponentId,
     type EquipmentComponent,
@@ -12,12 +12,12 @@ import {
 } from "../../../../../component/heldItemComponent.ts";
 import { PlayerUnitComponentId } from "../../../../../component/playerUnitComponent.ts";
 import { Entity } from "../../../../../entity/entity.ts";
-import { StateContext } from "../../../../handler/stateContext.ts";
-import { ButtonCollection } from "../../../../view/buttonCollection.ts";
-import { UIActionbarItem } from "../../../../view/uiActionbar.ts";
+import { type StateContext } from "../../../../handler/stateContext.ts";
+import { type ButtonCollection } from "../../../../view/buttonCollection.ts";
+import { type UIActionbarItem } from "../../../../view/uiActionbar.ts";
 import { ActorContextActionState } from "../actorContextActionState.ts";
 import {
-    ActorSelectionProvider,
+    type ActorSelectionProvider,
     emptySelection,
 } from "./actorSelectionProvider.ts";
 import { UnequipItemCommand } from "../../../../../../server/message/command/unequipItemCommand.ts";

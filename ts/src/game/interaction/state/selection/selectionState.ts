@@ -7,11 +7,11 @@ import { RenderScope } from "../../../../rendering/renderScope.ts";
 import { TileSize, HalfTileSize } from "../../../map/tile.ts";
 import { SelectedEntityItem } from "../../selection/selectedEntityItem.ts";
 import { SelectedTileItem } from "../../selection/selectedTileItem.ts";
-import { SelectedWorldItem } from "../../selection/selectedWorldItem.ts";
+import { type SelectedWorldItem } from "../../selection/selectedWorldItem.ts";
 import { InteractionState } from "../../handler/interactionState.ts";
-import { ButtonCollection } from "../../view/buttonCollection.ts";
-import { UIActionbarItem } from "../../view/uiActionbar.ts";
-import { ActorSelectionProvider } from "./actor/provider/actorSelectionProvider.ts";
+import { type ButtonCollection } from "../../view/buttonCollection.ts";
+import { type UIActionbarItem } from "../../view/uiActionbar.ts";
+import { type ActorSelectionProvider } from "./actor/provider/actorSelectionProvider.ts";
 import { AttackSelectionProvider } from "./actor/provider/attackSelectionProvider.ts";
 import { CraftingBuildingSelectionProvider } from "./actor/provider/craftingBuildingSelectionProvider.ts";
 import { CollectableProvider } from "./actor/provider/collectableProvider.ts";
@@ -19,7 +19,7 @@ import { TileSelectionProvider } from "./actor/provider/tileSelectionProvider.ts
 import { ResourceSelectionProvider } from "./actor/provider/resourceSelectionProvider.ts";
 import { WorkerSelectionProvider } from "./actor/provider/workerSelectionProvider.ts";
 import type { SelectionInfo } from "./selectionInfo.ts";
-import { ComponentDescriptor } from "../../../../ui/declarative/ui.ts";
+import { type ComponentDescriptor } from "../../../../ui/declarative/ui.ts";
 import { uiBox } from "../../../../ui/declarative/uiBox.ts";
 import {
     uiColumn,

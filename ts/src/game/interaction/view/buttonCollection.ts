@@ -1,4 +1,4 @@
-import { UIActionbarItem } from "./uiActionbar.ts";
+import { type UIActionbarItem } from "./uiActionbar.ts";
 
 export type ButtonCollection = {
     left: ReadonlyArray<UIActionbarItem>;

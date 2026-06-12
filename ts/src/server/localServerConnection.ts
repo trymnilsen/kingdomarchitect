@@ -5,7 +5,7 @@ import type { GameCommand } from "./message/gameCommand.ts";
 import type { CommandGameMessage, GameMessage } from "./message/gameMessage.ts";
 import {
     type GameSaveCapability,
-    GameServerConnection,
+    type GameServerConnection,
 } from "./gameServerConnection.ts";
 import { IndexedDBAdapter } from "./persistence/indexedDBAdapter.ts";
 import { PersistenceManager } from "./persistence/persistenceManager.ts";

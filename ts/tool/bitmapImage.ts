@@ -1,6 +1,6 @@
 import { PNG } from "pngjs";
 import { createWriteStream } from "fs";
-import { PixelColor } from "./util/pixels.ts";
+import { type PixelColor } from "./util/pixels.ts";
 import { createPng } from "./util/pngHelper.ts";
 
 export class BitmapImage {

@@ -1,11 +1,11 @@
-import { Bounds, boundsCenter } from "../../../../common/bounds.ts";
+import { type Bounds, boundsCenter } from "../../../../common/bounds.ts";
 import { Direction } from "../../../../common/direction.ts";
 import { shiftPoint } from "../../../../common/point.ts";
 import { Camera } from "../../../../rendering/camera.ts";
 import type { ComponentDescriptor } from "../../../../ui/declarative/ui.ts";
-import { FocusGroup } from "../../../../ui/focus/focusGroup.ts";
+import { type FocusGroup } from "../../../../ui/focus/focusGroup.ts";
 import { Entity } from "../../../entity/entity.ts";
-import { GroundTile, TileSize } from "../../../map/tile.ts";
+import { type GroundTile, TileSize } from "../../../map/tile.ts";
 import { InteractionState } from "../../handler/interactionState.ts";
 import { uiScaffold } from "../../view/uiScaffold.ts";
 import { AlertMessageState } from "../common/alertMessageState.ts";

@@ -1,12 +1,12 @@
 import { existsSync, readFileSync } from "fs";
 import * as fs from "fs/promises";
-import { PNG, PNGWithMetadata } from "pngjs";
+import { PNG, type PNGWithMetadata } from "pngjs";
 import { MaxRectsPacker } from "maxrects-packer";
 import * as path from "path";
 import { EOL } from "os";
 import { removeItem } from "../../src/common/array.ts";
 import { BitmapImage } from "../bitmapImage.ts";
-import { PixelColor } from "../util/pixels.ts";
+import { type PixelColor } from "../util/pixels.ts";
 import { getPixelColor, readPng } from "../util/pngHelper.ts";
 import { collectAssetFiles } from "../util/files.ts";
 

@@ -1,5 +1,5 @@
 import { log } from "./logging/logger.ts";
-import { ConstructorFunction, getConstructorName } from "./constructor.ts";
+import { type ConstructorFunction, getConstructorName } from "./constructor.ts";
 
 /**
  * An event allows modeling updates to data.

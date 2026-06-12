@@ -1,7 +1,7 @@
 import { log } from "../common/logging/logger.ts";
 import type { GameCommand } from "./message/gameCommand.ts";
 import { Event } from "../common/event.ts";
-import { GameServerConnection } from "./gameServerConnection.ts";
+import { type GameServerConnection } from "./gameServerConnection.ts";
 import type { CommandGameMessage, GameMessage } from "./message/gameMessage.ts";
 
 /**

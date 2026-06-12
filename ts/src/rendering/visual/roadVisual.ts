@@ -1,7 +1,7 @@
-import { Point } from "../../common/point.ts";
+import { type Point } from "../../common/point.ts";
 import { TileSize } from "../../game/map/tile.ts";
 import { RenderScope } from "../renderScope.ts";
-import { RenderVisual } from "../renderVisual.ts";
+import { type RenderVisual } from "../renderVisual.ts";
 
 export class RoadVisual implements RenderVisual {
     private position: Point;

@@ -1,9 +1,9 @@
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import * as path from "path";
 import * as util from "util";
-import { PNGWithMetadata } from "pngjs";
+import { type PNGWithMetadata } from "pngjs";
 import { collectAssetFiles } from "../util/files.ts";
-import { PixelColor } from "../util/pixels.ts";
+import { type PixelColor } from "../util/pixels.ts";
 import { getPixelColor, readPng } from "../util/pngHelper.ts";
 import type {
     CharacterDefinition,

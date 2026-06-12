@@ -1,4 +1,4 @@
-import { Bounds } from "../../common/bounds.ts";
+import { type Bounds } from "../../common/bounds.ts";
 import { Direction } from "../../common/direction.ts";
 
 export type FocusGroup = {

@@ -1,6 +1,6 @@
 import { spriteRefs } from "../../../generated/sprites.ts";
 import { generateId } from "../../common/idGenerator.ts";
-import { zeroPoint } from "../../common/point.js";
+import { zeroPoint } from "../../common/point.ts";
 import { createDespawnTimerComponent } from "../component/despawnTimerComponent.ts";
 import { createSpriteComponent } from "../component/spriteComponent.ts";
 import { Entity } from "../entity/entity.ts";

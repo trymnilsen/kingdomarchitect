@@ -1,31 +1,31 @@
 import { log } from "../common/logging/logger.ts";
 import {
-    Bounds,
+    type Bounds,
     boundsCenter,
     boundsEquals,
     boundsOverlap,
     withinRectangle,
 } from "../common/bounds.ts";
 import { Direction } from "../common/direction.ts";
-import { Event, EventListener } from "../common/event.ts";
-import { addPoint, Point, zeroPoint } from "../common/point.ts";
-import { UIRenderScope } from "../rendering/uiRenderContext.ts";
+import { Event, type EventListener } from "../common/event.ts";
+import { addPoint, type Point, zeroPoint } from "../common/point.ts";
+import { type UIRenderScope } from "../rendering/uiRenderContext.ts";
 import {
     tapStartType,
     tapType,
     tapUpType,
-    UIEvent,
-    UITapEvent,
+    type UIEvent,
+    type UITapEvent,
 } from "./event/uiEvent.ts";
-import { FocusGroup } from "./focus/focusGroup.ts";
+import { type FocusGroup } from "./focus/focusGroup.ts";
 import {
-    FocusNode,
+    type FocusNode,
     getClosestFocusableNode,
     getFocusableNodes,
 } from "./focus/focusHelpers.ts";
 import { FocusState } from "./focus/focusState.ts";
-import { UILayoutScope } from "./uiLayoutContext.ts";
-import { fillUiSize, UISize, zeroSize } from "./uiSize.ts";
+import { type UILayoutScope } from "./uiLayoutContext.ts";
+import { fillUiSize, type UISize, zeroSize } from "./uiSize.ts";
 
 export type UIAction = {
     type: string;

@@ -1,9 +1,9 @@
 import { spriteRefs } from "../../../../asset/sprite.ts";
-import { GroundTile } from "../../../map/tile.ts";
+import { type GroundTile } from "../../../map/tile.ts";
 import { RenderScope } from "../../../../rendering/renderScope.ts";
 import { Entity } from "../../../entity/entity.ts";
 import { InteractionState } from "../../handler/interactionState.ts";
-import { SelectionMode } from "../../selection/selectionMode.ts";
+import { type SelectionMode } from "../../selection/selectionMode.ts";
 import { SingleSelectionMode } from "../../selection/singleSelectionMode.ts";
 import { AlertMessageState } from "../common/alertMessageState.ts";
 import { log } from "../../../../common/logging/logger.ts";

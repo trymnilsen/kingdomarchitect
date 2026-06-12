@@ -1,5 +1,5 @@
 import type { Bounds } from "../../common/bounds.ts";
-import { EcsSystem } from "../../common/ecs/ecsSystem.ts";
+import { type EcsSystem } from "../../common/ecs/ecsSystem.ts";
 import { offsetPatternWithPoint } from "../../common/pattern.ts";
 import {
     encodePosition,
@@ -14,10 +14,10 @@ import {
 } from "../component/healthComponent.ts";
 import {
     compareSpriteStacking,
-    SpriteComponent,
+    type SpriteComponent,
     SpriteComponentId,
 } from "../component/spriteComponent.ts";
-import { TileComponent, TileComponentId } from "../component/tileComponent.ts";
+import { type TileComponent, TileComponentId } from "../component/tileComponent.ts";
 import { spriteRegistry } from "../../asset/spriteRegistry.ts";
 import { SPRITE_W, SPRITE_H } from "../../asset/sprite.ts";
 import { VisibilityComponentId } from "../component/visibilityComponent.ts";

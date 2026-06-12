@@ -1,5 +1,5 @@
 import type { SpriteRef } from "../../asset/sprite.ts";
-import { addPoint, Point, zeroPoint } from "../../common/point.ts";
+import { addPoint, type Point, zeroPoint } from "../../common/point.ts";
 import { RenderScope } from "../renderScope.ts";
 
 export class SpriteAnimation {

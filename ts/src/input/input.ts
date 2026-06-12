@@ -1,6 +1,6 @@
-import { InputAction } from "./inputAction.ts";
+import { type InputAction } from "./inputAction.ts";
 import { Keyboard } from "./keyboard.ts";
-import { Event, EventListener } from "../common/event.ts";
+import { Event, type EventListener } from "../common/event.ts";
 
 export type InputEvent = {
     action: InputAction;

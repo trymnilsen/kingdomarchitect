@@ -1,5 +1,5 @@
 import {
-    Bounds,
+    type Bounds,
     boundsCenter,
     boundsContains,
     boundsOverlap,
@@ -10,7 +10,7 @@ import { InvalidArgumentError } from "../../common/error/invalidArgumentError.ts
 import {
     closestPointOnLine,
     manhattanDistance,
-    Point,
+    type Point,
 } from "../../common/point.ts";
 import { visitChildren } from "../../common/visit/visit.ts";
 import { UIView } from "../uiView.ts";

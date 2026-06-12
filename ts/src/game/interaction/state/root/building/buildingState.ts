@@ -10,7 +10,7 @@ import { bookInkColor } from "../../../../../ui/color.ts";
 import { InteractionState } from "../../../handler/interactionState.ts";
 import { BuildConfirmState } from "../../building2/buildConfirmState.ts";
 import {
-    Building,
+    type Building,
     specialRequirementNames,
     type SpecialRequirement,
 } from "../../../../../data/building/building.ts";
@@ -20,7 +20,7 @@ import { goldBuildings } from "../../../../../data/building/gold/gold.ts";
 import { foodBuildings } from "../../../../../data/building/food/food.ts";
 import { growBuildings } from "../../../../../data/building/grow/grow.ts";
 import { lightBuildings } from "../../../../../data/building/light/light.ts";
-import { Point } from "../../../../../common/point.ts";
+import { type Point } from "../../../../../common/point.ts";
 import {
     createComponent,
     type ComponentDescriptor,

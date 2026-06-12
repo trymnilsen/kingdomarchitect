@@ -8,13 +8,13 @@ import {
 import { GroundItemComponentId } from "../../../../../component/groundItemComponent.ts";
 import { CollectItemJob } from "../../../../../job/collectItemJob.ts";
 import { EquipUnitSelectionState } from "../../../equip/equipUnitSelectionState.ts";
-import { StateContext } from "../../../../handler/stateContext.ts";
+import { type StateContext } from "../../../../handler/stateContext.ts";
 import { SelectedEntityItem } from "../../../../selection/selectedEntityItem.ts";
-import { SelectedWorldItem } from "../../../../selection/selectedWorldItem.ts";
-import { ButtonCollection } from "../../../../view/buttonCollection.ts";
-import { UIActionbarItem } from "../../../../view/uiActionbar.ts";
+import { type SelectedWorldItem } from "../../../../selection/selectedWorldItem.ts";
+import { type ButtonCollection } from "../../../../view/buttonCollection.ts";
+import { type UIActionbarItem } from "../../../../view/uiActionbar.ts";
 import {
-    ActorSelectionProvider,
+    type ActorSelectionProvider,
     emptySelection,
 } from "./actorSelectionProvider.ts";
 

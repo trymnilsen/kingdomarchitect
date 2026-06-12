@@ -1,5 +1,5 @@
 import { spriteRefs } from "../../asset/sprite.ts";
-import { SkillTree } from "./skill.ts";
+import { type SkillTree } from "./skill.ts";
 
 export const rangedSkills: SkillTree = [
     [

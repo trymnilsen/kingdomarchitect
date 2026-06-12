@@ -1,8 +1,8 @@
-import { Point } from "../../../../../common/point.ts";
+import { type Point } from "../../../../../common/point.ts";
 import { allSides } from "../../../../../common/sides.ts";
 import { spriteRefs } from "../../../../../asset/sprite.ts";
-import { GroundTile, TileSize } from "../../../../map/tile.ts";
-import { SearchedNode } from "../../../../map/path/search.ts";
+import { type GroundTile, TileSize } from "../../../../map/tile.ts";
+import { type SearchedNode } from "../../../../map/path/search.ts";
 import { queryPath } from "../../../../map/query/pathQuery.ts";
 import { RenderScope } from "../../../../../rendering/renderScope.ts";
 import type { ComponentDescriptor } from "../../../../../ui/declarative/ui.ts";

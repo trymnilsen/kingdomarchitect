@@ -1,5 +1,5 @@
-import { Point } from "../../../../../common/point.ts";
-import { BuildMode, BuildModeDescription } from "./buildMode.ts";
+import { type Point } from "../../../../../common/point.ts";
+import { type BuildMode, type BuildModeDescription } from "./buildMode.ts";
 
 export class ToggleBuildMode implements BuildMode {
     get description(): BuildModeDescription {

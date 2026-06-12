@@ -1,9 +1,9 @@
-import { adjacentPoints, Point } from "../../../../../common/point.ts";
+import { adjacentPoints, type Point } from "../../../../../common/point.ts";
 import { stoneResource } from "../../../../../data/inventory/items/naturalResource.ts";
 import { ResourceComponentId } from "../../../../component/resourceComponent.ts";
 import { Entity } from "../../../../entity/entity.ts";
 import { queryEntity } from "../../../../map/query/queryEntity.ts";
-import { BuildingApplicability } from "../buildingApplicability.ts";
+import { type BuildingApplicability } from "../buildingApplicability.ts";
 
 export const quaryApplicability: BuildingApplicability = (
     point: Point,

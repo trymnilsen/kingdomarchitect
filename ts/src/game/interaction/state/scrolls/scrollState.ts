@@ -1,5 +1,5 @@
 import { spriteRefs } from "../../../../asset/sprite.ts";
-import { Point } from "../../../../common/point.ts";
+import { type Point } from "../../../../common/point.ts";
 import { RenderScope } from "../../../../rendering/renderScope.ts";
 import { biomes } from "../../../map/biome.ts";
 import { InteractionState } from "../../handler/interactionState.ts";

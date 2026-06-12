@@ -1,8 +1,8 @@
-import { SelectedWorldItem } from "../../../../selection/selectedWorldItem.ts";
-import { StateContext } from "../../../../handler/stateContext.ts";
-import { ButtonCollection } from "../../../../view/buttonCollection.ts";
+import { type SelectedWorldItem } from "../../../../selection/selectedWorldItem.ts";
+import { type StateContext } from "../../../../handler/stateContext.ts";
+import { type ButtonCollection } from "../../../../view/buttonCollection.ts";
 import {
-    ActorSelectionProvider,
+    type ActorSelectionProvider,
     emptySelection,
 } from "./actorSelectionProvider.ts";
 

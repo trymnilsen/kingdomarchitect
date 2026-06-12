@@ -10,7 +10,7 @@ import type { SearchedNode } from "../../../map/path/search.ts";
 import { queryPath } from "../../../map/query/pathQuery.ts";
 import { queryEntity } from "../../../map/query/queryEntity.ts";
 import { TileSize, type GroundTile } from "../../../map/tile.ts";
-import { InteractionState } from "../../handler/interactionState";
+import { InteractionState } from "../../handler/interactionState.ts";
 import { uiScaffold } from "../../view/uiScaffold.ts";
 import { AlertMessageState } from "../common/alertMessageState.ts";
 

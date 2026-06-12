@@ -1,5 +1,5 @@
 import { type SpriteRef, spriteRefs } from "../../../../../asset/sprite.ts";
-import { ComponentDescriptor } from "../../../../../ui/declarative/ui.ts";
+import { type ComponentDescriptor } from "../../../../../ui/declarative/ui.ts";
 import {
     InventoryComponentId,
     type InventoryComponent,

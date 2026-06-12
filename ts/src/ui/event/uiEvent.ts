@@ -1,4 +1,4 @@
-import { Point } from "../../common/point.ts";
+import { type Point } from "../../common/point.ts";
 
 export type UIEvent = UITapEvent;
 

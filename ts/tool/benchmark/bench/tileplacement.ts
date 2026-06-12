@@ -1,7 +1,7 @@
-import { encodePosition, Point } from "../../../src/common/point.ts";
+import { encodePosition, type Point } from "../../../src/common/point.ts";
 import { QuadTree } from "../../../src/common/structure/quadtree.ts";
 import {
-    Rectangle,
+    type Rectangle,
     splitRectangle,
 } from "../../../src/common/structure/rectangle.ts";
 import { logTable, MiniBench } from "../miniBench.ts";
