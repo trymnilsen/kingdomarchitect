@@ -17,6 +17,7 @@ import { CraftWithBuildingState } from "../../../crafting/craftWithBuildingState
 import { CollectItemJob } from "../../../../../job/collectItemJob.ts";
 import { QueueJobCommand } from "../../../../../../server/message/command/queueJobCommand.ts";
 import { InventoryState } from "../../../root/inventory/inventoryState.ts";
+import { singleInventoryFilter } from "../../../../../building/stockFilter.ts";
 
 export class CraftingBuildingSelectionProvider implements ActorSelectionProvider {
     provideButtons(
@@ -42,7 +43,13 @@ export class CraftingBuildingSelectionProvider implements ActorSelectionProvider
                     icon: spriteRefs.empty_sprite,
                     onClick: () => {
                         stateContext.stateChanger.push(
-                            new InventoryState(selection.entity),
+                            new InventoryState(
+                                selection.entity,
+                                singleInventoryFilter(
+                                    selection.entity.id,
+                                    "This building",
+                                ),
+                            ),
                         );
                     },
                 };

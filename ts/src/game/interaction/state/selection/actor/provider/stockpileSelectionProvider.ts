@@ -10,6 +10,7 @@ import { BuildingComponentId } from "../../../../../component/buildingComponent.
 import { StockpileComponentId } from "../../../../../component/stockpileComponent.ts";
 import { spriteRefs } from "../../../../../../asset/sprite.ts";
 import { InventoryState } from "../../../root/inventory/inventoryState.ts";
+import { singleInventoryFilter } from "../../../../../building/stockFilter.ts";
 
 export class StockpileSelectionProvider implements ActorSelectionProvider {
     provideButtons(
@@ -30,7 +31,13 @@ export class StockpileSelectionProvider implements ActorSelectionProvider {
                             icon: spriteRefs.empty_sprite,
                             onClick: () => {
                                 stateContext.stateChanger.push(
-                                    new InventoryState(selection.entity),
+                                    new InventoryState(
+                                        selection.entity,
+                                        singleInventoryFilter(
+                                            selection.entity.id,
+                                            "This stockpile",
+                                        ),
+                                    ),
                                 );
                             },
                         },

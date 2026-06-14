@@ -1,7 +1,13 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
-import { getConstructionMaterialProgress } from "../../../src/game/building/materialQuery.ts";
+import {
+    getConstructionMaterialProgress,
+    getTotalItemInStockpiles,
+} from "../../../src/game/building/materialQuery.ts";
 import { createInventoryComponent } from "../../../src/game/component/inventoryComponent.ts";
+import { createStockpileComponent } from "../../../src/game/component/stockpileComponent.ts";
+import { Entity } from "../../../src/game/entity/entity.ts";
+import { ItemRarity } from "../../../src/data/inventory/inventoryItem.ts";
 import type { BuildingRequirements } from "../../../src/data/building/building.ts";
 import {
     goldCoins,
@@ -102,6 +108,47 @@ describe("getConstructionMaterialProgress", () => {
         assert.deepStrictEqual(
             getConstructionMaterialProgress(undefined, { materials: {} }),
             [],
+        );
+    });
+});
+
+describe("getTotalItemInStockpiles", () => {
+    function rootWithStockpile(): Entity {
+        const root = new Entity("root");
+        const stockpile = new Entity("stock");
+        // The same item id held in two rarities — separate stacks, as the
+        // inventory stacks by (id, rarity).
+        stockpile.setEcsComponent(
+            createInventoryComponent([
+                { item: woodResourceItem, amount: 5 },
+                {
+                    item: { ...woodResourceItem, rarity: ItemRarity.Rare },
+                    amount: 3,
+                },
+            ]),
+        );
+        stockpile.setEcsComponent(createStockpileComponent());
+        root.addChild(stockpile);
+        return root;
+    }
+
+    it("sums an item across rarities when no rarity is given", () => {
+        // Regression guard for the under-count bug: reading a single stack
+        // would have returned 5, not the full 8.
+        assert.strictEqual(
+            getTotalItemInStockpiles(rootWithStockpile(), woodResourceItem.id),
+            8,
+        );
+    });
+
+    it("counts only the requested rarity when one is given", () => {
+        assert.strictEqual(
+            getTotalItemInStockpiles(
+                rootWithStockpile(),
+                woodResourceItem.id,
+                ItemRarity.Rare,
+            ),
+            3,
         );
     });
 });

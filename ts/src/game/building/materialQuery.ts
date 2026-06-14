@@ -18,6 +18,13 @@ import {
 } from "../component/stockpileComponent.ts";
 import type { Entity } from "../entity/entity.ts";
 import { log } from "../../common/logging/logger.ts";
+import {
+    aggregateStock,
+    entryFor,
+    sourcesForId,
+    totalForId,
+    type StockAggregate,
+} from "./stockAggregate.ts";
 
 export type MaterialSource = {
     entity: Entity;
@@ -60,27 +67,53 @@ export function findStockpiles(settlement: Entity): Entity[] {
 }
 
 /**
- * Get total amount of an item available across all stockpiles
+ * Get total amount of an item available across all stockpiles. With no rarity
+ * the total sums every rarity of the id (rarity-agnostic, the construction
+ * case); a specific rarity reads just that bucket.
  */
 export function getTotalItemInStockpiles(
     root: Entity,
     itemId: string,
     rarity?: ItemRarity,
 ): number {
-    const stockpiles = findStockpiles(root);
-    let total = 0;
+    const aggregate = aggregateStock(findStockpiles(root));
+    return rarity !== undefined
+        ? (entryFor(aggregate, itemId, rarity)?.total ?? 0)
+        : totalForId(aggregate, itemId);
+}
 
-    for (const stockpile of stockpiles) {
-        const inventory = stockpile.getEcsComponent(InventoryComponentId);
-        if (inventory) {
-            const item = getInventoryItem(inventory, itemId, rarity);
-            if (item) {
-                total += item.amount;
-            }
-        }
-    }
+/**
+ * Turn aggregated stock into distance-sorted material sources for a single
+ * item. Rarity-agnostic by default (the construction case); a specific rarity
+ * narrows to that bucket. Sources are merged per stockpile by sourcesForId, so
+ * each entity appears once.
+ */
+function sortedMaterialSources(
+    aggregate: StockAggregate,
+    itemId: string,
+    item: InventoryItem,
+    fromPosition: Point,
+    rarity?: ItemRarity,
+): MaterialSource[] {
+    const sources =
+        rarity !== undefined
+            ? (entryFor(aggregate, itemId, rarity)?.sources ?? [])
+            : sourcesForId(aggregate, itemId);
 
-    return total;
+    const materialSources = sources.map((source) => ({
+        entity: source.entity,
+        position: source.entity.worldPosition,
+        item,
+        availableAmount: source.amount,
+    }));
+
+    materialSources.sort(
+        (a, b) =>
+            distance(fromPosition, a.position) -
+            distance(fromPosition, b.position),
+    );
+
+    return materialSources;
 }
 
 export type ConstructionMaterialProgress = {
@@ -155,37 +188,13 @@ export function findStockpilesWithItem(
     fromPosition: Point,
     rarity?: ItemRarity,
 ): MaterialSource[] {
-    const stockpiles = findStockpiles(root);
-    const sources: MaterialSource[] = [];
     const item = inventoryItemsMap[itemId as keyof typeof inventoryItemsMap];
-
     if (!item) {
-        return sources;
+        return [];
     }
 
-    for (const stockpile of stockpiles) {
-        const inventory = stockpile.getEcsComponent(InventoryComponentId);
-        if (inventory) {
-            const inventoryItem = getInventoryItem(inventory, itemId, rarity);
-            if (inventoryItem && inventoryItem.amount > 0) {
-                sources.push({
-                    entity: stockpile,
-                    position: stockpile.worldPosition,
-                    item: item,
-                    availableAmount: inventoryItem.amount,
-                });
-            }
-        }
-    }
-
-    // Sort by distance from the given position
-    sources.sort(
-        (a, b) =>
-            distance(fromPosition, a.position) -
-            distance(fromPosition, b.position),
-    );
-
-    return sources;
+    const aggregate = aggregateStock(findStockpiles(root));
+    return sortedMaterialSources(aggregate, itemId, item, fromPosition, rarity);
 }
 
 /**
@@ -207,6 +216,10 @@ export function checkMaterialsForBuilding(
             materialsToFetch: [],
         };
     }
+
+    // Aggregate the settlement's stockpiles once and read each material's
+    // sources from it, rather than re-querying the stockpiles per material.
+    const aggregate = aggregateStock(findStockpiles(root));
 
     for (const [itemId, amountNeeded] of Object.entries(
         requirements.materials,
@@ -232,9 +245,10 @@ export function checkMaterialsForBuilding(
         }
 
         // Check stockpiles
-        const sources = findStockpilesWithItem(
-            root,
+        const sources = sortedMaterialSources(
+            aggregate,
             itemId,
+            item,
             workerEntity.worldPosition,
         );
         const amountInStockpiles = sources.reduce(

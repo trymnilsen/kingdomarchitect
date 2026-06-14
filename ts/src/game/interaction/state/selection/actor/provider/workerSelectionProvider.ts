@@ -34,6 +34,11 @@ import {
 import { UpdateWorkerStanceCommand } from "../../../../../../server/message/command/updateWorkerStanceCommand.ts";
 import { StatsViewState } from "../../../stats/statsViewState.ts";
 import { SetPlayerCommand } from "../../../../../../server/message/command/setPlayerCommand.ts";
+import { InventoryState } from "../../../root/inventory/inventoryState.ts";
+import {
+    equippablePredicate,
+    kingdomStockFilter,
+} from "../../../../../building/stockFilter.ts";
 
 export class WorkerSelectionProvider implements ActorSelectionProvider {
     provideButtons(
@@ -214,6 +219,18 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
             items.push({
                 text: "Secondary",
                 icon: spriteRefs.empty_sprite,
+                children: [
+                    {
+                        text: "Equip",
+                        icon: spriteRefs.empty_sprite,
+                        onClick: () =>
+                            this.openEquipInventory(
+                                stateContext,
+                                selectedEntity,
+                                "secondary",
+                            ),
+                    },
+                ],
             });
         }
     }
@@ -270,8 +287,39 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
             items.push({
                 text: "Primary",
                 icon: spriteRefs.empty_sprite,
+                children: [
+                    {
+                        text: "Equip",
+                        icon: spriteRefs.empty_sprite,
+                        onClick: () =>
+                            this.openEquipInventory(
+                                stateContext,
+                                selectedEntity,
+                                "primary",
+                            ),
+                    },
+                ],
             });
         }
+    }
+
+    /**
+     * Open the stock inventory filtered to equippable items so the player can
+     * pick something to fill an empty slot; choosing an item equips it into
+     * that slot on the worker.
+     */
+    private openEquipInventory(
+        stateContext: StateContext,
+        worker: Entity,
+        slot: "primary" | "secondary",
+    ) {
+        stateContext.stateChanger.push(
+            new InventoryState(
+                worker,
+                kingdomStockFilter([equippablePredicate()]),
+                slot,
+            ),
+        );
     }
 
     private getPrimaryActions(
