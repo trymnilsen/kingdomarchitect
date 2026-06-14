@@ -47,23 +47,24 @@ export const inventoryView = createComponent<InventoryViewProps>(
             ) ?? props.entries[0];
         const selectedKey = selectedEntry ? stockEntryKey(selectedEntry) : null;
 
-        const listItems = props.entries.map((entry) => {
-            const key = stockEntryKey(entry);
-            return stockListItem({
-                entry,
-                isSelected: key === selectedKey,
-                onTap: () => {
-                    props.onSelect(key);
-                    setCurrentPage(UIBookLayoutPage.Right);
-                },
-            });
-        });
-
         const list = uiPaginatedList({
-            items: listItems,
+            itemCount: props.entries.length,
+            itemsPerPage: 8,
+            gap: 4,
             width: fillUiSize,
             height: fillUiSize,
-            gap: 4,
+            renderItem: (index) => {
+                const entry = props.entries[index];
+                const key = stockEntryKey(entry);
+                return stockListItem({
+                    entry,
+                    isSelected: key === selectedKey,
+                    onTap: () => {
+                        props.onSelect(key);
+                        setCurrentPage(UIBookLayoutPage.Right);
+                    },
+                });
+            },
         });
 
         const chipRow = uiRow({

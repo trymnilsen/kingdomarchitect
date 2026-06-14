@@ -1,3 +1,4 @@
+import type { Bounds } from "../../common/bounds.ts";
 import { log } from "../../common/logging/logger.ts";
 import { nameof } from "../../common/nameof.ts";
 import { addPoint, zeroPoint, type Point } from "../../common/point.ts";
@@ -9,6 +10,16 @@ import { PointerTracker, type PointerFlags } from "./pointerTracker.ts";
 
 export type UISize = { width: number; height: number };
 export type Rectangle = { x: number; y: number; width: number; height: number };
+
+/** Converts an {x, y, width, height} rectangle to {x1, y1, x2, y2} bounds. */
+function rectangleToBounds(rectangle: Rectangle): Bounds {
+    return {
+        x1: rectangle.x,
+        y1: rectangle.y,
+        x2: rectangle.x + rectangle.width,
+        y2: rectangle.y + rectangle.height,
+    };
+}
 
 const isLayoutResult = (
     value: LayoutResult | ComponentDescriptor,
@@ -48,6 +59,12 @@ export type LayoutInfo = {
     region: Rectangle;
     /** When true, offset is an absolute screen position, not parent-relative. */
     absolute?: boolean;
+    /**
+     * When true, this node clips its whole subtree (its own draw and all
+     * descendants) to its region during drawing, and hit-testing is pruned to
+     * the same bounds. Used by viewports such as {@link uiClip}.
+     */
+    clip?: boolean;
 };
 
 export type UiNode = {
@@ -71,6 +88,11 @@ export type PlacedChild = ComponentDescriptor & {
 export type LayoutResult = {
     size: UISize;
     children: PlacedChild[];
+    /**
+     * When true, the subtree rooted at this node is clipped to its size during
+     * drawing and hit-testing. See {@link LayoutInfo.clip}.
+     */
+    clip?: boolean;
 };
 
 export type ComponentContext<P extends {}> = {
@@ -365,6 +387,7 @@ export class UiRenderer {
             node.layout = {
                 offset: node.layout?.offset ?? zeroPoint(),
                 region: { ...zeroPoint(), ...renderOutput.size },
+                clip: renderOutput.clip === true,
             };
             return renderOutput.size;
         } else {
@@ -502,6 +525,20 @@ export class UiRenderer {
         node.layout.region.x = absolutePosition.x;
         node.layout.region.y = absolutePosition.y;
 
+        // A clipping node confines its whole subtree to its region. The own
+        // draw and the children are wrapped together so the rule is a single
+        // self-consistent "this node clips to its bounds".
+        if (node.layout.clip) {
+            this.renderScope.drawWithClip(
+                rectangleToBounds(node.layout.region),
+                () => this._drawNodeContent(node, absolutePosition),
+            );
+        } else {
+            this._drawNodeContent(node, absolutePosition);
+        }
+    }
+
+    private _drawNodeContent(node: UiNode, absolutePosition: Point) {
         const nodeHooks = this.hooks.get(node);
         if (nodeHooks && nodeHooks.draw && node.layout) {
             nodeHooks.draw(this.renderScope, node.layout.region);

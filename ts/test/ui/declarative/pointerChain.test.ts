@@ -69,6 +69,36 @@ describe("pointerChainAt", () => {
         assert.deepStrictEqual(chain, []);
     });
 
+    it("hits a clipped child where it is visible inside the clip region", () => {
+        const child = node({ x: 20, y: 14, width: 30, height: 40 });
+        const clip = node({ x: 12, y: 8, width: 60, height: 30 }, [child]);
+        clip.layout!.clip = true;
+        const interactive = new Set<UiNode>([child]);
+
+        // y:20 is inside both the child and the clip region: visible, so a hit.
+        const chain = pointerChainAt(clip, { x: 30, y: 20 }, (n) =>
+            interactive.has(n),
+        );
+
+        assert.deepStrictEqual(chain, [child]);
+    });
+
+    it("does not hit a clipped child in the area cropped by the clip", () => {
+        // The child is taller than the clip, so its lower half is cropped away.
+        const child = node({ x: 20, y: 14, width: 30, height: 40 });
+        const clip = node({ x: 12, y: 8, width: 60, height: 20 }, [child]);
+        clip.layout!.clip = true;
+        const interactive = new Set<UiNode>([child]);
+
+        // y:50 is inside the child's region but below the clip (clip bottom=28),
+        // so it is cropped and must not register as a hit.
+        const chain = pointerChainAt(clip, { x: 30, y: 50 }, (n) =>
+            interactive.has(n),
+        );
+
+        assert.deepStrictEqual(chain, []);
+    });
+
     it("orders the chain outermost to deepest when several nest", () => {
         const leaf = node({ x: 20, y: 16, width: 30, height: 20 });
         const mid = node({ x: 16, y: 12, width: 60, height: 40 }, [leaf]);

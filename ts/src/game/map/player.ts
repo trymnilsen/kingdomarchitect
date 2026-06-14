@@ -8,14 +8,36 @@ import {
     stoneResource,
     treeResource,
 } from "../../data/inventory/items/naturalResource.ts";
-import { swordItem } from "../../data/inventory/items/equipment.ts";
 import {
+    bowItem,
+    hammerItem,
+    swordItem,
+    wizardHat,
+} from "../../data/inventory/items/equipment.ts";
+import { bedrollItem } from "../../data/inventory/items/fieldEquipment.ts";
+import {
+    charcoalItem,
+    clayBricksItem,
+    gearsItem,
+    ironBarsItem,
+    joineryItem,
     planksItem,
+    stoneBarsItem,
     timberFramesItem,
 } from "../../data/inventory/items/processedMaterials.ts";
 import {
+    berryItem,
+    blueBook,
+    breadItem,
+    gemResource,
     goldCoins,
+    greaterHealthPotion,
+    healthPotion,
+    ironOreItem,
+    manaPotion,
+    scroll,
     stoneResource as stoneInventoryItem,
+    wheatResourceItem,
     woodResourceItem,
 } from "../../data/inventory/items/resources.ts";
 import { ChunkMapComponentId } from "../component/chunkMapComponent.ts";
@@ -66,6 +88,28 @@ export function addInitialPlayerChunk(scopedEntity: Entity): Point {
     addInventoryItem(stockpileInventory, planksItem, 40);
     addInventoryItem(stockpileInventory, timberFramesItem, 40);
     addInventoryItem(stockpileInventory, goldCoins, 4);
+    // Extra variety so the inventory list spans several pages, exercising the
+    // paginated list and its numbered pager.
+    addInventoryItem(stockpileInventory, bowItem, 1);
+    addInventoryItem(stockpileInventory, hammerItem, 1);
+    addInventoryItem(stockpileInventory, wizardHat, 1);
+    addInventoryItem(stockpileInventory, bedrollItem, 3);
+    addInventoryItem(stockpileInventory, joineryItem, 12);
+    addInventoryItem(stockpileInventory, ironBarsItem, 24);
+    addInventoryItem(stockpileInventory, stoneBarsItem, 18);
+    addInventoryItem(stockpileInventory, gearsItem, 9);
+    addInventoryItem(stockpileInventory, clayBricksItem, 30);
+    addInventoryItem(stockpileInventory, charcoalItem, 16);
+    addInventoryItem(stockpileInventory, ironOreItem, 28);
+    addInventoryItem(stockpileInventory, gemResource, 5);
+    addInventoryItem(stockpileInventory, wheatResourceItem, 60);
+    addInventoryItem(stockpileInventory, breadItem, 14);
+    addInventoryItem(stockpileInventory, berryItem, 22);
+    addInventoryItem(stockpileInventory, healthPotion, 6);
+    addInventoryItem(stockpileInventory, greaterHealthPotion, 2);
+    addInventoryItem(stockpileInventory, manaPotion, 4);
+    addInventoryItem(stockpileInventory, blueBook, 1);
+    addInventoryItem(stockpileInventory, scroll, 7);
 
     // World resources stay on the chunk entity
     chunkEntity.addChild(firstTree);

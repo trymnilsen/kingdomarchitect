@@ -56,6 +56,11 @@ const bookSize: UISize = {
 };
 const horizontalPadding = 44;
 const verticalPadding = 32;
+// Inset of the page content from the page edge. The book sprite has a thick
+// decorative border, so the bottom needs more room than the top or content
+// clips into the border (most visible with a scrolling page).
+const pageContentTopMargin = 16;
+const pageContentBottomMargin = 36;
 
 export const uiBookLayout = createComponent<UiBookLayoutProps>(
     ({ props, measureDescriptor, constraints }) => {
@@ -86,7 +91,7 @@ export const uiBookLayout = createComponent<UiBookLayoutProps>(
 
         const pageConstraints: UISize = {
             width: pageWidth - 40, // Account for page margins
-            height: pageHeight - 32,
+            height: pageHeight - pageContentTopMargin - pageContentBottomMargin,
         };
 
         // Measure pages
@@ -202,7 +207,7 @@ export const uiBookLayout = createComponent<UiBookLayoutProps>(
                 ...props.leftPage,
                 offset: {
                     x: centerX + horizontalPadding + bookOffset + 28,
-                    y: centerY + verticalPadding + 16,
+                    y: centerY + verticalPadding + pageContentTopMargin,
                 },
                 size: leftPageSize,
             });
@@ -219,7 +224,7 @@ export const uiBookLayout = createComponent<UiBookLayoutProps>(
                         horizontalPadding +
                         bookOffset +
                         16,
-                    y: centerY + verticalPadding + 16,
+                    y: centerY + verticalPadding + pageContentTopMargin,
                 },
                 size: rightPageSize,
             });

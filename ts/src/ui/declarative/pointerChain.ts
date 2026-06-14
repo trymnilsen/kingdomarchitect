@@ -45,8 +45,16 @@ export function pointerChainAt(
             winner = [...ancestors];
         }
 
-        for (const child of node.children) {
-            visit(child);
+        // A clipping node hides its subtree outside its region, so a point that
+        // falls outside cannot reach anything inside it. Pruning here mirrors
+        // the canvas clip on the draw side, including for nested clips.
+        const clippedOut =
+            node.layout?.clip === true &&
+            !(region && withinRectangle(point, region));
+        if (!clippedOut) {
+            for (const child of node.children) {
+                visit(child);
+            }
         }
 
         if (interactive) {

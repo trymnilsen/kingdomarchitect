@@ -3,7 +3,7 @@ import { spriteRefs } from "../../../asset/sprite.ts";
 import { bookInkColor } from "../../../ui/color.ts";
 import { createComponent } from "../../../ui/declarative/ui.ts";
 import { uiButton } from "../../../ui/declarative/uiButton.ts";
-import { uiImage } from "../../../ui/declarative/uiImage.ts";
+import { uiIcon } from "../../../ui/declarative/uiIcon.ts";
 import {
     CrossAxisAlignment,
     MainAxisAlignment,
@@ -43,7 +43,7 @@ export const stockListItem = createComponent<StockListItemProps>(
 
         return uiButton({
             width: fillUiSize,
-            height: 36,
+            height: fillUiSize,
             padding: 6,
             background,
             onTap: props.onTap,
@@ -60,10 +60,9 @@ export const stockListItem = createComponent<StockListItemProps>(
                         gap: 8,
                         crossAxisAlignment: CrossAxisAlignment.Center,
                         children: [
-                            uiImage({
+                            uiIcon({
                                 sprite: props.entry.item.asset,
-                                width: 24,
-                                height: 24,
+                                size: 32,
                             }),
                             uiText({
                                 content: props.entry.item.name,

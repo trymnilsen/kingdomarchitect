@@ -15,6 +15,7 @@ import {
     uiColumn,
     uiRow,
 } from "../../../ui/declarative/uiSequence.ts";
+import { uiScrollView } from "../../../ui/declarative/uiScrollView.ts";
 import { uiSpace } from "../../../ui/declarative/uiSpace.ts";
 import { uiText } from "../../../ui/declarative/uiText.ts";
 import { ninePatchBackground } from "../../../ui/uiBackground.ts";
@@ -37,6 +38,7 @@ export type StockDetailsPageProps = {
 const headingStyle = { color: bookInkColor, font: "Silkscreen", size: 20 };
 const bodyStyle = { color: bookInkColor, font: "Silkscreen", size: 16 };
 const sourceStyle = { color: bookInkColor, font: "Silkscreen", size: 14 };
+const hintStyle = { color: bookInkColor, font: "Silkscreen", size: 14 };
 
 /**
  * The "pop-up book" item preview: an oversized sprite in a shorter framed box so
@@ -97,12 +99,23 @@ export const stockDetailsPage = createComponent<StockDetailsPageProps>(
             uiText({ content: `total: ${entry.total}`, textStyle: bodyStyle }),
         ];
 
+        // The flavour text and the source list are both unbounded, so they live
+        // together in a scroll section that fills the remaining page height
+        // instead of overflowing the book page.
+        const scrollChildren: ComponentDescriptor[] = [];
+
+        if (entry.item.hint) {
+            scrollChildren.push(
+                uiText({ content: entry.item.hint, textStyle: hintStyle }),
+            );
+        }
+
         if (props.showSources !== false) {
-            children.push(
+            scrollChildren.push(
                 uiText({ content: "stored in:", textStyle: bodyStyle }),
             );
             for (const source of entry.sources) {
-                children.push(
+                scrollChildren.push(
                     uiRow({
                         width: fillUiSize,
                         height: wrapUiSize,
@@ -134,8 +147,23 @@ export const stockDetailsPage = createComponent<StockDetailsPageProps>(
             }
         }
 
-        // Trailing fill spacer pins content to the top of the page.
-        children.push(uiSpace({ width: 1, height: fillUiSize }));
+        if (scrollChildren.length > 0) {
+            children.push(
+                uiScrollView({
+                    width: fillUiSize,
+                    height: fillUiSize,
+                    child: uiColumn({
+                        width: fillUiSize,
+                        height: wrapUiSize,
+                        gap: 8,
+                        children: scrollChildren,
+                    }),
+                }),
+            );
+        } else {
+            // Trailing fill spacer pins content to the top of the page.
+            children.push(uiSpace({ width: 1, height: fillUiSize }));
+        }
 
         return uiBox({
             width: fillUiSize,

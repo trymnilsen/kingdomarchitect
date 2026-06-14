@@ -74,6 +74,11 @@ export function createPointerHarness(
                 height: config.height,
             });
         },
+        // Clip nodes wrap their subtree draw in this; the fake just runs the
+        // body so a clipped subtree still draws and lays out as normal.
+        drawWithClip: (_bounds: unknown, fn: (scope: RenderScope) => void) => {
+            fn(scope);
+        },
     } as unknown as RenderScope;
 
     const renderer = new UiRenderer(scope);
