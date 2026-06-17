@@ -17,9 +17,17 @@ import {
 } from "../../../src/game/component/healthComponent.ts";
 import { Entity } from "../../../src/game/entity/entity.ts";
 import type { Volume } from "../../../src/game/map/volume.ts";
-import { buildWorldStateMessage } from "../../../src/server/replicatedEntitiesSystem.ts";
-import { WorldStateMessageType } from "../../../src/server/message/gameMessage.ts";
+import {
+    buildWorldStateMessage,
+    makeReplicatedEntitiesSystem,
+} from "../../../src/server/replicatedEntitiesSystem.ts";
+import {
+    WorldStateMessageType,
+    SetComponentGameMessageType,
+    type GameMessage,
+} from "../../../src/server/message/gameMessage.ts";
 import { ChunkSize } from "../../../src/game/map/chunk.ts";
+import { EcsWorld } from "../../../src/common/ecs/ecsWorld.ts";
 
 function createTestVolume(id: string): Volume {
     return {
@@ -401,6 +409,39 @@ describe("replicatedEntitiesSystem", () => {
             const parentData = message.rootChildren[0];
             assert.ok(parentData.children);
             assert.strictEqual(parentData.children[0].parent, "parent");
+        });
+    });
+
+    describe("component_added replication", () => {
+        it("replicates a component added to an already-attached entity", () => {
+            const messages: GameMessage[] = [];
+            const world = new EcsWorld();
+            world.addSystem(
+                makeReplicatedEntitiesSystem((message) =>
+                    messages.push(message),
+                ),
+            );
+
+            const child = new Entity("child1");
+            world.root.addChild(child);
+
+            // Ignore the addEntity emitted by attaching the child; we only care
+            // about the component added afterwards.
+            messages.length = 0;
+            child.setEcsComponent(createHealthComponent(50, 100));
+
+            const setComponentMessage = messages.find(
+                (message) => message.type === SetComponentGameMessageType,
+            );
+            assert.ok(
+                setComponentMessage,
+                "adding a component to a live entity should replicate it",
+            );
+            assert.strictEqual(setComponentMessage.entity, "child1");
+            assert.strictEqual(
+                setComponentMessage.component.id,
+                HealthComponentId,
+            );
         });
     });
 });
