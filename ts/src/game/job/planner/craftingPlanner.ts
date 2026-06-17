@@ -7,15 +7,30 @@ import {
 } from "../../component/inventoryComponent.ts";
 import {
     HeldItemComponentId,
+    type HeldItemComponent,
     isHeldEmpty,
 } from "../../component/heldItemComponent.ts";
 import { CollectableComponentId } from "../../component/collectableComponent.ts";
 import { GroundItemComponentId } from "../../component/groundItemComponent.ts";
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import type { CraftingJob } from "../craftingJob.ts";
-import { failJobFromQueue } from "../jobLifecycle.ts";
+import { failJobFromQueue, suspendJobInQueue } from "../jobLifecycle.ts";
 import { findStockpilesWithItem } from "../../building/materialQuery.ts";
 import { findDropPosition } from "../../behavior/dropItem.ts";
+
+/**
+ * Release the worker's claim while leaving the job in the queue, so it can be
+ * retried once its inputs become available (mirrors the build planner). Used
+ * for temporary blockers like "no source for an input yet" or "can't free
+ * hands to fetch ingredients" — not for permanently broken jobs (missing
+ * building/inventory), which call {@link failAndAbort} instead.
+ */
+function suspendJob(worker: Entity, job: CraftingJob): void {
+    const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
+    if (queueEntity) {
+        suspendJobInQueue(queueEntity, job);
+    }
+}
 
 /**
  * Plan actions for crafting an item under the held-item model.
@@ -55,6 +70,12 @@ export function planCrafting(
         // Before crafting we must guarantee held can accept the output —
         // either empty or already holding the same item id.
         const dropActions = ensureHeldAcceptsOutputs(root, worker, job, held);
+        if (dropActions === null) {
+            // Holding an item that blocks the output and nowhere to drop it.
+            // Suspend rather than throw out of the unguarded expand() path.
+            suspendJob(worker, job);
+            return [];
+        }
         return [
             ...dropActions,
             {
@@ -115,10 +136,11 @@ export function planCrafting(
             held.item!,
         );
         if (!dropPos) {
-            throw new Error(
-                `craftingPlanner: cannot find drop position for held item ` +
-                    `'${held.item!.id}' within radius`,
-            );
+            // No free tile to drop the held item (e.g. worker boxed in). Suspend
+            // rather than throw: a throw here propagates out of the unguarded
+            // expand()/selectBehavior path and aborts the whole behavior tick.
+            suspendJob(worker, job);
+            return [];
         }
         return [
             { type: "moveTo", target: dropPos },
@@ -193,8 +215,12 @@ export function planCrafting(
         }
     }
 
-    // No source available for any needed input — suspend by failing.
-    return failAndAbort(worker, job);
+    // No source available for any needed input yet. Suspend (keep the job in
+    // the queue, release the claim) so it retries once materials arrive,
+    // matching the build planner. Failing here would silently delete a
+    // player-queued craft the moment its inputs are momentarily unavailable.
+    suspendJob(worker, job);
+    return [];
 }
 
 function failAndAbort(worker: Entity, job: CraftingJob): BehaviorActionData[] {
@@ -205,12 +231,18 @@ function failAndAbort(worker: Entity, job: CraftingJob): BehaviorActionData[] {
     return [];
 }
 
+/**
+ * Returns the actions needed to free the worker's hands so held can accept the
+ * craft outputs (empty, or already the same item). Returns an empty array when
+ * no drop is needed, or `null` when a drop is required but no drop position
+ * exists — the caller suspends the job in that case.
+ */
 function ensureHeldAcceptsOutputs(
     root: Entity,
     worker: Entity,
     job: CraftingJob,
-    held: import("../../component/heldItemComponent.ts").HeldItemComponent,
-): BehaviorActionData[] {
+    held: HeldItemComponent,
+): BehaviorActionData[] | null {
     if (isHeldEmpty(held)) return [];
     const allOutputsMatch = job.recipe.outputs.every(
         (out) => out.item.id === held.item!.id,
@@ -219,10 +251,7 @@ function ensureHeldAcceptsOutputs(
 
     const dropPos = findDropPosition(root, worker.worldPosition, held.item!);
     if (!dropPos) {
-        throw new Error(
-            `craftingPlanner: cannot find drop position for held item ` +
-                `'${held.item!.id}' within radius`,
-        );
+        return null;
     }
     return [
         { type: "moveTo", target: dropPos },
