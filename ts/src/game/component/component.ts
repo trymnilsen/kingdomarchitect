@@ -46,6 +46,8 @@ import type { TraversalComponent } from "./traversalComponent.ts";
 import type { DayComponent } from "./dayComponent.ts";
 import type { LightSourceComponent } from "./lightSourceComponent.ts";
 import type { RaidingComponent } from "./raidingComponent.ts";
+import type { StationComponent } from "./stationComponent.ts";
+import type { WatchComponent } from "./watchComponent.ts";
 
 export type Components =
     | SpriteComponent
@@ -95,7 +97,9 @@ export type Components =
     | TraversalComponent
     | DayComponent
     | LightSourceComponent
-    | RaidingComponent;
+    | RaidingComponent
+    | StationComponent
+    | WatchComponent;
 
 export interface BaseComponent {
     id: string;

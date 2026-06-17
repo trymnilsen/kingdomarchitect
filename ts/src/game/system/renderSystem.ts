@@ -45,6 +45,10 @@ import {
 } from "../vision/revealFootprint.ts";
 import { perceivedBandAt } from "../vision/perceivedBand.ts";
 import { forEachComponentWithin } from "../component/chunkMapComponent.ts";
+import { WatchComponentId } from "../component/watchComponent.ts";
+import { searchlightWedgeOffsets } from "../vision/searchlight.ts";
+import { isTowerManned } from "../component/stationQuery.ts";
+import { STATION_MANNED_REACH } from "../vision/visionReach.ts";
 
 export const renderSystem: EcsSystem = {
     onRender,
@@ -108,6 +112,12 @@ function onRender(
     const emitters = collectLightEmitters(rootEntity);
     const phase = rootEntity.getEcsComponent(DayComponentId)?.phase ?? "dawn";
 
+    // The night searchlight lights its swept quarter; the rest of the reach stays
+    // dark. Stamp it after the per-viewer floor so the beam reads bright.
+    if (visibilityMap && phase === "night") {
+        stampSearchlightBeams(rootEntity, viewport, visibilityMap);
+    }
+
     if (tiles && visibilityMap) {
         drawTiles(tiles, renderScope, visibilityMap, emitters, phase, rootEntity);
     }
@@ -151,6 +161,34 @@ function onRender(
         start: renderStart,
         end: renderEnd,
     });*/
+}
+
+/**
+ * Stamps each manned tower's night searchlight wedge into the perception floor as
+ * `bright`, so the swept quarter is seen while the rest of the reach stays dark. The
+ * wedge sits inside the manned worker's reach diamond, so its tiles are already in the
+ * reach set; re-adding them is harmless.
+ */
+function stampSearchlightBeams(
+    root: Entity,
+    viewport: Bounds,
+    visibilityMap: VisibilityMapComponent,
+) {
+    forEachComponentWithin(root, viewport, WatchComponentId, (tower, watch) => {
+        if (!isTowerManned(root, tower)) {
+            return;
+        }
+        const offsets = searchlightWedgeOffsets(
+            watch.beamAim,
+            STATION_MANNED_REACH,
+        );
+        const points = offsetPatternWithPoint(tower.worldPosition, offsets);
+        for (let i = 0; i < points.length; i++) {
+            const numberId = makeNumberId(points[i].x, points[i].y);
+            visibilityMap.visibility.add(numberId);
+            visibilityMap.perceptionFloor.set(numberId, "bright");
+        }
+    });
 }
 
 function drawSprite(

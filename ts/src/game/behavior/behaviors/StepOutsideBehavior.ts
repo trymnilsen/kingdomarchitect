@@ -3,6 +3,7 @@ import { isImpassableStructure } from "../../component/traversalComponent.ts";
 import { queryEntity } from "../../map/query/queryEntity.ts";
 import type { BehaviorActionData } from "../actions/ActionData.ts";
 import type { Behavior } from "./Behavior.ts";
+import { isManningStation } from "../../component/stationQuery.ts";
 
 /**
  * Utility above normal work (performJob = 50), hauling, player commands and combat
@@ -34,9 +35,15 @@ export function createStepOutsideBehavior(): Behavior {
         isValid(entity: Entity): boolean {
             const root = entity.getRootEntity();
             const occupants = queryEntity(root, entity.worldPosition);
-            return occupants.some((occupant) =>
-                isImpassableStructure(occupant),
-            );
+            if (!occupants.some((occupant) => isImpassableStructure(occupant))) {
+                return false;
+            }
+            // A guard manning its (enabled) station stands on the building on
+            // purpose — don't ground it, or it would oscillate on and off the post.
+            if (isManningStation(entity)) {
+                return false;
+            }
+            return true;
         },
 
         utility(_entity: Entity): number {

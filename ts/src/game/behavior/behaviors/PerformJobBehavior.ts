@@ -27,6 +27,10 @@ import {
 } from "../../component/heldItemComponent.ts";
 import { getResourceById } from "../../../data/inventory/items/naturalResource.ts";
 import { getJobTargetPosition } from "../../job/jobQuery.ts";
+import {
+    RoleComponentId,
+    WorkerRole,
+} from "../../component/worker/roleComponent.ts";
 
 type BuildJobValidator = (
     root: Entity,
@@ -62,6 +66,13 @@ export function createPerformJobBehavior(
         name: "performJob",
 
         isValid(entity: Entity): boolean {
+            // Guards are pure sentries: removed from the labor pool entirely, so
+            // they never claim jobs. They man towers (GarrisonBehavior) instead.
+            const role = entity.getEcsComponent(RoleComponentId);
+            if (role?.role === WorkerRole.Guard) {
+                return false;
+            }
+
             const jobQueue =
                 entity.getAncestorEcsComponent(JobQueueComponentId);
 

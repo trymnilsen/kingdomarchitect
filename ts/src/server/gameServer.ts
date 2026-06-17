@@ -29,6 +29,7 @@ import { createCommandSystem } from "../game/system/commandSystem.ts";
 import { createEffectSystem } from "../game/system/effectSystem.ts";
 import { createEffectExecutorMap } from "../data/effect/effectExecutorRegistry.ts";
 import { housingSystem } from "../game/system/housingSystem.ts";
+import { watchSystem } from "../game/system/watchSystem.ts";
 import { regrowSystem } from "../game/system/regrowSystem.ts";
 import { farmGrowthSystem } from "../game/system/farmGrowthSystem.ts";
 import { createPhaseTransitionSystem } from "../game/system/phaseTransitionSystem.ts";
@@ -236,6 +237,7 @@ export class GameServer {
             createCommandSystem(this.gameTime, this.persistenceManager),
         );
         this.world.addSystem(housingSystem);
+        this.world.addSystem(watchSystem);
         this.world.addSystem(regrowSystem);
         this.world.addSystem(farmGrowthSystem);
         this.world.addSystem(

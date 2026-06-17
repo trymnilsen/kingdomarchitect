@@ -49,6 +49,15 @@ import {
     LightSourceComponentId,
 } from "../component/lightSourceComponent.ts";
 import { HousingComponentId } from "../component/housingComponent.ts";
+import { stoneTower } from "../../data/building/stone/tower.ts";
+import {
+    createStationComponent,
+    StationComponentId,
+} from "../component/stationComponent.ts";
+import {
+    createWatchComponent,
+    WatchComponentId,
+} from "../component/watchComponent.ts";
 import { CraftingComponentId } from "../component/craftingComponent.ts";
 import { WorkplaceComponentId } from "../component/workplaceComponent.ts";
 import { StockpileComponentId } from "../component/stockpileComponent.ts";
@@ -183,5 +192,13 @@ export function applyFunctionalComponents(
         entity.invalidateComponent(CraftingComponentId);
         entity.invalidateComponent(InventoryComponentId);
         entity.invalidateComponent(WorkplaceComponentId);
+    }
+    if (building.id == stoneTower.id) {
+        // The lookout station: a worker stationed on top surveys a wide area by day
+        // and runs the searchlight watch by night. Priority defaults to Off (inert).
+        entity.setEcsComponent(createStationComponent());
+        entity.setEcsComponent(createWatchComponent());
+        entity.invalidateComponent(StationComponentId);
+        entity.invalidateComponent(WatchComponentId);
     }
 }

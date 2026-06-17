@@ -96,6 +96,16 @@ import {
     type SetFarmCropCommand,
 } from "../../server/message/command/setFarmCropCommand.ts";
 import { RoleComponentId } from "../component/worker/roleComponent.ts";
+import {
+    SetStationPriorityCommandId,
+    type SetStationPriorityCommand,
+} from "../../server/message/command/setStationPriorityCommand.ts";
+import {
+    SetSearchlightModeCommandId,
+    type SetSearchlightModeCommand,
+} from "../../server/message/command/setSearchlightModeCommand.ts";
+import { StationComponentId } from "../component/stationComponent.ts";
+import { WatchComponentId } from "../component/watchComponent.ts";
 import { FarmComponentId, FarmState } from "../component/farmComponent.ts";
 import {
     SetPreferredAmountCommandId,
@@ -223,7 +233,67 @@ function onGameMessage(
         case PrioritiseJobCommandId:
             prioritiseJob(root, message.command as PrioritiseJobCommand);
             break;
+        case SetStationPriorityCommandId:
+            setStationPriority(
+                root,
+                message.command as SetStationPriorityCommand,
+            );
+            break;
+        case SetSearchlightModeCommandId:
+            setSearchlightMode(
+                root,
+                message.command as SetSearchlightModeCommand,
+            );
+            break;
     }
+}
+
+function setStationPriority(root: Entity, command: SetStationPriorityCommand) {
+    const tower = root.findEntity(command.tower);
+    if (!tower) {
+        log.warn("Tower not found for SetStationPriority", {
+            tower: command.tower,
+        });
+        return;
+    }
+
+    const station = tower.getEcsComponent(StationComponentId);
+    if (!station) {
+        log.warn("Entity has no station component for SetStationPriority", {
+            tower: command.tower,
+        });
+        return;
+    }
+
+    station.priority = command.priority;
+    tower.invalidateComponent(StationComponentId);
+}
+
+function setSearchlightMode(root: Entity, command: SetSearchlightModeCommand) {
+    const tower = root.findEntity(command.tower);
+    if (!tower) {
+        log.warn("Tower not found for SetSearchlightMode", {
+            tower: command.tower,
+        });
+        return;
+    }
+
+    const watch = tower.getEcsComponent(WatchComponentId);
+    if (!watch) {
+        log.warn("Entity has no watch component for SetSearchlightMode", {
+            tower: command.tower,
+        });
+        return;
+    }
+
+    watch.searchlight = command.mode;
+    // A fixed cardinal also sets the resolved aim immediately; "auto" lets the
+    // WatchSystem drive beamAim.
+    if (command.mode !== "auto") {
+        watch.lockedOn = null;
+        watch.beamAim = command.mode;
+    }
+    tower.invalidateComponent(WatchComponentId);
 }
 
 function changeOccupation(root: Entity, command: ChangeOccupationCommand) {

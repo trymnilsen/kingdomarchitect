@@ -3,6 +3,13 @@ import {
     VisibilityComponentId,
     type MinimalPerception,
 } from "../component/visibilityComponent.ts";
+import { stationUnderEntity } from "../component/stationQuery.ts";
+
+/**
+ * The vision reach a viewer has while standing on a station tile (the stone tower's
+ * lookout vantage). A commanding survey that clearly out-ranges a wandering worker.
+ */
+export const STATION_MANNED_REACH = 8;
 
 /**
  * How far a worker can see, in tiles, before illumination is considered. This is
@@ -42,10 +49,25 @@ export const BUILDING_VISION_REACH = 1;
  * derive-on-read shape is already in place and the modifier stack lands here
  * without touching the call sites.
  *
- * @param _entity the viewer whose modifiers would be summed (unused for now)
+ * @param entity the viewer whose modifiers are summed
  */
-export function visionReachModifiers(_entity: Entity): number {
-    return 0;
+export function visionReachModifiers(entity: Entity): number {
+    return stationVantageModifier(entity);
+}
+
+/**
+ * A viewer standing on a station tile (a manned tower) sees from that vantage. The
+ * bonus is granted to the viewer on the tile, not to the station — so it lives and
+ * dies with the worker and leaves no reference on the station to dangle. The station
+ * itself is excluded so an unmanned tower never gets the bonus from matching its own
+ * position.
+ */
+function stationVantageModifier(entity: Entity): number {
+    if (!stationUnderEntity(entity)) {
+        return 0;
+    }
+    const base = entity.getEcsComponent(VisibilityComponentId)?.baseReach ?? 0;
+    return STATION_MANNED_REACH - base;
 }
 
 /**
