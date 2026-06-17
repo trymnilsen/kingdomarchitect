@@ -22,7 +22,12 @@ describe("LazyGraph", () => {
     });
 
     it("Gets null if attempting to get node not in graph", () => {
-        assert.strictEqual(2, 2);
+        // The node function returns null for any blocked coordinate.
+        const lazyGraph = new LazyGraph((point) =>
+            point.x === 1 && point.y === 1 ? null : 1,
+        );
+        assert.strictEqual(lazyGraph.nodeAt(1, 1), null);
+        assert.ok(lazyGraph.nodeAt(0, 0) !== null);
     });
 
     it("Can invalidate point in graph", () => {
@@ -43,14 +48,45 @@ describe("LazyGraph", () => {
     });
 
     it("Can mark node as dirty", () => {
-        assert.strictEqual(2, 2);
+        const lazyGraph = new LazyGraph(() => 1);
+        const node = lazyGraph.nodeAt(0, 0);
+        assert.ok(node);
+        assert.strictEqual(node.isDirty, false);
+        lazyGraph.markDirtyNode(node);
+        assert.strictEqual(node.isDirty, true);
     });
 
     it("Can clean nodes", () => {
-        assert.strictEqual(2, 2);
+        const lazyGraph = new LazyGraph(() => 1);
+        const node = lazyGraph.nodeAt(0, 0);
+        assert.ok(node);
+        node.f = 7;
+        node.g = 6;
+        node.h = 5;
+        node.isDirty = true;
+        node.closed = true;
+
+        lazyGraph.cleanDirtyNodes();
+
+        assert.strictEqual(node.f, 0);
+        assert.strictEqual(node.g, 0);
+        assert.strictEqual(node.h, 0);
+        assert.strictEqual(node.isDirty, false);
+        assert.strictEqual(node.closed, false);
     });
 
     it("Can get neighbor of graph node", () => {
-        assert.strictEqual(2, 2);
+        // Block the western neighbor (x-1) of (1,1) so it is omitted.
+        const lazyGraph = new LazyGraph((point) =>
+            point.x === 0 && point.y === 1 ? null : 1,
+        );
+        const center = lazyGraph.nodeAt(1, 1);
+        assert.ok(center);
+        const neighbors = lazyGraph.neighbors(center);
+
+        // East, South, North materialize; West is null and omitted.
+        assert.strictEqual(neighbors.length, 3);
+        const coords = neighbors.map((n) => `${n.x},${n.y}`).sort();
+        assert.deepStrictEqual(coords, ["1,0", "1,2", "2,1"]);
     });
 });
