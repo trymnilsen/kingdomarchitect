@@ -224,9 +224,9 @@ export class TypedEvent<TBaseEvent extends object> {
      * @param handleId the id of the subscription to remove
      */
     removeListener(handleId: string) {
-        this.subscriptions = this.subscriptions.filter((item) => {
-            item.handleId != handleId;
-        });
+        this.subscriptions = this.subscriptions.filter(
+            (item) => item.handleId !== handleId,
+        );
     }
 
     private getNextListenerId(): string {

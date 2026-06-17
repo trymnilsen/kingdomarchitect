@@ -18,9 +18,13 @@ export class Completer<T> {
         });
     }
 
-    resolveWith(_value: T) {}
+    resolveWith(value: T) {
+        this.resolvedEvent.publish(value);
+    }
 
-    rejectWith(_value: unknown) {}
+    rejectWith(value: unknown) {
+        this.rejectedEvent.publish(value);
+    }
 
     dispose() {
         this.resolvedEvent.dispose();

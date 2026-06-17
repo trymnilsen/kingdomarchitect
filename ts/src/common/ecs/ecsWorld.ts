@@ -154,7 +154,11 @@ export class EcsWorld {
     runUpdate(gameTime: number) {
         for (let i = 0; i < this.updateSystems.length; i++) {
             const system = this.updateSystems[i];
-            system(this.root, gameTime);
+            try {
+                system(this.root, gameTime);
+            } catch (err) {
+                log.error("Update system error", { error: err });
+            }
         }
     }
 
