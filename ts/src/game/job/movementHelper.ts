@@ -12,6 +12,11 @@ import {
 } from "../component/directionComponent.ts";
 import { getPathfindingGraphForEntity } from "../map/path/getPathfindingGraphForEntity.ts";
 import { discoverFootprint } from "../map/discoverFootprint.ts";
+import {
+    MovementStaminaComponentId,
+    recordMove,
+} from "../component/movementStaminaComponent.ts";
+import { spendEntityEnergy } from "../component/energyComponent.ts";
 
 export const MovementResult = {
     Ok: "ok",
@@ -68,4 +73,30 @@ export function discoverAfterMovement(entity: Entity, nextPoint: Point) {
     if (visibility) {
         discoverFootprint(entity.getRootEntity(), entity, nextPoint);
     }
+}
+
+/**
+ * Apply the side-effects of an entity moving one tile from `from` to `to`:
+ * reveal the footprint, face the move direction, commit the new position, and
+ * spend stamina and one unit of energy. One tile of travel is this whole bundle,
+ * shared by every single-step action (moveTo, stepOnto, stepOff) so the cost and
+ * bookkeeping can't drift between them.
+ */
+export function applyStep(
+    entity: Entity,
+    from: Point,
+    to: Point,
+    tick: number,
+): void {
+    discoverAfterMovement(entity, to);
+    entity.updateComponent(DirectionComponentId, (component) => {
+        updateDirectionComponent(component, from, to);
+    });
+    entity.worldPosition = to;
+    const stamina = entity.getEcsComponent(MovementStaminaComponentId);
+    if (stamina) {
+        recordMove(stamina, tick);
+        entity.invalidateComponent(MovementStaminaComponentId);
+    }
+    spendEntityEnergy(entity, 1);
 }

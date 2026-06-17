@@ -4,7 +4,7 @@ import {
     weightedRandomEntry,
 } from "../../common/array.ts";
 import { log } from "../../common/logging/logger.ts";
-import { randomColor } from "../../common/color.ts";
+import { randomColor } from "../../common/color/hexColor.ts";
 import { generateId } from "../../common/idGenerator.ts";
 import { type Point, adjacentPoints } from "../../common/point.ts";
 import { getChunk, TileComponentId } from "../component/tileComponent.ts";

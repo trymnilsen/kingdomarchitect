@@ -9,6 +9,7 @@ import { createVisibilityComponent } from "../component/visibilityComponent.ts";
 import { BUILDING_VISION_REACH } from "../vision/visionReach.ts";
 import { createHousingComponent } from "../component/housingComponent.ts";
 import { createCraftingComponent } from "../component/craftingComponent.ts";
+import type { CraftingRecipe } from "../../data/crafting/craftingRecipe.ts";
 import { createInventoryComponent } from "../component/inventoryComponent.ts";
 import { woodenHouse } from "../../data/building/wood/house.ts";
 import { blacksmith } from "../../data/building/stone/blacksmith.ts";
@@ -95,6 +96,37 @@ export function buildingPrefab(
 }
 
 /**
+ * Buildings that are crafting stations, mapped to the recipes they can make.
+ * They are otherwise identical (crafting + inventory + workplace), so the only
+ * per-building difference is the recipe list.
+ */
+const craftingStationRecipes: ReadonlyMap<string, readonly CraftingRecipe[]> =
+    new Map([
+        [blacksmith.id, blacksmithRecipes],
+        [carpenter.id, carpenterRecipes],
+        [quary.id, quarryRecipes],
+        [baker.id, bakerRecipes],
+        [workshop.id, workshopRecipes],
+        [enchanter.id, enchanterRecipes],
+    ]);
+
+/**
+ * Turn an entity into a crafting station: it can craft `recipes`, holds staged
+ * inputs and outputs in an inventory, and is a workplace a worker mans.
+ */
+function applyCraftingStation(
+    entity: Entity,
+    recipes: readonly CraftingRecipe[],
+): void {
+    entity.setEcsComponent(createCraftingComponent(recipes));
+    entity.setEcsComponent(createInventoryComponent());
+    entity.setEcsComponent(createWorkplaceComponent());
+    entity.invalidateComponent(CraftingComponentId);
+    entity.invalidateComponent(InventoryComponentId);
+    entity.invalidateComponent(WorkplaceComponentId);
+}
+
+/**
  * Attaches the functional ECS components for a completed building.
  * Called both when creating a non-scaffolded building and when construction finishes.
  */
@@ -117,21 +149,9 @@ export function applyFunctionalComponents(
         entity.setEcsComponent(createHousingComponent());
         entity.invalidateComponent(HousingComponentId);
     }
-    if (building.id == blacksmith.id) {
-        entity.setEcsComponent(createCraftingComponent(blacksmithRecipes));
-        entity.setEcsComponent(createInventoryComponent());
-        entity.setEcsComponent(createWorkplaceComponent());
-        entity.invalidateComponent(CraftingComponentId);
-        entity.invalidateComponent(InventoryComponentId);
-        entity.invalidateComponent(WorkplaceComponentId);
-    }
-    if (building.id == carpenter.id) {
-        entity.setEcsComponent(createCraftingComponent(carpenterRecipes));
-        entity.setEcsComponent(createInventoryComponent());
-        entity.setEcsComponent(createWorkplaceComponent());
-        entity.invalidateComponent(CraftingComponentId);
-        entity.invalidateComponent(InventoryComponentId);
-        entity.invalidateComponent(WorkplaceComponentId);
+    const stationRecipes = craftingStationRecipes.get(building.id);
+    if (stationRecipes) {
+        applyCraftingStation(entity, stationRecipes);
     }
     if (building.id == stockPile.id) {
         entity.setEcsComponent(createInventoryComponent());
@@ -147,14 +167,6 @@ export function applyFunctionalComponents(
         );
         entity.invalidateComponent(ProductionComponentId);
     }
-    if (building.id == quary.id) {
-        entity.setEcsComponent(createCraftingComponent(quarryRecipes));
-        entity.setEcsComponent(createInventoryComponent());
-        entity.setEcsComponent(createWorkplaceComponent());
-        entity.invalidateComponent(CraftingComponentId);
-        entity.invalidateComponent(InventoryComponentId);
-        entity.invalidateComponent(WorkplaceComponentId);
-    }
     if (building.id == goblinCampfire.id) {
         entity.setEcsComponent(createFireSourceComponent(15, 2, 1));
         entity.invalidateComponent(FireSourceComponentId);
@@ -168,30 +180,6 @@ export function applyFunctionalComponents(
         entity.invalidateComponent(FarmComponentId);
         entity.setEcsComponent(createTraversalComponent(10));
         entity.invalidateComponent(TraversalComponentId);
-    }
-    if (building.id == baker.id) {
-        entity.setEcsComponent(createCraftingComponent(bakerRecipes));
-        entity.setEcsComponent(createInventoryComponent());
-        entity.setEcsComponent(createWorkplaceComponent());
-        entity.invalidateComponent(CraftingComponentId);
-        entity.invalidateComponent(InventoryComponentId);
-        entity.invalidateComponent(WorkplaceComponentId);
-    }
-    if (building.id == workshop.id) {
-        entity.setEcsComponent(createCraftingComponent(workshopRecipes));
-        entity.setEcsComponent(createInventoryComponent());
-        entity.setEcsComponent(createWorkplaceComponent());
-        entity.invalidateComponent(CraftingComponentId);
-        entity.invalidateComponent(InventoryComponentId);
-        entity.invalidateComponent(WorkplaceComponentId);
-    }
-    if (building.id == enchanter.id) {
-        entity.setEcsComponent(createCraftingComponent(enchanterRecipes));
-        entity.setEcsComponent(createInventoryComponent());
-        entity.setEcsComponent(createWorkplaceComponent());
-        entity.invalidateComponent(CraftingComponentId);
-        entity.invalidateComponent(InventoryComponentId);
-        entity.invalidateComponent(WorkplaceComponentId);
     }
     if (building.id == stoneTower.id) {
         // The lookout station: a worker stationed on top surveys a wide area by day

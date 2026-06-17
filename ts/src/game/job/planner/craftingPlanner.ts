@@ -1,5 +1,5 @@
-import { distance } from "../../../common/point.ts";
 import type { Entity } from "../../entity/entity.ts";
+import { findNearestGroundPileWithItem } from "../../entity/findNearestGroundPileWithItem.ts";
 import type { BehaviorActionData } from "../../behavior/actions/ActionData.ts";
 import {
     InventoryComponentId,
@@ -10,8 +10,6 @@ import {
     type HeldItemComponent,
     isHeldEmpty,
 } from "../../component/heldItemComponent.ts";
-import { CollectableComponentId } from "../../component/collectableComponent.ts";
-import { GroundItemComponentId } from "../../component/groundItemComponent.ts";
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import type { CraftingJob } from "../craftingJob.ts";
 import { failJobFromQueue, suspendJobInQueue } from "../jobLifecycle.ts";
@@ -263,26 +261,3 @@ function ensureHeldAcceptsOutputs(
     ];
 }
 
-function findNearestGroundPileWithItem(
-    root: Entity,
-    from: import("../../../common/point.ts").Point,
-    itemId: string,
-): Entity | null {
-    const candidates = root.queryComponents(GroundItemComponentId);
-    let best: Entity | null = null;
-    let bestDistance = Infinity;
-    for (const [entity] of candidates) {
-        const collectable = entity.getEcsComponent(CollectableComponentId);
-        if (!collectable) continue;
-        const matches = collectable.items.some(
-            (stack) => stack.item.id === itemId && stack.amount > 0,
-        );
-        if (!matches) continue;
-        const d = distance(from, entity.worldPosition);
-        if (d < bestDistance) {
-            bestDistance = d;
-            best = entity;
-        }
-    }
-    return best;
-}

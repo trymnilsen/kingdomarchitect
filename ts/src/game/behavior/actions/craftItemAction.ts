@@ -11,12 +11,8 @@ import {
 } from "../../component/heldItemComponent.ts";
 import { spendEntityEnergy } from "../../component/energyComponent.ts";
 
-import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
-import {
-    findJobClaimedBy,
-    completeJobFromQueue,
-} from "../../job/jobLifecycle.ts";
+import { completeClaimedJob } from "../../job/jobLifecycle.ts";
 import { ActionComplete, ActionRunning, type ActionResult } from "./Action.ts";
 import type { CraftingRecipe } from "../../../data/crafting/craftingRecipe.ts";
 
@@ -119,13 +115,7 @@ export function executeCraftItemAction(
         }
         entity.invalidateComponent(HeldItemComponentId);
 
-        const queueEntity = entity.getAncestorEntity(JobQueueComponentId);
-        if (queueEntity) {
-            const job = findJobClaimedBy(queueEntity, entity.id);
-            if (job) {
-                completeJobFromQueue(queueEntity, job);
-            }
-        }
+        completeClaimedJob(entity);
         return ActionComplete;
     }
 

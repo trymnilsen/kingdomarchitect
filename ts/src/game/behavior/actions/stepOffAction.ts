@@ -1,17 +1,8 @@
 import { adjacentPoints, type Point } from "../../../common/point.ts";
 import { log } from "../../../common/logging/logger.ts";
-import {
-    DirectionComponentId,
-    updateDirectionComponent,
-} from "../../component/directionComponent.ts";
-import {
-    MovementStaminaComponentId,
-    recordMove,
-} from "../../component/movementStaminaComponent.ts";
-import { spendEntityEnergy } from "../../component/energyComponent.ts";
 import { TRAVERSAL_IMPASSABLE_THRESHOLD } from "../../component/traversalComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
-import { discoverAfterMovement } from "../../job/movementHelper.ts";
+import { applyStep } from "../../job/movementHelper.ts";
 import {
     getWeightAtPoint,
     isTileAvailable,
@@ -54,17 +45,7 @@ export function executeStepOffAction(
         return ActionRunning;
     }
 
-    discoverAfterMovement(entity, to);
-    entity.updateComponent(DirectionComponentId, (component) => {
-        updateDirectionComponent(component, from, to);
-    });
-    entity.worldPosition = to;
-    const stamina = entity.getEcsComponent(MovementStaminaComponentId);
-    if (stamina) {
-        recordMove(stamina, tick);
-        entity.invalidateComponent(MovementStaminaComponentId);
-    }
-    spendEntityEnergy(entity, 1);
+    applyStep(entity, from, to, tick);
 
     return ActionComplete;
 }

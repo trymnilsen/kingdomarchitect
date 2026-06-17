@@ -5,11 +5,7 @@ import {
     removeCollectableItems,
 } from "../../component/collectableComponent.ts";
 import { BuildingComponentId } from "../../component/buildingComponent.ts";
-import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
-import {
-    findJobClaimedBy,
-    completeJobFromQueue,
-} from "../../job/jobLifecycle.ts";
+import { completeClaimedJob } from "../../job/jobLifecycle.ts";
 
 import {
     addToHeldItem,
@@ -59,7 +55,7 @@ export function executeCollectItemsAction(
     }
 
     if (collectableComponent.items.length === 0) {
-        completeCollectJob(entity);
+        completeClaimedJob(entity);
         return ActionComplete;
     }
 
@@ -98,24 +94,10 @@ export function executeCollectItemsAction(
         targetEntity.remove();
     }
 
-    completeCollectJob(entity);
+    // Complete the claimed job so the post-pickup replan picks DepositHeldBehavior
+    // to haul the item to a stockpile, instead of re-selecting PerformJobBehavior
+    // and stranding the worker holding it.
+    completeClaimedJob(entity);
     return ActionComplete;
 }
 
-/**
- * Mark the CollectItemJob claimed by this worker as complete. Mirrors the
- * job-completion step every other job-fulfilling action performs — without it
- * the claimed job lingers in the queue, so the post-pickup replan re-selects
- * PerformJobBehavior (utility 50) over DepositHeldBehavior (15) and the worker
- * strands itself holding the item instead of hauling it to a stockpile.
- */
-function completeCollectJob(entity: Entity): void {
-    const queueEntity = entity.getAncestorEntity(JobQueueComponentId);
-    if (!queueEntity) {
-        return;
-    }
-    const job = findJobClaimedBy(queueEntity, entity.id);
-    if (job) {
-        completeJobFromQueue(queueEntity, job);
-    }
-}

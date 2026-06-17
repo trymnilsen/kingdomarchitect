@@ -1,16 +1,7 @@
 import { isPointAdjacentTo, pointEquals } from "../../../common/point.ts";
 import { log } from "../../../common/logging/logger.ts";
-import {
-    DirectionComponentId,
-    updateDirectionComponent,
-} from "../../component/directionComponent.ts";
-import {
-    MovementStaminaComponentId,
-    recordMove,
-} from "../../component/movementStaminaComponent.ts";
-import { spendEntityEnergy } from "../../component/energyComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
-import { discoverAfterMovement } from "../../job/movementHelper.ts";
+import { applyStep } from "../../job/movementHelper.ts";
 import { ActionComplete, type ActionResult } from "./Action.ts";
 
 /**
@@ -63,17 +54,7 @@ export function executeStepOntoAction(
         return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 
-    discoverAfterMovement(entity, to);
-    entity.updateComponent(DirectionComponentId, (component) => {
-        updateDirectionComponent(component, from, to);
-    });
-    entity.worldPosition = to;
-    const stamina = entity.getEcsComponent(MovementStaminaComponentId);
-    if (stamina) {
-        recordMove(stamina, tick);
-        entity.invalidateComponent(MovementStaminaComponentId);
-    }
-    spendEntityEnergy(entity, 1);
+    applyStep(entity, from, to, tick);
 
     return ActionComplete;
 }

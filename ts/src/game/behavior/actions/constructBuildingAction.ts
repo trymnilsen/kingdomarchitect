@@ -3,13 +3,9 @@ import { log } from "../../../common/logging/logger.ts";
 import { BuildingComponentId } from "../../component/buildingComponent.ts";
 
 import { heal, HealthComponentId } from "../../component/healthComponent.ts";
-import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { finishConstruction } from "../../job/buildBuildingJob.ts";
-import {
-    findJobClaimedBy,
-    completeJobFromQueue,
-} from "../../job/jobLifecycle.ts";
+import { completeClaimedJob } from "../../job/jobLifecycle.ts";
 import { ActionComplete, ActionRunning, type ActionResult } from "./Action.ts";
 
 export type ConstructBuildingActionData = {
@@ -52,13 +48,7 @@ export function executeConstructBuildingAction(
 
     if (healthComponent.currentHp >= healthComponent.maxHp) {
         finishConstruction(root, buildingEntity, buildingComponent);
-        const queueEntity = entity.getAncestorEntity(JobQueueComponentId);
-        if (queueEntity) {
-            const job = findJobClaimedBy(queueEntity, entity.id);
-            if (job) {
-                completeJobFromQueue(queueEntity, job);
-            }
-        }
+        completeClaimedJob(entity);
         return ActionComplete;
     }
 

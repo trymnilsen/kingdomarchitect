@@ -1,6 +1,4 @@
-import { spriteRefs } from "../../../../asset/sprite.ts";
 import type { Point } from "../../../../common/point.ts";
-import { allSides } from "../../../../common/sides.ts";
 import type { RenderScope } from "../../../../rendering/renderScope.ts";
 import { SetPlayerCommand } from "../../../../server/message/command/setPlayerCommand.ts";
 import type { ComponentDescriptor } from "../../../../ui/declarative/ui.ts";
@@ -9,8 +7,9 @@ import type { Entity } from "../../../entity/entity.ts";
 import type { SearchedNode } from "../../../map/path/search.ts";
 import { queryPath } from "../../../map/query/pathQuery.ts";
 import { queryEntity } from "../../../map/query/queryEntity.ts";
-import { TileSize, type GroundTile } from "../../../map/tile.ts";
+import { type GroundTile } from "../../../map/tile.ts";
 import { InteractionState } from "../../handler/interactionState.ts";
+import { drawSelectionCursor } from "../drawSelectionCursor.ts";
 import { uiScaffold } from "../../view/uiScaffold.ts";
 import { AlertMessageState } from "../common/alertMessageState.ts";
 
@@ -70,24 +69,7 @@ export class AttackSelectionState extends InteractionState {
     }
 
     override onDraw(context: RenderScope): void {
-        if (this.selectedPoint) {
-            const cursorWorldPosition = context.camera.tileSpaceToScreenSpace(
-                this.selectedPoint,
-            );
-
-            context.drawNinePatchSprite({
-                sprite: this.selection
-                    ? spriteRefs.cursor
-                    : spriteRefs.cursor_red,
-                height: TileSize,
-                width: TileSize,
-                scale: 1.0,
-                sides: allSides(12.0),
-                x: cursorWorldPosition.x,
-                y: cursorWorldPosition.y,
-            });
-        }
-
+        drawSelectionCursor(context, this.selectedPoint, !!this.selection);
         super.onDraw(context);
     }
 

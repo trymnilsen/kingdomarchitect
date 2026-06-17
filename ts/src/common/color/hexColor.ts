@@ -38,6 +38,18 @@ function componentToHex(c: number): string {
     return hex.length === 1 ? "0" + hex : hex;
 }
 
+/**
+ * A random opaque "#rrggbb" colour. Used only for debug tints (e.g. per-volume
+ * debug colours), so the exact distribution does not matter.
+ */
+export function randomColor(): string {
+    return rgbToHex({
+        r: Math.floor(Math.random() * 256),
+        g: Math.floor(Math.random() * 256),
+        b: Math.floor(Math.random() * 256),
+    });
+}
+
 /** Converts an {@link RgbColor} to a "#rrggbb" hex string. */
 export function rgbToHex(rgb: RgbColor): string {
     return (

@@ -8,18 +8,12 @@ import {
 } from "../../component/BehaviorAgentComponent.ts";
 import { isImpassableStructure } from "../../component/traversalComponent.ts";
 import {
-    DirectionComponentId,
-    updateDirectionComponent,
-} from "../../component/directionComponent.ts";
-import {
     MovementStaminaComponentId,
     hasMovedThisTick,
-    recordMove,
 } from "../../component/movementStaminaComponent.ts";
 import { ResourceComponentId } from "../../component/resourceComponent.ts";
-import { spendEntityEnergy } from "../../component/energyComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
-import { discoverAfterMovement } from "../../job/movementHelper.ts";
+import { applyStep } from "../../job/movementHelper.ts";
 import { getPathfindingGraphForEntity } from "../../map/path/getPathfindingGraphForEntity.ts";
 import type { GraphNode } from "../../map/path/graph/graph.ts";
 import { isTileAvailable } from "../../map/path/graph/weight.ts";
@@ -200,7 +194,7 @@ export function executeMoveToAction(
         }
 
         // Tile is free — step into it.
-        applyRequesterStep(entity, entity.worldPosition, nextPoint, tick);
+        applyStep(entity, entity.worldPosition, nextPoint, tick);
         action.cachedPath = action.cachedPath!.slice(1);
         log.info(
             `${entity.id} stepped to (${entity.worldPosition.x},${entity.worldPosition.y})`,
@@ -260,24 +254,6 @@ function hasArrived(
  * Move the requester one step from `from` to `to`, updating direction,
  * fog of war, and stamina tracking. Called after the next tile is confirmed clear.
  */
-function applyRequesterStep(
-    entity: Entity,
-    from: Point,
-    to: Point,
-    tick: number,
-): void {
-    discoverAfterMovement(entity, to);
-    entity.updateComponent(DirectionComponentId, (component) => {
-        updateDirectionComponent(component, from, to);
-    });
-    entity.worldPosition = to;
-    const stamina = entity.getEcsComponent(MovementStaminaComponentId);
-    if (stamina) {
-        recordMove(stamina, tick);
-        entity.invalidateComponent(MovementStaminaComponentId);
-    }
-    spendEntityEnergy(entity, 1);
-}
 
 /**
  * Returns a weight modifier that makes structures (non-road buildings and large
@@ -485,7 +461,7 @@ function resolveDisplacedTile(
         }
         // Non-cycle: chain cleared the target tile, step into it.
         if (!result.transaction.isCycle) {
-            applyRequesterStep(entity, entity.worldPosition, nextPoint, tick);
+            applyStep(entity, entity.worldPosition, nextPoint, tick);
             action.cachedPath = action.cachedPath!.slice(1);
             log.debug(
                 `${entity.id} displaced chain, stepped to (${entity.worldPosition.x},${entity.worldPosition.y})`,

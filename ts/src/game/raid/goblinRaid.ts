@@ -119,17 +119,7 @@ export function formGoblinRaid(root: Entity): void {
  */
 function rankedPlayerBuildingTargets(root: Entity): Entity[] {
     const candidates = collectPlayerTargets(root);
-    candidates.sort((a, b) => {
-        if (a.value !== b.value) {
-            return b.value - a.value;
-        }
-        const da = squaredDistance(a.entity.worldPosition, { x: 0, y: 0 });
-        const db = squaredDistance(b.entity.worldPosition, { x: 0, y: 0 });
-        if (da !== db) {
-            return da - db;
-        }
-        return a.entity.id < b.entity.id ? -1 : 1;
-    });
+    candidates.sort(byRaidPriority({ x: 0, y: 0 }));
     return candidates.map((candidate) => candidate.entity);
 }
 
@@ -160,24 +150,34 @@ export function findReplacementTarget(
     if (candidates.length === 0) {
         return null;
     }
-    candidates.sort((a, b) => {
+    candidates.sort(byRaidPriority(from));
+    return candidates[0].entity;
+}
+
+type PlayerTarget = { entity: Entity; value: number };
+
+/**
+ * Comparator ranking raid targets: highest raid value first, then closest to
+ * `anchor` (squared distance), then id for a stable, deterministic order.
+ */
+function byRaidPriority(
+    anchor: Point,
+): (a: PlayerTarget, b: PlayerTarget) => number {
+    return (a, b) => {
         if (a.value !== b.value) {
             return b.value - a.value;
         }
-        const da = squaredDistance(a.entity.worldPosition, from);
-        const db = squaredDistance(b.entity.worldPosition, from);
+        const da = squaredDistance(a.entity.worldPosition, anchor);
+        const db = squaredDistance(b.entity.worldPosition, anchor);
         if (da !== db) {
             return da - db;
         }
         return a.entity.id < b.entity.id ? -1 : 1;
-    });
-    return candidates[0].entity;
+    };
 }
 
-function collectPlayerTargets(
-    root: Entity,
-): { entity: Entity; value: number }[] {
-    const candidates: { entity: Entity; value: number }[] = [];
+function collectPlayerTargets(root: Entity): PlayerTarget[] {
+    const candidates: PlayerTarget[] = [];
     for (const [entity, building] of root.queryComponents(
         BuildingComponentId,
     )) {

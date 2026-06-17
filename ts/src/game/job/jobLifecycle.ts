@@ -50,6 +50,23 @@ export function failJobFromQueue(queueEntity: Entity, job: Jobs): void {
 }
 
 /**
+ * Complete the job currently claimed by `worker`, if any. Resolves the worker's
+ * job queue from its ancestors, finds the job it claimed, and removes it. A
+ * no-op when the worker has no queue or no claimed job. Job-fulfilling actions
+ * call this on success so the finished job stops being re-selected.
+ */
+export function completeClaimedJob(worker: Entity): void {
+    const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
+    if (!queueEntity) {
+        return;
+    }
+    const job = findJobClaimedBy(queueEntity, worker.id);
+    if (job) {
+        completeJobFromQueue(queueEntity, job);
+    }
+}
+
+/**
  * Suspend a job by releasing the claim.
  * The job remains in the queue and can be claimed by another worker.
  * Call this when a job cannot proceed temporarily (e.g., missing materials).

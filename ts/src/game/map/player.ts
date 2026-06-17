@@ -1,4 +1,4 @@
-import { randomColor } from "../../common/color.ts";
+import { randomColor } from "../../common/color/hexColor.ts";
 import { generateId } from "../../common/idGenerator.ts";
 import type { Point } from "../../common/point.ts";
 import { farm } from "../../data/building/grow/grow.ts";
