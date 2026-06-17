@@ -14,7 +14,6 @@ import type {
     Components,
 } from "../component/component.ts";
 import { visitChildren } from "./child/visit.ts";
-import { entityWithId } from "./child/withId.ts";
 import type { EntityEvent } from "./entityEvent.ts";
 import { log } from "../../common/logging/logger.ts";
 
@@ -45,6 +44,19 @@ export class Entity {
      * entities actually queried (in practice the root) ever allocate one.
      */
     private _queryCache?: Map<ComponentID, Map<Entity, Components>>;
+    /**
+     * Lazily-built cache mapping entity id to the entity within this subtree,
+     * built on the first {@link findEntity} miss by one `visitChildren` walk
+     * (the same walk `entityWithId` does) and reused after. Mirrors
+     * {@link _queryCache}: scoped to this entity's subtree, allocated only on
+     * entities actually searched (in practice the root), runtime-only and never
+     * serialized.
+     *
+     * Invalidated wholesale on `child_added` / `child_removed` in
+     * {@link invalidateCaches}; component and transform events leave it valid
+     * because they change neither tree membership nor any entity id.
+     */
+    private _idCache?: Map<EntityId, Entity>;
     private _gameTime?: GameTime;
     readonly id: EntityId;
 
@@ -295,10 +307,24 @@ export class Entity {
         return root!;
     }
 
-    findEntity(id: string): Entity | null {
-        //TODO: cache the result here to dont walk the tree on every call
-        //use entity events to invalidate cache on remove
-        return entityWithId(this, id);
+    findEntity(id: EntityId): Entity | null {
+        let cache = this._idCache;
+        if (!cache) {
+            // First miss builds the whole subtree id map in one breadth-first
+            // walk (mirrors queryComponents). A built map makes a null return
+            // authoritative: an absent key means the id is genuinely not here.
+            // First writer wins, matching entityWithId's breadth-first
+            // first-match order on duplicate ids.
+            cache = new Map<EntityId, Entity>();
+            visitChildren(this, (child) => {
+                if (!cache!.has(child.id)) {
+                    cache!.set(child.id, child);
+                }
+                return false;
+            });
+            this._idCache = cache;
+        }
+        return cache.get(id) ?? null;
     }
 
     /**
@@ -490,7 +516,7 @@ export class Entity {
     }
 
     bubbleEvent(event: EntityEvent) {
-        this.invalidateQueryCache(event);
+        this.invalidateCaches(event);
         if (!!this._entityEvents) {
             try {
                 this._entityEvents(event);
@@ -506,15 +532,20 @@ export class Entity {
     }
 
     /**
-     * Keeps this entity's {@link _queryCache} consistent as events bubble past
-     * it. `bubbleEvent` runs on the source entity and then every ancestor, so an
-     * ancestor whose subtree changed deep below invalidates its own cache here.
+     * Keeps this entity's {@link _queryCache} and {@link _idCache} consistent as
+     * events bubble past it. `bubbleEvent` runs on the source entity and then
+     * every ancestor, so an ancestor whose subtree changed deep below
+     * invalidates its own caches here.
      *
      * Only membership changes matter:
      *  - `component_added` / `component_removed` upsert / delete the one
-     *    (entity → component) entry, leaving every other cached query intact.
-     *  - `child_added` / `child_removed` can change many component ids at once,
-     *    so the whole cache is dropped and rebuilt lazily.
+     *    (entity → component) entry in the query cache, leaving every other
+     *    cached query intact. The id cache is unaffected (no id changed).
+     *  - `child_added` / `child_removed` can change many component ids and add
+     *    or remove ids, so both caches are dropped and rebuilt lazily. Dropping
+     *    (rather than rebuilding here) is what keeps this correct against
+     *    `removeChild` bubbling before it detaches the child: nothing rebuilds
+     *    until the next query/findEntity, by which point the child is gone.
      *
      * `component_updated` and `transform` are deliberately ignored:
      * `updateComponent` mutates the component in place (same reference, same
@@ -522,21 +553,23 @@ export class Entity {
      * per-tick hot events — reacting to them would thrash the cache every frame
      * for no benefit.
      */
-    private invalidateQueryCache(event: EntityEvent) {
-        const cache = this._queryCache;
-        if (!cache) {
-            return;
-        }
+    private invalidateCaches(event: EntityEvent) {
         switch (event.id) {
             case "component_added":
-                cache.get(event.item.id)?.set(event.source, event.item);
+                this._queryCache
+                    ?.get(event.item.id)
+                    ?.set(event.source, event.item);
                 break;
             case "component_removed":
-                cache.get(event.item.id)?.delete(event.source);
+                this._queryCache?.get(event.item.id)?.delete(event.source);
                 break;
             case "child_added":
             case "child_removed":
-                cache.clear();
+                this._queryCache?.clear();
+                // Drop the id cache entirely rather than clear() it: findEntity
+                // rebuilds only when the map is absent, and an emptied-but-present
+                // map would read as a built cache that never finds anything.
+                this._idCache = undefined;
                 break;
             default:
                 break;
