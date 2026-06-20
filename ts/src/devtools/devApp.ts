@@ -9,6 +9,7 @@ import { DrawMode } from "../rendering/drawMode.ts";
 import { renderSystem } from "../game/system/renderSystem.ts";
 import type { ComponentDescriptor } from "../ui/declarative/ui.ts";
 import type { Point } from "../common/point.ts";
+import type { RenderScope } from "../rendering/renderScope.ts";
 
 /**
  * Base class for development and preview applications.
@@ -85,6 +86,13 @@ export class DevApp {
      */
     protected onTick(): void {}
 
+    /**
+     * Override to draw custom canvas content (e.g. an abstract grid) using the
+     * render scope directly, rather than an entity scene. Drawn below the UI
+     * and above the cleared background.
+     */
+    protected drawCanvas(_scope: RenderScope): void {}
+
     protected render() {
         this.renderer.clearScreen("#001408");
 
@@ -97,6 +105,8 @@ export class DevApp {
                 DrawMode.Tick,
             );
         }
+
+        this.drawCanvas(this.renderer.context);
 
         this.uiRenderer.renderComponent(this.buildUI());
         this.renderer.renderDeferred();

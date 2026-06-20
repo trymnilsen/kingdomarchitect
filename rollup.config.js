@@ -52,4 +52,13 @@ export default [
             format: "esm",
         },
     },
+    {
+        input: "build/src/mountainpreview/main.js",
+        plugins: [sourcemaps()],
+        output: {
+            sourcemap: true,
+            file: "public/dist/mountainpreview.js",
+            format: "esm",
+        },
+    },
 ];
