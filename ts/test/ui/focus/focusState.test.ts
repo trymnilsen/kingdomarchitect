@@ -1,7 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
 import { FocusState } from "../../../src/ui/focus/focusState.ts";
-import type { FocusNode } from "../../../src/ui/focus/focusHelpers.ts";
+import type { FocusNode } from "../../../src/ui/focus/focusNode.ts";
 import type { Bounds } from "../../../src/common/bounds.ts";
 
 type SpyNode = FocusNode & {

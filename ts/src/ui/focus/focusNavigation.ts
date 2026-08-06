@@ -12,27 +12,20 @@ import {
     manhattanDistance,
     type Point,
 } from "../../common/point.ts";
-import { visitChildren } from "../../common/visit/visit.ts";
-import { UIView } from "../uiView.ts";
+import { type FocusNode } from "./focusNode.ts";
 
-export interface FocusNode {
-    bounds: Bounds;
-    onFocus(): void;
-    onFocusLost(): void;
-    onFocusTapActivate(node: FocusNode): boolean;
-}
-
-export function getFocusableNodes(rootView: UIView): FocusNode[] {
-    const nodes: FocusNode[] = [];
-    visitChildren(rootView, (child) => {
-        if (!!child.focusNodes && child.focusNodes.length > 0) {
-            nodes.push(...child.focusNodes);
-        }
-        return false;
-    });
-    return nodes;
-}
-
+/**
+ * Pick the node a directional input should move focus to.
+ *
+ * Callers supply the candidate set themselves; collecting focusable nodes is
+ * the job of whichever UI implementation owns the view tree, since only it
+ * knows how to walk its own hierarchy.
+ *
+ * @param focusableNodes every node currently eligible to receive focus
+ * @param currentFocusBounds the bounds we are navigating away from
+ * @param direction the direction the input asked for
+ * @returns the best candidate, or null when nothing lies that way
+ */
 export function getClosestFocusableNode(
     focusableNodes: FocusNode[],
     currentFocusBounds: Bounds,
@@ -78,10 +71,10 @@ export function getClosestFocusableNode(
  * Wanted Direction is right
  * +---------------->
  *                                                           '
- * 
+ *
  * 1: Potential views that contain/wrap the currently focused
  * view (cfv)
- * 
+ *
  * ````
  *                     EdgeLine
  *      Potential     +
@@ -107,7 +100,7 @@ export function getClosestFocusableNode(
  * corners (x) of the potential are further in the
  * direction than the least directionmost corners (y)
  * of the cfv
- * 
+ *
  * ````
  *                    + Edgeline
  *                    |
@@ -126,12 +119,12 @@ export function getClosestFocusableNode(
  *     View           |
  *                    +
  * ````
- * 
+ *
  * 3: Get view that have corners(x) that are all more
  *    in the direction than the edgeline of the cfv
- * 
+ *
  * ````
- * 
+ *
  *                     + Edgeline
  *                     |
  *                   +---------------------------+
@@ -151,9 +144,9 @@ export function getClosestFocusableNode(
  *                     |    + Potential view
  *                     +
  * ````
- * 
+ *
  * Not Valid Example: None of the three cases above
- * 
+ *
  * ````
  *                     + Edgeline
  *                   +---------------------------+
@@ -173,7 +166,7 @@ export function getClosestFocusableNode(
  *                     |
  *                     +
  * ````
- * 
+ *
  * **Note**: This example is applicable for the up
  * direction as in that case it would have
  * all its four corners (x) past the edgeline
