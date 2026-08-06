@@ -1,4 +1,4 @@
-import type { Point } from "../common/point.ts";
+import type { Point } from "../../common/point.ts";
 import type { BiomeShapeParams } from "./biomeShapeSearch.ts";
 
 export type ShapePresetName = "round" | "square" | "long" | "blobby" | "peanut";
@@ -10,7 +10,11 @@ export type ShapePresetName = "round" | "square" | "long" | "blobby" | "peanut";
  */
 export type ShapePresetParams = Pick<
     BiomeShapeParams,
-    "metric" | "anisotropy" | "orientation" | "noiseAmplitude" | "noiseFrequency"
+    | "metric"
+    | "anisotropy"
+    | "orientation"
+    | "noiseAmplitude"
+    | "noiseFrequency"
 > & {
     /** Peanut/lobed shapes: a second attractor placed at start + this offset. */
     wellOffset?: Point;

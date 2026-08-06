@@ -1,6 +1,6 @@
-import { adjacentPoints, manhattanDistance } from "../common/point.ts";
-import type { Point } from "../common/point.ts";
-import { fbmNoise2d } from "../common/noise.ts";
+import { adjacentPoints, manhattanDistance } from "../../common/point.ts";
+import type { Point } from "../../common/point.ts";
+import { fbmNoise2d } from "../../common/noise.ts";
 
 /** Base distance metric that gives the biome its underlying silhouette. */
 export type ShapeMetric = "euclidean" | "chebyshev" | "manhattan";
@@ -162,7 +162,10 @@ function offsetCenter(params: BiomeShapeParams): Point {
             if (dx === 0 && dy === 0) {
                 continue;
             }
-            const neighbour = { x: params.start.x + dx, y: params.start.y + dy };
+            const neighbour = {
+                x: params.start.x + dx,
+                y: params.start.y + dy,
+            };
             if (!params.blocked.has(chunkKey(neighbour))) {
                 continue;
             }

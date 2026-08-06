@@ -1,4 +1,4 @@
-import { setupLogger, log } from "../common/logging/logger.ts";
+import { setupLogger, log } from "../../common/logging/logger.ts";
 import { MountainPreview } from "./mountainPreview.ts";
 
 setupLogger();

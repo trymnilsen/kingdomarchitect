@@ -1,6 +1,9 @@
-import { log } from "../common/logging/logger.ts";
-import type { Point } from "../common/point.ts";
-import type { MountainPreviewState, PaintMode } from "./mountainPreviewState.ts";
+import { log } from "../../common/logging/logger.ts";
+import type { Point } from "../../common/point.ts";
+import type {
+    MountainPreviewState,
+    PaintMode,
+} from "./mountainPreviewState.ts";
 import { shapePresetNames, type ShapePresetName } from "./shapePresets.ts";
 
 const STORAGE_KEY = "mountainPreview.scenario";

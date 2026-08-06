@@ -1,9 +1,9 @@
-import { spriteRefs, type SpriteRef } from "../asset/sprite.ts";
-import type { Point } from "../common/point.ts";
-import { ItemCategory } from "../data/inventory/inventoryItem.ts";
-import type { EquipmentComponent } from "../game/component/equipmentComponent.ts";
+import { spriteRefs, type SpriteRef } from "../../asset/sprite.ts";
+import type { Point } from "../../common/point.ts";
+import { ItemCategory } from "../../data/inventory/inventoryItem.ts";
+import type { EquipmentComponent } from "../../game/component/equipmentComponent.ts";
 import type { Facing } from "./characterAnimation.ts";
-import { wizardHat } from "../data/inventory/items/equipment.ts";
+import { wizardHat } from "../../data/inventory/items/equipment.ts";
 
 export type EquipmentSpriteVariant =
     | { type: "single"; sprite: SpriteRef }

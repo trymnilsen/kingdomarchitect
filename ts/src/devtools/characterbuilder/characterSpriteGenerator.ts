@@ -2,14 +2,14 @@ import type {
     RenderScope,
     OffscreenRenderScope,
     OffscreenCanvasFactory,
-} from "../rendering/renderScope.ts";
-import type { SpriteDefinition, SpriteRef } from "../asset/sprite.ts";
-import { spriteRegistry } from "../asset/spriteRegistry.ts";
+} from "../../rendering/renderScope.ts";
+import type { SpriteDefinition, SpriteRef } from "../../asset/sprite.ts";
+import { spriteRegistry } from "../../asset/spriteRegistry.ts";
 import type { CharacterColors, EquipmentSpriteVariant } from "./colors.ts";
-import type { Rectangle } from "../common/structure/rectangle.ts";
-import type { Point } from "../common/point.ts";
+import type { Rectangle } from "../../common/structure/rectangle.ts";
+import type { Point } from "../../common/point.ts";
 import { CHARACTER_SPRITE } from "./ui/characterBuilderConstants.ts";
-import type { AssetLoader } from "../asset/loader/assetLoader.ts";
+import type { AssetLoader } from "../../asset/loader/assetLoader.ts";
 import { getCharacterBinId } from "./characterBinId.ts";
 import {
     getFacingAtFrame,

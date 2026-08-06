@@ -9,7 +9,7 @@ import {
     chunkKey,
     generateBiomeShape,
     type BiomeShapeParams,
-} from "../../src/mountainpreview/biomeShapeSearch.ts";
+} from "../../src/devtools/mountainpreview/biomeShapeSearch.ts";
 
 function baseParams(overrides: Partial<BiomeShapeParams>): BiomeShapeParams {
     return {
@@ -209,10 +209,7 @@ describe("generateBiomeShape", () => {
             baseParams({ ...params, wallOffset: 1.2 }),
         );
 
-        assert.deepEqual(
-            withOffset.map(chunkKey),
-            withoutOffset.map(chunkKey),
-        );
+        assert.deepEqual(withOffset.map(chunkKey), withoutOffset.map(chunkKey));
     });
 
     it("ignores a well that lands on a blocked chunk", () => {

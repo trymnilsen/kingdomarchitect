@@ -1,8 +1,8 @@
-import type { ComponentDescriptor } from "../../ui/declarative/ui.ts";
-import { uiColumn } from "../../ui/declarative/uiSequence.ts";
-import { uiText } from "../../ui/declarative/uiText.ts";
-import { subTitleTextStyle } from "../../rendering/text/textStyle.ts";
-import { wrapUiSize } from "../../ui/uiSize.ts";
+import type { ComponentDescriptor } from "../../../ui/declarative/ui.ts";
+import { uiColumn } from "../../../ui/declarative/uiSequence.ts";
+import { uiText } from "../../../ui/declarative/uiText.ts";
+import { subTitleTextStyle } from "../../../rendering/text/textStyle.ts";
+import { wrapUiSize } from "../../../ui/uiSize.ts";
 import { LAYOUT } from "./cityPreviewConstants.ts";
 import type { CityPreviewState } from "../cityPreviewState.ts";
 

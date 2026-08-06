@@ -1,16 +1,16 @@
-import { log } from "../../common/logging/logger.ts";
-import { subTitleTextStyle } from "../../rendering/text/textStyle.ts";
+import { log } from "../../../common/logging/logger.ts";
+import { subTitleTextStyle } from "../../../rendering/text/textStyle.ts";
 import {
     createComponent,
     type ComponentDescriptor,
-} from "../../ui/declarative/ui.ts";
-import { uiBox } from "../../ui/declarative/uiBox.ts";
-import { uiButton } from "../../ui/declarative/uiButton.ts";
-import { uiStack } from "../../ui/declarative/uiStack.ts";
-import { uiText } from "../../ui/declarative/uiText.ts";
-import { uiAlignment } from "../../ui/uiAlignment.ts";
-import { boxBackground } from "../../ui/uiBackground.ts";
-import { fillUiSize, wrapUiSize } from "../../ui/uiSize.ts";
+} from "../../../ui/declarative/ui.ts";
+import { uiBox } from "../../../ui/declarative/uiBox.ts";
+import { uiButton } from "../../../ui/declarative/uiButton.ts";
+import { uiStack } from "../../../ui/declarative/uiStack.ts";
+import { uiText } from "../../../ui/declarative/uiText.ts";
+import { uiAlignment } from "../../../ui/uiAlignment.ts";
+import { boxBackground } from "../../../ui/uiBackground.ts";
+import { fillUiSize, wrapUiSize } from "../../../ui/uiSize.ts";
 import { COLORS, LAYOUT } from "./characterBuilderConstants.ts";
 
 /**

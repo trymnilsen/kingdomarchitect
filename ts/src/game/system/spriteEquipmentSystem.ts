@@ -1,15 +1,15 @@
 import {
     buildSpriteSheet,
     type SpriteDefinitionCache,
-} from "../../characterbuilder/characterSpriteGenerator.ts";
+} from "../../devtools/characterbuilder/characterSpriteGenerator.ts";
 import { characterPartFrames } from "../../../generated/characterFrames.ts";
-import { getAllAnimations } from "../../characterbuilder/animation/getAllAnimations.ts";
-import type { CharacterAnimation } from "../../characterbuilder/characterAnimation.ts";
+import { getAllAnimations } from "../../devtools/characterbuilder/animation/getAllAnimations.ts";
+import type { CharacterAnimation } from "../../devtools/characterbuilder/characterAnimation.ts";
 import { log } from "../../common/logging/logger.ts";
 import {
     getCharacterColors,
     type CharacterColors,
-} from "../../characterbuilder/colors.ts";
+} from "../../devtools/characterbuilder/colors.ts";
 import type { EcsSystem } from "../../ecs/ecsSystem.ts";
 import type { AssetLoader } from "../../asset/loader/assetLoader.ts";
 import type {

@@ -1,24 +1,24 @@
-import { createComponent, sized } from "../../ui/declarative/ui.ts";
+import { createComponent, sized } from "../../../ui/declarative/ui.ts";
 import {
     buildSpriteSheet,
     SpriteDefinitionCache,
 } from "../characterSpriteGenerator.ts";
-import { spriteRegistry } from "../../asset/spriteRegistry.ts";
+import { spriteRegistry } from "../../../asset/spriteRegistry.ts";
 import type { CharacterColors } from "../colors.ts";
 import {
     CHARACTER_SPRITE,
     LAYOUT,
     type PreviewMode,
 } from "./characterBuilderConstants.ts";
-import { characterPartFrames } from "../../../generated/characterFrames.ts";
+import { characterPartFrames } from "../../../../generated/characterFrames.ts";
 import { getAllAnimations } from "../animation/getAllAnimations.ts";
 import type { CharacterAnimation } from "../characterAnimation.ts";
 import { createPrimaryButton } from "./CharacterBuilderButtons.ts";
-import { uiBox } from "../../ui/declarative/uiBox.ts";
-import { uiColumn, uiRow } from "../../ui/declarative/uiSequence.ts";
-import { uiText } from "../../ui/declarative/uiText.ts";
-import { fillUiSize, wrapUiSize } from "../../ui/uiSize.ts";
-import { subTitleTextStyle } from "../../rendering/text/textStyle.ts";
+import { uiBox } from "../../../ui/declarative/uiBox.ts";
+import { uiColumn, uiRow } from "../../../ui/declarative/uiSequence.ts";
+import { uiText } from "../../../ui/declarative/uiText.ts";
+import { fillUiSize, wrapUiSize } from "../../../ui/uiSize.ts";
+import { subTitleTextStyle } from "../../../rendering/text/textStyle.ts";
 
 export type CharacterPreviewProps = {
     colors: CharacterColors;

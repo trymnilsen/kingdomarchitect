@@ -1,8 +1,8 @@
-import type { ComponentDescriptor } from "../ui/declarative/ui.ts";
-import { addPoint, type Point } from "../common/point.ts";
-import { clamp } from "../common/number.ts";
-import type { RenderScope } from "../rendering/renderScope.ts";
-import { DevApp } from "../devtools/devApp.ts";
+import type { ComponentDescriptor } from "../../ui/declarative/ui.ts";
+import { addPoint, type Point } from "../../common/point.ts";
+import { clamp } from "../../common/number.ts";
+import type { RenderScope } from "../../rendering/renderScope.ts";
+import { DevApp } from "../devApp.ts";
 import {
     createInitialState,
     maxEncompassBias,
@@ -24,7 +24,7 @@ import {
 } from "./biomeShapeSearch.ts";
 import { restoreScenario, saveScenario } from "./mountainPreviewStorage.ts";
 import { shapePresets, type ShapePresetName } from "./shapePresets.ts";
-import { randomSeed } from "../common/randomSeed.ts";
+import { randomSeed } from "../../common/randomSeed.ts";
 
 /** On-screen size of one chunk square, in pixels. */
 const CHUNK_PX = 40;
@@ -280,13 +280,7 @@ export class MountainPreview extends DevApp {
 
         for (const key of this.state.blocked) {
             const chunk = parseChunkKey(key);
-            this.drawChunkSquare(
-                scope,
-                chunk,
-                BLOCKED_FILL,
-                BLOCKED_STROKE,
-                1,
-            );
+            this.drawChunkSquare(scope, chunk, BLOCKED_FILL, BLOCKED_STROKE, 1);
         }
 
         if (this.state.startChunk != null) {

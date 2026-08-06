@@ -1,12 +1,12 @@
-import type { ComponentDescriptor } from "../../ui/declarative/ui.ts";
-import { uiButton } from "../../ui/declarative/uiButton.ts";
-import { uiColumn } from "../../ui/declarative/uiSequence.ts";
-import { uiText } from "../../ui/declarative/uiText.ts";
-import { boxBackground } from "../../ui/uiBackground.ts";
-import { wrapUiSize } from "../../ui/uiSize.ts";
-import { subTitleTextStyle } from "../../rendering/text/textStyle.ts";
+import type { ComponentDescriptor } from "../../../ui/declarative/ui.ts";
+import { uiButton } from "../../../ui/declarative/uiButton.ts";
+import { uiColumn } from "../../../ui/declarative/uiSequence.ts";
+import { uiText } from "../../../ui/declarative/uiText.ts";
+import { boxBackground } from "../../../ui/uiBackground.ts";
+import { wrapUiSize } from "../../../ui/uiSize.ts";
+import { subTitleTextStyle } from "../../../rendering/text/textStyle.ts";
 import { COLORS, LAYOUT } from "./cityPreviewConstants.ts";
-import type { BiomeType } from "../../game/map/biome.ts";
+import type { BiomeType } from "../../../game/map/biome.ts";
 
 const SELECTABLE_BIOMES: BiomeType[] = [
     "plains",

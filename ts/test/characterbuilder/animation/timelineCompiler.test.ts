@@ -1,8 +1,8 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
-import { compileTimeline } from "../../../src/characterbuilder/animation/timelineCompiler.ts";
-import type { AnimationRecipe } from "../../../src/characterbuilder/animation/animationRecipe.ts";
-import type { CharacterAnimation } from "../../../src/characterbuilder/characterAnimation.ts";
+import { compileTimeline } from "../../../src/devtools/characterbuilder/animation/timelineCompiler.ts";
+import type { AnimationRecipe } from "../../../src/devtools/characterbuilder/animation/animationRecipe.ts";
+import type { CharacterAnimation } from "../../../src/devtools/characterbuilder/characterAnimation.ts";
 
 /**
  * Build a minimal source animation with non-trivial coordinates (never at origin).

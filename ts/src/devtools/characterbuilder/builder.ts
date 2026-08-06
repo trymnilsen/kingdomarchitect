@@ -1,5 +1,5 @@
-import type { ComponentDescriptor } from "../ui/declarative/ui.ts";
-import { DevApp } from "../devtools/devApp.ts";
+import type { ComponentDescriptor } from "../../ui/declarative/ui.ts";
+import { DevApp } from "../devApp.ts";
 import { CharacterBuilderUI } from "./characterBuilderUI.ts";
 
 /**

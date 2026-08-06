@@ -1,10 +1,10 @@
-import type { ComponentDescriptor } from "../../ui/declarative/ui.ts";
-import { uiButton } from "../../ui/declarative/uiButton.ts";
-import { uiRow } from "../../ui/declarative/uiSequence.ts";
-import { uiText } from "../../ui/declarative/uiText.ts";
-import { boxBackground } from "../../ui/uiBackground.ts";
+import type { ComponentDescriptor } from "../../../ui/declarative/ui.ts";
+import { uiButton } from "../../../ui/declarative/uiButton.ts";
+import { uiRow } from "../../../ui/declarative/uiSequence.ts";
+import { uiText } from "../../../ui/declarative/uiText.ts";
+import { boxBackground } from "../../../ui/uiBackground.ts";
 
-import { subTitleTextStyle } from "../../rendering/text/textStyle.ts";
+import { subTitleTextStyle } from "../../../rendering/text/textStyle.ts";
 import { COLORS, LAYOUT } from "./cityPreviewConstants.ts";
 import type { CityPreviewCallbacks } from "../cityPreviewUI.ts";
 

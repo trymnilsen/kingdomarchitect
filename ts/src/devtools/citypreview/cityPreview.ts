@@ -1,8 +1,8 @@
-import type { ComponentDescriptor } from "../ui/declarative/ui.ts";
-import { Entity } from "../game/entity/entity.ts";
-import { DevApp } from "../devtools/devApp.ts";
-import { TileSize } from "../game/map/tile.ts";
-import type { BiomeType } from "../game/map/biome.ts";
+import type { ComponentDescriptor } from "../../ui/declarative/ui.ts";
+import { Entity } from "../../game/entity/entity.ts";
+import { DevApp } from "../devApp.ts";
+import { TileSize } from "../../game/map/tile.ts";
+import type { BiomeType } from "../../game/map/biome.ts";
 import {
     createInitialState,
     type CityPreviewState,

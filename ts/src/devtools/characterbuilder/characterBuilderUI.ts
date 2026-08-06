@@ -1,10 +1,10 @@
-import { log } from "../common/logging/logger.ts";
-import { characterPartFrames } from "../../generated/characterFrames.ts";
+import { log } from "../../common/logging/logger.ts";
+import { characterPartFrames } from "../../../generated/characterFrames.ts";
 import { getAllAnimations } from "./animation/getAllAnimations.ts";
 import type { CharacterAnimation } from "./characterAnimation.ts";
-import { createComponent } from "../ui/declarative/ui.ts";
-import { uiColumn, uiRow } from "../ui/declarative/uiSequence.ts";
-import { fillUiSize } from "../ui/uiSize.ts";
+import { createComponent } from "../../ui/declarative/ui.ts";
+import { uiColumn, uiRow } from "../../ui/declarative/uiSequence.ts";
+import { fillUiSize } from "../../ui/uiSize.ts";
 import type { CharacterColors } from "./colors.ts";
 import {
     createAnimationPanel,
@@ -18,7 +18,7 @@ import {
     type BodyPart,
     type PreviewMode,
 } from "./ui/characterBuilderConstants.ts";
-import { spriteRefs } from "../asset/sprite.ts";
+import { spriteRefs } from "../../asset/sprite.ts";
 
 const allAnimations = getAllAnimations(
     characterPartFrames as unknown as CharacterAnimation[],

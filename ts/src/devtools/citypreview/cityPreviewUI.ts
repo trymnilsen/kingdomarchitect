@@ -1,14 +1,14 @@
-import type { ComponentDescriptor } from "../ui/declarative/ui.ts";
-import { uiBox } from "../ui/declarative/uiBox.ts";
-import { uiColumn, uiRow } from "../ui/declarative/uiSequence.ts";
-import { uiText } from "../ui/declarative/uiText.ts";
-import { colorBackground } from "../ui/uiBackground.ts";
-import { fillUiSize, wrapUiSize } from "../ui/uiSize.ts";
+import type { ComponentDescriptor } from "../../ui/declarative/ui.ts";
+import { uiBox } from "../../ui/declarative/uiBox.ts";
+import { uiColumn, uiRow } from "../../ui/declarative/uiSequence.ts";
+import { uiText } from "../../ui/declarative/uiText.ts";
+import { colorBackground } from "../../ui/uiBackground.ts";
+import { fillUiSize, wrapUiSize } from "../../ui/uiSize.ts";
 import {
     subTitleTextStyle,
     titleTextStyle,
-} from "../rendering/text/textStyle.ts";
-import type { BiomeType } from "../game/map/biome.ts";
+} from "../../rendering/text/textStyle.ts";
+import type { BiomeType } from "../../game/map/biome.ts";
 import type { CityPreviewState } from "./cityPreviewState.ts";
 import { createBiomeSelector } from "./ui/biomeSelector.ts";
 import { createStateDisplay } from "./ui/stateDisplay.ts";

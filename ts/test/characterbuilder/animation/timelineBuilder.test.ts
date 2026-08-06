@@ -1,7 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
-import { timeline } from "../../../src/characterbuilder/animation/timelineBuilder.ts";
-import type { AnimationRecipe } from "../../../src/characterbuilder/animation/animationRecipe.ts";
+import { timeline } from "../../../src/devtools/characterbuilder/animation/timelineBuilder.ts";
+import type { AnimationRecipe } from "../../../src/devtools/characterbuilder/animation/animationRecipe.ts";
 
 describe("timeline builder — basic recipe structure", () => {
     it("produces correct name, base, and duration", () => {

@@ -26,9 +26,12 @@ import { createTileComponent } from "./component/tileComponent.ts";
 import { createSpriteEquipmentSystem } from "./system/spriteEquipmentSystem.ts";
 import { createAttackVfxSystem } from "./system/attackVfxSystem.ts";
 import { despawnTimerSystem } from "./system/despawnTimerSystem.ts";
-import { SpriteDefinitionCache } from "../characterbuilder/characterSpriteGenerator.ts";
+import { SpriteDefinitionCache } from "../devtools/characterbuilder/characterSpriteGenerator.ts";
 import { createRootEntity } from "./rootFactory.ts";
-import { DayComponentId, phaseBackgroundColor } from "./component/dayComponent.ts";
+import {
+    DayComponentId,
+    phaseBackgroundColor,
+} from "./component/dayComponent.ts";
 import { WorldStateMessageType } from "../server/message/gameMessage.ts";
 
 export class Game {

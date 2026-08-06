@@ -35,7 +35,7 @@ export default [
         },
     },
     {
-        input: "build/src/characterbuilder/main.js",
+        input: "build/src/devtools/characterbuilder/main.js",
         plugins: [sourcemaps()],
         output: {
             sourcemap: true,
@@ -44,7 +44,7 @@ export default [
         },
     },
     {
-        input: "build/src/citypreview/main.js",
+        input: "build/src/devtools/citypreview/main.js",
         plugins: [sourcemaps()],
         output: {
             sourcemap: true,
@@ -53,7 +53,7 @@ export default [
         },
     },
     {
-        input: "build/src/mountainpreview/main.js",
+        input: "build/src/devtools/mountainpreview/main.js",
         plugins: [sourcemaps()],
         output: {
             sourcemap: true,

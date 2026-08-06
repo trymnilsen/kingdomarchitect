@@ -1,19 +1,22 @@
-import type { ComponentDescriptor } from "../ui/declarative/ui.ts";
-import { uiBox } from "../ui/declarative/uiBox.ts";
+import type { ComponentDescriptor } from "../../ui/declarative/ui.ts";
+import { uiBox } from "../../ui/declarative/uiBox.ts";
 import {
     CrossAxisAlignment,
     uiColumn,
     uiRow,
-} from "../ui/declarative/uiSequence.ts";
-import { uiText } from "../ui/declarative/uiText.ts";
-import { uiButton } from "../ui/declarative/uiButton.ts";
-import { boxBackground, colorBackground } from "../ui/uiBackground.ts";
-import { fillUiSize, wrapUiSize } from "../ui/uiSize.ts";
+} from "../../ui/declarative/uiSequence.ts";
+import { uiText } from "../../ui/declarative/uiText.ts";
+import { uiButton } from "../../ui/declarative/uiButton.ts";
+import { boxBackground, colorBackground } from "../../ui/uiBackground.ts";
+import { fillUiSize, wrapUiSize } from "../../ui/uiSize.ts";
 import {
     subTitleTextStyle,
     titleTextStyle,
-} from "../rendering/text/textStyle.ts";
-import type { MountainPreviewState, PaintMode } from "./mountainPreviewState.ts";
+} from "../../rendering/text/textStyle.ts";
+import type {
+    MountainPreviewState,
+    PaintMode,
+} from "./mountainPreviewState.ts";
 import { shapePresetNames, type ShapePresetName } from "./shapePresets.ts";
 import {
     encompassBiasStep,
@@ -122,7 +125,8 @@ export class MountainPreviewUI {
                         "Wall offset",
                         this.state.wallOffset.toFixed(1),
                         "wall-offset",
-                        () => this.callbacks.onChangeWallOffset(-wallOffsetStep),
+                        () =>
+                            this.callbacks.onChangeWallOffset(-wallOffsetStep),
                         () => this.callbacks.onChangeWallOffset(wallOffsetStep),
                     ),
                     this.buildSeedRow(),
@@ -135,10 +139,7 @@ export class MountainPreviewUI {
         return uiRow({
             width: fillUiSize,
             height: fillUiSize,
-            children: [
-                uiBox({ width: fillUiSize, height: fillUiSize }),
-                panel,
-            ],
+            children: [uiBox({ width: fillUiSize, height: fillUiSize }), panel],
         });
     }
 

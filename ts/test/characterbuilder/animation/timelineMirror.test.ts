@@ -5,8 +5,8 @@ import {
     mirrorAnchorFrame,
     mirrorPartFrame,
     swapPartName,
-} from "../../../src/characterbuilder/animation/timelineMirror.ts";
-import type { CharacterAnimation } from "../../../src/characterbuilder/characterAnimation.ts";
+} from "../../../src/devtools/characterbuilder/animation/timelineMirror.ts";
+import type { CharacterAnimation } from "../../../src/devtools/characterbuilder/characterAnimation.ts";
 
 function makeAnimation(
     parts: { partName: string; frames: number[][] }[],

@@ -5,9 +5,9 @@ import {
     SPRITE_FRAMES,
 } from "../../asset/sprite.ts";
 import { spriteRegistry } from "../../asset/spriteRegistry.ts";
-import { getCharacterBinId } from "../../characterbuilder/characterBinId.ts";
-import type { SpriteDefinitionCache } from "../../characterbuilder/characterSpriteGenerator.ts";
-import { getCharacterColors } from "../../characterbuilder/colors.ts";
+import { getCharacterBinId } from "../../devtools/characterbuilder/characterBinId.ts";
+import type { SpriteDefinitionCache } from "../../devtools/characterbuilder/characterSpriteGenerator.ts";
+import { getCharacterColors } from "../../devtools/characterbuilder/colors.ts";
 import { Direction, OrdinalDirection } from "../../common/direction.ts";
 import type { EcsSystem } from "../../ecs/ecsSystem.ts";
 import { checkAdjacency } from "../../common/point.ts";

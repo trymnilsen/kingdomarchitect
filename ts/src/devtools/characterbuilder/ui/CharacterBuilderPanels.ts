@@ -1,12 +1,12 @@
-import { titleTextStyle } from "../../rendering/text/textStyle.ts";
-import type { ComponentDescriptor } from "../../ui/declarative/ui.ts";
-import { uiBox } from "../../ui/declarative/uiBox.ts";
-import { uiGrid } from "../../ui/declarative/uiGrid.ts";
-import { uiColumn, uiRow } from "../../ui/declarative/uiSequence.ts";
-import { uiText } from "../../ui/declarative/uiText.ts";
-import { uiAlignment } from "../../ui/uiAlignment.ts";
-import { colorBackground } from "../../ui/uiBackground.ts";
-import { fillUiSize, wrapUiSize } from "../../ui/uiSize.ts";
+import { titleTextStyle } from "../../../rendering/text/textStyle.ts";
+import type { ComponentDescriptor } from "../../../ui/declarative/ui.ts";
+import { uiBox } from "../../../ui/declarative/uiBox.ts";
+import { uiGrid } from "../../../ui/declarative/uiGrid.ts";
+import { uiColumn, uiRow } from "../../../ui/declarative/uiSequence.ts";
+import { uiText } from "../../../ui/declarative/uiText.ts";
+import { uiAlignment } from "../../../ui/uiAlignment.ts";
+import { colorBackground } from "../../../ui/uiBackground.ts";
+import { fillUiSize, wrapUiSize } from "../../../ui/uiSize.ts";
 import type { CharacterColors } from "../colors.ts";
 import { CharacterPreview } from "./CharacterPreview.ts";
 import {

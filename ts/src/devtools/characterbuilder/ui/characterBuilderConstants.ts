@@ -1,6 +1,6 @@
-import { characterPartFrames } from "../../../generated/characterFrames.ts";
-import { spriteRefs, type SpriteRef } from "../../asset/sprite.ts";
-import type { Point } from "../../common/point.ts";
+import { characterPartFrames } from "../../../../generated/characterFrames.ts";
+import { spriteRefs, type SpriteRef } from "../../../asset/sprite.ts";
+import type { Point } from "../../../common/point.ts";
 
 /**
  * Character sprite dimensions

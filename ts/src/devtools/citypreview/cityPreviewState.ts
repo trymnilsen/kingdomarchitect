@@ -1,14 +1,14 @@
-import { generateId } from "../common/idGenerator.ts";
-import { makeNumberId } from "../common/point.ts";
-import { Entity } from "../game/entity/entity.ts";
+import { generateId } from "../../common/idGenerator.ts";
+import { makeNumberId } from "../../common/point.ts";
+import { Entity } from "../../game/entity/entity.ts";
 import {
     createTileComponent,
     setChunk,
-} from "../game/component/tileComponent.ts";
-import { createVisibilityMapComponent } from "../game/component/visibilityMapComponent.ts";
-import { type TileChunk } from "../game/map/chunk.ts";
-import type { BiomeType } from "../game/map/biome.ts";
-import type { Volume } from "../game/map/volume.ts";
+} from "../../game/component/tileComponent.ts";
+import { createVisibilityMapComponent } from "../../game/component/visibilityMapComponent.ts";
+import { type TileChunk } from "../../game/map/chunk.ts";
+import type { BiomeType } from "../../game/map/biome.ts";
+import type { Volume } from "../../game/map/volume.ts";
 
 export type CityPreviewState = {
     root: Entity;
