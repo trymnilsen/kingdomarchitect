@@ -1,30 +1,38 @@
-import { findMapped } from "../../../../common/array.ts";
-import { makeNumberId, type Point } from "../../../../common/point.ts";
-import { allSides } from "../../../../common/sides.ts";
-import { type Building } from "../../../../data/building/building.ts";
-import { spriteRefs } from "../../../../asset/sprite.ts";
-import { type GroundTile, TileSize } from "../../../map/tile.ts";
-import type { ComponentDescriptor } from "../../../../ui/declarative/ui.ts";
-import { RenderScope } from "../../../../rendering/renderScope.ts";
-import { getChunkPosition } from "../../../map/chunk.ts";
+import { findMapped } from "../../../../../common/array.ts";
+import { makeNumberId, type Point } from "../../../../../common/point.ts";
+import { allSides } from "../../../../../common/sides.ts";
+import { type Building } from "../../../../../data/building/building.ts";
+import { spriteRefs } from "../../../../../asset/sprite.ts";
+import { type GroundTile, TileSize } from "../../../../map/tile.ts";
+import type { ComponentDescriptor } from "../../../../../ui/declarative/ui.ts";
+import { RenderScope } from "../../../../../rendering/renderScope.ts";
+import { getChunkPosition } from "../../../../map/chunk.ts";
 import {
     hasDiscoveredChunk,
     VisibilityMapComponentId,
-} from "../../../component/visibilityMapComponent.ts";
-import { getTile, TileComponentId } from "../../../component/tileComponent.ts";
-import { InteractionState } from "../../handler/interactionState.ts";
-import { uiScaffold } from "../../view/uiScaffold.ts";
-import { AlertMessageState } from "../common/alertMessageState.ts";
+} from "../../../../component/visibilityMapComponent.ts";
+import { getTile, TileComponentId } from "../../../../component/tileComponent.ts";
+import { InteractionState } from "../../../handler/interactionState.ts";
+import { uiScaffold } from "../../../view/uiScaffold.ts";
+import { AlertMessageState } from "../../common/alertMessageState.ts";
 import { type BuildingApplicabilityResult } from "./buildingApplicability.ts";
 import { buildingApplicabilityList } from "./buildingApplicabilityList.ts";
 import { type BuildMode } from "./mode/buildMode.ts";
 import { LineBuildMode } from "./mode/lineBuildMode.ts";
 import { SingleBuildMode } from "./mode/singleBuildMode.ts";
-import { BuildCommand } from "../../../../server/message/command/buildCommand.ts";
-import { queryEntity } from "../../../map/query/queryEntity.ts";
-import { ResourceComponentId } from "../../../component/resourceComponent.ts";
-import { isDecorativeResource } from "../../../../data/inventory/items/naturalResource.ts";
+import { BuildCommand } from "../../../../../server/message/command/buildCommand.ts";
+import { queryEntity } from "../../../../map/query/queryEntity.ts";
+import { ResourceComponentId } from "../../../../component/resourceComponent.ts";
+import { isDecorativeResource } from "../../../../../data/inventory/items/naturalResource.ts";
 
+/**
+ * Places a building that the player has already chosen.
+ *
+ * This is the second half of the build flow. `buildingState` shows the catalog
+ * and picks what to put down, then hands the choice here. This state owns the
+ * cursor, the applicability checks that decide whether a tile will take the
+ * building, and the confirm step that sends the BuildCommand.
+ */
 export class BuildConfirmState extends InteractionState {
     private blinkScaffold = true;
     private buildMode: BuildMode;

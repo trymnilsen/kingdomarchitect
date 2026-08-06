@@ -8,7 +8,7 @@ import { spriteRegistry } from "../../../../../asset/spriteRegistry.ts";
 import { allSides } from "../../../../../common/sides.ts";
 import { bookInkColor } from "../../../../../ui/color.ts";
 import { InteractionState } from "../../../handler/interactionState.ts";
-import { BuildConfirmState } from "../../building2/buildConfirmState.ts";
+import { BuildConfirmState } from "../../building/placement/buildConfirmState.ts";
 import {
     type Building,
     specialRequirementNames,

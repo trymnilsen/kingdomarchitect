@@ -1,9 +1,9 @@
-import type { Point } from "../../../../../common/point.ts";
-import { forresterProduction } from "../../../../../data/production/productionDefinition.ts";
-import { ProductionComponentId } from "../../../../component/productionComponent.ts";
-import type { Entity } from "../../../../entity/entity.ts";
-import { getDiamondPoints } from "../../../../map/item/placement.ts";
-import { queryEntity } from "../../../../map/query/queryEntity.ts";
+import type { Point } from "../../../../../../common/point.ts";
+import { forresterProduction } from "../../../../../../data/production/productionDefinition.ts";
+import { ProductionComponentId } from "../../../../../component/productionComponent.ts";
+import type { Entity } from "../../../../../entity/entity.ts";
+import { getDiamondPoints } from "../../../../../map/item/placement.ts";
+import { queryEntity } from "../../../../../map/query/queryEntity.ts";
 import type { BuildingApplicability } from "../buildingApplicability.ts";
 
 export const forresterApplicability: BuildingApplicability = (

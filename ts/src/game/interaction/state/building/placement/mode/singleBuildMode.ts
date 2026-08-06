@@ -1,4 +1,4 @@
-import { type Point } from "../../../../../common/point.ts";
+import { type Point } from "../../../../../../common/point.ts";
 import { type BuildMode, type BuildModeDescription } from "./buildMode.ts";
 
 export class SingleBuildMode implements BuildMode {

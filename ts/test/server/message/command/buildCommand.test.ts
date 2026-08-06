@@ -59,11 +59,11 @@ describe("BuildCommand", () => {
     });
 
     it("creates separate commands for different buildings", () => {
-        const building1 = createTestBuilding("stockpile");
-        const building2 = createTestBuilding("warehouse");
+        const stockpile = createTestBuilding("stockpile");
+        const warehouse = createTestBuilding("warehouse");
 
-        const command1 = BuildCommand(building1, { x: 0, y: 0 });
-        const command2 = BuildCommand(building2, { x: 10, y: 10 });
+        const command1 = BuildCommand(stockpile, { x: 0, y: 0 });
+        const command2 = BuildCommand(warehouse, { x: 10, y: 10 });
 
         assert.strictEqual(command1.buildingId, "stockpile");
         assert.strictEqual(command2.buildingId, "warehouse");
