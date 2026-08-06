@@ -1,5 +1,5 @@
 /**
- * Displacement negotiation engine — bounded, cost-sensitive graph search.
+ * Displacement negotiation engine. A bounded, cost-sensitive graph search.
  *
  * When an entity's moveTo action finds its next tile occupied by another entity,
  * this module searches for a chain of willing displacing entities that creates
@@ -14,7 +14,7 @@
  *   - An entity refuses displacement (high resistance)
  *
  * Cardinal direction traversal order (left, right, up, down) is fixed for
- * determinism — never random tiebreaks.
+ * determinism. Tiebreaks are never random.
  */
 import { adjacentPoints, type Point, pointEquals } from "../../../common/point.ts";
 import { BehaviorAgentComponentId } from "../../component/BehaviorAgentComponent.ts";
@@ -78,7 +78,7 @@ export function negotiateDisplacement(
         o.hasComponent(BehaviorAgentComponentId),
     );
     if (!blocker) {
-        // No displaceable entity at target — building, resource, or empty
+        // No displaceable entity at target. It is a building, a resource, or empty.
         log.debug(
             `${requester.id} no displaceable entity at (${targetTile.x},${targetTile.y}), skipping`,
         );
@@ -91,8 +91,9 @@ export function negotiateDisplacement(
     // a head-on in a 1-wide corridor between two equally-important workers could
     // never resolve, because neither could "out-rank" the other. But if the blocker
     // is itself trying to step into the requester's tile, a swap advances BOTH along
-    // their own paths and costs neither any progress — so it's always allowed,
-    // regardless of utility (even zero). That's why it skips the affordability check.
+    // their own paths and costs neither any progress. That makes it always
+    // allowed, regardless of utility (even zero), which is why it skips the
+    // affordability check.
     //
     // On a cardinal grid a reciprocal pass is always a 2-entity swap (a longer cycle
     // can't reach back to the requester without revisiting a tile). If the blocker
@@ -134,8 +135,8 @@ export function negotiateDisplacement(
     switch (cls.kind) {
         case "transient":
         case "movedThisTick":
-            // It will vacate on its own (walking / undecided) or already moved this tick
-            // and is free next tick — either way we don't shove it. Wait and retry next
+            // It will vacate on its own (walking / undecided), or it already moved
+            // this tick and is free next tick. Neither case gets shoved. Wait and retry next
             // tick, holding the cached path. This keeps same-direction traffic queueing
             // rather than barging, and lets a not-yet-planned head-on partner resolve via
             // the swap above once it has computed its path.
@@ -144,7 +145,7 @@ export function negotiateDisplacement(
             );
             return { kind: "wait" };
         case "immovable":
-            // Not a behaviour agent — nothing to displace (defensive; the blocker was
+            // Not a behaviour agent, so there is nothing to displace (defensive; the blocker was
             // already found via BehaviorAgentComponentId, so this shouldn't be reached).
             return { kind: "noChain" };
         case "displaceable":
@@ -206,8 +207,8 @@ interface ChainResult {
 
 /**
  * Recursive DFS that finds the cheapest valid displacement chain starting from `entity`.
- * `initialTargetTile` is where the original requester wants to end up — needed to construct
- * the requester's move when a cycle back to it is detected.
+ * `initialTargetTile` is where the original requester wants to end up. It is
+ * needed to construct the requester's move when a cycle back to it is detected.
  */
 function findBestChain(
     entity: Entity,
@@ -222,14 +223,15 @@ function findBestChain(
     accumulatedCost: number,
 ): ChainResult | null {
     // A displacement chain terminates in one of two ways:
-    //   1. at a free tile — everyone shifts over by one (preferred; handled in the loop)
-    //   2. at the requester's own tile — `entity` rotates into the spot the requester is
-    //      about to vacate, closing a swap/rotation cycle.
+    //   1. at a free tile, where everyone shifts over by one (preferred; handled
+    //      in the loop)
+    //   2. at the requester's own tile, where `entity` rotates into the spot the
+    //      requester is about to vacate, closing a swap/rotation cycle.
     // The cycle terminator is built explicitly here, not scored as a candidate, because
     // the requester is in transit so scoreCandidateTile (correctly) rejects its tile as a
     // normal push target. It's checked at every depth: the cycle can close at the initial
-    // blocker (the 2-entity swap) or deeper, through a ring of pushed entities — in which
-    // case the recursion prepends the intermediate moves as it unwinds.
+    // blocker (the 2-entity swap) or deeper, through a ring of pushed entities. In
+    // that case the recursion prepends the intermediate moves as it unwinds.
     //
     // It's recorded as a candidate result, not returned early: a free tile still wins
     // (the loop returns on the first one), and among non-free results the cheapest wins.
@@ -276,7 +278,7 @@ function findBestChain(
         );
 
         if (displaceable.length === 0) {
-            // Free passable tile — the best possible displacement destination.
+            // Free passable tile, the best possible displacement destination.
             // scoreCandidateTile returns 100 for free tiles and at most 50 for any
             // occupied tile (50 - resistance). Since candidates are sorted descending,
             // a free tile always appears first. No chain outcome can be better, so
@@ -293,7 +295,7 @@ function findBestChain(
 
         const nextEntity = displaceable[0];
 
-        // Back-edge: the tile is held by an entity already in the chain — including the
+        // Back-edge: the tile is held by an entity already in the chain, including the
         // requester, whose cycle-back is the terminator handled above. Pushing into it
         // would loop, so prune.
         if (visitedIds.has(nextEntity.id)) {
@@ -303,7 +305,7 @@ function findBestChain(
             continue;
         }
 
-        // At max depth with an occupied tile — can't extend the chain further.
+        // At max depth with an occupied tile, so the chain cannot extend further.
         if (depth >= MAX_CHAIN_DEPTH) {
             log.debug(
                 `${entity.id} max chain depth reached at (${tile.x},${tile.y}), pruning`,
@@ -313,8 +315,8 @@ function findBestChain(
 
         // Only a settled (displaceable) entity can extend the chain, and only if the
         // requester out-ranks its cost. Transient/moved occupants were already dropped by
-        // scoreCandidateTile, so in practice nextEntity is displaceable — classify to be
-        // safe and to read its cost.
+        // scoreCandidateTile, so in practice nextEntity is displaceable. Classify it
+        // anyway to be safe and to read its cost.
         const nextCls = classifyBlocker(nextEntity, currentTick);
         if (
             nextCls.kind !== "displaceable" ||

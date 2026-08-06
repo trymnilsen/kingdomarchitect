@@ -78,7 +78,7 @@ export const goblinCampSystem: EcsSystem = {
 
 /**
  * Ratchet the camp's size toward the player kingdom: maxPopulation grows to
- * RAID_POPULATION_FACTOR × playerPop — floored at GOBLIN_CAMP_MIN_SIZE so a camp
+ * RAID_POPULATION_FACTOR × playerPop, floored at GOBLIN_CAMP_MIN_SIZE so a camp
  * always supports at least one goblin, and capped at GOBLIN_HOUSE_CAP. It never
  * shrinks on its own, so a camp the player provoked stays large even if the
  * player's numbers later fall. The existing expansion/spawning logic then
@@ -271,7 +271,7 @@ function processCampRemoval(
  * Place a scaffolded building near the camp and queue a BuildBuildingJob.
  * The search starts at the camp anchor (the campfire tile) and the camp
  * validator keeps the ring around campfires free, so buildings end up close
- * to — but never crowding — the fire.
+ * close to the fire without ever crowding it.
  */
 function placeScaffoldingAndQueueJob(
     root: Entity,
@@ -310,7 +310,7 @@ function placeScaffoldingAndQueueJob(
     });
 
     // Idle goblins re-select every tick, so they pick up the newly queued
-    // build job on their own — no explicit notification needed.
+    // build job on their own, so no explicit notification is needed.
 }
 
 function getCampPopulation(root: Entity, campEntityId: string): number {
@@ -359,7 +359,7 @@ function findAvailableGoblinHut(
             return child;
         }
 
-        // Tenant was killed — clear the stale reference and reuse the hut
+        // Tenant was killed. Clear the stale reference and reuse the hut.
         if (!root.findEntity(housing.tenant)) {
             housing.tenant = null;
             child.invalidateComponent(HousingComponentId);

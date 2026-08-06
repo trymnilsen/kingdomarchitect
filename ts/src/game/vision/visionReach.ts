@@ -22,7 +22,7 @@ export const WORKER_VISION_REACH = 2;
 /**
  * The sight a worker keeps in total darkness: their own tile and the four
  * cardinal neighbours, perceived dimly. This replaces the old innate "worker
- * glow" light source — the footprint is the same five tiles, but the worker no
+ * glow" light source. The footprint is the same five tiles, but the worker no
  * longer lights them; they merely perceive them. Dim rather than bright so the
  * dark still reads as dark, and so an actual carried light (a torch lights the
  * same plus *brightly*, and for everyone) stays a visible upgrade.
@@ -41,8 +41,9 @@ export const BUILDING_VISION_REACH = 1;
 
 /**
  * The sum of all modifiers acting on an entity's vision reach right now. This is
- * the seam for the future modifier stack — scars, traits, equipment, a vantage
- * tile bonus — each of which will read its own components and contribute here.
+ * the seam for the future modifier stack of scars, traits, equipment and a
+ * vantage tile bonus, each of which will read its own components and contribute
+ * here.
  *
  * It is deliberately empty for this stage: it returns 0 so reach equals the
  * entity's base radius. Keeping it as a real (if empty) function means the
@@ -57,8 +58,9 @@ export function visionReachModifiers(entity: Entity): number {
 
 /**
  * A viewer standing on a station tile (a manned tower) sees from that vantage. The
- * bonus is granted to the viewer on the tile, not to the station — so it lives and
- * dies with the worker and leaves no reference on the station to dangle. The station
+ * bonus is granted to the viewer on the tile rather than to the station, so it
+ * lives and dies with the worker and leaves no reference on the station to
+ * dangle. The station
  * itself is excluded so an unmanned tower never gets the bonus from matching its own
  * position.
  */
@@ -76,8 +78,8 @@ function stationVantageModifier(entity: Entity): number {
  * modifier can change reach (e.g. equipping a lantern) without rebuilding any
  * stored pattern.
  *
- * Returns 0 for an entity without a {@link VisibilityComponent} — it sees only
- * the tile it stands on — which keeps callers from having to null-check the
+ * Returns 0 for an entity without a {@link VisibilityComponent}, meaning it sees
+ * only the tile it stands on. That keeps callers from having to null-check the
  * component before asking for reach.
  *
  * @param entity the viewer to measure

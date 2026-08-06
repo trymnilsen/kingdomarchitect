@@ -21,7 +21,7 @@ export type BehaviorResolver = (entity: Entity) => Behavior[];
  * Per-tick re-selection counters, logged periodically so the cost of behavior
  * selection stays observable. Idle workers re-select every tick (that is what
  * lets them recover from idle), so these are the numbers to watch if the system
- * ever needs profiling — every (re-)selection routes through one call tree
+ * ever needs profiling. Every (re-)selection routes through one call tree
  * (selectBehavior), so timing onUpdate captures the full cost.
  */
 interface BehaviorTickStats {
@@ -38,15 +38,15 @@ const BEHAVIOR_STATS_LOG_INTERVAL = 100;
  * executes actions from the queue.
  *
  * Per-tick order for each agent:
- *   1. (Re-)select a behavior when forced (pendingReplan set — first tick,
- *      action failure, or an imperative interrupt such as taking damage) OR
+ *   1. (Re-)select a behavior when forced (pendingReplan set by the first tick,
+ *      an action failure, or an imperative interrupt such as taking damage) OR
  *      whenever the action queue is empty.
  *   2. Execute the first action in the queue.
  *
  * The empty-queue trigger is the heart of the design: a worker that just
  * finished its plan, or that found nothing valid to do, re-selects on the next
  * tick instead of freezing. Crucially this is gated on the queue being empty,
- * NOT on pendingReplan — so an idle worker keeps pendingReplan === undefined and
+ * NOT on pendingReplan, so an idle worker keeps pendingReplan === undefined and
  * the displacement system still classifies it as displaceable, not transient.
  *
  * A busy worker (non-empty queue, no pending replan) is never re-selected
@@ -143,7 +143,7 @@ function updateBehaviorAgent(
             agent.actionQueue.splice(0, 0, ...result.actions);
         }
         entity.invalidateComponent(BehaviorAgentComponentId);
-        // result.kind === "running" — keep action in queue, it will run again next tick
+        // result.kind === "running". Keep the action in the queue; it runs again next tick.
     }
 }
 
@@ -164,7 +164,7 @@ function concludeActivePlan(agent: BehaviorAgentComponent): void {
 
 /**
  * Reset all behavior state on an agent, including the hysteresis memory. This is
- * concludeActivePlan plus forgetting which behavior to favor — so the next replan
+ * concludeActivePlan plus forgetting which behavior to favor, so the next replan
  * starts from a clean slate with no anti-thrashing bonus. Used on the abnormal
  * termination paths (action failure, no valid behavior, behavior expanded to
  * nothing), matching the pre-split behavior where clearing currentBehaviorName
@@ -180,7 +180,7 @@ function clearBehavior(agent: BehaviorAgentComponent): void {
  * This is called when an action fails to ensure jobs aren't left in a claimed state.
  *
  * Uses ancestor traversal rather than a direct component lookup because entities
- * don't own their job queue — it lives on their parent (worker → root, goblin → camp).
+ * don't own their job queue. It lives on their parent (worker → root, goblin → camp).
  * The loop breaks after the first match because an entity can only claim one job at a time.
  */
 function unclaimCurrentJob(entity: Entity): void {
@@ -233,7 +233,7 @@ function selectBehavior(
         const buildingEntity = root.findEntity(inProgressCraftItem.buildingId);
         if (buildingEntity) {
             log.info(
-                `Entity ${entity.id} displaced mid-craft — returning to building ${inProgressCraftItem.buildingId}`,
+                `Entity ${entity.id} displaced mid-craft, returning to building ${inProgressCraftItem.buildingId}`,
             );
             agent.actionQueue = [
                 {
@@ -262,7 +262,7 @@ function selectBehavior(
         return;
     }
 
-    // The behavior to favor for hysteresis — the planner's last pick, which
+    // The behavior to favor for hysteresis. This is the planner's last pick, which
     // survives a plan completing (see concludeActivePlan), unlike currentBehaviorName.
     const hysteresisName = agent.hysteresis?.behaviorName ?? null;
     const hysteresisBehavior = hysteresisName
@@ -270,7 +270,7 @@ function selectBehavior(
         : null;
 
     // Hysteresis: give the previously-selected behavior a bonus to prevent
-    // "thrashing" — rapidly switching back and forth between two behaviors with
+    // "thrashing", where it rapidly switches back and forth between two behaviors with
     // similar utilities. For example, a goblin at warmth=51 (just above threshold)
     // after warming up shouldn't oscillate between keepWarm and performJob every replan.
     const REPLAN_THRESHOLD = 5; // Only switch if a new behavior is 5+ utility higher
@@ -299,7 +299,7 @@ function selectBehavior(
     stats.expandsRun++;
     const newActions = bestBehavior.behavior.expand(entity);
 
-    // Behavior produced no actions — nothing to run this round. Treat the worker as
+    // Behavior produced no actions, so there is nothing to run this round. Treat the worker as
     // idle: clear all behavior/display state so it never shows a behavior name (e.g.
     // "performJob") with no job or action context. This also empties the action queue
     // (a stale queue would otherwise execute next tick against work that is gone).
@@ -307,7 +307,7 @@ function selectBehavior(
         clearBehavior(agent);
         agent.pendingReplan = undefined;
         log.info(
-            `Entity ${entity.id} behavior ${bestBehavior.behavior.name} expanded to empty — idle`,
+            `Entity ${entity.id} behavior ${bestBehavior.behavior.name} expanded to empty, going idle`,
         );
         return;
     }
@@ -319,7 +319,7 @@ function selectBehavior(
     agent.hysteresis = { behaviorName: bestBehavior.behavior.name };
     // Always adopt the freshly expanded plan. Selection only runs at a plan
     // boundary (empty queue) or on a forced replan; in both cases a fresh plan
-    // is what we want — e.g. a displaced worker needs a new path, not the stale
+    // is what we want. A displaced worker needs a new path rather than the stale
     // cachedPath from its previous moveTo. There is no running head to preserve.
     agent.actionQueue = newActions;
     // Clear after expand so the failure context is consumed

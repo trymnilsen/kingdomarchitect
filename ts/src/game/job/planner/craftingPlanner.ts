@@ -20,8 +20,8 @@ import { findDropPosition } from "../../behavior/dropItem.ts";
  * Release the worker's claim while leaving the job in the queue, so it can be
  * retried once its inputs become available (mirrors the build planner). Used
  * for temporary blockers like "no source for an input yet" or "can't free
- * hands to fetch ingredients" — not for permanently broken jobs (missing
- * building/inventory), which call {@link failAndAbort} instead.
+ * hands to fetch ingredients". Permanently broken jobs (missing
+ * building/inventory) call {@link failAndAbort} instead.
  */
 function suspendJob(worker: Entity, job: CraftingJob): void {
     const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
@@ -65,8 +65,8 @@ export function planCrafting(
     });
 
     if (buildingHasAllInputs) {
-        // Before crafting we must guarantee held can accept the output —
-        // either empty or already holding the same item id.
+        // Before crafting we must guarantee held can accept the output. It has
+        // to be empty or already holding the same item id.
         const dropActions = ensureHeldAcceptsOutputs(root, worker, job, held);
         if (dropActions === null) {
             // Holding an item that blocks the output and nowhere to drop it.
@@ -104,7 +104,7 @@ export function planCrafting(
         .filter((entry) => entry.deficit > 0);
 
     if (stillNeeded.length === 0) {
-        // Building has everything — caller will retry and hit the craft branch.
+        // Building has everything. The caller retries and hits the craft branch.
         return [];
     }
 
@@ -127,7 +127,7 @@ export function planCrafting(
                 },
             ];
         }
-        // Held has something the building doesn't need — drop it before fetching.
+        // Held has something the building doesn't need, so drop it before fetching.
         const dropPos = findDropPosition(
             root,
             worker.worldPosition,
@@ -150,8 +150,8 @@ export function planCrafting(
         ];
     }
 
-    // Held empty — find a source for the first needed input, prefer stockpiles
-    // then ground piles.
+    // Held is empty. Find a source for the first needed input, preferring
+    // stockpiles then ground piles.
     for (const need of stillNeeded) {
         const stockpileSources = findStockpilesWithItem(
             root,
@@ -233,7 +233,7 @@ function failAndAbort(worker: Entity, job: CraftingJob): BehaviorActionData[] {
  * Returns the actions needed to free the worker's hands so held can accept the
  * craft outputs (empty, or already the same item). Returns an empty array when
  * no drop is needed, or `null` when a drop is required but no drop position
- * exists — the caller suspends the job in that case.
+ * exists. The caller suspends the job in that case.
  */
 function ensureHeldAcceptsOutputs(
     root: Entity,

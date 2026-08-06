@@ -33,9 +33,9 @@ import { ActionComplete, ActionRunning, type ActionResult } from "./Action.ts";
 
 /**
  * The `stopAdjacent` option lets behaviors place the entity next to a target
- * without standing on it — necessary for actions like constructBuilding or harvestResource
- * that require adjacency. "cardinal" stops one step away on N/S/E/W; "diagonal" includes
- * corners (used for warmByFire which checks Chebyshev distance).
+ * without standing on it. Actions like constructBuilding or harvestResource
+ * require that adjacency. "cardinal" stops one step away on N/S/E/W; "diagonal"
+ * includes corners (used for warmByFire which checks Chebyshev distance).
  */
 export type MoveToActionData = {
     type: "moveTo";
@@ -54,16 +54,18 @@ export type MoveToActionData = {
  * cached path without re-running A*, committing the entity to the planned route. The
  * cache is only cleared when the next tile proves impassable (displacement refused or
  * no viable chain), at which point a local replan is performed immediately with that
- * tile treated as a wall. This prevents oscillation — without caching, A* would
+ * tile treated as a wall. This prevents oscillation. Without caching, A* would
  * rediscover the same blocked route on every tick and the entity would cycle in place.
  *
  * Displacement uses the entity's currentBehaviorUtility as its negotiation priority.
  * A higher-priority entity can displace idle or low-priority entities that block its path.
  *
  * Returns:
- *   "complete" — arrived at target (or adjacent, if stopAdjacent is set)
- *   "running"  — still en route, or waiting for blockers to clear
- *   "failed"   — path is permanently blocked (building, resource, no graph, no path)
+ *   "complete" when the entity arrived at the target, or adjacent to it if
+ *     stopAdjacent is set.
+ *   "running" while it is still en route, or waiting for blockers to clear.
+ *   "failed" when the path is permanently blocked by a building, a resource, a
+ *     missing graph, or no route at all.
  */
 export function executeMoveToAction(
     action: MoveToActionData,
@@ -77,9 +79,10 @@ export function executeMoveToAction(
         return ActionComplete;
     }
 
-    // One-move-per-tick gate. If this entity already moved this tick — e.g. it was
-    // advanced as part of a beneficial swap during another agent's turn — it must
-    // not step again. Wait; it continues along its route next tick. This keeps net
+    // One-move-per-tick gate. An entity that already moved this tick must not
+    // step again. That happens when it was advanced as part of a beneficial swap
+    // during another agent's turn. Wait; it continues along its route next tick.
+    // This keeps net
     // speed at one tile per tick and the swap's energy cost from being doubled.
     const stamina = entity.getEcsComponent(MovementStaminaComponentId);
     if (stamina && hasMovedThisTick(stamina, tick)) {
@@ -106,7 +109,7 @@ export function executeMoveToAction(
     for (let attempt = 0; attempt <= MAX_REPLAN_ATTEMPTS; attempt++) {
         const nextPoint = action.cachedPath![0];
         if (!nextPoint) {
-            // Path exhausted without arriving — should not happen in normal flow.
+            // Path exhausted without arriving. Should not happen in normal flow.
             action.cachedPath = undefined;
             return ActionRunning;
         }
@@ -147,7 +150,7 @@ export function executeMoveToAction(
                 if (!isClearableObstacle(resourceComponent.resourceId)) {
                     // Permanent obstacles (stone) are walls in the pathfinding
                     // graph, so a path should never step onto one. Reaching here
-                    // means the graph and the obstacle rules disagree — fail
+                    // means the graph and the obstacle rules disagree. Fail
                     // loudly rather than destroy an infinite node.
                     log.error(
                         `${entity.id} path routed onto permanent obstacle ${resource.id} at (${nextPoint.x},${nextPoint.y})`,
@@ -158,7 +161,7 @@ export function executeMoveToAction(
                     };
                 }
 
-                // Clear stale cached path — it was planned through this tile
+                // Clear the stale cached path. It was planned through this tile
                 // before the resource was found blocking. After the obstacle is
                 // cleared a fresh path will be computed.
                 action.cachedPath = undefined;
@@ -193,7 +196,7 @@ export function executeMoveToAction(
             return resolution.value;
         }
 
-        // Tile is free — step into it.
+        // Tile is free, so step into it.
         applyStep(entity, entity.worldPosition, nextPoint, tick);
         action.cachedPath = action.cachedPath!.slice(1);
         log.info(
@@ -287,7 +290,7 @@ function makePathModifier(
 
 /**
  * Plan a path from `from` to `target`. Buildings and large resources are always
- * treated as impassable. Any tiles in `locallyBlocked` are also blocked — these
+ * treated as impassable. Any tiles in `locallyBlocked` are also blocked. Those
  * accumulate within a tick when displacement negotiation fails for a tile.
  * Returns the path array or null if no path exists.
  */
@@ -402,8 +405,8 @@ function resolveDisplacedTile(
     );
 
     if (result.kind === "wait") {
-        // The blocker is transient (walking, or about to (re)plan) — it will vacate on
-        // its own. Hold position and keep the cached path intact so we retry the same
+        // The blocker is transient (walking, or about to (re)plan), so it will
+        // vacate on its own. Hold position and keep the cached path intact so we retry the same
         // step next tick, rather than clearing it and replanning a detour. This is what
         // makes a worker queue behind same-direction traffic and wait out a head-on
         // partner that hasn't computed its path yet.
@@ -432,7 +435,7 @@ function resolveDisplacedTile(
         );
 
         if (!newPath) {
-            // No path around the blocked tiles. Wait — the blockers may move next tick.
+            // No path around the blocked tiles. Wait, since the blockers may move next tick.
             // Leave cachedPath undefined so we plan fresh on the next tick.
             log.debug(`${entity.id} no path around blocked tiles, waiting`);
             return { kind: "result", value: ActionRunning };
@@ -480,7 +483,8 @@ function resolveDisplacedTile(
     }
 
     // Stale transaction: world changed between negotiation and commit.
-    // Keep the cached path — this is a timing issue, not proof of impassability.
+    // Keep the cached path. A stale transaction is a timing issue and says
+    // nothing about whether the tile is passable.
     log.debug(`${entity.id} displacement transaction stale, waiting`);
     return { kind: "result", value: ActionRunning };
 }

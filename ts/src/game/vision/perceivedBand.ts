@@ -9,11 +9,11 @@ import type { LightEmitter } from "../light/lightEmitter.ts";
 import { brightestBand, type LightBand } from "../light/lightBand.ts";
 
 /**
- * The band the player actually perceives at a tile —
+ * The band the player perceives at a tile, given by
  * `min(reach, max(perceptionFloor, illumination))`. Reach is the outer limit: a
  * tile out of every viewer's reach is `dark` however brightly it is lit. Within
- * reach, the tile reads as lit as it actually is, except that a viewer's minimal
- * perception can floor its immediate surroundings above darkness — a worker
+ * reach, the tile reads as lit as it is, except that a viewer's minimal
+ * perception can floor its immediate surroundings above darkness. A worker
  * perceives their own tile and the cardinal neighbours dimly even on an unlit
  * night, without casting any light into the world.
  *
@@ -28,19 +28,19 @@ import { brightestBand, type LightBand } from "../light/lightBand.ts";
  * both are always within reach: by night this rule reveals every lit pool plus each
  * viewer's perceived plus, and by day the bright ambient washes both out. A worker
  * whose reach (2) outruns their minimal perception (1) sees only the perceived plus
- * on an unlit night, because the outer ring is in reach but floors at dark — the
- * single rule, no special case.
+ * on an unlit night, because the outer ring is in reach but floors at dark. That
+ * falls out of the single rule with no special case.
  *
- * `dark` therefore means "not perceivable right now" — out of reach, unlit and
- * unperceived — and `bright`/`dim` mean "seen to this level". Rendering keys off
+ * `dark` therefore means "not perceivable right now", covering out of reach,
+ * unlit and unperceived. `bright` and `dim` mean "seen to this level". Rendering keys off
  * that: bright and dim tiles show their entities and their tint; dark tiles fall
  * back to fog-of-war and hide their entities.
  *
  * Emitters and phase are passed in rather than queried so the render pass can gather
  * them once per frame; this function does no entity-tree query of its own. A tile
- * already lit bright short-circuits before the floor lookup — bright is the maximum
- * band, so the floor could never raise it — which skips the map probe entirely for
- * the whole day phase.
+ * already lit bright short-circuits before the floor lookup, since bright is the
+ * maximum band and the floor could never raise it. That skips the map probe
+ * entirely for the whole day phase.
  *
  * @param visibilityMap the root visibility map holding the current reach set and
  * perception floor

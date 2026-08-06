@@ -19,27 +19,29 @@ import type { Entity } from "../../entity/entity.ts";
 import { queryEntity } from "../../map/query/queryEntity.ts";
 
 /**
- * How a blocking entity may be dealt with. The model is transient vs persistent
- * *occupancy* of a tile — is the blocker going to leave on its own, or not?
+ * How a blocking entity may be dealt with. The model turns on whether the
+ * blocker's *occupancy* of a tile is transient or persistent, which comes down
+ * to one question: is it going to leave on its own?
  *
- *   - `transient`     — the blocker will vacate the tile by itself. Either it's *walking*
- *                       (a `moveTo` at its queue head, so it steps off next tick) or it's
- *                       *undecided* (`pendingReplan` set — freshly spawned, or it just
- *                       finished/failed an action and hasn't re-chosen yet). You never
- *                       shove a transient occupant: you wait for it, or swap if you're
- *                       head-on. Shoving a walker wastes the route progress it made;
- *                       shoving an undecided worker pre-empts a choice it's one tick from
- *                       making.
- *   - `movedThisTick` — it already moved this tick (the hard one-move-per-tick gate), so
- *                       it can't move again until next tick. Like a transient occupant
- *                       it's free next tick → the requester waits and retries.
- *   - `displaceable`  — it has *settled*: idle (no plan → `cost` 0, yields for free) or
- *                       doing a stationary task (`cost` = its behaviour utility). It won't
- *                       move unless pushed, so it is shoved only by a higher-priority
- *                       requester.
- *   - `immovable`     — not a behaviour agent at all (building / resource / inert). Cannot
- *                       be displaced. Defensive: the real call paths only ever classify
- *                       agent-bearing entities, but keeping it makes the function total.
+ *   - `transient` means the blocker will vacate the tile by itself. It is either
+ *     *walking* (a `moveTo` at its queue head, so it steps off next tick) or
+ *     *undecided* (`pendingReplan` set, so freshly spawned or just finished or
+ *     failed an action and not yet re-chosen). A transient occupant never gets
+ *     shoved. You wait for it, or swap if you are head-on. Shoving a walker
+ *     wastes the route progress it made, and shoving an undecided worker
+ *     pre-empts a choice it is one tick away from making.
+ *   - `movedThisTick` means it already moved this tick and is held by the hard
+ *     one-move-per-tick gate, so it cannot move again until the next one. It is
+ *     free next tick, same as a transient occupant, so the requester waits and
+ *     retries.
+ *   - `displaceable` means it has *settled*. It is either idle (no plan, `cost`
+ *     0, yields for free) or doing a stationary task (`cost` is its behaviour
+ *     utility). It will not move unless pushed, and only a higher-priority
+ *     requester can push it.
+ *   - `immovable` means it is not a behaviour agent at all, such as a building,
+ *     a resource, or something inert. It cannot be displaced. This case is
+ *     defensive: the real call paths only ever classify agent-bearing entities,
+ *     and keeping it makes the function total.
  */
 export type BlockerClass =
     | { kind: "transient" }
@@ -51,7 +53,7 @@ export type BlockerClass =
  * Classify a blocking entity. See {@link BlockerClass} for what each kind means and why.
  *
  * The `pendingReplan` half of `transient` is load-bearing: it's what lets two workers
- * that become adjacent before either has a committed path resolve cleanly — the first
+ * that become adjacent before either has a committed path resolve cleanly. The first
  * waits instead of shoving, and the beneficial swap fires once the second plans the same
  * tick. It relies on the behaviour system clearing `pendingReplan` when a worker settles
  * (idle or mid-task); a settled worker must classify as `displaceable`, not `transient`.
@@ -94,7 +96,8 @@ export function canAffordDisplacement(
  *
  * Returns -Infinity for tiles the entity cannot move to at all: walls, buildings,
  * resources, or a tile held by an occupant that isn't `displaceable` (a transient,
- * already-moved, or immovable occupant is never a chain link — you don't shove it).
+ * already-moved, or immovable occupant is never a chain link, since none of them
+ * get shoved).
  */
 export function scoreCandidateTile(
     tile: Point,
@@ -124,7 +127,7 @@ export function scoreCandidateTile(
         }
     }
 
-    // Free tile — ideal, terminates the displacement chain
+    // Free tile. This is ideal and terminates the displacement chain.
     const displaceable = occupants.filter((o) =>
         o.hasComponent(BehaviorAgentComponentId),
     );
@@ -132,7 +135,7 @@ export function scoreCandidateTile(
         return 100;
     }
 
-    // Tile has an entity — only a `displaceable` one is a valid chain link, scored by
+    // Tile has an entity. Only a `displaceable` one is a valid chain link, scored by
     // the inverse of its cost (cheaper to move = better). Transient/moved/immovable
     // occupants drop the tile out (-Infinity); a future BlockerClass kind safely defaults
     // to not-chainable here too.

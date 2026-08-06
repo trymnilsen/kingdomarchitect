@@ -10,7 +10,7 @@ import { KingdomSpawnConfig } from "./kingdomSpawnConfig.ts";
  * Builds a map of territorial influence keyed by volume id.
  *
  * BFS traverses registered chunks outward from each kingdom's position.
- * Influence is uniform within a volume — it only decays when the BFS
+ * Influence is uniform within a volume. It only decays when the BFS
  * crosses into a new volume (one volume boundary = one decay step).
  *
  * Two visited sets keep the traversal correct:
@@ -18,10 +18,10 @@ import { KingdomSpawnConfig } from "./kingdomSpawnConfig.ts";
  *   neighbours, keeping the BFS from exploding inside large volumes.
  * - visitedVolumes: once a volume is reached via the shortest path,
  *   longer paths to the same volume are ignored. This is what makes
- *   FIFO ordering load-bearing — the first dequeue of any volume is
+ *   FIFO ordering load-bearing. The first dequeue of any volume is
  *   always the highest-influence one.
  *
- * Volumes from different kingdoms accumulate — the map stores the
+ * Volumes from different kingdoms accumulate, so the map stores the
  * sum of all kingdoms' contributions to each volume.
  */
 export function buildInfluenceMap(root: Entity): Map<string, number> {
@@ -38,7 +38,7 @@ export function buildInfluenceMap(root: Entity): Map<string, number> {
 
         const startChunk = getChunk(tileComponent, kingdomChunkPos);
         if (!startChunk?.volume) {
-            // Kingdom is not sitting on a registered chunk — skip it.
+            // Kingdom is not sitting on a registered chunk, so skip it.
             // This can happen if the kingdom is placed before the map generates.
             continue;
         }
@@ -93,7 +93,7 @@ export function buildInfluenceMap(root: Entity): Map<string, number> {
 
                 const neighborChunk = getChunk(tileComponent, neighbor);
                 if (!neighborChunk?.volume) {
-                    // Unregistered chunk — influence cannot cross gaps
+                    // Unregistered chunk. Influence cannot cross gaps.
                     continue;
                 }
 

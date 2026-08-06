@@ -27,7 +27,7 @@ export type DisplacementTransaction = {
     moves: DisplacementMove[];
     /**
      * True when the chain forms a closed cycle (e.g., A↔B swap or A→B→C→A rotation).
-     * Cycles require all positions to be reassigned simultaneously — no entity can move
+     * Cycles require all positions to be reassigned simultaneously. No entity can move
      * "first" because every destination is occupied by another entity in the cycle.
      */
     isCycle: boolean;
@@ -59,7 +59,7 @@ type ResolvedMove = {
  * the chain unravels back-to-front. For cycles all positions are swapped at once.
  *
  * `requesterEntityId` identifies the entity that initiated the displacement.
- * That entity should NOT receive a replan — its move action continues normally
+ * That entity should NOT receive a replan. Its move action continues normally
  * (or in a cycle, its position was updated as part of the rotation and its
  * action will complete when it checks arrival).
  */
@@ -101,7 +101,7 @@ export function commitDisplacementTransaction(
 /**
  * Resolve each move in the transaction to a live Entity reference, validating
  * that every entity is still at its expected from-position and has not already
- * moved this tick. Returns null if any check fails — no entity has been moved.
+ * moved this tick. Returns null if any check fails, leaving every entity in place.
  */
 function resolveTransaction(
     transaction: DisplacementTransaction,
@@ -189,7 +189,7 @@ function commitCycle(
         } else {
             // Forced cycle (the old "boxed-in blocker swaps with a higher-priority
             // requester" case): the non-requester is shoved off its own path, so it
-            // must replan, and — unlike a willing traveller — is not charged energy.
+            // must replan. Unlike a willing traveller, it is not charged energy.
             applyEntityMove(
                 entity,
                 from,
@@ -206,7 +206,7 @@ function commitCycle(
  * Keep a swapped entity on its existing `moveTo` instead of replanning. The tile it
  * just moved into was the head of its cached path, so we drop that one step and the
  * rest of the route stays valid for next tick. The else-branch (clear the path) is a
- * safety net for the rare case where the head doesn't match — the entity then plans
+ * safety net for the rare case where the head doesn't match. The entity then plans
  * fresh next tick rather than walking a stale route. Avoiding a full replan here is
  * what makes "continue your route" cheap and keeps a worker from re-deciding its
  * goal every time it squeezes past someone.
@@ -235,7 +235,7 @@ function advanceOrClearMoveCache(entity: Entity, to: Point): void {
  * Apply one entity's repositioning. The two flags differ by caller because the
  * meaning of the move differs: a shoved entity (forced chain/cycle) replans and
  * pays nothing, while a willing traveller (beneficial swap) keeps its plan and pays
- * energy like any other step. `recordMove` always runs — it backs both the
+ * energy like any other step. `recordMove` always runs, since it backs both the
  * one-move-per-tick guard and the staleness check, regardless of move type.
  */
 function applyEntityMove(

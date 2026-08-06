@@ -30,8 +30,8 @@ import {
  *
  * All raid coordination lives here because this is the only place with a global
  * view of both the warband and the available targets. After this runs, each
- * raider's RaidingComponent is the durable state that drives RaidBehavior — the
- * decision is never re-evaluated centrally; it lives until the goblin dies.
+ * raider's RaidingComponent is the durable state that drives RaidBehavior. The
+ * decision is never re-evaluated centrally and lives until the goblin dies.
  *
  * No flags or guards are needed: the night branch in phaseTransitionSystem is a
  * true once-per-night edge, and on save/resume mid-night the phase is already
@@ -45,14 +45,14 @@ export function formGoblinRaid(root: Entity): void {
         GoblinCampComponentId,
     )) {
         // Goblins available to commit: present at the camp and not already on
-        // a raid (RaidingComponent persists until death — there is no retreat).
+        // a raid (RaidingComponent persists until death, since there is no retreat).
         const present = campEntity.children.filter(
             (child) =>
                 child.hasComponent(GoblinUnitComponentId) &&
                 !child.hasComponent(RaidingComponentId),
         );
 
-        // Floor: a small camp never raids — early-game grace, and it keeps the
+        // Floor: a small camp never raids. This is early-game grace, and it keeps the
         // raid party from degenerating to 0–1 goblins.
         if (camp.maxPopulation < RAID_MIN_HOUSES) {
             continue;
@@ -115,7 +115,7 @@ export function formGoblinRaid(root: Entity): void {
  * All non-scaffolded player buildings that are valid raid objectives, ranked by
  * raid value (desc), then proximity to the world origin, then id for a stable
  * order. Buildings with an explicit raidValue of 0 (walls, gates) and roads are
- * excluded — they are obstacles handled by the siege path, never objectives.
+ * excluded. They are obstacles handled by the siege path, never objectives.
  */
 function rankedPlayerBuildingTargets(root: Entity): Entity[] {
     const candidates = collectPlayerTargets(root);
@@ -124,8 +124,8 @@ function rankedPlayerBuildingTargets(root: Entity): Entity[] {
 }
 
 /**
- * Whether an entity id still refers to a live, player-owned building — i.e. a
- * raider's current target is still worth attacking.
+ * Whether an entity id still refers to a live, player-owned building, which is
+ * how a raider checks that its current target is still worth attacking.
  */
 export function isLivePlayerBuilding(root: Entity, entityId: string): boolean {
     const entity = root.findEntity(entityId);
@@ -139,7 +139,7 @@ export function isLivePlayerBuilding(root: Entity, entityId: string): boolean {
  * Picks a replacement target for a raider whose current target was destroyed:
  * the highest-value remaining player building, breaking ties by proximity to
  * the raider. Returns null when no player buildings remain (the raider then
- * yields to idle — the post-razing end state). Coordination across raiders is
+ * yields to idle, the post-razing end state). Coordination across raiders is
  * intentionally loose here; by the endgame, fan-out no longer matters.
  */
 export function findReplacementTarget(

@@ -22,7 +22,7 @@
  * stage). This is data only here: nothing in this slice burns or depletes. A
  * `"none"` source never runs down (it is fed by its structure, not a consumable);
  * a `"charcoal"` source draws on stored fuel. Charcoal may not yet exist as an
- * inventory item — this field encodes intent, not a live dependency.
+ * inventory item. This field encodes intent rather than a live dependency.
  */
 export type LightSourceFuel = "none" | "charcoal";
 
@@ -30,9 +30,9 @@ export type LightSourceFuel = "none" | "charcoal";
  * How hard a source is to put out, for the future extinguish verb. `"easy"` and
  * `"hard"` gate that verb's effort; `"destroy"` means the source cannot be
  * extinguished at all and only goes away when its host is dismantled. It is named
- * "destroy" rather than "dismantle" because a light source need not be a building
- * — we may have non-building emitters later. Data only; no extinguish behaviour
- * is implemented here.
+ * "destroy" rather than "dismantle" because a light source need not be a
+ * building, and we may have non-building emitters later. Data only; no
+ * extinguish behaviour is implemented here.
  */
 export type LightSourceExtinguishDifficulty = "easy" | "hard" | "destroy";
 
@@ -61,14 +61,14 @@ export const brazierLightSource: LightSourceDefinition = {
  * The default emission for an ordinary building: its own tile and the cardinal
  * neighbours read dim, and nothing reads bright. Buildings glow faintly so the
  * places people live and work are never pitch dark, but only placed sources can
- * actually brighten an area — keeping placed light meaningful.
+ * brighten an area, which keeps placed light meaningful.
  */
 export const buildingGlowLightSource: LightSourceDefinition = {
     id: "buildingGlow",
     brightRadius: 0,
     dimRadius: 1,
     // The glow is an emergent property of an occupied building, not a fire: it
-    // has nothing to burn and cannot be "put out" — it only ends with the
+    // has nothing to burn and cannot be "put out". It only ends with the
     // building itself.
     fuel: "none",
     extinguishDifficulty: "destroy",
@@ -76,8 +76,8 @@ export const buildingGlowLightSource: LightSourceDefinition = {
 
 /**
  * A handheld torch: lights only its own tile and the cardinal neighbours, then
- * nothing. The cheapest, most disposable source — quick to light and quick to
- * snuff, so it carries no fuel and is trivially extinguished.
+ * nothing. This is the cheapest and most disposable source, quick to light and
+ * quick to snuff, so it carries no fuel and is trivially extinguished.
  */
 export const torchLightSource: LightSourceDefinition = {
     id: "torch",

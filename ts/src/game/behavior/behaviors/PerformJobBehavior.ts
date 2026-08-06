@@ -41,7 +41,7 @@ type BuildJobValidator = (
 /**
  * PerformJobBehavior handles job execution for entities.
  * Uses ancestor traversal to find the nearest JobQueueComponent in the
- * entity hierarchy — player workers find the root queue, goblins find
+ * entity hierarchy. Player workers find the root queue, goblins find
  * their camp's queue.
  *
  * @param buildPlanner Injected planner for build jobs. Player workers
@@ -51,7 +51,7 @@ type BuildJobValidator = (
  *   canExecuteBuildJob (stockpile check). Pass `() => true` for goblins
  *   that gather from the environment.
  * @param claimRequiresEmptyHand When true, a worker may not claim a new job
- *   while carrying something — it must deposit its load (via DepositHeldBehavior)
+ *   while carrying something. It must deposit its load (via DepositHeldBehavior)
  *   first. This keeps workers from grabbing more work and panic-dropping their
  *   load on the ground. Player workers opt in; goblins leave it off (default)
  *   because they have no deposit behavior and would otherwise be stranded
@@ -170,8 +170,8 @@ export function createPerformJobBehavior(
  * produce no actions, stranding it on a behavior it can't act on (and displaying a
  * stale/empty activity label).
  *
- * The target-position check comes first so a stale job — one whose target entity
- * was removed but the job is still queued — is rejected before reaching a
+ * The target-position check comes first so a stale job, one whose target entity
+ * was removed while the job stayed queued, is rejected before reaching a
  * type-specific validator that assumes the target exists.
  *
  * buildJobValidator is injected because goblins gather from the environment and
@@ -181,7 +181,7 @@ export function createPerformJobBehavior(
  * carrying something, so it deposits its load before taking more work rather
  * than panic-dropping it. If the held item is one no stockpile accepts the
  * worker idles holding it (DepositHeldBehavior is also invalid); that is
- * acceptable — the eat behavior's deposit-or-drop clears the hand if it ever
+ * acceptable, since the eat behavior's deposit-or-drop clears the hand if it ever
  * matters, and idling beats littering.
  */
 function canTakeJob(
