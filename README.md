@@ -101,7 +101,7 @@ A HUD state system for navigation.
 
 ### Multiplayer
 
-Mulitplayer and singleplayer is generalised using a server running either remote or in a webworker.
+Multiplayer and singleplayer share one simulation. The same server code runs either on a remote host over websockets, or inside the client itself for singleplayer. The singleplayer path uses `LocalServerConnection`, which keeps the server on the same thread and delivers messages through direct function calls, so a debugger can step from client code into server code in one go.
 
 ## 🙋 Contributing
 ### I have a suggestion for a feature

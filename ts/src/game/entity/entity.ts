@@ -18,10 +18,16 @@ import type { EntityEvent } from "./entityEvent.ts";
 import { log } from "../../common/logging/logger.ts";
 
 /**
- * Represents a node in the entity tree used to create a scenegraph for the
- * game. Entities has positions and components attached to them.
+ * A node in the entity tree that forms the scenegraph for the game.
  *
- * For more info see the entities.md doc
+ * An entity is identified by a string id and owns a local position, a set of
+ * children, and a map of ECS components. Components are plain data, so all the
+ * logic that reads them lives in systems. Entities refer to each other by id
+ * rather than by object reference, which is what keeps the tree serializable.
+ *
+ * Positions come in two flavours. `localPosition` is relative to the parent and
+ * `worldPosition` is absolute. Set `worldPosition` after `addChild`, since an
+ * entity with no parent treats the two as the same value.
  */
 export class Entity {
     private _isGameRoot = false;
