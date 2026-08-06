@@ -1,12 +1,8 @@
 import { spriteRefs } from "../../../../asset/sprite.ts";
 import { allSides } from "../../../../common/sides.ts";
-import type { Point } from "../../../../common/point.ts";
-import { offsetPatternWithPoint } from "../../../../common/pattern.ts";
-import { revealFootprintOffsets } from "../../../vision/revealFootprint.ts";
 import { RenderScope } from "../../../../rendering/renderScope.ts";
-import { TileSize, HalfTileSize } from "../../../map/tile.ts";
+import { TileSize } from "../../../map/tile.ts";
 import { SelectedEntityItem } from "../../selection/selectedEntityItem.ts";
-import { SelectedTileItem } from "../../selection/selectedTileItem.ts";
 import { type SelectedWorldItem } from "../../selection/selectedWorldItem.ts";
 import { InteractionState } from "../../handler/interactionState.ts";
 import { type ButtonCollection } from "../../view/buttonCollection.ts";
@@ -18,24 +14,6 @@ import { CollectableProvider } from "./actor/provider/collectableProvider.ts";
 import { TileSelectionProvider } from "./actor/provider/tileSelectionProvider.ts";
 import { ResourceSelectionProvider } from "./actor/provider/resourceSelectionProvider.ts";
 import { WorkerSelectionProvider } from "./actor/provider/workerSelectionProvider.ts";
-import type { SelectionInfo } from "./selectionInfo.ts";
-import { type ComponentDescriptor } from "../../../../ui/declarative/ui.ts";
-import { uiBox } from "../../../../ui/declarative/uiBox.ts";
-import {
-    uiColumn,
-    uiRow,
-    CrossAxisAlignment,
-    MainAxisAlignment,
-} from "../../../../ui/declarative/uiSequence.ts";
-import { uiText } from "../../../../ui/declarative/uiText.ts";
-import { uiImage } from "../../../../ui/declarative/uiImage.ts";
-import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize.ts";
-import { NinePatchBackground } from "../../../../ui/uiBackground.ts";
-import {
-    titleTextStyle,
-    subTitleTextStyle,
-} from "../../../../rendering/text/textStyle.ts";
-import { uiScaffold } from "../../view/uiScaffold.ts";
 import { BuildingSelectionProvider } from "./actor/provider/buildingSelectionProvider.ts";
 import { ProductionBuildingSelectionProvider } from "./actor/provider/productionBuildingSelectionProvider.ts";
 import { StockpileSelectionProvider } from "./actor/provider/stockpileSelectionProvider.ts";
@@ -43,64 +21,24 @@ import { FarmBuildingSelectionProvider } from "./actor/provider/farmBuildingSele
 import { WindmillSelectionProvider } from "./actor/provider/windmillSelectionProvider.ts";
 import { DismantleSelectionProvider } from "./actor/provider/dismantleSelectionProvider.ts";
 import { PrioritiseJobSelectionProvider } from "./actor/provider/prioritiseJobSelectionProvider.ts";
-import {
-    FarmComponentId,
-    FarmState,
-} from "../../../component/farmComponent.ts";
-import { getCropDefinition } from "../../../../data/crop/cropDefinitions.ts";
-import { getCraftingJobDisplayInfos } from "../../../job/craftingJobQuery.ts";
-import {
-    getJobForWorker,
-    getJobsTargetingEntity,
-    getJobTargetPosition,
-} from "../../../job/jobQuery.ts";
-import { getJobDisplayName } from "../../../job/jobDisplayName.ts";
-import { craftingQueueStrip } from "../crafting/craftingQueueStrip.ts";
+import { type ComponentDescriptor } from "../../../../ui/declarative/ui.ts";
 import { uiAbsoluteLayer } from "../../../../ui/declarative/uiAbsoluteLayer.ts";
-import type { Entity } from "../../../entity/entity.ts";
-import {
-    HealthComponentId,
-    type HealthComponent,
-} from "../../../component/healthComponent.ts";
-import {
-    EnergyComponentId,
-    type EnergyComponent,
-} from "../../../component/energyComponent.ts";
-import { SpriteComponentId } from "../../../component/spriteComponent.ts";
-import { BuildingComponentId } from "../../../component/buildingComponent.ts";
-import { InventoryComponentId } from "../../../component/inventoryComponent.ts";
-import {
-    getConstructionMaterialProgress,
-    type ConstructionMaterialProgress,
-} from "../../../building/materialQuery.ts";
-import { constructionMaterialsView } from "./constructionMaterialsView.ts";
-import { getSettlementEntity } from "../../../entity/settlementQueries.ts";
-import { ResourceComponentId } from "../../../component/resourceComponent.ts";
-import { ProductionComponentId } from "../../../component/productionComponent.ts";
-import { getProductionDefinition } from "../../../../data/production/productionDefinition.ts";
-import { getDiamondPoints } from "../../../map/item/placement.ts";
-import { getResourceById } from "../../../../data/inventory/items/naturalResource.ts";
-import { RoleComponentId } from "../../../component/worker/roleComponent.ts";
-import { getRoleDefinition } from "../../../../data/role/roleDefinitions.ts";
-import { bins } from "../../../../../generated/sprites.ts";
-import { BehaviorAgentComponentId } from "../../../component/BehaviorAgentComponent.ts";
-import { GoblinUnitComponentId } from "../../../component/goblinUnitComponent.ts";
-import {
-    CollectableComponentId,
-    hasCollectableItems,
-} from "../../../component/collectableComponent.ts";
-import { VisibilityComponentId } from "../../../component/visibilityComponent.ts";
-import { VisibilityMapComponentId } from "../../../component/visibilityMapComponent.ts";
-import { DayComponentId } from "../../../component/dayComponent.ts";
-import { LightSourceComponentId } from "../../../component/lightSourceComponent.ts";
-import { getLightSourceDefinition } from "../../../../data/light/lightSourceDefinition.ts";
-import {
-    bandFromEmitters,
-    illuminationBandAt,
-} from "../../../light/illumination.ts";
-import { collectLightEmitters } from "../../../light/lightEmitter.ts";
-import { perceivedBandAt } from "../../../vision/perceivedBand.ts";
+import { uiScaffold } from "../../view/uiScaffold.ts";
+import { getCraftingJobDisplayInfos } from "../../../job/craftingJobQuery.ts";
+import { craftingQueueStrip } from "../crafting/craftingQueueStrip.ts";
+import { buildSelectionInfo } from "./selectionInfoQuery.ts";
+import { selectionInfoPanel } from "./selectionInfoPanel.ts";
+import { drawSelectionOverlays } from "./selectionOverlay.ts";
 
+/**
+ * The state the player sits in after picking something in the world.
+ *
+ * Its own job is wiring. The action buttons come from the provider list, the
+ * info panel from `buildSelectionInfo` and `selectionInfoPanel`, and the world
+ * space decorations from `drawSelectionOverlays`. Each provider decides on its
+ * own whether the current selection is something it has buttons for, so adding
+ * a new kind of selectable means adding a provider rather than editing here.
+ */
 export class SelectionState extends InteractionState {
     private providers: ActorSelectionProvider[] = [
         new WorkerSelectionProvider(),
@@ -134,70 +72,20 @@ export class SelectionState extends InteractionState {
 
     override getView(): ComponentDescriptor | null {
         const items = this.getActionItems();
-        const selectionInfo = this.getSelectionInfo();
+        const selectionInfo = buildSelectionInfo(this._selection, this.context);
 
-        // Convert UIActionbarItems to ScaffoldButtons
-        const leftButtons = items.left.map((item) => ({
-            text: item.text,
-            onClick: item.onClick,
-            icon: item.icon,
-            children: item.children?.map((child) => ({
-                text: child.text,
-                icon: child.icon,
-                onClick: child.onClick,
-            })),
-        }));
-
-        const rightButtons = items.right.map((item) => ({
-            text: item.text,
-            onClick: item.onClick,
-            icon: item.icon,
-            children: item.children?.map((child) => ({
-                text: child.text,
-                icon: child.icon,
-                onClick: child.onClick,
-            })),
-        }));
-
-        const content = selectionInfo
-            ? this.createSelectionInfoPanel(selectionInfo)
-            : undefined;
+        let content: ComponentDescriptor | undefined;
+        if (selectionInfo) {
+            content = selectionInfoPanel(selectionInfo);
+        }
 
         const scaffold = uiScaffold({
-            leftButtons,
-            rightButtons,
+            leftButtons: toScaffoldButtons(items.left),
+            rightButtons: toScaffoldButtons(items.right),
             content,
         });
 
-        if (this._selection instanceof SelectedEntityItem) {
-            const displayInfos = getCraftingJobDisplayInfos(
-                this._selection.entity,
-            );
-            if (displayInfos.length > 0) {
-                const tileScreenPos =
-                    this.context.camera.tileSpaceToScreenSpace(
-                        this._selection.tilePosition,
-                    );
-                const tileCenterX =
-                    tileScreenPos.x +
-                    (this._selection.selectionSize.x * TileSize) / 2;
-                return uiAbsoluteLayer({
-                    base: scaffold,
-                    overlays: [
-                        {
-                            anchorX: tileCenterX,
-                            anchorY: tileScreenPos.y - 6,
-                            child: craftingQueueStrip({
-                                displayInfos,
-                                maxVisible: 5,
-                            }),
-                        },
-                    ],
-                });
-            }
-        }
-
-        return scaffold;
+        return this.withCraftingQueue(scaffold);
     }
 
     override onUpdate(_tick: number): void {
@@ -222,290 +110,43 @@ export class SelectionState extends InteractionState {
         });
 
         if (selection instanceof SelectedEntityItem) {
-            drawJobLinks(context, selection);
-            drawVisibilityRange(context, selection.entity);
-            drawLightEmission(context, selection.entity);
-
-            const productionComp = selection.entity.getEcsComponent(
-                ProductionComponentId,
-            );
-            if (productionComp) {
-                const definition = getProductionDefinition(
-                    productionComp.productionId,
-                );
-                if (definition?.kind === "zone") {
-                    const zonePoints = getDiamondPoints(
-                        selection.entity.worldPosition,
-                        definition.zoneRadius,
-                    );
-                    for (const zonePoint of zonePoints) {
-                        context.drawRectangle({
-                            x: zonePoint.x * TileSize + 14,
-                            y: zonePoint.y * TileSize + 14,
-                            width: 8,
-                            height: 8,
-                            fill: "lightgreen",
-                        });
-                    }
-                }
-            }
-
-            const healthComponent =
-                selection.entity.getEcsComponent(HealthComponentId);
-            const energyComponent =
-                selection.entity.getEcsComponent(EnergyComponentId);
-            if (healthComponent) {
-                const healthbarYOffset = energyComponent ? -18 : -8;
-                drawHealthbar(
-                    context,
-                    selection.entity,
-                    healthComponent,
-                    healthbarYOffset,
-                );
-            }
-            if (energyComponent) {
-                drawEnergyBar(context, selection.entity, energyComponent);
-            }
+            drawSelectionOverlays(context, selection);
         }
     }
 
-    private getSelectionInfo(): SelectionInfo | null {
-        if (this._selection instanceof SelectedTileItem) {
-            const type = this._selection.groundTile.type;
-            if (!!type) {
-                return {
-                    title: type,
-                    subtitle: "Tile",
-                    icon: spriteRefs.blue_book,
-                    light: illuminationBandAt(
-                        this.context.root,
-                        this._selection.tilePosition,
-                    ),
-                };
-            } else {
-                return null;
-            }
-        } else if (this._selection instanceof SelectedEntityItem) {
-            /*
-            const selectionComponent = this._selection.entity.getComponent(
-                SelectionInfoComponent,
-            );
-
-            if (!selectionComponent) {
-                return null;
-            }
-
-            return selectionComponent.getSelectionInfo();*/
-            let icon = spriteRefs.empty_sprite;
-            const spriteComponent =
-                this._selection.entity.getEcsComponent(SpriteComponentId);
-            if (spriteComponent) {
-                icon = spriteComponent.sprite;
-            }
-
-            const collectableComponent = this._selection.entity.getEcsComponent(
-                CollectableComponentId,
-            );
-            if (
-                collectableComponent &&
-                hasCollectableItems(collectableComponent)
-            ) {
-                const firstItem = collectableComponent.items[0].item;
-                return {
-                    icon: firstItem.asset,
-                    title: firstItem.name,
-                    subtitle: collectableComponent.reason ?? "Collectable",
-                };
-            }
-
-            let name = "Entity";
-            let materials: ConstructionMaterialProgress[] | undefined;
-            const buildingComponent =
-                this._selection.entity.getEcsComponent(BuildingComponentId);
-            if (buildingComponent) {
-                name = `${this._selection.entity.id} - ${buildingComponent.building.name}`;
-                if (buildingComponent.scaffolded) {
-                    const inventory =
-                        this._selection.entity.getEcsComponent(
-                            InventoryComponentId,
-                        );
-                    materials = getConstructionMaterialProgress(
-                        inventory,
-                        buildingComponent.building.requirements,
-                        getSettlementEntity(this._selection.entity),
-                    );
-                }
-            }
-
-            const resourceComponent =
-                this._selection.entity.getEcsComponent(ResourceComponentId);
-
-            if (resourceComponent) {
-                const resource = getResourceById(resourceComponent.resourceId);
-                if (resource) {
-                    name = `${this._selection.entity.id} - ${resource.name}`;
-                }
-            }
-
-            const roleComponent =
-                this._selection.entity.getEcsComponent(RoleComponentId);
-
-            if (roleComponent) {
-                const roleDefinition = getRoleDefinition(roleComponent.role);
-                name = roleDefinition.name;
-            }
-
-            if (this._selection.entity.hasComponent(GoblinUnitComponentId)) {
-                name = `${this._selection.entity.id}`;
-            }
-
-            const farmComponent =
-                this._selection.entity.getEcsComponent(FarmComponentId);
-            if (farmComponent) {
-                const cropDefinition = getCropDefinition(farmComponent.cropId);
-                let farmSubtitle: string;
-                if (farmComponent.state === FarmState.Empty) {
-                    farmSubtitle = `${cropDefinition.name} (empty)`;
-                } else if (farmComponent.state === FarmState.Growing) {
-                    let progress = 100;
-                    if (cropDefinition.growthDuration > 0) {
-                        progress = Math.floor(
-                            ((this.context.gameTime.tick -
-                                farmComponent.plantedAtTick) /
-                                cropDefinition.growthDuration) *
-                                100,
-                        );
-                    }
-                    farmSubtitle = `growing (${Math.min(progress, 99)}%)`;
-                } else {
-                    farmSubtitle = `${cropDefinition.name} ready`;
-                }
-                return { icon, subtitle: farmSubtitle, title: name };
-            }
-
-            const behaviorAgent = this._selection.entity.getEcsComponent(
-                BehaviorAgentComponentId,
-            );
-            let subtitle = "selected";
-            if (behaviorAgent) {
-                const claimedJob = getJobForWorker(this._selection.entity);
-                const jobName = claimedJob
-                    ? getJobDisplayName(
-                          this._selection.entity.getRootEntity(),
-                          claimedJob,
-                      )
-                    : null;
-                if (jobName) {
-                    subtitle = jobName;
-                } else {
-                    const behaviorName =
-                        behaviorAgent.currentBehaviorName ?? "idle";
-                    if (behaviorName === "stepOutside") {
-                        subtitle = "stepping outside";
-                    } else {
-                        const actionType = behaviorAgent.actionQueue[0]?.type;
-                        subtitle = actionType
-                            ? `${behaviorName} - ${actionType}`
-                            : behaviorName;
-                    }
-                }
-            }
-
-            if (buildingComponent?.scaffolded) {
-                subtitle = "Under construction";
-            }
-
-            return {
-                icon: icon,
-                subtitle,
-                title: name,
-                materials,
-            };
-        } else {
-            return null;
-        }
-    }
-
-    private createSelectionInfoPanel(
-        selectionInfo: SelectionInfo,
+    /**
+     * Floats the crafting queue above the selected building when it has work
+     * queued. Anything else passes the scaffold straight through.
+     */
+    private withCraftingQueue(
+        scaffold: ComponentDescriptor,
     ): ComponentDescriptor {
-        return uiColumn({
-            height: fillUiSize,
-            width: fillUiSize,
-            crossAxisAlignment: CrossAxisAlignment.Start,
-            mainAxisAlignment: MainAxisAlignment.End,
-            children: [
-                uiBox({
-                    width: wrapUiSize,
-                    height: wrapUiSize,
-                    padding: 8,
-                    background: new NinePatchBackground(
-                        spriteRefs.stone_slate_background,
-                        allSides(8),
-                        1.0,
-                    ),
-                    child: uiColumn({
-                        width: wrapUiSize,
-                        height: wrapUiSize,
-                        gap: 8,
-                        crossAxisAlignment: CrossAxisAlignment.Start,
-                        children: [
-                            uiRow({
-                                width: wrapUiSize,
-                                height: wrapUiSize,
-                                gap: 8,
-                                crossAxisAlignment: CrossAxisAlignment.Center,
-                                children: [
-                                    uiImage({
-                                        sprite: selectionInfo.icon,
-                                        width: 32,
-                                        height: 40,
-                                        fillMode: "contain",
-                                        scale: bins.some(
-                                            (it) =>
-                                                it.name ==
-                                                selectionInfo.icon.bin,
-                                        )
-                                            ? 1
-                                            : 2,
-                                    }),
-                                    uiColumn({
-                                        width: wrapUiSize,
-                                        height: wrapUiSize,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.Start,
-                                        children: [
-                                            uiText({
-                                                content: selectionInfo.title,
-                                                textStyle: titleTextStyle,
-                                            }),
-                                            uiText({
-                                                content: selectionInfo.subtitle,
-                                                textStyle: subTitleTextStyle,
-                                            }),
-                                        ],
-                                    }),
-                                ],
-                            }),
-                            ...(selectionInfo.materials &&
-                            selectionInfo.materials.length > 0
-                                ? [
-                                      constructionMaterialsView({
-                                          materials: selectionInfo.materials,
-                                      }),
-                                  ]
-                                : []),
-                            ...(selectionInfo.light
-                                ? [
-                                      uiText({
-                                          content: `Light: ${selectionInfo.light}`,
-                                          textStyle: subTitleTextStyle,
-                                      }),
-                                  ]
-                                : []),
-                        ],
+        if (!(this._selection instanceof SelectedEntityItem)) {
+            return scaffold;
+        }
+
+        const displayInfos = getCraftingJobDisplayInfos(this._selection.entity);
+        if (displayInfos.length === 0) {
+            return scaffold;
+        }
+
+        const tileScreenPos = this.context.camera.tileSpaceToScreenSpace(
+            this._selection.tilePosition,
+        );
+        const tileCenterX =
+            tileScreenPos.x + (this._selection.selectionSize.x * TileSize) / 2;
+
+        return uiAbsoluteLayer({
+            base: scaffold,
+            overlays: [
+                {
+                    anchorX: tileCenterX,
+                    anchorY: tileScreenPos.y - 6,
+                    child: craftingQueueStrip({
+                        displayInfos,
+                        maxVisible: 5,
                     }),
-                }),
+                },
             ],
         });
     }
@@ -527,225 +168,19 @@ export class SelectionState extends InteractionState {
     }
 }
 
-const claimedLinkColor = "#5fbf5f";
-const unclaimedMarkerColor = "#ffb000";
-const jobLinkWidth = 2;
-
 /**
- * Draw the job relationships for the selected entity, derived live from the job
- * queue each frame. A worker shows a line to the job it is performing; an entity
- * that is the target of work shows a line to whoever claimed it, or an amber box
- * when the work is queued but unclaimed.
+ * Narrows action bar items down to the fields the scaffold renders. The two
+ * types overlap by hand rather than by inheritance, so the copy is explicit.
  */
-function drawJobLinks(context: RenderScope, selection: SelectedEntityItem) {
-    const entity = selection.entity;
-    const root = entity.getRootEntity();
-
-    const workerJob = getJobForWorker(entity);
-    if (workerJob && workerJob.id !== "moveToJob") {
-        const targetPosition = getJobTargetPosition(root, workerJob);
-        if (targetPosition) {
-            drawDottedLink(
-                context,
-                entity.worldPosition,
-                targetPosition,
-                claimedLinkColor,
-            );
-        }
-    }
-
-    for (const job of getJobsTargetingEntity(entity)) {
-        if (job.claimedBy) {
-            const worker = root.findEntity(job.claimedBy);
-            if (worker) {
-                drawDottedLink(
-                    context,
-                    entity.worldPosition,
-                    worker.worldPosition,
-                    claimedLinkColor,
-                );
-            }
-        } else {
-            drawUnclaimedMarker(context, selection);
-        }
-    }
-}
-
-/**
- * Draws the tiles a selected agent can actually see right now as small boxes:
- * its reveal footprint intersected with the perceived band, evaluated through
- * the same `perceivedBandAt` rule the renderer uses, on the same frame-fresh
- * visibility map (the render pass stamps it before interaction drawing runs).
- * Sharing the rule rather than re-deriving it keeps the overlay from ever
- * disagreeing with what is actually rendered — including floors granted by
- * *other* nearby viewers. Emitters and phase are gathered once, not per tile.
- */
-function drawVisibilityRange(context: RenderScope, entity: Entity) {
-    const visibility = entity.getEcsComponent(VisibilityComponentId);
-    if (!visibility) {
-        return;
-    }
-    const root = entity.getRootEntity();
-    const visibilityMap = root.getEcsComponent(VisibilityMapComponentId);
-    const emitters = collectLightEmitters(root);
-    const phase = root.getEcsComponent(DayComponentId)?.phase ?? "day";
-    const tiles = offsetPatternWithPoint(
-        entity.worldPosition,
-        revealFootprintOffsets(entity),
-    );
-    for (const tile of tiles) {
-        // A root without a visibility map (previews) has no reach or floor to
-        // bind on, so fall back to plain illumination.
-        const band = visibilityMap
-            ? perceivedBandAt(visibilityMap, emitters, phase, tile.x, tile.y)
-            : bandFromEmitters(emitters, phase, tile);
-        if (band === "dark") {
-            continue;
-        }
-        context.drawRectangle({
-            x: tile.x * TileSize + 8,
-            y: tile.y * TileSize + 8,
-            width: 6,
-            height: 6,
-            fill: "rgba(120, 170, 255, 0.5)",
-        });
-    }
-}
-
-/**
- * Draws how a selected light source contributes to illumination: bright tiles in
- * yellow, dim tiles in blue, using the same squared-radius bands the
- * illumination field derives from.
- */
-function drawLightEmission(context: RenderScope, entity: Entity) {
-    const lightSource = entity.getEcsComponent(LightSourceComponentId);
-    if (!lightSource) {
-        return;
-    }
-    const definition = getLightSourceDefinition(lightSource.sourceId);
-    if (!definition) {
-        return;
-    }
-    const origin = entity.worldPosition;
-    const brightSq = definition.brightRadius * definition.brightRadius;
-    const dimSq = definition.dimRadius * definition.dimRadius;
-    for (let dx = -definition.dimRadius; dx <= definition.dimRadius; dx++) {
-        for (let dy = -definition.dimRadius; dy <= definition.dimRadius; dy++) {
-            const distanceSq = dx * dx + dy * dy;
-            let fill: string;
-            if (definition.brightRadius > 0 && distanceSq <= brightSq) {
-                fill = "rgba(255, 221, 0, 0.4)";
-            } else if (definition.dimRadius > 0 && distanceSq <= dimSq) {
-                fill = "rgba(40, 90, 200, 0.4)";
-            } else {
-                continue;
-            }
-            context.drawRectangle({
-                x: (origin.x + dx) * TileSize + 22,
-                y: (origin.y + dy) * TileSize + 22,
-                width: 6,
-                height: 6,
-                fill,
-            });
-        }
-    }
-}
-
-function drawDottedLink(
-    context: RenderScope,
-    from: Point,
-    to: Point,
-    color: string,
-) {
-    const fromScreen = context.camera.tileSpaceToScreenSpace(from);
-    const toScreen = context.camera.tileSpaceToScreenSpace(to);
-    context.drawDottedLine(
-        fromScreen.x + HalfTileSize,
-        fromScreen.y + HalfTileSize,
-        toScreen.x + HalfTileSize,
-        toScreen.y + HalfTileSize,
-        color,
-        jobLinkWidth,
-    );
-}
-
-function drawUnclaimedMarker(
-    context: RenderScope,
-    selection: SelectedEntityItem,
-) {
-    const topLeft = context.camera.tileSpaceToScreenSpace(
-        selection.tilePosition,
-    );
-    const x1 = topLeft.x;
-    const y1 = topLeft.y;
-    const x2 = topLeft.x + selection.selectionSize.x * TileSize;
-    const y2 = topLeft.y + selection.selectionSize.y * TileSize;
-
-    context.drawDottedLine(x1, y1, x2, y1, unclaimedMarkerColor, jobLinkWidth);
-    context.drawDottedLine(x2, y1, x2, y2, unclaimedMarkerColor, jobLinkWidth);
-    context.drawDottedLine(x2, y2, x1, y2, unclaimedMarkerColor, jobLinkWidth);
-    context.drawDottedLine(x1, y2, x1, y1, unclaimedMarkerColor, jobLinkWidth);
-}
-
-function drawHealthbar(
-    renderContext: RenderScope,
-    entity: Entity,
-    healthComponent: HealthComponent,
-    healthbarYOffset: number,
-) {
-    const screenPosition = renderContext.camera.tileSpaceToScreenSpace(
-        entity.worldPosition,
-    );
-    const healthbarWidth = 28;
-    const maxHp = healthComponent.maxHp > 0 ? healthComponent.maxHp : 1;
-    const percentageWidth = Math.floor(
-        (healthbarWidth - 4) * (healthComponent.currentHp / maxHp),
-    );
-
-    renderContext.drawScreenSpaceRectangle({
-        x: screenPosition.x + 3,
-        y: screenPosition.y + healthbarYOffset,
-        width: healthbarWidth,
-        height: 8,
-        fill: "black",
-    });
-    renderContext.drawScreenSpaceRectangle({
-        x: screenPosition.x + 5,
-        y: screenPosition.y + 2 + healthbarYOffset,
-        width: percentageWidth,
-        height: 4,
-        fill: "green",
-    });
-}
-
-function drawEnergyBar(
-    renderContext: RenderScope,
-    entity: Entity,
-    energyComponent: EnergyComponent,
-) {
-    const screenPosition = renderContext.camera.tileSpaceToScreenSpace(
-        entity.worldPosition,
-    );
-    const barWidth = 28;
-    const barYOffset = -8;
-    const maxEnergy =
-        energyComponent.maxEnergy > 0 ? energyComponent.maxEnergy : 1;
-    const percentageWidth = Math.floor(
-        (barWidth - 4) * (energyComponent.energy / maxEnergy),
-    );
-
-    renderContext.drawScreenSpaceRectangle({
-        x: screenPosition.x + 3,
-        y: screenPosition.y + barYOffset,
-        width: barWidth,
-        height: 8,
-        fill: "black",
-    });
-    renderContext.drawScreenSpaceRectangle({
-        x: screenPosition.x + 5,
-        y: screenPosition.y + 2 + barYOffset,
-        width: percentageWidth,
-        height: 4,
-        fill: "#4488ff",
-    });
+function toScaffoldButtons(items: ReadonlyArray<UIActionbarItem>) {
+    return items.map((item) => ({
+        text: item.text,
+        onClick: item.onClick,
+        icon: item.icon,
+        children: item.children?.map((child) => ({
+            text: child.text,
+            icon: child.icon,
+            onClick: child.onClick,
+        })),
+    }));
 }
