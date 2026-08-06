@@ -9,13 +9,29 @@ import { type Graph, GraphNode } from "./graph/graph.ts";
 import { manhattanDistance } from "./pathHeuristics.ts";
 
 export type SearchOptions = {
+    /**
+     * Replaces the cost read from each node. Returning 0 makes a node
+     * impassable no matter what weight it stores.
+     */
     weightModifier?: (graphNode: GraphNode) => number;
-    allowPartialPaths?: boolean;
+    /**
+     * Stop once a node next to the goal is reached. Use this to path towards
+     * something that cannot be stood on, like a wall or a tree.
+     */
     allowAdjacentStop?: boolean;
 };
 
 const defaultWeightFunction = (node: GraphNode) => node.weight;
 
+/**
+ * Find a route between two points across the pathfinding graph.
+ *
+ * An unreachable goal still produces a result. The search falls back to a
+ * partial path aimed at whichever reachable node ended up closest, which lets a
+ * caller make some forward progress and try again later. An empty path means
+ * one of three things: the start was missing from the graph, the goal was
+ * missing from the graph, or nothing could be reached from the start.
+ */
 export function aStarSearch(
     from: Point,
     to: Point,
@@ -41,6 +57,12 @@ export function aStarSearch(
         };
     }
 
+    // Movement is four directional and the cheapest passable node costs 1, so
+    // plain Manhattan distance is already an exact estimate of what remains.
+    // The doubling overestimates on purpose. That turns this into weighted A*,
+    // which settles for paths that can run slightly longer than optimal in
+    // exchange for exploring far fewer nodes. Touching the 2 changes how every
+    // unit in the game moves, so treat it as a tuning decision.
     const heuristics = (from: Point, to: Point) => {
         return manhattanDistance(from, to) * 2;
     };
@@ -49,7 +71,6 @@ export function aStarSearch(
     graph.cleanDirtyNodes();
 
     const openHeap = createHeap();
-    //var closestNode = start; // set start node to be closest if required
 
     start.h = heuristics(start, end);
     graph.markDirtyNode(start);
@@ -58,7 +79,7 @@ export function aStarSearch(
 
     while (openHeap.size > 0) {
         // Grab the lowest f(x) to process next.  Heap keeps this sorted for us.
-        var currentNode = openHeap.pop();
+        const currentNode = openHeap.pop();
 
         // End case -- result has been found, return the traced path.
         if (
@@ -78,8 +99,8 @@ export function aStarSearch(
         // Find all neighbors for the current node.
         const neighbors = graph.neighbors(currentNode);
 
-        for (var i = 0, il = neighbors.length; i < il; ++i) {
-            var neighbor = neighbors[i];
+        for (let i = 0, il = neighbors.length; i < il; ++i) {
+            const neighbor = neighbors[i];
             const neighborWeight = weightModifier(neighbor);
             if (neighbor.closed || neighborWeight === 0) {
                 // Not a valid node to process, skip to next neighbor.
@@ -90,8 +111,8 @@ export function aStarSearch(
 
             // The g score is the shortest distance from start to current node.
             // We need to check if the path we have arrived at this neighbor is the shortest one we have seen yet.
-            var gScore = currentNode.g + neighborWeight;
-            var beenVisited = neighbor.visited;
+            const gScore = currentNode.g + neighborWeight;
+            const beenVisited = neighbor.visited;
 
             if (!beenVisited || gScore < neighbor.g) {
                 // Found an optimal (so far) path to this node.  Take score for node to see how good it is.
@@ -145,7 +166,14 @@ function createHeap(): BinaryHeap<GraphNode> {
     return new BinaryHeap((node) => node.f);
 }
 
-function pathTo(node: GraphNode) {
+/**
+ * Walk the parent chain from a node back towards the search origin.
+ *
+ * The result reads as the steps to take. It includes the node passed in and
+ * leaves out the origin, since a caller already standing on the origin has no
+ * reason to move onto it.
+ */
+function pathTo(node: GraphNode): GraphNode[] {
     let curr = node;
     const path: GraphNode[] = [];
     while (curr.parent) {
@@ -178,6 +206,23 @@ export type SearchedNode = {
 };
 
 export type SearchResult = {
+    /**
+     * The steps from the search origin to the goal, with the origin left out.
+     *
+     * The entries are live GraphNode instances widened to Point. Read x and y
+     * from them and leave everything else alone. The next aStarSearch call runs
+     * graph.cleanDirtyNodes(), which wipes parent, g, f, h, visited and closed
+     * on every node listed here. Copy the coordinates out if the path has to
+     * outlive the search that produced it.
+     */
     path: Point[];
+    /**
+     * Every node the search touched, flattened for the debug overlays.
+     *
+     * This gets built on each successful search and allocates one fresh object
+     * per explored node. Only two interaction states read it,
+     * attackSelectionState and actorContextActionState. Every other caller pays
+     * for the copy and throws it away.
+     */
     graph: SearchedNode[];
 };
