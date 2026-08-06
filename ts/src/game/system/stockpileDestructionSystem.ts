@@ -1,4 +1,4 @@
-import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
+import type { EcsSystem } from "../../ecs/ecsSystem.ts";
 import { log } from "../../common/logging/logger.ts";
 import { StockpileComponentId } from "../component/stockpileComponent.ts";
 import { InventoryComponentId } from "../component/inventoryComponent.ts";

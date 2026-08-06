@@ -1,6 +1,6 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
-import { EcsWorld } from "../../../src/common/ecs/ecsWorld.ts";
+import { EcsWorld } from "../../src/ecs/ecsWorld.ts";
 
 describe("EcsWorld.runUpdate", () => {
     it("isolates a throwing system so later systems still run", () => {

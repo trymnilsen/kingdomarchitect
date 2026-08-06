@@ -27,7 +27,7 @@ import {
     type GameMessage,
 } from "../../../src/server/message/gameMessage.ts";
 import { ChunkSize } from "../../../src/game/map/chunk.ts";
-import { EcsWorld } from "../../../src/common/ecs/ecsWorld.ts";
+import { EcsWorld } from "../../../src/ecs/ecsWorld.ts";
 
 function createTestVolume(id: string): Volume {
     return {

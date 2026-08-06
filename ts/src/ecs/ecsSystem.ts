@@ -1,12 +1,12 @@
-import type { Entity } from "../../game/entity/entity.ts";
+import type { Entity } from "../game/entity/entity.ts";
 import type {
     EntityEvent,
     EntityEventType,
-} from "../../game/entity/entityEvent.ts";
-import { DrawMode } from "../../rendering/drawMode.ts";
-import { RenderScope } from "../../rendering/renderScope.ts";
-import type { GameCommand } from "../../server/message/gameCommand.ts";
-import type { GameMessage } from "../../server/message/gameMessage.ts";
+} from "../game/entity/entityEvent.ts";
+import { DrawMode } from "../rendering/drawMode.ts";
+import { RenderScope } from "../rendering/renderScope.ts";
+import type { GameCommand } from "../server/message/gameCommand.ts";
+import type { GameMessage } from "../server/message/gameMessage.ts";
 
 export type EcsRenderFunction = (
     root: Entity,

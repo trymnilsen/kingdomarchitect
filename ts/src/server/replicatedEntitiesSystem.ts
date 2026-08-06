@@ -1,4 +1,4 @@
-import type { EcsSystem } from "../common/ecs/ecsSystem.ts";
+import type { EcsSystem } from "../ecs/ecsSystem.ts";
 import type { ComponentID, Components } from "../game/component/component.ts";
 import { DayComponentId } from "../game/component/dayComponent.ts";
 import { TileComponentId } from "../game/component/tileComponent.ts";

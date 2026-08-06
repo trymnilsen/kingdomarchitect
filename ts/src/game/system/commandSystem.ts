@@ -1,4 +1,4 @@
-import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
+import type { EcsSystem } from "../../ecs/ecsSystem.ts";
 import { log } from "../../common/logging/logger.ts";
 import { getBuildingById } from "../../data/building/buildings.ts";
 import { itemEffectFactoryList } from "../../data/inventory/itemEffectFactoryList.ts";

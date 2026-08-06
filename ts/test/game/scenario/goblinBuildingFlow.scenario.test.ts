@@ -32,7 +32,7 @@ import { createLazyGraphFromRootNode } from "../../../src/game/map/path/graph/ge
 import { buildingPrefab } from "../../../src/game/prefab/buildingPrefab.ts";
 import { isPointAdjacentTo } from "../../../src/common/point.ts";
 import { chunkMapSystem } from "../../../src/game/system/chunkMapSystem.ts";
-import { EcsWorld } from "../../../src/common/ecs/ecsWorld.ts";
+import { EcsWorld } from "../../../src/ecs/ecsWorld.ts";
 import { Entity } from "../../../src/game/entity/entity.ts";
 import type { TileChunk } from "../../../src/game/map/chunk.ts";
 import type { Point } from "../../../src/common/point.ts";

@@ -1,4 +1,4 @@
-import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
+import type { EcsSystem } from "../../ecs/ecsSystem.ts";
 import { DespawnTimerComponentId } from "../component/despawnTimerComponent.ts";
 import type { Entity } from "../entity/entity.ts";
 

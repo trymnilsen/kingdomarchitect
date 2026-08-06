@@ -1,5 +1,5 @@
 import { AssetLoader } from "../../../asset/loader/assetLoader.ts";
-import type { EcsWorld } from "../../../common/ecs/ecsWorld.ts";
+import type { EcsWorld } from "../../../ecs/ecsWorld.ts";
 import { GameTime } from "../../../common/time.ts";
 import { Camera } from "../../../rendering/camera.ts";
 import type { GameSaveCapability } from "../../../server/gameServerConnection.ts";

@@ -1,4 +1,4 @@
-import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
+import type { EcsSystem } from "../../ecs/ecsSystem.ts";
 import { goldCoins } from "../../data/inventory/items/resources.ts";
 import { dropItemAtPosition, DropMode } from "../behavior/dropItem.ts";
 import {

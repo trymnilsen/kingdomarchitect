@@ -1,5 +1,5 @@
 import type { GameTime } from "../../common/time.ts";
-import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
+import type { EcsSystem } from "../../ecs/ecsSystem.ts";
 import { EventGameMessageType } from "../../server/message/gameMessage.ts";
 import {
     AttackGameEventType,

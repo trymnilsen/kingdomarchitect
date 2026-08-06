@@ -27,7 +27,7 @@ import type { GameSaveCapability } from "../../../server/gameServerConnection.ts
 import type { GameCommand } from "../../../server/message/gameCommand.ts";
 import { queryEntity } from "../../map/query/queryEntity.ts";
 import { entitiesFrontToBack } from "../../component/spriteComponent.ts";
-import type { EcsWorld } from "../../../common/ecs/ecsWorld.ts";
+import type { EcsWorld } from "../../../ecs/ecsWorld.ts";
 import { log } from "../../../common/logging/logger.ts";
 import { uiStatusBar } from "../view/uiStatusBar.ts";
 

@@ -1,6 +1,6 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
-import { EcsWorld } from "../../../src/common/ecs/ecsWorld.ts";
+import { EcsWorld } from "../../../src/ecs/ecsWorld.ts";
 import { chunkMapSystem } from "../../../src/game/system/chunkMapSystem.ts";
 import {
     createTileComponent,

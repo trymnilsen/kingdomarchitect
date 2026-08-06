@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
-import { EcsWorld } from "../../../src/common/ecs/ecsWorld.ts";
+import { EcsWorld } from "../../../src/ecs/ecsWorld.ts";
 import { pointEquals, type Point } from "../../../src/common/point.ts";
 import {
     setDiscoveryForPlayer,

@@ -1,4 +1,4 @@
-import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
+import type { EcsSystem } from "../../ecs/ecsSystem.ts";
 import type { Entity } from "../entity/entity.ts";
 import { FarmComponentId, FarmState } from "../component/farmComponent.ts";
 import { getCropDefinition } from "../../data/crop/cropDefinitions.ts";

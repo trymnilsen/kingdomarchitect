@@ -1,5 +1,5 @@
 import { AssetLoader } from "../../../src/asset/loader/assetLoader.ts";
-import { EcsWorld } from "../../../src/common/ecs/ecsWorld.ts";
+import { EcsWorld } from "../../../src/ecs/ecsWorld.ts";
 import type { Point } from "../../../src/common/point.ts";
 import { GameTime } from "../../../src/common/time.ts";
 import { wireGameInput } from "../../../src/game/gameInput.ts";

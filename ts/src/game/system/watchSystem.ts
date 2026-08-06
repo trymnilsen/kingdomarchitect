@@ -1,4 +1,4 @@
-import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
+import type { EcsSystem } from "../../ecs/ecsSystem.ts";
 import type { Point } from "../../common/point.ts";
 import type { Entity } from "../entity/entity.ts";
 import { DayComponentId } from "../component/dayComponent.ts";

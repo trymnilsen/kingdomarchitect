@@ -1,13 +1,13 @@
-import { log } from "../logging/logger.ts";
-import { Entity } from "../../game/entity/entity.ts";
+import { log } from "../common/logging/logger.ts";
+import { Entity } from "../game/entity/entity.ts";
 import {
     type EntityEventType,
     type EntityEvent,
-} from "../../game/entity/entityEvent.ts";
-import { DrawMode } from "../../rendering/drawMode.ts";
-import { RenderScope } from "../../rendering/renderScope.ts";
-import type { GameCommand } from "../../server/message/gameCommand.ts";
-import type { GameMessage } from "../../server/message/gameMessage.ts";
+} from "../game/entity/entityEvent.ts";
+import { DrawMode } from "../rendering/drawMode.ts";
+import { RenderScope } from "../rendering/renderScope.ts";
+import type { GameCommand } from "../server/message/gameCommand.ts";
+import type { GameMessage } from "../server/message/gameMessage.ts";
 import {
     type EcsEntityEventFunction,
     type EcsInitFunction,
@@ -23,6 +23,17 @@ type EcsEntityEventHandlersMap = {
     // Note: We are NOT using Partial<> here, so all keys are mandatory.
 };
 
+/**
+ * Owns the root entity and the registered systems, and drives them on update,
+ * render, entity events and incoming game messages.
+ *
+ * This module sits at the top level of `src` because of what it reaches for.
+ * Running a system means touching entities, a render scope and server messages
+ * all at once, so the world cannot live under `game/`, `rendering/` or
+ * `server/` without pointing sideways into the other two. It used to live in
+ * `common/`, which implied a leaf utility with no dependencies and made the
+ * upward edges easy to miss.
+ */
 export class EcsWorld {
     private renderSystems: EcsRenderFunction[] = [];
     private initSystems: EcsInitFunction[] = [];

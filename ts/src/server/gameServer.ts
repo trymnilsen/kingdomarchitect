@@ -4,7 +4,7 @@ import { GameTime } from "../game/gameTime.ts";
 import { chunkMapSystem } from "../game/system/chunkMapSystem.ts";
 import { pathfindingSystem } from "../game/system/pathfindingSystem.ts";
 import { worldGenerationSystem } from "../game/system/worldGenerationSystem.ts";
-import { EcsWorld } from "../common/ecs/ecsWorld.ts";
+import { EcsWorld } from "../ecs/ecsWorld.ts";
 import { createRootEntity } from "../game/rootFactory.ts";
 import { hungerSystem } from "../game/system/hungerSystem.ts";
 import { createBehaviorSystem } from "../game/behavior/systems/BehaviorSystem.ts";

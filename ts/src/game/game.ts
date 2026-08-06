@@ -3,7 +3,7 @@ import { multiplyPoint, type Point } from "../common/point.ts";
 import { AssetLoader } from "../asset/loader/assetLoader.ts";
 
 import { GameTime } from "../common/time.ts";
-import { EcsWorld } from "../common/ecs/ecsWorld.ts";
+import { EcsWorld } from "../ecs/ecsWorld.ts";
 import { Input, type InputEvent } from "../input/input.ts";
 import { TouchInput } from "../input/touchInput.ts";
 import { TileSize } from "./map/tile.ts";

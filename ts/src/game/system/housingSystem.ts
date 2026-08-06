@@ -1,5 +1,5 @@
 import { randomEntry, removeItem } from "../../common/array.ts";
-import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
+import type { EcsSystem } from "../../ecs/ecsSystem.ts";
 import { BuildingComponentId } from "../component/buildingComponent.ts";
 import {
     HousingComponentId,

@@ -1,4 +1,4 @@
-import { EcsWorld } from "../../../src/common/ecs/ecsWorld.ts";
+import { EcsWorld } from "../../../src/ecs/ecsWorld.ts";
 import { chunkMapSystem } from "../../../src/game/system/chunkMapSystem.ts";
 import {
     createTileComponent,
@@ -33,7 +33,7 @@ import { stockPile } from "../../../src/data/building/wood/storage.ts";
 import { playerKingdomPrefab } from "../../../src/game/prefab/playerKingdomPrefab.ts";
 import { goblinCampPrefab } from "../../../src/game/prefab/goblinCampPrefab.ts";
 import { goblinPrefab } from "../../../src/game/prefab/goblinPrefab.ts";
-import type { EcsSystem } from "../../../src/common/ecs/ecsSystem.ts";
+import type { EcsSystem } from "../../../src/ecs/ecsSystem.ts";
 import type { Point } from "../../../src/common/point.ts";
 import type { InventoryItemQuantity } from "../../../src/data/inventory/inventoryItemQuantity.ts";
 import { createHousingComponent } from "../../../src/game/component/housingComponent.ts";

@@ -4,7 +4,7 @@ import {
     setChunk,
 } from "../../src/game/component/tileComponent.ts";
 import { createChunkMapComponent } from "../../src/game/component/chunkMapComponent.ts";
-import { EcsWorld } from "../../src/common/ecs/ecsWorld.ts";
+import { EcsWorld } from "../../src/ecs/ecsWorld.ts";
 import { chunkMapSystem } from "../../src/game/system/chunkMapSystem.ts";
 
 /**

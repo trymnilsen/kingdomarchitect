@@ -10,7 +10,7 @@ import {
     getCharacterColors,
     type CharacterColors,
 } from "../../characterbuilder/colors.ts";
-import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
+import type { EcsSystem } from "../../ecs/ecsSystem.ts";
 import type { AssetLoader } from "../../asset/loader/assetLoader.ts";
 import type {
     OffscreenCanvasFactory,

@@ -1,5 +1,5 @@
 import type { Bounds } from "../../common/bounds.ts";
-import { type EcsSystem } from "../../common/ecs/ecsSystem.ts";
+import { type EcsSystem } from "../../ecs/ecsSystem.ts";
 import { offsetPatternWithPoint } from "../../common/pattern.ts";
 import {
     encodePosition,

@@ -1,6 +1,6 @@
 import { encodePosition } from "../../common/point.ts";
 import { SparseSet } from "../../common/structure/sparseSet.ts";
-import type { EcsSystem } from "../../common/ecs/ecsSystem.ts";
+import type { EcsSystem } from "../../ecs/ecsSystem.ts";
 import { ChunkSize } from "../map/chunk.ts";
 import {
     ChunkMapComponentId,
