@@ -1,88 +1,70 @@
 import type { EcsSystem } from "../../ecs/ecsSystem.ts";
 import { log } from "../../common/logging/logger.ts";
-import { getBuildingById } from "../../data/building/buildings.ts";
-import { itemEffectFactoryList } from "../../data/inventory/itemEffectFactoryList.ts";
 import {
     BuildCommandId,
     type BuildCommand,
 } from "../../server/message/command/buildCommand.ts";
 import {
+    ChangeOccupationCommandId,
+    type ChangeOccupationCommand,
+} from "../../server/message/command/changeOccupationCommand.ts";
+import {
+    ClearBuildingJobsCommandId,
+    type ClearBuildingJobsCommand,
+} from "../../server/message/command/clearBuildingJobsCommand.ts";
+import {
     ConsumeItemCommandId,
     type ConsumeItemCommand,
 } from "../../server/message/command/consumeItemCommand.ts";
 import {
-    EquipItemCommandId,
-    type EquipItemCommand,
-} from "../../server/message/command/equipItemCommand.ts";
+    DismantleBuildingCommandId,
+    type DismantleBuildingCommand,
+} from "../../server/message/command/dismantleBuildingCommand.ts";
 import {
     DropHeldCommandId,
     type DropHeldCommand,
 } from "../../server/message/command/dropHeldCommand.ts";
 import {
-    UnequipItemCommandId,
-    type UnequipItemCommand,
-} from "../../server/message/command/unequipItemCommand.ts";
-import {
     EquipFromHeldCommandId,
     type EquipFromHeldCommand,
 } from "../../server/message/command/equipFromHeldCommand.ts";
-import { HeldItemComponentId } from "../component/heldItemComponent.ts";
-import { markStatsDirty } from "../component/statsComponent.ts";
 import {
-    NewGameCommandId,
-    type NewGameCommand,
-} from "../../server/message/command/newGameCommand.ts";
+    EquipItemCommandId,
+    type EquipItemCommand,
+} from "../../server/message/command/equipItemCommand.ts";
+import { NewGameCommandId } from "../../server/message/command/newGameCommand.ts";
+import {
+    PrioritiseJobCommandId,
+    type PrioritiseJobCommand,
+} from "../../server/message/command/prioritiseJobCommand.ts";
 import {
     QueueJobCommandId,
     type QueueJobCommand,
 } from "../../server/message/command/queueJobCommand.ts";
-import { findPlayerKingdom } from "../component/playerKingdomComponent.ts";
-import { placeBuildingAt } from "../building/placeBuilding.ts";
 import {
-    CommandGameMessageType,
-    type GameMessage,
-} from "../../server/message/gameMessage.ts";
-import {
-    ActiveEffectsComponentId,
-    addEffect,
-    createActiveEffectsComponent,
-} from "../component/activeEffectsComponent.ts";
-import {
-    addCollectableItems,
-    CollectableComponentId,
-} from "../component/collectableComponent.ts";
-import { MessageEmitterComponentId } from "../component/messageEmitterComponent.ts";
-import { EquipmentComponentId } from "../component/equipmentComponent.ts";
-import {
-    addInventoryItem,
-    InventoryComponentId,
-    takeInventoryItem,
-} from "../component/inventoryComponent.ts";
-import {
-    JobQueueComponentId,
-    addJob,
-    moveJobToFront,
-} from "../component/jobQueueComponent.ts";
-import type { Entity } from "../entity/entity.ts";
-import { BuildBuildingJob } from "../job/buildBuildingJob.ts";
-import type { GameTime } from "../gameTime.ts";
-import type { PersistenceManager } from "../../server/persistence/persistenceManager.ts";
-import { ReloadGameMessageType } from "../../server/message/gameMessage.ts";
-import {
-    ChangeOccupationCommandId,
-    type ChangeOccupationCommand,
-} from "../../server/message/command/changeOccupationCommand.ts";
+    SetFarmCropCommandId,
+    type SetFarmCropCommand,
+} from "../../server/message/command/setFarmCropCommand.ts";
 import {
     SetPlayerCommandId,
     type SetPlayerCommand,
 } from "../../server/message/command/setPlayerCommand.ts";
-import { OccupationComponentId } from "../component/occupationComponent.ts";
-import { WorkplaceComponentId } from "../component/workplaceComponent.ts";
-import { removeItem } from "../../common/array.ts";
 import {
-    BehaviorAgentComponentId,
-    requestReplan as requestBehaviorReplan,
-} from "../component/BehaviorAgentComponent.ts";
+    SetPreferredAmountCommandId,
+    type SetPreferredAmountCommand,
+} from "../../server/message/command/setPreferredAmountCommand.ts";
+import {
+    SetSearchlightModeCommandId,
+    type SetSearchlightModeCommand,
+} from "../../server/message/command/setSearchlightModeCommand.ts";
+import {
+    SetStationPriorityCommandId,
+    type SetStationPriorityCommand,
+} from "../../server/message/command/setStationPriorityCommand.ts";
+import {
+    UnequipItemCommandId,
+    type UnequipItemCommand,
+} from "../../server/message/command/unequipItemCommand.ts";
 import {
     UpdateWorkerRoleCommandId,
     type UpdateWorkerRoleCommand,
@@ -92,72 +74,67 @@ import {
     type UpdateWorkerStanceCommand,
 } from "../../server/message/command/updateWorkerStanceCommand.ts";
 import {
-    SetFarmCropCommandId,
-    type SetFarmCropCommand,
-} from "../../server/message/command/setFarmCropCommand.ts";
-import { RoleComponentId } from "../component/worker/roleComponent.ts";
+    CommandGameMessageType,
+    ReloadGameMessageType,
+    type GameMessage,
+} from "../../server/message/gameMessage.ts";
+import type { PersistenceManager } from "../../server/persistence/persistenceManager.ts";
+import { MessageEmitterComponentId } from "../component/messageEmitterComponent.ts";
+import type { Entity } from "../entity/entity.ts";
 import {
-    SetStationPriorityCommandId,
-    type SetStationPriorityCommand,
-} from "../../server/message/command/setStationPriorityCommand.ts";
+    buildBuilding,
+    clearBuildingJobs,
+    dismantleBuilding,
+} from "./command/buildingCommands.ts";
 import {
-    SetSearchlightModeCommandId,
-    type SetSearchlightModeCommand,
-} from "../../server/message/command/setSearchlightModeCommand.ts";
-import { StationComponentId } from "../component/stationComponent.ts";
-import { WatchComponentId } from "../component/watchComponent.ts";
-import { FarmComponentId, FarmState } from "../component/farmComponent.ts";
+    dropHeld,
+    equipFromHeld,
+    equipItem,
+    unequipItem,
+} from "./command/equipmentCommands.ts";
+import { setFarmCrop } from "./command/farmCommands.ts";
+import { consumeItem } from "./command/inventoryCommands.ts";
+import { prioritiseJob, queueJob } from "./command/jobCommands.ts";
+import { setPlayerCommand } from "./command/playerCommands.ts";
 import {
-    SetPreferredAmountCommandId,
-    type SetPreferredAmountCommand,
-} from "../../server/message/command/setPreferredAmountCommand.ts";
+    setSearchlightMode,
+    setStationPriority,
+} from "./command/stationCommands.ts";
+import { setStockpilePreferredAmount } from "./command/stockpileCommands.ts";
 import {
-    setPreferredAmount,
-    StockpileComponentId,
-} from "../component/stockpileComponent.ts";
-import {
-    ClearBuildingJobsCommandId,
-    type ClearBuildingJobsCommand,
-} from "../../server/message/command/clearBuildingJobsCommand.ts";
-import {
-    DismantleBuildingCommandId,
-    type DismantleBuildingCommand,
-} from "../../server/message/command/dismantleBuildingCommand.ts";
-import {
-    PrioritiseJobCommandId,
-    type PrioritiseJobCommand,
-} from "../../server/message/command/prioritiseJobCommand.ts";
-import { isTargetOfJob } from "../job/job.ts";
-import { BuildingComponentId } from "../component/buildingComponent.ts";
-import { HealthComponentId } from "../component/healthComponent.ts";
-import {
-    cancelScaffold,
-    createDismantleBuildingJob,
-    hasDismantleJobForBuilding,
-    stopConstruction,
-} from "../job/dismantleBuildingJob.ts";
-import { getSettlementEntity } from "../entity/settlementQueries.ts";
+    changeOccupation,
+    updateWorkerRole,
+    updateWorkerStance,
+} from "./command/workerCommands.ts";
 
+/**
+ * Routes player commands arriving from the client to the handler that carries
+ * them out.
+ *
+ * This module only dispatches. The handlers live one per domain under
+ * `./command/`, matching how `server/message/command/` splits the command
+ * types themselves. A new command means a new case here and a function there.
+ */
 export function createCommandSystem(
-    gameTime: GameTime,
     persistenceManager: PersistenceManager,
 ): EcsSystem {
     return {
         onGameMessage: (root, message) =>
-            onGameMessage(root, message, gameTime, persistenceManager),
+            onGameMessage(root, message, persistenceManager),
     };
 }
 
 function onGameMessage(
     root: Entity,
     message: GameMessage,
-    gameTime: GameTime,
     persistenceManager: PersistenceManager,
 ) {
     if (message.type != CommandGameMessageType) return;
     log.info("command", { command: message.command });
     switch (message.command.id) {
         case NewGameCommandId:
+            // Kept inline because it is the one command that needs the
+            // persistence manager and completes asynchronously.
             persistenceManager
                 .clearGame()
                 .then(() => {
@@ -194,11 +171,7 @@ function onGameMessage(
             consumeItem(root, message.command as ConsumeItemCommand);
             break;
         case SetPlayerCommandId:
-            setPlayerCommand(
-                root,
-                message.command as SetPlayerCommand,
-                gameTime,
-            );
+            setPlayerCommand(root, message.command as SetPlayerCommand);
             break;
         case UpdateWorkerRoleCommandId:
             updateWorkerRole(root, message.command as UpdateWorkerRoleCommand);
@@ -213,7 +186,7 @@ function onGameMessage(
             setFarmCrop(root, message.command as SetFarmCropCommand);
             break;
         case SetPreferredAmountCommandId:
-            handleSetPreferredAmount(
+            setStockpilePreferredAmount(
                 root,
                 message.command as SetPreferredAmountCommand,
             );
@@ -246,555 +219,4 @@ function onGameMessage(
             );
             break;
     }
-}
-
-function setStationPriority(root: Entity, command: SetStationPriorityCommand) {
-    const tower = root.findEntity(command.tower);
-    if (!tower) {
-        log.warn("Tower not found for SetStationPriority", {
-            tower: command.tower,
-        });
-        return;
-    }
-
-    const station = tower.getEcsComponent(StationComponentId);
-    if (!station) {
-        log.warn("Entity has no station component for SetStationPriority", {
-            tower: command.tower,
-        });
-        return;
-    }
-
-    station.priority = command.priority;
-    tower.invalidateComponent(StationComponentId);
-}
-
-function setSearchlightMode(root: Entity, command: SetSearchlightModeCommand) {
-    const tower = root.findEntity(command.tower);
-    if (!tower) {
-        log.warn("Tower not found for SetSearchlightMode", {
-            tower: command.tower,
-        });
-        return;
-    }
-
-    const watch = tower.getEcsComponent(WatchComponentId);
-    if (!watch) {
-        log.warn("Entity has no watch component for SetSearchlightMode", {
-            tower: command.tower,
-        });
-        return;
-    }
-
-    watch.searchlight = command.mode;
-    // A fixed cardinal also sets the resolved aim immediately; "auto" lets the
-    // WatchSystem drive beamAim.
-    if (command.mode !== "auto") {
-        watch.lockedOn = null;
-        watch.beamAim = command.mode;
-    }
-    tower.invalidateComponent(WatchComponentId);
-}
-
-function changeOccupation(root: Entity, command: ChangeOccupationCommand) {
-    const worker = root.findEntity(command.worker);
-    if (!worker) {
-        throw new Error(`Worker ${worker} not found`);
-    }
-
-    const workplace = root.findEntity(command.workplace);
-    if (!workplace) {
-        throw new Error(`workplace ${workplace} not found`);
-    }
-
-    const occupationComponent = worker.requireEcsComponent(
-        OccupationComponentId,
-    );
-
-    const workplaceComponent =
-        workplace.requireEcsComponent(WorkplaceComponentId);
-
-    switch (command.action) {
-        case "assign":
-            occupationComponent.workplace = workplace.id;
-            workplaceComponent.workers.push(worker.id);
-            break;
-        case "unassign":
-            occupationComponent.workplace = undefined;
-            removeItem(workplaceComponent.workers, worker.id);
-            break;
-    }
-
-    worker.invalidateComponent(OccupationComponentId);
-    workplace.invalidateComponent(WorkplaceComponentId);
-}
-
-function buildBuilding(root: Entity, command: BuildCommand) {
-    const points = Array.isArray(command.position)
-        ? command.position
-        : [command.position];
-    const building = getBuildingById(command.buildingId);
-    if (!building) {
-        log.error("Building not found", { buildingId: command.buildingId });
-        return;
-    }
-
-    const playerKingdom = findPlayerKingdom(root);
-    if (!playerKingdom) {
-        log.error("Player kingdom not found, cannot place building");
-        return;
-    }
-
-    for (const point of points) {
-        const buildingEntity = placeBuildingAt(
-            root,
-            playerKingdom,
-            building,
-            point,
-        );
-        const job = BuildBuildingJob(buildingEntity);
-        playerKingdom.updateComponent(JobQueueComponentId, (component) => {
-            component.jobs.push(job);
-        });
-    }
-}
-
-function queueJob(root: Entity, command: QueueJobCommand) {
-    const playerKingdom = findPlayerKingdom(root);
-    if (!playerKingdom) {
-        log.error("Player kingdom not found for job queue");
-        return;
-    }
-    const jobQueue = playerKingdom.requireEcsComponent(JobQueueComponentId);
-    addJob(jobQueue, command.job);
-
-    // No explicit worker notification: idle workers re-select every tick, so
-    // they pick up the newly queued job on their own next tick.
-    playerKingdom.invalidateComponent(JobQueueComponentId);
-}
-
-function equipItem(root: Entity, command: EquipItemCommand) {
-    const entity = root.findEntity(command.entity);
-    if (!entity) {
-        log.error("Unable to equip, entity not found");
-        return;
-    }
-
-    const equipment = entity.getEcsComponent(EquipmentComponentId);
-    if (!equipment) {
-        log.error("Unable to equip, equipment component not found");
-        return;
-    }
-
-    if (!(command.slot in equipment.slots)) {
-        log.error("No equipment slot on entity", {
-            slot: command.slot,
-            entityId: entity.id,
-        });
-        return;
-    }
-
-    const agent = entity.getEcsComponent(BehaviorAgentComponentId);
-    if (!agent) {
-        log.warn("Equip: entity has no behavior agent", {
-            entity: command.entity,
-        });
-        return;
-    }
-
-    agent.playerCommand = {
-        action: "equip",
-        sourceEntityId: command.sourceEntityId,
-        itemId: command.itemId,
-        slot: command.slot,
-    };
-    entity.invalidateComponent(BehaviorAgentComponentId);
-    requestBehaviorReplan(entity);
-}
-
-function unequipItem(root: Entity, command: UnequipItemCommand) {
-    const entity = root.findEntity(command.entity);
-    if (!entity) {
-        log.error("Unable to unequip, entity not found");
-        return;
-    }
-
-    const equipment = entity.getEcsComponent(EquipmentComponentId);
-    const held = entity.getEcsComponent(HeldItemComponentId);
-    if (!equipment || !held) {
-        log.error("Unable to unequip, missing equipment or held component");
-        return;
-    }
-
-    const slotItem = equipment.slots[command.slot];
-    if (!slotItem) {
-        return;
-    }
-
-    if (held.item !== null && held.amount > 0) {
-        log.warn("Unequip failed: held is occupied", {
-            entity: command.entity,
-            slot: command.slot,
-        });
-        return;
-    }
-
-    held.item = slotItem;
-    held.amount = 1;
-    equipment.slots[command.slot] = null;
-
-    entity.invalidateComponent(HeldItemComponentId);
-    entity.invalidateComponent(EquipmentComponentId);
-    markStatsDirty(entity);
-}
-
-function equipFromHeld(root: Entity, command: EquipFromHeldCommand) {
-    const entity = root.findEntity(command.entity);
-    if (!entity) {
-        log.error("Unable to equipFromHeld, entity not found");
-        return;
-    }
-    const equipment = entity.getEcsComponent(EquipmentComponentId);
-    if (!equipment) return;
-    if (!(command.slot in equipment.slots)) return;
-
-    const agent = entity.getEcsComponent(BehaviorAgentComponentId);
-    if (!agent) return;
-
-    agent.playerCommand = {
-        action: "equipFromHeld",
-        slot: command.slot,
-    };
-    entity.invalidateComponent(BehaviorAgentComponentId);
-    requestBehaviorReplan(entity);
-}
-
-function dropHeld(root: Entity, command: DropHeldCommand) {
-    const entity = root.findEntity(command.entity);
-    if (!entity) {
-        log.warn("DropHeld: entity not found", { entity: command.entity });
-        return;
-    }
-
-    const agent = entity.getEcsComponent(BehaviorAgentComponentId);
-    if (!agent) {
-        log.warn("DropHeld: entity has no behavior agent", {
-            entity: command.entity,
-        });
-        return;
-    }
-
-    agent.playerCommand = { action: "drop" };
-    entity.invalidateComponent(BehaviorAgentComponentId);
-    requestBehaviorReplan(entity);
-}
-
-function consumeItem(root: Entity, command: ConsumeItemCommand) {
-    const entity = root.findEntity(command.entity);
-    if (!entity) {
-        log.error("Unable to consume, entity not found");
-        return;
-    }
-
-    const equipment = entity.getEcsComponent(EquipmentComponentId);
-    if (!equipment) {
-        log.error("Unable to consume, equipment component not found");
-        return;
-    }
-
-    const inventory = entity.getEcsComponent(InventoryComponentId);
-    if (!inventory) {
-        log.error("Unable to consume, inventory component not found");
-        return;
-    }
-
-    // Get the item from the specified slot
-    const item = equipment.slots[command.slot];
-    if (!item) {
-        log.error("No item equipped in slot", { slot: command.slot });
-        return;
-    }
-
-    // Check if we have an effect factory for this item
-    const effectFactory = itemEffectFactoryList[item.id];
-    if (!effectFactory) {
-        log.error("No effect factory for item", { itemId: item.id });
-        return;
-    }
-
-    // Try to take the item from inventory (for stack management)
-    const withdrawnItem = takeInventoryItem(inventory, item.id, 1);
-    if (!withdrawnItem) {
-        log.error("Not enough items in inventory");
-        return;
-    }
-
-    // Remove the item from the equipment slot
-    equipment.slots[command.slot] = null;
-
-    // Create the effect from the item
-    const effect = effectFactory(item);
-
-    // Get or create the active effects component
-    let activeEffects = entity.getEcsComponent(ActiveEffectsComponentId);
-    if (!activeEffects) {
-        activeEffects = createActiveEffectsComponent();
-        entity.setEcsComponent(activeEffects);
-    }
-
-    // Add the effect to the entity
-    addEffect(activeEffects, effect, entity.id);
-
-    // Notify changes
-    entity.invalidateComponent(InventoryComponentId);
-    entity.invalidateComponent(EquipmentComponentId);
-    entity.invalidateComponent(ActiveEffectsComponentId);
-}
-
-function setPlayerCommand(
-    root: Entity,
-    command: SetPlayerCommand,
-    _gameTime: GameTime,
-) {
-    const agent = root.findEntity(command.agentId);
-    if (!agent) {
-        log.warn("Agent not found for SetPlayerCommand", {
-            agentId: command.agentId,
-        });
-        return;
-    }
-
-    const behaviorAgent = agent.getEcsComponent(BehaviorAgentComponentId);
-    if (!behaviorAgent) {
-        log.warn("Agent has no BehaviorAgent component", {
-            agentId: command.agentId,
-        });
-        return;
-    }
-
-    // Set the player command on the agent
-    behaviorAgent.playerCommand = command.command;
-    agent.invalidateComponent(BehaviorAgentComponentId);
-
-    // Trigger replan to execute command immediately
-    requestBehaviorReplan(agent);
-
-    log.info("Command set for agent", {
-        agentId: command.agentId,
-        action: command.command.action,
-    });
-}
-
-function updateWorkerRole(root: Entity, command: UpdateWorkerRoleCommand) {
-    const worker = root.findEntity(command.worker);
-    if (!worker) {
-        log.warn("Worker not found for UpdateWorkerRole", {
-            worker: command.worker,
-        });
-        return;
-    }
-
-    const roleComponent = worker.getEcsComponent(RoleComponentId);
-    if (!roleComponent) {
-        log.warn("Worker has no role component", { worker: command.worker });
-        return;
-    }
-
-    roleComponent.role = command.role;
-    worker.invalidateComponent(RoleComponentId);
-}
-
-function setFarmCrop(root: Entity, command: SetFarmCropCommand) {
-    const building = root.findEntity(command.building);
-    if (!building) {
-        log.warn("Building not found for SetFarmCrop", {
-            building: command.building,
-        });
-        return;
-    }
-
-    const farmComponent = building.getEcsComponent(FarmComponentId);
-    if (!farmComponent) {
-        log.warn("Building has no farm component for SetFarmCrop", {
-            building: command.building,
-        });
-        return;
-    }
-
-    // A planted crop is committed until harvested, so the yield always matches
-    // what was sown. Only a fallow farm may have its crop reconfigured.
-    if (farmComponent.state !== FarmState.Empty) {
-        log.warn("Cannot change crop while farm is not fallow", {
-            building: command.building,
-            state: farmComponent.state,
-        });
-        return;
-    }
-
-    farmComponent.cropId = command.cropId;
-    building.invalidateComponent(FarmComponentId);
-}
-
-function updateWorkerStance(root: Entity, command: UpdateWorkerStanceCommand) {
-    const worker = root.findEntity(command.worker);
-    if (!worker) {
-        log.warn("Worker not found for UpdateWorkerStance", {
-            worker: command.worker,
-        });
-        return;
-    }
-
-    const roleComponent = worker.getEcsComponent(RoleComponentId);
-    if (!roleComponent) {
-        log.warn("Worker has no role component for UpdateWorkerStance", {
-            worker: command.worker,
-        });
-        return;
-    }
-
-    roleComponent.stance = command.stance;
-    worker.invalidateComponent(RoleComponentId);
-}
-
-function handleSetPreferredAmount(
-    root: Entity,
-    command: SetPreferredAmountCommand,
-) {
-    const stockpile = root.findEntity(command.stockpileEntityId);
-    if (!stockpile) {
-        log.warn("Stockpile not found for SetPreferredAmount", {
-            entityId: command.stockpileEntityId,
-        });
-        return;
-    }
-
-    const stockpileComponent = stockpile.getEcsComponent(StockpileComponentId);
-    if (!stockpileComponent) {
-        log.warn("Entity is not a stockpile", {
-            entityId: command.stockpileEntityId,
-        });
-        return;
-    }
-
-    setPreferredAmount(stockpileComponent, command.itemId, command.amount);
-    stockpile.invalidateComponent(StockpileComponentId);
-}
-
-function clearBuildingJobs(root: Entity, command: ClearBuildingJobsCommand) {
-    const playerKingdom = findPlayerKingdom(root);
-    if (!playerKingdom) {
-        log.warn("Player kingdom not found for ClearBuildingJobs");
-        return;
-    }
-
-    const building = root.findEntity(command.buildingId);
-    if (!building) {
-        log.warn("Building not found for ClearBuildingJobs", {
-            buildingId: command.buildingId,
-        });
-        return;
-    }
-
-    const jobQueue = playerKingdom.requireEcsComponent(JobQueueComponentId);
-    jobQueue.jobs = jobQueue.jobs.filter(
-        (job) =>
-            !(
-                job.id === command.jobTypeId &&
-                job.claimedBy === undefined &&
-                isTargetOfJob(job, building)
-            ),
-    );
-    playerKingdom.invalidateComponent(JobQueueComponentId);
-}
-
-function dismantleBuilding(
-    root: Entity,
-    command: DismantleBuildingCommand,
-) {
-    const building = root.findEntity(command.buildingId);
-    if (!building) {
-        log.warn("Building not found for Dismantle", {
-            buildingId: command.buildingId,
-        });
-        return;
-    }
-
-    const buildingComponent = building.getEcsComponent(BuildingComponentId);
-    if (!buildingComponent) {
-        log.warn("Dismantle target is not a building", {
-            buildingId: command.buildingId,
-        });
-        return;
-    }
-
-    const playerKingdom = findPlayerKingdom(root);
-    if (!playerKingdom) {
-        log.error("Player kingdom not found, cannot dismantle");
-        return;
-    }
-
-    // Only player-owned buildings can be dismantled — never goblin/enemy ones.
-    if (getSettlementEntity(building) !== playerKingdom) {
-        log.warn("Refusing to dismantle a building the player does not own", {
-            buildingId: command.buildingId,
-        });
-        return;
-    }
-
-    const jobQueue = playerKingdom.requireEcsComponent(JobQueueComponentId);
-
-    // Idempotent: ignore repeat presses while a dismantle is already queued.
-    if (hasDismantleJobForBuilding(jobQueue, building.id)) {
-        return;
-    }
-
-    // Decide from the building's live state, not what the client rendered.
-    if (buildingComponent.scaffolded) {
-        // Stop the in-flight construction first so the builder can't keep
-        // healing the building while we tear it down.
-        stopConstruction(playerKingdom, building);
-
-        const health = building.getEcsComponent(HealthComponentId);
-        const hp = health?.currentHp ?? 0;
-        if (hp <= 0) {
-            // Untouched scaffold — nothing built yet, remove it instantly.
-            cancelScaffold(root, building);
-            return;
-        }
-    }
-
-    // Completed building, or a partially-built scaffold: a worker drains its HP.
-    addJob(jobQueue, createDismantleBuildingJob(building.id));
-    playerKingdom.invalidateComponent(JobQueueComponentId);
-}
-
-function prioritiseJob(root: Entity, command: PrioritiseJobCommand) {
-    const playerKingdom = findPlayerKingdom(root);
-    if (!playerKingdom) {
-        log.error("Player kingdom not found, cannot prioritise job");
-        return;
-    }
-
-    const entity = root.findEntity(command.entityId);
-    if (!entity) {
-        log.warn("Entity not found for PrioritiseJob", {
-            entityId: command.entityId,
-        });
-        return;
-    }
-
-    const jobQueue = playerKingdom.requireEcsComponent(JobQueueComponentId);
-
-    // Bump the first job that targets this entity to the front of the queue.
-    // Searching only the player kingdom's own queue is itself the ownership
-    // check: a job here is the player's work (resources sit on world chunks,
-    // not under the kingdom, so an ancestor-based check would wrongly reject
-    // chop/mine jobs). No match → nothing to do.
-    const job = jobQueue.jobs.find((job) => isTargetOfJob(job, entity));
-    if (!job) {
-        return;
-    }
-
-    moveJobToFront(jobQueue, job);
-    playerKingdom.invalidateComponent(JobQueueComponentId);
 }
