@@ -1,61 +1,25 @@
+import { createHash, randomBytes } from "node:crypto";
 import type { DatabaseSync } from "node:sqlite";
 import {
-    generateRegistrationOptions as webauthnGenerateRegistration,
-    verifyRegistrationResponse,
-    generateAuthenticationOptions as webauthnGenerateAuthentication,
-    verifyAuthenticationResponse,
-} from "@simplewebauthn/server";
-import type {
-    RegistrationResponseJSON,
-    AuthenticationResponseJSON,
-    AuthenticatorTransportFuture,
-    WebAuthnCredential,
-} from "@simplewebauthn/server";
-
-type PendingChallenge = {
-    challenge: string;
-    expires: number;
-};
-
-const CHALLENGE_TTL_MS = 120_000; // 2 minutes
-
-/**
- * In-memory storage for short-lived WebAuthn challenges.
- * Challenges are server-local and never persisted, so a class is appropriate here.
- */
-export class ChallengeStore {
-    private readonly challenges = new Map<string, PendingChallenge>();
-
-    store(key: string, challenge: string): void {
-        // Opportunistically prune expired entries on every write
-        this.cleanExpired();
-        this.challenges.set(key, {
-            challenge,
-            expires: Date.now() + CHALLENGE_TTL_MS,
-        });
-    }
-
-    consume(key: string): string | null {
-        const entry = this.challenges.get(key);
-        if (!entry) {
-            return null;
-        }
-        this.challenges.delete(key);
-        if (entry.expires < Date.now()) {
-            return null;
-        }
-        return entry.challenge;
-    }
-
-    private cleanExpired(): void {
-        const now = Date.now();
-        for (const [key, entry] of this.challenges.entries()) {
-            if (entry.expires < now) {
-                this.challenges.delete(key);
-            }
-        }
-    }
-}
+    isCounterAcceptable,
+    parseAuthenticatorData,
+    verifyAuthenticatorData,
+} from "./authenticatorData.ts";
+import { bytesToBase64Url, decodeRequiredBase64Url } from "./base64url.ts";
+import type { ChallengeStore } from "./challengeStore.ts";
+import { verifyClientData } from "./clientData.ts";
+import {
+    importCredentialKey,
+    isSupportedAlgorithm,
+    SUPPORTED_ALGORITHMS,
+    verifyCredentialSignature,
+} from "./credentialKey.ts";
+import {
+    findCredential,
+    findCredentialsForPlayer,
+    insertCredential,
+    updateCredentialCounter,
+} from "./credentialStore.ts";
 
 export type PasskeyConfig = {
     rpName: string;
@@ -63,172 +27,347 @@ export type PasskeyConfig = {
     expectedOrigin: string;
 };
 
-type CredentialRow = {
-    credential_id: string;
-    player_id: string;
-    public_key: Buffer;
-    counter: number;
-    transports: string | null;
+const CHALLENGE_BYTES = 32;
+const CEREMONY_TIMEOUT_MS = 60_000;
+
+/**
+ * We ask for user verification but do not require it. A hardware key with no
+ * PIN configured omits the UV flag legitimately, and rejecting those would turn
+ * a working authenticator into an unexplained failure.
+ */
+const REQUIRE_USER_VERIFICATION = false;
+
+type CredentialDescriptor = {
+    type: "public-key";
+    id: string;
+    transports?: string[];
 };
 
-function getCredentialsForPlayer(
-    db: DatabaseSync,
-    playerId: string,
-): CredentialRow[] {
-    return db
-        .prepare("SELECT * FROM credentials WHERE player_id = ?")
-        .all(playerId) as CredentialRow[];
+export type RegistrationOptions = {
+    rp: { name: string; id: string };
+    user: { id: string; name: string; displayName: string };
+    challenge: string;
+    pubKeyCredParams: { type: "public-key"; alg: number }[];
+    timeout: number;
+    attestation: "none";
+    excludeCredentials: CredentialDescriptor[];
+    authenticatorSelection: {
+        residentKey: "preferred";
+        userVerification: "preferred";
+    };
+};
+
+export type AuthenticationOptions = {
+    challenge: string;
+    timeout: number;
+    rpId: string;
+    allowCredentials: CredentialDescriptor[];
+    userVerification: "preferred";
+};
+
+/**
+ * The registration fields the client reads off `PublicKeyCredential` and posts
+ * back, all binary values base64url encoded.
+ *
+ * `publicKey` and `publicKeyAlgorithm` come from `getPublicKey()` and
+ * `getPublicKeyAlgorithm()`, and `authenticatorData` from
+ * `getAuthenticatorData()`. Taking those three from the browser is what keeps
+ * the attestation object, and therefore CBOR, off the server.
+ *
+ * These values are unverified client input. That is not a weakening: under
+ * `attestation: "none"` the same bytes inside an attestation object carry no
+ * signature either. What binds the account to the authenticator is that every
+ * later login must produce a signature this key validates.
+ */
+export type RegistrationResponse = {
+    id: string;
+    response: {
+        clientDataJSON: string;
+        authenticatorData: string;
+        publicKey: string;
+        publicKeyAlgorithm: number;
+        transports?: string[];
+    };
+};
+
+/**
+ * The assertion fields the client reads off `AuthenticatorAssertionResponse`.
+ */
+export type AuthenticationResponse = {
+    id: string;
+    response: {
+        clientDataJSON: string;
+        authenticatorData: string;
+        signature: string;
+    };
+};
+
+function registrationChallengeKey(playerId: string): string {
+    return `reg:${playerId}`;
 }
 
-function rowToWebAuthnCredential(row: CredentialRow): WebAuthnCredential {
+function authenticationChallengeKey(playerId: string): string {
+    return `auth:${playerId}`;
+}
+
+function createChallenge(): string {
+    return bytesToBase64Url(new Uint8Array(randomBytes(CHALLENGE_BYTES)));
+}
+
+function toDescriptor(
+    credentialId: string,
+    transports: string[],
+): CredentialDescriptor {
+    if (transports.length === 0) {
+        return { type: "public-key", id: credentialId };
+    }
+    return { type: "public-key", id: credentialId, transports };
+}
+
+/**
+ * Builds the options for creating a new passkey.
+ *
+ * `excludeCredentials` lists what the player already has so the authenticator
+ * refuses to enroll a second credential for the same account instead of
+ * silently stacking them up.
+ */
+export function generateRegistrationOptions(
+    db: DatabaseSync,
+    playerId: string,
+    config: PasskeyConfig,
+    challenges: ChallengeStore,
+): RegistrationOptions {
+    const existing = findCredentialsForPlayer(db, playerId);
+    const challenge = createChallenge();
+
+    challenges.store(registrationChallengeKey(playerId), challenge);
+
     return {
-        id: row.credential_id,
-        publicKey: new Uint8Array(row.public_key),
-        counter: row.counter,
-        transports: row.transports
-            ? (JSON.parse(row.transports) as AuthenticatorTransportFuture[])
-            : undefined,
+        rp: { name: config.rpName, id: config.rpId },
+        user: {
+            // The user handle must stay stable across re-registrations, or a
+            // discoverable credential shows up as a separate account in the
+            // authenticator's list every time.
+            id: bytesToBase64Url(new Uint8Array(Buffer.from(playerId, "utf8"))),
+            name: playerId,
+            displayName: playerId,
+        },
+        challenge,
+        pubKeyCredParams: SUPPORTED_ALGORITHMS.map((alg) => ({
+            type: "public-key",
+            alg,
+        })),
+        timeout: CEREMONY_TIMEOUT_MS,
+        attestation: "none",
+        excludeCredentials: existing.map((credential) =>
+            toDescriptor(credential.credentialId, credential.transports),
+        ),
+        authenticatorSelection: {
+            residentKey: "preferred",
+            userVerification: "preferred",
+        },
     };
 }
 
 /**
- * Generates registration options for a new passkey credential.
+ * Verifies a registration ceremony and stores the credential.
+ *
+ * The challenge is consumed before anything else so that a failed attempt still
+ * burns it. Leaving it alive on the error paths would let an attacker retry a
+ * captured response until one of the later checks happened to pass.
  */
-export async function generateRegistrationOpts(
+export function verifyRegistration(
     db: DatabaseSync,
     playerId: string,
+    response: RegistrationResponse,
     config: PasskeyConfig,
     challenges: ChallengeStore,
-): Promise<ReturnType<typeof webauthnGenerateRegistration>> {
-    const existingCredentials = getCredentialsForPlayer(db, playerId);
-
-    const options = await webauthnGenerateRegistration({
-        rpName: config.rpName,
-        rpID: config.rpId,
-        userName: playerId,
-        excludeCredentials: existingCredentials.map((c) => ({
-            id: c.credential_id,
-            transports: c.transports
-                ? (JSON.parse(c.transports) as AuthenticatorTransportFuture[])
-                : undefined,
-        })),
-    });
-
-    challenges.store(`reg:${playerId}`, options.challenge);
-    return options;
-}
-
-/**
- * Verifies a registration response and stores the new credential.
- */
-export async function verifyRegistration(
-    db: DatabaseSync,
-    playerId: string,
-    response: RegistrationResponseJSON,
-    config: PasskeyConfig,
-    challenges: ChallengeStore,
-): Promise<boolean> {
-    const expectedChallenge = challenges.consume(`reg:${playerId}`);
-    if (!expectedChallenge) {
-        return false;
-    }
-
-    const verification = await verifyRegistrationResponse({
-        response,
-        expectedChallenge,
-        expectedOrigin: config.expectedOrigin,
-        expectedRPID: config.rpId,
-    });
-
-    if (!verification.verified || !verification.registrationInfo) {
-        return false;
-    }
-
-    const { credential } = verification.registrationInfo;
-
-    db.prepare(
-        `INSERT INTO credentials (credential_id, player_id, public_key, counter, transports)
-         VALUES (?, ?, ?, ?, ?)`,
-    ).run(
-        credential.id,
-        playerId,
-        Buffer.from(credential.publicKey),
-        credential.counter,
-        credential.transports ? JSON.stringify(credential.transports) : null,
+): boolean {
+    const expectedChallenge = challenges.consume(
+        registrationChallengeKey(playerId),
     );
-
-    return true;
-}
-
-/**
- * Generates authentication options for an existing player.
- */
-export async function generateAuthenticationOpts(
-    db: DatabaseSync,
-    playerId: string,
-    config: PasskeyConfig,
-    challenges: ChallengeStore,
-): Promise<ReturnType<typeof webauthnGenerateAuthentication>> {
-    const credentials = getCredentialsForPlayer(db, playerId);
-
-    const options = await webauthnGenerateAuthentication({
-        rpID: config.rpId,
-        allowCredentials: credentials.map((c) => ({
-            id: c.credential_id,
-            transports: c.transports
-                ? (JSON.parse(c.transports) as AuthenticatorTransportFuture[])
-                : undefined,
-        })),
-    });
-
-    challenges.store(`auth:${playerId}`, options.challenge);
-    return options;
-}
-
-/**
- * Verifies an authentication response and updates the credential counter.
- */
-export async function verifyAuthentication(
-    db: DatabaseSync,
-    playerId: string,
-    response: AuthenticationResponseJSON,
-    config: PasskeyConfig,
-    challenges: ChallengeStore,
-): Promise<boolean> {
-    const expectedChallenge = challenges.consume(`auth:${playerId}`);
     if (!expectedChallenge) {
         return false;
     }
 
-    // Find the credential being used
-    const credRow = db
-        .prepare(
-            "SELECT * FROM credentials WHERE credential_id = ? AND player_id = ?",
+    if (typeof response.id !== "string" || response.id.length === 0) {
+        return false;
+    }
+
+    const clientDataJson = decodeRequiredBase64Url(
+        response.response?.clientDataJSON,
+    );
+    const authenticatorDataBytes = decodeRequiredBase64Url(
+        response.response?.authenticatorData,
+    );
+    const publicKeySpki = decodeRequiredBase64Url(response.response?.publicKey);
+    if (!clientDataJson || !authenticatorDataBytes || !publicKeySpki) {
+        return false;
+    }
+
+    const algorithm = response.response.publicKeyAlgorithm;
+    if (typeof algorithm !== "number" || !isSupportedAlgorithm(algorithm)) {
+        return false;
+    }
+
+    if (
+        !verifyClientData(
+            clientDataJson,
+            "webauthn.create",
+            expectedChallenge,
+            config.expectedOrigin,
         )
-        .get(response.id, playerId) as CredentialRow | undefined;
-
-    if (!credRow) {
+    ) {
         return false;
     }
 
-    const credential = rowToWebAuthnCredential(credRow);
+    const authenticatorData = parseAuthenticatorData(authenticatorDataBytes);
+    if (!authenticatorData) {
+        return false;
+    }
 
-    const verification = await verifyAuthenticationResponse({
-        response,
-        expectedChallenge,
-        expectedOrigin: config.expectedOrigin,
-        expectedRPID: config.rpId,
-        credential,
+    if (
+        !verifyAuthenticatorData(
+            authenticatorData,
+            config.rpId,
+            REQUIRE_USER_VERIFICATION,
+        )
+    ) {
+        return false;
+    }
+
+    // Import now rather than at first login. A key we cannot parse is a
+    // credential the player could never authenticate with.
+    if (!importCredentialKey(publicKeySpki, algorithm)) {
+        return false;
+    }
+
+    return insertCredential(db, {
+        credentialId: response.id,
+        playerId,
+        publicKey: publicKeySpki,
+        algorithm,
+        counter: authenticatorData.signCount,
+        transports: Array.isArray(response.response.transports)
+            ? response.response.transports.filter(
+                  (entry) => typeof entry === "string",
+              )
+            : [],
     });
+}
 
-    if (!verification.verified) {
+/**
+ * Builds the options for asserting an existing passkey.
+ */
+export function generateAuthenticationOptions(
+    db: DatabaseSync,
+    playerId: string,
+    config: PasskeyConfig,
+    challenges: ChallengeStore,
+): AuthenticationOptions {
+    const credentials = findCredentialsForPlayer(db, playerId);
+    const challenge = createChallenge();
+
+    challenges.store(authenticationChallengeKey(playerId), challenge);
+
+    return {
+        challenge,
+        timeout: CEREMONY_TIMEOUT_MS,
+        rpId: config.rpId,
+        allowCredentials: credentials.map((credential) =>
+            toDescriptor(credential.credentialId, credential.transports),
+        ),
+        userVerification: "preferred",
+    };
+}
+
+/**
+ * Verifies an assertion and advances the stored signature counter.
+ *
+ * The signature covers the authenticator data concatenated with the SHA-256 of
+ * the client data. Both halves have already been checked on their own by this
+ * point, so the signature is what proves those checked bytes came from the
+ * enrolled authenticator rather than from the caller.
+ */
+export function verifyAuthentication(
+    db: DatabaseSync,
+    playerId: string,
+    response: AuthenticationResponse,
+    config: PasskeyConfig,
+    challenges: ChallengeStore,
+): boolean {
+    const expectedChallenge = challenges.consume(
+        authenticationChallengeKey(playerId),
+    );
+    if (!expectedChallenge) {
         return false;
     }
 
-    // Update counter to prevent replay attacks
-    db.prepare(
-        "UPDATE credentials SET counter = ? WHERE credential_id = ?",
-    ).run(verification.authenticationInfo.newCounter, response.id);
+    if (typeof response.id !== "string" || response.id.length === 0) {
+        return false;
+    }
 
+    const clientDataJson = decodeRequiredBase64Url(
+        response.response?.clientDataJSON,
+    );
+    const authenticatorDataBytes = decodeRequiredBase64Url(
+        response.response?.authenticatorData,
+    );
+    const signature = decodeRequiredBase64Url(response.response?.signature);
+    if (!clientDataJson || !authenticatorDataBytes || !signature) {
+        return false;
+    }
+
+    const stored = findCredential(db, response.id, playerId);
+    if (!stored) {
+        return false;
+    }
+
+    if (
+        !verifyClientData(
+            clientDataJson,
+            "webauthn.get",
+            expectedChallenge,
+            config.expectedOrigin,
+        )
+    ) {
+        return false;
+    }
+
+    const authenticatorData = parseAuthenticatorData(authenticatorDataBytes);
+    if (!authenticatorData) {
+        return false;
+    }
+
+    if (
+        !verifyAuthenticatorData(
+            authenticatorData,
+            config.rpId,
+            REQUIRE_USER_VERIFICATION,
+        )
+    ) {
+        return false;
+    }
+
+    if (!isCounterAcceptable(stored.counter, authenticatorData.signCount)) {
+        return false;
+    }
+
+    const key = importCredentialKey(stored.publicKey, stored.algorithm);
+    if (!key) {
+        return false;
+    }
+
+    const clientDataHash = createHash("sha256").update(clientDataJson).digest();
+    const signedData = Buffer.concat([
+        Buffer.from(authenticatorDataBytes),
+        clientDataHash,
+    ]);
+
+    if (!verifyCredentialSignature(key, signedData, signature)) {
+        return false;
+    }
+
+    updateCredentialCounter(db, stored.credentialId, authenticatorData.signCount);
     return true;
 }

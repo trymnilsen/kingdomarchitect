@@ -151,4 +151,25 @@ export const authMigrations: StoreMigration[] = [
             },
         ],
     },
+    {
+        version: 3,
+        description: "Record the signature algorithm for each credential",
+        operations: [
+            {
+                type: "addColumn",
+                sqlOnly: true,
+                store: "credentials",
+                column: {
+                    name: "algorithm",
+                    type: "integer",
+                    notNull: true,
+                    // ES256, the common case. The default only exists to
+                    // satisfy NOT NULL on an ALTER TABLE. No rows can predate
+                    // this migration because no client ever registered a
+                    // passkey against version 2.
+                    defaultValue: "-7",
+                },
+            },
+        ],
+    },
 ];

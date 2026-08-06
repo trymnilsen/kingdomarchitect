@@ -14,7 +14,7 @@
         "serve": "node ts/tool/dev-server.ts",
         "spritepack": "tsc && node build/tool/spritepack/spritePack.js && npm run build",
         "characterpack": "tsc && node build/tool/characterpack/characterPack.js && npm run build",
-        "test": "node --test 'ts/test/**/*.test.ts'",
+        "test": "node --test --test-reporter=dot 'ts/test/**/*.test.ts'",
         "format": "prettier ts/ --write",
         "check-format": "prettier --check ts/**/*.ts"
     },
@@ -26,7 +26,6 @@
         "url": "https://github.com/trymnilsen/kingdomarchitect/issues"
     },
     "dependencies": {
-        "@simplewebauthn/server": "^13.3.2",
         "@types/node": "^26.0.1",
         "@types/pngjs": "^6.0.5",
         "@types/ws": "^8.18.1",
@@ -35,8 +34,7 @@
         "prettier": "^3.8.4",
         "rollup": "^4.62.2",
         "rollup-plugin-sourcemaps2": "^0.5.8",
-        "typescript": "^6.0.3",
+        "typescript": "^7.0.2",
         "ws": "^8.21.0"
-    },
-    "devDependencies": {}
+    }
 }

@@ -10,7 +10,7 @@ import { applySQLiteMigrations } from "./persistence/sqliteMigrationCompiler.ts"
 import { ConnectionManager } from "./connectionManager.ts";
 import { createMultiplayerMessageRouter } from "./multiplayerMessageRouter.ts";
 import { handleAuthRoute, type AuthConfig } from "./auth/routes.ts";
-import { ChallengeStore } from "./auth/passkey.ts";
+import { ChallengeStore } from "./auth/challengeStore.ts";
 import { validateSession, parseCookies } from "./auth/session.ts";
 import { createRateLimiter } from "./http/rateLimit.ts";
 import { serveStaticFile } from "./http/staticFiles.ts";

@@ -2,10 +2,6 @@ import { log } from "../../common/logging/logger.ts";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { DatabaseSync } from "node:sqlite";
 
-import type {
-    RegistrationResponseJSON,
-    AuthenticationResponseJSON,
-} from "@simplewebauthn/server";
 import {
     parseJsonBody,
     BodyTooLargeError,
@@ -13,13 +9,15 @@ import {
 } from "../http/bodyParser.ts";
 import type { RateLimiter } from "../http/rateLimit.ts";
 import { checkOrigin } from "../http/security.ts";
+import { ChallengeStore } from "./challengeStore.ts";
 import {
-    generateRegistrationOpts,
+    generateRegistrationOptions,
     verifyRegistration,
-    generateAuthenticationOpts,
+    generateAuthenticationOptions,
     verifyAuthentication,
-    ChallengeStore,
+    type AuthenticationResponse,
     type PasskeyConfig,
+    type RegistrationResponse,
 } from "./passkey.ts";
 import { createSession, deleteSession, parseCookies } from "./session.ts";
 
@@ -28,13 +26,20 @@ export type AuthConfig = PasskeyConfig & {
 };
 
 const MAX_BODY_BYTES = 64 * 1024; // 64 KB
-const MAX_PLAYER_ID_LENGTH = 64;
+
+/**
+ * WebAuthn caps the user handle at 64 bytes, and we derive that handle from the
+ * player id. The limit is measured in bytes rather than characters because a
+ * 64-character id with multi-byte characters would overflow the handle and be
+ * rejected by the authenticator partway through registration.
+ */
+const MAX_PLAYER_ID_BYTES = 64;
 
 function isValidPlayerId(playerId: unknown): playerId is string {
     return (
         typeof playerId === "string" &&
         playerId.length > 0 &&
-        playerId.length <= MAX_PLAYER_ID_LENGTH
+        Buffer.byteLength(playerId, "utf8") <= MAX_PLAYER_ID_BYTES
     );
 }
 
@@ -167,15 +172,11 @@ async function handleRegisterBegin(
     const body = await parseJsonBody<{ playerId: string }>(req, MAX_BODY_BYTES);
 
     if (!isValidPlayerId(body.playerId)) {
-        sendError(
-            res,
-            400,
-            "playerId is required and must be at most 64 characters",
-        );
+        sendError(res, 400, "playerId is required and must be at most 64 bytes");
         return true;
     }
 
-    const options = await generateRegistrationOpts(
+    const options = generateRegistrationOptions(
         db,
         body.playerId,
         config,
@@ -194,7 +195,7 @@ async function handleRegisterComplete(
 ): Promise<true> {
     const body = await parseJsonBody<{
         playerId: string;
-        response: RegistrationResponseJSON;
+        response: RegistrationResponse;
     }>(req, MAX_BODY_BYTES);
 
     if (!isValidPlayerId(body.playerId) || !body.response) {
@@ -202,7 +203,7 @@ async function handleRegisterComplete(
         return true;
     }
 
-    const verified = await verifyRegistration(
+    const verified = verifyRegistration(
         db,
         body.playerId,
         body.response,
@@ -236,15 +237,11 @@ async function handleLoginBegin(
     const body = await parseJsonBody<{ playerId: string }>(req, MAX_BODY_BYTES);
 
     if (!isValidPlayerId(body.playerId)) {
-        sendError(
-            res,
-            400,
-            "playerId is required and must be at most 64 characters",
-        );
+        sendError(res, 400, "playerId is required and must be at most 64 bytes");
         return true;
     }
 
-    const options = await generateAuthenticationOpts(
+    const options = generateAuthenticationOptions(
         db,
         body.playerId,
         config,
@@ -263,7 +260,7 @@ async function handleLoginComplete(
 ): Promise<true> {
     const body = await parseJsonBody<{
         playerId: string;
-        response: AuthenticationResponseJSON;
+        response: AuthenticationResponse;
     }>(req, MAX_BODY_BYTES);
 
     if (!isValidPlayerId(body.playerId) || !body.response) {
@@ -271,7 +268,7 @@ async function handleLoginComplete(
         return true;
     }
 
-    const verified = await verifyAuthentication(
+    const verified = verifyAuthentication(
         db,
         body.playerId,
         body.response,
