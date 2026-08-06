@@ -3,9 +3,9 @@ import type {
     ComponentContext,
     ComponentDescriptor,
     LayoutResult,
-    Rectangle,
-    UISize,
 } from "../../../src/ui/declarative/ui.ts";
+import type { Rectangle } from "../../../src/common/structure/rectangle.ts";
+import type { UISize } from "../../../src/ui/uiSize.ts";
 import type { RenderScope } from "../../../src/rendering/renderScope.ts";
 import type { PointerFlags } from "../../../src/ui/declarative/pointerTracker.ts";
 

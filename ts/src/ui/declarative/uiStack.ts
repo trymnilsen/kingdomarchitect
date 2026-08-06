@@ -4,12 +4,11 @@ import {
     uiAlignment,
     type UiAlignment,
 } from "../uiAlignment.ts";
-import { wrapUiSize } from "../uiSize.ts";
+import { type UISize, wrapUiSize } from "../uiSize.ts";
 import {
     createComponent,
     type ComponentDescriptor,
     type PlacedChild,
-    type UISize,
 } from "./ui.ts";
 
 type UiStackProps = {

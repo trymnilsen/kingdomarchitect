@@ -1,6 +1,6 @@
 import type { TextStyle } from "../../rendering/text/textStyle.ts";
-import { fillUiSize, wrapUiSize } from "../uiSize.ts";
-import { createComponent, type UISize } from "./ui.ts";
+import { fillUiSize, type UISize, wrapUiSize } from "../uiSize.ts";
+import { createComponent } from "./ui.ts";
 import {
     wrapTextToLines,
     measureLineHeight,

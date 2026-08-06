@@ -4,12 +4,10 @@ import { nameof } from "../../common/nameof.ts";
 import { addPoint, zeroPoint, type Point } from "../../common/point.ts";
 import type { RenderScope } from "../../rendering/renderScope.ts";
 import type { TextStyle } from "../../rendering/text/textStyle.ts";
-import { fillUiSize, zeroSize } from "../uiSize.ts";
+import type { Rectangle } from "../../common/structure/rectangle.ts";
+import { fillUiSize, type UISize, zeroSize } from "../uiSize.ts";
 import { pointerChainAt } from "./pointerChain.ts";
 import { PointerTracker, type PointerFlags } from "./pointerTracker.ts";
-
-export type UISize = { width: number; height: number };
-export type Rectangle = { x: number; y: number; width: number; height: number };
 
 /** Converts an {x, y, width, height} rectangle to {x1, y1, x2, y2} bounds. */
 function rectangleToBounds(rectangle: Rectangle): Bounds {

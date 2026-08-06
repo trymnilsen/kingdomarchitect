@@ -1,5 +1,5 @@
 import type { TextStyle } from "../../rendering/text/textStyle.ts";
-import type { UISize } from "./ui.ts";
+import type { UISize } from "../uiSize.ts";
 
 export type MeasureTextFn = (text: string, style: TextStyle) => UISize;
 

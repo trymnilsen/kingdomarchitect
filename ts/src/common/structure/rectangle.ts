@@ -1,8 +1,18 @@
-import type { UISize } from "../../ui/uiSize.ts";
 import { type Bounds, sizeOfBounds } from "../bounds.ts";
 import type { Point } from "../point.ts";
 
-export type Rectangle = Point & UISize;
+/**
+ * An axis aligned box given by its top left corner plus a size.
+ *
+ * Use this when a caller wants an origin and an extent. `Bounds` covers the
+ * same shape as two corners and suits containment checks better. `bounds.ts`
+ * has converters both ways.
+ *
+ * The width and height are declared inline here on purpose. Reusing the UI
+ * layer's `UISize` would point `common/` at `ui/` and would pull the
+ * `fillUiSize` layout contract into geometry code that has no use for it.
+ */
+export type Rectangle = Point & { width: number; height: number };
 
 export function withinRectangle(point: Point, rectangle: Rectangle): boolean {
     // Check if the point's x-coordinate is within the rectangle's horizontal bounds.

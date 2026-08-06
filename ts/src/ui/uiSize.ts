@@ -9,9 +9,16 @@ export const wrapUiSize = -1;
  */
 export const fillUiSize = -2;
 /**
- * Represents the size of an UI. Will also be used for the _wanted_ size of
- * a UI where width and height can be less than zero. See `fillUiSize` and
- * `wrapUiSize` for further details on these to magic numbers.
+ * The size of a UI element, and also the _wanted_ size of one.
+ *
+ * A negative width or height carries meaning rather than describing pixels.
+ * See `fillUiSize` and `wrapUiSize` for what the two magic numbers ask the
+ * layout pass to do.
+ *
+ * This type belongs to the UI layer because of those magic numbers. A plain
+ * width and height pair looks like a candidate for `common/`, and moving it
+ * there would drag the layout contract along with it. Declare a local
+ * `{ width, height }` instead when all a module needs is two numbers.
  */
 export type UISize = {
     height: number;

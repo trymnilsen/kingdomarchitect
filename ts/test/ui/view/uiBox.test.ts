@@ -11,8 +11,8 @@ import { wrapUiSize } from "../../../src/ui/uiSize.ts";
 import type {
     LayoutResult,
     PlacedChild,
-    UISize,
 } from "../../../src/ui/declarative/ui.ts";
+import type { UISize } from "../../../src/ui/uiSize.ts";
 
 function childDescriptor() {
     return uiText({ content: "x", textStyle: createTestTextStyle() });
