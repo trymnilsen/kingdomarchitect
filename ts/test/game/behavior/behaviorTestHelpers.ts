@@ -1,6 +1,9 @@
 import { Entity } from "../../../src/game/entity/entity.ts";
 import { createBehaviorAgentComponent } from "../../../src/game/component/BehaviorAgentComponent.ts";
-import { createEnergyComponent } from "../../../src/game/component/energyComponent.ts";
+import {
+    createEnergyComponent,
+    DEFAULT_MAX_ENERGY,
+} from "../../../src/game/component/energyComponent.ts";
 import { createJobQueueComponent } from "../../../src/game/component/jobQueueComponent.ts";
 import type { Jobs } from "../../../src/game/job/job.ts";
 import { ResourceHarvestMode } from "../../../src/data/inventory/items/naturalResource.ts";
@@ -93,14 +96,17 @@ export function createBehaviorTestEntity(
 }
 
 /**
- * Create a test entity with energy component.
+ * Create a test entity with energy component. maxEnergy is explicit so tests can
+ * check that behaviour depends on the energy fraction rather than on a pool size
+ * that happens to be the default.
  */
 export function createEntityWithEnergy(
     id: string = "test-entity",
-    energy: number = 100,
+    energy: number = DEFAULT_MAX_ENERGY,
+    maxEnergy: number = DEFAULT_MAX_ENERGY,
 ): Entity {
     const entity = createBehaviorTestEntity(id);
-    const energyComponent = createEnergyComponent();
+    const energyComponent = createEnergyComponent(maxEnergy);
     energyComponent.energy = energy;
     entity.setEcsComponent(energyComponent);
     return entity;

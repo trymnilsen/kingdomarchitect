@@ -23,8 +23,15 @@ export type EnergyComponent = {
 
 export const EnergyComponentId = "Energy";
 
+/**
+ * Default energy pool, sized so a full day cycle of travel and work fits in a
+ * single tank. Spend rates (1 per tile, 2 per work tick) are absolute, so the
+ * pool size is what decides how often an entity has to stop and sleep.
+ */
+export const DEFAULT_MAX_ENERGY = 300;
+
 export function createEnergyComponent(
-    maxEnergy: number = 100,
+    maxEnergy: number = DEFAULT_MAX_ENERGY,
 ): EnergyComponent {
     return {
         id: EnergyComponentId,
@@ -32,6 +39,8 @@ export function createEnergyComponent(
         maxEnergy,
         exhaustionLevel: 0,
         exhaustionDebt: 0,
+        // Absolute, not a fraction of maxEnergy: debt measures work performed
+        // past empty, which does not get easier because the pool is larger.
         exhaustionDebtThreshold: 15,
         sleepMultiplier: 1.0,
     };

@@ -1,104 +1,154 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
-import { createSleepBehavior } from "../../../src/game/behavior/behaviors/SleepBehavior.ts";
+import {
+    createSleepBehavior,
+    SLEEP_THRESHOLD_FRACTION,
+    SLEEP_UTILITY_BASE,
+    SLEEP_UTILITY_RANGE,
+} from "../../../src/game/behavior/behaviors/SleepBehavior.ts";
 import {
     createEntityWithEnergy,
     createBehaviorTestEntity,
 } from "./behaviorTestHelpers.ts";
 import { EnergyComponentId } from "../../../src/game/component/energyComponent.ts";
 
+/**
+ * Pool sizes the fraction-based rules are checked against. Two differently sized
+ * pools is the whole point: any rule that reads an absolute point count instead
+ * of a fraction diverges between them.
+ */
+const POOL_SIZES = [100, 300];
+
+function entityAtFraction(fraction: number, maxEnergy: number) {
+    return createEntityWithEnergy("test", fraction * maxEnergy, maxEnergy);
+}
+
 describe("SleepBehavior", () => {
     describe("isValid", () => {
-        it("returns true when energy is below 30", () => {
+        it("returns true below the sleep threshold fraction", () => {
             const behavior = createSleepBehavior();
-            const entity = createEntityWithEnergy("test", 29);
 
-            const valid = behavior.isValid(entity);
+            for (const maxEnergy of POOL_SIZES) {
+                const entity = entityAtFraction(
+                    SLEEP_THRESHOLD_FRACTION - 0.01,
+                    maxEnergy,
+                );
 
-            assert.strictEqual(valid, true);
+                assert.strictEqual(
+                    behavior.isValid(entity),
+                    true,
+                    `should want sleep just under the threshold at maxEnergy ${maxEnergy}`,
+                );
+            }
         });
 
-        it("returns false when energy is 30 or above and no exhaustion", () => {
+        it("returns false at the sleep threshold fraction with no exhaustion", () => {
             const behavior = createSleepBehavior();
-            const entity = createEntityWithEnergy("test", 30);
 
-            const valid = behavior.isValid(entity);
+            for (const maxEnergy of POOL_SIZES) {
+                const entity = entityAtFraction(
+                    SLEEP_THRESHOLD_FRACTION,
+                    maxEnergy,
+                );
 
-            assert.strictEqual(valid, false);
+                assert.strictEqual(
+                    behavior.isValid(entity),
+                    false,
+                    `should not want sleep at the threshold at maxEnergy ${maxEnergy}`,
+                );
+            }
         });
 
-        it("returns true when exhaustionLevel > 0 even with energy >= 30", () => {
+        it("returns true when exhausted even above the threshold fraction", () => {
             const behavior = createSleepBehavior();
-            const entity = createEntityWithEnergy("test", 50);
-            const energy = entity.requireEcsComponent(EnergyComponentId);
-            energy.exhaustionLevel = 1;
+            const entity = entityAtFraction(0.5, 300);
+            entity.requireEcsComponent(EnergyComponentId).exhaustionLevel = 1;
 
-            const valid = behavior.isValid(entity);
-
-            assert.strictEqual(valid, true);
+            assert.strictEqual(behavior.isValid(entity), true);
         });
 
         it("returns false when entity has no energy component", () => {
             const behavior = createSleepBehavior();
             const entity = createBehaviorTestEntity("test");
 
-            const valid = behavior.isValid(entity);
-
-            assert.strictEqual(valid, false);
+            assert.strictEqual(behavior.isValid(entity), false);
         });
     });
 
     describe("utility", () => {
-        it("returns 0 when energy is 30 or above and no exhaustion", () => {
+        it("returns 0 at and above the threshold fraction", () => {
             const behavior = createSleepBehavior();
-            const entity = createEntityWithEnergy("test", 30);
 
-            const utility = behavior.utility(entity);
+            for (const fraction of [SLEEP_THRESHOLD_FRACTION, 0.6, 1.0]) {
+                const entity = entityAtFraction(fraction, 300);
 
-            assert.strictEqual(utility, 0);
+                assert.strictEqual(
+                    behavior.utility(entity),
+                    0,
+                    `expected no urgency at fraction ${fraction}`,
+                );
+            }
         });
 
-        it("returns ~56 when energy is exactly 29 (base formula)", () => {
+        it("ramps from the base at the threshold to base plus range at empty", () => {
             const behavior = createSleepBehavior();
-            const entity = createEntityWithEnergy("test", 29);
 
-            const utility = behavior.utility(entity);
+            // Just under the threshold the ramp has barely started, so utility
+            // sits at the base; at empty it has travelled the full range.
+            const barelyTired = entityAtFraction(
+                SLEEP_THRESHOLD_FRACTION - 0.0001,
+                300,
+            );
+            const empty = entityAtFraction(0, 300);
 
-            // base = 55 + (30-29)*0.67 = 55.67
             assert.ok(
-                utility >= 55 && utility < 57,
-                `expected ~56, got ${utility}`,
+                Math.abs(behavior.utility(barelyTired) - SLEEP_UTILITY_BASE) <
+                    0.1,
+                `expected ~${SLEEP_UTILITY_BASE}, got ${behavior.utility(barelyTired)}`,
+            );
+            assert.strictEqual(
+                behavior.utility(empty),
+                SLEEP_UTILITY_BASE + SLEEP_UTILITY_RANGE,
             );
         });
 
-        it("returns ~75 when energy is 0 and no exhaustion", () => {
+        it("rises strictly as energy falls", () => {
             const behavior = createSleepBehavior();
-            const entity = createEntityWithEnergy("test", 0);
+            const fractions = [0.29, 0.2, 0.1, 0.0];
 
-            const utility = behavior.utility(entity);
-
-            // base = 55 + 30*0.67 = 75.1
-            assert.ok(
-                utility >= 74 && utility <= 76,
-                `expected ~75, got ${utility}`,
-            );
+            let previous = 0;
+            for (const fraction of fractions) {
+                const utility = behavior.utility(
+                    entityAtFraction(fraction, 300),
+                );
+                assert.ok(
+                    utility > previous,
+                    `utility should rise as energy falls, but fraction ${fraction} gave ${utility} after ${previous}`,
+                );
+                previous = utility;
+            }
         });
 
-        it("returns higher utility for lower energy", () => {
+        it("returns the same utility for the same fraction across pool sizes", () => {
             const behavior = createSleepBehavior();
-            const entity20 = createEntityWithEnergy("test", 20);
-            const entity10 = createEntityWithEnergy("test", 10);
 
-            const utility20 = behavior.utility(entity20);
-            const utility10 = behavior.utility(entity10);
+            for (const fraction of [0, 0.1, 0.2, 0.29]) {
+                const [small, large] = POOL_SIZES.map((maxEnergy) =>
+                    behavior.utility(entityAtFraction(fraction, maxEnergy)),
+                );
 
-            assert.ok(utility10 > utility20);
+                assert.strictEqual(
+                    small,
+                    large,
+                    `fraction ${fraction} scored ${small} at maxEnergy ${POOL_SIZES[0]} but ${large} at ${POOL_SIZES[1]}`,
+                );
+            }
         });
 
-        it("utility at exhaustion level 3 is greater than at level 1 for same energy", () => {
+        it("scores higher at the same energy when exhaustion is worse", () => {
             const behavior = createSleepBehavior();
-            const entity1 = createEntityWithEnergy("test", 20);
-            const entity3 = createEntityWithEnergy("test", 20);
+            const entity1 = entityAtFraction(0.2, 300);
+            const entity3 = entityAtFraction(0.2, 300);
 
             entity1.requireEcsComponent(EnergyComponentId).exhaustionLevel = 1;
             entity3.requireEcsComponent(EnergyComponentId).exhaustionLevel = 3;
@@ -110,30 +160,35 @@ describe("SleepBehavior", () => {
             const behavior = createSleepBehavior();
             const entity = createBehaviorTestEntity("test");
 
-            const utility = behavior.utility(entity);
-
-            assert.strictEqual(utility, 0);
+            assert.strictEqual(behavior.utility(entity), 0);
         });
     });
 
     describe("expand", () => {
-        it("returns sleep action with energyPerTick and energyTarget", () => {
+        it("scales the sleep action to the entity's own pool", () => {
             const behavior = createSleepBehavior();
-            const entity = createEntityWithEnergy("test", 10);
 
-            const actions = behavior.expand(entity);
+            const [small, large] = POOL_SIZES.map((maxEnergy) => {
+                const actions = behavior.expand(
+                    entityAtFraction(0.1, maxEnergy),
+                );
+                assert.strictEqual(actions.length, 1);
+                assert.strictEqual(actions[0].type, "sleep");
+                return actions[0];
+            });
 
-            assert.strictEqual(actions.length, 1);
-            assert.strictEqual(actions[0].type, "sleep");
-            if (actions[0].type === "sleep") {
-                assert.ok(actions[0].energyPerTick > 0);
-                assert.ok(actions[0].energyTarget > 0);
+            if (small.type !== "sleep" || large.type !== "sleep") {
+                throw new Error("expected sleep actions");
             }
+            // A three times larger pool must restore three times as fast and
+            // three times as far, so the sleep still takes the same wall time.
+            assert.strictEqual(large.energyPerTick, small.energyPerTick * 3);
+            assert.strictEqual(large.energyTarget, small.energyTarget * 3);
         });
 
         it("returns collapse action at exhaustion level 4", () => {
             const behavior = createSleepBehavior();
-            const entity = createEntityWithEnergy("test", 0);
+            const entity = entityAtFraction(0, 300);
             entity.requireEcsComponent(EnergyComponentId).exhaustionLevel = 4;
 
             const actions = behavior.expand(entity);

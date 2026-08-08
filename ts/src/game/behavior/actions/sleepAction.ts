@@ -24,8 +24,13 @@ export type SleepActionData = {
 };
 
 type SleepParams = {
-    /** Energy restored per tick (at sleepMultiplier 1.0) */
-    energyPerTick: number;
+    /**
+     * Energy restored per tick, as a fraction of maxEnergy (at sleepMultiplier
+     * 1.0). Expressed as a fraction rather than a point count so that retuning
+     * the energy pool leaves sleep duration, and therefore total HP healed per
+     * sleep, unchanged.
+     */
+    energyFractionPerTick: number;
     /** Energy restored to (fraction of maxEnergy, 0-1) */
     energyRestoreFraction: number;
     /** Exhaustion level cleared to */
@@ -38,34 +43,69 @@ type SleepParams = {
 
 export const sleepParamsByQuality: Record<SleepQuality, SleepParams> = {
     house: {
-        energyPerTick: 10,
+        energyFractionPerTick: 0.1,
         energyRestoreFraction: 1.0,
         clearsExhaustionTo: 0,
         canBeWoken: true,
         healPerTick: 4,
     },
     bedrollFire: {
-        energyPerTick: 8,
+        energyFractionPerTick: 0.08,
         energyRestoreFraction: 0.8,
         clearsExhaustionTo: 0,
         canBeWoken: true,
         healPerTick: 2.5,
     },
     bedrollAlone: {
-        energyPerTick: 6,
+        energyFractionPerTick: 0.06,
         energyRestoreFraction: 0.6,
         clearsExhaustionTo: 1,
         canBeWoken: true,
         healPerTick: 1.5,
     },
     collapse: {
-        energyPerTick: 2,
+        energyFractionPerTick: 0.02,
         energyRestoreFraction: 0.3,
         clearsExhaustionTo: 2,
         canBeWoken: false,
         healPerTick: 0.5,
     },
 };
+
+/**
+ * Resolve the per-tick energy gain for a sleep quality against a concrete pool.
+ * Floored for the same reason the target is: it keeps energy on whole points and
+ * absorbs the binary representation error in the fraction literals, since
+ * 300 * 0.08 evaluates to 24.000000000000004.
+ *
+ * The floor is held at a minimum of one point because a rate of zero would leave
+ * the sleeper permanently short of the target, wedging the action forever. Small
+ * pools sleep proportionally longer instead.
+ */
+export function resolveSleepEnergyPerTick(
+    quality: SleepQuality,
+    maxEnergy: number,
+    sleepMultiplier: number,
+): number {
+    const params = sleepParamsByQuality[quality];
+    const perTick = Math.max(
+        1,
+        Math.floor(maxEnergy * params.energyFractionPerTick),
+    );
+    return perTick / sleepMultiplier;
+}
+
+/**
+ * Resolve the energy value a sleep of this quality restores up to. Only a house
+ * fills the pool completely; rougher shelter tops out lower.
+ */
+export function resolveSleepEnergyTarget(
+    quality: SleepQuality,
+    maxEnergy: number,
+): number {
+    const params = sleepParamsByQuality[quality];
+    return Math.floor(maxEnergy * params.energyRestoreFraction);
+}
 
 /**
  * Execute one tick of the sleep action. Increments the entity's energy by

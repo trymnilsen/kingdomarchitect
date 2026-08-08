@@ -54,7 +54,7 @@ export function workerPrefab(id?: string): Entity {
     entity.setEcsComponent(createBehaviorAgentComponent());
     entity.setEcsComponent(createRoleComponent());
     entity.setEcsComponent(createHungerComponent(0, 0.1));
-    entity.setEcsComponent(createEnergyComponent(100));
+    entity.setEcsComponent(createEnergyComponent(300));
     entity.setEcsComponent(createActiveEffectsComponent());
     entity.setEcsComponent(createMovementStaminaComponent());
     entity.setEcsComponent(createStatsComponent());

@@ -100,8 +100,9 @@ describe("step-outside scenario tests", () => {
 
         // Make the worker tired enough that SleepBehavior takes over.
         const energy = worker.getEcsComponent(EnergyComponentId)!;
-        energy.energy = 10;
+        energy.energy = energy.maxEnergy * 0.1;
         worker.invalidateComponent(EnergyComponentId);
+        const restedEnergy = energy.maxEnergy * 0.9;
 
         // It should walk to the house and step onto it to sleep "inside".
         const mountedIn = harness.tickUntil(
@@ -116,11 +117,12 @@ describe("step-outside scenario tests", () => {
 
         // Once rested it must step back outside rather than linger on the house.
         harness.tickUntil(
-            () => energy.energy >= 90 && !isOnBuilding(harness, worker),
+            () =>
+                energy.energy >= restedEnergy && !isOnBuilding(harness, worker),
             120,
         );
         assert.ok(
-            energy.energy >= 90,
+            energy.energy >= restedEnergy,
             `worker should have slept and restored energy, was ${energy.energy}`,
         );
         assert.ok(

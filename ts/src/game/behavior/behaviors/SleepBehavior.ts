@@ -1,5 +1,8 @@
 import type { Entity } from "../../entity/entity.ts";
-import { EnergyComponentId } from "../../component/energyComponent.ts";
+import {
+    EnergyComponentId,
+    type EnergyComponent,
+} from "../../component/energyComponent.ts";
 import { HousingComponentId } from "../../component/housingComponent.ts";
 import { FireSourceComponentId } from "../../component/fireSourceComponent.ts";
 import {
@@ -12,10 +15,33 @@ import { isTileAvailable } from "../../map/path/graph/weight.ts";
 import type { SleepQuality } from "../actions/Action.ts";
 import type { BehaviorActionData } from "../actions/ActionData.ts";
 import type { Behavior } from "./Behavior.ts";
-import { sleepParamsByQuality } from "../actions/sleepAction.ts";
+import {
+    resolveSleepEnergyPerTick,
+    resolveSleepEnergyTarget,
+} from "../actions/sleepAction.ts";
 import type { Point } from "../../../common/point.ts";
 
 const CAMPFIRE_SEARCH_RADIUS = 20;
+
+/**
+ * Energy fraction below which a worker wants to sleep. A fraction rather than a
+ * point count, so retuning maxEnergy cannot silently move the trigger.
+ */
+export const SLEEP_THRESHOLD_FRACTION = 0.3;
+
+/** Utility at the sleep threshold, before any exhaustion boost. */
+export const SLEEP_UTILITY_BASE = 55;
+
+/** How much utility climbs between the threshold and fully empty. */
+export const SLEEP_UTILITY_RANGE = 20;
+
+/**
+ * Current energy as a fraction of the pool. Guards a zero pool, which would
+ * otherwise produce NaN and silently disable sleeping altogether.
+ */
+function energyFraction(energy: EnergyComponent): number {
+    return energy.energy / Math.max(1, energy.maxEnergy);
+}
 
 /**
  * SleepBehavior manages rest for workers. Activates when tired or exhausted.
@@ -29,17 +55,25 @@ export function createSleepBehavior(): Behavior {
         isValid(entity: Entity): boolean {
             const energy = entity.getEcsComponent(EnergyComponentId);
             if (!energy) return false;
-            return energy.energy < 30 || energy.exhaustionLevel > 0;
+            return (
+                energyFraction(energy) < SLEEP_THRESHOLD_FRACTION ||
+                energy.exhaustionLevel > 0
+            );
         },
 
         utility(entity: Entity): number {
             const energy = entity.getEcsComponent(EnergyComponentId);
             if (!energy) return 0;
 
-            // Base from energy: when energy < 30, scales from 55 to 75
+            // Below the threshold, urgency ramps linearly with how far into the
+            // reserve the worker has dug, reaching its peak at empty.
             let base = 0;
-            if (energy.energy < 30) {
-                base = 55 + (30 - energy.energy) * 0.67;
+            const fraction = energyFraction(energy);
+            if (fraction < SLEEP_THRESHOLD_FRACTION) {
+                const deficit =
+                    (SLEEP_THRESHOLD_FRACTION - fraction) /
+                    SLEEP_THRESHOLD_FRACTION;
+                base = SLEEP_UTILITY_BASE + deficit * SLEEP_UTILITY_RANGE;
             }
 
             // Exhaustion boost pushes priority higher as condition worsens
@@ -54,7 +88,7 @@ export function createSleepBehavior(): Behavior {
 
             // Level 4: collapse in place immediately, no movement
             if (energy.exhaustionLevel >= 4) {
-                return [makeSleepAction("collapse", entity)];
+                return [makeSleepAction("collapse", energy)];
             }
 
             const root = entity.getRootEntity();
@@ -71,7 +105,7 @@ export function createSleepBehavior(): Behavior {
                         stopAdjacent: "cardinal",
                     },
                     { type: "stepOnto", targetId: houseEntity.id },
-                    makeSleepAction("house", entity),
+                    makeSleepAction("house", energy),
                 ];
             }
 
@@ -93,31 +127,36 @@ export function createSleepBehavior(): Behavior {
                     const target = adjacentTile ?? campfire.worldPosition;
                     return [
                         { type: "moveTo", target, stopAdjacent: "cardinal" },
-                        makeSleepAction("bedrollFire", entity),
+                        makeSleepAction("bedrollFire", energy),
                     ];
                 }
-                return [makeSleepAction("bedrollAlone", entity)];
+                return [makeSleepAction("bedrollAlone", energy)];
             }
 
             // Fallback: sleep in place
-            return [makeSleepAction("bedrollAlone", entity)];
+            return [makeSleepAction("bedrollAlone", energy)];
         },
     };
 }
 
+/**
+ * Build the sleep action for a quality, sized against the sleeper's own pool.
+ * Takes the component rather than the entity because only expand() decides that
+ * an entity can sleep at all, and it has already resolved the component.
+ */
 function makeSleepAction(
     quality: SleepQuality,
-    entity: Entity,
+    energy: EnergyComponent,
 ): BehaviorActionData {
-    const params = sleepParamsByQuality[quality];
-    const energy = entity.getEcsComponent(EnergyComponentId);
-    const maxEnergy = energy?.maxEnergy ?? 100;
-    const sleepMultiplier = energy?.sleepMultiplier ?? 1.0;
     return {
         type: "sleep",
         quality,
-        energyPerTick: params.energyPerTick / sleepMultiplier,
-        energyTarget: Math.floor(maxEnergy * params.energyRestoreFraction),
+        energyPerTick: resolveSleepEnergyPerTick(
+            quality,
+            energy.maxEnergy,
+            energy.sleepMultiplier,
+        ),
+        energyTarget: resolveSleepEnergyTarget(quality, energy.maxEnergy),
     };
 }
 

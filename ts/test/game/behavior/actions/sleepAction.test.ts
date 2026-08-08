@@ -11,8 +11,11 @@ import {
 } from "../../../../src/game/component/BehaviorAgentComponent.ts";
 import {
     executeSleepAction,
+    resolveSleepEnergyPerTick,
+    resolveSleepEnergyTarget,
     type SleepActionData,
 } from "../../../../src/game/behavior/actions/sleepAction.ts";
+import type { SleepQuality } from "../../../../src/game/behavior/actions/Action.ts";
 import {
     createHealthComponent,
     HealthComponentId,
@@ -133,6 +136,83 @@ describe("executeSleepAction", () => {
         executeSleepAction(makeSleepAction(10, 100), worker);
 
         assert.strictEqual(invalidated, true);
+    });
+});
+
+describe("sleep energy resolution", () => {
+    const QUALITIES: SleepQuality[] = [
+        "house",
+        "bedrollFire",
+        "bedrollAlone",
+        "collapse",
+    ];
+    const SMALL_POOL = 100;
+    const LARGE_POOL = 300;
+    const POOL_RATIO = LARGE_POOL / SMALL_POOL;
+
+    /** Sleep from empty to completion, returning how many ticks it took. */
+    function ticksToWake(quality: SleepQuality, maxEnergy: number): number {
+        const worker = createSleeper(0, maxEnergy);
+        const action: SleepActionData = {
+            type: "sleep",
+            quality,
+            energyPerTick: resolveSleepEnergyPerTick(quality, maxEnergy, 1.0),
+            energyTarget: resolveSleepEnergyTarget(quality, maxEnergy),
+        };
+
+        let ticks = 0;
+        while (executeSleepAction(action, worker).kind === "running") {
+            ticks++;
+            assert.ok(ticks < 1000, `${quality} sleep never completed`);
+        }
+        return ticks + 1;
+    }
+
+    it("keeps sleep duration constant when the energy pool is retuned", () => {
+        // The regression guard for the fraction conversion: if the restore rate
+        // were still an absolute point count, tripling the pool would triple
+        // every sleep, and with it the total HP healed per sleep.
+        for (const quality of QUALITIES) {
+            assert.strictEqual(
+                ticksToWake(quality, LARGE_POOL),
+                ticksToWake(quality, SMALL_POOL),
+                `${quality} sleep changed duration between pool sizes`,
+            );
+        }
+    });
+
+    it("restores energy at a rate proportional to the pool", () => {
+        for (const quality of QUALITIES) {
+            assert.strictEqual(
+                resolveSleepEnergyPerTick(quality, LARGE_POOL, 1.0),
+                resolveSleepEnergyPerTick(quality, SMALL_POOL, 1.0) *
+                    POOL_RATIO,
+                `${quality} restore rate did not scale with the pool`,
+            );
+        }
+    });
+
+    it("always restores something, so sleep cannot wedge on a small pool", () => {
+        // The restore rate is a floored fraction, which rounds to zero once the
+        // pool is small enough. A zero rate leaves the sleeper permanently short
+        // of its target and the action never completes.
+        for (const maxEnergy of [10, 20, 50, SMALL_POOL, LARGE_POOL]) {
+            for (const quality of QUALITIES) {
+                assert.ok(
+                    resolveSleepEnergyPerTick(quality, maxEnergy, 1.0) > 0,
+                    `${quality} restores nothing per tick at maxEnergy ${maxEnergy}`,
+                );
+                // Throws rather than hanging if the action never completes.
+                ticksToWake(quality, maxEnergy);
+            }
+        }
+    });
+
+    it("slows sleep by the entity's sleep multiplier", () => {
+        assert.strictEqual(
+            resolveSleepEnergyPerTick("house", LARGE_POOL, 2.0),
+            resolveSleepEnergyPerTick("house", LARGE_POOL, 1.0) / 2,
+        );
     });
 });
 

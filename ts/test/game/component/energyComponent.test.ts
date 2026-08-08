@@ -2,6 +2,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert";
 import {
     createEnergyComponent,
+    DEFAULT_MAX_ENERGY,
     spendEnergy,
     addExhaustionDebt,
     clearExhaustion,
@@ -30,12 +31,13 @@ function makeEntityWithEnergy(
 
 describe("EnergyComponent", () => {
     describe("createEnergyComponent", () => {
-        it("defaults to full energy", () => {
-            const comp = createEnergyComponent(100);
-            assert.strictEqual(comp.energy, 100);
-            assert.strictEqual(comp.maxEnergy, 100);
-            assert.strictEqual(comp.exhaustionLevel, 0);
-            assert.strictEqual(comp.exhaustionDebt, 0);
+        it("starts rested at whatever pool size it is given", () => {
+            for (const maxEnergy of [100, DEFAULT_MAX_ENERGY]) {
+                const comp = createEnergyComponent(maxEnergy);
+                assert.strictEqual(comp.energy, comp.maxEnergy);
+                assert.strictEqual(comp.maxEnergy, maxEnergy);
+                assert.strictEqual(comp.exhaustionLevel, 0);
+            }
         });
     });
 
@@ -67,6 +69,8 @@ describe("EnergyComponent", () => {
     describe("addExhaustionDebt", () => {
         it("accumulates debt without changing level when below threshold", () => {
             const comp = createEnergyComponent(100);
+            comp.exhaustionDebtThreshold = 10;
+
             const raised = addExhaustionDebt(comp, 5);
             assert.strictEqual(raised, false);
             assert.strictEqual(comp.exhaustionLevel, 0);
@@ -75,8 +79,10 @@ describe("EnergyComponent", () => {
 
         it("increases exhaustion level and resets debt when threshold crossed", () => {
             const comp = createEnergyComponent(100);
-            // threshold default is 15
-            const raised = addExhaustionDebt(comp, 15);
+            comp.exhaustionDebtThreshold = 10;
+
+            const raised = addExhaustionDebt(comp, 10);
+
             assert.strictEqual(raised, true);
             assert.strictEqual(comp.exhaustionLevel, 1);
             assert.strictEqual(comp.exhaustionDebt, 0);
