@@ -32,6 +32,9 @@ export function discoverFootprint(root: Entity, entity: Entity, center: Point) {
         return;
     }
 
-    const points = offsetPatternWithPoint(center, revealFootprintOffsets(entity));
+    const points = offsetPatternWithPoint(
+        center,
+        revealFootprintOffsets(entity),
+    );
     setDiscoveryForPlayer(root, messageEmitter.emitter, "player", points);
 }

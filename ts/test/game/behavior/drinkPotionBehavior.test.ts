@@ -35,11 +35,7 @@ function createSettlement(id = "settlement"): Entity {
     return settlement;
 }
 
-function createWorker(
-    settlement: Entity,
-    currentHp = 90,
-    maxHp = 200,
-): Entity {
+function createWorker(settlement: Entity, currentHp = 90, maxHp = 200): Entity {
     const worker = new Entity("worker");
     settlement.addChild(worker);
     worker.worldPosition = { x: 12, y: 8 };

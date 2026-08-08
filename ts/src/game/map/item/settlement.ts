@@ -16,11 +16,7 @@ import { isDecorativeResource } from "../../../data/inventory/items/naturalResou
 import { clearDecorativeResourcesAt } from "../../building/clearDecorativeResources.ts";
 import { goblinCampPrefab } from "../../prefab/goblinCampPrefab.ts";
 import { findClosestAvailablePosition } from "../query/closestPositionQuery.ts";
-import {
-    ChunkSize,
-    getChunkBounds,
-    type TileChunk,
-} from "../chunk.ts";
+import { ChunkSize, getChunkBounds, type TileChunk } from "../chunk.ts";
 
 /**
  * The preferred camp anchor within a chunk, roughly its center.

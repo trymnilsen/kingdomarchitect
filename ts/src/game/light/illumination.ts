@@ -83,7 +83,10 @@ export function bandFromEmitters(
  * @param root the world root entity
  * @param tilePosition the tile to evaluate, in world tile coordinates
  */
-export function illuminationBandAt(root: Entity, tilePosition: Point): LightBand {
+export function illuminationBandAt(
+    root: Entity,
+    tilePosition: Point,
+): LightBand {
     const day = root.getEcsComponent(DayComponentId);
     // A world without a day component is fully visible, so default to day.
     const phase = day?.phase ?? "day";

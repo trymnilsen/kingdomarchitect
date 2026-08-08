@@ -1,7 +1,10 @@
 import { type Point } from "../../../common/point.ts";
 import { GameTime } from "../../../common/time.ts";
 import { AssetLoader } from "../../../asset/loader/assetLoader.ts";
-import { type InputAction, InputActionType } from "../../../input/inputAction.ts";
+import {
+    type InputAction,
+    InputActionType,
+} from "../../../input/inputAction.ts";
 import { type OnTapEndEvent } from "../../../input/touchInput.ts";
 import { SelectedEntityItem } from "../selection/selectedEntityItem.ts";
 import { SelectedTileItem } from "../selection/selectedTileItem.ts";

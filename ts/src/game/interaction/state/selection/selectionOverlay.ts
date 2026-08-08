@@ -183,7 +183,9 @@ function drawProductionZone(context: RenderScope, entity: Entity) {
     if (!productionComponent) {
         return;
     }
-    const definition = getProductionDefinition(productionComponent.productionId);
+    const definition = getProductionDefinition(
+        productionComponent.productionId,
+    );
     if (definition?.kind !== "zone") {
         return;
     }

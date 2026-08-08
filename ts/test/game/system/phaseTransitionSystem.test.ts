@@ -45,10 +45,7 @@ describe("daysSurvived", () => {
     });
 
     it("increments to 1 exactly at the dawn rollover", () => {
-        assert.strictEqual(
-            derivePhaseState(TOTAL_CYCLE_TICKS).daysSurvived,
-            1,
-        );
+        assert.strictEqual(derivePhaseState(TOTAL_CYCLE_TICKS).daysSurvived, 1);
     });
 
     it("stays at 1 on the tick after the rollover", () => {

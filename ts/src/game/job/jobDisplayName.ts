@@ -61,9 +61,8 @@ export function getJobDisplayName(root: Entity, job: Jobs): string | null {
         case "dismantleBuildingJob": {
             const dismantleJob = job as DismantleBuildingJob;
             const buildingEntity = root.findEntity(dismantleJob.entityId);
-            const buildingComp = buildingEntity?.getEcsComponent(
-                BuildingComponentId,
-            );
+            const buildingComp =
+                buildingEntity?.getEcsComponent(BuildingComponentId);
             // Scaffolds being torn down read as "Cancel", completed as "Dismantle",
             // matching the player-facing button label.
             const verb = buildingComp?.scaffolded ? "Cancel" : "Dismantle";

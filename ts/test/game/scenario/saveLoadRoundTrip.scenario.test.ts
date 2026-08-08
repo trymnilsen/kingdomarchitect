@@ -38,7 +38,12 @@ describe("save and load round trip", () => {
     }> {
         const harness = new ScenarioHarness();
         const kingdom = harness.addPlayerKingdom();
-        harness.addPlayerBuilding(kingdom, stockPile, { x: 10, y: 9 }, "stockpile-1");
+        harness.addPlayerBuilding(
+            kingdom,
+            stockPile,
+            { x: 10, y: 9 },
+            "stockpile-1",
+        );
         const worker = harness.addWorker("worker-1", { x: 9, y: 9 });
         harness.addGoblinCamp({ x: 20, y: 18 });
 

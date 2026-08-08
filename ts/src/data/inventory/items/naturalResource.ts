@@ -297,7 +297,5 @@ const BLOCKING_RESOURCE_PATH_WEIGHT = 30;
 
 /** Extra path weight a resource adds to its tile. 0 = no contribution. */
 export function getResourcePathWeight(resourceId: string): number {
-    return isDecorativeResource(resourceId)
-        ? 0
-        : BLOCKING_RESOURCE_PATH_WEIGHT;
+    return isDecorativeResource(resourceId) ? 0 : BLOCKING_RESOURCE_PATH_WEIGHT;
 }

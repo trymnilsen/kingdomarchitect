@@ -328,8 +328,16 @@ describe("displacementTransaction", () => {
 
             const tx: DisplacementTransaction = {
                 moves: [
-                    { entityId: "b", from: { x: 11, y: 8 }, to: { x: 10, y: 8 } },
-                    { entityId: "a", from: { x: 10, y: 8 }, to: { x: 11, y: 8 } },
+                    {
+                        entityId: "b",
+                        from: { x: 11, y: 8 },
+                        to: { x: 10, y: 8 },
+                    },
+                    {
+                        entityId: "a",
+                        from: { x: 10, y: 8 },
+                        to: { x: 11, y: 8 },
+                    },
                 ],
                 isCycle: true,
                 beneficialSwap: true,
@@ -342,8 +350,14 @@ describe("displacementTransaction", () => {
             assert.deepStrictEqual(b.worldPosition, { x: 10, y: 8 });
 
             // Both members paid for their own step.
-            assert.strictEqual(a.getEcsComponent(EnergyComponentId)!.energy, 99);
-            assert.strictEqual(b.getEcsComponent(EnergyComponentId)!.energy, 99);
+            assert.strictEqual(
+                a.getEcsComponent(EnergyComponentId)!.energy,
+                99,
+            );
+            assert.strictEqual(
+                b.getEcsComponent(EnergyComponentId)!.energy,
+                99,
+            );
 
             // Each continues its route — consumed step sliced off, no replan.
             assert.deepStrictEqual(aAgent.actionQueue[0], {

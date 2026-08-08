@@ -90,7 +90,10 @@ function totalOnGround(root: Entity, itemId: string): number {
 
 describe("finishDismantle", () => {
     it("refunds materials, scatters inventory, evicts workers, clears jobs, and removes the building", () => {
-        const root = createWorld({ min: { x: 4, y: 2 }, max: { x: 24, y: 16 } });
+        const root = createWorld({
+            min: { x: 4, y: 2 },
+            max: { x: 24, y: 16 },
+        });
 
         const kingdom = new Entity("playerKingdom");
         kingdom.setEcsComponent(createPlayerKingdomComponent());
@@ -114,9 +117,9 @@ describe("finishDismantle", () => {
         worker.setEcsComponent(occupation);
         kingdom.addChild(worker);
         worker.worldPosition = { x: 13, y: 8 };
-        building.requireEcsComponent(WorkplaceComponentId).workers.push(
-            worker.id,
-        );
+        building
+            .requireEcsComponent(WorkplaceComponentId)
+            .workers.push(worker.id);
 
         // Jobs: one targeting this building (should be cleared), one targeting
         // a different building (should survive), and the dismantle job itself
@@ -162,7 +165,9 @@ describe("finishDismantle", () => {
         const remaining = jobQueue.jobs;
         assert.ok(
             !remaining.some(
-                (j) => j.id === "productionJob" && j.targetBuilding === building.id,
+                (j) =>
+                    j.id === "productionJob" &&
+                    j.targetBuilding === building.id,
             ),
             "jobs targeting the dismantled building should be cleared",
         );
@@ -185,7 +190,10 @@ describe("finishDismantle", () => {
         // direct finishDismantle test above does NOT cover: it exercises
         // getJobTargetPosition / PerformJobBehavior, which is where a missing
         // job-target case would silently strand the job forever.
-        const root = createWorld({ min: { x: 4, y: 2 }, max: { x: 24, y: 16 } });
+        const root = createWorld({
+            min: { x: 4, y: 2 },
+            max: { x: 24, y: 16 },
+        });
 
         const kingdom = new Entity("playerKingdom");
         kingdom.setEcsComponent(createPlayerKingdomComponent());

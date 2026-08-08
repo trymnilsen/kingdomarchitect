@@ -19,7 +19,10 @@ import {
     hasChunk,
     TileComponentId,
 } from "../../../src/game/component/tileComponent.ts";
-import { getChunkBounds, getChunkPosition } from "../../../src/game/map/chunk.ts";
+import {
+    getChunkBounds,
+    getChunkPosition,
+} from "../../../src/game/map/chunk.ts";
 import type { Entity } from "../../../src/game/entity/entity.ts";
 import type { GameMessage } from "../../../src/server/message/gameMessage.ts";
 
@@ -145,9 +148,7 @@ describe("worldGenerationSystem", () => {
             const campEntity = [...camps.keys()][0];
             const chunkMap =
                 root.requireEcsComponent(ChunkMapComponentId).chunkMap;
-            const campChunkBounds = getChunkBounds(
-                getCampChunkPosition(root),
-            );
+            const campChunkBounds = getChunkBounds(getCampChunkPosition(root));
 
             for (const child of campEntity.children) {
                 const tile = child.worldPosition;
@@ -176,10 +177,7 @@ describe("worldGenerationSystem", () => {
         const camps = root.queryComponents(GoblinCampComponentId);
         const campEntity = [...camps.keys()][0];
         campEntity.removeEcsComponent(GoblinCampComponentId);
-        assert.strictEqual(
-            root.queryComponents(GoblinCampComponentId).size,
-            0,
-        );
+        assert.strictEqual(root.queryComponents(GoblinCampComponentId).size, 0);
 
         const messageEmitter = (message: GameMessage) => {
             messages.push(message);
@@ -200,9 +198,6 @@ describe("worldGenerationSystem", () => {
 
         const tileComponent = root.requireEcsComponent(TileComponentId);
         assert.strictEqual(tileComponent.chunks.size, 10);
-        assert.strictEqual(
-            root.queryComponents(GoblinCampComponentId).size,
-            1,
-        );
+        assert.strictEqual(root.queryComponents(GoblinCampComponentId).size, 1);
     });
 });

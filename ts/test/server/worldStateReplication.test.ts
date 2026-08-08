@@ -91,7 +91,10 @@ describe("world state replication", () => {
     it("keeps the volume instance chunks reference when a discover message resends it", () => {
         const root = setupServerWorld();
         const clientRoot = new Entity("client-root");
-        handleGameMessage(clientRoot, buildWorldStateMessage(root, "player", 0));
+        handleGameMessage(
+            clientRoot,
+            buildWorldStateMessage(root, "player", 0),
+        );
 
         // The camp chunk is replicated but undiscovered; discovering a tile
         // in it later resends its volume as a fresh object instance

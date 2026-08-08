@@ -28,38 +28,56 @@ describe("perceivedBandAt", () => {
 
     it("at night, in reach and brightly lit reads bright", () => {
         const map = reachOf([12, 8]);
-        assert.strictEqual(perceivedBandAt(map, emitters, "night", 12, 8), "bright");
+        assert.strictEqual(
+            perceivedBandAt(map, emitters, "night", 12, 8),
+            "bright",
+        );
     });
 
     it("at night, in reach and dimly lit reads dim", () => {
         // (15,8) is distSq 9 from the emitter: outside bright (4), inside dim (16).
         const map = reachOf([15, 8]);
-        assert.strictEqual(perceivedBandAt(map, emitters, "night", 15, 8), "dim");
+        assert.strictEqual(
+            perceivedBandAt(map, emitters, "night", 15, 8),
+            "dim",
+        );
     });
 
     it("at night, in reach but unlit reads dark — reach alone is not sight", () => {
         // (18,8) is distSq 36 from the emitter: beyond all light.
         const map = reachOf([18, 8]);
-        assert.strictEqual(perceivedBandAt(map, emitters, "night", 18, 8), "dark");
+        assert.strictEqual(
+            perceivedBandAt(map, emitters, "night", 18, 8),
+            "dark",
+        );
     });
 
     it("brightly lit but out of reach reads dark — min binds on reach", () => {
         // (13,8) is distSq 1 (bright) but is not in the reach set.
         const map = reachOf([12, 8]);
-        assert.strictEqual(perceivedBandAt(map, emitters, "night", 13, 8), "dark");
+        assert.strictEqual(
+            perceivedBandAt(map, emitters, "night", 13, 8),
+            "dark",
+        );
     });
 
     it("by day, in reach reads bright even where no source lights it", () => {
         // Same unlit tile as the night-dark case; daylight is a global bright.
         const map = reachOf([18, 8]);
-        assert.strictEqual(perceivedBandAt(map, emitters, "day", 18, 8), "bright");
+        assert.strictEqual(
+            perceivedBandAt(map, emitters, "day", 18, 8),
+            "bright",
+        );
     });
 
     it("at night, an unlit tile with a dim perception floor reads dim", () => {
         // (18,8) is beyond all light; a viewer's minimal perception floors it.
         const map = reachOf([18, 8]);
         map.perceptionFloor.set(makeNumberId(18, 8), "dim");
-        assert.strictEqual(perceivedBandAt(map, emitters, "night", 18, 8), "dim");
+        assert.strictEqual(
+            perceivedBandAt(map, emitters, "night", 18, 8),
+            "dim",
+        );
     });
 
     it("at night, real light wins over a dimmer perception floor", () => {
@@ -78,6 +96,9 @@ describe("perceivedBandAt", () => {
         // behaviour if that invariant is ever broken.
         const map = reachOf([12, 8]);
         map.perceptionFloor.set(makeNumberId(18, 8), "dim");
-        assert.strictEqual(perceivedBandAt(map, emitters, "night", 18, 8), "dark");
+        assert.strictEqual(
+            perceivedBandAt(map, emitters, "night", 18, 8),
+            "dark",
+        );
     });
 });

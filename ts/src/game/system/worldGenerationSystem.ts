@@ -35,10 +35,7 @@ import {
 } from "../component/worldDiscoveryComponent.ts";
 import { Entity } from "../entity/entity.ts";
 import { getChunkPosition } from "../map/chunk.ts";
-import {
-    generateChunk,
-    type GeneratedChunk,
-} from "../map/chunkGenerator.ts";
+import { generateChunk, type GeneratedChunk } from "../map/chunkGenerator.ts";
 import {
     placeSettlement,
     placeSettlementIfNoneExists,

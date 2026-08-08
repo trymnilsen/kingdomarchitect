@@ -125,7 +125,11 @@ export const uiPaginatedList = createComponent<UiPaginatedListProps>(
         const itemAreaHeight = showFooter
             ? height - footerHeight - gap
             : height;
-        const itemHeight = paginatedItemHeight(itemAreaHeight, itemsPerPage, gap);
+        const itemHeight = paginatedItemHeight(
+            itemAreaHeight,
+            itemsPerPage,
+            gap,
+        );
 
         const startIndex = clampedPage * itemsPerPage;
         const children: PlacedChild[] = [];

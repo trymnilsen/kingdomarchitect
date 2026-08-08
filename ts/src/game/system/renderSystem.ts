@@ -17,7 +17,10 @@ import {
     type SpriteComponent,
     SpriteComponentId,
 } from "../component/spriteComponent.ts";
-import { type TileComponent, TileComponentId } from "../component/tileComponent.ts";
+import {
+    type TileComponent,
+    TileComponentId,
+} from "../component/tileComponent.ts";
 import { spriteRegistry } from "../../asset/spriteRegistry.ts";
 import { SPRITE_W, SPRITE_H } from "../../asset/sprite.ts";
 import { VisibilityComponentId } from "../component/visibilityComponent.ts";
@@ -119,7 +122,14 @@ function onRender(
     }
 
     if (tiles && visibilityMap) {
-        drawTiles(tiles, renderScope, visibilityMap, emitters, phase, rootEntity);
+        drawTiles(
+            tiles,
+            renderScope,
+            visibilityMap,
+            emitters,
+            phase,
+            rootEntity,
+        );
     }
     visibleSpriteScratch.length = 0;
     forEachComponentWithin(

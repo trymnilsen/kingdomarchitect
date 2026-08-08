@@ -16,7 +16,10 @@ import {
  * test asserts the cached `queryComponents` matches this on the same tree, so a
  * stale cache surfaces as a mismatch rather than a silent wrong answer.
  */
-function bruteForceQuery(root: Entity, componentId: string): Map<Entity, unknown> {
+function bruteForceQuery(
+    root: Entity,
+    componentId: string,
+): Map<Entity, unknown> {
     const result = new Map<Entity, unknown>();
     visitChildren(root, (entity) => {
         const component = entity.getEcsComponent(componentId as never);

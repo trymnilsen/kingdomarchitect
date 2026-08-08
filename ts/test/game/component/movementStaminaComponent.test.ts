@@ -68,5 +68,4 @@ describe("movementStaminaComponent", () => {
             assert.strictEqual(hasMovedThisTick(component, 10), false);
         });
     });
-
 });

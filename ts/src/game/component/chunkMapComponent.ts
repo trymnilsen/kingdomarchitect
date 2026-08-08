@@ -122,7 +122,10 @@ export function forEachComponentWithin<ID extends ComponentID>(
     root: Entity,
     bounds: Bounds,
     componentId: ID,
-    visitor: (entity: Entity, component: Extract<Components, { id: ID }>) => void,
+    visitor: (
+        entity: Entity,
+        component: Extract<Components, { id: ID }>,
+    ) => void,
 ): void {
     const chunkMapComponent = root.getEcsComponent(ChunkMapComponentId);
     if (!chunkMapComponent) {

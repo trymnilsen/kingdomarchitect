@@ -368,6 +368,10 @@ export function verifyAuthentication(
         return false;
     }
 
-    updateCredentialCounter(db, stored.credentialId, authenticatorData.signCount);
+    updateCredentialCounter(
+        db,
+        stored.credentialId,
+        authenticatorData.signCount,
+    );
     return true;
 }

@@ -1,8 +1,5 @@
 import { spriteRefs } from "../../../asset/sprite.ts";
-import {
-    stoneResource,
-    ironOreItem,
-} from "../../inventory/items/resources.ts";
+import { stoneResource, ironOreItem } from "../../inventory/items/resources.ts";
 import type { CraftingRecipe } from "../craftingRecipe.ts";
 
 // The quarry "crafts" in the mechanical sense — the player selects an output and a

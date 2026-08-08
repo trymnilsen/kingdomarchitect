@@ -48,7 +48,10 @@ describe("clearDecorativeResourcesAt", () => {
 
         clearDecorativeResourcesAt(root, { x: 3, y: 3 });
 
-        assert.ok(root.children.includes(grass), "adjacent grass should remain");
+        assert.ok(
+            root.children.includes(grass),
+            "adjacent grass should remain",
+        );
     });
 
     it("leaves non-resource entities on the same tile untouched", () => {

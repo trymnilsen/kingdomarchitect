@@ -16,7 +16,11 @@
  * Cardinal direction traversal order (left, right, up, down) is fixed for
  * determinism. Tiebreaks are never random.
  */
-import { adjacentPoints, type Point, pointEquals } from "../../../common/point.ts";
+import {
+    adjacentPoints,
+    type Point,
+    pointEquals,
+} from "../../../common/point.ts";
 import { BehaviorAgentComponentId } from "../../component/BehaviorAgentComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { queryEntity } from "../../map/query/queryEntity.ts";

@@ -58,7 +58,10 @@ export type BlockerClass =
  * tick. It relies on the behaviour system clearing `pendingReplan` when a worker settles
  * (idle or mid-task); a settled worker must classify as `displaceable`, not `transient`.
  */
-export function classifyBlocker(entity: Entity, currentTick: number): BlockerClass {
+export function classifyBlocker(
+    entity: Entity,
+    currentTick: number,
+): BlockerClass {
     const agent = entity.getEcsComponent(BehaviorAgentComponentId);
     if (!agent) {
         return { kind: "immovable" };

@@ -27,10 +27,7 @@ describe("valueNoise2d", () => {
     });
 
     it("changes with the seed", () => {
-        assert.notEqual(
-            valueNoise2d(2.5, 2.5, 1),
-            valueNoise2d(2.5, 2.5, 2),
-        );
+        assert.notEqual(valueNoise2d(2.5, 2.5, 1), valueNoise2d(2.5, 2.5, 2));
     });
 });
 

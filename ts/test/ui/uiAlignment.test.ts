@@ -1,9 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
-import {
-    calculateAlignment,
-    uiAlignment,
-} from "../../src/ui/uiAlignment.ts";
+import { calculateAlignment, uiAlignment } from "../../src/ui/uiAlignment.ts";
 
 describe("UiAlignment", () => {
     it("centers an item smaller than the target", () => {

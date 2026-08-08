@@ -8,11 +8,7 @@ import {
 } from "../component/watchComponent.ts";
 import { GoblinUnitComponentId } from "../component/goblinUnitComponent.ts";
 import { STATION_MANNED_REACH } from "../vision/visionReach.ts";
-import {
-    SWEEP_ORDER,
-    inWedge,
-    quarterToward,
-} from "../vision/searchlight.ts";
+import { SWEEP_ORDER, inWedge, quarterToward } from "../vision/searchlight.ts";
 import { isTowerManned } from "../component/stationQuery.ts";
 
 /**
@@ -97,7 +93,10 @@ function hostileInReach(
     if (!entity || !entity.hasComponent(GoblinUnitComponentId)) {
         return null;
     }
-    if (reachDistance(tower.worldPosition, entity.worldPosition) > STATION_MANNED_REACH) {
+    if (
+        reachDistance(tower.worldPosition, entity.worldPosition) >
+        STATION_MANNED_REACH
+    ) {
         return null;
     }
     return entity;

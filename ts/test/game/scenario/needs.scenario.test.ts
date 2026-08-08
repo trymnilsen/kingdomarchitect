@@ -26,7 +26,10 @@ import { wheatResourceItem } from "../../../src/data/inventory/items/resources.t
  *     next selection at a plan boundary; a worker mid-plan runs that plan to
  *     completion. Only explicit/imperative events (damage, command) preempt.
  */
-function addTree(harness: ScenarioHarness, position: { x: number; y: number }): Entity {
+function addTree(
+    harness: ScenarioHarness,
+    position: { x: number; y: number },
+): Entity {
     const tree = new Entity("tree");
     tree.setEcsComponent(createResourceComponent("tree1"));
     tree.setEcsComponent(createHealthComponent(10, 10));

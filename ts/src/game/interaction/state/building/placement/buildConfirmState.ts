@@ -11,7 +11,10 @@ import {
     hasDiscoveredChunk,
     VisibilityMapComponentId,
 } from "../../../../component/visibilityMapComponent.ts";
-import { getTile, TileComponentId } from "../../../../component/tileComponent.ts";
+import {
+    getTile,
+    TileComponentId,
+} from "../../../../component/tileComponent.ts";
 import { InteractionState } from "../../../handler/interactionState.ts";
 import { uiScaffold } from "../../../view/uiScaffold.ts";
 import { AlertMessageState } from "../../common/alertMessageState.ts";

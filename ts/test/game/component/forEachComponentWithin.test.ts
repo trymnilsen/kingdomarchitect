@@ -56,7 +56,10 @@ describe("forEachComponentWithin", () => {
 
         const visited = visitSpriteIds(root);
 
-        assert.deepStrictEqual(new Set(visited), new Set(["inView", "inView2"]));
+        assert.deepStrictEqual(
+            new Set(visited),
+            new Set(["inView", "inView2"]),
+        );
         assert.ok(!visited.includes("farAway"));
     });
 

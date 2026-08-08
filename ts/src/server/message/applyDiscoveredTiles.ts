@@ -80,9 +80,7 @@ export function applyDiscoveredTiles(
         // empty partial set next to the full flag would leave inconsistent
         // discovery state behind
         if (
-            visibilityMapComponent.discovered.fullyDiscoveredChunks.has(
-                chunkId,
-            )
+            visibilityMapComponent.discovered.fullyDiscoveredChunks.has(chunkId)
         ) {
             continue;
         }

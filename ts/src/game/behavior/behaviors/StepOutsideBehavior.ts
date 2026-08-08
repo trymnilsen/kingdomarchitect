@@ -35,7 +35,9 @@ export function createStepOutsideBehavior(): Behavior {
         isValid(entity: Entity): boolean {
             const root = entity.getRootEntity();
             const occupants = queryEntity(root, entity.worldPosition);
-            if (!occupants.some((occupant) => isImpassableStructure(occupant))) {
+            if (
+                !occupants.some((occupant) => isImpassableStructure(occupant))
+            ) {
                 return false;
             }
             // A guard manning its (enabled) station stands on the building on

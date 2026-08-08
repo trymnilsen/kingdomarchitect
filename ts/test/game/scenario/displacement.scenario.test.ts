@@ -301,7 +301,10 @@ describe("Displacement Scenario", () => {
             { type: "moveTo", target: { x: 12, y: 11 } },
         ];
 
-        const action: MoveToAction = { type: "moveTo", target: { x: 15, y: 8 } };
+        const action: MoveToAction = {
+            type: "moveTo",
+            target: { x: 15, y: 8 },
+        };
 
         // Tick 1: next tile (12,8) holds a transient blocker → mover holds position and
         // keeps its cached path aimed at the same tile (no replan, no detour).

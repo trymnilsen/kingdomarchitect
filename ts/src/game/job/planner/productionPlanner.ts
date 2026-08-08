@@ -70,7 +70,8 @@ export function planProduction(
 
     const center = buildingEntity.worldPosition;
     // Plantable tiles = diamond tiles minus the center (building) tile.
-    const plantableTiles = getDiamondPoints(center, definition.zoneRadius).length - 1;
+    const plantableTiles =
+        getDiamondPoints(center, definition.zoneRadius).length - 1;
     const target = Math.round(definition.maxTreeFraction * plantableTiles);
     const floor = Math.floor(definition.minTreeFraction * plantableTiles);
 

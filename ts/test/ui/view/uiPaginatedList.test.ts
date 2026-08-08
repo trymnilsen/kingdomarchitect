@@ -19,7 +19,10 @@ import { uiText } from "../../../src/ui/declarative/uiText.ts";
  * factory is called with the right index for the current page.
  */
 function renderIndexedItem(index: number) {
-    return uiText({ content: `Item ${index}`, textStyle: createTestTextStyle() });
+    return uiText({
+        content: `Item ${index}`,
+        textStyle: createTestTextStyle(),
+    });
 }
 
 /**

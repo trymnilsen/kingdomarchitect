@@ -100,8 +100,7 @@ describe("placeSettlement", () => {
 
         // The camp's footprint (its children's tiles) must be inside the
         // chunk and free of anything that is not part of the camp itself.
-        const chunkMap =
-            root.requireEcsComponent(ChunkMapComponentId).chunkMap;
+        const chunkMap = root.requireEcsComponent(ChunkMapComponentId).chunkMap;
         for (const member of camp.children) {
             const world = member.worldPosition;
             assert.ok(
@@ -114,8 +113,7 @@ describe("placeSettlement", () => {
             const occupants = getEntitiesAt(chunkMap, world.x, world.y);
             assert.ok(
                 occupants.every(
-                    (occupant) =>
-                        occupant === camp || occupant.parent === camp,
+                    (occupant) => occupant === camp || occupant.parent === camp,
                 ),
                 `tile (${world.x},${world.y}) should only hold camp members`,
             );
@@ -144,8 +142,7 @@ describe("placeSettlement", () => {
 
         // The occupants of the claimed footprint are removed; everything
         // else stays.
-        const chunkMap =
-            root.requireEcsComponent(ChunkMapComponentId).chunkMap;
+        const chunkMap = root.requireEcsComponent(ChunkMapComponentId).chunkMap;
         for (const member of camp.children) {
             const world = member.worldPosition;
             const displaced = trees.get(`${world.x},${world.y}`)!;

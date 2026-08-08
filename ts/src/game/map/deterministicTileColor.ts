@@ -1,5 +1,9 @@
 import { log } from "../../common/logging/logger.ts";
-import { hexToRgb, rgbToHex, type RgbColor } from "../../common/color/hexColor.ts";
+import {
+    hexToRgb,
+    rgbToHex,
+    type RgbColor,
+} from "../../common/color/hexColor.ts";
 
 /**
  * Defines a 2D position.

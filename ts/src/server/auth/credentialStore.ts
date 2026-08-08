@@ -122,8 +122,7 @@ export function updateCredentialCounter(
     credentialId: string,
     counter: number,
 ): void {
-    db.prepare("UPDATE credentials SET counter = ? WHERE credential_id = ?").run(
-        counter,
-        credentialId,
-    );
+    db.prepare(
+        "UPDATE credentials SET counter = ? WHERE credential_id = ?",
+    ).run(counter, credentialId);
 }

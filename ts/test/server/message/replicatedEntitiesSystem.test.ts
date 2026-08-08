@@ -348,8 +348,16 @@ describe("replicatedEntitiesSystem", () => {
                 partiallyDiscoveredChunks: new Map(),
             });
 
-            const messageForPlayer1 = buildWorldStateMessage(root, "player1", 0);
-            const messageForPlayer2 = buildWorldStateMessage(root, "player2", 0);
+            const messageForPlayer1 = buildWorldStateMessage(
+                root,
+                "player1",
+                0,
+            );
+            const messageForPlayer2 = buildWorldStateMessage(
+                root,
+                "player2",
+                0,
+            );
 
             // Player1 should only see tiles from chunk 0 (tiles 0-7 on x axis)
             assert.strictEqual(

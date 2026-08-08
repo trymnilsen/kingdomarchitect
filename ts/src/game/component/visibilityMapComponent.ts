@@ -93,7 +93,9 @@ export function perceptionFloorAt(
     x: number,
     y: number,
 ): LightBand {
-    return visibilityComponent.perceptionFloor.get(makeNumberId(x, y)) ?? "dark";
+    return (
+        visibilityComponent.perceptionFloor.get(makeNumberId(x, y)) ?? "dark"
+    );
 }
 
 export const VisibilityMapComponentId = "visibilityMap";

@@ -233,9 +233,7 @@ export class GameServer {
         this.world.addSystem(stockpileDestructionSystem);
         this.world.addSystem(worldGenerationSystem);
         this.world.addSystem(createPhaseTransitionSystem());
-        this.world.addSystem(
-            createCommandSystem(this.persistenceManager),
-        );
+        this.world.addSystem(createCommandSystem(this.persistenceManager));
         this.world.addSystem(housingSystem);
         this.world.addSystem(watchSystem);
         this.world.addSystem(regrowSystem);

@@ -60,8 +60,11 @@ describe("building light at night", () => {
         assert.strictEqual(illuminationBandAt(root, { x: 14, y: 8 }), "bright");
     });
 
-    it("emits no light when the building opts out with \"none\"", () => {
-        const root = placeBuildingAtNight(unlitBuilding, false, { x: 12, y: 8 });
+    it('emits no light when the building opts out with "none"', () => {
+        const root = placeBuildingAtNight(unlitBuilding, false, {
+            x: 12,
+            y: 8,
+        });
 
         assert.strictEqual(illuminationBandAt(root, { x: 12, y: 8 }), "dark");
     });

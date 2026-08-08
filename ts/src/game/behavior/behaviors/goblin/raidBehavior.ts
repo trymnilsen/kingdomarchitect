@@ -80,7 +80,9 @@ export function createRaidBehavior(): Behavior {
 
             // Already adjacent → keep attacking (don't reset the running action
             // with a redundant moveTo, matching engageInCombatBehavior).
-            if (isPointAdjacentTo(entity.worldPosition, obstacle.worldPosition)) {
+            if (
+                isPointAdjacentTo(entity.worldPosition, obstacle.worldPosition)
+            ) {
                 return [{ type: "attackTarget", targetId: obstacle.id }];
             }
 

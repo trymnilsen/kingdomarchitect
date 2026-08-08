@@ -70,9 +70,27 @@ describe("workWindmillAction", () => {
         addWindmill(root, { x: 10, y: 10 });
         // Wheat sits at the top tile, scanned before the straw tiles. It was
         // replanted recently; the straw farms have waited far longer.
-        const wheatFarm = addFarm(root, "wheatFarm", { x: 10, y: 9 }, "wheat", 200);
-        const strawFarm1 = addFarm(root, "strawFarm1", { x: 9, y: 10 }, "straw", 100);
-        const strawFarm2 = addFarm(root, "strawFarm2", { x: 10, y: 11 }, "straw", 110);
+        const wheatFarm = addFarm(
+            root,
+            "wheatFarm",
+            { x: 10, y: 9 },
+            "wheat",
+            200,
+        );
+        const strawFarm1 = addFarm(
+            root,
+            "strawFarm1",
+            { x: 9, y: 10 },
+            "straw",
+            100,
+        );
+        const strawFarm2 = addFarm(
+            root,
+            "strawFarm2",
+            { x: 10, y: 11 },
+            "straw",
+            110,
+        );
         const worker = addWorker(root, { x: 10, y: 10 });
 
         const result = executeWorkWindmillAction(
@@ -88,7 +106,11 @@ describe("workWindmillAction", () => {
             "straw",
             "held should lock to the oldest ready crop",
         );
-        assert.strictEqual(held.amount, 8, "both straw farms should be harvested");
+        assert.strictEqual(
+            held.amount,
+            8,
+            "both straw farms should be harvested",
+        );
         assert.strictEqual(
             strawFarm1.requireEcsComponent(FarmComponentId).state,
             FarmState.Empty,
@@ -107,8 +129,20 @@ describe("workWindmillAction", () => {
     it("only harvests farms matching an already-held crop", () => {
         const root = createWorld();
         addWindmill(root, { x: 10, y: 10 });
-        const wheatFarm = addFarm(root, "wheatFarm", { x: 10, y: 9 }, "wheat", 200);
-        const strawFarm = addFarm(root, "strawFarm", { x: 9, y: 10 }, "straw", 100);
+        const wheatFarm = addFarm(
+            root,
+            "wheatFarm",
+            { x: 10, y: 9 },
+            "wheat",
+            200,
+        );
+        const strawFarm = addFarm(
+            root,
+            "strawFarm",
+            { x: 9, y: 10 },
+            "straw",
+            100,
+        );
         const worker = addWorker(root, { x: 10, y: 10 });
         const held = worker.requireEcsComponent(HeldItemComponentId);
         held.item = wheatResourceItem;

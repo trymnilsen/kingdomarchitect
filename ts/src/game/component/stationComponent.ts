@@ -10,7 +10,8 @@
  * and the garrison behavior), so there is nothing to dangle when a worker dies or
  * despawns. The effect lives on the *worker* standing on the tile, not on the station.
  */
-export type StationPriority = (typeof StationPriority)[keyof typeof StationPriority];
+export type StationPriority =
+    (typeof StationPriority)[keyof typeof StationPriority];
 export const StationPriority = {
     Off: 0,
     Low: 1,

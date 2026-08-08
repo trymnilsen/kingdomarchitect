@@ -313,7 +313,11 @@ describe("pointer interaction (Scenario)", () => {
         assert.strictEqual(captured, false, "press misses the UI");
 
         const handled = harness.pointerUp(A_CENTER);
-        assert.strictEqual(handled, false, "the gesture never belonged to the UI");
+        assert.strictEqual(
+            handled,
+            false,
+            "the gesture never belonged to the UI",
+        );
         assert.strictEqual(taps, 0);
     });
 

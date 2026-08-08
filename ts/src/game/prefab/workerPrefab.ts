@@ -46,7 +46,10 @@ export function workerPrefab(id?: string): Entity {
     // only ever reflects real sources (and a future carried torch is an upgrade,
     // not a duplicate of an innate glow).
     entity.setEcsComponent(
-        createVisibilityComponent(WORKER_VISION_REACH, WORKER_MINIMAL_PERCEPTION),
+        createVisibilityComponent(
+            WORKER_VISION_REACH,
+            WORKER_MINIMAL_PERCEPTION,
+        ),
     );
     entity.setEcsComponent(createAnimationComponent(nobleKnightAnimationGraph));
     entity.setEcsComponent(createDirectionComponent());

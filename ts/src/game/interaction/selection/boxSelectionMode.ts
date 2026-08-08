@@ -1,5 +1,8 @@
 import { type Point, pointEquals } from "../../../common/point.ts";
-import { type SelectionMode, type SelectionModeDescription } from "./selectionMode.ts";
+import {
+    type SelectionMode,
+    type SelectionModeDescription,
+} from "./selectionMode.ts";
 import { log } from "../../../common/logging/logger.ts";
 
 export class BoxSelectionMode implements SelectionMode {

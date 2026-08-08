@@ -100,4 +100,3 @@ export function executeCollectItemsAction(
     completeClaimedJob(entity);
     return ActionComplete;
 }
-

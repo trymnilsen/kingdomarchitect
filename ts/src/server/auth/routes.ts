@@ -172,7 +172,11 @@ async function handleRegisterBegin(
     const body = await parseJsonBody<{ playerId: string }>(req, MAX_BODY_BYTES);
 
     if (!isValidPlayerId(body.playerId)) {
-        sendError(res, 400, "playerId is required and must be at most 64 bytes");
+        sendError(
+            res,
+            400,
+            "playerId is required and must be at most 64 bytes",
+        );
         return true;
     }
 
@@ -237,7 +241,11 @@ async function handleLoginBegin(
     const body = await parseJsonBody<{ playerId: string }>(req, MAX_BODY_BYTES);
 
     if (!isValidPlayerId(body.playerId)) {
-        sendError(res, 400, "playerId is required and must be at most 64 bytes");
+        sendError(
+            res,
+            400,
+            "playerId is required and must be at most 64 bytes",
+        );
         return true;
     }
 

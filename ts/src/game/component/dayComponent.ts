@@ -22,7 +22,8 @@ export const DAWN_TICKS = 60;
 export const DAY_TICKS = 60;
 export const DUSK_TICKS = 60;
 export const NIGHT_TICKS = 60;
-export const TOTAL_CYCLE_TICKS = DAWN_TICKS + DAY_TICKS + DUSK_TICKS + NIGHT_TICKS;
+export const TOTAL_CYCLE_TICKS =
+    DAWN_TICKS + DAY_TICKS + DUSK_TICKS + NIGHT_TICKS;
 
 // Tunable background colour per phase.
 const PHASE_COLORS: Record<Phase, string> = {

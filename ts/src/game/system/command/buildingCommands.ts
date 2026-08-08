@@ -6,7 +6,10 @@ import type { DismantleBuildingCommand } from "../../../server/message/command/d
 import { placeBuildingAt } from "../../building/placeBuilding.ts";
 import { BuildingComponentId } from "../../component/buildingComponent.ts";
 import { HealthComponentId } from "../../component/healthComponent.ts";
-import { addJob, JobQueueComponentId } from "../../component/jobQueueComponent.ts";
+import {
+    addJob,
+    JobQueueComponentId,
+} from "../../component/jobQueueComponent.ts";
 import { findPlayerKingdom } from "../../component/playerKingdomComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { getSettlementEntity } from "../../entity/settlementQueries.ts";
