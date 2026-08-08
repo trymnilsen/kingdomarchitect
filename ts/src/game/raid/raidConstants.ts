@@ -44,24 +44,52 @@ export const RAIDERS_PER_TARGET = 2;
 export const RAID_UTILITY = 50;
 
 /**
- * A goblin camp grows toward RAID_POPULATION_FACTOR × (player worker count),
- * ratcheted up and capped at GOBLIN_HOUSE_CAP. The same factor gates raids:
- * a camp only strikes a kingdom big enough that the warband is at most this
- * fraction of it (playerPop ≥ goblinsPresent / factor) — see formGoblinRaid.
+ * What one player worker adds to the kingdom score. Set to DEFAULT_RAID_VALUE so
+ * a worker is worth exactly one generic building, which keeps the score readable
+ * as "how much is there here to take".
  */
-export const RAID_POPULATION_FACTOR = 0.5;
+export const WORKER_SCORE = 20;
 
 /**
- * Camps below this size never raid. This is the early-game grace period (with
- * factor 0.5 it means no raids until the kingdom reaches ~6 workers) and it
- * keeps a raid party from degenerating to 0–1 goblins.
+ * Factor applied to the kingdom score when a camp restamps its threshold after
+ * raiding. The kingdom must grow 25% past what it was worth on raid night before
+ * that same camp marches again, so prosperity itself is the cooldown.
+ */
+export const RAID_THRESHOLD_GROWTH = 1.25;
+
+/**
+ * Kingdom score a camp at zero distance waits for before its first raid. This is
+ * the early-game grace period, calibrated against a starting kingdom: 6 workers
+ * (120) plus a house (60) plus a stockpile (100).
+ */
+export const INITIAL_RAID_THRESHOLD_BASE = 280;
+
+/**
+ * Added to a camp's initial threshold per tile of distance from the kingdom.
+ * Every camp reads the same score, so without this spread they would all cross a
+ * shared bar on the same night. Near camps covet the kingdom sooner; far ones
+ * need a richer prize to march for.
+ */
+export const RAID_THRESHOLD_DISTANCE_FACTOR = 2;
+
+/**
+ * Kingdom score needed per goblin a camp can support, so its cap is roughly
+ * score / 80. Calibrated to preserve the old sizing: a mid-game kingdom of 6
+ * workers, 3 houses and a stockpile scores 400 and yields a cap of 5.
+ */
+export const CAMP_SIZE_SCORE_DIVISOR = 80;
+
+/**
+ * Camps below this size never raid, which keeps a raid party from degenerating
+ * to 0–1 goblins. The early-game grace period lives in
+ * INITIAL_RAID_THRESHOLD_BASE, not here.
  */
 export const RAID_MIN_HOUSES = 3;
 
 /**
- * A camp always supports at least this many goblins, even with no player
- * workers — so a camp is never sized to 0 and always sustains its lone starting
- * goblin. Kept below RAID_MIN_HOUSES so a minimum-size camp never raids.
+ * A camp always supports at least this many goblins, even with no kingdom score
+ * to size against — so a camp is never sized to 0 and always sustains its lone
+ * starting goblin. Kept below RAID_MIN_HOUSES so a minimum-size camp never raids.
  */
 export const GOBLIN_CAMP_MIN_SIZE = 1;
 

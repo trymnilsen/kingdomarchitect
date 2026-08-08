@@ -223,17 +223,18 @@ export class ScenarioHarness {
     }
 
     /**
-     * Add a completed building owned by the given player kingdom, using the real
+     * Add a building owned by the given player kingdom, using the real
      * buildingPrefab. Mirrors how commandSystem parents placed buildings to the
-     * kingdom.
+     * kingdom. Pass scaffolded to get a building still under construction.
      */
     addPlayerBuilding(
         kingdom: Entity,
         building: Building,
         position: Point,
         id?: string,
+        scaffolded: boolean = false,
     ): Entity {
-        const entity = buildingPrefab(building, false, id);
+        const entity = buildingPrefab(building, scaffolded, id);
         kingdom.addChild(entity);
         entity.worldPosition = position;
         return entity;

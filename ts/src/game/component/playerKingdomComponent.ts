@@ -31,8 +31,8 @@ export function findPlayerKingdom(root: Entity): Entity | undefined {
 }
 
 /**
- * Number of living player workers (PlayerUnit entities) in the world. Drives
- * goblin-camp scaling and the raid trigger (see goblinRaid / goblinCampSystem).
+ * Number of living player workers (PlayerUnit entities) in the world. Feeds
+ * kingdomScore, which in turn drives goblin-camp scaling and the raid trigger.
  * Counted globally rather than per-kingdom: the game has a single player kingdom
  * and the raid system already targets player buildings world-wide. PlayerUnit is
  * workers-only (goblins use GoblinUnitComponent), so this never counts enemies.

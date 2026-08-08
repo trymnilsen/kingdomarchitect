@@ -1,9 +1,6 @@
 import type { Entity } from "../entity/entity.ts";
 import type { GraphNode } from "../map/path/graph/graph.ts";
-import {
-    getWeightAtPoint,
-    isTileAvailable,
-} from "../map/path/graph/weight.ts";
+import { getWeightAtPoint, isTileAvailable } from "../map/path/graph/weight.ts";
 import { queryEntity } from "../map/query/queryEntity.ts";
 import { isImpassableStructure } from "../component/traversalComponent.ts";
 import { BuildingComponentId } from "../component/buildingComponent.ts";
@@ -68,7 +65,9 @@ export function goblinSiegeModifier(
             const building = entity.getEcsComponent(BuildingComponentId);
             const health = entity.getEcsComponent(HealthComponentId);
             if (building && health) {
-                return SIEGE_COST_MULTIPLIER * (health.maxHp / STRUCTURE_DAMAGE);
+                return (
+                    SIEGE_COST_MULTIPLIER * (health.maxHp / STRUCTURE_DAMAGE)
+                );
             }
 
             // Impassable and not a destructible building → hard block.

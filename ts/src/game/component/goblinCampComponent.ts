@@ -7,6 +7,12 @@ export type GoblinCampComponent = {
 
     /** Maximum number of goblins this camp can support */
     maxPopulation: number;
+    /**
+     * Kingdom score this camp waits for before its next raid. 0 means it has not
+     * been seeded yet; formGoblinRaid seeds it on the camp's first evaluation,
+     * since the seed depends on where the camp ended up relative to the kingdom.
+     */
+    nextRaidThreshold: number;
 };
 
 export const GoblinCampComponentId = "GoblinCamp";
@@ -20,5 +26,6 @@ export function createGoblinCampComponent(
     return {
         id: GoblinCampComponentId,
         maxPopulation,
+        nextRaidThreshold: 0,
     };
 }

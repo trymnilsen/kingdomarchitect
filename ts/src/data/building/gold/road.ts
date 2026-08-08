@@ -7,4 +7,9 @@ export const road = {
     scale: 4,
     previewScale: 4,
     previewOffset: 0,
+    /**
+     * Never loot and never a raid objective. Paving is infrastructure, not
+     * wealth, so it must not raise the kingdom score that paces raids.
+     */
+    raidValue: 0,
 } as const;

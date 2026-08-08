@@ -6,7 +6,7 @@ import { GoblinCampComponentId } from "../component/goblinCampComponent.ts";
 import { GoblinUnitComponentId } from "../component/goblinUnitComponent.ts";
 import {
     PlayerKingdomComponentId,
-    countPlayerWorkers,
+    findPlayerKingdom,
 } from "../component/playerKingdomComponent.ts";
 import { BuildingComponentId } from "../component/buildingComponent.ts";
 import { FireSourceComponentId } from "../component/fireSourceComponent.ts";
@@ -15,18 +15,34 @@ import {
     RaidingComponentId,
 } from "../component/raidingComponent.ts";
 import { requestReplan } from "../component/BehaviorAgentComponent.ts";
+import { kingdomScoreFromTargets } from "./kingdomScore.ts";
 import {
-    DEFAULT_RAID_VALUE,
+    collectPlayerTargets,
+    type PlayerTarget,
+} from "./playerRaidTargets.ts";
+import {
+    INITIAL_RAID_THRESHOLD_BASE,
     RAIDERS_PER_TARGET,
     RAID_MIN_HOUSES,
-    RAID_POPULATION_FACTOR,
+    RAID_THRESHOLD_DISTANCE_FACTOR,
+    RAID_THRESHOLD_GROWTH,
 } from "./raidConstants.ts";
 
 /**
  * Forms goblin night raids. Called once at the night phase edge
- * (phaseTransitionSystem). For every camp at full population it commits all but
+ * (phaseTransitionSystem). A camp marches when it is mature, full, and the
+ * kingdom has grown rich enough to be worth the walk; it then commits all but
  * one goblin (the fire-tender / defender, chosen as the one closest to the
  * campfire) to a one-way raid, assigning each raider a player-building target.
+ *
+ * Raids are paced by prosperity rather than by a timer. Each camp holds the
+ * kingdom score it is waiting for, and forming a raid restamps that bar above
+ * the score the kingdom had that night. A raid that razes the settlement drops
+ * the score far below the new bar, so the grace period is proportional to the
+ * damage done; a raid that is beaten off leaves the score intact but the bar
+ * standing above it, so the kingdom buys its peace by not growing. A kingdom
+ * that stagnates is left alone, which is the intended bargain: raids are the
+ * tax on prosperity.
  *
  * All raid coordination lives here because this is the only place with a global
  * view of both the warband and the available targets. After this runs, each
@@ -38,8 +54,11 @@ import {
  * "night" so this does not re-fire (the in-flight raid persists via components).
  */
 export function formGoblinRaid(root: Entity): void {
-    const targets = rankedPlayerBuildingTargets(root);
-    const playerPop = countPlayerWorkers(root);
+    // One pass over the player's buildings feeds both halves of the decision:
+    // what there is to take, and how much it is all worth.
+    const playerTargets = collectPlayerTargets(root);
+    const targets = rankedPlayerBuildingTargets(playerTargets);
+    const score = kingdomScoreFromTargets(root, playerTargets);
 
     for (const [campEntity, camp] of root.queryComponents(
         GoblinCampComponentId,
@@ -52,8 +71,8 @@ export function formGoblinRaid(root: Entity): void {
                 !child.hasComponent(RaidingComponentId),
         );
 
-        // Floor: a small camp never raids. This is early-game grace, and it keeps the
-        // raid party from degenerating to 0–1 goblins.
+        // Floor: a small camp never raids, which keeps the raid party from
+        // degenerating to 0-1 goblins.
         if (camp.maxPopulation < RAID_MIN_HOUSES) {
             continue;
         }
@@ -62,11 +81,27 @@ export function formGoblinRaid(root: Entity): void {
         if (present.length < camp.maxPopulation) {
             continue;
         }
-        // Valve: only raid a kingdom large enough relative to the warband
-        // (present ≤ factor × playerPop, i.e. playerPop ≥ present / factor). A
-        // just-wiped kingdom falls below this and is left to rebuild rather
-        // than be snowballed by the camp it already grew.
-        if (present.length > RAID_POPULATION_FACTOR * playerPop) {
+        // Seed the camp's bar the first time it is ever evaluated. It cannot be
+        // set when the camp is built: the prefab entity has no parent yet, so
+        // neither its final position nor the kingdom is reachable from there.
+        if (camp.nextRaidThreshold <= 0) {
+            camp.nextRaidThreshold = initialRaidThreshold(
+                root,
+                campEntity.worldPosition,
+            );
+            campEntity.invalidateComponent(GoblinCampComponentId);
+            // Deliberately falls through to the gate below rather than skipping
+            // the night: a camp seeded under a score it already clears should
+            // march tonight, not a day late.
+        }
+
+        // Prosperity gate: the camp waits until the kingdom is worth the walk.
+        if (score < camp.nextRaidThreshold) {
+            log.debug("Goblin camp full but waiting for a richer kingdom", {
+                campId: campEntity.id,
+                score,
+                threshold: camp.nextRaidThreshold,
+            });
             continue;
         }
 
@@ -103,24 +138,58 @@ export function formGoblinRaid(root: Entity): void {
             requestReplan(raider);
         });
 
+        // Restamp against the score as it stood before the raid lands. The
+        // raiders are about to burn part of that score down, so the gap the
+        // kingdom has to climb back widens with the damage they do. That is the
+        // grace period, not an oversight in the ordering.
+        camp.nextRaidThreshold = score * RAID_THRESHOLD_GROWTH;
+        campEntity.invalidateComponent(GoblinCampComponentId);
+
         log.info("Goblin raid formed", {
             campId: campEntity.id,
             raiders: raiders.length,
-            targets: Math.min(targets.length, Math.ceil(raiders.length / RAIDERS_PER_TARGET)),
+            targets: Math.min(
+                targets.length,
+                Math.ceil(raiders.length / RAIDERS_PER_TARGET),
+            ),
+            score,
+            nextThreshold: camp.nextRaidThreshold,
         });
     }
 }
 
 /**
- * All non-scaffolded player buildings that are valid raid objectives, ranked by
- * raid value (desc), then proximity to the world origin, then id for a stable
- * order. Buildings with an explicit raidValue of 0 (walls, gates) and roads are
- * excluded. They are obstacles handled by the siege path, never objectives.
+ * The given player targets ranked as raid objectives: by raid value (desc), then
+ * proximity to the world origin, then id for a stable order. See
+ * collectPlayerTargets for what counts as worth taking.
  */
-function rankedPlayerBuildingTargets(root: Entity): Entity[] {
-    const candidates = collectPlayerTargets(root);
-    candidates.sort(byRaidPriority({ x: 0, y: 0 }));
-    return candidates.map((candidate) => candidate.entity);
+function rankedPlayerBuildingTargets(candidates: PlayerTarget[]): Entity[] {
+    return [...candidates]
+        .sort(byRaidPriority({ x: 0, y: 0 }))
+        .map((candidate) => candidate.entity);
+}
+
+/**
+ * The bar a camp at this position starts out waiting for, before it has ever
+ * raided. Scaled by distance to the kingdom because every camp reads the same
+ * score: without the spread, the night that score first crosses a shared bar
+ * every eligible camp would march at once. Near camps covet the kingdom sooner;
+ * far ones need a richer prize to make the walk worth it. Derived from world
+ * layout, so it is deterministic with no RNG.
+ *
+ * Exported because it is the camp's opening terms rather than a private detail:
+ * it is what any caller needs to reason about whether a camp will ever march.
+ */
+export function initialRaidThreshold(
+    root: Entity,
+    campPosition: Point,
+): number {
+    const distance = Math.sqrt(
+        squaredDistance(campPosition, kingdomAnchor(root)),
+    );
+    return (
+        INITIAL_RAID_THRESHOLD_BASE + distance * RAID_THRESHOLD_DISTANCE_FACTOR
+    );
 }
 
 /**
@@ -154,8 +223,6 @@ export function findReplacementTarget(
     return candidates[0].entity;
 }
 
-type PlayerTarget = { entity: Entity; value: number };
-
 /**
  * Comparator ranking raid targets: highest raid value first, then closest to
  * `anchor` (squared distance), then id for a stable, deterministic order.
@@ -176,29 +243,14 @@ function byRaidPriority(
     };
 }
 
-function collectPlayerTargets(root: Entity): PlayerTarget[] {
-    const candidates: PlayerTarget[] = [];
-    for (const [entity, building] of root.queryComponents(
-        BuildingComponentId,
-    )) {
-        if (building.scaffolded) {
-            continue;
-        }
-        if (building.building.id === "road") {
-            continue;
-        }
-        if (
-            !getSettlementEntity(entity).hasComponent(PlayerKingdomComponentId)
-        ) {
-            continue;
-        }
-        const value = building.building.raidValue ?? DEFAULT_RAID_VALUE;
-        if (value <= 0) {
-            continue;
-        }
-        candidates.push({ entity, value });
-    }
-    return candidates;
+/**
+ * The point camps measure their distance to when seeding a first raid threshold.
+ * Falls back to the world origin, the same convention rankedPlayerBuildingTargets
+ * uses, and is kept separate from initialRaidThreshold so the anchor can move
+ * without the formula being touched.
+ */
+function kingdomAnchor(root: Entity): Point {
+    return findPlayerKingdom(root)?.worldPosition ?? { x: 0, y: 0 };
 }
 
 function campfireAnchor(campEntity: Entity): Point {

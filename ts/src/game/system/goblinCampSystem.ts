@@ -7,9 +7,9 @@ import {
 } from "../component/goblinCampComponent.ts";
 import { GoblinUnitComponentId } from "../component/goblinUnitComponent.ts";
 import { clamp } from "../../common/number.ts";
-import { countPlayerWorkers } from "../component/playerKingdomComponent.ts";
+import { kingdomScore } from "../raid/kingdomScore.ts";
 import {
-    RAID_POPULATION_FACTOR,
+    CAMP_SIZE_SCORE_DIVISOR,
     GOBLIN_CAMP_MIN_SIZE,
     GOBLIN_HOUSE_CAP,
 } from "../raid/raidConstants.ts";
@@ -44,10 +44,10 @@ import { goblinCampfire } from "../../data/building/goblin/goblinCampfire.ts";
 export const goblinCampSystem: EcsSystem = {
     onUpdate: (root: Entity, _tick: number) => {
         const camps = root.queryComponents(GoblinCampComponentId);
-        const playerPop = countPlayerWorkers(root);
+        const score = kingdomScore(root);
 
         for (const [campEntity, campComponent] of camps) {
-            growCampCap(campEntity, campComponent, playerPop);
+            growCampCap(campEntity, campComponent, score);
             const population = getCampPopulation(root, campEntity.id);
             const hasActiveFire = campHasActiveFire(campEntity);
             const jobQueue = campEntity.getEcsComponent(JobQueueComponentId);
@@ -77,25 +77,23 @@ export const goblinCampSystem: EcsSystem = {
 };
 
 /**
- * Ratchet the camp's size toward the player kingdom: maxPopulation grows to
- * RAID_POPULATION_FACTOR × playerPop, floored at GOBLIN_CAMP_MIN_SIZE so a camp
- * always supports at least one goblin, and capped at GOBLIN_HOUSE_CAP. It never
- * shrinks on its own, so a camp the player provoked stays large even if the
- * player's numbers later fall. The existing expansion/spawning logic then
- * builds huts and goblins up to this cap.
+ * Ratchet the camp's size toward the kingdom's wealth: maxPopulation grows to
+ * roughly score / CAMP_SIZE_SCORE_DIVISOR, floored at GOBLIN_CAMP_MIN_SIZE so a
+ * camp always supports at least one goblin, and capped at GOBLIN_HOUSE_CAP. It
+ * never shrinks on its own, so a camp the player provoked stays large even if
+ * the kingdom later declines. The existing expansion/spawning logic then builds
+ * huts and goblins up to this cap.
  *
- * Math.floor (not round) is load-bearing: the raid valve in formGoblinRaid
- * requires the warband ≤ RAID_POPULATION_FACTOR × playerPop un-rounded, and a
- * camp only raids when full. Rounding up at odd populations would grow the cap
- * past the valve and deadlock raids until the player gains another worker.
+ * Math.floor keeps the cap a whole number of goblins and the result
+ * deterministic across a fractional score.
  */
 function growCampCap(
     campEntity: Entity,
     campComponent: GoblinCampComponent,
-    playerPop: number,
+    score: number,
 ): void {
     const target = clamp(
-        Math.floor(RAID_POPULATION_FACTOR * playerPop),
+        Math.floor(score / CAMP_SIZE_SCORE_DIVISOR),
         GOBLIN_CAMP_MIN_SIZE,
         GOBLIN_HOUSE_CAP,
     );

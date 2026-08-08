@@ -6,7 +6,17 @@ import type { Point } from "../../../src/common/point.ts";
 import { pathfindingSystem } from "../../../src/game/system/pathfindingSystem.ts";
 import { createPhaseTransitionSystem } from "../../../src/game/system/phaseTransitionSystem.ts";
 import { stockpileDestructionSystem } from "../../../src/game/system/stockpileDestructionSystem.ts";
-import { formGoblinRaid } from "../../../src/game/raid/goblinRaid.ts";
+import {
+    formGoblinRaid,
+    initialRaidThreshold,
+} from "../../../src/game/raid/goblinRaid.ts";
+import { kingdomScore } from "../../../src/game/raid/kingdomScore.ts";
+import {
+    CAMP_SIZE_SCORE_DIVISOR,
+    GOBLIN_HOUSE_CAP,
+    RAID_THRESHOLD_GROWTH,
+    WORKER_SCORE,
+} from "../../../src/game/raid/raidConstants.ts";
 import { createRaidBehavior } from "../../../src/game/behavior/behaviors/goblin/raidBehavior.ts";
 import {
     RaidingComponentId,
@@ -76,10 +86,9 @@ function setWarmth(goblin: Entity, value: number): void {
 }
 
 /**
- * Build a goblin camp of 5 goblins and arm it so the population-scaled raid
- * trigger fires: the camp prefab's initial goblin plus four more, clustered
- * around the camp. Defender identity is not controlled here — tests that care
- * about it place goblins explicitly.
+ * Build a goblin camp of 5 goblins and arm every raid gate: the camp prefab's
+ * initial goblin plus four more, clustered around the camp. Defender identity is
+ * not controlled here, so tests that care about it place goblins explicitly.
  */
 function fullCamp(
     harness: ScenarioHarness,
@@ -97,10 +106,26 @@ function fullCamp(
 }
 
 /**
- * Satisfy the population-scaled raid trigger for a camp built directly in a
- * test: mark it "full" (maxPopulation = the goblins currently present) and give
- * the world enough player workers to clear the valve (playerPop ≥ 2 × present).
- * After this the only remaining gate is whether valid targets exist.
+ * Grow the kingdom with workers until it is worth at least `target`. Workers are
+ * the lever because they are the cheapest score to add and need no placement.
+ *
+ * Every setup that has to clear (or stay under) a raid threshold goes through
+ * this rather than a hardcoded worker count, so retuning the threshold constants
+ * cannot break tests that are not about tuning.
+ */
+function enrichKingdomTo(harness: ScenarioHarness, target: number): Entity[] {
+    const deficit = target - kingdomScore(harness.root);
+    if (deficit <= 0) {
+        return [];
+    }
+    return harness.addPlayerUnits(Math.ceil(deficit / WORKER_SCORE));
+}
+
+/**
+ * Satisfy every raid gate for a camp built directly in a test: mark it "full"
+ * (maxPopulation = the goblins currently present) and make the kingdom rich
+ * enough to clear whatever bar this camp will seed for itself. After this the
+ * only remaining gate is whether valid targets exist.
  */
 function armRaid(harness: ScenarioHarness, camp: Entity): void {
     const present = camp.children.filter(
@@ -109,7 +134,82 @@ function armRaid(harness: ScenarioHarness, camp: Entity): void {
             !c.hasComponent(RaidingComponentId),
     ).length;
     camp.getEcsComponent(GoblinCampComponentId)!.maxPopulation = present;
-    harness.addPlayerUnits(present * 2);
+    enrichKingdomTo(
+        harness,
+        initialRaidThreshold(harness.root, camp.worldPosition),
+    );
+}
+
+/** The kingdom score as the raid system sees it. */
+function scoreOf(harness: ScenarioHarness): number {
+    return kingdomScore(harness.root);
+}
+
+/** The threshold a camp is currently waiting for. */
+function thresholdOf(camp: Entity): number {
+    return camp.getEcsComponent(GoblinCampComponentId)!.nextRaidThreshold;
+}
+
+/**
+ * Top a camp back up to its maxPopulation with fresh goblins, so that a test
+ * probing the prosperity gate is not silently blocked by the full-camp gate
+ * instead. Positions are spread along a free row well clear of the camp.
+ */
+function refillCamp(harness: ScenarioHarness, camp: Entity): void {
+    const maxPopulation = camp.getEcsComponent(
+        GoblinCampComponentId,
+    )!.maxPopulation;
+    let offset = 0;
+    while (
+        camp.children.filter(
+            (c) =>
+                c.hasComponent(GoblinUnitComponentId) &&
+                !c.hasComponent(RaidingComponentId),
+        ).length < maxPopulation
+    ) {
+        harness.addGoblinToCamp(camp, { x: 9 + offset, y: 22 });
+        offset++;
+    }
+}
+
+/**
+ * A full, above-floor camp of 5 goblins at the given position, with no workers
+ * added, so a test probing the prosperity gate controls the kingdom score itself.
+ */
+function fullCampAt(harness: ScenarioHarness, campPos: Point): Entity {
+    const { camp } = harness.addGoblinCamp(campPos);
+    for (const p of [
+        { x: campPos.x - 1, y: campPos.y },
+        { x: campPos.x + 1, y: campPos.y },
+        { x: campPos.x, y: campPos.y - 1 },
+        { x: campPos.x - 1, y: campPos.y - 1 },
+    ]) {
+        harness.addGoblinToCamp(camp, p);
+    }
+    camp.getEcsComponent(GoblinCampComponentId)!.maxPopulation = 5;
+    return camp;
+}
+
+/**
+ * The shared starting point for the pacing tests: a full camp at (12,14) facing
+ * a kingdom left exactly one worker short of the bar that camp will seed. A
+ * single addPlayerUnits(1) is then what tips it over, whatever the constants are
+ * currently tuned to.
+ */
+function poorKingdomWithFullCamp(): {
+    harness: ScenarioHarness;
+    kingdom: Entity;
+    camp: Entity;
+} {
+    const harness = new ScenarioHarness();
+    const kingdom = harness.addPlayerKingdom();
+    harness.addPlayerBuilding(kingdom, stockPile, { x: 20, y: 14 }, "stock");
+    const camp = fullCampAt(harness, { x: 12, y: 14 });
+    enrichKingdomTo(
+        harness,
+        initialRaidThreshold(harness.root, camp.worldPosition) - WORKER_SCORE,
+    );
+    return { harness, kingdom, camp };
 }
 
 describe("goblin night raid scenario tests", () => {
@@ -123,7 +223,10 @@ describe("goblin night raid scenario tests", () => {
         // Camp at (12,14): campfire at (12,14), initial goblin at (13,14) [d²=1].
         // Extra goblins placed clearly farther so the initial one is uniquely
         // closest to the fire and is therefore the defender.
-        const { camp, goblin: initial } = harness.addGoblinCamp({ x: 12, y: 14 });
+        const { camp, goblin: initial } = harness.addGoblinCamp({
+            x: 12,
+            y: 14,
+        });
         for (const p of [
             { x: 16, y: 14 },
             { x: 17, y: 14 },
@@ -153,7 +256,10 @@ describe("goblin night raid scenario tests", () => {
         const kingdom = harness.addPlayerKingdom();
         harness.addPlayerBuilding(kingdom, stockPile, { x: 20, y: 14 });
 
-        const { camp, goblin: initial } = harness.addGoblinCamp({ x: 12, y: 14 });
+        const { camp, goblin: initial } = harness.addGoblinCamp({
+            x: 12,
+            y: 14,
+        });
         // Move the prefab goblin far away so it isn't the closest.
         initial.worldPosition = { x: 18, y: 14 };
         // Two goblins equidistant (d²=1) from the campfire at (12,14) → a tie.
@@ -224,39 +330,186 @@ describe("goblin night raid scenario tests", () => {
         );
     });
 
-    it("holds off a small kingdom, then strikes once it grows (valve)", () => {
-        const harness = new ScenarioHarness();
-        const kingdom = harness.addPlayerKingdom();
-        harness.addPlayerBuilding(kingdom, stockPile, { x: 20, y: 14 });
+    it("holds off a poor kingdom, then strikes once it prospers (gate)", () => {
+        const { harness, camp } = poorKingdomWithFullCamp();
 
-        // A full, above-floor camp of 5 goblins.
-        const { camp } = harness.addGoblinCamp({ x: 12, y: 14 });
-        for (const p of [
-            { x: 11, y: 14 },
-            { x: 13, y: 14 },
-            { x: 12, y: 13 },
-            { x: 12, y: 15 },
-        ]) {
-            harness.addGoblinToCamp(camp, p);
-        }
-        camp.getEcsComponent(GoblinCampComponentId)!.maxPopulation = 5;
-
-        // 6 workers: present (5) > 0.5 * 6 = 3 → the valve blocks the raid.
-        harness.addPlayerUnits(6);
         formGoblinRaid(harness.root);
         assert.strictEqual(
             raidersOf(camp).length,
             0,
-            "a kingdom too small for the warband is left to rebuild",
+            "a kingdom not yet worth the walk is left alone",
+        );
+        assert.ok(
+            thresholdOf(camp) > scoreOf(harness),
+            "the camp is waiting on a bar it has already seeded",
         );
 
-        // Grow to 10 workers: present (5) ≤ 0.5 * 10 = 5 → the raid fires.
-        harness.addPlayerUnits(4);
+        // One more worker is all it takes to cross the bar.
+        harness.addPlayerUnits(1);
         formGoblinRaid(harness.root);
         assert.strictEqual(
             raidersOf(camp).length,
             4,
-            "once the kingdom is large enough, the camp raids",
+            "once the kingdom is rich enough, the camp raids",
+        );
+    });
+
+    it("raises its bar above the kingdom it just raided", () => {
+        const { harness, camp } = poorKingdomWithFullCamp();
+        harness.addPlayerUnits(1);
+
+        const scoreAtRaid = scoreOf(harness);
+        formGoblinRaid(harness.root);
+        assert.strictEqual(raidersOf(camp).length, 4, "the raid fires");
+        assert.strictEqual(
+            thresholdOf(camp),
+            scoreAtRaid * RAID_THRESHOLD_GROWTH,
+            "the bar is restamped above the score the kingdom had that night",
+        );
+
+        // Refill so the full-camp gate is not what blocks the next night.
+        refillCamp(harness, camp);
+        const raidersBefore = raidersOf(camp).length;
+        formGoblinRaid(harness.root);
+        assert.strictEqual(
+            raidersOf(camp).length,
+            raidersBefore,
+            "an unchanged kingdom is not raided again the following night",
+        );
+    });
+
+    it("grants a repelled kingdom downtime until it grows past the new bar", () => {
+        const { harness, kingdom, camp } = poorKingdomWithFullCamp();
+        harness.addPlayerUnits(1);
+
+        formGoblinRaid(harness.root);
+        assert.strictEqual(raidersOf(camp).length, 4, "the first raid fires");
+        refillCamp(harness, camp);
+
+        // The raid was beaten off, so the kingdom kept everything it had. Growth
+        // alone is the lever here: climb to one worker short of the new bar.
+        enrichKingdomTo(harness, thresholdOf(camp) - WORKER_SCORE);
+        formGoblinRaid(harness.root);
+        assert.strictEqual(
+            raidersOf(camp).length,
+            4,
+            "just short of the new bar, so no second raid",
+        );
+
+        harness.addPlayerUnits(1);
+        formGoblinRaid(harness.root);
+        assert.strictEqual(
+            raidersOf(camp).length,
+            8,
+            "outgrowing the bar brings the camp back",
+        );
+    });
+
+    it("leaves a razed kingdom alone until it rebuilds past the bar", () => {
+        const { harness, kingdom, camp } = poorKingdomWithFullCamp();
+        harness.addPlayerUnits(1);
+
+        formGoblinRaid(harness.root);
+        assert.strictEqual(raidersOf(camp).length, 4, "the first raid fires");
+        refillCamp(harness, camp);
+
+        // The raid landed: the stockpile is gone, so the score collapses while
+        // the bar stands where it was stamped.
+        harness.root.findEntity("stock")!.remove();
+        assert.ok(
+            scoreOf(harness) < thresholdOf(camp),
+            "razing drops the kingdom back under the camp's bar",
+        );
+        for (let night = 0; night < 5; night++) {
+            formGoblinRaid(harness.root);
+            assert.strictEqual(
+                raidersOf(camp).length,
+                4,
+                "a razed kingdom is given time to rebuild",
+            );
+        }
+
+        // Rebuild the stockpile and grow back past the bar.
+        harness.addPlayerBuilding(kingdom, stockPile, { x: 20, y: 14 }, "s2");
+        enrichKingdomTo(harness, thresholdOf(camp));
+        formGoblinRaid(harness.root);
+        assert.strictEqual(
+            raidersOf(camp).length,
+            8,
+            "once rebuilt past the bar the camp marches again",
+        );
+    });
+
+    it("seeds distant camps with a higher bar than near ones", () => {
+        const harness = new ScenarioHarness();
+        const kingdom = harness.addPlayerKingdom();
+        harness.addPlayerBuilding(
+            kingdom,
+            stockPile,
+            { x: 20, y: 14 },
+            "stock",
+        );
+
+        const near = fullCampAt(harness, { x: 12, y: 14 });
+        const far = fullCampAt(harness, { x: 28, y: 22 });
+        const nearBar = initialRaidThreshold(harness.root, near.worldPosition);
+        const farBar = initialRaidThreshold(harness.root, far.worldPosition);
+        assert.ok(nearBar < farBar, "the formula favours the nearer camp");
+
+        // Under both bars: both camps seed themselves and neither marches.
+        enrichKingdomTo(harness, nearBar - WORKER_SCORE);
+        formGoblinRaid(harness.root);
+        assert.strictEqual(raidersOf(near).length, 0, "the near camp waits");
+        assert.strictEqual(raidersOf(far).length, 0, "the far camp waits");
+        assert.strictEqual(
+            thresholdOf(near),
+            nearBar,
+            "the near camp seeded the bar the formula predicts",
+        );
+        assert.strictEqual(thresholdOf(far), farBar, "and so did the far one");
+
+        // Grow to sit between the two bars.
+        enrichKingdomTo(harness, nearBar);
+        assert.ok(
+            scoreOf(harness) < farBar,
+            "the kingdom is worth the near camp's walk but not the far one's",
+        );
+        formGoblinRaid(harness.root);
+        assert.strictEqual(
+            raidersOf(near).length,
+            4,
+            "the near camp marches first",
+        );
+        assert.strictEqual(
+            raidersOf(far).length,
+            0,
+            "the far camp needs a richer prize",
+        );
+    });
+
+    it("seeds and raids on the same night when the kingdom is already rich", () => {
+        const harness = new ScenarioHarness();
+        const kingdom = harness.addPlayerKingdom();
+        harness.addPlayerBuilding(
+            kingdom,
+            stockPile,
+            { x: 20, y: 14 },
+            "stock",
+        );
+        const { camp } = fullCamp(harness, { x: 12, y: 14 });
+
+        assert.strictEqual(
+            thresholdOf(camp),
+            0,
+            "a fresh camp has not been seeded yet",
+        );
+
+        formGoblinRaid(harness.root);
+
+        assert.strictEqual(
+            raidersOf(camp).length,
+            4,
+            "seeding must not cost the camp its night",
         );
     });
 
@@ -292,62 +545,39 @@ describe("goblin night raid scenario tests", () => {
         );
     });
 
-    it("camp size tracks the player population, caps, and never shrinks", () => {
+    it("camp size tracks kingdom prosperity, caps, and never shrinks", () => {
         const harness = new ScenarioHarness([goblinCampSystem]);
         const { camp } = harness.addGoblinCamp({ x: 12, y: 14 });
         const campComp = camp.getEcsComponent(GoblinCampComponentId)!;
 
-        harness.addPlayerUnits(12); // floor(0.5 * 12) = 6
+        // Worth exactly six goblins, whatever the constants are tuned to.
+        enrichKingdomTo(harness, 6 * CAMP_SIZE_SCORE_DIVISOR);
         harness.tick();
-        assert.strictEqual(campComp.maxPopulation, 6, "tracks 50% of player pop");
+        assert.strictEqual(
+            campComp.maxPopulation,
+            6,
+            "tracks the score divided by the size divisor",
+        );
 
-        const big = harness.addPlayerUnits(40); // 52 total → 26, capped at 10
+        // Rich enough to want more goblins than the hard ceiling allows.
+        const big = enrichKingdomTo(
+            harness,
+            (GOBLIN_HOUSE_CAP + 6) * CAMP_SIZE_SCORE_DIVISOR,
+        );
         harness.tick();
-        assert.strictEqual(campComp.maxPopulation, 10, "capped at the house cap");
+        assert.strictEqual(
+            campComp.maxPopulation,
+            GOBLIN_HOUSE_CAP,
+            "capped at the house cap",
+        );
 
         // Remove the surplus so the computed target falls back to 6.
         for (const u of big) harness.root.removeChild(u);
         harness.tick();
         assert.strictEqual(
             campComp.maxPopulation,
-            10,
-            "camp does not shrink when the player population falls",
-        );
-    });
-
-    it("raids when full at the cap grown from an odd player population", () => {
-        // Pins the invariant between growCampCap and the raid valve: the cap
-        // must never exceed RAID_POPULATION_FACTOR × playerPop, or a full camp
-        // fails the valve and raids deadlock. Math.round(0.5 * 13) = 7 broke
-        // this (7 > 6.5); Math.floor keeps the camp raidable.
-        const harness = new ScenarioHarness([goblinCampSystem]);
-        const kingdom = harness.addPlayerKingdom();
-        harness.addPlayerBuilding(kingdom, stockPile, { x: 20, y: 14 });
-
-        const { camp } = harness.addGoblinCamp({ x: 12, y: 14 });
-        const campComp = camp.getEcsComponent(GoblinCampComponentId)!;
-
-        harness.addPlayerUnits(13);
-        harness.tick();
-        assert.strictEqual(
-            campComp.maxPopulation,
-            6,
-            "cap stays at or below the valve threshold (floor(0.5 * 13))",
-        );
-
-        // Fill the camp to its cap (the prefab spawned the first goblin).
-        let offset = 0;
-        while (goblinsOf(camp).length < campComp.maxPopulation) {
-            harness.addGoblinToCamp(camp, { x: 10 - offset, y: 14 });
-            offset++;
-        }
-
-        formGoblinRaid(harness.root);
-
-        assert.strictEqual(
-            raidersOf(camp).length,
-            campComp.maxPopulation - 1,
-            "a full camp grown at an odd player population raids",
+            GOBLIN_HOUSE_CAP,
+            "camp does not shrink when the kingdom declines",
         );
     });
 
@@ -417,10 +647,7 @@ describe("goblin night raid scenario tests", () => {
         fullCamp(harness, { x: 12, y: 14 });
 
         formGoblinRaid(harness.root);
-        harness.tickUntil(
-            (root) => root.findEntity("target") === null,
-            150,
-        );
+        harness.tickUntil((root) => root.findEntity("target") === null, 150);
 
         assert.strictEqual(
             harness.root.findEntity("target"),
@@ -446,7 +673,12 @@ describe("goblin night raid scenario tests", () => {
             { x: 21, y: 15 },
         ];
         for (const p of ring) {
-            harness.addPlayerBuilding(kingdom, stoneWall, p, `wall-${p.x}-${p.y}`);
+            harness.addPlayerBuilding(
+                kingdom,
+                stoneWall,
+                p,
+                `wall-${p.x}-${p.y}`,
+            );
         }
         fullCamp(harness, { x: 12, y: 14 });
 
@@ -626,7 +858,10 @@ describe("goblin night raid scenario tests", () => {
             "B",
             "the raider re-targeted the remaining building",
         );
-        assert.ok(hp(harness.root.findEntity("B")!) < 100, "B is taking damage");
+        assert.ok(
+            hp(harness.root.findEntity("B")!) < 100,
+            "B is taking damage",
+        );
     });
 
     it("stops raiding when no buildings remain", () => {

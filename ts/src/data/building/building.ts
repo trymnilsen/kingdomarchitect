@@ -49,12 +49,17 @@ export type Building = {
     light?: string;
     requirements?: BuildingRequirements;
     /**
-     * How attractive this building is as a goblin raid objective. Higher values
-     * are razed first. Goblin raiders rank player buildings by this when forming
-     * a raid (see formGoblinRaid). Omitted → a base value (DEFAULT_RAID_VALUE) is
-     * used. Set to 0 for things that should never be a raid *objective* (walls,
-     * gates, roads); those are still broken through as obstacles by the siege
-     * path when they block the route, just never chosen as a target.
+     * What this building is worth to a goblin, which drives two things at once.
+     * Raiders rank player buildings by it when forming a raid (see
+     * formGoblinRaid), razing the highest first; and kingdomScore sums it across
+     * the settlement to decide how often camps raid at all. Omitted → a base
+     * value (DEFAULT_RAID_VALUE) is used.
+     *
+     * Set to 0 for things that are neither loot nor an objective (walls, gates,
+     * roads). Those add nothing to the score, so fortifying does not raise the
+     * threat level, and they are still broken through as obstacles by the siege
+     * path when they block the route. Changing this number therefore retunes
+     * raid pacing as well as targeting; do not treat it as cosmetic.
      */
     raidValue?: number;
 };
