@@ -179,7 +179,7 @@ describe("equipCommandPlanner", () => {
         it("uses pickupFromGround when source is a ground pile", () => {
             const { root, worker } = createScene();
             const pile = new Entity("ground-pile");
-            pile.setEcsComponent(createGroundItemComponent());
+            pile.setEcsComponent(createGroundItemComponent(1));
             const collectable = createCollectableComponent([
                 { item: swordItem, amount: 1 },
             ]);

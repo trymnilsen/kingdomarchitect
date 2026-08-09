@@ -2,10 +2,12 @@ import type { Entity } from "../entity/entity.ts";
 import { BuildingComponentId } from "../component/buildingComponent.ts";
 import { ResourceComponentId } from "../component/resourceComponent.ts";
 import { ProductionComponentId } from "../component/productionComponent.ts";
+import { getInventoryItemById } from "../../data/inventory/inventoryItemHelpers.ts";
 import { getResourceById } from "../../data/inventory/items/naturalResource.ts";
 import { getProductionDefinition } from "../../data/production/productionDefinition.ts";
 import type { Jobs } from "./job.ts";
 import type { CraftingJob } from "./craftingJob.ts";
+import type { CollectItemJob } from "./collectItemJob.ts";
 import type { CollectResourceJob } from "./collectResourceJob.ts";
 import type { BuildBuildingJob } from "./buildBuildingJob.ts";
 import type { ProductionJob } from "./productionJob.ts";
@@ -43,8 +45,10 @@ export function getJobDisplayName(root: Entity, job: Jobs): string | null {
             const resource = getResourceById(resourceComp.resourceId);
             return resource ? `Collect ${resource.name}` : "Collect resource";
         }
-        case "collectItem":
-            return "Collect item";
+        case "collectItem": {
+            const item = getInventoryItemById((job as CollectItemJob).itemId);
+            return item ? `Collect ${item.name}` : "Collect item";
+        }
         case "productionJob": {
             const prodJob = job as ProductionJob;
             const prodEntity = root.findEntity(prodJob.targetBuilding);

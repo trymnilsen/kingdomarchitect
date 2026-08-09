@@ -10,7 +10,7 @@ import { MoveToJob } from "../../../../src/game/job/moveToPointJob.ts";
 
 describe("QueueJobCommand", () => {
     it("creates command with correct id", () => {
-        const job = CollectItemJob(new Entity("target"));
+        const job = CollectItemJob(new Entity("target"), "wood");
 
         const command = QueueJobCommand(job);
 
@@ -20,7 +20,7 @@ describe("QueueJobCommand", () => {
 
     it("stores job in command", () => {
         const targetEntity = new Entity("chest1");
-        const job = CollectItemJob(targetEntity);
+        const job = CollectItemJob(targetEntity, "wood");
 
         const command = QueueJobCommand(job);
 
@@ -29,7 +29,7 @@ describe("QueueJobCommand", () => {
     });
 
     it("works with different job types", () => {
-        const collectJob = CollectItemJob(new Entity("chest"));
+        const collectJob = CollectItemJob(new Entity("chest"), "wood");
         const moveJob = MoveToJob(new Entity("worker"), { x: 5, y: 7 });
 
         const collectCommand = QueueJobCommand(collectJob);
@@ -40,7 +40,7 @@ describe("QueueJobCommand", () => {
     });
 
     it("preserves job claimedBy", () => {
-        const job = CollectItemJob(new Entity("target"));
+        const job = CollectItemJob(new Entity("target"), "wood");
         job.claimedBy = "worker-1";
 
         const command = QueueJobCommand(job);

@@ -31,12 +31,10 @@ const bookSubtitleStyle = {
 export type CraftingViewProps = {
     recipes: readonly CraftingRecipe[];
     selectedRecipeIndex: number;
-    hasCollectableItems: boolean;
     /** Count of all queued jobs (claimed + unclaimed) for the selected recipe. */
     queuedCountForRecipe: number;
     onRecipeSelected: (index: number) => void;
     onCraft: () => void;
-    onCollect: () => void;
     onCancelOneJob: () => void;
 };
 
@@ -259,19 +257,14 @@ export const craftingView = createComponent<CraftingViewProps>(
             }),
         });
 
-        // Determine button configuration
-        let leftButtons: { text: string; onClick: () => void }[];
-
-        if (props.hasCollectableItems) {
-            leftButtons = [{ text: "Collect", onClick: props.onCollect }];
-        } else {
-            leftButtons = [{ text: "+ Craft", onClick: props.onCraft }];
-            if (props.queuedCountForRecipe > 0) {
-                leftButtons.push({
-                    text: "- Cancel",
-                    onClick: props.onCancelOneJob,
-                });
-            }
+        const leftButtons: { text: string; onClick: () => void }[] = [
+            { text: "+ Craft", onClick: props.onCraft },
+        ];
+        if (props.queuedCountForRecipe > 0) {
+            leftButtons.push({
+                text: "- Cancel",
+                onClick: props.onCancelOneJob,
+            });
         }
 
         return uiScaffold({

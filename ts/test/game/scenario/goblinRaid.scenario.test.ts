@@ -5,7 +5,10 @@ import type { Entity } from "../../../src/game/entity/entity.ts";
 import type { Point } from "../../../src/common/point.ts";
 import { pathfindingSystem } from "../../../src/game/system/pathfindingSystem.ts";
 import { createPhaseTransitionSystem } from "../../../src/game/system/phaseTransitionSystem.ts";
-import { stockpileDestructionSystem } from "../../../src/game/system/stockpileDestructionSystem.ts";
+import { createInventorySpillSystem } from "../../../src/game/system/inventorySpillSystem.ts";
+import { GameTime } from "../../../src/game/gameTime.ts";
+import { CollectableComponentId } from "../../../src/game/component/collectableComponent.ts";
+import { GroundItemComponentId } from "../../../src/game/component/groundItemComponent.ts";
 import {
     formGoblinRaid,
     initialRaidThreshold,
@@ -896,10 +899,10 @@ describe("goblin night raid scenario tests", () => {
 
     // --- Integration with adjacent systems ---
 
-    it("razing a stockpile removes it and its stored contents", () => {
+    it("razing a stockpile spills its contents onto the ground", () => {
         const harness = new ScenarioHarness([
             pathfindingSystem,
-            stockpileDestructionSystem,
+            createInventorySpillSystem(new GameTime()),
         ]);
         const kingdom = harness.addPlayerKingdom();
         const store = harness.addPlayerBuilding(
@@ -921,8 +924,23 @@ describe("goblin night raid scenario tests", () => {
         assert.strictEqual(
             harness.root.findEntity("store"),
             null,
-            "the stockpile (and its inventory) is gone",
+            "the stockpile itself is gone",
         );
+
+        // The wood survives the raid on the ground: losing the building should
+        // cost the player the hauling, not the resources.
+        let wood = 0;
+        for (const [entity, collectable] of harness.root.queryComponents(
+            CollectableComponentId,
+        )) {
+            if (!entity.hasComponent(GroundItemComponentId)) continue;
+            for (const stack of collectable.items) {
+                if (stack.item.id === woodResourceItem.id) {
+                    wood += stack.amount;
+                }
+            }
+        }
+        assert.strictEqual(wood, 25, "all 25 wood is lying in the yard");
     });
 
     it("forms the raid when the night phase begins", () => {

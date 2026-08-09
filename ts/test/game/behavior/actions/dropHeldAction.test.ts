@@ -26,7 +26,7 @@ function setupScene(): { root: Entity; worker: Entity } {
 describe("dropHeldAction", () => {
     it("returns complete with no work when held is empty", () => {
         const { worker } = setupScene();
-        const result = executeDropHeldAction({ type: "dropHeld" }, worker);
+        const result = executeDropHeldAction({ type: "dropHeld" }, worker, 1);
         assert.strictEqual(result.kind, "complete");
     });
 
@@ -36,7 +36,7 @@ describe("dropHeldAction", () => {
         held.item = woodResourceItem;
         held.amount = 4;
 
-        const result = executeDropHeldAction({ type: "dropHeld" }, worker);
+        const result = executeDropHeldAction({ type: "dropHeld" }, worker, 1);
         assert.strictEqual(result.kind, "complete");
         assert.strictEqual(held.item, null);
         assert.strictEqual(held.amount, 0);
@@ -59,6 +59,7 @@ describe("dropHeldAction", () => {
         const result = executeDropHeldAction(
             { type: "dropHeld", destination: { x: 99, y: 99 } },
             worker,
+            1,
         );
         assert.strictEqual(result.kind, "failed");
         assert.strictEqual(held.amount, 1);

@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 import { Entity } from "../../../src/game/entity/entity.ts";
 import { createChunkMapComponent } from "../../../src/game/component/chunkMapComponent.ts";
 import { createCommandSystem } from "../../../src/game/system/commandSystem.ts";
+import { GameTime } from "../../../src/game/gameTime.ts";
 import { PersistenceManager } from "../../../src/server/persistence/persistenceManager.ts";
 import { TestAdapter } from "../persistence/testAdapter.ts";
 import {
@@ -110,9 +111,12 @@ describe("commandSystem", () => {
             const { root, playerKingdom } = createRootWithKingdom();
             const persistenceManager = createTestPersistenceManager();
 
-            const system = createCommandSystem(persistenceManager);
+            const system = createCommandSystem(
+                persistenceManager,
+                new GameTime(),
+            );
 
-            const job = CollectItemJob(new Entity("target"));
+            const job = CollectItemJob(new Entity("target"), "wood");
             const message: CommandGameMessage = {
                 type: CommandGameMessageType,
                 command: {
@@ -152,10 +156,13 @@ describe("commandSystem", () => {
 
             const queue =
                 playerKingdom.requireEcsComponent(JobQueueComponentId);
-            addJob(queue, CollectItemJob(entityA));
-            addJob(queue, CollectItemJob(entityB));
+            addJob(queue, CollectItemJob(entityA, "wood"));
+            addJob(queue, CollectItemJob(entityB, "wood"));
 
-            const system = createCommandSystem(createTestPersistenceManager());
+            const system = createCommandSystem(
+                createTestPersistenceManager(),
+                new GameTime(),
+            );
 
             return { root, playerKingdom, entityA, entityB, system };
         }
@@ -248,7 +255,10 @@ describe("commandSystem", () => {
             entity.setEcsComponent(createBehaviorAgentComponent());
             root.addChild(entity);
 
-            const system = createCommandSystem(persistenceManager);
+            const system = createCommandSystem(
+                persistenceManager,
+                new GameTime(),
+            );
 
             const message: CommandGameMessage = {
                 type: CommandGameMessageType,
@@ -277,7 +287,10 @@ describe("commandSystem", () => {
             const root = new Entity("root");
             const persistenceManager = createTestPersistenceManager();
 
-            const system = createCommandSystem(persistenceManager);
+            const system = createCommandSystem(
+                persistenceManager,
+                new GameTime(),
+            );
 
             const message: CommandGameMessage = {
                 type: CommandGameMessageType,
@@ -300,7 +313,10 @@ describe("commandSystem", () => {
             const { root, playerKingdom } = createRootWithKingdom();
             const persistenceManager = createTestPersistenceManager();
 
-            const system = createCommandSystem(persistenceManager);
+            const system = createCommandSystem(
+                persistenceManager,
+                new GameTime(),
+            );
 
             const message: CommandGameMessage = {
                 type: CommandGameMessageType,
@@ -328,7 +344,10 @@ describe("commandSystem", () => {
             const { root, playerKingdom } = createRootWithKingdom();
             const persistenceManager = createTestPersistenceManager();
 
-            const system = createCommandSystem(persistenceManager);
+            const system = createCommandSystem(
+                persistenceManager,
+                new GameTime(),
+            );
 
             const message: CommandGameMessage = {
                 type: CommandGameMessageType,
@@ -359,7 +378,10 @@ describe("commandSystem", () => {
             const { root, playerKingdom } = createRootWithKingdom();
             const persistenceManager = createTestPersistenceManager();
 
-            const system = createCommandSystem(persistenceManager);
+            const system = createCommandSystem(
+                persistenceManager,
+                new GameTime(),
+            );
 
             const message: CommandGameMessage = {
                 type: CommandGameMessageType,
@@ -393,7 +415,10 @@ describe("commandSystem", () => {
             workplace.setEcsComponent(workplaceComponent);
             root.addChild(workplace);
 
-            const system = createCommandSystem(persistenceManager);
+            const system = createCommandSystem(
+                persistenceManager,
+                new GameTime(),
+            );
 
             const message: CommandGameMessage = {
                 type: CommandGameMessageType,
@@ -435,7 +460,10 @@ describe("commandSystem", () => {
             workplace.setEcsComponent(workplaceComponent);
             root.addChild(workplace);
 
-            const system = createCommandSystem(persistenceManager);
+            const system = createCommandSystem(
+                persistenceManager,
+                new GameTime(),
+            );
 
             const message: CommandGameMessage = {
                 type: CommandGameMessageType,
@@ -470,7 +498,10 @@ describe("commandSystem", () => {
             workplace.setEcsComponent(workplaceComponent);
             root.addChild(workplace);
 
-            const system = createCommandSystem(persistenceManager);
+            const system = createCommandSystem(
+                persistenceManager,
+                new GameTime(),
+            );
 
             const message: CommandGameMessage = {
                 type: CommandGameMessageType,
@@ -496,7 +527,10 @@ describe("commandSystem", () => {
             worker.setEcsComponent(occupation);
             root.addChild(worker);
 
-            const system = createCommandSystem(persistenceManager);
+            const system = createCommandSystem(
+                persistenceManager,
+                new GameTime(),
+            );
 
             const message: CommandGameMessage = {
                 type: CommandGameMessageType,
@@ -524,7 +558,10 @@ describe("commandSystem", () => {
             agent.setEcsComponent(behaviorAgent);
             root.addChild(agent);
 
-            const system = createCommandSystem(persistenceManager);
+            const system = createCommandSystem(
+                persistenceManager,
+                new GameTime(),
+            );
 
             const message: CommandGameMessage = {
                 type: CommandGameMessageType,
@@ -562,7 +599,10 @@ describe("commandSystem", () => {
             agent.setEcsComponent(behaviorAgent);
             root.addChild(agent);
 
-            const system = createCommandSystem(persistenceManager);
+            const system = createCommandSystem(
+                persistenceManager,
+                new GameTime(),
+            );
 
             const message: CommandGameMessage = {
                 type: CommandGameMessageType,
@@ -591,7 +631,10 @@ describe("commandSystem", () => {
             const root = new Entity("root");
             const persistenceManager = createTestPersistenceManager();
 
-            const system = createCommandSystem(persistenceManager);
+            const system = createCommandSystem(
+                persistenceManager,
+                new GameTime(),
+            );
 
             const message: CommandGameMessage = {
                 type: CommandGameMessageType,
@@ -617,7 +660,10 @@ describe("commandSystem", () => {
             // No BehaviorAgentComponent
             root.addChild(agent);
 
-            const system = createCommandSystem(persistenceManager);
+            const system = createCommandSystem(
+                persistenceManager,
+                new GameTime(),
+            );
 
             const message: CommandGameMessage = {
                 type: CommandGameMessageType,
@@ -644,7 +690,10 @@ describe("commandSystem", () => {
             const jobQueue = createJobQueueComponent();
             root.setEcsComponent(jobQueue);
 
-            const system = createCommandSystem(persistenceManager);
+            const system = createCommandSystem(
+                persistenceManager,
+                new GameTime(),
+            );
 
             // Send a non-command message
             const message = {
@@ -673,7 +722,10 @@ describe("commandSystem", () => {
             worker.setEcsComponent(roleComponent);
             root.addChild(worker);
 
-            const system = createCommandSystem(persistenceManager);
+            const system = createCommandSystem(
+                persistenceManager,
+                new GameTime(),
+            );
 
             const message: CommandGameMessage = {
                 type: CommandGameMessageType,
@@ -695,7 +747,10 @@ describe("commandSystem", () => {
             const root = new Entity("root");
             const persistenceManager = createTestPersistenceManager();
 
-            const system = createCommandSystem(persistenceManager);
+            const system = createCommandSystem(
+                persistenceManager,
+                new GameTime(),
+            );
 
             const message: CommandGameMessage = {
                 type: CommandGameMessageType,
@@ -718,7 +773,10 @@ describe("commandSystem", () => {
             // No role component
             root.addChild(worker);
 
-            const system = createCommandSystem(persistenceManager);
+            const system = createCommandSystem(
+                persistenceManager,
+                new GameTime(),
+            );
 
             const message: CommandGameMessage = {
                 type: CommandGameMessageType,
@@ -742,7 +800,10 @@ describe("commandSystem", () => {
             worker.setEcsComponent(roleComponent);
             root.addChild(worker);
 
-            const system = createCommandSystem(persistenceManager);
+            const system = createCommandSystem(
+                persistenceManager,
+                new GameTime(),
+            );
 
             const roles = [
                 WorkerRole.Worker,
@@ -783,7 +844,10 @@ describe("commandSystem", () => {
             worker.setEcsComponent(roleComponent);
             root.addChild(worker);
 
-            const system = createCommandSystem(persistenceManager);
+            const system = createCommandSystem(
+                persistenceManager,
+                new GameTime(),
+            );
 
             const message: CommandGameMessage = {
                 type: CommandGameMessageType,
@@ -811,7 +875,10 @@ describe("commandSystem", () => {
             worker.setEcsComponent(roleComponent);
             root.addChild(worker);
 
-            const system = createCommandSystem(persistenceManager);
+            const system = createCommandSystem(
+                persistenceManager,
+                new GameTime(),
+            );
 
             const message: CommandGameMessage = {
                 type: CommandGameMessageType,
@@ -833,7 +900,10 @@ describe("commandSystem", () => {
             const root = new Entity("root");
             const persistenceManager = createTestPersistenceManager();
 
-            const system = createCommandSystem(persistenceManager);
+            const system = createCommandSystem(
+                persistenceManager,
+                new GameTime(),
+            );
 
             const message: CommandGameMessage = {
                 type: CommandGameMessageType,
@@ -856,7 +926,10 @@ describe("commandSystem", () => {
             // No role component
             root.addChild(worker);
 
-            const system = createCommandSystem(persistenceManager);
+            const system = createCommandSystem(
+                persistenceManager,
+                new GameTime(),
+            );
 
             const message: CommandGameMessage = {
                 type: CommandGameMessageType,
@@ -879,7 +952,10 @@ describe("commandSystem", () => {
             farm.setEcsComponent(createFarmComponent("wheat"));
             root.addChild(farm);
 
-            const system = createCommandSystem(createTestPersistenceManager());
+            const system = createCommandSystem(
+                createTestPersistenceManager(),
+                new GameTime(),
+            );
 
             const message: CommandGameMessage = {
                 type: CommandGameMessageType,
@@ -907,7 +983,10 @@ describe("commandSystem", () => {
             farm.setEcsComponent(farmComponent);
             root.addChild(farm);
 
-            const system = createCommandSystem(createTestPersistenceManager());
+            const system = createCommandSystem(
+                createTestPersistenceManager(),
+                new GameTime(),
+            );
 
             const message: CommandGameMessage = {
                 type: CommandGameMessageType,
@@ -932,7 +1011,10 @@ describe("commandSystem", () => {
             // No farm component
             root.addChild(building);
 
-            const system = createCommandSystem(createTestPersistenceManager());
+            const system = createCommandSystem(
+                createTestPersistenceManager(),
+                new GameTime(),
+            );
 
             const message: CommandGameMessage = {
                 type: CommandGameMessageType,

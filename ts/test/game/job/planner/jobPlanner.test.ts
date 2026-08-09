@@ -8,6 +8,8 @@ import { CollectItemJob } from "../../../../src/game/job/collectItemJob.ts";
 import { MoveToJob } from "../../../../src/game/job/moveToPointJob.ts";
 import { ResourceHarvestMode } from "../../../../src/data/inventory/items/naturalResource.ts";
 import { createJobQueueComponent } from "../../../../src/game/component/jobQueueComponent.ts";
+import { createCollectableComponent } from "../../../../src/game/component/collectableComponent.ts";
+import { woodResourceItem } from "../../../../src/data/inventory/items/resources.ts";
 import { createInventoryComponent } from "../../../../src/game/component/inventoryComponent.ts";
 import { createProductionComponent } from "../../../../src/game/component/productionComponent.ts";
 import { createChunkMapComponent } from "../../../../src/game/component/chunkMapComponent.ts";
@@ -71,9 +73,12 @@ describe("jobPlanner", () => {
         const { root, worker } = createTestScene();
         const chest = new Entity("chest");
         chest.worldPosition = { x: 15, y: 13 };
+        chest.setEcsComponent(
+            createCollectableComponent([{ item: woodResourceItem, amount: 3 }]),
+        );
         root.addChild(chest);
 
-        const job = CollectItemJob(chest);
+        const job = CollectItemJob(chest, woodResourceItem.id);
         const actions = planJob(root, worker, job, () => []);
 
         assert.strictEqual(actions.length, 2);

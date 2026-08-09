@@ -22,6 +22,7 @@ export type DropFromSlotActionData = {
 export function executeDropFromSlotAction(
     action: DropFromSlotActionData,
     entity: Entity,
+    tick: number,
 ): ActionResult {
     const equipment = entity.getEcsComponent(EquipmentComponentId);
     if (!equipment) {
@@ -43,14 +44,21 @@ export function executeDropFromSlotAction(
     }
 
     const root = entity.getRootEntity();
-    dropItemAtPosition(
+    const placed = dropItemAtPosition(
         root,
+        tick,
         action.destination,
         slotItem,
         1,
         `Evicted ${slotItem.name} from ${action.slot} slot to equip a different item`,
         DropMode.Nearest,
     );
+    if (!placed) {
+        // Emptying the slot after a refused placement would delete the item.
+        // Keep it equipped and fail; dropItemAtPosition logged why.
+        return { kind: "failed", cause: { type: "unknown" } };
+    }
+
     equipment.slots[action.slot] = null;
 
     entity.invalidateComponent(EquipmentComponentId);

@@ -17,12 +17,17 @@ import { zeroPoint } from "../../common/point.ts";
  * queries can identify world-loose item piles distinctly from other
  * collectables (chests, etc.).
  *
+ * A pile holds a single stack of a single item type — several types on one tile
+ * are several piles — which is what lets each one decay on its own clock and be
+ * hauled by its own worker.
+ *
  * `reason` records why this pile was dropped and is stored on the collectable
  * component for debugging (shown in the selection tile).
  */
 export function collectableItemPrefab(
     item: InventoryItem,
     quantity: number,
+    droppedAtTick: number,
     reason?: string,
 ): Entity {
     const entity = new Entity(generateId("collectable"));
@@ -32,7 +37,7 @@ export function collectableItemPrefab(
     entity.setEcsComponent(
         createCollectableComponent([{ item, amount: quantity }], reason),
     );
-    entity.setEcsComponent(createGroundItemComponent());
+    entity.setEcsComponent(createGroundItemComponent(droppedAtTick));
 
     const frames = spriteDefinitions[item.asset.spriteId]?.[SPRITE_FRAMES] ?? 1;
     if (frames > 1) {

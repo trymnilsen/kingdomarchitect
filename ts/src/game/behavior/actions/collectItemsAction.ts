@@ -4,25 +4,28 @@ import {
     CollectableComponentId,
     removeCollectableItems,
 } from "../../component/collectableComponent.ts";
-import { BuildingComponentId } from "../../component/buildingComponent.ts";
+import { GroundItemComponentId } from "../../component/groundItemComponent.ts";
 import { completeClaimedJob } from "../../job/jobLifecycle.ts";
 
 import {
     addToHeldItem,
+    canAddToHeld,
     HeldItemComponentId,
-    isHeldEmpty,
 } from "../../component/heldItemComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { ActionComplete, type ActionResult } from "./Action.ts";
 
-export type CollectItemsActionData = { type: "collectItems"; entityId: string };
+export type CollectItemsActionData = {
+    type: "collectItems";
+    entityId: string;
+    itemId: string;
+};
 
 /**
- * Collect items from an entity with a CollectableComponent into the
- * worker's held slot. Held is a single-item-id slot, so this can only
- * transfer items matching held's existing item id (or any single item id
- * when held is empty). The remainder stays on the collectable; callers
- * can re-trigger the job to collect the rest after dropping held.
+ * Move one named stack from an entity with a CollectableComponent into the
+ * worker's held slot. Which type to take is decided when the job is created,
+ * not here — the job says what the work is, and this action carries it out.
+ * Any other stacks on the target are somebody else's job and are left alone.
  *
  * Assumes worker is already adjacent to target (moveTo should have run first).
  */
@@ -54,42 +57,41 @@ export function executeCollectItemsAction(
         return { kind: "failed", cause: { type: "unknown" } };
     }
 
-    if (collectableComponent.items.length === 0) {
+    const stack = collectableComponent.items.find(
+        (candidate) => candidate.item.id === action.itemId,
+    );
+
+    if (!stack) {
+        // Another worker got here first between planning and arriving. The
+        // point of the job was that this stack be hauled, and it has been —
+        // so the job is done, not failed.
         completeClaimedJob(entity);
         return ActionComplete;
     }
 
     const held = entity.requireEcsComponent(HeldItemComponentId);
-
-    // Pick which item id we are willing to take this trip.
-    let acceptedItemId: string;
-    if (!isHeldEmpty(held)) {
-        acceptedItemId = held.item!.id;
-    } else {
-        acceptedItemId = collectableComponent.items[0].item.id;
+    if (!canAddToHeld(held, stack.item)) {
+        // The planner deposits whatever the worker is carrying before a collect
+        // job (see jobsRequiringEmptyHeld), so arriving with an incompatible
+        // load means that deposit did not happen. Say so and replan rather than
+        // let addToHeldItem throw.
+        log.warn(
+            `Worker ${entity.id} cannot carry ${stack.item.id}, held has ${held.item?.id}`,
+        );
+        return { kind: "failed", cause: { type: "unknown" } };
     }
 
-    const transferred: {
-        item: (typeof collectableComponent.items)[number]["item"];
-        amount: number;
-    }[] = [];
-    for (const stack of collectableComponent.items) {
-        if (stack.item.id !== acceptedItemId) continue;
-        addToHeldItem(held, stack.item, stack.amount);
-        transferred.push({ item: stack.item, amount: stack.amount });
-    }
+    addToHeldItem(held, stack.item, stack.amount);
+    removeCollectableItems(collectableComponent, [stack]);
+    entity.invalidateComponent(HeldItemComponentId);
+    targetEntity.invalidateComponent(CollectableComponentId);
 
-    if (transferred.length > 0) {
-        removeCollectableItems(collectableComponent, transferred);
-        entity.invalidateComponent(HeldItemComponentId);
-        targetEntity.invalidateComponent(CollectableComponentId);
-    }
-
-    // Only remove the entity if it was fully drained AND it is not part of
-    // a building (chest-style collectables on buildings should persist).
+    // A ground pile exists only to hold its stack, so it goes when the stack
+    // does. Anything else carrying a collectable owns its own lifetime and is
+    // not ours to remove.
     if (
         collectableComponent.items.length === 0 &&
-        !targetEntity.hasComponent(BuildingComponentId)
+        targetEntity.hasComponent(GroundItemComponentId)
     ) {
         targetEntity.remove();
     }

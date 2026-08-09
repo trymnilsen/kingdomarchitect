@@ -115,7 +115,11 @@ describe("BehaviorSystem", () => {
 
             // Queue an action that will fail (collectItems on nonexistent entity)
             agent.actionQueue = [
-                { type: "collectItems", entityId: "nonexistent" },
+                {
+                    type: "collectItems",
+                    entityId: "nonexistent",
+                    itemId: "wood",
+                },
                 { type: "wait", until: 100 },
             ];
             agent.currentBehaviorName = "test";
@@ -133,7 +137,11 @@ describe("BehaviorSystem", () => {
             const agent = worker.getEcsComponent(BehaviorAgentComponentId)!;
 
             agent.actionQueue = [
-                { type: "collectItems", entityId: "nonexistent" },
+                {
+                    type: "collectItems",
+                    entityId: "nonexistent",
+                    itemId: "wood",
+                },
             ];
             agent.currentBehaviorName = "testBehavior";
             agent.pendingReplan = undefined;
@@ -149,7 +157,11 @@ describe("BehaviorSystem", () => {
             const agent = worker.getEcsComponent(BehaviorAgentComponentId)!;
 
             agent.actionQueue = [
-                { type: "collectItems", entityId: "nonexistent" },
+                {
+                    type: "collectItems",
+                    entityId: "nonexistent",
+                    itemId: "wood",
+                },
             ];
             agent.currentBehaviorName = "test";
             agent.pendingReplan = undefined;
@@ -168,11 +180,20 @@ describe("BehaviorSystem", () => {
 
             // Add a job claimed by the worker
             jobQueue.jobs = [
-                { id: "collectItem", entityId: "chest", claimedBy: "worker" },
+                {
+                    id: "collectItem",
+                    entityId: "chest",
+                    itemId: "wood",
+                    claimedBy: "worker",
+                },
             ];
 
             agent.actionQueue = [
-                { type: "collectItems", entityId: "nonexistent" },
+                {
+                    type: "collectItems",
+                    entityId: "nonexistent",
+                    itemId: "wood",
+                },
             ];
             agent.currentBehaviorName = "test";
             agent.pendingReplan = undefined;
@@ -436,7 +457,11 @@ describe("BehaviorSystem", () => {
 
             // An action that fails (collectItems on a nonexistent entity).
             agent.actionQueue = [
-                { type: "collectItems", entityId: "nonexistent" },
+                {
+                    type: "collectItems",
+                    entityId: "nonexistent",
+                    itemId: "wood",
+                },
             ];
             agent.currentBehaviorName = "test";
             agent.hysteresis = { behaviorName: "test" };

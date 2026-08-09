@@ -27,6 +27,7 @@ export type DismantleBuildingActionData = {
 export function executeDismantleBuildingAction(
     action: DismantleBuildingActionData,
     entity: Entity,
+    tick: number,
 ): ActionResult {
     const root = entity.getRootEntity();
     const buildingEntity = root.findEntity(action.entityId);
@@ -68,7 +69,7 @@ export function executeDismantleBuildingAction(
     buildingEntity.invalidateComponent(HealthComponentId);
 
     if (healthComponent.currentHp <= 0) {
-        finishDismantle(root, buildingEntity);
+        finishDismantle(root, tick, buildingEntity);
         const queueEntity = entity.getAncestorEntity(JobQueueComponentId);
         if (queueEntity) {
             const job = findJobClaimedBy(queueEntity, entity.id);

@@ -61,6 +61,7 @@ export function buildBuilding(root: Entity, command: BuildCommand) {
 
 export function dismantleBuilding(
     root: Entity,
+    tick: number,
     command: DismantleBuildingCommand,
 ) {
     const building = root.findEntity(command.buildingId);
@@ -112,7 +113,7 @@ export function dismantleBuilding(
         if (hp <= 0) {
             // An untouched scaffold has nothing built into it yet, so it can go
             // away immediately.
-            cancelScaffold(root, building);
+            cancelScaffold(root, tick, building);
             return;
         }
     }

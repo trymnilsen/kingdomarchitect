@@ -33,14 +33,19 @@ export function hasCollectableItems(component: CollectableComponent): boolean {
 }
 
 /**
- * Add an item to the collectable items
+ * Add an item to the collectable items.
+ *
+ * Stacks are keyed by item id rather than by object identity. Item definitions
+ * are meant to be shared singletons, but callers that hand over a copy would
+ * otherwise silently append a second stack of the same id, breaking the
+ * one-stack-per-item-id invariant that collect jobs address their work by.
  */
 export function addCollectableItem(
     component: CollectableComponent,
     item: InventoryItemQuantity,
 ): void {
     // Check if we already have this item type, if so combine
-    const existing = component.items.find((i) => i.item === item.item);
+    const existing = component.items.find((i) => i.item.id === item.item.id);
     if (existing) {
         existing.amount += item.amount;
     } else {
@@ -74,7 +79,8 @@ export function collectAllItems(
 
 /**
  * Remove specific items from the collectable component
- * Used when collecting partial amounts
+ * Used when collecting partial amounts. Matches by item id, mirroring
+ * addCollectableItem.
  */
 export function removeCollectableItems(
     component: CollectableComponent,
@@ -82,7 +88,7 @@ export function removeCollectableItems(
 ): void {
     for (const toRemove of itemsToRemove) {
         const index = component.items.findIndex(
-            (i) => i.item === toRemove.item,
+            (i) => i.item.id === toRemove.item.id,
         );
         if (index === -1) continue;
 

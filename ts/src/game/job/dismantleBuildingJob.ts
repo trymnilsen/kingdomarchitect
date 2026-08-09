@@ -6,7 +6,6 @@ import {
     BuildingComponentId,
     type BuildingComponent,
 } from "../component/buildingComponent.ts";
-import { InventoryComponentId } from "../component/inventoryComponent.ts";
 import {
     JobQueueComponentId,
     type JobQueueComponent,
@@ -14,6 +13,7 @@ import {
 import { OccupationComponentId } from "../component/occupationComponent.ts";
 import { WorkplaceComponentId } from "../component/workplaceComponent.ts";
 import { DropMode, dropItemAtPosition } from "../behavior/dropItem.ts";
+import { scatterInventory } from "../behavior/scatterInventory.ts";
 import type { Entity } from "../entity/entity.ts";
 import { getSettlementEntity } from "../entity/settlementQueries.ts";
 import {
@@ -67,17 +67,21 @@ export function hasDismantleJobForBuilding(
  * remove the entity. Branches on whether the building was completed or still a
  * scaffold (which holds only its deposited construction materials).
  */
-export function finishDismantle(root: Entity, buildingEntity: Entity): void {
+export function finishDismantle(
+    root: Entity,
+    tick: number,
+    buildingEntity: Entity,
+): void {
     const buildingComponent =
         buildingEntity.getEcsComponent(BuildingComponentId);
     const position = { ...buildingEntity.worldPosition };
 
     // Drop whatever sits in the building's inventory: deposited construction
     // materials for a scaffold, stored goods for a completed building.
-    scatterInventory(root, buildingEntity);
+    scatterBuildingStorage(root, tick, buildingEntity);
 
     if (buildingComponent && !buildingComponent.scaffolded) {
-        refundConstructionMaterials(root, buildingComponent, position);
+        refundConstructionMaterials(root, tick, buildingComponent, position);
         evictWorkers(root, buildingEntity);
         // Tenant needs no handling: removing the building drops its
         // HousingComponent, and housingSystem rehouses the worker next tick.
@@ -96,8 +100,12 @@ export function finishDismantle(root: Entity, buildingEntity: Entity): void {
  * Instantly cancel an untouched (0 HP) scaffold: scatter any materials that
  * were already delivered and remove the entity. No worker, no HP draining.
  */
-export function cancelScaffold(root: Entity, buildingEntity: Entity): void {
-    scatterInventory(root, buildingEntity);
+export function cancelScaffold(
+    root: Entity,
+    tick: number,
+    buildingEntity: Entity,
+): void {
+    scatterBuildingStorage(root, tick, buildingEntity);
 
     const buildingComponent =
         buildingEntity.getEcsComponent(BuildingComponentId);
@@ -154,36 +162,26 @@ export function stopConstruction(
     }
 }
 
-function scatterInventory(root: Entity, buildingEntity: Entity): void {
-    const inventory = buildingEntity.getEcsComponent(InventoryComponentId);
-    if (!inventory) {
-        return;
-    }
-
+function scatterBuildingStorage(
+    root: Entity,
+    tick: number,
+    buildingEntity: Entity,
+): void {
     const buildingName =
         buildingEntity.getEcsComponent(BuildingComponentId)?.building.name ??
         "building";
 
-    for (const stack of [...inventory.items]) {
-        if (stack.amount <= 0) {
-            continue;
-        }
-        dropItemAtPosition(
-            root,
-            buildingEntity.worldPosition,
-            structuredClone(stack.item),
-            stack.amount,
-            `${stack.item.name} scattered from dismantled ${buildingName}'s storage`,
-            DropMode.Nearest,
-        );
-    }
-
-    // No invalidate / clear: the building entity is removed right after, which
-    // tears down its components anyway.
+    scatterInventory(
+        root,
+        tick,
+        buildingEntity,
+        `scattered from dismantled ${buildingName}'s storage`,
+    );
 }
 
 function refundConstructionMaterials(
     root: Entity,
+    tick: number,
     buildingComponent: BuildingComponent,
     position: Point,
 ): void {
@@ -207,8 +205,9 @@ function refundConstructionMaterials(
         }
         dropItemAtPosition(
             root,
+            tick,
             position,
-            structuredClone(item),
+            item,
             refund,
             `${item.name} refunded from dismantling ${buildingComponent.building.name}`,
             DropMode.Nearest,

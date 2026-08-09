@@ -5,12 +5,7 @@ import {
     CraftingComponentId,
     type CraftingComponent,
 } from "../../../component/craftingComponent.ts";
-import {
-    CollectableComponentId,
-    hasCollectableItems,
-} from "../../../component/collectableComponent.ts";
 import { craftingView } from "./craftingView.ts";
-import { CollectItemJob } from "../../../job/collectItemJob.ts";
 import { createCraftingJob } from "../../../job/craftingJob.ts";
 import { QueueJobCommand } from "../../../../server/message/command/queueJobCommand.ts";
 import {
@@ -32,10 +27,6 @@ export class CraftWithBuildingState extends InteractionState {
     }
 
     override getView(): ComponentDescriptor | null {
-        const collectableComponent = this._buildingEntity.getEcsComponent(
-            CollectableComponentId,
-        );
-
         const selectedRecipe =
             this._craftingComponent.recipes[this._selectedRecipeIndex];
         const allJobs = getCraftingJobsForBuilding(this._buildingEntity);
@@ -46,18 +37,12 @@ export class CraftWithBuildingState extends InteractionState {
         return craftingView({
             recipes: this._craftingComponent.recipes,
             selectedRecipeIndex: this._selectedRecipeIndex,
-            hasCollectableItems:
-                collectableComponent !== null &&
-                hasCollectableItems(collectableComponent),
             queuedCountForRecipe,
             onRecipeSelected: (index: number) => {
                 this._selectedRecipeIndex = index;
             },
             onCraft: () => {
                 this.onCraft();
-            },
-            onCollect: () => {
-                this.onCollect();
             },
             onCancelOneJob: () => {
                 this.onCancelOneJob();
@@ -105,12 +90,5 @@ export class CraftWithBuildingState extends InteractionState {
             this._buildingEntity.id,
             selectedRecipe.id,
         );
-    }
-
-    private onCollect() {
-        // Queue a job for a worker to collect items from this building
-        const job = CollectItemJob(this._buildingEntity);
-        this.context.commandDispatcher(QueueJobCommand(job));
-        this.context.stateChanger.pop();
     }
 }

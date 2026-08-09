@@ -6,7 +6,7 @@ import {
     hasCollectableItems,
 } from "../../../../../component/collectableComponent.ts";
 import { GroundItemComponentId } from "../../../../../component/groundItemComponent.ts";
-import { CollectItemJob } from "../../../../../job/collectItemJob.ts";
+import { collectJobsForEntity } from "../../../../../job/collectJobsForEntity.ts";
 import { EquipUnitSelectionState } from "../../../equip/equipUnitSelectionState.ts";
 import { type StateContext } from "../../../../handler/stateContext.ts";
 import { SelectedEntityItem } from "../../../../selection/selectedEntityItem.ts";
@@ -37,9 +37,14 @@ export class CollectableProvider implements ActorSelectionProvider {
                 text: "Collect",
                 icon: spriteRefs.empty_sprite,
                 onClick: () => {
-                    stateContext.commandDispatcher(
-                        QueueJobCommand(CollectItemJob(selection.entity)),
+                    const entity = selection.entity;
+                    const jobs = collectJobsForEntity(
+                        entity.getRootEntity(),
+                        entity,
                     );
+                    for (const job of jobs) {
+                        stateContext.commandDispatcher(QueueJobCommand(job));
+                    }
                     stateContext.stateChanger.clear();
                 },
             },

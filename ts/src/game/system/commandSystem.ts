@@ -1,5 +1,6 @@
 import type { EcsSystem } from "../../ecs/ecsSystem.ts";
 import { log } from "../../common/logging/logger.ts";
+import type { GameTime } from "../gameTime.ts";
 import {
     BuildCommandId,
     type BuildCommand,
@@ -117,10 +118,11 @@ import {
  */
 export function createCommandSystem(
     persistenceManager: PersistenceManager,
+    gameTime: GameTime,
 ): EcsSystem {
     return {
         onGameMessage: (root, message) =>
-            onGameMessage(root, message, persistenceManager),
+            onGameMessage(root, message, persistenceManager, gameTime.tick),
     };
 }
 
@@ -128,6 +130,7 @@ function onGameMessage(
     root: Entity,
     message: GameMessage,
     persistenceManager: PersistenceManager,
+    tick: number,
 ) {
     if (message.type != CommandGameMessageType) return;
     log.info("command", { command: message.command });
@@ -200,6 +203,7 @@ function onGameMessage(
         case DismantleBuildingCommandId:
             dismantleBuilding(
                 root,
+                tick,
                 message.command as DismantleBuildingCommand,
             );
             break;

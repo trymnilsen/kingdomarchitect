@@ -31,6 +31,7 @@ const CLEAR_DAMAGE_PER_TICK = 10;
 export function executeClearObstacleAction(
     action: ClearObstacleActionData,
     entity: Entity,
+    tick: number,
 ): ActionResult {
     const root = entity.getRootEntity();
     const resourceEntity = root.findEntity(action.entityId);
@@ -65,7 +66,7 @@ export function executeClearObstacleAction(
     const healthComponent = resourceEntity.getEcsComponent(HealthComponentId);
     if (!healthComponent) {
         // Nothing to whittle down — just remove it to clear the way.
-        scatterYields(root, resourceEntity);
+        scatterYields(root, tick, resourceEntity);
         resourceEntity.remove();
         return ActionComplete;
     }
@@ -75,7 +76,7 @@ export function executeClearObstacleAction(
     spendEntityEnergy(entity, 2);
 
     if (healthComponent.currentHp <= 0) {
-        scatterYields(root, resourceEntity);
+        scatterYields(root, tick, resourceEntity);
         resourceEntity.remove();
         return ActionComplete;
     }
@@ -88,7 +89,11 @@ export function executeClearObstacleAction(
  * resource tile itself is impassable, so DropMode.Nearest places the piles on
  * adjacent walkable tiles.
  */
-function scatterYields(root: Entity, resourceEntity: Entity): void {
+function scatterYields(
+    root: Entity,
+    tick: number,
+    resourceEntity: Entity,
+): void {
     const resourceComponent =
         resourceEntity.getEcsComponent(ResourceComponentId);
     if (!resourceComponent) return;
@@ -99,8 +104,9 @@ function scatterYields(root: Entity, resourceEntity: Entity): void {
     for (const yieldItem of resource.yields) {
         dropItemAtPosition(
             root,
+            tick,
             resourceEntity.worldPosition,
-            structuredClone(yieldItem.item),
+            yieldItem.item,
             yieldItem.amount,
             `${yieldItem.item.name} yielded from clearing ${resource.name}`,
             DropMode.Nearest,

@@ -25,7 +25,7 @@ function createScene(): { root: Entity; worker: Entity; pile: Entity } {
     const pile = new Entity("pile");
     pile.worldPosition = { x: 6, y: 5 };
     pile.setEcsComponent(createCollectableComponent());
-    pile.setEcsComponent(createGroundItemComponent());
+    pile.setEcsComponent(createGroundItemComponent(1));
 
     root.addChild(worker);
     root.addChild(pile);

@@ -11,8 +11,9 @@ import { createBehaviorSystem } from "../game/behavior/systems/BehaviorSystem.ts
 import { createBehaviorResolver } from "../game/behavior/behaviorResolver.ts";
 import { warmthSystem } from "../game/system/warmthSystem.ts";
 import { goblinCampSystem } from "../game/system/goblinCampSystem.ts";
-import { lootDropSystem } from "../game/system/lootDropSystem.ts";
-import { stockpileDestructionSystem } from "../game/system/stockpileDestructionSystem.ts";
+import { createLootDropSystem } from "../game/system/lootDropSystem.ts";
+import { createInventorySpillSystem } from "../game/system/inventorySpillSystem.ts";
+import { groundItemDecaySystem } from "../game/system/groundItemDecaySystem.ts";
 
 import {
     buildWorldStateMessage,
@@ -229,11 +230,14 @@ export class GameServer {
         this.world.addSystem(hungerSystem);
         this.world.addSystem(warmthSystem);
         this.world.addSystem(goblinCampSystem);
-        this.world.addSystem(lootDropSystem);
-        this.world.addSystem(stockpileDestructionSystem);
+        this.world.addSystem(createLootDropSystem(this.gameTime));
+        this.world.addSystem(createInventorySpillSystem(this.gameTime));
+        this.world.addSystem(groundItemDecaySystem);
         this.world.addSystem(worldGenerationSystem);
         this.world.addSystem(createPhaseTransitionSystem());
-        this.world.addSystem(createCommandSystem(this.persistenceManager));
+        this.world.addSystem(
+            createCommandSystem(this.persistenceManager, this.gameTime),
+        );
         this.world.addSystem(housingSystem);
         this.world.addSystem(watchSystem);
         this.world.addSystem(regrowSystem);

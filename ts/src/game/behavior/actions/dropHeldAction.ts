@@ -33,6 +33,7 @@ export type DropHeldActionData = {
 export function executeDropHeldAction(
     action: DropHeldActionData,
     entity: Entity,
+    tick: number,
 ): ActionResult {
     const held = entity.getEcsComponent(HeldItemComponentId);
     if (!held || isHeldEmpty(held)) {
@@ -54,13 +55,20 @@ export function executeDropHeldAction(
     const root = entity.getRootEntity();
     const item = held.item!;
     const amount = held.amount;
-    dropItemAtPosition(
+    const placed = dropItemAtPosition(
         root,
+        tick,
         dropPos,
         item,
         amount,
         action.reason ?? `Dropped ${item.name}`,
     );
+    if (!placed) {
+        // Clearing held after a refused placement would delete the goods. Fail
+        // instead and let the worker replan; dropItemAtPosition logged why.
+        return { kind: "failed", cause: { type: "unknown" } };
+    }
+
     clearHeldItem(held);
     entity.invalidateComponent(HeldItemComponentId);
 

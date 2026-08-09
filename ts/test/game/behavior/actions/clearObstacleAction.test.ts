@@ -43,6 +43,7 @@ describe("clearObstacleAction", () => {
         const result = executeClearObstacleAction(
             { type: "clearObstacle", entityId: "resource" },
             worker,
+            1,
         );
 
         assert.strictEqual(result.kind, "running");
@@ -57,6 +58,7 @@ describe("clearObstacleAction", () => {
         const result = executeClearObstacleAction(
             { type: "clearObstacle", entityId: "resource" },
             worker,
+            1,
         );
 
         assert.strictEqual(result.kind, "complete");
@@ -82,6 +84,7 @@ describe("clearObstacleAction", () => {
         executeClearObstacleAction(
             { type: "clearObstacle", entityId: "resource" },
             worker,
+            1,
         );
 
         const held = worker.getEcsComponent(HeldItemComponentId)!;
@@ -94,6 +97,7 @@ describe("clearObstacleAction", () => {
         const result = executeClearObstacleAction(
             { type: "clearObstacle", entityId: "missing" },
             worker,
+            1,
         );
 
         assert.strictEqual(result.kind, "complete");
@@ -106,6 +110,7 @@ describe("clearObstacleAction", () => {
         const result = executeClearObstacleAction(
             { type: "clearObstacle", entityId: "resource" },
             worker,
+            1,
         );
 
         assert.strictEqual(result.kind, "failed");
@@ -121,6 +126,7 @@ describe("clearObstacleAction", () => {
         const result = executeClearObstacleAction(
             { type: "clearObstacle", entityId: "resource" },
             worker,
+            1,
         );
 
         assert.strictEqual(result.kind, "failed");

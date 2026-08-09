@@ -129,7 +129,7 @@ describe("finishDismantle", () => {
         jobQueue.jobs.push(createProductionJob("otherBuilding"));
         jobQueue.jobs.push(createDismantleBuildingJob(building.id));
 
-        finishDismantle(root, building);
+        finishDismantle(root, 1, building);
 
         // Entity removed from the tree.
         assert.ok(

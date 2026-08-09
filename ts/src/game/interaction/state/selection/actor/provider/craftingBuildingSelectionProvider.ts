@@ -8,14 +8,8 @@ import {
 import { SelectedEntityItem } from "../../../../selection/selectedEntityItem.ts";
 import { BuildingComponentId } from "../../../../../component/buildingComponent.ts";
 import { CraftingComponentId } from "../../../../../component/craftingComponent.ts";
-import {
-    CollectableComponentId,
-    hasCollectableItems,
-} from "../../../../../component/collectableComponent.ts";
 import { spriteRefs } from "../../../../../../asset/sprite.ts";
 import { CraftWithBuildingState } from "../../../crafting/craftWithBuildingState.ts";
-import { CollectItemJob } from "../../../../../job/collectItemJob.ts";
-import { QueueJobCommand } from "../../../../../../server/message/command/queueJobCommand.ts";
 import { InventoryState } from "../../../root/inventory/inventoryState.ts";
 import { singleInventoryFilter } from "../../../../../building/stockFilter.ts";
 
@@ -31,67 +25,37 @@ export class CraftingBuildingSelectionProvider implements ActorSelectionProvider
                 selection.entity.getEcsComponent(CraftingComponentId);
 
             if (buildingComponent && craftingComponent) {
-                const collectableComponent = selection.entity.getEcsComponent(
-                    CollectableComponentId,
-                );
-                const hasItems =
-                    collectableComponent !== null &&
-                    hasCollectableItems(collectableComponent);
-
-                const inventory = {
-                    text: "Ledger",
-                    icon: spriteRefs.empty_sprite,
-                    onClick: () => {
-                        stateContext.stateChanger.push(
-                            new InventoryState(
-                                selection.entity,
-                                singleInventoryFilter(
-                                    selection.entity.id,
-                                    "This building",
-                                ),
-                            ),
-                        );
-                    },
-                };
-
-                if (hasItems) {
-                    return {
-                        left: [
-                            {
-                                text: "Collect",
-                                icon: spriteRefs.empty_sprite,
-                                onClick: () => {
-                                    const job = CollectItemJob(
+                return {
+                    left: [
+                        {
+                            text: "Craft",
+                            icon: spriteRefs.empty_sprite,
+                            onClick: () => {
+                                stateContext.stateChanger.replace(
+                                    new CraftWithBuildingState(
                                         selection.entity,
-                                    );
-                                    stateContext.commandDispatcher(
-                                        QueueJobCommand(job),
-                                    );
-                                },
+                                    ),
+                                );
                             },
-                            inventory,
-                        ],
-                        right: [],
-                    };
-                } else {
-                    return {
-                        left: [
-                            {
-                                text: "Craft",
-                                icon: spriteRefs.empty_sprite,
-                                onClick: () => {
-                                    stateContext.stateChanger.replace(
-                                        new CraftWithBuildingState(
-                                            selection.entity,
+                        },
+                        {
+                            text: "Ledger",
+                            icon: spriteRefs.empty_sprite,
+                            onClick: () => {
+                                stateContext.stateChanger.push(
+                                    new InventoryState(
+                                        selection.entity,
+                                        singleInventoryFilter(
+                                            selection.entity.id,
+                                            "This building",
                                         ),
-                                    );
-                                },
+                                    ),
+                                );
                             },
-                            inventory,
-                        ],
-                        right: [],
-                    };
-                }
+                        },
+                    ],
+                    right: [],
+                };
             }
         }
 

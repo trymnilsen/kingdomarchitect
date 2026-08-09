@@ -63,11 +63,11 @@ export const executeAction: BehaviorActionExecutor = (
         case "harvestResource":
             return executeHarvestResourceAction(action, entity, tick);
         case "clearObstacle":
-            return executeClearObstacleAction(action, entity);
+            return executeClearObstacleAction(action, entity, tick);
         case "constructBuilding":
             return executeConstructBuildingAction(action, entity);
         case "dismantleBuilding":
-            return executeDismantleBuildingAction(action, entity);
+            return executeDismantleBuildingAction(action, entity, tick);
         case "takeFromInventory":
             return executeTakeFromInventoryAction(action, entity);
         case "depositToInventory":
@@ -99,13 +99,13 @@ export const executeAction: BehaviorActionExecutor = (
         case "workWindmill":
             return executeWorkWindmillAction(action, entity, tick);
         case "dropHeld":
-            return executeDropHeldAction(action, entity);
+            return executeDropHeldAction(action, entity, tick);
         case "pickupFromGround":
             return executePickupFromGroundAction(action, entity);
         case "equipFromHeld":
             return executeEquipFromHeldAction(action, entity);
         case "dropFromSlot":
-            return executeDropFromSlotAction(action, entity);
+            return executeDropFromSlotAction(action, entity, tick);
         default:
             log.warn(`Unknown action type: ${(action as any).type}`);
             return { kind: "failed", cause: { type: "unknown" } };

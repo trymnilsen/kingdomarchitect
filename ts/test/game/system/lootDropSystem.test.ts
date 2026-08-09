@@ -12,12 +12,13 @@ import {
     CollectableComponentId,
     hasCollectableItems,
 } from "../../../src/game/component/collectableComponent.ts";
-import { lootDropSystem } from "../../../src/game/system/lootDropSystem.ts";
+import { createLootDropSystem } from "../../../src/game/system/lootDropSystem.ts";
+import { GameTime } from "../../../src/game/gameTime.ts";
 
 describe("lootDropSystem", () => {
     it("spawns a collectable entity when a goblin is killed", () => {
         const { root, world } = createMinimalWorld();
-        world.addSystem(lootDropSystem);
+        world.addSystem(createLootDropSystem(new GameTime()));
 
         const settlement = new Entity("settlement");
         settlement.setEcsComponent(createPlayerKingdomComponent());
@@ -47,7 +48,7 @@ describe("lootDropSystem", () => {
 
     it("does not spawn loot when a non-goblin entity dies", () => {
         const { root, world } = createMinimalWorld();
-        world.addSystem(lootDropSystem);
+        world.addSystem(createLootDropSystem(new GameTime()));
 
         const unit = new Entity("unit-1");
         unit.setEcsComponent(createHealthComponent(10, 10));
