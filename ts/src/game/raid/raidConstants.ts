@@ -73,28 +73,17 @@ export const INITIAL_RAID_THRESHOLD_BASE = 280;
 export const RAID_THRESHOLD_DISTANCE_FACTOR = 2;
 
 /**
- * Kingdom score needed per goblin a camp can support, so its cap is roughly
- * score / 80. Calibrated to preserve the old sizing: a mid-game kingdom of 6
- * workers, 3 houses and a stockpile scores 400 and yields a cap of 5.
- */
-export const CAMP_SIZE_SCORE_DIVISOR = 80;
-
-/**
  * Camps below this size never raid, which keeps a raid party from degenerating
- * to 0–1 goblins. The early-game grace period lives in
- * INITIAL_RAID_THRESHOLD_BASE, not here.
+ * to 0–1 goblins. The camp size table (campSizeSteps) is anchored to it: a camp
+ * sits at RAID_MIN_HOUSES - 1 until the kingdom crosses the first raid
+ * threshold, so the floor is structural rather than a safety net. The
+ * early-game grace period lives in INITIAL_RAID_THRESHOLD_BASE, not here.
  */
 export const RAID_MIN_HOUSES = 3;
 
 /**
- * A camp always supports at least this many goblins, even with no kingdom score
- * to size against — so a camp is never sized to 0 and always sustains its lone
- * starting goblin. Kept below RAID_MIN_HOUSES so a minimum-size camp never raids.
+ * A fresh camp starts out supporting this many goblins, just its lone starting
+ * goblin, until goblinCampSystem sizes it from the camp size table. Kept below
+ * RAID_MIN_HOUSES so a minimum-size camp never raids.
  */
 export const GOBLIN_CAMP_MIN_SIZE = 1;
-
-/**
- * Hard ceiling on a camp's tracked size, so a large kingdom can't drive an
- * unbounded goblin force (building footprint, perf, winnability).
- */
-export const GOBLIN_HOUSE_CAP = 10;

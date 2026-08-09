@@ -15,11 +15,11 @@ import {
 } from "../../../src/game/raid/goblinRaid.ts";
 import { kingdomScore } from "../../../src/game/raid/kingdomScore.ts";
 import {
-    CAMP_SIZE_SCORE_DIVISOR,
-    GOBLIN_HOUSE_CAP,
+    RAID_MIN_HOUSES,
     RAID_THRESHOLD_GROWTH,
     WORKER_SCORE,
 } from "../../../src/game/raid/raidConstants.ts";
+import { campSizeSteps } from "../../../src/game/raid/campSize.ts";
 import { createRaidBehavior } from "../../../src/game/behavior/behaviors/goblin/raidBehavior.ts";
 import {
     RaidingComponentId,
@@ -548,40 +548,86 @@ describe("goblin night raid scenario tests", () => {
         );
     });
 
-    it("camp size tracks kingdom prosperity, caps, and never shrinks", () => {
+    it("camp size steps up the size table, caps, and never shrinks", () => {
         const harness = new ScenarioHarness([goblinCampSystem]);
         const { camp } = harness.addGoblinCamp({ x: 12, y: 14 });
         const campComp = camp.getEcsComponent(GoblinCampComponentId)!;
 
-        // Worth exactly six goblins, whatever the constants are tuned to.
-        enrichKingdomTo(harness, 6 * CAMP_SIZE_SCORE_DIVISOR);
+        const raidCapableStep = campSizeSteps[1];
+        const lastStep = campSizeSteps[campSizeSteps.length - 1];
+
+        // Below the first raid threshold the camp sits one goblin short of the
+        // raid floor, so it can never march early.
+        enrichKingdomTo(harness, raidCapableStep.atScore - WORKER_SCORE);
         harness.tick();
         assert.strictEqual(
             campComp.maxPopulation,
-            6,
-            "tracks the score divided by the size divisor",
+            RAID_MIN_HOUSES - 1,
+            "a camp facing a poor kingdom stays below the raid floor",
         );
 
-        // Rich enough to want more goblins than the hard ceiling allows.
+        // Crossing the threshold makes the camp raid-capable. This is the
+        // calibration that sizes the first raid party at RAID_MIN_HOUSES - 1.
+        harness.addPlayerUnits(1);
+        harness.tick();
+        assert.strictEqual(
+            campComp.maxPopulation,
+            RAID_MIN_HOUSES,
+            "the camp becomes raid-capable at the first raid threshold",
+        );
+
+        // Rich enough to reach past the last step: the table is the ceiling.
         const big = enrichKingdomTo(
             harness,
-            (GOBLIN_HOUSE_CAP + 6) * CAMP_SIZE_SCORE_DIVISOR,
+            lastStep.atScore + 10 * WORKER_SCORE,
         );
         harness.tick();
         assert.strictEqual(
             campComp.maxPopulation,
-            GOBLIN_HOUSE_CAP,
-            "capped at the house cap",
+            lastStep.size,
+            "capped at the last step of the size table",
         );
 
-        // Remove the surplus so the computed target falls back to 6.
+        // Remove the surplus so the computed target falls back down.
         for (const u of big) harness.root.removeChild(u);
         harness.tick();
         assert.strictEqual(
             campComp.maxPopulation,
-            GOBLIN_HOUSE_CAP,
+            lastStep.size,
             "camp does not shrink when the kingdom declines",
         );
+    });
+
+    it("sizes the first raid party from the table, not the kingdom's wealth", () => {
+        const harness = new ScenarioHarness([goblinCampSystem]);
+        const kingdom = harness.addPlayerKingdom();
+        harness.addPlayerBuilding(kingdom, stockPile, { x: 20, y: 14 });
+        const { camp } = harness.addGoblinCamp({ x: 12, y: 14 });
+        const campComp = camp.getEcsComponent(GoblinCampComponentId)!;
+
+        // Rich enough to clear the bar this camp will seed for itself.
+        enrichKingdomTo(
+            harness,
+            initialRaidThreshold(harness.root, camp.worldPosition),
+        );
+        harness.tick();
+        assert.strictEqual(
+            campComp.maxPopulation,
+            RAID_MIN_HOUSES,
+            "at the raid threshold the camp is sized to the raid floor",
+        );
+
+        // Fill the camp to its small cap; the prefab supplied the first goblin.
+        harness.addGoblinToCamp(camp, { x: 11, y: 14 });
+        harness.addGoblinToCamp(camp, { x: 13, y: 15 });
+        formGoblinRaid(harness.root);
+
+        assert.strictEqual(
+            raidersOf(camp).length,
+            RAID_MIN_HOUSES - 1,
+            "the first raid is a small party, one below the camp size",
+        );
+        assert.ok(defenderOf(camp), "one goblin stays home as defender");
     });
 
     it("does not raid when there are no valid player buildings", () => {

@@ -6,13 +6,8 @@ import {
     type GoblinCampComponent,
 } from "../component/goblinCampComponent.ts";
 import { GoblinUnitComponentId } from "../component/goblinUnitComponent.ts";
-import { clamp } from "../../common/number.ts";
 import { kingdomScore } from "../raid/kingdomScore.ts";
-import {
-    CAMP_SIZE_SCORE_DIVISOR,
-    GOBLIN_CAMP_MIN_SIZE,
-    GOBLIN_HOUSE_CAP,
-} from "../raid/raidConstants.ts";
+import { campSizeForScore } from "../raid/campSize.ts";
 import { HousingComponentId } from "../component/housingComponent.ts";
 import { FireSourceComponentId } from "../component/fireSourceComponent.ts";
 import { BuildingComponentId } from "../component/buildingComponent.ts";
@@ -77,26 +72,20 @@ export const goblinCampSystem: EcsSystem = {
 };
 
 /**
- * Ratchet the camp's size toward the kingdom's wealth: maxPopulation grows to
- * roughly score / CAMP_SIZE_SCORE_DIVISOR, floored at GOBLIN_CAMP_MIN_SIZE so a
- * camp always supports at least one goblin, and capped at GOBLIN_HOUSE_CAP. It
- * never shrinks on its own, so a camp the player provoked stays large even if
- * the kingdom later declines. The existing expansion/spawning logic then builds
- * huts and goblins up to this cap.
- *
- * Math.floor keeps the cap a whole number of goblins and the result
- * deterministic across a fractional score.
+ * Ratchet the camp's size toward the step the kingdom's wealth has reached in
+ * the camp size table (campSizeSteps). The table lags well behind the kingdom:
+ * the camp sits one goblin below the raid floor until the kingdom crosses the
+ * first raid threshold, becomes raid-capable exactly there, and steps up only
+ * as the kingdom grows much richer. The cap never shrinks on its own, so a
+ * camp the player provoked stays large even if the kingdom later declines. The
+ * existing expansion/spawning logic then builds huts and goblins up to this cap.
  */
 function growCampCap(
     campEntity: Entity,
     campComponent: GoblinCampComponent,
     score: number,
 ): void {
-    const target = clamp(
-        Math.floor(score / CAMP_SIZE_SCORE_DIVISOR),
-        GOBLIN_CAMP_MIN_SIZE,
-        GOBLIN_HOUSE_CAP,
-    );
+    const target = campSizeForScore(score);
     if (target > campComponent.maxPopulation) {
         campComponent.maxPopulation = target;
         campEntity.invalidateComponent(GoblinCampComponentId);

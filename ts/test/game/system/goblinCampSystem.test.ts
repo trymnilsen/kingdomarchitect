@@ -227,19 +227,22 @@ describe("goblinCampSystem spawning", () => {
 
         it("does not spawn when at max population", () => {
             const root = new Entity("root");
-            const camp = createTestCamp("camp-1", 1);
+            setupWorldComponents(root);
+            // The camp size table sizes any camp with no kingdom to raid up to
+            // its base of 2, so "at max population" means 2 goblins present.
+            const camp = createTestCamp("camp-1", 2);
             const campfire = createTestCampfire();
-            const existingGoblin = createTestGoblin("camp-1", "goblin-1");
             const hut = createTestHut();
 
             camp.addChild(campfire);
-            camp.addChild(existingGoblin);
+            camp.addChild(createTestGoblin("camp-1", "goblin-1"));
+            camp.addChild(createTestGoblin("camp-1", "goblin-2"));
             camp.addChild(hut);
             root.addChild(camp);
 
             goblinCampSystem.onUpdate!(root, 1);
 
-            assert.strictEqual(countGoblinsInCamp(root, "camp-1"), 1);
+            assert.strictEqual(countGoblinsInCamp(root, "camp-1"), 2);
         });
 
         it("does not spawn into a scaffolded hut", () => {
