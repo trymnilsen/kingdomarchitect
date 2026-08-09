@@ -13,6 +13,7 @@ import {
     getTopThreat,
     ThreatMapComponentId,
 } from "../../component/threatMapComponent.ts";
+import { getGameTimeTick } from "../../component/gameTimeComponent.ts";
 import { StockpileComponentId } from "../../component/stockpileComponent.ts";
 import { getSettlementEntity } from "../../entity/settlementQueries.ts";
 import type { Entity } from "../../entity/entity.ts";
@@ -104,18 +105,17 @@ function isPotion(itemId: string): boolean {
 }
 
 /**
- * Inverse of engageInCombatBehavior's validity check: in combat only if the
- * top threat still resolves to a live entity, so stale entries from slain
- * attackers don't block drinking.
+ * Inverse of engageInCombatBehavior's validity check. getTopThreat skips
+ * decayed and unresolvable entries, so stale entries from slain attackers
+ * don't block drinking. An intrusion sighting counts as combat too: a
+ * pursuing worker does not stop mid-chase to heal (accepted by decision).
  */
 function isInCombat(entity: Entity): boolean {
     const threat = entity.getEcsComponent(ThreatMapComponentId);
     if (!threat) return false;
 
-    const topId = getTopThreat(threat);
-    if (!topId) return false;
-
-    return entity.getRootEntity().findEntity(topId) !== null;
+    const root = entity.getRootEntity();
+    return getTopThreat(threat, getGameTimeTick(root), root) !== undefined;
 }
 
 function tryStockpileStage(

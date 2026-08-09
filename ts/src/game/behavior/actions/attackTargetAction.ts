@@ -58,9 +58,9 @@ export function executeAttackTargetAction(
         : UNIT_DAMAGE;
     const threatmap = targetEntity.getEcsComponent(ThreatMapComponentId);
     if (threatmap) {
-        const topBefore = getTopThreat(threatmap);
-        addThreat(threatmap, entity.id, damageAmount, tick);
-        const topAfter = getTopThreat(threatmap);
+        const topBefore = getTopThreat(threatmap, tick, root);
+        addThreat(threatmap, entity.id, damageAmount, tick, root);
+        const topAfter = getTopThreat(threatmap, tick, root);
         if (topBefore !== topAfter) {
             requestReplan(targetEntity);
         }

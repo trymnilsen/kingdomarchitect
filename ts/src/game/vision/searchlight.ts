@@ -2,13 +2,14 @@ import type { Point } from "../../common/point.ts";
 import type { Cardinal } from "../component/watchComponent.ts";
 
 /**
- * Geometry for the night searchlight: a 90° wedge that is one quarter of the tower's
- * reach-diamond. The four cardinal wedges exactly partition the diamond (minus the
- * centre tile), so a full N→E→S→W sweep covers precisely the area the tower sees at
- * once by day.
+ * Geometry for the searchlight: a 90 degree wedge that is one quarter of the
+ * tower's reach-diamond. The four cardinal wedges exactly partition the diamond
+ * (minus the centre tile), so a full N -> E -> S -> W sweep covers the whole
+ * diamond over one rotation.
  *
- * Quarter assignment is by dominant axis, ties (the diagonals, |dx| == |dy|) going to
- * the vertical (N/S) quarter, so every non-centre tile lands in exactly one quarter.
+ * Quarter assignment is by dominant axis, ties (the diagonals, |dx| == |dy|)
+ * going to the vertical (N/S) quarter, so every non-centre tile lands in
+ * exactly one quarter.
  */
 
 export const SWEEP_ORDER: readonly Cardinal[] = ["N", "E", "S", "W"];
@@ -29,17 +30,6 @@ export function inWedge(dx: number, dy: number, aim: Cardinal): boolean {
         case "W":
             return !vertical && dx < 0;
     }
-}
-
-/** The cardinal quarter a point lies in, relative to the tower at `from`. */
-export function quarterToward(from: Point, to: Point): Cardinal {
-    const dx = to.x - from.x;
-    const dy = to.y - from.y;
-    const vertical = Math.abs(dy) >= Math.abs(dx);
-    if (vertical) {
-        return dy <= 0 ? "N" : "S";
-    }
-    return dx > 0 ? "E" : "W";
 }
 
 /**

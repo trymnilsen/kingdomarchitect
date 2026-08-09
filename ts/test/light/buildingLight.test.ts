@@ -1,10 +1,12 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
 import { Entity } from "../../src/game/entity/entity.ts";
-import type { Point } from "../../src/common/point.ts";
-import { createDayComponent } from "../../src/game/component/dayComponent.ts";
+import { makeNumberId, type Point } from "../../src/common/point.ts";
 import { buildingPrefab } from "../../src/game/prefab/buildingPrefab.ts";
-import { illuminationBandAt } from "../../src/game/light/illumination.ts";
+import {
+    collectLightClaims,
+    computeLitTiles,
+} from "../../src/game/light/lightClaims.ts";
 import { woodenHouse } from "../../src/data/building/wood/house.ts";
 import { brazier } from "../../src/data/building/wood/brazier.ts";
 import type { Building } from "../../src/data/building/building.ts";
@@ -19,59 +21,55 @@ const unlitBuilding: Building = {
 };
 
 /**
- * Builds a night world and places a prefab building in it, returning the root so
- * the illumination field can be queried. This exercises the whole chain:
- * buildingPrefab attaching a light source, collectLightEmitters finding it, and
- * illuminationBandAt deriving the band.
+ * Places a prefab building in a bare world and derives coverage. This
+ * exercises the whole chain: buildingPrefab attaching a light source,
+ * collectLightClaims finding it, and computeLitTiles stamping it.
  */
-function placeBuildingAtNight(
+function coverageWithBuilding(
     building: Building,
     scaffolded: boolean,
     position: Point,
-): Entity {
+): Set<number> {
     const root = new Entity("root");
-    const day = createDayComponent();
-    day.phase = "night";
-    root.setEcsComponent(day);
-
     const entity = buildingPrefab(building, scaffolded);
     root.addChild(entity);
     // worldPosition must be set after addChild so the parent transform applies.
     entity.worldPosition = position;
-    return root;
+    return computeLitTiles(collectLightClaims(root, "illumination"));
 }
 
-describe("building light at night", () => {
-    it("gives a completed ordinary building a faint dim self-glow", () => {
-        const root = placeBuildingAtNight(woodenHouse, false, { x: 12, y: 8 });
+function litAt(litTiles: ReadonlySet<number>, x: number, y: number): boolean {
+    return litTiles.has(makeNumberId(x, y));
+}
 
-        // Own tile and cardinal neighbour are dim; nothing reads bright and the
-        // glow does not reach two tiles out.
-        assert.strictEqual(illuminationBandAt(root, { x: 12, y: 8 }), "dim");
-        assert.strictEqual(illuminationBandAt(root, { x: 13, y: 8 }), "dim");
-        assert.strictEqual(illuminationBandAt(root, { x: 14, y: 8 }), "dark");
+describe("building light", () => {
+    it("gives a completed ordinary building a one-tile self-glow", () => {
+        const lit = coverageWithBuilding(woodenHouse, false, { x: 12, y: 8 });
+
+        // Own tile and cardinal neighbour are lit, and the glow does not
+        // reach two tiles out.
+        assert.strictEqual(litAt(lit, 12, 8), true);
+        assert.strictEqual(litAt(lit, 13, 8), true);
+        assert.strictEqual(litAt(lit, 14, 8), false);
     });
 
-    it("lets a dedicated light-source building cast a bright pool", () => {
-        const root = placeBuildingAtNight(brazier, false, { x: 12, y: 8 });
+    it("lets a dedicated light-source building cast a wide pool", () => {
+        const lit = coverageWithBuilding(brazier, false, { x: 12, y: 8 });
 
-        // A bright ring can only come from the brazier profile, so this proves
-        // building.light is honoured rather than the default dim-only glow.
-        assert.strictEqual(illuminationBandAt(root, { x: 14, y: 8 }), "bright");
+        // Four tiles out can only come from the brazier profile, so this
+        // proves building.light is honoured rather than the default glow.
+        assert.strictEqual(litAt(lit, 16, 8), true);
     });
 
     it('emits no light when the building opts out with "none"', () => {
-        const root = placeBuildingAtNight(unlitBuilding, false, {
-            x: 12,
-            y: 8,
-        });
+        const lit = coverageWithBuilding(unlitBuilding, false, { x: 12, y: 8 });
 
-        assert.strictEqual(illuminationBandAt(root, { x: 12, y: 8 }), "dark");
+        assert.strictEqual(lit.size, 0);
     });
 
     it("does not light an unbuilt scaffolded foundation", () => {
-        const root = placeBuildingAtNight(woodenHouse, true, { x: 12, y: 8 });
+        const lit = coverageWithBuilding(woodenHouse, true, { x: 12, y: 8 });
 
-        assert.strictEqual(illuminationBandAt(root, { x: 12, y: 8 }), "dark");
+        assert.strictEqual(lit.size, 0);
     });
 });

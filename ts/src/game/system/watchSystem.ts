@@ -1,129 +1,119 @@
 import type { EcsSystem } from "../../ecs/ecsSystem.ts";
-import type { Point } from "../../common/point.ts";
 import type { Entity } from "../entity/entity.ts";
-import { DayComponentId } from "../component/dayComponent.ts";
+import { WatchComponentId } from "../component/watchComponent.ts";
 import {
-    WatchComponentId,
-    type Cardinal,
-} from "../component/watchComponent.ts";
-import { GoblinUnitComponentId } from "../component/goblinUnitComponent.ts";
+    createLightSourceComponent,
+    LightSourceComponentId,
+} from "../component/lightSourceComponent.ts";
+import {
+    buildingGlowLightSource,
+    searchlightLightSource,
+} from "../../data/light/lightSourceDefinition.ts";
+import { BuildingComponentId } from "../component/buildingComponent.ts";
 import { STATION_MANNED_REACH } from "../vision/visionReach.ts";
-import { SWEEP_ORDER, inWedge, quarterToward } from "../vision/searchlight.ts";
+import { SWEEP_ORDER, searchlightWedgeOffsets } from "../vision/searchlight.ts";
 import { isTowerManned } from "../component/stationQuery.ts";
+import { discoverFootprint } from "../map/discoverFootprint.ts";
 
 /**
- * Ticks the auto-sweep dwells on each quarter before advancing. The key
- * night-difficulty knob: faster ≈ always-on vision, slower lets raiders slip
- * between passes.
+ * Ticks the auto-sweep dwells on each quarter before advancing. The hearth
+ * defense system samples every HEARTH_DEFENSE_INTERVAL (5) ticks, so dwell must
+ * stay at or above twice that interval. Below it an intruder can cross a wedge
+ * between two defense scans and never register. Whoever retunes either
+ * constant meets this comment.
  */
-const SEARCHLIGHT_SWEEP_TICKS = 8;
+const SEARCHLIGHT_SWEEP_TICKS = 10;
 
 /**
- * Drives the night searchlight on manned towers. Owns where the beam points
- * (`beamAim`) and which hostile it is following (`lockedOn`); the render pass reads
- * `beamAim` to light the wedge.
+ * Drives the searchlight on manned towers. The tower has one emitter slot and
+ * the beam borrows it: a manned tower carries the searchlight component with
+ * the current wedge as its pattern, and unmanning restores whatever light the
+ * building profile originally attached (its faint self-glow by default,
+ * nothing for a "none" profile). The beam's claim therefore vanishes the
+ * instant the watchman leaves, exactly like a snuffed torch.
  *
- * Auto mode sweeps N→E→S→W and, when the swept quarter catches a hostile in range,
- * locks on and follows it (re-aiming as it moves) until it leaves reach or dies —
- * turning a glimpse into tracking. A fixed mode just holds the chosen quarter. The
- * lock target is re-validated every tick, so it cannot get stuck pointing at a dead
- * or vanished entity. Dormant when the tower is unmanned or it is not night.
+ * The beam runs in every phase. Its lit claim feeds hearthlight, and whether
+ * the wedge looks different at noon is the render pass's business. The beam
+ * never tracks hostiles. It rotates (or holds a player-fixed cardinal), and
+ * detection falls out of the hearth defense system reading the lit tiles it
+ * claims.
+ *
+ * Each aim advance stamps the freshly swept wedge into the discovered store, so
+ * a border tower maps its surroundings over a full rotation. Discovery is a
+ * server-only write to authoritative state. Stamping happens only on aim
+ * edges rather than per tick, because setDiscoveryForPlayer walks chunk
+ * lookups per point and can trigger lazy chunk generation.
  */
 export const watchSystem: EcsSystem = {
     onUpdate: update,
 };
 
 function update(root: Entity, tick: number) {
-    const phase = root.getEcsComponent(DayComponentId)?.phase;
-    const isNight = phase === "night";
-
     for (const [tower, watch] of root.queryComponents(WatchComponentId)) {
-        const prevAim = watch.beamAim;
-        const prevLock = watch.lockedOn;
+        const light = tower.getEcsComponent(LightSourceComponentId);
+        const hasSearchlight = light?.sourceId === searchlightLightSource.id;
 
-        if (!isNight || !isTowerManned(root, tower)) {
-            watch.lockedOn = null;
-        } else if (watch.searchlight !== "auto") {
-            watch.beamAim = watch.searchlight;
-            watch.lockedOn = null;
-        } else {
-            let target = watch.lockedOn
-                ? hostileInReach(root, tower, watch.lockedOn)
-                : null;
-
-            if (!target) {
-                // Sweep, then try to catch a hostile in the freshly-lit quarter.
-                watch.beamAim =
-                    SWEEP_ORDER[
-                        Math.floor(tick / SEARCHLIGHT_SWEEP_TICKS) %
-                            SWEEP_ORDER.length
-                    ];
-                target = nearestHostileInQuarter(root, tower, watch.beamAim);
+        if (!isTowerManned(root, tower)) {
+            if (hasSearchlight) {
+                restoreBuildingLight(tower);
             }
-
-            if (target) {
-                watch.beamAim = quarterToward(
-                    tower.worldPosition,
-                    target.worldPosition,
-                );
-                watch.lockedOn = target.id;
-            } else {
-                watch.lockedOn = null;
-            }
+            continue;
         }
 
-        if (watch.beamAim !== prevAim || watch.lockedOn !== prevLock) {
+        const previousAim = watch.beamAim;
+        if (watch.searchlight !== "auto") {
+            watch.beamAim = watch.searchlight;
+        } else {
+            // Derived from the tick rather than incremented, so the sweep needs
+            // no stored counter and survives save and load unchanged.
+            watch.beamAim =
+                SWEEP_ORDER[
+                    Math.floor(tick / SEARCHLIGHT_SWEEP_TICKS) %
+                        SWEEP_ORDER.length
+                ];
+        }
+        const aimChanged = watch.beamAim !== previousAim;
+
+        if (!hasSearchlight) {
+            tower.setEcsComponent(
+                createLightSourceComponent(
+                    searchlightLightSource.id,
+                    searchlightWedgeOffsets(
+                        watch.beamAim,
+                        STATION_MANNED_REACH,
+                    ),
+                ),
+            );
+            discoverFootprint(root, tower, tower.worldPosition);
+        } else if (aimChanged) {
+            tower.updateComponent(LightSourceComponentId, (component) => {
+                component.pattern = searchlightWedgeOffsets(
+                    watch.beamAim,
+                    STATION_MANNED_REACH,
+                );
+            });
+            discoverFootprint(root, tower, tower.worldPosition);
+        }
+
+        if (aimChanged) {
             tower.invalidateComponent(WatchComponentId);
         }
     }
 }
 
-/** Manhattan distance — the reach metric. */
-function reachDistance(a: Point, b: Point): number {
-    return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
-}
-
-/** The locked entity, if it still exists, is hostile, and is within beam reach. */
-function hostileInReach(
-    root: Entity,
-    tower: Entity,
-    id: string,
-): Entity | null {
-    const entity = root.findEntity(id);
-    if (!entity || !entity.hasComponent(GoblinUnitComponentId)) {
-        return null;
+/**
+ * Puts the tower's own building light back when the watchman leaves. The rule
+ * mirrors applyFunctionalComponents: the building's named profile, the default
+ * self-glow, or nothing for "none". The remove path is what needs the
+ * remove-component replication message, or the client would render the old
+ * emitter forever.
+ */
+function restoreBuildingLight(tower: Entity): void {
+    const building = tower.getEcsComponent(BuildingComponentId)?.building;
+    const lightSourceId = building?.light ?? buildingGlowLightSource.id;
+    if (lightSourceId === "none") {
+        tower.removeEcsComponent(LightSourceComponentId);
+    } else {
+        tower.setEcsComponent(createLightSourceComponent(lightSourceId));
     }
-    if (
-        reachDistance(tower.worldPosition, entity.worldPosition) >
-        STATION_MANNED_REACH
-    ) {
-        return null;
-    }
-    return entity;
-}
-
-/** Nearest hostile within reach that lies in the given quarter, or null. */
-function nearestHostileInQuarter(
-    root: Entity,
-    tower: Entity,
-    aim: Cardinal,
-): Entity | null {
-    let best: Entity | null = null;
-    let bestDistance = Infinity;
-    for (const [goblin] of root.queryComponents(GoblinUnitComponentId)) {
-        const dx = goblin.worldPosition.x - tower.worldPosition.x;
-        const dy = goblin.worldPosition.y - tower.worldPosition.y;
-        const d = Math.abs(dx) + Math.abs(dy);
-        if (d > STATION_MANNED_REACH || d === 0) {
-            continue;
-        }
-        if (!inWedge(dx, dy, aim)) {
-            continue;
-        }
-        if (d < bestDistance) {
-            best = goblin;
-            bestDistance = d;
-        }
-    }
-    return best;
 }

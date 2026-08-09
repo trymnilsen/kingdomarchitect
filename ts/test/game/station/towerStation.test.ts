@@ -23,15 +23,11 @@ import {
 import { createGarrisonBehavior } from "../../../src/game/behavior/behaviors/GarrisonBehavior.ts";
 import { createStepOutsideBehavior } from "../../../src/game/behavior/behaviors/StepOutsideBehavior.ts";
 import {
-    inWedge,
-    quarterToward,
     searchlightWedgeOffsets,
     SWEEP_ORDER,
 } from "../../../src/game/vision/searchlight.ts";
 import type { Point } from "../../../src/common/point.ts";
 import { STATION_MANNED_REACH } from "../../../src/game/vision/visionReach.ts";
-
-type Cardinal = "N" | "E" | "S" | "W";
 
 function addTower(
     root: Entity,
@@ -102,23 +98,6 @@ describe("searchlight wedge geometry", () => {
                 assert.ok(Math.abs(o.x) + Math.abs(o.y) <= R, "within diamond");
                 assert.ok(!(o.x === 0 && o.y === 0), "centre excluded");
             }
-        }
-    });
-
-    it("quarterToward agrees with inWedge", () => {
-        const samples: Point[] = [
-            { x: 3, y: -1 },
-            { x: -1, y: -4 },
-            { x: 2, y: 2 },
-            { x: -5, y: 1 },
-            { x: 0, y: 3 },
-        ];
-        for (const s of samples) {
-            const aim = quarterToward({ x: 0, y: 0 }, s) as Cardinal;
-            assert.ok(
-                inWedge(s.x, s.y, aim),
-                `(${s.x},${s.y}) → ${aim} should contain it`,
-            );
         }
     });
 });

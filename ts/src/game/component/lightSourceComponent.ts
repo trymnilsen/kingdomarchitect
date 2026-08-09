@@ -1,27 +1,36 @@
+import type { Point } from "../../common/point.ts";
 import type { LightSourceDefinition } from "../../data/light/lightSourceDefinition.ts";
 
 /**
- * Marks an entity as emitting light. The component is intentionally thin: it
- * only names which {@link LightSourceDefinition} describes its emission, so all
- * the data that grows over later stages (radii now, fuel and extinguish
- * difficulty later) lives in the definition and the component never changes
- * shape.
+ * Marks an entity as emitting light. The component names which
+ * {@link LightSourceDefinition} describes its emission and optionally carries a
+ * pattern that overrides the definition's disc.
  *
- * Every emitter — a placed brazier or a building's faint self-glow — carries
- * this one component, so the illumination field gathers light by querying a
- * single component type with no per-source-kind branching.
+ * `pattern` is explicitly null in the common case, meaning "a disc of the
+ * definition's lightRadius". A present array means "exactly these offsets from
+ * my position, verbatim". This is how a light gets a non-circular shape without
+ * the coverage code knowing why: the watchtower's rotating searchlight writes
+ * its wedge offsets here, and the collector just reads a pattern of light.
+ *
+ * Every emitter (a placed brazier, a building's faint self-glow, a worker's
+ * presence glow, a tower's beam) carries this one component, so the coverage
+ * field gathers light by querying a single component type with no
+ * per-source-kind branching.
  */
 export type LightSourceComponent = {
     id: typeof LightSourceComponentId;
     sourceId: string;
+    pattern: Point[] | null;
 };
 
 export function createLightSourceComponent(
     sourceId: string,
+    pattern: Point[] | null = null,
 ): LightSourceComponent {
     return {
         id: LightSourceComponentId,
         sourceId,
+        pattern,
     };
 }
 

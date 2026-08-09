@@ -1,4 +1,7 @@
-import { offsetPatternWithPoint } from "../../../../common/pattern.ts";
+import {
+    generateDiscPattern,
+    offsetPatternWithPoint,
+} from "../../../../common/pattern.ts";
 import type { Point } from "../../../../common/point.ts";
 import { RenderScope } from "../../../../rendering/renderScope.ts";
 import {
@@ -9,11 +12,9 @@ import {
     HealthComponentId,
     type HealthComponent,
 } from "../../../component/healthComponent.ts";
-import { DayComponentId } from "../../../component/dayComponent.ts";
 import { LightSourceComponentId } from "../../../component/lightSourceComponent.ts";
 import { ProductionComponentId } from "../../../component/productionComponent.ts";
 import { VisibilityComponentId } from "../../../component/visibilityComponent.ts";
-import { VisibilityMapComponentId } from "../../../component/visibilityMapComponent.ts";
 import { getLightSourceDefinition } from "../../../../data/light/lightSourceDefinition.ts";
 import { getProductionDefinition } from "../../../../data/production/productionDefinition.ts";
 import type { Entity } from "../../../entity/entity.ts";
@@ -22,12 +23,9 @@ import {
     getJobsTargetingEntity,
     getJobTargetPosition,
 } from "../../../job/jobQuery.ts";
-import { bandFromEmitters } from "../../../light/illumination.ts";
-import { collectLightEmitters } from "../../../light/lightEmitter.ts";
+import { discoveryFootprintOffsets } from "../../../map/discoverFootprint.ts";
 import { getDiamondPoints } from "../../../map/item/placement.ts";
 import { TileSize, HalfTileSize } from "../../../map/tile.ts";
-import { perceivedBandAt } from "../../../vision/perceivedBand.ts";
-import { revealFootprintOffsets } from "../../../vision/revealFootprint.ts";
 import { SelectedEntityItem } from "../../selection/selectedEntityItem.ts";
 
 const claimedLinkColor = "#5fbf5f";
@@ -46,7 +44,7 @@ export function drawSelectionOverlays(
     selection: SelectedEntityItem,
 ) {
     drawJobLinks(context, selection);
-    drawVisibilityRange(context, selection.entity);
+    drawDiscoveryRange(context, selection.entity);
     drawLightEmission(context, selection.entity);
     drawProductionZone(context, selection.entity);
     drawVitalBars(context, selection.entity);
@@ -93,38 +91,22 @@ function drawJobLinks(context: RenderScope, selection: SelectedEntityItem) {
 }
 
 /**
- * Draws the tiles a selected agent can see right now as small boxes. The set is
- * its reveal footprint intersected with the perceived band, evaluated through
- * the same `perceivedBandAt` rule the renderer uses, on the same frame-fresh
- * visibility map. The render pass stamps that map before interaction drawing
- * runs.
- *
- * Sharing the rule keeps the overlay from disagreeing with what gets rendered,
- * including floors granted by other nearby viewers. Emitters and phase are
- * gathered once for the whole footprint instead of per tile.
+ * Draws the tiles a selected entity uncovers on the map as small boxes: its
+ * discovery diamond plus, for an emitter, its lit footprint. "What can this
+ * entity see right now" no longer exists per entity, because visibility is
+ * discovered-and-lit globally. How far the entity reveals the map is still
+ * useful selection feedback, so that is what this shows.
  */
-function drawVisibilityRange(context: RenderScope, entity: Entity) {
+function drawDiscoveryRange(context: RenderScope, entity: Entity) {
     const visibility = entity.getEcsComponent(VisibilityComponentId);
     if (!visibility) {
         return;
     }
-    const root = entity.getRootEntity();
-    const visibilityMap = root.getEcsComponent(VisibilityMapComponentId);
-    const emitters = collectLightEmitters(root);
-    const phase = root.getEcsComponent(DayComponentId)?.phase ?? "day";
     const tiles = offsetPatternWithPoint(
         entity.worldPosition,
-        revealFootprintOffsets(entity),
+        discoveryFootprintOffsets(entity),
     );
     for (const tile of tiles) {
-        // A root without a visibility map (previews) has no reach or floor to
-        // bind on, so fall back to plain illumination.
-        const band = visibilityMap
-            ? perceivedBandAt(visibilityMap, emitters, phase, tile.x, tile.y)
-            : bandFromEmitters(emitters, phase, tile);
-        if (band === "dark") {
-            continue;
-        }
         context.drawRectangle({
             x: tile.x * TileSize + 8,
             y: tile.y * TileSize + 8,
@@ -136,41 +118,33 @@ function drawVisibilityRange(context: RenderScope, entity: Entity) {
 }
 
 /**
- * Draws how a selected light source contributes to illumination: bright tiles in
- * yellow, dim tiles in blue, using the same squared-radius bands the
- * illumination field derives from.
+ * Draws the tiles a selected light source lights, derived from the same shape
+ * the coverage field stamps: the component's pattern when present, otherwise
+ * the definition's disc. Sharing the shape keeps the overlay honest, and a
+ * selected manned tower shows its searchlight wedge automatically.
  */
 function drawLightEmission(context: RenderScope, entity: Entity) {
     const lightSource = entity.getEcsComponent(LightSourceComponentId);
     if (!lightSource) {
         return;
     }
-    const definition = getLightSourceDefinition(lightSource.sourceId);
-    if (!definition) {
-        return;
+    let offsets = lightSource.pattern;
+    if (offsets === null) {
+        const definition = getLightSourceDefinition(lightSource.sourceId);
+        if (!definition) {
+            return;
+        }
+        offsets = generateDiscPattern(definition.lightRadius);
     }
     const origin = entity.worldPosition;
-    const brightSq = definition.brightRadius * definition.brightRadius;
-    const dimSq = definition.dimRadius * definition.dimRadius;
-    for (let dx = -definition.dimRadius; dx <= definition.dimRadius; dx++) {
-        for (let dy = -definition.dimRadius; dy <= definition.dimRadius; dy++) {
-            const distanceSq = dx * dx + dy * dy;
-            let fill: string;
-            if (definition.brightRadius > 0 && distanceSq <= brightSq) {
-                fill = "rgba(255, 221, 0, 0.4)";
-            } else if (definition.dimRadius > 0 && distanceSq <= dimSq) {
-                fill = "rgba(40, 90, 200, 0.4)";
-            } else {
-                continue;
-            }
-            context.drawRectangle({
-                x: (origin.x + dx) * TileSize + 22,
-                y: (origin.y + dy) * TileSize + 22,
-                width: 6,
-                height: 6,
-                fill,
-            });
-        }
+    for (const offset of offsets) {
+        context.drawRectangle({
+            x: (origin.x + offset.x) * TileSize + 22,
+            y: (origin.y + offset.y) * TileSize + 22,
+            width: 6,
+            height: 6,
+            fill: "rgba(255, 221, 0, 0.4)",
+        });
     }
 }
 

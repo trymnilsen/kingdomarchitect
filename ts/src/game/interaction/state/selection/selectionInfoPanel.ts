@@ -38,10 +38,14 @@ export function selectionInfoPanel(
         );
     }
 
-    if (selectionInfo.light) {
+    if (selectionInfo.lit !== undefined) {
+        let litLabel = "dark";
+        if (selectionInfo.lit) {
+            litLabel = "lit";
+        }
         rows.push(
             uiText({
-                content: `Light: ${selectionInfo.light}`,
+                content: `Light: ${litLabel}`,
                 textStyle: subTitleTextStyle,
             }),
         );

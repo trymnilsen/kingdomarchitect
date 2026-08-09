@@ -25,7 +25,15 @@ import {
 import { getSettlementEntity } from "../../../entity/settlementQueries.ts";
 import { getJobDisplayName } from "../../../job/jobDisplayName.ts";
 import { getJobForWorker } from "../../../job/jobQuery.ts";
-import { illuminationBandAt } from "../../../light/illumination.ts";
+import {
+    ambientIsLight,
+    collectLightClaims,
+    computeLitTiles,
+    isTileLit,
+} from "../../../light/lightClaims.ts";
+import { DayComponentId } from "../../../component/dayComponent.ts";
+import type { Entity } from "../../../entity/entity.ts";
+import type { Point } from "../../../../common/point.ts";
 import type { StateContext } from "../../handler/stateContext.ts";
 import { SelectedEntityItem } from "../../selection/selectedEntityItem.ts";
 import { SelectedTileItem } from "../../selection/selectedTileItem.ts";
@@ -66,8 +74,24 @@ function tileSelectionInfo(
         title: type,
         subtitle: "Tile",
         icon: spriteRefs.blue_book,
-        light: illuminationBandAt(context.root, selection.tilePosition),
+        lit: tileLitAt(context.root, selection.tilePosition),
     };
+}
+
+/**
+ * Whether one tile is currently lit, for the selection readout. Presentational
+ * only. It derives through the shared coverage functions so it can never
+ * disagree with the renderer, and the ambient short-circuit skips the coverage
+ * build entirely outside night.
+ */
+function tileLitAt(root: Entity, tilePosition: Point): boolean {
+    // A world without a day component is fully visible, so default to day.
+    const phase = root.getEcsComponent(DayComponentId)?.phase ?? "day";
+    if (ambientIsLight(phase)) {
+        return true;
+    }
+    const litTiles = computeLitTiles(collectLightClaims(root, "illumination"));
+    return isTileLit(litTiles, phase, tilePosition);
 }
 
 function entitySelectionInfo(

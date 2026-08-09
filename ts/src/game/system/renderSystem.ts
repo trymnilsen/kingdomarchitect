@@ -1,17 +1,7 @@
-import type { Bounds } from "../../common/bounds.ts";
 import { type EcsSystem } from "../../ecs/ecsSystem.ts";
-import { offsetPatternWithPoint } from "../../common/pattern.ts";
-import {
-    encodePosition,
-    makeNumberId,
-    type Point,
-} from "../../common/point.ts";
+import { makeNumberId, type Point } from "../../common/point.ts";
 import { DrawMode } from "../../rendering/drawMode.ts";
 import type { RenderScope } from "../../rendering/renderScope.ts";
-import {
-    HealthComponentId,
-    type HealthComponent,
-} from "../component/healthComponent.ts";
 import {
     compareSpriteStacking,
     type SpriteComponent,
@@ -23,9 +13,9 @@ import {
 } from "../component/tileComponent.ts";
 import { spriteRegistry } from "../../asset/spriteRegistry.ts";
 import { SPRITE_W, SPRITE_H } from "../../asset/sprite.ts";
-import { VisibilityComponentId } from "../component/visibilityComponent.ts";
 import {
     hasDiscovered,
+    hasDiscoveredWorldTile,
     VisibilityMapComponentId,
     type VisibilityMapComponent,
 } from "../component/visibilityMapComponent.ts";
@@ -36,22 +26,13 @@ import { biomeDimColors } from "../map/biomeDimColor.ts";
 import { ChunkDimension, ChunkSize } from "../map/chunk.ts";
 import { getTileColorVariation } from "../map/deterministicTileColor.ts";
 import { TileSize } from "../map/tile.ts";
-import { illuminationBandAt } from "../light/illumination.ts";
 import {
-    collectLightEmitters,
-    type LightEmitter,
-} from "../light/lightEmitter.ts";
-import type { LightBand } from "../light/lightBand.ts";
-import {
-    revealFootprintOffsets,
-    stampPerceptionFloor,
-} from "../vision/revealFootprint.ts";
-import { perceivedBandAt } from "../vision/perceivedBand.ts";
+    ambientIsLight,
+    collectLightClaims,
+    computeLitTiles,
+    isTileLit,
+} from "../light/lightClaims.ts";
 import { forEachComponentWithin } from "../component/chunkMapComponent.ts";
-import { WatchComponentId } from "../component/watchComponent.ts";
-import { searchlightWedgeOffsets } from "../vision/searchlight.ts";
-import { isTowerManned } from "../component/stationQuery.ts";
-import { STATION_MANNED_REACH } from "../vision/visionReach.ts";
 
 export const renderSystem: EcsSystem = {
     onRender,
@@ -65,71 +46,39 @@ export const renderSystem: EcsSystem = {
  */
 const visibleSpriteScratch: [Entity, SpriteComponent][] = [];
 
+/**
+ * Shared empty coverage for light-ambient phases. When the sky lights
+ * everything, no claim needs stamping, so the render pass skips building the
+ * set entirely.
+ */
+const noLitTiles: ReadonlySet<number> = new Set();
+
 function onRender(
     rootEntity: Entity,
     _renderTick: number,
     renderScope: RenderScope,
     drawMode: DrawMode,
 ) {
-    //const renderStart = performance.now();
     const viewport = renderScope.camera.tileSpaceViewPort;
     const tiles = rootEntity.getEcsComponent(TileComponentId);
     const visibilityMap = rootEntity.getEcsComponent(VisibilityMapComponentId);
 
-    if (visibilityMap) {
-        visibilityMap.visibility.clear();
-        visibilityMap.perceptionFloor.clear();
-        //TODO: this might be able to piggyback of sprites? Are there entities without sprites but with visibility?
-        forEachComponentWithin(
-            rootEntity,
-            viewport,
-            VisibilityComponentId,
-            (entity) => {
-                // An entity reveals where it can look and where it casts light,
-                // so the reach set carries that whole footprint (base sight union
-                // own light). perceivedBandAt then takes min(reach, illumination)
-                // over it.
-                const offsets = revealFootprintOffsets(entity);
-                const visiblePoints = offsetPatternWithPoint(
-                    entity.worldPosition,
-                    offsets,
-                );
-                for (let i = 0; i < visiblePoints.length; i++) {
-                    const numberId = makeNumberId(
-                        visiblePoints[i].x,
-                        visiblePoints[i].y,
-                    );
-                    visibilityMap.visibility.add(numberId);
-                }
-                // A viewer's minimal perception floors its immediate tiles above
-                // darkness without lighting them.
-                stampPerceptionFloor(entity, visibilityMap.perceptionFloor);
-            },
+    // A world without a day component is fully visible, so default to day.
+    const phase = rootEntity.getEcsComponent(DayComponentId)?.phase ?? "day";
+
+    // Build the lit-coverage set once per frame. This is derive-on-read rather
+    // than a cache: it is rebuilt fresh every render, so moving lights cost
+    // nothing extra. During light-ambient phases the ambient short-circuit in
+    // isTileLit makes the set unnecessary, so skip building it.
+    let litTiles: ReadonlySet<number> = noLitTiles;
+    if (!ambientIsLight(phase)) {
+        litTiles = computeLitTiles(
+            collectLightClaims(rootEntity, "illumination"),
         );
-    }
-
-    // Gather the illumination inputs once per frame: the band of any tile is the
-    // same for every viewer, so re-querying emitters per tile would walk the whole
-    // entity tree hundreds of times a frame. This is derive-on-read, not a cache —
-    // both are rebuilt fresh every render.
-    const emitters = collectLightEmitters(rootEntity);
-    const phase = rootEntity.getEcsComponent(DayComponentId)?.phase ?? "dawn";
-
-    // The night searchlight lights its swept quarter; the rest of the reach stays
-    // dark. Stamp it after the per-viewer floor so the beam reads bright.
-    if (visibilityMap && phase === "night") {
-        stampSearchlightBeams(rootEntity, viewport, visibilityMap);
     }
 
     if (tiles && visibilityMap) {
-        drawTiles(
-            tiles,
-            renderScope,
-            visibilityMap,
-            emitters,
-            phase,
-            rootEntity,
-        );
+        drawTiles(tiles, renderScope, visibilityMap, litTiles, phase);
     }
     visibleSpriteScratch.length = 0;
     forEachComponentWithin(
@@ -148,57 +97,24 @@ function onRender(
     for (let i = 0; i < visibleSpriteScratch.length; i++) {
         const sprite = visibleSpriteScratch[i][1];
         const position = visibleSpriteScratch[i][0].worldPosition;
-        // An entity is shown only where the player can actually see it: in reach
-        // and lit (bright or dim). On dark tiles it is hidden, even when an emitter
-        // is within sight range.
-        let band: LightBand = "bright";
-        if (visibilityMap) {
-            band = perceivedBandAt(
+        // An entity is shown only where the player can see it: on a discovered
+        // tile that is currently lit. A goblin attacking from an adjacent dark
+        // tile is deliberately not drawn. The player watches their worker fight
+        // something unseen. That is night-raid tension rather than a rendering
+        // bug, so no attacker-reveal rule belongs here.
+        let visible = true;
+        if (!window.debugChunks && visibilityMap) {
+            const discovered = hasDiscoveredWorldTile(
                 visibilityMap,
-                emitters,
-                phase,
                 position.x,
                 position.y,
             );
+            visible = discovered && isTileLit(litTiles, phase, position);
         }
-        if (band !== "dark" || window.debugChunks) {
+        if (visible) {
             drawSprite(sprite, position, renderScope, drawMode);
         }
     }
-
-    /*const renderEnd = performance.now();
-    performance.measure("render duration", {
-        start: renderStart,
-        end: renderEnd,
-    });*/
-}
-
-/**
- * Stamps each manned tower's night searchlight wedge into the perception floor as
- * `bright`, so the swept quarter is seen while the rest of the reach stays dark. The
- * wedge sits inside the manned worker's reach diamond, so its tiles are already in the
- * reach set; re-adding them is harmless.
- */
-function stampSearchlightBeams(
-    root: Entity,
-    viewport: Bounds,
-    visibilityMap: VisibilityMapComponent,
-) {
-    forEachComponentWithin(root, viewport, WatchComponentId, (tower, watch) => {
-        if (!isTowerManned(root, tower)) {
-            return;
-        }
-        const offsets = searchlightWedgeOffsets(
-            watch.beamAim,
-            STATION_MANNED_REACH,
-        );
-        const points = offsetPatternWithPoint(tower.worldPosition, offsets);
-        for (let i = 0; i < points.length; i++) {
-            const numberId = makeNumberId(points[i].x, points[i].y);
-            visibilityMap.visibility.add(numberId);
-            visibilityMap.perceptionFloor.set(numberId, "bright");
-        }
-    });
 }
 
 function drawSprite(
@@ -229,17 +145,6 @@ function drawSprite(
         targetHeight = sprite[SPRITE_H] * scale;
     }
 
-    /*
-    if (drawMode == DrawMode.Tick && !!spriteComponent.tint) {
-        // if there are no frames left, clear it
-        if (spriteComponent.tint.frames == 0) {
-            console.log("Resetting sprite tint");
-            spriteComponent.tint = null;
-        } else if (spriteComponent.tint.frames > 0) {
-            console.log("Subtracting sprite tint");
-            spriteComponent.tint.frames -= 1;
-        }
-    }*/
     const screenPosition =
         renderContext.camera.tileSpaceToScreenSpace(position);
     const offsetX = spriteComponent.offset?.x ?? 0;
@@ -255,49 +160,28 @@ function drawSprite(
     });
 }
 
-function getVisibleChunks(bounds: Bounds): number[] {
-    const minChunkX = Math.floor(bounds.x1 / ChunkSize);
-    const maxChunkX = Math.ceil(bounds.x2 / ChunkSize); // Ensure inclusion of overlapping chunks
-    const minChunkY = Math.floor(bounds.y1 / ChunkSize);
-    const maxChunkY = Math.ceil(bounds.y2 / ChunkSize); // Ensure inclusion of overlapping chunks
-
-    const chunkKeys: number[] = [];
-
-    for (let chunkY = minChunkY; chunkY <= maxChunkY; chunkY++) {
-        for (let chunkX = minChunkX; chunkX <= maxChunkX; chunkX++) {
-            chunkKeys.push(encodePosition(chunkX, chunkY));
-        }
-    }
-
-    return chunkKeys;
-}
-
-const illuminationBandOverlay: Record<
-    LightBand,
-    { fill: string; label: string }
-> = {
-    bright: { fill: "rgba(255, 221, 0, 0.28)", label: "B" },
-    dim: { fill: "rgba(40, 90, 200, 0.32)", label: "D" },
-    dark: { fill: "rgba(0, 0, 0, 0.5)", label: "X" },
-};
+const litOverlay = { fill: "rgba(255, 221, 0, 0.28)", label: "L" };
+const darkOverlay = { fill: "rgba(0, 0, 0, 0.5)", label: "D" };
 
 /**
- * Dev-only overlay that tints each tile by its illumination band so the whole
- * field can be eyeballed at once before any real lighting render exists. This is
- * a diagnostic, not player-facing rendering — Stage 3 owns the real bands. It
- * intentionally re-derives the band per tile (no cached grid); the cost is
- * accepted for a debug view.
+ * Dev-only overlay that marks each tile lit (L) or dark (D). It consumes the
+ * frame's already-built coverage set instead of deriving its own: an overlay
+ * with a private derivation path can lie, and its entire value is proving the
+ * field the game logic uses.
  */
-function drawIlluminationBand(
+function drawLitOverlay(
     renderContext: RenderScope,
-    root: Entity,
+    litTiles: ReadonlySet<number>,
+    phase: Phase,
     worldTileX: number,
     worldTileY: number,
     screenTileX: number,
     screenTileY: number,
 ) {
-    const band = illuminationBandAt(root, { x: worldTileX, y: worldTileY });
-    const overlay = illuminationBandOverlay[band];
+    let overlay = darkOverlay;
+    if (isTileLit(litTiles, phase, { x: worldTileX, y: worldTileY })) {
+        overlay = litOverlay;
+    }
     renderContext.drawScreenSpaceRectangle({
         x: screenTileX,
         y: screenTileY,
@@ -316,31 +200,29 @@ function drawIlluminationBand(
 }
 
 /**
- * The tile fill for a perceived band: bright shows the biome's full daylight
- * colour, dim shows the midpoint tint, and dark reuses the biome's existing dark
- * tint — the same faded colour a discovered-but-unseen (fog-of-war) tile uses, so
- * an unlit tile and a remembered tile read alike even though they mean different
- * things.
+ * The fill for a discovered tile. An unlit tile renders the biome's dark tint,
+ * the same faded colour fog-of-war memory has always used. A lit tile renders
+ * the biome's full colour under ambient sky light, and the midpoint tint when
+ * only an emitter lights it at night, which keeps night's pooled look.
  */
-function tileFillForBand(biomeType: BiomeType, band: LightBand): string {
-    if (band === "bright") {
+function tileFill(biomeType: BiomeType, phase: Phase, lit: boolean): string {
+    if (!lit) {
+        return biomes[biomeType].tint;
+    }
+    if (ambientIsLight(phase)) {
         return biomes[biomeType].color;
     }
-    if (band === "dim") {
-        return biomeDimColors[biomeType];
-    }
-    return biomes[biomeType].tint;
+    return biomeDimColors[biomeType];
 }
 
 function drawTiles(
     tiles: TileComponent,
     renderContext: RenderScope,
     visibilityMap: VisibilityMapComponent,
-    emitters: readonly LightEmitter[],
+    litTiles: ReadonlySet<number>,
     phase: Phase,
-    root: Entity,
 ) {
-    for (const [chunkId, chunk] of tiles.chunks) {
+    for (const [_chunkId, chunk] of tiles.chunks) {
         if (!chunk.volume) {
             continue;
         }
@@ -375,10 +257,10 @@ function drawTiles(
             for (let y = 0; y < ChunkSize; y++) {
                 const screenTileY = screenPosition.y + y * TileSize;
                 const worldTileY = chunkPosition.y + y;
-                // Debug mode reveals the whole map at full colour with the band
-                // overlay drawn on top, so it bypasses the perceived-band gate.
-                let band: LightBand = "bright";
 
+                // Debug mode reveals the whole map at full colour with the
+                // lit overlay drawn on top, so it bypasses both gates.
+                let lit = true;
                 if (!window.debugChunks) {
                     const discovered = hasDiscovered(
                         visibilityMap,
@@ -386,23 +268,20 @@ function drawTiles(
                         x,
                         y,
                     );
-                    band = perceivedBandAt(
-                        visibilityMap,
-                        emitters,
-                        phase,
-                        worldTileX,
-                        worldTileY,
-                    );
-
-                    // A dark tile the player has never discovered is neither seen
-                    // nor remembered, so it is not drawn at all. A discovered dark
-                    // tile still renders as fog (the dark tint via tileFillForBand).
-                    if (band === "dark" && !discovered) {
+                    // An undiscovered tile is never drawn, lit or not.
+                    // Discovery is memory and only proximity or placed light
+                    // grants it. A discovered but unlit tile still renders as
+                    // fog via tileFill.
+                    if (!discovered) {
                         continue;
                     }
+                    lit = isTileLit(litTiles, phase, {
+                        x: worldTileX,
+                        y: worldTileY,
+                    });
                 }
 
-                const color = tileFillForBand(chunk.volume.type, band);
+                const color = tileFill(chunk.volume.type, phase, lit);
 
                 const finalColor = getTileColorVariation(
                     color,
@@ -420,9 +299,10 @@ function drawTiles(
                 });
 
                 if (window.debugChunks) {
-                    drawIlluminationBand(
+                    drawLitOverlay(
                         renderContext,
-                        root,
+                        litTiles,
+                        phase,
                         worldTileX,
                         worldTileY,
                         screenTileX,

@@ -3,16 +3,34 @@ import {
     getTopThreat,
     ThreatMapComponentId,
 } from "../../component/threatMapComponent.ts";
+import { getGameTimeTick } from "../../component/gameTimeComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import type { BehaviorActionData } from "../actions/ActionData.ts";
 import type { Behavior } from "./Behavior.ts";
 
 /**
- * EngageInCombatBehavior makes an entity fight back against whoever is
- * accumulating the most threat against it. Activates whenever the threat
- * map has at least one live attacker entry. Sits just below player
- * commands so that direct player intent (e.g. "attack G1") is not
- * preempted by an opportunistic hit from another enemy.
+ * Utility when the top threat is damage-sourced: someone is hitting this
+ * entity. Self-defence preempts nearly everything. This ties player commands
+ * at 90, and the tie resolves to the player command only because it precedes
+ * this behavior in the resolver's array (the sort is stable). The hysteresis
+ * bonus can keep an already-running engagement ahead of a fresh command, which
+ * is the existing behavior and kept on purpose.
+ */
+const DAMAGE_UTILITY = 90;
+
+/**
+ * Utility when the top threat is only an intrusion sighting. Hunting a
+ * trespasser yields to a critical task in progress, so this sits below player
+ * commands and self-defence.
+ */
+const INTRUSION_UTILITY = 75;
+
+/**
+ * EngageInCombatBehavior makes an entity fight back against its most pressing
+ * threat: whoever is hitting it, or failing that, an intruder sighted inside
+ * hearthlight. Activates whenever the threat map has a live, undecayed entry.
+ * Release needs no extra code: once refreshes and hits stop, the entry decays
+ * out, isValid fails and the next replan frees the worker.
  */
 export function createEngageInCombatBehavior(): Behavior {
     return {
@@ -23,15 +41,28 @@ export function createEngageInCombatBehavior(): Behavior {
             if (!threat) {
                 return false;
             }
-            const topId = getTopThreat(threat);
-            if (!topId) {
-                return false;
-            }
-            return entity.getRootEntity().findEntity(topId) !== null;
+            const root = entity.getRootEntity();
+            // getTopThreat already skips unresolvable entries, so a non-empty
+            // answer means a live target exists.
+            return (
+                getTopThreat(threat, getGameTimeTick(root), root) !== undefined
+            );
         },
 
-        utility(_entity: Entity): number {
-            return 90;
+        utility(entity: Entity): number {
+            const threat = entity.getEcsComponent(ThreatMapComponentId);
+            if (!threat) {
+                return 0;
+            }
+            const root = entity.getRootEntity();
+            const topId = getTopThreat(threat, getGameTimeTick(root), root);
+            if (!topId) {
+                return 0;
+            }
+            if (threat.threat[topId]?.source === "damage") {
+                return DAMAGE_UTILITY;
+            }
+            return INTRUSION_UTILITY;
         },
 
         expand(entity: Entity): BehaviorActionData[] {
@@ -39,11 +70,12 @@ export function createEngageInCombatBehavior(): Behavior {
             if (!threat) {
                 return [];
             }
-            const topId = getTopThreat(threat);
+            const root = entity.getRootEntity();
+            const topId = getTopThreat(threat, getGameTimeTick(root), root);
             if (!topId) {
                 return [];
             }
-            const attacker = entity.getRootEntity().findEntity(topId);
+            const attacker = root.findEntity(topId);
             if (!attacker) {
                 return [];
             }

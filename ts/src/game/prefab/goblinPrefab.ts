@@ -13,6 +13,8 @@ import { createHeldItemComponent } from "../component/heldItemComponent.ts";
 import { createWarmthComponent } from "../component/warmthComponent.ts";
 import { createGoblinUnitComponent } from "../component/goblinUnitComponent.ts";
 import { createFireSourceComponent } from "../component/fireSourceComponent.ts";
+import { createLightSourceComponent } from "../component/lightSourceComponent.ts";
+import { campfireLightSource } from "../../data/light/lightSourceDefinition.ts";
 import { Entity } from "../entity/entity.ts";
 import { createThreatMapComponent } from "../component/threatMapComponent.ts";
 
@@ -57,6 +59,9 @@ export function goblinFireplace(): Entity {
     entity.setEcsComponent(createAnimationComponent(loopingAnimation));
     entity.setEcsComponent(createSpriteComponent(spriteRefs.stone_brazier));
     entity.setEcsComponent(createFireSourceComponent(15, 2, 1));
+    // The camp fire is a real light: a scouted camp glows at night. Ownership
+    // keeps it out of the player's hearthlight, so it lights without claiming.
+    entity.setEcsComponent(createLightSourceComponent(campfireLightSource.id));
 
     return entity;
 }

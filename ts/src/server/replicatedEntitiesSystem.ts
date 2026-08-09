@@ -103,6 +103,29 @@ export function makeReplicatedEntitiesSystem(
                     entity: event.source.id,
                 });
             },
+            component_removed: (_root, event) => {
+                // A component removed from a live entity must disappear on the
+                // client too. Component presence is state: an unmanned tower's
+                // searchlight emitter is removed rather than zeroed. Same
+                // root-allowlist and client-only guards as component_updated.
+                if (
+                    event.source.isGameRoot &&
+                    !replicatedRootComponents.has(event.item.id)
+                ) {
+                    return;
+                }
+                if (
+                    event.item.id === TileComponentId ||
+                    event.item.id === VisibilityMapComponentId
+                ) {
+                    return;
+                }
+                postMessage({
+                    type: "removeComponent",
+                    componentId: event.item.id,
+                    entity: event.source.id,
+                });
+            },
             transform: (_root, event) => {
                 postMessage({
                     type: "transform",

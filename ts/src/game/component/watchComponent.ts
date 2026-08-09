@@ -1,12 +1,12 @@
 /**
- * The night searchlight on a manned station. Only meaningful at night while a worker
- * is on the tile; dormant otherwise.
+ * The searchlight on a manned station. The beam runs whenever the tower is
+ * manned, in every phase: its lit claim is what matters to hearthlight, and
+ * daylight only changes how it renders.
  *
- * `searchlight` is the player-set aim mode: `auto` (sweep N→E→S→W, locking onto a
- * caught hostile) or a fixed cardinal. `beamAim` is the currently-lit quarter the
- * `WatchSystem` resolves each tick. `lockedOn` is a *transient* target the auto-sweep
- * is following; it is re-validated (and cleared if the target is gone or out of range)
- * by the WatchSystem every tick, so it cannot get stuck pointing at a dead entity.
+ * `searchlight` is the player-set aim mode: `auto` (sweep N -> E -> S -> W) or
+ * a fixed cardinal. `beamAim` is the currently-lit quarter the watch system
+ * resolves each tick. The beam never tracks hostiles. Detection is the hearth
+ * defense system's job, fed by the lit tiles the beam claims.
  */
 export type Cardinal = "N" | "E" | "S" | "W";
 export type SearchlightMode = "auto" | Cardinal;
@@ -15,7 +15,6 @@ export type WatchComponent = {
     id: typeof WatchComponentId;
     searchlight: SearchlightMode;
     beamAim: Cardinal;
-    lockedOn: string | null;
 };
 
 export function createWatchComponent(): WatchComponent {
@@ -23,7 +22,6 @@ export function createWatchComponent(): WatchComponent {
         id: WatchComponentId,
         searchlight: "auto",
         beamAim: "N",
-        lockedOn: null,
     };
 }
 

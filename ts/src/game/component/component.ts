@@ -44,6 +44,7 @@ import type { HeldItemComponent } from "./heldItemComponent.ts";
 import type { GroundItemComponent } from "./groundItemComponent.ts";
 import type { TraversalComponent } from "./traversalComponent.ts";
 import type { DayComponent } from "./dayComponent.ts";
+import type { GameTimeComponent } from "./gameTimeComponent.ts";
 import type { LightSourceComponent } from "./lightSourceComponent.ts";
 import type { RaidingComponent } from "./raidingComponent.ts";
 import type { StationComponent } from "./stationComponent.ts";
@@ -96,6 +97,7 @@ export type Components =
     | GroundItemComponent
     | TraversalComponent
     | DayComponent
+    | GameTimeComponent
     | LightSourceComponent
     | RaidingComponent
     | StationComponent

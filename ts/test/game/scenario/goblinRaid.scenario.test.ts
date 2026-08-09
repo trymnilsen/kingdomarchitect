@@ -820,6 +820,7 @@ describe("goblin night raid scenario tests", () => {
             attacker.id,
             5,
             harness.currentTick,
+            harness.root,
         );
         requestReplan(raider);
         harness.tick();

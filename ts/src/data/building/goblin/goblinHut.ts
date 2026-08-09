@@ -9,6 +9,9 @@ export const goblinHut: Building = {
     scale: 2,
     previewScale: 4,
     previewOffset: 0,
+    // Goblin-built structures emit no light for now. Raiders staying invisible
+    // in the dark is the point of night raids.
+    light: "none",
     requirements: {
         materials: {
             [woodResourceItem.id]: 15,

@@ -9,6 +9,10 @@ export const goblinCampfire: Building = {
     scale: 1,
     previewScale: 2,
     previewOffset: 0,
+    // Goblin-built structures emit no light for now. Raiders staying invisible
+    // in the dark is the point of night raids. The camp's prefab-placed
+    // fireplace is the one goblin light in the world.
+    light: "none",
     requirements: {
         materials: {
             [woodResourceItem.id]: 10,

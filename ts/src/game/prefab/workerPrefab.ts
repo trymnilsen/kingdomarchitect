@@ -9,10 +9,9 @@ import {
 } from "../component/spriteComponent.ts";
 import { Entity } from "../entity/entity.ts";
 import { createVisibilityComponent } from "../component/visibilityComponent.ts";
-import {
-    WORKER_MINIMAL_PERCEPTION,
-    WORKER_VISION_REACH,
-} from "../vision/visionReach.ts";
+import { createLightSourceComponent } from "../component/lightSourceComponent.ts";
+import { workerGlowLightSource } from "../../data/light/lightSourceDefinition.ts";
+import { WORKER_VISION_REACH } from "../vision/visionReach.ts";
 import { createAnimationComponent } from "../component/animationComponent.ts";
 import { nobleKnightAnimationGraph } from "../../asset/animation/knight.animation.ts";
 import { createDirectionComponent } from "../component/directionComponent.ts";
@@ -41,15 +40,13 @@ export function workerPrefab(id?: string): Entity {
     entity.setEcsComponent(createPlayerUnitComponent());
     entity.setEcsComponent(createEquipmentComponent());
     entity.setEcsComponent(createHeldItemComponent());
-    // Workers see in the dark via minimal perception rather than by emitting
-    // light: their surroundings stay objectively dark, so the illumination field
-    // only ever reflects real sources (and a future carried torch is an upgrade,
-    // not a duplicate of an innate glow).
+    entity.setEcsComponent(createVisibilityComponent(WORKER_VISION_REACH));
+    // The presence glow lights exactly the worker's own tile, so the player
+    // never loses a worker in the dark while the world around them stays
+    // black. It claims no hearthlight (see the definition), and a future
+    // carried torch is a visible upgrade over it.
     entity.setEcsComponent(
-        createVisibilityComponent(
-            WORKER_VISION_REACH,
-            WORKER_MINIMAL_PERCEPTION,
-        ),
+        createLightSourceComponent(workerGlowLightSource.id),
     );
     entity.setEcsComponent(createAnimationComponent(nobleKnightAnimationGraph));
     entity.setEcsComponent(createDirectionComponent());

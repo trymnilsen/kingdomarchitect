@@ -1,26 +1,21 @@
-import { makeNumberId, type Point } from "../../common/point.ts";
-import type { LightBand } from "../light/lightBand.ts";
+import { makeNumberId } from "../../common/point.ts";
+import { ChunkSize } from "../map/chunk.ts";
 import type { WorldDiscoveryData } from "./worldDiscoveryComponent.ts";
 
+/**
+ * Client-only mirror of the player's permanent map memory. It holds exactly one
+ * thing: the discovered store, written by discovery messages from the server.
+ * What the player currently sees is derived per frame as discovered-and-lit.
+ * Nothing per-frame lives on this component.
+ */
 export type VisibilityMapComponent = {
     id: typeof VisibilityMapComponentId;
-    visibility: Set<number>;
-    /**
-     * The minimum band each tile is perceived at this frame regardless of
-     * illumination, from viewers' minimal perception (see
-     * {@link MinimalPerception}). Holds entries only for tiles some viewer
-     * grants a floor on; every other tile floors at `dark`. Rebuilt fresh each
-     * render alongside `visibility`, and like it never replicated.
-     */
-    perceptionFloor: Map<number, LightBand>;
     discovered: WorldDiscoveryData;
 };
 
 export function createVisibilityMapComponent(): VisibilityMapComponent {
     return {
         id: VisibilityMapComponentId,
-        visibility: new Set(),
-        perceptionFloor: new Map(),
         discovered: {
             fullyDiscoveredChunks: new Set(),
             partiallyDiscoveredChunks: new Map(),
@@ -49,6 +44,26 @@ export function hasDiscovered(
 }
 
 /**
+ * Whether the tile at a world position has been discovered. Wraps
+ * {@link hasDiscovered} for callers that hold world coordinates rather than
+ * chunk-local ones, such as the sprite pass of the renderer.
+ */
+export function hasDiscoveredWorldTile(
+    visibilityComponent: VisibilityMapComponent,
+    worldX: number,
+    worldY: number,
+): boolean {
+    const chunkX = Math.floor(worldX / ChunkSize);
+    const chunkY = Math.floor(worldY / ChunkSize);
+    return hasDiscovered(
+        visibilityComponent,
+        makeNumberId(chunkX, chunkY),
+        worldX - chunkX * ChunkSize,
+        worldY - chunkY * ChunkSize,
+    );
+}
+
+/**
  * Whether any tile of the chunk has been discovered by the player. Chunks can
  * exist client side without being discovered (the server replicates all
  * generated chunks), so player-facing checks should use this rather than
@@ -65,37 +80,6 @@ export function hasDiscoveredChunk(
     const partiallyDiscovered =
         visibilityComponent.discovered.partiallyDiscoveredChunks.get(chunkId);
     return !!partiallyDiscovered && partiallyDiscovered.size > 0;
-}
-
-/**
- * Whether a tile falls within some viewer's vision reach this frame — the maximum
- * distance an emitter can see, before illumination is taken into account. This is
- * only one of the two limits on what the player actually sees: a tile in reach can
- * still be unseen if it is dark. The combined rule (the smaller of reach and the
- * tile's light band) lives in the perceived-band derivation, not here.
- */
-export function isInVisionReach(
-    visibilityComponent: VisibilityMapComponent,
-    x: number,
-    y: number,
-): boolean {
-    return visibilityComponent.visibility.has(makeNumberId(x, y));
-}
-
-/**
- * The minimum band a tile is perceived at this frame, before illumination is
- * considered: the floor some viewer's minimal perception grants it, or `dark`
- * where no viewer does. The perceived-band rule takes the brighter of this and
- * the tile's actual illumination.
- */
-export function perceptionFloorAt(
-    visibilityComponent: VisibilityMapComponent,
-    x: number,
-    y: number,
-): LightBand {
-    return (
-        visibilityComponent.perceptionFloor.get(makeNumberId(x, y)) ?? "dark"
-    );
 }
 
 export const VisibilityMapComponentId = "visibilityMap";

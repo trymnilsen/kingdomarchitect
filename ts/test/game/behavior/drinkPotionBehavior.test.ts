@@ -96,7 +96,7 @@ describe("drinkPotionBehavior", () => {
             attacker.worldPosition = { x: 13, y: 8 };
             settlement.addChild(attacker);
             const threat = worker.requireEcsComponent(ThreatMapComponentId);
-            addThreat(threat, "G1", 5, 0);
+            addThreat(threat, "G1", 5, 0, worker.getRootEntity());
 
             assert.strictEqual(behavior.isValid(worker), false);
         });
@@ -106,7 +106,7 @@ describe("drinkPotionBehavior", () => {
             const settlement = createSettlement();
             const worker = createWorker(settlement, 50, 200);
             const threat = worker.requireEcsComponent(ThreatMapComponentId);
-            addThreat(threat, "slainGoblin", 5, 0);
+            addThreat(threat, "slainGoblin", 5, 0, worker.getRootEntity());
 
             assert.strictEqual(behavior.isValid(worker), true);
         });

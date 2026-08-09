@@ -21,6 +21,7 @@ import {
 } from "./replicatedEntitiesSystem.ts";
 import type { GameCommand } from "./message/gameCommand.ts";
 import { createMessageEmitterComponent } from "../game/component/messageEmitterComponent.ts";
+import { createGameTimeComponent } from "../game/component/gameTimeComponent.ts";
 import {
     DiscoverTileGameMessageType,
     type DiscoverTileGameMessage,
@@ -30,6 +31,7 @@ import { createCommandSystem } from "../game/system/commandSystem.ts";
 import { createEffectSystem } from "../game/system/effectSystem.ts";
 import { createEffectExecutorMap } from "../data/effect/effectExecutorRegistry.ts";
 import { housingSystem } from "../game/system/housingSystem.ts";
+import { hearthDefenseSystem } from "../game/system/hearthDefenseSystem.ts";
 import { watchSystem } from "../game/system/watchSystem.ts";
 import { regrowSystem } from "../game/system/regrowSystem.ts";
 import { farmGrowthSystem } from "../game/system/farmGrowthSystem.ts";
@@ -86,6 +88,10 @@ export class GameServer {
                 this.broadcastCallback.invoke(message);
             }),
         );
+        // Expose the live tick to entity-only code paths like behaviors. The
+        // component references the same GameTime instance setTick updates, so
+        // it is always current without any per-tick stamping.
+        this.world.root.setEcsComponent(createGameTimeComponent(this.gameTime));
         this.addSystems();
 
         const hasSave = await this.persistenceManager.hasSave();
@@ -226,6 +232,9 @@ export class GameServer {
         this.world.addSystem(pathfindingSystem);
         // Effect system runs before behavior so stat modifiers are current when behaviors evaluate
         this.world.addSystem(createEffectSystem(createEffectExecutorMap()));
+        // Hearth defense runs before behavior so intrusion refreshes and the
+        // replans they request influence the same tick's behavior selection
+        this.world.addSystem(hearthDefenseSystem);
         this.world.addSystem(createBehaviorSystem(createBehaviorResolver()));
         this.world.addSystem(hungerSystem);
         this.world.addSystem(warmthSystem);

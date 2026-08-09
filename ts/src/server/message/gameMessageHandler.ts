@@ -18,6 +18,7 @@ import {
     ComponentDeltaGameMessageType,
     DiscoverTileGameMessageType,
     ReloadGameMessageType,
+    RemoveComponentGameMessageType,
     RemoveEntityGameMessageType,
     SetComponentGameMessageType,
     TransformGameMessageType,
@@ -26,6 +27,7 @@ import {
     type DiscoverTileGameMessage,
     type ReplicatedEntityData,
     type GameMessage,
+    type RemoveComponentGameMessage,
     type RemoveEntityGameMessage,
     type SetComponentGameMessage,
     type TransformGameMessage,
@@ -47,6 +49,9 @@ export function handleGameMessage(root: Entity, message: GameMessage) {
             break;
         case SetComponentGameMessageType:
             setComponentHandler(root, message);
+            break;
+        case RemoveComponentGameMessageType:
+            removeComponentHandler(root, message);
             break;
         case ComponentDeltaGameMessageType:
             componentDeltaHandler(root, message);
@@ -147,6 +152,16 @@ function setComponentHandler(root: Entity, message: SetComponentGameMessage) {
     if (entity) {
         entity.setEcsComponent(message.component);
         entity.invalidateComponent(message.component.id);
+    }
+}
+
+function removeComponentHandler(
+    root: Entity,
+    message: RemoveComponentGameMessage,
+) {
+    const entity = root.findEntity(message.entity);
+    if (entity) {
+        entity.removeEcsComponent(message.componentId);
     }
 }
 

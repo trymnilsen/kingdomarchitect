@@ -13,6 +13,7 @@ export type GameMessage =
     | AddEntityGameMessage
     | RemoveEntityGameMessage
     | SetComponentGameMessage
+    | RemoveComponentGameMessage
     | ComponentDeltaGameMessage
     | TransformGameMessage
     | DiscoverTileGameMessage
@@ -33,6 +34,7 @@ export const WorldStateMessageType = "worldState";
 export const AddEntityGameMessageType = "addEntity";
 export const RemoveEntityGameMessageType = "removeEntity";
 export const SetComponentGameMessageType = "setComponent";
+export const RemoveComponentGameMessageType = "removeComponent";
 export const ComponentDeltaGameMessageType = "componentDelta";
 export const TransformGameMessageType = "transform";
 export const DiscoverTileGameMessageType = "discoverTile";
@@ -92,6 +94,17 @@ export type RemoveEntityGameMessage = {
 export type SetComponentGameMessage = {
     type: typeof SetComponentGameMessageType;
     component: Components;
+    entity: string;
+};
+
+/**
+ * Deletes a component from a replicated entity. Component presence is state
+ * (an unmanned tower's searchlight emitter is removed rather than zeroed), so
+ * removal must reach the client like any other mutation.
+ */
+export type RemoveComponentGameMessage = {
+    type: typeof RemoveComponentGameMessageType;
+    componentId: ComponentID;
     entity: string;
 };
 

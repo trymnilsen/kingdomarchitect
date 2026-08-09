@@ -39,6 +39,7 @@ import type { InventoryItemQuantity } from "../../../src/data/inventory/inventor
 import { createHousingComponent } from "../../../src/game/component/housingComponent.ts";
 import { createFireSourceComponent } from "../../../src/game/component/fireSourceComponent.ts";
 import { createPlayerUnitComponent } from "../../../src/game/component/playerUnitComponent.ts";
+import { createGameTimeComponent } from "../../../src/game/component/gameTimeComponent.ts";
 
 /**
  * Full-stack scenario test harness for logistics, crafting, and behavior flows.
@@ -46,7 +47,9 @@ import { createPlayerUnitComponent } from "../../../src/game/component/playerUni
  * pipeline so tests exercise actual behavior selection and action execution.
  *
  * Pass extraSystems to add additional systems (e.g. effectSystem) to the pipeline.
- * Systems run in registration order: chunkMap → behavior → extraSystems.
+ * Systems run in registration order: chunkMap → preBehaviorSystems → behavior →
+ * extraSystems. Use preBehaviorSystems for systems that must influence the same
+ * tick's behavior selection (hearth defense does, matching production order).
  */
 export class ScenarioHarness {
     root: Entity;
@@ -54,7 +57,10 @@ export class ScenarioHarness {
     currentTick: number = 0;
     private playerUnitCounter = 0;
 
-    constructor(extraSystems: EcsSystem[] = []) {
+    constructor(
+        extraSystems: EcsSystem[] = [],
+        preBehaviorSystems: EcsSystem[] = [],
+    ) {
         this.ecsWorld = new EcsWorld();
         this.ecsWorld.addSystem(chunkMapSystem);
         this.root = this.ecsWorld.root;
@@ -78,6 +84,21 @@ export class ScenarioHarness {
         // Required by discoverAfterMovement when entities have VisibilityComponent
         this.root.setEcsComponent(createMessageEmitterComponent(() => {}));
         this.root.setEcsComponent(createWorldDiscoveryComponent());
+        // Behaviors read the current tick through the root, mirroring how the
+        // game server exposes its GameTime instance. The source reads the
+        // harness tick live, so tick() needs no extra bookkeeping.
+        const harness = this;
+        this.root.setEcsComponent(
+            createGameTimeComponent({
+                get tick() {
+                    return harness.currentTick;
+                },
+            }),
+        );
+
+        for (const system of preBehaviorSystems) {
+            this.ecsWorld.addSystem(system);
+        }
 
         this.ecsWorld.addSystem(createBehaviorSystem(createBehaviorResolver()));
 

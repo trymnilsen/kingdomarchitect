@@ -2,6 +2,7 @@ import { randomColor } from "../../common/color/hexColor.ts";
 import { generateId } from "../../common/idGenerator.ts";
 import type { Point } from "../../common/point.ts";
 import { farm } from "../../data/building/grow/grow.ts";
+import { torch } from "../../data/building/light/torch.ts";
 import { woodenHouse } from "../../data/building/wood/house.ts";
 import { stockPile } from "../../data/building/wood/storage.ts";
 import {
@@ -132,6 +133,15 @@ export function addInitialPlayerChunk(scopedEntity: Entity): Point {
     startingStockpile.worldPosition = {
         x: 2 + randomOffsetX,
         y: randomOffsetY,
+    };
+
+    // A fresh kingdom starts with one deliberate light so it has a hearthlight
+    // claim from day one. Plain buildings glow without claiming.
+    const startingTorch = buildingPrefab(torch, false);
+    playerKingdom.addChild(startingTorch);
+    startingTorch.worldPosition = {
+        x: 2 + randomOffsetX,
+        y: randomOffsetY + 1,
     };
 
     scopedEntity.updateComponent(TileComponentId, (component) => {

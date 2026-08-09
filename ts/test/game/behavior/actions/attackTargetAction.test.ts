@@ -244,7 +244,7 @@ describe("attackTargetAction", () => {
             const { worker, target } = createCombatScene();
             const threat = target.getEcsComponent(ThreatMapComponentId)!;
             // Worker is the established top threat from a prior fight tick.
-            addThreat(threat, "worker", 5, 0);
+            addThreat(threat, "worker", 5, 0, target.getRootEntity());
 
             const agent = target.getEcsComponent(BehaviorAgentComponentId)!;
             agent.pendingReplan = undefined;
@@ -265,13 +265,20 @@ describe("attackTargetAction", () => {
         it("triggers replan when a second attacker overtakes the previous top", () => {
             const { worker, target } = createCombatScene();
             const threat = target.getEcsComponent(ThreatMapComponentId)!;
-            // Pre-seed: G2 is the established top with amount 2; worker is
-            // also at 2 but loses ties (insertion order + strict `>`).
-            // After one attack from worker, worker accumulates more and
-            // overtakes G2. This couples to attackTargetAction's damage > 0,
-            // which is a fair invariant — a no-op attack would be a bug.
-            addThreat(threat, "G2", 2, 0);
-            addThreat(threat, "worker", 2, 0);
+            // Pre-seed: G2 is the established top. Both amounts land on the
+            // intrusion floor, so the tie goes to G2 (insertion order plus
+            // strict `>`). After one attack from worker, worker accumulates
+            // more and overtakes G2. This couples to attackTargetAction's
+            // damage > 0, which is a fair invariant. A no-op attack would be
+            // a bug.
+            const sceneRoot = target.getRootEntity();
+            // G2 must resolve as a live entity or the write-time sweep and
+            // getTopThreat both ignore it.
+            const otherAttacker = new Entity("G2");
+            otherAttacker.worldPosition = { x: 12, y: 8 };
+            sceneRoot.addChild(otherAttacker);
+            addThreat(threat, "G2", 2, 0, sceneRoot);
+            addThreat(threat, "worker", 2, 0, sceneRoot);
 
             const agent = target.getEcsComponent(BehaviorAgentComponentId)!;
             agent.pendingReplan = undefined;

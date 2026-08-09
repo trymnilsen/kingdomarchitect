@@ -1,115 +1,148 @@
 /**
- * A light source definition describes how strongly a single emitter lights the
- * world around it, expressed as two concentric radii (in tiles):
+ * A light source definition describes how far a single emitter lights the world
+ * around it, as one radius in tiles. Lit-ness is binary. A tile is either inside
+ * some source's light or it is dark.
  *
- *   - within `brightRadius`            -> bright
- *   - beyond that, within `dimRadius`  -> dim
- *   - beyond `dimRadius`               -> contributes nothing
+ * A `lightRadius` of 0 lights exactly the emitter's own tile. There is no
+ * "emits nothing" radius value. An entity that should emit nothing simply has no
+ * {@link LightSourceComponent}.
  *
- * A radius of 0 means that band is not emitted at all (not "just the centre
- * tile"). This is what lets the building self-glow profile emit dim-only by
- * setting `brightRadius: 0`.
- *
- * Definitions are data, not behaviour. Stage 2 grows this roster with the full
- * set of buildable light sources (torch, campfire, lamp post, great hearth,
- * shrine, everlight) and grows each entry with fuel and extinguish-difficulty
- * fields. Keeping that here means the {@link LightSourceComponent} stays a thin
- * reference and never changes shape as the system grows.
+ * Definitions are data, not behaviour. Later stages grow each entry with live
+ * fuel and extinguish behaviour. Keeping that here means the
+ * {@link LightSourceComponent} stays a thin reference and never changes shape as
+ * the system grows.
  */
 
 /**
  * The fuel an emitter consumes once the fuel-consuming system exists (a later
  * stage). This is data only here: nothing in this slice burns or depletes. A
- * `"none"` source never runs down (it is fed by its structure, not a consumable);
- * a `"charcoal"` source draws on stored fuel. Charcoal may not yet exist as an
- * inventory item. This field encodes intent rather than a live dependency.
+ * `"none"` source never runs down (it is fed by its structure rather than a
+ * consumable). A `"charcoal"` source draws on stored fuel. This field encodes
+ * intent rather than a live dependency.
  */
 export type LightSourceFuel = "none" | "charcoal";
 
 /**
  * How hard a source is to put out, for the future extinguish verb. `"easy"` and
- * `"hard"` gate that verb's effort; `"destroy"` means the source cannot be
+ * `"hard"` gate that verb's effort. `"destroy"` means the source cannot be
  * extinguished at all and only goes away when its host is dismantled. It is named
  * "destroy" rather than "dismantle" because a light source need not be a
- * building, and we may have non-building emitters later. Data only; no
- * extinguish behaviour is implemented here.
+ * building. Data only here, no extinguish behaviour is implemented.
  */
 export type LightSourceExtinguishDifficulty = "easy" | "hard" | "destroy";
 
 export type LightSourceDefinition = {
     id: string;
-    brightRadius: number;
-    dimRadius: number;
+    lightRadius: number;
     fuel: LightSourceFuel;
     extinguishDifficulty: LightSourceExtinguishDifficulty;
+    /**
+     * Whether this source's lit tiles count as hearthlight, the kingdom's home
+     * region, when the source belongs to the player. Only deliberate placed
+     * lights claim territory. Presence glows and ambient conveniences light
+     * tiles without claiming them, so the home region cannot be dragged around
+     * the map by whoever happens to be walking at night.
+     */
+    claimsHearthlight: boolean;
 };
 
 /**
- * The brazier is the single placed source exercised in Stage 1: a bright pool
- * out to 2 tiles, fading to dim out to 4.
+ * The brazier is the widest placed source: a standing fixture with a pool out to
+ * 4 tiles.
  */
 export const brazierLightSource: LightSourceDefinition = {
     id: "brazier",
-    brightRadius: 2,
-    dimRadius: 4,
+    lightRadius: 4,
     fuel: "charcoal",
     // A standing fixture, not lit by hand: putting it out takes real effort.
     extinguishDifficulty: "hard",
+    claimsHearthlight: true,
 };
 
 /**
  * The default emission for an ordinary building: its own tile and the cardinal
- * neighbours read dim, and nothing reads bright. Buildings glow faintly so the
- * places people live and work are never pitch dark, but only placed sources can
- * brighten an area, which keeps placed light meaningful.
+ * neighbours are lit. Buildings glow faintly so the places people live and work
+ * are never pitch dark. The glow claims no hearthlight. A wall segment or a lone
+ * farm in the wilderness is not home territory. Only deliberate light sources
+ * (torch, brazier, campfire, lamp post) claim.
  */
 export const buildingGlowLightSource: LightSourceDefinition = {
     id: "buildingGlow",
-    brightRadius: 0,
-    dimRadius: 1,
-    // The glow is an emergent property of an occupied building, not a fire: it
-    // has nothing to burn and cannot be "put out". It only ends with the
-    // building itself.
+    lightRadius: 1,
+    // The glow is an emergent property of an occupied building rather than a
+    // fire: it has nothing to burn and cannot be "put out". It only ends with
+    // the building itself.
     fuel: "none",
     extinguishDifficulty: "destroy",
+    claimsHearthlight: false,
 };
 
 /**
- * A handheld torch: lights only its own tile and the cardinal neighbours, then
- * nothing. This is the cheapest and most disposable source, quick to light and
- * quick to snuff, so it carries no fuel and is trivially extinguished.
+ * A placed torch: lights its own tile and the cardinal neighbours. This is the
+ * cheapest and most disposable source, quick to light and quick to snuff, so it
+ * carries no fuel and is trivially extinguished.
  */
 export const torchLightSource: LightSourceDefinition = {
     id: "torch",
-    brightRadius: 1,
-    dimRadius: 1,
+    lightRadius: 1,
     fuel: "none",
     extinguishDifficulty: "easy",
+    claimsHearthlight: true,
 };
 
 /**
- * A campfire: a modest gathering light, bright in close and fading a little
- * further than the torch. It is fed (charcoal) but, being an open fire, is easy
- * to kick out.
+ * A campfire: a modest gathering light. It is fed (charcoal) but, being an open
+ * fire, is easy to kick out.
  */
 export const campfireLightSource: LightSourceDefinition = {
     id: "campfire",
-    brightRadius: 2,
-    dimRadius: 3,
+    lightRadius: 3,
     fuel: "charcoal",
     extinguishDifficulty: "easy",
+    claimsHearthlight: true,
 };
 
 /**
- * A lamp post: durable infrastructure with the widest dim reach of this slice.
- * Built to stay lit, so it draws on fuel and is hard to extinguish by hand.
+ * A lamp post: durable infrastructure with the same reach as the brazier. Built
+ * to stay lit, so it draws on fuel and is hard to extinguish by hand.
  */
 export const lampPostLightSource: LightSourceDefinition = {
     id: "lampPost",
-    brightRadius: 2,
-    dimRadius: 4,
+    lightRadius: 4,
     fuel: "charcoal",
     extinguishDifficulty: "hard",
+    claimsHearthlight: true,
+};
+
+/**
+ * A worker's presence glow. This is not an in-world lantern. A worker at night
+ * is visible as a single lit tile with nothing around it, so the player never
+ * loses a worker in the dark, while the lone pinprick in a black field heightens
+ * the darkness instead of relieving it. It claims no hearthlight: if it did,
+ * every worker would be walking home territory and the defenders-inside-
+ * hearthlight gate would be meaningless, because every aggressive worker always
+ * stands inside their own one-tile bubble.
+ */
+export const workerGlowLightSource: LightSourceDefinition = {
+    id: "workerGlow",
+    lightRadius: 0,
+    fuel: "none",
+    extinguishDifficulty: "destroy",
+    claimsHearthlight: false,
+};
+
+/**
+ * The manned watchtower's beam. The radius here is an inert fallback. The real
+ * shape arrives as a pattern written onto the component by the watch system, so
+ * everything that reads lights (coverage, hearthlight, future fuel or lens work)
+ * gets the searchlight for free without knowing towers exist.
+ */
+export const searchlightLightSource: LightSourceDefinition = {
+    id: "searchlight",
+    lightRadius: 0,
+    fuel: "none",
+    extinguishDifficulty: "destroy",
+    claimsHearthlight: true,
 };
 
 const lightSourceDefinitions: readonly LightSourceDefinition[] = [
@@ -118,6 +151,8 @@ const lightSourceDefinitions: readonly LightSourceDefinition[] = [
     torchLightSource,
     campfireLightSource,
     lampPostLightSource,
+    workerGlowLightSource,
+    searchlightLightSource,
 ];
 
 export function getLightSourceDefinition(

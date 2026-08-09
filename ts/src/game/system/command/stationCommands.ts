@@ -53,10 +53,9 @@ export function setSearchlightMode(
     }
 
     watch.searchlight = command.mode;
-    // A fixed cardinal also sets the resolved aim immediately; "auto" lets the
-    // WatchSystem drive beamAim.
+    // A fixed cardinal also sets the resolved aim immediately. "auto" lets the
+    // watch system drive beamAim.
     if (command.mode !== "auto") {
-        watch.lockedOn = null;
         watch.beamAim = command.mode;
     }
     tower.invalidateComponent(WatchComponentId);

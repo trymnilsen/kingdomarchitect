@@ -50,11 +50,12 @@ export function diamondPatternForRadius(radius: number): Point[] {
  * (Euclidean) distance, centred on the origin: every offset where
  * `dx*dx + dy*dy <= radius*radius`.
  *
- * This is deliberately a disc, not a {@link generateDiamondPattern} diamond,
- * because it is used to represent a light source's footprint and must equal the
- * set of tiles that source illuminates. Illumination tests `distSq <= radiusSq`
- * (see `bandFromEmitters`), so a disc of the same radius covers exactly the lit
- * tiles — a Manhattan diamond would miss the lit tiles near the diagonals.
+ * This is deliberately a disc rather than a {@link generateDiamondPattern}
+ * diamond, because it is used to represent a light source's footprint and must
+ * equal the set of tiles that source illuminates. Coverage stamping tests
+ * `distSq <= radiusSq` (see `computeLitTiles`), so a disc of the same radius
+ * covers exactly the lit tiles. A Manhattan diamond would miss the lit tiles
+ * near the diagonals.
  *
  * @param radius the Euclidean reach in tiles (0 yields just the centre tile)
  */
