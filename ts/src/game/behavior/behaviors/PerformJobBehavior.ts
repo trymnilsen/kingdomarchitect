@@ -10,7 +10,11 @@ import {
     canExecuteBuildJob,
     type BuildBuildingJob,
 } from "../../job/buildBuildingJob.ts";
-import { findJobClaimedBy, claimJobInQueue } from "../../job/jobLifecycle.ts";
+import {
+    findJobClaimedBy,
+    claimJobInQueue,
+    suspendJobInQueue,
+} from "../../job/jobLifecycle.ts";
 import { CraftingJobId, type CraftingJob } from "../../job/craftingJob.ts";
 import { WindmillJobId, type WindmillJob } from "../../job/windmillJob.ts";
 import {
@@ -118,7 +122,11 @@ export function createPerformJobBehavior(
                 return [];
             }
 
-            // Find job claimed by this entity
+            // A job claimed on a previous tick is resumed first. If it no
+            // longer plans to anything, release the claim so the job stops
+            // being hidden from other workers, then look for different work
+            // below. Holding the claim while idling would livelock this worker
+            // on the same dead job and starve everyone else of it.
             const claimedJob = findJobClaimedBy(queueEntity, entity.id);
             if (claimedJob) {
                 log.debug(
@@ -126,49 +134,155 @@ export function createPerformJobBehavior(
                     claimedJob,
                 );
                 const actions = planJob(root, entity, claimedJob, buildPlanner);
-                log.info(
-                    `[PerformJobBehavior] entity ${entity.id} planned actions`,
-                    actions,
+                if (actions.length > 0) {
+                    log.info(
+                        `[PerformJobBehavior] entity ${entity.id} planned actions`,
+                        actions,
+                    );
+                    return actions;
+                }
+                releaseClaimIfHeld(
+                    queueEntity,
+                    jobQueue,
+                    claimedJob,
+                    entity.id,
                 );
-                return actions;
             }
 
-            // No claimed job, try to claim a new one
-            const bestJobIndex = findBestJob(
+            return claimNextPlannableJob(
+                root,
                 entity,
+                queueEntity,
                 jobQueue,
+                buildPlanner,
                 buildJobValidator,
                 claimRequiresEmptyHand,
+                claimedJob,
             );
-            if (bestJobIndex === -1) {
-                log.debug(
-                    `[PerformJobBehavior] entity ${entity.id} had no possible jobs, returning []`,
-                );
-                return [];
-            }
-
-            const job = jobQueue.jobs[bestJobIndex];
-            log.debug(
-                `[PerformJobBehavior] entity ${entity.id} claiming job`,
-                job,
-            );
-            claimJobInQueue(job, entity.id, queueEntity);
-            const actions = planJob(root, entity, job, buildPlanner);
-            log.info(
-                `[PerformJobBehavior] entity ${entity.id} planned actions`,
-                actions,
-            );
-            return actions;
         },
     };
 }
 
 /**
+ * Release `entityId`'s claim on `job`, but only if the job is still in the
+ * queue and still claimed by this entity. Planners retire or suspend jobs as a
+ * side effect of planning (failAndAbort splices the job out, suspendJob
+ * releases the claim), so by the time a plan comes back empty the claim may
+ * already be gone. Releasing unconditionally would clobber another worker's
+ * claim or resurrect a removed job's bookkeeping.
+ */
+function releaseClaimIfHeld(
+    queueEntity: Entity,
+    jobQueue: JobQueueComponent,
+    job: Jobs,
+    entityId: string,
+): void {
+    if (job.claimedBy === entityId && jobQueue.jobs.includes(job)) {
+        suspendJobInQueue(queueEntity, job);
+    }
+}
+
+/**
+ * Walk takeable jobs from cheapest to most expensive and claim the first one
+ * that plans to a non-empty action list.
+ *
+ * Trying candidates in order instead of committing to the single cheapest one
+ * is what keeps one unplannable job from starving the whole queue: the
+ * take-check (canTakeJob) is deliberately cheap and cannot know everything the
+ * planner knows (e.g. whether a recipe input has any source in the world), so
+ * a job can pass it and still plan to nothing. Before this loop, every worker
+ * would pick that same job, fail to plan it, idle, and repeat next tick while
+ * plannable jobs sat behind it in the queue.
+ *
+ * Candidates are collected as references before any planning happens because
+ * planners mutate the queue mid-loop: failAndAbort splices jobs out and
+ * suspendJob releases claims. Each candidate is re-validated right before the
+ * attempt for the same reason. An empty plan releases the claim explicitly,
+ * because several planner paths return empty without releasing it themselves.
+ * A worker that walks off to other work while holding a dead claim hides that
+ * job from every worker permanently.
+ *
+ * @param skipJob A job that already failed to plan this tick (the resumed
+ *   claimed job), excluded so it isn't planned twice in one selection.
+ */
+function claimNextPlannableJob(
+    root: Entity,
+    worker: Entity,
+    queueEntity: Entity,
+    jobQueue: JobQueueComponent,
+    buildPlanner: BuildJobPlanner,
+    buildJobValidator: BuildJobValidator,
+    claimRequiresEmptyHand: boolean,
+    skipJob: Jobs | null,
+): BehaviorActionData[] {
+    // Cost combines distance and queue position so workers prefer nearby jobs
+    // but still respect rough priority order (earlier jobs score lower queue
+    // cost). baseCost provides a floor so a job at distance 0 doesn't get an
+    // unfair advantage purely from its index relative to other close-by jobs.
+    const baseCost = 10;
+    const candidates: { job: Jobs; cost: number }[] = [];
+    for (let i = 0; i < jobQueue.jobs.length; i++) {
+        const job = jobQueue.jobs[i];
+        if (job === skipJob) {
+            continue;
+        }
+        if (
+            !canTakeJob(
+                root,
+                worker,
+                job,
+                jobQueue,
+                buildJobValidator,
+                claimRequiresEmptyHand,
+            )
+        ) {
+            continue;
+        }
+        const targetPosition = getJobTargetPosition(root, job);
+        if (!targetPosition) {
+            continue;
+        }
+        const cost =
+            baseCost + distance(worker.worldPosition, targetPosition) + i;
+        candidates.push({ job, cost });
+    }
+    candidates.sort((a, b) => a.cost - b.cost);
+
+    for (const candidate of candidates) {
+        const job = candidate.job;
+        // An earlier candidate's planner may have retired this job or another
+        // worker's bookkeeping may have changed it; skip anything that is no
+        // longer freely claimable.
+        if (job.claimedBy !== undefined || !jobQueue.jobs.includes(job)) {
+            continue;
+        }
+
+        log.debug(`[PerformJobBehavior] entity ${worker.id} claiming job`, job);
+        claimJobInQueue(job, worker.id, queueEntity);
+        const actions = planJob(root, worker, job, buildPlanner);
+        if (actions.length > 0) {
+            log.info(
+                `[PerformJobBehavior] entity ${worker.id} planned actions`,
+                actions,
+            );
+            return actions;
+        }
+        releaseClaimIfHeld(queueEntity, jobQueue, job, worker.id);
+    }
+
+    log.debug(
+        `[PerformJobBehavior] entity ${worker.id} had no plannable jobs, returning []`,
+    );
+    return [];
+}
+
+/**
  * Single source of truth for "can this worker take this job right now". Used by
- * both isValid() (via hasAvailableJobs) and expand() (via findBestJob) so the two
- * can never disagree. A disagreement would let a worker select performJob and then
- * produce no actions, stranding it on a behavior it can't act on (and displaying a
- * stale/empty activity label).
+ * both isValid() (via hasAvailableJobs) and expand() (via claimNextPlannableJob)
+ * so the two can never disagree. This check is deliberately cheap and cannot
+ * know everything the planners know, so a job passing it can still plan to
+ * nothing; expand() handles that by trying the next candidate, and the behavior
+ * system falls through to a lower-utility behavior if no job plans at all.
  *
  * The target-position check comes first so a stale job, one whose target entity
  * was removed while the job stayed queued, is rejected before reaching a
@@ -238,59 +352,6 @@ function hasAvailableJobs(
             claimRequiresEmptyHand,
         ),
     );
-}
-
-/**
- * Find the best job for an entity based on distance and queue position.
- * Returns the index of the best job, or -1 if no suitable job found.
- */
-function findBestJob(
-    entity: Entity,
-    jobQueue: JobQueueComponent,
-    buildJobValidator: BuildJobValidator,
-    claimRequiresEmptyHand: boolean,
-): number {
-    const root = entity.getRootEntity();
-    let bestJobIndex = -1;
-    let bestCost = Infinity;
-
-    for (let i = 0; i < jobQueue.jobs.length; i++) {
-        const job = jobQueue.jobs[i];
-
-        if (
-            !canTakeJob(
-                root,
-                entity,
-                job,
-                jobQueue,
-                buildJobValidator,
-                claimRequiresEmptyHand,
-            )
-        ) {
-            continue;
-        }
-
-        const targetPosition = getJobTargetPosition(root, job);
-        if (!targetPosition) {
-            continue;
-        }
-
-        // Cost combines distance and queue position so workers prefer nearby jobs
-        // but still respect rough priority order (earlier jobs score lower queue cost).
-        // baseCost provides a floor so a job at distance 0 doesn't get an unfair
-        // advantage purely from its index relative to other close-by jobs.
-        const baseCost = 10;
-        const distanceCost = distance(entity.worldPosition, targetPosition);
-        const queuePositionCost = i;
-        const totalCost = baseCost + distanceCost + queuePositionCost;
-
-        if (totalCost < bestCost) {
-            bestCost = totalCost;
-            bestJobIndex = i;
-        }
-    }
-
-    return bestJobIndex;
 }
 
 /**

@@ -35,7 +35,9 @@ export class LocalServerConnection implements GameServerConnection {
                 this.gameServer.worldMeta,
             );
             data.logs = log.getLogBuffer();
-            const json = JSON.stringify(data, null, 2);
+            // Compact on purpose: pretty-printing was 62% of a measured save
+            // file's size. Loading is JSON.parse either way.
+            const json = JSON.stringify(data);
             const blob = new Blob([json], { type: "application/json" });
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");

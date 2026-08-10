@@ -292,40 +292,66 @@ function selectBehavior(
     log.debug(`Entity ${entity.id} sorted behaviors`, {
         behaviors: JSON.stringify(behaviorUtilities),
     });
-    const bestBehavior = behaviorUtilities[0];
 
-    // pendingReplan is still set here so behaviors can read failure context
-    // from the component inside expand()
-    stats.expandsRun++;
-    const newActions = bestBehavior.behavior.expand(entity);
+    // Walk behaviors from highest utility down and adopt the first one that
+    // expands to a non-empty plan. A behavior can be valid yet produce nothing
+    // (its target vanished between isValid and expand, or every job it could
+    // take turned out unplannable); going idle in that case would starve
+    // lower-utility behaviors that do have runnable work. pendingReplan stays
+    // set through the loop so every attempted expand can read the failure
+    // context from the component.
+    //
+    // Each expand is guarded because selection runs outside the per-action
+    // try/catch in updateBehaviorAgent: an uncaught throw here would escape
+    // onUpdate and abort the tick for every agent in the world. A throwing
+    // behavior is treated like an empty expansion and the next one is tried.
+    for (const candidate of behaviorUtilities) {
+        stats.expandsRun++;
+        let newActions: BehaviorActionData[];
+        try {
+            newActions = candidate.behavior.expand(entity);
+        } catch (error) {
+            log.error(
+                `Behavior ${candidate.behavior.name} expand threw for entity ${entity.id}`,
+                { error },
+            );
+            continue;
+        }
 
-    // Behavior produced no actions, so there is nothing to run this round. Treat the worker as
-    // idle: clear all behavior/display state so it never shows a behavior name (e.g.
-    // "performJob") with no job or action context. This also empties the action queue
-    // (a stale queue would otherwise execute next tick against work that is gone).
-    if (newActions.length === 0) {
-        clearBehavior(agent);
+        if (newActions.length === 0) {
+            log.debug(
+                `Entity ${entity.id} behavior ${candidate.behavior.name} expanded to empty, trying next`,
+            );
+            continue;
+        }
+
+        agent.currentBehaviorName = candidate.behavior.name;
+        agent.currentBehaviorUtility = candidate.utility;
+        // Remember this pick so the next selection can apply the hysteresis bonus,
+        // even if this plan completes and clears currentBehaviorName before then.
+        agent.hysteresis = { behaviorName: candidate.behavior.name };
+        // Always adopt the freshly expanded plan. Selection only runs at a plan
+        // boundary (empty queue) or on a forced replan; in both cases a fresh plan
+        // is what we want. A displaced worker needs a new path rather than the stale
+        // cachedPath from its previous moveTo. There is no running head to preserve.
+        agent.actionQueue = newActions;
+        // Clear after expand so the failure context is consumed
         agent.pendingReplan = undefined;
         log.info(
-            `Entity ${entity.id} behavior ${bestBehavior.behavior.name} expanded to empty, going idle`,
+            `Entity ${entity.id} selected behavior ${candidate.behavior.name} with utility ${candidate.utility}`,
+            { actions: JSON.stringify(newActions) },
         );
         return;
     }
 
-    agent.currentBehaviorName = bestBehavior.behavior.name;
-    agent.currentBehaviorUtility = bestBehavior.utility;
-    // Remember this pick so the next selection can apply the hysteresis bonus,
-    // even if this plan completes and clears currentBehaviorName before then.
-    agent.hysteresis = { behaviorName: bestBehavior.behavior.name };
-    // Always adopt the freshly expanded plan. Selection only runs at a plan
-    // boundary (empty queue) or on a forced replan; in both cases a fresh plan
-    // is what we want. A displaced worker needs a new path rather than the stale
-    // cachedPath from its previous moveTo. There is no running head to preserve.
-    agent.actionQueue = newActions;
-    // Clear after expand so the failure context is consumed
+    // Nothing produced actions this round. Treat the worker as idle: clear all
+    // behavior/display state so it never shows a behavior name (e.g.
+    // "performJob") with no job or action context. This also empties the action
+    // queue (a stale queue would otherwise execute next tick against work that
+    // is gone).
+    clearBehavior(agent);
     agent.pendingReplan = undefined;
     log.info(
-        `Entity ${entity.id} selected behavior ${bestBehavior.behavior.name} with utility ${bestBehavior.utility}`,
-        { actions: JSON.stringify(newActions) },
+        `Entity ${entity.id} all valid behaviors expanded to empty, going idle`,
     );
 }

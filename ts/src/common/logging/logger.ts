@@ -52,8 +52,15 @@ export class ConsoleWriter {
     }
 }
 
+/**
+ * How many log entries the rolling buffer keeps. The buffer is embedded in
+ * save files, so this is the main lever on save size: entries carry snapshotted
+ * data payloads and dominate the file once a session has run for a while.
+ */
+const LOG_BUFFER_CAPACITY = 819;
+
 export class BufferWriter {
-    private buffer = createRingBuffer<LogEntry>(8192);
+    private buffer = createRingBuffer<LogEntry>(LOG_BUFFER_CAPACITY);
 
     write(entry: LogEntry): void {
         if (entry.data === undefined) {
