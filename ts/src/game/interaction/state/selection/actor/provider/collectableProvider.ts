@@ -1,6 +1,6 @@
 import { spriteRefs } from "../../../../../../asset/sprite.ts";
 import { QueueJobCommand } from "../../../../../../server/message/command/queueJobCommand.ts";
-import { ItemTag } from "../../../../../../data/inventory/inventoryItem.ts";
+import { isEquippableItem } from "../../../../../../data/inventory/inventoryItemHelpers.ts";
 import {
     CollectableComponentId,
     hasCollectableItems,
@@ -57,7 +57,7 @@ export class CollectableProvider implements ActorSelectionProvider {
         );
         if (isGroundPile) {
             const equipStack = collectable.items.find((stack) =>
-                stack.item.tag?.includes(ItemTag.SkillGear),
+                isEquippableItem(stack.item),
             );
             if (equipStack) {
                 const sourceId = selection.entity.id;

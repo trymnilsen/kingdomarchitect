@@ -4,7 +4,7 @@ import {
     collectPlayerTargets,
     type PlayerTarget,
 } from "./playerRaidTargets.ts";
-import { WORKER_SCORE } from "./raidConstants.ts";
+import { WORKER_SCORE } from "./raidWorth.ts";
 
 /**
  * How rich the player kingdom looks to a goblin: the raid value of everything

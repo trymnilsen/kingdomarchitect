@@ -7,7 +7,7 @@ import { uiText } from "../../../ui/declarative/uiText.ts";
 import { uiAlignment } from "../../../ui/uiAlignment.ts";
 import { colorBackground } from "../../../ui/uiBackground.ts";
 import { fillUiSize, wrapUiSize } from "../../../ui/uiSize.ts";
-import type { CharacterColors } from "../colors.ts";
+import type { CharacterColors } from "../../../rendering/character/characterColors.ts";
 import { CharacterPreview } from "./CharacterPreview.ts";
 import {
     createAnimationButton,

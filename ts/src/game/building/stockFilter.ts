@@ -1,4 +1,5 @@
 import { ItemTag } from "../../data/inventory/inventoryItem.ts";
+import { isEquippableItem } from "../../data/inventory/inventoryItemHelpers.ts";
 import type { StockScope } from "./resolveStockSources.ts";
 import type { StockEntry } from "./stockAggregate.ts";
 
@@ -77,20 +78,16 @@ export function equipmentPredicate(dismissable = false): StockPredicate {
 }
 
 /**
- * Predicate for items a worker can equip into a slot: skill gear or
- * consumables (potions can sit in the secondary slot to be drunk). Used as a
+ * Predicate for items a worker can equip into a slot. Used as a
  * non-dismissable constraint when opening the inventory from an equipment slot.
+ * What counts as equippable is the item layer's rule, not this filter's.
  */
 export function equippablePredicate(dismissable = false): StockPredicate {
     return {
         id: "tag:equippable",
         label: "Equipment",
         dismissable,
-        match: (entry) =>
-            entry.item.tag?.some(
-                (tag) =>
-                    tag === ItemTag.SkillGear || tag === ItemTag.Consumable,
-            ) ?? false,
+        match: (entry) => isEquippableItem(entry.item),
     };
 }
 

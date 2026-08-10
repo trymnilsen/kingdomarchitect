@@ -1,11 +1,11 @@
 import { log } from "../../common/logging/logger.ts";
 import { characterPartFrames } from "../../../generated/characterFrames.ts";
 import { getAllAnimations } from "./animation/getAllAnimations.ts";
-import type { CharacterAnimation } from "./characterAnimation.ts";
+import type { CharacterAnimation } from "../../rendering/character/characterAnimation.ts";
 import { createComponent } from "../../ui/declarative/ui.ts";
 import { uiColumn, uiRow } from "../../ui/declarative/uiSequence.ts";
 import { fillUiSize } from "../../ui/uiSize.ts";
-import type { CharacterColors } from "./colors.ts";
+import type { CharacterColors } from "../../rendering/character/characterColors.ts";
 import {
     createAnimationPanel,
     createHeaderBar,

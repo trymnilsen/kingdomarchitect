@@ -4,12 +4,10 @@ import {
 } from "../../devtools/characterbuilder/characterSpriteGenerator.ts";
 import { characterPartFrames } from "../../../generated/characterFrames.ts";
 import { getAllAnimations } from "../../devtools/characterbuilder/animation/getAllAnimations.ts";
-import type { CharacterAnimation } from "../../devtools/characterbuilder/characterAnimation.ts";
+import type { CharacterAnimation } from "../../rendering/character/characterAnimation.ts";
 import { log } from "../../common/logging/logger.ts";
-import {
-    getCharacterColors,
-    type CharacterColors,
-} from "../../devtools/characterbuilder/colors.ts";
+import { getCharacterColors } from "../appearance/getCharacterColors.ts";
+import type { CharacterColors } from "../../rendering/character/characterColors.ts";
 import type { EcsSystem } from "../../ecs/ecsSystem.ts";
 import type { AssetLoader } from "../../asset/loader/assetLoader.ts";
 import type {

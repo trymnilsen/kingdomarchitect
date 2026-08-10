@@ -4,7 +4,7 @@ import { collectLightClaims, computeLitTiles } from "./lightClaims.ts";
 
 /**
  * Hearthlight is what the kingdom's own light illuminates, right now. A
- * sweeping searchlight beam and a torch that can be snuffed are the same kind
+ * sweeping searchlight beam and a cresset that can be snuffed are the same kind
  * of thing: when the light leaves a tile, the claim leaves with it.
  *
  * There is deliberately no phase or ambient term. Ambient daylight is the
@@ -12,9 +12,11 @@ import { collectLightClaims, computeLitTiles } from "./lightClaims.ts";
  * is identical at noon and midnight while the illumination of the world
  * differs. Illumination is "what can be seen". Hearthlight is "what is ours".
  *
- * `workerGlow` is the one deliberate exception to beam-equals-torch: a
- * presence affordance rather than a light in the fiction. It renders and never
- * claims (see its definition's `claimsHearthlight`).
+ * `workerGlow` and the carried torch are the deliberate exceptions to
+ * beam-equals-cresset. Neither is kingdom territory: one is a presence
+ * affordance rather than a light in the fiction, the other would let territory
+ * follow feet. Both render and neither claims (see their definitions'
+ * `claimsHearthlight`).
  */
 export function computeHearthlight(root: Entity): Set<number> {
     return computeLitTiles(collectLightClaims(root, "hearthlight"));

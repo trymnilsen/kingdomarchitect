@@ -15,7 +15,7 @@ import {
 import { LightSourceComponentId } from "../../../component/lightSourceComponent.ts";
 import { ProductionComponentId } from "../../../component/productionComponent.ts";
 import { VisibilityComponentId } from "../../../component/visibilityComponent.ts";
-import { getLightSourceDefinition } from "../../../../data/light/lightSourceDefinition.ts";
+import { resolveLightSource } from "../../../light/resolveLightSource.ts";
 import { getProductionDefinition } from "../../../../data/production/productionDefinition.ts";
 import type { Entity } from "../../../entity/entity.ts";
 import {
@@ -130,7 +130,7 @@ function drawLightEmission(context: RenderScope, entity: Entity) {
     }
     let offsets = lightSource.pattern;
     if (offsets === null) {
-        const definition = getLightSourceDefinition(lightSource.sourceId);
+        const definition = resolveLightSource(entity, lightSource);
         if (!definition) {
             return;
         }

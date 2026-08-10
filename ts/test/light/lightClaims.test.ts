@@ -88,9 +88,9 @@ describe("lit coverage", () => {
         camp.setEcsComponent(createGoblinCampComponent(2));
         root.addChild(camp);
 
-        // Player torch claims. Player workerGlow and buildingGlow light
+        // Player cresset claims. Player workerGlow and buildingGlow light
         // without claiming. The goblin camp fire is excluded by ownership.
-        addSource(kingdom, "torch", "torch", { x: 12, y: 8 });
+        addSource(kingdom, "cresset", "cresset", { x: 12, y: 8 });
         addSource(kingdom, "glow", "workerGlow", { x: 20, y: 8 });
         addSource(kingdom, "house", "buildingGlow", { x: 24, y: 8 });
         addSource(camp, "fire", "campfire", { x: 30, y: 8 });
@@ -101,7 +101,7 @@ describe("lit coverage", () => {
 
         const hearth = computeLitTiles(collectLightClaims(root, "hearthlight"));
 
-        assert.strictEqual(litAt(hearth, 12, 8), true, "torch claims");
+        assert.strictEqual(litAt(hearth, 12, 8), true, "cresset claims");
         assert.strictEqual(litAt(hearth, 17, 16), true, "beam pattern claims");
         assert.strictEqual(
             litAt(hearth, 20, 8),
@@ -147,7 +147,7 @@ describe("lit coverage", () => {
 
     it("answers set membership at night through isTileLit", () => {
         const root = new Entity("root");
-        addSource(root, "t", "torch", { x: 12, y: 8 });
+        addSource(root, "t", "cresset", { x: 12, y: 8 });
         const lit = computeLitTiles(collectLightClaims(root, "illumination"));
 
         assert.strictEqual(isTileLit(lit, "night", { x: 13, y: 8 }), true);

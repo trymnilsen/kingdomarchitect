@@ -2,7 +2,7 @@ import type { Entity } from "../entity/entity.ts";
 import { getSettlementEntity } from "../entity/settlementQueries.ts";
 import { PlayerKingdomComponentId } from "../component/playerKingdomComponent.ts";
 import { BuildingComponentId } from "../component/buildingComponent.ts";
-import { DEFAULT_RAID_VALUE } from "./raidConstants.ts";
+import { DEFAULT_RAID_VALUE } from "./raidWorth.ts";
 
 export type PlayerTarget = { entity: Entity; value: number };
 

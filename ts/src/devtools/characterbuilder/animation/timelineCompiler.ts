@@ -12,7 +12,7 @@ import {
     type Facing,
     type FacingKeyframe,
     inferFacingFromName,
-} from "../characterAnimation.ts";
+} from "../../../rendering/character/characterAnimation.ts";
 import {
     computeXBounds,
     mirrorAnchorFrame,

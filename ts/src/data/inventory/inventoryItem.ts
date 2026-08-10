@@ -12,6 +12,13 @@ export type InventoryItem = {
     readonly visual?: ItemVisual;
     readonly rarity?: ItemRarity;
     readonly statModifiers?: StatModifiers;
+    /**
+     * Names a LightSourceDefinition the holder emits while this item is
+     * equipped. Resolved at read time by `resolveLightSource`, never written
+     * into a component: an item grants light the same way it grants stats, as
+     * a function of what is held rather than as state copied onto the holder.
+     */
+    readonly light?: string;
 };
 
 export type ItemVisual = {

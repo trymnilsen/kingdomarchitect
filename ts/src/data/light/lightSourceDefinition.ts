@@ -63,8 +63,8 @@ export const brazierLightSource: LightSourceDefinition = {
  * The default emission for an ordinary building: its own tile and the cardinal
  * neighbours are lit. Buildings glow faintly so the places people live and work
  * are never pitch dark. The glow claims no hearthlight. A wall segment or a lone
- * farm in the wilderness is not home territory. Only deliberate light sources
- * (torch, brazier, campfire, lamp post) claim.
+ * farm in the wilderness is not home territory. Only deliberate placed light
+ * sources (cresset, brazier, campfire, lamp post) claim.
  */
 export const buildingGlowLightSource: LightSourceDefinition = {
     id: "buildingGlow",
@@ -78,16 +78,36 @@ export const buildingGlowLightSource: LightSourceDefinition = {
 };
 
 /**
- * A placed torch: lights its own tile and the cardinal neighbours. This is the
- * cheapest and most disposable source, quick to light and quick to snuff, so it
- * carries no fuel and is trivially extinguished.
+ * A placed cresset, a staked iron fire-basket: lights its own tile and the
+ * cardinal neighbours. This is the cheapest and most disposable placed source,
+ * quick to light and quick to snuff, so it carries no fuel and is trivially
+ * extinguished.
+ */
+export const cressetLightSource: LightSourceDefinition = {
+    id: "cresset",
+    lightRadius: 1,
+    fuel: "none",
+    extinguishDifficulty: "easy",
+    claimsHearthlight: true,
+};
+
+/**
+ * A torch carried in the hand. It reaches as far as a cresset, and it claims no
+ * hearthlight. That is the whole point of it being separate from
+ * {@link cressetLightSource}: territory must not follow feet.
+ *
+ * The reason is the one that keeps {@link workerGlowLightSource} from claiming.
+ * A carried claim would let every torchbearer walk home territory across the
+ * map, and the defenders-inside-hearthlight gate would be silently nullified
+ * because a torchbearer always stands inside their own claim. It lights. It
+ * does not claim.
  */
 export const torchLightSource: LightSourceDefinition = {
     id: "torch",
     lightRadius: 1,
     fuel: "none",
     extinguishDifficulty: "easy",
-    claimsHearthlight: true,
+    claimsHearthlight: false,
 };
 
 /**
@@ -148,6 +168,7 @@ export const searchlightLightSource: LightSourceDefinition = {
 const lightSourceDefinitions: readonly LightSourceDefinition[] = [
     brazierLightSource,
     buildingGlowLightSource,
+    cressetLightSource,
     torchLightSource,
     campfireLightSource,
     lampPostLightSource,

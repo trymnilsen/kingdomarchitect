@@ -2,6 +2,7 @@ import type { Entity } from "../../entity/entity.ts";
 import { DayComponentId } from "../../component/dayComponent.ts";
 import { BehaviorAgentComponentId } from "../../component/BehaviorAgentComponent.ts";
 import { PlayerUnitComponentId } from "../../component/playerUnitComponent.ts";
+import { kingdomScore } from "../../raid/kingdomScore.ts";
 import { statusbarTextStyle } from "../../../rendering/text/textStyle.ts";
 import { createComponent } from "../../../ui/declarative/ui.ts";
 import { uiBox } from "../../../ui/declarative/uiBox.ts";
@@ -27,9 +28,9 @@ type UiStatusBarProps = {
 };
 
 /**
- * The top HUD strip showing phase, current day, and population.
- * Reads DayComponent from the root and queries player units for population
- * counts on each render.
+ * The top HUD strip showing phase, current day, kingdom score, and population.
+ * Reads DayComponent from the root and queries player units and buildings for
+ * the counts on each render.
  */
 export const uiStatusBar = createComponent<UiStatusBarProps>(
     ({ props }) => {
@@ -41,7 +42,7 @@ export const uiStatusBar = createComponent<UiStatusBarProps>(
 
         const rightTexts = [
             uiText({
-                content: `People: ${total}`,
+                content: `ks: ${kingdomScore(props.root)}  ·  People: ${total}`,
                 textStyle: statusbarTextStyle,
             }),
         ];

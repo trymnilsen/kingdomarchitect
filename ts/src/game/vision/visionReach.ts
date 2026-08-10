@@ -9,8 +9,10 @@ export const STATION_MANNED_REACH = 8;
 
 /**
  * How far a worker discovers the map around itself as it moves, in tiles. This
- * is the placeholder innate radius every worker has until equippable torches
- * and lanterns extend it.
+ * is the innate radius every worker has, and carrying a light does not change
+ * it: a torch widens what the worker reveals through the light's own footprint
+ * (see `discoveryFootprintOffsets`), not through this reach. How far you can
+ * see and how far your light falls stay separate questions.
  */
 export const WORKER_VISION_REACH = 2;
 

@@ -2,7 +2,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert";
 import { compileTimeline } from "../../../src/devtools/characterbuilder/animation/timelineCompiler.ts";
 import type { AnimationRecipe } from "../../../src/devtools/characterbuilder/animation/animationRecipe.ts";
-import type { CharacterAnimation } from "../../../src/devtools/characterbuilder/characterAnimation.ts";
+import type { CharacterAnimation } from "../../../src/rendering/character/characterAnimation.ts";
 
 /**
  * Build a minimal source animation with non-trivial coordinates (never at origin).

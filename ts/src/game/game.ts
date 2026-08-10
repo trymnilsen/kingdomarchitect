@@ -18,6 +18,7 @@ import { wireGameInput } from "./gameInput.ts";
 import { chunkMapSystem } from "./system/chunkMapSystem.ts";
 import { pathfindingSystem } from "./system/pathfindingSystem.ts";
 import { renderSystem } from "./system/renderSystem.ts";
+import { raidDebugSystem } from "./system/raidDebugSystem.ts";
 import { createVisibilityMapComponent } from "./component/visibilityMapComponent.ts";
 import { handleGameMessage } from "../server/message/gameMessageHandler.ts";
 import { createAnimationSystem } from "./system/animationSystem.ts";
@@ -143,6 +144,7 @@ export class Game {
         this.ecsWorld.addSystem(pathfindingSystem);
         this.ecsWorld.addSystem(createAnimationSystem(this.spriteCache));
         this.ecsWorld.addSystem(renderSystem);
+        this.ecsWorld.addSystem(raidDebugSystem);
         this.ecsWorld.addSystem(
             createSpriteEquipmentSystem(
                 (width, height) =>

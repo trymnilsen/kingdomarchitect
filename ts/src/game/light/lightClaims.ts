@@ -1,5 +1,5 @@
-import { getLightSourceDefinition } from "../../data/light/lightSourceDefinition.ts";
 import { makeNumberId, type Point } from "../../common/point.ts";
+import { resolveLightSource } from "./resolveLightSource.ts";
 import type { Entity } from "../entity/entity.ts";
 import type { Phase } from "../component/dayComponent.ts";
 import { LightSourceComponentId } from "../component/lightSourceComponent.ts";
@@ -64,10 +64,15 @@ export type LightClaimScope = "illumination" | "hearthlight";
 /**
  * Gathers every light claim in the world, freshly, on each call.
  *
- * Claims are phase-independent and existence-gated only. A torch claims at noon
- * just like the beam of a manned tower. Whether anything renders differently is
- * ambient's business rather than the claim's. A sweeping searchlight and a
- * snuffable torch are the same kind of thing: present while lit, gone when not.
+ * Claims are phase-independent and existence-gated only. A cresset claims at
+ * noon just like the beam of a manned tower. Whether anything renders
+ * differently is ambient's business rather than the claim's. A sweeping
+ * searchlight and a snuffable cresset are the same kind of thing: present while
+ * lit, gone when not.
+ *
+ * What each source emits is resolved per entity by {@link resolveLightSource},
+ * so a worker's carried torch reaches this code as an ordinary definition. Who
+ * emits at all is still decided here, by the component query alone.
  *
  * The `"hearthlight"` scope keeps claims whose settlement ancestry resolves to
  * the player kingdom and whose definition claims hearthlight. Without the
@@ -75,7 +80,8 @@ export type LightClaimScope = "illumination" | "hearthlight";
  * home region would get dragged around the map, and the defenders-inside-
  * hearthlight gate in the defense system would be silently nullified because
  * every aggressive worker always stands inside their own one-tile glow. The
- * glow renders. It does not claim.
+ * glow renders. It does not claim. A carried torch is dropped by that same
+ * branch, for that same reason.
  *
  * No scaffold check is needed. Light components only attach when construction
  * finishes (see `applyFunctionalComponents`), so a half-built building has no
@@ -88,7 +94,7 @@ export function collectLightClaims(
     const claims: LightClaim[] = [];
     const sources = root.queryComponents(LightSourceComponentId);
     for (const [entity, source] of sources) {
-        const definition = getLightSourceDefinition(source.sourceId);
+        const definition = resolveLightSource(entity, source);
         if (!definition) {
             continue;
         }

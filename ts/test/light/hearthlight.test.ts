@@ -10,21 +10,21 @@ import {
     isInHearthlight,
 } from "../../src/game/light/hearthlight.ts";
 
-function worldWithTorch(torchPosition: Point): Entity {
+function worldWithCresset(cressetPosition: Point): Entity {
     const root = new Entity("root");
     const kingdom = new Entity("kingdom");
     kingdom.setEcsComponent(createPlayerKingdomComponent());
     root.addChild(kingdom);
-    const torch = new Entity("torch");
-    kingdom.addChild(torch);
-    torch.setEcsComponent(createLightSourceComponent("torch"));
-    torch.worldPosition = torchPosition;
+    const cresset = new Entity("cresset");
+    kingdom.addChild(cresset);
+    cresset.setEcsComponent(createLightSourceComponent("cresset"));
+    cresset.worldPosition = cressetPosition;
     return root;
 }
 
 describe("hearthlight", () => {
-    it("contains a player torch pool and nothing beyond it", () => {
-        const root = worldWithTorch({ x: 12, y: 8 });
+    it("contains a player cresset pool and nothing beyond it", () => {
+        const root = worldWithCresset({ x: 12, y: 8 });
         const hearth = computeHearthlight(root);
 
         assert.strictEqual(isInHearthlight(hearth, { x: 12, y: 8 }), true);
@@ -37,7 +37,7 @@ describe("hearthlight", () => {
     it("is identical at noon and at night", () => {
         // Hearthlight has no phase term. The sky's light is not the
         // kingdom's, so the claim set must not change with the phase.
-        const root = worldWithTorch({ x: 12, y: 8 });
+        const root = worldWithCresset({ x: 12, y: 8 });
         const day = createDayComponent();
         day.phase = "day";
         root.setEcsComponent(day);

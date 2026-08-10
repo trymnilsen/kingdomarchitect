@@ -3,7 +3,7 @@ import { InteractionState } from "../../../handler/interactionState.ts";
 import { AlertMessageState } from "../../common/alertMessageState.ts";
 import { inventoryView, type InventoryChip } from "./inventoryView.ts";
 import type { Entity } from "../../../../entity/entity.ts";
-import { ItemTag } from "../../../../../data/inventory/inventoryItem.ts";
+import { isEquippableItem } from "../../../../../data/inventory/inventoryItemHelpers.ts";
 import { distance } from "../../../../../common/point.ts";
 import { EquipSlotSelectionState } from "../../equip/equipSlotSelectionState.ts";
 import { EquipItemCommand } from "../../../../../server/message/command/equipItemCommand.ts";
@@ -103,7 +103,7 @@ export class InventoryState extends InteractionState {
         }
 
         // Browse mode: item-first flow — pick the slot, then tap a unit.
-        if (!entry.item.tag?.includes(ItemTag.SkillGear)) {
+        if (!isEquippableItem(entry.item)) {
             return;
         }
         this.context.stateChanger.replace(

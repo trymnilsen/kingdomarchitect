@@ -15,10 +15,11 @@ import {
 } from "../../../src/game/raid/goblinRaid.ts";
 import { kingdomScore } from "../../../src/game/raid/kingdomScore.ts";
 import {
+    INITIAL_RAID_THRESHOLD_BASE,
     RAID_MIN_HOUSES,
     RAID_THRESHOLD_GROWTH,
-    WORKER_SCORE,
 } from "../../../src/game/raid/raidConstants.ts";
+import { WORKER_SCORE } from "../../../src/game/raid/raidWorth.ts";
 import { campSizeSteps } from "../../../src/game/raid/campSize.ts";
 import { createRaidBehavior } from "../../../src/game/behavior/behaviors/goblin/raidBehavior.ts";
 import {
@@ -48,8 +49,9 @@ import {
 } from "../../../src/game/component/inventoryComponent.ts";
 import { stockPile } from "../../../src/data/building/wood/storage.ts";
 import { woodenHouse } from "../../../src/data/building/wood/house.ts";
+import { farm } from "../../../src/data/building/grow/grow.ts";
 import { stoneWall } from "../../../src/data/building/stone/wall.ts";
-import { torch } from "../../../src/data/building/light/torch.ts";
+import { cresset } from "../../../src/data/building/light/cresset.ts";
 import { woodResourceItem } from "../../../src/data/inventory/items/resources.ts";
 
 // --- small query helpers (no entity construction; all creation goes through
@@ -330,6 +332,47 @@ describe("goblin night raid scenario tests", () => {
             raidersOf(camp).length,
             0,
             "a camp below the size floor never raids",
+        );
+    });
+
+    it("leaves the starting kingdom far below the first raid bar", () => {
+        const harness = new ScenarioHarness();
+        const kingdom = harness.addPlayerKingdom();
+        // The actual game start (see addInitialPlayerChunk in game/map/player.ts):
+        // one worker, a house, a farm, a stockpile and a cresset.
+        harness.addPlayerUnits(1);
+        harness.addPlayerBuilding(kingdom, woodenHouse, { x: 20, y: 14 });
+        harness.addPlayerBuilding(kingdom, farm, { x: 22, y: 14 });
+        harness.addPlayerBuilding(kingdom, stockPile, { x: 24, y: 14 });
+        harness.addPlayerBuilding(kingdom, cresset, { x: 26, y: 14 });
+
+        const startWorth = kingdomScore(harness.root);
+        assert.ok(
+            startWorth <= INITIAL_RAID_THRESHOLD_BASE / 2,
+            `the grace period must be real: a fresh settlement (worth ${startWorth}) ` +
+                `must stay at most half the first raid bar (${INITIAL_RAID_THRESHOLD_BASE})`,
+        );
+    });
+
+    it("cannot raid the starting kingdom even with a full camp at the door", () => {
+        const harness = new ScenarioHarness();
+        const kingdom = harness.addPlayerKingdom();
+        harness.addPlayerUnits(1);
+        harness.addPlayerBuilding(kingdom, woodenHouse, { x: 20, y: 14 });
+        harness.addPlayerBuilding(kingdom, farm, { x: 22, y: 14 });
+        harness.addPlayerBuilding(kingdom, stockPile, { x: 24, y: 14 });
+        harness.addPlayerBuilding(kingdom, cresset, { x: 26, y: 14 });
+
+        // A full, raid-capable camp right next door. The only thing protecting
+        // the fresh settlement is the prosperity gate, which is the point.
+        const camp = fullCampAt(harness, { x: 12, y: 14 });
+
+        formGoblinRaid(harness.root);
+
+        assert.strictEqual(
+            raidersOf(camp).length,
+            0,
+            "night one against a starting kingdom must never produce a raid",
         );
     });
 
@@ -708,9 +751,9 @@ describe("goblin night raid scenario tests", () => {
     it("breaks through a wall to reach a walled-in target", () => {
         const harness = new ScenarioHarness([pathfindingSystem]);
         const kingdom = harness.addPlayerKingdom();
-        // Torch target fully ringed by 8 stone walls — the only way in is to
+        // Cresset target fully ringed by 8 stone walls — the only way in is to
         // break a wall. Raiders approach from the west, so they breach (19,14).
-        harness.addPlayerBuilding(kingdom, torch, { x: 20, y: 14 }, "target");
+        harness.addPlayerBuilding(kingdom, cresset, { x: 20, y: 14 }, "target");
         const ring: Point[] = [
             { x: 19, y: 13 },
             { x: 19, y: 14 },
@@ -753,7 +796,7 @@ describe("goblin night raid scenario tests", () => {
     it("goes around a wall instead of breaching when the detour is short", () => {
         const harness = new ScenarioHarness([pathfindingSystem]);
         const kingdom = harness.addPlayerKingdom();
-        harness.addPlayerBuilding(kingdom, torch, { x: 20, y: 14 }, "target");
+        harness.addPlayerBuilding(kingdom, cresset, { x: 20, y: 14 }, "target");
         // A single wall directly between camp and target, but the target's other
         // neighbours are open, so a short detour is cheaper than breaching.
         const wall = harness.addPlayerBuilding(

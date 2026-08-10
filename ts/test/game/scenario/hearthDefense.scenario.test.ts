@@ -7,7 +7,7 @@ import {
     HEARTH_DEFENSE_INTERVAL,
     hearthDefenseSystem,
 } from "../../../src/game/system/hearthDefenseSystem.ts";
-import { torch } from "../../../src/data/building/light/torch.ts";
+import { cresset } from "../../../src/data/building/light/cresset.ts";
 import { stoneTower } from "../../../src/data/building/stone/tower.ts";
 import { goblinPrefab } from "../../../src/game/prefab/goblinPrefab.ts";
 import { Entity } from "../../../src/game/entity/entity.ts";
@@ -56,8 +56,8 @@ function makeHarness(): { harness: ScenarioHarness; kingdom: Entity } {
         [hearthDefenseSystem],
     );
     const kingdom = harness.addPlayerKingdom();
-    // One deliberate light: a torch pool at (12,8) plus cardinals.
-    harness.addPlayerBuilding(kingdom, torch, { x: 12, y: 8 }, "torch1");
+    // One deliberate light: a cresset pool at (12,8) plus cardinals.
+    harness.addPlayerBuilding(kingdom, cresset, { x: 12, y: 8 }, "cresset1");
     return { harness, kingdom };
 }
 

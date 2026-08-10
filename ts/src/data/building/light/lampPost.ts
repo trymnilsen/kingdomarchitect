@@ -7,7 +7,7 @@ import { ironBarsItem } from "../../inventory/items/processedMaterials.ts";
 /**
  * A lamp post: durable infrastructure with the widest dim reach of this slice.
  * Its iron-bar requirement marks it as the costly, permanent option versus the
- * throwaway torch. Emission is described by {@link lampPostLightSource}.
+ * throwaway cresset. Emission is described by {@link lampPostLightSource}.
  */
 export const lampPost: Building = {
     id: "lampPost",

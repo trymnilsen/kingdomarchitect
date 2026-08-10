@@ -6,12 +6,12 @@ export type {
     CharacterAnimation,
     Facing,
     FacingKeyframe,
-} from "../characterAnimation.ts";
+} from "../../../rendering/character/characterAnimation.ts";
 
 export {
     inferFacingFromName,
     getFacingAtFrame,
-} from "../characterAnimation.ts";
+} from "../../../rendering/character/characterAnimation.ts";
 
 /**
  * Base sourced from a single frame of a named hand-painted animation.

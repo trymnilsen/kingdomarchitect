@@ -2,12 +2,12 @@ import assert from "node:assert";
 import { describe, it } from "node:test";
 import { ScenarioHarness } from "../scenario/scenarioHarness.ts";
 import { kingdomScore } from "../../../src/game/raid/kingdomScore.ts";
-import { WORKER_SCORE } from "../../../src/game/raid/raidConstants.ts";
+import { WORKER_SCORE } from "../../../src/game/raid/raidWorth.ts";
 import { stockPile } from "../../../src/data/building/wood/storage.ts";
 import { woodenHouse } from "../../../src/data/building/wood/house.ts";
 import { stoneWall } from "../../../src/data/building/stone/wall.ts";
 import { road } from "../../../src/data/building/stone/road.ts";
-import { torch } from "../../../src/data/building/light/torch.ts";
+import { cresset } from "../../../src/data/building/light/cresset.ts";
 
 describe("kingdomScore", () => {
     it("counts each player worker at WORKER_SCORE", () => {
@@ -29,8 +29,8 @@ describe("kingdomScore", () => {
     it("falls back to the default value for a building with no raid value", () => {
         const harness = new ScenarioHarness();
         const kingdom = harness.addPlayerKingdom();
-        // torch declares no raidValue, so it is worth a generic building.
-        harness.addPlayerBuilding(kingdom, torch, { x: 20, y: 14 });
+        // cresset declares no raidValue, so it is worth a generic building.
+        harness.addPlayerBuilding(kingdom, cresset, { x: 20, y: 14 });
 
         assert.strictEqual(kingdomScore(harness.root), 20);
     });

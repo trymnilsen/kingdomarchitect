@@ -43,8 +43,9 @@ export function workerPrefab(id?: string): Entity {
     entity.setEcsComponent(createVisibilityComponent(WORKER_VISION_REACH));
     // The presence glow lights exactly the worker's own tile, so the player
     // never loses a worker in the dark while the world around them stays
-    // black. It claims no hearthlight (see the definition), and a future
-    // carried torch is a visible upgrade over it.
+    // black. It claims no hearthlight (see the definition). This component is
+    // also what makes the worker a light-source member at all: equipping a
+    // torch only changes what it emits, resolved by resolveLightSource.
     entity.setEcsComponent(
         createLightSourceComponent(workerGlowLightSource.id),
     );

@@ -1,7 +1,10 @@
+import { type KingdomDescription, worthOfKingdom } from "./raidWorth.ts";
+
 /**
  * Shared tuning constants for the goblin night-raid feature. Kept in one place
  * so the siege pathfinding cost, the combat damage split, and the raid
- * formation/behavior all agree on the same numbers.
+ * formation/behavior all agree on the same numbers. What individual things are
+ * worth to a raider lives in raidWorth.ts; this file is pacing policy.
  */
 
 /**
@@ -27,13 +30,6 @@ export const UNIT_DAMAGE = 1;
  */
 export const SIEGE_COST_MULTIPLIER = 1.0;
 
-/**
- * Raid value used for a player building that does not declare one. Buildings
- * with an explicit raidValue of 0 (walls, gates, roads) are never chosen as
- * objectives — they are only broken through as obstacles by the siege path.
- */
-export const DEFAULT_RAID_VALUE = 20;
-
 /** Soft cap on how many raiders are assigned to a single target before stacking. */
 export const RAIDERS_PER_TARGET = 2;
 
@@ -44,13 +40,6 @@ export const RAIDERS_PER_TARGET = 2;
 export const RAID_UTILITY = 50;
 
 /**
- * What one player worker adds to the kingdom score. Set to DEFAULT_RAID_VALUE so
- * a worker is worth exactly one generic building, which keeps the score readable
- * as "how much is there here to take".
- */
-export const WORKER_SCORE = 20;
-
-/**
  * Factor applied to the kingdom score when a camp restamps its threshold after
  * raiding. The kingdom must grow 25% past what it was worth on raid night before
  * that same camp marches again, so prosperity itself is the cooldown.
@@ -58,11 +47,25 @@ export const WORKER_SCORE = 20;
 export const RAID_THRESHOLD_GROWTH = 1.25;
 
 /**
- * Kingdom score a camp at zero distance waits for before its first raid. This is
- * the early-game grace period, calibrated against a starting kingdom: 6 workers
- * (120) plus a house (60) plus a stockpile (100).
+ * The settlement goblins consider worth a first raid. The threshold below is
+ * derived from this description, so the calibration question is always "does
+ * this look like the kingdom the first raid should land on?", never "what does
+ * 700 mean?". For scale: a fresh game starts at 1 worker, a house, a farm, a
+ * stockpile and a cresset, which is worth 220.
  */
-export const INITIAL_RAID_THRESHOLD_BASE = 280;
+export const FIRST_RAID_KINGDOM: KingdomDescription = {
+    workers: 12,
+    houses: 5,
+    stockpiles: 1,
+    otherBuildings: 3,
+};
+
+/**
+ * Kingdom score a camp at zero distance waits for before its first raid: the
+ * worth of FIRST_RAID_KINGDOM. The gap between the starting kingdom and this
+ * bar is the early-game grace period.
+ */
+export const INITIAL_RAID_THRESHOLD_BASE = worthOfKingdom(FIRST_RAID_KINGDOM);
 
 /**
  * Added to a camp's initial threshold per tile of distance from the kingdom.

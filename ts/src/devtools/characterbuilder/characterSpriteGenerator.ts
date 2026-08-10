@@ -5,7 +5,10 @@ import type {
 } from "../../rendering/renderScope.ts";
 import type { SpriteDefinition, SpriteRef } from "../../asset/sprite.ts";
 import { spriteRegistry } from "../../asset/spriteRegistry.ts";
-import type { CharacterColors, EquipmentSpriteVariant } from "./colors.ts";
+import type {
+    CharacterColors,
+    EquipmentSpriteVariant,
+} from "../../rendering/character/characterColors.ts";
 import type { Rectangle } from "../../common/structure/rectangle.ts";
 import type { Point } from "../../common/point.ts";
 import { CHARACTER_SPRITE } from "./ui/characterBuilderConstants.ts";
@@ -15,7 +18,7 @@ import {
     getFacingAtFrame,
     type CharacterAnimation,
     type Facing,
-} from "./characterAnimation.ts";
+} from "../../rendering/character/characterAnimation.ts";
 
 const CHARACTER_FRAME_WIDTH = CHARACTER_SPRITE.FRAME_WIDTH;
 const CHARACTER_FRAME_HEIGHT = CHARACTER_SPRITE.FRAME_HEIGHT;

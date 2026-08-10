@@ -30,7 +30,7 @@ const SEARCHLIGHT_SWEEP_TICKS = 10;
  * the current wedge as its pattern, and unmanning restores whatever light the
  * building profile originally attached (its faint self-glow by default,
  * nothing for a "none" profile). The beam's claim therefore vanishes the
- * instant the watchman leaves, exactly like a snuffed torch.
+ * instant the watchman leaves, exactly like a snuffed cresset.
  *
  * The beam runs in every phase. Its lit claim feeds hearthlight, and whether
  * the wedge looks different at noon is the render pass's business. The beam
@@ -51,6 +51,10 @@ export const watchSystem: EcsSystem = {
 function update(root: Entity, tick: number) {
     for (const [tower, watch] of root.queryComponents(WatchComponentId)) {
         const light = tower.getEcsComponent(LightSourceComponentId);
+        // Deliberately a raw sourceId read rather than resolveLightSource:
+        // this asks whether the beam this system installs is already there,
+        // which is a question about the component's own written state. What
+        // the tower emits is nobody's business here.
         const hasSearchlight = light?.sourceId === searchlightLightSource.id;
 
         if (!isTowerManned(root, tower)) {

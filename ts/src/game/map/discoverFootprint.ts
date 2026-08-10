@@ -8,7 +8,7 @@ import type { Entity } from "../entity/entity.ts";
 import { MessageEmitterComponentId } from "../component/messageEmitterComponent.ts";
 import { WorldDiscoveryComponentId } from "../component/worldDiscoveryComponent.ts";
 import { LightSourceComponentId } from "../component/lightSourceComponent.ts";
-import { getLightSourceDefinition } from "../../data/light/lightSourceDefinition.ts";
+import { resolveLightSource } from "../light/resolveLightSource.ts";
 import { setDiscoveryForPlayer } from "../system/worldGenerationSystem.ts";
 import { visionReachRadius } from "../vision/visionReach.ts";
 
@@ -20,7 +20,11 @@ import { visionReachRadius } from "../vision/visionReach.ts";
  *  - if it emits light, the footprint that light illuminates. A pattern on the
  *    component wins over the definition's disc, which is what makes a manned
  *    tower's searchlight wedge part of the tower's discovery footprint without
- *    this code knowing towers exist.
+ *    this code knowing towers exist. The disc comes from
+ *    {@link resolveLightSource}, so what an entity carries counts as much as
+ *    what it is. This changes nothing for a worker holding a torch today: the
+ *    vision diamond (radius 2) already contains the torch's radius-1 disc. It
+ *    matters the moment a carried light outreaches its bearer's own eyes.
  *
  * This is the single source of truth for "what does this entity reveal", used
  * to stamp fog-of-war discovery as a worker moves, when a building finishes
@@ -37,7 +41,7 @@ export function discoveryFootprintOffsets(entity: Entity): Point[] {
         if (lightSource.pattern !== null) {
             offsets.push(...lightSource.pattern);
         } else {
-            const definition = getLightSourceDefinition(lightSource.sourceId);
+            const definition = resolveLightSource(entity, lightSource);
             if (definition) {
                 offsets.push(...generateDiscPattern(definition.lightRadius));
             }
