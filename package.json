@@ -35,6 +35,6 @@
         "rollup": "^4.62.2",
         "rollup-plugin-sourcemaps2": "^0.5.8",
         "typescript": "^7.0.2",
-        "ws": "^8.21.0"
+        "ws": "^8.21.1"
     }
 }
