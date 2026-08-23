@@ -11,8 +11,8 @@ import { resolveLightSource } from "../../src/game/light/resolveLightSource.ts";
 import { spriteRefs } from "../../src/asset/sprite.ts";
 import { torchItem } from "../../src/data/inventory/items/equipment.ts";
 import {
-    brazierLightSource,
     cressetLightSource,
+    lampPostLightSource,
     torchLightSource,
     workerGlowLightSource,
 } from "../../src/data/light/lightSourceDefinition.ts";
@@ -41,11 +41,12 @@ function lightOf(entity: Entity) {
     return resolveLightSource(entity, source);
 }
 
-const brazierInHand: InventoryItem = {
-    id: "testBrazierProp",
-    name: "Brazier Prop",
+/** A prop that emits a wide light, so "brightest wins" has something to win. */
+const wideLightInHand: InventoryItem = {
+    id: "testWideLightProp",
+    name: "Wide Light Prop",
     asset: spriteRefs.empty_sprite,
-    light: brazierLightSource.id,
+    light: lampPostLightSource.id,
 };
 
 const brokenLightItem: InventoryItem = {
@@ -71,10 +72,10 @@ describe("resolveLightSource", () => {
     });
 
     it("takes the brightest when both hands hold a light", () => {
-        const definition = lightOf(makeWorker(torchItem, brazierInHand));
+        const definition = lightOf(makeWorker(torchItem, wideLightInHand));
 
         // Lit-ness is binary, so two lights do not add. The wider one wins.
-        assert.strictEqual(definition?.id, brazierLightSource.id);
+        assert.strictEqual(definition?.id, lampPostLightSource.id);
         assert.strictEqual(definition?.lightRadius, 4);
     });
 

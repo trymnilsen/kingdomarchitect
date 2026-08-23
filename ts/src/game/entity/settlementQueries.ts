@@ -1,5 +1,7 @@
 import { GoblinCampComponentId } from "../component/goblinCampComponent.ts";
+import { InventoryComponentId } from "../component/inventoryComponent.ts";
 import { PlayerKingdomComponentId } from "../component/playerKingdomComponent.ts";
+import { StockpileComponentId } from "../component/stockpileComponent.ts";
 import type { Entity } from "./entity.ts";
 
 /**
@@ -22,4 +24,25 @@ export function getSettlementEntity(entity: Entity): Entity {
         current = current.parent;
     }
     return entity.getRootEntity();
+}
+
+/**
+ * Every stockpile in the settlement that can actually hold something.
+ *
+ * This is a settlement query rather than a material one. It lives here because
+ * both the material planner and the special-requirement check need it, and
+ * having one import the other made those two modules mutually dependent.
+ */
+export function findStockpiles(settlement: Entity): Entity[] {
+    const stockpiles: Entity[] = [];
+    const stockpileComponents =
+        settlement.queryComponents(StockpileComponentId);
+
+    for (const [entity] of stockpileComponents) {
+        if (entity.getEcsComponent(InventoryComponentId)) {
+            stockpiles.push(entity);
+        }
+    }
+
+    return stockpiles;
 }

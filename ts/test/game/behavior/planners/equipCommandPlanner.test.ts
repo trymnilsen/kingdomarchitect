@@ -40,7 +40,7 @@ function createScene(): {
     worker.worldPosition = { x: 5, y: 5 };
 
     const stockpile = new Entity("stockpile");
-    stockpile.setEcsComponent(createStockpileComponent());
+    stockpile.setEcsComponent(createStockpileComponent(200));
     const inv = createInventoryComponent();
     addInventoryItem(inv, swordItem, 3);
     stockpile.setEcsComponent(inv);

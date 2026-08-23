@@ -6,8 +6,8 @@
  * consume it, so the transient/persistent model is defined in exactly one place.
  */
 import type { Point } from "../../../common/point.ts";
-import { BuildingComponentId } from "../../component/buildingComponent.ts";
 import { BehaviorAgentComponentId } from "../../component/BehaviorAgentComponent.ts";
+import { isImpassableStructure } from "../../component/traversalComponent.ts";
 import {
     MovementStaminaComponentId,
     hasMovedThisTick,
@@ -115,14 +115,13 @@ export function scoreCandidateTile(
 
     const occupants = queryEntity(root, tile);
 
-    // Check for impassable entities (buildings, resources)
+    // Check for impassable entities (buildings, resources). Buildings go
+    // through isImpassableStructure so a shoved worker obeys exactly the rule
+    // the pathfinder planned with. Doing it locally here is what previously let
+    // displacement treat a farm as a wall while A* walked over it.
     for (const occupant of occupants) {
-        if (occupant.hasComponent(BuildingComponentId)) {
-            const building = occupant.getEcsComponent(BuildingComponentId);
-            // Roads (weight 1) are passable; non-road buildings are not
-            if (building && building.building.id !== "road") {
-                return -Infinity;
-            }
+        if (isImpassableStructure(occupant)) {
+            return -Infinity;
         }
         const resource = occupant.getEcsComponent(ResourceComponentId);
         if (resource && !isDecorativeResource(resource.resourceId)) {

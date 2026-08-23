@@ -12,7 +12,7 @@ function stockpileEntity(id: string): Entity {
     entity.setEcsComponent(
         createInventoryComponent([{ item: woodResourceItem, amount: 5 }]),
     );
-    entity.setEcsComponent(createStockpileComponent());
+    entity.setEcsComponent(createStockpileComponent(200));
     return entity;
 }
 

@@ -63,6 +63,14 @@ export const stoneResource = {
     rarity: ItemRarity.Common,
 } as const;
 
+export const moonpetalItem = {
+    asset: spriteRefs.plainsFlower2,
+    id: "moonpetal",
+    name: "Moonpetal",
+    hint: "A pale flower that opens after dark. The enchanter will not say why it matters",
+    rarity: ItemRarity.Common,
+} as const;
+
 export const ironOreItem = {
     asset: spriteRefs.iron_ore_resource,
     id: "ironore",
@@ -132,6 +140,7 @@ export const resources = [
     gemResource,
     bagOfGlitter,
     stoneResource,
+    moonpetalItem,
     ironOreItem,
     wheatResourceItem,
     flaxResourceItem,

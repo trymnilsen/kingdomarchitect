@@ -142,7 +142,7 @@ describe("harvestResourceAction", () => {
 
         function addStockpile(settlement: Entity): Entity {
             const stockpile = new Entity("stockpile");
-            const stockpileComp = createStockpileComponent();
+            const stockpileComp = createStockpileComponent(200);
             setPreferredAmount(stockpileComp, "stone", 50);
             stockpile.setEcsComponent(stockpileComp);
             stockpile.setEcsComponent(createInventoryComponent());

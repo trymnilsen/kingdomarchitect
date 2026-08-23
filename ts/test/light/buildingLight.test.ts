@@ -8,7 +8,7 @@ import {
     computeLitTiles,
 } from "../../src/game/light/lightClaims.ts";
 import { woodenHouse } from "../../src/data/building/wood/house.ts";
-import { brazier } from "../../src/data/building/wood/brazier.ts";
+import { lampPost } from "../../src/data/building/light/lampPost.ts";
 import type { Building } from "../../src/data/building/building.ts";
 import { emptySpriteRef } from "../../src/asset/sprite.ts";
 
@@ -54,9 +54,9 @@ describe("building light", () => {
     });
 
     it("lets a dedicated light-source building cast a wide pool", () => {
-        const lit = coverageWithBuilding(brazier, false, { x: 12, y: 8 });
+        const lit = coverageWithBuilding(lampPost, false, { x: 12, y: 8 });
 
-        // Four tiles out can only come from the brazier profile, so this
+        // Four tiles out can only come from the lamp post profile, so this
         // proves building.light is honoured rather than the default glow.
         assert.strictEqual(litAt(lit, 16, 8), true);
     });

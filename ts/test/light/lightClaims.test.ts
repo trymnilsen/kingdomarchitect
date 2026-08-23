@@ -35,7 +35,7 @@ function litAt(litTiles: ReadonlySet<number>, x: number, y: number): boolean {
 describe("lit coverage", () => {
     it("stamps a disc by squared euclidean distance at its radius edge", () => {
         const root = new Entity("root");
-        addSource(root, "b", "brazier", { x: 12, y: 8 });
+        addSource(root, "b", "lampPost", { x: 12, y: 8 });
 
         const lit = computeLitTiles(collectLightClaims(root, "illumination"));
 

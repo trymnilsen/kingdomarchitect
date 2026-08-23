@@ -38,7 +38,7 @@ function createStockpile(
     preferences: { itemId: string; amount: number }[] = [],
 ): Entity {
     const stockpile = new Entity(id);
-    const stockpileComp = createStockpileComponent();
+    const stockpileComp = createStockpileComponent(200);
     for (const pref of preferences) {
         setPreferredAmount(stockpileComp, pref.itemId, pref.amount);
     }

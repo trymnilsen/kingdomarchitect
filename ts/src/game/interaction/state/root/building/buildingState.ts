@@ -45,6 +45,8 @@ import {
 import type { InventoryItem } from "../../../../../data/inventory/inventoryItem.ts";
 import { log } from "../../../../../common/logging/logger.ts";
 import { ItemSourceState } from "../../itemsource/itemSourceState.ts";
+import { findPlayerKingdom } from "../../../../component/playerKingdomComponent.ts";
+import { findUnmetSpecialRequirements } from "../../../../building/specialRequirementQuery.ts";
 
 // Declarative UI building components
 const bookTextStyle = {
@@ -139,6 +141,7 @@ const requirementMaterialRow = createComponent<{
 
 const buildingRequirementsView = createComponent<{
     building: Building;
+    unmetSpecial: readonly SpecialRequirement[];
     onItemTap?: (item: InventoryItem) => void;
 }>(({ props }) => {
     const requirements = props.building.requirements;
@@ -185,9 +188,13 @@ const buildingRequirementsView = createComponent<{
 
         for (const req of requirements.special) {
             const reqName = specialRequirementNames[req];
+            // A cross marks what the settlement cannot currently supply. These
+            // block construction, so showing the name alone would leave the
+            // player staring at a building that refuses to start.
+            const met = !props.unmetSpecial.includes(req);
             children.push(
                 uiText({
-                    content: `  ${reqName}`,
+                    content: `  ${met ? "+" : "x"} ${reqName}`,
                     textStyle: bookTextStyle,
                 }),
             );
@@ -203,6 +210,7 @@ const buildingRequirementsView = createComponent<{
 
 const buildingDetailsView = createComponent<{
     building: Building;
+    unmetSpecial: readonly SpecialRequirement[];
     onBuild: () => void;
     onItemTap?: (item: InventoryItem) => void;
 }>(({ props }) => {
@@ -254,6 +262,7 @@ const buildingDetailsView = createComponent<{
                 uiSpace({ width: 1, height: 8 }),
                 buildingRequirementsView({
                     building: props.building,
+                    unmetSpecial: props.unmetSpecial,
                     onItemTap: props.onItemTap,
                 }),
                 uiSpace({ width: 1, height: fillUiSize }),
@@ -295,6 +304,7 @@ const buildingBookLayout = createComponent<{
     onBuild: () => void;
     onTabSelect: (index: number) => void;
     selectedTab: number;
+    unmetSpecial: readonly SpecialRequirement[];
     onItemTap?: (item: InventoryItem) => void;
 }>(({ props }) => {
     const masterView = buildingMasterView({
@@ -304,6 +314,7 @@ const buildingBookLayout = createComponent<{
 
     const detailsView = buildingDetailsView({
         building: props.selectedBuilding,
+        unmetSpecial: props.unmetSpecial,
         onBuild: props.onBuild,
         onItemTap: props.onItemTap,
     });
@@ -351,6 +362,9 @@ export class BuildingState extends InteractionState {
     private _selectedBuilding: Building;
     private _selectedTab: number = 0;
     private _buildingPosition: Point;
+    /** Building id the cached unmet-requirement list was computed for. */
+    private _unmetSpecialFor: string | null = null;
+    private _unmetSpecial: SpecialRequirement[] = [];
 
     override get isModal(): boolean {
         return true;
@@ -368,6 +382,7 @@ export class BuildingState extends InteractionState {
             onBuild: () => this.buildSelected(),
             onTabSelect: (index: number) => this.tabSelected(index),
             selectedTab: this._selectedTab,
+            unmetSpecial: this.unmetSpecialRequirements(),
             onItemTap: (item) => {
                 this.context.stateChanger.push(new ItemSourceState(item));
             },
@@ -395,6 +410,29 @@ export class BuildingState extends InteractionState {
         this._buildingPosition = buildingPosition;
         this._activeBuildings = woodenBuildings;
         this._selectedBuilding = woodenBuildings[0];
+    }
+
+    /**
+     * Which special requirements the selected building cannot currently meet.
+     *
+     * Answering this walks the settlement's workers, buildings and stockpile
+     * inventories, and getView runs on every redraw rather than once a tick, so
+     * the result is held until the selection changes. Buildings with no special
+     * requirements (nearly all of them) never query at all.
+     */
+    private unmetSpecialRequirements(): readonly SpecialRequirement[] {
+        const special = this._selectedBuilding.requirements?.special;
+        if (!special || special.length === 0) {
+            return [];
+        }
+        if (this._unmetSpecialFor === this._selectedBuilding.id) {
+            return this._unmetSpecial;
+        }
+        const settlement =
+            findPlayerKingdom(this.context.root) ?? this.context.root;
+        this._unmetSpecial = findUnmetSpecialRequirements(settlement, special);
+        this._unmetSpecialFor = this._selectedBuilding.id;
+        return this._unmetSpecial;
     }
 
     private buildSelected() {

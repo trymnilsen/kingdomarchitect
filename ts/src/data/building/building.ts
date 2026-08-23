@@ -49,6 +49,30 @@ export type Building = {
     light?: string;
     requirements?: BuildingRequirements;
     /**
+     * How many items this building can hold when it acts as settlement storage.
+     * Presence of this field is what makes a building storage at all: the prefab
+     * attaches the stockpile components to anything that declares it. Absent
+     * means the building is not a storage site.
+     */
+    storageCapacity?: number;
+    /**
+     * Path cost of walking over this building. Present means walkable, and the
+     * number is what pathfinding pays to cross it (a road is cheap, a farm is
+     * trampled through reluctantly). Absent means solid, which is the default
+     * for anything with walls.
+     *
+     * Weights at or above TRAVERSAL_IMPASSABLE_THRESHOLD read as solid, which is
+     * how a gate closes without needing a separate passability rule.
+     */
+    traversalWeight?: number;
+    /**
+     * Marks this building as a gate: something the settlement can open and
+     * shut, which is passable while open and a wall while closed. Declaring it
+     * here rather than matching an id in the prefab keeps "what this building
+     * is" in the building definition.
+     */
+    isGate?: boolean;
+    /**
      * What this building is worth to a goblin, which drives two things at once.
      * Raiders rank player buildings by it when forming a raid (see
      * formGoblinRaid), razing the highest first; and kingdomScore sums it across

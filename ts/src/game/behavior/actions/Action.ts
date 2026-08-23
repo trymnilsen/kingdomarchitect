@@ -19,6 +19,7 @@ export type FailureCause =
     | { type: "targetGone"; entityId: string }
     | { type: "notAdjacent" }
     | { type: "noResources" }
+    | { type: "stockpileFull"; stockpileId: string }
     | { type: "unknown" };
 
 export type ActionFailure = {

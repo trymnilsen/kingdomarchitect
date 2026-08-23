@@ -17,7 +17,7 @@ import { woodResourceItem } from "../../../src/data/inventory/items/resources.ts
 
 function createStockpileEntity(id: string): Entity {
     const stockpile = new Entity(id);
-    stockpile.setEcsComponent(createStockpileComponent());
+    stockpile.setEcsComponent(createStockpileComponent(200));
     stockpile.setEcsComponent(createInventoryComponent());
     return stockpile;
 }
@@ -228,7 +228,7 @@ describe("RestockBehavior", () => {
             // Target1: preferred 10, current 5 → deficit 5, ratio 0.5
             const target1 = new Entity("target1");
             target1.setEcsComponent(createInventoryComponent());
-            const t1Comp = createStockpileComponent();
+            const t1Comp = createStockpileComponent(200);
             setPreferredAmount(t1Comp, "wood", 10);
             target1.setEcsComponent(t1Comp);
             const t1Inv = target1.getEcsComponent(InventoryComponentId)!;

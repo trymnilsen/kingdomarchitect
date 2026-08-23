@@ -2,7 +2,7 @@ import assert from "node:assert";
 import { describe, it } from "node:test";
 import { ScenarioHarness } from "./scenarioHarness.ts";
 import { buildingPrefab } from "../../../src/game/prefab/buildingPrefab.ts";
-import { brazier } from "../../../src/data/building/wood/brazier.ts";
+import { lampPost } from "../../../src/data/building/light/lampPost.ts";
 import { BuildingComponentId } from "../../../src/game/component/buildingComponent.ts";
 import { finishConstruction } from "../../../src/game/job/buildBuildingJob.ts";
 import {
@@ -17,11 +17,11 @@ describe("discover on build", () => {
             WorldDiscoveryComponentId,
         );
 
-        // A brazier lights bright 2 / dim 4, but a building only sees 1 tile. The
-        // harness does no startup discovery, so the area is undiscovered and any
-        // discovery here must come from finishing this building.
+        // A lamp post lights bright 2 / dim 4, but a building only sees 1 tile.
+        // The harness does no startup discovery, so the area is undiscovered and
+        // any discovery here must come from finishing this building.
         const position = { x: 20, y: 16 };
-        const building = buildingPrefab(brazier, true, "brazier");
+        const building = buildingPrefab(lampPost, true, "lampPost");
         harness.root.addChild(building);
         building.worldPosition = position;
 

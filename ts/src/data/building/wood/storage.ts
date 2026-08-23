@@ -9,20 +9,33 @@ import {
     woodResourceItem,
 } from "../../inventory/items/resources.ts";
 
+/**
+ * The open-air pile a settlement starts with. Free to place and small, so
+ * outgrowing it is the thing that sends you looking for the warehouse.
+ */
 export const stockPile: Building = {
     id: "stockpile",
     icon: spriteRefs.stockpile,
     name: "Stockpile",
     scale: 2,
     raidValue: 100,
+    // Room for one costly build order (the church stages 195 items) with space
+    // left to keep working. Below that a settlement can reach a building it can
+    // never actually stage the materials for.
+    storageCapacity: 400,
 };
 
+/**
+ * Roofed storage: three times the pile, for a cost that needs a carpenter and a
+ * blacksmith standing first. The capacity is the whole reason to build one.
+ */
 export const warehouse: Building = {
     id: "warehouse",
     icon: spriteRefs.warehouse,
     name: "Warehouse",
     scale: 2,
     raidValue: 100,
+    storageCapacity: 1200,
     requirements: {
         materials: {
             [woodResourceItem.id]: 40,

@@ -4,6 +4,7 @@ import {
     woodResourceItem,
     stoneResource as stoneInventoryItem,
     berryItem,
+    moonpetalItem,
     mushroomFoodItem,
 } from "./resources.ts";
 
@@ -49,13 +50,20 @@ type Resource = {
     footprint?: ResourceFootprint;
 };
 
+/**
+ * The common tree, and the yardstick the wood economy is measured in. One of
+ * every building in the game costs roughly 1,700 wood once the plank, frame and
+ * joinery chains are resolved, so this number decides how much of a playthrough
+ * is spent felling. It matches the swamp trees deliberately: they were always 8,
+ * and it was this one that carried a placeholder.
+ */
 export const treeResource = {
     asset: spriteRefs.tree_1,
     id: "tree1",
     name: "Tree",
     harvestMode: ResourceHarvestMode.Chop,
     lifecycle: { type: "Finite" },
-    yields: [{ item: woodResourceItem, amount: 100 }],
+    yields: [{ item: woodResourceItem, amount: 8 }],
     workDuration: 1,
 } as const;
 
@@ -65,7 +73,7 @@ export const pineResource = {
     name: "Pine Tree",
     harvestMode: ResourceHarvestMode.Chop,
     lifecycle: { type: "Finite" },
-    yields: [{ item: woodResourceItem, amount: 100 }],
+    yields: [{ item: woodResourceItem, amount: 8 }],
     workDuration: 1,
 } as const;
 
@@ -188,6 +196,28 @@ export const snowFlowerResource = {
     workDuration: 1,
 } as const;
 
+/**
+ * The gathered half of the magic economy. Moonpetal regrows rather than being
+ * consumed, so a settlement can keep an enchanter supplied without fighting for
+ * it. The other half, gems, only comes off dead goblins.
+ */
+export const moonpetalResource = {
+    asset: spriteRefs.plainsFlower2,
+    // Node ids stay distinct from the item they yield, as tree1 yields wood and
+    // stone1 yields stone. Two registries, two names.
+    id: "moonpetal1",
+    name: "Moonpetal",
+    harvestMode: ResourceHarvestMode.Pick,
+    lifecycle: {
+        type: "Regrow",
+        time: 150,
+        sprite: spriteRefs.plainsFlower3,
+    },
+    yields: [{ item: moonpetalItem, amount: 2 }],
+    workDuration: 2,
+    footprint: "decorative",
+} as const;
+
 export const stoneResource = {
     asset: spriteRefs.stone,
     id: "stone1",
@@ -208,6 +238,7 @@ export const NaturalResources = [
     cactusFlowerResource,
     berryBushResource,
     mushroomResource,
+    moonpetalResource,
     grassResource,
     treeResource,
     pineResource,

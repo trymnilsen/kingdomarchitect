@@ -7,6 +7,8 @@ export const farm: Building = {
     icon: spriteRefs.farm_4,
     name: "Farm",
     scale: 2,
+    /** Crossable, but people would rather not tramp through the crop. */
+    traversalWeight: 10,
     requirements: {
         materials: {
             [woodResourceItem.id]: 20,

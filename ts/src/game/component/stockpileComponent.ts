@@ -17,12 +17,15 @@ export type PreferredAmount = {
 export type StockpileComponent = {
     id: typeof StockpileComponentId;
     preferredAmounts: PreferredAmount[];
+    /** Total item count this store can hold, from Building.storageCapacity. */
+    capacity: number;
 };
 
-export function createStockpileComponent(): StockpileComponent {
+export function createStockpileComponent(capacity: number): StockpileComponent {
     return {
         id: StockpileComponentId,
         preferredAmounts: [],
+        capacity,
     };
 }
 
@@ -54,6 +57,27 @@ export function setPreferredAmount(
     } else {
         component.preferredAmounts.push({ itemId, amount });
     }
+}
+
+/**
+ * Items currently held, counted as a flat total across every stack. Capacity is
+ * deliberately measured in items rather than stacks so that filling a store with
+ * one bulky resource costs the same room as spreading it across many.
+ */
+export function getStockpileUsedSpace(inventory: InventoryComponent): number {
+    let used = 0;
+    for (const stack of inventory.items) {
+        used += stack.amount;
+    }
+    return used;
+}
+
+/** Room left before the store is full. Never negative. */
+export function getStockpileFreeSpace(
+    component: StockpileComponent,
+    inventory: InventoryComponent,
+): number {
+    return Math.max(0, component.capacity - getStockpileUsedSpace(inventory));
 }
 
 /**

@@ -1,5 +1,6 @@
 import {
     berryBushResource,
+    moonpetalResource,
     stoneResource,
     treeResource,
 } from "../../../data/inventory/items/naturalResource.ts";
@@ -18,6 +19,7 @@ export function generateForrest(chunk: TileChunk, chunkEntity: Entity) {
     placeResource(fixed(16), treeResource, chunk, chunkEntity, chunkMap);
     placeResource(random(3), stoneResource, chunk, chunkEntity, chunkMap);
     placeResource(random(3), berryBushResource, chunk, chunkEntity, chunkMap);
+    placeResource(random(2), moonpetalResource, chunk, chunkEntity, chunkMap);
 
     placeRocks(chunk, chunkEntity);
 }

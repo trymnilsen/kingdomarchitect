@@ -51,7 +51,7 @@ function createStockpileWithFood(
     const stockpile = new Entity(id);
     parent.addChild(stockpile);
     stockpile.worldPosition = { x: 15, y: 8 };
-    stockpile.setEcsComponent(createStockpileComponent());
+    stockpile.setEcsComponent(createStockpileComponent(200));
     const inv = createInventoryComponent();
     addInventoryItem(inv, breadItem, amount);
     stockpile.setEcsComponent(inv);

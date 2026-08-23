@@ -47,24 +47,11 @@ export type LightSourceDefinition = {
 };
 
 /**
- * The brazier is the widest placed source: a standing fixture with a pool out to
- * 4 tiles.
- */
-export const brazierLightSource: LightSourceDefinition = {
-    id: "brazier",
-    lightRadius: 4,
-    fuel: "charcoal",
-    // A standing fixture, not lit by hand: putting it out takes real effort.
-    extinguishDifficulty: "hard",
-    claimsHearthlight: true,
-};
-
-/**
  * The default emission for an ordinary building: its own tile and the cardinal
  * neighbours are lit. Buildings glow faintly so the places people live and work
  * are never pitch dark. The glow claims no hearthlight. A wall segment or a lone
  * farm in the wilderness is not home territory. Only deliberate placed light
- * sources (cresset, brazier, campfire, lamp post) claim.
+ * sources (cresset, campfire, lamp post) claim.
  */
 export const buildingGlowLightSource: LightSourceDefinition = {
     id: "buildingGlow",
@@ -166,7 +153,6 @@ export const searchlightLightSource: LightSourceDefinition = {
 };
 
 const lightSourceDefinitions: readonly LightSourceDefinition[] = [
-    brazierLightSource,
     buildingGlowLightSource,
     cressetLightSource,
     torchLightSource,

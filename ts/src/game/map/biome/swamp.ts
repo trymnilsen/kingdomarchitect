@@ -1,4 +1,5 @@
 import {
+    moonpetalResource,
     mushroomResource,
     swampFlowerResource,
     swampTree2Resource,
@@ -19,4 +20,5 @@ export function generateSwamp(chunk: TileChunk, chunkEntity: Entity) {
     placeResource(fixed(8), swampTree2Resource, chunk, chunkEntity, chunkMap);
     placeResource(random(8), swampFlowerResource, chunk, chunkEntity, chunkMap);
     placeResource(random(4), mushroomResource, chunk, chunkEntity, chunkMap);
+    placeResource(random(3), moonpetalResource, chunk, chunkEntity, chunkMap);
 }

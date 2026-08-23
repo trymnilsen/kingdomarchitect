@@ -25,10 +25,8 @@ import {
 } from "../component/heldItemComponent.ts";
 import type { Entity } from "../entity/entity.ts";
 import type { Job } from "./job.ts";
-import {
-    findStockpiles,
-    canBuildingBeConstructed,
-} from "../building/materialQuery.ts";
+import { canBuildingBeConstructed } from "../building/materialQuery.ts";
+import { findStockpiles } from "../entity/settlementQueries.ts";
 import {
     calculateBuildingQuality,
     getRarityName,
@@ -207,8 +205,9 @@ export function finishConstruction(
         quality: getRarityName(quality),
     });
 
-    applyFunctionalComponents(buildingEntity, buildingComponent.building);
-
+    // Swap the scaffold for the finished art first, then let the functional
+    // components specialise it. A gate replaces this with its shut-state
+    // sprite, and it can only do that if it runs last.
     if (spriteComponent) {
         const adjacency = buildingAdjecency[buildingComponent.building.id];
         if (adjacency) {
@@ -221,6 +220,8 @@ export function finishConstruction(
             spriteComponent.sprite = buildingComponent.building.icon;
         }
     }
+
+    applyFunctionalComponents(buildingEntity, buildingComponent.building);
 
     buildingEntity.invalidateComponent(BuildingComponentId);
     buildingEntity.invalidateComponent(SpriteComponentId);

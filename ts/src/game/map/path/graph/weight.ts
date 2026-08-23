@@ -1,5 +1,4 @@
 import type { Point } from "../../../../common/point.ts";
-import { BuildingComponentId } from "../../../component/buildingComponent.ts";
 import { GoblinUnitComponentId } from "../../../component/goblinUnitComponent.ts";
 import { PlayerUnitComponentId } from "../../../component/playerUnitComponent.ts";
 import { ResourceComponentId } from "../../../component/resourceComponent.ts";
@@ -11,8 +10,8 @@ import {
 } from "../../../../data/inventory/items/naturalResource.ts";
 import { queryEntity } from "../../query/queryEntity.ts";
 import {
+    getBuildingTraversalWeight,
     isImpassableStructure,
-    TraversalComponentId,
 } from "../../../component/traversalComponent.ts";
 
 /**
@@ -66,18 +65,12 @@ export function getWeightAtPoint(point: Point, scope: Entity): number {
                 );
             }
 
-            const buildingComponent =
-                entity.getEcsComponent(BuildingComponentId);
-            if (buildingComponent) {
-                const traversal = entity.getEcsComponent(TraversalComponentId);
-                if (traversal) {
-                    entityWeight = Math.max(entityWeight, traversal.weight);
-                } else {
-                    // Roads have weight 1 to prioritize pathfinding through them
-                    const w =
-                        buildingComponent.building.id === "road" ? 1 : 100;
-                    entityWeight = Math.max(entityWeight, w);
-                }
+            // Same rule the passability check uses, so the cost A* pays to
+            // cross a building and the decision about whether it may cross at
+            // all can never disagree.
+            const buildingWeight = getBuildingTraversalWeight(entity);
+            if (buildingWeight !== undefined) {
+                entityWeight = Math.max(entityWeight, buildingWeight);
             }
 
             if (entity.hasComponent(PlayerUnitComponentId)) {

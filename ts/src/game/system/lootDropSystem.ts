@@ -1,5 +1,5 @@
 import type { EcsSystem } from "../../ecs/ecsSystem.ts";
-import { goldCoins } from "../../data/inventory/items/resources.ts";
+import { goblinLootTable, rollLootDrops } from "../../data/loot/lootTable.ts";
 import { dropItemAtPosition, DropMode } from "../behavior/dropItem.ts";
 import {
     HeldItemComponentId,
@@ -26,15 +26,17 @@ export function createLootDropSystem(gameTime: GameTime): EcsSystem {
                 const deathPosition = event.source.worldPosition;
                 const tick = gameTime.tick;
 
-                dropItemAtPosition(
-                    root,
-                    tick,
-                    deathPosition,
-                    goldCoins,
-                    1,
-                    `Gold dropped as loot by slain goblin (${event.source.id})`,
-                    DropMode.Nearest,
-                );
+                for (const drop of rollLootDrops(goblinLootTable)) {
+                    dropItemAtPosition(
+                        root,
+                        tick,
+                        deathPosition,
+                        drop.item,
+                        drop.amount,
+                        `${drop.item.name} dropped as loot by slain goblin (${event.source.id})`,
+                        DropMode.Nearest,
+                    );
+                }
 
                 const held = event.source.getEcsComponent(HeldItemComponentId);
                 if (held && !isHeldEmpty(held)) {

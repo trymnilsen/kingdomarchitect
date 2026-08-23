@@ -43,7 +43,7 @@ function createTestScene(): {
     worker.setEcsComponent(createHeldItemComponent());
     building.setEcsComponent(createInventoryComponent());
 
-    stockpile.setEcsComponent(createStockpileComponent());
+    stockpile.setEcsComponent(createStockpileComponent(200));
     stockpile.setEcsComponent(createInventoryComponent());
 
     root.setEcsComponent(createJobQueueComponent());

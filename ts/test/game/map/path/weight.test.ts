@@ -21,7 +21,7 @@ import {
 } from "../../../../src/game/map/path/graph/weight.ts";
 import { goblinHut } from "../../../../src/data/building/goblin/goblinHut.ts";
 import { goblinCampfire } from "../../../../src/data/building/goblin/goblinCampfire.ts";
-import { road } from "../../../../src/data/building/stone/road.ts";
+import { road } from "../../../../src/data/building/gold/road.ts";
 import { createPlayerUnitComponent } from "../../../../src/game/component/playerUnitComponent.ts";
 
 const TEST_POS: Point = { x: 5, y: 4 };

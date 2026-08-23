@@ -1,4 +1,5 @@
 import { spriteRefs } from "../../../asset/sprite.ts";
+import type { Building } from "../building.ts";
 
 export const road = {
     id: "road",
@@ -12,4 +13,10 @@ export const road = {
      * wealth, so it must not raise the kingdom score that paces raids.
      */
     raidValue: 0,
-} as const;
+    /**
+     * The cheapest ground in the game, which is the entire point of paving.
+     * Pathfinding pays 1 to cross a road against 25 for bare ground, so routes
+     * bend onto roads wherever one exists.
+     */
+    traversalWeight: 1,
+} as const satisfies Building;

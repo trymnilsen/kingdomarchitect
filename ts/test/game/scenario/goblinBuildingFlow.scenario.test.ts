@@ -128,9 +128,12 @@ function findBuiltCampfire(camp: Entity): Entity | null {
 describe("Goblin Building Flow", () => {
     it("cold goblin builds campfire and warms up when tree is adjacent", () => {
         /**
-         * Scenario: No movement needed to reach the tree.
-         * Goblin and camp are at (12, 8). Tree is immediately adjacent at (13, 8).
+         * Scenario: No movement needed to reach the trees.
+         * Goblin and camp are at (12, 8), trees immediately adjacent either side.
          * Full flow: harvest → deposit → construct → warm at fire.
+         *
+         * Two trees because a campfire costs 10 wood and a tree yields 8, so
+         * the goblin has to make a second trip.
          */
         const { root } = createWorld({
             min: { x: 4, y: 2 },
@@ -140,6 +143,7 @@ describe("Goblin Building Flow", () => {
         const camp = createCamp(root, "goblinCamp1", { x: 12, y: 8 });
         const goblin = createGoblin(camp, { x: 12, y: 8 });
         createTree(root, "tree1", { x: 13, y: 8 });
+        createTree(root, "tree2", { x: 11, y: 8 });
 
         runSystems(root, 80);
 
@@ -165,8 +169,12 @@ describe("Goblin Building Flow", () => {
 
     it("cold goblin travels to distant tree, builds campfire, and warms up", () => {
         /**
-         * Scenario: Tree is 7 tiles from camp. Goblin must travel there to harvest.
-         * Verifies mid-simulation movement before asserting full completion.
+         * Scenario: Trees are 7 tiles from camp. Goblin must travel there to
+         * harvest. Verifies mid-simulation movement before asserting full
+         * completion.
+         *
+         * Two trees because a campfire costs 10 wood and a tree yields 8, so
+         * the goblin has to walk the distance twice.
          */
         const { root } = createWorld({
             min: { x: 4, y: 2 },
@@ -176,6 +184,7 @@ describe("Goblin Building Flow", () => {
         const camp = createCamp(root, "goblinCamp1", { x: 12, y: 8 });
         const goblin = createGoblin(camp, { x: 12, y: 8 });
         createTree(root, "tree1", { x: 19, y: 8 });
+        createTree(root, "tree2", { x: 19, y: 9 });
 
         const behaviorSystem = createBehaviorSystem(() => [
             createKeepWarmBehavior(),
@@ -222,9 +231,11 @@ describe("Goblin Building Flow", () => {
     it("goblin builds campfire then hut once warm", () => {
         /**
          * Scenario: Goblin starts cold with no fire and no hut in camp.
-         * Three trees are placed adjacent to camp (campfire needs 10 wood, hut needs 15).
          * Full flow: keepWarm triggers → harvest → deposit → build campfire → warm up →
          *            expandCamp triggers → harvest more → deposit → build hut.
+         *
+         * Campfire 10 wood plus hut 15 is 25, and a tree yields 8, so four
+         * trees is the smallest supply that finishes both.
          */
         const { root } = createWorld({
             min: { x: 4, y: 2 },
@@ -233,10 +244,10 @@ describe("Goblin Building Flow", () => {
 
         const camp = createCamp(root, "goblinCamp1", { x: 12, y: 8 });
         createGoblin(camp, { x: 12, y: 8 });
-        // Three trees: campfire costs 10 wood (1 tree), hut costs 15 wood (2 trees)
         createTree(root, "tree1", { x: 13, y: 8 });
         createTree(root, "tree2", { x: 14, y: 8 });
         createTree(root, "tree3", { x: 15, y: 8 });
+        createTree(root, "tree4", { x: 16, y: 8 });
 
         const behaviorSystem = createBehaviorSystem(createBehaviorResolver());
 

@@ -54,7 +54,7 @@ function createStockpileWithItems(
     const stockpile = new Entity(id);
     parent.addChild(stockpile);
     stockpile.worldPosition = position;
-    stockpile.setEcsComponent(createStockpileComponent());
+    stockpile.setEcsComponent(createStockpileComponent(200));
     const inv = createInventoryComponent();
     for (const stack of items) {
         addInventoryItem(inv, stack.item, stack.amount);

@@ -12,16 +12,10 @@ import { createCraftingComponent } from "../component/craftingComponent.ts";
 import type { CraftingRecipe } from "../../data/crafting/craftingRecipe.ts";
 import { createInventoryComponent } from "../component/inventoryComponent.ts";
 import { woodenHouse } from "../../data/building/wood/house.ts";
-import { blacksmith } from "../../data/building/stone/blacksmith.ts";
-import { blacksmithRecipes } from "../../data/crafting/recipes/blacksmithRecipes.ts";
+import { getRecipesForBuilding } from "../../data/crafting/craftingStations.ts";
 import { createWorkplaceComponent } from "../component/workplaceComponent.ts";
-import { stockPile } from "../../data/building/wood/storage.ts";
-import { carpenter } from "../../data/building/wood/carpenter.ts";
-import { carpenterRecipes } from "../../data/crafting/recipes/carpenterRecipes.ts";
-import { quarryRecipes } from "../../data/crafting/recipes/quarryRecipes.ts";
 import { createStockpileComponent } from "../component/stockpileComponent.ts";
 import { forrester } from "../../data/building/wood/forrester.ts";
-import { quary } from "../../data/building/stone/quary.ts";
 import { createProductionComponent } from "../component/productionComponent.ts";
 import { goblinCampfire } from "../../data/building/goblin/goblinCampfire.ts";
 import { goblinHut } from "../../data/building/goblin/goblinHut.ts";
@@ -38,12 +32,13 @@ import {
     createTraversalComponent,
     TraversalComponentId,
 } from "../component/traversalComponent.ts";
-import { baker } from "../../data/building/food/baker.ts";
-import { bakerRecipes } from "../../data/crafting/recipes/bakerRecipes.ts";
-import { workshop } from "../../data/building/stone/workshop.ts";
-import { workshopRecipes } from "../../data/crafting/recipes/workshopRecipes.ts";
-import { enchanter } from "../../data/building/gold/enchanter.ts";
-import { enchanterRecipes } from "../../data/crafting/recipes/enchanterRecipes.ts";
+import {
+    createGateComponent,
+    gateSprite,
+    gateTraversalWeight,
+    GateComponentId,
+} from "../component/gateComponent.ts";
+import { SpriteComponentId } from "../component/spriteComponent.ts";
 import { buildingGlowLightSource } from "../../data/light/lightSourceDefinition.ts";
 import {
     createLightSourceComponent,
@@ -77,6 +72,16 @@ export function buildingPrefab(
     );
     entity.setEcsComponent(createVisibilityComponent(BUILDING_VISION_REACH));
 
+    // The default sprite goes on first so that applyFunctionalComponents can
+    // replace it. A gate draws its own art for its open or shut state, and it
+    // can only do that if the generic icon is already in place to overwrite.
+    entity.setEcsComponent(
+        createSpriteComponent(
+            startScaffolded ? spriteRefs.wooden_house_scaffold : building.icon,
+            { x: 0, y: 0 },
+        ),
+    );
+
     if (startScaffolded) {
         // Scaffolded buildings only get an inventory to hold construction materials
         if (building.requirements?.materials) {
@@ -86,29 +91,8 @@ export function buildingPrefab(
         applyFunctionalComponents(entity, building);
     }
 
-    entity.setEcsComponent(
-        createSpriteComponent(
-            startScaffolded ? spriteRefs.wooden_house_scaffold : building.icon,
-            { x: 0, y: 0 },
-        ),
-    );
     return entity;
 }
-
-/**
- * Buildings that are crafting stations, mapped to the recipes they can make.
- * They are otherwise identical (crafting + inventory + workplace), so the only
- * per-building difference is the recipe list.
- */
-const craftingStationRecipes: ReadonlyMap<string, readonly CraftingRecipe[]> =
-    new Map([
-        [blacksmith.id, blacksmithRecipes],
-        [carpenter.id, carpenterRecipes],
-        [quary.id, quarryRecipes],
-        [baker.id, bakerRecipes],
-        [workshop.id, workshopRecipes],
-        [enchanter.id, enchanterRecipes],
-    ]);
 
 /**
  * Turn an entity into a crafting station: it can craft `recipes`, holds staged
@@ -136,7 +120,7 @@ export function applyFunctionalComponents(
 ): void {
     // Every completed building emits light: its faint self-glow by default, a
     // per-type override, or nothing when set to "none". Dedicated light sources
-    // (e.g. the brazier) flow through this same path by naming their profile.
+    // (e.g. the lamp post) flow through this same path by naming their profile.
     // Because this runs only for non-scaffolded buildings, foundations never
     // glow without any extra check.
     const lightSourceId = building.light ?? buildingGlowLightSource.id;
@@ -149,13 +133,18 @@ export function applyFunctionalComponents(
         entity.setEcsComponent(createHousingComponent());
         entity.invalidateComponent(HousingComponentId);
     }
-    const stationRecipes = craftingStationRecipes.get(building.id);
+    const stationRecipes = getRecipesForBuilding(building.id);
     if (stationRecipes) {
         applyCraftingStation(entity, stationRecipes);
     }
-    if (building.id == stockPile.id) {
+    // Any building that declares a storage capacity is a store. Keying off the
+    // data rather than a list of ids means adding a bigger granary later is a
+    // data change, not a change here.
+    if (building.storageCapacity !== undefined) {
         entity.setEcsComponent(createInventoryComponent());
-        entity.setEcsComponent(createStockpileComponent());
+        entity.setEcsComponent(
+            createStockpileComponent(building.storageCapacity),
+        );
         entity.setEcsComponent(createWorkplaceComponent());
         entity.invalidateComponent(InventoryComponentId);
         entity.invalidateComponent(StockpileComponentId);
@@ -178,8 +167,24 @@ export function applyFunctionalComponents(
     if (building.id == farm.id) {
         entity.setEcsComponent(createFarmComponent());
         entity.invalidateComponent(FarmComponentId);
-        entity.setEcsComponent(createTraversalComponent(10));
+    }
+    if (building.isGate) {
+        // A new gate is shut. The safe default matters because the whole point
+        // of the thing is that an open one lets raiders walk in.
+        const gateComponent = createGateComponent(false);
+        entity.setEcsComponent(gateComponent);
+        entity.setEcsComponent(
+            createTraversalComponent(gateTraversalWeight(gateComponent.isOpen)),
+        );
+        entity.setEcsComponent(
+            createSpriteComponent(gateSprite(gateComponent.isOpen), {
+                x: 0,
+                y: 0,
+            }),
+        );
+        entity.invalidateComponent(GateComponentId);
         entity.invalidateComponent(TraversalComponentId);
+        entity.invalidateComponent(SpriteComponentId);
     }
     if (building.id == stoneTower.id) {
         // The lookout station: a worker stationed on top surveys a wide area by day

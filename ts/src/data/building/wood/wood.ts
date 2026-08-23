@@ -1,5 +1,4 @@
 import { bowyer } from "./bowyer.ts";
-import { brazier } from "./brazier.ts";
 import { carpenter } from "./carpenter.ts";
 import { forrester } from "./forrester.ts";
 import { woodenHouse } from "./house.ts";
@@ -12,5 +11,4 @@ export const woodenBuildings = [
     bowyer,
     stockPile,
     warehouse,
-    //brazier,
 ];

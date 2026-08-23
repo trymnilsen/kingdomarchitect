@@ -1,13 +1,19 @@
 import { distance } from "../../common/point.ts";
 import { InventoryComponentId } from "../component/inventoryComponent.ts";
-import { StockpileComponentId } from "../component/stockpileComponent.ts";
+import {
+    getStockpileFreeSpace,
+    StockpileComponentId,
+} from "../component/stockpileComponent.ts";
 import { getSettlementEntity } from "./settlementQueries.ts";
 import type { Entity } from "./entity.ts";
 
 /**
  * Find the nearest stockpile in the worker's settlement that will accept the
  * given item id. A stockpile with no preferences is treated as a generic
- * destination. Returns null if no stockpile accepts the item.
+ * destination. A full stockpile accepts nothing, so a settlement that has run
+ * out of room sends its haulers looking further afield rather than piling into
+ * a store that cannot take the load. Returns null if no stockpile accepts the
+ * item.
  */
 export function findAcceptingStockpile(
     entity: Entity,
@@ -19,7 +25,9 @@ export function findAcceptingStockpile(
     let best: Entity | null = null;
     let bestDistance = Infinity;
     for (const [stockpileEntity, stockpile] of stockpiles) {
-        if (!stockpileEntity.getEcsComponent(InventoryComponentId)) continue;
+        const inventory = stockpileEntity.getEcsComponent(InventoryComponentId);
+        if (!inventory) continue;
+        if (getStockpileFreeSpace(stockpile, inventory) <= 0) continue;
         if (stockpile.preferredAmounts.length === 0) {
             const d = distance(
                 entity.worldPosition,

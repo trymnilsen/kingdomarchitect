@@ -6,7 +6,7 @@ import { WORKER_SCORE } from "../../../src/game/raid/raidWorth.ts";
 import { stockPile } from "../../../src/data/building/wood/storage.ts";
 import { woodenHouse } from "../../../src/data/building/wood/house.ts";
 import { stoneWall } from "../../../src/data/building/stone/wall.ts";
-import { road } from "../../../src/data/building/stone/road.ts";
+import { road } from "../../../src/data/building/gold/road.ts";
 import { cresset } from "../../../src/data/building/light/cresset.ts";
 
 describe("kingdomScore", () => {

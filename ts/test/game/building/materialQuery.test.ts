@@ -127,7 +127,7 @@ describe("getTotalItemInStockpiles", () => {
                 },
             ]),
         );
-        stockpile.setEcsComponent(createStockpileComponent());
+        stockpile.setEcsComponent(createStockpileComponent(200));
         root.addChild(stockpile);
         return root;
     }

@@ -4,6 +4,7 @@ import {
     enchanterRecipes,
     greaterHealthPotionRecipe,
     healthPotionRecipe,
+    manaPotionRecipe,
 } from "../../../src/data/crafting/recipes/enchanterRecipes.ts";
 import { itemEffectFactoryList } from "../../../src/data/inventory/itemEffectFactoryList.ts";
 import {
@@ -37,10 +38,11 @@ describe("enchanterRecipes", () => {
         assert.strictEqual(greaterHealthPotionRecipe.duration, 5);
     });
 
-    it("contains both potion recipes", () => {
+    it("contains every potion recipe", () => {
         assert.deepStrictEqual(enchanterRecipes, [
             healthPotionRecipe,
             greaterHealthPotionRecipe,
+            manaPotionRecipe,
         ]);
     });
 

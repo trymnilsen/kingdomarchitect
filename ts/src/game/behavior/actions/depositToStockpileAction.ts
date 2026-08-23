@@ -6,8 +6,12 @@ import {
     clearHeldItem,
     HeldItemComponentId,
     isHeldEmpty,
+    setHeldItem,
 } from "../../component/heldItemComponent.ts";
-import { StockpileComponentId } from "../../component/stockpileComponent.ts";
+import {
+    getStockpileFreeSpace,
+    StockpileComponentId,
+} from "../../component/stockpileComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { ActionComplete, type ActionResult } from "./Action.ts";
 import { log } from "../../../common/logging/logger.ts";
@@ -48,13 +52,36 @@ export function executeDepositToStockpileAction(
         return ActionComplete;
     }
 
-    addInventoryItem(stockpileInventory, held.item!, held.amount);
-    clearHeldItem(held);
+    // Deposit only what fits. The remainder stays in hand so the worker carries
+    // it on to another store rather than the store silently swallowing more than
+    // it can hold.
+    const freeSpace = getStockpileFreeSpace(
+        stockpileMarker,
+        stockpileInventory,
+    );
+    if (freeSpace <= 0) {
+        log.info(
+            `Stockpile ${action.stockpileId} is full, ${entity.id} keeps its load`,
+        );
+        return {
+            kind: "failed",
+            cause: { type: "stockpileFull", stockpileId: action.stockpileId },
+        };
+    }
+
+    const deposited = Math.min(held.amount, freeSpace);
+    const item = held.item!;
+    addInventoryItem(stockpileInventory, item, deposited);
+    if (deposited >= held.amount) {
+        clearHeldItem(held);
+    } else {
+        setHeldItem(held, item, held.amount - deposited);
+    }
 
     entity.invalidateComponent(HeldItemComponentId);
     stockpile.invalidateComponent(InventoryComponentId);
     log.info(
-        `Entity ${entity.id} deposited held into stockpile ${action.stockpileId}`,
+        `Entity ${entity.id} deposited ${deposited} into stockpile ${action.stockpileId}`,
     );
 
     return ActionComplete;

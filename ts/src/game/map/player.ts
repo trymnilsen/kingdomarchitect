@@ -9,45 +9,8 @@ import {
     stoneResource,
     treeResource,
 } from "../../data/inventory/items/naturalResource.ts";
-import {
-    bowItem,
-    hammerItem,
-    swordItem,
-    wizardHat,
-} from "../../data/inventory/items/equipment.ts";
-import { bedrollItem } from "../../data/inventory/items/fieldEquipment.ts";
-import {
-    charcoalItem,
-    clayBricksItem,
-    gearsItem,
-    ironBarsItem,
-    joineryItem,
-    planksItem,
-    stoneBarsItem,
-    timberFramesItem,
-} from "../../data/inventory/items/processedMaterials.ts";
-import {
-    berryItem,
-    blueBook,
-    breadItem,
-    gemResource,
-    goldCoins,
-    greaterHealthPotion,
-    healthPotion,
-    ironOreItem,
-    manaPotion,
-    scroll,
-    stoneResource as stoneInventoryItem,
-    wheatResourceItem,
-    woodResourceItem,
-} from "../../data/inventory/items/resources.ts";
 import { ChunkMapComponentId } from "../component/chunkMapComponent.ts";
 import { HousingComponentId } from "../component/housingComponent.ts";
-import {
-    addInventoryItem,
-    InventoryComponentId,
-} from "../component/inventoryComponent.ts";
-import { KingdomComponentId } from "../component/kingdomComponent.ts";
 import { setChunk, TileComponentId } from "../component/tileComponent.ts";
 import { Entity } from "../entity/entity.ts";
 import { buildingPrefab } from "../prefab/buildingPrefab.ts";
@@ -77,40 +40,10 @@ export function addInitialPlayerChunk(scopedEntity: Entity): Point {
     const firstHouse = buildingPrefab(woodenHouse, false);
     firstHouse.requireEcsComponent(HousingComponentId).tenant = firstWorker.id;
 
-    // Stocked with a sword so the new equip-from-stockpile flow has
-    // something to grab in a fresh game.
+    // The stockpile starts empty. A kingdom owns nothing it has not cut,
+    // mined, or grown, so the opening move is always to send the first worker
+    // at a tree.
     const startingStockpile = buildingPrefab(stockPile, false);
-    const stockpileInventory =
-        startingStockpile.requireEcsComponent(InventoryComponentId);
-    addInventoryItem(stockpileInventory, swordItem, 1);
-    // Enough to build two windmills, two carpenters, and two blacksmiths
-    addInventoryItem(stockpileInventory, woodResourceItem, 220);
-    addInventoryItem(stockpileInventory, stoneInventoryItem, 180);
-    addInventoryItem(stockpileInventory, planksItem, 40);
-    addInventoryItem(stockpileInventory, timberFramesItem, 40);
-    addInventoryItem(stockpileInventory, goldCoins, 4);
-    // Extra variety so the inventory list spans several pages, exercising the
-    // paginated list and its numbered pager.
-    addInventoryItem(stockpileInventory, bowItem, 1);
-    addInventoryItem(stockpileInventory, hammerItem, 1);
-    addInventoryItem(stockpileInventory, wizardHat, 1);
-    addInventoryItem(stockpileInventory, bedrollItem, 3);
-    addInventoryItem(stockpileInventory, joineryItem, 12);
-    addInventoryItem(stockpileInventory, ironBarsItem, 24);
-    addInventoryItem(stockpileInventory, stoneBarsItem, 18);
-    addInventoryItem(stockpileInventory, gearsItem, 9);
-    addInventoryItem(stockpileInventory, clayBricksItem, 30);
-    addInventoryItem(stockpileInventory, charcoalItem, 16);
-    addInventoryItem(stockpileInventory, ironOreItem, 28);
-    addInventoryItem(stockpileInventory, gemResource, 5);
-    addInventoryItem(stockpileInventory, wheatResourceItem, 60);
-    addInventoryItem(stockpileInventory, breadItem, 14);
-    addInventoryItem(stockpileInventory, berryItem, 22);
-    addInventoryItem(stockpileInventory, healthPotion, 6);
-    addInventoryItem(stockpileInventory, greaterHealthPotion, 2);
-    addInventoryItem(stockpileInventory, manaPotion, 4);
-    addInventoryItem(stockpileInventory, blueBook, 1);
-    addInventoryItem(stockpileInventory, scroll, 7);
 
     // World resources stay on the chunk entity
     chunkEntity.addChild(firstTree);
@@ -175,37 +108,4 @@ export function addInitialPlayerChunk(scopedEntity: Entity): Point {
     firstStoneEntity.worldPosition = firstStone[0];
     chunkEntity.addChild(firstStoneEntity);
     return firstWorkerPosition;
-    /*
-    const firstWorker = workerPrefab(generateId("worker"));
-    const firstHouse = housePrefab(generateId("house"), false);
-    const firstFarm = farmPrefab(generateId("farm"));
-    const firstTree = treePrefab(generateId("tree"), 1);
-    const well = wellPrefab(generateId("well"));
-    const chestItems: InventoryItem[] = [
-        goldCoins,
-        swordItem,
-        hammerItem,
-        wizardHat,
-        bowItem,
-    ];
-    const chest = chestPrefab(generateId("chest"), chestItems);
-    const trainingDummy = trainingDummyPrefab(generateId("dummy"));
-    const randomOffsetX = Math.round(Math.random() * 3) + 1;
-    const randomOffsetY = Math.round(Math.random() * 3) + 1;
-    chest.position = { x: 2 + randomOffsetX, y: randomOffsetY };
-    firstFarm.position = { x: 1 + randomOffsetX, y: 0 + randomOffsetY };
-    firstHouse.position = { x: 0 + randomOffsetX, y: 0 + randomOffsetY };
-    firstTree.position = { x: 2 + randomOffsetX, y: 2 + randomOffsetY };
-    firstWorker.position = { x: 0 + randomOffsetX, y: 1 + randomOffsetY };
-    well.position = { x: 1 + randomOffsetX, y: 1 + randomOffsetY };
-    firstHouse.requireComponent(HousingComponent).residentId = firstWorker.id;
-    trainingDummy.position = { x: 1, y: 1 };
-    chunkEntity.addChild(firstFarm);
-    chunkEntity.addChild(firstWorker);
-    chunkEntity.addChild(firstHouse);
-    chunkEntity.addChild(firstTree);
-    chunkEntity.addChild(well);
-    chunkEntity.addChild(chest);
-    
-    */
 }

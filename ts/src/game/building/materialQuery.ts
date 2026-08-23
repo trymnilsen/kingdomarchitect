@@ -17,6 +17,7 @@ import {
     type StockpileComponent,
 } from "../component/stockpileComponent.ts";
 import type { Entity } from "../entity/entity.ts";
+import { findStockpiles } from "../entity/settlementQueries.ts";
 import { log } from "../../common/logging/logger.ts";
 import {
     aggregateStock,
@@ -25,6 +26,7 @@ import {
     totalForId,
     type StockAggregate,
 } from "./stockAggregate.ts";
+import { findUnmetSpecialRequirements } from "./specialRequirementQuery.ts";
 
 export type MaterialSource = {
     entity: Entity;
@@ -48,23 +50,6 @@ export type MaterialCheckResult = {
     missingMaterials: MaterialRequirement[];
     materialsToFetch: MaterialRequirement[];
 };
-
-/**
- * Find all stockpile buildings in the settlement that have inventory components
- */
-export function findStockpiles(settlement: Entity): Entity[] {
-    const stockpiles: Entity[] = [];
-    const stockpileComponents =
-        settlement.queryComponents(StockpileComponentId);
-
-    for (const [entity] of stockpileComponents) {
-        if (entity.getEcsComponent(InventoryComponentId)) {
-            stockpiles.push(entity);
-        }
-    }
-
-    return stockpiles;
-}
 
 /**
  * Get total amount of an item available across all stockpiles. With no rarity
@@ -289,15 +274,28 @@ export function checkMaterialsForBuilding(
 }
 
 /**
- * Check if all required materials for a building exist somewhere in the settlement.
- * This checks worker inventory + all stockpiles.
+ * Check whether a building can be raised: its materials exist somewhere in the
+ * settlement (worker inventory plus all stockpiles), and the settlement meets
+ * every special requirement the building names.
+ *
+ * Both halves are checked here so there is one gate rather than two. A caller
+ * that consulted only the materials would happily start a church with nobody to
+ * consecrate it.
  */
 export function canBuildingBeConstructed(
     root: Entity,
     workerEntity: Entity,
     requirements: BuildingRequirements | undefined,
 ): boolean {
-    if (!requirements?.materials) {
+    if (!requirements) {
+        return true;
+    }
+
+    if (findUnmetSpecialRequirements(root, requirements.special).length > 0) {
+        return false;
+    }
+
+    if (!requirements.materials) {
         return true;
     }
 

@@ -18,7 +18,7 @@ import { ResourceHarvestMode } from "../../../data/inventory/items/naturalResour
 import type { Entity } from "../../entity/entity.ts";
 import type { BehaviorActionData } from "../actions/ActionData.ts";
 import type { Behavior } from "./Behavior.ts";
-import { findStockpiles } from "../../building/materialQuery.ts";
+import { findStockpiles } from "../../entity/settlementQueries.ts";
 import { planDepositHeld } from "../../job/planner/planDepositHeld.ts";
 
 export const HUNGER_THRESHOLD = 40;

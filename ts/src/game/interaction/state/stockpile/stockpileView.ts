@@ -5,7 +5,11 @@ import {
 } from "../../../../ui/declarative/ui.ts";
 import { uiBookLayout } from "../../../../ui/declarative/uiBookLayout.ts";
 import type { InventoryComponent } from "../../../component/inventoryComponent.ts";
-import type { StockpileComponent } from "../../../component/stockpileComponent.ts";
+import {
+    getStockpileFreeSpace,
+    getStockpileUsedSpace,
+    type StockpileComponent,
+} from "../../../component/stockpileComponent.ts";
 import { uiScaffold } from "../../view/uiScaffold.ts";
 import { inventoryGridPage } from "../../view/inventoryGridPage.ts";
 import { itemDetailsPage } from "../../view/itemDetailsPage.ts";
@@ -36,6 +40,10 @@ export type StockpileViewProps = {
 
 export const stockpileView = createComponent<StockpileViewProps>(
     ({ props }) => {
+        const used = getStockpileUsedSpace(props.inventory);
+        const full =
+            getStockpileFreeSpace(props.stockpile, props.inventory) <= 0;
+
         const leftPage: ComponentDescriptor =
             props.selectedTab === 0
                 ? inventoryGridPage({
@@ -88,6 +96,16 @@ export const stockpileView = createComponent<StockpileViewProps>(
                 {
                     text: "Close",
                     onClick: props.onClose,
+                },
+            ],
+            // A full store quietly stops accepting hauls, and without this the
+            // only symptom is workers standing around holding things.
+            rightButtons: [
+                {
+                    text: full
+                        ? `FULL ${used}/${props.stockpile.capacity}`
+                        : `${used}/${props.stockpile.capacity}`,
+                    onClick: () => {},
                 },
             ],
         });

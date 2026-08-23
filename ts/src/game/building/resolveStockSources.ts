@@ -1,7 +1,7 @@
 import { InventoryComponentId } from "../component/inventoryComponent.ts";
 import type { Entity } from "../entity/entity.ts";
 import { getSettlementEntity } from "../entity/settlementQueries.ts";
-import { findStockpiles } from "./materialQuery.ts";
+import { findStockpiles } from "../entity/settlementQueries.ts";
 
 /**
  * Which inventories an aggregated stock view reads from.

@@ -19,6 +19,7 @@ import { ProductionBuildingSelectionProvider } from "./actor/provider/production
 import { StockpileSelectionProvider } from "./actor/provider/stockpileSelectionProvider.ts";
 import { FarmBuildingSelectionProvider } from "./actor/provider/farmBuildingSelectionProvider.ts";
 import { WindmillSelectionProvider } from "./actor/provider/windmillSelectionProvider.ts";
+import { GateSelectionProvider } from "./actor/provider/gateSelectionProvider.ts";
 import { DismantleSelectionProvider } from "./actor/provider/dismantleSelectionProvider.ts";
 import { PrioritiseJobSelectionProvider } from "./actor/provider/prioritiseJobSelectionProvider.ts";
 import { type ComponentDescriptor } from "../../../../ui/declarative/ui.ts";
@@ -51,6 +52,7 @@ export class SelectionState extends InteractionState {
         new AttackSelectionProvider(),
         new FarmBuildingSelectionProvider(),
         new WindmillSelectionProvider(),
+        new GateSelectionProvider(),
         new BuildingSelectionProvider(),
         new DismantleSelectionProvider(),
         new PrioritiseJobSelectionProvider(),

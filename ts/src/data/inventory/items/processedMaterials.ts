@@ -65,6 +65,22 @@ export const charcoalItem = {
     rarity: ItemRarity.Common,
 } as const;
 
+export const parchmentItem = {
+    asset: spriteRefs.scroll,
+    id: "parchment",
+    name: "Parchment",
+    hint: "Retted flax beaten into sheets, ready to be written on",
+    rarity: ItemRarity.Common,
+} as const;
+
+export const inkItem = {
+    asset: spriteRefs.charcoal_resource,
+    id: "ink",
+    name: "Ink",
+    hint: "Lampblack and crushed berries. Stains everything it touches",
+    rarity: ItemRarity.Common,
+} as const;
+
 export const processedMaterials = [
     planksItem,
     timberFramesItem,
@@ -74,4 +90,6 @@ export const processedMaterials = [
     gearsItem,
     clayBricksItem,
     charcoalItem,
+    parchmentItem,
+    inkItem,
 ] as const;

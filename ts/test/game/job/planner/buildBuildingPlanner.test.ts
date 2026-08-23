@@ -36,7 +36,7 @@ function createTestScene(): {
     building.setEcsComponent(createBuildingComponent(woodenHouse, true));
     building.setEcsComponent(createInventoryComponent());
 
-    stockpile.setEcsComponent(createStockpileComponent());
+    stockpile.setEcsComponent(createStockpileComponent(200));
     stockpile.setEcsComponent(createInventoryComponent());
 
     root.setEcsComponent(createJobQueueComponent());

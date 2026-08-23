@@ -1,7 +1,6 @@
 import { spriteRefs } from "../../../asset/sprite.ts";
 import {
     swordItem,
-    bowItem,
     wizardHat,
     hammerItem,
 } from "../../inventory/items/equipment.ts";
@@ -13,6 +12,8 @@ import {
 import {
     ironBarsItem,
     charcoalItem,
+    gearsItem,
+    planksItem,
 } from "../../inventory/items/processedMaterials.ts";
 import type { CraftingRecipe } from "../craftingRecipe.ts";
 
@@ -26,15 +27,6 @@ export const swordRecipe: CraftingRecipe = {
     ],
     outputs: [{ item: swordItem, amount: 1 }],
     duration: 5, // 5 seconds at 1 tick/second
-};
-
-export const bowRecipe: CraftingRecipe = {
-    id: "craft_bow",
-    name: "Bow",
-    icon: spriteRefs.archer_skill,
-    inputs: [{ item: woodResourceItem, amount: 15 }],
-    outputs: [{ item: bowItem, amount: 1 }],
-    duration: 4, // 4 seconds
 };
 
 export const wizardHatRecipe: CraftingRecipe = {
@@ -70,10 +62,27 @@ export const ironBarRecipe: CraftingRecipe = {
     duration: 5,
 };
 
+/**
+ * Iron teeth set in a wooden hub. Machinery is the one thing a kingdom cannot
+ * fake with raw material, so gears are what stand between piled stone and a
+ * mill that actually turns.
+ */
+export const gearsRecipe: CraftingRecipe = {
+    id: "craft_gears",
+    name: "Gears",
+    icon: spriteRefs.stone_resource,
+    inputs: [
+        { item: ironBarsItem, amount: 2 },
+        { item: planksItem, amount: 2 },
+    ],
+    outputs: [{ item: gearsItem, amount: 2 }],
+    duration: 6,
+};
+
 export const blacksmithRecipes: readonly CraftingRecipe[] = [
     swordRecipe,
-    bowRecipe,
     wizardHatRecipe,
     hammerRecipe,
     ironBarRecipe,
+    gearsRecipe,
 ] as const;

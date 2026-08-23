@@ -17,6 +17,11 @@ export const gate: Building = {
     scale: 4,
     // Never a raid objective — broken through as an obstacle by the siege path.
     raidValue: 0,
+    /**
+     * Passable while open, a wall while shut, for everyone alike. Leaving one
+     * open at dusk is meant to be a mistake the player can make.
+     */
+    isGate: true,
     // The gate sprite already has transparent rows at the bottom that create natural breathing
     // room between the art and the container border. No additional offset needed.
     previewOffset: 0,

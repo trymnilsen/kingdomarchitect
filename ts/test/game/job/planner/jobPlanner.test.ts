@@ -138,7 +138,7 @@ describe("jobPlanner", () => {
 
         const stockpile = new Entity("stockpile");
         stockpile.worldPosition = { x: 12, y: 9 };
-        const stockpileComp = createStockpileComponent();
+        const stockpileComp = createStockpileComponent(200);
         setPreferredAmount(stockpileComp, wheatResourceItem.id, 50);
         stockpile.setEcsComponent(stockpileComp);
         stockpile.setEcsComponent(createInventoryComponent());

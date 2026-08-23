@@ -2,13 +2,18 @@ import { spriteRefs } from "../../../asset/sprite.ts";
 import {
     clayBricksItem,
     charcoalItem,
+    inkItem,
+    parchmentItem,
 } from "../../inventory/items/processedMaterials.ts";
 import {
+    berryItem,
+    flaxResourceItem,
     stoneResource,
     strawResourceItem,
     woodResourceItem,
 } from "../../inventory/items/resources.ts";
 import { torchItem, woodenSwordItem } from "../../inventory/items/equipment.ts";
+import { bedrollItem } from "../../inventory/items/fieldEquipment.ts";
 import type { CraftingRecipe } from "../craftingRecipe.ts";
 
 // TODO: Replace stone input with a raw clay resource once one is added. Stone
@@ -60,9 +65,56 @@ export const woodenSwordRecipe: CraftingRecipe = {
     duration: 3,
 };
 
+/**
+ * Straw stuffed into a flax sack. Both inputs come off a farm, so a settlement
+ * can bed its workers down before it has any craft industry at all. This lives
+ * at the workshop rather than a tailor because there is no tailor: cloth,
+ * looms, and the trade that goes with them are not built yet.
+ */
+export const bedrollRecipe: CraftingRecipe = {
+    id: "craft_bedroll",
+    name: "Bedroll",
+    icon: spriteRefs.wood_resource,
+    inputs: [
+        { item: flaxResourceItem, amount: 2 },
+        { item: strawResourceItem, amount: 2 },
+    ],
+    outputs: [{ item: bedrollItem, amount: 1 }],
+    duration: 5,
+};
+
+/**
+ * Flax beaten flat and dried. Writing surface has to exist before anything can
+ * be written on it, and it comes off the same farm that feeds the settlement.
+ */
+export const parchmentRecipe: CraftingRecipe = {
+    id: "craft_parchment",
+    name: "Parchment",
+    icon: spriteRefs.scroll,
+    inputs: [{ item: flaxResourceItem, amount: 3 }],
+    outputs: [{ item: parchmentItem, amount: 2 }],
+    duration: 4,
+};
+
+/** Lampblack from the charcoal pile, bound with crushed berries. */
+export const inkRecipe: CraftingRecipe = {
+    id: "craft_ink",
+    name: "Ink",
+    icon: spriteRefs.charcoal_resource,
+    inputs: [
+        { item: charcoalItem, amount: 1 },
+        { item: berryItem, amount: 2 },
+    ],
+    outputs: [{ item: inkItem, amount: 2 }],
+    duration: 3,
+};
+
 export const workshopRecipes: readonly CraftingRecipe[] = [
     clayBricksRecipe,
     charcoalRecipe,
     torchRecipe,
     woodenSwordRecipe,
+    bedrollRecipe,
+    parchmentRecipe,
+    inkRecipe,
 ] as const;

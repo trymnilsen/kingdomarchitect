@@ -7,14 +7,14 @@ import {
 } from "../../inventory/items/resources.ts";
 
 /**
- * A campfire: a modest gathering light. It deliberately reuses the brazier sprite
- * ({@link spriteRefs.stone_brazier}) — sharing one sprite across buildings is
- * expected, not a conflict. Emission is described by {@link campfireLightSource}.
+ * A campfire: a modest gathering light. The art it borrows
+ * ({@link spriteRefs.stone_brazier}) is a placeholder standing in until a
+ * campfire sprite exists. Emission is described by {@link campfireLightSource}.
  */
 export const campfire: Building = {
     id: "campfire",
     icon: spriteRefs.stone_brazier,
-    name: "Brazier",
+    name: "Campfire",
     scale: 1,
     //previewScale: 2,
     previewOffset: 0,

@@ -55,6 +55,10 @@ import {
     type SetPreferredAmountCommand,
 } from "../../server/message/command/setPreferredAmountCommand.ts";
 import {
+    SetGateOpenCommandId,
+    type SetGateOpenCommand,
+} from "../../server/message/command/setGateOpenCommand.ts";
+import {
     SetSearchlightModeCommandId,
     type SetSearchlightModeCommand,
 } from "../../server/message/command/setSearchlightModeCommand.ts";
@@ -94,6 +98,7 @@ import {
     unequipItem,
 } from "./command/equipmentCommands.ts";
 import { setFarmCrop } from "./command/farmCommands.ts";
+import { setGateOpen } from "./command/gateCommands.ts";
 import { consumeItem } from "./command/inventoryCommands.ts";
 import { prioritiseJob, queueJob } from "./command/jobCommands.ts";
 import { setPlayerCommand } from "./command/playerCommands.ts";
@@ -221,6 +226,9 @@ function onGameMessage(
                 root,
                 message.command as SetSearchlightModeCommand,
             );
+            break;
+        case SetGateOpenCommandId:
+            setGateOpen(root, message.command as SetGateOpenCommand);
             break;
     }
 }

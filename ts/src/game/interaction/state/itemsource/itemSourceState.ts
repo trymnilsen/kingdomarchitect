@@ -25,6 +25,7 @@ import {
     type ItemSourceRecipe,
     type ItemSourceResource,
     type ItemSourceProduction,
+    type ItemSourceLoot,
 } from "../../../../data/inventory/itemSources.ts";
 
 const textStyle = {
@@ -113,6 +114,13 @@ function productionSourceRow(
     });
 }
 
+function lootSourceRow(source: ItemSourceLoot): ComponentDescriptor {
+    return uiText({
+        content: `${source.sourceName} — ${source.amount}x`,
+        textStyle: textStyle,
+    });
+}
+
 function sourceSection(
     title: string,
     rows: ComponentDescriptor[],
@@ -164,6 +172,9 @@ const itemSourceView = createComponent<ItemSourceViewProps>(
         const productions = props.sources.filter(
             (s): s is ItemSourceProduction => s.kind === "production",
         );
+        const loot = props.sources.filter(
+            (s): s is ItemSourceLoot => s.kind === "loot",
+        );
 
         if (recipes.length > 0) {
             children.push(
@@ -187,6 +198,10 @@ const itemSourceView = createComponent<ItemSourceViewProps>(
                     productions.map(productionSourceRow),
                 ),
             );
+        }
+
+        if (loot.length > 0) {
+            children.push(...sourceSection("Loot:", loot.map(lootSourceRow)));
         }
 
         if (props.sources.length === 0) {
