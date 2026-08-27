@@ -32,17 +32,14 @@ const isLayoutResult = (
 // Deps are equal when same length and every entry is ===. Used to decide
 // whether an effect or remember can be skipped this render.
 const _depsAreEqual = (a: any[] | undefined, b: any[] | undefined): boolean => {
-    // If the identities are the same (e.g., both undefined), they are equal.
     if (a === b) {
         return true;
     }
 
-    // If one is defined and the other isn't, or if lengths differ, they are not equal.
     if (!a || !b || a.length !== b.length) {
         return false;
     }
 
-    // Check if all elements are strictly equal.
     for (let i = 0; i < a.length; i++) {
         if (a[i] !== b[i]) {
             return false;
@@ -589,7 +586,6 @@ export class UiRenderer {
                     this.hooks.set(node, nodeHooks);
                 }
 
-                // Initialize state if this is the first time this hook is called
                 if (!nodeHooks.states[currentHookIndex]) {
                     nodeHooks.states[currentHookIndex] = { value: state };
                 }
@@ -662,10 +658,8 @@ export class UiRenderer {
                     !oldEffectHook ||
                     !_depsAreEqual(oldEffectHook.deps, deps)
                 ) {
-                    // Run cleanup for the previous effect if it exists.
                     oldEffectHook?.cleanup?.();
 
-                    // Run the new effect and store its cleanup function.
                     const cleanup = effectFn();
                     nodeHooks.effects[currentHookIndex] = {
                         deps,
@@ -690,7 +684,6 @@ export class UiRenderer {
                     !oldRememberHook ||
                     !_depsAreEqual(oldRememberHook.deps, deps)
                 ) {
-                    // Recompute the value if dependencies changed
                     const value = factory();
                     nodeHooks.remembers[currentHookIndex] = {
                         deps,
@@ -699,7 +692,6 @@ export class UiRenderer {
                     return value;
                 }
 
-                // Return the cached value
                 return oldRememberHook.value as T;
             },
             measureText: (text, style) => {

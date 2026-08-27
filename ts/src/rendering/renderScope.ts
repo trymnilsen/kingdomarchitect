@@ -474,16 +474,14 @@ export class OffscreenRenderScope extends RenderScope {
         const pixelSet = new Set<string>();
         let maxY = -Infinity;
 
-        // Read pixel data from the canvas for the specified region
         const imageData = this.context.getImageData(x, y, width, height);
 
-        // Iterate through the image data to find non-transparent pixels
         for (let py = 0; py < height; py++) {
             for (let px = 0; px < width; px++) {
                 const pixelIndex = (py * width + px) * 4;
                 const alpha = imageData.data[pixelIndex + 3];
 
-                // If pixel has any opacity, consider it part of the rendered content
+                // Any opacity at all counts as drawn content.
                 if (alpha > 0) {
                     pixelSet.add(`${px},${py}`);
                     maxY = Math.max(maxY, py);

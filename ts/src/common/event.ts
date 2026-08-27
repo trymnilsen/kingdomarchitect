@@ -88,9 +88,8 @@ export type EventSubscriptionHandler<T> = (data: T) => void;
 export type EventHandle = () => void;
 
 /**
- * Allows wrapping another event that can be updated after it has been created,
- * gracefully handling changing the underlying event without the listeners
- * knowing or leaking.
+ * Wraps another event that can be swapped after listeners have attached. The
+ * listeners neither notice the change nor leak a subscription to the old one.
  */
 export class ForwardEvent<T> implements EventListener<T> {
     private _sourceHandle: EventHandle | null;

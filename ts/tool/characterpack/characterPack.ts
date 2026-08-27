@@ -294,7 +294,7 @@ function processSpriteFrame(
                 const pixelColor = getPixelColor(png, absoluteX, absoluteY);
 
                 if (colorsMatch(pixelColor, targetColor)) {
-                    pixels.push([x, y]); // Tuple format: [x, y]
+                    pixels.push([x, y]);
                 }
             }
         }

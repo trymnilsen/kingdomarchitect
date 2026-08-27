@@ -53,7 +53,7 @@ export function saveScenario(state: MountainPreviewState): void {
 /**
  * Applies a previously saved scenario onto a freshly created state. Anything
  * missing or malformed is left at its default, so a corrupt or partial entry
- * degrades gracefully rather than throwing.
+ * loads as far as it can instead of throwing.
  */
 export function restoreScenario(state: MountainPreviewState): void {
     const scenario = readScenario();

@@ -1,22 +1,17 @@
 import type { SpriteRef } from "../../asset/sprite.ts";
 import { nameof } from "../../common/nameof.ts";
 
-// Define the valid values for the {direction} placeholder
 export type Direction = "up" | "down" | "left" | "right";
 export type Ordinal = "southeast" | "southwest" | "northeast" | "northwest";
 export type AnimationPrefix = "idle" | "walk" | "attack" | "hit";
 
-// --- Generated Template Literal Types for Validation ---
-
-// Creates a type for all possible valid animation keys, e.g., "walk_down"
+/** A resolved animation key, such as "walk_southeast". */
 export type AnimationKey = `${AnimationPrefix}_${Ordinal}`;
 
-// Creates a type for all valid animation templates, e.g., "walk_{direction}"
+/** An unresolved key, such as "walk_{direction}", filled in per entity. */
 export type AnimationTemplate =
     | `${AnimationPrefix}_{direction}`
     | `${AnimationPrefix}_{ordinal}`;
-
-// --- Main Data Structures ---
 
 type AnimationEventTransition = {
     event: string;

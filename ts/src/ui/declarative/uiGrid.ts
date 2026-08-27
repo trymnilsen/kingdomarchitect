@@ -17,7 +17,6 @@ export const uiGrid = createComponent<UiGridProps>(
         const gap = props.gap ?? 0;
         const children: PlacedChild[] = [];
 
-        // If no children, return empty grid
         if (props.children.length === 0) {
             const emptyWidth =
                 props.width === fillUiSize
@@ -42,16 +41,13 @@ export const uiGrid = createComponent<UiGridProps>(
             };
         }
 
-        // Measure the first item to determine item size
-        // We assume all items are the same size
+        // Every cell takes the first item's size, so the grid measures one item.
         const firstItemSize = measureDescriptor(
             "grid-item-0",
             props.children[0],
             constraints,
         );
 
-        // Calculate how many columns can fit in the available width
-        // Handle magic size values: fillUiSize uses constraints, wrapUiSize uses content
         const availableWidth =
             props.width === fillUiSize
                 ? constraints.width
@@ -69,16 +65,13 @@ export const uiGrid = createComponent<UiGridProps>(
         const itemWidth = firstItemSize.width;
         const itemHeight = firstItemSize.height;
 
-        // Calculate columns: fit as many items as possible with gaps between them
-        // Formula: availableWidth = (columns * itemWidth) + ((columns - 1) * gap)
-        // Solving for columns: columns = (availableWidth + gap) / (itemWidth + gap)
+        // n items span n*itemWidth + (n-1)*gap, so adding one gap to both sides
+        // makes the division exact.
         const columnsFloat = (availableWidth + gap) / (itemWidth + gap);
         const columns = Math.max(1, Math.floor(columnsFloat));
 
-        // Calculate number of rows needed
         const rows = Math.ceil(props.children.length / columns);
 
-        // Layout children in grid
         props.children.forEach((child, index) => {
             const row = Math.floor(index / columns);
             const col = index % columns;
@@ -93,8 +86,6 @@ export const uiGrid = createComponent<UiGridProps>(
             });
         });
 
-        // Calculate final grid size
-        // For width: if wrapUiSize, use content size; if fillUiSize, use available; otherwise use specified
         const contentWidth = columns * itemWidth + (columns - 1) * gap;
         const finalWidth =
             props.width === wrapUiSize
@@ -103,7 +94,6 @@ export const uiGrid = createComponent<UiGridProps>(
                   ? availableWidth
                   : Math.min(props.width, contentWidth);
 
-        // For height: if wrapUiSize, use content size; if fillUiSize, use available; otherwise use specified
         const contentHeight = rows * itemHeight + (rows - 1) * gap;
         const finalHeight =
             props.height === wrapUiSize

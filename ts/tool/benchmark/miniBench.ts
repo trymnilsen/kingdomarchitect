@@ -22,17 +22,16 @@ function calculateStatisticsWithPercentiles(
         throw new Error("The array of durations is empty.");
     }
 
-    // Sort data (BigInt supports standard comparison)
+    // Comparing rather than subtracting, since the default sort stringifies
+    // and BigInt subtraction does not fit the number a comparator wants.
     const sortedData = [...durations].sort((a, b) =>
         a < b ? -1 : a > b ? 1 : 0,
     );
 
     const total = BigInt(durations.length);
-    // Calculate mean
     const sum = sortedData.reduce((acc, num) => acc + num, 0n);
     const mean = sum / total;
 
-    // Calculate median
     let median: bigint;
     const mid = Number(total / 2n);
     if (total % 2n === 0n) {
@@ -41,7 +40,6 @@ function calculateStatisticsWithPercentiles(
         median = sortedData[mid];
     }
 
-    // Calculate percentiles
     const percentiles: Record<string, string> = {};
     [25, 50, 75, 95, 99, 100].forEach((percentile) => {
         const index = Math.ceil((Number(percentile) / 100) * Number(total)) - 1;
@@ -58,26 +56,21 @@ function calculateStatisticsWithPercentiles(
 type TableData = Record<string, string[]>;
 
 function generateTable(data: TableData): void {
-    // Get column names and rows
     const columns = Object.keys(data);
     const rows = Math.max(...Object.values(data).map((col) => col.length));
 
-    // Calculate column widths based on the longest content in each column
     const columnWidths = columns.map((col) =>
         Math.max(col.length, ...data[col].map((row) => row.length)),
     );
 
-    // Helper function to pad strings
     const padString = (str: string, length: number) => str.padEnd(length, " ");
 
-    // Generate and print header
     const header = columns
         .map((col, i) => padString(col, columnWidths[i]))
         .join(" | ");
     console.log(header);
     console.log("-".repeat(header.length));
 
-    // Generate and print rows
     for (let i = 0; i < rows; i++) {
         const row = columns
             .map((col, colIndex) =>

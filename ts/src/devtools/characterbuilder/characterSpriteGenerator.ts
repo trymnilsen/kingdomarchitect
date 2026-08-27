@@ -518,11 +518,10 @@ function drawAnimation(
 
     // Draw all frames for this animation
     for (let frameIdx = 0; frameIdx < frameCount; frameIdx++) {
-        // Calculate the base position for this frame in the sprite sheet
         const frameBaseX = frameIdx * CHARACTER_FRAME_WIDTH;
         const frameBaseY = animIdx * CHARACTER_FRAME_HEIGHT;
 
-        // Step 1: Draw back-layer equipment (behind the character)
+        // Layer 0 equipment goes behind the character.
         if (colors.Equipment && colors.Equipment.length > 0) {
             drawEquipment(
                 offscreenScope,
@@ -538,7 +537,6 @@ function drawAnimation(
             );
         }
 
-        // Step 2: Draw all character parts directly to the main canvas
         for (const part of animation.parts) {
             const frameData = part.frames[frameIdx];
             if (!frameData || frameData.length === 0) {
@@ -553,7 +551,6 @@ function drawAnimation(
 
             const color = getPartColor(part.partName, colors);
 
-            // Draw the part's pixels to main canvas
             for (let i = 0; i < frameData.length; i += 2) {
                 const x = frameData[i];
                 const y = frameData[i + 1];
@@ -573,7 +570,7 @@ function drawAnimation(
             }
         }
 
-        // Step 4: Draw front-layer equipment (in front of the character)
+        // Layer 1 equipment goes in front.
         if (colors.Equipment && colors.Equipment.length > 0) {
             drawEquipment(
                 offscreenScope,
@@ -589,7 +586,8 @@ function drawAnimation(
             );
         }
 
-        // Step 5: Extract pixels from the frame region in the main canvas
+        // The outline is traced from the finished frame, so it wraps character
+        // and equipment together instead of each part separately.
         const { pixelSet, maxY } = offscreenScope.extractPixels(
             frameBaseX,
             frameBaseY,
@@ -597,10 +595,7 @@ function drawAnimation(
             CHARACTER_FRAME_HEIGHT,
         );
 
-        // Step 6: Generate outline from extracted pixels
         const outlinePixels = generateOutlineFromPixels(pixelSet, maxY);
-
-        // Step 7: Draw outline on top of the frame
         drawFrameOutline(offscreenScope, outlinePixels, frameBaseX, frameBaseY);
     }
 }

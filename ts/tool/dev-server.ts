@@ -40,7 +40,8 @@ async function startServer(options: ServerOptions): Promise<void> {
             const filePath = path.join(resolvedServeDirectory, pathname);
             const normalizedPath = path.normalize(filePath);
 
-            // **Critical Security Check: Prevent Directory Traversal**
+            // A normalized path that escapes the served directory is a
+            // traversal attempt.
             if (!normalizedPath.startsWith(resolvedServeDirectory)) {
                 res.writeHead(403, { "Content-Type": "text/plain" });
                 res.end("Forbidden");
@@ -48,16 +49,13 @@ async function startServer(options: ServerOptions): Promise<void> {
                 return;
             }
 
-            // **Critical Security Check: Restrict Cross-Origin Requests (CORS)**
-
-            // Only allow requests from the same origin (localhost)
+            // Only same-origin requests, under either name for localhost.
             const origin = req.headers.origin;
             if (
                 origin &&
                 !origin.startsWith("http://localhost") &&
                 !origin.startsWith(`http://127.0.0.1`)
             ) {
-                // Allow both 127.0.0.1 and localhost
                 res.writeHead(403, { "Content-Type": "text/plain" });
                 res.end("Forbidden - Cross-Origin Request Blocked");
                 logRequest(403);
@@ -112,7 +110,6 @@ async function startServer(options: ServerOptions): Promise<void> {
     });
 
     server.listen(port, "127.0.0.1", () => {
-        // Bind to localhost
         console.log(`Server running at http://127.0.0.1:${port}/`);
         console.log(`Serving files from: ${resolvedServeDirectory}`);
     });
@@ -124,7 +121,7 @@ async function startServer(options: ServerOptions): Promise<void> {
 
 const options: ServerOptions = {
     port: 8080,
-    serveDirectory: "./public", // Directory to serve files from.  Create a 'public' folder.
+    serveDirectory: "./public",
 };
 
 async function init() {

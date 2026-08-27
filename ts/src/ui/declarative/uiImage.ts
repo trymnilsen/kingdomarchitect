@@ -15,10 +15,7 @@ export type UiImageProps = {
     sprite: SpriteRef;
     width: number;
     height: number;
-    /**
-     * How the sprite should be sized within the bounds.
-     * Defaults to "stretch" for backwards compatibility.
-     */
+    /** How the sprite is sized within the bounds. Defaults to "stretch". */
     fillMode?: UiImageFillMode;
     /**
      * Optional scale factor for the sprite within the bounds.
@@ -38,7 +35,6 @@ export const uiImage = createComponent<UiImageProps>(
         const spriteWidth = spriteDef ? spriteDef[SPRITE_W] : props.width;
         const spriteHeight = spriteDef ? spriteDef[SPRITE_H] : props.height;
 
-        // Calculate base dimensions based on fill mode
         let baseWidth: number;
         let baseHeight: number;
 
@@ -70,15 +66,14 @@ export const uiImage = createComponent<UiImageProps>(
                 break;
         }
 
-        // Apply additional scale factor
         const targetWidth = baseWidth * scale;
         const targetHeight = baseHeight * scale;
 
-        // Determine if clipping is needed (when scaled sprite exceeds bounds)
+        // A sprite scaled past its bounds is clipped rather than allowed to
+        // spill over its neighbours.
         const needsClip =
             targetWidth > props.width || targetHeight > props.height;
 
-        // Always center the sprite within bounds
         const offsetX = (props.width - targetWidth) / 2;
         const offsetY = (props.height - targetHeight) / 2;
 
