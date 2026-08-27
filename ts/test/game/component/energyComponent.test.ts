@@ -29,6 +29,28 @@ function makeEntityWithEnergy(
     return entity;
 }
 
+/**
+ * Puts an exhaustion effect on the entity by hand, standing in for one an
+ * earlier tick would have applied.
+ */
+function addExistingExhaustionEffect(entity: Entity): void {
+    const effectsComp = entity.requireEcsComponent(ActiveEffectsComponentId);
+    effectsComp.effects.push({
+        effect: {
+            id: "exhaustion",
+            timing: { type: "persistent" },
+            data: {},
+            name: "Exhaustion",
+            sprite: "empty_sprite",
+        },
+        source: "exhaustion",
+        modifiers: {},
+        state: {},
+        remainingTicks: 0,
+        ticksSinceLastApplication: 0,
+    });
+}
+
 describe("EnergyComponent", () => {
     describe("createEnergyComponent", () => {
         it("starts rested at whatever pool size it is given", () => {
@@ -158,24 +180,10 @@ describe("EnergyComponent", () => {
             const entity = makeEntityWithEnergy(0);
             const comp = entity.requireEcsComponent(EnergyComponentId);
             comp.exhaustionLevel = 2;
-            // Manually add effect to simulate pre-existing state
+            addExistingExhaustionEffect(entity);
             const effectsComp = entity.requireEcsComponent(
                 ActiveEffectsComponentId,
             );
-            effectsComp.effects.push({
-                effect: {
-                    id: "exhaustion",
-                    timing: { type: "persistent" },
-                    data: {},
-                    name: "Exhaustion",
-                    sprite: "empty_sprite",
-                },
-                source: "exhaustion",
-                modifiers: {},
-                state: {},
-                remainingTicks: 0,
-                ticksSinceLastApplication: 0,
-            });
 
             spendEntityEnergy(entity, 1); // debt, but level stays >= 1 so no new effect
 
@@ -198,23 +206,10 @@ describe("EnergyComponent", () => {
             const entity = makeEntityWithEnergy(50);
             const comp = entity.requireEcsComponent(EnergyComponentId);
             comp.exhaustionLevel = 1;
+            addExistingExhaustionEffect(entity);
             const effectsComp = entity.requireEcsComponent(
                 ActiveEffectsComponentId,
             );
-            effectsComp.effects.push({
-                effect: {
-                    id: "exhaustion",
-                    timing: { type: "persistent" },
-                    data: {},
-                    name: "Exhaustion",
-                    sprite: "empty_sprite",
-                },
-                source: "exhaustion",
-                modifiers: {},
-                state: {},
-                remainingTicks: 0,
-                ticksSinceLastApplication: 0,
-            });
 
             clearEntityExhaustion(entity, 0);
 
@@ -230,23 +225,10 @@ describe("EnergyComponent", () => {
             const entity = makeEntityWithEnergy(50);
             const comp = entity.requireEcsComponent(EnergyComponentId);
             comp.exhaustionLevel = 3;
+            addExistingExhaustionEffect(entity);
             const effectsComp = entity.requireEcsComponent(
                 ActiveEffectsComponentId,
             );
-            effectsComp.effects.push({
-                effect: {
-                    id: "exhaustion",
-                    timing: { type: "persistent" },
-                    data: {},
-                    name: "Exhaustion",
-                    sprite: "empty_sprite",
-                },
-                source: "exhaustion",
-                modifiers: {},
-                state: {},
-                remainingTicks: 0,
-                ticksSinceLastApplication: 0,
-            });
 
             clearEntityExhaustion(entity, 1);
 

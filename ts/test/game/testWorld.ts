@@ -6,6 +6,10 @@ import {
 import { createChunkMapComponent } from "../../src/game/component/chunkMapComponent.ts";
 import { EcsWorld } from "../../src/ecs/ecsWorld.ts";
 import { chunkMapSystem } from "../../src/game/system/chunkMapSystem.ts";
+import { createPathfindingGraphComponent } from "../../src/game/component/pathfindingGraphComponent.ts";
+import { createLazyGraphFromRootNode } from "../../src/game/map/path/graph/generateGraph.ts";
+import { ChunkSize } from "../../src/game/map/chunk.ts";
+import type { Point } from "../../src/common/point.ts";
 
 /**
  * Build the smallest viable world for tests: a chunk-mapped tile grid
@@ -34,6 +38,29 @@ export function createMinimalWorld(
     }
     root.setEcsComponent(tileComponent);
     root.setEcsComponent(createChunkMapComponent());
+
+    return { root, world };
+}
+
+/**
+ * A world whose chunks cover the given tile bounds with a chunk of margin on
+ * every side, carrying a pathfinding graph as well as the chunk map. Use this
+ * for tests that move workers or query paths. `createMinimalWorld` is enough
+ * when a test only looks entities up by position.
+ */
+export function createWorldCovering(bounds: { min: Point; max: Point }): {
+    root: Entity;
+    world: EcsWorld;
+} {
+    const minChunk =
+        Math.floor(Math.min(bounds.min.x, bounds.min.y) / ChunkSize) - 1;
+    const maxChunk =
+        Math.floor(Math.max(bounds.max.x, bounds.max.y) / ChunkSize) + 1;
+
+    const { root, world } = createMinimalWorld({ minChunk, maxChunk });
+    root.setEcsComponent(
+        createPathfindingGraphComponent(createLazyGraphFromRootNode(root)),
+    );
 
     return { root, world };
 }

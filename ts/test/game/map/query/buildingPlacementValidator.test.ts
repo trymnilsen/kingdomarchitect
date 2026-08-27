@@ -46,70 +46,42 @@ function createWorld(tiledPositions: Point[]): Entity {
 }
 
 /**
- * Registers a completed building entity in root's chunk map at the given
- * world position so that queryEntity can find it.
+ * Places an entity at a world position and registers it in root's chunk map, so
+ * queryEntity can find it. These tests build the index by hand rather than
+ * running chunkMapSystem.
  */
+function addToChunkMap(root: Entity, entity: Entity, pos: Point): Entity {
+    entity.worldPosition = pos;
+
+    const chunkMap = root.requireEcsComponent(ChunkMapComponentId).chunkMap;
+    const chunkX = Math.floor(pos.x / ChunkSize);
+    const chunkY = Math.floor(pos.y / ChunkSize);
+    const chunkKey = encodePosition(chunkX, chunkY);
+
+    if (!chunkMap.chunks.has(chunkKey)) {
+        chunkMap.chunks.set(chunkKey, new SparseSet<Entity>());
+    }
+    chunkMap.chunks.get(chunkKey)!.add(entity);
+
+    return entity;
+}
+
 function addBuilding(root: Entity, pos: Point): Entity {
     const building = new Entity(`building-${pos.x}-${pos.y}`);
     building.setEcsComponent(createBuildingComponent(woodenHouse, false));
-    building.worldPosition = pos;
-
-    const chunkMapComponent = root.requireEcsComponent(ChunkMapComponentId);
-    const chunkMap = chunkMapComponent.chunkMap;
-    const chunkX = Math.floor(pos.x / ChunkSize);
-    const chunkY = Math.floor(pos.y / ChunkSize);
-    const chunkKey = encodePosition(chunkX, chunkY);
-
-    if (!chunkMap.chunks.has(chunkKey)) {
-        chunkMap.chunks.set(chunkKey, new SparseSet<Entity>());
-    }
-    chunkMap.chunks.get(chunkKey)!.add(building);
-
-    return building;
+    return addToChunkMap(root, building, pos);
 }
 
-/**
- * Registers a resource entity in root's chunk map at the given world position.
- */
 function addResource(root: Entity, pos: Point, resourceId: string): Entity {
     const resource = new Entity(`resource-${pos.x}-${pos.y}`);
     resource.setEcsComponent(createResourceComponent(resourceId));
-    resource.worldPosition = pos;
-
-    const chunkMapComponent = root.requireEcsComponent(ChunkMapComponentId);
-    const chunkMap = chunkMapComponent.chunkMap;
-    const chunkX = Math.floor(pos.x / ChunkSize);
-    const chunkY = Math.floor(pos.y / ChunkSize);
-    const chunkKey = encodePosition(chunkX, chunkY);
-
-    if (!chunkMap.chunks.has(chunkKey)) {
-        chunkMap.chunks.set(chunkKey, new SparseSet<Entity>());
-    }
-    chunkMap.chunks.get(chunkKey)!.add(resource);
-
-    return resource;
+    return addToChunkMap(root, resource, pos);
 }
 
-/**
- * Registers an agent entity in root's chunk map at the given world position.
- */
 function addAgent(root: Entity, pos: Point): Entity {
     const agent = new Entity(`agent-${pos.x}-${pos.y}`);
     agent.setEcsComponent(createBehaviorAgentComponent());
-    agent.worldPosition = pos;
-
-    const chunkMapComponent = root.requireEcsComponent(ChunkMapComponentId);
-    const chunkMap = chunkMapComponent.chunkMap;
-    const chunkX = Math.floor(pos.x / ChunkSize);
-    const chunkY = Math.floor(pos.y / ChunkSize);
-    const chunkKey = encodePosition(chunkX, chunkY);
-
-    if (!chunkMap.chunks.has(chunkKey)) {
-        chunkMap.chunks.set(chunkKey, new SparseSet<Entity>());
-    }
-    chunkMap.chunks.get(chunkKey)!.add(agent);
-
-    return agent;
+    return addToChunkMap(root, agent, pos);
 }
 
 describe("createBuildingPlacementValidator", () => {

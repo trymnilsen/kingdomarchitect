@@ -1,24 +1,11 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
-import { EcsWorld } from "../../../../src/ecs/ecsWorld.ts";
-import { chunkMapSystem } from "../../../../src/game/system/chunkMapSystem.ts";
+import { getBehaviorAgent } from "../../../../src/game/component/BehaviorAgentComponent.ts";
 import {
-    createTileComponent,
-    setChunk,
-} from "../../../../src/game/component/tileComponent.ts";
-import { createChunkMapComponent } from "../../../../src/game/component/chunkMapComponent.ts";
-import { Entity } from "../../../../src/game/entity/entity.ts";
-import {
-    createBehaviorAgentComponent,
-    getBehaviorAgent,
-} from "../../../../src/game/component/BehaviorAgentComponent.ts";
-import {
-    createMovementStaminaComponent,
     MovementStaminaComponentId,
     hasMovedThisTick,
     recordMove,
 } from "../../../../src/game/component/movementStaminaComponent.ts";
-import { createSpriteComponent } from "../../../../src/game/component/spriteComponent.ts";
 import {
     createEnergyComponent,
     EnergyComponentId,
@@ -27,37 +14,11 @@ import {
     commitDisplacementTransaction,
     type DisplacementTransaction,
 } from "../../../../src/game/behavior/displacement/displacementTransaction.ts";
-import type { SpriteRef } from "../../../../src/asset/sprite.ts";
-
-const testSprite: SpriteRef = { bin: "test", spriteId: "test" };
-
-function createTestWorld(): { root: Entity } {
-    const ecsWorld = new EcsWorld();
-    ecsWorld.addSystem(chunkMapSystem);
-    const root = ecsWorld.root;
-
-    const tileComponent = createTileComponent();
-    setChunk(tileComponent, { chunkX: 1, chunkY: 1 });
-    setChunk(tileComponent, { chunkX: 2, chunkY: 1 });
-    root.setEcsComponent(tileComponent);
-    root.setEcsComponent(createChunkMapComponent());
-
-    return { root };
-}
-
-/**
- * Create an agent entity with stamina tracking so commit can record moves.
- * worldPosition is set AFTER addChild.
- */
-function createAgent(id: string, root: Entity, x: number, y: number): Entity {
-    const entity = new Entity(id);
-    entity.setEcsComponent(createSpriteComponent(testSprite));
-    entity.setEcsComponent(createBehaviorAgentComponent());
-    entity.setEcsComponent(createMovementStaminaComponent());
-    root.addChild(entity);
-    entity.worldPosition = { x, y };
-    return entity;
-}
+import {
+    createAgent,
+    createAgentWithoutStamina,
+    createTestWorld,
+} from "./displacementTestWorld.ts";
 
 describe("displacementTransaction", () => {
     describe("commitDisplacementTransaction", () => {
@@ -376,13 +337,7 @@ describe("displacementTransaction", () => {
 
         it("does not record a move on an entity without MovementStaminaComponent", () => {
             const { root } = createTestWorld();
-            // Entity without stamina component — commit should not throw
-            const entity = new Entity("no-stamina");
-            entity.setEcsComponent(createSpriteComponent(testSprite));
-            entity.setEcsComponent(createBehaviorAgentComponent());
-            // No MovementStaminaComponent added
-            root.addChild(entity);
-            entity.worldPosition = { x: 11, y: 8 };
+            const entity = createAgentWithoutStamina("no-stamina", root, 11, 8);
 
             const tx: DisplacementTransaction = {
                 moves: [

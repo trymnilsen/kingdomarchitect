@@ -1,93 +1,19 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
-import { EcsWorld } from "../../../../src/ecs/ecsWorld.ts";
-import { chunkMapSystem } from "../../../../src/game/system/chunkMapSystem.ts";
-import {
-    createTileComponent,
-    setChunk,
-} from "../../../../src/game/component/tileComponent.ts";
-import { createChunkMapComponent } from "../../../../src/game/component/chunkMapComponent.ts";
-import { Entity } from "../../../../src/game/entity/entity.ts";
-import {
-    createBehaviorAgentComponent,
-    getBehaviorAgent,
-} from "../../../../src/game/component/BehaviorAgentComponent.ts";
-import {
-    createMovementStaminaComponent,
-    recordMove,
-} from "../../../../src/game/component/movementStaminaComponent.ts";
-import { createSpriteComponent } from "../../../../src/game/component/spriteComponent.ts";
-import { createBuildingComponent } from "../../../../src/game/component/buildingComponent.ts";
-import { nullBuilding } from "../../../../src/data/building/building.ts";
+import { getBehaviorAgent } from "../../../../src/game/component/BehaviorAgentComponent.ts";
+import { recordMove } from "../../../../src/game/component/movementStaminaComponent.ts";
 import { negotiateDisplacement } from "../../../../src/game/behavior/displacement/displacementNegotiation.ts";
-import type { SpriteRef } from "../../../../src/asset/sprite.ts";
-
-const testSprite: SpriteRef = { bin: "test", spriteId: "test" };
-
-/**
- * World covering world tiles x=8..23, y=8..15.
- * Tiles at y=7 (north of row y=8) fall outside any chunk and score -Infinity,
- * acting as natural walls. Tiles at y=9 and beyond (inside the chunk) are
- * valid ground unless explicitly blocked with a building entity.
- */
-function createTestWorld(): { root: Entity } {
-    const ecsWorld = new EcsWorld();
-    ecsWorld.addSystem(chunkMapSystem);
-    const root = ecsWorld.root;
-
-    const tileComponent = createTileComponent();
-    setChunk(tileComponent, { chunkX: 1, chunkY: 1 });
-    setChunk(tileComponent, { chunkX: 2, chunkY: 1 });
-    root.setEcsComponent(tileComponent);
-    root.setEcsComponent(createChunkMapComponent());
-
-    return { root };
-}
-
-/**
- * Create a displaceable agent entity at the given position.
- * Must set worldPosition AFTER addChild so the parent transform is available.
- */
-function createAgent(
-    id: string,
-    utility: number,
-    root: Entity,
-    x: number,
-    y: number,
-): Entity {
-    const entity = new Entity(id);
-    entity.setEcsComponent(createSpriteComponent(testSprite));
-    entity.setEcsComponent(createBehaviorAgentComponent());
-    entity.setEcsComponent(createMovementStaminaComponent());
-    const agent = getBehaviorAgent(entity)!;
-    agent.currentBehaviorUtility = utility;
-    // Default to "settled": a freshly-created agent carries pendingReplan, which would
-    // mark it transient (waited-for, not displaced). These unit tests model committed
-    // blockers, so clear it; the transient cases set it (or a moveTo) explicitly.
-    agent.pendingReplan = undefined;
-    root.addChild(entity);
-    entity.worldPosition = { x, y };
-    return entity;
-}
-
-/**
- * Place an impassable building entity at a tile to block displacement paths.
- * The nullBuilding id is not "road", so scoreCandidateTile returns -Infinity.
- */
-function createWall(id: string, root: Entity, x: number, y: number): Entity {
-    const entity = new Entity(id);
-    entity.setEcsComponent(createSpriteComponent(testSprite));
-    entity.setEcsComponent(createBuildingComponent(nullBuilding, false));
-    root.addChild(entity);
-    entity.worldPosition = { x, y };
-    return entity;
-}
+import {
+    createAgent,
+    createTestWorld,
+    createWall,
+} from "./displacementTestWorld.ts";
 
 describe("displacementNegotiation", () => {
     describe("negotiateDisplacement", () => {
         it("returns noChain when target tile has no displaceable entity", () => {
             const { root } = createTestWorld();
-            const requester = createAgent("requester", 100, root, 10, 8);
+            const requester = createAgent("requester", root, 10, 8, 100);
             // Building at target — no BehaviorAgentComponent
             createWall("wall", root, 11, 8);
 
@@ -104,9 +30,9 @@ describe("displacementNegotiation", () => {
 
         it("returns refused when a settled blocker's cost exceeds requester priority", () => {
             const { root } = createTestWorld();
-            const requester = createAgent("requester", 5, root, 10, 8);
+            const requester = createAgent("requester", root, 10, 8, 5);
             // Settled blocker, utility 20 → displaceable cost 20. Priority 5 < 20.
-            createAgent("blocker", 20, root, 11, 8);
+            createAgent("blocker", root, 11, 8, 20);
 
             const result = negotiateDisplacement(
                 requester,
@@ -121,8 +47,8 @@ describe("displacementNegotiation", () => {
 
         it("waits when the blocker has already moved this tick (free next tick)", () => {
             const { root } = createTestWorld();
-            const requester = createAgent("requester", 100, root, 10, 8);
-            const blocker = createAgent("blocker", 0, root, 11, 8);
+            const requester = createAgent("requester", root, 10, 8, 100);
+            const blocker = createAgent("blocker", root, 11, 8, 0);
             const stamina = blocker.getEcsComponent("MovementStamina")!;
             // Record a move at the current tick — makes hasMovedThisTick return true, so
             // the blocker is movedThisTick: it can't move again now but is free next tick,
@@ -145,8 +71,8 @@ describe("displacementNegotiation", () => {
             // Requester at (10,8), wants (11,8) where blocker is.
             // (12,8) is free — blocker can move there.
             // (11,9) is also free in the chunk, so blocker has multiple exits.
-            const requester = createAgent("requester", 100, root, 10, 8);
-            createAgent("blocker", 5, root, 11, 8);
+            const requester = createAgent("requester", root, 10, 8, 100);
+            createAgent("blocker", root, 11, 8, 5);
 
             const result = negotiateDisplacement(
                 requester,
@@ -171,8 +97,8 @@ describe("displacementNegotiation", () => {
             // Requester at (10,8) wants (11,8) where B is.
             // Block all of B's exits except (10,8) = requester's position.
             // (11,7) is automatically a wall (outside chunk at y=7).
-            const requester = createAgent("requester", 100, root, 10, 8);
-            createAgent("blocker", 5, root, 11, 8);
+            const requester = createAgent("requester", root, 10, 8, 100);
+            createAgent("blocker", root, 11, 8, 5);
             createWall("wall-east", root, 12, 8);
             createWall("wall-south", root, 11, 9);
             // B's only valid candidate is (10,8) = requester → cycle
@@ -212,11 +138,11 @@ describe("displacementNegotiation", () => {
             // queue head). scoreCandidateTile rejects the requester's own tile as a push
             // target (it's transient), so the cycle is found only via the explicit
             // cycle-back terminator — this pins that path.
-            const requester = createAgent("requester", 100, root, 10, 8);
+            const requester = createAgent("requester", root, 10, 8, 100);
             getBehaviorAgent(requester)!.actionQueue = [
                 { type: "moveTo", target: { x: 11, y: 8 } },
             ];
-            createAgent("blocker", 5, root, 11, 8);
+            createAgent("blocker", root, 11, 8, 5);
             createWall("wall-east", root, 12, 8);
             createWall("wall-south", root, 11, 9);
 
@@ -242,8 +168,8 @@ describe("displacementNegotiation", () => {
             // Equal utility: dominance would refuse (5 > 5 is false). But the blocker
             // is itself trying to step into the requester's tile (its cachedPath[0] is
             // the requester's position), so it's a mutually-beneficial head-on swap.
-            const requester = createAgent("requester", 5, root, 10, 8);
-            const blocker = createAgent("blocker", 5, root, 11, 8);
+            const requester = createAgent("requester", root, 10, 8, 5);
+            const blocker = createAgent("blocker", root, 11, 8, 5);
             getBehaviorAgent(blocker)!.actionQueue = [
                 {
                     type: "moveTo",
@@ -287,8 +213,8 @@ describe("displacementNegotiation", () => {
             // It is in transit (transient), so rather than shove it off its route the
             // requester waits for it to vacate. This is what keeps same-direction
             // traffic queueing rather than the follower barging past the leader.
-            const requester = createAgent("requester", 5, root, 10, 8);
-            const blocker = createAgent("blocker", 5, root, 11, 8);
+            const requester = createAgent("requester", root, 10, 8, 5);
+            const blocker = createAgent("blocker", root, 11, 8, 5);
             getBehaviorAgent(blocker)!.actionQueue = [
                 {
                     type: "moveTo",
@@ -313,9 +239,9 @@ describe("displacementNegotiation", () => {
             // Requester at (8,8) — NOT adjacent to B — targeting (11,8).
             // This prevents A from appearing in B's cardinal-neighbor list,
             // so there is no cycle shortcut: B's only exit is through C.
-            const requester = createAgent("requester", 100, root, 8, 8);
-            createAgent("blocker-b", 5, root, 11, 8);
-            createAgent("blocker-c", 5, root, 12, 8);
+            const requester = createAgent("requester", root, 8, 8, 100);
+            createAgent("blocker-b", root, 11, 8, 5);
+            createAgent("blocker-c", root, 12, 8, 5);
             // Block all of B's exits except east (12,8)=C
             createWall("wall-bw", root, 10, 8); // west of B
             createWall("wall-bs", root, 11, 9); // south of B
@@ -367,8 +293,8 @@ describe("displacementNegotiation", () => {
             // Requester at (10,8) adjacent to B at (11,8).
             // B has both: (12,8) free (score 100) AND (10,8)=requester (cycle).
             // The free tile is scored higher so it must be chosen.
-            const requester = createAgent("requester", 100, root, 10, 8);
-            createAgent("blocker", 5, root, 11, 8);
+            const requester = createAgent("requester", root, 10, 8, 100);
+            createAgent("blocker", root, 11, 8, 5);
             // (12,8) and (11,9) are both free — B will pick one immediately
 
             const result = negotiateDisplacement(
@@ -393,12 +319,12 @@ describe("displacementNegotiation", () => {
             // Requester at (8,8) is NOT adjacent to B, so no cycle shortcut exists.
             // Each entity can only move east. F blocks E's exit at depth=3,
             // which is MAX_CHAIN_DEPTH, so the search gives up.
-            const requester = createAgent("requester", 100, root, 8, 8);
-            createAgent("b", 5, root, 11, 8);
-            createAgent("c", 5, root, 12, 8);
-            createAgent("d", 5, root, 13, 8);
-            createAgent("e", 5, root, 14, 8);
-            createAgent("f", 5, root, 15, 8); // blocks E's only exit
+            const requester = createAgent("requester", root, 8, 8, 100);
+            createAgent("b", root, 11, 8, 5);
+            createAgent("c", root, 12, 8, 5);
+            createAgent("d", root, 13, 8, 5);
+            createAgent("e", root, 14, 8, 5);
+            createAgent("f", root, 15, 8, 5); // blocks E's only exit
 
             // Block south of each entity so they can only go east (or west = visited)
             createWall("wall-b-w", root, 10, 8);

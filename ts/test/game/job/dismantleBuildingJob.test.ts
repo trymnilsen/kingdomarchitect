@@ -1,15 +1,7 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
-import { EcsWorld } from "../../../src/ecs/ecsWorld.ts";
 import { Entity } from "../../../src/game/entity/entity.ts";
-import { chunkMapSystem } from "../../../src/game/system/chunkMapSystem.ts";
-import {
-    createTileComponent,
-    setChunk,
-} from "../../../src/game/component/tileComponent.ts";
-import { createChunkMapComponent } from "../../../src/game/component/chunkMapComponent.ts";
-import { createPathfindingGraphComponent } from "../../../src/game/component/pathfindingGraphComponent.ts";
-import { createLazyGraphFromRootNode } from "../../../src/game/map/path/graph/generateGraph.ts";
+import { createWorldCovering } from "../testWorld.ts";
 import { createPlayerKingdomComponent } from "../../../src/game/component/playerKingdomComponent.ts";
 import {
     createJobQueueComponent,
@@ -47,32 +39,7 @@ import type { Point } from "../../../src/common/point.ts";
 import type { TileChunk } from "../../../src/game/map/chunk.ts";
 
 function createWorld(bounds: { min: Point; max: Point }): Entity {
-    const ecsWorld = new EcsWorld();
-    ecsWorld.addSystem(chunkMapSystem);
-    const root = ecsWorld.root;
-
-    const tileComponent = createTileComponent();
-    for (
-        let cx = Math.floor(bounds.min.x / 8) - 1;
-        cx <= Math.floor(bounds.max.x / 8) + 1;
-        cx++
-    ) {
-        for (
-            let cy = Math.floor(bounds.min.y / 8) - 1;
-            cy <= Math.floor(bounds.max.y / 8) + 1;
-            cy++
-        ) {
-            const chunk: TileChunk = { chunkX: cx, chunkY: cy };
-            setChunk(tileComponent, chunk);
-        }
-    }
-    root.setEcsComponent(tileComponent);
-    root.setEcsComponent(createChunkMapComponent());
-    root.setEcsComponent(
-        createPathfindingGraphComponent(createLazyGraphFromRootNode(root)),
-    );
-
-    return root;
+    return createWorldCovering(bounds).root;
 }
 
 function totalOnGround(root: Entity, itemId: string): number {
