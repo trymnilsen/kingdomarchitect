@@ -71,10 +71,9 @@ export function handleGameMessage(root: Entity, message: GameMessage) {
 }
 
 function addEntityHandler(root: Entity, message: AddEntityGameMessage) {
-    // Check if entity already exists (e.g., client created it locally)
+    // The client may have created this entity locally already.
     const existingEntity = root.findEntity(message.id);
     if (existingEntity) {
-        // Entity already exists - merge server data with existing entity
         mergeEntityData(existingEntity, message);
         return;
     }
@@ -95,16 +94,13 @@ function addEntityHandler(root: Entity, message: AddEntityGameMessage) {
  * Updates position and adds/updates server components while preserving client-only components.
  */
 function mergeEntityData(entity: Entity, data: ReplicatedEntityData) {
-    // Update position from server
     entity.worldPosition = data.position;
 
-    // Add/update components from server
-    // Client-only components (not in the message) are preserved
+    // Components absent from the message are client-only and survive the merge.
     for (const component of data.components) {
         entity.setEcsComponent(component);
     }
 
-    // Handle children - merge existing, add new
     if (data.children && data.children.length > 0) {
         for (const childData of data.children) {
             const existingChild = entity.findEntity(childData.id);
@@ -123,7 +119,6 @@ function mergeEntityData(entity: Entity, data: ReplicatedEntityData) {
 function createEntityWithChildren(parent: Entity, data: ReplicatedEntityData) {
     const entity = new Entity(data.id);
 
-    // Add components
     for (const component of data.components) {
         entity.setEcsComponent(component);
     }
@@ -208,14 +203,12 @@ function discoverTileHandler(root: Entity, message: DiscoverTileGameMessage) {
  * This populates the entire world including entities, discovered tiles, and volumes.
  */
 function updateWorldState(root: Entity, message: WorldStateGameMessage) {
-    // Create or get the TileComponent on the root
     let tileComponent = root.getEcsComponent(TileComponentId);
     if (!tileComponent) {
         tileComponent = createTileComponent();
         root.setEcsComponent(tileComponent);
     }
 
-    // Create or get the VisibilityMapComponent on the root
     let visibilityMapComponent = root.getEcsComponent(VisibilityMapComponentId);
     if (!visibilityMapComponent) {
         visibilityMapComponent = createVisibilityMapComponent();
@@ -243,7 +236,6 @@ function updateWorldState(root: Entity, message: WorldStateGameMessage) {
         });
     }
 
-    // Apply discovered tiles and volumes
     applyDiscoveredTiles(
         tileComponent,
         visibilityMapComponent,
@@ -251,12 +243,10 @@ function updateWorldState(root: Entity, message: WorldStateGameMessage) {
         message.volumes,
     );
 
-    // Apply replicated root components (e.g. DayComponent)
     for (const comp of message.replicatedRootComponents) {
         root.setEcsComponent(comp);
     }
 
-    // Create all root children entities recursively
     for (const childData of message.rootChildren) {
         createEntityWithChildren(root, childData);
     }

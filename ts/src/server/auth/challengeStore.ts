@@ -12,9 +12,8 @@ const DEFAULT_CHALLENGE_TTL_MS = 120_000;
  * here. A single server process owns the whole ceremony, and a challenge that
  * outlives a restart would be a replay window rather than a convenience.
  *
- * `consume` deletes on read. Single use is what makes a captured response
- * worthless to an attacker, so nothing in this class hands the same challenge
- * out twice.
+ * `consume` deletes on read, so nothing here hands the same challenge out
+ * twice. Single use is what leaves a captured response worthless.
  */
 export class ChallengeStore {
     private readonly challenges = new Map<string, PendingChallenge>();

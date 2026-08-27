@@ -178,14 +178,11 @@ export class PersistenceManager {
      * Serialize an entity to a plain object suitable for storage
      */
     private serializeEntity(entity: Entity): SerializedEntity {
-        // Deep clone components to avoid reference issues
         const componentsObj: Record<string, any> = {};
         for (const component of entity.components) {
-            // Skip runtime-only components
             if (runtimeOnlyComponents.has(component.id)) {
                 continue;
             }
-            // Serialize component (handles Maps/Sets specially)
             componentsObj[component.id] = this.serializeComponent(component);
         }
 
@@ -198,15 +195,13 @@ export class PersistenceManager {
         };
     }
 
-    /**
-     * Serialize component data, converting Maps and Sets to plain objects/arrays recursively
-     */
     private serializeComponent(component: Components): SerialisedComponent {
         return this.serializeValue(component);
     }
 
     /**
-     * Recursively serialize a value, handling Maps, Sets, and nested structures
+     * Maps and Sets do not survive JSON, so they are written as
+     * `{ __type, __data }` envelopes and rebuilt on load.
      */
     private serializeValue(value: unknown): SerialisedComponent {
         if (value === null || value === undefined) {
@@ -214,7 +209,6 @@ export class PersistenceManager {
         }
 
         if (value instanceof Map) {
-            // Convert Map to special object with type marker
             const obj: any = { __type: "Map", __data: {} };
             for (const [key, val] of value) {
                 obj.__data[String(key)] = this.serializeValue(val);
@@ -223,7 +217,6 @@ export class PersistenceManager {
         }
 
         if (value instanceof Set) {
-            // Convert Set to special object with type marker
             return {
                 __type: "Set",
                 __data: Array.from(value)
@@ -264,7 +257,6 @@ export class PersistenceManager {
     private deserializeEntity(serialized: SerializedEntity): Entity {
         const entity = new Entity(serialized.id);
 
-        // Restore components
         for (const componentId in serialized.components) {
             const component = serialized.components[componentId];
             const deserializedComponent = this.deserializeComponent(component);
@@ -277,22 +269,15 @@ export class PersistenceManager {
         return entity;
     }
 
-    /**
-     * Deserialize component data, reconstructing Maps and Sets that were serialized as objects/arrays
-     */
     private deserializeComponent(component: any): any {
         return this.deserializeValue(component);
     }
 
-    /**
-     * Recursively deserialize a value, reconstructing Maps and Sets from type markers
-     */
     private deserializeValue(value: any): any {
         if (value === null || value === undefined) {
             return value;
         }
 
-        // Check for type markers
         if (typeof value === "object" && value.__type) {
             if (value.__type === "Map") {
                 const map = new Map();

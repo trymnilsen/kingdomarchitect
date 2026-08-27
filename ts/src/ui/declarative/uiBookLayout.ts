@@ -66,7 +66,7 @@ export const uiBookLayout = createComponent<UiBookLayoutProps>(
     ({ props, measureDescriptor, constraints }) => {
         const currentPage = props.currentPage ?? UIBookLayoutPage.Left;
 
-        // Determine layout mode based on available space
+        // Too narrow for two pages side by side means one page at a time.
         const availableSize = {
             width: constraints.width - horizontalPadding * 2,
             height: constraints.height - verticalPadding * 2,
@@ -94,7 +94,6 @@ export const uiBookLayout = createComponent<UiBookLayoutProps>(
             height: pageHeight - pageContentTopMargin - pageContentBottomMargin,
         };
 
-        // Measure pages
         const leftPageSize = props.leftPage
             ? measureDescriptor("leftPage", props.leftPage, pageConstraints)
             : { width: 0, height: 0 };
@@ -103,7 +102,6 @@ export const uiBookLayout = createComponent<UiBookLayoutProps>(
             ? measureDescriptor("rightPage", props.rightPage, pageConstraints)
             : { width: 0, height: 0 };
 
-        // Measure tabs if they exist
         let tabsSize = { width: 0, height: 0 };
         let tabDescriptor: ComponentDescriptor | undefined;
         if (props.tabs && props.tabs.length > 0) {
@@ -115,7 +113,6 @@ export const uiBookLayout = createComponent<UiBookLayoutProps>(
             );
         }
 
-        // Calculate book position to center it in the container
         const bookContainerWidth = bookWidth + horizontalPadding * 2;
         const bookContainerHeight = pageHeight + verticalPadding * 2;
 
@@ -201,7 +198,6 @@ export const uiBookLayout = createComponent<UiBookLayoutProps>(
                 },
             });
         }
-        // Add left page with proper margins
         if (props.leftPage) {
             children.push({
                 ...props.leftPage,
@@ -213,7 +209,6 @@ export const uiBookLayout = createComponent<UiBookLayoutProps>(
             });
         }
 
-        // Add right page with proper margins
         if (props.rightPage) {
             children.push({
                 ...props.rightPage,
@@ -230,7 +225,7 @@ export const uiBookLayout = createComponent<UiBookLayoutProps>(
             });
         }
 
-        // Add tabs positioned as actual book tabs on the left side
+        // Tabs sit against the outside edge of the left page.
         if (props.tabs && props.tabs.length > 0 && tabDescriptor) {
             children.push({
                 ...tabDescriptor,

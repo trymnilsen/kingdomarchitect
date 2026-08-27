@@ -273,12 +273,11 @@ function claimNextPlannableJob(
 }
 
 /**
- * Single source of truth for "can this worker take this job right now". Used by
- * both isValid() (via hasAvailableJobs) and expand() (via claimNextPlannableJob)
- * so the two can never disagree. This check is deliberately cheap and cannot
- * know everything the planners know, so a job passing it can still plan to
- * nothing; expand() handles that by trying the next candidate, and the behavior
- * system falls through to a lower-utility behavior if no job plans at all.
+ * Whether this worker can take this job right now. isValid() and expand() both
+ * ask here, so the two cannot disagree about what work exists. The check is
+ * cheap and cannot know what the planners know, so a job that passes it may
+ * still plan to nothing; expand() then tries the next candidate, and the
+ * behavior system falls through to a lower-utility behavior if none plan.
  *
  * The target-position check comes first so a stale job, one whose target entity
  * was removed while the job stayed queued, is rejected before reaching a

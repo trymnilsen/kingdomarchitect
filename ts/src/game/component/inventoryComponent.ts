@@ -73,7 +73,6 @@ export function takeInventoryItem(
     amount: number,
     rarity?: ItemRarity,
 ): InventoryItemQuantity[] | null {
-    // Find all matching stacks
     const matchingStacks = inventory.items.filter((stack) => {
         if (stack.item.id !== id) return false;
         if (rarity !== undefined) {
@@ -82,7 +81,7 @@ export function takeInventoryItem(
         return true;
     });
 
-    // Check if we have enough total
+    // The amount can span several stacks, so the check is against the total.
     const total = matchingStacks.reduce((sum, stack) => sum + stack.amount, 0);
     if (total < amount) return null;
 

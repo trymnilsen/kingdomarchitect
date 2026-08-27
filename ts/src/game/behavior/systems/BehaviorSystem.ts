@@ -184,7 +184,6 @@ function unclaimCurrentJob(entity: Entity): void {
         return;
     }
 
-    // Find any job claimed by this entity and unclaim it
     for (const job of jobQueue.jobs) {
         if (job.claimedBy === entity.id) {
             job.claimedBy = undefined;
@@ -236,10 +235,7 @@ function selectBehavior(
         }
     }
 
-    // Resolve applicable behaviors for this entity type
     const behaviors = resolver(entity);
-
-    // Find all valid behaviors
     const validBehaviors = behaviors.filter((behavior) =>
         behavior.isValid(entity),
     );
@@ -261,8 +257,7 @@ function selectBehavior(
     // "thrashing", where it rapidly switches back and forth between two behaviors with
     // similar utilities. For example, a goblin at warmth=51 (just above threshold)
     // after warming up shouldn't oscillate between keepWarm and performJob every replan.
-    const REPLAN_THRESHOLD = 5; // Only switch if a new behavior is 5+ utility higher
-    // Calculate utilities for all valid behaviors
+    const REPLAN_THRESHOLD = 5;
     const behaviorUtilities = validBehaviors.map((behavior) => {
         let utility = behavior.utility(entity);
         if (behavior.name == hysteresisBehavior?.name) {
@@ -274,7 +269,6 @@ function selectBehavior(
         };
     });
 
-    // Sort by utility (highest first)
     behaviorUtilities.sort((a, b) => b.utility - a.utility);
 
     log.debug(`Entity ${entity.id} sorted behaviors`, {

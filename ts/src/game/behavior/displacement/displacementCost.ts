@@ -1,9 +1,9 @@
 /**
- * Displacement classification + scoring policy.
+ * Displacement classification and scoring policy.
  *
- * `classifyBlocker` is the single source of truth for "what is this blocking entity, and
- * what may I do with it." The negotiation engine and the chain-candidate scorer both
- * consume it, so the transient/persistent model is defined in exactly one place.
+ * The negotiation engine and the chain-candidate scorer both ask
+ * `classifyBlocker` what a blocking entity is and what may be done with it, so
+ * the transient/persistent model is defined once.
  */
 import type { Point } from "../../../common/point.ts";
 import { BehaviorAgentComponentId } from "../../component/BehaviorAgentComponent.ts";

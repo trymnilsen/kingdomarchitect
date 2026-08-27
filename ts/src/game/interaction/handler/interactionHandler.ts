@@ -256,8 +256,8 @@ export class InteractionHandler {
      * filling the remaining space beside it.
      *
      * The tree is rebuilt every frame, so scrim visibility and the current
-     * state's view follow the interaction state automatically. The scrim is
-     * tap-transparent on purpose: modal dismissal stays in onTapDown/onTapUp.
+     * state's view follow the interaction state on their own. The scrim is
+     * tap-transparent, since modal dismissal lives in onTapDown/onTapUp.
      */
     private buildHudView(): ComponentDescriptor {
         const state = this.history.state;

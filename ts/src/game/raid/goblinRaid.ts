@@ -90,9 +90,9 @@ export function formGoblinRaid(root: Entity): void {
                 campEntity.worldPosition,
             );
             campEntity.invalidateComponent(GoblinCampComponentId);
-            // Deliberately falls through to the gate below rather than skipping
-            // the night: a camp seeded under a score it already clears should
-            // march tonight, not a day late.
+            // Falls through to the gate below rather than skipping the night: a
+            // camp seeded under a score it already clears marches tonight, not
+            // a day late.
         }
 
         // Prosperity gate: the camp waits until the kingdom is worth the walk.

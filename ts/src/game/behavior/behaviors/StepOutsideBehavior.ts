@@ -9,9 +9,9 @@ import { isManningStation } from "../../component/stationQuery.ts";
  * Utility above normal work (performJob = 50), hauling, player commands and combat
  * (both 90), so a worker left standing on a building always grounds itself before
  * doing anything else — including work it could otherwise perform from the rooftop
- * via adjacency. Deliberately below an urgent sleep/eat (which can climb past this):
- * sleeping inside one's own house is legitimate and should win; once that plan
- * finishes, this behaviour steps the worker back outside.
+ * via adjacency. It sits below an urgent sleep or meal, which can climb past
+ * this: sleeping inside one's own house is legitimate and should win. Once that
+ * plan finishes, this behaviour steps the worker back outside.
  */
 const STEP_OUTSIDE_UTILITY = 92;
 

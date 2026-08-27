@@ -24,7 +24,6 @@ function update(root: Entity, _deltaTime: number) {
     const availableHouses: [Entity, HousingComponent][] = [];
     const workersWithHouse: Set<string> = new Set();
 
-    // Process all houses
     for (const [entity, housingComponent] of houses) {
         const buildingComponent = entity.getEcsComponent(BuildingComponentId);
 
@@ -33,12 +32,11 @@ function update(root: Entity, _deltaTime: number) {
             continue;
         }
 
-        // Skip scaffolded buildings
         if (buildingComponent?.scaffolded) {
             continue;
         }
 
-        // Check if the tenant id is still valid
+        // A tenant can die or despawn, leaving a dangling id on the house.
         const tenantId = housingComponent.tenant;
         if (tenantId) {
             const tenantEntity = root.findEntity(tenantId);
@@ -46,7 +44,6 @@ function update(root: Entity, _deltaTime: number) {
                 tenantEntity &&
                 tenantEntity.hasComponent(PlayerUnitComponentId);
             if (!tenantExists) {
-                // Reset to null if a worker with this id does not exist
                 housingComponent.tenant = null;
                 entity.invalidateComponent(HousingComponentId);
             } else {
@@ -62,7 +59,6 @@ function update(root: Entity, _deltaTime: number) {
         }
     }
 
-    // Process all workers
     for (const [entity, _] of workers) {
         // If the worker has a house, decided in previous loop we skip it
         if (workersWithHouse.has(entity.id)) {
@@ -75,10 +71,8 @@ function update(root: Entity, _deltaTime: number) {
             const [houseEntity, housingComponent] = houseForWorker;
             housingComponent.tenant = entity.id;
             houseEntity.invalidateComponent(HousingComponentId);
-            // Remove homeless effect if any
             removeHomelessEffect(entity);
         } else {
-            // Assign homeless effect
             addHomelessEffect(entity);
         }
     }

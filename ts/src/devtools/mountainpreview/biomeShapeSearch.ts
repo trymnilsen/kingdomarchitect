@@ -9,9 +9,8 @@ export type ShapeMetric = "euclidean" | "chebyshev" | "manhattan";
 export type ShapeOrientation = "horizontal" | "vertical";
 
 /**
- * Parameters for growing a biome shape. These are deliberately simple,
- * self-contained types: the search works purely in abstract chunk coordinates
- * so it can be modelled and tested in isolation from world generation.
+ * Parameters for growing a biome shape. The search works in abstract chunk
+ * coordinates, so it can be modelled and tested apart from world generation.
  */
 export type BiomeShapeParams = {
     /** The initial chunk the biome grows out from, in chunk coordinates. */
@@ -202,10 +201,9 @@ type FrontierEntry = {
 };
 
 /**
- * Removes and returns the lowest-scoring frontier entry. A linear scan is used
- * deliberately: biome sizes are small (a few hundred chunks at most), so the
- * clarity outweighs a heap. Ties keep the earliest-inserted entry, which keeps
- * the output deterministic.
+ * Removes and returns the lowest-scoring frontier entry. A linear scan beats a
+ * heap for clarity at these sizes, a few hundred chunks at most. Ties keep the
+ * earliest-inserted entry, which keeps the output deterministic.
  */
 function takeLowestScore(frontier: FrontierEntry[]): FrontierEntry {
     let bestIndex = 0;

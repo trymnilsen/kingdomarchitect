@@ -31,7 +31,6 @@ export const warmthSystem: EcsSystem = {
         const entitiesWithWarmth = root.queryComponents(WarmthComponentId);
         const fireSources = root.queryComponents(FireSourceComponentId);
 
-        // Build list of active fire positions with their passive rates
         const activeFirePositions: Array<{
             position: Point;
             passiveRate: number;
@@ -48,7 +47,6 @@ export const warmthSystem: EcsSystem = {
 
         for (const [entity, warmthComponent] of entitiesWithWarmth) {
             const currentWarmth = warmthComponent.warmth;
-            // Apply decay
             if (tick % WARMTH_DECAY_TICK_INTERVAL == 0) {
                 decreaseWarmth(warmthComponent, warmthComponent.decayRate);
             }

@@ -280,8 +280,9 @@ export type CharacterSprite = {
 };
 
 /**
- * Calculate the overall bounding box across all frames in an animation
- * This ensures consistent positioning across all frames (e.g., for jump animations)
+ * The bounding box covering every frame of an animation. Centring each frame on
+ * this shared box rather than its own keeps a jumping character from sliding
+ * around inside the sprite as the frames change height.
  */
 function getAnimationBounds(animation: CharacterAnimation): Rectangle {
     const frameCount = animationFrameCount(animation);

@@ -54,23 +54,20 @@ export function readConfig(): MultiplayerServerConfig {
 export function startMultiplayerServer(
     config: MultiplayerServerConfig,
 ): http.Server {
-    // Initialize SQLite with all migrations
     const db = new DatabaseSync(config.dbPath);
     db.exec("PRAGMA journal_mode=WAL");
     db.exec("PRAGMA synchronous=NORMAL");
     applySQLiteMigrations(db, [...gameMigrations, ...authMigrations]);
 
-    // Create persistence adapter
     const adapter = new SQLiteAdapter(db);
     const persistenceManager = new PersistenceManager(adapter);
 
-    // Create connection manager, message router, and rate limiter
     const connectionManager = new ConnectionManager();
     const messageRouter = createMultiplayerMessageRouter(connectionManager);
     const authRateLimiter = createRateLimiter(60_000, 20);
     const challengeStore = new ChallengeStore();
 
-    // Create and init game server (no initial player — players join via WebSocket)
+    // Players join over the websocket, so the server starts with none.
     const gameServer = new GameServer(messageRouter, persistenceManager);
     let gameServerReady = false;
     gameServer
@@ -84,7 +81,6 @@ export function startMultiplayerServer(
             process.exit(1);
         });
 
-    // Create HTTP server
     const server = http.createServer(async (req, res) => {
         try {
             // Auth routes

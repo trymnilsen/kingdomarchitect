@@ -49,10 +49,9 @@ export const watchSystem: EcsSystem = {
 function update(root: Entity, tick: number) {
     for (const [tower, watch] of root.queryComponents(WatchComponentId)) {
         const light = tower.getEcsComponent(LightSourceComponentId);
-        // Deliberately a raw sourceId read rather than resolveLightSource:
-        // this asks whether the beam this system installs is already there,
-        // which is a question about the component's own written state. What
-        // the tower emits is nobody's business here.
+        // A raw sourceId read rather than resolveLightSource: the question is
+        // whether the beam this system installs is already written on the
+        // component, not what the tower ends up emitting.
         const hasSearchlight = light?.sourceId === searchlightLightSource.id;
 
         if (!isTowerManned(root, tower)) {

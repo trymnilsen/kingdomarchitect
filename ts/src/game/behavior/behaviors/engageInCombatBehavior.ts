@@ -13,8 +13,7 @@ import type { Behavior } from "./Behavior.ts";
  * entity. Self-defence preempts nearly everything. This ties player commands
  * at 90, and the tie resolves to the player command only because it precedes
  * this behavior in the resolver's array (the sort is stable). The hysteresis
- * bonus can keep an already-running engagement ahead of a fresh command, which
- * is the existing behavior and kept on purpose.
+ * bonus can keep an already-running engagement ahead of a fresh command.
  */
 const DAMAGE_UTILITY = 90;
 
