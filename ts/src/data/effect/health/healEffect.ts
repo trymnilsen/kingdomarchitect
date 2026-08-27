@@ -24,9 +24,6 @@ export const healEffectExecutor: EffectExecutor = {
     },
 };
 
-/**
- * Creates an immediate healing effect
- */
 export function createHealEffect(amount: number): HealEffect {
     return {
         data: {
@@ -39,9 +36,7 @@ export function createHealEffect(amount: number): HealEffect {
     };
 }
 
-/**
- * Creates a healing effect that applies over time
- */
+/** Heals `amount` every `interval` ticks, for `ticks` ticks in total. */
 export function createHealOverTimeEffect(
     amount: number,
     ticks: number,

@@ -54,7 +54,7 @@ export const torchRecipe: CraftingRecipe = {
 
 /**
  * A weapon from wood alone. Cheaper and quicker than the blacksmith's sword,
- * and worse, which is what makes it the one you arm people with first.
+ * and worse. It is the first thing a kingdom can arm anyone with.
  */
 export const woodenSwordRecipe: CraftingRecipe = {
     id: "craft_woodensword",

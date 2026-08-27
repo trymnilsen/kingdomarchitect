@@ -52,13 +52,9 @@ export const hammerItem = {
 } as const;
 
 /**
- * A torch carried in the hand. The `light` field is what makes it equippable
- * and what makes its holder emit {@link torchLightSource} while it is in a
- * slot. It is not skill gear: it teaches nothing and modifies no stat, it just
- * burns.
- *
- * The item id and the light definition id are both "torch". Items and light
- * definitions are separate registries, so the doubling is deliberate.
+ * A torch carried in the hand. The `light` field makes it equippable and makes
+ * its holder emit {@link torchLightSource} while it sits in a slot. It is not
+ * skill gear: it teaches nothing and modifies no stat, it just burns.
  */
 export const torchItem = {
     asset: spriteRefs.torches,
@@ -66,11 +62,10 @@ export const torchItem = {
     name: "Torch",
     hint: "A bundle of straw and pitch on a stick. Burns while you carry it.",
     light: torchLightSource.id,
-    // Placeholder in-hand art, and it looks it: `torches` is a 16x16 building
-    // icon where character-held sprites are 8x16, so it draws at roughly double
-    // the width of a held sword. It is also an 8-frame fire animation that
-    // equipment drawing renders as a static frame 0. Both go away with proper
-    // character-scale art; neither is a rendering bug.
+    // Placeholder in-hand art. `torches` is a 16x16 building icon where
+    // character-held sprites are 8x16, so it draws about twice the width of a
+    // held sword, and it is an 8-frame fire animation drawn as a static frame
+    // 0. Both go away with proper character-scale art.
     visual: { sprite: spriteRefs.torches, offset: { x: 8, y: 8 } },
     rarity: ItemRarity.Common,
 } as const;

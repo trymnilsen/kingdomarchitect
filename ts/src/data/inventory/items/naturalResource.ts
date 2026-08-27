@@ -52,10 +52,9 @@ type Resource = {
 
 /**
  * The common tree, and the yardstick the wood economy is measured in. One of
- * every building in the game costs roughly 1,700 wood once the plank, frame and
- * joinery chains are resolved, so this number decides how much of a playthrough
- * is spent felling. It matches the swamp trees deliberately: they were always 8,
- * and it was this one that carried a placeholder.
+ * every building costs roughly 1,700 wood once the plank, frame and joinery
+ * chains are resolved, so this yield decides how much of a playthrough is spent
+ * felling. It matches the swamp trees.
  */
 export const treeResource = {
     asset: spriteRefs.tree_1,
@@ -203,8 +202,8 @@ export const snowFlowerResource = {
  */
 export const moonpetalResource = {
     asset: spriteRefs.plainsFlower2,
-    // Node ids stay distinct from the item they yield, as tree1 yields wood and
-    // stone1 yields stone. Two registries, two names.
+    // A node id names the node, not the item it yields, the way tree1 yields
+    // wood.
     id: "moonpetal1",
     name: "Moonpetal",
     harvestMode: ResourceHarvestMode.Pick,
@@ -248,10 +247,8 @@ export const NaturalResources = [
 
 export type NaturalResource = (typeof NaturalResources)[number];
 
-// Resource registry for efficient lookup
 const resourceRegistry = new Map<string, NaturalResource>();
 
-// Initialize registry
 for (const resource of NaturalResources) {
     const definition: Resource = resource;
     if (
@@ -266,11 +263,6 @@ for (const resource of NaturalResources) {
     resourceRegistry.set(resource.id, resource);
 }
 
-/**
- * Get a natural resource by its ID
- * @param id The resource ID (e.g., "tree1", "stone1")
- * @returns The resource definition or undefined if not found
- */
 export function getResourceById(id: string): NaturalResource | undefined {
     return resourceRegistry.get(id);
 }

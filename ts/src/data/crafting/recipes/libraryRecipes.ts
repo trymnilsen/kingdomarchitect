@@ -28,8 +28,8 @@ export const scrollRecipe: CraftingRecipe = {
 
 /**
  * A bound volume with a gem set into the cover as its focus. The gem is the
- * expensive part and it only comes off a dead goblin, which is what keeps a
- * library standing on the back of somebody having gone out and fought for it.
+ * expensive part and only comes off a dead goblin, so a library stands on
+ * somebody having gone out and fought for it.
  */
 export const tomeRecipe: CraftingRecipe = {
     id: "scribe_tome",

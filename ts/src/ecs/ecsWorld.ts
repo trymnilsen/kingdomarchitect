@@ -17,22 +17,19 @@ import {
     type EcsGameMessageFunction,
 } from "./ecsSystem.ts";
 
+/** One handler list per event id. Every id has a list, so none is optional. */
 type EcsEntityEventHandlersMap = {
-    // Iterate over each event ID 'K' which is a key in EntityEventMapDynamic
-    [K in keyof EntityEventType]: EcsEntityEventFunction<EntityEvent>[]; // ...of the specific event handler function type for that event. // For each key 'K', define the value as an array '[]' ...
-    // Note: We are NOT using Partial<> here, so all keys are mandatory.
+    [K in keyof EntityEventType]: EcsEntityEventFunction<EntityEvent>[];
 };
 
 /**
  * Owns the root entity and the registered systems, and drives them on update,
  * render, entity events and incoming game messages.
  *
- * This module sits at the top level of `src` because of what it reaches for.
- * Running a system means touching entities, a render scope and server messages
- * all at once, so the world cannot live under `game/`, `rendering/` or
- * `server/` without pointing sideways into the other two. It used to live in
- * `common/`, which implied a leaf utility with no dependencies and made the
- * upward edges easy to miss.
+ * This module sits at the top level of `src` because running a system touches
+ * entities, a render scope and server messages at once. Under `game/`,
+ * `rendering/` or `server/` it would point sideways into the other two, and
+ * under `common/` it would look like a leaf utility with no dependencies.
  */
 export class EcsWorld {
     private renderSystems: EcsRenderFunction[] = [];

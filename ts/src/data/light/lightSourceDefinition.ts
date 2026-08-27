@@ -7,27 +7,23 @@
  * "emits nothing" radius value. An entity that should emit nothing simply has no
  * {@link LightSourceComponent}.
  *
- * Definitions are data, not behaviour. Later stages grow each entry with live
- * fuel and extinguish behaviour. Keeping that here means the
- * {@link LightSourceComponent} stays a thin reference and never changes shape as
- * the system grows.
+ * Definitions are data. The {@link LightSourceComponent} holds only a reference
+ * to one, so an entity's emission changes by pointing at a different profile.
+ *
+ * Nothing burns fuel or gets extinguished yet. The two fields below record what
+ * each source is meant to do when those verbs exist.
  */
 
 /**
- * The fuel an emitter consumes once the fuel-consuming system exists (a later
- * stage). This is data only here: nothing in this slice burns or depletes. A
- * `"none"` source never runs down (it is fed by its structure rather than a
- * consumable). A `"charcoal"` source draws on stored fuel. This field encodes
- * intent rather than a live dependency.
+ * What an emitter burns. `"none"` never runs down because its structure feeds
+ * it; `"charcoal"` draws on stored fuel.
  */
 export type LightSourceFuel = "none" | "charcoal";
 
 /**
- * How hard a source is to put out, for the future extinguish verb. `"easy"` and
- * `"hard"` gate that verb's effort. `"destroy"` means the source cannot be
- * extinguished at all and only goes away when its host is dismantled. It is named
- * "destroy" rather than "dismantle" because a light source need not be a
- * building. Data only here, no extinguish behaviour is implemented.
+ * How hard a source is to put out. `"destroy"` means it cannot be snuffed at
+ * all and goes away only with its host, and is named for destruction rather
+ * than dismantling because a light source need not be a building.
  */
 export type LightSourceExtinguishDifficulty = "easy" | "hard" | "destroy";
 
@@ -79,15 +75,11 @@ export const cressetLightSource: LightSourceDefinition = {
 };
 
 /**
- * A torch carried in the hand. It reaches as far as a cresset, and it claims no
- * hearthlight. That is the whole point of it being separate from
- * {@link cressetLightSource}: territory must not follow feet.
- *
- * The reason is the one that keeps {@link workerGlowLightSource} from claiming.
- * A carried claim would let every torchbearer walk home territory across the
- * map, and the defenders-inside-hearthlight gate would be silently nullified
- * because a torchbearer always stands inside their own claim. It lights. It
- * does not claim.
+ * A torch carried in the hand. It reaches as far as a cresset but claims no
+ * hearthlight, which is the only reason it is a separate profile: a carried
+ * claim would let a torchbearer walk home territory across the map, and would
+ * nullify the defenders-inside-hearthlight gate, since a torchbearer always
+ * stands inside their own claim.
  */
 export const torchLightSource: LightSourceDefinition = {
     id: "torch",
@@ -110,8 +102,8 @@ export const campfireLightSource: LightSourceDefinition = {
 };
 
 /**
- * A lamp post: durable infrastructure with the same reach as the brazier. Built
- * to stay lit, so it draws on fuel and is hard to extinguish by hand.
+ * A lamp post: durable infrastructure, built to stay lit, so it draws on fuel
+ * and is hard to put out by hand.
  */
 export const lampPostLightSource: LightSourceDefinition = {
     id: "lampPost",
@@ -122,13 +114,10 @@ export const lampPostLightSource: LightSourceDefinition = {
 };
 
 /**
- * A worker's presence glow. This is not an in-world lantern. A worker at night
- * is visible as a single lit tile with nothing around it, so the player never
- * loses a worker in the dark, while the lone pinprick in a black field heightens
- * the darkness instead of relieving it. It claims no hearthlight: if it did,
- * every worker would be walking home territory and the defenders-inside-
- * hearthlight gate would be meaningless, because every aggressive worker always
- * stands inside their own one-tile bubble.
+ * A worker's presence glow, not an in-world lantern. A worker at night shows as
+ * a single lit tile with nothing around it, so the player never loses one in
+ * the dark. It claims no hearthlight, for the same reason the carried torch
+ * does not.
  */
 export const workerGlowLightSource: LightSourceDefinition = {
     id: "workerGlow",

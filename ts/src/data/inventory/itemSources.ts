@@ -107,12 +107,10 @@ export function getItemSources(itemId: string): ItemSource[] {
  * world hands over directly and then applying recipes until nothing new can be
  * made.
  *
- * This is deliberately built on {@link getItemSources} rather than walking the
- * recipe and resource tables again. One enumeration of "where things come from"
- * is the whole point: a second copy is how the Tailor came to own a recipe list
- * with no building to cook it in, unnoticed. Anything that is not a recipe
- * counts as directly obtainable, so a new kind of source is picked up here for
- * free.
+ * Built on {@link getItemSources} rather than walking the recipe and resource
+ * tables again, so there is one enumeration of where things come from and a new
+ * kind of source is picked up here for free. Anything that is not a recipe
+ * counts as directly obtainable.
  *
  * An item missing from the returned set is unreachable, which means it is
  * either content nobody can ever get or a dead end in a build order.

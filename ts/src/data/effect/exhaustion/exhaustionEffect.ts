@@ -52,7 +52,7 @@ export const exhaustionEffectExecutor: EffectExecutor = {
         const level = energy.exhaustionLevel;
         const newModifiers = modifiersByLevel[level] ?? {};
 
-        // Only dirty stats if modifiers actually changed
+        // This runs every tick, so only a real change dirties the stat cache.
         const currentJson = JSON.stringify(activeEffect.modifiers);
         const newJson = JSON.stringify(newModifiers);
         if (currentJson !== newJson) {
@@ -60,7 +60,7 @@ export const exhaustionEffectExecutor: EffectExecutor = {
             markStatsDirty(entity);
         }
 
-        // Level 4: deal periodic HP damage
+        // At the last level exhaustion starts killing the worker.
         if (level >= 4) {
             if (activeEffect.state["damageTimer"] === undefined) {
                 activeEffect.state["damageTimer"] = 0;
@@ -75,7 +75,6 @@ export const exhaustionEffectExecutor: EffectExecutor = {
                 }
             }
         } else {
-            // Reset timer when not at level 4
             activeEffect.state["damageTimer"] = 0;
         }
     },

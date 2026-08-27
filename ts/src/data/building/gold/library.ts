@@ -11,14 +11,14 @@ import {
 } from "../../inventory/items/resources.ts";
 
 /**
- * Where the settlement keeps what it knows. Magic here is clerical work: someone
- * sits and copies, and the building is what makes them a scribe rather than a
- * person with a pen.
+ * Where the settlement keeps what it knows. Magic here is clerical work:
+ * someone sits and copies, and the building turns them into a scribe rather
+ * than a person with a pen.
  *
- * The focus requirement is a low bar on purpose. A wizard hat satisfies it, and
- * a wizard hat is ten wood, because by local custom the hat is what makes you
- * the wizard. The gate exists so that somebody in the settlement has claimed to
- * be one before a library goes up, not to make that claim expensive.
+ * The focus requirement is a low bar. A wizard hat satisfies it, and a wizard
+ * hat is ten wood, because by local custom the hat makes the wizard. The gate
+ * asks that somebody in the settlement has claimed to be one before a library
+ * goes up, not that the claim be expensive.
  */
 export const library: Building = {
     id: "library",

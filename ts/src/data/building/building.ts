@@ -50,9 +50,9 @@ export type Building = {
     requirements?: BuildingRequirements;
     /**
      * How many items this building can hold when it acts as settlement storage.
-     * Presence of this field is what makes a building storage at all: the prefab
-     * attaches the stockpile components to anything that declares it. Absent
-     * means the building is not a storage site.
+     * A building becomes storage by declaring this: the prefab attaches the
+     * stockpile components to anything that does. Absent means it is not a
+     * storage site.
      */
     storageCapacity?: number;
     /**

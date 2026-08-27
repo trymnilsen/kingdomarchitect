@@ -10,8 +10,8 @@ export type LootDrop = {
     amount: number;
     /**
      * Probability from 0 to 1 that this drop appears at all. Omitted means it
-     * always drops, which is what keeps the goblin purse a reliable reward
-     * rather than a lottery.
+     * always drops, so the goblin purse stays a reliable reward rather than a
+     * lottery.
      */
     chance?: number;
 };
@@ -31,13 +31,12 @@ export type LootTable = {
 
 /**
  * A goblin's purse and whatever shiny thing it was hoarding. Gold has no mine
- * and no recipe anywhere in the world, so this is the only tap the economy has:
- * coin enters the kingdom by being taken off raiders. Gems follow the same rule
- * on purpose, which is what puts the enchanter and the library downstream of
- * going out and fighting for them.
+ * and no recipe, so this is the economy's only tap: coin enters the kingdom by
+ * being taken off raiders. Gems come the same way, which puts the enchanter and
+ * the library downstream of going out and fighting.
  *
- * Widening these numbers is the lever for how affordable gold-priced buildings
- * and magic feel.
+ * These numbers are the lever for how affordable gold-priced buildings and
+ * magic feel.
  */
 export const goblinLootTable: LootTable = {
     id: "goblin",
