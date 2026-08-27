@@ -1,6 +1,10 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
 import { Entity } from "../../../src/game/entity/entity.ts";
+import {
+    createHealthComponent,
+    HealthComponentId,
+} from "../../../src/game/component/healthComponent.ts";
 
 describe("Entity", () => {
     it("Add child entity", () => {
@@ -63,53 +67,97 @@ describe("Entity", () => {
         });
     });
 
-    it("Recursively run lifecycle when entity is added to a live tree", () => {
-        assert.strictEqual(2, 2);
-    });
-    it("Recursively run lifecycle when entity is removed from a live tree", () => {
-        assert.strictEqual(2, 2);
+    it("Component added to a descendant shows up in an already-built root query", () => {
+        const root = new Entity("1");
+        const child = new Entity("2");
+        root.addChild(child);
+
+        assert.strictEqual(root.queryComponents(HealthComponentId).size, 0);
+
+        child.setEcsComponent(createHealthComponent(10, 10));
+
+        const query = root.queryComponents(HealthComponentId);
+        assert.strictEqual(query.size, 1);
+        assert.strictEqual(query.get(child)?.currentHp, 10);
     });
 
-    it("Add component", () => {
-        //TODO: Reimplement test
-        assert.strictEqual(2, 2);
+    it("Replacing a component replaces it in the root query", () => {
+        const root = new Entity("1");
+        const child = new Entity("2");
+        root.addChild(child);
+
+        child.setEcsComponent(createHealthComponent(10, 10));
+        root.queryComponents(HealthComponentId);
+        child.setEcsComponent(createHealthComponent(4, 10));
+
+        const query = root.queryComponents(HealthComponentId);
+        assert.strictEqual(query.size, 1);
+        assert.strictEqual(query.get(child)?.currentHp, 4);
     });
 
-    it("can remove entity", () => {
-        assert.strictEqual(2, 2);
+    it("Removing a component drops it from the root query", () => {
+        const root = new Entity("1");
+        const child = new Entity("2");
+        root.addChild(child);
+
+        child.setEcsComponent(createHealthComponent(10, 10));
+        root.queryComponents(HealthComponentId);
+        child.removeEcsComponent(HealthComponentId);
+
+        assert.strictEqual(root.queryComponents(HealthComponentId).size, 0);
     });
 
-    it("will keep components sorted by priority from highest to lowest on add", () => {
-        assert.strictEqual(2, 2);
+    it("Removing an entity drops its whole subtree from the root query", () => {
+        const root = new Entity("1");
+        const child = new Entity("2");
+        const grandchild = new Entity("3");
+
+        root.addChild(child);
+        child.addChild(grandchild);
+        child.setEcsComponent(createHealthComponent(10, 10));
+        grandchild.setEcsComponent(createHealthComponent(7, 7));
+        assert.strictEqual(root.queryComponents(HealthComponentId).size, 2);
+
+        child.remove();
+
+        assert.strictEqual(root.queryComponents(HealthComponentId).size, 0);
+        assert.strictEqual(root.children.length, 0);
     });
 
-    it("will keep components sorted when one is removed", () => {
-        assert.strictEqual(2, 2);
+    it("Attaching a subtree registers the components it already carries", () => {
+        const root = new Entity("1");
+        const child = new Entity("2");
+        const grandchild = new Entity("3");
+
+        child.addChild(grandchild);
+        grandchild.setEcsComponent(createHealthComponent(7, 7));
+        assert.strictEqual(root.queryComponents(HealthComponentId).size, 0);
+
+        root.addChild(child);
+
+        const query = root.queryComponents(HealthComponentId);
+        assert.strictEqual(query.size, 1);
+        assert.strictEqual(query.get(grandchild)?.currentHp, 7);
     });
 
-    it("Cannot add component of same type twice", () => {
-        //TODO: Reimplement test
-        assert.strictEqual(2, 2);
-    });
+    it("Ancestor lookup finds the nearest holder of a component", () => {
+        const root = new Entity("1");
+        const child = new Entity("2");
+        const grandchild = new Entity("3");
 
-    it("Get component", () => {
-        //TODO: Reimplement test
-        assert.strictEqual(2, 2);
-    });
+        root.addChild(child);
+        child.addChild(grandchild);
+        root.setEcsComponent(createHealthComponent(100, 100));
+        child.setEcsComponent(createHealthComponent(20, 20));
 
-    it("Get component returns null if not present", () => {
-        //TODO: Reimplement test
-        assert.strictEqual(2, 2);
-    });
-
-    it("Remove component", () => {
-        //TODO: Reimplement test
-        assert.strictEqual(2, 2);
-    });
-
-    it("Remove component returns false on non existence", () => {
-        //TODO: Reimplement test
-        assert.strictEqual(2, 2);
+        assert.strictEqual(
+            grandchild.getAncestorEcsComponent(HealthComponentId)?.maxHp,
+            20,
+        );
+        assert.strictEqual(
+            grandchild.getAncestorEntity(HealthComponentId),
+            child,
+        );
     });
 
     it("Position of children is updated on parent update", () => {

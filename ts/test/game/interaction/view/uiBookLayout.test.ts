@@ -360,24 +360,4 @@ describe("UiBookLayout", () => {
         tabButtons[0].props.onTap();
         assert.strictEqual(tappedIndex, 0, "tapping tab 0 reports index 0");
     });
-
-    it("when tab is focused, down-direction will focus next tab", () => {
-        // TODO: Requires focus system integration
-        assert.ok(true);
-    });
-
-    it("directional navigation in single mode switches page if needed", () => {
-        // TODO: Requires focus system integration
-        assert.ok(true);
-    });
-
-    it("Focus changes switches page if needed", () => {
-        // TODO: Requires focus system integration
-        assert.ok(true);
-    });
-
-    it("Focus is kept when tab is selected or unselected", () => {
-        // TODO: Requires focus system integration
-        assert.ok(true);
-    });
 });

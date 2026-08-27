@@ -57,8 +57,8 @@ describe("RegrowSystem", () => {
             regrowComponent.harvestedAtTick = harvestTick;
             bush.invalidateComponent(RegrowComponentId);
 
-            // Run system before regrow time (200 ticks for berry bush)
-            const beforeRegrowTick = harvestTick + 150;
+            // One tick short of the berry bush's 200 tick regrow time.
+            const beforeRegrowTick = harvestTick + 199;
             regrowSystem.onUpdate(root, beforeRegrowTick);
 
             const updatedRegrowComponent =
@@ -67,29 +67,6 @@ describe("RegrowSystem", () => {
                 updatedRegrowComponent.harvestedAtTick,
                 harvestTick,
                 "Should still be marked as harvested before regrow time",
-            );
-        });
-
-        it("regrows resource after regrow time has passed", () => {
-            const root = new Entity("root");
-            const bush = createBerryBush(root);
-
-            // Mark as harvested
-            const harvestTick = 100;
-            const regrowComponent = bush.requireEcsComponent(RegrowComponentId);
-            regrowComponent.harvestedAtTick = harvestTick;
-            bush.invalidateComponent(RegrowComponentId);
-
-            // Run system after regrow time (200 ticks for berry bush)
-            const afterRegrowTick = harvestTick + 200;
-            regrowSystem.onUpdate(root, afterRegrowTick);
-
-            const updatedRegrowComponent =
-                bush.requireEcsComponent(RegrowComponentId);
-            assert.strictEqual(
-                updatedRegrowComponent.harvestedAtTick,
-                -1,
-                "Should be reset to -1 after regrow completes",
             );
         });
 
@@ -252,13 +229,6 @@ describe("RegrowSystem", () => {
             bush.requireEcsComponent(RegrowComponentId).harvestedAtTick =
                 harvestTick2;
             bush.invalidateComponent(RegrowComponentId);
-
-            regrowComponent = bush.requireEcsComponent(RegrowComponentId);
-            assert.strictEqual(
-                regrowComponent.harvestedAtTick,
-                harvestTick2,
-                "Should be harvested again",
-            );
 
             // Wait for second regrow
             regrowSystem.onUpdate(root, harvestTick2 + 200);

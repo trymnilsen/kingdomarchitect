@@ -1,6 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
 import {
+    clearPlayerCommand,
     createBehaviorAgentComponent,
     getBehaviorAgent,
     requestReplan,
@@ -51,60 +52,29 @@ describe("BehaviorAgentComponent", () => {
 
             assert.deepStrictEqual(agent.pendingReplan, { kind: "replan" });
         });
-
-        it("does nothing on entity without agent", () => {
-            const entity = createTestEntity();
-
-            requestReplan(entity);
-        });
     });
 
-    describe("playerCommand", () => {
-        it("can set move command", () => {
+    describe("clearPlayerCommand", () => {
+        it("consumes the command and invalidates the component", () => {
+            const entity = createTestEntity();
             const agent = createBehaviorAgentComponent();
+            entity.setEcsComponent(agent);
             agent.playerCommand = {
                 action: "move",
-                targetPosition: { x: 10, y: 10 },
+                targetPosition: { x: 12, y: 8 },
             };
 
-            assert.strictEqual(agent.playerCommand.action, "move");
-            assert.deepStrictEqual(agent.playerCommand.targetPosition, {
-                x: 10,
-                y: 10,
-            });
-        });
-
-        it("can set attack command", () => {
-            const agent = createBehaviorAgentComponent();
-            agent.playerCommand = {
-                action: "attack",
-                targetEntityId: "enemy-1",
+            let invalidated: string | null = null;
+            entity.entityEvent = (event) => {
+                if (event.id === "component_updated") {
+                    invalidated = event.item.id;
+                }
             };
 
-            assert.strictEqual(agent.playerCommand.action, "attack");
-            assert.strictEqual(agent.playerCommand.targetEntityId, "enemy-1");
-        });
+            clearPlayerCommand(entity);
 
-        it("can set pickup command", () => {
-            const agent = createBehaviorAgentComponent();
-            agent.playerCommand = {
-                action: "pickup",
-                targetEntityId: "item-1",
-            };
-
-            assert.strictEqual(agent.playerCommand.action, "pickup");
-            assert.strictEqual(agent.playerCommand.targetEntityId, "item-1");
-        });
-
-        it("can set interact command", () => {
-            const agent = createBehaviorAgentComponent();
-            agent.playerCommand = {
-                action: "interact",
-                targetEntityId: "door-1",
-            };
-
-            assert.strictEqual(agent.playerCommand.action, "interact");
-            assert.strictEqual(agent.playerCommand.targetEntityId, "door-1");
+            assert.strictEqual(agent.playerCommand, undefined);
+            assert.strictEqual(invalidated, "behavioragent");
         });
     });
 });

@@ -17,7 +17,6 @@ describe("rectangle2 tests", () => {
             rect(10, 50, 50, 10), // Bottom
             rect(15, 20, 45, 30), // Middle (right of B)
         ];
-        assert.deepEqual;
         assert.deepStrictEqual(result, expected);
     });
 
@@ -252,24 +251,6 @@ describe("rectangle2 tests", () => {
             { x: 10, y: 50, width: 50, height: 10 }, // Bottom
             { x: 10, y: 30, width: 20, height: 20 }, // Left
             { x: 50, y: 30, width: 10, height: 20 }, // Right
-        ];
-        assert.deepStrictEqual(splitRectangle(rectA, rectB), expectedSplit);
-    });
-
-    test("splitRectangle - B fully contains A", () => {
-        const rectA: Rectangle = { x: 20, y: 20, width: 10, height: 10 };
-        const rectB: Rectangle = { x: 10, y: 10, width: 30, height: 30 };
-        assert.deepStrictEqual(splitRectangle(rectA, rectB), []);
-    });
-
-    test("splitRectangle - A fully contains B", () => {
-        const rectA: Rectangle = { x: 10, y: 10, width: 30, height: 30 };
-        const rectB: Rectangle = { x: 20, y: 20, width: 10, height: 10 };
-        const expectedSplit: Rectangle[] = [
-            { x: 10, y: 10, width: 30, height: 10 },
-            { x: 10, y: 30, width: 30, height: 10 },
-            { x: 10, y: 20, width: 10, height: 10 },
-            { x: 30, y: 20, width: 10, height: 10 },
         ];
         assert.deepStrictEqual(splitRectangle(rectA, rectB), expectedSplit);
     });

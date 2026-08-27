@@ -202,6 +202,10 @@ describe("compileTimeline — track operations", () => {
     });
 });
 
+// Head pixels as authored, and after the mirror (axis 16, so newX = 16 - x).
+const unmirroredHead = [6, 4, 7, 4, 6, 5, 7, 5];
+const mirroredHead = [10, 4, 9, 4, 10, 5, 9, 5];
+
 describe("compileTimeline — mirroring", () => {
     it("mirror at frame 0 flips x coordinates and swaps Left/Right part names", () => {
         const sources = [makeSourceAnimation("source_walk", 1)];
@@ -258,7 +262,7 @@ describe("compileTimeline — mirroring", () => {
         assert.deepStrictEqual(rightHandAnchor.frames[0], [7, 7, 1]);
     });
 
-    it("mid-animation toggle: frames before toggle unmirrored, frames after mirrored", () => {
+    it("mid-animation toggle mirrors only the frames from the toggle onwards", () => {
         const sources = [makeSourceAnimation("source_walk", 1)];
         const recipe = makeRecipe({
             duration: 4,
@@ -267,49 +271,45 @@ describe("compileTimeline — mirroring", () => {
 
         const result = compileTimeline(recipe, sources);
 
-        // Frames 0-1: unmirrored — LeftHand should be in LeftHand slot
-        // Frames 2-3: mirrored — LeftHand should be swapped to RightHand slot
+        const headFrames = result.parts.find(
+            (p) => p.partName === "Head",
+        )?.frames;
+        assert.ok(headFrames);
+        assert.deepStrictEqual(headFrames[0], unmirroredHead);
+        assert.deepStrictEqual(headFrames[1], unmirroredHead);
+        assert.deepStrictEqual(headFrames[2], mirroredHead);
+        assert.deepStrictEqual(headFrames[3], mirroredHead);
 
-        // Check that part names are consistent (all frames use same part structure)
-        const partNames = result.parts.map((p) => p.partName);
-        // After mirror transform, LeftHand should be swapped to RightHand
-        // This means the result has RightHand with swapped name
-        assert.ok(partNames.includes("RightHand"));
-
-        // The key test: frames 0-1 should have unmirrored data (original LeftHand coords)
-        // and frames 2-3 should have mirrored data
-        // Since all frames share the same part name post-transform, we check coordinate values
-        const leftHandPart = result.parts.find(
+        // The Left/Right name swap applies to the whole part as soon as any
+        // frame mirrors, while coordinates flip per frame. The "LeftHand" slot
+        // therefore carries source RightHand data across all four frames:
+        // x=10 while unmirrored, 16-10=6 once toggled.
+        const leftHandFrames = result.parts.find(
             (p) => p.partName === "LeftHand",
-        );
-        const rightHandPart = result.parts.find(
-            (p) => p.partName === "RightHand",
-        );
-
-        // In unmirrored frames: LeftHand exists with original coords [8, 8]
-        // In mirrored frames: LeftHand maps to RightHand (name-swapped)
-        // The frame data in the swapped part will have original LeftHand data mirrored
-
-        // Verify the structure has the right number of frames
-        if (leftHandPart) {
-            assert.strictEqual(leftHandPart.frames.length, 4);
-        }
-        if (rightHandPart) {
-            assert.strictEqual(rightHandPart.frames.length, 4);
-        }
+        )?.frames;
+        assert.ok(leftHandFrames);
+        assert.deepStrictEqual(leftHandFrames[1], [10, 8]);
+        assert.deepStrictEqual(leftHandFrames[2], [6, 8]);
     });
 
-    it("double mirror (XOR) produces correct starting orientation", () => {
+    it("a second toggle flips the orientation back", () => {
         const sources = [makeSourceAnimation("source_walk", 1)];
-        // toggles [0, 2]: frame 0 is mirrored (one toggle), frame 2 flips back (two toggles)
+        // toggles [0, 2]: frames 0-1 are mirrored, frame 2 flips back.
         const recipe = makeRecipe({
             duration: 4,
             mirrorToggles: [0, 2],
         });
 
         const result = compileTimeline(recipe, sources);
-        assert.ok(result.parts.length > 0, "should produce parts");
-        assert.strictEqual(result.parts[0].frames.length, 4);
+
+        const headFrames = result.parts.find(
+            (p) => p.partName === "Head",
+        )?.frames;
+        assert.ok(headFrames);
+        assert.deepStrictEqual(headFrames[0], mirroredHead);
+        assert.deepStrictEqual(headFrames[1], mirroredHead);
+        assert.deepStrictEqual(headFrames[2], unmirroredHead);
+        assert.deepStrictEqual(headFrames[3], unmirroredHead);
     });
 });
 
