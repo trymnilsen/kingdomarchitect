@@ -14,6 +14,11 @@ export type ColumnDef = {
 
 export type IndexDef = {
     name: string;
+    /**
+     * SQLite reads this as a column name, IndexedDB as a property path on the
+     * stored object. On a store that compiles to both, only a name that works
+     * as both will index anything.
+     */
     keyPath: string;
     unique?: boolean;
 };
@@ -71,9 +76,6 @@ export const gameMigrations: StoreMigration[] = [
                     { name: "x", type: "real", notNull: true },
                     { name: "y", type: "real", notNull: true },
                     { name: "components", type: "text", notNull: true },
-                ],
-                indexes: [
-                    { name: "parentId", keyPath: "parent_id", unique: false },
                 ],
             },
             {

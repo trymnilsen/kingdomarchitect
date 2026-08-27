@@ -33,7 +33,7 @@ function createTestFire(
     y: number = 0,
 ): Entity {
     const fire = new Entity(id);
-    const fireComponent = createFireSourceComponent(15, passiveRate, 1);
+    const fireComponent = createFireSourceComponent(15, passiveRate);
     fireComponent.isActive = active;
     fire.setEcsComponent(fireComponent);
     fire.worldPosition = { x, y };

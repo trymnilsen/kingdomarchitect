@@ -1,4 +1,5 @@
 import type { Components } from "../../game/component/component.ts";
+import { deepEquals } from "./diffComponent.ts";
 import type { DeltaOperation, PropertyPath } from "./deltaTypes.ts";
 
 /**
@@ -259,5 +260,13 @@ function applySetDelete(
     if (!(target instanceof Set)) {
         throw new Error(`Expected Set at path ${path.join(".")}`);
     }
-    target.delete(value);
+    // diffSet detects removals with deep equality, so the member we are told to
+    // delete is a structural copy and never the same reference as the one held
+    // by this Set. Native Set.delete would silently do nothing.
+    for (const member of target) {
+        if (deepEquals(member, value)) {
+            target.delete(member);
+            return;
+        }
+    }
 }

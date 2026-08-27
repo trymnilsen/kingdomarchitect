@@ -30,7 +30,7 @@ function createTestCamp(id: string = "camp-1"): Entity {
 
 function createTestFireSource(active: boolean = true): Entity {
     const fire = new Entity("fire-1");
-    const fireComponent = createFireSourceComponent(15, 2, 1);
+    const fireComponent = createFireSourceComponent(15, 2);
     fireComponent.isActive = active;
     fire.setEcsComponent(fireComponent);
     return fire;

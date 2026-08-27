@@ -2,6 +2,7 @@ import assert from "node:assert";
 import { describe, it } from "node:test";
 import { DatabaseSync } from "node:sqlite";
 import {
+    authMigrations,
     gameMigrations,
     type StoreMigration,
 } from "../../../src/server/persistence/migration.ts";
@@ -45,7 +46,7 @@ describe("SQLite Schema Migrations", () => {
 
     it("creates indexes defined in migration operations", () => {
         const db = new DatabaseSync(":memory:");
-        applySQLiteMigrations(db, gameMigrations);
+        applySQLiteMigrations(db, [...gameMigrations, ...authMigrations]);
 
         const indexes = db
             .prepare(
@@ -55,8 +56,12 @@ describe("SQLite Schema Migrations", () => {
 
         const indexNames = indexes.map((i) => i.name);
         assert.ok(
-            indexNames.includes("idx_entities_parentId"),
-            "parentId index should exist",
+            indexNames.includes("idx_credentials_player"),
+            "credentials player index should exist",
+        );
+        assert.ok(
+            indexNames.includes("idx_sessions_expires"),
+            "sessions expires index should exist",
         );
 
         db.close();

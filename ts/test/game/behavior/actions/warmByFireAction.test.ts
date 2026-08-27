@@ -26,7 +26,7 @@ function createTestFire(
     y: number = 0,
 ): Entity {
     const fire = new Entity("fire-1");
-    const fireComponent = createFireSourceComponent(15, 2, 1);
+    const fireComponent = createFireSourceComponent(15, 2);
     fireComponent.isActive = active;
     fire.setEcsComponent(fireComponent);
     fire.position = { x, y };

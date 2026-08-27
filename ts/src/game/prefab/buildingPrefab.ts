@@ -157,7 +157,7 @@ export function applyFunctionalComponents(
         entity.invalidateComponent(ProductionComponentId);
     }
     if (building.id == goblinCampfire.id) {
-        entity.setEcsComponent(createFireSourceComponent(15, 2, 1));
+        entity.setEcsComponent(createFireSourceComponent(15, 2));
         entity.invalidateComponent(FireSourceComponentId);
     }
     if (building.id == goblinHut.id) {

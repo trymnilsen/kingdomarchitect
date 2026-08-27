@@ -59,7 +59,7 @@ function createTestCampfire(
     const fire = new Entity(id);
     const buildingComponent = createBuildingComponent(goblinCampfire, false);
     fire.setEcsComponent(buildingComponent);
-    const fireComponent = createFireSourceComponent(15, 2, 1);
+    const fireComponent = createFireSourceComponent(15, 2);
     fireComponent.isActive = active;
     fire.setEcsComponent(fireComponent);
     fire.position = { x: 12, y: 8 };

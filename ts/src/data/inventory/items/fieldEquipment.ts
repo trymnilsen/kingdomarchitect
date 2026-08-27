@@ -13,3 +13,5 @@ export const bedrollItem = {
     hint: "A compact sleeping roll for camp use",
     rarity: ItemRarity.Common,
 } as const;
+
+export const fieldEquipment = [bedrollItem] as const;

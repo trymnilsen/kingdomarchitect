@@ -58,7 +58,7 @@ export function goblinFireplace(): Entity {
     const loopingAnimation = loopAnimation(spriteRefs.stone_brazier, 4);
     entity.setEcsComponent(createAnimationComponent(loopingAnimation));
     entity.setEcsComponent(createSpriteComponent(spriteRefs.stone_brazier));
-    entity.setEcsComponent(createFireSourceComponent(15, 2, 1));
+    entity.setEcsComponent(createFireSourceComponent(15, 2));
     // The camp fire is a real light: a scouted camp glows at night. Ownership
     // keeps it out of the player's hearthlight, so it lights without claiming.
     entity.setEcsComponent(createLightSourceComponent(campfireLightSource.id));

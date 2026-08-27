@@ -4,17 +4,8 @@ import {
     rgbToHex,
     type RgbColor,
 } from "../../common/color/hexColor.ts";
-
-/**
- * Defines a 2D position.
- */
-interface Position {
-    x: number;
-    y: number;
-}
-
-// The fixed size of a chunk.
-const CHUNK_SIZE = 8;
+import type { Point } from "../../common/point.ts";
+import { ChunkSize } from "./chunk.ts";
 
 /**
  * A simple deterministic PRNG (Pseudo-Random Number Generator) based on tile coordinates and a seed.
@@ -46,8 +37,8 @@ function prng(x: number, y: number, seed: number): number {
  */
 export function getTileColorVariation(
     baseHex: string,
-    chunkPos: Position,
-    tilePos: Position,
+    chunkPos: Point,
+    tilePos: Point,
     maxVariation: number = 20,
 ): string {
     const rgb = hexToRgb(baseHex);
@@ -57,8 +48,8 @@ export function getTileColorVariation(
     }
 
     // 1. Calculate global tile coordinates
-    const globalX = chunkPos.x * CHUNK_SIZE + tilePos.x;
-    const globalY = chunkPos.y * CHUNK_SIZE + tilePos.y;
+    const globalX = chunkPos.x * ChunkSize + tilePos.x;
+    const globalY = chunkPos.y * ChunkSize + tilePos.y;
 
     const offset = Math.floor((prng(globalX, globalY, 1) - 0.5) * maxVariation);
 

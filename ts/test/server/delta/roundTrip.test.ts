@@ -135,6 +135,19 @@ describe("diff -> apply round-trip", () => {
         );
     });
 
+    it("deletes object-valued Set members that only match by value", () => {
+        assertRoundTrip(
+            {
+                id: "test",
+                claims: new Set([
+                    { x: 12, y: 8 },
+                    { x: 3, y: 19 },
+                ]),
+            },
+            { id: "test", claims: new Set([{ x: 3, y: 19 }]) },
+        );
+    });
+
     it("handles mixed changes across multiple fields", () => {
         assertRoundTrip(
             {
