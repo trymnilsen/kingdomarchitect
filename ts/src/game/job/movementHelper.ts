@@ -10,7 +10,7 @@ import {
     DirectionComponentId,
     updateDirectionComponent,
 } from "../component/directionComponent.ts";
-import { getPathfindingGraphForEntity } from "../map/path/getPathfindingGraphForEntity.ts";
+import { getPathfindingGraph } from "../map/path/getPathfindingGraph.ts";
 import { discoverFootprint } from "../map/discoverFootprint.ts";
 import {
     MovementStaminaComponentId,
@@ -34,7 +34,7 @@ export function doMovement(
     const root = entity.getRootEntity();
 
     // Get the pathfinding graph for the entity's space
-    const pathfindingGraph = getPathfindingGraphForEntity(root, entity);
+    const pathfindingGraph = getPathfindingGraph(root);
     if (!pathfindingGraph) {
         return MovementResult.Failure;
     }

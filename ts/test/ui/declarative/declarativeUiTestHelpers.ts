@@ -131,8 +131,7 @@ export function createTestComponentContext<P extends {}>(
         },
         withEffect: () => {},
         withRemember: <T>(factory: () => T) => factory(),
-        withPointerState: () =>
-            options.pointerFlags ?? { pressed: false, hovered: false },
+        withPointerState: () => options.pointerFlags ?? { pressed: false },
         withPointerTap: (handler) => {
             drawCapture.taps.push(handler);
         },

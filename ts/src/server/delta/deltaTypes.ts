@@ -15,8 +15,6 @@
  * See diffComponent.ts for the diff side and applyDelta.ts for the apply side.
  */
 
-import type { ComponentID } from "../../game/component/component.ts";
-
 /**
  * A path to a property within a component.
  * Can be a mix of string keys and numeric indices.
@@ -110,13 +108,3 @@ export type DeltaOperation =
     | MapDeleteOperation
     | SetAddOperation
     | SetDeleteOperation;
-
-/**
- * A delta update for a component, containing a list of operations
- * to transform the component from its previous state to its current state.
- */
-export type ComponentDelta = {
-    entityId: string;
-    componentId: ComponentID;
-    operations: DeltaOperation[];
-};

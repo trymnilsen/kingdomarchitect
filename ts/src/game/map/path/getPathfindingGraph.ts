@@ -6,17 +6,13 @@ import {
 } from "../../component/pathfindingGraphComponent.ts";
 
 /**
- * Gets the pathfinding graph for an entity from the root entity.
- * This is a convenience function that retrieves the global pathfinding graph.
+ * The world's pathfinding graph, held on the root entity. There is one graph
+ * for everything that moves.
  *
  * @param root The root entity containing the PathfindingGraphComponent
- * @param _entity The entity (unused, kept for backwards compatibility)
  * @returns The PathfindingGraph or null if not found
  */
-export function getPathfindingGraphForEntity(
-    root: Entity,
-    _entity: Entity,
-): PathfindingGraph | null {
+export function getPathfindingGraph(root: Entity): PathfindingGraph | null {
     const pathfindingGraphComponent = root.getEcsComponent(
         PathfindingGraphComponentId,
     );

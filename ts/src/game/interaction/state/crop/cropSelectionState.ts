@@ -5,7 +5,7 @@ import {
     FarmComponentId,
     type FarmComponent,
 } from "../../../component/farmComponent.ts";
-import { getAvailableCrops } from "../../../../data/crop/cropDefinitions.ts";
+import { cropDefinitions } from "../../../../data/crop/cropDefinitions.ts";
 import { bookSelectionView } from "../../view/bookSelectionView.ts";
 import { SetFarmCropCommand } from "../../../../server/message/command/setFarmCropCommand.ts";
 
@@ -33,17 +33,16 @@ export class CropSelectionState extends InteractionState {
         this._entity = entity;
         this._farmComponent = farmComponent;
 
-        // Seed the selection from the farm's current crop. Falls back to the
-        // first available crop when the current crop is not (or no longer)
-        // selectable, e.g. once unlock gating filters the list.
-        const currentIndex = getAvailableCrops().findIndex(
+        // Seed the selection from the farm's current crop, falling back to the
+        // first crop when the farm holds one the book does not list.
+        const currentIndex = cropDefinitions.findIndex(
             (crop) => crop.cropId === farmComponent.cropId,
         );
         this._selectedCropIndex = currentIndex >= 0 ? currentIndex : 0;
     }
 
     override getView(): ComponentDescriptor | null {
-        const crops = getAvailableCrops();
+        const crops = cropDefinitions;
         return bookSelectionView({
             entries: crops,
             currentIndex: crops.findIndex(

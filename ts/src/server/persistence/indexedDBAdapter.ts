@@ -130,11 +130,6 @@ export class IndexedDBAdapter implements PersistenceAdapter {
         );
     }
 
-    async saveEntity(entity: SerializedEntity): Promise<void> {
-        // Delegate to batch save for consistency
-        await this.saveEntities([entity]);
-    }
-
     async saveEntities(entities: SerializedEntity[]): Promise<void> {
         if (entities.length === 0) {
             return;
@@ -203,26 +198,6 @@ export class IndexedDBAdapter implements PersistenceAdapter {
 
                 request.onerror = () => {
                     reject(new Error("Failed to load entities"));
-                };
-            }),
-        );
-    }
-
-    async deleteEntity(entityId: string): Promise<void> {
-        const db = await this.ensureDb();
-
-        return this.track(
-            new Promise((resolve, reject) => {
-                const transaction = db.transaction([ENTITY_STORE], "readwrite");
-                const store = transaction.objectStore(ENTITY_STORE);
-                const request = store.delete(entityId);
-
-                request.onsuccess = () => {
-                    resolve();
-                };
-
-                request.onerror = () => {
-                    reject(new Error(`Failed to delete entity ${entityId}`));
                 };
             }),
         );

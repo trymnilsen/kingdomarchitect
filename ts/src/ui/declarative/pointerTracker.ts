@@ -2,15 +2,14 @@ import type { UiNode } from "./ui.ts";
 
 /**
  * Pointer-interaction flags a component reads via `withPointerState()`. A flag
- * is true when the component instance is part of that interaction chain. The
- * hovered flag isn't wired to any input yet. See {@link PointerTracker.setHovered}.
+ * is true when the component instance is part of that interaction chain.
  */
-export type PointerFlags = { pressed: boolean; hovered: boolean };
+export type PointerFlags = { pressed: boolean };
 
 /**
- * Stores the pointer-capture state for the current gesture, and later hover.
- * The UiRenderer composes one of these so the state lives in one place outside
- * the renderer's own fields.
+ * Stores the pointer-capture state for the current gesture. The UiRenderer
+ * composes one of these so the state lives in one place outside the renderer's
+ * own fields.
  *
  * A gesture follows capture semantics: the interactive chain hit on pointer
  * down becomes the captured chain and owns the gesture until it ends. The
@@ -29,7 +28,6 @@ export type PointerFlags = { pressed: boolean; hovered: boolean };
 export class PointerTracker {
     private captured = new Set<UiNode>();
     private pressed = new Set<UiNode>();
-    private hovered = new Set<UiNode>();
     private captureActive = false;
 
     /**
@@ -79,20 +77,6 @@ export class PointerTracker {
     }
 
     /**
-     * Replaces the hovered chain. Nothing calls this yet. Hover will get an
-     * input source once pointer-move outside a capture is forwarded to the
-     * renderer. It's here now to keep the hover shape in place.
-     */
-    setHovered(chain: UiNode[]): void {
-        this.hovered = new Set(chain);
-    }
-
-    /** Clears the hovered chain. */
-    clearHovered(): void {
-        this.hovered.clear();
-    }
-
-    /**
      * Removes a node from every relationship. The renderer calls this when a
      * node unmounts so a component that disappears mid-press leaves nothing
      * behind. The capture itself stays active, see {@link hasCapture}.
@@ -100,12 +84,6 @@ export class PointerTracker {
     forget(node: UiNode): void {
         this.captured.delete(node);
         this.pressed.delete(node);
-        this.hovered.delete(node);
-    }
-
-    /** Whether a node is in the pressed visual set. */
-    isPressed(node: UiNode): boolean {
-        return this.pressed.has(node);
     }
 
     /**
@@ -115,9 +93,6 @@ export class PointerTracker {
      * render rather than stored, so it can never go stale.
      */
     flagsFor(node: UiNode): PointerFlags {
-        return {
-            pressed: this.pressed.has(node),
-            hovered: this.hovered.has(node),
-        };
+        return { pressed: this.pressed.has(node) };
     }
 }

@@ -316,37 +316,6 @@ function getAnimationBounds(animation: CharacterAnimation): Rectangle {
 }
 
 /**
- * Draw a single part's pixels to the sprite sheet
- */
-function drawPartPixels(
-    offscreenScope: RenderScope,
-    frameData: readonly number[],
-    frameBaseX: number,
-    frameBaseY: number,
-    contentCenterX: number,
-    contentCenterY: number,
-    animationBounds: Rectangle,
-    color: string,
-) {
-    for (let i = 0; i < frameData.length; i += 2) {
-        const x = frameData[i];
-        const y = frameData[i + 1];
-
-        // Adjust coordinates to center content relative to animation bounds
-        const adjustedX = frameBaseX + contentCenterX + (x - animationBounds.x);
-        const adjustedY = frameBaseY + contentCenterY + (y - animationBounds.y);
-
-        offscreenScope.drawScreenSpaceRectangle({
-            x: adjustedX,
-            y: adjustedY,
-            width: 1,
-            height: 1,
-            fill: color,
-        });
-    }
-}
-
-/**
  * Generate outline pixels from a set of pixels
  * Outlines are drawn on top, left, and right sides, but not on the bottom
  * @param pixelSet Set of pixel coordinates as "x,y" strings

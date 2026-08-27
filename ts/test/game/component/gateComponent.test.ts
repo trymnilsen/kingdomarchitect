@@ -3,9 +3,7 @@ import { describe, it } from "node:test";
 import { spriteRefs } from "../../../src/asset/sprite.ts";
 import { gate } from "../../../src/data/building/stone/gate.ts";
 import {
-    gateSprite,
     GateComponentId,
-    GateOrientation,
     setGateOpen,
 } from "../../../src/game/component/gateComponent.ts";
 import { isImpassableStructure } from "../../../src/game/component/traversalComponent.ts";
@@ -45,19 +43,6 @@ describe("gate", () => {
         assert.strictEqual(
             entity.requireEcsComponent(SpriteComponentId).sprite.spriteId,
             spriteRefs.gate_horizontal.spriteId,
-        );
-    });
-
-    it("draws one sprite for a vertical gate in both states", () => {
-        // Seen along its axis the swinging part is not visible, so open and
-        // shut are the same picture. Passability still has to differ.
-        assert.strictEqual(
-            gateSprite(true, GateOrientation.Vertical).spriteId,
-            spriteRefs.gate_vertical.spriteId,
-        );
-        assert.strictEqual(
-            gateSprite(false, GateOrientation.Vertical).spriteId,
-            spriteRefs.gate_vertical.spriteId,
         );
     });
 

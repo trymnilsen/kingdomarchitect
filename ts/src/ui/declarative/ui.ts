@@ -110,9 +110,8 @@ export type ComponentContext<P extends {}> = {
     withRemember: <T>(factory: () => T, deps?: any[]) => T;
     /**
      * Reads this component's pointer flags ({@link PointerFlags}) and marks it
-     * as an interactive hit-test target. Tells the component whether it is
-     * pressed, and later hovered. The flags come from the renderer fresh each
-     * render, so the component just reads them again on the render after a
+     * as an interactive hit-test target. The flags come from the renderer fresh
+     * each render, so the component just reads them again on the render after a
      * pointer event.
      */
     withPointerState: () => PointerFlags;
@@ -258,7 +257,6 @@ export class UiRenderer {
      */
     public onPointerMove(point: Point): void {
         if (!this.pointer.hasCapture()) {
-            // Future home for hover: hit-test and setHovered here.
             return;
         }
         this.pointer.moveCapture(this.interactiveChainAt(point));
@@ -442,9 +440,6 @@ export class UiRenderer {
         oldNode: UiNode | undefined,
         descriptor: ComponentDescriptor,
     ): UiNode {
-        const nodeType = descriptor.type?.name || descriptor.type || "unknown";
-        const nodeKey = descriptor.key || "no-key";
-
         if (
             oldNode &&
             oldNode.descriptor.type === descriptor.type &&
@@ -549,9 +544,6 @@ export class UiRenderer {
     private _cleanupNode(node: UiNode) {
         // Run cleanup functions for all effects before removing the node.
         const nodeHooks = this.hooks.get(node);
-        const nodeType =
-            node.descriptor.type?.name || node.descriptor.type || "unknown";
-        const nodeKey = node.descriptor.key || "no-key";
         if (nodeHooks) {
             for (const effect of nodeHooks.effects) {
                 effect.cleanup?.();
@@ -570,7 +562,7 @@ export class UiRenderer {
         }
 
         // Forget the node so one that's going away doesn't stay in the pressed
-        // or hovered set.
+        // set.
         this.pointer.forget(node);
         this.hooks.delete(node);
     }
@@ -629,7 +621,7 @@ export class UiRenderer {
             },
             withPointerState: () => {
                 if (isMeasurePass) {
-                    return { pressed: false, hovered: false };
+                    return { pressed: false };
                 }
                 const nodeHooks = this.hooks.get(node) ?? {
                     effects: [],

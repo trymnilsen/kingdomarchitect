@@ -8,7 +8,7 @@ import { HealthComponentId } from "../../../component/healthComponent.ts";
 import { isImpassableStructure } from "../../../component/traversalComponent.ts";
 import { queryEntity } from "../../../map/query/queryEntity.ts";
 import { queryPath } from "../../../map/query/pathQuery.ts";
-import { getPathfindingGraphForEntity } from "../../../map/path/getPathfindingGraphForEntity.ts";
+import { getPathfindingGraph } from "../../../map/path/getPathfindingGraph.ts";
 import { goblinSiegeModifier } from "../../../raid/goblinSiegeModifier.ts";
 import { RAID_UTILITY } from "../../../raid/raidConstants.ts";
 import {
@@ -109,7 +109,7 @@ function nextSiegeObstacle(
     entity: Entity,
     target: Entity,
 ): Entity | null {
-    const pathfindingGraph = getPathfindingGraphForEntity(root, entity);
+    const pathfindingGraph = getPathfindingGraph(root);
     if (!pathfindingGraph) {
         return null;
     }

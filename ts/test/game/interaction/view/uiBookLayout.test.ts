@@ -340,7 +340,7 @@ describe("UiBookLayout", () => {
             withDraw: (_fn: any) => {},
             withEffect: (_fn: any) => {},
             withRemember: <T>(factory: () => T) => factory(),
-            withPointerState: () => ({ pressed: false, hovered: false }),
+            withPointerState: () => ({ pressed: false }),
             withPointerTap: (_handler: any) => {},
         };
 

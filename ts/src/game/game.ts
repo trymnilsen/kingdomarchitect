@@ -1,5 +1,5 @@
 import { log } from "../common/logging/logger.ts";
-import { multiplyPoint, type Point } from "../common/point.ts";
+import { multiplyPoint } from "../common/point.ts";
 import { AssetLoader } from "../asset/loader/assetLoader.ts";
 
 import { GameTime } from "./gameTime.ts";
@@ -23,7 +23,6 @@ import { createVisibilityMapComponent } from "./component/visibilityMapComponent
 import { handleGameMessage } from "../server/message/gameMessageHandler.ts";
 import { createAnimationSystem } from "./system/animationSystem.ts";
 import { createJobQueueComponent } from "./component/jobQueueComponent.ts";
-import { createTileComponent } from "./component/tileComponent.ts";
 import { createSpriteEquipmentSystem } from "./system/spriteEquipmentSystem.ts";
 import { createAttackVfxSystem } from "./system/attackVfxSystem.ts";
 import { despawnTimerSystem } from "./system/despawnTimerSystem.ts";
@@ -203,11 +202,6 @@ export class Game {
         this.renderer.context.drawTick = this.drawTick;
         this.render(DrawMode.Tick);
     };
-
-    private updateCamera(newPosition: Point) {
-        this.renderer.camera.position = newPosition;
-        this.render(DrawMode.Gesture);
-    }
 
     private onInput(inputEvent: InputEvent) {
         this.interactionHandler.onInput(inputEvent.action);

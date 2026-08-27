@@ -19,14 +19,6 @@ export class SpriteRegistry {
     }
 
     /**
-     * Check if a dynamic sprite is registered.
-     */
-    hasSprite(ref: SpriteRef): boolean {
-        const key = this.makeKey(ref);
-        return this.dynamicSprites.has(key);
-    }
-
-    /**
      * Resolve a SpriteRef to a SpriteDefinition.
      * First checks dynamic sprites, then falls back to static sprites.
      * Returns undefined if the sprite is not found.
@@ -47,18 +39,6 @@ export class SpriteRegistry {
         }
 
         return def as SpriteDefinition;
-    }
-
-    /**
-     * Clear all dynamic sprites for a specific bin.
-     * Useful when regenerating character sprites.
-     */
-    clearBin(binId: string): void {
-        for (const [key] of this.dynamicSprites) {
-            if (key.startsWith(binId + ":")) {
-                this.dynamicSprites.delete(key);
-            }
-        }
     }
 
     private makeKey(ref: SpriteRef): string {

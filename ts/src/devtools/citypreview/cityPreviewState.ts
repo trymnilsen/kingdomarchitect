@@ -14,7 +14,6 @@ export type CityPreviewState = {
     root: Entity;
     biome: BiomeType;
     seed: number;
-    fate: string;
     currentTick: number;
     log: string[];
 };
@@ -47,7 +46,6 @@ export function createInitialState(
         root,
         biome,
         seed,
-        fate: "none",
         currentTick: 0,
         log: [],
     };

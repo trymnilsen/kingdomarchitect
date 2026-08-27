@@ -51,18 +51,6 @@ export class PersistenceManager {
     }
 
     /**
-     * Save an entity and all its descendants recursively.
-     * Uses batched saving for performance.
-     * @param rootEntity The entity to start the subtree save from
-     */
-    async saveSubtree(rootEntity: Entity): Promise<void> {
-        const entitiesToSave: SerializedEntity[] = [];
-        this.collectSubtree(rootEntity, entitiesToSave);
-
-        await this.adapter.saveEntities(entitiesToSave);
-    }
-
-    /**
      * Save the entire world (all children of root and root components).
      * Uses batched saving for performance.
      * @param root The root entity of the world
@@ -166,13 +154,6 @@ export class PersistenceManager {
         }
 
         return true;
-    }
-
-    /**
-     * Delete an entity from storage
-     */
-    deleteEntity(entityId: string): Promise<void> {
-        return this.adapter.deleteEntity(entityId);
     }
 
     clearGame(): Promise<void> {

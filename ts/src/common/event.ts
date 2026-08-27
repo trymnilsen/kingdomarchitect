@@ -139,23 +139,6 @@ export class ForwardEvent<T> implements EventListener<T> {
     }
 }
 
-export const LifecycleStatus = {
-    Alive: 0,
-    Stopped: 1,
-} as const;
-
-export type LifecycleStatus =
-    (typeof LifecycleStatus)[keyof typeof LifecycleStatus];
-
-export class Lifecycle implements EventListener<LifecycleStatus> {
-    listen(): EventHandle {
-        throw new Error("Method not implemented.");
-    }
-    listenOnce(): EventHandle {
-        throw new Error("Method not implemented.");
-    }
-}
-
 /**
  * An event that allows listening for a specific event type.
  * Discrimination is done based on the name of the constructor for the type.

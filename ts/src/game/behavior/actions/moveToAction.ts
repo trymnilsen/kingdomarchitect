@@ -14,7 +14,7 @@ import {
 import { ResourceComponentId } from "../../component/resourceComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { applyStep } from "../../job/movementHelper.ts";
-import { getPathfindingGraphForEntity } from "../../map/path/getPathfindingGraphForEntity.ts";
+import { getPathfindingGraph } from "../../map/path/getPathfindingGraph.ts";
 import type { GraphNode } from "../../map/path/graph/graph.ts";
 import { isTileAvailable } from "../../map/path/graph/weight.ts";
 import { queryEntity } from "../../map/query/queryEntity.ts";
@@ -90,7 +90,7 @@ export function executeMoveToAction(
     }
 
     const root = entity.getRootEntity();
-    const pathfindingGraph = getPathfindingGraphForEntity(root, entity);
+    const pathfindingGraph = getPathfindingGraph(root);
     if (!pathfindingGraph) {
         log.warn(`${entity.id} no pathfinding graph, failing`);
         return {
@@ -295,7 +295,7 @@ function makePathModifier(
  * Returns the path array or null if no path exists.
  */
 function planPath(
-    pathfindingGraph: ReturnType<typeof getPathfindingGraphForEntity>,
+    pathfindingGraph: ReturnType<typeof getPathfindingGraph>,
     root: Entity,
     from: Point,
     target: Point,
@@ -335,7 +335,7 @@ type DisplacementResolution =
  */
 function ensureCachedPath(
     action: MoveToActionData,
-    pathfindingGraph: ReturnType<typeof getPathfindingGraphForEntity>,
+    pathfindingGraph: ReturnType<typeof getPathfindingGraph>,
     root: Entity,
     entity: Entity,
 ): ActionResult | null {
@@ -384,7 +384,7 @@ function resolveDisplacedTile(
     action: MoveToActionData,
     nextPoint: Point,
     displaceable: Entity[],
-    pathfindingGraph: ReturnType<typeof getPathfindingGraphForEntity>,
+    pathfindingGraph: ReturnType<typeof getPathfindingGraph>,
     root: Entity,
     tick: number,
     locallyBlocked: Set<string>,

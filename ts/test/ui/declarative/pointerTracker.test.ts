@@ -34,9 +34,9 @@ describe("PointerTracker", () => {
         tracker.beginCapture([first]);
         tracker.beginCapture([second]);
 
-        assert.strictEqual(tracker.isPressed(first), false);
+        assert.strictEqual(tracker.flagsFor(first).pressed, false);
         assert.strictEqual(tracker.isCaptured(first), false);
-        assert.strictEqual(tracker.isPressed(second), true);
+        assert.strictEqual(tracker.flagsFor(second).pressed, true);
         assert.strictEqual(tracker.isCaptured(second), true);
     });
 
@@ -56,9 +56,9 @@ describe("PointerTracker", () => {
         tracker.beginCapture([container, child]);
         tracker.moveCapture([container]);
 
-        assert.strictEqual(tracker.isPressed(child), false);
+        assert.strictEqual(tracker.flagsFor(child).pressed, false);
         assert.strictEqual(tracker.isCaptured(child), true);
-        assert.strictEqual(tracker.isPressed(container), true);
+        assert.strictEqual(tracker.flagsFor(container).pressed, true);
     });
 
     it("moveCapture re-presses a node the pointer returns to", () => {
@@ -67,10 +67,10 @@ describe("PointerTracker", () => {
 
         tracker.beginCapture([node]);
         tracker.moveCapture([]);
-        assert.strictEqual(tracker.isPressed(node), false);
+        assert.strictEqual(tracker.flagsFor(node).pressed, false);
 
         tracker.moveCapture([node]);
-        assert.strictEqual(tracker.isPressed(node), true);
+        assert.strictEqual(tracker.flagsFor(node).pressed, true);
     });
 
     it("moveCapture never presses a node outside the captured chain", () => {
@@ -81,7 +81,7 @@ describe("PointerTracker", () => {
         tracker.beginCapture([captured]);
         tracker.moveCapture([other]);
 
-        assert.strictEqual(tracker.isPressed(other), false);
+        assert.strictEqual(tracker.flagsFor(other).pressed, false);
         assert.strictEqual(tracker.isCaptured(other), false);
     });
 
@@ -91,7 +91,7 @@ describe("PointerTracker", () => {
 
         tracker.moveCapture([node]);
 
-        assert.strictEqual(tracker.isPressed(node), false);
+        assert.strictEqual(tracker.flagsFor(node).pressed, false);
         assert.strictEqual(tracker.hasCapture(), false);
     });
 
@@ -103,7 +103,7 @@ describe("PointerTracker", () => {
         tracker.endCapture();
 
         assert.strictEqual(tracker.hasCapture(), false);
-        assert.strictEqual(tracker.isPressed(node), false);
+        assert.strictEqual(tracker.flagsFor(node).pressed, false);
         assert.strictEqual(tracker.isCaptured(node), false);
     });
 
@@ -113,12 +113,9 @@ describe("PointerTracker", () => {
         const b = fakeNode();
 
         tracker.beginCapture([a, b]);
-        tracker.setHovered([a]);
         tracker.forget(a);
 
-        const flagsA = tracker.flagsFor(a);
-        assert.strictEqual(flagsA.pressed, false);
-        assert.strictEqual(flagsA.hovered, false);
+        assert.strictEqual(tracker.flagsFor(a).pressed, false);
         assert.strictEqual(tracker.isCaptured(a), false);
         assert.strictEqual(tracker.flagsFor(b).pressed, true);
         assert.strictEqual(
@@ -128,25 +125,18 @@ describe("PointerTracker", () => {
         );
     });
 
-    it("tracks pressed and hovered independently", () => {
+    it("only reports the nodes in the current gesture as pressed", () => {
         const tracker = new PointerTracker();
         const pressedNode = fakeNode();
-        const hoveredNode = fakeNode();
+        const untouchedNode = fakeNode();
 
         tracker.beginCapture([pressedNode]);
-        tracker.setHovered([hoveredNode]);
 
         assert.deepStrictEqual(tracker.flagsFor(pressedNode), {
             pressed: true,
-            hovered: false,
         });
-        assert.deepStrictEqual(tracker.flagsFor(hoveredNode), {
+        assert.deepStrictEqual(tracker.flagsFor(untouchedNode), {
             pressed: false,
-            hovered: true,
         });
-
-        tracker.clearHovered();
-        assert.strictEqual(tracker.flagsFor(hoveredNode).hovered, false);
-        assert.strictEqual(tracker.flagsFor(pressedNode).pressed, true);
     });
 });

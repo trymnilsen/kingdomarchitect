@@ -99,7 +99,7 @@ describe("SQLiteAdapter", () => {
     describe("entities", () => {
         it("round-trips a single entity", async () => {
             const entity = makeEntity("e1", null, 12, 8);
-            await adapter.saveEntity(entity);
+            await adapter.saveEntities([entity]);
             const loaded = await adapter.loadEntities();
             assert.strictEqual(loaded.length, 1);
             assert.deepStrictEqual(loaded[0], entity);
@@ -117,23 +117,12 @@ describe("SQLiteAdapter", () => {
         });
 
         it("upserts entities with same ID", async () => {
-            await adapter.saveEntity(makeEntity("e1", null, 5, 10));
-            await adapter.saveEntity(makeEntity("e1", null, 99, 88));
+            await adapter.saveEntities([makeEntity("e1", null, 5, 10)]);
+            await adapter.saveEntities([makeEntity("e1", null, 99, 88)]);
             const loaded = await adapter.loadEntities();
             assert.strictEqual(loaded.length, 1);
             assert.strictEqual(loaded[0].x, 99);
             assert.strictEqual(loaded[0].y, 88);
-        });
-
-        it("deletes a specific entity", async () => {
-            await adapter.saveEntities([
-                makeEntity("e1", null, 5, 10),
-                makeEntity("e2", null, 15, 20),
-            ]);
-            await adapter.deleteEntity("e1");
-            const loaded = await adapter.loadEntities();
-            assert.strictEqual(loaded.length, 1);
-            assert.strictEqual(loaded[0].id, "e2");
         });
 
         it("clears all entities", async () => {
@@ -170,7 +159,7 @@ describe("SQLiteAdapter", () => {
                     },
                 },
             };
-            await adapter.saveEntity(entity);
+            await adapter.saveEntities([entity]);
             const loaded = await adapter.loadEntities();
             assert.deepStrictEqual(loaded[0], entity);
         });
@@ -201,7 +190,7 @@ describe("SQLiteAdapter", () => {
                 seed: 1,
                 idCounters: {},
             });
-            await adapter.saveEntity(makeEntity("e1", null, 5, 10));
+            await adapter.saveEntities([makeEntity("e1", null, 5, 10)]);
             await adapter.saveRootComponents({ test: { id: "test" } });
 
             await adapter.clearGame();

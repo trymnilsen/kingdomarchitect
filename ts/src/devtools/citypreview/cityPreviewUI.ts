@@ -19,8 +19,6 @@ export type CityPreviewCallbacks = {
     onAdvance: (ticks: number) => void;
     onReset: () => void;
     onBiomeChange: (biome: BiomeType) => void;
-    onFateChange: (fate: string) => void;
-    onSeedChange: (seed: number) => void;
 };
 
 export class CityPreviewUI {

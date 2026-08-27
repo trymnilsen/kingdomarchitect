@@ -9,7 +9,7 @@ import type { ComponentDescriptor } from "../../../../../ui/declarative/ui.ts";
 import { Entity } from "../../../../entity/entity.ts";
 import { InteractionState } from "../../../handler/interactionState.ts";
 import { uiScaffold } from "../../../view/uiScaffold.ts";
-import { getPathfindingGraphForEntity } from "../../../../map/path/getPathfindingGraphForEntity.ts";
+import { getPathfindingGraph } from "../../../../map/path/getPathfindingGraph.ts";
 import { queryEntity } from "../../../../map/query/queryEntity.ts";
 import type { SelectedWorldItem } from "../../../selection/selectedWorldItem.ts";
 import { SelectedEntityItem } from "../../../selection/selectedEntityItem.ts";
@@ -126,11 +126,7 @@ export class ActorContextActionState extends InteractionState {
             return true;
         } else {
             this.currentSelection = new SelectedTileItem(tile);
-            // Get the pathfinding graph
-            const pathfindingGraph = getPathfindingGraphForEntity(
-                this.context.root,
-                this.entity,
-            );
+            const pathfindingGraph = getPathfindingGraph(this.context.root);
             if (!pathfindingGraph) {
                 return false;
             }

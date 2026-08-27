@@ -43,21 +43,6 @@ export class SQLiteAdapter implements PersistenceAdapter {
             .run(JSON.stringify(meta));
     }
 
-    async saveEntity(entity: SerializedEntity): Promise<void> {
-        this.db
-            .prepare(
-                `INSERT OR REPLACE INTO entities (id, parent_id, x, y, components)
-                 VALUES (?, ?, ?, ?, ?)`,
-            )
-            .run(
-                entity.id,
-                entity.parentId,
-                entity.x,
-                entity.y,
-                JSON.stringify(entity.components),
-            );
-    }
-
     async saveEntities(entities: SerializedEntity[]): Promise<void> {
         const stmt = this.db.prepare(
             `INSERT OR REPLACE INTO entities (id, parent_id, x, y, components)
@@ -98,10 +83,6 @@ export class SQLiteAdapter implements PersistenceAdapter {
             y: row.y,
             components: JSON.parse(row.components),
         }));
-    }
-
-    async deleteEntity(entityId: string): Promise<void> {
-        this.db.prepare("DELETE FROM entities WHERE id = ?").run(entityId);
     }
 
     async clearEntities(): Promise<void> {
@@ -145,16 +126,4 @@ export class SQLiteAdapter implements PersistenceAdapter {
     close(): void {
         this.db.close();
     }
-}
-
-/**
- * Convenience factory that creates a SQLite database at the given path,
- * configures WAL mode, runs persistence migrations, and returns an adapter.
- */
-export function createSQLiteAdapter(dbPath: string): SQLiteAdapter {
-    const db = new DatabaseSync(dbPath);
-    db.exec("PRAGMA journal_mode=WAL");
-    db.exec("PRAGMA synchronous=NORMAL");
-    applySQLiteMigrations(db, gameMigrations);
-    return new SQLiteAdapter(db);
 }

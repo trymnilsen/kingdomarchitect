@@ -1,50 +1,34 @@
 /**
- * Tracks recent movement history for an entity to support displacement negotiation.
- * The rolling buffer of tick numbers backs the hard one-move-per-tick gate
- * (`hasMovedThisTick`) — has this entity already moved this tick? — which prevents
- * double-movement and lets the transaction commit detect stale negotiations.
+ * Backs the one-move-per-tick gate used by displacement negotiation. An entity
+ * that has already moved this tick cannot move again, which is also how the
+ * transaction commit spots a negotiation that has gone stale.
  */
 export type MovementStaminaComponent = {
     id: typeof MovementStaminaComponentId;
 
-    /** Rolling buffer of tick numbers when this entity moved. Newest entry is always last. */
-    recentMoveTicks: number[];
+    /** The tick this entity last moved on, or -1 if it never has. */
+    lastMoveTick: number;
 };
 
 export const MovementStaminaComponentId = "MovementStamina";
 
-/** Maximum number of recent move ticks to retain in the buffer. */
-const BUFFER_CAPACITY = 5;
-
 export function createMovementStaminaComponent(): MovementStaminaComponent {
     return {
         id: MovementStaminaComponentId,
-        recentMoveTicks: [],
+        lastMoveTick: -1,
     };
 }
 
-/**
- * Record that this entity moved at the given tick.
- * Pushes the tick to the end of the buffer, dropping the oldest entry if at capacity.
- */
 export function recordMove(
     component: MovementStaminaComponent,
     tick: number,
 ): void {
-    component.recentMoveTicks.push(tick);
-    if (component.recentMoveTicks.length > BUFFER_CAPACITY) {
-        component.recentMoveTicks.shift();
-    }
+    component.lastMoveTick = tick;
 }
 
-/**
- * Returns true if the entity has already moved during this tick.
- * An empty buffer means the entity has never moved, so returns false.
- */
 export function hasMovedThisTick(
     component: MovementStaminaComponent,
     tick: number,
 ): boolean {
-    const len = component.recentMoveTicks.length;
-    return len > 0 && component.recentMoveTicks[len - 1] === tick;
+    return component.lastMoveTick === tick;
 }

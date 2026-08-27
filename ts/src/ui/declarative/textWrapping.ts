@@ -38,12 +38,9 @@ export function wrapTextToLines(
             if (currentLine) {
                 lines.push(currentLine);
             }
-            currentLine = fitWordToWidth(
-                word,
-                maxWidth,
-                textStyle,
-                measureText,
-            );
+            // A word wider than maxWidth still goes on its own line: nothing
+            // here breaks words mid-character.
+            currentLine = word;
         }
     }
 
@@ -52,19 +49,6 @@ export function wrapTextToLines(
     }
 
     return lines.length > 0 ? lines : [text];
-}
-
-function fitWordToWidth(
-    word: string,
-    maxWidth: number,
-    textStyle: TextStyle,
-    measureText: MeasureTextFn,
-): string {
-    const wordWidth = measureText(word, textStyle).width;
-    if (wordWidth <= maxWidth) {
-        return word;
-    }
-    return word;
 }
 
 /**

@@ -3,7 +3,7 @@ import { describe, it, beforeEach } from "node:test";
 import { DatabaseSync } from "node:sqlite";
 import { applySQLiteMigrations } from "../../../src/server/persistence/sqliteMigrationCompiler.ts";
 import { gameMigrations } from "../../../src/server/persistence/migration.ts";
-import { authMigrations } from "../../../src/server/auth/authSchema.ts";
+import { authMigrations } from "../../../src/server/persistence/migration.ts";
 import {
     createSession,
     validateSession,

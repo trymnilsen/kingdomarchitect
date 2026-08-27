@@ -82,15 +82,6 @@ type ScaffoldButton = {
     children?: ScaffoldButton[];
 };
 
-const MenuState = {
-    closed: 0,
-    left: 1,
-    main: 2,
-    other: 3,
-} as const;
-
-type MenuState = (typeof MenuState)[keyof typeof MenuState];
-
 type ExpandedMenuState = {
     expandedGroup: "left" | "right" | null;
     expandedPath: number[]; // [] = closed, [n] = button n expanded, [n, m] = button n's child m expanded
@@ -118,7 +109,6 @@ export const uiScaffold = createComponent<ScaffoldProps>(
                 log.info("Disposed ui scaffold");
             };
         });
-        const [_menuState, _setMenuState] = withState(MenuState.closed);
         const [expandedMenu, setExpandedMenu] = withState<ExpandedMenuState>({
             expandedGroup: null,
             expandedPath: [],

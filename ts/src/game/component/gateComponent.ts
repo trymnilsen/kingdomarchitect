@@ -45,32 +45,10 @@ export function createGateComponent(isOpen: boolean = false): GateComponent {
 }
 
 /**
- * Which way a gateway runs. Placement cannot rotate buildings, so every gate is
- * horizontal today. This exists as a parameter rather than stored state so that
- * nothing unsettable ends up in a save; when placement learns to rotate, the
- * orientation gets a home then.
+ * The sprite a gate should draw for its state. Placement cannot rotate
+ * buildings, so every gate runs horizontally.
  */
-export const GateOrientation = {
-    Horizontal: "horizontal",
-    Vertical: "vertical",
-} as const;
-
-export type GateOrientation =
-    (typeof GateOrientation)[keyof typeof GateOrientation];
-
-/**
- * The sprite a gate should draw for its orientation and state.
- *
- * The vertical gate uses one sprite for both states on purpose: seen along its
- * axis the part that swings is not visible, so there is nothing to redraw.
- */
-export function gateSprite(
-    isOpen: boolean,
-    orientation: GateOrientation = GateOrientation.Horizontal,
-): SpriteRef {
-    if (orientation === GateOrientation.Vertical) {
-        return spriteRefs.gate_vertical;
-    }
+export function gateSprite(isOpen: boolean): SpriteRef {
     if (isOpen) {
         return spriteRefs.gate_horizontal;
     }

@@ -23,29 +23,21 @@ export class TestAdapter implements PersistenceAdapter {
         this.meta = meta;
     }
 
-    async saveEntity(entity: SerializedEntity): Promise<void> {
-        const existingIndex = this.entities.findIndex(
-            (e) => e.id === entity.id,
-        );
-        if (existingIndex >= 0) {
-            this.entities[existingIndex] = entity;
-        } else {
-            this.entities.push(entity);
-        }
-    }
-
     async saveEntities(entities: SerializedEntity[]): Promise<void> {
         for (const entity of entities) {
-            await this.saveEntity(entity);
+            const existingIndex = this.entities.findIndex(
+                (e) => e.id === entity.id,
+            );
+            if (existingIndex >= 0) {
+                this.entities[existingIndex] = entity;
+            } else {
+                this.entities.push(entity);
+            }
         }
     }
 
     async loadEntities(): Promise<SerializedEntity[]> {
         return [...this.entities];
-    }
-
-    async deleteEntity(entityId: string): Promise<void> {
-        this.entities = this.entities.filter((e) => e.id !== entityId);
     }
 
     async clearEntities(): Promise<void> {

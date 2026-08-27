@@ -9,10 +9,8 @@ export type SleepQuality =
     | "collapse";
 
 /**
- * Failure causes carry enough context for behaviors to branch intelligently
- * when a replan is triggered. For example, keepWarmBehavior can see that
- * the path to fire was blocked and try a different fire, or fall back to
- * building a new one. Without cause, every failure would look the same.
+ * Why an action gave up. Reported when the behavior system logs the failure,
+ * so a stuck worker can be told apart from one whose target vanished.
  */
 export type FailureCause =
     | { type: "pathBlocked"; target: Point }
@@ -21,11 +19,6 @@ export type FailureCause =
     | { type: "noResources" }
     | { type: "stockpileFull"; stockpileId: string }
     | { type: "unknown" };
-
-export type ActionFailure = {
-    actionType: string;
-    cause: FailureCause;
-};
 
 export type ActionResult =
     | { kind: "complete" }

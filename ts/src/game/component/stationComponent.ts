@@ -1,14 +1,13 @@
 /**
- * Marks a building as exposing a single *station* — a post a worker stands on to
- * provide a passive, occupancy-driven effect (the stone tower's lookout/searchlight).
+ * Marks a building as exposing a single station, a post a worker stands on to
+ * provide a passive effect while it is occupied (the stone tower's searchlight).
  *
- * The component holds ONLY the player-set `priority`. `Off` means inert (no guard
- * pull); otherwise a free guard takes the highest-priority enabled station.
+ * The component holds only the player-set `priority`. `Off` means inert, with no
+ * guard pull; otherwise a free guard takes the highest-priority enabled station.
  *
- * Deliberately stores no reference to the occupying worker: who is currently manning
- * a station is derived live from physical co-location (see {@link visionReachModifiers}
- * and the garrison behavior), so there is nothing to dangle when a worker dies or
- * despawns. The effect lives on the *worker* standing on the tile, not on the station.
+ * Who is manning a station is derived from standing on its tile rather than
+ * stored here, so nothing dangles when a worker dies or despawns. The effect
+ * lives on the worker, not on the station.
  */
 export type StationPriority =
     (typeof StationPriority)[keyof typeof StationPriority];

@@ -75,14 +75,3 @@ export function getCropDefinition(cropId: CropId): CropDefinition {
         cropDefinitions[0]
     );
 }
-
-/**
- * Crops the player may currently choose for a farm. Today every crop is
- * available; this is the single seam where progression/unlock gating will later
- * filter the list (it will take a settlement/tech context argument). Keeping it
- * distinct from `cropDefinitions` means the selection UI never needs reworking
- * when gating arrives.
- */
-export function getAvailableCrops(): CropDefinition[] {
-    return cropDefinitions;
-}

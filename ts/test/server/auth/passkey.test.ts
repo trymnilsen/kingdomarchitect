@@ -7,7 +7,7 @@ import {
 } from "node:crypto";
 import { DatabaseSync } from "node:sqlite";
 import { beforeEach, describe, it } from "node:test";
-import { authMigrations } from "../../../src/server/auth/authSchema.ts";
+import { authMigrations } from "../../../src/server/persistence/migration.ts";
 import { ChallengeStore } from "../../../src/server/auth/challengeStore.ts";
 import {
     COSE_ALGORITHM_ES256,

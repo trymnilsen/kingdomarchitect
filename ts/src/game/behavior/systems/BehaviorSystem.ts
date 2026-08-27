@@ -125,15 +125,11 @@ function updateBehaviorAgent(
             }
         } else if (result.kind === "failed") {
             log.warn(
-                `Action failed for entity ${entity.id}, cleaning up and replanning`,
+                `Action ${action.type} failed for entity ${entity.id} (${result.cause.type}), cleaning up and replanning`,
             );
             unclaimCurrentJob(entity);
             clearBehavior(agent);
-            agent.pendingReplan = {
-                kind: "replanAfterFailure",
-                failure: { actionType: action.type, cause: result.cause },
-                since: tick,
-            };
+            agent.pendingReplan = { kind: "replan" };
         } else if (result.kind === "subaction") {
             log.info(
                 `Entity ${entity.id} action "${action.type}" suspended, inserting ${result.actions.length} subactions`,
@@ -207,9 +203,7 @@ function unclaimCurrentJob(entity: Entity): void {
 
 /**
  * Select and activate a behavior for the agent. Runs at a plan boundary (the
- * action queue is empty) or on a forced replan (pendingReplan set). pendingReplan
- * is cleared after expand() so behaviors can read failure context from the
- * component inside their expand() implementation.
+ * action queue is empty) or on a forced replan (pendingReplan set).
  */
 function selectBehavior(
     entity: Entity,
@@ -297,9 +291,6 @@ function selectBehavior(
     // expands to a non-empty plan. A behavior can be valid yet produce nothing
     // (its target vanished between isValid and expand, or every job it could
     // take turned out unplannable); going idle in that case would starve
-    // lower-utility behaviors that do have runnable work. pendingReplan stays
-    // set through the loop so every attempted expand can read the failure
-    // context from the component.
     //
     // Each expand is guarded because selection runs outside the per-action
     // try/catch in updateBehaviorAgent: an uncaught throw here would escape
@@ -335,7 +326,6 @@ function selectBehavior(
         // is what we want. A displaced worker needs a new path rather than the stale
         // cachedPath from its previous moveTo. There is no running head to preserve.
         agent.actionQueue = newActions;
-        // Clear after expand so the failure context is consumed
         agent.pendingReplan = undefined;
         log.info(
             `Entity ${entity.id} selected behavior ${candidate.behavior.name} with utility ${candidate.utility}`,

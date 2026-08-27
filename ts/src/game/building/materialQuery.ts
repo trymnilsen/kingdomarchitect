@@ -330,38 +330,6 @@ export function logMissingMaterials(
     }
 }
 
-/**
- * Find the nearest stockpile that has materials the worker still needs
- */
-export function findNearestStockpileForMaterials(
-    _root: Entity,
-    workerEntity: Entity,
-    materialsToFetch: MaterialRequirement[],
-): MaterialSource | null {
-    if (materialsToFetch.length === 0) {
-        return null;
-    }
-
-    // Collect all unique sources and sort by distance
-    const allSources: MaterialSource[] = [];
-    for (const req of materialsToFetch) {
-        allSources.push(...req.sources);
-    }
-
-    if (allSources.length === 0) {
-        return null;
-    }
-
-    // Sort by distance and return the nearest
-    allSources.sort(
-        (a, b) =>
-            distance(workerEntity.worldPosition, a.position) -
-            distance(workerEntity.worldPosition, b.position),
-    );
-
-    return allSources[0];
-}
-
 export type StockpileDeficit = {
     stockpile: Entity;
     itemId: string;
@@ -370,13 +338,10 @@ export type StockpileDeficit = {
 };
 
 /**
- * Find all stockpile deficits across the settlement.
- * A deficit exists when a stockpile's current amount is below its preferred amount.
- *
- * Future consideration: material queries for construction could eventually respect
- * preferred amounts (e.g. a stockpile with preferred 10 and current 12 only shows 2
- * as "available" for build tasks). Not implemented here — preferred amounts are
- * currently logistics hints only, not reservations.
+ * Find all stockpile deficits across the settlement. A deficit exists when a
+ * stockpile's current amount is below its preferred amount. Preferred amounts
+ * are logistics hints, not reservations: a build task can still take material
+ * a stockpile counts itself short of.
  */
 export function findStockpileDeficits(settlement: Entity): StockpileDeficit[] {
     const deficits: StockpileDeficit[] = [];

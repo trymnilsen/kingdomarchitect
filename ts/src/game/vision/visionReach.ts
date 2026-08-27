@@ -23,22 +23,7 @@ export const WORKER_VISION_REACH = 2;
 export const BUILDING_VISION_REACH = 1;
 
 /**
- * The sum of all modifiers acting on an entity's discovery radius right now.
- * This is the seam for the future modifier stack of scars, traits and
- * equipment, each of which will read its own components and contribute here.
- *
- * It is deliberately empty for this stage: it returns 0 so the radius equals
- * the entity's base value. Keeping it as a real (if empty) function means the
- * derive-on-read shape is already in place and the modifier stack lands here
- * without touching the call sites.
- */
-export function visionReachModifiers(_entity: Entity): number {
-    return 0;
-}
-
-/**
- * The discovery radius an entity actually has this moment: its stored base
- * radius plus whatever the modifier stack currently grants.
+ * The discovery radius an entity has right now.
  *
  * Returns 0 for an entity without a {@link VisibilityComponent}, meaning it
  * reveals only the tile it stands on. That keeps callers from having to
@@ -49,5 +34,5 @@ export function visionReachRadius(entity: Entity): number {
     if (!visibility) {
         return 0;
     }
-    return visibility.baseReach + visionReachModifiers(entity);
+    return visibility.baseReach;
 }

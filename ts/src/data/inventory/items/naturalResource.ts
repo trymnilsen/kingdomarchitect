@@ -276,13 +276,6 @@ export function getResourceById(id: string): NaturalResource | undefined {
 }
 
 /**
- * Check if a resource ID exists in the registry
- */
-export function hasResource(id: string): boolean {
-    return resourceRegistry.has(id);
-}
-
-/**
  * Returns true if the resource blocks movement — trees, stone, cacti, and similar
  * large objects. Lifecycle "Finite" (trees) and "Infinite" (stone) mark solid
  * obstacles. Regrowable and removable resources (grass, flowers, mushrooms) are

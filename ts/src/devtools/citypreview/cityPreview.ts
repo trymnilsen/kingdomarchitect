@@ -46,15 +46,6 @@ export class CityPreview extends DevApp {
                 this.cityUI.setState(this.state);
                 this.render();
             },
-            onFateChange: (fate: string) => {
-                this.state.fate = fate;
-                this.render();
-            },
-            onSeedChange: (seed: number) => {
-                this.state = createInitialState(this.state.biome, seed);
-                this.cityUI.setState(this.state);
-                this.render();
-            },
         });
 
         // Pan: movement is in screen pixels, camera.position is in world pixels — 1:1 mapping.
