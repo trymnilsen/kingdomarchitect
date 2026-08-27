@@ -66,7 +66,7 @@ describe("playerDiscoveryData", () => {
                 "Should have 64 tiles for a fully discovered chunk",
             );
 
-            // Verify tiles are in the correct positions (0-7, 0-7 for chunk at 0,0)
+            // A chunk at (0,0) covers tiles (0,0) to (7,7).
             const tilePositions = new Set(
                 result.tiles.map((t) => `${t.x},${t.y}`),
             );
@@ -79,7 +79,6 @@ describe("playerDiscoveryData", () => {
                 }
             }
 
-            // Verify volume reference
             for (const tile of result.tiles) {
                 assert.strictEqual(tile.volume, "vol1");
             }

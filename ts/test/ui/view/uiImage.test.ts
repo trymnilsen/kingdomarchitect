@@ -155,9 +155,7 @@ describe("UiImage", () => {
 
     describe("fillMode: contain", () => {
         it("scales sprite to fit within bounds maintaining aspect ratio (wider bounds)", () => {
-            // Sprite is 16x16, bounds are 64x32
-            // To fit, scale by min(64/16, 32/16) = min(4, 2) = 2
-            // Result: 32x32
+            // 16x16 into 64x32 scales by min(64/16, 32/16) = 2.
             const props = {
                 sprite: testSprite16x16,
                 width: 64,
@@ -180,9 +178,7 @@ describe("UiImage", () => {
         });
 
         it("scales sprite to fit within bounds maintaining aspect ratio (taller bounds)", () => {
-            // Sprite is 16x16, bounds are 32x64
-            // To fit, scale by min(32/16, 64/16) = min(2, 4) = 2
-            // Result: 32x32
+            // 16x16 into 32x64 scales by min(32/16, 64/16) = 2.
             const props = {
                 sprite: testSprite16x16,
                 width: 32,
@@ -205,8 +201,7 @@ describe("UiImage", () => {
         });
 
         it("centers sprite when contained (horizontal letterboxing)", () => {
-            // Sprite is 16x16, bounds are 64x32
-            // Scaled to 32x32, centered: x = (64 - 32) / 2 = 16, y = (32 - 32) / 2 = 0
+            // 16x16 scaled to 32x32 leaves 16 of slack on x and none on y.
             const props = {
                 sprite: testSprite16x16,
                 width: 64,
@@ -229,9 +224,7 @@ describe("UiImage", () => {
         });
 
         it("handles wide sprite in tall bounds", () => {
-            // Sprite is 32x16, bounds are 32x64
-            // To fit, scale by min(32/32, 64/16) = min(1, 4) = 1
-            // Result: 32x16
+            // 32x16 into 32x64 scales by min(32/32, 64/16) = 1, so it is unchanged.
             const props = {
                 sprite: testSprite32x16,
                 width: 32,

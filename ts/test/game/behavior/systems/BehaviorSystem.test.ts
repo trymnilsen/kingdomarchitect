@@ -663,12 +663,8 @@ describe("BehaviorSystem", () => {
 
             const system = createBehaviorSystem(() => []);
 
-            // Should not throw, should handle gracefully
-            assert.doesNotThrow(() => {
-                system.onUpdate!(root, 1);
-            });
+            system.onUpdate!(root, 1);
 
-            // Should have cleaned up after failure
             assert.strictEqual(agent.actionQueue.length, 0);
             assert.strictEqual(agent.currentBehaviorName, null);
         });

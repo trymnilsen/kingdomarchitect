@@ -373,16 +373,19 @@ describe("gameMessageHandler", () => {
             assert.ok(!root.findEntity("toRemove"));
         });
 
-        it("handles removal of non-existent entity gracefully", () => {
+        it("leaves the tree alone when removing an entity it does not hold", () => {
             const root = new Entity("root");
+            const existing = new Entity("existing");
+            root.addChild(existing);
 
             const message: RemoveEntityGameMessage = {
                 type: RemoveEntityGameMessageType,
                 entity: "nonexistent",
             };
 
-            // Should not throw
             handleGameMessage(root, message);
+
+            assert.deepStrictEqual(root.children, [existing]);
         });
 
         it("removes entity from nested hierarchy", () => {
@@ -427,7 +430,7 @@ describe("gameMessageHandler", () => {
             assert.strictEqual(component.currentHp, 75);
         });
 
-        it("handles set component on non-existent entity gracefully", () => {
+        it("drops a component addressed to an entity it does not hold", () => {
             const root = new Entity("root");
 
             const message: SetComponentGameMessage = {
@@ -436,8 +439,10 @@ describe("gameMessageHandler", () => {
                 component: createHealthComponent(50, 100),
             };
 
-            // Should not throw
             handleGameMessage(root, message);
+
+            assert.strictEqual(root.getEcsComponent(HealthComponentId), null);
+            assert.strictEqual(root.children.length, 0);
         });
 
         it("adds new component if not present", () => {
@@ -480,8 +485,11 @@ describe("gameMessageHandler", () => {
             assert.deepStrictEqual(entity.worldPosition, { x: 500, y: 300 });
         });
 
-        it("handles transform on non-existent entity gracefully", () => {
+        it("moves nothing on a transform for an entity it does not hold", () => {
             const root = new Entity("root");
+            const existing = new Entity("existing");
+            root.addChild(existing);
+            existing.worldPosition = { x: 12, y: 8 };
 
             const message: TransformGameMessage = {
                 type: TransformGameMessageType,
@@ -490,8 +498,9 @@ describe("gameMessageHandler", () => {
                 oldPosition: { x: 0, y: 0 },
             };
 
-            // Should not throw
             handleGameMessage(root, message);
+
+            assert.deepStrictEqual(existing.worldPosition, { x: 12, y: 8 });
         });
 
         it("updates nested entity position", () => {

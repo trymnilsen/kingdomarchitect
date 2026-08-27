@@ -374,7 +374,7 @@ describe("commandSystem", () => {
             assert.strictEqual(updatedJobQueue.jobs.length, 3);
         });
 
-        it("handles invalid building ID gracefully", () => {
+        it("builds nothing for an unknown building id", () => {
             const { root, playerKingdom } = createRootWithKingdom();
             const persistenceManager = createTestPersistenceManager();
 
@@ -627,7 +627,7 @@ describe("commandSystem", () => {
             });
         });
 
-        it("handles missing agent gracefully", () => {
+        it("ignores a player command for an agent that does not exist", () => {
             const root = new Entity("root");
             const persistenceManager = createTestPersistenceManager();
 
@@ -652,7 +652,7 @@ describe("commandSystem", () => {
             system.onGameMessage?.(root, message);
         });
 
-        it("handles missing BehaviorAgentComponent gracefully", () => {
+        it("ignores a player command for an entity with no behavior agent", () => {
             const root = new Entity("root");
             const persistenceManager = createTestPersistenceManager();
 
@@ -743,7 +743,7 @@ describe("commandSystem", () => {
             assert.strictEqual(updatedRole.role, WorkerRole.Guard);
         });
 
-        it("handles missing worker gracefully", () => {
+        it("ignores a role update for a worker that does not exist", () => {
             const root = new Entity("root");
             const persistenceManager = createTestPersistenceManager();
 
@@ -765,12 +765,11 @@ describe("commandSystem", () => {
             system.onGameMessage?.(root, message);
         });
 
-        it("handles missing role component gracefully", () => {
+        it("ignores a role update for an entity with no role component", () => {
             const root = new Entity("root");
             const persistenceManager = createTestPersistenceManager();
 
             const worker = new Entity("worker1");
-            // No role component
             root.addChild(worker);
 
             const system = createCommandSystem(
@@ -896,7 +895,7 @@ describe("commandSystem", () => {
             assert.strictEqual(updatedRole.stance, WorkerStance.Defensive);
         });
 
-        it("handles missing worker gracefully", () => {
+        it("ignores a stance update for a worker that does not exist", () => {
             const root = new Entity("root");
             const persistenceManager = createTestPersistenceManager();
 
@@ -918,12 +917,11 @@ describe("commandSystem", () => {
             system.onGameMessage?.(root, message);
         });
 
-        it("handles missing role component gracefully", () => {
+        it("ignores a stance update for an entity with no role component", () => {
             const root = new Entity("root");
             const persistenceManager = createTestPersistenceManager();
 
             const worker = new Entity("worker1");
-            // No role component
             root.addChild(worker);
 
             const system = createCommandSystem(
@@ -1005,7 +1003,7 @@ describe("commandSystem", () => {
             );
         });
 
-        it("handles a missing farm component gracefully", () => {
+        it("ignores a crop change for a building with no farm", () => {
             const root = new Entity("root");
             const building = new Entity("building1");
             // No farm component

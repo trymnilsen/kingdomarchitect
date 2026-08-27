@@ -243,7 +243,7 @@ describe("RegrowSystem", () => {
     });
 
     describe("Edge Cases", () => {
-        it("handles missing ResourceComponent gracefully", () => {
+        it("leaves an entity with no ResourceComponent harvested", () => {
             const root = new Entity("root");
             const entity = new Entity("invalid");
             entity.setEcsComponent(createRegrowComponent(berryBushResource.id));
@@ -251,12 +251,8 @@ describe("RegrowSystem", () => {
             entity.invalidateComponent(RegrowComponentId);
             root.addChild(entity);
 
-            // Should not throw
-            assert.doesNotThrow(() => {
-                regrowSystem.onUpdate(root, 300);
-            });
+            regrowSystem.onUpdate(root, 300);
 
-            // Entity should still be harvested (no change)
             const regrowComponent =
                 entity.requireEcsComponent(RegrowComponentId);
             assert.strictEqual(
@@ -266,7 +262,7 @@ describe("RegrowSystem", () => {
             );
         });
 
-        it("handles missing SpriteComponent gracefully", () => {
+        it("regrows an entity that has no sprite to swap", () => {
             const root = new Entity("root");
             const entity = new Entity("no-sprite");
             entity.setEcsComponent(
@@ -277,10 +273,7 @@ describe("RegrowSystem", () => {
             entity.invalidateComponent(RegrowComponentId);
             root.addChild(entity);
 
-            // Should not throw and should still process regrow
-            assert.doesNotThrow(() => {
-                regrowSystem.onUpdate(root, 300);
-            });
+            regrowSystem.onUpdate(root, 300);
 
             const regrowComponent =
                 entity.requireEcsComponent(RegrowComponentId);
