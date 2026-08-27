@@ -13,12 +13,6 @@ export type ChangeOccupationCommand = {
     action: "assign" | "unassign";
 };
 
-/**
- *
- * @param target
- * @param attacker
- * @returns
- */
 export function ChangeOccupationCommand(
     worker: Entity,
     workplace: Entity,

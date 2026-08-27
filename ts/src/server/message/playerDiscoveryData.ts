@@ -12,12 +12,11 @@ export type PlayerDiscoveryData = {
 };
 
 /**
- * Extracts all discovered tiles and their volumes for a player.
- * This is the core logic shared between WorldStateGameMessage and DiscoverTileEffect.
+ * The tiles a player has discovered, with the volumes they reference. Both the
+ * initial world state and later discover-tile effects are built from this, so
+ * the two cannot disagree about what the player has seen.
  *
- * @param tileComponent The tile component containing chunk and volume data
- * @param playerDiscovery The player's discovery data from WorldDiscoveryComponent
- * @returns The discovered tiles and volumes, or null if nothing discovered
+ * Returns null when the player has discovered nothing.
  */
 export function getPlayerDiscoveryData(
     tileComponent: TileComponent,

@@ -30,7 +30,8 @@ export type AdjacencyMask = {
 };
 
 /**
- * Convert an AdjacencyMask to the legacy Adjacency enum for compatibility
+ * Convert an AdjacencyMask to the Adjacency enum that BuildingComponent stores
+ * and sprite selection reads.
  */
 export function adjacencyMaskToEnum(mask: AdjacencyMask): Adjacency {
     const { left, right, up, down } = mask;

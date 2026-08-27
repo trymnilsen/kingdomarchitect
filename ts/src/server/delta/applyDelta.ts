@@ -21,9 +21,6 @@ export function applyDelta(
     }
 }
 
-/**
- * Apply a single delta operation to a component.
- */
 function applyOperation(component: Components, op: DeltaOperation): void {
     switch (op.op) {
         case "set":
@@ -93,9 +90,6 @@ function navigateToParent(
     return [current, path[path.length - 1]];
 }
 
-/**
- * Navigate to the target of a path.
- */
 function navigateToTarget(component: Components, path: PropertyPath): unknown {
     let current: unknown = component;
     for (const key of path) {
@@ -114,9 +108,6 @@ function navigateToTarget(component: Components, path: PropertyPath): unknown {
     return current;
 }
 
-/**
- * Set a value at a path.
- */
 function applySet(
     component: Components,
     path: PropertyPath,
@@ -143,9 +134,6 @@ function applySet(
     }
 }
 
-/**
- * Delete a property at a path.
- */
 function applyDelete(component: Components, path: PropertyPath): void {
     if (path.length === 0) {
         return; // Can't delete the root
@@ -166,9 +154,6 @@ function applyDelete(component: Components, path: PropertyPath): void {
     }
 }
 
-/**
- * Push values to an array at a path.
- */
 function applyArrayPush(
     component: Components,
     path: PropertyPath,
@@ -181,9 +166,6 @@ function applyArrayPush(
     target.push(...values);
 }
 
-/**
- * Splice an array at a path.
- */
 function applyArraySplice(
     component: Components,
     path: PropertyPath,
@@ -202,9 +184,6 @@ function applyArraySplice(
     }
 }
 
-/**
- * Set a key in a Map at a path.
- */
 function applyMapSet(
     component: Components,
     path: PropertyPath,
@@ -218,9 +197,6 @@ function applyMapSet(
     target.set(key, value);
 }
 
-/**
- * Delete a key from a Map at a path.
- */
 function applyMapDelete(
     component: Components,
     path: PropertyPath,
@@ -233,9 +209,6 @@ function applyMapDelete(
     target.delete(key);
 }
 
-/**
- * Add a value to a Set at a path.
- */
 function applySetAdd(
     component: Components,
     path: PropertyPath,
@@ -248,9 +221,6 @@ function applySetAdd(
     target.add(value);
 }
 
-/**
- * Delete a value from a Set at a path.
- */
 function applySetDelete(
     component: Components,
     path: PropertyPath,

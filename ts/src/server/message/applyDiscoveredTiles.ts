@@ -15,14 +15,9 @@ import type { Volume } from "../../game/map/volume.ts";
 import type { DiscoveredTileData } from "./playerDiscoveryData.ts";
 
 /**
- * Applies discovered tiles to the client-side tile and visibility components.
- * This is the shared logic used by both WorldStateGameMessage handling and
- * DiscoverTileEffect handling.
- *
- * @param tileComponent The tile component to populate with chunks
- * @param visibilityMapComponent The visibility component to track discovered tiles
- * @param tiles The discovered tile data to apply
- * @param volumes The volumes referenced by the tiles
+ * Applies discovered tiles to the client's tile and visibility components.
+ * Both the initial world state and later discover-tile effects land here, so
+ * the two paths cannot drift.
  */
 export function applyDiscoveredTiles(
     tileComponent: TileComponent,

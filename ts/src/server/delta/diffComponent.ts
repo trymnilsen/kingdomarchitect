@@ -38,31 +38,27 @@ function diffValue(
         return;
     }
 
-    // Handle null/undefined transitions
+    // A transition into or out of null replaces the whole value.
     if (oldVal == null || newVal == null) {
         operations.push({ op: "set", path, value: newVal });
         return;
     }
 
-    // Handle Map
     if (oldVal instanceof Map && newVal instanceof Map) {
         diffMap(oldVal, newVal, path, operations);
         return;
     }
 
-    // Handle Set
     if (oldVal instanceof Set && newVal instanceof Set) {
         diffSet(oldVal, newVal, path, operations);
         return;
     }
 
-    // Handle Array
     if (Array.isArray(oldVal) && Array.isArray(newVal)) {
         diffArray(oldVal, newVal, path, operations);
         return;
     }
 
-    // Handle Object
     if (
         typeof oldVal === "object" &&
         typeof newVal === "object" &&
@@ -82,9 +78,6 @@ function diffValue(
     operations.push({ op: "set", path, value: newVal });
 }
 
-/**
- * Diff two plain objects.
- */
 function diffObject(
     oldObj: Record<string, unknown>,
     newObj: Record<string, unknown>,
@@ -258,9 +251,6 @@ function diffMap(
     }
 }
 
-/**
- * Diff two Sets.
- */
 function diffSet(
     oldSet: Set<unknown>,
     newSet: Set<unknown>,
@@ -297,9 +287,6 @@ function setHas(set: Set<unknown>, value: unknown): boolean {
     return false;
 }
 
-/**
- * Deep equality check for comparing values.
- */
 export function deepEquals(a: unknown, b: unknown): boolean {
     if (a === b) {
         return true;
@@ -317,7 +304,6 @@ export function deepEquals(a: unknown, b: unknown): boolean {
         return a === b;
     }
 
-    // Handle Map
     if (a instanceof Map && b instanceof Map) {
         if (a.size !== b.size) {
             return false;
@@ -330,7 +316,6 @@ export function deepEquals(a: unknown, b: unknown): boolean {
         return true;
     }
 
-    // Handle Set
     if (a instanceof Set && b instanceof Set) {
         if (a.size !== b.size) {
             return false;
@@ -343,7 +328,6 @@ export function deepEquals(a: unknown, b: unknown): boolean {
         return true;
     }
 
-    // Handle Array
     if (Array.isArray(a) && Array.isArray(b)) {
         if (a.length !== b.length) {
             return false;
@@ -356,7 +340,7 @@ export function deepEquals(a: unknown, b: unknown): boolean {
         return true;
     }
 
-    // Handle Object
+    // One array and one plain object never match.
     if (Array.isArray(a) || Array.isArray(b)) {
         return false;
     }

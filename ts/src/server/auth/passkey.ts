@@ -71,13 +71,13 @@ export type AuthenticationOptions = {
  *
  * `publicKey` and `publicKeyAlgorithm` come from `getPublicKey()` and
  * `getPublicKeyAlgorithm()`, and `authenticatorData` from
- * `getAuthenticatorData()`. Taking those three from the browser is what keeps
- * the attestation object, and therefore CBOR, off the server.
+ * `getAuthenticatorData()`. Taking those three from the browser keeps the
+ * attestation object, and therefore CBOR, off the server.
  *
- * These values are unverified client input. That is not a weakening: under
+ * These values are unverified client input, which costs nothing here: under
  * `attestation: "none"` the same bytes inside an attestation object carry no
- * signature either. What binds the account to the authenticator is that every
- * later login must produce a signature this key validates.
+ * signature either. The account is bound to the authenticator by every later
+ * login having to produce a signature this key validates.
  */
 export type RegistrationResponse = {
     id: string;

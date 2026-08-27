@@ -4,13 +4,13 @@ import type { Point } from "../point.ts";
 /**
  * An axis aligned box given by its top left corner plus a size.
  *
- * Use this when a caller wants an origin and an extent. `Bounds` covers the
- * same shape as two corners and suits containment checks better. `bounds.ts`
- * has converters both ways.
+ * Use this when a caller wants an origin and an extent. `Bounds` describes the
+ * same shape as two corners and suits containment checks better;
+ * {@link rectangleFromBounds} converts.
  *
- * The width and height are declared inline here on purpose. Reusing the UI
- * layer's `UISize` would point `common/` at `ui/` and would pull the
- * `fillUiSize` layout contract into geometry code that has no use for it.
+ * Width and height are declared inline rather than reusing the UI layer's
+ * `UISize`, which would point `common/` at `ui/` and drag the `fillUiSize`
+ * layout contract into geometry code that has no use for it.
  */
 export type Rectangle = Point & { width: number; height: number };
 
@@ -55,7 +55,7 @@ export function splitRectangle(a: Rectangle, b: Rectangle): Rectangle[] {
     const intersection = intersectRect(a, b);
 
     if (!intersection) {
-        return [a]; // No intersection, return original rectangle
+        return [a];
     }
 
     const result: Rectangle[] = [];

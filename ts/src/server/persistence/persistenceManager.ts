@@ -29,23 +29,14 @@ export class PersistenceManager {
         this.adapter = adapter;
     }
 
-    /**
-     * Check if a save exists
-     */
     async hasSave(): Promise<boolean> {
         return this.adapter.hasSave();
     }
 
-    /**
-     * Save metadata about the world state
-     */
     async saveMeta(meta: SerializedWorldMeta): Promise<void> {
         return this.adapter.saveMeta(meta);
     }
 
-    /**
-     * Load metadata about the world state
-     */
     async loadMeta(): Promise<SerializedWorldMeta | null> {
         return this.adapter.loadMeta();
     }
@@ -75,7 +66,6 @@ export class PersistenceManager {
         await this.adapter.clearEntities();
         await this.adapter.saveEntities(entitiesToSave);
         await this.adapter.saveRootComponents(rootComponents);
-        //console.log("[Persistence Manager] Save world");
     }
 
     /**
@@ -105,22 +95,15 @@ export class PersistenceManager {
             return false;
         }
 
-        // Build a map of entities by ID for quick lookup
-        const entityMap = new Map<string, SerializedEntity>();
-        for (const serializedEntity of entities) {
-            entityMap.set(serializedEntity.id, serializedEntity);
-        }
-
-        // Build a map to track which entities have been created
         const createdEntities = new Map<string, Entity>();
 
-        // First pass: create all entities and attach their components
+        // Entities are stored flat, and a parent can be read after its child,
+        // so every entity is created before any parent link is made.
         for (const serializedEntity of entities) {
             const entity = this.deserializeEntity(serializedEntity);
             createdEntities.set(entity.id, entity);
         }
 
-        // Second pass: reconstruct the hierarchy
         for (const serializedEntity of entities) {
             const entity = createdEntities.get(serializedEntity.id);
             if (!entity) {
@@ -128,7 +111,6 @@ export class PersistenceManager {
             }
 
             if (serializedEntity.parentId) {
-                // Find parent entity
                 const parentEntity = createdEntities.get(
                     serializedEntity.parentId,
                 );
@@ -136,7 +118,6 @@ export class PersistenceManager {
                     parentEntity.addChild(entity);
                 } else {
                     if (serializedEntity.parentId !== RootEntityId) {
-                        // Parent not found in saved entities, attach to root
                         log.warn(
                             "Parent not found for entity, attaching to root",
                             {
@@ -148,7 +129,6 @@ export class PersistenceManager {
                     root.addChild(entity);
                 }
             } else {
-                // No parent, attach to root
                 root.addChild(entity);
             }
         }
