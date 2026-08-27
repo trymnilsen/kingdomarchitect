@@ -61,8 +61,8 @@ export function setPreferredAmount(
 
 /**
  * Items currently held, counted as a flat total across every stack. Capacity is
- * deliberately measured in items rather than stacks so that filling a store with
- * one bulky resource costs the same room as spreading it across many.
+ * measured in items rather than stacks, so filling a store with one bulky
+ * resource costs the same room as spreading it across many.
  */
 export function getStockpileUsedSpace(inventory: InventoryComponent): number {
     let used = 0;

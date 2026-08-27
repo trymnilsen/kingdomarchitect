@@ -16,11 +16,9 @@ export type ThreatMapComponent = {
 /**
  * The threat a sighted intruder carries, and the floor every new entry gets.
  *
- * Coupling invariant: INTRUSION_THREAT must stay greater than
- * HEARTH_DEFENSE_INTERVAL x THREAT_DECAY_PER_TICK (currently 10 > 5, twice the
- * headroom). Violate it and intrusion entries expire between refresh scans, so
- * defense flickers off while the goblin stands in the light. Whoever retunes
- * any of the three meets this comment.
+ * Must stay greater than HEARTH_DEFENSE_INTERVAL x THREAT_DECAY_PER_TICK
+ * (currently 10 against 5). Below that, intrusion entries expire between
+ * refresh scans and defense flickers off while the goblin stands in the light.
  */
 export const INTRUSION_THREAT = 10;
 

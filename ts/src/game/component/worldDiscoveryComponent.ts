@@ -21,15 +21,9 @@ export function createWorldDiscoveryComponent(): WorldDiscoveryComponent {
 export const WorldDiscoveryComponentId = "worldDiscovery";
 
 /**
- * Marks a specific tile as discovered by a player. If discovering this tile
- * results in a whole chunk being discovered, the chunk is moved from the
- * 'partially discovered' collection to the 'fully discovered' collection for efficiency.
- *
- * This function assumes a `worldDiscoveryComponent: WorldDiscoveryComponent` instance
- * is accessible within its scope.
- *
- * @param player The ID of the player discovering the tile.
- * @param tile The world coordinates of the tile being discovered.
+ * Marks a tile as discovered by a player. The tile that completes a chunk moves
+ * that chunk from the partially-discovered map to the fully-discovered set, so
+ * a finished chunk costs one entry instead of one per tile.
  */
 export function discoverTile(
     component: WorldDiscoveryComponent,

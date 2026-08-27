@@ -23,7 +23,7 @@ import { log } from "../../common/logging/logger.ts";
  * An entity is identified by a string id and owns a local position, a set of
  * children, and a map of ECS components. Components are plain data, so all the
  * logic that reads them lives in systems. Entities refer to each other by id
- * rather than by object reference, which is what keeps the tree serializable.
+ * rather than by object reference, so the tree stays serializable.
  *
  * Positions come in two flavours. `localPosition` is relative to the parent and
  * `worldPosition` is absolute. Set `worldPosition` after `addChild`, since an
@@ -549,15 +549,14 @@ export class Entity {
      *    cached query intact. The id cache is unaffected (no id changed).
      *  - `child_added` / `child_removed` can change many component ids and add
      *    or remove ids, so both caches are dropped and rebuilt lazily. Dropping
-     *    (rather than rebuilding here) is what keeps this correct against
-     *    `removeChild` bubbling before it detaches the child: nothing rebuilds
-     *    until the next query/findEntity, by which point the child is gone.
+     *    rather than rebuilding here is what makes this correct against
+     *    `removeChild`, which bubbles before it detaches the child: nothing
+     *    rebuilds until the next query, by which point the child is gone.
      *
-     * `component_updated` and `transform` are deliberately ignored:
-     * `updateComponent` mutates the component in place (same reference, same
-     * membership) so the cached map is still correct, and these two are the
-     * per-tick hot events — reacting to them would thrash the cache every frame
-     * for no benefit.
+     * `component_updated` and `transform` are ignored. `updateComponent` mutates
+     * in place, leaving both the reference and the membership unchanged, and
+     * these two are the per-tick hot events, so reacting to them would thrash
+     * the cache every frame for nothing.
      */
     private invalidateCaches(event: EntityEvent) {
         switch (event.id) {

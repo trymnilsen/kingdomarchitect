@@ -15,10 +15,9 @@ import {
 export const DECAY_SWEEP_INTERVAL = 50;
 
 /**
- * Removes ground piles that have lain out long enough to rot. Jobs still
- * targeting a removed pile fail gracefully on their own: planCollectItem drops
- * the job when the entity is gone, and collectItemsAction fails with
- * targetGone, so there is deliberately no second cleanup path here.
+ * Removes ground piles that have lain out long enough to rot. Jobs targeting a
+ * removed pile clean themselves up: planCollectItem drops the job when the
+ * entity is gone, and collectItemsAction fails with targetGone.
  */
 export const groundItemDecaySystem: EcsSystem = {
     onUpdate: (root, tick) => {

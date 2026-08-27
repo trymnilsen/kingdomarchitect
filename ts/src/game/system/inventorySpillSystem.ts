@@ -7,21 +7,19 @@ import { DeathGameEventType } from "../entity/event/deathGameEventData.ts";
 import type { GameTime } from "../gameTime.ts";
 
 /**
- * Spills the contents of anything that dies holding stored goods — a stockpile
- * razed in a raid, a scaffold destroyed with its delivered materials still
- * inside. The goods land on the ground around the wreck instead of vanishing
- * with the entity, so a raid costs the player the building and the hauling
- * work, not the resources themselves.
+ * Spills the contents of anything that dies holding stored goods: a stockpile
+ * razed in a raid, a scaffold destroyed with its delivered materials inside.
+ * The goods land around the wreck instead of vanishing, so a raid costs the
+ * player the building and the hauling work rather than the resources.
  *
- * Triggers on any dying entity with a non-empty inventory rather than on
- * stockpiles specifically, so chests and other future stores inherit this
- * without a second system. Units carry goods in their held slot instead and
- * spill through lootDropSystem; an entity with both spills through both.
+ * The trigger is any dying entity with a non-empty inventory, not stockpiles
+ * specifically, so other stores are covered without a second system. Units
+ * carry goods in their held slot and spill through lootDropSystem instead.
  *
- * The death event is bubbled before the entity is removed (see damageEntity),
- * so the inventory is still readable here, and the dying entity's own footprint
- * still blocks placement — which is why the goods ring the collapsing building
- * rather than piling up underneath it.
+ * damageEntity bubbles the death event before removing the entity, so the
+ * inventory is still readable here and the dying building's footprint still
+ * blocks placement. That is why the goods ring the wreck instead of piling up
+ * underneath it.
  */
 export function createInventorySpillSystem(gameTime: GameTime): EcsSystem {
     return {

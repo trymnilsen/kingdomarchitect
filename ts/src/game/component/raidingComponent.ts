@@ -1,10 +1,9 @@
 /**
  * Marker component stamped on a goblin that has been committed to a night
- * raid by formGoblinRaid. Its presence is the single source of truth that
- * RaidBehavior reads — it is decided once at raid formation and lives until
- * the goblin dies (there is no retreat). A goblin without this component is
- * not a raider (e.g. the fire-tender left behind, or a goblin spawned after
- * the warband already left).
+ * raid by formGoblinRaid. RaidBehavior reads its presence and nothing else.
+ * Membership is decided once at raid formation and lasts until the goblin dies,
+ * since there is no retreat. A goblin without it is not a raider: the
+ * fire-tender left behind, or one spawned after the warband set out.
  */
 export type RaidingComponent = {
     id: typeof RaidingComponentId;

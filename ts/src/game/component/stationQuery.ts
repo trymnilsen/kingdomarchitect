@@ -5,17 +5,17 @@ import { RoleComponentId, WorkerRole } from "./worker/roleComponent.ts";
 import { PlayerUnitComponentId } from "./playerUnitComponent.ts";
 
 /**
- * Station occupancy, derived live from physical co-location — never a stored
- * reference, so nothing dangles when a worker dies or despawns. The single home for
- * "who is on which station", shared by the vision vantage, the garrison behavior,
- * the step-outside exemption, and the night watch, so those can never drift apart.
+ * Station occupancy, derived from standing on the tile rather than stored, so
+ * nothing dangles when a worker dies or despawns. The vision vantage, the
+ * garrison behavior, the step-outside exemption and the night watch all ask
+ * here, so they cannot drift apart.
  *
- * Two predicates are deliberately distinct because the asymmetry is real:
- *  - {@link stationUnderEntity} is role-agnostic — *any* body on a station tile gets
- *    the manned-tower effects (and a future drafted worker will too).
- *  - {@link isManningStation} is role-gated — only an *intended occupant* (a Guard)
- *    of an *enabled* station is left in place; that narrowness is what makes a
- *    disabled station or an un-roled guard self-heal (StepOutside grounds them).
+ * The two predicates differ on purpose:
+ *  - {@link stationUnderEntity} is role-agnostic. Any body on a station tile
+ *    gets the manned-tower effects.
+ *  - {@link isManningStation} is role-gated. Only a Guard on an enabled station
+ *    is left in place, which is how a disabled station or an un-roled guard
+ *    self-heals: StepOutside grounds them.
  */
 
 /** The built station the entity is standing on, or null. */

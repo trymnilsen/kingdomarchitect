@@ -12,10 +12,10 @@ import { spriteRefs, type SpriteRef } from "../../asset/sprite.ts";
  * through it, including raiders. Closed, nothing does, including your own
  * workers, and it has to be broken like any other wall.
  *
- * There is deliberately no notion of who may pass. A gate that let friendly feet
- * through while stopping goblins would be a second passability system layered on
- * the one the pathfinder already has. Open or shut is the whole mechanic, and
- * leaving it open at dusk is meant to be a mistake you can make.
+ * A gate holds no notion of who may pass. Letting friendly feet through while
+ * stopping goblins would be a second passability system on top of the
+ * pathfinder's. Open or shut is the whole mechanic, and leaving it open at dusk
+ * is a mistake the player is allowed to make.
  */
 export type GateComponent = {
     id: typeof GateComponentId;
@@ -63,11 +63,10 @@ export function gateTraversalWeight(isOpen: boolean): number {
 /**
  * Open or shut a gate.
  *
- * This is the only place the parts of a gate's state are written, because they
- * must not drift: `isOpen` is what the player set, the traversal weight is what
- * every pathfinding consumer reads, and the sprite is what the player sees.
- * Invalidating the components is what makes the pathfinding graph and the
- * spatial index pick the change up.
+ * Three things have to move together and are written only here: `isOpen` is
+ * what the player set, the traversal weight is what pathfinding reads, and the
+ * sprite is what the player sees. The invalidation calls are how the
+ * pathfinding graph and the spatial index learn about the change.
  */
 export function setGateOpen(entity: Entity, isOpen: boolean): void {
     const gate = entity.getEcsComponent(GateComponentId);

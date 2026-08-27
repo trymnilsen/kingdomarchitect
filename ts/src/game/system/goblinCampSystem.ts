@@ -153,15 +153,13 @@ function processExpansion(
 }
 
 /**
- * Spawn goblins when camp has available housing, active fire,
- * and is below max population.
+ * Spawn goblins when the camp has an active fire, housing to spare and room
+ * below its population cap.
  *
- * Path A (campfire fallback): population is 0 and fire is active →
- * spawn one goblin near the fire with no housing assignment.
- * This is the safety valve that lets a camp recover after all goblins die.
- *
- * Path B (house spawn): fire is active and an unoccupied (or stale-tenanted)
- * hut exists → spawn a goblin and assign it to the hut.
+ * A camp whose population has reached zero spawns one goblin by the fire with
+ * no hut assigned. That is the safety valve that lets a wiped-out camp recover.
+ * Otherwise a goblin spawns into an unoccupied or stale-tenanted hut and is
+ * assigned to it.
  */
 function processSpawning(
     root: Entity,

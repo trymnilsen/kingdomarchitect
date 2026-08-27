@@ -97,11 +97,9 @@ function onRender(
     for (let i = 0; i < visibleSpriteScratch.length; i++) {
         const sprite = visibleSpriteScratch[i][1];
         const position = visibleSpriteScratch[i][0].worldPosition;
-        // An entity is shown only where the player can see it: on a discovered
-        // tile that is currently lit. A goblin attacking from an adjacent dark
-        // tile is deliberately not drawn. The player watches their worker fight
-        // something unseen. That is night-raid tension rather than a rendering
-        // bug, so no attacker-reveal rule belongs here.
+        // An entity is drawn only on a discovered tile that is currently lit.
+        // An attacker in adjacent darkness stays unseen, so the player watches
+        // their worker fight something they cannot see.
         let visible = true;
         if (!window.debugChunks && visibilityMap) {
             const discovered = hasDiscoveredWorldTile(
@@ -164,10 +162,9 @@ const litOverlay = { fill: "rgba(255, 221, 0, 0.28)", label: "L" };
 const darkOverlay = { fill: "rgba(0, 0, 0, 0.5)", label: "D" };
 
 /**
- * Dev-only overlay that marks each tile lit (L) or dark (D). It consumes the
- * frame's already-built coverage set instead of deriving its own: an overlay
- * with a private derivation path can lie, and its entire value is proving the
- * field the game logic uses.
+ * Dev-only overlay that marks each tile lit (L) or dark (D). It reads the
+ * frame's coverage set rather than deriving its own, so what it shows is the
+ * same field the game logic uses.
  */
 function drawLitOverlay(
     renderContext: RenderScope,

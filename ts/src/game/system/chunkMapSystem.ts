@@ -22,12 +22,14 @@ function hasSpatialPresence(entity: Entity): boolean {
 }
 
 /**
- * System responsible for maintaining a spatial index (ChunkMap) of all entities.
- * It ensures that entities—including those nested deep within hierarchies (like Goblins
- * inside a Camp)—are indexed by their world position for fast spatial queries.
+ * Keeps the ChunkMap spatial index in step with the entity tree. Entities are
+ * indexed by world position no matter how deep they sit, so a goblin inside a
+ * camp is found by a query over the tiles it stands on.
+ *
+ * The index is event-driven: it updates on add, remove and transform rather
+ * than being rebuilt on a tick.
  */
 export const chunkMapSystem: EcsSystem = {
-    onInit: init,
     onEntityEvent: {
         child_added: onEntityAdded,
         child_removed: onEntityRemoved,
@@ -36,18 +38,8 @@ export const chunkMapSystem: EcsSystem = {
 };
 
 /**
- * @param _root The root entity of the ECS world.
- */
-function init(_root: Entity) {
-    // Initialized via root factory
-}
-
-/**
- * Updates the spatial index when an entity moves.
- * * If a parent moves, this recursively updates all children since their
- * world positions are relative to the parent and will have changed.
- * @param rootEntity The world root containing the ChunkMapComponent.
- * @param entityEvent The transform event details.
+ * A moving parent drags its children's world positions with it, so a transform
+ * re-indexes the whole subtree.
  */
 function onTransform(rootEntity: Entity, entityEvent: EntityTransformEvent) {
     const chunkMap =
@@ -55,9 +47,6 @@ function onTransform(rootEntity: Entity, entityEvent: EntityTransformEvent) {
     updateEntityHierarchyInMap(chunkMap, entityEvent.source);
 }
 
-/**
- * Recursively checks and updates chunk assignments for an entity branch.
- */
 function updateEntityHierarchyInMap(chunkMap: ChunkMap, entity: Entity) {
     if (hasSpatialPresence(entity)) {
         const currentChunkKey = chunkMap.entityChunkMap.get(entity.id);
@@ -65,7 +54,7 @@ function updateEntityHierarchyInMap(chunkMap: ChunkMap, entity: Entity) {
         const chunkY = Math.floor(entity.worldPosition.y / ChunkSize);
         const newChunkKey = encodePosition(chunkX, chunkY);
 
-        // Boundary check optimization: only modify the map if the entity moved to a new chunk
+        // Most steps stay inside the same chunk, so only a crossing touches the map.
         if (currentChunkKey !== newChunkKey) {
             if (currentChunkKey !== undefined) {
                 chunkMap.chunks.get(currentChunkKey)?.delete(entity);
@@ -82,9 +71,8 @@ function updateEntityHierarchyInMap(chunkMap: ChunkMap, entity: Entity) {
 }
 
 /**
- * Indexes an entity and its entire subtree when added to the world.
- * This ensures that if a parent (e.g., a building) is added with pre-existing
- * children (e.g., workers), every child is correctly registered in the spatial map.
+ * Indexes the added entity and its subtree, so a parent attached with children
+ * already on it (a camp with its goblins) registers all of them.
  */
 function onEntityAdded(
     rootEntity: Entity,
@@ -95,9 +83,6 @@ function onEntityAdded(
     addToChunkmap(chunkMap, entityEvent.target);
 }
 
-/**
- * Adds an entity to the chunkmap, potentially doing it for all its children too
- */
 function addToChunkmap(chunkMap: ChunkMap, entity: Entity) {
     if (hasSpatialPresence(entity)) {
         const chunkX = Math.floor(entity.worldPosition.x / ChunkSize);
@@ -114,9 +99,8 @@ function addToChunkmap(chunkMap: ChunkMap, entity: Entity) {
 }
 
 /**
- * Removes an entity and its entire subtree from the spatial index.
- * Prevents "ghost" entities by ensuring that when a parent is removed,
- * no dangling references to its children remain in the ChunkMap.
+ * Removes the entity and its subtree, so a removed parent leaves no children
+ * behind in the index.
  */
 function onEntityRemoved(
     rootEntity: Entity,
@@ -127,9 +111,6 @@ function onEntityRemoved(
     removeFromChunkmap(chunkMap, entityEvent.target);
 }
 
-/**
- * Removes an entity from the chunkmap, potentially also doing it for children
- */
 function removeFromChunkmap(chunkMap: ChunkMap, entity: Entity) {
     if (hasSpatialPresence(entity)) {
         const chunkKey = chunkMap.entityChunkMap.get(entity.id);
@@ -144,12 +125,6 @@ function removeFromChunkmap(chunkMap: ChunkMap, entity: Entity) {
     }
 }
 
-/**
- * Retrieves an existing chunk or initializes a new SparseSet for the given key.
- * @param chunkMap The current spatial map.
- * @param chunkKey The encoded XY position of the chunk.
- * @returns A SparseSet of entities for that chunk.
- */
 function getOrCreateChunk(
     chunkMap: ChunkMap,
     chunkKey: number,

@@ -1,3 +1,12 @@
+/**
+ * Handlers for the commands that move items between a worker's hands and its
+ * equipment slots.
+ *
+ * Equipping and dropping go through the behavior agent rather than mutating
+ * slots outright, because the worker may need to walk somewhere first. Taking
+ * something off is immediate, since that needs no travel.
+ */
+
 import { log } from "../../../common/logging/logger.ts";
 import type { DropHeldCommand } from "../../../server/message/command/dropHeldCommand.ts";
 import type { EquipFromHeldCommand } from "../../../server/message/command/equipFromHeldCommand.ts";
@@ -12,14 +21,6 @@ import { HeldItemComponentId } from "../../component/heldItemComponent.ts";
 import { markStatsDirty } from "../../component/statsComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 
-/**
- * Handlers for the commands that move items between a worker's hands and its
- * equipment slots.
- *
- * Equipping and dropping go through the behavior agent rather than mutating
- * slots outright, because the worker may need to walk somewhere first. Taking
- * something off is immediate, since that needs no travel.
- */
 export function equipItem(root: Entity, command: EquipItemCommand) {
     const entity = root.findEntity(command.entity);
     if (!entity) {

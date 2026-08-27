@@ -11,17 +11,20 @@ export type EntityEvent =
 
 export type EntityEventId = EntityEvent["id"];
 
-type FindEventById<Id extends EntityEventId, EventUnion = EntityEvent> =
-    // Distribute over the EventUnion (EntityEvent)
-    EventUnion extends { id: infer EventIdType }
-        ? // Check if the target Id (e.g., "child_added") is assignable to this specific Event's id type (e.g., "child_added" | "child_removed")
-          Id extends EventIdType
-            ? // If yes, this is the Event type we want for this Id
-              EventUnion
-            : never
-        : never;
+/**
+ * The event type carrying a given id. One event type can cover several ids, as
+ * ComponentsUpdatedEvent does, so the match is by assignability rather than
+ * equality.
+ */
+type FindEventById<
+    Id extends EntityEventId,
+    EventUnion = EntityEvent,
+> = EventUnion extends { id: infer EventIdType }
+    ? Id extends EventIdType
+        ? EventUnion
+        : never
+    : never;
 
-// The dynamically generated map using the helper
 export type EntityEventType = {
     [K in EntityEventId]: FindEventById<K>;
 };

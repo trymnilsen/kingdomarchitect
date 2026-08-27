@@ -6,22 +6,14 @@ import { getInventoryItemById } from "../../data/inventory/inventoryItemHelpers.
 import { getResourceById } from "../../data/inventory/items/naturalResource.ts";
 import { getProductionDefinition } from "../../data/production/productionDefinition.ts";
 import type { Jobs } from "./job.ts";
-import type { CraftingJob } from "./craftingJob.ts";
-import type { CollectItemJob } from "./collectItemJob.ts";
-import type { CollectResourceJob } from "./collectResourceJob.ts";
-import type { BuildBuildingJob } from "./buildBuildingJob.ts";
-import type { ProductionJob } from "./productionJob.ts";
-import type { DismantleBuildingJob } from "./dismantleBuildingJob.ts";
 
 export function getJobDisplayName(root: Entity, job: Jobs): string | null {
     switch (job.id) {
         case "craftingJob": {
-            const recipe = (job as CraftingJob).recipe;
-            return `Craft ${recipe.name}`;
+            return `Craft ${job.recipe.name}`;
         }
         case "buildBuildingJob": {
-            const buildJob = job as BuildBuildingJob;
-            const buildingEntity = root.findEntity(buildJob.entityId);
+            const buildingEntity = root.findEntity(job.entityId);
             if (!buildingEntity) {
                 return "Build building";
             }
@@ -32,8 +24,7 @@ export function getJobDisplayName(root: Entity, job: Jobs): string | null {
                 : "Build building";
         }
         case "collectResource": {
-            const collectJob = job as CollectResourceJob;
-            const resourceEntity = root.findEntity(collectJob.entityId);
+            const resourceEntity = root.findEntity(job.entityId);
             if (!resourceEntity) {
                 return "Collect resource";
             }
@@ -46,12 +37,11 @@ export function getJobDisplayName(root: Entity, job: Jobs): string | null {
             return resource ? `Collect ${resource.name}` : "Collect resource";
         }
         case "collectItem": {
-            const item = getInventoryItemById((job as CollectItemJob).itemId);
+            const item = getInventoryItemById(job.itemId);
             return item ? `Collect ${item.name}` : "Collect item";
         }
         case "productionJob": {
-            const prodJob = job as ProductionJob;
-            const prodEntity = root.findEntity(prodJob.targetBuilding);
+            const prodEntity = root.findEntity(job.targetBuilding);
             if (!prodEntity) {
                 return "Produce";
             }
@@ -63,8 +53,7 @@ export function getJobDisplayName(root: Entity, job: Jobs): string | null {
             return definition ? definition.actionName : "Produce";
         }
         case "dismantleBuildingJob": {
-            const dismantleJob = job as DismantleBuildingJob;
-            const buildingEntity = root.findEntity(dismantleJob.entityId);
+            const buildingEntity = root.findEntity(job.entityId);
             const buildingComp =
                 buildingEntity?.getEcsComponent(BuildingComponentId);
             // Scaffolds being torn down read as "Cancel", completed as "Dismantle",

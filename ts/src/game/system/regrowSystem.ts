@@ -18,16 +18,14 @@ export const regrowSystem = {
  * @param currentTick The current game tick
  */
 function update(root: Entity, currentTick: number): void {
-    // Query all entities with RegrowComponent
     const regrowingEntitiesMap = root.queryComponents(RegrowComponentId);
 
     for (const [entity, regrowComponent] of regrowingEntitiesMap) {
-        // Skip if never harvested
+        // A negative harvest tick means the resource is standing, not regrowing.
         if (regrowComponent.harvestedAtTick < 0) {
             continue;
         }
 
-        // Must have resource component too
         const resourceComponent = entity.getEcsComponent(ResourceComponentId);
         if (!resourceComponent) {
             continue;
@@ -47,14 +45,11 @@ function update(root: Entity, currentTick: number): void {
             continue;
         }
 
-        // Check if enough time has passed
         const ticksSinceHarvest = currentTick - regrowComponent.harvestedAtTick;
         if (ticksSinceHarvest >= resource.lifecycle.time) {
-            // Restore resource - mark as not harvested
             regrowComponent.harvestedAtTick = -1;
             entity.invalidateComponent(RegrowComponentId);
 
-            // Restore sprite to normal (not depleted)
             const spriteComponent = entity.getEcsComponent(SpriteComponentId);
             if (spriteComponent) {
                 spriteComponent.sprite = resource.asset;

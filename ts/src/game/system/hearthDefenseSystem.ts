@@ -24,28 +24,22 @@ export const HEARTH_DEFENSE_INTERVAL = 5;
 
 /**
  * Watches the kingdom's hearthlight for intruders and rallies aggressive
- * workers against them. This is the authoritative, server-side hearthlight
- * derivation. Anything the client derives is presentational only.
+ * workers against them. This is the authoritative hearthlight derivation;
+ * anything the client derives is presentational.
  *
- * The stance filter sits here and only here. A defensive worker never receives
- * an intrusion entry but still retaliates at full priority when personally
- * hit, because damage threat is written by attackTargetAction regardless of
- * stance. That split falls out of where the filter sits, so no second filter
- * belongs downstream.
+ * The stance filter lives here. A defensive worker gets no intrusion entry but
+ * still retaliates at full priority when hit, because attackTargetAction writes
+ * damage threat regardless of stance.
  *
- * Response is hearthlight-wide: the player bounds the mob by choosing who is
- * aggressive. Flat INTRUSION_THREAT plus the insertion-order tie-break means
- * all responders focus-fire the first-registered intruder, and when it dies
- * the next resolvable intruder takes over the same tick (dead entries are
- * skipped by getTopThreat). Acceptable v1. Per-distance amounts are a later
- * tuning option.
+ * Response is hearthlight-wide, and the player bounds the mob by choosing who
+ * is aggressive. A flat INTRUSION_THREAT with an insertion-order tie-break has
+ * every responder focus the first-registered intruder, and the next one takes
+ * over the same tick it dies.
  *
- * The searchlight makes this a tripwire: a wedge sweeping over a goblin puts
- * that tile in hearthlight for a few ticks, so a passer-by produces a short
- * search-and-give-up via threat decay, while a genuine approach reaches the
- * static pools before the entry dies and the chase sustains. A worker the
- * wedge sweeps over is likewise momentarily inside hearthlight and eligible
- * as a defender that tick. The light found them.
+ * A sweeping searchlight wedge puts a tile in hearthlight for a few ticks,
+ * which turns it into a tripwire: a passer-by draws a short search that threat
+ * decay ends, while a real approach reaches the static pools before the entry
+ * dies and the chase holds.
  */
 export const hearthDefenseSystem: EcsSystem = {
     onUpdate: update,

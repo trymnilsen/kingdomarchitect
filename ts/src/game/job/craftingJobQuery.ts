@@ -1,7 +1,4 @@
-import {
-    BehaviorAgentComponentId,
-    type BehaviorAgentComponent,
-} from "../component/BehaviorAgentComponent.ts";
+import { BehaviorAgentComponentId } from "../component/BehaviorAgentComponent.ts";
 import { JobQueueComponentId } from "../component/jobQueueComponent.ts";
 import type { Entity } from "../entity/entity.ts";
 import { CraftingJobId, type CraftingJob } from "./craftingJob.ts";
@@ -56,9 +53,7 @@ export function getCraftingJobProgress(root: Entity, job: CraftingJob): number {
         return 0;
     }
 
-    const agent = worker.getEcsComponent(
-        BehaviorAgentComponentId,
-    ) as BehaviorAgentComponent | null;
+    const agent = worker.getEcsComponent(BehaviorAgentComponentId);
     if (!agent) {
         return 0;
     }

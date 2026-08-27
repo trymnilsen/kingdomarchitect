@@ -55,11 +55,9 @@ export function getBuildingTraversalWeight(entity: Entity): number | undefined {
  * There is no per-building exception: a road is passable because its definition
  * gives it a low weight, and a gate opens by having its weight lowered.
  *
- * This is the single source of truth for every consumer: the pathfinding graph
- * (so routes may be planned through passable structures), the movement step
- * check (so the mover actually steps onto them instead of failing), and
- * displacement scoring (so a shoved worker uses the same rule). They must never
- * diverge, or A* will plan a path the mover then refuses to walk.
+ * The pathfinding graph, the movement step check and displacement scoring all
+ * answer this question through here. If they diverged, A* would plan a path the
+ * mover then refuses to walk.
  */
 export function isImpassableStructure(entity: Entity): boolean {
     const weight = getBuildingTraversalWeight(entity);

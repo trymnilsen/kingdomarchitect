@@ -226,11 +226,11 @@ export function finishConstruction(
     buildingEntity.invalidateComponent(BuildingComponentId);
     buildingEntity.invalidateComponent(SpriteComponentId);
 
-    // The building now reveals its surroundings — its vision reach and, for a light
-    // source, the pool it lights. Discover that footprint so a lit area placed away
-    // from any worker becomes permanent map memory instead of reverting to black by
-    // day. applyFunctionalComponents above has already attached the light source, so
-    // its radius is readable here.
+    // The finished building reveals its surroundings: its vision reach, and for
+    // a light source the pool it lights. Discovering that footprint makes a lit
+    // area placed away from any worker permanent map memory instead of black by
+    // day. The light source is readable here because applyFunctionalComponents
+    // above has already attached it.
     discoverFootprint(root, buildingEntity, buildingEntity.worldPosition);
 }
 

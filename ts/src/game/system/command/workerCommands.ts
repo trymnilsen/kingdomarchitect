@@ -1,3 +1,11 @@
+/**
+ * Handlers for what a worker is and where it works.
+ *
+ * Occupation is a link between a worker and a building, so changing it has to
+ * keep both sides in step. Role and stance belong to the worker alone and touch
+ * one entity.
+ */
+
 import { removeItem } from "../../../common/array.ts";
 import { log } from "../../../common/logging/logger.ts";
 import type { ChangeOccupationCommand } from "../../../server/message/command/changeOccupationCommand.ts";
@@ -8,13 +16,6 @@ import { RoleComponentId } from "../../component/worker/roleComponent.ts";
 import { WorkplaceComponentId } from "../../component/workplaceComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 
-/**
- * Handlers for what a worker is and where it works.
- *
- * Occupation is the link between a worker and a building. Role and stance are
- * properties of the worker on its own, which is why they touch a single entity
- * while occupation has to keep both sides of the link in step.
- */
 export function changeOccupation(
     root: Entity,
     command: ChangeOccupationCommand,

@@ -9,10 +9,10 @@ export interface CollectItemJob extends Job {
      * Which of that entity's stacks this job is for.
      *
      * A worker's held slot takes one item type per trip, so a collectable
-     * holding several types is several hauls. The entity alone therefore stops
-     * naming the work, and the job's address grows a coordinate. Deciding the
-     * type here rather than at execution time is what keeps a two-output
-     * building from hauling one type and stranding the other.
+     * holding several types is several hauls and the entity alone no longer
+     * names the work. Naming the type when the job is queued, rather than when
+     * it runs, keeps a two-output building from hauling one type forever and
+     * stranding the other.
      */
     itemId: string;
 }

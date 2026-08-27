@@ -15,11 +15,10 @@ export interface GameTimeSource {
  * already updates every tick, so there is no per-tick stamping and no second
  * counter that could drift.
  *
- * This bends the components-are-pure-data rule on purpose. That rule exists
- * for serialization and replication, and this component takes part in neither:
- * root replication is allowlist-based and persistence is whitelist-based, so
- * the reference never crosses a serializer. The authoritative tick is saved in
- * the world meta instead.
+ * Holding a reference bends the components-are-pure-data rule, which exists for
+ * serialization and replication. This component takes part in neither: root
+ * replication and persistence are both allowlist-based, so the reference never
+ * reaches a serializer. The authoritative tick is saved in the world meta.
  */
 export type GameTimeComponent = {
     id: typeof GameTimeComponentId;

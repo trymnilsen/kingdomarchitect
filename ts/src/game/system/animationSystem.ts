@@ -144,36 +144,27 @@ function updateAnimation(
     spriteCache: SpriteDefinitionCache,
 ) {
     animatable.currentAnimation = nextStateKey;
-    const spriteComponent = entity.updateComponent(
-        SpriteComponentId,
-        (component) => {
-            const sprite = getSpriteForState(
-                animatable,
-                nextStateKey,
-                entity,
-                spriteCache,
-            );
-            component.sprite = sprite;
-            component.frame = 0;
-        },
-    );
+    entity.updateComponent(SpriteComponentId, (component) => {
+        component.sprite = getSpriteForState(
+            animatable,
+            nextStateKey,
+            entity,
+            spriteCache,
+        );
+        component.frame = 0;
+    });
 }
 
 /**
- * Replaces placeholders like {direction} in a template string with
- * actual values from an entity's components.
- * @param template The animation template string (e.g., "walk_{direction}").
- * @param entity The entity to get contextual data from.
- * @returns The final animation key (e.g., "walk_down").
+ * Fills placeholders in an animation template from the entity's components,
+ * turning "walk_{direction}" into "walk_down".
  */
 function resolvePlaceholders(
     template: AnimationTemplate,
     entity: Entity,
 ): AnimationKey {
-    // Start with the template string
     let resolvedString = template as string;
 
-    // Check for and replace the {direction} placeholder
     if (resolvedString.includes("{direction}")) {
         const direction =
             entity.getEcsComponent(DirectionComponentId)?.direction ??
@@ -188,8 +179,8 @@ function resolvePlaceholders(
         resolvedString = resolvedString.replace("{ordinal}", ordinal);
     }
 
-    // We cast back to ValidAnimationKey because our type system guarantees
-    // that a valid template will resolve to a valid key.
+    // A valid template always resolves to a valid key, which the types cannot
+    // express through the string replacement.
     return resolvedString as AnimationKey;
 }
 

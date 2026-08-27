@@ -50,11 +50,10 @@ export type PendingReplan = { kind: "replan" };
 export interface BehaviorAgentComponent {
     id: typeof BehaviorAgentComponentId;
     /**
-     * The behavior whose actions are currently in actionQueue — i.e. what this
-     * agent is doing right now. null whenever there is no active plan (the queue
-     * is empty / the agent is idle). This is the single source of truth the
-     * selection UI reads, so it is cleared the moment a plan ends — see
-     * clearBehavior and concludeActivePlan in BehaviorSystem.
+     * The behavior whose actions are in actionQueue, so what this agent is
+     * doing right now. null whenever there is no active plan. The selection UI
+     * reads this, so it is cleared the moment a plan ends. See clearBehavior
+     * and concludeActivePlan in BehaviorSystem.
      */
     currentBehaviorName: string | null;
     /**

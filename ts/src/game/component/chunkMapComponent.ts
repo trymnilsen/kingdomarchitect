@@ -33,18 +33,14 @@ export function createChunkMap(): ChunkMap {
 }
 
 /**
- * Gets all entities in the chunk at the given world position
- * @param chunkMap The ChunkMap to search in
- * @param x the x coordinate in tilespace
- * @param y the y coordinate in tilespace
- * @returns an array of entities within the chunk at the given position
+ * Every entity in the chunk containing the given tile. Note the whole chunk, not
+ * the single tile.
  */
 export function getEntitiesAt(
     chunkMap: ChunkMap,
     x: number,
     y: number,
 ): Entity[] {
-    // Convert to chunk coordinates
     const chunkX = Math.floor(x / ChunkSize);
     const chunkY = Math.floor(y / ChunkSize);
     const chunkKey = encodePosition(chunkX, chunkY);
@@ -98,24 +94,19 @@ export function getEntitiesInChunkMapWithin(
 }
 
 /**
- * Visits every entity carrying `componentId` whose chunk overlaps `bounds`,
- * handing the entity and its (narrowed) component straight to the visitor. This
- * is the allocation-free spatial query the render pass uses: it walks each
- * overlapping chunk's dense array inline — no intermediate entity array, no
- * result map, no spread — so a per-frame pan does not churn collections.
+ * Visits every entity carrying `componentId` whose chunk overlaps `bounds`.
+ * The render pass uses this, so it walks each overlapping chunk's dense array
+ * inline and allocates nothing: no intermediate array, no result map.
  *
- * The cut is at chunk granularity ({@link ChunkSize} tiles) with a one-chunk
- * margin, matching {@link getEntitiesInChunkMapWithin}; there is intentionally no
- * exact per-entity bounds test, so an entity near the edge whose footprint or
- * sprite still reaches on-screen is included rather than popping out.
+ * The cut is at chunk granularity with a one-chunk margin, matching
+ * {@link getEntitiesInChunkMapWithin}. There is no exact per-entity bounds
+ * test, so an entity near the edge whose sprite still reaches on-screen is
+ * included rather than popping out.
  *
  * Only sprite-bearing entities are spatially indexed, so callers must query a
- * component that co-occurs with a sprite. Roots without a chunk map (bare test
- * trees) fall back to a full {@link visitChildren} walk with the same filter.
+ * component that comes with a sprite. A root without a chunk map, as in bare
+ * test trees, falls back to a full {@link visitChildren} walk.
  *
- * @param root world root holding the {@link ChunkMapComponent}
- * @param bounds the region to cover, in world tile coordinates
- * @param componentId the component every visited entity must carry
  * @param visitor called once per matching entity; must not mutate the tree
  */
 export function forEachComponentWithin<ID extends ComponentID>(

@@ -16,11 +16,9 @@ import { isTowerManned } from "../component/stationQuery.ts";
 import { discoverFootprint } from "../map/discoverFootprint.ts";
 
 /**
- * Ticks the auto-sweep dwells on each quarter before advancing. The hearth
- * defense system samples every HEARTH_DEFENSE_INTERVAL (5) ticks, so dwell must
- * stay at or above twice that interval. Below it an intruder can cross a wedge
- * between two defense scans and never register. Whoever retunes either
- * constant meets this comment.
+ * Ticks the auto-sweep dwells on each quarter before advancing. Must stay at or
+ * above twice HEARTH_DEFENSE_INTERVAL (5), the hearth defense sampling rate.
+ * Below that an intruder can cross a wedge between two scans and never register.
  */
 const SEARCHLIGHT_SWEEP_TICKS = 10;
 

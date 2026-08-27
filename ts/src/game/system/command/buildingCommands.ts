@@ -1,3 +1,11 @@
+/**
+ * Handlers for putting buildings down and taking them back up.
+ *
+ * Placing a building creates the entity as a scaffold straight away and queues
+ * the work that fills it in, so the player sees the footprint before a worker
+ * has walked over.
+ */
+
 import { log } from "../../../common/logging/logger.ts";
 import { getBuildingById } from "../../../data/building/buildings.ts";
 import type { BuildCommand } from "../../../server/message/command/buildCommand.ts";
@@ -22,13 +30,6 @@ import {
 } from "../../job/dismantleBuildingJob.ts";
 import { isTargetOfJob } from "../../job/job.ts";
 
-/**
- * Handlers for putting buildings down and taking them back up.
- *
- * Placing a building creates the entity as a scaffold straight away and queues
- * the work that fills it in, so the player sees the footprint before a worker
- * has walked over.
- */
 export function buildBuilding(root: Entity, command: BuildCommand) {
     const points = Array.isArray(command.position)
         ? command.position

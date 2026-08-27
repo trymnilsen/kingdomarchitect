@@ -87,15 +87,12 @@ export const UNIT_SPRITE_DEPTH = 10;
 
 /**
  * Stacking comparator for `[Entity, SpriteComponent]` entries, sorting
- * back-to-front (draw order): lower world Y first; on a Y tie the lower `depth`
- * first, so the higher-`depth` sprite is drawn last and sits on top. Returns the
- * standard comparator sign.
+ * back-to-front: lower world Y first, and on a Y tie the lower `depth` first so
+ * the higher-`depth` sprite is drawn last and sits on top.
  *
- * Single source of truth for stacking order. The chunk map only spatially
- * indexes sprite-bearing entities, so both the render query and tap-selection
- * can supply this `[Entity, SpriteComponent]` shape and share this one rule.
- * Reads depth straight from the paired component, so there is no
- * `getEcsComponent` inside the per-frame comparator.
+ * Rendering and tap-selection both order by this. Only sprite-bearing entities
+ * are spatially indexed, so both can supply the pair shape, which keeps
+ * getEcsComponent out of a comparator that runs per frame.
  */
 export function compareSpriteStacking(
     a: [Entity, SpriteComponent],
@@ -106,11 +103,10 @@ export function compareSpriteStacking(
 }
 
 /**
- * Entities on one tile ordered top-most first — the reverse of draw order — so
- * tap-cycling visits what the player sees on top first. Pairs each entity with
- * its sprite (guaranteed present: only sprite-bearing entities are spatially
- * indexed) to reuse `compareSpriteStacking`, then unwraps. Returns a new array;
- * the input is left untouched. Cold path (once per tap, few entities).
+ * Entities on one tile ordered top-most first, the reverse of draw order, so
+ * tap-cycling visits what the player sees on top first. The sprite lookup is
+ * safe because only sprite-bearing entities are spatially indexed. Returns a
+ * new array and leaves the input alone.
  */
 export function entitiesFrontToBack(entities: readonly Entity[]): Entity[] {
     return entities
