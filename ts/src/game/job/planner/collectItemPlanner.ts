@@ -1,9 +1,8 @@
 import type { Entity } from "../../entity/entity.ts";
 import type { BehaviorActionData } from "../../behavior/actions/ActionData.ts";
 import { CollectableComponentId } from "../../component/collectableComponent.ts";
-import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import type { CollectItemJob } from "../collectItemJob.ts";
-import { failJobFromQueue } from "../jobLifecycle.ts";
+import { removeJobForWorker } from "../jobLifecycle.ts";
 
 /**
  * Plan actions for collecting one stack from an entity with a
@@ -20,7 +19,7 @@ export function planCollectItem(
     const targetEntity = root.findEntity(job.entityId);
 
     if (!targetEntity) {
-        dropJob(worker, job);
+        removeJobForWorker(worker, job);
         return [];
     }
 
@@ -32,7 +31,7 @@ export function planCollectItem(
         (stack) => stack.item.id === job.itemId,
     );
     if (!hasStack) {
-        dropJob(worker, job);
+        removeJobForWorker(worker, job);
         return [];
     }
 
@@ -44,11 +43,4 @@ export function planCollectItem(
         },
         { type: "collectItems", entityId: job.entityId, itemId: job.itemId },
     ];
-}
-
-function dropJob(worker: Entity, job: CollectItemJob): void {
-    const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
-    if (queueEntity) {
-        failJobFromQueue(queueEntity, job);
-    }
 }

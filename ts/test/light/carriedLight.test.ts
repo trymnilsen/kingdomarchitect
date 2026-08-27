@@ -1,7 +1,7 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
 import { Entity } from "../../src/game/entity/entity.ts";
-import { makeNumberId, type Point } from "../../src/common/point.ts";
+import { encodePosition, type Point } from "../../src/common/point.ts";
 import type { InventoryItem } from "../../src/data/inventory/inventoryItem.ts";
 import { createEquipmentComponent } from "../../src/game/component/equipmentComponent.ts";
 import { createLightSourceComponent } from "../../src/game/component/lightSourceComponent.ts";
@@ -36,7 +36,7 @@ function kingdomWithTorchbearer(position: Point): Entity {
 }
 
 function litAt(litTiles: ReadonlySet<number>, x: number, y: number): boolean {
-    return litTiles.has(makeNumberId(x, y));
+    return litTiles.has(encodePosition(x, y));
 }
 
 describe("carried light", () => {

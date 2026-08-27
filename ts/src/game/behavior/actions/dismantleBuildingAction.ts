@@ -7,10 +7,7 @@ import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import { SpriteComponentId } from "../../component/spriteComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { finishDismantle } from "../../job/dismantleBuildingJob.ts";
-import {
-    findJobClaimedBy,
-    completeJobFromQueue,
-} from "../../job/jobLifecycle.ts";
+import { completeClaimedJob } from "../../job/jobLifecycle.ts";
 import { ActionComplete, ActionRunning, type ActionResult } from "./Action.ts";
 
 export type DismantleBuildingActionData = {
@@ -70,13 +67,7 @@ export function executeDismantleBuildingAction(
 
     if (healthComponent.currentHp <= 0) {
         finishDismantle(root, tick, buildingEntity);
-        const queueEntity = entity.getAncestorEntity(JobQueueComponentId);
-        if (queueEntity) {
-            const job = findJobClaimedBy(queueEntity, entity.id);
-            if (job) {
-                completeJobFromQueue(queueEntity, job);
-            }
-        }
+        completeClaimedJob(entity);
         return ActionComplete;
     }
 

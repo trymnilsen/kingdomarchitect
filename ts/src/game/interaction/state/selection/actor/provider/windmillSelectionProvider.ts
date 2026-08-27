@@ -14,9 +14,9 @@ import { QueueJobCommand } from "../../../../../../server/message/command/queueJ
 import { ClearBuildingJobsCommand } from "../../../../../../server/message/command/clearBuildingJobsCommand.ts";
 import {
     createWindmillJob,
-    getWindmillJobCountForBuilding,
     WindmillJobId,
 } from "../../../../../job/windmillJob.ts";
+import { countJobsForBuilding } from "../../../../../job/jobQuery.ts";
 import { windmill } from "../../../../../../data/building/food/windmill.ts";
 import type { UIActionbarItem } from "../../../../view/uiActionbar.ts";
 
@@ -42,7 +42,7 @@ export class WindmillSelectionProvider implements ActorSelectionProvider {
         const settlement = getSettlementEntity(selection.entity);
         const jobQueue = settlement.getEcsComponent(JobQueueComponentId);
         const queuedCount = jobQueue
-            ? getWindmillJobCountForBuilding(jobQueue, selection.entity.id)
+            ? countJobsForBuilding(jobQueue, WindmillJobId, selection.entity.id)
             : 0;
 
         const actionText = queuedCount > 0 ? `Farm (${queuedCount})` : "Farm";

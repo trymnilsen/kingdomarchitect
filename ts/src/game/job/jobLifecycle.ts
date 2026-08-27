@@ -18,27 +18,12 @@ export function findJobClaimedBy(
 }
 
 /**
- * Complete a job and remove it from the queue.
- * Call this when a job has been successfully finished.
+ * Take a job out of the queue for good, whether it finished or turned out to
+ * be impossible. A job that leaves the queue is never re-selected, so both
+ * outcomes end the same way.
  * @param queueEntity The entity holding the JobQueueComponent
  */
-export function completeJobFromQueue(queueEntity: Entity, job: Jobs): void {
-    const jobQueue = queueEntity.getEcsComponent(JobQueueComponentId);
-    if (!jobQueue) return;
-
-    const index = jobQueue.jobs.indexOf(job);
-    if (index !== -1) {
-        jobQueue.jobs.splice(index, 1);
-        queueEntity.invalidateComponent(JobQueueComponentId);
-    }
-}
-
-/**
- * Fail a job and remove it from the queue.
- * Call this when a job cannot be completed (e.g., target destroyed).
- * @param queueEntity The entity holding the JobQueueComponent
- */
-export function failJobFromQueue(queueEntity: Entity, job: Jobs): void {
+export function removeJobFromQueue(queueEntity: Entity, job: Jobs): void {
     const jobQueue = queueEntity.getEcsComponent(JobQueueComponentId);
     if (!jobQueue) return;
 
@@ -62,7 +47,30 @@ export function completeClaimedJob(worker: Entity): void {
     }
     const job = findJobClaimedBy(queueEntity, worker.id);
     if (job) {
-        completeJobFromQueue(queueEntity, job);
+        removeJobFromQueue(queueEntity, job);
+    }
+}
+
+/**
+ * Remove a job from whichever queue owns the worker. Planners and actions hold
+ * the worker, not the queue, so they go through here instead of resolving the
+ * ancestor queue themselves.
+ */
+export function removeJobForWorker(worker: Entity, job: Jobs): void {
+    const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
+    if (queueEntity) {
+        removeJobFromQueue(queueEntity, job);
+    }
+}
+
+/**
+ * Release the worker's claim on a job it cannot proceed with, leaving the job
+ * queued for whoever can. See removeJobForWorker for why this takes the worker.
+ */
+export function suspendJobForWorker(worker: Entity, job: Jobs): void {
+    const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
+    if (queueEntity) {
+        suspendJobInQueue(queueEntity, job);
     }
 }
 

@@ -3,7 +3,6 @@ import { BuildingComponentId } from "../../component/buildingComponent.ts";
 import {
     getInventoryItem,
     InventoryComponentId,
-    type InventoryComponent,
 } from "../../component/inventoryComponent.ts";
 import {
     HeldItemComponentId,
@@ -15,7 +14,10 @@ import { ResourceHarvestMode } from "../../../data/inventory/items/naturalResour
 import { distance } from "../../../common/point.ts";
 import { woodResourceItem } from "../../../data/inventory/items/resources.ts";
 import type { Entity } from "../../entity/entity.ts";
-import type { BuildBuildingJob } from "../buildBuildingJob.ts";
+import {
+    getRemainingMaterials,
+    type BuildBuildingJob,
+} from "../buildBuildingJob.ts";
 import { GoblinUnitComponentId } from "../../component/goblinUnitComponent.ts";
 import { findDropPosition } from "../../behavior/dropItem.ts";
 import { log } from "../../../common/logging/logger.ts";
@@ -54,11 +56,10 @@ export function planGoblinBuildJob(
     const buildingInventory =
         buildingEntity.getEcsComponent(InventoryComponentId);
 
-    const requirements =
-        buildingComponent.building.requirements?.materials ?? {};
+    const requirements = buildingComponent.building.requirements;
     const remainingMaterials = buildingInventory
         ? getRemainingMaterials(buildingInventory, requirements)
-        : { ...requirements };
+        : { ...(requirements?.materials ?? {}) };
 
     if (Object.keys(remainingMaterials).length === 0) {
         return [
@@ -158,22 +159,6 @@ function findCampEntity(worker: Entity, root: Entity): Entity | null {
     const goblinUnit = worker.getEcsComponent(GoblinUnitComponentId);
     if (!goblinUnit) return null;
     return root.findEntity(goblinUnit.campEntityId);
-}
-
-function getRemainingMaterials(
-    buildingInventory: InventoryComponent,
-    requirements: Record<string, number>,
-): Record<string, number> {
-    const remaining: Record<string, number> = {};
-    for (const [itemId, amountNeeded] of Object.entries(requirements)) {
-        const item = getInventoryItem(buildingInventory, itemId);
-        const have = item?.amount ?? 0;
-        const needed = amountNeeded - have;
-        if (needed > 0) {
-            remaining[itemId] = needed;
-        }
-    }
-    return remaining;
 }
 
 function findCampStockpileWithMaterials(

@@ -1,7 +1,7 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
 import { Entity } from "../../src/game/entity/entity.ts";
-import { makeNumberId, type Point } from "../../src/common/point.ts";
+import { encodePosition, type Point } from "../../src/common/point.ts";
 import { buildingPrefab } from "../../src/game/prefab/buildingPrefab.ts";
 import {
     collectLightClaims,
@@ -39,7 +39,7 @@ function coverageWithBuilding(
 }
 
 function litAt(litTiles: ReadonlySet<number>, x: number, y: number): boolean {
-    return litTiles.has(makeNumberId(x, y));
+    return litTiles.has(encodePosition(x, y));
 }
 
 describe("building light", () => {

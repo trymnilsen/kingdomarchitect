@@ -1,24 +1,20 @@
-import { allSides } from "../../../../common/sides.ts";
-import { spriteRefs } from "../../../../asset/sprite.ts";
-import { bookInkColor } from "../../../../ui/color.ts";
+import { allSides } from "../../../common/sides.ts";
+import type { SpriteRef } from "../../../asset/sprite.ts";
+import { spriteRefs } from "../../../asset/sprite.ts";
+import { bookInkColor } from "../../../ui/color.ts";
 import {
     createComponent,
     type ComponentDescriptor,
-} from "../../../../ui/declarative/ui.ts";
-import { uiBookLayout } from "../../../../ui/declarative/uiBookLayout.ts";
-import { uiBox } from "../../../../ui/declarative/uiBox.ts";
-import { uiButton } from "../../../../ui/declarative/uiButton.ts";
-import { uiImage } from "../../../../ui/declarative/uiImage.ts";
-import { uiColumn, uiRow } from "../../../../ui/declarative/uiSequence.ts";
-import { uiText } from "../../../../ui/declarative/uiText.ts";
-import { ninePatchBackground } from "../../../../ui/uiBackground.ts";
-import { fillUiSize, wrapUiSize } from "../../../../ui/uiSize.ts";
-import { uiScaffold } from "../../view/uiScaffold.ts";
-import {
-    roleDefinitions,
-    type RoleDefinition,
-} from "../../../../data/role/roleDefinitions.ts";
-import type { WorkerRole } from "../../../component/worker/roleComponent.ts";
+} from "../../../ui/declarative/ui.ts";
+import { uiBookLayout } from "../../../ui/declarative/uiBookLayout.ts";
+import { uiBox } from "../../../ui/declarative/uiBox.ts";
+import { uiButton } from "../../../ui/declarative/uiButton.ts";
+import { uiImage } from "../../../ui/declarative/uiImage.ts";
+import { uiColumn, uiRow } from "../../../ui/declarative/uiSequence.ts";
+import { uiText } from "../../../ui/declarative/uiText.ts";
+import { ninePatchBackground } from "../../../ui/uiBackground.ts";
+import { fillUiSize, wrapUiSize } from "../../../ui/uiSize.ts";
+import { uiScaffold } from "./uiScaffold.ts";
 
 const bookTextStyle = {
     color: bookInkColor,
@@ -38,22 +34,35 @@ const bookSubtitleStyle = {
     size: 12,
 };
 
-export type RoleSelectionViewProps = {
-    currentRole: WorkerRole;
-    selectedRoleIndex: number;
-    onRoleSelected: (index: number) => void;
-    onAssign: (role: WorkerRole) => void;
+/**
+ * One pickable thing in the book. Crop and role definitions both satisfy this
+ * shape, so they can be handed to the view as they are.
+ */
+export type BookSelectionEntry = {
+    name: string;
+    subtitle: string;
+    description: string;
+    icon: SpriteRef;
+};
+
+export type BookSelectionViewProps = {
+    entries: BookSelectionEntry[];
+    /** Entry already assigned to the subject, marked "(current)". -1 for none. */
+    currentIndex: number;
+    selectedIndex: number;
+    onSelected: (index: number) => void;
+    onAssign: (index: number) => void;
     onCancel: () => void;
 };
 
-type RoleListItemProps = {
-    role: RoleDefinition;
+type BookListItemProps = {
+    entry: BookSelectionEntry;
     isSelected: boolean;
     isCurrent: boolean;
     onTap: () => void;
 };
 
-const roleListItem = createComponent<RoleListItemProps>(({ props }) => {
+const bookListItem = createComponent<BookListItemProps>(({ props }) => {
     const backgroundSprite = props.isSelected
         ? spriteRefs.book_grid_item_focused
         : spriteRefs.book_grid_item;
@@ -74,7 +83,7 @@ const roleListItem = createComponent<RoleListItemProps>(({ props }) => {
             gap: 8,
             children: [
                 uiImage({
-                    sprite: props.role.icon,
+                    sprite: props.entry.icon,
                     width: 32,
                     height: 32,
                 }),
@@ -84,12 +93,12 @@ const roleListItem = createComponent<RoleListItemProps>(({ props }) => {
                     children: [
                         uiText({
                             content:
-                                props.role.name +
+                                props.entry.name +
                                 (props.isCurrent ? " (current)" : ""),
                             textStyle: bookTextStyle,
                         }),
                         uiText({
-                            content: props.role.subtitle,
+                            content: props.entry.subtitle,
                             textStyle: bookSubtitleStyle,
                         }),
                     ],
@@ -100,16 +109,17 @@ const roleListItem = createComponent<RoleListItemProps>(({ props }) => {
 });
 
 function createMasterView(
-    currentRole: WorkerRole,
+    entries: BookSelectionEntry[],
+    currentIndex: number,
     selectedIndex: number,
-    onRoleSelect: (index: number) => void,
+    onSelect: (index: number) => void,
 ): ComponentDescriptor {
-    const listItems = roleDefinitions.map((role, index) =>
-        roleListItem({
-            role,
+    const listItems = entries.map((entry, index) =>
+        bookListItem({
+            entry,
             isSelected: index === selectedIndex,
-            isCurrent: role.role === currentRole,
-            onTap: () => onRoleSelect(index),
+            isCurrent: index === currentIndex,
+            onTap: () => onSelect(index),
         }),
     );
 
@@ -126,9 +136,7 @@ function createMasterView(
     });
 }
 
-function createDetailsView(selectedRoleIndex: number): ComponentDescriptor {
-    const role = roleDefinitions[selectedRoleIndex];
-
+function createDetailsView(entry: BookSelectionEntry): ComponentDescriptor {
     return uiBox({
         width: fillUiSize,
         height: fillUiSize,
@@ -147,21 +155,21 @@ function createDetailsView(selectedRoleIndex: number): ComponentDescriptor {
                         scale: 1,
                     }),
                     child: uiImage({
-                        sprite: role.icon,
+                        sprite: entry.icon,
                         width: 64,
                         height: 64,
                     }),
                 }),
                 uiText({
-                    content: role.name,
+                    content: entry.name,
                     textStyle: bookTitleStyle,
                 }),
                 uiText({
-                    content: role.subtitle,
+                    content: entry.subtitle,
                     textStyle: bookTextStyle,
                 }),
                 uiText({
-                    content: role.description,
+                    content: entry.description,
                     textStyle: bookSubtitleStyle,
                 }),
             ],
@@ -169,22 +177,28 @@ function createDetailsView(selectedRoleIndex: number): ComponentDescriptor {
     });
 }
 
-export const roleSelectionView = createComponent<RoleSelectionViewProps>(
+/**
+ * Master/detail picker rendered as an open book: the list on the left page,
+ * the selected entry described on the right. Crop and role selection both use
+ * it, and the caller maps the chosen index back to its own domain value.
+ */
+export const bookSelectionView = createComponent<BookSelectionViewProps>(
     ({ props, withState }) => {
         const [selectedIndex, setSelectedIndex] = withState(
-            props.selectedRoleIndex,
+            props.selectedIndex,
         );
 
         const masterView = createMasterView(
-            props.currentRole,
+            props.entries,
+            props.currentIndex,
             selectedIndex,
             (index: number) => {
                 setSelectedIndex(index);
-                props.onRoleSelected(index);
+                props.onSelected(index);
             },
         );
 
-        const detailsView = createDetailsView(selectedIndex);
+        const detailsView = createDetailsView(props.entries[selectedIndex]);
 
         return uiScaffold({
             content: uiBookLayout({
@@ -195,10 +209,7 @@ export const roleSelectionView = createComponent<RoleSelectionViewProps>(
                 {
                     text: "Assign",
                     icon: spriteRefs.empty_sprite,
-                    onClick: () => {
-                        const selectedRole = roleDefinitions[selectedIndex];
-                        props.onAssign(selectedRole.role);
-                    },
+                    onClick: () => props.onAssign(selectedIndex),
                 },
                 {
                     text: "Cancel",
@@ -208,5 +219,5 @@ export const roleSelectionView = createComponent<RoleSelectionViewProps>(
             ],
         });
     },
-    { displayName: "RoleSelectionView" },
+    { displayName: "BookSelectionView" },
 );

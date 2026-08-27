@@ -6,11 +6,7 @@ import { spendEntityEnergy } from "../../component/energyComponent.ts";
 import { ProductionComponentId } from "../../component/productionComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { resourcePrefab } from "../../prefab/resourcePrefab.ts";
-import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
-import {
-    findJobClaimedBy,
-    completeJobFromQueue,
-} from "../../job/jobLifecycle.ts";
+import { completeClaimedJob } from "../../job/jobLifecycle.ts";
 import { ActionComplete, ActionRunning, type ActionResult } from "./Action.ts";
 
 export type PlantTreeActionData = {
@@ -73,13 +69,7 @@ export function executePlantTreeAction(
         root.addChild(spawned);
         spawned.worldPosition = action.targetPosition;
 
-        const queueEntity = entity.getAncestorEntity(JobQueueComponentId);
-        if (queueEntity) {
-            const job = findJobClaimedBy(queueEntity, entity.id);
-            if (job) {
-                completeJobFromQueue(queueEntity, job);
-            }
-        }
+        completeClaimedJob(entity);
         return ActionComplete;
     }
 

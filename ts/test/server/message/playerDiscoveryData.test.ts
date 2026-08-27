@@ -1,6 +1,6 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
-import { encodePosition, makeNumberId } from "../../../src/common/point.ts";
+import { encodePosition } from "../../../src/common/point.ts";
 import {
     createTileComponent,
     setChunk,
@@ -143,9 +143,9 @@ describe("playerDiscoveryData", () => {
             const chunkId = encodePosition(0, 0);
             // Discover only tiles at local positions (0,0), (1,1), (2,2)
             const discoveredTiles = new Set([
-                makeNumberId(0, 0),
-                makeNumberId(1, 1),
-                makeNumberId(2, 2),
+                encodePosition(0, 0),
+                encodePosition(1, 1),
+                encodePosition(2, 2),
             ]);
 
             const playerDiscovery: WorldDiscoveryData = {
@@ -318,7 +318,7 @@ describe("playerDiscoveryData", () => {
             const chunk1Id = encodePosition(1, 0);
 
             // One tile discovered in chunk 1
-            const discoveredTiles = new Set([makeNumberId(0, 0)]);
+            const discoveredTiles = new Set([encodePosition(0, 0)]);
 
             const playerDiscovery: WorldDiscoveryData = {
                 fullyDiscoveredChunks: new Set([chunk0Id]),

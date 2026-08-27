@@ -1,5 +1,5 @@
 import { type EcsSystem } from "../../ecs/ecsSystem.ts";
-import { makeNumberId, type Point } from "../../common/point.ts";
+import { encodePosition, type Point } from "../../common/point.ts";
 import { DrawMode } from "../../rendering/drawMode.ts";
 import type { RenderScope } from "../../rendering/renderScope.ts";
 import {
@@ -226,7 +226,7 @@ function drawTiles(
         if (!chunk.volume) {
             continue;
         }
-        const chunkNumberId = makeNumberId(chunk.chunkX, chunk.chunkY);
+        const chunkNumberId = encodePosition(chunk.chunkX, chunk.chunkY);
         const chunkPosition = {
             x: chunk.chunkX * ChunkSize,
             y: chunk.chunkY * ChunkSize,

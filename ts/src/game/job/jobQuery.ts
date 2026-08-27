@@ -1,5 +1,8 @@
 import type { Point } from "../../common/point.ts";
-import { JobQueueComponentId } from "../component/jobQueueComponent.ts";
+import {
+    JobQueueComponentId,
+    type JobQueueComponent,
+} from "../component/jobQueueComponent.ts";
 import type { Entity } from "../entity/entity.ts";
 import { isTargetOfJob, type Jobs } from "./job.ts";
 
@@ -62,4 +65,20 @@ export function getJobTargetPosition(root: Entity, job: Jobs): Point | null {
         default:
             return null;
     }
+}
+
+/**
+ * Count queued jobs of one kind that target a building. Workstation UI reads
+ * this to show how much work is still pending at that station.
+ */
+export function countJobsForBuilding(
+    jobQueue: JobQueueComponent,
+    jobId: string,
+    buildingId: string,
+): number {
+    return jobQueue.jobs.filter(
+        (job) =>
+            job.id === jobId &&
+            (job as { targetBuilding?: string }).targetBuilding === buildingId,
+    ).length;
 }

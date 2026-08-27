@@ -7,7 +7,7 @@ import {
     subtractPoint,
     zeroPoint,
 } from "../../common/point.ts";
-import { GameTime } from "../../common/time.ts";
+import { GameTime } from "../gameTime.ts";
 import type {
     BaseComponent,
     ComponentID,

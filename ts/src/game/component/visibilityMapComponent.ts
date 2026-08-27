@@ -1,4 +1,4 @@
-import { makeNumberId } from "../../common/point.ts";
+import { encodePosition } from "../../common/point.ts";
 import { ChunkSize } from "../map/chunk.ts";
 import type { WorldDiscoveryData } from "./worldDiscoveryComponent.ts";
 
@@ -40,7 +40,7 @@ export function hasDiscovered(
         return false;
     }
 
-    return partiallyDiscovered.has(makeNumberId(tileX, tileY));
+    return partiallyDiscovered.has(encodePosition(tileX, tileY));
 }
 
 /**
@@ -57,7 +57,7 @@ export function hasDiscoveredWorldTile(
     const chunkY = Math.floor(worldY / ChunkSize);
     return hasDiscovered(
         visibilityComponent,
-        makeNumberId(chunkX, chunkY),
+        encodePosition(chunkX, chunkY),
         worldX - chunkX * ChunkSize,
         worldY - chunkY * ChunkSize,
     );

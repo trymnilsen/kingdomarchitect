@@ -2,7 +2,7 @@ import { log } from "../common/logging/logger.ts";
 import { multiplyPoint, type Point } from "../common/point.ts";
 import { AssetLoader } from "../asset/loader/assetLoader.ts";
 
-import { GameTime } from "../common/time.ts";
+import { GameTime } from "./gameTime.ts";
 import { EcsWorld } from "../ecs/ecsWorld.ts";
 import { Input, type InputEvent } from "../input/input.ts";
 import { TouchInput } from "../input/touchInput.ts";
@@ -79,7 +79,7 @@ export class Game {
         this.gameServer.onMessage.listen((message) => {
             if (message.type === WorldStateMessageType) {
                 this.updateTick = message.serverTick;
-                this.gameTime.tick = message.serverTick;
+                this.gameTime.setTick(message.serverTick);
             }
             handleGameMessage(this.ecsWorld.root, message);
             this.ecsWorld.runGameMessage(message);
@@ -196,7 +196,7 @@ export class Game {
         this.drawTick += 1;
         if (this.drawTick % 5 == 0) {
             this.updateTick += 1;
-            this.gameTime.tick = this.updateTick;
+            this.gameTime.setTick(this.updateTick);
             this.ecsWorld.runUpdate(this.updateTick);
             this.interactionHandler.onUpdate(this.updateTick);
         }

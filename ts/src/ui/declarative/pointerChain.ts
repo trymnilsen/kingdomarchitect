@@ -1,5 +1,5 @@
 import type { Point } from "../../common/point.ts";
-import { withinRectangle } from "../../common/structure/rectangle.ts";
+import { pointWithinRectangle } from "../../common/structure/rectangle.ts";
 import type { UiNode } from "./ui.ts";
 
 /**
@@ -39,7 +39,7 @@ export function pointerChainAt(
         }
 
         const region = node.layout?.region;
-        if (interactive && region && withinRectangle(point, region)) {
+        if (interactive && region && pointWithinRectangle(point, region)) {
             // Record the path to this hit. Later records overwrite earlier
             // ones, so the final value is the node drawn on top.
             winner = [...ancestors];
@@ -50,7 +50,7 @@ export function pointerChainAt(
         // the canvas clip on the draw side, including for nested clips.
         const clippedOut =
             node.layout?.clip === true &&
-            !(region && withinRectangle(point, region));
+            !(region && pointWithinRectangle(point, region));
         if (!clippedOut) {
             for (const child of node.children) {
                 visit(child);

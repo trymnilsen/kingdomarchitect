@@ -1,7 +1,7 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
 import { Entity } from "../../src/game/entity/entity.ts";
-import { makeNumberId, type Point } from "../../src/common/point.ts";
+import { encodePosition, type Point } from "../../src/common/point.ts";
 import type { Phase } from "../../src/game/component/dayComponent.ts";
 import { createLightSourceComponent } from "../../src/game/component/lightSourceComponent.ts";
 import { createPlayerKingdomComponent } from "../../src/game/component/playerKingdomComponent.ts";
@@ -29,7 +29,7 @@ function addSource(
 }
 
 function litAt(litTiles: ReadonlySet<number>, x: number, y: number): boolean {
-    return litTiles.has(makeNumberId(x, y));
+    return litTiles.has(encodePosition(x, y));
 }
 
 describe("lit coverage", () => {

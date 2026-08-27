@@ -10,25 +10,10 @@ import {
     type HeldItemComponent,
     isHeldEmpty,
 } from "../../component/heldItemComponent.ts";
-import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import type { CraftingJob } from "../craftingJob.ts";
-import { failJobFromQueue, suspendJobInQueue } from "../jobLifecycle.ts";
+import { removeJobForWorker, suspendJobForWorker } from "../jobLifecycle.ts";
 import { findStockpilesWithItem } from "../../building/materialQuery.ts";
 import { findDropPosition } from "../../behavior/dropItem.ts";
-
-/**
- * Release the worker's claim while leaving the job in the queue, so it can be
- * retried once its inputs become available (mirrors the build planner). Used
- * for temporary blockers like "no source for an input yet" or "can't free
- * hands to fetch ingredients". Permanently broken jobs (missing
- * building/inventory) call {@link failAndAbort} instead.
- */
-function suspendJob(worker: Entity, job: CraftingJob): void {
-    const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
-    if (queueEntity) {
-        suspendJobInQueue(queueEntity, job);
-    }
-}
 
 /**
  * Plan actions for crafting an item under the held-item model.
@@ -48,13 +33,15 @@ export function planCrafting(
 ): BehaviorActionData[] {
     const buildingEntity = root.findEntity(job.targetBuilding);
     if (!buildingEntity) {
-        return failAndAbort(worker, job);
+        removeJobForWorker(worker, job);
+        return [];
     }
 
     const buildingInventory =
         buildingEntity.getEcsComponent(InventoryComponentId);
     if (!buildingInventory) {
-        return failAndAbort(worker, job);
+        removeJobForWorker(worker, job);
+        return [];
     }
 
     const held = worker.requireEcsComponent(HeldItemComponentId);
@@ -71,7 +58,7 @@ export function planCrafting(
         if (dropActions === null) {
             // Holding an item that blocks the output and nowhere to drop it.
             // Suspend rather than throw out of the unguarded expand() path.
-            suspendJob(worker, job);
+            suspendJobForWorker(worker, job);
             return [];
         }
         return [
@@ -137,7 +124,7 @@ export function planCrafting(
             // No free tile to drop the held item (e.g. worker boxed in). Suspend
             // rather than throw: a throw here propagates out of the unguarded
             // expand()/selectBehavior path and aborts the whole behavior tick.
-            suspendJob(worker, job);
+            suspendJobForWorker(worker, job);
             return [];
         }
         return [
@@ -217,15 +204,7 @@ export function planCrafting(
     // the queue, release the claim) so it retries once materials arrive,
     // matching the build planner. Failing here would silently delete a
     // player-queued craft the moment its inputs are momentarily unavailable.
-    suspendJob(worker, job);
-    return [];
-}
-
-function failAndAbort(worker: Entity, job: CraftingJob): BehaviorActionData[] {
-    const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
-    if (queueEntity) {
-        failJobFromQueue(queueEntity, job);
-    }
+    suspendJobForWorker(worker, job);
     return [];
 }
 

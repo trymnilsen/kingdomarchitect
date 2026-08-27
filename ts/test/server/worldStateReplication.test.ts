@@ -20,7 +20,7 @@ import {
 } from "../../src/game/component/visibilityMapComponent.ts";
 import { createTileComponent } from "../../src/game/component/tileComponent.ts";
 import { ChunkSize } from "../../src/game/map/chunk.ts";
-import { makeNumberId } from "../../src/common/point.ts";
+import { encodePosition } from "../../src/common/point.ts";
 import type { Volume } from "../../src/game/map/volume.ts";
 import type { DiscoveredTileData } from "../../src/server/message/playerDiscoveryData.ts";
 
@@ -135,9 +135,9 @@ describe("world state replication", () => {
         );
         const partialChunk =
             visibilityMap.discovered.partiallyDiscoveredChunks.get(
-                makeNumberId(campChunk.x, campChunk.y),
+                encodePosition(campChunk.x, campChunk.y),
             );
-        assert.ok(partialChunk?.has(makeNumberId(0, 0)));
+        assert.ok(partialChunk?.has(encodePosition(0, 0)));
     });
 
     it("ignores duplicate tiles for fully discovered chunks", () => {
@@ -159,7 +159,7 @@ describe("world state replication", () => {
         }
         applyDiscoveredTiles(tileComponent, visibilityMap, allTiles, [volume]);
 
-        const chunkId = makeNumberId(0, 0);
+        const chunkId = encodePosition(0, 0);
         assert.ok(visibilityMap.discovered.fullyDiscoveredChunks.has(chunkId));
         assert.ok(
             !visibilityMap.discovered.partiallyDiscoveredChunks.has(chunkId),

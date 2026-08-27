@@ -1,10 +1,9 @@
 import type { Entity } from "../../entity/entity.ts";
 import type { BehaviorActionData } from "../../behavior/actions/ActionData.ts";
-import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import { ChunkMapComponentId } from "../../component/chunkMapComponent.ts";
 import { ProductionComponentId } from "../../component/productionComponent.ts";
 import type { ProductionJob } from "../productionJob.ts";
-import { failJobFromQueue } from "../jobLifecycle.ts";
+import { removeJobForWorker } from "../jobLifecycle.ts";
 import { getProductionDefinition } from "../../../data/production/productionDefinition.ts";
 import {
     findRandomSpawnInDiamond,
@@ -32,10 +31,7 @@ export function planProduction(
     const buildingEntity = root.findEntity(job.targetBuilding);
 
     if (!buildingEntity) {
-        const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
-        if (queueEntity) {
-            failJobFromQueue(queueEntity, job);
-        }
+        removeJobForWorker(worker, job);
         return [];
     }
 
@@ -43,28 +39,19 @@ export function planProduction(
         ProductionComponentId,
     );
     if (!productionComp) {
-        const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
-        if (queueEntity) {
-            failJobFromQueue(queueEntity, job);
-        }
+        removeJobForWorker(worker, job);
         return [];
     }
 
     const definition = getProductionDefinition(productionComp.productionId);
     if (!definition) {
-        const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
-        if (queueEntity) {
-            failJobFromQueue(queueEntity, job);
-        }
+        removeJobForWorker(worker, job);
         return [];
     }
 
     const chunkMapComp = root.getEcsComponent(ChunkMapComponentId);
     if (!chunkMapComp) {
-        const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
-        if (queueEntity) {
-            failJobFromQueue(queueEntity, job);
-        }
+        removeJobForWorker(worker, job);
         return [];
     }
 
@@ -130,10 +117,7 @@ export function planProduction(
         return chopActions;
     }
 
-    // Nothing to do (can't plant, can't chop) — drop the order.
-    const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
-    if (queueEntity) {
-        failJobFromQueue(queueEntity, job);
-    }
+    // Nothing to do (can't plant, can't chop), so drop the order.
+    removeJobForWorker(worker, job);
     return [];
 }

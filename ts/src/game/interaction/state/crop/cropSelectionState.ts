@@ -5,11 +5,8 @@ import {
     FarmComponentId,
     type FarmComponent,
 } from "../../../component/farmComponent.ts";
-import {
-    getAvailableCrops,
-    type CropId,
-} from "../../../../data/crop/cropDefinitions.ts";
-import { cropSelectionView } from "./cropSelectionView.ts";
+import { getAvailableCrops } from "../../../../data/crop/cropDefinitions.ts";
+import { bookSelectionView } from "../../view/bookSelectionView.ts";
 import { SetFarmCropCommand } from "../../../../server/message/command/setFarmCropCommand.ts";
 
 export class CropSelectionState extends InteractionState {
@@ -46,15 +43,19 @@ export class CropSelectionState extends InteractionState {
     }
 
     override getView(): ComponentDescriptor | null {
-        return cropSelectionView({
-            currentCropId: this._farmComponent.cropId,
-            selectedCropIndex: this._selectedCropIndex,
-            onCropSelected: (index: number) => {
+        const crops = getAvailableCrops();
+        return bookSelectionView({
+            entries: crops,
+            currentIndex: crops.findIndex(
+                (crop) => crop.cropId === this._farmComponent.cropId,
+            ),
+            selectedIndex: this._selectedCropIndex,
+            onSelected: (index: number) => {
                 this._selectedCropIndex = index;
             },
-            onAssign: (cropId: CropId) => {
+            onAssign: (index: number) => {
                 this.context.commandDispatcher(
-                    SetFarmCropCommand(this._entity, cropId),
+                    SetFarmCropCommand(this._entity, crops[index].cropId),
                 );
                 this.context.stateChanger.pop();
             },

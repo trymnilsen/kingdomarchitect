@@ -1,7 +1,7 @@
 import { AssetLoader } from "../../../src/asset/loader/assetLoader.ts";
 import { EcsWorld } from "../../../src/ecs/ecsWorld.ts";
 import type { Point } from "../../../src/common/point.ts";
-import { GameTime } from "../../../src/common/time.ts";
+import { GameTime } from "../../../src/game/gameTime.ts";
 import { wireGameInput } from "../../../src/game/gameInput.ts";
 import { InteractionHandler } from "../../../src/game/interaction/handler/interactionHandler.ts";
 import type { InteractionState } from "../../../src/game/interaction/handler/interactionState.ts";

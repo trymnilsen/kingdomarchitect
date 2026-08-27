@@ -109,3 +109,16 @@ export function requestReplan(entity: Entity): void {
         agent.pendingReplan = { kind: "replan" };
     }
 }
+
+/**
+ * Consume the pending player command. Both the action that ends a successful
+ * command and every path that abandons one (target gone, hands empty, no plan)
+ * end here, so the agent stops re-expanding a command it cannot carry out.
+ */
+export function clearPlayerCommand(entity: Entity): void {
+    const agent = getBehaviorAgent(entity);
+    if (agent) {
+        agent.playerCommand = undefined;
+        entity.invalidateComponent(BehaviorAgentComponentId);
+    }
+}

@@ -2,7 +2,6 @@ import { withinRectangle } from "../../../../common/bounds.ts";
 import { Direction } from "../../../../common/direction.ts";
 import {
     encodePosition,
-    makeNumberId,
     type Point,
     shiftPoint,
 } from "../../../../common/point.ts";
@@ -127,7 +126,7 @@ export class LandUnlockState extends InteractionState {
                 visibilityMap &&
                 !hasDiscoveredChunk(
                     visibilityMap,
-                    makeNumberId(chunk.chunkX, chunk.chunkY),
+                    encodePosition(chunk.chunkX, chunk.chunkY),
                 )
             ) {
                 continue;

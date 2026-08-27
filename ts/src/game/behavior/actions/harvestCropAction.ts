@@ -8,11 +8,7 @@ import {
 import { getInventoryItemById } from "../../../data/inventory/inventoryItemHelpers.ts";
 import { getCropDefinition } from "../../../data/crop/cropDefinitions.ts";
 import type { Entity } from "../../entity/entity.ts";
-import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
-import {
-    completeJobFromQueue,
-    findJobClaimedBy,
-} from "../../job/jobLifecycle.ts";
+import { completeClaimedJob } from "../../job/jobLifecycle.ts";
 import { ActionComplete, type ActionResult } from "./Action.ts";
 import {
     addToHeldItem,
@@ -54,13 +50,7 @@ export function executeHarvestCropAction(
 
     // Another worker may have already harvested — complete without changing state
     if (farm.state !== FarmState.Ready) {
-        const queueEntity = entity.getAncestorEntity(JobQueueComponentId);
-        if (queueEntity) {
-            const job = findJobClaimedBy(queueEntity, entity.id);
-            if (job) {
-                completeJobFromQueue(queueEntity, job);
-            }
-        }
+        completeClaimedJob(entity);
         return ActionComplete;
     }
 
@@ -79,13 +69,7 @@ export function executeHarvestCropAction(
     farm.plantedAtTick = 0;
     buildingEntity.invalidateComponent(FarmComponentId);
 
-    const queueEntity = entity.getAncestorEntity(JobQueueComponentId);
-    if (queueEntity) {
-        const job = findJobClaimedBy(queueEntity, entity.id);
-        if (job) {
-            completeJobFromQueue(queueEntity, job);
-        }
-    }
+    completeClaimedJob(entity);
 
     return ActionComplete;
 }

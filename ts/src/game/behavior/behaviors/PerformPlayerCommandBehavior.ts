@@ -1,6 +1,9 @@
 import { Entity } from "../../entity/entity.ts";
 import type { BehaviorActionData } from "../actions/ActionData.ts";
-import { getBehaviorAgent } from "../../component/BehaviorAgentComponent.ts";
+import {
+    clearPlayerCommand,
+    getBehaviorAgent,
+} from "../../component/BehaviorAgentComponent.ts";
 import {
     HeldItemComponentId,
     isHeldEmpty,
@@ -51,8 +54,7 @@ export function createPerformPlayerCommandBehavior(): Behavior {
                     const root = entity.getRootEntity();
                     const target = root.findEntity(command.targetEntityId);
                     if (!target) {
-                        agent.playerCommand = undefined;
-                        entity.invalidateComponent("behavioragent");
+                        clearPlayerCommand(entity);
                         return [];
                     }
                     return [
@@ -73,8 +75,7 @@ export function createPerformPlayerCommandBehavior(): Behavior {
                     const root = entity.getRootEntity();
                     const target = root.findEntity(command.targetEntityId);
                     if (!target) {
-                        agent.playerCommand = undefined;
-                        entity.invalidateComponent("behavioragent");
+                        clearPlayerCommand(entity);
                         return [];
                     }
                     return [
@@ -94,8 +95,7 @@ export function createPerformPlayerCommandBehavior(): Behavior {
                 case "drop": {
                     const held = entity.getEcsComponent(HeldItemComponentId);
                     if (!held || isHeldEmpty(held)) {
-                        agent.playerCommand = undefined;
-                        entity.invalidateComponent("behavioragent");
+                        clearPlayerCommand(entity);
                         return [];
                     }
                     const root = entity.getRootEntity();
@@ -108,8 +108,7 @@ export function createPerformPlayerCommandBehavior(): Behavior {
                         log.warn(
                             `Drop failed for ${entity.id}: no free adjacent tile`,
                         );
-                        agent.playerCommand = undefined;
-                        entity.invalidateComponent("behavioragent");
+                        clearPlayerCommand(entity);
                         return [];
                     }
                     return [
@@ -126,8 +125,7 @@ export function createPerformPlayerCommandBehavior(): Behavior {
                 case "deposit": {
                     const held = entity.getEcsComponent(HeldItemComponentId);
                     if (!held || isHeldEmpty(held)) {
-                        agent.playerCommand = undefined;
-                        entity.invalidateComponent("behavioragent");
+                        clearPlayerCommand(entity);
                         return [];
                     }
                     return [
@@ -144,8 +142,7 @@ export function createPerformPlayerCommandBehavior(): Behavior {
                         slot: command.slot,
                     });
                     if (plan.length === 0) {
-                        agent.playerCommand = undefined;
-                        entity.invalidateComponent("behavioragent");
+                        clearPlayerCommand(entity);
                         return [];
                     }
                     return plan;
@@ -154,8 +151,7 @@ export function createPerformPlayerCommandBehavior(): Behavior {
                 case "equipFromHeld": {
                     const held = entity.getEcsComponent(HeldItemComponentId);
                     if (!held || isHeldEmpty(held)) {
-                        agent.playerCommand = undefined;
-                        entity.invalidateComponent("behavioragent");
+                        clearPlayerCommand(entity);
                         return [];
                     }
                     const root = entity.getRootEntity();
@@ -167,16 +163,14 @@ export function createPerformPlayerCommandBehavior(): Behavior {
                     log.warn(
                         `Interact command not yet implemented for entity ${entity.id}`,
                     );
-                    agent.playerCommand = undefined;
-                    entity.invalidateComponent("behavioragent");
+                    clearPlayerCommand(entity);
                     return [];
 
                 default:
                     log.warn(
                         `Unknown player command action: ${(command as any).action}`,
                     );
-                    agent.playerCommand = undefined;
-                    entity.invalidateComponent("behavioragent");
+                    clearPlayerCommand(entity);
                     return [];
             }
         },

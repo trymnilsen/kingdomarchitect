@@ -1,4 +1,4 @@
-import { makeNumberId, type Point } from "../../common/point.ts";
+import { encodePosition, type Point } from "../../common/point.ts";
 import { resolveLightSource } from "./resolveLightSource.ts";
 import type { Entity } from "../entity/entity.ts";
 import type { Phase } from "../component/dayComponent.ts";
@@ -140,7 +140,7 @@ export function computeLitTiles(claims: readonly LightClaim[]): Set<number> {
         if ("offsets" in claim) {
             for (const offset of claim.offsets) {
                 litTiles.add(
-                    makeNumberId(
+                    encodePosition(
                         claim.position.x + offset.x,
                         claim.position.y + offset.y,
                     ),
@@ -153,7 +153,7 @@ export function computeLitTiles(claims: readonly LightClaim[]): Set<number> {
                 for (let dx = -radius; dx <= radius; dx++) {
                     if (dx * dx + dy * dy <= radiusSq) {
                         litTiles.add(
-                            makeNumberId(
+                            encodePosition(
                                 claim.position.x + dx,
                                 claim.position.y + dy,
                             ),
@@ -191,5 +191,5 @@ export function isTileLit(
     if (ambientIsLight(phase)) {
         return true;
     }
-    return litTiles.has(makeNumberId(point.x, point.y));
+    return litTiles.has(encodePosition(point.x, point.y));
 }

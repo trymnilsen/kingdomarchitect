@@ -2,11 +2,7 @@ import { isPointAdjacentTo } from "../../../common/point.ts";
 import { log } from "../../../common/logging/logger.ts";
 import { FarmComponentId, FarmState } from "../../component/farmComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
-import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
-import {
-    completeJobFromQueue,
-    findJobClaimedBy,
-} from "../../job/jobLifecycle.ts";
+import { completeClaimedJob } from "../../job/jobLifecycle.ts";
 import { ActionComplete, ActionRunning, type ActionResult } from "./Action.ts";
 
 export type PlantCropActionData = {
@@ -47,13 +43,7 @@ export function executePlantCropAction(
 
     // Farm may have already been planted by another worker — complete without changing state
     if (farm.state !== FarmState.Empty) {
-        const queueEntity = entity.getAncestorEntity(JobQueueComponentId);
-        if (queueEntity) {
-            const job = findJobClaimedBy(queueEntity, entity.id);
-            if (job) {
-                completeJobFromQueue(queueEntity, job);
-            }
-        }
+        completeClaimedJob(entity);
         return ActionComplete;
     }
 
@@ -67,13 +57,7 @@ export function executePlantCropAction(
         farm.plantedAtTick = tick;
         buildingEntity.invalidateComponent(FarmComponentId);
 
-        const queueEntity = entity.getAncestorEntity(JobQueueComponentId);
-        if (queueEntity) {
-            const job = findJobClaimedBy(queueEntity, entity.id);
-            if (job) {
-                completeJobFromQueue(queueEntity, job);
-            }
-        }
+        completeClaimedJob(entity);
         return ActionComplete;
     }
 

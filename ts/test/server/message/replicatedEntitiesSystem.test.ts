@@ -1,6 +1,6 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
-import { encodePosition, makeNumberId } from "../../../src/common/point.ts";
+import { encodePosition } from "../../../src/common/point.ts";
 import {
     createTileComponent,
     setChunk,
@@ -249,7 +249,7 @@ describe("replicatedEntitiesSystem", () => {
                 partiallyDiscoveredChunks: new Map([
                     [
                         chunkId,
-                        new Set([makeNumberId(0, 0), makeNumberId(1, 1)]),
+                        new Set([encodePosition(0, 0), encodePosition(1, 1)]),
                     ],
                 ]),
             });

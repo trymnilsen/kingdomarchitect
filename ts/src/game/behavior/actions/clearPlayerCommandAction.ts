@@ -1,8 +1,5 @@
 import type { Entity } from "../../entity/entity.ts";
-import {
-    BehaviorAgentComponentId,
-    getBehaviorAgent,
-} from "../../component/BehaviorAgentComponent.ts";
+import { clearPlayerCommand } from "../../component/BehaviorAgentComponent.ts";
 import { ActionComplete, type ActionResult } from "./Action.ts";
 
 export type ClearPlayerCommandActionData = { type: "clearPlayerCommand" };
@@ -15,10 +12,6 @@ export type ClearPlayerCommandActionData = { type: "clearPlayerCommand" };
  * action queue before this action runs and the command persists for replanning.
  */
 export function executeClearPlayerCommandAction(entity: Entity): ActionResult {
-    const agent = getBehaviorAgent(entity);
-    if (agent) {
-        agent.playerCommand = undefined;
-        entity.invalidateComponent(BehaviorAgentComponentId);
-    }
+    clearPlayerCommand(entity);
     return ActionComplete;
 }

@@ -1,4 +1,4 @@
-import { makeNumberId, type Point } from "../../common/point.ts";
+import { encodePosition, type Point } from "../../common/point.ts";
 import type { Entity } from "../entity/entity.ts";
 import { collectLightClaims, computeLitTiles } from "./lightClaims.ts";
 
@@ -26,5 +26,5 @@ export function isInHearthlight(
     hearthlight: ReadonlySet<number>,
     point: Point,
 ): boolean {
-    return hearthlight.has(makeNumberId(point.x, point.y));
+    return hearthlight.has(encodePosition(point.x, point.y));
 }

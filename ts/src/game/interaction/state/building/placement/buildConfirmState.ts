@@ -1,5 +1,5 @@
 import { findMapped } from "../../../../../common/array.ts";
-import { makeNumberId, type Point } from "../../../../../common/point.ts";
+import { encodePosition, type Point } from "../../../../../common/point.ts";
 import { allSides } from "../../../../../common/sides.ts";
 import { type Building } from "../../../../../data/building/building.ts";
 import { spriteRefs } from "../../../../../asset/sprite.ts";
@@ -263,7 +263,7 @@ export class BuildConfirmState extends InteractionState {
             visibilityMap &&
             !hasDiscoveredChunk(
                 visibilityMap,
-                makeNumberId(chunkPosition.x, chunkPosition.y),
+                encodePosition(chunkPosition.x, chunkPosition.y),
             )
         ) {
             return {

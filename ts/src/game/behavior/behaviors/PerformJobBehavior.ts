@@ -379,11 +379,23 @@ function canExecuteJob(
                 workerEntity,
             );
         case "craftingJob":
-            return canExecuteCraftingJob(jobQueue, job as CraftingJob);
+            return noClaimedJobAtBuilding(
+                jobQueue,
+                CraftingJobId,
+                (job as CraftingJob).targetBuilding,
+            );
         case "windmillJob":
-            return canExecuteWindmillJob(jobQueue, job as WindmillJob);
+            return noClaimedJobAtBuilding(
+                jobQueue,
+                WindmillJobId,
+                (job as WindmillJob).targetBuilding,
+            );
         case "productionJob":
-            return canExecuteProductionJob(jobQueue, job as ProductionJob);
+            return noClaimedJobAtBuilding(
+                jobQueue,
+                ProductionJobId,
+                (job as ProductionJob).targetBuilding,
+            );
         default:
             return true;
     }
@@ -418,49 +430,20 @@ function canHeldAcceptResourceYield(
 }
 
 /**
- * Reject crafting jobs when another worker has already claimed a crafting job
- * at the same building. Only one worker can use a crafting station at a time.
+ * Whether the building is free for a job of this kind. A workstation takes one
+ * worker at a time, so a claimed job of the same kind at the same building
+ * blocks every other worker from starting one there.
  */
-function canExecuteCraftingJob(
+function noClaimedJobAtBuilding(
     jobQueue: JobQueueComponent,
-    job: CraftingJob,
+    jobId: string,
+    targetBuilding: string,
 ): boolean {
     return !jobQueue.jobs.some(
         (j) =>
             j.claimedBy !== undefined &&
-            j.id === CraftingJobId &&
-            (j as CraftingJob).targetBuilding === job.targetBuilding,
-    );
-}
-
-/**
- * Reject windmill jobs when another worker has already claimed a windmill job
- * at the same building. Only one worker can operate a windmill at a time.
- */
-function canExecuteWindmillJob(
-    jobQueue: JobQueueComponent,
-    job: WindmillJob,
-): boolean {
-    return !jobQueue.jobs.some(
-        (j) =>
-            j.claimedBy !== undefined &&
-            j.id === WindmillJobId &&
-            (j as WindmillJob).targetBuilding === job.targetBuilding,
-    );
-}
-
-/**
- * Reject production jobs when another worker has already claimed a production job
- * at the same building. Only one worker can operate a production facility at a time.
- */
-function canExecuteProductionJob(
-    jobQueue: JobQueueComponent,
-    job: ProductionJob,
-): boolean {
-    return !jobQueue.jobs.some(
-        (j) =>
-            j.claimedBy !== undefined &&
-            j.id === ProductionJobId &&
-            (j as ProductionJob).targetBuilding === job.targetBuilding,
+            j.id === jobId &&
+            (j as { targetBuilding?: string }).targetBuilding ===
+                targetBuilding,
     );
 }

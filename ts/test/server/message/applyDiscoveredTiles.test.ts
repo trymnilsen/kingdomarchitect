@@ -1,6 +1,6 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
-import { makeNumberId } from "../../../src/common/point.ts";
+import { encodePosition } from "../../../src/common/point.ts";
 import {
     createTileComponent,
     type TileComponent,
@@ -200,7 +200,7 @@ describe("applyDiscoveredTiles", () => {
                 volume,
             ]);
 
-            const chunkId = makeNumberId(0, 0);
+            const chunkId = encodePosition(0, 0);
             const partiallyDiscovered =
                 visibilityMapComponent.discovered.partiallyDiscoveredChunks.get(
                     chunkId,
@@ -211,11 +211,11 @@ describe("applyDiscoveredTiles", () => {
                 "Should have partial discovery data",
             );
             assert.ok(
-                partiallyDiscovered.has(makeNumberId(0, 0)),
+                partiallyDiscovered.has(encodePosition(0, 0)),
                 "Should track tile at (0,0)",
             );
             assert.ok(
-                partiallyDiscovered.has(makeNumberId(1, 1)),
+                partiallyDiscovered.has(encodePosition(1, 1)),
                 "Should track tile at (1,1)",
             );
             assert.strictEqual(partiallyDiscovered.size, 2);
@@ -246,7 +246,7 @@ describe("applyDiscoveredTiles", () => {
                 volume,
             ]);
 
-            const chunkId = makeNumberId(0, 0);
+            const chunkId = encodePosition(0, 0);
 
             assert.ok(
                 visibilityMapComponent.discovered.fullyDiscoveredChunks.has(
@@ -284,7 +284,7 @@ describe("applyDiscoveredTiles", () => {
                 [volume],
             );
 
-            const chunkId = makeNumberId(0, 0);
+            const chunkId = encodePosition(0, 0);
 
             assert.ok(
                 !visibilityMapComponent.discovered.fullyDiscoveredChunks.has(
@@ -338,7 +338,7 @@ describe("applyDiscoveredTiles", () => {
                 volume,
             ]);
 
-            const chunkId = makeNumberId(-1, -1);
+            const chunkId = encodePosition(-1, -1);
             const partiallyDiscovered =
                 visibilityMapComponent.discovered.partiallyDiscoveredChunks.get(
                     chunkId,
@@ -351,7 +351,7 @@ describe("applyDiscoveredTiles", () => {
             // Local position for -5 in chunk -1 (which covers -8 to -1) is: -5 - (-8) = 3
             // Local position for -3 in chunk -1 is: -3 - (-8) = 5
             assert.ok(
-                partiallyDiscovered.has(makeNumberId(3, 5)),
+                partiallyDiscovered.has(encodePosition(3, 5)),
                 "Should track tile at local (3,5)",
             );
         });

@@ -1,4 +1,4 @@
-import type { GameTime } from "../../common/time.ts";
+import type { GameTime } from "../gameTime.ts";
 import type { EcsSystem } from "../../ecs/ecsSystem.ts";
 import { EventGameMessageType } from "../../server/message/gameMessage.ts";
 import {

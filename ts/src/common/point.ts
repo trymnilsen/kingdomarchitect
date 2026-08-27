@@ -38,10 +38,6 @@ export function pointGrid(width: number, height: number): Point[] {
     return points;
 }
 
-export function makeNumberId(x: number, y: number): number {
-    return ((x & 0xffff) << 16) | (y & 0xffff);
-}
-
 /**
  * Adds the component of one point with the components of another
  * @param p1 the first addend
@@ -459,8 +455,12 @@ export function isPoint(value: unknown): value is Point {
     return "x" in value && "y" in value;
 }
 
+/**
+ * Pack a coordinate pair into one number so it can key a Map or Set. Both
+ * components are truncated to signed 16 bits, which covers every tile and
+ * chunk coordinate the world uses.
+ */
 export function encodePosition(x: number, y: number): number {
-    // Convert to 16-bit signed representation
     const x16 = x < 0 ? 0x10000 + x : x;
     const y16 = y < 0 ? 0x10000 + y : y;
     return (x16 << 16) | (y16 & 0xffff);

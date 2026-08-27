@@ -17,18 +17,10 @@ import {
     checkMaterialsAvailability,
     findNearestStockpileWithMaterials,
 } from "../buildBuildingJob.ts";
-import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
-import { suspendJobInQueue } from "../jobLifecycle.ts";
+import { suspendJobForWorker } from "../jobLifecycle.ts";
 import { getSettlementEntity } from "../../entity/settlementQueries.ts";
 import { findDropPosition } from "../../behavior/dropItem.ts";
 import { log } from "../../../common/logging/logger.ts";
-
-function suspendJob(worker: Entity, job: BuildBuildingJob): void {
-    const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
-    if (queueEntity) {
-        suspendJobInQueue(queueEntity, job);
-    }
-}
 
 /**
  * Plan actions for building construction under the held-item model.
@@ -128,7 +120,7 @@ export function planBuildBuilding(
             workerHeld.item!,
         );
         if (!dropPos) {
-            suspendJob(worker, job);
+            suspendJobForWorker(worker, job);
             return [];
         }
         return [
@@ -182,7 +174,7 @@ export function planBuildBuilding(
             building: buildingComponent.building.name,
             missing: materialCheck.missing.join(", "),
         });
-        suspendJob(worker, job);
+        suspendJobForWorker(worker, job);
         return [];
     }
 
@@ -193,14 +185,14 @@ export function planBuildBuilding(
     );
 
     if (!stockpileEntity) {
-        suspendJob(worker, job);
+        suspendJobForWorker(worker, job);
         return [];
     }
 
     const stockpileInventory =
         stockpileEntity.getEcsComponent(InventoryComponentId);
     if (!stockpileInventory) {
-        suspendJob(worker, job);
+        suspendJobForWorker(worker, job);
         return [];
     }
 
@@ -218,7 +210,7 @@ export function planBuildBuilding(
     }
 
     if (!chosenItemId) {
-        suspendJob(worker, job);
+        suspendJobForWorker(worker, job);
         return [];
     }
 

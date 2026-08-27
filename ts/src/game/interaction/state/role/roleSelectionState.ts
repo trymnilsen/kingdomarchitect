@@ -4,9 +4,9 @@ import { InteractionState } from "../../handler/interactionState.ts";
 import {
     RoleComponentId,
     type RoleComponent,
-    type WorkerRole,
 } from "../../../component/worker/roleComponent.ts";
-import { roleSelectionView } from "./roleSelectionView.ts";
+import { roleDefinitions } from "../../../../data/role/roleDefinitions.ts";
+import { bookSelectionView } from "../../view/bookSelectionView.ts";
 import { UpdateWorkerRoleCommand } from "../../../../server/message/command/updateWorkerRoleCommand.ts";
 
 export class RoleSelectionState extends InteractionState {
@@ -32,19 +32,30 @@ export class RoleSelectionState extends InteractionState {
         }
         this._entity = entity;
         this._roleComponent = roleComponent;
-        this._selectedRoleIndex = roleComponent.role;
+        // Seed the selection from the worker's current role, falling back to
+        // the first definition if the role has no entry in the book.
+        const currentIndex = roleDefinitions.findIndex(
+            (definition) => definition.role === roleComponent.role,
+        );
+        this._selectedRoleIndex = currentIndex >= 0 ? currentIndex : 0;
     }
 
     override getView(): ComponentDescriptor | null {
-        return roleSelectionView({
-            currentRole: this._roleComponent.role,
-            selectedRoleIndex: this._selectedRoleIndex,
-            onRoleSelected: (index: number) => {
+        return bookSelectionView({
+            entries: roleDefinitions,
+            currentIndex: roleDefinitions.findIndex(
+                (definition) => definition.role === this._roleComponent.role,
+            ),
+            selectedIndex: this._selectedRoleIndex,
+            onSelected: (index: number) => {
                 this._selectedRoleIndex = index;
             },
-            onAssign: (role: WorkerRole) => {
+            onAssign: (index: number) => {
                 this.context.commandDispatcher(
-                    UpdateWorkerRoleCommand(this._entity, role),
+                    UpdateWorkerRoleCommand(
+                        this._entity,
+                        roleDefinitions[index].role,
+                    ),
                 );
                 this.context.stateChanger.pop();
             },

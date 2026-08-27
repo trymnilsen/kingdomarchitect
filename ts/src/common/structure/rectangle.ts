@@ -1,4 +1,4 @@
-import { type Bounds, sizeOfBounds } from "../bounds.ts";
+import { type Bounds, sizeOfBounds, withinRectangle } from "../bounds.ts";
 import type { Point } from "../point.ts";
 
 /**
@@ -14,17 +14,20 @@ import type { Point } from "../point.ts";
  */
 export type Rectangle = Point & { width: number; height: number };
 
-export function withinRectangle(point: Point, rectangle: Rectangle): boolean {
-    // Check if the point's x-coordinate is within the rectangle's horizontal bounds.
-    const isWithinX =
-        point.x >= rectangle.x && point.x <= rectangle.x + rectangle.width;
-
-    // Check if the point's y-coordinate is within the rectangle's vertical bounds.
-    const isWithinY =
-        point.y >= rectangle.y && point.y <= rectangle.y + rectangle.height;
-
-    // The point is within the rectangle only if it's within both X and Y bounds.
-    return isWithinX && isWithinY;
+/**
+ * Whether the point falls inside the rectangle, edges included.
+ */
+export function pointWithinRectangle(
+    point: Point,
+    rectangle: Rectangle,
+): boolean {
+    return withinRectangle(
+        point,
+        rectangle.x,
+        rectangle.y,
+        rectangle.x + rectangle.width,
+        rectangle.y + rectangle.height,
+    );
 }
 
 export function intersectRect(a: Rectangle, b: Rectangle): Rectangle | null {

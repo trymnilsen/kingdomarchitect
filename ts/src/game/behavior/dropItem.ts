@@ -1,4 +1,4 @@
-import { adjacentPoints, pointEquals, type Point } from "../../common/point.ts";
+import { adjacentPoints, type Point } from "../../common/point.ts";
 import { log } from "../../common/logging/logger.ts";
 import type { InventoryItem } from "../../data/inventory/inventoryItem.ts";
 import {
@@ -256,8 +256,4 @@ export function dropItemAtPosition(
         `Spawned new pile ${pile.id} (${amount}x ${item.id}) at (${dropPos.x},${dropPos.y})`,
     );
     return true;
-}
-
-export function isSamePoint(a: Point, b: Point): boolean {
-    return pointEquals(a, b);
 }

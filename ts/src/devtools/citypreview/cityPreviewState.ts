@@ -1,5 +1,5 @@
 import { generateId } from "../../common/idGenerator.ts";
-import { makeNumberId } from "../../common/point.ts";
+import { encodePosition } from "../../common/point.ts";
 import { Entity } from "../../game/entity/entity.ts";
 import {
     createTileComponent,
@@ -41,7 +41,7 @@ export function createInitialState(
     };
     const chunk: TileChunk = { chunkX: 0, chunkY: 0, volume };
     setChunk(tiles, chunk);
-    visibilityMap.discovered.fullyDiscoveredChunks.add(makeNumberId(0, 0));
+    visibilityMap.discovered.fullyDiscoveredChunks.add(encodePosition(0, 0));
 
     return {
         root,

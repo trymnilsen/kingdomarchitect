@@ -15,9 +15,9 @@ import { QueueJobCommand } from "../../../../../../server/message/command/queueJ
 import { ClearBuildingJobsCommand } from "../../../../../../server/message/command/clearBuildingJobsCommand.ts";
 import {
     createProductionJob,
-    getProductionJobCountForBuilding,
     ProductionJobId,
 } from "../../../../../job/productionJob.ts";
+import { countJobsForBuilding } from "../../../../../job/jobQuery.ts";
 import { getProductionDefinition } from "../../../../../../data/production/productionDefinition.ts";
 import type { UIActionbarItem } from "../../../../view/uiActionbar.ts";
 
@@ -45,8 +45,9 @@ export class ProductionBuildingSelectionProvider implements ActorSelectionProvid
                 const jobQueue =
                     settlement.getEcsComponent(JobQueueComponentId);
                 const queuedCount = jobQueue
-                    ? getProductionJobCountForBuilding(
+                    ? countJobsForBuilding(
                           jobQueue,
+                          ProductionJobId,
                           selection.entity.id,
                       )
                     : 0;

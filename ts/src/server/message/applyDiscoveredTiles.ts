@@ -1,5 +1,5 @@
 import { log } from "../../common/logging/logger.ts";
-import { makeNumberId, pointEquals } from "../../common/point.ts";
+import { encodePosition, pointEquals } from "../../common/point.ts";
 
 import {
     setChunk,
@@ -75,7 +75,7 @@ export function applyDiscoveredTiles(
         const localY = ((tile.y % ChunkSize) + ChunkSize) % ChunkSize;
 
         const size = ChunkSize * ChunkSize;
-        const chunkId = makeNumberId(chunkPosition.x, chunkPosition.y);
+        const chunkId = encodePosition(chunkPosition.x, chunkPosition.y);
         // A fully discovered chunk has nothing left to track; recreating an
         // empty partial set next to the full flag would leave inconsistent
         // discovery state behind
@@ -97,7 +97,7 @@ export function applyDiscoveredTiles(
         }
 
         if (partiallyDiscoveredChunkData.size < size - 1) {
-            partiallyDiscoveredChunkData.add(makeNumberId(localX, localY));
+            partiallyDiscoveredChunkData.add(encodePosition(localX, localY));
         } else {
             visibilityMapComponent.discovered.partiallyDiscoveredChunks.delete(
                 chunkId,

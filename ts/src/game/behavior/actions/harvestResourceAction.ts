@@ -20,7 +20,7 @@ import { findAcceptingStockpile } from "../../entity/findAcceptingStockpile.ts";
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import {
     findJobClaimedBy,
-    completeJobFromQueue,
+    removeJobFromQueue,
 } from "../../job/jobLifecycle.ts";
 import { ActionComplete, ActionRunning, type ActionResult } from "./Action.ts";
 
@@ -205,16 +205,7 @@ function executeChopHarvest(
         depositYields(worker, resource, held);
         resourceEntity.remove();
 
-        const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
-        if (queueEntity) {
-            const job = findJobClaimedBy(queueEntity, worker.id);
-            if (
-                job &&
-                (job.id === "collectResource" || job.id === "productionJob")
-            ) {
-                completeJobFromQueue(queueEntity, job);
-            }
-        }
+        completeHarvestOrder(worker);
         return ActionComplete;
     }
 
@@ -242,20 +233,28 @@ function executeWorkHarvest(
 
         applyResourceLifecycle(resourceEntity, resource, tick);
 
-        const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
-        if (queueEntity) {
-            const job = findJobClaimedBy(queueEntity, worker.id);
-            if (
-                job &&
-                (job.id === "collectResource" || job.id === "productionJob")
-            ) {
-                completeJobFromQueue(queueEntity, job);
-            }
-        }
+        completeHarvestOrder(worker);
         return ActionComplete;
     }
 
     return ActionRunning;
+}
+
+/**
+ * Retire the order that sent the worker here. A harvest can also happen under
+ * a production job (the forrester chopping its own zone), so both job kinds
+ * end here. Any other claimed job the worker holds is left alone, since this
+ * harvest was not what it asked for.
+ */
+function completeHarvestOrder(worker: Entity): void {
+    const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
+    if (!queueEntity) {
+        return;
+    }
+    const job = findJobClaimedBy(queueEntity, worker.id);
+    if (job && (job.id === "collectResource" || job.id === "productionJob")) {
+        removeJobFromQueue(queueEntity, job);
+    }
 }
 
 function applyResourceLifecycle(

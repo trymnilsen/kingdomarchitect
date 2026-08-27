@@ -1,8 +1,7 @@
 import type { Entity } from "../../entity/entity.ts";
 import type { BehaviorActionData } from "../../behavior/actions/ActionData.ts";
-import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import type { WindmillJob } from "../windmillJob.ts";
-import { failJobFromQueue } from "../jobLifecycle.ts";
+import { planWorkAtBuilding } from "./planWorkAtBuilding.ts";
 
 /**
  * Plan actions for working a windmill.
@@ -14,26 +13,11 @@ export function planWindmill(
     worker: Entity,
     job: WindmillJob,
 ): BehaviorActionData[] {
-    const buildingEntity = root.findEntity(job.targetBuilding);
-
-    if (!buildingEntity) {
-        const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
-        if (queueEntity) {
-            failJobFromQueue(queueEntity, job);
-        }
-        return [];
-    }
-
-    return [
-        {
-            type: "moveTo",
-            target: buildingEntity.worldPosition,
-            stopAdjacent: "cardinal",
-        },
+    return planWorkAtBuilding(root, worker, job, [
         { type: "stepOnto", targetId: job.targetBuilding },
         {
             type: "workWindmill",
             windmillId: job.targetBuilding,
         },
-    ];
+    ]);
 }

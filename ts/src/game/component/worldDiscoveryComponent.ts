@@ -1,4 +1,4 @@
-import { makeNumberId, type Point } from "../../common/point.ts";
+import { encodePosition, type Point } from "../../common/point.ts";
 import { ChunkSize, getChunkPosition } from "../map/chunk.ts";
 
 export type WorldDiscoveryData = {
@@ -46,7 +46,7 @@ export function discoverTile(
     }
 
     const chunkPosition = getChunkPosition(tile.x, tile.y);
-    const chunkId = makeNumberId(chunkPosition.x, chunkPosition.y);
+    const chunkId = encodePosition(chunkPosition.x, chunkPosition.y);
 
     if (playerData.fullyDiscoveredChunks.has(chunkId)) {
         return;
@@ -65,7 +65,7 @@ export function discoverTile(
     // Convert to local coordinates within the chunk (0-7)
     const localX = ((tile.x % ChunkSize) + ChunkSize) % ChunkSize;
     const localY = ((tile.y % ChunkSize) + ChunkSize) % ChunkSize;
-    const tileId = makeNumberId(localX, localY);
+    const tileId = encodePosition(localX, localY);
 
     if (discoveredTilesInChunk.has(tileId)) {
         return;
@@ -91,7 +91,7 @@ export function hasDiscoveredTile(
     if (!playerData) return false;
 
     const chunkPos = getChunkPosition(position.x, position.y);
-    const chunkId = makeNumberId(chunkPos.x, chunkPos.y);
+    const chunkId = encodePosition(chunkPos.x, chunkPos.y);
 
     if (playerData.fullyDiscoveredChunks.has(chunkId)) return true;
     const discoveredTiles = playerData.partiallyDiscoveredChunks.get(chunkId);
@@ -100,7 +100,7 @@ export function hasDiscoveredTile(
     // Convert to local coordinates within the chunk (0-7)
     const localX = ((position.x % ChunkSize) + ChunkSize) % ChunkSize;
     const localY = ((position.y % ChunkSize) + ChunkSize) % ChunkSize;
-    const tileId = makeNumberId(localX, localY);
+    const tileId = encodePosition(localX, localY);
     return discoveredTiles.has(tileId);
 }
 
@@ -123,7 +123,7 @@ export function hasDiscoveredChunkByChunkPosition(
 ): boolean {
     const playerData = component.discoveriesByUser.get(playerId);
     if (!playerData) return false;
-    const chunkId = makeNumberId(position.x, position.y);
+    const chunkId = encodePosition(position.x, position.y);
 
     if (playerData.fullyDiscoveredChunks.has(chunkId)) return true;
     const discoveredTiles = playerData.partiallyDiscoveredChunks.has(chunkId);

@@ -1,4 +1,4 @@
-import { makeNumberId } from "../common/point.ts";
+import { encodePosition } from "../common/point.ts";
 
 export class RenderVisibilityMap {
     private _useVisibility = false;
@@ -13,16 +13,16 @@ export class RenderVisibilityMap {
 
     private visibilityMap = new Map<number, boolean>();
     isVisible(x: number, y: number) {
-        const pointId = makeNumberId(x, y);
+        const pointId = encodePosition(x, y);
         return this.visibilityMap.has(pointId);
     }
 
     hasDiscovered(worldTileX: number, worldTileY: number) {
-        const id = makeNumberId(worldTileX, worldTileY);
+        const id = encodePosition(worldTileX, worldTileY);
     }
 
     setIsVisible(x: number, y: number, isVisible: boolean) {
-        const pointId = makeNumberId(x, y);
+        const pointId = encodePosition(x, y);
         if (isVisible) {
             this.visibilityMap.set(pointId, true);
         } else {
