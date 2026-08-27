@@ -18,20 +18,19 @@ import { visionReachRadius } from "../vision/visionReach.ts";
  *
  *  - its discovery diamond, from {@link visionReachRadius}, and
  *  - if it emits light, the footprint that light illuminates. A pattern on the
- *    component wins over the definition's disc, which is what makes a manned
- *    tower's searchlight wedge part of the tower's discovery footprint without
- *    this code knowing towers exist. The disc comes from
- *    {@link resolveLightSource}, so what an entity carries counts as much as
- *    what it is. This changes nothing for a worker holding a torch today: the
- *    vision diamond (radius 2) already contains the torch's radius-1 disc. It
- *    matters the moment a carried light outreaches its bearer's own eyes.
+ *    component wins over the definition's disc, which is how a manned tower's
+ *    searchlight wedge joins the tower's discovery footprint without this code
+ *    knowing towers exist. The disc comes from {@link resolveLightSource}, so
+ *    what an entity carries counts as much as what it is. That changes nothing
+ *    for a worker with a torch today, since the radius-2 vision diamond already
+ *    contains the torch's radius-1 disc, but it matters as soon as a carried
+ *    light outreaches its bearer's eyes.
  *
- * This is the single source of truth for "what does this entity reveal", used
- * to stamp fog-of-war discovery as a worker moves, when a building finishes
- * construction, and when the watch system advances a searchlight.
+ * Fog-of-war stamping asks here in all three cases: as a worker moves, when a
+ * building finishes, and when the watch system advances a searchlight.
  *
- * The sets are simply concatenated rather than de-duplicated: discovery
- * stamping is idempotent, so overlap between them costs nothing.
+ * The two sets are concatenated rather than de-duplicated, since stamping the
+ * same tile twice costs nothing.
  */
 export function discoveryFootprintOffsets(entity: Entity): Point[] {
     const offsets = diamondPatternForRadius(visionReachRadius(entity));

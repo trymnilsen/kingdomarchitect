@@ -11,11 +11,10 @@ import { worthOfKingdom } from "./raidWorth.ts";
  * `size: 3` means a raid party of 2. The last row is the hard ceiling on camp
  * size.
  *
- * The second row is anchored to the raid constants on purpose: the camp
- * becomes raid-capable (RAID_MIN_HOUSES) at exactly the score where the
- * kingdom becomes worth raiding (the worth of FIRST_RAID_KINGDOM). Below that
- * the camp is one goblin short of the raid floor and never marches. The later
- * steps widen so the camp always lags well behind the kingdom's growth.
+ * The second row is anchored to the raid constants: the camp reaches
+ * RAID_MIN_HOUSES at exactly the score where the kingdom becomes worth raiding.
+ * Below that it is one goblin short of the raid floor and never marches. The
+ * later steps widen so the camp lags well behind the kingdom's growth.
  */
 export const campSizeSteps = [
     { atScore: 0, size: RAID_MIN_HOUSES - 1 },

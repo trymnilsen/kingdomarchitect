@@ -38,8 +38,8 @@ export function placeSettlement(chunk: TileChunk, chunkEntity: Entity) {
     chunkEntity.setEcsComponent(createKingdomComponent(KingdomType.Goblin));
 
     const { camp } = goblinCampPrefab();
-    // The camp children (campfire and goblin) define the tiles the camp
-    // needs, keeping the prefab the single source of truth for its layout.
+    // The camp's children (campfire and goblin) define the tiles it needs, so
+    // the layout is read off the prefab instead of restated here.
     const footprint = camp.children.map((child) => child.position);
 
     const root = chunkEntity.getRootEntity();

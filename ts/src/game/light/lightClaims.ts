@@ -7,26 +7,16 @@ import { PlayerKingdomComponentId } from "../component/playerKingdomComponent.ts
 import { getSettlementEntity } from "../entity/settlementQueries.ts";
 
 /**
- * Lit coverage is derived, never stored. These are pure functions over an
- * entity tree. Share the function, never the data: no factory injection, no
- * component, no cached grid, no serialization. Server and client each derive
- * over their own tree. The server derives on its update interval (the hearth
- * defense system) and the client derives per render frame. All stamping, discs
- * and patterns alike, lives in this module and nowhere else, so client and
- * server can never disagree about a tile's lit-ness except by holding different
- * entity state. Client-built coverage is presentational only. It may draw. It
- * may never gate logic. This split holds in singleplayer's shared context and
- * is mandatory in multiplayer's hosted topology.
+ * Lit coverage is derived from the entity tree, never stored: no component, no
+ * cached grid, nothing serialized. The server derives on its update interval
+ * (the hearth defense system) and the client per render frame, both through
+ * these functions, so the two can only disagree by holding different entity
+ * state. Coverage the client builds is presentational and must not gate logic.
  *
- * There is deliberately no viewport parameter. Cost is driven by claim count
- * rather than camera, so viewport culling would save a fraction of an already
- * cheap pass while adding radius-inflated-bounds edge bugs (pool edges popping
- * during pans) and forking client output from server output. If a profile ever
- * shows the client rebuild mattering, the correct future optimization is
- * temporal (a cache keyed on a light-claims revision counter), never spatial.
- *
- * Terminology: this is coverage, a union of stamped footprints. Nothing here is
- * a "cluster". Connectivity clustering was designed and explicitly deleted.
+ * There is no viewport parameter. Cost follows the claim count rather than the
+ * camera, so culling by viewport would save little, make pool edges pop during
+ * pans, and fork client output from server output. If the rebuild ever shows up
+ * in a profile, cache it against a light-claims revision counter instead.
  */
 
 /**

@@ -10,28 +10,18 @@ import type { Entity } from "../entity/entity.ts";
  * What an entity is emitting right now: the light granted by whatever it holds,
  * falling back to the profile named on its own component.
  *
- * Equipment refines emission. It never grants membership. Who emits is decided
- * entirely by who carries a {@link LightSourceComponent}, and this function only
- * decides what they emit. An entity holding a torch with no light component is
- * invisible to the collector, and that is deliberate: a torch in a stockpile
- * crate lights nothing. This mirrors how an item's `statModifiers` reach the
- * holder through `getStats` rather than by being copied onto them, so nothing
- * has to be written, cleaned up, or kept in sync when the item moves.
- *
- * This never fires for goblins today: goblin units carry a held item but
- * neither an equipment component nor a light component, so they are not
- * light-source members at all. If one ever gains both, no special case is
- * needed here. The hearthlight scope already filters on player-kingdom
- * ancestry and on the definition's `claimsHearthlight`, and a carried torch
- * satisfies neither, so a goblin would light its surroundings without ever
- * claiming them.
+ * Equipment refines emission without granting it. Carrying a
+ * {@link LightSourceComponent} is what makes an entity emit; this only decides
+ * what it emits. An entity holding a torch without that component is invisible
+ * to the collector, so a torch in a crate lights nothing. Emission is read from
+ * the item the same way `getStats` reads its stat modifiers, so nothing needs
+ * writing or cleaning up when the item moves.
  *
  * The brightest equipped light wins when both hands hold one, rather than
- * summing, because lit-ness is binary and two torches are not a bonfire. Note
- * that any equipped light beats the entity's own profile even when the profile
- * is wider: every emitter with hands currently has a radius-0 presence glow, so
- * the two rules agree. Fold the profile into the same comparison if an entity
- * ever has both hands and a light of its own worth keeping.
+ * summing, since lit-ness is binary and two torches are not a bonfire. An
+ * equipped light also beats the entity's own profile, which is harmless today
+ * because every emitter with hands has only a radius-0 presence glow of its
+ * own.
  */
 export function resolveLightSource(
     entity: Entity,

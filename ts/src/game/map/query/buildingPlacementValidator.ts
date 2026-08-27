@@ -150,20 +150,11 @@ export function createBuildingPlacementValidator(
             }
         }
 
-        // Check that no two buildings end up sharing the same single free
-        // cardinal tile after placement (sole-access conflict).
-        //
-        // Placing `candidate` can only shrink the free-tile sets of buildings
-        // adjacent to it. We check:
-        //   a) The new building itself — if it has exactly one free neighbour,
-        //      no other building may also depend on that tile.
-        //   b) Each adjacent existing building — if it is now constrained to
-        //      a single free tile, no other building (affected or not) may
-        //      depend on the same tile.
-        //
-        // Non-affected buildings (not adjacent to `candidate`) have unchanged
-        // free-tile sets; if any already relies on the same sole tile, the
-        // placement creates the conflict.
+        // No two buildings may end up depending on the same single free tile.
+        // Placing here can only shrink the free-tile sets of buildings adjacent
+        // to the candidate, so those are the ones to re-check, along with any
+        // building further out that already relies on one of the sole tiles
+        // this placement creates.
         const soleAccessClaimed = new Set<string>();
         const adjacentBuildingKeys = new Set<string>();
         const soleTilesToScan: Point[] = [];
@@ -207,10 +198,8 @@ export function createBuildingPlacementValidator(
             }
         }
 
-        // For each sole-access tile of an affected building, scan non-affected
-        // buildings adjacent to it. A non-affected building's free-tile set is
-        // unchanged; if it already depends on the same sole tile, the placement
-        // introduces a conflict that did not exist before.
+        // A building further from the candidate keeps its free-tile set, so it
+        // only conflicts if it already depends on one of these sole tiles.
         for (const soleTile of soleTilesToScan) {
             for (const adj of adjacentPoints(soleTile)) {
                 const adjKey = pointKey(adj);

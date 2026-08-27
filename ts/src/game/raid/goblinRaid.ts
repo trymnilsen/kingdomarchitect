@@ -140,8 +140,8 @@ export function formGoblinRaid(root: Entity): void {
 
         // Restamp against the score as it stood before the raid lands. The
         // raiders are about to burn part of that score down, so the gap the
-        // kingdom has to climb back widens with the damage they do. That is the
-        // grace period, not an oversight in the ordering.
+        // kingdom must climb back widens with the damage they do. That is the
+        // grace period the kingdom gets after a raid.
         camp.nextRaidThreshold = score * RAID_THRESHOLD_GROWTH;
         campEntity.invalidateComponent(GoblinCampComponentId);
 

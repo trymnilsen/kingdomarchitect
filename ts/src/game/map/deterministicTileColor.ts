@@ -8,21 +8,13 @@ import type { Point } from "../../common/point.ts";
 import { ChunkSize } from "./chunk.ts";
 
 /**
- * A simple deterministic PRNG (Pseudo-Random Number Generator) based on tile coordinates and a seed.
- * This uses a common shader technique (fract(sin(dot(...)))) to get a pseudo-random,
- * deterministic value between 0.0 and 1.0 for any given coordinate.
- *
- * @param x - The global X coordinate.
- * @param y - The global Y coordinate.
- * @param seed - A seed value to get different results for the same coordinate.
- * @returns A deterministic float value between 0.0 and 1.0.
+ * A value in [0, 1) that depends only on the coordinate and the seed. This is
+ * the fract(sin(dot(...))) trick from shader code: no state, same answer every
+ * time, which is what a tile needs to keep its colour across frames.
  */
 function prng(x: number, y: number, seed: number): number {
-    // Use large prime-like numbers for dot product
     const dot = x * 12.9898 + y * 78.233 + seed * 45.678;
-    // Use sin and a large multiplier to create chaos
     const sin = Math.sin(dot) * 43758.5453;
-    // Return the fractional part (fract())
     return sin - Math.floor(sin);
 }
 

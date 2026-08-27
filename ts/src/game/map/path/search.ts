@@ -59,10 +59,9 @@ export function aStarSearch(
 
     // Movement is four directional and the cheapest passable node costs 1, so
     // plain Manhattan distance is already an exact estimate of what remains.
-    // The doubling overestimates on purpose. That turns this into weighted A*,
-    // which settles for paths that can run slightly longer than optimal in
-    // exchange for exploring far fewer nodes. Touching the 2 changes how every
-    // unit in the game moves, so treat it as a tuning decision.
+    // Doubling it overestimates, which makes this weighted A*: paths can run
+    // slightly longer than optimal in exchange for exploring far fewer nodes.
+    // The 2 is a tuning decision that changes how every unit moves.
     const heuristics = (from: Point, to: Point) => {
         return manhattanDistance(from, to) * 2;
     };

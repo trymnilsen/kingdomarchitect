@@ -42,18 +42,16 @@ const noSpawn = (
  *
  * Evaluation runs in three stages:
  *
- * 1. **Hard gates** are volume properties that disqualify immediately regardless
- *    of anything else (start biome, taint biome, too small).
+ * 1. Hard gates: volume properties that disqualify outright, being a start
+ *    biome, a taint biome, or too small.
  *
- * 2. **Spawn score** is a multiplicative formula:
- *    `baseProbability × biomeWeight × progressionWeight × influenceWeight`
- *    A random roll must land below this score for the spawn to proceed.
- *    Returning the score even on failure lets callers tune the config.
+ * 2. Spawn score, the product of baseProbability, biomeWeight,
+ *    progressionWeight and influenceWeight. A random roll must land below it.
+ *    The score is returned even on failure so callers can tune the config.
  *
- * 3. **Spatial feasibility** is a BFS flood fill into unregistered space
- *    around the candidate to ensure the kingdom has room to grow. This is
- *    checked last because it involves traversal that is more expensive than
- *    the earlier checks.
+ * 3. Spatial feasibility: a BFS flood fill into unregistered space around the
+ *    candidate, checking the kingdom has room to grow. It runs last because the
+ *    traversal costs more than the earlier checks.
  *
  * @param random Injectable random function, defaulting to Math.random.
  *               Pass a deterministic function in tests to control rolls.
@@ -71,17 +69,16 @@ export function evaluateKingdomSpawn(
         influenceWeight: 0,
     };
 
-    // Gate 1: start biomes are reserved for the player, so never spawn here.
+    // Start biomes are reserved for the player.
     if (volume.isStartBiome === true) {
         return noSpawn(0, zeroFactors);
     }
 
-    // Gate 2: taint is a hostile magical biome, kingdoms won't settle there
+    // Taint is a hostile magical biome and nobody settles there.
     if (volume.type === "taint") {
         return noSpawn(0, zeroFactors);
     }
 
-    // Gate 3: volume must be large enough to support a viable kingdom
     if (volume.maxSize < KingdomSpawnConfig.minimumVolumeSize) {
         return noSpawn(0, zeroFactors);
     }
@@ -96,9 +93,9 @@ export function evaluateKingdomSpawn(
         return noSpawn(0, { ...zeroFactors, biomeWeight });
     }
 
-    // Progression weight: logarithmic ramp from floor to ceiling over time.
-    // Log scale is intentional. Kingdoms should appear quickly at first and then
-    // slow down, rather than accelerating linearly into the late game.
+    // Logarithmic ramp from floor to ceiling over time, so kingdoms appear
+    // quickly at first and then slow down instead of accelerating into the
+    // late game.
     const { floor, ceiling, scaleDivisor } = KingdomSpawnConfig.progression;
     const maxLogValue = Math.log10(1 + 20000 / scaleDivisor);
     const unclampedProgressionWeight =

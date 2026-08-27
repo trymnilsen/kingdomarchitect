@@ -17,9 +17,9 @@ import { KingdomSpawnConfig } from "./kingdomSpawnConfig.ts";
  * - visitedChunks: prevents re-queuing the same chunk from multiple
  *   neighbours, keeping the BFS from exploding inside large volumes.
  * - visitedVolumes: once a volume is reached via the shortest path,
- *   longer paths to the same volume are ignored. This is what makes
- *   FIFO ordering load-bearing. The first dequeue of any volume is
- *   always the highest-influence one.
+ *   longer paths to the same volume are ignored. This relies on FIFO
+ *   ordering, which makes the first dequeue of a volume the
+ *   highest-influence one.
  *
  * Volumes from different kingdoms accumulate, so the map stores the
  * sum of all kingdoms' contributions to each volume.
