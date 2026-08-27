@@ -158,15 +158,14 @@ export type DropMode = (typeof DropMode)[keyof typeof DropMode];
 /**
  * Decide which tile a drop actually lands on, or null if there is nowhere.
  *
- * This is the single place that answer is worked out, so that no mode can slip
- * a pile onto a tile that is already full. A caller may vouch for a tile being
- * a legal place to put things, but nobody gets to vouch for its capacity: a
- * tile holding more than MAX_GROUND_ITEMS_PER_TILE piles breaks selection
- * (which cycles through the entities on a tile) and defeats the spreading that
- * lets haulers work a spill in parallel.
+ * Every mode resolves through here so none can put a pile on a full tile. A
+ * caller may know a tile is a legal place to put things, but the capacity check
+ * belongs here: a tile holding more than MAX_GROUND_ITEMS_PER_TILE piles breaks
+ * selection, which cycles through the entities on a tile, and defeats the
+ * spreading that lets haulers work a spill in parallel.
  *
- * A full tile therefore overflows to the nearest tile with room rather than
- * refusing, so that enforcing the cap can never destroy goods.
+ * A full tile overflows to the nearest tile with room rather than refusing, so
+ * enforcing the cap can never destroy goods.
  */
 function resolveDropPosition(
     root: Entity,

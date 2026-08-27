@@ -89,14 +89,12 @@ export function negotiateDisplacement(
         return { kind: "noChain" };
     }
 
-    // Mutual-benefit pass, checked BEFORE the dominance gate below on purpose.
-    // Displacement (shoving someone off their task) and passing (two travellers
-    // trading tiles) are different things that the old cost model lumped together:
-    // a head-on in a 1-wide corridor between two equally-important workers could
-    // never resolve, because neither could "out-rank" the other. But if the blocker
-    // is itself trying to step into the requester's tile, a swap advances BOTH along
-    // their own paths and costs neither any progress. That makes it always
-    // allowed, regardless of utility (even zero), which is why it skips the
+    // Passing is checked before the dominance gate below. Shoving someone off
+    // their task and two travellers trading tiles are different things: a
+    // head-on in a one-wide corridor between two equally-important workers can
+    // never resolve on rank, because neither out-ranks the other. When the
+    // blocker is trying to step into the requester's tile, the swap advances
+    // both along their own paths, so it is allowed at any utility and skips the
     // affordability check.
     //
     // On a cardinal grid a reciprocal pass is always a 2-entity swap (a longer cycle
@@ -149,8 +147,6 @@ export function negotiateDisplacement(
             );
             return { kind: "wait" };
         case "immovable":
-            // Not a behaviour agent, so there is nothing to displace (defensive; the blocker was
-            // already found via BehaviorAgentComponentId, so this shouldn't be reached).
             return { kind: "noChain" };
         case "displaceable":
             break;

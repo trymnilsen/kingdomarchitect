@@ -43,16 +43,15 @@ const BEHAVIOR_STATS_LOG_INTERVAL = 100;
  *      whenever the action queue is empty.
  *   2. Execute the first action in the queue.
  *
- * The empty-queue trigger is the heart of the design: a worker that just
- * finished its plan, or that found nothing valid to do, re-selects on the next
- * tick instead of freezing. Crucially this is gated on the queue being empty,
- * NOT on pendingReplan, so an idle worker keeps pendingReplan === undefined and
- * the displacement system still classifies it as displaceable, not transient.
+ * A worker that just finished its plan, or that found nothing valid to do,
+ * re-selects on the next tick instead of freezing. That is gated on the queue
+ * being empty, not on pendingReplan, so an idle worker keeps pendingReplan
+ * undefined and the displacement system still counts it as displaceable rather
+ * than transient.
  *
  * A busy worker (non-empty queue, no pending replan) is never re-selected
- * mid-plan: it runs its current plan to completion. Needs (hunger, energy) only
- * influence the next selection at a plan boundary; interrupting a running plan
- * is reserved for explicit, imperative requestReplan calls.
+ * mid-plan. Needs like hunger and energy only influence the next selection at a
+ * plan boundary; interrupting a running plan takes an explicit requestReplan.
  */
 export function createBehaviorSystem(resolver: BehaviorResolver): EcsSystem {
     return {
@@ -87,8 +86,8 @@ function updateBehaviorAgent(
     stats.agentsProcessed++;
 
     // Re-select when forced (pendingReplan) or whenever idle (empty queue). The
-    // empty-queue branch is what un-sticks idle workers; it deliberately does
-    // NOT set pendingReplan, so an idle worker stays classified as displaceable.
+    // empty-queue branch un-sticks idle workers without setting pendingReplan,
+    // which would reclassify them as transient for displacement.
     if (agent.pendingReplan !== undefined || agent.actionQueue.length === 0) {
         log.debug(`Entity ${entity.id} selecting behavior`);
         stats.selectionsRun++;
@@ -114,13 +113,12 @@ function updateBehaviorAgent(
             agent.actionQueue.shift();
             if (agent.actionQueue.length === 0) {
                 log.debug(`Entity ${entity.id} actionQueue empty`);
-                // The plan finished normally. Clear the active/display state so
-                // the selection UI doesn't show this just-finished behavior
-                // against an empty queue, but keep `hysteresis` so the behavior
-                // is still favored when we re-select. We deliberately do NOT set
-                // pendingReplan: the empty queue itself triggers re-selection on
-                // the next tick, and leaving pendingReplan undefined keeps this
-                // just-settled worker classified as displaceable (not transient).
+                // The plan finished normally. Clear the display state so the
+                // selection UI doesn't show this behavior against an empty
+                // queue, but keep `hysteresis` so it is still favored on the
+                // next selection. pendingReplan stays unset: the empty queue
+                // triggers re-selection, and setting it would reclassify this
+                // settled worker as transient for displacement.
                 concludeActivePlan(agent);
             }
         } else if (result.kind === "failed") {
@@ -144,13 +142,11 @@ function updateBehaviorAgent(
 }
 
 /**
- * Reset the active plan: the behavior that is currently executing and its queue.
- * Clears currentBehaviorName (so the selection UI stops showing a behavior the
- * instant its plan ends) and currentBehaviorUtility (so a newly-idle entity
- * doesn't retain stale displacement resistance), and empties the queue. Crucially
- * it leaves `hysteresis` intact, so a plan that ended normally is still favored on
- * the next replan. Use this when a plan finishes; use clearBehavior when it ends
- * abnormally.
+ * Reset the plan that just finished: the behavior name (so the selection UI
+ * stops showing it), its utility (so a newly-idle entity keeps no stale
+ * displacement resistance), and the queue. `hysteresis` survives, so a plan
+ * that ended normally is still favored on the next replan. Use clearBehavior
+ * instead when a plan ends abnormally.
  */
 function concludeActivePlan(agent: BehaviorAgentComponent): void {
     agent.currentBehaviorName = null;
@@ -159,12 +155,10 @@ function concludeActivePlan(agent: BehaviorAgentComponent): void {
 }
 
 /**
- * Reset all behavior state on an agent, including the hysteresis memory. This is
- * concludeActivePlan plus forgetting which behavior to favor, so the next replan
- * starts from a clean slate with no anti-thrashing bonus. Used on the abnormal
- * termination paths (action failure, no valid behavior, behavior expanded to
- * nothing), matching the pre-split behavior where clearing currentBehaviorName
- * dropped the bonus on exactly those paths.
+ * Reset all behavior state on an agent, including the hysteresis memory, so the
+ * next replan starts with no anti-thrashing bonus. Used on the abnormal
+ * termination paths: action failure, no valid behavior, or a behavior that
+ * expanded to nothing.
  */
 function clearBehavior(agent: BehaviorAgentComponent): void {
     concludeActivePlan(agent);
@@ -172,12 +166,12 @@ function clearBehavior(agent: BehaviorAgentComponent): void {
 }
 
 /**
- * Unclaim the current job if the entity has one.
- * This is called when an action fails to ensure jobs aren't left in a claimed state.
+ * Unclaim the current job if the entity has one, so a failed action does not
+ * leave the job claimed by a worker that is no longer doing it.
  *
- * Uses ancestor traversal rather than a direct component lookup because entities
- * don't own their job queue. It lives on their parent (worker → root, goblin → camp).
- * The loop breaks after the first match because an entity can only claim one job at a time.
+ * The queue lives on an ancestor, not on the entity: a worker's is on the root,
+ * a goblin's on its camp. An entity can only claim one job, so the search stops
+ * at the first match.
  */
 function unclaimCurrentJob(entity: Entity): void {
     const queueEntity = entity.getAncestorEntity(JobQueueComponentId);

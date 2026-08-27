@@ -79,11 +79,10 @@ export function executeMoveToAction(
         return ActionComplete;
     }
 
-    // One-move-per-tick gate. An entity that already moved this tick must not
-    // step again. That happens when it was advanced as part of a beneficial swap
-    // during another agent's turn. Wait; it continues along its route next tick.
-    // This keeps net
-    // speed at one tile per tick and the swap's energy cost from being doubled.
+    // An entity that already moved this tick must not step again. That happens
+    // when it was advanced as part of a swap during another agent's turn.
+    // Waiting keeps net speed at one tile per tick and stops the swap's energy
+    // cost from being paid twice.
     const stamina = entity.getEcsComponent(MovementStaminaComponentId);
     if (stamina && hasMovedThisTick(stamina, tick)) {
         return ActionRunning;
@@ -252,11 +251,6 @@ function hasArrived(
     }
     return false;
 }
-
-/**
- * Move the requester one step from `from` to `to`, updating direction,
- * fog of war, and stamina tracking. Called after the next tile is confirmed clear.
- */
 
 /**
  * Returns a weight modifier that makes structures (non-road buildings and large

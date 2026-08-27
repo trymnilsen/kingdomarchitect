@@ -19,29 +19,22 @@ import type { Entity } from "../../entity/entity.ts";
 import { queryEntity } from "../../map/query/queryEntity.ts";
 
 /**
- * How a blocking entity may be dealt with. The model turns on whether the
- * blocker's *occupancy* of a tile is transient or persistent, which comes down
- * to one question: is it going to leave on its own?
+ * How a blocking entity may be dealt with. The question behind the model is
+ * whether the blocker will leave the tile on its own.
  *
- *   - `transient` means the blocker will vacate the tile by itself. It is either
- *     *walking* (a `moveTo` at its queue head, so it steps off next tick) or
- *     *undecided* (`pendingReplan` set, so freshly spawned or just finished or
- *     failed an action and not yet re-chosen). A transient occupant never gets
- *     shoved. You wait for it, or swap if you are head-on. Shoving a walker
- *     wastes the route progress it made, and shoving an undecided worker
- *     pre-empts a choice it is one tick away from making.
- *   - `movedThisTick` means it already moved this tick and is held by the hard
- *     one-move-per-tick gate, so it cannot move again until the next one. It is
- *     free next tick, same as a transient occupant, so the requester waits and
- *     retries.
- *   - `displaceable` means it has *settled*. It is either idle (no plan, `cost`
- *     0, yields for free) or doing a stationary task (`cost` is its behaviour
- *     utility). It will not move unless pushed, and only a higher-priority
- *     requester can push it.
- *   - `immovable` means it is not a behaviour agent at all, such as a building,
- *     a resource, or something inert. It cannot be displaced. This case is
- *     defensive: the real call paths only ever classify agent-bearing entities,
- *     and keeping it makes the function total.
+ *   - `transient` means it will vacate by itself. Either it is walking (a
+ *     `moveTo` at its queue head, so it steps off next tick) or it is undecided
+ *     (`pendingReplan` set: freshly spawned, or between actions). A transient
+ *     occupant is never shoved. You wait for it, or swap if you are head-on.
+ *     Shoving a walker throws away its route progress, and shoving an undecided
+ *     worker pre-empts a choice it is one tick from making.
+ *   - `movedThisTick` means the one-move-per-tick gate holds it. It is free
+ *     next tick, like a transient occupant, so the requester waits and retries.
+ *   - `displaceable` means it has settled: idle (`cost` 0, yields for free) or
+ *     on a stationary task (`cost` is its behaviour utility). It moves only
+ *     when a higher-priority requester pushes it.
+ *   - `immovable` means it is not a behaviour agent at all, such as a building
+ *     or a resource.
  */
 export type BlockerClass =
     | { kind: "transient" }
@@ -50,13 +43,13 @@ export type BlockerClass =
     | { kind: "immovable" };
 
 /**
- * Classify a blocking entity. See {@link BlockerClass} for what each kind means and why.
+ * Classify a blocking entity. See {@link BlockerClass} for what each kind means.
  *
- * The `pendingReplan` half of `transient` is load-bearing: it's what lets two workers
- * that become adjacent before either has a committed path resolve cleanly. The first
- * waits instead of shoving, and the beneficial swap fires once the second plans the same
- * tick. It relies on the behaviour system clearing `pendingReplan` when a worker settles
- * (idle or mid-task); a settled worker must classify as `displaceable`, not `transient`.
+ * The `pendingReplan` half of `transient` is what lets two workers that become
+ * adjacent before either has a committed path resolve cleanly: the first waits
+ * instead of shoving, and the swap fires once the second plans. This depends on
+ * the behaviour system clearing `pendingReplan` when a worker settles, since a
+ * settled worker must classify as `displaceable`.
  */
 export function classifyBlocker(
     entity: Entity,

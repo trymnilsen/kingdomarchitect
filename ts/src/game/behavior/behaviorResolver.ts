@@ -19,29 +19,17 @@ import { planGoblinBuildJob } from "../job/planner/goblinBuildJobPlanner.ts";
 import { canExecuteBuildJob } from "../job/buildBuildingJob.ts";
 
 /**
- * Creates a BehaviorResolver that returns applicable behaviors
- * based on the entity's components. Behavior instances are created
- * once and reused across all calls.
+ * Creates a BehaviorResolver that returns the behaviors applicable to an
+ * entity. Behavior instances are created once and reused across all calls.
  *
- * Worker behaviors (standard human NPCs):
- *   - performPlayerCommand: direct player orders, highest priority
- *   - sleep: energy recovery when exhausted
- *   - performJob: claim and execute jobs from the root job queue
- *   - haul: deposit loose inventory items to stockpiles when idle
+ * Goblins get their own shorter list. They take no player commands, have no
+ * EnergyComponent (warmth is their survival stat), and belong to a camp rather
+ * than the root tree, so the worker behaviors that look for stockpiles under
+ * the kingdom would search the wrong place.
  *
- * Goblin behaviors:
- *   - keepWarm: survival — go to fire or build one if none exists
- *   - performJob: claim and execute jobs from the camp job queue
- *
- * Goblins don't get sleep/haul/playerCommand because:
- *   - They aren't directly controlled by the player
- *   - They don't have an EnergyComponent (warmth is their survival stat)
- *   - They belong to a camp, not the root entity tree, so haul
- *     would look for stockpiles in the wrong place anyway
- *
- * The `() => true` validator for goblin performJob bypasses the
- * stockpile check used by player workers — goblins gather materials
- * from the environment directly, so the pre-check would always fail.
+ * The `() => true` validator on goblin performJob bypasses the stockpile
+ * pre-check player workers use. Goblins gather from the environment, so that
+ * check would always fail for them.
  */
 export function createBehaviorResolver(): BehaviorResolver {
     const workerBehaviors: Behavior[] = [

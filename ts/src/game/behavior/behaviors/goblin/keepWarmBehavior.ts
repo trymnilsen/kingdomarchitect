@@ -29,8 +29,8 @@ export function createKeepWarmBehavior(): Behavior {
         name: "keepWarm",
 
         isValid(entity: Entity): boolean {
-            // A committed raider never goes home to warm up — it fights until
-            // it dies. Suppressing keepWarm here is what keeps the siege going.
+            // A committed raider fights until it dies rather than going home to
+            // warm up, so keepWarm is suppressed for the duration of the raid.
             if (entity.hasComponent(RaidingComponentId)) {
                 return false;
             }

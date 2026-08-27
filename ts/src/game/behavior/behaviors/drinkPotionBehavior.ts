@@ -61,7 +61,6 @@ export function createDrinkPotionBehavior(): Behavior {
             const health = entity.getEcsComponent(HealthComponentId);
             if (!health) return [];
 
-            // Stage 1: drink from held
             const held = entity.getEcsComponent(HeldItemComponentId);
             if (held && !isHeldEmpty(held) && isPotion(held.item!.id)) {
                 return [{ type: "drinkFromHeld" }];
@@ -69,13 +68,12 @@ export function createDrinkPotionBehavior(): Behavior {
 
             const actions: BehaviorActionData[] = [];
 
-            // Stage 2: Clear the held slot so a fetched potion can be drunk
-            // from hand (planDepositHeld prefers a stockpile, drops otherwise)
+            // Clear the held slot so a fetched potion can be drunk from hand.
+            // planDepositHeld prefers a stockpile and drops otherwise.
             if (held && !isHeldEmpty(held)) {
                 actions.push(...planDepositHeld(entity));
             }
 
-            // Stage 3: walk to stockpile potion
             const missingHp = health.maxHp - health.currentHp;
             const stockpileActions = tryStockpileStage(entity, missingHp);
             if (stockpileActions) {
@@ -83,7 +81,6 @@ export function createDrinkPotionBehavior(): Behavior {
                 return actions;
             }
 
-            // Stage 4: nothing viable
             return [];
         },
     };

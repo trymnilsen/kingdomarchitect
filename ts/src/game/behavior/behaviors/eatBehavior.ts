@@ -47,13 +47,11 @@ export function createEatBehavior(): Behavior {
             const hunger = entity.getEcsComponent(HungerComponentId);
             if (!hunger) return [];
 
-            // Stage 1: eat from equipment slot
             const equipmentSlot = findEquippedFoodSlot(entity);
             if (equipmentSlot) {
                 return [{ type: "eatFromEquipment", slot: equipmentSlot }];
             }
 
-            // Stage 2: eat from held
             const held = entity.getEcsComponent(HeldItemComponentId);
             if (
                 held &&
@@ -66,14 +64,13 @@ export function createEatBehavior(): Behavior {
             const actions: BehaviorActionData[] = [];
             const settlement = getSettlementEntity(entity);
 
-            // Stage 3: Clear the held slot so acquired food can be eaten from
-            // hand. Prefer depositing the carried item at a stockpile and only
-            // drop it on the ground when none will take it (planDepositHeld).
+            // Clear the held slot so fetched food can be eaten from hand.
+            // planDepositHeld prefers a stockpile and only drops on the ground
+            // when none will take the carried item.
             if (held && !isHeldEmpty(held)) {
                 actions.push(...planDepositHeld(entity));
             }
 
-            // Stage 4: walk to stockpile food
             const stockpileActions = tryStockpileStage(entity, settlement);
 
             if (stockpileActions) {
@@ -81,21 +78,18 @@ export function createEatBehavior(): Behavior {
                 return actions;
             }
 
-            // Stage 5: walk to ground pile food
             const groundPileActions = tryGroundPileStage(entity);
             if (groundPileActions) {
                 actions.push(...groundPileActions);
                 return actions;
             }
 
-            // Stage 6: forage from world resource
             const forageActions = tryForageStage(entity);
             if (forageActions) {
                 actions.push(...forageActions);
                 return actions;
             }
 
-            // Stage 7: steal at critical hunger
             if (hunger.hunger >= STEAL_THRESHOLD) {
                 const stealActions = tryStealStage(entity);
                 if (stealActions) {
@@ -104,7 +98,6 @@ export function createEatBehavior(): Behavior {
                 }
             }
 
-            // Stage 8: nothing viable
             return [];
         },
     };

@@ -186,21 +186,17 @@ function releaseClaimIfHeld(
  * Walk takeable jobs from cheapest to most expensive and claim the first one
  * that plans to a non-empty action list.
  *
- * Trying candidates in order instead of committing to the single cheapest one
- * is what keeps one unplannable job from starving the whole queue: the
- * take-check (canTakeJob) is deliberately cheap and cannot know everything the
- * planner knows (e.g. whether a recipe input has any source in the world), so
- * a job can pass it and still plan to nothing. Before this loop, every worker
- * would pick that same job, fail to plan it, idle, and repeat next tick while
- * plannable jobs sat behind it in the queue.
+ * Trying candidates in order keeps one unplannable job from starving the queue.
+ * canTakeJob is cheap and cannot know what the planner knows, such as whether a
+ * recipe input has any source in the world, so a job can pass the take-check and
+ * still plan to nothing. Committing to the cheapest job alone would have every
+ * worker pick that one, fail, idle, and repeat while plannable jobs waited.
  *
- * Candidates are collected as references before any planning happens because
- * planners mutate the queue mid-loop: failAndAbort splices jobs out and
- * suspendJob releases claims. Each candidate is re-validated right before the
- * attempt for the same reason. An empty plan releases the claim explicitly,
- * because several planner paths return empty without releasing it themselves.
- * A worker that walks off to other work while holding a dead claim hides that
- * job from every worker permanently.
+ * Candidates are collected as references before any planning, and re-validated
+ * right before each attempt, because planners mutate the queue mid-loop: they
+ * remove jobs and release claims. An empty plan releases the claim explicitly,
+ * since several planner paths return empty without doing so. A worker holding a
+ * dead claim hides that job from every other worker for good.
  *
  * @param skipJob A job that already failed to plan this tick (the resumed
  *   claimed job), excluded so it isn't planned twice in one selection.
