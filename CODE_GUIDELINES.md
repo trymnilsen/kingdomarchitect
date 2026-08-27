@@ -75,7 +75,7 @@ What a comment must contain:
 - **Cover what, why, and when. Leave how to the code.** Explain what a symbol
   represents, why it exists, and when a caller reaches for it. The mechanics are
   already visible below the comment.
-- **Write down the decision and its reason.** The load-bearing line is the one
+- **Write down the decision and its reason.** The line worth keeping is the one
   that stops a future reader from undoing a choice, like "read fresh each render
   rather than stored, so it can't go stale."
 - **Prefer a concrete example over abstraction.** "A button uses the pressed
@@ -83,6 +83,25 @@ What a comment must contain:
 - **Comment the surprising parts.** Constraints, invariants, gotchas, and the
   reason behind an odd construction. If deleting the comment loses nothing a
   reader could not get at a glance, it should not be there.
+
+What to delete on sight:
+
+- **Narration of the next line.** `// Check worker inventory` above a check,
+  `// Calculate mean` above a mean, numbered step sequences, and value-restating
+  comments such as `duration: 5, // 5 seconds`.
+- **Argument with an imagined reviewer.** "deliberately", "on purpose", "that is
+  X, not an oversight", "no second filter belongs downstream", "this is
+  defensive". If the code needs defending, say what breaks otherwise; if nothing
+  breaks, say nothing.
+- **Flavour and epigram.** Comments are not the place for a closing line. The
+  cleft constructions "is what makes" and "is what keeps" are the usual tell.
+- **Changelog.** What the code used to do, which bug a line fixed, where a
+  module used to live. Git holds that.
+- **Vocabulary with no content.** "load-bearing", "gracefully", "Crucially",
+  "for backwards compatibility" in a single-author repo. "Single source of
+  truth" becomes a plain statement of the sync constraint, or goes.
+- **Signature-restating JSDoc**, `@param` blocks that repeat the parameter
+  names, empty `@param` stubs, and JSDoc left attached to the wrong function.
 
 How a comment should read:
 
@@ -92,3 +111,5 @@ How a comment should read:
   sentences.
 - **When trimming, cut words, not the reason.** A shorter comment should still
   answer why the thing exists.
+- **Keep the human ones.** A genuine why-comment, a TODO, or third-party
+  attribution stays as written, typos and all.
