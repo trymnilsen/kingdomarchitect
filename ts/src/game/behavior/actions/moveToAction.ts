@@ -319,8 +319,7 @@ function planPath(
 }
 
 type DisplacementResolution =
-    | { kind: "continue" }
-    | { kind: "result"; value: ActionResult };
+    { kind: "continue" } | { kind: "result"; value: ActionResult };
 
 /**
  * Ensures `action.cachedPath` is populated, planning a fresh route when needed.

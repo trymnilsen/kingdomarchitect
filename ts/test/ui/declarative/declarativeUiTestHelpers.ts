@@ -94,8 +94,7 @@ export function createTestComponentContext<P extends {}>(
     };
 
     let capturedDrawFn:
-        | ((scope: RenderScope, region: Rectangle) => void)
-        | null = null;
+        ((scope: RenderScope, region: Rectangle) => void) | null = null;
 
     const measureText = (text: string, _style: TextStyle): UISize => ({
         width: text.length * measureConfig.charWidth,

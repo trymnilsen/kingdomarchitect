@@ -84,10 +84,7 @@ export class CommitableInteractionStateChanger implements InteractionStateChange
 }
 
 type StateOperation =
-    | PopOperation
-    | ReplaceOperation
-    | PushOperation
-    | ClearOperation;
+    PopOperation | ReplaceOperation | PushOperation | ClearOperation;
 
 type PopOperation = {
     type: "pop";

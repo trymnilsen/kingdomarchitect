@@ -7,8 +7,7 @@ export type Sprite2Id = keyof typeof spriteRefs;
  * Use the SPRITE_* constants for indexed access.
  */
 export type SpriteDefinition =
-    | [number, number, number, number]
-    | [number, number, number, number, number];
+    [number, number, number, number] | [number, number, number, number, number];
 
 /** Index for sprite width in SpriteDefinition tuple */
 export const SPRITE_W = 0;

@@ -3,10 +3,7 @@ import type { BehaviorActionData } from "./actionData.ts";
 
 /** Quality of sleep determines restore rates and duration. */
 export type SleepQuality =
-    | "house"
-    | "bedrollFire"
-    | "bedrollAlone"
-    | "collapse";
+    "house" | "bedrollFire" | "bedrollAlone" | "collapse";
 
 /**
  * Why an action gave up. Reported when the behavior system logs the failure,

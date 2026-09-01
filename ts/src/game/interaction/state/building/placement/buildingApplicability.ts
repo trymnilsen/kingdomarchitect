@@ -11,8 +11,7 @@ export type BuildingApplicableErrorResult = {
 };
 
 export type BuildingApplicabilityResult =
-    | BuildingApplicableSuccessResult
-    | BuildingApplicableErrorResult;
+    BuildingApplicableSuccessResult | BuildingApplicableErrorResult;
 
 export type BuildingApplicability = (
     position: Point,

@@ -111,8 +111,7 @@ export function getSQLiteVersion(db: DatabaseSync): number {
     }
 
     const row = db.prepare("SELECT version FROM schema_version").get() as
-        | { version: number }
-        | undefined;
+        { version: number } | undefined;
 
     return row?.version ?? 0;
 }

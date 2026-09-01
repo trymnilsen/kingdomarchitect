@@ -52,8 +52,7 @@ describe("engageInCombatBehavior", () => {
 
             const actions = behavior.expand(victim);
             const attack = actions.find((a) => a.type === "attackTarget") as
-                | { type: "attackTarget"; targetId: string }
-                | undefined;
+                { type: "attackTarget"; targetId: string } | undefined;
 
             assert.ok(attack, "expand must include an attackTarget action");
             assert.strictEqual(attack.targetId, "G2");
@@ -151,8 +150,7 @@ describe("engageInCombatBehavior", () => {
             const actions = behavior.expand(victim);
             const hasMoveTo = actions.some((a) => a.type === "moveTo");
             const attack = actions.find((a) => a.type === "attackTarget") as
-                | { type: "attackTarget"; targetId: string }
-                | undefined;
+                { type: "attackTarget"; targetId: string } | undefined;
 
             assert.ok(hasMoveTo, "expand should include a moveTo action");
             assert.ok(attack, "expand should include an attackTarget action");

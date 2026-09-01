@@ -11,8 +11,7 @@ import { findStockpiles } from "../entity/settlementQueries.ts";
  *    kingdom-wide view you get by dismissing the scope chip.
  */
 export type StockScope =
-    | { kind: "single"; entityId: string }
-    | { kind: "allStockpiles" };
+    { kind: "single"; entityId: string } | { kind: "allStockpiles" };
 
 /**
  * Resolve a scope to the concrete list of source entities to aggregate. The

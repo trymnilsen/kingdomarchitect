@@ -10,8 +10,7 @@ export type AnimationKey = `${AnimationPrefix}_${Ordinal}`;
 
 /** An unresolved key, such as "walk_{direction}", filled in per entity. */
 export type AnimationTemplate =
-    | `${AnimationPrefix}_{direction}`
-    | `${AnimationPrefix}_{ordinal}`;
+    `${AnimationPrefix}_{direction}` | `${AnimationPrefix}_{ordinal}`;
 
 type AnimationEventTransition = {
     event: string;
@@ -24,8 +23,7 @@ type AnimationEffectTransition = {
 };
 
 export type AnimationTransition =
-    | AnimationEventTransition
-    | AnimationEffectTransition;
+    AnimationEventTransition | AnimationEffectTransition;
 
 export function isEventTransition(
     transition: AnimationTransition,
