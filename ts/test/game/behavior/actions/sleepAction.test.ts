@@ -8,14 +8,14 @@ import {
 import {
     createBehaviorAgentComponent,
     BehaviorAgentComponentId,
-} from "../../../../src/game/component/BehaviorAgentComponent.ts";
+} from "../../../../src/game/component/behaviorAgentComponent.ts";
 import {
     executeSleepAction,
     resolveSleepEnergyPerTick,
     resolveSleepEnergyTarget,
     type SleepActionData,
 } from "../../../../src/game/behavior/actions/sleepAction.ts";
-import type { SleepQuality } from "../../../../src/game/behavior/actions/Action.ts";
+import type { SleepQuality } from "../../../../src/game/behavior/actions/action.ts";
 import {
     createHealthComponent,
     HealthComponentId,

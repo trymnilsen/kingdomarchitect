@@ -36,7 +36,7 @@ export type PreferredAmountsListPageProps = {
 };
 
 /**
- * Left page of the stockpile book — a paginated, filterable list of all
+ * Left page of the stockpile book, a paginated, filterable list of all
  * inventory items with +/- controls for setting preferred amounts.
  */
 export const preferredAmountsListPage =
@@ -72,7 +72,7 @@ export const preferredAmountsListPage =
 
             const rows: ComponentDescriptor[] = [];
 
-            // Filter button row — shows an "x" clear button when a filter is active
+            // Filter button row, shows an "x" clear button when a filter is active
             const filterLabel = props.filterText
                 ? `Filter: ${props.filterText}`
                 : "Filter";

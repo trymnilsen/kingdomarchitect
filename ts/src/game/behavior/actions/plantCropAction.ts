@@ -3,7 +3,7 @@ import { log } from "../../../common/logging/logger.ts";
 import { FarmComponentId, FarmState } from "../../component/farmComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { completeClaimedJob } from "../../job/jobLifecycle.ts";
-import { ActionComplete, ActionRunning, type ActionResult } from "./Action.ts";
+import { ActionComplete, ActionRunning, type ActionResult } from "./action.ts";
 
 export type PlantCropActionData = {
     type: "plantCrop";
@@ -41,7 +41,7 @@ export function executePlantCropAction(
         return { kind: "failed", cause: { type: "unknown" } };
     }
 
-    // Farm may have already been planted by another worker — complete without changing state
+    // Farm may have already been planted by another worker, so complete without changing state
     if (farm.state !== FarmState.Empty) {
         completeClaimedJob(entity);
         return ActionComplete;

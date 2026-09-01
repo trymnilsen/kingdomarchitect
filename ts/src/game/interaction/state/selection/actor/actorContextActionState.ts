@@ -16,7 +16,7 @@ import { SelectedEntityItem } from "../../../selection/selectedEntityItem.ts";
 import { SelectedTileItem } from "../../../selection/selectedTileItem.ts";
 import { WorkplaceComponentId } from "../../../../component/workplaceComponent.ts";
 import { ChangeOccupationCommand } from "../../../../../server/message/command/changeOccupationCommand.ts";
-import { BehaviorAgentComponentId } from "../../../../component/BehaviorAgentComponent.ts";
+import { BehaviorAgentComponentId } from "../../../../component/behaviorAgentComponent.ts";
 import { SetPlayerCommand } from "../../../../../server/message/command/setPlayerCommand.ts";
 import { log } from "../../../../../common/logging/logger.ts";
 

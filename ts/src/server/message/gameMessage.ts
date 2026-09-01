@@ -70,7 +70,7 @@ export type WorldStateGameMessage = {
     // so we should only add the first level
     rootChildren: ReplicatedEntityData[];
     // All generated chunks. Ground data exists client side for these even
-    // when no tile in them has been discovered yet — entities are replicated
+    // when no tile in them has been discovered yet. Entities are replicated
     // regardless of discovery, so the ground they stand on must be too.
     chunks: ReplicatedChunkData[];
     // Tiles discovered by the player, includes volume reference

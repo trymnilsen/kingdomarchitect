@@ -209,8 +209,8 @@ export function manhattanDistance(from: Point, to: Point): number {
 /**
  * Measures the distance between two points as the larger of the x and y
  * component differences (Chebyshev distance). Diagonal steps count the same
- * as cardinal ones, so all eight tiles surrounding a point are at distance 1
- * — useful for "ring around a tile" checks.
+ * as cardinal ones, so all eight tiles surrounding a point are at distance 1.
+ * Useful for "ring around a tile" checks.
  * @param from the point to measure from
  * @param to the point to measure to
  * @returns the chebyshev distance between the points

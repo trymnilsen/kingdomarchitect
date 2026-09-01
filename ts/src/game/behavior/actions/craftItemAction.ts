@@ -13,7 +13,7 @@ import { spendEntityEnergy } from "../../component/energyComponent.ts";
 
 import type { Entity } from "../../entity/entity.ts";
 import { completeClaimedJob } from "../../job/jobLifecycle.ts";
-import { ActionComplete, ActionRunning, type ActionResult } from "./Action.ts";
+import { ActionComplete, ActionRunning, type ActionResult } from "./action.ts";
 import type { CraftingRecipe } from "../../../data/crafting/craftingRecipe.ts";
 
 /**
@@ -21,8 +21,8 @@ import type { CraftingRecipe } from "../../../data/crafting/craftingRecipe.ts";
  * On the first tick, inputs are taken from the building's input buffer
  * and inputsConsumed is set to true. Subsequent ticks track progress
  * toward completion without touching inventories. If the entity replans
- * before completion, the consumed inputs are lost — intentional, as
- * partial crafting is treated as a failed attempt.
+ * before completion, the consumed inputs are lost. Partial crafting counts
+ * as a failed attempt.
  */
 export type CraftItemActionData = {
     type: "craftItem";
@@ -39,7 +39,7 @@ export type CraftItemActionData = {
  * - On completion: deposit outputs into the worker's held slot.
  *
  * The planner is responsible for ensuring held is either empty or holds
- * the same item id as the recipe's output before this action runs; if
+ * the same item id as the recipe's output before this action runs. If
  * held holds an incompatible item the action fails.
  */
 export function executeCraftItemAction(

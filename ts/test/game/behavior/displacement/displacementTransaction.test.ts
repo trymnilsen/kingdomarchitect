@@ -1,6 +1,6 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
-import { getBehaviorAgent } from "../../../../src/game/component/BehaviorAgentComponent.ts";
+import { getBehaviorAgent } from "../../../../src/game/component/behaviorAgentComponent.ts";
 import {
     MovementStaminaComponentId,
     hasMovedThisTick,
@@ -51,7 +51,7 @@ describe("displacementTransaction", () => {
         it("returns false when entity is not at the expected from-position", () => {
             const { root } = createTestWorld();
             const b = createAgent("b", root, 11, 8);
-            // Move entity before commit — stale transaction
+            // Move entity before commit, making the transaction stale
             b.worldPosition = { x: 13, y: 8 };
 
             const tx: DisplacementTransaction = {
@@ -134,7 +134,7 @@ describe("displacementTransaction", () => {
             // B at (11,8) moves to (12,8); C at (12,8) moves to (13,8).
             // Correct execution order: C moves first (into free tile at 13,8), then B.
             // If the chain were applied front-to-back, B would try to move to (12,8)
-            // which is still occupied by C — the commit would be invalid. Reverse
+            // which is still occupied by C, so the commit would be invalid. Reverse
             // order is the only correct execution, and a successful commit (true)
             // with correct final positions validates it implicitly.
             const b = createAgent("b", root, 11, 8);
@@ -260,7 +260,7 @@ describe("displacementTransaction", () => {
             a.setEcsComponent(createEnergyComponent(100));
             b.setEcsComponent(createEnergyComponent(100));
 
-            // Each is heading into the other's tile — a head-on swap. Cached paths
+            // Each is heading into the other's tile, a head-on swap. Cached paths
             // start with the tile each is about to step into.
             const aAgent = getBehaviorAgent(a)!;
             const bAgent = getBehaviorAgent(b)!;
@@ -320,7 +320,7 @@ describe("displacementTransaction", () => {
                 99,
             );
 
-            // Each continues its route — consumed step sliced off, no replan.
+            // Each continues its route. Consumed step sliced off, no replan.
             assert.deepStrictEqual(aAgent.actionQueue[0], {
                 type: "moveTo",
                 target: { x: 15, y: 8 },

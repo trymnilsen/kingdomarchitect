@@ -3,7 +3,7 @@ import type { SetPlayerCommand } from "../../../server/message/command/setPlayer
 import {
     BehaviorAgentComponentId,
     requestReplan as requestBehaviorReplan,
-} from "../../component/BehaviorAgentComponent.ts";
+} from "../../component/behaviorAgentComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 
 /**

@@ -17,8 +17,8 @@ import { getGameTimeTick } from "../../component/gameTimeComponent.ts";
 import { StockpileComponentId } from "../../component/stockpileComponent.ts";
 import { getSettlementEntity } from "../../entity/settlementQueries.ts";
 import type { Entity } from "../../entity/entity.ts";
-import type { BehaviorActionData } from "../actions/ActionData.ts";
-import type { Behavior } from "./Behavior.ts";
+import type { BehaviorActionData } from "../actions/actionData.ts";
+import type { Behavior } from "./behavior.ts";
 import { planDepositHeld } from "../../job/planner/planDepositHeld.ts";
 
 export const DRINK_HP_FRACTION_THRESHOLD = 0.5;
@@ -26,10 +26,10 @@ export const GREATER_POTION_MISSING_HP = 120;
 const MAX_UTILITY = 85;
 
 /**
- * Drink a health potion when badly hurt. Never triggers while in combat —
+ * Drink a health potion when badly hurt. Never triggers while in combat, since
  * a threatened worker stays in the fight and heals afterwards. The heal
  * effect applies on the next effect system tick after drinking, so the
- * behavior may briefly re-validate before the heal lands; the replan
+ * behavior may briefly re-validate before the heal lands. The replan
  * discards the stale action queue.
  */
 export function createDrinkPotionBehavior(): Behavior {
@@ -123,7 +123,7 @@ function tryStockpileStage(
     const settlement = getSettlementEntity(entity);
     const stockpiles = settlement.queryComponents(StockpileComponentId);
 
-    // Nearest stockpile per tier; the fallback tier is only used when no
+    // Nearest stockpile per tier. The fallback tier is only used when no
     // stockpile holds the preferred one
     const nearestEntities: (Entity | null)[] = [null, null];
     const nearestDists = [Infinity, Infinity];

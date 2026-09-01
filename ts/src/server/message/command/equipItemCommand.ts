@@ -6,8 +6,7 @@ type SlotType = keyof EquipmentComponent["slots"];
 /**
  * Issue an equip command. The worker walks to the source (a stockpile or
  * a ground pile), picks up one unit of the item, evicts the target slot
- * to the ground if occupied, then equips. Use UnequipItemCommand to
- * unequip — the null-itemId path no longer exists.
+ * to the ground if occupied, then equips. Use UnequipItemCommand to unequip.
  */
 export type EquipItemCommand = {
     id: typeof EquipItemCommandId;

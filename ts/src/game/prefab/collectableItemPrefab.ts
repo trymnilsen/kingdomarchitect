@@ -11,15 +11,15 @@ import { loopAnimation } from "../../rendering/animation/animationGraph.ts";
 import { zeroPoint } from "../../common/point.ts";
 
 /**
- * Canonical prefab for any item that exists loose in the world — drops from
+ * Canonical prefab for any item that exists loose in the world: drops from
  * the held-item system, loot from deaths, and any future drop scenarios all
  * use this prefab. Adds a GroundItemComponent marker so behaviours and
  * queries can identify world-loose item piles distinctly from other
  * collectables (chests, etc.).
  *
- * A pile holds a single stack of a single item type — several types on one tile
- * are several piles — which is what lets each one decay on its own clock and be
- * hauled by its own worker.
+ * A pile holds a single stack of a single item type. Several types on one tile
+ * are several piles, so each one decays on its own clock and is hauled by its
+ * own worker.
  *
  * `reason` records why this pile was dropped and is stored on the collectable
  * component for debugging (shown in the selection tile).

@@ -74,7 +74,7 @@ export type UiPaginatedListProps = {
  * The height each row gets on a page: the item area divided evenly by the
  * configured items-per-page. The divisor is always `itemsPerPage`, never the
  * number of rows actually on the page, so a row is the same height on a full
- * page and on a partial last page — there is no leftover space to absorb.
+ * page and on a partial last page, so there is no leftover space to absorb.
  */
 export function paginatedItemHeight(
     availableHeight: number,

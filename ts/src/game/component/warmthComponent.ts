@@ -6,7 +6,7 @@
  * of 1.0/tick a goblin starting at 55 warmth will hit the cold threshold in
  * roughly 5 ticks, giving it a short window before keepWarmBehavior kicks in.
  * Fire warms at activeWarmthRate (default 15/tick), so recovery is fast relative
- * to decay — goblins spend most of their time working, not warming.
+ * to decay, since goblins spend most of their time working, not warming.
  */
 export type WarmthComponent = {
     id: typeof WarmthComponentId;

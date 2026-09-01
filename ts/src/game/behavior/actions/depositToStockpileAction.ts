@@ -13,7 +13,7 @@ import {
     StockpileComponentId,
 } from "../../component/stockpileComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
-import { ActionComplete, type ActionResult } from "./Action.ts";
+import { ActionComplete, type ActionResult } from "./action.ts";
 import { log } from "../../../common/logging/logger.ts";
 
 export type DepositToStockpileActionData = {

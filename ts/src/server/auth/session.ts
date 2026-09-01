@@ -47,7 +47,7 @@ export function validateSession(
     }
 
     if (new Date(row.expires_at) <= new Date()) {
-        // Session expired — clean it up
+        // Session expired, clean it up
         db.prepare("DELETE FROM sessions WHERE session_id = ?").run(sessionId);
         return null;
     }

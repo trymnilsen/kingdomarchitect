@@ -48,7 +48,7 @@ export class CityPreview extends DevApp {
             },
         });
 
-        // Pan: movement is in screen pixels, camera.position is in world pixels — 1:1 mapping.
+        // Pan: movement is in screen pixels, camera.position is in world pixels, a 1:1 mapping.
         // Negate because dragging right reveals tiles to the left (camera moves left).
         this.touchInput.onPan = (movement) => {
             this.camera.translate({

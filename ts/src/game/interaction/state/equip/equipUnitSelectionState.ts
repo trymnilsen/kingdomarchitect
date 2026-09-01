@@ -14,7 +14,7 @@ import { AlertMessageState } from "../common/alertMessageState.ts";
 
 /**
  * Tap-a-unit selection state for the equip flow. Started from a stockpile
- * inventory or ground-pile selection — the player has already chosen the
+ * inventory or ground-pile selection. The player has already chosen the
  * source, the item, and the slot. Tapping a friendly equippable unit
  * dispatches an EquipItemCommand routing the worker through the equip
  * planner.

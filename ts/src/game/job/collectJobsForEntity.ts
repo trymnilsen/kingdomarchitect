@@ -10,8 +10,8 @@ import { CollectItemJob, CollectItemJobId } from "./collectItemJob.ts";
  * skipping any stack that already has a job waiting.
  *
  * A worker's held slot takes one item type per trip, so a collectable holding
- * two types is two jobs. Queueing them together is what lets one tap clear the
- * whole thing, and lets a different worker take each type.
+ * two types is two jobs. Queueing them together lets one tap clear the whole
+ * thing, and lets a different worker take each type.
  */
 export function collectJobsForEntity(
     root: Entity,
@@ -50,7 +50,7 @@ export function collectJobsForEntity(
  * planCollectItem retires a job whose stack is gone before any worker walks.
  *
  * The (entity, item) pair identifies the work because a collectable never holds
- * two stacks of the same item id — same-type additions merge.
+ * two stacks of the same item id, since same-type additions merge.
  */
 function hasPendingCollectJobFor(
     jobQueue: JobQueueComponent,

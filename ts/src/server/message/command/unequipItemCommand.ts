@@ -5,7 +5,7 @@ type SlotType = keyof EquipmentComponent["slots"];
 
 /**
  * Move an item out of an equipment slot into the worker's held slot.
- * Instant — no movement required. Fails if held is occupied (caller
+ * Instant, no movement required. Fails if held is occupied (caller
  * needs to drop held first).
  */
 export type UnequipItemCommand = {

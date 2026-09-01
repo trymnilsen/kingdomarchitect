@@ -10,7 +10,7 @@ import { PlayerUnitComponentId } from "./playerUnitComponent.ts";
  * garrison behavior, the step-outside exemption and the night watch all ask
  * here, so they cannot drift apart.
  *
- * The two predicates differ on purpose:
+ * The two predicates differ:
  *  - {@link stationUnderEntity} is role-agnostic. Any body on a station tile
  *    gets the manned-tower effects.
  *  - {@link isManningStation} is role-gated. Only a Guard on an enabled station
@@ -34,7 +34,7 @@ export function stationUnderEntity(entity: Entity): Entity | null {
     return null;
 }
 
-/** The worker standing on this tower, or null (at most one — the tile is impassable). */
+/** The worker standing on this tower, or null (at most one, the tile is impassable). */
 export function stationOccupant(root: Entity, tower: Entity): Entity | null {
     for (const [unit] of root.queryComponents(PlayerUnitComponentId)) {
         if (pointEquals(unit.worldPosition, tower.worldPosition)) {

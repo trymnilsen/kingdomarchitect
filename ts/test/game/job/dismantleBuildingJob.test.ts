@@ -31,7 +31,7 @@ import {
     DismantleBuildingJobId,
     finishDismantle,
 } from "../../../src/game/job/dismantleBuildingJob.ts";
-import { createBehaviorSystem } from "../../../src/game/behavior/systems/BehaviorSystem.ts";
+import { createBehaviorSystem } from "../../../src/game/behavior/systems/behaviorSystem.ts";
 import { createBehaviorResolver } from "../../../src/game/behavior/behaviorResolver.ts";
 import { workerPrefab } from "../../../src/game/prefab/workerPrefab.ts";
 import { stockPile } from "../../../src/data/building/wood/storage.ts";
@@ -90,7 +90,7 @@ describe("finishDismantle", () => {
 
         // Jobs: one targeting this building (should be cleared), one targeting
         // a different building (should survive), and the dismantle job itself
-        // (should survive — the action completes it).
+        // (should survive, since the action completes it).
         const jobQueue = kingdom.requireEcsComponent(JobQueueComponentId);
         jobQueue.jobs.push(createProductionJob(building.id));
         jobQueue.jobs.push(createProductionJob("otherBuilding"));

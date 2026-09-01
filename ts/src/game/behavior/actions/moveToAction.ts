@@ -5,7 +5,7 @@ import { log } from "../../../common/logging/logger.ts";
 import {
     BehaviorAgentComponentId,
     getBehaviorAgent,
-} from "../../component/BehaviorAgentComponent.ts";
+} from "../../component/behaviorAgentComponent.ts";
 import { isImpassableStructure } from "../../component/traversalComponent.ts";
 import {
     MovementStaminaComponentId,
@@ -29,7 +29,7 @@ import {
 } from "../../../data/inventory/items/naturalResource.ts";
 import { negotiateDisplacement } from "../displacement/displacementNegotiation.ts";
 import { commitDisplacementTransaction } from "../displacement/displacementTransaction.ts";
-import { ActionComplete, ActionRunning, type ActionResult } from "./Action.ts";
+import { ActionComplete, ActionRunning, type ActionResult } from "./action.ts";
 
 /**
  * The `stopAdjacent` option lets behaviors place the entity next to a target
@@ -218,7 +218,7 @@ export function executeMoveToAction(
 
 /**
  * Maximum number of immediate replans within a single tick after proving a tile
- * impassable via failed displacement. In practice this terminates in 1–2 iterations;
+ * impassable via failed displacement. In practice this terminates in 1 or 2 iterations,
  * the cap guards against bugs in the blocked-tile accumulation.
  */
 const MAX_REPLAN_ATTEMPTS = 10;

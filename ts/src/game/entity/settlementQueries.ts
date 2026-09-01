@@ -5,8 +5,8 @@ import { StockpileComponentId } from "../component/stockpileComponent.ts";
 import type { Entity } from "./entity.ts";
 
 /**
- * Walks up the ancestor chain to find the nearest settlement entity —
- * either a PlayerKingdom or a GoblinCamp. Returns that entity so queries
+ * Walks up the ancestor chain to find the nearest settlement entity, either
+ * a PlayerKingdom or a GoblinCamp. Returns that entity so queries
  * (stockpiles, housing, jobs) are scoped to the owning settlement rather
  * than the entire world tree.
  *

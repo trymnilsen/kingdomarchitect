@@ -10,7 +10,7 @@ export type RaidingComponent = {
 
     /**
      * Entity id of the player building this raider is currently assigned to
-     * raze. Assigned at formation; re-pointed by RaidBehavior when the target
+     * raze. Assigned at formation, then re-pointed by RaidBehavior when the target
      * is destroyed and other player buildings remain.
      */
     targetId: string;

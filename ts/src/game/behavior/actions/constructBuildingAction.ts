@@ -6,7 +6,7 @@ import { heal, HealthComponentId } from "../../component/healthComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { finishConstruction } from "../../job/buildBuildingJob.ts";
 import { completeClaimedJob } from "../../job/jobLifecycle.ts";
-import { ActionComplete, ActionRunning, type ActionResult } from "./Action.ts";
+import { ActionComplete, ActionRunning, type ActionResult } from "./action.ts";
 
 export type ConstructBuildingActionData = {
     type: "constructBuilding";

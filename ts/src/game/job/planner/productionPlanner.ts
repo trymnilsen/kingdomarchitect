@@ -1,5 +1,5 @@
 import type { Entity } from "../../entity/entity.ts";
-import type { BehaviorActionData } from "../../behavior/actions/ActionData.ts";
+import type { BehaviorActionData } from "../../behavior/actions/actionData.ts";
 import { ChunkMapComponentId } from "../../component/chunkMapComponent.ts";
 import { ProductionComponentId } from "../../component/productionComponent.ts";
 import type { ProductionJob } from "../productionJob.ts";
@@ -21,7 +21,7 @@ import { planDepositHeld } from "./planDepositHeld.ts";
  * Plan actions for operating a production facility.
  *
  * zone kind (forrester): the worker auto-decides plant-vs-chop from the current
- * tree population — plant up to a target count, then chop a random standing tree.
+ * tree population: plant up to a target count, then chop a random standing tree.
  */
 export function planProduction(
     root: Entity,

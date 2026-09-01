@@ -9,7 +9,7 @@ import type { Entity } from "../entity/entity.ts";
  * One physical contribution to a logical stock entry: the stockpile entity that
  * holds the items and how many it holds. The live entity reference is kept
  * (rather than an id) because a stock aggregate is a transient, read-time view
- * that is never serialized — callers use it immediately to read positions, jump
+ * that is never serialized. Callers use it immediately to read positions, jump
  * the camera, or sort by distance. This mirrors {@link MaterialSource}.
  */
 export type StockSource = {
@@ -51,8 +51,8 @@ export function stockEntryKey(entry: StockEntry): string {
 
 /**
  * Aggregate the contents of the given stockpiles into logical entries keyed by
- * (item id, rarity). This is a single sweep — one pass over the stockpiles and
- * one pass over each inventory's stacks — so cost is O(stockpiles * stacks)
+ * (item id, rarity). This is a single sweep: one pass over the stockpiles and
+ * one pass over each inventory's stacks, so cost is O(stockpiles * stacks)
  * regardless of how many distinct items callers later look up. Resolve the
  * stockpile set once per recompute (see resolveStockSources) and reuse the
  * aggregate for every item, chip and predicate rather than re-querying per item.

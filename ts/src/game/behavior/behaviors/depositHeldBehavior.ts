@@ -4,17 +4,16 @@ import {
 } from "../../component/heldItemComponent.ts";
 import { findAcceptingStockpile } from "../../entity/findAcceptingStockpile.ts";
 import type { Entity } from "../../entity/entity.ts";
-import type { BehaviorActionData } from "../actions/ActionData.ts";
-import type { Behavior } from "./Behavior.ts";
+import type { BehaviorActionData } from "../actions/actionData.ts";
+import type { Behavior } from "./behavior.ts";
 
 const UTILITY = 15;
 
 /**
  * DepositHeldBehavior nudges an idle worker carrying something to walk
- * the held item to the nearest stockpile and drop it. Replaces the old
- * pressure-scaled HaulBehavior — the new model is single-item-id held,
- * so there's no "fullness" to scale by. Any task above utility 15
- * preempts this; the worker only auto-deposits when nothing else fits.
+ * the held item to the nearest stockpile and drop it. Held is a single
+ * item id, so there is no "fullness" to scale by. Any task above utility
+ * 15 preempts this. The worker only auto-deposits when nothing else fits.
  */
 export function createDepositHeldBehavior(): Behavior {
     return {

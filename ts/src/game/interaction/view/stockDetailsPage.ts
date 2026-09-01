@@ -29,7 +29,7 @@ export type StockDetailsPageProps = {
     onJump?: (entity: Entity) => void;
     /**
      * Whether to list the stockpiles a pile is stored in with jump targets.
-     * Pointless when the view is already scoped to a single inventory — every
+     * Pointless when the view is already scoped to a single inventory, since every
      * item is in the same box the player is looking at.
      */
     showSources?: boolean;

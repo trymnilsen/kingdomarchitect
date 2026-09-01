@@ -130,7 +130,7 @@ export const uiBookLayout = createComponent<UiBookLayoutProps>(
         // The book panel is a real, bounded box so it occludes taps over just
         // its own window (a click on the page does nothing) while a click on the
         // surrounding scrim still falls through to dismiss the modal. In single
-        // mode only the visible page is drawn; in dual mode both halves are.
+        // mode only the visible page is drawn. In dual mode both halves are.
         const isSingleMode = mode === UIBookLayoutMode.Single;
         const bookWindowWidth = isSingleMode ? pageWidth : bookSize.width;
         let backgroundPage: OpenBookPage;

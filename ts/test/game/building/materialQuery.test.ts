@@ -116,7 +116,7 @@ describe("getTotalItemInStockpiles", () => {
     function rootWithStockpile(): Entity {
         const root = new Entity("root");
         const stockpile = new Entity("stock");
-        // The same item id held in two rarities — separate stacks, as the
+        // The same item id held in two rarities gives separate stacks, as the
         // inventory stacks by (id, rarity).
         stockpile.setEcsComponent(
             createInventoryComponent([

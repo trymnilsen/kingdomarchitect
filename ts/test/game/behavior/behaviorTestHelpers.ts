@@ -1,5 +1,5 @@
 import { Entity } from "../../../src/game/entity/entity.ts";
-import { createBehaviorAgentComponent } from "../../../src/game/component/BehaviorAgentComponent.ts";
+import { createBehaviorAgentComponent } from "../../../src/game/component/behaviorAgentComponent.ts";
 import {
     createEnergyComponent,
     DEFAULT_MAX_ENERGY,

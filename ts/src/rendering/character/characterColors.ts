@@ -43,7 +43,7 @@ export type PartBoundsEquipment = {
  * The full appearance of a character, as the sprite generator consumes it: part
  * colours plus the equipment drawn over them. This is the contract between
  * whoever decides what a character looks like and the generator that draws it.
- * The character builder devtool writes one of these by hand; the game derives
+ * The character builder devtool writes one of these by hand. The game derives
  * one from a worker's equipment (see `getCharacterColors`).
  */
 export type CharacterColors = {

@@ -5,7 +5,7 @@
     "type": "module",
     "author": "Trym Nilsen",
     "private": true,
-    "license": "Kingdom Architect Open License (KAOL-1.0)",
+    "license": "Kingdom Architect Source-Available License (KASAL-1.0)",
     "homepage": "https://github.com/trymnilsen/kingdomarchitect#readme",
     "scripts": {
         "build": "tsc && rollup -c",
@@ -15,8 +15,8 @@
         "spritepack": "tsc && node build/tool/spritepack/spritePack.js && npm run build",
         "characterpack": "tsc && node build/tool/characterpack/characterPack.js && npm run build",
         "test": "node --test --test-reporter=dot 'ts/test/**/*.test.ts'",
-        "format": "prettier ts/ --write",
-        "check-format": "prettier --check ts/**/*.ts"
+        "format": "prettier --write \"ts/**/*.ts\"",
+        "check-format": "prettier --check \"ts/**/*.ts\""
     },
     "repository": {
         "type": "git",

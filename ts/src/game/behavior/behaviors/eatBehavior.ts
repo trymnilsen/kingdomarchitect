@@ -16,8 +16,8 @@ import { findFoodInInventory } from "../../../data/inventory/inventoryItemHelper
 import { FORAGEABLE_RESOURCE_IDS } from "./forageableResources.ts";
 import { ResourceHarvestMode } from "../../../data/inventory/items/naturalResource.ts";
 import type { Entity } from "../../entity/entity.ts";
-import type { BehaviorActionData } from "../actions/ActionData.ts";
-import type { Behavior } from "./Behavior.ts";
+import type { BehaviorActionData } from "../actions/actionData.ts";
+import type { Behavior } from "./behavior.ts";
 import { findStockpiles } from "../../entity/settlementQueries.ts";
 import { planDepositHeld } from "../../job/planner/planDepositHeld.ts";
 

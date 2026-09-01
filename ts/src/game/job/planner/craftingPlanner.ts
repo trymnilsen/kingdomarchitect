@@ -1,6 +1,6 @@
 import type { Entity } from "../../entity/entity.ts";
 import { findNearestGroundPileWithItem } from "../../entity/findNearestGroundPileWithItem.ts";
-import type { BehaviorActionData } from "../../behavior/actions/ActionData.ts";
+import type { BehaviorActionData } from "../../behavior/actions/actionData.ts";
 import {
     InventoryComponentId,
     getInventoryItem,
@@ -19,7 +19,7 @@ import { findDropPosition } from "../../behavior/dropItem.ts";
  * Plan actions for crafting an item under the held-item model.
  *
  * Inputs are staged inside the building's inventory rather than the
- * worker's; the worker shuttles inputs in piecemeal (held is single
+ * worker's. The worker shuttles inputs in piecemeal (held is single
  * item id). When all inputs are present in the building the worker
  * walks over and runs the craft action, which consumes from the
  * building and outputs to held.

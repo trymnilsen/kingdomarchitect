@@ -9,7 +9,7 @@
  *
  * The operation set mirrors JS's native mutation capabilities: property
  * set/delete for objects, push/splice for arrays, and get/set/delete for
- * Map and Set. This keeps applyDelta simple — each operation maps directly
+ * Map and Set. This keeps applyDelta simple, since each operation maps directly
  * to a single JS mutation call.
  *
  * See diffComponent.ts for the diff side and applyDelta.ts for the apply side.

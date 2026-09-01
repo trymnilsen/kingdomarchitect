@@ -133,7 +133,7 @@ describe("worldGenerationSystem", () => {
             assert.notStrictEqual(campVolume.isStartBiome, true);
         }
 
-        // Direction is random; over 25 worlds we should see variety. Not
+        // Direction is random. Over 25 worlds we should see variety. Not
         // asserting all four to keep the test free of rare flakes.
         assert.ok(
             seenCampChunks.size >= 2,

@@ -1,7 +1,7 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
 import { Entity } from "../../../src/game/entity/entity.ts";
-import { createRestockBehavior } from "../../../src/game/behavior/behaviors/RestockBehavior.ts";
+import { createRestockBehavior } from "../../../src/game/behavior/behaviors/restockBehavior.ts";
 import { createBehaviorTestEntity } from "./behaviorTestHelpers.ts";
 import {
     createInventoryComponent,
@@ -63,7 +63,7 @@ describe("RestockBehavior", () => {
             const worker = createBehaviorTestEntity("worker");
             worker.setEcsComponent(createHeldItemComponent());
 
-            // Stockpile B wants 10 wood but has 0 — deficit exists, no surplus
+            // Stockpile B wants 10 wood but has 0, so deficit exists with no surplus
             const stockpileB = createStockpileWithPreference(
                 "stockpile-b",
                 "wood",
@@ -83,12 +83,12 @@ describe("RestockBehavior", () => {
             const worker = createBehaviorTestEntity("worker");
             worker.setEcsComponent(createHeldItemComponent());
 
-            // Stockpile A: 20 wood, no preference — all surplus
+            // Stockpile A: 20 wood, no preference, all surplus
             const stockpileA = createStockpileEntity("stockpile-a");
             const invA = stockpileA.getEcsComponent(InventoryComponentId)!;
             addInventoryItem(invA, woodResourceItem, 20);
 
-            // Stockpile B: preferred 10, current 0 — deficit
+            // Stockpile B: preferred 10, current 0, deficit
             const stockpileB = createStockpileWithPreference(
                 "stockpile-b",
                 "wood",
@@ -253,7 +253,7 @@ describe("RestockBehavior", () => {
                 { type: "depositToStockpile" }
             >;
 
-            // target2 has ratio 1.0 vs target1's 0.5 — should pick target2
+            // target2 has ratio 1.0 vs target1's 0.5, so it should be picked
             assert.strictEqual(deposit.stockpileId, "target2");
         });
     });

@@ -65,7 +65,7 @@ export class BuildingSelectionProvider implements ActorSelectionProvider {
         return { left, right: [] };
     }
 
-    /** Sets the tower's garrison priority — which towers guards prefer to man. */
+    /** Sets the tower's garrison priority, which towers guards prefer to man. */
     private garrisonButton(
         stateContext: StateContext,
         tower: Entity,

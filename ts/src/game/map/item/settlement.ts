@@ -31,7 +31,7 @@ const campAnchor: Point = { x: 4, y: 3 };
  * The camp searches for unoccupied tiles near the chunk center, so placement
  * is valid no matter what was generated in the chunk before it. In the
  * degenerate case where no free spot exists, the camp claims the center
- * tiles and removes whatever occupies them — a camp must always be placed,
+ * tiles and removes whatever occupies them. A camp must always be placed,
  * the single-camp invariant and respawn flow depend on it.
  */
 export function placeSettlement(chunk: TileChunk, chunkEntity: Entity) {
@@ -45,7 +45,7 @@ export function placeSettlement(chunk: TileChunk, chunkEntity: Entity) {
     const root = chunkEntity.getRootEntity();
     const chunkMap = root.requireEcsComponent(ChunkMapComponentId).chunkMap;
     const bounds = getChunkBounds({ x: chunk.chunkX, y: chunk.chunkY });
-    // Decorative resources (grass) don't claim a tile — they are cleared
+    // Decorative resources (grass) don't claim a tile. They are cleared
     // when the camp is placed on top of them.
     const isTileFree = (tile: Point) =>
         getEntitiesAt(chunkMap, tile.x, tile.y).every((occupant) => {

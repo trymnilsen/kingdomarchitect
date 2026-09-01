@@ -9,8 +9,8 @@ import {
     ActionRunning,
     type ActionResult,
     type SleepQuality,
-} from "./Action.ts";
-import { getBehaviorAgent } from "../../component/BehaviorAgentComponent.ts";
+} from "./action.ts";
+import { getBehaviorAgent } from "../../component/behaviorAgentComponent.ts";
 
 export type SleepActionData = {
     type: "sleep";
@@ -97,7 +97,7 @@ export function resolveSleepEnergyPerTick(
 
 /**
  * Resolve the energy value a sleep of this quality restores up to. Only a house
- * fills the pool completely; rougher shelter tops out lower.
+ * fills the pool completely. Rougher shelter tops out lower.
  */
 export function resolveSleepEnergyTarget(
     quality: SleepQuality,
@@ -110,7 +110,7 @@ export function resolveSleepEnergyTarget(
 /**
  * Execute one tick of the sleep action. Increments the entity's energy by
  * energyPerTick each tick and completes once energy reaches energyTarget.
- * Each tick also restores HP based on sleep quality; fractional amounts
+ * Each tick also restores HP based on sleep quality. Fractional amounts
  * accumulate on the action data since heal() only applies whole points.
  * Exhaustion is cleared on completion. Collapse-quality sleep suppresses
  * replanning until complete.

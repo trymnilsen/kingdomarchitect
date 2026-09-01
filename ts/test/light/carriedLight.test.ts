@@ -75,12 +75,7 @@ describe("carried light", () => {
         assert.strictEqual(isInHearthlight(hearth, { x: 27, y: 14 }), false);
     });
 
-    it("never claims hearthlight, for every light-granting item there is", () => {
-        // This is what turns "carried light never claims" from a convention
-        // into something CI enforces. Every item that grants light is checked,
-        // so a new lantern or relic cannot quietly opt into claiming. If a
-        // claiming carried light is ever deliberately designed, delete this
-        // test knowingly rather than weakening it.
+    it("no light-granting item claims hearthlight", () => {
         const lightItems = (inventoryItems as readonly InventoryItem[]).filter(
             (item): item is InventoryItem & { light: string } =>
                 item.light !== undefined,

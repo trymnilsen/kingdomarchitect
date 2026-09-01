@@ -5,7 +5,7 @@ import {
     SLEEP_THRESHOLD_FRACTION,
     SLEEP_UTILITY_BASE,
     SLEEP_UTILITY_RANGE,
-} from "../../../src/game/behavior/behaviors/SleepBehavior.ts";
+} from "../../../src/game/behavior/behaviors/sleepBehavior.ts";
 import {
     createEntityWithEnergy,
     createBehaviorTestEntity,
@@ -94,7 +94,7 @@ describe("SleepBehavior", () => {
             const behavior = createSleepBehavior();
 
             // Just under the threshold the ramp has barely started, so utility
-            // sits at the base; at empty it has travelled the full range.
+            // sits at the base. At empty it has travelled the full range.
             const barelyTired = entityAtFraction(
                 SLEEP_THRESHOLD_FRACTION - 0.0001,
                 300,

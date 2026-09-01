@@ -12,7 +12,7 @@ import {
     refreshIntrusionThreat,
     ThreatMapComponentId,
 } from "../component/threatMapComponent.ts";
-import { requestReplan } from "../component/BehaviorAgentComponent.ts";
+import { requestReplan } from "../component/behaviorAgentComponent.ts";
 
 /**
  * How often the defense scan runs, in ticks. See the coupling invariant beside

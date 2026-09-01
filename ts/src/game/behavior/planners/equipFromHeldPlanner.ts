@@ -1,6 +1,6 @@
 import { EquipmentComponentId } from "../../component/equipmentComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
-import type { BehaviorActionData } from "../actions/ActionData.ts";
+import type { BehaviorActionData } from "../actions/actionData.ts";
 import { findDropPosition } from "../dropItem.ts";
 
 /**
@@ -8,7 +8,7 @@ import { findDropPosition } from "../dropItem.ts";
  *
  * If the target slot is empty the plan is a single equipFromHeld step. If
  * the target slot is occupied the slot item is dropped directly to the
- * ground via dropFromSlot — held is never disturbed, so the new item that
+ * ground via dropFromSlot. Held is never disturbed, so the new item that
  * the player wants equipped survives the swap.
  */
 export function planEquipFromHeld(

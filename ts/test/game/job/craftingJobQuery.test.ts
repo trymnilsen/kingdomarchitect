@@ -8,7 +8,7 @@ import {
 import {
     createBehaviorAgentComponent,
     BehaviorAgentComponentId,
-} from "../../../src/game/component/BehaviorAgentComponent.ts";
+} from "../../../src/game/component/behaviorAgentComponent.ts";
 import { createCraftingJob } from "../../../src/game/job/craftingJob.ts";
 import {
     getCraftingJobsForBuilding,

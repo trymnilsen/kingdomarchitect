@@ -5,7 +5,7 @@ import {
 } from "../../component/warmthComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import type { Point } from "../../../common/point.ts";
-import { ActionComplete, ActionRunning, type ActionResult } from "./Action.ts";
+import { ActionComplete, ActionRunning, type ActionResult } from "./action.ts";
 
 export type WarmByFireActionData = { type: "warmByFire"; fireEntityId: string };
 import { log } from "../../../common/logging/logger.ts";
@@ -13,7 +13,7 @@ import { log } from "../../../common/logging/logger.ts";
 /**
  * Check if two points are within 1 tile of each other (8-directional adjacency).
  * Uses Chebyshev distance (max of abs differences) rather than Manhattan so that
- * diagonal neighbors count — a goblin standing diagonally next to a campfire
+ * diagonal neighbors count. A goblin standing diagonally next to a campfire
  * should still be able to warm up.
  */
 function isWithinOneTile(a: Point, b: Point): boolean {

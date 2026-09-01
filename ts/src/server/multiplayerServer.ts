@@ -188,7 +188,7 @@ export function startMultiplayerServer(
         log.info("Multiplayer server running", { port: config.port });
         if (config.devAuth) {
             log.info(
-                "DEV_AUTH enabled — connect with ?player=name to skip authentication",
+                "DEV_AUTH enabled, connect with ?player=name to skip authentication",
             );
         }
     });

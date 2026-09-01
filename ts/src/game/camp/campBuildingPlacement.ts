@@ -17,9 +17,9 @@ export const CAMPFIRE_CLEARANCE_RADIUS = 1;
 
 /**
  * Creates a validator for placing a camp building that keeps the clearance
- * ring around campfires open. The invariant is symmetric — no campfire and
+ * ring around campfires open. The invariant is symmetric: no campfire and
  * building may end up within {@link CAMPFIRE_CLEARANCE_RADIUS} of each
- * other — so which positions the candidate must keep clear of depends on
+ * other. Which positions the candidate must keep clear of depends on
  * what is being placed:
  *
  * - A campfire keeps its own ring clear of every existing camp building,

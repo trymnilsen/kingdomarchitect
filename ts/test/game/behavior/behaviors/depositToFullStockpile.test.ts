@@ -1,7 +1,7 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
 import { Entity } from "../../../../src/game/entity/entity.ts";
-import { createDepositHeldBehavior } from "../../../../src/game/behavior/behaviors/DepositHeldBehavior.ts";
+import { createDepositHeldBehavior } from "../../../../src/game/behavior/behaviors/depositHeldBehavior.ts";
 import { executeDepositToStockpileAction } from "../../../../src/game/behavior/actions/depositToStockpileAction.ts";
 import {
     createHeldItemComponent,

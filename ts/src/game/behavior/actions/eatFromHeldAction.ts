@@ -9,7 +9,7 @@ import {
     HungerComponentId,
 } from "../../component/hungerComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
-import { ActionComplete, type ActionResult } from "./Action.ts";
+import { ActionComplete, type ActionResult } from "./action.ts";
 
 export type EatFromHeldActionData = {
     type: "eatFromHeld";

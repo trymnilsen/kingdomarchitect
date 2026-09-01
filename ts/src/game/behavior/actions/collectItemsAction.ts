@@ -13,7 +13,7 @@ import {
     HeldItemComponentId,
 } from "../../component/heldItemComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
-import { ActionComplete, type ActionResult } from "./Action.ts";
+import { ActionComplete, type ActionResult } from "./action.ts";
 
 export type CollectItemsActionData = {
     type: "collectItems";
@@ -24,7 +24,7 @@ export type CollectItemsActionData = {
 /**
  * Move one named stack from an entity with a CollectableComponent into the
  * worker's held slot. Which type to take is decided when the job is created,
- * not here — the job says what the work is, and this action carries it out.
+ * not here. The job says what the work is, and this action carries it out.
  * Any other stacks on the target are somebody else's job and are left alone.
  *
  * Assumes worker is already adjacent to target (moveTo should have run first).
@@ -63,8 +63,8 @@ export function executeCollectItemsAction(
 
     if (!stack) {
         // Another worker got here first between planning and arriving. The
-        // point of the job was that this stack be hauled, and it has been —
-        // so the job is done, not failed.
+        // point of the job was that this stack be hauled, and it has been.
+        // The job is done, not failed.
         completeClaimedJob(entity);
         return ActionComplete;
     }

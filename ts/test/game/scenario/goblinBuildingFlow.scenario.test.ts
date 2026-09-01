@@ -1,6 +1,6 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
-import { createBehaviorSystem } from "../../../src/game/behavior/systems/BehaviorSystem.ts";
+import { createBehaviorSystem } from "../../../src/game/behavior/systems/behaviorSystem.ts";
 import { createBehaviorResolver } from "../../../src/game/behavior/behaviorResolver.ts";
 import { warmthSystem } from "../../../src/game/system/warmthSystem.ts";
 import { goblinCampSystem } from "../../../src/game/system/goblinCampSystem.ts";
@@ -13,7 +13,7 @@ import {
     COLD_THRESHOLD,
     WarmthComponentId,
 } from "../../../src/game/component/warmthComponent.ts";
-import { createBehaviorAgentComponent } from "../../../src/game/component/BehaviorAgentComponent.ts";
+import { createBehaviorAgentComponent } from "../../../src/game/component/behaviorAgentComponent.ts";
 import { createHeldItemComponent } from "../../../src/game/component/heldItemComponent.ts";
 import { createHealthComponent } from "../../../src/game/component/healthComponent.ts";
 import { createResourceComponent } from "../../../src/game/component/resourceComponent.ts";

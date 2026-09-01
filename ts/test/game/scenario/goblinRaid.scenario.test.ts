@@ -32,7 +32,7 @@ import { goblinCampSystem } from "../../../src/game/system/goblinCampSystem.ts";
 import {
     BehaviorAgentComponentId,
     requestReplan,
-} from "../../../src/game/component/BehaviorAgentComponent.ts";
+} from "../../../src/game/component/behaviorAgentComponent.ts";
 import {
     addThreat,
     ThreatMapComponentId,
@@ -54,8 +54,8 @@ import { stoneWall } from "../../../src/data/building/stone/wall.ts";
 import { cresset } from "../../../src/data/building/light/cresset.ts";
 import { woodResourceItem } from "../../../src/data/inventory/items/resources.ts";
 
-// --- small query helpers (no entity construction; all creation goes through
-// the real prefabs via ScenarioHarness) ---
+// Small query helpers. No entity construction here, all creation goes through
+// the real prefabs via ScenarioHarness.
 
 function goblinsOf(camp: Entity): Entity[] {
     return camp.children.filter((c) => c.hasComponent(GoblinUnitComponentId));
@@ -660,7 +660,7 @@ describe("goblin night raid scenario tests", () => {
             "at the raid threshold the camp is sized to the raid floor",
         );
 
-        // Fill the camp to its small cap; the prefab supplied the first goblin.
+        // Fill the camp to its small cap. The prefab supplied the first goblin.
         harness.addGoblinToCamp(camp, { x: 11, y: 14 });
         harness.addGoblinToCamp(camp, { x: 13, y: 15 });
         formGoblinRaid(harness.root);
@@ -751,7 +751,7 @@ describe("goblin night raid scenario tests", () => {
     it("breaks through a wall to reach a walled-in target", () => {
         const harness = new ScenarioHarness([pathfindingSystem]);
         const kingdom = harness.addPlayerKingdom();
-        // Cresset target fully ringed by 8 stone walls — the only way in is to
+        // Cresset target fully ringed by 8 stone walls, so the only way in is to
         // break a wall. Raiders approach from the west, so they breach (19,14).
         harness.addPlayerBuilding(kingdom, cresset, { x: 20, y: 14 }, "target");
         const ring: Point[] = [
@@ -827,7 +827,7 @@ describe("goblin night raid scenario tests", () => {
     it("ignores warmth while raiding", () => {
         const harness = new ScenarioHarness([pathfindingSystem]);
         const kingdom = harness.addPlayerKingdom();
-        // Target far to the east; the campfire is back west at the camp.
+        // Target far to the east. The campfire is back west at the camp.
         harness.addPlayerBuilding(
             kingdom,
             stockPile,

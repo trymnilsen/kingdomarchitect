@@ -1,5 +1,5 @@
 import type { Entity } from "../../entity/entity.ts";
-import type { BehaviorActionData } from "../actions/ActionData.ts";
+import type { BehaviorActionData } from "../actions/actionData.ts";
 import type { Building } from "../../../data/building/building.ts";
 import { log } from "../../../common/logging/logger.ts";
 
@@ -152,7 +152,7 @@ function planConstructExistingBuilding(
     }
 
     if (!isHeldEmpty(goblinHeld)) {
-        // Held has something the building doesn't need — drop it before fetching.
+        // Held has something the building doesn't need, so drop it before fetching.
         const dropPos = findDropPosition(
             root,
             goblin.worldPosition,

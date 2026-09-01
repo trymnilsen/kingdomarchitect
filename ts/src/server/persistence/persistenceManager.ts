@@ -142,7 +142,7 @@ export class PersistenceManager {
 
     /**
      * Export the entire world to a portable save file object.
-     * Does not write to the adapter — the caller owns the data.
+     * Does not write to the adapter. The caller owns the data.
      */
     exportWorld(root: Entity, meta: SerializedWorldMeta): SaveFileData {
         const entities: SerializedEntity[] = [];

@@ -5,7 +5,7 @@ import type { DeltaOperation, PropertyPath } from "./deltaTypes.ts";
 /**
  * Apply delta operations to a component, mutating it in place. This runs
  * on the client after receiving a ComponentDeltaGameMessage from the server.
- * Operations are applied in order — the server's diffComponents guarantees
+ * Operations are applied in order. The server's diffComponents guarantees
  * that applying them sequentially to the old state produces the new state.
  *
  * Mutations are done in-place rather than producing a new object because

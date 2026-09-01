@@ -1,11 +1,11 @@
 import { log } from "../../../common/logging/logger.ts";
-import type { BehaviorActionData } from "../../behavior/actions/ActionData.ts";
+import type { BehaviorActionData } from "../../behavior/actions/actionData.ts";
 import type { Entity } from "../../entity/entity.ts";
 import type { DismantleBuildingJob } from "../dismantleBuildingJob.ts";
 
 /**
  * Plan actions for dismantling a building: walk adjacent and drain its HP.
- * Simpler than the build planner — no materials to gather. If the building is
+ * Simpler than the build planner, with no materials to gather. If the building is
  * already gone, return no actions so the job is dropped.
  */
 export function planDismantleBuilding(

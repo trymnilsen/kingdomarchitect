@@ -7,7 +7,7 @@ import {
 } from "../../../src/game/component/inventoryComponent.ts";
 import { EquipmentComponentId } from "../../../src/game/component/equipmentComponent.ts";
 import { HeldItemComponentId } from "../../../src/game/component/heldItemComponent.ts";
-import { BehaviorAgentComponentId } from "../../../src/game/component/BehaviorAgentComponent.ts";
+import { BehaviorAgentComponentId } from "../../../src/game/component/behaviorAgentComponent.ts";
 import {
     swordItem,
     hammerItem,

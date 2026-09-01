@@ -29,7 +29,7 @@ describe("getClosestFocusableNode", () => {
     });
 
     it("returns null when no node lies in the requested direction", () => {
-        // Only candidate is to the left; we ask for right.
+        // Only candidate is to the left. We ask for right.
         const left = node(10, 24, 20, 34);
         assert.strictEqual(
             getClosestFocusableNode([left], current, Direction.Right),

@@ -17,7 +17,7 @@ import { collectableItemPrefab } from "../prefab/collectableItemPrefab.ts";
 /**
  * Maximum Manhattan radius the drop search will scan from the worker's
  * position when looking for somewhere to leave an item. Generous enough
- * that real gameplay never hits the bound; if it does, the planner throws
+ * that real gameplay never hits the bound. If it does, the planner throws
  * rather than silently lose the item.
  */
 export const DROP_SEARCH_RADIUS = 64;
@@ -64,7 +64,7 @@ function findGroundPileAt(
  *
  * Kept separate from tileBlocksDrop because the two answer different questions:
  * that one asks whether the tile is a legal place to put things at all, which
- * DropMode.Exact is allowed to override; this one is a hard capacity limit that
+ * DropMode.Exact is allowed to override. This one is a hard capacity limit that
  * no drop may exceed.
  */
 function tileHasPileRoom(
@@ -121,7 +121,7 @@ export function findDropPosition(
 
 /**
  * Find a free cardinally-adjacent tile to `from` that can accept a drop of
- * `item`. Used by player drop — the worker drops next to themselves rather
+ * `item`. Used by player drop, where the worker drops next to themselves rather
  * than searching wide.
  */
 export function findFreeAdjacentTile(
@@ -142,7 +142,7 @@ export function findFreeAdjacentTile(
  *
  * - `Exact`: place at the given position, taking the caller's word that the tile
  *   is a legal place to leave things (a worker standing on a building, say).
- *   The per-tile pile cap still applies — see resolveDropPosition.
+ *   The per-tile pile cap still applies, see resolveDropPosition.
  * - `Nearest`: search outward from the given position and place at the closest
  *   valid tile. Returns `false` if none found within DROP_SEARCH_RADIUS.
  * - `Fail`: return `false` immediately if the tile is blocked.
@@ -195,7 +195,7 @@ function resolveDropPosition(
  * MAX_GROUND_ITEMS_PER_TILE piles per tile.
  *
  * `mode` decides how hard the drop tries to honour `position` when the tile is
- * occupied — see DropMode and resolveDropPosition. Whichever mode is used, the
+ * occupied, see DropMode and resolveDropPosition. Whichever mode is used, the
  * pile lands on a tile that has room for it.
  *
  * `tick` stamps the pile's decay clock. Merging refreshes it: fresh goods keep

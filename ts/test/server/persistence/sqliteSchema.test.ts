@@ -169,7 +169,7 @@ describe("SQLite Schema Migrations", () => {
         applySQLiteMigrations(db, [migration1]);
         assert.strictEqual(getSQLiteVersion(db), 1);
 
-        // Now apply both — only migration 2 should run
+        // Now apply both, so only migration 2 should run
         applySQLiteMigrations(db, [migration1, migration2]);
         assert.strictEqual(getSQLiteVersion(db), 2);
 

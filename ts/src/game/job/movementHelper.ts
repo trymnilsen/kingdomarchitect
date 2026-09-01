@@ -67,7 +67,7 @@ export function doMovement(
 }
 
 export function discoverAfterMovement(entity: Entity, nextPoint: Point) {
-    // Only viewers discover as they move; an entity with no vision reach reveals
+    // Only viewers discover as they move. An entity with no vision reach reveals
     // nothing by walking.
     const visibility = entity.getEcsComponent(VisibilityComponentId);
     if (visibility) {

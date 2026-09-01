@@ -9,7 +9,7 @@ import {
     ActionComplete,
     type ActionResult,
     type ItemTransfer,
-} from "./Action.ts";
+} from "./action.ts";
 
 export type TakeFromInventoryActionData = {
     type: "takeFromInventory";

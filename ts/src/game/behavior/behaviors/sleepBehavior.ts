@@ -12,9 +12,9 @@ import {
 import { InventoryComponentId } from "../../component/inventoryComponent.ts";
 import { BuildingComponentId } from "../../component/buildingComponent.ts";
 import { isTileAvailable } from "../../map/path/graph/weight.ts";
-import type { SleepQuality } from "../actions/Action.ts";
-import type { BehaviorActionData } from "../actions/ActionData.ts";
-import type { Behavior } from "./Behavior.ts";
+import type { SleepQuality } from "../actions/action.ts";
+import type { BehaviorActionData } from "../actions/actionData.ts";
+import type { Behavior } from "./behavior.ts";
 import {
     resolveSleepEnergyPerTick,
     resolveSleepEnergyTarget,

@@ -21,7 +21,7 @@ import {
     type Point,
     pointEquals,
 } from "../../../common/point.ts";
-import { BehaviorAgentComponentId } from "../../component/BehaviorAgentComponent.ts";
+import { BehaviorAgentComponentId } from "../../component/behaviorAgentComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { queryEntity } from "../../map/query/queryEntity.ts";
 import {
@@ -99,7 +99,7 @@ export function negotiateDisplacement(
     //
     // On a cardinal grid a reciprocal pass is always a 2-entity swap (a longer cycle
     // can't reach back to the requester without revisiting a tile). If the blocker
-    // already moved this tick we still return the transaction; commit's staleness
+    // already moved this tick we still return the transaction. Commit's staleness
     // check (it re-validates positions/one-move-per-tick) turns it into a harmless
     // "wait" that leaves the requester's cached path intact to retry next tick.
     const blockerNextStep = deriveIntendedNextStep(blocker);
@@ -223,7 +223,7 @@ function findBestChain(
     accumulatedCost: number,
 ): ChainResult | null {
     // A displacement chain terminates in one of two ways:
-    //   1. at a free tile, where everyone shifts over by one (preferred; handled
+    //   1. at a free tile, where everyone shifts over by one (preferred, handled
     //      in the loop)
     //   2. at the requester's own tile, where `entity` rotates into the spot the
     //      requester is about to vacate, closing a swap/rotation cycle.
@@ -260,7 +260,7 @@ function findBestChain(
     }
 
     // Other destinations, best score first (free tiles score 100). The requester's tile
-    // is handled above; scoreCandidateTile rejects it (along with any transient/immovable
+    // is handled above. scoreCandidateTile rejects it (along with any transient/immovable
     // occupant), so it never appears here. Cardinal order (left, right, up, down) is the
     // deterministic tiebreak.
     const candidates = adjacentPoints(fromTile)

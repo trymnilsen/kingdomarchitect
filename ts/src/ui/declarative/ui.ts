@@ -264,8 +264,8 @@ export class UiRenderer {
      * was captured on down and is under the release point, then ends the
      * capture.
      *
-     * @returns true when the UI owns this gesture — the press began on an
-     *     interactive component — whether or not a tap handler ran. A captured
+     * @returns true when the UI owns this gesture, meaning the press began on
+     *     an interactive component, whether or not a tap handler ran. A captured
      *     gesture is absorbed entirely so a release that slid off the pressed
      *     component never falls through to whatever is behind the UI.
      */

@@ -50,7 +50,7 @@ export type BiomeShapeParams = {
     wallOffset: number;
 };
 
-// Noise detail level is fixed here; the presets vary amplitude and frequency,
+// Noise detail level is fixed here. The presets vary amplitude and frequency,
 // not the number of octaves, so these stay module constants rather than params.
 const NOISE_OCTAVES = 3;
 const NOISE_PERSISTENCE = 0.5;
@@ -99,7 +99,7 @@ export function generateBiomeShape(params: BiomeShapeParams): Point[] {
         (well) => !params.blocked.has(chunkKey(well)),
     );
     // Anchor the silhouette at a centre shifted off the start, into open space.
-    // The start is still the growth seed; only the distance field's origin moves.
+    // The start is still the growth seed. Only the distance field's origin moves.
     const center = offsetCenter(params);
     const attractors = [center, ...wells];
     const result: Point[] = [];
@@ -122,7 +122,7 @@ export function generateBiomeShape(params: BiomeShapeParams): Point[] {
                 continue;
             }
             // Mark visited the first time the chunk is queued so it can never be
-            // queued twice; the path that reaches it first sets its `g`.
+            // queued twice. The path that reaches it first sets its `g`.
             visited.add(key);
             const g = current.g + 1;
             frontier.push({
@@ -220,7 +220,7 @@ function takeLowestScore(frontier: FrontierEntry[]): FrontierEntry {
  * Cost used to order growth: lower scores are grown first. Combines the
  * positional silhouette cost, a noise perturbation of the boundary, and a detour
  * penalty. The detour is how much longer the real path to the chunk (`g`) is than
- * the obstacle-free straight line; it is ~0 in open space (so silhouettes are
+ * the obstacle-free straight line. It is ~0 in open space (so silhouettes are
  * unchanged) but large for chunks only reachable by wrapping around a blocker,
  * which is what biases growth outward instead of around obstacles.
  */

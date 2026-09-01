@@ -9,7 +9,7 @@ import { getInventoryItemById } from "../../../data/inventory/inventoryItemHelpe
 import { getCropDefinition } from "../../../data/crop/cropDefinitions.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { completeClaimedJob } from "../../job/jobLifecycle.ts";
-import { ActionComplete, type ActionResult } from "./Action.ts";
+import { ActionComplete, type ActionResult } from "./action.ts";
 import {
     addToHeldItem,
     canAddToHeld,
@@ -48,7 +48,7 @@ export function executeHarvestCropAction(
         return { kind: "failed", cause: { type: "unknown" } };
     }
 
-    // Another worker may have already harvested — complete without changing state
+    // Another worker may have already harvested, so complete without changing state
     if (farm.state !== FarmState.Ready) {
         completeClaimedJob(entity);
         return ActionComplete;

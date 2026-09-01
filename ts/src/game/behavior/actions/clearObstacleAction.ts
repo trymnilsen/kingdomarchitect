@@ -9,13 +9,13 @@ import { spendEntityEnergy } from "../../component/energyComponent.ts";
 import { ResourceComponentId } from "../../component/resourceComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { dropItemAtPosition, DropMode } from "../dropItem.ts";
-import { ActionComplete, ActionRunning, type ActionResult } from "./Action.ts";
+import { ActionComplete, ActionRunning, type ActionResult } from "./action.ts";
 
 /**
- * Remove a resource that is blocking a path. Unlike harvestResource this never
- * collects yields into the worker's held slot — the worker is clearing an
- * obstacle on the way somewhere, not harvesting it. When the resource dies its
- * yields are scattered onto the nearest free tiles so they remain collectable.
+ * Remove a resource that is blocking a path. Yields never go into the worker's
+ * held slot, which is where this differs from harvestResource. The worker is
+ * clearing an obstacle on the way somewhere. When the resource dies its yields
+ * are scattered onto the nearest free tiles so they remain collectable.
  *
  * Damage is dealt per tick (the resource is felled over several ticks) and the
  * entity is removed on death regardless of its lifecycle: a path-clear destroys
@@ -37,7 +37,7 @@ export function executeClearObstacleAction(
     const resourceEntity = root.findEntity(action.entityId);
 
     if (!resourceEntity) {
-        // Already gone — the path is clear.
+        // Already gone, so the path is clear.
         return ActionComplete;
     }
 
@@ -55,7 +55,7 @@ export function executeClearObstacleAction(
         !isClearableObstacle(resourceComponent.resourceId)
     ) {
         // Only removable obstacles (trees) may be cleared. A permanent node
-        // (stone) reaching this action is a bug — pathfinding should have
+        // (stone) reaching this action is a bug, since pathfinding should have
         // routed around it. Refuse rather than destroy an infinite resource.
         log.error(
             `Refusing to clear non-clearable obstacle ${action.entityId} (${resourceComponent.resourceId})`,
@@ -65,7 +65,7 @@ export function executeClearObstacleAction(
 
     const healthComponent = resourceEntity.getEcsComponent(HealthComponentId);
     if (!healthComponent) {
-        // Nothing to whittle down — just remove it to clear the way.
+        // Nothing to whittle down, so just remove it to clear the way.
         scatterYields(root, tick, resourceEntity);
         resourceEntity.remove();
         return ActionComplete;

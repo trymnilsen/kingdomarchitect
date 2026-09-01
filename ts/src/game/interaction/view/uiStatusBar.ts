@@ -1,6 +1,6 @@
 import type { Entity } from "../../entity/entity.ts";
 import { DayComponentId } from "../../component/dayComponent.ts";
-import { BehaviorAgentComponentId } from "../../component/BehaviorAgentComponent.ts";
+import { BehaviorAgentComponentId } from "../../component/behaviorAgentComponent.ts";
 import { PlayerUnitComponentId } from "../../component/playerUnitComponent.ts";
 import { kingdomScore } from "../../raid/kingdomScore.ts";
 import { statusbarTextStyle } from "../../../rendering/text/textStyle.ts";

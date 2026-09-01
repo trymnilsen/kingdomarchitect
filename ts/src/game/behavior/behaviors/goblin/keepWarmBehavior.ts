@@ -1,6 +1,6 @@
 import type { Entity } from "../../../entity/entity.ts";
-import type { BehaviorActionData } from "../../actions/ActionData.ts";
-import type { Behavior } from "../Behavior.ts";
+import type { BehaviorActionData } from "../../actions/actionData.ts";
+import type { Behavior } from "../behavior.ts";
 import { WarmthComponentId } from "../../../component/warmthComponent.ts";
 import { GoblinUnitComponentId } from "../../../component/goblinUnitComponent.ts";
 import { RaidingComponentId } from "../../../component/raidingComponent.ts";
@@ -13,7 +13,7 @@ import { log } from "../../../../common/logging/logger.ts";
 /**
  * KeepWarmBehavior - highest priority goblin survival behavior.
  * Activates when warmth drops below 50. Builds a campfire directly
- * (not via jobs) when no fire exists — survival can't wait for the
+ * (not via jobs) when no fire exists. Survival can't wait for the
  * camp director to issue a job.
  *
  * Utility scaling:
@@ -21,7 +21,7 @@ import { log } from "../../../../common/logging/logger.ts";
  * - warmth 30: utility = 72
  * - warmth 10: utility = 95 (critical)
  *
- * Applicability is guaranteed by the BehaviorResolver — only goblins
+ * Applicability is guaranteed by the BehaviorResolver. Only goblins
  * receive this behavior, so no GoblinUnitComponent guard is needed in isValid.
  */
 export function createKeepWarmBehavior(): Behavior {

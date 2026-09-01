@@ -1,5 +1,5 @@
 import { adjacentPoints, type Point } from "../../../common/point.ts";
-import { BehaviorAgentComponentId } from "../../component/BehaviorAgentComponent.ts";
+import { BehaviorAgentComponentId } from "../../component/behaviorAgentComponent.ts";
 import { BuildingComponentId } from "../../component/buildingComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { getWeightAtPoint } from "../path/graph/weight.ts";
@@ -80,7 +80,7 @@ function pointKey(p: Point): string {
  *    least one free cardinal neighbour after placement (so we don't trap
  *    a unit).
  * 5. No two buildings share the same single free cardinal tile after
- *    placement. Working buildings require a unit to stand adjacent; two units
+ *    placement. Working buildings require a unit to stand adjacent. Two units
  *    cannot occupy the same tile, so two buildings cannot share a sole
  *    access tile.
  */

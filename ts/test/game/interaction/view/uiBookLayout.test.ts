@@ -75,7 +75,7 @@ describe("UiBookLayout", () => {
 
         assert.ok(isLayoutResult(result1));
         assert.ok(isLayoutResult(result2));
-        // The second render uses page2 — verify it's a different descriptor.
+        // The second render uses page2, so verify it's a different descriptor.
         // Index 1 because the book background box occupies index 0.
         const leftChild2 = result2.children[1] as any;
         assert.strictEqual(leftChild2.props.content, "Page2");
@@ -247,7 +247,7 @@ describe("UiBookLayout", () => {
         );
 
         assert.ok(isLayoutResult(result));
-        // Book background box + two page children — no back button in dual mode
+        // Book background box + two page children, no back button in dual mode
         assert.strictEqual(result.children.length, 3);
     });
 
@@ -320,7 +320,7 @@ describe("UiBookLayout", () => {
         const tabChild = result.children[result.children.length - 1] as any;
         assert.ok(tabChild !== undefined, "tab child should be present");
 
-        // The tab descriptor is a component; render it to get the button children
+        // The tab descriptor is a component. Render it to get the button children
         const tabContext = {
             props: tabChild.props,
             constraints: { width: 100, height: 300 },

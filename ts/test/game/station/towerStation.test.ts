@@ -20,8 +20,8 @@ import {
     stationOccupant,
     stationUnderEntity,
 } from "../../../src/game/component/stationQuery.ts";
-import { createGarrisonBehavior } from "../../../src/game/behavior/behaviors/GarrisonBehavior.ts";
-import { createStepOutsideBehavior } from "../../../src/game/behavior/behaviors/StepOutsideBehavior.ts";
+import { createGarrisonBehavior } from "../../../src/game/behavior/behaviors/garrisonBehavior.ts";
+import { createStepOutsideBehavior } from "../../../src/game/behavior/behaviors/stepOutsideBehavior.ts";
 import {
     searchlightWedgeOffsets,
     SWEEP_ORDER,
@@ -63,7 +63,7 @@ describe("searchlight wedge geometry", () => {
 
     it("the four cardinal wedges partition the reach-diamond exactly", () => {
         // Every non-centre tile of the Manhattan diamond must land in exactly one
-        // quarter — no gaps, no overlap.
+        // quarter, with no gaps and no overlap.
         const seen = new Map<string, number>();
         for (const aim of SWEEP_ORDER) {
             for (const o of searchlightWedgeOffsets(aim, R)) {
@@ -114,7 +114,7 @@ describe("station occupancy queries", () => {
         assert.strictEqual(isManningStation(guard), true);
     });
 
-    it("a disabled (Off) tower is not being manned — self-heals", () => {
+    it("a disabled (Off) tower is not being manned", () => {
         const { root } = createMinimalWorld();
         addTower(root, "t", { x: 2, y: 2 }, StationPriority.Off);
         const guard = addUnit(root, "g", { x: 2, y: 2 });
@@ -125,7 +125,7 @@ describe("station occupancy queries", () => {
         assert.strictEqual(isManningStation(guard), false);
     });
 
-    it("a non-guard on a tower is not manning it — self-heals", () => {
+    it("a non-guard on a tower is not manning it", () => {
         const { root } = createMinimalWorld();
         addTower(root, "t", { x: 2, y: 2 }, StationPriority.High);
         const worker = addUnit(root, "w", { x: 2, y: 2 }, WorkerRole.Worker);

@@ -77,7 +77,7 @@ function resolveBase(
 /**
  * Returns the base animation to copy pixels from. For a "frame" base this is
  * the source animation directly. For a "recipe" base the compiler has already
- * produced a CharacterAnimation — we treat its frame 0 as the base frame.
+ * produced a CharacterAnimation. We treat its frame 0 as the base frame.
  */
 function extractBaseFrame(
     baseAnimation: CharacterAnimation,
@@ -318,7 +318,7 @@ function applyMirrorTransform(
 /**
  * Builds the sparse facing keyframe list for a compiled animation.
  * Starting facing is inferred from the animation name. A keyframe is emitted
- * only when the computed facing changes from the previous frame — meaning frame 0
+ * only when the computed facing changes from the previous frame, meaning frame 0
  * is skipped when it matches the implied default.
  */
 function buildFacingKeyframes(

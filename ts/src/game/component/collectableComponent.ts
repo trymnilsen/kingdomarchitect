@@ -7,7 +7,7 @@ export type CollectableComponent = {
     /**
      * Human-readable explanation of why these items were dropped here. Set when
      * the pile is spawned and refreshed on merge to reflect the most recent
-     * drop. Purely a debugging aid — surfaced in the selection tile.
+     * drop. Purely a debugging aid, surfaced in the selection tile.
      */
     reason?: string;
 };

@@ -1,14 +1,14 @@
 import { Entity } from "../../entity/entity.ts";
-import type { BehaviorActionData } from "../actions/ActionData.ts";
+import type { BehaviorActionData } from "../actions/actionData.ts";
 import {
     clearPlayerCommand,
     getBehaviorAgent,
-} from "../../component/BehaviorAgentComponent.ts";
+} from "../../component/behaviorAgentComponent.ts";
 import {
     HeldItemComponentId,
     isHeldEmpty,
 } from "../../component/heldItemComponent.ts";
-import type { Behavior } from "./Behavior.ts";
+import type { Behavior } from "./behavior.ts";
 import { log } from "../../../common/logging/logger.ts";
 import { findFreeAdjacentTile } from "../dropItem.ts";
 import { planEquipCommand } from "../planners/equipCommandPlanner.ts";

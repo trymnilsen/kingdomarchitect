@@ -7,7 +7,7 @@ import {
 } from "../../component/heldItemComponent.ts";
 import { markStatsDirty } from "../../component/statsComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
-import { ActionComplete, type ActionResult } from "./Action.ts";
+import { ActionComplete, type ActionResult } from "./action.ts";
 
 /**
  * Move the worker's held item into an equipment slot. Held must contain

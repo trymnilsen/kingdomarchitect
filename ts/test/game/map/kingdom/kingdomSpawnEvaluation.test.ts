@@ -239,7 +239,7 @@ describe("evaluateKingdomSpawn", () => {
         assert.strictEqual(result.shouldSpawn, false);
         assert.ok(
             result.spawnScore > 0,
-            `spawnScore (${result.spawnScore}) should be positive — feasibility blocked the spawn, not the score`,
+            `spawnScore (${result.spawnScore}) should be positive, so feasibility blocked the spawn, not the score`,
         );
     });
 

@@ -35,7 +35,7 @@ describe("createRingBuffer", () => {
         writeEntry(buf, 3);
         writeEntry(buf, 4);
         writeEntry(buf, 5);
-        // Entry 1 is overwritten; oldest remaining is 2
+        // Entry 1 is overwritten. Oldest remaining is 2
         assert.deepStrictEqual(readEntries(buf), [2, 3, 4, 5]);
     });
 

@@ -22,7 +22,7 @@ export function isHeldEmpty(component: HeldItemComponent): boolean {
 
 /**
  * Replace held with a new item. Throws if held already contains a different
- * item id — caller must clear first.
+ * item id. The caller must clear first.
  */
 export function setHeldItem(
     component: HeldItemComponent,

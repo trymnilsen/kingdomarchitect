@@ -8,7 +8,7 @@ import { EquipUnitSelectionState } from "./equipUnitSelectionState.ts";
  * on": the player chooses which slot the item goes into. Pushed by the
  * stockpile inventory equip button. The ground-pile selection panel exposes
  * the same Primary/Secondary choices inline because it can fit them in the
- * actor submenu — this state exists for the inventory-view path which only
+ * actor submenu. This state exists for the inventory-view path which only
  * has room for a single button.
  */
 export class EquipSlotSelectionState extends InteractionState {

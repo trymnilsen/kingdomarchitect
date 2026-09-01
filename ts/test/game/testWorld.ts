@@ -15,10 +15,10 @@ import type { Point } from "../../src/common/point.ts";
  * Build the smallest viable world for tests: a chunk-mapped tile grid
  * sized to cover the requested origin neighbourhood. Use this whenever
  * a test needs to query entities by position, run drop searches, or
- * spawn ground-pile entities — anything that walks the chunk map.
+ * spawn ground-pile entities, or anything else that walks the chunk map.
  *
  * Tests that don't touch position queries can keep using a bare
- * `new Entity("root")`; this helper is the upgrade for the cases that do.
+ * `new Entity("root")`. This helper is the upgrade for the cases that do.
  */
 export function createMinimalWorld(
     chunkRange: { minChunk: number; maxChunk: number } = {

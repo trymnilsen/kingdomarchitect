@@ -1,7 +1,7 @@
 import type { Point } from "../../common/point.ts";
 import { log } from "../../common/logging/logger.ts";
 import { getInventoryItemById } from "../../data/inventory/inventoryItemHelpers.ts";
-import { requestReplan } from "../component/BehaviorAgentComponent.ts";
+import { requestReplan } from "../component/behaviorAgentComponent.ts";
 import {
     BuildingComponentId,
     type BuildingComponent,
@@ -41,8 +41,8 @@ export function createDismantleBuildingJob(
 
 /**
  * Fraction of a completed building's construction materials returned when it is
- * dismantled. A single knob for all buildings — start at full refund; lower it
- * later (or make it per-building) if dismantling should cost something.
+ * dismantled. A single knob for all buildings. Start at full refund and lower
+ * it later (or make it per-building) if dismantling should cost something.
  */
 export const DISMANTLE_REFUND_FRACTION = 1.0;
 

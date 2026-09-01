@@ -1,5 +1,5 @@
 import type { Entity } from "../../entity/entity.ts";
-import type { ActionResult } from "./Action.ts";
+import type { ActionResult } from "./action.ts";
 import type { WaitActionData } from "./waitAction.ts";
 import type { MoveToActionData } from "./moveToAction.ts";
 import type { StepOntoActionData } from "./stepOntoAction.ts";

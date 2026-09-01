@@ -6,7 +6,7 @@ import {
     ChunkMapComponentId,
     createChunkMapComponent,
 } from "../../../../src/game/component/chunkMapComponent.ts";
-import { createBehaviorAgentComponent } from "../../../../src/game/component/BehaviorAgentComponent.ts";
+import { createBehaviorAgentComponent } from "../../../../src/game/component/behaviorAgentComponent.ts";
 import { createBuildingComponent } from "../../../../src/game/component/buildingComponent.ts";
 import { createResourceComponent } from "../../../../src/game/component/resourceComponent.ts";
 import {
@@ -21,8 +21,8 @@ import { woodenHouse } from "../../../../src/data/building/wood/house.ts";
 
 /**
  * Creates a root entity with tile and chunk-map components.
- * The TileComponent registers a chunk for every unique 8×8 chunk that contains
- * at least one of the listed positions — giving the whole chunk valid ground.
+ * The TileComponent registers a chunk for every unique 8x8 chunk that contains
+ * at least one of the listed positions, which gives the whole chunk valid ground.
  */
 function createWorld(tiledPositions: Point[]): Entity {
     const root = new Entity("root");
@@ -87,7 +87,7 @@ function addAgent(root: Entity, pos: Point): Entity {
 describe("createBuildingPlacementValidator", () => {
     describe("candidate tile validity", () => {
         it("rejects a candidate that falls in an unregistered chunk (no ground)", () => {
-            // Tiles only exist in chunk (0,0) — positions 0-7 on both axes.
+            // Tiles only exist in chunk (0,0), positions 0-7 on both axes.
             // The candidate lives in chunk (2,2), which has never been registered.
             const world = createWorld([{ x: 4, y: 4 }]);
             const validator = createBuildingPlacementValidator(world);
@@ -140,7 +140,7 @@ describe("createBuildingPlacementValidator", () => {
 
     describe("reachability of the new building", () => {
         it("rejects a candidate whose every cardinal neighbour is occupied by a building", () => {
-            // (4,4) is the candidate; all four cardinal neighbours have buildings.
+            // (4,4) is the candidate. All four cardinal neighbours have buildings.
             const world = createWorld([
                 { x: 4, y: 4 },
                 { x: 3, y: 4 },
@@ -169,14 +169,14 @@ describe("createBuildingPlacementValidator", () => {
             addBuilding(world, { x: 3, y: 4 });
             addBuilding(world, { x: 5, y: 4 });
             addBuilding(world, { x: 4, y: 3 });
-            // (4,5) deliberately left free
+            // (4,5) left free
             const validator = createBuildingPlacementValidator(world);
 
             assert.strictEqual(validator({ x: 4, y: 4 }), true);
         });
 
         it("counts a grass-occupied neighbour as a walkable exit", () => {
-            // Three neighbours hold buildings; the last holds decorative grass,
+            // Three neighbours hold buildings. The last holds decorative grass,
             // which doesn't block reachability.
             const world = createWorld([
                 { x: 4, y: 4 },
@@ -200,7 +200,7 @@ describe("createBuildingPlacementValidator", () => {
             // Building B sits at (4,3).
             // Its three other cardinal exits are all blocked by buildings:
             //   (3,3) → building, (5,3) → building, (4,2) → building.
-            // Only (4,4) — the candidate — remains free for B.
+            // Only (4,4), the candidate, remains free for B.
             // Placing here would seal B in.
             const world = createWorld([
                 { x: 4, y: 4 },
@@ -229,7 +229,7 @@ describe("createBuildingPlacementValidator", () => {
             ]);
             addBuilding(world, { x: 4, y: 3 }); // B
             addBuilding(world, { x: 3, y: 3 });
-            // (5,3) and (4,2) are free ground — B still has two exits after placement
+            // (5,3) and (4,2) are free ground, so B still has two exits after placement
             const validator = createBuildingPlacementValidator(world);
 
             assert.strictEqual(validator({ x: 4, y: 4 }), true);
@@ -254,7 +254,7 @@ describe("createBuildingPlacementValidator", () => {
             // Agent A sits at (6,5).
             // Its three other cardinal exits are blocked by buildings:
             //   (5,5) → building, (7,5) → building, (6,4) → building.
-            // Only (6,6) — the candidate — remains free for A.
+            // Only (6,6), the candidate, remains free for A.
             // Placing here would trap A.
             const world = createWorld([
                 { x: 6, y: 6 },
@@ -284,7 +284,7 @@ describe("createBuildingPlacementValidator", () => {
             ]);
             addAgent(world, { x: 6, y: 5 }); // A
             addBuilding(world, { x: 5, y: 5 });
-            // (7,5) and (6,4) are free ground — A still has two exits
+            // (7,5) and (6,4) are free ground, so A still has two exits
             const validator = createBuildingPlacementValidator(world);
 
             assert.strictEqual(validator({ x: 6, y: 6 }), true);
@@ -335,7 +335,7 @@ describe("createBuildingPlacementValidator", () => {
         });
 
         it("rejects placement when an affected building gains the same sole tile as a non-adjacent building", () => {
-            // B1 is adjacent to candidate; after placement its only free exit
+            // B1 is adjacent to candidate. After placement its only free exit
             // becomes T=(4,3). B2 is not adjacent to candidate but is already
             // constrained to sole tile T=(4,3). The placement creates a conflict.
             //

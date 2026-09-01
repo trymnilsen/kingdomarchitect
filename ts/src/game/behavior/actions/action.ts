@@ -1,5 +1,5 @@
 import type { Point } from "../../../common/point.ts";
-import type { BehaviorActionData } from "./ActionData.ts";
+import type { BehaviorActionData } from "./actionData.ts";
 
 /** Quality of sleep determines restore rates and duration. */
 export type SleepQuality =

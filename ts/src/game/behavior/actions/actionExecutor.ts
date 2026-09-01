@@ -1,9 +1,9 @@
 import type { Entity } from "../../entity/entity.ts";
-import type { ActionResult } from "./Action.ts";
+import type { ActionResult } from "./action.ts";
 import type {
     BehaviorActionData,
     BehaviorActionExecutor,
-} from "./ActionData.ts";
+} from "./actionData.ts";
 import { log } from "../../../common/logging/logger.ts";
 
 import { executeWaitAction } from "./waitAction.ts";

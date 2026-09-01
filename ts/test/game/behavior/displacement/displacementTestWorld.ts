@@ -9,7 +9,7 @@ import { Entity } from "../../../../src/game/entity/entity.ts";
 import {
     createBehaviorAgentComponent,
     getBehaviorAgent,
-} from "../../../../src/game/component/BehaviorAgentComponent.ts";
+} from "../../../../src/game/component/behaviorAgentComponent.ts";
 import { createMovementStaminaComponent } from "../../../../src/game/component/movementStaminaComponent.ts";
 import { createSpriteComponent } from "../../../../src/game/component/spriteComponent.ts";
 import { createBuildingComponent } from "../../../../src/game/component/buildingComponent.ts";
@@ -44,7 +44,7 @@ export function createTestWorld(): { root: Entity } {
  *
  * A freshly created agent carries pendingReplan, which would classify it as
  * transient and so waited for rather than displaced. These tests model
- * committed blockers, so it is cleared here; the transient cases set it, or a
+ * committed blockers, so it is cleared here. The transient cases set it, or a
  * moveTo, explicitly.
  *
  * worldPosition is set after addChild so the parent transform exists.

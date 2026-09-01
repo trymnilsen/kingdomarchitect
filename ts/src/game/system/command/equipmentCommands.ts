@@ -15,7 +15,7 @@ import type { UnequipItemCommand } from "../../../server/message/command/unequip
 import {
     BehaviorAgentComponentId,
     requestReplan as requestBehaviorReplan,
-} from "../../component/BehaviorAgentComponent.ts";
+} from "../../component/behaviorAgentComponent.ts";
 import { EquipmentComponentId } from "../../component/equipmentComponent.ts";
 import { HeldItemComponentId } from "../../component/heldItemComponent.ts";
 import { markStatsDirty } from "../../component/statsComponent.ts";

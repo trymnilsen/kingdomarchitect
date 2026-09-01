@@ -4,15 +4,15 @@ import { type KingdomDescription, worthOfKingdom } from "./raidWorth.ts";
  * Shared tuning constants for the goblin night-raid feature. Kept in one place
  * so the siege pathfinding cost, the combat damage split, and the raid
  * formation/behavior all agree on the same numbers. What individual things are
- * worth to a raider lives in raidWorth.ts; this file is pacing policy.
+ * worth to a raider lives in raidWorth.ts. This file is pacing policy.
  */
 
 /**
  * Damage dealt per tick when attacking a building (structure). Goblin raiders
- * use this to raze the player's settlement at a meaningful pace; it also lets
+ * use this to raze the player's settlement at a meaningful pace. It also lets
  * the player raze a goblin campfire faster when counter-raiding a camp.
  *
- * TODO: this is a blunt instrument — a flat structure-damage bonus applied to
+ * TODO: this is a blunt instrument, a flat structure-damage bonus applied to
  * any attacker. Revisit with a proper damage model (per-unit attack stats,
  * siege weapons, building armor) instead of a single global constant.
  */
@@ -24,7 +24,7 @@ export const UNIT_DAMAGE = 1;
 /**
  * Multiplier on the siege-path cost of routing through a destructible
  * structure. Cost ≈ SIEGE_COST_MULTIPLIER * (building maxHp / STRUCTURE_DAMAGE),
- * compared against ~2 per ground tile. Higher → raiders prefer detours; lower →
+ * compared against ~2 per ground tile. Higher → raiders prefer detours, lower →
  * they punch through walls more eagerly. At 1.0 a 100hp wall (≈10 cost) is worth
  * breaching whenever going around would be more than ~5 tiles.
  */
@@ -35,7 +35,7 @@ export const RAIDERS_PER_TARGET = 2;
 
 /**
  * Utility of RaidBehavior. Below engageInCombat (90) so a raider that is
- * attacked defends itself first, then resumes the siege; above keepWarm/idle.
+ * attacked defends itself first, then resumes the siege. Above keepWarm/idle.
  */
 export const RAID_UTILITY = 50;
 
@@ -70,14 +70,14 @@ export const INITIAL_RAID_THRESHOLD_BASE = worthOfKingdom(FIRST_RAID_KINGDOM);
 /**
  * Added to a camp's initial threshold per tile of distance from the kingdom.
  * Every camp reads the same score, so without this spread they would all cross a
- * shared bar on the same night. Near camps covet the kingdom sooner; far ones
+ * shared bar on the same night. Near camps covet the kingdom sooner. Far ones
  * need a richer prize to march for.
  */
 export const RAID_THRESHOLD_DISTANCE_FACTOR = 2;
 
 /**
  * Camps below this size never raid, which keeps a raid party from degenerating
- * to 0–1 goblins. The camp size table (campSizeSteps) is anchored to it: a camp
+ * to 0 or 1 goblins. The camp size table (campSizeSteps) is anchored to it: a camp
  * sits at RAID_MIN_HOUSES - 1 until the kingdom crosses the first raid
  * threshold, so the floor is structural rather than a safety net. The
  * early-game grace period lives in INITIAL_RAID_THRESHOLD_BASE, not here.

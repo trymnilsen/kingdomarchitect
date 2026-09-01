@@ -10,7 +10,7 @@ import {
 } from "../../component/heldItemComponent.ts";
 import { StockpileComponentId } from "../../component/stockpileComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
-import { ActionComplete, type ActionResult } from "./Action.ts";
+import { ActionComplete, type ActionResult } from "./action.ts";
 
 export type WithdrawFromStockpileActionData = {
     type: "withdrawFromStockpile";
@@ -22,7 +22,7 @@ export type WithdrawFromStockpileActionData = {
 /**
  * Withdraw a single item type from a stockpile into the worker's held
  * slot. Held is single-item-id, so the action fails when held already
- * holds a different item id — the caller (planner) is responsible for
+ * holds a different item id. The caller (planner) is responsible for
  * having dropped held first.
  */
 export function executeWithdrawFromStockpileAction(

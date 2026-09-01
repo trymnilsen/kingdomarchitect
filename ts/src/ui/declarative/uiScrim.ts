@@ -8,10 +8,10 @@ type UiScrimProps = {
 /**
  * A dimming overlay that fills the available space with a translucent color.
  *
- * The scrim is intentionally NOT an interactive hit-test target: taps on it
- * fall through the declarative UI so the interaction layer can treat them as
- * a tap on the modal backdrop and pop the state. Do not give it a pointer
- * state or tap handler — that would absorb the tap and break dismissal.
+ * The scrim is NOT an interactive hit-test target. Taps on it fall through the
+ * declarative UI so the interaction layer can treat them as a tap on the modal
+ * backdrop and pop the state. A pointer state or tap handler here would absorb
+ * the tap and break dismissal.
  */
 export const uiScrim = createComponent<UiScrimProps>(
     ({ props, withDraw, constraints }) => {

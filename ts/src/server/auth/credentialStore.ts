@@ -5,7 +5,7 @@ import type { DatabaseSync } from "node:sqlite";
  *
  * `publicKey` holds SubjectPublicKeyInfo DER rather than the COSE key the
  * WebAuthn spec describes. The browser already hands us SPKI through
- * `getPublicKey()`, and storing it in that form is what lets this server verify
+ * `getPublicKey()`, and storing it in that form lets this server verify
  * assertions without a CBOR decoder.
  */
 export type StoredCredential = {

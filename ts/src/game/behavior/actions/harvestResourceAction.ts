@@ -22,7 +22,7 @@ import {
     findJobClaimedBy,
     removeJobFromQueue,
 } from "../../job/jobLifecycle.ts";
-import { ActionComplete, ActionRunning, type ActionResult } from "./Action.ts";
+import { ActionComplete, ActionRunning, type ActionResult } from "./action.ts";
 
 export type HarvestResourceActionData = {
     type: "harvestResource";
@@ -79,7 +79,7 @@ export function executeHarvestResourceAction(
 
     // Precondition: the held slot must be empty or already hold the yield item.
     // If it holds something else, free the hand before harvesting rather than
-    // failing — otherwise the worker can never collect this resource.
+    // failing. Otherwise the worker can never collect this resource.
     if (heldBlocksYield(held, resource)) {
         return freeHandSubaction(entity, resourceEntity, held);
     }
@@ -100,7 +100,7 @@ export function executeHarvestResourceAction(
 
 /**
  * True when the held slot holds an item that does not match the resource's
- * yield — i.e. collecting would require mixing two item ids in one slot.
+ * yield, so collecting would require mixing two item ids in one slot.
  */
 function heldBlocksYield(
     held: HeldItemComponent,

@@ -8,22 +8,21 @@ import {
     InventoryComponentId,
     addInventoryItem,
 } from "../../../src/game/component/inventoryComponent.ts";
-import { BehaviorAgentComponentId } from "../../../src/game/component/BehaviorAgentComponent.ts";
+import { BehaviorAgentComponentId } from "../../../src/game/component/behaviorAgentComponent.ts";
 import { HungerComponentId } from "../../../src/game/component/hungerComponent.ts";
 import { CollectResourceJob } from "../../../src/game/job/collectResourceJob.ts";
 import { ResourceHarvestMode } from "../../../src/data/inventory/items/naturalResource.ts";
 import { wheatResourceItem } from "../../../src/data/inventory/items/resources.ts";
 
 /**
- * End-to-end coverage for the replanning refactor's two headline behaviors:
+ * End-to-end coverage for two replanning rules:
  *
- *  1. An idle worker recovers from idle on its own — the bug that motivated the
- *     work. Pre-fix, a worker with nothing valid to do cleared pendingReplan and
- *     an empty queue and then sat frozen, never noticing a rising need. Now the
- *     empty queue itself drives re-selection each tick, with no external poke.
+ *  1. An idle worker recovers from idle on its own. A worker with nothing valid
+ *     to do holds an empty queue and a cleared pendingReplan, and the empty
+ *     queue itself drives re-selection each tick with no external poke.
  *
  *  2. A busy worker is NOT interrupted by a rising need. Needs only influence the
- *     next selection at a plan boundary; a worker mid-plan runs that plan to
+ *     next selection at a plan boundary, so a worker mid-plan runs that plan to
  *     completion. Only explicit/imperative events (damage, command) preempt.
  */
 function addTree(
@@ -54,8 +53,8 @@ describe("needs and plan-commitment scenario tests", () => {
         const hunger = worker.getEcsComponent(HungerComponentId)!;
 
         // Let the worker settle into idle: no jobs, not hungry, fully rested, so
-        // nothing is valid. Pre-fix this is a terminal "stuck" state — empty queue
-        // and pendingReplan cleared, with nothing left to re-arm it.
+        // nothing is valid. That leaves an empty queue and a cleared
+        // pendingReplan, with only the empty-queue rule left to re-arm it.
         harness.tickN(3);
         assert.strictEqual(
             agent.currentBehaviorName,
@@ -73,8 +72,8 @@ describe("needs and plan-commitment scenario tests", () => {
             "settled idle worker must not carry a pending replan (keeps it displaceable)",
         );
 
-        // It gets hungry. Nothing pokes the behavior agent — the empty-queue rule
-        // must re-select on its own and pick eat.
+        // It gets hungry. Nothing pokes the behavior agent, so the empty-queue
+        // rule must re-select on its own and pick eat.
         hunger.hunger = 45; // >= HUNGER_THRESHOLD (40)
         worker.invalidateComponent(HungerComponentId);
 
@@ -94,7 +93,7 @@ describe("needs and plan-commitment scenario tests", () => {
     it("does not abandon a job for a rising need mid-plan", () => {
         const harness = new ScenarioHarness();
         const worker = harness.addWorker("worker", { x: 10, y: 8 });
-        // Food is available, so eat is a fully viable competitor — the worker
+        // Food is available, so eat is a fully viable competitor. The worker
         // staying on the job proves commitment, not a lack of reachable food.
         const stockpile = harness.addStockpile("stockpile", { x: 10, y: 11 });
         addInventoryItem(
@@ -103,7 +102,7 @@ describe("needs and plan-commitment scenario tests", () => {
             5,
         );
 
-        // A tree far to the east, so the worker spends many ticks walking — it is
+        // A tree far to the east, so the worker spends many ticks walking. It is
         // unambiguously mid-plan for the whole window the test inspects.
         const tree = addTree(harness, { x: 30, y: 8 });
         harness.queueJob(CollectResourceJob(tree, ResourceHarvestMode.Chop));

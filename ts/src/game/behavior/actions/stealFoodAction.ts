@@ -11,7 +11,7 @@ import {
     isHeldEmpty,
 } from "../../component/heldItemComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
-import { ActionComplete, type ActionResult } from "./Action.ts";
+import { ActionComplete, type ActionResult } from "./action.ts";
 
 export type StealFoodActionData = {
     type: "stealFood";

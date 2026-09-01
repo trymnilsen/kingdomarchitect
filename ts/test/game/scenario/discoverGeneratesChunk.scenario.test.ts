@@ -22,9 +22,9 @@ import {
  * Discovering a tile in an ungenerated chunk drives the full generation
  * path: generateChunk creates the chunk entity and biome contents, and
  * placeSettlementIfNoneExists hosts the goblin camp. These tests assert
- * the structural invariants that path must maintain — registered tiles,
- * consistent transforms, and a chunk map matching the entity tree —
- * rather than the (random) biome contents themselves.
+ * the structural invariants that path must maintain: registered tiles,
+ * consistent transforms, and a chunk map matching the entity tree. The
+ * (random) biome contents themselves are not checked.
  */
 
 // Outside the harness's pre-seeded chunks (x 1..4, y 1..3), so the chunk

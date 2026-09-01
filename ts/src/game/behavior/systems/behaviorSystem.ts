@@ -3,12 +3,12 @@ import { Entity } from "../../entity/entity.ts";
 import {
     type BehaviorAgentComponent,
     BehaviorAgentComponentId,
-} from "../../component/BehaviorAgentComponent.ts";
-import type { Behavior } from "../behaviors/Behavior.ts";
+} from "../../component/behaviorAgentComponent.ts";
+import type { Behavior } from "../behaviors/behavior.ts";
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
-import { executeAction } from "../actions/ActionExecutor.ts";
+import { executeAction } from "../actions/actionExecutor.ts";
 import { log } from "../../../common/logging/logger.ts";
-import type { BehaviorActionData } from "../actions/ActionData.ts";
+import type { BehaviorActionData } from "../actions/actionData.ts";
 
 /**
  * Resolves which behaviors are applicable for a given entity.
@@ -51,7 +51,7 @@ const BEHAVIOR_STATS_LOG_INTERVAL = 100;
  *
  * A busy worker (non-empty queue, no pending replan) is never re-selected
  * mid-plan. Needs like hunger and energy only influence the next selection at a
- * plan boundary; interrupting a running plan takes an explicit requestReplan.
+ * plan boundary. Interrupting a running plan takes an explicit requestReplan.
  */
 export function createBehaviorSystem(resolver: BehaviorResolver): EcsSystem {
     return {
@@ -137,7 +137,7 @@ function updateBehaviorAgent(
             agent.actionQueue.splice(0, 0, ...result.actions);
         }
         entity.invalidateComponent(BehaviorAgentComponentId);
-        // result.kind === "running". Keep the action in the queue; it runs again next tick.
+        // result.kind === "running". Keep the action in the queue. It runs again next tick.
     }
 }
 
@@ -310,7 +310,7 @@ function selectBehavior(
         // even if this plan completes and clears currentBehaviorName before then.
         agent.hysteresis = { behaviorName: candidate.behavior.name };
         // Always adopt the freshly expanded plan. Selection only runs at a plan
-        // boundary (empty queue) or on a forced replan; in both cases a fresh plan
+        // boundary (empty queue) or on a forced replan. In both cases a fresh plan
         // is what we want. A displaced worker needs a new path rather than the stale
         // cachedPath from its previous moveTo. There is no running head to preserve.
         agent.actionQueue = newActions;

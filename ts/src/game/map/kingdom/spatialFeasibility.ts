@@ -14,7 +14,7 @@ export type SpatialFeasibilityResult = {
  * Checks how much unregistered (undiscovered) space is available around
  * the candidate chunk position for a kingdom to grow into.
  *
- * Registered chunks act as walls — the flood fill only traverses
+ * Registered chunks act as walls, so the flood fill only traverses
  * unregistered positions. This mirrors how world generation works: newly
  * placed kingdoms expand into chunks that haven't been discovered yet.
  *
@@ -55,14 +55,14 @@ export function checkSpatialFeasibility(
         const position = queue.shift()!;
 
         if (hasChunk(tileComponent, position)) {
-            // Registered chunk — treat as a wall, do not count or expand
+            // Registered chunk, treat as a wall, do not count or expand
             continue;
         }
 
         availableChunks++;
 
         // Stop early once we have confirmed enough space exists.
-        // We don't need to count every reachable chunk — just enough
+        // We don't need to count every reachable chunk, just enough
         // to make the feasibility decision.
         if (availableChunks >= countNeeded) {
             break;

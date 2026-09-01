@@ -17,7 +17,7 @@ import { type FocusNode } from "./focusNode.ts";
 /**
  * Pick the node a directional input should move focus to.
  *
- * Callers supply the candidate set themselves; collecting focusable nodes is
+ * Callers supply the candidate set themselves. Collecting focusable nodes is
  * the job of whichever UI implementation owns the view tree, since only it
  * knows how to walk its own hierarchy.
  *

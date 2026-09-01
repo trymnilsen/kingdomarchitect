@@ -49,7 +49,7 @@ const idleSouthwest = timeline("idle_southwest")
     .mirror()
     .build();
 
-// NE: back-facing, no visible eyes — just the mid-animation turn
+// NE: back-facing, no visible eyes, just the mid-animation turn
 const idleNortheast = timeline("idle_northeast")
     .basedOn("walk_northeast", 0)
     .duration(40)

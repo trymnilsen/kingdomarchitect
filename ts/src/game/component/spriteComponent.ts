@@ -79,8 +79,8 @@ export const SpriteComponentId = "Sprite";
 
 /**
  * Sprite depth for units (workers, goblins). Higher than the building/scenery
- * default of 0 so that when a unit shares a tile's Y with a building — most
- * notably while standing on top of one to craft or sleep — it renders in front
+ * default of 0 so that when a unit shares a tile's Y with a building, most
+ * notably while standing on top of one to craft or sleep, it renders in front
  * instead of being hidden behind the (often scaled-up) building sprite.
  */
 export const UNIT_SPRITE_DEPTH = 10;

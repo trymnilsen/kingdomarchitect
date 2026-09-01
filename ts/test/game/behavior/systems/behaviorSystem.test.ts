@@ -4,14 +4,14 @@ import { Entity } from "../../../../src/game/entity/entity.ts";
 import {
     createBehaviorAgentComponent,
     BehaviorAgentComponentId,
-} from "../../../../src/game/component/BehaviorAgentComponent.ts";
+} from "../../../../src/game/component/behaviorAgentComponent.ts";
 import {
     createJobQueueComponent,
     JobQueueComponentId,
 } from "../../../../src/game/component/jobQueueComponent.ts";
-import { createBehaviorSystem } from "../../../../src/game/behavior/systems/BehaviorSystem.ts";
-import type { Behavior } from "../../../../src/game/behavior/behaviors/Behavior.ts";
-import type { BehaviorActionData } from "../../../../src/game/behavior/actions/ActionData.ts";
+import { createBehaviorSystem } from "../../../../src/game/behavior/systems/behaviorSystem.ts";
+import type { Behavior } from "../../../../src/game/behavior/behaviors/behavior.ts";
+import type { BehaviorActionData } from "../../../../src/game/behavior/actions/actionData.ts";
 
 /**
  * Create a mock behavior for testing
@@ -169,7 +169,7 @@ describe("BehaviorSystem", () => {
             const system = createBehaviorSystem(() => []);
             system.onUpdate!(root, 1);
 
-            // Failure causes immediate replan same-tick; with no behaviors, currentBehaviorName is cleared
+            // Failure causes immediate replan same-tick. With no behaviors, currentBehaviorName is cleared
             assert.strictEqual(agent.currentBehaviorName, null);
         });
 
@@ -419,7 +419,7 @@ describe("BehaviorSystem", () => {
             const { root, worker } = createTestScene();
             const agent = worker.getEcsComponent(BehaviorAgentComponentId)!;
 
-            // "haul" is the running behavior; a slightly stronger "other" exists.
+            // "haul" is the running behavior. A slightly stronger "other" exists.
             const haul = createMockBehavior("haul", {
                 utility: 50,
                 actions: [{ type: "wait", until: 200 }],
@@ -486,8 +486,8 @@ describe("BehaviorSystem", () => {
             agent.currentBehaviorName = "myBehavior";
             agent.hysteresis = { behaviorName: "myBehavior" };
             // Forced replan (e.g. the worker was displaced) while myBehavior is
-            // still the best choice. The queue is rebuilt from scratch — there
-            // is no head reuse; a forced replan wants a fresh plan/path.
+            // still the best choice. The queue is rebuilt from scratch with no
+            // head reuse. A forced replan wants a fresh plan and path.
             agent.pendingReplan = { kind: "replan" };
 
             const behavior = createMockBehavior("myBehavior", {
@@ -518,7 +518,7 @@ describe("BehaviorSystem", () => {
             const headAction: BehaviorActionData = { type: "wait", until: 100 };
             agent.actionQueue = [headAction];
             agent.currentBehaviorName = "behaviorA";
-            // behaviorA was the last selection; switching to behaviorB must replace.
+            // behaviorA was the last selection. Switching to behaviorB must replace.
             agent.hysteresis = { behaviorName: "behaviorA" };
             agent.pendingReplan = { kind: "replan" };
 

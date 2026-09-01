@@ -14,7 +14,7 @@ export type PointerFlags = { pressed: boolean };
  * A gesture follows capture semantics: the interactive chain hit on pointer
  * down becomes the captured chain and owns the gesture until it ends. The
  * captured set decides tap eligibility on release. The pressed set is the
- * visual subset of it — the captured nodes currently under the pointer — so a
+ * visual subset of it, the captured nodes currently under the pointer, so a
  * button un-presses when the pointer slides off it and re-presses when the
  * pointer slides back, while staying eligible to tap the whole time.
  *
@@ -43,7 +43,7 @@ export class PointerTracker {
 
     /**
      * Updates the pressed visuals as the pointer moves during a capture. Pass
-     * the chain currently under the pointer; the pressed set becomes its
+     * the chain currently under the pointer. The pressed set becomes its
      * intersection with the captured chain. Does nothing without a capture.
      */
     moveCapture(chainUnderPointer: UiNode[]): void {

@@ -13,7 +13,7 @@ import {
 import {
     BehaviorAgentComponentId,
     createBehaviorAgentComponent,
-} from "../../../../src/game/component/BehaviorAgentComponent.ts";
+} from "../../../../src/game/component/behaviorAgentComponent.ts";
 import { executeAttackTargetAction } from "../../../../src/game/behavior/actions/attackTargetAction.ts";
 import { createImmortalComponent } from "../../../../src/game/component/immortalComponent.ts";
 import { DeathGameEventType } from "../../../../src/game/entity/event/deathGameEventData.ts";
@@ -44,7 +44,7 @@ function createCombatScene(): {
     scene.target.setEcsComponent(createThreatMapComponent());
     scene.target.setEcsComponent(createBehaviorAgentComponent());
     const agent = scene.target.getEcsComponent(BehaviorAgentComponentId)!;
-    // The default factory seeds pendingReplan; clear it so we can observe
+    // The default factory seeds pendingReplan. Clear it so we can observe
     // whether the action under test sets it.
     agent.pendingReplan = undefined;
     return scene;

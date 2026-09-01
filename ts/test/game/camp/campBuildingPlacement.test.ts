@@ -18,8 +18,8 @@ import { findClosestAvailablePosition } from "../../../src/game/map/query/closes
 import type { Building } from "../../../src/data/building/building.ts";
 
 /**
- * Creates a root entity with ground registered for chunk (0,0) — world
- * positions 0–7 on both axes — and a camp entity anchored at (4,4).
+ * Creates a root entity with ground registered for chunk (0,0), covering world
+ * positions 0 to 7 on both axes, plus a camp entity anchored at (4,4).
  */
 function createWorldWithCamp(): { root: Entity; camp: Entity } {
     const root = new Entity("root");

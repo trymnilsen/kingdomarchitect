@@ -1,7 +1,7 @@
 /**
  * Flat array of pixel coordinates: [x1, y1, x2, y2, ...]
  * Coordinates are raw pixel positions in source-sprite space.
- * They are NOT 0-based — a 16px frame cell may have x values like 6..11.
+ * They are NOT 0-based. A 16px frame cell may have x values like 6..11.
  * An empty array means the part is absent for that frame.
  */
 export type PartFrame = number[];
@@ -33,7 +33,7 @@ export type Facing = "se" | "sw" | "ne" | "nw";
 
 /**
  * A sparse keyframe recording when facing direction changes.
- * Only transitions are stored — the starting facing is implied by the animation name.
+ * Only transitions are stored. The starting facing is implied by the animation name.
  */
 export interface FacingKeyframe {
     frame: number;

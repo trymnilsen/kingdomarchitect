@@ -5,13 +5,13 @@ import { EquipmentComponentId } from "../../component/equipmentComponent.ts";
 import { markStatsDirty } from "../../component/statsComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { dropItemAtPosition, DropMode } from "../dropItem.ts";
-import { ActionComplete, type ActionResult } from "./Action.ts";
+import { ActionComplete, type ActionResult } from "./action.ts";
 
 /**
  * Drop an item from an equipment slot directly to the ground at the
  * worker's position, bypassing held. Used when held already contains
  * something incompatible and we need to evict a slot without disturbing
- * held — for example during equip swap.
+ * held, for example during an equip swap.
  */
 export type DropFromSlotActionData = {
     type: "dropFromSlot";
@@ -32,7 +32,7 @@ export function executeDropFromSlotAction(
 
     const slotItem = equipment.slots[action.slot];
     if (!slotItem) {
-        // Nothing to drop — treat as success.
+        // Nothing to drop, so treat as success.
         return ActionComplete;
     }
 
@@ -55,7 +55,7 @@ export function executeDropFromSlotAction(
     );
     if (!placed) {
         // Emptying the slot after a refused placement would delete the item.
-        // Keep it equipped and fail; dropItemAtPosition logged why.
+        // Keep it equipped and fail. dropItemAtPosition logged why.
         return { kind: "failed", cause: { type: "unknown" } };
     }
 

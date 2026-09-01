@@ -91,7 +91,7 @@ describe("engageInCombatBehavior", () => {
             const behavior = createEngageInCombatBehavior();
             const { root, victim } = createVictim();
             const threat = victim.getEcsComponent(ThreatMapComponentId)!;
-            // G1 is never attached to root — represents a despawned attacker
+            // G1 is never attached to root, representing a despawned attacker
             // whose threat entry lingers
             addThreat(threat, "G1", 5, 0, root);
 

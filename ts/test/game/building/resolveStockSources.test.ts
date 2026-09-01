@@ -29,7 +29,7 @@ describe("resolveStockSources", () => {
         const kingdomA = settlement("kingdomA");
         const stockA1 = stockpileEntity("stockA1");
         const stockA2 = stockpileEntity("stockA2");
-        // A crafting building has an inventory but no StockpileComponent — it
+        // A crafting building has an inventory but no StockpileComponent, so it
         // must not be treated as shared stock.
         const craftingA = new Entity("craftingA");
         craftingA.setEcsComponent(

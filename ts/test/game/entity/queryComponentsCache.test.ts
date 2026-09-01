@@ -51,7 +51,7 @@ function assertMatchesBruteForce(root: Entity, componentId: string) {
 /**
  * root(12,8) ── a(13,10) ── a1(15,14)
  *            └─ b(14,12)
- * Health is placed on a1 and b; immortal on a. Off-origin positions per the
+ * Health is placed on a1 and b, immortal on a. Off-origin positions per the
  * project's testing convention.
  */
 function buildTree() {
@@ -153,9 +153,9 @@ describe("queryComponents cache", () => {
         const healthBefore = root.queryComponents(HealthComponentId);
         const immortalBefore = root.queryComponents(ImmortalComponentId);
 
-        // component_added upserts only the immortal cache (in place — same map
-        // reference, now with the new member) and leaves the unrelated health
-        // map entirely untouched.
+        // component_added upserts only the immortal cache in place, keeping the
+        // same map reference and adding the new member. The unrelated health
+        // map is left untouched.
         b.setEcsComponent(createImmortalComponent());
 
         assert.strictEqual(

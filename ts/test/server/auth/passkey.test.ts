@@ -39,9 +39,9 @@ const FLAG_USER_VERIFIED = 0x04;
 const PRESENT_AND_VERIFIED = FLAG_USER_PRESENT | FLAG_USER_VERIFIED;
 
 /**
- * Stands in for a real authenticator. Holds the private key so tests can
- * produce genuine signatures rather than asserting against canned bytes, which
- * is what makes the negative cases meaningful.
+ * Stands in for a real authenticator. It holds the private key and produces
+ * genuine signatures rather than canned bytes, so the negative cases exercise
+ * the actual verification.
  */
 type FakeAuthenticator = {
     credentialId: string;

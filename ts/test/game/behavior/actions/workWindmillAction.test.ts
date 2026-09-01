@@ -69,7 +69,7 @@ describe("workWindmillAction", () => {
         const root = createWorld();
         addWindmill(root, { x: 10, y: 10 });
         // Wheat sits at the top tile, scanned before the straw tiles. It was
-        // replanted recently; the straw farms have waited far longer.
+        // replanted recently. The straw farms have waited far longer.
         const wheatFarm = addFarm(
             root,
             "wheatFarm",

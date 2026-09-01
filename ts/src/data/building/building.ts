@@ -75,7 +75,7 @@ export type Building = {
     /**
      * What this building is worth to a goblin, which drives two things at once.
      * Raiders rank player buildings by it when forming a raid (see
-     * formGoblinRaid), razing the highest first; and kingdomScore sums it across
+     * formGoblinRaid), razing the highest first. kingdomScore sums it across
      * the settlement to decide how often camps raid at all. Omitted → a base
      * value (DEFAULT_RAID_VALUE) is used.
      *
@@ -83,7 +83,7 @@ export type Building = {
      * roads). Those add nothing to the score, so fortifying does not raise the
      * threat level, and they are still broken through as obstacles by the siege
      * path when they block the route. Changing this number therefore retunes
-     * raid pacing as well as targeting; do not treat it as cosmetic.
+     * raid pacing as well as targeting. Do not treat it as cosmetic.
      */
     raidValue?: number;
 };

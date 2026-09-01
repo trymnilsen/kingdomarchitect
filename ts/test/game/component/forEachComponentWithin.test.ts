@@ -89,7 +89,7 @@ describe("forEachComponentWithin", () => {
     it("includes edge entities within the one-chunk margin (no exact-bounds cut)", () => {
         const { root } = createMinimalWorld({ minChunk: -1, maxChunk: 4 });
         // x=30 is outside the viewport (x2=24) but lives in chunk x=3, which the
-        // margin includes — so it must still be visited rather than pop out.
+        // margin includes, so it must still be visited rather than pop out.
         addSpriteEntity(root, "edge", 30, 8);
 
         assert.deepStrictEqual(visitSpriteIds(root), ["edge"]);

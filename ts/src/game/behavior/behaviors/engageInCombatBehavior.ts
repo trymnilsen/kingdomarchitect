@@ -5,8 +5,8 @@ import {
 } from "../../component/threatMapComponent.ts";
 import { getGameTimeTick } from "../../component/gameTimeComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
-import type { BehaviorActionData } from "../actions/ActionData.ts";
-import type { Behavior } from "./Behavior.ts";
+import type { BehaviorActionData } from "../actions/actionData.ts";
+import type { Behavior } from "./behavior.ts";
 
 /**
  * Utility when the top threat is damage-sourced: someone is hitting this

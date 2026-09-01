@@ -17,7 +17,7 @@ import {
     woodResourceItem,
     stoneResource,
 } from "../../../../src/data/inventory/items/resources.ts";
-import type { BehaviorActionData } from "../../../../src/game/behavior/actions/ActionData.ts";
+import type { BehaviorActionData } from "../../../../src/game/behavior/actions/actionData.ts";
 
 type WithdrawAction = Extract<
     BehaviorActionData,

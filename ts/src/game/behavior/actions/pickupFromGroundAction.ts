@@ -11,7 +11,7 @@ import {
     isHeldEmpty,
 } from "../../component/heldItemComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
-import { ActionComplete, type ActionResult } from "./Action.ts";
+import { ActionComplete, type ActionResult } from "./action.ts";
 
 /**
  * Pick up a single ground pile (entity with GroundItemComponent +
@@ -56,15 +56,15 @@ export function executePickupFromGroundAction(
 
     const collectable = pile.getEcsComponent(CollectableComponentId);
     if (!collectable || collectable.items.length === 0) {
-        // Pile is drained; remove and complete.
+        // Pile is drained, so remove and complete.
         pile.remove();
         return ActionComplete;
     }
 
     const held = entity.requireEcsComponent(HeldItemComponentId);
 
-    // Ground piles only ever hold one item id by construction (drop helper
-    // enforces this), but be defensive — pull the first stack.
+    // Ground piles only ever hold one item id by construction (the drop helper
+    // enforces this), so the first stack is the whole pile.
     const stack = collectable.items[0];
 
     if (!isHeldEmpty(held) && held.item!.id !== stack.item.id) {

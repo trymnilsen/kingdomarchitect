@@ -18,7 +18,7 @@ import { getInventoryItemById } from "../../../data/inventory/inventoryItemHelpe
 import { getCropDefinition } from "../../../data/crop/cropDefinitions.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { completeClaimedJob } from "../../job/jobLifecycle.ts";
-import { ActionComplete, ActionRunning, type ActionResult } from "./Action.ts";
+import { ActionComplete, ActionRunning, type ActionResult } from "./action.ts";
 
 export type WorkWindmillActionData = {
     type: "workWindmill";
@@ -28,7 +28,7 @@ export type WorkWindmillActionData = {
 /**
  * Growth-speed multiplier applied to a farm while the windmill is actively
  * operated. The baseline farmGrowthSystem advances a growing crop by one tick
- * of progress each tick; the windmill credits the remaining (multiplier - 1)
+ * of progress each tick. The windmill credits the remaining (multiplier - 1)
  * ticks per tick it tends the farm, so a value of 3 means adjacent crops grow
  * at triple speed.
  */
@@ -51,9 +51,9 @@ const ADJACENT_OFFSETS: ReadonlyArray<{ dx: number; dy: number }> = [
  * (see WINDMILL_GROWTH_MULTIPLIER), and once nothing is Growing harvest Ready
  * farms into the worker's held slot and complete the job.
  *
- * Held is single-slot, so this pass harvests one crop type only — whatever the
+ * Held is single-slot, so this pass harvests one crop type only: whatever the
  * worker already holds, or the crop of the longest-waiting Ready farm if held
- * is empty. Ready farms are visited oldest plantedAtTick first; without that
+ * is empty. Ready farms are visited oldest plantedAtTick first. Without that
  * ordering a crop sitting earlier in the adjacency scan would claim the held
  * slot every pass and starve the others, since replanting happens before
  * harvesting and keeps every other crop perpetually Ready alongside it.

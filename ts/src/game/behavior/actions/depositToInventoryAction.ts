@@ -9,14 +9,14 @@ import {
     isHeldEmpty,
 } from "../../component/heldItemComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
-import { ActionComplete, type ActionResult } from "./Action.ts";
+import { ActionComplete, type ActionResult } from "./action.ts";
 import { log } from "../../../common/logging/logger.ts";
 
 /**
  * Deposit the worker's held item into a target entity's inventory.
  * Held is single-item-id, so a deposit transfers exactly the held stack
  * and clears held. Optional `itemId` enforces that the worker is carrying
- * the item the planner expected — fails if mismatched.
+ * the item the planner expected, and fails if mismatched.
  */
 export type DepositToInventoryActionData = {
     type: "depositToInventory";

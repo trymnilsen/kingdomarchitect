@@ -23,7 +23,7 @@ import {
 } from "../../../src/game/component/jobQueueComponent.ts";
 import { createMessageEmitterComponent } from "../../../src/game/component/messageEmitterComponent.ts";
 import { createWorldDiscoveryComponent } from "../../../src/game/component/worldDiscoveryComponent.ts";
-import { createBehaviorSystem } from "../../../src/game/behavior/systems/BehaviorSystem.ts";
+import { createBehaviorSystem } from "../../../src/game/behavior/systems/behaviorSystem.ts";
 import { createBehaviorResolver } from "../../../src/game/behavior/behaviorResolver.ts";
 import type { Jobs } from "../../../src/game/job/job.ts";
 import type { Building } from "../../../src/data/building/building.ts";
@@ -124,8 +124,8 @@ export class ScenarioHarness {
 
     /**
      * Tick until predicate returns true or maxTicks is reached.
-     * Returns the number of ticks elapsed. Does NOT throw if maxTicks is reached —
-     * let the calling test assert on the return value or world state.
+     * Returns the number of ticks elapsed. Does NOT throw if maxTicks is reached.
+     * The calling test asserts on the return value or world state.
      */
     tickUntil(
         predicate: (root: Entity, tick: number) => boolean,

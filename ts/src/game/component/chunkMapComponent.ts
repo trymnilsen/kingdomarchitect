@@ -107,7 +107,7 @@ export function getEntitiesInChunkMapWithin(
  * component that comes with a sprite. A root without a chunk map, as in bare
  * test trees, falls back to a full {@link visitChildren} walk.
  *
- * @param visitor called once per matching entity; must not mutate the tree
+ * @param visitor called once per matching entity, must not mutate the tree
  */
 export function forEachComponentWithin<ID extends ComponentID>(
     root: Entity,

@@ -5,7 +5,7 @@ import {
     treeResource,
 } from "../../../src/data/inventory/items/naturalResource.ts";
 import { clearDecorativeResourcesAt } from "../../../src/game/building/clearDecorativeResources.ts";
-import { createBehaviorAgentComponent } from "../../../src/game/component/BehaviorAgentComponent.ts";
+import { createBehaviorAgentComponent } from "../../../src/game/component/behaviorAgentComponent.ts";
 import { createSpriteComponent } from "../../../src/game/component/spriteComponent.ts";
 import { Entity } from "../../../src/game/entity/entity.ts";
 import { resourcePrefab } from "../../../src/game/prefab/resourcePrefab.ts";

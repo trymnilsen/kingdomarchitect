@@ -95,7 +95,7 @@ describe("collectItemPlanner", () => {
     it("fails the job when the target no longer holds that item", () => {
         const { root, worker, chest } = createTestScene();
 
-        // The entity is still there, but somebody already hauled this stack —
+        // The entity is still there, but somebody already hauled this stack,
         // or it never held stone to begin with.
         const job = CollectItemJob(chest, stoneResource.id);
         const queue = root.requireEcsComponent(JobQueueComponentId);

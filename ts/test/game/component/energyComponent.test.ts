@@ -163,7 +163,7 @@ describe("EnergyComponent", () => {
             const comp = entity.requireEcsComponent(EnergyComponentId);
             comp.exhaustionDebtThreshold = 5;
 
-            // Spend more than we have — will trigger overspend → debt → level up
+            // Spend more than we have, which triggers overspend → debt → level up
             spendEntityEnergy(entity, 5);
 
             const effectsComp = entity.requireEcsComponent(

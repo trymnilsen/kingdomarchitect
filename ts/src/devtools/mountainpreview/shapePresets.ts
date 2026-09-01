@@ -6,7 +6,7 @@ export type ShapePresetName = "round" | "square" | "long" | "blobby" | "peanut";
 /**
  * The tuning subset of {@link BiomeShapeParams}. Start chunk, blocked set,
  * target size and seed are scenario state and supplied separately at search
- * time; a preset only describes the silhouette.
+ * time. A preset only describes the silhouette.
  */
 export type ShapePresetParams = Pick<
     BiomeShapeParams,

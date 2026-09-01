@@ -141,7 +141,7 @@ Typescript and rollup is used for transpiling, typechecking and bundling the cod
 This is performed with the `build` npm task.
 
 ### Testing
-Some tests already exists for the game, these are made for the built in node test runner. Some files are currently just scaffold and some contain actual test code. Tests can be run with `npm test`.
+Some tests already exists for the game, these are made for the built in node test runner. Tests can be run with `npm test`.
 
 ### Custom tooling
 #### Spritepacking

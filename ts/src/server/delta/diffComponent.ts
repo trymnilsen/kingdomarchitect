@@ -205,7 +205,7 @@ function diffArray(
 /**
  * Diff two Maps. Map values are compared with deepEquals but not
  * recursively diffed. If a value changed, the entire new value is sent
- * via map_set. This keeps the operation set simple; recursive map-value
+ * via map_set. This keeps the operation set simple. Recursive map-value
  * diffing can be added later if Map values become large enough to warrant it.
  */
 function diffMap(

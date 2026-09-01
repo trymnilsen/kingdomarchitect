@@ -12,7 +12,7 @@ import { createLazyGraphFromRootNode } from "../../../../src/game/map/path/graph
 import { Entity } from "../../../../src/game/entity/entity.ts";
 import { createSpriteComponent } from "../../../../src/game/component/spriteComponent.ts";
 import { createBuildingComponent } from "../../../../src/game/component/buildingComponent.ts";
-import { createBehaviorAgentComponent } from "../../../../src/game/component/BehaviorAgentComponent.ts";
+import { createBehaviorAgentComponent } from "../../../../src/game/component/behaviorAgentComponent.ts";
 import { createMovementStaminaComponent } from "../../../../src/game/component/movementStaminaComponent.ts";
 import { nullBuilding } from "../../../../src/data/building/building.ts";
 import { executeStepOntoAction } from "../../../../src/game/behavior/actions/stepOntoAction.ts";
@@ -22,7 +22,7 @@ import {
     pointEquals,
     type Point,
 } from "../../../../src/common/point.ts";
-import type { BehaviorActionData } from "../../../../src/game/behavior/actions/ActionData.ts";
+import type { BehaviorActionData } from "../../../../src/game/behavior/actions/actionData.ts";
 import type { SpriteRef } from "../../../../src/asset/sprite.ts";
 
 type MoveToAction = Extract<BehaviorActionData, { type: "moveTo" }>;

@@ -23,7 +23,7 @@ import {
     setPreferredAmount,
 } from "../../../../src/game/component/stockpileComponent.ts";
 import { createInventoryComponent } from "../../../../src/game/component/inventoryComponent.ts";
-import type { BehaviorActionData } from "../../../../src/game/behavior/actions/ActionData.ts";
+import type { BehaviorActionData } from "../../../../src/game/behavior/actions/actionData.ts";
 import { InvalidationTracker } from "../behaviorTestHelpers.ts";
 
 type HarvestResourceAction = Extract<
@@ -126,7 +126,7 @@ describe("harvestResourceAction", () => {
             const worker = new Entity("worker");
             worker.worldPosition = { x: 10, y: 8 };
             const held = createHeldItemComponent();
-            held.item = stoneItem; // tree yields wood — stone is incompatible
+            held.item = stoneItem; // tree yields wood, so stone is incompatible
             held.amount = 4;
             worker.setEcsComponent(held);
             settlement.addChild(worker);
@@ -184,7 +184,7 @@ describe("harvestResourceAction", () => {
 
         it("drops the held item in place when no stockpile accepts it", () => {
             const { worker } = createSettlementScene();
-            // No stockpile added — nowhere to deposit the stone.
+            // No stockpile added, so nowhere to deposit the stone.
 
             const action = {
                 type: "harvestResource" as const,

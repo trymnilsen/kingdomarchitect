@@ -1,12 +1,12 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
 import { Entity } from "../../../src/game/entity/entity.ts";
-import { createPerformPlayerCommandBehavior } from "../../../src/game/behavior/behaviors/PerformPlayerCommandBehavior.ts";
+import { createPerformPlayerCommandBehavior } from "../../../src/game/behavior/behaviors/performPlayerCommandBehavior.ts";
 import {
     createBehaviorTestEntity,
     createTestEntity,
 } from "./behaviorTestHelpers.ts";
-import { getBehaviorAgent } from "../../../src/game/component/BehaviorAgentComponent.ts";
+import { getBehaviorAgent } from "../../../src/game/component/behaviorAgentComponent.ts";
 
 function createAttackScene(): {
     root: Entity;

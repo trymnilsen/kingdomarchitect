@@ -57,7 +57,7 @@ export function damage(component: HealthComponent, amount: number): number {
 
 /**
  * Apply damage to an entity. When the hit drops the entity to 0 hp, a
- * death event is bubbled and the entity is removed from its parent —
+ * death event is bubbled and the entity is removed from its parent,
  * unless it has an ImmortalComponent, in which case it stays at 0 hp.
  * Bubbling happens before removal so the event can still travel up the
  * parent chain.

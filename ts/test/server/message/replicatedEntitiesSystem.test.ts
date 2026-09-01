@@ -283,7 +283,7 @@ describe("replicatedEntitiesSystem", () => {
             const message = buildWorldStateMessage(root, "player1", 0);
 
             assert.strictEqual(message.discoveredTiles.length, 0);
-            // Chunks and volumes are replicated regardless of discovery —
+            // Chunks and volumes are replicated regardless of discovery, and
             // entities are too, so the ground they stand on must exist
             assert.strictEqual(message.volumes.length, 1);
             assert.strictEqual(message.chunks.length, 1);
@@ -433,7 +433,7 @@ describe("replicatedEntitiesSystem", () => {
             const child = new Entity("child1");
             world.root.addChild(child);
 
-            // Ignore the addEntity emitted by attaching the child; we only care
+            // Ignore the addEntity emitted by attaching the child. We only care
             // about the component added afterwards.
             messages.length = 0;
             child.setEcsComponent(createHealthComponent(50, 100));

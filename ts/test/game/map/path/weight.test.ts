@@ -222,7 +222,7 @@ describe("getWeightAtPoint", () => {
             resource.setEcsComponent(createResourceComponent("tree1"));
             placeAt(root, resource);
 
-            // Goblin weight is 50, resource is 30 — goblin wins
+            // Goblin weight is 50, resource is 30, so goblin wins
             assert.strictEqual(getWeightAtPoint(TEST_POS, root), 50);
         });
 

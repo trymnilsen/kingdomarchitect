@@ -1,6 +1,6 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
-import { getBehaviorAgent } from "../../../../src/game/component/BehaviorAgentComponent.ts";
+import { getBehaviorAgent } from "../../../../src/game/component/behaviorAgentComponent.ts";
 import { recordMove } from "../../../../src/game/component/movementStaminaComponent.ts";
 import { negotiateDisplacement } from "../../../../src/game/behavior/displacement/displacementNegotiation.ts";
 import {
@@ -14,7 +14,7 @@ describe("displacementNegotiation", () => {
         it("returns noChain when target tile has no displaceable entity", () => {
             const { root } = createTestWorld();
             const requester = createAgent("requester", root, 10, 8, 100);
-            // Building at target — no BehaviorAgentComponent
+            // Building at target, no BehaviorAgentComponent
             createWall("wall", root, 11, 8);
 
             const result = negotiateDisplacement(
@@ -50,9 +50,9 @@ describe("displacementNegotiation", () => {
             const requester = createAgent("requester", root, 10, 8, 100);
             const blocker = createAgent("blocker", root, 11, 8, 0);
             const stamina = blocker.getEcsComponent("MovementStamina")!;
-            // Record a move at the current tick — makes hasMovedThisTick return true, so
-            // the blocker is movedThisTick: it can't move again now but is free next tick,
-            // so the requester waits and retries rather than routing around it.
+            // Record a move at the current tick. That makes hasMovedThisTick return true,
+            // so the blocker is movedThisTick: it can't move again now but is free next
+            // tick, so the requester waits and retries rather than routing around it.
             recordMove(stamina, 5);
 
             const result = negotiateDisplacement(
@@ -69,7 +69,7 @@ describe("displacementNegotiation", () => {
         it("returns a single-move non-cycle transaction when blocker has a free tile", () => {
             const { root } = createTestWorld();
             // Requester at (10,8), wants (11,8) where blocker is.
-            // (12,8) is free — blocker can move there.
+            // (12,8) is free, so the blocker can move there.
             // (11,9) is also free in the chunk, so blocker has multiple exits.
             const requester = createAgent("requester", root, 10, 8, 100);
             createAgent("blocker", root, 11, 8, 5);
@@ -137,7 +137,7 @@ describe("displacementNegotiation", () => {
             // Same boxed-in cycle as above, but the requester is walking (a moveTo at its
             // queue head). scoreCandidateTile rejects the requester's own tile as a push
             // target (it's transient), so the cycle is found only via the explicit
-            // cycle-back terminator — this pins that path.
+            // cycle-back terminator. This test pins that path.
             const requester = createAgent("requester", root, 10, 8, 100);
             getBehaviorAgent(requester)!.actionQueue = [
                 { type: "moveTo", target: { x: 11, y: 8 } },
@@ -209,10 +209,10 @@ describe("displacementNegotiation", () => {
         it("waits for a same-direction follower's blocker instead of shoving it", () => {
             const { root } = createTestWorld();
             // Blocker is moving, but heading AWAY from the requester (its next step is
-            // east, not into the requester) — so it is NOT a head-on beneficial swap.
-            // It is in transit (transient), so rather than shove it off its route the
-            // requester waits for it to vacate. This is what keeps same-direction
-            // traffic queueing rather than the follower barging past the leader.
+            // east, not into the requester), so it is NOT a head-on beneficial swap.
+            // It is in transit (transient). The requester waits for it to vacate and
+            // does not shove it off its route. Same-direction traffic queues up, and
+            // the follower does not barge past the leader.
             const requester = createAgent("requester", root, 10, 8, 5);
             const blocker = createAgent("blocker", root, 11, 8, 5);
             getBehaviorAgent(blocker)!.actionQueue = [
@@ -236,7 +236,7 @@ describe("displacementNegotiation", () => {
 
         it("returns a 2-move chain when blocker must displace a second entity", () => {
             const { root } = createTestWorld();
-            // Requester at (8,8) — NOT adjacent to B — targeting (11,8).
+            // Requester at (8,8), NOT adjacent to B, targeting (11,8).
             // This prevents A from appearing in B's cardinal-neighbor list,
             // so there is no cycle shortcut: B's only exit is through C.
             const requester = createAgent("requester", root, 8, 8, 100);
@@ -245,10 +245,10 @@ describe("displacementNegotiation", () => {
             // Block all of B's exits except east (12,8)=C
             createWall("wall-bw", root, 10, 8); // west of B
             createWall("wall-bs", root, 11, 9); // south of B
-            // north of B (11,7) is outside the chunk — natural wall
-            // C's north (12,7) is also outside — natural wall
-            // C's south (12,9) is free — that's where C will move
-            // C's west (11,8) is B (visited in chain) — skipped
+            // north of B (11,7) is outside the chunk, natural wall
+            // C's north (12,7) is also outside, natural wall
+            // C's south (12,9) is free, that's where C will move
+            // C's west (11,8) is B (visited in chain), skipped
 
             const result = negotiateDisplacement(
                 requester,
@@ -295,7 +295,7 @@ describe("displacementNegotiation", () => {
             // The free tile is scored higher so it must be chosen.
             const requester = createAgent("requester", root, 10, 8, 100);
             createAgent("blocker", root, 11, 8, 5);
-            // (12,8) and (11,9) are both free — B will pick one immediately
+            // (12,8) and (11,9) are both free, so B will pick one immediately
 
             const result = negotiateDisplacement(
                 requester,

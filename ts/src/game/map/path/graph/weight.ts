@@ -15,13 +15,13 @@ import {
 } from "../../../component/traversalComponent.ts";
 
 /**
- * Returns true if a tile can be entered during movement — i.e. the tile exists
+ * Returns true if a tile can be entered during movement, meaning the tile exists
  * and is not occupied by a solid structure. Mirrors the rules applied by the
  * movement weight modifier so that behaviour planning and pathfinding agree.
  *
  * Clearable obstacles (trees) remain "available": pathfinding may route through
  * them and the mover chops them down on arrival. Permanent obstacles (stone and
- * other infinite nodes) are treated as walls — they are never destroyed to make
+ * other infinite nodes) are treated as walls. They are never destroyed to make
  * way, so a path must route around them.
  */
 export function isTileAvailable(point: Point, root: Entity): boolean {

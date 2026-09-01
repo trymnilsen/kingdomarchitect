@@ -7,7 +7,7 @@ import type { InteractionHandler } from "./interaction/handler/interactionHandle
 /**
  * Routes raw touch gestures between the interaction handler and the camera.
  * A gesture that starts on the UI (or a modal) belongs to the interaction
- * handler for its whole lifetime; otherwise dragging pans the camera. Lives
+ * handler for its whole lifetime. Otherwise dragging pans the camera. Lives
  * outside Game so tests can drive the exact same routing headlessly.
  *
  * Discrete gestures (tap down/up/cancel) call {@link render} for an immediate

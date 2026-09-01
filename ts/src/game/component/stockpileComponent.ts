@@ -12,7 +12,7 @@ export type PreferredAmount = {
  * Marker component for buildings that act as stockpiles.
  * Stockpiles store settlement resources that workers can fetch from.
  * The preferredAmounts list signals the logistics system how much of each
- * item this stockpile wants to hold — used by the restock behavior.
+ * item this stockpile wants to hold, used by the restock behavior.
  */
 export type StockpileComponent = {
     id: typeof StockpileComponentId;

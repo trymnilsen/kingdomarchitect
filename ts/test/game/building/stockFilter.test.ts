@@ -63,7 +63,7 @@ describe("applyStockPredicates", () => {
             match: (entry) => entry.item.id === woodResourceItem.id,
         };
 
-        // Equipment AND wood is unsatisfiable — no entry is both.
+        // Equipment AND wood is unsatisfiable, since no entry is both.
         assert.deepStrictEqual(
             applyStockPredicates(
                 [sword, wood],

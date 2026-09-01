@@ -1,4 +1,4 @@
-import type { BehaviorActionData } from "../../behavior/actions/ActionData.ts";
+import type { BehaviorActionData } from "../../behavior/actions/actionData.ts";
 import { BuildingComponentId } from "../../component/buildingComponent.ts";
 import {
     getInventoryItem,

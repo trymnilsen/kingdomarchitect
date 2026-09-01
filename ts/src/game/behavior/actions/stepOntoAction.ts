@@ -2,16 +2,16 @@ import { isPointAdjacentTo, pointEquals } from "../../../common/point.ts";
 import { log } from "../../../common/logging/logger.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { applyStep } from "../../job/movementHelper.ts";
-import { ActionComplete, type ActionResult } from "./Action.ts";
+import { ActionComplete, type ActionResult } from "./action.ts";
 
 /**
  * Move directly onto a target entity's tile from an adjacent tile.
  *
  * Buildings stay impassable in the pathfinding graph (weight 100), so a plain
  * moveTo can only ever stop a worker *beside* a building. This action performs
- * the single, deliberate final step onto the building's own tile — the one place
- * the impassable-tile rule is intentionally bypassed — so the worker can craft,
- * operate, or sleep while standing on top of it instead of clogging a corridor.
+ * the final step onto the building's own tile, the one place the impassable-tile
+ * rule is bypassed. The worker can then craft, operate, or sleep while standing
+ * on top of it without clogging a corridor.
  *
  * The planner is responsible for emitting a `moveTo` with `stopAdjacent: "cardinal"`
  * immediately before this action, so the worker is already adjacent when it runs.

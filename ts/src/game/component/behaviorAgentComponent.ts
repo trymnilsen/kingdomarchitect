@@ -1,6 +1,6 @@
 import type { Point } from "../../common/point.ts";
 import type { Entity } from "../entity/entity.ts";
-import type { BehaviorActionData } from "../behavior/actions/ActionData.ts";
+import type { BehaviorActionData } from "../behavior/actions/actionData.ts";
 
 export const BehaviorAgentComponentId = "behavioragent";
 
@@ -65,10 +65,10 @@ export interface BehaviorAgentComponent {
     actionQueue: BehaviorActionData[];
     /**
      * Planner memory for replan hysteresis (anti-thrashing): the behavior that
-     * receives the REPLAN_THRESHOLD bonus on the next selection — normally
+     * receives the REPLAN_THRESHOLD bonus on the next selection, normally
      * whatever the planner last picked. Unlike currentBehaviorName, this survives
      * a plan completing normally, so the just-finished behavior is still favored
-     * on the next replan; it is reset to null only when a plan ends abnormally
+     * on the next replan. It is reset to null only when a plan ends abnormally
      * (failure / no valid behavior), matching the pre-split behavior where those
      * paths dropped the bonus. Never read by the UI. Wrapped in an object so the
      * field name documents its purpose and it can carry more later if needed.

@@ -118,7 +118,7 @@ describe("clearObstacleAction", () => {
 
     it("refuses to clear a permanent obstacle (infinite node)", () => {
         const { root, worker, resource } = createScene();
-        // Replace the tree with stone — an infinite node that must never be
+        // Replace the tree with stone, an infinite node that must never be
         // destroyed to clear a path.
         resource.setEcsComponent(createResourceComponent("stone1"));
         resource.getEcsComponent(HealthComponentId)!.currentHp = 5;

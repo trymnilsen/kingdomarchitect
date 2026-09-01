@@ -52,7 +52,7 @@ export function drawSelectionOverlays(
 
 /**
  * Draw the job relationships for the selected entity, derived live from the job
- * queue each frame. A worker shows a line to the job it is performing; an entity
+ * queue each frame. A worker shows a line to the job it is performing. An entity
  * that is the target of work shows a line to whoever claimed it, or an amber box
  * when the work is queued but unclaimed.
  */

@@ -48,7 +48,7 @@ describe("world state replication", () => {
         }
 
         // The camp chunk starts undiscovered but its ground must still be
-        // replicated — its entities are
+        // replicated, because its entities are
         const camps = root.queryComponents(GoblinCampComponentId);
         const campEntity = [...camps.keys()][0];
         const campChunk = getChunkPosition(
@@ -96,7 +96,7 @@ describe("world state replication", () => {
             buildWorldStateMessage(root, "player", 0),
         );
 
-        // The camp chunk is replicated but undiscovered; discovering a tile
+        // The camp chunk is replicated but undiscovered. Discovering a tile
         // in it later resends its volume as a fresh object instance
         const camps = root.queryComponents(GoblinCampComponentId);
         const campEntity = [...camps.keys()][0];

@@ -23,7 +23,7 @@ import {
     getTopThreat,
     ThreatMapComponentId,
 } from "../../../src/game/component/threatMapComponent.ts";
-import { BehaviorAgentComponentId } from "../../../src/game/component/BehaviorAgentComponent.ts";
+import { BehaviorAgentComponentId } from "../../../src/game/component/behaviorAgentComponent.ts";
 import { LightSourceComponentId } from "../../../src/game/component/lightSourceComponent.ts";
 import { WatchComponentId } from "../../../src/game/component/watchComponent.ts";
 import {

@@ -7,7 +7,7 @@ import { worldGenerationSystem } from "../game/system/worldGenerationSystem.ts";
 import { EcsWorld } from "../ecs/ecsWorld.ts";
 import { createRootEntity } from "../game/rootFactory.ts";
 import { hungerSystem } from "../game/system/hungerSystem.ts";
-import { createBehaviorSystem } from "../game/behavior/systems/BehaviorSystem.ts";
+import { createBehaviorSystem } from "../game/behavior/systems/behaviorSystem.ts";
 import { createBehaviorResolver } from "../game/behavior/behaviorResolver.ts";
 import { warmthSystem } from "../game/system/warmthSystem.ts";
 import { goblinCampSystem } from "../game/system/goblinCampSystem.ts";

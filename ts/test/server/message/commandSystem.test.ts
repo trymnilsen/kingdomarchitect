@@ -55,7 +55,7 @@ import {
 import {
     createBehaviorAgentComponent,
     BehaviorAgentComponentId,
-} from "../../../src/game/component/BehaviorAgentComponent.ts";
+} from "../../../src/game/component/behaviorAgentComponent.ts";
 
 import { CollectItemJob } from "../../../src/game/job/collectItemJob.ts";
 import { isTargetOfJob } from "../../../src/game/job/job.ts";
@@ -187,7 +187,7 @@ describe("commandSystem", () => {
 
             system.onGameMessage?.(root, message);
 
-            // entityB's job is now first; nothing was added or removed.
+            // entityB's job is now first. Nothing was added or removed.
             const after =
                 playerKingdom.requireEcsComponent(JobQueueComponentId);
             assert.strictEqual(after.jobs.length, 2);

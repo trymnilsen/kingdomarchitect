@@ -32,7 +32,7 @@ describe("TypedEvent", () => {
         handleA.dispose();
         event.publish(new SampleEvent(1));
 
-        // The disposed listener must not fire; the other one must still fire.
+        // The disposed listener must not fire. The other one must still fire.
         // Guards against the bug where removeListener wiped every subscription.
         assert.strictEqual(a, 0);
         assert.strictEqual(b, 1);

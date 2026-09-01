@@ -4,7 +4,7 @@ import { Entity } from "../../../../src/game/entity/entity.ts";
 import {
     createBehaviorAgentComponent,
     getBehaviorAgent,
-} from "../../../../src/game/component/BehaviorAgentComponent.ts";
+} from "../../../../src/game/component/behaviorAgentComponent.ts";
 import {
     MovementStaminaComponentId,
     createMovementStaminaComponent,

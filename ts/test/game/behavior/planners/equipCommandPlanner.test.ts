@@ -23,7 +23,7 @@ import {
 } from "../../../../src/data/inventory/items/equipment.ts";
 import { woodResourceItem } from "../../../../src/data/inventory/items/resources.ts";
 import { createMinimalWorld } from "../../testWorld.ts";
-import type { BehaviorActionData } from "../../../../src/game/behavior/actions/ActionData.ts";
+import type { BehaviorActionData } from "../../../../src/game/behavior/actions/actionData.ts";
 
 type ActionType = BehaviorActionData["type"];
 
@@ -55,7 +55,7 @@ function actionTypes(actions: BehaviorActionData[]): ActionType[] {
 }
 
 describe("equipCommandPlanner", () => {
-    describe("matrix: held state × slot occupancy", () => {
+    describe("matrix: held state by slot occupancy", () => {
         it("held empty + slot empty → fetch + equip (no displacement)", () => {
             const { root, worker } = createScene();
             const actions = planEquipCommand(root, worker, {

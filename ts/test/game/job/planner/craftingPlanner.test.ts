@@ -170,7 +170,7 @@ describe("craftingPlanner", () => {
             addJob(queue, job);
 
             // Holding flax: not a planks input and not a planks output, so the
-            // planner must drop it before fetching wood — but it can't.
+            // planner must drop it before fetching wood, but it can't.
             const held = worker.requireEcsComponent(HeldItemComponentId);
             held.item = flaxResourceItem;
             held.amount = 1;

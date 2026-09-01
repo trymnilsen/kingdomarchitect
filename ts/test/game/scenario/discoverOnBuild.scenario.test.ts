@@ -32,7 +32,7 @@ describe("discover on build", () => {
         );
 
         // Four tiles east sits exactly on the dim-radius edge (distSq 16 == dim
-        // radius squared) yet is Manhattan distance 4 — far outside the building's
+        // radius squared) yet is Manhattan distance 4, far outside the building's
         // vision reach of 1. Discovering it proves the light footprint, not reach,
         // drove discovery.
         assert.ok(
@@ -41,7 +41,7 @@ describe("discover on build", () => {
         );
 
         // One tile further is unlit (distSq 25 > 16) and still out of reach, so it
-        // must stay undiscovered — the discovered footprint matches the light and
+        // must stay undiscovered, so the discovered footprint matches the light and
         // nothing beyond it.
         assert.ok(
             !hasDiscoveredTile(worldDiscovery, "player", { x: 25, y: 16 }),

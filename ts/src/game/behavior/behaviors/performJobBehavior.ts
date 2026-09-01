@@ -4,8 +4,8 @@ import type { Entity } from "../../entity/entity.ts";
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import type { JobQueueComponent } from "../../component/jobQueueComponent.ts";
 import type { Jobs } from "../../job/job.ts";
-import type { BehaviorActionData } from "../actions/ActionData.ts";
-import type { Behavior } from "./Behavior.ts";
+import type { BehaviorActionData } from "../actions/actionData.ts";
+import type { Behavior } from "./behavior.ts";
 import {
     canExecuteBuildJob,
     type BuildBuildingJob,
@@ -57,7 +57,7 @@ type BuildJobValidator = (
  * @param claimRequiresEmptyHand When true, a worker may not claim a new job
  *   while carrying something. It must deposit its load (via DepositHeldBehavior)
  *   first. This keeps workers from grabbing more work and panic-dropping their
- *   load on the ground. Player workers opt in; goblins leave it off (default)
+ *   load on the ground. Player workers opt in. Goblins leave it off (default)
  *   because they have no deposit behavior and would otherwise be stranded
  *   holding gathered materials forever.
  */
@@ -247,7 +247,7 @@ function claimNextPlannableJob(
     for (const candidate of candidates) {
         const job = candidate.job;
         // An earlier candidate's planner may have retired this job or another
-        // worker's bookkeeping may have changed it; skip anything that is no
+        // worker's bookkeeping may have changed it. Skip anything that is no
         // longer freely claimable.
         if (job.claimedBy !== undefined || !jobQueue.jobs.includes(job)) {
             continue;
@@ -276,7 +276,7 @@ function claimNextPlannableJob(
  * Whether this worker can take this job right now. isValid() and expand() both
  * ask here, so the two cannot disagree about what work exists. The check is
  * cheap and cannot know what the planners know, so a job that passes it may
- * still plan to nothing; expand() then tries the next candidate, and the
+ * still plan to nothing. expand() then tries the next candidate, and the
  * behavior system falls through to a lower-utility behavior if none plan.
  *
  * The target-position check comes first so a stale job, one whose target entity

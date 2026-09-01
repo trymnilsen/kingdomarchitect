@@ -1,5 +1,5 @@
 import type { Point } from "../../../common/point.ts";
-import { getBehaviorAgent } from "../../component/BehaviorAgentComponent.ts";
+import { getBehaviorAgent } from "../../component/behaviorAgentComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 
 /**

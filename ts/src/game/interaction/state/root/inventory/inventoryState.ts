@@ -25,8 +25,8 @@ type EquipSlot = "primary" | "secondary";
 
 /**
  * Shows aggregated stock for a settlement. The view is a read-only projection
- * over the stockpiles selected by the current filter — selecting a building
- * opens its own stock (a dismissable scope chip); dismissing that chip broadens
+ * over the stockpiles selected by the current filter. Selecting a building
+ * opens its own stock (a dismissable scope chip). Dismissing that chip broadens
  * to the whole kingdom. No items are mutated here.
  */
 export class InventoryState extends InteractionState {
@@ -61,7 +61,7 @@ export class InventoryState extends InteractionState {
     override getView(): ComponentDescriptor | null {
         // Recompute the aggregate every render so the view is a live mirror of
         // stock that changes each tick. The stockpile set is resolved once per
-        // render; see stockAggregate for why this single sweep is the whole cost.
+        // render. See stockAggregate for why this single sweep is the whole cost.
         const sources = resolveStockSources(this._filter.scope, this._anchor);
         const aggregate = aggregateStock(sources);
         const entries = applyStockPredicates(
@@ -74,7 +74,7 @@ export class InventoryState extends InteractionState {
             chips: this.buildChips(),
             selectedKey: this._selectedKey,
             // A single-inventory scope is one box, so per-location jump targets
-            // are pointless — the player is already looking at the box.
+            // are pointless, since the player is already looking at the box.
             showSources: this._filter.scope.kind !== "single",
             onSelect: (key) => {
                 this._selectedKey = key;
@@ -102,7 +102,7 @@ export class InventoryState extends InteractionState {
             return;
         }
 
-        // Browse mode: item-first flow — pick the slot, then tap a unit.
+        // Browse mode: item-first flow, so pick the slot, then tap a unit.
         if (!isEquippableItem(entry.item)) {
             return;
         }
@@ -114,7 +114,7 @@ export class InventoryState extends InteractionState {
     /**
      * Equip the chosen item into the worker's slot, fetching it from the
      * nearest stockpile that holds it. The worker (the anchor) walks to that
-     * source, picks one up, and equips — the whole modal chain then closes.
+     * source, picks one up, and equips. The whole modal chain then closes.
      */
     private equipIntoSlot(entry: StockEntry, slot: EquipSlot): void {
         const source = nearestSource(entry, this._anchor.worldPosition);

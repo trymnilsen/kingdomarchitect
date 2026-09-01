@@ -62,7 +62,7 @@ describe("exhaustionEffect", () => {
     });
 
     describe("executor sets correct modifiers for exhaustion levels", () => {
-        it("level 1 — sets might -15% and wit -1 flat", () => {
+        it("level 1 sets might -15% and wit -1 flat", () => {
             const { entity, activeEffect } = makeTestEntity(1);
             exhaustionEffectExecutor.execute(entity, activeEffect, 1);
             assert.deepStrictEqual(activeEffect.modifiers, {
@@ -71,7 +71,7 @@ describe("exhaustionEffect", () => {
             });
         });
 
-        it("level 2 — sets might -30%, wit -20% flat -1, presence -1", () => {
+        it("level 2 sets might -30%, wit -20% flat -1, presence -1", () => {
             const { entity, activeEffect } = makeTestEntity(2);
             exhaustionEffectExecutor.execute(entity, activeEffect, 1);
             assert.deepStrictEqual(activeEffect.modifiers, {
@@ -81,7 +81,7 @@ describe("exhaustionEffect", () => {
             });
         });
 
-        it("level 3 — sets severe penalties across all four stats", () => {
+        it("level 3 sets severe penalties across all four stats", () => {
             const { entity, activeEffect } = makeTestEntity(3);
             exhaustionEffectExecutor.execute(entity, activeEffect, 1);
             assert.deepStrictEqual(activeEffect.modifiers, {
@@ -92,7 +92,7 @@ describe("exhaustionEffect", () => {
             });
         });
 
-        it("level 4 — sets maximum penalties", () => {
+        it("level 4 sets maximum penalties", () => {
             const { entity, activeEffect } = makeTestEntity(4);
             exhaustionEffectExecutor.execute(entity, activeEffect, 1);
             assert.deepStrictEqual(activeEffect.modifiers, {

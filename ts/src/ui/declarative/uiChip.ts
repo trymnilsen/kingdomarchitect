@@ -24,8 +24,8 @@ const chipTextStyle = {
 
 /**
  * A small pill showing a filter label, with an optional dismiss affordance.
- * Whether the dismiss is shown is driven entirely by the `dismissable` prop —
- * the chip itself does not decide which filters can be removed.
+ * Whether the dismiss is shown is driven entirely by the `dismissable` prop.
+ * The chip itself does not decide which filters can be removed.
  */
 export const uiChip = createComponent<UiChipProps>(
     ({ props }) => {

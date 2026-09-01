@@ -72,7 +72,7 @@ describe("visitChildren", () => {
         assert.deepStrictEqual(visited, bfsOrder);
 
         // Depth must be non-decreasing across the visit order. This is the
-        // invariant firstChildWhere / entityWithId rely on; a silent switch to
+        // invariant firstChildWhere / entityWithId rely on. A silent switch to
         // DFS would break "first match" semantics without changing the set.
         let previousDepth = -1;
         for (const id of visited) {
@@ -114,7 +114,7 @@ describe("visitChildren", () => {
             (entity) => entity.id === "a",
         );
 
-        // root is visited and enqueues a, b, c; visiting a returns true and
+        // root is visited and enqueues a, b, c. Visiting a returns true and
         // breaks before b, c or any depth-2 node is touched.
         assert.deepStrictEqual(visited, ["root", "a"]);
     });
@@ -126,7 +126,7 @@ describe("visitChildren", () => {
             (entity) => entity.id === "a2",
         );
 
-        // Everything up to a2 in BFS order is visited; b1 (queued after a2)
+        // Everything up to a2 in BFS order is visited. b1 (queued after a2)
         // is never reached.
         assert.deepStrictEqual(visited, ["root", "a", "b", "c", "a1", "a2"]);
         assert.ok(!visited.includes("b1"));

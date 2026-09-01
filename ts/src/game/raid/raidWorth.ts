@@ -4,7 +4,7 @@ import { stockPile } from "../../data/building/wood/storage.ts";
 /**
  * Raid value used for a player building that does not declare one. Buildings
  * with an explicit raidValue of 0 (walls, gates, roads) are never chosen as
- * objectives — they are only broken through as obstacles by the siege path.
+ * objectives. They are only broken through as obstacles by the siege path.
  */
 export const DEFAULT_RAID_VALUE = 20;
 

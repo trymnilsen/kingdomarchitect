@@ -9,7 +9,7 @@ import { woodResourceItem } from "../../../src/data/inventory/items/resources.ts
 import { planksRecipe } from "../../../src/data/crafting/recipes/carpenterRecipes.ts";
 import { carpenter } from "../../../src/data/building/wood/carpenter.ts";
 import { createCraftingJob } from "../../../src/game/job/craftingJob.ts";
-import { getBehaviorAgent } from "../../../src/game/component/BehaviorAgentComponent.ts";
+import { getBehaviorAgent } from "../../../src/game/component/behaviorAgentComponent.ts";
 
 describe("craftAndHaul scenario tests", () => {
     it("crafted output ends up in the worker's held slot", () => {
@@ -17,7 +17,7 @@ describe("craftAndHaul scenario tests", () => {
          * Worker at (10, 8). Carpenter at (11, 8) starts with 4 wood already in
          * its inventory (the held-item refactor stages inputs in the building,
          * not the worker). Queue a planks crafting job. After the worker
-         * crafts, the planks land in held — not in the building.
+         * crafts, the planks land in held, not in the building.
          */
         const harness = new ScenarioHarness();
         const building = harness.addCraftingBuilding(

@@ -7,7 +7,7 @@ import { codeDefinedRecipes } from "./characterAnimations.ts";
  * compiled code-defined animations.
  *
  * Source animations pass through unchanged. Code-defined recipes are compiled
- * against the source animations — recipe-as-base references are resolved
+ * against the source animations. Recipe-as-base references are resolved
  * recursively by the compiler, so declaration order here does not matter.
  *
  * @param sourceAnimations The animations from characterPartFrames (generated)

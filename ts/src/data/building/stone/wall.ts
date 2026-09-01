@@ -7,7 +7,7 @@ export const stoneWall = {
     icon: spriteRefs.stone_wood_walls,
     name: "Stone wall",
     scale: 1,
-    // Never a raid objective — broken through as an obstacle by the siege path.
+    // Never a raid objective, broken through as an obstacle by the siege path.
     raidValue: 0,
     requirements: {
         materials: {

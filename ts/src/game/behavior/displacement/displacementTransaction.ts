@@ -2,7 +2,7 @@ import type { Point } from "../../../common/point.ts";
 import {
     BehaviorAgentComponentId,
     requestReplan,
-} from "../../component/BehaviorAgentComponent.ts";
+} from "../../component/behaviorAgentComponent.ts";
 import { spendEntityEnergy } from "../../component/energyComponent.ts";
 import {
     DirectionComponentId,
@@ -178,7 +178,7 @@ function commitCycle(
             // Both members stepped into a tile they were already heading for, so
             // each just keeps following its existing route. Two consequences:
             //   - No replan. Replanning would re-evaluate behaviour and could make a
-            //     worker abandon its goal mid-corridor; there's no reason to, since
+            //     worker abandon its goal mid-corridor. There's no reason to, since
             //     its destination hasn't changed. We advance its cached path instead.
             //   - It pays energy (spendEnergy=true): a swap step is real travel, no
             //     cheaper than a normal step. The one-move-per-tick guard in

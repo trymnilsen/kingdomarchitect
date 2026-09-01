@@ -4,7 +4,7 @@ import { TOTAL_CYCLE_TICKS } from "./dayComponent.ts";
 /**
  * Marks an entity as a pile of items lying loose in the world, as opposed to a
  * collectable held by a building. A pile holds exactly one stack of one item
- * type; several stacks on the same tile are several entities.
+ * type. Several stacks on the same tile are several entities.
  */
 export type GroundItemComponent = {
     id: typeof GroundItemComponentId;

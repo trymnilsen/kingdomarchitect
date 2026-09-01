@@ -7,7 +7,7 @@ import {
 } from "../../component/hungerComponent.ts";
 import { markStatsDirty } from "../../component/statsComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
-import { ActionComplete, type ActionResult } from "./Action.ts";
+import { ActionComplete, type ActionResult } from "./action.ts";
 
 export type EatFromEquipmentActionData = {
     type: "eatFromEquipment";
@@ -19,7 +19,7 @@ const HUNGER_REDUCTION = 30;
 /**
  * Eat a food item out of an equipment slot. Equipment slots are single-
  * unit (no quantity field), so consuming a slot food clears the slot
- * regardless of whether the food id stacks elsewhere — equipping a single
+ * regardless of whether the food id stacks elsewhere. Equipping a single
  * loaf of bread is one meal, no more.
  */
 export function executeEatFromEquipmentAction(

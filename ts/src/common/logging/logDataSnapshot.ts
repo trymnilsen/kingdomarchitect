@@ -1,6 +1,6 @@
 /**
  * Maximum object nesting depth retained when snapshotting log data. Live game
- * objects such as entities form deep trees; capping the depth keeps a stray
+ * objects such as entities form deep trees. Capping the depth keeps a stray
  * entity log from inflating a single buffered entry into the whole world.
  */
 const maxDepth = 8;

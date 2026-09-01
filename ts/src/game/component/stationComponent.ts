@@ -3,7 +3,7 @@
  * provide a passive effect while it is occupied (the stone tower's searchlight).
  *
  * The component holds only the player-set `priority`. `Off` means inert, with no
- * guard pull; otherwise a free guard takes the highest-priority enabled station.
+ * guard pull. Otherwise a free guard takes the highest-priority enabled station.
  *
  * Who is manning a station is derived from standing on its tile rather than
  * stored here, so nothing dangles when a worker dies or despawns. The effect

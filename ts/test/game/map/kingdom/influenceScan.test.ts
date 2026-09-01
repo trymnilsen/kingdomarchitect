@@ -57,7 +57,7 @@ describe("influenceScan", () => {
             );
         }
 
-        // Past the cutoff distance the BFS stops — influence is 0
+        // Past the cutoff distance the BFS stops, so influence is 0
         const farInfluence = computeInfluenceAtChunk(h.root, positions[18]);
         assert.strictEqual(
             farInfluence,
@@ -139,8 +139,8 @@ describe("influenceScan", () => {
         h.addChunk(3, 8, h.createVolume("plains", 4)); // V1, kingdom here
         h.addChunk(4, 8, h.createVolume("plains", 4)); // V2
         h.addChunk(5, 8, h.createVolume("plains", 4)); // V3
-        // (6,8) is unregistered — gap
-        h.addChunk(7, 8, h.createVolume("plains", 4)); // V4 — unreachable
+        // (6,8) is unregistered, a gap
+        h.addChunk(7, 8, h.createVolume("plains", 4)); // V4, unreachable
 
         h.placeKingdom({ x: 3, y: 8 }, KingdomType.Npc);
 
@@ -160,7 +160,7 @@ describe("influenceScan", () => {
         const kingdomPos = { x: 7, y: 10 };
         const candidatePos = { x: 10, y: 10 };
 
-        // Short path: direct horizontal chain — 3 volume hops
+        // Short path: direct horizontal chain, 3 volume hops
         const hShort = new KingdomSpawnTestHarness();
         for (let x = 7; x <= 10; x++) {
             hShort.addChunk(x, 10, hShort.createVolume("plains", 4));
@@ -171,7 +171,7 @@ describe("influenceScan", () => {
             candidatePos,
         );
 
-        // Long path: L-shape — no direct route, 7 volume hops
+        // Long path: L-shape, no direct route, 7 volume hops
         // (7,10)→(7,11)→(7,12)→(8,12)→(9,12)→(10,12)→(10,11)→(10,10)
         const hLong = new KingdomSpawnTestHarness();
         for (let y = 10; y <= 12; y++) {
@@ -223,7 +223,7 @@ describe("influenceScan", () => {
         const kingdomPos = { x: 6, y: 9 };
         const h = new KingdomSpawnTestHarness();
 
-        // 5×5 grid of single-chunk volumes around kingdom
+        // 5x5 grid of single-chunk volumes around kingdom
         for (let x = 4; x <= 8; x++) {
             for (let y = 7; y <= 11; y++) {
                 h.addChunk(x, y, h.createVolume("plains", 4));

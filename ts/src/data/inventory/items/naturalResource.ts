@@ -268,7 +268,7 @@ export function getResourceById(id: string): NaturalResource | undefined {
 }
 
 /**
- * Returns true if the resource blocks movement — trees, stone, cacti, and similar
+ * Returns true if the resource blocks movement: trees, stone, cacti, and similar
  * large objects. Lifecycle "Finite" (trees) and "Infinite" (stone) mark solid
  * obstacles. Regrowable and removable resources (grass, flowers, mushrooms) are
  * treated as passable.
@@ -282,7 +282,7 @@ export function isImpassableResource(resourceId: string): boolean {
 
 /**
  * A clearable obstacle is an impassable resource that is removed from the world
- * when destroyed — i.e. "Finite" nodes like trees. A worker may chop through one
+ * when destroyed, meaning "Finite" nodes like trees. A worker may chop through one
  * to clear a path, after which the tile is permanently passable.
  */
 export function isClearableObstacle(resourceId: string): boolean {
@@ -293,8 +293,8 @@ export function isClearableObstacle(resourceId: string): boolean {
 
 /**
  * A permanent obstacle is an impassable resource that is never removed by
- * clearing — i.e. "Infinite" nodes like stone. Pathfinding must route around
- * these; a worker only ever approaches them to mine, never to pass through.
+ * clearing, meaning "Infinite" nodes like stone. Pathfinding must route around
+ * these. A worker only ever approaches them to mine, never to pass through.
  */
 export function isPermanentObstacle(resourceId: string): boolean {
     return isImpassableResource(resourceId) && !isClearableObstacle(resourceId);

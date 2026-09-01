@@ -33,7 +33,7 @@ export const largeDiamondPattern: Point[] = generateDiamondPattern(5);
 /**
  * Builds the diamond of tile offsets reachable within `radius` tiles (Manhattan),
  * centred on the origin. This is the radius-first wrapper over
- * {@link generateDiamondPattern}, which takes a diameter; expressing it as a
+ * {@link generateDiamondPattern}, which takes a diameter. Expressing it as a
  * radius keeps callers in the same units as vision-reach values.
  *
  * Kept as its own named function (no memoization) so that if pattern generation

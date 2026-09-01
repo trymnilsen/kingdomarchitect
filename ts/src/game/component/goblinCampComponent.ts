@@ -9,7 +9,7 @@ export type GoblinCampComponent = {
     maxPopulation: number;
     /**
      * Kingdom score this camp waits for before its next raid. 0 means it has not
-     * been seeded yet; formGoblinRaid seeds it on the camp's first evaluation,
+     * been seeded yet. formGoblinRaid seeds it on the camp's first evaluation,
      * since the seed depends on where the camp ended up relative to the kingdom.
      */
     nextRaidThreshold: number;

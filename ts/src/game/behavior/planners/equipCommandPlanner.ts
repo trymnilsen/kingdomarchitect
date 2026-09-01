@@ -4,7 +4,7 @@ import { GroundItemComponentId } from "../../component/groundItemComponent.ts";
 import { HeldItemComponentId } from "../../component/heldItemComponent.ts";
 import { StockpileComponentId } from "../../component/stockpileComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
-import type { BehaviorActionData } from "../actions/ActionData.ts";
+import type { BehaviorActionData } from "../actions/actionData.ts";
 import { findDropPosition } from "../dropItem.ts";
 
 export type EquipPlannerCommand = {
@@ -22,7 +22,7 @@ export type EquipPlannerCommand = {
  *  2. If the target slot is already occupied, drop the slot item directly
  *     to the ground (using dropFromSlot, never passing through held).
  *
- * Returns an empty plan if the source entity is gone — caller treats this
+ * Returns an empty plan if the source entity is gone. The caller treats this
  * as a failed command and clears it.
  */
 export function planEquipCommand(
@@ -61,7 +61,7 @@ export function planEquipCommand(
         });
     }
 
-    // 2. Evict target slot if occupied — drop directly from slot, never
+    // 2. Evict target slot if occupied. Drop directly from slot, never
     //    pass through held (held may now contain the source item id).
     const slotItem = equipment.slots[command.slot];
     if (slotItem) {

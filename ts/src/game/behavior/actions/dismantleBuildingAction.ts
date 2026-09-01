@@ -8,7 +8,7 @@ import { SpriteComponentId } from "../../component/spriteComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { finishDismantle } from "../../job/dismantleBuildingJob.ts";
 import { completeClaimedJob } from "../../job/jobLifecycle.ts";
-import { ActionComplete, ActionRunning, type ActionResult } from "./Action.ts";
+import { ActionComplete, ActionRunning, type ActionResult } from "./action.ts";
 
 export type DismantleBuildingActionData = {
     type: "dismantleBuilding";
@@ -16,7 +16,7 @@ export type DismantleBuildingActionData = {
 };
 
 /**
- * Dismantle a building by draining its HealthComponent — the reverse of
+ * Dismantle a building by draining its HealthComponent, the reverse of
  * constructBuildingAction. Complete when hp <= 0, at which point finishDismantle
  * scatters materials, evicts occupants, clears jobs, and removes the entity.
  * Assumes the worker is already adjacent (moveTo should have run first).
@@ -30,7 +30,7 @@ export function executeDismantleBuildingAction(
     const buildingEntity = root.findEntity(action.entityId);
 
     if (!buildingEntity) {
-        // Already removed (e.g. cancelled out from under us) — replan.
+        // Already removed (e.g. cancelled out from under us), so replan.
         return {
             kind: "failed",
             cause: { type: "targetGone", entityId: action.entityId },

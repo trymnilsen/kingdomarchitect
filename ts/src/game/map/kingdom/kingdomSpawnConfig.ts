@@ -5,7 +5,7 @@ export const KingdomSpawnConfig = {
     /** Minimum volume maxSize to be eligible for kingdom spawning */
     minimumVolumeSize: 4,
 
-    /** Biome suitability weights — multiplied against base probability */
+    /** Biome suitability weights, multiplied against base probability */
     biomeSuitability: {
         plains: 1.3,
         forrest: 0.9,
@@ -22,7 +22,7 @@ export const KingdomSpawnConfig = {
         floor: 0.4,
         /** Maximum multiplier (late game) */
         ceiling: 1.2,
-        /** Scaling divisor for the log curve — higher = slower ramp */
+        /** Scaling divisor for the log curve, higher = slower ramp */
         scaleDivisor: 1000,
     } as const,
 
@@ -38,7 +38,7 @@ export const KingdomSpawnConfig = {
             [1]: 10.0, // KingdomType.Npc
             [2]: 3.0, // KingdomType.Goblin
         } as const,
-        /** Fraction of influence lost per volume boundary crossing (0–1) */
+        /** Fraction of influence lost per volume boundary crossing (0 to 1) */
         decayRate: 0.35,
         /** Influence values below this are discarded (stops flood fill) */
         cutoffThreshold: 0.1,

@@ -2,7 +2,7 @@ import { spriteRefs } from "../../../../asset/sprite.ts";
 import { getCropDefinition } from "../../../../data/crop/cropDefinitions.ts";
 import { getResourceById } from "../../../../data/inventory/items/naturalResource.ts";
 import { getRoleDefinition } from "../../../../data/role/roleDefinitions.ts";
-import { BehaviorAgentComponentId } from "../../../component/BehaviorAgentComponent.ts";
+import { BehaviorAgentComponentId } from "../../../component/behaviorAgentComponent.ts";
 import { BuildingComponentId } from "../../../component/buildingComponent.ts";
 import {
     CollectableComponentId,

@@ -12,8 +12,8 @@ import {
     isManningStation,
     stationOccupant,
 } from "../../component/stationQuery.ts";
-import type { BehaviorActionData } from "../actions/ActionData.ts";
-import type { Behavior } from "./Behavior.ts";
+import type { BehaviorActionData } from "../actions/actionData.ts";
+import type { Behavior } from "./behavior.ts";
 
 /**
  * Utility for *walking to* a tower. Below survival/combat (90+) so a guard still
@@ -29,14 +29,14 @@ const GARRISON_UTILITY = 40;
  * simply standing on the tile.
  *
  * There is no "hold" action. Once on the post the behavior has nothing left to do,
- * so it expands to an empty plan — the worker idles in place. An empty queue makes
+ * so it expands to an empty plan and the worker idles in place. An empty queue makes
  * the behavior system re-evaluate every tick, so the guard reacts promptly to needs
- * and combat; and because nothing moves it, it stays put. StepOutsideBehavior is
+ * and combat. Because nothing moves it, it stays put. StepOutsideBehavior is
  * taught (via {@link isManningStation}) to leave a manning guard alone.
  *
  * Staffing is fully stateless: occupancy is read live from {@link stationQuery}, so
  * nothing can dangle when a guard dies or despawns. This behavior owns only the
- * staffing *policy* — which free post to take.
+ * staffing *policy*, which free post to take.
  */
 export function createGarrisonBehavior(): Behavior {
     return {
@@ -47,7 +47,7 @@ export function createGarrisonBehavior(): Behavior {
             if (role?.role !== WorkerRole.Guard) {
                 return false;
             }
-            // Already manning a post → nothing to do but stay; idling there keeps
+            // Already manning a post → nothing to do but stay. Idling there keeps
             // the body on the tile (StepOutside leaves a manning guard alone).
             if (isManningStation(entity)) {
                 return false;

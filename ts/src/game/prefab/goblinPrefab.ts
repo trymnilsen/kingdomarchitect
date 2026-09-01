@@ -7,7 +7,7 @@ import {
     createSpriteComponent,
     UNIT_SPRITE_DEPTH,
 } from "../component/spriteComponent.ts";
-import { createBehaviorAgentComponent } from "../component/BehaviorAgentComponent.ts";
+import { createBehaviorAgentComponent } from "../component/behaviorAgentComponent.ts";
 import { createMovementStaminaComponent } from "../component/movementStaminaComponent.ts";
 import { createHeldItemComponent } from "../component/heldItemComponent.ts";
 import { createWarmthComponent } from "../component/warmthComponent.ts";

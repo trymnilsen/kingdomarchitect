@@ -7,7 +7,7 @@ import { dropItemAtPosition, DropMode } from "./dropItem.ts";
  *
  * Shared by the two ways a stocked building can stop existing: the player
  * dismantling it, and it being destroyed under them. Both mean the same thing
- * physically — the walls come down and what was inside ends up in the mud — so
+ * physically. The walls come down and what was inside ends up in the mud, so
  * they must not drift apart.
  *
  * The source entity is normally still in the world while this runs, so its own

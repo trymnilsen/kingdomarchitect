@@ -20,7 +20,7 @@ export type KingdomSpawnResult = {
     };
     /** Present when shouldSpawn is true. The spatial check result. */
     feasibility?: SpatialFeasibilityResult;
-    /** Present when shouldSpawn is true. How developed this kingdom starts (0–1). */
+    /** Present when shouldSpawn is true. How developed this kingdom starts (0 to 1). */
     developmentLevel?: number;
 };
 

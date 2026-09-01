@@ -41,9 +41,9 @@ export class Entity {
     /**
      * Lazily-built cache of `queryComponents` results for this entity's subtree,
      * keyed by component id. A miss runs the `visitChildren` walk once and stores
-     * the resulting map; subsequent identical queries return the same map without
+     * the resulting map. Subsequent identical queries return the same map without
      * re-walking. Invalidated by {@link invalidateQueryCache} on the entity events
-     * this entity receives (only membership changes matter — see that method).
+     * this entity receives (only membership changes matter, see that method).
      *
      * Runtime-only: it is rebuilt from the live tree and is never serialized
      * (persistence walks `_ecsComponents` and children, not this field). Only
@@ -251,7 +251,7 @@ export class Entity {
         // Keep the child's world position unchanged across the parenting:
         // recompute its local position relative to this entity and update
         // the transforms of its subtree so locals and worlds stay
-        // consistent. No transform event is bubbled — the world position
+        // consistent. No transform event is bubbled. The world position
         // did not change, and the child_added event below covers spatial
         // indexing.
         entity._localPosition = subtractPoint(
@@ -459,7 +459,7 @@ export class Entity {
             (this._queryCache ??= new Map()).set(componentId, cached);
         }
 
-        // All entries under a given id key carry that component type; the cache
+        // All entries under a given id key carry that component type. The cache
         // stores the erased `Components` union and we narrow on the way out, the
         // same cast the uncached walk used to do per entry.
         return cached as unknown as ReadonlyMap<
@@ -548,10 +548,9 @@ export class Entity {
      *    (entity → component) entry in the query cache, leaving every other
      *    cached query intact. The id cache is unaffected (no id changed).
      *  - `child_added` / `child_removed` can change many component ids and add
-     *    or remove ids, so both caches are dropped and rebuilt lazily. Dropping
-     *    rather than rebuilding here is what makes this correct against
-     *    `removeChild`, which bubbles before it detaches the child: nothing
-     *    rebuilds until the next query, by which point the child is gone.
+     *    or remove ids, so both caches are dropped and rebuilt lazily. The drop
+     *    matters for `removeChild`, which bubbles before it detaches the child.
+     *    Nothing rebuilds until the next query, and by then the child is gone.
      *
      * `component_updated` and `transform` are ignored. `updateComponent` mutates
      * in place, leaving both the reference and the membership unchanged, and

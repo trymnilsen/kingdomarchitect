@@ -7,24 +7,24 @@ import {
     getWeightAtPoint,
     isTileAvailable,
 } from "../../map/path/graph/weight.ts";
-import { ActionComplete, ActionRunning, type ActionResult } from "./Action.ts";
+import { ActionComplete, ActionRunning, type ActionResult } from "./action.ts";
 
 /**
  * Step off the building tile the worker is currently standing on, back onto a
- * free adjacent ground tile. The deliberate counterpart to {@link StepOntoActionData}.
+ * free adjacent ground tile. The explicit counterpart to {@link StepOntoActionData}.
  *
- * A plain moveTo also walks a worker off a building (A* never weights the start
- * node), but only when the *next* destination demands it. After a worker sleeps
- * in a house or operates a facility, the following behaviour can often be
- * satisfied from the building tile itself — anything that only needs to be
- * *adjacent* to its target counts the building's neighbours as adjacent — so
- * nothing pulls the worker back onto the ground and they end up working from the
- * rooftop. The StepOutsideBehavior emits this action to make leaving explicit and
- * self-healing: whenever a worker is left standing on a building with no plan that
- * keeps them there, it grounds them first.
+ * A plain moveTo also walks a worker off a building, since A* never weights the
+ * start node, but only when the next destination demands it. After a worker
+ * sleeps in a house or operates a facility, the following behaviour can often be
+ * satisfied from the building tile itself, because anything that only needs to be
+ * *adjacent* to its target counts the building's neighbours as adjacent. Nothing
+ * pulls the worker back onto the ground, and they end up working from the
+ * rooftop. StepOutsideBehavior emits this action to make leaving explicit: a
+ * worker left standing on a building with no plan that keeps them there gets
+ * grounded first.
  *
  * If every adjacent tile is blocked (other units, walls) the worker waits in
- * place — returning `running` — until a tile frees up, rather than failing.
+ * place, returning `running`, until a tile frees up. It does not fail.
  */
 export type StepOffActionData = {
     type: "stepOff";
@@ -40,7 +40,7 @@ export function executeStepOffAction(
 
     const to = findFreeAdjacentTile(from, root);
     if (!to) {
-        // Boxed in — hold position and try again next tick.
+        // Boxed in, so hold position and try again next tick.
         log.debug(`stepOff: no free adjacent tile, waiting`);
         return ActionRunning;
     }

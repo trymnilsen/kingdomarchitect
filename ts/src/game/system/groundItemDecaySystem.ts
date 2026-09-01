@@ -7,7 +7,7 @@ import {
 
 /**
  * How often the sweep looks for rotted piles. Decay is derived from each pile's
- * drop tick, so the sweep only decides when the world notices — a pile may
+ * drop tick, so the sweep only decides when the world notices. A pile may
  * linger up to this many ticks past its expiry, which at a two-day lifetime is
  * not something a player can perceive. Sweeping rarely keeps the cost off every
  * tick.

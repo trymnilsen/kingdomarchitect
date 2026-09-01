@@ -19,7 +19,7 @@ import { createHealthComponent } from "../component/healthComponent.ts";
 import { createOccupationComponent } from "../component/occupationComponent.ts";
 import { createHungerComponent } from "../component/hungerComponent.ts";
 import { createEnergyComponent } from "../component/energyComponent.ts";
-import { createBehaviorAgentComponent } from "../component/BehaviorAgentComponent.ts";
+import { createBehaviorAgentComponent } from "../component/behaviorAgentComponent.ts";
 import { createActiveEffectsComponent } from "../component/activeEffectsComponent.ts";
 import { createRoleComponent } from "../component/worker/roleComponent.ts";
 import { createMovementStaminaComponent } from "../component/movementStaminaComponent.ts";

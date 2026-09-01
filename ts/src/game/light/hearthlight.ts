@@ -9,7 +9,7 @@ import { collectLightClaims, computeLitTiles } from "./lightClaims.ts";
  *
  * There is no phase or ambient term. Daylight is the sky's light, not the
  * kingdom's, so it claims nothing and the claim set is the same at noon as at
- * midnight. Illumination is what can be seen; hearthlight is what is ours.
+ * midnight.
  *
  * `workerGlow` and the carried torch render without claiming, through their
  * definitions' `claimsHearthlight`. One is a presence affordance rather than a

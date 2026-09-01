@@ -305,7 +305,7 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
 
     /**
      * Open the stock inventory filtered to equippable items so the player can
-     * pick something to fill an empty slot; choosing an item equips it into
+     * pick something to fill an empty slot. Choosing an item equips it into
      * that slot on the worker.
      */
     private openEquipInventory(

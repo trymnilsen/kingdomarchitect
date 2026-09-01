@@ -9,7 +9,7 @@ import { goblinCampfire } from "../../data/building/goblin/goblinCampfire.ts";
 
 /**
  * Creates a goblin camp entity with an initial campfire and goblin.
- * The campfire is the permanent anchor of the camp — as long as it stands,
+ * The campfire is the permanent anchor of the camp. As long as it stands,
  * goblins will be attracted back even if all are killed.
  *
  * Camp entity structure:
@@ -19,7 +19,7 @@ import { goblinCampfire } from "../../data/building/goblin/goblinCampfire.ts";
  */
 export function goblinCampPrefab(): { camp: Entity; goblin: Entity } {
     const camp = new Entity(generateId("goblinCamp"));
-    // Start at the minimum camp size — the camp's size is driven by the player
+    // Start at the minimum camp size. The camp's size is driven by the player
     // kingdom's population and ratchets up from here, never below this floor
     // (see goblinCampSystem.growCampCap).
     camp.setEcsComponent(createGoblinCampComponent(GOBLIN_CAMP_MIN_SIZE));

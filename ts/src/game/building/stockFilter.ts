@@ -36,7 +36,7 @@ export type StockFilter = {
 
 /**
  * Filter to a single inventory, shown as a dismissable scope chip. This is how
- * selecting a building opens its own stock; dismissing the chip broadens to the
+ * selecting a building opens its own stock. Dismissing the chip broadens to the
  * kingdom-wide view.
  */
 export function singleInventoryFilter(

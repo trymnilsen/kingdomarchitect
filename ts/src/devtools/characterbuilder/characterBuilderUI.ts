@@ -12,7 +12,7 @@ import {
     createLayerPanel,
     createPartSelectionPanel,
     createPreviewPanel,
-} from "./ui/CharacterBuilderPanels.ts";
+} from "./ui/characterBuilderPanels.ts";
 import {
     EQUIPMENT_OPTIONS,
     type BodyPart,

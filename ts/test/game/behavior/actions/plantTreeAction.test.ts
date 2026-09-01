@@ -8,7 +8,7 @@ import {
     JobQueueComponentId,
 } from "../../../../src/game/component/jobQueueComponent.ts";
 import { executePlantTreeAction } from "../../../../src/game/behavior/actions/plantTreeAction.ts";
-import type { BehaviorActionData } from "../../../../src/game/behavior/actions/ActionData.ts";
+import type { BehaviorActionData } from "../../../../src/game/behavior/actions/actionData.ts";
 import { claimJobInQueue } from "../../../../src/game/job/jobLifecycle.ts";
 import { createProductionJob } from "../../../../src/game/job/productionJob.ts";
 

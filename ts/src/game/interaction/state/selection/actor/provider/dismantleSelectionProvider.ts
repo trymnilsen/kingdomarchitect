@@ -16,7 +16,7 @@ import { ConfirmMessageState } from "../../../common/confirmMessageState.ts";
 /**
  * Adds a button to every building that lets the player remove it. Labelled
  * "Cancel" while under construction (scaffolded) and "Dismantle" once built.
- * Both dispatch the same command — the server decides from live state.
+ * Both dispatch the same command. The server decides from live state.
  */
 export class DismantleSelectionProvider implements ActorSelectionProvider {
     provideButtons(

@@ -13,7 +13,7 @@ import { EnergyComponentId } from "../../../src/game/component/energyComponent.t
 import { CollectResourceJob } from "../../../src/game/job/collectResourceJob.ts";
 import { ResourceHarvestMode } from "../../../src/data/inventory/items/naturalResource.ts";
 import { woodenHouse } from "../../../src/data/building/wood/house.ts";
-import { createStepOutsideBehavior } from "../../../src/game/behavior/behaviors/StepOutsideBehavior.ts";
+import { createStepOutsideBehavior } from "../../../src/game/behavior/behaviors/stepOutsideBehavior.ts";
 import { Entity } from "../../../src/game/entity/entity.ts";
 
 /**
@@ -66,7 +66,7 @@ describe("step-outside scenario tests", () => {
         );
     });
 
-    it("does not work from the rooftop — steps off before doing an adjacent job", () => {
+    it("steps off the roof before doing an adjacent job", () => {
         const harness = new ScenarioHarness();
         harness.placeBuilding("stockpile", { x: 12, y: 10 });
         const worker = harness.addWorker("worker", { x: 12, y: 10 });
@@ -85,7 +85,7 @@ describe("step-outside scenario tests", () => {
         const health = liveTree?.getEcsComponent(HealthComponentId);
         assert.ok(
             !!health && health.currentHp === health.maxHp,
-            "tree must be at full health when the worker steps off — it must not work from the rooftop",
+            "tree must be at full health when the worker steps off, proving it does not work from the rooftop",
         );
     });
 
@@ -149,7 +149,7 @@ describe("step-outside scenario tests", () => {
             "worker should wait on the building while every side is blocked",
         );
 
-        // Free the east tile — the still-running stepOff should now resolve.
+        // Free the east tile, so the still-running stepOff should now resolve.
         harness.root.removeChild(east);
         harness.tickN(3);
 

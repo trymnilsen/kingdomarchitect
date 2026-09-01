@@ -120,7 +120,7 @@ export class LandUnlockState extends InteractionState {
         };
 
         for (const [key, chunk] of chunks) {
-            // Chunks can exist client side without being discovered; the
+            // Chunks can exist client side without being discovered. The
             // unlock ring should only grow from land the player has explored
             if (
                 visibilityMap &&

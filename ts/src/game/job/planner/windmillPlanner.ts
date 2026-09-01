@@ -1,5 +1,5 @@
 import type { Entity } from "../../entity/entity.ts";
-import type { BehaviorActionData } from "../../behavior/actions/ActionData.ts";
+import type { BehaviorActionData } from "../../behavior/actions/actionData.ts";
 import type { WindmillJob } from "../windmillJob.ts";
 import { planWorkAtBuilding } from "./planWorkAtBuilding.ts";
 

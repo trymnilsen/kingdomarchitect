@@ -2,7 +2,7 @@ import type { CityPreviewState } from "./cityPreviewState.ts";
 
 /**
  * Advance the city preview simulation by one tick.
- * Currently a stub — full planner and building placement logic
+ * Currently a stub. Full planner and building placement logic
  * will be added as those systems are built.
  */
 export function simulateTick(state: CityPreviewState): void {

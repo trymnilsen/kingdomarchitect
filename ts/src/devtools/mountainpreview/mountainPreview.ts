@@ -39,9 +39,9 @@ const START_STROKE = "#e6c83c";
 
 /**
  * Dev app for modelling mountain biome shape generation. The developer paints a
- * start guide and blocking chunks on a pannable grid and tunes the shape; the
+ * start guide and blocking chunks on a pannable grid and tunes the shape. The
  * biome is grown by best-first cost-field expansion (see generateBiomeShape).
- * Parameter changes regenerate live; editing the scenario (paint/clear) clears
+ * Parameter changes regenerate live. Editing the scenario (paint/clear) clears
  * the result and waits for Start.
  */
 export class MountainPreview extends DevApp {
@@ -81,7 +81,7 @@ export class MountainPreview extends DevApp {
             onSelectPreset: (preset: ShapePresetName) => {
                 this.state.preset = preset;
                 // Adopt the preset's noise as the new baseline so switching
-                // presets feels clean; it stays tunable from there.
+                // presets feels clean. It stays tunable from there.
                 this.state.noiseAmplitude = shapePresets[preset].noiseAmplitude;
                 this.rerun();
             },

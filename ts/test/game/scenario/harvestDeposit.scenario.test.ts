@@ -65,7 +65,7 @@ describe("harvest-deposit scenario tests", () => {
         harness.queueJob(CollectResourceJob(tree, ResourceHarvestMode.Chop));
 
         // Let it harvest, then keep ticking to confirm it neither drops the
-        // load nor thrashes — the gate keeps it from claiming further work.
+        // load nor thrashes. The gate keeps it from claiming further work.
         harness.tickUntil(() => harness.getHeldAmount(worker, "wood") > 0, 60);
         harness.tickN(10);
 

@@ -9,7 +9,7 @@ import {
 import { createGoblinUnitComponent } from "../../../../../src/game/component/goblinUnitComponent.ts";
 import { createGoblinCampComponent } from "../../../../../src/game/component/goblinCampComponent.ts";
 import { createFireSourceComponent } from "../../../../../src/game/component/fireSourceComponent.ts";
-import { createBehaviorAgentComponent } from "../../../../../src/game/component/BehaviorAgentComponent.ts";
+import { createBehaviorAgentComponent } from "../../../../../src/game/component/behaviorAgentComponent.ts";
 
 function createTestGoblin(
     warmth: number = 80,

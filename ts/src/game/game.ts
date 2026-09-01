@@ -55,9 +55,9 @@ export class Game {
      * or null when none is pending. Panning mutates the camera synchronously on
      * every native move event but renders at most once per frame: the many move
      * events that arrive between paints coalesce into a single render of the
-     * latest camera state. This is scoped to an active gesture — a frame is only
+     * latest camera state. This is scoped to an active gesture. A frame is only
      * ever requested in response to a move, and nothing reschedules once the
-     * finger stops — so it is not a persistent render loop.
+     * finger stops, so it is not a persistent render loop.
      */
     private panRenderHandle: number | null = null;
 
@@ -179,7 +179,7 @@ export class Game {
             this.touchInput,
             this.interactionHandler,
             this.renderer.camera,
-            // Discrete gestures (tap down/up/cancel) render immediately; panning
+            // Discrete gestures (tap down/up/cancel) render immediately. Panning
             // coalesces its render onto the next animation frame so a burst of
             // move events between paints draws once.
             () => this.renderGesture(),

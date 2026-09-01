@@ -6,13 +6,13 @@ import {
 } from "../../component/healthComponent.ts";
 
 import type { Entity } from "../../entity/entity.ts";
-import { ActionComplete, ActionRunning, type ActionResult } from "./Action.ts";
+import { ActionComplete, ActionRunning, type ActionResult } from "./action.ts";
 import {
     addThreat,
     getTopThreat,
     ThreatMapComponentId,
 } from "../../component/threatMapComponent.ts";
-import { requestReplan } from "../../component/BehaviorAgentComponent.ts";
+import { requestReplan } from "../../component/behaviorAgentComponent.ts";
 import { createAttackGameEvent } from "../../entity/event/attackGameEventData.ts";
 import { BuildingComponentId } from "../../component/buildingComponent.ts";
 import { STRUCTURE_DAMAGE, UNIT_DAMAGE } from "../../raid/raidConstants.ts";

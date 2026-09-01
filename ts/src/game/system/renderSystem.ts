@@ -42,7 +42,7 @@ export const renderSystem: EcsSystem = {
  * Reused across frames to gather the visible sprites for depth sorting without
  * allocating a fresh array (and the chunk helper's intermediate array, and a
  * result map) on every render. Render is never reentrant, so a single shared
- * buffer is safe; it is cleared at the start of each gather.
+ * buffer is safe. It is cleared at the start of each gather.
  */
 const visibleSpriteScratch: [Entity, SpriteComponent][] = [];
 

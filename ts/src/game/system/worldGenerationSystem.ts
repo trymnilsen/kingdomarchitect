@@ -92,7 +92,7 @@ type ChunkToGenerate = {
  * deterministically becomes the start biome's second (and final, maxSize 2)
  * chunk, and the camp chunk goes last so its only generated neighbor holds
  * the by-then-full start volume and it always receives a volume of its own.
- * The remaining ring chunks carry no ordering guarantees — a corner chunk
+ * The remaining ring chunks carry no ordering guarantees. A corner chunk
  * generated before any cardinal neighbor simply receives a volume of its
  * own through the empty-adjacency branch in generateChunk.
  */

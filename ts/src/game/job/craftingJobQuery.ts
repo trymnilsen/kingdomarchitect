@@ -1,4 +1,4 @@
-import { BehaviorAgentComponentId } from "../component/BehaviorAgentComponent.ts";
+import { BehaviorAgentComponentId } from "../component/behaviorAgentComponent.ts";
 import { JobQueueComponentId } from "../component/jobQueueComponent.ts";
 import type { Entity } from "../entity/entity.ts";
 import { CraftingJobId, type CraftingJob } from "./craftingJob.ts";
@@ -91,7 +91,7 @@ export function getCraftingJobDisplayInfos(
 
 /**
  * Cancel the first unclaimed crafting job matching the given building and recipe.
- * Uses FIFO ordering — the earliest queued job is removed.
+ * Uses FIFO ordering, so the earliest queued job is removed.
  * Returns true if a job was cancelled, false if none matched.
  */
 export function cancelCraftingJob(

@@ -6,10 +6,10 @@ import { TestAdapter } from "./testAdapter.ts";
 import { assertTransformsConsistent } from "../../game/worldInvariants.ts";
 
 /**
- * Entities persist their world position; loading parents them back together
+ * Entities persist their world position. Loading parents them back together
  * and re-derives local positions. These tests use a nested tree with a
  * non-origin parent so the world-to-local conversion on load is actually
- * exercised — at the origin a broken conversion is indistinguishable from
+ * exercised. At the origin a broken conversion is indistinguishable from
  * a correct one.
  */
 describe("position persistence", () => {

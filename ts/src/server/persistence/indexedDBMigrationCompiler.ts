@@ -49,7 +49,7 @@ function applyIndexedDBOp(
         }
         case "addColumn":
         case "removeColumn":
-            // No-op — IndexedDB stores are schemaless
+            // No-op, IndexedDB stores are schemaless
             break;
     }
 }

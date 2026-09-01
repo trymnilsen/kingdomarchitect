@@ -253,7 +253,7 @@ export class BuildConfirmState extends InteractionState {
             };
         }
 
-        // Chunks exist client side before being discovered; building is only
+        // Chunks exist client side before being discovered. Building is only
         // allowed on land the player has actually explored
         const visibilityMap = rootEntity.getEcsComponent(
             VisibilityMapComponentId,

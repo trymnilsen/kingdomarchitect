@@ -140,7 +140,7 @@ describe("placeSettlement", () => {
             "a camp must always be placed, falling back to the preferred anchor",
         );
 
-        // The occupants of the claimed footprint are removed; everything
+        // The occupants of the claimed footprint are removed. Everything
         // else stays.
         const chunkMap = root.requireEcsComponent(ChunkMapComponentId).chunkMap;
         for (const member of camp.children) {

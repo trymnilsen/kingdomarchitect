@@ -12,7 +12,7 @@ function pickConsoleFn(level: LogLevel): (...args: unknown[]) => void {
 /**
  * Pulls an Error out of the data payload so we can pass it as a top-level
  * console argument. Browsers only render clickable, sourcemapped stack traces
- * when an Error instance is a direct console argument — wrapping it inside an
+ * when an Error instance is a direct console argument. Wrapping it inside an
  * object (e.g. `{ error: err }`) reduces the stack to a plain string property.
  */
 function extractError(data: unknown): Error | undefined {

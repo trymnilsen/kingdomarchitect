@@ -68,7 +68,7 @@ describe("dropItemAtPosition", () => {
 
         dropItemAtPosition(root, 1, TILE, woodResourceItem, 3, "test");
         // Callers that hand over a copy (a clone, a deserialised save) must not
-        // split the pile — stacks are keyed by item id, not object identity.
+        // split the pile. Stacks are keyed by item id, not object identity.
         dropItemAtPosition(
             root,
             1,

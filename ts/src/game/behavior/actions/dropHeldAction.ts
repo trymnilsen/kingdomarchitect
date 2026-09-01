@@ -8,16 +8,16 @@ import {
 } from "../../component/heldItemComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { dropItemAtPosition } from "../dropItem.ts";
-import { ActionComplete, type ActionResult } from "./Action.ts";
+import { ActionComplete, type ActionResult } from "./action.ts";
 
 /**
  * Drop the worker's held item into the world.
  *
  * If `destination` is set, the worker must already be at that tile (an
  * earlier moveTo enforces this) and the held item is placed there. If
- * `destination` is unset, the action drops on the worker's current tile —
- * panic-drop semantics that accept any visual mess so an interrupt can
- * always resolve.
+ * `destination` is unset, the action drops on the worker's current tile.
+ * These are panic-drop semantics that accept any visual mess so an interrupt
+ * can always resolve.
  */
 export type DropHeldActionData = {
     type: "dropHeld";
@@ -65,7 +65,7 @@ export function executeDropHeldAction(
     );
     if (!placed) {
         // Clearing held after a refused placement would delete the goods. Fail
-        // instead and let the worker replan; dropItemAtPosition logged why.
+        // instead and let the worker replan. dropItemAtPosition logged why.
         return { kind: "failed", cause: { type: "unknown" } };
     }
 

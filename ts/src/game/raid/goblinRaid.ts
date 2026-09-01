@@ -14,7 +14,7 @@ import {
     createRaidingComponent,
     RaidingComponentId,
 } from "../component/raidingComponent.ts";
-import { requestReplan } from "../component/BehaviorAgentComponent.ts";
+import { requestReplan } from "../component/behaviorAgentComponent.ts";
 import { kingdomScoreFromTargets } from "./kingdomScore.ts";
 import {
     collectPlayerTargets,
@@ -31,7 +31,7 @@ import {
 /**
  * Forms goblin night raids. Called once at the night phase edge
  * (phaseTransitionSystem). A camp marches when it is mature, full, and the
- * kingdom has grown rich enough to be worth the walk; it then commits all but
+ * kingdom has grown rich enough to be worth the walk. It then commits all but
  * one goblin (the fire-tender / defender, chosen as the one closest to the
  * campfire) to a one-way raid, assigning each raider a player-building target.
  *
@@ -39,7 +39,7 @@ import {
  * kingdom score it is waiting for, and forming a raid restamps that bar above
  * the score the kingdom had that night. A raid that razes the settlement drops
  * the score far below the new bar, so the grace period is proportional to the
- * damage done; a raid that is beaten off leaves the score intact but the bar
+ * damage done. A raid that is beaten off leaves the score intact but the bar
  * standing above it, so the kingdom buys its peace by not growing. A kingdom
  * that stagnates is left alone, which is the intended bargain: raids are the
  * tax on prosperity.
@@ -209,7 +209,7 @@ export function isLivePlayerBuilding(root: Entity, entityId: string): boolean {
  * the highest-value remaining player building, breaking ties by proximity to
  * the raider. Returns null when no player buildings remain (the raider then
  * yields to idle, the post-razing end state). Coordination across raiders is
- * intentionally loose here; by the endgame, fan-out no longer matters.
+ * loose here. By the endgame, fan-out no longer matters.
  */
 export function findReplacementTarget(
     root: Entity,

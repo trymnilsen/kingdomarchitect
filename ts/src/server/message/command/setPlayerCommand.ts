@@ -1,4 +1,4 @@
-import type { PlayerCommand } from "../../../game/component/BehaviorAgentComponent.ts";
+import type { PlayerCommand } from "../../../game/component/behaviorAgentComponent.ts";
 
 export type SetPlayerCommand = {
     id: typeof SetPlayerCommandId;

@@ -27,7 +27,7 @@ export type InventoryViewProps = {
     entries: StockEntry[];
     chips: InventoryChip[];
     selectedKey: string | null;
-    /** False when scoped to one inventory — hides the per-location jump list. */
+    /** False when scoped to one inventory, which hides the per-location jump list. */
     showSources: boolean;
     onSelect: (key: string) => void;
     onJump: (entity: Entity) => void;

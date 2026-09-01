@@ -7,7 +7,7 @@ import { ProductionComponentId } from "../../component/productionComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { resourcePrefab } from "../../prefab/resourcePrefab.ts";
 import { completeClaimedJob } from "../../job/jobLifecycle.ts";
-import { ActionComplete, ActionRunning, type ActionResult } from "./Action.ts";
+import { ActionComplete, ActionRunning, type ActionResult } from "./action.ts";
 
 export type PlantTreeActionData = {
     type: "plantTree";

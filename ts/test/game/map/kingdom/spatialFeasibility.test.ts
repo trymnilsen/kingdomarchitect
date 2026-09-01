@@ -48,7 +48,7 @@ describe("spatialFeasibility", () => {
         const candidate = { x: 5, y: 5 };
         const targetChunks = 20;
 
-        // Fully open: only candidate registered — BFS finds targetChunks unregistered.
+        // Fully open: only candidate registered, so BFS finds targetChunks unregistered.
         const hOpen = new KingdomSpawnTestHarness();
         hOpen.addChunk(candidate.x, candidate.y);
         const openResult = checkSpatialFeasibility(

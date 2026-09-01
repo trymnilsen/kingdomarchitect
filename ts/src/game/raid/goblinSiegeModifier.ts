@@ -16,9 +16,9 @@ import { SIEGE_COST_MULTIPLIER, STRUCTURE_DAMAGE } from "./raidConstants.ts";
  * the time it takes to break it. A* therefore routes around a wall when going
  * around is cheaper, but punches straight through when the wall is the shortcut.
  *
- * Used only by RaidBehavior's own path query to decide the siege route — the
+ * Used only by RaidBehavior's own path query to decide the siege route. The
  * normal moveTo pathing is untouched. The route this produces tells the behavior
- * which wall to break next; the goblin then walks (with normal pathing) up to
+ * which wall to break next. The goblin then walks (with normal pathing) up to
  * that wall and attacks it, after which the destroyed tile opens up.
  *
  * GraphNode coordinates are in graph space (world + offset); we subtract the
@@ -40,7 +40,7 @@ export function goblinSiegeModifier(
             return 0;
         }
 
-        // A normally-available tile keeps its ordinary cost — no siege handling
+        // A normally-available tile keeps its ordinary cost, with no siege handling
         // needed. This covers open ground, roads, passable resources and units.
         if (isTileAvailable(point, root)) {
             return node.weight;

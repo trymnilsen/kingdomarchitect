@@ -5,7 +5,7 @@ import {
     createBehaviorAgentComponent,
     getBehaviorAgent,
     requestReplan,
-} from "../../../src/game/component/BehaviorAgentComponent.ts";
+} from "../../../src/game/component/behaviorAgentComponent.ts";
 import { createTestEntity } from "./behaviorTestHelpers.ts";
 
 describe("BehaviorAgentComponent", () => {

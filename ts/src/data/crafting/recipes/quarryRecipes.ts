@@ -25,9 +25,8 @@ export const ironOreRecipe: CraftingRecipe = {
 };
 
 /**
- * Squared masonry blocks. Everything monumental — the church, the gate, the
- * tower — is built out of these, so the quarry is what a kingdom must stand up
- * before it can build in stone rather than merely with it.
+ * Squared masonry blocks. The church, the gate and the tower are all built out
+ * of these, so a kingdom needs a quarry before it can build in stone.
  */
 export const stoneBarsRecipe: CraftingRecipe = {
     id: "cut_stone_bars",

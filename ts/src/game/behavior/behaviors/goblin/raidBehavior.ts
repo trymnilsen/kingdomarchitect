@@ -1,7 +1,7 @@
 import { isPointAdjacentTo } from "../../../../common/point.ts";
 import type { Entity } from "../../../entity/entity.ts";
-import type { BehaviorActionData } from "../../actions/ActionData.ts";
-import type { Behavior } from "../Behavior.ts";
+import type { BehaviorActionData } from "../../actions/actionData.ts";
+import type { Behavior } from "../behavior.ts";
 import { RaidingComponentId } from "../../../component/raidingComponent.ts";
 import { BuildingComponentId } from "../../../component/buildingComponent.ts";
 import { HealthComponentId } from "../../../component/healthComponent.ts";
@@ -23,15 +23,15 @@ import {
  * dies or no player buildings remain.
  *
  * Sits below engageInCombat (90) so a raider that gets attacked defends itself
- * first and then resumes the siege, and below keepWarm — except keepWarm is
- * suppressed for raiders, so a raider never abandons the siege to warm up.
+ * first and then resumes the siege, and below keepWarm. keepWarm is suppressed
+ * for raiders, so a raider never abandons the siege to warm up.
  *
  * Siege movement: expand runs its own A* with the goblinSiegeModifier, which
  * treats destructible structures as traversable at a finite cost. That route
- * reveals the next wall to break; the goblin then walks (with ordinary moveTo
+ * reveals the next wall to break. The goblin then walks (with ordinary moveTo
  * pathing) up to that wall and attacks it. Once the wall falls the graph
  * invalidates the tile, the next replan produces a shorter route, and the
- * raider advances — chewing inward until it reaches the target.
+ * raider advances, chewing inward until it reaches the target.
  */
 export function createRaidBehavior(): Behavior {
     return {
@@ -46,7 +46,7 @@ export function createRaidBehavior(): Behavior {
             if (isLivePlayerBuilding(root, raiding.targetId)) {
                 return true;
             }
-            // Current target gone — still valid if any player building remains.
+            // Current target gone, but still valid if any player building remains.
             return findReplacementTarget(root, entity.worldPosition) !== null;
         },
 

@@ -21,7 +21,7 @@ export const mirrorPairs: [string, string][] = [
  * We cannot use a fixed frame width because coordinates in PartFrame are raw
  * pixel positions in source-sprite space (e.g., x in 6..11 for a 16px cell).
  * The correct mirror transform is: newX = (minX + maxX) - oldX, which places
- * the axis of symmetry at the midpoint of the content bounds — consistent with
+ * the axis of symmetry at the midpoint of the content bounds, consistent with
  * how buildSpriteSheet computes animationBounds for centering.
  */
 export function computeXBounds(animation: CharacterAnimation): {

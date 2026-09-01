@@ -13,15 +13,15 @@ import { Entity } from "../../../src/game/entity/entity.ts";
 import {
     createBehaviorAgentComponent,
     getBehaviorAgent,
-} from "../../../src/game/component/BehaviorAgentComponent.ts";
+} from "../../../src/game/component/behaviorAgentComponent.ts";
 import { createMovementStaminaComponent } from "../../../src/game/component/movementStaminaComponent.ts";
 import { createSpriteComponent } from "../../../src/game/component/spriteComponent.ts";
 import { createBuildingComponent } from "../../../src/game/component/buildingComponent.ts";
 import { nullBuilding } from "../../../src/data/building/building.ts";
-import { createBehaviorSystem } from "../../../src/game/behavior/systems/BehaviorSystem.ts";
-import { createPerformPlayerCommandBehavior } from "../../../src/game/behavior/behaviors/PerformPlayerCommandBehavior.ts";
+import { createBehaviorSystem } from "../../../src/game/behavior/systems/behaviorSystem.ts";
+import { createPerformPlayerCommandBehavior } from "../../../src/game/behavior/behaviors/performPlayerCommandBehavior.ts";
 import { executeMoveToAction } from "../../../src/game/behavior/actions/moveToAction.ts";
-import type { BehaviorActionData } from "../../../src/game/behavior/actions/ActionData.ts";
+import type { BehaviorActionData } from "../../../src/game/behavior/actions/actionData.ts";
 import type { SpriteRef } from "../../../src/asset/sprite.ts";
 import type { Point } from "../../../src/common/point.ts";
 
@@ -31,7 +31,7 @@ const testSprite: SpriteRef = { bin: "test", spriteId: "test" };
 
 /**
  * Open world with tiles, chunk map, and pathfinding. Covers roughly
- * x=8..31, y=8..15 — enough room for entities to move around.
+ * x=8..31, y=8..15. That is room enough for entities to move around.
  */
 function createWorld(): { root: Entity; ecsWorld: EcsWorld } {
     const ecsWorld = new EcsWorld();
@@ -62,7 +62,7 @@ function createAgent(id: string, root: Entity, position: Point): Entity {
     entity.setEcsComponent(createMovementStaminaComponent());
     // Start "settled": a fresh agent carries pendingReplan, which marks it transient
     // (waited-for, not displaced). A plain placed agent is a settled obstacle until it
-    // is given something to do; moveCommand re-arms pendingReplan so commanded workers
+    // is given something to do. moveCommand re-arms pendingReplan so commanded workers
     // plan and move.
     getBehaviorAgent(entity)!.pendingReplan = undefined;
     root.addChild(entity);
@@ -129,13 +129,13 @@ describe("Displacement Scenario", () => {
         /**
          * A at (10,8) wants to reach (11,8). B is at (11,8) with no active
          * behavior (utility=0). All of B's exits are walled off except the tile
-         * where A currently stands (10,8) — so the only valid displacement is
+         * where A currently stands (10,8). The only valid displacement is
          * a 2-entity cycle: B moves to (10,8) and A moves to (11,8) atomically.
          *
          * Walls:
-         *   (12,8) — east of B       (explicitly placed)
-         *   (11,9) — south of B      (explicitly placed)
-         *   (11,7) — north of B      (y=7 is outside chunk, natural wall)
+         *   (12,8) east of B    (explicitly placed)
+         *   (11,9) south of B   (explicitly placed)
+         *   (11,7) north of B   (y=7 is outside chunk, natural wall)
          */
         const { root } = createWorld();
 
@@ -176,8 +176,8 @@ describe("Displacement Scenario", () => {
     it("mover does not oscillate when direct path is blocked by equal-priority entity", () => {
         /**
          * Mover at (11,8) wants to reach (15,8). Blocker at (12,8) has the same
-         * utility (50), so displacement always fails — priority (50) is not strictly
-         * greater than resistance (50).
+         * utility (50), so displacement always fails. Priority (50) is not
+         * strictly greater than resistance (50).
          *
          * Without path caching the mover would replan on every tick. After stepping
          * off the direct route (e.g. to (11,9)), A* may route back through (12,8)
@@ -215,7 +215,7 @@ describe("Displacement Scenario", () => {
             const pos = `${mover.worldPosition.x},${mover.worldPosition.y}`;
             assert.ok(
                 !visitedPositions.has(pos),
-                `Mover revisited position (${pos}) on tick ${tick} — oscillation detected`,
+                `Mover revisited position (${pos}) on tick ${tick}: oscillation detected`,
             );
             visitedPositions.add(pos);
             if (finalResult.kind === "complete") break;
@@ -268,7 +268,7 @@ describe("Displacement Scenario", () => {
         // Snapshot the path remaining after tick 1.
         const pathAfterTick1 = [...action.cachedPath!];
 
-        // Tick 2: the next tile in the cached path is free — the entity should step
+        // Tick 2: the next tile in the cached path is free. The entity should step
         // there by consuming cachedPath[0], leaving the tail unchanged.
         executeMoveToAction(action, mover, 2);
 
@@ -284,7 +284,7 @@ describe("Displacement Scenario", () => {
         assert.deepStrictEqual(
             action.cachedPath,
             pathAfterTick1.slice(1),
-            "Remaining cached path should be the tail of the path from tick 1 — no replanning occurred",
+            "Remaining cached path should be the tail of the path from tick 1, so no replanning occurred",
         );
     });
 
@@ -338,16 +338,15 @@ describe("Displacement Scenario", () => {
 
     it("displacement chain: A displaces B which displaces C to reach target", () => {
         /**
-         * A at (11,8) wants to move to (12,8) — where B is.
+         * A at (11,8) wants to move to (12,8), where B is.
          * B at (12,8) is idle (utility=0). C at (13,8) is also idle.
          *
          * A's moveTo triggers displacement. B has free adjacent tiles (e.g. south
          * at (12,9)), so B steps aside immediately rather than chaining through C.
          * A enters (12,8) and the command completes in one tick.
          *
-         * This test verifies that the displacement system gracefully handles a
-         * target tile occupied by an idle entity even when additional idle
-         * entities are nearby in the same row.
+         * The displacement system must handle a target tile occupied by an idle
+         * entity even when additional idle entities are nearby in the same row.
          */
         const { root } = createWorld();
 
@@ -381,7 +380,7 @@ describe("Displacement Scenario", () => {
     /**
      * Seal y=8 into a true 1-wide corridor: y=7 is outside the chunk (natural wall)
      * and we wall the entire y=9 row across the chunk width (x=8..31) so there is no
-     * way around — a refused worker cannot detour, making a swap the only resolution.
+     * way around. A refused worker cannot detour, so a swap is the only resolution.
      */
     function sealCorridor(root: Entity) {
         for (let x = 8; x <= 31; x++) {
@@ -415,8 +414,8 @@ describe("Displacement Scenario", () => {
 
     it("two equal-priority workers swap past each other in a 1-wide corridor", () => {
         /**
-         * A at (10,8) wants (13,8); B at (13,8) wants (10,8). y=9 is walled, y=7 is
-         * outside the chunk — so the row is a 1-wide corridor with no way around.
+         * A at (10,8) wants (13,8). B at (13,8) wants (10,8). y=9 is walled and y=7
+         * is outside the chunk, so the row is a 1-wide corridor with no way around.
          * The only way both reach their targets is a head-on swap. With equal
          * priority the old dominance gate would deadlock them forever.
          */
@@ -460,7 +459,7 @@ describe("Displacement Scenario", () => {
          * has a committed path. On tick 1 the first to act finds the other still
          * undecided (pendingReplan set) → transient → it waits, keeping its computed
          * path. The second then plans, sees the first's path heading into its tile, and
-         * the existing beneficial swap fires — both reach their goals the same tick.
+         * the existing beneficial swap fires. Both reach their goals the same tick.
          */
         const { root } = createWorld();
         sealCorridor(root);
@@ -486,7 +485,7 @@ describe("Displacement Scenario", () => {
 
     it("one worker passes two oncoming workers in a 1-wide corridor", () => {
         // Groups approach from a distance (as in real gameplay) so each worker has a
-        // committed cached path by the time the streams meet — the swap is detected
+        // committed cached path by the time the streams meet. The swap is detected
         // from cachedPath[0]. (Starting workers already adjacent would not resolve
         // until the deferred "in-transit is cheap to displace" resistance change.)
         const { root } = createWorld();

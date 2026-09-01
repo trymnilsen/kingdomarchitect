@@ -12,7 +12,7 @@ export type UiClipProps = {
     height: number;
     /**
      * Where to place the child within the viewport, defaults to the origin.
-     * Negative values scroll the content up/left out of view; the part outside
+     * Negative values scroll the content up/left out of view. The part outside
      * the viewport is clipped. See {@link uiScrollView}.
      */
     contentOffset?: Point;

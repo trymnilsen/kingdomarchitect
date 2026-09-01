@@ -8,12 +8,11 @@ import { stockPile } from "../../../src/data/building/wood/storage.ts";
 import { pointEquals, type Point } from "../../../src/common/point.ts";
 
 /**
- * Regression guard for the farm-traversal bug: the A* planner and the per-tile
- * step check in executeMoveToAction must agree on what "walkable" means. A farm
- * carries a sub-threshold TraversalComponent, so it is passable-but-heavy — the
- * planner routes through it. The step check previously rejected ANY building
- * outright, so the worker failed the moment it tried to step onto the planned
- * farm tile (plan → fail → replan forever).
+ * The A* planner and the per-tile step check in executeMoveToAction must agree
+ * on what "walkable" means. A farm carries a sub-threshold TraversalComponent,
+ * so it is passable-but-heavy and the planner routes through it. A step check
+ * that rejects ANY building outright makes the worker fail the moment it tries
+ * to step onto the planned farm tile, giving plan → fail → replan forever.
  *
  * This drives executeMoveToAction directly because both gates live inside it.
  * The unit test on isImpassableStructure can't catch a regression here: it stays
@@ -23,7 +22,7 @@ import { pointEquals, type Point } from "../../../src/common/point.ts";
 /**
  * Seal column x with impassable walls except for a single gap row, so the only
  * way from one side to the other is the tile at (x, gapY). Stockpiles carry no
- * TraversalComponent, so they are walls per isImpassableStructure; placing them
+ * TraversalComponent, so they are walls per isImpassableStructure. Placing them
  * through the real prefab gives them the SpriteComponent the spatial index
  * requires (entities without one are invisible to queryEntity).
  */

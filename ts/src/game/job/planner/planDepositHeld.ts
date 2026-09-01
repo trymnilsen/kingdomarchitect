@@ -4,7 +4,7 @@ import {
 } from "../../component/heldItemComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { findAcceptingStockpile } from "../../entity/findAcceptingStockpile.ts";
-import type { BehaviorActionData } from "../../behavior/actions/ActionData.ts";
+import type { BehaviorActionData } from "../../behavior/actions/actionData.ts";
 
 /**
  * Build the action sequence that drains the worker's held slot before

@@ -13,7 +13,7 @@ export type UiIconProps = {
 /**
  * A sprite icon rendered crisply inside a fixed square box. It picks the largest
  * integer scale whose result still fits the box, so a 16px sprite in a 32px box
- * draws at a clean 2x and a 32px sprite draws at 1x — never a fractional fit that
+ * draws at a clean 2x and a 32px sprite draws at 1x, never a fractional fit that
  * blurs pixel art. Sprites larger than the box fall back to an aspect-preserving
  * fit. The box size is fixed regardless of the sprite, so rows stay aligned.
  */

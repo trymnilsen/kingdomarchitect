@@ -119,7 +119,7 @@ describe("collectItemsAction", () => {
         };
         executeCollectItemsAction(action, worker);
 
-        // A pile exists only to hold its stack; anything else owns its own
+        // A pile exists only to hold its stack. Anything else owns its own
         // lifetime, and draining it must never delete the host entity.
         assert.ok(root.findEntity("chest"));
     });

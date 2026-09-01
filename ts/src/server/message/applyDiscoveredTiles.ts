@@ -27,7 +27,7 @@ export function applyDiscoveredTiles(
 ): void {
     // Register volumes first. Chunks hold references to the registered volume
     // instances (the world state replicates all chunks up front), so an
-    // already known volume is updated in place rather than replaced — a new
+    // already known volume is updated in place rather than replaced. A new
     // instance would diverge from the one existing chunks point at.
     for (const volume of volumes) {
         const existingVolume = tileComponent.volume.get(volume.id);
@@ -71,7 +71,7 @@ export function applyDiscoveredTiles(
 
         const size = ChunkSize * ChunkSize;
         const chunkId = encodePosition(chunkPosition.x, chunkPosition.y);
-        // A fully discovered chunk has nothing left to track; recreating an
+        // A fully discovered chunk has nothing left to track. Recreating an
         // empty partial set next to the full flag would leave inconsistent
         // discovery state behind
         if (

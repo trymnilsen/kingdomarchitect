@@ -13,7 +13,7 @@ import {
 import { characterPartFrames } from "../../../../generated/characterFrames.ts";
 import { getAllAnimations } from "../animation/getAllAnimations.ts";
 import type { CharacterAnimation } from "../../../rendering/character/characterAnimation.ts";
-import { createPrimaryButton } from "./CharacterBuilderButtons.ts";
+import { createPrimaryButton } from "./characterBuilderButtons.ts";
 import { uiBox } from "../../../ui/declarative/uiBox.ts";
 import { uiColumn, uiRow } from "../../../ui/declarative/uiSequence.ts";
 import { uiText } from "../../../ui/declarative/uiText.ts";
@@ -151,7 +151,7 @@ const SingleFrameViewport = createComponent<SingleFrameViewportProps>(
 /**
  * Character preview component that renders the sprite with selected colors
  * and animation. Supports both single frame and sprite sheet preview modes.
- * In sheet mode, zoom (1x–8x) and pan controls are shown below the preview.
+ * In sheet mode, zoom (1x to 8x) and pan controls are shown below the preview.
  */
 export const CharacterPreview = createComponent<CharacterPreviewProps>(
     ({ props, withState }) => {

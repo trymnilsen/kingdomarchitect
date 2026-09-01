@@ -9,8 +9,8 @@ import {
 } from "../../component/heldItemComponent.ts";
 import { getSettlementEntity } from "../../entity/settlementQueries.ts";
 import type { Entity } from "../../entity/entity.ts";
-import type { BehaviorActionData } from "../actions/ActionData.ts";
-import type { Behavior } from "./Behavior.ts";
+import type { BehaviorActionData } from "../actions/actionData.ts";
+import type { Behavior } from "./behavior.ts";
 import type {
     StockpileDeficit,
     StockpileSurplus,
@@ -31,7 +31,7 @@ export function createRestockBehavior(): Behavior {
         isValid(entity: Entity): boolean {
             const held = entity.getEcsComponent(HeldItemComponentId);
             if (!held || !isHeldEmpty(held)) {
-                // Restock is an idle-loop trip; only fires when held is free.
+                // Restock is an idle-loop trip. Only fires when held is free.
                 return false;
             }
 

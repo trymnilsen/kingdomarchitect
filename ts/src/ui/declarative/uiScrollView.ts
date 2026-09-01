@@ -54,7 +54,7 @@ export type UiScrollViewProps = {
 /**
  * Clamps a desired scroll offset to the valid range for the given content and
  * viewport. The maximum scroll is the amount of content hidden below the
- * viewport; content that fits cannot scroll.
+ * viewport. Content that fits cannot scroll.
  */
 export function clampScroll(
     offset: number,
@@ -136,9 +136,9 @@ export const uiScrollView = createComponent<UiScrollViewProps>(
         const viewportHeight =
             props.height === fillUiSize ? constraints.height : props.height;
 
-        // Measure at the full width first; only if the content overflows do we
-        // reserve a gutter for the scrollbar and re-measure against the
-        // narrower width (which can itself change the wrapped height).
+        // Measure at the full width first. If the content overflows we reserve
+        // a gutter for the scrollbar and re-measure against the narrower width
+        // (which can itself change the wrapped height).
         const fullMeasure = measureDescriptor("content", props.child, {
             width: viewportWidth,
             height: unboundedHeight,

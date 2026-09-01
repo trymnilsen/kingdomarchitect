@@ -89,7 +89,7 @@ describe("entitiesFrontToBack", () => {
 
     it("places a mounted unit ahead of the building it stands on", () => {
         // A worker (UNIT_SPRITE_DEPTH) standing on a building (depth 0) shares
-        // the building's tile; the worker must come out first.
+        // the building's tile. The worker must come out first.
         const building = entityAt("building", { x: 12, y: 8 }, 0);
         const worker = entityAt("worker", { x: 12, y: 8 }, UNIT_SPRITE_DEPTH);
 

@@ -83,7 +83,7 @@ export function makeReplicatedEntitiesSystem(
                 // A component added to an already-replicated entity. Adding a
                 // component to an entity before it is attached doesn't bubble to
                 // the root, so this only fires for live entities the client
-                // already mirrors — send the full component as an upsert. Same
+                // already mirrors, so send the full component as an upsert. Same
                 // root-allowlist and client-only guards as component_updated.
                 if (
                     event.source.isGameRoot &&
