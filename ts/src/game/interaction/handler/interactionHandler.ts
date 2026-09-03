@@ -26,6 +26,7 @@ import { SelectionState } from "../state/selection/selectionState.ts";
 import { CommitableInteractionStateChanger } from "./interactionStateChanger.ts";
 import { InteractionStateHistory } from "./interactionStateHistory.ts";
 import { type StateContext } from "./stateContext.ts";
+import { WorldOverlays } from "../overlay/worldOverlays.ts";
 import type { GameSaveCapability } from "../../../server/gameServerConnection.ts";
 import type { GameCommand } from "../../../server/message/gameCommand.ts";
 import { queryEntity } from "../../map/query/queryEntity.ts";
@@ -70,6 +71,7 @@ export class InteractionHandler {
             gameTime: time,
             camera: camera,
             commandDispatcher: command,
+            worldOverlays: new WorldOverlays(),
             gameSaveCapability: gameSaveCapability,
         };
         this.history = new InteractionStateHistory(this.stateContext);
@@ -299,6 +301,7 @@ export class InteractionHandler {
     onDraw(renderScope: RenderScope) {
         //const start = performance.now();
         //performance.mark("InteractionStateDraw");
+        this.stateContext.worldOverlays.draw(this.world.root, renderScope);
         this.history.state.onDraw(renderScope);
 
         this.uiRenderer.renderComponent(this.buildHudView());

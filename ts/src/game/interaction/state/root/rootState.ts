@@ -42,11 +42,16 @@ export class RootState extends InteractionState {
                 },
                 {
                     text: "Map",
-                    onClick: () => {
-                        this.context.stateChanger.push(
-                            new AlertMessageState("Map", "Not implemented yet"),
-                        );
-                    },
+                    children: [
+                        {
+                            text: "Hearthlight",
+                            onClick: () => {
+                                this.context.worldOverlays.toggle(
+                                    "hearthlight",
+                                );
+                            },
+                        },
+                    ],
                 },
             ],
             rightButtons: [
