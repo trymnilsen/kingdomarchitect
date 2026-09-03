@@ -70,10 +70,10 @@ export function createPerformJobBehavior(
         name: "performJob",
 
         isValid(entity: Entity): boolean {
-            // Guards are pure sentries: removed from the labor pool entirely, so
-            // they never claim jobs. They man towers (GarrisonBehavior) instead.
+            // Only the Worker role draws from the job pool; other roles have
+            // their own behaviors. Goblins have no role component and keep working.
             const role = entity.getEcsComponent(RoleComponentId);
-            if (role?.role === WorkerRole.Guard) {
+            if (role && role.role !== WorkerRole.Worker) {
                 return false;
             }
 

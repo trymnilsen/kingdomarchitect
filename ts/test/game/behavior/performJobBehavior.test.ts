@@ -2,6 +2,10 @@ import assert from "node:assert";
 import { describe, it } from "node:test";
 import { Entity } from "../../../src/game/entity/entity.ts";
 import { createPerformJobBehavior } from "../../../src/game/behavior/behaviors/performJobBehavior.ts";
+import {
+    createRoleComponent,
+    WorkerRole,
+} from "../../../src/game/component/worker/roleComponent.ts";
 import { planBuildBuilding } from "../../../src/game/job/planner/buildBuildingPlanner.ts";
 import { canExecuteBuildJob } from "../../../src/game/job/buildBuildingJob.ts";
 import {
@@ -298,6 +302,50 @@ describe("performJobBehavior", () => {
                 "expand must plan actions for a takeable job",
             );
             assert.strictEqual(queue.jobs[0].claimedBy, worker.id);
+        });
+    });
+
+    describe("role gate", () => {
+        const behavior = createPerformJobBehavior(planBuildBuilding);
+
+        /** A worker with an open move job. Pass null for no role component, as goblins have. */
+        function workerWithMoveJob(role: WorkerRole | null): Entity {
+            const root = new Entity("root");
+            root.setEcsComponent(createJobQueueComponent());
+            const worker = new Entity("worker");
+            worker.setEcsComponent(createHeldItemComponent());
+            worker.setEcsComponent(createBehaviorAgentComponent());
+            if (role !== null) {
+                const roleComponent = createRoleComponent();
+                roleComponent.role = role;
+                worker.setEcsComponent(roleComponent);
+            }
+            root.addChild(worker);
+            worker.worldPosition = { x: 12, y: 8 };
+
+            const queue = root.requireEcsComponent("JobQueue");
+            addJob(queue, MoveToJob(worker, { x: 14, y: 8 }));
+            return worker;
+        }
+
+        it("lets a Worker take jobs", () => {
+            const worker = workerWithMoveJob(WorkerRole.Worker);
+            assert.strictEqual(behavior.isValid(worker), true);
+        });
+
+        it("keeps a Hauler out of the job pool", () => {
+            const worker = workerWithMoveJob(WorkerRole.Hauler);
+            assert.strictEqual(behavior.isValid(worker), false);
+        });
+
+        it("keeps a Guard out of the job pool", () => {
+            const worker = workerWithMoveJob(WorkerRole.Guard);
+            assert.strictEqual(behavior.isValid(worker), false);
+        });
+
+        it("lets an entity with no role component take jobs", () => {
+            const worker = workerWithMoveJob(null);
+            assert.strictEqual(behavior.isValid(worker), true);
         });
     });
 });

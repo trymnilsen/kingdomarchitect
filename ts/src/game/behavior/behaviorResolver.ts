@@ -8,6 +8,7 @@ import { createKeepWarmBehavior } from "./behaviors/goblin/keepWarmBehavior.ts";
 import { createRaidBehavior } from "./behaviors/goblin/raidBehavior.ts";
 import { createPerformJobBehavior } from "./behaviors/performJobBehavior.ts";
 import { createGarrisonBehavior } from "./behaviors/garrisonBehavior.ts";
+import { createHaulBehavior } from "./behaviors/haulBehavior.ts";
 import { createDepositHeldBehavior } from "./behaviors/depositHeldBehavior.ts";
 import { createRestockBehavior } from "./behaviors/restockBehavior.ts";
 import { createEatBehavior } from "./behaviors/eatBehavior.ts";
@@ -40,6 +41,7 @@ export function createBehaviorResolver(): BehaviorResolver {
         createEatBehavior(),
         createDrinkPotionBehavior(),
         createGarrisonBehavior(),
+        createHaulBehavior(),
         createPerformJobBehavior(planBuildBuilding, canExecuteBuildJob, true),
         createDepositHeldBehavior(),
         createRestockBehavior(),
