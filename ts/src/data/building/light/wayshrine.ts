@@ -1,22 +1,21 @@
 import { spriteRefs } from "../../../asset/sprite.ts";
 import type { Building } from "../building.ts";
-import { cressetLightSource } from "../../light/lightSourceDefinition.ts";
+import { wayshrineLightSource } from "../../light/lightSourceDefinition.ts";
 import {
-    woodResourceItem,
+    stoneResource,
     strawResourceItem,
 } from "../../inventory/items/resources.ts";
 
-export const cresset: Building = {
-    id: "cresset",
-    icon: spriteRefs.torches,
-    name: "Cresset",
+export const wayshrine: Building = {
+    id: "wayshrine",
+    icon: spriteRefs.wayshrine,
+    name: "Wayshrine",
     scale: 1,
-    //previewScale: 2,
     previewOffset: 0,
-    light: cressetLightSource.id,
+    light: wayshrineLightSource.id,
     requirements: {
         materials: {
-            [woodResourceItem.id]: 2,
+            [stoneResource.id]: 2,
             [strawResourceItem.id]: 1,
         },
     },

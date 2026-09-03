@@ -15,22 +15,37 @@
  */
 
 /**
- * What an emitter burns. `"none"` never runs down because its structure feeds
- * it; `"charcoal"` draws on stored fuel.
+ * What an emitter burns. `Charcoal` draws on stored fuel that haulers keep
+ * topped up; `Wood` is a single charge of logs built into the source itself,
+ * burned once and never refilled. A source that never runs down because its
+ * structure feeds it has no fuel at all, and stores `null`.
  */
-export type LightSourceFuel = "none" | "charcoal";
+export const LightSourceFuel = {
+    Charcoal: "charcoal",
+    Wood: "wood",
+} as const;
+
+export type LightSourceFuel =
+    (typeof LightSourceFuel)[keyof typeof LightSourceFuel];
 
 /**
- * How hard a source is to put out. `"destroy"` means it cannot be snuffed at
+ * How hard a source is to put out. `Destroy` means it cannot be snuffed at
  * all and goes away only with its host, and is named for destruction rather
  * than dismantling because a light source need not be a building.
  */
-export type LightSourceExtinguishDifficulty = "easy" | "hard" | "destroy";
+export const LightSourceExtinguishDifficulty = {
+    Easy: "easy",
+    Hard: "hard",
+    Destroy: "destroy",
+} as const;
+
+export type LightSourceExtinguishDifficulty =
+    (typeof LightSourceExtinguishDifficulty)[keyof typeof LightSourceExtinguishDifficulty];
 
 export type LightSourceDefinition = {
     id: string;
     lightRadius: number;
-    fuel: LightSourceFuel;
+    fuel: LightSourceFuel | null;
     extinguishDifficulty: LightSourceExtinguishDifficulty;
     /**
      * Whether this source's lit tiles count as hearthlight, the kingdom's home
@@ -47,7 +62,7 @@ export type LightSourceDefinition = {
  * neighbours are lit. Buildings glow faintly so the places people live and work
  * are never pitch dark. The glow claims no hearthlight. A wall segment or a lone
  * farm in the wilderness is not home territory. Only deliberate placed light
- * sources (cresset, campfire, lamp post) claim.
+ * sources (the light tab of the build book) claim.
  */
 export const buildingGlowLightSource: LightSourceDefinition = {
     id: "buildingGlow",
@@ -55,8 +70,8 @@ export const buildingGlowLightSource: LightSourceDefinition = {
     // The glow is an emergent property of an occupied building rather than a
     // fire: it has nothing to burn and cannot be "put out". It only ends with
     // the building itself.
-    fuel: "none",
-    extinguishDifficulty: "destroy",
+    fuel: null,
+    extinguishDifficulty: LightSourceExtinguishDifficulty.Destroy,
     claimsHearthlight: false,
 };
 
@@ -69,8 +84,8 @@ export const buildingGlowLightSource: LightSourceDefinition = {
 export const cressetLightSource: LightSourceDefinition = {
     id: "cresset",
     lightRadius: 1,
-    fuel: "none",
-    extinguishDifficulty: "easy",
+    fuel: null,
+    extinguishDifficulty: LightSourceExtinguishDifficulty.Easy,
     claimsHearthlight: true,
 };
 
@@ -84,8 +99,8 @@ export const cressetLightSource: LightSourceDefinition = {
 export const torchLightSource: LightSourceDefinition = {
     id: "torch",
     lightRadius: 1,
-    fuel: "none",
-    extinguishDifficulty: "easy",
+    fuel: null,
+    extinguishDifficulty: LightSourceExtinguishDifficulty.Easy,
     claimsHearthlight: false,
 };
 
@@ -96,8 +111,8 @@ export const torchLightSource: LightSourceDefinition = {
 export const campfireLightSource: LightSourceDefinition = {
     id: "campfire",
     lightRadius: 3,
-    fuel: "charcoal",
-    extinguishDifficulty: "easy",
+    fuel: LightSourceFuel.Charcoal,
+    extinguishDifficulty: LightSourceExtinguishDifficulty.Easy,
     claimsHearthlight: true,
 };
 
@@ -108,8 +123,61 @@ export const campfireLightSource: LightSourceDefinition = {
 export const lampPostLightSource: LightSourceDefinition = {
     id: "lampPost",
     lightRadius: 4,
-    fuel: "charcoal",
-    extinguishDifficulty: "hard",
+    fuel: LightSourceFuel.Charcoal,
+    extinguishDifficulty: LightSourceExtinguishDifficulty.Hard,
+    claimsHearthlight: true,
+};
+
+/**
+ * A wayshrine: a carved standing stone with one candle in its niche. The
+ * cheapest and most permanent claim, lighting only itself and its neighbours.
+ * The candle is tended rather than fed, so it carries no fuel, and the stone
+ * cannot be snuffed, only broken.
+ */
+export const wayshrineLightSource: LightSourceDefinition = {
+    id: "wayshrine",
+    lightRadius: 1,
+    fuel: null,
+    extinguishDifficulty: LightSourceExtinguishDifficulty.Destroy,
+    claimsHearthlight: true,
+};
+
+/**
+ * An iron brazier: the brightest fed light, built where the settlement intends
+ * to be and kept stocked by haulers. Iron and heavy, it is hard to put out by
+ * hand.
+ */
+export const ironBrazierLightSource: LightSourceDefinition = {
+    id: "ironBrazier",
+    lightRadius: 5,
+    fuel: LightSourceFuel.Charcoal,
+    extinguishDifficulty: LightSourceExtinguishDifficulty.Hard,
+    claimsHearthlight: true,
+};
+
+/**
+ * A glowmoss lantern: living moss that glows in place of a flame. Dim, but it
+ * needs no feeding and cannot be blown out, so it is the light for places no
+ * hauler can be spared for.
+ */
+export const glowmossLanternLightSource: LightSourceDefinition = {
+    id: "glowmossLantern",
+    lightRadius: 2,
+    fuel: null,
+    extinguishDifficulty: LightSourceExtinguishDifficulty.Destroy,
+    claimsHearthlight: true,
+};
+
+/**
+ * A pyre: the surge light. The widest disc of any source, from one charge of
+ * logs that burns through a single night and is never refilled. As an open
+ * stack it is easy to kick apart.
+ */
+export const pyreLightSource: LightSourceDefinition = {
+    id: "pyre",
+    lightRadius: 6,
+    fuel: LightSourceFuel.Wood,
+    extinguishDifficulty: LightSourceExtinguishDifficulty.Easy,
     claimsHearthlight: true,
 };
 
@@ -122,8 +190,8 @@ export const lampPostLightSource: LightSourceDefinition = {
 export const workerGlowLightSource: LightSourceDefinition = {
     id: "workerGlow",
     lightRadius: 0,
-    fuel: "none",
-    extinguishDifficulty: "destroy",
+    fuel: null,
+    extinguishDifficulty: LightSourceExtinguishDifficulty.Destroy,
     claimsHearthlight: false,
 };
 
@@ -136,8 +204,8 @@ export const workerGlowLightSource: LightSourceDefinition = {
 export const searchlightLightSource: LightSourceDefinition = {
     id: "searchlight",
     lightRadius: 0,
-    fuel: "none",
-    extinguishDifficulty: "destroy",
+    fuel: null,
+    extinguishDifficulty: LightSourceExtinguishDifficulty.Destroy,
     claimsHearthlight: true,
 };
 
@@ -147,6 +215,10 @@ const lightSourceDefinitions: readonly LightSourceDefinition[] = [
     torchLightSource,
     campfireLightSource,
     lampPostLightSource,
+    wayshrineLightSource,
+    ironBrazierLightSource,
+    glowmossLanternLightSource,
+    pyreLightSource,
     workerGlowLightSource,
     searchlightLightSource,
 ];

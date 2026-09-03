@@ -6,11 +6,6 @@ import {
     stoneResource,
 } from "../../inventory/items/resources.ts";
 
-/**
- * A campfire: a modest gathering light. The art it borrows
- * ({@link spriteRefs.stone_brazier}) is a placeholder standing in until a
- * campfire sprite exists. Emission is described by {@link campfireLightSource}.
- */
 export const campfire: Building = {
     id: "campfire",
     icon: spriteRefs.stone_brazier,

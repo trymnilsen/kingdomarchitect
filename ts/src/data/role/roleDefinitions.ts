@@ -16,7 +16,7 @@ export const roleDefinitions: RoleDefinition[] = [
         name: "Worker",
         subtitle: "Labor & Production",
         description:
-            "The backbone of any settlement. Workers keep the realm fed, housed, and functional through daily labor - baking, hauling, building, whatever needs doing. Their purpose is production, not conflict.",
+            "The backbone of any settlement. Workers keep the realm fed, housed, and functional through daily labor, baking, hauling, building, whatever needs doing. Their purpose is production, not conflict.",
         icon: emptySpriteRef,
     },
     {
@@ -24,7 +24,7 @@ export const roleDefinitions: RoleDefinition[] = [
         name: "Explorer",
         subtitle: "Discovery & Mapping",
         description:
-            "Venture beyond known boundaries into unmapped darkness. Explorers cycle expeditions, returning with discoveries, rumors, and tales. They reveal the world piece by piece - resources, ruins, threats.",
+            "Venture beyond known boundaries into unmapped darkness. Explorers cycle expeditions, returning with discoveries, rumors, and tales. They reveal the world piece by piece, resources, ruins, threats.",
         icon: emptySpriteRef,
     },
     {
@@ -40,7 +40,7 @@ export const roleDefinitions: RoleDefinition[] = [
         name: "Devotee",
         subtitle: "Faith & Divine Favor",
         description:
-            "Servants who tend temples and generate faith through ritual. Where workers produce bread and guards provide steel, devotees offer something older - divine favor that can bless or curse.",
+            "Servants who tend temples and generate faith through ritual. Where workers produce bread and guards provide steel, devotees offer something older, divine favor that can bless or curse.",
         icon: emptySpriteRef,
     },
     {
@@ -48,7 +48,7 @@ export const roleDefinitions: RoleDefinition[] = [
         name: "Spy",
         subtitle: "Intelligence & Secrets",
         description:
-            "Shadows who infiltrate other factions to steal secrets - their strength, plans, weaknesses. They might not return, or their capture could spark catastrophe.",
+            "Shadows who infiltrate other factions to steal secrets, their strength, plans, weaknesses. They might not return, or their capture could spark catastrophe.",
         icon: emptySpriteRef,
     },
     {
@@ -64,7 +64,14 @@ export const roleDefinitions: RoleDefinition[] = [
         name: "Trader",
         subtitle: "Commerce & Supply",
         description:
-            "Merchants who maintain commerce between settlements, moving goods where needed - grain north, iron south. They're the economic arteries connecting distant places.",
+            "Merchants who maintain commerce between settlements, moving goods where needed, grain north, iron south. They're the economic arteries connecting distant places.",
+        icon: emptySpriteRef,
+    },
+    {
+        role: WorkerRole.Hauler,
+        name: "Hauler",
+        subtitle: "Logistics & Items",
+        description: "Haulers making sure items on the ground are picked up",
         icon: emptySpriteRef,
     },
 ];

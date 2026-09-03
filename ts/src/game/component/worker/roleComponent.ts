@@ -6,6 +6,7 @@ export const WorkerRole = {
     Spy: 4,
     Envoy: 5,
     Trader: 6,
+    Hauler: 7,
 } as const;
 
 export type WorkerRole = (typeof WorkerRole)[keyof typeof WorkerRole];
