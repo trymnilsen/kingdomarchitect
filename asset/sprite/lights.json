@@ -1,0 +1,66 @@
+{
+    "wayshrine": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16,
+        "frames": 8
+    },
+    "iron_brazier": {
+        "x": 0,
+        "y": 16,
+        "w": 16,
+        "h": 16,
+        "frames": 8
+    },
+    "iron_brazier_dark": {
+        "x": 0,
+        "y": 32,
+        "w": 16,
+        "h": 16
+    },
+    "glowmoss_lantern": {
+        "x": 0,
+        "y": 48,
+        "w": 16,
+        "h": 16,
+        "frames": 8
+    },
+    "pyre": {
+        "x": 0,
+        "y": 64,
+        "w": 16,
+        "h": 16,
+        "frames": 8
+    },
+    "pyre_dark": {
+        "x": 0,
+        "y": 80,
+        "w": 16,
+        "h": 16
+    },
+    "wayshrine_scaffold": {
+        "x": 0,
+        "y": 96,
+        "w": 16,
+        "h": 16
+    },
+    "iron_brazier_scaffold": {
+        "x": 0,
+        "y": 112,
+        "w": 16,
+        "h": 16
+    },
+    "glowmoss_lantern_scaffold": {
+        "x": 0,
+        "y": 128,
+        "w": 16,
+        "h": 16
+    },
+    "pyre_scaffold": {
+        "x": 0,
+        "y": 144,
+        "w": 16,
+        "h": 16
+    }
+}
