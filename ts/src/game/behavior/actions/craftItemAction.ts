@@ -8,13 +8,19 @@ import {
     addToHeldItem,
     HeldItemComponentId,
     isHeldEmpty,
+    type HeldItemComponent,
 } from "../../component/heldItemComponent.ts";
 import { spendEntityEnergy } from "../../component/energyComponent.ts";
-
+import {
+    CraftingComponentId,
+    CraftingOutputPolicy,
+} from "../../component/craftingComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { completeClaimedJob } from "../../job/jobLifecycle.ts";
+import { DropMode, dropItemAtPosition } from "../dropItem.ts";
 import { ActionComplete, ActionRunning, type ActionResult } from "./action.ts";
 import type { CraftingRecipe } from "../../../data/crafting/craftingRecipe.ts";
+import type { InventoryItemQuantity } from "../../../data/inventory/inventoryItemQuantity.ts";
 
 /**
  * Two-phase to avoid consuming inputs and then losing them to a replan.
@@ -36,15 +42,20 @@ export type CraftItemActionData = {
  * Craft an item at a building.
  * - First tick: consume inputs from the building's inventory.
  * - Progress stored on action.progress.
- * - On completion: deposit outputs into the worker's held slot.
+ * - On completion: the output goes where the building's output policy says.
+ *   Haul puts it in the worker's held slot, and the held-item behaviors carry
+ *   it to a store. Drop sets it on the ground beside the bench for haulers.
  *
  * The planner is responsible for ensuring held is either empty or holds
- * the same item id as the recipe's output before this action runs. If
- * held holds an incompatible item the action fails.
+ * the same item id as the recipe's output before this action runs. That
+ * holds under both policies, since a drop with no free tile nearby falls
+ * back to held rather than lose the goods. If held holds an incompatible
+ * item the action fails.
  */
 export function executeCraftItemAction(
     action: CraftItemActionData,
     entity: Entity,
+    tick: number,
 ): ActionResult {
     const root = entity.getRootEntity();
     const buildingEntity = root.findEntity(action.buildingId);
@@ -104,7 +115,24 @@ export function executeCraftItemAction(
     spendEntityEnergy(entity, 2);
 
     if (action.progress >= recipe.duration) {
+        const policy =
+            buildingEntity.getEcsComponent(CraftingComponentId)?.outputPolicy;
         for (const output of recipe.outputs) {
+            let placedOnGround = false;
+            if (policy === CraftingOutputPolicy.Drop) {
+                placedOnGround = setOutputBesideBench(
+                    root,
+                    tick,
+                    buildingEntity,
+                    output,
+                );
+            }
+            if (placedOnGround) {
+                continue;
+            }
+
+            // Haul policy, or no tile beside the bench with room: the output
+            // goes in hand. Losing goods is never an option.
             if (!isHeldEmpty(held) && held.item!.id !== output.item.id) {
                 log.warn(
                     `Cannot deposit craft output: held has ${held.item!.id}, output is ${output.item.id}`,
@@ -120,4 +148,27 @@ export function executeCraftItemAction(
     }
 
     return ActionRunning;
+}
+
+/**
+ * Put a craft output on the nearest free tile beside the bench. The bench's
+ * own tile never takes a drop, so the search starts adjacent to it. Returns
+ * false when no tile within reach has room, and the caller keeps the output
+ * in hand instead.
+ */
+function setOutputBesideBench(
+    root: Entity,
+    tick: number,
+    building: Entity,
+    output: InventoryItemQuantity,
+): boolean {
+    return dropItemAtPosition(
+        root,
+        tick,
+        building.worldPosition,
+        output.item,
+        output.amount,
+        `Set out ${output.item.name} for haulers`,
+        DropMode.Nearest,
+    );
 }

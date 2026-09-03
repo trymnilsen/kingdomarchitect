@@ -73,7 +73,7 @@ export const executeAction: BehaviorActionExecutor = (
         case "depositToInventory":
             return executeDepositToInventoryAction(action, entity);
         case "craftItem":
-            return executeCraftItemAction(action, entity);
+            return executeCraftItemAction(action, entity, tick);
         case "collectItems":
             return executeCollectItemsAction(action, entity);
         case "attackTarget":

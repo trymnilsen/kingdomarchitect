@@ -1,58 +1,100 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
 import { ScenarioHarness } from "./scenarioHarness.ts";
+import type { Entity } from "../../../src/game/entity/entity.ts";
+import { isPointAdjacentTo } from "../../../src/common/point.ts";
 import {
     addInventoryItem,
     InventoryComponentId,
 } from "../../../src/game/component/inventoryComponent.ts";
+import {
+    CraftingComponentId,
+    CraftingOutputPolicy,
+} from "../../../src/game/component/craftingComponent.ts";
+import { CollectableComponentId } from "../../../src/game/component/collectableComponent.ts";
+import { GroundItemComponentId } from "../../../src/game/component/groundItemComponent.ts";
 import { woodResourceItem } from "../../../src/data/inventory/items/resources.ts";
 import { planksRecipe } from "../../../src/data/crafting/recipes/carpenterRecipes.ts";
 import { carpenter } from "../../../src/data/building/wood/carpenter.ts";
 import { createCraftingJob } from "../../../src/game/job/craftingJob.ts";
 import { getBehaviorAgent } from "../../../src/game/component/behaviorAgentComponent.ts";
 
+/**
+ * Worker at (10, 8), carpenter at (11, 8) stocked with the wood for one planks
+ * craft, and a stockpile at (15, 8) to haul into.
+ */
+function craftingYard(): {
+    harness: ScenarioHarness;
+    building: Entity;
+    stockpile: Entity;
+    worker: Entity;
+} {
+    const harness = new ScenarioHarness();
+    const building = harness.addCraftingBuilding(
+        "carpenter",
+        { x: 11, y: 8 },
+        carpenter,
+    );
+    addInventoryItem(
+        building.requireEcsComponent(InventoryComponentId),
+        woodResourceItem,
+        4,
+    );
+    const stockpile = harness.addStockpile("stockpile", { x: 15, y: 8 });
+    const worker = harness.addWorker("worker", { x: 10, y: 8 });
+    harness.queueJob(createCraftingJob(building.id, planksRecipe));
+    return { harness, building, stockpile, worker };
+}
+
+function groundPlanks(root: Entity): Entity | null {
+    for (const [pile, collectable] of root.queryComponents(
+        CollectableComponentId,
+    )) {
+        if (!pile.hasComponent(GroundItemComponentId)) continue;
+        if (collectable.items.some((stack) => stack.item.id === "planks")) {
+            return pile;
+        }
+    }
+    return null;
+}
+
 describe("craftAndHaul scenario tests", () => {
-    it("crafted output ends up in the worker's held slot", () => {
-        /**
-         * Worker at (10, 8). Carpenter at (11, 8) starts with 4 wood already in
-         * its inventory (the held-item refactor stages inputs in the building,
-         * not the worker). Queue a planks crafting job. After the worker
-         * crafts, the planks land in held, not in the building.
-         */
-        const harness = new ScenarioHarness();
-        const building = harness.addCraftingBuilding(
-            "carpenter",
-            { x: 11, y: 8 },
-            carpenter,
-        );
-        harness.addWorker("worker", { x: 10, y: 8 });
+    it("hauls the crafted output to a stockpile by default", () => {
+        const { harness, building, stockpile, worker } = craftingYard();
 
-        const buildingInventory =
-            building.requireEcsComponent(InventoryComponentId);
-        addInventoryItem(buildingInventory, woodResourceItem, 4);
-
-        harness.queueJob(createCraftingJob(building.id, planksRecipe));
-
-        const worker = harness.root.findEntity("worker")!;
-        const ticks = harness.tickUntil(
-            () => harness.getHeldAmount(worker, "planks") > 0,
-            50,
+        harness.tickUntil(
+            () => harness.getItemCount(stockpile, "planks") > 0,
+            80,
         );
 
         assert.ok(
-            harness.getHeldAmount(worker, "planks") > 0,
-            `Worker should have planks in held after crafting (elapsed: ${ticks} ticks)`,
+            harness.getItemCount(stockpile, "planks") > 0,
+            "the store holds the planks",
         );
-        assert.strictEqual(
-            harness.getItemCount(building, "planks"),
-            0,
-            "Building should NOT have planks",
-        );
+        assert.strictEqual(harness.getHeldAmount(worker, "planks"), 0);
+        assert.strictEqual(harness.getItemCount(building, "planks"), 0);
         assert.strictEqual(
             harness.getItemCount(building, "wood"),
             0,
-            "Building should have consumed its wood",
+            "the craft consumed the wood",
         );
+    });
+
+    it("sets the crafted output down beside the bench under the drop policy", () => {
+        const { harness, building, stockpile, worker } = craftingYard();
+        building.requireEcsComponent(CraftingComponentId).outputPolicy =
+            CraftingOutputPolicy.Drop;
+
+        harness.tickUntil(() => groundPlanks(harness.root) !== null, 80);
+
+        const pile = groundPlanks(harness.root);
+        assert.ok(pile, "a planks pile lies on the ground");
+        assert.ok(
+            isPointAdjacentTo(pile.worldPosition, building.worldPosition),
+            "the pile lies beside the bench",
+        );
+        assert.strictEqual(harness.getItemCount(stockpile, "planks"), 0);
+        assert.strictEqual(harness.getHeldAmount(worker, "planks"), 0);
     });
 
     it("restock moves items from surplus stockpile to deficit stockpile", () => {

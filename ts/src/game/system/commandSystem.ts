@@ -43,6 +43,10 @@ import {
     type QueueJobCommand,
 } from "../../server/message/command/queueJobCommand.ts";
 import {
+    SetCraftingOutputPolicyCommandId,
+    type SetCraftingOutputPolicyCommand,
+} from "../../server/message/command/setCraftingOutputPolicyCommand.ts";
+import {
     SetFarmCropCommandId,
     type SetFarmCropCommand,
 } from "../../server/message/command/setFarmCropCommand.ts";
@@ -97,6 +101,7 @@ import {
     equipItem,
     unequipItem,
 } from "./command/equipmentCommands.ts";
+import { setCraftingOutputPolicy } from "./command/craftingCommands.ts";
 import { setFarmCrop } from "./command/farmCommands.ts";
 import { setGateOpen } from "./command/gateCommands.ts";
 import { consumeItem } from "./command/inventoryCommands.ts";
@@ -229,6 +234,12 @@ function onGameMessage(
             break;
         case SetGateOpenCommandId:
             setGateOpen(root, message.command as SetGateOpenCommand);
+            break;
+        case SetCraftingOutputPolicyCommandId:
+            setCraftingOutputPolicy(
+                root,
+                message.command as SetCraftingOutputPolicyCommand,
+            );
             break;
     }
 }
