@@ -59,9 +59,12 @@ export function goblinFireplace(): Entity {
     entity.setEcsComponent(createAnimationComponent(loopingAnimation));
     entity.setEcsComponent(createSpriteComponent(spriteRefs.stone_brazier));
     entity.setEcsComponent(createFireSourceComponent(15, 2));
-    // The camp fire is a real light: a scouted camp glows at night. Ownership
-    // keeps it out of the player's hearthlight, so it lights without claiming.
-    entity.setEcsComponent(createLightSourceComponent(campfireLightSource.id));
+    // The camp fire is a real light: a scouted camp glows at night. It stakes
+    // the camp's own ground, and ownership keeps it out of the player's
+    // hearthlight.
+    entity.setEcsComponent(
+        createLightSourceComponent(campfireLightSource.id, true),
+    );
 
     return entity;
 }

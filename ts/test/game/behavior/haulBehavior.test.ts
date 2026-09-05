@@ -11,8 +11,9 @@ import {
     HeldItemComponentId,
 } from "../../../src/game/component/heldItemComponent.ts";
 import { createInventoryComponent } from "../../../src/game/component/inventoryComponent.ts";
-import { createLightSourceComponent } from "../../../src/game/component/lightSourceComponent.ts";
 import { createPlayerKingdomComponent } from "../../../src/game/component/playerKingdomComponent.ts";
+import { buildingPrefab } from "../../../src/game/prefab/buildingPrefab.ts";
+import { cresset } from "../../../src/data/building/light/cresset.ts";
 import {
     createStockpileComponent,
     setPreferredAmount,
@@ -28,7 +29,7 @@ import {
     woodResourceItem,
 } from "../../../src/data/inventory/items/resources.ts";
 
-/** A radius-1 cresset at (12, 8) lights itself and its four cardinal neighbours. */
+/** A cresset at (12, 8) claims a radius-2 disc of hearthlight around itself. */
 const CRESSET = { x: 12, y: 8 };
 const LIT = { x: 13, y: 8 };
 const LIT_FARTHER = { x: 12, y: 9 };
@@ -50,10 +51,10 @@ function litYard(): Yard {
     kingdom.setEcsComponent(createPlayerKingdomComponent());
     root.addChild(kingdom);
 
-    const cresset = new Entity("cresset");
-    cresset.setEcsComponent(createLightSourceComponent("cresset"));
-    kingdom.addChild(cresset);
-    cresset.worldPosition = CRESSET;
+    // The real prefab, because a bare light component claims nothing.
+    const light = buildingPrefab(cresset, false);
+    kingdom.addChild(light);
+    light.worldPosition = CRESSET;
 
     const store = new Entity("store");
     store.setEcsComponent(createStockpileComponent(100));

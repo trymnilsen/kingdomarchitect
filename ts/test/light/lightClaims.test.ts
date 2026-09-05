@@ -18,11 +18,14 @@ function addSource(
     id: string,
     sourceId: string,
     position: Point,
+    claimsHearthlight: boolean,
     pattern: Point[] | null = null,
 ): Entity {
     const source = new Entity(id);
     parent.addChild(source);
-    source.setEcsComponent(createLightSourceComponent(sourceId, pattern));
+    source.setEcsComponent(
+        createLightSourceComponent(sourceId, claimsHearthlight, pattern),
+    );
     // worldPosition must be set after addChild so the parent transform applies.
     source.worldPosition = position;
     return source;
@@ -35,7 +38,7 @@ function litAt(litTiles: ReadonlySet<number>, x: number, y: number): boolean {
 describe("lit coverage", () => {
     it("stamps a disc by squared euclidean distance at its radius edge", () => {
         const root = new Entity("root");
-        addSource(root, "b", "lampPost", { x: 12, y: 8 });
+        addSource(root, "b", "lampPost", { x: 12, y: 8 }, true);
 
         const lit = computeLitTiles(collectLightClaims(root, "illumination"));
 
@@ -51,7 +54,7 @@ describe("lit coverage", () => {
 
     it("lights exactly the emitter's own tile at radius 0", () => {
         const root = new Entity("root");
-        addSource(root, "w", "workerGlow", { x: 12, y: 8 });
+        addSource(root, "w", "workerGlow", { x: 12, y: 8 }, false);
 
         const lit = computeLitTiles(collectLightClaims(root, "illumination"));
 
@@ -63,7 +66,7 @@ describe("lit coverage", () => {
 
     it("stamps a pattern claim's offsets verbatim, ignoring the radius", () => {
         const root = new Entity("root");
-        addSource(root, "s", "searchlight", { x: 12, y: 8 }, [
+        addSource(root, "s", "searchlight", { x: 12, y: 8 }, true, [
             { x: 2, y: 0 },
             { x: 3, y: 1 },
         ]);
@@ -77,7 +80,7 @@ describe("lit coverage", () => {
         assert.strictEqual(lit.size, 2);
     });
 
-    it("scopes hearthlight to player-owned, claiming sources", () => {
+    it("scopes hearthlight to player-owned emitters carrying a claim", () => {
         const root = new Entity("root");
 
         const kingdom = new Entity("kingdom");
@@ -88,20 +91,21 @@ describe("lit coverage", () => {
         camp.setEcsComponent(createGoblinCampComponent(2));
         root.addChild(camp);
 
-        // Player cresset claims. Player workerGlow and buildingGlow light
-        // without claiming. The goblin camp fire is excluded by ownership.
-        addSource(kingdom, "cresset", "cresset", { x: 12, y: 8 });
-        addSource(kingdom, "glow", "workerGlow", { x: 20, y: 8 });
-        addSource(kingdom, "house", "buildingGlow", { x: 24, y: 8 });
-        addSource(camp, "fire", "campfire", { x: 30, y: 8 });
-        // A player searchlight pattern claims by the same data path as discs.
-        addSource(kingdom, "beam", "searchlight", { x: 16, y: 16 }, [
+        // A cresset pool and a house's glow claim alike. A worker's glow is
+        // created without a claim. The goblin hut claims, for its own camp.
+        addSource(kingdom, "cresset", "cresset", { x: 12, y: 8 }, true);
+        addSource(kingdom, "house", "buildingGlow", { x: 24, y: 8 }, true);
+        addSource(kingdom, "glow", "workerGlow", { x: 20, y: 8 }, false);
+        addSource(camp, "hut", "buildingGlow", { x: 30, y: 8 }, true);
+        // A player tower's searchlight pattern claims by the same path as discs.
+        addSource(kingdom, "beam", "searchlight", { x: 16, y: 16 }, true, [
             { x: 1, y: 0 },
         ]);
 
         const hearth = computeLitTiles(collectLightClaims(root, "hearthlight"));
 
         assert.strictEqual(litAt(hearth, 12, 8), true, "cresset claims");
+        assert.strictEqual(litAt(hearth, 24, 8), true, "house glow claims");
         assert.strictEqual(litAt(hearth, 17, 16), true, "beam pattern claims");
         assert.strictEqual(
             litAt(hearth, 20, 8),
@@ -109,14 +113,9 @@ describe("lit coverage", () => {
             "workerGlow never claims",
         );
         assert.strictEqual(
-            litAt(hearth, 24, 8),
-            false,
-            "buildingGlow never claims",
-        );
-        assert.strictEqual(
             litAt(hearth, 30, 8),
             false,
-            "goblin fire is not ours",
+            "goblin hut is not ours",
         );
 
         // The illumination scope still sees all of them.
@@ -147,9 +146,10 @@ describe("lit coverage", () => {
 
     it("answers set membership at night through isTileLit", () => {
         const root = new Entity("root");
-        addSource(root, "t", "cresset", { x: 12, y: 8 });
+        addSource(root, "t", "wayshrine", { x: 12, y: 8 }, true);
         const lit = computeLitTiles(collectLightClaims(root, "illumination"));
 
+        // Radius 1: the cardinal neighbour is lit, the diagonal is not.
         assert.strictEqual(isTileLit(lit, "night", { x: 13, y: 8 }), true);
         assert.strictEqual(isTileLit(lit, "night", { x: 13, y: 9 }), false);
     });

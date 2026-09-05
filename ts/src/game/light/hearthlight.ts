@@ -3,17 +3,8 @@ import type { Entity } from "../entity/entity.ts";
 import { collectLightClaims, computeLitTiles } from "./lightClaims.ts";
 
 /**
- * Hearthlight is what the kingdom's own light illuminates right now. A sweeping
- * searchlight beam and a cresset that can be snuffed work the same way: when
- * the light leaves a tile, the claim leaves with it.
- *
- * There is no phase or ambient term. Daylight is the sky's light, not the
- * kingdom's, so it claims nothing and the claim set is the same at noon as at
- * midnight.
- *
- * `workerGlow` and the carried torch render without claiming, through their
- * definitions' `claimsHearthlight`. One is a presence affordance rather than a
- * light in the fiction, and the other would let territory follow feet.
+ * Hearthlight is the defined "kingdom area" of a player. Its what would be
+ * defended and hauled in
  */
 export function computeHearthlight(root: Entity): Set<number> {
     return computeLitTiles(collectLightClaims(root, "hearthlight"));

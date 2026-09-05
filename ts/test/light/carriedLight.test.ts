@@ -2,7 +2,6 @@ import assert from "node:assert";
 import { describe, it } from "node:test";
 import { Entity } from "../../src/game/entity/entity.ts";
 import { encodePosition, type Point } from "../../src/common/point.ts";
-import type { InventoryItem } from "../../src/data/inventory/inventoryItem.ts";
 import { createEquipmentComponent } from "../../src/game/component/equipmentComponent.ts";
 import { createLightSourceComponent } from "../../src/game/component/lightSourceComponent.ts";
 import { createPlayerKingdomComponent } from "../../src/game/component/playerKingdomComponent.ts";
@@ -14,8 +13,6 @@ import {
     computeHearthlight,
     isInHearthlight,
 } from "../../src/game/light/hearthlight.ts";
-import { getLightSourceDefinition } from "../../src/data/light/lightSourceDefinition.ts";
-import { inventoryItems } from "../../src/data/inventory/inventoryItems.ts";
 import { torchItem } from "../../src/data/inventory/items/equipment.ts";
 
 /** A player worker holding a torch, alone in the dark away from any building. */
@@ -30,7 +27,7 @@ function kingdomWithTorchbearer(position: Point): Entity {
     const equipment = createEquipmentComponent();
     equipment.slots.secondary = torchItem;
     worker.setEcsComponent(equipment);
-    worker.setEcsComponent(createLightSourceComponent("workerGlow"));
+    worker.setEcsComponent(createLightSourceComponent("workerGlow", false));
     worker.worldPosition = position;
     return root;
 }
@@ -56,6 +53,8 @@ describe("carried light", () => {
     });
 
     it("claims no hearthlight, so territory cannot follow feet", () => {
+        // The worker's light is created without a claim, and equipping a
+        // torch only changes what is emitted.
         const root = kingdomWithTorchbearer({ x: 12, y: 8 });
 
         const hearth = computeLitTiles(collectLightClaims(root, "hearthlight"));
@@ -73,23 +72,5 @@ describe("carried light", () => {
 
         assert.strictEqual(isInHearthlight(hearth, { x: 26, y: 14 }), false);
         assert.strictEqual(isInHearthlight(hearth, { x: 27, y: 14 }), false);
-    });
-
-    it("no light-granting item claims hearthlight", () => {
-        const lightItems = (inventoryItems as readonly InventoryItem[]).filter(
-            (item): item is InventoryItem & { light: string } =>
-                item.light !== undefined,
-        );
-        assert.ok(lightItems.length > 0, "there is at least one to check");
-
-        for (const item of lightItems) {
-            const definition = getLightSourceDefinition(item.light);
-            assert.ok(definition, `${item.id} names a real light definition`);
-            assert.strictEqual(
-                definition.claimsHearthlight,
-                false,
-                `${item.id} must not claim hearthlight`,
-            );
-        }
     });
 });

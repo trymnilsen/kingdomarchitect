@@ -56,7 +56,7 @@ function makeHarness(): { harness: ScenarioHarness; kingdom: Entity } {
         [hearthDefenseSystem],
     );
     const kingdom = harness.addPlayerKingdom();
-    // One deliberate light: a cresset pool at (12,8) plus cardinals.
+    // One building claiming light: a cresset pool of radius 2 around (12,8).
     harness.addPlayerBuilding(kingdom, cresset, { x: 12, y: 8 }, "cresset1");
     return { harness, kingdom };
 }

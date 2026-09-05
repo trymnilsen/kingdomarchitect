@@ -43,6 +43,7 @@ import { buildingGlowLightSource } from "../../data/light/lightSourceDefinition.
 import {
     createLightSourceComponent,
     LightSourceComponentId,
+    type LightSourceComponent,
 } from "../component/lightSourceComponent.ts";
 import { HousingComponentId } from "../component/housingComponent.ts";
 import { stoneTower } from "../../data/building/stone/tower.ts";
@@ -110,22 +111,22 @@ function applyCraftingStation(
     entity.invalidateComponent(WorkplaceComponentId);
 }
 
-/**
- * Attaches the functional ECS components for a completed building.
- * Called both when creating a non-scaffolded building and when construction finishes.
- */
+export function createBuildingLightSource(
+    building: Building,
+): LightSourceComponent | null {
+    const lightSourceId = building.light ?? buildingGlowLightSource.id;
+    return createLightSourceComponent(lightSourceId, true);
+}
+
 export function applyFunctionalComponents(
     entity: Entity,
     building: Building,
 ): void {
-    // Every completed building emits light: its faint self-glow by default, a
-    // per-type override, or nothing when set to "none". Dedicated light sources
-    // (e.g. the lamp post) flow through this same path by naming their profile.
-    // Because this runs only for non-scaffolded buildings, foundations never
-    // glow without any extra check.
-    const lightSourceId = building.light ?? buildingGlowLightSource.id;
-    if (lightSourceId !== "none") {
-        entity.setEcsComponent(createLightSourceComponent(lightSourceId));
+    // This runs only for non-scaffolded buildings, so foundations never glow
+    // or claim without any extra check.
+    const lightSource = createBuildingLightSource(building);
+    if (lightSource) {
+        entity.setEcsComponent(lightSource);
         entity.invalidateComponent(LightSourceComponentId);
     }
 

@@ -31,7 +31,7 @@ function makeWorker(
     equipment.slots.secondary = secondary;
     worker.setEcsComponent(equipment);
     worker.setEcsComponent(
-        createLightSourceComponent(workerGlowLightSource.id),
+        createLightSourceComponent(workerGlowLightSource.id, false),
     );
     return worker;
 }
@@ -103,7 +103,7 @@ describe("resolveLightSource", () => {
     it("reads a building's own profile, having no equipment at all", () => {
         const building = new Entity("cressetBuilding");
         building.setEcsComponent(
-            createLightSourceComponent(cressetLightSource.id),
+            createLightSourceComponent(cressetLightSource.id, true),
         );
 
         assert.strictEqual(lightOf(building)?.id, cressetLightSource.id);

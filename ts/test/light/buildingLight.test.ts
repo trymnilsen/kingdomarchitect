@@ -17,7 +17,6 @@ const unlitBuilding: Building = {
     icon: emptySpriteRef,
     name: "Unlit",
     scale: 1,
-    light: "none",
 };
 
 /**

@@ -40,11 +40,7 @@ export type Building = {
      */
     previewOffset?: number;
     /**
-     * Which light source profile this building emits, as a
-     * {@link LightSourceDefinition} id, or `"none"` to emit nothing (ruins,
-     * foundations). When omitted the building uses the default faint self-glow.
-     * A building that is itself a placed light source (e.g. a brazier) points
-     * this at its own profile so it flows through the same emission path.
+     * Which light source profile this building emits
      */
     light?: string;
     requirements?: BuildingRequirements;

@@ -68,8 +68,6 @@ export function addInitialPlayerChunk(scopedEntity: Entity): Point {
         y: randomOffsetY,
     };
 
-    // A fresh kingdom starts with one deliberate light so it has a hearthlight
-    // claim from day one. Plain buildings glow without claiming.
     const startingCresset = buildingPrefab(cresset, false);
     playerKingdom.addChild(startingCresset);
     startingCresset.worldPosition = {
