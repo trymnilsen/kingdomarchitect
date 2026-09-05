@@ -60,17 +60,28 @@ describe("depositing into a store with limited room", () => {
         assert.strictEqual(isHeldEmpty(held), false);
     });
 
-    it("stops the worker choosing a store with no room left", () => {
+    it("falls back to dropping when the only store has no room left", () => {
         const behavior = createDepositHeldBehavior();
         const { worker } = settlementWithStockpile(200, 200);
         const held = worker.requireEcsComponent(HeldItemComponentId);
         held.item = woodResourceItem;
         held.amount = 8;
 
-        // The only store is full, so there is nowhere to take this. The worker
-        // must not plan a haul it cannot complete.
-        assert.strictEqual(behavior.isValid(worker), false);
-        assert.deepStrictEqual(behavior.expand(worker), []);
+        // The only store is full, so the worker cannot deposit there.
+        // Instead of attempting to haul to a full store or deadlocking in idle,
+        // it falls back to dropping the item.
+        assert.strictEqual(behavior.isValid(worker), true);
+        const actions = behavior.expand(worker);
+        assert.strictEqual(
+            actions.some((a) => a.type === "depositToStockpile"),
+            false,
+            "should not attempt to deposit to the full stockpile",
+        );
+        assert.strictEqual(
+            actions.some((a) => a.type === "dropHeld"),
+            true,
+            "should fall back to dropping the held item",
+        );
     });
 
     it("keeps a starting settlement able to bank what it chops", () => {

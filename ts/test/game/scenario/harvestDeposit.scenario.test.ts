@@ -57,26 +57,26 @@ describe("harvest-deposit scenario tests", () => {
         );
     });
 
-    it("idles holding the yield when no stockpile can accept it", () => {
+    it("drops the yield when no stockpile can accept it rather than deadlocking", () => {
         const harness = new ScenarioHarness();
         const worker = harness.addWorker("worker", { x: 12, y: 8 });
         const tree = addTree(harness);
 
         harness.queueJob(CollectResourceJob(tree, ResourceHarvestMode.Chop));
 
-        // Let it harvest, then keep ticking to confirm it neither drops the
-        // load nor thrashes. The gate keeps it from claiming further work.
-        harness.tickUntil(() => harness.getHeldAmount(worker, "wood") > 0, 60);
-        harness.tickN(10);
+        // Let it harvest, then tick for depositHeld fallback to drop the load
+        // so the worker's hands are freed and it doesn't deadlock in idle.
+        harness.tickUntil(() => groundPileCount(harness) > 0, 60);
 
-        assert.ok(
-            harness.getHeldAmount(worker, "wood") > 0,
-            "worker should still be holding the harvested wood",
+        assert.strictEqual(
+            harness.getHeldAmount(worker, "wood"),
+            0,
+            "worker should drop the wood to free its hands",
         );
         assert.strictEqual(
             groundPileCount(harness),
-            0,
-            "worker should not litter when there is nowhere to deposit",
+            1,
+            "harvested wood should be placed on the ground as a collectable pile",
         );
     });
 });
