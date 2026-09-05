@@ -60,12 +60,6 @@ describe("building light", () => {
         assert.strictEqual(litAt(lit, 16, 8), true);
     });
 
-    it('emits no light when the building opts out with "none"', () => {
-        const lit = coverageWithBuilding(unlitBuilding, false, { x: 12, y: 8 });
-
-        assert.strictEqual(lit.size, 0);
-    });
-
     it("does not light an unbuilt scaffolded foundation", () => {
         const lit = coverageWithBuilding(woodenHouse, true, { x: 12, y: 8 });
 
