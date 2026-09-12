@@ -7,10 +7,8 @@ import { carpenter } from "../../../src/data/building/wood/carpenter.ts";
 import { stockPile } from "../../../src/data/building/wood/storage.ts";
 import { gemResource } from "../../../src/data/inventory/items/resources.ts";
 import { woodResourceItem } from "../../../src/data/inventory/items/resources.ts";
-import {
-    RoleComponentId,
-    WorkerRole,
-} from "../../../src/game/component/worker/roleComponent.ts";
+import { WorkerRole } from "../../../src/game/component/worker/roleComponent.ts";
+import { setRoles } from "../behavior/behaviorTestHelpers.ts";
 import {
     addInventoryItem,
     InventoryComponentId,
@@ -36,7 +34,7 @@ describe("special building requirements", () => {
             false,
         );
 
-        worker.requireEcsComponent(RoleComponentId).role = WorkerRole.Devotee;
+        setRoles(worker, [WorkerRole.Devotee]);
 
         assert.strictEqual(
             checkSpecialRequirement(

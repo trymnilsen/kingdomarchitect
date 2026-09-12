@@ -12,6 +12,10 @@ import {
 import { createBehaviorSystem } from "../../../../src/game/behavior/systems/behaviorSystem.ts";
 import type { Behavior } from "../../../../src/game/behavior/behaviors/behavior.ts";
 import type { BehaviorActionData } from "../../../../src/game/behavior/actions/actionData.ts";
+import {
+    ROLE_RANK_STEP,
+    TOP_ROLE_UTILITY,
+} from "../../../../src/game/component/worker/rolePriority.ts";
 
 /**
  * Create a mock behavior for testing
@@ -384,6 +388,33 @@ describe("BehaviorSystem", () => {
 
             // Should stay with current behavior
             assert.strictEqual(agent.currentBehaviorName, "current");
+        });
+
+        it("still prefers a higher-ranked role after finishing a lower-ranked one", () => {
+            const { root, worker } = createTestScene();
+            const agent = worker.getEcsComponent(BehaviorAgentComponentId)!;
+
+            // One rank apart is the closest two roles get, so the tightest case.
+            const preferred = createMockBehavior("preferred", {
+                utility: TOP_ROLE_UTILITY,
+                actions: [{ type: "wait", until: 100 }],
+            });
+            const justFinished = createMockBehavior("justFinished", {
+                utility: TOP_ROLE_UTILITY - ROLE_RANK_STEP,
+                actions: [{ type: "wait", until: 200 }],
+            });
+
+            agent.hysteresis = { behaviorName: "justFinished" };
+            agent.actionQueue = [];
+            agent.pendingReplan = { kind: "replan" };
+
+            const system = createBehaviorSystem(() => [
+                preferred,
+                justFinished,
+            ]);
+            system.onUpdate!(root, 1);
+
+            assert.strictEqual(agent.currentBehaviorName, "preferred");
         });
 
         it("switches to significantly higher utility behavior", () => {

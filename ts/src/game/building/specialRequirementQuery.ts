@@ -8,13 +8,14 @@ import {
     RoleComponentId,
     WorkerRole,
 } from "../component/worker/roleComponent.ts";
+import { getRoleRank } from "../component/worker/rolePriority.ts";
 import type { Entity } from "../entity/entity.ts";
 import { findStockpiles } from "../entity/settlementQueries.ts";
 
 /**
  * Items that count as a magical focus. Any one of them satisfies the
  * requirement, so a settlement can qualify by looting a gem, by scribing a
- * tome, or by whatever it was that made someone the wizard.
+ * tome, or by whatever it was that made someone the wizard
  */
 const magicalFocusItemIds: readonly string[] = [
     gemResource.id,
@@ -23,15 +24,11 @@ const magicalFocusItemIds: readonly string[] = [
 ];
 
 /**
- * Whether the settlement currently employs anyone in the given role.
- *
- * Roles are worker state rather than building state, which is why the devotee
- * requirements read people and the carving requirement reads buildings.
+ * Whether the settlement currently employs anyone in the given role
  */
 function settlementHasRole(settlement: Entity, role: WorkerRole): boolean {
-    const roles = settlement.queryComponents(RoleComponentId);
-    for (const [, roleComponent] of roles) {
-        if (roleComponent.role === role) {
+    for (const [worker] of settlement.queryComponents(RoleComponentId)) {
+        if (getRoleRank(worker, role) >= 0) {
             return true;
         }
     }

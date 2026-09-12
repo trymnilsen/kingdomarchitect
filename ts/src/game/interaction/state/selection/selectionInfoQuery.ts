@@ -141,10 +141,14 @@ function entitySelectionInfo(
         }
     }
 
+    // Named after its first role, the one it does whenever it has the choice.
     const roleComponent = entity.getEcsComponent(RoleComponentId);
     if (roleComponent) {
-        const roleDefinition = getRoleDefinition(roleComponent.role);
-        name = roleDefinition.name;
+        if (roleComponent.permittedDutyCount === 0) {
+            name = "No roles";
+        } else {
+            name = getRoleDefinition(roleComponent.dutyPriority[0]).name;
+        }
     }
 
     if (entity.hasComponent(GoblinUnitComponentId)) {
@@ -171,6 +175,14 @@ function entitySelectionInfo(
 
         if (jobName) {
             subtitle = jobName;
+        } else if (
+            behaviorAgent.currentBehaviorName === null &&
+            roleComponent !== null &&
+            roleComponent.permittedDutyCount === 0
+        ) {
+            // This idling is the player's choice, not a worker failing to find
+            // work, and saying so is what stops the idling being silent.
+            subtitle = "no roles assigned";
         } else {
             const behaviorName = behaviorAgent.currentBehaviorName ?? "idle";
             if (behaviorName === "stepOutside") {

@@ -26,11 +26,8 @@ import { EquipFromHeldCommand } from "../../../../../../server/message/command/e
 import { AttackSelectionState } from "../../../attack/attackSelectionState.ts";
 import { ItemTag } from "../../../../../../data/inventory/inventoryItem.ts";
 import { ConsumeItemCommand } from "../../../../../../server/message/command/consumeItemCommand.ts";
-import { RoleSelectionState } from "../../../role/roleSelectionState.ts";
-import {
-    RoleComponentId,
-    WorkerStance,
-} from "../../../../../component/worker/roleComponent.ts";
+import { RolePriorityState } from "../../../role/rolePriorityState.ts";
+import { WorkerStance } from "../../../../../component/worker/roleComponent.ts";
 import { UpdateWorkerStanceCommand } from "../../../../../../server/message/command/updateWorkerStanceCommand.ts";
 import { StatsViewState } from "../../../stats/statsViewState.ts";
 import { SetPlayerCommand } from "../../../../../../server/message/command/setPlayerCommand.ts";
@@ -326,9 +323,6 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
         stateContext: StateContext,
         selectedEntity: Entity,
     ): UIActionbarItem[] {
-        const roleComponent = selectedEntity.getEcsComponent(RoleComponentId);
-        const currentStance = roleComponent?.stance ?? WorkerStance.Defensive;
-
         const items: UIActionbarItem[] = [
             {
                 text: "Interact",
@@ -339,11 +333,11 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
                 },
             },
             {
-                text: "Role",
+                text: "Roles",
                 icon: spriteRefs.empty_sprite,
                 onClick: () => {
                     stateContext.stateChanger.push(
-                        new RoleSelectionState(selectedEntity),
+                        new RolePriorityState(selectedEntity),
                     );
                 },
             },

@@ -35,6 +35,13 @@ import {
     RoleComponentId,
     WorkerRole,
 } from "../../component/worker/roleComponent.ts";
+import {
+    getRoleRank,
+    roleUtility,
+} from "../../component/worker/rolePriority.ts";
+
+/** For entities without roles, in practice goblins. Nobody ranks their work. */
+const UNROLED_JOB_UTILITY = 50;
 
 type BuildJobValidator = (
     root: Entity,
@@ -70,10 +77,12 @@ export function createPerformJobBehavior(
         name: "performJob",
 
         isValid(entity: Entity): boolean {
-            // Only the Worker role draws from the job pool; other roles have
-            // their own behaviors. Goblins have no role component and keep working.
-            const role = entity.getEcsComponent(RoleComponentId);
-            if (role && role.role !== WorkerRole.Worker) {
+            // A worker who excluded the Worker role draws nothing from the job
+            // pool. Goblins have no roles at all and keep working.
+            if (
+                entity.hasComponent(RoleComponentId) &&
+                getRoleRank(entity, WorkerRole.Worker) < 0
+            ) {
                 return false;
             }
 
@@ -101,8 +110,11 @@ export function createPerformJobBehavior(
             );
         },
 
-        utility(_entity: Entity): number {
-            return 50;
+        utility(entity: Entity): number {
+            if (!entity.hasComponent(RoleComponentId)) {
+                return UNROLED_JOB_UTILITY;
+            }
+            return roleUtility(entity, WorkerRole.Worker);
         },
 
         expand(entity: Entity): BehaviorActionData[] {

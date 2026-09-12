@@ -8,6 +8,12 @@ import { createJobQueueComponent } from "../../../src/game/component/jobQueueCom
 import type { Jobs } from "../../../src/game/job/job.ts";
 import { ResourceHarvestMode } from "../../../src/data/inventory/items/naturalResource.ts";
 import type { ComponentID } from "../../../src/game/component/component.ts";
+import {
+    allWorkerRoles,
+    createRoleComponent,
+    RoleComponentId,
+    type WorkerRole,
+} from "../../../src/game/component/worker/roleComponent.ts";
 import type { EntityEvent } from "../../../src/game/entity/entityEvent.ts";
 
 /**
@@ -134,6 +140,19 @@ export function createTestScene(): {
     const worker = createBehaviorTestEntity("worker");
     root.addChild(worker);
     return { root, worker };
+}
+
+/**
+ * Permit exactly the listed roles, in that order, with the rest excluded below
+ * them. Saves every test spelling out all eight roles.
+ */
+export function setRoles(entity: Entity, permitted: WorkerRole[]): void {
+    const rest = allWorkerRoles.filter((role) => !permitted.includes(role));
+    const roleComponent =
+        entity.getEcsComponent(RoleComponentId) ?? createRoleComponent();
+    roleComponent.dutyPriority = [...permitted, ...rest];
+    roleComponent.permittedDutyCount = permitted.length;
+    entity.setEcsComponent(roleComponent);
 }
 
 /**

@@ -1,9 +1,11 @@
 import { distance } from "../../../common/point.ts";
 import type { Entity } from "../../entity/entity.ts";
+import { getGameTimeTick } from "../../component/gameTimeComponent.ts";
+import { WorkerRole } from "../../component/worker/roleComponent.ts";
 import {
-    RoleComponentId,
-    WorkerRole,
-} from "../../component/worker/roleComponent.ts";
+    getRoleRank,
+    roleUtility,
+} from "../../component/worker/rolePriority.ts";
 import {
     StationComponentId,
     StationPriority,
@@ -15,51 +17,44 @@ import {
 import type { BehaviorActionData } from "../actions/actionData.ts";
 import type { Behavior } from "./behavior.ts";
 
-/**
- * Utility for *walking to* a tower. Below survival/combat (90+) so a guard still
- * leaves to eat, sleep, and fight, then returns. Above incidental behaviors
- * (deposit/restock ~15). It need not out-rank jobs (50) because guards are excluded
- * from the job pool entirely (see PerformJobBehavior).
- */
-const GARRISON_UTILITY = 40;
+/** How long one watch lasts before the guard re-selects. */
+const HOLD_TICKS = 1;
 
 /**
- * GarrisonBehavior: a Guard walks to a tower's lookout station and mans it. The
- * effects (vision vantage by day, searchlight by night) follow from the worker
- * simply standing on the tile.
+ * GarrisonBehavior: a Guard walks to a tower's lookout station, mans it, and
+ * keeps standing there. The vantage and searchlight follow from the tile alone.
  *
- * There is no "hold" action. Once on the post the behavior has nothing left to do,
- * so it expands to an empty plan and the worker idles in place. An empty queue makes
- * the behavior system re-evaluate every tick, so the guard reacts promptly to needs
- * and combat. Because nothing moves it, it stays put. StepOutsideBehavior is
- * taught (via {@link isManningStation}) to leave a manning guard alone.
+ * Holding the post competes with the guard's other duties on rank. Ranked above
+ * work a guard stays on the wall, ranked below it the guard climbs down and
+ * returns when work runs out.
  *
- * Staffing is fully stateless: occupancy is read live from {@link stationQuery}, so
- * nothing can dangle when a guard dies or despawns. This behavior owns only the
- * staffing *policy*, which free post to take.
+ * Occupancy is read live rather than stored, so nothing dangles when a guard
+ * dies. This behavior owns only the staffing policy, which free post to take.
  */
 export function createGarrisonBehavior(): Behavior {
     return {
         name: "garrison",
 
         isValid(entity: Entity): boolean {
-            const role = entity.getEcsComponent(RoleComponentId);
-            if (role?.role !== WorkerRole.Guard) {
+            if (getRoleRank(entity, WorkerRole.Guard) < 0) {
                 return false;
             }
-            // Already manning a post → nothing to do but stay. Idling there keeps
-            // the body on the tile (StepOutside leaves a manning guard alone).
+            // Already on a post: staying there is the duty.
             if (isManningStation(entity)) {
-                return false;
+                return true;
             }
             return bestFreeStation(entity) !== null;
         },
 
-        utility(_entity: Entity): number {
-            return GARRISON_UTILITY;
+        utility(entity: Entity): number {
+            return roleUtility(entity, WorkerRole.Guard);
         },
 
         expand(entity: Entity): BehaviorActionData[] {
+            if (isManningStation(entity)) {
+                const now = getGameTimeTick(entity.getRootEntity());
+                return [{ type: "holdStation", untilTick: now + HOLD_TICKS }];
+            }
             const post = bestFreeStation(entity);
             if (!post) {
                 return [];

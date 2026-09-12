@@ -15,7 +15,7 @@ import type { Behavior } from "./behavior.ts";
  * this behavior in the resolver's array (the sort is stable). The hysteresis
  * bonus can keep an already-running engagement ahead of a fresh command.
  */
-const DAMAGE_UTILITY = 90;
+export const DAMAGE_UTILITY = 90;
 
 /**
  * Utility when the top threat is only an intrusion sighting. Hunting a

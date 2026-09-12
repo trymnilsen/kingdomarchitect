@@ -11,6 +11,18 @@ export const WorkerRole = {
 
 export type WorkerRole = (typeof WorkerRole)[keyof typeof WorkerRole];
 
+/** Every role in book order. A worker's own order is a permutation of this. */
+export const allWorkerRoles: readonly WorkerRole[] = [
+    WorkerRole.Worker,
+    WorkerRole.Explorer,
+    WorkerRole.Guard,
+    WorkerRole.Devotee,
+    WorkerRole.Spy,
+    WorkerRole.Envoy,
+    WorkerRole.Trader,
+    WorkerRole.Hauler,
+];
+
 export const WorkerStance = {
     Defensive: 0,
     Aggressive: 1,
@@ -20,14 +32,31 @@ export type WorkerStance = (typeof WorkerStance)[keyof typeof WorkerStance];
 
 export type RoleComponent = {
     id: typeof RoleComponentId;
-    role: WorkerRole;
+    /** Every WorkerRole exactly once, most preferred first. Index is rank. */
+    dutyPriority: WorkerRole[];
+    /** How many leading entries the worker performs. The rest report invalid. */
+    permittedDutyCount: number;
     stance: WorkerStance;
 };
 
+/**
+ * A fresh worker works and hauls. Hauling by default keeps ground piles from
+ * sitting there until the player thinks to staff a hauler.
+ */
 export function createRoleComponent(): RoleComponent {
     return {
         id: RoleComponentId,
-        role: WorkerRole.Worker,
+        dutyPriority: [
+            WorkerRole.Worker,
+            WorkerRole.Hauler,
+            WorkerRole.Explorer,
+            WorkerRole.Guard,
+            WorkerRole.Devotee,
+            WorkerRole.Spy,
+            WorkerRole.Envoy,
+            WorkerRole.Trader,
+        ],
+        permittedDutyCount: 2,
         stance: WorkerStance.Defensive,
     };
 }

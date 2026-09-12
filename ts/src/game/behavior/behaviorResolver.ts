@@ -18,7 +18,6 @@ import { createStepOutsideBehavior } from "./behaviors/stepOutsideBehavior.ts";
 import { planBuildBuilding } from "../job/planner/buildBuildingPlanner.ts";
 import { planGoblinBuildJob } from "../job/planner/goblinBuildJobPlanner.ts";
 import { canExecuteBuildJob } from "../job/buildBuildingJob.ts";
-
 /**
  * Creates a BehaviorResolver that returns the behaviors applicable to an
  * entity. Behavior instances are created once and reused across all calls.

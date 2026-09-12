@@ -1,7 +1,6 @@
 import { allSides } from "../../../common/sides.ts";
 import type { SpriteRef } from "../../../asset/sprite.ts";
 import { spriteRefs } from "../../../asset/sprite.ts";
-import { bookInkColor } from "../../../ui/color.ts";
 import {
     createComponent,
     type ComponentDescriptor,
@@ -14,29 +13,16 @@ import { uiColumn, uiRow } from "../../../ui/declarative/uiSequence.ts";
 import { uiText } from "../../../ui/declarative/uiText.ts";
 import { ninePatchBackground } from "../../../ui/uiBackground.ts";
 import { fillUiSize, wrapUiSize } from "../../../ui/uiSize.ts";
+import {
+    bookSubtitleStyle,
+    bookTextStyle,
+    bookTitleStyle,
+} from "./bookTextStyles.ts";
 import { uiScaffold } from "./uiScaffold.ts";
 
-const bookTextStyle = {
-    color: bookInkColor,
-    font: "Silkscreen",
-    size: 16,
-};
-
-const bookTitleStyle = {
-    color: bookInkColor,
-    font: "Silkscreen",
-    size: 20,
-};
-
-const bookSubtitleStyle = {
-    color: bookInkColor,
-    font: "Silkscreen",
-    size: 12,
-};
-
 /**
- * One pickable thing in the book. Crop and role definitions both satisfy this
- * shape, so they can be handed to the view as they are.
+ * One pickable thing in the book. A crop definition satisfies this shape, so
+ * it can be handed to the view as it is.
  */
 export type BookSelectionEntry = {
     name: string;
@@ -177,11 +163,6 @@ function createDetailsView(entry: BookSelectionEntry): ComponentDescriptor {
     });
 }
 
-/**
- * Master/detail picker rendered as an open book: the list on the left page,
- * the selected entry described on the right. Crop and role selection both use
- * it, and the caller maps the chosen index back to its own domain value.
- */
 export const bookSelectionView = createComponent<BookSelectionViewProps>(
     ({ props, withState }) => {
         const [selectedIndex, setSelectedIndex] = withState(

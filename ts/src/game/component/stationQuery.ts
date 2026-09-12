@@ -1,24 +1,13 @@
 import { pointEquals } from "../../common/point.ts";
 import type { Entity } from "../entity/entity.ts";
 import { StationComponentId, StationPriority } from "./stationComponent.ts";
-import { RoleComponentId, WorkerRole } from "./worker/roleComponent.ts";
+import { WorkerRole } from "./worker/roleComponent.ts";
+import { getRoleRank } from "./worker/rolePriority.ts";
 import { PlayerUnitComponentId } from "./playerUnitComponent.ts";
 
 /**
- * Station occupancy, derived from standing on the tile rather than stored, so
- * nothing dangles when a worker dies or despawns. The vision vantage, the
- * garrison behavior, the step-outside exemption and the night watch all ask
- * here, so they cannot drift apart.
- *
- * The two predicates differ:
- *  - {@link stationUnderEntity} is role-agnostic. Any body on a station tile
- *    gets the manned-tower effects.
- *  - {@link isManningStation} is role-gated. Only a Guard on an enabled station
- *    is left in place, which is how a disabled station or an un-roled guard
- *    self-heals: StepOutside grounds them.
+ * The built station the entity is standing on, or null.
  */
-
-/** The built station the entity is standing on, or null. */
 export function stationUnderEntity(entity: Entity): Entity | null {
     // A tower never counts as standing on itself.
     if (entity.getEcsComponent(StationComponentId)) {
@@ -34,7 +23,10 @@ export function stationUnderEntity(entity: Entity): Entity | null {
     return null;
 }
 
-/** The worker standing on this tower, or null (at most one, the tile is impassable). */
+/**
+ * The worker standing on this tower, or null
+ * (at most one, the tile is impassable).
+ */
 export function stationOccupant(root: Entity, tower: Entity): Entity | null {
     for (const [unit] of root.queryComponents(PlayerUnitComponentId)) {
         if (pointEquals(unit.worldPosition, tower.worldPosition)) {
@@ -44,20 +36,18 @@ export function stationOccupant(root: Entity, tower: Entity): Entity | null {
     return null;
 }
 
-/** Whether any worker is manning this tower. */
+/**
+ * Whether any worker is manning this tower.
+ */
 export function isTowerManned(root: Entity, tower: Entity): boolean {
     return stationOccupant(root, tower) !== null;
 }
 
 /**
- * Whether this worker is the intended occupant of an *enabled* station it stands on.
- * v1: intended occupant == Guard. This is the single predicate the garrison behavior
- * (already manning → idle) and StepOutsideBehavior (don't ground a manning guard)
- * both read, and the one line drafting later broadens to "Guard or drafted-here".
+ * Check if an entity should man the station
  */
 export function isManningStation(entity: Entity): boolean {
-    const role = entity.getEcsComponent(RoleComponentId);
-    if (role?.role !== WorkerRole.Guard) {
+    if (getRoleRank(entity, WorkerRole.Guard) < 0) {
         return false;
     }
     const tower = stationUnderEntity(entity);

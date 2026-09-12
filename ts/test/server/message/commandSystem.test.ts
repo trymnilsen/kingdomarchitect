@@ -65,14 +65,15 @@ import {
 } from "../../../src/server/message/command/prioritiseJobCommand.ts";
 import { swordItem } from "../../../src/data/inventory/items/equipment.ts";
 import {
-    UpdateWorkerRoleCommandId,
-    type UpdateWorkerRoleCommand,
-} from "../../../src/server/message/command/updateWorkerRoleCommand.ts";
+    SetRolePriorityCommandId,
+    type SetRolePriorityCommand,
+} from "../../../src/server/message/command/setRolePriorityCommand.ts";
 import {
     UpdateWorkerStanceCommandId,
     type UpdateWorkerStanceCommand,
 } from "../../../src/server/message/command/updateWorkerStanceCommand.ts";
 import {
+    allWorkerRoles,
     createRoleComponent,
     RoleComponentId,
     WorkerRole,
@@ -712,124 +713,156 @@ describe("commandSystem", () => {
         });
     });
 
-    describe("UpdateWorkerRoleCommand", () => {
-        it("updates worker role", () => {
+    describe("SetRolePriorityCommand", () => {
+        /** A worker with the default role order, ready to be reordered. */
+        function workerWithRoles(): {
+            root: Entity;
+            worker: Entity;
+            send: (command: SetRolePriorityCommand) => void;
+        } {
             const root = new Entity("root");
-            const persistenceManager = createTestPersistenceManager();
-
             const worker = new Entity("worker1");
-            const roleComponent = createRoleComponent();
-            worker.setEcsComponent(roleComponent);
+            worker.setEcsComponent(createRoleComponent());
+            worker.setEcsComponent(createBehaviorAgentComponent());
             root.addChild(worker);
 
             const system = createCommandSystem(
-                persistenceManager,
+                createTestPersistenceManager(),
                 new GameTime(),
             );
 
-            const message: CommandGameMessage = {
-                type: CommandGameMessageType,
-                command: {
-                    id: UpdateWorkerRoleCommandId,
+            return {
+                root,
+                worker,
+                send: (command: SetRolePriorityCommand) => {
+                    system.onGameMessage?.(root, {
+                        type: CommandGameMessageType,
+                        command,
+                    } as CommandGameMessage);
+                },
+            };
+        }
+
+        /** Guard first, then the rest of the roles in their usual order. */
+        const guardFirst = [
+            WorkerRole.Guard,
+            ...allWorkerRoles.filter((role) => role !== WorkerRole.Guard),
+        ];
+
+        it("applies a valid order and asks the worker to replan", () => {
+            const { worker, send } = workerWithRoles();
+            const agent = worker.requireEcsComponent(BehaviorAgentComponentId);
+            agent.pendingReplan = undefined;
+
+            send({
+                id: SetRolePriorityCommandId,
+                worker: "worker1",
+                dutyPriority: guardFirst,
+                permittedDutyCount: 3,
+            });
+
+            const role = worker.requireEcsComponent(RoleComponentId);
+            assert.deepStrictEqual(role.dutyPriority, guardFirst);
+            assert.strictEqual(role.permittedDutyCount, 3);
+            assert.ok(
+                agent.pendingReplan,
+                "the worker acts on the new order now, not when its plan runs out",
+            );
+        });
+
+        it("excludes every role when the threshold is zero", () => {
+            const { worker, send } = workerWithRoles();
+
+            send({
+                id: SetRolePriorityCommandId,
+                worker: "worker1",
+                dutyPriority: guardFirst,
+                permittedDutyCount: 0,
+            });
+
+            assert.strictEqual(
+                worker.requireEcsComponent(RoleComponentId).permittedDutyCount,
+                0,
+            );
+        });
+
+        it("rejects an order that is not a permutation of every role", () => {
+            const { worker, send } = workerWithRoles();
+            const before = worker.requireEcsComponent(RoleComponentId);
+            const original = [...before.dutyPriority];
+
+            const duplicated = [...guardFirst];
+            duplicated[1] = WorkerRole.Guard;
+
+            send({
+                id: SetRolePriorityCommandId,
+                worker: "worker1",
+                dutyPriority: duplicated,
+                permittedDutyCount: 3,
+            });
+
+            assert.deepStrictEqual(before.dutyPriority, original);
+        });
+
+        it("rejects an order missing a role", () => {
+            const { worker, send } = workerWithRoles();
+            const before = worker.requireEcsComponent(RoleComponentId);
+            const original = [...before.dutyPriority];
+
+            send({
+                id: SetRolePriorityCommandId,
+                worker: "worker1",
+                dutyPriority: guardFirst.slice(0, 7),
+                permittedDutyCount: 3,
+            });
+
+            assert.deepStrictEqual(before.dutyPriority, original);
+        });
+
+        it("rejects a threshold outside the list", () => {
+            const { worker, send } = workerWithRoles();
+            const before = worker.requireEcsComponent(RoleComponentId);
+            const originalCount = before.permittedDutyCount;
+
+            for (const permittedDutyCount of [-1, 9]) {
+                send({
+                    id: SetRolePriorityCommandId,
                     worker: "worker1",
-                    role: WorkerRole.Guard,
-                } as UpdateWorkerRoleCommand,
-            };
-
-            system.onGameMessage?.(root, message);
-
-            const updatedRole = worker.getEcsComponent(RoleComponentId);
-            assert.ok(updatedRole);
-            assert.strictEqual(updatedRole.role, WorkerRole.Guard);
-        });
-
-        it("ignores a role update for a worker that does not exist", () => {
-            const root = new Entity("root");
-            const persistenceManager = createTestPersistenceManager();
-
-            const system = createCommandSystem(
-                persistenceManager,
-                new GameTime(),
-            );
-
-            const message: CommandGameMessage = {
-                type: CommandGameMessageType,
-                command: {
-                    id: UpdateWorkerRoleCommandId,
-                    worker: "nonexistent",
-                    role: WorkerRole.Guard,
-                } as UpdateWorkerRoleCommand,
-            };
-
-            // Should not throw
-            system.onGameMessage?.(root, message);
-        });
-
-        it("ignores a role update for an entity with no role component", () => {
-            const root = new Entity("root");
-            const persistenceManager = createTestPersistenceManager();
-
-            const worker = new Entity("worker1");
-            root.addChild(worker);
-
-            const system = createCommandSystem(
-                persistenceManager,
-                new GameTime(),
-            );
-
-            const message: CommandGameMessage = {
-                type: CommandGameMessageType,
-                command: {
-                    id: UpdateWorkerRoleCommandId,
-                    worker: "worker1",
-                    role: WorkerRole.Guard,
-                } as UpdateWorkerRoleCommand,
-            };
-
-            // Should not throw
-            system.onGameMessage?.(root, message);
-        });
-
-        it("updates to all role types correctly", () => {
-            const root = new Entity("root");
-            const persistenceManager = createTestPersistenceManager();
-
-            const worker = new Entity("worker1");
-            const roleComponent = createRoleComponent();
-            worker.setEcsComponent(roleComponent);
-            root.addChild(worker);
-
-            const system = createCommandSystem(
-                persistenceManager,
-                new GameTime(),
-            );
-
-            const roles = [
-                WorkerRole.Worker,
-                WorkerRole.Explorer,
-                WorkerRole.Guard,
-                WorkerRole.Devotee,
-                WorkerRole.Spy,
-                WorkerRole.Envoy,
-                WorkerRole.Trader,
-            ];
-
-            for (const role of roles) {
-                const message: CommandGameMessage = {
-                    type: CommandGameMessageType,
-                    command: {
-                        id: UpdateWorkerRoleCommandId,
-                        worker: "worker1",
-                        role,
-                    } as UpdateWorkerRoleCommand,
-                };
-
-                system.onGameMessage?.(root, message);
-
-                const updatedRole = worker.getEcsComponent(RoleComponentId);
-                assert.ok(updatedRole);
-                assert.strictEqual(updatedRole.role, role);
+                    dutyPriority: guardFirst,
+                    permittedDutyCount,
+                });
             }
+
+            assert.strictEqual(before.permittedDutyCount, originalCount);
+            assert.deepStrictEqual(
+                before.dutyPriority,
+                createRoleComponent().dutyPriority,
+                "a rejected order leaves the whole component untouched",
+            );
+        });
+
+        it("ignores an order for a worker that does not exist", () => {
+            const { send } = workerWithRoles();
+
+            send({
+                id: SetRolePriorityCommandId,
+                worker: "nonexistent",
+                dutyPriority: guardFirst,
+                permittedDutyCount: 3,
+            });
+        });
+
+        it("ignores an order for an entity with no role component", () => {
+            const { root, send } = workerWithRoles();
+            const stone = new Entity("stone");
+            root.addChild(stone);
+
+            send({
+                id: SetRolePriorityCommandId,
+                worker: "stone",
+                dutyPriority: guardFirst,
+                permittedDutyCount: 3,
+            });
         });
     });
 

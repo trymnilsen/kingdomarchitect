@@ -15,6 +15,9 @@ import { planEquipCommand } from "../planners/equipCommandPlanner.ts";
 import { planEquipFromHeld } from "../planners/equipFromHeldPlanner.ts";
 import { planDepositHeld } from "../../job/planner/planDepositHeld.ts";
 
+/** Outranks anything a worker chooses for itself. Yields only to survival. */
+export const PLAYER_COMMAND_UTILITY = 90;
+
 /**
  * PerformPlayerCommandBehavior executes player-issued commands with high priority.
  * This behavior overrides all autonomous behaviors to ensure immediate response
@@ -30,9 +33,7 @@ export function createPerformPlayerCommandBehavior(): Behavior {
         },
 
         utility(_entity: Entity): number {
-            // High priority (90) - player commands should override most autonomous behaviors
-            // Only critical survival behaviors (95-100) should take precedence
-            return 90;
+            return PLAYER_COMMAND_UTILITY;
         },
 
         expand(entity: Entity): BehaviorActionData[] {

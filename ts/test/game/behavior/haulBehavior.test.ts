@@ -19,11 +19,12 @@ import {
     setPreferredAmount,
     StockpileComponentId,
 } from "../../../src/game/component/stockpileComponent.ts";
+import { WorkerRole } from "../../../src/game/component/worker/roleComponent.ts";
 import {
-    createRoleComponent,
-    RoleComponentId,
-    WorkerRole,
-} from "../../../src/game/component/worker/roleComponent.ts";
+    ROLE_RANK_STEP,
+    TOP_ROLE_UTILITY,
+} from "../../../src/game/component/worker/rolePriority.ts";
+import { setRoles } from "./behaviorTestHelpers.ts";
 import {
     stoneResource,
     woodResourceItem,
@@ -63,9 +64,7 @@ function litYard(): Yard {
     store.worldPosition = { x: 10, y: 8 };
 
     const hauler = new Entity("hauler");
-    const role = createRoleComponent();
-    role.role = WorkerRole.Hauler;
-    hauler.setEcsComponent(role);
+    setRoles(hauler, [WorkerRole.Hauler]);
     hauler.setEcsComponent(createHeldItemComponent());
     kingdom.addChild(hauler);
     hauler.worldPosition = { x: 11, y: 8 };
@@ -140,11 +139,25 @@ describe("haulBehavior", () => {
         assert.strictEqual(haul.isValid(hauler), false);
     });
 
-    it("ignores piles for any role but Hauler", () => {
+    it("ignores piles when the Hauler role is excluded", () => {
         const { root, hauler } = litYard();
-        hauler.requireEcsComponent(RoleComponentId).role = WorkerRole.Worker;
+        setRoles(hauler, [WorkerRole.Worker]);
         addPile(root, "pile", LIT, woodResourceItem);
 
         assert.strictEqual(haul.isValid(hauler), false);
+    });
+
+    it("scores hauling by the rank the player gave it", () => {
+        const { root, hauler } = litYard();
+        addPile(root, "pile", LIT, woodResourceItem);
+
+        setRoles(hauler, [WorkerRole.Hauler, WorkerRole.Worker]);
+        const firstRank = haul.utility(hauler);
+
+        setRoles(hauler, [WorkerRole.Worker, WorkerRole.Hauler]);
+        const secondRank = haul.utility(hauler);
+
+        assert.strictEqual(firstRank, TOP_ROLE_UTILITY);
+        assert.strictEqual(secondRank, TOP_ROLE_UTILITY - ROLE_RANK_STEP);
     });
 });

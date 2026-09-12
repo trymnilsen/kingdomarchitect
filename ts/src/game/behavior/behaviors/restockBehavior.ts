@@ -16,6 +16,9 @@ import type {
     StockpileSurplus,
 } from "../../building/materialQuery.ts";
 
+/** Below every duty, so workers shuffle stock only once the duties run out. */
+export const RESTOCK_UTILITY = 15;
+
 /**
  * RestockBehavior moves items between stockpiles to satisfy preferred amounts.
  * An idle worker with nothing better to do will restock underserved stockpiles
@@ -60,9 +63,7 @@ export function createRestockBehavior(): Behavior {
         },
 
         utility(_entity: Entity): number {
-            // Below normal work (50), above wander. Will be boosted by a hauler
-            // role/occupation in a future pass.
-            return 15;
+            return RESTOCK_UTILITY;
         },
 
         expand(entity: Entity): BehaviorActionData[] {

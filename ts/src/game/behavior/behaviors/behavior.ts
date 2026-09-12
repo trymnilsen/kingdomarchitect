@@ -20,12 +20,6 @@ export interface Behavior {
 
     /**
      * Return a utility score for this behavior. Higher scores indicate higher priority.
-     * Typical ranges:
-     * - Critical survival (combat, fleeing): 95-100
-     * - Player commands: 90
-     * - Urgent needs (very hungry, very tired): 60-80
-     * - Normal work/jobs: 40-60
-     * - Low priority autonomy (wander, socialize): 10-30
      */
     utility(entity: Entity): number;
 

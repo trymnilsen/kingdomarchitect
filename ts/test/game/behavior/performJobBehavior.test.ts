@@ -2,10 +2,12 @@ import assert from "node:assert";
 import { describe, it } from "node:test";
 import { Entity } from "../../../src/game/entity/entity.ts";
 import { createPerformJobBehavior } from "../../../src/game/behavior/behaviors/performJobBehavior.ts";
+import { WorkerRole } from "../../../src/game/component/worker/roleComponent.ts";
 import {
-    createRoleComponent,
-    WorkerRole,
-} from "../../../src/game/component/worker/roleComponent.ts";
+    ROLE_RANK_STEP,
+    TOP_ROLE_UTILITY,
+} from "../../../src/game/component/worker/rolePriority.ts";
+import { setRoles } from "./behaviorTestHelpers.ts";
 import { planBuildBuilding } from "../../../src/game/job/planner/buildBuildingPlanner.ts";
 import { canExecuteBuildJob } from "../../../src/game/job/buildBuildingJob.ts";
 import {
@@ -308,17 +310,18 @@ describe("performJobBehavior", () => {
     describe("role gate", () => {
         const behavior = createPerformJobBehavior(planBuildBuilding);
 
-        /** A worker with an open move job. Pass null for no role component, as goblins have. */
-        function workerWithMoveJob(role: WorkerRole | null): Entity {
+        /**
+         * A worker with an open move job and the listed roles permitted.
+         * Pass null for no role component at all, as goblins have.
+         */
+        function workerWithMoveJob(permitted: WorkerRole[] | null): Entity {
             const root = new Entity("root");
             root.setEcsComponent(createJobQueueComponent());
             const worker = new Entity("worker");
             worker.setEcsComponent(createHeldItemComponent());
             worker.setEcsComponent(createBehaviorAgentComponent());
-            if (role !== null) {
-                const roleComponent = createRoleComponent();
-                roleComponent.role = role;
-                worker.setEcsComponent(roleComponent);
+            if (permitted !== null) {
+                setRoles(worker, permitted);
             }
             root.addChild(worker);
             worker.worldPosition = { x: 12, y: 8 };
@@ -328,24 +331,47 @@ describe("performJobBehavior", () => {
             return worker;
         }
 
-        it("lets a Worker take jobs", () => {
-            const worker = workerWithMoveJob(WorkerRole.Worker);
+        it("lets a worker who performs the Worker role take jobs", () => {
+            const worker = workerWithMoveJob([WorkerRole.Worker]);
             assert.strictEqual(behavior.isValid(worker), true);
         });
 
-        it("keeps a Hauler out of the job pool", () => {
-            const worker = workerWithMoveJob(WorkerRole.Hauler);
+        it("keeps a worker who excluded the Worker role out of the job pool", () => {
+            const worker = workerWithMoveJob([WorkerRole.Hauler]);
             assert.strictEqual(behavior.isValid(worker), false);
         });
 
-        it("keeps a Guard out of the job pool", () => {
-            const worker = workerWithMoveJob(WorkerRole.Guard);
+        it("lets a guard who also works take jobs", () => {
+            const worker = workerWithMoveJob([
+                WorkerRole.Guard,
+                WorkerRole.Worker,
+            ]);
+            assert.strictEqual(behavior.isValid(worker), true);
+        });
+
+        it("takes no jobs when every role is excluded", () => {
+            const worker = workerWithMoveJob([]);
             assert.strictEqual(behavior.isValid(worker), false);
         });
 
-        it("lets an entity with no role component take jobs", () => {
+        it("lets an entity with no role component take jobs at the flat rate", () => {
             const worker = workerWithMoveJob(null);
             assert.strictEqual(behavior.isValid(worker), true);
+            assert.strictEqual(behavior.utility(worker), 50);
+        });
+
+        it("scores work by the rank the player gave it", () => {
+            const first = workerWithMoveJob([WorkerRole.Worker]);
+            const second = workerWithMoveJob([
+                WorkerRole.Guard,
+                WorkerRole.Worker,
+            ]);
+
+            assert.strictEqual(behavior.utility(first), TOP_ROLE_UTILITY);
+            assert.strictEqual(
+                behavior.utility(second),
+                TOP_ROLE_UTILITY - ROLE_RANK_STEP,
+            );
         });
     });
 });

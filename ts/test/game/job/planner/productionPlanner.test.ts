@@ -17,6 +17,7 @@ import {
     JobQueueComponentId,
 } from "../../../../src/game/component/jobQueueComponent.ts";
 import { createProductionComponent } from "../../../../src/game/component/productionComponent.ts";
+import type { PlantTreeActionData } from "../../../../src/game/behavior/actions/plantTreeAction.ts";
 import {
     createHeldItemComponent,
     setHeldItem,
@@ -39,11 +40,6 @@ const FLOOR = 4;
 
 const buildingPosition = { x: 20, y: 15 };
 
-type PlantTreeAction = {
-    type: "plantTree";
-    resourceId: string;
-    targetPosition: Point;
-};
 type HarvestAction = {
     type: "harvestResource";
     entityId: string;
@@ -243,10 +239,10 @@ describe("productionPlanner - zone kind", () => {
             }
 
             const actions = scene.plan();
-            const plant = actions[1] as PlantTreeAction;
+            const plant = actions[1] as PlantTreeActionData;
 
             assert.strictEqual(
-                plant.resourceId,
+                plant.resourceIdToPlant,
                 treeResource.id,
                 "the forest side of the zone grows forest trees, even though the building stands in the snow",
             );
@@ -266,9 +262,9 @@ describe("productionPlanner - zone kind", () => {
                 scene.addAt(tile, treeResource);
             }
 
-            const plant = scene.plan()[1] as PlantTreeAction;
+            const plant = scene.plan()[1] as PlantTreeActionData;
 
-            assert.strictEqual(plant.resourceId, snowTreeResource.id);
+            assert.strictEqual(plant.resourceIdToPlant, snowTreeResource.id);
             assert.ok(
                 snowSide.some(
                     (tile) =>

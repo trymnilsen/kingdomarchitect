@@ -16,8 +16,8 @@ import {
     RoleComponentId,
     WorkerRole,
     WorkerStance,
-    createRoleComponent,
 } from "../../../src/game/component/worker/roleComponent.ts";
+import { setRoles } from "../behavior/behaviorTestHelpers.ts";
 import { createPlayerUnitComponent } from "../../../src/game/component/playerUnitComponent.ts";
 import {
     getTopThreat,
@@ -75,9 +75,7 @@ function addGoblin(harness: ScenarioHarness, position: Point): Entity {
 /** A bare watchman body: guard role plus player unit, no behavior agent. */
 function addWatchman(harness: ScenarioHarness, position: Point): Entity {
     const unit = new Entity("watchman");
-    const role = createRoleComponent();
-    role.role = WorkerRole.Guard;
-    unit.setEcsComponent(role);
+    setRoles(unit, [WorkerRole.Guard]);
     unit.setEcsComponent(createPlayerUnitComponent());
     harness.root.addChild(unit);
     unit.worldPosition = position;

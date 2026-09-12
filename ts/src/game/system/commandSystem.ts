@@ -75,9 +75,9 @@ import {
     type UnequipItemCommand,
 } from "../../server/message/command/unequipItemCommand.ts";
 import {
-    UpdateWorkerRoleCommandId,
-    type UpdateWorkerRoleCommand,
-} from "../../server/message/command/updateWorkerRoleCommand.ts";
+    SetRolePriorityCommandId,
+    type SetRolePriorityCommand,
+} from "../../server/message/command/setRolePriorityCommand.ts";
 import {
     UpdateWorkerStanceCommandId,
     type UpdateWorkerStanceCommand,
@@ -114,7 +114,7 @@ import {
 import { setStockpilePreferredAmount } from "./command/stockpileCommands.ts";
 import {
     changeOccupation,
-    updateWorkerRole,
+    setRolePriority,
     updateWorkerStance,
 } from "./command/workerCommands.ts";
 
@@ -186,8 +186,8 @@ function onGameMessage(
         case SetPlayerCommandId:
             setPlayerCommand(root, message.command as SetPlayerCommand);
             break;
-        case UpdateWorkerRoleCommandId:
-            updateWorkerRole(root, message.command as UpdateWorkerRoleCommand);
+        case SetRolePriorityCommandId:
+            setRolePriority(root, message.command as SetRolePriorityCommand);
             break;
         case UpdateWorkerStanceCommandId:
             updateWorkerStance(

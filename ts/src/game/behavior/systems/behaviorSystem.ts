@@ -33,6 +33,12 @@ interface BehaviorTickStats {
 const BEHAVIOR_STATS_LOG_INTERVAL = 100;
 
 /**
+ * Bonus for the behavior the planner last picked, so a worker does not
+ * oscillate between two of similar utility.
+ */
+export const REPLAN_THRESHOLD = 5;
+
+/**
  * BehaviorSystem manages behavior selection and execution for entities with
  * BehaviorAgent components. It selects the highest-utility valid behavior and
  * executes actions from the queue.
@@ -257,7 +263,6 @@ function selectBehavior(
     // "thrashing", where it rapidly switches back and forth between two behaviors with
     // similar utilities. For example, a goblin at warmth=51 (just above threshold)
     // after warming up shouldn't oscillate between keepWarm and performJob every replan.
-    const REPLAN_THRESHOLD = 5;
     const behaviorUtilities = validBehaviors.map((behavior) => {
         let utility = behavior.utility(entity);
         if (behavior.name == hysteresisBehavior?.name) {

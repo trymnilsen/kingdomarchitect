@@ -11,7 +11,8 @@ import { findDropPosition } from "../dropItem.ts";
 import type { BehaviorActionData } from "../actions/actionData.ts";
 import type { Behavior } from "./behavior.ts";
 
-const UTILITY = 15;
+/** Below every duty. Emptying your hands is what happens between duties. */
+export const DEPOSIT_HELD_UTILITY = 15;
 
 /**
  * Empties an idle worker's hands so they can take new jobs.
@@ -39,7 +40,7 @@ export function createDepositHeldBehavior(): Behavior {
         },
 
         utility(_entity: Entity): number {
-            return UTILITY;
+            return DEPOSIT_HELD_UTILITY;
         },
 
         expand(entity: Entity): BehaviorActionData[] {

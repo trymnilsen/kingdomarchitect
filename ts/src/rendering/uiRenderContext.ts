@@ -24,5 +24,13 @@ export type UIRenderScope = {
         color: string,
         width: number,
     ): void;
+    drawDottedLine(
+        x1: number,
+        y1: number,
+        x2: number,
+        y2: number,
+        color: string,
+        width: number,
+    ): void;
     getSprite(id: string): SpriteDefinition | undefined;
 };

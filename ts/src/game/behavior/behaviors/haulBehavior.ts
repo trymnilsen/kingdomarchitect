@@ -1,9 +1,10 @@
 import { distance } from "../../../common/point.ts";
 import type { Entity } from "../../entity/entity.ts";
+import { WorkerRole } from "../../component/worker/roleComponent.ts";
 import {
-    RoleComponentId,
-    WorkerRole,
-} from "../../component/worker/roleComponent.ts";
+    getRoleRank,
+    roleUtility,
+} from "../../component/worker/rolePriority.ts";
 import {
     HeldItemComponentId,
     isHeldEmpty,
@@ -17,9 +18,6 @@ import {
 } from "../../light/hearthlight.ts";
 import type { BehaviorActionData } from "../actions/actionData.ts";
 import type { Behavior } from "./behavior.ts";
-
-/** Same band as garrison. Haulers are out of the job pool, so jobs (50) need not be outranked. */
-const HAUL_UTILITY = 40;
 
 /**
  * HaulBehavior: a Hauler walks to the nearest ground pile inside the hearthlight
@@ -37,8 +35,7 @@ export function createHaulBehavior(): Behavior {
         name: "haul",
 
         isValid(entity: Entity): boolean {
-            const role = entity.getEcsComponent(RoleComponentId);
-            if (role?.role !== WorkerRole.Hauler) {
+            if (getRoleRank(entity, WorkerRole.Hauler) < 0) {
                 return false;
             }
             const held = entity.getEcsComponent(HeldItemComponentId);
@@ -48,8 +45,8 @@ export function createHaulBehavior(): Behavior {
             return nearestLitPile(entity) !== null;
         },
 
-        utility(_entity: Entity): number {
-            return HAUL_UTILITY;
+        utility(entity: Entity): number {
+            return roleUtility(entity, WorkerRole.Hauler);
         },
 
         expand(entity: Entity): BehaviorActionData[] {

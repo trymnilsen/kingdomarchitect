@@ -4,11 +4,12 @@ import { Entity } from "../../../src/game/entity/entity.ts";
 import { createMinimalWorld } from "../testWorld.ts";
 import { buildingPrefab } from "../../../src/game/prefab/buildingPrefab.ts";
 import { stoneTower } from "../../../src/data/building/stone/tower.ts";
+import { WorkerRole } from "../../../src/game/component/worker/roleComponent.ts";
 import {
-    createRoleComponent,
-    RoleComponentId,
-    WorkerRole,
-} from "../../../src/game/component/worker/roleComponent.ts";
+    ROLE_RANK_STEP,
+    TOP_ROLE_UTILITY,
+} from "../../../src/game/component/worker/rolePriority.ts";
+import { setRoles } from "../behavior/behaviorTestHelpers.ts";
 import { createPlayerUnitComponent } from "../../../src/game/component/playerUnitComponent.ts";
 import {
     StationComponentId,
@@ -21,6 +22,11 @@ import {
     stationUnderEntity,
 } from "../../../src/game/component/stationQuery.ts";
 import { createGarrisonBehavior } from "../../../src/game/behavior/behaviors/garrisonBehavior.ts";
+import {
+    executeHoldStationAction,
+    type HoldStationActionData,
+} from "../../../src/game/behavior/actions/holdStationAction.ts";
+import { getGameTimeTick } from "../../../src/game/component/gameTimeComponent.ts";
 import { createStepOutsideBehavior } from "../../../src/game/behavior/behaviors/stepOutsideBehavior.ts";
 import {
     searchlightWedgeOffsets,
@@ -49,9 +55,7 @@ function addUnit(
     role: WorkerRole = WorkerRole.Guard,
 ): Entity {
     const unit = new Entity(id);
-    const roleComponent = createRoleComponent();
-    roleComponent.role = role;
-    unit.setEcsComponent(roleComponent);
+    setRoles(unit, [role]);
     unit.setEcsComponent(createPlayerUnitComponent());
     root.addChild(unit);
     unit.worldPosition = pos;
@@ -164,12 +168,125 @@ describe("garrison behavior", () => {
         });
     });
 
-    it("is idle (invalid) once the guard is already manning the post", () => {
+    it("holds the post once the guard is already manning it", () => {
         const { root } = createMinimalWorld();
         addTower(root, "t", { x: 2, y: 2 }, StationPriority.High);
         const guard = addUnit(root, "g", { x: 2, y: 2 });
 
+        assert.strictEqual(garrison.isValid(guard), true);
+
+        const plan = garrison.expand(guard);
+        assert.strictEqual(plan.length, 1);
+        const hold = plan[0] as HoldStationActionData;
+        assert.strictEqual(hold.type, "holdStation");
+        assert.ok(
+            hold.untilTick > getGameTimeTick(root),
+            "the watch ends at a fixed future tick rather than counting down",
+        );
+    });
+
+    it("keeps standing until the watch is up, then ends it", () => {
+        const { root } = createMinimalWorld();
+        addTower(root, "t", { x: 2, y: 2 }, StationPriority.High);
+        const guard = addUnit(root, "g", { x: 2, y: 2 });
+
+        const hold = garrison.expand(guard)[0] as HoldStationActionData;
+        const before = { ...hold };
+
+        assert.deepStrictEqual(
+            executeHoldStationAction(hold, guard, hold.untilTick - 1),
+            { kind: "running" },
+        );
+        assert.deepStrictEqual(
+            hold,
+            before,
+            "a running watch rewrites nothing, so it puts no delta on the wire",
+        );
+        assert.deepStrictEqual(
+            executeHoldStationAction(hold, guard, hold.untilTick),
+            { kind: "complete" },
+        );
+    });
+
+    it("gives up the watch when the station is switched off underneath it", () => {
+        const { root } = createMinimalWorld();
+        const tower = addTower(root, "t", { x: 2, y: 2 }, StationPriority.High);
+        const guard = addUnit(root, "g", { x: 2, y: 2 });
+
+        const hold = garrison.expand(guard)[0] as HoldStationActionData;
+        tower.requireEcsComponent(StationComponentId).priority =
+            StationPriority.Off;
+
+        const result = executeHoldStationAction(
+            hold,
+            guard,
+            hold.untilTick - 1,
+        );
+
+        assert.strictEqual(
+            result.kind,
+            "failed",
+            "the guard is handed back to selection instead of waiting out the tick",
+        );
+    });
+
+    it("gives up the watch when the guard is no longer on the tower", () => {
+        const { root } = createMinimalWorld();
+        addTower(root, "t", { x: 2, y: 2 }, StationPriority.High);
+        const guard = addUnit(root, "g", { x: 2, y: 2 });
+
+        const hold = garrison.expand(guard)[0] as HoldStationActionData;
+        guard.worldPosition = { x: 5, y: 5 };
+
+        const result = executeHoldStationAction(
+            hold,
+            guard,
+            hold.untilTick - 1,
+        );
+
+        assert.strictEqual(result.kind, "failed");
+    });
+
+    it("is not valid for a guard whose Guard role is excluded", () => {
+        const { root } = createMinimalWorld();
+        addTower(root, "t", { x: 2, y: 2 }, StationPriority.High);
+        const guard = addUnit(root, "g", { x: 5, y: 5 });
+        setRoles(guard, [WorkerRole.Worker]);
+
         assert.strictEqual(garrison.isValid(guard), false);
+    });
+
+    it("leaves a manning guard when the Guard role is taken away", () => {
+        const { root } = createMinimalWorld();
+        addTower(root, "t", { x: 2, y: 2 }, StationPriority.High);
+        const guard = addUnit(root, "g", { x: 2, y: 2 });
+        setRoles(guard, [WorkerRole.Worker]);
+
+        assert.strictEqual(garrison.isValid(guard), false);
+        assert.strictEqual(
+            isManningStation(guard),
+            false,
+            "so StepOutside grounds it rather than leaving it on the roof",
+        );
+    });
+
+    it("scores holding the post by the rank the player gave it", () => {
+        const { root } = createMinimalWorld();
+        addTower(root, "t", { x: 2, y: 2 }, StationPriority.High);
+        const guard = addUnit(root, "g", { x: 2, y: 2 });
+
+        setRoles(guard, [WorkerRole.Guard, WorkerRole.Worker]);
+        const above = garrison.utility(guard);
+
+        setRoles(guard, [WorkerRole.Worker, WorkerRole.Guard]);
+        const below = garrison.utility(guard);
+
+        assert.strictEqual(above, TOP_ROLE_UTILITY);
+        assert.strictEqual(below, TOP_ROLE_UTILITY - ROLE_RANK_STEP);
+        assert.ok(
+            above > below,
+            "a guard ranked above work outscores it, and below work loses to it",
+        );
     });
 
     it("does nothing when the only tower is disabled", () => {
