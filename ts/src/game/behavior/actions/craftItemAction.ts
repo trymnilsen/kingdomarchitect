@@ -8,13 +8,12 @@ import {
     addToHeldItem,
     HeldItemComponentId,
     isHeldEmpty,
-    type HeldItemComponent,
 } from "../../component/heldItemComponent.ts";
 import { spendEntityEnergy } from "../../component/energyComponent.ts";
 import {
-    CraftingComponentId,
-    CraftingOutputPolicy,
-} from "../../component/craftingComponent.ts";
+    getOutputPolicy,
+    OutputPolicy,
+} from "../../component/outputPolicyComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { completeClaimedJob } from "../../job/jobLifecycle.ts";
 import { DropMode, dropItemAtPosition } from "../dropItem.ts";
@@ -115,11 +114,10 @@ export function executeCraftItemAction(
     spendEntityEnergy(entity, 2);
 
     if (action.progress >= recipe.duration) {
-        const policy =
-            buildingEntity.getEcsComponent(CraftingComponentId)?.outputPolicy;
+        const policy = getOutputPolicy(buildingEntity);
         for (const output of recipe.outputs) {
             let placedOnGround = false;
-            if (policy === CraftingOutputPolicy.Drop) {
+            if (policy === OutputPolicy.Drop) {
                 placedOnGround = setOutputBesideBench(
                     root,
                     tick,

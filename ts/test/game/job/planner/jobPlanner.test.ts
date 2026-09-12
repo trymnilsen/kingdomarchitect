@@ -12,7 +12,7 @@ import { createCollectableComponent } from "../../../../src/game/component/colle
 import { woodResourceItem } from "../../../../src/data/inventory/items/resources.ts";
 import { createInventoryComponent } from "../../../../src/game/component/inventoryComponent.ts";
 import { createProductionComponent } from "../../../../src/game/component/productionComponent.ts";
-import { createChunkMapComponent } from "../../../../src/game/component/chunkMapComponent.ts";
+import { createWorldCovering } from "../../testWorld.ts";
 import {
     createHeldItemComponent,
     setHeldItem,
@@ -52,14 +52,24 @@ describe("jobPlanner", () => {
     });
 
     it("dispatches productionJob jobs to productionPlanner", () => {
-        const { root, worker } = createTestScene();
-        root.setEcsComponent(createChunkMapComponent());
+        // A forrester plants what the biome grows, so this one needs a world
+        // with land under it rather than the bare root the other cases use.
+        const { root } = createWorldCovering(
+            { min: { x: 8, y: 8 }, max: { x: 23, y: 23 } },
+            "forrest",
+        );
+        const worker = new Entity("worker");
+        worker.setEcsComponent(createInventoryComponent());
+        root.setEcsComponent(createJobQueueComponent());
+        root.addChild(worker);
+        worker.worldPosition = { x: 10, y: 8 };
+
         const building = new Entity("building");
-        building.worldPosition = { x: 15, y: 13 };
         building.setEcsComponent(
-            createProductionComponent("forrester_production", 4),
+            createProductionComponent("forrester_production"),
         );
         root.addChild(building);
+        building.worldPosition = { x: 15, y: 13 };
 
         const job = createProductionJob("building");
         const actions = planJob(root, worker, job, () => []);

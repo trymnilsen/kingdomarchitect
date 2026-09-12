@@ -16,9 +16,9 @@ import { planksRecipe } from "../../../../src/data/crafting/recipes/carpenterRec
 import { woodResourceItem } from "../../../../src/data/inventory/items/resources.ts";
 import type { BehaviorActionData } from "../../../../src/game/behavior/actions/actionData.ts";
 import {
-    CraftingComponentId,
-    CraftingOutputPolicy,
-} from "../../../../src/game/component/craftingComponent.ts";
+    OutputPolicy,
+    OutputPolicyComponentId,
+} from "../../../../src/game/component/outputPolicyComponent.ts";
 import { CollectableComponentId } from "../../../../src/game/component/collectableComponent.ts";
 import { createTileComponent } from "../../../../src/game/component/tileComponent.ts";
 import { createChunkMapComponent } from "../../../../src/game/component/chunkMapComponent.ts";
@@ -144,8 +144,8 @@ describe("craftItemAction", () => {
             bench: Entity;
         } {
             const bench = buildingPrefab(carpenter, false, "bench");
-            bench.requireEcsComponent(CraftingComponentId).outputPolicy =
-                CraftingOutputPolicy.Drop;
+            bench.requireEcsComponent(OutputPolicyComponentId).policy =
+                OutputPolicy.Drop;
             root.addChild(bench);
             bench.worldPosition = { x: 11, y: 8 };
 

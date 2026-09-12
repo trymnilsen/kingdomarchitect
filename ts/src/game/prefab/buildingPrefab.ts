@@ -17,6 +17,11 @@ import { createWorkplaceComponent } from "../component/workplaceComponent.ts";
 import { createStockpileComponent } from "../component/stockpileComponent.ts";
 import { forrester } from "../../data/building/wood/forrester.ts";
 import { createProductionComponent } from "../component/productionComponent.ts";
+import {
+    createOutputPolicyComponent,
+    OutputPolicyComponentId,
+} from "../component/outputPolicyComponent.ts";
+import { forresterProduction } from "../../data/production/productionDefinition.ts";
 import { goblinCampfire } from "../../data/building/goblin/goblinCampfire.ts";
 import { goblinHut } from "../../data/building/goblin/goblinHut.ts";
 import {
@@ -106,9 +111,11 @@ function applyCraftingStation(
     entity.setEcsComponent(createCraftingComponent(recipes));
     entity.setEcsComponent(createInventoryComponent());
     entity.setEcsComponent(createWorkplaceComponent());
+    entity.setEcsComponent(createOutputPolicyComponent());
     entity.invalidateComponent(CraftingComponentId);
     entity.invalidateComponent(InventoryComponentId);
     entity.invalidateComponent(WorkplaceComponentId);
+    entity.invalidateComponent(OutputPolicyComponentId);
 }
 
 export function createBuildingLightSource(
@@ -153,9 +160,11 @@ export function applyFunctionalComponents(
     }
     if (building.id == forrester.id) {
         entity.setEcsComponent(
-            createProductionComponent("forrester_production", 4),
+            createProductionComponent(forresterProduction.id),
         );
+        entity.setEcsComponent(createOutputPolicyComponent());
         entity.invalidateComponent(ProductionComponentId);
+        entity.invalidateComponent(OutputPolicyComponentId);
     }
     if (building.id == goblinCampfire.id) {
         entity.setEcsComponent(createFireSourceComponent(15, 2));

@@ -2,13 +2,11 @@ import {
     moonpetalResource,
     mushroomResource,
     swampFlowerResource,
-    swampTree2Resource,
-    swampTreeResource,
 } from "../../../data/inventory/items/naturalResource.ts";
 import { ChunkMapComponentId } from "../../component/chunkMapComponent.ts";
 import { Entity } from "../../entity/entity.ts";
 import type { TileChunk } from "../chunk.ts";
-import { fixed, placeResource, random } from "./placeResource.ts";
+import { placeBiomeTrees, placeResource, random } from "./placeResource.ts";
 
 export function generateSwamp(chunk: TileChunk, chunkEntity: Entity) {
     const chunkMapComponent = chunkEntity
@@ -16,8 +14,7 @@ export function generateSwamp(chunk: TileChunk, chunkEntity: Entity) {
         .requireEcsComponent(ChunkMapComponentId);
     const chunkMap = chunkMapComponent.chunkMap;
 
-    placeResource(fixed(8), swampTreeResource, chunk, chunkEntity, chunkMap);
-    placeResource(fixed(8), swampTree2Resource, chunk, chunkEntity, chunkMap);
+    placeBiomeTrees("swamp", chunk, chunkEntity, chunkMap);
     placeResource(random(8), swampFlowerResource, chunk, chunkEntity, chunkMap);
     placeResource(random(4), mushroomResource, chunk, chunkEntity, chunkMap);
     placeResource(random(3), moonpetalResource, chunk, chunkEntity, chunkMap);

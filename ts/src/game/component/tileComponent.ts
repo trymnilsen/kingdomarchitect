@@ -1,5 +1,6 @@
 import type { Bounds } from "../../common/bounds.ts";
 import type { Point } from "../../common/point.ts";
+import type { BiomeType } from "../map/biome.ts";
 import { ChunkSize, type TileChunk } from "../map/chunk.ts";
 import { getTileId, type GroundTile } from "../map/tile.ts";
 import type { Volume } from "../map/volume.ts";
@@ -75,12 +76,21 @@ export function getTile(
         return null;
     }
 
-    const tileId = getTileId(tilePosition.x, tilePosition.y);
     return {
         tileX: tilePosition.x,
         tileY: tilePosition.y,
         type: chunk.volume?.type,
     };
+}
+
+export function getBiomeAtTile(
+    component: TileComponent,
+    tilePosition: Point,
+): BiomeType | null {
+    const chunk = component.chunks.get(
+        makeChunkId(tilePosition.x, tilePosition.y),
+    );
+    return chunk?.volume?.type ?? null;
 }
 
 export function getBoundsForTiles(component: TileComponent): Bounds {
@@ -90,7 +100,7 @@ export function getBoundsForTiles(component: TileComponent): Bounds {
     let minY = Number.MAX_SAFE_INTEGER;
     let maxX = Number.MIN_SAFE_INTEGER;
     let maxY = Number.MIN_SAFE_INTEGER;
-    for (const [id, chunk] of component.chunks) {
+    for (const chunk of component.chunks.values()) {
         if (chunk.chunkX > maxX) {
             maxX = chunk.chunkX;
         }

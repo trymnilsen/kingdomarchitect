@@ -1,28 +1,37 @@
-import type { Entity } from "../../entity/entity.ts";
-import type { BehaviorActionData } from "../../behavior/actions/actionData.ts";
-import { ChunkMapComponentId } from "../../component/chunkMapComponent.ts";
-import { ProductionComponentId } from "../../component/productionComponent.ts";
-import type { ProductionJob } from "../productionJob.ts";
-import { removeJobForWorker } from "../jobLifecycle.ts";
+import type { Point } from "../../../common/point.ts";
+import { randomEntry } from "../../../common/array.ts";
 import { getProductionDefinition } from "../../../data/production/productionDefinition.ts";
+import {
+    isChoppable,
+    ResourceHarvestMode,
+    type NaturalResource,
+} from "../../../data/inventory/items/naturalResource.ts";
+import type { BehaviorActionData } from "../../behavior/actions/actionData.ts";
+import {
+    ChunkMapComponentId,
+    type ChunkMap,
+} from "../../component/chunkMapComponent.ts";
+import {
+    getOutputPolicy,
+    OutputPolicy,
+} from "../../component/outputPolicyComponent.ts";
+import { ProductionComponentId } from "../../component/productionComponent.ts";
+import {
+    getBiomeAtTile,
+    TileComponentId,
+    type TileComponent,
+} from "../../component/tileComponent.ts";
+import type { Entity } from "../../entity/entity.ts";
+import { biomes } from "../../map/biome.ts";
 import {
     findRandomSpawnInDiamond,
     getDiamondPoints,
     getResourcesInDiamond,
 } from "../../map/item/placement.ts";
-import { ResourceHarvestMode } from "../../../data/inventory/items/naturalResource.ts";
-import {
-    HeldItemComponentId,
-    isHeldEmpty,
-} from "../../component/heldItemComponent.ts";
+import { removeJobForWorker } from "../jobLifecycle.ts";
+import type { ProductionJob } from "../productionJob.ts";
 import { planDepositHeld } from "./planDepositHeld.ts";
 
-/**
- * Plan actions for operating a production facility.
- *
- * zone kind (forrester): the worker auto-decides plant-vs-chop from the current
- * tree population: plant up to a target count, then chop a random standing tree.
- */
 export function planProduction(
     root: Entity,
     worker: Entity,
@@ -62,62 +71,121 @@ export function planProduction(
     const target = Math.round(definition.maxTreeFraction * plantableTiles);
     const floor = Math.floor(definition.minTreeFraction * plantableTiles);
 
-    const trees = getResourcesInDiamond(
+    const standing = getResourcesInDiamond(
         center,
         definition.zoneRadius,
         chunkMapComp.chunkMap,
-        definition.plantResourceId,
+        isChoppable,
     );
-    const treeCount = trees.length;
 
-    // Plant while the population is still climbing toward the target.
-    if (treeCount < target) {
-        const emptySpot = findRandomSpawnInDiamond(
+    // The tree to fell is drawn from the crop standing when the plan was made.
+    // A sapling planted by this same plan does not exist yet, since plantTree
+    // spawns it several ticks later at execution, so it can never be the tree
+    // this order takes.
+    let felling: Entity | null = null;
+    if (standing.length >= floor && standing.length > 0) {
+        felling = randomEntry(standing);
+    }
+
+    const actions: BehaviorActionData[] = [];
+
+    if (standing.length < target) {
+        const planting = planPlanting(
+            root,
             center,
             definition.zoneRadius,
             chunkMapComp.chunkMap,
+            job.targetBuilding,
         );
-        if (emptySpot) {
-            return [
-                {
-                    type: "moveTo",
-                    target: emptySpot,
-                    stopAdjacent: "cardinal",
-                },
-                {
-                    type: "plantTree",
-                    buildingId: job.targetBuilding,
-                    targetPosition: emptySpot,
-                },
-            ];
-        }
+        actions.push(...planting);
     }
 
-    // At/above target (or no room to plant): chop a randomly-picked tree, as
-    // long as we're above the safety floor so we never clear a sparse forest.
-    if (treeCount >= floor && treeCount > 0) {
-        const tree = trees[Math.floor(Math.random() * trees.length)];
-        const chopActions: BehaviorActionData[] = [
+    if (felling) {
+        const policy = getOutputPolicy(buildingEntity);
+        // Hauling writes the timber into the worker's hands, so they have to be
+        // empty first. Dropping never touches them, and a worker carrying
+        // something can fell a tree without putting it down.
+        if (policy === OutputPolicy.Haul) {
+            actions.push(...planDepositHeld(worker));
+        }
+        actions.push(
             {
                 type: "moveTo",
-                target: tree.worldPosition,
+                target: felling.worldPosition,
                 stopAdjacent: "cardinal",
             },
             {
                 type: "harvestResource",
-                entityId: tree.id,
+                entityId: felling.id,
                 harvestAction: ResourceHarvestMode.Chop,
+                outputPolicy: policy,
             },
-        ];
-        // Chopping deposits wood into the held slot, so free the hands first.
-        const held = worker.getEcsComponent(HeldItemComponentId);
-        if (held && !isHeldEmpty(held)) {
-            return [...planDepositHeld(worker), ...chopActions];
-        }
-        return chopActions;
+        );
     }
 
-    // Nothing to do (can't plant, can't chop), so drop the order.
-    removeJobForWorker(worker, job);
-    return [];
+    if (actions.length === 0) {
+        // Nowhere to plant and nothing that may be felled. Drop the order
+        // rather than hold a claim nobody can act on.
+        removeJobForWorker(worker, job);
+    }
+
+    return actions;
+}
+
+/**
+ * Walk to a free tile in the zone and plant what belongs there. Returns no
+ * actions when the zone is full or the free tiles are all in biomes where
+ * nothing grows.
+ */
+function planPlanting(
+    root: Entity,
+    center: Point,
+    zoneRadius: number,
+    chunkMap: ChunkMap,
+    buildingId: string,
+): BehaviorActionData[] {
+    const tiles = root.getEcsComponent(TileComponentId);
+    const spot = findRandomSpawnInDiamond(
+        center,
+        zoneRadius,
+        chunkMap,
+        (point) => nativeTreesAt(tiles, point).length > 0,
+    );
+    if (!spot) {
+        return [];
+    }
+
+    const natives = nativeTreesAt(tiles, spot);
+    return [
+        {
+            type: "moveTo",
+            target: spot,
+            stopAdjacent: "cardinal",
+        },
+        {
+            type: "plantTree",
+            buildingId,
+            targetPosition: spot,
+            resourceIdToPlant: randomEntry(natives).id,
+        },
+    ];
+}
+
+/**
+ * The trees that belong on a tile. A zone can straddle a biome edge, so this
+ * asks about the tile being planted rather than about the building, and a spot
+ * in a biome where nothing woody grows yields nothing to plant.
+ */
+function nativeTreesAt(
+    tiles: TileComponent | null,
+    point: Point,
+): readonly NaturalResource[] {
+    if (!tiles) {
+        return [];
+    }
+    const biome = getBiomeAtTile(tiles, point);
+    if (!biome) {
+        return [];
+    }
+    return biomes[biome].trees;
 }

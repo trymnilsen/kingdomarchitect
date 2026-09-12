@@ -3,7 +3,7 @@
  * @param array the array to return from
  * @returns the randomly selected item
  */
-export function randomEntry<T>(array: T[]): T {
+export function randomEntry<T>(array: readonly T[]): T {
     //TODO: return early if array is empty
     const randomIndex = Math.floor(Math.random() * array.length);
     return array[randomIndex];

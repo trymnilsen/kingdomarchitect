@@ -8,9 +8,9 @@ import {
     InventoryComponentId,
 } from "../../../src/game/component/inventoryComponent.ts";
 import {
-    CraftingComponentId,
-    CraftingOutputPolicy,
-} from "../../../src/game/component/craftingComponent.ts";
+    OutputPolicy,
+    OutputPolicyComponentId,
+} from "../../../src/game/component/outputPolicyComponent.ts";
 import { CollectableComponentId } from "../../../src/game/component/collectableComponent.ts";
 import { GroundItemComponentId } from "../../../src/game/component/groundItemComponent.ts";
 import { woodResourceItem } from "../../../src/data/inventory/items/resources.ts";
@@ -82,8 +82,8 @@ describe("craftAndHaul scenario tests", () => {
 
     it("sets the crafted output down beside the bench under the drop policy", () => {
         const { harness, building, stockpile, worker } = craftingYard();
-        building.requireEcsComponent(CraftingComponentId).outputPolicy =
-            CraftingOutputPolicy.Drop;
+        building.requireEcsComponent(OutputPolicyComponentId).policy =
+            OutputPolicy.Drop;
 
         harness.tickUntil(() => groundPlanks(harness.root) !== null, 80);
 

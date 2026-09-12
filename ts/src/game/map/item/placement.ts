@@ -1,5 +1,9 @@
 import { encodePosition, type Point } from "../../../common/point.ts";
 import {
+    getResourceById,
+    type NaturalResource,
+} from "../../../data/inventory/items/naturalResource.ts";
+import {
     type ChunkMap,
     getEntitiesInChunkMapWithin,
 } from "../../component/chunkMapComponent.ts";
@@ -14,6 +18,7 @@ export function findRandomSpawnInDiamond(
     center: Point,
     radius: number,
     chunkMap: ChunkMap,
+    isAllowed: (point: Point) => boolean = () => true,
 ): Point | null {
     // Get all tiles in diamond pattern
     const candidates: Point[] = [];
@@ -46,9 +51,9 @@ export function findRandomSpawnInDiamond(
         );
     }
 
-    // Filter to unoccupied candidates
+    // Filter to unoccupied candidates the caller will accept
     const valid = candidates.filter(
-        (p) => !occupied.has(encodePosition(p.x, p.y)),
+        (p) => !occupied.has(encodePosition(p.x, p.y)) && isAllowed(p),
     );
 
     if (valid.length === 0) {
@@ -60,15 +65,15 @@ export function findRandomSpawnInDiamond(
 }
 
 /**
- * Find all resource entities of a given resourceId within a diamond pattern
+ * Find all resource entities matching a predicate within a diamond pattern
  * around a center point (excluding the center tile, where the building sits).
- * Used by the forester to count and randomly pick trees in its zone.
+ * Used by the forester to count and randomly pick the trees in its zone.
  */
 export function getResourcesInDiamond(
     center: Point,
     radius: number,
     chunkMap: ChunkMap,
-    resourceId: string,
+    matches: (resource: NaturalResource) => boolean,
 ): Entity[] {
     const bounds = {
         x1: center.x - radius,
@@ -82,8 +87,10 @@ export function getResourcesInDiamond(
         const dy = entity.worldPosition.y - center.y;
         if (Math.abs(dx) + Math.abs(dy) > radius) return false;
         if (dx === 0 && dy === 0) return false;
-        const resource = entity.getEcsComponent(ResourceComponentId);
-        return resource?.resourceId === resourceId;
+        const resourceComponent = entity.getEcsComponent(ResourceComponentId);
+        if (!resourceComponent) return false;
+        const resource = getResourceById(resourceComponent.resourceId);
+        return !!resource && matches(resource);
     });
 }
 

@@ -268,6 +268,20 @@ export function getResourceById(id: string): NaturalResource | undefined {
 }
 
 /**
+ * Whether felling this resource with an axe is how it is harvested. A resource
+ * can offer several harvest modes, so this asks about membership rather than
+ * equality. This is what makes a resource a "tree" as far as the forrester and
+ * the timber economy are concerned, which keeps cacti and swamp trees in scope
+ * without naming every id.
+ */
+export function isChoppable(resource: NaturalResource): boolean {
+    if (Array.isArray(resource.harvestMode)) {
+        return resource.harvestMode.includes(ResourceHarvestMode.Chop);
+    }
+    return resource.harvestMode === ResourceHarvestMode.Chop;
+}
+
+/**
  * Returns true if the resource blocks movement: trees, stone, cacti, and similar
  * large objects. Lifecycle "Finite" (trees) and "Infinite" (stone) mark solid
  * obstacles. Regrowable and removable resources (grass, flowers, mushrooms) are

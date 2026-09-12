@@ -4,6 +4,7 @@ import type { NaturalResource } from "../../../data/inventory/items/naturalResou
 import { resourcePrefab } from "../../prefab/resourcePrefab.ts";
 import { generateSpawnPoints } from "../item/vegetation.ts";
 import type { ChunkMap } from "../../component/chunkMapComponent.ts";
+import { biomes, TREES_PER_CHUNK, type BiomeType } from "../biome.ts";
 
 export type CountFn = (max?: number) => number;
 
@@ -32,5 +33,21 @@ export function placeResource(
         const entity = resourcePrefab(resource);
         entity.worldPosition = pos;
         chunkEntity.addChild(entity);
+    }
+}
+
+export function placeBiomeTrees(
+    biome: BiomeType,
+    chunk: TileChunk,
+    chunkEntity: Entity,
+    chunkMap: ChunkMap,
+) {
+    const trees = biomes[biome].trees;
+    if (trees.length === 0) {
+        return;
+    }
+    const perKind = Math.round(TREES_PER_CHUNK / trees.length);
+    for (const tree of trees) {
+        placeResource(fixed(perKind), tree, chunk, chunkEntity, chunkMap);
     }
 }

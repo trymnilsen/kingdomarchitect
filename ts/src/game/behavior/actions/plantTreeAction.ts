@@ -1,3 +1,4 @@
+import { isAtOrAdjacent } from "../../../common/point.ts";
 import { log } from "../../../common/logging/logger.ts";
 import type { Point } from "../../../common/point.ts";
 import { getProductionDefinition } from "../../../data/production/productionDefinition.ts";
@@ -6,20 +7,23 @@ import { spendEntityEnergy } from "../../component/energyComponent.ts";
 import { ProductionComponentId } from "../../component/productionComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { resourcePrefab } from "../../prefab/resourcePrefab.ts";
-import { completeClaimedJob } from "../../job/jobLifecycle.ts";
 import { ActionComplete, ActionRunning, type ActionResult } from "./action.ts";
 
 export type PlantTreeActionData = {
     type: "plantTree";
     buildingId: string;
     targetPosition: Point;
+    resourceIdToPlant: string;
     progress?: number;
 };
 
 /**
- * Plant a tree entity at targetPosition.
- * The worker should already be standing at targetPosition (moveTo with no stopAdjacent).
- * On completion the spawned entity is added to the world at targetPosition.
+ * Plant a tree at targetPosition. The worker stands next to the spot, since a
+ * free tile is one no entity occupies and the worker is an entity.
+ *
+ * Planting never completes the production order. An order is one tree's worth
+ * of timber, and planting is the upkeep that makes the next felling possible,
+ * so the order is retired by the chop that follows.
  */
 export function executePlantTreeAction(
     action: PlantTreeActionData,
@@ -34,6 +38,11 @@ export function executePlantTreeAction(
             kind: "failed",
             cause: { type: "targetGone", entityId: action.buildingId },
         };
+    }
+
+    if (!isAtOrAdjacent(action.targetPosition, entity.worldPosition)) {
+        log.warn(`Worker not at or adjacent to the planting spot`);
+        return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 
     const productionComp = buildingEntity.getEcsComponent(
@@ -52,6 +61,12 @@ export function executePlantTreeAction(
         return { kind: "failed", cause: { type: "unknown" } };
     }
 
+    const resource = getResourceById(action.resourceIdToPlant);
+    if (!resource) {
+        log.warn(`Unknown plant resource: ${action.resourceIdToPlant}`);
+        return { kind: "failed", cause: { type: "unknown" } };
+    }
+
     if (action.progress === undefined) {
         action.progress = 0;
     }
@@ -59,17 +74,10 @@ export function executePlantTreeAction(
     spendEntityEnergy(entity, 2);
 
     if (action.progress >= definition.plantDuration) {
-        const resource = getResourceById(definition.plantResourceId);
-        if (!resource) {
-            log.warn(`Unknown plant resource: ${definition.plantResourceId}`);
-            return { kind: "failed", cause: { type: "unknown" } };
-        }
-
         const spawned = resourcePrefab(resource);
         root.addChild(spawned);
         spawned.worldPosition = action.targetPosition;
 
-        completeClaimedJob(entity);
         return ActionComplete;
     }
 

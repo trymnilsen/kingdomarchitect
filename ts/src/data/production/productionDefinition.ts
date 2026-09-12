@@ -1,10 +1,7 @@
-import type { NaturalResource } from "../inventory/items/naturalResource.ts";
-
 export type ProductionDefinition = {
     kind: "zone";
     id: string;
     actionName: string;
-    plantResourceId: NaturalResource["id"];
     zoneRadius: number;
     plantDuration: number;
     maxTreeFraction: number;
@@ -14,12 +11,12 @@ export type ProductionDefinition = {
 export const forresterProduction: ProductionDefinition = {
     kind: "zone",
     id: "forrester_production",
-    actionName: "Tend Forest",
-    plantResourceId: "tree1",
+    actionName: "Harvest Timber",
     zoneRadius: 2,
     plantDuration: 3,
-    // maxTreeFraction = target population (plant up to this), reached before any
-    // chopping starts. minTreeFraction = safety floor (never chop below this).
+    // maxTreeFraction = target population the worker plants toward.
+    // minTreeFraction = safety floor: below it the worker only plants, so a
+    // thinned-out zone regrows instead of being cleared for the last order.
     maxTreeFraction: 0.8,
     minTreeFraction: 0.4,
 };

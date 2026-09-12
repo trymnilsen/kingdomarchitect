@@ -1,4 +1,4 @@
-import { isPointAdjacentTo } from "../../../common/point.ts";
+import { isPointAdjacentTo, type Point } from "../../../common/point.ts";
 import { log } from "../../../common/logging/logger.ts";
 import {
     getResourceById,
@@ -13,6 +13,7 @@ import {
     isHeldEmpty,
     type HeldItemComponent,
 } from "../../component/heldItemComponent.ts";
+import { OutputPolicy } from "../../component/outputPolicyComponent.ts";
 import { RegrowComponentId } from "../../component/regrowComponent.ts";
 import { ResourceComponentId } from "../../component/resourceComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
@@ -22,22 +23,34 @@ import {
     findJobClaimedBy,
     removeJobFromQueue,
 } from "../../job/jobLifecycle.ts";
+import { scatterYields } from "../scatterYields.ts";
 import { ActionComplete, ActionRunning, type ActionResult } from "./action.ts";
 
 export type HarvestResourceActionData = {
     type: "harvestResource";
     entityId: string;
     harvestAction: ResourceHarvestMode;
+    /**
+     * Where the yields go. Absent means Haul, which is what a worker sent out
+     * to collect something wants: it comes back carrying it.
+     */
+    outputPolicy?: OutputPolicy;
     workProgress?: number;
 };
 import type { NaturalResource } from "../../../data/inventory/items/naturalResource.ts";
 
 /**
- * Harvest a resource entity and deposit yields into the worker's held slot.
- * Held is single-item-id, so a resource that yields a different item id than
- * what's already held cannot be collected directly. Rather than fail, the
- * worker frees its hand first (see {@link freeHandSubaction}) and then resumes
- * the harvest into an empty slot.
+ * Harvest a resource entity.
+ *
+ * Under the Haul policy the yields go into the worker's held slot. Held is
+ * single-item-id, so a resource that yields a different item id than what's
+ * already held cannot be collected directly. Rather than fail, the worker frees
+ * its hand first (see {@link freeHandSubaction}) and then resumes the harvest
+ * into an empty slot.
+ *
+ * Under Drop the yields are left on the ground where the resource stood and the
+ * hand is never involved, so a worker producing at a building keeps working
+ * instead of walking each load to a store.
  */
 export function executeHarvestResourceAction(
     action: HarvestResourceActionData,
@@ -76,26 +89,62 @@ export function executeHarvestResourceAction(
     }
 
     const held = entity.requireEcsComponent(HeldItemComponentId);
+    const policy = action.outputPolicy ?? OutputPolicy.Haul;
 
-    // Precondition: the held slot must be empty or already hold the yield item.
-    // If it holds something else, free the hand before harvesting rather than
-    // failing. Otherwise the worker can never collect this resource.
-    if (heldBlocksYield(held, resource)) {
+    // Precondition for hauling: the held slot must be empty or already hold the
+    // yield item. If it holds something else, free the hand before harvesting
+    // rather than failing. Otherwise the worker can never collect this
+    // resource. Dropping never touches the hand, so it has no such precondition.
+    if (policy === OutputPolicy.Haul && heldBlocksYield(held, resource)) {
         return freeHandSubaction(entity, resourceEntity, held);
     }
 
     if (action.harvestAction === ResourceHarvestMode.Chop) {
-        return executeChopHarvest(entity, resourceEntity, resource, held);
+        return executeChopHarvest(
+            entity,
+            resourceEntity,
+            resource,
+            held,
+            policy,
+            tick,
+        );
     } else {
         return executeWorkHarvest(
             entity,
             resourceEntity,
             resource,
             held,
+            policy,
             action,
             tick,
         );
     }
+}
+
+/**
+ * Hand the yields to the worker or to the ground, depending on the policy the
+ * order was planned under. Dropping happens after the resource is gone so the
+ * tile it stood on can take the pile.
+ */
+function collectYields(
+    worker: Entity,
+    resource: NaturalResource,
+    held: HeldItemComponent,
+    policy: OutputPolicy,
+    position: Point,
+    tick: number,
+): void {
+    if (policy === OutputPolicy.Drop) {
+        scatterYields(
+            worker.getRootEntity(),
+            tick,
+            resource,
+            position,
+            `Set out from harvesting ${resource.name}`,
+        );
+        return;
+    }
+    depositYields(worker, resource, held);
 }
 
 /**
@@ -193,6 +242,8 @@ function executeChopHarvest(
     resourceEntity: Entity,
     resource: NaturalResource,
     held: HeldItemComponent,
+    policy: OutputPolicy,
+    tick: number,
 ): ActionResult {
     const healthComponent =
         resourceEntity.requireEcsComponent(HealthComponentId);
@@ -202,8 +253,9 @@ function executeChopHarvest(
     spendEntityEnergy(worker, 2);
 
     if (healthComponent.currentHp <= 0) {
-        depositYields(worker, resource, held);
+        const position = resourceEntity.worldPosition;
         resourceEntity.remove();
+        collectYields(worker, resource, held, policy, position, tick);
 
         completeHarvestOrder(worker);
         return ActionComplete;
@@ -217,6 +269,7 @@ function executeWorkHarvest(
     resourceEntity: Entity,
     resource: NaturalResource,
     held: HeldItemComponent,
+    policy: OutputPolicy,
     action: HarvestResourceActionData,
     tick: number,
 ): ActionResult {
@@ -229,9 +282,9 @@ function executeWorkHarvest(
     spendEntityEnergy(worker, 2);
 
     if (action.workProgress >= workDuration) {
-        depositYields(worker, resource, held);
-
+        const position = resourceEntity.worldPosition;
         applyResourceLifecycle(resourceEntity, resource, tick);
+        collectYields(worker, resource, held, policy, position, tick);
 
         completeHarvestOrder(worker);
         return ActionComplete;

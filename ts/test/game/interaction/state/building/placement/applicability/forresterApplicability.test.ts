@@ -54,7 +54,7 @@ describe("forresterApplicability", () => {
             y: 10,
         };
         existingForrester.setEcsComponent(
-            createProductionComponent("forrester_production", 4),
+            createProductionComponent("forrester_production"),
         );
         registerInChunkMap(world, existingForrester);
 
@@ -79,7 +79,7 @@ describe("forresterApplicability", () => {
             y: 10,
         };
         existingForrester.setEcsComponent(
-            createProductionComponent("forrester_production", 4),
+            createProductionComponent("forrester_production"),
         );
         registerInChunkMap(world, existingForrester);
 
@@ -98,7 +98,7 @@ describe("forresterApplicability", () => {
             y: 10,
         };
         existingForrester.setEcsComponent(
-            createProductionComponent("forrester_production", 4),
+            createProductionComponent("forrester_production"),
         );
         registerInChunkMap(world, existingForrester);
 
@@ -114,7 +114,7 @@ describe("forresterApplicability", () => {
         const otherProduction = new Entity("otherProduction");
         otherProduction.worldPosition = { x: 12, y: 10 };
         otherProduction.setEcsComponent(
-            createProductionComponent("unknown_production", 4),
+            createProductionComponent("unknown_production"),
         );
         registerInChunkMap(world, otherProduction);
 

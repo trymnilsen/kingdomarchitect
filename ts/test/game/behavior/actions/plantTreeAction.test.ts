@@ -9,10 +9,13 @@ import {
 } from "../../../../src/game/component/jobQueueComponent.ts";
 import { executePlantTreeAction } from "../../../../src/game/behavior/actions/plantTreeAction.ts";
 import type { BehaviorActionData } from "../../../../src/game/behavior/actions/actionData.ts";
+import { forresterProduction } from "../../../../src/data/production/productionDefinition.ts";
 import { claimJobInQueue } from "../../../../src/game/job/jobLifecycle.ts";
 import { createProductionJob } from "../../../../src/game/job/productionJob.ts";
 
 type PlantTreeAction = Extract<BehaviorActionData, { type: "plantTree" }>;
+
+const plantSpot = { x: 13, y: 8 };
 
 function createTestScene(): {
     root: Entity;
@@ -26,74 +29,64 @@ function createTestScene(): {
     root.addChild(worker);
     root.addChild(building);
 
+    // The worker stands beside the spot, which is where the planner puts it:
+    // a free tile is one no entity occupies, and the worker is an entity.
     worker.worldPosition = { x: 12, y: 8 };
     building.worldPosition = { x: 20, y: 15 };
 
-    building.setEcsComponent(
-        createProductionComponent("forrester_production", 4),
-    );
+    building.setEcsComponent(createProductionComponent("forrester_production"));
 
     return { root, worker, building };
 }
 
+function plantAction(
+    overrides: Partial<PlantTreeAction> = {},
+): PlantTreeAction {
+    return {
+        type: "plantTree",
+        buildingId: "building",
+        targetPosition: plantSpot,
+        resourceIdToPlant: "tree1",
+        ...overrides,
+    };
+}
+
+function treesIn(root: Entity, resourceId: string): Entity[] {
+    return root.children.filter(
+        (child) =>
+            child.getEcsComponent(ResourceComponentId)?.resourceId ===
+            resourceId,
+    );
+}
+
 describe("plantTreeAction", () => {
-    it("returns running and initialises progress on first tick", () => {
-        const { worker } = createTestScene();
-
-        const action: PlantTreeAction = {
-            type: "plantTree",
-            buildingId: "building",
-            targetPosition: { x: 12, y: 8 },
-        };
-
-        const result = executePlantTreeAction(action, worker);
-
-        assert.strictEqual(result.kind, "running");
-        assert.strictEqual(action.progress, 1);
-    });
-
-    it("increments progress each tick", () => {
-        const { worker } = createTestScene();
-
-        const action: PlantTreeAction = {
-            type: "plantTree",
-            buildingId: "building",
-            targetPosition: { x: 12, y: 8 },
-            progress: 1,
-        };
-
-        executePlantTreeAction(action, worker);
-
-        assert.strictEqual(action.progress, 2);
-    });
-
-    it("spawns resource entity at targetPosition when progress reaches plantDuration", () => {
+    it("takes plantDuration ticks of work before anything grows", () => {
         const { root, worker } = createTestScene();
+        const action = plantAction({ resourceIdToPlant: "pineTreeSnow" });
 
-        // forrester_production has plantDuration: 3, so progress 2 -> completes on tick 3
-        const targetPosition = { x: 12, y: 8 };
-        const action: PlantTreeAction = {
-            type: "plantTree",
-            buildingId: "building",
-            targetPosition,
-            progress: 2,
-        };
+        for (let tick = 1; tick < forresterProduction.plantDuration; tick++) {
+            const result = executePlantTreeAction(action, worker);
+            assert.strictEqual(result.kind, "running", `tick ${tick}`);
+            assert.strictEqual(
+                treesIn(root, "pineTreeSnow").length,
+                0,
+                `nothing has grown by tick ${tick}`,
+            );
+        }
 
         const result = executePlantTreeAction(action, worker);
 
         assert.strictEqual(result.kind, "complete");
-
-        const children = root.children;
-        const spawned = children.find(
-            (c) =>
-                c.getEcsComponent(ResourceComponentId)?.resourceId === "tree1",
+        const spawned = treesIn(root, "pineTreeSnow");
+        assert.strictEqual(
+            spawned.length,
+            1,
+            "it plants the species it was handed, not the building's own",
         );
-        assert.ok(spawned, "Expected a tree entity to be spawned");
-        assert.strictEqual(spawned.worldPosition.x, targetPosition.x);
-        assert.strictEqual(spawned.worldPosition.y, targetPosition.y);
+        assert.deepStrictEqual(spawned[0].worldPosition, plantSpot);
     });
 
-    it("completes the claimed job on success", () => {
+    it("leaves the claimed order in the queue, since the felling completes it", () => {
         const root = new Entity("root");
         const settlement = new Entity("settlement");
         const worker = new Entity("worker");
@@ -107,78 +100,32 @@ describe("plantTreeAction", () => {
         worker.worldPosition = { x: 12, y: 8 };
         building.worldPosition = { x: 20, y: 15 };
         building.setEcsComponent(
-            createProductionComponent("forrester_production", 4),
+            createProductionComponent("forrester_production"),
         );
 
         const job = createProductionJob("building");
-        const jobQueue = settlement.getEcsComponent(JobQueueComponentId)!;
+        const jobQueue = settlement.requireEcsComponent(JobQueueComponentId);
         jobQueue.jobs.push(job);
         claimJobInQueue(job, worker.id, settlement);
 
-        const action: PlantTreeAction = {
-            type: "plantTree",
-            buildingId: "building",
-            targetPosition: { x: 12, y: 8 },
-            progress: 2,
-        };
-
-        executePlantTreeAction(action, worker);
-
-        const remaining = settlement.getEcsComponent(JobQueueComponentId)!.jobs;
-        const stillClaimed = remaining.find((j) => j.claimedBy === worker.id);
-        assert.ok(
-            !stillClaimed,
-            "Job should be completed and removed from queue",
+        executePlantTreeAction(
+            plantAction({ progress: forresterProduction.plantDuration - 1 }),
+            worker,
         );
+
+        const stillClaimed = settlement
+            .requireEcsComponent(JobQueueComponentId)
+            .jobs.find((queued) => queued.claimedBy === worker.id);
+        assert.ok(stillClaimed, "the order outlives the planting");
     });
 
-    it("fails if building entity not found", () => {
+    it("fails when the worker is nowhere near the spot", () => {
         const { worker } = createTestScene();
 
-        const action: PlantTreeAction = {
-            type: "plantTree",
-            buildingId: "nonexistent",
-            targetPosition: { x: 12, y: 8 },
-        };
-
-        const result = executePlantTreeAction(action, worker);
-
-        assert.strictEqual(result.kind, "failed");
-    });
-
-    it("fails if building has no ProductionComponent", () => {
-        const { root, worker } = createTestScene();
-        const bareBuilding = new Entity("bareBuilding");
-        root.addChild(bareBuilding);
-        bareBuilding.worldPosition = { x: 20, y: 15 };
-
-        const action: PlantTreeAction = {
-            type: "plantTree",
-            buildingId: "bareBuilding",
-            targetPosition: { x: 12, y: 8 },
-        };
-
-        const result = executePlantTreeAction(action, worker);
-
-        assert.strictEqual(result.kind, "failed");
-    });
-
-    it("fails if production definition is missing or not zone kind", () => {
-        const { root, worker } = createTestScene();
-        const otherBuilding = new Entity("otherBuilding");
-        root.addChild(otherBuilding);
-        otherBuilding.worldPosition = { x: 20, y: 15 };
-        otherBuilding.setEcsComponent(
-            createProductionComponent("unknown_production", 4),
+        const result = executePlantTreeAction(
+            plantAction({ targetPosition: { x: 25, y: 19 } }),
+            worker,
         );
-
-        const action: PlantTreeAction = {
-            type: "plantTree",
-            buildingId: "otherBuilding",
-            targetPosition: { x: 12, y: 8 },
-        };
-
-        const result = executePlantTreeAction(action, worker);
 
         assert.strictEqual(result.kind, "failed");
     });

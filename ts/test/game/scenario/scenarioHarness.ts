@@ -3,7 +3,12 @@ import { chunkMapSystem } from "../../../src/game/system/chunkMapSystem.ts";
 import {
     createTileComponent,
     setChunk,
+    TileComponentId,
 } from "../../../src/game/component/tileComponent.ts";
+import type { BiomeType } from "../../../src/game/map/biome.ts";
+import type { NaturalResource } from "../../../src/data/inventory/items/naturalResource.ts";
+import { resourcePrefab } from "../../../src/game/prefab/resourcePrefab.ts";
+import { testVolume } from "../testWorld.ts";
 import { createChunkMapComponent } from "../../../src/game/component/chunkMapComponent.ts";
 import { createPathfindingGraphComponent } from "../../../src/game/component/pathfindingGraphComponent.ts";
 import { createLazyGraphFromRootNode } from "../../../src/game/map/path/graph/generateGraph.ts";
@@ -281,6 +286,27 @@ export class ScenarioHarness {
         camp.addChild(goblin);
         goblin.worldPosition = position;
         return goblin;
+    }
+
+    /**
+     * Cover the whole harness world in one biome. Chunks start without one,
+     * which suits tests that do not care what grows where. Anything that reads
+     * the land (planting, foraging) needs this.
+     */
+    setBiome(biome: BiomeType): void {
+        const tiles = this.root.requireEcsComponent(TileComponentId);
+        const volume = testVolume(biome);
+        for (const chunk of [...tiles.chunks.values()]) {
+            setChunk(tiles, { ...chunk, volume });
+        }
+    }
+
+    /** Add a natural resource entity, such as a tree, at a position. */
+    addResource(resource: NaturalResource, position: Point): Entity {
+        const entity = resourcePrefab(resource);
+        this.root.addChild(entity);
+        entity.worldPosition = position;
+        return entity;
     }
 
     /** Queue a job on the global job queue */

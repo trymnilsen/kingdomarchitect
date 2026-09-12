@@ -8,7 +8,7 @@ import { damage, HealthComponentId } from "../../component/healthComponent.ts";
 import { spendEntityEnergy } from "../../component/energyComponent.ts";
 import { ResourceComponentId } from "../../component/resourceComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
-import { dropItemAtPosition, DropMode } from "../dropItem.ts";
+import { scatterYields } from "../scatterYields.ts";
 import { ActionComplete, ActionRunning, type ActionResult } from "./action.ts";
 
 /**
@@ -66,7 +66,7 @@ export function executeClearObstacleAction(
     const healthComponent = resourceEntity.getEcsComponent(HealthComponentId);
     if (!healthComponent) {
         // Nothing to whittle down, so just remove it to clear the way.
-        scatterYields(root, tick, resourceEntity);
+        scatterObstacleYields(root, tick, resourceEntity);
         resourceEntity.remove();
         return ActionComplete;
     }
@@ -76,7 +76,7 @@ export function executeClearObstacleAction(
     spendEntityEnergy(entity, 2);
 
     if (healthComponent.currentHp <= 0) {
-        scatterYields(root, tick, resourceEntity);
+        scatterObstacleYields(root, tick, resourceEntity);
         resourceEntity.remove();
         return ActionComplete;
     }
@@ -85,11 +85,11 @@ export function executeClearObstacleAction(
 }
 
 /**
- * Scatter the resource's yields onto the nearest free tiles around it. The
- * resource tile itself is impassable, so DropMode.Nearest places the piles on
- * adjacent walkable tiles.
+ * Scatter the obstacle's yields around it. This runs while the resource still
+ * stands, so its own tile is impassable and the piles land on the walkable
+ * tiles beside it.
  */
-function scatterYields(
+function scatterObstacleYields(
     root: Entity,
     tick: number,
     resourceEntity: Entity,
@@ -101,15 +101,11 @@ function scatterYields(
     const resource = getResourceById(resourceComponent.resourceId);
     if (!resource) return;
 
-    for (const yieldItem of resource.yields) {
-        dropItemAtPosition(
-            root,
-            tick,
-            resourceEntity.worldPosition,
-            yieldItem.item,
-            yieldItem.amount,
-            `${yieldItem.item.name} yielded from clearing ${resource.name}`,
-            DropMode.Nearest,
-        );
-    }
+    scatterYields(
+        root,
+        tick,
+        resource,
+        resourceEntity.worldPosition,
+        `Yielded from clearing ${resource.name}`,
+    );
 }

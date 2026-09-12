@@ -29,6 +29,7 @@ import type { WorldDiscoveryComponent } from "./worldDiscoveryComponent.ts";
 import type { RoleComponent } from "./worker/roleComponent.ts";
 import type { StockpileComponent } from "./stockpileComponent.ts";
 import type { ProductionComponent } from "./productionComponent.ts";
+import type { OutputPolicyComponent } from "./outputPolicyComponent.ts";
 import type { WarmthComponent } from "./warmthComponent.ts";
 import type { GoblinCampComponent } from "./goblinCampComponent.ts";
 import type { GoblinUnitComponent } from "./goblinUnitComponent.ts";
@@ -83,6 +84,7 @@ export type Components =
     | RoleComponent
     | StockpileComponent
     | ProductionComponent
+    | OutputPolicyComponent
     | WarmthComponent
     | GoblinCampComponent
     | GoblinUnitComponent

@@ -19,6 +19,7 @@ import {
 } from "../../../../../job/productionJob.ts";
 import { countJobsForBuilding } from "../../../../../job/jobQuery.ts";
 import { getProductionDefinition } from "../../../../../../data/production/productionDefinition.ts";
+import { outputPolicyButton } from "./outputPolicyButton.ts";
 import type { UIActionbarItem } from "../../../../view/uiActionbar.ts";
 
 export class ProductionBuildingSelectionProvider implements ActorSelectionProvider {
@@ -52,10 +53,10 @@ export class ProductionBuildingSelectionProvider implements ActorSelectionProvid
                       )
                     : 0;
 
-                let actionText =
-                    queuedCount > 0
-                        ? `${definition.actionName} (${queuedCount})`
-                        : definition.actionName;
+                let actionText = definition.actionName;
+                if (queuedCount > 0) {
+                    actionText = `${definition.actionName} (${queuedCount})`;
+                }
 
                 const leftButtons: UIActionbarItem[] = [
                     {
@@ -86,6 +87,10 @@ export class ProductionBuildingSelectionProvider implements ActorSelectionProvid
                         },
                     });
                 }
+
+                leftButtons.push(
+                    outputPolicyButton(stateContext, selection.entity),
+                );
 
                 return {
                     left: leftButtons,
