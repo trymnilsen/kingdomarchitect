@@ -18,7 +18,7 @@ import type { BehaviorActionData } from "../actions/actionData.ts";
 import type { Behavior } from "./behavior.ts";
 
 /** How long one watch lasts before the guard re-selects. */
-const HOLD_TICKS = 1;
+const HOLD_TICKS = 10;
 
 /**
  * GarrisonBehavior: a Guard walks to a tower's lookout station, mans it, and
