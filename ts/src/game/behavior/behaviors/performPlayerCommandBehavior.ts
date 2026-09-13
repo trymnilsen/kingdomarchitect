@@ -14,6 +14,7 @@ import { findFreeAdjacentTile } from "../dropItem.ts";
 import { planEquipCommand } from "../planners/equipCommandPlanner.ts";
 import { planEquipFromHeld } from "../planners/equipFromHeldPlanner.ts";
 import { planDepositHeld } from "../../job/planner/planDepositHeld.ts";
+import { planAttack } from "../planners/attackPlanner.ts";
 
 /** Outranks anything a worker chooses for itself. Yields only to survival. */
 export const PLAYER_COMMAND_UTILITY = 90;
@@ -52,24 +53,12 @@ export function createPerformPlayerCommandBehavior(): Behavior {
                     ];
 
                 case "attack": {
-                    const root = entity.getRootEntity();
-                    const target = root.findEntity(command.targetEntityId);
-                    if (!target) {
+                    const plan = planAttack(entity, command.target);
+                    if (plan.length === 0) {
                         clearPlayerCommand(entity);
                         return [];
                     }
-                    return [
-                        {
-                            type: "moveTo",
-                            target: target.worldPosition,
-                            stopAdjacent: "cardinal",
-                        },
-                        {
-                            type: "attackTarget",
-                            targetId: command.targetEntityId,
-                        },
-                        { type: "clearPlayerCommand" },
-                    ];
+                    return [...plan, { type: "clearPlayerCommand" }];
                 }
 
                 case "pickup": {
@@ -83,7 +72,7 @@ export function createPerformPlayerCommandBehavior(): Behavior {
                         {
                             type: "moveTo",
                             target: target.worldPosition,
-                            stopAdjacent: "cardinal",
+                            goal: { kind: "adjacent" },
                         },
                         {
                             type: "pickupFromGround",

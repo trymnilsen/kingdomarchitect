@@ -25,6 +25,7 @@ import { DropHeldCommand } from "../../../../../../server/message/command/dropHe
 import { EquipFromHeldCommand } from "../../../../../../server/message/command/equipFromHeldCommand.ts";
 import { AttackSelectionState } from "../../../attack/attackSelectionState.ts";
 import { ItemTag } from "../../../../../../data/inventory/inventoryItem.ts";
+import { isWeaponItem } from "../../../../../../data/inventory/inventoryItemHelpers.ts";
 import { ConsumeItemCommand } from "../../../../../../server/message/command/consumeItemCommand.ts";
 import { RolePriorityState } from "../../../role/rolePriorityState.ts";
 import { WorkerStance } from "../../../../../component/worker/roleComponent.ts";
@@ -207,6 +208,10 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
                 });
             }
 
+            if (isWeaponItem(secondaryItem)) {
+                children.push(attackAction(stateContext, selectedEntity));
+            }
+
             items.push({
                 text: "Secondary",
                 icon: secondaryItem.asset,
@@ -263,16 +268,10 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
                     },
                     icon: spriteRefs.empty_sprite,
                 });
-            } else {
-                children.push({
-                    text: "Attack",
-                    onClick: () => {
-                        stateContext.stateChanger.push(
-                            new AttackSelectionState(selectedEntity),
-                        );
-                    },
-                    icon: spriteRefs.empty_sprite,
-                });
+            }
+
+            if (isWeaponItem(primaryItem)) {
+                children.push(attackAction(stateContext, selectedEntity));
             }
 
             items.push({
@@ -384,4 +383,23 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
 
         return items;
     }
+}
+
+/**
+ * The attack entry offered under a slot holding a weapon. Both slots open the
+ * same state, which weapon gets used is resolved from the attacker
+ */
+function attackAction(
+    stateContext: StateContext,
+    selectedEntity: Entity,
+): UIActionbarItem {
+    return {
+        text: "Attack",
+        onClick: () => {
+            stateContext.stateChanger.push(
+                new AttackSelectionState(selectedEntity),
+            );
+        },
+        icon: spriteRefs.empty_sprite,
+    };
 }

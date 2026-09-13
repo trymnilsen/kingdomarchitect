@@ -89,6 +89,7 @@ import {
     FarmComponentId,
     FarmState,
 } from "../../../src/game/component/farmComponent.ts";
+import { AttackTargetKind } from "../../../src/data/combat/attackProfileDefinition.ts";
 
 function createTestPersistenceManager(): PersistenceManager {
     return new PersistenceManager(new TestAdapter());
@@ -612,7 +613,7 @@ describe("commandSystem", () => {
                     agentId: "agent1",
                     command: {
                         action: "attack",
-                        targetEntityId: "enemy1",
+                        target: { kind: AttackTargetKind.Entity, id: "enemy1" },
                     },
                 } as SetPlayerCommand,
             };

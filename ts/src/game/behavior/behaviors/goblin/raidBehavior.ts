@@ -15,6 +15,9 @@ import {
     findReplacementTarget,
     isLivePlayerBuilding,
 } from "../../../raid/goblinRaid.ts";
+import { resolveAttackProfile } from "../../../combat/resolveAttackProfile.ts";
+import { planAttack } from "../../planners/attackPlanner.ts";
+import { AttackTargetKind } from "../../../../data/combat/attackProfileDefinition.ts";
 
 /**
  * RaidBehavior drives a committed raider (a goblin carrying a RaidingComponent)
@@ -28,10 +31,11 @@ import {
  *
  * Siege movement: expand runs its own A* with the goblinSiegeModifier, which
  * treats destructible structures as traversable at a finite cost. That route
- * reveals the next wall to break. The goblin then walks (with ordinary moveTo
- * pathing) up to that wall and attacks it. Once the wall falls the graph
- * invalidates the tile, the next replan produces a shorter route, and the
- * raider advances, chewing inward until it reaches the target.
+ * reveals the next wall to break. Once it falls the graph invalidates the tile,
+ * the next replan is shorter, and the raider chews inward to the target
+ *
+ * Breach cost and how close the raider gets both come from its own attack
+ * profile, so one that is bad at walls prefers to go around them
  */
 export function createRaidBehavior(): Behavior {
     return {
@@ -78,22 +82,10 @@ export function createRaidBehavior(): Behavior {
             // route, or the target itself if the route is clear.
             const obstacle = nextSiegeObstacle(root, entity, target) ?? target;
 
-            // Already adjacent → keep attacking (don't reset the running action
-            // with a redundant moveTo, matching engageInCombatBehavior).
-            if (
-                isPointAdjacentTo(entity.worldPosition, obstacle.worldPosition)
-            ) {
-                return [{ type: "attackTarget", targetId: obstacle.id }];
-            }
-
-            return [
-                {
-                    type: "moveTo",
-                    target: obstacle.worldPosition,
-                    stopAdjacent: "cardinal",
-                },
-                { type: "attackTarget", targetId: obstacle.id },
-            ];
+            return planAttack(entity, {
+                kind: AttackTargetKind.Entity,
+                id: obstacle.id,
+            });
         },
     };
 }
@@ -115,13 +107,19 @@ function nextSiegeObstacle(
     }
 
     const { offsetX, offsetY } = pathfindingGraph.graph;
+    const structureDamage = resolveAttackProfile(entity).structureDamage;
     const result = queryPath(
         pathfindingGraph,
         entity.worldPosition,
         target.worldPosition,
         {
-            weightModifier: goblinSiegeModifier(root, offsetX, offsetY),
-            allowAdjacentStop: true,
+            weightModifier: goblinSiegeModifier(
+                root,
+                offsetX,
+                offsetY,
+                structureDamage,
+            ),
+            isGoal: (point) => isPointAdjacentTo(point, target.worldPosition),
         },
     );
 

@@ -74,7 +74,7 @@ export function planBuildBuilding(
             {
                 type: "moveTo",
                 target: buildingEntity.worldPosition,
-                stopAdjacent: "cardinal",
+                goal: { kind: "adjacent" },
             },
             { type: "constructBuilding", entityId: job.entityId },
         ];
@@ -91,7 +91,7 @@ export function planBuildBuilding(
             {
                 type: "moveTo",
                 target: buildingEntity.worldPosition,
-                stopAdjacent: "cardinal",
+                goal: { kind: "adjacent" },
             },
             { type: "constructBuilding", entityId: job.entityId },
         ];
@@ -103,7 +103,7 @@ export function planBuildBuilding(
             {
                 type: "moveTo",
                 target: buildingEntity.worldPosition,
-                stopAdjacent: "cardinal",
+                goal: { kind: "adjacent" },
             },
             {
                 type: "depositToInventory",
@@ -154,13 +154,13 @@ export function planBuildBuilding(
                     {
                         type: "moveTo",
                         target: pile.worldPosition,
-                        stopAdjacent: "cardinal",
+                        goal: { kind: "adjacent" },
                     },
                     { type: "pickupFromGround", pileEntityId: pile.id },
                     {
                         type: "moveTo",
                         target: buildingEntity.worldPosition,
-                        stopAdjacent: "cardinal",
+                        goal: { kind: "adjacent" },
                     },
                     {
                         type: "depositToInventory",
@@ -218,7 +218,7 @@ export function planBuildBuilding(
         {
             type: "moveTo",
             target: stockpileEntity.worldPosition,
-            stopAdjacent: "cardinal",
+            goal: { kind: "adjacent" },
         },
         {
             type: "withdrawFromStockpile",
@@ -229,7 +229,7 @@ export function planBuildBuilding(
         {
             type: "moveTo",
             target: buildingEntity.worldPosition,
-            stopAdjacent: "cardinal",
+            goal: { kind: "adjacent" },
         },
         {
             type: "depositToInventory",

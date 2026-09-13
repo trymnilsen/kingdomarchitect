@@ -23,7 +23,7 @@ import { type FocusNode } from "./focusNode.ts";
  *
  * @param focusableNodes every node currently eligible to receive focus
  * @param currentFocusBounds the bounds we are navigating away from
- * @param direction the direction the input asked for
+ * @param direction the direction of to look for nodes in
  * @returns the best candidate, or null when nothing lies that way
  */
 export function getClosestFocusableNode(

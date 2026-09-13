@@ -66,22 +66,21 @@ describe("farmHarvestJobPlanner", () => {
         const moveAction = actions[0] as {
             type: "moveTo";
             target: { x: number; y: number };
-            stopAdjacent?: string;
         };
         assert.strictEqual(moveAction.target.x, 20);
         assert.strictEqual(moveAction.target.y, 15);
     });
 
-    it("moveTo uses stopAdjacent cardinal", () => {
+    it("moveTo stops beside the farm", () => {
         const { root, worker } = createTestScene();
         const job = createFarmHarvestJob("farm");
         const actions = planFarmHarvest(root, worker, job);
 
         const moveAction = actions[0] as {
             type: "moveTo";
-            stopAdjacent?: string;
+            goal?: { kind: string };
         };
-        assert.strictEqual(moveAction.stopAdjacent, "cardinal");
+        assert.deepStrictEqual(moveAction.goal, { kind: "adjacent" });
     });
 
     it("harvestCrop references the correct building id", () => {

@@ -8,17 +8,22 @@ export function isFood(item: InventoryItem): boolean {
 }
 
 /**
- * Whether a worker can put this item in an equipment slot. Equippability is a
- * property of the item, so every path that offers an equip action asks here
- * rather than testing tags itself.
- *
- * Three things qualify. Skill gear, which is the ordinary case. Consumables,
- * because a potion sits in the secondary slot to be drunk. And anything
- * granting light, which is how a carried torch is equippable without being
- * mislabelled as gear that teaches a skill.
+ * Whether this item lets its holder fight with it
+ */
+export function isWeaponItem(item: InventoryItem): boolean {
+    return item.attack !== undefined;
+}
+
+/**
+ * Whether a worker can put this item in an equipment slot. Four things qualify:
+ * skill gear, consumables (a potion sits in a slot to be drunk), anything
+ * granting light, and anything you can fight with
  */
 export function isEquippableItem(item: InventoryItem): boolean {
     if (item.light !== undefined) {
+        return true;
+    }
+    if (isWeaponItem(item)) {
         return true;
     }
     return (

@@ -13,6 +13,11 @@ import { ChunkSize } from "../../src/game/map/chunk.ts";
 import type { Point } from "../../src/common/point.ts";
 import type { BiomeType } from "../../src/game/map/biome.ts";
 import type { Volume } from "../../src/game/map/volume.ts";
+import type { Building } from "../../src/data/building/building.ts";
+import { stockPile } from "../../src/data/building/wood/storage.ts";
+import { buildingPrefab } from "../../src/game/prefab/buildingPrefab.ts";
+import { resourcePrefab } from "../../src/game/prefab/resourcePrefab.ts";
+import type { NaturalResource } from "../../src/data/inventory/items/naturalResource.ts";
 
 /**
  * Build the smallest viable world for tests: a chunk-mapped tile grid
@@ -105,4 +110,33 @@ export function createWorldCovering(
     );
 
     return { root, world };
+}
+
+/**
+ * Put a real building on the map, through the prefab the game uses. Position
+ * goes on after parenting, and the prefab's sprite is what gets it into the
+ * chunk map
+ */
+export function addBuilding(
+    root: Entity,
+    id: string,
+    position: Point,
+    building: Building = stockPile,
+): Entity {
+    const entity = buildingPrefab(building, false, id);
+    root.addChild(entity);
+    entity.worldPosition = position;
+    return entity;
+}
+
+/** Put a real natural resource on the map, for the same reasons */
+export function addResource(
+    root: Entity,
+    resource: NaturalResource,
+    position: Point,
+): Entity {
+    const entity = resourcePrefab(resource);
+    root.addChild(entity);
+    entity.worldPosition = position;
+    return entity;
 }

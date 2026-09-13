@@ -9,6 +9,7 @@ import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import { executeAction } from "../actions/actionExecutor.ts";
 import { log } from "../../../common/logging/logger.ts";
 import type { BehaviorActionData } from "../actions/actionData.ts";
+import type { FailureCause } from "../actions/action.ts";
 
 /**
  * Resolves which behaviors are applicable for a given entity.
@@ -128,9 +129,12 @@ function updateBehaviorAgent(
                 concludeActivePlan(agent);
             }
         } else if (result.kind === "failed") {
-            log.warn(
-                `Action ${action.type} failed for entity ${entity.id} (${result.cause.type}), cleaning up and replanning`,
-            );
+            const message = `Action ${action.type} failed for entity ${entity.id} (${result.cause.type}), cleaning up and replanning`;
+            if (isExpectedFailure(result.cause)) {
+                log.info(message);
+            } else {
+                log.warn(message);
+            }
             unclaimCurrentJob(entity);
             clearBehavior(agent);
             agent.pendingReplan = { kind: "replan" };
@@ -145,6 +149,14 @@ function updateBehaviorAgent(
         entity.invalidateComponent(BehaviorAgentComponentId);
         // result.kind === "running". Keep the action in the queue. It runs again next tick.
     }
+}
+
+/**
+ * Named causes happen constantly and the replan is the designed answer, so only
+ * `unknown` stays loud
+ */
+function isExpectedFailure(cause: FailureCause): boolean {
+    return cause.type !== "unknown";
 }
 
 /**
@@ -232,7 +244,7 @@ function selectBehavior(
                 {
                     type: "moveTo",
                     target: buildingEntity.worldPosition,
-                    stopAdjacent: "cardinal",
+                    goal: { kind: "adjacent" },
                 },
                 inProgressCraftItem,
             ];

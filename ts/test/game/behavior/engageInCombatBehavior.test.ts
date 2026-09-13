@@ -9,6 +9,8 @@ import {
     ThreatMapComponentId,
 } from "../../../src/game/component/threatMapComponent.ts";
 import { createGameTimeComponent } from "../../../src/game/component/gameTimeComponent.ts";
+import type { AttackTarget } from "../../../src/game/combat/attackTarget.ts";
+import { AttackTargetKind } from "../../../src/data/combat/attackProfileDefinition.ts";
 
 function createVictim(): {
     root: Entity;
@@ -52,10 +54,13 @@ describe("engageInCombatBehavior", () => {
 
             const actions = behavior.expand(victim);
             const attack = actions.find((a) => a.type === "attackTarget") as
-                { type: "attackTarget"; targetId: string } | undefined;
+                { type: "attackTarget"; target: AttackTarget } | undefined;
 
             assert.ok(attack, "expand must include an attackTarget action");
-            assert.strictEqual(attack.targetId, "G2");
+            assert.deepStrictEqual(attack.target, {
+                kind: AttackTargetKind.Entity,
+                id: "G2",
+            });
         });
 
         it("switches target when accumulated threat amounts shift", () => {
@@ -70,8 +75,11 @@ describe("engageInCombatBehavior", () => {
             const firstActions = behavior.expand(victim);
             const firstAttack = firstActions.find(
                 (a) => a.type === "attackTarget",
-            ) as { type: "attackTarget"; targetId: string } | undefined;
-            assert.strictEqual(firstAttack?.targetId, "G1");
+            ) as { type: "attackTarget"; target: AttackTarget } | undefined;
+            assert.deepStrictEqual(firstAttack?.target, {
+                kind: AttackTargetKind.Entity,
+                id: "G1",
+            });
 
             // G2 piles on and overtakes
             time.tick = 1;
@@ -80,8 +88,11 @@ describe("engageInCombatBehavior", () => {
             const secondActions = behavior.expand(victim);
             const secondAttack = secondActions.find(
                 (a) => a.type === "attackTarget",
-            ) as { type: "attackTarget"; targetId: string } | undefined;
-            assert.strictEqual(secondAttack?.targetId, "G2");
+            ) as { type: "attackTarget"; target: AttackTarget } | undefined;
+            assert.deepStrictEqual(secondAttack?.target, {
+                kind: AttackTargetKind.Entity,
+                id: "G2",
+            });
         });
     });
 
@@ -150,11 +161,14 @@ describe("engageInCombatBehavior", () => {
             const actions = behavior.expand(victim);
             const hasMoveTo = actions.some((a) => a.type === "moveTo");
             const attack = actions.find((a) => a.type === "attackTarget") as
-                { type: "attackTarget"; targetId: string } | undefined;
+                { type: "attackTarget"; target: AttackTarget } | undefined;
 
             assert.ok(hasMoveTo, "expand should include a moveTo action");
             assert.ok(attack, "expand should include an attackTarget action");
-            assert.strictEqual(attack.targetId, "G1");
+            assert.deepStrictEqual(attack.target, {
+                kind: AttackTargetKind.Entity,
+                id: "G1",
+            });
         });
     });
 });

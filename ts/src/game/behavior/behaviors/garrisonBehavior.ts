@@ -63,7 +63,7 @@ export function createGarrisonBehavior(): Behavior {
                 {
                     type: "moveTo",
                     target: post.worldPosition,
-                    stopAdjacent: "cardinal",
+                    goal: { kind: "adjacent" },
                 },
                 { type: "stepOnto", targetId: post.id },
             ];

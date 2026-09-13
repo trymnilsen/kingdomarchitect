@@ -1,6 +1,7 @@
 import type { Point } from "../../common/point.ts";
 import type { Entity } from "../entity/entity.ts";
 import type { BehaviorActionData } from "../behavior/actions/actionData.ts";
+import type { AttackTarget } from "../combat/attackTarget.ts";
 
 export const BehaviorAgentComponentId = "behavioragent";
 
@@ -15,7 +16,7 @@ export type PlayerCommand =
       }
     | {
           action: "attack";
-          targetEntityId: string;
+          target: AttackTarget;
       }
     | {
           action: "pickup";

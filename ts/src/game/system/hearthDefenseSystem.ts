@@ -29,7 +29,7 @@ export const HEARTH_DEFENSE_INTERVAL = 5;
  *
  * The stance filter lives here. A defensive worker gets no intrusion entry but
  * still retaliates at full priority when hit, because attackTargetAction writes
- * damage threat regardless of stance.
+ * threat regardless of stance.
  *
  * Response is hearthlight-wide, and the player bounds the mob by choosing who
  * is aggressive. A flat INTRUSION_THREAT with an insertion-order tie-break has

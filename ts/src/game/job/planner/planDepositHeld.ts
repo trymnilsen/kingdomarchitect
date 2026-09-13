@@ -25,7 +25,7 @@ export function planDepositHeld(worker: Entity): BehaviorActionData[] {
             {
                 type: "moveTo",
                 target: stockpile.worldPosition,
-                stopAdjacent: "cardinal",
+                goal: { kind: "adjacent" },
             },
             {
                 type: "depositToStockpile",

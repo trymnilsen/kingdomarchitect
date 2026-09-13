@@ -43,13 +43,12 @@ describe("collectResourcePlanner", () => {
         const moveAction = actions[0] as {
             type: "moveTo";
             target: { x: number; y: number };
-            stopAdjacent?: string;
         };
         assert.strictEqual(moveAction.target.x, 10);
         assert.strictEqual(moveAction.target.y, 15);
     });
 
-    it("sets stopAdjacent to cardinal for moveTo action", () => {
+    it("stops the worker beside the resource rather than on it", () => {
         const { root, worker, resource } = createTestScene();
 
         const job = CollectResourceJob(resource, ResourceHarvestMode.Chop);
@@ -57,13 +56,12 @@ describe("collectResourcePlanner", () => {
 
         const moveAction = actions[0] as {
             type: "moveTo";
-            target: { x: number; y: number };
-            stopAdjacent?: string;
+            goal?: { kind: string };
         };
-        assert.strictEqual(
-            moveAction.stopAdjacent,
-            "cardinal",
-            "moveTo should have stopAdjacent: cardinal for resource harvesting",
+        assert.deepStrictEqual(
+            moveAction.goal,
+            { kind: "adjacent" },
+            "a tree cannot be stood on, so harvesting needs an adjacent goal",
         );
     });
 

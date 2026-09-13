@@ -88,7 +88,7 @@ export function planEquipCommand(
     actions.push({
         type: "moveTo",
         target: source.worldPosition,
-        stopAdjacent: "cardinal",
+        goal: { kind: "adjacent" },
     });
 
     if (source.getEcsComponent(StockpileComponentId)) {

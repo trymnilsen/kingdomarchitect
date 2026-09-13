@@ -58,7 +58,7 @@ export function createHaulBehavior(): Behavior {
                 {
                     type: "moveTo",
                     target: pile.worldPosition,
-                    stopAdjacent: "cardinal",
+                    goal: { kind: "adjacent" },
                 },
                 { type: "pickupFromGround", pileEntityId: pile.id },
             ];

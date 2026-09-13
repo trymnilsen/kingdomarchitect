@@ -7,7 +7,7 @@ import { BuildingComponentId } from "../component/buildingComponent.ts";
 import { HealthComponentId } from "../component/healthComponent.ts";
 import { ResourceComponentId } from "../component/resourceComponent.ts";
 import { isPermanentObstacle } from "../../data/inventory/items/naturalResource.ts";
-import { SIEGE_COST_MULTIPLIER, STRUCTURE_DAMAGE } from "./raidConstants.ts";
+import { SIEGE_COST_MULTIPLIER } from "./raidConstants.ts";
 
 /**
  * Weight modifier for goblin "siege" pathfinding. Unlike the normal movement
@@ -15,6 +15,9 @@ import { SIEGE_COST_MULTIPLIER, STRUCTURE_DAMAGE } from "./raidConstants.ts";
  * this treats a *destructible* structure as traversable at a finite cost equal to
  * the time it takes to break it. A* therefore routes around a wall when going
  * around is cheaper, but punches straight through when the wall is the shortcut.
+ *
+ * `structureDamage` comes from the planning raider's own profile. Cost is
+ * time-to-breach, so a raider poor against walls finds them expensive
  *
  * Used only by RaidBehavior's own path query to decide the siege route. The
  * normal moveTo pathing is untouched. The route this produces tells the behavior
@@ -29,6 +32,7 @@ export function goblinSiegeModifier(
     root: Entity,
     offsetX: number,
     offsetY: number,
+    structureDamage: number,
 ): (node: GraphNode) => number {
     return (node) => {
         const wx = node.x - offsetX;
@@ -65,9 +69,7 @@ export function goblinSiegeModifier(
             const building = entity.getEcsComponent(BuildingComponentId);
             const health = entity.getEcsComponent(HealthComponentId);
             if (building && health) {
-                return (
-                    SIEGE_COST_MULTIPLIER * (health.maxHp / STRUCTURE_DAMAGE)
-                );
+                return SIEGE_COST_MULTIPLIER * (health.maxHp / structureDamage);
             }
 
             // Impassable and not a destructible building → hard block.

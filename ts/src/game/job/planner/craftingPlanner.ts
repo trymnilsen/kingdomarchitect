@@ -66,7 +66,7 @@ export function planCrafting(
             {
                 type: "moveTo",
                 target: buildingEntity.worldPosition,
-                stopAdjacent: "cardinal",
+                goal: { kind: "adjacent" },
             },
             { type: "stepOnto", targetId: job.targetBuilding },
             {
@@ -105,7 +105,7 @@ export function planCrafting(
                 {
                     type: "moveTo",
                     target: buildingEntity.worldPosition,
-                    stopAdjacent: "cardinal",
+                    goal: { kind: "adjacent" },
                 },
                 {
                     type: "depositToInventory",
@@ -152,7 +152,7 @@ export function planCrafting(
                 {
                     type: "moveTo",
                     target: nearest.position,
-                    stopAdjacent: "cardinal",
+                    goal: { kind: "adjacent" },
                 },
                 {
                     type: "withdrawFromStockpile",
@@ -163,7 +163,7 @@ export function planCrafting(
                 {
                     type: "moveTo",
                     target: buildingEntity.worldPosition,
-                    stopAdjacent: "cardinal",
+                    goal: { kind: "adjacent" },
                 },
                 {
                     type: "depositToInventory",
@@ -183,13 +183,13 @@ export function planCrafting(
                 {
                     type: "moveTo",
                     target: pile.worldPosition,
-                    stopAdjacent: "cardinal",
+                    goal: { kind: "adjacent" },
                 },
                 { type: "pickupFromGround", pileEntityId: pile.id },
                 {
                     type: "moveTo",
                     target: buildingEntity.worldPosition,
-                    stopAdjacent: "cardinal",
+                    goal: { kind: "adjacent" },
                 },
                 {
                     type: "depositToInventory",

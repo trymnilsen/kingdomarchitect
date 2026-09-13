@@ -130,7 +130,7 @@ export function createRestockBehavior(): Behavior {
                 {
                     type: "moveTo",
                     target: bestSource.stockpile.worldPosition,
-                    stopAdjacent: "cardinal",
+                    goal: { kind: "adjacent" },
                 },
                 {
                     type: "withdrawFromStockpile",
@@ -141,7 +141,7 @@ export function createRestockBehavior(): Behavior {
                 {
                     type: "moveTo",
                     target: bestDeficit.stockpile.worldPosition,
-                    stopAdjacent: "cardinal",
+                    goal: { kind: "adjacent" },
                 },
                 {
                     type: "depositToStockpile",

@@ -88,14 +88,14 @@ describe("PathSearch", () => {
         );
     });
 
-    describe("allowAdjacentStop", () => {
+    describe("isGoal", () => {
         it("terminates at a node adjacent to the target, not at the target itself", () => {
             const graph = createEmptyGraph(14, 14);
             const from: Point = { x: 3, y: 8 };
             const to: Point = { x: 11, y: 8 };
 
             const result = aStarSearch(from, to, graph, {
-                allowAdjacentStop: true,
+                isGoal: (node) => isPointAdjacentTo(node, to),
             });
 
             assert.ok(result.path.length > 0, "should find a path");
@@ -117,7 +117,7 @@ describe("PathSearch", () => {
 
             const full = aStarSearch(from, to, graph);
             const adjacent = aStarSearch(from, to, graph, {
-                allowAdjacentStop: true,
+                isGoal: (node) => isPointAdjacentTo(node, to),
             });
 
             assert.strictEqual(
@@ -134,7 +134,7 @@ describe("PathSearch", () => {
             const to: Point = { x: 6, y: 8 };
 
             const result = aStarSearch(from, to, graph, {
-                allowAdjacentStop: true,
+                isGoal: (node) => isPointAdjacentTo(node, to),
             });
 
             assert.strictEqual(
@@ -147,14 +147,14 @@ describe("PathSearch", () => {
         it("succeeds when the target tile is a wall", () => {
             const to: Point = { x: 11, y: 8 };
             const from: Point = { x: 3, y: 8 };
-            // Target tile is impassable, but allowAdjacentStop should still
+            // Target tile is impassable, but an adjacency goal should still
             // find a path to the tile next to it.
             const graph = FixedGraph.createWithWidthAndHeight(14, 14, (p) => {
                 return pointEquals(p, to) ? 0 : 1;
             });
 
             const result = aStarSearch(from, to, graph, {
-                allowAdjacentStop: true,
+                isGoal: (node) => isPointAdjacentTo(node, to),
             });
 
             assert.ok(
@@ -168,7 +168,26 @@ describe("PathSearch", () => {
             );
         });
 
-        it("without the option, fails to reach a walled target via full path", () => {
+        it("stops at any node the goal accepts, not only adjacent ones", () => {
+            const graph = createEmptyGraph(14, 14);
+            const from: Point = { x: 3, y: 8 };
+            const to: Point = { x: 11, y: 8 };
+
+            // Nothing to do with adjacency. Stop at column 7, four tiles short
+            // of the target, the same shape as a bow's reach check
+            const result = aStarSearch(from, to, graph, {
+                isGoal: (node) => node.x >= 7,
+            });
+
+            const lastNode = result.path[result.path.length - 1];
+            assert.strictEqual(
+                lastNode.x,
+                7,
+                "the search should end the moment the goal is satisfied",
+            );
+        });
+
+        it("without a goal, fails to reach a walled target via full path", () => {
             const to: Point = { x: 11, y: 8 };
             const from: Point = { x: 3, y: 8 };
             const graph = FixedGraph.createWithWidthAndHeight(14, 14, (p) => {
@@ -177,7 +196,7 @@ describe("PathSearch", () => {
 
             const result = aStarSearch(from, to, graph);
 
-            // Without the option the search never terminates at the wall node,
+            // Without a goal the search never terminates at the wall node,
             // so the last node in the result is not the intended target.
             const lastNode = result.path[result.path.length - 1];
             assert.ok(

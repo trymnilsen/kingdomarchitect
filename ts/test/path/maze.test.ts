@@ -1,4 +1,5 @@
 import { describe, it } from "node:test";
+import { isPointAdjacentTo } from "../../src/common/point.ts";
 import { FixedGraph } from "../../src/game/map/path/graph/fixedGraph.ts";
 import { aStarSearch } from "../../src/game/map/path/search.ts";
 import { createGraphFromTestFile, verifyPath } from "./testGraph.ts";
@@ -14,7 +15,7 @@ describe("Maze", () => {
             };
         });
         const pathResult = aStarSearch(graph.start, graph.stop, fixedGraph, {
-            allowAdjacentStop: true,
+            isGoal: (node) => isPointAdjacentTo(node, graph.stop),
             weightModifier: (node) => node.weight,
         });
 

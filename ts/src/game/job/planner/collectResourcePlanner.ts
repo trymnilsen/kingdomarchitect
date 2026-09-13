@@ -25,7 +25,7 @@ export function planCollectResource(
         {
             type: "moveTo",
             target: resourceEntity.worldPosition,
-            stopAdjacent: "cardinal",
+            goal: { kind: "adjacent" },
         },
         {
             type: "harvestResource",

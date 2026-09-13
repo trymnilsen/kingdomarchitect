@@ -341,13 +341,13 @@ describe("harvestResourceAction", () => {
                     {
                         type: "moveTo",
                         target: stockpile.worldPosition,
-                        stopAdjacent: "cardinal",
+                        goal: { kind: "adjacent" },
                     },
                     { type: "depositToStockpile", stockpileId: "stockpile" },
                     {
                         type: "moveTo",
                         target: { x: 11, y: 8 },
-                        stopAdjacent: "cardinal",
+                        goal: { kind: "adjacent" },
                     },
                 ],
             );

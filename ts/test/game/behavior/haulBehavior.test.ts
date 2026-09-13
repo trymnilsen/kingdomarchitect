@@ -95,7 +95,7 @@ describe("haulBehavior", () => {
 
         assert.strictEqual(haul.isValid(hauler), true);
         assert.deepStrictEqual(haul.expand(hauler), [
-            { type: "moveTo", target: LIT, stopAdjacent: "cardinal" },
+            { type: "moveTo", target: LIT, goal: { kind: "adjacent" } },
             { type: "pickupFromGround", pileEntityId: pile.id },
         ]);
     });

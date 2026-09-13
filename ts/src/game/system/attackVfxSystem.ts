@@ -14,12 +14,10 @@ export function createAttackVfxSystem(gameTime: GameTime): EcsSystem {
             if (message.eventType !== AttackGameEventType) return;
 
             const payload = message.payload as AttackGameEventData;
-            const target = root.findEntity(payload.target);
-            if (!target) return;
 
             const vfx = swipeVfxPrefab(gameTime.tick);
             root.addChild(vfx);
-            vfx.worldPosition = target.worldPosition;
+            vfx.worldPosition = payload.impact;
         },
     };
 }

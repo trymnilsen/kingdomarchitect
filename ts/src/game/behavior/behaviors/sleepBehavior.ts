@@ -102,7 +102,7 @@ export function createSleepBehavior(): Behavior {
                     {
                         type: "moveTo",
                         target: houseEntity.worldPosition,
-                        stopAdjacent: "cardinal",
+                        goal: { kind: "adjacent" },
                     },
                     { type: "stepOnto", targetId: houseEntity.id },
                     makeSleepAction("house", energy),
@@ -126,7 +126,7 @@ export function createSleepBehavior(): Behavior {
                     );
                     const target = adjacentTile ?? campfire.worldPosition;
                     return [
-                        { type: "moveTo", target, stopAdjacent: "cardinal" },
+                        { type: "moveTo", target, goal: { kind: "adjacent" } },
                         makeSleepAction("bedrollFire", energy),
                     ];
                 }

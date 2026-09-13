@@ -75,7 +75,7 @@ const uiMenuButton = createComponent<UiButtonProps>(
     },
 );
 
-type ScaffoldButton = {
+export type ScaffoldButton = {
     text: string;
     onClick?: () => void;
     icon?: SpriteRef;

@@ -1,4 +1,3 @@
-import { isPointAdjacentTo } from "../../../common/point.ts";
 import {
     getTopThreat,
     ThreatMapComponentId,
@@ -6,6 +5,8 @@ import {
 import { getGameTimeTick } from "../../component/gameTimeComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import type { BehaviorActionData } from "../actions/actionData.ts";
+import { planAttack } from "../planners/attackPlanner.ts";
+import { AttackTargetKind } from "../../../data/combat/attackProfileDefinition.ts";
 import type { Behavior } from "./behavior.ts";
 
 /**
@@ -74,25 +75,10 @@ export function createEngageInCombatBehavior(): Behavior {
             if (!topId) {
                 return [];
             }
-            const attacker = root.findEntity(topId);
-            if (!attacker) {
-                return [];
-            }
-
-            const actions: BehaviorActionData[] = [];
-            // Skip the moveTo when already adjacent so the attack starts this
-            // tick rather than routing through a no-op move.
-            if (
-                !isPointAdjacentTo(entity.worldPosition, attacker.worldPosition)
-            ) {
-                actions.push({
-                    type: "moveTo",
-                    target: attacker.worldPosition,
-                    stopAdjacent: "cardinal",
-                });
-            }
-            actions.push({ type: "attackTarget", targetId: topId });
-            return actions;
+            return planAttack(entity, {
+                kind: AttackTargetKind.Entity,
+                id: topId,
+            });
         },
     };
 }

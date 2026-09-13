@@ -39,7 +39,7 @@ export function planCollectItem(
         {
             type: "moveTo",
             target: targetEntity.worldPosition,
-            stopAdjacent: "cardinal",
+            goal: { kind: "adjacent" },
         },
         { type: "collectItems", entityId: job.entityId, itemId: job.itemId },
     ];

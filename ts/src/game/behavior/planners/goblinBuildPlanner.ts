@@ -127,7 +127,7 @@ function planConstructExistingBuilding(
             {
                 type: "moveTo",
                 target: buildingEntity.worldPosition,
-                stopAdjacent: "cardinal",
+                goal: { kind: "adjacent" },
             },
             { type: "constructBuilding", entityId: buildingEntity.id },
         ];
@@ -141,7 +141,7 @@ function planConstructExistingBuilding(
             {
                 type: "moveTo",
                 target: buildingEntity.worldPosition,
-                stopAdjacent: "cardinal",
+                goal: { kind: "adjacent" },
             },
             {
                 type: "depositToInventory",
@@ -186,7 +186,7 @@ function planConstructExistingBuilding(
                     {
                         type: "moveTo",
                         target: stockpileWithMaterials.worldPosition,
-                        stopAdjacent: "cardinal",
+                        goal: { kind: "adjacent" },
                     },
                     {
                         type: "withdrawFromStockpile",
@@ -197,7 +197,7 @@ function planConstructExistingBuilding(
                     {
                         type: "moveTo",
                         target: buildingEntity.worldPosition,
-                        stopAdjacent: "cardinal",
+                        goal: { kind: "adjacent" },
                     },
                     {
                         type: "depositToInventory",
@@ -258,7 +258,7 @@ function planGatherMaterials(
                 {
                     type: "moveTo",
                     target: nearestTree.worldPosition,
-                    stopAdjacent: "cardinal",
+                    goal: { kind: "adjacent" },
                 },
                 {
                     type: "harvestResource",

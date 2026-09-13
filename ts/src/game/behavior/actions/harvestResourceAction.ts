@@ -179,7 +179,7 @@ function freeHandSubaction(
                 {
                     type: "moveTo",
                     target: stockpile.worldPosition,
-                    stopAdjacent: "cardinal",
+                    goal: { kind: "adjacent" },
                 },
                 {
                     type: "depositToStockpile",
@@ -188,7 +188,7 @@ function freeHandSubaction(
                 {
                     type: "moveTo",
                     target: resourceEntity.worldPosition,
-                    stopAdjacent: "cardinal",
+                    goal: { kind: "adjacent" },
                 },
             ],
         };

@@ -8,7 +8,7 @@ import { RenderScope } from "../../../../../rendering/renderScope.ts";
 import type { ComponentDescriptor } from "../../../../../ui/declarative/ui.ts";
 import { Entity } from "../../../../entity/entity.ts";
 import { InteractionState } from "../../../handler/interactionState.ts";
-import { uiScaffold } from "../../../view/uiScaffold.ts";
+import { uiScaffold, type ScaffoldButton } from "../../../view/uiScaffold.ts";
 import { getPathfindingGraph } from "../../../../map/path/getPathfindingGraph.ts";
 import { queryEntity } from "../../../../map/query/queryEntity.ts";
 import type { SelectedWorldItem } from "../../../selection/selectedWorldItem.ts";
@@ -19,13 +19,6 @@ import { ChangeOccupationCommand } from "../../../../../server/message/command/c
 import { BehaviorAgentComponentId } from "../../../../component/behaviorAgentComponent.ts";
 import { SetPlayerCommand } from "../../../../../server/message/command/setPlayerCommand.ts";
 import { log } from "../../../../../common/logging/logger.ts";
-
-type ScaffoldButton = {
-    text: string;
-    onClick?: () => void;
-    icon?: import("../../../../../asset/sprite.js").SpriteRef;
-    children?: ScaffoldButton[];
-};
 
 export class ActorContextActionState extends InteractionState {
     private selectedPoint: Point | null = null;

@@ -23,7 +23,7 @@ export function planDismantleBuilding(
         {
             type: "moveTo",
             target: buildingEntity.worldPosition,
-            stopAdjacent: "cardinal",
+            goal: { kind: "adjacent" },
         },
         { type: "dismantleBuilding", entityId: job.entityId },
     ];

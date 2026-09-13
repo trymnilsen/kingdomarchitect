@@ -15,6 +15,9 @@ export type FailureCause =
     | { type: "notAdjacent" }
     | { type: "noResources" }
     | { type: "stockpileFull"; stockpileId: string }
+    | { type: "outOfReach" }
+    | { type: "noLineOfSight" }
+    | { type: "nothingToAttack" }
     | { type: "unknown" };
 
 export type ActionResult =

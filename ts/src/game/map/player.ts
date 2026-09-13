@@ -5,12 +5,17 @@ import { farm } from "../../data/building/grow/grow.ts";
 import { cresset } from "../../data/building/light/cresset.ts";
 import { woodenHouse } from "../../data/building/wood/house.ts";
 import { stockPile } from "../../data/building/wood/storage.ts";
+import { bowItem } from "../../data/inventory/items/equipment.ts";
 import {
     stoneResource,
     treeResource,
 } from "../../data/inventory/items/naturalResource.ts";
 import { ChunkMapComponentId } from "../component/chunkMapComponent.ts";
 import { HousingComponentId } from "../component/housingComponent.ts";
+import {
+    addInventoryItem,
+    InventoryComponentId,
+} from "../component/inventoryComponent.ts";
 import { setChunk, TileComponentId } from "../component/tileComponent.ts";
 import { Entity } from "../entity/entity.ts";
 import { buildingPrefab } from "../prefab/buildingPrefab.ts";
@@ -40,10 +45,12 @@ export function addInitialPlayerChunk(scopedEntity: Entity): Point {
     const firstHouse = buildingPrefab(woodenHouse, false);
     firstHouse.requireEcsComponent(HousingComponentId).tenant = firstWorker.id;
 
-    // The stockpile starts empty. A kingdom owns nothing it has not cut,
-    // mined, or grown, so the opening move is always to send the first worker
-    // at a tree.
     const startingStockpile = buildingPrefab(stockPile, false);
+    addInventoryItem(
+        startingStockpile.requireEcsComponent(InventoryComponentId),
+        bowItem,
+        1,
+    );
 
     // World resources stay on the chunk entity
     chunkEntity.addChild(firstTree);

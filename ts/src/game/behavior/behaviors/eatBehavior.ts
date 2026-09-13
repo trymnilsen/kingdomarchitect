@@ -144,7 +144,7 @@ function tryStockpileStage(
         {
             type: "moveTo",
             target: nearestEntity.worldPosition,
-            stopAdjacent: "cardinal",
+            goal: { kind: "adjacent" },
         },
         {
             type: "withdrawFromStockpile",
@@ -180,7 +180,7 @@ function tryGroundPileStage(entity: Entity): BehaviorActionData[] | null {
         {
             type: "moveTo",
             target: nearest.worldPosition,
-            stopAdjacent: "cardinal",
+            goal: { kind: "adjacent" },
         },
         { type: "pickupFromGround", pileEntityId: nearest.id },
         { type: "eatFromHeld" },
@@ -211,7 +211,7 @@ function tryForageStage(entity: Entity): BehaviorActionData[] | null {
         {
             type: "moveTo",
             target: nearestResource.worldPosition,
-            stopAdjacent: "cardinal",
+            goal: { kind: "adjacent" },
         },
         {
             type: "harvestResource",
@@ -254,7 +254,7 @@ function tryStealStage(entity: Entity): BehaviorActionData[] | null {
         {
             type: "moveTo",
             target: bestTarget.worldPosition,
-            stopAdjacent: "cardinal",
+            goal: { kind: "adjacent" },
         },
         {
             type: "stealFood",

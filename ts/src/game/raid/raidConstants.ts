@@ -2,31 +2,17 @@ import { type KingdomDescription, worthOfKingdom } from "./raidWorth.ts";
 
 /**
  * Shared tuning constants for the goblin night-raid feature. Kept in one place
- * so the siege pathfinding cost, the combat damage split, and the raid
- * formation/behavior all agree on the same numbers. What individual things are
- * worth to a raider lives in raidWorth.ts. This file is pacing policy.
+ * so the siege pathfinding cost and the raid formation/behavior agree on the
+ * same numbers. What individual things are worth to a raider lives in
+ * raidWorth.ts. This file is pacing policy.
  */
-
-/**
- * Damage dealt per tick when attacking a building (structure). Goblin raiders
- * use this to raze the player's settlement at a meaningful pace. It also lets
- * the player raze a goblin campfire faster when counter-raiding a camp.
- *
- * TODO: this is a blunt instrument, a flat structure-damage bonus applied to
- * any attacker. Revisit with a proper damage model (per-unit attack stats,
- * siege weapons, building armor) instead of a single global constant.
- */
-export const STRUCTURE_DAMAGE = 10;
-
-/** Damage dealt per tick when attacking a unit (non-building). Unchanged. */
-export const UNIT_DAMAGE = 1;
 
 /**
  * Multiplier on the siege-path cost of routing through a destructible
- * structure. Cost ≈ SIEGE_COST_MULTIPLIER * (building maxHp / STRUCTURE_DAMAGE),
- * compared against ~2 per ground tile. Higher → raiders prefer detours, lower →
- * they punch through walls more eagerly. At 1.0 a 100hp wall (≈10 cost) is worth
- * breaching whenever going around would be more than ~5 tiles.
+ * structure. Cost ≈ SIEGE_COST_MULTIPLIER * (maxHp / the attacker's own
+ * structure damage), against ~2 per ground tile. Higher → raiders prefer
+ * detours. At 1.0 a 100hp wall costs ≈10 to an unarmed raider, worth breaching
+ * whenever going around would be more than ~5 tiles
  */
 export const SIEGE_COST_MULTIPLIER = 1.0;
 

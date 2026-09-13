@@ -1,8 +1,4 @@
-import {
-    isPointAdjacentTo,
-    type Point,
-    pointEquals,
-} from "../../../common/point.ts";
+import { type Point, pointEquals } from "../../../common/point.ts";
 import { BinaryHeap } from "../../../common/structure/binaryHeap.ts";
 import { log } from "../../../common/logging/logger.ts";
 import { type Graph, GraphNode } from "./graph/graph.ts";
@@ -15,10 +11,10 @@ export type SearchOptions = {
      */
     weightModifier?: (graphNode: GraphNode) => number;
     /**
-     * Stop once a node next to the goal is reached. Use this to path towards
-     * something that cannot be stood on, like a wall or a tree.
+     * Stop early at any node this accepts, on top of always stopping at the
+     * end node
      */
-    allowAdjacentStop?: boolean;
+    isGoal?: (graphNode: GraphNode) => boolean;
 };
 
 const defaultWeightFunction = (node: GraphNode) => node.weight;
@@ -81,10 +77,7 @@ export function aStarSearch(
         const currentNode = openHeap.pop();
 
         // End case -- result has been found, return the traced path.
-        if (
-            currentNode === end ||
-            (options?.allowAdjacentStop && isPointAdjacentTo(currentNode, end))
-        ) {
+        if (currentNode === end || options?.isGoal?.(currentNode)) {
             const path = pathTo(currentNode);
             return {
                 path: path,

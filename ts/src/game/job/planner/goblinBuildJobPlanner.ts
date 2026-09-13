@@ -66,7 +66,7 @@ export function planGoblinBuildJob(
             {
                 type: "moveTo",
                 target: buildingEntity.worldPosition,
-                stopAdjacent: "cardinal",
+                goal: { kind: "adjacent" },
             },
             { type: "constructBuilding", entityId: buildingEntity.id },
         ];
@@ -80,7 +80,7 @@ export function planGoblinBuildJob(
             {
                 type: "moveTo",
                 target: buildingEntity.worldPosition,
-                stopAdjacent: "cardinal",
+                goal: { kind: "adjacent" },
             },
             {
                 type: "depositToInventory",
@@ -128,7 +128,7 @@ export function planGoblinBuildJob(
                         {
                             type: "moveTo",
                             target: stockpileWithMaterials.worldPosition,
-                            stopAdjacent: "cardinal",
+                            goal: { kind: "adjacent" },
                         },
                         {
                             type: "withdrawFromStockpile",
@@ -139,7 +139,7 @@ export function planGoblinBuildJob(
                         {
                             type: "moveTo",
                             target: buildingEntity.worldPosition,
-                            stopAdjacent: "cardinal",
+                            goal: { kind: "adjacent" },
                         },
                         {
                             type: "depositToInventory",
@@ -200,7 +200,7 @@ function planGatherMaterials(
                 {
                     type: "moveTo",
                     target: nearestTree.worldPosition,
-                    stopAdjacent: "cardinal",
+                    goal: { kind: "adjacent" },
                 },
                 {
                     type: "harvestResource",

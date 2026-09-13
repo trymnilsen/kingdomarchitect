@@ -1,4 +1,9 @@
 import { spriteRefs } from "../../../asset/sprite.ts";
+import {
+    bowAttackProfile,
+    swordAttackProfile,
+    woodenSwordAttackProfile,
+} from "../../combat/attackProfileDefinition.ts";
 import { torchLightSource } from "../../light/lightSourceDefinition.ts";
 import { ItemCategory, ItemRarity, ItemTag } from "./../inventoryItem.ts";
 
@@ -8,6 +13,7 @@ export const swordItem = {
     name: "Sword",
     tag: [ItemTag.SkillGear],
     category: ItemCategory.Melee,
+    attack: swordAttackProfile.id,
 } as const;
 
 export const bowItem = {
@@ -16,6 +22,7 @@ export const bowItem = {
     name: "Bow",
     tag: [ItemTag.SkillGear],
     category: ItemCategory.Ranged,
+    attack: bowAttackProfile.id,
 } as const;
 
 export const wizardHat = {
@@ -82,6 +89,7 @@ export const woodenSwordItem = {
     hint: "Carved, not forged. It holds an edge for about one argument.",
     tag: [ItemTag.SkillGear],
     category: ItemCategory.Melee,
+    attack: woodenSwordAttackProfile.id,
     statModifiers: { might: { flat: 1 } },
     visual: { sprite: spriteRefs.character_sword, offset: { x: 4, y: 8 } },
     rarity: ItemRarity.Common,

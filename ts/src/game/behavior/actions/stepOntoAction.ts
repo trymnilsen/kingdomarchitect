@@ -13,7 +13,7 @@ import { ActionComplete, type ActionResult } from "./action.ts";
  * rule is bypassed. The worker can then craft, operate, or sleep while standing
  * on top of it without clogging a corridor.
  *
- * The planner is responsible for emitting a `moveTo` with `stopAdjacent: "cardinal"`
+ * The planner is responsible for emitting a `moveTo` with an adjacent goal
  * immediately before this action, so the worker is already adjacent when it runs.
  *
  * Stepping back off needs no companion action: A* never weights the start node, so

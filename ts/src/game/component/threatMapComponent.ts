@@ -47,7 +47,9 @@ export function effectiveThreat(entry: ThreatEntry, tick: number): number {
 
 /**
  * Records or accumulates threat from an attacker. Repeated hits from the same
- * attacker stack their damage amount raw.
+ * attacker stack raw.
+ *
+ * The amount is the attacker's own threat value, not the damage it dealt
  *
  * A new entry is floored at INTRUSION_THREAT. The invariant is that one hit
  * must sustain pursuit at least as long as one intrusion sighting does,

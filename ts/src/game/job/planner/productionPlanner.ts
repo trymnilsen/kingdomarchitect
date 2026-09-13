@@ -112,7 +112,7 @@ export function planProduction(
             {
                 type: "moveTo",
                 target: felling.worldPosition,
-                stopAdjacent: "cardinal",
+                goal: { kind: "adjacent" },
             },
             {
                 type: "harvestResource",
@@ -160,7 +160,7 @@ function planPlanting(
         {
             type: "moveTo",
             target: spot,
-            stopAdjacent: "cardinal",
+            goal: { kind: "adjacent" },
         },
         {
             type: "plantTree",

@@ -6,7 +6,7 @@ import { aStarSearch, type SearchedNode } from "../path/search.ts";
 
 export type QueryPathOptions = {
     weightModifier?: (node: GraphNode) => number;
-    allowAdjacentStop?: boolean;
+    isGoal?: (point: Point) => boolean;
 };
 
 export function queryPath(
@@ -35,10 +35,21 @@ export function queryPath(
 
     const weightModifier = options?.weightModifier ?? defaultWeightModifier;
 
+    // The caller's goal speaks world coordinates, graph space stays in here
+    const worldGoal = options?.isGoal;
+    let isGoal: ((node: GraphNode) => boolean) | undefined = undefined;
+    if (worldGoal) {
+        isGoal = (node) =>
+            worldGoal({
+                x: node.x - offsetPoint.x,
+                y: node.y - offsetPoint.y,
+            });
+    }
+
     // Perform the search
     const result = aStarSearch(offsetFrom, offsetTo, graph, {
         weightModifier,
-        allowAdjacentStop: options?.allowAdjacentStop,
+        isGoal,
     });
 
     // The path results are returned in a absolute space, so we convert them

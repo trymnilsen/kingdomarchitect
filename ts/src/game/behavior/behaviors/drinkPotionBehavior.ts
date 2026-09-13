@@ -153,7 +153,7 @@ function tryStockpileStage(
         {
             type: "moveTo",
             target: nearestEntity.worldPosition,
-            stopAdjacent: "cardinal",
+            goal: { kind: "adjacent" },
         },
         {
             type: "withdrawFromStockpile",

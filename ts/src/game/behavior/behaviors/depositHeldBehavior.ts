@@ -53,7 +53,7 @@ export function createDepositHeldBehavior(): Behavior {
                     {
                         type: "moveTo",
                         target: stockpile.worldPosition,
-                        stopAdjacent: "cardinal",
+                        goal: { kind: "adjacent" },
                     },
                     {
                         type: "depositToStockpile",

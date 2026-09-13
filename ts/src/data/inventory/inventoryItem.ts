@@ -19,6 +19,8 @@ export type InventoryItem = {
      * a function of what is held rather than as state copied onto the holder.
      */
     readonly light?: string;
+    /** Names an AttackProfileDefinition. Having one is what makes it a weapon */
+    readonly attack?: string;
 };
 
 export type ItemVisual = {

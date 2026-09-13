@@ -1,6 +1,7 @@
 import type { Point } from "../../../common/point.ts";
-import { isPointAdjacentTo, pointEquals } from "../../../common/point.ts";
+import { pointEquals } from "../../../common/point.ts";
 import { log } from "../../../common/logging/logger.ts";
+import { resolveMoveGoal, type MoveGoal } from "./moveGoal.ts";
 
 import {
     BehaviorAgentComponentId,
@@ -32,15 +33,14 @@ import { commitDisplacementTransaction } from "../displacement/displacementTrans
 import { ActionComplete, ActionRunning, type ActionResult } from "./action.ts";
 
 /**
- * The `stopAdjacent` option lets behaviors place the entity next to a target
- * without standing on it. Actions like constructBuilding or harvestResource
- * require that adjacency. "cardinal" stops one step away on N/S/E/W; "diagonal"
- * includes corners (used for warmByFire which checks Chebyshev distance).
+ * `goal` says what counts as having arrived. Left out, the entity has to reach
+ * `target` itself, which is the common case and pays nothing. Set, it is
+ * evaluated every tick and the move ends as soon as it is satisfied
  */
 export type MoveToActionData = {
     type: "moveTo";
     target: Point;
-    stopAdjacent?: "cardinal" | "diagonal";
+    goal?: MoveGoal;
     cachedPath?: Point[];
 };
 
@@ -61,8 +61,8 @@ export type MoveToActionData = {
  * A higher-priority entity can displace idle or low-priority entities that block its path.
  *
  * Returns:
- *   "complete" when the entity arrived at the target, or adjacent to it if
- *     stopAdjacent is set.
+ *   "complete" when the entity arrived at the target, or at any tile its goal
+ *     accepts
  *   "running" while it is still en route, or waiting for blockers to clear.
  *   "failed" when the path is permanently blocked by a building, a resource, a
  *     missing graph, or no route at all.
@@ -72,7 +72,13 @@ export function executeMoveToAction(
     entity: Entity,
     tick: number,
 ): ActionResult {
-    if (hasArrived(entity.worldPosition, action.target, action.stopAdjacent)) {
+    // Once per tick, so the arrival check and the path search cannot disagree
+    // about where the target is
+    const isGoal = action.goal
+        ? resolveMoveGoal(action.goal, entity, action.target)
+        : undefined;
+
+    if (hasArrived(entity.worldPosition, action.target, isGoal)) {
         log.info(
             `${entity.id} arrived at (${entity.worldPosition.x},${entity.worldPosition.y})`,
         );
@@ -98,7 +104,13 @@ export function executeMoveToAction(
         };
     }
 
-    const pathResult = ensureCachedPath(action, pathfindingGraph, root, entity);
+    const pathResult = ensureCachedPath(
+        action,
+        pathfindingGraph,
+        root,
+        entity,
+        isGoal,
+    );
     if (pathResult !== null) return pathResult;
 
     // The locallyBlocked set accumulates tiles proven impassable within this tick.
@@ -113,9 +125,7 @@ export function executeMoveToAction(
             return ActionRunning;
         }
 
-        if (
-            hasArrived(entity.worldPosition, action.target, action.stopAdjacent)
-        ) {
+        if (hasArrived(entity.worldPosition, action.target, isGoal)) {
             log.info(
                 `${entity.id} arrived at (${entity.worldPosition.x},${entity.worldPosition.y})`,
             );
@@ -190,6 +200,7 @@ export function executeMoveToAction(
                 root,
                 tick,
                 locallyBlocked,
+                isGoal,
             );
             if (resolution.kind === "continue") continue;
             return resolution.value;
@@ -201,13 +212,10 @@ export function executeMoveToAction(
         log.info(
             `${entity.id} stepped to (${entity.worldPosition.x},${entity.worldPosition.y})`,
         );
-        return hasArrived(
-            entity.worldPosition,
-            action.target,
-            action.stopAdjacent,
-        )
-            ? ActionComplete
-            : ActionRunning;
+        if (hasArrived(entity.worldPosition, action.target, isGoal)) {
+            return ActionComplete;
+        }
+        return ActionRunning;
     }
 
     // Safety cap: exceeded max replan attempts within one tick.
@@ -223,33 +231,15 @@ export function executeMoveToAction(
  */
 const MAX_REPLAN_ATTEMPTS = 10;
 
-/**
- * Check if two points are diagonally adjacent (including cardinal directions).
- */
-function isPointAdjacentDiagonal(pointA: Point, pointB: Point): boolean {
-    const dx = Math.abs(pointA.x - pointB.x);
-    const dy = Math.abs(pointA.y - pointB.y);
-    return dx <= 1 && dy <= 1 && (dx > 0 || dy > 0);
-}
-
-/**
- * Check if position is considered "arrived" based on stopAdjacent mode.
- */
 function hasArrived(
     position: Point,
     target: Point,
-    stopAdjacent: "cardinal" | "diagonal" | undefined,
+    isGoal: ((point: Point) => boolean) | undefined,
 ): boolean {
-    if (pointEquals(position, target)) {
-        return true;
+    if (isGoal) {
+        return isGoal(position);
     }
-    if (stopAdjacent === "cardinal") {
-        return isPointAdjacentTo(position, target);
-    }
-    if (stopAdjacent === "diagonal") {
-        return isPointAdjacentDiagonal(position, target);
-    }
-    return false;
+    return pointEquals(position, target);
 }
 
 /**
@@ -293,14 +283,14 @@ function planPath(
     root: Entity,
     from: Point,
     target: Point,
-    stopAdjacent: "cardinal" | "diagonal" | undefined,
+    isGoal: ((point: Point) => boolean) | undefined,
     locallyBlocked: Set<string>,
 ): Point[] | null {
     if (!pathfindingGraph) return null;
 
     const { offsetX, offsetY } = pathfindingGraph.graph;
     const pathOptions: QueryPathOptions = {
-        allowAdjacentStop: !!stopAdjacent,
+        isGoal,
         weightModifier: makePathModifier(
             root,
             offsetX,
@@ -331,6 +321,7 @@ function ensureCachedPath(
     pathfindingGraph: ReturnType<typeof getPathfindingGraph>,
     root: Entity,
     entity: Entity,
+    isGoal: ((point: Point) => boolean) | undefined,
 ): ActionResult | null {
     if (action.cachedPath && action.cachedPath.length > 0) {
         return null;
@@ -341,16 +332,14 @@ function ensureCachedPath(
         root,
         entity.worldPosition,
         action.target,
-        action.stopAdjacent,
+        isGoal,
         new Set(),
     );
 
     if (!path) {
-        if (
-            hasArrived(entity.worldPosition, action.target, action.stopAdjacent)
-        ) {
+        if (hasArrived(entity.worldPosition, action.target, isGoal)) {
             log.info(
-                `${entity.id} arrived at (${entity.worldPosition.x},${entity.worldPosition.y}) via stopAdjacent fallback`,
+                `${entity.id} arrived at (${entity.worldPosition.x},${entity.worldPosition.y}) with no path needed`,
             );
             return ActionComplete;
         }
@@ -381,6 +370,7 @@ function resolveDisplacedTile(
     root: Entity,
     tick: number,
     locallyBlocked: Set<string>,
+    isGoal: ((point: Point) => boolean) | undefined,
 ): DisplacementResolution {
     const agent = getBehaviorAgent(entity);
     const priority = agent?.currentBehaviorUtility ?? 0;
@@ -423,7 +413,7 @@ function resolveDisplacedTile(
             root,
             entity.worldPosition,
             action.target,
-            action.stopAdjacent,
+            isGoal,
             locallyBlocked,
         );
 
@@ -447,9 +437,7 @@ function resolveDisplacedTile(
 
     if (committed) {
         // Cycle: the transaction repositioned all entities atomically including us.
-        if (
-            hasArrived(entity.worldPosition, action.target, action.stopAdjacent)
-        ) {
+        if (hasArrived(entity.worldPosition, action.target, isGoal)) {
             log.info(
                 `${entity.id} displacement cycle committed, arrived at (${entity.worldPosition.x},${entity.worldPosition.y})`,
             );
@@ -462,13 +450,7 @@ function resolveDisplacedTile(
             log.debug(
                 `${entity.id} displaced chain, stepped to (${entity.worldPosition.x},${entity.worldPosition.y})`,
             );
-            if (
-                hasArrived(
-                    entity.worldPosition,
-                    action.target,
-                    action.stopAdjacent,
-                )
-            ) {
+            if (hasArrived(entity.worldPosition, action.target, isGoal)) {
                 return { kind: "result", value: ActionComplete };
             }
         }

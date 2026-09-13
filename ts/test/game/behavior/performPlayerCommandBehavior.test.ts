@@ -7,6 +7,7 @@ import {
     createTestEntity,
 } from "./behaviorTestHelpers.ts";
 import { getBehaviorAgent } from "../../../src/game/component/behaviorAgentComponent.ts";
+import { AttackTargetKind } from "../../../src/data/combat/attackProfileDefinition.ts";
 
 function createAttackScene(): {
     root: Entity;
@@ -99,7 +100,7 @@ describe("PerformPlayerCommandBehavior", () => {
             const agent = getBehaviorAgent(attacker);
             agent!.playerCommand = {
                 action: "attack",
-                targetEntityId: target.id,
+                target: { kind: AttackTargetKind.Entity, id: target.id },
             };
 
             const actions = behavior.expand(attacker);
@@ -108,11 +109,17 @@ describe("PerformPlayerCommandBehavior", () => {
             assert.strictEqual(actions[0].type, "moveTo");
             if (actions[0].type === "moveTo") {
                 assert.deepStrictEqual(actions[0].target, { x: 15, y: 12 });
-                assert.strictEqual(actions[0].stopAdjacent, "cardinal");
+                assert.deepStrictEqual(actions[0].goal, {
+                    kind: "attackReach",
+                    target: { kind: AttackTargetKind.Entity, id: target.id },
+                });
             }
             assert.strictEqual(actions[1].type, "attackTarget");
             if (actions[1].type === "attackTarget") {
-                assert.strictEqual(actions[1].targetId, target.id);
+                assert.deepStrictEqual(actions[1].target, {
+                    kind: AttackTargetKind.Entity,
+                    id: target.id,
+                });
             }
             assert.strictEqual(actions[2].type, "clearPlayerCommand");
         });
@@ -123,7 +130,7 @@ describe("PerformPlayerCommandBehavior", () => {
             const agent = getBehaviorAgent(attacker);
             agent!.playerCommand = {
                 action: "attack",
-                targetEntityId: "nonexistent",
+                target: { kind: AttackTargetKind.Entity, id: "nonexistent" },
             };
 
             const actions = behavior.expand(attacker);

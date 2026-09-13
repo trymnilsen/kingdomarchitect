@@ -11,8 +11,8 @@ import {
 type MoveToAction = Extract<BehaviorActionData, { type: "moveTo" }>;
 
 describe("moveToAction", () => {
-    describe("stopAdjacent", () => {
-        it("completes when already at target position (no stopAdjacent)", () => {
+    describe("goal", () => {
+        it("completes when already at target position (no goal)", () => {
             const root = new Entity("root");
             const entity = new Entity("entity");
             entity.worldPosition = { x: 5, y: 5 };
@@ -28,7 +28,7 @@ describe("moveToAction", () => {
             assert.strictEqual(result.kind, "complete");
         });
 
-        it("completes when already adjacent with stopAdjacent: cardinal", () => {
+        it("completes when already adjacent with an adjacent goal", () => {
             const root = new Entity("root");
             const entity = new Entity("entity");
             entity.worldPosition = { x: 5, y: 5 };
@@ -37,7 +37,7 @@ describe("moveToAction", () => {
             const action: MoveToAction = {
                 type: "moveTo",
                 target: { x: 6, y: 5 }, // One tile to the right
-                stopAdjacent: "cardinal",
+                goal: { kind: "adjacent" },
             };
 
             const result = executeMoveToAction(action, entity, 1);
@@ -45,7 +45,7 @@ describe("moveToAction", () => {
             assert.strictEqual(result.kind, "complete");
         });
 
-        it("completes when already at target with stopAdjacent: cardinal", () => {
+        it("completes when standing on the target with an adjacent goal", () => {
             const root = new Entity("root");
             const entity = new Entity("entity");
             entity.worldPosition = { x: 5, y: 5 };
@@ -54,7 +54,7 @@ describe("moveToAction", () => {
             const action: MoveToAction = {
                 type: "moveTo",
                 target: { x: 5, y: 5 },
-                stopAdjacent: "cardinal",
+                goal: { kind: "adjacent" },
             };
 
             const result = executeMoveToAction(action, entity, 1);
@@ -62,7 +62,7 @@ describe("moveToAction", () => {
             assert.strictEqual(result.kind, "complete");
         });
 
-        it("completes when diagonally adjacent with stopAdjacent: diagonal", () => {
+        it("does not complete when only diagonally adjacent", () => {
             const root = new Entity("root");
             const entity = new Entity("entity");
             entity.worldPosition = { x: 5, y: 5 };
@@ -71,24 +71,7 @@ describe("moveToAction", () => {
             const action: MoveToAction = {
                 type: "moveTo",
                 target: { x: 6, y: 6 }, // Diagonally adjacent
-                stopAdjacent: "diagonal",
-            };
-
-            const result = executeMoveToAction(action, entity, 1);
-
-            assert.strictEqual(result.kind, "complete");
-        });
-
-        it("does not complete when diagonally adjacent with stopAdjacent: cardinal", () => {
-            const root = new Entity("root");
-            const entity = new Entity("entity");
-            entity.worldPosition = { x: 5, y: 5 };
-            root.addChild(entity);
-
-            const action: MoveToAction = {
-                type: "moveTo",
-                target: { x: 6, y: 6 }, // Diagonally adjacent
-                stopAdjacent: "cardinal",
+                goal: { kind: "adjacent" },
             };
 
             const result = executeMoveToAction(action, entity, 1);
@@ -98,7 +81,7 @@ describe("moveToAction", () => {
             assert.notStrictEqual(result.kind, "complete");
         });
 
-        it("does not complete when adjacent without stopAdjacent set", () => {
+        it("does not complete when adjacent without a goal set", () => {
             const root = new Entity("root");
             const entity = new Entity("entity");
             entity.worldPosition = { x: 5, y: 5 };
@@ -106,7 +89,7 @@ describe("moveToAction", () => {
 
             const action: MoveToAction = {
                 type: "moveTo",
-                target: { x: 6, y: 5 }, // Adjacent but no stopAdjacent
+                target: { x: 6, y: 5 }, // Adjacent but no goal
             };
 
             const result = executeMoveToAction(action, entity, 1);
@@ -133,7 +116,7 @@ describe("moveToAction", () => {
                 const action: MoveToAction = {
                     type: "moveTo",
                     target,
-                    stopAdjacent: "cardinal",
+                    goal: { kind: "adjacent" },
                 };
 
                 const result = executeMoveToAction(action, entity, 1);
@@ -142,40 +125,6 @@ describe("moveToAction", () => {
                     result.kind,
                     "complete",
                     `Should complete when adjacent at ${target.x}, ${target.y}`,
-                );
-            }
-        });
-
-        it("completes for all eight diagonal directions", () => {
-            const directions = [
-                { x: 5, y: 4 }, // Up
-                { x: 5, y: 6 }, // Down
-                { x: 4, y: 5 }, // Left
-                { x: 6, y: 5 }, // Right
-                { x: 4, y: 4 }, // Up-Left
-                { x: 6, y: 4 }, // Up-Right
-                { x: 4, y: 6 }, // Down-Left
-                { x: 6, y: 6 }, // Down-Right
-            ];
-
-            for (const target of directions) {
-                const root = new Entity("root");
-                const entity = new Entity("entity");
-                entity.worldPosition = { x: 5, y: 5 };
-                root.addChild(entity);
-
-                const action: MoveToAction = {
-                    type: "moveTo",
-                    target,
-                    stopAdjacent: "diagonal",
-                };
-
-                const result = executeMoveToAction(action, entity, 1);
-
-                assert.strictEqual(
-                    result.kind,
-                    "complete",
-                    `Should complete when diagonally adjacent at ${target.x}, ${target.y}`,
                 );
             }
         });

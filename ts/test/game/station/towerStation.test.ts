@@ -160,7 +160,7 @@ describe("garrison behavior", () => {
         assert.deepStrictEqual(actions[0], {
             type: "moveTo",
             target: tower.worldPosition,
-            stopAdjacent: "cardinal",
+            goal: { kind: "adjacent" },
         });
         assert.deepStrictEqual(actions[1], {
             type: "stepOnto",

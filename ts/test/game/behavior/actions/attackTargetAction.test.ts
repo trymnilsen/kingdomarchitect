@@ -18,6 +18,24 @@ import { executeAttackTargetAction } from "../../../../src/game/behavior/actions
 import { createImmortalComponent } from "../../../../src/game/component/immortalComponent.ts";
 import { DeathGameEventType } from "../../../../src/game/entity/event/deathGameEventData.ts";
 import type { EntityEvent } from "../../../../src/game/entity/entityEvent.ts";
+import type { AttackTarget } from "../../../../src/game/combat/attackTarget.ts";
+import type { Point } from "../../../../src/common/point.ts";
+import { createEquipmentComponent } from "../../../../src/game/component/equipmentComponent.ts";
+import {
+    bowItem,
+    swordItem,
+} from "../../../../src/data/inventory/items/equipment.ts";
+import type { InventoryItem } from "../../../../src/data/inventory/inventoryItem.ts";
+import { bowAttackProfile } from "../../../../src/data/combat/attackProfileDefinition.ts";
+import { addBuilding, createMinimalWorld } from "../../testWorld.ts";
+import { AttackTargetKind } from "../../../../src/data/combat/attackProfileDefinition.ts";
+
+/** Matches the goblin prefab, so the arithmetic below is the game's */
+const GOBLIN_HP = 10;
+
+function entityTarget(id: string): AttackTarget {
+    return { kind: AttackTargetKind.Entity, id };
+}
 
 function createTestScene(): { root: Entity; worker: Entity; target: Entity } {
     const root = new Entity("root");
@@ -56,7 +74,7 @@ describe("attackTargetAction", () => {
 
         const action = {
             type: "attackTarget" as const,
-            targetId: "target",
+            target: entityTarget("target"),
         };
 
         const result = executeAttackTargetAction(action, worker, 1);
@@ -75,7 +93,7 @@ describe("attackTargetAction", () => {
 
         const action = {
             type: "attackTarget" as const,
-            targetId: "target",
+            target: entityTarget("target"),
         };
 
         const result = executeAttackTargetAction(action, worker, 1);
@@ -84,34 +102,61 @@ describe("attackTargetAction", () => {
         assert.strictEqual(healthComponent.currentHp, 0);
     });
 
-    it("fails if target entity not found", () => {
+    it("names the entity that went missing", () => {
         const { worker } = createTestScene();
 
         const action = {
             type: "attackTarget" as const,
-            targetId: "nonexistent",
+            target: entityTarget("nonexistent"),
         };
 
         const result = executeAttackTargetAction(action, worker, 1);
 
         assert.strictEqual(result.kind, "failed");
+        assert.deepStrictEqual(
+            (result as { cause: { type: string; entityId: string } }).cause,
+            { type: "targetGone", entityId: "nonexistent" },
+        );
     });
 
-    it("fails if worker not adjacent to target", () => {
+    it("fails out of reach when the target is beyond an unarmed swing", () => {
         const { worker, target } = createTestScene();
-        target.worldPosition = { x: 25, y: 25 }; // Not adjacent
+        target.worldPosition = { x: 25, y: 25 };
 
         const action = {
             type: "attackTarget" as const,
-            targetId: "target",
+            target: entityTarget("target"),
         };
 
         const result = executeAttackTargetAction(action, worker, 1);
 
         assert.strictEqual(result.kind, "failed");
+        assert.deepStrictEqual(
+            (result as { cause: { type: string } }).cause,
+            { type: "outOfReach" },
+            "the behavior needs to tell reach apart from a vanished target",
+        );
     });
 
-    it("fails if target has no HealthComponent", () => {
+    it("fails out of reach diagonally, where range 1 does not stretch", () => {
+        const { worker, target } = createTestScene();
+        worker.worldPosition = { x: 10, y: 8 };
+        target.worldPosition = { x: 11, y: 9 };
+
+        const result = executeAttackTargetAction(
+            { type: "attackTarget", target: entityTarget("target") },
+            worker,
+            1,
+        );
+
+        assert.strictEqual(
+            result.kind,
+            "failed",
+            "a Euclidean range of 1 covers the four cardinal tiles and no more",
+        );
+    });
+
+    it("reports nothing to attack when the target cannot be hurt", () => {
         const { root, worker } = createTestScene();
         const noHealthTarget = new Entity("noHealthTarget");
         noHealthTarget.worldPosition = { x: 11, y: 8 };
@@ -119,12 +164,17 @@ describe("attackTargetAction", () => {
 
         const action = {
             type: "attackTarget" as const,
-            targetId: "noHealthTarget",
+            target: entityTarget("noHealthTarget"),
         };
 
         const result = executeAttackTargetAction(action, worker, 1);
 
         assert.strictEqual(result.kind, "failed");
+        assert.deepStrictEqual(
+            (result as { cause: { type: string } }).cause,
+            { type: "nothingToAttack" },
+            "it is standing right there, so nothing has gone missing",
+        );
     });
 
     it("continues running while target has hp remaining", () => {
@@ -132,7 +182,7 @@ describe("attackTargetAction", () => {
 
         const action = {
             type: "attackTarget" as const,
-            targetId: "target",
+            target: entityTarget("target"),
         };
 
         // Execute multiple times
@@ -152,7 +202,7 @@ describe("attackTargetAction", () => {
             target.getEcsComponent(HealthComponentId)!.currentHp = 1;
 
             executeAttackTargetAction(
-                { type: "attackTarget", targetId: "target" },
+                { type: "attackTarget", target: entityTarget("target") },
                 worker,
                 1,
             );
@@ -167,7 +217,7 @@ describe("attackTargetAction", () => {
             healthComponent.currentHp = 1;
 
             executeAttackTargetAction(
-                { type: "attackTarget", targetId: "target" },
+                { type: "attackTarget", target: entityTarget("target") },
                 worker,
                 1,
             );
@@ -185,7 +235,7 @@ describe("attackTargetAction", () => {
             root.entityEvent = (event) => events.push(event);
 
             executeAttackTargetAction(
-                { type: "attackTarget", targetId: "target" },
+                { type: "attackTarget", target: entityTarget("target") },
                 worker,
                 1,
             );
@@ -211,7 +261,7 @@ describe("attackTargetAction", () => {
             root.entityEvent = (event) => events.push(event);
 
             executeAttackTargetAction(
-                { type: "attackTarget", targetId: "target" },
+                { type: "attackTarget", target: entityTarget("target") },
                 worker,
                 1,
             );
@@ -228,7 +278,7 @@ describe("attackTargetAction", () => {
             const { worker, target } = createCombatScene();
             const action = {
                 type: "attackTarget" as const,
-                targetId: "target",
+                target: entityTarget("target"),
             };
 
             executeAttackTargetAction(action, worker, 1);
@@ -251,7 +301,7 @@ describe("attackTargetAction", () => {
 
             const action = {
                 type: "attackTarget" as const,
-                targetId: "target",
+                target: entityTarget("target"),
             };
             executeAttackTargetAction(action, worker, 1);
 
@@ -285,7 +335,7 @@ describe("attackTargetAction", () => {
 
             const action = {
                 type: "attackTarget" as const,
-                targetId: "target",
+                target: entityTarget("target"),
             };
             executeAttackTargetAction(action, worker, 1);
 
@@ -295,4 +345,162 @@ describe("attackTargetAction", () => {
             );
         });
     });
+
+    describe("the attacker's weapon", () => {
+        it("hits a building for the weapon's structure damage, not its body damage", () => {
+            const { root } = createMinimalWorld();
+            const archer = armedWorker("archer", { x: 10, y: 8 });
+            root.addChild(archer);
+            archer.worldPosition = { x: 10, y: 8 };
+            const wall = addBuilding(root, "wall", { x: 12, y: 8 });
+
+            executeAttackTargetAction(
+                { type: "attackTarget", target: entityTarget("wall") },
+                archer,
+                1,
+            );
+
+            const health = wall.getEcsComponent(HealthComponentId)!;
+            assert.strictEqual(
+                health.currentHp,
+                health.maxHp - bowAttackProfile.structureDamage,
+                `a bow should spend its structure damage (${bowAttackProfile.structureDamage}) on a wall, not its body damage (${bowAttackProfile.damage})`,
+            );
+        });
+
+        it("reaches five tiles with a bow where bare hands reach one", () => {
+            const { root } = createMinimalWorld();
+            const archer = armedWorker("archer", { x: 10, y: 8 });
+            root.addChild(archer);
+            archer.worldPosition = { x: 10, y: 8 };
+
+            const goblin = new Entity("goblin");
+            goblin.setEcsComponent(createHealthComponent(GOBLIN_HP, GOBLIN_HP));
+            root.addChild(goblin);
+            goblin.worldPosition = { x: 15, y: 8 };
+
+            const result = executeAttackTargetAction(
+                { type: "attackTarget", target: entityTarget("goblin") },
+                archer,
+                1,
+            );
+
+            assert.strictEqual(result.kind, "running");
+            assert.strictEqual(
+                goblin.getEcsComponent(HealthComponentId)!.currentHp,
+                GOBLIN_HP - bowAttackProfile.damage,
+                "the hit lands in the tick it is ordered, five tiles away",
+            );
+        });
+
+        it("fails for want of a line of sight when a building blocks the shot", () => {
+            const { root } = createMinimalWorld();
+            const archer = armedWorker("archer", { x: 10, y: 8 });
+            root.addChild(archer);
+            archer.worldPosition = { x: 10, y: 8 };
+            addBuilding(root, "granary", { x: 12, y: 8 });
+
+            const goblin = new Entity("goblin");
+            goblin.setEcsComponent(createHealthComponent(GOBLIN_HP, GOBLIN_HP));
+            root.addChild(goblin);
+            goblin.worldPosition = { x: 14, y: 8 };
+
+            const result = executeAttackTargetAction(
+                { type: "attackTarget", target: entityTarget("goblin") },
+                archer,
+                1,
+            );
+
+            assert.strictEqual(result.kind, "failed");
+            assert.deepStrictEqual(
+                (result as { cause: { type: string } }).cause,
+                { type: "noLineOfSight" },
+            );
+            assert.strictEqual(
+                goblin.getEcsComponent(HealthComponentId)!.currentHp,
+                10,
+                "a blocked shot is not fired at all, so nothing is hurt",
+            );
+        });
+
+        it("adds the weapon's threat rather than the damage it dealt", () => {
+            const { root } = createMinimalWorld();
+            const archer = armedWorker("archer", { x: 10, y: 8 });
+            root.addChild(archer);
+            archer.worldPosition = { x: 10, y: 8 };
+
+            const goblin = new Entity("goblin");
+            goblin.setEcsComponent(createHealthComponent(GOBLIN_HP, GOBLIN_HP));
+            goblin.setEcsComponent(createThreatMapComponent());
+            root.addChild(goblin);
+            goblin.worldPosition = { x: 14, y: 8 };
+
+            // Seeded first, because a brand new entry is floored at the
+            // intrusion amount and would hide what this hit contributed
+            const seeded = 20;
+            const threat = goblin.getEcsComponent(ThreatMapComponentId)!;
+            addThreat(threat, "archer", seeded, 1, root);
+
+            executeAttackTargetAction(
+                { type: "attackTarget", target: entityTarget("goblin") },
+                archer,
+                1,
+            );
+
+            assert.strictEqual(
+                threat.threat["archer"].amount,
+                seeded + bowAttackProfile.threat,
+                `the entry should grow by the bow's threat (${bowAttackProfile.threat}), not by the damage it dealt (${bowAttackProfile.damage})`,
+            );
+        });
+
+        it("refuses to aim a weapon at something it cannot be aimed at", () => {
+            // No weapon in the game accepts a tile yet, so a planner handing a
+            // sword one is a bug rather than a situation. It has to fail loudly
+            // instead of quietly swinging at the ground
+            const { root } = createMinimalWorld();
+            const swordsman = armedWorker(
+                "swordsman",
+                { x: 10, y: 8 },
+                swordItem,
+            );
+            root.addChild(swordsman);
+            swordsman.worldPosition = { x: 10, y: 8 };
+
+            const result = executeAttackTargetAction(
+                {
+                    type: "attackTarget",
+                    target: {
+                        kind: AttackTargetKind.Tile,
+                        point: { x: 11, y: 8 },
+                    },
+                },
+                swordsman,
+                1,
+            );
+
+            assert.strictEqual(result.kind, "failed");
+            assert.deepStrictEqual(
+                (result as { cause: { type: string } }).cause,
+                { type: "unknown" },
+            );
+        });
+    });
 });
+
+/**
+ * A worker carrying a weapon in its main hand. Built with a real equipment
+ * component so the profile is resolved the same way the game resolves it
+ */
+function armedWorker(
+    id: string,
+    position: Point,
+    weapon: InventoryItem = bowItem,
+): Entity {
+    const worker = new Entity(id);
+    worker.worldPosition = position;
+    const equipment = createEquipmentComponent();
+    equipment.slots.primary = weapon;
+    worker.setEcsComponent(equipment);
+    return worker;
+}

@@ -24,7 +24,7 @@ export function planWorkAtBuilding(
         {
             type: "moveTo",
             target: buildingEntity.worldPosition,
-            stopAdjacent: "cardinal",
+            goal: { kind: "adjacent" },
         },
         ...workAtBuilding,
     ];

@@ -1,11 +1,16 @@
+import type { Point } from "../../../common/point.ts";
 import type { Entity } from "../entity.ts";
 import type { EntityGameEvent } from "./entityGameEvent.ts";
 
 export const AttackGameEventType = "attack";
 
+/**
+ * A blow that already landed. Carries the struck tile and not the struck
+ * entity, since a tile can be aimed at and the victim of a killing blow is
+ * already gone
+ */
 export type AttackGameEventData = {
-    attacker: string;
-    target: string;
+    impact: Point;
 };
 
 export type AttackGameEvent = EntityGameEvent & {
@@ -14,15 +19,14 @@ export type AttackGameEvent = EntityGameEvent & {
 
 export function createAttackGameEvent(
     source: Entity,
-    attacker: string,
-    target: string,
+    impact: Point,
 ): AttackGameEvent {
     return {
         id: "game",
         source,
         data: {
             type: AttackGameEventType,
-            payload: { attacker, target },
+            payload: { impact },
         },
     };
 }
