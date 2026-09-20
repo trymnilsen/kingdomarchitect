@@ -1,4 +1,5 @@
 import type { InventoryItem } from "./inventoryItem.ts";
+import { animalProducts } from "./items/animalProducts.ts";
 import { equipmentItems } from "./items/equipment.ts";
 import { fieldEquipment } from "./items/fieldEquipment.ts";
 import { processedMaterials } from "./items/processedMaterials.ts";
@@ -9,6 +10,7 @@ export const inventoryItems = [
     ...resources,
     ...processedMaterials,
     ...fieldEquipment,
+    ...animalProducts,
 ] as const;
 
 type InventoryItemMap = {

@@ -1,3 +1,4 @@
+import { animals } from "../animal/animals.ts";
 import type { InventoryItem } from "../inventory/inventoryItem.ts";
 import {
     bagOfGlitter,
@@ -48,7 +49,23 @@ export const goblinLootTable: LootTable = {
     ],
 };
 
-export const lootTables: readonly LootTable[] = [goblinLootTable] as const;
+/**
+ * Every table the game knows about. Animals carry their own table on their
+ * definition, so hunting shows up in the item-source screen the moment an
+ * animal is added rather than when someone remembers to list it here.
+ */
+export const lootTables: readonly LootTable[] = [
+    goblinLootTable,
+    ...animals.map((animal) => animal.loot),
+];
+
+/**
+ * The table behind a loot table id. Entities store the id, so the loot system
+ * resolves the drops here instead of testing what kind of creature died.
+ */
+export function getLootTable(lootTableId: string): LootTable | undefined {
+    return lootTables.find((table) => table.id === lootTableId);
+}
 
 /**
  * Resolve a table into the drops that actually landed this time. Drops with no

@@ -1,7 +1,9 @@
 import { spriteRefs } from "../../../../asset/sprite.ts";
+import { getAnimal } from "../../../../data/animal/animals.ts";
 import { getCropDefinition } from "../../../../data/crop/cropDefinitions.ts";
 import { getResourceById } from "../../../../data/inventory/items/naturalResource.ts";
 import { getRoleDefinition } from "../../../../data/role/roleDefinitions.ts";
+import { AnimalComponentId } from "../../../component/animalComponent.ts";
 import { BehaviorAgentComponentId } from "../../../component/behaviorAgentComponent.ts";
 import { BuildingComponentId } from "../../../component/buildingComponent.ts";
 import {
@@ -153,6 +155,14 @@ function entitySelectionInfo(
 
     if (entity.hasComponent(GoblinUnitComponentId)) {
         name = `${entity.id}`;
+    }
+
+    const animalComponent = entity.getEcsComponent(AnimalComponentId);
+    if (animalComponent) {
+        const animal = getAnimal(animalComponent.animalId);
+        if (animal) {
+            name = animal.name;
+        }
     }
 
     const farmComponent = entity.getEcsComponent(FarmComponentId);

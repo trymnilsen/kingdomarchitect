@@ -15,6 +15,8 @@ import { createGoblinUnitComponent } from "../component/goblinUnitComponent.ts";
 import { createFireSourceComponent } from "../component/fireSourceComponent.ts";
 import { createLightSourceComponent } from "../component/lightSourceComponent.ts";
 import { campfireLightSource } from "../../data/light/lightSourceDefinition.ts";
+import { goblinLootTable } from "../../data/loot/lootTable.ts";
+import { createLootComponent } from "../component/lootComponent.ts";
 import { Entity } from "../entity/entity.ts";
 import { createThreatMapComponent } from "../component/threatMapComponent.ts";
 
@@ -34,6 +36,7 @@ export function goblinPrefab(campEntityId?: string): Entity {
         ),
     );
     entity.setEcsComponent(createHealthComponent(10, 10));
+    entity.setEcsComponent(createLootComponent(goblinLootTable.id));
     entity.setEcsComponent(createBehaviorAgentComponent());
     entity.setEcsComponent(createHeldItemComponent());
     entity.setEcsComponent(createWarmthComponent(55, 1.0)); // Start warm, decay 1/tick

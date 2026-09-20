@@ -10,6 +10,7 @@ import { hungerSystem } from "../game/system/hungerSystem.ts";
 import { createBehaviorSystem } from "../game/behavior/systems/behaviorSystem.ts";
 import { createBehaviorResolver } from "../game/behavior/behaviorResolver.ts";
 import { warmthSystem } from "../game/system/warmthSystem.ts";
+import { createAnimalSystem } from "../game/system/animalSystem.ts";
 import { goblinCampSystem } from "../game/system/goblinCampSystem.ts";
 import { createLootDropSystem } from "../game/system/lootDropSystem.ts";
 import { createInventorySpillSystem } from "../game/system/inventorySpillSystem.ts";
@@ -239,6 +240,7 @@ export class GameServer {
         this.world.addSystem(hungerSystem);
         this.world.addSystem(warmthSystem);
         this.world.addSystem(goblinCampSystem);
+        this.world.addSystem(createAnimalSystem());
         this.world.addSystem(createLootDropSystem(this.gameTime));
         this.world.addSystem(createInventorySpillSystem(this.gameTime));
         this.world.addSystem(groundItemDecaySystem);

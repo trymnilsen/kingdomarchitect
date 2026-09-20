@@ -13,6 +13,9 @@ import {
     hasCollectableItems,
 } from "../../../src/game/component/collectableComponent.ts";
 import { createLootDropSystem } from "../../../src/game/system/lootDropSystem.ts";
+import { createLootComponent } from "../../../src/game/component/lootComponent.ts";
+import { goblinLootTable } from "../../../src/data/loot/lootTable.ts";
+import { boar } from "../../../src/data/animal/animals.ts";
 import { GameTime } from "../../../src/game/gameTime.ts";
 
 describe("lootDropSystem", () => {
@@ -27,6 +30,7 @@ describe("lootDropSystem", () => {
 
         const goblin = new Entity("goblin-1");
         goblin.setEcsComponent(createGoblinUnitComponent("camp-1"));
+        goblin.setEcsComponent(createLootComponent(goblinLootTable.id));
         goblin.setEcsComponent(createHealthComponent(10, 10));
         root.addChild(goblin);
         goblin.worldPosition = { x: 12, y: 8 };
@@ -46,7 +50,7 @@ describe("lootDropSystem", () => {
         );
     });
 
-    it("does not spawn loot when a non-goblin entity dies", () => {
+    it("does not spawn loot when the dying entity has no loot table", () => {
         const { root, world } = createMinimalWorld();
         world.addSystem(createLootDropSystem(new GameTime()));
 
@@ -61,7 +65,34 @@ describe("lootDropSystem", () => {
         assert.strictEqual(
             collectables.size,
             0,
-            "no collectable should spawn for a non-goblin death",
+            "no collectable should spawn for a death without loot",
+        );
+    });
+
+    it("drops the animal's own table when an animal is killed", () => {
+        const { root, world } = createMinimalWorld();
+        world.addSystem(createLootDropSystem(new GameTime()));
+
+        const settlement = new Entity("settlement");
+        settlement.setEcsComponent(createPlayerKingdomComponent());
+        settlement.setEcsComponent(createJobQueueComponent());
+        root.addChild(settlement);
+
+        const animal = new Entity("boar-1");
+        animal.setEcsComponent(createLootComponent(boar.loot.id));
+        animal.setEcsComponent(createHealthComponent(boar.health, boar.health));
+        root.addChild(animal);
+        animal.worldPosition = { x: 14, y: 9 };
+
+        damageEntity(animal, boar.health, 1);
+
+        const collectables = root.queryComponents(CollectableComponentId);
+        const droppedItemIds = [...collectables].flatMap(([, collectable]) =>
+            collectable.items.map((stack) => stack.item.id),
+        );
+        assert.ok(
+            droppedItemIds.includes("rawmeat"),
+            "a slain boar should leave meat behind",
         );
     });
 });

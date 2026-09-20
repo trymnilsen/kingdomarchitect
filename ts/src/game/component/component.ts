@@ -51,6 +51,8 @@ import type { LightSourceComponent } from "./lightSourceComponent.ts";
 import type { RaidingComponent } from "./raidingComponent.ts";
 import type { StationComponent } from "./stationComponent.ts";
 import type { WatchComponent } from "./watchComponent.ts";
+import type { AnimalComponent } from "./animalComponent.ts";
+import type { LootComponent } from "./lootComponent.ts";
 
 export type Components =
     | SpriteComponent
@@ -105,6 +107,8 @@ export type Components =
     | LightSourceComponent
     | RaidingComponent
     | StationComponent
+    | AnimalComponent
+    | LootComponent
     | WatchComponent;
 
 export interface BaseComponent {
