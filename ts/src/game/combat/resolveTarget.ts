@@ -1,5 +1,8 @@
 import type { Point } from "../../common/point.ts";
-import { AttackTargetKind } from "../../data/combat/attackProfileDefinition.ts";
+import {
+    AttackTargetKind,
+    type AttackProfileDefinition,
+} from "../../data/combat/attackProfileDefinition.ts";
 import { HealthComponentId } from "../component/healthComponent.ts";
 import type { Entity } from "../entity/entity.ts";
 import { queryEntity } from "../map/query/queryEntity.ts";
@@ -38,7 +41,21 @@ export function resolveTargets(
         candidates = queryEntity(root, impact);
     }
 
-    return candidates.filter((entity) =>
-        entity.hasComponent(HealthComponentId),
-    );
+    return candidates.filter(isAttackable);
+}
+
+export function findAttackableEntity(
+    root: Entity,
+    profile: AttackProfileDefinition,
+    point: Point,
+): Entity | null {
+    if (!profile.targets.includes(AttackTargetKind.Entity)) {
+        return null;
+    }
+
+    return queryEntity(root, point).find(isAttackable) ?? null;
+}
+
+function isAttackable(entity: Entity): boolean {
+    return entity.hasComponent(HealthComponentId);
 }

@@ -3,7 +3,11 @@ import { describe, it } from "node:test";
 import { distance, type Point } from "../../../src/common/point.ts";
 import { bowItem } from "../../../src/data/inventory/items/equipment.ts";
 import { hasLineOfSight } from "../../../src/game/combat/lineOfSight.ts";
-import { requestReplan } from "../../../src/game/component/behaviorAgentComponent.ts";
+import { AttackTargetKind } from "../../../src/data/combat/attackProfileDefinition.ts";
+import {
+    getBehaviorAgent,
+    requestReplan,
+} from "../../../src/game/component/behaviorAgentComponent.ts";
 import { EquipmentComponentId } from "../../../src/game/component/equipmentComponent.ts";
 import { HealthComponentId } from "../../../src/game/component/healthComponent.ts";
 import {
@@ -32,6 +36,15 @@ function archerAgainstDummy(
     harness.root.addChild(dummy);
     dummy.worldPosition = dummyAt;
 
+    return { archer, dummy };
+}
+
+/** The archer picks the fight itself, the way it would after being shot at */
+function provoke(
+    harness: ScenarioHarness,
+    archer: Entity,
+    dummy: Entity,
+): void {
     addThreat(
         archer.getEcsComponent(ThreatMapComponentId)!,
         dummy.id,
@@ -40,8 +53,15 @@ function archerAgainstDummy(
         harness.root,
     );
     requestReplan(archer);
+}
 
-    return { archer, dummy };
+/** What the HUD sends when the player picks a target and confirms the attack */
+function orderAttack(archer: Entity, dummy: Entity): void {
+    getBehaviorAgent(archer)!.playerCommand = {
+        action: "attack",
+        target: { kind: AttackTargetKind.Entity, id: dummy.id },
+    };
+    requestReplan(archer);
 }
 
 function hp(entity: Entity): number {
@@ -74,6 +94,7 @@ describe("archer scenario", () => {
             { x: 12, y: 12 },
             { x: 22, y: 12 },
         );
+        provoke(harness, archer, dummy);
 
         const closest = fight(harness, archer, dummy, 12);
 
@@ -98,6 +119,7 @@ describe("archer scenario", () => {
             { x: 12, y: 12 },
             { x: 22, y: 12 },
         );
+        provoke(harness, archer, dummy);
         // Right in front of the dummy, so every tile on the straight approach
         // that is close enough to shoot from is also behind cover
         harness.placeBuilding("granary", { x: 20, y: 12 });
@@ -125,6 +147,29 @@ describe("archer scenario", () => {
         assert.ok(
             closest > 1,
             `the archer should still never have closed to melee, got within ${closest}`,
+        );
+    });
+
+    it("walks into range for a target the player picked from outside it", () => {
+        const harness = new ScenarioHarness([pathfindingSystem]);
+        const { archer, dummy } = archerAgainstDummy(
+            harness,
+            { x: 12, y: 12 },
+            { x: 26, y: 12 },
+        );
+        // Nothing has threatened the archer, so the walk and the shot can only
+        // come from the order
+        orderAttack(archer, dummy);
+
+        const closest = fight(harness, archer, dummy, 16);
+
+        assert.ok(
+            hp(dummy) < 10,
+            `the ordered attack should have landed, dummy hp is ${hp(dummy)}`,
+        );
+        assert.ok(
+            closest <= 5,
+            `the archer should have walked into bow range, got within ${closest}`,
         );
     });
 });
