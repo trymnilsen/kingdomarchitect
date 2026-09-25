@@ -68,7 +68,7 @@ export function generateChunk(
             "desert",
             "forrest",
             "swamp",
-            "snow", 
+            "snow",
             "plains",
             "mountains",
         ] as const);
