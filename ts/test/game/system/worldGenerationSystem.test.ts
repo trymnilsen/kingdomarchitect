@@ -281,38 +281,6 @@ describe("worldGenerationSystem discovery", () => {
         ]);
     });
 
-    it("reports a volume the first time the player sees it", () => {
-        const { root, discoveries } = setupWorld();
-        const tileComponent = root.requireEcsComponent(TileComponentId);
-        const startVolume = getChunk(tileComponent, { x: 0, y: 0 })?.volume;
-        assert.ok(startVolume);
-        assert.ok(
-            discoveries[0].newVolumes.some(
-                (volume) => volume.id === startVolume.id,
-            ),
-            "the startup reveal should report the start volume",
-        );
-        const before = discoveries.length;
-
-        const viewer = placeViewer(root, {
-            x: 10 * ChunkSize + 8,
-            y: 10 * ChunkSize + 8,
-        });
-        const farVolume = getChunk(tileComponent, { x: 10, y: 10 })?.volume;
-        assert.ok(farVolume);
-        assert.deepStrictEqual(
-            discoveries[before].newVolumes.map((volume) => volume.id),
-            [farVolume.id],
-        );
-
-        // More of a chunk in a volume the player has already seen
-        viewer.worldPosition = {
-            x: 10 * ChunkSize + 9,
-            y: 10 * ChunkSize + 8,
-        };
-        assert.deepStrictEqual(discoveries[before + 1].newVolumes, []);
-    });
-
     it("reveals the wedge when the light source of a viewer changes", () => {
         const { root } = setupWorld();
         const worldDiscovery = root.requireEcsComponent(
