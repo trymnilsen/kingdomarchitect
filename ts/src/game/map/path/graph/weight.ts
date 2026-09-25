@@ -2,7 +2,11 @@ import type { Point } from "../../../../common/point.ts";
 import { GoblinUnitComponentId } from "../../../component/goblinUnitComponent.ts";
 import { PlayerUnitComponentId } from "../../../component/playerUnitComponent.ts";
 import { ResourceComponentId } from "../../../component/resourceComponent.ts";
-import { getTile, TileComponentId } from "../../../component/tileComponent.ts";
+import {
+    getTerrainAt,
+    TileComponentId,
+} from "../../../component/tileComponent.ts";
+import { terrainDefinitions } from "../../terrain.ts";
 import type { Entity } from "../../../entity/entity.ts";
 import {
     getResourcePathWeight,
@@ -14,16 +18,6 @@ import {
     isImpassableStructure,
 } from "../../../component/traversalComponent.ts";
 
-/**
- * Returns true if a tile can be entered during movement, meaning the tile exists
- * and is not occupied by a solid structure. Mirrors the rules applied by the
- * movement weight modifier so that behaviour planning and pathfinding agree.
- *
- * Clearable obstacles (trees) remain "available": pathfinding may route through
- * them and the mover chops them down on arrival. Permanent obstacles (stone and
- * other infinite nodes) are treated as walls. They are never destroyed to make
- * way, so a path must route around them.
- */
 export function isTileAvailable(point: Point, root: Entity): boolean {
     if (getWeightAtPoint(point, root) === 0) return false;
 
@@ -39,53 +33,50 @@ export function isTileAvailable(point: Point, root: Entity): boolean {
 }
 
 export function getWeightAtPoint(point: Point, scope: Entity): number {
-    let weight = 25;
+    const terrainWeight = getTerrainWeight(point, scope);
+    if (terrainWeight === 0) {
+        return 0;
+    }
+
+    const occupantWeight = getOccupantWeight(point, scope);
+    if (occupantWeight > 0) {
+        return occupantWeight;
+    }
+    return terrainWeight;
+}
+
+export function getTerrainWeight(point: Point, scope: Entity): number {
     const tileComponent = scope.requireEcsComponent(TileComponentId);
-    const ground = getTile(tileComponent, {
-        x: point.x,
-        y: point.y,
-    });
-    if (!ground) {
-        weight = 0;
-    } else {
-        weight = 2;
+    const terrain = getTerrainAt(tileComponent, point);
+    if (terrain === null) {
+        return 0;
     }
+    return terrainDefinitions[terrain].pathWeight;
+}
 
-    const entities = queryEntity(scope, point);
-
-    if (entities.length > 0) {
-        let entityWeight = 0;
-        for (const entity of entities) {
-            const resourceComponent =
-                entity.getEcsComponent(ResourceComponentId);
-            if (resourceComponent) {
-                entityWeight = Math.max(
-                    entityWeight,
-                    getResourcePathWeight(resourceComponent.resourceId),
-                );
-            }
-
-            // Same rule the passability check uses, so the cost A* pays to
-            // cross a building and the decision about whether it may cross at
-            // all can never disagree.
-            const buildingWeight = getBuildingTraversalWeight(entity);
-            if (buildingWeight !== undefined) {
-                entityWeight = Math.max(entityWeight, buildingWeight);
-            }
-
-            if (entity.hasComponent(PlayerUnitComponentId)) {
-                entityWeight = Math.max(entityWeight, 100);
-            }
-
-            if (entity.hasComponent(GoblinUnitComponentId)) {
-                entityWeight = Math.max(entityWeight, 50);
-            }
+export function getOccupantWeight(point: Point, scope: Entity): number {
+    let weight = 0;
+    for (const entity of queryEntity(scope, point)) {
+        const resourceComponent = entity.getEcsComponent(ResourceComponentId);
+        if (resourceComponent) {
+            weight = Math.max(
+                weight,
+                getResourcePathWeight(resourceComponent.resourceId),
+            );
         }
 
-        if (entityWeight > 0) {
-            weight = entityWeight;
+        const buildingWeight = getBuildingTraversalWeight(entity);
+        if (buildingWeight !== undefined) {
+            weight = Math.max(weight, buildingWeight);
+        }
+
+        if (entity.hasComponent(PlayerUnitComponentId)) {
+            weight = Math.max(weight, 100);
+        }
+
+        if (entity.hasComponent(GoblinUnitComponentId)) {
+            weight = Math.max(weight, 50);
         }
     }
-
     return weight;
 }

@@ -1,6 +1,7 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
 import { Entity } from "../../../src/game/entity/entity.ts";
+import { createChunkMapComponent } from "../../../src/game/component/chunkMapComponent.ts";
 import { createTileComponent } from "../../../src/game/component/tileComponent.ts";
 import { createWorldDiscoveryComponent } from "../../../src/game/component/worldDiscoveryComponent.ts";
 import { PersistenceManager } from "../../../src/server/persistence/persistenceManager.ts";
@@ -101,10 +102,7 @@ describe("PersistenceManager", () => {
 
             const tileComponent = createTileComponent();
             root.setEcsComponent(tileComponent);
-            root.setEcsComponent({
-                id: "ChunkMap",
-                chunkMap: { chunks: new Map(), entityChunkMap: new Map() },
-            });
+            root.setEcsComponent(createChunkMapComponent());
 
             await manager.saveWorld(root);
 

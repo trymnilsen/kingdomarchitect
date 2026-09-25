@@ -1,7 +1,12 @@
 import type { Bounds } from "../../common/bounds.ts";
 import type { Point } from "../../common/point.ts";
 import type { BiomeType } from "../map/biome.ts";
-import { ChunkSize, type TileChunk } from "../map/chunk.ts";
+import {
+    ChunkSize,
+    getTerrainAtWorldPosition,
+    type TileChunk,
+} from "../map/chunk.ts";
+import type { Terrain } from "../map/terrain.ts";
 import { getTileId, type GroundTile } from "../map/tile.ts";
 import type { Volume } from "../map/volume.ts";
 
@@ -79,8 +84,26 @@ export function getTile(
     return {
         tileX: tilePosition.x,
         tileY: tilePosition.y,
-        type: chunk.volume?.type,
+        biome: chunk.volume?.type,
+        terrain: getTerrainAtWorldPosition(
+            chunk,
+            tilePosition.x,
+            tilePosition.y,
+        ),
     };
+}
+
+export function getTerrainAt(
+    component: TileComponent,
+    tilePosition: Point,
+): Terrain | null {
+    const chunk = component.chunks.get(
+        makeChunkId(tilePosition.x, tilePosition.y),
+    );
+    if (!chunk) {
+        return null;
+    }
+    return getTerrainAtWorldPosition(chunk, tilePosition.x, tilePosition.y);
 }
 
 export function getBiomeAtTile(

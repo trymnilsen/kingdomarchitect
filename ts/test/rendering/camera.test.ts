@@ -47,6 +47,22 @@ describe("Camera", () => {
         assert.deepStrictEqual(camera.position, { x: 125, y: 60 });
     });
 
+    it("moves the tile viewport along when the camera pans", () => {
+        const camera = new Camera({ x: 200, y: 200 });
+        camera.position = { x: 500, y: 600 };
+        const before = camera.tileSpaceViewPort;
+
+        camera.translate({ x: 2 * TileSize, y: -3 * TileSize });
+        const after = camera.tileSpaceViewPort;
+
+        assert.deepStrictEqual(after, {
+            x1: before.x1 + 2,
+            y1: before.y1 - 3,
+            x2: before.x2 + 2,
+            y2: before.y2 - 3,
+        });
+    });
+
     it("position setter floors the incoming point", () => {
         const camera = new Camera({ x: 200, y: 200 });
         camera.position = { x: 10.9, y: 20.7 };

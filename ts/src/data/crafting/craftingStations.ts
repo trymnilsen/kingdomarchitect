@@ -1,4 +1,5 @@
 import { baker } from "../building/food/baker.ts";
+import { fishingHut } from "../building/food/fishingHut.ts";
 import { enchanter } from "../building/gold/enchanter.ts";
 import { blacksmith } from "../building/stone/blacksmith.ts";
 import { quary } from "../building/stone/quary.ts";
@@ -14,6 +15,7 @@ import { bowyerRecipes } from "./recipes/bowyerRecipes.ts";
 import { carpenterRecipes } from "./recipes/carpenterRecipes.ts";
 import { libraryRecipes } from "./recipes/libraryRecipes.ts";
 import { enchanterRecipes } from "./recipes/enchanterRecipes.ts";
+import { fishingHutRecipes } from "./recipes/fishingHutRecipes.ts";
 import { quarryRecipes } from "./recipes/quarryRecipes.ts";
 import { workshopRecipes } from "./recipes/workshopRecipes.ts";
 
@@ -39,6 +41,7 @@ export const craftingStations: readonly CraftingStation[] = [
     { building: baker, recipes: bakerRecipes },
     { building: workshop, recipes: workshopRecipes },
     { building: quary, recipes: quarryRecipes },
+    { building: fishingHut, recipes: fishingHutRecipes },
     { building: enchanter, recipes: enchanterRecipes },
     { building: bowyer, recipes: bowyerRecipes },
     { building: library, recipes: libraryRecipes },

@@ -6,7 +6,7 @@ import {
     setChunk,
 } from "../../game/component/tileComponent.ts";
 import { createVisibilityMapComponent } from "../../game/component/visibilityMapComponent.ts";
-import { type TileChunk } from "../../game/map/chunk.ts";
+import { createLandTerrain, type TileChunk } from "../../game/map/chunk.ts";
 import type { BiomeType } from "../../game/map/biome.ts";
 import type { Volume } from "../../game/map/volume.ts";
 
@@ -38,7 +38,12 @@ export function createInitialState(
         chunks: [{ x: 0, y: 0 }],
         debugColor: "#888888",
     };
-    const chunk: TileChunk = { chunkX: 0, chunkY: 0, volume };
+    const chunk: TileChunk = {
+        chunkX: 0,
+        chunkY: 0,
+        volume,
+        terrain: createLandTerrain(),
+    };
     setChunk(tiles, chunk);
     visibilityMap.discovered.fullyDiscoveredChunks.add(encodePosition(0, 0));
 

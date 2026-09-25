@@ -20,6 +20,7 @@ import { InventoryComponentId } from "../../../component/inventoryComponent.ts";
 import { ResourceComponentId } from "../../../component/resourceComponent.ts";
 import { RoleComponentId } from "../../../component/worker/roleComponent.ts";
 import { SpriteComponentId } from "../../../component/spriteComponent.ts";
+import { terrainDefinitions } from "../../../map/terrain.ts";
 import {
     getConstructionMaterialProgress,
     type ConstructionMaterialProgress,
@@ -68,13 +69,13 @@ function tileSelectionInfo(
     selection: SelectedTileItem,
     context: StateContext,
 ): SelectionInfo | null {
-    const type = selection.groundTile.type;
-    if (!type) {
+    const { biome, terrain } = selection.groundTile;
+    if (!biome) {
         return null;
     }
     return {
-        title: type,
-        subtitle: "Tile",
+        title: biome,
+        subtitle: terrainDefinitions[terrain].name,
         icon: spriteRefs.blue_book,
         lit: tileLitAt(context.root, selection.tilePosition),
     };

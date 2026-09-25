@@ -2,7 +2,7 @@ import { distance, type Point } from "../../common/point.ts";
 import { buildingAdjecency } from "../../data/building/buildings.ts";
 import type { BuildingRequirements } from "../../data/building/building.ts";
 import { applyFunctionalComponents } from "../prefab/buildingPrefab.ts";
-import { discoverFootprint } from "../map/discoverFootprint.ts";
+import { discoverPoints } from "../map/discoverFootprint.ts";
 import {
     type AdjacencyMask,
     adjacencyMaskToEnum,
@@ -231,7 +231,7 @@ export function finishConstruction(
     // area placed away from any worker permanent map memory instead of black by
     // day. The light source is readable here because applyFunctionalComponents
     // above has already attached it.
-    discoverFootprint(root, buildingEntity, buildingEntity.worldPosition);
+    discoverPoints(root, buildingEntity, buildingEntity.worldPosition);
 }
 
 function calculateAdjacencyMask(

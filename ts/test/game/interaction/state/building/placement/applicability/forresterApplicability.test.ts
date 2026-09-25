@@ -4,11 +4,9 @@ import { Entity } from "../../../../../../../src/game/entity/entity.ts";
 import {
     createChunkMapComponent,
     ChunkMapComponentId,
+    indexEntity,
 } from "../../../../../../../src/game/component/chunkMapComponent.ts";
 import { createProductionComponent } from "../../../../../../../src/game/component/productionComponent.ts";
-import { SparseSet } from "../../../../../../../src/common/structure/sparseSet.ts";
-import { encodePosition } from "../../../../../../../src/common/point.ts";
-import { ChunkSize } from "../../../../../../../src/game/map/chunk.ts";
 import { forresterApplicability } from "../../../../../../../src/game/interaction/state/building/placement/applicability/forresterApplicability.ts";
 import { forresterProduction } from "../../../../../../../src/data/production/productionDefinition.ts";
 
@@ -17,16 +15,10 @@ import { forresterProduction } from "../../../../../../../src/data/production/pr
  * so that queryEntity can find it.
  */
 function registerInChunkMap(world: Entity, entity: Entity): void {
-    const chunkMapComp = world.getEcsComponent(ChunkMapComponentId)!;
-    const { x, y } = entity.worldPosition;
-    const chunkX = Math.floor(x / ChunkSize);
-    const chunkY = Math.floor(y / ChunkSize);
-    const chunkKey = encodePosition(chunkX, chunkY);
-
-    if (!chunkMapComp.chunkMap.chunks.has(chunkKey)) {
-        chunkMapComp.chunkMap.chunks.set(chunkKey, new SparseSet<Entity>());
-    }
-    chunkMapComp.chunkMap.chunks.get(chunkKey)!.add(entity);
+    indexEntity(
+        world.requireEcsComponent(ChunkMapComponentId).chunkMap,
+        entity,
+    );
 }
 
 function createWorld(): Entity {

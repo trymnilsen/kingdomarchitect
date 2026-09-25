@@ -3,10 +3,10 @@ import type {
     ComponentID,
     Components,
 } from "../../game/component/component.ts";
+import type { Terrain } from "../../game/map/terrain.ts";
 import type { Volume } from "../../game/map/volume.ts";
 import type { DeltaOperation } from "../delta/deltaTypes.ts";
 import type { GameCommand } from "./gameCommand.ts";
-import type { DiscoveredTileData } from "./playerDiscoveryData.ts";
 
 export type GameMessage =
     | WorldStateGameMessage
@@ -16,7 +16,7 @@ export type GameMessage =
     | RemoveComponentGameMessage
     | ComponentDeltaGameMessage
     | TransformGameMessage
-    | DiscoverTileGameMessage
+    | GroundUpdateGameMessage
     | ReloadGameMessage
     | CommandGameMessage
     | EventGameMessage;
@@ -37,7 +37,7 @@ export const SetComponentGameMessageType = "setComponent";
 export const RemoveComponentGameMessageType = "removeComponent";
 export const ComponentDeltaGameMessageType = "componentDelta";
 export const TransformGameMessageType = "transform";
-export const DiscoverTileGameMessageType = "discoverTile";
+export const GroundUpdateGameMessageType = "groundUpdate";
 export const ReloadGameMessageType = "reloadGame";
 export const CommandGameMessageType = "command";
 
@@ -50,14 +50,17 @@ export type ReplicatedEntityData = {
     children?: ReplicatedEntityData[];
 };
 
-/**
- * A generated chunk and the id of the volume it belongs to, resolved against
- * the `volumes` list of the message carrying it.
- */
 export type ReplicatedChunkData = {
     chunkX: number;
     chunkY: number;
     volume: string;
+    terrain: readonly Terrain[];
+};
+
+export type GroundUpdate = {
+    volumes: Volume[];
+    chunks: ReplicatedChunkData[];
+    discoveredTiles: Point[];
 };
 
 /**
@@ -69,13 +72,7 @@ export type WorldStateGameMessage = {
     // The entities added to the root node, will visit children as well
     // so we should only add the first level
     rootChildren: ReplicatedEntityData[];
-    // All generated chunks. Ground data exists client side for these even
-    // when no tile in them has been discovered yet. Entities are replicated
-    // regardless of discovery, so the ground they stand on must be too.
-    chunks: ReplicatedChunkData[];
-    // Tiles discovered by the player, includes volume reference
-    discoveredTiles: DiscoveredTileData[];
-    volumes: Volume[];
+    ground: GroundUpdate;
     /** Server simulation tick at the time this snapshot was taken. Used by the client to sync its local tick. */
     serverTick: number;
     /** Snapshot of root-level components that are opted into replication (see replicatedRootComponents in replicatedEntitiesSystem). */
@@ -122,10 +119,9 @@ export type TransformGameMessage = {
     position: Point;
 };
 
-export type DiscoverTileGameMessage = {
-    type: typeof DiscoverTileGameMessageType;
-    tiles: DiscoveredTileData[];
-    volumes?: Volume[];
+export type GroundUpdateGameMessage = {
+    type: typeof GroundUpdateGameMessageType;
+    ground: GroundUpdate;
 };
 
 export type ReloadGameMessage = {

@@ -1,6 +1,10 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
-import { TileComponentId } from "../../../src/game/component/tileComponent.ts";
+import { encodePosition } from "../../../src/common/point.ts";
+import {
+    getChunk,
+    TileComponentId,
+} from "../../../src/game/component/tileComponent.ts";
 import { VisibilityMapComponentId } from "../../../src/game/component/visibilityMapComponent.ts";
 import {
     createHealthComponent,
@@ -16,12 +20,19 @@ import {
     SetComponentGameMessageType,
     TransformGameMessageType,
     type WorldStateGameMessage,
+    type GroundUpdate,
     type AddEntityGameMessage,
     type RemoveEntityGameMessage,
     type SetComponentGameMessage,
     type TransformGameMessage,
 } from "../../../src/server/message/gameMessage.ts";
 import type { Volume } from "../../../src/game/map/volume.ts";
+import {
+    ChunkSize,
+    createLandTerrain,
+    terrainIndex,
+} from "../../../src/game/map/chunk.ts";
+import { Terrain } from "../../../src/game/map/terrain.ts";
 
 function createTestVolume(id: string): Volume {
     return {
@@ -32,6 +43,12 @@ function createTestVolume(id: string): Volume {
         chunks: [],
     };
 }
+
+const noGround: GroundUpdate = {
+    volumes: [],
+    chunks: [],
+    discoveredTiles: [],
+};
 
 function createTestCamera(): Camera {
     return new Camera({ x: 800, y: 600 });
@@ -45,9 +62,7 @@ describe("gameMessageHandler", () => {
             const message: WorldStateGameMessage = {
                 type: WorldStateMessageType,
                 rootChildren: [],
-                chunks: [],
-                discoveredTiles: [],
-                volumes: [],
+                ground: noGround,
                 serverTick: 0,
                 replicatedRootComponents: [],
             };
@@ -71,9 +86,7 @@ describe("gameMessageHandler", () => {
             const message: WorldStateGameMessage = {
                 type: WorldStateMessageType,
                 rootChildren: [],
-                chunks: [],
-                discoveredTiles: [],
-                volumes: [],
+                ground: noGround,
                 serverTick: 0,
                 replicatedRootComponents: [],
             };
@@ -91,20 +104,25 @@ describe("gameMessageHandler", () => {
             );
         });
 
-        it("applies discovered tiles and volumes", () => {
+        it("applies replicated ground before discovered tiles", () => {
             const root = new Entity("root");
 
             const volume = createTestVolume("vol1");
+            const terrain = createLandTerrain();
+            terrain[terrainIndex(2, 1)] = Terrain.Water;
+            terrain[terrainIndex(2, 2)] = Terrain.Ice;
 
             const message: WorldStateGameMessage = {
                 type: WorldStateMessageType,
                 rootChildren: [],
-                chunks: [],
-                discoveredTiles: [
-                    { x: 0, y: 0, volume: "vol1" },
-                    { x: 1, y: 1, volume: "vol1" },
-                ],
-                volumes: [volume],
+                ground: {
+                    volumes: [volume],
+                    chunks: [{ chunkX: 2, chunkY: 1, volume: "vol1", terrain }],
+                    discoveredTiles: [
+                        { x: 2 * ChunkSize + 1, y: ChunkSize + 1 },
+                        { x: 2 * ChunkSize + 2, y: ChunkSize + 2 },
+                    ],
+                },
                 serverTick: 0,
                 replicatedRootComponents: [],
             };
@@ -117,11 +135,17 @@ describe("gameMessageHandler", () => {
                 tileComponent.volume.has("vol1"),
                 "Should register volume",
             );
-            assert.strictEqual(
-                tileComponent.chunks.size,
-                1,
-                "Should create chunk",
+            const chunk = getChunk(tileComponent, { x: 2, y: 1 });
+            assert.deepStrictEqual(chunk?.terrain, terrain);
+
+            const visibilityMap = root.requireEcsComponent(
+                VisibilityMapComponentId,
             );
+            const discovered =
+                visibilityMap.discovered.partiallyDiscoveredChunks.get(
+                    encodePosition(2, 1),
+                );
+            assert.strictEqual(discovered?.size, 2);
         });
 
         it("creates entities from rootChildren", () => {
@@ -141,9 +165,7 @@ describe("gameMessageHandler", () => {
                         components: [],
                     },
                 ],
-                chunks: [],
-                discoveredTiles: [],
-                volumes: [],
+                ground: noGround,
                 serverTick: 0,
                 replicatedRootComponents: [],
             };
@@ -187,9 +209,7 @@ describe("gameMessageHandler", () => {
                         ],
                     },
                 ],
-                chunks: [],
-                discoveredTiles: [],
-                volumes: [],
+                ground: noGround,
                 serverTick: 0,
                 replicatedRootComponents: [],
             };
@@ -224,9 +244,7 @@ describe("gameMessageHandler", () => {
                         components: [healthComponent],
                     },
                 ],
-                chunks: [],
-                discoveredTiles: [],
-                volumes: [],
+                ground: noGround,
                 serverTick: 0,
                 replicatedRootComponents: [],
             };

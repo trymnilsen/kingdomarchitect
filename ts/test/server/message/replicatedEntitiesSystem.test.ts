@@ -26,7 +26,7 @@ import {
     SetComponentGameMessageType,
     type GameMessage,
 } from "../../../src/server/message/gameMessage.ts";
-import { ChunkSize } from "../../../src/game/map/chunk.ts";
+import { ChunkSize, createLandTerrain } from "../../../src/game/map/chunk.ts";
 import { EcsWorld } from "../../../src/ecs/ecsWorld.ts";
 
 function createTestVolume(id: string): Volume {
@@ -202,6 +202,7 @@ describe("replicatedEntitiesSystem", () => {
                 chunkX: 0,
                 chunkY: 0,
                 volume: volume,
+                terrain: createLandTerrain(),
             });
 
             root.setEcsComponent(tileComponent);
@@ -217,11 +218,11 @@ describe("replicatedEntitiesSystem", () => {
             const message = buildWorldStateMessage(root, "player1", 0);
 
             assert.strictEqual(
-                message.discoveredTiles.length,
+                message.ground.discoveredTiles.length,
                 ChunkSize * ChunkSize,
             );
-            assert.strictEqual(message.volumes.length, 1);
-            assert.strictEqual(message.volumes[0].id, "vol1");
+            assert.strictEqual(message.ground.volumes.length, 1);
+            assert.strictEqual(message.ground.volumes[0].id, "vol1");
         });
 
         it("includes partially discovered tiles", () => {
@@ -237,6 +238,7 @@ describe("replicatedEntitiesSystem", () => {
                 chunkX: 0,
                 chunkY: 0,
                 volume: volume,
+                terrain: createLandTerrain(),
             });
 
             root.setEcsComponent(tileComponent);
@@ -256,8 +258,8 @@ describe("replicatedEntitiesSystem", () => {
 
             const message = buildWorldStateMessage(root, "player1", 0);
 
-            assert.strictEqual(message.discoveredTiles.length, 2);
-            assert.strictEqual(message.volumes.length, 1);
+            assert.strictEqual(message.ground.discoveredTiles.length, 2);
+            assert.strictEqual(message.ground.volumes.length, 1);
         });
 
         it("returns empty discoveredTiles when player has no discovery data", () => {
@@ -273,6 +275,7 @@ describe("replicatedEntitiesSystem", () => {
                 chunkX: 0,
                 chunkY: 0,
                 volume: volume,
+                terrain: createLandTerrain(),
             });
 
             root.setEcsComponent(tileComponent);
@@ -282,11 +285,11 @@ describe("replicatedEntitiesSystem", () => {
 
             const message = buildWorldStateMessage(root, "player1", 0);
 
-            assert.strictEqual(message.discoveredTiles.length, 0);
+            assert.strictEqual(message.ground.discoveredTiles.length, 0);
             // Chunks and volumes are replicated regardless of discovery, and
             // entities are too, so the ground they stand on must exist
-            assert.strictEqual(message.volumes.length, 1);
-            assert.strictEqual(message.chunks.length, 1);
+            assert.strictEqual(message.ground.volumes.length, 1);
+            assert.strictEqual(message.ground.chunks.length, 1);
         });
 
         it("returns empty discoveredTiles for player with empty discovery", () => {
@@ -306,8 +309,8 @@ describe("replicatedEntitiesSystem", () => {
 
             const message = buildWorldStateMessage(root, "player1", 0);
 
-            assert.strictEqual(message.discoveredTiles.length, 0);
-            assert.strictEqual(message.volumes.length, 0);
+            assert.strictEqual(message.ground.discoveredTiles.length, 0);
+            assert.strictEqual(message.ground.volumes.length, 0);
         });
 
         it("only includes tiles for the requested player", () => {
@@ -323,12 +326,14 @@ describe("replicatedEntitiesSystem", () => {
                 chunkX: 0,
                 chunkY: 0,
                 volume: volume,
+                terrain: createLandTerrain(),
             });
 
             setChunk(tileComponent, {
                 chunkX: 1,
                 chunkY: 0,
                 volume: volume,
+                terrain: createLandTerrain(),
             });
 
             root.setEcsComponent(tileComponent);
@@ -359,24 +364,24 @@ describe("replicatedEntitiesSystem", () => {
                 0,
             );
 
-            // Player1 should only see tiles from chunk 0 (tiles 0-7 on x axis)
+            // Player1 should only see tiles from chunk 0
             assert.strictEqual(
-                messageForPlayer1.discoveredTiles.length,
+                messageForPlayer1.ground.discoveredTiles.length,
                 ChunkSize * ChunkSize,
             );
             assert.ok(
-                messageForPlayer1.discoveredTiles.every(
+                messageForPlayer1.ground.discoveredTiles.every(
                     (t) => t.x >= 0 && t.x < ChunkSize,
                 ),
             );
 
-            // Player2 should only see tiles from chunk 1 (tiles 8-15 on x axis)
+            // Player2 should only see tiles from chunk 1
             assert.strictEqual(
-                messageForPlayer2.discoveredTiles.length,
+                messageForPlayer2.ground.discoveredTiles.length,
                 ChunkSize * ChunkSize,
             );
             assert.ok(
-                messageForPlayer2.discoveredTiles.every(
+                messageForPlayer2.ground.discoveredTiles.every(
                     (t) => t.x >= ChunkSize && t.x < ChunkSize * 2,
                 ),
             );
@@ -394,8 +399,8 @@ describe("replicatedEntitiesSystem", () => {
             const message = buildWorldStateMessage(root, "player1", 0);
 
             assert.strictEqual(message.rootChildren.length, 0);
-            assert.strictEqual(message.discoveredTiles.length, 0);
-            assert.strictEqual(message.volumes.length, 0);
+            assert.strictEqual(message.ground.discoveredTiles.length, 0);
+            assert.strictEqual(message.ground.volumes.length, 0);
         });
 
         it("includes parent reference in child data", () => {

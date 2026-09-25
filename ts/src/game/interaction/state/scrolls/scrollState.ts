@@ -27,7 +27,7 @@ function drawCard(context: RenderScope, origin: Point) {
     context.drawScreenSpaceRectangle({
         width: 80,
         height: 90,
-        fill: biomes.forrest.color,
+        fill: biomes.forrest.ground.color,
         x: origin.x,
         y: origin.y + 3,
     });

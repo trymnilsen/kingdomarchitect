@@ -40,6 +40,22 @@ export const breadItem = {
     tag: [ItemTag.Food],
 } as const;
 
+export const fishItem = {
+    asset: spriteRefs.fish,
+    id: "fish",
+    name: "Fish",
+    hint: "Caught from the shore, baked into pies",
+    rarity: ItemRarity.Common,
+} as const;
+
+export const fishPieItem = {
+    asset: spriteRefs.fish_pie,
+    id: "fish_pie",
+    name: "Fish Pie",
+    rarity: ItemRarity.Common,
+    tag: [ItemTag.Food],
+} as const;
+
 export const berryItem = {
     asset: spriteRefs.farm_4,
     id: "berry",
@@ -147,6 +163,8 @@ export const resources = [
     strawResourceItem,
     woodResourceItem,
     breadItem,
+    fishItem,
+    fishPieItem,
     berryItem,
     mushroomFoodItem,
 ] as const;

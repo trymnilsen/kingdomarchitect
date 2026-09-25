@@ -30,6 +30,7 @@ import {
 import type { BiomeType } from "../../../../src/game/map/biome.ts";
 import { resourcePrefab } from "../../../../src/game/prefab/resourcePrefab.ts";
 import { createWorldCovering, setChunkBiome } from "../../testWorld.ts";
+import { ChunkSize, getChunkPosition } from "../../../../src/game/map/chunk.ts";
 
 /**
  * The zone is a radius-2 diamond, so twelve tiles around the building.
@@ -211,25 +212,29 @@ describe("productionPlanner - zone kind", () => {
     });
 
     describe("biome of the planting spot", () => {
+        const edgeX = 2 * ChunkSize;
+        const edgeChunk = getChunkPosition(edgeX, 12);
+        const buildingAtEdge = { x: edgeX - 1, y: 12 };
+
         /**
          * A forrester on the last tile of a snow chunk, so the eastern half of
          * its zone reaches into the neighbouring forest chunk.
          */
         function straddlingScene(): ZoneScene {
-            const scene = createZoneScene("snow", { x: 23, y: 12 });
-            setChunkBiome(scene.root, { x: 3, y: 1 }, "forrest");
+            const scene = createZoneScene("snow", buildingAtEdge);
+            setChunkBiome(scene.root, edgeChunk, "forrest");
             return scene;
         }
 
-        /** Zone tiles on the far side of the chunk edge, at x >= 24. */
+        /** Zone tiles on the far side of the chunk edge */
         const forestSide: Point[] = [
-            { x: 24, y: 11 },
-            { x: 24, y: 12 },
-            { x: 24, y: 13 },
-            { x: 25, y: 12 },
+            { x: edgeX, y: 11 },
+            { x: edgeX, y: 12 },
+            { x: edgeX, y: 13 },
+            { x: edgeX + 1, y: 12 },
         ];
-        const snowSide: Point[] = zoneTiles({ x: 23, y: 12 }, 12).filter(
-            (tile) => tile.x < 24,
+        const snowSide: Point[] = zoneTiles(buildingAtEdge, 12).filter(
+            (tile) => tile.x < edgeX,
         );
 
         it("plants the neighbouring biome's tree when only that side is free", () => {
@@ -276,8 +281,8 @@ describe("productionPlanner - zone kind", () => {
         });
 
         it("never plants on a tile whose biome grows nothing", () => {
-            const scene = createZoneScene("snow", { x: 23, y: 12 });
-            setChunkBiome(scene.root, { x: 3, y: 1 }, "plains");
+            const scene = createZoneScene("snow", buildingAtEdge);
+            setChunkBiome(scene.root, edgeChunk, "plains");
             for (const tile of snowSide) {
                 scene.addAt(tile, snowTreeResource);
             }

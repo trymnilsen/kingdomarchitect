@@ -13,7 +13,7 @@ import { BuildingComponentId } from "../component/buildingComponent.ts";
 import { STATION_MANNED_REACH } from "../vision/visionReach.ts";
 import { SWEEP_ORDER, searchlightWedgeOffsets } from "../vision/searchlight.ts";
 import { isTowerManned } from "../component/stationQuery.ts";
-import { discoverFootprint } from "../map/discoverFootprint.ts";
+import { discoverPoints } from "../map/discoverFootprint.ts";
 import { createBuildingLightSource } from "../prefab/buildingPrefab.ts";
 
 /**
@@ -62,7 +62,7 @@ function update(root: Entity, tick: number) {
 
         if (!hasSearchlight) {
             installSearchlight(tower, watch.beamAim);
-            discoverFootprint(root, tower, tower.worldPosition);
+            discoverPoints(root, tower, tower.worldPosition);
         } else if (aimChanged) {
             tower.updateComponent(LightSourceComponentId, (component) => {
                 component.pattern = searchlightWedgeOffsets(
@@ -70,7 +70,7 @@ function update(root: Entity, tick: number) {
                     STATION_MANNED_REACH,
                 );
             });
-            discoverFootprint(root, tower, tower.worldPosition);
+            discoverPoints(root, tower, tower.worldPosition);
         }
 
         if (aimChanged) {

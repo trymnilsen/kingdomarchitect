@@ -3,19 +3,25 @@ import {
     createTileComponent,
     setChunk,
     TileComponentId,
+    type TileComponent,
 } from "../../src/game/component/tileComponent.ts";
 import { createChunkMapComponent } from "../../src/game/component/chunkMapComponent.ts";
 import { EcsWorld } from "../../src/ecs/ecsWorld.ts";
 import { chunkMapSystem } from "../../src/game/system/chunkMapSystem.ts";
 import { createPathfindingGraphComponent } from "../../src/game/component/pathfindingGraphComponent.ts";
 import { createLazyGraphFromRootNode } from "../../src/game/map/path/graph/generateGraph.ts";
-import { ChunkSize } from "../../src/game/map/chunk.ts";
+import { ChunkSize, createLandTerrain } from "../../src/game/map/chunk.ts";
 import type { Point } from "../../src/common/point.ts";
+import type { Bounds } from "../../src/common/bounds.ts";
 import type { BiomeType } from "../../src/game/map/biome.ts";
 import type { Volume } from "../../src/game/map/volume.ts";
 import type { Building } from "../../src/data/building/building.ts";
 import { stockPile } from "../../src/data/building/wood/storage.ts";
 import { buildingPrefab } from "../../src/game/prefab/buildingPrefab.ts";
+import { nullBuilding } from "../../src/data/building/building.ts";
+import { createBuildingComponent } from "../../src/game/component/buildingComponent.ts";
+import { createSpriteComponent } from "../../src/game/component/spriteComponent.ts";
+import { emptySpriteRef } from "../../src/asset/sprite.ts";
 import { resourcePrefab } from "../../src/game/prefab/resourcePrefab.ts";
 import type { NaturalResource } from "../../src/data/inventory/items/naturalResource.ts";
 
@@ -43,7 +49,12 @@ export function createMinimalWorld(
     const tileComponent = createTileComponent();
     for (let cx = chunkRange.minChunk; cx <= chunkRange.maxChunk; cx++) {
         for (let cy = chunkRange.minChunk; cy <= chunkRange.maxChunk; cy++) {
-            setChunk(tileComponent, { chunkX: cx, chunkY: cy, volume });
+            setChunk(tileComponent, {
+                chunkX: cx,
+                chunkY: cy,
+                volume,
+                terrain: createLandTerrain(),
+            });
         }
     }
     root.setEcsComponent(tileComponent);
@@ -83,6 +94,7 @@ export function setChunkBiome(
         chunkX: chunkPosition.x,
         chunkY: chunkPosition.y,
         volume: testVolume(biome),
+        terrain: createLandTerrain(),
     });
 }
 
@@ -139,4 +151,44 @@ export function addResource(
     root.addChild(entity);
     entity.worldPosition = position;
     return entity;
+}
+
+export function addGroundCovering(
+    tiles: TileComponent,
+    bounds: Bounds,
+    volume?: Volume,
+): void {
+    // ground snaps to whole chunks so it can reach past the bounds
+    const x1 = Math.floor(bounds.x1 / ChunkSize);
+    const y1 = Math.floor(bounds.y1 / ChunkSize);
+    const x2 = Math.floor(bounds.x2 / ChunkSize);
+    const y2 = Math.floor(bounds.y2 / ChunkSize);
+    for (let cx = x1; cx <= x2; cx++) {
+        for (let cy = y1; cy <= y2; cy++) {
+            setChunk(tiles, {
+                chunkX: cx,
+                chunkY: cy,
+                volume,
+                terrain: createLandTerrain(),
+            });
+        }
+    }
+}
+
+export function wallOff(root: Entity, bounds: Bounds): void {
+    const addWall = (x: number, y: number) => {
+        const wall = new Entity(`wall-${x}-${y}`);
+        wall.setEcsComponent(createSpriteComponent(emptySpriteRef));
+        wall.setEcsComponent(createBuildingComponent(nullBuilding, false));
+        root.addChild(wall);
+        wall.worldPosition = { x, y };
+    };
+    for (let x = bounds.x1 - 1; x <= bounds.x2 + 1; x++) {
+        addWall(x, bounds.y1 - 1);
+        addWall(x, bounds.y2 + 1);
+    }
+    for (let y = bounds.y1; y <= bounds.y2; y++) {
+        addWall(bounds.x1 - 1, y);
+        addWall(bounds.x2 + 1, y);
+    }
 }

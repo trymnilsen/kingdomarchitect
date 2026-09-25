@@ -2,6 +2,7 @@ import { cactusFlowerResource } from "../../../data/inventory/items/naturalResou
 import { ChunkMapComponentId } from "../../component/chunkMapComponent.ts";
 import { Entity } from "../../entity/entity.ts";
 import type { TileChunk } from "../chunk.ts";
+import { placeBiomePonds } from "./placePonds.ts";
 import { placeBiomeTrees, placeResource, random } from "./placeResource.ts";
 
 export function generateDesert(chunk: TileChunk, chunkEntity: Entity) {
@@ -10,9 +11,10 @@ export function generateDesert(chunk: TileChunk, chunkEntity: Entity) {
         .requireEcsComponent(ChunkMapComponentId);
     const chunkMap = chunkMapComponent.chunkMap;
 
+    placeBiomePonds("desert", chunk, Math.random);
     placeBiomeTrees("desert", chunk, chunkEntity, chunkMap);
     placeResource(
-        random(5),
+        random(20),
         cactusFlowerResource,
         chunk,
         chunkEntity,

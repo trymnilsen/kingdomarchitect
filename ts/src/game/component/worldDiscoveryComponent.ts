@@ -56,7 +56,6 @@ export function discoverTile(
         );
     }
 
-    // Convert to local coordinates within the chunk (0-7)
     const localX = ((tile.x % ChunkSize) + ChunkSize) % ChunkSize;
     const localY = ((tile.y % ChunkSize) + ChunkSize) % ChunkSize;
     const tileId = encodePosition(localX, localY);
@@ -91,7 +90,6 @@ export function hasDiscoveredTile(
     const discoveredTiles = playerData.partiallyDiscoveredChunks.get(chunkId);
     if (!discoveredTiles) return false;
 
-    // Convert to local coordinates within the chunk (0-7)
     const localX = ((position.x % ChunkSize) + ChunkSize) % ChunkSize;
     const localY = ((position.y % ChunkSize) + ChunkSize) % ChunkSize;
     const tileId = encodePosition(localX, localY);

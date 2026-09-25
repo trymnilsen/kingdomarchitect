@@ -1,9 +1,9 @@
 import { type EcsSystem } from "../../ecs/ecsSystem.ts";
+import type { Bounds } from "../../common/bounds.ts";
 import { encodePosition, type Point } from "../../common/point.ts";
 import { DrawMode } from "../../rendering/drawMode.ts";
 import type { RenderScope } from "../../rendering/renderScope.ts";
 import {
-    compareSpriteStacking,
     type SpriteComponent,
     SpriteComponentId,
 } from "../component/spriteComponent.ts";
@@ -21,10 +21,11 @@ import {
 } from "../component/visibilityMapComponent.ts";
 import { DayComponentId, type Phase } from "../component/dayComponent.ts";
 import type { Entity } from "../entity/entity.ts";
-import { biomes, type BiomeType } from "../map/biome.ts";
-import { biomeDimColors } from "../map/biomeDimColor.ts";
-import { ChunkDimension, ChunkSize } from "../map/chunk.ts";
-import { getTileColorVariation } from "../map/deterministicTileColor.ts";
+import type { BiomeType } from "../map/biome.ts";
+import { biomeTileShades, TileColorVariation } from "../map/biomeTileShades.ts";
+import { ChunkDimension, ChunkSize, getTerrainInChunk } from "../map/chunk.ts";
+import type { Terrain } from "../map/terrain.ts";
+import { tileShadeIndex } from "../map/deterministicTileColor.ts";
 import { TileSize } from "../map/tile.ts";
 import {
     ambientIsLight,
@@ -32,19 +33,22 @@ import {
     computeLitTiles,
     isTileLit,
 } from "../light/lightClaims.ts";
-import { forEachComponentWithin } from "../component/chunkMapComponent.ts";
+import {
+    ChunkMapComponentId,
+    collectEntitiesInRow,
+    type ChunkMap,
+} from "../component/chunkMapComponent.ts";
 
 export const renderSystem: EcsSystem = {
     onRender,
 };
 
-/**
- * Reused across frames to gather the visible sprites for depth sorting without
- * allocating a fresh array (and the chunk helper's intermediate array, and a
- * result map) on every render. Render is never reentrant, so a single shared
- * buffer is safe. It is cleared at the start of each gather.
- */
-const visibleSpriteScratch: [Entity, SpriteComponent][] = [];
+const spriteGatherMargin = 2;
+
+// shared across frames since render is never reentrant
+const rowEntities: Entity[] = [];
+const rowDrawEntities: Entity[] = [];
+const rowDrawSprites: SpriteComponent[] = [];
 
 /**
  * Shared empty coverage for light-ambient phases. When the sky lights
@@ -59,7 +63,6 @@ function onRender(
     renderScope: RenderScope,
     drawMode: DrawMode,
 ) {
-    const viewport = renderScope.camera.tileSpaceViewPort;
     const tiles = rootEntity.getEcsComponent(TileComponentId);
     const visibilityMap = rootEntity.getEcsComponent(VisibilityMapComponentId);
 
@@ -80,39 +83,100 @@ function onRender(
     if (tiles && visibilityMap) {
         drawTiles(tiles, renderScope, visibilityMap, litTiles, phase);
     }
-    visibleSpriteScratch.length = 0;
-    forEachComponentWithin(
-        rootEntity,
-        viewport,
-        SpriteComponentId,
-        (entity, sprite) => {
-            visibleSpriteScratch.push([entity, sprite]);
-        },
-    );
-    // compareSpriteStacking reads depth from the paired component, so the sort
-    // needs the [entity, sprite] pairs (not bare entities) and stays free of any
-    // getEcsComponent in the comparator.
-    visibleSpriteScratch.sort(compareSpriteStacking);
+    const chunkMap = rootEntity.getEcsComponent(ChunkMapComponentId)?.chunkMap;
+    if (chunkMap) {
+        drawSprites(
+            chunkMap,
+            renderScope,
+            drawMode,
+            visibilityMap,
+            litTiles,
+            phase,
+        );
+    }
+}
 
-    for (let i = 0; i < visibleSpriteScratch.length; i++) {
-        const sprite = visibleSpriteScratch[i][1];
-        const position = visibleSpriteScratch[i][0].worldPosition;
-        // An entity is drawn only on a discovered tile that is currently lit.
-        // An attacker in adjacent darkness stays unseen, so the player watches
-        // their worker fight something they cannot see.
-        let visible = true;
-        if (!window.debugChunks && visibilityMap) {
-            const discovered = hasDiscoveredWorldTile(
-                visibilityMap,
-                position.x,
-                position.y,
-            );
-            visible = discovered && isTileLit(litTiles, phase, position);
+function drawSprites(
+    chunkMap: ChunkMap,
+    renderScope: RenderScope,
+    drawMode: DrawMode,
+    visibilityMap: VisibilityMapComponent | null,
+    litTiles: ReadonlySet<number>,
+    phase: Phase,
+) {
+    const viewport = renderScope.camera.tileSpaceViewPort;
+    const bounds: Bounds = {
+        x1: viewport.x1 - spriteGatherMargin,
+        y1: viewport.y1 - spriteGatherMargin,
+        x2: viewport.x2 + spriteGatherMargin,
+        y2: viewport.y2 + spriteGatherMargin,
+    };
+
+    for (let y = bounds.y1; y <= bounds.y2; y++) {
+        rowEntities.length = 0;
+        collectEntitiesInRow(chunkMap, y, bounds.x1, bounds.x2, rowEntities);
+
+        rowDrawEntities.length = 0;
+        rowDrawSprites.length = 0;
+        for (let i = 0; i < rowEntities.length; i++) {
+            const entity = rowEntities[i];
+            const sprite = entity.getEcsComponent(SpriteComponentId);
+            if (!sprite) {
+                continue;
+            }
+            if (
+                !isSpriteShown(
+                    entity.worldPosition,
+                    visibilityMap,
+                    litTiles,
+                    phase,
+                )
+            ) {
+                continue;
+            }
+            insertByDepth(entity, sprite);
         }
-        if (visible) {
-            drawSprite(sprite, position, renderScope, drawMode);
+
+        for (let i = 0; i < rowDrawEntities.length; i++) {
+            drawSprite(
+                rowDrawSprites[i],
+                rowDrawEntities[i].worldPosition,
+                renderScope,
+                drawMode,
+            );
         }
     }
+}
+
+function isSpriteShown(
+    position: Point,
+    visibilityMap: VisibilityMapComponent | null,
+    litTiles: ReadonlySet<number>,
+    phase: Phase,
+): boolean {
+    if (window.debugChunks || !visibilityMap) {
+        return true;
+    }
+    // an attacker in the dark stays unseen on purpose
+    return (
+        hasDiscoveredWorldTile(visibilityMap, position.x, position.y) &&
+        isTileLit(litTiles, phase, position)
+    );
+}
+
+function insertByDepth(entity: Entity, sprite: SpriteComponent) {
+    // insertion sort on purpose so equal depths keep their x order
+    const depth = sprite.depth ?? 0;
+    let index = rowDrawEntities.length;
+    rowDrawEntities.push(entity);
+    rowDrawSprites.push(sprite);
+    while (index > 0 && (rowDrawSprites[index - 1].depth ?? 0) > depth) {
+        rowDrawEntities[index] = rowDrawEntities[index - 1];
+        rowDrawSprites[index] = rowDrawSprites[index - 1];
+        index--;
+    }
+    rowDrawEntities[index] = entity;
+    rowDrawSprites[index] = sprite;
 }
 
 function drawSprite(
@@ -196,20 +260,20 @@ function drawLitOverlay(
     });
 }
 
-/**
- * The fill for a discovered tile. An unlit tile renders the biome's dark tint,
- * the same faded colour fog-of-war memory has always used. A lit tile renders
- * the biome's full colour under ambient sky light, and the midpoint tint when
- * only an emitter lights it at night, which keeps night's pooled look.
- */
-function tileFill(biomeType: BiomeType, phase: Phase, lit: boolean): string {
+function tileShadesFor(
+    biomeType: BiomeType,
+    terrain: Terrain,
+    phase: Phase,
+    lit: boolean,
+): string[] {
+    const shades = biomeTileShades[biomeType][terrain];
     if (!lit) {
-        return biomes[biomeType].tint;
+        return shades.dark;
     }
     if (ambientIsLight(phase)) {
-        return biomes[biomeType].color;
+        return shades.bright;
     }
-    return biomeDimColors[biomeType];
+    return shades.dim;
 }
 
 function drawTiles(
@@ -253,6 +317,12 @@ function drawTiles(
 
             for (let y = 0; y < ChunkSize; y++) {
                 const screenTileY = screenPosition.y + y * TileSize;
+                const yWithin =
+                    screenTileY + TileSize > 0 &&
+                    screenTileY - TileSize < renderContext.height;
+                if (!yWithin) {
+                    continue;
+                }
                 const worldTileY = chunkPosition.y + y;
 
                 // Debug mode reveals the whole map at full colour with the
@@ -278,14 +348,20 @@ function drawTiles(
                     });
                 }
 
-                const color = tileFill(chunk.volume.type, phase, lit);
-
-                const finalColor = getTileColorVariation(
-                    color,
-                    { x: chunk.chunkX, y: chunk.chunkY },
-                    { x, y },
-                    20,
+                const shades = tileShadesFor(
+                    chunk.volume.type,
+                    getTerrainInChunk(chunk, x, y),
+                    phase,
+                    lit,
                 );
+                const finalColor =
+                    shades[
+                        tileShadeIndex(
+                            worldTileX,
+                            worldTileY,
+                            TileColorVariation,
+                        )
+                    ];
 
                 renderContext.drawScreenSpaceRectangle({
                     x: screenTileX,

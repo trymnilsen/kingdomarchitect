@@ -2,10 +2,8 @@ import assert from "node:assert";
 import { describe, it } from "node:test";
 import { EcsWorld } from "../../../src/ecs/ecsWorld.ts";
 import { chunkMapSystem } from "../../../src/game/system/chunkMapSystem.ts";
-import {
-    createTileComponent,
-    setChunk,
-} from "../../../src/game/component/tileComponent.ts";
+import { createTileComponent } from "../../../src/game/component/tileComponent.ts";
+import { addGroundCovering, wallOff } from "../testWorld.ts";
 import { createChunkMapComponent } from "../../../src/game/component/chunkMapComponent.ts";
 import { createPathfindingGraphComponent } from "../../../src/game/component/pathfindingGraphComponent.ts";
 import { createLazyGraphFromRootNode } from "../../../src/game/map/path/graph/generateGraph.ts";
@@ -29,8 +27,10 @@ type MoveToAction = Extract<BehaviorActionData, { type: "moveTo" }>;
 
 const testSprite: SpriteRef = { bin: "test", spriteId: "test" };
 
+const worldBounds = { x1: 8, y1: 8, x2: 31, y2: 15 };
+
 /**
- * Open world with tiles, chunk map, and pathfinding. Covers roughly
+ * Open world with tiles, chunk map, and pathfinding. Walled off to
  * x=8..31, y=8..15. That is room enough for entities to move around.
  */
 function createWorld(): { root: Entity; ecsWorld: EcsWorld } {
@@ -39,14 +39,13 @@ function createWorld(): { root: Entity; ecsWorld: EcsWorld } {
     const root = ecsWorld.root;
 
     const tileComponent = createTileComponent();
-    for (let cx = 1; cx <= 3; cx++) {
-        setChunk(tileComponent, { chunkX: cx, chunkY: 1 });
-    }
+    addGroundCovering(tileComponent, worldBounds);
     root.setEcsComponent(tileComponent);
     root.setEcsComponent(createChunkMapComponent());
     root.setEcsComponent(
         createPathfindingGraphComponent(createLazyGraphFromRootNode(root)),
     );
+    wallOff(root, worldBounds);
 
     return { ecsWorld, root };
 }
@@ -135,7 +134,7 @@ describe("Displacement Scenario", () => {
          * Walls:
          *   (12,8) east of B    (explicitly placed)
          *   (11,9) south of B   (explicitly placed)
-         *   (11,7) north of B   (y=7 is outside chunk, natural wall)
+         *   (11,7) north of B   (y=7 is the world wall)
          */
         const { root } = createWorld();
 
@@ -378,7 +377,7 @@ describe("Displacement Scenario", () => {
     });
 
     /**
-     * Seal y=8 into a true 1-wide corridor: y=7 is outside the chunk (natural wall)
+     * Seal y=8 into a true 1-wide corridor: y=7 is the world wall
      * and we wall the entire y=9 row across the chunk width (x=8..31) so there is no
      * way around. A refused worker cannot detour, so a swap is the only resolution.
      */
@@ -415,7 +414,7 @@ describe("Displacement Scenario", () => {
     it("two equal-priority workers swap past each other in a 1-wide corridor", () => {
         /**
          * A at (10,8) wants (13,8). B at (13,8) wants (10,8). y=9 is walled and y=7
-         * is outside the chunk, so the row is a 1-wide corridor with no way around.
+         * is the world wall, so the row is a 1-wide corridor with no way around.
          * The only way both reach their targets is a head-on swap. With equal
          * priority the old dominance gate would deadlock them forever.
          */

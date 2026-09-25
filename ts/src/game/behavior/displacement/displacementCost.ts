@@ -14,7 +14,11 @@ import {
 } from "../../component/movementStaminaComponent.ts";
 import { ResourceComponentId } from "../../component/resourceComponent.ts";
 import { isDecorativeResource } from "../../../data/inventory/items/naturalResource.ts";
-import { TileComponentId, getTile } from "../../component/tileComponent.ts";
+import {
+    TileComponentId,
+    getTerrainAt,
+} from "../../component/tileComponent.ts";
+import { isWalkableTerrain } from "../../map/terrain.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { queryEntity } from "../../map/query/queryEntity.ts";
 
@@ -98,7 +102,11 @@ export function scoreCandidateTile(
     currentTick: number,
 ): number {
     const tileComponent = root.getEcsComponent(TileComponentId);
-    if (!tileComponent || !getTile(tileComponent, tile)) {
+    if (!tileComponent) {
+        return -Infinity;
+    }
+    const terrain = getTerrainAt(tileComponent, tile);
+    if (terrain === null || !isWalkableTerrain(terrain)) {
         return -Infinity;
     }
 

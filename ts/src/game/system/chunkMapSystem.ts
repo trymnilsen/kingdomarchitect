@@ -1,14 +1,15 @@
-import { encodePosition } from "../../common/point.ts";
-import { SparseSet } from "../../common/structure/sparseSet.ts";
 import type { EcsSystem } from "../../ecs/ecsSystem.ts";
-import { ChunkSize } from "../map/chunk.ts";
 import {
     ChunkMapComponentId,
+    indexEntity,
+    moveIndexedEntity,
+    unindexEntity,
     type ChunkMap,
 } from "../component/chunkMapComponent.ts";
 import { SpriteComponentId } from "../component/spriteComponent.ts";
 import type { Entity } from "../entity/entity.ts";
 import type {
+    ComponentsUpdatedEvent,
     EntityChildrenUpdatedEvent,
     EntityTransformEvent,
 } from "../entity/entityEvent.ts";
@@ -34,6 +35,8 @@ export const chunkMapSystem: EcsSystem = {
         child_added: onEntityAdded,
         child_removed: onEntityRemoved,
         transform: onTransform,
+        component_added: onComponentAdded,
+        component_removed: onComponentRemoved,
     },
 };
 
@@ -44,30 +47,10 @@ export const chunkMapSystem: EcsSystem = {
 function onTransform(rootEntity: Entity, entityEvent: EntityTransformEvent) {
     const chunkMap =
         rootEntity.requireEcsComponent(ChunkMapComponentId).chunkMap;
-    updateEntityHierarchyInMap(chunkMap, entityEvent.source);
-}
-
-function updateEntityHierarchyInMap(chunkMap: ChunkMap, entity: Entity) {
-    if (hasSpatialPresence(entity)) {
-        const currentChunkKey = chunkMap.entityChunkMap.get(entity.id);
-        const chunkX = Math.floor(entity.worldPosition.x / ChunkSize);
-        const chunkY = Math.floor(entity.worldPosition.y / ChunkSize);
-        const newChunkKey = encodePosition(chunkX, chunkY);
-
-        // Most steps stay inside the same chunk, so only a crossing touches the map.
-        if (currentChunkKey !== newChunkKey) {
-            if (currentChunkKey !== undefined) {
-                chunkMap.chunks.get(currentChunkKey)?.delete(entity);
-            }
-
-            chunkMap.entityChunkMap.set(entity.id, newChunkKey);
-            getOrCreateChunk(chunkMap, newChunkKey).add(entity);
-        }
-    }
-
-    for (const child of entity.children) {
-        updateEntityHierarchyInMap(chunkMap, child);
-    }
+    const source = entityEvent.source;
+    const offsetX = source.worldPosition.x - entityEvent.oldPosition.x;
+    const offsetY = source.worldPosition.y - entityEvent.oldPosition.y;
+    moveHierarchy(chunkMap, source, offsetX, offsetY);
 }
 
 /**
@@ -80,22 +63,7 @@ function onEntityAdded(
 ) {
     const chunkMap =
         rootEntity.requireEcsComponent(ChunkMapComponentId).chunkMap;
-    addToChunkmap(chunkMap, entityEvent.target);
-}
-
-function addToChunkmap(chunkMap: ChunkMap, entity: Entity) {
-    if (hasSpatialPresence(entity)) {
-        const chunkX = Math.floor(entity.worldPosition.x / ChunkSize);
-        const chunkY = Math.floor(entity.worldPosition.y / ChunkSize);
-        const chunkKey = encodePosition(chunkX, chunkY);
-
-        chunkMap.entityChunkMap.set(entity.id, chunkKey);
-        getOrCreateChunk(chunkMap, chunkKey).add(entity);
-    }
-
-    for (const child of entity.children) {
-        addToChunkmap(chunkMap, child);
-    }
+    indexHierarchy(chunkMap, entityEvent.target);
 }
 
 /**
@@ -108,32 +76,60 @@ function onEntityRemoved(
 ) {
     const chunkMap =
         rootEntity.requireEcsComponent(ChunkMapComponentId).chunkMap;
-    removeFromChunkmap(chunkMap, entityEvent.target);
+    unindexHierarchy(chunkMap, entityEvent.target);
 }
 
-function removeFromChunkmap(chunkMap: ChunkMap, entity: Entity) {
+function onComponentAdded(rootEntity: Entity, event: ComponentsUpdatedEvent) {
+    if (event.item.id !== SpriteComponentId) {
+        return;
+    }
+    const chunkMap =
+        rootEntity.requireEcsComponent(ChunkMapComponentId).chunkMap;
+    indexEntity(chunkMap, event.source);
+}
+
+function onComponentRemoved(rootEntity: Entity, event: ComponentsUpdatedEvent) {
+    if (event.item.id !== SpriteComponentId) {
+        return;
+    }
+    const chunkMap =
+        rootEntity.requireEcsComponent(ChunkMapComponentId).chunkMap;
+    unindexEntity(chunkMap, event.source);
+}
+
+function indexHierarchy(chunkMap: ChunkMap, entity: Entity) {
     if (hasSpatialPresence(entity)) {
-        const chunkKey = chunkMap.entityChunkMap.get(entity.id);
-        if (chunkKey !== undefined) {
-            chunkMap.chunks.get(chunkKey)?.delete(entity);
-            chunkMap.entityChunkMap.delete(entity.id);
-        }
+        indexEntity(chunkMap, entity);
     }
-
     for (const child of entity.children) {
-        removeFromChunkmap(chunkMap, child);
+        indexHierarchy(chunkMap, child);
     }
 }
 
-function getOrCreateChunk(
+function moveHierarchy(
     chunkMap: ChunkMap,
-    chunkKey: number,
-): SparseSet<Entity> {
-    const chunk = chunkMap.chunks.get(chunkKey);
-    if (chunk) {
-        return chunk;
+    entity: Entity,
+    offsetX: number,
+    offsetY: number,
+) {
+    if (hasSpatialPresence(entity)) {
+        moveIndexedEntity(
+            chunkMap,
+            entity,
+            entity.worldPosition.x - offsetX,
+            entity.worldPosition.y - offsetY,
+        );
     }
-    const set = new SparseSet<Entity>();
-    chunkMap.chunks.set(chunkKey, set);
-    return set;
+    for (const child of entity.children) {
+        moveHierarchy(chunkMap, child, offsetX, offsetY);
+    }
+}
+
+function unindexHierarchy(chunkMap: ChunkMap, entity: Entity) {
+    if (hasSpatialPresence(entity)) {
+        unindexEntity(chunkMap, entity);
+    }
+    for (const child of entity.children) {
+        unindexHierarchy(chunkMap, child);
+    }
 }

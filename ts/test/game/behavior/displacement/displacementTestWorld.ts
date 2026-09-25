@@ -1,9 +1,7 @@
 import { EcsWorld } from "../../../../src/ecs/ecsWorld.ts";
 import { chunkMapSystem } from "../../../../src/game/system/chunkMapSystem.ts";
-import {
-    createTileComponent,
-    setChunk,
-} from "../../../../src/game/component/tileComponent.ts";
+import { createTileComponent } from "../../../../src/game/component/tileComponent.ts";
+import { addGroundCovering, wallOff } from "../../testWorld.ts";
 import { createChunkMapComponent } from "../../../../src/game/component/chunkMapComponent.ts";
 import { Entity } from "../../../../src/game/entity/entity.ts";
 import {
@@ -18,11 +16,13 @@ import type { SpriteRef } from "../../../../src/asset/sprite.ts";
 
 const testSprite: SpriteRef = { bin: "test", spriteId: "test" };
 
+const worldBounds = { x1: 8, y1: 8, x2: 23, y2: 15 };
+
 /**
- * World covering world tiles x=8..23, y=8..15.
- * Tiles at y=7 (north of row y=8) fall outside any chunk and score -Infinity,
- * acting as natural walls. Tiles at y=9 and beyond (inside the chunk) are
- * valid ground unless explicitly blocked with a building entity.
+ * World covering world tiles x=8..23, y=8..15, ringed by walls.
+ * Tiles at y=7 (north of row y=8) are walls and score -Infinity. Tiles at
+ * y=9 and beyond are valid ground unless explicitly blocked with a building
+ * entity.
  */
 export function createTestWorld(): { root: Entity } {
     const ecsWorld = new EcsWorld();
@@ -30,10 +30,10 @@ export function createTestWorld(): { root: Entity } {
     const root = ecsWorld.root;
 
     const tileComponent = createTileComponent();
-    setChunk(tileComponent, { chunkX: 1, chunkY: 1 });
-    setChunk(tileComponent, { chunkX: 2, chunkY: 1 });
+    addGroundCovering(tileComponent, worldBounds);
     root.setEcsComponent(tileComponent);
     root.setEcsComponent(createChunkMapComponent());
+    wallOff(root, worldBounds);
 
     return { root };
 }

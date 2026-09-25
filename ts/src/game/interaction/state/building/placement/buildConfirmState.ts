@@ -19,6 +19,7 @@ import { InteractionState } from "../../../handler/interactionState.ts";
 import { uiScaffold } from "../../../view/uiScaffold.ts";
 import { AlertMessageState } from "../../common/alertMessageState.ts";
 import { type BuildingApplicabilityResult } from "./buildingApplicability.ts";
+import { landApplicability } from "./applicability/landApplicability.ts";
 import { buildingApplicabilityList } from "./buildingApplicabilityList.ts";
 import { type BuildMode } from "./mode/buildMode.ts";
 import { LineBuildMode } from "./mode/lineBuildMode.ts";
@@ -272,23 +273,10 @@ export class BuildConfirmState extends InteractionState {
             };
         }
 
-        const buildingApplicabilityCheck =
-            buildingApplicabilityList[this.building.id];
+        const applicability =
+            buildingApplicabilityList[this.building.id] ?? landApplicability;
 
-        if (buildingApplicabilityCheck) {
-            const applicabilityResult = buildingApplicabilityCheck(
-                tilePosition,
-                this.context.root,
-            );
-
-            if (!applicabilityResult.isApplicable) {
-                return applicabilityResult;
-            }
-        }
-
-        return {
-            isApplicable: true,
-        };
+        return applicability(tilePosition, this.context.root);
     }
 }
 

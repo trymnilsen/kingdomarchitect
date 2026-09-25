@@ -9,6 +9,7 @@ import {
     createTileComponent,
     setChunk,
 } from "../../../src/game/component/tileComponent.ts";
+import { createLandTerrain } from "../../../src/game/map/chunk.ts";
 import { Entity } from "../../../src/game/entity/entity.ts";
 import {
     CAMPFIRE_CLEARANCE_RADIUS,
@@ -24,7 +25,11 @@ import type { Building } from "../../../src/data/building/building.ts";
 function createWorldWithCamp(): { root: Entity; camp: Entity } {
     const root = new Entity("root");
     const tileComponent = createTileComponent();
-    setChunk(tileComponent, { chunkX: 0, chunkY: 0 });
+    setChunk(tileComponent, {
+        chunkX: 0,
+        chunkY: 0,
+        terrain: createLandTerrain(),
+    });
     root.setEcsComponent(tileComponent);
     root.setEcsComponent(createChunkMapComponent());
 

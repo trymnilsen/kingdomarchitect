@@ -39,7 +39,7 @@ function discoverChunk(): { harness: ScenarioHarness; chunkEntity: Entity } {
     const harness = new ScenarioHarness();
     const childrenBefore = new Set(harness.root.children);
 
-    setDiscoveryForPlayer(harness.root, () => {}, "player", [discoveredPoint]);
+    setDiscoveryForPlayer(harness.root, "player", [discoveredPoint]);
 
     const newChildren = harness.root.children.filter(
         (child) => !childrenBefore.has(child),

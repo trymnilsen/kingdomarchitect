@@ -1,19 +1,19 @@
+import type { Bounds } from "../../../common/bounds.ts";
 import { type Point, encodePosition } from "../../../common/point.ts";
-import { treeResource } from "../../../data/inventory/items/naturalResource.ts";
 import {
     type ChunkMap,
     getEntitiesInChunkMapWithin,
 } from "../../component/chunkMapComponent.ts";
-import { Entity } from "../../entity/entity.ts";
-import { resourcePrefab } from "../../prefab/resourcePrefab.ts";
-import { ChunkSize, getChunkBounds } from "../chunk.ts";
+import { getTerrainAtWorldPosition, type TileChunk } from "../chunk.ts";
+import { isBuildableTerrain } from "../terrain.ts";
 
 /**
  * Generates random spawn points within a chunk, avoiding existing entities
  */
 export function generateSpawnPoints(
     amount: number,
-    chunk: Point,
+    chunk: TileChunk,
+    area: Bounds,
     chunkMap: ChunkMap,
 ): Point[] {
     if (amount === 0) {
@@ -21,8 +21,7 @@ export function generateSpawnPoints(
     }
 
     const spawnPoints: Point[] = [];
-    const chunkBounds = getChunkBounds(chunk);
-    const items = getEntitiesInChunkMapWithin(chunkMap, chunkBounds);
+    const items = getEntitiesInChunkMapWithin(chunkMap, area);
     const skipPoints = new Set<number>();
 
     // Mark existing entity positions as occupied
@@ -35,23 +34,32 @@ export function generateSpawnPoints(
         skipPoints.add(encodedPosition);
     }
 
-    const totalCells = ChunkSize * ChunkSize;
+    const width = area.x2 - area.x1 + 1;
+    const height = area.y2 - area.y1 + 1;
+    const totalCells = width * height;
     for (let j = 0; j < amount; j++) {
         const start = Math.floor(Math.random() * totalCells);
 
         for (let i = 0; i < totalCells; i++) {
             const index = (start + i) % totalCells;
-            const x = index % ChunkSize;
-            const y = Math.floor(index / ChunkSize);
             const worldPosition: Point = {
-                x: chunkBounds.x1 + x,
-                y: chunkBounds.y1 + y,
+                x: area.x1 + (index % width),
+                y: area.y1 + Math.floor(index / width),
             };
             const encodedPoint = encodePosition(
                 worldPosition.x,
                 worldPosition.y,
             );
-            if (skipPoints.has(encodedPoint)) {
+            if (
+                skipPoints.has(encodedPoint) ||
+                !isBuildableTerrain(
+                    getTerrainAtWorldPosition(
+                        chunk,
+                        worldPosition.x,
+                        worldPosition.y,
+                    ),
+                )
+            ) {
                 continue;
             }
 

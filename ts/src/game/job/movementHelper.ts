@@ -11,7 +11,7 @@ import {
     updateDirectionComponent,
 } from "../component/directionComponent.ts";
 import { getPathfindingGraph } from "../map/path/getPathfindingGraph.ts";
-import { discoverFootprint } from "../map/discoverFootprint.ts";
+import { discoverPoints } from "../map/discoverFootprint.ts";
 import {
     MovementStaminaComponentId,
     recordMove,
@@ -71,7 +71,7 @@ export function discoverAfterMovement(entity: Entity, nextPoint: Point) {
     // nothing by walking.
     const visibility = entity.getEcsComponent(VisibilityComponentId);
     if (visibility) {
-        discoverFootprint(entity.getRootEntity(), entity, nextPoint);
+        discoverPoints(entity.getRootEntity(), entity, nextPoint);
     }
 }
 

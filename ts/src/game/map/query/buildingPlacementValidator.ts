@@ -2,64 +2,45 @@ import { adjacentPoints, type Point } from "../../../common/point.ts";
 import { BehaviorAgentComponentId } from "../../component/behaviorAgentComponent.ts";
 import { BuildingComponentId } from "../../component/buildingComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
-import { getWeightAtPoint } from "../path/graph/weight.ts";
+import {
+    getTerrainAt,
+    TileComponentId,
+} from "../../component/tileComponent.ts";
+import { getOccupantWeight, getTerrainWeight } from "../path/graph/weight.ts";
+import { isBuildableTerrain } from "../terrain.ts";
 import type { PositionValidator } from "./closestPositionQuery.ts";
 import { queryEntity } from "./queryEntity.ts";
 
-const DEFAULT_MAX_WEIGHT = 5;
+const MaxOpenTileOccupantWeight = 5;
 
-/**
- * Returns true if at least one cardinal neighbour of `point` is walkable
- * (weight non-zero and below maxWeight), excluding `excludePoint` from
- * consideration (used to treat a hypothetical occupant as impassable).
- */
-function hasWalkableCardinalNeighbour(
-    point: Point,
-    root: Entity,
-    maxWeight: number,
-    excludePoint?: Point,
-): boolean {
-    for (const neighbour of adjacentPoints(point)) {
-        if (
-            excludePoint &&
-            neighbour.x === excludePoint.x &&
-            neighbour.y === excludePoint.y
-        ) {
-            continue;
-        }
-        const weight = getWeightAtPoint(neighbour, root);
-        if (weight !== 0 && weight < maxWeight) {
-            return true;
-        }
-    }
-    return false;
+function isOpenTile(point: Point, root: Entity): boolean {
+    return (
+        getTerrainWeight(point, root) > 0 &&
+        getOccupantWeight(point, root) < MaxOpenTileOccupantWeight
+    );
 }
 
-/**
- * Returns the list of walkable (weight > 0 and < maxWeight) cardinal
- * neighbours of `point`, treating `excludePoint` as occupied (impassable).
- */
-function getFreeCardinalNeighbours(
+function getOpenCardinalNeighbours(
     point: Point,
     root: Entity,
-    maxWeight: number,
     excludePoint?: Point,
 ): Point[] {
-    const free: Point[] = [];
-    for (const neighbour of adjacentPoints(point)) {
-        if (
-            excludePoint &&
-            neighbour.x === excludePoint.x &&
-            neighbour.y === excludePoint.y
-        ) {
-            continue;
-        }
-        const weight = getWeightAtPoint(neighbour, root);
-        if (weight !== 0 && weight < maxWeight) {
-            free.push(neighbour);
-        }
-    }
-    return free;
+    return adjacentPoints(point).filter(
+        (neighbour) =>
+            !(
+                excludePoint &&
+                neighbour.x === excludePoint.x &&
+                neighbour.y === excludePoint.y
+            ) && isOpenTile(neighbour, root),
+    );
+}
+
+function hasOpenCardinalNeighbour(
+    point: Point,
+    root: Entity,
+    excludePoint?: Point,
+): boolean {
+    return getOpenCardinalNeighbours(point, root, excludePoint).length > 0;
 }
 
 function pointKey(p: Point): string {
@@ -69,8 +50,7 @@ function pointKey(p: Point): string {
 /**
  * Creates a validator for placing a building at a candidate position.
  * A candidate passes when:
- * 1. The candidate tile itself is walkable (would be occupied by the new
- *    building, so this just checks it's a valid ground tile: weight != 0).
+ * 1. The candidate tile has buildable terrain and is currently passable.
  * 2. The candidate has at least one free cardinal neighbour after placement
  *    (so the building can be reached).
  * 3. Every existing adjacent building still has at least one free cardinal
@@ -86,19 +66,23 @@ function pointKey(p: Point): string {
  */
 export function createBuildingPlacementValidator(
     root: Entity,
-    maxWeight: number = DEFAULT_MAX_WEIGHT,
 ): PositionValidator {
+    const tileComponent = root.requireEcsComponent(TileComponentId);
     return (candidate: Point) => {
-        // The candidate must be on a valid ground tile and currently passable
-        const candidateWeight = getWeightAtPoint(candidate, root);
-        if (candidateWeight === 0 || candidateWeight >= maxWeight) {
+        // ice is walkable but not buildable
+        const terrain = getTerrainAt(tileComponent, candidate);
+        if (terrain === null || !isBuildableTerrain(terrain)) {
+            return false;
+        }
+
+        if (!isOpenTile(candidate, root)) {
             return false;
         }
 
         // The new building will occupy the candidate tile, so check that at
-        // least one cardinal neighbour remains passable (reachability of the
-        // new building itself).
-        if (!hasWalkableCardinalNeighbour(candidate, root, maxWeight)) {
+        // least one cardinal neighbour remains open (reachability of the new
+        // building itself).
+        if (!hasOpenCardinalNeighbour(candidate, root)) {
             return false;
         }
 
@@ -115,14 +99,7 @@ export function createBuildingPlacementValidator(
 
             // Simulate the candidate being occupied: does this neighbour
             // building still have at least one other free cardinal exit?
-            if (
-                !hasWalkableCardinalNeighbour(
-                    neighbour,
-                    root,
-                    maxWeight,
-                    candidate,
-                )
-            ) {
+            if (!hasOpenCardinalNeighbour(neighbour, root, candidate)) {
                 return false;
             }
         }
@@ -138,14 +115,7 @@ export function createBuildingPlacementValidator(
                 continue;
             }
 
-            if (
-                !hasWalkableCardinalNeighbour(
-                    neighbour,
-                    root,
-                    maxWeight,
-                    candidate,
-                )
-            ) {
+            if (!hasOpenCardinalNeighbour(neighbour, root, candidate)) {
                 return false;
             }
         }
@@ -159,11 +129,7 @@ export function createBuildingPlacementValidator(
         const adjacentBuildingKeys = new Set<string>();
         const soleTilesToScan: Point[] = [];
 
-        const newBuildingFree = getFreeCardinalNeighbours(
-            candidate,
-            root,
-            maxWeight,
-        );
+        const newBuildingFree = getOpenCardinalNeighbours(candidate, root);
         if (newBuildingFree.length === 1) {
             soleAccessClaimed.add(pointKey(newBuildingFree[0]));
             soleTilesToScan.push(newBuildingFree[0]);
@@ -181,10 +147,9 @@ export function createBuildingPlacementValidator(
 
             adjacentBuildingKeys.add(pointKey(neighbour));
 
-            const freeNeighbours = getFreeCardinalNeighbours(
+            const freeNeighbours = getOpenCardinalNeighbours(
                 neighbour,
                 root,
-                maxWeight,
                 candidate,
             );
 
@@ -217,11 +182,7 @@ export function createBuildingPlacementValidator(
                     continue;
                 }
 
-                const freeNeighbours = getFreeCardinalNeighbours(
-                    adj,
-                    root,
-                    maxWeight,
-                );
+                const freeNeighbours = getOpenCardinalNeighbours(adj, root);
                 if (
                     freeNeighbours.length === 1 &&
                     freeNeighbours[0].x === soleTile.x &&

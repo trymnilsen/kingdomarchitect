@@ -8,7 +8,6 @@ import {
 } from "../../../src/game/system/worldGenerationSystem.ts";
 import { chunkMapSystem } from "../../../src/game/system/chunkMapSystem.ts";
 import { createRootEntity } from "../../../src/game/rootFactory.ts";
-import { createMessageEmitterComponent } from "../../../src/game/component/messageEmitterComponent.ts";
 import { GoblinCampComponentId } from "../../../src/game/component/goblinCampComponent.ts";
 import {
     ChunkMapComponentId,
@@ -20,29 +19,19 @@ import {
     TileComponentId,
 } from "../../../src/game/component/tileComponent.ts";
 import {
+    ChunkSize,
     getChunkBounds,
     getChunkPosition,
 } from "../../../src/game/map/chunk.ts";
 import type { Entity } from "../../../src/game/entity/entity.ts";
-import type { GameMessage } from "../../../src/server/message/gameMessage.ts";
 
-function setupWorld(): {
-    root: Entity;
-    ecsWorld: EcsWorld;
-    messages: GameMessage[];
-} {
-    const messages: GameMessage[] = [];
+function setupWorld(): { root: Entity } {
     const root = createRootEntity();
-    root.setEcsComponent(
-        createMessageEmitterComponent((message) => {
-            messages.push(message);
-        }),
-    );
     const ecsWorld = new EcsWorld(root);
     ecsWorld.addSystem(chunkMapSystem);
     ecsWorld.addSystem(worldGenerationSystem);
     ecsWorld.runInit();
-    return { root, ecsWorld, messages };
+    return { root };
 }
 
 function getCampChunkPosition(root: Entity): Point {
@@ -172,19 +161,16 @@ describe("worldGenerationSystem", () => {
     });
 
     it("respawns a goblin camp on later discovery when none exists", () => {
-        const { root, messages } = setupWorld();
+        const { root } = setupWorld();
 
         const camps = root.queryComponents(GoblinCampComponentId);
         const campEntity = [...camps.keys()][0];
         campEntity.removeEcsComponent(GoblinCampComponentId);
         assert.strictEqual(root.queryComponents(GoblinCampComponentId).size, 0);
 
-        const messageEmitter = (message: GameMessage) => {
-            messages.push(message);
-        };
         // Discover a tile in a far, ungenerated chunk (10,10)
-        setDiscoveryForPlayer(root, messageEmitter, "player", [
-            { x: 80, y: 80 },
+        setDiscoveryForPlayer(root, "player", [
+            { x: 10 * ChunkSize, y: 10 * ChunkSize },
         ]);
 
         const newCampChunk = getCampChunkPosition(root);

@@ -1,10 +1,10 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
-import { encodePosition, type Point } from "../../../../src/common/point.ts";
-import { SparseSet } from "../../../../src/common/structure/sparseSet.ts";
+import type { Point } from "../../../../src/common/point.ts";
 import {
     ChunkMapComponentId,
     createChunkMapComponent,
+    indexEntity,
 } from "../../../../src/game/component/chunkMapComponent.ts";
 import { createBehaviorAgentComponent } from "../../../../src/game/component/behaviorAgentComponent.ts";
 import { createBuildingComponent } from "../../../../src/game/component/buildingComponent.ts";
@@ -14,14 +14,19 @@ import {
     setChunk,
 } from "../../../../src/game/component/tileComponent.ts";
 import { Entity } from "../../../../src/game/entity/entity.ts";
-import { ChunkSize } from "../../../../src/game/map/chunk.ts";
+import {
+    ChunkSize,
+    createLandTerrain,
+    terrainIndex,
+} from "../../../../src/game/map/chunk.ts";
+import { Terrain } from "../../../../src/game/map/terrain.ts";
 import { createBuildingPlacementValidator } from "../../../../src/game/map/query/buildingPlacementValidator.ts";
 import { findClosestAvailablePosition } from "../../../../src/game/map/query/closestPositionQuery.ts";
 import { woodenHouse } from "../../../../src/data/building/wood/house.ts";
 
 /**
  * Creates a root entity with tile and chunk-map components.
- * The TileComponent registers a chunk for every unique 8x8 chunk that contains
+ * The TileComponent registers a chunk for every unique chunk that contains
  * at least one of the listed positions, which gives the whole chunk valid ground.
  */
 function createWorld(tiledPositions: Point[]): Entity {
@@ -36,7 +41,11 @@ function createWorld(tiledPositions: Point[]): Entity {
         const chunkKey = `${chunkX},${chunkY}`;
         if (!seenChunks.has(chunkKey)) {
             seenChunks.add(chunkKey);
-            setChunk(tileComponent, { chunkX, chunkY });
+            setChunk(tileComponent, {
+                chunkX,
+                chunkY,
+                terrain: createLandTerrain(),
+            });
         }
     }
 
@@ -52,17 +61,7 @@ function createWorld(tiledPositions: Point[]): Entity {
  */
 function addToChunkMap(root: Entity, entity: Entity, pos: Point): Entity {
     entity.worldPosition = pos;
-
-    const chunkMap = root.requireEcsComponent(ChunkMapComponentId).chunkMap;
-    const chunkX = Math.floor(pos.x / ChunkSize);
-    const chunkY = Math.floor(pos.y / ChunkSize);
-    const chunkKey = encodePosition(chunkX, chunkY);
-
-    if (!chunkMap.chunks.has(chunkKey)) {
-        chunkMap.chunks.set(chunkKey, new SparseSet<Entity>());
-    }
-    chunkMap.chunks.get(chunkKey)!.add(entity);
-
+    indexEntity(root.requireEcsComponent(ChunkMapComponentId).chunkMap, entity);
     return entity;
 }
 
@@ -87,12 +86,15 @@ function addAgent(root: Entity, pos: Point): Entity {
 describe("createBuildingPlacementValidator", () => {
     describe("candidate tile validity", () => {
         it("rejects a candidate that falls in an unregistered chunk (no ground)", () => {
-            // Tiles only exist in chunk (0,0), positions 0-7 on both axes.
-            // The candidate lives in chunk (2,2), which has never been registered.
+            // Tiles only exist in chunk (0,0). The candidate lives in chunk
+            // (2,2), which has never been registered.
             const world = createWorld([{ x: 4, y: 4 }]);
             const validator = createBuildingPlacementValidator(world);
 
-            assert.strictEqual(validator({ x: 20, y: 20 }), false);
+            assert.strictEqual(
+                validator({ x: 2 * ChunkSize + 4, y: 2 * ChunkSize + 4 }),
+                false,
+            );
         });
 
         it("rejects a candidate already occupied by a building", () => {
@@ -475,6 +477,60 @@ describe("createBuildingPlacementValidator", () => {
                 { x: 4, y: 4 },
                 "Should not pick the position that blocks building B",
             );
+        });
+    });
+
+    describe("terrain", () => {
+        const candidate: Point = { x: 2 * ChunkSize + 4, y: ChunkSize + 3 };
+
+        function createWorldWithTerrain(
+            tiles: { local: Point; terrain: Terrain }[],
+        ): Entity {
+            const root = new Entity("root");
+            const terrain = createLandTerrain();
+            for (const tile of tiles) {
+                terrain[terrainIndex(tile.local.x, tile.local.y)] =
+                    tile.terrain;
+            }
+            const tileComponent = createTileComponent();
+            setChunk(tileComponent, { chunkX: 2, chunkY: 1, terrain });
+            root.setEcsComponent(tileComponent);
+            root.setEcsComponent(createChunkMapComponent());
+            return root;
+        }
+
+        it("rejects building on ice even though ice can be walked", () => {
+            const world = createWorldWithTerrain([
+                { local: { x: 4, y: 3 }, terrain: Terrain.Ice },
+            ]);
+            const validator = createBuildingPlacementValidator(world);
+
+            assert.strictEqual(validator(candidate), false);
+            assert.strictEqual(
+                validator({ x: candidate.x + 1, y: candidate.y }),
+                true,
+                "the land beside the ice is still buildable",
+            );
+        });
+
+        it("counts ice as a way in to a building and water as none", () => {
+            const surroundedBy = (lastSide: Terrain) =>
+                createWorldWithTerrain([
+                    { local: { x: 3, y: 3 }, terrain: Terrain.Water },
+                    { local: { x: 5, y: 3 }, terrain: Terrain.Water },
+                    { local: { x: 4, y: 2 }, terrain: Terrain.Water },
+                    { local: { x: 4, y: 4 }, terrain: lastSide },
+                ]);
+
+            const reachedOverIce = createBuildingPlacementValidator(
+                surroundedBy(Terrain.Ice),
+            );
+            const cutOffByWater = createBuildingPlacementValidator(
+                surroundedBy(Terrain.Water),
+            );
+
+            assert.strictEqual(reachedOverIce(candidate), true);
+            assert.strictEqual(cutOffByWater(candidate), false);
         });
     });
 });

@@ -4,19 +4,18 @@ import type { Camera } from "../../rendering/camera.ts";
 
 import {
     createTileComponent,
-    setChunk,
     TileComponentId,
 } from "../../game/component/tileComponent.ts";
 import {
     createVisibilityMapComponent,
     VisibilityMapComponentId,
 } from "../../game/component/visibilityMapComponent.ts";
-import { applyDiscoveredTiles } from "./applyDiscoveredTiles.ts";
+import { applyGroundUpdate } from "./groundUpdate.ts";
 import { applyDelta } from "../delta/applyDelta.ts";
 import {
     AddEntityGameMessageType,
     ComponentDeltaGameMessageType,
-    DiscoverTileGameMessageType,
+    GroundUpdateGameMessageType,
     ReloadGameMessageType,
     RemoveComponentGameMessageType,
     RemoveEntityGameMessageType,
@@ -24,7 +23,7 @@ import {
     TransformGameMessageType,
     type AddEntityGameMessage,
     type ComponentDeltaGameMessage,
-    type DiscoverTileGameMessage,
+    type GroundUpdateGameMessage,
     type ReplicatedEntityData,
     type GameMessage,
     type RemoveComponentGameMessage,
@@ -59,8 +58,8 @@ export function handleGameMessage(root: Entity, message: GameMessage) {
         case TransformGameMessageType:
             transformHandler(root, message);
             break;
-        case DiscoverTileGameMessageType:
-            discoverTileHandler(root, message);
+        case GroundUpdateGameMessageType:
+            groundUpdateHandler(root, message);
             break;
         case ReloadGameMessageType:
             window.location.reload();
@@ -184,17 +183,11 @@ function transformHandler(root: Entity, message: TransformGameMessage) {
     }
 }
 
-function discoverTileHandler(root: Entity, message: DiscoverTileGameMessage) {
-    const tileComponent = root.requireEcsComponent(TileComponentId);
-    const visibilityMapComponent = root.requireEcsComponent(
-        VisibilityMapComponentId,
-    );
-
-    applyDiscoveredTiles(
-        tileComponent,
-        visibilityMapComponent,
-        message.tiles,
-        message.volumes ?? [],
+function groundUpdateHandler(root: Entity, message: GroundUpdateGameMessage) {
+    applyGroundUpdate(
+        root.requireEcsComponent(TileComponentId),
+        root.requireEcsComponent(VisibilityMapComponentId),
+        message.ground,
     );
 }
 
@@ -215,33 +208,7 @@ function updateWorldState(root: Entity, message: WorldStateGameMessage) {
         root.setEcsComponent(visibilityMapComponent);
     }
 
-    // Register every generated chunk so ground data exists client side even
-    // for chunks where no tile is discovered yet. What the player actually
-    // sees of them is decided by the discovery data, not by chunk existence.
-    for (const volume of message.volumes) {
-        if (!tileComponent.volume.has(volume.id)) {
-            tileComponent.volume.set(volume.id, volume);
-        }
-    }
-    for (const chunkData of message.chunks) {
-        const volume = tileComponent.volume.get(chunkData.volume);
-        if (!volume) {
-            log.warn("No volume found for replicated chunk", { chunkData });
-            continue;
-        }
-        setChunk(tileComponent, {
-            chunkX: chunkData.chunkX,
-            chunkY: chunkData.chunkY,
-            volume,
-        });
-    }
-
-    applyDiscoveredTiles(
-        tileComponent,
-        visibilityMapComponent,
-        message.discoveredTiles,
-        message.volumes,
-    );
+    applyGroundUpdate(tileComponent, visibilityMapComponent, message.ground);
 
     for (const comp of message.replicatedRootComponents) {
         root.setEcsComponent(comp);

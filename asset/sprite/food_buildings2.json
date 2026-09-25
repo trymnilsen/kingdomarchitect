@@ -1,0 +1,20 @@
+{
+    "smokehouse": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+    },
+    "building_fishing_hut_left": {
+        "x": 0,
+        "y": 16,
+        "w": 16,
+        "h": 16
+    },
+    "building_fishing_hut_right": {
+        "x": 16,
+        "y": 16,
+        "w": 16,
+        "h": 16
+    }
+}

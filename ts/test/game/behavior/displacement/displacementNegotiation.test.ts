@@ -96,7 +96,7 @@ describe("displacementNegotiation", () => {
             const { root } = createTestWorld();
             // Requester at (10,8) wants (11,8) where B is.
             // Block all of B's exits except (10,8) = requester's position.
-            // (11,7) is automatically a wall (outside chunk at y=7).
+            // (11,7) is automatically a wall (the world wall at y=7).
             const requester = createAgent("requester", root, 10, 8, 100);
             createAgent("blocker", root, 11, 8, 5);
             createWall("wall-east", root, 12, 8);
@@ -245,7 +245,7 @@ describe("displacementNegotiation", () => {
             // Block all of B's exits except east (12,8)=C
             createWall("wall-bw", root, 10, 8); // west of B
             createWall("wall-bs", root, 11, 9); // south of B
-            // north of B (11,7) is outside the chunk, natural wall
+            // north of B (11,7) is the world wall
             // C's north (12,7) is also outside, natural wall
             // C's south (12,9) is free, that's where C will move
             // C's west (11,8) is B (visited in chain), skipped
@@ -333,7 +333,7 @@ describe("displacementNegotiation", () => {
             createWall("wall-d-s", root, 13, 9);
             createWall("wall-e-s", root, 14, 9);
             createWall("wall-f-s", root, 15, 9);
-            // North of each is automatically a wall (y=7, outside chunk)
+            // North of each is automatically a wall (y=7, the world wall)
 
             const result = negotiateDisplacement(
                 requester,

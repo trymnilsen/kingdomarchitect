@@ -1,71 +1,29 @@
 import { log } from "../../common/logging/logger.ts";
-import { encodePosition, pointEquals } from "../../common/point.ts";
-
+import { encodePosition, type Point } from "../../common/point.ts";
 import {
-    setChunk,
+    hasChunk,
     type TileComponent,
 } from "../../game/component/tileComponent.ts";
 import type { VisibilityMapComponent } from "../../game/component/visibilityMapComponent.ts";
-import {
-    ChunkSize,
-    getChunkId,
-    getChunkPosition,
-} from "../../game/map/chunk.ts";
-import type { Volume } from "../../game/map/volume.ts";
-import type { DiscoveredTileData } from "./playerDiscoveryData.ts";
+import { ChunkSize, getChunkPosition } from "../../game/map/chunk.ts";
 
-/**
- * Applies discovered tiles to the client's tile and visibility components.
- * Both the initial world state and later discover-tile effects land here, so
- * the two paths cannot drift.
- */
 export function applyDiscoveredTiles(
     tileComponent: TileComponent,
     visibilityMapComponent: VisibilityMapComponent,
-    tiles: DiscoveredTileData[],
-    volumes: Volume[],
+    tiles: readonly Point[],
 ): void {
-    // Register volumes first. Chunks hold references to the registered volume
-    // instances (the world state replicates all chunks up front), so an
-    // already known volume is updated in place rather than replaced. A new
-    // instance would diverge from the one existing chunks point at.
-    for (const volume of volumes) {
-        const existingVolume = tileComponent.volume.get(volume.id);
-        if (existingVolume) {
-            existingVolume.chunks = volume.chunks;
-            existingVolume.maxSize = volume.maxSize;
-        } else {
-            tileComponent.volume.set(volume.id, volume);
-        }
-    }
-
-    // Process each discovered tile
     for (const tile of tiles) {
-        const volume = tileComponent.volume.get(tile.volume);
-        if (!volume) {
-            log.warn("No volume found for tile", { x: tile.x, y: tile.y });
+        const chunkPosition = getChunkPosition(tile.x, tile.y);
+        if (!hasChunk(tileComponent, chunkPosition)) {
+            log.warn("Discovered tile in a chunk with no replicated ground", {
+                x: tile.x,
+                y: tile.y,
+            });
             continue;
         }
 
-        const chunkPosition = getChunkPosition(tile.x, tile.y);
-        let chunk = tileComponent.chunks.get(getChunkId(chunkPosition));
-        if (!chunk) {
-            chunk = {
-                chunkX: chunkPosition.x,
-                chunkY: chunkPosition.y,
-                volume: volume,
-            };
-            const volumeAlreadyHasChunk = volume.chunks.find((item) =>
-                pointEquals(item, chunkPosition),
-            );
-            if (!volumeAlreadyHasChunk) {
-                volume.chunks.push(chunkPosition);
-            }
-            setChunk(tileComponent, chunk);
-        }
-
         // Track visibility
-        // Javascript modulus can return negative values, so we normalize to 0-7
+        // js modulus goes negative so wrap it back into the chunk
         const localX = ((tile.x % ChunkSize) + ChunkSize) % ChunkSize;
         const localY = ((tile.y % ChunkSize) + ChunkSize) % ChunkSize;
 

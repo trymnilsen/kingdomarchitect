@@ -2,10 +2,8 @@ import assert from "node:assert";
 import { describe, it } from "node:test";
 import { EcsWorld } from "../../../../src/ecs/ecsWorld.ts";
 import { chunkMapSystem } from "../../../../src/game/system/chunkMapSystem.ts";
-import {
-    createTileComponent,
-    setChunk,
-} from "../../../../src/game/component/tileComponent.ts";
+import { createTileComponent } from "../../../../src/game/component/tileComponent.ts";
+import { addGroundCovering, wallOff } from "../../testWorld.ts";
 import { createChunkMapComponent } from "../../../../src/game/component/chunkMapComponent.ts";
 import { createPathfindingGraphComponent } from "../../../../src/game/component/pathfindingGraphComponent.ts";
 import { createLazyGraphFromRootNode } from "../../../../src/game/map/path/graph/generateGraph.ts";
@@ -29,21 +27,22 @@ type MoveToAction = Extract<BehaviorActionData, { type: "moveTo" }>;
 
 const testSprite: SpriteRef = { bin: "test", spriteId: "test" };
 
-/** Open world with tiles, chunk map, and pathfinding (covers x=8..31, y=8..15). */
+const worldBounds = { x1: 8, y1: 8, x2: 31, y2: 15 };
+
+/** Open world with tiles, chunk map, and pathfinding, walled off to x=8..31, y=8..15. */
 function createWorld(): Entity {
     const ecsWorld = new EcsWorld();
     ecsWorld.addSystem(chunkMapSystem);
     const root = ecsWorld.root;
 
     const tileComponent = createTileComponent();
-    for (let cx = 1; cx <= 3; cx++) {
-        setChunk(tileComponent, { chunkX: cx, chunkY: 1 });
-    }
+    addGroundCovering(tileComponent, worldBounds);
     root.setEcsComponent(tileComponent);
     root.setEcsComponent(createChunkMapComponent());
     root.setEcsComponent(
         createPathfindingGraphComponent(createLazyGraphFromRootNode(root)),
     );
+    wallOff(root, worldBounds);
     return root;
 }
 

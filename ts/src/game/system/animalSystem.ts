@@ -9,8 +9,9 @@ import {
     getEntitiesInChunk,
     type ChunkMap,
 } from "../component/chunkMapComponent.ts";
-import { TileComponentId } from "../component/tileComponent.ts";
+import { getChunk, TileComponentId } from "../component/tileComponent.ts";
 import type { Entity } from "../entity/entity.ts";
+import { getChunkBounds, type TileChunk } from "../map/chunk.ts";
 import { generateSpawnPoints } from "../map/item/vegetation.ts";
 import { animalPrefab } from "../prefab/animalPrefab.ts";
 
@@ -35,21 +36,18 @@ export function createAnimalSystem(
 ): EcsSystem {
     return {
         onUpdate: (root: Entity) => {
-            const volumes = root
-                .requireEcsComponent(TileComponentId)
-                .volume.values();
-
+            const tiles = root.requireEcsComponent(TileComponentId);
             const chunkMap =
                 root.requireEcsComponent(ChunkMapComponentId).chunkMap;
 
-            for (const volume of volumes) {
+            for (const volume of tiles.volume.values()) {
                 const nativeAnimals = animalsForBiome(volume.type);
                 if (nativeAnimals.length === 0) {
                     continue;
                 }
 
-                for (const chunk of volume.chunks) {
-                    if (chunkHasAnimal(chunkMap, chunk)) {
+                for (const chunkPosition of volume.chunks) {
+                    if (chunkHasAnimal(chunkMap, chunkPosition)) {
                         continue;
                     }
 
@@ -57,6 +55,10 @@ export function createAnimalSystem(
                         continue;
                     }
 
+                    const chunk = getChunk(tiles, chunkPosition);
+                    if (!chunk) {
+                        continue;
+                    }
                     spawnAnimal(root, chunkMap, chunk, nativeAnimals, random);
                 }
             }
@@ -80,11 +82,16 @@ function chunkHasAnimal(chunkMap: ChunkMap, chunk: Point): boolean {
 function spawnAnimal(
     root: Entity,
     chunkMap: ChunkMap,
-    chunk: Point,
+    chunk: TileChunk,
     nativeAnimals: readonly Animal[],
     random: () => number,
 ): void {
-    const [spawnPosition] = generateSpawnPoints(1, chunk, chunkMap);
+    const [spawnPosition] = generateSpawnPoints(
+        1,
+        chunk,
+        getChunkBounds({ x: chunk.chunkX, y: chunk.chunkY }),
+        chunkMap,
+    );
     if (!spawnPosition) {
         return;
     }

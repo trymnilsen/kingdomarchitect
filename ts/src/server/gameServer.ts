@@ -23,11 +23,7 @@ import {
 import type { GameCommand } from "./message/gameCommand.ts";
 import { createMessageEmitterComponent } from "../game/component/messageEmitterComponent.ts";
 import { createGameTimeComponent } from "../game/component/gameTimeComponent.ts";
-import {
-    DiscoverTileGameMessageType,
-    type DiscoverTileGameMessage,
-    type GameMessage,
-} from "./message/gameMessage.ts";
+import { type GameMessage } from "./message/gameMessage.ts";
 import { createCommandSystem } from "../game/system/commandSystem.ts";
 import { createEffectSystem } from "../game/system/effectSystem.ts";
 import { createEffectExecutorMap } from "../data/effect/effectExecutorRegistry.ts";
@@ -42,7 +38,6 @@ import type { Entity } from "../game/entity/entity.ts";
 import type { SerializedWorldMeta } from "./persistence/serializedWorldMeta.ts";
 import { TileComponentId } from "../game/component/tileComponent.ts";
 import { WorldDiscoveryComponentId } from "../game/component/worldDiscoveryComponent.ts";
-import { getPlayerDiscoveryData } from "./message/playerDiscoveryData.ts";
 import { ToggleableCallback } from "../common/toggleableCallback.ts";
 import type { MessageRouter } from "./messageRouter.ts";
 import {

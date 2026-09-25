@@ -1,7 +1,7 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
 import { generateChunk } from "../../../src/game/map/chunkGenerator.ts";
-import { ChunkSize } from "../../../src/game/map/chunk.ts";
+import { ChunkSize, createLandTerrain } from "../../../src/game/map/chunk.ts";
 import type { Volume } from "../../../src/game/map/volume.ts";
 import {
     TileComponentId,
@@ -36,7 +36,12 @@ describe("generateChunk", () => {
         const { root } = createMinimalWorld();
         const tiles = root.requireEcsComponent(TileComponentId);
         const volume = startVolume(2);
-        setChunk(tiles, { chunkX: 0, chunkY: 0, volume });
+        setChunk(tiles, {
+            chunkX: 0,
+            chunkY: 0,
+            volume,
+            terrain: createLandTerrain(),
+        });
 
         const generated = generateChunk(root, { x: 1, y: 0 });
 
@@ -55,7 +60,12 @@ describe("generateChunk", () => {
         const { root } = createMinimalWorld();
         const tiles = root.requireEcsComponent(TileComponentId);
         const volume = startVolume(1);
-        setChunk(tiles, { chunkX: 0, chunkY: 0, volume });
+        setChunk(tiles, {
+            chunkX: 0,
+            chunkY: 0,
+            volume,
+            terrain: createLandTerrain(),
+        });
 
         const generated = generateChunk(root, { x: 1, y: 0 });
 

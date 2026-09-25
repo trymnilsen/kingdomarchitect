@@ -1,7 +1,17 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
-import { placeSettlement } from "../../../../src/game/map/item/settlement.ts";
-import { ChunkSize, getChunkBounds } from "../../../../src/game/map/chunk.ts";
+import {
+    campAnchor,
+    placeSettlement,
+} from "../../../../src/game/map/item/settlement.ts";
+import {
+    ChunkSize,
+    createLandTerrain,
+    getChunkBounds,
+    terrainIndex,
+} from "../../../../src/game/map/chunk.ts";
+import { Terrain } from "../../../../src/game/map/terrain.ts";
+import { KingdomComponentId } from "../../../../src/game/component/kingdomComponent.ts";
 import {
     ChunkMapComponentId,
     getEntitiesAt,
@@ -21,8 +31,10 @@ import {
 
 const chunkPosition = { x: 1, y: 1 };
 const bounds = getChunkBounds(chunkPosition);
-// The preferred camp anchor: campAnchor (4,3) offset by the chunk origin.
-const preferredAnchor = { x: bounds.x1 + 4, y: bounds.y1 + 3 };
+const preferredAnchor = {
+    x: bounds.x1 + campAnchor.x,
+    y: bounds.y1 + campAnchor.y,
+};
 
 function createWorldWithChunk(): { root: Entity; chunkEntity: Entity } {
     const { root } = createMinimalWorld({ minChunk: 0, maxChunk: 1 });
@@ -54,7 +66,11 @@ function findCamp(root: Entity): Entity {
 describe("placeSettlement", () => {
     it("places the camp at the preferred anchor in an empty chunk", () => {
         const { root, chunkEntity } = createWorldWithChunk();
-        const chunk = { chunkX: chunkPosition.x, chunkY: chunkPosition.y };
+        const chunk = {
+            chunkX: chunkPosition.x,
+            chunkY: chunkPosition.y,
+            terrain: createLandTerrain(),
+        };
 
         placeSettlement(chunk, chunkEntity);
 
@@ -70,7 +86,11 @@ describe("placeSettlement", () => {
         const grass = resourcePrefab(grassResource);
         chunkEntity.addChild(grass);
         grass.worldPosition = preferredAnchor;
-        const chunk = { chunkX: chunkPosition.x, chunkY: chunkPosition.y };
+        const chunk = {
+            chunkX: chunkPosition.x,
+            chunkY: chunkPosition.y,
+            terrain: createLandTerrain(),
+        };
 
         placeSettlement(chunk, chunkEntity);
 
@@ -91,7 +111,11 @@ describe("placeSettlement", () => {
     it("shifts the camp to a free footprint when the anchor is occupied", () => {
         const { root, chunkEntity } = createWorldWithChunk();
         addTreeAt(chunkEntity, preferredAnchor);
-        const chunk = { chunkX: chunkPosition.x, chunkY: chunkPosition.y };
+        const chunk = {
+            chunkX: chunkPosition.x,
+            chunkY: chunkPosition.y,
+            terrain: createLandTerrain(),
+        };
 
         placeSettlement(chunk, chunkEntity);
 
@@ -121,7 +145,7 @@ describe("placeSettlement", () => {
         assertTransformsConsistent(root);
     });
 
-    it("claims the preferred anchor and removes occupants when no tile is free", () => {
+    it("clears the occupants at the preferred anchor when no tile is free", () => {
         const { root, chunkEntity } = createWorldWithChunk();
         const trees = new Map<string, Entity>();
         for (let x = bounds.x1; x <= bounds.x2; x++) {
@@ -129,7 +153,11 @@ describe("placeSettlement", () => {
                 trees.set(`${x},${y}`, addTreeAt(chunkEntity, { x, y }));
             }
         }
-        const chunk = { chunkX: chunkPosition.x, chunkY: chunkPosition.y };
+        const chunk = {
+            chunkX: chunkPosition.x,
+            chunkY: chunkPosition.y,
+            terrain: createLandTerrain(),
+        };
 
         placeSettlement(chunk, chunkEntity);
 
@@ -137,7 +165,7 @@ describe("placeSettlement", () => {
         assert.deepStrictEqual(
             camp.worldPosition,
             preferredAnchor,
-            "a camp must always be placed, falling back to the preferred anchor",
+            "with land everywhere the closest clearable spot is the anchor itself",
         );
 
         // The occupants of the claimed footprint are removed. Everything
@@ -158,4 +186,91 @@ describe("placeSettlement", () => {
         }
         assertChunkMapMatchesTree(root);
     });
+
+    it("clears room only on buildable terrain", () => {
+        const { root, chunkEntity } = createWorldWithChunk();
+        const trees = new Map<string, Entity>();
+        for (let x = bounds.x1; x <= bounds.x2; x++) {
+            for (let y = bounds.y1; y <= bounds.y2; y++) {
+                trees.set(`${x},${y}`, addTreeAt(chunkEntity, { x, y }));
+            }
+        }
+        const landTiles = [
+            { x: 1, y: 6 },
+            { x: 2, y: 6 },
+        ];
+        const chunk = {
+            chunkX: chunkPosition.x,
+            chunkY: chunkPosition.y,
+            terrain: terrainWithLandAt(landTiles),
+        };
+
+        placeSettlement(chunk, chunkEntity);
+
+        const camp = findCamp(root);
+        const campTiles = camp.children.map((member) => ({
+            x: member.worldPosition.x - bounds.x1,
+            y: member.worldPosition.y - bounds.y1,
+        }));
+        assert.deepStrictEqual(sortPoints(campTiles), sortPoints(landTiles));
+        for (const tile of landTiles) {
+            const tree = trees.get(
+                `${bounds.x1 + tile.x},${bounds.y1 + tile.y}`,
+            )!;
+            assert.ok(
+                !chunkEntity.children.includes(tree),
+                `tree at local ${tile.x},${tile.y} should have been cleared`,
+            );
+        }
+        assert.ok(
+            chunkEntity.children.includes(trees.get(preferredAnchorKey)!),
+            "trees outside the camp footprint are left standing",
+        );
+        assertChunkMapMatchesTree(root);
+    });
+
+    it("places no camp when no two neighbouring tiles are buildable", () => {
+        const { root, chunkEntity } = createWorldWithChunk();
+        const chunk = {
+            chunkX: chunkPosition.x,
+            chunkY: chunkPosition.y,
+            terrain: terrainWithLandAt([
+                { x: 1, y: 1 },
+                { x: 4, y: 3 },
+                { x: 6, y: 6 },
+            ]),
+        };
+
+        placeSettlement(chunk, chunkEntity);
+
+        assert.strictEqual(root.queryComponents(GoblinCampComponentId).size, 0);
+        assert.strictEqual(
+            chunkEntity.getEcsComponent(KingdomComponentId),
+            null,
+            "a chunk without a camp does not become a goblin kingdom",
+        );
+    });
 });
+
+const preferredAnchorKey = `${preferredAnchor.x},${preferredAnchor.y}`;
+
+function terrainWithLandAt(landTiles: { x: number; y: number }[]): Terrain[] {
+    const terrain = createLandTerrain();
+    for (let y = 0; y < ChunkSize; y++) {
+        for (let x = 0; x < ChunkSize; x++) {
+            if (y % 2 === 0) {
+                terrain[terrainIndex(x, y)] = Terrain.Water;
+            } else {
+                terrain[terrainIndex(x, y)] = Terrain.Ice;
+            }
+        }
+    }
+    for (const tile of landTiles) {
+        terrain[terrainIndex(tile.x, tile.y)] = Terrain.Land;
+    }
+    return terrain;
+}
+
+function sortPoints(points: { x: number; y: number }[]) {
+    return [...points].sort((a, b) => a.x - b.x || a.y - b.y);
+}

@@ -8,7 +8,7 @@ import {
 import type { BiomeType } from "../../../src/game/map/biome.ts";
 import type { NaturalResource } from "../../../src/data/inventory/items/naturalResource.ts";
 import { resourcePrefab } from "../../../src/game/prefab/resourcePrefab.ts";
-import { testVolume } from "../testWorld.ts";
+import { addGroundCovering, testVolume } from "../testWorld.ts";
 import { createChunkMapComponent } from "../../../src/game/component/chunkMapComponent.ts";
 import { createPathfindingGraphComponent } from "../../../src/game/component/pathfindingGraphComponent.ts";
 import { createLazyGraphFromRootNode } from "../../../src/game/map/path/graph/generateGraph.ts";
@@ -26,7 +26,6 @@ import {
     createJobQueueComponent,
     addJob,
 } from "../../../src/game/component/jobQueueComponent.ts";
-import { createMessageEmitterComponent } from "../../../src/game/component/messageEmitterComponent.ts";
 import { createWorldDiscoveryComponent } from "../../../src/game/component/worldDiscoveryComponent.ts";
 import { createBehaviorSystem } from "../../../src/game/behavior/systems/behaviorSystem.ts";
 import { createBehaviorResolver } from "../../../src/game/behavior/behaviorResolver.ts";
@@ -70,13 +69,9 @@ export class ScenarioHarness {
         this.ecsWorld.addSystem(chunkMapSystem);
         this.root = this.ecsWorld.root;
 
-        // Set up tiles covering a reasonable play area (x=8..31, y=8..23)
+        // Set up ground covering at least the play area x=8..39, y=8..31
         const tileComponent = createTileComponent();
-        for (let cx = 1; cx <= 4; cx++) {
-            for (let cy = 1; cy <= 3; cy++) {
-                setChunk(tileComponent, { chunkX: cx, chunkY: cy });
-            }
-        }
+        addGroundCovering(tileComponent, { x1: 8, y1: 8, x2: 39, y2: 31 });
         this.root.setEcsComponent(tileComponent);
         this.root.setEcsComponent(createChunkMapComponent());
         this.root.setEcsComponent(
@@ -87,7 +82,6 @@ export class ScenarioHarness {
 
         this.root.setEcsComponent(createJobQueueComponent());
         // Required by discoverAfterMovement when entities have VisibilityComponent
-        this.root.setEcsComponent(createMessageEmitterComponent(() => {}));
         this.root.setEcsComponent(createWorldDiscoveryComponent());
         // Behaviors read the current tick through the root, mirroring how the
         // game server exposes its GameTime instance. The source reads the

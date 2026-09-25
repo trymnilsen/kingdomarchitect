@@ -2,11 +2,7 @@ import type { PixelColor } from "./pixels.ts";
 import { type PNGWithMetadata, PNG } from "pngjs";
 import { readFileSync } from "fs";
 
-export function getPixelColor(
-    png: PNGWithMetadata,
-    x: number,
-    y: number,
-): PixelColor {
+export function getPixelColor(png: PNG, x: number, y: number): PixelColor {
     const idx = (png.width * y + x) << 2;
     const r = png.data[idx];
     const g = png.data[idx + 1];

@@ -23,7 +23,7 @@ import {
     getJobsTargetingEntity,
     getJobTargetPosition,
 } from "../../../job/jobQuery.ts";
-import { discoveryFootprintOffsets } from "../../../map/discoverFootprint.ts";
+import { getVisibilityOffsets } from "../../../map/discoverFootprint.ts";
 import { getDiamondPoints } from "../../../map/item/placement.ts";
 import { TileSize, HalfTileSize } from "../../../map/tile.ts";
 import { SelectedEntityItem } from "../../selection/selectedEntityItem.ts";
@@ -104,7 +104,7 @@ function drawDiscoveryRange(context: RenderScope, entity: Entity) {
     }
     const tiles = offsetPatternWithPoint(
         entity.worldPosition,
-        discoveryFootprintOffsets(entity),
+        getVisibilityOffsets(entity),
     );
     for (const tile of tiles) {
         context.drawRectangle({

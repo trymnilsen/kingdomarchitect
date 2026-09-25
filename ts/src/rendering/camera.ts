@@ -1,4 +1,3 @@
-import { zeroBounds } from "../common/bounds.ts";
 import type { Bounds } from "../common/bounds.ts";
 import { addPoint, multiplyPoint, subtractPoint } from "../common/point.ts";
 import type { Point } from "../common/point.ts";
@@ -8,30 +7,23 @@ export class Camera {
     private _position: Point;
     private _halfWindowSize: Point;
     private _windowSize: Point;
-    private _viewPortIsDirty: boolean = true;
-    private _tilespaceViewport: Bounds = zeroBounds();
 
     get position(): Point {
         return this._position;
     }
 
     get tileSpaceViewPort(): Bounds {
-        if (this._viewPortIsDirty) {
-            const offsetCameraPosition = subtractPoint(
-                this._position,
-                this._halfWindowSize,
-            );
-            const tilespace = this.worldSpaceToTileSpace(offsetCameraPosition);
-            this._tilespaceViewport = {
-                x1: tilespace.x,
-                y1: tilespace.y,
-                x2: tilespace.x + Math.floor(this._windowSize.x / TileSize),
-                y2: tilespace.y + Math.floor(this._windowSize.y / TileSize),
-            };
-            this._viewPortIsDirty = false;
-        }
-
-        return this._tilespaceViewport;
+        const offsetCameraPosition = subtractPoint(
+            this._position,
+            this._halfWindowSize,
+        );
+        const tilespace = this.worldSpaceToTileSpace(offsetCameraPosition);
+        return {
+            x1: tilespace.x,
+            y1: tilespace.y,
+            x2: tilespace.x + Math.floor(this._windowSize.x / TileSize),
+            y2: tilespace.y + Math.floor(this._windowSize.y / TileSize),
+        };
     }
 
     set position(point: Point) {
@@ -39,7 +31,6 @@ export class Camera {
             x: Math.floor(point.x),
             y: Math.floor(point.y),
         };
-        this._viewPortIsDirty = true;
     }
 
     get windowSize(): Point {

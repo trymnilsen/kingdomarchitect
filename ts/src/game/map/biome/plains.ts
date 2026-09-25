@@ -14,7 +14,7 @@ export function generatePlains(chunk: TileChunk, chunkEntity: Entity) {
         .requireEcsComponent(ChunkMapComponentId);
     const chunkMap = chunkMapComponent.chunkMap;
 
-    placeResource(fixed(16), grassResource, chunk, chunkEntity, chunkMap);
-    placeResource(random(3), stoneResource, chunk, chunkEntity, chunkMap);
-    placeResource(random(3), flowerResource, chunk, chunkEntity, chunkMap);
+    placeResource(fixed(64), grassResource, chunk, chunkEntity, chunkMap);
+    placeResource(random(12), stoneResource, chunk, chunkEntity, chunkMap);
+    placeResource(random(12), flowerResource, chunk, chunkEntity, chunkMap);
 }

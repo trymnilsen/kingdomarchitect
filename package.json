@@ -14,6 +14,7 @@
         "serve": "node ts/tool/dev-server.ts",
         "spritepack": "tsc && node build/tool/spritepack/spritePack.js && npm run build",
         "characterpack": "tsc && node build/tool/characterpack/characterPack.js && npm run build",
+        "pondpack": "node ts/tool/pondpack/pondPack.ts",
         "test": "node --test --test-reporter=dot 'ts/test/**/*.test.ts'",
         "format": "prettier --write \"ts/**/*.ts\"",
         "check-format": "prettier --check \"ts/**/*.ts\""

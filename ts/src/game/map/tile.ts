@@ -1,5 +1,6 @@
 import { nameof } from "../../common/nameof.ts";
 import type { BiomeType } from "./biome.ts";
+import type { Terrain } from "./terrain.ts";
 
 export function getTileId(x: number, y: number) {
     return `x${x}y${y}`;
@@ -11,7 +12,8 @@ export const HalfTileSize = TileSize / 2;
 export type GroundTile = {
     tileX: number;
     tileY: number;
-    type?: BiomeType;
+    biome?: BiomeType;
+    terrain: Terrain;
 };
 
 export function isTile(value: unknown): value is GroundTile {

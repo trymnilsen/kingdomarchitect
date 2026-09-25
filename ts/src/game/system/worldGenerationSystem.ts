@@ -8,32 +8,25 @@ import {
 import {
     adjacentPoint,
     adjacentPoints,
+    encodePosition,
     multiplyPoint,
     pointEquals,
     type Point,
 } from "../../common/point.ts";
 import {
-    DiscoverTileGameMessageType,
-    type GameMessage,
-} from "../../server/message/gameMessage.ts";
-import { MessageEmitterComponentId } from "../component/messageEmitterComponent.ts";
-import {
     createTileComponent,
-    getChunk,
     hasChunk,
     setChunk,
     TileComponentId,
-    type TileComponent,
 } from "../component/tileComponent.ts";
 import {
     createWorldDiscoveryComponent,
     discoverTile,
-    hasDiscoveredChunkByChunkPosition,
     hasDiscoveredTile,
     WorldDiscoveryComponentId,
-    type WorldDiscoveryComponent,
 } from "../component/worldDiscoveryComponent.ts";
 import { Entity } from "../entity/entity.ts";
+import { createGroundDiscoveredGameEvent } from "../entity/event/groundDiscoveredGameEventData.ts";
 import { getChunkPosition } from "../map/chunk.ts";
 import { generateChunk, type GeneratedChunk } from "../map/chunkGenerator.ts";
 import {
@@ -41,7 +34,6 @@ import {
     placeSettlementIfNoneExists,
 } from "../map/item/settlement.ts";
 import { addInitialPlayerChunk } from "../map/player.ts";
-import type { Volume } from "../map/volume.ts";
 
 export const worldGenerationSystem: EcsSystem = {
     onInit,
@@ -63,23 +55,15 @@ function onInit(root: Entity) {
         log.info("Generating new world");
         const start = addInitialPlayerChunk(root);
         generateInitialChunks(root);
-        const messageEmitter = root.requireEcsComponent(
-            MessageEmitterComponentId,
-        ).emitter;
         const pattern = offsetPatternWithPoint(
             start,
             generateDiamondPattern(16),
         );
-        setDiscoveryForPlayer(root, messageEmitter, "player", pattern);
+        setDiscoveryForPlayer(root, "player", pattern);
     } else {
         log.info("World already exists, skipping generation");
     }
 }
-
-type ChunkToGenerate = {
-    chunkPosition: Point;
-    discoveredPoints: Point[];
-};
 
 /**
  * Generates the initial chunks of a new world: the 3x3 block of chunks around
@@ -129,42 +113,33 @@ function generateInitialChunks(root: Entity) {
     placeSettlement(campChunk.chunk, campChunk.chunkEntity);
 }
 
-/**
- * Sets the discovery status for a player based on a list of discovered points.
- * @param root The root entity of the ECS system.
- * @param effectEmitter Function to emit game effects
- * @param player The ID of the player.
- * @param discoveredPoints An array of points that have been discovered.
- */
 export function setDiscoveryForPlayer(
     root: Entity,
-    messageEmitter: (message: GameMessage) => void,
     player: string,
     discoveredPoints: Point[],
 ) {
     const tileComponent = root.requireEcsComponent(TileComponentId);
     const worldDiscovery = root.requireEcsComponent(WorldDiscoveryComponentId);
 
-    const chunksToGenerate: ChunkToGenerate[] = [];
-    const newPoints: { point: Point; volumeId: string }[] = [];
-    const newVolumesToDiscover: Volume[] = [];
-
+    const newTiles = new Map<number, Point>();
+    const chunksToGenerate = new Map<number, Point>();
     for (const point of discoveredPoints) {
+        if (hasDiscoveredTile(worldDiscovery, player, point)) {
+            continue;
+        }
+        newTiles.set(encodePosition(point.x, point.y), point);
+
         const chunkPosition = getChunkPosition(point.x, point.y);
-        processDiscoveredPoint(
-            point,
-            chunkPosition,
-            tileComponent,
-            worldDiscovery,
-            player,
-            chunksToGenerate,
-            newPoints,
-            newVolumesToDiscover,
-        );
+        if (!hasChunk(tileComponent, chunkPosition)) {
+            chunksToGenerate.set(
+                encodePosition(chunkPosition.x, chunkPosition.y),
+                chunkPosition,
+            );
+        }
     }
 
-    for (const chunkToGenerate of chunksToGenerate) {
-        const generated = generateChunk(root, chunkToGenerate.chunkPosition);
+    for (const chunkPosition of chunksToGenerate.values()) {
+        const generated = generateChunk(root, chunkPosition);
         root.updateComponent(TileComponentId, (component) => {
             setChunk(component, generated.chunk);
         });
@@ -173,24 +148,6 @@ export function setDiscoveryForPlayer(
             generated.chunk,
             generated.chunkEntity,
         );
-        //Check if the volume of the new chunk has been discovered by the
-        //player already, it can either be completely new one or an expanded
-        //volume from a chunk that the player has not discovered yet
-        checkAndAddNewVolume(
-            generated.chunk.volume,
-            worldDiscovery,
-            player,
-            newVolumesToDiscover,
-        );
-        //Add the points that was discovered within this new chunk
-        for (const point of chunkToGenerate.discoveredPoints) {
-            if (!newPoints.find((item) => pointEquals(item.point, point))) {
-                newPoints.push({
-                    point: point,
-                    volumeId: generated.chunk.volume.id,
-                });
-            }
-        }
     }
 
     root.updateComponent(WorldDiscoveryComponentId, (component) => {
@@ -199,91 +156,14 @@ export function setDiscoveryForPlayer(
         }
     });
 
-    messageEmitter({
-        type: DiscoverTileGameMessageType,
-        tiles: newPoints.map((point) => {
-            return { ...point.point, volume: point.volumeId };
-        }),
-        volumes: newVolumesToDiscover,
-    });
-}
-
-/**
- * Processes a single discovered point, determining if a chunk needs generation,
- * if a tile needs to be marked as discovered, or if a new volume needs to be discovered.
- * @param point The discovered point.
- * @param chunkPosition The chunk coordinates of the point.
- * @param tileComponent The TileComponent instance.
- * @param worldDiscovery The WorldDiscoveryComponent instance.
- * @param player The ID of the player.
- * @param chunksToGenerate Array to push chunk positions that need generation.
- * @param newPoints Array to push newly discovered tiles with their volume IDs.
- * @param newVolumesToDiscover Array to push newly discovered volumes.
- */
-function processDiscoveredPoint(
-    point: Point,
-    chunkPosition: Point,
-    tileComponent: TileComponent,
-    worldDiscovery: WorldDiscoveryComponent,
-    player: string,
-    chunksToGenerate: ChunkToGenerate[],
-    newPoints: { point: Point; volumeId: string }[],
-    newVolumesToDiscover: Volume[],
-) {
-    //If there is no chunk at this position we should add it to the list of
-    //chunks to generate
-    if (!hasChunk(tileComponent, chunkPosition)) {
-        let existingChunkToGenerate = chunksToGenerate.find((item) =>
-            pointEquals(item.chunkPosition, chunkPosition),
-        );
-        if (!existingChunkToGenerate) {
-            existingChunkToGenerate = {
-                chunkPosition: chunkPosition,
-                discoveredPoints: [],
-            };
-            chunksToGenerate.push(existingChunkToGenerate);
-        }
-
-        existingChunkToGenerate.discoveredPoints.push(point);
+    if (newTiles.size === 0 && chunksToGenerate.size === 0) {
         return;
     }
-
-    if (!hasDiscoveredTile(worldDiscovery, player, point)) {
-        //If the chunk exists, check if its discovered already, passing a point
-        //that is already discovered should be a no-op
-        const chunk = getChunk(tileComponent, chunkPosition);
-        if (chunk?.volume) {
-            newPoints.push({
-                point,
-                volumeId: chunk.volume.id,
-            });
-            checkAndAddNewVolume(
-                chunk.volume,
-                worldDiscovery,
-                player,
-                newVolumesToDiscover,
-            );
-        }
-    }
-}
-
-function checkAndAddNewVolume(
-    volume: Volume,
-    worldDiscovery: WorldDiscoveryComponent,
-    player: string,
-    newVolumesToDiscover: Volume[],
-) {
-    const hasDiscoveredVolume = volume.chunks.some((chunkInVolumePosition) =>
-        hasDiscoveredChunkByChunkPosition(
-            worldDiscovery,
+    root.bubbleEvent(
+        createGroundDiscoveredGameEvent(root, {
             player,
-            chunkInVolumePosition,
-        ),
+            discoveredTiles: [...newTiles.values()],
+            generatedChunks: [...chunksToGenerate.values()],
+        }),
     );
-    if (
-        !hasDiscoveredVolume &&
-        !newVolumesToDiscover.some((v) => v.id === volume.id)
-    ) {
-        newVolumesToDiscover.push(volume);
-    }
 }

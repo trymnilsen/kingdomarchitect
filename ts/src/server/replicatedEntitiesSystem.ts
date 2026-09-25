@@ -1,20 +1,32 @@
+import type { Point } from "../common/point.ts";
 import type { EcsSystem } from "../ecs/ecsSystem.ts";
 import type { ComponentID, Components } from "../game/component/component.ts";
 import { DayComponentId } from "../game/component/dayComponent.ts";
-import { TileComponentId } from "../game/component/tileComponent.ts";
 import { VisibilityMapComponentId } from "../game/component/visibilityMapComponent.ts";
 import { WorldDiscoveryComponentId } from "../game/component/worldDiscoveryComponent.ts";
 import { Entity } from "../game/entity/entity.ts";
 import { diffComponents, isDeltaSmaller } from "./delta/diffComponent.ts";
 import {
+    getChunk,
+    TileComponentId,
+    type TileComponent,
+} from "../game/component/tileComponent.ts";
+import {
+    isGroundDiscoveredGameEvent,
+    type GroundDiscoveredGameEventData,
+} from "../game/entity/event/groundDiscoveredGameEventData.ts";
+import type { TileChunk } from "../game/map/chunk.ts";
+import {
     EventGameMessageType,
+    GroundUpdateGameMessageType,
     WorldStateMessageType,
     type GameMessage,
-    type ReplicatedChunkData,
+    type GroundUpdateGameMessage,
     type ReplicatedEntityData,
     type WorldStateGameMessage,
 } from "./message/gameMessage.ts";
-import { getPlayerDiscoveryData } from "./message/playerDiscoveryData.ts";
+import { buildGroundUpdate } from "./message/groundUpdate.ts";
+import { getPlayerDiscoveredTiles } from "./message/playerDiscoveredTiles.ts";
 
 /**
  * Server-side system that listens for entity tree mutations and forwards
@@ -162,7 +174,13 @@ export function makeReplicatedEntitiesSystem(
                     entity: event.target.id,
                 });
             },
-            game: (_root, event) => {
+            game: (root, event) => {
+                if (isGroundDiscoveredGameEvent(event)) {
+                    postMessage(
+                        buildGroundUpdateMessage(root, event.data.payload),
+                    );
+                    return;
+                }
                 postMessage({
                     type: EventGameMessageType,
                     sourceEntityId: event.source.id,
@@ -174,6 +192,34 @@ export function makeReplicatedEntitiesSystem(
     };
 }
 
+function buildGroundUpdateMessage(
+    root: Entity,
+    discovery: GroundDiscoveredGameEventData,
+): GroundUpdateGameMessage {
+    const tileComponent = root.requireEcsComponent(TileComponentId);
+    return {
+        type: GroundUpdateGameMessageType,
+        ground: buildGroundUpdate(
+            getChunks(tileComponent, discovery.generatedChunks),
+            discovery.discoveredTiles,
+        ),
+    };
+}
+
+function getChunks(
+    tileComponent: TileComponent,
+    chunkPositions: readonly Point[],
+): TileChunk[] {
+    const chunks: TileChunk[] = [];
+    for (const position of chunkPositions) {
+        const chunk = getChunk(tileComponent, position);
+        if (chunk) {
+            chunks.push(chunk);
+        }
+    }
+    return chunks;
+}
+
 export function buildWorldStateMessage(
     rootEntity: Entity,
     player: string,
@@ -182,30 +228,14 @@ export function buildWorldStateMessage(
     // Build replicated data for all root children
     const rootChildren = buildChildrenData(rootEntity);
 
-    // Extract discovered tiles for this player
     const tileComponent = rootEntity.requireEcsComponent(TileComponentId);
     const discoveryComponent = rootEntity.requireEcsComponent(
         WorldDiscoveryComponentId,
     );
-
     const playerDiscovery = discoveryComponent.discoveriesByUser.get(player);
-    const discoveryData =
-        playerDiscovery &&
-        getPlayerDiscoveryData(tileComponent, playerDiscovery);
-
-    // All generated chunks are sent, not just discovered ones: entities are
-    // replicated regardless of discovery, so the client needs the ground they
-    // stand on as well. Discovery only decides what is rendered.
-    const chunks: ReplicatedChunkData[] = [];
-    for (const chunk of tileComponent.chunks.values()) {
-        if (!chunk.volume) {
-            continue;
-        }
-        chunks.push({
-            chunkX: chunk.chunkX,
-            chunkY: chunk.chunkY,
-            volume: chunk.volume.id,
-        });
+    let discoveredTiles: Point[] = [];
+    if (playerDiscovery) {
+        discoveredTiles = getPlayerDiscoveredTiles(playerDiscovery);
     }
 
     const rootComponentSnapshot: Components[] = [];
@@ -219,9 +249,11 @@ export function buildWorldStateMessage(
     return {
         type: WorldStateMessageType,
         rootChildren,
-        chunks,
-        discoveredTiles: discoveryData?.tiles ?? [],
-        volumes: [...tileComponent.volume.values()],
+        // all chunks and not just discovered since entities replicate regardless
+        ground: buildGroundUpdate(
+            tileComponent.chunks.values(),
+            discoveredTiles,
+        ),
         serverTick,
         replicatedRootComponents: rootComponentSnapshot,
     };

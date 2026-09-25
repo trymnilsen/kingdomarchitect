@@ -16,27 +16,18 @@ import { isDecorativeResource } from "../../../data/inventory/items/naturalResou
 import { clearDecorativeResourcesAt } from "../../building/clearDecorativeResources.ts";
 import { goblinCampPrefab } from "../../prefab/goblinCampPrefab.ts";
 import { findClosestAvailablePosition } from "../query/closestPositionQuery.ts";
-import { ChunkSize, getChunkBounds, type TileChunk } from "../chunk.ts";
+import {
+    ChunkSize,
+    getChunkBounds,
+    getTerrainAtWorldPosition,
+    type GeneratedTileChunk,
+    type TileChunk,
+} from "../chunk.ts";
+import { isBuildableTerrain } from "../terrain.ts";
 
-/**
- * The preferred camp anchor within a chunk, roughly its center.
- */
-const campAnchor: Point = { x: 4, y: 3 };
+export const campAnchor: Point = { x: ChunkSize / 2, y: ChunkSize / 2 - 1 };
 
-/**
- * Places a goblin settlement in a chunk.
- * Creates a camp entity with an initial goblin.
- * The goblin must build their own fire and other structures.
- *
- * The camp searches for unoccupied tiles near the chunk center, so placement
- * is valid no matter what was generated in the chunk before it. In the
- * degenerate case where no free spot exists, the camp claims the center
- * tiles and removes whatever occupies them. A camp must always be placed,
- * the single-camp invariant and respawn flow depend on it.
- */
 export function placeSettlement(chunk: TileChunk, chunkEntity: Entity) {
-    chunkEntity.setEcsComponent(createKingdomComponent(KingdomType.Goblin));
-
     const { camp } = goblinCampPrefab();
     // The camp's children (campfire and goblin) define the tiles it needs, so
     // the layout is read off the prefab instead of restated here.
@@ -45,24 +36,26 @@ export function placeSettlement(chunk: TileChunk, chunkEntity: Entity) {
     const root = chunkEntity.getRootEntity();
     const chunkMap = root.requireEcsComponent(ChunkMapComponentId).chunkMap;
     const bounds = getChunkBounds({ x: chunk.chunkX, y: chunk.chunkY });
-    // Decorative resources (grass) don't claim a tile. They are cleared
-    // when the camp is placed on top of them.
-    const isTileFree = (tile: Point) =>
+    const isBuildable = (tile: Point) =>
+        isBuildableTerrain(getTerrainAtWorldPosition(chunk, tile.x, tile.y));
+    const isFree = (tile: Point) =>
+        isBuildable(tile) &&
         getEntitiesAt(chunkMap, tile.x, tile.y).every((occupant) => {
             const resource = occupant.getEcsComponent(ResourceComponentId);
             return resource && isDecorativeResource(resource.resourceId);
         });
-    const isFootprintFree = (anchor: Point) =>
-        footprint.every((offset) => {
-            const tile = addPoint(anchor, offset);
-            return (
-                tile.x >= bounds.x1 &&
-                tile.x <= bounds.x2 &&
-                tile.y >= bounds.y1 &&
-                tile.y <= bounds.y2 &&
-                isTileFree(tile)
-            );
-        });
+    const footprintFits =
+        (tileAccepts: (tile: Point) => boolean) => (anchor: Point) =>
+            footprint.every((offset) => {
+                const tile = addPoint(anchor, offset);
+                return (
+                    tile.x >= bounds.x1 &&
+                    tile.x <= bounds.x2 &&
+                    tile.y >= bounds.y1 &&
+                    tile.y <= bounds.y2 &&
+                    tileAccepts(tile)
+                );
+            });
 
     const preferredAnchor = {
         x: bounds.x1 + campAnchor.x,
@@ -71,21 +64,35 @@ export function placeSettlement(chunk: TileChunk, chunkEntity: Entity) {
     // The radius is required: without it the search never terminates when
     // every candidate is rejected. ChunkSize * 2 covers the chunk from any
     // anchor with margin.
-    const anchor = findClosestAvailablePosition(
+    const searchRadius = ChunkSize * 2;
+    let campPosition = findClosestAvailablePosition(
         root,
         preferredAnchor,
-        isFootprintFree,
-        ChunkSize * 2,
+        footprintFits(isFree),
+        searchRadius,
     );
-    if (!anchor) {
-        clearTiles(chunkMap, preferredAnchor, footprint);
+    if (!campPosition) {
+        campPosition = findClosestAvailablePosition(
+            root,
+            preferredAnchor,
+            footprintFits(isBuildable),
+            searchRadius,
+        );
+        if (!campPosition) {
+            log.warn("No buildable room for a goblin camp, skipping chunk", {
+                chunkX: chunk.chunkX,
+                chunkY: chunk.chunkY,
+            });
+            return;
+        }
+        clearOccupants(chunkMap, campPosition, footprint);
     }
-    const campPosition = anchor ?? preferredAnchor;
 
     for (const offset of footprint) {
         clearDecorativeResourcesAt(root, addPoint(campPosition, offset));
     }
 
+    chunkEntity.setEcsComponent(createKingdomComponent(KingdomType.Goblin));
     chunkEntity.addChild(camp);
     camp.position = {
         x: campPosition.x - bounds.x1,
@@ -93,12 +100,7 @@ export function placeSettlement(chunk: TileChunk, chunkEntity: Entity) {
     };
 }
 
-/**
- * Removes every entity occupying the given footprint, making room for a camp
- * in a chunk with no free tiles. Last resort for the unreachable-in-practice
- * case where the free-tile search fails.
- */
-function clearTiles(chunkMap: ChunkMap, anchor: Point, footprint: Point[]) {
+function clearOccupants(chunkMap: ChunkMap, anchor: Point, footprint: Point[]) {
     for (const offset of footprint) {
         const tile = addPoint(anchor, offset);
         for (const occupant of getEntitiesAt(chunkMap, tile.x, tile.y)) {
@@ -122,7 +124,7 @@ function clearTiles(chunkMap: ChunkMap, anchor: Point, footprint: Point[]) {
  */
 export function placeSettlementIfNoneExists(
     rootEntity: Entity,
-    chunk: Required<TileChunk>,
+    chunk: GeneratedTileChunk,
     chunkEntity: Entity,
 ) {
     const goblinCamps = rootEntity.queryComponents(GoblinCampComponentId);

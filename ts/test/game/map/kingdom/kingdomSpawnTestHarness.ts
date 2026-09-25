@@ -8,7 +8,10 @@ import {
     createKingdomComponent,
     KingdomType,
 } from "../../../../src/game/component/kingdomComponent.ts";
-import { ChunkSize } from "../../../../src/game/map/chunk.ts";
+import {
+    ChunkSize,
+    createLandTerrain,
+} from "../../../../src/game/map/chunk.ts";
 import type { Volume } from "../../../../src/game/map/volume.ts";
 import type { Point } from "../../../../src/common/point.ts";
 
@@ -38,7 +41,12 @@ export class KingdomSpawnTestHarness {
     }
 
     addChunk(chunkX: number, chunkY: number, volume?: Volume): void {
-        setChunk(this._tileComponent, { chunkX, chunkY, volume });
+        setChunk(this._tileComponent, {
+            chunkX,
+            chunkY,
+            volume,
+            terrain: createLandTerrain(),
+        });
     }
 
     createVolume(

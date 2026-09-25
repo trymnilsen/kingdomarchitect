@@ -7,6 +7,7 @@ import { ChunkMapComponentId } from "../../component/chunkMapComponent.ts";
 import { Entity } from "../../entity/entity.ts";
 import type { TileChunk } from "../chunk.ts";
 import { placeRocks } from "../item/rocks.ts";
+import { placeBiomePonds } from "./placePonds.ts";
 import { placeBiomeTrees, placeResource, random } from "./placeResource.ts";
 
 export function generateForrest(chunk: TileChunk, chunkEntity: Entity) {
@@ -15,10 +16,11 @@ export function generateForrest(chunk: TileChunk, chunkEntity: Entity) {
         .requireEcsComponent(ChunkMapComponentId);
     const chunkMap = chunkMapComponent.chunkMap;
 
+    placeBiomePonds("forrest", chunk, Math.random);
     placeBiomeTrees("forrest", chunk, chunkEntity, chunkMap);
-    placeResource(random(3), stoneResource, chunk, chunkEntity, chunkMap);
-    placeResource(random(3), berryBushResource, chunk, chunkEntity, chunkMap);
-    placeResource(random(2), moonpetalResource, chunk, chunkEntity, chunkMap);
+    placeResource(random(12), stoneResource, chunk, chunkEntity, chunkMap);
+    placeResource(random(12), berryBushResource, chunk, chunkEntity, chunkMap);
+    placeResource(random(8), moonpetalResource, chunk, chunkEntity, chunkMap);
 
     placeRocks(chunk, chunkEntity);
 }

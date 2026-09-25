@@ -24,11 +24,16 @@ import {
     createTileComponent,
     setChunk,
 } from "../../../src/game/component/tileComponent.ts";
+import { createLandTerrain } from "../../../src/game/map/chunk.ts";
 import { createChunkMapComponent } from "../../../src/game/component/chunkMapComponent.ts";
 
 function setupWorldComponents(root: Entity): void {
     const tileComponent = createTileComponent();
-    setChunk(tileComponent, { chunkX: 0, chunkY: 0 });
+    setChunk(tileComponent, {
+        chunkX: 0,
+        chunkY: 0,
+        terrain: createLandTerrain(),
+    });
     root.setEcsComponent(tileComponent);
     root.setEcsComponent(createChunkMapComponent());
 }

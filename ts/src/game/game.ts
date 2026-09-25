@@ -82,6 +82,10 @@ export class Game {
             }
             handleGameMessage(this.ecsWorld.root, message);
             this.ecsWorld.runGameMessage(message);
+
+            if (message.type === WorldStateMessageType) {
+                this.render(DrawMode.Gesture);
+            }
         });
         this.assetLoader = new AssetLoader();
 
