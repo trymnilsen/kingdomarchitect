@@ -1,3 +1,5 @@
+import type { Entity } from "../entity/entity.ts";
+
 export const KingdomType = {
     Player: 0,
     Npc: 1,
@@ -21,6 +23,11 @@ export function createKingdomComponent(
         type,
         foundedAtTick,
     };
+}
+
+export function belongsToPlayerKingdom(entity: Entity): boolean {
+    const kingdom = entity.getAncestorEcsComponent(KingdomComponentId);
+    return kingdom?.type === KingdomType.Player;
 }
 
 export const KingdomComponentId = "kingdom";

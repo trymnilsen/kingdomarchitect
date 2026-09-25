@@ -38,30 +38,7 @@ export class Entity {
     private _worldPosition: Point = zeroPoint();
     private _entityEvents?: (event: EntityEvent) => void;
     private _ecsComponents = new Map<string, Components>();
-    /**
-     * Lazily-built cache of `queryComponents` results for this entity's subtree,
-     * keyed by component id. A miss runs the `visitChildren` walk once and stores
-     * the resulting map. Subsequent identical queries return the same map without
-     * re-walking. Invalidated by {@link invalidateQueryCache} on the entity events
-     * this entity receives (only membership changes matter, see that method).
-     *
-     * Runtime-only: it is rebuilt from the live tree and is never serialized
-     * (persistence walks `_ecsComponents` and children, not this field). Only
-     * entities actually queried (in practice the root) ever allocate one.
-     */
     private _queryCache?: Map<ComponentID, Map<Entity, Components>>;
-    /**
-     * Lazily-built cache mapping entity id to the entity within this subtree,
-     * built on the first {@link findEntity} miss by one `visitChildren` walk
-     * (the same walk `entityWithId` does) and reused after. Mirrors
-     * {@link _queryCache}: scoped to this entity's subtree, allocated only on
-     * entities actually searched (in practice the root), runtime-only and never
-     * serialized.
-     *
-     * Invalidated wholesale on `child_added` / `child_removed` in
-     * {@link invalidateCaches}; component and transform events leave it valid
-     * because they change neither tree membership nor any entity id.
-     */
     private _idCache?: Map<EntityId, Entity>;
     private _gameTime?: GameTime;
     readonly id: EntityId;
@@ -285,7 +262,12 @@ export class Entity {
             target: entity,
         });
 
-        return removeItem(this._children, entity);
+        const removed = removeItem(this._children, entity);
+        // Detach after the event so listeners still see the entity attached.
+        // A removed entity that kept its parent would keep bubbling component
+        // events into the tree it left, and the query cache would take it back.
+        entity.parent = undefined;
+        return removed;
     }
 
     /**
@@ -346,13 +328,8 @@ export class Entity {
 
     setEcsComponent(ecsComponent: Components & BaseComponent) {
         this._ecsComponents.set(ecsComponent.id, ecsComponent);
-        // component_added carries upsert semantics for the query cache: it is
-        // emitted on both a first add and a replace, and the cache does
-        // `map.set(source, item)` either way, which correctly overwrites a stale
-        // reference on replace. `updateComponent` never reaches here (it mutates
-        // in place), so it never changes a component's reference.
         this.bubbleEvent({
-            id: "component_added",
+            id: "component_updated",
             source: this,
             item: ecsComponent,
         });
@@ -537,29 +514,9 @@ export class Entity {
         this._parent?.bubbleEvent(event);
     }
 
-    /**
-     * Keeps this entity's {@link _queryCache} and {@link _idCache} consistent as
-     * events bubble past it. `bubbleEvent` runs on the source entity and then
-     * every ancestor, so an ancestor whose subtree changed deep below
-     * invalidates its own caches here.
-     *
-     * Only membership changes matter:
-     *  - `component_added` / `component_removed` upsert / delete the one
-     *    (entity → component) entry in the query cache, leaving every other
-     *    cached query intact. The id cache is unaffected (no id changed).
-     *  - `child_added` / `child_removed` can change many component ids and add
-     *    or remove ids, so both caches are dropped and rebuilt lazily. The drop
-     *    matters for `removeChild`, which bubbles before it detaches the child.
-     *    Nothing rebuilds until the next query, and by then the child is gone.
-     *
-     * `component_updated` and `transform` are ignored. `updateComponent` mutates
-     * in place, leaving both the reference and the membership unchanged, and
-     * these two are the per-tick hot events, so reacting to them would thrash
-     * the cache every frame for nothing.
-     */
     private invalidateCaches(event: EntityEvent) {
         switch (event.id) {
-            case "component_added":
+            case "component_updated":
                 this._queryCache
                     ?.get(event.item.id)
                     ?.set(event.source, event.item);

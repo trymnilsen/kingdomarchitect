@@ -1,7 +1,7 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
 import { ScenarioHarness } from "./scenarioHarness.ts";
-import { setDiscoveryForPlayer } from "../../../src/game/system/worldGenerationSystem.ts";
+import { workerPrefab } from "../../../src/game/prefab/workerPrefab.ts";
 import {
     TileComponentId,
     hasChunk,
@@ -37,9 +37,14 @@ const discoveredPoint = {
 
 function discoverChunk(): { harness: ScenarioHarness; chunkEntity: Entity } {
     const harness = new ScenarioHarness();
+    const kingdom = harness.addPlayerKingdom();
+    const worker = workerPrefab("viewer");
+    kingdom.addChild(worker);
+    worker.worldPosition = { x: 20, y: 16 };
     const childrenBefore = new Set(harness.root.children);
 
-    setDiscoveryForPlayer(harness.root, "player", [discoveredPoint]);
+    // Stepping into the ungenerated chunk is what discovers it
+    worker.worldPosition = discoveredPoint;
 
     const newChildren = harness.root.children.filter(
         (child) => !childrenBefore.has(child),

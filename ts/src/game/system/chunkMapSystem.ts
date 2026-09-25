@@ -14,6 +14,18 @@ import type {
     EntityTransformEvent,
 } from "../entity/entityEvent.ts";
 
+export const chunkMapSystem: EcsSystem = {
+    onEntityEvent: {
+        child_added: onEntityAdded,
+        child_removed: onEntityRemoved,
+        transform: onTransform,
+    },
+    onComponent: {
+        updated: { [SpriteComponentId]: onSpriteSet },
+        removed: { [SpriteComponentId]: onSpriteRemoved },
+    },
+};
+
 /**
  * Only entities with a sprite have a physical presence in the world
  * and should be spatially indexed.
@@ -21,24 +33,6 @@ import type {
 function hasSpatialPresence(entity: Entity): boolean {
     return entity.hasComponent(SpriteComponentId);
 }
-
-/**
- * Keeps the ChunkMap spatial index in step with the entity tree. Entities are
- * indexed by world position no matter how deep they sit, so a goblin inside a
- * camp is found by a query over the tiles it stands on.
- *
- * The index is event-driven: it updates on add, remove and transform rather
- * than being rebuilt on a tick.
- */
-export const chunkMapSystem: EcsSystem = {
-    onEntityEvent: {
-        child_added: onEntityAdded,
-        child_removed: onEntityRemoved,
-        transform: onTransform,
-        component_added: onComponentAdded,
-        component_removed: onComponentRemoved,
-    },
-};
 
 /**
  * A moving parent drags its children's world positions with it, so a transform
@@ -79,19 +73,19 @@ function onEntityRemoved(
     unindexHierarchy(chunkMap, entityEvent.target);
 }
 
-function onComponentAdded(rootEntity: Entity, event: ComponentsUpdatedEvent) {
-    if (event.item.id !== SpriteComponentId) {
-        return;
-    }
+function onSpriteSet(
+    rootEntity: Entity,
+    event: ComponentsUpdatedEvent<typeof SpriteComponentId>,
+) {
     const chunkMap =
         rootEntity.requireEcsComponent(ChunkMapComponentId).chunkMap;
     indexEntity(chunkMap, event.source);
 }
 
-function onComponentRemoved(rootEntity: Entity, event: ComponentsUpdatedEvent) {
-    if (event.item.id !== SpriteComponentId) {
-        return;
-    }
+function onSpriteRemoved(
+    rootEntity: Entity,
+    event: ComponentsUpdatedEvent<typeof SpriteComponentId>,
+) {
     const chunkMap =
         rootEntity.requireEcsComponent(ChunkMapComponentId).chunkMap;
     unindexEntity(chunkMap, event.source);

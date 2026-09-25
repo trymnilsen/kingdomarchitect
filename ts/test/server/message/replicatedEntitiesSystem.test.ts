@@ -425,8 +425,8 @@ describe("replicatedEntitiesSystem", () => {
         });
     });
 
-    describe("component_added replication", () => {
-        it("replicates a component added to an already-attached entity", () => {
+    describe("component set replication", () => {
+        it("replicates a component set on an already-attached entity", () => {
             const messages: GameMessage[] = [];
             const world = new EcsWorld();
             world.addSystem(

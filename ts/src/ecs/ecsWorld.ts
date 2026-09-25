@@ -1,6 +1,7 @@
 import { log } from "../common/logging/logger.ts";
 import { Entity } from "../game/entity/entity.ts";
 import {
+    type ComponentsUpdatedEvent,
     type EntityEventType,
     type EntityEvent,
 } from "../game/entity/entityEvent.ts";
@@ -8,7 +9,10 @@ import { DrawMode } from "../rendering/drawMode.ts";
 import { RenderScope } from "../rendering/renderScope.ts";
 import type { GameCommand } from "../server/message/gameCommand.ts";
 import type { GameMessage } from "../server/message/gameMessage.ts";
+import type { ComponentID } from "../game/component/component.ts";
 import {
+    type EcsComponentEventFunction,
+    type EcsComponentHandlers,
     type EcsEntityEventFunction,
     type EcsInitFunction,
     type EcsRenderFunction,
@@ -21,6 +25,12 @@ import {
 type EcsEntityEventHandlersMap = {
     [K in keyof EntityEventType]: EcsEntityEventFunction<EntityEvent>[];
 };
+
+/** Handler lists per component id. Ids nobody listens to have no entry. */
+type EcsComponentHandlersMap = Map<
+    ComponentID,
+    EcsComponentEventFunction<ComponentID>[]
+>;
 
 /**
  * Owns the root entity and the registered systems, and drives them on update,
@@ -38,12 +48,13 @@ export class EcsWorld {
     private entityEvents: EcsEntityEventHandlersMap = {
         child_added: [],
         child_removed: [],
-        component_added: [],
         component_removed: [],
         component_updated: [],
         transform: [],
         game: [],
     };
+    private componentUpdated: EcsComponentHandlersMap = new Map();
+    private componentRemoved: EcsComponentHandlersMap = new Map();
     private rootEntity: Entity;
     private gameMessageSystems: EcsGameMessageFunction[] = [];
 
@@ -98,11 +109,6 @@ export class EcsWorld {
                     entityEventsFromSystem.child_removed as EcsEntityEventFunction<EntityEvent>,
                 );
             }
-            if (entityEventsFromSystem.component_added) {
-                this.entityEvents.component_added.push(
-                    entityEventsFromSystem.component_added as EcsEntityEventFunction<EntityEvent>,
-                );
-            }
             if (entityEventsFromSystem.component_removed) {
                 this.entityEvents.component_removed.push(
                     entityEventsFromSystem.component_removed as EcsEntityEventFunction<EntityEvent>,
@@ -123,6 +129,18 @@ export class EcsWorld {
                     entityEventsFromSystem.game as EcsEntityEventFunction<EntityEvent>,
                 );
             }
+        }
+
+        const componentEventsFromSystem = system.onComponent;
+        if (!!componentEventsFromSystem) {
+            registerComponentHandlers(
+                this.componentUpdated,
+                componentEventsFromSystem.updated,
+            );
+            registerComponentHandlers(
+                this.componentRemoved,
+                componentEventsFromSystem.removed,
+            );
         }
     }
 
@@ -180,5 +198,54 @@ export class EcsWorld {
                 log.error("Entity event handler error", { error: err });
             }
         }
+
+        if (event.id === "component_updated") {
+            this.runComponentHandlers(this.componentUpdated, event);
+        } else if (event.id === "component_removed") {
+            this.runComponentHandlers(this.componentRemoved, event);
+        }
     };
+
+    /**
+     * Calls only the handlers subscribed to the component the event is about.
+     * They run after the entity event handlers, so a system that listens to both
+     * sees the same state ordering on every event.
+     */
+    private runComponentHandlers(
+        handlersByComponent: EcsComponentHandlersMap,
+        event: ComponentsUpdatedEvent,
+    ) {
+        const handlers = handlersByComponent.get(event.item.id);
+        if (!handlers) {
+            return;
+        }
+        for (let i = 0; i < handlers.length; i++) {
+            try {
+                handlers[i](this.root, event);
+            } catch (err) {
+                log.error("Component event handler error", { error: err });
+            }
+        }
+    }
+}
+
+function registerComponentHandlers(
+    handlersByComponent: EcsComponentHandlersMap,
+    handlers: EcsComponentHandlers | undefined,
+) {
+    if (!handlers) {
+        return;
+    }
+    for (const componentId of Object.keys(handlers) as ComponentID[]) {
+        const handler = handlers[componentId];
+        if (!handler) {
+            continue;
+        }
+        let list = handlersByComponent.get(componentId);
+        if (!list) {
+            list = [];
+            handlersByComponent.set(componentId, list);
+        }
+        list.push(handler as EcsComponentEventFunction<ComponentID>);
+    }
 }

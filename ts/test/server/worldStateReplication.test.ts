@@ -2,10 +2,11 @@ import { describe, it } from "node:test";
 import assert from "node:assert";
 import { EcsWorld } from "../../src/ecs/ecsWorld.ts";
 import { encodePosition, pointEquals } from "../../src/common/point.ts";
-import {
-    setDiscoveryForPlayer,
-    worldGenerationSystem,
-} from "../../src/game/system/worldGenerationSystem.ts";
+import { makeWorldGenSystem } from "../../src/game/system/worldGenerationSystem.ts";
+import { buildGroundUpdateMessage } from "../../src/server/message/groundUpdate.ts";
+import { findPlayerKingdom } from "../../src/game/component/playerKingdomComponent.ts";
+import { workerPrefab } from "../../src/game/prefab/workerPrefab.ts";
+import { LightSourceComponentId } from "../../src/game/component/lightSourceComponent.ts";
 import { chunkMapSystem } from "../../src/game/system/chunkMapSystem.ts";
 import { createRootEntity } from "../../src/game/rootFactory.ts";
 import { GoblinCampComponentId } from "../../src/game/component/goblinCampComponent.ts";
@@ -46,7 +47,18 @@ function setupServerWorld(): { root: Entity; messages: GameMessage[] } {
     const root = createRootEntity();
     const ecsWorld = new EcsWorld(root);
     ecsWorld.addSystem(chunkMapSystem);
-    ecsWorld.addSystem(worldGenerationSystem);
+    // Wired the way GameServer wires it: a discovery becomes a ground update
+    ecsWorld.addSystem(
+        makeWorldGenSystem((discovery) => {
+            messages.push(
+                buildGroundUpdateMessage(
+                    root.requireEcsComponent(TileComponentId),
+                    discovery.discoveredTiles,
+                    discovery.generatedChunks,
+                ),
+            );
+        }),
+    );
     ecsWorld.addSystem(
         makeReplicatedEntitiesSystem((message) => messages.push(message)),
     );
@@ -54,6 +66,19 @@ function setupServerWorld(): { root: Entity; messages: GameMessage[] } {
     // world state covers everything so far so only later messages matter
     messages.length = 0;
     return { root, messages };
+}
+
+/**
+ * Steps a player worker onto the position so the ground around it is
+ * discovered, the way a real worker discovers land by moving.
+ */
+function placeViewer(root: Entity, position: Point): Entity {
+    const kingdom = findPlayerKingdom(root);
+    assert.ok(kingdom, "expected the new world to have a player kingdom");
+    const viewer = workerPrefab();
+    kingdom.addChild(viewer);
+    viewer.worldPosition = position;
+    return viewer;
 }
 
 function getCampChunk(root: Entity): Point {
@@ -197,11 +222,13 @@ describe("world state replication", () => {
             buildWorldStateMessage(root, "player", 0),
         );
 
+        // Two ungenerated chunks meet at x=48, and a worker at x=47 sees into
+        // both.
         const discovered = [
-            { x: 43, y: -29 },
-            { x: 51, y: -29 },
+            { x: 47, y: -29 },
+            { x: 48, y: -29 },
         ];
-        setDiscoveryForPlayer(root, "player", discovered);
+        placeViewer(root, discovered[0]);
         for (const message of messages) {
             handleGameMessage(clientRoot, structuredClone(message));
         }
@@ -237,14 +264,11 @@ describe("world state replication", () => {
 
     it("sends nothing when a discovery finds nothing new", () => {
         const { root, messages } = setupServerWorld();
-        const explored = [
-            { x: 43, y: -29 },
-            { x: 44, y: -29 },
-        ];
-        setDiscoveryForPlayer(root, "player", explored);
+        const viewer = placeViewer(root, { x: 47, y: -29 });
         messages.length = 0;
 
-        setDiscoveryForPlayer(root, "player", explored);
+        // Same position, same footprint, so nothing is left to discover
+        viewer.invalidateComponent(LightSourceComponentId);
 
         assert.ok(
             !messages.some(

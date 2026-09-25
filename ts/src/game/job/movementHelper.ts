@@ -5,13 +5,11 @@ import {
     type QueryPathOptions,
 } from "../map/query/pathQuery.ts";
 import type { Entity } from "../entity/entity.ts";
-import { VisibilityComponentId } from "../component/visibilityComponent.ts";
 import {
     DirectionComponentId,
     updateDirectionComponent,
 } from "../component/directionComponent.ts";
 import { getPathfindingGraph } from "../map/path/getPathfindingGraph.ts";
-import { discoverPoints } from "../map/discoverFootprint.ts";
 import {
     MovementStaminaComponentId,
     recordMove,
@@ -42,7 +40,6 @@ export function doMovement(
     const path = queryPath(pathfindingGraph, entity.worldPosition, to, options);
     const nextPoint = path.path.shift();
     if (nextPoint) {
-        discoverAfterMovement(entity, nextPoint);
         entity.updateComponent(DirectionComponentId, (component) => {
             updateDirectionComponent(
                 component,
@@ -66,29 +63,12 @@ export function doMovement(
     }
 }
 
-export function discoverAfterMovement(entity: Entity, nextPoint: Point) {
-    // Only viewers discover as they move. An entity with no vision reach reveals
-    // nothing by walking.
-    const visibility = entity.getEcsComponent(VisibilityComponentId);
-    if (visibility) {
-        discoverPoints(entity.getRootEntity(), entity, nextPoint);
-    }
-}
-
-/**
- * Apply the side-effects of an entity moving one tile from `from` to `to`:
- * reveal the footprint, face the move direction, commit the new position, and
- * spend stamina and one unit of energy. One tile of travel is this whole bundle,
- * shared by every single-step action (moveTo, stepOnto, stepOff) so the cost and
- * bookkeeping can't drift between them.
- */
 export function applyStep(
     entity: Entity,
     from: Point,
     to: Point,
     tick: number,
 ): void {
-    discoverAfterMovement(entity, to);
     entity.updateComponent(DirectionComponentId, (component) => {
         updateDirectionComponent(component, from, to);
     });

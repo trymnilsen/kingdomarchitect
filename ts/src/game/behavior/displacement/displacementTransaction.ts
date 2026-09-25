@@ -14,7 +14,6 @@ import {
     recordMove,
 } from "../../component/movementStaminaComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
-import { discoverAfterMovement } from "../../job/movementHelper.ts";
 import { log } from "../../../common/logging/logger.ts";
 
 export type DisplacementMove = {
@@ -246,8 +245,6 @@ function applyEntityMove(
     triggerReplan: boolean,
     spendEnergy: boolean,
 ): void {
-    discoverAfterMovement(entity, to);
-
     entity.updateComponent(DirectionComponentId, (component) => {
         updateDirectionComponent(component, from, to);
     });

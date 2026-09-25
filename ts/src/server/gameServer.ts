@@ -3,7 +3,7 @@ import { createWorldDiscoveryComponent } from "../game/component/worldDiscoveryC
 import { GameTime } from "../game/gameTime.ts";
 import { chunkMapSystem } from "../game/system/chunkMapSystem.ts";
 import { pathfindingSystem } from "../game/system/pathfindingSystem.ts";
-import { worldGenerationSystem } from "../game/system/worldGenerationSystem.ts";
+import { makeWorldGenSystem } from "../game/system/worldGenerationSystem.ts";
 import { EcsWorld } from "../ecs/ecsWorld.ts";
 import { createRootEntity } from "../game/rootFactory.ts";
 import { hungerSystem } from "../game/system/hungerSystem.ts";
@@ -24,6 +24,7 @@ import type { GameCommand } from "./message/gameCommand.ts";
 import { createMessageEmitterComponent } from "../game/component/messageEmitterComponent.ts";
 import { createGameTimeComponent } from "../game/component/gameTimeComponent.ts";
 import { type GameMessage } from "./message/gameMessage.ts";
+import { buildGroundUpdateMessage } from "./message/groundUpdate.ts";
 import { createCommandSystem } from "../game/system/commandSystem.ts";
 import { createEffectSystem } from "../game/system/effectSystem.ts";
 import { createEffectExecutorMap } from "../data/effect/effectExecutorRegistry.ts";
@@ -37,7 +38,6 @@ import { PersistenceManager } from "./persistence/persistenceManager.ts";
 import type { Entity } from "../game/entity/entity.ts";
 import type { SerializedWorldMeta } from "./persistence/serializedWorldMeta.ts";
 import { TileComponentId } from "../game/component/tileComponent.ts";
-import { WorldDiscoveryComponentId } from "../game/component/worldDiscoveryComponent.ts";
 import { ToggleableCallback } from "../common/toggleableCallback.ts";
 import type { MessageRouter } from "./messageRouter.ts";
 import {
@@ -134,41 +134,6 @@ export class GameServer {
             playerId,
             buildWorldStateMessage(this.world.root, playerId, this.updateTick),
         );
-
-        const message = this.buildDiscoverTileMessage(playerId);
-        if (message) {
-            this.messageRouter.sendTo(playerId, message);
-        }
-    }
-
-    private buildDiscoverTileMessage(
-        playerId: string,
-    ): DiscoverTileGameMessage | null {
-        const tileComponent = this.world.root.getEcsComponent(TileComponentId);
-        const discoveryComponent = this.world.root.getEcsComponent(
-            WorldDiscoveryComponentId,
-        );
-
-        if (!tileComponent || !discoveryComponent) {
-            return null;
-        }
-
-        const playerDiscovery =
-            discoveryComponent.discoveriesByUser.get(playerId);
-        if (!playerDiscovery) {
-            return null;
-        }
-
-        const data = getPlayerDiscoveryData(tileComponent, playerDiscovery);
-        if (!data) {
-            return null;
-        }
-
-        return {
-            type: DiscoverTileGameMessageType,
-            tiles: data.tiles,
-            volumes: data.volumes,
-        };
     }
 
     private async loadGame(): Promise<void> {
@@ -239,7 +204,17 @@ export class GameServer {
         this.world.addSystem(createLootDropSystem(this.gameTime));
         this.world.addSystem(createInventorySpillSystem(this.gameTime));
         this.world.addSystem(groundItemDecaySystem);
-        this.world.addSystem(worldGenerationSystem);
+        this.world.addSystem(
+            makeWorldGenSystem((discovery) => {
+                this.broadcastCallback.invoke(
+                    buildGroundUpdateMessage(
+                        this.world.root.requireEcsComponent(TileComponentId),
+                        discovery.discoveredTiles,
+                        discovery.generatedChunks,
+                    ),
+                );
+            }),
+        );
         this.world.addSystem(createPhaseTransitionSystem());
         this.world.addSystem(
             createCommandSystem(this.persistenceManager, this.gameTime),

@@ -4,6 +4,11 @@ import { ScenarioHarness } from "./scenarioHarness.ts";
 import { buildingPrefab } from "../../../src/game/prefab/buildingPrefab.ts";
 import { lampPost } from "../../../src/data/building/light/lampPost.ts";
 import { BuildingComponentId } from "../../../src/game/component/buildingComponent.ts";
+import {
+    createKingdomComponent,
+    KingdomType,
+} from "../../../src/game/component/kingdomComponent.ts";
+import { Entity } from "../../../src/game/entity/entity.ts";
 import { finishConstruction } from "../../../src/game/job/buildBuildingJob.ts";
 import {
     hasDiscoveredTile,
@@ -13,6 +18,7 @@ import {
 describe("discover on build", () => {
     it("discovers a light building's full lit footprint, beyond its vision reach", () => {
         const harness = new ScenarioHarness();
+        const kingdom = harness.addPlayerKingdom();
         const worldDiscovery = harness.root.requireEcsComponent(
             WorldDiscoveryComponentId,
         );
@@ -21,9 +27,20 @@ describe("discover on build", () => {
         // The harness does no startup discovery, so the area is undiscovered and
         // any discovery here must come from finishing this building.
         const position = { x: 20, y: 16 };
-        const building = buildingPrefab(lampPost, true, "lampPost");
-        harness.root.addChild(building);
-        building.worldPosition = position;
+        const building = harness.addPlayerBuilding(
+            kingdom,
+            lampPost,
+            position,
+            "lampPost",
+            true,
+        );
+
+        // Placing the scaffold moved it into position, which reveals nothing
+        // because a foundation surveys nothing until it is finished.
+        assert.ok(
+            !hasDiscoveredTile(worldDiscovery, "player", position),
+            "a scaffold should not discover the tile it stands on",
+        );
 
         finishConstruction(
             harness.root,
@@ -46,6 +63,30 @@ describe("discover on build", () => {
         assert.ok(
             !hasDiscoveredTile(worldDiscovery, "player", { x: 25, y: 16 }),
             "tile beyond the light should remain undiscovered",
+        );
+    });
+
+    it("does not discover for a finished building the player does not own", () => {
+        const harness = new ScenarioHarness();
+        const worldDiscovery = harness.root.requireEcsComponent(
+            WorldDiscoveryComponentId,
+        );
+
+        // Goblin buildings use the same prefab and carry the same vision, so
+        // only ownership keeps them from revealing land for the player.
+        const goblinKingdom = new Entity("goblinKingdom");
+        goblinKingdom.setEcsComponent(
+            createKingdomComponent(KingdomType.Goblin),
+        );
+        harness.root.addChild(goblinKingdom);
+        const position = { x: 20, y: 16 };
+        const building = buildingPrefab(lampPost, false, "goblinLamp");
+        goblinKingdom.addChild(building);
+        building.worldPosition = position;
+
+        assert.ok(
+            !hasDiscoveredTile(worldDiscovery, "player", position),
+            "a building in a goblin kingdom should not discover",
         );
     });
 });

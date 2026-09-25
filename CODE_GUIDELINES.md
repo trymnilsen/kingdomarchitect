@@ -52,15 +52,5 @@ Conventions and practices for this repository. Goals: clarity, maintainability, 
 
 ## Comments
 
-- Use **JSDoc block comments** for functions and exported symbols.
-  ```typescript
-  /**
-   * Finds the closest point on a line segment to the given point.
-   * Uses vector projection to handle all edge cases correctly.
-   * @param a Start of line segment
-   * @param b End of line segment
-   * @param p Point to test
-   */
-  export function closestPointOnLine(a: Point, b: Point, p: Point): Point {}
-  ```
+- Comment why, not what or how. Do not make jsdoc comments that restates the name and arguments only.
 - **Do not use separator comments** like `// ----- Section -----` or `// ===== Section =====`.

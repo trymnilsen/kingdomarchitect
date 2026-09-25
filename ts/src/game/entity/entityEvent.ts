@@ -1,5 +1,5 @@
 import type { Point } from "../../common/point.ts";
-import type { Components } from "../component/component.ts";
+import type { ComponentID, Components } from "../component/component.ts";
 import { Entity } from "./entity.ts";
 import type { EntityGameEvent } from "./event/entityGameEvent.ts";
 
@@ -11,11 +11,6 @@ export type EntityEvent =
 
 export type EntityEventId = EntityEvent["id"];
 
-/**
- * The event type carrying a given id. One event type can cover several ids, as
- * ComponentsUpdatedEvent does, so the match is by assignability rather than
- * equality.
- */
 type FindEventById<
     Id extends EntityEventId,
     EventUnion = EntityEvent,
@@ -47,31 +42,16 @@ export type EntityChildrenUpdatedEvent = {
     target: Entity;
 };
 
-export type ComponentsUpdatedEvent = {
-    id:
-        | typeof componentAddedId
-        | typeof componentRemovedId
-        | typeof componentUpdatedId;
+export type ComponentsUpdatedEvent<ID extends ComponentID = ComponentID> = {
+    id: typeof componentRemovedId | typeof componentUpdatedId;
     source: Entity;
-    item: Components;
+    item: Extract<Components, { id: ID }>;
     /**
      * The previous value of the component before the update.
      * Only present for component_updated events when using updateComponent().
-     * Used for computing delta updates.
      */
-    oldValue?: Components;
+    oldValue?: Extract<Components, { id: ID }>;
 };
 
-/**
- * The id of the ComponentsUpdatedEvent when a component has been added to an entity
- */
-const componentAddedId = "component_added";
-/**
- * The id of the ComponentsUpdatedEvent when a component has been removed from an entity
- */
 const componentRemovedId = "component_removed";
-/**
- * The id of the ComponentsUpdatedEvent when a component has been updated. This
- * is triggered manually with the invalidateComponent method on an entity
- */
 const componentUpdatedId = "component_updated";

@@ -6,22 +6,11 @@ import { VisibilityMapComponentId } from "../game/component/visibilityMapCompone
 import { WorldDiscoveryComponentId } from "../game/component/worldDiscoveryComponent.ts";
 import { Entity } from "../game/entity/entity.ts";
 import { diffComponents, isDeltaSmaller } from "./delta/diffComponent.ts";
-import {
-    getChunk,
-    TileComponentId,
-    type TileComponent,
-} from "../game/component/tileComponent.ts";
-import {
-    isGroundDiscoveredGameEvent,
-    type GroundDiscoveredGameEventData,
-} from "../game/entity/event/groundDiscoveredGameEventData.ts";
-import type { TileChunk } from "../game/map/chunk.ts";
+import { TileComponentId } from "../game/component/tileComponent.ts";
 import {
     EventGameMessageType,
-    GroundUpdateGameMessageType,
     WorldStateMessageType,
     type GameMessage,
-    type GroundUpdateGameMessage,
     type ReplicatedEntityData,
     type WorldStateGameMessage,
 } from "./message/gameMessage.ts";
@@ -91,30 +80,6 @@ export function makeReplicatedEntitiesSystem(
                     entity: event.source.id,
                 });
             },
-            component_added: (_root, event) => {
-                // A component added to an already-replicated entity. Adding a
-                // component to an entity before it is attached doesn't bubble to
-                // the root, so this only fires for live entities the client
-                // already mirrors, so send the full component as an upsert. Same
-                // root-allowlist and client-only guards as component_updated.
-                if (
-                    event.source.isGameRoot &&
-                    !replicatedRootComponents.has(event.item.id)
-                ) {
-                    return;
-                }
-                if (
-                    event.item.id === TileComponentId ||
-                    event.item.id === VisibilityMapComponentId
-                ) {
-                    return;
-                }
-                postMessage({
-                    type: "setComponent",
-                    component: event.item,
-                    entity: event.source.id,
-                });
-            },
             component_removed: (_root, event) => {
                 // A component removed from a live entity must disappear on the
                 // client too. Component presence is state: an unmanned tower's
@@ -174,13 +139,7 @@ export function makeReplicatedEntitiesSystem(
                     entity: event.target.id,
                 });
             },
-            game: (root, event) => {
-                if (isGroundDiscoveredGameEvent(event)) {
-                    postMessage(
-                        buildGroundUpdateMessage(root, event.data.payload),
-                    );
-                    return;
-                }
+            game: (_root, event) => {
                 postMessage({
                     type: EventGameMessageType,
                     sourceEntityId: event.source.id,
@@ -190,34 +149,6 @@ export function makeReplicatedEntitiesSystem(
             },
         },
     };
-}
-
-function buildGroundUpdateMessage(
-    root: Entity,
-    discovery: GroundDiscoveredGameEventData,
-): GroundUpdateGameMessage {
-    const tileComponent = root.requireEcsComponent(TileComponentId);
-    return {
-        type: GroundUpdateGameMessageType,
-        ground: buildGroundUpdate(
-            getChunks(tileComponent, discovery.generatedChunks),
-            discovery.discoveredTiles,
-        ),
-    };
-}
-
-function getChunks(
-    tileComponent: TileComponent,
-    chunkPositions: readonly Point[],
-): TileChunk[] {
-    const chunks: TileChunk[] = [];
-    for (const position of chunkPositions) {
-        const chunk = getChunk(tileComponent, position);
-        if (chunk) {
-            chunks.push(chunk);
-        }
-    }
-    return chunks;
 }
 
 export function buildWorldStateMessage(

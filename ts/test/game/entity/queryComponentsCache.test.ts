@@ -153,7 +153,7 @@ describe("queryComponents cache", () => {
         const healthBefore = root.queryComponents(HealthComponentId);
         const immortalBefore = root.queryComponents(ImmortalComponentId);
 
-        // component_added upserts only the immortal cache in place, keeping the
+        // component_updated upserts only the immortal cache in place, keeping the
         // same map reference and adding the new member. The unrelated health
         // map is left untouched.
         b.setEcsComponent(createImmortalComponent());

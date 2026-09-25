@@ -1,5 +1,6 @@
 import { EcsWorld } from "../../../src/ecs/ecsWorld.ts";
 import { chunkMapSystem } from "../../../src/game/system/chunkMapSystem.ts";
+import { makeWorldGenSystem } from "../../../src/game/system/worldGenerationSystem.ts";
 import {
     createTileComponent,
     setChunk,
@@ -67,6 +68,9 @@ export class ScenarioHarness {
     ) {
         this.ecsWorld = new EcsWorld();
         this.ecsWorld.addSystem(chunkMapSystem);
+        // Discovery follows from movement, buildings and light. Only entities
+        // under a player kingdom reveal anything, see addPlayerKingdom.
+        this.ecsWorld.addSystem(makeWorldGenSystem(() => {}));
         this.root = this.ecsWorld.root;
 
         // Set up ground covering at least the play area x=8..39, y=8..31
@@ -81,7 +85,7 @@ export class ScenarioHarness {
         );
 
         this.root.setEcsComponent(createJobQueueComponent());
-        // Required by discoverAfterMovement when entities have VisibilityComponent
+        // Required by the world generation system when a viewer reveals tiles
         this.root.setEcsComponent(createWorldDiscoveryComponent());
         // Behaviors read the current tick through the root, mirroring how the
         // game server exposes its GameTime instance. The source reads the

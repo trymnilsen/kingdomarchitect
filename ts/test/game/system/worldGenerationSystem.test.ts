@@ -3,12 +3,24 @@ import assert from "node:assert";
 import { EcsWorld } from "../../../src/ecs/ecsWorld.ts";
 import { pointEquals, type Point } from "../../../src/common/point.ts";
 import {
-    setDiscoveryForPlayer,
-    worldGenerationSystem,
+    makeWorldGenSystem,
+    type GroundDiscovery,
 } from "../../../src/game/system/worldGenerationSystem.ts";
 import { chunkMapSystem } from "../../../src/game/system/chunkMapSystem.ts";
 import { createRootEntity } from "../../../src/game/rootFactory.ts";
 import { GoblinCampComponentId } from "../../../src/game/component/goblinCampComponent.ts";
+import { findPlayerKingdom } from "../../../src/game/component/playerKingdomComponent.ts";
+import { workerPrefab } from "../../../src/game/prefab/workerPrefab.ts";
+import { EquipmentComponentId } from "../../../src/game/component/equipmentComponent.ts";
+import { LightSourceComponentId } from "../../../src/game/component/lightSourceComponent.ts";
+import {
+    createWorldDiscoveryComponent,
+    hasDiscoveredTile,
+    WorldDiscoveryComponentId,
+} from "../../../src/game/component/worldDiscoveryComponent.ts";
+import { torchItem } from "../../../src/data/inventory/items/equipment.ts";
+import { lampPostLightSource } from "../../../src/data/light/lightSourceDefinition.ts";
+import type { EcsSystem } from "../../../src/ecs/ecsSystem.ts";
 import {
     ChunkMapComponentId,
     getEntitiesAt,
@@ -23,15 +35,43 @@ import {
     getChunkBounds,
     getChunkPosition,
 } from "../../../src/game/map/chunk.ts";
-import type { Entity } from "../../../src/game/entity/entity.ts";
+import { Entity } from "../../../src/game/entity/entity.ts";
+import {
+    createKingdomComponent,
+    KingdomType,
+} from "../../../src/game/component/kingdomComponent.ts";
 
-function setupWorld(): { root: Entity } {
+type TestWorld = {
+    root: Entity;
+    system: EcsSystem;
+    /** Every discovery the system reported, in order, including startup */
+    discoveries: GroundDiscovery[];
+};
+
+function setupWorld(): TestWorld {
+    const discoveries: GroundDiscovery[] = [];
     const root = createRootEntity();
     const ecsWorld = new EcsWorld(root);
+    const system = makeWorldGenSystem((discovery) => {
+        discoveries.push(discovery);
+    });
     ecsWorld.addSystem(chunkMapSystem);
-    ecsWorld.addSystem(worldGenerationSystem);
+    ecsWorld.addSystem(system);
     ecsWorld.runInit();
-    return { root };
+    return { root, system, discoveries };
+}
+
+/**
+ * Puts a worker under the player kingdom and steps it onto the position, the
+ * way a real worker discovers land by moving.
+ */
+function placeViewer(root: Entity, position: Point): Entity {
+    const kingdom = findPlayerKingdom(root);
+    assert.ok(kingdom, "expected the new world to have a player kingdom");
+    const viewer = workerPrefab();
+    kingdom.addChild(viewer);
+    viewer.worldPosition = position;
+    return viewer;
 }
 
 function getCampChunkPosition(root: Entity): Point {
@@ -168,22 +208,173 @@ describe("worldGenerationSystem", () => {
         campEntity.removeEcsComponent(GoblinCampComponentId);
         assert.strictEqual(root.queryComponents(GoblinCampComponentId).size, 0);
 
-        // Discover a tile in a far, ungenerated chunk (10,10)
-        setDiscoveryForPlayer(root, "player", [
-            { x: 10 * ChunkSize, y: 10 * ChunkSize },
-        ]);
+        // Walk a worker into a far, ungenerated chunk (10,10)
+        placeViewer(root, {
+            x: 10 * ChunkSize + 8,
+            y: 10 * ChunkSize + 8,
+        });
 
         const newCampChunk = getCampChunkPosition(root);
         assert.deepStrictEqual(newCampChunk, { x: 10, y: 10 });
     });
 
     it("skips generation when a world already exists", () => {
-        const { root } = setupWorld();
+        const { root, system } = setupWorld();
 
-        worldGenerationSystem.onInit!(root);
+        system.onInit!(root);
 
         const tileComponent = root.requireEcsComponent(TileComponentId);
         assert.strictEqual(tileComponent.chunks.size, 10);
         assert.strictEqual(root.queryComponents(GoblinCampComponentId).size, 1);
+    });
+});
+
+describe("worldGenerationSystem discovery", () => {
+    // The middle of chunk (1,1), which exists from the start. It lies far
+    // outside the radius-16 diamond revealed around the start position, and
+    // far enough from the chunk edges that nothing near it needs generating.
+    const farTile = { x: 24, y: 24 };
+
+    it("reveals the footprint of a viewer that moves and reports it once", () => {
+        const { root, discoveries } = setupWorld();
+        const worldDiscovery = root.requireEcsComponent(
+            WorldDiscoveryComponentId,
+        );
+        assert.ok(!hasDiscoveredTile(worldDiscovery, "player", farTile));
+        const before = discoveries.length;
+
+        const viewer = placeViewer(root, farTile);
+
+        assert.strictEqual(discoveries.length, before + 1);
+        const discovery = discoveries[discoveries.length - 1];
+        assert.deepStrictEqual(discovery.generatedChunks, []);
+        // A worker sees a diamond of radius 2 around itself
+        assert.ok(
+            hasDiscoveredTile(worldDiscovery, "player", { x: 26, y: 24 }),
+        );
+        assert.ok(
+            hasDiscoveredTile(worldDiscovery, "player", { x: 23, y: 23 }),
+        );
+        assert.ok(
+            !hasDiscoveredTile(worldDiscovery, "player", { x: 27, y: 24 }),
+        );
+        assert.strictEqual(discovery.discoveredTiles.length, 13);
+
+        // Stepping back onto tiles it already revealed finds nothing new
+        viewer.worldPosition = { x: 24, y: 25 };
+        const afterStep = discoveries.length;
+        viewer.worldPosition = farTile;
+        assert.strictEqual(discoveries.length, afterStep);
+    });
+
+    it("generates a chunk once when a reveal reaches into it", () => {
+        const { root, discoveries } = setupWorld();
+        const before = discoveries.length;
+
+        // Generating the chunk adds entities that fire their own events. None
+        // of them may start another reveal, so the reveal reports once.
+        placeViewer(root, { x: 10 * ChunkSize + 8, y: 10 * ChunkSize + 8 });
+
+        assert.strictEqual(discoveries.length, before + 1);
+        assert.deepStrictEqual(discoveries[before].generatedChunks, [
+            { x: 10, y: 10 },
+        ]);
+    });
+
+    it("reports a volume the first time the player sees it", () => {
+        const { root, discoveries } = setupWorld();
+        const tileComponent = root.requireEcsComponent(TileComponentId);
+        const startVolume = getChunk(tileComponent, { x: 0, y: 0 })?.volume;
+        assert.ok(startVolume);
+        assert.ok(
+            discoveries[0].newVolumes.some(
+                (volume) => volume.id === startVolume.id,
+            ),
+            "the startup reveal should report the start volume",
+        );
+        const before = discoveries.length;
+
+        const viewer = placeViewer(root, {
+            x: 10 * ChunkSize + 8,
+            y: 10 * ChunkSize + 8,
+        });
+        const farVolume = getChunk(tileComponent, { x: 10, y: 10 })?.volume;
+        assert.ok(farVolume);
+        assert.deepStrictEqual(
+            discoveries[before].newVolumes.map((volume) => volume.id),
+            [farVolume.id],
+        );
+
+        // More of a chunk in a volume the player has already seen
+        viewer.worldPosition = {
+            x: 10 * ChunkSize + 9,
+            y: 10 * ChunkSize + 8,
+        };
+        assert.deepStrictEqual(discoveries[before + 1].newVolumes, []);
+    });
+
+    it("reveals the wedge when the light source of a viewer changes", () => {
+        const { root } = setupWorld();
+        const worldDiscovery = root.requireEcsComponent(
+            WorldDiscoveryComponentId,
+        );
+        const viewer = placeViewer(root, farTile);
+        const beamTip = { x: farTile.x + 6, y: farTile.y };
+        assert.ok(!hasDiscoveredTile(worldDiscovery, "player", beamTip));
+
+        // Well beyond the worker's own reach of 2, so only the light can
+        // account for it being discovered
+        viewer.updateComponent(LightSourceComponentId, (component) => {
+            component.pattern = [{ x: 6, y: 0 }];
+        });
+
+        assert.ok(hasDiscoveredTile(worldDiscovery, "player", beamTip));
+    });
+
+    it("reveals the light of an item when a viewer equips it", () => {
+        const { root } = setupWorld();
+        const worldDiscovery = root.requireEcsComponent(
+            WorldDiscoveryComponentId,
+        );
+        const viewer = placeViewer(root, farTile);
+        const litTile = { x: farTile.x + 4, y: farTile.y };
+        assert.ok(!hasDiscoveredTile(worldDiscovery, "player", litTile));
+
+        // A torch lights radius 1, which the worker already sees. Use a
+        // brighter light so the equipment is the only thing that can explain it.
+        viewer.updateComponent(EquipmentComponentId, (component) => {
+            component.slots.primary = {
+                ...torchItem,
+                light: lampPostLightSource.id,
+            };
+        });
+
+        assert.ok(hasDiscoveredTile(worldDiscovery, "player", litTile));
+    });
+
+    it("ignores events until the system has initialised", () => {
+        // A load attaches entities while handlers are live, and revealing from
+        // half a world could generate chunks and place a second goblin camp.
+        const discoveries: GroundDiscovery[] = [];
+        const root = createRootEntity();
+        root.setEcsComponent(createWorldDiscoveryComponent());
+        const ecsWorld = new EcsWorld(root);
+        ecsWorld.addSystem(chunkMapSystem);
+        ecsWorld.addSystem(
+            makeWorldGenSystem((discovery) => discoveries.push(discovery)),
+        );
+        const kingdom = new Entity("kingdom");
+        kingdom.setEcsComponent(createKingdomComponent(KingdomType.Player));
+        root.addChild(kingdom);
+        const viewer = workerPrefab();
+        kingdom.addChild(viewer);
+
+        viewer.worldPosition = { x: 5 * ChunkSize, y: 5 * ChunkSize };
+
+        assert.strictEqual(discoveries.length, 0);
+        assert.strictEqual(
+            root.requireEcsComponent(TileComponentId).chunks.size,
+            0,
+        );
     });
 });

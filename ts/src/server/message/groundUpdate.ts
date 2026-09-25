@@ -1,6 +1,7 @@
 import { log } from "../../common/logging/logger.ts";
 import { pointEquals, type Point } from "../../common/point.ts";
 import {
+    getChunk,
     setChunk,
     type TileComponent,
 } from "../../game/component/tileComponent.ts";
@@ -8,7 +9,12 @@ import type { VisibilityMapComponent } from "../../game/component/visibilityMapC
 import type { TileChunk } from "../../game/map/chunk.ts";
 import type { Volume } from "../../game/map/volume.ts";
 import { applyDiscoveredTiles } from "./applyDiscoveredTiles.ts";
-import type { GroundUpdate, ReplicatedChunkData } from "./gameMessage.ts";
+import {
+    GroundUpdateGameMessageType,
+    type GroundUpdate,
+    type GroundUpdateGameMessage,
+    type ReplicatedChunkData,
+} from "./gameMessage.ts";
 
 export function buildGroundUpdate(
     chunks: Iterable<TileChunk>,
@@ -34,6 +40,24 @@ export function buildGroundUpdate(
         volumes: [...volumes.values()],
         chunks: replicatedChunks,
         discoveredTiles,
+    };
+}
+
+export function buildGroundUpdateMessage(
+    tileComponent: TileComponent,
+    discoveredTiles: Point[],
+    generatedChunks: readonly Point[],
+): GroundUpdateGameMessage {
+    const chunks: TileChunk[] = [];
+    for (const position of generatedChunks) {
+        const chunk = getChunk(tileComponent, position);
+        if (chunk) {
+            chunks.push(chunk);
+        }
+    }
+    return {
+        type: GroundUpdateGameMessageType,
+        ground: buildGroundUpdate(chunks, discoveredTiles),
     };
 }
 

@@ -34,17 +34,19 @@ export function createSpriteEquipmentSystem(
     spriteCache: SpriteDefinitionCache,
 ): EcsSystem {
     return {
-        onEntityEvent: {
-            component_updated: (_root, event) => {
-                if (event.item.id === EquipmentComponentId) {
+        onComponent: {
+            updated: {
+                [EquipmentComponentId]: (_root, event) => {
                     updateEquipmentSprite(
                         event.source,
                         createOffscreenCanvas,
                         assetLoader,
                         spriteCache,
                     );
-                }
+                },
             },
+        },
+        onEntityEvent: {
             child_added: (_root, event) => {
                 const equipmentComponent =
                     event.target.getEcsComponent(EquipmentComponentId);
