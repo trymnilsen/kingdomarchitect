@@ -5,7 +5,10 @@ import type { CharacterAnimation } from "../../rendering/character/characterAnim
 import { createComponent } from "../../ui/declarative/ui.ts";
 import { uiColumn, uiRow } from "../../ui/declarative/uiSequence.ts";
 import { fillUiSize } from "../../ui/uiSize.ts";
-import type { CharacterColors } from "../../rendering/character/characterColors.ts";
+import {
+    EquipmentSpriteVariantType,
+    type CharacterColors,
+} from "../../rendering/character/characterColors.ts";
 import {
     createAnimationPanel,
     createHeaderBar,
@@ -14,21 +17,16 @@ import {
     createPreviewPanel,
 } from "./ui/characterBuilderPanels.ts";
 import {
-    EQUIPMENT_OPTIONS,
     type BodyPart,
     type PreviewMode,
 } from "./ui/characterBuilderConstants.ts";
+import { ITEMS_WITH_VISUAL } from "./ui/itemsWithVisual.ts";
 import { spriteRefs } from "../../asset/sprite.ts";
 
 const allAnimations = getAllAnimations(
     characterPartFrames as unknown as CharacterAnimation[],
 );
 
-/**
- * Main UI component for the character builder
- * Manages the layout and state for part selection, color customization,
- * and animation preview
- */
 export const CharacterBuilderUI = createComponent(({ withState }) => {
     const [selectedPart, setSelectedPart] = withState<BodyPart>("Chest");
     const [selectedAnimation, setSelectedAnimation] = withState<string>(
@@ -60,8 +58,11 @@ export const CharacterBuilderUI = createComponent(({ withState }) => {
         if (hatId !== "none") {
             existing.push({
                 attachToPart: "Head",
-                offset: { x: 6, y: 10 },
-                sprite: { type: "single", sprite: spriteRefs.wizard_hat },
+                sprite: {
+                    type: EquipmentSpriteVariantType.Single,
+                    sprite: spriteRefs.wizard_hat,
+                    offset: { x: 6, y: 10 },
+                },
             });
         }
         setSelectedColors({
@@ -70,23 +71,18 @@ export const CharacterBuilderUI = createComponent(({ withState }) => {
         });
     };
 
-    const handleEquipmentSelect = (anchorId: string, equipmentId: string) => {
+    const handleEquipmentSelect = (anchorId: string, itemId: string | null) => {
         const existing = selectedColors.Equipment ?? [];
         const filtered = existing.filter(
-            (e) => "anchor" in e && e.anchor !== anchorId,
+            (e) => !("anchor" in e) || e.anchor !== anchorId,
         );
-        const option = EQUIPMENT_OPTIONS.find((o) => o.id === equipmentId);
-        if (option && option.sprite && option.offset) {
-            filtered.push({
-                sprite: { type: "single", sprite: option.sprite },
-                offsetInSpriteForAnchorPoint: option.offset,
-                anchor: anchorId,
-            });
+        const item = ITEMS_WITH_VISUAL.find((i) => i.id === itemId);
+        if (item) {
+            filtered.push({ anchor: anchorId, sprite: item.visual });
         }
         setSelectedColors({ ...selectedColors, Equipment: filtered });
     };
 
-    // Get the current animation's frame count
     const getCurrentFrameCount = (): number => {
         const animation = allAnimations.find(
             (a) => a.animationName === selectedAnimation,
@@ -99,7 +95,7 @@ export const CharacterBuilderUI = createComponent(({ withState }) => {
             const frameCount = getCurrentFrameCount();
             setCurrentFrame((prev) => {
                 if (prev === 0) {
-                    return frameCount - 1; // Loop to last frame
+                    return frameCount - 1;
                 }
                 return prev - 1;
             });
@@ -111,7 +107,7 @@ export const CharacterBuilderUI = createComponent(({ withState }) => {
             const frameCount = getCurrentFrameCount();
             setCurrentFrame((prev) => {
                 if (prev >= frameCount - 1) {
-                    return 0; // Loop to first frame
+                    return 0;
                 }
                 return prev + 1;
             });
@@ -120,7 +116,7 @@ export const CharacterBuilderUI = createComponent(({ withState }) => {
 
     const handleAnimationChange = (animation: string) => {
         setSelectedAnimation(animation);
-        setCurrentFrame(0); // Reset frame when changing animation
+        setCurrentFrame(0);
     };
 
     return uiColumn({

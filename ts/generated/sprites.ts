@@ -109,6 +109,7 @@ export const spriteDefinitions: Record<string, number[]> = {
     "interior_wood_wall_right_left": [16,16,0,175],
     "interior_wood_wall_left_top": [16,16,16,175],
     "interior_wood_wall_left_bottom": [16,16,32,175],
+    "fishingrod": [6,8,88,71],
     "character_sword": [8,16,48,175],
     "wizard_hat": [16,16,56,175],
     "wayshrine": [16,16,175,48,8],
@@ -127,11 +128,11 @@ export const spriteDefinitions: Record<string, number[]> = {
     "building_enchanter": [16,16,240,32],
     "empty_sprite": [16,16,256,0],
     "nature_grass_leaves": [9,6,96,80],
-    "nature_mushroom": [8,7,88,71],
-    "nature_mushroom2": [8,7,77,101],
-    "nature_treestub": [14,11,107,100],
-    "nature_berrybush": [13,10,128,160],
-    "nature_berrybush_wo": [13,10,141,160],
+    "nature_mushroom": [8,7,77,101],
+    "nature_mushroom2": [8,7,107,100],
+    "nature_treestub": [14,11,128,160],
+    "nature_berrybush": [13,10,115,100],
+    "nature_berrybush_wo": [13,10,142,160],
     "paladin": [16,16,200,80,5],
     "pine_tree": [16,16,256,32],
     "pine_tree_winter": [16,16,272,0],
@@ -697,6 +698,10 @@ export const spriteRefs = {
   "interior_wood_wall_left_bottom": {
     "bin": "0",
     "spriteId": "interior_wood_wall_left_bottom"
+  },
+  "fishingrod": {
+    "bin": "0",
+    "spriteId": "fishingrod"
   },
   "character_sword": {
     "bin": "0",

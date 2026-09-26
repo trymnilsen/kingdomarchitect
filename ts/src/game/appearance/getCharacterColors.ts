@@ -1,33 +1,23 @@
 import { ItemCategory } from "../../data/inventory/inventoryItem.ts";
 import { wizardHat } from "../../data/inventory/items/equipment.ts";
 import { spriteRefs } from "../../asset/sprite.ts";
-import type {
-    AnchorEquipment,
-    CharacterColors,
-    PartBoundsEquipment,
+import {
+    EquipmentSpriteVariantType,
+    type AnchorEquipment,
+    type CharacterColors,
+    type PartBoundsEquipment,
 } from "../../rendering/character/characterColors.ts";
 import type { EquipmentComponent } from "../component/equipmentComponent.ts";
 
-/**
- * Which hand each equipment slot is drawn in. Held items follow the slot rather
- * than the item, so the same torch renders in either hand depending on where it
- * was equipped.
- */
+/** Held items follow the slot, not the item, so a torch can be in either hand. */
 const slotAnchors = [
     { anchor: "RightHand", slot: "primary" },
     { anchor: "LeftHand", slot: "secondary" },
 ] as const;
 
 /**
- * What a character looks like given what they are carrying. This is the game's
- * appearance policy: it reads equipment (game state) and produces the sprite
- * generator's {@link CharacterColors} contract.
- *
- * It lives in the game layer rather than beside the generator because the rules
- * here are about items and slots, not about drawing. Adding a held item is a
- * data change (give the item a `visual`), and changing which hand a slot maps
- * to is a change here, neither of which should require touching rendering code
- * or the character builder devtool.
+ * Lives in the game layer because its rules are about items and slots, not
+ * drawing. A new held item is a data change: give the item a `visual`.
  */
 export function getCharacterColors(
     equipmentComponent: EquipmentComponent,
@@ -49,19 +39,16 @@ export function getCharacterColors(
         if (item.id === wizardHat.id) {
             equipment.push({
                 attachToPart: "Head",
-                offset: { x: 6, y: 10 },
-                sprite: { type: "single", sprite: spriteRefs.wizard_hat },
+                sprite: {
+                    type: EquipmentSpriteVariantType.Single,
+                    sprite: spriteRefs.wizard_hat,
+                    offset: { x: 6, y: 10 },
+                },
             });
             continue;
         }
-        // An item's own `visual` says what it looks like in a hand, so a new
-        // held item is data rather than another branch here.
         if (item.visual) {
-            equipment.push({
-                anchor,
-                offsetInSpriteForAnchorPoint: item.visual.offset,
-                sprite: { type: "single", sprite: item.visual.sprite },
-            });
+            equipment.push({ anchor, sprite: item.visual });
         }
     }
 

@@ -20,17 +20,14 @@ import {
     AVAILABLE_ANCHORS,
     BODY_PARTS,
     COLORS,
-    EQUIPMENT_OPTIONS,
     FANTASY_GEAR_COLORS,
     HAT_OPTIONS,
     LAYOUT,
     type BodyPart,
     type PreviewMode,
 } from "./characterBuilderConstants.ts";
+import { ITEMS_WITH_VISUAL } from "./itemsWithVisual.ts";
 
-/**
- * Creates the top header bar
- */
 export function createHeaderBar() {
     return uiBox({
         width: fillUiSize,
@@ -44,9 +41,6 @@ export function createHeaderBar() {
     });
 }
 
-/**
- * Creates the left panel for part selection and color customization
- */
 export function createPartSelectionPanel(
     selectedPart: BodyPart,
     onPartSelect: (part: BodyPart) => void,
@@ -54,7 +48,7 @@ export function createPartSelectionPanel(
     onColorSelect: (color: string | undefined) => void,
     selectedAnchor: string | null,
     onAnchorSelect: (anchor: string | null) => void,
-    onEquipmentSelect: (anchorId: string, equipmentId: string) => void,
+    onEquipmentSelect: (anchorId: string, itemId: string | null) => void,
     onHatSelect: (hatId: string) => void,
 ) {
     return uiBox({
@@ -94,7 +88,7 @@ function createCustomizationSection(
     onColorSelect: (color: string | undefined) => void,
     selectedAnchor: string | null,
     onAnchorSelect: (anchor: string | null) => void,
-    onEquipmentSelect: (anchorId: string, equipmentId: string) => void,
+    onEquipmentSelect: (anchorId: string, itemId: string | null) => void,
     onHatSelect: (hatId: string) => void,
 ): ComponentDescriptor[] {
     if (selectedPart === "Hat") {
@@ -150,17 +144,17 @@ function createCustomizationSection(
             textStyle: titleTextStyle,
         }),
         createPartButton("< Back", false, () => onAnchorSelect(null)),
-        ...EQUIPMENT_OPTIONS.map((option) =>
-            createPartButton(option.name, false, () =>
-                onEquipmentSelect(selectedAnchor, option.id),
+        createPartButton("None", false, () =>
+            onEquipmentSelect(selectedAnchor, null),
+        ),
+        ...ITEMS_WITH_VISUAL.map((item) =>
+            createPartButton(item.name, false, () =>
+                onEquipmentSelect(selectedAnchor, item.id),
             ),
         ),
     ];
 }
 
-/**
- * Creates the center preview area with mode toggle and sprite preview
- */
 export function createPreviewPanel(
     previewMode: PreviewMode,
     onModeChange: (mode: PreviewMode) => void,
@@ -199,9 +193,6 @@ export function createPreviewPanel(
     });
 }
 
-/**
- * Creates the layer management panel
- */
 export function createLayerPanel() {
     return uiBox({
         width: LAYOUT.LAYER_BOX_SIZE,
@@ -221,9 +212,6 @@ export function createLayerPanel() {
     });
 }
 
-/**
- * Creates the right panel for animations and playback controls
- */
 export function createAnimationPanel(
     selectedAnimation: string,
     onAnimationSelect: (animation: string) => void,

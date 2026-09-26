@@ -1,6 +1,6 @@
 import type { SpriteRef } from "../../asset/sprite.ts";
-import type { Point } from "../../common/point.ts";
 import type { StatModifiers } from "../../game/stat/statType.ts";
+import type { EquipmentSpriteVariant } from "../../rendering/character/characterColors.ts";
 
 export type InventoryItem = {
     readonly id: string;
@@ -9,23 +9,17 @@ export type InventoryItem = {
     readonly hint?: string;
     readonly tag?: readonly ItemTag[];
     readonly category?: ItemCategory;
-    readonly visual?: ItemVisual;
+    readonly visual?: EquipmentSpriteVariant;
     readonly rarity?: ItemRarity;
     readonly statModifiers?: StatModifiers;
     /**
-     * Names a LightSourceDefinition the holder emits while this item is
-     * equipped. Resolved at read time by `resolveLightSource`, never written
-     * into a component: an item grants light the same way it grants stats, as
-     * a function of what is held rather than as state copied onto the holder.
+     * Names a LightSourceDefinition the holder emits while this is equipped.
+     * Resolved at read time by `resolveLightSource` rather than copied onto
+     * the holder, the same way stats are.
      */
     readonly light?: string;
     /** Names an AttackProfileDefinition. Having one is what makes it a weapon */
     readonly attack?: string;
-};
-
-export type ItemVisual = {
-    sprite: SpriteRef;
-    offset: Point;
 };
 
 export const ItemTag = {

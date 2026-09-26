@@ -5,23 +5,20 @@ import type {
 } from "../../rendering/renderScope.ts";
 import type { SpriteDefinition, SpriteRef } from "../../asset/sprite.ts";
 import { spriteRegistry } from "../../asset/spriteRegistry.ts";
-import type {
-    CharacterColors,
-    EquipmentSpriteVariant,
-} from "../../rendering/character/characterColors.ts";
+import type { CharacterColors } from "../../rendering/character/characterColors.ts";
+import { placeEquipmentSprite } from "../../rendering/character/placeEquipmentSprite.ts";
+import { CHARACTER_FRAME } from "../../rendering/character/characterFrame.ts";
 import type { Rectangle } from "../../common/structure/rectangle.ts";
 import type { Point } from "../../common/point.ts";
-import { CHARACTER_SPRITE } from "./ui/characterBuilderConstants.ts";
 import type { AssetLoader } from "../../asset/loader/assetLoader.ts";
 import { getCharacterBinId } from "./characterBinId.ts";
 import {
     getFacingAtFrame,
     type CharacterAnimation,
-    type Facing,
 } from "../../rendering/character/characterAnimation.ts";
 
-const CHARACTER_FRAME_WIDTH = CHARACTER_SPRITE.FRAME_WIDTH;
-const CHARACTER_FRAME_HEIGHT = CHARACTER_SPRITE.FRAME_HEIGHT;
+const CHARACTER_FRAME_WIDTH = CHARACTER_FRAME.WIDTH;
+const CHARACTER_FRAME_HEIGHT = CHARACTER_FRAME.HEIGHT;
 
 const defaultColor = "#FACBA6"; // Default skin color for other parts
 export type PartNames =
@@ -36,12 +33,8 @@ export type PartNames =
     | "RightEye";
 
 /**
- * Builds sprite sheets for a character with the given customization
- * Creates one sprite per animation, all on the same canvas with each animation on a new row
- * @param scopeFactory Factory for creating offscreen render scopes
- * @param colors The colors to use for different body parts
- * @param assetLoader The asset loader to register generated sprites with
- * @returns An array of CharacterSprite objects
+ * Draws every animation for one appearance onto a single sheet, one row per
+ * animation. Cached by appearance, so each look is only drawn once.
  */
 export function buildSpriteSheet(
     scopeFactory: OffscreenCanvasFactory,
@@ -56,23 +49,15 @@ export function buildSpriteSheet(
     if (assetLoader.hasAsset(binId) && spriteCache.has(binId)) {
         return spriteCache.get(binId);
     }
-    // Create a single canvas with each animation on a new row
     const canvasWidth = CHARACTER_FRAME_WIDTH * maxFramesPerAnimation;
     const canvasHeight = CHARACTER_FRAME_HEIGHT * animationCount;
     const offscreenScope = scopeFactory(canvasWidth, canvasHeight);
 
-    // Iterate through all animations and draw each on its own row
     for (let animIdx = 0; animIdx < animations.length; animIdx++) {
         const animation = animations[animIdx];
         const animationName = animation.animationName;
-
-        // Get the number of frames from the first part (all parts have same frame count)
-        const frameCount = animationFrameCount(animation);
-
-        // Calculate the overall bounds across all frames in this animation
         const animationBounds = getAnimationBounds(animation);
 
-        // Draw all frames of this animation
         drawAnimation(
             offscreenScope,
             animation,
@@ -94,7 +79,6 @@ export function buildSpriteSheet(
             animationFrameCount(animation),
         ];
 
-        // Register the sprite definition with the global registry
         spriteRegistry.registerSprite(spriteRef, definition);
 
         const characterSprite: CharacterSprite = {
@@ -106,7 +90,6 @@ export function buildSpriteSheet(
         spriteCache.addAnimation(binId, animationName, characterSprite);
     }
 
-    // Get the generated bitmap and store it in the asset loader once
     const bitmap = offscreenScope.getBitmap();
     assetLoader.addGeneratedAsset(binId, bitmap);
 
@@ -158,9 +141,6 @@ export class SpriteDefinitionCache {
     }
 }
 
-/**
- * Color mapping for different body parts
- */
 function getPartColor(partName: string, colors: CharacterColors): string {
     switch (partName) {
         case "LeftEye":
@@ -181,11 +161,7 @@ function getPartColor(partName: string, colors: CharacterColors): string {
     }
 }
 
-/**
- * Calculate the bounding box of a body part based on its pixel coordinates
- * @param frameData Array of pixel coordinates [x1, y1, x2, y2, ...]
- * @returns Rectangle containing the bounds (x, y, width, height)
- */
+/** @param frameData Flat pixel coordinates: [x1, y1, x2, y2, ...] */
 function getPartBounds(frameData: readonly number[]): Rectangle {
     if (frameData.length === 0) {
         return { x: 0, y: 0, width: 0, height: 0 };
@@ -196,7 +172,6 @@ function getPartBounds(frameData: readonly number[]): Rectangle {
     let maxX = -Infinity;
     let maxY = -Infinity;
 
-    // Iterate through coordinate pairs to find min/max bounds
     for (let i = 0; i < frameData.length; i += 2) {
         const x = frameData[i];
         const y = frameData[i + 1];
@@ -215,9 +190,6 @@ function getPartBounds(frameData: readonly number[]): Rectangle {
     };
 }
 
-/**
- * Calculate the maximum number of frames in any single animation
- */
 function getMaxFramesPerAnimation(animations: CharacterAnimation[]): number {
     let maxFrames = 0;
     for (const animation of animations) {
@@ -229,12 +201,6 @@ function getMaxFramesPerAnimation(animations: CharacterAnimation[]): number {
     return maxFrames;
 }
 
-/**
- * Calculate the overall bounding box for all parts in a single frame
- * @param animation The animation containing all parts
- * @param frameIdx The frame index to calculate bounds for
- * @returns Rectangle containing the combined bounds of all parts
- */
 function getFrameBounds(
     animation: CharacterAnimation,
     frameIdx: number,
@@ -280,9 +246,8 @@ export type CharacterSprite = {
 };
 
 /**
- * The bounding box covering every frame of an animation. Centring each frame on
- * this shared box rather than its own keeps a jumping character from sliding
- * around inside the sprite as the frames change height.
+ * Frames are centred on this shared box rather than their own, so a jumping
+ * character does not slide around inside the sprite.
  */
 function getAnimationBounds(animation: CharacterAnimation): Rectangle {
     const frameCount = animationFrameCount(animation);
@@ -317,12 +282,8 @@ function getAnimationBounds(animation: CharacterAnimation): Rectangle {
 }
 
 /**
- * Generate outline pixels from a set of pixels
- * Outlines are drawn on top, left, and right sides, but not on the bottom
- * @param pixelSet Set of pixel coordinates as "x,y" strings
- * @param maxY The maximum Y coordinate of all pixels
- * @param outlineColor The color of the outline
- * @returns Array of outline pixel coordinates with their color
+ * A one-pixel outline around the pixels, except below the bottom row.
+ * @param pixelSet Pixel coordinates as "x,y" strings
  */
 function generateOutlineFromPixels(
     pixelSet: Set<string>,
@@ -332,18 +293,16 @@ function generateOutlineFromPixels(
     const outlinePixels: Array<{ x: number; y: number; color: string }> = [];
     const outlineSet = new Set<string>();
 
-    // Check each pixel and add outline pixels around it
     for (const pixelKey of pixelSet) {
         const [xStr, yStr] = pixelKey.split(",");
         const x = parseInt(xStr);
         const y = parseInt(yStr);
 
-        // Check only 4 cardinal directions (no diagonals)
         const directions = [
-            { dx: 0, dy: -1 }, // top
-            { dx: -1, dy: 0 }, // left
-            { dx: 1, dy: 0 }, // right
-            { dx: 0, dy: 1 }, // bottom
+            { dx: 0, dy: -1 },
+            { dx: -1, dy: 0 },
+            { dx: 1, dy: 0 },
+            { dx: 0, dy: 1 },
         ];
 
         for (const { dx, dy } of directions) {
@@ -351,17 +310,14 @@ function generateOutlineFromPixels(
             const checkY = y + dy;
             const key = `${checkX},${checkY}`;
 
-            // Skip if this position already has a pixel
             if (pixelSet.has(key)) {
                 continue;
             }
 
-            // Skip bottom outline - don't add outline below pixels at the maximum Y
             if (dy > 0 && y === maxY) {
                 continue;
             }
 
-            // Add outline pixel
             if (!outlineSet.has(key)) {
                 outlinePixels.push({
                     x: checkX,
@@ -376,9 +332,7 @@ function generateOutlineFromPixels(
     return outlinePixels;
 }
 
-/**
- * Draw outline pixels directly to the frame (no animation bounds adjustment needed)
- */
+/** Outline pixels are already in frame space, so only the frame's base offset applies. */
 function drawFrameOutline(
     offscreenScope: RenderScope,
     outlinePixels: Array<{ x: number; y: number; color: string }>,
@@ -396,30 +350,7 @@ function drawFrameOutline(
     }
 }
 
-/**
- * Draw equipment sprites at anchor positions for a given z-layer.
- * @param targetZ 0 for behind the character, 1 for in front
- */
-function resolveEquipmentSprite(
-    variant: EquipmentSpriteVariant,
-    facing: Facing,
-): { sprite: SpriteRef; flipX: boolean } {
-    switch (variant.type) {
-        case "single":
-            return { sprite: variant.sprite, flipX: false };
-        case "mirrored":
-            return {
-                sprite: variant.east,
-                flipX: facing === "sw" || facing === "nw",
-            };
-        case "perFacing":
-            return {
-                sprite: variant.sprites[facing] ?? variant.fallback,
-                flipX: false,
-            };
-    }
-}
-
+/** @param targetZ 0 for behind the character, 1 for in front */
 function drawEquipment(
     offscreenScope: OffscreenRenderScope,
     animation: CharacterAnimation,
@@ -435,8 +366,7 @@ function drawEquipment(
     const facing = getFacingAtFrame(animation, frameIdx);
 
     for (const equip of equipment) {
-        let drawX: number;
-        let drawY: number;
+        let attachBox: Rectangle;
 
         if ("anchor" in equip) {
             const anchor = animation.anchors.find(
@@ -450,16 +380,7 @@ function drawEquipment(
             const [anchorX, anchorY, z] = anchorFrame;
             if (z !== targetZ) continue;
 
-            drawX =
-                frameBaseX +
-                contentCenterX +
-                (anchorX - animationBounds.x) -
-                equip.offsetInSpriteForAnchorPoint.x;
-            drawY =
-                frameBaseY +
-                contentCenterY +
-                (anchorY - animationBounds.y) -
-                equip.offsetInSpriteForAnchorPoint.y;
+            attachBox = { x: anchorX, y: anchorY, width: 1, height: 1 };
         } else {
             if ((equip.z ?? 1) !== targetZ) continue;
 
@@ -469,37 +390,32 @@ function drawEquipment(
             const frameData = part?.frames[frameIdx] ?? [];
             if (frameData.length === 0) continue;
 
-            const partBounds = getPartBounds(frameData);
-            drawX =
-                frameBaseX +
-                contentCenterX +
-                (partBounds.x - equip.offset.x - animationBounds.x);
-            drawY =
-                frameBaseY +
-                contentCenterY +
-                (partBounds.y - equip.offset.y - animationBounds.y);
+            attachBox = getPartBounds(frameData);
         }
 
-        const { sprite, flipX } = resolveEquipmentSprite(equip.sprite, facing);
-        if (flipX) {
+        const placement = placeEquipmentSprite(equip.sprite, facing, attachBox);
+        if (!placement) continue;
+
+        const drawX =
+            frameBaseX + contentCenterX + (placement.x - animationBounds.x);
+        const drawY =
+            frameBaseY + contentCenterY + (placement.y - animationBounds.y);
+        if (placement.flipX) {
             offscreenScope.drawScreenSpaceSpriteFlippedX({
                 x: drawX,
                 y: drawY,
-                sprite,
+                sprite: placement.sprite,
             });
         } else {
             offscreenScope.drawScreenSpaceSprite({
                 x: drawX,
                 y: drawY,
-                sprite,
+                sprite: placement.sprite,
             });
         }
     }
 }
 
-/**
- * Draw all frames of a single animation to the sprite sheet
- */
 function drawAnimation(
     offscreenScope: OffscreenRenderScope,
     animation: CharacterAnimation,
@@ -509,7 +425,6 @@ function drawAnimation(
 ): void {
     const frameCount = animationFrameCount(animation);
 
-    // Calculate offset to center the animation content within the frame
     const contentCenterX = Math.floor(
         (CHARACTER_FRAME_WIDTH - animationBounds.width) / 2,
     );
@@ -517,7 +432,6 @@ function drawAnimation(
         (CHARACTER_FRAME_HEIGHT - animationBounds.height) / 2,
     );
 
-    // Draw all frames for this animation
     for (let frameIdx = 0; frameIdx < frameCount; frameIdx++) {
         const frameBaseX = frameIdx * CHARACTER_FRAME_WIDTH;
         const frameBaseY = animIdx * CHARACTER_FRAME_HEIGHT;
@@ -541,7 +455,7 @@ function drawAnimation(
         for (const part of animation.parts) {
             const frameData = part.frames[frameIdx];
             if (!frameData || frameData.length === 0) {
-                continue; // Skip empty frames
+                continue;
             }
 
             if (frameData.length % 2 !== 0) {

@@ -5,11 +5,8 @@ import {
 } from "../characterSpriteGenerator.ts";
 import { spriteRegistry } from "../../../asset/spriteRegistry.ts";
 import type { CharacterColors } from "../../../rendering/character/characterColors.ts";
-import {
-    CHARACTER_SPRITE,
-    LAYOUT,
-    type PreviewMode,
-} from "./characterBuilderConstants.ts";
+import { CHARACTER_FRAME } from "../../../rendering/character/characterFrame.ts";
+import { LAYOUT, type PreviewMode } from "./characterBuilderConstants.ts";
 import { characterPartFrames } from "../../../../generated/characterFrames.ts";
 import { getAllAnimations } from "../animation/getAllAnimations.ts";
 import type { CharacterAnimation } from "../../../rendering/character/characterAnimation.ts";
@@ -27,8 +24,8 @@ export type CharacterPreviewProps = {
     currentFrame?: number;
 };
 
-const FRAME_WIDTH = CHARACTER_SPRITE.FRAME_WIDTH;
-const FRAME_HEIGHT = CHARACTER_SPRITE.FRAME_HEIGHT;
+const FRAME_WIDTH = CHARACTER_FRAME.WIDTH;
+const FRAME_HEIGHT = CHARACTER_FRAME.HEIGHT;
 
 type ZoomLevel = 1 | 2 | 4 | 8;
 
@@ -148,11 +145,7 @@ const SingleFrameViewport = createComponent<SingleFrameViewportProps>(
     },
 );
 
-/**
- * Character preview component that renders the sprite with selected colors
- * and animation. Supports both single frame and sprite sheet preview modes.
- * In sheet mode, zoom (1x to 8x) and pan controls are shown below the preview.
- */
+/** In sheet mode, zoom (1x to 8x) and pan controls are shown below the preview. */
 export const CharacterPreview = createComponent<CharacterPreviewProps>(
     ({ props, withState }) => {
         const [zoom, setZoom] = withState<ZoomLevel>(1);

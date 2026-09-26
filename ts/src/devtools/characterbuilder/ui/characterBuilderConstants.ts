@@ -1,36 +1,20 @@
 import { characterPartFrames } from "../../../../generated/characterFrames.ts";
-import { spriteRefs, type SpriteRef } from "../../../asset/sprite.ts";
-import type { Point } from "../../../common/point.ts";
+import { CHARACTER_FRAME } from "../../../rendering/character/characterFrame.ts";
 
-/**
- * Character sprite dimensions
- */
-export const CHARACTER_SPRITE = {
-    FRAME_WIDTH: 32,
-    FRAME_HEIGHT: 32,
-} as const;
-
-/**
- * Layout dimensions for the character builder UI
- */
 export const LAYOUT = {
     TOP_BAR_HEIGHT: 60,
     LEFT_PANEL_WIDTH: 210,
     RIGHT_PANEL_WIDTH: 250,
     LAYER_BOX_SIZE: 100,
-    SPRITE_GRID_SIZE: CHARACTER_SPRITE.FRAME_WIDTH * 4,
+    SPRITE_GRID_SIZE: CHARACTER_FRAME.WIDTH * 4,
     COLOR_SWATCH_SIZE: 40,
 } as const;
 
-/**
- * Color palette for the character builder UI
- */
 export const COLORS = {
     BACKGROUND_DARK: "rgba(20, 20, 20, 0.9)",
     BACKGROUND_BLACK: "rgba(0, 0, 0, 0.8)",
     DIVIDER: "white",
 
-    // Button colors
     PART_BUTTON_DEFAULT: "rgba(50, 50, 50, 0.8)",
     PART_BUTTON_SELECTED: "rgba(100, 150, 100, 0.8)",
     PART_BUTTON_PRESSED: "rgba(70, 120, 70, 0.8)",
@@ -54,9 +38,6 @@ export const COLORS = {
     LAYER_BOX_BORDER: "rgba(100, 100, 100, 1)",
 } as const;
 
-/**
- * Available body parts for character customization
- */
 export const BODY_PARTS = [
     "Chest",
     "Feet",
@@ -66,9 +47,6 @@ export const BODY_PARTS = [
     "Equipment",
 ] as const;
 
-/**
- * Available colors for gear customization
- */
 export const FANTASY_GEAR_COLORS = [
     "DarkSlateBlue",
     "Indigo",
@@ -87,23 +65,6 @@ export const FANTASY_GEAR_COLORS = [
 export type BodyPart = (typeof BODY_PARTS)[number];
 export type PreviewMode = "Sheet" | "Single";
 
-export type EquipmentOption = {
-    id: string;
-    name: string;
-    sprite?: SpriteRef;
-    offset?: Point;
-};
-
-export const EQUIPMENT_OPTIONS: EquipmentOption[] = [
-    { id: "none", name: "None" },
-    {
-        id: "sword",
-        name: "Sword",
-        sprite: spriteRefs.character_sword,
-        offset: { x: 4, y: 8 },
-    },
-];
-
 export type HatOption = {
     id: string;
     name: string;
@@ -114,8 +75,5 @@ export const HAT_OPTIONS: HatOption[] = [
     { id: "hat", name: "Wizard Hat" },
 ];
 
-/**
- * Available anchor points derived from the first animation's anchor data
- */
 export const AVAILABLE_ANCHORS: string[] =
     characterPartFrames[0]?.anchors.map((a) => a.anchorId) ?? [];

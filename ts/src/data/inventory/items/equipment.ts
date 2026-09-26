@@ -5,6 +5,7 @@ import {
     woodenSwordAttackProfile,
 } from "../../combat/attackProfileDefinition.ts";
 import { torchLightSource } from "../../light/lightSourceDefinition.ts";
+import { EquipmentSpriteVariantType } from "../../../rendering/character/characterColors.ts";
 import { ItemCategory, ItemRarity, ItemTag } from "./../inventoryItem.ts";
 
 export const swordItem = {
@@ -69,11 +70,13 @@ export const torchItem = {
     name: "Torch",
     hint: "A bundle of straw and pitch on a stick. Burns while you carry it.",
     light: torchLightSource.id,
-    // Placeholder in-hand art. `torches` is a 16x16 building icon where
-    // character-held sprites are 8x16, so it draws about twice the width of a
-    // held sword, and it is an 8-frame fire animation drawn as a static frame
-    // 0. Both go away with proper character-scale art.
-    visual: { sprite: spriteRefs.torches, offset: { x: 8, y: 8 } },
+    // Placeholder art: a 16x16 building icon, twice the width of held sprites,
+    // and an 8-frame animation drawn as frame 0.
+    visual: {
+        type: EquipmentSpriteVariantType.Single,
+        sprite: spriteRefs.torches,
+        offset: { x: 8, y: 8 },
+    },
     rarity: ItemRarity.Common,
 } as const;
 
@@ -91,7 +94,26 @@ export const woodenSwordItem = {
     category: ItemCategory.Melee,
     attack: woodenSwordAttackProfile.id,
     statModifiers: { might: { flat: 1 } },
-    visual: { sprite: spriteRefs.character_sword, offset: { x: 4, y: 8 } },
+    visual: {
+        type: EquipmentSpriteVariantType.Single,
+        sprite: spriteRefs.character_sword,
+        offset: { x: 4, y: 8 },
+    },
+    rarity: ItemRarity.Common,
+} as const;
+
+export const fishingRodItem = {
+    asset: spriteRefs.fishingrod,
+    id: "fishingRod",
+    name: "Fishing Rod",
+    hint: "A springy length of wood and a braided line. The fish still decide the rest.",
+    tag: [ItemTag.SkillGear],
+    category: ItemCategory.Productivity,
+    visual: {
+        type: EquipmentSpriteVariantType.Mirrored,
+        sprite: spriteRefs.fishingrod,
+        offset: { x: 0, y: 8 },
+    },
     rarity: ItemRarity.Common,
 } as const;
 
@@ -102,4 +124,5 @@ export const equipmentItems = [
     hammerItem,
     torchItem,
     woodenSwordItem,
+    fishingRodItem,
 ] as const;

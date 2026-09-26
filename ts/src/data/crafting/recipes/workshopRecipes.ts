@@ -4,6 +4,7 @@ import {
     charcoalItem,
     inkItem,
     parchmentItem,
+    planksItem,
 } from "../../inventory/items/processedMaterials.ts";
 import {
     berryItem,
@@ -12,7 +13,11 @@ import {
     strawResourceItem,
     woodResourceItem,
 } from "../../inventory/items/resources.ts";
-import { torchItem, woodenSwordItem } from "../../inventory/items/equipment.ts";
+import {
+    fishingRodItem,
+    torchItem,
+    woodenSwordItem,
+} from "../../inventory/items/equipment.ts";
 import { bedrollItem } from "../../inventory/items/fieldEquipment.ts";
 import type { CraftingRecipe } from "../craftingRecipe.ts";
 
@@ -65,6 +70,19 @@ export const woodenSwordRecipe: CraftingRecipe = {
     duration: 3,
 };
 
+export const fishingRodRecipe: CraftingRecipe = {
+    id: "craft_fishingrod",
+    name: "Fishing Rod",
+    // Placeholder until a 16x16 icon exists.
+    icon: spriteRefs.fishingrod,
+    inputs: [
+        { item: planksItem, amount: 2 },
+        { item: strawResourceItem, amount: 1 },
+    ],
+    outputs: [{ item: fishingRodItem, amount: 1 }],
+    duration: 3,
+};
+
 /**
  * Straw stuffed into a flax sack. Both inputs come off a farm, so a settlement
  * can bed its workers down before it has any craft industry at all. This lives
@@ -114,6 +132,7 @@ export const workshopRecipes: readonly CraftingRecipe[] = [
     charcoalRecipe,
     torchRecipe,
     woodenSwordRecipe,
+    fishingRodRecipe,
     bedrollRecipe,
     parchmentRecipe,
     inkRecipe,
