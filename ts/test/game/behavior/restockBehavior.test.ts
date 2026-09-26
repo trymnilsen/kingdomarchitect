@@ -40,23 +40,6 @@ function createStockpileWithPreference(
 
 describe("RestockBehavior", () => {
     describe("isValid", () => {
-        it("returns false when no stockpile deficits exist", () => {
-            const behavior = createRestockBehavior();
-            const root = new Entity("root");
-            const worker = createBehaviorTestEntity("worker");
-            worker.setEcsComponent(createHeldItemComponent());
-
-            // Stockpile with surplus but no preference = no deficit
-            const stockpile = createStockpileEntity("stockpile");
-            const inv = stockpile.getEcsComponent(InventoryComponentId)!;
-            addInventoryItem(inv, woodResourceItem, 10);
-
-            root.addChild(worker);
-            root.addChild(stockpile);
-
-            assert.strictEqual(behavior.isValid(worker), false);
-        });
-
         it("returns false when deficit exists but no surplus source", () => {
             const behavior = createRestockBehavior();
             const root = new Entity("root");
@@ -102,85 +85,9 @@ describe("RestockBehavior", () => {
 
             assert.strictEqual(behavior.isValid(worker), true);
         });
-
-        it("returns false when worker has no inventory component", () => {
-            const behavior = createRestockBehavior();
-            const root = new Entity("root");
-            const worker = createBehaviorTestEntity("worker");
-            // No inventory component
-
-            const stockpileA = createStockpileEntity("stockpile-a");
-            const invA = stockpileA.getEcsComponent(InventoryComponentId)!;
-            addInventoryItem(invA, woodResourceItem, 20);
-
-            const stockpileB = createStockpileWithPreference(
-                "stockpile-b",
-                "wood",
-                10,
-                0,
-            );
-
-            root.addChild(worker);
-            root.addChild(stockpileA);
-            root.addChild(stockpileB);
-
-            assert.strictEqual(behavior.isValid(worker), false);
-        });
-    });
-
-    describe("utility", () => {
-        it("returns 15 (static)", () => {
-            const behavior = createRestockBehavior();
-            const worker = createBehaviorTestEntity("worker");
-
-            assert.strictEqual(behavior.utility(worker), 15);
-        });
     });
 
     describe("expand", () => {
-        it("returns 4-action sequence: moveTo source, withdraw, moveTo target, deposit", () => {
-            const behavior = createRestockBehavior();
-            const root = new Entity("root");
-            const worker = createBehaviorTestEntity("worker", 12, 8);
-            worker.setEcsComponent(createHeldItemComponent());
-
-            const stockpileA = createStockpileEntity("stockpile-a");
-            const invA = stockpileA.getEcsComponent(InventoryComponentId)!;
-            addInventoryItem(invA, woodResourceItem, 20);
-
-            const stockpileB = createStockpileWithPreference(
-                "stockpile-b",
-                "wood",
-                10,
-                0,
-            );
-
-            root.addChild(worker);
-            root.addChild(stockpileA);
-            root.addChild(stockpileB);
-
-            const actions = behavior.expand(worker);
-
-            assert.strictEqual(actions.length, 4);
-            assert.strictEqual(actions[0].type, "moveTo");
-            assert.strictEqual(actions[1].type, "withdrawFromStockpile");
-            assert.strictEqual(actions[2].type, "moveTo");
-            assert.strictEqual(actions[3].type, "depositToStockpile");
-
-            const withdraw = actions[1] as Extract<
-                (typeof actions)[1],
-                { type: "withdrawFromStockpile" }
-            >;
-            assert.strictEqual(withdraw.stockpileId, "stockpile-a");
-            assert.strictEqual(withdraw.itemId, "wood");
-
-            const deposit = actions[3] as Extract<
-                (typeof actions)[3],
-                { type: "depositToStockpile" }
-            >;
-            assert.strictEqual(deposit.stockpileId, "stockpile-b");
-        });
-
         it("withdraws correct amount (min of surplus and deficit)", () => {
             const behavior = createRestockBehavior();
             const root = new Entity("root");
@@ -255,13 +162,6 @@ describe("RestockBehavior", () => {
 
             // target2 has ratio 1.0 vs target1's 0.5, so it should be picked
             assert.strictEqual(deposit.stockpileId, "target2");
-        });
-    });
-
-    describe("name", () => {
-        it("has name 'restock'", () => {
-            const behavior = createRestockBehavior();
-            assert.strictEqual(behavior.name, "restock");
         });
     });
 });

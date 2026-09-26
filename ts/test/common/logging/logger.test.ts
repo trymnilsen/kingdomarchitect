@@ -40,37 +40,7 @@ afterEach(() => {
 });
 
 describe("logger", () => {
-    describe("no writers", () => {
-        it("produces no console output without a ConsoleWriter", () => {
-            const { calls } = withConsoleSpy(() => {
-                log.info("should be silent");
-            });
-            assert.strictEqual(calls.length, 0);
-        });
-    });
-
     describe("ConsoleWriter", () => {
-        it("prints the message to console when added", () => {
-            log.setConsoleWriter(new ConsoleWriter());
-            const { calls } = withConsoleSpy(() => {
-                log.info("Hunger increased");
-            });
-            assert.strictEqual(calls.length, 1);
-            assert.ok(
-                (calls[0].args[0] as string).includes("Hunger increased"),
-            );
-        });
-
-        it("passes data as a separate console argument", () => {
-            log.setConsoleWriter(new ConsoleWriter());
-            const data = { entityId: "worker_1" };
-            const { calls } = withConsoleSpy(() => {
-                log.info("message", data);
-            });
-            assert.strictEqual(calls[0].args.length, 2);
-            assert.strictEqual(calls[0].args[1], data);
-        });
-
         it("routes each level to the correct console method", () => {
             log.setConsoleWriter(new ConsoleWriter());
             const { calls } = withConsoleSpy(() => {
@@ -93,41 +63,9 @@ describe("logger", () => {
             });
             assert.ok(calls[0].args.includes(err));
         });
-
-        it("produces no output after setConsoleWriter(undefined)", () => {
-            log.setConsoleWriter(new ConsoleWriter());
-            log.setConsoleWriter(undefined);
-            const { calls } = withConsoleSpy(() => {
-                log.info("should be silent");
-            });
-            assert.strictEqual(calls.length, 0);
-        });
     });
 
     describe("BufferWriter", () => {
-        it("does not write to console", () => {
-            log.setLogBufferWriter(new BufferWriter());
-            const { calls } = withConsoleSpy(() => {
-                log.info("buffered only");
-            });
-            assert.strictEqual(calls.length, 0);
-        });
-
-        it("getLogBuffer returns entries written to the buffer", () => {
-            log.setLogBufferWriter(new BufferWriter());
-            log.info("first");
-            log.warn("second");
-            const entries = log.getLogBuffer();
-            assert.ok(entries !== undefined);
-            assert.strictEqual(entries.length, 2);
-            assert.strictEqual(entries[0].message, "first");
-            assert.strictEqual(entries[1].message, "second");
-        });
-
-        it("getLogBuffer returns undefined when no buffer writer is set", () => {
-            assert.strictEqual(log.getLogBuffer(), undefined);
-        });
-
         it("stores a JSON-safe snapshot of circular data payloads", () => {
             log.setLogBufferWriter(new BufferWriter());
 

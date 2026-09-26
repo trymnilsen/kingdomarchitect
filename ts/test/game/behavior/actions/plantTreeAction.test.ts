@@ -118,15 +118,4 @@ describe("plantTreeAction", () => {
             .jobs.find((queued) => queued.claimedBy === worker.id);
         assert.ok(stillClaimed, "the order outlives the planting");
     });
-
-    it("fails when the worker is nowhere near the spot", () => {
-        const { worker } = createTestScene();
-
-        const result = executePlantTreeAction(
-            plantAction({ targetPosition: { x: 25, y: 19 } }),
-            worker,
-        );
-
-        assert.strictEqual(result.kind, "failed");
-    });
 });

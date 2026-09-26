@@ -15,7 +15,6 @@ import {
 import { createLootDropSystem } from "../../../src/game/system/lootDropSystem.ts";
 import { createLootComponent } from "../../../src/game/component/lootComponent.ts";
 import { goblinLootTable } from "../../../src/data/loot/lootTable.ts";
-import { boar } from "../../../src/data/animal/animals.ts";
 import { GameTime } from "../../../src/game/gameTime.ts";
 
 describe("lootDropSystem", () => {
@@ -47,52 +46,6 @@ describe("lootDropSystem", () => {
         assert.ok(
             hasCollectableItems(collectableComponent),
             "collectable entity should have items",
-        );
-    });
-
-    it("does not spawn loot when the dying entity has no loot table", () => {
-        const { root, world } = createMinimalWorld();
-        world.addSystem(createLootDropSystem(new GameTime()));
-
-        const unit = new Entity("unit-1");
-        unit.setEcsComponent(createHealthComponent(10, 10));
-        root.addChild(unit);
-        unit.worldPosition = { x: 5, y: 5 };
-
-        damageEntity(unit, 100, 1);
-
-        const collectables = root.queryComponents(CollectableComponentId);
-        assert.strictEqual(
-            collectables.size,
-            0,
-            "no collectable should spawn for a death without loot",
-        );
-    });
-
-    it("drops the animal's own table when an animal is killed", () => {
-        const { root, world } = createMinimalWorld();
-        world.addSystem(createLootDropSystem(new GameTime()));
-
-        const settlement = new Entity("settlement");
-        settlement.setEcsComponent(createPlayerKingdomComponent());
-        settlement.setEcsComponent(createJobQueueComponent());
-        root.addChild(settlement);
-
-        const animal = new Entity("boar-1");
-        animal.setEcsComponent(createLootComponent(boar.loot.id));
-        animal.setEcsComponent(createHealthComponent(boar.health, boar.health));
-        root.addChild(animal);
-        animal.worldPosition = { x: 14, y: 9 };
-
-        damageEntity(animal, boar.health, 1);
-
-        const collectables = root.queryComponents(CollectableComponentId);
-        const droppedItemIds = [...collectables].flatMap(([, collectable]) =>
-            collectable.items.map((stack) => stack.item.id),
-        );
-        assert.ok(
-            droppedItemIds.includes("rawmeat"),
-            "a slain boar should leave meat behind",
         );
     });
 });

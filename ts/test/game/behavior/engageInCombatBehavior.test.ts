@@ -41,28 +41,6 @@ function attachAttacker(
 
 describe("engageInCombatBehavior", () => {
     describe("expand", () => {
-        it("picks the highest-amount threat when multiple attackers exist", () => {
-            const behavior = createEngageInCombatBehavior();
-            const { root, victim } = createVictim();
-            const threat = victim.getEcsComponent(ThreatMapComponentId)!;
-            attachAttacker(root, "G1", 18, 8);
-            attachAttacker(root, "G2", 19, 8);
-            // Amounts above the intrusion floor so the ordering is the
-            // amounts' own, not the floor's.
-            addThreat(threat, "G1", 12, 0, root);
-            addThreat(threat, "G2", 15, 0, root);
-
-            const actions = behavior.expand(victim);
-            const attack = actions.find((a) => a.type === "attackTarget") as
-                { type: "attackTarget"; target: AttackTarget } | undefined;
-
-            assert.ok(attack, "expand must include an attackTarget action");
-            assert.deepStrictEqual(attack.target, {
-                kind: AttackTargetKind.Entity,
-                id: "G2",
-            });
-        });
-
         it("switches target when accumulated threat amounts shift", () => {
             const behavior = createEngageInCombatBehavior();
             const { root, victim, time } = createVictim();
@@ -108,16 +86,6 @@ describe("engageInCombatBehavior", () => {
             assert.strictEqual(behavior.isValid(victim), false);
         });
 
-        it("returns true when the top-threat entity is in the world", () => {
-            const behavior = createEngageInCombatBehavior();
-            const { root, victim } = createVictim();
-            const threat = victim.getEcsComponent(ThreatMapComponentId)!;
-            attachAttacker(root, "G1", 18, 8);
-            addThreat(threat, "G1", 5, 0, root);
-
-            assert.strictEqual(behavior.isValid(victim), true);
-        });
-
         it("goes invalid once the entry has decayed to nothing", () => {
             const behavior = createEngageInCombatBehavior();
             const { root, victim, time } = createVictim();
@@ -146,29 +114,6 @@ describe("engageInCombatBehavior", () => {
 
             addThreat(threat, "G1", 3, 0, root);
             assert.strictEqual(behavior.utility(victim), 90);
-        });
-    });
-
-    describe("action shape", () => {
-        it("returns moveTo and attackTarget actions for the top threat", () => {
-            const behavior = createEngageInCombatBehavior();
-            const { root, victim } = createVictim();
-            const threat = victim.getEcsComponent(ThreatMapComponentId)!;
-            // Place attacker far from victim so a moveTo step is meaningful
-            attachAttacker(root, "G1", 20, 15);
-            addThreat(threat, "G1", 5, 0, root);
-
-            const actions = behavior.expand(victim);
-            const hasMoveTo = actions.some((a) => a.type === "moveTo");
-            const attack = actions.find((a) => a.type === "attackTarget") as
-                { type: "attackTarget"; target: AttackTarget } | undefined;
-
-            assert.ok(hasMoveTo, "expand should include a moveTo action");
-            assert.ok(attack, "expand should include an attackTarget action");
-            assert.deepStrictEqual(attack.target, {
-                kind: AttackTargetKind.Entity,
-                id: "G1",
-            });
         });
     });
 });

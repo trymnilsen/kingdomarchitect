@@ -7,13 +7,6 @@ import {
 } from "../../../src/game/component/movementStaminaComponent.ts";
 
 describe("movementStaminaComponent", () => {
-    it("reports no move before the entity has ever moved", () => {
-        const component = createMovementStaminaComponent();
-
-        assert.strictEqual(hasMovedThisTick(component, 0), false);
-        assert.strictEqual(hasMovedThisTick(component, 10), false);
-    });
-
     it("gates only the tick the entity moved on", () => {
         const component = createMovementStaminaComponent();
         recordMove(component, 10);

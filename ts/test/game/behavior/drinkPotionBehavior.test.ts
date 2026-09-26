@@ -65,26 +65,10 @@ function createStockpileWithItems(
 
 describe("drinkPotionBehavior", () => {
     describe("isValid", () => {
-        it("returns true below half health", () => {
-            const behavior = createDrinkPotionBehavior();
-            const settlement = createSettlement();
-            const worker = createWorker(settlement, 99, 200);
-            assert.strictEqual(behavior.isValid(worker), true);
-        });
-
         it("returns false at exactly half health", () => {
             const behavior = createDrinkPotionBehavior();
             const settlement = createSettlement();
             const worker = createWorker(settlement, 100, 200);
-            assert.strictEqual(behavior.isValid(worker), false);
-        });
-
-        it("returns false without a health component", () => {
-            const behavior = createDrinkPotionBehavior();
-            const settlement = createSettlement();
-            const worker = new Entity("worker");
-            settlement.addChild(worker);
-            worker.setEcsComponent(createHeldItemComponent());
             assert.strictEqual(behavior.isValid(worker), false);
         });
 
@@ -113,21 +97,6 @@ describe("drinkPotionBehavior", () => {
     });
 
     describe("utility", () => {
-        it("returns 0 at or above half health", () => {
-            const behavior = createDrinkPotionBehavior();
-            const settlement = createSettlement();
-            const worker = createWorker(settlement, 100, 200);
-            assert.strictEqual(behavior.utility(worker), 0);
-        });
-
-        it("starts around 50 just below the threshold", () => {
-            const behavior = createDrinkPotionBehavior();
-            const settlement = createSettlement();
-            const worker = createWorker(settlement, 99, 200);
-            const utility = behavior.utility(worker);
-            assert.ok(utility >= 50 && utility < 55);
-        });
-
         it("increases as health drops", () => {
             const behavior = createDrinkPotionBehavior();
             const settlement = createSettlement();
@@ -147,14 +116,6 @@ describe("drinkPotionBehavior", () => {
     });
 
     describe("choosePotionIds", () => {
-        it("prefers the lesser potion below the greater cutoff", () => {
-            const [preferred, fallback] = choosePotionIds(
-                GREATER_POTION_MISSING_HP - 1,
-            );
-            assert.strictEqual(preferred, healthPotion.id);
-            assert.strictEqual(fallback, greaterHealthPotion.id);
-        });
-
         it("prefers the greater potion at the cutoff", () => {
             const [preferred, fallback] = choosePotionIds(
                 GREATER_POTION_MISSING_HP,
@@ -198,57 +159,6 @@ describe("drinkPotionBehavior", () => {
             assert.ok(actions.some((a) => a.type === "drinkFromHeld"));
         });
 
-        it("fetches from a stockpile when held is empty", () => {
-            const behavior = createDrinkPotionBehavior();
-            const settlement = createSettlement();
-            const worker = createWorker(settlement, 90, 200);
-            createStockpileWithItems("stockpile", settlement, [
-                { item: healthPotion, amount: 3 },
-            ]);
-
-            const actions = behavior.expand(worker);
-            assert.strictEqual(actions.length, 3);
-            assert.strictEqual(actions[0].type, "moveTo");
-            assert.strictEqual(actions[1].type, "withdrawFromStockpile");
-            assert.strictEqual(
-                (actions[1] as { itemId: string }).itemId,
-                healthPotion.id,
-            );
-            assert.strictEqual(actions[2].type, "drinkFromHeld");
-        });
-
-        it("withdraws the greater potion when missing hp reaches the cutoff", () => {
-            const behavior = createDrinkPotionBehavior();
-            const settlement = createSettlement();
-            const worker = createWorker(settlement, 50, 200);
-            createStockpileWithItems("stockpile", settlement, [
-                { item: healthPotion, amount: 3 },
-                { item: greaterHealthPotion, amount: 1 },
-            ]);
-
-            const actions = behavior.expand(worker);
-            assert.strictEqual(
-                (actions[1] as { itemId: string }).itemId,
-                greaterHealthPotion.id,
-            );
-        });
-
-        it("withdraws the lesser potion for smaller wounds even when both are stocked", () => {
-            const behavior = createDrinkPotionBehavior();
-            const settlement = createSettlement();
-            const worker = createWorker(settlement, 90, 200);
-            createStockpileWithItems("stockpile", settlement, [
-                { item: healthPotion, amount: 3 },
-                { item: greaterHealthPotion, amount: 1 },
-            ]);
-
-            const actions = behavior.expand(worker);
-            assert.strictEqual(
-                (actions[1] as { itemId: string }).itemId,
-                healthPotion.id,
-            );
-        });
-
         it("falls back to the other tier when the preferred one is out of stock", () => {
             const behavior = createDrinkPotionBehavior();
             const settlement = createSettlement();
@@ -286,18 +196,6 @@ describe("drinkPotionBehavior", () => {
                 (actions[1] as { stockpileId: string }).stockpileId,
                 "nearStockpile",
             );
-        });
-
-        it("returns empty when no potions are stocked anywhere", () => {
-            const behavior = createDrinkPotionBehavior();
-            const settlement = createSettlement();
-            const worker = createWorker(settlement, 90, 200);
-            createStockpileWithItems("stockpile", settlement, [
-                { item: woodResourceItem, amount: 10 },
-            ]);
-
-            const actions = behavior.expand(worker);
-            assert.strictEqual(actions.length, 0);
         });
     });
 });

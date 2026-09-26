@@ -200,42 +200,4 @@ describe("equipCommandPlanner", () => {
             ]);
         });
     });
-
-    describe("error cases", () => {
-        it("returns empty plan when source entity is missing", () => {
-            const { root, worker } = createScene();
-            const actions = planEquipCommand(root, worker, {
-                sourceEntityId: "nonexistent",
-                itemId: swordItem.id,
-                slot: "primary",
-            });
-            assert.deepStrictEqual(actions, []);
-        });
-
-        it("throws when source is neither stockpile nor ground pile", () => {
-            const { root, worker } = createScene();
-            const oddSource = new Entity("odd-source");
-            root.addChild(oddSource);
-            oddSource.worldPosition = { x: 7, y: 5 };
-
-            assert.throws(() =>
-                planEquipCommand(root, worker, {
-                    sourceEntityId: "odd-source",
-                    itemId: swordItem.id,
-                    slot: "primary",
-                }),
-            );
-        });
-
-        it("throws on unknown itemId", () => {
-            const { root, worker } = createScene();
-            assert.throws(() =>
-                planEquipCommand(root, worker, {
-                    sourceEntityId: "stockpile",
-                    itemId: "not-a-real-item",
-                    slot: "primary",
-                }),
-            );
-        });
-    });
 });

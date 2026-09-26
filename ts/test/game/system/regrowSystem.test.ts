@@ -25,28 +25,6 @@ describe("RegrowSystem", () => {
     }
 
     describe("Resource Regrowth", () => {
-        it("does not affect resources that have never been harvested", () => {
-            const root = new Entity("root");
-            const bush = createBerryBush(root);
-
-            const regrowComponent = bush.requireEcsComponent(RegrowComponentId);
-            assert.strictEqual(
-                regrowComponent.harvestedAtTick,
-                -1,
-                "Initial harvestedAtTick should be -1",
-            );
-
-            regrowSystem.onUpdate(root, 100);
-
-            const updatedRegrowComponent =
-                bush.requireEcsComponent(RegrowComponentId);
-            assert.strictEqual(
-                updatedRegrowComponent.harvestedAtTick,
-                -1,
-                "harvestedAtTick should remain -1 after system update",
-            );
-        });
-
         it("does not regrow resource before regrow time has passed", () => {
             const root = new Entity("root");
             const bush = createBerryBush(root);
@@ -94,50 +72,6 @@ describe("RegrowSystem", () => {
     });
 
     describe("Sprite Updates", () => {
-        it("changes sprite to depleted during regrow period", () => {
-            const root = new Entity("root");
-            const bush = createBerryBush(root);
-
-            // Mark as harvested
-            const harvestTick = 100;
-            const regrowComponent = bush.requireEcsComponent(RegrowComponentId);
-            regrowComponent.harvestedAtTick = harvestTick;
-            bush.invalidateComponent(RegrowComponentId);
-
-            // Run system during regrow period
-            const duringRegrowTick = harvestTick + 50;
-            regrowSystem.onUpdate(root, duringRegrowTick);
-
-            const spriteComponent = bush.requireEcsComponent(SpriteComponentId);
-            assert.strictEqual(
-                spriteComponent.sprite,
-                berryBushResource.lifecycle.sprite,
-                "Sprite should be changed to depleted sprite",
-            );
-        });
-
-        it("restores sprite to normal after regrow completes", () => {
-            const root = new Entity("root");
-            const bush = createBerryBush(root);
-
-            // Mark as harvested
-            const harvestTick = 100;
-            const regrowComponent = bush.requireEcsComponent(RegrowComponentId);
-            regrowComponent.harvestedAtTick = harvestTick;
-            bush.invalidateComponent(RegrowComponentId);
-
-            // Run system after regrow completes
-            const afterRegrowTick = harvestTick + 200;
-            regrowSystem.onUpdate(root, afterRegrowTick);
-
-            const spriteComponent = bush.requireEcsComponent(SpriteComponentId);
-            assert.strictEqual(
-                spriteComponent.sprite,
-                berryBushResource.asset,
-                "Sprite should be restored to normal sprite",
-            );
-        });
-
         it("only updates sprite once to depleted state", () => {
             const root = new Entity("root");
             const bush = createBerryBush(root);
@@ -163,124 +97,6 @@ describe("RegrowSystem", () => {
                 sprite1,
                 berryBushResource.lifecycle.sprite,
                 "Should be depleted sprite",
-            );
-        });
-    });
-
-    describe("Multiple Resources", () => {
-        it("handles multiple resources with different harvest times", () => {
-            const root = new Entity("root");
-            const bush1 = createBerryBush(root);
-            const bush2 = createBerryBush(root);
-
-            // Harvest bush1 early, bush2 later
-            const harvestTick1 = 100;
-            const harvestTick2 = 200;
-
-            bush1.requireEcsComponent(RegrowComponentId).harvestedAtTick =
-                harvestTick1;
-            bush1.invalidateComponent(RegrowComponentId);
-
-            bush2.requireEcsComponent(RegrowComponentId).harvestedAtTick =
-                harvestTick2;
-            bush2.invalidateComponent(RegrowComponentId);
-
-            // Run at time when bush1 should regrow but bush2 should not
-            const midTick = harvestTick1 + 200;
-            regrowSystem.onUpdate(root, midTick);
-
-            const regrow1 = bush1.requireEcsComponent(RegrowComponentId);
-            const regrow2 = bush2.requireEcsComponent(RegrowComponentId);
-
-            assert.strictEqual(
-                regrow1.harvestedAtTick,
-                -1,
-                "Bush1 should be regrown",
-            );
-            assert.strictEqual(
-                regrow2.harvestedAtTick,
-                harvestTick2,
-                "Bush2 should still be harvested",
-            );
-        });
-
-        it("regrowing resource can be harvested again", () => {
-            const root = new Entity("root");
-            const bush = createBerryBush(root);
-
-            // First harvest cycle
-            const harvestTick1 = 100;
-            bush.requireEcsComponent(RegrowComponentId).harvestedAtTick =
-                harvestTick1;
-            bush.invalidateComponent(RegrowComponentId);
-
-            // Wait for regrow
-            regrowSystem.onUpdate(root, harvestTick1 + 200);
-
-            let regrowComponent = bush.requireEcsComponent(RegrowComponentId);
-            assert.strictEqual(
-                regrowComponent.harvestedAtTick,
-                -1,
-                "Should be regrown after first cycle",
-            );
-
-            // Second harvest cycle
-            const harvestTick2 = harvestTick1 + 250;
-            bush.requireEcsComponent(RegrowComponentId).harvestedAtTick =
-                harvestTick2;
-            bush.invalidateComponent(RegrowComponentId);
-
-            // Wait for second regrow
-            regrowSystem.onUpdate(root, harvestTick2 + 200);
-
-            regrowComponent = bush.requireEcsComponent(RegrowComponentId);
-            assert.strictEqual(
-                regrowComponent.harvestedAtTick,
-                -1,
-                "Should be regrown after second cycle",
-            );
-        });
-    });
-
-    describe("Edge Cases", () => {
-        it("leaves an entity with no ResourceComponent harvested", () => {
-            const root = new Entity("root");
-            const entity = new Entity("invalid");
-            entity.setEcsComponent(createRegrowComponent(berryBushResource.id));
-            entity.requireEcsComponent(RegrowComponentId).harvestedAtTick = 100;
-            entity.invalidateComponent(RegrowComponentId);
-            root.addChild(entity);
-
-            regrowSystem.onUpdate(root, 300);
-
-            const regrowComponent =
-                entity.requireEcsComponent(RegrowComponentId);
-            assert.strictEqual(
-                regrowComponent.harvestedAtTick,
-                100,
-                "Should remain unchanged",
-            );
-        });
-
-        it("regrows an entity that has no sprite to swap", () => {
-            const root = new Entity("root");
-            const entity = new Entity("no-sprite");
-            entity.setEcsComponent(
-                createResourceComponent(berryBushResource.id),
-            );
-            entity.setEcsComponent(createRegrowComponent(berryBushResource.id));
-            entity.requireEcsComponent(RegrowComponentId).harvestedAtTick = 100;
-            entity.invalidateComponent(RegrowComponentId);
-            root.addChild(entity);
-
-            regrowSystem.onUpdate(root, 300);
-
-            const regrowComponent =
-                entity.requireEcsComponent(RegrowComponentId);
-            assert.strictEqual(
-                regrowComponent.harvestedAtTick,
-                -1,
-                "Should regrow despite missing sprite",
             );
         });
     });

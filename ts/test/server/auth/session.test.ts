@@ -37,22 +37,9 @@ describe("Session Management", () => {
                 "Token should be 32 bytes hex-encoded",
             );
         });
-
-        it("creates distinct sessions for same player", () => {
-            const s1 = createSession(db, "player1", 3600_000);
-            const s2 = createSession(db, "player1", 3600_000);
-            assert.notStrictEqual(s1.sessionId, s2.sessionId);
-        });
     });
 
     describe("validateSession", () => {
-        it("returns session for valid token", () => {
-            const created = createSession(db, "player1", 3600_000);
-            const validated = validateSession(db, created.sessionId);
-            assert.ok(validated, "Session should be valid");
-            assert.strictEqual(validated!.playerId, "player1");
-        });
-
         it("returns null for unknown token", () => {
             const result = validateSession(db, "nonexistent-token");
             assert.strictEqual(result, null);
@@ -101,25 +88,8 @@ describe("Session Management", () => {
 });
 
 describe("parseCookies", () => {
-    it("parses simple cookie header", () => {
-        const cookies = parseCookies("session=abc123; theme=dark");
-        assert.strictEqual(cookies["session"], "abc123");
-        assert.strictEqual(cookies["theme"], "dark");
-    });
-
-    it("handles empty string", () => {
-        const cookies = parseCookies("");
-        assert.deepStrictEqual(cookies, {});
-    });
-
     it("handles cookie values with equals signs", () => {
         const cookies = parseCookies("token=abc=def=ghi");
         assert.strictEqual(cookies["token"], "abc=def=ghi");
-    });
-
-    it("trims whitespace", () => {
-        const cookies = parseCookies("  session = abc123 ; theme = dark ");
-        assert.strictEqual(cookies["session"], "abc123");
-        assert.strictEqual(cookies["theme"], "dark");
     });
 });

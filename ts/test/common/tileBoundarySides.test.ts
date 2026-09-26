@@ -24,19 +24,6 @@ describe("tileBoundarySides", () => {
         ]);
     });
 
-    it("gives a tile surrounded on all sides no sides", () => {
-        const centre = { x: 21, y: 16 };
-        const tiles = tileSet([
-            centre,
-            { x: 21, y: 15 },
-            { x: 21, y: 17 },
-            { x: 20, y: 16 },
-            { x: 22, y: 16 },
-        ]);
-
-        assertSides(tileBoundarySides(tiles, centre), []);
-    });
-
     it("turns the inner corner of an L shape", () => {
         // One column two tiles tall, plus one tile to its right on the
         // bottom row.

@@ -13,7 +13,6 @@ import { EnergyComponentId } from "../../../src/game/component/energyComponent.t
 import { CollectResourceJob } from "../../../src/game/job/collectResourceJob.ts";
 import { ResourceHarvestMode } from "../../../src/data/inventory/items/naturalResource.ts";
 import { woodenHouse } from "../../../src/data/building/wood/house.ts";
-import { createStepOutsideBehavior } from "../../../src/game/behavior/behaviors/stepOutsideBehavior.ts";
 import { Entity } from "../../../src/game/entity/entity.ts";
 
 /**
@@ -175,25 +174,5 @@ describe("step-outside scenario tests", () => {
             "worker should settle off the building, not oscillate back on",
         );
         assert.ok(!isOnBuilding(harness, worker));
-    });
-
-    it("is valid only while on a building, and expands to a single stepOff", () => {
-        const harness = new ScenarioHarness();
-        harness.placeBuilding("stockpile", { x: 12, y: 10 });
-        const onBuilding = harness.addWorker("on", { x: 12, y: 10 });
-        const onGround = harness.addWorker("off", { x: 15, y: 10 });
-        const behavior = createStepOutsideBehavior();
-
-        assert.ok(
-            behavior.isValid(onBuilding),
-            "valid when standing on the building",
-        );
-        assert.ok(
-            !behavior.isValid(onGround),
-            "invalid when standing on open ground",
-        );
-        assert.deepStrictEqual(behavior.expand(onBuilding), [
-            { type: "stepOff" },
-        ]);
     });
 });

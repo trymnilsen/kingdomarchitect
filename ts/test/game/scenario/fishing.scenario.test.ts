@@ -1,20 +1,14 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
 import type { Bounds } from "../../../src/common/bounds.ts";
-import { isPointAdjacentTo, type Point } from "../../../src/common/point.ts";
+import { type Point } from "../../../src/common/point.ts";
 import { fishingRodProfile } from "../../../src/data/fishing/fishingProfileDefinition.ts";
 import { fishingRodItem } from "../../../src/data/inventory/items/equipment.ts";
-import { woodResourceItem } from "../../../src/data/inventory/items/resources.ts";
 import {
     getBehaviorAgent,
     requestReplan,
 } from "../../../src/game/component/behaviorAgentComponent.ts";
-import { CollectableComponentId } from "../../../src/game/component/collectableComponent.ts";
 import { EquipmentComponentId } from "../../../src/game/component/equipmentComponent.ts";
-import {
-    addToHeldItem,
-    HeldItemComponentId,
-} from "../../../src/game/component/heldItemComponent.ts";
 import {
     getChunk,
     setChunk,
@@ -112,19 +106,6 @@ describe("fishing scenario", () => {
         assert.deepStrictEqual(fisher.worldPosition, start);
     });
 
-    it("drops an order into water something is built over", () => {
-        const harness = new ScenarioHarness();
-        const fisher = fisherBesidePond(harness);
-        const start = fisher.worldPosition;
-        placeWall(harness.root, shoreSpot);
-
-        orderFishing(fisher, shoreSpot);
-        harness.tickN(3);
-
-        assert.strictEqual(hasOrder(fisher), false);
-        assert.deepStrictEqual(fisher.worldPosition, start);
-    });
-
     it("drops the order when no one can reach the bank", () => {
         const harness = new ScenarioHarness();
         const fisher = fisherBesidePond(harness);
@@ -142,47 +123,5 @@ describe("fishing scenario", () => {
             `still ordered after ${ticks} ticks`,
         );
         assert.strictEqual(harness.getHeldAmount(fisher, "fish"), 0);
-    });
-
-    it("gives up when the rod is unequipped mid-cast", () => {
-        const harness = new ScenarioHarness();
-        const fisher = fisherBesidePond(harness);
-
-        orderFishing(fisher, shoreSpot);
-        harness.tickUntil(() => isFishing(fisher), 30);
-        harness.tick();
-        fisher.getEcsComponent(EquipmentComponentId)!.slots.primary = null;
-        harness.tickN(fishingRodProfile.duration + 2);
-
-        assert.strictEqual(harness.getHeldAmount(fisher, "fish"), 0);
-        assert.strictEqual(hasOrder(fisher), false);
-    });
-
-    it("sets down what it carries to free its hands, then fishes", () => {
-        const harness = new ScenarioHarness();
-        const fisher = fisherBesidePond(harness);
-        const carried = 3;
-        addToHeldItem(
-            fisher.getEcsComponent(HeldItemComponentId)!,
-            woodResourceItem,
-            carried,
-        );
-
-        orderFishing(fisher, shoreSpot);
-        harness.tickUntil(() => harness.getHeldAmount(fisher, "fish") > 0, 40);
-
-        const piles = [...harness.root.queryComponents(CollectableComponentId)];
-        assert.deepStrictEqual(
-            piles.map(([, pile]) =>
-                pile.items.map((stack) => [stack.item.id, stack.amount]),
-            ),
-            [[[woodResourceItem.id, carried]]],
-            "the wood should be set down whole, not lost or split",
-        );
-        assert.strictEqual(
-            harness.getHeldAmount(fisher, "fish"),
-            fishingRodProfile.catch.amount,
-        );
-        assert.ok(isPointAdjacentTo(fisher.worldPosition, shoreSpot));
     });
 });

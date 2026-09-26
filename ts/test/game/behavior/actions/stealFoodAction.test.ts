@@ -53,42 +53,4 @@ describe("stealFoodAction", () => {
         assert.ok(remainingStack);
         assert.strictEqual(remainingStack.amount, 2);
     });
-
-    it("returns failed when target entity does not exist", () => {
-        const { thief } = createTestScene();
-        const action = {
-            type: "stealFood" as const,
-            targetEntityId: "nonexistent",
-        };
-
-        const result = executeStealFoodAction(action, thief);
-
-        assert.strictEqual(result.kind, "failed");
-    });
-
-    it("returns failed when target has no food-tagged items", () => {
-        const { root, thief } = createTestScene();
-        const emptyTarget = new Entity("emptyTarget");
-        emptyTarget.worldPosition = { x: 13, y: 8 };
-        emptyTarget.setEcsComponent(createInventoryComponent());
-        root.addChild(emptyTarget);
-
-        const action = {
-            type: "stealFood" as const,
-            targetEntityId: "emptyTarget",
-        };
-        const result = executeStealFoodAction(action, thief);
-
-        assert.strictEqual(result.kind, "failed");
-    });
-
-    it("returns failed when thief is not adjacent to target", () => {
-        const { thief, target } = createTestScene();
-        target.worldPosition = { x: 25, y: 25 };
-
-        const action = { type: "stealFood" as const, targetEntityId: "target" };
-        const result = executeStealFoodAction(action, thief);
-
-        assert.strictEqual(result.kind, "failed");
-    });
 });

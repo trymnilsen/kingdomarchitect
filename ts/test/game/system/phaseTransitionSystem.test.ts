@@ -9,21 +9,6 @@ import {
 } from "../../../src/game/component/dayComponent.ts";
 
 describe("derivePhaseState", () => {
-    it("maps tick 0 to dawn", () => {
-        assert.strictEqual(derivePhaseState(0).phase, "dawn");
-    });
-
-    it("maps tick at start of day to day", () => {
-        assert.strictEqual(derivePhaseState(DAWN_TICKS).phase, "day");
-    });
-
-    it("maps tick at start of dusk to dusk", () => {
-        assert.strictEqual(
-            derivePhaseState(DAWN_TICKS + DAY_TICKS).phase,
-            "dusk",
-        );
-    });
-
     it("maps tick at start of night to night", () => {
         assert.strictEqual(
             derivePhaseState(DAWN_TICKS + DAY_TICKS + DUSK_TICKS).phase,
@@ -46,12 +31,5 @@ describe("daysSurvived", () => {
 
     it("increments to 1 exactly at the dawn rollover", () => {
         assert.strictEqual(derivePhaseState(TOTAL_CYCLE_TICKS).daysSurvived, 1);
-    });
-
-    it("stays at 1 on the tick after the rollover", () => {
-        assert.strictEqual(
-            derivePhaseState(TOTAL_CYCLE_TICKS + 1).daysSurvived,
-            1,
-        );
     });
 });

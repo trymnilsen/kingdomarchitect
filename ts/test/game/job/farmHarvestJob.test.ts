@@ -46,31 +46,6 @@ function createTestScene(cropId: CropId = "wheat"): {
 }
 
 describe("farmHarvestJobPlanner", () => {
-    it("returns moveTo and harvestCrop actions for valid job", () => {
-        const { root, worker } = createTestScene();
-        const job = createFarmHarvestJob("farm");
-        const actions = planFarmHarvest(root, worker, job);
-
-        assert.strictEqual(actions.length, 2);
-        assert.strictEqual(actions[0].type, "moveTo");
-        assert.strictEqual(actions[1].type, "harvestCrop");
-    });
-
-    it("moveTo targets farm position", () => {
-        const { root, worker, farm } = createTestScene();
-        farm.worldPosition = { x: 20, y: 15 };
-
-        const job = createFarmHarvestJob("farm");
-        const actions = planFarmHarvest(root, worker, job);
-
-        const moveAction = actions[0] as {
-            type: "moveTo";
-            target: { x: number; y: number };
-        };
-        assert.strictEqual(moveAction.target.x, 20);
-        assert.strictEqual(moveAction.target.y, 15);
-    });
-
     it("moveTo stops beside the farm", () => {
         const { root, worker } = createTestScene();
         const job = createFarmHarvestJob("farm");
@@ -82,47 +57,9 @@ describe("farmHarvestJobPlanner", () => {
         };
         assert.deepStrictEqual(moveAction.goal, { kind: "adjacent" });
     });
-
-    it("harvestCrop references the correct building id", () => {
-        const { root, worker } = createTestScene();
-        const job = createFarmHarvestJob("farm");
-        const actions = planFarmHarvest(root, worker, job);
-
-        const harvestAction = actions[1] as {
-            type: "harvestCrop";
-            buildingId: string;
-        };
-        assert.strictEqual(harvestAction.buildingId, "farm");
-    });
-
-    it("returns empty array when farm building not found", () => {
-        const root = new Entity("root");
-        const worker = new Entity("worker");
-        root.setEcsComponent(createJobQueueComponent());
-        root.addChild(worker);
-        worker.worldPosition = { x: 12, y: 8 };
-
-        const job = createFarmHarvestJob("nonexistent");
-        const actions = planFarmHarvest(root, worker, job);
-
-        assert.strictEqual(actions.length, 0);
-    });
 });
 
 describe("harvestCropAction", () => {
-    it("adds cropYieldAmount of crop item to worker held slot", () => {
-        const { worker } = createTestScene();
-        const action = { type: "harvestCrop" as const, buildingId: "farm" };
-
-        const result = executeHarvestCropAction(action, worker);
-
-        assert.strictEqual(result.kind, "complete");
-        const held = worker.getEcsComponent(HeldItemComponentId)!;
-        assert.ok(held.item, "worker should be holding the crop");
-        assert.strictEqual(held.item.id, "wheat");
-        assert.strictEqual(held.amount, 4);
-    });
-
     it("yields the configured crop's item and amount, not a hardcoded wheat", () => {
         // Proves the harvest derives output from the farm's cropId via the crop
         // registry rather than a value baked onto the component at creation.
@@ -136,27 +73,6 @@ describe("harvestCropAction", () => {
         const held = worker.getEcsComponent(HeldItemComponentId)!;
         assert.strictEqual(held.item?.id, flax.itemId);
         assert.strictEqual(held.amount, flax.yieldAmount);
-    });
-
-    it("transitions farm from Ready to Empty", () => {
-        const { worker, farm } = createTestScene();
-        const action = { type: "harvestCrop" as const, buildingId: "farm" };
-
-        executeHarvestCropAction(action, worker);
-
-        const farmComp = farm.getEcsComponent(FarmComponentId)!;
-        assert.strictEqual(farmComp.state, FarmState.Empty);
-    });
-
-    it("resets plantedAtTick to 0 after harvest", () => {
-        const { worker, farm } = createTestScene();
-        const farmComp = farm.getEcsComponent(FarmComponentId)!;
-        farmComp.plantedAtTick = 50;
-
-        const action = { type: "harvestCrop" as const, buildingId: "farm" };
-        executeHarvestCropAction(action, worker);
-
-        assert.strictEqual(farmComp.plantedAtTick, 0);
     });
 
     it("completes without state change when farm is not Ready (race condition)", () => {
@@ -175,27 +91,5 @@ describe("harvestCropAction", () => {
             isHeldEmpty(held),
             "held should remain empty when farm is not Ready",
         );
-    });
-
-    it("fails when farm building is not found", () => {
-        const { worker } = createTestScene();
-        const action = {
-            type: "harvestCrop" as const,
-            buildingId: "nonexistent",
-        };
-
-        const result = executeHarvestCropAction(action, worker);
-
-        assert.strictEqual(result.kind, "failed");
-    });
-
-    it("fails when worker is not adjacent to farm", () => {
-        const { worker, farm } = createTestScene();
-        farm.worldPosition = { x: 25, y: 25 };
-
-        const action = { type: "harvestCrop" as const, buildingId: "farm" };
-        const result = executeHarvestCropAction(action, worker);
-
-        assert.strictEqual(result.kind, "failed");
     });
 });

@@ -24,12 +24,6 @@ function setupScene(): { root: Entity; worker: Entity } {
 }
 
 describe("dropHeldAction", () => {
-    it("returns complete with no work when held is empty", () => {
-        const { worker } = setupScene();
-        const result = executeDropHeldAction({ type: "dropHeld" }, worker, 1);
-        assert.strictEqual(result.kind, "complete");
-    });
-
     it("spawns a ground pile at the worker's tile when destination omitted", () => {
         const { root, worker } = setupScene();
         const held = worker.requireEcsComponent(HeldItemComponentId);

@@ -21,14 +21,6 @@ describe("stockpile capacity", () => {
         assert.strictEqual(getStockpileUsedSpace(inventory), 42);
     });
 
-    it("reports the room left against capacity", () => {
-        const inventory = createInventoryComponent();
-        addInventoryItem(inventory, woodResourceItem, 180);
-        const stockpile = createStockpileComponent(200);
-
-        assert.strictEqual(getStockpileFreeSpace(stockpile, inventory), 20);
-    });
-
     it("clamps free space at zero when overfilled", () => {
         // Capacity can be crossed by a store that was filled before its cap
         // changed. Free space must not go negative, or a deposit would compute

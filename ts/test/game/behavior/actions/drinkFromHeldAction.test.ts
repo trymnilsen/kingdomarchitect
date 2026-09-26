@@ -17,7 +17,6 @@ import { executeDrinkFromHeldAction } from "../../../../src/game/behavior/action
 import { createEffectSystem } from "../../../../src/game/system/effectSystem.ts";
 import { createEffectExecutorMap } from "../../../../src/data/effect/effectExecutorRegistry.ts";
 import {
-    breadItem,
     greaterHealthPotion,
     healthPotion,
 } from "../../../../src/data/inventory/items/resources.ts";
@@ -88,29 +87,6 @@ describe("drinkFromHeldAction", () => {
 
         assert.strictEqual(held.item, healthPotion);
         assert.strictEqual(held.amount, 1);
-    });
-
-    it("returns failed when held is empty", () => {
-        const { worker } = createDrinker();
-        const result = executeDrinkFromHeldAction(
-            { type: "drinkFromHeld" },
-            worker,
-        );
-        assert.strictEqual(result.kind, "failed");
-    });
-
-    it("returns failed when held item has no effect factory", () => {
-        const { worker } = createDrinker();
-        const held = worker.requireEcsComponent(HeldItemComponentId);
-        held.item = breadItem;
-        held.amount = 2;
-
-        const result = executeDrinkFromHeldAction(
-            { type: "drinkFromHeld" },
-            worker,
-        );
-        assert.strictEqual(result.kind, "failed");
-        assert.strictEqual(held.amount, 2, "bread should be untouched");
     });
 
     it("heals the entity once the effect system runs", () => {

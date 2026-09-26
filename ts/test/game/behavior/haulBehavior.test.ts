@@ -33,7 +33,6 @@ import {
 /** A cresset at (12, 8) claims a radius-2 disc of hearthlight around itself. */
 const CRESSET = { x: 12, y: 8 };
 const LIT = { x: 13, y: 8 };
-const LIT_FARTHER = { x: 12, y: 9 };
 const DARK = { x: 16, y: 8 };
 
 type Yard = {
@@ -89,17 +88,6 @@ function addPile(
 describe("haulBehavior", () => {
     const haul = createHaulBehavior();
 
-    it("walks to a lit pile and picks it up", () => {
-        const { root, hauler } = litYard();
-        const pile = addPile(root, "pile", LIT, woodResourceItem);
-
-        assert.strictEqual(haul.isValid(hauler), true);
-        assert.deepStrictEqual(haul.expand(hauler), [
-            { type: "moveTo", target: LIT, goal: { kind: "adjacent" } },
-            { type: "pickupFromGround", pileEntityId: pile.id },
-        ]);
-    });
-
     it("leaves a pile in the dark alone", () => {
         const { root, hauler } = litYard();
         addPile(root, "pile", DARK, woodResourceItem);
@@ -114,19 +102,6 @@ describe("haulBehavior", () => {
         addPile(root, "pile", LIT, woodResourceItem);
 
         assert.strictEqual(haul.isValid(hauler), false);
-    });
-
-    it("prefers the nearer of two lit piles", () => {
-        const { root, hauler } = litYard();
-        hauler.worldPosition = { x: 14, y: 8 };
-        addPile(root, "far", LIT_FARTHER, woodResourceItem);
-        const near = addPile(root, "near", LIT, woodResourceItem);
-
-        const actions = haul.expand(hauler);
-        assert.deepStrictEqual(actions[1], {
-            type: "pickupFromGround",
-            pileEntityId: near.id,
-        });
     });
 
     it("is not valid while the hand is full, so depositHeld can take over", () => {

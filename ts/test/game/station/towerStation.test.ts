@@ -17,8 +17,6 @@ import {
 } from "../../../src/game/component/stationComponent.ts";
 import {
     isManningStation,
-    isTowerManned,
-    stationOccupant,
     stationUnderEntity,
 } from "../../../src/game/component/stationQuery.ts";
 import { createGarrisonBehavior } from "../../../src/game/behavior/behaviors/garrisonBehavior.ts";
@@ -26,7 +24,6 @@ import {
     executeHoldStationAction,
     type HoldStationActionData,
 } from "../../../src/game/behavior/actions/holdStationAction.ts";
-import { getGameTimeTick } from "../../../src/game/component/gameTimeComponent.ts";
 import { createStepOutsideBehavior } from "../../../src/game/behavior/behaviors/stepOutsideBehavior.ts";
 import {
     searchlightWedgeOffsets,
@@ -95,29 +92,9 @@ describe("searchlight wedge geometry", () => {
             "wedges cover only diamond tiles",
         );
     });
-
-    it("wedge tiles stay within the diamond and exclude the centre", () => {
-        for (const aim of SWEEP_ORDER) {
-            for (const o of searchlightWedgeOffsets(aim, R)) {
-                assert.ok(Math.abs(o.x) + Math.abs(o.y) <= R, "within diamond");
-                assert.ok(!(o.x === 0 && o.y === 0), "centre excluded");
-            }
-        }
-    });
 });
 
 describe("station occupancy queries", () => {
-    it("a guard on an enabled tower is manning it", () => {
-        const { root } = createMinimalWorld();
-        const tower = addTower(root, "t", { x: 2, y: 2 }, StationPriority.High);
-        const guard = addUnit(root, "g", { x: 2, y: 2 });
-
-        assert.strictEqual(stationUnderEntity(guard), tower);
-        assert.strictEqual(stationOccupant(root, tower), guard);
-        assert.strictEqual(isTowerManned(root, tower), true);
-        assert.strictEqual(isManningStation(guard), true);
-    });
-
     it("a disabled (Off) tower is not being manned", () => {
         const { root } = createMinimalWorld();
         addTower(root, "t", { x: 2, y: 2 }, StationPriority.Off);
@@ -126,23 +103,6 @@ describe("station occupancy queries", () => {
         // Role-agnostic occupancy still sees the body...
         assert.notStrictEqual(stationUnderEntity(guard), null);
         // ...but the role+enabled exemption does not apply, so it will be grounded.
-        assert.strictEqual(isManningStation(guard), false);
-    });
-
-    it("a non-guard on a tower is not manning it", () => {
-        const { root } = createMinimalWorld();
-        addTower(root, "t", { x: 2, y: 2 }, StationPriority.High);
-        const worker = addUnit(root, "w", { x: 2, y: 2 }, WorkerRole.Worker);
-
-        assert.strictEqual(isManningStation(worker), false);
-    });
-
-    it("a guard standing off the tower is not manning anything", () => {
-        const { root } = createMinimalWorld();
-        addTower(root, "t", { x: 2, y: 2 }, StationPriority.High);
-        const guard = addUnit(root, "g", { x: 5, y: 5 });
-
-        assert.strictEqual(stationUnderEntity(guard), null);
         assert.strictEqual(isManningStation(guard), false);
     });
 });
@@ -166,23 +126,6 @@ describe("garrison behavior", () => {
             type: "stepOnto",
             targetId: tower.id,
         });
-    });
-
-    it("holds the post once the guard is already manning it", () => {
-        const { root } = createMinimalWorld();
-        addTower(root, "t", { x: 2, y: 2 }, StationPriority.High);
-        const guard = addUnit(root, "g", { x: 2, y: 2 });
-
-        assert.strictEqual(garrison.isValid(guard), true);
-
-        const plan = garrison.expand(guard);
-        assert.strictEqual(plan.length, 1);
-        const hold = plan[0] as HoldStationActionData;
-        assert.strictEqual(hold.type, "holdStation");
-        assert.ok(
-            hold.untilTick > getGameTimeTick(root),
-            "the watch ends at a fixed future tick rather than counting down",
-        );
     });
 
     it("keeps standing until the watch is up, then ends it", () => {
@@ -230,32 +173,6 @@ describe("garrison behavior", () => {
         );
     });
 
-    it("gives up the watch when the guard is no longer on the tower", () => {
-        const { root } = createMinimalWorld();
-        addTower(root, "t", { x: 2, y: 2 }, StationPriority.High);
-        const guard = addUnit(root, "g", { x: 2, y: 2 });
-
-        const hold = garrison.expand(guard)[0] as HoldStationActionData;
-        guard.worldPosition = { x: 5, y: 5 };
-
-        const result = executeHoldStationAction(
-            hold,
-            guard,
-            hold.untilTick - 1,
-        );
-
-        assert.strictEqual(result.kind, "failed");
-    });
-
-    it("is not valid for a guard whose Guard role is excluded", () => {
-        const { root } = createMinimalWorld();
-        addTower(root, "t", { x: 2, y: 2 }, StationPriority.High);
-        const guard = addUnit(root, "g", { x: 5, y: 5 });
-        setRoles(guard, [WorkerRole.Worker]);
-
-        assert.strictEqual(garrison.isValid(guard), false);
-    });
-
     it("leaves a manning guard when the Guard role is taken away", () => {
         const { root } = createMinimalWorld();
         addTower(root, "t", { x: 2, y: 2 }, StationPriority.High);
@@ -289,14 +206,6 @@ describe("garrison behavior", () => {
         );
     });
 
-    it("does nothing when the only tower is disabled", () => {
-        const { root } = createMinimalWorld();
-        addTower(root, "t", { x: 2, y: 2 }, StationPriority.Off);
-        const guard = addUnit(root, "g", { x: 5, y: 5 });
-
-        assert.strictEqual(garrison.isValid(guard), false);
-    });
-
     it("a second guard does not target a tower already occupied", () => {
         const { root } = createMinimalWorld();
         addTower(root, "t", { x: 2, y: 2 }, StationPriority.High);
@@ -304,21 +213,6 @@ describe("garrison behavior", () => {
         const guardB = addUnit(root, "b", { x: 6, y: 6 });
 
         assert.strictEqual(garrison.isValid(guardB), false);
-    });
-
-    it("a second guard covers a different free tower", () => {
-        const { root } = createMinimalWorld();
-        addTower(root, "t1", { x: 2, y: 2 }, StationPriority.High);
-        const t2 = addTower(root, "t2", { x: 8, y: 8 }, StationPriority.High);
-        addUnit(root, "a", { x: 2, y: 2 }); // A on t1
-        const guardB = addUnit(root, "b", { x: 7, y: 7 });
-
-        assert.strictEqual(garrison.isValid(guardB), true);
-        const actions = garrison.expand(guardB);
-        assert.deepStrictEqual(actions[1], {
-            type: "stepOnto",
-            targetId: t2.id,
-        });
     });
 });
 

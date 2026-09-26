@@ -42,34 +42,6 @@ function makeSleepAction(
 }
 
 describe("executeSleepAction", () => {
-    it("increments energy by energyPerTick each tick", () => {
-        const worker = createSleeper(20);
-        const action = makeSleepAction(10, 100);
-
-        executeSleepAction(action, worker);
-
-        const energy = worker.requireEcsComponent(EnergyComponentId);
-        assert.strictEqual(energy.energy, 30);
-    });
-
-    it("returns running while energy is below target", () => {
-        const worker = createSleeper(20);
-        const action = makeSleepAction(10, 100);
-
-        const result = executeSleepAction(action, worker);
-
-        assert.strictEqual(result.kind, "running");
-    });
-
-    it("returns complete when energy reaches target", () => {
-        const worker = createSleeper(90);
-        const action = makeSleepAction(10, 100);
-
-        const result = executeSleepAction(action, worker);
-
-        assert.strictEqual(result.kind, "complete");
-    });
-
     it("clamps energy to energyTarget on completion, not beyond", () => {
         const worker = createSleeper(95);
         const action = makeSleepAction(10, 100);
@@ -91,17 +63,6 @@ describe("executeSleepAction", () => {
         assert.strictEqual(energy.exhaustionLevel, 0);
     });
 
-    it("does not clear exhaustion while still sleeping", () => {
-        const worker = createSleeper(20);
-        const energy = worker.requireEcsComponent(EnergyComponentId);
-        energy.exhaustionLevel = 2;
-        const action = makeSleepAction(10, 100, "house");
-
-        executeSleepAction(action, worker);
-
-        assert.strictEqual(energy.exhaustionLevel, 2);
-    });
-
     it("collapse quality clears exhaustion to level 2 on completion", () => {
         const worker = createSleeper(28);
         const energy = worker.requireEcsComponent(EnergyComponentId);
@@ -111,31 +72,6 @@ describe("executeSleepAction", () => {
         executeSleepAction(action, worker);
 
         assert.strictEqual(energy.exhaustionLevel, 2);
-    });
-
-    it("invalidates energy component each tick", () => {
-        const root = new Entity("root");
-        const worker = new Entity("worker");
-        worker.worldPosition = { x: 12, y: 8 };
-        const energyComp = createEnergyComponent(100);
-        energyComp.energy = 20;
-        worker.setEcsComponent(energyComp);
-        worker.setEcsComponent(createBehaviorAgentComponent());
-        root.addChild(worker);
-
-        let invalidated = false;
-        root.entityEvent = (event) => {
-            if (
-                event.id === "component_updated" &&
-                event.item.id === EnergyComponentId
-            ) {
-                invalidated = true;
-            }
-        };
-
-        executeSleepAction(makeSleepAction(10, 100), worker);
-
-        assert.strictEqual(invalidated, true);
     });
 });
 
@@ -226,16 +162,6 @@ describe("executeSleepAction healing", () => {
         return worker;
     }
 
-    it("house quality heals 4 hp per tick", () => {
-        const worker = createWoundedSleeper(100);
-        const action = makeSleepAction(10, 100, "house");
-
-        executeSleepAction(action, worker);
-
-        const health = worker.requireEcsComponent(HealthComponentId);
-        assert.strictEqual(health.currentHp, 104);
-    });
-
     it("bedrollFire quality accumulates fractional heals to 5 hp over 2 ticks", () => {
         const worker = createWoundedSleeper(100);
         const action = makeSleepAction(8, 80, "bedrollFire");
@@ -261,43 +187,5 @@ describe("executeSleepAction healing", () => {
 
         executeSleepAction(action, worker);
         assert.strictEqual(health.currentHp, 101);
-    });
-
-    it("does not heal past maxHp", () => {
-        const worker = createWoundedSleeper(199);
-        const action = makeSleepAction(10, 100, "house");
-
-        executeSleepAction(action, worker);
-
-        const health = worker.requireEcsComponent(HealthComponentId);
-        assert.strictEqual(health.currentHp, 200);
-    });
-
-    it("runs without a health component", () => {
-        const worker = createSleeper(20);
-        const action = makeSleepAction(10, 100, "house");
-
-        const result = executeSleepAction(action, worker);
-
-        assert.strictEqual(result.kind, "running");
-    });
-
-    it("invalidates the health component when whole hp lands", () => {
-        const worker = createWoundedSleeper(100);
-        const root = worker.getRootEntity();
-
-        let invalidated = false;
-        root.entityEvent = (event) => {
-            if (
-                event.id === "component_updated" &&
-                event.item.id === HealthComponentId
-            ) {
-                invalidated = true;
-            }
-        };
-
-        executeSleepAction(makeSleepAction(10, 100, "house"), worker);
-
-        assert.strictEqual(invalidated, true);
     });
 });

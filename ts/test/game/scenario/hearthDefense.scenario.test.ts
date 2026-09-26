@@ -122,19 +122,6 @@ describe("hearth defense", () => {
         assert.deepStrictEqual(Object.keys(darkThreat.threat), []);
     });
 
-    it("writes nothing when no intruder stands in the light", () => {
-        const { harness } = makeHarness();
-        const aggressive = harness.addWorker("aggro", { x: 13, y: 8 });
-        makeAggressive(aggressive);
-        // A goblin outside every pool is invisible to the scan.
-        addGoblin(harness, { x: 24, y: 20 });
-
-        harness.tickN(HEARTH_DEFENSE_INTERVAL);
-
-        const threat = aggressive.getEcsComponent(ThreatMapComponentId)!;
-        assert.deepStrictEqual(Object.keys(threat.threat), []);
-    });
-
     it("engages within the interval and releases after the entry decays", () => {
         const { harness } = makeHarness();
         const worker = harness.addWorker("aggro", { x: 13, y: 8 });

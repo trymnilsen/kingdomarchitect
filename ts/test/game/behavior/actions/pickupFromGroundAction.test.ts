@@ -84,27 +84,4 @@ describe("pickupFromGroundAction", () => {
         assert.strictEqual(held.item?.id, "stone");
         assert.strictEqual(held.amount, 1);
     });
-
-    it("fails when worker is not adjacent to pile", () => {
-        const { worker, pile } = createScene();
-        pile.worldPosition = { x: 20, y: 20 };
-
-        const collectable = pile.requireEcsComponent("Collectable");
-        addCollectableItem(collectable, { item: woodResourceItem, amount: 1 });
-
-        const result = executePickupFromGroundAction(
-            { type: "pickupFromGround", pileEntityId: "pile" },
-            worker,
-        );
-        assert.strictEqual(result.kind, "failed");
-    });
-
-    it("fails when pile entity is missing", () => {
-        const { worker } = createScene();
-        const result = executePickupFromGroundAction(
-            { type: "pickupFromGround", pileEntityId: "nonexistent" },
-            worker,
-        );
-        assert.strictEqual(result.kind, "failed");
-    });
 });

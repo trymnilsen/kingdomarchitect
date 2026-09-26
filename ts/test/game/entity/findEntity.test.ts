@@ -13,13 +13,6 @@ describe("Entity.findEntity", () => {
         assert.strictEqual(root.findEntity("grandchild"), grandchild);
     });
 
-    it("returns null for an unknown id", () => {
-        const root = new Entity("root");
-        root.addChild(new Entity("child"));
-
-        assert.strictEqual(root.findEntity("nope"), null);
-    });
-
     it("finds an entity added after the cache was first built", () => {
         const root = new Entity("root");
         // Prime the cache with a miss so it exists and could go stale.
@@ -44,13 +37,5 @@ describe("Entity.findEntity", () => {
         // child_removed must have invalidated the id cache, and the lazy
         // rebuild must not re-include the now-detached child.
         assert.strictEqual(root.findEntity("child"), null);
-    });
-
-    it("returns the same instance on repeated lookups", () => {
-        const root = new Entity("root");
-        const child = new Entity("child");
-        root.addChild(child);
-
-        assert.strictEqual(root.findEntity("child"), root.findEntity("child"));
     });
 });

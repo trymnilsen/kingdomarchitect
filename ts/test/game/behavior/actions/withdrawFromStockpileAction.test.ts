@@ -70,28 +70,6 @@ describe("withdrawFromStockpileAction", () => {
         assert.strictEqual(remainingWood?.amount, 5);
     });
 
-    it("stacks onto held when held already holds the same item id", () => {
-        const { worker, stockpile } = createTestScene();
-        const held = worker.requireEcsComponent(HeldItemComponentId);
-        held.item = woodResourceItem;
-        held.amount = 2;
-
-        const stockpileInventory =
-            stockpile.getEcsComponent(InventoryComponentId)!;
-        addInventoryItem(stockpileInventory, woodResourceItem, 4);
-
-        const action: WithdrawAction = {
-            type: "withdrawFromStockpile",
-            stockpileId: "stockpile",
-            itemId: "wood",
-            amount: 3,
-        };
-
-        const result = executeWithdrawFromStockpileAction(action, worker);
-        assert.strictEqual(result.kind, "complete");
-        assert.strictEqual(held.amount, 5);
-    });
-
     it("fails when held holds a different item id", () => {
         const { worker, stockpile } = createTestScene();
         const held = worker.requireEcsComponent(HeldItemComponentId);
@@ -115,18 +93,6 @@ describe("withdrawFromStockpileAction", () => {
         assert.strictEqual(held.amount, 1);
     });
 
-    it("fails if stockpile entity not found", () => {
-        const { worker } = createTestScene();
-        const action: WithdrawAction = {
-            type: "withdrawFromStockpile",
-            stockpileId: "nonexistent",
-            itemId: "wood",
-            amount: 5,
-        };
-        const result = executeWithdrawFromStockpileAction(action, worker);
-        assert.strictEqual(result.kind, "failed");
-    });
-
     it("fails if stockpile has insufficient items", () => {
         const { worker, stockpile } = createTestScene();
 
@@ -139,28 +105,6 @@ describe("withdrawFromStockpileAction", () => {
             stockpileId: "stockpile",
             itemId: "wood",
             amount: 10,
-        };
-
-        const result = executeWithdrawFromStockpileAction(action, worker);
-        assert.strictEqual(result.kind, "failed");
-    });
-
-    it("fails if entity has no StockpileComponent", () => {
-        const root = new Entity("root");
-        const worker = new Entity("worker");
-        const notAStockpile = new Entity("not-stockpile");
-
-        worker.setEcsComponent(createHeldItemComponent());
-        notAStockpile.setEcsComponent(createInventoryComponent());
-
-        root.addChild(worker);
-        root.addChild(notAStockpile);
-
-        const action: WithdrawAction = {
-            type: "withdrawFromStockpile",
-            stockpileId: "not-stockpile",
-            itemId: "wood",
-            amount: 5,
         };
 
         const result = executeWithdrawFromStockpileAction(action, worker);

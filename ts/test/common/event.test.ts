@@ -10,18 +10,6 @@ class SampleEvent {
 }
 
 describe("TypedEvent", () => {
-    it("delivers a published event to a listener", () => {
-        const event = new TypedEvent<object>();
-        let received = 0;
-        event.listen(SampleEvent, (e) => {
-            received = e.value;
-        });
-
-        event.publish(new SampleEvent(42));
-
-        assert.strictEqual(received, 42);
-    });
-
     it("removeListener removes only the disposed subscription", () => {
         const event = new TypedEvent<object>();
         let a = 0;

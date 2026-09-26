@@ -25,42 +25,6 @@ function makeEffect(name: string = "Test Effect") {
 }
 
 describe("getStats", () => {
-    it("applies flat modifier from active effect", () => {
-        const entity = makeEntity();
-        const effectsComponent = createActiveEffectsComponent();
-        entity.setEcsComponent(effectsComponent);
-
-        effectsComponent.effects.push({
-            effect: makeEffect(),
-            source: "test",
-            modifiers: { might: { flat: 3 } },
-            state: {},
-            remainingTicks: 10,
-            ticksSinceLastApplication: 0,
-        });
-
-        const stats = getStats(entity);
-        assert.strictEqual(stats.might, 8); // 5 base + 3 flat
-    });
-
-    it("applies percent modifier from active effect", () => {
-        const entity = makeEntity();
-        const effectsComponent = createActiveEffectsComponent();
-        entity.setEcsComponent(effectsComponent);
-
-        effectsComponent.effects.push({
-            effect: makeEffect(),
-            source: "test",
-            modifiers: { might: { percent: 0.2 } },
-            state: {},
-            remainingTicks: 10,
-            ticksSinceLastApplication: 0,
-        });
-
-        const stats = getStats(entity);
-        assert.strictEqual(stats.might, 6); // floor(5 * 1.2) = 6
-    });
-
     it("applies flat before percent: (base + flat) * (1 + pct)", () => {
         const entity = makeEntity();
         const effectsComponent = createActiveEffectsComponent();

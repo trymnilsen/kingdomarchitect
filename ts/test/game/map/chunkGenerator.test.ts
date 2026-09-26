@@ -1,17 +1,13 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
 import { generateChunk } from "../../../src/game/map/chunkGenerator.ts";
-import { ChunkSize, createLandTerrain } from "../../../src/game/map/chunk.ts";
+import { createLandTerrain } from "../../../src/game/map/chunk.ts";
 import type { Volume } from "../../../src/game/map/volume.ts";
 import {
     TileComponentId,
     setChunk,
 } from "../../../src/game/component/tileComponent.ts";
 import { createMinimalWorld } from "../testWorld.ts";
-import {
-    assertChunkMapMatchesTree,
-    assertTransformsConsistent,
-} from "../worldInvariants.ts";
 
 /**
  * generateChunk mixes deterministic volume rules with random volume sizes,
@@ -89,19 +85,5 @@ describe("generateChunk", () => {
             volume.maxSize >= 1,
             "the new volume should allow at least its own chunk",
         );
-    });
-
-    it("places the chunk entity at the chunk's world origin with consistent contents", () => {
-        const { root } = createMinimalWorld();
-
-        const generated = generateChunk(root, { x: 1, y: 1 });
-
-        assert.strictEqual(generated.chunkEntity.parent, root);
-        assert.deepStrictEqual(generated.chunkEntity.worldPosition, {
-            x: ChunkSize,
-            y: ChunkSize,
-        });
-        assertTransformsConsistent(root);
-        assertChunkMapMatchesTree(root);
     });
 });

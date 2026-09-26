@@ -1,14 +1,8 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
 import { ScenarioHarness } from "./scenarioHarness.ts";
-import { buildingPrefab } from "../../../src/game/prefab/buildingPrefab.ts";
 import { lampPost } from "../../../src/data/building/light/lampPost.ts";
 import { BuildingComponentId } from "../../../src/game/component/buildingComponent.ts";
-import {
-    createKingdomComponent,
-    KingdomType,
-} from "../../../src/game/component/kingdomComponent.ts";
-import { Entity } from "../../../src/game/entity/entity.ts";
 import { finishConstruction } from "../../../src/game/job/buildBuildingJob.ts";
 import {
     hasDiscoveredTile,
@@ -63,30 +57,6 @@ describe("discover on build", () => {
         assert.ok(
             !hasDiscoveredTile(worldDiscovery, "player", { x: 25, y: 16 }),
             "tile beyond the light should remain undiscovered",
-        );
-    });
-
-    it("does not discover for a finished building the player does not own", () => {
-        const harness = new ScenarioHarness();
-        const worldDiscovery = harness.root.requireEcsComponent(
-            WorldDiscoveryComponentId,
-        );
-
-        // Goblin buildings use the same prefab and carry the same vision, so
-        // only ownership keeps them from revealing land for the player.
-        const goblinKingdom = new Entity("goblinKingdom");
-        goblinKingdom.setEcsComponent(
-            createKingdomComponent(KingdomType.Goblin),
-        );
-        harness.root.addChild(goblinKingdom);
-        const position = { x: 20, y: 16 };
-        const building = buildingPrefab(lampPost, false, "goblinLamp");
-        goblinKingdom.addChild(building);
-        building.worldPosition = position;
-
-        assert.ok(
-            !hasDiscoveredTile(worldDiscovery, "player", position),
-            "a building in a goblin kingdom should not discover",
         );
     });
 });

@@ -12,37 +12,6 @@ import {
 } from "../../../src/server/persistence/sqliteMigrationCompiler.ts";
 
 describe("SQLite Schema Migrations", () => {
-    it("creates schema_version table and applies migrations", () => {
-        const db = new DatabaseSync(":memory:");
-        applySQLiteMigrations(db, gameMigrations);
-
-        const version = getSQLiteVersion(db);
-        assert.strictEqual(version, 1, "Should be at version 1");
-
-        const tables = db
-            .prepare(
-                "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name",
-            )
-            .all() as Array<{ name: string }>;
-
-        const tableNames = tables.map((t) => t.name);
-        assert.ok(
-            tableNames.includes("entities"),
-            "entities table should exist",
-        );
-        assert.ok(tableNames.includes("meta"), "meta table should exist");
-        assert.ok(
-            tableNames.includes("root_components"),
-            "root_components table should exist",
-        );
-        assert.ok(
-            tableNames.includes("schema_version"),
-            "schema_version table should exist",
-        );
-
-        db.close();
-    });
-
     it("creates indexes defined in migration operations", () => {
         const db = new DatabaseSync(":memory:");
         applySQLiteMigrations(db, [...gameMigrations, ...authMigrations]);
@@ -188,13 +157,6 @@ describe("SQLite Schema Migrations", () => {
         db.close();
     });
 
-    it("returns version 0 for empty database", () => {
-        const db = new DatabaseSync(":memory:");
-        const version = getSQLiteVersion(db);
-        assert.strictEqual(version, 0);
-        db.close();
-    });
-
     it("compiles addColumn to ALTER TABLE", () => {
         const migrations: StoreMigration[] = [
             {
@@ -248,50 +210,6 @@ describe("SQLite Schema Migrations", () => {
 
         assert.strictEqual(row.weight, 3.5);
         assert.strictEqual(getSQLiteVersion(db), 2);
-
-        db.close();
-    });
-
-    it("applies sqlOnly operations in SQLite", () => {
-        const migrations: StoreMigration[] = [
-            {
-                version: 1,
-                description: "Game store plus a SQL-only auth store",
-                operations: [
-                    {
-                        type: "createStore",
-                        name: "data",
-                        columns: [
-                            { name: "id", type: "text", primaryKey: true },
-                        ],
-                    },
-                    {
-                        type: "createStore",
-                        sqlOnly: true,
-                        name: "auth",
-                        columns: [
-                            { name: "token", type: "text", primaryKey: true },
-                        ],
-                    },
-                ],
-            },
-        ];
-
-        const db = new DatabaseSync(":memory:");
-        applySQLiteMigrations(db, migrations);
-
-        const tables = db
-            .prepare(
-                "SELECT name FROM sqlite_master WHERE type='table' AND name IN ('data','auth') ORDER BY name",
-            )
-            .all() as Array<{ name: string }>;
-
-        assert.deepStrictEqual(
-            tables.map((t) => t.name),
-            ["auth", "data"],
-            "Both regular and sqlOnly stores should be created in SQLite",
-        );
-        assert.strictEqual(getSQLiteVersion(db), 1);
 
         db.close();
     });

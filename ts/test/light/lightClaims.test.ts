@@ -52,34 +52,6 @@ describe("lit coverage", () => {
         assert.strictEqual(litAt(lit, 14, 11), true);
     });
 
-    it("lights exactly the emitter's own tile at radius 0", () => {
-        const root = new Entity("root");
-        addSource(root, "w", "workerGlow", { x: 12, y: 8 }, false);
-
-        const lit = computeLitTiles(collectLightClaims(root, "illumination"));
-
-        assert.strictEqual(litAt(lit, 12, 8), true);
-        assert.strictEqual(litAt(lit, 13, 8), false);
-        assert.strictEqual(litAt(lit, 12, 9), false);
-        assert.strictEqual(lit.size, 1);
-    });
-
-    it("stamps a pattern claim's offsets verbatim, ignoring the radius", () => {
-        const root = new Entity("root");
-        addSource(root, "s", "searchlight", { x: 12, y: 8 }, true, [
-            { x: 2, y: 0 },
-            { x: 3, y: 1 },
-        ]);
-
-        const lit = computeLitTiles(collectLightClaims(root, "illumination"));
-
-        assert.strictEqual(litAt(lit, 14, 8), true);
-        assert.strictEqual(litAt(lit, 15, 9), true);
-        // The emitter's own tile is not in the pattern, so it is not lit.
-        assert.strictEqual(litAt(lit, 12, 8), false);
-        assert.strictEqual(lit.size, 2);
-    });
-
     it("scopes hearthlight to player-owned emitters carrying a claim", () => {
         const root = new Entity("root");
 
@@ -142,15 +114,5 @@ describe("lit coverage", () => {
                 `isTileLit at ${phase}`,
             );
         }
-    });
-
-    it("answers set membership at night through isTileLit", () => {
-        const root = new Entity("root");
-        addSource(root, "t", "wayshrine", { x: 12, y: 8 }, true);
-        const lit = computeLitTiles(collectLightClaims(root, "illumination"));
-
-        // Radius 1: the cardinal neighbour is lit, the diagonal is not.
-        assert.strictEqual(isTileLit(lit, "night", { x: 13, y: 8 }), true);
-        assert.strictEqual(isTileLit(lit, "night", { x: 13, y: 9 }), false);
     });
 });

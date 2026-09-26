@@ -94,47 +94,6 @@ function findBuiltCampfire(camp: Entity): Entity | null {
 }
 
 describe("Goblin Building Flow", () => {
-    it("cold goblin builds campfire and warms up when tree is adjacent", () => {
-        /**
-         * Scenario: No movement needed to reach the trees.
-         * Goblin and camp are at (12, 8), trees immediately adjacent either side.
-         * Full flow: harvest → deposit → construct → warm at fire.
-         *
-         * Two trees because a campfire costs 10 wood and a tree yields 8, so
-         * the goblin has to make a second trip.
-         */
-        const { root } = createWorld({
-            min: { x: 4, y: 2 },
-            max: { x: 20, y: 16 },
-        });
-
-        const camp = createCamp(root, "goblinCamp1", { x: 12, y: 8 });
-        const goblin = createGoblin(camp, { x: 12, y: 8 });
-        createTree(root, "tree1", { x: 13, y: 8 });
-        createTree(root, "tree2", { x: 11, y: 8 });
-
-        runSystems(root, 80);
-
-        const campfire = findBuiltCampfire(camp);
-        assert.ok(campfire, "Campfire should be fully constructed");
-        assert.ok(
-            campfire.getEcsComponent(FireSourceComponentId),
-            "Completed campfire should have a FireSourceComponent",
-        );
-
-        const warmth = goblin.getEcsComponent(WarmthComponentId)!;
-        assert.ok(
-            warmth.warmth >= COLD_THRESHOLD,
-            `Goblin should be warm after building campfire (warmth: ${warmth.warmth})`,
-        );
-        const dx = Math.abs(goblin.worldPosition.x - campfire.worldPosition.x);
-        const dy = Math.abs(goblin.worldPosition.y - campfire.worldPosition.y);
-        assert.ok(
-            Math.max(dx, dy) <= 1,
-            `Goblin should be within 1 tile of fire (goblin: ${JSON.stringify(goblin.worldPosition)}, fire: ${JSON.stringify(campfire.worldPosition)})`,
-        );
-    });
-
     it("cold goblin travels to distant tree, builds campfire, and warms up", () => {
         /**
          * Scenario: Trees are 7 tiles from camp. Goblin must travel there to

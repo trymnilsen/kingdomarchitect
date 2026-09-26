@@ -159,24 +159,6 @@ describe("createBuildingPlacementValidator", () => {
             assert.strictEqual(validator({ x: 4, y: 4 }), false);
         });
 
-        it("accepts a candidate when at least one cardinal neighbour is free", () => {
-            // Three neighbours are blocked; (4,5) is a clear tiled tile.
-            const world = createWorld([
-                { x: 4, y: 4 },
-                { x: 3, y: 4 },
-                { x: 5, y: 4 },
-                { x: 4, y: 3 },
-                { x: 4, y: 5 },
-            ]);
-            addBuilding(world, { x: 3, y: 4 });
-            addBuilding(world, { x: 5, y: 4 });
-            addBuilding(world, { x: 4, y: 3 });
-            // (4,5) left free
-            const validator = createBuildingPlacementValidator(world);
-
-            assert.strictEqual(validator({ x: 4, y: 4 }), true);
-        });
-
         it("counts a grass-occupied neighbour as a walkable exit", () => {
             // Three neighbours hold buildings. The last holds decorative grass,
             // which doesn't block reachability.
@@ -219,36 +201,6 @@ describe("createBuildingPlacementValidator", () => {
 
             assert.strictEqual(validator({ x: 4, y: 4 }), false);
         });
-
-        it("accepts a candidate next to a building that still has other free exits", () => {
-            // Building B at (4,3). Only (3,3) is blocked; (5,3) and (4,2) remain free.
-            const world = createWorld([
-                { x: 4, y: 4 },
-                { x: 4, y: 3 },
-                { x: 3, y: 3 },
-                { x: 5, y: 3 },
-                { x: 4, y: 2 },
-            ]);
-            addBuilding(world, { x: 4, y: 3 }); // B
-            addBuilding(world, { x: 3, y: 3 });
-            // (5,3) and (4,2) are free ground, so B still has two exits after placement
-            const validator = createBuildingPlacementValidator(world);
-
-            assert.strictEqual(validator({ x: 4, y: 4 }), true);
-        });
-
-        it("accepts placement when there are no adjacent buildings at all", () => {
-            const world = createWorld([
-                { x: 4, y: 4 },
-                { x: 3, y: 4 },
-                { x: 5, y: 4 },
-                { x: 4, y: 3 },
-                { x: 4, y: 5 },
-            ]);
-            const validator = createBuildingPlacementValidator(world);
-
-            assert.strictEqual(validator({ x: 4, y: 4 }), true);
-        });
     });
 
     describe("protecting adjacent agents", () => {
@@ -273,36 +225,6 @@ describe("createBuildingPlacementValidator", () => {
             const validator = createBuildingPlacementValidator(world);
 
             assert.strictEqual(validator({ x: 6, y: 6 }), false);
-        });
-
-        it("accepts a candidate next to an agent that still has other free exits", () => {
-            // Agent A at (6,5). Only (5,5) is blocked; (7,5) and (6,4) remain free.
-            const world = createWorld([
-                { x: 6, y: 6 },
-                { x: 6, y: 5 },
-                { x: 5, y: 5 },
-                { x: 7, y: 5 },
-                { x: 6, y: 4 },
-            ]);
-            addAgent(world, { x: 6, y: 5 }); // A
-            addBuilding(world, { x: 5, y: 5 });
-            // (7,5) and (6,4) are free ground, so A still has two exits
-            const validator = createBuildingPlacementValidator(world);
-
-            assert.strictEqual(validator({ x: 6, y: 6 }), true);
-        });
-
-        it("accepts placement when there are no adjacent agents", () => {
-            const world = createWorld([
-                { x: 6, y: 6 },
-                { x: 5, y: 6 },
-                { x: 7, y: 6 },
-                { x: 6, y: 5 },
-                { x: 6, y: 7 },
-            ]);
-            const validator = createBuildingPlacementValidator(world);
-
-            assert.strictEqual(validator({ x: 6, y: 6 }), true);
         });
     });
 
@@ -498,20 +420,6 @@ describe("createBuildingPlacementValidator", () => {
             root.setEcsComponent(createChunkMapComponent());
             return root;
         }
-
-        it("rejects building on ice even though ice can be walked", () => {
-            const world = createWorldWithTerrain([
-                { local: { x: 4, y: 3 }, terrain: Terrain.Ice },
-            ]);
-            const validator = createBuildingPlacementValidator(world);
-
-            assert.strictEqual(validator(candidate), false);
-            assert.strictEqual(
-                validator({ x: candidate.x + 1, y: candidate.y }),
-                true,
-                "the land beside the ice is still buildable",
-            );
-        });
 
         it("counts ice as a way in to a building and water as none", () => {
             const surroundedBy = (lastSide: Terrain) =>

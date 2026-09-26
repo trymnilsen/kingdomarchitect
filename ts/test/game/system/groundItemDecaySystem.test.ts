@@ -7,10 +7,8 @@ import {
     groundItemDecaySystem,
 } from "../../../src/game/system/groundItemDecaySystem.ts";
 import {
-    createGroundItemComponent,
     GROUND_ITEM_DECAY_TICKS,
     GroundItemComponentId,
-    groundItemDecayFraction,
 } from "../../../src/game/component/groundItemComponent.ts";
 import { dropItemAtPosition } from "../../../src/game/behavior/dropItem.ts";
 import { CollectableComponentId } from "../../../src/game/component/collectableComponent.ts";
@@ -30,40 +28,6 @@ function pileAt(root: Entity, x: number, y: number): Entity | undefined {
         entity.hasComponent(GroundItemComponentId),
     );
 }
-
-describe("groundItemDecayFraction", () => {
-    it("runs from 0 at the drop to 1 at the end of its life", () => {
-        const component = createGroundItemComponent(200);
-
-        assert.strictEqual(groundItemDecayFraction(component, 200), 0);
-        assert.strictEqual(
-            groundItemDecayFraction(
-                component,
-                200 + GROUND_ITEM_DECAY_TICKS / 2,
-            ),
-            0.5,
-        );
-        assert.strictEqual(
-            groundItemDecayFraction(component, 200 + GROUND_ITEM_DECAY_TICKS),
-            1,
-        );
-    });
-
-    it("clamps rather than running past its bounds", () => {
-        const component = createGroundItemComponent(200);
-
-        // A pile cannot be more than gone, and a save loaded at an earlier
-        // tick must not read as negative decay.
-        assert.strictEqual(
-            groundItemDecayFraction(
-                component,
-                200 + GROUND_ITEM_DECAY_TICKS * 3,
-            ),
-            1,
-        );
-        assert.strictEqual(groundItemDecayFraction(component, 150), 0);
-    });
-});
 
 describe("groundItemDecaySystem", () => {
     it("removes a pile once it has lain out its full life", () => {

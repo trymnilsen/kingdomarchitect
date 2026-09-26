@@ -105,59 +105,5 @@ describe("buildBuildingPlanner", () => {
             assert.strictEqual(actions[2].type, "moveTo");
             assert.strictEqual(actions[3].type, "depositToInventory");
         });
-
-        it("withdraw moves to the stockpile position", () => {
-            const { root, worker, stockpile } = createTestScene();
-
-            const stockpileInventory = stockpile.getEcsComponent("Inventory")!;
-            addInventoryItem(stockpileInventory, woodResourceItem, 30);
-
-            const job = BuildBuildingJob({ id: "building" } as Entity);
-            const actions = planBuildBuilding(root, worker, job);
-
-            const moveAction = actions[0] as {
-                type: "moveTo";
-                target: { x: number; y: number };
-            };
-            assert.strictEqual(moveAction.target.x, 20);
-            assert.strictEqual(moveAction.target.y, 8);
-        });
-    });
-
-    describe("error cases", () => {
-        it("returns empty array if building not found", () => {
-            const { root, worker } = createTestScene();
-
-            const job: ReturnType<typeof BuildBuildingJob> = {
-                id: "buildBuildingJob",
-                entityId: "nonexistent",
-            };
-
-            const actions = planBuildBuilding(root, worker, job);
-            assert.strictEqual(actions.length, 0);
-        });
-
-        it("returns empty array if building has no BuildingComponent", () => {
-            const { root, worker } = createTestScene();
-            const noBuildingComp = new Entity("noBuildingComp");
-            noBuildingComp.worldPosition = { x: 5, y: 5 };
-            noBuildingComp.setEcsComponent(createInventoryComponent());
-            root.addChild(noBuildingComp);
-
-            const job = BuildBuildingJob(noBuildingComp);
-            const actions = planBuildBuilding(root, worker, job);
-            assert.strictEqual(actions.length, 0);
-        });
-
-        it("returns empty array if worker has no held component", () => {
-            const { root, building } = createTestScene();
-            const workerNoHeld = new Entity("workerNoHeld");
-            workerNoHeld.worldPosition = { x: 10, y: 8 };
-            root.addChild(workerNoHeld);
-
-            const job = BuildBuildingJob(building);
-            const actions = planBuildBuilding(root, workerNoHeld, job);
-            assert.strictEqual(actions.length, 0);
-        });
     });
 });

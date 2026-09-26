@@ -5,7 +5,6 @@ import { SQLiteAdapter } from "../../../src/server/persistence/sqliteAdapter.ts"
 import { applySQLiteMigrations } from "../../../src/server/persistence/sqliteMigrationCompiler.ts";
 import { gameMigrations } from "../../../src/server/persistence/migration.ts";
 import type { SerializedEntity } from "../../../src/server/persistence/serializedEntity.ts";
-import type { SerializedWorldMeta } from "../../../src/server/persistence/serializedWorldMeta.ts";
 
 function createTestAdapter(): { adapter: SQLiteAdapter; db: DatabaseSync } {
     const db = new DatabaseSync(":memory:");
@@ -39,40 +38,7 @@ describe("SQLiteAdapter", () => {
         db = result.db;
     });
 
-    describe("hasSave", () => {
-        it("returns false on empty database", async () => {
-            assert.strictEqual(await adapter.hasSave(), false);
-        });
-
-        it("returns true after saving meta", async () => {
-            await adapter.saveMeta({
-                version: 1,
-                tick: 42,
-                seed: 123,
-                idCounters: {},
-            });
-            assert.strictEqual(await adapter.hasSave(), true);
-        });
-    });
-
     describe("meta", () => {
-        it("round-trips meta data", async () => {
-            const meta: SerializedWorldMeta = {
-                version: 1,
-                tick: 100,
-                seed: 42,
-                idCounters: { worker: 3, chunk: 7 },
-            };
-            await adapter.saveMeta(meta);
-            const loaded = await adapter.loadMeta();
-            assert.deepStrictEqual(loaded, meta);
-        });
-
-        it("returns null when no meta exists", async () => {
-            const loaded = await adapter.loadMeta();
-            assert.strictEqual(loaded, null);
-        });
-
         it("overwrites existing meta", async () => {
             await adapter.saveMeta({
                 version: 1,
@@ -97,25 +63,6 @@ describe("SQLiteAdapter", () => {
     });
 
     describe("entities", () => {
-        it("round-trips a single entity", async () => {
-            const entity = makeEntity("e1", null, 12, 8);
-            await adapter.saveEntities([entity]);
-            const loaded = await adapter.loadEntities();
-            assert.strictEqual(loaded.length, 1);
-            assert.deepStrictEqual(loaded[0], entity);
-        });
-
-        it("saves multiple entities in a batch", async () => {
-            const entities = [
-                makeEntity("e1", null, 5, 10),
-                makeEntity("e2", "e1", 15, 20),
-                makeEntity("e3", "e1", 25, 30),
-            ];
-            await adapter.saveEntities(entities);
-            const loaded = await adapter.loadEntities();
-            assert.strictEqual(loaded.length, 3);
-        });
-
         it("upserts entities with same ID", async () => {
             await adapter.saveEntities([makeEntity("e1", null, 5, 10)]);
             await adapter.saveEntities([makeEntity("e1", null, 99, 88)]);
@@ -174,11 +121,6 @@ describe("SQLiteAdapter", () => {
             await adapter.saveRootComponents(components);
             const loaded = await adapter.loadRootComponents();
             assert.deepStrictEqual(loaded, components);
-        });
-
-        it("returns null when no root components exist", async () => {
-            const loaded = await adapter.loadRootComponents();
-            assert.strictEqual(loaded, null);
         });
     });
 

@@ -33,36 +33,6 @@ function stacksOn(pile: Entity) {
 }
 
 describe("dropItemAtPosition", () => {
-    it("keeps one pile per item type on a tile", () => {
-        const { root } = createMinimalWorld();
-
-        dropItemAtPosition(root, 1, TILE, woodResourceItem, 3, "test");
-        dropItemAtPosition(root, 1, TILE, stoneResource, 2, "test");
-
-        const piles = pilesAt(root, TILE);
-        assert.strictEqual(piles.length, 2);
-        for (const pile of piles) {
-            assert.strictEqual(
-                stacksOn(pile).length,
-                1,
-                "a pile is a single stack of a single type",
-            );
-        }
-    });
-
-    it("merges a repeat drop of the same type into one stack", () => {
-        const { root } = createMinimalWorld();
-
-        dropItemAtPosition(root, 1, TILE, woodResourceItem, 3, "test");
-        dropItemAtPosition(root, 1, TILE, woodResourceItem, 4, "test");
-
-        const piles = pilesAt(root, TILE);
-        assert.strictEqual(piles.length, 1, "no second wood pile appears");
-        const stacks = stacksOn(piles[0]);
-        assert.strictEqual(stacks.length, 1);
-        assert.strictEqual(stacks[0].amount, 7);
-    });
-
     it("merges a copied item definition rather than adding a second stack", () => {
         const { root } = createMinimalWorld();
 

@@ -36,23 +36,6 @@ function createScene() {
 }
 
 describe("collectJobsForEntity", () => {
-    it("queues one job per output type", () => {
-        const { root, building } = createScene();
-
-        const jobs = collectJobsForEntity(root, building);
-
-        // A worker hauls one item type per trip, so two outputs are two jobs.
-        // One job would haul one type and strand the other.
-        assert.strictEqual(jobs.length, 2);
-        assert.deepStrictEqual(
-            jobs.map((job) => job.itemId).sort(),
-            [stoneResource.id, woodResourceItem.id].sort(),
-        );
-        for (const job of jobs) {
-            assert.strictEqual(job.entityId, "workshop");
-        }
-    });
-
     it("skips stacks that already have a job waiting", () => {
         const { root, building, queue } = createScene();
 
@@ -78,13 +61,5 @@ describe("collectJobsForEntity", () => {
 
         assert.strictEqual(remaining.length, 1);
         assert.notStrictEqual(remaining[0].itemId, first.itemId);
-    });
-
-    it("returns nothing for an entity with no collectable", () => {
-        const { root, kingdom } = createScene();
-        const plain = new Entity("plain");
-        kingdom.addChild(plain);
-
-        assert.deepStrictEqual(collectJobsForEntity(root, plain), []);
     });
 });

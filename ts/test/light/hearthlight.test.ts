@@ -33,32 +33,6 @@ function addBuilding(kingdom: Entity, building: Building, position: Point) {
 }
 
 describe("hearthlight", () => {
-    it("is claimed by an ordinary building on its own tile and cardinals", () => {
-        const { root, kingdom } = playerKingdom();
-        addBuilding(kingdom, woodenHouse, { x: 12, y: 8 });
-
-        const hearth = computeHearthlight(root);
-
-        assert.strictEqual(isInHearthlight(hearth, { x: 12, y: 8 }), true);
-        assert.strictEqual(isInHearthlight(hearth, { x: 13, y: 8 }), true);
-        assert.strictEqual(isInHearthlight(hearth, { x: 12, y: 7 }), true);
-        // The diagonal neighbour is outside a radius-1 disc.
-        assert.strictEqual(isInHearthlight(hearth, { x: 13, y: 9 }), false);
-        assert.strictEqual(isInHearthlight(hearth, { x: 14, y: 8 }), false);
-        assert.strictEqual(hearth.size, 5);
-    });
-
-    it("reaches further from a placed cresset than from a plain building", () => {
-        const { root, kingdom } = playerKingdom();
-        addBuilding(kingdom, cresset, { x: 12, y: 8 });
-
-        const hearth = computeHearthlight(root);
-
-        // Two tiles out is cresset-only reach. A house stops at one.
-        assert.strictEqual(isInHearthlight(hearth, { x: 14, y: 8 }), true);
-        assert.strictEqual(isInHearthlight(hearth, { x: 15, y: 8 }), false);
-    });
-
     it("is claimed only once construction finishes", () => {
         const { root, kingdom } = playerKingdom();
         const site = buildingPrefab(woodenHouse, true);

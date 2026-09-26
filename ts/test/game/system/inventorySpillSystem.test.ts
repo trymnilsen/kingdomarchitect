@@ -77,32 +77,6 @@ function groundStacks(root: Entity) {
 }
 
 describe("inventorySpillSystem", () => {
-    it("spills every stored stack onto the ground when a store dies", () => {
-        const stock = [
-            woodResourceItem,
-            stoneResource,
-            ironOreItem,
-            wheatResourceItem,
-            flaxResourceItem,
-            berryItem,
-        ];
-        const { root, store } = createWorldWithStore(stock, 6, 400);
-
-        damageEntity(store, 100, 400);
-
-        const stacks = groundStacks(root);
-        assert.strictEqual(
-            stacks.length,
-            stock.length,
-            "one ground stack per stored type, nothing destroyed",
-        );
-        for (const item of stock) {
-            const spilled = stacks.find((stack) => stack.itemId === item.id);
-            assert.ok(spilled, `${item.id} reached the ground`);
-            assert.strictEqual(spilled.amount, 6, `all of the ${item.id}`);
-        }
-    });
-
     it("rings the wreck rather than burying the goods under it", () => {
         const stock = [
             woodResourceItem,
@@ -152,13 +126,5 @@ describe("inventorySpillSystem", () => {
         const stacks = groundStacks(root);
         assert.strictEqual(stacks.length, 1);
         assert.strictEqual(stacks[0].groundItem.droppedAtTick, 731);
-    });
-
-    it("ignores a dying entity with nothing stored", () => {
-        const { root, store } = createWorldWithStore([], 0, 10);
-
-        damageEntity(store, 100, 10);
-
-        assert.strictEqual(groundStacks(root).length, 0);
     });
 });

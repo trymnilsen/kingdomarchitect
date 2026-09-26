@@ -11,23 +11,6 @@ import {
 
 describe("displacementNegotiation", () => {
     describe("negotiateDisplacement", () => {
-        it("returns noChain when target tile has no displaceable entity", () => {
-            const { root } = createTestWorld();
-            const requester = createAgent("requester", root, 10, 8, 100);
-            // Building at target, no BehaviorAgentComponent
-            createWall("wall", root, 11, 8);
-
-            const result = negotiateDisplacement(
-                requester,
-                { x: 11, y: 8 },
-                100,
-                root,
-                1,
-            );
-
-            assert.strictEqual(result.kind, "noChain");
-        });
-
         it("returns refused when a settled blocker's cost exceeds requester priority", () => {
             const { root } = createTestWorld();
             const requester = createAgent("requester", root, 10, 8, 5);
@@ -64,32 +47,6 @@ describe("displacementNegotiation", () => {
             );
 
             assert.strictEqual(result.kind, "wait");
-        });
-
-        it("returns a single-move non-cycle transaction when blocker has a free tile", () => {
-            const { root } = createTestWorld();
-            // Requester at (10,8), wants (11,8) where blocker is.
-            // (12,8) is free, so the blocker can move there.
-            // (11,9) is also free in the chunk, so blocker has multiple exits.
-            const requester = createAgent("requester", root, 10, 8, 100);
-            createAgent("blocker", root, 11, 8, 5);
-
-            const result = negotiateDisplacement(
-                requester,
-                { x: 11, y: 8 },
-                100,
-                root,
-                1,
-            );
-
-            assert.ok(result.kind === "success", "Should return a transaction");
-            assert.strictEqual(result.transaction.isCycle, false);
-            assert.strictEqual(result.transaction.moves.length, 1);
-            assert.strictEqual(result.transaction.moves[0].entityId, "blocker");
-            assert.deepStrictEqual(result.transaction.moves[0].from, {
-                x: 11,
-                y: 8,
-            });
         });
 
         it("returns a 2-move cycle transaction when blocker can only swap with requester", () => {

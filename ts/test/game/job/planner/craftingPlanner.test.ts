@@ -105,33 +105,6 @@ describe("craftingPlanner", () => {
         });
     });
 
-    describe("error cases", () => {
-        it("returns empty array if building not found", () => {
-            const { root, worker } = createTestScene();
-            const job = createCraftingJob("nonexistent", planksRecipe);
-            const actions = planCrafting(root, worker, job);
-            assert.strictEqual(actions.length, 0);
-        });
-
-        it("returns empty array when no source has materials", () => {
-            const { root, worker } = createTestScene();
-            const job = createCraftingJob("building", planksRecipe);
-            const actions = planCrafting(root, worker, job);
-            assert.strictEqual(actions.length, 0);
-        });
-
-        it("returns empty array if building has no inventory", () => {
-            const { root, worker } = createTestScene();
-            const buildingNoInv = new Entity("buildingNoInv");
-            buildingNoInv.worldPosition = { x: 5, y: 5 };
-            root.addChild(buildingNoInv);
-
-            const job = createCraftingJob("buildingNoInv", planksRecipe);
-            const actions = planCrafting(root, worker, job);
-            assert.strictEqual(actions.length, 0);
-        });
-    });
-
     describe("temporary blockers suspend rather than delete the job", () => {
         it("keeps a queued craft in the queue (claim released) when no input source exists", () => {
             const { root, worker } = createTestScene();

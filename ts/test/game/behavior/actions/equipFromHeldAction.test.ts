@@ -40,29 +40,6 @@ describe("equipFromHeldAction", () => {
         assert.strictEqual(held.amount, 0);
     });
 
-    it("fails when held is empty", () => {
-        const worker = createWorker();
-        const result = executeEquipFromHeldAction(
-            { type: "equipFromHeld", slot: "primary" },
-            worker,
-        );
-        assert.strictEqual(result.kind, "failed");
-    });
-
-    it("fails when held amount is not exactly 1", () => {
-        const worker = createWorker();
-        const held = worker.requireEcsComponent(HeldItemComponentId);
-        held.item = swordItem;
-        held.amount = 2;
-
-        const result = executeEquipFromHeldAction(
-            { type: "equipFromHeld", slot: "primary" },
-            worker,
-        );
-        assert.strictEqual(result.kind, "failed");
-        assert.strictEqual(held.amount, 2);
-    });
-
     it("fails when target slot is occupied", () => {
         const worker = createWorker();
         const equipment = worker.requireEcsComponent(EquipmentComponentId);

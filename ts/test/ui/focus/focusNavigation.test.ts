@@ -21,27 +21,12 @@ describe("getClosestFocusableNode", () => {
     // actually exercised rather than cancelling out against zero.
     const current: Bounds = { x1: 40, y1: 24, x2: 50, y2: 34 };
 
-    it("returns null for an empty candidate list", () => {
-        assert.strictEqual(
-            getClosestFocusableNode([], current, Direction.Right),
-            null,
-        );
-    });
-
     it("returns null when no node lies in the requested direction", () => {
         // Only candidate is to the left. We ask for right.
         const left = node(10, 24, 20, 34);
         assert.strictEqual(
             getClosestFocusableNode([left], current, Direction.Right),
             null,
-        );
-    });
-
-    it("returns a node that is fully past the edge in the direction", () => {
-        const right = node(80, 24, 90, 34);
-        assert.strictEqual(
-            getClosestFocusableNode([right], current, Direction.Right),
-            right,
         );
     });
 

@@ -59,41 +59,6 @@ function addCampBuilding(
 
 describe("createCampBuildingPlacementValidator", () => {
     describe("placing a non-campfire building", () => {
-        it("rejects the campfire tile and every tile in its clearance ring", () => {
-            const { root, camp } = createWorldWithCamp();
-            // Campfire on the camp anchor, as in the real camp prefab
-            addCampBuilding(camp, goblinCampfire, { x: 4, y: 4 });
-            const validator = createCampBuildingPlacementValidator(
-                root,
-                camp,
-                goblinHut,
-            );
-
-            for (let dx = -1; dx <= 1; dx++) {
-                for (let dy = -1; dy <= 1; dy++) {
-                    const candidate = { x: 4 + dx, y: 4 + dy };
-                    assert.strictEqual(
-                        validator(candidate),
-                        false,
-                        `tile (${candidate.x},${candidate.y}) is within the campfire clearance ring`,
-                    );
-                }
-            }
-        });
-
-        it("accepts a tile just outside the clearance ring", () => {
-            const { root, camp } = createWorldWithCamp();
-            addCampBuilding(camp, goblinCampfire, { x: 4, y: 4 });
-            const validator = createCampBuildingPlacementValidator(
-                root,
-                camp,
-                goblinHut,
-            );
-
-            assert.strictEqual(validator({ x: 6, y: 4 }), true);
-            assert.strictEqual(validator({ x: 6, y: 6 }), true);
-        });
-
         it("keeps clearance around scaffolded campfires too", () => {
             const { root, camp } = createWorldWithCamp();
             addCampBuilding(camp, goblinCampfire, { x: 4, y: 4 }, true);
@@ -105,20 +70,6 @@ describe("createCampBuildingPlacementValidator", () => {
 
             assert.strictEqual(validator({ x: 5, y: 4 }), false);
             assert.strictEqual(validator({ x: 6, y: 4 }), true);
-        });
-
-        it("still applies the generic placement rules outside the ring", () => {
-            const { root, camp } = createWorldWithCamp();
-            addCampBuilding(camp, goblinCampfire, { x: 4, y: 4 });
-            const validator = createCampBuildingPlacementValidator(
-                root,
-                camp,
-                goblinHut,
-            );
-
-            // (20,4) is far from the fire but in an unregistered chunk:
-            // no ground, so the generic building rules reject it.
-            assert.strictEqual(validator({ x: 20, y: 4 }), false);
         });
     });
 

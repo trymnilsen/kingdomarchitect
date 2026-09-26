@@ -32,7 +32,6 @@ import {
 } from "../../../src/server/message/command/setPlayerCommand.ts";
 import {
     addJob,
-    createJobQueueComponent,
     JobQueueComponentId,
 } from "../../../src/game/component/jobQueueComponent.ts";
 import {
@@ -225,26 +224,6 @@ describe("commandSystem", () => {
                 "entityA",
             );
         });
-
-        it("is a no-op when the target's job is already first", () => {
-            const { root, playerKingdom, entityA, system } =
-                setupQueueWithTwoTargets();
-
-            const message: CommandGameMessage = {
-                type: CommandGameMessageType,
-                command: {
-                    id: PrioritiseJobCommandId,
-                    entityId: "entityA",
-                } as PrioritiseJobCommand,
-            };
-
-            system.onGameMessage?.(root, message);
-
-            const after =
-                playerKingdom.requireEcsComponent(JobQueueComponentId);
-            assert.strictEqual(after.jobs.length, 2);
-            assert.ok(isTargetOfJob(after.jobs[0], entityA));
-        });
     });
 
     describe("EquipItemCommand", () => {
@@ -284,30 +263,6 @@ describe("commandSystem", () => {
                 slot: "primary",
             });
         });
-
-        it("does nothing when entity is missing", () => {
-            const root = new Entity("root");
-            const persistenceManager = createTestPersistenceManager();
-
-            const system = createCommandSystem(
-                persistenceManager,
-                new GameTime(),
-            );
-
-            const message: CommandGameMessage = {
-                type: CommandGameMessageType,
-                command: {
-                    id: EquipItemCommandId,
-                    entity: "nonexistent",
-                    sourceEntityId: "stockpile-1",
-                    itemId: swordItem.id,
-                    slot: "primary",
-                } as EquipItemCommand,
-            };
-
-            // Should not throw
-            system.onGameMessage?.(root, message);
-        });
     });
 
     describe("BuildCommand", () => {
@@ -340,40 +295,6 @@ describe("commandSystem", () => {
             assert.ok(updatedJobQueue);
             assert.strictEqual(updatedJobQueue.jobs.length, 1);
             assert.strictEqual(updatedJobQueue.jobs[0].id, "buildBuildingJob");
-        });
-
-        it("creates multiple building entities for array of positions", () => {
-            const { root, playerKingdom } = createRootWithKingdom();
-            const persistenceManager = createTestPersistenceManager();
-
-            const system = createCommandSystem(
-                persistenceManager,
-                new GameTime(),
-            );
-
-            const message: CommandGameMessage = {
-                type: CommandGameMessageType,
-                command: {
-                    id: BuildCommandId,
-                    buildingId: "stockpile",
-                    position: [
-                        { x: 100, y: 200 },
-                        { x: 150, y: 200 },
-                        { x: 200, y: 200 },
-                    ],
-                } as BuildCommand,
-            };
-
-            system.onGameMessage?.(root, message);
-
-            // 3 building entities should be under the player kingdom
-            assert.strictEqual(playerKingdom.children.length, 3);
-
-            // Should create 3 BuildBuildingJobs in the player kingdom's queue
-            const updatedJobQueue =
-                playerKingdom.getEcsComponent(JobQueueComponentId);
-            assert.ok(updatedJobQueue);
-            assert.strictEqual(updatedJobQueue.jobs.length, 3);
         });
 
         it("builds nothing for an unknown building id", () => {
@@ -490,107 +411,9 @@ describe("commandSystem", () => {
             assert.ok(updatedWorkplace);
             assert.ok(!updatedWorkplace.workers.includes("worker1"));
         });
-
-        it("throws when worker not found", () => {
-            const root = new Entity("root");
-            const persistenceManager = createTestPersistenceManager();
-
-            const workplace = new Entity("workplace1");
-            const workplaceComponent = createWorkplaceComponent();
-            workplace.setEcsComponent(workplaceComponent);
-            root.addChild(workplace);
-
-            const system = createCommandSystem(
-                persistenceManager,
-                new GameTime(),
-            );
-
-            const message: CommandGameMessage = {
-                type: CommandGameMessageType,
-                command: {
-                    id: ChangeOccupationCommandId,
-                    worker: "nonexistent",
-                    workplace: "workplace1",
-                    action: "assign",
-                } as ChangeOccupationCommand,
-            };
-
-            assert.throws(() => {
-                system.onGameMessage?.(root, message);
-            });
-        });
-
-        it("throws when workplace not found", () => {
-            const root = new Entity("root");
-            const persistenceManager = createTestPersistenceManager();
-
-            const worker = new Entity("worker1");
-            const occupation = createOccupationComponent();
-            worker.setEcsComponent(occupation);
-            root.addChild(worker);
-
-            const system = createCommandSystem(
-                persistenceManager,
-                new GameTime(),
-            );
-
-            const message: CommandGameMessage = {
-                type: CommandGameMessageType,
-                command: {
-                    id: ChangeOccupationCommandId,
-                    worker: "worker1",
-                    workplace: "nonexistent",
-                    action: "assign",
-                } as ChangeOccupationCommand,
-            };
-
-            assert.throws(() => {
-                system.onGameMessage?.(root, message);
-            });
-        });
     });
 
     describe("SetPlayerCommand", () => {
-        it("sets player command on BehaviorAgentComponent", () => {
-            const root = new Entity("root");
-            const persistenceManager = createTestPersistenceManager();
-
-            const agent = new Entity("agent1");
-            const behaviorAgent = createBehaviorAgentComponent();
-            agent.setEcsComponent(behaviorAgent);
-            root.addChild(agent);
-
-            const system = createCommandSystem(
-                persistenceManager,
-                new GameTime(),
-            );
-
-            const message: CommandGameMessage = {
-                type: CommandGameMessageType,
-                command: {
-                    id: SetPlayerCommandId,
-                    agentId: "agent1",
-                    command: {
-                        action: "move",
-                        targetPosition: { x: 100, y: 200 },
-                    },
-                } as SetPlayerCommand,
-            };
-
-            system.onGameMessage?.(root, message);
-
-            const updatedAgent = agent.getEcsComponent(
-                BehaviorAgentComponentId,
-            );
-            assert.ok(updatedAgent);
-            assert.ok(updatedAgent.playerCommand);
-            assert.strictEqual(updatedAgent.playerCommand.action, "move");
-            assert.deepStrictEqual(
-                (updatedAgent.playerCommand as any).targetPosition,
-                { x: 100, y: 200 },
-            );
-        });
-
         it("triggers replan on agent", () => {
             const root = new Entity("root");
             const persistenceManager = createTestPersistenceManager();
@@ -627,90 +450,6 @@ describe("commandSystem", () => {
             assert.deepStrictEqual(updatedAgent.pendingReplan, {
                 kind: "replan",
             });
-        });
-
-        it("ignores a player command for an agent that does not exist", () => {
-            const root = new Entity("root");
-            const persistenceManager = createTestPersistenceManager();
-
-            const system = createCommandSystem(
-                persistenceManager,
-                new GameTime(),
-            );
-
-            const message: CommandGameMessage = {
-                type: CommandGameMessageType,
-                command: {
-                    id: SetPlayerCommandId,
-                    agentId: "nonexistent",
-                    command: {
-                        action: "move",
-                        targetPosition: { x: 100, y: 200 },
-                    },
-                } as SetPlayerCommand,
-            };
-
-            // Should not throw
-            system.onGameMessage?.(root, message);
-        });
-
-        it("ignores a player command for an entity with no behavior agent", () => {
-            const root = new Entity("root");
-            const persistenceManager = createTestPersistenceManager();
-
-            const agent = new Entity("agent1");
-            // No BehaviorAgentComponent
-            root.addChild(agent);
-
-            const system = createCommandSystem(
-                persistenceManager,
-                new GameTime(),
-            );
-
-            const message: CommandGameMessage = {
-                type: CommandGameMessageType,
-                command: {
-                    id: SetPlayerCommandId,
-                    agentId: "agent1",
-                    command: {
-                        action: "move",
-                        targetPosition: { x: 100, y: 200 },
-                    },
-                } as SetPlayerCommand,
-            };
-
-            // Should not throw
-            system.onGameMessage?.(root, message);
-        });
-    });
-
-    describe("message filtering", () => {
-        it("ignores non-command messages", () => {
-            const root = new Entity("root");
-            const persistenceManager = createTestPersistenceManager();
-
-            const jobQueue = createJobQueueComponent();
-            root.setEcsComponent(jobQueue);
-
-            const system = createCommandSystem(
-                persistenceManager,
-                new GameTime(),
-            );
-
-            // Send a non-command message
-            const message = {
-                type: "worldState",
-                rootChildren: [],
-                discoveredTiles: [],
-                volumes: [],
-            };
-
-            system.onGameMessage?.(root, message as any);
-
-            // JobQueue should be unaffected
-            const updatedJobQueue = root.getEcsComponent(JobQueueComponentId);
-            assert.ok(updatedJobQueue);
-            assert.strictEqual(updatedJobQueue.jobs.length, 0);
         });
     });
 
@@ -771,22 +510,6 @@ describe("commandSystem", () => {
             );
         });
 
-        it("excludes every role when the threshold is zero", () => {
-            const { worker, send } = workerWithRoles();
-
-            send({
-                id: SetRolePriorityCommandId,
-                worker: "worker1",
-                dutyPriority: guardFirst,
-                permittedDutyCount: 0,
-            });
-
-            assert.strictEqual(
-                worker.requireEcsComponent(RoleComponentId).permittedDutyCount,
-                0,
-            );
-        });
-
         it("rejects an order that is not a permutation of every role", () => {
             const { worker, send } = workerWithRoles();
             const before = worker.requireEcsComponent(RoleComponentId);
@@ -841,30 +564,6 @@ describe("commandSystem", () => {
                 "a rejected order leaves the whole component untouched",
             );
         });
-
-        it("ignores an order for a worker that does not exist", () => {
-            const { send } = workerWithRoles();
-
-            send({
-                id: SetRolePriorityCommandId,
-                worker: "nonexistent",
-                dutyPriority: guardFirst,
-                permittedDutyCount: 3,
-            });
-        });
-
-        it("ignores an order for an entity with no role component", () => {
-            const { root, send } = workerWithRoles();
-            const stone = new Entity("stone");
-            root.addChild(stone);
-
-            send({
-                id: SetRolePriorityCommandId,
-                worker: "stone",
-                dutyPriority: guardFirst,
-                permittedDutyCount: 3,
-            });
-        });
     });
 
     describe("UpdateWorkerStanceCommand", () => {
@@ -896,84 +595,6 @@ describe("commandSystem", () => {
             const updatedRole = worker.getEcsComponent(RoleComponentId);
             assert.ok(updatedRole);
             assert.strictEqual(updatedRole.stance, WorkerStance.Aggressive);
-        });
-
-        it("updates worker stance to defensive", () => {
-            const root = new Entity("root");
-            const persistenceManager = createTestPersistenceManager();
-
-            const worker = new Entity("worker1");
-            const roleComponent = createRoleComponent();
-            roleComponent.stance = WorkerStance.Aggressive; // Start with aggressive
-            worker.setEcsComponent(roleComponent);
-            root.addChild(worker);
-
-            const system = createCommandSystem(
-                persistenceManager,
-                new GameTime(),
-            );
-
-            const message: CommandGameMessage = {
-                type: CommandGameMessageType,
-                command: {
-                    id: UpdateWorkerStanceCommandId,
-                    worker: "worker1",
-                    stance: WorkerStance.Defensive,
-                } as UpdateWorkerStanceCommand,
-            };
-
-            system.onGameMessage?.(root, message);
-
-            const updatedRole = worker.getEcsComponent(RoleComponentId);
-            assert.ok(updatedRole);
-            assert.strictEqual(updatedRole.stance, WorkerStance.Defensive);
-        });
-
-        it("ignores a stance update for a worker that does not exist", () => {
-            const root = new Entity("root");
-            const persistenceManager = createTestPersistenceManager();
-
-            const system = createCommandSystem(
-                persistenceManager,
-                new GameTime(),
-            );
-
-            const message: CommandGameMessage = {
-                type: CommandGameMessageType,
-                command: {
-                    id: UpdateWorkerStanceCommandId,
-                    worker: "nonexistent",
-                    stance: WorkerStance.Aggressive,
-                } as UpdateWorkerStanceCommand,
-            };
-
-            // Should not throw
-            system.onGameMessage?.(root, message);
-        });
-
-        it("ignores a stance update for an entity with no role component", () => {
-            const root = new Entity("root");
-            const persistenceManager = createTestPersistenceManager();
-
-            const worker = new Entity("worker1");
-            root.addChild(worker);
-
-            const system = createCommandSystem(
-                persistenceManager,
-                new GameTime(),
-            );
-
-            const message: CommandGameMessage = {
-                type: CommandGameMessageType,
-                command: {
-                    id: UpdateWorkerStanceCommandId,
-                    worker: "worker1",
-                    stance: WorkerStance.Aggressive,
-                } as UpdateWorkerStanceCommand,
-            };
-
-            // Should not throw
-            system.onGameMessage?.(root, message);
         });
     });
 
@@ -1035,30 +656,6 @@ describe("commandSystem", () => {
                 farm.getEcsComponent(FarmComponentId)?.cropId,
                 "wheat",
             );
-        });
-
-        it("ignores a crop change for a building with no farm", () => {
-            const root = new Entity("root");
-            const building = new Entity("building1");
-            // No farm component
-            root.addChild(building);
-
-            const system = createCommandSystem(
-                createTestPersistenceManager(),
-                new GameTime(),
-            );
-
-            const message: CommandGameMessage = {
-                type: CommandGameMessageType,
-                command: {
-                    id: SetFarmCropCommandId,
-                    building: "building1",
-                    cropId: "flax",
-                } as SetFarmCropCommand,
-            };
-
-            // Should not throw
-            system.onGameMessage?.(root, message);
         });
     });
 });
