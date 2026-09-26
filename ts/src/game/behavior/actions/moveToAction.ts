@@ -348,7 +348,7 @@ function ensureCachedPath(
         );
         return {
             kind: "failed",
-            cause: { type: "pathBlocked", target: action.target },
+            cause: { type: "noRoute", target: action.target },
         };
     }
 

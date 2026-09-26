@@ -2,7 +2,10 @@ import type { Point } from "../../../../common/point.ts";
 import type { RenderScope } from "../../../../rendering/renderScope.ts";
 import { EquipItemCommand } from "../../../../server/message/command/equipItemCommand.ts";
 import type { ComponentDescriptor } from "../../../../ui/declarative/ui.ts";
-import { EquipmentComponentId } from "../../../component/equipmentComponent.ts";
+import {
+    EquipmentComponentId,
+    type EquipmentSlot,
+} from "../../../component/equipmentComponent.ts";
 import { PlayerUnitComponentId } from "../../../component/playerUnitComponent.ts";
 import type { Entity } from "../../../entity/entity.ts";
 import { queryEntity } from "../../../map/query/queryEntity.ts";
@@ -24,13 +27,9 @@ export class EquipUnitSelectionState extends InteractionState {
     private selection: Entity | null = null;
     private readonly sourceEntityId: string;
     private readonly itemId: string;
-    private readonly slot: "primary" | "secondary";
+    private readonly slot: EquipmentSlot;
 
-    constructor(
-        sourceEntityId: string,
-        itemId: string,
-        slot: "primary" | "secondary",
-    ) {
+    constructor(sourceEntityId: string, itemId: string, slot: EquipmentSlot) {
         super();
         this.sourceEntityId = sourceEntityId;
         this.itemId = itemId;

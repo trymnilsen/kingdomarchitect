@@ -1,5 +1,8 @@
 import { log } from "../../../common/logging/logger.ts";
-import { EquipmentComponentId } from "../../component/equipmentComponent.ts";
+import {
+    EquipmentComponentId,
+    type EquipmentSlot,
+} from "../../component/equipmentComponent.ts";
 import {
     clearHeldItem,
     HeldItemComponentId,
@@ -16,7 +19,7 @@ import { ActionComplete, type ActionResult } from "./action.ts";
  */
 export type EquipFromHeldActionData = {
     type: "equipFromHeld";
-    slot: "primary" | "secondary";
+    slot: EquipmentSlot;
 };
 
 export function executeEquipFromHeldAction(

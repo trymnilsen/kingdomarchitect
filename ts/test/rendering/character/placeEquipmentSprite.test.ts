@@ -1,6 +1,10 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
-import { SPRITE_W, spriteRefs, type SpriteRef } from "../../../src/asset/sprite.ts";
+import {
+    SPRITE_W,
+    spriteRefs,
+    type SpriteRef,
+} from "../../../src/asset/sprite.ts";
 import { spriteRegistry } from "../../../src/asset/spriteRegistry.ts";
 import type { Rectangle } from "../../../src/common/structure/rectangle.ts";
 import { fishingRodItem } from "../../../src/data/inventory/items/equipment.ts";
@@ -99,7 +103,10 @@ describe("placeEquipmentSprite", () => {
             sprites: {
                 se: { sprite: spriteRefs.fishingrod, offset: { x: 1, y: 7 } },
                 sw: { sprite: spriteRefs.wizard_hat, offset: { x: 5, y: 7 } },
-                ne: { sprite: spriteRefs.character_sword, offset: { x: 2, y: 6 } },
+                ne: {
+                    sprite: spriteRefs.character_sword,
+                    offset: { x: 2, y: 6 },
+                },
                 nw: { sprite: spriteRefs.torches, offset: { x: 9, y: 4 } },
             },
         };

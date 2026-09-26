@@ -175,20 +175,23 @@ export function addGroundCovering(
     }
 }
 
+// Carries a sprite so the spatial index, and with it the pathfinder, sees it
+export function placeWall(root: Entity, position: Point): Entity {
+    const wall = new Entity(`wall-${position.x}-${position.y}`);
+    wall.setEcsComponent(createSpriteComponent(emptySpriteRef));
+    wall.setEcsComponent(createBuildingComponent(nullBuilding, false));
+    root.addChild(wall);
+    wall.worldPosition = position;
+    return wall;
+}
+
 export function wallOff(root: Entity, bounds: Bounds): void {
-    const addWall = (x: number, y: number) => {
-        const wall = new Entity(`wall-${x}-${y}`);
-        wall.setEcsComponent(createSpriteComponent(emptySpriteRef));
-        wall.setEcsComponent(createBuildingComponent(nullBuilding, false));
-        root.addChild(wall);
-        wall.worldPosition = { x, y };
-    };
     for (let x = bounds.x1 - 1; x <= bounds.x2 + 1; x++) {
-        addWall(x, bounds.y1 - 1);
-        addWall(x, bounds.y2 + 1);
+        placeWall(root, { x, y: bounds.y1 - 1 });
+        placeWall(root, { x, y: bounds.y2 + 1 });
     }
     for (let y = bounds.y1; y <= bounds.y2; y++) {
-        addWall(bounds.x1 - 1, y);
-        addWall(bounds.x2 + 1, y);
+        placeWall(root, { x: bounds.x1 - 1, y });
+        placeWall(root, { x: bounds.x2 + 1, y });
     }
 }

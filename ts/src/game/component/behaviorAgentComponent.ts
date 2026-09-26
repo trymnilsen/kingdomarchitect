@@ -2,6 +2,7 @@ import type { Point } from "../../common/point.ts";
 import type { Entity } from "../entity/entity.ts";
 import type { BehaviorActionData } from "../behavior/actions/actionData.ts";
 import type { AttackTarget } from "../combat/attackTarget.ts";
+import type { EquipmentSlot } from "./equipmentComponent.ts";
 
 export const BehaviorAgentComponentId = "behavioragent";
 
@@ -17,6 +18,11 @@ export type PlayerCommand =
     | {
           action: "attack";
           target: AttackTarget;
+      }
+    | {
+          action: "fish";
+          // The water tile, not the bank tile the worker stands on
+          target: Point;
       }
     | {
           action: "pickup";
@@ -36,11 +42,11 @@ export type PlayerCommand =
           action: "equip";
           sourceEntityId: string;
           itemId: string;
-          slot: "primary" | "secondary";
+          slot: EquipmentSlot;
       }
     | {
           action: "equipFromHeld";
-          slot: "primary" | "secondary";
+          slot: EquipmentSlot;
       };
 
 /**

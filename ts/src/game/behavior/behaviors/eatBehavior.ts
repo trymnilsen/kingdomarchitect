@@ -3,7 +3,10 @@ import { ItemTag } from "../../../data/inventory/inventoryItem.ts";
 import { InventoryComponentId } from "../../component/inventoryComponent.ts";
 import { CollectableComponentId } from "../../component/collectableComponent.ts";
 import { GroundItemComponentId } from "../../component/groundItemComponent.ts";
-import { EquipmentComponentId } from "../../component/equipmentComponent.ts";
+import {
+    EquipmentComponentId,
+    type EquipmentSlot,
+} from "../../component/equipmentComponent.ts";
 import {
     HeldItemComponentId,
     isHeldEmpty,
@@ -103,7 +106,7 @@ export function createEatBehavior(): Behavior {
     };
 }
 
-function findEquippedFoodSlot(entity: Entity): "primary" | "secondary" | null {
+function findEquippedFoodSlot(entity: Entity): EquipmentSlot | null {
     const equipment = entity.getEcsComponent(EquipmentComponentId);
     if (!equipment) return null;
     if (equipment.slots.primary?.tag?.includes(ItemTag.Food)) return "primary";

@@ -1,7 +1,5 @@
-import type { EquipmentComponent } from "../../../game/component/equipmentComponent.ts";
+import type { EquipmentSlot } from "../../../game/component/equipmentComponent.ts";
 import type { Entity } from "../../../game/entity/entity.ts";
-
-type SlotType = keyof EquipmentComponent["slots"];
 
 /**
  * Equip the worker's currently-held item into a slot. Routed through the
@@ -11,12 +9,12 @@ type SlotType = keyof EquipmentComponent["slots"];
 export type EquipFromHeldCommand = {
     id: typeof EquipFromHeldCommandId;
     entity: string;
-    slot: SlotType;
+    slot: EquipmentSlot;
 };
 
 export function EquipFromHeldCommand(
     entity: Entity,
-    slot: SlotType,
+    slot: EquipmentSlot,
 ): EquipFromHeldCommand {
     return {
         id: EquipFromHeldCommandId,

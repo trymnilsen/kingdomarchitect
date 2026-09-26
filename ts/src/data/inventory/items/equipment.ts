@@ -4,6 +4,7 @@ import {
     swordAttackProfile,
     woodenSwordAttackProfile,
 } from "../../combat/attackProfileDefinition.ts";
+import { fishingRodProfile } from "../../fishing/fishingProfileDefinition.ts";
 import { torchLightSource } from "../../light/lightSourceDefinition.ts";
 import { EquipmentSpriteVariantType } from "../../../rendering/character/characterColors.ts";
 import { ItemCategory, ItemRarity, ItemTag } from "./../inventoryItem.ts";
@@ -109,6 +110,7 @@ export const fishingRodItem = {
     hint: "A springy length of wood and a braided line. The fish still decide the rest.",
     tag: [ItemTag.SkillGear],
     category: ItemCategory.Productivity,
+    fishing: fishingRodProfile.id,
     visual: {
         type: EquipmentSpriteVariantType.Mirrored,
         sprite: spriteRefs.fishingrod,

@@ -48,20 +48,12 @@ export function clearHeldItem(component: HeldItemComponent): void {
     component.amount = 0;
 }
 
+// A spent stack counts as empty, matching addToHeldItem
 export function canAddToHeld(
     component: HeldItemComponent,
     item: InventoryItem,
 ): boolean {
-    if (component.item === null) {
-        return true;
-    }
-
-    //If we are holding the same item, we can add to it
-    if (component.item.id == item.id) {
-        return true;
-    }
-
-    return false;
+    return isHeldEmpty(component) || component.item!.id === item.id;
 }
 
 /**

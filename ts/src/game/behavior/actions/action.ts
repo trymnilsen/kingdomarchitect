@@ -6,10 +6,12 @@ export type SleepQuality =
     "house" | "bedrollFire" | "bedrollAlone" | "collapse";
 
 /**
- * Why an action gave up. Reported when the behavior system logs the failure,
- * so a stuck worker can be told apart from one whose target vanished.
+ * Why an action gave up, so the behavior that planned it can decide whether to
+ * retry. noRoute means no path exists from here. pathBlocked means the route
+ * turned impassable mid-walk and a fresh search may find another
  */
 export type FailureCause =
+    | { type: "noRoute"; target: Point }
     | { type: "pathBlocked"; target: Point }
     | { type: "targetGone"; entityId: string }
     | { type: "notAdjacent" }
@@ -18,6 +20,8 @@ export type FailureCause =
     | { type: "outOfReach" }
     | { type: "noLineOfSight" }
     | { type: "nothingToAttack" }
+    | { type: "notFishingSpot"; target: Point }
+    | { type: "noFishingTackle" }
     | { type: "unknown" };
 
 export type ActionResult =

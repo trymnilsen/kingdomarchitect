@@ -31,6 +31,7 @@ import type { DropHeldActionData } from "./dropHeldAction.ts";
 import type { PickupFromGroundActionData } from "./pickupFromGroundAction.ts";
 import type { EquipFromHeldActionData } from "./equipFromHeldAction.ts";
 import type { DropFromSlotActionData } from "./dropFromSlotAction.ts";
+import type { FishActionData } from "./fishAction.ts";
 
 /**
  * Action data types - these are serializable plain objects that can be stored in components.
@@ -72,7 +73,8 @@ export type BehaviorActionData =
     | DropHeldActionData
     | PickupFromGroundActionData
     | EquipFromHeldActionData
-    | DropFromSlotActionData;
+    | DropFromSlotActionData
+    | FishActionData;
 
 /**
  * Action executor function type - takes action data, entity, and tick, returns result.

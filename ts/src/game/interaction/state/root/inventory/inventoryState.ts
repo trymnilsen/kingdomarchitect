@@ -20,8 +20,7 @@ import {
     kingdomStockFilter,
     type StockFilter,
 } from "../../../../building/stockFilter.ts";
-
-type EquipSlot = "primary" | "secondary";
+import type { EquipmentSlot } from "../../../../component/equipmentComponent.ts";
 
 /**
  * Shows aggregated stock for a settlement. The view is a read-only projection
@@ -33,7 +32,7 @@ export class InventoryState extends InteractionState {
     private _selectedKey: string | null = null;
     private _anchor: Entity;
     private _filter: StockFilter;
-    private _equipSlot?: EquipSlot;
+    private _equipSlot?: EquipmentSlot;
 
     override get isModal(): boolean {
         return true;
@@ -51,7 +50,11 @@ export class InventoryState extends InteractionState {
      * @param equipSlot when set, the view is in equip-pick mode: choosing an
      *  item equips it into this slot on the anchor worker instead of browsing.
      */
-    constructor(anchor: Entity, filter?: StockFilter, equipSlot?: EquipSlot) {
+    constructor(
+        anchor: Entity,
+        filter?: StockFilter,
+        equipSlot?: EquipmentSlot,
+    ) {
         super();
         this._anchor = anchor;
         this._filter = filter ?? kingdomStockFilter();
@@ -116,7 +119,7 @@ export class InventoryState extends InteractionState {
      * nearest stockpile that holds it. The worker (the anchor) walks to that
      * source, picks one up, and equips. The whole modal chain then closes.
      */
-    private equipIntoSlot(entry: StockEntry, slot: EquipSlot): void {
+    private equipIntoSlot(entry: StockEntry, slot: EquipmentSlot): void {
         const source = nearestSource(entry, this._anchor.worldPosition);
         if (!source) {
             return;

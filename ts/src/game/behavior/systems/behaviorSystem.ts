@@ -5,7 +5,6 @@ import {
     BehaviorAgentComponentId,
 } from "../../component/behaviorAgentComponent.ts";
 import type { Behavior } from "../behaviors/behavior.ts";
-import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import { executeAction } from "../actions/actionExecutor.ts";
 import { log } from "../../../common/logging/logger.ts";
 import type { BehaviorActionData } from "../actions/actionData.ts";
@@ -135,7 +134,7 @@ function updateBehaviorAgent(
             } else {
                 log.warn(message);
             }
-            unclaimCurrentJob(entity);
+            notifyPlanningBehavior(entity, agent, resolver, result.cause);
             clearBehavior(agent);
             agent.pendingReplan = { kind: "replan" };
         } else if (result.kind === "subaction") {
@@ -184,31 +183,30 @@ function clearBehavior(agent: BehaviorAgentComponent): void {
 }
 
 /**
- * Unclaim the current job if the entity has one, so a failed action does not
- * leave the job claimed by a worker that is no longer doing it.
- *
- * The queue lives on an ancestor, not on the entity: a worker's is on the root,
- * a goblin's on its camp. An entity can only claim one job, so the search stops
- * at the first match.
+ * Must run before clearBehavior, which forgets which behavior was running.
+ * Guarded because a throw here would abort the tick for every agent
  */
-function unclaimCurrentJob(entity: Entity): void {
-    const queueEntity = entity.getAncestorEntity(JobQueueComponentId);
-    if (!queueEntity) {
+function notifyPlanningBehavior(
+    entity: Entity,
+    agent: BehaviorAgentComponent,
+    resolver: BehaviorResolver,
+    cause: FailureCause,
+): void {
+    const behaviorName = agent.currentBehaviorName;
+    if (!behaviorName) {
         return;
     }
-
-    const jobQueue = queueEntity.getEcsComponent(JobQueueComponentId);
-    if (!jobQueue) {
+    const behavior = resolver(entity).find((b) => b.name === behaviorName);
+    if (!behavior?.onActionFailed) {
         return;
     }
-
-    for (const job of jobQueue.jobs) {
-        if (job.claimedBy === entity.id) {
-            job.claimedBy = undefined;
-            queueEntity.invalidateComponent(JobQueueComponentId);
-            log.info(`Unclaimed job ${job.id} for entity ${entity.id}`);
-            break;
-        }
+    try {
+        behavior.onActionFailed(entity, cause);
+    } catch (error) {
+        log.error(
+            `Behavior ${behaviorName} onActionFailed threw for entity ${entity.id}`,
+            { error },
+        );
     }
 }
 

@@ -1,4 +1,5 @@
 import type { Entity } from "../../entity/entity.ts";
+import type { FailureCause } from "../actions/action.ts";
 import type { BehaviorActionData } from "../actions/actionData.ts";
 
 /**
@@ -28,4 +29,11 @@ export interface Behavior {
      * This is called when the behavior is selected for execution.
      */
     expand(entity: Entity): BehaviorActionData[];
+
+    /**
+     * Runs before the agent replans after one of this behavior's actions
+     * fails. The behavior owns the state it planned from, so it decides
+     * whether that state survives
+     */
+    onActionFailed?(entity: Entity, cause: FailureCause): void;
 }

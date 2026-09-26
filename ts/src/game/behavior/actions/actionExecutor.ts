@@ -37,6 +37,7 @@ import { executeDropHeldAction } from "./dropHeldAction.ts";
 import { executePickupFromGroundAction } from "./pickupFromGroundAction.ts";
 import { executeEquipFromHeldAction } from "./equipFromHeldAction.ts";
 import { executeDropFromSlotAction } from "./dropFromSlotAction.ts";
+import { executeFishAction } from "./fishAction.ts";
 
 /**
  * Main action executor that dispatches to specific action handlers based on action type.
@@ -109,6 +110,8 @@ export const executeAction: BehaviorActionExecutor = (
             return executeEquipFromHeldAction(action, entity);
         case "dropFromSlot":
             return executeDropFromSlotAction(action, entity, tick);
+        case "fish":
+            return executeFishAction(action, entity);
         default:
             log.warn(`Unknown action type: ${(action as any).type}`);
             return { kind: "failed", cause: { type: "unknown" } };

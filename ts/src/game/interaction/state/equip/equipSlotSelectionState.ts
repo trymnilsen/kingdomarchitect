@@ -1,4 +1,5 @@
 import type { ComponentDescriptor } from "../../../../ui/declarative/ui.ts";
+import type { EquipmentSlot } from "../../../component/equipmentComponent.ts";
 import { InteractionState } from "../../handler/interactionState.ts";
 import { uiScaffold } from "../../view/uiScaffold.ts";
 import { EquipUnitSelectionState } from "./equipUnitSelectionState.ts";
@@ -48,7 +49,7 @@ export class EquipSlotSelectionState extends InteractionState {
         });
     }
 
-    private pickSlot(slot: "primary" | "secondary"): void {
+    private pickSlot(slot: EquipmentSlot): void {
         this.context.stateChanger.replace(
             new EquipUnitSelectionState(this.sourceEntityId, this.itemId, slot),
         );

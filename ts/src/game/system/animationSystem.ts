@@ -133,4 +133,3 @@ function updateAnimation(
         component.frame = 0;
     });
 }
-

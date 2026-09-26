@@ -13,6 +13,7 @@ import {
 import {
     findJobClaimedBy,
     claimJobInQueue,
+    releaseClaimedJob,
     suspendJobInQueue,
 } from "../../job/jobLifecycle.ts";
 import { CraftingJobId, type CraftingJob } from "../../job/craftingJob.ts";
@@ -26,6 +27,7 @@ import type { BuildJobPlanner } from "../../job/planner/jobPlanner.ts";
 import type { CollectResourceJob } from "../../job/collectResourceJob.ts";
 import { ResourceComponentId } from "../../component/resourceComponent.ts";
 import {
+    canAddToHeld,
     HeldItemComponentId,
     isHeldEmpty,
 } from "../../component/heldItemComponent.ts";
@@ -171,6 +173,11 @@ export function createPerformJobBehavior(
                 claimRequiresEmptyHand,
                 claimedJob,
             );
+        },
+
+        onActionFailed(entity: Entity): void {
+            // A failed step says nothing about whether another worker could do it
+            releaseClaimedJob(entity);
         },
     };
 }
@@ -432,8 +439,7 @@ function canHeldAcceptResourceYield(
     const resource = getResourceById(resourceComponent.resourceId);
     if (!resource) return false;
 
-    const heldId = held.item!.id;
-    return resource.yields.every((y) => y.item.id === heldId);
+    return resource.yields.every((y) => canAddToHeld(held, y.item));
 }
 
 /**

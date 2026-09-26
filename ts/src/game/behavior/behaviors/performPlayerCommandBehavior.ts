@@ -1,4 +1,5 @@
 import { Entity } from "../../entity/entity.ts";
+import type { FailureCause } from "../actions/action.ts";
 import type { BehaviorActionData } from "../actions/actionData.ts";
 import {
     clearPlayerCommand,
@@ -15,6 +16,7 @@ import { planEquipCommand } from "../planners/equipCommandPlanner.ts";
 import { planEquipFromHeld } from "../planners/equipFromHeldPlanner.ts";
 import { planDepositHeld } from "../../job/planner/planDepositHeld.ts";
 import { planAttack } from "../planners/attackPlanner.ts";
+import { planFishing } from "../planners/fishingPlanner.ts";
 
 /** Outranks anything a worker chooses for itself. Yields only to survival. */
 export const PLAYER_COMMAND_UTILITY = 90;
@@ -54,6 +56,15 @@ export function createPerformPlayerCommandBehavior(): Behavior {
 
                 case "attack": {
                     const plan = planAttack(entity, command.target);
+                    if (plan.length === 0) {
+                        clearPlayerCommand(entity);
+                        return [];
+                    }
+                    return [...plan, { type: "clearPlayerCommand" }];
+                }
+
+                case "fish": {
+                    const plan = planFishing(entity, command.target);
                     if (plan.length === 0) {
                         clearPlayerCommand(entity);
                         return [];
@@ -164,5 +175,44 @@ export function createPerformPlayerCommandBehavior(): Behavior {
                     return [];
             }
         },
+
+        onActionFailed(entity: Entity, cause: FailureCause): void {
+            if (endsPlayerOrder(cause)) {
+                log.info(`Player order for ${entity.id} abandoned`, {
+                    cause: cause.type,
+                });
+                clearPlayerCommand(entity);
+            }
+        },
     };
+}
+
+/**
+ * Failures a replan cannot fix. Retrying them would plan the same doomed steps
+ * every tick and hold the worker at player-order utility forever. Exhaustive
+ * so a new cause must be classified before it compiles
+ */
+function endsPlayerOrder(cause: FailureCause): boolean {
+    switch (cause.type) {
+        case "noRoute":
+        case "targetGone":
+        case "nothingToAttack":
+        case "notFishingSpot":
+        case "noFishingTackle":
+            return true;
+        case "unknown":
+            // An action that throws every tick would otherwise hold the worker
+            return true;
+        case "pathBlocked":
+        case "notAdjacent":
+        case "outOfReach":
+        case "noLineOfSight":
+        case "noResources":
+        case "stockpileFull":
+            return false;
+        default: {
+            const unhandled: never = cause;
+            return unhandled;
+        }
+    }
 }

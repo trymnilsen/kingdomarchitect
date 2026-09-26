@@ -1,5 +1,8 @@
 import { inventoryItemsMap } from "../../../data/inventory/inventoryItems.ts";
-import { EquipmentComponentId } from "../../component/equipmentComponent.ts";
+import {
+    EquipmentComponentId,
+    type EquipmentSlot,
+} from "../../component/equipmentComponent.ts";
 import { GroundItemComponentId } from "../../component/groundItemComponent.ts";
 import { HeldItemComponentId } from "../../component/heldItemComponent.ts";
 import { StockpileComponentId } from "../../component/stockpileComponent.ts";
@@ -10,7 +13,7 @@ import { findDropPosition } from "../dropItem.ts";
 export type EquipPlannerCommand = {
     sourceEntityId: string;
     itemId: string;
-    slot: "primary" | "secondary";
+    slot: EquipmentSlot;
 };
 
 /**

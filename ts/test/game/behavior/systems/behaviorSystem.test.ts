@@ -12,6 +12,9 @@ import {
 import { createBehaviorSystem } from "../../../../src/game/behavior/systems/behaviorSystem.ts";
 import type { Behavior } from "../../../../src/game/behavior/behaviors/behavior.ts";
 import type { BehaviorActionData } from "../../../../src/game/behavior/actions/actionData.ts";
+import type { FailureCause } from "../../../../src/game/behavior/actions/action.ts";
+import { createPerformJobBehavior } from "../../../../src/game/behavior/behaviors/performJobBehavior.ts";
+import { planBuildBuilding } from "../../../../src/game/job/planner/buildBuildingPlanner.ts";
 import {
     ROLE_RANK_STEP,
     TOP_ROLE_UTILITY,
@@ -177,12 +180,41 @@ describe("BehaviorSystem", () => {
             assert.strictEqual(agent.currentBehaviorName, null);
         });
 
-        it("unclaims job on action failure", () => {
+        it("tells the behavior whose plan failed what the action reported", () => {
+            const { root, worker } = createTestScene();
+            const agent = worker.getEcsComponent(BehaviorAgentComponentId)!;
+            const reported: FailureCause[] = [];
+            const planner: Behavior = {
+                ...createMockBehavior("planner", { isValid: false }),
+                onActionFailed: (_entity, cause) => reported.push(cause),
+            };
+            const bystander: Behavior = {
+                ...createMockBehavior("bystander", { isValid: false }),
+                onActionFailed: () => assert.fail("only the planner hears"),
+            };
+
+            agent.actionQueue = [
+                {
+                    type: "collectItems",
+                    entityId: "nonexistent",
+                    itemId: "wood",
+                },
+            ];
+            agent.currentBehaviorName = "planner";
+            agent.pendingReplan = undefined;
+
+            const system = createBehaviorSystem(() => [bystander, planner]);
+            system.onUpdate!(root, 1);
+
+            assert.deepStrictEqual(reported, [
+                { type: "targetGone", entityId: "nonexistent" },
+            ]);
+        });
+
+        it("releases a claimed job when a performJob action fails", () => {
             const { root, worker } = createTestScene();
             const agent = worker.getEcsComponent(BehaviorAgentComponentId)!;
             const jobQueue = root.getEcsComponent(JobQueueComponentId)!;
-
-            // Add a job claimed by the worker
             jobQueue.jobs = [
                 {
                     id: "collectItem",
@@ -199,13 +231,13 @@ describe("BehaviorSystem", () => {
                     itemId: "wood",
                 },
             ];
-            agent.currentBehaviorName = "test";
+            agent.currentBehaviorName = "performJob";
             agent.pendingReplan = undefined;
 
-            const system = createBehaviorSystem(() => []);
+            const performJob = createPerformJobBehavior(planBuildBuilding);
+            const system = createBehaviorSystem(() => [performJob]);
             system.onUpdate!(root, 1);
 
-            // Job should be unclaimed
             assert.strictEqual(jobQueue.jobs[0].claimedBy, undefined);
         });
     });

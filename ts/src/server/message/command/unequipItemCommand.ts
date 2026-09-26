@@ -1,7 +1,5 @@
-import type { EquipmentComponent } from "../../../game/component/equipmentComponent.ts";
+import type { EquipmentSlot } from "../../../game/component/equipmentComponent.ts";
 import type { Entity } from "../../../game/entity/entity.ts";
-
-type SlotType = keyof EquipmentComponent["slots"];
 
 /**
  * Move an item out of an equipment slot into the worker's held slot.
@@ -11,12 +9,12 @@ type SlotType = keyof EquipmentComponent["slots"];
 export type UnequipItemCommand = {
     id: typeof UnequipItemCommandId;
     entity: string;
-    slot: SlotType;
+    slot: EquipmentSlot;
 };
 
 export function UnequipItemCommand(
     entity: Entity,
-    slot: SlotType,
+    slot: EquipmentSlot,
 ): UnequipItemCommand {
     return {
         id: UnequipItemCommandId,

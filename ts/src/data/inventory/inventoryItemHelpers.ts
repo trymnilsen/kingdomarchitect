@@ -14,16 +14,19 @@ export function isWeaponItem(item: InventoryItem): boolean {
     return item.attack !== undefined;
 }
 
-/**
- * Whether a worker can put this item in an equipment slot. Four things qualify:
- * skill gear, consumables (a potion sits in a slot to be drunk), anything
- * granting light, and anything you can fight with
- */
+export function isFishingItem(item: InventoryItem): boolean {
+    return item.fishing !== undefined;
+}
+
+// Consumables qualify because a potion sits in a slot until it is drunk
 export function isEquippableItem(item: InventoryItem): boolean {
     if (item.light !== undefined) {
         return true;
     }
     if (isWeaponItem(item)) {
+        return true;
+    }
+    if (isFishingItem(item)) {
         return true;
     }
     return (

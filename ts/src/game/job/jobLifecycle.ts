@@ -51,6 +51,18 @@ export function completeClaimedJob(worker: Entity): void {
     }
 }
 
+// The failure counterpart of completeClaimedJob, the job stays queued for others
+export function releaseClaimedJob(worker: Entity): void {
+    const queueEntity = worker.getAncestorEntity(JobQueueComponentId);
+    if (!queueEntity) {
+        return;
+    }
+    const job = findJobClaimedBy(queueEntity, worker.id);
+    if (job) {
+        suspendJobInQueue(queueEntity, job);
+    }
+}
+
 /**
  * Remove a job from whichever queue owns the worker. Planners and actions hold
  * the worker, not the queue, so they go through here instead of resolving the

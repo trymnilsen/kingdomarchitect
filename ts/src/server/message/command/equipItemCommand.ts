@@ -1,7 +1,5 @@
-import type { EquipmentComponent } from "../../../game/component/equipmentComponent.ts";
+import type { EquipmentSlot } from "../../../game/component/equipmentComponent.ts";
 import type { Entity } from "../../../game/entity/entity.ts";
-
-type SlotType = keyof EquipmentComponent["slots"];
 
 /**
  * Issue an equip command. The worker walks to the source (a stockpile or
@@ -13,14 +11,14 @@ export type EquipItemCommand = {
     entity: string;
     sourceEntityId: string;
     itemId: string;
-    slot: SlotType;
+    slot: EquipmentSlot;
 };
 
 export function EquipItemCommand(
     entity: Entity,
     sourceEntityId: string,
     itemId: string,
-    slot: SlotType,
+    slot: EquipmentSlot,
 ): EquipItemCommand {
     return {
         id: EquipItemCommandId,

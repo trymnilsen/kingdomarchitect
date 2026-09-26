@@ -18,8 +18,8 @@ export type InventoryItem = {
      * the holder, the same way stats are.
      */
     readonly light?: string;
-    /** Names an AttackProfileDefinition. Having one is what makes it a weapon */
     readonly attack?: string;
+    readonly fishing?: string;
 };
 
 export const ItemTag = {

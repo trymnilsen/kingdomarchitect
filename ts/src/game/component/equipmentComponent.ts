@@ -8,6 +8,9 @@ export type EquipmentComponent = {
     };
 };
 
+// Derived from the component so a new slot reaches every caller
+export type EquipmentSlot = keyof EquipmentComponent["slots"];
+
 export function createEquipmentComponent(): EquipmentComponent {
     return {
         id: EquipmentComponentId,

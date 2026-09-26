@@ -9,15 +9,14 @@ import { spendEntityEnergy } from "../../component/energyComponent.ts";
 import { damage, HealthComponentId } from "../../component/healthComponent.ts";
 import {
     addToHeldItem,
+    canAddToHeld,
     HeldItemComponentId,
-    isHeldEmpty,
     type HeldItemComponent,
 } from "../../component/heldItemComponent.ts";
 import { OutputPolicy } from "../../component/outputPolicyComponent.ts";
 import { RegrowComponentId } from "../../component/regrowComponent.ts";
 import { ResourceComponentId } from "../../component/resourceComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
-import { findAcceptingStockpile } from "../../entity/findAcceptingStockpile.ts";
 import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import {
     findJobClaimedBy,
@@ -25,6 +24,7 @@ import {
 } from "../../job/jobLifecycle.ts";
 import { scatterYields } from "../scatterYields.ts";
 import { ActionComplete, ActionRunning, type ActionResult } from "./action.ts";
+import { freeHandSubaction } from "./freeHandSubaction.ts";
 
 export type HarvestResourceActionData = {
     type: "harvestResource";
@@ -95,8 +95,17 @@ export function executeHarvestResourceAction(
     // yield item. If it holds something else, free the hand before harvesting
     // rather than failing. Otherwise the worker can never collect this
     // resource. Dropping never touches the hand, so it has no such precondition.
-    if (policy === OutputPolicy.Haul && heldBlocksYield(held, resource)) {
-        return freeHandSubaction(entity, resourceEntity, held);
+    if (
+        policy === OutputPolicy.Haul &&
+        held.item &&
+        heldBlocksYield(held, resource)
+    ) {
+        return freeHandSubaction(
+            entity,
+            held.item,
+            resourceEntity.worldPosition,
+            `harvesting ${resource.name}`,
+        );
     }
 
     if (action.harvestAction === ResourceHarvestMode.Chop) {
@@ -147,67 +156,11 @@ function collectYields(
     depositYields(worker, resource, held);
 }
 
-/**
- * True when the held slot holds an item that does not match the resource's
- * yield, so collecting would require mixing two item ids in one slot.
- */
 function heldBlocksYield(
     held: HeldItemComponent,
     resource: NaturalResource,
 ): boolean {
-    if (isHeldEmpty(held)) return false;
-    const heldId = held.item!.id;
-    return resource.yields.some((y) => y.item.id !== heldId);
-}
-
-/**
- * Emit a subaction chain that empties the worker's hand so the suspended
- * harvest can resume. Prefers depositing into an accepting stockpile (walking
- * there and back), and falls back to dropping the held item where the worker
- * stands when no stockpile will take it.
- */
-function freeHandSubaction(
-    worker: Entity,
-    resourceEntity: Entity,
-    held: HeldItemComponent,
-): ActionResult {
-    const stockpile = findAcceptingStockpile(worker, held.item!.id);
-    if (stockpile) {
-        return {
-            kind: "subaction",
-            actions: [
-                {
-                    type: "moveTo",
-                    target: stockpile.worldPosition,
-                    goal: { kind: "adjacent" },
-                },
-                {
-                    type: "depositToStockpile",
-                    stockpileId: stockpile.id,
-                },
-                {
-                    type: "moveTo",
-                    target: resourceEntity.worldPosition,
-                    goal: { kind: "adjacent" },
-                },
-            ],
-        };
-    }
-
-    const resourceName =
-        getResourceById(
-            resourceEntity.getEcsComponent(ResourceComponentId)?.resourceId ??
-                "",
-        )?.name ?? "a resource";
-    return {
-        kind: "subaction",
-        actions: [
-            {
-                type: "dropHeld",
-                reason: `Dropped ${held.item!.name} to free hands for harvesting ${resourceName}`,
-            },
-        ],
-    };
+    return resource.yields.some((y) => !canAddToHeld(held, y.item));
 }
 
 /**

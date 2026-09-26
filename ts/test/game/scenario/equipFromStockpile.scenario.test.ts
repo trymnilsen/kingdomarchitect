@@ -5,7 +5,10 @@ import {
     addInventoryItem,
     InventoryComponentId,
 } from "../../../src/game/component/inventoryComponent.ts";
-import { EquipmentComponentId } from "../../../src/game/component/equipmentComponent.ts";
+import {
+    EquipmentComponentId,
+    type EquipmentSlot,
+} from "../../../src/game/component/equipmentComponent.ts";
 import { HeldItemComponentId } from "../../../src/game/component/heldItemComponent.ts";
 import { BehaviorAgentComponentId } from "../../../src/game/component/behaviorAgentComponent.ts";
 import {
@@ -21,7 +24,7 @@ function setEquipPlayerCommand(
     worker: Entity,
     sourceId: string,
     itemId: string,
-    slot: "primary" | "secondary",
+    slot: EquipmentSlot,
 ): void {
     const agent = worker.requireEcsComponent(BehaviorAgentComponentId);
     agent.playerCommand = {

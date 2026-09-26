@@ -1,6 +1,9 @@
 import { log } from "../../../common/logging/logger.ts";
 import { ItemTag } from "../../../data/inventory/inventoryItem.ts";
-import { EquipmentComponentId } from "../../component/equipmentComponent.ts";
+import {
+    EquipmentComponentId,
+    type EquipmentSlot,
+} from "../../component/equipmentComponent.ts";
 import {
     decreaseHunger,
     HungerComponentId,
@@ -11,7 +14,7 @@ import { ActionComplete, type ActionResult } from "./action.ts";
 
 export type EatFromEquipmentActionData = {
     type: "eatFromEquipment";
-    slot: "primary" | "secondary";
+    slot: EquipmentSlot;
 };
 
 const HUNGER_REDUCTION = 30;

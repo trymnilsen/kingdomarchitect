@@ -1,4 +1,7 @@
-import { EquipmentComponentId } from "../../component/equipmentComponent.ts";
+import {
+    EquipmentComponentId,
+    type EquipmentSlot,
+} from "../../component/equipmentComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import type { BehaviorActionData } from "../actions/actionData.ts";
 import { findDropPosition } from "../dropItem.ts";
@@ -14,7 +17,7 @@ import { findDropPosition } from "../dropItem.ts";
 export function planEquipFromHeld(
     root: Entity,
     entity: Entity,
-    slot: "primary" | "secondary",
+    slot: EquipmentSlot,
 ): BehaviorActionData[] {
     const equipment = entity.requireEcsComponent(EquipmentComponentId);
     const slotItem = equipment.slots[slot];

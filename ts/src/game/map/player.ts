@@ -6,7 +6,10 @@ import { farm } from "../../data/building/grow/grow.ts";
 import { cresset } from "../../data/building/light/cresset.ts";
 import { woodenHouse } from "../../data/building/wood/house.ts";
 import { stockPile } from "../../data/building/wood/storage.ts";
-import { bowItem } from "../../data/inventory/items/equipment.ts";
+import {
+    bowItem,
+    fishingRodItem,
+} from "../../data/inventory/items/equipment.ts";
 import {
     stoneResource,
     treeResource,
@@ -78,11 +81,12 @@ export function addInitialPlayerChunk(
     firstHouse.requireEcsComponent(HousingComponentId).tenant = firstWorker.id;
 
     const startingStockpile = buildingPrefab(stockPile, false);
-    addInventoryItem(
-        startingStockpile.requireEcsComponent(InventoryComponentId),
-        bowItem,
-        1,
-    );
+    const startingStock =
+        startingStockpile.requireEcsComponent(InventoryComponentId);
+    addInventoryItem(startingStock, bowItem, 1);
+    // The start chunk always has a lake, so settlers can fish before anyone
+    // has built a workshop to make a rod
+    addInventoryItem(startingStock, fishingRodItem, 1);
 
     // World resources stay on the chunk entity
     chunkEntity.addChild(firstTree);

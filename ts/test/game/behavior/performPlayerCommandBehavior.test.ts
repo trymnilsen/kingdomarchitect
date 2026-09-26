@@ -179,6 +179,55 @@ describe("PerformPlayerCommandBehavior", () => {
         });
     });
 
+    describe("onActionFailed", () => {
+        const target = { x: 14, y: 9 };
+
+        function orderedEntity() {
+            const entity = createBehaviorTestEntity("worker", 10, 8);
+            getBehaviorAgent(entity)!.playerCommand = {
+                action: "move",
+                targetPosition: target,
+            };
+            return entity;
+        }
+
+        it("keeps the order through a blockage a replan can route around", () => {
+            const behavior = createPerformPlayerCommandBehavior();
+            const entity = orderedEntity();
+
+            behavior.onActionFailed!(entity, { type: "pathBlocked", target });
+
+            assert.notStrictEqual(
+                getBehaviorAgent(entity)!.playerCommand,
+                undefined,
+            );
+        });
+
+        it("drops the order when no route exists", () => {
+            const behavior = createPerformPlayerCommandBehavior();
+            const entity = orderedEntity();
+
+            behavior.onActionFailed!(entity, { type: "noRoute", target });
+
+            assert.strictEqual(
+                getBehaviorAgent(entity)!.playerCommand,
+                undefined,
+            );
+        });
+
+        it("drops the order on a failure nothing explains", () => {
+            const behavior = createPerformPlayerCommandBehavior();
+            const entity = orderedEntity();
+
+            behavior.onActionFailed!(entity, { type: "unknown" });
+
+            assert.strictEqual(
+                getBehaviorAgent(entity)!.playerCommand,
+                undefined,
+            );
+        });
+    });
+
     describe("name", () => {
         it("has name 'performPlayerCommand'", () => {
             const behavior = createPerformPlayerCommandBehavior();

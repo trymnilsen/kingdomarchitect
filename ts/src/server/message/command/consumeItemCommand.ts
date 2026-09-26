@@ -1,16 +1,14 @@
-import type { EquipmentComponent } from "../../../game/component/equipmentComponent.ts";
+import type { EquipmentSlot } from "../../../game/component/equipmentComponent.ts";
 import type { Entity } from "../../../game/entity/entity.ts";
-
-type SlotType = keyof EquipmentComponent["slots"];
 
 export type ConsumeItemCommand = {
     id: typeof ConsumeItemCommandId;
-    slot: SlotType;
+    slot: EquipmentSlot;
     entity: string;
 };
 
 export function ConsumeItemCommand(
-    slot: SlotType,
+    slot: EquipmentSlot,
     entity: Entity,
 ): ConsumeItemCommand {
     return {

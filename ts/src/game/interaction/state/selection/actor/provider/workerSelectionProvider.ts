@@ -4,6 +4,7 @@ import { type SelectedWorldItem } from "../../../../selection/selectedWorldItem.
 import {
     EquipmentComponentId,
     type EquipmentComponent,
+    type EquipmentSlot,
 } from "../../../../../component/equipmentComponent.ts";
 import {
     HeldItemComponentId,
@@ -25,7 +26,11 @@ import { DropHeldCommand } from "../../../../../../server/message/command/dropHe
 import { EquipFromHeldCommand } from "../../../../../../server/message/command/equipFromHeldCommand.ts";
 import { AttackSelectionState } from "../../../attack/attackSelectionState.ts";
 import { ItemTag } from "../../../../../../data/inventory/inventoryItem.ts";
-import { isWeaponItem } from "../../../../../../data/inventory/inventoryItemHelpers.ts";
+import {
+    isFishingItem,
+    isWeaponItem,
+} from "../../../../../../data/inventory/inventoryItemHelpers.ts";
+import { FishingSpotSelectionState } from "../../../fishing/fishingSpotSelectionState.ts";
 import { ConsumeItemCommand } from "../../../../../../server/message/command/consumeItemCommand.ts";
 import { RolePriorityState } from "../../../role/rolePriorityState.ts";
 import { WorkerStance } from "../../../../../component/worker/roleComponent.ts";
@@ -79,20 +84,20 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
         equipmentComponent: EquipmentComponent,
         heldComponent: HeldItemComponent | null,
     ): UIActionbarItem[] {
-        const items: UIActionbarItem[] = [];
-        this.addPrimaryEquipmentActions(
-            equipmentComponent,
-            items,
-            stateContext,
-            selectedEntity,
-        );
-
-        this.addSecondaryEquipmentActions(
-            equipmentComponent,
-            items,
-            stateContext,
-            selectedEntity,
-        );
+        const items: UIActionbarItem[] = [
+            this.getSlotActions(
+                equipmentComponent,
+                "primary",
+                stateContext,
+                selectedEntity,
+            ),
+            this.getSlotActions(
+                equipmentComponent,
+                "secondary",
+                stateContext,
+                selectedEntity,
+            ),
+        ];
 
         if (heldComponent) {
             this.addHeldActions(
@@ -172,54 +177,17 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
         });
     }
 
-    private addSecondaryEquipmentActions(
+    private getSlotActions(
         equipmentComponent: EquipmentComponent,
-        items: UIActionbarItem[],
+        slot: EquipmentSlot,
         stateContext: StateContext,
         selectedEntity: Entity,
-    ) {
-        const secondaryItem = equipmentComponent.slots.secondary;
-
-        if (secondaryItem) {
-            const isConsumable = secondaryItem.tag?.includes(
-                ItemTag.Consumable,
-            );
-            const children: UIActionbarItem[] = [
-                {
-                    text: "Unequip",
-                    onClick: () => {
-                        stateContext.commandDispatcher(
-                            UnequipItemCommand(selectedEntity, "secondary"),
-                        );
-                    },
-                    icon: spriteRefs.empty_sprite,
-                },
-            ];
-
-            if (isConsumable) {
-                children.push({
-                    text: "Consume",
-                    onClick: () => {
-                        stateContext.commandDispatcher(
-                            ConsumeItemCommand("secondary", selectedEntity),
-                        );
-                    },
-                    icon: spriteRefs.empty_sprite,
-                });
-            }
-
-            if (isWeaponItem(secondaryItem)) {
-                children.push(attackAction(stateContext, selectedEntity));
-            }
-
-            items.push({
-                text: "Secondary",
-                icon: secondaryItem.asset,
-                children,
-            });
-        } else {
-            items.push({
-                text: "Secondary",
+    ): UIActionbarItem {
+        const label = slotLabels[slot];
+        const item = equipmentComponent.slots[slot];
+        if (!item) {
+            return {
+                text: label,
                 icon: spriteRefs.empty_sprite,
                 children: [
                     {
@@ -229,74 +197,50 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
                             this.openEquipInventory(
                                 stateContext,
                                 selectedEntity,
-                                "secondary",
+                                slot,
                             ),
                     },
                 ],
-            });
+            };
         }
-    }
 
-    addPrimaryEquipmentActions(
-        equipmentComponent: EquipmentComponent,
-        items: UIActionbarItem[],
-        stateContext: StateContext,
-        selectedEntity: Entity,
-    ) {
-        const primaryItem = equipmentComponent.slots.primary;
-        if (!!primaryItem) {
-            const isConsumable = primaryItem.tag?.includes(ItemTag.Consumable);
-            const children: UIActionbarItem[] = [
-                {
-                    text: "Unequip",
-                    onClick: () => {
-                        stateContext.commandDispatcher(
-                            UnequipItemCommand(selectedEntity, "primary"),
-                        );
-                    },
-                    icon: spriteRefs.empty_sprite,
+        const children: UIActionbarItem[] = [
+            {
+                text: "Unequip",
+                onClick: () => {
+                    stateContext.commandDispatcher(
+                        UnequipItemCommand(selectedEntity, slot),
+                    );
                 },
-            ];
-
-            if (isConsumable) {
-                children.push({
-                    text: "Consume",
-                    onClick: () => {
-                        stateContext.commandDispatcher(
-                            ConsumeItemCommand("primary", selectedEntity),
-                        );
-                    },
-                    icon: spriteRefs.empty_sprite,
-                });
-            }
-
-            if (isWeaponItem(primaryItem)) {
-                children.push(attackAction(stateContext, selectedEntity));
-            }
-
-            items.push({
-                text: "Primary",
-                icon: primaryItem.asset,
-                children,
-            });
-        } else {
-            items.push({
-                text: "Primary",
                 icon: spriteRefs.empty_sprite,
-                children: [
-                    {
-                        text: "Equip",
-                        icon: spriteRefs.empty_sprite,
-                        onClick: () =>
-                            this.openEquipInventory(
-                                stateContext,
-                                selectedEntity,
-                                "primary",
-                            ),
-                    },
-                ],
+            },
+        ];
+
+        if (item.tag?.includes(ItemTag.Consumable)) {
+            children.push({
+                text: "Consume",
+                onClick: () => {
+                    stateContext.commandDispatcher(
+                        ConsumeItemCommand(slot, selectedEntity),
+                    );
+                },
+                icon: spriteRefs.empty_sprite,
             });
         }
+
+        if (isWeaponItem(item)) {
+            children.push(attackAction(stateContext, selectedEntity));
+        }
+
+        if (isFishingItem(item)) {
+            children.push(fishAction(stateContext, selectedEntity));
+        }
+
+        return {
+            text: label,
+            icon: item.asset,
+            children,
+        };
     }
 
     /**
@@ -307,7 +251,7 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
     private openEquipInventory(
         stateContext: StateContext,
         worker: Entity,
-        slot: "primary" | "secondary",
+        slot: EquipmentSlot,
     ) {
         stateContext.stateChanger.push(
             new InventoryState(
@@ -403,3 +347,24 @@ function attackAction(
         icon: spriteRefs.empty_sprite,
     };
 }
+
+// The worker resolves which tackle to use, so both slots offer the same entry
+function fishAction(
+    stateContext: StateContext,
+    selectedEntity: Entity,
+): UIActionbarItem {
+    return {
+        text: "Fish",
+        onClick: () => {
+            stateContext.stateChanger.push(
+                new FishingSpotSelectionState(selectedEntity),
+            );
+        },
+        icon: spriteRefs.empty_sprite,
+    };
+}
+
+const slotLabels: Record<EquipmentSlot, string> = {
+    primary: "Primary",
+    secondary: "Secondary",
+};
