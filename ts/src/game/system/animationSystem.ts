@@ -1,39 +1,18 @@
-import type { AssetLoader } from "../../asset/loader/assetLoader.ts";
-import {
-    spriteRefs,
-    type SpriteRef,
-    SPRITE_FRAMES,
-} from "../../asset/sprite.ts";
+import { SPRITE_FRAMES } from "../../asset/sprite.ts";
 import { spriteRegistry } from "../../asset/spriteRegistry.ts";
-import { getCharacterBinId } from "../../devtools/characterbuilder/characterBinId.ts";
 import type { SpriteDefinitionCache } from "../../devtools/characterbuilder/characterSpriteGenerator.ts";
-import { getCharacterColors } from "../appearance/getCharacterColors.ts";
-import { Direction, OrdinalDirection } from "../../common/direction.ts";
+import { getSpriteForState } from "../appearance/getSpriteForState.ts";
 import type { EcsSystem } from "../../ecs/ecsSystem.ts";
 import { checkAdjacency } from "../../common/point.ts";
-import {
-    isEventTransition,
-    type AnimationGraph,
-    type AnimationState,
-    type AnimationTemplate,
-    type AnimationKey,
-} from "../../rendering/animation/animationGraph.ts";
+import { isEventTransition } from "../../rendering/animation/animationGraph.ts";
 import { DrawMode } from "../../rendering/drawMode.ts";
 import type { RenderScope } from "../../rendering/renderScope.ts";
-import type {
-    GameMessage,
-    TransformGameMessage,
-} from "../../server/message/gameMessage.ts";
+import type { GameMessage } from "../../server/message/gameMessage.ts";
 import {
     AnimationComponentId,
     type AnimationComponent,
 } from "../component/animationComponent.ts";
-import { DirectionComponentId } from "../component/directionComponent.ts";
-import { EquipmentComponentId } from "../component/equipmentComponent.ts";
-import {
-    SpriteComponentId,
-    type SpriteComponent,
-} from "../component/spriteComponent.ts";
+import { SpriteComponentId } from "../component/spriteComponent.ts";
 import type { Entity } from "../entity/entity.ts";
 
 export function createAnimationSystem(
@@ -155,71 +134,3 @@ function updateAnimation(
     });
 }
 
-/**
- * Fills placeholders in an animation template from the entity's components,
- * turning "walk_{direction}" into "walk_down".
- */
-function resolvePlaceholders(
-    template: AnimationTemplate,
-    entity: Entity,
-): AnimationKey {
-    let resolvedString = template as string;
-
-    if (resolvedString.includes("{direction}")) {
-        const direction =
-            entity.getEcsComponent(DirectionComponentId)?.direction ??
-            Direction.Down;
-        resolvedString = resolvedString.replace("{direction}", direction);
-    }
-
-    if (resolvedString.includes("{ordinal}")) {
-        const ordinal =
-            entity.getEcsComponent(DirectionComponentId)?.ordinal ??
-            OrdinalDirection.Northeast;
-        resolvedString = resolvedString.replace("{ordinal}", ordinal);
-    }
-
-    // A valid template always resolves to a valid key, which the types cannot
-    // express through the string replacement.
-    return resolvedString as AnimationKey;
-}
-
-/**
- * A utility to resolve a state name into a concrete sprite.
- * It centralizes the logic for looking up the state, resolving placeholders in the template,
- * and validating that the final sprite exists.
- * @param animatable The AnimationComponent containing the animation graph.
- * @param stateName The key of the state to resolve (e.g., "walking").
- * @param entity The entity, required for resolving placeholders like `{direction}`.
- * @throws Throws an error if the state key is invalid or the resolved sprite name doesn't exist.
- */
-function getSpriteForState(
-    animatable: AnimationComponent,
-    stateName: string,
-    entity: Entity,
-    spriteCache: SpriteDefinitionCache,
-): SpriteRef {
-    const { animationGraph } = animatable;
-
-    const animationState = animationGraph.states[stateName];
-    if (!animationState) {
-        throw new Error(`Invalid animation state key: "${stateName}"`);
-    }
-
-    const animationTemplate = animationState.animation;
-    const animationName = resolvePlaceholders(animationTemplate, entity);
-    if (animationName in spriteRefs) {
-        return spriteRefs[animationName as keyof typeof spriteRefs];
-    } else if (entity.hasComponent(EquipmentComponentId)) {
-        const equipment = entity.requireEcsComponent(EquipmentComponentId);
-        const colors = getCharacterColors(equipment);
-        const characterId = getCharacterBinId(colors);
-        // Get the SpriteRef from the cache (sprites are registered with spriteRegistry)
-        const sprite = spriteCache.getSpriteFor(characterId, animationName);
-        return sprite;
-    } else {
-        throw new Error(
-            `Animation state "${stateName}" resolved to "${animationName}", which is not a valid animation.`,
-        );
-    }
-}

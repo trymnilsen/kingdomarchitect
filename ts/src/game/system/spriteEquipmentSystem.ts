@@ -7,26 +7,14 @@ import { getAllAnimations } from "../../devtools/characterbuilder/animation/getA
 import type { CharacterAnimation } from "../../rendering/character/characterAnimation.ts";
 import { log } from "../../common/logging/logger.ts";
 import { getCharacterColors } from "../appearance/getCharacterColors.ts";
-import type { CharacterColors } from "../../rendering/character/characterColors.ts";
+import { getSpriteForState } from "../appearance/getSpriteForState.ts";
 import type { EcsSystem } from "../../ecs/ecsSystem.ts";
 import type { AssetLoader } from "../../asset/loader/assetLoader.ts";
-import type {
-    OffscreenCanvasFactory,
-    RenderScope,
-} from "../../rendering/renderScope.ts";
-import {
-    EquipmentComponentId,
-    type EquipmentComponent,
-} from "../component/equipmentComponent.ts";
-import {
-    SpriteComponentId,
-    type SpriteComponent,
-} from "../component/spriteComponent.ts";
+import type { OffscreenCanvasFactory } from "../../rendering/renderScope.ts";
+import { AnimationComponentId } from "../component/animationComponent.ts";
+import { EquipmentComponentId } from "../component/equipmentComponent.ts";
+import { SpriteComponentId } from "../component/spriteComponent.ts";
 import type { Entity } from "../entity/entity.ts";
-import type {
-    ComponentsUpdatedEvent,
-    EntityChildrenUpdatedEvent,
-} from "../entity/entityEvent.ts";
 
 export function createSpriteEquipmentSystem(
     createOffscreenCanvas: OffscreenCanvasFactory,
@@ -77,7 +65,7 @@ function updateEquipmentSprite(
     const animations = getAllAnimations(
         characterPartFrames as unknown as CharacterAnimation[],
     );
-    const sprite = buildSpriteSheet(
+    const sheet = buildSpriteSheet(
         offscreenCanvasFactory,
         colors,
         assetLoader,
@@ -85,8 +73,16 @@ function updateEquipmentSprite(
         animations,
     );
     log.info("Update equipment sprite", { colors });
-    //Update the sprite
-    const animation = sprite[0];
-    spriteComponent.sprite = animation.sprite;
-    spriteComponent.offset = animation.offset;
+    // The new sheet replaces the one the current animation state was drawing
+    // from, so pick that state's sprite out of it. The frame is kept as the
+    // animation itself has not changed, only the colors it is drawn in.
+    const animatable = target.requireEcsComponent(AnimationComponentId);
+    spriteComponent.sprite = getSpriteForState(
+        animatable,
+        animatable.currentAnimation,
+        target,
+        spriteCache,
+    );
+    // Every animation in a character sheet is drawn with the same offset
+    spriteComponent.offset = sheet[0].offset;
 }
