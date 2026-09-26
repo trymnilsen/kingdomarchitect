@@ -1,12 +1,12 @@
-name: Build preview
+name: CI
 on:
   push:
     branches:
       - main
       
 jobs:
-  compile:
-    name: Compile with tsc
+  verify:
+    name: Typecheck, check format and test
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -17,27 +17,5 @@ jobs:
           node-version: '24.x'
       - run: npm i
       - run: npm run build:tsc
-  check-format:
-    name: Check format with prettier
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24.x'
-      - run: npm i
       - run: npm run check-format
-  test:
-    name: Run tests
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24.x'
-      - run: npm i
       - run: npm run test
