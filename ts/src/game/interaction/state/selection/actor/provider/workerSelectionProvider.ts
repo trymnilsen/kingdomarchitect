@@ -33,7 +33,10 @@ import {
 import { FishingSpotSelectionState } from "../../../fishing/fishingSpotSelectionState.ts";
 import { ConsumeItemCommand } from "../../../../../../server/message/command/consumeItemCommand.ts";
 import { RolePriorityState } from "../../../role/rolePriorityState.ts";
-import { WorkerStance } from "../../../../../component/worker/roleComponent.ts";
+import {
+    RoleComponentId,
+    WorkerStance,
+} from "../../../../../component/worker/roleComponent.ts";
 import { UpdateWorkerStanceCommand } from "../../../../../../server/message/command/updateWorkerStanceCommand.ts";
 import { StatsViewState } from "../../../stats/statsViewState.ts";
 import { SetPlayerCommand } from "../../../../../../server/message/command/setPlayerCommand.ts";
@@ -296,37 +299,44 @@ export class WorkerSelectionProvider implements ActorSelectionProvider {
             {
                 text: "Stance",
                 icon: spriteRefs.empty_sprite,
-                children: [
-                    {
-                        text: "Aggressive",
-                        icon: spriteRefs.empty_sprite,
-                        onClick: () => {
-                            stateContext.commandDispatcher(
-                                UpdateWorkerStanceCommand(
-                                    selectedEntity,
-                                    WorkerStance.Aggressive,
-                                ),
-                            );
-                        },
-                    },
-                    {
-                        text: "Defensive",
-                        icon: spriteRefs.empty_sprite,
-                        onClick: () => {
-                            stateContext.commandDispatcher(
-                                UpdateWorkerStanceCommand(
-                                    selectedEntity,
-                                    WorkerStance.Defensive,
-                                ),
-                            );
-                        },
-                    },
-                ],
+                children: getStances(stateContext, selectedEntity),
             },
         ];
 
         return items;
     }
+}
+
+function getStances(stateContext: StateContext, selectedEntity: Entity) {
+    const currentStance =
+        selectedEntity.requireAncestorEcsComponent(RoleComponentId).stance;
+    const isAgressive = currentStance == WorkerStance.Aggressive;
+    return [
+        {
+            text: `${isAgressive ? "[x]" : ""} Aggressive`,
+            icon: spriteRefs.empty_sprite,
+            onClick: () => {
+                stateContext.commandDispatcher(
+                    UpdateWorkerStanceCommand(
+                        selectedEntity,
+                        WorkerStance.Aggressive,
+                    ),
+                );
+            },
+        },
+        {
+            text: `${!isAgressive ? "[x]" : ""} Defensive`,
+            icon: spriteRefs.empty_sprite,
+            onClick: () => {
+                stateContext.commandDispatcher(
+                    UpdateWorkerStanceCommand(
+                        selectedEntity,
+                        WorkerStance.Defensive,
+                    ),
+                );
+            },
+        },
+    ];
 }
 
 /**
