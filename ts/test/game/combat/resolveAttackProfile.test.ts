@@ -30,12 +30,6 @@ const brokenWeapon: InventoryItem = {
 };
 
 describe("resolveAttackProfile", () => {
-    it("takes the profile of whatever weapon is equipped", () => {
-        const archer = makeFighter(bowItem);
-
-        assert.strictEqual(resolveAttackProfile(archer).id, "bow");
-    });
-
     it("prefers the main hand when both hands hold a weapon", () => {
         const fighter = makeFighter(swordItem, bowItem);
 

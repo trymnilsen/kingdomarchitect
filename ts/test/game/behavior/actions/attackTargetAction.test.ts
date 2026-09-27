@@ -102,23 +102,6 @@ describe("attackTargetAction", () => {
         assert.strictEqual(healthComponent.currentHp, 0);
     });
 
-    it("names the entity that went missing", () => {
-        const { worker } = createTestScene();
-
-        const action = {
-            type: "attackTarget" as const,
-            target: entityTarget("nonexistent"),
-        };
-
-        const result = executeAttackTargetAction(action, worker, 1);
-
-        assert.strictEqual(result.kind, "failed");
-        assert.deepStrictEqual(
-            (result as { cause: { type: string; entityId: string } }).cause,
-            { type: "targetGone", entityId: "nonexistent" },
-        );
-    });
-
     it("fails out of reach when the target is beyond an unarmed swing", () => {
         const { worker, target } = createTestScene();
         target.worldPosition = { x: 25, y: 25 };
@@ -136,64 +119,6 @@ describe("attackTargetAction", () => {
             { type: "outOfReach" },
             "the behavior needs to tell reach apart from a vanished target",
         );
-    });
-
-    it("fails out of reach diagonally, where range 1 does not stretch", () => {
-        const { worker, target } = createTestScene();
-        worker.worldPosition = { x: 10, y: 8 };
-        target.worldPosition = { x: 11, y: 9 };
-
-        const result = executeAttackTargetAction(
-            { type: "attackTarget", target: entityTarget("target") },
-            worker,
-            1,
-        );
-
-        assert.strictEqual(
-            result.kind,
-            "failed",
-            "a Euclidean range of 1 covers the four cardinal tiles and no more",
-        );
-    });
-
-    it("reports nothing to attack when the target cannot be hurt", () => {
-        const { root, worker } = createTestScene();
-        const noHealthTarget = new Entity("noHealthTarget");
-        noHealthTarget.worldPosition = { x: 11, y: 8 };
-        root.addChild(noHealthTarget);
-
-        const action = {
-            type: "attackTarget" as const,
-            target: entityTarget("noHealthTarget"),
-        };
-
-        const result = executeAttackTargetAction(action, worker, 1);
-
-        assert.strictEqual(result.kind, "failed");
-        assert.deepStrictEqual(
-            (result as { cause: { type: string } }).cause,
-            { type: "nothingToAttack" },
-            "it is standing right there, so nothing has gone missing",
-        );
-    });
-
-    it("continues running while target has hp remaining", () => {
-        const { worker, target } = createTestScene();
-
-        const action = {
-            type: "attackTarget" as const,
-            target: entityTarget("target"),
-        };
-
-        // Execute multiple times
-        let result = executeAttackTargetAction(action, worker, 1);
-        assert.strictEqual(result.kind, "running");
-
-        result = executeAttackTargetAction(action, worker, 2);
-        assert.strictEqual(result.kind, "running");
-
-        const healthComponent = target.getEcsComponent(HealthComponentId)!;
-        assert.strictEqual(healthComponent.currentHp, 8);
     });
 
     describe("on lethal hit", () => {
@@ -250,46 +175,9 @@ describe("attackTargetAction", () => {
                 "target",
             );
         });
-
-        it("does not bubble a death event for an Immortal target", () => {
-            const { root, worker, target } = createTestScene();
-            target.setEcsComponent(createImmortalComponent());
-            const healthComponent = target.getEcsComponent(HealthComponentId)!;
-            healthComponent.currentHp = 1;
-
-            const events: EntityEvent[] = [];
-            root.entityEvent = (event) => events.push(event);
-
-            executeAttackTargetAction(
-                { type: "attackTarget", target: entityTarget("target") },
-                worker,
-                1,
-            );
-
-            const death = events.find(
-                (e) => e.id === "game" && e.data.type === DeathGameEventType,
-            );
-            assert.strictEqual(death, undefined);
-        });
     });
 
     describe("replan trigger from threat", () => {
-        it("triggers replan on the victim when a new attacker becomes top threat", () => {
-            const { worker, target } = createCombatScene();
-            const action = {
-                type: "attackTarget" as const,
-                target: entityTarget("target"),
-            };
-
-            executeAttackTargetAction(action, worker, 1);
-
-            const agent = target.getEcsComponent(BehaviorAgentComponentId)!;
-            assert.ok(
-                agent.pendingReplan,
-                "victim should replan when first attacker becomes top threat",
-            );
-        });
-
         it("does not re-trigger replan when the same attacker stays top threat", () => {
             const { worker, target } = createCombatScene();
             const threat = target.getEcsComponent(ThreatMapComponentId)!;

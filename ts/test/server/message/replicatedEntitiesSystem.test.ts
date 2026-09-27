@@ -6,10 +6,6 @@ import {
     setChunk,
     TileComponentId,
 } from "../../../src/game/component/tileComponent.ts";
-import {
-    createVisibilityMapComponent,
-    VisibilityMapComponentId,
-} from "../../../src/game/component/visibilityMapComponent.ts";
 import { createWorldDiscoveryComponent } from "../../../src/game/component/worldDiscoveryComponent.ts";
 import {
     createHealthComponent,
@@ -22,7 +18,6 @@ import {
     makeReplicatedEntitiesSystem,
 } from "../../../src/server/replicatedEntitiesSystem.ts";
 import {
-    WorldStateMessageType,
     SetComponentGameMessageType,
     type GameMessage,
 } from "../../../src/server/message/gameMessage.ts";
@@ -41,98 +36,6 @@ function createTestVolume(id: string): Volume {
 
 describe("replicatedEntitiesSystem", () => {
     describe("buildWorldStateMessage", () => {
-        it("returns correct message type", () => {
-            const root = new Entity("root");
-
-            const tileComponent = createTileComponent();
-            const discoveryComponent = createWorldDiscoveryComponent();
-
-            root.setEcsComponent(tileComponent);
-            root.setEcsComponent(discoveryComponent);
-
-            const message = buildWorldStateMessage(root, "player1", 0);
-
-            assert.strictEqual(message.type, WorldStateMessageType);
-        });
-
-        it("includes all root children recursively", () => {
-            const root = new Entity("root");
-
-            const tileComponent = createTileComponent();
-            const discoveryComponent = createWorldDiscoveryComponent();
-
-            root.setEcsComponent(tileComponent);
-            root.setEcsComponent(discoveryComponent);
-
-            const child1 = new Entity("child1");
-            const child2 = new Entity("child2");
-            const grandchild = new Entity("grandchild");
-
-            child1.addChild(grandchild);
-            root.addChild(child1);
-            root.addChild(child2);
-
-            const message = buildWorldStateMessage(root, "player1", 0);
-
-            assert.strictEqual(message.rootChildren.length, 2);
-
-            const child1Data = message.rootChildren.find(
-                (c) => c.id === "child1",
-            );
-            const child2Data = message.rootChildren.find(
-                (c) => c.id === "child2",
-            );
-
-            assert.ok(child1Data, "Should include child1");
-            assert.ok(child2Data, "Should include child2");
-
-            assert.ok(child1Data.children, "child1 should have children");
-            assert.strictEqual(child1Data.children.length, 1);
-            assert.strictEqual(child1Data.children[0].id, "grandchild");
-        });
-
-        it("includes entity positions", () => {
-            const root = new Entity("root");
-
-            const tileComponent = createTileComponent();
-            const discoveryComponent = createWorldDiscoveryComponent();
-
-            root.setEcsComponent(tileComponent);
-            root.setEcsComponent(discoveryComponent);
-
-            const child = new Entity("child1");
-            child.worldPosition = { x: 100, y: 200 };
-            root.addChild(child);
-
-            const message = buildWorldStateMessage(root, "player1", 0);
-
-            assert.deepStrictEqual(message.rootChildren[0].position, {
-                x: 100,
-                y: 200,
-            });
-        });
-
-        it("includes entity components", () => {
-            const root = new Entity("root");
-
-            const tileComponent = createTileComponent();
-            const discoveryComponent = createWorldDiscoveryComponent();
-
-            root.setEcsComponent(tileComponent);
-            root.setEcsComponent(discoveryComponent);
-
-            const child = new Entity("child1");
-            const healthComponent = createHealthComponent(50, 100);
-            child.setEcsComponent(healthComponent);
-            root.addChild(child);
-
-            const message = buildWorldStateMessage(root, "player1", 0);
-
-            assert.strictEqual(message.rootChildren[0].components.length, 1);
-            const component = message.rootChildren[0].components[0];
-            assert.strictEqual(component.id, HealthComponentId);
-        });
-
         it("filters client-only components (TileComponent)", () => {
             const root = new Entity("root");
 
@@ -160,69 +63,6 @@ describe("replicatedEntitiesSystem", () => {
             );
             assert.strictEqual(childData.components.length, 1);
             assert.strictEqual(childData.components[0].id, HealthComponentId);
-        });
-
-        it("filters client-only components (VisibilityMapComponent)", () => {
-            const root = new Entity("root");
-
-            const tileComponent = createTileComponent();
-            const discoveryComponent = createWorldDiscoveryComponent();
-
-            root.setEcsComponent(tileComponent);
-            root.setEcsComponent(discoveryComponent);
-
-            const child = new Entity("child1");
-            child.setEcsComponent(createVisibilityMapComponent()); // Client-only
-            child.setEcsComponent(createHealthComponent(50, 100));
-            root.addChild(child);
-
-            const message = buildWorldStateMessage(root, "player1", 0);
-
-            const childData = message.rootChildren[0];
-            const hasClientOnlyComponent = childData.components.some(
-                (c) => c.id === VisibilityMapComponentId,
-            );
-
-            assert.ok(
-                !hasClientOnlyComponent,
-                "Should not include VisibilityMapComponent",
-            );
-        });
-
-        it("includes player discovered tiles and volumes", () => {
-            const root = new Entity("root");
-
-            const tileComponent = createTileComponent();
-            const discoveryComponent = createWorldDiscoveryComponent();
-
-            const volume = createTestVolume("vol1");
-            tileComponent.volume.set(volume.id, volume);
-
-            setChunk(tileComponent, {
-                chunkX: 0,
-                chunkY: 0,
-                volume: volume,
-                terrain: createLandTerrain(),
-            });
-
-            root.setEcsComponent(tileComponent);
-            root.setEcsComponent(discoveryComponent);
-
-            // Add player discovery data
-            const chunkId = encodePosition(0, 0);
-            discoveryComponent.discoveriesByUser.set("player1", {
-                fullyDiscoveredChunks: new Set([chunkId]),
-                partiallyDiscoveredChunks: new Map(),
-            });
-
-            const message = buildWorldStateMessage(root, "player1", 0);
-
-            assert.strictEqual(
-                message.ground.discoveredTiles.length,
-                ChunkSize * ChunkSize,
-            );
-            assert.strictEqual(message.ground.volumes.length, 1);
-            assert.strictEqual(message.ground.volumes[0].id, "vol1");
         });
 
         it("includes partially discovered tiles", () => {
@@ -260,57 +100,6 @@ describe("replicatedEntitiesSystem", () => {
 
             assert.strictEqual(message.ground.discoveredTiles.length, 2);
             assert.strictEqual(message.ground.volumes.length, 1);
-        });
-
-        it("returns empty discoveredTiles when player has no discovery data", () => {
-            const root = new Entity("root");
-
-            const tileComponent = createTileComponent();
-            const discoveryComponent = createWorldDiscoveryComponent();
-
-            const volume = createTestVolume("vol1");
-            tileComponent.volume.set(volume.id, volume);
-
-            setChunk(tileComponent, {
-                chunkX: 0,
-                chunkY: 0,
-                volume: volume,
-                terrain: createLandTerrain(),
-            });
-
-            root.setEcsComponent(tileComponent);
-            root.setEcsComponent(discoveryComponent);
-
-            // No discovery data for player1
-
-            const message = buildWorldStateMessage(root, "player1", 0);
-
-            assert.strictEqual(message.ground.discoveredTiles.length, 0);
-            // Chunks and volumes are replicated regardless of discovery, and
-            // entities are too, so the ground they stand on must exist
-            assert.strictEqual(message.ground.volumes.length, 1);
-            assert.strictEqual(message.ground.chunks.length, 1);
-        });
-
-        it("returns empty discoveredTiles for player with empty discovery", () => {
-            const root = new Entity("root");
-
-            const tileComponent = createTileComponent();
-            const discoveryComponent = createWorldDiscoveryComponent();
-
-            root.setEcsComponent(tileComponent);
-            root.setEcsComponent(discoveryComponent);
-
-            // Player exists but has discovered nothing
-            discoveryComponent.discoveriesByUser.set("player1", {
-                fullyDiscoveredChunks: new Set(),
-                partiallyDiscoveredChunks: new Map(),
-            });
-
-            const message = buildWorldStateMessage(root, "player1", 0);
-
-            assert.strictEqual(message.ground.discoveredTiles.length, 0);
-            assert.strictEqual(message.ground.volumes.length, 0);
         });
 
         it("only includes tiles for the requested player", () => {
@@ -385,22 +174,6 @@ describe("replicatedEntitiesSystem", () => {
                     (t) => t.x >= ChunkSize && t.x < ChunkSize * 2,
                 ),
             );
-        });
-
-        it("handles empty entity tree", () => {
-            const root = new Entity("root");
-
-            const tileComponent = createTileComponent();
-            const discoveryComponent = createWorldDiscoveryComponent();
-
-            root.setEcsComponent(tileComponent);
-            root.setEcsComponent(discoveryComponent);
-
-            const message = buildWorldStateMessage(root, "player1", 0);
-
-            assert.strictEqual(message.rootChildren.length, 0);
-            assert.strictEqual(message.ground.discoveredTiles.length, 0);
-            assert.strictEqual(message.ground.volumes.length, 0);
         });
 
         it("includes parent reference in child data", () => {

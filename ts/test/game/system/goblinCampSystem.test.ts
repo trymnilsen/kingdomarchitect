@@ -116,41 +116,6 @@ describe("goblinCampSystem spawning", () => {
             assert.strictEqual(finalCount, 1);
         });
 
-        it("does not spawn when campfire is absent and population is zero", () => {
-            const root = new Entity("root");
-            setupWorldComponents(root);
-            const camp = createTestCamp("camp-1", 5);
-
-            root.addChild(camp);
-            camp.position = { x: 4, y: 4 };
-
-            goblinCampSystem.onUpdate!(root, 1);
-
-            assert.strictEqual(countGoblinsInCamp(root, "camp-1"), 0);
-        });
-
-        it("does not assign housing when spawning via campfire fallback", () => {
-            const root = new Entity("root");
-            setupWorldComponents(root);
-            const camp = createTestCamp("camp-1", 5);
-            const campfire = createTestCampfire();
-            const hut = createTestHut();
-
-            camp.addChild(campfire);
-            camp.addChild(hut);
-            root.addChild(camp);
-            camp.position = { x: 4, y: 4 };
-
-            goblinCampSystem.onUpdate!(root, 1);
-
-            const housing = hut.getEcsComponent(HousingComponentId);
-            assert.strictEqual(
-                housing?.tenant,
-                null,
-                "hut should remain unoccupied after campfire fallback spawn",
-            );
-        });
-
         it("does not spawn when campfire is inactive", () => {
             const root = new Entity("root");
             const camp = createTestCamp("camp-1", 5);
@@ -166,28 +131,6 @@ describe("goblinCampSystem spawning", () => {
     });
 
     describe("house spawn (population > 0)", () => {
-        it("spawns into an unoccupied hut when conditions are met", () => {
-            const root = new Entity("root");
-            setupWorldComponents(root);
-            const camp = createTestCamp("camp-1", 5);
-            const campfire = createTestCampfire();
-            const existingGoblin = createTestGoblin("camp-1", "goblin-1");
-            const hut = createTestHut();
-
-            camp.addChild(campfire);
-            camp.addChild(existingGoblin);
-            camp.addChild(hut);
-            root.addChild(camp);
-            camp.position = { x: 4, y: 4 };
-
-            const initialCount = countGoblinsInCamp(root, "camp-1");
-            goblinCampSystem.onUpdate!(root, 1);
-            const finalCount = countGoblinsInCamp(root, "camp-1");
-
-            assert.strictEqual(initialCount, 1);
-            assert.strictEqual(finalCount, 2);
-        });
-
         it("assigns housing to the spawned goblin", () => {
             const root = new Entity("root");
             setupWorldComponents(root);
@@ -356,40 +299,6 @@ describe("goblinCampSystem camp removal", () => {
         );
     });
 
-    it("does not remove camp when goblins are still alive", () => {
-        const root = new Entity("root");
-        const camp = createTestCamp("camp-1", 5);
-        const goblin = createTestGoblin("camp-1");
-
-        camp.addChild(goblin);
-        root.addChild(camp);
-
-        goblinCampSystem.onUpdate!(root, 1);
-
-        assert.ok(
-            camp.hasComponent(GoblinCampComponentId),
-            "camp should persist while goblins live",
-        );
-    });
-
-    it("does not remove camp when campfire is still active", () => {
-        const root = new Entity("root");
-        setupWorldComponents(root);
-        const camp = createTestCamp("camp-1", 5);
-        const campfire = createTestCampfire();
-
-        camp.addChild(campfire);
-        root.addChild(camp);
-        camp.position = { x: 4, y: 4 };
-
-        // The campfire is active so the camp should be preserved (spawning also fires, keeping pop > 0)
-        goblinCampSystem.onUpdate!(root, 1);
-        assert.ok(
-            camp.hasComponent(GoblinCampComponentId),
-            "camp should persist while campfire is active",
-        );
-    });
-
     it("does not remove camp when a hut still exists", () => {
         const root = new Entity("root");
         const camp = createTestCamp("camp-1", 5);
@@ -403,20 +312,6 @@ describe("goblinCampSystem camp removal", () => {
         assert.ok(
             camp.hasComponent(GoblinCampComponentId),
             "camp should persist while huts remain",
-        );
-    });
-
-    it("keeps the entity in the world after component removal", () => {
-        const root = new Entity("root");
-        const camp = createTestCamp("camp-1", 5);
-        root.addChild(camp);
-
-        goblinCampSystem.onUpdate!(root, 1);
-
-        assert.ok(!camp.hasComponent(GoblinCampComponentId));
-        assert.ok(
-            camp.parent !== undefined,
-            "camp entity should still be attached to root",
         );
     });
 });

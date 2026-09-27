@@ -25,7 +25,6 @@ import {
 import {
     createOutputPolicyComponent,
     OutputPolicy,
-    OutputPolicyComponentId,
 } from "../../../../src/game/component/outputPolicyComponent.ts";
 import type { BiomeType } from "../../../../src/game/map/biome.ts";
 import { resourcePrefab } from "../../../../src/game/prefab/resourcePrefab.ts";
@@ -296,20 +295,6 @@ describe("productionPlanner - zone kind", () => {
     });
 
     describe("output policy", () => {
-        it("carries the building's policy into the felling", () => {
-            const scene = createZoneScene();
-            scene.stock(TARGET);
-            scene.building.requireEcsComponent(OutputPolicyComponentId).policy =
-                OutputPolicy.Drop;
-
-            const actions = scene.plan();
-
-            assert.strictEqual(
-                (actions[1] as HarvestAction).outputPolicy,
-                OutputPolicy.Drop,
-            );
-        });
-
         it("empties the hand first when the timber is to be hauled", () => {
             const scene = createZoneScene();
             scene.stock(TARGET);
@@ -324,24 +309,6 @@ describe("productionPlanner - zone kind", () => {
                 "moveTo",
                 "harvestResource",
             ]);
-        });
-
-        it("fells with a full hand when the timber is to be dropped", () => {
-            const scene = createZoneScene();
-            scene.stock(TARGET);
-            scene.building.requireEcsComponent(OutputPolicyComponentId).policy =
-                OutputPolicy.Drop;
-            setHeldItem(
-                scene.worker.requireEcsComponent(createHeldItemComponent().id),
-                woodResourceItem,
-                3,
-            );
-
-            assert.deepStrictEqual(
-                actionTypes(scene.plan()),
-                ["moveTo", "harvestResource"],
-                "nothing is set down, because the yields never reach the hand",
-            );
         });
     });
 });

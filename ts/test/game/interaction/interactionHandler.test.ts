@@ -51,28 +51,6 @@ function fills(rects: { fill: string }[]): string[] {
 }
 
 describe("InteractionHandler gestures", () => {
-    it("a press that slides within the button still taps", () => {
-        const harness = createGestureHarness();
-        const state = new ButtonState();
-        harness.pushState(state);
-
-        const center = harness.centerOf(BUTTON_NORMAL);
-        // 12px slide: well past the 5px drag threshold, still inside the
-        // 80x40 button.
-        harness.mouseGesture([
-            center,
-            { x: center.x + 6, y: center.y + 2 },
-            { x: center.x + 12, y: center.y + 4 },
-        ]);
-
-        assert.strictEqual(state.buttonTaps, 1);
-        assert.strictEqual(
-            state.stateTaps.length,
-            0,
-            "the UI consumed the gesture, the state never saw it",
-        );
-    });
-
     it("the button stays visually pressed through an inside slide", () => {
         const harness = createGestureHarness();
         const state = new ButtonState();

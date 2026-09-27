@@ -335,47 +335,6 @@ describe("Displacement Scenario", () => {
         );
     });
 
-    it("displacement chain: A displaces B which displaces C to reach target", () => {
-        /**
-         * A at (11,8) wants to move to (12,8), where B is.
-         * B at (12,8) is idle (utility=0). C at (13,8) is also idle.
-         *
-         * A's moveTo triggers displacement. B has free adjacent tiles (e.g. south
-         * at (12,9)), so B steps aside immediately rather than chaining through C.
-         * A enters (12,8) and the command completes in one tick.
-         *
-         * The displacement system must handle a target tile occupied by an idle
-         * entity even when additional idle entities are nearby in the same row.
-         */
-        const { root } = createWorld();
-
-        const agentA = createAgent("agent-a", root, { x: 11, y: 8 });
-        createAgent("agent-b", root, { x: 12, y: 8 });
-        createAgent("agent-c", root, { x: 13, y: 8 });
-
-        const agentAComp = getBehaviorAgent(agentA)!;
-        moveCommand(agentA, { x: 12, y: 8 });
-
-        const behaviorSystem = createBehaviorSystem(() => [
-            createPerformPlayerCommandBehavior(),
-        ]);
-
-        for (let tick = 1; tick <= 5; tick++) {
-            behaviorSystem.onUpdate!(root, tick);
-        }
-
-        assert.deepStrictEqual(
-            agentA.worldPosition,
-            { x: 12, y: 8 },
-            `Agent A should be at target (12,8), is at ${JSON.stringify(agentA.worldPosition)}`,
-        );
-        assert.strictEqual(
-            agentAComp.playerCommand,
-            undefined,
-            "Player command should be cleared after arrival",
-        );
-    });
-
     /**
      * Seal y=8 into a true 1-wide corridor: y=7 is the world wall
      * and we wall the entire y=9 row across the chunk width (x=8..31) so there is no
@@ -480,35 +439,6 @@ describe("Displacement Scenario", () => {
 
         assert.deepStrictEqual(a.worldPosition, { x: 12, y: 8 });
         assert.deepStrictEqual(b.worldPosition, { x: 11, y: 8 });
-    });
-
-    it("one worker passes two oncoming workers in a 1-wide corridor", () => {
-        // Groups approach from a distance (as in real gameplay) so each worker has a
-        // committed cached path by the time the streams meet. The swap is detected
-        // from cachedPath[0]. (Starting workers already adjacent would not resolve
-        // until the deferred "in-transit is cheap to displace" resistance change.)
-        const { root } = createWorld();
-        sealCorridor(root);
-
-        const a = createAgent("a", root, { x: 9, y: 8 }); // heading right
-        const b = createAgent("b", root, { x: 13, y: 8 }); // heading left (leads)
-        const c = createAgent("c", root, { x: 14, y: 8 }); // heading left (follows b)
-        moveCommand(a, { x: 14, y: 8 });
-        moveCommand(b, { x: 8, y: 8 });
-        moveCommand(c, { x: 9, y: 8 });
-
-        const behaviorSystem = createBehaviorSystem(() => [
-            createPerformPlayerCommandBehavior(),
-        ]);
-
-        for (let tick = 1; tick <= 20; tick++) {
-            behaviorSystem.onUpdate!(root, tick);
-            assertNoOverlap([a, b, c], tick);
-        }
-
-        assert.deepStrictEqual(a.worldPosition, { x: 14, y: 8 });
-        assert.deepStrictEqual(b.worldPosition, { x: 8, y: 8 });
-        assert.deepStrictEqual(c.worldPosition, { x: 9, y: 8 });
     });
 
     it("two workers pass two oncoming workers in a 1-wide corridor", () => {

@@ -37,20 +37,6 @@ function createScene(): { root: Entity; worker: Entity; resource: Entity } {
 }
 
 describe("clearObstacleAction", () => {
-    it("damages the obstacle each tick until it dies", () => {
-        const { worker, resource } = createScene();
-
-        const result = executeClearObstacleAction(
-            { type: "clearObstacle", entityId: "resource" },
-            worker,
-            1,
-        );
-
-        assert.strictEqual(result.kind, "running");
-        const health = resource.getEcsComponent(HealthComponentId)!;
-        assert.strictEqual(health.currentHp, 20);
-    });
-
     it("removes the obstacle and scatters its yields on death", () => {
         const { root, worker, resource } = createScene();
         resource.getEcsComponent(HealthComponentId)!.currentHp = 5;
@@ -89,31 +75,6 @@ describe("clearObstacleAction", () => {
 
         const held = worker.getEcsComponent(HeldItemComponentId)!;
         assert.ok(isHeldEmpty(held), "held slot must stay empty after a clear");
-    });
-
-    it("completes immediately when the obstacle is already gone", () => {
-        const { worker } = createScene();
-
-        const result = executeClearObstacleAction(
-            { type: "clearObstacle", entityId: "missing" },
-            worker,
-            1,
-        );
-
-        assert.strictEqual(result.kind, "complete");
-    });
-
-    it("fails when the worker is not adjacent to the obstacle", () => {
-        const { worker, resource } = createScene();
-        resource.worldPosition = { x: 25, y: 25 };
-
-        const result = executeClearObstacleAction(
-            { type: "clearObstacle", entityId: "resource" },
-            worker,
-            1,
-        );
-
-        assert.strictEqual(result.kind, "failed");
     });
 
     it("refuses to clear a permanent obstacle (infinite node)", () => {

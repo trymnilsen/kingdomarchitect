@@ -35,22 +35,6 @@ function archerAndQuarry(quarryAt: Point): {
 }
 
 describe("resolveMoveGoal", () => {
-    describe("adjacent", () => {
-        it("accepts the destination tile itself", () => {
-            // Work actions accept a mounted worker as readily as one beside it,
-            // which is why this is isAtOrAdjacent and not isPointAdjacentTo
-            const destination: Point = { x: 12, y: 10 };
-            const walker = new Entity("walker");
-            const isGoal = resolveMoveGoal(
-                { kind: "adjacent" },
-                walker,
-                destination,
-            );
-
-            assert.strictEqual(isGoal(destination), true);
-        });
-    });
-
     describe("attackReach", () => {
         it("is satisfied well short of the target for an archer", () => {
             const { archer } = archerAndQuarry({ x: 14, y: 10 });

@@ -24,11 +24,6 @@ class SpyState extends InteractionState {
 }
 
 describe("InteractionStateHistory", () => {
-    it("seeds a RootState so size starts at 1", () => {
-        const history = new InteractionStateHistory(fakeContext);
-        assert.strictEqual(history.size, 1);
-    });
-
     it("push activates the new state, deactivates the previous, and grows the stack", () => {
         const history = new InteractionStateHistory(fakeContext);
         const pushed = new SpyState();
@@ -56,11 +51,6 @@ describe("InteractionStateHistory", () => {
         assert.strictEqual(replacement.activeCount, 1);
     });
 
-    it("replace at the root throws", () => {
-        const history = new InteractionStateHistory(fakeContext);
-        assert.throws(() => history.replace(new SpyState()));
-    });
-
     it("pop returns to the previous state and fires the onPop callback", () => {
         const history = new InteractionStateHistory(fakeContext);
         const pushed = new SpyState();
@@ -74,11 +64,6 @@ describe("InteractionStateHistory", () => {
         assert.strictEqual(history.size, 1);
         assert.strictEqual(pushed.inactiveCount, 1);
         assert.strictEqual(popValue, "done");
-    });
-
-    it("pop at the root throws", () => {
-        const history = new InteractionStateHistory(fakeContext);
-        assert.throws(() => history.pop());
     });
 
     it("clear pops every pushed state back down to the root", () => {

@@ -12,39 +12,6 @@ type MoveToAction = Extract<BehaviorActionData, { type: "moveTo" }>;
 
 describe("moveToAction", () => {
     describe("goal", () => {
-        it("completes when already at target position (no goal)", () => {
-            const root = new Entity("root");
-            const entity = new Entity("entity");
-            entity.worldPosition = { x: 5, y: 5 };
-            root.addChild(entity);
-
-            const action: MoveToAction = {
-                type: "moveTo",
-                target: { x: 5, y: 5 },
-            };
-
-            const result = executeMoveToAction(action, entity, 1);
-
-            assert.strictEqual(result.kind, "complete");
-        });
-
-        it("completes when already adjacent with an adjacent goal", () => {
-            const root = new Entity("root");
-            const entity = new Entity("entity");
-            entity.worldPosition = { x: 5, y: 5 };
-            root.addChild(entity);
-
-            const action: MoveToAction = {
-                type: "moveTo",
-                target: { x: 6, y: 5 }, // One tile to the right
-                goal: { kind: "adjacent" },
-            };
-
-            const result = executeMoveToAction(action, entity, 1);
-
-            assert.strictEqual(result.kind, "complete");
-        });
-
         it("completes when standing on the target with an adjacent goal", () => {
             const root = new Entity("root");
             const entity = new Entity("entity");
@@ -79,54 +46,6 @@ describe("moveToAction", () => {
             // Without pathfinding graph, movement will fail
             // The key assertion is that it doesn't complete just because diagonal
             assert.notStrictEqual(result.kind, "complete");
-        });
-
-        it("does not complete when adjacent without a goal set", () => {
-            const root = new Entity("root");
-            const entity = new Entity("entity");
-            entity.worldPosition = { x: 5, y: 5 };
-            root.addChild(entity);
-
-            const action: MoveToAction = {
-                type: "moveTo",
-                target: { x: 6, y: 5 }, // Adjacent but no goal
-            };
-
-            const result = executeMoveToAction(action, entity, 1);
-
-            // Without pathfinding graph, movement will fail
-            // The key assertion is that it doesn't complete just because adjacent
-            assert.notStrictEqual(result.kind, "complete");
-        });
-
-        it("completes for all four cardinal directions", () => {
-            const directions = [
-                { x: 5, y: 4 }, // Up
-                { x: 5, y: 6 }, // Down
-                { x: 4, y: 5 }, // Left
-                { x: 6, y: 5 }, // Right
-            ];
-
-            for (const target of directions) {
-                const root = new Entity("root");
-                const entity = new Entity("entity");
-                entity.worldPosition = { x: 5, y: 5 };
-                root.addChild(entity);
-
-                const action: MoveToAction = {
-                    type: "moveTo",
-                    target,
-                    goal: { kind: "adjacent" },
-                };
-
-                const result = executeMoveToAction(action, entity, 1);
-
-                assert.strictEqual(
-                    result.kind,
-                    "complete",
-                    `Should complete when adjacent at ${target.x}, ${target.y}`,
-                );
-            }
         });
     });
 

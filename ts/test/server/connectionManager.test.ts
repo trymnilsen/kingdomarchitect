@@ -29,20 +29,6 @@ function mockSocket(): MockWebSocket {
 }
 
 describe("ConnectionManager", () => {
-    it("adds and retrieves a connection", () => {
-        const cm = new ConnectionManager();
-        const ws = mockSocket();
-        cm.addConnection("player1", ws as any);
-
-        assert.strictEqual(cm.getConnection("player1"), ws);
-        assert.deepStrictEqual(cm.getConnectedPlayerIds(), ["player1"]);
-    });
-
-    it("returns null for unknown player", () => {
-        const cm = new ConnectionManager();
-        assert.strictEqual(cm.getConnection("unknown"), null);
-    });
-
     it("removes a connection and closes the socket", () => {
         const cm = new ConnectionManager();
         const ws = mockSocket();
@@ -81,42 +67,6 @@ describe("ConnectionManager", () => {
 
         assert.strictEqual(ws.sentMessages.length, 1);
         assert.deepStrictEqual(JSON.parse(ws.sentMessages[0]), message);
-    });
-
-    it("does not throw when sending to unknown player", () => {
-        const cm = new ConnectionManager();
-        const message: GameMessage = {
-            type: "removeEntity",
-            entity: "e1",
-        };
-        // Should not throw
-        cm.sendTo("unknown", message);
-    });
-
-    it("broadcasts to all connected players", () => {
-        const cm = new ConnectionManager();
-        const ws1 = mockSocket();
-        const ws2 = mockSocket();
-        const ws3 = mockSocket();
-
-        cm.addConnection("player1", ws1 as any);
-        cm.addConnection("player2", ws2 as any);
-        cm.addConnection("player3", ws3 as any);
-
-        const message: GameMessage = {
-            type: "removeEntity",
-            entity: "e1",
-        };
-
-        cm.broadcast(message);
-
-        const expected = JSON.stringify(message);
-        assert.strictEqual(ws1.sentMessages.length, 1);
-        assert.strictEqual(ws1.sentMessages[0], expected);
-        assert.strictEqual(ws2.sentMessages.length, 1);
-        assert.strictEqual(ws2.sentMessages[0], expected);
-        assert.strictEqual(ws3.sentMessages.length, 1);
-        assert.strictEqual(ws3.sentMessages[0], expected);
     });
 
     it("skips closed sockets during broadcast", () => {

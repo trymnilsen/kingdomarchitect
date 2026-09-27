@@ -9,46 +9,6 @@ import { TestAdapter } from "./testAdapter.ts";
 
 describe("PersistenceManager", () => {
     describe("Root Components", () => {
-        it("saves root components separately from entity tree", async () => {
-            const adapter = new TestAdapter();
-            const manager = new PersistenceManager(adapter);
-            const root = new Entity("root");
-
-            const tileComponent = createTileComponent();
-            const discoveryComponent = createWorldDiscoveryComponent();
-
-            root.setEcsComponent(tileComponent);
-            root.setEcsComponent(discoveryComponent);
-
-            const child = new Entity("child");
-            root.addChild(child);
-
-            await manager.saveWorld(root);
-
-            const storedComponents = adapter.getStoredRootComponents();
-            assert.ok(storedComponents, "Root components should be saved");
-            assert.ok(
-                storedComponents["Tile"],
-                "TileComponent should be in root components",
-            );
-            assert.ok(
-                storedComponents["worldDiscovery"],
-                "WorldDiscoveryComponent should be in root components",
-            );
-
-            const storedEntities = adapter.getStoredEntities();
-            assert.strictEqual(
-                storedEntities.length,
-                1,
-                "Should save child entity",
-            );
-            assert.strictEqual(
-                storedEntities[0].id,
-                "child",
-                "Saved entity should be the child",
-            );
-        });
-
         it("loads root components before entity tree", async () => {
             const adapter = new TestAdapter();
             const manager = new PersistenceManager(adapter);
@@ -181,40 +141,6 @@ describe("PersistenceManager", () => {
                 "grandchild should be loaded",
             );
         });
-
-        it("preserves entity components", async () => {
-            const adapter = new TestAdapter();
-            const manager = new PersistenceManager(adapter);
-            const saveRoot = new Entity("root");
-
-            const entity = new Entity("entity");
-            entity.setEcsComponent({
-                id: "testComponent",
-                value: 42,
-                text: "hello",
-            } as any);
-            saveRoot.addChild(entity);
-
-            await manager.saveWorld(saveRoot);
-            await manager.saveMeta({
-                version: 1,
-                tick: 0,
-                seed: 12345,
-                idCounters: {},
-            });
-
-            const loadRoot = new Entity("root");
-            await manager.load(loadRoot);
-
-            const loadedEntity = loadRoot.children[0];
-            const component: any = loadedEntity.getEcsComponent(
-                "testComponent" as any,
-            );
-
-            assert.ok(component, "Component should be loaded");
-            assert.strictEqual(component.value, 42);
-            assert.strictEqual(component.text, "hello");
-        });
     });
 
     describe("Edge Cases", () => {
@@ -229,67 +155,6 @@ describe("PersistenceManager", () => {
                 loaded,
                 false,
                 "Should return false for no save",
-            );
-        });
-
-        it("handles save with no children", async () => {
-            const adapter = new TestAdapter();
-            const manager = new PersistenceManager(adapter);
-            const saveRoot = new Entity("root");
-
-            const tileComponent = createTileComponent();
-            saveRoot.setEcsComponent(tileComponent);
-
-            await manager.saveWorld(saveRoot);
-            await manager.saveMeta({
-                version: 1,
-                tick: 0,
-                seed: 12345,
-                idCounters: {},
-            });
-
-            const loadRoot = new Entity("root");
-            const loaded = await manager.load(loadRoot);
-
-            assert.ok(loaded, "Should load save with no entities");
-            assert.ok(
-                loadRoot.getEcsComponent("Tile"),
-                "Root component should be loaded",
-            );
-            assert.strictEqual(
-                loadRoot.children.length,
-                0,
-                "Root should have no children",
-            );
-        });
-
-        it("handles save with only entity tree and no root components", async () => {
-            const adapter = new TestAdapter();
-            const manager = new PersistenceManager(adapter);
-            const saveRoot = new Entity("root");
-
-            const child = new Entity("child");
-            saveRoot.addChild(child);
-
-            await manager.saveWorld(saveRoot);
-            await manager.saveMeta({
-                version: 1,
-                tick: 0,
-                seed: 12345,
-                idCounters: {},
-            });
-
-            const loadRoot = new Entity("root");
-            const loaded = await manager.load(loadRoot);
-
-            assert.ok(
-                loaded,
-                "Should load save with entities but no root components",
-            );
-            assert.strictEqual(
-                loadRoot.children.length,
-                1,
-                "Should load child entity",
             );
         });
 

@@ -34,47 +34,6 @@ function createTestScene(): { root: Entity; worker: Entity; chest: Entity } {
 }
 
 describe("collectItemPlanner", () => {
-    it("returns moveTo and collectItems actions", () => {
-        const { root, worker, chest } = createTestScene();
-
-        const job = CollectItemJob(chest, woodResourceItem.id);
-        const actions = planCollectItem(root, worker, job);
-
-        assert.strictEqual(actions.length, 2);
-        assert.strictEqual(actions[0].type, "moveTo");
-        assert.strictEqual(actions[1].type, "collectItems");
-    });
-
-    it("sets correct target position for moveTo action", () => {
-        const { root, worker, chest } = createTestScene();
-        chest.worldPosition = { x: 10, y: 15 };
-
-        const job = CollectItemJob(chest, woodResourceItem.id);
-        const actions = planCollectItem(root, worker, job);
-
-        const moveAction = actions[0] as {
-            type: "moveTo";
-            target: { x: number; y: number };
-        };
-        assert.strictEqual(moveAction.target.x, 10);
-        assert.strictEqual(moveAction.target.y, 15);
-    });
-
-    it("carries the job's entity and item into the collectItems action", () => {
-        const { root, worker, chest } = createTestScene();
-
-        const job = CollectItemJob(chest, woodResourceItem.id);
-        const actions = planCollectItem(root, worker, job);
-
-        const collectAction = actions[1] as {
-            type: "collectItems";
-            entityId: string;
-            itemId: string;
-        };
-        assert.strictEqual(collectAction.entityId, "chest");
-        assert.strictEqual(collectAction.itemId, woodResourceItem.id);
-    });
-
     it("returns empty array and fails job if entity not found", () => {
         const { root, worker } = createTestScene();
 

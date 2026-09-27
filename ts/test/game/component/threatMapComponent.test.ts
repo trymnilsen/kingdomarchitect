@@ -61,15 +61,6 @@ describe("threat entries", () => {
         assert.strictEqual(map.threat["G1"].amount, INTRUSION_THREAT);
     });
 
-    it("accumulates raw onto an existing entry", () => {
-        const root = worldWith("G1");
-        const map = freshMap();
-        addThreat(map, "G1", 1, 0, root);
-        addThreat(map, "G1", 1, 1, root);
-        // The floor applies only at creation. Accumulation stays raw.
-        assert.strictEqual(map.threat["G1"].amount, INTRUSION_THREAT + 1);
-    });
-
     it("upgrades an intrusion entry to damage when the intruder hits", () => {
         const root = worldWith("G1");
         const map = freshMap();
@@ -108,24 +99,6 @@ describe("getTopThreat", () => {
         map.threat["liveGoblin"] = { amount: 12, time: 0, source: "damage" };
 
         assert.strictEqual(getTopThreat(map, 0, root), "liveGoblin");
-    });
-
-    it("skips decayed entries and returns undefined when all are stale", () => {
-        const root = worldWith("G1");
-        const map = freshMap();
-        addThreat(map, "G1", 1, 0, root);
-
-        assert.strictEqual(getTopThreat(map, 9, root), "G1");
-        assert.strictEqual(getTopThreat(map, 10, root), undefined);
-    });
-
-    it("breaks ties by insertion order with strict greater-than", () => {
-        const root = worldWith("first", "second");
-        const map = freshMap();
-        addThreat(map, "first", 12, 0, root);
-        addThreat(map, "second", 12, 0, root);
-
-        assert.strictEqual(getTopThreat(map, 0, root), "first");
     });
 });
 

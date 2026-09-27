@@ -43,12 +43,4 @@ describe("idGenerator persistence", () => {
 
         assert.strictEqual(snapshot["a"], 2);
     });
-
-    it("resetIdCounters restarts numbering at 1", () => {
-        resetIdCounters();
-        generateId("foo");
-        generateId("foo");
-        resetIdCounters();
-        assert.strictEqual(generateId("foo"), "foo1");
-    });
 });

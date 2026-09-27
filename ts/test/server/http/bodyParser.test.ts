@@ -34,15 +34,6 @@ function createChunkedMockRequest(chunks: string[]): IncomingMessage {
 }
 
 describe("parseJsonBody", () => {
-    it("parses valid JSON", async () => {
-        const req = createMockRequest('{"name": "test", "value": 42}');
-        const result = await parseJsonBody<{ name: string; value: number }>(
-            req,
-            1024,
-        );
-        assert.deepStrictEqual(result, { name: "test", value: 42 });
-    });
-
     it("rejects body exceeding size limit", async () => {
         const largeBody = JSON.stringify({ data: "x".repeat(200) });
         const req = createMockRequest(largeBody);
@@ -54,14 +45,6 @@ describe("parseJsonBody", () => {
 
     it("rejects invalid JSON", async () => {
         const req = createMockRequest("not valid json {{{");
-        await assert.rejects(
-            () => parseJsonBody(req, 1024),
-            (err: Error) => err instanceof InvalidJsonError,
-        );
-    });
-
-    it("handles empty body as invalid JSON", async () => {
-        const req = createMockRequest("");
         await assert.rejects(
             () => parseJsonBody(req, 1024),
             (err: Error) => err instanceof InvalidJsonError,

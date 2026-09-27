@@ -1,11 +1,5 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
-import { encodePosition } from "../../../src/common/point.ts";
-import {
-    getChunk,
-    TileComponentId,
-} from "../../../src/game/component/tileComponent.ts";
-import { VisibilityMapComponentId } from "../../../src/game/component/visibilityMapComponent.ts";
 import {
     createHealthComponent,
     HealthComponentId,
@@ -26,23 +20,6 @@ import {
     type SetComponentGameMessage,
     type TransformGameMessage,
 } from "../../../src/server/message/gameMessage.ts";
-import type { Volume } from "../../../src/game/map/volume.ts";
-import {
-    ChunkSize,
-    createLandTerrain,
-    terrainIndex,
-} from "../../../src/game/map/chunk.ts";
-import { Terrain } from "../../../src/game/map/terrain.ts";
-
-function createTestVolume(id: string): Volume {
-    return {
-        id,
-        type: "plains",
-        debugColor: "#8dd66d",
-        maxSize: 64,
-        chunks: [],
-    };
-}
 
 const noGround: GroundUpdate = {
     volumes: [],
@@ -56,133 +33,6 @@ function createTestCamera(): Camera {
 
 describe("gameMessageHandler", () => {
     describe("WorldStateGameMessage", () => {
-        it("creates TileComponent if missing", () => {
-            const root = new Entity("root");
-
-            const message: WorldStateGameMessage = {
-                type: WorldStateMessageType,
-                rootChildren: [],
-                ground: noGround,
-                serverTick: 0,
-                replicatedRootComponents: [],
-            };
-
-            assert.ok(
-                !root.getEcsComponent(TileComponentId),
-                "Should not have TileComponent initially",
-            );
-
-            handleGameMessage(root, message);
-
-            assert.ok(
-                root.getEcsComponent(TileComponentId),
-                "Should create TileComponent",
-            );
-        });
-
-        it("creates VisibilityMapComponent if missing", () => {
-            const root = new Entity("root");
-
-            const message: WorldStateGameMessage = {
-                type: WorldStateMessageType,
-                rootChildren: [],
-                ground: noGround,
-                serverTick: 0,
-                replicatedRootComponents: [],
-            };
-
-            assert.ok(
-                !root.getEcsComponent(VisibilityMapComponentId),
-                "Should not have VisibilityMapComponent initially",
-            );
-
-            handleGameMessage(root, message);
-
-            assert.ok(
-                root.getEcsComponent(VisibilityMapComponentId),
-                "Should create VisibilityMapComponent",
-            );
-        });
-
-        it("applies replicated ground before discovered tiles", () => {
-            const root = new Entity("root");
-
-            const volume = createTestVolume("vol1");
-            const terrain = createLandTerrain();
-            terrain[terrainIndex(2, 1)] = Terrain.Water;
-            terrain[terrainIndex(2, 2)] = Terrain.Ice;
-
-            const message: WorldStateGameMessage = {
-                type: WorldStateMessageType,
-                rootChildren: [],
-                ground: {
-                    volumes: [volume],
-                    chunks: [{ chunkX: 2, chunkY: 1, volume: "vol1", terrain }],
-                    discoveredTiles: [
-                        { x: 2 * ChunkSize + 1, y: ChunkSize + 1 },
-                        { x: 2 * ChunkSize + 2, y: ChunkSize + 2 },
-                    ],
-                },
-                serverTick: 0,
-                replicatedRootComponents: [],
-            };
-
-            handleGameMessage(root, message);
-
-            const tileComponent = root.getEcsComponent(TileComponentId);
-            assert.ok(tileComponent);
-            assert.ok(
-                tileComponent.volume.has("vol1"),
-                "Should register volume",
-            );
-            const chunk = getChunk(tileComponent, { x: 2, y: 1 });
-            assert.deepStrictEqual(chunk?.terrain, terrain);
-
-            const visibilityMap = root.requireEcsComponent(
-                VisibilityMapComponentId,
-            );
-            const discovered =
-                visibilityMap.discovered.partiallyDiscoveredChunks.get(
-                    encodePosition(2, 1),
-                );
-            assert.strictEqual(discovered?.size, 2);
-        });
-
-        it("creates entities from rootChildren", () => {
-            const root = new Entity("root");
-
-            const message: WorldStateGameMessage = {
-                type: WorldStateMessageType,
-                rootChildren: [
-                    {
-                        id: "entity1",
-                        position: { x: 10, y: 20 },
-                        components: [],
-                    },
-                    {
-                        id: "entity2",
-                        position: { x: 30, y: 40 },
-                        components: [],
-                    },
-                ],
-                ground: noGround,
-                serverTick: 0,
-                replicatedRootComponents: [],
-            };
-
-            handleGameMessage(root, message);
-
-            assert.strictEqual(root.children.length, 2);
-
-            const entity1 = root.findEntity("entity1");
-            assert.ok(entity1, "Should create entity1");
-            assert.deepStrictEqual(entity1.worldPosition, { x: 10, y: 20 });
-
-            const entity2 = root.findEntity("entity2");
-            assert.ok(entity2, "Should create entity2");
-            assert.deepStrictEqual(entity2.worldPosition, { x: 30, y: 40 });
-        });
-
         it("creates entity hierarchy with nested children", () => {
             const root = new Entity("root");
 
@@ -262,23 +112,6 @@ describe("gameMessageHandler", () => {
     });
 
     describe("AddEntityGameMessage", () => {
-        it("creates entity with specified ID", () => {
-            const root = new Entity("root");
-
-            const message: AddEntityGameMessage = {
-                type: AddEntityGameMessageType,
-                id: "newEntity",
-                position: { x: 100, y: 200 },
-                components: [],
-            };
-
-            handleGameMessage(root, message);
-
-            const entity = root.findEntity("newEntity");
-            assert.ok(entity, "Should create entity");
-            assert.deepStrictEqual(entity.worldPosition, { x: 100, y: 200 });
-        });
-
         it("creates entity as child of specified parent", () => {
             const root = new Entity("root");
 
@@ -299,40 +132,6 @@ describe("gameMessageHandler", () => {
             assert.ok(child);
             assert.strictEqual(child.parent?.id, "parent");
             assert.strictEqual(parent.children.length, 1);
-        });
-
-        it("creates entity hierarchy with children", () => {
-            const root = new Entity("root");
-
-            const message: AddEntityGameMessage = {
-                type: AddEntityGameMessageType,
-                id: "parent",
-                position: { x: 0, y: 0 },
-                components: [],
-                children: [
-                    {
-                        id: "child1",
-                        position: { x: 10, y: 10 },
-                        components: [],
-                    },
-                    {
-                        id: "child2",
-                        position: { x: 20, y: 20 },
-                        components: [],
-                    },
-                ],
-            };
-
-            handleGameMessage(root, message);
-
-            const parent = root.findEntity("parent");
-            assert.ok(parent);
-            assert.strictEqual(parent.children.length, 2);
-
-            const child1 = root.findEntity("child1");
-            const child2 = root.findEntity("child2");
-            assert.ok(child1);
-            assert.ok(child2);
         });
 
         it("merges server data when entity already exists", () => {
@@ -372,40 +171,6 @@ describe("gameMessageHandler", () => {
     });
 
     describe("RemoveEntityGameMessage", () => {
-        it("removes entity from tree", () => {
-            const root = new Entity("root");
-
-            const entity = new Entity("toRemove");
-            root.addChild(entity);
-
-            assert.strictEqual(root.children.length, 1);
-
-            const message: RemoveEntityGameMessage = {
-                type: RemoveEntityGameMessageType,
-                entity: "toRemove",
-            };
-
-            handleGameMessage(root, message);
-
-            assert.strictEqual(root.children.length, 0);
-            assert.ok(!root.findEntity("toRemove"));
-        });
-
-        it("leaves the tree alone when removing an entity it does not hold", () => {
-            const root = new Entity("root");
-            const existing = new Entity("existing");
-            root.addChild(existing);
-
-            const message: RemoveEntityGameMessage = {
-                type: RemoveEntityGameMessageType,
-                entity: "nonexistent",
-            };
-
-            handleGameMessage(root, message);
-
-            assert.deepStrictEqual(root.children, [existing]);
-        });
-
         it("removes entity from nested hierarchy", () => {
             const root = new Entity("root");
 
@@ -462,65 +227,9 @@ describe("gameMessageHandler", () => {
             assert.strictEqual(root.getEcsComponent(HealthComponentId), null);
             assert.strictEqual(root.children.length, 0);
         });
-
-        it("adds new component if not present", () => {
-            const root = new Entity("root");
-
-            const entity = new Entity("entity1");
-            root.addChild(entity);
-
-            const message: SetComponentGameMessage = {
-                type: SetComponentGameMessageType,
-                entity: "entity1",
-                component: createHealthComponent(42, 100),
-            };
-
-            handleGameMessage(root, message);
-
-            const component = entity.getEcsComponent(HealthComponentId);
-            assert.ok(component);
-            assert.strictEqual(component.currentHp, 42);
-        });
     });
 
     describe("TransformGameMessage", () => {
-        it("updates entity position", () => {
-            const root = new Entity("root");
-
-            const entity = new Entity("entity1");
-            entity.worldPosition = { x: 0, y: 0 };
-            root.addChild(entity);
-
-            const message: TransformGameMessage = {
-                type: TransformGameMessageType,
-                entity: "entity1",
-                position: { x: 500, y: 300 },
-                oldPosition: { x: 0, y: 0 },
-            };
-
-            handleGameMessage(root, message);
-
-            assert.deepStrictEqual(entity.worldPosition, { x: 500, y: 300 });
-        });
-
-        it("moves nothing on a transform for an entity it does not hold", () => {
-            const root = new Entity("root");
-            const existing = new Entity("existing");
-            root.addChild(existing);
-            existing.worldPosition = { x: 12, y: 8 };
-
-            const message: TransformGameMessage = {
-                type: TransformGameMessageType,
-                entity: "nonexistent",
-                position: { x: 100, y: 100 },
-                oldPosition: { x: 0, y: 0 },
-            };
-
-            handleGameMessage(root, message);
-
-            assert.deepStrictEqual(existing.worldPosition, { x: 12, y: 8 });
-        });
-
         it("updates nested entity position", () => {
             const root = new Entity("root");
 

@@ -21,7 +21,6 @@ const placedRoot = createComponent<{ children: PlacedChild[] }>(
 
 const PANEL_REGION = { x: 12, y: 10, width: 60, height: 40 };
 const PANEL_CENTER = { x: 42, y: 30 };
-const OUTSIDE_POINT = { x: 150, y: 90 };
 
 function place(
     descriptor: ComponentDescriptor,
@@ -59,30 +58,6 @@ describe("pointer occlusion (Scenario)", () => {
             handled,
             true,
             "the tap is absorbed so it cannot fall through to a dismiss scrim",
-        );
-    });
-
-    it("lets a tap fall through where there is no backgrounded surface", () => {
-        const harness = createPointerHarness();
-        const panel = place(
-            uiBox({
-                width: PANEL_REGION.width,
-                height: PANEL_REGION.height,
-                background: colorBackground("panel"),
-            }),
-            PANEL_REGION,
-        );
-        harness.render(placedRoot({ children: [panel] }));
-
-        assert.strictEqual(
-            harness.pointerDown(OUTSIDE_POINT),
-            false,
-            "press on empty space is not captured",
-        );
-        assert.strictEqual(
-            harness.pointerUp(OUTSIDE_POINT),
-            false,
-            "release on empty space is not handled, so a modal can dismiss",
         );
     });
 

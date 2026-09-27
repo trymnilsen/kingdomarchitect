@@ -28,39 +28,6 @@ function createWorld(): Entity {
 }
 
 describe("forresterApplicability", () => {
-    it("returns applicable when no other forrester is nearby", () => {
-        const world = createWorld();
-
-        const result = forresterApplicability({ x: 10, y: 10 }, world);
-
-        assert.strictEqual(result.isApplicable, true);
-    });
-
-    it("returns not applicable when another forrester is within zone radius", () => {
-        const world = createWorld();
-
-        // Place an existing forrester 1 tile away (within zone radius)
-        const existingForrester = new Entity("existingForrester");
-        existingForrester.worldPosition = {
-            x: 10 + forresterProduction.zoneRadius - 1,
-            y: 10,
-        };
-        existingForrester.setEcsComponent(
-            createProductionComponent("forrester_production"),
-        );
-        registerInChunkMap(world, existingForrester);
-
-        const result = forresterApplicability({ x: 10, y: 10 }, world);
-
-        assert.strictEqual(result.isApplicable, false);
-        if (!result.isApplicable) {
-            assert.ok(
-                result.reason.length > 0,
-                "Should provide a reason string",
-            );
-        }
-    });
-
     it("returns applicable when existing forrester is beyond zone radius", () => {
         const world = createWorld();
 

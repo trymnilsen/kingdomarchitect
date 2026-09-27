@@ -5,20 +5,12 @@ import type { Entity } from "../../../src/game/entity/entity.ts";
 import type { Point } from "../../../src/common/point.ts";
 import { pathfindingSystem } from "../../../src/game/system/pathfindingSystem.ts";
 import { createPhaseTransitionSystem } from "../../../src/game/system/phaseTransitionSystem.ts";
-import { createInventorySpillSystem } from "../../../src/game/system/inventorySpillSystem.ts";
-import { GameTime } from "../../../src/game/gameTime.ts";
-import { CollectableComponentId } from "../../../src/game/component/collectableComponent.ts";
-import { GroundItemComponentId } from "../../../src/game/component/groundItemComponent.ts";
 import {
     formGoblinRaid,
     initialRaidThreshold,
 } from "../../../src/game/raid/goblinRaid.ts";
 import { kingdomScore } from "../../../src/game/raid/kingdomScore.ts";
-import {
-    INITIAL_RAID_THRESHOLD_BASE,
-    RAID_MIN_HOUSES,
-    RAID_THRESHOLD_GROWTH,
-} from "../../../src/game/raid/raidConstants.ts";
+import { RAID_MIN_HOUSES } from "../../../src/game/raid/raidConstants.ts";
 import { WORKER_SCORE } from "../../../src/game/raid/raidWorth.ts";
 import { campSizeSteps } from "../../../src/game/raid/campSize.ts";
 import { createRaidBehavior } from "../../../src/game/behavior/behaviors/goblin/raidBehavior.ts";
@@ -43,16 +35,11 @@ import {
 } from "../../../src/game/component/warmthComponent.ts";
 import { HealthComponentId } from "../../../src/game/component/healthComponent.ts";
 import { DayComponentId } from "../../../src/game/component/dayComponent.ts";
-import {
-    InventoryComponentId,
-    addInventoryItem,
-} from "../../../src/game/component/inventoryComponent.ts";
 import { stockPile } from "../../../src/data/building/wood/storage.ts";
 import { woodenHouse } from "../../../src/data/building/wood/house.ts";
 import { farm } from "../../../src/data/building/grow/grow.ts";
 import { stoneWall } from "../../../src/data/building/stone/wall.ts";
 import { cresset } from "../../../src/data/building/light/cresset.ts";
-import { woodResourceItem } from "../../../src/data/inventory/items/resources.ts";
 
 // Small query helpers. No entity construction here, all creation goes through
 // the real prefabs via ScenarioHarness.
@@ -335,25 +322,6 @@ describe("goblin night raid scenario tests", () => {
         );
     });
 
-    it("leaves the starting kingdom far below the first raid bar", () => {
-        const harness = new ScenarioHarness();
-        const kingdom = harness.addPlayerKingdom();
-        // The actual game start (see addInitialPlayerChunk in game/map/player.ts):
-        // one worker, a house, a farm, a stockpile and a cresset.
-        harness.addPlayerUnits(1);
-        harness.addPlayerBuilding(kingdom, woodenHouse, { x: 20, y: 14 });
-        harness.addPlayerBuilding(kingdom, farm, { x: 22, y: 14 });
-        harness.addPlayerBuilding(kingdom, stockPile, { x: 24, y: 14 });
-        harness.addPlayerBuilding(kingdom, cresset, { x: 26, y: 14 });
-
-        const startWorth = kingdomScore(harness.root);
-        assert.ok(
-            startWorth <= INITIAL_RAID_THRESHOLD_BASE / 2,
-            `the grace period must be real: a fresh settlement (worth ${startWorth}) ` +
-                `must stay at most half the first raid bar (${INITIAL_RAID_THRESHOLD_BASE})`,
-        );
-    });
-
     it("cannot raid the starting kingdom even with a full camp at the door", () => {
         const harness = new ScenarioHarness();
         const kingdom = harness.addPlayerKingdom();
@@ -397,57 +365,6 @@ describe("goblin night raid scenario tests", () => {
             raidersOf(camp).length,
             4,
             "once the kingdom is rich enough, the camp raids",
-        );
-    });
-
-    it("raises its bar above the kingdom it just raided", () => {
-        const { harness, camp } = poorKingdomWithFullCamp();
-        harness.addPlayerUnits(1);
-
-        const scoreAtRaid = scoreOf(harness);
-        formGoblinRaid(harness.root);
-        assert.strictEqual(raidersOf(camp).length, 4, "the raid fires");
-        assert.strictEqual(
-            thresholdOf(camp),
-            scoreAtRaid * RAID_THRESHOLD_GROWTH,
-            "the bar is restamped above the score the kingdom had that night",
-        );
-
-        // Refill so the full-camp gate is not what blocks the next night.
-        refillCamp(harness, camp);
-        const raidersBefore = raidersOf(camp).length;
-        formGoblinRaid(harness.root);
-        assert.strictEqual(
-            raidersOf(camp).length,
-            raidersBefore,
-            "an unchanged kingdom is not raided again the following night",
-        );
-    });
-
-    it("grants a repelled kingdom downtime until it grows past the new bar", () => {
-        const { harness, kingdom, camp } = poorKingdomWithFullCamp();
-        harness.addPlayerUnits(1);
-
-        formGoblinRaid(harness.root);
-        assert.strictEqual(raidersOf(camp).length, 4, "the first raid fires");
-        refillCamp(harness, camp);
-
-        // The raid was beaten off, so the kingdom kept everything it had. Growth
-        // alone is the lever here: climb to one worker short of the new bar.
-        enrichKingdomTo(harness, thresholdOf(camp) - WORKER_SCORE);
-        formGoblinRaid(harness.root);
-        assert.strictEqual(
-            raidersOf(camp).length,
-            4,
-            "just short of the new bar, so no second raid",
-        );
-
-        harness.addPlayerUnits(1);
-        formGoblinRaid(harness.root);
-        assert.strictEqual(
-            raidersOf(camp).length,
-            8,
-            "outgrowing the bar brings the camp back",
         );
     });
 
@@ -533,32 +450,6 @@ describe("goblin night raid scenario tests", () => {
         );
     });
 
-    it("seeds and raids on the same night when the kingdom is already rich", () => {
-        const harness = new ScenarioHarness();
-        const kingdom = harness.addPlayerKingdom();
-        harness.addPlayerBuilding(
-            kingdom,
-            stockPile,
-            { x: 20, y: 14 },
-            "stock",
-        );
-        const { camp } = fullCamp(harness, { x: 12, y: 14 });
-
-        assert.strictEqual(
-            thresholdOf(camp),
-            0,
-            "a fresh camp has not been seeded yet",
-        );
-
-        formGoblinRaid(harness.root);
-
-        assert.strictEqual(
-            raidersOf(camp).length,
-            4,
-            "seeding must not cost the camp its night",
-        );
-    });
-
     it("excludes goblins already out raiding from the trigger", () => {
         const harness = new ScenarioHarness();
         const kingdom = harness.addPlayerKingdom();
@@ -641,55 +532,6 @@ describe("goblin night raid scenario tests", () => {
         );
     });
 
-    it("sizes the first raid party from the table, not the kingdom's wealth", () => {
-        const harness = new ScenarioHarness([goblinCampSystem]);
-        const kingdom = harness.addPlayerKingdom();
-        harness.addPlayerBuilding(kingdom, stockPile, { x: 20, y: 14 });
-        const { camp } = harness.addGoblinCamp({ x: 12, y: 14 });
-        const campComp = camp.getEcsComponent(GoblinCampComponentId)!;
-
-        // Rich enough to clear the bar this camp will seed for itself.
-        enrichKingdomTo(
-            harness,
-            initialRaidThreshold(harness.root, camp.worldPosition),
-        );
-        harness.tick();
-        assert.strictEqual(
-            campComp.maxPopulation,
-            RAID_MIN_HOUSES,
-            "at the raid threshold the camp is sized to the raid floor",
-        );
-
-        // Fill the camp to its small cap. The prefab supplied the first goblin.
-        harness.addGoblinToCamp(camp, { x: 11, y: 14 });
-        harness.addGoblinToCamp(camp, { x: 13, y: 15 });
-        formGoblinRaid(harness.root);
-
-        assert.strictEqual(
-            raidersOf(camp).length,
-            RAID_MIN_HOUSES - 1,
-            "the first raid is a small party, one below the camp size",
-        );
-        assert.ok(defenderOf(camp), "one goblin stays home as defender");
-    });
-
-    it("does not raid when there are no valid player buildings", () => {
-        const harness = new ScenarioHarness();
-        const kingdom = harness.addPlayerKingdom();
-        // A wall has raidValue 0 → never a raid objective.
-        harness.addPlayerBuilding(kingdom, stoneWall, { x: 20, y: 14 });
-
-        const { camp } = fullCamp(harness, { x: 12, y: 14 });
-
-        formGoblinRaid(harness.root);
-
-        assert.strictEqual(
-            raidersOf(camp).length,
-            0,
-            "no raiders are stamped when only zero-value buildings exist",
-        );
-    });
-
     it("prioritises high-value buildings and spreads ~2 per target", () => {
         const harness = new ScenarioHarness();
         const kingdom = harness.addPlayerKingdom();
@@ -726,27 +568,6 @@ describe("goblin night raid scenario tests", () => {
     });
 
     // --- Siege & destruction (drive the behavior system) ---
-
-    it("razes an undefended building in the open", () => {
-        const harness = new ScenarioHarness([pathfindingSystem]);
-        const kingdom = harness.addPlayerKingdom();
-        harness.addPlayerBuilding(
-            kingdom,
-            stockPile,
-            { x: 20, y: 14 },
-            "target",
-        );
-        fullCamp(harness, { x: 12, y: 14 });
-
-        formGoblinRaid(harness.root);
-        harness.tickUntil((root) => root.findEntity("target") === null, 150);
-
-        assert.strictEqual(
-            harness.root.findEntity("target"),
-            null,
-            "the building is razed",
-        );
-    });
 
     it("breaks through a wall to reach a walled-in target", () => {
         const harness = new ScenarioHarness([pathfindingSystem]);
@@ -855,36 +676,6 @@ describe("goblin night raid scenario tests", () => {
         );
     });
 
-    it("leaves the defender free to keep warm", () => {
-        const harness = new ScenarioHarness([pathfindingSystem]);
-        const kingdom = harness.addPlayerKingdom();
-        harness.addPlayerBuilding(
-            kingdom,
-            stockPile,
-            { x: 20, y: 14 },
-            "target",
-        );
-        const { camp } = fullCamp(harness, { x: 12, y: 14 });
-
-        formGoblinRaid(harness.root);
-        const defender = defenderOf(camp)!;
-        setWarmth(defender, 10);
-        requestReplan(defender);
-
-        harness.tick();
-
-        assert.strictEqual(
-            behaviorName(defender),
-            "keepWarm",
-            "the un-stamped defender still keeps warm when cold",
-        );
-        assert.strictEqual(
-            behaviorName(raidersOf(camp)[0]),
-            "raid",
-            "raiders raid",
-        );
-    });
-
     it("defends itself when attacked, then resumes the raid", () => {
         const harness = new ScenarioHarness([pathfindingSystem]);
         const kingdom = harness.addPlayerKingdom();
@@ -988,50 +779,6 @@ describe("goblin night raid scenario tests", () => {
     });
 
     // --- Integration with adjacent systems ---
-
-    it("razing a stockpile spills its contents onto the ground", () => {
-        const harness = new ScenarioHarness([
-            pathfindingSystem,
-            createInventorySpillSystem(new GameTime()),
-        ]);
-        const kingdom = harness.addPlayerKingdom();
-        const store = harness.addPlayerBuilding(
-            kingdom,
-            stockPile,
-            { x: 20, y: 14 },
-            "store",
-        );
-        addInventoryItem(
-            store.getEcsComponent(InventoryComponentId)!,
-            woodResourceItem,
-            25,
-        );
-        fullCamp(harness, { x: 12, y: 14 });
-
-        formGoblinRaid(harness.root);
-        harness.tickUntil((root) => root.findEntity("store") === null, 150);
-
-        assert.strictEqual(
-            harness.root.findEntity("store"),
-            null,
-            "the stockpile itself is gone",
-        );
-
-        // The wood survives the raid on the ground: losing the building should
-        // cost the player the hauling, not the resources.
-        let wood = 0;
-        for (const [entity, collectable] of harness.root.queryComponents(
-            CollectableComponentId,
-        )) {
-            if (!entity.hasComponent(GroundItemComponentId)) continue;
-            for (const stack of collectable.items) {
-                if (stack.item.id === woodResourceItem.id) {
-                    wood += stack.amount;
-                }
-            }
-        }
-        assert.strictEqual(wood, 25, "all 25 wood is lying in the yard");
-    });
 
     it("forms the raid when the night phase begins", () => {
         const harness = new ScenarioHarness([

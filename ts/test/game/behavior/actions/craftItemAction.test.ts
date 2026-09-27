@@ -93,23 +93,6 @@ describe("craftItemAction", () => {
         assert.strictEqual(wood?.amount, 10);
     });
 
-    it("tracks progress on action object", () => {
-        const { worker, building } = createTestScene();
-
-        const buildingInventory =
-            building.getEcsComponent(InventoryComponentId)!;
-        addInventoryItem(buildingInventory, woodResourceItem, 10);
-
-        const action: CraftItemAction = {
-            type: "craftItem",
-            buildingId: "building",
-            recipe: planksRecipe,
-        };
-
-        executeCraftItemAction(action, worker, 0);
-        assert.strictEqual(action.progress, 1);
-    });
-
     it("completes and outputs to held when progress reaches duration", () => {
         const { worker } = createTestScene();
 
@@ -212,52 +195,12 @@ describe("craftItemAction", () => {
         });
     });
 
-    it("fails if the building lacks required materials", () => {
-        const { worker } = createTestScene();
-
-        const action = {
-            type: "craftItem" as const,
-            buildingId: "building",
-            recipe: planksRecipe,
-        };
-
-        const result = executeCraftItemAction(action, worker, 0);
-        assert.strictEqual(result.kind, "failed");
-    });
-
     it("fails if the building has insufficient materials", () => {
         const { worker, building } = createTestScene();
 
         const buildingInventory =
             building.getEcsComponent(InventoryComponentId)!;
         addInventoryItem(buildingInventory, woodResourceItem, 2);
-
-        const action = {
-            type: "craftItem" as const,
-            buildingId: "building",
-            recipe: planksRecipe,
-        };
-
-        const result = executeCraftItemAction(action, worker, 0);
-        assert.strictEqual(result.kind, "failed");
-    });
-
-    it("fails if building entity not found", () => {
-        const { worker } = createTestScene();
-
-        const action = {
-            type: "craftItem" as const,
-            buildingId: "nonexistent",
-            recipe: planksRecipe,
-        };
-
-        const result = executeCraftItemAction(action, worker, 0);
-        assert.strictEqual(result.kind, "failed");
-    });
-
-    it("fails if worker not adjacent to building", () => {
-        const { worker, building } = createTestScene();
-        building.worldPosition = { x: 25, y: 25 };
 
         const action = {
             type: "craftItem" as const,

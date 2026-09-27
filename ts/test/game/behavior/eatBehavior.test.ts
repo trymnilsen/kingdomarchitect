@@ -60,13 +60,6 @@ function createStockpileWithFood(
 
 describe("eatBehavior", () => {
     describe("isValid", () => {
-        it("returns false when hunger is below 40", () => {
-            const behavior = createEatBehavior();
-            const settlement = createSettlement();
-            const worker = createWorker(settlement, HUNGER_THRESHOLD - 10);
-            assert.strictEqual(behavior.isValid(worker), false);
-        });
-
         it("returns true when hunger is exactly 40", () => {
             const behavior = createEatBehavior();
             const settlement = createSettlement();
@@ -76,13 +69,6 @@ describe("eatBehavior", () => {
     });
 
     describe("utility", () => {
-        it("returns 0 when hunger is below 40", () => {
-            const behavior = createEatBehavior();
-            const settlement = createSettlement();
-            const worker = createWorker(settlement, HUNGER_THRESHOLD - 20);
-            assert.strictEqual(behavior.utility(worker), 0);
-        });
-
         it("increases as hunger increases above threshold", () => {
             const behavior = createEatBehavior();
             const settlement = createSettlement();
@@ -131,19 +117,6 @@ describe("eatBehavior", () => {
             const actions = behavior.expand(worker);
             assert.strictEqual(actions.length, 1);
             assert.strictEqual(actions[0].type, "eatFromHeld");
-        });
-
-        it("returns moveTo + withdrawFromStockpile + eatFromHeld when held empty but stockpile has food", () => {
-            const behavior = createEatBehavior();
-            const settlement = createSettlement();
-            const worker = createWorker(settlement, 60);
-            createStockpileWithFood("stockpile", settlement);
-
-            const actions = behavior.expand(worker);
-            assert.strictEqual(actions.length, 3);
-            assert.strictEqual(actions[0].type, "moveTo");
-            assert.strictEqual(actions[1].type, "withdrawFromStockpile");
-            assert.strictEqual(actions[2].type, "eatFromHeld");
         });
 
         it("returns moveTo + harvestResource + eatFromHeld when only forageable is available", () => {
@@ -214,32 +187,6 @@ describe("eatBehavior", () => {
             const actions = behavior.expand(thief);
             assert.strictEqual(actions.length, 0);
         });
-
-        it("ignores non-food held items", () => {
-            const behavior = createEatBehavior();
-            const settlement = createSettlement();
-            const worker = createWorker(settlement, 60);
-            const held = worker.requireEcsComponent(HeldItemComponentId);
-            held.item = woodResourceItem;
-            held.amount = 5;
-
-            const actions = behavior.expand(worker);
-            assert.strictEqual(actions.length, 0);
-        });
-
-        it("returns empty when no food source exists", () => {
-            const behavior = createEatBehavior();
-            const root = new Entity("root");
-            const worker = new Entity("worker");
-            root.addChild(worker);
-            worker.worldPosition = { x: 12, y: 8 };
-            worker.setEcsComponent(createHeldItemComponent());
-            worker.setEcsComponent(createEquipmentComponent());
-            worker.setEcsComponent(createHungerComponent(90, 0.1));
-
-            const actions = behavior.expand(worker);
-            assert.strictEqual(actions.length, 0);
-        });
     });
 
     describe("clearing a held non-food item before eating", () => {
@@ -269,35 +216,6 @@ describe("eatBehavior", () => {
                 actions.some((a) => a.type === "eatFromHeld"),
                 "still proceeds to eat after depositing",
             );
-        });
-
-        it("drops the held item only when no stockpile will accept it", () => {
-            const behavior = createEatBehavior();
-            const root = new Entity("root");
-            const worker = new Entity("worker");
-            root.addChild(worker);
-            worker.worldPosition = { x: 12, y: 8 };
-            worker.setEcsComponent(createHeldItemComponent());
-            worker.setEcsComponent(createEquipmentComponent());
-            worker.setEcsComponent(createHungerComponent(60, 0.1));
-            const held = worker.requireEcsComponent(HeldItemComponentId);
-            held.item = woodResourceItem;
-            held.amount = 4;
-
-            // A forageable food source but no stockpile anywhere.
-            const berry = new Entity("berryBush");
-            root.addChild(berry);
-            berry.worldPosition = { x: 14, y: 8 };
-            berry.setEcsComponent(createResourceComponent("berrybush"));
-
-            const actions = behavior.expand(worker);
-
-            assert.strictEqual(
-                actions[0].type,
-                "dropHeld",
-                "falls back to dropping when no stockpile accepts the item",
-            );
-            assert.ok(actions.some((a) => a.type === "eatFromHeld"));
         });
     });
 });

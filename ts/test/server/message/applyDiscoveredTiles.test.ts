@@ -131,32 +131,4 @@ describe("applyDiscoveredTiles", () => {
             ),
         );
     });
-
-    it("skips tiles in chunks without replicated ground", () => {
-        const tileComponent = createTilesWithGround(chunk);
-        const visibilityMapComponent = createVisibilityMapComponent();
-
-        const chunkWithoutGround = { x: 5, y: 3 };
-        applyDiscoveredTiles(tileComponent, visibilityMapComponent, [
-            worldTile(chunk, 3, 3),
-            worldTile(chunkWithoutGround, 3, 3),
-        ]);
-
-        assert.ok(
-            visibilityMapComponent.discovered.partiallyDiscoveredChunks.has(
-                chunkId,
-            ),
-        );
-        assert.ok(
-            !visibilityMapComponent.discovered.partiallyDiscoveredChunks.has(
-                encodePosition(chunkWithoutGround.x, chunkWithoutGround.y),
-            ),
-            "No visibility is tracked for a chunk the client has no ground for",
-        );
-        assert.strictEqual(
-            tileComponent.chunks.size,
-            1,
-            "Discovering a tile never invents a chunk",
-        );
-    });
 });

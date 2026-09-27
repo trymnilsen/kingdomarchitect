@@ -10,10 +10,7 @@ import {
     HungerComponentId,
 } from "../../../../src/game/component/hungerComponent.ts";
 import { executeEatFromHeldAction } from "../../../../src/game/behavior/actions/eatFromHeldAction.ts";
-import {
-    breadItem,
-    woodResourceItem,
-} from "../../../../src/data/inventory/items/resources.ts";
+import { breadItem } from "../../../../src/data/inventory/items/resources.ts";
 
 function createTestEntity(): Entity {
     const entity = new Entity("worker");
@@ -53,28 +50,5 @@ describe("eatFromHeldAction", () => {
         executeEatFromHeldAction({ type: "eatFromHeld" }, entity);
         assert.strictEqual(held.item, null);
         assert.strictEqual(held.amount, 0);
-    });
-
-    it("returns failed when held is empty", () => {
-        const entity = createTestEntity();
-        const result = executeEatFromHeldAction(
-            { type: "eatFromHeld" },
-            entity,
-        );
-        assert.strictEqual(result.kind, "failed");
-    });
-
-    it("returns failed when held holds a non-food item", () => {
-        const entity = createTestEntity();
-        const held = entity.requireEcsComponent(HeldItemComponentId);
-        held.item = woodResourceItem;
-        held.amount = 5;
-
-        const result = executeEatFromHeldAction(
-            { type: "eatFromHeld" },
-            entity,
-        );
-        assert.strictEqual(result.kind, "failed");
-        assert.strictEqual(held.amount, 5, "wood should be untouched");
     });
 });

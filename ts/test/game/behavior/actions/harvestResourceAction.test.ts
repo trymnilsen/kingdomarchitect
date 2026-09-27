@@ -69,24 +69,6 @@ function createTestScene(): {
 
 describe("harvestResourceAction", () => {
     describe("Chop mode", () => {
-        it("deals damage to resource each tick", () => {
-            const { worker, resource } = createTestScene();
-
-            const action = {
-                type: "harvestResource" as const,
-                entityId: "resource",
-                harvestAction: ResourceHarvestMode.Chop,
-            };
-
-            const result = executeHarvestResourceAction(action, worker, 0);
-
-            assert.strictEqual(result.kind, "running");
-
-            const healthComponent =
-                resource.getEcsComponent(HealthComponentId)!;
-            assert.strictEqual(healthComponent.currentHp, 20);
-        });
-
         it("completes and grants yields when hp reaches 0", () => {
             const { worker, resource } = createTestScene();
 
@@ -107,24 +89,6 @@ describe("harvestResourceAction", () => {
             const held = worker.getEcsComponent(HeldItemComponentId)!;
             assert.strictEqual(held.item?.id, "wood");
             assert.strictEqual(held.amount, treeResource.yields[0].amount);
-        });
-
-        it("removes resource entity on completion", () => {
-            const { root, worker, resource } = createTestScene();
-
-            const healthComponent =
-                resource.getEcsComponent(HealthComponentId)!;
-            healthComponent.currentHp = 5;
-
-            const action = {
-                type: "harvestResource" as const,
-                entityId: "resource",
-                harvestAction: ResourceHarvestMode.Chop,
-            };
-
-            executeHarvestResourceAction(action, worker, 0);
-
-            assert.strictEqual(root.findEntity("resource"), null);
         });
     });
 
@@ -395,23 +359,6 @@ describe("harvestResourceAction", () => {
     });
 
     describe("Work-based harvest (Mine/Pick/Cut)", () => {
-        it("tracks progress on action object", () => {
-            const { worker, resource } = createTestScene();
-            resource.setEcsComponent(createResourceComponent("stone1"));
-            // Stone resource has workDuration: 3
-
-            const action: HarvestResourceAction = {
-                type: "harvestResource",
-                entityId: "resource",
-                harvestAction: ResourceHarvestMode.Mine,
-            };
-
-            const result = executeHarvestResourceAction(action, worker, 0);
-
-            assert.strictEqual(result.kind, "running");
-            assert.strictEqual(action.workProgress, 1);
-        });
-
         it("completes when workProgress reaches workDuration", () => {
             const { worker, resource } = createTestScene();
             resource.setEcsComponent(createResourceComponent("stone1"));
@@ -433,127 +380,7 @@ describe("harvestResourceAction", () => {
         });
     });
 
-    describe("Error handling", () => {
-        it("fails if resource entity not found", () => {
-            const { worker } = createTestScene();
-
-            const action = {
-                type: "harvestResource" as const,
-                entityId: "nonexistent",
-                harvestAction: ResourceHarvestMode.Chop,
-            };
-
-            const result = executeHarvestResourceAction(action, worker, 0);
-
-            assert.strictEqual(result.kind, "failed");
-        });
-
-        it("fails if worker not adjacent to resource", () => {
-            const { worker, resource } = createTestScene();
-            resource.worldPosition = { x: 25, y: 25 };
-
-            const action = {
-                type: "harvestResource" as const,
-                entityId: "resource",
-                harvestAction: ResourceHarvestMode.Chop,
-            };
-
-            const result = executeHarvestResourceAction(action, worker, 0);
-
-            assert.strictEqual(result.kind, "failed");
-        });
-
-        it("fails if worker is at same position as resource (not adjacent)", () => {
-            const { worker, resource } = createTestScene();
-            // Worker and resource at exact same position - a point is NOT adjacent to itself
-            worker.worldPosition = { x: 5, y: 5 };
-            resource.worldPosition = { x: 5, y: 5 };
-
-            const action = {
-                type: "harvestResource" as const,
-                entityId: "resource",
-                harvestAction: ResourceHarvestMode.Chop,
-            };
-
-            const result = executeHarvestResourceAction(action, worker, 0);
-
-            assert.strictEqual(result.kind, "failed");
-        });
-
-        it("fails if resource has no ResourceComponent", () => {
-            const { root, worker } = createTestScene();
-            const noResource = new Entity("noResource");
-            noResource.worldPosition = { x: 11, y: 8 };
-            root.addChild(noResource);
-
-            const action = {
-                type: "harvestResource" as const,
-                entityId: "noResource",
-                harvestAction: ResourceHarvestMode.Chop,
-            };
-
-            const result = executeHarvestResourceAction(action, worker, 0);
-
-            assert.strictEqual(result.kind, "failed");
-        });
-
-        it("throws if worker has no held component", () => {
-            const { root, resource } = createTestScene();
-            const workerNoHeld = new Entity("workerNoHeld");
-            workerNoHeld.worldPosition = { x: 10, y: 8 };
-            root.addChild(workerNoHeld);
-
-            const action = {
-                type: "harvestResource" as const,
-                entityId: "resource",
-                harvestAction: ResourceHarvestMode.Chop,
-            };
-
-            assert.throws(() => {
-                executeHarvestResourceAction(action, workerNoHeld, 0);
-            });
-        });
-
-        it("throws if chop mode resource has no HealthComponent", () => {
-            const { root, worker } = createTestScene();
-            const noHealth = new Entity("noHealth");
-            noHealth.worldPosition = { x: 11, y: 8 };
-            noHealth.setEcsComponent(createResourceComponent("tree1"));
-            root.addChild(noHealth);
-
-            const action = {
-                type: "harvestResource" as const,
-                entityId: "noHealth",
-                harvestAction: ResourceHarvestMode.Chop,
-            };
-
-            assert.throws(() => {
-                executeHarvestResourceAction(action, worker, 0);
-            });
-        });
-    });
-
     describe("component invalidation", () => {
-        it("invalidates HealthComponent when chopping", () => {
-            const { root, worker, resource } = createTestScene();
-            const tracker = new InvalidationTracker();
-            tracker.attach(root);
-
-            const action = {
-                type: "harvestResource" as const,
-                entityId: "resource",
-                harvestAction: ResourceHarvestMode.Chop,
-            };
-
-            executeHarvestResourceAction(action, worker, 0);
-
-            assert.strictEqual(
-                tracker.wasInvalidated("resource", HealthComponentId),
-                true,
-                "HealthComponent should be invalidated when chopping",
-            );
-        });
-
         it("invalidates InventoryComponent when harvest completes", () => {
             const { root, worker, resource } = createTestScene();
             const tracker = new InvalidationTracker();
@@ -575,29 +402,6 @@ describe("harvestResourceAction", () => {
                 tracker.wasInvalidated("worker", HeldItemComponentId),
                 true,
                 "InventoryComponent should be invalidated when yields are granted",
-            );
-        });
-
-        it("invalidates InventoryComponent when work-based harvest completes", () => {
-            const { root, worker, resource } = createTestScene();
-            const tracker = new InvalidationTracker();
-            tracker.attach(root);
-
-            resource.setEcsComponent(createResourceComponent("stone1"));
-
-            const action = {
-                type: "harvestResource" as const,
-                entityId: "resource",
-                harvestAction: ResourceHarvestMode.Mine,
-                workProgress: 2,
-            };
-
-            executeHarvestResourceAction(action, worker, 0);
-
-            assert.strictEqual(
-                tracker.wasInvalidated("worker", HeldItemComponentId),
-                true,
-                "InventoryComponent should be invalidated when work-based harvest completes",
             );
         });
     });

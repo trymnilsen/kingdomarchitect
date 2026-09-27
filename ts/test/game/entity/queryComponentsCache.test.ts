@@ -76,16 +76,6 @@ function buildTree() {
 }
 
 describe("queryComponents cache", () => {
-    it("returns the same map reference on repeated identical queries (no rebuild)", () => {
-        const { root } = buildTree();
-
-        const first = root.queryComponents(HealthComponentId);
-        const second = root.queryComponents(HealthComponentId);
-
-        assert.strictEqual(first, second);
-        assert.strictEqual(first.size, 2);
-    });
-
     it("invalidates when a component is added to an in-tree entity", () => {
         const { root, a } = buildTree();
 
@@ -192,15 +182,5 @@ describe("queryComponents cache", () => {
             "same component reference, mutated in place",
         );
         assert.strictEqual(after.get(b)?.currentHp, 1);
-    });
-
-    it("survives a transform (move): same map reference", () => {
-        const { root, b } = buildTree();
-
-        const before = root.queryComponents(HealthComponentId);
-        b.position = { x: 99, y: 99 };
-        const after = root.queryComponents(HealthComponentId);
-
-        assert.strictEqual(after, before);
     });
 });

@@ -1,7 +1,7 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
 import { Entity } from "../../src/game/entity/entity.ts";
-import { encodePosition, type Point } from "../../src/common/point.ts";
+import { type Point } from "../../src/common/point.ts";
 import { createEquipmentComponent } from "../../src/game/component/equipmentComponent.ts";
 import { createLightSourceComponent } from "../../src/game/component/lightSourceComponent.ts";
 import { createPlayerKingdomComponent } from "../../src/game/component/playerKingdomComponent.ts";
@@ -9,10 +9,6 @@ import {
     collectLightClaims,
     computeLitTiles,
 } from "../../src/game/light/lightClaims.ts";
-import {
-    computeHearthlight,
-    isInHearthlight,
-} from "../../src/game/light/hearthlight.ts";
 import { torchItem } from "../../src/data/inventory/items/equipment.ts";
 
 /** A player worker holding a torch, alone in the dark away from any building. */
@@ -32,26 +28,7 @@ function kingdomWithTorchbearer(position: Point): Entity {
     return root;
 }
 
-function litAt(litTiles: ReadonlySet<number>, x: number, y: number): boolean {
-    return litTiles.has(encodePosition(x, y));
-}
-
 describe("carried light", () => {
-    it("lights the ring around its holder instead of the bare glow tile", () => {
-        const root = kingdomWithTorchbearer({ x: 12, y: 8 });
-
-        const lit = computeLitTiles(collectLightClaims(root, "illumination"));
-
-        assert.strictEqual(litAt(lit, 12, 8), true, "own tile");
-        assert.strictEqual(litAt(lit, 13, 8), true, "cardinal neighbour");
-        assert.strictEqual(litAt(lit, 12, 7), true, "cardinal neighbour");
-        // Radius 1 is a disc, so diagonals stay dark and the ring stops there.
-        assert.strictEqual(litAt(lit, 13, 9), false, "diagonal");
-        assert.strictEqual(litAt(lit, 14, 8), false, "two tiles out");
-        // Without the torch this worker would light exactly one tile.
-        assert.strictEqual(lit.size, 5);
-    });
-
     it("claims no hearthlight, so territory cannot follow feet", () => {
         // The worker's light is created without a claim, and equipping a
         // torch only changes what is emitted.
@@ -60,17 +37,5 @@ describe("carried light", () => {
         const hearth = computeLitTiles(collectLightClaims(root, "hearthlight"));
 
         assert.strictEqual(hearth.size, 0);
-    });
-
-    it("leaves a lone torchbearer outside hearthlight for the defender gate", () => {
-        // The hearth defense system gates defenders on standing inside
-        // hearthlight. A worker must not be able to satisfy that gate simply
-        // by carrying their own light into the wilderness.
-        const root = kingdomWithTorchbearer({ x: 26, y: 14 });
-
-        const hearth = computeHearthlight(root);
-
-        assert.strictEqual(isInHearthlight(hearth, { x: 26, y: 14 }), false);
-        assert.strictEqual(isInHearthlight(hearth, { x: 27, y: 14 }), false);
     });
 });

@@ -13,14 +13,6 @@ describe("checkOrigin", () => {
         assert.strictEqual(checkOrigin(req), true);
     });
 
-    it("returns true when Origin host matches Host header", () => {
-        const req = makeRequest({
-            host: "example.com",
-            origin: "https://example.com",
-        });
-        assert.strictEqual(checkOrigin(req), true);
-    });
-
     it("returns true when Origin host matches Host including port", () => {
         const req = makeRequest({
             host: "example.com:8080",

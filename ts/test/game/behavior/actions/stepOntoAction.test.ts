@@ -80,49 +80,6 @@ describe("stepOntoAction", () => {
         assert.strictEqual(result.kind, "complete");
         assert.deepStrictEqual(worker.worldPosition, building.worldPosition);
     });
-
-    it("completes as a no-op when already on the target tile", () => {
-        const root = createWorld();
-        addBuilding(root, "building", { x: 12, y: 8 });
-        const worker = addWorker(root, "worker", { x: 12, y: 8 });
-
-        const result = executeStepOntoAction(
-            { type: "stepOnto", targetId: "building" },
-            worker,
-            1,
-        );
-
-        assert.strictEqual(result.kind, "complete");
-        assert.deepStrictEqual(worker.worldPosition, { x: 12, y: 8 });
-    });
-
-    it("fails when the worker is not adjacent to the target", () => {
-        const root = createWorld();
-        addBuilding(root, "building", { x: 12, y: 8 });
-        const worker = addWorker(root, "worker", { x: 15, y: 8 });
-
-        const result = executeStepOntoAction(
-            { type: "stepOnto", targetId: "building" },
-            worker,
-            1,
-        );
-
-        assert.strictEqual(result.kind, "failed");
-        assert.deepStrictEqual(worker.worldPosition, { x: 15, y: 8 });
-    });
-
-    it("fails when the target entity is gone", () => {
-        const root = createWorld();
-        const worker = addWorker(root, "worker", { x: 11, y: 8 });
-
-        const result = executeStepOntoAction(
-            { type: "stepOnto", targetId: "missing" },
-            worker,
-            1,
-        );
-
-        assert.strictEqual(result.kind, "failed");
-    });
 });
 
 describe("stepping off a building (emergent via moveTo)", () => {

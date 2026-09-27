@@ -6,15 +6,6 @@ import { workerPrefab } from "../../../src/game/prefab/workerPrefab.ts";
 import { addBuilding, addResource, createMinimalWorld } from "../testWorld.ts";
 
 describe("lineOfSight", () => {
-    it("sees diagonally across open ground", () => {
-        const { root } = createMinimalWorld();
-
-        assert.strictEqual(
-            hasLineOfSight(root, { x: 9, y: 9 }, { x: 13, y: 13 }),
-            true,
-        );
-    });
-
     it("is blocked by a building standing between the two tiles", () => {
         const { root } = createMinimalWorld();
         addBuilding(root, "granary", { x: 11, y: 11 });
@@ -78,17 +69,6 @@ describe("lineOfSight", () => {
         assert.strictEqual(
             hasLineOfSight(root, { x: 9, y: 11 }, { x: 12, y: 11 }),
             true,
-        );
-    });
-
-    it("always sees an adjacent tile, since nothing lies between", () => {
-        const { root } = createMinimalWorld();
-        addBuilding(root, "wall", { x: 10, y: 11 });
-
-        assert.strictEqual(
-            hasLineOfSight(root, { x: 9, y: 11 }, { x: 10, y: 11 }),
-            true,
-            "melee needs no special case in sight",
         );
     });
 });

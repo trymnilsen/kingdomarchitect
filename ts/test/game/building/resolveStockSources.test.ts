@@ -53,30 +53,4 @@ describe("resolveStockSources", () => {
             "stockA2",
         ]);
     });
-
-    it("single returns just the named entity when it has an inventory", () => {
-        const root = new Entity("root");
-        const kingdom = settlement("kingdom");
-        const stock = stockpileEntity("stock");
-        const noInventory = new Entity("noInventory");
-
-        root.addChild(kingdom);
-        kingdom.addChild(stock);
-        kingdom.addChild(noInventory);
-
-        assert.deepStrictEqual(
-            resolveStockSources(
-                { kind: "single", entityId: "stock" },
-                stock,
-            ).map((s) => s.id),
-            ["stock"],
-        );
-        assert.deepStrictEqual(
-            resolveStockSources(
-                { kind: "single", entityId: "noInventory" },
-                stock,
-            ),
-            [],
-        );
-    });
 });

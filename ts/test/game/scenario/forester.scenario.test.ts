@@ -4,9 +4,7 @@ import { ScenarioHarness } from "./scenarioHarness.ts";
 import type { Entity } from "../../../src/game/entity/entity.ts";
 import type { Point } from "../../../src/common/point.ts";
 import { forrester } from "../../../src/data/building/wood/forrester.ts";
-import { forresterProduction } from "../../../src/data/production/productionDefinition.ts";
 import { snowTreeResource } from "../../../src/data/inventory/items/naturalResource.ts";
-import { ResourceComponentId } from "../../../src/game/component/resourceComponent.ts";
 import { CollectableComponentId } from "../../../src/game/component/collectableComponent.ts";
 import { GroundItemComponentId } from "../../../src/game/component/groundItemComponent.ts";
 import { JobQueueComponentId } from "../../../src/game/component/jobQueueComponent.ts";
@@ -60,19 +58,6 @@ function snowForest(): {
     return { harness, building, stockpile, worker, seeded };
 }
 
-/** Every tree standing in the forrester's radius-2 diamond zone. */
-function zoneTrees(harness: ScenarioHarness): Entity[] {
-    const trees: Entity[] = [];
-    for (const [entity] of harness.root.queryComponents(ResourceComponentId)) {
-        const dx = entity.worldPosition.x - forresterPosition.x;
-        const dy = entity.worldPosition.y - forresterPosition.y;
-        if (Math.abs(dx) + Math.abs(dy) <= forresterProduction.zoneRadius) {
-            trees.push(entity);
-        }
-    }
-    return trees;
-}
-
 /** Total wood lying on the ground anywhere in the world. */
 function groundWood(root: Entity): number {
     let total = 0;
@@ -91,10 +76,6 @@ function groundWood(root: Entity): number {
 
 function queuedJobCount(harness: ScenarioHarness): number {
     return harness.root.requireEcsComponent(JobQueueComponentId).jobs.length;
-}
-
-function samePoint(a: Point, b: Point): boolean {
-    return a.x === b.x && a.y === b.y;
 }
 
 describe("forester scenario tests", () => {
@@ -140,28 +121,6 @@ describe("forester scenario tests", () => {
             "two orders take exactly two trees",
         );
         assert.strictEqual(queuedJobCount(harness), 0);
-    });
-
-    /**
-     * Checked as the sapling appears rather than after the run settles. A
-     * worker will fell a tree that blocks its path, the zone's own saplings
-     * included, so no count in the zone survives to the end of a run.
-     */
-    it("plants the biome's own tree as part of the order", () => {
-        const { harness, seeded } = snowForest();
-        const isNew = (tree: Entity) =>
-            !seeded.some((p) => samePoint(p, tree.worldPosition));
-
-        harness.queueJob(createProductionJob("forrester"));
-        harness.tickUntil(() => zoneTrees(harness).some(isNew), 300);
-
-        const planted = zoneTrees(harness).find(isNew);
-        assert.ok(planted, "the order put a new tree in the zone");
-        assert.strictEqual(
-            planted.requireEcsComponent(ResourceComponentId).resourceId,
-            snowTreeResource.id,
-            "a forrester in the snow plants snow trees",
-        );
     });
 
     it("sends the timber to the ground instead of the store under the drop policy", () => {

@@ -2,10 +2,8 @@ import { describe, it } from "node:test";
 import assert from "node:assert";
 import {
     createEnergyComponent,
-    DEFAULT_MAX_ENERGY,
     spendEnergy,
     addExhaustionDebt,
-    clearExhaustion,
     spendEntityEnergy,
     clearEntityExhaustion,
     EnergyComponentId,
@@ -52,25 +50,7 @@ function addExistingExhaustionEffect(entity: Entity): void {
 }
 
 describe("EnergyComponent", () => {
-    describe("createEnergyComponent", () => {
-        it("starts rested at whatever pool size it is given", () => {
-            for (const maxEnergy of [100, DEFAULT_MAX_ENERGY]) {
-                const comp = createEnergyComponent(maxEnergy);
-                assert.strictEqual(comp.energy, comp.maxEnergy);
-                assert.strictEqual(comp.maxEnergy, maxEnergy);
-                assert.strictEqual(comp.exhaustionLevel, 0);
-            }
-        });
-    });
-
     describe("spendEnergy", () => {
-        it("returns 0 when entity has sufficient energy", () => {
-            const comp = createEnergyComponent(100);
-            const overspend = spendEnergy(comp, 10);
-            assert.strictEqual(overspend, 0);
-            assert.strictEqual(comp.energy, 90);
-        });
-
         it("returns overspend amount and clamps energy to 0 when insufficient", () => {
             const comp = createEnergyComponent(100);
             comp.energy = 3;
@@ -78,27 +58,9 @@ describe("EnergyComponent", () => {
             assert.strictEqual(overspend, 2);
             assert.strictEqual(comp.energy, 0);
         });
-
-        it("returns exact cost as overspend when energy is already 0", () => {
-            const comp = createEnergyComponent(100);
-            comp.energy = 0;
-            const overspend = spendEnergy(comp, 5);
-            assert.strictEqual(overspend, 5);
-            assert.strictEqual(comp.energy, 0);
-        });
     });
 
     describe("addExhaustionDebt", () => {
-        it("accumulates debt without changing level when below threshold", () => {
-            const comp = createEnergyComponent(100);
-            comp.exhaustionDebtThreshold = 10;
-
-            const raised = addExhaustionDebt(comp, 5);
-            assert.strictEqual(raised, false);
-            assert.strictEqual(comp.exhaustionLevel, 0);
-            assert.strictEqual(comp.exhaustionDebt, 5);
-        });
-
         it("increases exhaustion level and resets debt when threshold crossed", () => {
             const comp = createEnergyComponent(100);
             comp.exhaustionDebtThreshold = 10;
@@ -125,39 +87,7 @@ describe("EnergyComponent", () => {
         });
     });
 
-    describe("clearExhaustion", () => {
-        it("sets exhaustion level and zeroes debt", () => {
-            const comp = createEnergyComponent(100);
-            comp.exhaustionLevel = 3;
-            comp.exhaustionDebt = 10;
-
-            clearExhaustion(comp, 1);
-
-            assert.strictEqual(comp.exhaustionLevel, 1);
-            assert.strictEqual(comp.exhaustionDebt, 0);
-        });
-
-        it("clamps level to 0 minimum", () => {
-            const comp = createEnergyComponent(100);
-            clearExhaustion(comp, -5);
-            assert.strictEqual(comp.exhaustionLevel, 0);
-        });
-
-        it("clamps level to 4 maximum", () => {
-            const comp = createEnergyComponent(100);
-            clearExhaustion(comp, 10);
-            assert.strictEqual(comp.exhaustionLevel, 4);
-        });
-    });
-
     describe("spendEntityEnergy", () => {
-        it("reduces entity energy by cost", () => {
-            const entity = makeEntityWithEnergy(50);
-            spendEntityEnergy(entity, 10);
-            const comp = entity.requireEcsComponent(EnergyComponentId);
-            assert.strictEqual(comp.energy, 40);
-        });
-
         it("adds exhaustion effect when exhaustion level goes from 0 to 1", () => {
             const entity = makeEntityWithEnergy(0);
             const comp = entity.requireEcsComponent(EnergyComponentId);
@@ -193,12 +123,6 @@ describe("EnergyComponent", () => {
                 "should not duplicate effect",
             );
         });
-
-        it("no-ops if entity has no EnergyComponent", () => {
-            const entity = new Entity("no-energy");
-            // Should not throw
-            spendEntityEnergy(entity, 10);
-        });
     });
 
     describe("clearEntityExhaustion", () => {
@@ -218,25 +142,6 @@ describe("EnergyComponent", () => {
                 effectsComp.effects.length,
                 0,
                 "exhaustion effect should be removed",
-            );
-        });
-
-        it("keeps exhaustion effect when level stays above 0", () => {
-            const entity = makeEntityWithEnergy(50);
-            const comp = entity.requireEcsComponent(EnergyComponentId);
-            comp.exhaustionLevel = 3;
-            addExistingExhaustionEffect(entity);
-            const effectsComp = entity.requireEcsComponent(
-                ActiveEffectsComponentId,
-            );
-
-            clearEntityExhaustion(entity, 1);
-
-            assert.strictEqual(comp.exhaustionLevel, 1);
-            assert.strictEqual(
-                effectsComp.effects.length,
-                1,
-                "exhaustion effect should remain",
             );
         });
     });

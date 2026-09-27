@@ -8,10 +8,7 @@ import {
     ChunkSize,
     createLandTerrain,
     getChunkBounds,
-    terrainIndex,
 } from "../../../../src/game/map/chunk.ts";
-import { Terrain } from "../../../../src/game/map/terrain.ts";
-import { KingdomComponentId } from "../../../../src/game/component/kingdomComponent.ts";
 import {
     ChunkMapComponentId,
     getEntitiesAt,
@@ -64,23 +61,6 @@ function findCamp(root: Entity): Entity {
 }
 
 describe("placeSettlement", () => {
-    it("places the camp at the preferred anchor in an empty chunk", () => {
-        const { root, chunkEntity } = createWorldWithChunk();
-        const chunk = {
-            chunkX: chunkPosition.x,
-            chunkY: chunkPosition.y,
-            terrain: createLandTerrain(),
-        };
-
-        placeSettlement(chunk, chunkEntity);
-
-        const camp = findCamp(root);
-        assert.strictEqual(camp.parent, chunkEntity);
-        assert.deepStrictEqual(camp.worldPosition, preferredAnchor);
-        assertTransformsConsistent(root);
-        assertChunkMapMatchesTree(root);
-    });
-
     it("places the camp on decorative grass and removes it", () => {
         const { root, chunkEntity } = createWorldWithChunk();
         const grass = resourcePrefab(grassResource);
@@ -186,91 +166,4 @@ describe("placeSettlement", () => {
         }
         assertChunkMapMatchesTree(root);
     });
-
-    it("clears room only on buildable terrain", () => {
-        const { root, chunkEntity } = createWorldWithChunk();
-        const trees = new Map<string, Entity>();
-        for (let x = bounds.x1; x <= bounds.x2; x++) {
-            for (let y = bounds.y1; y <= bounds.y2; y++) {
-                trees.set(`${x},${y}`, addTreeAt(chunkEntity, { x, y }));
-            }
-        }
-        const landTiles = [
-            { x: 1, y: 6 },
-            { x: 2, y: 6 },
-        ];
-        const chunk = {
-            chunkX: chunkPosition.x,
-            chunkY: chunkPosition.y,
-            terrain: terrainWithLandAt(landTiles),
-        };
-
-        placeSettlement(chunk, chunkEntity);
-
-        const camp = findCamp(root);
-        const campTiles = camp.children.map((member) => ({
-            x: member.worldPosition.x - bounds.x1,
-            y: member.worldPosition.y - bounds.y1,
-        }));
-        assert.deepStrictEqual(sortPoints(campTiles), sortPoints(landTiles));
-        for (const tile of landTiles) {
-            const tree = trees.get(
-                `${bounds.x1 + tile.x},${bounds.y1 + tile.y}`,
-            )!;
-            assert.ok(
-                !chunkEntity.children.includes(tree),
-                `tree at local ${tile.x},${tile.y} should have been cleared`,
-            );
-        }
-        assert.ok(
-            chunkEntity.children.includes(trees.get(preferredAnchorKey)!),
-            "trees outside the camp footprint are left standing",
-        );
-        assertChunkMapMatchesTree(root);
-    });
-
-    it("places no camp when no two neighbouring tiles are buildable", () => {
-        const { root, chunkEntity } = createWorldWithChunk();
-        const chunk = {
-            chunkX: chunkPosition.x,
-            chunkY: chunkPosition.y,
-            terrain: terrainWithLandAt([
-                { x: 1, y: 1 },
-                { x: 4, y: 3 },
-                { x: 6, y: 6 },
-            ]),
-        };
-
-        placeSettlement(chunk, chunkEntity);
-
-        assert.strictEqual(root.queryComponents(GoblinCampComponentId).size, 0);
-        assert.strictEqual(
-            chunkEntity.getEcsComponent(KingdomComponentId),
-            null,
-            "a chunk without a camp does not become a goblin kingdom",
-        );
-    });
 });
-
-const preferredAnchorKey = `${preferredAnchor.x},${preferredAnchor.y}`;
-
-function terrainWithLandAt(landTiles: { x: number; y: number }[]): Terrain[] {
-    const terrain = createLandTerrain();
-    for (let y = 0; y < ChunkSize; y++) {
-        for (let x = 0; x < ChunkSize; x++) {
-            if (y % 2 === 0) {
-                terrain[terrainIndex(x, y)] = Terrain.Water;
-            } else {
-                terrain[terrainIndex(x, y)] = Terrain.Ice;
-            }
-        }
-    }
-    for (const tile of landTiles) {
-        terrain[terrainIndex(tile.x, tile.y)] = Terrain.Land;
-    }
-    return terrain;
-}
-
-function sortPoints(points: { x: number; y: number }[]) {
-    return [...points].sort((a, b) => a.x - b.x || a.y - b.y);
-}

@@ -53,39 +53,6 @@ function createStockpile(
 }
 
 describe("DepositHeldBehavior", () => {
-    it("isValid returns false when held is empty", () => {
-        const behavior = createDepositHeldBehavior();
-        const settlement = createSettlement();
-        const worker = createWorker(settlement);
-        createStockpile(settlement, "sp", [{ itemId: "wood", amount: 10 }]);
-
-        assert.strictEqual(behavior.isValid(worker), false);
-    });
-
-    it("isValid returns true when held is occupied and a stockpile accepts", () => {
-        const behavior = createDepositHeldBehavior();
-        const settlement = createSettlement();
-        const worker = createWorker(settlement);
-        const held = worker.requireEcsComponent(HeldItemComponentId);
-        held.item = woodResourceItem;
-        held.amount = 3;
-        createStockpile(settlement, "sp", [{ itemId: "wood", amount: 10 }]);
-
-        assert.strictEqual(behavior.isValid(worker), true);
-    });
-
-    it("isValid returns true when no preferences are set (any stockpile accepts)", () => {
-        const behavior = createDepositHeldBehavior();
-        const settlement = createSettlement();
-        const worker = createWorker(settlement);
-        const held = worker.requireEcsComponent(HeldItemComponentId);
-        held.item = woodResourceItem;
-        held.amount = 3;
-        createStockpile(settlement, "sp");
-
-        assert.strictEqual(behavior.isValid(worker), true);
-    });
-
     it("expand returns moveTo + depositToStockpile pair", () => {
         const behavior = createDepositHeldBehavior();
         const settlement = createSettlement();

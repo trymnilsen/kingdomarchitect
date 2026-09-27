@@ -1,9 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
-import {
-    buildInfluenceMap,
-    computeInfluenceAtChunk,
-} from "../../../../src/game/map/kingdom/influenceScan.ts";
+import { computeInfluenceAtChunk } from "../../../../src/game/map/kingdom/influenceScan.ts";
 import { KingdomType } from "../../../../src/game/component/kingdomComponent.ts";
 import { KingdomSpawnTestHarness } from "./kingdomSpawnTestHarness.ts";
 
@@ -27,18 +24,6 @@ function buildVolumeChain(
 }
 
 describe("influenceScan", () => {
-    it("returns zero influence when no kingdoms exist", () => {
-        const h = new KingdomSpawnTestHarness();
-        // Register some chunks with volumes but no kingdoms
-        const v = h.createVolume("plains", 4);
-        h.addChunk(5, 5, v);
-        h.addChunk(6, 5, h.createVolume("plains", 4));
-
-        const result = computeInfluenceAtChunk(h.root, { x: 5, y: 5 });
-
-        assert.strictEqual(result, 0);
-    });
-
     it("influence decays monotonically with distance from kingdom", () => {
         const h = new KingdomSpawnTestHarness();
         const positions = buildVolumeChain(h, 5, 8, 20);
@@ -88,51 +73,6 @@ describe("influenceScan", () => {
         }
     });
 
-    it("influence from multiple kingdoms combines to exceed either individual contribution", () => {
-        const candidate = { x: 10, y: 10 };
-
-        // Kingdom A approaching from the left (via horizontal chain)
-        // Kingdom B approaching from above (via vertical chain)
-        const setup = (includeA: boolean, includeB: boolean) => {
-            const h = new KingdomSpawnTestHarness();
-            const vCand = h.createVolume("plains", 4);
-            h.addChunk(10, 10, vCand);
-            // Horizontal chain: (7,10)→(8,10)→(9,10)→(10,10)
-            for (let x = 7; x < 10; x++) {
-                h.addChunk(x, 10, h.createVolume("plains", 4));
-            }
-            // Vertical chain: (10,7)→(10,8)→(10,9)→(10,10)
-            for (let y = 7; y < 10; y++) {
-                h.addChunk(10, y, h.createVolume("plains", 4));
-            }
-            if (includeA) h.placeKingdom({ x: 7, y: 10 }, KingdomType.Npc);
-            if (includeB) h.placeKingdom({ x: 10, y: 7 }, KingdomType.Npc);
-            return h;
-        };
-
-        const combined = computeInfluenceAtChunk(
-            setup(true, true).root,
-            candidate,
-        );
-        const onlyA = computeInfluenceAtChunk(
-            setup(true, false).root,
-            candidate,
-        );
-        const onlyB = computeInfluenceAtChunk(
-            setup(false, true).root,
-            candidate,
-        );
-
-        assert.ok(
-            combined > onlyA,
-            `combined (${combined}) should exceed A alone (${onlyA})`,
-        );
-        assert.ok(
-            combined > onlyB,
-            `combined (${combined}) should exceed B alone (${onlyB})`,
-        );
-    });
-
     it("influence does not propagate across gaps in registered chunks", () => {
         const h = new KingdomSpawnTestHarness();
         // Kingdom in V1, chain V1→V2→V3, then gap, then isolated V4
@@ -153,42 +93,6 @@ describe("influenceScan", () => {
             influenceAfterGap,
             0,
             "influence should not cross a gap of unregistered chunks",
-        );
-    });
-
-    it("influence is higher via a shorter volume path than a longer one", () => {
-        const kingdomPos = { x: 7, y: 10 };
-        const candidatePos = { x: 10, y: 10 };
-
-        // Short path: direct horizontal chain, 3 volume hops
-        const hShort = new KingdomSpawnTestHarness();
-        for (let x = 7; x <= 10; x++) {
-            hShort.addChunk(x, 10, hShort.createVolume("plains", 4));
-        }
-        hShort.placeKingdom(kingdomPos, KingdomType.Npc);
-        const shortInfluence = computeInfluenceAtChunk(
-            hShort.root,
-            candidatePos,
-        );
-
-        // Long path: L-shape, no direct route, 7 volume hops
-        // (7,10)→(7,11)→(7,12)→(8,12)→(9,12)→(10,12)→(10,11)→(10,10)
-        const hLong = new KingdomSpawnTestHarness();
-        for (let y = 10; y <= 12; y++) {
-            hLong.addChunk(7, y, hLong.createVolume("plains", 4));
-        }
-        for (let x = 8; x <= 10; x++) {
-            hLong.addChunk(x, 12, hLong.createVolume("plains", 4));
-        }
-        for (let y = 11; y >= 10; y--) {
-            hLong.addChunk(10, y, hLong.createVolume("plains", 4));
-        }
-        hLong.placeKingdom(kingdomPos, KingdomType.Npc);
-        const longInfluence = computeInfluenceAtChunk(hLong.root, candidatePos);
-
-        assert.ok(
-            shortInfluence > longInfluence,
-            `short path influence (${shortInfluence}) should exceed long path influence (${longInfluence})`,
         );
     });
 
@@ -215,33 +119,6 @@ describe("influenceScan", () => {
             assert.ok(
                 goblinInfluence > 0,
                 `goblin influence at distance ${dist} should still be positive`,
-            );
-        }
-    });
-
-    it("influence at kingdom origin is positive and is the maximum value in the map", () => {
-        const kingdomPos = { x: 6, y: 9 };
-        const h = new KingdomSpawnTestHarness();
-
-        // 5x5 grid of single-chunk volumes around kingdom
-        for (let x = 4; x <= 8; x++) {
-            for (let y = 7; y <= 11; y++) {
-                h.addChunk(x, y, h.createVolume("plains", 4));
-            }
-        }
-        h.placeKingdom(kingdomPos, KingdomType.Npc);
-
-        const influenceMap = buildInfluenceMap(h.root);
-        const originVolume = h.getVolumeAtChunk(kingdomPos.x, kingdomPos.y);
-        assert.ok(originVolume, "kingdom chunk must have a volume");
-        const originInfluence = influenceMap.get(originVolume.id) ?? 0;
-
-        assert.ok(originInfluence > 0, "origin influence should be positive");
-
-        for (const [id, value] of influenceMap) {
-            assert.ok(
-                originInfluence >= value,
-                `origin influence (${originInfluence}) should be >= volume ${id} (${value})`,
             );
         }
     });

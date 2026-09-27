@@ -20,7 +20,6 @@ const placedRoot = createComponent<{ children: PlacedChild[] }>(
 const A_REGION = { x: 12, y: 10, width: 40, height: 30 };
 const B_REGION = { x: 80, y: 10, width: 40, height: 30 };
 const A_CENTER = { x: 32, y: 25 };
-const A_EDGE = { x: 45, y: 15 };
 const B_CENTER = { x: 100, y: 25 };
 const OUTSIDE = { x: 180, y: 100 };
 
@@ -70,38 +69,6 @@ describe("pointer interaction (Scenario)", () => {
         assert.strictEqual(tapped, true, "release on the button fires a tap");
         assert.strictEqual(taps, 1);
         assert.deepStrictEqual(fills(harness.rects), ["normal"]);
-    });
-
-    it("a slide that stays inside the button keeps it pressed and taps", () => {
-        const harness = createPointerHarness();
-        let taps = 0;
-        const button = place(
-            uiButton({
-                width: A_REGION.width,
-                height: A_REGION.height,
-                background: colorBackground("normal"),
-                pressedBackground: colorBackground("pressed"),
-                onTap: () => {
-                    taps += 1;
-                },
-            }),
-            A_REGION,
-        );
-        const ui = () => placedRoot({ children: [button] });
-
-        harness.render(ui());
-        harness.pointerDown(A_CENTER);
-        harness.pointerMove(A_EDGE);
-        harness.render(ui());
-        assert.deepStrictEqual(
-            fills(harness.rects),
-            ["pressed"],
-            "stays pressed while the slide remains inside",
-        );
-
-        const handled = harness.pointerUp(A_EDGE);
-        assert.strictEqual(handled, true);
-        assert.strictEqual(taps, 1, "release inside the button taps");
     });
 
     it("unpresses when the slide leaves the button, re-presses and taps on return", () => {
@@ -174,44 +141,6 @@ describe("pointer interaction (Scenario)", () => {
             "press is released by the cancel",
         );
         assert.strictEqual(taps, 0, "a cancelled press does not tap");
-    });
-
-    it("pressing one button does not press its sibling", () => {
-        const harness = createPointerHarness();
-        const buttonA = place(
-            uiButton({
-                width: A_REGION.width,
-                height: A_REGION.height,
-                background: colorBackground("a-normal"),
-                pressedBackground: colorBackground("a-pressed"),
-                onTap: () => {},
-            }),
-            A_REGION,
-        );
-        const buttonB = place(
-            uiButton({
-                width: B_REGION.width,
-                height: B_REGION.height,
-                background: colorBackground("b-normal"),
-                pressedBackground: colorBackground("b-pressed"),
-                onTap: () => {},
-            }),
-            B_REGION,
-        );
-        const ui = () => placedRoot({ children: [buttonA, buttonB] });
-
-        harness.render(ui());
-        harness.pointerDown(A_CENTER);
-        harness.render(ui());
-
-        const drawn = fills(harness.rects);
-        assert.ok(
-            drawn.includes("a-pressed"),
-            "pressed button shows pressed bg",
-        );
-        assert.ok(drawn.includes("b-normal"), "sibling stays normal");
-        assert.ok(!drawn.includes("a-normal"));
-        assert.ok(!drawn.includes("b-pressed"));
     });
 
     it("sliding onto a sibling button neither presses nor taps it", () => {

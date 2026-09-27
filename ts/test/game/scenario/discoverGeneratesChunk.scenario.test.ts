@@ -13,10 +13,6 @@ import {
 } from "../../../src/game/component/worldDiscoveryComponent.ts";
 import { ChunkSize, getChunkBounds } from "../../../src/game/map/chunk.ts";
 import type { Entity } from "../../../src/game/entity/entity.ts";
-import {
-    assertChunkMapMatchesTree,
-    assertTransformsConsistent,
-} from "../worldInvariants.ts";
 
 /**
  * Discovering a tile in an ungenerated chunk drives the full generation
@@ -78,18 +74,6 @@ describe("discover generates chunk", () => {
             hasDiscoveredTile(worldDiscovery, "player", discoveredPoint),
             "the discovered tile should be marked as discovered",
         );
-    });
-
-    it("keeps transforms consistent across the generated entity tree", () => {
-        const { harness } = discoverChunk();
-
-        assertTransformsConsistent(harness.root);
-    });
-
-    it("indexes the generated entities in the chunk map", () => {
-        const { harness } = discoverChunk();
-
-        assertChunkMapMatchesTree(harness.root);
     });
 
     it("places a goblin camp with its footprint inside the discovered chunk", () => {

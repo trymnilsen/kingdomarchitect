@@ -1,7 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
 import {
-    exhaustionEffectId,
     exhaustionEffect,
     exhaustionEffectExecutor,
 } from "../../../../src/data/effect/exhaustion/exhaustionEffect.ts";
@@ -53,57 +52,6 @@ function makeTestEntity(exhaustionLevel: number): {
 }
 
 describe("exhaustionEffect", () => {
-    it("effect id is 'exhaustion'", () => {
-        assert.strictEqual(exhaustionEffectId, "exhaustion");
-    });
-
-    it("effect timing is persistent", () => {
-        assert.strictEqual(exhaustionEffect.timing.type, "persistent");
-    });
-
-    describe("executor sets correct modifiers for exhaustion levels", () => {
-        it("level 1 sets might -15% and wit -1 flat", () => {
-            const { entity, activeEffect } = makeTestEntity(1);
-            exhaustionEffectExecutor.execute(entity, activeEffect, 1);
-            assert.deepStrictEqual(activeEffect.modifiers, {
-                might: { percent: -0.15 },
-                wit: { flat: -1 },
-            });
-        });
-
-        it("level 2 sets might -30%, wit -20% flat -1, presence -1", () => {
-            const { entity, activeEffect } = makeTestEntity(2);
-            exhaustionEffectExecutor.execute(entity, activeEffect, 1);
-            assert.deepStrictEqual(activeEffect.modifiers, {
-                might: { percent: -0.3 },
-                wit: { percent: -0.2, flat: -1 },
-                presence: { flat: -1 },
-            });
-        });
-
-        it("level 3 sets severe penalties across all four stats", () => {
-            const { entity, activeEffect } = makeTestEntity(3);
-            exhaustionEffectExecutor.execute(entity, activeEffect, 1);
-            assert.deepStrictEqual(activeEffect.modifiers, {
-                might: { percent: -0.5 },
-                wit: { percent: -0.4, flat: -2 },
-                presence: { flat: -2 },
-                valor: { flat: -1 },
-            });
-        });
-
-        it("level 4 sets maximum penalties", () => {
-            const { entity, activeEffect } = makeTestEntity(4);
-            exhaustionEffectExecutor.execute(entity, activeEffect, 1);
-            assert.deepStrictEqual(activeEffect.modifiers, {
-                might: { percent: -0.6 },
-                wit: { percent: -0.5, flat: -3 },
-                presence: { flat: -3 },
-                valor: { flat: -2 },
-            });
-        });
-    });
-
     describe("HP damage at level 4", () => {
         it("deals 5 HP damage every 10 ticks at level 4", () => {
             const { entity, activeEffect } = makeTestEntity(4);

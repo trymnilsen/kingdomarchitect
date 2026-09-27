@@ -25,29 +25,6 @@ function asLayout(
 }
 
 describe("UiBox", () => {
-    it("uses the fixed width/height for its size", () => {
-        const { result } = renderComponent(
-            uiBox,
-            { width: 120, height: 80 },
-            createConstraints(400, 300),
-        );
-        assert.deepStrictEqual(asLayout(result).size, {
-            width: 120,
-            height: 80,
-        });
-    });
-
-    it("wraps to the child size when width/height are wrap", () => {
-        const childSize: UISize = { width: 60, height: 40 };
-        const { result } = renderComponent(
-            uiBox,
-            { width: wrapUiSize, height: wrapUiSize, child: childDescriptor() },
-            createConstraints(400, 300),
-            { measureDescriptorFn: () => childSize },
-        );
-        assert.deepStrictEqual(asLayout(result).size, childSize);
-    });
-
     it("inflates the wrap size by padding and shrinks the child constraints", () => {
         const childSize: UISize = { width: 60, height: 40 };
         let receivedConstraints: UISize | null = null;

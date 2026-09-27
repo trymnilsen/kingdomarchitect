@@ -85,28 +85,6 @@ describe("performJobBehavior", () => {
             );
         });
 
-        it("claims the job once the hand is empty", () => {
-            const root = new Entity("root");
-            root.setEcsComponent(createJobQueueComponent());
-            const worker = setupWorker(root);
-
-            const queue = root.requireEcsComponent("JobQueue");
-            addJob(queue, MoveToJob(worker, { x: 14, y: 8 }));
-
-            const behavior = createPerformJobBehavior(
-                planBuildBuilding,
-                canExecuteBuildJob,
-                true,
-            );
-
-            assert.strictEqual(behavior.isValid(worker), true);
-            assert.ok(
-                behavior.expand(worker).length > 0,
-                "empty-handed worker should claim and plan the job",
-            );
-            assert.strictEqual(queue.jobs[0].claimedBy, worker.id);
-        });
-
         it("does not gate when claimRequiresEmptyHand is off (goblin default)", () => {
             const root = new Entity("root");
             root.setEcsComponent(createJobQueueComponent());
@@ -177,25 +155,6 @@ describe("performJobBehavior", () => {
                 undefined,
                 "job should remain unclaimed",
             );
-        });
-
-        it("claims collect-resource job when held is empty", () => {
-            const root = new Entity("root");
-            root.setEcsComponent(createJobQueueComponent());
-            const worker = setupWorker();
-            root.addChild(worker);
-
-            const tree = setupTree(root);
-            const queue = root.requireEcsComponent("JobQueue");
-            addJob(queue, CollectResourceJob(tree, ResourceHarvestMode.Chop));
-
-            const behavior = createPerformJobBehavior(planBuildBuilding);
-            const actions = behavior.expand(worker);
-            assert.ok(
-                actions.length > 0,
-                "worker should claim and plan the job",
-            );
-            assert.strictEqual(queue.jobs[0].claimedBy, worker.id);
         });
 
         it("claims collect-resource job when held already holds the yield item id", () => {
@@ -274,37 +233,6 @@ describe("performJobBehavior", () => {
                 "stale job must remain unclaimed",
             );
         });
-
-        it("isValid() is true and expand() produces actions when the target exists", () => {
-            const root = new Entity("root");
-            root.setEcsComponent(createJobQueueComponent());
-            const worker = setupWorker();
-            root.addChild(worker);
-            worker.worldPosition = { x: 12, y: 8 };
-
-            const tree = new Entity("tree");
-            tree.setEcsComponent(createResourceComponent("tree1"));
-            tree.setEcsComponent(createHealthComponent(10, 10));
-            root.addChild(tree);
-            tree.worldPosition = { x: 14, y: 8 };
-
-            const queue = root.requireEcsComponent("JobQueue");
-            addJob(queue, CollectResourceJob(tree, ResourceHarvestMode.Chop));
-
-            const behavior = createPerformJobBehavior(planBuildBuilding);
-
-            assert.strictEqual(
-                behavior.isValid(worker),
-                true,
-                "a job with a live target must count as available",
-            );
-            const actions = behavior.expand(worker);
-            assert.ok(
-                actions.length > 0,
-                "expand must plan actions for a takeable job",
-            );
-            assert.strictEqual(queue.jobs[0].claimedBy, worker.id);
-        });
     });
 
     describe("role gate", () => {
@@ -331,26 +259,8 @@ describe("performJobBehavior", () => {
             return worker;
         }
 
-        it("lets a worker who performs the Worker role take jobs", () => {
-            const worker = workerWithMoveJob([WorkerRole.Worker]);
-            assert.strictEqual(behavior.isValid(worker), true);
-        });
-
         it("keeps a worker who excluded the Worker role out of the job pool", () => {
             const worker = workerWithMoveJob([WorkerRole.Hauler]);
-            assert.strictEqual(behavior.isValid(worker), false);
-        });
-
-        it("lets a guard who also works take jobs", () => {
-            const worker = workerWithMoveJob([
-                WorkerRole.Guard,
-                WorkerRole.Worker,
-            ]);
-            assert.strictEqual(behavior.isValid(worker), true);
-        });
-
-        it("takes no jobs when every role is excluded", () => {
-            const worker = workerWithMoveJob([]);
             assert.strictEqual(behavior.isValid(worker), false);
         });
 

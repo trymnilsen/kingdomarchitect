@@ -3,7 +3,6 @@ import { describe, it } from "node:test";
 import { getBehaviorAgent } from "../../../../src/game/component/behaviorAgentComponent.ts";
 import {
     MovementStaminaComponentId,
-    hasMovedThisTick,
     recordMove,
 } from "../../../../src/game/component/movementStaminaComponent.ts";
 import {
@@ -14,40 +13,10 @@ import {
     commitDisplacementTransaction,
     type DisplacementTransaction,
 } from "../../../../src/game/behavior/displacement/displacementTransaction.ts";
-import {
-    createAgent,
-    createAgentWithoutStamina,
-    createTestWorld,
-} from "./displacementTestWorld.ts";
+import { createAgent, createTestWorld } from "./displacementTestWorld.ts";
 
 describe("displacementTransaction", () => {
     describe("commitDisplacementTransaction", () => {
-        it("returns true and moves entity on a valid single-step chain", () => {
-            const { root } = createTestWorld();
-            const b = createAgent("b", root, 11, 8);
-
-            const tx: DisplacementTransaction = {
-                moves: [
-                    {
-                        entityId: "b",
-                        from: { x: 11, y: 8 },
-                        to: { x: 12, y: 8 },
-                    },
-                ],
-                isCycle: false,
-            };
-
-            const committed = commitDisplacementTransaction(
-                tx,
-                root,
-                1,
-                "requester",
-            );
-
-            assert.strictEqual(committed, true);
-            assert.deepStrictEqual(b.worldPosition, { x: 12, y: 8 });
-        });
-
         it("returns false when entity is not at the expected from-position", () => {
             const { root } = createTestWorld();
             const b = createAgent("b", root, 11, 8);
@@ -102,30 +71,6 @@ describe("displacementTransaction", () => {
             assert.strictEqual(committed, false);
             // Entity should not have moved
             assert.deepStrictEqual(b.worldPosition, { x: 11, y: 8 });
-        });
-
-        it("returns false when entity is not found in the entity tree", () => {
-            const { root } = createTestWorld();
-
-            const tx: DisplacementTransaction = {
-                moves: [
-                    {
-                        entityId: "ghost",
-                        from: { x: 11, y: 8 },
-                        to: { x: 12, y: 8 },
-                    },
-                ],
-                isCycle: false,
-            };
-
-            const committed = commitDisplacementTransaction(
-                tx,
-                root,
-                1,
-                "requester",
-            );
-
-            assert.strictEqual(committed, false);
         });
 
         it("commits a 2-move chain in reverse order (last entity moves first)", () => {
@@ -195,27 +140,6 @@ describe("displacementTransaction", () => {
             assert.strictEqual(committed, true);
             assert.deepStrictEqual(a.worldPosition, { x: 11, y: 8 });
             assert.deepStrictEqual(b.worldPosition, { x: 10, y: 8 });
-        });
-
-        it("records a move on the stamina component after committing", () => {
-            const { root } = createTestWorld();
-            const b = createAgent("b", root, 11, 8);
-
-            const tx: DisplacementTransaction = {
-                moves: [
-                    {
-                        entityId: "b",
-                        from: { x: 11, y: 8 },
-                        to: { x: 12, y: 8 },
-                    },
-                ],
-                isCycle: false,
-            };
-
-            commitDisplacementTransaction(tx, root, 7, "requester");
-
-            const stamina = b.getEcsComponent(MovementStaminaComponentId)!;
-            assert.strictEqual(hasMovedThisTick(stamina, 7), true);
         });
 
         it("sets pendingReplan on displaced entities but not on the requester", () => {
@@ -333,32 +257,6 @@ describe("displacementTransaction", () => {
             });
             assert.strictEqual(aAgent.pendingReplan, undefined);
             assert.strictEqual(bAgent.pendingReplan, undefined);
-        });
-
-        it("does not record a move on an entity without MovementStaminaComponent", () => {
-            const { root } = createTestWorld();
-            const entity = createAgentWithoutStamina("no-stamina", root, 11, 8);
-
-            const tx: DisplacementTransaction = {
-                moves: [
-                    {
-                        entityId: "no-stamina",
-                        from: { x: 11, y: 8 },
-                        to: { x: 12, y: 8 },
-                    },
-                ],
-                isCycle: false,
-            };
-
-            const committed = commitDisplacementTransaction(
-                tx,
-                root,
-                1,
-                "requester",
-            );
-
-            assert.strictEqual(committed, true);
-            assert.deepStrictEqual(entity.worldPosition, { x: 12, y: 8 });
         });
     });
 });

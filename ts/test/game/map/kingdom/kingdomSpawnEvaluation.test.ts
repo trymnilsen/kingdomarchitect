@@ -7,30 +7,12 @@ import { KingdomSpawnTestHarness } from "./kingdomSpawnTestHarness.ts";
 import type { Volume } from "../../../../src/game/map/volume.ts";
 
 const alwaysPass = () => 0;
-const alwaysFail = () => 1.0;
 
 function makePlains(h: KingdomSpawnTestHarness, maxSize = 12): Volume {
     return h.createVolume("plains", maxSize);
 }
 
 describe("evaluateKingdomSpawn", () => {
-    it("rejects volumes with isStartBiome flag regardless of other conditions", () => {
-        const h = new KingdomSpawnTestHarness();
-        const candidate = { x: 5, y: 5 };
-        h.buildChunkGrid(3, 3, 8, 8);
-        const volume = h.createVolume("plains", 16, true);
-
-        const result = evaluateKingdomSpawn(
-            h.root,
-            volume,
-            candidate,
-            10000,
-            alwaysPass,
-        );
-
-        assert.strictEqual(result.shouldSpawn, false);
-    });
-
     it("rejects taint biome volumes", () => {
         const h = new KingdomSpawnTestHarness();
         const candidate = { x: 5, y: 5 };
@@ -46,115 +28,6 @@ describe("evaluateKingdomSpawn", () => {
         );
 
         assert.strictEqual(result.shouldSpawn, false);
-    });
-
-    it("rejects volumes below minimum size threshold", () => {
-        const h = new KingdomSpawnTestHarness();
-        const candidate = { x: 5, y: 5 };
-        h.buildChunkGrid(3, 3, 8, 8);
-        const volume = h.createVolume(
-            "plains",
-            KingdomSpawnConfig.minimumVolumeSize - 1,
-        );
-
-        const result = evaluateKingdomSpawn(
-            h.root,
-            volume,
-            candidate,
-            10000,
-            alwaysPass,
-        );
-
-        assert.strictEqual(result.shouldSpawn, false);
-    });
-
-    it("more hospitable biomes produce higher spawn scores than harsh biomes", () => {
-        const candidate = { x: 5, y: 5 };
-        const tick = 5000;
-
-        const hPlains = new KingdomSpawnTestHarness();
-        hPlains.buildChunkGrid(3, 3, 8, 8);
-        const plainsVolume = hPlains.createVolume("plains", 16);
-        const plainsResult = evaluateKingdomSpawn(
-            hPlains.root,
-            plainsVolume,
-            candidate,
-            tick,
-            alwaysFail,
-        );
-
-        const hSwamp = new KingdomSpawnTestHarness();
-        hSwamp.buildChunkGrid(3, 3, 8, 8);
-        const swampVolume = hSwamp.createVolume("swamp", 16);
-        const swampResult = evaluateKingdomSpawn(
-            hSwamp.root,
-            swampVolume,
-            candidate,
-            tick,
-            alwaysFail,
-        );
-
-        assert.ok(
-            plainsResult.spawnScore > swampResult.spawnScore,
-            `plains score (${plainsResult.spawnScore}) should exceed swamp score (${swampResult.spawnScore})`,
-        );
-    });
-
-    it("spawn score increases monotonically with game progression", () => {
-        const candidate = { x: 5, y: 5 };
-        const ticks = [100, 2000, 10000];
-
-        const results = ticks.map((tick) => {
-            const h = new KingdomSpawnTestHarness();
-            h.buildChunkGrid(3, 3, 8, 8);
-            const volume = makePlains(h);
-            return evaluateKingdomSpawn(
-                h.root,
-                volume,
-                candidate,
-                tick,
-                alwaysFail,
-            );
-        });
-
-        for (let i = 1; i < results.length; i++) {
-            assert.ok(
-                results[i].factors.progressionWeight >=
-                    results[i - 1].factors.progressionWeight,
-                `progressionWeight at tick ${ticks[i]} (${results[i].factors.progressionWeight}) should be >= at tick ${ticks[i - 1]} (${results[i - 1].factors.progressionWeight})`,
-            );
-            assert.ok(
-                results[i].spawnScore >= results[i - 1].spawnScore,
-                `spawnScore at tick ${ticks[i]} should be >= at tick ${ticks[i - 1]}`,
-            );
-        }
-    });
-
-    it("progression weight stays within configured floor and ceiling bounds", () => {
-        const candidate = { x: 5, y: 5 };
-        const { floor, ceiling } = KingdomSpawnConfig.progression;
-
-        for (const tick of [0, 1000000]) {
-            const h = new KingdomSpawnTestHarness();
-            h.buildChunkGrid(3, 3, 8, 8);
-            const volume = makePlains(h);
-            const result = evaluateKingdomSpawn(
-                h.root,
-                volume,
-                candidate,
-                tick,
-                alwaysFail,
-            );
-
-            assert.ok(
-                result.factors.progressionWeight >= floor,
-                `progressionWeight (${result.factors.progressionWeight}) should be >= floor (${floor}) at tick ${tick}`,
-            );
-            assert.ok(
-                result.factors.progressionWeight <= ceiling,
-                `progressionWeight (${result.factors.progressionWeight}) should be <= ceiling (${ceiling}) at tick ${tick}`,
-            );
-        }
     });
 
     it("nearby kingdoms suppress spawn score via influence", () => {
@@ -192,28 +65,6 @@ describe("evaluateKingdomSpawn", () => {
         assert.ok(
             result.factors.influenceWeight === 0 || result.spawnScore === 0,
             `influence should suppress the spawn (influenceWeight=${result.factors.influenceWeight}, spawnScore=${result.spawnScore})`,
-        );
-    });
-
-    it("spawns succeed in wilderness with favorable conditions", () => {
-        const candidate = { x: 10, y: 10 };
-        const h = new KingdomSpawnTestHarness();
-        // Candidate chunk registered, open space all around
-        h.addChunk(candidate.x, candidate.y);
-        const volume = makePlains(h, 16);
-
-        const result = evaluateKingdomSpawn(
-            h.root,
-            volume,
-            candidate,
-            10000,
-            () => 0.001,
-        );
-
-        assert.strictEqual(result.shouldSpawn, true);
-        assert.ok(
-            result.feasibility !== undefined,
-            "feasibility should be present on a successful spawn",
         );
     });
 

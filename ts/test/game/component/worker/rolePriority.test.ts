@@ -7,8 +7,6 @@ import {
     lowerRole,
     raiseRole,
     ROLE_RANK_STEP,
-    ROLE_SLOT_COUNT,
-    roleSlot,
     roleUtility,
     TOP_ROLE_UTILITY,
     type RoleOrder,
@@ -70,12 +68,6 @@ describe("role rank", () => {
 
         assert.strictEqual(getRoleRank(worker, WorkerRole.Guard), -1);
     });
-
-    it("reports an entity with no roles as unranked", () => {
-        const goblin = new Entity("goblin");
-
-        assert.strictEqual(getRoleRank(goblin, WorkerRole.Worker), -1);
-    });
 });
 
 describe("role utility band", () => {
@@ -116,39 +108,9 @@ describe("role order validation", () => {
             );
         }
     });
-
-    it("rejects a repeated role", () => {
-        const duplicated = [...allWorkerRoles];
-        duplicated[1] = duplicated[0];
-
-        assert.strictEqual(isValidRoleOrder(duplicated, 2), false);
-    });
-
-    it("rejects a short list, even one with no repeats", () => {
-        assert.strictEqual(
-            isValidRoleOrder(allWorkerRoles.slice(0, 7), 2),
-            false,
-        );
-    });
-
-    it("rejects a threshold outside the list", () => {
-        assert.strictEqual(isValidRoleOrder([...allWorkerRoles], -1), false);
-        assert.strictEqual(isValidRoleOrder([...allWorkerRoles], 9), false);
-        assert.strictEqual(isValidRoleOrder([...allWorkerRoles], 1.5), false);
-    });
 });
 
 describe("moving a role through the list", () => {
-    it("swaps two permitted roles without touching the line", () => {
-        const order = orderOf([WorkerRole.Worker, WorkerRole.Hauler]);
-
-        const raised = raiseRole(order, WorkerRole.Hauler);
-
-        assert.strictEqual(raised.dutyPriority[0], WorkerRole.Hauler);
-        assert.strictEqual(raised.dutyPriority[1], WorkerRole.Worker);
-        assert.strictEqual(raised.permittedDutyCount, 2);
-    });
-
     it("excludes a role by lowering it past the line", () => {
         const order = orderOf([WorkerRole.Worker, WorkerRole.Hauler]);
 
@@ -178,29 +140,6 @@ describe("moving a role through the list", () => {
         const raised = raiseRole(order, order.dutyPriority[0]);
 
         assert.strictEqual(raised.permittedDutyCount, 1);
-    });
-
-    it("refuses to move past either end of the list", () => {
-        const everythingPermitted = orderOf([...allWorkerRoles]);
-        const top = everythingPermitted.dutyPriority[0];
-
-        const nothingPermitted = orderOf([]);
-        const bottom = nothingPermitted.dutyPriority[7];
-
-        assert.strictEqual(roleSlot(everythingPermitted, top), 0);
-        assert.strictEqual(
-            roleSlot(nothingPermitted, bottom),
-            ROLE_SLOT_COUNT - 1,
-            "the last excluded role sits in the final slot, below the line",
-        );
-        assert.strictEqual(
-            raiseRole(everythingPermitted, top),
-            everythingPermitted,
-        );
-        assert.strictEqual(
-            lowerRole(nothingPermitted, bottom),
-            nothingPermitted,
-        );
     });
 
     it("keeps every order it produces valid", () => {

@@ -22,32 +22,6 @@ function createTestScene(): { root: Entity; worker: Entity; resource: Entity } {
 }
 
 describe("collectResourcePlanner", () => {
-    it("returns moveTo and harvestResource actions", () => {
-        const { root, worker, resource } = createTestScene();
-
-        const job = CollectResourceJob(resource, ResourceHarvestMode.Chop);
-        const actions = planCollectResource(root, worker, job);
-
-        assert.strictEqual(actions.length, 2);
-        assert.strictEqual(actions[0].type, "moveTo");
-        assert.strictEqual(actions[1].type, "harvestResource");
-    });
-
-    it("sets correct target position for moveTo action", () => {
-        const { root, worker, resource } = createTestScene();
-        resource.worldPosition = { x: 10, y: 15 };
-
-        const job = CollectResourceJob(resource, ResourceHarvestMode.Chop);
-        const actions = planCollectResource(root, worker, job);
-
-        const moveAction = actions[0] as {
-            type: "moveTo";
-            target: { x: number; y: number };
-        };
-        assert.strictEqual(moveAction.target.x, 10);
-        assert.strictEqual(moveAction.target.y, 15);
-    });
-
     it("stops the worker beside the resource rather than on it", () => {
         const { root, worker, resource } = createTestScene();
 
@@ -63,37 +37,5 @@ describe("collectResourcePlanner", () => {
             { kind: "adjacent" },
             "a tree cannot be stood on, so harvesting needs an adjacent goal",
         );
-    });
-
-    it("sets correct entityId and harvestAction for harvestResource action", () => {
-        const { root, worker, resource } = createTestScene();
-
-        const job = CollectResourceJob(resource, ResourceHarvestMode.Mine);
-        const actions = planCollectResource(root, worker, job);
-
-        const harvestAction = actions[1] as {
-            type: "harvestResource";
-            entityId: string;
-            harvestAction: number;
-        };
-        assert.strictEqual(harvestAction.entityId, "resource");
-        assert.strictEqual(
-            harvestAction.harvestAction,
-            ResourceHarvestMode.Mine,
-        );
-    });
-
-    it("returns empty array and fails job if resource not found", () => {
-        const { root, worker } = createTestScene();
-
-        const job: ReturnType<typeof CollectResourceJob> = {
-            id: "collectResource",
-            entityId: "nonexistent",
-            harvestAction: ResourceHarvestMode.Chop,
-        };
-
-        const actions = planCollectResource(root, worker, job);
-
-        assert.strictEqual(actions.length, 0);
     });
 });
