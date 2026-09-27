@@ -1,4 +1,3 @@
-import { isAtOrAdjacent } from "../../../common/point.ts";
 import { log } from "../../../common/logging/logger.ts";
 import { BuildingComponentId } from "../../component/buildingComponent.ts";
 
@@ -16,7 +15,6 @@ export type ConstructBuildingActionData = {
 /**
  * Construct a scaffolded building by healing its HealthComponent.
  * Progress is derived from HealthComponent.currentHp - complete when hp >= maxHp.
- * Assumes worker is already adjacent to building (moveTo should have run first).
  */
 export function executeConstructBuildingAction(
     action: ConstructBuildingActionData,
@@ -31,11 +29,6 @@ export function executeConstructBuildingAction(
             kind: "failed",
             cause: { type: "targetGone", entityId: action.entityId },
         };
-    }
-
-    if (!isAtOrAdjacent(buildingEntity.worldPosition, entity.worldPosition)) {
-        log.warn(`Worker not at or adjacent to building`);
-        return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 
     const buildingComponent =

@@ -1,4 +1,3 @@
-import { isPointAdjacentTo } from "../../../common/point.ts";
 import { log } from "../../../common/logging/logger.ts";
 import { FarmComponentId, FarmState } from "../../component/farmComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
@@ -27,12 +26,6 @@ export function executePlantCropAction(
             kind: "failed",
             cause: { type: "targetGone", entityId: action.buildingId },
         };
-    }
-
-    if (
-        !isPointAdjacentTo(buildingEntity.worldPosition, entity.worldPosition)
-    ) {
-        return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 
     const farm = buildingEntity.getEcsComponent(FarmComponentId);

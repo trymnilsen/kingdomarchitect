@@ -16,10 +16,10 @@ import { createAttackGameEvent } from "../../entity/event/attackGameEventData.ts
 import { BuildingComponentId } from "../../component/buildingComponent.ts";
 import { resolveAttackProfile } from "../../combat/resolveAttackProfile.ts";
 import type { AttackTarget } from "../../combat/attackTarget.ts";
-import { resolveTargetPoint } from "../../combat/resolveTarget.ts";
-import { isWithinReach } from "../../combat/attackReach.ts";
-import { hasLineOfSight } from "../../combat/lineOfSight.ts";
-import { resolveTargets } from "../../combat/resolveTarget.ts";
+import {
+    resolveTargetPoint,
+    resolveTargets,
+} from "../../combat/resolveTarget.ts";
 import {
     AttackTargetKind,
     type AttackProfileDefinition,
@@ -33,9 +33,10 @@ export type AttackTargetActionData = {
 /**
  * Hit whatever the attacker is aimed at, with whatever it is holding
  *
- * Reach and sight are re-checked every tick, because both change under a
- * running attack. When either fails there is no miss and no firing into a wall,
- * the attack simply does not happen
+ * Reach and sight change under a running attack, so they are the attack's
+ * reach and the behavior system re-checks them every tick before this runs.
+ * When either is lost the attacker closes in again instead of swinging: there
+ * is no miss and no firing into a wall
  *
  * The hit lands in the tick it is ordered. At one tick per second an arrow
  * crossing five tiles would otherwise take five seconds to arrive
@@ -66,16 +67,6 @@ export function executeAttackTargetAction(
             };
         }
         return { kind: "failed", cause: { type: "nothingToAttack" } };
-    }
-
-    if (!isWithinReach(profile, entity.worldPosition, impact)) {
-        log.debug(`${entity.id} target out of reach for ${profile.id}`);
-        return { kind: "failed", cause: { type: "outOfReach" } };
-    }
-
-    if (!hasLineOfSight(root, entity.worldPosition, impact)) {
-        log.debug(`${entity.id} has no line of sight to its target`);
-        return { kind: "failed", cause: { type: "noLineOfSight" } };
     }
 
     // The aim resolved, so nothing went missing. What is here cannot be hurt

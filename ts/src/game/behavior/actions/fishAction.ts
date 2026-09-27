@@ -1,5 +1,5 @@
 import { log } from "../../../common/logging/logger.ts";
-import { isPointAdjacentTo, type Point } from "../../../common/point.ts";
+import type { Point } from "../../../common/point.ts";
 import { spendEntityEnergy } from "../../component/energyComponent.ts";
 import {
     addToHeldItem,
@@ -35,11 +35,6 @@ export function executeFishAction(
         };
     }
 
-    if (!isPointAdjacentTo(action.target, entity.worldPosition)) {
-        log.warn(`Worker not adjacent to fishing spot`);
-        return { kind: "failed", cause: { type: "notAdjacent" } };
-    }
-
     const profile = resolveFishingProfile(entity);
     if (!profile) {
         return { kind: "failed", cause: { type: "noFishingTackle" } };
@@ -48,7 +43,7 @@ export function executeFishAction(
     const held = entity.requireEcsComponent(HeldItemComponentId);
     const catchItem = profile.catch.item;
     if (held.item && !canAddToHeld(held, catchItem)) {
-        return freeHandSubaction(entity, held.item, action.target, "fishing");
+        return freeHandSubaction(entity, held.item, "fishing");
     }
 
     if (action.progress === undefined) {

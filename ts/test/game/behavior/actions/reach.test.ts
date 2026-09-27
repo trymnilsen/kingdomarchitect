@@ -2,7 +2,7 @@ import assert from "node:assert";
 import { describe, it } from "node:test";
 import type { Point } from "../../../../src/common/point.ts";
 import { bowItem } from "../../../../src/data/inventory/items/equipment.ts";
-import { resolveMoveGoal } from "../../../../src/game/behavior/actions/moveGoal.ts";
+import { resolveReach } from "../../../../src/game/behavior/actions/reach.ts";
 import { createEquipmentComponent } from "../../../../src/game/component/equipmentComponent.ts";
 import { createHealthComponent } from "../../../../src/game/component/healthComponent.ts";
 import { Entity } from "../../../../src/game/entity/entity.ts";
@@ -34,13 +34,56 @@ function archerAndQuarry(quarryAt: Point): {
     return { root, archer };
 }
 
-describe("resolveMoveGoal", () => {
-    describe("attackReach", () => {
+describe("resolveReach", () => {
+    const target: Point = { x: 12, y: 8 };
+
+    describe("touch", () => {
+        const inTouch = resolveReach(
+            { kind: "touch" },
+            new Entity("worker"),
+            target,
+        );
+
+        it("accepts standing on the target, so a pile underfoot is picked up", () => {
+            assert.strictEqual(inTouch({ x: 12, y: 8 }), true);
+        });
+
+        it("accepts all four cardinal neighbours", () => {
+            assert.strictEqual(inTouch({ x: 11, y: 8 }), true);
+            assert.strictEqual(inTouch({ x: 13, y: 8 }), true);
+            assert.strictEqual(inTouch({ x: 12, y: 7 }), true);
+            assert.strictEqual(inTouch({ x: 12, y: 9 }), true);
+        });
+
+        it("rejects a diagonal neighbour", () => {
+            assert.strictEqual(inTouch({ x: 13, y: 9 }), false);
+        });
+    });
+
+    describe("near", () => {
+        const isNear = resolveReach(
+            { kind: "near" },
+            new Entity("goblin"),
+            target,
+        );
+
+        it("accepts a diagonal neighbour, since warmth reaches the corners", () => {
+            assert.strictEqual(isNear({ x: 11, y: 7 }), true);
+            assert.strictEqual(isNear({ x: 13, y: 9 }), true);
+        });
+
+        it("rejects two tiles out", () => {
+            assert.strictEqual(isNear({ x: 14, y: 8 }), false);
+            assert.strictEqual(isNear({ x: 13, y: 10 }), false);
+        });
+    });
+
+    describe("attack", () => {
         it("is satisfied well short of the target for an archer", () => {
             const { archer } = archerAndQuarry({ x: 14, y: 10 });
-            const isGoal = resolveMoveGoal(
+            const isGoal = resolveReach(
                 {
-                    kind: "attackReach",
+                    kind: "attack",
                     target: { kind: AttackTargetKind.Entity, id: "goblin" },
                 },
                 archer,
@@ -63,9 +106,9 @@ describe("resolveMoveGoal", () => {
             // The destination is where the goblin stood at plan time. It has
             // since walked four tiles closer
             const { archer } = archerAndQuarry({ x: 10, y: 10 });
-            const isGoal = resolveMoveGoal(
+            const isGoal = resolveReach(
                 {
-                    kind: "attackReach",
+                    kind: "attack",
                     target: { kind: AttackTargetKind.Entity, id: "goblin" },
                 },
                 archer,
@@ -79,9 +122,9 @@ describe("resolveMoveGoal", () => {
             const { root, archer } = archerAndQuarry({ x: 12, y: 10 });
             addBuilding(root, "wall", { x: 10, y: 10 });
 
-            const isGoal = resolveMoveGoal(
+            const isGoal = resolveReach(
                 {
-                    kind: "attackReach",
+                    kind: "attack",
                     target: { kind: AttackTargetKind.Entity, id: "goblin" },
                 },
                 archer,
@@ -102,9 +145,9 @@ describe("resolveMoveGoal", () => {
 
         it("accepts nothing once the target is gone", () => {
             const { archer } = archerAndQuarry({ x: 12, y: 10 });
-            const isGoal = resolveMoveGoal(
+            const isGoal = resolveReach(
                 {
-                    kind: "attackReach",
+                    kind: "attack",
                     target: { kind: AttackTargetKind.Entity, id: "ghost" },
                 },
                 archer,

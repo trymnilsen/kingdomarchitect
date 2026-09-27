@@ -14,8 +14,5 @@ export function planFishing(entity: Entity, spot: Point): BehaviorActionData[] {
         return [];
     }
 
-    return [
-        { type: "moveTo", target: spot, goal: { kind: "adjacent" } },
-        { type: "fish", target: spot },
-    ];
+    return [{ type: "fish", target: spot }];
 }

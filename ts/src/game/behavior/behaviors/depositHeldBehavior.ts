@@ -1,4 +1,4 @@
-import { pointEquals, type Point } from "../../../common/point.ts";
+import type { Point } from "../../../common/point.ts";
 import type { InventoryItem } from "../../../data/inventory/inventoryItem.ts";
 import { ChunkMapComponentId } from "../../component/chunkMapComponent.ts";
 import {
@@ -51,11 +51,6 @@ export function createDepositHeldBehavior(): Behavior {
             if (stockpile) {
                 return [
                     {
-                        type: "moveTo",
-                        target: stockpile.worldPosition,
-                        goal: { kind: "adjacent" },
-                    },
-                    {
                         type: "depositToStockpile",
                         stockpileId: stockpile.id,
                     },
@@ -69,26 +64,11 @@ export function createDepositHeldBehavior(): Behavior {
                 return [];
             }
 
-            const reason = `No accepting stockpile available for ${item.name}`;
-            if (pointEquals(entity.worldPosition, dropPos)) {
-                return [
-                    {
-                        type: "dropHeld",
-                        destination: dropPos,
-                        reason,
-                    },
-                ];
-            }
-
             return [
-                {
-                    type: "moveTo",
-                    target: dropPos,
-                },
                 {
                     type: "dropHeld",
                     destination: dropPos,
-                    reason,
+                    reason: `No accepting stockpile available for ${item.name}`,
                 },
             ];
         },

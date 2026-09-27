@@ -1,5 +1,4 @@
 import { log } from "../../../common/logging/logger.ts";
-import { isPointAdjacentTo } from "../../../common/point.ts";
 import { findFoodInInventory } from "../../../data/inventory/inventoryItemHelpers.ts";
 import {
     InventoryComponentId,
@@ -30,10 +29,6 @@ export function executeStealFoodAction(
             kind: "failed",
             cause: { type: "targetGone", entityId: action.targetEntityId },
         };
-    }
-
-    if (!isPointAdjacentTo(entity.worldPosition, target.worldPosition)) {
-        return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 
     const targetInventory = target.getEcsComponent(InventoryComponentId);

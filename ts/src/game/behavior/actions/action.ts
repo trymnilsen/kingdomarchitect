@@ -8,17 +8,17 @@ export type SleepQuality =
 /**
  * Why an action gave up, so the behavior that planned it can decide whether to
  * retry. noRoute means no path exists from here. pathBlocked means the route
- * turned impassable mid-walk and a fresh search may find another
+ * turned impassable mid-walk and a fresh search may find another.
+ *
+ * Being too far away is not a cause. An action only runs within its reach
+ * (see actionApproach.ts), and an entity out of reach is walked into it.
  */
 export type FailureCause =
     | { type: "noRoute"; target: Point }
     | { type: "pathBlocked"; target: Point }
     | { type: "targetGone"; entityId: string }
-    | { type: "notAdjacent" }
     | { type: "noResources" }
     | { type: "stockpileFull"; stockpileId: string }
-    | { type: "outOfReach" }
-    | { type: "noLineOfSight" }
     | { type: "nothingToAttack" }
     | { type: "notFishingSpot"; target: Point }
     | { type: "noFishingTackle" }

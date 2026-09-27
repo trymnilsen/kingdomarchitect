@@ -4,27 +4,15 @@ import {
     increaseWarmth,
 } from "../../component/warmthComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
-import type { Point } from "../../../common/point.ts";
+import { log } from "../../../common/logging/logger.ts";
 import { ActionComplete, ActionRunning, type ActionResult } from "./action.ts";
 
 export type WarmByFireActionData = { type: "warmByFire"; fireEntityId: string };
-import { log } from "../../../common/logging/logger.ts";
 
 /**
- * Check if two points are within 1 tile of each other (8-directional adjacency).
- * Uses Chebyshev distance (max of abs differences) rather than Manhattan so that
- * diagonal neighbors count. A goblin standing diagonally next to a campfire
- * should still be able to warm up.
- */
-function isWithinOneTile(a: Point, b: Point): boolean {
-    const dx = Math.abs(a.x - b.x);
-    const dy = Math.abs(a.y - b.y);
-    return Math.max(dx, dy) <= 1;
-}
-
-/**
- * Warm by fire action - recovers warmth when adjacent to an active fire source.
- * Returns complete when warmth reaches 100.
+ * Warm by fire action - recovers warmth while near an active fire source,
+ * diagonals included (see the `near` reach). Returns complete when warmth
+ * reaches 100.
  */
 export function executeWarmByFireAction(
     action: WarmByFireActionData,
@@ -61,12 +49,6 @@ export function executeWarmByFireAction(
             kind: "failed",
             cause: { type: "targetGone", entityId: action.fireEntityId },
         };
-    }
-
-    // Check adjacency (must be within 1 tile, including diagonals)
-    if (!isWithinOneTile(entity.worldPosition, fireEntity.worldPosition)) {
-        log.warn(`Entity not adjacent to fire`);
-        return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 
     // Apply active warming rate

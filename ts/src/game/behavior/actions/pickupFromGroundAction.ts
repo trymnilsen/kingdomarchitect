@@ -1,5 +1,4 @@
 import { log } from "../../../common/logging/logger.ts";
-import { isPointAdjacentTo } from "../../../common/point.ts";
 import {
     CollectableComponentId,
     collectAllItems,
@@ -17,7 +16,7 @@ import { ActionComplete, type ActionResult } from "./action.ts";
  * Pick up a single ground pile (entity with GroundItemComponent +
  * CollectableComponent) into the worker's held slot.
  *
- * - Worker must be cardinally adjacent to the pile.
+ * - Done within touch of the pile, so a worker standing on it picks it up too.
  * - If held is empty, transfers the pile contents into held.
  * - If held holds the same item id, stacks the pile onto held.
  * - If held holds a different item id, the action fails. Caller is
@@ -48,10 +47,6 @@ export function executePickupFromGroundAction(
             `Pickup target ${action.pileEntityId} is not a ground item pile`,
         );
         return { kind: "failed", cause: { type: "unknown" } };
-    }
-
-    if (!isPointAdjacentTo(entity.worldPosition, pile.worldPosition)) {
-        return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 
     const collectable = pile.getEcsComponent(CollectableComponentId);

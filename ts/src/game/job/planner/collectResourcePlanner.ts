@@ -7,7 +7,7 @@ import { removeJobForWorker } from "../jobLifecycle.ts";
  * Plan actions for collecting a resource.
  *
  * @example
- * // Typical return: [moveTo(resource), harvestResource(resource)]
+ * // Typical return: [harvestResource(resource)]
  */
 export function planCollectResource(
     root: Entity,
@@ -22,11 +22,6 @@ export function planCollectResource(
     }
 
     return [
-        {
-            type: "moveTo",
-            target: resourceEntity.worldPosition,
-            goal: { kind: "adjacent" },
-        },
         {
             type: "harvestResource",
             entityId: job.entityId,

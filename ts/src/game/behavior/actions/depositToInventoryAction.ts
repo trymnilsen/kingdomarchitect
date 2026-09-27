@@ -1,4 +1,3 @@
-import { isPointAdjacentTo, pointEquals } from "../../../common/point.ts";
 import {
     addInventoryItem,
     InventoryComponentId,
@@ -43,14 +42,6 @@ export function executeDepositToInventoryAction(
             kind: "failed",
             cause: { type: "targetGone", entityId: action.targetEntityId },
         };
-    }
-
-    if (
-        !isPointAdjacentTo(targetEntity.worldPosition, entity.worldPosition) &&
-        !pointEquals(targetEntity.worldPosition, entity.worldPosition)
-    ) {
-        log.warn(`Worker not adjacent to target`);
-        return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 
     const targetInventory =

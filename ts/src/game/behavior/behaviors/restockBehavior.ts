@@ -128,20 +128,10 @@ export function createRestockBehavior(): Behavior {
 
             return [
                 {
-                    type: "moveTo",
-                    target: bestSource.stockpile.worldPosition,
-                    goal: { kind: "adjacent" },
-                },
-                {
                     type: "withdrawFromStockpile",
                     stockpileId: bestSource.stockpile.id,
                     itemId: bestDeficit.itemId,
                     amount,
-                },
-                {
-                    type: "moveTo",
-                    target: bestDeficit.stockpile.worldPosition,
-                    goal: { kind: "adjacent" },
                 },
                 {
                     type: "depositToStockpile",

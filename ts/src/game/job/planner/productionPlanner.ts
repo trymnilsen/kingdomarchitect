@@ -108,19 +108,12 @@ export function planProduction(
         if (policy === OutputPolicy.Haul) {
             actions.push(...planDepositHeld(worker));
         }
-        actions.push(
-            {
-                type: "moveTo",
-                target: felling.worldPosition,
-                goal: { kind: "adjacent" },
-            },
-            {
-                type: "harvestResource",
-                entityId: felling.id,
-                harvestAction: ResourceHarvestMode.Chop,
-                outputPolicy: policy,
-            },
-        );
+        actions.push({
+            type: "harvestResource",
+            entityId: felling.id,
+            harvestAction: ResourceHarvestMode.Chop,
+            outputPolicy: policy,
+        });
     }
 
     if (actions.length === 0) {
@@ -133,8 +126,7 @@ export function planProduction(
 }
 
 /**
- * Walk to a free tile in the zone and plant what belongs there. Returns no
- * actions when the zone is full or the free tiles are all in biomes where
+ * Plant what belongs on a free tile in the zone. Returns no actions when the zone is full or the free tiles are all in biomes where
  * nothing grows.
  */
 function planPlanting(
@@ -157,11 +149,6 @@ function planPlanting(
 
     const natives = nativeTreesAt(tiles, spot);
     return [
-        {
-            type: "moveTo",
-            target: spot,
-            goal: { kind: "adjacent" },
-        },
         {
             type: "plantTree",
             buildingId,

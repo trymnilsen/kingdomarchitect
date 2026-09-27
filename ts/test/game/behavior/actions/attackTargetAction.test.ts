@@ -102,25 +102,6 @@ describe("attackTargetAction", () => {
         assert.strictEqual(healthComponent.currentHp, 0);
     });
 
-    it("fails out of reach when the target is beyond an unarmed swing", () => {
-        const { worker, target } = createTestScene();
-        target.worldPosition = { x: 25, y: 25 };
-
-        const action = {
-            type: "attackTarget" as const,
-            target: entityTarget("target"),
-        };
-
-        const result = executeAttackTargetAction(action, worker, 1);
-
-        assert.strictEqual(result.kind, "failed");
-        assert.deepStrictEqual(
-            (result as { cause: { type: string } }).cause,
-            { type: "outOfReach" },
-            "the behavior needs to tell reach apart from a vanished target",
-        );
-    });
-
     describe("on lethal hit", () => {
         it("removes the target from its parent when hp reaches 0", () => {
             const { root, worker, target } = createTestScene();
@@ -278,36 +259,6 @@ describe("attackTargetAction", () => {
                 goblin.getEcsComponent(HealthComponentId)!.currentHp,
                 GOBLIN_HP - bowAttackProfile.damage,
                 "the hit lands in the tick it is ordered, five tiles away",
-            );
-        });
-
-        it("fails for want of a line of sight when a building blocks the shot", () => {
-            const { root } = createMinimalWorld();
-            const archer = armedWorker("archer", { x: 10, y: 8 });
-            root.addChild(archer);
-            archer.worldPosition = { x: 10, y: 8 };
-            addBuilding(root, "granary", { x: 12, y: 8 });
-
-            const goblin = new Entity("goblin");
-            goblin.setEcsComponent(createHealthComponent(GOBLIN_HP, GOBLIN_HP));
-            root.addChild(goblin);
-            goblin.worldPosition = { x: 14, y: 8 };
-
-            const result = executeAttackTargetAction(
-                { type: "attackTarget", target: entityTarget("goblin") },
-                archer,
-                1,
-            );
-
-            assert.strictEqual(result.kind, "failed");
-            assert.deepStrictEqual(
-                (result as { cause: { type: string } }).cause,
-                { type: "noLineOfSight" },
-            );
-            assert.strictEqual(
-                goblin.getEcsComponent(HealthComponentId)!.currentHp,
-                10,
-                "a blocked shot is not fired at all, so nothing is hurt",
             );
         });
 

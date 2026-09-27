@@ -154,8 +154,7 @@ describe("drinkPotionBehavior", () => {
             ]);
 
             const actions = behavior.expand(worker);
-            assert.strictEqual(actions[0].type, "moveTo");
-            assert.strictEqual(actions[1].type, "depositToStockpile");
+            assert.strictEqual(actions[0].type, "depositToStockpile");
             assert.ok(actions.some((a) => a.type === "drinkFromHeld"));
         });
 
@@ -169,7 +168,7 @@ describe("drinkPotionBehavior", () => {
 
             const actions = behavior.expand(worker);
             assert.strictEqual(
-                (actions[1] as { itemId: string }).itemId,
+                (actions[0] as { itemId: string }).itemId,
                 healthPotion.id,
             );
         });
@@ -193,7 +192,7 @@ describe("drinkPotionBehavior", () => {
 
             const actions = behavior.expand(worker);
             assert.strictEqual(
-                (actions[1] as { stockpileId: string }).stockpileId,
+                (actions[0] as { stockpileId: string }).stockpileId,
                 "nearStockpile",
             );
         });

@@ -64,7 +64,6 @@ describe("equipCommandPlanner", () => {
                 slot: "primary",
             });
             assert.deepStrictEqual(actionTypes(actions), [
-                "moveTo",
                 "withdrawFromStockpile",
                 "equipFromHeld",
                 "clearPlayerCommand",
@@ -82,7 +81,6 @@ describe("equipCommandPlanner", () => {
                 slot: "primary",
             });
             assert.deepStrictEqual(actionTypes(actions), [
-                "moveTo",
                 "withdrawFromStockpile",
                 "equipFromHeld",
                 "clearPlayerCommand",
@@ -100,9 +98,7 @@ describe("equipCommandPlanner", () => {
                 slot: "primary",
             });
             assert.deepStrictEqual(actionTypes(actions), [
-                "moveTo",
                 "dropHeld",
-                "moveTo",
                 "withdrawFromStockpile",
                 "equipFromHeld",
                 "clearPlayerCommand",
@@ -119,9 +115,7 @@ describe("equipCommandPlanner", () => {
                 slot: "primary",
             });
             assert.deepStrictEqual(actionTypes(actions), [
-                "moveTo",
                 "dropFromSlot",
-                "moveTo",
                 "withdrawFromStockpile",
                 "equipFromHeld",
                 "clearPlayerCommand",
@@ -141,9 +135,7 @@ describe("equipCommandPlanner", () => {
                 slot: "primary",
             });
             assert.deepStrictEqual(actionTypes(actions), [
-                "moveTo",
                 "dropFromSlot",
-                "moveTo",
                 "withdrawFromStockpile",
                 "equipFromHeld",
                 "clearPlayerCommand",
@@ -163,11 +155,8 @@ describe("equipCommandPlanner", () => {
                 slot: "primary",
             });
             assert.deepStrictEqual(actionTypes(actions), [
-                "moveTo",
                 "dropHeld",
-                "moveTo",
                 "dropFromSlot",
-                "moveTo",
                 "withdrawFromStockpile",
                 "equipFromHeld",
                 "clearPlayerCommand",
@@ -193,7 +182,6 @@ describe("equipCommandPlanner", () => {
                 slot: "primary",
             });
             assert.deepStrictEqual(actionTypes(actions), [
-                "moveTo",
                 "pickupFromGround",
                 "equipFromHeld",
                 "clearPlayerCommand",

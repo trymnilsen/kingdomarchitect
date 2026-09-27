@@ -81,11 +81,6 @@ export function createPerformPlayerCommandBehavior(): Behavior {
                     }
                     return [
                         {
-                            type: "moveTo",
-                            target: target.worldPosition,
-                            goal: { kind: "adjacent" },
-                        },
-                        {
                             type: "pickupFromGround",
                             pileEntityId: command.targetEntityId,
                         },
@@ -113,7 +108,6 @@ export function createPerformPlayerCommandBehavior(): Behavior {
                         return [];
                     }
                     return [
-                        { type: "moveTo", target: adjacent },
                         {
                             type: "dropHeld",
                             destination: adjacent,
@@ -204,9 +198,6 @@ function endsPlayerOrder(cause: FailureCause): boolean {
             // An action that throws every tick would otherwise hold the worker
             return true;
         case "pathBlocked":
-        case "notAdjacent":
-        case "outOfReach":
-        case "noLineOfSight":
         case "noResources":
         case "stockpileFull":
             return false;

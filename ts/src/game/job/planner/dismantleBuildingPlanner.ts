@@ -4,7 +4,7 @@ import type { Entity } from "../../entity/entity.ts";
 import type { DismantleBuildingJob } from "../dismantleBuildingJob.ts";
 
 /**
- * Plan actions for dismantling a building: walk adjacent and drain its HP.
+ * Plan actions for dismantling a building: drain its HP.
  * Simpler than the build planner, with no materials to gather. If the building is
  * already gone, return no actions so the job is dropped.
  */
@@ -19,12 +19,5 @@ export function planDismantleBuilding(
         return [];
     }
 
-    return [
-        {
-            type: "moveTo",
-            target: buildingEntity.worldPosition,
-            goal: { kind: "adjacent" },
-        },
-        { type: "dismantleBuilding", entityId: job.entityId },
-    ];
+    return [{ type: "dismantleBuilding", entityId: job.entityId }];
 }

@@ -75,9 +75,9 @@ describe("KeepWarmBehavior", () => {
 
             const actions = behavior.expand(goblin);
 
-            assert.strictEqual(actions.length, 2);
-            assert.strictEqual(actions[0].type, "moveTo");
-            assert.strictEqual(actions[1].type, "warmByFire");
+            assert.deepStrictEqual(actions, [
+                { type: "warmByFire", fireEntityId: fire.id },
+            ]);
         });
     });
 });

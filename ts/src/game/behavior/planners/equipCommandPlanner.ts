@@ -56,7 +56,6 @@ export function planEquipCommand(
                     `'${held.item.id}' within radius`,
             );
         }
-        actions.push({ type: "moveTo", target: dropPos });
         actions.push({
             type: "dropHeld",
             destination: dropPos,
@@ -79,7 +78,6 @@ export function planEquipCommand(
                     `slot item '${slotItem.id}' within radius`,
             );
         }
-        actions.push({ type: "moveTo", target: evictDropPos });
         actions.push({
             type: "dropFromSlot",
             slot: command.slot,
@@ -87,13 +85,7 @@ export function planEquipCommand(
         });
     }
 
-    // 3. Walk to source, pick up exactly one unit.
-    actions.push({
-        type: "moveTo",
-        target: source.worldPosition,
-        goal: { kind: "adjacent" },
-    });
-
+    // 3. Pick up exactly one unit from the source.
     if (source.getEcsComponent(StockpileComponentId)) {
         actions.push({
             type: "withdrawFromStockpile",

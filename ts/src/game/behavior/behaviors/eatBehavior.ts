@@ -21,7 +21,6 @@ import { ResourceHarvestMode } from "../../../data/inventory/items/naturalResour
 import type { Entity } from "../../entity/entity.ts";
 import type { BehaviorActionData } from "../actions/actionData.ts";
 import type { Behavior } from "./behavior.ts";
-import { findStockpiles } from "../../entity/settlementQueries.ts";
 import { planDepositHeld } from "../../job/planner/planDepositHeld.ts";
 
 export const HUNGER_THRESHOLD = 40;
@@ -145,11 +144,6 @@ function tryStockpileStage(
 
     return [
         {
-            type: "moveTo",
-            target: nearestEntity.worldPosition,
-            goal: { kind: "adjacent" },
-        },
-        {
             type: "withdrawFromStockpile",
             stockpileId: nearestEntity.id,
             itemId: nearestItemId,
@@ -180,11 +174,6 @@ function tryGroundPileStage(entity: Entity): BehaviorActionData[] | null {
     }
     if (!nearest) return null;
     return [
-        {
-            type: "moveTo",
-            target: nearest.worldPosition,
-            goal: { kind: "adjacent" },
-        },
         { type: "pickupFromGround", pileEntityId: nearest.id },
         { type: "eatFromHeld" },
     ];
@@ -211,11 +200,6 @@ function tryForageStage(entity: Entity): BehaviorActionData[] | null {
     if (!nearestResource) return null;
 
     return [
-        {
-            type: "moveTo",
-            target: nearestResource.worldPosition,
-            goal: { kind: "adjacent" },
-        },
         {
             type: "harvestResource",
             entityId: nearestResource.id,
@@ -254,11 +238,6 @@ function tryStealStage(entity: Entity): BehaviorActionData[] | null {
     if (!bestTarget) return null;
 
     return [
-        {
-            type: "moveTo",
-            target: bestTarget.worldPosition,
-            goal: { kind: "adjacent" },
-        },
         {
             type: "stealFood",
             targetEntityId: bestTarget.id,

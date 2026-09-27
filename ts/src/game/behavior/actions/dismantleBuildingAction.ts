@@ -1,9 +1,6 @@
-import { isAtOrAdjacent } from "../../../common/point.ts";
-import { log } from "../../../common/logging/logger.ts";
 import { spriteRefs } from "../../../asset/sprite.ts";
 import { BuildingComponentId } from "../../component/buildingComponent.ts";
 import { damage, HealthComponentId } from "../../component/healthComponent.ts";
-import { JobQueueComponentId } from "../../component/jobQueueComponent.ts";
 import { SpriteComponentId } from "../../component/spriteComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { finishDismantle } from "../../job/dismantleBuildingJob.ts";
@@ -19,7 +16,6 @@ export type DismantleBuildingActionData = {
  * Dismantle a building by draining its HealthComponent, the reverse of
  * constructBuildingAction. Complete when hp <= 0, at which point finishDismantle
  * scatters materials, evicts occupants, clears jobs, and removes the entity.
- * Assumes the worker is already adjacent (moveTo should have run first).
  */
 export function executeDismantleBuildingAction(
     action: DismantleBuildingActionData,
@@ -35,11 +31,6 @@ export function executeDismantleBuildingAction(
             kind: "failed",
             cause: { type: "targetGone", entityId: action.entityId },
         };
-    }
-
-    if (!isAtOrAdjacent(buildingEntity.worldPosition, entity.worldPosition)) {
-        log.warn(`Worker not at or adjacent to building being dismantled`);
-        return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 
     const buildingComponent =

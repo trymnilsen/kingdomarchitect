@@ -49,7 +49,7 @@ function createTestScene(): {
 
 describe("buildBuildingPlanner", () => {
     describe("State 1: Building has all materials", () => {
-        it("returns moveTo and constructBuilding actions", () => {
+        it("returns a constructBuilding action", () => {
             const { root, worker, building } = createTestScene();
 
             const buildingInventory = building.getEcsComponent("Inventory")!;
@@ -58,14 +58,13 @@ describe("buildBuildingPlanner", () => {
             const job = BuildBuildingJob(building);
             const actions = planBuildBuilding(root, worker, job);
 
-            assert.strictEqual(actions.length, 2);
-            assert.strictEqual(actions[0].type, "moveTo");
-            assert.strictEqual(actions[1].type, "constructBuilding");
+            assert.strictEqual(actions.length, 1);
+            assert.strictEqual(actions[0].type, "constructBuilding");
         });
     });
 
     describe("State 2: Worker held matches a needed material", () => {
-        it("returns moveTo + depositToInventory carrying held's item id", () => {
+        it("returns depositToInventory carrying held's item id", () => {
             const { root, worker, building } = createTestScene();
 
             const held = worker.requireEcsComponent(HeldItemComponentId);
@@ -75,11 +74,10 @@ describe("buildBuildingPlanner", () => {
             const job = BuildBuildingJob(building);
             const actions = planBuildBuilding(root, worker, job);
 
-            assert.strictEqual(actions.length, 2);
-            assert.strictEqual(actions[0].type, "moveTo");
-            assert.strictEqual(actions[1].type, "depositToInventory");
+            assert.strictEqual(actions.length, 1);
+            assert.strictEqual(actions[0].type, "depositToInventory");
 
-            const depositAction = actions[1] as {
+            const depositAction = actions[0] as {
                 type: "depositToInventory";
                 targetEntityId: string;
                 itemId?: string;
@@ -90,7 +88,7 @@ describe("buildBuildingPlanner", () => {
     });
 
     describe("State 3: Need to fetch from stockpile (held empty)", () => {
-        it("returns moveTo + withdrawFromStockpile + moveTo + deposit", () => {
+        it("returns withdrawFromStockpile + deposit", () => {
             const { root, worker, stockpile } = createTestScene();
 
             const stockpileInventory = stockpile.getEcsComponent("Inventory")!;
@@ -99,11 +97,9 @@ describe("buildBuildingPlanner", () => {
             const job = BuildBuildingJob({ id: "building" } as Entity);
             const actions = planBuildBuilding(root, worker, job);
 
-            assert.strictEqual(actions.length, 4);
-            assert.strictEqual(actions[0].type, "moveTo");
-            assert.strictEqual(actions[1].type, "withdrawFromStockpile");
-            assert.strictEqual(actions[2].type, "moveTo");
-            assert.strictEqual(actions[3].type, "depositToInventory");
+            assert.strictEqual(actions.length, 2);
+            assert.strictEqual(actions[0].type, "withdrawFromStockpile");
+            assert.strictEqual(actions[1].type, "depositToInventory");
         });
     });
 });

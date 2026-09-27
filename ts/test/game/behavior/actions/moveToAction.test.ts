@@ -12,7 +12,7 @@ type MoveToAction = Extract<BehaviorActionData, { type: "moveTo" }>;
 
 describe("moveToAction", () => {
     describe("goal", () => {
-        it("completes when standing on the target with an adjacent goal", () => {
+        it("completes when standing on the target with a touch goal", () => {
             const root = new Entity("root");
             const entity = new Entity("entity");
             entity.worldPosition = { x: 5, y: 5 };
@@ -21,7 +21,7 @@ describe("moveToAction", () => {
             const action: MoveToAction = {
                 type: "moveTo",
                 target: { x: 5, y: 5 },
-                goal: { kind: "adjacent" },
+                goal: { kind: "touch" },
             };
 
             const result = executeMoveToAction(action, entity, 1);
@@ -38,7 +38,7 @@ describe("moveToAction", () => {
             const action: MoveToAction = {
                 type: "moveTo",
                 target: { x: 6, y: 6 }, // Diagonally adjacent
-                goal: { kind: "adjacent" },
+                goal: { kind: "touch" },
             };
 
             const result = executeMoveToAction(action, entity, 1);

@@ -9,7 +9,7 @@ import { removeJobForWorker } from "../jobLifecycle.ts";
  * CollectableComponent.
  *
  * @example
- * // Typical return: [moveTo(entity), collectItems(entity, itemId)]
+ * // Typical return: [collectItems(entity, itemId)]
  */
 export function planCollectItem(
     root: Entity,
@@ -36,11 +36,6 @@ export function planCollectItem(
     }
 
     return [
-        {
-            type: "moveTo",
-            target: targetEntity.worldPosition,
-            goal: { kind: "adjacent" },
-        },
         { type: "collectItems", entityId: job.entityId, itemId: job.itemId },
     ];
 }

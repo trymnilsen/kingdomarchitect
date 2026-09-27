@@ -1,6 +1,5 @@
 import { log } from "../../../common/logging/logger.ts";
 import type { Point } from "../../../common/point.ts";
-import { pointEquals } from "../../../common/point.ts";
 import {
     EquipmentComponentId,
     type EquipmentSlot,
@@ -11,8 +10,9 @@ import { dropItemAtPosition, DropMode } from "../dropItem.ts";
 import { ActionComplete, type ActionResult } from "./action.ts";
 
 /**
- * Drop an item from an equipment slot directly to the ground at the
- * worker's position, bypassing held. Used when held already contains
+ * Drop an item from an equipment slot directly to the ground at
+ * `destination`, which the worker walks onto first, bypassing held. Used
+ * when held already contains
  * something incompatible and we need to evict a slot without disturbing
  * held, for example during an equip swap.
  */
@@ -37,13 +37,6 @@ export function executeDropFromSlotAction(
     if (!slotItem) {
         // Nothing to drop, so treat as success.
         return ActionComplete;
-    }
-
-    if (!pointEquals(entity.worldPosition, action.destination)) {
-        log.warn(
-            `Worker ${entity.id} not at drop destination (${action.destination.x},${action.destination.y})`,
-        );
-        return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 
     const root = entity.getRootEntity();

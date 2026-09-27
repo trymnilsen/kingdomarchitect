@@ -119,7 +119,7 @@ describe("eatBehavior", () => {
             assert.strictEqual(actions[0].type, "eatFromHeld");
         });
 
-        it("returns moveTo + harvestResource + eatFromHeld when only forageable is available", () => {
+        it("returns harvestResource + eatFromHeld when only forageable is available", () => {
             const behavior = createEatBehavior();
             const root = new Entity("root");
             const worker = new Entity("worker");
@@ -135,13 +135,12 @@ describe("eatBehavior", () => {
             berry.setEcsComponent(createResourceComponent("berrybush"));
 
             const actions = behavior.expand(worker);
-            assert.strictEqual(actions.length, 3);
-            assert.strictEqual(actions[0].type, "moveTo");
-            assert.strictEqual(actions[1].type, "harvestResource");
-            assert.strictEqual(actions[2].type, "eatFromHeld");
+            assert.strictEqual(actions.length, 2);
+            assert.strictEqual(actions[0].type, "harvestResource");
+            assert.strictEqual(actions[1].type, "eatFromHeld");
         });
 
-        it("returns moveTo + stealFood + eatFromHeld at hunger >= 80", () => {
+        it("returns stealFood + eatFromHeld at hunger >= 80", () => {
             const behavior = createEatBehavior();
             const root = new Entity("root");
             const thief = new Entity("thief");
@@ -159,10 +158,9 @@ describe("eatBehavior", () => {
             victim.setEcsComponent(victimInv);
 
             const actions = behavior.expand(thief);
-            assert.strictEqual(actions.length, 3);
-            assert.strictEqual(actions[0].type, "moveTo");
-            assert.strictEqual(actions[1].type, "stealFood");
-            assert.strictEqual(actions[2].type, "eatFromHeld");
+            assert.strictEqual(actions.length, 2);
+            assert.strictEqual(actions[0].type, "stealFood");
+            assert.strictEqual(actions[1].type, "eatFromHeld");
         });
 
         it("does not return stealFood when hunger is below 80", () => {
@@ -204,11 +202,6 @@ describe("eatBehavior", () => {
 
             assert.strictEqual(
                 actions[0].type,
-                "moveTo",
-                "first walk to the stockpile to drop the load",
-            );
-            assert.strictEqual(
-                actions[1].type,
                 "depositToStockpile",
                 "deposit the carried wood rather than dropping it",
             );

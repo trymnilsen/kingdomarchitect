@@ -134,10 +134,7 @@ describe("productionPlanner - zone kind", () => {
             const scene = createZoneScene();
             scene.stock(FLOOR - 1);
 
-            assert.deepStrictEqual(actionTypes(scene.plan()), [
-                "moveTo",
-                "plantTree",
-            ]);
+            assert.deepStrictEqual(actionTypes(scene.plan()), ["plantTree"]);
         });
 
         it("starts felling once the zone reaches the floor", () => {
@@ -147,12 +144,10 @@ describe("productionPlanner - zone kind", () => {
             const actions = scene.plan();
 
             assert.deepStrictEqual(actionTypes(actions), [
-                "moveTo",
                 "plantTree",
-                "moveTo",
                 "harvestResource",
             ]);
-            const felled = (actions[3] as HarvestAction).entityId;
+            const felled = (actions[1] as HarvestAction).entityId;
             assert.ok(
                 standing.some((tree) => tree.id === felled),
                 "the tree felled is one that was already standing",
@@ -164,7 +159,6 @@ describe("productionPlanner - zone kind", () => {
             scene.stock(TARGET);
 
             assert.deepStrictEqual(actionTypes(scene.plan()), [
-                "moveTo",
                 "harvestResource",
             ]);
         });
@@ -193,7 +187,7 @@ describe("productionPlanner - zone kind", () => {
 
             assert.deepStrictEqual(
                 actionTypes(scene.plan()),
-                ["moveTo", "harvestResource"],
+                ["harvestResource"],
                 "ten cacti fill the zone as surely as ten trees",
             );
         });
@@ -204,7 +198,7 @@ describe("productionPlanner - zone kind", () => {
 
             assert.deepStrictEqual(
                 actionTypes(scene.plan()),
-                ["moveTo", "plantTree"],
+                ["plantTree"],
                 "a zone full of bushes is still an empty forest",
             );
         });
@@ -242,8 +236,7 @@ describe("productionPlanner - zone kind", () => {
                 scene.addAt(tile, snowTreeResource);
             }
 
-            const actions = scene.plan();
-            const plant = actions[1] as PlantTreeActionData;
+            const plant = scene.plan()[0] as PlantTreeActionData;
 
             assert.strictEqual(
                 plant.resourceIdToPlant,
@@ -266,7 +259,7 @@ describe("productionPlanner - zone kind", () => {
                 scene.addAt(tile, treeResource);
             }
 
-            const plant = scene.plan()[1] as PlantTreeActionData;
+            const plant = scene.plan()[0] as PlantTreeActionData;
 
             assert.strictEqual(plant.resourceIdToPlant, snowTreeResource.id);
             assert.ok(
@@ -288,7 +281,7 @@ describe("productionPlanner - zone kind", () => {
 
             assert.deepStrictEqual(
                 actionTypes(scene.plan()),
-                ["moveTo", "harvestResource"],
+                ["harvestResource"],
                 "the plains half is not plantable, so the order is a felling alone",
             );
         });
@@ -306,7 +299,6 @@ describe("productionPlanner - zone kind", () => {
 
             assert.deepStrictEqual(actionTypes(scene.plan()), [
                 "dropHeld",
-                "moveTo",
                 "harvestResource",
             ]);
         });

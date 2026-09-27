@@ -1,4 +1,3 @@
-import { isPointAdjacentTo } from "../../../common/point.ts";
 import { log } from "../../../common/logging/logger.ts";
 import {
     getResourceById,
@@ -39,13 +38,6 @@ export function executeClearObstacleAction(
     if (!resourceEntity) {
         // Already gone, so the path is clear.
         return ActionComplete;
-    }
-
-    if (
-        !isPointAdjacentTo(resourceEntity.worldPosition, entity.worldPosition)
-    ) {
-        log.warn(`Worker not adjacent to obstacle ${action.entityId}`);
-        return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 
     const resourceComponent =

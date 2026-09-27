@@ -1,4 +1,3 @@
-import { isAtOrAdjacent } from "../../../common/point.ts";
 import { log } from "../../../common/logging/logger.ts";
 import {
     FarmComponentId,
@@ -73,10 +72,6 @@ export function executeWorkWindmillAction(
             kind: "failed",
             cause: { type: "targetGone", entityId: action.windmillId },
         };
-    }
-
-    if (!isAtOrAdjacent(windmillEntity.worldPosition, entity.worldPosition)) {
-        return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 
     const chunkMapComponent = root.getEcsComponent(ChunkMapComponentId);

@@ -110,22 +110,15 @@ describe("station occupancy queries", () => {
 describe("garrison behavior", () => {
     const garrison = createGarrisonBehavior();
 
-    it("walks an idle guard to an enabled tower", () => {
+    it("sends an idle guard onto an enabled tower", () => {
         const { root } = createMinimalWorld();
         const tower = addTower(root, "t", { x: 2, y: 2 }, StationPriority.High);
         const guard = addUnit(root, "g", { x: 5, y: 5 });
 
         assert.strictEqual(garrison.isValid(guard), true);
-        const actions = garrison.expand(guard);
-        assert.deepStrictEqual(actions[0], {
-            type: "moveTo",
-            target: tower.worldPosition,
-            goal: { kind: "adjacent" },
-        });
-        assert.deepStrictEqual(actions[1], {
-            type: "stepOnto",
-            targetId: tower.id,
-        });
+        assert.deepStrictEqual(garrison.expand(guard), [
+            { type: "stepOnto", targetId: tower.id },
+        ]);
     });
 
     it("keeps standing until the watch is up, then ends it", () => {

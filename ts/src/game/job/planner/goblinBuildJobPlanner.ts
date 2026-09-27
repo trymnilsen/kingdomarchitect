@@ -62,14 +62,7 @@ export function planGoblinBuildJob(
         : { ...(requirements?.materials ?? {}) };
 
     if (Object.keys(remainingMaterials).length === 0) {
-        return [
-            {
-                type: "moveTo",
-                target: buildingEntity.worldPosition,
-                goal: { kind: "adjacent" },
-            },
-            { type: "constructBuilding", entityId: buildingEntity.id },
-        ];
+        return [{ type: "constructBuilding", entityId: buildingEntity.id }];
     }
 
     if (
@@ -77,11 +70,6 @@ export function planGoblinBuildJob(
         remainingMaterials[workerHeld.item!.id] !== undefined
     ) {
         return [
-            {
-                type: "moveTo",
-                target: buildingEntity.worldPosition,
-                goal: { kind: "adjacent" },
-            },
             {
                 type: "depositToInventory",
                 targetEntityId: buildingEntity.id,
@@ -98,7 +86,6 @@ export function planGoblinBuildJob(
         );
         if (!dropPos) return [];
         return [
-            { type: "moveTo", target: dropPos },
             {
                 type: "dropHeld",
                 destination: dropPos,
@@ -126,20 +113,10 @@ export function planGoblinBuildJob(
                     const fetch = Math.min(item.amount, amountNeeded);
                     return [
                         {
-                            type: "moveTo",
-                            target: stockpileWithMaterials.worldPosition,
-                            goal: { kind: "adjacent" },
-                        },
-                        {
                             type: "withdrawFromStockpile",
                             stockpileId: stockpileWithMaterials.id,
                             itemId,
                             amount: fetch,
-                        },
-                        {
-                            type: "moveTo",
-                            target: buildingEntity.worldPosition,
-                            goal: { kind: "adjacent" },
                         },
                         {
                             type: "depositToInventory",
@@ -197,11 +174,6 @@ function planGatherMaterials(
         const nearestTree = findNearestChoppableResource(root, goblin);
         if (nearestTree) {
             return [
-                {
-                    type: "moveTo",
-                    target: nearestTree.worldPosition,
-                    goal: { kind: "adjacent" },
-                },
                 {
                     type: "harvestResource",
                     entityId: nearestTree.id,

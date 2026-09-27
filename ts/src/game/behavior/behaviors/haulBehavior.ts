@@ -54,14 +54,7 @@ export function createHaulBehavior(): Behavior {
             if (!pile) {
                 return [];
             }
-            return [
-                {
-                    type: "moveTo",
-                    target: pile.worldPosition,
-                    goal: { kind: "adjacent" },
-                },
-                { type: "pickupFromGround", pileEntityId: pile.id },
-            ];
+            return [{ type: "pickupFromGround", pileEntityId: pile.id }];
         },
     };
 }

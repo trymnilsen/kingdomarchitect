@@ -63,11 +63,6 @@ export function planCrafting(
         }
         return [
             ...dropActions,
-            {
-                type: "moveTo",
-                target: buildingEntity.worldPosition,
-                goal: { kind: "adjacent" },
-            },
             { type: "stepOnto", targetId: job.targetBuilding },
             {
                 type: "craftItem",
@@ -103,11 +98,6 @@ export function planCrafting(
         if (matching) {
             return [
                 {
-                    type: "moveTo",
-                    target: buildingEntity.worldPosition,
-                    goal: { kind: "adjacent" },
-                },
-                {
                     type: "depositToInventory",
                     targetEntityId: job.targetBuilding,
                     itemId: held.item!.id,
@@ -128,7 +118,6 @@ export function planCrafting(
             return [];
         }
         return [
-            { type: "moveTo", target: dropPos },
             {
                 type: "dropHeld",
                 destination: dropPos,
@@ -150,20 +139,10 @@ export function planCrafting(
             const fetchAmount = Math.min(nearest.availableAmount, need.deficit);
             return [
                 {
-                    type: "moveTo",
-                    target: nearest.position,
-                    goal: { kind: "adjacent" },
-                },
-                {
                     type: "withdrawFromStockpile",
                     stockpileId: nearest.entity.id,
                     itemId: need.itemId,
                     amount: fetchAmount,
-                },
-                {
-                    type: "moveTo",
-                    target: buildingEntity.worldPosition,
-                    goal: { kind: "adjacent" },
                 },
                 {
                     type: "depositToInventory",
@@ -180,17 +159,7 @@ export function planCrafting(
         );
         if (pile) {
             return [
-                {
-                    type: "moveTo",
-                    target: pile.worldPosition,
-                    goal: { kind: "adjacent" },
-                },
                 { type: "pickupFromGround", pileEntityId: pile.id },
-                {
-                    type: "moveTo",
-                    target: buildingEntity.worldPosition,
-                    goal: { kind: "adjacent" },
-                },
                 {
                     type: "depositToInventory",
                     targetEntityId: job.targetBuilding,
@@ -231,7 +200,6 @@ function ensureHeldAcceptsOutputs(
         return null;
     }
     return [
-        { type: "moveTo", target: dropPos },
         {
             type: "dropHeld",
             destination: dropPos,

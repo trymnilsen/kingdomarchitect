@@ -1,4 +1,3 @@
-import { isAtOrAdjacent } from "../../../common/point.ts";
 import { log } from "../../../common/logging/logger.ts";
 import {
     InventoryComponentId,
@@ -65,11 +64,6 @@ export function executeCraftItemAction(
             kind: "failed",
             cause: { type: "targetGone", entityId: action.buildingId },
         };
-    }
-
-    if (!isAtOrAdjacent(buildingEntity.worldPosition, entity.worldPosition)) {
-        log.warn(`Worker not at or adjacent to building`);
-        return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 
     const buildingInventory =

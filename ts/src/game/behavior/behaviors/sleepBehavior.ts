@@ -11,7 +11,6 @@ import {
 } from "../../component/chunkMapComponent.ts";
 import { InventoryComponentId } from "../../component/inventoryComponent.ts";
 import { BuildingComponentId } from "../../component/buildingComponent.ts";
-import { isTileAvailable } from "../../map/path/graph/weight.ts";
 import type { SleepQuality } from "../actions/action.ts";
 import type { BehaviorActionData } from "../actions/actionData.ts";
 import type { Behavior } from "./behavior.ts";
@@ -19,7 +18,6 @@ import {
     resolveSleepEnergyPerTick,
     resolveSleepEnergyTarget,
 } from "../actions/sleepAction.ts";
-import type { Point } from "../../../common/point.ts";
 
 const CAMPFIRE_SEARCH_RADIUS = 20;
 
@@ -93,17 +91,11 @@ export function createSleepBehavior(): Behavior {
 
             const root = entity.getRootEntity();
 
-            // Check for assigned house. The worker walks adjacent, then steps
-            // onto the house tile to sleep "inside" rather than blocking a tile
-            // beside it.
+            // Check for assigned house. The worker steps onto the house tile to
+            // sleep "inside" rather than blocking a tile beside it.
             const houseEntity = findAssignedHouse(root, entity.id);
             if (houseEntity) {
                 return [
-                    {
-                        type: "moveTo",
-                        target: houseEntity.worldPosition,
-                        goal: { kind: "adjacent" },
-                    },
                     { type: "stepOnto", targetId: houseEntity.id },
                     makeSleepAction("house", energy),
                 ];
@@ -119,14 +111,15 @@ export function createSleepBehavior(): Behavior {
                     CAMPFIRE_SEARCH_RADIUS,
                 );
                 if (campfire) {
-                    const adjacentTile = findAdjacentWalkable(
-                        root,
-                        entity,
-                        campfire.worldPosition,
-                    );
-                    const target = adjacentTile ?? campfire.worldPosition;
+                    // Sleeping carries no target, so the walk is planned
+                    // here. The bedroll goes down where the fire's warmth
+                    // reaches, the same reach warming by it uses.
                     return [
-                        { type: "moveTo", target, goal: { kind: "adjacent" } },
+                        {
+                            type: "moveTo",
+                            target: campfire.worldPosition,
+                            goal: { kind: "near" },
+                        },
                         makeSleepAction("bedrollFire", energy),
                     ];
                 }
@@ -201,27 +194,6 @@ function findNearbyCampfire(
         const dx = candidate.worldPosition.x - pos.x;
         const dy = candidate.worldPosition.y - pos.y;
         if (Math.abs(dx) <= radius && Math.abs(dy) <= radius) {
-            return candidate;
-        }
-    }
-    return null;
-}
-
-function findAdjacentWalkable(
-    root: Entity,
-    _entity: Entity,
-    target: Point,
-): Point | null {
-    const cardinalOffsets: Point[] = [
-        { x: 0, y: -1 },
-        { x: 1, y: 0 },
-        { x: 0, y: 1 },
-        { x: -1, y: 0 },
-    ];
-
-    for (const offset of cardinalOffsets) {
-        const candidate = { x: target.x + offset.x, y: target.y + offset.y };
-        if (isTileAvailable(candidate, root)) {
             return candidate;
         }
     }

@@ -43,13 +43,12 @@ describe("jobPlanner", () => {
         const job = CollectResourceJob(resource, ResourceHarvestMode.Chop);
         const actions = planJob(root, worker, job, () => []);
 
-        assert.strictEqual(actions.length, 3);
+        assert.strictEqual(actions.length, 2);
         assert.strictEqual(actions[0].type, "dropHeld");
-        assert.strictEqual(actions[1].type, "moveTo");
-        assert.strictEqual(actions[2].type, "harvestResource");
+        assert.strictEqual(actions[1].type, "harvestResource");
     });
 
-    it("prepends moveTo+depositToStockpile when worker holds an item and an accepting stockpile exists", () => {
+    it("prepends depositToStockpile when worker holds an item and an accepting stockpile exists", () => {
         const { root, worker } = createTestScene();
         const held = createHeldItemComponent();
         setHeldItem(held, wheatResourceItem, 3);
@@ -70,12 +69,10 @@ describe("jobPlanner", () => {
         const job = CollectResourceJob(resource, ResourceHarvestMode.Chop);
         const actions = planJob(root, worker, job, () => []);
 
-        assert.strictEqual(actions.length, 4);
-        assert.strictEqual(actions[0].type, "moveTo");
-        assert.strictEqual(actions[1].type, "depositToStockpile");
-        assert.strictEqual(actions[2].type, "moveTo");
-        assert.strictEqual(actions[3].type, "harvestResource");
-        const deposit = actions[1] as {
+        assert.strictEqual(actions.length, 2);
+        assert.strictEqual(actions[0].type, "depositToStockpile");
+        assert.strictEqual(actions[1].type, "harvestResource");
+        const deposit = actions[0] as {
             type: "depositToStockpile";
             stockpileId: string;
         };
@@ -93,8 +90,7 @@ describe("jobPlanner", () => {
         const job = CollectResourceJob(resource, ResourceHarvestMode.Chop);
         const actions = planJob(root, worker, job, () => []);
 
-        assert.strictEqual(actions.length, 2);
-        assert.strictEqual(actions[0].type, "moveTo");
-        assert.strictEqual(actions[1].type, "harvestResource");
+        assert.strictEqual(actions.length, 1);
+        assert.strictEqual(actions[0].type, "harvestResource");
     });
 });

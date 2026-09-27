@@ -1,4 +1,4 @@
-import { isPointAdjacentTo, pointEquals } from "../../../common/point.ts";
+import { pointEquals } from "../../../common/point.ts";
 import { log } from "../../../common/logging/logger.ts";
 import type { Entity } from "../../entity/entity.ts";
 import { applyStep } from "../../job/movementHelper.ts";
@@ -13,8 +13,8 @@ import { ActionComplete, type ActionResult } from "./action.ts";
  * rule is bypassed. The worker can then craft, operate, or sleep while standing
  * on top of it without clogging a corridor.
  *
- * The planner is responsible for emitting a `moveTo` with an adjacent goal
- * immediately before this action, so the worker is already adjacent when it runs.
+ * Its reach is `touch`, so the behavior system walks the worker beside the
+ * target before this runs. A worker already on the tile is done.
  *
  * Stepping back off needs no companion action: A* never weights the start node, so
  * a later moveTo plans a path out of the impassable tile normally, its first step
@@ -44,14 +44,8 @@ export function executeStepOntoAction(
     const from = entity.worldPosition;
     const to = target.worldPosition;
 
-    // Already on the tile (e.g. a mid-action replan re-queued this step).
     if (pointEquals(from, to)) {
         return ActionComplete;
-    }
-
-    if (!isPointAdjacentTo(from, to)) {
-        log.warn(`stepOnto requires adjacency to ${action.targetId}`);
-        return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 
     applyStep(entity, from, to, tick);

@@ -37,7 +37,6 @@ export function planEquipFromHeld(
         );
     }
     return [
-        { type: "moveTo", target: dropPos },
         { type: "dropFromSlot", slot, destination: dropPos },
         { type: "equipFromHeld", slot },
         { type: "clearPlayerCommand" },

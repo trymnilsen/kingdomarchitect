@@ -11,8 +11,6 @@ import {
     getCropDefinition,
     type CropId,
 } from "../../../src/data/crop/cropDefinitions.ts";
-import { planFarmHarvest } from "../../../src/game/job/planner/farmHarvestJobPlanner.ts";
-import { createFarmHarvestJob } from "../../../src/game/job/farmHarvestJob.ts";
 import { executeHarvestCropAction } from "../../../src/game/behavior/actions/harvestCropAction.ts";
 import {
     createHeldItemComponent,
@@ -44,20 +42,6 @@ function createTestScene(cropId: CropId = "wheat"): {
 
     return { root, worker, farm };
 }
-
-describe("farmHarvestJobPlanner", () => {
-    it("moveTo stops beside the farm", () => {
-        const { root, worker } = createTestScene();
-        const job = createFarmHarvestJob("farm");
-        const actions = planFarmHarvest(root, worker, job);
-
-        const moveAction = actions[0] as {
-            type: "moveTo";
-            goal?: { kind: string };
-        };
-        assert.deepStrictEqual(moveAction.goal, { kind: "adjacent" });
-    });
-});
 
 describe("harvestCropAction", () => {
     it("yields the configured crop's item and amount, not a hardcoded wheat", () => {

@@ -11,7 +11,6 @@ import {
 import {
     HeldItemComponentId,
     isHeldEmpty,
-    type HeldItemComponent,
 } from "../../component/heldItemComponent.ts";
 import { BuildingComponentId } from "../../component/buildingComponent.ts";
 import { StockpileComponentId } from "../../component/stockpileComponent.ts";
@@ -123,14 +122,7 @@ function planConstructExistingBuilding(
         : { ...requirements };
 
     if (Object.keys(remainingMaterials).length === 0) {
-        return [
-            {
-                type: "moveTo",
-                target: buildingEntity.worldPosition,
-                goal: { kind: "adjacent" },
-            },
-            { type: "constructBuilding", entityId: buildingEntity.id },
-        ];
+        return [{ type: "constructBuilding", entityId: buildingEntity.id }];
     }
 
     if (
@@ -138,11 +130,6 @@ function planConstructExistingBuilding(
         remainingMaterials[goblinHeld.item!.id] !== undefined
     ) {
         return [
-            {
-                type: "moveTo",
-                target: buildingEntity.worldPosition,
-                goal: { kind: "adjacent" },
-            },
             {
                 type: "depositToInventory",
                 targetEntityId: buildingEntity.id,
@@ -160,7 +147,6 @@ function planConstructExistingBuilding(
         );
         if (!dropPos) return [];
         return [
-            { type: "moveTo", target: dropPos },
             {
                 type: "dropHeld",
                 destination: dropPos,
@@ -184,20 +170,10 @@ function planConstructExistingBuilding(
                 const fetch = Math.min(item.amount, amountNeeded);
                 return [
                     {
-                        type: "moveTo",
-                        target: stockpileWithMaterials.worldPosition,
-                        goal: { kind: "adjacent" },
-                    },
-                    {
                         type: "withdrawFromStockpile",
                         stockpileId: stockpileWithMaterials.id,
                         itemId,
                         amount: fetch,
-                    },
-                    {
-                        type: "moveTo",
-                        target: buildingEntity.worldPosition,
-                        goal: { kind: "adjacent" },
                     },
                     {
                         type: "depositToInventory",
@@ -255,11 +231,6 @@ function planGatherMaterials(
         const nearestTree = findNearestChoppableResource(root, goblin);
         if (nearestTree) {
             return [
-                {
-                    type: "moveTo",
-                    target: nearestTree.worldPosition,
-                    goal: { kind: "adjacent" },
-                },
                 {
                     type: "harvestResource",
                     entityId: nearestTree.id,

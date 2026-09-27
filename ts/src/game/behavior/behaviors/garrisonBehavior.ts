@@ -59,14 +59,7 @@ export function createGarrisonBehavior(): Behavior {
             if (!post) {
                 return [];
             }
-            return [
-                {
-                    type: "moveTo",
-                    target: post.worldPosition,
-                    goal: { kind: "adjacent" },
-                },
-                { type: "stepOnto", targetId: post.id },
-            ];
+            return [{ type: "stepOnto", targetId: post.id }];
         },
     };
 }

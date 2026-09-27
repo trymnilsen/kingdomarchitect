@@ -53,7 +53,7 @@ function createStockpile(
 }
 
 describe("DepositHeldBehavior", () => {
-    it("expand returns moveTo + depositToStockpile pair", () => {
+    it("expand deposits at an accepting stockpile rather than dropping", () => {
         const behavior = createDepositHeldBehavior();
         const settlement = createSettlement();
         const worker = createWorker(settlement);
@@ -65,11 +65,9 @@ describe("DepositHeldBehavior", () => {
         ]);
 
         const actions = behavior.expand(worker);
-        assert.strictEqual(actions.length, 2);
-        assert.strictEqual(actions[0].type, "moveTo");
-        assert.strictEqual(actions[1].type, "depositToStockpile");
-        const deposit = actions[1] as { stockpileId: string };
-        assert.strictEqual(deposit.stockpileId, stockpile.id);
+        assert.deepStrictEqual(actions, [
+            { type: "depositToStockpile", stockpileId: stockpile.id },
+        ]);
     });
 
     it("isValid returns true when no stockpile exists (fallback to drop)", () => {
@@ -102,7 +100,7 @@ describe("DepositHeldBehavior", () => {
         assert.ok(drop.reason?.includes("No accepting stockpile"));
     });
 
-    it("expand moves to a free tile before dropping if standing on an obstacle", () => {
+    it("expand drops on a free tile, not the obstacle the worker stands on", () => {
         const { root } = createMinimalWorld();
         const settlement = createSettlement();
         root.addChild(settlement);
@@ -114,10 +112,10 @@ describe("DepositHeldBehavior", () => {
             createSpriteComponent({ bin: "0", spriteId: "test" }),
         );
         root.addChild(building);
-        building.worldPosition = { x: 0, y: 0 };
+        building.worldPosition = { x: 10, y: 6 };
 
         const worker = createWorker(settlement);
-        worker.worldPosition = { x: 0, y: 0 };
+        worker.worldPosition = { x: 10, y: 6 };
         const held = worker.requireEcsComponent(HeldItemComponentId);
         held.item = woodResourceItem;
         held.amount = 3;
@@ -125,11 +123,13 @@ describe("DepositHeldBehavior", () => {
         const behavior = createDepositHeldBehavior();
         const actions = behavior.expand(worker);
 
-        assert.strictEqual(actions.length, 2);
-        assert.strictEqual(actions[0].type, "moveTo");
-        assert.strictEqual(actions[1].type, "dropHeld");
-        const moveTo = actions[0] as { target: { x: number; y: number } };
-        // Target must not be (0, 0) because (0, 0) is blocked by the building
-        assert.notDeepStrictEqual(moveTo.target, { x: 0, y: 0 });
+        assert.strictEqual(actions.length, 1);
+        assert.strictEqual(actions[0].type, "dropHeld");
+        const drop = actions[0] as { destination: { x: number; y: number } };
+        assert.notDeepStrictEqual(
+            drop.destination,
+            { x: 10, y: 6 },
+            "the building's tile cannot take a pile, so the drop lands beside it",
+        );
     });
 });

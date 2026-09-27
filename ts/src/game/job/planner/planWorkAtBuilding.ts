@@ -4,9 +4,9 @@ import type { Jobs } from "../job.ts";
 import { removeJobForWorker } from "../jobLifecycle.ts";
 
 /**
- * Plan a trip to the job's building followed by the work done there. When the
- * building is gone there is nothing left to walk to, so the job is retired
- * instead of sending the worker to an empty tile.
+ * Plan the work done at the job's building. When the building is gone there is
+ * nothing left to work at, so the job is retired instead of handed out. The
+ * walk there is each action's own approach.
  */
 export function planWorkAtBuilding(
     root: Entity,
@@ -14,18 +14,10 @@ export function planWorkAtBuilding(
     job: Jobs & { targetBuilding: string },
     workAtBuilding: BehaviorActionData[],
 ): BehaviorActionData[] {
-    const buildingEntity = root.findEntity(job.targetBuilding);
-    if (!buildingEntity) {
+    if (!root.findEntity(job.targetBuilding)) {
         removeJobForWorker(worker, job);
         return [];
     }
 
-    return [
-        {
-            type: "moveTo",
-            target: buildingEntity.worldPosition,
-            goal: { kind: "adjacent" },
-        },
-        ...workAtBuilding,
-    ];
+    return workAtBuilding;
 }

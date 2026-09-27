@@ -286,9 +286,9 @@ describe("harvestResourceAction", () => {
             return stockpile;
         }
 
-        it("deposits at an accepting stockpile then returns to the resource", () => {
+        it("deposits at an accepting stockpile before resuming", () => {
             const { settlement, worker } = createSettlementScene();
-            const stockpile = addStockpile(settlement);
+            addStockpile(settlement);
 
             const action = {
                 type: "harvestResource" as const,
@@ -301,19 +301,8 @@ describe("harvestResourceAction", () => {
             assert.strictEqual(result.kind, "subaction");
             assert.deepStrictEqual(
                 (result as { actions: BehaviorActionData[] }).actions,
-                [
-                    {
-                        type: "moveTo",
-                        target: stockpile.worldPosition,
-                        goal: { kind: "adjacent" },
-                    },
-                    { type: "depositToStockpile", stockpileId: "stockpile" },
-                    {
-                        type: "moveTo",
-                        target: { x: 11, y: 8 },
-                        goal: { kind: "adjacent" },
-                    },
-                ],
+                [{ type: "depositToStockpile", stockpileId: "stockpile" }],
+                "the walks there and back are each action's own approach",
             );
         });
 

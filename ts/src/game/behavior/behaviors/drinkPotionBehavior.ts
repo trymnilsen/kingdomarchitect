@@ -151,11 +151,6 @@ function tryStockpileStage(
 
     return [
         {
-            type: "moveTo",
-            target: nearestEntity.worldPosition,
-            goal: { kind: "adjacent" },
-        },
-        {
             type: "withdrawFromStockpile",
             stockpileId: nearestEntity.id,
             itemId: potionIds[tier],

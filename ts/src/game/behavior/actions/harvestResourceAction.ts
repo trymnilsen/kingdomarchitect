@@ -1,8 +1,9 @@
-import { isPointAdjacentTo, type Point } from "../../../common/point.ts";
+import type { Point } from "../../../common/point.ts";
 import { log } from "../../../common/logging/logger.ts";
 import {
     getResourceById,
     ResourceHarvestMode,
+    type NaturalResource,
 } from "../../../data/inventory/items/naturalResource.ts";
 import { spendEntityEnergy } from "../../component/energyComponent.ts";
 
@@ -37,7 +38,6 @@ export type HarvestResourceActionData = {
     outputPolicy?: OutputPolicy;
     workProgress?: number;
 };
-import type { NaturalResource } from "../../../data/inventory/items/naturalResource.ts";
 
 /**
  * Harvest a resource entity.
@@ -68,13 +68,6 @@ export function executeHarvestResourceAction(
         };
     }
 
-    if (
-        !isPointAdjacentTo(resourceEntity.worldPosition, entity.worldPosition)
-    ) {
-        log.warn(`Worker not adjacent to resource`);
-        return { kind: "failed", cause: { type: "notAdjacent" } };
-    }
-
     const resourceComponent =
         resourceEntity.getEcsComponent(ResourceComponentId);
     if (!resourceComponent) {
@@ -103,7 +96,6 @@ export function executeHarvestResourceAction(
         return freeHandSubaction(
             entity,
             held.item,
-            resourceEntity.worldPosition,
             `harvesting ${resource.name}`,
         );
     }

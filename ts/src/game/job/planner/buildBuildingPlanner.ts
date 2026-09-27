@@ -70,14 +70,7 @@ export function planBuildBuilding(
             });
             return [];
         }
-        return [
-            {
-                type: "moveTo",
-                target: buildingEntity.worldPosition,
-                goal: { kind: "adjacent" },
-            },
-            { type: "constructBuilding", entityId: job.entityId },
-        ];
+        return [{ type: "constructBuilding", entityId: job.entityId }];
     }
 
     const remainingMaterials = getRemainingMaterials(
@@ -87,24 +80,12 @@ export function planBuildBuilding(
     const buildingReady = Object.keys(remainingMaterials).length === 0;
 
     if (buildingReady) {
-        return [
-            {
-                type: "moveTo",
-                target: buildingEntity.worldPosition,
-                goal: { kind: "adjacent" },
-            },
-            { type: "constructBuilding", entityId: job.entityId },
-        ];
+        return [{ type: "constructBuilding", entityId: job.entityId }];
     }
 
     if (workerHasAnyMaterials(workerHeld, remainingMaterials)) {
         const itemId = workerHeld.item!.id;
         return [
-            {
-                type: "moveTo",
-                target: buildingEntity.worldPosition,
-                goal: { kind: "adjacent" },
-            },
             {
                 type: "depositToInventory",
                 targetEntityId: job.entityId,
@@ -124,7 +105,6 @@ export function planBuildBuilding(
             return [];
         }
         return [
-            { type: "moveTo", target: dropPos },
             {
                 type: "dropHeld",
                 destination: dropPos,
@@ -151,17 +131,7 @@ export function planBuildBuilding(
             );
             if (pile) {
                 return [
-                    {
-                        type: "moveTo",
-                        target: pile.worldPosition,
-                        goal: { kind: "adjacent" },
-                    },
                     { type: "pickupFromGround", pileEntityId: pile.id },
-                    {
-                        type: "moveTo",
-                        target: buildingEntity.worldPosition,
-                        goal: { kind: "adjacent" },
-                    },
                     {
                         type: "depositToInventory",
                         targetEntityId: job.entityId,
@@ -216,20 +186,10 @@ export function planBuildBuilding(
 
     return [
         {
-            type: "moveTo",
-            target: stockpileEntity.worldPosition,
-            goal: { kind: "adjacent" },
-        },
-        {
             type: "withdrawFromStockpile",
             stockpileId: stockpileEntity.id,
             itemId: chosenItemId,
             amount: chosenAmount,
-        },
-        {
-            type: "moveTo",
-            target: buildingEntity.worldPosition,
-            goal: { kind: "adjacent" },
         },
         {
             type: "depositToInventory",

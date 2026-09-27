@@ -1,4 +1,3 @@
-import { isPointAdjacentTo } from "../../../common/point.ts";
 import { log } from "../../../common/logging/logger.ts";
 import {
     CollectableComponentId,
@@ -26,8 +25,6 @@ export type CollectItemsActionData = {
  * worker's held slot. Which type to take is decided when the job is created,
  * not here. The job says what the work is, and this action carries it out.
  * Any other stacks on the target are somebody else's job and are left alone.
- *
- * Assumes worker is already adjacent to target (moveTo should have run first).
  */
 export function executeCollectItemsAction(
     action: CollectItemsActionData,
@@ -42,11 +39,6 @@ export function executeCollectItemsAction(
             kind: "failed",
             cause: { type: "targetGone", entityId: action.entityId },
         };
-    }
-
-    if (!isPointAdjacentTo(targetEntity.worldPosition, entity.worldPosition)) {
-        log.warn(`Worker not adjacent to target`);
-        return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 
     const collectableComponent = targetEntity.getEcsComponent(

@@ -6,6 +6,7 @@ import {
 } from "../../component/behaviorAgentComponent.ts";
 import type { Behavior } from "../behaviors/behavior.ts";
 import { executeAction } from "../actions/actionExecutor.ts";
+import { planApproach } from "../actions/actionApproach.ts";
 import { log } from "../../../common/logging/logger.ts";
 import type { BehaviorActionData } from "../actions/actionData.ts";
 import type { FailureCause } from "../actions/action.ts";
@@ -102,10 +103,13 @@ function updateBehaviorAgent(
 
     // Execute the current action in the queue
     if (agent.actionQueue.length > 0) {
-        const action = agent.actionQueue[0];
+        let action = agent.actionQueue[0];
 
         let result: ReturnType<typeof executeAction>;
         try {
+            // Every tick, not only when the action first comes up: the target
+            // may have moved since, and an attack in particular has to follow
+            action = approachQueueHead(entity, agent);
             result = executeAction(action, entity, tick);
         } catch (error) {
             log.error(`Action threw exception for entity ${entity.id}`, {
@@ -126,6 +130,8 @@ function updateBehaviorAgent(
                 // triggers re-selection, and setting it would reclassify this
                 // settled worker as transient for displacement.
                 concludeActivePlan(agent);
+            } else {
+                approachNextHead(entity, agent);
             }
         } else if (result.kind === "failed") {
             const message = `Action ${action.type} failed for entity ${entity.id} (${result.cause.type}), cleaning up and replanning`;
@@ -144,9 +150,51 @@ function updateBehaviorAgent(
             // Suspend the current action by inserting subactions before it.
             // When the subactions complete the suspended action will resume.
             agent.actionQueue.splice(0, 0, ...result.actions);
+            approachNextHead(entity, agent);
         }
         entity.invalidateComponent(BehaviorAgentComponentId);
         // result.kind === "running". Keep the action in the queue. It runs again next tick.
+    }
+}
+
+/**
+ * Put the walk into the head action's reach in front of it, and return what is
+ * now at the head. Planners queue actions without their walks, so this is where
+ * an entity learns it has to go somewhere first.
+ */
+function approachQueueHead(
+    entity: Entity,
+    agent: BehaviorAgentComponent,
+): BehaviorActionData {
+    const head = agent.actionQueue[0];
+    const approach = planApproach(head, entity);
+    if (!approach) {
+        return head;
+    }
+    log.debug(
+        `Entity ${entity.id} out of reach for "${head.type}", walking to (${approach.target.x},${approach.target.y})`,
+    );
+    agent.actionQueue.unshift(approach);
+    return approach;
+}
+
+/**
+ * Approach the new head as soon as the queue moves on, not at the start of the
+ * next tick. Between ticks other agents read this queue: displacement treats a
+ * worker whose head is a moveTo as about to leave, and the selection UI names
+ * the head. A worker bound for its next target should read as walking.
+ *
+ * Guarded like the other calls outside the per-action try, since a throw here
+ * would abort the tick for every agent. The next tick approaches again inside
+ * that try, where a persistent throw fails the action and replans.
+ */
+function approachNextHead(entity: Entity, agent: BehaviorAgentComponent): void {
+    try {
+        approachQueueHead(entity, agent);
+    } catch (error) {
+        log.error(`Approaching next action threw for entity ${entity.id}`, {
+            error,
+        });
     }
 }
 
@@ -223,8 +271,8 @@ function selectBehavior(
     // Guard: if a craftItem action with inputs already consumed is in the queue,
     // don't discard it. Inputs are no longer in the building or worker inventory,
     // so a normal replan would cause planCrafting to permanently fail the job.
-    // Instead, rebuild the queue as [moveTo(building), craftItem] so the worker
-    // returns to the building and finishes the craft with progress preserved.
+    // Instead, keep only the craftItem. Its approach walks the worker back to
+    // the building, where it finishes the craft with progress preserved.
     const inProgressCraftItem = agent.actionQueue.find(
         (a): a is Extract<BehaviorActionData, { type: "craftItem" }> =>
             a.type === "craftItem" &&
@@ -238,14 +286,7 @@ function selectBehavior(
             log.info(
                 `Entity ${entity.id} displaced mid-craft, returning to building ${inProgressCraftItem.buildingId}`,
             );
-            agent.actionQueue = [
-                {
-                    type: "moveTo",
-                    target: buildingEntity.worldPosition,
-                    goal: { kind: "adjacent" },
-                },
-                inProgressCraftItem,
-            ];
+            agent.actionQueue = [inProgressCraftItem];
             agent.pendingReplan = undefined;
             return;
         }

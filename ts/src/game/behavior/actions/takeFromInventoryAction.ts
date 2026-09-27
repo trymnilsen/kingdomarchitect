@@ -1,4 +1,4 @@
-import { isPointAdjacentTo } from "../../../common/point.ts";
+import { log } from "../../../common/logging/logger.ts";
 import {
     addInventoryItem,
     InventoryComponentId,
@@ -16,11 +16,9 @@ export type TakeFromInventoryActionData = {
     sourceEntityId: string;
     items: ItemTransfer[];
 };
-import { log } from "../../../common/logging/logger.ts";
 
 /**
  * Take specific items from a source entity's inventory and add to worker's inventory.
- * Assumes worker is already adjacent to source (moveTo should have run first).
  */
 export function executeTakeFromInventoryAction(
     action: TakeFromInventoryActionData,
@@ -35,11 +33,6 @@ export function executeTakeFromInventoryAction(
             kind: "failed",
             cause: { type: "targetGone", entityId: action.sourceEntityId },
         };
-    }
-
-    if (!isPointAdjacentTo(sourceEntity.worldPosition, entity.worldPosition)) {
-        log.warn(`Worker not adjacent to source`);
-        return { kind: "failed", cause: { type: "notAdjacent" } };
     }
 
     const sourceInventory =

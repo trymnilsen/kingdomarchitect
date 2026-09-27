@@ -80,14 +80,7 @@ export function createKeepWarmBehavior(): Behavior {
                     `Entity ${entity.id} going to warm at fire ${nearestFire.id} (warmth: ${warmthValue})`,
                 );
                 // Go warm up at fire
-                return [
-                    {
-                        type: "moveTo",
-                        target: nearestFire.worldPosition,
-                        goal: { kind: "adjacent" },
-                    },
-                    { type: "warmByFire", fireEntityId: nearestFire.id },
-                ];
+                return [{ type: "warmByFire", fireEntityId: nearestFire.id }];
             }
 
             log.info(

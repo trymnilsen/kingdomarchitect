@@ -112,8 +112,8 @@ describe("RestockBehavior", () => {
             root.addChild(stockpileB);
 
             const actions = behavior.expand(worker);
-            const withdraw = actions[1] as Extract<
-                (typeof actions)[1],
+            const withdraw = actions[0] as Extract<
+                (typeof actions)[0],
                 { type: "withdrawFromStockpile" }
             >;
 
@@ -155,8 +155,8 @@ describe("RestockBehavior", () => {
             root.addChild(target2);
 
             const actions = behavior.expand(worker);
-            const deposit = actions[3] as Extract<
-                (typeof actions)[3],
+            const deposit = actions[1] as Extract<
+                (typeof actions)[1],
                 { type: "depositToStockpile" }
             >;
 

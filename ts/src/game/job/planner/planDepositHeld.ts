@@ -23,11 +23,6 @@ export function planDepositHeld(worker: Entity): BehaviorActionData[] {
     if (stockpile) {
         return [
             {
-                type: "moveTo",
-                target: stockpile.worldPosition,
-                goal: { kind: "adjacent" },
-            },
-            {
                 type: "depositToStockpile",
                 stockpileId: stockpile.id,
             },

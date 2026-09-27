@@ -43,19 +43,4 @@ describe("dropHeldAction", () => {
         assert.strictEqual(collectable.items[0].item.id, "wood");
         assert.strictEqual(collectable.items[0].amount, 4);
     });
-
-    it("fails when destination is set and the worker is not there", () => {
-        const { worker } = setupScene();
-        const held = worker.requireEcsComponent(HeldItemComponentId);
-        held.item = woodResourceItem;
-        held.amount = 1;
-
-        const result = executeDropHeldAction(
-            { type: "dropHeld", destination: { x: 99, y: 99 } },
-            worker,
-            1,
-        );
-        assert.strictEqual(result.kind, "failed");
-        assert.strictEqual(held.amount, 1);
-    });
 });

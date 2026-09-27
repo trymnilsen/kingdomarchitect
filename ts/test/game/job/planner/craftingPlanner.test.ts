@@ -56,7 +56,7 @@ function createTestScene(): {
 
 describe("craftingPlanner", () => {
     describe("building has all inputs", () => {
-        it("returns moveTo, stepOnto and craftItem actions", () => {
+        it("returns stepOnto and craftItem actions", () => {
             const { root, worker, building } = createTestScene();
 
             const buildingInventory = building.getEcsComponent("Inventory")!;
@@ -65,16 +65,15 @@ describe("craftingPlanner", () => {
             const job = createCraftingJob("building", planksRecipe);
             const actions = planCrafting(root, worker, job);
 
-            assert.strictEqual(actions.length, 3);
-            assert.strictEqual(actions[0].type, "moveTo");
-            assert.strictEqual(actions[1].type, "stepOnto");
-            assert.strictEqual(actions[2].type, "craftItem");
+            assert.strictEqual(actions.length, 2);
+            assert.strictEqual(actions[0].type, "stepOnto");
+            assert.strictEqual(actions[1].type, "craftItem");
         });
     });
 
     describe("worker held already has a needed input", () => {
-        it("returns moveTo + depositToInventory", () => {
-            const { root, worker, building } = createTestScene();
+        it("returns depositToInventory", () => {
+            const { root, worker } = createTestScene();
             const held = worker.requireEcsComponent(HeldItemComponentId);
             held.item = woodResourceItem;
             held.amount = 4;
@@ -82,8 +81,7 @@ describe("craftingPlanner", () => {
             const job = createCraftingJob("building", planksRecipe);
             const actions = planCrafting(root, worker, job);
 
-            assert.strictEqual(actions[0].type, "moveTo");
-            assert.strictEqual(actions[1].type, "depositToInventory");
+            assert.strictEqual(actions[0].type, "depositToInventory");
         });
     });
 
@@ -97,11 +95,9 @@ describe("craftingPlanner", () => {
             const job = createCraftingJob("building", planksRecipe);
             const actions = planCrafting(root, worker, job);
 
-            assert.strictEqual(actions.length, 4);
-            assert.strictEqual(actions[0].type, "moveTo");
-            assert.strictEqual(actions[1].type, "withdrawFromStockpile");
-            assert.strictEqual(actions[2].type, "moveTo");
-            assert.strictEqual(actions[3].type, "depositToInventory");
+            assert.strictEqual(actions.length, 2);
+            assert.strictEqual(actions[0].type, "withdrawFromStockpile");
+            assert.strictEqual(actions[1].type, "depositToInventory");
         });
     });
 

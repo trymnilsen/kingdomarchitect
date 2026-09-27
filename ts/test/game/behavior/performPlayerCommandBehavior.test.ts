@@ -22,7 +22,7 @@ function createAttackScene(): {
 
 describe("PerformPlayerCommandBehavior", () => {
     describe("expand", () => {
-        it("expands attack command to moveTo + attackTarget + clearPlayerCommand", () => {
+        it("expands attack command to attackTarget + clearPlayerCommand", () => {
             const behavior = createPerformPlayerCommandBehavior();
             const { attacker, target } = createAttackScene();
             const agent = getBehaviorAgent(attacker);
@@ -33,23 +33,13 @@ describe("PerformPlayerCommandBehavior", () => {
 
             const actions = behavior.expand(attacker);
 
-            assert.strictEqual(actions.length, 3);
-            assert.strictEqual(actions[0].type, "moveTo");
-            if (actions[0].type === "moveTo") {
-                assert.deepStrictEqual(actions[0].target, { x: 15, y: 12 });
-                assert.deepStrictEqual(actions[0].goal, {
-                    kind: "attackReach",
+            assert.deepStrictEqual(actions, [
+                {
+                    type: "attackTarget",
                     target: { kind: AttackTargetKind.Entity, id: target.id },
-                });
-            }
-            assert.strictEqual(actions[1].type, "attackTarget");
-            if (actions[1].type === "attackTarget") {
-                assert.deepStrictEqual(actions[1].target, {
-                    kind: AttackTargetKind.Entity,
-                    id: target.id,
-                });
-            }
-            assert.strictEqual(actions[2].type, "clearPlayerCommand");
+                },
+                { type: "clearPlayerCommand" },
+            ]);
         });
 
         it("clears attack command and returns empty array when target not found", () => {

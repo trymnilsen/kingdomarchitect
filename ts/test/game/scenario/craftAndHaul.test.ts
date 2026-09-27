@@ -2,7 +2,10 @@ import assert from "node:assert";
 import { describe, it } from "node:test";
 import { ScenarioHarness } from "./scenarioHarness.ts";
 import type { Entity } from "../../../src/game/entity/entity.ts";
-import { isPointAdjacentTo } from "../../../src/common/point.ts";
+import {
+    isAtOrAdjacent,
+    isPointAdjacentTo,
+} from "../../../src/common/point.ts";
 import {
     addInventoryItem,
     InventoryComponentId,
@@ -17,7 +20,10 @@ import { woodResourceItem } from "../../../src/data/inventory/items/resources.ts
 import { planksRecipe } from "../../../src/data/crafting/recipes/carpenterRecipes.ts";
 import { carpenter } from "../../../src/data/building/wood/carpenter.ts";
 import { createCraftingJob } from "../../../src/game/job/craftingJob.ts";
-import { getBehaviorAgent } from "../../../src/game/component/behaviorAgentComponent.ts";
+import {
+    getBehaviorAgent,
+    requestReplan,
+} from "../../../src/game/component/behaviorAgentComponent.ts";
 
 /**
  * Worker at (10, 8), carpenter at (11, 8) stocked with the wood for one planks
@@ -58,6 +64,14 @@ function groundPlanks(root: Entity): Entity | null {
     return null;
 }
 
+/** Past the point of no return: the bench's inputs are already consumed */
+function craftInProgress(worker: Entity): boolean {
+    const queue = getBehaviorAgent(worker)?.actionQueue ?? [];
+    return queue.some(
+        (action) => action.type === "craftItem" && action.inputsConsumed,
+    );
+}
+
 describe("craftAndHaul scenario tests", () => {
     it("hauls the crafted output to a stockpile by default", () => {
         const { harness, building, stockpile, worker } = craftingYard();
@@ -95,6 +109,38 @@ describe("craftAndHaul scenario tests", () => {
         );
         assert.strictEqual(harness.getItemCount(stockpile, "planks"), 0);
         assert.strictEqual(harness.getHeldAmount(worker, "planks"), 0);
+    });
+
+    it("walks a crafter pulled away mid-craft back to finish it", () => {
+        const { harness, building, stockpile, worker } = craftingYard();
+
+        harness.tickUntil(() => craftInProgress(worker), 40);
+        assert.ok(craftInProgress(worker), "the craft got under way");
+
+        // Pushed off the bench by someone passing, the inputs already used up
+        worker.worldPosition = { x: 13, y: 11 };
+        requestReplan(worker);
+
+        harness.tickUntil(() => !craftInProgress(worker), 40);
+        assert.ok(
+            isAtOrAdjacent(worker.worldPosition, building.worldPosition),
+            "the craft finished at the bench, not from where the crafter was pushed to",
+        );
+
+        harness.tickUntil(
+            () => harness.getItemCount(stockpile, "planks") > 0,
+            80,
+        );
+
+        assert.ok(
+            harness.getItemCount(stockpile, "planks") > 0,
+            "the craft was finished and its planks hauled",
+        );
+        assert.strictEqual(
+            harness.getItemCount(building, "wood"),
+            0,
+            "one set of inputs made the planks, none was spent twice",
+        );
     });
 
     it("restock moves items from surplus stockpile to deficit stockpile", () => {

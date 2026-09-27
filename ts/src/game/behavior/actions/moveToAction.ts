@@ -1,7 +1,7 @@
 import type { Point } from "../../../common/point.ts";
 import { pointEquals } from "../../../common/point.ts";
 import { log } from "../../../common/logging/logger.ts";
-import { resolveMoveGoal, type MoveGoal } from "./moveGoal.ts";
+import { resolveReach, type Reach } from "./reach.ts";
 
 import {
     BehaviorAgentComponentId,
@@ -34,13 +34,15 @@ import { ActionComplete, ActionRunning, type ActionResult } from "./action.ts";
 
 /**
  * `goal` says what counts as having arrived. Left out, the entity has to reach
- * `target` itself, which is the common case and pays nothing. Set, it is
- * evaluated every tick and the move ends as soon as it is satisfied
+ * `target` itself, which is what a plain walk somewhere wants. Set, it is
+ * evaluated every tick and the move ends as soon as the entity is within that
+ * reach of `target`. The behavior system sets it when it walks an entity into
+ * an action's reach, see actionApproach.ts
  */
 export type MoveToActionData = {
     type: "moveTo";
     target: Point;
-    goal?: MoveGoal;
+    goal?: Reach;
     cachedPath?: Point[];
 };
 
@@ -75,7 +77,7 @@ export function executeMoveToAction(
     // Once per tick, so the arrival check and the path search cannot disagree
     // about where the target is
     const isGoal = action.goal
-        ? resolveMoveGoal(action.goal, entity, action.target)
+        ? resolveReach(action.goal, entity, action.target)
         : undefined;
 
     if (hasArrived(entity.worldPosition, action.target, isGoal)) {
