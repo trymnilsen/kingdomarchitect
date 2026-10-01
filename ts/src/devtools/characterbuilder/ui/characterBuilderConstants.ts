@@ -1,4 +1,5 @@
-import { characterPartFrames } from "../../../../generated/characterFrames.ts";
+import type { EquipmentSlot } from "../../../game/component/equipmentComponent.ts";
+import type { ColorPart } from "../../../rendering/character/characterColors.ts";
 import { CHARACTER_FRAME } from "../../../rendering/character/characterFrame.ts";
 
 export const LAYOUT = {
@@ -38,14 +39,31 @@ export const COLORS = {
     LAYER_BOX_BORDER: "rgba(100, 100, 100, 1)",
 } as const;
 
-export const BODY_PARTS = [
+export const COLOR_PARTS: readonly ColorPart[] = [
     "Chest",
     "Feet",
     "Hands",
     "Pants",
+];
+
+/** The menu entries: one per colorable part, then the hat and slot pickers. */
+export type BuilderSection = ColorPart | "Hat" | "Equipment";
+
+export const BUILDER_SECTIONS: readonly BuilderSection[] = [
+    ...COLOR_PARTS,
     "Hat",
     "Equipment",
-] as const;
+];
+
+export type SlotOption = {
+    slot: EquipmentSlot;
+    name: string;
+};
+
+export const SLOT_OPTIONS: readonly SlotOption[] = [
+    { slot: "primary", name: "Primary (right hand)" },
+    { slot: "secondary", name: "Secondary (left hand)" },
+];
 
 export const FANTASY_GEAR_COLORS = [
     "DarkSlateBlue",
@@ -62,18 +80,4 @@ export const FANTASY_GEAR_COLORS = [
     "Teal",
 ] as const;
 
-export type BodyPart = (typeof BODY_PARTS)[number];
 export type PreviewMode = "Sheet" | "Single";
-
-export type HatOption = {
-    id: string;
-    name: string;
-};
-
-export const HAT_OPTIONS: HatOption[] = [
-    { id: "none", name: "None" },
-    { id: "hat", name: "Wizard Hat" },
-];
-
-export const AVAILABLE_ANCHORS: string[] =
-    characterPartFrames[0]?.anchors.map((a) => a.anchorId) ?? [];

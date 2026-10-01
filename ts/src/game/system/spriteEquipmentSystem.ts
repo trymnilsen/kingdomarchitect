@@ -61,7 +61,7 @@ function updateEquipmentSprite(
     const spriteComponent = target.getEcsComponent(SpriteComponentId);
     if (!spriteComponent) return;
     const equipment = target.requireEcsComponent(EquipmentComponentId);
-    const colors = getCharacterColors(equipment);
+    const colors = getCharacterColors(equipment.slots);
     const animations = getAllAnimations(
         characterPartFrames as unknown as CharacterAnimation[],
     );

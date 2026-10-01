@@ -1,6 +1,6 @@
 import type { SpriteRef } from "../../asset/sprite.ts";
 import type { StatModifiers } from "../../game/stat/statType.ts";
-import type { EquipmentSpriteVariant } from "../../rendering/character/characterColors.ts";
+import type { ItemVisual } from "./itemVisual.ts";
 
 export type InventoryItem = {
     readonly id: string;
@@ -9,7 +9,7 @@ export type InventoryItem = {
     readonly hint?: string;
     readonly tag?: readonly ItemTag[];
     readonly category?: ItemCategory;
-    readonly visual?: EquipmentSpriteVariant;
+    readonly visual?: ItemVisual;
     readonly rarity?: ItemRarity;
     readonly statModifiers?: StatModifiers;
     /**

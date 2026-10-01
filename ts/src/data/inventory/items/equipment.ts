@@ -7,7 +7,25 @@ import {
 import { fishingRodProfile } from "../../fishing/fishingProfileDefinition.ts";
 import { torchLightSource } from "../../light/lightSourceDefinition.ts";
 import { EquipmentSpriteVariantType } from "../../../rendering/character/characterColors.ts";
+import {
+    archerHatWorn,
+    wizardHatWorn,
+} from "../../appearance/hatAppearance.ts";
+import type { ItemVisual } from "../itemVisual.ts";
 import { ItemCategory, ItemRarity, ItemTag } from "./../inventoryItem.ts";
+
+/**
+ * Both swords share the one held-sword sprite there is, and anyone carrying
+ * one is dressed in the dark shirt of someone expecting a fight.
+ */
+const swordVisual: ItemVisual = {
+    held: {
+        type: EquipmentSpriteVariantType.Single,
+        sprite: spriteRefs.character_sword,
+        offset: { x: 4, y: 8 },
+    },
+    partColors: { Chest: "#424242" },
+};
 
 export const swordItem = {
     asset: spriteRefs.sword_skill,
@@ -16,6 +34,7 @@ export const swordItem = {
     tag: [ItemTag.SkillGear],
     category: ItemCategory.Melee,
     attack: swordAttackProfile.id,
+    visual: swordVisual,
 } as const;
 
 export const bowItem = {
@@ -25,11 +44,19 @@ export const bowItem = {
     tag: [ItemTag.SkillGear],
     category: ItemCategory.Ranged,
     attack: bowAttackProfile.id,
+    visual: {
+        held: {
+            type: EquipmentSpriteVariantType.Mirrored,
+            sprite: spriteRefs.character_bow,
+            offset: { x: 4, y: 6 },
+        },
+        worn: [archerHatWorn],
+    },
 } as const;
 
 export const wizardHat = {
     asset: spriteRefs.wizard_hat_skill,
-    id: "hat",
+    id: "wizardHat",
     name: "Wizard Hat",
     hint:
         "A tall, pointed hat of deeply suspicious provenance. The guild insists " +
@@ -50,6 +77,7 @@ export const wizardHat = {
         "plans, or files for tenure.",
     tag: [ItemTag.SkillGear],
     category: ItemCategory.Magic,
+    visual: { worn: [wizardHatWorn] },
 } as const;
 
 export const hammerItem = {
@@ -74,9 +102,11 @@ export const torchItem = {
     // Placeholder art: a 16x16 building icon, twice the width of held sprites,
     // and an 8-frame animation drawn as frame 0.
     visual: {
-        type: EquipmentSpriteVariantType.Single,
-        sprite: spriteRefs.torches,
-        offset: { x: 8, y: 8 },
+        held: {
+            type: EquipmentSpriteVariantType.Single,
+            sprite: spriteRefs.torches,
+            offset: { x: 8, y: 8 },
+        },
     },
     rarity: ItemRarity.Common,
 } as const;
@@ -95,11 +125,7 @@ export const woodenSwordItem = {
     category: ItemCategory.Melee,
     attack: woodenSwordAttackProfile.id,
     statModifiers: { might: { flat: 1 } },
-    visual: {
-        type: EquipmentSpriteVariantType.Single,
-        sprite: spriteRefs.character_sword,
-        offset: { x: 4, y: 8 },
-    },
+    visual: swordVisual,
     rarity: ItemRarity.Common,
 } as const;
 
@@ -112,9 +138,11 @@ export const fishingRodItem = {
     category: ItemCategory.Productivity,
     fishing: fishingRodProfile.id,
     visual: {
-        type: EquipmentSpriteVariantType.Mirrored,
-        sprite: spriteRefs.fishingrod,
-        offset: { x: 0, y: 8 },
+        held: {
+            type: EquipmentSpriteVariantType.Mirrored,
+            sprite: spriteRefs.fishingrod,
+            offset: { x: 0, y: 8 },
+        },
     },
     rarity: ItemRarity.Common,
 } as const;

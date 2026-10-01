@@ -38,7 +38,7 @@ export function getSpriteForState(
         return spriteRefs[animationName as keyof typeof spriteRefs];
     } else if (entity.hasComponent(EquipmentComponentId)) {
         const equipment = entity.requireEcsComponent(EquipmentComponentId);
-        const colors = getCharacterColors(equipment);
+        const colors = getCharacterColors(equipment.slots);
         const characterId = getCharacterBinId(colors);
         // Get the SpriteRef from the cache (sprites are registered with spriteRegistry)
         const sprite = spriteCache.getSpriteFor(characterId, animationName);

@@ -53,13 +53,23 @@ export type PartBoundsEquipment = {
 };
 
 /**
- * The appearance the sprite generator draws. The character builder writes one
- * by hand, and the game derives one from equipment in `getCharacterColors`.
+ * Colors for the recolorable body parts. A part left out is drawn in the
+ * generator's fallback, which for pants is the chest color.
  */
-export type CharacterColors = {
+export type PartColors = {
     Chest?: string;
     Pants?: string;
     Feet?: string;
     Hands?: string;
+};
+
+export type ColorPart = keyof PartColors;
+
+/**
+ * The appearance the sprite generator draws. The game derives one from
+ * equipment in `getCharacterColors`, and the character builder adds its own
+ * choices on top of that.
+ */
+export type CharacterColors = PartColors & {
     Equipment?: Array<AnchorEquipment | PartBoundsEquipment>;
 };

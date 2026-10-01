@@ -7,7 +7,12 @@ import { uiText } from "../../../ui/declarative/uiText.ts";
 import { uiAlignment } from "../../../ui/uiAlignment.ts";
 import { colorBackground } from "../../../ui/uiBackground.ts";
 import { fillUiSize, wrapUiSize } from "../../../ui/uiSize.ts";
-import type { CharacterColors } from "../../../rendering/character/characterColors.ts";
+import type {
+    CharacterColors,
+    ColorPart,
+} from "../../../rendering/character/characterColors.ts";
+import { hatAppearances } from "../../../data/appearance/hatAppearance.ts";
+import type { EquipmentSlot } from "../../../game/component/equipmentComponent.ts";
 import { CharacterPreview } from "./characterPreview.ts";
 import {
     createAnimationButton,
@@ -17,15 +22,15 @@ import {
     createPrimaryButton,
 } from "./characterBuilderButtons.ts";
 import {
-    AVAILABLE_ANCHORS,
-    BODY_PARTS,
+    BUILDER_SECTIONS,
     COLORS,
     FANTASY_GEAR_COLORS,
-    HAT_OPTIONS,
     LAYOUT,
-    type BodyPart,
+    SLOT_OPTIONS,
+    type BuilderSection,
     type PreviewMode,
 } from "./characterBuilderConstants.ts";
+import type { CharacterBuilderSelection } from "./characterBuilderSelection.ts";
 import { ITEMS_WITH_VISUAL } from "./itemsWithVisual.ts";
 
 export function createHeaderBar() {
@@ -42,15 +47,29 @@ export function createHeaderBar() {
 }
 
 export function createPartSelectionPanel(
-    selectedPart: BodyPart,
-    onPartSelect: (part: BodyPart) => void,
-    selectedColors: CharacterColors,
-    onColorSelect: (color: string | undefined) => void,
-    selectedAnchor: string | null,
-    onAnchorSelect: (anchor: string | null) => void,
-    onEquipmentSelect: (anchorId: string, itemId: string | null) => void,
-    onHatSelect: (hatId: string) => void,
+    selectedSection: BuilderSection,
+    onSectionSelect: (section: BuilderSection) => void,
+    selection: CharacterBuilderSelection,
+    onColorSelect: (part: ColorPart, color: string | undefined) => void,
+    selectedSlot: EquipmentSlot | null,
+    onSlotSelect: (slot: EquipmentSlot | null) => void,
+    onItemSelect: (slot: EquipmentSlot, itemId: string | null) => void,
+    onHatSelect: (hatId: string | null) => void,
 ) {
+    let customization: ComponentDescriptor[];
+    if (selectedSection === "Hat") {
+        customization = createHatSection(selection.hatId, onHatSelect);
+    } else if (selectedSection === "Equipment") {
+        customization = createEquipmentSection(
+            selection,
+            selectedSlot,
+            onSlotSelect,
+            onItemSelect,
+        );
+    } else {
+        customization = createColorSection(selectedSection, onColorSelect);
+    }
+
     return uiBox({
         width: LAYOUT.LEFT_PANEL_WIDTH,
         height: fillUiSize,
@@ -63,93 +82,92 @@ export function createPartSelectionPanel(
                     content: "Parts",
                     textStyle: titleTextStyle,
                 }),
-                ...BODY_PARTS.map((part) =>
-                    createPartButton(part, selectedPart === part, () =>
-                        onPartSelect(part),
+                ...BUILDER_SECTIONS.map((section) =>
+                    createPartButton(
+                        section,
+                        selectedSection === section,
+                        () => onSectionSelect(section),
                     ),
                 ),
-                ...createCustomizationSection(
-                    selectedPart,
-                    selectedColors,
-                    onColorSelect,
-                    selectedAnchor,
-                    onAnchorSelect,
-                    onEquipmentSelect,
-                    onHatSelect,
-                ),
+                ...customization,
             ],
         }),
     });
 }
 
-function createCustomizationSection(
-    selectedPart: BodyPart,
-    selectedColors: CharacterColors,
-    onColorSelect: (color: string | undefined) => void,
-    selectedAnchor: string | null,
-    onAnchorSelect: (anchor: string | null) => void,
-    onEquipmentSelect: (anchorId: string, itemId: string | null) => void,
-    onHatSelect: (hatId: string) => void,
+function createHatSection(
+    activeHatId: string | null,
+    onHatSelect: (hatId: string | null) => void,
 ): ComponentDescriptor[] {
-    if (selectedPart === "Hat") {
-        const activeHatId = selectedColors.Equipment?.some(
-            (e) => "attachToPart" in e && e.attachToPart === "Head",
-        )
-            ? "hat"
-            : "none";
+    return [
+        uiText({ content: "Hat", textStyle: titleTextStyle }),
+        createPartButton("From items", activeHatId === null, () =>
+            onHatSelect(null),
+        ),
+        ...hatAppearances.map((hat) =>
+            createPartButton(hat.name, hat.id === activeHatId, () =>
+                onHatSelect(hat.id),
+            ),
+        ),
+    ];
+}
+
+function createColorSection(
+    part: ColorPart,
+    onColorSelect: (part: ColorPart, color: string | undefined) => void,
+): ComponentDescriptor[] {
+    return [
+        uiText({
+            content: "Color",
+            textStyle: titleTextStyle,
+        }),
+        uiGrid({
+            gap: 8,
+            width: fillUiSize,
+            height: wrapUiSize,
+            children: createColorGridItems(FANTASY_GEAR_COLORS, (color) =>
+                onColorSelect(part, color),
+            ),
+        }),
+    ];
+}
+
+function createEquipmentSection(
+    selection: CharacterBuilderSelection,
+    selectedSlot: EquipmentSlot | null,
+    onSlotSelect: (slot: EquipmentSlot | null) => void,
+    onItemSelect: (slot: EquipmentSlot, itemId: string | null) => void,
+): ComponentDescriptor[] {
+    if (selectedSlot === null) {
         return [
-            uiText({ content: "Hat", textStyle: titleTextStyle }),
-            ...HAT_OPTIONS.map((option) =>
-                createPartButton(option.name, option.id === activeHatId, () =>
-                    onHatSelect(option.id),
+            uiText({
+                content: "Slot",
+                textStyle: titleTextStyle,
+            }),
+            ...SLOT_OPTIONS.map((option) =>
+                createPartButton(option.name, false, () =>
+                    onSlotSelect(option.slot),
                 ),
             ),
         ];
     }
 
-    if (selectedPart !== "Equipment") {
-        return [
-            uiText({
-                content: "Color",
-                textStyle: titleTextStyle,
-            }),
-            uiGrid({
-                gap: 8,
-                width: fillUiSize,
-                height: wrapUiSize,
-                children: createColorGridItems(FANTASY_GEAR_COLORS, (color) => {
-                    const newColor = { ...selectedColors };
-                    newColor[selectedPart] = color;
-                    onColorSelect(color);
-                }),
-            }),
-        ];
-    }
-
-    if (selectedAnchor === null) {
-        return [
-            uiText({
-                content: "Anchor",
-                textStyle: titleTextStyle,
-            }),
-            ...AVAILABLE_ANCHORS.map((anchor) =>
-                createPartButton(anchor, false, () => onAnchorSelect(anchor)),
-            ),
-        ];
-    }
-
+    const equippedId = selection.slots[selectedSlot];
+    const slotName =
+        SLOT_OPTIONS.find((option) => option.slot === selectedSlot)?.name ??
+        selectedSlot;
     return [
         uiText({
-            content: selectedAnchor,
+            content: slotName,
             textStyle: titleTextStyle,
         }),
-        createPartButton("< Back", false, () => onAnchorSelect(null)),
-        createPartButton("None", false, () =>
-            onEquipmentSelect(selectedAnchor, null),
+        createPartButton("< Back", false, () => onSlotSelect(null)),
+        createPartButton("None", equippedId === null, () =>
+            onItemSelect(selectedSlot, null),
         ),
         ...ITEMS_WITH_VISUAL.map((item) =>
-            createPartButton(item.name, false, () =>
-                onEquipmentSelect(selectedAnchor, item.id),
+            createPartButton(item.name, item.id === equippedId, () =>
+                onItemSelect(selectedSlot, item.id),
             ),
         ),
     ];

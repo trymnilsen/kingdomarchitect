@@ -1,9 +1,9 @@
 import type { InventoryItem } from "../../../data/inventory/inventoryItem.ts";
 import { inventoryItems } from "../../../data/inventory/inventoryItems.ts";
-import type { EquipmentSpriteVariant } from "../../../rendering/character/characterColors.ts";
+import type { ItemVisual } from "../../../data/inventory/itemVisual.ts";
 
 export type ItemWithVisual = InventoryItem & {
-    readonly visual: EquipmentSpriteVariant;
+    readonly visual: ItemVisual;
 };
 
 function hasVisual(item: InventoryItem): item is ItemWithVisual {

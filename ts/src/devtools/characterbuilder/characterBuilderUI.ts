@@ -5,10 +5,8 @@ import type { CharacterAnimation } from "../../rendering/character/characterAnim
 import { createComponent } from "../../ui/declarative/ui.ts";
 import { uiColumn, uiRow } from "../../ui/declarative/uiSequence.ts";
 import { fillUiSize } from "../../ui/uiSize.ts";
-import {
-    EquipmentSpriteVariantType,
-    type CharacterColors,
-} from "../../rendering/character/characterColors.ts";
+import type { ColorPart } from "../../rendering/character/characterColors.ts";
+import type { EquipmentSlot } from "../../game/component/equipmentComponent.ts";
 import {
     createAnimationPanel,
     createHeaderBar,
@@ -17,70 +15,61 @@ import {
     createPreviewPanel,
 } from "./ui/characterBuilderPanels.ts";
 import {
-    type BodyPart,
+    type BuilderSection,
     type PreviewMode,
 } from "./ui/characterBuilderConstants.ts";
-import { ITEMS_WITH_VISUAL } from "./ui/itemsWithVisual.ts";
-import { spriteRefs } from "../../asset/sprite.ts";
+import {
+    createEmptySelection,
+    toCharacterColors,
+    type CharacterBuilderSelection,
+} from "./ui/characterBuilderSelection.ts";
 
 const allAnimations = getAllAnimations(
     characterPartFrames as unknown as CharacterAnimation[],
 );
 
 export const CharacterBuilderUI = createComponent(({ withState }) => {
-    const [selectedPart, setSelectedPart] = withState<BodyPart>("Chest");
+    const [selectedSection, setSelectedSection] =
+        withState<BuilderSection>("Chest");
     const [selectedAnimation, setSelectedAnimation] = withState<string>(
         allAnimations[0].animationName,
     );
-    const [selectedColors, setSelectedColors] = withState<CharacterColors>({});
+    const [selection, setSelection] = withState<CharacterBuilderSelection>(
+        createEmptySelection(),
+    );
     const [previewMode, setPreviewMode] = withState<PreviewMode>("Single");
     const [currentFrame, setCurrentFrame] = withState<number>(0);
-    const [selectedAnchor, setSelectedAnchor] = withState<string | null>(null);
+    const [selectedSlot, setSelectedSlot] = withState<EquipmentSlot | null>(
+        null,
+    );
 
-    const handlePartSelect = (part: BodyPart) => {
-        setSelectedPart(part);
-        if (part !== "Equipment") {
-            setSelectedAnchor(null);
+    const handleSectionSelect = (section: BuilderSection) => {
+        setSelectedSection(section);
+        if (section !== "Equipment") {
+            setSelectedSlot(null);
         }
     };
 
-    const handleColorSelect = (color: string | undefined) => {
-        const newColors = { ...selectedColors };
-        newColors[selectedPart] = color;
-        log.info("Color updated", { newColors });
-        setSelectedColors(newColors);
+    const handleColorSelect = (part: ColorPart, color: string | undefined) => {
+        const partColors = { ...selection.partColors };
+        if (color === undefined) {
+            delete partColors[part];
+        } else {
+            partColors[part] = color;
+        }
+        log.info("Color updated", { partColors });
+        setSelection({ ...selection, partColors });
     };
 
-    const handleHatSelect = (hatId: string) => {
-        const existing = (selectedColors.Equipment ?? []).filter(
-            (e) => !("attachToPart" in e && e.attachToPart === "Head"),
-        );
-        if (hatId !== "none") {
-            existing.push({
-                attachToPart: "Head",
-                sprite: {
-                    type: EquipmentSpriteVariantType.Single,
-                    sprite: spriteRefs.wizard_hat,
-                    offset: { x: 6, y: 10 },
-                },
-            });
-        }
-        setSelectedColors({
-            ...selectedColors,
-            Equipment: existing.length > 0 ? existing : undefined,
+    const handleHatSelect = (hatId: string | null) => {
+        setSelection({ ...selection, hatId });
+    };
+
+    const handleItemSelect = (slot: EquipmentSlot, itemId: string | null) => {
+        setSelection({
+            ...selection,
+            slots: { ...selection.slots, [slot]: itemId },
         });
-    };
-
-    const handleEquipmentSelect = (anchorId: string, itemId: string | null) => {
-        const existing = selectedColors.Equipment ?? [];
-        const filtered = existing.filter(
-            (e) => !("anchor" in e) || e.anchor !== anchorId,
-        );
-        const item = ITEMS_WITH_VISUAL.find((i) => i.id === itemId);
-        if (item) {
-            filtered.push({ anchor: anchorId, sprite: item.visual });
-        }
-        setSelectedColors({ ...selectedColors, Equipment: filtered });
     };
 
     const getCurrentFrameCount = (): number => {
@@ -129,19 +118,19 @@ export const CharacterBuilderUI = createComponent(({ withState }) => {
                 height: fillUiSize,
                 children: [
                     createPartSelectionPanel(
-                        selectedPart,
-                        handlePartSelect,
-                        selectedColors,
+                        selectedSection,
+                        handleSectionSelect,
+                        selection,
                         handleColorSelect,
-                        selectedAnchor,
-                        setSelectedAnchor,
-                        handleEquipmentSelect,
+                        selectedSlot,
+                        setSelectedSlot,
+                        handleItemSelect,
                         handleHatSelect,
                     ),
                     createPreviewPanel(
                         previewMode,
                         setPreviewMode,
-                        selectedColors,
+                        toCharacterColors(selection),
                         selectedAnimation,
                         currentFrame,
                     ),
