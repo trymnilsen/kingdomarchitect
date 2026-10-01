@@ -318,6 +318,35 @@ export const uiScaffold = createComponent<ScaffoldProps>(
             return childrenToAdd;
         };
 
+        /**
+         * Places the content in the space above the button bar. It is the
+         * first child so it draws below the buttons and expanded menus, and
+         * because hit testing follows draw order, buttons that overlap it
+         * also win taps.
+         */
+        const placeContent = (buttonBarHeight: number): PlacedChild | null => {
+            if (!props.content) {
+                return null;
+            }
+            const contentConstraints = {
+                width: constraints.width,
+                height: Math.max(
+                    0,
+                    constraints.height - buttonBarHeight - spacing,
+                ),
+            };
+            const contentSize = measureDescriptor(
+                "content",
+                props.content,
+                contentConstraints,
+            );
+            return {
+                offset: { x: 0, y: 0 },
+                size: contentSize,
+                ...props.content,
+            };
+        };
+
         const leftSize = measureButtons(leftButtons);
         const rightSize = measureButtons(rightButtons);
 
@@ -328,6 +357,12 @@ export const uiScaffold = createComponent<ScaffoldProps>(
         const betweenGroupSpacing =
             leftButtons.length > 0 && rightButtons.length > 0 ? spacing : 0;
         if (width + betweenGroupSpacing <= constraints.width) {
+            const children: PlacedChild[] = [];
+            const content = placeContent(height);
+            if (content) {
+                children.push(content);
+            }
+
             let buttonX = 0;
             const left = leftButtons.map<PlacedChild>((button, index) => {
                 const buttonSize = leftSize.sizes[index];
@@ -345,7 +380,7 @@ export const uiScaffold = createComponent<ScaffoldProps>(
                 };
             });
 
-            let children: PlacedChild[] = [...left];
+            children.push(...left);
 
             // Add right buttons - maintain order but align to right
             let right: PlacedChild[] = [];
@@ -400,34 +435,12 @@ export const uiScaffold = createComponent<ScaffoldProps>(
                 }
             }
 
-            // Add content if provided - should fill the space above the buttons
-            if (props.content) {
-                const contentHeight = constraints.height - height - spacing;
-                const contentConstraints = {
-                    width: constraints.width,
-                    height: Math.max(0, contentHeight),
-                };
-
-                const contentSize = measureDescriptor(
-                    "content",
-                    props.content,
-                    contentConstraints,
-                );
-
-                children.push({
-                    offset: { x: 0, y: 0 },
-                    size: contentSize,
-                    ...props.content,
-                });
-            }
-
             return {
                 children: children,
                 size: { width: constraints.width, height: constraints.height },
             };
         } else {
             // Not enough space for buttons, collapse the left buttons into an expanding menu
-            let children: PlacedChild[] = [];
 
             // Create collapsed "Actions" menu from left buttons if they exist
             const hasLeftButtons =
@@ -468,39 +481,51 @@ export const uiScaffold = createComponent<ScaffoldProps>(
                     constraints,
                 );
             }
-            const rightSize = measureButtons(rightButtons);
+
+            const children: PlacedChild[] = [];
+            const buttonBarHeight = Math.max(
+                collapsedMenuSize?.height || 0,
+                rightSize.maxHeight,
+            );
+            const content = placeContent(buttonBarHeight);
+            if (content) {
+                children.push(content);
+            }
 
             // Position collapsed menu button on the left (if it exists)
+            let collapsedMenu: PlacedChild | null = null;
             if (collapsedMenuButton && collapsedMenuSize) {
                 const y = constraints.height - collapsedMenuSize.height;
-                children.push({
+                collapsedMenu = {
                     offset: { x: 0, y },
                     size: collapsedMenuSize,
                     ...collapsedMenuButton,
-                });
+                };
+                children.push(collapsedMenu);
             }
 
             // Position right buttons aligned to the right
-            if (rightButtons.length > 0) {
-                let rightButtonX = constraints.width - rightSize.totalWidth;
-                rightButtons.forEach((button, index) => {
-                    const buttonSize = rightSize.sizes[index];
-                    const y = constraints.height - buttonSize.height;
-                    const x = rightButtonX;
-                    rightButtonX += buttonSize.width;
+            let rightButtonX = constraints.width - rightSize.totalWidth;
+            const right = rightButtons.map<PlacedChild>((button, index) => {
+                const buttonSize = rightSize.sizes[index];
+                const y = constraints.height - buttonSize.height;
+                const x = rightButtonX;
+                rightButtonX += buttonSize.width;
 
-                    // Add spacing between buttons (but not after the last one)
-                    if (index < rightButtons.length - 1) {
-                        rightButtonX += spacing;
-                    }
+                // Add spacing between buttons (but not after the last one)
+                if (index < rightButtons.length - 1) {
+                    rightButtonX += spacing;
+                }
 
-                    children.push({
-                        offset: { x, y },
-                        size: buttonSize,
-                        ...button,
-                    });
-                });
-            } // Handle expanded menus in compact mode
+                return {
+                    offset: { x, y },
+                    size: buttonSize,
+                    ...button,
+                };
+            });
+            children.push(...right);
+
+            // Handle expanded menus in compact mode
             if (
                 expandedMenu.expandedPath.length > 0 &&
                 expandedMenu.expandedGroup !== null
@@ -517,7 +542,7 @@ export const uiScaffold = createComponent<ScaffoldProps>(
                 ) {
                     // Handle expanded Actions menu (collapsed left buttons)
                     sourceButtons = props.leftButtons;
-                    parentButtonData = children[0];
+                    parentButtonData = collapsedMenu ?? undefined;
                     keyPrefix = "left-child-0";
                 } else if (
                     expandedMenu.expandedGroup === "right" &&
@@ -528,14 +553,7 @@ export const uiScaffold = createComponent<ScaffoldProps>(
                         props.rightButtons[expandedButtonIndex];
                     if (sourceButton?.children) {
                         sourceButtons = sourceButton.children;
-                        // Find the right button that was expanded
-                        const rightButtonStartIndex = collapsedMenuButton
-                            ? 1
-                            : 0;
-                        parentButtonData =
-                            children[
-                                rightButtonStartIndex + expandedButtonIndex
-                            ];
+                        parentButtonData = right[expandedButtonIndex];
                         keyPrefix = `right-child-${expandedButtonIndex}`;
                     }
                 }
@@ -549,33 +567,6 @@ export const uiScaffold = createComponent<ScaffoldProps>(
                     );
                     children.push(...expandedChildren);
                 }
-            }
-
-            // Add content if provided - should fill the space above the buttons
-            if (props.content) {
-                // Calculate the maximum height of the button bar
-                const buttonBarHeight = Math.max(
-                    collapsedMenuSize?.height || 0,
-                    rightSize.maxHeight,
-                );
-                const contentHeight =
-                    constraints.height - buttonBarHeight - spacing;
-                const contentConstraints = {
-                    width: constraints.width,
-                    height: Math.max(0, contentHeight),
-                };
-
-                const contentSize = measureDescriptor(
-                    "content",
-                    props.content,
-                    contentConstraints,
-                );
-
-                children.push({
-                    offset: { x: 0, y: 0 },
-                    size: contentSize,
-                    ...props.content,
-                });
             }
 
             return {

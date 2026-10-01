@@ -17,10 +17,10 @@ export const windmill: Building = {
     scale: 2,
     requirements: {
         materials: {
-            [woodResourceItem.id]: 40,
-            [stoneResource.id]: 60,
+            [woodResourceItem.id]: 20,
+            [stoneResource.id]: 40,
             [goldCoins.id]: 2,
-            [timberFramesItem.id]: 20,
+            [timberFramesItem.id]: 10,
             [gearsItem.id]: 4,
         },
     },
