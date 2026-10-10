@@ -7,6 +7,7 @@ import {
     createAgent,
     createTestWorld,
     createWall,
+    createWalker,
 } from "./displacementTestWorld.ts";
 
 describe("displacementNegotiation", () => {
@@ -14,7 +15,6 @@ describe("displacementNegotiation", () => {
         it("returns refused when a settled blocker's cost exceeds requester priority", () => {
             const { root } = createTestWorld();
             const requester = createAgent("requester", root, 10, 8, 5);
-            // Settled blocker, utility 20 → displaceable cost 20. Priority 5 < 20.
             createAgent("blocker", root, 11, 8, 20);
 
             const result = negotiateDisplacement(
@@ -28,15 +28,11 @@ describe("displacementNegotiation", () => {
             assert.strictEqual(result.kind, "refused");
         });
 
-        it("waits when the blocker has already moved this tick (free next tick)", () => {
+        it("waits when the blocker has already moved this tick", () => {
             const { root } = createTestWorld();
             const requester = createAgent("requester", root, 10, 8, 100);
             const blocker = createAgent("blocker", root, 11, 8, 0);
-            const stamina = blocker.getEcsComponent("MovementStamina")!;
-            // Record a move at the current tick. That makes hasMovedThisTick return true,
-            // so the blocker is movedThisTick: it can't move again now but is free next
-            // tick, so the requester waits and retries rather than routing around it.
-            recordMove(stamina, 5);
+            recordMove(blocker.getEcsComponent("MovementStamina")!, 5);
 
             const result = negotiateDisplacement(
                 requester,
@@ -49,16 +45,13 @@ describe("displacementNegotiation", () => {
             assert.strictEqual(result.kind, "wait");
         });
 
-        it("returns a 2-move cycle transaction when blocker can only swap with requester", () => {
+        it("shoves a boxed-in blocker onto the requester's tile", () => {
             const { root } = createTestWorld();
-            // Requester at (10,8) wants (11,8) where B is.
-            // Block all of B's exits except (10,8) = requester's position.
-            // (11,7) is automatically a wall (the world wall at y=7).
+            // The world wall at y=7 closes the blocker's north side
             const requester = createAgent("requester", root, 10, 8, 100);
             createAgent("blocker", root, 11, 8, 5);
             createWall("wall-east", root, 12, 8);
             createWall("wall-south", root, 11, 9);
-            // B's only valid candidate is (10,8) = requester → cycle
 
             const result = negotiateDisplacement(
                 requester,
@@ -68,33 +61,22 @@ describe("displacementNegotiation", () => {
                 1,
             );
 
-            assert.ok(
-                result.kind === "success",
-                "Should return a cycle transaction",
-            );
-            assert.strictEqual(result.transaction.isCycle, true);
-            assert.strictEqual(result.transaction.moves.length, 2);
-
-            const blockerMove = result.transaction.moves.find(
-                (m) => m.entityId === "blocker",
-            );
-            const requesterMove = result.transaction.moves.find(
-                (m) => m.entityId === "requester",
-            );
-            assert.ok(blockerMove, "Should include blocker move");
-            assert.ok(requesterMove, "Should include requester move");
-            assert.deepStrictEqual(blockerMove!.from, { x: 11, y: 8 });
-            assert.deepStrictEqual(blockerMove!.to, { x: 10, y: 8 });
-            assert.deepStrictEqual(requesterMove!.from, { x: 10, y: 8 });
-            assert.deepStrictEqual(requesterMove!.to, { x: 11, y: 8 });
+            assert.deepStrictEqual(result, {
+                kind: "shove",
+                moves: [
+                    {
+                        entityId: "blocker",
+                        from: { x: 11, y: 8 },
+                        to: { x: 10, y: 8 },
+                    },
+                ],
+            });
         });
 
-        it("cycles with a boxed-in blocker even when the requester is itself in transit", () => {
+        it("shoves a boxed-in blocker onto a walking requester's tile", () => {
             const { root } = createTestWorld();
-            // Same boxed-in cycle as above, but the requester is walking (a moveTo at its
-            // queue head). scoreCandidateTile rejects the requester's own tile as a push
-            // target (it's transient), so the cycle is found only via the explicit
-            // cycle-back terminator. This test pins that path.
+            // scoreCandidateTile rejects a walker's tile, so only the explicit
+            // cycle-back in findBestChain can find this
             const requester = createAgent("requester", root, 10, 8, 100);
             getBehaviorAgent(requester)!.actionQueue = [
                 { type: "moveTo", target: { x: 11, y: 8 } },
@@ -111,29 +93,20 @@ describe("displacementNegotiation", () => {
                 1,
             );
 
-            assert.ok(result.kind === "success", "should return a cycle");
-            assert.strictEqual(result.transaction.isCycle, true);
-            assert.strictEqual(result.transaction.moves.length, 2);
-            const blockerMove = result.transaction.moves.find(
-                (m) => m.entityId === "blocker",
+            assert.ok(result.kind === "shove");
+            assert.deepStrictEqual(
+                result.moves.map((move) => move.to),
+                [requester.worldPosition],
             );
-            assert.deepStrictEqual(blockerMove!.to, { x: 10, y: 8 });
         });
 
-        it("returns a free beneficial swap when blocker is heading into the requester's tile", () => {
+        it("rotates head-on with a walker of equal utility", () => {
             const { root } = createTestWorld();
-            // Equal utility: dominance would refuse (5 > 5 is false). But the blocker
-            // is itself trying to step into the requester's tile (its cachedPath[0] is
-            // the requester's position), so it's a mutually-beneficial head-on swap.
             const requester = createAgent("requester", root, 10, 8, 5);
-            const blocker = createAgent("blocker", root, 11, 8, 5);
-            getBehaviorAgent(blocker)!.actionQueue = [
-                {
-                    type: "moveTo",
-                    target: { x: 8, y: 8 },
-                    cachedPath: [{ x: 10, y: 8 }],
-                },
-            ];
+            createWalker("blocker", root, 11, 8, [
+                { x: 10, y: 8 },
+                { x: 9, y: 8 },
+            ]);
 
             const result = negotiateDisplacement(
                 requester,
@@ -143,40 +116,115 @@ describe("displacementNegotiation", () => {
                 1,
             );
 
-            assert.ok(
-                result.kind === "success",
-                "Should return a swap transaction even at equal utility",
-            );
-            assert.strictEqual(result.transaction.isCycle, true);
-            assert.strictEqual(result.transaction.beneficialSwap, true);
-            assert.strictEqual(result.transaction.moves.length, 2);
-
-            const blockerMove = result.transaction.moves.find(
-                (m) => m.entityId === "blocker",
-            );
-            const requesterMove = result.transaction.moves.find(
-                (m) => m.entityId === "requester",
-            );
-            assert.deepStrictEqual(blockerMove!.from, { x: 11, y: 8 });
-            assert.deepStrictEqual(blockerMove!.to, { x: 10, y: 8 });
-            assert.deepStrictEqual(requesterMove!.from, { x: 10, y: 8 });
-            assert.deepStrictEqual(requesterMove!.to, { x: 11, y: 8 });
+            assert.deepStrictEqual(result, {
+                kind: "rotation",
+                moves: [
+                    {
+                        entityId: "blocker",
+                        from: { x: 11, y: 8 },
+                        to: { x: 10, y: 8 },
+                    },
+                ],
+            });
         });
 
-        it("waits for a same-direction follower's blocker instead of shoving it", () => {
+        it("rotates four walkers turning around a 2x2 square", () => {
             const { root } = createTestWorld();
-            // Blocker is moving, but heading AWAY from the requester (its next step is
-            // east, not into the requester), so it is NOT a head-on beneficial swap.
-            // It is in transit (transient). The requester waits for it to vacate and
-            // does not shove it off its route. Same-direction traffic queues up, and
-            // the follower does not barge past the leader.
+            // Each wants the next tile clockwise, and no pair is head-on
+            const requester = createWalker("requester", root, 12, 10, [
+                { x: 12, y: 9 },
+            ]);
+            createWalker("b", root, 12, 9, [{ x: 13, y: 9 }]);
+            createWalker("c", root, 13, 9, [{ x: 13, y: 10 }]);
+            createWalker("d", root, 13, 10, [{ x: 12, y: 10 }]);
+
+            const result = negotiateDisplacement(
+                requester,
+                { x: 12, y: 9 },
+                5,
+                root,
+                1,
+            );
+
+            assert.deepStrictEqual(result, {
+                kind: "rotation",
+                moves: [
+                    {
+                        entityId: "b",
+                        from: { x: 12, y: 9 },
+                        to: { x: 13, y: 9 },
+                    },
+                    {
+                        entityId: "c",
+                        from: { x: 13, y: 9 },
+                        to: { x: 13, y: 10 },
+                    },
+                    {
+                        entityId: "d",
+                        from: { x: 13, y: 10 },
+                        to: { x: 12, y: 10 },
+                    },
+                ],
+            });
+        });
+
+        it("waits behind a loop it only feeds into", () => {
+            const { root } = createTestWorld();
+            // The square turns on its own, with the requester queued outside
+            const requester = createWalker("requester", root, 11, 9, [
+                { x: 12, y: 9 },
+            ]);
+            createWalker("b", root, 12, 9, [{ x: 13, y: 9 }]);
+            createWalker("c", root, 13, 9, [{ x: 13, y: 10 }]);
+            createWalker("d", root, 13, 10, [{ x: 12, y: 10 }]);
+            createWalker("e", root, 12, 10, [{ x: 12, y: 9 }]);
+
+            const result = negotiateDisplacement(
+                requester,
+                { x: 12, y: 9 },
+                5,
+                root,
+                1,
+            );
+
+            assert.strictEqual(result.kind, "wait");
+        });
+
+        it("does not rotate with a walker that is about to replan", () => {
+            const { root } = createTestWorld();
             const requester = createAgent("requester", root, 10, 8, 5);
-            const blocker = createAgent("blocker", root, 11, 8, 5);
-            getBehaviorAgent(blocker)!.actionQueue = [
+            const blocker = createWalker("blocker", root, 11, 8, [
+                { x: 10, y: 8 },
+            ]);
+            getBehaviorAgent(blocker)!.pendingReplan = { kind: "replan" };
+
+            const result = negotiateDisplacement(
+                requester,
+                { x: 11, y: 8 },
+                5,
+                root,
+                1,
+            );
+
+            assert.strictEqual(result.kind, "wait");
+        });
+
+        it("does not rotate a walker off a goal it has already reached", () => {
+            const { root } = createTestWorld();
+            // Its path still leads through the requester, but it touches its
+            // target from where it stands and finishes on its own turn
+            const requester = createAgent("requester", root, 10, 8, 5);
+            getBehaviorAgent(
+                createAgent("blocker", root, 11, 8, 5),
+            )!.actionQueue = [
                 {
                     type: "moveTo",
-                    target: { x: 14, y: 8 },
-                    cachedPath: [{ x: 12, y: 8 }],
+                    target: { x: 12, y: 8 },
+                    goal: { kind: "touch" },
+                    cachedPath: [
+                        { x: 10, y: 8 },
+                        { x: 10, y: 9 },
+                    ],
                 },
             ];
 
@@ -191,21 +239,33 @@ describe("displacementNegotiation", () => {
             assert.strictEqual(result.kind, "wait");
         });
 
-        it("returns a 2-move chain when blocker must displace a second entity", () => {
+        it("waits for a walker heading the same way instead of shoving it", () => {
             const { root } = createTestWorld();
-            // Requester at (8,8), NOT adjacent to B, targeting (11,8).
-            // This prevents A from appearing in B's cardinal-neighbor list,
-            // so there is no cycle shortcut: B's only exit is through C.
+            const requester = createAgent("requester", root, 10, 8, 5);
+            createWalker("blocker", root, 11, 8, [
+                { x: 12, y: 8 },
+                { x: 13, y: 8 },
+            ]);
+
+            const result = negotiateDisplacement(
+                requester,
+                { x: 11, y: 8 },
+                5,
+                root,
+                1,
+            );
+
+            assert.strictEqual(result.kind, "wait");
+        });
+
+        it("shoves through a second settled worker when the first has nowhere else to go", () => {
+            const { root } = createTestWorld();
+            // The requester stands apart from b, so b cannot take its tile
             const requester = createAgent("requester", root, 8, 8, 100);
             createAgent("blocker-b", root, 11, 8, 5);
             createAgent("blocker-c", root, 12, 8, 5);
-            // Block all of B's exits except east (12,8)=C
-            createWall("wall-bw", root, 10, 8); // west of B
-            createWall("wall-bs", root, 11, 9); // south of B
-            // north of B (11,7) is the world wall
-            // C's north (12,7) is also outside, natural wall
-            // C's south (12,9) is free, that's where C will move
-            // C's west (11,8) is B (visited in chain), skipped
+            createWall("wall-bw", root, 10, 8);
+            createWall("wall-bs", root, 11, 9);
 
             const result = negotiateDisplacement(
                 requester,
@@ -215,44 +275,18 @@ describe("displacementNegotiation", () => {
                 1,
             );
 
-            assert.ok(
-                result.kind === "success",
-                "Should return a 2-move chain",
+            assert.ok(result.kind === "shove");
+            assert.deepStrictEqual(
+                result.moves.map((move) => move.entityId),
+                ["blocker-b", "blocker-c"],
             );
-            assert.strictEqual(result.transaction.isCycle, false);
-            assert.strictEqual(result.transaction.moves.length, 2);
-
-            assert.strictEqual(
-                result.transaction.moves[0].entityId,
-                "blocker-b",
-            );
-            assert.deepStrictEqual(result.transaction.moves[0].from, {
-                x: 11,
-                y: 8,
-            });
-            assert.deepStrictEqual(result.transaction.moves[0].to, {
-                x: 12,
-                y: 8,
-            });
-
-            assert.strictEqual(
-                result.transaction.moves[1].entityId,
-                "blocker-c",
-            );
-            assert.deepStrictEqual(result.transaction.moves[1].from, {
-                x: 12,
-                y: 8,
-            });
+            assert.deepStrictEqual(result.moves[0].to, result.moves[1].from);
         });
 
-        it("prefers a free tile over a cycle when both are available", () => {
+        it("prefers a free tile over taking the requester's tile", () => {
             const { root } = createTestWorld();
-            // Requester at (10,8) adjacent to B at (11,8).
-            // B has both: (12,8) free (score 100) AND (10,8)=requester (cycle).
-            // The free tile is scored higher so it must be chosen.
             const requester = createAgent("requester", root, 10, 8, 100);
             createAgent("blocker", root, 11, 8, 5);
-            // (12,8) and (11,9) are both free, so B will pick one immediately
 
             const result = negotiateDisplacement(
                 requester,
@@ -262,35 +296,23 @@ describe("displacementNegotiation", () => {
                 1,
             );
 
-            assert.ok(result.kind === "success");
-            assert.strictEqual(
-                result.transaction.isCycle,
-                false,
-                "Free tile should be preferred over cycle",
+            assert.ok(result.kind === "shove");
+            assert.notDeepStrictEqual(
+                result.moves[0].to,
+                requester.worldPosition,
             );
         });
 
-        it("returns null when the chain exceeds max depth without finding a free tile", () => {
+        it("gives up when the chain would be deeper than allowed", () => {
             const { root } = createTestWorld();
-            // Chain: B(11,8) → C(12,8) → D(13,8) → E(14,8) → F(15,8).
-            // Requester at (8,8) is NOT adjacent to B, so no cycle shortcut exists.
-            // Each entity can only move east. F blocks E's exit at depth=3,
-            // which is MAX_CHAIN_DEPTH, so the search gives up.
+            // A row of settled workers that can each only move east, with
+            // walls below and the world wall above
             const requester = createAgent("requester", root, 8, 8, 100);
-            createAgent("b", root, 11, 8, 5);
-            createAgent("c", root, 12, 8, 5);
-            createAgent("d", root, 13, 8, 5);
-            createAgent("e", root, 14, 8, 5);
-            createAgent("f", root, 15, 8, 5); // blocks E's only exit
-
-            // Block south of each entity so they can only go east (or west = visited)
+            for (const [index, id] of ["b", "c", "d", "e", "f"].entries()) {
+                createAgent(id, root, 11 + index, 8, 5);
+                createWall(`wall-${id}-s`, root, 11 + index, 9);
+            }
             createWall("wall-b-w", root, 10, 8);
-            createWall("wall-b-s", root, 11, 9);
-            createWall("wall-c-s", root, 12, 9);
-            createWall("wall-d-s", root, 13, 9);
-            createWall("wall-e-s", root, 14, 9);
-            createWall("wall-f-s", root, 15, 9);
-            // North of each is automatically a wall (y=7, the world wall)
 
             const result = negotiateDisplacement(
                 requester,
@@ -300,11 +322,7 @@ describe("displacementNegotiation", () => {
                 1,
             );
 
-            assert.strictEqual(
-                result.kind,
-                "noChain",
-                "Chain exceeding max depth should return noChain",
-            );
+            assert.strictEqual(result.kind, "noChain");
         });
     });
 });

@@ -3,6 +3,8 @@ import { chunkMapSystem } from "../../../../src/game/system/chunkMapSystem.ts";
 import { createTileComponent } from "../../../../src/game/component/tileComponent.ts";
 import { addGroundCovering, wallOff } from "../../testWorld.ts";
 import { createChunkMapComponent } from "../../../../src/game/component/chunkMapComponent.ts";
+import { createPathfindingGraphComponent } from "../../../../src/game/component/pathfindingGraphComponent.ts";
+import { createLazyGraphFromRootNode } from "../../../../src/game/map/path/graph/generateGraph.ts";
 import { Entity } from "../../../../src/game/entity/entity.ts";
 import {
     createBehaviorAgentComponent,
@@ -13,16 +15,15 @@ import { createSpriteComponent } from "../../../../src/game/component/spriteComp
 import { createBuildingComponent } from "../../../../src/game/component/buildingComponent.ts";
 import { nullBuilding } from "../../../../src/data/building/building.ts";
 import type { SpriteRef } from "../../../../src/asset/sprite.ts";
+import type { Point } from "../../../../src/common/point.ts";
 
 const testSprite: SpriteRef = { bin: "test", spriteId: "test" };
 
-const worldBounds = { x1: 8, y1: 8, x2: 23, y2: 15 };
+export const testWorldBounds = { x1: 8, y1: 8, x2: 31, y2: 15 };
 
 /**
- * World covering world tiles x=8..23, y=8..15, ringed by walls.
- * Tiles at y=7 (north of row y=8) are walls and score -Infinity. Tiles at
- * y=9 and beyond are valid ground unless explicitly blocked with a building
- * entity.
+ * Open ground over x=8..31, y=8..15, ringed by walls, with a pathfinding graph.
+ * Row y=7 is wall, which the tests use as the north side of a corridor.
  */
 export function createTestWorld(): { root: Entity } {
     const ecsWorld = new EcsWorld();
@@ -30,24 +31,21 @@ export function createTestWorld(): { root: Entity } {
     const root = ecsWorld.root;
 
     const tileComponent = createTileComponent();
-    addGroundCovering(tileComponent, worldBounds);
+    addGroundCovering(tileComponent, testWorldBounds);
     root.setEcsComponent(tileComponent);
     root.setEcsComponent(createChunkMapComponent());
-    wallOff(root, worldBounds);
+    root.setEcsComponent(
+        createPathfindingGraphComponent(createLazyGraphFromRootNode(root)),
+    );
+    wallOff(root, testWorldBounds);
 
     return { root };
 }
 
 /**
- * A settled agent at the given tile, carrying the stamina component commit
- * needs to record a move.
- *
- * A freshly created agent carries pendingReplan, which would classify it as
- * transient and so waited for rather than displaced. These tests model
- * committed blockers, so it is cleared here. The transient cases set it, or a
- * moveTo, explicitly.
- *
- * worldPosition is set after addChild so the parent transform exists.
+ * A settled agent. A fresh agent carries pendingReplan, which makes it
+ * transient, so it is cleared here and tests that want an undecided agent set
+ * it again.
  */
 export function createAgent(
     id: string,
@@ -69,27 +67,23 @@ export function createAgent(
 }
 
 /**
- * An agent with no MovementStaminaComponent, for the case where a commit has
- * nowhere to record the move it just made.
+ * An agent partway along `path`, which ends at its target. Every walker has the
+ * same utility, so rank never decides between them.
  */
-export function createAgentWithoutStamina(
+export function createWalker(
     id: string,
     root: Entity,
     x: number,
     y: number,
+    path: Point[],
 ): Entity {
-    const entity = new Entity(id);
-    entity.setEcsComponent(createSpriteComponent(testSprite));
-    entity.setEcsComponent(createBehaviorAgentComponent());
-    root.addChild(entity);
-    entity.worldPosition = { x, y };
-    return entity;
+    const walker = createAgent(id, root, x, y, 5);
+    getBehaviorAgent(walker)!.actionQueue = [
+        { type: "moveTo", target: path[path.length - 1], cachedPath: path },
+    ];
+    return walker;
 }
 
-/**
- * An impassable building at a tile, to block displacement paths. Its id is not
- * "road", so scoreCandidateTile returns -Infinity for the tile.
- */
 export function createWall(
     id: string,
     root: Entity,

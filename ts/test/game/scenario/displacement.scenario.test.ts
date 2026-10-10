@@ -1,410 +1,264 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
-import { EcsWorld } from "../../../src/ecs/ecsWorld.ts";
-import { chunkMapSystem } from "../../../src/game/system/chunkMapSystem.ts";
-import { createTileComponent } from "../../../src/game/component/tileComponent.ts";
-import { addGroundCovering, wallOff } from "../testWorld.ts";
-import { createChunkMapComponent } from "../../../src/game/component/chunkMapComponent.ts";
-import { createPathfindingGraphComponent } from "../../../src/game/component/pathfindingGraphComponent.ts";
-import { createLazyGraphFromRootNode } from "../../../src/game/map/path/graph/generateGraph.ts";
-import { Entity } from "../../../src/game/entity/entity.ts";
+import type { Entity } from "../../../src/game/entity/entity.ts";
 import {
-    createBehaviorAgentComponent,
+    BehaviorAgentComponentId,
     getBehaviorAgent,
 } from "../../../src/game/component/behaviorAgentComponent.ts";
-import { createMovementStaminaComponent } from "../../../src/game/component/movementStaminaComponent.ts";
-import { createSpriteComponent } from "../../../src/game/component/spriteComponent.ts";
-import { createBuildingComponent } from "../../../src/game/component/buildingComponent.ts";
-import { nullBuilding } from "../../../src/data/building/building.ts";
+import { recordMove } from "../../../src/game/component/movementStaminaComponent.ts";
 import { createBehaviorSystem } from "../../../src/game/behavior/systems/behaviorSystem.ts";
 import { createPerformPlayerCommandBehavior } from "../../../src/game/behavior/behaviors/performPlayerCommandBehavior.ts";
-import { executeMoveToAction } from "../../../src/game/behavior/actions/moveToAction.ts";
-import type { BehaviorActionData } from "../../../src/game/behavior/actions/actionData.ts";
-import type { SpriteRef } from "../../../src/asset/sprite.ts";
+import {
+    executeMoveToAction,
+    type MoveToActionData,
+} from "../../../src/game/behavior/actions/moveToAction.ts";
 import type { Point } from "../../../src/common/point.ts";
+import {
+    createAgent,
+    createTestWorld,
+    createWall,
+    createWalker,
+    testWorldBounds,
+} from "../behavior/displacement/displacementTestWorld.ts";
 
-type MoveToAction = Extract<BehaviorActionData, { type: "moveTo" }>;
+/** Walls off row y=9, which with the world wall at y=7 leaves y=8 one tile wide. */
+function sealCorridor(root: Entity) {
+    for (let x = testWorldBounds.x1; x <= testWorldBounds.x2; x++) {
+        createWall(`wall-${x}`, root, x, 9);
+    }
+}
 
-const testSprite: SpriteRef = { bin: "test", spriteId: "test" };
+function assertNoOverlap(entities: Entity[], tick: number) {
+    const seen = new Set<string>();
+    for (const e of entities) {
+        const key = `${e.worldPosition.x},${e.worldPosition.y}`;
+        assert.ok(
+            !seen.has(key),
+            `Two entities share tile ${key} on tick ${tick}`,
+        );
+        seen.add(key);
+    }
+}
 
-const worldBounds = { x1: 8, y1: 8, x2: 31, y2: 15 };
+function assertOneTileAtMost(
+    entities: Entity[],
+    previous: Point[],
+    tick: number,
+) {
+    entities.forEach((entity, index) => {
+        const step =
+            Math.abs(entity.worldPosition.x - previous[index].x) +
+            Math.abs(entity.worldPosition.y - previous[index].y);
+        assert.ok(
+            step <= 1,
+            `${entity.id} moved ${step} tiles on tick ${tick}`,
+        );
+    });
+}
 
-/**
- * Open world with tiles, chunk map, and pathfinding. Walled off to
- * x=8..31, y=8..15. That is room enough for entities to move around.
- */
-function createWorld(): { root: Entity; ecsWorld: EcsWorld } {
-    const ecsWorld = new EcsWorld();
-    ecsWorld.addSystem(chunkMapSystem);
-    const root = ecsWorld.root;
-
-    const tileComponent = createTileComponent();
-    addGroundCovering(tileComponent, worldBounds);
-    root.setEcsComponent(tileComponent);
-    root.setEcsComponent(createChunkMapComponent());
-    root.setEcsComponent(
-        createPathfindingGraphComponent(createLazyGraphFromRootNode(root)),
+/** The behavior system takes agents in this order, which the test relies on. */
+function assertProcessingOrder(root: Entity, ids: string[]) {
+    const order = Array.from(
+        root.queryComponents(BehaviorAgentComponentId),
+        ([entity]) => entity.id,
     );
-    wallOff(root, worldBounds);
-
-    return { ecsWorld, root };
+    assert.deepStrictEqual(order, ids);
 }
 
-/**
- * Create an agent that can be displaced or issue player commands.
- * Requires SpriteComponent so it registers in the chunk map.
- */
-function createAgent(id: string, root: Entity, position: Point): Entity {
-    const entity = new Entity(id);
-    entity.setEcsComponent(createSpriteComponent(testSprite));
-    entity.setEcsComponent(createBehaviorAgentComponent());
-    entity.setEcsComponent(createMovementStaminaComponent());
-    // Start "settled": a fresh agent carries pendingReplan, which marks it transient
-    // (waited-for, not displaced). A plain placed agent is a settled obstacle until it
-    // is given something to do. moveCommand re-arms pendingReplan so commanded workers
-    // plan and move.
-    getBehaviorAgent(entity)!.pendingReplan = undefined;
-    root.addChild(entity);
-    entity.worldPosition = position;
-    return entity;
+function moveCommand(entity: Entity, target: Point) {
+    const agent = getBehaviorAgent(entity)!;
+    agent.playerCommand = {
+        action: "move",
+        targetPosition: target,
+    };
+    agent.pendingReplan = { kind: "replan" };
 }
 
-/**
- * Place an impassable building at a tile to block displacement paths.
- * The SpriteComponent ensures it registers in the chunk map so
- * scoreCandidateTile can detect it and score the tile as -Infinity.
- */
-function createWall(id: string, root: Entity, position: Point): Entity {
-    const entity = new Entity(id);
-    entity.setEcsComponent(createSpriteComponent(testSprite));
-    entity.setEcsComponent(createBuildingComponent(nullBuilding, false));
-    root.addChild(entity);
-    entity.worldPosition = position;
-    return entity;
+function walkingRoute(entity: Entity): MoveToActionData {
+    const head = getBehaviorAgent(entity)!.actionQueue[0];
+    assert.ok(head.type === "moveTo");
+    return head;
 }
 
 describe("Displacement Scenario", () => {
     it("agent with player command displaces idle blocker to reach target tile", () => {
-        /**
-         * A at (11,8) has a move command to (12,8). B is at (12,8) with no
-         * active behavior (currentBehaviorUtility = 0 by default). Because
-         * A's PerformPlayerCommandBehavior gives it utility=90 >> B's resistance=0,
-         * displacement succeeds: B moves to an adjacent free tile, A arrives at (12,8).
-         */
-        const { root } = createWorld();
-
-        const agentA = createAgent("agent-a", root, { x: 11, y: 8 });
-        const agentB = createAgent("agent-b", root, { x: 12, y: 8 });
-
-        const agentAComp = getBehaviorAgent(agentA)!;
+        const { root } = createTestWorld();
+        const agentA = createAgent("agent-a", root, 11, 8);
+        const agentB = createAgent("agent-b", root, 12, 8);
         moveCommand(agentA, { x: 12, y: 8 });
 
         const behaviorSystem = createBehaviorSystem(() => [
             createPerformPlayerCommandBehavior(),
         ]);
-
         for (let tick = 1; tick <= 5; tick++) {
             behaviorSystem.onUpdate!(root, tick);
         }
 
-        assert.deepStrictEqual(
-            agentA.worldPosition,
-            { x: 12, y: 8 },
-            `Agent A should be at the target (12,8) but is at ${JSON.stringify(agentA.worldPosition)}`,
-        );
-        assert.strictEqual(
-            agentAComp.playerCommand,
-            undefined,
-            "Player command should be cleared after arrival",
-        );
-        assert.notDeepStrictEqual(
-            agentB.worldPosition,
-            { x: 12, y: 8 },
-            "Blocker B should have been displaced away from (12,8)",
-        );
+        assert.deepStrictEqual(agentA.worldPosition, { x: 12, y: 8 });
+        assert.strictEqual(getBehaviorAgent(agentA)!.playerCommand, undefined);
+        assert.notDeepStrictEqual(agentB.worldPosition, { x: 12, y: 8 });
     });
 
-    it("cycle displacement: agent reaches target when only path is swapping with idle blocker", () => {
-        /**
-         * A at (10,8) wants to reach (11,8). B is at (11,8) with no active
-         * behavior (utility=0). All of B's exits are walled off except the tile
-         * where A currently stands (10,8). The only valid displacement is
-         * a 2-entity cycle: B moves to (10,8) and A moves to (11,8) atomically.
-         *
-         * Walls:
-         *   (12,8) east of B    (explicitly placed)
-         *   (11,9) south of B   (explicitly placed)
-         *   (11,7) north of B   (y=7 is the world wall)
-         */
-        const { root } = createWorld();
-
-        const agentA = createAgent("agent-a", root, { x: 10, y: 8 });
-        const agentB = createAgent("agent-b", root, { x: 11, y: 8 });
-        createWall("wall-east", root, { x: 12, y: 8 });
-        createWall("wall-south", root, { x: 11, y: 9 });
-
-        const agentAComp = getBehaviorAgent(agentA)!;
+    it("agent reaches its target by swapping with a boxed-in idle blocker", () => {
+        const { root } = createTestWorld();
+        const agentA = createAgent("agent-a", root, 10, 8);
+        const agentB = createAgent("agent-b", root, 11, 8);
+        createWall("wall-east", root, 12, 8);
+        createWall("wall-south", root, 11, 9);
         moveCommand(agentA, { x: 11, y: 8 });
 
         const behaviorSystem = createBehaviorSystem(() => [
             createPerformPlayerCommandBehavior(),
         ]);
-
-        // Tick 1: A replans → moveTo fires → cycle commits atomically → A arrives at (11,8).
-        // Tick 2: clearPlayerCommand fires and clears the command.
         behaviorSystem.onUpdate!(root, 1);
         behaviorSystem.onUpdate!(root, 2);
 
-        assert.deepStrictEqual(
-            agentA.worldPosition,
+        assert.deepStrictEqual(agentA.worldPosition, { x: 11, y: 8 });
+        assert.strictEqual(getBehaviorAgent(agentA)!.playerCommand, undefined);
+        assert.deepStrictEqual(agentB.worldPosition, { x: 10, y: 8 });
+    });
+
+    it("walks on without losing a tick after swapping with a boxed-in blocker", () => {
+        // The blocker's only way out is the walker's tile, because the tile
+        // beyond holds another walker. The walker must keep moving one tile a
+        // tick straight through the swap.
+        const { root } = createTestWorld();
+        sealCorridor(root);
+        const walker = createWalker("walker", root, 10, 8, [
             { x: 11, y: 8 },
-            `Agent A should have reached (11,8) via cycle, is at ${JSON.stringify(agentA.worldPosition)}`,
-        );
-        assert.strictEqual(
-            agentAComp.playerCommand,
-            undefined,
-            "Player command should be cleared after A arrives at target",
-        );
-        assert.deepStrictEqual(
-            agentB.worldPosition,
-            { x: 10, y: 8 },
-            `Agent B should have been displaced to A's former position (10,8), is at ${JSON.stringify(agentB.worldPosition)}`,
-        );
+            { x: 12, y: 8 },
+            { x: 13, y: 8 },
+            { x: 14, y: 8 },
+        ]);
+        const blocker = createAgent("blocker", root, 11, 8);
+        createWalker("ahead", root, 12, 8, [
+            { x: 13, y: 8 },
+            { x: 14, y: 8 },
+            { x: 15, y: 8 },
+            { x: 16, y: 8 },
+            { x: 17, y: 8 },
+        ]);
+        assertProcessingOrder(root, ["walker", "blocker", "ahead"]);
+
+        const behaviorSystem = createBehaviorSystem(() => []);
+        for (let tick = 1; tick <= 4; tick++) {
+            behaviorSystem.onUpdate!(root, tick);
+            assert.deepStrictEqual(walker.worldPosition, {
+                x: 10 + tick,
+                y: 8,
+            });
+        }
+        assert.deepStrictEqual(blocker.worldPosition, { x: 10, y: 8 });
     });
 
     it("mover does not oscillate when direct path is blocked by equal-priority entity", () => {
-        /**
-         * Mover at (11,8) wants to reach (15,8). Blocker at (12,8) has the same
-         * utility (50), so displacement always fails. Priority (50) is not
-         * strictly greater than resistance (50).
-         *
-         * Without path caching the mover would replan on every tick. After stepping
-         * off the direct route (e.g. to (11,9)), A* may route back through (12,8)
-         * again (the tile has no goblin-weight penalty since the blocker carries only
-         * BehaviorAgentComponent), causing the entity to oscillate between positions
-         * rather than committing to the around path.
-         *
-         * With path caching the entity commits to the around route on the first tick
-         * and follows it to completion without reconsidering, guaranteeing no position
-         * is visited twice and the target is reached.
-         */
-        const { root } = createWorld();
-
-        const mover = createAgent("mover", root, { x: 11, y: 8 });
-        const moverAgent = getBehaviorAgent(mover)!;
-        moverAgent.currentBehaviorUtility = 50;
-
-        const blocker = createAgent("blocker", root, { x: 12, y: 8 });
-        const blockerAgent = getBehaviorAgent(blocker)!;
-        blockerAgent.currentBehaviorUtility = 50;
-
-        const action: MoveToAction = {
+        // Without a cached route, A* could lead back through the blocker after
+        // the first detour step and the mover would pace back and forth
+        const { root } = createTestWorld();
+        const mover = createAgent("mover", root, 11, 8, 50);
+        createAgent("blocker", root, 12, 8, 50);
+        const action: MoveToActionData = {
             type: "moveTo",
             target: { x: 15, y: 8 },
         };
 
-        const visitedPositions = new Set<string>();
-        visitedPositions.add(
-            `${mover.worldPosition.x},${mover.worldPosition.y}`,
-        );
-
-        let finalResult = { kind: "running" };
+        const visitedPositions = new Set<string>(["11,8"]);
         for (let tick = 1; tick <= 15; tick++) {
-            finalResult = executeMoveToAction(action, mover, tick);
+            const result = executeMoveToAction(action, mover, tick);
             const pos = `${mover.worldPosition.x},${mover.worldPosition.y}`;
             assert.ok(
                 !visitedPositions.has(pos),
-                `Mover revisited position (${pos}) on tick ${tick}: oscillation detected`,
+                `Mover revisited position (${pos}) on tick ${tick}`,
             );
             visitedPositions.add(pos);
-            if (finalResult.kind === "complete") break;
+            if (result.kind === "complete") break;
         }
 
-        assert.deepStrictEqual(
-            mover.worldPosition,
-            { x: 15, y: 8 },
-            `Mover should reach (15,8) but is at ${JSON.stringify(mover.worldPosition)}`,
-        );
+        assert.deepStrictEqual(mover.worldPosition, { x: 15, y: 8 });
     });
 
     it("path is cached after displacement fails and consumed step-by-step without replanning", () => {
-        /**
-         * Directly verifies the path-caching mechanism. After displacement fails on
-         * the first tick, action.cachedPath must be populated with the around route.
-         * On each subsequent tick the cached path is consumed by one step (length
-         * decreases by exactly 1) rather than being discarded and recalculated, which
-         * would happen if the entity were replanning every tick.
-         */
-        const { root } = createWorld();
-
-        const mover = createAgent("mover", root, { x: 11, y: 8 });
-        const moverAgent = getBehaviorAgent(mover)!;
-        moverAgent.currentBehaviorUtility = 50;
-
-        const blocker = createAgent("blocker", root, { x: 12, y: 8 });
-        const blockerAgent = getBehaviorAgent(blocker)!;
-        blockerAgent.currentBehaviorUtility = 50;
-
-        const action: MoveToAction = {
+        const { root } = createTestWorld();
+        const mover = createAgent("mover", root, 11, 8, 50);
+        createAgent("blocker", root, 12, 8, 50);
+        const action: MoveToActionData = {
             type: "moveTo",
             target: { x: 15, y: 8 },
         };
 
-        // Tick 1: displacement fails at (12,8), path is replanned around the blocker,
-        // and the entity takes the first step of the around route.
         executeMoveToAction(action, mover, 1);
+        assert.ok(action.cachedPath && action.cachedPath.length > 0);
+        assert.notDeepStrictEqual(mover.worldPosition, { x: 11, y: 8 });
+        const pathAfterTick1 = [...action.cachedPath];
 
-        assert.ok(
-            action.cachedPath !== undefined && action.cachedPath.length > 0,
-            "cachedPath should be set after displacement fails and replan finds an around route",
-        );
-        assert.notDeepStrictEqual(
-            mover.worldPosition,
-            { x: 11, y: 8 },
-            "Mover should have stepped away from its start position on tick 1",
-        );
-
-        // Snapshot the path remaining after tick 1.
-        const pathAfterTick1 = [...action.cachedPath!];
-
-        // Tick 2: the next tile in the cached path is free. The entity should step
-        // there by consuming cachedPath[0], leaving the tail unchanged.
         executeMoveToAction(action, mover, 2);
-
-        assert.ok(
-            action.cachedPath !== undefined,
-            "cachedPath should still exist after tick 2",
-        );
-        assert.strictEqual(
-            action.cachedPath!.length,
-            pathAfterTick1.length - 1,
-            "cachedPath should be exactly one step shorter after tick 2 (step consumed, not replanned)",
-        );
-        assert.deepStrictEqual(
-            action.cachedPath,
-            pathAfterTick1.slice(1),
-            "Remaining cached path should be the tail of the path from tick 1, so no replanning occurred",
-        );
+        assert.deepStrictEqual(action.cachedPath, pathAfterTick1.slice(1));
     });
 
     it("waits for a transient (walking) blocker, keeping its path, then proceeds when it clears", () => {
-        const { root } = createWorld();
-
-        const mover = createAgent("mover", root, { x: 11, y: 8 });
-        getBehaviorAgent(mover)!.currentBehaviorUtility = 50;
-
-        // Blocker is in transit (a moveTo at its queue head) → transient → waited-for,
-        // never shoved off its route.
-        const blocker = createAgent("blocker", root, { x: 12, y: 8 });
+        const { root } = createTestWorld();
+        const mover = createAgent("mover", root, 11, 8, 50);
+        const blocker = createAgent("blocker", root, 12, 8);
         getBehaviorAgent(blocker)!.actionQueue = [
             { type: "moveTo", target: { x: 12, y: 11 } },
         ];
-
-        const action: MoveToAction = {
+        const action: MoveToActionData = {
             type: "moveTo",
             target: { x: 15, y: 8 },
         };
 
-        // Tick 1: next tile (12,8) holds a transient blocker → mover holds position and
-        // keeps its cached path aimed at the same tile (no replan, no detour).
         executeMoveToAction(action, mover, 1);
-        assert.deepStrictEqual(
-            mover.worldPosition,
-            { x: 11, y: 8 },
-            "mover should wait in place for the walking blocker",
-        );
-        assert.ok(
-            action.cachedPath && action.cachedPath.length > 0,
-            "cached path is preserved while waiting",
-        );
-        assert.deepStrictEqual(
-            action.cachedPath![0],
-            { x: 12, y: 8 },
-            "still aimed at the same next tile",
-        );
+        assert.deepStrictEqual(mover.worldPosition, { x: 11, y: 8 });
+        assert.deepStrictEqual(action.cachedPath?.[0], { x: 12, y: 8 });
 
-        // Blocker walks away.
         blocker.worldPosition = { x: 12, y: 11 };
-
-        // Tick 2: the tile is now free → mover advances into it.
         executeMoveToAction(action, mover, 2);
-        assert.deepStrictEqual(
-            mover.worldPosition,
-            { x: 12, y: 8 },
-            "mover advances once the blocker has cleared",
-        );
+        assert.deepStrictEqual(mover.worldPosition, { x: 12, y: 8 });
     });
 
-    /**
-     * Seal y=8 into a true 1-wide corridor: y=7 is the world wall
-     * and we wall the entire y=9 row across the chunk width (x=8..31) so there is no
-     * way around. A refused worker cannot detour, so a swap is the only resolution.
-     */
-    function sealCorridor(root: Entity) {
-        for (let x = 8; x <= 31; x++) {
-            createWall(`wall-${x}`, root, { x, y: 9 });
-        }
-    }
+    it("keeps its route when a rotation goes stale, and rotates the tick after", () => {
+        // The oncoming walker was already stepped this tick, so the swap
+        // cannot commit now. That is timing, not a wall.
+        const { root } = createTestWorld();
+        const walker = createWalker("walker", root, 10, 8, [
+            { x: 11, y: 8 },
+            { x: 12, y: 8 },
+        ]);
+        const oncoming = createWalker("oncoming", root, 11, 8, [
+            { x: 10, y: 8 },
+            { x: 9, y: 8 },
+        ]);
+        recordMove(oncoming.getEcsComponent("MovementStamina")!, 1);
+        const route = walkingRoute(walker);
+        const pathBefore = [...route.cachedPath!];
 
-    /** Assert no two entities occupy the same tile this tick. */
-    function assertNoOverlap(entities: Entity[], tick: number) {
-        const seen = new Set<string>();
-        for (const e of entities) {
-            const key = `${e.worldPosition.x},${e.worldPosition.y}`;
-            assert.ok(
-                !seen.has(key),
-                `Two entities share tile ${key} on tick ${tick}`,
-            );
-            seen.add(key);
-        }
-    }
+        executeMoveToAction(route, walker, 1);
+        assert.deepStrictEqual(walker.worldPosition, { x: 10, y: 8 });
+        assert.deepStrictEqual(route.cachedPath, pathBefore);
 
-    function moveCommand(entity: Entity, target: Point) {
-        const agent = getBehaviorAgent(entity)!;
-        agent.playerCommand = {
-            action: "move",
-            targetPosition: target,
-        };
-        // Re-arm replanning so the commanded worker plans and starts moving (createAgent
-        // leaves agents settled).
-        agent.pendingReplan = { kind: "replan" };
-    }
+        executeMoveToAction(route, walker, 2);
+        assert.deepStrictEqual(walker.worldPosition, { x: 11, y: 8 });
+        assert.deepStrictEqual(oncoming.worldPosition, { x: 10, y: 8 });
+        assert.deepStrictEqual(route.cachedPath, pathBefore.slice(1));
+    });
 
     it("two equal-priority workers swap past each other in a 1-wide corridor", () => {
-        /**
-         * A at (10,8) wants (13,8). B at (13,8) wants (10,8). y=9 is walled and y=7
-         * is the world wall, so the row is a 1-wide corridor with no way around.
-         * The only way both reach their targets is a head-on swap. With equal
-         * priority the old dominance gate would deadlock them forever.
-         */
-        const { root } = createWorld();
+        const { root } = createTestWorld();
         sealCorridor(root);
-
-        const a = createAgent("a", root, { x: 10, y: 8 });
-        const b = createAgent("b", root, { x: 13, y: 8 });
+        const a = createAgent("a", root, 10, 8);
+        const b = createAgent("b", root, 13, 8);
         moveCommand(a, { x: 13, y: 8 });
         moveCommand(b, { x: 10, y: 8 });
 
         const behaviorSystem = createBehaviorSystem(() => [
             createPerformPlayerCommandBehavior(),
         ]);
-
-        let prevA = { ...a.worldPosition };
-        let prevB = { ...b.worldPosition };
+        let previous = [{ ...a.worldPosition }, { ...b.worldPosition }];
         for (let tick = 1; tick <= 12; tick++) {
             behaviorSystem.onUpdate!(root, tick);
             assertNoOverlap([a, b], tick);
-            // No worker advances more than one tile per tick.
-            const da =
-                Math.abs(a.worldPosition.x - prevA.x) +
-                Math.abs(a.worldPosition.y - prevA.y);
-            const db =
-                Math.abs(b.worldPosition.x - prevB.x) +
-                Math.abs(b.worldPosition.y - prevB.y);
-            assert.ok(da <= 1, `A moved ${da} tiles on tick ${tick}`);
-            assert.ok(db <= 1, `B moved ${db} tiles on tick ${tick}`);
-            prevA = { ...a.worldPosition };
-            prevB = { ...b.worldPosition };
+            assertOneTileAtMost([a, b], previous, tick);
+            previous = [{ ...a.worldPosition }, { ...b.worldPosition }];
         }
 
         assert.deepStrictEqual(a.worldPosition, { x: 13, y: 8 });
@@ -412,25 +266,18 @@ describe("Displacement Scenario", () => {
     });
 
     it("two workers spawned face-to-face in a sealed corridor resolve", () => {
-        /**
-         * Planless / spawned-adjacent head-on: two workers become adjacent before either
-         * has a committed path. On tick 1 the first to act finds the other still
-         * undecided (pendingReplan set) → transient → it waits, keeping its computed
-         * path. The second then plans, sees the first's path heading into its tile, and
-         * the existing beneficial swap fires. Both reach their goals the same tick.
-         */
-        const { root } = createWorld();
+        // Neither has a route on tick 1. The first waits on the undecided
+        // second, which then plans and rotates with it.
+        const { root } = createTestWorld();
         sealCorridor(root);
-
-        const a = createAgent("a", root, { x: 11, y: 8 });
-        const b = createAgent("b", root, { x: 12, y: 8 });
+        const a = createAgent("a", root, 11, 8);
+        const b = createAgent("b", root, 12, 8);
         moveCommand(a, { x: 12, y: 8 });
         moveCommand(b, { x: 11, y: 8 });
 
         const behaviorSystem = createBehaviorSystem(() => [
             createPerformPlayerCommandBehavior(),
         ]);
-
         for (let tick = 1; tick <= 6; tick++) {
             behaviorSystem.onUpdate!(root, tick);
             assertNoOverlap([a, b], tick);
@@ -441,15 +288,53 @@ describe("Displacement Scenario", () => {
         assert.deepStrictEqual(b.worldPosition, { x: 11, y: 8 });
     });
 
-    it("two workers pass two oncoming workers in a 1-wide corridor", () => {
-        // Two groups approaching from a distance (see note above).
-        const { root } = createWorld();
-        sealCorridor(root);
+    it("four walkers turning around a 2x2 square, with one queued behind, all get through", () => {
+        // The jam from the field. E queues behind the square and goes first,
+        // so it meets the loop before any member has had its turn.
+        const { root } = createTestWorld();
+        const e = createWalker("e", root, 11, 10, [{ x: 12, y: 10 }]);
+        const a = createWalker("a", root, 12, 10, [
+            { x: 13, y: 10 },
+            { x: 14, y: 10 },
+        ]);
+        const b = createWalker("b", root, 13, 10, [
+            { x: 13, y: 11 },
+            { x: 13, y: 12 },
+        ]);
+        const c = createWalker("c", root, 13, 11, [
+            { x: 12, y: 11 },
+            { x: 11, y: 11 },
+        ]);
+        const d = createWalker("d", root, 12, 11, [
+            { x: 12, y: 10 },
+            { x: 12, y: 9 },
+        ]);
+        const walkers = [e, a, b, c, d];
+        assertProcessingOrder(root, ["e", "a", "b", "c", "d"]);
 
-        const a = createAgent("a", root, { x: 9, y: 8 }); // heading right (follows b)
-        const b = createAgent("b", root, { x: 10, y: 8 }); // heading right (leads)
-        const c = createAgent("c", root, { x: 14, y: 8 }); // heading left (leads)
-        const d = createAgent("d", root, { x: 15, y: 8 }); // heading left (follows c)
+        const behaviorSystem = createBehaviorSystem(() => []);
+        let previous = walkers.map((walker) => ({ ...walker.worldPosition }));
+        for (let tick = 1; tick <= 8; tick++) {
+            behaviorSystem.onUpdate!(root, tick);
+            assertNoOverlap(walkers, tick);
+            assertOneTileAtMost(walkers, previous, tick);
+            previous = walkers.map((walker) => ({ ...walker.worldPosition }));
+        }
+
+        assert.deepStrictEqual(a.worldPosition, { x: 14, y: 10 });
+        assert.deepStrictEqual(b.worldPosition, { x: 13, y: 12 });
+        assert.deepStrictEqual(c.worldPosition, { x: 11, y: 11 });
+        assert.deepStrictEqual(d.worldPosition, { x: 12, y: 9 });
+        assert.deepStrictEqual(e.worldPosition, { x: 12, y: 10 });
+    });
+
+    it("two workers pass two oncoming workers in a 1-wide corridor", () => {
+        const { root } = createTestWorld();
+        sealCorridor(root);
+        const a = createAgent("a", root, 9, 8);
+        const b = createAgent("b", root, 10, 8);
+        const c = createAgent("c", root, 14, 8);
+        const d = createAgent("d", root, 15, 8);
         moveCommand(a, { x: 15, y: 8 });
         moveCommand(b, { x: 16, y: 8 });
         moveCommand(c, { x: 8, y: 8 });
@@ -458,7 +343,6 @@ describe("Displacement Scenario", () => {
         const behaviorSystem = createBehaviorSystem(() => [
             createPerformPlayerCommandBehavior(),
         ]);
-
         for (let tick = 1; tick <= 30; tick++) {
             behaviorSystem.onUpdate!(root, tick);
             assertNoOverlap([a, b, c, d], tick);

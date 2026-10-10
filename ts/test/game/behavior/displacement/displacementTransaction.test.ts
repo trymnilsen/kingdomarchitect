@@ -13,32 +13,71 @@ import {
     commitDisplacementTransaction,
     type DisplacementTransaction,
 } from "../../../../src/game/behavior/displacement/displacementTransaction.ts";
-import { createAgent, createTestWorld } from "./displacementTestWorld.ts";
+import type { Point } from "../../../../src/common/point.ts";
+import type { Entity } from "../../../../src/game/entity/entity.ts";
+import {
+    createAgent,
+    createTestWorld,
+    createWalker,
+} from "./displacementTestWorld.ts";
+
+function shoveOne(
+    entityId: string,
+    from: Point,
+    to: Point,
+): DisplacementTransaction {
+    return { kind: "shove", moves: [{ entityId, from, to }] };
+}
+
+/**
+ * Walkers turning clockwise around the square (12..13, 9..10), all but the
+ * requester at (12,10). Each has one more step after the rotation.
+ */
+function createTurningSquare(root: Entity): {
+    requester: Entity;
+    members: Entity[];
+    rotation: DisplacementTransaction;
+} {
+    const requester = createAgent("requester", root, 12, 10);
+    const members = [
+        createWalker("b", root, 12, 9, [
+            { x: 13, y: 9 },
+            { x: 14, y: 9 },
+        ]),
+        createWalker("c", root, 13, 9, [
+            { x: 13, y: 10 },
+            { x: 13, y: 11 },
+        ]),
+        createWalker("d", root, 13, 10, [
+            { x: 12, y: 10 },
+            { x: 11, y: 10 },
+        ]),
+    ];
+    for (const member of members) {
+        member.setEcsComponent(createEnergyComponent(100));
+    }
+    const rotation: DisplacementTransaction = {
+        kind: "rotation",
+        moves: [
+            { entityId: "b", from: { x: 12, y: 9 }, to: { x: 13, y: 9 } },
+            { entityId: "c", from: { x: 13, y: 9 }, to: { x: 13, y: 10 } },
+            { entityId: "d", from: { x: 13, y: 10 }, to: { x: 12, y: 10 } },
+        ],
+    };
+    return { requester, members, rotation };
+}
 
 describe("displacementTransaction", () => {
     describe("commitDisplacementTransaction", () => {
         it("returns false when entity is not at the expected from-position", () => {
             const { root } = createTestWorld();
             const b = createAgent("b", root, 11, 8);
-            // Move entity before commit, making the transaction stale
             b.worldPosition = { x: 13, y: 8 };
 
-            const tx: DisplacementTransaction = {
-                moves: [
-                    {
-                        entityId: "b",
-                        from: { x: 11, y: 8 },
-                        to: { x: 12, y: 8 },
-                    },
-                ],
-                isCycle: false,
-            };
-
             const committed = commitDisplacementTransaction(
-                tx,
+                shoveOne("b", { x: 11, y: 8 }, { x: 12, y: 8 }),
                 root,
                 1,
-                "requester",
             );
 
             assert.strictEqual(committed, false);
@@ -47,65 +86,55 @@ describe("displacementTransaction", () => {
         it("returns false when entity has already moved this tick", () => {
             const { root } = createTestWorld();
             const b = createAgent("b", root, 11, 8);
-            const stamina = b.getEcsComponent(MovementStaminaComponentId)!;
-            recordMove(stamina, 5); // entity moved at tick 5
-
-            const tx: DisplacementTransaction = {
-                moves: [
-                    {
-                        entityId: "b",
-                        from: { x: 11, y: 8 },
-                        to: { x: 12, y: 8 },
-                    },
-                ],
-                isCycle: false,
-            };
+            recordMove(b.getEcsComponent(MovementStaminaComponentId)!, 5);
 
             const committed = commitDisplacementTransaction(
-                tx,
+                shoveOne("b", { x: 11, y: 8 }, { x: 12, y: 8 }),
                 root,
                 5,
-                "requester",
             );
 
             assert.strictEqual(committed, false);
-            // Entity should not have moved
             assert.deepStrictEqual(b.worldPosition, { x: 11, y: 8 });
         });
 
-        it("commits a 2-move chain in reverse order (last entity moves first)", () => {
+        it("rejects a move that is not to an adjacent tile", () => {
             const { root } = createTestWorld();
+            const b = createAgent("b", root, 11, 8);
 
-            // B at (11,8) moves to (12,8); C at (12,8) moves to (13,8).
-            // Correct execution order: C moves first (into free tile at 13,8), then B.
-            // If the chain were applied front-to-back, B would try to move to (12,8)
-            // which is still occupied by C, so the commit would be invalid. Reverse
-            // order is the only correct execution, and a successful commit (true)
-            // with correct final positions validates it implicitly.
+            const committed = commitDisplacementTransaction(
+                shoveOne("b", { x: 11, y: 8 }, { x: 13, y: 8 }),
+                root,
+                1,
+            );
+
+            assert.strictEqual(committed, false);
+            assert.deepStrictEqual(b.worldPosition, { x: 11, y: 8 });
+        });
+
+        it("commits a chain last member first", () => {
+            const { root } = createTestWorld();
             const b = createAgent("b", root, 11, 8);
             const c = createAgent("c", root, 12, 8);
 
-            const tx: DisplacementTransaction = {
-                moves: [
-                    {
-                        entityId: "b",
-                        from: { x: 11, y: 8 },
-                        to: { x: 12, y: 8 },
-                    },
-                    {
-                        entityId: "c",
-                        from: { x: 12, y: 8 },
-                        to: { x: 13, y: 8 },
-                    },
-                ],
-                isCycle: false,
-            };
-
             const committed = commitDisplacementTransaction(
-                tx,
+                {
+                    kind: "shove",
+                    moves: [
+                        {
+                            entityId: "b",
+                            from: { x: 11, y: 8 },
+                            to: { x: 12, y: 8 },
+                        },
+                        {
+                            entityId: "c",
+                            from: { x: 12, y: 8 },
+                            to: { x: 13, y: 8 },
+                        },
+                    ],
+                },
                 root,
                 1,
-                "requester",
             );
 
             assert.strictEqual(committed, true);
@@ -113,150 +142,89 @@ describe("displacementTransaction", () => {
             assert.deepStrictEqual(c.worldPosition, { x: 13, y: 8 });
         });
 
-        it("commits a cycle transaction (A↔B swap) simultaneously", () => {
-            const { root } = createTestWorld();
-            const a = createAgent("a", root, 10, 8);
-            const b = createAgent("b", root, 11, 8);
-
-            const tx: DisplacementTransaction = {
-                moves: [
-                    {
-                        entityId: "b",
-                        from: { x: 11, y: 8 },
-                        to: { x: 10, y: 8 },
-                    },
-                    {
-                        entityId: "a",
-                        from: { x: 10, y: 8 },
-                        to: { x: 11, y: 8 },
-                    },
-                ],
-                isCycle: true,
-            };
-
-            // "a" is the requester in this cycle (a wanted to move to b's tile)
-            const committed = commitDisplacementTransaction(tx, root, 1, "a");
-
-            assert.strictEqual(committed, true);
-            assert.deepStrictEqual(a.worldPosition, { x: 11, y: 8 });
-            assert.deepStrictEqual(b.worldPosition, { x: 10, y: 8 });
-        });
-
-        it("sets pendingReplan on displaced entities but not on the requester", () => {
+        it("shoves onto the requester's tile and leaves the requester to step itself", () => {
             const { root } = createTestWorld();
             const requester = createAgent("requester", root, 10, 8);
-            const displaced = createAgent("displaced", root, 11, 8);
+            const b = createAgent("b", root, 11, 8);
 
-            // Clear initial pendingReplan so we can detect if it was re-set
-            const requesterAgent = getBehaviorAgent(requester)!;
-            const displacedAgent = getBehaviorAgent(displaced)!;
-            requesterAgent.pendingReplan = undefined;
-            displacedAgent.pendingReplan = undefined;
-
-            const tx: DisplacementTransaction = {
-                moves: [
-                    {
-                        entityId: "displaced",
-                        from: { x: 11, y: 8 },
-                        to: { x: 12, y: 8 },
-                    },
-                ],
-                isCycle: false,
-            };
-
-            commitDisplacementTransaction(tx, root, 1, "requester");
-
-            assert.ok(
-                displacedAgent.pendingReplan,
-                "Displaced entity should receive a replan request",
+            const committed = commitDisplacementTransaction(
+                shoveOne("b", { x: 11, y: 8 }, { x: 10, y: 8 }),
+                root,
+                1,
             );
+
+            assert.strictEqual(committed, true);
+            assert.deepStrictEqual(b.worldPosition, { x: 10, y: 8 });
+            assert.deepStrictEqual(requester.worldPosition, { x: 10, y: 8 });
+        });
+
+        it("shove replans its members and charges them no energy", () => {
+            const { root } = createTestWorld();
+            const displaced = createAgent("displaced", root, 11, 8);
+            displaced.setEcsComponent(createEnergyComponent(100));
+
+            commitDisplacementTransaction(
+                shoveOne("displaced", { x: 11, y: 8 }, { x: 12, y: 8 }),
+                root,
+                1,
+            );
+
+            assert.ok(getBehaviorAgent(displaced)!.pendingReplan);
             assert.strictEqual(
-                requesterAgent.pendingReplan,
-                undefined,
-                "Requester should NOT receive a replan (it manages its own moveTo action)",
+                displaced.getEcsComponent(EnergyComponentId)!.energy,
+                100,
             );
         });
 
-        it("beneficial swap charges energy, advances cached paths, and does not replan", () => {
+        it("rotation charges energy, advances routes, and does not replan", () => {
             const { root } = createTestWorld();
-            const a = createAgent("a", root, 10, 8);
-            const b = createAgent("b", root, 11, 8);
-            a.setEcsComponent(createEnergyComponent(100));
-            b.setEcsComponent(createEnergyComponent(100));
+            const { requester, members, rotation } = createTurningSquare(root);
+            const routesBefore = members.map((member) => {
+                const head = getBehaviorAgent(member)!.actionQueue[0];
+                assert.ok(head.type === "moveTo");
+                return [...head.cachedPath!];
+            });
 
-            // Each is heading into the other's tile, a head-on swap. Cached paths
-            // start with the tile each is about to step into.
-            const aAgent = getBehaviorAgent(a)!;
-            const bAgent = getBehaviorAgent(b)!;
-            aAgent.actionQueue = [
-                {
-                    type: "moveTo",
-                    target: { x: 15, y: 8 },
-                    cachedPath: [
-                        { x: 11, y: 8 },
-                        { x: 12, y: 8 },
-                    ],
-                },
-            ];
-            bAgent.actionQueue = [
-                {
-                    type: "moveTo",
-                    target: { x: 5, y: 8 },
-                    cachedPath: [
-                        { x: 10, y: 8 },
-                        { x: 9, y: 8 },
-                    ],
-                },
-            ];
-            aAgent.pendingReplan = undefined;
-            bAgent.pendingReplan = undefined;
-
-            const tx: DisplacementTransaction = {
-                moves: [
-                    {
-                        entityId: "b",
-                        from: { x: 11, y: 8 },
-                        to: { x: 10, y: 8 },
-                    },
-                    {
-                        entityId: "a",
-                        from: { x: 10, y: 8 },
-                        to: { x: 11, y: 8 },
-                    },
-                ],
-                isCycle: true,
-                beneficialSwap: true,
-            };
-
-            const committed = commitDisplacementTransaction(tx, root, 1, "a");
+            const committed = commitDisplacementTransaction(rotation, root, 1);
 
             assert.strictEqual(committed, true);
-            assert.deepStrictEqual(a.worldPosition, { x: 11, y: 8 });
-            assert.deepStrictEqual(b.worldPosition, { x: 10, y: 8 });
-
-            // Both members paid for their own step.
-            assert.strictEqual(
-                a.getEcsComponent(EnergyComponentId)!.energy,
-                99,
-            );
-            assert.strictEqual(
-                b.getEcsComponent(EnergyComponentId)!.energy,
-                99,
-            );
-
-            // Each continues its route. Consumed step sliced off, no replan.
-            assert.deepStrictEqual(aAgent.actionQueue[0], {
-                type: "moveTo",
-                target: { x: 15, y: 8 },
-                cachedPath: [{ x: 12, y: 8 }],
+            assert.deepStrictEqual(requester.worldPosition, { x: 12, y: 10 });
+            members.forEach((member, index) => {
+                const agent = getBehaviorAgent(member)!;
+                const head = agent.actionQueue[0];
+                assert.ok(head.type === "moveTo");
+                assert.deepStrictEqual(
+                    member.worldPosition,
+                    routesBefore[index][0],
+                );
+                assert.deepStrictEqual(
+                    head.cachedPath,
+                    routesBefore[index].slice(1),
+                );
+                assert.strictEqual(
+                    member.getEcsComponent(EnergyComponentId)!.energy,
+                    99,
+                );
+                assert.strictEqual(agent.pendingReplan, undefined);
             });
-            assert.deepStrictEqual(bAgent.actionQueue[0], {
-                type: "moveTo",
-                target: { x: 5, y: 8 },
-                cachedPath: [{ x: 9, y: 8 }],
-            });
-            assert.strictEqual(aAgent.pendingReplan, undefined);
-            assert.strictEqual(bAgent.pendingReplan, undefined);
+        });
+
+        it("rotation moves nobody when a member no longer heads where it did", () => {
+            const { root } = createTestWorld();
+            const { members, rotation } = createTurningSquare(root);
+            const lastMember = members[members.length - 1];
+            getBehaviorAgent(lastMember)!.pendingReplan = { kind: "replan" };
+            const positionsBefore = members.map((member) => ({
+                ...member.worldPosition,
+            }));
+
+            const committed = commitDisplacementTransaction(rotation, root, 1);
+
+            assert.strictEqual(committed, false);
+            assert.deepStrictEqual(
+                members.map((member) => member.worldPosition),
+                positionsBefore,
+            );
         });
     });
 });

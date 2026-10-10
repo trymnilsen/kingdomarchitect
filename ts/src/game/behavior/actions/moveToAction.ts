@@ -1,7 +1,7 @@
 import type { Point } from "../../../common/point.ts";
-import { pointEquals } from "../../../common/point.ts";
 import { log } from "../../../common/logging/logger.ts";
 import { resolveReach, type Reach } from "./reach.ts";
+import { hasArrived, stepAlongRoute } from "./moveRoute.ts";
 
 import {
     BehaviorAgentComponentId,
@@ -14,7 +14,6 @@ import {
 } from "../../component/movementStaminaComponent.ts";
 import { ResourceComponentId } from "../../component/resourceComponent.ts";
 import type { Entity } from "../../entity/entity.ts";
-import { applyStep } from "../../job/movementHelper.ts";
 import { getPathfindingGraph } from "../../map/path/getPathfindingGraph.ts";
 import type { GraphNode } from "../../map/path/graph/graph.ts";
 import { isTileAvailable } from "../../map/path/graph/weight.ts";
@@ -87,10 +86,8 @@ export function executeMoveToAction(
         return ActionComplete;
     }
 
-    // An entity that already moved this tick must not step again. That happens
-    // when it was advanced as part of a swap during another agent's turn.
-    // Waiting keeps net speed at one tile per tick and stops the swap's energy
-    // cost from being paid twice.
+    // Moved already when a rotation stepped it along during another agent's
+    // turn. One step per tick, and that one is paid for.
     const stamina = entity.getEcsComponent(MovementStaminaComponentId);
     if (stamina && hasMovedThisTick(stamina, tick)) {
         return ActionRunning;
@@ -204,13 +201,17 @@ export function executeMoveToAction(
                 locallyBlocked,
                 isGoal,
             );
-            if (resolution.kind === "continue") continue;
-            return resolution.value;
+            switch (resolution.kind) {
+                case "continue":
+                    continue;
+                case "result":
+                    return resolution.value;
+                case "cleared":
+                    break;
+            }
         }
 
-        // Tile is free, so step into it.
-        applyStep(entity, entity.worldPosition, nextPoint, tick);
-        action.cachedPath = action.cachedPath!.slice(1);
+        stepAlongRoute(entity, action, tick);
         log.info(
             `${entity.id} stepped to (${entity.worldPosition.x},${entity.worldPosition.y})`,
         );
@@ -232,17 +233,6 @@ export function executeMoveToAction(
  * the cap guards against bugs in the blocked-tile accumulation.
  */
 const MAX_REPLAN_ATTEMPTS = 10;
-
-function hasArrived(
-    position: Point,
-    target: Point,
-    isGoal: ((point: Point) => boolean) | undefined,
-): boolean {
-    if (isGoal) {
-        return isGoal(position);
-    }
-    return pointEquals(position, target);
-}
 
 /**
  * Returns a weight modifier that makes structures (non-road buildings and large
@@ -311,7 +301,9 @@ function planPath(
 }
 
 type DisplacementResolution =
-    { kind: "continue" } | { kind: "result"; value: ActionResult };
+    | { kind: "cleared" }
+    | { kind: "continue" }
+    | { kind: "result"; value: ActionResult };
 
 /**
  * Ensures `action.cachedPath` is populated, planning a fresh route when needed.
@@ -360,8 +352,6 @@ function ensureCachedPath(
 
 /**
  * Handles displacement negotiation for a tile occupied by other agents.
- * Returns "continue" to signal the caller should loop again with a fresh path,
- * or "result" with the ActionResult to return for this tick.
  */
 function resolveDisplacedTile(
     entity: Entity,
@@ -390,11 +380,8 @@ function resolveDisplacedTile(
     );
 
     if (result.kind === "wait") {
-        // The blocker is transient (walking, or about to (re)plan), so it will
-        // vacate on its own. Hold position and keep the cached path intact so we retry the same
-        // step next tick, rather than clearing it and replanning a detour. This is what
-        // makes a worker queue behind same-direction traffic and wait out a head-on
-        // partner that hasn't computed its path yet.
+        // Keeping the path, instead of planning a detour, is what makes workers
+        // queue behind traffic heading the same way
         log.debug(
             `${entity.id} waiting for transient blocker at (${nextPoint.x},${nextPoint.y})`,
         );
@@ -430,38 +417,27 @@ function resolveDisplacedTile(
         return { kind: "continue" };
     }
 
-    const committed = commitDisplacementTransaction(
-        result.transaction,
-        root,
-        tick,
-        entity.id,
-    );
-
-    if (committed) {
-        // Cycle: the transaction repositioned all entities atomically including us.
-        if (hasArrived(entity.worldPosition, action.target, isGoal)) {
-            log.info(
-                `${entity.id} displacement cycle committed, arrived at (${entity.worldPosition.x},${entity.worldPosition.y})`,
-            );
-            return { kind: "result", value: ActionComplete };
-        }
-        // Non-cycle: chain cleared the target tile, step into it.
-        if (!result.transaction.isCycle) {
-            applyStep(entity, entity.worldPosition, nextPoint, tick);
-            action.cachedPath = action.cachedPath!.slice(1);
-            log.debug(
-                `${entity.id} displaced chain, stepped to (${entity.worldPosition.x},${entity.worldPosition.y})`,
-            );
-            if (hasArrived(entity.worldPosition, action.target, isGoal)) {
-                return { kind: "result", value: ActionComplete };
-            }
-        }
+    if (!commitDisplacementTransaction(result, root, tick)) {
+        // Something moved since negotiation. That is timing, not a wall, so the
+        // path stays and the step is tried again next tick.
+        log.debug(`${entity.id} displacement transaction stale, waiting`);
         return { kind: "result", value: ActionRunning };
     }
 
-    // Stale transaction: world changed between negotiation and commit.
-    // Keep the cached path. A stale transaction is a timing issue and says
-    // nothing about whether the tile is passable.
-    log.debug(`${entity.id} displacement transaction stale, waiting`);
-    return { kind: "result", value: ActionRunning };
+    // Two walkers on one tile would break every rule that reads "the" agent
+    // on a tile, so a commit that leaves one behind is a bug to surface
+    const remaining = queryEntity(root, nextPoint).find((o) =>
+        o.hasComponent(BehaviorAgentComponentId),
+    );
+    if (remaining) {
+        log.error(
+            `${entity.id} ${result.kind} committed but ${remaining.id} still holds (${nextPoint.x},${nextPoint.y}), waiting`,
+        );
+        return { kind: "result", value: ActionRunning };
+    }
+
+    log.debug(
+        `${entity.id} ${result.kind} committed, (${nextPoint.x},${nextPoint.y}) is clear`,
+    );
+    return { kind: "cleared" };
 }

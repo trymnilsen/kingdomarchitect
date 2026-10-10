@@ -63,7 +63,26 @@ export function doMovement(
     }
 }
 
+/**
+ * A step the entity chose to take, so it pays for it. Every voluntary step goes
+ * through here, so anything a step should cause belongs here too.
+ */
 export function applyStep(
+    entity: Entity,
+    from: Point,
+    to: Point,
+    tick: number,
+): void {
+    relocate(entity, from, to, tick);
+    spendEntityEnergy(entity, 1);
+}
+
+/**
+ * Move an entity one tile without charging it. A worker shoved aside pays
+ * nothing for a step it did not choose. Recording the move still matters,
+ * since the one-move-per-tick guard reads it.
+ */
+export function relocate(
     entity: Entity,
     from: Point,
     to: Point,
@@ -78,5 +97,4 @@ export function applyStep(
         recordMove(stamina, tick);
         entity.invalidateComponent(MovementStaminaComponentId);
     }
-    spendEntityEnergy(entity, 1);
 }

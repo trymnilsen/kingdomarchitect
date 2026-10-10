@@ -28,10 +28,9 @@ import { queryEntity } from "../../map/query/queryEntity.ts";
  *
  *   - `transient` will vacate by itself: it is walking (a `moveTo` at its queue
  *     head, so it steps off next tick) or undecided (`pendingReplan` set:
- *     freshly spawned, or between actions). Never shoved. You wait for it, or
- *     swap if you are head-on. Shoving a walker throws away its route progress,
- *     and shoving an undecided worker pre-empts a choice it is one tick from
- *     making.
+ *     freshly spawned, or between actions). Never shoved, since that throws
+ *     away a walker's route or pre-empts a choice one tick from being made.
+ *     Waited for, unless it is part of a rotation.
  *   - `movedThisTick` is held by the one-move-per-tick gate. Free next tick, so
  *     the requester waits and retries.
  *   - `displaceable` has settled: idle (`cost` 0, yields for free) or on a
@@ -47,13 +46,8 @@ export type BlockerClass =
     | { kind: "immovable" };
 
 /**
- * Classify a blocking entity. See {@link BlockerClass} for what each kind means.
- *
- * The `pendingReplan` half of `transient` covers two workers that become
- * adjacent before either has a committed path. The first waits, and the swap
- * fires once the second plans. This depends on the behaviour system clearing
- * `pendingReplan` when a worker settles, since a settled worker must classify
- * as `displaceable`.
+ * Relies on the behaviour system clearing `pendingReplan` when a worker
+ * settles, or a settled worker would never classify as `displaceable`.
  */
 export function classifyBlocker(
     entity: Entity,

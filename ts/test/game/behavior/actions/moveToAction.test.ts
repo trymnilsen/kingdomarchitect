@@ -58,7 +58,7 @@ describe("moveToAction", () => {
             root.addChild(entity);
 
             // Simulate the entity having been advanced earlier this tick (e.g. via
-            // a beneficial swap committed during another agent's turn).
+            // a rotation committed during another agent's turn).
             const stamina = entity.getEcsComponent("MovementStamina")!;
             recordMove(stamina, 5);
 
