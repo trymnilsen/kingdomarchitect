@@ -34,7 +34,7 @@
         "pngjs": "^7.0.0",
         "prettier": "^3.9.9",
         "rollup": "^4.63.6",
-        "rollup-plugin-sourcemaps2": "^0.5.8",
+        "rollup-plugin-sourcemaps2": "^0.5.9",
         "typescript": "^7.0.2",
         "ws": "^8.22.0"
     }
