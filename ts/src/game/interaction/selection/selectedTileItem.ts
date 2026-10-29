@@ -1,5 +1,5 @@
-import { type Point } from "../../../common/point.ts";
-import { isTile, type GroundTile } from "../../map/tile.ts";
+import { pointEquals, type Point } from "../../../common/point.ts";
+import { type GroundTile } from "../../map/tile.ts";
 import { type SelectedWorldItem } from "./selectedWorldItem.ts";
 
 export class SelectedTileItem implements SelectedWorldItem {
@@ -21,13 +21,10 @@ export class SelectedTileItem implements SelectedWorldItem {
             y: 1,
         };
     }
-    isSelectedItem(item: unknown): boolean {
-        if (!isTile(item)) {
-            return false;
-        }
-
-        const xIsSame = this.groundTile.tileX === item.tileX;
-        const yIsSame = this.groundTile.tileY === item.tileY;
-        return xIsSame && yIsSame;
+    isSameItem(other: SelectedWorldItem): boolean {
+        return (
+            other instanceof SelectedTileItem &&
+            pointEquals(other.tilePosition, this.tilePosition)
+        );
     }
 }

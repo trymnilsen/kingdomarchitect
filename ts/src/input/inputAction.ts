@@ -7,6 +7,7 @@ export const InputActionType = {
     DOWN_PRESS: "DOWN_PRESS",
     ACTION_PRESS: "ACTION_PRESS",
     BACK_PRESS: "BACK_PRESS",
+    FOCUS_CYCLE_PRESS: "FOCUS_CYCLE_PRESS",
     MENU_PRESS: "MENU_PRESS",
     NUMBER_PRESS: "NUMBER_PRESS",
 } as const;

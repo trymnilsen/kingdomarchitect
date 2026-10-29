@@ -1,5 +1,4 @@
 import type { Point } from "../../../../common/point.ts";
-import type { RenderScope } from "../../../../rendering/renderScope.ts";
 import { EquipItemCommand } from "../../../../server/message/command/equipItemCommand.ts";
 import type { ComponentDescriptor } from "../../../../ui/declarative/ui.ts";
 import {
@@ -9,9 +8,7 @@ import {
 import { PlayerUnitComponentId } from "../../../component/playerUnitComponent.ts";
 import type { Entity } from "../../../entity/entity.ts";
 import { queryEntity } from "../../../map/query/queryEntity.ts";
-import { type GroundTile } from "../../../map/tile.ts";
-import { InteractionState } from "../../handler/interactionState.ts";
-import { drawSelectionCursor } from "../drawSelectionCursor.ts";
+import { CursorSelectionBaseState } from "../common/cursorSelectionBaseState.ts";
 import { uiScaffold } from "../../view/uiScaffold.ts";
 import { AlertMessageState } from "../common/alertMessageState.ts";
 
@@ -22,8 +19,7 @@ import { AlertMessageState } from "../common/alertMessageState.ts";
  * dispatches an EquipItemCommand routing the worker through the equip
  * planner.
  */
-export class EquipUnitSelectionState extends InteractionState {
-    private selectedPoint: Point | null = null;
+export class EquipUnitSelectionState extends CursorSelectionBaseState {
     private selection: Entity | null = null;
     private readonly sourceEntityId: string;
     private readonly itemId: string;
@@ -55,9 +51,7 @@ export class EquipUnitSelectionState extends InteractionState {
         });
     }
 
-    override onTileTap(tile: GroundTile): boolean {
-        const point = { x: tile.tileX, y: tile.tileY };
-        this.selectedPoint = point;
+    protected override onPick(point: Point): boolean {
         const candidates = queryEntity(this.context.root, point).filter(
             (entity) =>
                 entity.hasComponent(EquipmentComponentId) &&
@@ -67,9 +61,8 @@ export class EquipUnitSelectionState extends InteractionState {
         return true;
     }
 
-    override onDraw(context: RenderScope): void {
-        drawSelectionCursor(context, this.selectedPoint, !!this.selection);
-        super.onDraw(context);
+    protected override isPickValid(): boolean {
+        return !!this.selection;
     }
 
     private equip() {

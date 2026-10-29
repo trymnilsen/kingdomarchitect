@@ -7,6 +7,8 @@ import { InteractionHandler } from "../../../src/game/interaction/handler/intera
 import type { InteractionState } from "../../../src/game/interaction/handler/interactionState.ts";
 import { createRootEntity } from "../../../src/game/rootFactory.ts";
 import { TouchInput } from "../../../src/input/touchInput.ts";
+import type { InputActionType } from "../../../src/input/inputAction.ts";
+import type { Bounds } from "../../../src/common/bounds.ts";
 import { Camera } from "../../../src/rendering/camera.ts";
 import type { RenderScope } from "../../../src/rendering/renderScope.ts";
 import { UiRenderer } from "../../../src/ui/declarative/ui.ts";
@@ -38,12 +40,20 @@ export type GestureHarness = {
     mouseGesture(points: Point[]): void;
     /** A touch press followed by a system cancel instead of an up. */
     touchCancelGesture(down: Point, moves?: Point[]): void;
+    /** Presses a key the way the game's keyboard wiring does, then renders. */
+    key(action: InputActionType): void;
+    /** Where the HUD's keyboard focus is, or null when none is shown. */
+    hudFocus(): Bounds | null;
 };
 
 export function createGestureHarness(): GestureHarness {
     const rects: CapturedRect[] = [];
+    const camera = new Camera({ x: 800, y: 600 });
 
     const scopeBase = {
+        // World drawing, such as the selection frame, places itself through the
+        // scope's camera, so it is the same one input goes through.
+        camera,
         get size() {
             return { width: 800, height: 600 };
         },
@@ -76,7 +86,6 @@ export function createGestureHarness(): GestureHarness {
     const touchInput = new TouchInput(canvas.element);
     const uiRenderer = new UiRenderer(scope);
     const world = new EcsWorld(createRootEntity());
-    const camera = new Camera({ x: 800, y: 600 });
     const handler = new InteractionHandler(
         world,
         camera,
@@ -141,6 +150,13 @@ export function createGestureHarness(): GestureHarness {
                 canvas.fireTouch("touchmove", move);
             }
             canvas.fireTouch("touchcancel");
+        },
+        key(action) {
+            handler.onInput({ action, isShifted: false, value: "" });
+            render();
+        },
+        hudFocus() {
+            return uiRenderer.focus.focusedBounds();
         },
     };
 

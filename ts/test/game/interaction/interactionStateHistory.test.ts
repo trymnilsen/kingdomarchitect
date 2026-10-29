@@ -4,8 +4,8 @@ import { InteractionStateHistory } from "../../../src/game/interaction/handler/i
 import { InteractionState } from "../../../src/game/interaction/handler/interactionState.ts";
 import type { StateContext } from "../../../src/game/interaction/handler/stateContext.ts";
 
-// The history never calls into the context (only RootState.getView/getFocusGroups
-// would, and those are not invoked here), so an empty stand-in is sufficient.
+// The history never calls into the context (only RootState.getView
+// would, and it is not invoked here), so an empty stand-in is sufficient.
 const fakeContext = {} as unknown as StateContext;
 
 // Test double that records lifecycle calls. Extending the real base class keeps

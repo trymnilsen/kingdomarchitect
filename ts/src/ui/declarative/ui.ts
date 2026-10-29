@@ -1,23 +1,20 @@
-import type { Bounds } from "../../common/bounds.ts";
 import { log } from "../../common/logging/logger.ts";
 import { nameof } from "../../common/nameof.ts";
 import { addPoint, zeroPoint, type Point } from "../../common/point.ts";
 import type { RenderScope } from "../../rendering/renderScope.ts";
 import type { TextStyle } from "../../rendering/text/textStyle.ts";
-import type { Rectangle } from "../../common/structure/rectangle.ts";
+import {
+    boundsFromRectangle,
+    type Rectangle,
+} from "../../common/structure/rectangle.ts";
 import { fillUiSize, type UISize, zeroSize } from "../uiSize.ts";
-import { pointerChainAt } from "./pointerChain.ts";
+import {
+    focusCandidates,
+    pointerChainAt,
+    type FocusCandidate,
+} from "./interactiveNodes.ts";
 import { PointerTracker, type PointerFlags } from "./pointerTracker.ts";
-
-/** Converts an {x, y, width, height} rectangle to {x1, y1, x2, y2} bounds. */
-function rectangleToBounds(rectangle: Rectangle): Bounds {
-    return {
-        x1: rectangle.x,
-        y1: rectangle.y,
-        x2: rectangle.x + rectangle.width,
-        y2: rectangle.y + rectangle.height,
-    };
-}
+import { UiFocusGroup } from "./uiFocusGroup.ts";
 
 const isLayoutResult = (
     value: LayoutResult | ComponentDescriptor,
@@ -117,6 +114,10 @@ export type ComponentContext<P extends {}> = {
      * hit-test target. The handler runs when a press starts and ends on the
      * same component. You can use this hook with or without
      * {@link withPointerState}.
+     *
+     * Registering a handler also makes the component a keyboard focus target,
+     * and the action key runs the same handler, so anything tappable is
+     * reachable from the keyboard with no further opt-in.
      */
     withPointerTap: (handler: () => void) => void;
 };
@@ -191,19 +192,34 @@ type NodeHooks = {
     onTap?: () => void;
 };
 
+/**
+ * Renders a declarative component tree and routes pointer input to it. Its
+ * keyboard focus lives in {@link focus}, which pointer presses and renders
+ * keep up to date.
+ */
 export class UiRenderer {
     private currentTree: UiNode | null = null;
     private hooks: Map<UiNode, NodeHooks> = new Map();
     private renderScope: RenderScope;
     private pointer = new PointerTracker();
+    /** Keyboard focus over whatever the last render laid out. */
+    readonly focus = new UiFocusGroup(
+        () => this.collectFocusCandidates(),
+        (node) => this.runTap(node),
+    );
 
     constructor(renderScope: RenderScope) {
         this.renderScope = renderScope;
     }
 
     public renderComponent(topLevelDescriptor: ComponentDescriptor | null) {
-        const newDescriptor = topLevelDescriptor;
+        this.renderTree(topLevelDescriptor);
+        // Regions are only final after the draw, so focus catches up now.
+        // Components see any change on the next render.
+        this.focus.afterLayout();
+    }
 
+    private renderTree(newDescriptor: ComponentDescriptor | null) {
         const oldTree = this.currentTree;
         if (newDescriptor === null) {
             if (oldTree) {
@@ -241,6 +257,7 @@ export class UiRenderer {
      *     the press, like a world tap or a camera drag.
      */
     public onPointerDown(point: Point): boolean {
+        this.focus.hideForPointer(point);
         const chain = this.interactiveChainAt(point);
         this.pointer.beginCapture(chain);
         return chain.length > 0;
@@ -275,9 +292,7 @@ export class UiRenderer {
         // Innermost first: the deepest component that saw both down and up wins.
         for (let i = upChain.length - 1; i >= 0; i--) {
             const node = upChain[i];
-            const nodeHooks = this.hooks.get(node);
-            if (nodeHooks?.onTap && this.pointer.isCaptured(node)) {
-                nodeHooks.onTap();
+            if (this.pointer.isCaptured(node) && this.runTap(node)) {
                 break;
             }
         }
@@ -298,6 +313,33 @@ export class UiRenderer {
      */
     public onPointerCancel(): void {
         this.pointer.endCapture();
+    }
+
+    /**
+     * Runs the node's tap handler. Pointer release and keyboard activation both
+     * come through here so the two can't diverge.
+     * @returns false when the node has no handler this render
+     */
+    private runTap(node: UiNode): boolean {
+        const onTap = this.hooks.get(node)?.onTap;
+        if (!onTap) {
+            return false;
+        }
+        onTap();
+        return true;
+    }
+
+    /** Anything with a tap handler can take focus, the same as it can a tap. */
+    private collectFocusCandidates(): FocusCandidate[] {
+        if (!this.currentTree) {
+            return [];
+        }
+        const size = this.renderScope.size;
+        return focusCandidates(
+            this.currentTree,
+            { x: 0, y: 0, width: size.width, height: size.height },
+            (node) => this.hooks.get(node)?.onTap !== undefined,
+        );
     }
 
     /** Hit-tests the current tree for the interactive chain under `point`. */
@@ -520,7 +562,7 @@ export class UiRenderer {
         // self-consistent "this node clips to its bounds".
         if (node.layout.clip) {
             this.renderScope.drawWithClip(
-                rectangleToBounds(node.layout.region),
+                boundsFromRectangle(node.layout.region),
                 () => this._drawNodeContent(node, absolutePosition),
             );
         } else {
@@ -558,9 +600,10 @@ export class UiRenderer {
             this._cleanupNode(child);
         }
 
-        // Forget the node so one that's going away doesn't stay in the pressed
-        // set.
+        // Forget the node so one that's going away doesn't stay pressed, and
+        // so focus on it is moved to whatever replaces it.
         this.pointer.forget(node);
+        this.focus.forget(node);
         this.hooks.delete(node);
     }
 

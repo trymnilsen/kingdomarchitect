@@ -12,11 +12,11 @@ const BUTTON_PRESSED = "test-button-pressed";
 
 /**
  * A state exposing one declarative button, recording both button taps and the
- * fall-through taps that reach the state itself.
+ * fall-through presses that reach the world.
  */
 class ButtonState extends InteractionState {
     buttonTaps = 0;
-    stateTaps: Point[] = [];
+    tilePresses: Point[] = [];
 
     override getView(): ComponentDescriptor {
         return uiButton({
@@ -30,8 +30,8 @@ class ButtonState extends InteractionState {
         });
     }
 
-    override onTap(screenPosition: Point, _worldPosition: Point): boolean {
-        this.stateTaps.push(screenPosition);
+    override onTilePress(position: Point): boolean {
+        this.tilePresses.push(position);
         return false;
     }
 }
@@ -77,7 +77,7 @@ describe("InteractionHandler gestures", () => {
         });
         assert.strictEqual(state.buttonTaps, 1, "release inside taps");
         assert.strictEqual(
-            state.stateTaps.length,
+            state.tilePresses.length,
             0,
             "the UI consumed the gesture, the state never saw it",
         );
@@ -101,7 +101,7 @@ describe("InteractionHandler gestures", () => {
 
         assert.strictEqual(state.buttonTaps, 0, "no tap");
         assert.strictEqual(
-            state.stateTaps.length,
+            state.tilePresses.length,
             0,
             "the gesture is absorbed, it never falls through to the state",
         );

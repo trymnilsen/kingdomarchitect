@@ -1,16 +1,20 @@
-import { type Point, pointEquals } from "../../../common/point.ts";
+import { type Point, manhattanPath } from "../../../common/point.ts";
 import {
     type SelectionMode,
     type SelectionModeDescription,
 } from "./selectionMode.ts";
-import { log } from "../../../common/logging/logger.ts";
 
+/**
+ * Selects a manhattan line from a fixed start to the last point pressed. The
+ * start stays put so each press, or each arrow key moving the end, redraws the
+ * line to the new end instead of starting a new one from the old end.
+ */
 export class LineSelectionMode implements SelectionMode {
-    private from: Point;
+    private anchor: Point;
     private selection: Point[] = [];
 
     constructor(initialPoint: Point) {
-        this.from = initialPoint;
+        this.anchor = initialPoint;
         this.selection = [initialPoint];
     }
 
@@ -25,53 +29,11 @@ export class LineSelectionMode implements SelectionMode {
     }
 
     setSelection(point: Point): void {
-        if (pointEquals(this.from, point)) {
-            return;
-        }
-
-        const xRange = point.x - this.from.x;
-        const yRange = point.y - this.from.y;
-        const positions: Point[] = [];
-        log.info("SetSelection", { from: this.from, point, xRange, yRange });
-        // 1 is subtracted from the range to avoid pushing a duplicate
-        // position where the horizontal line (made here) and the
-        // vertical lines meet
-        for (let x = 0; x < Math.abs(xRange); x++) {
-            let direction = 1;
-            if (xRange < 0) {
-                direction = -1;
-            }
-
-            const xPosition = this.from.x + x * direction;
-            positions.push({
-                x: xPosition,
-                y: this.from.y,
-            });
-        }
-
-        for (let y = 0; y < Math.abs(yRange); y++) {
-            let direction = 1;
-            if (yRange < 0) {
-                direction = -1;
-            }
-
-            const yPosition = this.from.y + y * direction;
-            positions.push({
-                x: point.x,
-                y: yPosition,
-            });
-        }
-
-        positions.push(point);
-
-        //Filter out duplicates
-        this.selection = positions.filter(
-            (value, index, self) =>
-                index ===
-                self.findIndex((t) => t.x === value.x && t.y === value.y),
-        );
-        this.from = point;
+        const path = manhattanPath(this.anchor, point);
+        // Pressing the start again shrinks the line back to it
+        this.selection = path.length > 0 ? path : [this.anchor];
     }
+
     getSelection(): Point[] {
         return this.selection;
     }

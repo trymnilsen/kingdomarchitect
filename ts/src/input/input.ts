@@ -8,6 +8,7 @@ export type InputEvent = {
 };
 export const InputType = {
     Keyboard: 0,
+    Pointer: 1,
 } as const;
 
 export type InputType = (typeof InputType)[keyof typeof InputType];

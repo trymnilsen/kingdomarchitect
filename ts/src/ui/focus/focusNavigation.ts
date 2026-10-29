@@ -6,46 +6,95 @@ import {
     getCorners,
 } from "../../common/bounds.ts";
 import { Direction, invertDirection } from "../../common/direction.ts";
-import { InvalidArgumentError } from "../../common/error/invalidArgumentError.ts";
 import {
     closestPointOnLine,
     manhattanDistance,
     type Point,
 } from "../../common/point.ts";
-import { type FocusNode } from "./focusNode.ts";
 
 /**
- * Pick the node a directional input should move focus to.
+ * Anything focus can land on. Navigation only needs where a target is, so UI
+ * nodes and other targets share one algorithm.
+ */
+export type Spatial = {
+    bounds: Bounds;
+};
+
+/**
+ * Pick the target a directional input should move focus to.
  *
- * Callers supply the candidate set themselves. Collecting focusable nodes is
- * the job of whichever UI implementation owns the view tree, since only it
- * knows how to walk its own hierarchy.
+ * Callers supply the candidate set themselves. Collecting focusable targets is
+ * the job of whoever owns them, since only it knows how to walk its own
+ * hierarchy and which targets relate to the current one.
  *
- * @param focusableNodes every node currently eligible to receive focus
- * @param currentFocusBounds the bounds we are navigating away from
- * @param direction the direction of to look for nodes in
+ * @param candidates every target currently eligible to receive focus, not
+ *     including the one focus is moving away from
+ * @param from the bounds we are navigating away from
+ * @param direction the direction to look for targets in
  * @returns the best candidate, or null when nothing lies that way
  */
-export function getClosestFocusableNode(
-    focusableNodes: FocusNode[],
-    currentFocusBounds: Bounds,
+export function closestInDirection<T extends Spatial>(
+    candidates: readonly T[],
+    from: Bounds,
     direction: Direction,
-): FocusNode | null {
-    const adjacentNodes = getPrioritisedNodes(
-        focusableNodes,
-        currentFocusBounds,
-        direction,
+): T | null {
+    return nearestByEdge(
+        getPrioritisedNodes(candidates, from, direction),
+        from,
     );
+}
 
-    if (adjacentNodes.length > 0) {
-        const closestNode = closestNodeByEdge(
-            currentFocusBounds,
-            adjacentNodes,
-        );
-        return closestNode;
-    } else {
-        return null;
+/**
+ * The candidate with an edge closest to the center of `from`. Directional moves
+ * use it to choose within a direction, and focus recovery uses it to land next
+ * to where focus used to be, so both follow the same sense of "close".
+ */
+export function nearestByEdge<T extends Spatial>(
+    candidates: readonly T[],
+    from: Bounds,
+): T | null {
+    const fromPoint = boundsCenter(from);
+    let closest: T | null = null;
+    let closestDistance = Number.MAX_SAFE_INTEGER;
+
+    for (const candidate of candidates) {
+        for (const edge of getViewEdges(candidate.bounds)) {
+            const edgePoint = closestPointOnLine(
+                edge.start,
+                edge.end,
+                fromPoint,
+            );
+            const edgeDistance = manhattanDistance(fromPoint, edgePoint);
+            if (edgeDistance < closestDistance) {
+                closest = candidate;
+                closestDistance = edgeDistance;
+            }
+        }
     }
+
+    return closest;
+}
+
+/**
+ * Where focus lands when nothing guides it: the candidate whose top left corner
+ * is closest to the top left of the screen, roughly reading order.
+ */
+export function firstInReadingOrder<T extends Spatial>(
+    candidates: readonly T[],
+): T | null {
+    let first: T | null = null;
+    let firstDistance = Number.MAX_SAFE_INTEGER;
+    for (const candidate of candidates) {
+        const distance = manhattanDistance(
+            { x: 0, y: 0 },
+            { x: candidate.bounds.x1, y: candidate.bounds.y1 },
+        );
+        if (distance < firstDistance) {
+            first = candidate;
+            firstDistance = distance;
+        }
+    }
+    return first;
 }
 
 /**
@@ -178,11 +227,11 @@ export function getClosestFocusableNode(
  * @param direction the direction we are moving in
  * @returns a list view views that are considered the best candidates to move to
  */
-function getPrioritisedNodes(
-    focusableNodes: FocusNode[],
+function getPrioritisedNodes<T extends Spatial>(
+    focusableNodes: readonly T[],
     currentFocusBounds: Bounds,
     direction: Direction,
-): FocusNode[] {
+): T[] {
     const viewsInDirection = focusableNodes.filter((view) => {
         return isViewInDirection(
             view,
@@ -331,7 +380,7 @@ function isPointPastEdge(
  * @param direction the direction we a want to test against
  */
 function isViewInDirection(
-    view: FocusNode,
+    view: Spatial,
     origin: Point,
     direction: Direction,
 ): boolean {
@@ -339,41 +388,6 @@ function isViewInDirection(
         return isPointPastEdge(direction, corner, origin);
     });
     return hasCornerInDirection;
-}
-
-/**
- * Attempt to find the view in a list of views that has an _edge_ that is
- * considered closest to the from bounds. The center of fromBounds will be used
- * as the position to measure from.
- * @param fromBounds
- * @param views
- */
-function closestNodeByEdge(fromBounds: Bounds, views: FocusNode[]): FocusNode {
-    if (views.length == 0) {
-        throw new InvalidArgumentError("views cannot be empty");
-    }
-    const fromViewPoint = boundsCenter(fromBounds);
-    let closestView: FocusNode = views[0];
-    let closestViewDistance = Number.MAX_SAFE_INTEGER;
-
-    for (const view of views) {
-        const edges = getViewEdges(view.bounds);
-        for (const edge of edges) {
-            const edgePoint = closestPointOnLine(
-                edge.start,
-                edge.end,
-                fromViewPoint,
-            );
-
-            const edgeDistance = manhattanDistance(fromViewPoint, edgePoint);
-            if (edgeDistance < closestViewDistance) {
-                closestView = view;
-                closestViewDistance = edgeDistance;
-            }
-        }
-    }
-
-    return closestView;
 }
 
 function getViewEdges(view: Bounds): ViewEdge[] {

@@ -1,16 +1,22 @@
-import { type Point, pointEquals } from "../../../common/point.ts";
+import { type Point } from "../../../common/point.ts";
 import {
     type SelectionMode,
     type SelectionModeDescription,
 } from "./selectionMode.ts";
-import { log } from "../../../common/logging/logger.ts";
 
+/**
+ * Selects every tile in the box between a fixed corner and the last point
+ * pressed. The corner stays put so each press, or each arrow key moving the
+ * other corner, resizes the box instead of starting a new one.
+ */
 export class BoxSelectionMode implements SelectionMode {
-    private from: Point;
+    private anchor: Point;
+    private end: Point;
     private selection: Point[] = [];
 
     constructor(initialPoint: Point) {
-        this.from = initialPoint;
+        this.anchor = initialPoint;
+        this.end = initialPoint;
         this.selection = [initialPoint];
     }
 
@@ -21,21 +27,16 @@ export class BoxSelectionMode implements SelectionMode {
     }
 
     cursorSelection(): Point {
-        return this.from;
+        return this.end;
     }
 
     setSelection(point: Point): void {
-        if (pointEquals(this.from, point)) {
-            return;
-        }
-
-        const xRange = Math.abs(point.x - this.from.x);
-        const yRange = Math.abs(point.y - this.from.y);
-        const startX = Math.min(point.x, this.from.x);
-        const startY = Math.min(point.y, this.from.y);
+        const startX = Math.min(point.x, this.anchor.x);
+        const startY = Math.min(point.y, this.anchor.y);
+        const xRange = Math.abs(point.x - this.anchor.x);
+        const yRange = Math.abs(point.y - this.anchor.y);
 
         const positions: Point[] = [];
-        log.info("SetSelection", { from: this.from, point, xRange, yRange });
         for (let x = 0; x <= xRange; x++) {
             for (let y = 0; y <= yRange; y++) {
                 positions.push({
@@ -46,8 +47,9 @@ export class BoxSelectionMode implements SelectionMode {
         }
 
         this.selection = positions;
-        this.from = point;
+        this.end = point;
     }
+
     getSelection(): Point[] {
         return this.selection;
     }

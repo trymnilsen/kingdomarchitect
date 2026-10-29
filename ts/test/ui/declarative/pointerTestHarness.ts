@@ -4,6 +4,7 @@ import {
     UiRenderer,
     type ComponentDescriptor,
 } from "../../../src/ui/declarative/ui.ts";
+import type { UiFocusGroup } from "../../../src/ui/declarative/uiFocusGroup.ts";
 
 /**
  * A rectangle captured from the fake render scope. Backgrounds draw with
@@ -37,6 +38,8 @@ export type PointerHarness = {
     pointerCancel(): void;
     /** Rectangles drawn during the most recent render, in draw order. */
     rects: CapturedRect[];
+    /** The renderer's keyboard focus, driven the way the focus keys would. */
+    focus: UiFocusGroup;
 };
 
 /**
@@ -93,5 +96,6 @@ export function createPointerHarness(
         pointerUp: (point) => renderer.onPointerUp(point),
         pointerCancel: () => renderer.onPointerCancel(),
         rects,
+        focus: renderer.focus,
     };
 }

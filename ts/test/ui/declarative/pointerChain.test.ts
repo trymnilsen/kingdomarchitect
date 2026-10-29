@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
-import { pointerChainAt } from "../../../src/ui/declarative/pointerChain.ts";
+import { pointerChainAt } from "../../../src/ui/declarative/interactiveNodes.ts";
 import type { UiNode } from "../../../src/ui/declarative/ui.ts";
 import type { Rectangle } from "../../../src/common/structure/rectangle.ts";
 

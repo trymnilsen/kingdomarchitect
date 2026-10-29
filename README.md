@@ -30,13 +30,12 @@ You can either clone this repository and run it based on the instructions on how
 Tap the item you would like to select or activate
 
 #### Keyboard input
-- `WASD`: Use the W,A,S,D keys to move the cursor or selected items directionally
-- `Escape`: Go back, cancel or unselect
-- `E`: Activate the current selection or action
-- `1-9`: Activate the n'th actionbar button
-- `M`: Cycle between focus groups (e.g the action bar and selecting tiles in the world)
-- `J`: Activate the first secondary actionbar item
-- `K`: Activate the second secondary actionbar item
+- `WASD` or the arrow keys: Move focus. On the HUD this moves between buttons. In the world it moves the selection to the next tile
+- `E`, `Enter` or `Space`: Press the focused button, or press the selected tile again to cycle through what is stacked on it
+- `Tab` or `M`: Switch between the HUD and the world
+- `Q` or `Escape`: Go back, cancel or unselect
+
+Keyboard focus is hidden while using a pointer and comes back where the pointer was on the next key press.
 
 ## 📜 About the project
 Kingdom architects is intended to be a combined simulation and city building game around building your own kingdom and protecting it from hordes of evil monsters. Explore, build and complete quests. It is intended to be single or multi-player and playable both on mobile screens and desktop size clients. Your kingdom might last for decades or only seconds, who knows what the legends of your reign will be.

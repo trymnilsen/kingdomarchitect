@@ -10,17 +10,14 @@ import { attackFootprint } from "../../../combat/attackReach.ts";
 import { resolveAttackProfile } from "../../../combat/resolveAttackProfile.ts";
 import { findAttackableEntity } from "../../../combat/resolveTarget.ts";
 import type { Entity } from "../../../entity/entity.ts";
-import { type GroundTile } from "../../../map/tile.ts";
-import { InteractionState } from "../../handler/interactionState.ts";
 import { drawTileSetOverlay } from "../../overlay/drawTileSetOverlay.ts";
-import { drawSelectionCursor } from "../drawSelectionCursor.ts";
+import { CursorSelectionBaseState } from "../common/cursorSelectionBaseState.ts";
 import { uiScaffold, type ScaffoldButton } from "../../view/uiScaffold.ts";
 
 const reachFillColor = "rgba(228, 96, 72, 0.14)";
 const reachBoundaryColor = "rgba(228, 96, 72, 0.85)";
 
-export class AttackSelectionState extends InteractionState {
-    private selectedPoint: Point | null = null;
+export class AttackSelectionState extends CursorSelectionBaseState {
     private selection: Entity | null = null;
     private footprint: ReadonlySet<number> = new Set();
     private profile: AttackProfileDefinition;
@@ -67,11 +64,13 @@ export class AttackSelectionState extends InteractionState {
         return uiScaffold({ leftButtons: buttons });
     }
 
-    override onTileTap(tile: GroundTile): boolean {
-        const tappedPoint = { x: tile.tileX, y: tile.tileY };
-        this.selectedPoint = tappedPoint;
-        this.selection = this.findTarget(tappedPoint);
+    protected override onPick(point: Point): boolean {
+        this.selection = this.findTarget(point);
         return true;
+    }
+
+    protected override isPickValid(): boolean {
+        return !!this.selection;
     }
 
     override onDraw(context: RenderScope): void {
@@ -81,7 +80,6 @@ export class AttackSelectionState extends InteractionState {
             reachFillColor,
             reachBoundaryColor,
         );
-        drawSelectionCursor(context, this.selectedPoint, !!this.selection);
         super.onDraw(context);
     }
 

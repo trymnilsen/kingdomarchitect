@@ -1,14 +1,13 @@
 import { type Point } from "../../../common/point.ts";
 import { GameTime } from "../../gameTime.ts";
 import { AssetLoader } from "../../../asset/loader/assetLoader.ts";
+import { InputType } from "../../../input/input.ts";
 import {
     type InputAction,
     InputActionType,
 } from "../../../input/inputAction.ts";
 import { type OnTapEndEvent } from "../../../input/touchInput.ts";
-import { SelectedEntityItem } from "../selection/selectedEntityItem.ts";
-import { SelectedTileItem } from "../selection/selectedTileItem.ts";
-import { type SelectedWorldItem } from "../selection/selectedWorldItem.ts";
+import { type GroundTile } from "../../map/tile.ts";
 import type {
     ComponentDescriptor,
     UiRenderer,
@@ -21,7 +20,6 @@ import { fillUiSize } from "../../../ui/uiSize.ts";
 import { Camera } from "../../../rendering/camera.ts";
 import { RenderScope } from "../../../rendering/renderScope.ts";
 import { getTile, TileComponentId } from "../../component/tileComponent.ts";
-import { Entity } from "../../entity/entity.ts";
 import { SelectionState } from "../state/selection/selectionState.ts";
 import { CommitableInteractionStateChanger } from "./interactionStateChanger.ts";
 import { InteractionStateHistory } from "./interactionStateHistory.ts";
@@ -29,17 +27,27 @@ import { type StateContext } from "./stateContext.ts";
 import { WorldOverlays } from "../overlay/worldOverlays.ts";
 import type { GameSaveCapability } from "../../../server/gameServerConnection.ts";
 import type { GameCommand } from "../../../server/message/gameCommand.ts";
-import { queryEntity } from "../../map/query/queryEntity.ts";
-import { entitiesFrontToBack } from "../../component/spriteComponent.ts";
 import type { EcsWorld } from "../../../ecs/ecsWorld.ts";
 import { log } from "../../../common/logging/logger.ts";
 import { uiStatusBar } from "../view/uiStatusBar.ts";
+import { drawFocusCursor, drawSelectionCursor } from "../focus/drawCursor.ts";
+import { FocusController } from "../focus/focusController.ts";
+import { FocusDomain } from "../focus/focusDomain.ts";
+import { WorldSelectionFocusGroup } from "../focus/worldSelectionFocusGroup.ts";
+import { selectableItemsAt } from "../selection/selectableItemsAt.ts";
 
 const SCRIM_COLOR = "rgba(20, 20, 20, 0.8)";
 
 /**
- * The interactionHandler recieves input taps and forward them to the currently
- * active state. It also handles the transition and history of states.
+ * The interactionHandler recieves taps and key presses and forwards them to
+ * the currently active state. It also handles the transition and history of
+ * states.
+ *
+ * Pointer and keyboard meet in two places. On the HUD a key activating a
+ * button runs the same tap handler a pointer release does. In the world every
+ * press, from a tap or a key, goes through the world focus group to
+ * {@link pressTile}. Where the keys go between those two is up to the
+ * {@link FocusController}.
  */
 export class InteractionHandler {
     private camera: Camera;
@@ -48,6 +56,8 @@ export class InteractionHandler {
     private history: InteractionStateHistory;
     private stateContext: StateContext;
     private uiRenderer: UiRenderer;
+    private worldFocus: WorldSelectionFocusGroup;
+    private focus: FocusController;
     private stateInstanceCounter = 0;
     constructor(
         ecsWorld: EcsWorld,
@@ -63,6 +73,13 @@ export class InteractionHandler {
         this.interactionStateChanger = new CommitableInteractionStateChanger();
         this.camera = camera;
         this.world = ecsWorld;
+        this.worldFocus = new WorldSelectionFocusGroup(
+            camera,
+            ecsWorld.root,
+            () => this.history.state.getWorldSelection(),
+            (tile) => this.pressTile(tile),
+        );
+        this.focus = new FocusController(uiRenderer.focus, this.worldFocus);
         this.stateContext = {
             root: this.world.root,
             world: this.world,
@@ -77,136 +94,35 @@ export class InteractionHandler {
         this.history = new InteractionStateHistory(this.stateContext);
     }
 
+    /**
+     * @returns whether the handler owns the gesture. Otherwise dragging pans
+     *     the camera.
+     */
     onTapDown(screenPoint: Point): boolean {
-        // Press the declarative UI. Returns true when the press landed on an
-        // interactive component, which means the UI captured the pointer.
-        const declarativeHandled = this.uiRenderer.onPointerDown(screenPoint);
-        if (declarativeHandled) {
+        const state = this.history.state;
+        // Returns true when the press landed on an interactive component,
+        // which means the UI captured the pointer.
+        if (this.uiRenderer.onPointerDown(screenPoint)) {
+            this.focus.followPointer(FocusDomain.Hud, state);
             return true;
         }
 
-        const state = this.history.state;
-        //If the tap was not handled but the state is a modal it is still
-        //considered handled by the handler. so that tapping the faded overlay
-        //pops the state
-        if (state.isModal) {
-            return true;
-        } else {
-            return false;
-        }
+        // A modal owns the gesture even off its UI, so that tapping the faded
+        // overlay can pop it
+        return state.isModal;
     }
 
     onTapUp(tapUpEvent: OnTapEndEvent): void {
-        const screenPoint = tapUpEvent.position;
-
         // Release the declarative UI press. This runs the tap handler for the
         // component that was pressed and released, then clears the press.
-        let onTapResult = this.uiRenderer.onPointerUp(screenPoint);
+        const uiHandled = this.uiRenderer.onPointerUp(tapUpEvent.position);
 
-        const worldPosition = this.camera.screenToWorld(screenPoint);
-        const currentState = this.history.state;
-
-        // If declarative UI didn't handle it, check if state can handle it
-        if (!onTapResult) {
-            onTapResult = currentState.onTap(screenPoint, worldPosition);
+        // A drag that ends on the world was panning the camera, so it never
+        // selects or dismisses anything
+        if (!uiHandled && !tapUpEvent.wasDragging) {
+            this.pressWorldAt(tapUpEvent.position);
         }
-
-        // If the tap was not handled in the ui or by the state itself
-        // We will now check for either of the following:
-
-        // - The state is modal in which case this is considered a tap on the
-        // scrim and we should take the tap as a dismis
-        // - The state should check if there is a tile at the world position
-        // of the tap
-        if (!onTapResult && !tapUpEvent.wasDragging) {
-            if (currentState.isModal) {
-                // if the tap was not handled and the current route is a modal
-                // route we pop the state
-                log.debug("Tap was not handled by modal route, popping");
-                this.history.pop();
-                // Return to stop handling the tap more
-                return;
-            }
-
-            const tilePosition =
-                this.camera.worldSpaceToTileSpace(worldPosition);
-
-            // Check if a tile was clicked at this position
-            const tileComponent =
-                this.world.root.getEcsComponent(TileComponentId);
-
-            const tile = tileComponent
-                ? getTile(tileComponent, tilePosition)
-                : null;
-            let worldTapHandled = false;
-
-            if (tile) {
-                worldTapHandled = currentState.onTileTap(tile);
-            }
-
-            if (!worldTapHandled) {
-                log.debug("Tap not handled by state, checking for selection");
-
-                const entitiesAt = queryEntity(this.world.root, tilePosition);
-
-                // Cycle entities in the order they are stacked on screen, top
-                // first, so the click order matches what the player sees.
-                const orderedEntities = entitiesFrontToBack(entitiesAt);
-
-                const candidates: SelectedWorldItem[] = [
-                    ...orderedEntities.map((e) => new SelectedEntityItem(e)),
-                    ...(tile ? [new SelectedTileItem(tile)] : []),
-                ];
-
-                let selection: SelectedWorldItem | null = null;
-                if (candidates.length > 0) {
-                    const activeSelectionState =
-                        currentState instanceof SelectionState
-                            ? currentState
-                            : null;
-
-                    const currentTilePos =
-                        activeSelectionState?.selection.tilePosition;
-                    const isSameTile =
-                        currentTilePos !== undefined &&
-                        currentTilePos.x === tilePosition.x &&
-                        currentTilePos.y === tilePosition.y;
-
-                    if (isSameTile && activeSelectionState) {
-                        const current = activeSelectionState.selection;
-                        let currentIndex: number;
-                        if (current instanceof SelectedEntityItem) {
-                            currentIndex = orderedEntities.indexOf(
-                                current.entity,
-                            );
-                        } else {
-                            // Tile selection is at the end of the candidate list
-                            currentIndex = orderedEntities.length;
-                        }
-                        const nextIndex =
-                            currentIndex >= 0
-                                ? (currentIndex + 1) % candidates.length
-                                : 0;
-                        selection = candidates[nextIndex];
-                    } else {
-                        selection = candidates[0];
-                    }
-                }
-
-                if (selection) {
-                    const selectionState = new SelectionState(selection);
-                    if (this.history.size == 1) {
-                        this.interactionStateChanger.push(selectionState);
-                    } else {
-                        this.interactionStateChanger.replace(selectionState);
-                    }
-                } else {
-                    this.interactionStateChanger.clear();
-                }
-            }
-        }
-
-        this.interactionStateChanger.apply(this.history);
+        this.commitStateChanges(InputType.Pointer);
     }
 
     onTapPan(movement: Point, position: Point, startPosition: Point): void {
@@ -225,10 +141,10 @@ export class InteractionHandler {
     }
 
     onInput(inputAction: InputAction) {
-        const inputHandled = this.history.state.onInput(
-            inputAction,
-            this.interactionStateChanger,
-        );
+        const state = this.history.state;
+        const inputHandled =
+            state.onInput(inputAction, this.interactionStateChanger) ||
+            this.focus.handleKey(inputAction.action, state);
 
         if (
             !inputHandled &&
@@ -237,7 +153,105 @@ export class InteractionHandler {
         ) {
             this.interactionStateChanger.pop(undefined);
         }
+        this.commitStateChanges(InputType.Keyboard);
+    }
+
+    onUpdate(tick: number) {
+        this.history.state.onUpdate(tick);
+    }
+
+    onDraw(renderScope: RenderScope) {
+        const state = this.history.state;
+        this.stateContext.worldOverlays.draw(this.world.root, renderScope);
+        state.onDraw(renderScope);
+
+        // Drawn over the state's own world drawing, such as a building being
+        // placed or an attack's reach, so the selection is never hidden.
+        const worldSelection = state.getWorldSelection();
+        if (worldSelection) {
+            drawSelectionCursor(renderScope, worldSelection);
+        }
+
+        this.uiRenderer.renderComponent(this.buildHudView());
+
+        const hudFocus = this.uiRenderer.focus.focusedBounds();
+        if (hudFocus) {
+            drawFocusCursor(renderScope, hudFocus);
+        }
+    }
+
+    /**
+     * A pointer press that the HUD did not take. Over a modal it lands on the
+     * scrim and dismisses it, anywhere else it presses the tile beneath it.
+     */
+    private pressWorldAt(screenPoint: Point): void {
+        const state = this.history.state;
+        if (state.isModal) {
+            log.debug("Tap was not handled by modal route, popping");
+            this.interactionStateChanger.pop(undefined);
+            return;
+        }
+
+        this.focus.followPointer(FocusDomain.World, state);
+        const tile = this.camera.worldSpaceToTileSpace(
+            this.camera.screenToWorld(screenPoint),
+        );
+        this.worldFocus.pressTile(tile);
+    }
+
+    /**
+     * Every press on a world tile ends here, whether it came from a tap or a
+     * key. The state gets the first say, and a press it leaves selects what is
+     * on the tile.
+     */
+    private pressTile(position: Point): void {
+        const ground = this.groundAt(position);
+        if (this.history.state.onTilePress(position, ground)) {
+            return;
+        }
+        this.selectAt(position, ground);
+    }
+
+    /**
+     * Selects the topmost thing on the tile, or clears back to the root when
+     * there is nothing there. From the root the selection is pushed so back
+     * returns to it, from any other state it takes that state's place.
+     */
+    private selectAt(position: Point, ground: GroundTile | null): void {
+        const [topmost] = selectableItemsAt(this.world.root, position, ground);
+        if (!topmost) {
+            this.interactionStateChanger.clear();
+            return;
+        }
+
+        const selectionState = new SelectionState(topmost);
+        if (this.history.size == 1) {
+            this.interactionStateChanger.push(selectionState);
+        } else {
+            this.interactionStateChanger.replace(selectionState);
+        }
+    }
+
+    private groundAt(position: Point): GroundTile | null {
+        const tileComponent = this.world.root.getEcsComponent(TileComponentId);
+        if (!tileComponent) {
+            return null;
+        }
+        return getTile(tileComponent, position);
+    }
+
+    /**
+     * Commits the state operations queued during an input. Every state change
+     * goes through here, so it is the one place that sees transitions and
+     * can carry focus across them.
+     */
+    private commitStateChanges(source: InputType): void {
+        const previous = this.history.state;
         this.interactionStateChanger.apply(this.history);
+        const current = this.history.state;
+        if (current !== previous) {
+            this.focus.handOver(previous, current, source);
+        }
     }
 
     private getStateInstanceId(): number {
@@ -246,10 +260,6 @@ export class InteractionHandler {
             state.stateId = ++this.stateInstanceCounter;
         }
         return state.stateId;
-    }
-
-    onUpdate(tick: number) {
-        this.history.state.onUpdate(tick);
     }
 
     /**
@@ -296,22 +306,5 @@ export class InteractionHandler {
                 ? [uiScrim({ color: SCRIM_COLOR, key: "scrim" }), hudColumn]
                 : [hudColumn],
         });
-    }
-
-    onDraw(renderScope: RenderScope) {
-        //const start = performance.now();
-        //performance.mark("InteractionStateDraw");
-        this.stateContext.worldOverlays.draw(this.world.root, renderScope);
-        this.history.state.onDraw(renderScope);
-
-        this.uiRenderer.renderComponent(this.buildHudView());
-
-        //performance.mark("InteractionStateDrawEnd");
-        /*performance.measure(
-            "UI Drawing",
-            "InteractionStateDraw",
-            "InteractionStateDrawEnd",
-        );*/
-        //console.log("Interaction state draw", performance.now() - start);
     }
 }

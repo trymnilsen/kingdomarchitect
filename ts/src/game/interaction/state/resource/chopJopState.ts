@@ -1,5 +1,5 @@
 import { spriteRefs } from "../../../../asset/sprite.ts";
-import { type GroundTile } from "../../../map/tile.ts";
+import { type Point } from "../../../../common/point.ts";
 import { RenderScope } from "../../../../rendering/renderScope.ts";
 import { Entity } from "../../../entity/entity.ts";
 import { InteractionState } from "../../handler/interactionState.ts";
@@ -79,12 +79,7 @@ export class ChopJobState extends InteractionState {
         //this.view = scaffoldView;
     }
 
-    override onTileTap(tile: GroundTile): boolean {
-        const position = {
-            x: tile.tileX,
-            y: tile.tileY,
-        };
-
+    override onTilePress(position: Point): boolean {
         this.chopMode.setSelection(position);
         return true;
     }

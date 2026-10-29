@@ -1,6 +1,5 @@
 import { spriteRefs } from "../../../../asset/sprite.ts";
 import { type Point } from "../../../../common/point.ts";
-import type { RenderScope } from "../../../../rendering/renderScope.ts";
 import { SetPlayerCommand } from "../../../../server/message/command/setPlayerCommand.ts";
 import type { ComponentDescriptor } from "../../../../ui/declarative/ui.ts";
 import type { Entity } from "../../../entity/entity.ts";
@@ -8,20 +7,13 @@ import {
     checkFishingSpot,
     type FishingSpotCheck,
 } from "../../../fishing/checkFishingSpot.ts";
-import { type GroundTile } from "../../../map/tile.ts";
-import { InteractionState } from "../../handler/interactionState.ts";
-import { drawSelectionCursor } from "../drawSelectionCursor.ts";
+import { CursorSelectionBaseState } from "../common/cursorSelectionBaseState.ts";
 import { selectionInfoPanel } from "../selection/selectionInfoPanel.ts";
 import { uiScaffold, type ScaffoldButton } from "../../view/uiScaffold.ts";
 
-type TappedSpot = {
-    point: Point;
-    check: FishingSpotCheck;
-};
-
 // The panel says why a spot was refused, so a red cursor is never the only answer
-export class FishingSpotSelectionState extends InteractionState {
-    private tapped: TappedSpot | null = null;
+export class FishingSpotSelectionState extends CursorSelectionBaseState {
+    private check: FishingSpotCheck | null = null;
     private entity: Entity;
 
     override get stateName(): string {
@@ -35,7 +27,7 @@ export class FishingSpotSelectionState extends InteractionState {
 
     override getView(): ComponentDescriptor | null {
         const buttons: ScaffoldButton[] = [];
-        if (this.tapped?.check.isFishingSpot) {
+        if (this.check?.isFishingSpot) {
             buttons.push({
                 text: "Fish",
                 onClick: () => {
@@ -51,55 +43,47 @@ export class FishingSpotSelectionState extends InteractionState {
         });
         return uiScaffold({
             leftButtons: buttons,
-            content: spotPanel(this.tapped),
+            content: spotPanel(this.check),
         });
     }
 
-    override onTileTap(tile: GroundTile): boolean {
-        const point = { x: tile.tileX, y: tile.tileY };
-        this.tapped = {
-            point,
-            check: checkFishingSpot(this.context.root, point),
-        };
+    protected override onPick(point: Point): boolean {
+        this.check = checkFishingSpot(this.context.root, point);
         return true;
     }
 
-    override onDraw(context: RenderScope): void {
-        drawSelectionCursor(
-            context,
-            this.tapped?.point ?? null,
-            this.tapped?.check.isFishingSpot ?? false,
-        );
-        super.onDraw(context);
+    protected override isPickValid(): boolean {
+        return this.check?.isFishingSpot ?? false;
     }
 
     private fish() {
-        if (!this.tapped?.check.isFishingSpot) {
+        const target = this.pickedTile;
+        if (!target || !this.check?.isFishingSpot) {
             return;
         }
         this.context.commandDispatcher(
             SetPlayerCommand(this.entity.id, {
                 action: "fish",
-                target: this.tapped.point,
+                target,
             }),
         );
         this.context.stateChanger.clear();
     }
 }
 
-function spotPanel(tapped: TappedSpot | null): ComponentDescriptor {
-    if (!tapped) {
+function spotPanel(check: FishingSpotCheck | null): ComponentDescriptor {
+    if (!check) {
         return selectionInfoPanel({
             icon: spriteRefs.fish,
             title: "Pick a spot",
             subtitle: "Water at the edge of the bank",
         });
     }
-    if (!tapped.check.isFishingSpot) {
+    if (!check.isFishingSpot) {
         return selectionInfoPanel({
             icon: spriteRefs.fish,
             title: "Can't fish here",
-            subtitle: tapped.check.reason,
+            subtitle: check.reason,
         });
     }
     return selectionInfoPanel({

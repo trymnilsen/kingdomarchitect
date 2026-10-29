@@ -12,11 +12,32 @@ export type SelectedWorldItem = {
     get tilePosition(): Point;
     get selectionSize(): Point;
     /**
-     * Checks if the two items, the item wrapped by this class and the
-     * new item are refering to the same item. This check will be different
-     * based on the currently selected type. E.g selections might stretch across
-     * multiple tiles
-     * @param item the other item to check if is the selected item
+     * Whether the other selection wraps the same thing in the world. Each
+     * press makes new wrappers, so identity of the wrappers says nothing.
      */
-    isSelectedItem(item: unknown): boolean;
+    isSameItem(other: SelectedWorldItem): boolean;
 };
+
+/**
+ * Where a state's pick in the world is right now, and whether it is usable
+ * there. A worker selection is always usable while an empty tile picked as an
+ * attack target is not. The same item can be valid in one state and invalid in
+ * the next, so validity lives here rather than on the item.
+ */
+export type WorldSelection = {
+    tilePosition: Point;
+    selectionSize: Point;
+    isValid: boolean;
+};
+
+/** A pick that is only a tile position, such as a spot with no land on it. */
+export function tileWorldSelection(
+    tilePosition: Point,
+    isValid: boolean,
+): WorldSelection {
+    return {
+        tilePosition,
+        selectionSize: { x: 1, y: 1 },
+        isValid,
+    };
+}

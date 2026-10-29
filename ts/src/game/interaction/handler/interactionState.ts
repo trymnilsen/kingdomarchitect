@@ -1,22 +1,15 @@
 import { type Point } from "../../../common/point.ts";
-import { allSides } from "../../../common/sides.ts";
-import { spriteRefs } from "../../../asset/sprite.ts";
-import {
-    type InputAction,
-    InputActionType,
-    getDirectionFromInputType,
-} from "../../../input/inputAction.ts";
+import { type InputAction } from "../../../input/inputAction.ts";
 import { type GroundTile } from "../../map/tile.ts";
 import type { ComponentDescriptor } from "../../../ui/declarative/ui.ts";
-import { type UIEvent } from "../../../ui/event/uiEvent.ts";
-import { type FocusGroup } from "../../../ui/focus/focusGroup.ts";
 import { RenderScope } from "../../../rendering/renderScope.ts";
+import type { WorldSelection } from "../selection/selectedWorldItem.ts";
+import { FocusDomain } from "../focus/focusDomain.ts";
 // Full `import type` statements: these two modules import back into this one
 // (changer -> history -> root state -> this), so the edges must vanish at
 // runtime or loading this module first hits the cycle before the class exists.
 import type { InteractionStateChanger } from "./interactionStateChanger.ts";
 import type { StateContext } from "./stateContext.ts";
-import { log } from "../../../common/logging/logger.ts";
 
 /**
  * Interaction is built up as a simple state machine. Each state can via the
@@ -25,8 +18,6 @@ import { log } from "../../../common/logging/logger.ts";
  */
 export abstract class InteractionState {
     private _context: StateContext | undefined;
-    private _cachedFocusGroups: FocusGroup[] = [];
-    private _currentFocusGroupIndex = 0;
     public stateId?: number; // Unique identifier assigned by InteractionHandler
 
     /**
@@ -71,55 +62,36 @@ export abstract class InteractionState {
     }
 
     /**
-     * Retrieve the focus groups for this interaction state,
-     * defaults to return the root view if any. Implemented as a
-     * method and not a property to allow easy overriding.
+     * Where keyboard focus can be while this state is active, in the order the
+     * cycle key visits them. The first is where the keys go when the state
+     * opens. States about something in the world offer the world first.
      */
-    getFocusGroups(): FocusGroup[] {
-        /*
-        if (this._view) {
-            return [this._view];
-        } else {
-         */
-        return [];
-        //}
+    get focusDomains(): readonly FocusDomain[] {
+        return [FocusDomain.Hud];
     }
 
     /**
-     * Dispatch a UI event to the currently set view
+     * What this state has picked in the world, read every frame. It is the
+     * focus while the keys are on the world, and the interaction handler draws
+     * it as the world cursor, so a state reports its selection here instead of
+     * drawing a frame of its own.
      *
-     * This method is part of the old imperative UI system and is now deprecated
-     * in favor of the new declarative UI system. The InteractionHandler now
-     * dispatches events directly to the UiRenderer, bypassing InteractionState.
-     *
-     * @param event the event to dispatch to the view
-     * @returns if the event was handled or not
+     * States whose picks span several tiles with their own visuals, like
+     * placing a line of buildings, report only the tile the cursor is on.
      */
-    dispatchUIEvent(event: UIEvent): boolean {
-        // Old imperative UI system - commented out as we move to declarative UI
-        // The declarative UI system handles events directly in InteractionHandler
-        log.info("UI Event received in InteractionState (deprecated)", {
-            event,
-        });
-        return false;
+    getWorldSelection(): WorldSelection | null {
+        return null;
     }
 
     /**
-     * A tap has occured on a tile in the world. Will not be called if onTap has
-     * returned true indicating that is has handled it. (To avoid clicks on UI)
-     * elements also causing a selection of a tile behind.
-     * @param tile the tile that was tapped
+     * A tile in the world was pressed, by a tap the HUD did not take or by the
+     * keys moving or activating focus in the world. Presses the state does not
+     * take select what is on the tile.
+     * @param position the tile that was pressed
+     * @param ground the ground there, null where there is no land
+     * @returns whether the state took the press
      */
-    onTileTap(_tile: GroundTile): boolean {
-        return false;
-    }
-
-    /**
-     * A tap has occured on screen and it was not handled by the view
-     * @param screenPosition the position of the tap
-     * @returns if the tap was handled or not
-     */
-    onTap(_screenPosition: Point, _worldPosition: Point): boolean {
+    onTilePress(_position: Point, _ground: GroundTile | null): boolean {
         return false;
     }
 
@@ -132,17 +104,11 @@ export abstract class InteractionState {
      */
     onActive(): void {}
 
-    onFocusChanged(_focusGroup: FocusGroup) {}
-
     /**
      * Called when this state becomes inactive. Either from another state
      * becomming active on to or from being removed.
-     * Overriding implementions should call super.onInactive to ensure that
-     * the view is properly disposed
      */
-    onInactive(): void {
-        //this._view?.dispose();
-    }
+    onInactive(): void {}
 
     /**
      * Update method called consistently on each update
@@ -151,9 +117,9 @@ export abstract class InteractionState {
     onUpdate(_tick: number): void {}
 
     /**
-     * Called when its time to render/draw anything this state wants to.
-     * Make sure to call `super.OnDraw(...)` if this is overriden to show any
-     * views set.
+     * Called when its time to render/draw anything this state wants to in the
+     * world. The view returned by getView and the world selection are drawn by
+     * the interaction handler, not here.
      *
      * Note: this method has a varying frequency of updates. Any logic that
      * needs a consistent update cycle should be called in onUpdate
@@ -163,86 +129,17 @@ export abstract class InteractionState {
 
     /**
      * An input event has occured, like the directional keys or action key was
-     * pressed
+     * pressed. Runs before any generic handling of the input, so a state can
+     * claim a key for itself.
      * @param input the event that occured
      * @param stateChanger InteractionStateChanger that can be used to change
      * to a different state
-     * @returns if the tap has been handled or not
+     * @returns if the input has been handled or not
      */
     onInput(
-        input: InputAction,
+        _input: InputAction,
         _stateChanger: InteractionStateChanger,
     ): boolean {
-        const view = false;
-        const direction = getDirectionFromInputType(input.action);
-        if (!view) {
-            return false;
-        }
-
-        let consumedInput = false;
-        if (direction) {
-            const focusGroups = this._cachedFocusGroups;
-            const currentFocusIndex = this._currentFocusGroupIndex;
-            const currentFocusGroup = focusGroups[currentFocusIndex];
-            const currentFocusBounds = currentFocusGroup.getFocusBounds();
-
-            for (let i = currentFocusIndex; i < focusGroups.length; i++) {
-                const focusGroup = focusGroups[i];
-                const focusTaken = focusGroup.moveFocus(
-                    direction,
-                    currentFocusBounds,
-                );
-
-                if (focusTaken) {
-                    this._currentFocusGroupIndex = i;
-                    consumedInput = true;
-                    break;
-                }
-            }
-        }
-
-        if (input.action == InputActionType.ACTION_PRESS) {
-            const currentFocusGroup = this.getCurrentFocusGroup();
-            if (currentFocusGroup) {
-                currentFocusGroup.onFocusActionInput();
-            }
-        }
-
-        return consumedInput;
-    }
-
-    private drawFocus(context: RenderScope) {
-        const currentFocusGroup = this.getCurrentFocusGroup();
-        if (!currentFocusGroup) {
-            return;
-        }
-
-        const currentFocus = currentFocusGroup.getFocusBounds();
-        if (!!currentFocus && this._context) {
-            const width = currentFocus.x2 - currentFocus.x1;
-            const height = currentFocus.y2 - currentFocus.y1;
-
-            const sizeVariation = 2 - (this._context.gameTime.tick % 2) * 4;
-            context.drawNinePatchSprite({
-                sprite: spriteRefs.cursor,
-                height: height + sizeVariation,
-                width: width + sizeVariation,
-                scale: 1.0,
-                sides: allSides(12.0),
-                x: currentFocus.x1 + (this._context.gameTime.tick % 2) * 2,
-                y: currentFocus.y1 + (this._context.gameTime.tick % 2) * 2,
-            });
-        }
-    }
-
-    private getCurrentFocusGroup(): FocusGroup | null {
-        const index = this._currentFocusGroupIndex;
-        const focusGroups = this._cachedFocusGroups.length;
-
-        if (focusGroups === 0 || focusGroups <= index || index < 0) {
-            return null;
-        }
-
-        return this._cachedFocusGroups[index];
+        return false;
     }
 }

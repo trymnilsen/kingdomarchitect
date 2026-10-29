@@ -18,7 +18,7 @@ export class SelectedEntityItem implements SelectedWorldItem {
             y: 1,
         };
     }
-    isSelectedItem(item: unknown): boolean {
-        return item === this;
+    isSameItem(other: SelectedWorldItem): boolean {
+        return other instanceof SelectedEntityItem && other.entity === this.entity;
     }
 }

@@ -1,13 +1,18 @@
-import { withinRectangle } from "../../../../common/bounds.ts";
 import { Direction } from "../../../../common/direction.ts";
 import {
     encodePosition,
+    multiplyPoint,
     type Point,
+    pointEquals,
     shiftPoint,
 } from "../../../../common/point.ts";
 import { allSides } from "../../../../common/sides.ts";
 import { spriteRefs } from "../../../../asset/sprite.ts";
-import { ChunkDimension, ChunkSize } from "../../../map/chunk.ts";
+import {
+    ChunkDimension,
+    ChunkSize,
+    getChunkPosition,
+} from "../../../map/chunk.ts";
 import { TileSize } from "../../../map/tile.ts";
 import { RenderScope } from "../../../../rendering/renderScope.ts";
 import { hasChunk, TileComponentId } from "../../../component/tileComponent.ts";
@@ -62,24 +67,15 @@ export class LandUnlockState extends InteractionState {
         this.setUnlockableChunks();
     }
 
-    override onTap(screenPosition: Point, worldPosition: Point): boolean {
-        const unlockTap = this.unlockPoints.find((point) => {
-            return withinRectangle(
-                worldPosition,
-                point.x,
-                point.y,
-                point.x + ChunkDimension,
-                point.y + ChunkDimension,
-            );
-        });
+    // Unlockable chunks have no land yet, so presses are matched by position
+    override onTilePress(position: Point): boolean {
+        const chunk = getChunkPosition(position.x, position.y);
+        const unlockTap = this.unlockPoints.find((point) =>
+            pointEquals(point, multiplyPoint(chunk, ChunkDimension)),
+        );
 
         this.cursor = unlockTap ?? null;
-
-        if (!!unlockTap) {
-            return true;
-        } else {
-            return super.onTap(screenPosition, worldPosition);
-        }
+        return !!unlockTap;
     }
 
     private unlockSelected() {

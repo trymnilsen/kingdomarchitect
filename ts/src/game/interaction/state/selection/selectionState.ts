@@ -1,9 +1,13 @@
-import { spriteRefs } from "../../../../asset/sprite.ts";
-import { allSides } from "../../../../common/sides.ts";
+import { pointEquals, type Point } from "../../../../common/point.ts";
 import { RenderScope } from "../../../../rendering/renderScope.ts";
-import { TileSize } from "../../../map/tile.ts";
+import { type GroundTile, TileSize } from "../../../map/tile.ts";
+import { type FocusDomain, worldFirstFocus } from "../../focus/focusDomain.ts";
+import { selectableItemsAt } from "../../selection/selectableItemsAt.ts";
 import { SelectedEntityItem } from "../../selection/selectedEntityItem.ts";
-import { type SelectedWorldItem } from "../../selection/selectedWorldItem.ts";
+import {
+    type SelectedWorldItem,
+    type WorldSelection,
+} from "../../selection/selectedWorldItem.ts";
 import { InteractionState } from "../../handler/interactionState.ts";
 import { type ButtonCollection } from "../../view/buttonCollection.ts";
 import { type UIActionbarItem } from "../../view/uiActionbar.ts";
@@ -94,23 +98,43 @@ export class SelectionState extends InteractionState {
         // No need to manually update UI - declarative UI will re-render when getView() is called
     }
 
-    override onDraw(context: RenderScope): void {
-        super.onDraw(context);
-        const selection = this._selection;
-        const cursorWorldPosition = context.camera.tileSpaceToScreenSpace(
-            selection.tilePosition,
+    override get focusDomains(): readonly FocusDomain[] {
+        return worldFirstFocus;
+    }
+
+    override getWorldSelection(): WorldSelection {
+        return {
+            tilePosition: this._selection.tilePosition,
+            selectionSize: this._selection.selectionSize,
+            isValid: true,
+        };
+    }
+
+    /**
+     * Pressing the selected tile again moves on to the next thing stacked
+     * there, ending with the ground before starting over. A press anywhere
+     * else is left to the handler, which selects afresh.
+     */
+    override onTilePress(position: Point, ground: GroundTile | null): boolean {
+        if (!pointEquals(position, this._selection.tilePosition)) {
+            return false;
+        }
+
+        const items = selectableItemsAt(this.context.root, position, ground);
+        if (items.length == 0) {
+            return false;
+        }
+
+        const index = items.findIndex((item) =>
+            item.isSameItem(this._selection),
         );
+        const next = items[(index + 1) % items.length];
+        this.context.stateChanger.replace(new SelectionState(next));
+        return true;
+    }
 
-        context.drawNinePatchSprite({
-            sprite: spriteRefs.cursor,
-            height: selection.selectionSize.x * TileSize,
-            width: selection.selectionSize.y * TileSize,
-            scale: 1.0,
-            sides: allSides(12.0),
-            x: cursorWorldPosition.x,
-            y: cursorWorldPosition.y,
-        });
-
+    override onDraw(context: RenderScope): void {
+        const selection = this._selection;
         if (selection instanceof SelectedEntityItem) {
             drawSelectionOverlays(context, selection);
         }

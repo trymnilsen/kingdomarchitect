@@ -1,10 +1,18 @@
 import { findMapped } from "../../../../../common/array.ts";
-import { encodePosition, type Point } from "../../../../../common/point.ts";
+import {
+    encodePosition,
+    pointEquals,
+    type Point,
+} from "../../../../../common/point.ts";
 import { allSides } from "../../../../../common/sides.ts";
 import { type Building } from "../../../../../data/building/building.ts";
 import { spriteRefs } from "../../../../../asset/sprite.ts";
-import { type GroundTile, TileSize } from "../../../../map/tile.ts";
+import { TileSize } from "../../../../map/tile.ts";
 import type { ComponentDescriptor } from "../../../../../ui/declarative/ui.ts";
+import {
+    type FocusDomain,
+    worldFirstFocus,
+} from "../../../focus/focusDomain.ts";
 import { RenderScope } from "../../../../../rendering/renderScope.ts";
 import { getChunkPosition } from "../../../../map/chunk.ts";
 import {
@@ -16,14 +24,18 @@ import {
     TileComponentId,
 } from "../../../../component/tileComponent.ts";
 import { InteractionState } from "../../../handler/interactionState.ts";
+import {
+    tileWorldSelection,
+    type WorldSelection,
+} from "../../../selection/selectedWorldItem.ts";
 import { uiScaffold } from "../../../view/uiScaffold.ts";
 import { AlertMessageState } from "../../common/alertMessageState.ts";
 import { type BuildingApplicabilityResult } from "./buildingApplicability.ts";
 import { landApplicability } from "./applicability/landApplicability.ts";
 import { buildingApplicabilityList } from "./buildingApplicabilityList.ts";
-import { type BuildMode } from "./mode/buildMode.ts";
-import { LineBuildMode } from "./mode/lineBuildMode.ts";
-import { SingleBuildMode } from "./mode/singleBuildMode.ts";
+import { type SelectionMode } from "../../../selection/selectionMode.ts";
+import { LineSelectionMode } from "../../../selection/lineSelectionMode.ts";
+import { SingleSelectionMode } from "../../../selection/singleSelectionMode.ts";
 import { BuildCommand } from "../../../../../server/message/command/buildCommand.ts";
 import { queryEntity } from "../../../../map/query/queryEntity.ts";
 import { ResourceComponentId } from "../../../../component/resourceComponent.ts";
@@ -39,7 +51,7 @@ import { isDecorativeResource } from "../../../../../data/inventory/items/natura
  */
 export class BuildConfirmState extends InteractionState {
     private blinkScaffold = true;
-    private buildMode: BuildMode;
+    private buildMode: SelectionMode;
     private selection: SelectedTile[] = [];
     private building: Building;
     private cursorPosition: Point;
@@ -52,7 +64,7 @@ export class BuildConfirmState extends InteractionState {
         super();
         this.building = building;
         this.cursorPosition = cursorPosition;
-        this.buildMode = new SingleBuildMode(cursorPosition);
+        this.buildMode = new SingleSelectionMode(cursorPosition);
     }
 
     override onActive(): void {
@@ -82,7 +94,7 @@ export class BuildConfirmState extends InteractionState {
                             text: "Single",
                             onClick: () => {
                                 this.changeBuildMode(
-                                    new SingleBuildMode(
+                                    new SingleSelectionMode(
                                         this.buildMode.cursorSelection(),
                                     ),
                                 );
@@ -92,7 +104,7 @@ export class BuildConfirmState extends InteractionState {
                             text: "Line",
                             onClick: () => {
                                 this.changeBuildMode(
-                                    new LineBuildMode(
+                                    new LineSelectionMode(
                                         this.buildMode.cursorSelection(),
                                     ),
                                 );
@@ -149,7 +161,7 @@ export class BuildConfirmState extends InteractionState {
         }
     }
 
-    private changeBuildMode(mode: BuildMode) {
+    private changeBuildMode(mode: SelectionMode) {
         this.buildMode = mode;
     }
 
@@ -157,22 +169,9 @@ export class BuildConfirmState extends InteractionState {
         this.context.stateChanger.clear();
     }
 
-    override onTap(_screenPosition: Point, _worldPosition: Point): boolean {
-        /*
-        const isTileAtPosition = this.context.root
-            .requireComponent(TilesComponent)
-            .getTile(worldPosition);
-        */
-        //TODO: this was not used before, is it needed?
-        return false;
-    }
-
-    override onTileTap(tile: GroundTile): boolean {
-        const position = {
-            x: tile.tileX,
-            y: tile.tileY,
-        };
-
+    // Pressing past the land is still a pick, shown as unavailable, so a stray
+    // tap never throws away the placement
+    override onTilePress(position: Point): boolean {
         this.buildMode.setSelection(position);
         const newSelection = this.buildMode.getSelection();
         this.selection = newSelection.map((selectedTile) => {
@@ -192,7 +191,23 @@ export class BuildConfirmState extends InteractionState {
         this.blinkScaffold = !this.blinkScaffold;
     }
 
+    // The keys move where the building goes
+    override get focusDomains(): readonly FocusDomain[] {
+        return worldFirstFocus;
+    }
+
+    override getWorldSelection(): WorldSelection {
+        const cursor = this.buildMode.cursorSelection();
+        const cached = this.selection.find((selected) =>
+            pointEquals(selected, cursor),
+        );
+        const isAvailable =
+            cached?.isAvailable ?? this.isTileAvailable(cursor).isApplicable;
+        return tileWorldSelection(cursor, isAvailable);
+    }
+
     override onDraw(context: RenderScope): void {
+        const cursor = this.buildMode.cursorSelection();
         for (const selection of this.selection) {
             const buildingPosition =
                 context.camera.tileSpaceToScreenSpace(selection);
@@ -207,15 +222,17 @@ export class BuildConfirmState extends InteractionState {
                 });
             }
 
-            const cursorWidth = TileSize;
-            const cursorHeight = TileSize;
+            // The cursor tile is the world selection, framed by the handler
+            if (pointEquals(selection, cursor)) {
+                continue;
+            }
 
             context.drawNinePatchSprite({
                 sprite: selection.isAvailable
                     ? spriteRefs.cursor
                     : spriteRefs.cursor_red,
-                height: cursorHeight,
-                width: cursorWidth,
+                height: TileSize,
+                width: TileSize,
                 scale: 1.0,
                 sides: allSides(12.0),
                 x: buildingPosition.x,

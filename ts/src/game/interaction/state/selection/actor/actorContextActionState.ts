@@ -1,13 +1,11 @@
 import { type Point } from "../../../../../common/point.ts";
-import { allSides } from "../../../../../common/sides.ts";
-import { spriteRefs } from "../../../../../asset/sprite.ts";
 import { type GroundTile, TileSize } from "../../../../map/tile.ts";
 import { type SearchedNode } from "../../../../map/path/search.ts";
 import { queryPath } from "../../../../map/query/pathQuery.ts";
 import { RenderScope } from "../../../../../rendering/renderScope.ts";
 import type { ComponentDescriptor } from "../../../../../ui/declarative/ui.ts";
 import { Entity } from "../../../../entity/entity.ts";
-import { InteractionState } from "../../../handler/interactionState.ts";
+import { CursorSelectionBaseState } from "../../common/cursorSelectionBaseState.ts";
 import { uiScaffold, type ScaffoldButton } from "../../../view/uiScaffold.ts";
 import { getPathfindingGraph } from "../../../../map/path/getPathfindingGraph.ts";
 import { queryEntity } from "../../../../map/query/queryEntity.ts";
@@ -20,8 +18,7 @@ import { BehaviorAgentComponentId } from "../../../../component/behaviorAgentCom
 import { SetPlayerCommand } from "../../../../../server/message/command/setPlayerCommand.ts";
 import { log } from "../../../../../common/logging/logger.ts";
 
-export class ActorContextActionState extends InteractionState {
-    private selectedPoint: Point | null = null;
+export class ActorContextActionState extends CursorSelectionBaseState {
     private path: Point[] = [];
     private graph: SearchedNode[] = [];
     private currentSelection: SelectedWorldItem | null = null;
@@ -106,35 +103,37 @@ export class ActorContextActionState extends InteractionState {
         return buttons;
     }
 
-    override onTileTap(tile: GroundTile): boolean {
-        const toPoint = {
-            x: tile.tileX,
-            y: tile.tileY,
-        };
-        this.selectedPoint = toPoint;
+    protected override onPick(
+        toPoint: Point,
+        ground: GroundTile | null,
+    ): boolean {
         const atPoint = queryEntity(this.context.root, toPoint);
-
         if (atPoint.length > 0) {
             this.currentSelection = new SelectedEntityItem(atPoint[0]);
             return true;
-        } else {
-            this.currentSelection = new SelectedTileItem(tile);
-            const pathfindingGraph = getPathfindingGraph(this.context.root);
-            if (!pathfindingGraph) {
-                return false;
-            }
-
-            const path = queryPath(
-                pathfindingGraph,
-                this.entity.worldPosition,
-                toPoint,
-            );
-
-            this.path = path.path;
-            this.graph = path.graph;
-
-            return true;
         }
+
+        // Without land there is nowhere to walk to
+        if (!ground) {
+            return false;
+        }
+
+        this.currentSelection = new SelectedTileItem(ground);
+        const pathfindingGraph = getPathfindingGraph(this.context.root);
+        if (!pathfindingGraph) {
+            return false;
+        }
+
+        const path = queryPath(
+            pathfindingGraph,
+            this.entity.worldPosition,
+            toPoint,
+        );
+
+        this.path = path.path;
+        this.graph = path.graph;
+
+        return true;
     }
 
     override onDraw(context: RenderScope): void {
@@ -145,22 +144,6 @@ export class ActorContextActionState extends InteractionState {
                 width: 8,
                 height: 8,
                 fill: "pink",
-            });
-        }
-
-        if (this.selectedPoint) {
-            const cursorWorldPosition = context.camera.tileSpaceToScreenSpace(
-                this.selectedPoint,
-            );
-
-            context.drawNinePatchSprite({
-                sprite: spriteRefs.cursor,
-                height: TileSize,
-                width: TileSize,
-                scale: 1.0,
-                sides: allSides(12.0),
-                x: cursorWorldPosition.x,
-                y: cursorWorldPosition.y,
             });
         }
 
@@ -231,8 +214,14 @@ export class ActorContextActionState extends InteractionState {
         super.onDraw(context);
     }
 
+    protected override isPickValid(): boolean {
+        // Any tile is a place to walk to, and any entity on it one to work at
+        return true;
+    }
+
     private scheduleMovement() {
-        if (!this.selectedPoint) {
+        const targetPosition = this.pickedTile;
+        if (!targetPosition) {
             return;
         }
 
@@ -250,14 +239,14 @@ export class ActorContextActionState extends InteractionState {
         // Dispatch command to server to set player command
         const command = SetPlayerCommand(this.entity.id, {
             action: "move",
-            targetPosition: this.selectedPoint,
+            targetPosition,
         });
 
         this.context.commandDispatcher(command);
 
         log.info("Move command dispatched", {
             entityId: this.entity.id,
-            target: this.selectedPoint,
+            target: targetPosition,
         });
     }
 }

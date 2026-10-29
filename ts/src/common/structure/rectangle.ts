@@ -121,3 +121,12 @@ export function rectangleFromBounds(bounds: Bounds): Rectangle {
         height: size.y,
     };
 }
+
+export function boundsFromRectangle(rectangle: Rectangle): Bounds {
+    return {
+        x1: rectangle.x,
+        y1: rectangle.y,
+        x2: rectangle.x + rectangle.width,
+        y2: rectangle.y + rectangle.height,
+    };
+}
