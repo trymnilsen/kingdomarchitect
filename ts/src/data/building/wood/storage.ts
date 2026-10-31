@@ -35,13 +35,13 @@ export const warehouse: Building = {
     name: "Warehouse",
     scale: 2,
     raidValue: 100,
-    storageCapacity: 1200,
+    storageCapacity: 2000,
     requirements: {
         materials: {
             [woodResourceItem.id]: 40,
             [stoneResource.id]: 10,
             [planksItem.id]: 20,
-            [ironBarsItem.id]: 5,
+            [ironBarsItem.id]: 4,
         },
     },
 };

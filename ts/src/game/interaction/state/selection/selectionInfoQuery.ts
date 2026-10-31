@@ -5,7 +5,10 @@ import { getResourceById } from "../../../../data/inventory/items/naturalResourc
 import { getRoleDefinition } from "../../../../data/role/roleDefinitions.ts";
 import { AnimalComponentId } from "../../../component/animalComponent.ts";
 import { BehaviorAgentComponentId } from "../../../component/behaviorAgentComponent.ts";
-import { BuildingComponentId } from "../../../component/buildingComponent.ts";
+import {
+    BuildingComponentId,
+    type BuildingComponent,
+} from "../../../component/buildingComponent.ts";
 import {
     CollectableComponentId,
     hasCollectableItems,
@@ -16,7 +19,10 @@ import {
     FarmState,
 } from "../../../component/farmComponent.ts";
 import { GoblinUnitComponentId } from "../../../component/goblinUnitComponent.ts";
-import { InventoryComponentId } from "../../../component/inventoryComponent.ts";
+import {
+    InventoryComponentId,
+    type InventoryComponent,
+} from "../../../component/inventoryComponent.ts";
 import { ResourceComponentId } from "../../../component/resourceComponent.ts";
 import { RoleComponentId } from "../../../component/worker/roleComponent.ts";
 import { SpriteComponentId } from "../../../component/spriteComponent.ts";
@@ -42,6 +48,10 @@ import { SelectedEntityItem } from "../../selection/selectedEntityItem.ts";
 import { SelectedTileItem } from "../../selection/selectedTileItem.ts";
 import { type SelectedWorldItem } from "../../selection/selectedWorldItem.ts";
 import type { SelectionInfo } from "./selectionInfo.ts";
+import {
+    StockpileComponentId,
+    type StockpileComponent,
+} from "../../../component/stockpileComponent.ts";
 
 /**
  * Work out the title, subtitle and icon shown in the selection panel.
@@ -175,6 +185,16 @@ function entitySelectionInfo(
         };
     }
 
+    const stockpileComponent = entity.getEcsComponent(StockpileComponentId);
+    const inventoryComponent = entity.getEcsComponent(InventoryComponentId);
+    if (stockpileComponent && inventoryComponent) {
+        return {
+            icon,
+            title: name,
+            subtitle: stockpileSubtitle(stockpileComponent, inventoryComponent),
+        };
+    }
+
     let subtitle = "selected";
     const behaviorAgent = entity.getEcsComponent(BehaviorAgentComponentId);
     if (behaviorAgent) {
@@ -219,6 +239,17 @@ function entitySelectionInfo(
         title: name,
         materials,
     };
+}
+
+function stockpileSubtitle(
+    stockpile: StockpileComponent,
+    inventory: InventoryComponent,
+): string {
+    const amount = inventory.items.reduce((accumulator, item) => {
+        return accumulator + item.amount;
+    }, 0);
+
+    return `${amount} / ${stockpile.capacity} capacity`;
 }
 
 /**
