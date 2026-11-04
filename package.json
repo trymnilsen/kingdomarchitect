@@ -30,7 +30,7 @@
         "@types/node": "^26.6.5",
         "@types/pngjs": "^6.0.5",
         "@types/ws": "^8.18.2",
-        "maxrects-packer": "^2.7.3",
+        "maxrects-packer": "^3.0.0",
         "pngjs": "^7.0.0",
         "prettier": "^3.9.10",
         "rollup": "^4.63.6",
